@@ -77,10 +77,15 @@ private:
 
 
 // shared portion of a Signal
-//   The proxy just serves to hold the name of the signal and the object
-//   which is to be connected.  Actually, proxies are controlled by
-//   the template derivatives, which serve as gatekeepers for the
-//   types allowed on a particular signal.
+/** The SignalProxy provides an API similar to sigc::signal that can be used to
+ * connect sigc::slots to glib signals.
+ *
+ * This holds the name of the glib signal and the object
+ * which might emit it. Actually, proxies are controlled by
+ * the template derivatives, which serve as gatekeepers for the
+ * types allowed on a particular signal.
+ *
+ */
 class SignalProxyNormal : public SignalProxyBase
 {
 public:
@@ -96,14 +101,37 @@ public:
 #endif
 
 protected:
+
+  /** Create a proxy for a signal that can be emitted by @a obj.
+   * @param obj The object that can emit the signal.
+   * @param info Information about the signal, including its name, and the C callbacks that should be called by glib.
+   */
   SignalProxyNormal(Glib::ObjectBase* obj, const SignalProxyInfo* info);
 
+  /** Connects a signal to a generic signal handler. This is called by connect() in derived SignalProxy classes.
+   *
+   * @param slot The signal handler, usually created with sigc::mem_fun(), or sigc::ptr_fun().
+   * @param after Whether this signal handler should be called before or after the default signal handler.
+   */
   sigc::slot_base& connect_(const sigc::slot_base& slot, bool after);
+
+  /** Connects a signal to a signal handler without a return value.
+   * This is called by connect() in derived SignalProxy classes.
+   *
+   * By default, the signal handler will be called before the default signal handler,
+   * in which case any return value would be replaced anyway by that of the later signal handler.
+   *
+   * @param slot The signal handler, which should have a void return type, usually created with sigc::mem_fun(), or sigc::ptr_fun().
+   * @param after Whether this signal handler should be called before or after the default signal handler.
+   */
   sigc::slot_base& connect_notify_(const sigc::slot_base& slot, bool after);
 
 private:
   const SignalProxyInfo* info_;
 
+  //TODO: We could maybe replace both connect_ and connect_notify_ with this in future, because they don't do anything extra.
+  /** This is called by connect_ and connect_impl_.
+   */
   sigc::slot_base& connect_impl_(GCallback callback, const sigc::slot_base& slot, bool after);
 
   // no copy assignment
@@ -132,9 +160,24 @@ public:
   [SignalProxy]NUM($1)(ObjectBase* obj, const SignalProxyInfo* info)
     : SignalProxyNormal(obj, info) {}
 
+  /** Connects a signal to a signal handler.
+   * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
+   *
+   * @param slot The signal handler, usually created with sigc::mem_fun(), or sigc::ptr_fun().
+   * @param after Whether this signal handler should be called before or after the default signal handler.
+   */
   sigc::connection connect(const SlotType& slot, bool after = true)
     { return sigc::connection(connect_(slot, after)); }
 
+  /** Connects a signal to a signal handler without a return value.
+   * By default, the signal handler will be called before the default signal handler,
+   * in which case any return value would be replaced anyway by that of the later signal handler.
+   *
+   * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
+   *
+   * @param slot The signal handler, which should have a void return type, usually created with sigc::mem_fun(), or sigc::ptr_fun().
+   * @param after Whether this signal handler should be called before or after the default signal handler.
+   */
   sigc::connection connect_notify(const VoidSlotType& slot, bool after = false)
     { return sigc::connection(connect_notify_(slot, after)); }
 };

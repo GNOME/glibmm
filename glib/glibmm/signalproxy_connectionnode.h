@@ -32,12 +32,16 @@ namespace Glib
 {
 
 /** SignalProxyConnectionNode is a connection node for use with SignalProxy.
-  * It lives between the layer of Gtk+ and SigC++.
+  * It lives between the layer of Gtk+ and libsigc++.
   * It is very much an internal class.
   */
 class SignalProxyConnectionNode
 {
 public:
+
+  /** @param slot The signal handler for the GTK+ signal.
+   *
+   */
   SignalProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject);
 
   /** Callback that is executed when the slot becomes invalid.
@@ -50,7 +54,7 @@ public:
    * @param data The SignalProxyConnectionNode object (@p this).
    * @param closure The glib closure object.
    */
-  static void destroy_notify_handler(gpointer data, GClosure *closure);
+  static void destroy_notify_handler(gpointer data, GClosure* closure);
 
   gulong connection_id_;
   sigc::slot_base slot_;

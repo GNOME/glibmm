@@ -46,7 +46,7 @@ void* SignalProxyConnectionNode::notify(void* data)
   SignalProxyConnectionNode* conn = static_cast<SignalProxyConnectionNode*>(data);
 
   // if there is no object, this call was triggered from destroy_notify_handler().
-  if (conn->object_)
+  if(conn && conn->object_)
   {
     GObject* o = conn->object_;
     conn->object_ = 0;
@@ -70,7 +70,7 @@ void SignalProxyConnectionNode::destroy_notify_handler(gpointer data, GClosure*)
   SignalProxyConnectionNode* conn = static_cast<SignalProxyConnectionNode*>(data);
 
   // if there is no object, this call was triggered from notify().
-  if (conn->object_)
+  if (conn && conn->object_)
   {
     // the object has already lost track of this object.
     conn->object_ = 0;
