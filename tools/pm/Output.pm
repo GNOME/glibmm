@@ -476,11 +476,14 @@ sub output_wrap_property($$$$$$)
     {
        $proxy_suffix = "_ReadOnly";
     }
-    
-    $name =~ s/-/_/g;
 
-    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s)dnl\n",
+    # Convert - to _ so we can use it in C++ method and variable names:
+    my $name_underscored = $name;
+    $name_underscored =~ s/-/_/g;
+
+    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s)dnl\n",
       $name,
+      $name_underscored,
       $cpp_type,
       $proxy_suffix
     );
@@ -490,8 +493,9 @@ sub output_wrap_property($$$$$$)
     # If the property is not already read-only, then add a second const accessor for a read-only propertyproxy:
     if($proxy_suffix ne "_ReadOnly")
     {
-      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s)dnl\n",
+      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s)dnl\n",
         $name,
+        $name_underscored,
         $cpp_type,
         "_ReadOnly"
       );

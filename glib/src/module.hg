@@ -49,9 +49,9 @@ class Module
   _CLASS_GENERIC(Module, GModule)
   _IGNORE(g_module_open, g_module_close)
 
-public: 
-  /**
-   * Opens a module.
+public:
+ 
+  /** Opens a module.
    *
    * First of all it tries to open file_name as a module. If that
    * fails and file_name has the ".la"-suffix (and is a libtool
@@ -62,55 +62,58 @@ public:
    * doesn't have the ".la"-suffix, this suffix is appended and
    * it tries to open the corresponding module.
    *
-   * Check that gobj() != NULL to see whether this operation
-   * succeeded. glibmm 2.4 will have operator bool() to make this
-   * cleaner.
+   * Use operator bool() to see whether the operation succeeded. For instance,
+   * @code
+   * Glib::Module module("plugins/helloworld");
+   * if(module)
+   * {
+   *   void* func = 0;
+   *   bool found = get_symbol("some_function", func);
+   * }
+   * @endcode
    *
    * @param file_name The library filename to open
    * @param flags Flags to configure the load process
    */
   explicit Module(const std::string& file_name, ModuleFlags flags = ModuleFlags(0));
 
-  /**
-   * Close a module. The module will be removed from memory, unless
+  /** Close a module. The module will be removed from memory, unless
    * <tt>make_resident</tt> has been called.
    */
   virtual ~Module();
 
-  /**
-   * Checks if modules are supported on the current platform.
+  /** Check whether the module was found.
+   */
+  operator bool() const;
+
+  /** Checks if modules are supported on the current platform.
    * @returns true if available, false otherwise
    */
   _WRAP_METHOD(static bool get_supported(), g_module_supported)
 
-  /**
-   * Ensures that a module will never be unloaded. Any calls to the
+  /** Ensures that a module will never be unloaded. Any calls to the
    * Glib::Module destructor will not unload the module.
    */
   _WRAP_METHOD(void make_resident(), g_module_make_resident)
 
-  /**
-   * Gets a string describing the last module error.
+  /** Gets a string describing the last module error.
    * @returns The error string
    */
   _WRAP_METHOD(static std::string get_last_error(), g_module_error)
 
-  /**
-   * Gets a symbol pointer from the module.
+  /** Gets a symbol pointer from the module.
    * @param symbol_name The name of the symbol to lookup
    * @param symbol A pointer to set to the symbol
    * @returns True if the symbol was found, false otherwise.
    */
   _WRAP_METHOD(bool get_symbol(const std::string& symbol_name, void*& symbol) const, g_module_symbol)
 
-  /**
-   * Get the name of the module.
+  /** Get the name of the module.
    * @returns The name of the module
    */
   _WRAP_METHOD(std::string get_name() const, g_module_name)
 
-  /**
-   * A portable way to build the filename of a module. The
+  /** A portable way to build the filename of a module. The
    * platform-specific prefix and suffix are added to the filename, if
    * needed, and the result is added to the directory, using the
    * correct separator character.
