@@ -169,10 +169,32 @@ Object::Object()
 {
   // This constructor is ONLY for derived classes that are NOT wrappers of
   // derived C objects.  For instance, Gtk::Object should NOT use this
-  // constructor.  TODO: Remove the g_warning()
-  g_warning("Object::Object(): Did you really mean to call this?");
+  // constructor.
 
-  ObjectBase::initialize(static_cast<GObject*>(g_object_newv(G_TYPE_OBJECT, 0, 0)));
+  //g_warning("Object::Object(): Did you really mean to call this?");
+
+  // If Glib::ObjectBase has been constructed with a custom typeid, we derive
+  // a new GType on the fly.  This works because ObjectBase is a virtual base
+  // class, therefore its constructor is always executed first.
+
+  GType object_type = 0;
+  if(custom_type_name_ && !is_anonymous_custom_())
+  {
+    object_class_.init();
+    object_type = object_class_.clone_custom_type(custom_type_name_); //A type that is derived from GObject.
+  }
+  else
+    object_type = G_TYPE_OBJECT; //The default. Not very useful.
+
+  // Create a new GObject with the specified array of construct properties.
+  // This works with custom types too, since those inherit the properties of
+  // their base class.
+
+  void *const new_object = g_object_newv(object_type, 0, 0);
+
+  // Connect the GObject and Glib::Object instances.
+  ObjectBase::initialize(static_cast<GObject*>(new_object));
+
 }
 
 Object::Object(const Glib::ConstructParams& construct_params)
