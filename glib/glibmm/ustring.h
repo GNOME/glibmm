@@ -481,9 +481,29 @@ public:
 //! @name Retrieve the string's size.
 //! @{
 
-  bool      empty()  const;
+  /** Returns true if the string is empty. Equivalent to *this == "".
+   * @result Whether the string is empty.
+   */
+  bool empty()  const;
+
+  /** Returns the number of characters in the string, not including any null-termination.
+   * @result The number of UTF-8 characters.
+   *
+   * @see bytes(), empty() 
+   */
   size_type size()   const;
+
+  //We have length() as well as size(), because std::string has both.
+
+  /** This is the same as size().
+   */
   size_type length() const;
+  
+  /** Returns the number of bytes in the string, not including any null-termination.
+   * @result The number of bytes.
+   *
+   * @see size(), empty()
+   */
   size_type bytes()  const;
 
 //! @}

@@ -369,11 +369,11 @@ public:
 
   /** Passes the results of polling back to the main loop.
    * @param max_priority Maximum numerical priority of sources to check.
-   * @param timeout Location to store timeout to be used in polling.
    * @param fds Vector of Glib::PollFD's that was passed to the last call to query()
    * @return true if some sources are ready to be dispatched.
    */
   bool check(int max_priority, std::vector<PollFD>& fds);
+
   /** Dispatches all pending sources.
    */
   void dispatch();
@@ -584,12 +584,12 @@ protected:
 
   /** Adds a file descriptor to the set of file descriptors polled for this source. 
    * The event source's check function will typically test the revents field in the PollFD  and return true if events need to be processed.
-   * @param fd A PollFD object holding information about a file descriptor to watch.
+   * @param poll_fd A PollFD object holding information about a file descriptor to watch.
    */
   void add_poll(PollFD& poll_fd);
   
   /** Removes a file descriptor from the set of file descriptors polled for this source.
-   * @param fd A PollFD object previously passed to add_poll(). 
+   * @param poll_fd A PollFD object previously passed to add_poll(). 
    */
   void remove_poll(PollFD& poll_fd);
 
