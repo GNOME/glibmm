@@ -68,8 +68,6 @@ void* SignalProxyConnectionNode::notify(void* data)
       g_signal_handler_disconnect(o, connection_id);
     }
   }
-  else if(conn && !conn->object_)
-    g_warning("SignalProxyConnectionNode::notify(): called without gobject");
 
   return 0; // apparently unused in libsigc++
 }
