@@ -22,13 +22,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <iostream>
+#include <string>
 
 #include "fdstream.h"
 
 fdstream input_stream;
 Glib::RefPtr<Glib::MainLoop> mainloop;
-
-//int read_fd;
 
 /*
   send to the fifo with:

@@ -15,6 +15,40 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+/*
+ * The fdstream/fdstreambuf example classes provide a streambuffer
+ * interface for Glib::IOChannel, so that standard iostreams can be
+ * used with fifos, pipes and sockets, with safe temporary files
+ * opened with mkstemp() and with files opened with other system
+ * functions such as Unix open().
+ * 
+ * It does not make use of the Glib::IOChannel automatic charset code
+ * conversion facilities (which when enabled will convert from UTF-8
+ * to the locale codeset when writing out, and vice-versa when reading
+ * in).  Such automatic codeset conversion is usually undesirable as
+ * it makes the target file unportable - a file written out in the
+ * locale charset can only be used by those expecting the same locale
+ * codeset.  It is also unnecessary as the <<() and >>() operators for
+ * Glib::ustring already carry out this codeset conversion (to avoid
+ * this use Glib::ustring::raw() when writing out to a stream via
+ * operator <<(), and read in via a std::string object with operator
+ * >>()).
+ *
+ * If an automatic codeset conversion option is thought to be
+ * valuable, it would be possible to provide this by having a read
+ * buffer in fdstreambuf large enough to take and putback six bytes
+ * (the largest space occupied by a UTF-8 character).  This would
+ * require rewriting fdstreambuf::underflow(), but in compensation
+ * fdstreambuf::xsgetn() could be omitted, as if a read buffer were
+ * provided then std::streambuf::xsgetn() would be adequate for the
+ * purpose by itself.
+ *
+ * A serious implementation would probably also provide separate
+ * read-only ifdstream classes and write-only ofdstream classes, as
+ * fdstream provides both read and write facilities.
+*/
+
+
 #ifndef GLIBMMEXAMPLE_FDSTREAM_H
 #define GLIBMMEXAMPLE_FDSTREAM_H
 
@@ -23,18 +57,24 @@
 #include <streambuf>
 #include <glibmm/iochannel.h>
 
-class fdstreambuf : public std::streambuf
+struct fdstream_error
+{
+  bool error;
+  Glib::IOChannelError::Code code;  
+};
+
+class fdstreambuf: public std::streambuf
 {
 public:
-  fdstreambuf(int fd, bool manage, bool convert);
+  fdstreambuf(int fd, bool manage);
   fdstreambuf();
+  ~fdstreambuf();
 
-  // see comments in fdstream class definition about the convert argument
-  // in fdstreambuf::fdstreambuf() and fdstreambuf::create_iochannel
-  void create_iochannel(int fd, bool manage, bool convert);
+  void create_iochannel(int fd, bool manage);
+  void detach_fd();
   void close_iochannel();
   void connect(const sigc::slot<bool, Glib::IOCondition>& callback, Glib::IOCondition condition);
-
+  fdstream_error get_error() const;
 
 protected:
   virtual int_type underflow();
@@ -45,16 +85,14 @@ protected:
 
 private:
   Glib::RefPtr<Glib::IOChannel> iochannel_;
-  bool manage_;
+  fdstream_error error_condition;
 
-  // pushback_buffer does not do any buffering: it reserves one character
-  // for pushback and one character for a peek() and/or for bumping
+  // putback_buffer does not do any buffering: it reserves one character
+  // for putback and one character for a peek() and/or for bumping
   // with sbumpc/uflow()
-  char_type pushback_buffer[2];
+  char putback_buffer[2];
 
-  void reset() {
-    setg(pushback_buffer + 1, pushback_buffer + 1, pushback_buffer + 1);
-  }
+  void reset();
 };
 
 class fdstream : 
@@ -63,24 +101,18 @@ class fdstream :
 {
 public:
 
-  explicit fdstream(int fd, bool manage = true, bool convert = false);
+  explicit fdstream(int fd, bool manage = true);
   fdstream();
 
-  // NOTE: in fdstream::attach() and fdstream::fdstream()
-  // you do not want to set convert to true if you are using
-  // Glib::ustring, as operator << and >> for Glib::ustring
-  // do their own conversion.  If it is set, the IOChannel buffer
-  // will convert to the user's locale when writing to or reading
-  // from the filedescriptor. If in doubt, leave the default
-  // value of false.
-
   // If fdstream is managing a file descriptor, attaching a new
-  // one will close the old one
-  void attach(int fd, bool manage = true, bool convert = false);
+  // one will close the old one - call detach() to unmanage it
+  void attach(int fd, bool manage = true);
+  void detach();
 
   void close();
   void connect(const sigc::slot<bool, Glib::IOCondition>& callback,
 	       Glib::IOCondition condition);
+  fdstream_error get_error() const;
 
 private:
   fdstreambuf buf;
