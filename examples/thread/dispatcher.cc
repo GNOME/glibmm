@@ -159,7 +159,7 @@ void Application::on_progress_finished(ThreadProgress* thread_progress)
 } // anonymous namespace
 
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
   Glib::thread_init();
 

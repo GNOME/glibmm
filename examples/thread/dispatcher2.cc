@@ -213,7 +213,7 @@ void Dispatcher::end()
 } // anonymous namespace
 
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
   Glib::thread_init();
   main_loop = Glib::MainLoop::create();
