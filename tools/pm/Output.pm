@@ -86,20 +86,30 @@ sub output_wrap_vfunc_h($$$$$)
 {
   my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc) = @_;
 
-  my $str = sprintf("_VFUNC_H(%s,%s,\`%s\')dnl\n",
-    $$objCppfunc{name},
-    $$objCppfunc{rettype},
-    $objCppfunc->args_types_and_names()
-   );
-  $self->append($str);
+#TODO: We can probably remove _VFUNC_H from the .m4 file
+#  my $str = sprintf("_VFUNC_H(%s,%s,\`%s\',%s)dnl\n",
+#    $$objCppfunc{name},
+#    $$objCppfunc{rettype},
+#    $objCppfunc->args_types_and_names(),
+#    $objCppfunc->get_is_const()
+#   );
+#  $self->append($str);
 
-  #The default callback, which will call *_impl, which will then call the base default callback.
+  my $cppVfuncDecl = "virtual " . $$objCppfunc{rettype} . " " . $$objCppfunc{name} . "(" . $objCppfunc->args_types_and_names() . ")";
+  if($objCppfunc->get_is_const())
+  {
+    $cppVfuncDecl .= " const";
+  }
+
+  $self->append("  $cppVfuncDecl;");
+
+  #The default callback, which will call *_vfunc, which will then call the base default callback.
   #Declares the callback in the private *Class class and sets it in the class_init function.
 
   my $str = sprintf("_VFUNC_PH(%s,%s,\`%s\')dnl\n",
     $$objCDefsFunc{name},
     $$objCDefsFunc{rettype},
-    $objCDefsFunc->args_types_and_names()
+    $objCDefsFunc->args_types_and_names(),
    );
   $self->append($str);
 }
@@ -125,6 +135,7 @@ sub output_wrap_vfunc_cc($$$$$$)
     $$objDefsSignal{rettype},
     $objCppfunc->args_types_and_names(),
     convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num), #$objCppfunc->args_names_only(),
+    $objCppfunc->get_is_const(),
     $refreturn);
 
   $self->append($str);
@@ -327,22 +338,6 @@ sub output_wrap_create($$$)
   $self->append($str)
 }
 
-# _SIGNAL_IMPL(return_type,func_name,`<args>',cname)
-# sub output_wrap_sig_impl($$$$)
-# {
-#  my ($self, $filename, $line_num, $objCppfunc) = @_;
-#
-#   my $str;
-#   $str = sprintf("_SIGNAL_IMPL(%s,%s,\`%s\')dnl\n",
-#     $$objCppfunc{rettype},
-#     $$objCppfunc{name},
-#     $objCppfunc->args_types_only()
-#    );
-#
-#   $self->append($str);
-# }
-
-
 # void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name)
 # custom_signalproxy_name is "" when no type conversion is required - a normal templates SignalProxy will be used instead.
 sub output_wrap_sig_decl($$$$$$)
@@ -484,9 +479,22 @@ sub output_wrap_property($$$$$$)
       $name,
       $cpp_type,
       $proxy_suffix
-     );
-
+    );
     $self->append($str);
+    $self->append("\n");
+
+    # If the property is not already read-only, then add a second const accessor for a read-only propertyproxy:
+    if($proxy_suffix ne "_ReadOnly")
+    {
+      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s)dnl\n",
+        $name,
+        $cpp_type,
+        "_ReadOnly"
+      );
+      $self->append($str);
+    }
+
+    
   }
 }
 

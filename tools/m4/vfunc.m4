@@ -75,20 +75,25 @@ ifelse($4,void,,`dnl
 _POP()')
 
 
-#                $1      $2       $3
-# _VFUNC_H(vfunc_name,rettype,`<cppargs>')
+#                $1      $2       $3           $4
+# _VFUNC_H(vfunc_name, rettype, `<cppargs>', is_const)
 #
 define(`_VFUNC_H',`dnl
 _PUSH(SECTION_H_VFUNCS)
-  virtual $2 $1`'($3);
+ifelse($4,`1',`dnl
+virtual $2 $1`'($3) const;
+',`dnl
+virtual $2 $1`'($3);
+')
+ 
 _POP()')
 
-#                $1        $2        $3           $4          $5            $6         $7
-# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', refreturn)
+#                $1        $2        $3           $4          $5            $6         $7          $8
+# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn)
 #
 define(`_VFUNC_CC',`dnl
 _PUSH(SECTION_CC_VFUNCS)
-$3 __NAMESPACE__::__CPPNAME__::$1`'($5)
+$3 __NAMESPACE__::__CPPNAME__::$1`'($5) ifelse($7,1,const,)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
@@ -100,12 +105,12 @@ dnl  g_assert(base != 0);
 
   if(base && base->$2)
 ifelse($3,void,`dnl
-    (*base->$2)`'(gobj()`'_COMMA_PREFIX($6));
+    (*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6));
 ',`dnl
-ifelse($7,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requested.
-    return Glib::wrap((*base->$2)`'(gobj`'()`'_COMMA_PREFIX($6)), true);
+ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requested.
+    return Glib::wrap((*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6)), true);
 ',`dnl
-    return _CONVERT($4,$3,`(*base->$2)`'(gobj`'()`'_COMMA_PREFIX($6))');
+    return _CONVERT($4,$3,`(*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6))');
 ')dnl
 
   typedef $3 RType;

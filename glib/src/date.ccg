@@ -165,6 +165,18 @@ Date& Date::clamp(const Date& min_date, const Date& max_date)
   return *this;
 }
 
+Date& Date::clamp_min(const Date& min_date)
+{
+  g_date_clamp(&gobject_, &min_date.gobject_, 0 /* see the C docs */);
+  return *this;
+}
+
+Date& Date::clamp_max(const Date& max_date)
+{
+  g_date_clamp(&gobject_, 0 /* see the C docs */, &max_date.gobject_);
+  return *this;
+}
+
 void Date::order(Date& other)
 {
   g_date_order(&gobject_, &other.gobject_);

@@ -339,5 +339,12 @@ sub get_refdoc_comment($)
   return $str;
 }
 
+sub get_is_const($)
+{
+  my ($self) = @_;
+
+  return $$self{const};
+}
+
 1; # indicate proper module load.
 

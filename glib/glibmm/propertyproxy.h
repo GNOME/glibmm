@@ -28,6 +28,17 @@
 namespace Glib
 {
 
+/** A PropertyProxy can be used to get and set the value of an object's property.
+ * There are usually also get and set methods on the class itself, which you might find more convenient.
+ * With the PropertyProxy, you may use either get_value() and set_value(), or operator=() and
+ * operator PropertyType(), like so:
+ * @code
+ * int height = cellrenderer.property_height();
+ * cellrenderer.property_editable() = true;
+ * @endcode
+ *
+ * You may also receive notification when a property's value changes, by connecting to signal_changed().
+ */
 template <class T>
 class PropertyProxy : public PropertyProxy_Base
 {
@@ -37,9 +48,18 @@ public:
   PropertyProxy(ObjectBase* obj, const char* name)
     : PropertyProxy_Base(obj, name) {}
 
+  /** Set the value of this property.
+   * @param data The new value for the property.
+   */
   void set_value(const PropertyType& data);
+
+  /** Get the value of this property.
+   * @result The current value of the property.
+   */
   PropertyType get_value() const;
 
+  /** Set the value of this property back to its default value
+   */
   void reset_value()
     { reset_property_(); }
 
@@ -51,6 +71,9 @@ public:
 };
 
 
+/** See PropertyProxy().
+ * This property can be written, but not read, so there is no get_value() method.
+ */
 template <class T>
 class PropertyProxy_WriteOnly : public PropertyProxy_Base
 {
@@ -60,6 +83,9 @@ public:
   PropertyProxy_WriteOnly(ObjectBase* obj, const char* name)
     : PropertyProxy_Base(obj, name) {}
 
+  /** Set the value of this property.
+   * @param data The new value for the property.
+   */
   void set_value(const PropertyType& data)
     {
       PropertyProxy_Base& base = *this;
@@ -67,6 +93,8 @@ public:
       static_cast<PropertyProxy<T>&>(base).set_value(data);
     }
 
+  /** Set the value of this property back to its default value
+   */
   void reset_value()
     { reset_property_(); }
 
@@ -74,16 +102,22 @@ public:
     { this->set_value(data); return *this; }
 };
 
-
+/** See PropertyProxy().
+ * This property can be read, but not written, so there is no set_value() method.
+ */
 template <class T>
 class PropertyProxy_ReadOnly : public PropertyProxy_Base
 {
 public:
   typedef T PropertyType;
 
-  PropertyProxy_ReadOnly(ObjectBase* obj, const char* name)
-    : PropertyProxy_Base(obj, name) {}
+  //obj is const, because this should be returned by const accessors.
+  PropertyProxy_ReadOnly(const ObjectBase* obj, const char* name)
+    : PropertyProxy_Base(const_cast<ObjectBase*>(obj), name) {}
 
+  /** Get the value of this property.
+   * @result The current value of the property.
+   */
   PropertyType get_value() const
     {
       const PropertyProxy_Base& base = *this;

@@ -302,28 +302,100 @@ public:
   typedef Glib::MainContext  CppObjectType;
   typedef GMainContext       BaseObjectType;
 
+  /** Creates a new MainContext.
+   * @return The new MainContext.
+   */
   static Glib::RefPtr<MainContext> create();
+  /** Returns the default main context. 
+   * This is the main context used for main loop functions when a main loop is not explicitly specified.
+   * @return The new MainContext.
+   */
   static Glib::RefPtr<MainContext> get_default();
 
+  /** Runs a single iteration for the given main loop. 
+   * This involves checking to see if any event sources are ready to be processed, then if no events sources are ready and may_block is true, waiting for a source to become ready, then dispatching the highest priority events sources that are ready. Note that even when may_block is true, it is still possible for iteration() to return FALSE, since the the wait may be interrupted for other reasons than an event source becoming ready.
+   * @param may_block Whether the call may block.
+   * @return true if events were dispatched.
+   */
   bool iteration(bool may_block);
+
+  /** Checks if any sources have pending events for the given context.
+   * @return true if events are pending.
+   */
   bool pending();
+
+  /** If context is currently waiting in a poll(), interrupt the poll(), and continue the iteration process.
+   */
   void wakeup();
 
+  /** Tries to become the owner of the specified context. 
+   * If some other context is the owner of the context, returns FALSE immediately. Ownership is properly recursive: the owner can require ownership again and will release ownership when release() is called as many times as acquire().
+   * You must be the owner of a context before you can call prepare(), query(), check(), dispatch().
+   * @return true if the operation succeeded, and this thread is now the owner of context.
+   */
   bool acquire();
+
+
+  /** Tries to become the owner of the specified context, as with acquire(). But if another thread is the owner, atomically drop mutex and wait on cond until that owner releases ownership or until cond is signaled, then try again (once) to become the owner.
+   * @param cond A condition variable.
+   * @param mutex A mutex, currently held.
+   * @return true if the operation succeeded, and this thread is now the owner of context.
+   */
   bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
+
+  /** Releases ownership of a context previously acquired by this thread with acquire(). If the context was acquired multiple times, the only release ownership when release() is called as many times as it was acquired.
+   */
   void release();
 
+
+
+  /** Prepares to poll sources within a main loop. The resulting information for polling is determined by calling query().
+   * @param priority Location to store priority of highest priority source already ready.
+   * @return true if some source is ready to be dispatched prior to polling.
+   */
   bool prepare(int& priority);
+  /** Prepares to poll sources within a main loop. The resulting information for polling is determined by calling query().
+   * @return true if some source is ready to be dispatched prior to polling.
+   */
   bool prepare();
 
+  /** Determines information necessary to poll this main loop.
+   * @param max_priority Maximum priority source to check.
+   * @param timeout Location to store timeout to be used in polling.
+   * @param fds Location to store Glib::PollFD records that need to be polled.
+   * @return the number of records actually stored in fds, or, if more than n_fds records need to be stored, the number of records that need to be stored.
+   */
   void query(int max_priority, int& timeout, std::vector<PollFD>& fds);
+
+  /** Passes the results of polling back to the main loop.
+   * @param max_priority Maximum numerical priority of sources to check.
+   * @param timeout Location to store timeout to be used in polling.
+   * @param fds Vector of Glib::PollFD's that was passed to the last call to query()
+   * @return true if some sources are ready to be dispatched.
+   */
   bool check(int max_priority, std::vector<PollFD>& fds);
+  /** Dispatches all pending sources.
+   */
   void dispatch();
 
+  /** Sets the function to use to handle polling of file descriptors. It will be used instead of the poll() system call (or GLib's replacement function, which is used where poll() isn't available).
+   * This function could possibly be used to integrate the GLib event loop with an external event loop.
+   * @param poll_func The function to call to poll all file descriptors.
+   */
   void set_poll_func(GPollFunc poll_func);
+
+  /** Gets the poll function set by g_main_context_set_poll_func().
+   * @return The poll function
+   */
   GPollFunc get_poll_func();
 
+  /** Adds a file descriptor to the set of file descriptors polled for this context. This will very seldomly be used directly. Instead a typical event source will use Glib::Source::add_poll() instead.
+   * @param fd A GPollFD structure holding information about a file descriptor to watch.
+   * @param priority The priority for this file descriptor which should be the same as the priority used for Glib::Source::attach() to ensure that the file descriptor is polled whenever the results may be needed.
+   */
   void add_poll(PollFD& fd, int priority);
+  /** Removes file descriptor from the set of file descriptors to be polled for a particular context.
+   */
   void remove_poll(PollFD& fd);
 
   /** Timeout signal, attached to this MainContext.
@@ -373,13 +445,32 @@ public:
   static Glib::RefPtr<MainLoop> create(const Glib::RefPtr<MainContext>& context,
                                        bool is_running = false);
 
+  /** Runs a main loop until quit() is called on the loop. 
+   * If this is called for the thread of the loop's MainContext, it will process events from the loop, otherwise it will simply wait.
+   */
   void run();
+
+  /** Stops a MainLoop from running. Any calls to run() for the loop will return.
+   */
   void quit();
+
+  /** Checks to see if the main loop is currently being run via run().
+   * @return true if the mainloop is currently being run.
+   */
   bool is_running();
 
+  /** Returns the MainContext of loop.
+   * @return The MainContext of loop.
+   */
   Glib::RefPtr<MainContext> get_context();
 
+  /** Increases the reference count on a MainLoop object by one.
+   */
   void reference()   const;
+
+  /** Decreases the reference count on a MainLoop object by one. 
+   * If the result is zero, free the loop and free all associated memory.
+   */
   void unreference() const;
 
   GMainLoop*       gobj();
@@ -407,17 +498,57 @@ public:
 
   static Glib::RefPtr<Source> create() /* = 0 */;
 
+  /** Adds a Source to a context so that it will be executed within that context.
+   * @param context A MainContext.
+   * @return The ID for the source within the MainContext.
+   */
   unsigned int attach(const Glib::RefPtr<MainContext>& context);
+
+  /** Adds a Source to a context so that it will be executed within that context.
+   * The default context will be used.
+   * @return The ID for the source within the MainContext.
+   */
   unsigned int attach();
+
+  //TODO: Does this destroy step make sense in C++? Should it just be something that happens in a destructor?
+  
+  /** Removes a source from its MainContext, if any, and marks it as destroyed. 
+   * The source cannot be subsequently added to another context.
+   */
   void destroy();
 
+  /** Sets the priority of a source. While the main loop is being run, a source will be dispatched if it is ready to be dispatched and no sources at a higher (numerically smaller) priority are ready to be dispatched.
+   * @param priority The new priority.
+   */
   void set_priority(int priority);
+  
+  /** Gets the priority of a source.
+   * @return The priority of the source.
+   */
   int  get_priority() const;
 
+  /** Sets whether a source can be called recursively. 
+   * If @a can_recurse is true, then while the source is being dispatched then this source will be processed normally. Otherwise, all processing of this source is blocked until the dispatch function returns.
+   * @param can_recurse Whether recursion is allowed for this source.
+   */
   void set_can_recurse(bool can_recurse);
+  
+  /** Checks whether a source is allowed to be called recursively. see set_can_recurse().
+   * @return Whether recursion is allowed.
+   */
   bool get_can_recurse() const;
 
+  /** Returns the numeric ID for a particular source. 
+   * The ID of a source is unique within a particular main loop context. The reverse mapping from ID to source is done by MainContext::find_source_by_id().
+   * @return The ID for the source.
+   */
   unsigned int get_id() const;
+
+  //TODO: Add a const version of this method?
+  /** Gets the MainContext with which the source is associated. 
+   * Calling this function on a destroyed source is an error.
+   * @return The MainContext with which the source is associated, or a null RefPtr if the context has not yet been added to a source. 
+   */
   Glib::RefPtr<MainContext> get_context();
 
   GSource*       gobj()       { return gobject_; }
@@ -434,9 +565,9 @@ protected:
 
   /** Wrap an existing GSource object and install the given callback function.
    * The constructed object doesn't use the virtual functions prepare(), check() and dispatch().
-   * This ctor is for use by derived types that need to wrap a GSource object.
-   * The callback function can be a static member function. But beware!
-   * Depending on the actual implementation of the GSource's virtual functions
+   * This constructor is for use by derived types that need to wrap a GSource object.
+   * The callback function can be a static member function. But beware -
+   * depending on the actual implementation of the GSource's virtual functions
    * the expected type of the callback function can differ from GSourceFunc.
    */
   Source(GSource* cast_item, GSourceFunc callback_func);
@@ -445,9 +576,20 @@ protected:
 
   SigC::Connection connect_generic(const SigC::SlotBase& slot);
 
-  void add_poll   (PollFD& poll_fd);
+  /** Adds a file descriptor to the set of file descriptors polled for this source. 
+   * The event source's check function will typically test the revents field in the PollFD  and return true if events need to be processed.
+   * @param fd A PollFD object holding information about a file descriptor to watch.
+   */
+  void add_poll(PollFD& poll_fd);
+  
+  /** Removes a file descriptor from the set of file descriptors polled for this source.
+   * @param fd A PollFD object previously passed to add_poll(). 
+   */
   void remove_poll(PollFD& poll_fd);
 
+  /** Gets the "current time" to be used when checking this source. The advantage of calling this function over calling get_current_time() directly is that when checking multiple sources, GLib can cache a single value instead of having to repeatedly get the system time.
+   * @param timeval Glib::TimeVal in which to store current time
+   */
   void get_current_time(Glib::TimeVal& current_time);
 
   virtual bool prepare(int& timeout) = 0;

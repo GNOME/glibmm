@@ -74,7 +74,7 @@ protected:
   const char* property_name_; //Should be a static string literal.
 
 private:
-  //not implemented (for now) -- TODO: Why "for now"?  I don't think it'll ever be needed.  daniel.
+  //Declared as private, but not implemented to prevent any automatically generated implementation.
   PropertyProxy_Base& operator=(const PropertyProxy_Base&);
 };
 
