@@ -166,10 +166,34 @@ std::string build_filename(const Glib::ArrayHandle<std::string>& elements);
 std::string build_filename(const std::string& elem1, const std::string& elem2);
 
 /** Creates a path from a series of elements using @a separator as the
- * separator between elements.  At the boundary between two elements, any
- * trailing occurrences of @a separator in the first element, or leading
- * occurrences of @a separator in the second element are removed and exactly
- * one copy of the separator is inserted.
+ * separator between elements.
+ *
+ * At the boundary between two elements, any trailing occurrences of
+ * @a separator in the first element, or leading occurrences of @a separator
+ * in the second element are removed and exactly one copy of the separator is
+ * inserted.
+ *
+ * Empty elements are ignored.
+ *
+ * The number of leading copies of the separator on the result is
+ * the same as the number of leading copies of the separator on
+ * the first non-empty element.
+ *
+ * The number of trailing copies of the separator on the result is the same
+ * as the number of trailing copies of the separator on the last non-empty
+ * element. (Determination of the number of trailing copies is done without
+ * stripping leading copies, so if the separator is <tt>"ABA"</tt>,
+ * <tt>"ABABA"</tt> has 1 trailing copy.)
+ *
+ * However, if there is only a single non-empty element, and there
+ * are no characters in that element not part of the leading or
+ * trailing separators, then the result is exactly the original value
+ * of that element.
+ *
+ * Other than for determination of the number of leading and trailing
+ * copies of the separator, elements consisting only of copies
+ * of the separator are ignored.
+ *                                                                             
  * @param separator A string used to separate the elements of the path.
  * @param elements A container holding the elements of the path to build.
  *   Any STL compatible container type is accepted.

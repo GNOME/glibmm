@@ -36,14 +36,14 @@ extern "C" void g_free(void*);
  */
 #if ((__GNUC__ >= 3) || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96)) && !defined(__STRICT_ANSI__)
 
-#define GLIBMM_INITIALIZE_STRUCT(Var, Type) __builtin_bzero(&Var, sizeof(Type))
+#define GLIBMM_INITIALIZE_STRUCT(Var, Type) __builtin_memset(&(Var), 0, sizeof(Type))
 
 #else
 
 #define GLIBMM_INITIALIZE_STRUCT(Var, Type) \
     G_STMT_START{ \
-        Type const initializer = { 0, }; \
-        Var = initializer; \
+        Type const temp_initializer__ = { 0, }; \
+        (Var) = temp_initializer__; \
     }G_STMT_END
 
 #endif /* ((__GNUC__ >= 3) || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96)) && !defined(__STRICT_ANSI__) */

@@ -139,37 +139,26 @@ std::string build_filename(const Glib::ArrayHandle<std::string>& elements)
 
 std::string build_filename(const std::string& elem1, const std::string& elem2)
 {
-  std::string result;
-  result.reserve(elem1.size() + elem2.size() + 1);
-
-  // Skip trailing '/'.
-  std::string::size_type idx = elem1.find_last_not_of(G_DIR_SEPARATOR);
-
-  if(idx != std::string::npos)
-    result.append(elem1, 0, idx + 1);
-
-  result += G_DIR_SEPARATOR;
-
-  // Skip leading '/'.
-  idx = elem2.find_first_not_of(G_DIR_SEPARATOR);
-
-  if(idx != std::string::npos)
-    result.append(elem2, idx, std::string::npos);
-
-  return result;
+  const char *const elements[] = { elem1.c_str(), elem2.c_str(), 0 };
+  return build_path(G_DIR_SEPARATOR_S, elements);                                          
 }
 
 /* Yes, this reimplements the functionality of g_build_path() -- because
- * it takes a varargs list, and calling it several times would it result
+ * it takes a varargs list, and calling it several times would result
  * in different behaviour.
  */
-std::string build_path(const std::string& separator,
-                       const Glib::ArrayHandle<std::string>& elements)
+std::string build_path(const std::string& separator, const Glib::ArrayHandle<std::string>& elements)
 {
   std::string result;
+  result.reserve(256); //TODO: Explain why this magic number is useful. murrayc
 
   const char *const sep = separator.c_str();
   const size_t seplen   = separator.length();
+
+  bool is_first     = true;
+  bool have_leading = false;
+  const char* single_element = 0;
+  const char* last_trailing  = 0;
 
   const char *const *const elements_begin = elements.data();
   const char *const *const elements_end   = elements_begin + elements.size();
@@ -178,28 +167,56 @@ std::string build_path(const std::string& separator,
   {
     const char* start = *pelement;
 
-    if((pelement != elements_begin) && (seplen != 0))
+    if(*start == '\0')
+      continue; // ignore empty elements
+
+    if(seplen != 0)
     {
       while(strncmp(start, sep, seplen) == 0)
         start += seplen;
     }
 
-    size_t len = strlen(start);
+    const char* end = start + strlen(start);
 
-    if((pelement != elements_end - 1) && (seplen != 0))
+    if(seplen != 0)
     {
-      while((len >= seplen) && (strncmp(start + len - seplen, sep, seplen) == 0))
-        len -= seplen;
+      while(end >= start + seplen && strncmp(end - seplen, sep, seplen) == 0)
+        end -= seplen;
+
+      last_trailing = end;
+
+      while(last_trailing >= *pelement + seplen && strncmp(last_trailing - seplen, sep, seplen) == 0)
+        last_trailing -= seplen;
+
+      if(!have_leading)
+      {
+        // If the leading and trailing separator strings are in the
+        // same element and overlap, the result is exactly that element.
+        //
+        if(last_trailing <= start)
+          single_element = *pelement;
+
+        result.append(*pelement, start);
+        have_leading = true;
+      }
+      else
+        single_element = 0;
     }
 
-    if(len != 0)
-    {
-      if(!result.empty())
-        result.append(sep, seplen);
+    if(end == start)
+      continue;
 
-      result.append(start, len);
-    }
+    if(!is_first)
+      result += separator;
+
+    result.append(start, end);
+    is_first = false;
   }
+
+  if(single_element)
+    result = single_element;
+  else if(last_trailing)
+    result += last_trailing;
 
   return result;
 }
