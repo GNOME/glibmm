@@ -64,7 +64,6 @@ $main::defsdir = ".";
 $main::source = "";
 $main::debug = 0;
 $main::unwrapped = 1;
-$main::mergecdocs = 0; # e.g. gtk_docs.xml, contain C comments to be added to our generated C++ code.
 
 { # checking the environment for a set variable can trigger a warning
   no warnings;
@@ -87,11 +86,7 @@ $$objWrapParser{source} = $main::source;
 $$objOutputter{source} = $main::source;
 $$objOutputter{destdir} = $ARGV[1];
 
-
-if($main::mergecdocs eq 1)
-{
-  $$objWrapParser{mergecdocs} = 1;
-}
+# Merge the C docs, e.g. gtk_docs.xml
 
 # Suck the whole file into one big string, breaking it into tokens:
 $objWrapParser->read_file($main::srcdir, $main::source);
@@ -205,10 +200,6 @@ sub parse_command_line_args()
       if (/^-I/)
       {
         push @main::macrodirs, shift @ARGV;
-      }
-      elsif (/^--mergecdocs/)
-      {
-        $main::mergecdocs = 1
       }
       elsif (/^--unwrapped/)
       {

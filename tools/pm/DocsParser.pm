@@ -69,7 +69,7 @@ $DocsParser::commentEnd = "   */";
 sub read_defs($$$)
 {
   my ($path, $filename, $filename_override) = @_;
-
+   
   # check that the file is there.
   my $filepath = "$path/$filename";
   if ( ! -r $filepath)
@@ -84,7 +84,7 @@ sub read_defs($$$)
      print "DocsParser.pm: Error: can't read defs file $filename_override\n";
      return;
   }
-
+ 
   my $objParser = new XML::Parser();
   $objParser->setHandlers(Start => \&parse_on_start, End => \&parse_on_end, Char => \&parse_on_cdata);
 
@@ -198,11 +198,21 @@ sub parse_on_cdata($$)
 sub lookup_documentation($)
 {
   my ($functionName) = @_;
-
+   
   my $objFunction = $DocsParser::hasharrayFunctions{$functionName};
-  return "" if(!$objFunction);
+  if(!$objFunction)
+  {
+    #print "DocsParser.pm: Warning: function not found: $functionName\n";
+    return ""
+  }
   
   my $text = $$objFunction{description};
+
+  if(length($text) eq 0)
+  {
+    print "DocsParser.pm: Warning: No C docs for function:$functionName :\n";
+  }
+  
       
   DocsParser::convert_docs_to_cpp($objFunction, \$text);
   DocsParser::append_parameter_docs($objFunction, \$text);
@@ -292,6 +302,9 @@ sub convert_tags_to_doxygen($)
     # Some argument names are suffixed by "_" -- strip this.
     s" ?\@([_a-z]*[a-z])_?\b" \@a $1 "g;
     s"^Note ?\d?: "\@note "mg;
+
+    # gtk-doc uses @thearg, but doxygen uses @a thearg.
+    #s"\@"\@amurrayc "g;
 
     s"&lt;/?programlisting&gt;""g;
     s"&lt;informalexample&gt;"\@code"g;

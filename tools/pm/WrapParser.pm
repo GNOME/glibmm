@@ -55,7 +55,6 @@ sub new($)
   $$self{objOutputter} = $objOutputter;
   $$self{filename} = "(none)";
   $$self{line_num} = 0;
-  $$self{mergecdocs} = 0;
 
   $$self{level} = 0;
   $$self{class} = "";
@@ -110,7 +109,7 @@ sub parse_and_build_output($)
     if ($token eq "_IGNORE")     { $self->on_ignore(); next;} #Ignore a function.
     if ($token eq "_IGNORE_SIGNAL")     { $self->on_ignore_signal(); next;} #Ignore a signal.
     if ($token eq "_WRAP_METHOD")     { $self->on_wrap_method(); next;}
-    if ($token eq "_WRAP_METHOD_DOCS_ONLY")     { $self->on_wrap_method_on_docs_only(); next;}
+    if ($token eq "_WRAP_METHOD_DOCS_ONLY")     { $self->on_wrap_method_docs_only(); next;}
     if ($token eq "_WRAP_CORBA_METHOD")     { $self->on_wrap_corba_method(); next;} #Used in libbonobo*mm.
     if ($token eq "_WRAP_SIGNAL") { $self->on_wrap_signal(); next;}
     if ($token eq "_WRAP_PROPERTY") { $self->on_wrap_property(); next;}
@@ -463,12 +462,9 @@ sub on_defs($)
   GtkDefs::read_defs("$$self{defsdir}", "$defsfile.defs");
 
   #Read the documentation too, so that we can merge it into the generated C++ code:
-  if($$self{mergecdocs})
-  {
-    my $docs_filename = $defsfile . "_docs.xml";
-    my $docs_filename_override = $defsfile . "_docs_override.xml";
-    DocsParser::read_defs("$$self{defsdir}", $docs_filename, $docs_filename_override);
-  }
+  my $docs_filename = $defsfile . "_docs.xml";
+  my $docs_filename_override = $defsfile . "_docs_override.xml";
+  DocsParser::read_defs("$$self{defsdir}", $docs_filename, $docs_filename_override);
 }
 
 # void on_open_brace()
@@ -773,7 +769,7 @@ sub on_wrap_method($)
       $$objCfunc{throw_any_errors} = 1;
     }
   }
-
+   
   my $commentblock = "";
   $commentblock = DocsParser::lookup_documentation($argCFunctionName);
 
