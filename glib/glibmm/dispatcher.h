@@ -76,10 +76,10 @@ public:
   void emit();
   void operator()();
 
-  SigC::Connection connect(const SigC::Slot0<void>& slot);
+  sigc::connection connect(const sigc::slot<void>& slot);
 
 private:
-  SigC::Signal0<void> signal_;
+  sigc::signal<void> signal_;
   DispatchNotifier*   notifier_;
 
   // noncopyable

@@ -30,7 +30,7 @@ namespace
 {
 Glib::RefPtr<Glib::MainLoop> main_loop;
 
-class ThreadTimer : public SigC::Object
+class ThreadTimer : public sigc::trackable
 {
 public:
   ThreadTimer();
@@ -61,7 +61,7 @@ private:
 };
 
 //TODO: Rename to avoid confusion with Glib::Dispatcher. murrayc
-class Dispatcher : public SigC::Object
+class Dispatcher : public sigc::trackable
 {
 public:
   Dispatcher();
@@ -82,7 +82,7 @@ ThreadTimer::ThreadTimer()
   signal_finished_ptr_ (NULL)
 {
   // Connect the cross-thread signal.
-  signal_increment_.connect(SigC::slot(*this, &ThreadTimer::timer_increment));
+  signal_increment_.connect(sigc::mem_fun(*this, &ThreadTimer::timer_increment));
 }
 
 ThreadTimer::~ThreadTimer()
@@ -98,7 +98,7 @@ void ThreadTimer::launch()
 
   // Create a joinable thread -- it needs to be joined, otherwise it's a memory leak.
   thread_ = Glib::Thread::create(
-      SigC::slot_class(*this, &ThreadTimer::thread_function), true);
+      sigc::mem_fun(*this, &ThreadTimer::thread_function), true);
 
   // Wait for the 2nd thread's startup notification.
   while(signal_finished_ptr_ == NULL)
@@ -164,7 +164,7 @@ void ThreadTimer::thread_function()
 
   // attach a timeout handler, that is called every second, to the
   // newly created MainContext
-  context->signal_timeout().connect(SigC::slot(*this, &ThreadTimer::timeout_handler), 1000);
+  context->signal_timeout().connect(sigc::mem_fun(*this, &ThreadTimer::timeout_handler), 1000);
 
   // We need to lock while creating the Dispatcher instance,
   // in order to ensure memory visibility.
@@ -173,7 +173,7 @@ void ThreadTimer::thread_function()
   // create a new dispatcher, that is connected to the newly
   // created MainContext
   Glib::Dispatcher signal_finished (context);
-  signal_finished.connect(SigC::bind(SigC::slot(&ThreadTimer::finished_handler), mainloop));
+  signal_finished.connect(sigc::bind(sigc::ptr_fun(&ThreadTimer::finished_handler), mainloop));
 
   signal_finished_ptr_ = &signal_finished;
 
@@ -195,7 +195,7 @@ Dispatcher::Dispatcher()
   std::cout << "Thread Dispatcher Example #2" << std::endl;
 
   timer_ = new ThreadTimer();
-  timer_->signal_end().connect(SigC::slot(*this, &Dispatcher::end));
+  timer_->signal_end().connect(sigc::mem_fun(*this, &Dispatcher::end));
   timer_->print();
 }
 
@@ -223,7 +223,7 @@ int main(int argc, char** argv)
 
   // Install a one-shot idle handler to launch the threads
   Glib::signal_idle().connect(
-      SigC::bind_return(SigC::slot(dispatcher, &Dispatcher::launch_thread), false));
+      sigc::bind_return(sigc::mem_fun(dispatcher, &Dispatcher::launch_thread), false));
 
   main_loop->run();
 

@@ -23,7 +23,6 @@
 #include <glibmm/fileutils.h>
 #include <glibmm/main.h>
 #include <glibmm/thread.h>
-#include <sigc++/class_slot.h>
 
 #include <fcntl.h>
 #include <cerrno>
@@ -192,7 +191,7 @@ private:
 #else
   FD_TYPE                   fd_sender_;
 #endif /* G_OS_WIN32 */
-  SigC::Connection          conn_io_handler_;
+  sigc::connection          conn_io_handler_;
 
   void create_pipe();
   bool pipe_io_handler(Glib::IOCondition condition);
@@ -223,11 +222,11 @@ DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
   {
 #ifdef G_OS_WIN32
     conn_io_handler_ = context_->signal_io().connect(
-        SigC::slot_class(*this, &DispatchNotifier::pipe_io_handler),
+        sigc::mem_fun(*this, &DispatchNotifier::pipe_io_handler),
         GPOINTER_TO_INT(fd_receiver_), Glib::IO_IN);
 #else
     conn_io_handler_ = context_->signal_io().connect(
-        SigC::slot_class(*this, &DispatchNotifier::pipe_io_handler),
+        sigc::mem_fun(*this, &DispatchNotifier::pipe_io_handler),
         fd_receiver_, Glib::IO_IN);
 #endif /* G_OS_WIN32 */
   }
@@ -244,7 +243,7 @@ DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
 
 DispatchNotifier::~DispatchNotifier()
 {
-  // Disconnect manually because we're using SigC::slot_class().
+  // Disconnect manually because we don't inherit from sigc::trackable
   conn_io_handler_.disconnect();
 
 #ifndef G_OS_WIN32
@@ -465,7 +464,7 @@ void Dispatcher::operator()()
   emit();
 }
 
-SigC::Connection Dispatcher::connect(const SigC::Slot0<void>& slot)
+sigc::connection Dispatcher::connect(const sigc::slot<void>& slot)
 {
   return signal_.connect(slot);
 }

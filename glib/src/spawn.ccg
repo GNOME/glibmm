@@ -34,8 +34,7 @@ void child_setup_callback(void* user_data)
 {
   try
   {
-    SigC::Slot0<void> slot (static_cast<SigC::SlotNode*>(user_data));
-    slot();
+    (*reinterpret_cast<sigc::slot<void>*>(user_data))();
   }
   catch(...)
   {
@@ -66,13 +65,14 @@ void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& argv,
                             const Glib::ArrayHandle<std::string>& envp,
                             SpawnFlags flags,
-                            const SigC::Slot0<void>& child_setup,
+                            const sigc::slot<void>& child_setup,
                             int* child_pid,
                             int* standard_input,
                             int* standard_output,
                             int* standard_error)
 {
   const bool setup_slot = !child_setup.empty();
+  sigc::slot<void> child_setup_ = child_setup;
   GError* error = 0;
 
   g_spawn_async_with_pipes(
@@ -81,7 +81,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? child_setup.impl()    : 0,
+      (setup_slot) ? &child_setup_         : 0,
       child_pid,
       standard_input, standard_output, standard_error,
       &error);
@@ -93,13 +93,14 @@ void spawn_async_with_pipes(const std::string& working_directory,
 void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& argv,
                             SpawnFlags flags,
-                            const SigC::Slot0<void>& child_setup,
+                            const sigc::slot<void>& child_setup,
                             int* child_pid,
                             int* standard_input,
                             int* standard_output,
                             int* standard_error)
 {
   const bool setup_slot = !child_setup.empty();
+  sigc::slot<void> child_setup_ = child_setup;
   GError* error = 0;
 
   g_spawn_async_with_pipes(
@@ -107,7 +108,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
       const_cast<char**>(argv.data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? child_setup.impl()    : 0,
+      (setup_slot) ? &child_setup_         : 0,
       child_pid,
       standard_input, standard_output, standard_error,
       &error);
@@ -120,10 +121,11 @@ void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& argv,
                  const Glib::ArrayHandle<std::string>& envp,
                  SpawnFlags flags,
-                 const SigC::Slot0<void>& child_setup,
+                 const sigc::slot<void>& child_setup,
                  int* child_pid)
 {
   const bool setup_slot = !child_setup.empty();
+  sigc::slot<void> child_setup_ = child_setup;
   GError* error = 0;
 
   g_spawn_async(
@@ -132,7 +134,7 @@ void spawn_async(const std::string& working_directory,
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? child_setup.impl()    : 0,
+      (setup_slot) ? &child_setup_         : 0,
       child_pid,
       &error);
 
@@ -143,10 +145,11 @@ void spawn_async(const std::string& working_directory,
 void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& argv,
                  SpawnFlags flags,
-                 const SigC::Slot0<void>& child_setup,
+                 const sigc::slot<void>& child_setup,
                  int* child_pid)
 {
   const bool setup_slot = !child_setup.empty();
+  sigc::slot<void> child_setup_ = child_setup;
   GError* error = 0;
 
   g_spawn_async(
@@ -154,7 +157,7 @@ void spawn_async(const std::string& working_directory,
       const_cast<char**>(argv.data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? child_setup.impl()    : 0,
+      (setup_slot) ? &child_setup_         : 0,
       child_pid,
       &error);
 
@@ -166,12 +169,13 @@ void spawn_sync(const std::string& working_directory,
                 const Glib::ArrayHandle<std::string>& argv,
                 const Glib::ArrayHandle<std::string>& envp,
                 SpawnFlags flags,
-                const SigC::Slot0<void>& child_setup,
+                const sigc::slot<void>& child_setup,
                 std::string* standard_output,
                 std::string* standard_error,
                 int* exit_status)
 {
   const bool setup_slot = !child_setup.empty();
+  sigc::slot<void> child_setup_ = child_setup;
 
   Glib::ScopedPtr<char> buf_standard_output;
   Glib::ScopedPtr<char> buf_standard_error;
@@ -183,7 +187,7 @@ void spawn_sync(const std::string& working_directory,
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? child_setup.impl()    : 0,
+      (setup_slot) ? &child_setup_         : 0,
       (standard_output) ? buf_standard_output.addr() : 0,
       (standard_error)  ? buf_standard_error.addr()  : 0,
       exit_status,
@@ -199,12 +203,13 @@ void spawn_sync(const std::string& working_directory,
 void spawn_sync(const std::string& working_directory,
                 const Glib::ArrayHandle<std::string>& argv,
                 SpawnFlags flags,
-                const SigC::Slot0<void>& child_setup,
+                const sigc::slot<void>& child_setup,
                 std::string* standard_output,
                 std::string* standard_error,
                 int* exit_status)
 {
   const bool setup_slot = !child_setup.empty();
+  sigc::slot<void> child_setup_ = child_setup;
 
   Glib::ScopedPtr<char> buf_standard_output;
   Glib::ScopedPtr<char> buf_standard_error;
@@ -215,7 +220,7 @@ void spawn_sync(const std::string& working_directory,
       const_cast<char**>(argv.data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? child_setup.impl()    : 0,
+      (setup_slot) ? &child_setup_         : 0,
       (standard_output) ? buf_standard_output.addr() : 0,
       (standard_error)  ? buf_standard_error.addr()  : 0,
       exit_status,

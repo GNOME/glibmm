@@ -35,20 +35,18 @@ ifelse($8,`1',,`dnl Do not generate the implementation if it should be custom:
 $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
 {
   using namespace __NAMESPACE__;
-  typedef SigC::Slot`'_NUM($6)< $5`'_COMMA_PREFIX($6) > SlotType;
+  typedef sigc::slot< $5`'_COMMA_PREFIX($6) > SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
   {
     try
     {
-      if(SigC::SlotNode *const slot = Glib::SignalProxyNormal::data_to_slot`'(data))
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot`'(data))
 ifelse(`$2',void,`dnl
-        (*(SlotType::Proxy)(slot->proxy_))
-            (_COMMA_SUFFIX($7) slot);
+        (*static_cast<SlotType*>(slot))($7);
 ',`dnl else
-        return _CONVERT($5,$2,`((*(SlotType::Proxy)(slot->proxy_))
-            (_COMMA_SUFFIX($7) slot))');
+        return _CONVERT($5,$2,`(*static_cast<SlotType*>(slot))($7)');
 ')dnl endif
     }
     catch(...)
@@ -67,16 +65,15 @@ ifelse($2,void,,`dnl else
 $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`' void* data)
 {
   using namespace __NAMESPACE__;
-  typedef SigC::Slot`'_NUM($6)< void`'_COMMA_PREFIX($6) > SlotType;
+  typedef sigc::slot< void`'_COMMA_PREFIX($6) > SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
   {
     try
     {
-      if(SigC::SlotNode *const slot = Glib::SignalProxyNormal::data_to_slot`'(data))
-        (*(SlotType::Proxy)(slot->proxy_))
-            (_COMMA_SUFFIX($7) slot);
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot`'(data))
+        (*static_cast<SlotType*>(slot))($7);
     }
     catch(...)
     {

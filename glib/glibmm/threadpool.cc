@@ -37,14 +37,14 @@ public:
   SlotList();
   ~SlotList();
 
-  SigC::Slot0<void>* push(const SigC::Slot0<void>& slot);
-  SigC::Slot0<void>  pop(SigC::Slot0<void>* slot_ptr);
+  sigc::slot<void>* push(const sigc::slot<void>& slot);
+  sigc::slot<void>  pop(sigc::slot<void>* slot_ptr);
 
   void lock_and_unlock();
 
 private:
   Glib::Mutex                     mutex_;
-  std::list< SigC::Slot0<void> >  list_;
+  std::list< sigc::slot<void> >  list_;
 
   // noncopyable
   SlotList(const ThreadPool::SlotList&);
@@ -57,7 +57,7 @@ ThreadPool::SlotList::SlotList()
 ThreadPool::SlotList::~SlotList()
 {}
 
-SigC::Slot0<void>* ThreadPool::SlotList::push(const SigC::Slot0<void>& slot)
+sigc::slot<void>* ThreadPool::SlotList::push(const sigc::slot<void>& slot)
 {
   Mutex::Lock lock (mutex_);
 
@@ -65,14 +65,14 @@ SigC::Slot0<void>* ThreadPool::SlotList::push(const SigC::Slot0<void>& slot)
   return &list_.back();
 }
 
-SigC::Slot0<void> ThreadPool::SlotList::pop(SigC::Slot0<void>* slot_ptr)
+sigc::slot<void> ThreadPool::SlotList::pop(sigc::slot<void>* slot_ptr)
 {
-  SigC::Slot0<void> slot;
+  sigc::slot<void> slot;
 
   {
     Mutex::Lock lock (mutex_);
 
-    std::list< SigC::Slot0<void> >::iterator pslot = list_.begin();
+    std::list< sigc::slot<void> >::iterator pslot = list_.begin();
     while(pslot != list_.end() && slot_ptr != &*pslot)
       ++pslot;
 
@@ -105,7 +105,7 @@ void call_thread_entry_slot(void* data, void* user_data)
     Glib::ThreadPool::SlotList *const slot_list =
         static_cast<Glib::ThreadPool::SlotList*>(user_data);
 
-    SigC::Slot0<void> slot (slot_list->pop(static_cast<SigC::Slot0<void>*>(data)));
+    sigc::slot<void> slot (slot_list->pop(static_cast<sigc::slot<void>*>(data)));
 
     slot();
   }
@@ -156,9 +156,9 @@ ThreadPool::~ThreadPool()
   }
 }
 
-void ThreadPool::push(const SigC::Slot0<void>& slot)
+void ThreadPool::push(const sigc::slot<void>& slot)
 {
-  SigC::Slot0<void> *const slot_ptr = slot_list_->push(slot);
+  sigc::slot<void> *const slot_ptr = slot_list_->push(slot);
 
   GError* error = 0;
   g_thread_pool_push(gobject_, slot_ptr, &error);

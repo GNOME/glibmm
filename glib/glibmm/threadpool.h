@@ -72,7 +72,7 @@ public:
    * couldn't be created. In that case @a slot is simply appended to the
    * queue of work to do.
    */
-  void push(const SigC::Slot0<void>& slot);
+  void push(const sigc::slot<void>& slot);
 
   /** Sets the maximal allowed number of threads for the pool.
    * A value of -1 means that the maximal number of threads is unlimited.

@@ -36,43 +36,11 @@ GLIBMM_USING_STD(list)
 namespace
 {
 
-typedef std::list< SigC::Slot0<void> > HandlerList;
+typedef sigc::signal<void> HandlerList;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.
 Glib::StaticPrivate<HandlerList> thread_specific_handler_list = GLIBMM_STATIC_PRIVATE_INIT;
-
-
-class HandlerConnectionNode : public SigC::ConnectionNode
-{
-public:
-  explicit HandlerConnectionNode(const SigC::Slot0<void>& slot)
-    : SigC::ConnectionNode(static_cast<SigC::SlotNode*>(slot.impl())) {}
-
-  virtual void notify(bool from_child);
-};
-
-void HandlerConnectionNode::notify(bool from_child)
-{
-  if(HandlerList *const handler_list = thread_specific_handler_list.get())
-  {
-    // We can't use remove_if() because it's possible to insert the same
-    // slot multiple times, although unlikely.  std::list<>::remove_if()
-    // would remove only the first matching element.
-
-    HandlerList::iterator pslot = handler_list->begin();
-
-    while(pslot != handler_list->end())
-    {
-      if(pslot->impl() == slot().impl())
-        pslot = handler_list->erase(pslot);
-      else
-        ++pslot;
-    }
-  }
-
-  SigC::ConnectionNode::notify(from_child);
-}
 
 
 void glibmm_exception_warning(const GError* error)
@@ -121,7 +89,7 @@ void glibmm_unexpected_exception()
 namespace Glib
 {
 
-SigC::Connection add_exception_handler(const SigC::Slot0<void>& slot)
+sigc::connection add_exception_handler(const sigc::slot<void>& slot)
 {
   HandlerList* handler_list = thread_specific_handler_list.get();
 
@@ -131,10 +99,8 @@ SigC::Connection add_exception_handler(const SigC::Slot0<void>& slot)
     thread_specific_handler_list.set(handler_list);
   }
 
-  const SigC::Connection connection (new HandlerConnectionNode(slot));
-  handler_list->push_front(slot);
-
-  return connection;
+  handler_list->slots().push_front(slot);
+  return handler_list->slots().begin();
 }
 
 // internal
@@ -155,15 +121,15 @@ void exception_handlers_invoke() throw()
 
   if(HandlerList *const handler_list = thread_specific_handler_list.get())
   {
-    HandlerList::iterator pslot = handler_list->begin();
+    HandlerList::iterator pslot = handler_list->slots().begin();
 
-    while(pslot != handler_list->end())
+    while(pslot != handler_list->slots().end())
     {
       // Calling an empty slot would mean ignoring the exception,
       // thus we have to check for dead slots explicitly.
       if(pslot->empty())
       {
-        pslot = handler_list->erase(pslot);
+        pslot = handler_list->slots().erase(pslot);
         continue;
       }
 

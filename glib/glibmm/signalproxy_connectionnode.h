@@ -35,22 +35,28 @@ namespace Glib
   * It lives between the layer of Gtk+ and SigC++.
   * It is very much an internal class.
   */
-class SignalProxyConnectionNode : public SigC::ConnectionNode
+class SignalProxyConnectionNode
 {
 public:
-  SignalProxyConnectionNode(SigC::SlotNode* slot_data, GObject* gobject);
-  virtual ~SignalProxyConnectionNode();
+  SignalProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject);
 
-  virtual void notify(bool from_child); //overridden.
+  /** Callback that is executed when the slot becomes invalid.
+   * This callback is registered in the slot.
+   * @param data The SignalProxyConnectionNode object (@p this).
+   */
+  static void* notify(void* data);
 
+  /** Callback that is executed when the glib closure is destroyed.
+   * @param data The SignalProxyConnectionNode object (@p this).
+   * @param closure The glib closure object.
+   */
   static void destroy_notify_handler(gpointer data, GClosure *closure);
 
   gulong connection_id_;
-  bool gsignal_disconnection_in_process_;
+  sigc::slot_base slot_;
 
 protected:
   GObject* object_;
-
 };
 
 } /* namespace Glib */

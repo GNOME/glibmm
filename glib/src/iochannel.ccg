@@ -44,7 +44,7 @@ namespace
 // GlibmmIOChannel backend is used -- we use the GIOChannel reference
 // counting mechanism.  If the IOChannel backend is unknown, then the
 // wrapper instance holds always exactly one reference to the GIOChannel.
-// The wrapper object itself is then managed via the SigC::Object refcounting
+// The wrapper object itself is then managed via our own refcounting
 // mechanism.  To do that a utility class ForeignIOChannel is introduced to
 // override reference() and unreference().
 
@@ -52,20 +52,23 @@ class ForeignIOChannel : public Glib::IOChannel
 {
 public:
   ForeignIOChannel(GIOChannel* gobject, bool take_copy)
-    : Glib::IOChannel(gobject, take_copy) {}
+    : Glib::IOChannel(gobject, take_copy), ref_count_(0) {}
 
   virtual void reference()   const;
   virtual void unreference() const;
+
+private:
+  mutable int ref_count_;
 };
 
 void ForeignIOChannel::reference() const
 {
-  SigC::ObjectBase::reference();
+  ++ref_count_;
 }
 
 void ForeignIOChannel::unreference() const
 {
-  SigC::ObjectBase::unreference();
+  if (!(--ref_count_)) delete this;
 }
 
 } // anonymous namespace
@@ -371,8 +374,8 @@ Glib::RefPtr<IOChannel> wrap(GIOChannel* gobject, bool take_copy)
     }
     else
     {
-      cpp_object = SigC::manage(new ForeignIOChannel(gobject, take_copy));
-      cpp_object->reference(); // the SigC::Object refcount is initially 0
+      cpp_object = new ForeignIOChannel(gobject, take_copy);
+      cpp_object->reference(); // the refcount is initially 0
     }
   }
 

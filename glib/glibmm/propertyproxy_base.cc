@@ -36,8 +36,7 @@ class PropertyProxyConnectionNode : public SignalProxyConnectionNode
 public:
   friend class SignalProxyProperty;
 
-  PropertyProxyConnectionNode(SigC::SlotNode* slot_data, GObject* gobject, const gchar* property_name);
-  virtual ~PropertyProxyConnectionNode();
+  PropertyProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject, const gchar* property_name);
 
 protected:
   //This will be examined in the callback.
@@ -45,13 +44,9 @@ protected:
   const gchar* property_name_;
 };
 
-PropertyProxyConnectionNode::PropertyProxyConnectionNode(SigC::SlotNode* slot_data, GObject* gobject, const gchar* property_name)
-: SignalProxyConnectionNode(slot_data, gobject),
+PropertyProxyConnectionNode::PropertyProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject, const gchar* property_name)
+: SignalProxyConnectionNode(slot, gobject),
   property_name_(property_name)
-{
-}
-
-PropertyProxyConnectionNode::~PropertyProxyConnectionNode()
 {
 }
 
@@ -67,13 +62,10 @@ SignalProxyProperty::~SignalProxyProperty()
 {
 }
 
-SigC::Connection SignalProxyProperty::connect(const SlotType& sl)
+sigc::connection SignalProxyProperty::connect(const SlotType& sl)
 {
- // create a proxy to hold our connection info
-  PropertyProxyConnectionNode* pConnectionNode = new PropertyProxyConnectionNode( (SigC::SlotNode*)(sl.impl()), obj_->gobj(), property_name_ );
-
-  // gtk+ will hold a reference to this object
-  pConnectionNode->reference();
+  // create a proxy to hold our connection info
+  PropertyProxyConnectionNode* pConnectionNode = new PropertyProxyConnectionNode(sl, obj_->gobj(), property_name_ );
 
   // connect it to gtk+
   // pConnectionNode will be passed as the data argument to the callback.
@@ -84,7 +76,7 @@ SigC::Connection SignalProxyProperty::connect(const SlotType& sl)
          &PropertyProxyConnectionNode::destroy_notify_handler,
          G_CONNECT_AFTER);
 
-  return SigC::Connection(pConnectionNode);
+  return sigc::connection(pConnectionNode->slot_);
 }
 
 void SignalProxyProperty::callback(GObject*, GParamSpec* pspec, gpointer data) //static
@@ -101,8 +93,8 @@ void SignalProxyProperty::callback(GObject*, GParamSpec* pspec, gpointer data) /
     //If it's the correct property, then call the signal handler:
     if(strcmp(property_name_changed, property_name_monitored) == 0)
     {
-      if(SigC::SlotNode *const slot = data_to_slot(data))
-        (*(SlotType::Proxy)(slot->proxy_))(slot);
+      if(sigc::slot_base *const slot = data_to_slot(data))
+        (*static_cast<sigc::slot<void>*>(slot))();
     }
   }
 }

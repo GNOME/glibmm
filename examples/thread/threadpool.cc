@@ -36,7 +36,7 @@ int main(int, char**)
   Glib::ThreadPool pool (10);
 
   for(char c = 'a'; c <= 'z'; ++c)
-    pool.push(SigC::bind(SigC::slot(&print_char), c));
+    pool.push(sigc::bind(sigc::ptr_fun(&print_char), c));
 
   pool.shutdown();
 

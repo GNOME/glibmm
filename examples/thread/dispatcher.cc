@@ -20,7 +20,7 @@ namespace
 {
 Glib::RefPtr<Glib::MainLoop> main_loop;
 
-class ThreadProgress : public SigC::Object
+class ThreadProgress : public sigc::trackable
 {
 public:
   ThreadProgress(int id, Glib::Mutex& mtx);
@@ -28,7 +28,7 @@ public:
 
   void launch();
 
-  typedef SigC::Signal1<void, ThreadProgress*> type_signal_finished;
+  typedef sigc::signal<void, ThreadProgress*> type_signal_finished;
   type_signal_finished& signal_finished();
   int id() const;
 
@@ -44,7 +44,7 @@ private:
 };
 
 //TODO: Rename to avoid confusion with Glib::Dispatcher.
-class Dispatcher : public SigC::Object
+class Dispatcher : public sigc::trackable
 {
 public:
   Dispatcher();
@@ -65,7 +65,7 @@ ThreadProgress::ThreadProgress(int id, Glib::Mutex& mtx)
   progress_ (0), id_ (id), cout_mutex_ (mtx)
 {
   // Connect to the cross-thread signal.
-  signal_increment_.connect(SigC::slot(*this, &ThreadProgress::progress_increment));
+  signal_increment_.connect(sigc::mem_fun(*this, &ThreadProgress::progress_increment));
 }
 
 ThreadProgress::~ThreadProgress()
@@ -74,7 +74,7 @@ ThreadProgress::~ThreadProgress()
 void ThreadProgress::launch()
 {
   // Create a non-joinable thread -- it's deleted automatically on thread exit.
-  Glib::Thread::create(SigC::slot_class(*this, &ThreadProgress::thread_function), false);
+  Glib::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function), false);
 }
 
 ThreadProgress::type_signal_finished& ThreadProgress::signal_finished()
@@ -128,7 +128,7 @@ Dispatcher::Dispatcher()
     progress_list_.push_back(progress);
 
     progress->signal_finished().connect(
-        SigC::slot(*this, &Dispatcher::on_progress_finished));
+        sigc::mem_fun(*this, &Dispatcher::on_progress_finished));
   }
 }
 
@@ -166,7 +166,7 @@ int main(int argc, char** argv)
 
   // Install a one-shot idle handler to launch the threads
   Glib::signal_idle().connect(
-      SigC::bind_return(SigC::slot(dispatcher, &Dispatcher::launch_threads), false));
+      sigc::bind_return(sigc::mem_fun(dispatcher, &Dispatcher::launch_threads), false));
 
   main_loop->run();
 

@@ -180,7 +180,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  SigC::Connection connect(const SigC::Slot0<bool>& slot, unsigned int interval,
+  sigc::connection connect(const sigc::slot<bool>& slot, unsigned int interval,
                            int priority = PRIORITY_DEFAULT);
 private:
   GMainContext* context_;
@@ -211,7 +211,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  SigC::Connection connect(const SigC::Slot0<bool>& slot, int priority = PRIORITY_DEFAULT_IDLE);
+  sigc::connection connect(const sigc::slot<bool>& slot, int priority = PRIORITY_DEFAULT_IDLE);
 
 private:
   GMainContext* context_;
@@ -246,7 +246,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  SigC::Connection connect(const SigC::Slot1<bool,IOCondition>& slot, int fd,
+  sigc::connection connect(const sigc::slot<bool,IOCondition>& slot, int fd,
                            IOCondition condition, int priority = PRIORITY_DEFAULT);
 
   /** Connects an I/O channel.
@@ -267,7 +267,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  SigC::Connection connect(const SigC::Slot1<bool,IOCondition>& slot, const Glib::RefPtr<IOChannel>& channel,
+  sigc::connection connect(const sigc::slot<bool,IOCondition>& slot, const Glib::RefPtr<IOChannel>& channel,
                            IOCondition condition, int priority = PRIORITY_DEFAULT);
 
 private:
@@ -577,7 +577,7 @@ protected:
 
   virtual ~Source();
 
-  SigC::Connection connect_generic(const SigC::SlotBase& slot);
+  sigc::connection connect_generic(const sigc::slot_base& slot);
 
   /** Adds a file descriptor to the set of file descriptors polled for this source. 
    * The event source's check function will typically test the revents field in the PollFD  and return true if events need to be processed.
@@ -597,7 +597,7 @@ protected:
 
   virtual bool prepare(int& timeout) = 0;
   virtual bool check() = 0;
-  virtual bool dispatch(SigC::SlotNode* slot_data) = 0;
+  virtual bool dispatch(sigc::slot_base* slot) = 0;
 
 private:
   GSource* gobject_;
@@ -629,7 +629,7 @@ public:
   typedef Glib::TimeoutSource CppObjectType;
 
   static Glib::RefPtr<TimeoutSource> create(unsigned int interval);
-  SigC::Connection connect(const SigC::Slot0<bool>& slot);
+  sigc::connection connect(const sigc::slot<bool>& slot);
 
 protected:
   explicit TimeoutSource(unsigned int interval);
@@ -637,7 +637,7 @@ protected:
 
   virtual bool prepare(int& timeout);
   virtual bool check();
-  virtual bool dispatch(SigC::SlotNode* slot_data);
+  virtual bool dispatch(sigc::slot_base* slot);
 
 private:
   Glib::TimeVal expiration_;
@@ -651,7 +651,7 @@ public:
   typedef Glib::IdleSource CppObjectType;
 
   static Glib::RefPtr<IdleSource> create();
-  SigC::Connection connect(const SigC::Slot0<bool>& slot);
+  sigc::connection connect(const sigc::slot<bool>& slot);
 
 protected:
   IdleSource();
@@ -659,7 +659,7 @@ protected:
 
   virtual bool prepare(int& timeout);
   virtual bool check();
-  virtual bool dispatch(SigC::SlotNode* slot_data);
+  virtual bool dispatch(sigc::slot_base* slot_data);
 };
 
 
@@ -670,7 +670,7 @@ public:
 
   static Glib::RefPtr<IOSource> create(int fd, IOCondition condition);
   static Glib::RefPtr<IOSource> create(const Glib::RefPtr<IOChannel>& channel, IOCondition condition);
-  SigC::Connection connect(const SigC::Slot1<bool,IOCondition>& slot);
+  sigc::connection connect(const sigc::slot<bool,IOCondition>& slot);
 
 protected:
   IOSource(int fd, IOCondition condition);
@@ -679,7 +679,7 @@ protected:
 
   virtual bool prepare(int& timeout);
   virtual bool check();
-  virtual bool dispatch(SigC::SlotNode* slot_data);
+  virtual bool dispatch(sigc::slot_base* slot);
 
 private:
   PollFD poll_fd_;

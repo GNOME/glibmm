@@ -27,15 +27,12 @@ namespace
 
 void* call_thread_entry_slot(void* data)
 {
+  sigc::slot_base *const slot = reinterpret_cast<sigc::slot_base*>(data);
+
   try
   {
-    SigC::SlotNode *const slot_node = static_cast<SigC::SlotNode*>(data);
-
     // Recreate the specific slot, and drop the reference obtained by create().
-    SigC::Slot0<void> slot (slot_node);
-    slot_node->unreference();
-
-    slot();
+    (*static_cast<sigc::slot<void>*>(slot))();
   }
   catch(Glib::Thread::Exit&)
   {
@@ -47,6 +44,7 @@ void* call_thread_entry_slot(void* data)
     Glib::exception_handlers_invoke();
   }
 
+  delete slot;
   return 0;
 }
 
@@ -67,28 +65,19 @@ void thread_init_impl()
 /**** Glib::Thread *********************************************************/
 
 // static
-Thread* Thread::create(const SigC::Slot0<void>& slot, bool joinable)
+Thread* Thread::create(const sigc::slot<void>& slot, bool joinable)
 {
-  // Obtain ownership of the slot node, and let the slot forget about it.
-  // That avoids a thread-unsafe call to unreference() in the slot's dtor.
-  //
-  // TODO:  This isn't entirely safe yet, we still have reentrancy issues if
-  // the slot has been copied from another slot that still holds a reference.
-  // We need either thread-safe refcounting, or a way to force copying of the
-  // underlying slot node.  The latter approach would get my vote.  daniel.
-
-  SigC::SlotNode *const slot_node = static_cast<SigC::SlotNode*>(slot.impl());
-  slot_node->reference();
-  slot.clear();
+  // Make a copy of slot on the heap
+  sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
 
   GError* error = 0;
 
   GThread *const thread = g_thread_create(
-      &call_thread_entry_slot, slot_node, joinable, &error);
+      &call_thread_entry_slot, slot_copy, joinable, &error);
 
   if(error)
   {
-    slot_node->unreference();
+    delete slot_copy;
     Glib::Error::throw_exception(error);
   }
 
@@ -96,26 +85,21 @@ Thread* Thread::create(const SigC::Slot0<void>& slot, bool joinable)
 }
 
 // static
-Thread* Thread::create(const SigC::Slot0<void>& slot, unsigned long stack_size,
+Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
                        bool joinable, bool bound, ThreadPriority priority)
 {
-  // Obtain ownership of the slot node, and let the slot forget about it.
-  // That avoids a thread-unsafe call to unreference() in the slot's dtor.
-  // See the TODO comment in the other create() method.
-
-  SigC::SlotNode *const slot_node = static_cast<SigC::SlotNode*>(slot.impl());
-  slot_node->reference();
-  slot.clear();
+  // Make a copy of slot on the heap
+  sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
 
   GError* error = 0;
 
   GThread *const thread = g_thread_create_full(
-      &call_thread_entry_slot, slot_node, stack_size, joinable,
+      &call_thread_entry_slot, slot_copy, stack_size, joinable,
       bound, (GThreadPriority) priority, &error);
 
   if(error)
   {
-    slot_node->unreference();
+    delete slot_copy;
     Glib::Error::throw_exception(error);
   }
 

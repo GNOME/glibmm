@@ -23,7 +23,7 @@
 
 #include <glibmm/signalproxy.h>
 #include <glibmm/propertyproxy.h>
-#include <sigc++/object.h>
+#include <sigc++/trackable.h>
 #include <typeinfo>
 #include <glibmmconfig.h>
 #include <glibmm/debug.h>
@@ -42,9 +42,9 @@ namespace Glib
 class GSigConnectionNode;
 #endif
 
-//This inherits virtually from Sigc::Object, so that people can multiply inherit glibmm classes from other SigC::Object-derived classes.
+//This inherits virtually from sgc::trackable so that people can multiply inherit glibmm classes from other SigC::Object-derived classes.
 //See bugzilla.gnome.org bug # 116280
-class ObjectBase : virtual public SigC::Object
+class ObjectBase : virtual public sigc::trackable
 {
 protected:
   // Glib::ObjectBase is used as virtual base class.  This means the ObjectBase

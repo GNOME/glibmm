@@ -25,7 +25,6 @@
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/object.h>
 #include <glibmm/signalproxy.h>
-#include <glibmm/signalproxy_connectionnode.h>
 
 
 namespace Glib
@@ -50,27 +49,24 @@ SignalProxyNormal::SignalProxyNormal(Glib::ObjectBase* obj, const SignalProxyInf
 SignalProxyNormal::~SignalProxyNormal()
 {}
 
-SigC::ConnectionNode*
-SignalProxyNormal::connect_(const SigC::SlotBase& slot_base, bool after)
+sigc::slot_base&
+SignalProxyNormal::connect_(const sigc::slot_base& slot, bool after)
 {
-  return connect_impl_(info_->callback, slot_base, after);
+  return connect_impl_(info_->callback, slot, after);
 }
 
-SigC::ConnectionNode*
-SignalProxyNormal::connect_notify_(const SigC::SlotBase& slot_base, bool after)
+sigc::slot_base&
+SignalProxyNormal::connect_notify_(const sigc::slot_base& slot, bool after)
 {
-  return connect_impl_(info_->notify_callback, slot_base, after);
+  return connect_impl_(info_->notify_callback, slot, after);
 }
 
-SigC::ConnectionNode*
-SignalProxyNormal::connect_impl_(GCallback callback, const SigC::SlotBase& slot_base, bool after)
+sigc::slot_base&
+SignalProxyNormal::connect_impl_(GCallback callback, const sigc::slot_base& slot, bool after)
 {
   // create a proxy to hold our connection info
   SignalProxyConnectionNode *const pConnectionNode =
-      new SignalProxyConnectionNode(static_cast<SigC::SlotNode*>(slot_base.impl()), obj_->gobj());
-
-  // glib will hold a reference to this object
-  pConnectionNode->reference();
+      new SignalProxyConnectionNode(slot, obj_->gobj());
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
@@ -79,7 +75,7 @@ SignalProxyNormal::connect_impl_(GCallback callback, const SigC::SlotBase& slot_
       &SignalProxyConnectionNode::destroy_notify_handler,
       static_cast<GConnectFlags>((after) ? G_CONNECT_AFTER : 0));
 
-  return pConnectionNode;
+  return pConnectionNode->slot_;
 }
 
 void SignalProxyNormal::emission_stop()
@@ -90,15 +86,13 @@ void SignalProxyNormal::emission_stop()
 // static
 void SignalProxyNormal::slot0_void_callback(GObject* self, void* data)
 {
-  typedef SigC::Slot0<void> SlotType;
-
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper(self))
   {
     try
     {
-      if(SigC::SlotNode *const slot = data_to_slot(data))
-        (*(SlotType::Proxy)(slot->proxy_))(slot);
+      if(sigc::slot_base *const slot = data_to_slot(data))
+        (*static_cast<sigc::slot<void>*>(slot))();
     }
     catch(...)
     {

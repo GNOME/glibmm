@@ -17,8 +17,8 @@ public:
   ~SignalProxy_`'$1();
 
   //Reimplement connect(), to use the new glib_callback:
-  SigC::Connection connect(const SlotType& s, bool after = true);
-  SigC::Connection connect_notify(const VoidSlotType& s, bool after = false);
+  sigc::connection connect(const SlotType& s, bool after = true);
+  sigc::connection connect_notify(const VoidSlotType& s, bool after = false);
 
 protected:
   static $2 glib_callback(GObject* obj _COMMA_PREFIX(`$3'), void* data);
@@ -43,14 +43,14 @@ SignalProxy_`'$1`'::~SignalProxy_`'$1()
 {}
 
 //Reimplement connect(), to use the new glib_callback:
-SigC::Connection SignalProxy_`'$1`'::connect(const SlotType& s, bool after /* = true */)
+sigc::connection SignalProxy_`'$1`'::connect(const SlotType& s, bool after /* = true */)
 {
-  return SigC::Connection(connect_((GCallback)&glib_callback, s, after));
+  return sigc::connection(connect_((GCallback)&glib_callback, s, after));
 }
 
-SigC::Connection SignalProxy_`'$1`'::connect_notify(const VoidSlotType& s, bool after /* = false */)
+sigc::connection SignalProxy_`'$1`'::connect_notify(const VoidSlotType& s, bool after /* = false */)
 {
-  return SigC::Connection(connect_((GCallback)&glib_void_callback, s, after));
+  return sigc::connection(connect_((GCallback)&glib_void_callback, s, after));
 }
 
 
@@ -58,13 +58,11 @@ $2 SignalProxy_`'$1`'::glib_callback(GObject* obj _COMMA_PREFIX(`$3'), void* dat
 {
   try
   {
-    SigC::SlotNode* slot = data_to_slot(data);
+    sigc::slot_base* slot = data_to_slot(data);
 ifelse(`$2',void,`dnl
-    ((SlotType::Proxy)(slot->proxy_))
-                (_COMMA_SUFFIX($6) slot);
+    (*static_cast<SlotType*>(slot))(`$6');
 ',`dnl
-    $2 cresult = ((SlotType::Proxy)(slot->proxy_))
-                (_COMMA_SUFFIX($6) slot);
+    $2 cresult = (*static_cast<SlotType*>(slot))(`$6');
     //Convert to the C++ type, and return:
     return _CONVERT($2,$4,`cresult');
 ')
@@ -80,9 +78,8 @@ $2 SignalProxy_`'$1`'::glib_void_callback(GObject* obj _COMMA_PREFIX(`$3'), void
 {
   try
   {
-    SigC::SlotNode* slot = data_to_slot(data);
-    ((VoidSlotType::Proxy)(slot->proxy_))
-        (_COMMA_SUFFIX(`$6') slot);
+    sigc::slot_base* slot = data_to_slot(data);
+    (*static_cast<VoidSlotType*>(slot))(`$6');
   }
   catch (...)
   {

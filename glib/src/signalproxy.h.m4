@@ -32,6 +32,7 @@ extern "C"
 }
 
 #include <sigc++/sigc++.h>
+#include <glibmm/signalproxy_connectionnode.h>
 
 
 namespace Glib
@@ -58,14 +59,12 @@ public:
   SignalProxyBase(Glib::ObjectBase* obj);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  static inline SigC::SlotNode* data_to_slot(void* data)
+  static inline sigc::slot_base* data_to_slot(void* data)
   {
-    // We store a ProxyConnection_ on the data slot of the closure.
-    // But that type is not exposed, so we use the base type.
-    SigC::ConnectionNode *const conn = static_cast<SigC::ConnectionNode*>(data);
+    SignalProxyConnectionNode *const pConnectionNode = static_cast<SignalProxyConnectionNode*>(data);
 
     // Return 0 if the connection is blocked.
-    return (!conn->blocked()) ? static_cast<SigC::SlotNode*>(conn->slot_.impl()) : 0;
+    return (!pConnectionNode->slot_.blocked()) ? &pConnectionNode->slot_ : 0;
   }
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -87,7 +86,7 @@ class SignalProxyNormal : public SignalProxyBase
 public:
   ~SignalProxyNormal();
 
-  /// stops the current signal emmision (not in SigC++)
+  /// stops the current signal emmision (not in libsigc++)
   void emission_stop();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -99,13 +98,13 @@ public:
 protected:
   SignalProxyNormal(Glib::ObjectBase* obj, const SignalProxyInfo* info);
 
-  SigC::ConnectionNode* connect_(const SigC::SlotBase& slot_base, bool after);
-  SigC::ConnectionNode* connect_notify_(const SigC::SlotBase& slot_base, bool after);
+  sigc::slot_base& connect_(const sigc::slot_base& slot, bool after);
+  sigc::slot_base& connect_notify_(const sigc::slot_base& slot, bool after);
 
 private:
   const SignalProxyInfo* info_;
 
-  SigC::ConnectionNode* connect_impl_(GCallback callback, const SigC::SlotBase& slot_base, bool after);
+  sigc::slot_base& connect_impl_(GCallback callback, const sigc::slot_base& slot, bool after);
 
   // no copy assignment
   SignalProxyNormal& operator=(const SignalProxyNormal&);
@@ -121,23 +120,23 @@ LINE(]__line__[)dnl
 /**** Glib::[SignalProxy]NUM($1) ***************************************************/
 
 /** Proxy for signals with NUM($1) arguments.
- * Use the connect() method, with SigC::slot() to connect signals to signal handlers.
+ * Use the connect() method, with sigc::mem_fun() or sigc::ptr_fun() to connect signals to signal handlers.
  */
 template <LIST(class R,ARG_CLASS($1))>
 class [SignalProxy]NUM($1) : public SignalProxyNormal
 {
 public:
-  typedef SigC::[Slot]NUM($1)<LIST(R,ARG_TYPE($1))>    SlotType;
-  typedef SigC::[Slot]NUM($1)<LIST(void,ARG_TYPE($1))> VoidSlotType;
+  typedef sigc::slot<LIST(R,ARG_TYPE($1))>    SlotType;
+  typedef sigc::slot<LIST(void,ARG_TYPE($1))> VoidSlotType;
 
   [SignalProxy]NUM($1)(ObjectBase* obj, const SignalProxyInfo* info)
     : SignalProxyNormal(obj, info) {}
 
-  SigC::Connection connect(const SlotType& slot, bool after = true)
-    { return SigC::Connection(connect_(slot, after)); }
+  sigc::connection connect(const SlotType& slot, bool after = true)
+    { return sigc::connection(connect_(slot, after)); }
 
-  SigC::Connection connect_notify(const VoidSlotType& slot, bool after = false)
-    { return SigC::Connection(connect_notify_(slot, after)); }
+  sigc::connection connect_notify(const VoidSlotType& slot, bool after = false)
+    { return sigc::connection(connect_notify_(slot, after)); }
 };
 ])dnl
 

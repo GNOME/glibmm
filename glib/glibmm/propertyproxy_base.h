@@ -40,8 +40,8 @@ public:
   SignalProxyProperty(Glib::ObjectBase* obj, const gchar* property_name);
   ~SignalProxyProperty();
 
-  typedef SigC::Slot0<void> SlotType;
-  SigC::Connection connect(const SlotType& sl);
+  typedef sigc::slot<void> SlotType;
+  sigc::connection connect(const SlotType& sl);
 
 protected:
   static void callback(GObject* object, GParamSpec* pspec, gpointer data);
