@@ -1,6 +1,6 @@
 
 SUBDIRS		= tools glib examples docs
-DIST_SUBDIRS	= $(SUBDIRS) scripts examples tests
+DIST_SUBDIRS	= $(SUBDIRS) scripts tests
 
 EXTRA_DIST	= glibmm.spec.in \
 		  build_shared/Makefile_build.am_fragment \
