@@ -228,7 +228,14 @@ public:
       //because that would be "dependent", and g++ 3.4 does not allow that.
       //The specific Glib::wrap() overloads don't do anything special anyway.
       GObject* cobj = static_cast<GObject*>( (*node_).data );
+      
+      #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
       return *(dynamic_cast<pointer>(Glib::wrap_auto(cobj, false /* take_copy */)));
+      #else
+      //We really do need to use dynamic_cast<>, so I expect problems if this code is used. murrayc.
+      return *(static_cast<pointer>(Glib::wrap_auto(cobj, false /* take_copy */)));
+      #endif
+      
     }
     
     return *(pointer)glibmm_null_pointer;

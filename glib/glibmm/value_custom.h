@@ -88,7 +88,7 @@ private:
   inline CppType get_(void*) const;
 };
 
-
+  
 /** Generic value implementation for custom types.
  * @ingroup glibmmValue
  * Any type to be used with this template must implement:
@@ -164,11 +164,14 @@ void Value_Pointer<T,PtrT>::set_(PtrT data, Glib::Object*)
   set_object(const_cast<T*>(data));
 }
 
+//More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
+#ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 template <class T, class PtrT> inline
 PtrT Value_Pointer<T,PtrT>::get_(Glib::Object*) const
 {
   return dynamic_cast<T*>(get_object());
 }
+#endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 /** Implementation for custom pointers **/
 
