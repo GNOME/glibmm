@@ -151,4 +151,45 @@ AC_DEFUN([GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
   fi
 ])
 
+## GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS()
+##
+## Check whether the a static member variable may be initialized inline to std::string::npos.
+## The MipsPro (IRIX) compiler does not like this.
+## and #define GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS on success.
+##
+AC_DEFUN([GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS],
+[
+  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
+
+  AC_CACHE_CHECK(
+    [whether the compiler allows a static member variable to be initialized inline to std::string::npos],
+    [gtkmm_cv_cxx_has_allows_static_inline_npos],
+  [
+    AC_TRY_COMPILE(
+    [
+      #include <string>
+      #include <iostream>
+      
+      class ustringtest
+      {
+        public:
+        //The MipsPro compiler (IRIX) says "The indicated constant value is not known",
+        //so we need to initalize the static member data elsewhere.
+        static const std::string::size_type ustringnpos = std::string::npos;
+      };
+    ],[
+      std::cout << "npos=" << ustringtest::ustringnpos << std::endl;
+    ],
+      [gtkmm_cv_cxx_has_allows_static_inline_npos="yes"],
+      [gtkmm_cv_cxx_has_allows_static_inline_npos="no"]
+    )
+  ])
+
+  if test "x${gtkmm_cv_cxx_has_allows_static_inline_npos}" = "xyes"; then
+  {
+    AC_DEFINE([GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS],[1, [Defined if a static member variable may be initialized inline to std::string::npos]])
+  }
+  fi
+])
+
 
