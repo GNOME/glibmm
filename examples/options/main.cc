@@ -1,7 +1,4 @@
-// -*- c++ -*-
-/* $Id$ */
-
-/* Copyright (C) 2002 The gtkmm Development Team
+/* Copyright (C) 2004 The glibmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,34 +15,32 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/utility.h>
-#include <glib/goption.h>
-#include <glib/gmem.h>
+#include <glibmm.h>
+#include <iomanip>
+#include <iostream>
 
-namespace Glib
-{
 
-OptionEntry::OptionEntry()
-: gobject_( new GOptionEntry() ), owns_gobject_(true)
+
+
+
+int main(int argc, char** argv)
 {
-  gobject_ = g_new0(GOptionEntry, 1);
+  
+  typedef std::list<Glib::OptionEntry> type_list_entries;
+  type_list_entries list_entries;
+  
+  Glib::OptionEntry entry1;
+  entry1.set_long_name("foo");
+  entry1.set_short_name('f');
+  
+  list_entries.push_back( entry1 );
+   
+  Glib::OptionContext context;
+  //context.add_main_entries(list_entries);
+  
+  context.parse(argc, argv);
+
+
+  return 0;
 }
-
-OptionEntry::OptionEntry(GOptionEntry* castitem)
-: gobject_(castitem), owns_gobject_(false)
-{
-}
-
-OptionEntry::~OptionEntry()
-{
-  if(owns_gobject_)
-  {
-    g_free(const_cast<char*>(gobject_->long_name));
-    g_free(const_cast<char*>(gobject_->description));
-    g_free(const_cast<char*>(gobject_->arg_description));
-    g_free(gobject_);
-  }  
-}
-
-} // namespace Glib
 

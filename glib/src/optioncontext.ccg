@@ -41,7 +41,14 @@ OptionContext::~OptionContext()
   gobject_ = 0;
 }
 
+OptionGroup OptionContext::get_main_group() const
+{
+  const GOptionGroup* cobj = g_option_context_get_main_group(const_cast<GOptionContext*>( gobj()) );
+  OptionGroup cppObj(const_cast<GOptionGroup*>(cobj), true /* take_copy */);
+  return cppObj;
+}
 
+  
 
 } // namespace Glib
 

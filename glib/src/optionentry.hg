@@ -20,6 +20,7 @@
 _DEFS(glibmm,glib)
 
 #include <glibmm/ustring.h>
+#include <glibmm/value.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" { typedef struct _GOptionEntry GOptionEntry; }
@@ -29,6 +30,7 @@ extern "C" { typedef struct _GOptionEntry GOptionEntry; }
 namespace Glib
 {
 
+_WRAP_ENUM(OptionArg, GOptionArg, NO_GTYPE)
 
 /** TODO
  */
@@ -36,11 +38,44 @@ class OptionEntry
 {
   _CLASS_GENERIC(OptionEntry, GOptionEntry)
 public:
-  explicit OptionEntry(GOptionEntry* castitem);
 
+  //Copied from goption.h, instead of generated, so that we can put it inside the class.
+  enum Flags
+  {
+    FLAG_HIDDEN = 1 << 0,
+    FLAG_IN_MAIN = 1 << 1
+  } GOptionFlags;
+
+  OptionEntry();
+  explicit OptionEntry(GOptionEntry* castitem);
+  virtual ~OptionEntry();
+
+#m4 _CONVERSION(`Glib::ustring',`const gchar*',`g_strdup(($3).c_str())')
+
+  _MEMBER_GET(long_name, long_name, Glib::ustring, const char*)
+  _MEMBER_SET(long_name, long_name, Glib::ustring, const char*)
+  
+  _MEMBER_GET(short_name, short_name, gchar, gchar)
+  _MEMBER_SET(short_name, short_name, gchar, gchar)
+  
+  _MEMBER_GET(flags, flags, int, int)
+  _MEMBER_SET(flags, flags, int, int)
+
+  _MEMBER_GET(arg, arg, OptionArg, GOptionArg)
+  _MEMBER_SET(arg, arg, OptionArg, GOptionArg)
+    
+  //gpointer     arg_data;
+  
+  _MEMBER_GET(description, description, Glib::ustring, const char*)
+  _MEMBER_SET(arg_description, arg_description, Glib::ustring, const char*)
+  
+  GOptionEntry*       gobj()       { return gobject_; }
+  const GOptionEntry* gobj() const { return gobject_; }
+  
 protected:
 
   GOptionEntry* gobject_;
+  bool owns_gobject_;
 };
 
 } // namespace Glib

@@ -45,6 +45,7 @@
 #include <glibmm/module.h>
 #include <glibmm/objectbase.h>
 #include <glibmm/object.h>
+#include <glibmm/optioncontext.h>
 #include <glibmm/pattern.h>
 #include <glibmm/property.h>
 #include <glibmm/propertyproxy_base.h>
