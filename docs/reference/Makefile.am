@@ -1,5 +1,6 @@
 doxygen_configfile = Doxyfile
 doxygen_configfile_source = $(srcdir)/Doxyfile.in
+beautify_docs_source = $(srcdir)/beautify_docs.pl.in
 beautify_docs = $(srcdir)/beautify_docs.pl
 
 include $(top_srcdir)/docs/Makefile_web.am_fragment
@@ -9,7 +10,7 @@ EXTRA_DIST = README Doxyfile.in \
              glibmm_header.html_fragment glibmm_footer.html_fragment beautify_docs.pl \
              html glibmm_doxygen_tags
 
-html/index.html: $(doxygen_configfile_source) $(beautify_docs)
+html/index.html: $(doxygen_configfile_source) $(beautify_docs_source)
 	-rm -rf html
 	image_path=""; \
 	dir="`pkg-config --silence-errors --variable=prefix gtk+-2.0`/share/gtk-doc/html/gtk"; \
