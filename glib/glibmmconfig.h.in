@@ -1,0 +1,71 @@
+#ifndef _GLIBMM_CONFIG_H
+#define _GLIBMM_CONFIG_H 1
+
+/* version numbers */
+#undef GTKMM_MAJOR_VERSION
+#undef GTKMM_MINOR_VERSION
+#undef GTKMM_MICRO_VERSION
+
+// detect common platforms
+#if defined(_WIN32)
+// Win32 compilers have a lot of varation
+#if defined(_MSC_VER)
+#define GTKMM_MSC
+#define GTKMM_WIN32
+#define GLIBMM_DLL
+#elif defined(__CYGWIN__)
+#define GTKMM_GCC
+#elif defined(__MINGW32__)
+#define GTKMM_WIN32
+#define GTKMM_GCC
+#define GLIBMM_DLL
+#else
+#warning "Unknown architecture (send me gcc --dumpspecs or equiv)"
+#endif
+#else
+#define GTKMM_GCC
+#endif /* _WIN32 */
+
+#ifdef GTKMM_GCC
+/* compiler feature tests that are used during compile time and run-time
+   by gtk-- only. tests used by gdk-- and gtk-- should go into
+   gdk--config.h.in */
+#undef GTKMM_CXX_HAVE_MUTABLE
+#undef GTKMM_CXX_HAVE_NAMESPACES
+//#undef GTKMM_CXX_GAUB
+//#undef GTKMM_CXX_AMBIGUOUS_TEMPLATES
+#endif
+
+#ifdef GTKMM_MSC
+#define GTKMM_CXX_HAVE_MUTABLE
+#define GTKMM_CXX_HAVE_NAMESPACES
+#pragma warning (disable: 4786 4355 4800 4181)
+#endif
+
+#undef GTKMM_DEBUG_REFCOUNTING
+
+#undef GTKMM_HAVE_NAMESPACE_STD
+#undef GTKMM_HAVE_STD_ITERATOR_TRAITS
+#undef GTKMM_HAVE_SUN_REVERSE_ITERATOR
+#undef GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+
+#ifndef GTKMM_HAVE_NAMESPACE_STD
+#  define GTKMM_USING_STD(Symbol) namespace std { using ::Symbol; }
+#else
+#  define GTKMM_USING_STD(Symbol) /* empty */
+#endif
+
+#ifdef GLIBMM_DLL
+#if defined(glibmm_COMPILATION) && defined(DLL_EXPORT)
+#define GLIBMM_API __declspec(dllexport) 
+#elif !defined(glibmm_COMPILATION)
+#define GLIBMM_API __declspec(dllimport)
+#else
+#define GLIBMM_API
+#endif /* glibmm_COMPILATION - DLL_EXPORT */
+#else
+#define GLIBMM_API
+#endif /* GLIBMM_DLL */
+
+#endif /* _GLIBMM_CONFIG_H */
+

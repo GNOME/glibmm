@@ -1,0 +1,68 @@
+/* $Id$ */
+
+/* Copyright (C) 2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(glibmm,glib)
+
+#include <glibmmconfig.h>
+#include <string>
+
+GTKMM_USING_STD(string)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C" { typedef struct _GModule GModule; }
+#endif
+
+
+namespace Glib
+{
+
+_WRAP_ENUM(ModuleFlags, GModuleFlags, NO_GTYPE)
+
+//TODO: Replace get_last_error() with exceptions?
+//Provide operator()?
+class Module
+{
+  _CLASS_GENERIC(Module, GModule)
+  _IGNORE(g_module_open, g_module_close)
+
+public:
+  explicit Module(const std::string& file_name, ModuleFlags flags = ModuleFlags(0));
+  virtual ~Module();
+
+  _WRAP_METHOD(static bool get_supported(), g_module_supported)
+  _WRAP_METHOD(void make_resident(), g_module_make_resident)
+  _WRAP_METHOD(static std::string get_last_error(), g_module_error)
+  _WRAP_METHOD(bool get_symbol(const std::string& symbol_name, void*& symbol) const, g_module_symbol)
+  _WRAP_METHOD(std::string get_name() const, g_module_name)
+  _WRAP_METHOD(static std::string build_path(const std::string& directory, const std::string& module_name), g_module_build_path)
+
+  GModule*       gobj()       { return gobject_; }
+  const GModule* gobj() const { return gobject_; }
+
+protected:
+  GModule* gobject_;
+
+private:
+  // noncopyable
+  Module(const Module&);
+  Module& operator=(const Module&);
+};
+
+} // namespace Glib
+

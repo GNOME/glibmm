@@ -1,0 +1,151 @@
+/* $Id$ */
+
+/* Copyright (C) 2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(glibmm,glib)
+
+#include <glibmm/ustring.h>
+
+#include <glib/gdate.h>
+#include <glib/gtypes.h>
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C" { struct tm; }
+#endif
+
+
+namespace Glib
+{
+
+/** Julian calendar date.
+ */
+class Date
+{
+public:
+  typedef guint8  Day;
+  typedef guint16 Year;
+
+  _WRAP_ENUM(Month, GDateMonth, s#^DATE_##, NO_GTYPE)
+  _WRAP_ENUM(Weekday, GDateWeekday, s#^DATE_##, NO_GTYPE)
+  _WRAP_ENUM(DMY, GDateDMY, s#^DATE_##, NO_GTYPE)
+
+  static const Day     BAD_DAY    = 0;
+  static const Year    BAD_YEAR   = 0;
+  static const guint32 BAD_JULIAN = 0;
+
+  Date();
+  Date(Day day, Month month, Year year);
+  explicit Date(guint32 julian_day);
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  explicit Date(const GDate& castitem);
+#endif
+
+  void clear();
+  void set_parse (const Glib::ustring& str);
+  void set_time  (GTime time);
+  void set_month (Month month);
+  void set_day   (Day day);
+  void set_year  (Year year);
+  void set_dmy   (Day day, Month month, Year year);
+  void set_julian(guint32 julian_day);
+
+  Date& add_days       (int n_days);
+  Date& subtract_days  (int n_days);
+  Date& add_months     (int n_months);
+  Date& subtract_months(int n_months);
+  Date& add_years      (int n_years);
+  Date& subtract_years (int n_years);
+
+  int days_between(const Date& rhs) const;
+  int compare(const Date& rhs) const;
+
+  Date& clamp(const Date& min_date, const Date& max_date);
+  void order(Date& other);
+
+  Weekday      get_weekday()             const;
+  Month        get_month()               const;
+  Year         get_year()                const;
+  Day          get_day()                 const;
+  guint32      get_julian()              const;
+  unsigned int get_day_of_year()         const;
+  unsigned int get_monday_week_of_year() const;
+  unsigned int get_sunday_week_of_year() const;
+  bool         is_first_of_month()       const;
+  bool         is_last_of_month()        const;
+
+  static guint8 get_days_in_month(Month month, Year year);
+  static guint8 get_monday_weeks_in_year(Year year);
+  static guint8 get_sunday_weeks_in_year(Year year);
+  static bool   is_leap_year(Year year);
+
+  /** Convert date to string.
+   * @param format A format string as used by @c strftime(), in UTF-8
+   * encoding.  Only date formats are allowed, the result of time formats
+   * is undefined.
+   * @return The formatted date string.
+   * @throw Glib::ConvertError
+   */
+  Glib::ustring format_string(const Glib::ustring& format) const;
+
+  void to_struct_tm(struct tm& dest) const;
+
+  bool valid() const;
+  static bool valid_day    (Day day);
+  static bool valid_month  (Month month);
+  static bool valid_year   (Year year);
+  static bool valid_weekday(Weekday weekday);
+  static bool valid_julian (guint32 julian_day);
+  static bool valid_dmy    (Day day, Month month, Year year);
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  GDate*       gobj()       { return &gobject_; }
+  const GDate* gobj() const { return &gobject_; }
+#endif
+
+private:
+  GDate gobject_;
+};
+
+
+/** @relates Glib::Date */
+inline bool operator==(const Date& lhs, const Date& rhs)
+  { return (lhs.compare(rhs) == 0); }
+
+/** @relates Glib::Date */
+inline bool operator!=(const Date& lhs, const Date& rhs)
+  { return (lhs.compare(rhs) != 0); }
+
+/** @relates Glib::Date */
+inline bool operator<(const Date& lhs, const Date& rhs)
+  { return (lhs.compare(rhs) < 0); }
+
+/** @relates Glib::Date */
+inline bool operator>(const Date& lhs, const Date& rhs)
+  { return (lhs.compare(rhs) > 0); }
+
+/** @relates Glib::Date */
+inline bool operator<=(const Date& lhs, const Date& rhs)
+  { return (lhs.compare(rhs) <= 0); }
+
+/** @relates Glib::Date */
+inline bool operator>=(const Date& lhs, const Date& rhs)
+  { return (lhs.compare(rhs) >= 0); }
+
+} // namespace Glib
+
