@@ -1,7 +1,11 @@
 dnl $Id$
 
 define(`__OPERATOR_DECL',`dnl
-/** @relates __NAMESPACE__::__CPPNAME__ */
+/** @relates __NAMESPACE__::__CPPNAME__
+ * @param lhs The left-hand side
+ * @param rhs The right-hand side
+ * @result The result
+ */
 bool operator`'$1`'(const __CPPNAME__& lhs, const __CPPNAME__& rhs);
 ')
 

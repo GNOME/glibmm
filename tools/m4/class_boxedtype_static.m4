@@ -49,10 +49,16 @@ namespace Glib
 ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl else
 
-/** @relates __NAMESPACE__::__CPPNAME__ */
+/** @relates __NAMESPACE__::__CPPNAME__
+ * @param object The C instance
+ * @result A C++ instance that wraps this C instance.
+ */
 __NAMESPACE__::__CPPNAME__& wrap(__CNAME__* object);
 
-/** @relates __NAMESPACE__::__CPPNAME__ */
+/** @relates __NAMESPACE__::__CPPNAME__
+ * @param object The C instance
+ * @result A C++ instance that wraps this C instance.
+ */
 const __NAMESPACE__::__CPPNAME__& wrap(const __CNAME__* object);
 ')dnl endif __BOOL_NO_WRAP_FUNCTION__
 

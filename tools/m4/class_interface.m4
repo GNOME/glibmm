@@ -115,9 +115,12 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl
 namespace Glib
 {
-
-/** @relates __NAMESPACE__::__CPPNAME__ */
-Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__`'* object, bool take_copy = false);
+  /** @relates __NAMESPACE__::__CPPNAME__
+   * @param object The C instance
+   * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+   * @result A C++ instance that wraps this C instance.
+   */
+  Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__`'* object, bool take_copy = false);
 
 } // namespace Glib
 

@@ -30,8 +30,12 @@ _SECTION(SECTION_HEADER3)
 namespace Glib
 {
 
-/** @relates __NAMESPACE__::__CPPNAME__ */
-Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__* object, bool take_copy = false);
+  /** @relates __NAMESPACE__::__CPPNAME__
+   * @param object The C instance
+   * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+   * @result A C++ instance that wraps this C instance.
+   */
+  Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__* object, bool take_copy = false);
 
 } // namespace Glib
 
@@ -150,7 +154,7 @@ ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
   ///Provides access to the underlying C instance.
   const __CNAME__* gobj() const;
 
-  // The caller is responsible for freeing it. Use when directly setting fields in structs.
+  ///Provides access to the underlying C instance. The caller is responsible for unrefing it. Use when directly setting fields in structs.
   __CNAME__* gobj_copy() const;
 
 protected:

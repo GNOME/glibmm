@@ -51,7 +51,10 @@ _SECTION(SECTION_HEADER3)
 
 __NAMESPACE_BEGIN__
 
-/** @relates __NAMESPACE__::__CPPNAME__ */
+/** @relates __NAMESPACE__::__CPPNAME__
+ * @param lhs The left-hand side
+ * @param rhs The right-hand side
+ */
 inline void swap(__CPPNAME__& lhs, __CPPNAME__& rhs)
   { lhs.swap(rhs); }
 
@@ -62,7 +65,11 @@ namespace Glib
 ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl else
 
-/** @relates __NAMESPACE__::__CPPNAME__ */
+/** @relates __NAMESPACE__::__CPPNAME__
+ * @param object The C instance
+ * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+ * @result A C++ instance that wraps this C instance.
+ */
 __NAMESPACE__::__CPPNAME__ wrap(__CNAME__* object, bool take_copy = false);
 ')dnl endif __BOOL_NO_WRAP_FUNCTION__
 
@@ -196,7 +203,7 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
   ///Provides access to the underlying C instance.
   const __CNAME__* gobj() const { return gobject_; }
 
-  // The caller is responsible for freeing it. Use when directly setting fields in structs.
+  ///Provides access to the underlying C instance. The caller is responsible for freeing it. Use when directly setting fields in structs.
   __CNAME__* gobj_copy() const;
 
 protected:

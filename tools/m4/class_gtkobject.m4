@@ -76,7 +76,11 @@ __NAMESPACE_BEGIN__ class __CPPNAME__`'_Class; __NAMESPACE_END__
 _SECTION(SECTION_HEADER3)
 namespace Glib
 {
-  /** @relates __NAMESPACE__::__CPPNAME__ */
+  /** @relates __NAMESPACE__::__CPPNAME__
+   * @param object The C instance
+   * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+   * @result A C++ instance that wraps this C instance.
+   */
   __NAMESPACE__::__CPPNAME__`'* wrap(__CNAME__`'* object, bool take_copy = false);
 }
 dnl

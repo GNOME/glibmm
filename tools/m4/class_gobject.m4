@@ -84,7 +84,11 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl
 namespace Glib
 {
-  /** @relates __NAMESPACE__::__CPPNAME__ */
+  /** @relates __NAMESPACE__::__CPPNAME__
+   * @param object The C instance
+   * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
+   * @result A C++ instance that wraps this C instance.
+   */
   Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__REAL_CNAME__`'* object, bool take_copy = false);
 }
 ')dnl
@@ -211,6 +215,7 @@ public:
   ///Provides access to the underlying C GObject.
   const __CNAME__* gobj() const { return reinterpret_cast<__CNAME__*>(gobject_); }
 
+  ///Provides access to the underlying C instance. The caller is responsible for unrefing it. Use when directly setting fields in structs.
   __CNAME__* gobj_copy();
 
 private:
