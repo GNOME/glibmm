@@ -37,12 +37,7 @@ int main(int, char**)
 
   for(char c = 'a'; c <= 'z'; ++c)
   {
-// The AIX xlC compiler gives a linker error, even with the bind<1> hint.
-// See the comment in dispatcher.cc
-// Obviously this example will then be useless on AIX, but at least the build will succeed so people can install the library.
-#if !defined(_AIX)
     pool.push(sigc::bind<1>(sigc::ptr_fun(&print_char), c));
-#endif
   }
   
   pool.shutdown();

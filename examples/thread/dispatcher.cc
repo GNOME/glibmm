@@ -143,20 +143,8 @@ Application::Application()
     progress_list_.push_back(progress);
     progress_ref_list_.push_back(Glib::RefPtr<ThreadProgress>(progress));
 
-// The AIX xlC compiler gives this linker error, even with the bind<1> hint.
-// ld: 0711-317 ERROR: Undefined symbol: 
-// .sigc::bind_functor::__clXSP1TQ2_4sigc18bound_mem_functor1XTvTQ2_15dispatcher.cc-011ApplicationTPQ2_15dispatcher.cc-014ThreadProgress_TPQ2_15dispatcher.cc-014ThreadProgressTQ2_4sigc3nilTQ2_4sigc3nilTQ2_4sigc3nilTQ2_4sigc3nilTQ2_4sigc3nilTQ2_4sigc3nil_Fv
-// ld: 0711-345 Use the -bloadmap or -bnoquiet option to obtain more information.
-//
-// Obviously this example will then be useless on AIX, but at least the build will succeed so people can install the library.
-#if !defined(_AIX)
     progress->signal_finished().connect(
         sigc::bind<1>(sigc::mem_fun(*this, &Application::on_progress_finished), progress));
-    //Note: The AIX xlC compiler needs us to explicitly use sigc::bind<1> instead of just sigc::bind<>.
-    //Otherwise it says "The call to "visit_each" has no best match."
-#endif
-
-  
   }
 }
 
