@@ -338,7 +338,7 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
       *((int*)cpparg_) = *((int*)carg_);
       break;
     }
-    case G_OPTION_ARG_STRING_ARRAY:
+        case G_OPTION_ARG_STRING_ARRAY:
     {
       char*** typed_arg = (char***)carg_;
       vecustrings* typed_cpp_arg = (vecustrings*)cpparg_;
@@ -346,7 +346,20 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
       {
         //The C array seems to be null-terminated.
         Glib::StringArrayHandle array_handle(*typed_arg,  Glib::OWNERSHIP_NONE);
-        (*typed_cpp_arg) = array_handle;
+        
+        //The SUN Forte compiler complains about this:
+        // "optiongroup.cc", line 354: Error: Cannot assign Glib::ArrayHandle<Glib::ustring, 
+        // Glib::Container_Helpers::TypeTraits<Glib::ustring>> to std::vector<Glib::ustring> without 
+        // "std::vector<Glib::ustring>::operator=(const std::vector<Glib::ustring>&)";.
+        //
+        //(*typed_cpp_arg) = array_handle;
+        
+        //So we do this:
+        typed_cpp_arg->clear();
+        for(Glib::StringArrayHandle::iterator iter = array_handle.begin(); iter != array_handle.end(); ++iter)
+        {
+          typed_cpp_arg->push_back(*iter);
+        }
       }
       
       break;
@@ -359,7 +372,16 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
       {
         //The C array seems to be null-terminated.
         Glib::ArrayHandle<std::string>  array_handle(*typed_arg,  Glib::OWNERSHIP_NONE);
-        (*typed_cpp_arg) = array_handle;
+        
+        //The SUN Forte compiler complains about this:
+        //(*typed_cpp_arg) = array_handle;
+        
+        //So we do this:
+        typed_cpp_arg->clear();
+        for(Glib::ArrayHandle<std::string>::iterator iter = array_handle.begin(); iter != array_handle.end(); ++iter)
+        {
+          typed_cpp_arg->push_back(*iter);
+        }
       }
       
       break;
