@@ -20,26 +20,71 @@
 #include <iostream>
 
 
+class ExampleOptionGroup : public Glib::OptionGroup
+{ 
+public:
+  ExampleOptionGroup();
 
+  virtual bool on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group);
+  virtual bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group);
+  virtual void on_error(Glib::OptionContext& context, Glib::OptionGroup& group);
+  
+  int m_arg_foo;
+  int m_arg_bar;
+  
+protected:
+  Glib::OptionEntry m_entry1, m_entry2; //TODO: This is just for memory-management, to make them live long enough.
+};
+
+ExampleOptionGroup::ExampleOptionGroup()
+: Glib::OptionGroup("example_group", "description of example group", "help description of example group"),
+  m_arg_foo(0),
+  m_arg_bar(0)
+{
+  m_entry1.set_long_name("foo");
+  m_entry1.set_short_name('f');
+  m_entry1.set_arg_data(Glib::OPTION_ARG_INT, &m_arg_foo);
+
+  add_entry(m_entry1);
+      
+  m_entry2.set_long_name("bar");
+  m_entry2.set_short_name('b');
+  m_entry2.set_arg_data(Glib::OPTION_ARG_INT, &m_arg_bar);
+  
+  add_entry(m_entry2);
+}
+
+bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
+{
+  //This is called before m_arg_foo and m_arg_bar are given their values.
+  return Glib::OptionGroup::on_pre_parse(context, group);
+}
+
+bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
+{
+  //This is called afetr m_arg_foo and m_arg_bar are given their values.
+  return Glib::OptionGroup::on_post_parse(context, group);
+}
+
+void ExampleOptionGroup::on_error(Glib::OptionContext& context, Glib::OptionGroup& group)
+{
+  Glib::OptionGroup::on_error(context, group);
+}
+  
 
 
 int main(int argc, char** argv)
 {
-  
-  typedef std::list<Glib::OptionEntry> type_list_entries;
-  type_list_entries list_entries;
-  
-  Glib::OptionEntry entry1;
-  entry1.set_long_name("foo");
-  entry1.set_short_name('f');
-  
-  list_entries.push_back( entry1 );
+  Glib::init();
    
   Glib::OptionContext context;
-  //context.add_main_entries(list_entries);
+  
+  ExampleOptionGroup group;
+  context.set_main_group(group); //TODO: check memory management/copying.
   
   context.parse(argc, argv);
 
+  std::cout << "parsed values: foo = " << group.m_arg_foo << ", bar = " << group.m_arg_bar << std::endl;
 
   return 0;
 }

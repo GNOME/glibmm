@@ -47,8 +47,11 @@ public:
   } GOptionFlags;
 
   OptionEntry();
+  OptionEntry(const OptionEntry& src);
   explicit OptionEntry(GOptionEntry* castitem);
   virtual ~OptionEntry();
+  
+  OptionEntry& operator=(const OptionEntry& src);
 
 #m4 _CONVERSION(`Glib::ustring',`const gchar*',`g_strdup(($3).c_str())')
 
@@ -61,11 +64,14 @@ public:
   _MEMBER_GET(flags, flags, int, int)
   _MEMBER_SET(flags, flags, int, int)
 
-  _MEMBER_GET(arg, arg, OptionArg, GOptionArg)
-  _MEMBER_SET(arg, arg, OptionArg, GOptionArg)
-    
-  //gpointer     arg_data;
+  //The OptionArg must match the actual type of the arg_data.
+  //TODO: Use template specializations to avoid the OptionArg parameter?
+  void set_arg_data(OptionArg arg_type, void* data);
   
+  _MEMBER_GET(arg, arg, OptionArg, GOptionArg)
+  _MEMBER_GET(arg_data, arg_data, void*, void*)
+
+    
   _MEMBER_GET(description, description, Glib::ustring, const char*)
   _MEMBER_SET(arg_description, arg_description, Glib::ustring, const char*)
   

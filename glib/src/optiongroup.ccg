@@ -47,8 +47,11 @@ gboolean g_callback_post_parse(GOptionContext* context, GOptionGroup* group, gpo
   OptionGroup cppGroup(group); //Maybe this should be option_group.
   
   OptionGroup* option_group = static_cast<OptionGroup*>(data);
-  if(option_group)
+  if(option_group)\
+  {
+    //TODO: Convert C types to the appropriate C++ types.
     return option_group->on_post_parse(cppContext, cppGroup);
+  }
   else
     return false;
 }
@@ -78,6 +81,7 @@ OptionGroup::OptionGroup(GOptionGroup* castitem, bool take_copy)
 {
   if(take_copy)
   {
+    g_warning("TODO");
   }
   else
     gobject_ = castitem;
@@ -89,6 +93,12 @@ OptionGroup::~OptionGroup()
   gobject_ = 0;
 }
 
+void OptionGroup::add_entry(const OptionEntry& entry)
+{
+  //It does not copy the entry, so it needs to live as long as the group.
+  //TODO: Store temporary copies in the C++ instance?
+  g_option_group_add_entries(gobj(), entry.gobj()); //This can take an array, so think of this as an array of 1.
+}
 
 bool OptionGroup::on_pre_parse(OptionContext& /* context */, OptionGroup& /* group */)
 {
