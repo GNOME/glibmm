@@ -39,8 +39,8 @@ class SignalProxyConnectionNode
 {
 public:
 
-  /** @param slot The signal handler for the GTK+ signal.
-   *
+  /** @param slot The signal handler for the glib signal.
+   *  @parm gobject The GObject that might emit this glib signal
    */
   SignalProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject);
 

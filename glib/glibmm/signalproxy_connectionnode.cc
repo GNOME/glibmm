@@ -34,7 +34,8 @@ SignalProxyConnectionNode::SignalProxyConnectionNode(const sigc::slot_base& slot
   slot_          (slot),
   object_        (gobject)
 {
-  slot_.set_parent(this, &SignalProxyConnectionNode::notify);
+  //The cleanup callback will be called when the connection is disconnected.
+  slot_.set_parent(this, &SignalProxyConnectionNode::notify /* cleanup callback */);
 }
 
 // notify is a message coming up from the slot to be passed back to Gtk+
@@ -42,23 +43,33 @@ SignalProxyConnectionNode::SignalProxyConnectionNode(const sigc::slot_base& slot
 //static
 void* SignalProxyConnectionNode::notify(void* data)
 {
-  // notification from sigc++.
+  // notification from libsigc++.
   SignalProxyConnectionNode* conn = static_cast<SignalProxyConnectionNode*>(data);
 
-  // if there is no object, this call was triggered from destroy_notify_handler().
+  // If there is no object, this call was triggered from destroy_notify_handler(),
+  // because we set conn->object to 0 there:
   if(conn && conn->object_)
   {
     GObject* o = conn->object_;
     conn->object_ = 0;
+  
+    if(g_signal_handler_is_connected(o, conn->connection_id_)) //We check first, because during destruction, GTK+ sometimes seems to disconnect them for us, before we expect it to.  See bug #87912
+    {
+      // Disconnecting triggers execution of destroy_notify_handler(), eiter immediately or later:
+      //   When the signal handler is currently running. (for instance, if the callback disconnects its own connection)
+      //   In that case, destroy_notify_handler() will be called after this whole function has returned.
+      // Anyway. destroy_notify_handler() will always be called, so we leave that to do the deletion.
 
-    // this triggers execution of destroy_notify_handler():
-    if(g_signal_handler_is_connected(o, conn->connection_id_)) //During destruction, GTK+ sometimes seems to disconnect them for us, before we expect it to.  See bug #87912
-      g_signal_handler_disconnect(o, conn->connection_id_);
-
-    conn->connection_id_ = 0;
-
-    delete conn; // if there are connection objects referring to slot_ they are notified during destruction of slot_
+      
+      //Forget the connection:
+      gulong connection_id = conn->connection_id_;
+      conn->connection_id_ = 0;
+      
+      g_signal_handler_disconnect(o, connection_id);
+    }
   }
+  else if(conn && !conn->object_)
+    g_warning("SignalProxyConnectionNode::notify(): called without gobject");
 
   return 0; // apparently unused in libsigc++
 }
@@ -66,11 +77,13 @@ void* SignalProxyConnectionNode::notify(void* data)
 //static
 void SignalProxyConnectionNode::destroy_notify_handler(gpointer data, GClosure*)
 {
+  //glib calls this when it has finished with a glib signal connection,
+  //either when the emitting object dies, or when the connection has been disconnected.
+  
   // notification from gtk+.
   SignalProxyConnectionNode* conn = static_cast<SignalProxyConnectionNode*>(data);
 
-  // if there is no object, this call was triggered from notify().
-  if (conn && conn->object_)
+  if(conn)
   {
     // the object has already lost track of this object.
     conn->object_ = 0;
