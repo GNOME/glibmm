@@ -30,7 +30,18 @@ extern "C" { typedef struct _GOptionEntry GOptionEntry; }
 namespace Glib
 {
 
-/** TODO
+/** An OptionEntry defines a single option. To have an effect, it must be added to an OptionGroup with 
+ * OptionGroup::add_entry().
+ * 
+ * The long name of an option can be used to specify it in a commandline as --long_name. 
+ * Every option must have a long name. To resolve conflicts if multiple option groups contain the same long name, it is also 
+ * possible to specify the option as --groupname-long_name.
+ *
+ * If an option has a short name, it can be specified as -short_name in a commandline.
+ *
+ * The description for the option is shown in the --help  output.
+ *
+ * The arg_descripton is the placeholder to use for the extra argument parsed by the option in --help  output. 
  */
 class OptionEntry
 {
@@ -41,7 +52,8 @@ public:
   enum Flags
   {
     FLAG_HIDDEN = 1 << 0,
-    FLAG_IN_MAIN = 1 << 1
+    FLAG_IN_MAIN = 1 << 1,
+    FLAG_REVERSE = 1 << 2
   } GOptionFlags;
 
   OptionEntry();
@@ -51,7 +63,7 @@ public:
   OptionEntry& operator=(const OptionEntry& src);
 
 #m4 _CONVERSION(`Glib::ustring',`const gchar*',`g_strdup(($3).c_str())')
-
+  
   _MEMBER_GET(long_name, long_name, Glib::ustring, const char*)
   _MEMBER_SET(long_name, long_name, Glib::ustring, const char*)
   
@@ -60,8 +72,6 @@ public:
   
   _MEMBER_GET(flags, flags, int, int)
   _MEMBER_SET(flags, flags, int, int)
-  
-  //TODO: Is this ever used? G_OPTION_ARG_NONE,
   
   //TODO: G_OPTION_ARG_CALLBACK,
     

@@ -78,17 +78,13 @@ OptionGroup::OptionGroup(const Glib::ustring& name, const Glib::ustring& descrip
   g_option_group_set_error_hook(gobj(), &g_callback_error);
 }
 
-/*
-OptionGroup::OptionGroup(GOptionGroup* castitem, bool take_copy)
+OptionGroup::OptionGroup(GOptionGroup* castitem)
+: gobject_(castitem),
+  has_ownership_(true)
 {
-  if(take_copy)
-  {
-    g_warning("TODO");
-  }
-  else
-    gobject_ = castitem;
+  //Always takes ownership - never takes copy.
 }
-*/
+
 
 OptionGroup::~OptionGroup()
 {

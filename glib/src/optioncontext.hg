@@ -35,12 +35,16 @@ namespace Glib
  */
 _WRAP_GERROR(OptionError, GOptionError, G_OPTION_ERROR, NO_GTYPE)
 
-/** TODO
+/** An OptionContext defines which options are accepted by the commandline option parser.
  */
 class OptionContext
 {
   _CLASS_GENERIC(OptionContext, GOptionContext)
 public:
+
+  /** Creates a new option context.
+   * @param parameter_string A string which is displayed in the first line of --help output, after programname [OPTION...]
+   */
   explicit OptionContext(const Glib::ustring& parameter_string = Glib::ustring());
   
   //Note that, unlike Glib::Wrap(), this would create a second C++ instance for the same C instance,
@@ -60,15 +64,27 @@ public:
   //- a group without callbacks seems to do some simple default parsing.
   _IGNORE(g_option_context_add_main_entries)
   
+  /** Adds an OptionGroup to the context, so that parsing with context will recognize the options in the group. 
+   * Note that the group will not be copied, so it should exist for as long as the context exists.
+   *
+   * @param group The group to add.
+   */
   void add_group(OptionGroup& group);
   _IGNORE(g_option_context_add_group)
   
+  /** Sets an OptionGroup as the main group of the context. This has the same effect as calling add_group(), the only 
+   * difference is that the options in the main group are treated differently when generating --help output.
+   * Note that the group will not be copied, so it should exist for as long as the context exists.
+   *
+   * @param group The group to add.
+   */
   void set_main_group(OptionGroup& group);
   _IGNORE(g_option_context_set_main_group)
   
+  //We don't need this (hopefully), and the memory management would be really awkward.
   //OptionGroup& get_main_group();
   //const OptionGroup& get_main_group() const;
-  //_IGNORE(g_option_context_get_main_group)
+  _IGNORE(g_option_context_get_main_group)
 
 
   GOptionContext*       gobj()       { return gobject_; }
