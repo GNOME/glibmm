@@ -200,7 +200,7 @@ AC_DEFUN([GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS],
 
   if test "x${gtkmm_cv_cxx_can_disambiguate_const_template_specializations}" = "xyes"; then
   {
-    AC_DEFINE([GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS],[1, [Defined if the compiler does not find it ambiguous to have both const and non-const template specializations]])
+    AC_DEFINE([GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS],[1], [Defined if the compiler does not find it ambiguous to have both const and non-const template specializations])
   }
   fi
 ])
