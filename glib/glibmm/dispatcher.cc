@@ -25,21 +25,87 @@
 #include <glibmm/thread.h>
 #include <sigc++/class_slot.h>
 
+#include <fcntl.h>
 #include <cerrno>
 #include <glib.h>
 
 #ifndef G_OS_WIN32
-#include <fcntl.h>
 #include <unistd.h>
 #else
 #include <windows.h>
-#include <fcntl.h>
+#include <io.h>
 #include <direct.h>
+#include <list>
+#include <iostream>
 #endif /* G_OS_WIN32 */
 
 
 namespace
 {
+
+#ifdef G_OS_WIN32
+/*
+ * Template Class that is used to transfer notification data between
+ * running thread and GUI-thread
+ */
+ //TODO: What does "TQ" mean?
+template<class TQ> class Locked_Queue
+{
+public:
+  Locked_Queue()
+  {
+  }
+  
+  ~Locked_Queue()
+  {
+    // We used new() to create the notification data so here we are
+    // deleting all remaining pointers in the queue.
+    std::transform(lqueue_.begin(), lqueue_.end(), lqueue_.begin(), delete_ptr);
+  }
+
+  TQ* get()
+  {
+    Glib::Mutex::Lock lock(mutex_);
+
+    TQ* ret = 0;
+    if(lqueue_.size() > 0)
+    {
+      ret = lqueue_.front();
+      lqueue_.pop_front();
+    }
+    
+    return ret;
+  }
+  
+  void put(TQ* e)
+  {
+    Glib::Mutex::Lock lock(mutex_);
+    lqueue_.push_back(e);
+  }
+  
+private:
+  Glib::Mutex mutex_;
+  std::list<TQ*> lqueue_;
+  
+  static TQ* delete_ptr(TQ* p)
+  {
+    delete p;
+    return 0;
+  }
+};
+
+/*
+ * Here we define differences between Win32 and UNIX pipe types and invalid values:
+ */
+#define FD_TYPE HANDLE
+#define INVALID_FD (0)
+
+#else //#ifdef G_OS_WIN32
+
+#define FD_TYPE int
+#define INVALID_FD (-1)
+
+#endif //#ifdef G_OS_WIN32
 
 struct DispatchNotifyData
 {
@@ -70,10 +136,15 @@ void fd_set_close_on_exec(int fd)
 
 /* One word: paranoia.
  */
-void fd_close_and_invalidate(int& fd)
+void fd_close_and_invalidate(FD_TYPE& fd)
 {
-  if(fd >= 0)
+  if(fd != INVALID_FD)
   {
+#ifdef G_OS_WIN32
+    // The way Win32 closes "pipe" handles
+    if( !CloseHandle(fd) )
+      warn_failed_pipe_io( "close", GetLastError() );
+#else
     int result;
 
     do { result = close(fd); }
@@ -81,8 +152,9 @@ void fd_close_and_invalidate(int& fd)
 
     if(result < 0)
       warn_failed_pipe_io("close", errno);
+#endif /* G_OS_WIN32 */
 
-    fd = -1;
+    fd = INVALID_FD;
   }
 }
 
@@ -112,8 +184,13 @@ private:
 
   Glib::RefPtr<MainContext> context_;
   int                       ref_count_;
-  int                       fd_receiver_;
-  int                       fd_sender_;
+  FD_TYPE                   fd_receiver_;
+#ifdef G_OS_WIN32
+  // queue used instead of sender pipe channel
+  Locked_Queue<DispatchNotifyData>  notify_queue_;
+#else
+  FD_TYPE                   fd_sender_;
+#endif /* G_OS_WIN32 */
   SigC::Connection          conn_io_handler_;
 
   void create_pipe();
@@ -134,20 +211,30 @@ DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
 :
   context_      (context),
   ref_count_    (0),
-  fd_receiver_  (-1),
-  fd_sender_    (-1)
+  fd_receiver_  (INVALID_FD),
+#ifndef G_OS_WIN32
+  fd_sender_    (INVALID_FD)
+#endif /* G_OS_WIN32 */
 {
   create_pipe();
 
   try
   {
+#ifdef G_OS_WIN32
+    conn_io_handler_ = context_->signal_io().connect(
+        SigC::slot_class(*this, &DispatchNotifier::pipe_io_handler),
+        GPOINTER_TO_INT(fd_receiver_), Glib::IO_IN);
+#else
     conn_io_handler_ = context_->signal_io().connect(
         SigC::slot_class(*this, &DispatchNotifier::pipe_io_handler),
         fd_receiver_, Glib::IO_IN);
+#endif /* G_OS_WIN32 */
   }
   catch(...)
   {
+#ifndef G_OS_WIN32
     fd_close_and_invalidate(fd_sender_);
+#endif /* G_OS_WIN32 */
     fd_close_and_invalidate(fd_receiver_);
 
     throw;
@@ -159,30 +246,44 @@ DispatchNotifier::~DispatchNotifier()
   // Disconnect manually because we're using SigC::slot_class().
   conn_io_handler_.disconnect();
 
+#ifndef G_OS_WIN32
   fd_close_and_invalidate(fd_sender_);
+#endif /* G_OS_WIN32 */
   fd_close_and_invalidate(fd_receiver_);
 }
 
 void DispatchNotifier::create_pipe()
 {
-  int filedes[2] = { -1, -1 };
+#ifdef G_OS_WIN32
+  // On Win32 we are using synchronization object instead of pipe
+  // thus storing its handle as fd_receiver_
+  if( !(fd_receiver_ = CreateEvent(NULL, FALSE, FALSE, NULL)) )
+  {
+    gint err_no = GetLastError();
+    GError* const error = g_error_new( G_FILE_ERROR, g_file_error_from_errno( err_no ),
+      "Failed to create pipe for inter-thread communication: %s",
+      g_win32_error_message( err_no ) );
+
+    throw Glib::FileError(error);
+  }
+#else
+  int filedes[2] = { INVALID_FD, INVALID_FD };
 
   if(pipe(filedes) < 0)
   {
-    GError *const error = g_error_new(
-        G_FILE_ERROR, g_file_error_from_errno(errno),
-        "Failed to create pipe for inter-thread communication: %s", g_strerror(errno));
+    GError* const error = g_error_new(G_FILE_ERROR, g_file_error_from_errno(errno),
+      "Failed to create pipe for inter-thread communication: %s",
+      g_strerror(errno));
 
     throw Glib::FileError(error);
   }
 
-#ifndef G_OS_WIN32
   fd_set_close_on_exec(filedes[0]);
   fd_set_close_on_exec(filedes[1]);
-#endif
 
   fd_receiver_ = filedes[0];
   fd_sender_   = filedes[1];
+#endif /* G_OS_WIN32 */
 }
 
 // static
@@ -225,6 +326,23 @@ void DispatchNotifier::unreference_instance(DispatchNotifier* notifier)
 
 void DispatchNotifier::send_notification(Dispatcher* dispatcher)
 {
+#ifdef G_OS_WIN32
+  DispatchNotifyData* data = new DispatchNotifyData();
+
+  data->tag        = 0xdeadbeef;
+  data->dispatcher = dispatcher;
+  data->notifier   = this;
+
+  // put notification data into queue
+  notify_queue_.put(data);
+
+  // send notification event to GUI-thread
+  if( !SetEvent(fd_receiver_) )
+  {
+    warn_failed_pipe_io("write", GetLastError());
+    return;
+  }
+#else
   DispatchNotifyData data = { 0xdeadbeef, dispatcher, this };
   gssize n_written;
 
@@ -243,10 +361,38 @@ void DispatchNotifier::send_notification(Dispatcher* dispatcher)
   // it's safe to assume immediate success for the tiny amount of data we're
   // writing.
   g_return_if_fail(n_written == sizeof(data));
+#endif /* G_OS_WIN32 */
 }
 
 bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
 {
+#ifdef G_OS_WIN32
+  DispatchNotifyData* data;
+
+  // read notification data from queue
+  while( (data = notify_queue_.get()) )
+  {
+    DispatchNotifyData local_data = *data;
+    // delete pointer cuz we did create it with new() operator
+    delete data;
+    g_return_val_if_fail(local_data.tag == 0xdeadbeef, true);
+    g_return_val_if_fail(local_data.notifier == this, true);
+
+    // Actually, we wouldn't need the try/catch block because
+    // the Glib::Source C callback already does it for us.
+    // However, we do it anyway because the default return value
+    // is 'false', which is not what we want.
+    try
+    {
+      local_data.dispatcher->signal_();
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+#else
+
   DispatchNotifyData data = { 0, 0, 0 };
   gsize n_read = 0;
 
@@ -282,6 +428,8 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
   {
     Glib::exception_handlers_invoke();
   }
+
+#endif /* G_OS_WIN32 */
 
   return true;
 }
