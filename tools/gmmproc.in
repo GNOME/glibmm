@@ -43,7 +43,8 @@ BEGIN {
   my $exec_prefix = "@exec_prefix@";
   my $libdir = "@libdir@";
 
-  $main::procdir = "$libdir/gtkmm-2.0/proc";
+  # This line must match the install directory in m4/Makefile.am
+  $main::procdir = "$libdir/glibmm-2.4/proc";
   $main::m4path = "@M4@";
 
   # This line must match install dir from pm/Makefile.am
@@ -67,7 +68,7 @@ $main::mergecdocs = 0; # e.g. gtk_docs.xml, contain C comments to be added to ou
 
 { # checking the environment for a set variable can trigger a warning
   no warnings;
-  $main::debug = 1 if ($ENV{'GTKMMPROC_DEBUG'} eq 1);
+  $main::debug = 1 if ($ENV{'GMMPROC_DEBUG'} eq 1);
 }
 
 # prototypes
@@ -174,18 +175,13 @@ sub print_usage()
   --doc       Produces a header file for documentation.  (FIXME)
 
   --debug     Leave intermediate output arround for analysis.
-              Alternatively, set GTKMMPROC_DEBUG=1 in the environment.
+              Alternatively, set GMMPROC_DEBUG=1 in the environment.
 
   --unwrapped Warn about possible unwrapped functions.
  
   --defs dir  Change the directory to seach for defs.
 
   -I dir      Specify the directory with m4 files.
-
-  -l
-  --local     Local widget (not part of gtkmm).  (FIXME)
-
-  --header-prefix  Override default header #ifndef name.  (FIXME)
 
 
 Note: This will read srcdir/name.{hg,ccg} file and generates destdir/name.cc
@@ -247,7 +243,6 @@ sub parse_command_line_args()
   $main::srcdir = $ARGV[0];
   $main::source = $_;
 
-  # This line must match the install directory in m4/Makefile.am
   push @main::macrodirs,"$main::procdir/m4";
 }
 

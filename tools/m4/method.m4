@@ -22,7 +22,7 @@ ifelse(`$8'`$9',,dnl
   ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');
 ifelse(`$9',,,`  if(error) ::Glib::Error::throw_exception(error);')
 ifelse(`$8',,,`dnl
-  if(!(retvalue.is_null()))
+  if(retvalue)
     retvalue->reference(); //The function does not do a ref for us.
 ')dnl
 ifelse(`$3',void,,`  return retvalue;')
@@ -46,7 +46,7 @@ ifelse(`$7'`$8',,dnl
   ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'($6)');
 ifelse(`$8',,,`  if(error) ::Glib::Error::throw_exception(error);')
 ifelse(`$7',,,`dnl
-  if(!(retvalue.is_null()))
+  if(retvalue)
     retvalue->reference(); //The function does not do a ref for us.
 ')dnl
 ifelse(`$3',void,,`  return retvalue;')
