@@ -1,4 +1,3 @@
 SUBDIRS = gendef glibmm examples tests
 
-EXTRA_DIST = glibmm.sln \
-             README
+EXTRA_DIST = blank.cpp glibmm.sln README
