@@ -233,26 +233,69 @@ public:
 
   static const size_type npos = std::string::npos;
 
+  /** Default constructor, which creates an empty string.
+   */
   ustring();
+  
   ~ustring();
 
+  /** Construct a ustring as a copy of a ustring
+   * @param other A source string.
+   */
   ustring(const ustring& other);
+
+  /** Assign the value of a string to this string.
+   * @param other A source string
+   */ 
   ustring& operator=(const ustring& other);
 
+  /** Swap contents with another string.
+   * @param other String to swap with.
+   */
   void swap(ustring& other);
 
-//! @name Create new strings.
-//! @{
-
+  /** Construct a ustring as a copy of a std::string
+   * @param src A source std::string containing text encoded as UTF-8.
+   */
   ustring(const std::string& src);
+
+  /** Construct a ustring as a copy of a substring
+   * @param src Source Glib::ustring.
+   * @param i Index of first character to copy from.
+   * @param n Number of characters to copy (default to copying the remainder).
+   */
   ustring(const ustring& src, size_type i, size_type n=npos);
+
+  /** Construct a ustring as a copy of a substring
+   * @param src Source C string encoded as UTF-8.
+   * @param n Number of characters to copy.
+   */
   ustring(const char* src, size_type n);
+
+  /** Construct a ustring as a copy of a substring
+   * @param src Source C string encoded as UTF-8.
+   */
   ustring(const char* src);
+
+  /** Construct a  ustring as multiple characters.
+   * @param n Number of characters.
+   * @param uc UTF-8 character to use.
+   */  
   ustring(size_type n, gunichar uc);
+
+  /** Construct a ustring as multiple characters.
+   * @param n Number of characters.
+   * @param c ASCII character to use.
+   */  
   ustring(size_type n, char c);
+
+  /** Construct a ustring as a copy of a range.
+   * @param pbegin Start of range.
+   * @param pend End of range.
+   */  
   template <class In> ustring(In pbegin, In pend);
 
-//! @}
+
 //! @name Assign new contents.
 //! @{
 
