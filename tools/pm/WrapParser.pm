@@ -1122,7 +1122,7 @@ sub output_wrap_check($$$$$$)
 sub output_wrap_signal($$$$$$$$)
 {
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn) = @_;
-
+  
   #Some checks:
   $self->output_wrap_check($CppDecl, $signal_name, $filename, $line_num, "WRAP_SIGNAL");
 

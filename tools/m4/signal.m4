@@ -205,12 +205,11 @@ dnl  g_assert(base != 0);
 ifelse($3,void,`dnl
     (*base->$2)`'(gobj`'()`'_COMMA_PREFIX($6));
 ',`dnl
-    $3 retvalue = _CONVERT($4,$3,`(*base->$2)`'(gobj`'()`'_COMMA_PREFIX($6))');
-ifelse(`$8',,,`dnl
-    if(retvalue)
-      retvalue->reference(); //The C function does not do a ref for us.
+ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requested.
+    return Glib::wrap((*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6)), true);
+',`dnl
+    return _CONVERT($4,$3,`(*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6))');
 ')dnl
-    return retvalue;
 
   typedef $3 RType;
   return RType`'();

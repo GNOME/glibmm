@@ -167,11 +167,6 @@ sub build_element_list($$$$)
     {
       my $part1 = $1;
       my $part2 = $2;
-      print "debug enum:";
-      print $1;
-      print "\n";
-      print $2;
-      print "\n";
     }
     elsif(/^\s*s#([^#]+)#([^#]*)#\s*$/)
     {

@@ -187,7 +187,7 @@ sub output_wrap_default_signal_handler_h($$$$$$)
 }
 
 # _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>')
-sub output_wrap_default_signal_handler_cc($$$$$$$)
+sub output_wrap_default_signal_handler_cc($$$$$$$$)
 {
   my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement, $bCustomCCallback, $bRefreturn) = @_;
   my $cname = $$objDefsSignal{name};
@@ -196,6 +196,9 @@ sub output_wrap_default_signal_handler_cc($$$$$$$)
   # e.g. Gtk::Button::on_clicked:
   if($bImplement eq 1)
   {
+    my $refreturn = "";
+    $refreturn = "refreturn" if($bRefreturn eq 1);
+  
     my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s, %s)dnl\n",
       $$objCppfunc{name},
       $cname,
@@ -204,7 +207,7 @@ sub output_wrap_default_signal_handler_cc($$$$$$$)
       $objCppfunc->args_types_and_names(),
       convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num), #$objCppfunc->args_names_only(),
       $$objCppfunc{const},
-      $bRefreturn);
+      $refreturn);
     $self->append($str);
   }
 
