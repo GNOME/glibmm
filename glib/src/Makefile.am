@@ -3,7 +3,7 @@
 
 sublib_name = glibmm
 sublib_namespace = Glib
-files_defs = glib.defs glib_enums.defs glib_functions.defs gobject.defs gobject_enums.defs gobject_functions.defs gmodule_enums.defs gmodule_functions.defs
+files_defs = glib.defs glib_enums.defs glib_functions.defs gobject.defs gobject_enums.defs gobject_functions.defs  gmodule_enums.defs gmodule_functions.defs glib_docs.xml glib_docs_override.xml
 
 include $(top_srcdir)/build_shared/Makefile_gensrc.am_fragment
 
