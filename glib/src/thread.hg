@@ -575,17 +575,94 @@ private:
   RWLock::WriterLock& operator=(const RWLock::WriterLock&);
 };
 
-
+/** An opaque data structure to represent a condition. 
+ * A @a Cond is an object that threads can block on, if they find a certain 
+ * condition to be false. If other threads change the state of this condition 
+ * they can signal the @a Cond, such that the waiting thread is woken up.
+ * @par Usage example:
+ * @code
+ * Glib::Cond data_cond;
+ * Glib::Mutex data_mutex;
+ * void* current_data = NULL;
+ * 
+ * void push_data (void* data)
+ * {
+ *   data_mutex.lock();
+ *   current_data = data;
+ *   data_cond.signal();
+ *   data_mutex.unlock();
+ * }
+ * 
+ * void* pop_data ()
+ * {
+ *   void* data;
+ * 
+ *   data_mutex.lock();
+ *   while (!current_data)
+ *       data_cond.wait(data_mutex);
+ *   data = current_data;
+ *   current_data = NULL;
+ *   data_mutex.unlock();
+ *   return data;
+ * }
+ * @endcode
+*/
 class Cond
 {
 public:
   Cond();
   ~Cond();
 
+  /** If threads are waiting for this @a Cond, exactly one of them is woken up. 
+   * It is good practice to hold the same lock as the waiting thread, while calling 
+   * this method, though not required.
+   *
+   * @note This method can also be used if @a Glib::thread_init() has not yet been 
+   * called and will do nothing then.
+   */
   void signal();
+
+  /** If threads are waiting for this @a Cond, all of them are woken up.
+   * It is good practice to hold the same lock as the waiting thread, while calling 
+   * this method, though not required.
+   *
+   * @note This method can also be used if @a Glib::thread_init() has not yet been 
+   * called and will do nothing then.
+   */
   void broadcast();
 
+  /** Waits until this thread is woken up on this @a Cond.
+   * The mutex is unlocked before falling asleep and locked again before resuming.
+   *
+   * This method can also be used if @a Glib::thread_init() has not yet been 
+   * called and will immediately return then. 
+   *
+   * @param mutex a @a Mutex that is currently locked.
+   * 
+   * @note It is important to use the @a wait() and @a timed_wait() methods
+   * only inside a loop, which checks for the condition to be true as it is not 
+   * guaranteed that the waiting thread will find it fulfilled, even if the signaling 
+   * thread left the condition in that state. This is because another thread can have 
+   * altered the condition, before the waiting thread got the chance to be woken up, 
+   * even if the condition itself is protected by a @a Mutex.
+   */
   void wait(Mutex& mutex);
+
+  /** Waits until this thread is woken up on this @a Cond, but not longer than until the time, that is specified by @a abs_time.
+   * The mutex is unlocked before falling asleep and locked again before resuming.
+   *
+   * This function can also be used, if @a Glib::thread_init() has not yet been 
+   * called and will immediately return @c true then. 
+   *
+   * @param mutex a @a Mutex that is currently locked.
+   * 
+   * @note It is important to use the @a wait() and @a timed_wait() methods
+   * only inside a loop, which checks for the condition to be true as it is not 
+   * guaranteed that the waiting thread will find it fulfilled, even if the signaling 
+   * thread left the condition in that state. This is because another thread can have 
+   * altered the condition, before the waiting thread got the chance to be woken up, 
+   * even if the condition itself is protected by a @a Mutex.
+   */
   bool timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time);
 
   GCond* gobj() { return gobject_; }
