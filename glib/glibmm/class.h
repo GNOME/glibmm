@@ -30,6 +30,19 @@
 namespace Glib
 {
 
+#ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+namesapace { //anonymous
+
+extern "C"
+{
+  //This is an extern "C" function, to call the non-extern "C" function.
+  //This is not public API.
+  void Class_custom_class_init_function(void* g_class, void* class_data);
+}
+
+} //anonymous namespace
+#endif // GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+
 class Class
 {
 public:
@@ -51,6 +64,8 @@ public:
 
   inline GType get_type() const;
   GType clone_custom_type(const char* custom_type_name) const;
+  
+  friend void Class_custom_class_init_function(void* g_class, void* class_data);
 
 protected:
   GType           gtype_;
@@ -58,7 +73,11 @@ protected:
 
   void register_derived_type(GType base_type);
 
+#ifdef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 private:
+#else
+public: //TODO: The friend should make this unnecessary, but it is not working.
+#endif
   static void custom_class_init_function(void* g_class, void* class_data);
 };
 
