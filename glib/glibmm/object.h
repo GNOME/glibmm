@@ -145,6 +145,91 @@ private:
   //virtual void set_manage();
 };
 
+
+//For some (proably, more spec-compliant) compilers, these specializations must
+//be next to the objects that they use.
+#ifndef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+#ifndef DOXYGEN_SHOULD_SKIP_THIS /* hide the specializations */
+
+namespace Container_Helpers
+{
+
+/** Partial specialization for pointers to GObject instances.
+ * @ingroup ContHelpers
+ * The C++ type is always a Glib::RefPtr<>.
+ */
+template <class T>
+struct TypeTraits< Glib::RefPtr<T> >
+{
+  typedef Glib::RefPtr<T>              CppType;
+  typedef typename T::BaseObjectType * CType;
+  typedef typename T::BaseObjectType * CTypeNonConst;
+
+  static CType   to_c_type      (const CppType& ptr) { return Glib::unwrap(ptr);     }
+  static CType   to_c_type      (CType          ptr) { return ptr;                   }
+  static CppType to_cpp_type    (CType          ptr)
+  {
+    //return Glib::wrap(ptr, true);
+
+    //We copy/paste the wrap() implementation here,
+    //because we can not use a specific Glib::wrap(CType) overload here,
+    //because that would be "dependent", and g++ 3.4 does not allow that.
+    //The specific Glib::wrap() overloads don't do anything special anyway.
+    GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
+    return Glib::RefPtr<T>( dynamic_cast<T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
+    //We use dynamic_cast<> in case of multiple inheritance.
+  }
+  
+  static void    release_c_type (CType          ptr)
+  {
+    GLIBMM_DEBUG_UNREFERENCE(0, ptr);
+    g_object_unref(ptr);
+  }
+};
+
+//This confuse the SUN Forte compiler, so we ifdef it out:
+#ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
+/** Partial specialization for pointers to const GObject instances.
+ * @ingroup ContHelpers
+ * The C++ type is always a Glib::RefPtr<>.
+ */
+template <class T>
+struct TypeTraits< Glib::RefPtr<const T> >
+{
+  typedef Glib::RefPtr<const T>              CppType;
+  typedef const typename T::BaseObjectType * CType;
+  typedef typename T::BaseObjectType *       CTypeNonConst;
+
+  static CType   to_c_type      (const CppType& ptr) { return Glib::unwrap(ptr);     }
+  static CType   to_c_type      (CType          ptr) { return ptr;                   }
+  static CppType to_cpp_type    (CType          ptr)
+  {
+    //return Glib::wrap(ptr, true);
+
+    //We copy/paste the wrap() implementation here,
+    //because we can not use a specific Glib::wrap(CType) overload here,
+    //because that would be "dependent", and g++ 3.4 does not allow that.
+    //The specific Glib::wrap() overloads don't do anything special anyway.
+    GObject* cobj = (GObject*)(ptr);
+    return Glib::RefPtr<const T>( dynamic_cast<const T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
+    //We use dynamic_cast<> in case of multiple inheritance.
+  }
+  
+  static void    release_c_type (CType          ptr)
+  {
+    GLIBMM_DEBUG_UNREFERENCE(0, ptr);
+    g_object_unref(const_cast<CTypeNonConst>(ptr));
+  }
+};
+
+#endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
+} //namespace Container_Helpers
+
+#endif //DOXYGEN_SHOULD_SKIP_THIS
+#endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+
 } // namespace Glib
 
 #endif /* _GLIBMM_OBJECT_H */

@@ -51,47 +51,19 @@ class ParserCallbacks
 {
 public:
   static const GMarkupParser vfunc_table;
-
-  static void start_element(GMarkupParseContext* context,
-                            const char*          element_name,
-                            const char**         attribute_names,
-                            const char**         attribute_values,
-                            void*                user_data,
-                            GError**             error);
-
-  static void end_element(GMarkupParseContext* context,
-                          const char*          element_name,
-                          void*                user_data,
-                          GError**             error);
-
-  static void text(GMarkupParseContext* context,
-                   const char*          text,
-                   gsize                text_len,  
-                   void*                user_data,
-                   GError**             error);
-
-  static void passthrough(GMarkupParseContext* context,
-                          const char*          passthrough_text,
-                          gsize                text_len,  
-                          void*                user_data,
-                          GError**             error);
-
-  static void error(GMarkupParseContext* context,
-                    GError*              error,
-                    void*                user_data);
 };
 
 
 const GMarkupParser ParserCallbacks::vfunc_table =
 {
-  &ParserCallbacks::start_element,
-  &ParserCallbacks::end_element,
-  &ParserCallbacks::text,
-  &ParserCallbacks::passthrough,
-  &ParserCallbacks::error,
+  &ParserCallbacks_start_element,
+  &ParserCallbacks_end_element,
+  &ParserCallbacks_text,
+  &ParserCallbacks_passthrough,
+  &ParserCallbacks_error,
 };
 
-void ParserCallbacks::start_element(GMarkupParseContext* context,
+void ParserCallbacks_start_element(GMarkupParseContext* context,
                                     const char*          element_name,
                                     const char**         attribute_names,
                                     const char**         attribute_values,
@@ -128,7 +100,7 @@ void ParserCallbacks::start_element(GMarkupParseContext* context,
   }
 }
 
-void ParserCallbacks::end_element(GMarkupParseContext* context,
+void ParserCallbacks_end_element(GMarkupParseContext* context,
                                   const char*          element_name,
                                   void*                user_data,
                                   GError**             error)
@@ -150,7 +122,7 @@ void ParserCallbacks::end_element(GMarkupParseContext* context,
   }
 }
 
-void ParserCallbacks::text(GMarkupParseContext* context,
+void ParserCallbacks_text(GMarkupParseContext* context,
                            const char*          text,
                            gsize                text_len,  
                            void*                user_data,
@@ -173,7 +145,7 @@ void ParserCallbacks::text(GMarkupParseContext* context,
   }
 }
 
-void ParserCallbacks::passthrough(GMarkupParseContext* context,
+void ParserCallbacks_passthrough(GMarkupParseContext* context,
                                   const char*          passthrough_text,
                                   gsize                text_len,  
                                   void*                user_data,
@@ -197,7 +169,7 @@ void ParserCallbacks::passthrough(GMarkupParseContext* context,
   }
 }
 
-void ParserCallbacks::error(GMarkupParseContext* context,
+void ParserCallbacks_error(GMarkupParseContext* context,
                             GError*              error,
                             void*                user_data)
 {
@@ -247,7 +219,7 @@ ParseContext::ParseContext(Parser& parser, ParseFlags flags)
 :
   parser_  (&parser),
   gobject_ (g_markup_parse_context_new(&ParserCallbacks::vfunc_table, (GMarkupParseFlags) flags,
-                                       this, &ParseContext::destroy_notify_callback))
+                                       this, &ParseContext_destroy_notify_callback))
 {}
 
 ParseContext::~ParseContext()
@@ -302,9 +274,8 @@ int ParseContext::get_char_number() const
   g_markup_parse_context_get_position(gobject_, 0, &char_number);
   return char_number;
 }
-
-// static
-void ParseContext::destroy_notify_callback(void* data)
+ 
+void ParseContext_destroy_notify_callback(void* data)
 {
   ParseContext *const self = static_cast<ParseContext*>(data);
 

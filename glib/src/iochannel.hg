@@ -35,6 +35,40 @@ GLIBMM_USING_STD(string)
 extern "C" { typedef struct _GIOChannel GIOChannel; }
 #endif
 
+namespace Glib { //anonymous
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+//On some compilers, such as the MipsPro compiler, you can not assign 
+//a non-extern "C" function to a pointer to an extern "C" function.
+//And static member functions can never be extern "C",
+//so these must go outside the class.
+//
+//They must also be declared as extern "C", _before_ they are declared as being friends of a class,
+//so they must be in this header, though they are only used in the .cc file.
+//
+//murrayc.
+extern "C"
+{
+//These are definitely not public API. We would prefer not to export them, if we could find a way to do that.
+GIOStatus GlibmmIOChannel_io_read(GIOChannel* channel, char* buf, gsize count,
+                           gsize* bytes_read, GError** err);
+
+GIOStatus GlibmmIOChannel_io_write(GIOChannel* channel, const char* buf, gsize count,
+                            gsize* bytes_written, GError** err);
+
+GIOStatus GlibmmIOChannel_io_seek (GIOChannel* channel, gint64 offset, GSeekType type, GError** err);
+GIOStatus GlibmmIOChannel_io_close(GIOChannel* channel, GError** err);
+
+GSource*  GlibmmIOChannel_io_create_watch(GIOChannel* channel, GIOCondition condition);
+void      GlibmmIOChannel_io_free(GIOChannel* channel);
+
+GIOStatus GlibmmIOChannel_io_set_flags(GIOChannel* channel, GIOFlags flags, GError** err);
+GIOFlags  GlibmmIOChannel_io_get_flags(GIOChannel* channel);
+} //extern "C"
+
+#endif //DOXYGEN_SHOULD_SKIP_THIS
+
+} //anonymous namespace
 
 namespace Glib
 {
@@ -61,7 +95,7 @@ _WRAP_GERROR(IOChannelError, GIOChannelError, G_IO_CHANNEL_ERROR, NO_GTYPE,
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 class GlibmmIOChannel;
-#endif
+#endif //DOXYGEN_SHOULD_SKIP_THIS
 
 /** IOChannel aims to provide portable I/O support for files, pipes
  * and sockets, and to integrate them with the GLib main event loop.
@@ -443,6 +477,20 @@ protected:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   friend class Glib::GlibmmIOChannel;
+  
+  friend GIOStatus GlibmmIOChannel_io_read(GIOChannel* channel, char* buf, gsize count, 
+                            gsize* bytes_read, GError** err);
+  friend GIOStatus GlibmmIOChannel_io_write(GIOChannel* channel, const char* buf, gsize count,
+                            gsize* bytes_written, GError** err);
+
+  friend GIOStatus GlibmmIOChannel_io_seek (GIOChannel* channel, gint64 offset, GSeekType type, GError** err);
+  friend GIOStatus GlibmmIOChannel_io_close(GIOChannel* channel, GError** err);
+
+  friend GSource*  GlibmmIOChannel_io_create_watch(GIOChannel* channel, GIOCondition condition);
+  friend void      GlibmmIOChannel_io_free(GIOChannel* channel);
+
+  friend GIOStatus GlibmmIOChannel_io_set_flags(GIOChannel* channel, GIOFlags flags, GError** err);
+  friend GIOFlags  GlibmmIOChannel_io_get_flags(GIOChannel* channel);
 #endif
 };
 

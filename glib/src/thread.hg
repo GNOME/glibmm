@@ -676,7 +676,7 @@ private:
   Cond& operator=(const Cond&);
 };
 
-
+//TODO: What is this class used for? Is it public API? murrayc
 template <class T>
 struct StaticPrivate
 {
@@ -695,12 +695,24 @@ struct StaticPrivate
 #endif
 };
 
+namespace { //anonymous
+
+//We must put this here, because we can't use extern "C" inside the class.
+extern "C" {
+typedef void (*Private_DestructorFunc) (void*);
+}
+
+} //anonymous
+
+//TODO: What is this class used for? Is it public API? murray
 template <class T>
 class Private
 {
 public:
-  typedef void (*DestructorFunc) (void*);
-
+  //We can't do this: extern "C" { typedef void (*DestructorFunc) (void*); }
+  //So we do this:
+  typedef Private_DestructorFunc DestructorFunc;
+  
   static void delete_ptr(void* data);
 
   explicit inline Private(DestructorFunc destructor_func = &Private<T>::delete_ptr);
