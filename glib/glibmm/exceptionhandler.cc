@@ -40,10 +40,10 @@ typedef sigc::signal<void> HandlerList;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.
-Glib::StaticPrivate<HandlerList> thread_specific_handler_list = GLIBMM_STATIC_PRIVATE_INIT;
+static Glib::StaticPrivate<HandlerList> thread_specific_handler_list = GLIBMM_STATIC_PRIVATE_INIT;
 
 
-void glibmm_exception_warning(const GError* error)
+static void glibmm_exception_warning(const GError* error)
 {
   g_assert(error != 0);
 
@@ -56,7 +56,7 @@ void glibmm_exception_warning(const GError* error)
       (error->message) ? error->message : "(null)");
 }
 
-void glibmm_unexpected_exception()
+static void glibmm_unexpected_exception()
 {
   try
   {

@@ -154,7 +154,7 @@ void SourceCallbackData::destroy_notify_callback(void* data)
 
 /* Retrieve the callback data from a wrapped GSource object.
  */
-SourceCallbackData* glibmm_source_get_callback_data(GSource* source)
+static SourceCallbackData* glibmm_source_get_callback_data(GSource* source)
 {
   g_return_val_if_fail(source->callback_funcs->get != 0, 0);
 
@@ -175,7 +175,7 @@ SourceCallbackData* glibmm_source_get_callback_data(GSource* source)
  * than some random pointer.  That also allows for sanity checks
  * here as well as in Source::dispatch_vfunc().
  */
-gboolean glibmm_dummy_source_callback(void*)
+static gboolean glibmm_dummy_source_callback(void*)
 {
   g_assert_not_reached();
   return 0;
@@ -185,7 +185,7 @@ gboolean glibmm_dummy_source_callback(void*)
  * These don't use Glib::Source, to avoid the unnecessary overhead
  * of a completely unused wrapper object.
  */
-gboolean glibmm_source_callback(void* data)
+static gboolean glibmm_source_callback(void* data)
 {
   SourceConnectionNode *const conn_data = static_cast<SourceConnectionNode*>(data);
 
@@ -201,7 +201,7 @@ gboolean glibmm_source_callback(void* data)
   return 0;
 }
 
-gboolean glibmm_iosource_callback(GIOChannel*, GIOCondition condition, void* data)
+static gboolean glibmm_iosource_callback(GIOChannel*, GIOCondition condition, void* data)
 {
   SourceCallbackData *const callback_data = static_cast<SourceCallbackData*>(data);
   g_return_val_if_fail(callback_data->node != 0, 0);

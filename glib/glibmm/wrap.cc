@@ -43,10 +43,10 @@ namespace
 
 typedef std::vector<Glib::WrapNewFunction> WrapFuncTable;
 
-WrapFuncTable* wrap_func_table = 0;
+static WrapFuncTable* wrap_func_table = 0;
 
 
-Glib::ObjectBase* create_new_wrapper(GObject* object)
+static Glib::ObjectBase* create_new_wrapper(GObject* object)
 {
   g_return_val_if_fail(wrap_func_table != 0, 0);
 

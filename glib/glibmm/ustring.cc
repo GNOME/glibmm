@@ -56,7 +56,7 @@ struct UnicharToUtf8
 
 // First overload: stop on '\0' character.
 //
-ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset)
+static ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset)
 {
   if(offset == ustring::npos)
     return ustring::npos;
@@ -79,7 +79,7 @@ ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset)
 
 // Second overload: stop when reaching maxlen.
 //
-ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset,
+static ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset,
                                     ustring::size_type maxlen)
 {
   if(offset == ustring::npos)

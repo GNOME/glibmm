@@ -54,7 +54,7 @@ struct DispatchNotifyData
     : tag (tag_), dispatcher (dispatcher_), notifier (notifier_) {}
 };
 
-void warn_failed_pipe_io(const char* what, int err_no)
+static void warn_failed_pipe_io(const char* what, int err_no)
 {
 #ifdef G_OS_WIN32
   const char *const message = g_win32_error_message(err_no);
@@ -69,7 +69,7 @@ void warn_failed_pipe_io(const char* what, int err_no)
  * Try to set the close-on-exec flag of the file descriptor,
  * so that it won't be leaked if a new process is spawned.
  */
-void fd_set_close_on_exec(int fd)
+static void fd_set_close_on_exec(int fd)
 {
   const int flags = fcntl(fd, F_GETFD, 0);
   g_return_if_fail(flags >= 0);
@@ -82,7 +82,7 @@ void fd_set_close_on_exec(int fd)
  * One word: paranoia.
  */
 #ifdef G_OS_WIN32
-void fd_close_and_invalidate(HANDLE& fd)
+static void fd_close_and_invalidate(HANDLE& fd)
 {
   if(fd != 0)
   {
@@ -93,7 +93,7 @@ void fd_close_and_invalidate(HANDLE& fd)
   }
 }
 #else /* !G_OS_WIN32 */
-void fd_close_and_invalidate(int& fd)
+static void fd_close_and_invalidate(int& fd)
 {
   if(fd >= 0)
   {

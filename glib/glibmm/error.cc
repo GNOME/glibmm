@@ -36,7 +36,7 @@ namespace
 
 typedef std::map<GQuark,Glib::Error::ThrowFunc> ThrowFuncTable;
 
-ThrowFuncTable* throw_func_table = 0;
+static ThrowFuncTable* throw_func_table = 0;
 
 } // anonymous namespace
 

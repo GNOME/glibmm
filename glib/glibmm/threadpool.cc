@@ -98,7 +98,7 @@ void ThreadPool::SlotList::lock_and_unlock()
 namespace
 {
 
-void call_thread_entry_slot(void* data, void* user_data)
+static void call_thread_entry_slot(void* data, void* user_data)
 {
   try
   {
