@@ -61,14 +61,17 @@ ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset)
   if(offset == ustring::npos)
     return ustring::npos;
 
+  const char *const utf8_skip = g_utf8_skip;
   const char* p = str;
 
   for(; offset != 0; --offset)
   {
-    if(*p == '\0')
+    const unsigned int c = static_cast<unsigned char>(*p);
+
+    if(c == 0)
       return ustring::npos;
 
-    p = g_utf8_next_char(p);
+    p += utf8_skip[c];
   }
 
   return (p - str);
@@ -76,12 +79,13 @@ ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset)
 
 // Second overload: stop when reaching maxlen.
 //
-ustring::size_type utf8_byte_offset(
-    const char* str, ustring::size_type offset, ustring::size_type maxlen)
+ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset,
+                                    ustring::size_type maxlen)
 {
   if(offset == ustring::npos)
     return ustring::npos;
 
+  const char *const utf8_skip = g_utf8_skip;
   const char *const pend = str + maxlen;
   const char* p = str;
 
@@ -90,7 +94,7 @@ ustring::size_type utf8_byte_offset(
     if(p >= pend)
       return ustring::npos;
 
-    p = g_utf8_next_char(p);
+    p += utf8_skip[static_cast<unsigned char>(*p)];
   }
 
   return (p - str);
@@ -137,10 +141,9 @@ ustring::size_type utf8_char_offset(const std::string& str, ustring::size_type o
 // Helper to implement ustring::find_first_of() and find_first_not_of().
 // Returns the UTF-8 character offset, or ustring::npos if not found.
 //
-ustring::size_type utf8_find_first_of(
-    const std::string& str, ustring::size_type offset,
-    const char* utf8_match, long utf8_match_size,
-    bool find_not_of)
+ustring::size_type utf8_find_first_of(const std::string& str, ustring::size_type offset,
+                                      const char* utf8_match, long utf8_match_size,
+                                      bool find_not_of)
 {
   const ustring::size_type byte_offset = utf8_byte_offset(str, offset);
   if(byte_offset == ustring::npos)
@@ -160,8 +163,7 @@ ustring::size_type utf8_find_first_of(
       pstr < str_end;
       pstr = g_utf8_next_char(pstr))
   {
-    const gunichar *const pfound =
-        std::find(match_begin, match_end, g_utf8_get_char(pstr));
+    const gunichar *const pfound = std::find(match_begin, match_end, g_utf8_get_char(pstr));
 
     if((pfound != match_end) != find_not_of)
       return offset;
@@ -175,10 +177,9 @@ ustring::size_type utf8_find_first_of(
 // Helper to implement ustring::find_last_of() and find_last_not_of().
 // Returns the UTF-8 character offset, or ustring::npos if not found.
 //
-ustring::size_type utf8_find_last_of(
-    const std::string& str, ustring::size_type offset,
-    const char* utf8_match, long utf8_match_size,
-    bool find_not_of)
+ustring::size_type utf8_find_last_of(const std::string& str, ustring::size_type offset,
+                                     const char* utf8_match, long utf8_match_size,
+                                     bool find_not_of)
 {
   long ucs4_match_size = 0;
   const Glib::ScopedPtr<gunichar> ucs4_match
@@ -197,10 +198,9 @@ ustring::size_type utf8_find_last_of(
   while(pstr > str_begin)
   {
     // Move to previous character.
-    do { --pstr; } while((*pstr & '\xC0') == '\x80');
+    do --pstr; while((*pstr & '\xC0') == '\x80');
 
-    const gunichar *const pfound =
-        std::find(match_begin, match_end, g_utf8_get_char(pstr));
+    const gunichar *const pfound = std::find(match_begin, match_end, g_utf8_get_char(pstr));
 
     if((pfound != match_end) != find_not_of)
       return g_utf8_pointer_to_offset(str_begin, pstr);
@@ -217,29 +217,57 @@ namespace Glib
 
 // We need our own version of g_utf8_get_char(), because the std::string
 // iterator is not necessarily a plain pointer (it's in fact not in GCC's
-// libstdc++-v3).  Copying the UTF-8 data into a temporary buffer isn't
-// an option since this operation is quite time critical.
+// libstdc++-v3).  Copying the UTF-8 data into a temporary buffer isn't an
+// option since this operation is quite time critical.  The implementation
+// is quite different from g_utf8_get_char() -- both more generic and faster.
 //
-// Please excuse the lack of comments:  In order to understand what the
-// code does, you just have to know how UCS-4 characters are encoded in
-// UTF-8 (see http://www.cl.cam.ac.uk/~mgk25/unicode.html).  With that
-// knowledge, the code should be pretty easy to understand -- comments
-// would only reduce readability.
+// By looking at the first byte of a UTF-8 character one can determine the
+// number of bytes used.  GLib offers the g_utf8_skip[] array for this purpose,
+// but accessing this global variable would introduce a function call to fetch
+// the Global Offset Table, plus two levels of indirection in order to read the
+// value.  Even worse, fetching the GOT is always done right at the start of
+// the function instead of the branch that actually uses the variable.
+//
+// Fortunately, there's a better way to get the byte count.  As this table
+// shows, there's a nice regular pattern in the UTF-8 encoding scheme:
+//
+// 0x00000000 - 0x0000007F: 0xxxxxxx
+// 0x00000080 - 0x000007FF: 110xxxxx 10xxxxxx
+// 0x00000800 - 0x0000FFFF: 1110xxxx 10xxxxxx 10xxxxxx
+// 0x00010000 - 0x001FFFFF: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+// 0x00200000 - 0x03FFFFFF: 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+// 0x04000000 - 0x7FFFFFFF: 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+//
+// Except for the single byte case, the number of leading 1-bits equals the
+// byte count.  All that is needed is to shift the first byte to the left
+// until bit 7 becomes 0.  Naturally, doing so requires a loop -- but since
+// we already have one, no additional cost is introduced.  This shifting can
+// further be combined with the computation of the bitmask needed to eliminate
+// the leading length bits, thus saving yet another register.
 //
 gunichar get_unichar_from_std_iterator(std::string::const_iterator pos)
 {
-  gunichar result = static_cast<unsigned char>(*pos);
+  unsigned int result = static_cast<unsigned char>(*pos);
 
   if((result & 0x80) != 0)
   {
-    unsigned char len = g_utf8_skip[result];
-    result &= 0x7F >> len;
+    unsigned int mask = 0x40;
 
-    while(--len != 0)
+    // This loop may look somewhat strange, but this happens to be the
+    // one variant g++ 3.3 generates optimum code for.  (In particular,
+    // the unconditional break avoids counterproductive loop alignment.)
+    for(++pos;; ++pos)
     {
-      result <<= 6;
-      result |= static_cast<unsigned char>(*++pos) & 0x3F;
+      mask <<= 5;
+      const unsigned int c = static_cast<unsigned char>(*pos);
+      result = (result << 6) + c - 0x80;
+
+      if((result & mask) != 0)
+        continue;
+      break;
     }
+
+    result &= --mask;
   }
 
   return result;
@@ -283,7 +311,7 @@ ustring::ustring(ustring::size_type n, gunichar uc)
   if(uc < 0x80)
   {
     // Optimize the probably most common case.
-    string_.assign(n, static_cast<char>(static_cast<unsigned char>(uc)));
+    string_.assign(n, static_cast<char>(uc));
   }
   else
   {
@@ -377,8 +405,8 @@ ustring& ustring::assign(const char* src)
 
 ustring& ustring::assign(ustring::size_type n, gunichar uc)
 {
-  ustring tmp (n, uc);
-  string_.swap(tmp.string_);
+  ustring temp (n, uc);
+  string_.swap(temp.string_);
   return *this;
 }
 
@@ -747,33 +775,29 @@ ustring::const_reverse_iterator ustring::rend() const
 
 ustring::size_type ustring::find(const ustring& str, ustring::size_type i) const
 {
-  return utf8_char_offset(string_,
-      string_.find(str.string_, utf8_byte_offset(string_, i)));
+  return utf8_char_offset(string_, string_.find(str.string_, utf8_byte_offset(string_, i)));
 }
 
 ustring::size_type ustring::find(const char* str, ustring::size_type i, ustring::size_type n) const
 {
-  return utf8_char_offset(string_, string_.find(
-      str, utf8_byte_offset(string_, i), utf8_byte_offset(str, n)));
+  return utf8_char_offset(string_, string_.find(str, utf8_byte_offset(string_, i),
+                                                     utf8_byte_offset(str, n)));
 }
 
 ustring::size_type ustring::find(const char* str, ustring::size_type i) const
 {
-  return utf8_char_offset(string_,
-      string_.find(str, utf8_byte_offset(string_, i)));
+  return utf8_char_offset(string_, string_.find(str, utf8_byte_offset(string_, i)));
 }
 
 ustring::size_type ustring::find(gunichar uc, ustring::size_type i) const
 {
   const UnicharToUtf8 conv (uc);
-  return utf8_char_offset(string_,
-      string_.find(conv.buf, utf8_byte_offset(string_, i), conv.len));
+  return utf8_char_offset(string_, string_.find(conv.buf, utf8_byte_offset(string_, i), conv.len));
 }
 
 ustring::size_type ustring::find(char c, ustring::size_type i) const
 {
-  return utf8_char_offset(string_,
-      string_.find(c, utf8_byte_offset(string_, i)));
+  return utf8_char_offset(string_, string_.find(c, utf8_byte_offset(string_, i)));
 }
 
 
@@ -781,34 +805,30 @@ ustring::size_type ustring::find(char c, ustring::size_type i) const
 
 ustring::size_type ustring::rfind(const ustring& str, ustring::size_type i) const
 {
-  return utf8_char_offset(string_,
-      string_.rfind(str.string_, utf8_byte_offset(string_, i)));
+  return utf8_char_offset(string_, string_.rfind(str.string_, utf8_byte_offset(string_, i)));
 }
 
 ustring::size_type ustring::rfind(const char* str, ustring::size_type i,
                                   ustring::size_type n) const
 {
-  return utf8_char_offset(string_, string_.rfind(
-      str, utf8_byte_offset(string_, i), utf8_byte_offset(str, n)));
+  return utf8_char_offset(string_, string_.rfind(str, utf8_byte_offset(string_, i),
+                                                      utf8_byte_offset(str, n)));
 }
 
 ustring::size_type ustring::rfind(const char* str, ustring::size_type i) const
 {
-  return utf8_char_offset(string_,
-      string_.rfind(str, utf8_byte_offset(string_, i)));
+  return utf8_char_offset(string_, string_.rfind(str, utf8_byte_offset(string_, i)));
 }
 
 ustring::size_type ustring::rfind(gunichar uc, ustring::size_type i) const
 {
   const UnicharToUtf8 conv (uc);
-  return utf8_char_offset(string_,
-      string_.rfind(conv.buf, utf8_byte_offset(string_, i), conv.len));
+  return utf8_char_offset(string_, string_.rfind(conv.buf, utf8_byte_offset(string_, i), conv.len));
 }
 
 ustring::size_type ustring::rfind(char c, ustring::size_type i) const
 {
-  return utf8_char_offset(string_,
-      string_.rfind(c, utf8_byte_offset(string_, i)));
+  return utf8_char_offset(string_, string_.rfind(c, utf8_byte_offset(string_, i)));
 }
 
 
@@ -1070,45 +1090,47 @@ ustring::size_type ustring::copy(char* dest, ustring::size_type n, ustring::size
 
 bool ustring::validate() const
 {
-  return g_utf8_validate(string_.data(), string_.size(), 0);
+  return (g_utf8_validate(string_.data(), string_.size(), 0) != 0);
 }
 
 bool ustring::validate(ustring::iterator& first_invalid)
 {
   const char *const pdata = string_.data();
   const char* valid_end = pdata;
-  const bool is_valid = g_utf8_validate(pdata, string_.size(), &valid_end);
+  const int is_valid = g_utf8_validate(pdata, string_.size(), &valid_end);
 
   first_invalid = iterator(string_.begin() + (valid_end - pdata));
-  return is_valid;
+  return (is_valid != 0);
 }
 
 bool ustring::validate(ustring::const_iterator& first_invalid) const
 {
   const char *const pdata = string_.data();
   const char* valid_end = pdata;
-  const bool is_valid = g_utf8_validate(pdata, string_.size(), &valid_end);
+  const int is_valid = g_utf8_validate(pdata, string_.size(), &valid_end);
 
   first_invalid = const_iterator(string_.begin() + (valid_end - pdata));
-  return is_valid;
+  return (is_valid != 0);
 }
 
 bool ustring::is_ascii() const
 {
-  const std::string::const_iterator string_end = string_.end();
-  for(std::string::const_iterator p = string_.begin(); p != string_end; ++p)
+  const char* p = string_.data();
+  const char *const pend = p + string_.size();
+
+  for(; p != pend; ++p)
   {
     if((*p & '\x80') != 0)
       return false;
   }
+
   return true;
 }
 
 ustring ustring::normalize(NormalizeMode mode) const
 {
-  const ScopedPtr<char> buf (g_utf8_normalize(
-      string_.data(), string_.size(), static_cast<GNormalizeMode>(int(mode))));
-
+  const ScopedPtr<char> buf (g_utf8_normalize(string_.data(), string_.size(),
+                                              static_cast<GNormalizeMode>(int(mode))));
   return ustring(buf.get());
 }
 

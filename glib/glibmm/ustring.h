@@ -21,6 +21,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glib/gmacros.h>
 #include <glib/gunicode.h>
 #include <glibmm/unicode.h>
 
@@ -133,7 +134,7 @@ private:
  * but it might be useful as utility function if you prefer using
  * std::string even for UTF-8 encoding.
  */
-gunichar get_unichar_from_std_iterator(std::string::const_iterator pos);
+gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_PURE;
 
 
 /** Glib::ustring has much the same interface as std::string, but contains
@@ -543,7 +544,7 @@ public:
 //! @{
 
   /*! Returns a new UTF-8 string with all characters characters converted to
-   * their uppercase equivalent, while honoring the current locale.  The
+   * their lowercase equivalent, while honoring the current locale.  The
    * resulting string may change in the number of bytes as well as in the
    * number of characters.  For instance, the German sharp&nbsp;s
    * <tt>"&szlig;"</tt> will be replaced by two characters <tt>"SS"</tt>
@@ -678,24 +679,24 @@ ustring_Iterator<T>& ustring_Iterator<T>::operator++()
 template <class T> inline
 const ustring_Iterator<T> ustring_Iterator<T>::operator++(int)
 {
-  const ustring_Iterator<T> tmp (*this);
+  const ustring_Iterator<T> temp (*this);
   this->operator++();
-  return tmp;
+  return temp;
 }
 
 template <class T> inline
 ustring_Iterator<T>& ustring_Iterator<T>::operator--()
 {
-  do { --pos_; } while((*pos_ & '\xC0') == '\x80');
+  do --pos_; while((*pos_ & '\xC0') == '\x80');
   return *this;
 }
 
 template <class T> inline
 const ustring_Iterator<T> ustring_Iterator<T>::operator--(int)
 {
-  const ustring_Iterator<T> tmp (*this);
+  const ustring_Iterator<T> temp (*this);
   this->operator--();
-  return tmp;
+  return temp;
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
@@ -921,31 +922,31 @@ inline bool operator>=(const char* lhs, const ustring& rhs)
 
 /** @relates Glib::ustring */
 inline ustring operator+(const ustring& lhs, const ustring& rhs)
-  { return ustring(lhs) += rhs; }
+  { ustring temp (lhs); temp += rhs; return temp; }
 
 /** @relates Glib::ustring */
 inline ustring operator+(const ustring& lhs, const char* rhs)
-  { return ustring(lhs) += rhs; }
+  { ustring temp (lhs); temp += rhs; return temp; }
 
 /** @relates Glib::ustring */
 inline ustring operator+(const char* lhs, const ustring& rhs)
-  { return ustring(lhs) += rhs; }
+  { ustring temp (lhs); temp += rhs; return temp; }
 
 /** @relates Glib::ustring */
 inline ustring operator+(const ustring& lhs, gunichar rhs)
-  { return ustring(lhs) += rhs; }
+  { ustring temp (lhs); temp += rhs; return temp; }
 
 /** @relates Glib::ustring */
 inline ustring operator+(gunichar lhs, const ustring& rhs)
-  { return ustring(1, lhs) += rhs; }
+  { ustring temp (1, lhs); temp += rhs; return temp; }
 
 /** @relates Glib::ustring */
 inline ustring operator+(const ustring& lhs, char rhs)
-  { return ustring(lhs) += rhs; }
+  { ustring temp (lhs); temp += rhs; return temp; }
 
 /** @relates Glib::ustring */
 inline ustring operator+(char lhs, const ustring& rhs)
-  { return ustring(1, lhs) += rhs; }
+  { ustring temp (1, lhs); temp += rhs; return temp; }
 
 } // namespace Glib
 
