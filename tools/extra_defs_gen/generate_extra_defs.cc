@@ -41,10 +41,13 @@ std::string get_properties(GType gtype)
       //Name and type:
       std::string strName = g_param_spec_get_name(pParamSpec);
       std::string strTypeName = G_PARAM_SPEC_TYPE_NAME(pParamSpec);
+      
+      std::string strDocs = g_param_spec_get_blurb(pParamSpec);
 
       strResult += "(define-property " + strName + "\n";
       strResult += "  (of-object \"" + strObjectName + "\")\n";
       strResult += "  (prop-type \"" + strTypeName + "\")\n";
+      strResult += "  (docs \"" + strDocs + "\")\n";
 
       //Flags:
       GParamFlags flags = pParamSpec->flags;
