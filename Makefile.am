@@ -1,5 +1,5 @@
 
-SUBDIRS		= tools glib docs
+SUBDIRS		= tools glib examples docs
 DIST_SUBDIRS	= $(SUBDIRS) scripts examples tests
 
 EXTRA_DIST	= glibmm.spec.in \
