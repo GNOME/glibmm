@@ -10,6 +10,7 @@ namespace Foo { struct A {}; }
 using namespace Foo;
 ],[
 A a;
+(void)a;
 ],[
  ac_cxx_namespaces=yes
  AC_MSG_RESULT([$ac_cxx_namespaces])
@@ -31,6 +32,8 @@ AC_TRY_COMPILE(
 ],[
    bool b=true;
    bool b1=false;
+   (void)b;
+   (void)b1;
 ],[
   ac_cxx_bool=yes
   AC_MSG_RESULT([$ac_cxx_bool])
@@ -78,6 +81,7 @@ AC_TRY_COMPILE(
 ],[
    const foo *c=0;
    foo *c1=const_cast<foo*>(c);
+   (void)c1;
 ],[
   ac_cxx_const_cast=yes
   AC_MSG_RESULT([$ac_cxx_const_cast])
@@ -115,16 +119,19 @@ AC_TRY_COMPILE(
   void notabug() {
     void (foo::*func)();
     func = &foo::doit<int>;
+    (void)func;
   }
 
   void bar::neitherabug() {
     void (foo::*func)();
     func = &foo::doit<int>;
+    (void)func;
   }
 
   void foo::thebug() {
     void (foo::*func)();
     func = &foo::doit<int>; //Compiler bugs usually show here.
+    (void)func;
   }
 ],[],[
   gtkmm_cxx_member_functions_member_templates=yes
@@ -190,8 +197,6 @@ AC_DEFUN([GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS],
                     << fit.whoami() << std::endl;
           std::cout << "Traits<Foo<const int >> --> "
                     << cfit.whoami() << std::endl;
-
-          return 0;
     ],
       [gtkmm_cv_cxx_can_disambiguate_const_template_specializations="yes"],
       [gtkmm_cv_cxx_can_disambiguate_const_template_specializations="no"]
