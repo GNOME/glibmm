@@ -140,36 +140,6 @@ GType custom_pointer_type_register(const char* type_name)
   return g_type_register_static(G_TYPE_POINTER, full_name.c_str(), &type_info, GTypeFlags(0));
 }
 
-#ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
-namespace { //anonymous
-
-//Theses are extern "C" functions that call non-extern C functions:
-void Value_value_init_func(GValue* value)
-{
-  ValueBase_Boxed* pBase = static_cast<ValueBase_Boxed*>(value->data[0].v_pointer);
-  if(pBase)
-    pBase->value_init_func(value);
-}
-
-void Value_value_free_func(GValue* value)
-{
-  ValueBase_Boxed* pBase = static_cast<ValueBase_Boxed*>(value->data[0].v_pointer);
-  if(pBase)
-    pBase->value_free_func(value);
-}
-
-void Value_value_copy_func(const GValue* src_value, GValue* dest_value)
-{
-  ValueBase_Boxed* pBase = static_cast<ValueBase_Boxed*>(value->data[0].v_pointer);
-  if(pBase)
-    pBase->value_copy_func(src_value, dest_value);
-}
-
-} //namespace 
-#endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
-
-
-
 
 } // namespace Glib
 

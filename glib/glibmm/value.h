@@ -83,7 +83,6 @@ protected:
   GValue gobject_;
 };
 
-
 /**
  * @ingroup glibmmValue
  */
@@ -101,9 +100,14 @@ protected:
   void* get_boxed() const; // doesn't copy
   
   #ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+public: //TODO: This should not be necessary because of the friend declarations, but they don't seem to be working.
   virtual void value_init_func(GValue* value) {};
   virtual void value_free_func(GValue* value) {};
-  virtual void value_copy_func(const GValue* src_value, GValue* dest_value) {};        
+  virtual void value_copy_func(const GValue* src_value, GValue* dest_value) {}; 
+  
+  friend void Value_value_init_func(GValue* value);
+  friend void Value_value_free_func(GValue* value);
+  friend void Value_value_copy_func(const GValue* src_value, GValue* dest_value);       
   #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
   
 };

@@ -100,6 +100,32 @@ void Value_value_init_func(GValue* value);
 void Value_value_free_func(GValue* value);
 void Value_value_copy_func(const GValue* src_value, GValue* dest_value);
 
+//For some reason, the IRIX MipsPro compiler needs these to be defined here.
+//Otherwise, it says "function was referenced but not defined".
+//murrayc
+
+//Theses are extern "C" functions that call non-extern C functions:
+void Value_value_init_func(GValue* value)
+{
+  ValueBase_Boxed* pBase = static_cast<ValueBase_Boxed*>(value->data[0].v_pointer);
+  if(pBase)
+    pBase->value_init_func(value);
+}
+
+void Value_value_free_func(GValue* value)
+{
+  ValueBase_Boxed* pBase = static_cast<ValueBase_Boxed*>(value->data[0].v_pointer);
+  if(pBase)
+    pBase->value_free_func(value);
+}
+
+void Value_value_copy_func(const GValue* src_value, GValue* dest_value)
+{
+  ValueBase_Boxed* pBase = static_cast<ValueBase_Boxed*>(src_value->data[0].v_pointer);
+  if(pBase)
+    pBase->value_copy_func(src_value, dest_value);
+}
+
 } //extern "C"
 
 } //anonymous namespace
@@ -143,10 +169,15 @@ private:
   static void value_free_func(GValue* value);
   static void value_copy_func(const GValue* src_value, GValue* dest_value);
   #else
+protected:
   //The init, free, and copy funcs are virtual functions in the base class. 
   virtual void value_init_func(GValue* value);
   virtual void value_free_func(GValue* value);
   virtual void value_copy_func(const GValue* src_value, GValue* dest_value);  
+  
+  friend void Value_value_init_func(GValue* value);
+  friend void Value_value_free_func(GValue* value);
+  friend void Value_value_copy_func(const GValue* src_value, GValue* dest_value);
   #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 };
 
