@@ -87,7 +87,7 @@ GType Class::clone_custom_type(const char* custom_type_name) const
       base_query.class_size,
       0, // base_init
       0, // base_finalize
-      #ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+      #ifdef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
       &Class::custom_class_init_function,
       #else
       &Class_custom_class_init_function,
