@@ -14,7 +14,7 @@ dnl               $8 = `refdoc_comment')
 
 define(`_SIGNAL_PROXY',`
 $8
-  Glib::SignalProxy`'_NUM($6)<$5`'_COMMA_PREFIX($6)> signal_$4`'();
+  Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'();
 dnl
 _PUSH(SECTION_ANONYMOUS_NAMESPACE)
 dnl
@@ -33,7 +33,7 @@ const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
 {
   using namespace __NAMESPACE__;
-  typedef SigC::Slot`'_NUM($6)<$5`'_COMMA_PREFIX($6)> SlotType;
+  typedef SigC::Slot`'_NUM($6)< $5`'_COMMA_PREFIX($6) > SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
@@ -65,7 +65,7 @@ ifelse($2,void,,`dnl else
 $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`' void* data)
 {
   using namespace __NAMESPACE__;
-  typedef SigC::Slot`'_NUM($6)<void`'_COMMA_PREFIX($6)> SlotType;
+  typedef SigC::Slot`'_NUM($6)< void`'_COMMA_PREFIX($6) > SlotType;
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
@@ -96,9 +96,9 @@ const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 ')dnl endif
 
 _SECTION(SECTION_CC_SIGNALPROXIES)
-Glib::SignalProxy`'_NUM($6)<$5`'_COMMA_PREFIX($6)> __CPPNAME__::signal_$4`'()
+Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > __CPPNAME__::signal_$4`'()
 {
-  return Glib::SignalProxy`'_NUM($6)<$5`'_COMMA_PREFIX($6)>(this, &__CPPNAME__`'_signal_$4_info);
+  return Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) >(this, &__CPPNAME__`'_signal_$4_info);
 }
 
 _POP()')
