@@ -56,13 +56,16 @@ public:
 #m4 _CONVERSION(`char**&',`gchar***',`&($3)')
   _WRAP_METHOD(bool parse(int& argc, char**& argv), g_option_context_parse, errthrow)
 
-
   //g_option_context_add_main_entries(), just creates a group internally, adds them to it, and does a set_main_group()
   //- a group without callbacks seems to do some simple default parsing.
   _IGNORE(g_option_context_add_main_entries)
   
-  _WRAP_METHOD(void add_group(OptionGroup& group), g_option_context_add_group)
-  _WRAP_METHOD(void set_main_group(OptionGroup& group), g_option_context_set_main_group)
+  void add_group(OptionGroup& group);
+  _IGNORE(g_option_context_add_group)
+  
+  void set_main_group(OptionGroup& group);
+  _IGNORE(g_option_context_set_main_group)
+  
   //OptionGroup& get_main_group();
   //const OptionGroup& get_main_group() const;
   //_IGNORE(g_option_context_get_main_group)

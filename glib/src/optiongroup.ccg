@@ -69,7 +69,8 @@ void g_callback_error(GOptionContext* context, GOptionGroup* /* group */, gpoint
 
 
 OptionGroup::OptionGroup(const Glib::ustring& name, const Glib::ustring& description, const Glib::ustring& help_description)
-: gobject_( g_option_group_new(name.c_str(), description.c_str(), help_description.c_str(), this, 0 /* destroy_func */) )
+: gobject_( g_option_group_new(name.c_str(), description.c_str(), help_description.c_str(), this, 0 /* destroy_func */) ),
+  has_ownership_(true)
 {
   //Connect callbacks, so that derived classes can override the virtual methods:
   g_option_group_set_parse_hooks(gobj(), &g_callback_pre_parse, &g_callback_post_parse);
@@ -97,8 +98,11 @@ OptionGroup::~OptionGroup()
     cpp_entry.release_c_arg();
   }
   
-  g_option_group_free(gobj());
-  gobject_ = 0;
+  if(has_ownership_)
+  {
+    g_option_group_free(gobj());
+    gobject_ = 0;
+  }
 }
 
 void OptionGroup::add_entry(const OptionEntry& entry)
@@ -310,5 +314,11 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
   }
 } 
 
+GOptionGroup* OptionGroup::gobj_give_ownership()
+{
+  has_ownership_ = false;
+  return gobj();
+}
+  
 } // namespace Glib
 
