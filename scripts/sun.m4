@@ -4,13 +4,12 @@ AC_DEFUN(GLIBMM_PROG_CXX_SUN,
       ac_cv_prog_sun_cxx=yes
     else
       ac_cv_prog_sun_cxx=no
-    fi
-
-    if test "x${gtkmm_cv_cxx_has_namespace_std}" = "xyes"; then
-    {
-      AC_DEFINE([GLIBMM_COMPILER_SUN_FORTE],[1], [Defined when the SUN Forte C++ compiler is being used.])
-    }
     fi]
-    )
-  ]
+   )]
+
+   if test "x${gtkmm_cv_cxx_has_namespace_std}" = "xyes"; then
+   {
+     AC_DEFINE([GLIBMM_COMPILER_SUN_FORTE],[1], [Defined when the SUN Forte C++ compiler is being used.])
+   }
+   fi
 )

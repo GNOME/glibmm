@@ -137,4 +137,74 @@ AC_TRY_COMPILE(
 ])
 ])
 
+## GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS()
+##
+## Check whether the compiler finds it ambiguous to have both
+## const and non-const template specializations,
+## The SUN Forte compiler has this problem, though we are
+## not 100% sure that it's a C++ standards violation.
+##
+AC_DEFUN([GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS],
+[
+  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
+
+  AC_CACHE_CHECK(
+    [whether the compiler finds it ambiguous to have both const and non-const template specializations],
+    [gtkmm_cv_cxx_can_disambiguate_const_template_specializations],
+  [
+    AC_TRY_COMPILE(
+    [
+      #include <iostream>
+    ],[
+      template <class T> class Foo {};
+
+      template <typename T> class Traits {
+      public:
+          const char* whoami() {
+              return "generic template";
+          }
+      };
+
+      template <typename T> class Traits<Foo<T> > {
+      public:
+          const char* whoami() {
+              return "partial specialization for Foo<T>";
+          }
+      };
+
+      template <typename T> class Traits<Foo<const T> > {
+      public:
+          const char* whoami() {
+              return "partial specialization for Foo<const T>";
+          }
+      };
+
+      int main(int, char*[])
+      {
+          Traits<int> it;
+          Traits<Foo<int> > fit;
+          Traits<Foo<const int> > cfit;
+
+          std::cout << "Traits<int>             --> "
+                    << it.whoami() << std::endl;
+          std::cout << "Traits<Foo<int>>        --> "
+                    << fit.whoami() << std::endl;
+          std::cout << "Traits<Foo<const int >> --> "
+                    << cfit.whoami() << std::endl;
+
+          return 0;
+      }
+    ],
+      [gtkmm_cv_cxx_can_disambiguate_const_template_specializations="yes"],
+      [gtkmm_cv_cxx_can_disambiguate_const_template_specializations="no"]
+    )
+  ])
+
+  if test "x${gtkmm_cv_cxx_can_disambiguate_const_template_specializations}" = "xyes"; then
+  {
+    AC_DEFINE([GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS],[1, [Defined if the compiler does not find it ambiguous to have both const and non-const template specializations]])
+  }
+  fi
+])
+
 
