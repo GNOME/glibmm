@@ -40,7 +40,9 @@ namespace Glib
 class GSigConnectionNode;
 #endif
 
-class ObjectBase : public SigC::Object
+//This inherits virtually from Sigc::Object, so that people can multiply inherit glibmm classes from other SigC::Object-derived classes.
+//See bugzilla.gnome.org bug # 116280
+class ObjectBase : virtual public SigC::Object
 {
 protected:
   // Glib::ObjectBase is used as virtual base class.  This means the ObjectBase
