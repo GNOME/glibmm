@@ -29,7 +29,7 @@
 namespace Glib
 {
 
-class Object;
+class ObjectBase;
 
 /// Use the connect() method, with SigC::slot() to connect signals to signal handlers.
 class SignalProxyProperty : public SignalProxyBase
@@ -56,13 +56,13 @@ private:
 class PropertyProxy_Base
 {
 public:
-  PropertyProxy_Base(Object* obj, const char* property_name);
+  PropertyProxy_Base(ObjectBase* obj, const char* property_name);
   PropertyProxy_Base(const PropertyProxy_Base& other);
 
   ///This signal will be emitted when the property changes.
   SignalProxyProperty signal_changed();
 
-  Object* get_object()   const { return obj_; }
+  ObjectBase* get_object()   const { return obj_; }
   const char* get_name() const { return property_name_; }
 
 protected:
@@ -70,11 +70,11 @@ protected:
   void get_property_(Glib::ValueBase& value) const;
   void reset_property_();
 
-  Object* obj_; //The C++ wrapper instance of which this PropertyProxy is a member.
+  ObjectBase* obj_; //The C++ wrapper instance of which this PropertyProxy is a member.
   const char* property_name_; //Should be a static string literal.
 
 private:
-  // not implemented (for now) -- Why "for now"?  I don't think it'll ever be needed.  daniel.
+  //not implemented (for now) -- TODO: Why "for now"?  I don't think it'll ever be needed.  daniel.
   PropertyProxy_Base& operator=(const PropertyProxy_Base&);
 };
 

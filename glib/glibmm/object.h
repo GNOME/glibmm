@@ -23,8 +23,6 @@
 #include <glibmm/objectbase.h>
 #include <glibmm/wrap.h>
 #include <glibmm/quark.h>
-#include <glibmm/signalproxy.h>
-#include <glibmm/propertyproxy.h>
 #include <glibmm/refptr.h>
 #include <glibmm/utility.h> /* Could be private, but that would be tedious. */
 #include <glibmm/value.h>
@@ -126,20 +124,6 @@ public:
   //T& get_data_typed(const QueryQuark& quark)
   //  { return *static_cast<T*>(get_data(quark)); }
 
-  /// You probably want to use a specific property_*() accessor method instead.
-  void set_property_value(const Glib::ustring& property_name, const Glib::ValueBase& value);
-
-  /// You probably want to use a specific property_*() accessor method instead.
-  void get_property_value(const Glib::ustring& property_name, Glib::ValueBase& value) const;
-
-  /// You probably want to use a specific property_*() accessor method instead.
-  template <class PropertyType>
-  void set_property(const Glib::ustring& property_name, const PropertyType& value);
-
-  /// You probably want to use a specific property_*() accessor method instead.
-  template <class PropertyType>
-  void get_property(const Glib::ustring& property_name, PropertyType& value) const;
-
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 private:
@@ -155,32 +139,6 @@ private:
   // Glib::Object can not be dynamic because it lacks a float state.
   //virtual void set_manage();
 };
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-template <class PropertyType>
-void Object::set_property(const Glib::ustring& property_name, const PropertyType& value)
-{
-  Glib::Value<PropertyType> property_value;
-  property_value.init(Glib::Value<PropertyType>::value_type());
-
-  property_value.set(value);
-  this->set_property_value(property_name, property_value);
-}
-
-template <class PropertyType>
-void Object::get_property(const Glib::ustring& property_name, PropertyType& value) const
-{
-  Glib::Value<PropertyType> property_value;
-  property_value.init(Glib::Value<PropertyType>::value_type());
-
-  this->get_property_value(property_name, property_value);
-
-  value = property_value.get();
-}
-
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib
 

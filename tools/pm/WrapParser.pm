@@ -873,6 +873,7 @@ sub on_wrap_signal($)
   $argCName = string_unquote($argCName);
 
   my $bCustomDefaultHandler = 0;
+  my $bNoDefaultHandler = 0;
   if(scalar(@args) > 2) # If the optional argument is there.
   {
     my $argRef = string_trim($args[2]);
@@ -880,12 +881,15 @@ sub on_wrap_signal($)
     {
       $bCustomDefaultHandler = 1;
     }
+
+    if($argRef eq "no_default_handler")
+    {
+      $bNoDefaultHandler = 1;
+    }
   }
 
-  my $bImplement = 1;
-  if( $bCustomDefaultHandler eq 1) { $bImplement = 0 };
 
-  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bImplement);
+  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler);
 }
 
 # void on_wrap_vfunc()
@@ -1041,11 +1045,11 @@ sub output_wrap_check($$$$$$)
 
 }
 
-# void output_wrap($CppDecl, $signal_name, $filename, $line_num)
+# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler)
 # Also used for vfunc.
 sub output_wrap_signal($$$$$$)
 {
-  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bImplement) = @_;
+  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler) = @_;
 
   #Some checks:
   $self->output_wrap_check($CppDecl, $signal_name, $filename, $line_num, "WRAP_SIGNAL");
@@ -1088,8 +1092,15 @@ sub output_wrap_signal($$$$$$)
 #  }
 
   $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name);
-  $objOutputter->output_wrap_default_signal_handler_h($filename, $line_num, $objCppSignal, $objCSignal);
-  $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement);
+
+  if($bNoDefaultHandler eq 0)
+  {
+    $objOutputter->output_wrap_default_signal_handler_h($filename, $line_num, $objCppSignal, $objCSignal);
+
+    my $bImplement = 1;
+    if($bCustomDefaultHandler) { $bImplement = 0; }
+    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement);
+  }
 }
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num)

@@ -110,7 +110,7 @@ void SignalProxyProperty::callback(GObject*, GParamSpec* pspec, gpointer data) /
 
 //PropertyProxy_Base implementation:
 
-PropertyProxy_Base::PropertyProxy_Base(Object* obj, const char* property_name)
+PropertyProxy_Base::PropertyProxy_Base(ObjectBase* obj, const char* property_name)
 :
   obj_           (obj),
   property_name_ (property_name)

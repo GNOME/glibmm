@@ -175,7 +175,7 @@ sub output_wrap_default_signal_handler_h($$$$$$)
   $self->append($str);
 }
 
-# _SIGNAL_CC(signame,gtkname,rettype,crettype,`<cppargs>',`<cargs>')
+# _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>')
 sub output_wrap_default_signal_handler_cc($$$$$)
 {
   my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement) = @_;

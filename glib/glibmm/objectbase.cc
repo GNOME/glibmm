@@ -247,6 +247,16 @@ bool ObjectBase::_cpp_destruction_is_in_progress() const
   return cpp_destruction_in_progress_;
 }
 
+void ObjectBase::set_property_value(const Glib::ustring& property_name, const Glib::ValueBase& value)
+{
+  g_object_set_property(gobj(), property_name.c_str(), value.gobj());
+}
+
+void ObjectBase::get_property_value(const Glib::ustring& property_name, Glib::ValueBase& value) const
+{
+  g_object_get_property(const_cast<GObject*>(gobj()), property_name.c_str(), value.gobj());
+}
+
 
 bool _gobject_cppinstance_already_deleted(GObject* gobject)
 {

@@ -273,15 +273,5 @@ void* Object::steal_data(const QueryQuark& id)
   return g_object_steal_qdata(gobj(), id);
 }
 
-void Object::set_property_value(const Glib::ustring& property_name, const Glib::ValueBase& value)
-{
-  g_object_set_property(gobj(), property_name.c_str(), value.gobj());
-}
-
-void Object::get_property_value(const Glib::ustring& property_name, Glib::ValueBase& value) const
-{
-  g_object_get_property(const_cast<GObject*>(gobj()), property_name.c_str(), value.gobj());
-}
-
 } // namespace Glib
 

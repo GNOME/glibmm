@@ -34,7 +34,7 @@ class PropertyProxy : public PropertyProxy_Base
 public:
   typedef T PropertyType;
 
-  PropertyProxy(Object* obj, const char* name)
+  PropertyProxy(ObjectBase* obj, const char* name)
     : PropertyProxy_Base(obj, name) {}
 
   void set_value(const PropertyType& data);
@@ -57,7 +57,7 @@ class PropertyProxy_WriteOnly : public PropertyProxy_Base
 public:
   typedef T PropertyType;
 
-  PropertyProxy_WriteOnly(Object* obj, const char* name)
+  PropertyProxy_WriteOnly(ObjectBase* obj, const char* name)
     : PropertyProxy_Base(obj, name) {}
 
   void set_value(const PropertyType& data)
@@ -81,7 +81,7 @@ class PropertyProxy_ReadOnly : public PropertyProxy_Base
 public:
   typedef T PropertyType;
 
-  PropertyProxy_ReadOnly(Object* obj, const char* name)
+  PropertyProxy_ReadOnly(ObjectBase* obj, const char* name)
     : PropertyProxy_Base(obj, name) {}
 
   PropertyType get_value() const
