@@ -1,4 +1,3 @@
-
 doxygen_configfile = Doxyfile
 doxygen_configfile_source = $(srcdir)/Doxyfile.in
 beautify_docs = $(srcdir)/beautify_docs.pl
@@ -54,6 +53,9 @@ uninstall-reference: html/index.html
 	  rm -f $(DESTDIR)$(referencedir)/$$f; \
 	done
 
+# Install beautify_docs.pl, next to gmmproc.
+gmmproc_bin_SCRIPTS = $(beautify_docs)
+gmmproc_bindir = $(libdir)/glibmm-2.3/proc
 
 all-local: html/index.html
 

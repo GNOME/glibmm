@@ -1,4 +1,7 @@
-#! /usr/bin/perl -w
+#! /usr/local/bin/perl
+#
+# docs/reference/beautify_docs.pl.  Generated from beautify_docs.pl.in by configure.
+#
 
 #sub main()
 {

@@ -477,7 +477,11 @@ public:
 
   /*! Check whether the string is valid UTF-8. */
   bool validate() const;
+
+  /*! Check whether the string is valid UTF-8. */
   bool validate(iterator& first_invalid);
+
+  /*! Check whether the string is valid UTF-8. */
   bool validate(const_iterator& first_invalid) const;
 
   /*! Check whether the string is plain 7-bit ASCII. @par
