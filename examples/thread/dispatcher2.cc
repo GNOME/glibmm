@@ -172,7 +172,16 @@ void ThreadTimer::thread_function()
   // create a new dispatcher, that is connected to the newly
   // created MainContext
   Glib::Dispatcher signal_finished (context);
+  
+// The AIX xlC compiler gives this linker error, even with the bind<1> hint.
+// ld: 0711-317 ERROR: Undefined symbol:
+// .sigc::bind_functor<1,sigc::pointer_functor1<Glib::RefPtr<Glib::MainLoop>,void>,Glib::RefPtr<Glib::MainLoop>,sigc::nil,sigc::nil,sigc::nil,sigc::nil,sigc::nil,sigc::nil>::operator()()
+// ld: 0711-345 Use the -bloadmap or -bnoquiet option to obtain more information.
+//
+// Obviously this example will then be useless on AIX, but at least the build will succeed so people can install the library.
+#if !defined(_AIX)
   signal_finished.connect(sigc::bind(sigc::ptr_fun(&ThreadTimer::finished_handler), mainloop));
+#endif
 
   signal_finished_ptr_ = &signal_finished;
 

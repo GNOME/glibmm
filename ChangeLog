@@ -1,4 +1,19 @@
-2005-01-21  Murray Cumming  <murrayc@localhost.localdomain>
+2005-01-21  Murray Cumming  <murrayc@murrayc.com>
+
+	* configure.in, scripts/cxx.m4, glibmm/glibmmconfig.h.in: Added new 
+	compiler tests to see whether extern "C" functions are put in the 
+	global namespace, even when we use extern "C" inside a namespace 
+	declaration. The AIX xlC compiler does this, but allows us to 
+	redeclare the namespace inside the extern "C" block.
+	* glib/glibmm/property.h: Use the new 
+	#ifdef GLIBMM_MUST_REDECLARE_NAMESPACES_INSIDE_EXTERNC and redeclare 
+	the namespace when necessary.
+	* examples/thread/dispatcher.cc, dispatcher2.cc: Use sigc::bind<1> 
+	instead of just sigc::bind<> because the AIX xlC compiler needs the 
+	extra hint. However, the linker then fails, so the use of sigc::bind 
+	is ifdefed out for _AIX. See the comments in the code.
+	
+2005-01-21  Murray Cumming  <murrayc@murrayc.com>
 
 	* configure.in, scripts/cxx.m4, glibmm/glibmmconfig.h.in: Added new 
 	compiler tests.
