@@ -140,5 +140,6 @@ GType custom_pointer_type_register(const char* type_name)
   return g_type_register_static(G_TYPE_POINTER, full_name.c_str(), &type_info, GTypeFlags(0));
 }
 
+
 } // namespace Glib
 

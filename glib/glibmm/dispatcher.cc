@@ -30,6 +30,18 @@
 
 #ifndef G_OS_WIN32
 #include <unistd.h>
+
+#if defined(_tru64) //TODO: Use the real define
+//EINTR is not defined on Tru64
+//I have tried including these
+//#include <sys/types.h>
+//#include <sys/statvfs.h>
+//#include <signal.h>
+  #ifndef EINTR
+  #define EINTR 0
+  #endif
+#endif
+
 #else
 #include <windows.h>
 #include <io.h>

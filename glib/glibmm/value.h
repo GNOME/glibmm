@@ -83,7 +83,6 @@ protected:
   GValue gobject_;
 };
 
-
 /**
  * @ingroup glibmmValue
  */
@@ -98,7 +97,7 @@ public:
 
 protected:
   void  set_boxed(const void* data);
-  void* get_boxed() const; // doesn't copy
+  void* get_boxed() const; // doesn't copy  
 };
 
 
@@ -206,6 +205,9 @@ public:
   CppType get() const           { return CppType(static_cast<CType>(get_boxed())); }
 };
 
+//More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
+#ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+
 /** Partial specialization for RefPtr<> to Glib::Object.
  * @ingroup glibmmValue
  */
@@ -241,6 +243,8 @@ public:
   CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
 #endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
+#endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 } // namespace Glib
 

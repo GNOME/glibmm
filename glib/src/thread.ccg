@@ -25,7 +25,10 @@
 namespace
 {
 
-void* call_thread_entry_slot(void* data)
+extern "C"
+{
+
+static void* call_thread_entry_slot(void* data)
 {
   sigc::slot_base *const slot = reinterpret_cast<sigc::slot_base*>(data);
 
@@ -47,6 +50,8 @@ void* call_thread_entry_slot(void* data)
   delete slot;
   return 0;
 }
+
+} //extern "C"
 
 } // anonymous namespace
 
@@ -356,6 +361,7 @@ bool Cond::timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time)
 {
   return g_cond_timed_wait(gobject_, mutex.gobj(), const_cast<Glib::TimeVal*>(&abs_time));
 }
+
 
 } // namespace Glib
 

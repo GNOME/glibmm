@@ -1,3 +1,32 @@
+2005-01-21  Murray Cumming  <murrayc@localhost.localdomain>
+
+	* configure.in, scripts/cxx.m4, glibmm/glibmmconfig.h.in: Added new 
+	compiler tests.
+	1. To see whether it allows use of non extern C functions 
+	as extern C callbacks, because the Tru64 compiler does not 
+	allow this, when using strict_ansi. We do not actually use this yet.
+	2. To see whether it allows us to define a template that uses an 
+	undefined type, even if we do not use it before defining the type. 
+	Tru64 does not allow this. That's probably correct. 
+	* glib/glibmm/container.h: #ifdef out a dynamic_cast that Tru64
+	does not allow, and which I can not think of a better place to put.
+	See the comment in the code.
+	* glib/glibmm/containerhandler_helpers.h: When the compiler does not 
+	alllow the GObject and GtkObject (dynamic_cast of) specializations 
+	here, then put them in glib/glibmm/object.h and 
+	gtkmm/gtk/src/object.hg instead.- needed by Tru64 compiler.
+	* glib/glibmm/value.h, value_custom.[h|cc]: Conditionally moved 
+	the RefPtr Value specialization into object.h, as above.
+	* glib/src/ optiongroup.ccg, spawn.ccg, thread.ccg: Make C callacks 
+	separate extern "C".
+	* glib/src/optiongroup.ccg: Do not use the StringArrayHandle, 
+	because the Tru64 compiler has problems with it - see comments 
+	in code.
+	* glib/src/optionentry.hg: Remove the include of value.h, because 
+	it is not used and it causes a Tru64 compile error in 
+	optioncontext.cc because its templates are included before the 
+	types that the template uses.
+
 2005-01-19  Murray Cumming  <murrayc@murrayc.com>
 
 	* configure.in, scripts/cxx.m4, glibmm/glibmmconfig.h.in: Added a 
@@ -5,12 +34,12 @@
 	inline initialization of ustring::npos.
 	* glib/glibmm/ustring.[h|cc]: When the compiler does not support the 
 	inline initialization of npos, initialize it in the .cc file.
-	Declare partial specializatoins of the SequenceString inner class 
-	inside the class - needed by MipsPro (IRIX) compiler.. 
+	Declare partial specializations of the SequenceString inner class 
+	inside the class - needed by IRIX MipsPro compiler. 
 
 2005-01-18  Murray Cumming  <murrayc@murrayc.com>
 
-	* glibmm/src/optiongrup.[hg|ccg]: CppOptionEntry::convert_c_to_cpp(): 
+	* glibmm/src/optiongroup.[hg|ccg]: CppOptionEntry::convert_c_to_cpp(): 
 	Copy the strings to the vector in a loop, instead of using the 
 	ArrayHandle constructor, because that does not seem to work with the 
 	SUN Forte compiler.

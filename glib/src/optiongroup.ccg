@@ -21,7 +21,7 @@
 #include <glibmm/optionentry.h>
 #include <glibmm/optioncontext.h>
 #include <glibmm/utility.h>
-#include <glibmm/containers.h>
+//#include <glibmm/containers.h>
 #include <glib/goption.h>
 
 namespace Glib
@@ -30,7 +30,10 @@ namespace Glib
 namespace //anonymous
 {
 
-gboolean g_callback_pre_parse(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
+extern "C"
+{
+
+static gboolean g_callback_pre_parse(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
 {
   OptionContext cppContext(context, false /* take_ownership */);
   //OptionGroup cppGroup(group, true /* take_copy */); //Maybe this should be option_group.
@@ -42,7 +45,7 @@ gboolean g_callback_pre_parse(GOptionContext* context, GOptionGroup* /* group */
     return false;
 }
 
-gboolean g_callback_post_parse(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
+static gboolean g_callback_post_parse(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
 {
   OptionContext cppContext(context, false /* take_ownership */);
   //OptionGroup cppGroup(group, true /* take_copy */); //Maybe this should be option_group.
@@ -56,7 +59,7 @@ gboolean g_callback_post_parse(GOptionContext* context, GOptionGroup* /* group *
     return false;
 }
 
-void g_callback_error(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error*/)
+static void g_callback_error(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error*/)
 {
   OptionContext cppContext(context, false /* take_ownership */);
   //OptionGroup cppGroup(group); //Maybe this should be option_group.
@@ -65,6 +68,8 @@ void g_callback_error(GOptionContext* context, GOptionGroup* /* group */, gpoint
   if(option_group)
     return option_group->on_error(cppContext, *option_group);
 }
+
+} /* extern "C" */
 
 } //anonymous namespace
 
@@ -344,8 +349,10 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
       vecustrings* typed_cpp_arg = (vecustrings*)cpparg_;
       if(typed_arg && typed_cpp_arg)
       {
+        typed_cpp_arg->clear();
+        
         //The C array seems to be null-terminated.
-        Glib::StringArrayHandle array_handle(*typed_arg,  Glib::OWNERSHIP_NONE);
+        //Glib::StringArrayHandle array_handle(*typed_arg,  Glib::OWNERSHIP_NONE);
         
         //The SUN Forte compiler complains about this:
         // "optiongroup.cc", line 354: Error: Cannot assign Glib::ArrayHandle<Glib::ustring, 
@@ -353,12 +360,25 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
         // "std::vector<Glib::ustring>::operator=(const std::vector<Glib::ustring>&)";.
         //
         //(*typed_cpp_arg) = array_handle;
+        //
+        //And the Tru64 compiler does not even like us to instantiate the StringArrayHandle:
+        //
+        // cxx: Error: ../../glib/glibmm/containerhandle_shared.h, line 149: the operand
+        //     of a pointer dynamic_cast must be a pointer to a complete class type
+        //   return dynamic_cast<CppType>(Glib::wrap_auto(cobj, false /* take_copy */));
+        
+        //for(Glib::StringArrayHandle::iterator iter = array_handle.begin(); iter != array_handle.end(); ++iter)
+        //{
+        //  typed_cpp_arg->push_back(*iter);
+        //}
         
         //So we do this:
-        typed_cpp_arg->clear();
-        for(Glib::StringArrayHandle::iterator iter = array_handle.begin(); iter != array_handle.end(); ++iter)
+        
+        char** char_array_next = *typed_arg;
+        while(char_array_next && *char_array_next)
         {
-          typed_cpp_arg->push_back(*iter);
+          typed_cpp_arg->push_back(*char_array_next);
+          ++char_array_next;
         }
       }
       
@@ -369,18 +389,16 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
       char*** typed_arg = (char***)carg_;
       vecustrings* typed_cpp_arg = (vecustrings*)cpparg_;
       if(typed_arg && typed_cpp_arg)
-      {
-        //The C array seems to be null-terminated.
-        Glib::ArrayHandle<std::string>  array_handle(*typed_arg,  Glib::OWNERSHIP_NONE);
-        
-        //The SUN Forte compiler complains about this:
-        //(*typed_cpp_arg) = array_handle;
-        
-        //So we do this:
+      { 
         typed_cpp_arg->clear();
-        for(Glib::ArrayHandle<std::string>::iterator iter = array_handle.begin(); iter != array_handle.end(); ++iter)
+              
+        //See comments above about the SUN Forte and Tru64 compilers.
+   
+        char** char_array_next = *typed_arg;
+        while(char_array_next && *char_array_next)
         {
-          typed_cpp_arg->push_back(*iter);
+          typed_cpp_arg->push_back(*char_array_next);
+          ++char_array_next;
         }
       }
       
