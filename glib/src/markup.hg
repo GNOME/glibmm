@@ -149,44 +149,8 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 class ParserCallbacks;
+#endif
 
-extern "C"
-{
-//These are definitely not public API. We would prefer not to export them, if we could find a way to do that.
-void ParserCallbacks_start_element(GMarkupParseContext* context,
-                          const char*          element_name,
-                          const char**         attribute_names,
-                          const char**         attribute_values,
-                          void*                user_data,
-                          GError**             error);
-
-void ParserCallbacks_end_element(GMarkupParseContext* context,
-                        const char*          element_name,
-                        void*                user_data,
-                        GError**             error);
-
-void ParserCallbacks_text(GMarkupParseContext* context,
-                  const char*          text,
-                  gsize                text_len,  
-                  void*                user_data,
-                  GError**             error);
-
-void ParserCallbacks_passthrough(GMarkupParseContext* context,
-                        const char*          passthrough_text,
-                        gsize                text_len,  
-                        void*                user_data,
-                        GError**             error);
-
-void ParserCallbacks_error(GMarkupParseContext* context,
-                  GError*              error,
-                  void*                user_data);
-                  
-
-void ParseContext_destroy_notify_callback(void* data);
-} // extern "C""
-
-#endif //DOXYGEN_SHOULD_SKIP_THIS
-                    
 /** The abstract markup parser base class.
  * @ingroup Markup
  * To implement a parser for your markup format, derive from
@@ -284,36 +248,7 @@ private:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   friend class Glib::Markup::ParserCallbacks;
-  
-  friend void ParserCallbacks_start_element(GMarkupParseContext* context,
-                          const char*          element_name,
-                          const char**         attribute_names,
-                          const char**         attribute_values,
-                          void*                user_data,
-                          GError**             error);
-
-  friend void ParserCallbacks_end_element(GMarkupParseContext* context,
-                        const char*          element_name,
-                        void*                user_data,
-                        GError**             error);
-
-  friend void ParserCallbacks_text(GMarkupParseContext* context,
-                  const char*          text,
-                  gsize                text_len,  
-                  void*                user_data,
-                  GError**             error);
-
-  friend void ParserCallbacks_passthrough(GMarkupParseContext* context,
-                        const char*          passthrough_text,
-                        gsize                text_len,  
-                        void*                user_data,
-                        GError**             error);
-
-  friend void ParserCallbacks_error(GMarkupParseContext* context,
-                  GError*              error,
-                  void*                user_data);
-                         
-#endif //DOXYGEN_SHOULD_SKIP_THIS
+#endif
 };
 
 
@@ -392,8 +327,6 @@ public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GMarkupParseContext*       gobj()       { return gobject_; }
   const GMarkupParseContext* gobj() const { return gobject_; }
-  
-  friend void ParseContext_destroy_notify_callback(void* data);
 #endif
 
 private:
@@ -403,6 +336,8 @@ private:
   // noncopyable
   ParseContext(const ParseContext&);
   ParseContext& operator=(const ParseContext&);
+
+  static void destroy_notify_callback(void* data);
 };
 
 } // namespace Markup

@@ -85,34 +85,33 @@ public:
 
   static const GIOFuncs vfunc_table;
 
-  //See the declaration of these functions for an explanation.
-  friend GIOStatus GlibmmIOChannel_io_read(GIOChannel* channel, char* buf, gsize count,
+  static GIOStatus io_read(GIOChannel* channel, char* buf, gsize count,
                            gsize* bytes_read, GError** err);
 
-  friend GIOStatus GlibmmIOChannel_io_write(GIOChannel* channel, const char* buf, gsize count,
+  static GIOStatus io_write(GIOChannel* channel, const char* buf, gsize count,
                             gsize* bytes_written, GError** err);
 
-  friend GIOStatus GlibmmIOChannel_io_seek (GIOChannel* channel, gint64 offset, GSeekType type, GError** err);
-  friend GIOStatus GlibmmIOChannel_io_close(GIOChannel* channel, GError** err);
+  static GIOStatus io_seek (GIOChannel* channel, gint64 offset, GSeekType type, GError** err);
+  static GIOStatus io_close(GIOChannel* channel, GError** err);
 
-  friend GSource*  GlibmmIOChannel_io_create_watch(GIOChannel* channel, GIOCondition condition);
-  friend void      GlibmmIOChannel_io_free(GIOChannel* channel);
+  static GSource*  io_create_watch(GIOChannel* channel, GIOCondition condition);
+  static void      io_free(GIOChannel* channel);
 
-  friend GIOStatus GlibmmIOChannel_io_set_flags(GIOChannel* channel, GIOFlags flags, GError** err);
-  friend GIOFlags  GlibmmIOChannel_io_get_flags(GIOChannel* channel);
+  static GIOStatus io_set_flags(GIOChannel* channel, GIOFlags flags, GError** err);
+  static GIOFlags  io_get_flags(GIOChannel* channel);
 };
 
 // static
 const GIOFuncs GlibmmIOChannel::vfunc_table =
 {
-  &GlibmmIOChannel_io_read,
-  &GlibmmIOChannel_io_write,
-  &GlibmmIOChannel_io_seek,
-  &GlibmmIOChannel_io_close,
-  &GlibmmIOChannel_io_create_watch,
-  &GlibmmIOChannel_io_free,
-  &GlibmmIOChannel_io_set_flags,
-  &GlibmmIOChannel_io_get_flags,
+  &GlibmmIOChannel::io_read,
+  &GlibmmIOChannel::io_write,
+  &GlibmmIOChannel::io_seek,
+  &GlibmmIOChannel::io_close,
+  &GlibmmIOChannel::io_create_watch,
+  &GlibmmIOChannel::io_free,
+  &GlibmmIOChannel::io_set_flags,
+  &GlibmmIOChannel::io_get_flags,
 };
 
 
@@ -383,17 +382,11 @@ Glib::RefPtr<IOChannel> wrap(GIOChannel* gobject, bool take_copy)
   return Glib::RefPtr<IOChannel>(cpp_object);
 }
 
-} // namespace Glib
-
-namespace Glib
-{
 
 /**** Glib::GlibmmIOChannel ************************************************/
 
-using namespace Glib;
-
 // static
-GIOStatus GlibmmIOChannel_io_read(GIOChannel* channel, char* buf, gsize count,
+GIOStatus GlibmmIOChannel::io_read(GIOChannel* channel, char* buf, gsize count,
                                    gsize* bytes_read, GError** err)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
@@ -415,7 +408,7 @@ GIOStatus GlibmmIOChannel_io_read(GIOChannel* channel, char* buf, gsize count,
 }
 
 // static
-GIOStatus GlibmmIOChannel_io_write(GIOChannel* channel, const char* buf, gsize count,
+GIOStatus GlibmmIOChannel::io_write(GIOChannel* channel, const char* buf, gsize count,
                                     gsize* bytes_written, GError** err)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
@@ -437,7 +430,7 @@ GIOStatus GlibmmIOChannel_io_write(GIOChannel* channel, const char* buf, gsize c
 }
 
 // static
-GIOStatus GlibmmIOChannel_io_seek(GIOChannel* channel, gint64 offset, GSeekType type, GError** err)
+GIOStatus GlibmmIOChannel::io_seek(GIOChannel* channel, gint64 offset, GSeekType type, GError** err)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
@@ -458,7 +451,7 @@ GIOStatus GlibmmIOChannel_io_seek(GIOChannel* channel, gint64 offset, GSeekType 
 }
 
 // static
-GIOStatus GlibmmIOChannel_io_close(GIOChannel* channel, GError** err)
+GIOStatus GlibmmIOChannel::io_close(GIOChannel* channel, GError** err)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
@@ -479,7 +472,7 @@ GIOStatus GlibmmIOChannel_io_close(GIOChannel* channel, GError** err)
 }
 
 // static
-GSource* GlibmmIOChannel_io_create_watch(GIOChannel* channel, GIOCondition condition)
+GSource* GlibmmIOChannel::io_create_watch(GIOChannel* channel, GIOCondition condition)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
@@ -497,7 +490,7 @@ GSource* GlibmmIOChannel_io_create_watch(GIOChannel* channel, GIOCondition condi
 }
 
 // static
-void GlibmmIOChannel_io_free(GIOChannel* channel)
+void GlibmmIOChannel::io_free(GIOChannel* channel)
 {
   if(IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper)
   {
@@ -509,7 +502,7 @@ void GlibmmIOChannel_io_free(GIOChannel* channel)
 }
 
 // static
-GIOStatus GlibmmIOChannel_io_set_flags(GIOChannel* channel, GIOFlags flags, GError** err)
+GIOStatus GlibmmIOChannel::io_set_flags(GIOChannel* channel, GIOFlags flags, GError** err)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
@@ -530,7 +523,7 @@ GIOStatus GlibmmIOChannel_io_set_flags(GIOChannel* channel, GIOFlags flags, GErr
 }
 
 // static
-GIOFlags GlibmmIOChannel_io_get_flags(GIOChannel* channel)
+GIOFlags GlibmmIOChannel::io_get_flags(GIOChannel* channel)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
@@ -546,5 +539,5 @@ GIOFlags GlibmmIOChannel_io_get_flags(GIOChannel* channel)
   return GIOFlags(0);
 }
 
-} //anonymous namespace
+} // namespace Glib
 

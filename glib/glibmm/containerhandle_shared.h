@@ -127,10 +127,6 @@ struct TypeTraits
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS /* hide the specializations */
 
-//For some (proably, more spec-compliant) compilers, these specializations must
-//be next to the objects that they use.
-#ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
-
 /** Partial specialization for pointers to GtkObject instances.
  * @ingroup ContHelpers
  */
@@ -263,8 +259,6 @@ struct TypeTraits< Glib::RefPtr<const T> >
 };
 
 #endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
-
-#endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 /** Specialization for UTF-8 strings.
  * @ingroup ContHelpers

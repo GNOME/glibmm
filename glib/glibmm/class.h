@@ -22,7 +22,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmmconfig.h>
 #include <glib-object.h>
 
 
@@ -30,16 +29,6 @@
 
 namespace Glib
 {
-
-#ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
-extern "C"
-{
-  //This is an extern "C" function, to call the non-extern "C" function.
-  //This is not public API.
-  void Class_custom_class_init_function(void* g_class, void* class_data);
-}
-
-#endif // GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 
 class Class
 {
@@ -62,8 +51,6 @@ public:
 
   inline GType get_type() const;
   GType clone_custom_type(const char* custom_type_name) const;
-  
-  friend void Class_custom_class_init_function(void* g_class, void* class_data);
 
 protected:
   GType           gtype_;
@@ -71,11 +58,7 @@ protected:
 
   void register_derived_type(GType base_type);
 
-#ifdef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 private:
-#else
-//protected:
-#endif
   static void custom_class_init_function(void* g_class, void* class_data);
 };
 

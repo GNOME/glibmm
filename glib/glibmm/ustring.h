@@ -235,7 +235,7 @@ public:
 #ifdef GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
   static const size_type npos = std::string::npos;
 #else
-  //The IRIX MipsPro compiler says "The indicated constant value is not known",
+  //The MipsPro compiler (IRIX) says "The indicated constant value is not known",
   //so we need to initalize the static member data elsewhere.
   static const size_type npos;
 #endif
@@ -605,7 +605,7 @@ private:
 #endif
   struct SequenceToString;
   
-  //The Tru64 compiler needs these partial specializations to be declared here,
+  //The MipsPro (IRIX) compiler needs these partial specializations to be declared here,
   //as well as defined later. That's probably correct. murrayc.
   template <class In>
   struct SequenceToString<In, char>;

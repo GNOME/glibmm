@@ -1,63 +1,3 @@
-2005-01-21  Murray Cumming  <murrayc@localhost.localdomain>
-
-	* glib/glibmm/class.h: #include glibmmconfig.h so that 
-	GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS can 
-	be defined.
-	* glib/glibmm/class.cc: Use ifdef instead of ifndef where that is 
-	what I meant. Fixes the build.
-
-2005-01-20  Murray Cumming  <murrayc@murrayc.com>
-
-	* glib/glibmm/class.h: More use of exern "C", with an intermediate 
-	callback, to satisfy the Tru64 compiler.
-	* glib/glibmm/container.h: #ifdef out a dynamic_cast that Tru64
-	does not allow, and which I can not think of a better place to put.
-	See the comment in the code.
-
-2005-01-20  Murray Cumming  <murrayc@murrayc.com>
-
-	* glib/glibmm/value.h, value_custom.[h|cc]: Custom boxed types, more 
-	#ifdef ABI-changing to add intermediate extern-C callback function, 
-	for the Tru64 compiler. This might not actually work at runtime,
-	but if it does not then lots of funtionality should still work.
-	Conditionally moved the RefPtr Value specialization into object.h, as 
-	before.
-
-2005-01-20  Murray Cumming  <murrayc@murrayc.com>
-
-	* configure.in, scripts/cxx.m4, glibmm/glibmmconfig.h.in: Added a 
-	compiler test, to see whether it allows use of non extern C functions 
-	as extern C callbacks, because the Tru64 compiler does not 
-	allow this, but we can not completely fix that without changing ABI, 
-	which we can not do on the existing platforms.
-	* glib/src/thread.[hg|ccg]: On (new) platforms that do not allow 
-	non-exern-C C callbacks, store the destruction callback in a base 
-	class and call it from an intermediate extern-C callback.
-
-2005-01-20  Murray Cumming  <murrayc@murrayc.com>
-
-	* glib/src/iochannel.[hg|ccg], markup.[hg|ccg], optiongroup.ccg, 
-	spawn.ccg, thread.ccg: 
-	Make C callacks 
-	separate extern "C" functions instead of static member functions, to 
-	satisfy the Tru64 compiler. Unfortunately this means that 
-	we export some private API.
-	* glib/src/optionentry.hg: Remove the include of value.h, because 
-	it is not used and it causes a Tru64 compile error in 
-	optioncontext.cc because its templates are included before the 
-	types that the template uses.
-	* glib/src/optiongroup.ccg: Do not use the StringArrayHandle, 
-	because the Tru64 compiler has problems with it - see comments 
-	in code.
-	* configure.in, scripts/cxx.m4, glibmm/glibmmconfig.h.in: Added a 
-	compiler test, because the Tru64 compiler does not allow us 
-	to define a template that uses an undefined type, even if we do not 
-	use it before defining the type. That's probably correct.
-	* glib/glibmm/containerhandler_helpers.h: When the compiler does not 
-	alllow the GObject and GtkObject (dynamic_cast of) specializations 
-	here, then put them in glib/glibmm/object.h and 
-	gtkmm/gtk/src/object.hg instead.- needed by Tru64 compiler..
-
 2005-01-19  Murray Cumming  <murrayc@murrayc.com>
 
 	* configure.in, scripts/cxx.m4, glibmm/glibmmconfig.h.in: Added a 
@@ -65,8 +5,8 @@
 	inline initialization of ustring::npos.
 	* glib/glibmm/ustring.[h|cc]: When the compiler does not support the 
 	inline initialization of npos, initialize it in the .cc file.
-	Declare partial specializations of the SequenceString inner class 
-	inside the class - needed by IRIX MipsPro compiler.. 
+	Declare partial specializatoins of the SequenceString inner class 
+	inside the class - needed by MipsPro (IRIX) compiler.. 
 
 2005-01-18  Murray Cumming  <murrayc@murrayc.com>
 

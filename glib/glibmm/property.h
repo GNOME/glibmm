@@ -29,14 +29,11 @@ namespace Glib
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-extern "C"
-{
 void custom_get_property_callback(GObject* object, unsigned int property_id,
                                   GValue* value, GParamSpec* param_spec);
 
 void custom_set_property_callback(GObject* object, unsigned int property_id,
                                   const GValue* value, GParamSpec* param_spec);
-} //extern "C"
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
