@@ -26,6 +26,7 @@ our @EXPORT_OK;
 #       bool readable;
 #       bool writable;
 #       bool construct_only;
+#       string docs;
 #    }
 
 
@@ -45,6 +46,24 @@ sub new
   $$self{readable} = ($1 eq "#t")       if ($def =~ s/\(readable (\S+)\)//);
   $$self{writable} = ($1 eq "#t")       if ($def =~ s/\(writable (\S+)\)//);
   $$self{construct_only} = ($1 eq "#t") if ($def =~ s/\(construct-only (\S+)\)//);
+  
+  # Property documentation:
+  my $propertydocs = $1                     if ($def =~ s/\(docs "([^"]*)"\)//);
+  # Add a full-stop if there is not one already:
+  if(defined($propertydocs))
+  {
+    my $docslen = length($propertydocs);
+    if($docslen)
+    {
+      if( !(substr($propertydocs, $docslen - 1, 1) eq ".") )
+      {
+        $propertydocs = $propertydocs . ".";
+      }
+    }
+  }
+  
+  $$self{docs} = $propertydocs;
+  
 
   $$self{name} =~ s/-/_/g; # change - to _
 
@@ -88,6 +107,12 @@ sub get_writable($)
 {
   my ($self) = @_;
   return $$self{writable};
+}
+
+sub get_docs($)
+{
+  my ($self) = @_;
+  return $$self{docs};
 }
 
 

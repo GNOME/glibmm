@@ -42,7 +42,8 @@ std::string get_properties(GType gtype)
       std::string strName = g_param_spec_get_name(pParamSpec);
       std::string strTypeName = G_PARAM_SPEC_TYPE_NAME(pParamSpec);
       
-      std::string strDocs = g_param_spec_get_blurb(pParamSpec);
+      const gchar* pchBlurb = g_param_spec_get_blurb(pParamSpec);
+      std::string strDocs = (pchBlurb ? pchBlurb : std::string());
 
       strResult += "(define-property " + strName + "\n";
       strResult += "  (of-object \"" + strObjectName + "\")\n";

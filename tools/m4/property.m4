@@ -7,7 +7,7 @@ dnl
 dnl
 
 dnl
-dnl _PROPERTY_PROXY(name, name_underscored, cpp_type, proxy_suffix)
+dnl _PROPERTY_PROXY(name, name_underscored, cpp_type, proxy_suffix, docs)
 dnl proxy_suffix could be "_WriteOnly" or "_ReadOnly"
 dnl The method will be const if the propertyproxy is _ReadOnly.
 dnl
@@ -17,7 +17,9 @@ dnl Put spaces around the template parameter if necessary.
 pushdef(`__PROXY_TYPE__',`dnl
 Glib::PropertyProxy$4<'ifelse(regexp(_QUOTE($3),`>$'),`-1',_QUOTE($3),` '_QUOTE($3)` ')`>'dnl
 )dnl
-  /** You rarely need to use properties because there are get_ and set_ methods for almost all of them.
+/** $5
+   *
+   * You rarely need to use properties because there are get_ and set_ methods for almost all of them.
    * @return A PropertyProxy that allows you to get or set the property of the value, or receive notification when
    * the value of the property changes.
    */

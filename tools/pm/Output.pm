@@ -485,11 +485,12 @@ sub output_wrap_property($$$$$$)
     my $name_underscored = $name;
     $name_underscored =~ s/-/_/g;
 
-    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s)dnl\n",
+    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s)dnl\n",
       $name,
       $name_underscored,
       $cpp_type,
-      $proxy_suffix
+      $proxy_suffix,
+      $objProperty->get_docs()
     );
     $self->append($str);
     $self->append("\n");
