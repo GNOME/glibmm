@@ -29,8 +29,9 @@ namespace Glib
 
 void Interface_Class::add_interface(GType instance_type) const
 {
-  if( !g_type_is_a(instance_type, gtype_) ) //For convenience, don't complain about calling this twice.
-  {
+  //This check is distabled, because it checks whether any of the types's bases implement the interface, not just the specific type.
+  //if( !g_type_is_a(instance_type, gtype_) ) //For convenience, don't complain about calling this twice.
+  //{
     const GInterfaceInfo interface_info =
     {
       class_init_func_,
@@ -39,7 +40,7 @@ void Interface_Class::add_interface(GType instance_type) const
     };
 
     g_type_add_interface_static(instance_type, gtype_, &interface_info);
-  }
+  //}
 }
 
 
