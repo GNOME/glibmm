@@ -24,6 +24,13 @@ _POP()
 _SECTION(SECTION_CLASS2)
 ') dnl end of _CLASS_GOBJECT
 
+dnl Widget and Object, and some others, have custom-written destructor implementations:
+define(`_CUSTOM_DTOR',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_CUSTOM_DTOR__',`$1')
+_POP()
+')
 
 dnl Gdk::Pixmap_Class::wrap_new() needs a custom implementation, in order
 dnl to create a Gdk::Bitmap object if appropriate.  See comments there.
@@ -158,8 +165,13 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem)
   __CPPPARENT__`'(__PCAST__`'(castitem))
 {}
 
+ifdef(`__BOOL_CUSTOM_DTOR__',`dnl
+',`dnl
 __CPPNAME__::~__CPPNAME__`'()
 {}
+
+')dnl
+
 
 _CC_CLASS_IMPLEMENTATION()
 
