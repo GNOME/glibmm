@@ -60,7 +60,7 @@ $DocsParser::currentParam = undef;
 
 $DocsParser::objCurrentFunction = 0; #Function
 %DocsParser::hasharrayFunctions = (); #Function elements
-$DocsParser::bOverride = 0; #First we parse the C docs, then we parse the C++ override docs.
+#~ $DocsParser::bOverride = 0; #First we parse the C docs, then we parse the C++ override docs.
 
 $DocsParser::commentStart = "  /** ";
 $DocsParser::commentMiddleStart = "   * ";
@@ -92,7 +92,7 @@ sub read_defs($$$)
   $objParser->parsefile($filepath);
 
   # Parse the C++ overide docs:
-  $DocsParser::bOverride = 1; #The callbacks will act differently when this is set.
+  #~ $DocsParser::bOverride = 1; #The callbacks will act differently when this is set.
   $objParser->parsefile($filepath_override);
 }
 
@@ -113,14 +113,25 @@ sub parse_on_start($$%)
     {
       #Make a new one if necessary:
       $DocsParser::objCurrentFunction = Function::new_empty();
+      # The idea is to change the policy a bit:
+      # If a function is redefined in a later parsing run only values which are redefined
+      # will be overwritten. For the name this is trivial. The description is simply rewritten.
+      # Same goes for the return description and the class mapping. Only exception is the
+      # parameter list. Everytime we enter a <parameters> tag the list is emptied again.
+      $$DocsParser::objCurrentFunction{name} = $functionName;
+      $$DocsParser::objCurrentFunction{description} = "";
+      $$DocsParser::objCurrentFunction{param_names} = [];
+      $$DocsParser::objCurrentFunction{param_descriptions} = ();
+      $$DocsParser::objCurrentFunction{return_description} = "";
+      $$DocsParser::objCurrentFunction{mapped_class} = "";
+      # We don't need this any more, the only reference to this field is commented
+      # $$DocsParser::objCurrentFunction{description_overridden} = $DocsParser::bOverride;
     }
-
-    $$DocsParser::objCurrentFunction{name} = $functionName;
-    $$DocsParser::objCurrentFunction{description} = "";
+  }
+  elsif($tag eq "parameters")
+  {
     $$DocsParser::objCurrentFunction{param_names} = [];
     $$DocsParser::objCurrentFunction{param_descriptions} = ();
-    $$DocsParser::objCurrentFunction{return_description} = "";
-    $$DocsParser::objCurrentFunction{description_overridden} = $DocsParser::bOverride;
   }
   elsif($tag eq "parameter")
   {
@@ -129,6 +140,7 @@ sub parse_on_start($$%)
   }
   elsif($tag eq "description")
   {
+    $$DocsParser::objCurrentFunction{description} = "";
     # Set destination for parse_on_cdata().
     $DocsParser::refAppendTo = \$$DocsParser::objCurrentFunction{description};
   }
@@ -140,8 +152,13 @@ sub parse_on_start($$%)
   }
   elsif($tag eq "return")
   {
+    $$DocsParser::objCurrentFunction{return_description} = "";
     # Set destination for parse_on_cdata().
     $DocsParser::refAppendTo = \$$DocsParser::objCurrentFunction{return_description};
+  }
+  elsif($tag eq "mapping")
+  {
+    $$DocsParser::objCurrentFunction{mapped_class} = $attr{class};
   }
 }
 
@@ -240,7 +257,10 @@ sub append_parameter_docs($$)
 
   # Strip first parameter if this is a method.
   my $defs_method = GtkDefs::lookup_method_dont_mark($$obj_function{name});
-  shift(@param_names) if($defs_method && $$defs_method{class} ne "");
+  # the second alternative is for use with method-mappings meaning:
+  # this function is mapped into this Gtk::class
+  shift(@param_names) if(($defs_method && $$defs_method{class} ne "") ||
+                         ($$obj_function{mapped_class} ne ""));
 
   foreach my $param (@param_names)
   {
@@ -275,7 +295,8 @@ sub convert_docs_to_cpp($$)
   # Chop off leading and trailing whitespace.
   $$text =~ s/^\s+//;
   $$text =~ s/\s+$//;
-
+# HagenM: this is the only reference to $$obj_function{description_overridden}
+# and it seems not to be in use.
 #  if(!$$obj_function{description_overridden})
 #  {
     # Convert C documentation to C++.
@@ -300,11 +321,9 @@ sub convert_tags_to_doxygen($)
     s"&lt;(/?)function&gt;"<$1tt>"g;
 
     # Some argument names are suffixed by "_" -- strip this.
-    s" ?\@([_a-z]*[a-z])_?\b" \@a $1 "g;
-    s"^Note ?\d?: "\@note "mg;
-
     # gtk-doc uses @thearg, but doxygen uses @a thearg.
-    #s"\@"\@amurrayc "g;
+    s" ?\@(\w*[A-Za-z0-9])_?\b" \@a $1 "g;
+    s"^Note ?\d?: "\@note "mg;
 
     s"&lt;/?programlisting&gt;""g;
     s"&lt;informalexample&gt;"\@code"g;
