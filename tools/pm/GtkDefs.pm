@@ -263,7 +263,7 @@ sub get_unwrapped
 {
   # find methods which were used in for a _WRAP
   my @targets;
-  push @targets,grep {$$_{entity_type} eq "method" & $$_{mark}==1} values %GtkDefs::methods;
+  push @targets,grep {$$_{entity_type} eq "method" && $$_{mark}==1} values %GtkDefs::methods;
   push @targets,grep {$$_{mark}==1} values %GtkDefs::signals;
   push @targets,grep {$$_{mark}==1} values %GtkDefs::properties;
 
@@ -275,9 +275,9 @@ sub get_unwrapped
   my $class;
   foreach $class (@classes)
   {
-    push @unwrapped, grep {$$_{class} eq $class & $$_{mark}==0} values %GtkDefs::methods;
-    push @unwrapped, grep {$$_{class} eq $class & $$_{mark}==0} values %GtkDefs::properties;
-    push @unwrapped, grep {$$_{class} eq $class & $$_{mark}==0} values %GtkDefs::signals;
+    push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::methods;
+    push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::properties;
+    push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::signals;
   }
 
   return @unwrapped;
