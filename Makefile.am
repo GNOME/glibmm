@@ -1,3 +1,4 @@
+ACLOCAL_AMFLAGS	= -I scripts
 
 SUBDIRS		= tools glib examples docs
 DIST_SUBDIRS	= $(SUBDIRS) scripts tests

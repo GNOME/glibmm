@@ -1,4 +1,4 @@
-
+cv_cxx_has_namespace_std
 ## GLIBMM_CXX_HAS_NAMESPACE_STD()
 ##
 ## Test whether libstdc++ declares namespace std.  For safety,
@@ -35,7 +35,7 @@ AC_DEFUN([GLIBMM_CXX_HAS_NAMESPACE_STD],
 
   if test "x${gtkmm_cv_cxx_has_namespace_std}" = "xyes"; then
   {
-    AC_DEFINE([GLIBMM_HAVE_NAMESPACE_STD],[1])
+    AC_DEFINE([GLIBMM_HAVE_NAMESPACE_STD],[1], [Defined when the libstdc++ declares the std-namespace])
   }
   fi
 ])
@@ -70,7 +70,7 @@ AC_DEFUN([GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS],
 
   if test "x${gtkmm_cv_cxx_has_std_iterator_traits}" = "xyes"; then
   {
-    AC_DEFINE([GLIBMM_HAVE_STD_ITERATOR_TRAITS],[1])
+    AC_DEFINE([GLIBMM_HAVE_STD_ITERATOR_TRAITS],[1], [Defined if std::iterator_traits<> is standard-conforming])
   }
   fi
 ])
@@ -105,7 +105,7 @@ AC_DEFUN([GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR],
 
   if test "x${gtkmm_cv_cxx_has_sun_reverse_iterator}" = "xyes"; then
   {
-    AC_DEFINE([GLIBMM_HAVE_SUN_REVERSE_ITERATOR],[1])
+    AC_DEFINE([GLIBMM_HAVE_SUN_REVERSE_ITERATOR],[1], [Defined if std::reverse_iterator is in Sun libCstd style])
   }
   fi
 ])
@@ -146,7 +146,7 @@ AC_DEFUN([GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
 
   if test "x${gtkmm_cv_cxx_has_template_sequence_ctors}" = "xyes"; then
   {
-    AC_DEFINE([GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS],[1])
+    AC_DEFINE([GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS],[1, [Defined if the STL containers have templated sequence ctors]])
   }
   fi
 ])

@@ -116,7 +116,7 @@ AC_DEFUN([GTKMM_ARG_ENABLE_DEBUG_REFCOUNTING],
 
   if test "x$gtkmm_debug_refcounting" = "xyes"; then
   {
-    AC_DEFINE([GTKMM_DEBUG_REFCOUNTING],[1])
+    AC_DEFINE([GTKMM_DEBUG_REFCOUNTING],[1], [Defined when the --enable-debug-refcounting configure argument was given])
   }
   fi
 ])
