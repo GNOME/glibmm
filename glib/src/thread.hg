@@ -676,9 +676,36 @@ private:
   Cond& operator=(const Cond&);
 };
 
+//We should make this the default, but we can't do that until we can break ABI:
+
+#ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+namespace { //anonymous
+
+//We must put this here, because we can't use extern "C" inside the class.
+extern "C" {
+  void Private_DestructorFunc(void* data)
+} //extern "C"
+
+class PrivateBase
+{
+public:
+  typedef void (*DestructorFunc) (void*);
+  
+  friend void Private_DestructorFunc(void* data);
+  
+protected:
+  DestructorFunc destructor_func_;
+};
+
+} //anonymous
+#endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+  
 //TODO: What is this class used for? Is it public API? murrayc
 template <class T>
 struct StaticPrivate
+#ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+  : public PrivateBase
+#endif
 {
   typedef void (*DestroyNotifyFunc) (void*);
 
@@ -695,24 +722,18 @@ struct StaticPrivate
 #endif
 };
 
-namespace { //anonymous
-
-//We must put this here, because we can't use extern "C" inside the class.
-extern "C" {
-typedef void (*Private_DestructorFunc) (void*);
-}
-
-} //anonymous
-
 //TODO: What is this class used for? Is it public API? murray
 template <class T>
 class Private
+#ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+  : public PrivateBase
+#endif
 {
 public:
-  //We can't do this: extern "C" { typedef void (*DestructorFunc) (void*); }
-  //So we do this:
-  typedef Private_DestructorFunc DestructorFunc;
-  
+  #ifdef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+  typedef void (*DestructorFunc) (void*);
+  #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+
   static void delete_ptr(void* data);
 
   explicit inline Private(DestructorFunc destructor_func = &Private<T>::delete_ptr);
@@ -723,7 +744,7 @@ public:
 
 private:
   GPrivate* gobject_;
-
+  
   // noncopyable
   Private(const Private<T>&);
   Private<T>& operator=(const Private<T>&);
@@ -1022,7 +1043,12 @@ T* StaticPrivate<T>::get()
 template <class T> inline
 void StaticPrivate<T>::set(T* data, typename StaticPrivate<T>::DestroyNotifyFunc notify_func)
 {
+  #ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+  destructor_func_ = notify_func; //Private_DestructorFunc will use this.
+  g_static_private_set(&gobject_, data, &Private_DestructorFunc);
+  #else
   g_static_private_set(&gobject_, data, notify_func);
+  #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 }
 
 
@@ -1037,9 +1063,14 @@ void Private<T>::delete_ptr(void* data)
 
 template <class T> inline
 Private<T>::Private(typename Private<T>::DestructorFunc destructor_func)
-:
-  gobject_ (g_private_new(destructor_func))
-{}
+{
+  #ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+  destructor_func_ = destructor_func; //Private_DestructorFunc will use this.
+  gobject_ = g_private_new(Private_DestructorFunc);
+  #else
+  gobject_ = g_private_new(destructor_func);
+  #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+}
 
 template <class T> inline
 T* Private<T>::get()

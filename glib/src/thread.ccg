@@ -362,5 +362,21 @@ bool Cond::timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time)
   return g_cond_timed_wait(gobject_, mutex.gobj(), const_cast<Glib::TimeVal*>(&abs_time));
 }
 
+#ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+namespace { //anonymous
+
+//This is an extern "C" function that calls a non-extern "C" function:
+void Private_DestructorFunc(void* data)
+{
+  PrivateBase pBase = static_cast<PrivateBase*>(data);
+  if(pBase && pBase->destructor_func_)
+    (*(pBase->destructor_func_))(data);
+ 
+  //pBase has now been destroyed, via its derived class.
+}
+
+} //anonymous
+#endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+
 } // namespace Glib
 
