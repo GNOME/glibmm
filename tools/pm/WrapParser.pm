@@ -933,7 +933,8 @@ sub on_wrap_signal($)
 
   my $bCustomDefaultHandler = 0;
   my $bNoDefaultHandler = 0;
-  if(scalar(@args) > 2) # If the optional argument is there.
+  my $bCustomCCallback = 0;
+  if(scalar(@args) > 2) # If optional arguments are there.
   {
     my $argRef = string_trim($args[2]);
     if($argRef eq "custom_default_handler")
@@ -945,10 +946,15 @@ sub on_wrap_signal($)
     {
       $bNoDefaultHandler = 1;
     }
+
+    if($argRef eq "custom_c_callback")
+    {
+      $bCustomCCallback = 1;
+    }
   }
 
 
-  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler);
+  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback);
 }
 
 # void on_wrap_vfunc()
@@ -1104,11 +1110,11 @@ sub output_wrap_check($$$$$$)
 
 }
 
-# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler)
+# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback)
 # Also used for vfunc.
-sub output_wrap_signal($$$$$$)
+sub output_wrap_signal($$$$$$$)
 {
-  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler) = @_;
+  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback) = @_;
 
   #Some checks:
   $self->output_wrap_check($CppDecl, $signal_name, $filename, $line_num, "WRAP_SIGNAL");
@@ -1117,7 +1123,7 @@ sub output_wrap_signal($$$$$$)
 
   #Parse the method decaration and build an object that holds the details:
   my $objCppSignal = &Function::new($CppDecl, $self);
-  $$objCppSignal{class} = $$self{class}; #Remeber the class name for use in Outputter::output_wrap_signal().
+  $$objCppSignal{class} = $$self{class}; #Remember the class name for use in Outputter::output_wrap_signal().
 
 
   # handle second argument:
@@ -1140,17 +1146,7 @@ sub output_wrap_signal($$$$$$)
     }
   }
 
-  #If the C types and C++ types are different, then create a custom SignalProxy,
-  #which will do the C-to-C++ conversion in its C callback.
-#  my $no_type_conversion = $objCSignal->has_same_types($objCppSignal);
-#  my $custom_signalproxy_name = "";
-#  if($no_type_conversion ne 1)
-#  {
-#    $custom_signalproxy_name = $$objCppSignal{class} . "_" . $$objCppSignal{name};
-#    $objOutputter->output_wrap_sig_custom($filename, $line_num, $objCSignal, $objCppSignal, $custom_signalproxy_name);
-#  }
-
-  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name);
+  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name, $bCustomCCallback);
 
   if($bNoDefaultHandler eq 0)
   {
@@ -1158,7 +1154,7 @@ sub output_wrap_signal($$$$$$)
 
     my $bImplement = 1;
     if($bCustomDefaultHandler) { $bImplement = 0; }
-    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement);
+    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement, $bCustomCCallback);
   }
 }
 

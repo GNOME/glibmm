@@ -187,9 +187,9 @@ sub output_wrap_default_signal_handler_h($$$$$$)
 }
 
 # _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>')
-sub output_wrap_default_signal_handler_cc($$$$$)
+sub output_wrap_default_signal_handler_cc($$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement, $bCustomCCallback) = @_;
   my $cname = $$objDefsSignal{name};
   # $cname = $1 if ($args[3] =~ /"(.*)"/); #TODO: What's this about?
 
@@ -219,16 +219,19 @@ sub output_wrap_default_signal_handler_cc($$$$$)
 #    $arglist_names .= $arglist_names_extra;
 #  }
 
-  my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s)dnl\n",
-    $$objCppfunc{name},
-    $cname,
-    $$objCppfunc{rettype},
-    $$objDefsSignal{rettype},
-    $objDefsSignal->args_types_and_names(),
-    $objDefsSignal->args_names_only(),
-    convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num),
-    ${$objDefsSignal->get_param_names()}[0]);
-  $self->append($str);
+  if($bCustomCCallback ne 1)
+  {
+    my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s)dnl\n",
+      $$objCppfunc{name},
+      $cname,
+      $$objCppfunc{rettype},
+      $$objDefsSignal{rettype},
+      $objDefsSignal->args_types_and_names(),
+      $objDefsSignal->args_names_only(),
+      convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num),
+      ${$objDefsSignal->get_param_names()}[0]);
+    $self->append($str);
+  }
 }
 
 ### Convert _WRAP to a method
@@ -338,11 +341,11 @@ sub output_wrap_create($$$)
   $self->append($str)
 }
 
-# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name)
+# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback)
 # custom_signalproxy_name is "" when no type conversion is required - a normal templates SignalProxy will be used instead.
-sub output_wrap_sig_decl($$$$$$)
+sub output_wrap_sig_decl($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name) = @_;
+  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback) = @_;
 
 # _SIGNAL_PROXY(c_signal_name, c_return_type, `<c_arg_types_and_names>',
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
@@ -356,6 +359,7 @@ sub output_wrap_sig_decl($$$$$$)
     $$objCppfunc{rettype},
     $objCppfunc->args_types_only(),
     convert_args_c_to_cpp($objCSignal, $objCppfunc, $line_num),
+    $bCustomCCallback, #When this is true, it will not write the *_callback implementation for you.
     $objCppfunc->get_refdoc_comment()
   );
 

@@ -10,10 +10,11 @@ dnl               $4 = cpp_signal_name,
 dnl               $5 = cpp_return_type,
 dnl               $6 = `<cpp_arg_types>',
 dnl               $7 = `<c_args_to_cpp>',
-dnl               $8 = `refdoc_comment')
+dnl               $8 = `custom_c_callback (boolean)')
+dnl               $9 = `refdoc_comment')
 
 define(`_SIGNAL_PROXY',`
-$8
+$9
   Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'();
 dnl
 _PUSH(SECTION_ANONYMOUS_NAMESPACE)
@@ -30,6 +31,7 @@ const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 };
 ',`dnl else
 
+ifelse($8,`1',,`dnl Do not generate the implementation if it should be custom:
 $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
 {
   using namespace __NAMESPACE__;
@@ -85,6 +87,7 @@ $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3
   typedef $2 RType;
   return RType`'();
 }
+')dnl endif
 ')dnl endif
 
 const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
