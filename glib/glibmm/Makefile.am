@@ -4,6 +4,7 @@
 SUBDIRS = private
 
 sublib_name		= glibmm
+sublib_libname	= glibmm-2.3
 sublib_namespace	= Glib
 sublib_cflags		= $(GLIBMM_CFLAGS)
 

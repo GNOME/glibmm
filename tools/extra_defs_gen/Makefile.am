@@ -14,7 +14,7 @@ libglibmm_generate_extra_defs_2_3_la_SOURCES = $(files_h) $(files_cc)
 libglibmm_generate_extra_defs_2_3_la_LDFLAGS = $(no_undefined) -version-info $(LIBGLIBMM_SO_VERSION)
 libglibmm_generate_extra_defs_2_3_la_LIBADD = $(GLIBMM_LIBS)
 
-sublib_includedir	= $(includedir)/glibmm-2.4/glibmm_generate_extra_defs
+sublib_includedir	= $(includedir)/glibmm-2.3/glibmm_generate_extra_defs
 sublib_include_HEADERS	= $(files_h)
 
 
