@@ -48,8 +48,9 @@ public:
 
   static void iface_init_function(void* g_iface, void* iface_data);
 
-protected:
   static Glib::ObjectBase* wrap_new(GObject*);
+
+protected:
 
   //Callbacks (default signal handlers):
   //These will call the *_impl member methods, which will then call the existing default signal callbacks, if any.
@@ -227,10 +228,10 @@ public:
   static GType get_base_type() G_GNUC_CONST;
 #endif
 
-  ///Provides access to the underlying C instance.
+  ///Provides access to the underlying C GObject.
   __CNAME__*       gobj()       { return reinterpret_cast<__CNAME__*>(gobject_); }
 
-  ///Provides access to the underlying C instance.
+  ///Provides access to the underlying C GObject.  
   const __CNAME__* gobj() const { return reinterpret_cast<__CNAME__*>(gobject_); }
 
 private:
