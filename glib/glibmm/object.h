@@ -227,6 +227,51 @@ struct TypeTraits< Glib::RefPtr<const T> >
 
 } //namespace Container_Helpers
 
+
+template <class T, class PtrT> inline
+PtrT Value_Pointer<T,PtrT>::get_(Glib::Object*) const
+{
+  return dynamic_cast<T*>(get_object());
+}
+
+
+/** Partial specialization for RefPtr<> to Glib::Object.
+ * @ingroup glibmmValue
+ */
+template <class T>
+class Value< Glib::RefPtr<T> > : public ValueBase_Object
+{
+public:
+  typedef Glib::RefPtr<T>             CppType;
+  typedef typename T::BaseObjectType* CType;
+
+  static GType value_type() { return T::get_base_type(); }
+
+  void set(const CppType& data) { set_object(data.operator->()); }
+  CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
+};
+
+//The SUN Forte Compiler has a problem with this: 
+#ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
+/** Partial specialization for RefPtr<> to const Glib::Object.
+ * @ingroup glibmmValue
+ */
+template <class T>
+class Value< Glib::RefPtr<const T> > : public ValueBase_Object
+{
+public:
+  typedef Glib::RefPtr<const T>       CppType;
+  typedef typename T::BaseObjectType* CType;
+
+  static GType value_type() { return T::get_base_type(); }
+
+  void set(const CppType& data) { set_object(const_cast<T*>(data.operator->())); }
+  CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
+};
+#endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
+
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 #endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 

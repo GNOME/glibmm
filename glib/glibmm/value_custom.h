@@ -89,6 +89,23 @@ private:
 };
 
 
+#ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+namespace { //anonymous
+
+extern "C"
+{
+void Value_value_init_func(GValue* value);
+void Value_value_free_func(GValue* value);
+void Value_value_copy_func(const GValue* src_value, GValue* dest_value);
+
+} //extern "C"
+
+} //anonymous namespace
+#endif //DOXYGEN_SHOULD_SKIP_THIS
+#endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+
+  
 /** Generic value implementation for custom types.
  * @ingroup glibmmValue
  * Any type to be used with this template must implement:
@@ -120,9 +137,13 @@ public:
 private:
   static GType custom_type_;
 
+  #ifdef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
   static void value_init_func(GValue* value);
   static void value_free_func(GValue* value);
   static void value_copy_func(const GValue* src_value, GValue* dest_value);
+  #else
+    //The init, free, and copy funcs are virtual functions in the base class.   
+  #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 };
 
 
@@ -164,11 +185,14 @@ void Value_Pointer<T,PtrT>::set_(PtrT data, Glib::Object*)
   set_object(const_cast<T*>(data));
 }
 
+//More spec-compliant compilers (such as IRIX MipsPro) need this to be near Glib::Object instead.
+#ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 template <class T, class PtrT> inline
 PtrT Value_Pointer<T,PtrT>::get_(Glib::Object*) const
 {
   return dynamic_cast<T*>(get_object());
 }
+#endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 /** Implementation for custom pointers **/
 
@@ -249,9 +273,16 @@ GType Value<T>::value_type()
   {
     custom_type_ = Glib::custom_boxed_type_register(
         typeid(CppType).name(),
+        #ifdef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
         &Value<T>::value_init_func,
         &Value<T>::value_free_func,
         &Value<T>::value_copy_func);
+        #else
+        Value_value_init_func,
+        Value_value_free_func,
+        Value_value_copy_func);
+        #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+        
   }
   return custom_type_;
 }
