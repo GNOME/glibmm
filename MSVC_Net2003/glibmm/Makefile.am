@@ -1,1 +1,1 @@
-EXTRA_DIST = glibmm.vcproj
+EXTRA_DIST = glibmmconfig.h glibmm.vcproj

@@ -1,2 +1,2 @@
-EXTRA_DIST = gendef.cc
+EXTRA_DIST = gendef.vcproj gendef.cc
 
