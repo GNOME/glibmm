@@ -227,7 +227,10 @@ public:
   static GType get_base_type() G_GNUC_CONST;
 #endif
 
+  ///Provides access to the underlying C instance.
   __CNAME__*       gobj()       { return reinterpret_cast<__CNAME__*>(gobject_); }
+
+  ///Provides access to the underlying C instance.
   const __CNAME__* gobj() const { return reinterpret_cast<__CNAME__*>(gobject_); }
 
 private:

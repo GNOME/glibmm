@@ -190,7 +190,10 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
 
   void swap(__CPPNAME__& other);
 
+  ///Provides access to the underlying C instance.
   __CNAME__*       gobj()       { return gobject_; }
+
+  ///Provides access to the underlying C instance.
   const __CNAME__* gobj() const { return gobject_; }
 
   // The caller is responsible for freeing it. Use when directly setting fields in structs.

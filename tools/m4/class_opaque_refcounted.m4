@@ -144,7 +144,10 @@ ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
   void reference()   const;
   void unreference() const;
 
+  ///Provides access to the underlying C instance.
   __CNAME__*       gobj();
+
+  ///Provides access to the underlying C instance.
   const __CNAME__* gobj() const;
 
   // The caller is responsible for freeing it. Use when directly setting fields in structs.

@@ -147,7 +147,10 @@ ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
   explicit __CPPNAME__`'(const __CNAME__* gobject); // always takes a copy
 ')dnl
 
+  ///Provides access to the underlying C instance.
   __CNAME__*       gobj()       { return &gobject_; }
+
+  ///Provides access to the underlying C instance.
   const __CNAME__* gobj() const { return &gobject_; }
 
 protected:

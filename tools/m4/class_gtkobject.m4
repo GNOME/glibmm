@@ -183,7 +183,10 @@ public:
   static GType get_base_type() G_GNUC_CONST;
 #endif
 
+  ///Provides access to the underlying C GtkObject.
   __CNAME__*       gobj()       { return reinterpret_cast<__CNAME__*>(gobject_); }
+
+  ///Provides access to the underlying C GtkObject.
   const __CNAME__* gobj() const { return reinterpret_cast<__CNAME__*>(gobject_); }
 
 _H_VFUNCS_AND_SIGNALS()

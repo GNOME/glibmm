@@ -115,7 +115,11 @@ void DumpParser::on_text(Glib::Markup::ParseContext&, const Glib::ustring& text)
 void DumpParser::indent()
 {
   if(parse_depth_ > 0)
-    std::cout << std::setw(4 * parse_depth_) << std::right << ' ';
+  {
+    std::cout << std::setw(4 * parse_depth_)
+      /* gcc 2.95.3 doesn't like this: << std::right */
+      << ' ';
+  }
 }
 
 } // anonymous namespace
