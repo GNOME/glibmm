@@ -458,17 +458,18 @@ sub output_wrap_property($$$$$$)
   {
     $self->output_wrap_failed($name, "property defs lookup failed.");
   }
-  elsif($objProperty->get_construct_only() eq 1)
-  {
-    $self->output_wrap_failed($name, "Attempt to wrap a construct-only property.");
-  }
   else
   {
     # We use a suffix to specify a particular Glib::PropertyProxy* class.
     my $proxy_suffix = "";
 
     # Read/Write:
-    if($objProperty->get_readable() ne 1)
+    if($objProperty->get_construct_only() eq 1)
+    {
+      # construct-only functions can be read, but not written.
+      $proxy_suffix = "_ReadOnly";
+    }
+    elsif($objProperty->get_readable() ne 1)
     {
       $proxy_suffix = "_WriteOnly";
     }
@@ -476,7 +477,7 @@ sub output_wrap_property($$$$$$)
     {
        $proxy_suffix = "_ReadOnly";
     }
-
+    
     $name =~ s/-/_/g;
 
     my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s)dnl\n",
