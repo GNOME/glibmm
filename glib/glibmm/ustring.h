@@ -234,63 +234,63 @@ public:
 
   static const size_type npos = std::string::npos;
 
-  /** Default constructor, which creates an empty string.
+  /*! Default constructor, which creates an empty string.
    */
   ustring();
   
   ~ustring();
 
-  /** Construct a ustring as a copy of a ustring
+  /*! Construct a ustring as a copy of another ustring.
    * @param other A source string.
    */
   ustring(const ustring& other);
 
-  /** Assign the value of a string to this string.
-   * @param other A source string
+  /*! Assign the value of another string to this string.
+   * @param other A source string.
    */ 
   ustring& operator=(const ustring& other);
 
-  /** Swap contents with another string.
+  /*! Swap contents with another string.
    * @param other String to swap with.
    */
   void swap(ustring& other);
 
-  /** Construct a ustring as a copy of a std::string
-   * @param src A source std::string containing text encoded as UTF-8.
+  /*! Construct a ustring as a copy of another std::string.
+   * @param src A source <tt>std::string</tt> containing text encoded as UTF-8.
    */
   ustring(const std::string& src);
 
-  /** Construct a ustring as a copy of a substring
-   * @param src Source Glib::ustring.
+  /*! Construct a ustring as a copy of a substring.
+   * @param src %Source ustring.
    * @param i Index of first character to copy from.
-   * @param n Number of characters to copy (default to copying the remainder).
+   * @param n Number of characters to copy (defaults to copying the remainder).
    */
   ustring(const ustring& src, size_type i, size_type n=npos);
 
-  /** Construct a ustring as a copy of a substring
-   * @param src Source C string encoded as UTF-8.
+  /*! Construct a ustring as a partial copy of a C string.
+   * @param src %Source C string encoded as UTF-8.
    * @param n Number of characters to copy.
    */
   ustring(const char* src, size_type n);
 
-  /** Construct a ustring as a copy of a substring
-   * @param src Source C string encoded as UTF-8.
+  /*! Construct a ustring as a copy of a C string.
+   * @param src %Source C string encoded as UTF-8.
    */
   ustring(const char* src);
 
-  /** Construct a  ustring as multiple characters.
+  /*! Construct a ustring as multiple characters.
    * @param n Number of characters.
-   * @param uc UTF-8 character to use.
+   * @param uc UCS-4 code point to use.
    */  
   ustring(size_type n, gunichar uc);
 
-  /** Construct a ustring as multiple characters.
+  /*! Construct a ustring as multiple characters.
    * @param n Number of characters.
    * @param c ASCII character to use.
    */  
   ustring(size_type n, char c);
 
-  /** Construct a ustring as a copy of a range.
+  /*! Construct a ustring as a copy of a range.
    * @param pbegin Start of range.
    * @param pend End of range.
    */  
@@ -547,8 +547,8 @@ public:
    * their lowercase equivalent, while honoring the current locale.  The
    * resulting string may change in the number of bytes as well as in the
    * number of characters.  For instance, the German sharp&nbsp;s
-   * <tt>"&szlig;"</tt> will be replaced by two characters <tt>"SS"</tt>
-   * because there is no capital <tt>"&szlig;"</tt>.
+   * <tt>&quot;&szlig;&quot;</tt> will be replaced by two characters
+   * <tt>"SS"</tt> because there is no capital <tt>&quot;&szlig;&quot;</tt>.
    */
   ustring uppercase() const;
 
