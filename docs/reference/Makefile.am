@@ -7,8 +7,8 @@ include $(top_srcdir)/docs/Makefile_web.am_fragment
 web_path_reference = $(web_path_docs)reference
 
 EXTRA_DIST = README Doxyfile.in \
-             gtkmm_header.html_fragment gtkmm_footer.html_fragment beautify_docs.pl \
-             html
+             glibmm_header.html_fragment glibmm_footer.html_fragment beautify_docs.pl \
+             html glibmm_doxygen_tags
 
 html/index.html: $(doxygen_configfile_source) $(beautify_docs)
 	-rm -rf html
@@ -21,10 +21,10 @@ html/index.html: $(doxygen_configfile_source) $(beautify_docs)
 	$(PERL_PATH) $(beautify_docs) html
 
 
-gtkmm-reference-html.tar.gz: html/index.html
+glibmm-reference-html.tar.gz: html/index.html
 	tar cf - html | gzip -c --best >$@
 
-gtkmm-reference-html.tar.bz2: html/index.html
+glibmm-reference-html.tar.bz2: html/index.html
 	tar cf - html | bzip2 -c >$@
 
 post-html: html/index.html
@@ -32,8 +32,8 @@ post-html: html/index.html
 
 doc-clean:
 	-rm -rf html
-	-rm -f gtkmm_doxygen_tags
-	-rm -f gtkmm-reference-html.tar.gz gtkmm-reference-html.tar.bz2
+	-rm -f glibmm_doxygen_tags
+	-rm -f glibmm-reference-html.tar.gz glibmm-reference-html.tar.bz2
 
 referencedir = $(gtkmm_docdir)/reference/html
 
