@@ -57,8 +57,8 @@ namespace Glib
 enum OwnershipType
 {
   OWNERSHIP_NONE = 0,
-  OWNERSHIP_SHALLOW,
-  OWNERSHIP_DEEP
+  OWNERSHIP_SHALLOW, //Release the list, but not its elements, when the container is deleted
+  OWNERSHIP_DEEP //Release the list, and its elements, when the container is deleted.
 };
 
 
