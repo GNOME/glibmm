@@ -29,6 +29,12 @@ inline $1 $2(gunichar uc)
   { return g_unichar_$2(uc); }
 `'dnl`'')
 
+//MSVC++ needs the != 0 to avoid an int -> bool cast warning.
+m4_define(`_UNICHAR_FUNC_BOOL',`dnl
+inline $1 $2(gunichar uc)
+  { return (g_unichar_$2(uc) != 0); }
+`'dnl`'')
+
 m4_define(`_ASCII_FUNC',`dnl
 inline $1 $2(char c)
   { return g_ascii_$2(c); }
@@ -79,21 +85,21 @@ _WRAP_ENUM(NormalizeMode, GNormalizeMode, NO_GTYPE)
 namespace Unicode
 {
 
-_UNICHAR_FUNC(bool, validate)
-_UNICHAR_FUNC(bool, isalnum)
-_UNICHAR_FUNC(bool, isalpha)
-_UNICHAR_FUNC(bool, iscntrl)
-_UNICHAR_FUNC(bool, isdigit)
-_UNICHAR_FUNC(bool, isgraph)
-_UNICHAR_FUNC(bool, islower)
-_UNICHAR_FUNC(bool, isprint)
-_UNICHAR_FUNC(bool, ispunct)
-_UNICHAR_FUNC(bool, isspace)
-_UNICHAR_FUNC(bool, isupper)
-_UNICHAR_FUNC(bool, isxdigit)
-_UNICHAR_FUNC(bool, istitle)
-_UNICHAR_FUNC(bool, isdefined)
-_UNICHAR_FUNC(bool, iswide)
+_UNICHAR_FUNC_BOOL(bool, validate)
+_UNICHAR_FUNC_BOOL(bool, isalnum)
+_UNICHAR_FUNC_BOOL(bool, isalpha)
+_UNICHAR_FUNC_BOOL(bool, iscntrl)
+_UNICHAR_FUNC_BOOL(bool, isdigit)
+_UNICHAR_FUNC_BOOL(bool, isgraph)
+_UNICHAR_FUNC_BOOL(bool, islower)
+_UNICHAR_FUNC_BOOL(bool, isprint)
+_UNICHAR_FUNC_BOOL(bool, ispunct)
+_UNICHAR_FUNC_BOOL(bool, isspace)
+_UNICHAR_FUNC_BOOL(bool, isupper)
+_UNICHAR_FUNC_BOOL(bool, isxdigit)
+_UNICHAR_FUNC_BOOL(bool, istitle)
+_UNICHAR_FUNC_BOOL(bool, isdefined)
+_UNICHAR_FUNC_BOOL(bool, iswide)
 
 _UNICHAR_FUNC(gunichar, toupper)
 _UNICHAR_FUNC(gunichar, tolower)
