@@ -95,6 +95,7 @@ namespace { //anonymous
 
 extern "C"
 {
+
 void Value_value_init_func(GValue* value);
 void Value_value_free_func(GValue* value);
 void Value_value_copy_func(const GValue* src_value, GValue* dest_value);
@@ -142,7 +143,10 @@ private:
   static void value_free_func(GValue* value);
   static void value_copy_func(const GValue* src_value, GValue* dest_value);
   #else
-    //The init, free, and copy funcs are virtual functions in the base class.   
+  //The init, free, and copy funcs are virtual functions in the base class. 
+  virtual void value_init_func(GValue* value);
+  virtual void value_free_func(GValue* value);
+  virtual void value_copy_func(const GValue* src_value, GValue* dest_value);  
   #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 };
 

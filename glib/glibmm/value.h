@@ -99,6 +99,13 @@ public:
 protected:
   void  set_boxed(const void* data);
   void* get_boxed() const; // doesn't copy
+  
+  #ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+  virtual void value_init_func(GValue* value) {};
+  virtual void value_free_func(GValue* value) {};
+  virtual void value_copy_func(const GValue* src_value, GValue* dest_value) {};        
+  #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+  
 };
 
 
@@ -206,6 +213,9 @@ public:
   CppType get() const           { return CppType(static_cast<CType>(get_boxed())); }
 };
 
+//More spec-compliant compilers (such as IRIX MipsPro) need this to be near Glib::Object instead.
+#ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+
 /** Partial specialization for RefPtr<> to Glib::Object.
  * @ingroup glibmmValue
  */
@@ -241,6 +251,8 @@ public:
   CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
 #endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
+#endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 } // namespace Glib
 

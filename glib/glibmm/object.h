@@ -25,6 +25,7 @@
 #include <glibmm/quark.h>
 #include <glibmm/refptr.h>
 #include <glibmm/utility.h> /* Could be private, but that would be tedious. */
+#include <glibmm/containerhandlee_shared.h> //Because its specializations may be here.
 #include <glibmm/value.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
