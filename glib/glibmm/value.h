@@ -34,7 +34,7 @@ class Object;
 /** @defgroup glibmmValue Generic Values
  *
  * Glib::Value<> is specialized for almost any type used within
- * the gtkmm libraries.
+ * the glibmm and gtkmm libraries.
  *
  * - Basic types like <tt>int</tt>, <tt>char</tt>, <tt>bool</tt>, etc., also <tt>void*</tt>.
  * - Glib::ustring and std::string.
