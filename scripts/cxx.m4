@@ -155,7 +155,7 @@ AC_DEFUN([GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS],
     AC_TRY_COMPILE(
     [
       #include <iostream>
-    ],[
+
       template <class T> class Foo {};
 
       template <typename T> class Traits {
@@ -178,9 +178,8 @@ AC_DEFUN([GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS],
               return "partial specialization for Foo<const T>";
           }
       };
-
-      int main(int, char*[])
-      {
+      
+    ],[
           Traits<int> it;
           Traits<Foo<int> > fit;
           Traits<Foo<const int> > cfit;
@@ -193,7 +192,6 @@ AC_DEFUN([GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS],
                     << cfit.whoami() << std::endl;
 
           return 0;
-      }
     ],
       [gtkmm_cv_cxx_can_disambiguate_const_template_specializations="yes"],
       [gtkmm_cv_cxx_can_disambiguate_const_template_specializations="no"]
