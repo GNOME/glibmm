@@ -32,6 +32,9 @@ public:
   sigc::signal<void>& signal_finished();
   int id() const;
 
+  virtual void reference() const { ++ref_count_; }
+  virtual void unreference() const { if (!(--ref_count_)) delete this; }
+
 private:
   Glib::Thread*       thread_;
   int                 id_;
@@ -41,6 +44,9 @@ private:
 
   void progress_increment();
   void thread_function();
+
+  mutable int ref_count_;
+ 
 };
 
 class Application : public sigc::trackable
@@ -55,6 +61,7 @@ public:
 private:
   Glib::RefPtr<Glib::MainLoop>  main_loop_;
   std::list<ThreadProgress*>    progress_list_;
+  std::list<Glib::RefPtr<ThreadProgress> > progress_ref_list_;
 
   void on_progress_finished(ThreadProgress* thread_progress);
 };
@@ -64,8 +71,11 @@ ThreadProgress::ThreadProgress(int id)
 :
   thread_   (0),
   id_       (id),
-  progress_ (0)
+  progress_ (0),
+  ref_count_(0)
 {
+  // Increment the reference count
+  reference();
   // Connect to the cross-thread signal.
   signal_increment_.connect(sigc::mem_fun(*this, &ThreadProgress::progress_increment));
 }
@@ -129,16 +139,18 @@ Application::Application()
 
   for(int i = 1; i <= 5; ++i)
   {
-    std::auto_ptr<ThreadProgress> progress (new ThreadProgress(i));
-    progress_list_.push_back(progress.get());
+    ThreadProgress* progress=new ThreadProgress(i);
+    progress_list_.push_back(progress);
+    progress_ref_list_.push_back(Glib::RefPtr<ThreadProgress>(progress));
 
     progress->signal_finished().connect(
-        sigc::bind(sigc::mem_fun(*this, &Application::on_progress_finished), progress.release()));
+        sigc::bind(sigc::mem_fun(*this, &Application::on_progress_finished), progress));
   }
 }
 
 Application::~Application()
-{}
+{
+}
 
 void Application::launch_threads()
 {
@@ -154,12 +166,11 @@ void Application::run()
 void Application::on_progress_finished(ThreadProgress* thread_progress)
 {
   {
-    const std::auto_ptr<ThreadProgress> progress (thread_progress);
+    progress_list_.remove(thread_progress);
+    thread_progress->join();
 
-    progress_list_.remove(progress.get());
-    progress->join();
-
-    std::cout << "Thread " << progress->id() << ": finished." << std::endl;
+    std::cout << "Thread " << thread_progress->id() 
+	      << ": finished." << std::endl;
   }
 
   if(progress_list_.empty())
