@@ -29,14 +29,17 @@ namespace Glib
 
 void Interface_Class::add_interface(GType instance_type) const
 {
-  const GInterfaceInfo interface_info =
+  if( !g_type_is_a(instance_type, gtype_) ) //For convenience, don't complain about calling this twice.
   {
-    class_init_func_,
-    0, // interface_finalize
-    0, // interface_data
-  };
+    const GInterfaceInfo interface_info =
+    {
+      class_init_func_,
+      0, // interface_finalize
+      0, // interface_data
+    };
 
-  g_type_add_interface_static(instance_type, gtype_, &interface_info);
+    g_type_add_interface_static(instance_type, gtype_, &interface_info);
+  }
 }
 
 
