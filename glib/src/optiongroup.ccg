@@ -121,6 +121,11 @@ void OptionGroup::add_entry(const OptionEntry& entry)
   g_option_group_add_entries(gobj(), array);
 }
 
+void OptionGroup::add_entry(const OptionEntry& entry, bool& arg)
+{
+  add_entry_with_wrapper(entry, G_OPTION_ARG_NONE /* Actually a boolean on/off, depending on whether the argument name was given, without argument parameters. */, &arg);
+}
+
 void OptionGroup::add_entry(const OptionEntry& entry, int& arg)
 {
   add_entry_with_wrapper(entry, G_OPTION_ARG_INT, &arg);
@@ -236,6 +241,14 @@ void OptionGroup::CppOptionEntry::allocate_c_arg()
       
       break;
     }
+    case G_OPTION_ARG_NONE: /* Actually a boolean. */
+    {
+      gboolean* typed_arg = new gboolean;
+      *typed_arg = 0;
+      carg_ = typed_arg;
+      
+      break;
+    }
     default:
     {
       break;
@@ -271,6 +284,13 @@ void OptionGroup::CppOptionEntry::release_c_arg()
       case G_OPTION_ARG_FILENAME_ARRAY:
       {
         delete (char**)carg_;
+        break;
+      }
+      case G_OPTION_ARG_NONE: /* Actually a boolean. */
+      {
+        gboolean* typed_arg = (gboolean*)carg_;
+        delete typed_arg;
+
         break;
       }
       default:
@@ -346,6 +366,11 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
         (*typed_cpp_arg) = array_handle;
       }
       
+      break;
+    }
+    case G_OPTION_ARG_NONE: /* Actually a boolean. */
+    {
+      *((bool*)cpparg_) = *((gboolean*)carg_);
       break;
     }
     default:

@@ -34,12 +34,13 @@ public:
   int m_arg_foo;
   std::string m_arg_filename;
   Glib::ustring m_arg_goo;
+  bool m_arg_boolean;
   Glib::OptionGroup::vecustrings m_arg_list;
 };
 
 ExampleOptionGroup::ExampleOptionGroup()
 : Glib::OptionGroup("example_group", "description of example group", "help description of example group"),
-  m_arg_foo(0)
+  m_arg_foo(0), m_arg_boolean(false)
 {
   Glib::OptionEntry entry1;
   entry1.set_long_name("foo");
@@ -60,10 +61,16 @@ ExampleOptionGroup::ExampleOptionGroup()
   add_entry(entry3, m_arg_goo);
   
   Glib::OptionEntry entry4;
-  entry4.set_long_name("list");
-  entry4.set_short_name('l');
-  entry4.set_description("The List");
-  add_entry(entry4, m_arg_list);
+  entry4.set_long_name("activate_something");
+  entry4.set_short_name('a');
+  entry4.set_description("Activate something");
+  add_entry(entry4, m_arg_boolean);
+  
+  Glib::OptionEntry entry5;
+  entry5.set_long_name("list");
+  entry5.set_short_name('l');
+  entry5.set_description("The List");
+  add_entry(entry5, m_arg_list);
 }
 
 bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
@@ -110,6 +117,7 @@ int main(int argc, char** argv)
   std::cout << "parsed values: " << std::endl <<
     "  foo = " << group.m_arg_foo << std::endl << 
     "  filename = " << group.m_arg_filename << std::endl <<
+    "  activate_something = " << (group.m_arg_boolean ? "enabled" : "disabled") << std::endl <<
     "  goo = " << group.m_arg_goo << std::endl;
     
   //This one shows the results of multiple instance of the same option, such as --list=1 --list=a --list=b
