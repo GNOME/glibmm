@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <cerrno>
 #include <glib.h>
+#include <algorithm> //Needed by MSVC++.Net
 
 #ifndef G_OS_WIN32
 #include <unistd.h>
