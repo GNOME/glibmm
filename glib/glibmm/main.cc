@@ -557,7 +557,7 @@ Glib::RefPtr<MainContext> MainLoop::get_context()
 int MainLoop::depth()
 {
   return g_main_depth();
-}
+}                                             
 
 void MainLoop::reference() const
 {

@@ -1,6 +1,6 @@
 
 dnl
-dnl _ENUM(cpp_type, c_type, value_suffix, `element_list', `flags', `optional_refdoc_comment')
+dnl _ENUM(cpp_type, c_type, value_suffix, `element_list', `flags', `optional_refdoc_comment', 'get_type_function_name')
 dnl
 m4_define(`_ENUM',`dnl
 _PUSH()
