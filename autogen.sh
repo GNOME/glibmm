@@ -1,6 +1,6 @@
 #! /bin/sh
 
-PKG_NAME=gtkmm
+PKG_NAME=glibmm
 
 srcdir=`dirname $0`
 test "x$srcdir" = x && srcdir=.
@@ -8,8 +8,8 @@ test "x$srcdir" = x && srcdir=.
 origdir=`pwd`
 
 if test -f "$srcdir/configure.in" && \
-   test -d "$srcdir/gtk/src" && \
-   test -d "$srcdir/gtk/gtkmm"
+   test -d "$srcdir/glib/src" && \
+   test -d "$srcdir/glib/glibmm"
 then :; else
     echo "** Error **: Directory \`${srcdir}\' does not look like"
     echo "the top-level ${PKG_NAME} directory."

@@ -89,12 +89,12 @@ include $(top_srcdir)/build_shared/Makefile_build_gensrc.am_fragment
 files_built_general_cc	+= value_basictypes.cc
 files_built_general_h	+= signalproxy.h value_basictypes.h
 
-lib_LTLIBRARIES = libglibmm-2.0.la
+lib_LTLIBRARIES = libglibmm-2.4.la
 if OS_WIN32
-libglibmm_2_0_la_SOURCES = $(files_all_general_cc) $(files_all_win32_cc)
+libglibmm_2_4_la_SOURCES = $(files_all_general_cc) $(files_all_win32_cc)
 else
-libglibmm_2_0_la_SOURCES = $(files_all_general_cc) $(files_all_posix_cc)
+libglibmm_2_4_la_SOURCES = $(files_all_general_cc) $(files_all_posix_cc)
 endif
-libglibmm_2_0_la_LDFLAGS = $(common_ldflags)
-libglibmm_2_0_la_LIBADD = $(GLIBMM_LIBS)
+libglibmm_2_4_la_LDFLAGS = $(common_ldflags)
+libglibmm_2_4_la_LIBADD = $(GLIBMM_LIBS)
 

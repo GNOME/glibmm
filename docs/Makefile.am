@@ -1,11 +1,11 @@
 ## Copyright (c) 2001
 ## The gtkmm development team.
 
-SUBDIRS = FAQ images tutorial reference internal
+SUBDIRS = reference internal
 
-EXTRA_DIST = Makefile_web.am_fragment ChangeLog-before20011015.html index.html
+EXTRA_DIST = Makefile_web.am_fragment
 
-gtkmm_doc_DATA = index.html
+gtkmm_doc_DATA = 
 
 include $(top_srcdir)/docs/Makefile_web.am_fragment
 
@@ -16,7 +16,7 @@ post-html-recursive:
 	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) post-html); \
 	done
 
-post-html-local: index.html
+post-html-local: 
 	scp $$SSH_OPT $^ $$USER@shell.sourceforge.net:$(web_path_docs)
 
 post-html: post-html-recursive post-html-local

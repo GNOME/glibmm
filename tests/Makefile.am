@@ -1,7 +1,4 @@
-test_dirs = child_widget child_widget2 child_widget_managed \
-            dispatcher glibmm_value \
-            refcount_dialog dialog dialog_deletethis delete_cpp_child \
-            scrolledwindow
+test_dirs = glibmm_value
 
 SUBDIRS = $(test_dirs)
 EXTRA_DIST = Makefile.am_fragment
