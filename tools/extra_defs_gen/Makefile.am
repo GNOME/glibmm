@@ -9,10 +9,10 @@ else
 no_undefined =
 endif
 
-lib_LTLIBRARIES		= libglibmm_generate_extra_defs-2.4.la
-libglibmm_generate_extra_defs_2_4_la_SOURCES = $(files_h) $(files_cc)
-libglibmm_generate_extra_defs_2_4_la_LDFLAGS = $(no_undefined) -version-info $(LIBGTKMM_SO_VERSION) $(LIBSTDCPP_LIBS)
-libglibmm_generate_extra_defs_2_4_la_LIBADD = $(GLIBMM_LIBS)
+lib_LTLIBRARIES		= libglibmm_generate_extra_defs-2.3.la
+libglibmm_generate_extra_defs_2_3_la_SOURCES = $(files_h) $(files_cc)
+libglibmm_generate_extra_defs_2_3_la_LDFLAGS = $(no_undefined) -version-info $(LIBGTKMM_SO_VERSION) $(LIBSTDCPP_LIBS)
+libglibmm_generate_extra_defs_2_3_la_LIBADD = $(GLIBMM_LIBS)
 
 sublib_includedir	= $(includedir)/glibmm-2.4/glibmm_generate_extra_defs
 sublib_include_HEADERS	= $(files_h)
