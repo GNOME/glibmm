@@ -202,7 +202,19 @@ struct TypeTraits< Glib::RefPtr<T> >
 
   static CType   to_c_type      (const CppType& ptr) { return Glib::unwrap(ptr);     }
   static CType   to_c_type      (CType          ptr) { return ptr;                   }
-  static CppType to_cpp_type    (CType          ptr) { return Glib::wrap(ptr, true); }
+  static CppType to_cpp_type    (CType          ptr)
+  {
+    //return Glib::wrap(ptr, true);
+
+    //We copy/paste the wrap() implementation here,
+    //because we can not use a specific Glib::wrap(CType) overload here,
+    //because that would be "dependent", and g++ 3.4 does not allow that.
+    //The specific Glib::wrap() overloads don't do anything special anyway.
+    GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
+    return Glib::RefPtr<T>( dynamic_cast<CppType>(Glib::wrap_auto(cobj, true /* take_copy */)) );
+    //We use dynamic_cast<> in case of multiple inheritance.
+  }
+  
   static void    release_c_type (CType          ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
@@ -226,7 +238,19 @@ struct TypeTraits< Glib::RefPtr<const T> >
 
   static CType   to_c_type      (const CppType& ptr) { return Glib::unwrap(ptr);     }
   static CType   to_c_type      (CType          ptr) { return ptr;                   }
-  static CppType to_cpp_type    (CType          ptr) { return Glib::wrap(ptr, true); }
+  static CppType to_cpp_type    (CType          ptr)
+  {
+    //return Glib::wrap(ptr, true);
+
+    //We copy/paste the wrap() implementation here,
+    //because we can not use a specific Glib::wrap(CType) overload here,
+    //because that would be "dependent", and g++ 3.4 does not allow that.
+    //The specific Glib::wrap() overloads don't do anything special anyway.
+    GObject* cobj = (GObject*)(ptr);
+    return Glib::RefPtr<const T>( dynamic_cast<CppType>(Glib::wrap_auto(cobj, true /* take_copy */)) );
+    //We use dynamic_cast<> in case of multiple inheritance.
+  }
+  
   static void    release_c_type (CType          ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
