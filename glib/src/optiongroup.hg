@@ -1,0 +1,90 @@
+/* $Id$ */
+
+/* Copyright (C) 2004 The glibmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(glibmm,glib)
+
+#include <glibmm/optionentry.h>
+#include <glibmm/optioncontext.h>
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+extern "C" { typedef struct _GOptionGroup GOptionGroup; }
+#endif
+
+
+namespace Glib
+{
+/*
+_WRAP_ENUM(OptionFlags, GOptionFlags)
+
+typedef enum
+{
+  G_OPTION_FLAG_HIDDEN       = 1 << 0,
+  G_OPTION_FLAG_IN_MAIN      = 1 << 1
+} GOptionFlags;
+
+typedef enum
+{
+  G_OPTION_ARG_NONE,
+  G_OPTION_ARG_STRING,
+  G_OPTION_ARG_INT,
+  G_OPTION_ARG_CALLBACK,
+  G_OPTION_ARG_FILENAME,
+  G_OPTION_ARG_STRING_ARRAY,
+  G_OPTION_ARG_FILENAME_ARRAY
+} GOptionArg;
+*/
+
+/** TODO
+ */
+class OptionGroup
+{
+  _CLASS_GENERIC(OptionGroup, GOptionGroup)
+public:
+  OptionGroup(const Glib::ustring& name, const Glib::ustring& description, const Glib::ustring& help_description = Glib::ustring());
+  explicit OptionGroup(GOptionGroup* castitem);  
+  _IGNORE(g_option_group_new)
+  virtual ~OptionGroup();
+  _IGNORE(g_option_group_free)
+
+
+  virtual bool on_pre_parse(OptionContext& context, OptionGroup& group);
+  virtual bool on_post_parse(OptionContext& context, OptionGroup& group);
+  virtual void on_error(OptionContext& context, OptionGroup& group);
+  _IGNORE(g_option_group_set_parse_hooks, g_option_group_set_error_hook);
+  
+
+  //_WRAP_METHOD(void add_entries(const GOptionEntry *entries), g_option_group_add_entries)
+/* TODO:
+void          g_option_group_set_translate_func     (GOptionGroup       *group,
+						     GTranslateFunc      func,
+						     gpointer            data,
+						     GDestroyNotify      destroy_notify);
+*/
+  _WRAP_METHOD(void set_translation_domain(const Glib::ustring& domain), g_option_group_set_translation_domain)
+  
+  GOptionGroup*       gobj()       { return gobject_; }
+  const GOptionGroup* gobj() const { return gobject_; }
+
+protected:
+
+  GOptionGroup* gobject_;
+};
+
+} // namespace Glib
+

@@ -92,6 +92,7 @@
     '("intr" "G_FILE_ERROR_INTR")
     '("io" "G_FILE_ERROR_IO")
     '("perm" "G_FILE_ERROR_PERM")
+    '("nosys" "G_FILE_ERROR_NOSYS")
     '("failed" "G_FILE_ERROR_FAILED")
   )
 )
@@ -266,6 +267,42 @@
   )
 )
 
+(define-flags OptionFlags
+  (in-module "G")
+  (c-name "GOptionFlags")
+  (gtype-id "G_TYPE_OPTION_FLAGS")
+  (values
+    '("hidden" "G_OPTION_FLAG_HIDDEN")
+    '("in-main" "G_OPTION_FLAG_IN_MAIN")
+  )
+)
+
+(define-enum OptionArg
+  (in-module "G")
+  (c-name "GOptionArg")
+  (gtype-id "G_TYPE_OPTION_ARG")
+  (values
+    '("none" "G_OPTION_ARG_NONE")
+    '("string" "G_OPTION_ARG_STRING")
+    '("int" "G_OPTION_ARG_INT")
+    '("callback" "G_OPTION_ARG_CALLBACK")
+    '("filename" "G_OPTION_ARG_FILENAME")
+    '("string-array" "G_OPTION_ARG_STRING_ARRAY")
+    '("filename-array" "G_OPTION_ARG_FILENAME_ARRAY")
+  )
+)
+
+(define-enum OptionError
+  (in-module "G")
+  (c-name "GOptionError")
+  (gtype-id "G_TYPE_OPTION_ERROR")
+  (values
+    '("unknown-option" "G_OPTION_ERROR_UNKNOWN_OPTION")
+    '("bad-value" "G_OPTION_ERROR_BAD_VALUE")
+    '("failed" "G_OPTION_ERROR_FAILED")
+  )
+)
+
 (define-enum ErrorType
   (in-module "G")
   (c-name "GErrorType")
@@ -376,6 +413,17 @@
   )
 )
 
+(define-enum OnceStatus
+  (in-module "G")
+  (c-name "GOnceStatus")
+  (gtype-id "G_TYPE_ONCE_STATUS")
+  (values
+    '("notcalled" "G_ONCE_STATUS_NOTCALLED")
+    '("progress" "G_ONCE_STATUS_PROGRESS")
+    '("ready" "G_ONCE_STATUS_READY")
+  )
+)
+
 (define-enum UnicodeType
   (in-module "G")
   (c-name "GUnicodeType")
@@ -448,6 +496,8 @@
     '("complex-context" "G_UNICODE_BREAK_COMPLEX_CONTEXT")
     '("ambiguous" "G_UNICODE_BREAK_AMBIGUOUS")
     '("unknown" "G_UNICODE_BREAK_UNKNOWN")
+    '("next-line" "G_UNICODE_BREAK_NEXT_LINE")
+    '("word-joiner" "G_UNICODE_BREAK_WORD_JOINER")
   )
 )
 
@@ -468,28 +518,37 @@
 )
 
 
-;; From glib/galloca.h
+;; From /opt/gnome210/include/glib-2.0/glib/galloca.h
+
+(define-function alloca
+  (c-name "alloca")
+  (return-type "char*")
+  (parameters
+  )
+)
 
 
 
-;; From glib/garray.h
+;; From /opt/gnome210/include/glib-2.0/glib/garray.h
 
 (define-function g_array_new
   (c-name "g_array_new")
+  (is-constructor-of "GArray")
   (return-type "GArray*")
   (parameters
     '("gboolean" "zero_terminated")
-    '("gboolean" "clear")
+    '("gboolean" "clear_")
     '("guint" "element_size")
   )
 )
 
 (define-function g_array_sized_new
   (c-name "g_array_sized_new")
+  (is-constructor-of "GArraySized")
   (return-type "GArray*")
   (parameters
     '("gboolean" "zero_terminated")
-    '("gboolean" "clear")
+    '("gboolean" "clear_")
     '("guint" "element_size")
     '("guint" "reserved_size")
   )
@@ -529,7 +588,7 @@
   (c-name "g_array_insert_vals")
   (return-type "GArray*")
   (parameters
-    '("guint" "index")
+    '("guint" "index_")
     '("gconstpointer" "data")
     '("guint" "len")
   )
@@ -549,7 +608,7 @@
   (c-name "g_array_remove_index")
   (return-type "GArray*")
   (parameters
-    '("guint" "index")
+    '("guint" "index_")
   )
 )
 
@@ -558,7 +617,17 @@
   (c-name "g_array_remove_index_fast")
   (return-type "GArray*")
   (parameters
-    '("guint" "index")
+    '("guint" "index_")
+  )
+)
+
+(define-method remove_range
+  (of-object "GArray")
+  (c-name "g_array_remove_range")
+  (return-type "GArray*")
+  (parameters
+    '("guint" "index_")
+    '("guint" "length")
   )
 )
 
@@ -583,11 +652,13 @@
 
 (define-function g_ptr_array_new
   (c-name "g_ptr_array_new")
+  (is-constructor-of "GPtrArray")
   (return-type "GPtrArray*")
 )
 
 (define-function g_ptr_array_sized_new
   (c-name "g_ptr_array_sized_new")
+  (is-constructor-of "GPtrArraySized")
   (return-type "GPtrArray*")
   (parameters
     '("guint" "reserved_size")
@@ -617,7 +688,7 @@
   (c-name "g_ptr_array_remove_index")
   (return-type "gpointer")
   (parameters
-    '("guint" "index")
+    '("guint" "index_")
   )
 )
 
@@ -626,7 +697,7 @@
   (c-name "g_ptr_array_remove_index_fast")
   (return-type "gpointer")
   (parameters
-    '("guint" "index")
+    '("guint" "index_")
   )
 )
 
@@ -645,6 +716,16 @@
   (return-type "gboolean")
   (parameters
     '("gpointer" "data")
+  )
+)
+
+(define-method remove_range
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_remove_range")
+  (return-type "none")
+  (parameters
+    '("guint" "index_")
+    '("guint" "length")
   )
 )
 
@@ -676,13 +757,25 @@
   )
 )
 
+(define-method foreach
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_foreach")
+  (return-type "none")
+  (parameters
+    '("GFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-function g_byte_array_new
   (c-name "g_byte_array_new")
+  (is-constructor-of "GByteArray")
   (return-type "GByteArray*")
 )
 
 (define-function g_byte_array_sized_new
   (c-name "g_byte_array_sized_new")
+  (is-constructor-of "GByteArraySized")
   (return-type "GByteArray*")
   (parameters
     '("guint" "reserved_size")
@@ -732,7 +825,7 @@
   (c-name "g_byte_array_remove_index")
   (return-type "GByteArray*")
   (parameters
-    '("guint" "index")
+    '("guint" "index_")
   )
 )
 
@@ -741,7 +834,17 @@
   (c-name "g_byte_array_remove_index_fast")
   (return-type "GByteArray*")
   (parameters
-    '("guint" "index")
+    '("guint" "index_")
+  )
+)
+
+(define-method remove_range
+  (of-object "GByteArray")
+  (c-name "g_byte_array_remove_range")
+  (return-type "GByteArray*")
+  (parameters
+    '("guint" "index_")
+    '("guint" "length")
   )
 )
 
@@ -766,7 +869,13 @@
 
 
 
-;; From glib/gasyncqueue.h
+;; From /opt/gnome210/include/glib-2.0/glib/gasyncqueue.h
+
+(define-function g_async_queue_new
+  (c-name "g_async_queue_new")
+  (is-constructor-of "GAsyncQueue")
+  (return-type "GAsyncQueue*")
+)
 
 (define-method lock
   (of-object "GAsyncQueue")
@@ -786,15 +895,15 @@
   (return-type "none")
 )
 
-(define-method ref_unlocked
-  (of-object "GAsyncQueue")
-  (c-name "g_async_queue_ref_unlocked")
-  (return-type "none")
-)
-
 (define-method unref
   (of-object "GAsyncQueue")
   (c-name "g_async_queue_unref")
+  (return-type "none")
+)
+
+(define-method ref_unlocked
+  (of-object "GAsyncQueue")
+  (c-name "g_async_queue_ref_unlocked")
   (return-type "none")
 )
 
@@ -878,7 +987,73 @@
 
 
 
-;; From glib/gbacktrace.h
+;; From /opt/gnome210/include/glib-2.0/glib/gatomic.h
+
+(define-function g_atomic_int_exchange_and_add
+  (c-name "g_atomic_int_exchange_and_add")
+  (return-type "gint")
+  (parameters
+    '("gint*" "atomic")
+    '("gint" "val")
+  )
+)
+
+(define-function g_atomic_int_add
+  (c-name "g_atomic_int_add")
+  (return-type "none")
+  (parameters
+    '("gint*" "atomic")
+    '("gint" "val")
+  )
+)
+
+(define-function g_atomic_int_compare_and_exchange
+  (c-name "g_atomic_int_compare_and_exchange")
+  (return-type "gboolean")
+  (parameters
+    '("gint*" "atomic")
+    '("gint" "oldval")
+    '("gint" "newval")
+  )
+)
+
+(define-function g_atomic_pointer_compare_and_exchange
+  (c-name "g_atomic_pointer_compare_and_exchange")
+  (return-type "gboolean")
+  (parameters
+    '("gpointer*" "atomic")
+    '("gpointer" "oldval")
+    '("gpointer" "newval")
+  )
+)
+
+(define-function g_atomic_int_get
+  (c-name "g_atomic_int_get")
+  (return-type "gint")
+  (parameters
+    '("gint*" "atomic")
+  )
+)
+
+(define-function g_atomic_pointer_get
+  (c-name "g_atomic_pointer_get")
+  (return-type "gpointer")
+  (parameters
+    '("gpointer*" "atomic")
+  )
+)
+
+
+
+;; From /opt/gnome210/include/glib-2.0/glib/gbacktrace.h
+
+(define-function g_on_error_query
+  (c-name "g_on_error_query")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "prg_name")
+  )
+)
 
 (define-function g_on_error_stack_trace
   (c-name "g_on_error_stack_trace")
@@ -890,7 +1065,22 @@
 
 
 
-;; From glib/gcache.h
+;; From /opt/gnome210/include/glib-2.0/glib/gcache.h
+
+(define-function g_cache_new
+  (c-name "g_cache_new")
+  (is-constructor-of "GCache")
+  (return-type "GCache*")
+  (parameters
+    '("GCacheNewFunc" "value_new_func")
+    '("GCacheDestroyFunc" "value_destroy_func")
+    '("GCacheDupFunc" "key_dup_func")
+    '("GCacheDestroyFunc" "key_destroy_func")
+    '("GHashFunc" "hash_key_func")
+    '("GHashFunc" "hash_value_func")
+    '("GEqualFunc" "key_equal_func")
+  )
+)
 
 (define-method destroy
   (of-object "GCache")
@@ -938,10 +1128,11 @@
 
 
 
-;; From glib/gcompletion.h
+;; From /opt/gnome210/include/glib-2.0/glib/gcompletion.h
 
 (define-function g_completion_new
   (c-name "g_completion_new")
+  (is-constructor-of "GCompletion")
   (return-type "GCompletion*")
   (parameters
     '("GCompletionFunc" "func")
@@ -977,7 +1168,17 @@
   (c-name "g_completion_complete")
   (return-type "GList*")
   (parameters
-    '("gchar*" "prefix")
+    '("const-gchar*" "prefix")
+    '("gchar**" "new_prefix")
+  )
+)
+
+(define-method complete_utf8
+  (of-object "GCompletion")
+  (c-name "g_completion_complete_utf8")
+  (return-type "GList*")
+  (parameters
+    '("const-gchar*" "prefix")
     '("gchar**" "new_prefix")
   )
 )
@@ -999,7 +1200,12 @@
 
 
 
-;; From glib/gconvert.h
+;; From /opt/gnome210/include/glib-2.0/glib/gconvert.h
+
+(define-function g_convert_error_quark
+  (c-name "g_convert_error_quark")
+  (return-type "GQuark")
+)
 
 (define-function g_iconv_open
   (c-name "g_iconv_open")
@@ -1010,7 +1216,7 @@
   )
 )
 
-(define-method iconv
+(define-method 
   (of-object "GIConv")
   (c-name "g_iconv")
   (return-type "size_t")
@@ -1122,8 +1328,8 @@
   (c-name "g_filename_from_uri")
   (return-type "gchar*")
   (parameters
-    '("const-char*" "uri")
-    '("char**" "hostname")
+    '("const-gchar*" "uri")
+    '("gchar**" "hostname")
     '("GError**" "error")
   )
 )
@@ -1132,15 +1338,23 @@
   (c-name "g_filename_to_uri")
   (return-type "gchar*")
   (parameters
-    '("const-char*" "filename")
-    '("const-char*" "hostname")
+    '("const-gchar*" "filename")
+    '("const-gchar*" "hostname")
     '("GError**" "error")
   )
 )
 
 
 
-;; From glib/gdataset.h
+;; From /opt/gnome210/include/glib-2.0/glib/gdataset.h
+
+(define-function g_datalist_init
+  (c-name "g_datalist_init")
+  (return-type "none")
+  (parameters
+    '("GData**" "datalist")
+  )
+)
 
 (define-function g_datalist_clear
   (c-name "g_datalist_clear")
@@ -1189,6 +1403,14 @@
   )
 )
 
+(define-function g_dataset_destroy
+  (c-name "g_dataset_destroy")
+  (return-type "none")
+  (parameters
+    '("gconstpointer" "dataset_location")
+  )
+)
+
 (define-function g_dataset_id_get_data
   (c-name "g_dataset_id_get_data")
   (return-type "gpointer")
@@ -1230,10 +1452,11 @@
 
 
 
-;; From glib/gdate.h
+;; From /opt/gnome210/include/glib-2.0/glib/gdate.h
 
 (define-function g_date_new
   (c-name "g_date_new")
+  (is-constructor-of "GDate")
   (return-type "GDate*")
 )
 
@@ -1365,6 +1588,12 @@
   (return-type "guint")
 )
 
+(define-method get_iso8601_week_of_year
+  (of-object "GDate")
+  (c-name "g_date_get_iso8601_week_of_year")
+  (return-type "guint")
+)
+
 (define-method clear
   (of-object "GDate")
   (c-name "g_date_clear")
@@ -1388,7 +1617,7 @@
   (c-name "g_date_set_time")
   (return-type "none")
   (parameters
-    '("GTime" "time")
+    '("GTime" "time_")
   )
 )
 
@@ -1597,7 +1826,17 @@
 
 
 
-;; From glib/gdir.h
+;; From /opt/gnome210/include/glib-2.0/glib/gdir.h
+
+(define-function g_dir_open
+  (c-name "g_dir_open")
+  (return-type "GDir*")
+  (parameters
+    '("const-gchar*" "path")
+    '("guint" "flags")
+    '("GError**" "error")
+  )
+)
 
 (define-method read_name
   (of-object "GDir")
@@ -1619,10 +1858,11 @@
 
 
 
-;; From glib/gerror.h
+;; From /opt/gnome210/include/glib-2.0/glib/gerror.h
 
 (define-function g_error_new
   (c-name "g_error_new")
+  (is-constructor-of "GError")
   (return-type "GError*")
   (parameters
     '("GQuark" "domain")
@@ -1695,7 +1935,12 @@
 
 
 
-;; From glib/gfileutils.h
+;; From /opt/gnome210/include/glib-2.0/glib/gfileutils.h
+
+(define-function g_file_error_quark
+  (c-name "g_file_error_quark")
+  (return-type "GQuark")
+)
 
 (define-function g_file_error_from_errno
   (c-name "g_file_error_from_errno")
@@ -1725,20 +1970,29 @@
   )
 )
 
+(define-function g_file_read_link
+  (c-name "g_file_read_link")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "filename")
+    '("GError**" "error")
+  )
+)
+
 (define-function g_mkstemp
   (c-name "g_mkstemp")
-  (return-type "int")
+  (return-type "gint")
   (parameters
-    '("char*" "tmpl")
+    '("gchar*" "tmpl")
   )
 )
 
 (define-function g_file_open_tmp
   (c-name "g_file_open_tmp")
-  (return-type "int")
+  (return-type "gint")
   (parameters
-    '("const-char*" "tmpl")
-    '("char**" "name_used")
+    '("const-gchar*" "tmpl")
+    '("gchar**" "name_used")
     '("GError**" "error")
   )
 )
@@ -1764,7 +2018,17 @@
 
 
 
-;; From glib/ghash.h
+;; From /opt/gnome210/include/glib-2.0/glib/ghash.h
+
+(define-function g_hash_table_new
+  (c-name "g_hash_table_new")
+  (is-constructor-of "GHashTable")
+  (return-type "GHashTable*")
+  (parameters
+    '("GHashFunc" "hash_func")
+    '("GEqualFunc" "key_equal_func")
+  )
+)
 
 (define-function g_hash_table_new_full
   (c-name "g_hash_table_new_full")
@@ -1851,6 +2115,16 @@
   )
 )
 
+(define-method find
+  (of-object "GHashTable")
+  (c-name "g_hash_table_find")
+  (return-type "gpointer")
+  (parameters
+    '("GHRFunc" "predicate")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method foreach_remove
   (of-object "GHashTable")
   (c-name "g_hash_table_foreach_remove")
@@ -1930,7 +2204,16 @@
 
 
 
-;; From glib/ghook.h
+;; From /opt/gnome210/include/glib-2.0/glib/ghook.h
+
+(define-method init
+  (of-object "GHookList")
+  (c-name "g_hook_list_init")
+  (return-type "none")
+  (parameters
+    '("guint" "hook_size")
+  )
+)
 
 (define-method clear
   (of-object "GHookList")
@@ -2099,6 +2382,15 @@
   )
 )
 
+(define-method invoke
+  (of-object "GHookList")
+  (c-name "g_hook_list_invoke")
+  (return-type "none")
+  (parameters
+    '("gboolean" "may_recurse")
+  )
+)
+
 (define-method invoke_check
   (of-object "GHookList")
   (c-name "g_hook_list_invoke_check")
@@ -2132,7 +2424,15 @@
 
 
 
-;; From glib/giochannel.h
+;; From /opt/gnome210/include/glib-2.0/glib/gi18n.h
+
+
+
+;; From /opt/gnome210/include/glib-2.0/glib/gi18n-lib.h
+
+
+
+;; From /opt/gnome210/include/glib-2.0/glib/giochannel.h
 
 (define-method init
   (of-object "GIOChannel")
@@ -2458,6 +2758,7 @@
 
 (define-function g_io_channel_unix_new
   (c-name "g_io_channel_unix_new")
+  (is-constructor-of "GIoChannelUnix")
   (return-type "GIOChannel*")
   (parameters
     '("int" "fd")
@@ -2486,17 +2787,7 @@
   (parameters
     '("GPollFD*" "fds")
     '("gint" "n_fds")
-    '("gint" "timeout")
-  )
-)
-
-(define-function g_main_poll_win32_msg_add
-  (c-name "g_main_poll_win32_msg_add")
-  (return-type "none")
-  (parameters
-    '("gint" "priority")
-    '("GPollFD*" "fd")
-    '("guint" "hwnd")
+    '("gint" "timeout_")
   )
 )
 
@@ -2532,7 +2823,7 @@
 
 
 
-;; From glib/glist.h
+;; From /opt/gnome210/include/glib-2.0/glib/glist.h
 
 (define-function g_list_push_allocator
   (c-name "g_list_push_allocator")
@@ -2653,7 +2944,7 @@
   (c-name "g_list_delete_link")
   (return-type "GList*")
   (parameters
-    '("GList*" "link")
+    '("GList*" "link_")
   )
 )
 
@@ -2782,14 +3073,15 @@
 
 
 
-;; From glib/gmacros.h
+;; From /opt/gnome210/include/glib-2.0/glib/gmacros.h
 
 
 
-;; From glib/gmain.h
+;; From /opt/gnome210/include/glib-2.0/glib/gmain.h
 
 (define-function g_main_context_new
   (c-name "g_main_context_new")
+  (is-constructor-of "GMainContext")
   (return-type "GMainContext*")
 )
 
@@ -2896,7 +3188,7 @@
   (return-type "gint")
   (parameters
     '("gint" "max_priority")
-    '("gint*" "timeout")
+    '("gint*" "timeout_")
     '("GPollFD*" "fds")
     '("gint" "n_fds")
   )
@@ -2953,8 +3245,14 @@
   )
 )
 
+(define-function g_main_depth
+  (c-name "g_main_depth")
+  (return-type "int")
+)
+
 (define-function g_main_loop_new
   (c-name "g_main_loop_new")
+  (is-constructor-of "GMainLoop")
   (return-type "GMainLoop*")
   (parameters
     '("GMainContext*" "context")
@@ -3000,6 +3298,7 @@
 
 (define-function g_source_new
   (c-name "g_source_new")
+  (is-constructor-of "GSource")
   (return-type "GSource*")
   (parameters
     '("GSourceFuncs*" "source_funcs")
@@ -3126,11 +3425,22 @@
 
 (define-function g_idle_source_new
   (c-name "g_idle_source_new")
+  (is-constructor-of "GIdleSource")
   (return-type "GSource*")
+)
+
+(define-function g_child_watch_source_new
+  (c-name "g_child_watch_source_new")
+  (is-constructor-of "GChildWatchSource")
+  (return-type "GSource*")
+  (parameters
+    '("GPid" "pid")
+  )
 )
 
 (define-function g_timeout_source_new
   (c-name "g_timeout_source_new")
+  (is-constructor-of "GTimeoutSource")
   (return-type "GSource*")
   (parameters
     '("guint" "interval")
@@ -3192,6 +3502,28 @@
   )
 )
 
+(define-function g_child_watch_add_full
+  (c-name "g_child_watch_add_full")
+  (return-type "guint")
+  (parameters
+    '("gint" "priority")
+    '("GPid" "pid")
+    '("GChildWatchFunc" "function")
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-function g_child_watch_add
+  (c-name "g_child_watch_add")
+  (return-type "guint")
+  (parameters
+    '("GPid" "pid")
+    '("GChildWatchFunc" "function")
+    '("gpointer" "data")
+  )
+)
+
 (define-function g_idle_add
   (c-name "g_idle_add")
   (return-type "guint")
@@ -3220,22 +3552,18 @@
   )
 )
 
-(define-function g_main_poll_win32_msg_add
-  (c-name "g_main_poll_win32_msg_add")
-  (return-type "none")
-  (parameters
-    '("gint" "priority")
-    '("GPollFD*" "fd")
-    '("guint" "hwnd")
-  )
+
+
+;; From /opt/gnome210/include/glib-2.0/glib/gmarkup.h
+
+(define-function g_markup_error_quark
+  (c-name "g_markup_error_quark")
+  (return-type "GQuark")
 )
-
-
-
-;; From glib/gmarkup.h
 
 (define-function g_markup_parse_context_new
   (c-name "g_markup_parse_context_new")
+  (is-constructor-of "GMarkupParseContext")
   (return-type "GMarkupParseContext*")
   (parameters
     '("const-GMarkupParser*" "parser")
@@ -3271,6 +3599,12 @@
   )
 )
 
+(define-method get_element
+  (of-object "GMarkupParseContext")
+  (c-name "g_markup_parse_context_get_element")
+  (return-type "const-gchar*")
+)
+
 (define-method get_position
   (of-object "GMarkupParseContext")
   (c-name "g_markup_parse_context_get_position")
@@ -3290,9 +3624,35 @@
   )
 )
 
+(define-function g_markup_printf_escaped
+  (c-name "g_markup_printf_escaped")
+  (return-type "gchar*")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_markup_vprintf_escaped
+  (c-name "g_markup_vprintf_escaped")
+  (return-type "gchar*")
+  (parameters
+    '("const-char*" "format")
+    '("va_list" "args")
+  )
+)
 
 
-;; From glib/gmem.h
+
+;; From /opt/gnome210/include/glib-2.0/glib/gmem.h
+
+(define-function g_malloc
+  (c-name "g_malloc")
+  (return-type "gpointer")
+  (parameters
+    '("gulong" "n_bytes")
+  )
+)
 
 (define-function g_malloc0
   (c-name "g_malloc0")
@@ -3354,6 +3714,18 @@
   (return-type "none")
 )
 
+(define-function g_mem_chunk_new
+  (c-name "g_mem_chunk_new")
+  (is-constructor-of "GMemChunk")
+  (return-type "GMemChunk*")
+  (parameters
+    '("const-gchar*" "name")
+    '("gint" "atom_size")
+    '("gulong" "area_size")
+    '("gint" "type")
+  )
+)
+
 (define-method destroy
   (of-object "GMemChunk")
   (c-name "g_mem_chunk_destroy")
@@ -3411,6 +3783,7 @@
 
 (define-function g_allocator_new
   (c-name "g_allocator_new")
+  (is-constructor-of "GAllocator")
   (return-type "GAllocator*")
   (parameters
     '("const-gchar*" "name")
@@ -3426,7 +3799,16 @@
 
 
 
-;; From glib/gmessages.h
+;; From /opt/gnome210/include/glib-2.0/glib/gmessages.h
+
+(define-function g_printf_string_upper_bound
+  (c-name "g_printf_string_upper_bound")
+  (return-type "gsize")
+  (parameters
+    '("const-gchar*" "format")
+    '("va_list" "args")
+  )
+)
 
 (define-function g_log_set_handler
   (c-name "g_log_set_handler")
@@ -3456,6 +3838,15 @@
     '("GLogLevelFlags" "log_level")
     '("const-gchar*" "message")
     '("gpointer" "unused_data")
+  )
+)
+
+(define-function g_log_set_default_handler
+  (c-name "g_log_set_default_handler")
+  (return-type "GLogFunc")
+  (parameters
+    '("GLogFunc" "log_func")
+    '("gpointer" "user_data")
   )
 )
 
@@ -3498,17 +3889,6 @@
   )
 )
 
-(define-function _g_log_fallback_handler
-  (c-name "_g_log_fallback_handler")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "log_domain")
-    '("GLogLevelFlags" "log_level")
-    '("const-gchar*" "message")
-    '("gpointer" "unused_data")
-  )
-)
-
 (define-function g_set_print_handler
   (c-name "g_set_print_handler")
   (return-type "GPrintFunc")
@@ -3534,9 +3914,27 @@
   )
 )
 
+(define-function g_return_if_fail_warning
+  (c-name "g_return_if_fail_warning")
+  (return-type "none")
+  (parameters
+    '("const-char*" "log_domain")
+    '("const-char*" "pretty_function")
+    '("const-char*" "expression")
+  )
+)
 
 
-;; From glib/gnode.h
+
+;; From /opt/gnome210/include/glib-2.0/glib/gnode.h
+
+(define-function g_node_push_allocator
+  (c-name "g_node_push_allocator")
+  (return-type "none")
+  (parameters
+    '("GAllocator*" "allocator")
+  )
+)
 
 (define-function g_node_pop_allocator
   (c-name "g_node_pop_allocator")
@@ -3545,6 +3943,7 @@
 
 (define-function g_node_new
   (c-name "g_node_new")
+  (is-constructor-of "GNode")
   (return-type "GNode*")
   (parameters
     '("gpointer" "data")
@@ -3561,6 +3960,16 @@
   (of-object "GNode")
   (c-name "g_node_unlink")
   (return-type "none")
+)
+
+(define-method copy_deep
+  (of-object "GNode")
+  (c-name "g_node_copy_deep")
+  (return-type "GNode*")
+  (parameters
+    '("GCopyFunc" "copy_func")
+    '("gpointer" "data")
+  )
 )
 
 (define-method copy
@@ -3645,6 +4054,19 @@
   (parameters
     '("GTraverseType" "order")
     '("GTraverseFlags" "flags")
+    '("gpointer" "data")
+  )
+)
+
+(define-method traverse
+  (of-object "GNode")
+  (c-name "g_node_traverse")
+  (return-type "none")
+  (parameters
+    '("GTraverseType" "order")
+    '("GTraverseFlags" "flags")
+    '("gint" "max_depth")
+    '("GNodeTraverseFunc" "func")
     '("gpointer" "data")
   )
 )
@@ -3735,7 +4157,182 @@
 
 
 
-;; From glib/gpattern.h
+;; From /opt/gnome210/include/glib-2.0/glib/goption.h
+
+(define-function g_option_context_error_quark
+  (c-name "g_option_context_error_quark")
+  (return-type "GQuark")
+)
+
+(define-function g_option_context_new
+  (c-name "g_option_context_new")
+  (is-constructor-of "GOptionContext")
+  (return-type "GOptionContext*")
+  (parameters
+    '("const-gchar*" "parameter_string")
+  )
+)
+
+(define-method free
+  (of-object "GOptionContext")
+  (c-name "g_option_context_free")
+  (return-type "none")
+)
+
+(define-method set_help_enabled
+  (of-object "GOptionContext")
+  (c-name "g_option_context_set_help_enabled")
+  (return-type "none")
+  (parameters
+    '("gboolean" "help_enabled")
+  )
+)
+
+(define-method get_help_enabled
+  (of-object "GOptionContext")
+  (c-name "g_option_context_get_help_enabled")
+  (return-type "gboolean")
+)
+
+(define-method set_ignore_unknown_options
+  (of-object "GOptionContext")
+  (c-name "g_option_context_set_ignore_unknown_options")
+  (return-type "none")
+  (parameters
+    '("gboolean" "ignore_unknown")
+  )
+)
+
+(define-method get_ignore_unknown_options
+  (of-object "GOptionContext")
+  (c-name "g_option_context_get_ignore_unknown_options")
+  (return-type "gboolean")
+)
+
+(define-method add_main_entries
+  (of-object "GOptionContext")
+  (c-name "g_option_context_add_main_entries")
+  (return-type "none")
+  (parameters
+    '("const-GOptionEntry*" "entries")
+    '("const-gchar*" "translation_domain")
+  )
+)
+
+(define-method parse
+  (of-object "GOptionContext")
+  (c-name "g_option_context_parse")
+  (return-type "gboolean")
+  (parameters
+    '("gint*" "argc")
+    '("gchar***" "argv")
+    '("GError**" "error")
+  )
+)
+
+(define-method add_group
+  (of-object "GOptionContext")
+  (c-name "g_option_context_add_group")
+  (return-type "none")
+  (parameters
+    '("GOptionGroup*" "group")
+  )
+)
+
+(define-method set_main_group
+  (of-object "GOptionContext")
+  (c-name "g_option_context_set_main_group")
+  (return-type "none")
+  (parameters
+    '("GOptionGroup*" "group")
+  )
+)
+
+(define-method get_main_group
+  (of-object "GOptionContext")
+  (c-name "g_option_context_get_main_group")
+  (return-type "GOptionGroup*")
+)
+
+(define-function g_option_group_new
+  (c-name "g_option_group_new")
+  (is-constructor-of "GOptionGroup")
+  (return-type "GOptionGroup*")
+  (parameters
+    '("const-gchar*" "name")
+    '("const-gchar*" "description")
+    '("const-gchar*" "help_description")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "destroy")
+  )
+)
+
+(define-method set_parse_hooks
+  (of-object "GOptionGroup")
+  (c-name "g_option_group_set_parse_hooks")
+  (return-type "none")
+  (parameters
+    '("GOptionParseFunc" "pre_parse_func")
+    '("GOptionParseFunc" "post_parse_func")
+  )
+)
+
+(define-method set_error_hook
+  (of-object "GOptionGroup")
+  (c-name "g_option_group_set_error_hook")
+  (return-type "none")
+  (parameters
+    '("GOptionErrorFunc" "error_func")
+  )
+)
+
+(define-method free
+  (of-object "GOptionGroup")
+  (c-name "g_option_group_free")
+  (return-type "none")
+)
+
+(define-method add_entries
+  (of-object "GOptionGroup")
+  (c-name "g_option_group_add_entries")
+  (return-type "none")
+  (parameters
+    '("const-GOptionEntry*" "entries")
+  )
+)
+
+(define-method set_translate_func
+  (of-object "GOptionGroup")
+  (c-name "g_option_group_set_translate_func")
+  (return-type "none")
+  (parameters
+    '("GTranslateFunc" "func")
+    '("gpointer" "data")
+    '("GDestroyNotify" "destroy_notify")
+  )
+)
+
+(define-method set_translation_domain
+  (of-object "GOptionGroup")
+  (c-name "g_option_group_set_translation_domain")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "domain")
+  )
+)
+
+
+
+;; From /opt/gnome210/include/glib-2.0/glib/gpattern.h
+
+(define-function g_pattern_spec_new
+  (c-name "g_pattern_spec_new")
+  (is-constructor-of "GPatternSpec")
+  (return-type "GPatternSpec*")
+  (parameters
+    '("const-gchar*" "pattern")
+  )
+)
 
 (define-method free
   (of-object "GPatternSpec")
@@ -3783,15 +4380,137 @@
 
 
 
-;; From glib/gprimes.h
+;; From /opt/gnome210/include/glib-2.0/glib/gprimes.h
+
+(define-function g_spaced_primes_closest
+  (c-name "g_spaced_primes_closest")
+  (return-type "guint")
+  (parameters
+    '("guint" "num")
+  )
+)
 
 
 
-;; From glib/gqsort.h
+;; From /opt/gnome210/include/glib-2.0/glib/gprintf.h
+
+(define-function g_printf
+  (c-name "g_printf")
+  (return-type "gint")
+  (parameters
+    '("gchar-const*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_fprintf
+  (c-name "g_fprintf")
+  (return-type "gint")
+  (parameters
+    '("FILE*" "file")
+    '("gchar-const*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_sprintf
+  (c-name "g_sprintf")
+  (return-type "gint")
+  (parameters
+    '("gchar*" "string")
+    '("gchar-const*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_snprintf
+  (c-name "g_snprintf")
+  (return-type "gint")
+  (parameters
+    '("gchar*" "string")
+    '("gulong" "n")
+    '("gchar-const*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_vprintf
+  (c-name "g_vprintf")
+  (return-type "gint")
+  (parameters
+    '("gchar-const*" "format")
+    '("va_list" "args")
+  )
+)
+
+(define-function g_vfprintf
+  (c-name "g_vfprintf")
+  (return-type "gint")
+  (parameters
+    '("FILE*" "file")
+    '("gchar-const*" "format")
+    '("va_list" "args")
+  )
+)
+
+(define-function g_vsprintf
+  (c-name "g_vsprintf")
+  (return-type "gint")
+  (parameters
+    '("gchar*" "string")
+    '("gchar-const*" "format")
+    '("va_list" "args")
+  )
+)
+
+(define-function g_vsnprintf
+  (c-name "g_vsnprintf")
+  (return-type "gint")
+  (parameters
+    '("gchar*" "string")
+    '("gulong" "n")
+    '("gchar-const*" "format")
+    '("va_list" "args")
+  )
+)
+
+(define-function g_vasprintf
+  (c-name "g_vasprintf")
+  (return-type "gint")
+  (parameters
+    '("gchar**" "string")
+    '("gchar-const*" "format")
+    '("va_list" "args")
+  )
+)
 
 
 
-;; From glib/gquark.h
+;; From /opt/gnome210/include/glib-2.0/glib/gqsort.h
+
+(define-function g_qsort_with_data
+  (c-name "g_qsort_with_data")
+  (return-type "none")
+  (parameters
+    '("gconstpointer" "pbase")
+    '("gint" "total_elems")
+    '("gsize" "size")
+    '("GCompareDataFunc" "compare_func")
+    '("gpointer" "user_data")
+  )
+)
+
+
+
+;; From /opt/gnome210/include/glib-2.0/glib/gquark.h
+
+(define-function g_quark_try_string
+  (c-name "g_quark_try_string")
+  (return-type "GQuark")
+  (parameters
+    '("const-gchar*" "string")
+  )
+)
 
 (define-function g_quark_from_static_string
   (c-name "g_quark_from_static_string")
@@ -3817,10 +4536,11 @@
 
 
 
-;; From glib/gqueue.h
+;; From /opt/gnome210/include/glib-2.0/glib/gqueue.h
 
 (define-function g_queue_new
   (c-name "g_queue_new")
+  (is-constructor-of "GQueue")
   (return-type "GQueue*")
 )
 
@@ -3828,6 +4548,69 @@
   (of-object "GQueue")
   (c-name "g_queue_free")
   (return-type "none")
+)
+
+(define-method is_empty
+  (of-object "GQueue")
+  (c-name "g_queue_is_empty")
+  (return-type "gboolean")
+)
+
+(define-method get_length
+  (of-object "GQueue")
+  (c-name "g_queue_get_length")
+  (return-type "guint")
+)
+
+(define-method reverse
+  (of-object "GQueue")
+  (c-name "g_queue_reverse")
+  (return-type "none")
+)
+
+(define-method copy
+  (of-object "GQueue")
+  (c-name "g_queue_copy")
+  (return-type "GQueue*")
+)
+
+(define-method foreach
+  (of-object "GQueue")
+  (c-name "g_queue_foreach")
+  (return-type "none")
+  (parameters
+    '("GFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method find
+  (of-object "GQueue")
+  (c-name "g_queue_find")
+  (return-type "GList*")
+  (parameters
+    '("gconstpointer" "data")
+  )
+)
+
+(define-method find_custom
+  (of-object "GQueue")
+  (c-name "g_queue_find_custom")
+  (return-type "GList*")
+  (parameters
+    '("gconstpointer" "data")
+    '("GCompareFunc" "func")
+  )
+)
+
+(define-method sort
+  (of-object "GQueue")
+  (c-name "g_queue_sort")
+  (return-type "none")
+  (parameters
+    '("GCompareDataFunc" "compare_func")
+    '("gpointer" "user_data")
+  )
 )
 
 (define-method push_head
@@ -3848,6 +4631,16 @@
   )
 )
 
+(define-method push_nth
+  (of-object "GQueue")
+  (c-name "g_queue_push_nth")
+  (return-type "none")
+  (parameters
+    '("gpointer" "data")
+    '("gint" "n")
+  )
+)
+
 (define-method pop_head
   (of-object "GQueue")
   (c-name "g_queue_pop_head")
@@ -3860,10 +4653,13 @@
   (return-type "gpointer")
 )
 
-(define-method is_empty
+(define-method pop_nth
   (of-object "GQueue")
-  (c-name "g_queue_is_empty")
-  (return-type "gboolean")
+  (c-name "g_queue_pop_nth")
+  (return-type "gpointer")
+  (parameters
+    '("guint" "n")
+  )
 )
 
 (define-method peek_head
@@ -3878,12 +4674,79 @@
   (return-type "gpointer")
 )
 
+(define-method peek_nth
+  (of-object "GQueue")
+  (c-name "g_queue_peek_nth")
+  (return-type "gpointer")
+  (parameters
+    '("guint" "n")
+  )
+)
+
+(define-method index
+  (of-object "GQueue")
+  (c-name "g_queue_index")
+  (return-type "gint")
+  (parameters
+    '("gconstpointer" "data")
+  )
+)
+
+(define-method remove
+  (of-object "GQueue")
+  (c-name "g_queue_remove")
+  (return-type "none")
+  (parameters
+    '("gconstpointer" "data")
+  )
+)
+
+(define-method remove_all
+  (of-object "GQueue")
+  (c-name "g_queue_remove_all")
+  (return-type "none")
+  (parameters
+    '("gconstpointer" "data")
+  )
+)
+
+(define-method insert_before
+  (of-object "GQueue")
+  (c-name "g_queue_insert_before")
+  (return-type "none")
+  (parameters
+    '("GList*" "sibling")
+    '("gpointer" "data")
+  )
+)
+
+(define-method insert_after
+  (of-object "GQueue")
+  (c-name "g_queue_insert_after")
+  (return-type "none")
+  (parameters
+    '("GList*" "sibling")
+    '("gpointer" "data")
+  )
+)
+
+(define-method insert_sorted
+  (of-object "GQueue")
+  (c-name "g_queue_insert_sorted")
+  (return-type "none")
+  (parameters
+    '("gpointer" "data")
+    '("GCompareDataFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method push_head_link
   (of-object "GQueue")
   (c-name "g_queue_push_head_link")
   (return-type "none")
   (parameters
-    '("GList*" "link")
+    '("GList*" "link_")
   )
 )
 
@@ -3892,7 +4755,17 @@
   (c-name "g_queue_push_tail_link")
   (return-type "none")
   (parameters
-    '("GList*" "link")
+    '("GList*" "link_")
+  )
+)
+
+(define-method push_nth_link
+  (of-object "GQueue")
+  (c-name "g_queue_push_nth_link")
+  (return-type "none")
+  (parameters
+    '("gint" "n")
+    '("GList*" "link_")
   )
 )
 
@@ -3908,12 +4781,87 @@
   (return-type "GList*")
 )
 
+(define-method pop_nth_link
+  (of-object "GQueue")
+  (c-name "g_queue_pop_nth_link")
+  (return-type "GList*")
+  (parameters
+    '("guint" "n")
+  )
+)
+
+(define-method peek_head_link
+  (of-object "GQueue")
+  (c-name "g_queue_peek_head_link")
+  (return-type "GList*")
+)
+
+(define-method peek_tail_link
+  (of-object "GQueue")
+  (c-name "g_queue_peek_tail_link")
+  (return-type "GList*")
+)
+
+(define-method peek_nth_link
+  (of-object "GQueue")
+  (c-name "g_queue_peek_nth_link")
+  (return-type "GList*")
+  (parameters
+    '("guint" "n")
+  )
+)
+
+(define-method link_index
+  (of-object "GQueue")
+  (c-name "g_queue_link_index")
+  (return-type "gint")
+  (parameters
+    '("GList*" "link_")
+  )
+)
+
+(define-method unlink
+  (of-object "GQueue")
+  (c-name "g_queue_unlink")
+  (return-type "none")
+  (parameters
+    '("GList*" "link_")
+  )
+)
+
+(define-method delete_link
+  (of-object "GQueue")
+  (c-name "g_queue_delete_link")
+  (return-type "none")
+  (parameters
+    '("GList*" "link_")
+  )
+)
 
 
-;; From glib/grand.h
+
+;; From /opt/gnome210/include/glib-2.0/glib/grand.h
+
+(define-function g_rand_new_with_seed
+  (c-name "g_rand_new_with_seed")
+  (return-type "GRand*")
+  (parameters
+    '("guint32" "seed")
+  )
+)
+
+(define-function g_rand_new_with_seed_array
+  (c-name "g_rand_new_with_seed_array")
+  (return-type "GRand*")
+  (parameters
+    '("const-guint32*" "seed")
+    '("guint" "seed_length")
+  )
+)
 
 (define-function g_rand_new
   (c-name "g_rand_new")
+  (is-constructor-of "GRand")
   (return-type "GRand*")
 )
 
@@ -3923,12 +4871,28 @@
   (return-type "none")
 )
 
+(define-method copy
+  (of-object "GRand")
+  (c-name "g_rand_copy")
+  (return-type "GRand*")
+)
+
 (define-method set_seed
   (of-object "GRand")
   (c-name "g_rand_set_seed")
   (return-type "none")
   (parameters
     '("guint32" "seed")
+  )
+)
+
+(define-method set_seed_array
+  (of-object "GRand")
+  (c-name "g_rand_set_seed_array")
+  (return-type "none")
+  (parameters
+    '("const-guint32*" "seed")
+    '("guint" "seed_length")
   )
 )
 
@@ -4002,10 +4966,11 @@
 
 
 
-;; From glib/grel.h
+;; From /opt/gnome210/include/glib-2.0/glib/grel.h
 
 (define-function g_relation_new
   (c-name "g_relation_new")
+  (is-constructor-of "GRelation")
   (return-type "GRelation*")
   (parameters
     '("gint" "fields")
@@ -4094,17 +5059,18 @@
   (c-name "g_tuples_index")
   (return-type "gpointer")
   (parameters
-    '("gint" "index")
+    '("gint" "index_")
     '("gint" "field")
   )
 )
 
 
 
-;; From glib/gscanner.h
+;; From /opt/gnome210/include/glib-2.0/glib/gscanner.h
 
 (define-function g_scanner_new
   (c-name "g_scanner_new")
+  (is-constructor-of "GScanner")
   (return-type "GScanner*")
   (parameters
     '("const-GScannerConfig*" "config_templ")
@@ -4280,7 +5246,12 @@
 
 
 
-;; From glib/gshell.h
+;; From /opt/gnome210/include/glib-2.0/glib/gshell.h
+
+(define-function g_shell_error_quark
+  (c-name "g_shell_error_quark")
+  (return-type "GQuark")
+)
 
 (define-function g_shell_quote
   (c-name "g_shell_quote")
@@ -4312,7 +5283,7 @@
 
 
 
-;; From glib/gslist.h
+;; From /opt/gnome210/include/glib-2.0/glib/gslist.h
 
 (define-function g_slist_push_allocator
   (c-name "g_slist_push_allocator")
@@ -4424,7 +5395,7 @@
   (c-name "g_slist_remove_link")
   (return-type "GSList*")
   (parameters
-    '("GSList*" "link")
+    '("GSList*" "link_")
   )
 )
 
@@ -4433,7 +5404,7 @@
   (c-name "g_slist_delete_link")
   (return-type "GSList*")
   (parameters
-    '("GSList*" "link")
+    '("GSList*" "link_")
   )
 )
 
@@ -4547,7 +5518,12 @@
 
 
 
-;; From glib/gspawn.h
+;; From /opt/gnome210/include/glib-2.0/glib/gspawn.h
+
+(define-function g_spawn_error_quark
+  (c-name "g_spawn_error_quark")
+  (return-type "GQuark")
+)
 
 (define-function g_spawn_async
   (c-name "g_spawn_async")
@@ -4559,7 +5535,7 @@
     '("GSpawnFlags" "flags")
     '("GSpawnChildSetupFunc" "child_setup")
     '("gpointer" "user_data")
-    '("gint*" "child_pid")
+    '("GPid*" "child_pid")
     '("GError**" "error")
   )
 )
@@ -4574,7 +5550,7 @@
     '("GSpawnFlags" "flags")
     '("GSpawnChildSetupFunc" "child_setup")
     '("gpointer" "user_data")
-    '("gint*" "child_pid")
+    '("GPid*" "child_pid")
     '("gint*" "standard_input")
     '("gint*" "standard_output")
     '("gint*" "standard_error")
@@ -4620,9 +5596,25 @@
   )
 )
 
+(define-function g_spawn_close_pid
+  (c-name "g_spawn_close_pid")
+  (return-type "none")
+  (parameters
+    '("GPid" "pid")
+  )
+)
 
 
-;; From glib/gstrfuncs.h
+
+;; From /opt/gnome210/include/glib-2.0/glib/gstrfuncs.h
+
+(define-function g_ascii_tolower
+  (c-name "g_ascii_tolower")
+  (return-type "gchar")
+  (parameters
+    '("gchar" "c")
+  )
+)
 
 (define-function g_ascii_toupper
   (c-name "g_ascii_toupper")
@@ -4741,6 +5733,24 @@
   )
 )
 
+(define-function g_str_has_suffix
+  (c-name "g_str_has_suffix")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "str")
+    '("const-gchar*" "suffix")
+  )
+)
+
+(define-function g_str_has_prefix
+  (c-name "g_str_has_prefix")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "str")
+    '("const-gchar*" "prefix")
+  )
+)
+
 (define-function g_strtod
   (c-name "g_strtod")
   (return-type "gdouble")
@@ -4756,6 +5766,16 @@
   (parameters
     '("const-gchar*" "nptr")
     '("gchar**" "endptr")
+  )
+)
+
+(define-function g_ascii_strtoull
+  (c-name "g_ascii_strtoull")
+  (return-type "guint64")
+  (parameters
+    '("const-gchar*" "nptr")
+    '("gchar**" "endptr")
+    '("guint" "base")
   )
 )
 
@@ -4966,6 +5986,16 @@
   )
 )
 
+(define-function g_strsplit_set
+  (c-name "g_strsplit_set")
+  (return-type "gchar**")
+  (parameters
+    '("const-gchar*" "string")
+    '("const-gchar*" "delimiters")
+    '("gint" "max_tokens")
+  )
+)
+
 (define-function g_strjoinv
   (c-name "g_strjoinv")
   (return-type "gchar*")
@@ -4991,6 +6021,14 @@
   )
 )
 
+(define-function g_strv_length
+  (c-name "g_strv_length")
+  (return-type "guint")
+  (parameters
+    '("gchar**" "str_array")
+  )
+)
+
 (define-function g_stpcpy
   (c-name "g_stpcpy")
   (return-type "gchar*")
@@ -5000,12 +6038,22 @@
   )
 )
 
+(define-function g_strip_context
+  (c-name "g_strip_context")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "msgid")
+    '("const-gchar*" "msgval")
+  )
+)
 
 
-;; From glib/gstring.h
+
+;; From /opt/gnome210/include/glib-2.0/glib/gstring.h
 
 (define-function g_string_chunk_new
   (c-name "g_string_chunk_new")
+  (is-constructor-of "GStringChunk")
   (return-type "GStringChunk*")
   (parameters
     '("gsize" "size")
@@ -5027,8 +6075,19 @@
   )
 )
 
+(define-method insert_len
+  (of-object "GStringChunk")
+  (c-name "g_string_chunk_insert_len")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "string")
+    '("gssize" "len")
+  )
+)
+
 (define-function g_string_new
   (c-name "g_string_new")
+  (is-constructor-of "GString")
   (return-type "GString*")
   (parameters
     '("const-gchar*" "init")
@@ -5046,6 +6105,7 @@
 
 (define-function g_string_sized_new
   (c-name "g_string_sized_new")
+  (is-constructor-of "GStringSized")
   (return-type "GString*")
   (parameters
     '("gsize" "dfl_size")
@@ -5260,12 +6320,6 @@
   (varargs #t)
 )
 
-(define-method down
-  (of-object "GString")
-  (c-name "g_string_down")
-  (return-type "GString*")
-)
-
 (define-method up
   (of-object "GString")
   (c-name "g_string_up")
@@ -5274,7 +6328,7 @@
 
 
 
-;; From glib/gthread.h
+;; From /opt/gnome210/include/glib-2.0/glib/gthread.h
 
 (define-function g_thread_init
   (c-name "g_thread_init")
@@ -5297,6 +6351,20 @@
   (return-type "GMutex*")
   (parameters
     '("GMutex**" "mutex")
+  )
+)
+
+(define-function g_thread_create_full
+  (c-name "g_thread_create_full")
+  (return-type "GThread*")
+  (parameters
+    '("GThreadFunc" "func")
+    '("gpointer" "data")
+    '("gulong" "stack_size")
+    '("gboolean" "joinable")
+    '("gboolean" "bound")
+    '("GThreadPriority" "priority")
+    '("GError**" "error")
   )
 )
 
@@ -5326,6 +6394,12 @@
   (parameters
     '("GThreadPriority" "priority")
   )
+)
+
+(define-method init
+  (of-object "GStaticMutex")
+  (c-name "g_static_mutex_init")
+  (return-type "none")
 )
 
 (define-method free
@@ -5455,19 +6529,23 @@
   (return-type "none")
 )
 
-(define-function G_LOCK_NAME
-  (c-name "G_LOCK_NAME")
-  (return-type "GStaticMutex")
+(define-method impl
+  (of-object "GOnce")
+  (c-name "g_once_impl")
+  (return-type "gpointer")
   (parameters
+    '("GThreadFunc" "func")
+    '("gpointer" "arg")
   )
 )
 
 
 
-;; From glib/gthreadpool.h
+;; From /opt/gnome210/include/glib-2.0/glib/gthreadpool.h
 
 (define-function g_thread_pool_new
   (c-name "g_thread_pool_new")
+  (is-constructor-of "GThreadPool")
   (return-type "GThreadPool*")
   (parameters
     '("GFunc" "func")
@@ -5551,7 +6629,13 @@
 
 
 
-;; From glib/gtimer.h
+;; From /opt/gnome210/include/glib-2.0/glib/gtimer.h
+
+(define-function g_timer_new
+  (c-name "g_timer_new")
+  (is-constructor-of "GTimer")
+  (return-type "GTimer*")
+)
 
 (define-method destroy
   (of-object "GTimer")
@@ -5574,6 +6658,12 @@
 (define-method reset
   (of-object "GTimer")
   (c-name "g_timer_reset")
+  (return-type "none")
+)
+
+(define-method continue
+  (of-object "GTimer")
+  (c-name "g_timer_continue")
   (return-type "none")
 )
 
@@ -5605,7 +6695,16 @@
 
 
 
-;; From glib/gtree.h
+;; From /opt/gnome210/include/glib-2.0/glib/gtree.h
+
+(define-function g_tree_new
+  (c-name "g_tree_new")
+  (is-constructor-of "GTree")
+  (return-type "GTree*")
+  (parameters
+    '("GCompareFunc" "key_compare_func")
+  )
+)
 
 (define-function g_tree_new_with_data
   (c-name "g_tree_new_with_data")
@@ -5736,11 +6835,19 @@
 
 
 
-;; From glib/gtypes.h
+;; From /opt/gnome210/include/glib-2.0/glib/gtypes.h
 
 
 
-;; From glib/gunicode.h
+;; From /opt/gnome210/include/glib-2.0/glib/gunicode.h
+
+(define-function g_get_charset
+  (c-name "g_get_charset")
+  (return-type "gboolean")
+  (parameters
+    '("const-char**" "charset")
+  )
+)
 
 (define-method isalnum
   (of-object "gunichar")
@@ -5986,6 +7093,15 @@
   )
 )
 
+(define-function g_utf8_strreverse
+  (c-name "g_utf8_strreverse")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "str")
+    '("gssize" "len")
+  )
+)
+
 (define-function g_utf8_to_utf16
   (c-name "g_utf8_to_utf16")
   (return-type "gunichar2*")
@@ -6148,9 +7264,23 @@
   )
 )
 
+(define-method get_mirror_char
+  (of-object "gunichar")
+  (c-name "g_unichar_get_mirror_char")
+  (return-type "gboolean")
+  (parameters
+    '("gunichar*" "mirrored_ch")
+  )
+)
 
 
-;; From glib/gutils.h
+
+;; From /opt/gnome210/include/glib-2.0/glib/gutils.h
+
+(define-function g_get_user_name
+  (c-name "g_get_user_name")
+  (return-type "const-gchar*")
+)
 
 (define-function g_get_real_name
   (c-name "g_get_real_name")
@@ -6178,6 +7308,34 @@
   (parameters
     '("const-gchar*" "prgname")
   )
+)
+
+(define-function g_get_application_name
+  (c-name "g_get_application_name")
+  (return-type "const-gchar*")
+)
+
+(define-function g_set_application_name
+  (c-name "g_set_application_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "application_name")
+  )
+)
+
+(define-function g_get_user_data_dir
+  (c-name "g_get_user_data_dir")
+  (return-type "const-gchar*")
+)
+
+(define-function g_get_user_config_dir
+  (c-name "g_get_user_config_dir")
+  (return-type "const-gchar*")
+)
+
+(define-function g_get_user_cache_dir
+  (c-name "g_get_user_cache_dir")
+  (return-type "const-gchar*")
 )
 
 (define-function g_parse_debug_string
@@ -6273,6 +7431,24 @@
   )
 )
 
+(define-function g_setenv
+  (c-name "g_setenv")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "variable")
+    '("const-gchar*" "value")
+    '("gboolean" "overwrite")
+  )
+)
+
+(define-function g_unsetenv
+  (c-name "g_unsetenv")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "variable")
+  )
+)
+
 (define-function g_atexit
   (c-name "g_atexit")
   (return-type "none")
@@ -6289,9 +7465,28 @@
   )
 )
 
+(define-function glib_check_version
+  (c-name "glib_check_version")
+  (return-type "const-gchar*")
+  (parameters
+    '("guint" "required_major")
+    '("guint" "required_minor")
+    '("guint" "required_micro")
+  )
+)
 
 
-;; From glib/gwin32.h
+
+;; From /opt/gnome210/include/glib-2.0/glib/gwin32.h
+
+(define-function g_win32_ftruncate
+  (c-name "g_win32_ftruncate")
+  (return-type "gint")
+  (parameters
+    '("gint" "f")
+    '("guint" "size")
+  )
+)
 
 (define-function g_win32_getlocale
   (c-name "g_win32_getlocale")
@@ -6323,6 +7518,11 @@
     '("gchar*" "dll_name")
     '("gchar*" "subdir")
   )
+)
+
+(define-function g_win32_get_windows_version
+  (c-name "g_win32_get_windows_version")
+  (return-type "guint")
 )
 
 

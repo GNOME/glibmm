@@ -24,7 +24,7 @@ class ThreadProgress
 {
 public:
   explicit ThreadProgress(int id);
-  ~ThreadProgress();
+  virtual ~ThreadProgress();
 
   void launch();
   void join();
