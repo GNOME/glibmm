@@ -31,7 +31,7 @@ namespace Glib
 
 class ObjectBase;
 
-/// Use the connect() method, with SigC::slot() to connect signals to signal handlers.
+/// Use the connect() method, with sigc::ptr_fun() or sig::mem_fun() to connect signals to signal handlers.
 class SignalProxyProperty : public SignalProxyBase
 {
 public:

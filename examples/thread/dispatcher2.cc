@@ -20,7 +20,6 @@
  * Copyright (c) 2002-2003  Free Software Foundation
  */
 
-#include <sigc++/class_slot.h>
 #include <glibmm.h>
 #include <sstream>
 #include <iostream>
@@ -40,7 +39,7 @@ public:
   void signal_finished_emit();
   void print() const;
 
-  typedef SigC::Signal0<void> type_signal_end;
+  typedef sigc::signal<void> type_signal_end;
   static type_signal_end& signal_end();
 
 private:
@@ -122,7 +121,7 @@ void ThreadTimer::print() const
   std::cout << time_ << " seconds since start" << std::endl;
 }
 
-SigC::Signal0< void >& ThreadTimer::signal_end()
+sigc::signal< void >& ThreadTimer::signal_end()
 {
   return signal_end_;
 }

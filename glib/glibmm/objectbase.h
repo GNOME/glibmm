@@ -42,7 +42,7 @@ namespace Glib
 class GSigConnectionNode;
 #endif
 
-//This inherits virtually from sgc::trackable so that people can multiply inherit glibmm classes from other SigC::Object-derived classes.
+//This inherits virtually from sigc::trackable so that people can multiply inherit glibmm classes from other sigc::trackable-derived classes.
 //See bugzilla.gnome.org bug # 116280
 class ObjectBase : virtual public sigc::trackable
 {
@@ -97,8 +97,8 @@ public:
   void get_property(const Glib::ustring& property_name, PropertyType& value) const;
 
   
-  virtual void reference()   const; // overrides SigC::ObjectBase::reference()
-  virtual void unreference() const; // overrides SigC::ObjectBase::unreference()
+  virtual void reference()   const;
+  virtual void unreference() const;
 
   inline GObject*       gobj()       { return gobject_; }
   inline const GObject* gobj() const { return gobject_; }

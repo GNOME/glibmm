@@ -167,12 +167,12 @@ public:
 
   /** Connects a timeout handler.
    * @code
-   * Glib::signal_timeout().connect(SigC::slot(&timeout_handler), 1000);
+   * Glib::signal_timeout().connect(sigc::ptr_fun(&timeout_handler), 1000);
    * @endcode
    * is equivalent to:
    * @code
    * const Glib::RefPtr<Glib::TimeoutSource> timeout_source = Glib::TimeoutSource::create(1000);
-   * timeout_source->connect(SigC::slot(&timeout_handler));
+   * timeout_source->connect(sigc::ptr_fun(&timeout_handler));
    * timeout_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when @a interval elapsed.
@@ -199,12 +199,12 @@ public:
 
   /** Connects an idle handler.
    * @code
-   * Glib::signal_idle().connect(SigC::slot(&idle_handler));
+   * Glib::signal_idle().connect(sigc::ptr_fun(&idle_handler));
    * @endcode
    * is equivalent to:
    * @code
    * const Glib::RefPtr<Glib::IdleSource> idle_source = Glib::IdleSource::create();
-   * idle_source->connect(SigC::slot(&idle_handler));
+   * idle_source->connect(sigc::ptr_fun(&idle_handler));
    * idle_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when the main loop is idle.
@@ -230,12 +230,12 @@ public:
 
   /** Connects an I/O handler.
    * @code
-   * Glib::signal_io().connect(SigC::slot(&io_handler), fd, Glib::IO_IN | Glib::IO_HUP);
+   * Glib::signal_io().connect(sigc::ptr_fun(&io_handler), fd, Glib::IO_IN | Glib::IO_HUP);
    * @endcode
    * is equivalent to:
    * @code
    * const Glib::RefPtr<Glib::IOSource> io_source = Glib::IOSource::create(fd, Glib::IO_IN | Glib::IO_HUP);
-   * io_source->connect(SigC::slot(&io_handler));
+   * io_source->connect(sigc::ptr_fun(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when polling @a fd results in an event that matches @a condition.
@@ -251,12 +251,12 @@ public:
 
   /** Connects an I/O channel.
    * @code
-   * Glib::signal_io().connect(SigC::slot(&io_handler), channel, Glib::IO_IN | Glib::IO_HUP);
+   * Glib::signal_io().connect(sigc::ptr_fun(&io_handler), channel, Glib::IO_IN | Glib::IO_HUP);
    * @endcode
    * is equivalent to:
    * @code
    * const Glib::RefPtr<Glib::IOSource> io_source = Glib::IOSource::create(channel, Glib::IO_IN | Glib::IO_HUP);
-   * io_source->connect(SigC::slot(&io_handler));
+   * io_source->connect(sigc::ptr_fun(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when polling @a channel results in an event that matches @a condition.

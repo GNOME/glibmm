@@ -34,7 +34,7 @@ class DispatchNotifier;
 
 /** Signal class for inter-thread communication.
  * @ingroup Threads
- * Glib::Dispatcher works similar to SigC::Signal0<void>.  But unlike normal
+ * Glib::Dispatcher works similar to sigc::signal<void>.  But unlike normal
  * signals, the notification happens asynchronously through a pipe.  This is
  * a simple and efficient way of communicating between threads, and especially
  * useful in a thread model with a single GUI thread.

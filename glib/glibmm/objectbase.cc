@@ -129,14 +129,12 @@ ObjectBase::~ObjectBase()
 
 void ObjectBase::reference() const
 {
-  // Completely replace the SigC::Object refcounting.
   GLIBMM_DEBUG_REFERENCE(this, gobject_);
   g_object_ref(gobject_);
 }
 
 void ObjectBase::unreference() const
 {
-  // Completely replace the SigC::Object refcounting.
   GLIBMM_DEBUG_UNREFERENCE(this, gobject_);
   g_object_unref(gobject_);
 }
@@ -233,10 +231,10 @@ bool ObjectBase::is_derived_() const
 
 void ObjectBase::set_manage()
 {
-  // This is a private method and SigC::manage() is a template function.
+  // This is a private method and Gtk::manage() is a template function.
   // Thus this will probably never run, unless you do something like:
   //
-  // manage(static_cast<SigC::Object*>(refptr.operator->()));
+  // manage(static_cast<Gtk::Object*>(refptr.operator->()));
 
   g_error("Glib::ObjectBase::set_manage(): "
           "only Gtk::Object instances can be managed");

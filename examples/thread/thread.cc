@@ -1,7 +1,6 @@
 
 #include <iostream>
 #include <queue>
-#include <sigc++/class_slot.h>
 #include <glibmm/random.h>
 #include <glibmm/thread.h>
 #include <glibmm/timer.h>
@@ -99,10 +98,10 @@ int main(int, char**)
   MessageQueue queue;
 
   Glib::Thread *const producer = Glib::Thread::create(
-      SigC::slot_class(queue, &MessageQueue::producer), true);
+      sigc::mem_fun(queue, &MessageQueue::producer), true);
 
   Glib::Thread *const consumer = Glib::Thread::create(
-      SigC::slot_class(queue, &MessageQueue::consumer), true);
+      sigc::mem_fun(queue, &MessageQueue::consumer), true);
 
   producer->join();
   consumer->join();

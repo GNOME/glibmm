@@ -31,7 +31,7 @@ typedef struct _GObject GObject;
 namespace Glib
 {
 
-/** SignalProxyConnectionNode is a SigC::ConnectionNode for use with SignalProxy.
+/** SignalProxyConnectionNode is a connection node for use with SignalProxy.
   * It lives between the layer of Gtk+ and SigC++.
   * It is very much an internal class.
   */

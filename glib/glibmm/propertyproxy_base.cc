@@ -28,7 +28,7 @@
 namespace Glib
 {
 
-/** PropertyProxyConnectionNode is a SigC::ConnectionNode for use with SignalProxyProperty.
+/** PropertyProxyConnectionNode is a connection node for use with SignalProxyProperty.
   * It's like ProxyConnectionNode, but it contains the property name too.
   */
 class PropertyProxyConnectionNode : public SignalProxyConnectionNode
