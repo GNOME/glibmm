@@ -163,6 +163,16 @@ sub build_element_list($$$$)
     {
       $$ref_no_gtype = $1;
     }
+    elsif(/^\s*(get_type_func=)(\s*)\s*$/)
+    {
+      my $part1 = $1;
+      my $part2 = $2;
+      print "debug enum:";
+      print $1;
+      print "\n";
+      print $2;
+      print "\n";
+    }
     elsif(/^\s*s#([^#]+)#([^#]*)#\s*$/)
     {
       push(@subst_in,  $1);
