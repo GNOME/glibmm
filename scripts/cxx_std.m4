@@ -146,7 +146,7 @@ AC_DEFUN([GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
 
   if test "x${gtkmm_cv_cxx_has_template_sequence_ctors}" = "xyes"; then
   {
-    AC_DEFINE([GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS],[1, [Defined if the STL containers have templated sequence ctors]])
+    AC_DEFINE([GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS],[1], [Defined if the STL containers have templated sequence ctors])
   }
   fi
 ])
@@ -187,7 +187,7 @@ AC_DEFUN([GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS],
 
   if test "x${gtkmm_cv_cxx_has_allows_static_inline_npos}" = "xyes"; then
   {
-    AC_DEFINE([GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS],[1, [Defined if a static member variable may be initialized inline to std::string::npos]])
+    AC_DEFINE([GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS],[1], [Defined if a static member variable may be initialized inline to std::string::npos])
   }
   fi
 ])
