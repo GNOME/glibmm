@@ -90,9 +90,9 @@ AC_DEFUN([GTKMM_ARG_ENABLE_WARNINGS],
   gtkmm_warning_flags=''
 
   case "$gtkmm_enable_warnings" in
-    minimum|yes) gtkmm_warning_flags='-Wall';;
-    maximum)     gtkmm_warning_flags='-pedantic -W -Wall';;
-    hardcore)    gtkmm_warning_flags='-pedantic -W -Wall -Werror';;
+    minimum|yes) gtkmm_warning_flags='-Wall -Wno-long-long';;
+    maximum)     gtkmm_warning_flags='-pedantic -W -Wall -Wno-long-long';;
+    hardcore)    gtkmm_warning_flags='-pedantic -W -Wall -Wno-long-long -Werror';;
   esac
 
   gtkmm_use_flags=''
