@@ -108,7 +108,7 @@ sub parse_and_build_output($)
 
     if ($token eq "_DEFS")     { $self->on_defs(); next;} #Read the defs file.
     if ($token eq "_IGNORE")     { $self->on_ignore(); next;} #Ignore a function.
-    if ($token eq "_IGNORE_SIGNAL")     { $self->on_ignore_signal(); next;}
+    if ($token eq "_IGNORE_SIGNAL")     { $self->on_ignore_signal(); next;} #Ignore a signal.
     if ($token eq "_WRAP_METHOD")     { $self->on_wrap_method(); next;}
     if ($token eq "_WRAP_CORBA_METHOD")     { $self->on_wrap_corba_method(); next;} #Used in libbonobo*mm.
     if ($token eq "_WRAP_SIGNAL") { $self->on_wrap_signal(); next;}
@@ -386,6 +386,8 @@ sub on_ignore_signal($)
 {
   my ($self) = @_;
   my $str = $self->extract_bracketed_text();
+  $str = string_trim($str);
+  $str = string_unquote($str);
   my @args = split(/\s+|,/,$str);
   foreach (@args)
   {

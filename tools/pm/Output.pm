@@ -306,10 +306,11 @@ sub output_wrap_create($$$)
 
   my $objFunction = &Function::new($fake_decl, $objWrapParser);
   my $args_names_only = $objFunction->args_names_only();
-  my $args_type_and_name = $objFunction->args_types_and_names();
+  my $args_type_and_name_hpp = $objFunction->args_types_and_names_with_default_values();
+  my $args_type_and_name_cpp = $objFunction->args_types_and_names();
 
-  my $str = sprintf("_CREATE_METHOD(\`%s\',\`%s\')dnl\n",
-              $args_type_and_name, $args_names_only);
+  my $str = sprintf("_CREATE_METHOD(\`%s\',\`%s\',\`%s\')dnl\n",
+              $args_type_and_name_hpp, , $args_type_and_name_cpp, $args_names_only);
 
   $self->append($str)
 }

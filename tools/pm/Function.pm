@@ -67,7 +67,7 @@ sub new($$)
   $$self{name} = "";
   $$self{param_types} = [];
   $$self{param_names} = [];
-  $$self{param_default_value} = [];
+  $$self{param_default_values} = [];
   $$self{in_module} = "";
   $$self{class} = "";
   $$self{entity_type} = "method";
@@ -120,7 +120,7 @@ sub new_ctor($$)
   $$self{name} = "";
   $$self{param_types} = [];
   $$self{param_names} = [];
-  $$self{param_default_value} = [];
+  $$self{param_default_values} = [];
   $$self{in_module} = "";
   $$self{class} = "";
   $$self{entity_type} = "method";
@@ -166,7 +166,7 @@ sub parse_param($$)
 
   my $param_types = $$self{param_types};
   my $param_names = $$self{param_names};
-  my $param_default_values = $$self{param_default_value};
+  my $param_default_values = $$self{param_default_values};
 
   # clean up space and handle empty case
   $line = string_trim($line);
@@ -224,7 +224,7 @@ sub parse_param($$)
       push(@$param_types, $type);
       push(@$param_names, $name);
       push(@$param_default_values, $value);
-
+      
       #Clear variables, ready for the next parameter.
       @str = ();
       $type= "";

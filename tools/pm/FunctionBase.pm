@@ -177,30 +177,34 @@ sub dump($)
   print "</function>\n\n";
 }
 
-#sub args_types_and_names_with_default_values($)
-#{
-#  my ($self) = @_;
-#
-#  my $i;
-#
-#  my $param_names = $$self{param_names};
-#  my $param_types = $$self{param_types};
-#  my $param_default_values = $$self{param_default_values};
-#  my @out;
-#
-#  for ($i = 0; $i < $#$param_types + 1; $i++)
-#  {
-#    my $str = sprintf("%s %s", $$param_types[$i], $$param_names[$i]);
-#
-#    if($$param_default_values[$i] ne "")
-#    {
-#      $str .= " = " . $$param_default_values[$i];
-#    }
-#    push(@out, $str);
-#  }
-#
-#  return join(", ", @out);
-#}
+sub args_types_and_names_with_default_values($)
+{
+  my ($self) = @_;
+
+  my $i;
+
+  my $param_names = $$self{param_names};
+  my $param_types = $$self{param_types};
+  my $param_default_values = $$self{param_default_values};
+  my @out;
+  
+  for ($i = 0; $i < $#$param_types + 1; $i++)
+  {
+    my $str = sprintf("%s %s", $$param_types[$i], $$param_names[$i]);
+
+    if(defined($$param_default_values[$i]))
+    {
+      if($$param_default_values[$i] ne "")
+      {
+        $str .= " = " . $$param_default_values[$i];
+      }
+    }
+
+    push(@out, $str);
+  }
+
+  return join(", ", @out);
+}
 
 
 1; # indicate proper module load.

@@ -45,14 +45,14 @@ dnl _POP()
 dnl ')
 
 dnl
-dnl _CREATE_METHOD(args_type_and_name, args_name_only);
+dnl _CREATE_METHOD(args_type_and_name_hpp, args_type_and_name_cpp,args_name_only);
 dnl
 define(`_CREATE_METHOD',`
   static Glib::RefPtr<`'__CPPNAME__`'> create(`'$1`');
 _PUSH(SECTION_CC)
-Glib::RefPtr<`'__CPPNAME__`'> __CPPNAME__`'::create(`'$1`')
+Glib::RefPtr<`'__CPPNAME__`'> __CPPNAME__`'::create(`'$2`')
 {
-  return Glib::RefPtr<`'__CPPNAME__`'>( new __CPPNAME__`'(`'$2`') );
+  return Glib::RefPtr<`'__CPPNAME__`'>( new __CPPNAME__`'(`'$3`') );
 }
 _POP()
 ')
