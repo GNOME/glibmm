@@ -219,10 +219,9 @@ void DispatchNotifier::create_pipe()
 
   if(!fd_receiver_)
   {
-    const int err_no = GetLastError();
-    GError* const error = g_error_new(G_FILE_ERROR, g_file_error_from_errno(err_no),
-                                      "Failed to create pipe for inter-thread communication: %s",
-                                      g_win32_error_message(err_no));
+    GError* const error = g_error_new(G_FILE_ERROR, G_FILE_ERROR_FAILED,
+                                      "Failed to create event for inter-thread communication: %s",
+                                      g_win32_error_message(GetLastError()));
     throw Glib::FileError(error);
   }
 #else /* !G_OS_WIN32 */
