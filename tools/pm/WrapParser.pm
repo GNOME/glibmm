@@ -110,6 +110,7 @@ sub parse_and_build_output($)
     if ($token eq "_IGNORE")     { $self->on_ignore(); next;} #Ignore a function.
     if ($token eq "_IGNORE_SIGNAL")     { $self->on_ignore_signal(); next;} #Ignore a signal.
     if ($token eq "_WRAP_METHOD")     { $self->on_wrap_method(); next;}
+    if ($token eq "_WRAP_METHOD_DOCS_ONLY")     { $self->on_wrap_method_on_docs_only(); next;}
     if ($token eq "_WRAP_CORBA_METHOD")     { $self->on_wrap_corba_method(); next;} #Used in libbonobo*mm.
     if ($token eq "_WRAP_SIGNAL") { $self->on_wrap_signal(); next;}
     if ($token eq "_WRAP_PROPERTY") { $self->on_wrap_property(); next;}
@@ -745,9 +746,9 @@ sub on_wrap_method($)
   $argCFunctionName = string_trim($argCFunctionName);
 
   #Get the c function's details:
-  
+
   #Checks that it's not empty and that it contains no whitespace.
-  if ($argCFunctionName =~ /^\S+$/ ) 
+  if ($argCFunctionName =~ /^\S+$/ )
   {
     #c-name. e.g. gtk_clist_set_column_title
     $objCfunc = GtkDefs::lookup_function($argCFunctionName);
@@ -777,6 +778,68 @@ sub on_wrap_method($)
   $commentblock = DocsParser::lookup_documentation($argCFunctionName);
 
   $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock);
+}
+
+# void on_wrap_method_docs_only()
+sub on_wrap_method_docs_only($)
+{
+  my ($self) = @_;
+  my $objOutputter = $$self{objOutputter};
+
+  if( !($self->check_for_eof()) )
+  {
+   return;
+  }
+
+  my $filename = $$self{filename};
+  my $line_num = $$self{line_num};
+
+  my $str = $self->extract_bracketed_text();
+  my @args = string_split_commas($str);
+
+  my $entity_type = "method";
+
+  if (!$$self{in_class})
+    {
+      print STDERR "$filename:$line_num:_WRAP macro encountered outside class\n";
+      return;
+    }
+
+  my $objCfunc;
+
+  # handle first argument
+  my $argCFunctionName = $args[0];
+  $argCFunctionName = string_trim($argCFunctionName);
+
+  #Get the c function's details:
+  
+  #Checks that it's not empty and that it contains no whitespace.
+  if ($argCFunctionName =~ /^\S+$/ ) 
+  {
+    #c-name. e.g. gtk_clist_set_column_title
+    $objCfunc = GtkDefs::lookup_function($argCFunctionName);
+
+    if(!$objCfunc) #If the lookup failed:
+    {
+      $objOutputter->output_wrap_failed($argCFunctionName, "method defs lookup failed (1)");
+      return;
+    }
+  }
+
+  # Extra ref needed?
+  while(scalar(@args) > 1) # If the optional ref/err arguments are there.
+  {
+    my $argRef = string_trim(pop @args);
+    if($argRef eq "errthrow")
+    {
+      $$objCfunc{throw_any_errors} = 1;
+    }
+  }
+
+  my $commentblock = "";
+  $commentblock = DocsParser::lookup_documentation($argCFunctionName);
+
+  $objOutputter->output_wrap_meth_docs_only($filename, $line_num, $commentblock);
 }
 
 sub on_wrap_ctor($)

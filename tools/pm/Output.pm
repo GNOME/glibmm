@@ -229,7 +229,7 @@ sub output_wrap_meth($$$$$$)
   my $objDefsParser = $$self{objDefsParser};
 
   # Doxygen documentation before the method declaration:
-  $self->append("\n${documentation}");
+  $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
 
   #Declaration:
   $self->append("  ${cppMethodDecl};");
@@ -272,6 +272,18 @@ sub output_wrap_meth($$$$$$)
 
 
   $self->append($str);
+}
+
+### Convert _WRAP to a method
+#  _METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,const)
+#  void output_wrap_meth($filename, $line_num, $documentation)
+sub output_wrap_meth_docs_only($$$$)
+{
+  my ($self, $filename, $line_num, $documentation) = @_;
+  my $objDefsParser = $$self{objDefsParser};
+
+  # Doxygen documentation before the method declaration:
+  $self->append("\n${documentation}");
 }
 
 ### Convert _WRAP_CTOR to a ctor
