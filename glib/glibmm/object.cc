@@ -77,10 +77,8 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_,
   GObjectClass *const g_class =
       static_cast<GObjectClass*>(g_type_class_ref(glibmm_class.get_type()));
 
-  unsigned int n_alloced_params = 8;
-  parameters = g_new(GParameter, n_alloced_params);
-
-  char* collect_error = 0; // output arg of G_VALUE_COLLECT()
+  unsigned int n_alloced_params = 0;
+  char*        collect_error    = 0; // output argument of G_VALUE_COLLECT()
 
   for(const char* name = first_property_name;
       name != 0;
@@ -97,10 +95,7 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_,
     }
 
     if(n_parameters >= n_alloced_params)
-    {
-      n_alloced_params += 8;
-      parameters = g_renew(GParameter, parameters, n_alloced_params);
-    }
+      parameters = g_renew(GParameter, parameters, n_alloced_params += 8);
 
     GParameter& param = parameters[n_parameters];
 
@@ -115,9 +110,7 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_,
     {
       g_warning("Glib::ConstructParams::ConstructParams(): %s", collect_error);
       g_free(collect_error);
-
-      // We purposely leak the value here, it might not be
-      // in a sane state if an error condition occurred.
+      g_value_unset(&param.value);
       break;
     }
 
@@ -137,21 +130,24 @@ ConstructParams::~ConstructParams()
   g_free(parameters);
 }
 
+/*
+ * Some compilers require the existance of a copy constructor in certain
+ * usage contexts.  This implementation is fully functional, but unlikely
+ * to be ever actually called due to optimization.
+ */
 ConstructParams::ConstructParams(const ConstructParams& other)
 :
   glibmm_class  (other.glibmm_class),
   n_parameters  (other.n_parameters),
   parameters    (g_new(GParameter, n_parameters))
 {
-  for (unsigned int i = 0; i < n_parameters; ++i)
+  for(unsigned int i = 0; i < n_parameters; ++i)
   {
-    GParameter& param = parameters[i];
+    parameters[i].name = other.parameters[i].name;
+    parameters[i].value.g_type = 0;
 
-    param.name = other.parameters[i].name;
-    param.value.g_type = 0;
-
-    g_value_init(&param.value, G_VALUE_TYPE(&other.parameters[i].value));
-    g_value_copy(&other.parameters[i].value, &param.value);
+    g_value_init(&parameters[i].value, G_VALUE_TYPE(&other.parameters[i].value));
+    g_value_copy(&other.parameters[i].value, &parameters[i].value);
   }
 }
 
@@ -195,14 +191,13 @@ Object::Object()
   // a new GType on the fly.  This works because ObjectBase is a virtual base
   // class, therefore its constructor is always executed first.
 
-  GType object_type = 0;
+  GType object_type = G_TYPE_OBJECT; // the default -- not very useful
+
   if(custom_type_name_ && !is_anonymous_custom_())
   {
     object_class_.init();
     object_type = object_class_.clone_custom_type(custom_type_name_); //A type that is derived from GObject.
   }
-  else
-    object_type = G_TYPE_OBJECT; //The default. Not very useful.
 
   // Create a new GObject with the specified array of construct properties.
   // This works with custom types too, since those inherit the properties of

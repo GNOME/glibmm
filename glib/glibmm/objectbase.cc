@@ -186,8 +186,8 @@ void ObjectBase::destroy_notify_callback_(void* data)
   ObjectBase* cppObject = static_cast<ObjectBase*>(data); //Previously set with g_object_set_qdata_full().
 
 #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("ObjectBase::destroy_notify_callback_: cppObject=%10X, gobject_=%10X\n", cppObject, cppObject->gobject_);
-  g_warning("  gtypename=%s\n", cppObject->gobject_);
+  g_warning("ObjectBase::destroy_notify_callback_: cppObject = %p, gobject_ = %p, gtypename = %s",
+            (void*) cppObject, (void*) cppObject->gobject_, cppObject->gobject_);
 #endif
 
   if(cppObject) //This will be 0 if the C++ destructor has already run.
@@ -209,7 +209,7 @@ void ObjectBase::destroy_notify_()
   // the undobjecterlying instance after that, so it's OK to delete this.
 
 #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("Glib::ObjectBase::destroy_notify_: gobject_=%10X\n", gobject_);
+  g_warning("Glib::ObjectBase::destroy_notify_: gobject_ = %p", (void*) gobject_);
 #endif
 
   gobject_ = 0; // Make sure we don't unref it again in the dtor.
