@@ -35,7 +35,6 @@ namespace
 
 using Glib::ustring;
 
-
 // Little helper to make the conversion from gunichar to UTF-8 a one-liner.
 //
 struct UnicharToUtf8
@@ -214,6 +213,12 @@ ustring::size_type utf8_find_last_of(const std::string& str, ustring::size_type 
 
 namespace Glib
 {
+
+#ifndef GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
+// Initialize static member here, 
+// because the compiler did not allow us do it inline.
+const ustring::size_type ustring::npos = std::string::npos;
+#endif
 
 // We need our own version of g_utf8_get_char(), because the std::string
 // iterator is not necessarily a plain pointer (it's in fact not in GCC's

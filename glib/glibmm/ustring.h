@@ -232,7 +232,13 @@ public:
 
 #endif /* GLIBMM_HAVE_SUN_REVERSE_ITERATOR */
 
+#ifdef GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
   static const size_type npos = std::string::npos;
+#else
+  //The MipsPro compiler (IRIX) says "The indicated constant value is not known",
+  //so we need to initalize the static member data elsewhere.
+  static const size_type npos;
+#endif
 
   /*! Default constructor, which creates an empty string.
    */
@@ -598,7 +604,23 @@ private:
   template <class In, class ValueType = typename Glib::IteratorTraits<In>::value_type>
 #endif
   struct SequenceToString;
+  
+  //The MipsPro (IRIX) compiler needs these partial specializations to be declared here,
+  //as well as defined later. That's probably correct. murrayc.
+  template <class In>
+  struct SequenceToString<In, char>;
 
+  template <class In>
+  struct SequenceToString<In, gunichar>;
+  
+  /*
+  template <>
+  struct ustring::SequenceToString<Glib::ustring::iterator, gunichar>;
+
+  template <>
+  struct ustring::SequenceToString<Glib::ustring::const_iterator, gunichar>;
+  */
+  
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   std::string string_;
@@ -612,25 +634,25 @@ struct ustring::SequenceToString
 {};
 
 template <class In>
-struct ustring::SequenceToString<In,char> : public std::string
+struct ustring::SequenceToString<In, char> : public std::string
 {
   SequenceToString(In pbegin, In pend);
 };
 
 template <class In>
-struct ustring::SequenceToString<In,gunichar> : public std::string
+struct ustring::SequenceToString<In, gunichar> : public std::string
 {
   SequenceToString(In pbegin, In pend);
 };
 
 template <>
-struct ustring::SequenceToString<Glib::ustring::iterator,gunichar> : public std::string
+struct ustring::SequenceToString<Glib::ustring::iterator, gunichar> : public std::string
 {
   SequenceToString(Glib::ustring::iterator pbegin, Glib::ustring::iterator pend);
 };
 
 template <>
-struct ustring::SequenceToString<Glib::ustring::const_iterator,gunichar> : public std::string
+struct ustring::SequenceToString<Glib::ustring::const_iterator, gunichar> : public std::string
 {
   SequenceToString(Glib::ustring::const_iterator pbegin, Glib::ustring::const_iterator pend);
 };

@@ -1,7 +1,5 @@
 
 #include <glibmm.h>
-//#include <gdkmm.h>
-//#include <gtkmm.h>
 
 struct Foo
 {
