@@ -495,8 +495,8 @@ sub output_wrap_property($$$$$$)
     $self->append($str);
     $self->append("\n");
 
-    # If the property is not already read-only, then add a second const accessor for a read-only propertyproxy:
-    if($proxy_suffix ne "_ReadOnly")
+    # If the property is not already read-only, and the property can be read, then add a second const accessor for a read-only propertyproxy:
+    if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
     {
       my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s)dnl\n",
         $name,
