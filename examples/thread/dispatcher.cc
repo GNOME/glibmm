@@ -27,11 +27,13 @@ public:
   ~ThreadProgress();
 
   void launch();
+  void join();
 
   sigc::signal<void>& signal_finished();
   int id() const;
 
 private:
+  Glib::Thread*       thread_;
   int                 id_;
   unsigned int        progress_;
   Glib::Dispatcher    signal_increment_;
@@ -60,6 +62,7 @@ private:
 
 ThreadProgress::ThreadProgress(int id)
 :
+  thread_   (0),
   id_       (id),
   progress_ (0)
 {
@@ -72,8 +75,13 @@ ThreadProgress::~ThreadProgress()
 
 void ThreadProgress::launch()
 {
-  // Create a non-joinable thread -- it's deleted automatically on thread exit.
-  Glib::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function), false);
+  // Create a joinable thread.
+  thread_ = Glib::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function), true);
+}
+
+void ThreadProgress::join()
+{
+  thread_->join();
 }
 
 sigc::signal<void>& ThreadProgress::signal_finished()
@@ -147,7 +155,9 @@ void Application::on_progress_finished(ThreadProgress* thread_progress)
 {
   {
     const std::auto_ptr<ThreadProgress> progress (thread_progress);
+
     progress_list_.remove(progress.get());
+    progress->join();
 
     std::cout << "Thread " << progress->id() << ": finished." << std::endl;
   }
