@@ -2,67 +2,64 @@
  * Glib::Dispatcher example -- cross thread signalling
  * by Daniel Elstner  <daniel.elstner@gmx.net>
  *
- * Copyright (c) 2002  Free Software Foundation
+ * modified to only use glibmm
+ * by J. Abelardo Gutierrez <jabelardo@cantv.net>
+ *
+ * Copyright (c) 2002-2003  Free Software Foundation
  */
 
 #include <sigc++/class_slot.h>
 #include <glibmm.h>
-#include <gtkmm/box.h>
-#include <gtkmm/button.h>
-#include <gtkmm/buttonbox.h>
-#include <gtkmm/main.h>
-#include <gtkmm/progressbar.h>
-#include <gtkmm/stock.h>
-#include <gtkmm/window.h>
 
+#include <iostream>
 #include <algorithm>
 #include <functional>
 #include <list>
 
-
 namespace
 {
+Glib::RefPtr<Glib::MainLoop> main_loop;
 
-class ThreadProgress : public Gtk::ProgressBar
+class ThreadProgress : public SigC::Object
 {
 public:
-  ThreadProgress();
+  ThreadProgress(int id, Glib::Mutex& mtx);
   virtual ~ThreadProgress();
 
   void launch();
-  SigC::Signal0<void>& signal_finished();
+  SigC::Signal1<void, ThreadProgress*>& signal_finished();
+  int id() const;
 
 private:
   unsigned int        progress_;
   Glib::Dispatcher    signal_increment_;
-  SigC::Signal0<void> signal_finished_;
+  SigC::Signal1<void, ThreadProgress*>	signal_finished_;
+  int                 id_;
+  Glib::Mutex&        cout_mutex_;
 
   void progress_increment();
   void thread_function();
 };
 
-class MainWindow : public Gtk::Window
+class Dispatcher : public SigC::Object
 {
 public:
-  MainWindow();
-  virtual ~MainWindow();
+  Dispatcher();
+  virtual ~Dispatcher();
 
   void launch_threads();
 
-protected:
-  virtual bool on_delete_event(GdkEventAny* event);
-
 private:
-  std::list<ThreadProgress*>  progress_bars_;
-  Gtk::Button*                close_button_;
+  std::list<ThreadProgress*>  progress_list_;
+  Glib::Mutex                 cout_mutex_;
 
   void on_progress_finished(ThreadProgress* progress);
 };
 
 
-ThreadProgress::ThreadProgress()
-:
-  progress_ (0)
+ThreadProgress::ThreadProgress(int id, Glib::Mutex& mtx)
+: 
+  progress_ (0), id_ (id), cout_mutex_ (mtx)
 {
   // Connect to the cross-thread signal.
   signal_increment_.connect(SigC::slot(*this, &ThreadProgress::progress_increment));
@@ -77,22 +74,28 @@ void ThreadProgress::launch()
   Glib::Thread::create(SigC::slot_class(*this, &ThreadProgress::thread_function), false);
 }
 
-SigC::Signal0<void>& ThreadProgress::signal_finished()
+SigC::Signal1<void, ThreadProgress*>& ThreadProgress::signal_finished()
 {
   return signal_finished_;
+}
+
+int ThreadProgress::id() const
+{
+  return id_;
 }
 
 void ThreadProgress::progress_increment()
 {
   // Use an integer because floating point arithmetic is inaccurate --
-  // we want to finish *exactly* after the 1000th increment.
+  // we want to finish *exactly* after the 100th increment.
   ++progress_;
 
-  const double fraction = double(progress_) / 1000.0;
-  set_fraction(std::min(fraction, 1.0));
+  cout_mutex_.lock();
+  std::cout << "Thread " << id_ << ": " << progress_ << " %" << std::endl;
+  cout_mutex_.unlock();
 
-  if(progress_ >= 1000)
-    signal_finished_();
+  if(progress_ >= 100)
+    signal_finished().emit(this);
 }
 
 void ThreadProgress::thread_function()
@@ -100,74 +103,52 @@ void ThreadProgress::thread_function()
   Glib::Rand rand;
   int usecs = 5000;
 
-  for(int i = 0; i < 1000; ++i)
+  for(int i = 0; i < 100; ++i)
   {
     usecs = rand.get_int_range(std::max(0, usecs - 1000 - i), std::min(20000, usecs + 1000 + i));
     Glib::usleep(usecs);
 
-    // Tell the GUI thread to increment the progress bar value.
+    // Tell the thread to increment the progress value.
     signal_increment_();
   }
 }
 
-
-MainWindow::MainWindow()
-:
-  close_button_ (0)
+Dispatcher::Dispatcher()
+: 
+  cout_mutex_ ()
 {
-  set_title("Thread Dispatcher Example");
-
-  Gtk::VBox *const vbox = new Gtk::VBox(false, 10);
-  add(*Gtk::manage(vbox));
-  vbox->set_border_width(10);
+  std::cout << "Thread Dispatcher Example." << std::endl;
 
   for(int i = 0; i < 5; ++i)
   {
-    ThreadProgress *const progress = new ThreadProgress();
-    vbox->pack_start(*Gtk::manage(progress), Gtk::PACK_SHRINK);
-    progress_bars_.push_back(progress);
+    ThreadProgress *const progress = new ThreadProgress(i, cout_mutex_);
+    progress_list_.push_back(progress);
 
     progress->signal_finished().connect(
-        SigC::bind(SigC::slot(*this, &MainWindow::on_progress_finished), progress));
+        SigC::slot(*this, &Dispatcher::on_progress_finished));
   }
-
-  Gtk::ButtonBox *const button_box = new Gtk::HButtonBox();
-  vbox->pack_end(*Gtk::manage(button_box), Gtk::PACK_SHRINK);
-
-  close_button_ = new Gtk::Button(Gtk::Stock::CLOSE);
-  button_box->pack_start(*Gtk::manage(close_button_), Gtk::PACK_SHRINK);
-  close_button_->set_flags(Gtk::CAN_DEFAULT);
-  close_button_->grab_default();
-  close_button_->set_sensitive(false);
-  close_button_->signal_clicked().connect(SigC::slot(*this, &Gtk::Widget::hide));
-
-  show_all_children();
-  set_default_size(300, -1);
 }
 
-MainWindow::~MainWindow()
+Dispatcher::~Dispatcher()
 {}
 
-void MainWindow::launch_threads()
+void Dispatcher::launch_threads()
 {
   std::for_each(
-      progress_bars_.begin(), progress_bars_.end(),
+      progress_list_.begin(), progress_list_.end(),
       std::mem_fun(&ThreadProgress::launch));
 }
 
-bool MainWindow::on_delete_event(GdkEventAny*)
+void Dispatcher::on_progress_finished(ThreadProgress* progress)
 {
-  // Don't allow closing the window before all threads finished.
-  return !progress_bars_.empty();
-}
+  cout_mutex_.lock();
+  std::cout << "Thread " << progress->id() << ": finished." << std::endl;
+  cout_mutex_.unlock();
 
-void MainWindow::on_progress_finished(ThreadProgress* progress)
-{
-  progress_bars_.remove(progress);
+  progress_list_.remove(progress);
 
-  // Enable the close button when all threads finished.
-  if(progress_bars_.empty())
-    close_button_->set_sensitive(true);
+  if(progress_list_.empty())
+    main_loop->quit();
 }
 
 } // anonymous namespace
@@ -176,16 +157,15 @@ void MainWindow::on_progress_finished(ThreadProgress* progress)
 int main(int argc, char** argv)
 {
   Glib::thread_init();
-  Gtk::Main main_instance (&argc, &argv);
+  main_loop = Glib::MainLoop::create();
 
-  MainWindow window;
+  Dispatcher dispatcher;
 
   // Install a one-shot idle handler to launch the threads
-  // right after the main window has been displayed.
   Glib::signal_idle().connect(
-      SigC::bind_return(SigC::slot(window, &MainWindow::launch_threads), false));
+      SigC::bind_return(SigC::slot(dispatcher, &Dispatcher::launch_threads), false));
 
-  Gtk::Main::run(window);
+  main_loop->run();
 
   return 0;
 }

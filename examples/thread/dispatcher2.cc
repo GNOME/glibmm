@@ -9,37 +9,37 @@
  * updates the label stating how many seconds have passed since the start
  * of the program.
  *
+ * Modified by J. Abelardo Gutierrez <jabelardo@cantv.net>
+ * to cast all gtkmm out and make it glimm only
+ *
  * Note:  This example is special stuff that's seldomly needed by the
  * vast majority of applications.  Don't bother working out what this
  * code does unless you know for sure you need 2 main loops running in
  * 2 distinct main contexts.
  *
- * Copyright (c) 2002  Free Software Foundation
+ * Copyright (c) 2002-2003  Free Software Foundation
  */
 
 #include <sigc++/class_slot.h>
 #include <glibmm.h>
-#include <gtkmm/box.h>
-#include <gtkmm/button.h>
-#include <gtkmm/buttonbox.h>
-#include <gtkmm/main.h>
-#include <gtkmm/label.h>
-#include <gtkmm/stock.h>
-#include <gtkmm/window.h>
 #include <sstream>
+#include <iostream>
 
 
 namespace
 {
+Glib::RefPtr<Glib::MainLoop> main_loop;
 
-class ThreadTimer : public Gtk::Label
+class ThreadTimer : public SigC::Object
 {
 public:
   ThreadTimer();
   ~ThreadTimer();
 
-  Glib::Thread* launch();
+  void launch();
   void signal_finished_emit();
+  void print() const;
+  static SigC::Signal0<void>& signal_end();
 
 private:
   unsigned int      time_;
@@ -48,6 +48,9 @@ private:
 
   Glib::Mutex       startup_mutex_;
   Glib::Cond        startup_cond_;
+  Glib::Thread*     thread_;
+  
+  static SigC::Signal0<void> signal_end_;
 
   void timer_increment();
   bool timeout_handler();
@@ -55,33 +58,25 @@ private:
   void thread_function();
 };
 
-class MainWindow : public Gtk::Window
+class Dispatcher : public SigC::Object
 {
 public:
-  MainWindow();
+  Dispatcher();
 
   void launch_thread();
-
-protected:
-  bool on_delete_event(GdkEventAny* event);
-  void on_button_clicked();
+  void end();
 
 private:
-  Glib::Thread*   producer_;
-
-  ThreadTimer*    timer_label_;
-  Gtk::Button*    close_button_;
+  ThreadTimer* timer_;
 };
 
-
-ThreadTimer::ThreadTimer()
+ThreadTimer::ThreadTimer() 
 :
   time_ (0),
   // Create a new dispatcher that is attached to the default main context,
-  // which is the one Gtk::Main is using.
   signal_increment_ (),
   // This pointer will be initialized later by the 2nd thread.
-  signal_finished_ptr_ (0)
+  signal_finished_ptr_ (NULL)
 {
   // Connect the cross-thread signal.
   signal_increment_.connect(SigC::slot(*this, &ThreadTimer::timer_increment));
@@ -90,7 +85,7 @@ ThreadTimer::ThreadTimer()
 ThreadTimer::~ThreadTimer()
 {}
 
-Glib::Thread* ThreadTimer::launch()
+void ThreadTimer::launch()
 {
   // Unfortunately, the thread creation has to be fully synchronized in
   // order to access the Dispatcher object instantiated by the 2nd thread.
@@ -99,32 +94,44 @@ Glib::Thread* ThreadTimer::launch()
   Glib::Mutex::Lock lock (startup_mutex_);
 
   // Create a joinable thread -- it needs to be joined, otherwise it's a memory leak.
-  Glib::Thread *const thread = Glib::Thread::create(
+  thread_ = Glib::Thread::create(
       SigC::slot_class(*this, &ThreadTimer::thread_function), true);
 
   // Wait for the 2nd thread's startup notification.
-  while(signal_finished_ptr_ == 0)
+  while(signal_finished_ptr_ == NULL)
     startup_cond_.wait(startup_mutex_);
-
-  return thread;
 }
 
 void ThreadTimer::signal_finished_emit()
 {
   // Cause the 2nd thread's main loop to quit.
   signal_finished_ptr_->emit();
-  signal_finished_ptr_ = 0;
+
+  // wait for the thread to join
+  if(thread_ != NULL)
+    thread_->join();
+
+  signal_finished_ptr_ = NULL;
+}
+
+void ThreadTimer::print() const
+{
+  std::cout << time_ << " seconds since start" << std::endl;
+}
+
+SigC::Signal0< void >& ThreadTimer::signal_end()
+{
+  return signal_end_;
 }
 
 void ThreadTimer::timer_increment()
 {
   // another second has passed since the start of the program
   ++time_;
+  print();
 
-  std::ostringstream out;
-  out << time_ << " seconds since start";
-
-  set_text(out.str());
+  if(time_ >= 10)
+    signal_finished_emit();
 }
 
 // static
@@ -132,11 +139,13 @@ void ThreadTimer::finished_handler(Glib::RefPtr<Glib::MainLoop> mainloop)
 {
   // quit the timer thread mainloop
   mainloop->quit();
+  std::cout << "timer thread mainloop finished" << std::endl;
+  ThreadTimer::signal_end().emit();
 }
 
 bool ThreadTimer::timeout_handler()
 {
-  // inform the UI thread that another second has passed
+  // inform the printing thread that another second has passed
   signal_increment_();
 
   // this timer should stay alive
@@ -173,63 +182,30 @@ void ThreadTimer::thread_function()
   mainloop->run();
 }
 
+// static
+SigC::Signal0<void> ThreadTimer::signal_end_;
 
-MainWindow::MainWindow()
-:
-  producer_     (0),
-  timer_label_  (0),
-  close_button_ (0)
+Dispatcher::Dispatcher()
+: 
+  timer_ (NULL)
 {
-  set_title("Thread Dispatcher Example #2");
+  std::cout << "Thread Dispatcher Example #2" << std::endl;
 
-  Gtk::VBox *const vbox = new Gtk::VBox(false, 10);
-  add(*Gtk::manage(vbox));
-  vbox->set_border_width(10);
-
-  timer_label_ = new ThreadTimer();
-  vbox->pack_start(*Gtk::manage(timer_label_), Gtk::PACK_SHRINK);
-  timer_label_->set_text("0 seconds since start");
-
-  Gtk::ButtonBox *const button_box = new Gtk::HButtonBox();
-  vbox->pack_end(*Gtk::manage(button_box), Gtk::PACK_SHRINK);
-
-  close_button_ = new Gtk::Button(Gtk::Stock::CLOSE);
-  button_box->pack_start(*Gtk::manage(close_button_), Gtk::PACK_SHRINK);
-  close_button_->set_flags(Gtk::CAN_DEFAULT);
-  close_button_->grab_default();
-  close_button_->signal_clicked().connect(SigC::slot(*this, &MainWindow::on_button_clicked));
-
-  show_all_children();
-  set_default_size(300, -1);
+  timer_ = new ThreadTimer();
+  timer_->signal_end().connect(SigC::slot(*this, &Dispatcher::end));
+  timer_->print();
 }
 
-void MainWindow::launch_thread()
+void Dispatcher::launch_thread()
 {
   // launch the timer thread
-  producer_ = timer_label_->launch();
+  timer_->launch();
 }
 
-bool MainWindow::on_delete_event(GdkEventAny*)
-{ 
-  // signal the timer thread to stop
-  timer_label_->signal_finished_emit();
-
-  // wait for the timer thread to join
-  producer_->join();
-
-  return false;
-}
-
-void MainWindow::on_button_clicked()
+void Dispatcher::end()
 {
-  // signal the timer thread to stop
-  timer_label_->signal_finished_emit();
-
-  // wait for the timer thread to join
-  producer_->join();
-
-  // hide toplevel, thus stop the UI thread main loop
-  hide();
+  // quit the main mainloop
+  main_loop->quit();
 }
 
 } // anonymous namespace
@@ -238,16 +214,15 @@ void MainWindow::on_button_clicked()
 int main(int argc, char** argv)
 {
   Glib::thread_init();
-  Gtk::Main main_instance (&argc, &argv);
+  main_loop = Glib::MainLoop::create();
 
-  MainWindow window;
+  Dispatcher dispatcher;
 
   // Install a one-shot idle handler to launch the threads
-  // right after the main window has been displayed.
   Glib::signal_idle().connect(
-      SigC::bind_return(SigC::slot(window, &MainWindow::launch_thread), false));
+      SigC::bind_return(SigC::slot(dispatcher, &Dispatcher::launch_thread), false));
 
-  Gtk::Main::run(window);
+  main_loop->run();
 
   return 0;
 }
