@@ -54,7 +54,6 @@ private:
   Glib::RefPtr<Glib::MainLoop>  main_loop_;
   std::list<ThreadProgress*>    progress_list_;
 
-  void clear_progress_list();
   void on_progress_finished(ThreadProgress* thread_progress);
 };
 
@@ -120,28 +119,18 @@ Application::Application()
 {
   std::cout << "Thread Dispatcher Example." << std::endl;
 
-  try
+  for(int i = 1; i <= 5; ++i)
   {
-    for(int i = 1; i <= 5; ++i)
-    {
-      progress_list_.push_back(0); // be paronoid about exceptions
-      ThreadProgress *const progress = (progress_list_.back() = new ThreadProgress(i));
+    std::auto_ptr<ThreadProgress> progress (new ThreadProgress(i));
+    progress_list_.push_back(progress.get());
 
-      progress->signal_finished().connect(
-          sigc::bind(sigc::mem_fun(*this, &Application::on_progress_finished), progress));
-    }
-  }
-  catch(...)
-  {
-    clear_progress_list();
-    throw;
+    progress->signal_finished().connect(
+        sigc::bind(sigc::mem_fun(*this, &Application::on_progress_finished), progress.release()));
   }
 }
 
 Application::~Application()
-{
-  clear_progress_list();
-}
+{}
 
 void Application::launch_threads()
 {
@@ -152,15 +141,6 @@ void Application::launch_threads()
 void Application::run()
 {
   main_loop_->run();
-}
-
-void Application::clear_progress_list()
-{
-  while(!progress_list_.empty())
-  {
-    const std::auto_ptr<ThreadProgress> temp (progress_list_.back());
-    progress_list_.pop_back();
-  }
 }
 
 void Application::on_progress_finished(ThreadProgress* thread_progress)
