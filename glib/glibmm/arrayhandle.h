@@ -180,7 +180,7 @@ private:
 } // namespace Container_Helpers
 
 
-/** If a method takes this as an argument then you can use a standard
+/** If a method takes this as an argument, or has this as a return type, then you can use a standard
  * container such as std::list or std::vector.
  * @ingroup ContHandles
  */
@@ -229,14 +229,14 @@ public:
 
 private:
   size_t                      size_;
-  const CType *               parray_;
+  const CType*                parray_;
   mutable Glib::OwnershipType ownership_;
 
   // No copy assignment.
-  ArrayHandle<T,Tr>& operator=(const ArrayHandle<T,Tr>&);
+  ArrayHandle<T, Tr>& operator=(const ArrayHandle<T,Tr>&);
 };
 
-/** If a method takes this as an argument then you can use a standard
+/** If a method takes this as an argument, or has this as a return type, then you can use a standard
  * container such as std::list<Glib::ustring> or std::vector<Glib::ustring>.
  * @ingroup ContHandles
  */

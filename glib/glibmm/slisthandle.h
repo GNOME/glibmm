@@ -121,6 +121,8 @@ struct SListSourceTraits<Tr,const Cont[N]> : SListSourceTraits<Tr,Cont[N]>
 
 /**
  * @ingroup ContHelpers
+ * If a method takes this as an argument, or has this as a return type, then you can use a standard
+ * container such as std::list or std::vector.
  */
 template <class Tr>
 class SListHandleIterator
