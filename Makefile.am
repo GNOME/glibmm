@@ -2,13 +2,13 @@
 SUBDIRS		= tools glib docs
 DIST_SUBDIRS	= $(SUBDIRS) scripts examples tests
 
-EXTRA_DIST	= gtkmm.spec.in \
+EXTRA_DIST	= glibmm.spec.in \
 		  build_shared/Makefile_build.am_fragment \
 		  build_shared/Makefile_build_gensrc.am_fragment \
 		  build_shared/Makefile_gensrc.am_fragment \
 		  build_shared/Makefile_gensrc_platform.am_fragment \
 		  build_shared/Makefile_build_extra.am_fragment \
-		  CHANGES README.win32 PORTING
+		  CHANGES README.win32
 
 
 all-local:
