@@ -34,6 +34,14 @@ define(`__BOOL_CUSTOM_WRAP_NEW__',`1')
 _POP()
 ')
 
+dnl Gnome::Canvas::CanvasAA::CanvasAA() needs access to the
+dnl normally-private canvas_class_ member variable. See comments there.
+define(`_GMMPROC_PROTECTED_GCLASS',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_PROTECTED_GCLASS__',`1')
+_POP()
+')
 
 dnl Some of the Gdk types are actually direct typedefs of their base type.
 dnl This means that 2 wrap functions would have the same argument.
@@ -172,10 +180,13 @@ public:
   typedef __CNAME__ BaseObjectType;
   typedef __REAL_CNAME__`'Class BaseClassType;
 
-private:
+m4_ifdef(`__BOOL_PROTECTED_GCLASS__',
+`protected:',`dnl else
+private:')dnl endif
   friend class __CPPNAME__`'_Class;
   static CppClassType `'__BASE__`'_class_;
 
+private:
   // noncopyable
   __CPPNAME__`'(const __CPPNAME__&);
   __CPPNAME__& operator=(const __CPPNAME__&);

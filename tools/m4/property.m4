@@ -14,6 +14,11 @@ define(`_PROPERTY_PROXY',`dnl
 dnl
 dnl Put spaces around the template parameter if necessary.
 pushdef(`__PROXY_TYPE__',`dnl
+/**
+ * You rarely need to use properties because there are get_ and set_ methods for almost all of them.
+ * @return A PropertyProxy that allows you to get or set the property of the value, or receive notification when
+ * the value of the property changes.
+ */
 Glib::PropertyProxy$3<'ifelse(regexp(_QUOTE($2),`>$'),`-1',_QUOTE($2),` '_QUOTE($2)` ')`>'dnl
 )dnl
 __PROXY_TYPE__ property_$1`'();

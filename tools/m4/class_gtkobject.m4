@@ -54,6 +54,15 @@ define(`__BOOL_UNMANAGEABLE__',`$1')
 _POP()
 ')
 
+dnl Gnome::Canvas::CanvasAA::CanvasAA() needs access to the
+dnl normally-private canvas_class_ member variable. See comments there.
+define(`_GMMPROC_PROTECTED_GCLASS',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_PROTECTED_GCLASS__',`1')
+_POP()
+')
+
 
 dnl
 dnl _END_CLASS_GTKOBJECT()
@@ -163,7 +172,10 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-private:
+m4_ifdef(`__BOOL_PROTECTED_GCLASS__',
+`protected:',`dnl else
+private:')dnl endif
+
   friend class __CPPNAME__`'_Class;
   static CppClassType `'__BASE__`'_class_;
 
