@@ -39,7 +39,9 @@ public:
   void launch();
   void signal_finished_emit();
   void print() const;
-  static SigC::Signal0<void>& signal_end();
+
+  typedef SigC::Signal0<void> type_signal_end;
+  static type_signal_end& signal_end();
 
 private:
   unsigned int      time_;
@@ -50,7 +52,7 @@ private:
   Glib::Cond        startup_cond_;
   Glib::Thread*     thread_;
   
-  static SigC::Signal0<void> signal_end_;
+  static type_signal_end signal_end_;
 
   void timer_increment();
   bool timeout_handler();
@@ -58,6 +60,7 @@ private:
   void thread_function();
 };
 
+//TODO: Rename to avoid confusion with Glib::Dispatcher. murrayc
 class Dispatcher : public SigC::Object
 {
 public:
@@ -182,8 +185,8 @@ void ThreadTimer::thread_function()
   mainloop->run();
 }
 
-// static
-SigC::Signal0<void> ThreadTimer::signal_end_;
+// initialize static member:
+ThreadTimer::type_signal_end ThreadTimer::signal_end_;
 
 Dispatcher::Dispatcher()
 : 

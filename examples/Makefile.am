@@ -1,5 +1,4 @@
-example_dirs = \
-markup 
+example_dirs = markup thread
 
 # These use gtkmm stuff:
 # thread

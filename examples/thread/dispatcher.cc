@@ -27,13 +27,15 @@ public:
   virtual ~ThreadProgress();
 
   void launch();
-  SigC::Signal1<void, ThreadProgress*>& signal_finished();
+
+  typedef SigC::Signal1<void, ThreadProgress*> type_signal_finished;
+  type_signal_finished& signal_finished();
   int id() const;
 
 private:
   unsigned int        progress_;
   Glib::Dispatcher    signal_increment_;
-  SigC::Signal1<void, ThreadProgress*>	signal_finished_;
+  type_signal_finished signal_finished_;
   int                 id_;
   Glib::Mutex&        cout_mutex_;
 
@@ -41,6 +43,7 @@ private:
   void thread_function();
 };
 
+//TODO: Rename to avoid confusion with Glib::Dispatcher.
 class Dispatcher : public SigC::Object
 {
 public:
@@ -74,7 +77,7 @@ void ThreadProgress::launch()
   Glib::Thread::create(SigC::slot_class(*this, &ThreadProgress::thread_function), false);
 }
 
-SigC::Signal1<void, ThreadProgress*>& ThreadProgress::signal_finished()
+ThreadProgress::type_signal_finished& ThreadProgress::signal_finished()
 {
   return signal_finished_;
 }
@@ -109,7 +112,7 @@ void ThreadProgress::thread_function()
     Glib::usleep(usecs);
 
     // Tell the thread to increment the progress value.
-    signal_increment_();
+    signal_increment_.emit();
   }
 }
 
