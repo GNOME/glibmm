@@ -67,7 +67,7 @@ void* SourceConnectionNode::notify(void* data)
   {
     GSource* s = self->source_;  
     self->source_ = 0;
-    g_source_destroy(self->source_);
+    g_source_destroy(s);
 
     delete self;
   }
