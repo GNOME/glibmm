@@ -211,9 +211,9 @@ DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
 :
   context_      (context),
   ref_count_    (0),
-  fd_receiver_  (INVALID_FD),
+  fd_receiver_  (INVALID_FD)
 #ifndef G_OS_WIN32
-  fd_sender_    (INVALID_FD)
+  ,fd_sender_    (INVALID_FD)
 #endif /* G_OS_WIN32 */
 {
   create_pipe();
