@@ -259,4 +259,49 @@ AC_DEFUN([GLIBMM_CXX_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION]
 ])
 
 
+## GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS()
+##
+## Check whether the compiler allows us to use a non-extern "C" function, 
+## such as a static member function, to an extern "C" function pointer, 
+## such as a GTK+ callback.
+## This should not be allowed anyway.
+##
+AC_DEFUN([GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS],
+[
+  AC_CACHE_CHECK(
+    [whether the the compilerallows us to use a non-extern "C" function for an extern "C" function pointer.],
+    [gtkmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks],
+  [
+    AC_TRY_COMPILE(
+    [
+      extern "C"
+      {
+        struct somestruct
+        {
+          void (*callback) (int);
+        };
+        
+      } // extern "C"
+      
+      void somefunction(int)
+      {
+      }
+      
+    ],[ 
+      somestruct something;
+      something.callback = &somefunction;
+    ],
+      [gtkmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks="yes"],
+      [gtkmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks="no"]
+    )
+  ])
+
+  if test "x${gtkmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks}" = "xyes"; then
+  {
+    AC_DEFINE([GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS],[1], [Defined if the compiler allows us to use a non-extern "C" function for an extern "C" function pointer.])
+  }
+  fi
+])
+
+
 
