@@ -176,24 +176,25 @@ sub parse_param($$)
   # parse through argument list
   my @str = ();
   my $par = 0;
-  foreach (split(/([,=&*()])|(<[^,]*>)|(\s+)/, $line)) #special characters OR <something> OR whitespace.
+  foreach (split(/(const )|([,=&*()])|(<[^,]*>)|(\s+)/, $line)) #special characters OR <something> OR whitespace.
   {
     next if ( !defined($_) or $_ eq "" );
-    if ( $_ eq "(" )
+      
+    if ( $_ eq "(" ) #Detect the opening bracket.
     {
        push(@str, $_);
-       $par++;
+       $par++; #Increment the number of parameters.
        next;
     }
     elsif ( $_ eq ")" )
     {
        push(@str, $_);
-       $par--;
+       $par--; #Decrement the number of parameters.
        next;
     }
-    elsif ( $par || /^(const)|(<[^,]*>)|([*&])|(\s+)/ ) #TODO: What's happening here?
+    elsif ( $par || /^(const )|(<[^,]*>)|([*&])|(\s+)/ ) #TODO: What's happening here?
     {
-      push(@str, $_);
+      push(@str, $_); #This looks like part of the type, so we store it.
       next;
     }
     elsif ( $_ eq "=" ) #Default value
