@@ -78,6 +78,16 @@ std::string getenv(const std::string& variable)
   return (value) ? std::string(value) : std::string();
 }
 
+bool setenv(const std::string& variable, const std::string& value, bool overwrite)
+{
+  return g_setenv(variable.c_str(), value.c_str(), overwrite);
+}
+
+void unsetenv(const std::string& variable)
+{
+  g_unsetenv(variable.c_str());
+}
+
 std::string get_user_name()
 {
   return std::string(g_get_user_name());

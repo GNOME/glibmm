@@ -73,18 +73,57 @@ std::string get_prgname();
  */
 void set_prgname(const std::string& prgname);
 
-/** Returns an environment variable.
+/** Returns the value of an environment variable. The name and value
+ * are in the GLib file name encoding. On Unix, this means the actual
+ * bytes which might or might not be in some consistent character set
+ * and encoding. On Windows, it is in UTF-8. On Windows, in case the
+ * environment variable's value contains references to other
+ * environment variables, they are expanded.
+ *
  * @param variable The environment variable to get.
- * @retval found <tt>true</tt> if the environment variable has been found.
+ * @retval found <tt>true</tt> Whether the environment variable has been found.
  * @return The value of the environment variable, or <tt>""</tt> if not found.
  */
 std::string getenv(const std::string& variable, bool& found);
 
-/** Returns an environment variable.
+/** Returns the value of an environment variable. The name and value
+ * are in the GLib file name encoding. On Unix, this means the actual
+ * bytes which might or might not be in some consistent character set
+ * and encoding. On Windows, it is in UTF-8. On Windows, in case the
+ * environment variable's value contains references to other
+ * environment variables, they are expanded.
+ *
  * @param variable The environment variable to get.
  * @return The value of the environment variable, or <tt>""</tt> if not found.
  */
 std::string getenv(const std::string& variable);
+
+
+/** Sets an environment variable. Both the variable's name and value
+ * should be in the GLib file name encoding. On Unix, this means that
+ * they can be any sequence of bytes. On Windows, they should be in
+ * UTF-8.
+ *
+ * Note that on some systems, when variables are overwritten, the memory 
+ * used for the previous variables and its value isn't reclaimed.
+ *
+ * @param variable The environment variable to set. It must not contain '='.
+ * @param value  The value to which the variable should be set.
+ * @param overwrite Whether to change the variable if it already exists.
+ * @result false if the environment variable couldn't be set.
+ */ 
+bool setenv(const std::string& variable, const std::string& value, bool overwrite = true);
+
+/** Removes an environment variable from the environment.
+ *
+ * Note that on some systems, when variables are overwritten, the memory 
+ * used for the previous variables and its value isn't reclaimed.
+ * Furthermore, this function can't be guaranteed to operate in a 
+ * threadsafe way.
+ *
+ * @param variable: the environment variable to remove. It  must not contain '='.
+ **/
+void unsetenv(const std::string& variable);
 
 /** Gets the user name of the current user.
  * @return The name of the current user.
