@@ -8,61 +8,60 @@
  * Copyright (c) 2002-2003  Free Software Foundation
  */
 
-#include <sigc++/class_slot.h>
 #include <glibmm.h>
 
-#include <iostream>
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <list>
+#include <memory>
+
 
 namespace
 {
-Glib::RefPtr<Glib::MainLoop> main_loop;
 
-class ThreadProgress : public sigc::trackable
+class ThreadProgress
 {
 public:
-  ThreadProgress(int id, Glib::Mutex& mtx);
-  virtual ~ThreadProgress();
+  explicit ThreadProgress(int id);
+  ~ThreadProgress();
 
   void launch();
 
-  typedef sigc::signal<void, ThreadProgress*> type_signal_finished;
-  type_signal_finished& signal_finished();
+  sigc::signal<void>& signal_finished();
   int id() const;
 
 private:
+  int                 id_;
   unsigned int        progress_;
   Glib::Dispatcher    signal_increment_;
-  type_signal_finished signal_finished_;
-  int                 id_;
-  Glib::Mutex&        cout_mutex_;
+  sigc::signal<void>  signal_finished_;
 
   void progress_increment();
   void thread_function();
 };
 
-//TODO: Rename to avoid confusion with Glib::Dispatcher.
-class Dispatcher : public sigc::trackable
+class Application : public sigc::trackable
 {
 public:
-  Dispatcher();
-  virtual ~Dispatcher();
+  Application();
+  virtual ~Application();
 
   void launch_threads();
+  void run();
 
 private:
-  std::list<ThreadProgress*>  progress_list_;
-  Glib::Mutex                 cout_mutex_;
+  Glib::RefPtr<Glib::MainLoop>  main_loop_;
+  std::list<ThreadProgress*>    progress_list_;
 
-  void on_progress_finished(ThreadProgress* progress);
+  void on_progress_finished(ThreadProgress* thread_progress);
 };
 
 
-ThreadProgress::ThreadProgress(int id, Glib::Mutex& mtx)
-: 
-  progress_ (0), id_ (id), cout_mutex_ (mtx)
+ThreadProgress::ThreadProgress(int id)
+:
+  id_       (id),
+  progress_ (0)
 {
   // Connect to the cross-thread signal.
   signal_increment_.connect(sigc::mem_fun(*this, &ThreadProgress::progress_increment));
@@ -77,7 +76,7 @@ void ThreadProgress::launch()
   Glib::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function), false);
 }
 
-ThreadProgress::type_signal_finished& ThreadProgress::signal_finished()
+sigc::signal<void>& ThreadProgress::signal_finished()
 {
   return signal_finished_;
 }
@@ -93,12 +92,10 @@ void ThreadProgress::progress_increment()
   // we want to finish *exactly* after the 100th increment.
   ++progress_;
 
-  cout_mutex_.lock();
-  std::cout << "Thread " << id_ << ": " << progress_ << " %" << std::endl;
-  cout_mutex_.unlock();
+  std::cout << "Thread " << id_ << ": " << progress_ << '%' << std::endl;
 
   if(progress_ >= 100)
-    signal_finished().emit(this);
+    signal_finished_();
 }
 
 void ThreadProgress::thread_function()
@@ -111,47 +108,52 @@ void ThreadProgress::thread_function()
     usecs = rand.get_int_range(std::max(0, usecs - 1000 - i), std::min(20000, usecs + 1000 + i));
     Glib::usleep(usecs);
 
-    // Tell the thread to increment the progress value.
-    signal_increment_.emit();
+    // Tell the main thread to increment the progress value.
+    signal_increment_();
   }
 }
 
-Dispatcher::Dispatcher()
-: 
-  cout_mutex_ ()
+Application::Application()
+:
+  main_loop_ (Glib::MainLoop::create())
 {
   std::cout << "Thread Dispatcher Example." << std::endl;
 
-  for(int i = 0; i < 5; ++i)
+  for(int i = 1; i <= 5; ++i)
   {
-    ThreadProgress *const progress = new ThreadProgress(i, cout_mutex_);
-    progress_list_.push_back(progress);
+    std::auto_ptr<ThreadProgress> progress (new ThreadProgress(i));
+    progress_list_.push_back(progress.get());
 
     progress->signal_finished().connect(
-        sigc::mem_fun(*this, &Dispatcher::on_progress_finished));
+        sigc::bind(sigc::mem_fun(*this, &Application::on_progress_finished), progress.release()));
   }
 }
 
-Dispatcher::~Dispatcher()
+Application::~Application()
 {}
 
-void Dispatcher::launch_threads()
+void Application::launch_threads()
 {
-  std::for_each(
-      progress_list_.begin(), progress_list_.end(),
-      std::mem_fun(&ThreadProgress::launch));
+  std::for_each(progress_list_.begin(), progress_list_.end(),
+                std::mem_fun(&ThreadProgress::launch));
 }
 
-void Dispatcher::on_progress_finished(ThreadProgress* progress)
+void Application::run()
 {
-  cout_mutex_.lock();
-  std::cout << "Thread " << progress->id() << ": finished." << std::endl;
-  cout_mutex_.unlock();
+  main_loop_->run();
+}
 
-  progress_list_.remove(progress);
+void Application::on_progress_finished(ThreadProgress* thread_progress)
+{
+  {
+    const std::auto_ptr<ThreadProgress> progress (thread_progress);
+    progress_list_.remove(progress.get());
+
+    std::cout << "Thread " << progress->id() << ": finished." << std::endl;
+  }
 
   if(progress_list_.empty())
-    main_loop->quit();
+    main_loop_->quit();
 }
 
 } // anonymous namespace
@@ -160,15 +162,14 @@ void Dispatcher::on_progress_finished(ThreadProgress* progress)
 int main(int argc, char** argv)
 {
   Glib::thread_init();
-  main_loop = Glib::MainLoop::create();
 
-  Dispatcher dispatcher;
+  Application application;
 
   // Install a one-shot idle handler to launch the threads
   Glib::signal_idle().connect(
-      sigc::bind_return(sigc::mem_fun(dispatcher, &Dispatcher::launch_threads), false));
+      sigc::bind_return(sigc::mem_fun(application, &Application::launch_threads), false));
 
-  main_loop->run();
+  application.run();
 
   return 0;
 }
