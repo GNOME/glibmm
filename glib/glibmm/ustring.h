@@ -509,7 +509,7 @@ public:
   ustring uppercase() const;
 
   /*! Returns a new UTF-8 string with all characters characters converted to
-   * their uppercase equivalent, while honoring the current locale.  The
+   * their lowercase equivalent, while honoring the current locale.  The
    * resulting string may change in the number of bytes as well as in the
    * number of characters.
    */

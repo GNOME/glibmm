@@ -186,8 +186,8 @@ _PUSH(SECTION_H_DEFAULT_SIGNAL_HANDLERS)
   virtual $2 on_$1`'($3);
 _POP()')
 
-dnl              $1      $2     $3     $4         $5          $6
-dnl _SIGNAL_CC(signame,gname,rettype,crettype,`<cppargs>',`<carg_names>')
+dnl              $1      $2     $3     $4         $5          $6            $7      $8
+dnl _SIGNAL_CC(signame,gname,rettype,crettype,`<cppargs>',`<carg_names>', const, refreturn)
 dnl
 define(`_SIGNAL_CC',`dnl
 _PUSH(SECTION_CC_DEFAULT_SIGNAL_HANDLERS)
@@ -205,7 +205,12 @@ dnl  g_assert(base != 0);
 ifelse($3,void,`dnl
     (*base->$2)`'(gobj`'()`'_COMMA_PREFIX($6));
 ',`dnl
-    return _CONVERT($4,$3,`(*base->$2)`'(gobj`'()`'_COMMA_PREFIX($6))');
+    $3 retvalue = _CONVERT($4,$3,`(*base->$2)`'(gobj`'()`'_COMMA_PREFIX($6))');
+ifelse(`$8',,,`dnl
+    if(retvalue)
+      retvalue->reference(); //The C function does not do a ref for us.
+')dnl
+    return retvalue;
 
   typedef $3 RType;
   return RType`'();

@@ -934,9 +934,11 @@ sub on_wrap_signal($)
   my $bCustomDefaultHandler = 0;
   my $bNoDefaultHandler = 0;
   my $bCustomCCallback = 0;
-  if(scalar(@args) > 2) # If optional arguments are there.
+  my $bRefreturn = 0;
+  
+  while(scalar(@args) > 2) # If optional arguments are there.
   {
-    my $argRef = string_trim($args[2]);
+    my $argRef = string_trim(pop @args);
     if($argRef eq "custom_default_handler")
     {
       $bCustomDefaultHandler = 1;
@@ -951,10 +953,15 @@ sub on_wrap_signal($)
     {
       $bCustomCCallback = 1;
     }
+
+    if($argRef eq "refreturn")
+    {
+      $bRefreturn = 1;
+    }
   }
 
 
-  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback);
+  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn);
 }
 
 # void on_wrap_vfunc()
@@ -1110,11 +1117,11 @@ sub output_wrap_check($$$$$$)
 
 }
 
-# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback)
+# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn)
 # Also used for vfunc.
-sub output_wrap_signal($$$$$$$)
+sub output_wrap_signal($$$$$$$$)
 {
-  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback) = @_;
+  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn) = @_;
 
   #Some checks:
   $self->output_wrap_check($CppDecl, $signal_name, $filename, $line_num, "WRAP_SIGNAL");
@@ -1154,7 +1161,7 @@ sub output_wrap_signal($$$$$$$)
 
     my $bImplement = 1;
     if($bCustomDefaultHandler) { $bImplement = 0; }
-    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement, $bCustomCCallback);
+    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement, $bCustomCCallback, $bRefreturn);
   }
 }
 

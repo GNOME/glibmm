@@ -12,7 +12,7 @@ files_extra_all_h	= interface_p.h object_p.h
 dist_sources = $(files_built_all_h) $(files_extra_all_h)
 DISTFILES = $(DIST_COMMON) $(dist_sources)
 
-private_includedir	= $(includedir)/glibmm-2.3/glibmm/private
+private_includedir	= $(includedir)/glibmm-2.4/glibmm/private
 private_include_HEADERS	= $(files_built_h) $(files_extra_h)
 
 maintainer-clean-local:

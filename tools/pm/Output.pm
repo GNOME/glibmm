@@ -187,23 +187,24 @@ sub output_wrap_default_signal_handler_h($$$$$$)
 }
 
 # _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>')
-sub output_wrap_default_signal_handler_cc($$$$$$)
+sub output_wrap_default_signal_handler_cc($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement, $bCustomCCallback) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement, $bCustomCCallback, $bRefreturn) = @_;
   my $cname = $$objDefsSignal{name};
   # $cname = $1 if ($args[3] =~ /"(.*)"/); #TODO: What's this about?
 
   # e.g. Gtk::Button::on_clicked:
   if($bImplement eq 1)
   {
-    my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s)dnl\n",
+    my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s, %s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
       $$objDefsSignal{rettype},
       $objCppfunc->args_types_and_names(),
       convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num), #$objCppfunc->args_names_only(),
-      $$objCppfunc{const});
+      $$objCppfunc{const},
+      $bRefreturn);
     $self->append($str);
   }
 

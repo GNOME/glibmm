@@ -55,7 +55,7 @@ uninstall-reference: html/index.html
 
 # Install beautify_docs.pl, next to gmmproc.
 gmmproc_bin_SCRIPTS = $(beautify_docs)
-gmmproc_bindir = $(libdir)/glibmm-2.3/proc
+gmmproc_bindir = $(libdir)/glibmm-2.4/proc
 
 all-local: html/index.html
 
