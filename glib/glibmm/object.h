@@ -70,10 +70,10 @@ public:
   ConstructParams(const Glib::Class& glibmm_class_, const char* first_property_name, ...);
   ~ConstructParams();
 
-  //This is only used by the C++ compiler (since g++ 3.4) to create temporary instances.
-  //Apparently the compiler will actually optimize away the use of this.
-  //See bug #132300.
-  ConstructParams(const ConstructParams& src);
+  // This is only used by the C++ compiler (since g++ 3.4) to create temporary instances.
+  // Apparently the compiler will actually optimize away the use of this.
+  // See bug #132300.
+  ConstructParams(const ConstructParams& other);
 
 private:
   // noncopyable 
