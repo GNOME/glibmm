@@ -259,7 +259,7 @@ public:
    * io_source->connect(SigC::slot(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode
-   * @param slot A slot to call when polling @a fd results in an event that matches @a condition.
+   * @param slot A slot to call when polling @a channel results in an event that matches @a condition.
    * The event will be passed as a parameter to @a slot.
    * If @a io_handler returns <tt>false</tt> the signal is disconnected.
    * @param channel The IOChannel object to watch.
@@ -378,6 +378,7 @@ public:
    */
   void dispatch();
 
+  //TODO: Use slot instead?
   /** Sets the function to use to handle polling of file descriptors. It will be used instead of the poll() system call (or GLib's replacement function, which is used where poll() isn't available).
    * This function could possibly be used to integrate the GLib event loop with an external event loop.
    * @param poll_func The function to call to poll all file descriptors.
@@ -390,11 +391,13 @@ public:
   GPollFunc get_poll_func();
 
   /** Adds a file descriptor to the set of file descriptors polled for this context. This will very seldomly be used directly. Instead a typical event source will use Glib::Source::add_poll() instead.
-   * @param fd A GPollFD structure holding information about a file descriptor to watch.
+   * @param fd A PollFD structure holding information about a file descriptor to watch.
    * @param priority The priority for this file descriptor which should be the same as the priority used for Glib::Source::attach() to ensure that the file descriptor is polled whenever the results may be needed.
    */
   void add_poll(PollFD& fd, int priority);
+  
   /** Removes file descriptor from the set of file descriptors to be polled for a particular context.
+   * @param fd A PollFD structure holding information about a file descriptor.
    */
   void remove_poll(PollFD& fd);
 
@@ -588,7 +591,7 @@ protected:
   void remove_poll(PollFD& poll_fd);
 
   /** Gets the "current time" to be used when checking this source. The advantage of calling this function over calling get_current_time() directly is that when checking multiple sources, GLib can cache a single value instead of having to repeatedly get the system time.
-   * @param timeval Glib::TimeVal in which to store current time
+   * @param current_time Glib::TimeVal in which to store current time
    */
   void get_current_time(Glib::TimeVal& current_time);
 
