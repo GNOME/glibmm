@@ -59,8 +59,9 @@ class GSigConnectionNode;
  * The comments in object.cc and objectbase.cc should explain in detail
  * how this works.
  */
-struct ConstructParams
+class ConstructParams
 {
+public:
   const Glib::Class&  glibmm_class;
   unsigned int        n_parameters;
   GParameter*         parameters;
@@ -69,9 +70,13 @@ struct ConstructParams
   ConstructParams(const Glib::Class& glibmm_class_, const char* first_property_name, ...);
   ~ConstructParams();
 
+  //This is only used by the C++ compiler (since g++ 3.4) to create temporary instances.
+  //Apparently the compiler will actually optimize away the use of this.
+  //See bug #132300.
+  ConstructParams(const ConstructParams& src);
+
 private:
-  // noncopyable
-  ConstructParams(const ConstructParams&);
+  // noncopyable 
   ConstructParams& operator=(const ConstructParams&);
 };
 

@@ -86,10 +86,9 @@ const Glib::Class& __CPPNAME__`'_Class::init()
     // Glib::Class has to know the class init function to clone custom types.
     class_init_func_ = &__CPPNAME__`'_Class::class_init_function;
 
-    // TODO: This is currently just optimized away, apparently with no harm.
-    // Is it actually necessary?
+    // This is actually just optimized away, apparently with no harm.
     // Make sure that the parent type has been created.
-    CppClassParent::CppObjectType::get_type();
+    //CppClassParent::CppObjectType::get_type();
 
     // Create the wrapper type, with the same class/instance size as the base type.
     register_derived_type(_LOWER(__CCAST__)_get_type());

@@ -129,6 +129,16 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_,
   va_end(var_args);
 }
 
+ConstructParams::ConstructParams(const ConstructParams& src)
+: glibmm_class(src.glibmm_class),
+  n_parameters(src.n_parameters),
+  parameters(src.parameters)
+{
+  //This is only used by the C++ compiler (since g++ 3.4) to create temporary instances.
+  //Apparently the compiler will actually optimize away the use of this.
+  //See bug #132300.
+}
+
 ConstructParams::~ConstructParams()
 {
   while(n_parameters > 0)

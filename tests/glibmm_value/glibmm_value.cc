@@ -3,23 +3,29 @@
 //#include <gdkmm.h>
 //#include <gtkmm.h>
 
-struct Foo { int bar; };
+struct Foo
+{
+  int bar;
+};
 
-// custom copyable
-template Glib::Value<Foo>;
-
-// custom pointer
-template Glib::Value<Foo*>;
-template Glib::Value<const Foo*>;
-
-// Glib::Object pointer
 namespace Gtk
 {
 class Widget;
 }
 
-template Glib::Value<Gtk::Widget*>;
-template Glib::Value<const Gtk::Widget*>;
+void some_method()
+{
+// custom copyable
+  Glib::Value<Foo> value_foo;
+
+  // custom pointer
+  Glib::Value<Foo*> value_foo_pointer;
+  Glib::Value<const Foo*> value_foo_const_pointer;
+
+// Glib::Object pointer
+  Glib::Value<Gtk::Widget*> value_widget_pointer;
+  Glib::Value<const Gtk::Widget*> value_widget_const_pointer;
+}
 
 // Glib::Object RefPtr<>
 
