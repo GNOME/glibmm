@@ -4,5 +4,5 @@ MAINTAINERCLEANFILES = $(built_sources)
 
 EXTRA_DIST = glibmmconfig.h glibmm.vcproj
 
-glibmmconfig.h: $(top_srcdir)/glib/glibmmconfig.h
+glibmmconfig.h: $(top_builddir)/glib/glibmmconfig.h
 	cp -f $< $@
