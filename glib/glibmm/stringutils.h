@@ -162,7 +162,7 @@ std::string strcompress(const std::string& source);
  *
  * @param errnum The system error number. See the standard C <tt>errno</tt> documentation.
  * @return A string describing the error code. If the error code is unknown,
- * <tt>"unknown error (<em>\<errnum\></em>)"</tt> is returned.
+ * <tt>&quot;unknown error (<em>\<errnum\></em>)&quot;</tt> is returned.
  */
 Glib::ustring strerror(int errnum);
 
@@ -173,7 +173,7 @@ Glib::ustring strerror(int errnum);
  *
  * @param signum The signal number. See the <tt>signal()</tt> documentation.
  * @return A string describing the signal. If the signal is unknown,
- * <tt>"unknown signal (<em>\<signum\></em>)"</tt> is returned.
+ * <tt>&quot;unknown signal (<em>\<signum\></em>)&quot;</tt> is returned.
  */
 Glib::ustring strsignal(int signum);
 
