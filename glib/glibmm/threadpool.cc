@@ -229,8 +229,6 @@ int ThreadPool::get_max_unused_threads()
   return g_thread_pool_get_max_unused_threads();
 }
 
-#ifndef GLIBMM_WIN32
-
 // static
 unsigned int ThreadPool::get_num_unused_threads()
 {
@@ -242,8 +240,6 @@ void ThreadPool::stop_unused_threads()
 {
   g_thread_pool_stop_unused_threads();
 }
-
-#endif /* GLIBMM_WIN32 */
 
 } // namespace Glib
 
