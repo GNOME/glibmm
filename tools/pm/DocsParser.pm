@@ -54,11 +54,12 @@ use warnings;
 
 #####################################
 
+$DocsParser::CurrentFile = "";
 
 $DocsParser::refAppendTo = undef; # string reference to store the data into
 $DocsParser::currentParam = undef;
 
-$DocsParser::objCurrentFunction = 0; #Function
+$DocsParser::objCurrentFunction = undef; #Function
 %DocsParser::hasharrayFunctions = (); #Function elements
 #~ $DocsParser::bOverride = 0; #First we parse the C docs, then we parse the C++ override docs.
 
@@ -69,31 +70,41 @@ $DocsParser::commentEnd = "   */";
 sub read_defs($$$)
 {
   my ($path, $filename, $filename_override) = @_;
-   
-  # check that the file is there.
-  my $filepath = "$path/$filename";
-  if ( ! -r $filepath)
-  {
-     print "DocsParser.pm: Error: can't read defs file $filename\n";
-     return;
-  }
-
-  my $filepath_override = "$path/$filename_override";
-  if ( ! -r $filepath_override)
-  {
-     print "DocsParser.pm: Error: can't read defs file $filename_override\n";
-     return;
-  }
- 
-  my $objParser = new XML::Parser();
+  
+  my $objParser = new XML::Parser(ErrorContext => 0);
   $objParser->setHandlers(Start => \&parse_on_start, End => \&parse_on_end, Char => \&parse_on_cdata);
+  
+  # C documentation:
+  $DocsParser::CurrentFile = "$path/$filename";
+  if ( ! -r $DocsParser::CurrentFile)
+  {
+     print "DocsParser.pm: Warning: Can't read file \"" . $DocsParser::CurrentFile . "\".\n";
+     return;
+  }
+  # Parse
+  eval { $objParser->parsefile($DocsParser::CurrentFile) };
+  if( $@ )
+  {
+    $@ =~ s/at \/.*?$//s;
+    print "\nError in \"" . $DocsParser::CurrentFile . "\":$@\n";
+    return;
+  }
 
-  # Parse the C docs:
-  $objParser->parsefile($filepath);
-
-  # Parse the C++ overide docs:
-  #~ $DocsParser::bOverride = 1; #The callbacks will act differently when this is set.
-  $objParser->parsefile($filepath_override);
+  # C++ overide documentation:
+  $DocsParser::CurrentFile = "$path/$filename_override";
+  if ( ! -r $DocsParser::CurrentFile)
+  {
+     print "DocsParser.pm: Warning: Can't read file \"" . $DocsParser::CurrentFile . "\".\n";
+     return;
+  }
+  # Parse
+  eval { $objParser->parsefile($DocsParser::CurrentFile) };
+  if( $@ )
+  {
+    $@ =~ s/at \/.*?$//s;
+    print "\nError in \"" . $DocsParser::CurrentFile . "\":$@";
+    return;
+  }
 }
 
 sub parse_on_start($$%)
@@ -104,6 +115,11 @@ sub parse_on_start($$%)
 
   if($tag eq "function")
   {
+    if(defined $DocsParser::objCurrentFunction)
+    {
+      $objParser->xpcroak("\nClose a function tag before you open another one.");
+    }
+    
     my $functionName = $attr{name};
 
     #Reuse existing Function, if it exists:
@@ -159,6 +175,10 @@ sub parse_on_start($$%)
   elsif($tag eq "mapping")
   {
     $$DocsParser::objCurrentFunction{mapped_class} = $attr{class};
+  }
+  elsif($tag ne "root")
+  {
+    $objParser->xpcroak("\nUnknown tag \"$tag\".");
   }
 }
 
@@ -227,7 +247,7 @@ sub lookup_documentation($)
 
   if(length($text) eq 0)
   {
-    print "DocsParser.pm: Warning: No C docs for function:$functionName :\n";
+    print "DocsParser.pm: Warning: No C docs for function: \"$functionName\"\n";
   }
   
       
@@ -265,8 +285,9 @@ sub append_parameter_docs($$)
   foreach my $param (@param_names)
   {
     my $desc = $$param_descriptions->{$param};
+    
+    $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
     DocsParser::convert_docs_to_cpp($obj_function, \$desc);
-
     if(length($desc) > 0)
     {
       $desc  .= '.' unless($desc =~ /(?:^|\.)$/);
@@ -322,7 +343,7 @@ sub convert_tags_to_doxygen($)
 
     # Some argument names are suffixed by "_" -- strip this.
     # gtk-doc uses @thearg, but doxygen uses @a thearg.
-    s" ?\@(\w*[A-Za-z0-9])_?\b" \@a $1 "g;
+    s" ?\@([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?\b" \@a $1 "g;
     s"^Note ?\d?: "\@note "mg;
 
     s"&lt;/?programlisting&gt;""g;
