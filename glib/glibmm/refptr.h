@@ -86,10 +86,6 @@ public:
   /// Copy from another RefPtr:
   inline RefPtr<T_CppObject>& operator=(const RefPtr<T_CppObject>& src);
 
-  // TODO: Get rid of this evilness.
-  /// For use only by the ::create() methods.
-  inline RefPtr<T_CppObject>& operator=(T_CppObject* pCppObject); 
-
   /** Copy from different, but castable type).
    *
    * Increments the reference count.
@@ -244,24 +240,6 @@ RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr<T_CppObject>& s
   //   object data is managed indirectly via a pointer, which is very common.
 
   RefPtr<T_CppObject> temp (src);
-  this->swap(temp);
-  return *this;
-}
-
-template <class T_CppObject> inline
-RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(T_CppObject* pCppObject)
-{
-  RefPtr<T_CppObject> temp (pCppObject);
-
-  // This extra reference is necessary because operator=(T_CppObject*) used
-  // to behave differently than the ctor RefPtr(T_CppObject*), i.e. it takes
-  // a reference.  Unfortunately we can't fix it at this point.
-  //
-  // TODO: This assignment operator should be removed entirely at the next API break.
-
-  if(pCppObject)
-    pCppObject->reference();
-
   this->swap(temp);
   return *this;
 }
