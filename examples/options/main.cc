@@ -62,7 +62,6 @@ ExampleOptionGroup::ExampleOptionGroup()
   
   Glib::OptionEntry entry4;
   entry4.set_long_name("activate_something");
-  entry4.set_short_name('a');
   entry4.set_description("Activate something");
   add_entry(entry4, m_arg_boolean);
   
