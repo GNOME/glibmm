@@ -8,7 +8,8 @@ web_path_reference = $(web_path_docs)reference
 
 EXTRA_DIST = README Doxyfile.in \
              glibmm_header.html_fragment glibmm_footer.html_fragment beautify_docs.pl \
-             html glibmm_doxygen_tags
+             html glibmm_doxygen_tags libstdc++.tag.xml
+#Ideally, libstdc++.tag.xml would be installed by gcc, instead of being copied into every project.
 
 html/index.html: $(doxygen_configfile_source) $(beautify_docs_source)
 	-rm -rf html
