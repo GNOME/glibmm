@@ -3,8 +3,7 @@ ACLOCAL_AMFLAGS	= -I scripts
 SUBDIRS		= tools glib examples docs scripts tests
 DIST_SUBDIRS	= $(SUBDIRS)
 
-EXTRA_DIST	= glibmm.spec.in \
-		  build_shared/Makefile_build.am_fragment \
+EXTRA_DIST	= build_shared/Makefile_build.am_fragment \
 		  build_shared/Makefile_build_gensrc.am_fragment \
 		  build_shared/Makefile_gensrc.am_fragment \
 		  build_shared/Makefile_gensrc_platform.am_fragment \
