@@ -30,7 +30,7 @@
 #include <glibmm/wrap.h>
 
 #include <glibmmconfig.h>
-GTKMM_USING_STD(vector)
+GLIBMM_USING_STD(vector)
 
 
 namespace

@@ -26,7 +26,7 @@
 
 // Some stuff that's useful when debugging gtkmm internals:
 
-#ifdef GTKMM_DEBUG_REFCOUNTING
+#ifdef GLIBMM_DEBUG_REFCOUNTING
 
 #include <glib/gmessages.h>
 
@@ -35,12 +35,12 @@
  * right (i.e. concatenation with string literals isn't allowed).
  */
 #ifdef __GNUC__
-#define GTKMM_GNUC_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#define GLIBMM_GNUC_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #else
-#define GTKMM_GNUC_PRETTY_FUNCTION ""
+#define GLIBMM_GNUC_PRETTY_FUNCTION ""
 #endif
 
-#define GTKMM_DEBUG_REFERENCE(cppInstance, cInstance)                               \
+#define GLIBMM_DEBUG_REFERENCE(cppInstance, cInstance)                               \
     G_STMT_START{                                                                   \
       void *const cppInstance__ = (void*) (cppInstance);                            \
       void *const cInstance__   = (void*) (cInstance);                              \
@@ -50,14 +50,14 @@
             "ref: C++ instance: %p; C instance: %p, ref_count = %u, type = %s\n",   \
             __FILE__,                                                               \
             __LINE__,                                                               \
-            GTKMM_GNUC_PRETTY_FUNCTION,                                             \
+            GLIBMM_GNUC_PRETTY_FUNCTION,                                             \
             cppInstance__,                                                          \
             cInstance__,                                                            \
             G_OBJECT(cInstance__)->ref_count,                                       \
             G_OBJECT_TYPE_NAME(cInstance__));                                       \
     }G_STMT_END
 
-#define GTKMM_DEBUG_UNREFERENCE(cppInstance, cInstance)                             \
+#define GLIBMM_DEBUG_UNREFERENCE(cppInstance, cInstance)                             \
     G_STMT_START{                                                                   \
       void *const cppInstance__ = (void*) (cppInstance);                            \
       void *const cInstance__   = (void*) (cInstance);                              \
@@ -67,7 +67,7 @@
             "unref: C++ instance: %p; C instance: %p, ref_count = %u, type = %s\n", \
             __FILE__,                                                               \
             __LINE__,                                                               \
-            GTKMM_GNUC_PRETTY_FUNCTION,                                             \
+            GLIBMM_GNUC_PRETTY_FUNCTION,                                             \
             cppInstance__,                                                          \
             cInstance__,                                                            \
             G_OBJECT(cInstance__)->ref_count,                                       \
@@ -76,10 +76,10 @@
 
 #else
 
-#define GTKMM_DEBUG_REFERENCE(cppInstance,cInstance)    G_STMT_START{ (void)0; }G_STMT_END
-#define GTKMM_DEBUG_UNREFERENCE(cppInstance,cInstance)  G_STMT_START{ (void)0; }G_STMT_END
+#define GLIBMM_DEBUG_REFERENCE(cppInstance,cInstance)    G_STMT_START{ (void)0; }G_STMT_END
+#define GLIBMM_DEBUG_UNREFERENCE(cppInstance,cInstance)  G_STMT_START{ (void)0; }G_STMT_END
 
-#endif /* GTKMM_DEBUG_REFCOUNTING */
+#endif /* GLIBMM_DEBUG_REFCOUNTING */
 
 #endif /* _GLIBMM_DEBUG_H */
 

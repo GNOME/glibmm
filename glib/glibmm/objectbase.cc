@@ -105,13 +105,13 @@ ObjectBase::~ObjectBase()
   //
   if(GObject *const gobject = gobject_)
   {
-#ifdef GTKMM_DEBUG_REFCOUNTING
+#ifdef GLIBMM_DEBUG_REFCOUNTING
     g_warning("(Glib::ObjectBase::~ObjectBase): gobject_ = %p", (void*) gobject_);
 #endif
 
     gobject_ = 0;
 
-#ifdef GTKMM_DEBUG_REFCOUNTING
+#ifdef GLIBMM_DEBUG_REFCOUNTING
     g_warning("(Glib::ObjectBase::~ObjectBase): before g_object_steal_qdata()");
 #endif
 
@@ -119,7 +119,7 @@ ObjectBase::~ObjectBase()
     // This does _not_ cause invocation of the destroy_notify callback.
     g_object_steal_qdata(gobject, quark_);
 
-#ifdef GTKMM_DEBUG_REFCOUNTING
+#ifdef GLIBMM_DEBUG_REFCOUNTING
     g_warning("(Glib::ObjectBase::~ObjectBase): calling g_object_unref()");
 #endif
 
@@ -130,14 +130,14 @@ ObjectBase::~ObjectBase()
 void ObjectBase::reference() const
 {
   // Completely replace the SigC::Object refcounting.
-  GTKMM_DEBUG_REFERENCE(this, gobject_);
+  GLIBMM_DEBUG_REFERENCE(this, gobject_);
   g_object_ref(gobject_);
 }
 
 void ObjectBase::unreference() const
 {
   // Completely replace the SigC::Object refcounting.
-  GTKMM_DEBUG_UNREFERENCE(this, gobject_);
+  GLIBMM_DEBUG_UNREFERENCE(this, gobject_);
   g_object_unref(gobject_);
 }
 
@@ -181,13 +181,13 @@ ObjectBase* ObjectBase::_get_current_wrapper(GObject* object)
 // static
 void ObjectBase::destroy_notify_callback_(void* data)
 {
-  //GTKMM_LIFECYCLE
+  //GLIBMM_LIFECYCLE
 
   // This method is called (indirectly) from g_object_run_dispose().
   // Get the C++ instance associated with the C instance:
   ObjectBase* cppObject = static_cast<ObjectBase*>(data); //Previously set with g_object_set_qdata_full().
 
-#ifdef GTKMM_DEBUG_REFCOUNTING
+#ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("ObjectBase::destroy_notify_callback_: cppObject=%10X, gobject_=%10X\n", cppObject, cppObject->gobject_);
   g_warning("  gtypename=%s\n", cppObject->gobject_);
 #endif
@@ -210,7 +210,7 @@ void ObjectBase::destroy_notify_()
   // the RefPtr<> destructor.  There should be no way to access the wrapper or
   // the undobjecterlying instance after that, so it's OK to delete this.
 
-#ifdef GTKMM_DEBUG_REFCOUNTING
+#ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Glib::ObjectBase::destroy_notify_: gobject_=%10X\n", gobject_);
 #endif
 

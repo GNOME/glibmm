@@ -24,7 +24,7 @@
 #include <list>
 #include <glibmmconfig.h>
 
-GTKMM_USING_STD(list)
+GLIBMM_USING_STD(list)
 
 
 namespace Glib
@@ -229,7 +229,7 @@ int ThreadPool::get_max_unused_threads()
   return g_thread_pool_get_max_unused_threads();
 }
 
-#ifndef GTKMM_WIN32
+#ifndef GLIBMM_WIN32
 
 // static
 unsigned int ThreadPool::get_num_unused_threads()
@@ -243,7 +243,7 @@ void ThreadPool::stop_unused_threads()
   g_thread_pool_stop_unused_threads();
 }
 
-#endif /* GTKMM_WIN32 */
+#endif /* GLIBMM_WIN32 */
 
 } // namespace Glib
 

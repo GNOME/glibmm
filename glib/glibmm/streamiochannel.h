@@ -25,9 +25,9 @@
 #include <glibmmconfig.h>
 #include <iosfwd>
 
-GTKMM_USING_STD(istream)
-GTKMM_USING_STD(ostream)
-GTKMM_USING_STD(iostream)
+GLIBMM_USING_STD(istream)
+GLIBMM_USING_STD(ostream)
+GLIBMM_USING_STD(iostream)
 
 
 namespace Glib

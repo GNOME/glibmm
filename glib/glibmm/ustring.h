@@ -29,17 +29,17 @@
 #include <string>
 
 #include <glibmmconfig.h>
-GTKMM_USING_STD(bidirectional_iterator_tag)
-GTKMM_USING_STD(reverse_iterator)
-GTKMM_USING_STD(string)
-GTKMM_USING_STD(istream)
-GTKMM_USING_STD(ostream)
+GLIBMM_USING_STD(bidirectional_iterator_tag)
+GLIBMM_USING_STD(reverse_iterator)
+GLIBMM_USING_STD(string)
+GLIBMM_USING_STD(istream)
+GLIBMM_USING_STD(ostream)
 
-#ifdef GTKMM_HAVE_STD_ITERATOR_TRAITS
-GTKMM_USING_STD(iterator_traits)
+#ifdef GLIBMM_HAVE_STD_ITERATOR_TRAITS
+GLIBMM_USING_STD(iterator_traits)
 #else
 #include <cstddef> /* for ptrdiff_t */
-GTKMM_USING_STD(random_access_iterator_tag)
+GLIBMM_USING_STD(random_access_iterator_tag)
 #endif
 
 
@@ -47,7 +47,7 @@ namespace Glib
 {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#ifndef GTKMM_HAVE_STD_ITERATOR_TRAITS
+#ifndef GLIBMM_HAVE_STD_ITERATOR_TRAITS
 
 template <class T>
 struct IteratorTraits
@@ -79,7 +79,7 @@ struct IteratorTraits<const T*>
   typedef const T&                        reference;
 };
 
-#endif /* GTKMM_HAVE_STD_ITERATOR_TRAITS */
+#endif /* GLIBMM_HAVE_STD_ITERATOR_TRAITS */
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 
@@ -209,7 +209,7 @@ public:
   typedef ustring_Iterator<std::string::iterator>       iterator;
   typedef ustring_Iterator<std::string::const_iterator> const_iterator;
 
-#ifndef GTKMM_HAVE_SUN_REVERSE_ITERATOR
+#ifndef GLIBMM_HAVE_SUN_REVERSE_ITERATOR
 
   typedef std::reverse_iterator<iterator>               reverse_iterator;
   typedef std::reverse_iterator<const_iterator>         const_reverse_iterator;
@@ -229,7 +229,7 @@ public:
                                 const_iterator::pointer,
                                 const_iterator::difference_type> const_reverse_iterator;
 
-#endif /* GTKMM_HAVE_SUN_REVERSE_ITERATOR */
+#endif /* GLIBMM_HAVE_SUN_REVERSE_ITERATOR */
 
   static const size_type npos = std::string::npos;
 
@@ -524,7 +524,7 @@ private:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#ifdef GTKMM_HAVE_STD_ITERATOR_TRAITS
+#ifdef GLIBMM_HAVE_STD_ITERATOR_TRAITS
   template <class In, class ValueType = typename std::iterator_traits<In>::value_type>
 #else
   template <class In, class ValueType = typename Glib::IteratorTraits<In>::value_type>

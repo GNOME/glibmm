@@ -22,7 +22,7 @@
 #include <fstream>
 #include <iostream>
 
-GTKMM_USING_STD(ios)
+GLIBMM_USING_STD(ios)
 
 
 namespace Glib

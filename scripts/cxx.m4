@@ -89,12 +89,12 @@ AC_TRY_COMPILE(
 
 
 dnl
-dnl GTKMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES(ACTION_FOUND,ACTION_NOT_FOUND)
+dnl GLIBMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES(ACTION_FOUND,ACTION_NOT_FOUND)
 dnl
 dnl Test whether the compiler allows member functions to refer to spezialized member function templates.
 dnl Some compilers have problems with this. gcc 2.95.3 aborts with an internal compiler error.
 dnl
-AC_DEFUN([GTKMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[
+AC_DEFUN([GLIBMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[
 AC_MSG_CHECKING([if C++ compiler allows member functions to refer to member templates])
 AC_TRY_COMPILE(
 [
@@ -128,11 +128,11 @@ AC_TRY_COMPILE(
   }
 ],[],[
   gtkmm_cxx_member_functions_member_templates=yes
-  AC_DEFINE([GTKMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[1],[does the C++ compiler allow member functions to refer to member templates])
+  AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[1],[does the C++ compiler allow member functions to refer to member templates])
   AC_MSG_RESULT([$gtkmm_cxx_member_functions_member_templates])
 ],[
   gtkmm_cxx_member_functions_member_templates=no
-  AC_DEFINE([GTKMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[0])
+  AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[0])
   AC_MSG_RESULT([$gtkmm_cxx_member_functions_member_templates])
 ])
 ])

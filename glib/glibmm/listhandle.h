@@ -317,7 +317,7 @@ template <class T, class Tr>
 inline
 ListHandle<T,Tr>::operator std::vector<U>() const
 {
-#ifdef GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   return std::vector<U>(this->begin(), this->end());
 #else
   std::vector<U> temp;
@@ -332,7 +332,7 @@ template <class T, class Tr>
 inline
 ListHandle<T,Tr>::operator std::deque<U>() const
 {
-#ifdef GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   return std::deque<U>(this->begin(), this->end());
 #else
   std::deque<U> temp;
@@ -346,7 +346,7 @@ template <class T, class Tr>
 inline
 ListHandle<T,Tr>::operator std::list<U>() const
 {
-#ifdef GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   return std::list<U>(this->begin(), this->end());
 #else
   std::list<U> temp;
@@ -360,7 +360,7 @@ template <class T, class Tr>
 inline
 void ListHandle<T,Tr>::assign_to(Cont& container) const
 {
-#ifdef GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   container.assign(this->begin(), this->end());
 #else
   Cont temp;

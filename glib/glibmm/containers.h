@@ -30,8 +30,8 @@
 #include <iterator>
 #include <glibmmconfig.h>
 
-GTKMM_USING_STD(bidirectional_iterator_tag)
-GTKMM_USING_STD(forward_iterator_tag)
+GLIBMM_USING_STD(bidirectional_iterator_tag)
+GLIBMM_USING_STD(forward_iterator_tag)
 
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

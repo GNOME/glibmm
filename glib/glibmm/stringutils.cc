@@ -25,9 +25,9 @@
 #include <stdexcept>
 #include <glibmmconfig.h>
 
-GTKMM_USING_STD(out_of_range)
-GTKMM_USING_STD(overflow_error)
-GTKMM_USING_STD(underflow_error)
+GLIBMM_USING_STD(out_of_range)
+GLIBMM_USING_STD(overflow_error)
+GLIBMM_USING_STD(underflow_error)
 
 
 bool Glib::str_has_prefix(const std::string& str, const std::string& prefix)

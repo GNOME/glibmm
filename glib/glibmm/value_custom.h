@@ -28,7 +28,7 @@
 #include <typeinfo>
 #include <glibmmconfig.h>
 
-GTKMM_USING_STD(nothrow)
+GLIBMM_USING_STD(nothrow)
 
 
 namespace Glib

@@ -36,13 +36,13 @@
 #include <glibmm/debug.h>
 
 #include <glibmmconfig.h>
-GTKMM_USING_STD(forward_iterator_tag)
-GTKMM_USING_STD(random_access_iterator_tag)
-GTKMM_USING_STD(distance)
-GTKMM_USING_STD(copy)
-GTKMM_USING_STD(vector)
-GTKMM_USING_STD(deque)
-GTKMM_USING_STD(list)
+GLIBMM_USING_STD(forward_iterator_tag)
+GLIBMM_USING_STD(random_access_iterator_tag)
+GLIBMM_USING_STD(distance)
+GLIBMM_USING_STD(copy)
+GLIBMM_USING_STD(vector)
+GLIBMM_USING_STD(deque)
+GLIBMM_USING_STD(list)
 
 
 namespace Glib
@@ -142,7 +142,7 @@ struct TypeTraits<T*>
   static CppType to_cpp_type    (CType   ptr) { return Glib::wrap(ptr, false); }
   static void    release_c_type (CType   ptr)
   {
-    GTKMM_DEBUG_UNREFERENCE(0, ptr);
+    GLIBMM_DEBUG_UNREFERENCE(0, ptr);
     g_object_unref(ptr);
   }
 };
@@ -162,7 +162,7 @@ struct TypeTraits<const T*>
   static CppType to_cpp_type    (CType   ptr) { return Glib::wrap(ptr, false); }
   static void    release_c_type (CType   ptr)
   {
-    GTKMM_DEBUG_UNREFERENCE(0, ptr);
+    GLIBMM_DEBUG_UNREFERENCE(0, ptr);
     g_object_unref(const_cast<CTypeNonConst>(ptr));
   }
 };
@@ -183,7 +183,7 @@ struct TypeTraits< Glib::RefPtr<T> >
   static CppType to_cpp_type    (CType          ptr) { return Glib::wrap(ptr, true); }
   static void    release_c_type (CType          ptr)
   {
-    GTKMM_DEBUG_UNREFERENCE(0, ptr);
+    GLIBMM_DEBUG_UNREFERENCE(0, ptr);
     g_object_unref(ptr);
   }
 };
@@ -204,7 +204,7 @@ struct TypeTraits< Glib::RefPtr<const T> >
   static CppType to_cpp_type    (CType          ptr) { return Glib::wrap(ptr, true); }
   static void    release_c_type (CType          ptr)
   {
-    GTKMM_DEBUG_UNREFERENCE(0, ptr);
+    GLIBMM_DEBUG_UNREFERENCE(0, ptr);
     g_object_unref(const_cast<CTypeNonConst>(ptr));
   }
 };
@@ -261,7 +261,7 @@ struct TypeTraits<std::string>
 
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#ifndef GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+#ifndef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
 
 /* The STL containers in Sun's libCstd don't support templated sequence
  * constructors, for "backward compatibility" reasons.  This helper function
@@ -274,7 +274,7 @@ void fill_container(Cont& container, In pbegin, In pend)
     container.push_back(*pbegin);
 }
 
-#endif /* GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS */
+#endif /* GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS */
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Container_Helpers

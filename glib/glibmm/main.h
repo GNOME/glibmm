@@ -31,7 +31,7 @@
 #include <glibmm/refptr.h>
 #include <glibmm/timeval.h>
 
-GTKMM_USING_STD(vector)
+GLIBMM_USING_STD(vector)
 
 
 namespace Glib

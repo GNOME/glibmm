@@ -1,13 +1,13 @@
 
-## GTKMM_CXX_HAS_NAMESPACE_STD()
+## GLIBMM_CXX_HAS_NAMESPACE_STD()
 ##
 ## Test whether libstdc++ declares namespace std.  For safety,
 ## also check whether several randomly selected STL symbols
 ## are available in namespace std.
 ##
-## On success, #define GTKMM_HAVE_NAMESPACE_STD to 1.
+## On success, #define GLIBMM_HAVE_NAMESPACE_STD to 1.
 ##
-AC_DEFUN([GTKMM_CXX_HAS_NAMESPACE_STD],
+AC_DEFUN([GLIBMM_CXX_HAS_NAMESPACE_STD],
 [
   AC_CACHE_CHECK(
     [whether C++ library symbols are declared in namespace std],
@@ -35,20 +35,20 @@ AC_DEFUN([GTKMM_CXX_HAS_NAMESPACE_STD],
 
   if test "x${gtkmm_cv_cxx_has_namespace_std}" = "xyes"; then
   {
-    AC_DEFINE([GTKMM_HAVE_NAMESPACE_STD],[1])
+    AC_DEFINE([GLIBMM_HAVE_NAMESPACE_STD],[1])
   }
   fi
 ])
 
 
-## GTKMM_CXX_HAS_STD_ITERATOR_TRAITS()
+## GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS()
 ##
 ## Check for standard-conform std::iterator_traits<>, and
-## #define GTKMM_HAVE_STD_ITERATOR_TRAITS on success.
+## #define GLIBMM_HAVE_STD_ITERATOR_TRAITS on success.
 ##
-AC_DEFUN([GTKMM_CXX_HAS_STD_ITERATOR_TRAITS],
+AC_DEFUN([GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS],
 [
-  AC_REQUIRE([GTKMM_CXX_HAS_NAMESPACE_STD])
+  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
 
   AC_CACHE_CHECK(
     [whether the C++ library supports std::iterator_traits],
@@ -57,7 +57,7 @@ AC_DEFUN([GTKMM_CXX_HAS_STD_ITERATOR_TRAITS],
     AC_TRY_COMPILE(
     [
       #include <iterator>
-      #ifdef GTKMM_HAVE_NAMESPACE_STD
+      #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
       #endif
     ],[
@@ -70,20 +70,20 @@ AC_DEFUN([GTKMM_CXX_HAS_STD_ITERATOR_TRAITS],
 
   if test "x${gtkmm_cv_cxx_has_std_iterator_traits}" = "xyes"; then
   {
-    AC_DEFINE([GTKMM_HAVE_STD_ITERATOR_TRAITS],[1])
+    AC_DEFINE([GLIBMM_HAVE_STD_ITERATOR_TRAITS],[1])
   }
   fi
 ])
 
 
-## GTKMM_CXX_HAS_SUN_REVERSE_ITERATOR()
+## GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR()
 ##
 ## Check for Sun libCstd style std::reverse_iterator,
-## and #define GTKMM_HAVE_SUN_REVERSE_ITERATOR if found.
+## and #define GLIBMM_HAVE_SUN_REVERSE_ITERATOR if found.
 ##
-AC_DEFUN([GTKMM_CXX_HAS_SUN_REVERSE_ITERATOR],
+AC_DEFUN([GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR],
 [
-  AC_REQUIRE([GTKMM_CXX_HAS_NAMESPACE_STD])
+  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
 
   AC_CACHE_CHECK(
     [for non-standard Sun libCstd reverse_iterator],
@@ -92,7 +92,7 @@ AC_DEFUN([GTKMM_CXX_HAS_SUN_REVERSE_ITERATOR],
     AC_TRY_COMPILE(
     [
       #include <iterator>
-      #ifdef GTKMM_HAVE_NAMESPACE_STD
+      #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
       #endif
     ],[
@@ -105,20 +105,20 @@ AC_DEFUN([GTKMM_CXX_HAS_SUN_REVERSE_ITERATOR],
 
   if test "x${gtkmm_cv_cxx_has_sun_reverse_iterator}" = "xyes"; then
   {
-    AC_DEFINE([GTKMM_HAVE_SUN_REVERSE_ITERATOR],[1])
+    AC_DEFINE([GLIBMM_HAVE_SUN_REVERSE_ITERATOR],[1])
   }
   fi
 ])
 
 
-## GTKMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS()
+## GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS()
 ##
 ## Check whether the STL containers have templated sequence ctors,
-## and #define GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS on success.
+## and #define GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS on success.
 ##
-AC_DEFUN([GTKMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
+AC_DEFUN([GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
 [
-  AC_REQUIRE([GTKMM_CXX_HAS_NAMESPACE_STD])
+  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
 
   AC_CACHE_CHECK(
     [whether STL containers have templated sequence constructors],
@@ -129,7 +129,7 @@ AC_DEFUN([GTKMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
       #include <vector>
       #include <deque>
       #include <list>
-      #ifdef GTKMM_HAVE_NAMESPACE_STD
+      #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
       #endif
     ],[
@@ -146,7 +146,7 @@ AC_DEFUN([GTKMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
 
   if test "x${gtkmm_cv_cxx_has_template_sequence_ctors}" = "xyes"; then
   {
-    AC_DEFINE([GTKMM_HAVE_TEMPLATE_SEQUENCE_CTORS],[1])
+    AC_DEFINE([GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS],[1])
   }
   fi
 ])

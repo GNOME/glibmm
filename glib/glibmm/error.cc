@@ -28,7 +28,7 @@
 #include <glibmm/error.h>
 #include <glibmm/wrap_init.h>
 
-GTKMM_USING_STD(map)
+GLIBMM_USING_STD(map)
 
 
 namespace

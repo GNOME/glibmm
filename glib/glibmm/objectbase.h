@@ -26,7 +26,7 @@
 #include <glibmmconfig.h>
 #include <glibmm/debug.h>
 
-GTKMM_USING_STD(type_info)
+GLIBMM_USING_STD(type_info)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" { typedef struct _GObject GObject; }

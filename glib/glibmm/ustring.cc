@@ -27,7 +27,7 @@
 #include <iostream>
 
 #include <glibmmconfig.h>
-GTKMM_USING_STD(find)
+GLIBMM_USING_STD(find)
 
 
 namespace

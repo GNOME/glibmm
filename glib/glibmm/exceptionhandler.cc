@@ -29,8 +29,8 @@
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/thread.h>
 
-GTKMM_USING_STD(exception)
-GTKMM_USING_STD(list)
+GLIBMM_USING_STD(exception)
+GLIBMM_USING_STD(list)
 
 
 namespace

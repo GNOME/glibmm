@@ -27,7 +27,7 @@
 #include <glib/gmessages.h>
 #include <algorithm>
 
-GTKMM_USING_STD(min)
+GLIBMM_USING_STD(min)
 
 
 namespace
