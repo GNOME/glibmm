@@ -156,6 +156,9 @@ struct TypeTraits<T*>
   }
 };
 
+//This confuse the SUN Forte compiler, so we ifdef it out:
+#ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS 
+
 /** Partial specialization for pointers to const GtkObject instances.
  * @ingroup ContHelpers
  */
@@ -184,6 +187,7 @@ struct TypeTraits<const T*>
     g_object_unref(const_cast<CTypeNonConst>(ptr));
   }
 };
+#endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for pointers to GObject instances.
  * @ingroup ContHelpers
@@ -206,6 +210,9 @@ struct TypeTraits< Glib::RefPtr<T> >
   }
 };
 
+//This confuse the SUN Forte compiler, so we ifdef it out:
+#ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
 /** Partial specialization for pointers to const GObject instances.
  * @ingroup ContHelpers
  * The C++ type is always a Glib::RefPtr<>.
@@ -226,6 +233,8 @@ struct TypeTraits< Glib::RefPtr<const T> >
     g_object_unref(const_cast<CTypeNonConst>(ptr));
   }
 };
+
+#endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Specialization for UTF-8 strings.
  * @ingroup ContHelpers

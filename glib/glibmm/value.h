@@ -206,7 +206,6 @@ public:
   CppType get() const           { return CppType(static_cast<CType>(get_boxed())); }
 };
 
-
 /** Partial specialization for RefPtr<> to Glib::Object.
  * @ingroup glibmmValue
  */
@@ -223,6 +222,9 @@ public:
   CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
 
+//The SUN Forte Compiler has a problem with this: 
+#ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+
 /** Partial specialization for RefPtr<> to const Glib::Object.
  * @ingroup glibmmValue
  */
@@ -238,6 +240,7 @@ public:
   void set(const CppType& data) { set_object(const_cast<T*>(data.operator->())); }
   CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
+#endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 } // namespace Glib
 
