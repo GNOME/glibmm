@@ -159,7 +159,7 @@ struct TypeTraits<const T*>
 
   static CType   to_c_type      (CppType ptr) { return Glib::unwrap(ptr);      }
   static CType   to_c_type      (CType   ptr) { return ptr;                    }
-  static CppType to_cpp_type    (CType   ptr) { return Glib::wrap(ptr, false); }
+  static CppType to_cpp_type    (CType   ptr) { return Glib::wrap(const_cast<CTypeNonConst>(ptr), false); /* TODO: Allow wrap() to take a const. */}
   static void    release_c_type (CType   ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
