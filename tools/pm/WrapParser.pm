@@ -1084,6 +1084,12 @@ sub on_wrap_property($)
   my $argPropertyName = $args[0];
   $argPropertyName = string_trim($argPropertyName);
   $argPropertyName = string_unquote($argPropertyName);
+
+  #Convert the property name to a canonical form, as it is inside gobject.
+  #Otherwise, gobject might not recognise the name, 
+  #and we will not recognise the property name when we get notification that the value changes.
+  $argPropertyName =~ s/_/-/g; #g means replace all.
+
   my $argCppType = $args[1];
   $argCppType = string_trim($argCppType);
   $argCppType = string_unquote($argCppType);
