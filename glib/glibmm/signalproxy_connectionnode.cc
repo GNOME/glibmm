@@ -30,9 +30,9 @@ namespace Glib
 
 SignalProxyConnectionNode::SignalProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject)
 :
-  slot_ (slot),
   connection_id_ (0),
-  object_ (gobject)
+  slot_          (slot),
+  object_        (gobject)
 {
   slot_.set_parent(this, &SignalProxyConnectionNode::notify);
 }
@@ -59,6 +59,8 @@ void* SignalProxyConnectionNode::notify(void* data)
 
     delete conn; // if there are connection objects referring to slot_ they are notified during destruction of slot_
   }
+
+  return 0; // apparently unused in libsigc++
 }
 
 //static
