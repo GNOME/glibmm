@@ -62,14 +62,16 @@ void* SourceConnectionNode::notify(void* data)
 {
   SourceConnectionNode *const self = static_cast<SourceConnectionNode*>(data);
 
-  // if there is no object, this call was triggered from destroy_notify_handler().
+  // if there is no object, this call was triggered from destroy_notify_handler(),
+  // because we set self->source_ to 0 there:
   if (self->source_)
   {
     GSource* s = self->source_;  
     self->source_ = 0;
     g_source_destroy(s);
 
-    delete self;
+    // Destroying the object triggers execution of destroy_notify_handler(),
+    // eiter immediately or later, so we leave that to do the deletion.
   }
 
   return 0;
@@ -80,8 +82,7 @@ void SourceConnectionNode::destroy_notify_callback(void* data)
 {
   SourceConnectionNode *const self = static_cast<SourceConnectionNode*>(data);
 
-  // if there is no object, this call was triggered from notify().
-  if (self->source_)
+  if (self)
   {
     // The GLib side is disconnected now, thus the GSource* is no longer valid.
     self->source_ = 0;
