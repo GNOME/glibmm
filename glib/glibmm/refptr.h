@@ -53,7 +53,7 @@ class RefPtr
 public:
   /** Default constructor
    *
-   * Afterwards is_null() will return true and use of -> will cause a segmentation fault.
+   * Afterwards it will be null and use of -> will cause a segmentation fault.
    */
   inline RefPtr();
   
@@ -116,12 +116,9 @@ public:
    */
   inline operator bool() const;
 
-  /// Test whether the RefPtr<> points to any underlying instance.
-  inline bool is_null() const;  // whether there is no underlying instance
-
-  
   /// Set underlying instance to 0, decrementing reference count of existing instance appropriately.
   inline void clear();
+
 
   /** Dynamic cast to derived class.
    *
@@ -270,12 +267,6 @@ template <class T_CppObject> inline
 RefPtr<T_CppObject>::operator bool() const
 {
   return (pCppObject_ != 0);
-}
-
-template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::is_null() const
-{
-  return (pCppObject_ == 0);
 }
 
 template <class T_CppObject> inline

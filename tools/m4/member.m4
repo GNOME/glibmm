@@ -45,7 +45,7 @@ Glib::RefPtr<$3> __CPPNAME__::get_$1()
   Glib::RefPtr<$3> ref_ptr(_CONVERT($4,Glib::RefPtr<$3>,`gobj()->$2'));
 
 dnl We could use the bool with Glib::wrap(), but we want to share the m4 type-conversion map.
-  if(!ref_ptr.is_null())
+  if(ref_ptr)
     ref_ptr->reference();
 
   return ref_ptr;
@@ -56,7 +56,7 @@ Glib::RefPtr<const $3> __CPPNAME__::get_$1() const
   Glib::RefPtr<const $3> ref_ptr(_CONVERT($4,Glib::RefPtr<const $3>,`gobj()->$2'));
 
 dnl We could use the bool with Glib::wrap(), but we want to share the m4 type-conversion map.
-  if(!ref_ptr.is_null())
+  if(ref_ptr)
     ref_ptr->reference();
 
   return ref_ptr;
@@ -97,7 +97,7 @@ void __CPPNAME__::set_$1(const Glib::RefPtr<$3>& value)
 {
   Glib::RefPtr<$3> valueOld(_CONVERT($4,Glib::RefPtr<$3>,`gobj()->$2')); //Take possession of the old one, unref-ing it in the destructor.
 
-  if(!(value.is_null()))
+  if(value)
     value->reference(); //Ref once for the recipient.
 
   gobj()->$2 = _CONVERT(const Glib::RefPtr<$3>&,$4,`value');

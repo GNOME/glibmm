@@ -79,7 +79,7 @@ const typename T::BaseObjectType* unwrap(const T* ptr)
 template <class T> inline
 typename T::BaseObjectType* unwrap(const Glib::RefPtr<T>& ptr)
 {
-  return (!ptr.is_null()) ? ptr->gobj() : 0;
+  return (ptr) ? ptr->gobj() : 0;
 }
 
 /** Get the underlying C instance from the C++ instance.  This is just
@@ -88,7 +88,7 @@ typename T::BaseObjectType* unwrap(const Glib::RefPtr<T>& ptr)
 template <class T> inline
 const typename T::BaseObjectType* unwrap(const Glib::RefPtr<const T>& ptr)
 {
-  return (!ptr.is_null()) ? ptr->gobj() : 0;
+  return (ptr) ? ptr->gobj() : 0;
 }
 
 /** Get the underlying C instance from the C++ instance and acquire a
@@ -98,7 +98,7 @@ const typename T::BaseObjectType* unwrap(const Glib::RefPtr<const T>& ptr)
 template <class T> inline
 typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<T>& ptr)
 {
-  return (!ptr.is_null()) ? ptr->gobj_copy() : 0;
+  return (ptr) ? ptr->gobj_copy() : 0;
 }
 
 /** Get the underlying C instance from the C++ instance and acquire a
@@ -108,7 +108,7 @@ typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<T>& ptr)
 template <class T> inline
 const typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<const T>& ptr)
 {
-  return (!ptr.is_null()) ? ptr->gobj_copy() : 0;
+  return (ptr) ? ptr->gobj_copy() : 0;
 }
 
 } // namespace Glib
