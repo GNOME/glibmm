@@ -100,7 +100,7 @@ void Value_value_init_func(GValue* value);
 void Value_value_free_func(GValue* value);
 void Value_value_copy_func(const GValue* src_value, GValue* dest_value);
 
-//For some reason, the IRIX MipsPro compiler needs these to be defined here.
+//For some reason, the Tru64 compiler needs these to be defined here.
 //Otherwise, it says "function was referenced but not defined".
 //murrayc
 
@@ -220,7 +220,7 @@ void Value_Pointer<T,PtrT>::set_(PtrT data, Glib::Object*)
   set_object(const_cast<T*>(data));
 }
 
-//More spec-compliant compilers (such as IRIX MipsPro) need this to be near Glib::Object instead.
+//More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
 #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 template <class T, class PtrT> inline
 PtrT Value_Pointer<T,PtrT>::get_(Glib::Object*) const

@@ -217,7 +217,7 @@ public:
   CppType get() const           { return CppType(static_cast<CType>(get_boxed())); }
 };
 
-//More spec-compliant compilers (such as IRIX MipsPro) need this to be near Glib::Object instead.
+//More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
 #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 /** Partial specialization for RefPtr<> to Glib::Object.
