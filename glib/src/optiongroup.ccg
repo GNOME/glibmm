@@ -142,7 +142,7 @@ void OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg ar
     map_entries_[name] = cppEntry;
   
     //Give the information to the C API:
-    cppEntry.entry_ = new OptionEntry(entry);
+    cppEntry.entry_ = new OptionEntry(entry); //g_option_group_add_entry() does not take its own copy, so we must keep the instance alive.*/
     cppEntry.entry_->gobj()->arg = arg_type;
     cppEntry.entry_->gobj()->arg_data = cppEntry.carg_;
     
