@@ -321,7 +321,9 @@ _POP()
 
 define(`_PINCLUDE', defn(`_PH_INCLUDE'))
 
-# Put these, for instance, around gtkmmproc macros to make the #ifndef appear around the generated code in both the .h and .cc files.
+# Put these, for instance, around gtkmmproc macros (_WRAP_SIGNAL) 
+# to make the #ifndef appear around the generated code in both the .h 
+# and .cc files.
 # e.g.  _GTKMMPROC_H_AND_CC(#ifndef _SUN_CC_)
 # e.g.  _GTKMMPROC_H_AND_CC(#endif //_SUN_CC_)
 # _GTKMMPROC_H_AND_CC(code)
@@ -333,6 +335,38 @@ $1
 _POP()
 ')dnl
 
+# Same thing as _GTKMMPROC_H_AND_CC but for signals (_WRAP_SIGNAL)
+define(`_GTKMMPROC_SIGNAL_H_AND_CC',`dnl
+$1
+_PUSH(SECTION_ANONYMOUS_NAMESPACE)
+$1
+_POP()
+
+$1
+_PUSH(SECTION_H_DEFAULT_SIGNAL_HANDLERS)
+$1
+_POP()
+
+$1
+_PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
+$1
+_POP()
+
+$1
+_PUSH(SECTION_CC_DEFAULT_SIGNAL_HANDLERS)
+$1
+_POP()
+
+$1
+_PUSH(SECTION_PCC_DEFAULT_SIGNAL_HANDLERS)
+$1
+_POP()
+
+$1
+_PUSH(SECTION_CC_SIGNALPROXIES)
+$1
+_POP()
+')dnl
 
 m4_include(class_shared.m4)
 m4_include(class_generic.m4)
