@@ -26,29 +26,23 @@ namespace Glib
 {
 
 OptionEntry::OptionEntry()
-: gobject_( new GOptionEntry() ), owns_gobject_(true)
+: gobject_( new GOptionEntry() )
 {
   gobject_ = g_new0(GOptionEntry, 1);
 }
 
-OptionEntry::OptionEntry(GOptionEntry* castitem)
-: gobject_(castitem), owns_gobject_(false)
-{
-}
-
 OptionEntry::~OptionEntry()
 {
-  if(owns_gobject_)
-  { 
-    g_free(const_cast<char*>(gobject_->long_name));  
-    g_free(const_cast<char*>(gobject_->description));
-    g_free(const_cast<char*>(gobject_->arg_description));
-    g_free(gobject_);
-  }  
+  g_free(const_cast<char*>(gobject_->long_name));  
+  g_free(const_cast<char*>(gobject_->description));
+  g_free(const_cast<char*>(gobject_->arg_description));
+  g_free(gobject_);  
 }
 
 OptionEntry::OptionEntry(const OptionEntry& src)
 {
+  gobject_ = g_new0(GOptionEntry, 1);
+  
   operator=(src);
 }
 
@@ -56,19 +50,26 @@ OptionEntry& OptionEntry::operator=(const OptionEntry& src)
 {
   if(this != &src)
   {
-    g_free(const_cast<char*>(gobject_->long_name));
+    if(gobject_->long_name)
+      g_free(const_cast<char*>(gobject_->long_name));
+      
     gobject_->long_name = g_strdup(src.gobject_->long_name);
 
-    gobject_->short_name = gobject_->short_name; //It's just one char.
+    if(gobject_->short_name)
+      gobject_->short_name = gobject_->short_name; //It's just one char.
     
     gobject_->flags = src.gobject_->flags;
     gobject_->arg = src.gobject_->arg;
     gobject_->arg_data = src.gobject_->arg_data; //Shared, because it's not owned by any instance of this class anyway.
     
-    g_free(const_cast<char*>(gobject_->description));    
+    if(gobject_->description)
+      g_free(const_cast<char*>(gobject_->description));    
+    
     gobject_->description = g_strdup(src.gobject_->description);
     
-    g_free(const_cast<char*>(gobject_->arg_description));    
+    if(gobject_->arg_description)
+      g_free(const_cast<char*>(gobject_->arg_description));
+        
     gobject_->arg_description = g_strdup(src.gobject_->arg_description);
   }
   
@@ -84,6 +85,8 @@ void OptionEntry::set_arg_data(OptionArg arg_type, void* data)
     gobject_->arg_data = data;
   }
 }
+
+   
 
 } // namespace Glib
 

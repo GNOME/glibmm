@@ -48,7 +48,6 @@ public:
 
   OptionEntry();
   OptionEntry(const OptionEntry& src);
-  explicit OptionEntry(GOptionEntry* castitem);
   virtual ~OptionEntry();
   
   OptionEntry& operator=(const OptionEntry& src);
@@ -68,11 +67,20 @@ public:
   //TODO: Use template specializations to avoid the OptionArg parameter?
   void set_arg_data(OptionArg arg_type, void* data);
   
-  _MEMBER_GET(arg, arg, OptionArg, GOptionArg)
-  _MEMBER_GET(arg_data, arg_data, void*, void*)
+  
+  //TODO: Is this ever used? G_OPTION_ARG_NONE,
+  
+  //TODO: G_OPTION_ARG_CALLBACK,
+
+  //TODO: Remove these?        
+  //_MEMBER_GET(arg, arg, OptionArg, GOptionArg)
+  //_MEMBER_GET(arg_data, arg_data, void*, void*)
 
     
   _MEMBER_GET(description, description, Glib::ustring, const char*)
+  _MEMBER_SET(description, description, Glib::ustring, const char*)
+  
+  _MEMBER_GET(arg_description, arg_description, Glib::ustring, const char*)
   _MEMBER_SET(arg_description, arg_description, Glib::ustring, const char*)
   
   GOptionEntry*       gobj()       { return gobject_; }
@@ -81,7 +89,6 @@ public:
 protected:
 
   GOptionEntry* gobject_;
-  bool owns_gobject_;
 };
 
 } // namespace Glib

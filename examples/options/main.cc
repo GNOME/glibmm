@@ -33,9 +33,7 @@ public:
   //and as long as the OptionContext to which those OptionGroups are added.
   int m_arg_foo;
   int m_arg_bar;
-  
-protected:
-  Glib::OptionEntry m_entry1, m_entry2; // These are member variables, so that they live as long as the OptionGroup.
+  Glib::ustring m_arg_goo;
 };
 
 ExampleOptionGroup::ExampleOptionGroup()
@@ -43,17 +41,23 @@ ExampleOptionGroup::ExampleOptionGroup()
   m_arg_foo(0),
   m_arg_bar(0)
 {
-  m_entry1.set_long_name("foo");
-  m_entry1.set_short_name('f');
-  m_entry1.set_arg_data(Glib::OPTION_ARG_INT, &m_arg_foo);
-
-  add_entry(m_entry1);
+  Glib::OptionEntry entry1;
+  entry1.set_long_name("foo");
+  entry1.set_short_name('f');
+  entry1.set_description("The Foo");
+  add_entry(entry1, m_arg_foo);
       
-  m_entry2.set_long_name("bar");
-  m_entry2.set_short_name('b');
-  m_entry2.set_arg_data(Glib::OPTION_ARG_INT, &m_arg_bar);
-  
-  add_entry(m_entry2);
+  Glib::OptionEntry entry2;
+  entry2.set_long_name("bar");
+  entry2.set_short_name('b');
+  entry2.set_description("The Bar");
+  add_entry(entry2, m_arg_bar);
+ 
+  Glib::OptionEntry entry3;
+  entry3.set_long_name("goo");
+  entry3.set_short_name('g');
+  entry3.set_description("The Goo");
+  add_entry(entry3, m_arg_goo);
 }
 
 bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
@@ -77,6 +81,10 @@ void ExampleOptionGroup::on_error(Glib::OptionContext& context, Glib::OptionGrou
 
 int main(int argc, char** argv)
 {
+  //This example should be executed like so:
+  //./example --foo=1 --bar=2 --goo=abc
+  //./example --help
+  
   Glib::init();
    
   Glib::OptionContext context;
@@ -84,9 +92,19 @@ int main(int argc, char** argv)
   ExampleOptionGroup group;
   context.set_main_group(group);
   
-  context.parse(argc, argv);
+  try
+  {
+    context.parse(argc, argv);
+  }
+  catch(const Glib::Error& ex)
+  {
+    std::cout << "Exception: " << ex.what() << std::endl;
+  }
 
-  std::cout << "parsed values: foo = " << group.m_arg_foo << ", bar = " << group.m_arg_bar << std::endl;
+  std::cout << "parsed values: " << std::endl <<
+    "  foo = " << group.m_arg_foo << std::endl << 
+    "  bar = " << group.m_arg_bar << std::endl <<
+    "  goo = " << group.m_arg_goo << std::endl;
 
   return 0;
 }
