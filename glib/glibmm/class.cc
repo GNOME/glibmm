@@ -56,15 +56,12 @@ void Class::register_derived_type(GType base_type)
 }
 
 #ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
-namespace { //anonymous
-
 //This is an extern "C" function, to call the non-extern "C" function.
 void Class_custom_class_init_function(void* g_class, void* class_data)
 {
   Class::custom_class_init_function(g_class, class_data)
 }
 
-} //anonymous namespace
 #endif //GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 
 GType Class::clone_custom_type(const char* custom_type_name) const

@@ -31,8 +31,6 @@ namespace Glib
 {
 
 #ifndef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
-namesapace { //anonymous
-
 extern "C"
 {
   //This is an extern "C" function, to call the non-extern "C" function.
@@ -40,7 +38,6 @@ extern "C"
   void Class_custom_class_init_function(void* g_class, void* class_data);
 }
 
-} //anonymous namespace
 #endif // GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 
 class Class
@@ -76,7 +73,7 @@ protected:
 #ifdef GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 private:
 #else
-public: //TODO: The friend should make this unnecessary, but it is not working.
+//protected:
 #endif
   static void custom_class_init_function(void* g_class, void* class_data);
 };
