@@ -21,6 +21,7 @@
 #include <glibmm/optionentry.h>
 #include <glibmm/optioncontext.h>
 #include <glibmm/utility.h>
+#include <glibmm/containers.h>
 #include <glib/goption.h>
 
 namespace Glib
@@ -130,6 +131,21 @@ void OptionGroup::add_entry(const OptionEntry& entry, Glib::ustring& arg)
   add_entry_with_wrapper(entry, G_OPTION_ARG_STRING, &arg);
 }
 
+void OptionGroup::add_entry(const OptionEntry& entry, vecustrings& arg)
+{
+  add_entry_with_wrapper(entry, G_OPTION_ARG_STRING_ARRAY, &arg);
+}
+
+void OptionGroup::add_entry_filename(const OptionEntry& entry, std::string& arg)
+{
+  add_entry_with_wrapper(entry, G_OPTION_ARG_FILENAME, &arg);
+}
+
+void OptionGroup::add_entry_filename(const OptionEntry& entry, vecstrings& arg)
+{
+  add_entry_with_wrapper(entry, G_OPTION_ARG_FILENAME_ARRAY, &arg);
+}
+ 
 void OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg arg_type, void* cpp_arg)
 {
   const Glib::ustring name = entry.get_long_name();
@@ -194,7 +210,8 @@ void OptionGroup::CppOptionEntry::allocate_c_arg()
   //This will be destroyed in the OptionGroup destructor.
   switch(carg_type_)
   {
-    case G_OPTION_ARG_STRING:
+    case G_OPTION_ARG_STRING: //The char* will be for UTF8 strins.
+    case G_OPTION_ARG_FILENAME: //The char* will be for strings in the current locale's encoding.
     {
       char** typed_arg = new char*;
       *typed_arg = 0; //The C code will allocate a char* and put it here, for us to g_free() later.
@@ -211,48 +228,48 @@ void OptionGroup::CppOptionEntry::allocate_c_arg()
       break;
     }
     case G_OPTION_ARG_STRING_ARRAY:
+    case G_OPTION_ARG_FILENAME_ARRAY:
     {
-      carg_ = new char**;
+      char*** typed_arg = new char**;
+      *typed_arg = 0;
+      carg_ = typed_arg;
+      
       break;
     }
     default:
     {
-    /* TODO:
-	G_OPTION_ARG_CALLBACK,
-	G_OPTION_ARG_FILENAME,
-	G_OPTION_ARG_STRING_ARRAY,
-	G_OPTION_ARG_FILENAME_ARRAY
-	*/
-	break;
+      break;
     }
   }
 }
 
 void OptionGroup::CppOptionEntry::release_c_arg()
 {
-  //Create an instance of the appropriate C type.
-  //This will be destroyed in the OptionGroup destructor.
+  //Delete the instances that we created in allocate_c_arg().
+  //Notice that we delete the type that we created, but not the value to which it points.
   if(carg_)
   {
     switch(carg_type_)
     {
       case G_OPTION_ARG_STRING:
+      case G_OPTION_ARG_FILENAME:
       {
         char** typed_arg = (char**)carg_;
         g_free(*typed_arg); //Free the char* string at type_arg, which was allocated by the C code.
         delete typed_arg; //Delete the char** that we allocated in allocate_c_arg;
+        
         break;
       }
       case G_OPTION_ARG_INT:
       {
         int* typed_arg = (int*)carg_;
         delete typed_arg;
-	
+
         break;
       }
       case G_OPTION_ARG_STRING_ARRAY:
+      case G_OPTION_ARG_FILENAME_ARRAY:
       {
-        //TODO: Deep free?
         delete (char**)carg_;
         break;
       }
@@ -260,11 +277,8 @@ void OptionGroup::CppOptionEntry::release_c_arg()
       {
       /* TODO:
 	G_OPTION_ARG_CALLBACK,
-	G_OPTION_ARG_FILENAME,
-	G_OPTION_ARG_STRING_ARRAY,
-	G_OPTION_ARG_FILENAME_ARRAY
-	*/
-	break;
+*/
+        break;
       }
     }
     
@@ -291,6 +305,18 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
         break;
       }
     }
+    case G_OPTION_ARG_FILENAME:
+    {
+      char** typed_arg = (char**)carg_;
+      std::string* typed_cpp_arg = (std::string*)cpparg_;
+      if(typed_arg && typed_cpp_arg)
+      {
+        char* pch = *typed_arg;
+        (*typed_cpp_arg) = Glib::convert_const_gchar_ptr_to_stdstring(pch);
+       
+        break;
+      }
+    }
     case G_OPTION_ARG_INT:
     {
       *((int*)cpparg_) = *((int*)carg_);
@@ -298,16 +324,34 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
     }
     case G_OPTION_ARG_STRING_ARRAY:
     {
-      //pCArg = new char**;
+      char*** typed_arg = (char***)carg_;
+      vecustrings* typed_cpp_arg = (vecustrings*)cpparg_;
+      if(typed_arg && typed_cpp_arg)
+      {
+        //The C array seems to be null-terminated.
+        Glib::StringArrayHandle array_handle(*typed_arg,  Glib::OWNERSHIP_NONE);
+        (*typed_cpp_arg) = array_handle;
+      }
+      
+      break;
+    }
+    case G_OPTION_ARG_FILENAME_ARRAY:
+    {
+      char*** typed_arg = (char***)carg_;
+      vecustrings* typed_cpp_arg = (vecustrings*)cpparg_;
+      if(typed_arg && typed_cpp_arg)
+      {
+        //The C array seems to be null-terminated.
+        Glib::ArrayHandle<std::string>  array_handle(*typed_arg,  Glib::OWNERSHIP_NONE);
+        (*typed_cpp_arg) = array_handle;
+      }
+      
       break;
     }
     default:
     {
       /* TODO:
 	G_OPTION_ARG_CALLBACK,
-	G_OPTION_ARG_FILENAME,
-	G_OPTION_ARG_STRING_ARRAY,
-	G_OPTION_ARG_FILENAME_ARRAY
 	*/
 	break;
     }

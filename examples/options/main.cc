@@ -32,14 +32,14 @@ public:
   //These int instances should live as long as the OptionGroup to which they are added, 
   //and as long as the OptionContext to which those OptionGroups are added.
   int m_arg_foo;
-  int m_arg_bar;
+  std::string m_arg_filename;
   Glib::ustring m_arg_goo;
+  Glib::OptionGroup::vecustrings m_arg_list;
 };
 
 ExampleOptionGroup::ExampleOptionGroup()
 : Glib::OptionGroup("example_group", "description of example group", "help description of example group"),
-  m_arg_foo(0),
-  m_arg_bar(0)
+  m_arg_foo(0)
 {
   Glib::OptionEntry entry1;
   entry1.set_long_name("foo");
@@ -48,27 +48,33 @@ ExampleOptionGroup::ExampleOptionGroup()
   add_entry(entry1, m_arg_foo);
       
   Glib::OptionEntry entry2;
-  entry2.set_long_name("bar");
-  entry2.set_short_name('b');
-  entry2.set_description("The Bar");
-  add_entry(entry2, m_arg_bar);
+  entry2.set_long_name("file");
+  entry2.set_short_name('F');
+  entry2.set_description("The Filename");
+  add_entry_filename(entry2, m_arg_filename);
  
   Glib::OptionEntry entry3;
   entry3.set_long_name("goo");
   entry3.set_short_name('g');
   entry3.set_description("The Goo");
   add_entry(entry3, m_arg_goo);
+  
+  Glib::OptionEntry entry4;
+  entry4.set_long_name("list");
+  entry4.set_short_name('l');
+  entry4.set_description("The List");
+  add_entry(entry4, m_arg_list);
 }
 
 bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
 {
-  //This is called before m_arg_foo and m_arg_bar are given their values.
+  //This is called before the m_arg_* instances are given their values.
   return Glib::OptionGroup::on_pre_parse(context, group);
 }
 
 bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
 {
-  //This is called after m_arg_foo and m_arg_bar are given their values.
+  //This is called after the m_arg_* instances are given their values.
   return Glib::OptionGroup::on_post_parse(context, group);
 }
 
@@ -103,9 +109,17 @@ int main(int argc, char** argv)
 
   std::cout << "parsed values: " << std::endl <<
     "  foo = " << group.m_arg_foo << std::endl << 
-    "  bar = " << group.m_arg_bar << std::endl <<
+    "  filename = " << group.m_arg_filename << std::endl <<
     "  goo = " << group.m_arg_goo << std::endl;
-
+    
+  //This one shows the results of multiple instance of the same option, such as --list=1 --list=a --list=b
+  std::cout << "  list = ";
+  for(Glib::OptionGroup::vecustrings::const_iterator iter = group.m_arg_list.begin(); iter != group.m_arg_list.end(); ++iter)
+  {
+    std::cout << *iter << ", ";
+  }
+  std::cout << std::endl;
+ 
   return 0;
 }
 
