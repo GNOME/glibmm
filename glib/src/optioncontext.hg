@@ -42,7 +42,10 @@ class OptionContext
   _CLASS_GENERIC(OptionContext, GOptionContext)
 public:
   explicit OptionContext(const Glib::ustring& parameter_string = Glib::ustring());
-  explicit OptionContext(GOptionContext* castitem);
+  
+  //Note that, unlike Glib::Wrap(), this would create a second C++ instance for the same C instance,
+  //so it should be used carefully. For instance you could not access data in a derived class via this second instance.
+  explicit OptionContext(GOptionContext* castitem, bool take_ownership = false);
   virtual ~OptionContext();
   
   _WRAP_METHOD(void set_help_enabled(bool help_enabled = true), g_option_context_set_help_enabled)
@@ -58,10 +61,11 @@ public:
   //- a group without callbacks seems to do some simple default parsing.
   _IGNORE(g_option_context_add_main_entries)
   
-  _WRAP_METHOD(void add_group(const OptionGroup& group), g_option_context_add_group)
-  _WRAP_METHOD(void set_main_group(const OptionGroup& group), g_option_context_set_main_group)
-  OptionGroup get_main_group() const;
-  _IGNORE(g_option_context_get_main_group)
+  _WRAP_METHOD(void add_group(OptionGroup& group), g_option_context_add_group)
+  _WRAP_METHOD(void set_main_group(OptionGroup& group), g_option_context_set_main_group)
+  //OptionGroup& get_main_group();
+  //const OptionGroup& get_main_group() const;
+  //_IGNORE(g_option_context_get_main_group)
 
 
   GOptionContext*       gobj()       { return gobject_; }
@@ -69,9 +73,8 @@ public:
 
 protected:
 
-
-
   GOptionContext* gobject_;
+  bool has_ownership_;
 };
 
 

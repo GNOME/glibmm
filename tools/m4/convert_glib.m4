@@ -58,6 +58,6 @@ _CONVERSION(`const Glib::ValueBase&',`GValue*',`const_cast<GValue*>(($3).gobj())
 _CONVERSION(`GValue*', `Glib::ValueBase&', `*reinterpret_cast<Glib::ValueBase*>($3)')
 _CONVERSION(`const GValue*', `const Glib::ValueBase&', `*reinterpret_cast<const Glib::ValueBase*>($3)')
 
-_CONVERSION(`const OptionGroup&',`GOptionGroup*',`const_cast<GOptionGroup*>(($3).gobj())')
-_CONVERSION(`GOptionGroup*',`OptionGroup',`Glib::wrap(($3), true /* take_copy */)')
+_CONVERSION(`OptionGroup&',`GOptionGroup*',`($3).gobj()')
+#_CONVERSION(`GOptionGroup*',`OptionGroup',`Glib::wrap(($3), true /* take_copy */)')
 

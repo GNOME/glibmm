@@ -29,41 +29,41 @@ namespace Glib
 namespace //anonymous
 {
 
-gboolean g_callback_pre_parse(GOptionContext* context, GOptionGroup* group, gpointer data, GError** /* TODO error */)
+gboolean g_callback_pre_parse(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
 {
-  OptionContext cppContext(context);
-  OptionGroup cppGroup(group); //Maybe this should be option_group.
+  OptionContext cppContext(context, false /* take_ownership */);
+  //OptionGroup cppGroup(group, true /* take_copy */); //Maybe this should be option_group.
   
   OptionGroup* option_group = static_cast<OptionGroup*>(data);
   if(option_group)
-    return option_group->on_pre_parse(cppContext, cppGroup);
+    return option_group->on_pre_parse(cppContext, *option_group);
   else
     return false;
 }
 
-gboolean g_callback_post_parse(GOptionContext* context, GOptionGroup* group, gpointer data, GError** /* TODO error */)
+gboolean g_callback_post_parse(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
 {
-  OptionContext cppContext(context);
-  OptionGroup cppGroup(group); //Maybe this should be option_group.
+  OptionContext cppContext(context, false /* take_ownership */);
+  //OptionGroup cppGroup(group, true /* take_copy */); //Maybe this should be option_group.
   
   OptionGroup* option_group = static_cast<OptionGroup*>(data);
-  if(option_group)\
+  if(option_group)
   {
     //TODO: Convert C types to the appropriate C++ types.
-    return option_group->on_post_parse(cppContext, cppGroup);
+    return option_group->on_post_parse(cppContext, *option_group);
   }
   else
     return false;
 }
 
-void g_callback_error(GOptionContext* context, GOptionGroup* group, gpointer data, GError** /* TODO error*/)
+void g_callback_error(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error*/)
 {
-  OptionContext cppContext(context);
-  OptionGroup cppGroup(group); //Maybe this should be option_group.
+  OptionContext cppContext(context, false /* take_ownership */);
+  //OptionGroup cppGroup(group); //Maybe this should be option_group.
   
   OptionGroup* option_group = static_cast<OptionGroup*>(data);
   if(option_group)
-    return option_group->on_error(cppContext, cppGroup);
+    return option_group->on_error(cppContext, *option_group);
 }
 
 } //anonymous namespace
@@ -77,6 +77,7 @@ OptionGroup::OptionGroup(const Glib::ustring& name, const Glib::ustring& descrip
   g_option_group_set_error_hook(gobj(), &g_callback_error);
 }
 
+/*
 OptionGroup::OptionGroup(GOptionGroup* castitem, bool take_copy)
 {
   if(take_copy)
@@ -86,6 +87,7 @@ OptionGroup::OptionGroup(GOptionGroup* castitem, bool take_copy)
   else
     gobject_ = castitem;
 }
+*/
 
 OptionGroup::~OptionGroup()
 {
@@ -96,8 +98,16 @@ OptionGroup::~OptionGroup()
 void OptionGroup::add_entry(const OptionEntry& entry)
 {
   //It does not copy the entry, so it needs to live as long as the group.
-  //TODO: Store temporary copies in the C++ instance?
-  g_option_group_add_entries(gobj(), entry.gobj()); //This can take an array, so think of this as an array of 1.
+  
+  //g_option_group_add_entries takes an array, with the last item in the array having a null long_name.
+  //Hopefully this will be properly documented eventually - see bug #
+  
+  //Create a temporary array, just so we can give the correct thing to g_option_group_add_entries:
+  GOptionEntry array[2];
+  array[0] = *(entry.gobj()); //Copy contents.
+  GLIBMM_INITIALIZE_STRUCT(array[1], GOptionEntry);
+   
+  g_option_group_add_entries(gobj(), array);
 }
 
 bool OptionGroup::on_pre_parse(OptionContext& /* context */, OptionGroup& /* group */)

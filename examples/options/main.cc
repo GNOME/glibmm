@@ -29,11 +29,13 @@ public:
   virtual bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group);
   virtual void on_error(Glib::OptionContext& context, Glib::OptionGroup& group);
   
+  //These int instances should live as long as the OptionGroup to which they are added, 
+  //and as long as the OptionContext to which those OptionGroups are added.
   int m_arg_foo;
   int m_arg_bar;
   
 protected:
-  Glib::OptionEntry m_entry1, m_entry2; //TODO: This is just for memory-management, to make them live long enough.
+  Glib::OptionEntry m_entry1, m_entry2; // These are member variables, so that they live as long as the OptionGroup.
 };
 
 ExampleOptionGroup::ExampleOptionGroup()
@@ -62,7 +64,7 @@ bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::Option
 
 bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
 {
-  //This is called afetr m_arg_foo and m_arg_bar are given their values.
+  //This is called after m_arg_foo and m_arg_bar are given their values.
   return Glib::OptionGroup::on_post_parse(context, group);
 }
 
@@ -80,7 +82,7 @@ int main(int argc, char** argv)
   Glib::OptionContext context;
   
   ExampleOptionGroup group;
-  context.set_main_group(group); //TODO: check memory management/copying.
+  context.set_main_group(group);
   
   context.parse(argc, argv);
 
