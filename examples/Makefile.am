@@ -3,7 +3,6 @@ markup
 
 # These use gtkmm stuff:
 # thread
-# idle
 
 SUBDIRS = $(example_dirs)
 EXTRA_DIST = README Makefile.am_fragment
