@@ -88,6 +88,7 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   static ObjectBase* _get_current_wrapper(GObject* object);
+  bool _cpp_destruction_is_in_progress() const;
 #endif
 
 protected:

@@ -242,6 +242,12 @@ void ObjectBase::set_manage()
           "only Gtk::Object instances can be managed");
 }
 
+bool ObjectBase::_cpp_destruction_is_in_progress() const
+{
+  return cpp_destruction_in_progress_;
+}
+
+
 bool _gobject_cppinstance_already_deleted(GObject* gobject)
 {
   //This function is used to prevent calling wrap() on a GTK+ instance whose gtkmm instance has been deleted.
