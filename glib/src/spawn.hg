@@ -31,6 +31,8 @@ GLIBMM_USING_STD(string)
 namespace Glib
 {
 
+typedef GPid Pid;
+
 _WRAP_ENUM(SpawnFlags, GSpawnFlags, NO_GTYPE)
 
 /** @defgroup Spawn Spawning Processes
@@ -48,7 +50,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& envp,
                             SpawnFlags flags = SpawnFlags(0),
                             const sigc::slot<void>& child_setup = sigc::slot<void>(),
-                            int* child_pid = 0,
+                            Pid* child_pid = 0,
                             int* standard_input = 0,
                             int* standard_output = 0,
                             int* standard_error = 0);
@@ -57,7 +59,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& argv,
                             SpawnFlags flags = SpawnFlags(0),
                             const sigc::slot<void>& child_setup = sigc::slot<void>(),
-                            int* child_pid = 0,
+                            Pid* child_pid = 0,
                             int* standard_input = 0,
                             int* standard_output = 0,
                             int* standard_error = 0);
@@ -67,13 +69,13 @@ void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& envp,
                  SpawnFlags flags = SpawnFlags(0),
                  const sigc::slot<void>& child_setup = sigc::slot<void>(),
-                 int* child_pid = 0);
+                 Pid* child_pid = 0);
 
 void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& argv,
                  SpawnFlags flags = SpawnFlags(0),
                  const sigc::slot<void>& child_setup = sigc::slot<void>(),
-                 int* child_pid = 0);
+                 Pid* child_pid = 0);
 
 void spawn_sync(const std::string& working_directory,
                 const Glib::ArrayHandle<std::string>& argv,
@@ -98,6 +100,8 @@ void spawn_command_line_sync(const std::string& command_line,
                              std::string* standard_output = 0,
                              std::string* standard_error = 0,
                              int* exit_status = 0);
+
+void spawn_close_pid(Pid pid);                             
 
 /** @} group Spawn */
 

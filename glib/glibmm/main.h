@@ -467,6 +467,9 @@ public:
    */
   Glib::RefPtr<MainContext> get_context();
 
+  //TODO: C++ize the (big) g_main_depth docs here.
+  static int depth();
+
   /** Increases the reference count on a MainLoop object by one.
    */
   void reference()   const;

@@ -66,7 +66,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& envp,
                             SpawnFlags flags,
                             const sigc::slot<void>& child_setup,
-                            int* child_pid,
+                            Pid* child_pid,
                             int* standard_input,
                             int* standard_output,
                             int* standard_error)
@@ -94,7 +94,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& argv,
                             SpawnFlags flags,
                             const sigc::slot<void>& child_setup,
-                            int* child_pid,
+                            Pid* child_pid,
                             int* standard_input,
                             int* standard_output,
                             int* standard_error)
@@ -122,7 +122,7 @@ void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& envp,
                  SpawnFlags flags,
                  const sigc::slot<void>& child_setup,
-                 int* child_pid)
+                 Pid* child_pid)
 {
   const bool setup_slot = !child_setup.empty();
   sigc::slot<void> child_setup_ = child_setup;
@@ -146,7 +146,7 @@ void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& argv,
                  SpawnFlags flags,
                  const sigc::slot<void>& child_setup,
-                 int* child_pid)
+                 Pid* child_pid)
 {
   const bool setup_slot = !child_setup.empty();
   sigc::slot<void> child_setup_ = child_setup;
@@ -263,6 +263,11 @@ void spawn_command_line_sync(const std::string& command_line,
 
   copy_output_buf(standard_output, buf_standard_output.get());
   copy_output_buf(standard_error, buf_standard_error.get());
+}
+
+void spawn_close_pid(Pid pid)
+{
+  g_spawn_close_pid(pid);
 }
 
 } // namespace Glib

@@ -553,6 +553,12 @@ Glib::RefPtr<MainContext> MainLoop::get_context()
   return Glib::wrap(g_main_loop_get_context(gobj()), true);
 }
 
+//static:
+int MainLoop::depth()
+{
+  return g_main_depth();
+}
+
 void MainLoop::reference() const
 {
   g_main_loop_ref(reinterpret_cast<GMainLoop*>(const_cast<MainLoop*>(this)));
