@@ -134,13 +134,13 @@ AC_TRY_COMPILE(
     (void)func;
   }
 ],[],[
-  gtkmm_cxx_member_functions_member_templates=yes
+  glibmm_cxx_member_functions_member_templates=yes
   AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[1],[does the C++ compiler allow member functions to refer to member templates])
-  AC_MSG_RESULT([$gtkmm_cxx_member_functions_member_templates])
+  AC_MSG_RESULT([$glibmm_cxx_member_functions_member_templates])
 ],[
-  gtkmm_cxx_member_functions_member_templates=no
+  glibmm_cxx_member_functions_member_templates=no
   AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[0])
-  AC_MSG_RESULT([$gtkmm_cxx_member_functions_member_templates])
+  AC_MSG_RESULT([$glibmm_cxx_member_functions_member_templates])
 ])
 ])
 
@@ -157,7 +157,7 @@ AC_DEFUN([GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS],
 
   AC_CACHE_CHECK(
     [whether the compiler finds it ambiguous to have both const and non-const template specializations],
-    [gtkmm_cv_cxx_can_disambiguate_const_template_specializations],
+    [glibmm_cv_cxx_can_disambiguate_const_template_specializations],
   [
     AC_TRY_COMPILE(
     [
@@ -198,12 +198,12 @@ AC_DEFUN([GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS],
           std::cout << "Traits<Foo<const int >> --> "
                     << cfit.whoami() << std::endl;
     ],
-      [gtkmm_cv_cxx_can_disambiguate_const_template_specializations="yes"],
-      [gtkmm_cv_cxx_can_disambiguate_const_template_specializations="no"]
+      [glibmm_cv_cxx_can_disambiguate_const_template_specializations="yes"],
+      [glibmm_cv_cxx_can_disambiguate_const_template_specializations="no"]
     )
   ])
 
-  if test "x${gtkmm_cv_cxx_can_disambiguate_const_template_specializations}" = "xyes"; then
+  if test "x${glibmm_cv_cxx_can_disambiguate_const_template_specializations}" = "xyes"; then
   {
     AC_DEFINE([GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS],[1], [Defined if the compiler does not find it ambiguous to have both const and non-const template specializations])
   }
@@ -223,7 +223,7 @@ AC_DEFUN([GLIBMM_CXX_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION]
 [
   AC_CACHE_CHECK(
     [whether the compiler allows us to define a template that uses dynamic_cast<> with an object whose type is not yet defined],
-    [gtkmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition],
+    [glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition],
   [
     AC_TRY_COMPILE(
     [
@@ -246,12 +246,12 @@ AC_DEFUN([GLIBMM_CXX_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION]
     ],[
        
     ],
-      [gtkmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition="yes"],
-      [gtkmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition="no"]
+      [glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition="yes"],
+      [glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition="no"]
     )
   ])
 
-  if test "x${gtkmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition}" = "xyes"; then
+  if test "x${glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition}" = "xyes"; then
   {
     AC_DEFINE([GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION],[1], [Defined if the compiler allows us to define a template that uses dynamic_cast<> with an object whose type is not yet defined.])
   }
@@ -270,7 +270,7 @@ AC_DEFUN([GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS],
 [
   AC_CACHE_CHECK(
     [whether the the compilerallows us to use a non-extern "C" function for an extern "C" function pointer.],
-    [gtkmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks],
+    [glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks],
   [
     AC_TRY_COMPILE(
     [
@@ -291,17 +291,74 @@ AC_DEFUN([GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS],
       somestruct something;
       something.callback = &somefunction;
     ],
-      [gtkmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks="yes"],
-      [gtkmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks="no"]
+      [glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks="yes"],
+      [glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks="no"]
     )
   ])
 
-  if test "x${gtkmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks}" = "xyes"; then
+  if test "x${glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks}" = "xyes"; then
   {
     AC_DEFINE([GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS],[1], [Defined if the compiler allows us to use a non-extern "C" function for an extern "C" function pointer.])
   }
   fi
 ])
 
+## GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC()
+##
+## Check whether the compiler puts extern "C" functions in the global namespace, 
+## even inside a namespace declaration. The AIX xlC compiler does this, and also 
+## gets confused if we declare the namespace again inside the extern "C" block.
+## This seems like a compiler bug, but not a serious one.
+##
+AC_DEFUN([GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC],
+[
+  AC_CACHE_CHECK(
+    [whether the compiler uses namespace declarations inside extern "C" blocks.],
+    [glibmm_cv_cxx_can_use_namespaces_inside_externc],
+  [
+    AC_TRY_COMPILE(
+    [
+      namespace test
+      {
+      
+      extern "C"
+      {
+      
+      void do_something();
+      
+      } //extern C
+      
+      
+      class Something
+      {
+      protected:
+        int i;
+      
+        friend void do_something();
+      };
+      
+      void do_something()
+      {
+        Something something;
+        something.i = 1;
+      }
+      
+      } //namespace
+
+      
+    ],[ 
+     
+    ],
+      [glibmm_cv_cxx_can_use_namespaces_inside_externc="yes"],
+      [glibmm_cv_cxx_can_use_namespaces_inside_externc="no"]
+    )
+  ])
+
+  if test "x${glibmm_cv_cxx_can_use_namespaces_inside_externc}" = "xyes"; then
+  {
+    AC_DEFINE([GLIBMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC],[1], [Defined if the compiler whether the compiler uses namespace declarations inside extern "C" blocks.])
+  }
+  fi
+])
 
 

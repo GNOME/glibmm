@@ -29,14 +29,21 @@ namespace Glib
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
+#ifdef GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
+//For the AIX xlC compiler, I can not find a way to do this without putting the functions in the global namespace. murrayc
 extern "C"
 {
+#endif //GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
+
 void custom_get_property_callback(GObject* object, unsigned int property_id,
                                   GValue* value, GParamSpec* param_spec);
 
 void custom_set_property_callback(GObject* object, unsigned int property_id,
                                   const GValue* value, GParamSpec* param_spec);
+
+#ifdef GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 } //extern "C"
+#endif //GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
