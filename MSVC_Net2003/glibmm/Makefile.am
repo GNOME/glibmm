@@ -9,4 +9,4 @@ EXTRA_DIST = glibmmconfig.h glibmm.vcproj glibmm-2.4.rc
 # See http://sources.redhat.com/automake/automake.html#distcleancheck
 
 glibmmconfig.h: $(top_srcdir)/glib/glibmmconfig.h.in $(top_srcdir)/configure.in
-	cp -f $(top_srcdir)/glib/glibmmconfig.h $@
+	cp -f $(top_builddir)/glib/glibmmconfig.h $@
