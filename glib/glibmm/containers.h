@@ -222,8 +222,15 @@ public:
   reference operator*() const
   {
     if (node_ && node_->data)
-      return *Glib::wrap(static_cast<T_Impl*>((*node_).data));
-
+    {
+      //We copy/paste the widget wrap() implementation here,
+      //because we can not use a specific Glib::wrap(T_Impl) overload here,
+      //because that would be "dependent", and g++ 3.4 does not allow that.
+      //The specific Glib::wrap() overloads don't do anything special anyway.
+      GObject* cobj = static_cast<GObject*>( (*node_).data );
+      return *(dynamic_cast<pointer>(Glib::wrap_auto(cobj, false /* take_copy */)));
+    }
+    
     return *(pointer)glibmm_null_pointer;
   }
 

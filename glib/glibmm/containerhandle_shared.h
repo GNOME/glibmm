@@ -139,7 +139,16 @@ struct TypeTraits<T*>
 
   static CType   to_c_type      (CppType ptr) { return Glib::unwrap(ptr);      }
   static CType   to_c_type      (CType   ptr) { return ptr;                    }
-  static CppType to_cpp_type    (CType   ptr) { return Glib::wrap(ptr, false); }
+  static CppType to_cpp_type    (CType   ptr)
+  {
+    //We copy/paste the widget wrap() implementation here,
+    //because we can not use a specific Glib::wrap(T_Impl) overload here,
+    //because that would be "dependent", and g++ 3.4 does not allow that.
+    //The specific Glib::wrap() overloads don't do anything special anyway.
+    GObject* cobj = (GObject*)ptr;
+    return dynamic_cast<CppType>(Glib::wrap_auto(cobj, false /* take_copy */));
+  }
+  
   static void    release_c_type (CType   ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
@@ -159,7 +168,16 @@ struct TypeTraits<const T*>
 
   static CType   to_c_type      (CppType ptr) { return Glib::unwrap(ptr);      }
   static CType   to_c_type      (CType   ptr) { return ptr;                    }
-  static CppType to_cpp_type    (CType   ptr) { return Glib::wrap(const_cast<CTypeNonConst>(ptr), false); /* TODO: Allow wrap() to take a const. */}
+  static CppType to_cpp_type    (CType   ptr)
+  {
+     //We copy/paste the widget wrap() implementation here,
+     //because we can not use a specific Glib::wrap(T_Impl) overload here,
+     //because that would be "dependent", and g++ 3.4 does not allow that.
+     //The specific Glib::wrap() overloads don't do anything special anyway.
+     GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
+     return dynamic_cast<CppType>(Glib::wrap_auto(cobj, false /* take_copy */));
+  }
+  
   static void    release_c_type (CType   ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
