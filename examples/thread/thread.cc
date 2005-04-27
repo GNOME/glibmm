@@ -9,7 +9,7 @@
 namespace
 {
 
-class MessageQueue
+class MessageQueue : public sigc::trackable
 {
 public:
   MessageQueue();

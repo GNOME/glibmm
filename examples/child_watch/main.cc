@@ -22,7 +22,7 @@
 
 using namespace std;
 
-class ChildWatch
+class ChildWatch : public sigc::trackable
 {
 public:
   ChildWatch(const Glib::RefPtr<Glib::MainLoop>& mainLoop)

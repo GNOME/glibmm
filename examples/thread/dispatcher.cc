@@ -20,7 +20,7 @@
 namespace
 {
 
-class ThreadProgress
+class ThreadProgress : public sigc::trackable
 {
 public:
   explicit ThreadProgress(int id);

@@ -129,7 +129,7 @@ static void fd_close_and_invalidate(int& fd)
 namespace Glib
 {
 
-class DispatchNotifier
+class DispatchNotifier : public sigc::trackable
 {
 public:
   ~DispatchNotifier();
