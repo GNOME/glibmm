@@ -100,7 +100,8 @@ std::string get_real_name()
 
 std::string get_home_dir()
 {
-  return std::string(g_get_home_dir());
+  const char *const value = g_get_home_dir();
+  return (value) ? std::string(value) : std::string();
 }
 
 std::string get_tmp_dir()
