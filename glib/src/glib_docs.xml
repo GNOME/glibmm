@@ -1,4 +1,22 @@
 <root>
+<function name="g_str_hash">
+<description>
+Converts a string to a hash value.
+It can be passed to g_hash_table_new() as the @hash_func parameter, 
+when using strings as keys in a #GHashTable.
+
+
+</description>
+<parameters>
+<parameter name="v">
+<parameter_description> a string key.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a hash value corresponding to the key.
+</return>
+</function>
+
 <function name="g_strcasecmp">
 <description>
 A case-insensitive string comparison, corresponding to the standard
@@ -98,6 +116,30 @@ literally.
 </return>
 </function>
 
+<function name="g_build_pathv">
+<description>
+Behaves exactly like g_build_path(), but takes the path elements 
+as a string array, instead of varargs. This function is mainly
+meant for language bindings.
+
+
+</description>
+<parameters>
+<parameter name="separator">
+<parameter_description> a string used to separator the elements of the path.
+</parameter_description>
+</parameter>
+<parameter name="args">
+<parameter_description> %NULL-terminated array of strings containing the path elements.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated string that must be freed with g_free().
+
+Since: 2.8
+</return>
+</function>
+
 <function name="g_propagate_error">
 <description>
 If @dest is %NULL, free @src; otherwise,
@@ -174,35 +216,6 @@ Deprecated: Use g_io_channel_shutdown() instead.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="g_io_channel_new_file">
-<description>
-Open a file @filename as a #GIOChannel using mode @mode. This
-channel will be closed when the last reference to it is dropped,
-so there is no need to call g_io_channel_close() (though doing
-so will not cause problems, as long as no attempt is made to
-access the channel after it is closed).
-
-
-</description>
-<parameters>
-<parameter name="filename">
-<parameter_description> A string containing the name of a file.
-</parameter_description>
-</parameter>
-<parameter name="mode">
-<parameter_description> One of &quot;r&quot;, &quot;w&quot;, &quot;a&quot;, &quot;r+&quot;, &quot;w+&quot;, &quot;a+&quot;. These have
-the same meaning as in fopen().
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> A location to return an error of type %G_FILE_ERROR.
-</parameter_description>
-</parameter>
-</parameters>
-<return> A #GIOChannel on success, %NULL on failure.
-</return>
 </function>
 
 <function name="g_source_new">
@@ -289,6 +302,22 @@ of the API &quot;read&quot; functions.
 </parameters>
 <return> %G_IO_STATUS_NORMAL if the encoding was successfully set.
 </return>
+</function>
+
+<function name="g_markup_parse_context_free">
+<description>
+Frees a #GMarkupParseContext. Can&apos;t be called from inside
+one of the #GMarkupParser functions.
+
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GMarkupParseContext
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_utf8_normalize">
@@ -408,6 +437,23 @@ Since: 2.2
 </return>
 </function>
 
+<function name="g_get_tmp_dir">
+<description>
+Gets the directory to use for temporary files. This is found from 
+inspecting the environment variables &amp;lt;envar&amp;gt;TMPDIR&amp;lt;/envar&amp;gt;, 
+&amp;lt;envar&amp;gt;TMP&amp;lt;/envar&amp;gt;, and &amp;lt;envar&amp;gt;TEMP&amp;lt;/envar&amp;gt; in that order. If none 
+of those are defined &quot;/tmp&quot; is returned on UNIX and &quot;C:\&quot; on Windows. 
+The encoding of the returned string is system-defined. On Windows, 
+it is always UTF-8. The return value is never %NULL.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the directory to use for temporary files.
+</return>
+</function>
+
 <function name="g_snprintf">
 <description>
 A safer form of the standard sprintf() function. The output is guaranteed
@@ -522,6 +568,63 @@ this thread is now the owner of @context.
 </return>
 </function>
 
+<function name="g_file_set_contents">
+<description>
+Writes all of @contents to a file named @filename, with good error checking.
+If a file called @filename already exists it will be overwritten.
+
+This write is atomic in the sense that it is first written to a temporary
+file which is then renamed to the final name. Notes:
+&amp;lt;itemizedlist&amp;gt;
+&amp;lt;listitem&amp;gt;
+On Unix, if @filename already exists hard links to @filename will break.
+Also since the file is recreated, existing permissions, access control
+lists, metadata etc. may be lost. If @filename is a symbolic link,
+the link itself will be replaced, not the linked file.
+&amp;lt;/listitem&amp;gt;
+&amp;lt;listitem&amp;gt;
+On Windows renaming a file will not remove an existing file with the
+new name, so on Windows there is a race condition between the existing
+file being removed and the temporary file being renamed.
+&amp;lt;/listitem&amp;gt;
+&amp;lt;listitem&amp;gt;
+On Windows there is no way to remove a file that is open to some
+process, or mapped into memory. Thus, this function will fail if
+@filename already exists and is open.
+&amp;lt;/listitem&amp;gt;
+&amp;lt;/itemizedlist&amp;gt;
+
+If the call was sucessful, it returns %TRUE. If the call was not successful,
+it returns %FALSE and sets @error. The error domain is #G_FILE_ERROR.
+Possible error codes are those in the #GFileError enumeration.
+
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> name of a file to write @contents to, in the GLib file name
+encoding
+</parameter_description>
+</parameter>
+<parameter name="contents">
+<parameter_description> string to write to the file
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> length of @contents, or -1 if @contents is a nul-terminated string
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if an error occurred
+
+Since: 2.8
+</return>
+</function>
+
 <function name="g_idle_add_full">
 <description>
 Adds a function to be called whenever there are no higher priority
@@ -568,38 +671,21 @@ will return the first entry again.
 <return></return>
 </function>
 
-<function name="g_key_file_get_boolean">
+<function name="g_get_system_config_dirs">
 <description>
-Returns the value associated with @key under @group_name as a
-boolean. If @group_name is %NULL, the start group is used.
+Returns an ordered list of base directories in which to access 
+system-wide configuration information.
 
-If @key cannot be found then the return value is undefined and
-@error is set to #G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if
-the value associated with @key cannot be interpreted as a boolean
-then the return value is also undefined and @error is set to
-#G_KEY_FILE_ERROR_INVALID_VALUE.
+On UNIX platforms this is determined using the mechanisms described in
+the &amp;lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&amp;gt;
+XDG Base Directory Specification&amp;lt;/ulink&amp;gt;
 
 
 </description>
 <parameters>
-<parameter name="key_file">
-<parameter_description> a #GKeyFile
-</parameter_description>
-</parameter>
-<parameter name="group_name">
-<parameter_description> a group name
-</parameter_description>
-</parameter>
-<parameter name="key">
-<parameter_description> a key
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> return location for a #GError
-</parameter_description>
-</parameter>
 </parameters>
-<return> the value associated with the key as a boolean
+<return> a %NULL-terminated array of strings owned by GLib that must 
+not be modified or freed.
 Since: 2.6
 </return>
 </function>
@@ -629,8 +715,7 @@ Since: 2.4
 <function name="g_key_file_has_key">
 <description>
 Looks whether the key file has the key @key in the group
-@group_name. If @group_name is %NULL, the start group is
-used.
+@group_name. 
 
 
 </description>
@@ -966,6 +1051,9 @@ the first one found will be returned.
 <description>
 Converts a string from one character set to another.
 
+Note that you should use g_iconv() for streaming 
+conversions&amp;lt;footnoteref linkend=&quot;streaming-state&quot;/&amp;gt;.
+
 
 </description>
 <parameters>
@@ -974,7 +1062,14 @@ Converts a string from one character set to another.
 </parameter_description>
 </parameter>
 <parameter name="len">
-<parameter_description>           the length of the string
+<parameter_description>           the length of the string, or -1 if the string is 
+nul-terminated&amp;lt;footnote id=&quot;nul-unsafe&quot;&amp;gt;
+                     &amp;lt;para&amp;gt;
+                       Note that some encodings may allow nul bytes to 
+                       occur inside strings. In that case, using -1 for 
+                       the @len parameter is unsafe.
+                     &amp;lt;/para&amp;gt;
+                   &amp;lt;/footnote&amp;gt;. 
 </parameter_description>
 </parameter>
 <parameter name="to_codeset">
@@ -1126,6 +1221,38 @@ the string in place.)
 </return>
 </function>
 
+<function name="g_tree_search">
+<description>
+Searches a #GTree using @search_func.
+
+The @search_func is called with a pointer to the key of a key/value pair in the tree,
+and the passed in @user_data. If @search_func returns 0 for a key/value pair, then
+g_tree_search_func() will return the value of that pair. If @search_func returns -1,
+searching will proceed among the key/value pairs that have a smaller key; if @search_func
+returns 1, searching will proceed among the key/value pairs that have a larger key.
+
+
+</description>
+<parameters>
+<parameter name="tree">
+<parameter_description> a #GTree.
+</parameter_description>
+</parameter>
+<parameter name="search_func">
+<parameter_description> a function used to search the #GTree. 
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data passed as the second argument to the @search_func 
+function.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value corresponding to the found key, or %NULL if the key 
+was not found.
+</return>
+</function>
+
 <function name="g_freopen">
 <description>
 A wrapper for the POSIX freopen() function. The freopen() function
@@ -1137,7 +1264,7 @@ See the C library manual for more details about freopen().
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -1150,7 +1277,7 @@ opened
 </parameter_description>
 </parameter>
 </parameters>
-<return> A &amp;lt;typename&amp;gt;FILE&amp;lt;/typename&amp;gt; pointer if the file was successfully
+<return> A &amp;lt;type&amp;gt;FILE&amp;lt;/type&amp;gt; pointer if the file was successfully
 opened, or %NULL if an error occurred.
 
 Since: 2.6
@@ -1202,6 +1329,28 @@ Since: 2.4
 <return></return>
 </function>
 
+<function name="g_str_equal">
+<description>
+Compares two strings and returns %TRUE if they are equal.
+It can be passed to g_hash_table_new() as the @key_equal_func
+parameter, when using strings as keys in a #GHashTable.
+
+
+</description>
+<parameters>
+<parameter name="v1">
+<parameter_description> a key. 
+</parameter_description>
+</parameter>
+<parameter name="v2">
+<parameter_description> a key to compare with @v1.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the two keys match.
+</return>
+</function>
+
 <function name="g_key_file_get_start_group">
 <description>
 Returns the name of the start group of the file. 
@@ -1238,7 +1387,8 @@ fast.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the value corresponding to the key.
+<return> the value corresponding to the key, or %NULL if the key was
+not found.
 </return>
 </function>
 
@@ -1260,20 +1410,23 @@ the #GHashTable.
 <return></return>
 </function>
 
-<function name="g_async_queue_ref">
+<function name="g_tree_height">
 <description>
-Increases the reference count of the asynchronous @queue by 1. You
-do not need to hold the lock to call this function.
+Gets the height of a #GTree.
+
+If the #GTree contains no nodes, the height is 0.
+If the #GTree contains only one root node the height is 1.
+If the root node has children the height is 2, etc.
 
 
 </description>
 <parameters>
-<parameter name="queue">
-<parameter_description> a #GAsyncQueue.
+<parameter name="tree">
+<parameter_description> a #GTree.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the @queue that was passed in (since 2.6)
+<return> the height of the #GTree.
 </return>
 </function>
 
@@ -1282,7 +1435,7 @@ do not need to hold the lock to call this function.
 Returns a base directory in which to access application data such
 as icons that is customized for a particular user.  
 
-On Unix platforms this is determined using the mechanisms described in
+On UNIX platforms this is determined using the mechanisms described in
 the &amp;lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&amp;gt;
 XDG Base Directory Specification&amp;lt;/ulink&amp;gt;
 
@@ -1422,8 +1575,8 @@ instead.
 Finds an element in a #GQueue, using a supplied function to find the
 desired element. It iterates over the queue, calling the given function
 which should return 0 when the desired element is found. The function
-takes two gconstpointer arguments, the #GQueue element&apos;s data and the
-given user data.
+takes two gconstpointer arguments, the #GQueue element&apos;s data as the
+first argument and the given user data as the second argument.
 
 
 </description>
@@ -1491,29 +1644,50 @@ character, though it&apos;s normally a string terminator.
 </return>
 </function>
 
-<function name="g_get_language_names">
+<function name="g_thread_pool_free">
 <description>
-Computes a list of applicable locale names, which can be used to 
-e.g. construct locale-dependent filenames or search paths. The returned 
-list is sorted from most desirable to least desirable and always contains 
-the default locale &quot;C&quot;.
+Frees all resources allocated for @pool.
 
-For example, if LANGUAGE=de:en_US, then the returned list is
-&quot;de&quot;, &quot;en_US&quot;, &quot;en&quot;, &quot;C&quot;.
+If @immediate is %TRUE, no new task is processed for
+@pool. Otherwise @pool is not freed before the last task is
+processed. Note however, that no thread of this pool is
+interrupted, while processing a task. Instead at least all still
+running threads can finish their tasks before the @pool is freed.
 
-This function consults the environment variables &amp;lt;envar&amp;gt;LANGUAGE&amp;lt;/envar&amp;gt;, 
-&amp;lt;envar&amp;gt;LC_ALL&amp;lt;/envar&amp;gt;, &amp;lt;envar&amp;gt;LC_MESSAGES&amp;lt;/envar&amp;gt; and &amp;lt;envar&amp;gt;LANG&amp;lt;/envar&amp;gt; 
-to find the list of locales specified by the user.
+If @wait is %TRUE, the functions does not return before all tasks
+to be processed (dependent on @immediate, whether all or only the
+currently running) are ready. Otherwise the function returns immediately.
 
+After calling this function @pool must not be used anymore. 
+
+</description>
+<parameters>
+<parameter name="pool">
+<parameter_description> a #GThreadPool
+</parameter_description>
+</parameter>
+<parameter name="immediate">
+<parameter_description> should @pool shut down immediately?
+</parameter_description>
+</parameter>
+<parameter name="wait">
+<parameter_description> should the function wait for all tasks to be finished?
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_thread_pool_stop_unused_threads">
+<description>
+Stops all currently unused threads. This does not change the
+maximal number of unused threads. This function can be used to
+regularly stop all unused threads e.g. from g_timeout_add().
 
 </description>
 <parameters>
 </parameters>
-<return> a %NULL-terminated array of strings owned by GLib 
-that must not be modified or freed.
-
-Since: 2.6
-</return>
+<return></return>
 </function>
 
 <function name="g_utf8_prev_char">
@@ -1592,7 +1766,8 @@ or %NULL, if none.
 
 <function name="g_filename_from_utf8">
 <description>
-Converts a string from UTF-8 to the encoding used for filenames.
+Converts a string from UTF-8 to the encoding GLib uses for
+filenames. Note that on Windows GLib uses UTF-8 for filenames.
 
 
 </description>
@@ -1629,6 +1804,31 @@ errors. Any of the errors in #GConvertError may occur.
 </parameter>
 </parameters>
 <return> The converted string, or %NULL on an error.
+</return>
+</function>
+
+<function name="g_get_host_name">
+<description>
+Return a name for the machine. 
+
+The returned name is not necessarily a fully-qualified domain name,
+or even present in DNS or some other name service at all. It need
+not even be unique on your local network or site, but usually it
+is. Callers should not rely on the return value having any specific
+properties like uniqueness for security purposes. Even if the name
+of the machine is changed while an application is running, the
+return value from this function does not change. The returned
+string is owned by GLib and should not be modified or freed. If no
+name can be determined, a default fixed string &quot;localhost&quot; is
+returned.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the host name of the machine.
+
+Since: 2.8
 </return>
 </function>
 
@@ -1722,28 +1922,32 @@ also be negative to decrease the value of @time_.
 <return></return>
 </function>
 
-<function name="g_io_channel_write_unichar">
+<function name="g_rename">
 <description>
-This function cannot be called on a channel with %NULL encoding.
+A wrapper for the POSIX rename() function. The rename() function 
+renames a file, moving it between directories if required.
+
+See your C library manual for more details about how rename() works
+on your system. Note in particular that on Windows, it is in
+general not possible to rename a file if a file with the new name
+already exists. Also it is not possible in general to rename an
+open file.
 
 
 </description>
 <parameters>
-<parameter name="channel">
-<parameter_description> a #GIOChannel
+<parameter name="oldfilename">
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
-<parameter name="thechar">
-<parameter_description> a character
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> A location to return an error of type #GConvertError
-or #GIOChannelError
+<parameter name="newfilename">
+<parameter_description> a pathname in the GLib file name encoding
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GIOStatus
+<return> 0 if the renaming succeeded, -1 if an error occurred
+
+Since: 2.6
 </return>
 </function>
 
@@ -1781,26 +1985,38 @@ Since: 2.4
 </return>
 </function>
 
-<function name="g_async_queue_length_unlocked">
+<function name="g_ascii_formatd">
 <description>
-Returns the length of the queue, negative values mean waiting
-threads, positive values mean available entries in the
-@queue. Actually this function returns the number of data items in
-the queue minus the number of waiting threads. Thus a return value
-of 0 could mean &apos;n&apos; entries in the queue and &apos;n&apos; thread waiting.
-That can happen due to locking of the queue or due to
-scheduling. This function must be called while holding the @queue&apos;s
-lock.
+Converts a #gdouble to a string, using the &apos;.&apos; as
+decimal point. To format the number you pass in
+a printf()-style format string. Allowed conversion
+specifiers are &apos;e&apos;, &apos;E&apos;, &apos;f&apos;, &apos;F&apos;, &apos;g&apos; and &apos;G&apos;. 
+
+If you just want to want to serialize the value into a
+string, use g_ascii_dtostr().
 
 
 </description>
 <parameters>
-<parameter name="queue">
-<parameter_description> a #GAsyncQueue.
+<parameter name="buffer">
+<parameter_description> A buffer to place the resulting string in
+</parameter_description>
+</parameter>
+<parameter name="buf_len">
+<parameter_description> The length of the buffer.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> The printf()-style format to use for the
+code to use for converting. 
+</parameter_description>
+</parameter>
+<parameter name="d">
+<parameter_description> The #gdouble to convert
 </parameter_description>
 </parameter>
 </parameters>
-<return> the length of the @queue.
+<return> The pointer to the buffer with the converted string.
 </return>
 </function>
 
@@ -1826,46 +2042,66 @@ Sets the buffer size.
 <description>
 Locates the first executable named @program in the user&apos;s path, in the
 same way that execvp() would locate it. Returns an allocated string
-with the absolute path name, or NULL if the program is not found in
+with the absolute path name, or %NULL if the program is not found in
 the path. If @program is already an absolute path, returns a copy of
-@program if @program exists and is executable, and NULL otherwise.
+@program if @program exists and is executable, and %NULL otherwise.
 
-On Windows, if @program does not have a file type suffix, tries to
-append the suffixes in the PATHEXT environment variable (if that
-doesn&apos;t exists, the suffixes .com, .exe, and .bat) in turn, and
-then look for the resulting file name in the same way as
-CreateProcess() would. This means first in the directory where the
+On Windows, if @program does not have a file type suffix, tries
+with the suffixes .exe, .cmd, .bat and .com, and the suffixes in
+the &amp;lt;envar&amp;gt;PATHEXT&amp;lt;/envar&amp;gt; environment variable. 
+
+On Windows, it looks for the file in the same way as CreateProcess() 
+would. This means first in the directory where the executing
 program was loaded from, then in the current directory, then in the
 Windows 32-bit system directory, then in the Windows directory, and
-finally in the directories in the PATH environment variable. If
-the program is found, the return value contains the full name
-including the type suffix.
+finally in the directories in the &amp;lt;envar&amp;gt;PATH&amp;lt;/envar&amp;gt; environment 
+variable. If the program is found, the return value contains the 
+full name including the type suffix.
 
 
 </description>
 <parameters>
 <parameter name="program">
-<parameter_description> a program name
+<parameter_description> a program name in the GLib file name encoding
 </parameter_description>
 </parameter>
 </parameters>
-<return> absolute path, or NULL
+<return> absolute path, or %NULL
 </return>
 </function>
 
-<function name="g_error_free">
+<function name="g_hash_table_new_full">
 <description>
-Frees a #GError and associated resources.
+Creates a new #GHashTable like g_hash_table_new() and allows to specify
+functions to free the memory allocated for the key and value that get 
+called when removing the entry from the #GHashTable.
 
 
 </description>
 <parameters>
-<parameter name="error">
-<parameter_description> a #GError
+<parameter name="hash_func">
+<parameter_description> a function to create a hash value from a key.
+</parameter_description>
+</parameter>
+<parameter name="key_equal_func">
+<parameter_description> a function to check two keys for equality.
+</parameter_description>
+</parameter>
+<parameter name="key_destroy_func">
+<parameter_description> a function to free the memory allocated for the key 
+used when removing the entry from the #GHashTable or %NULL if you 
+don&apos;t want to supply such a function.
+</parameter_description>
+</parameter>
+<parameter name="value_destroy_func">
+<parameter_description> a function to free the memory allocated for the 
+value used when removing the entry from the #GHashTable or %NULL if 
+you don&apos;t want to supply such a function.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a new #GHashTable.
+</return>
 </function>
 
 <function name="g_idle_add">
@@ -1892,40 +2128,16 @@ sources and will not be called again.
 </return>
 </function>
 
-<function name="g_io_channel_set_buffered">
+<function name="g_random_double">
 <description>
-The buffering state can only be set if the channel&apos;s encoding
-is %NULL. For any other encoding, the channel must be buffered.
+Returns a random #gdouble equally distributed over the range [0..1).
 
-A buffered channel can only be set unbuffered if the channel&apos;s
-internal buffers have been flushed. Newly created channels or
-channels which have returned %G_IO_STATUS_EOF
-not require such a flush. For write-only channels, a call to
-g_io_channel_flush () is sufficient. For all other channels,
-the buffers may be flushed by a call to g_io_channel_seek_position ().
-This includes the possibility of seeking with seek type %G_SEEK_CUR
-and an offset of zero. Note that this means that socket-based
-channels cannot be set unbuffered once they have had data
-read from them.
-
-On unbuffered channels, it is safe to mix read and write
-calls from the new and old APIs, if this is necessary for
-maintaining old code.
-
-The default state of the channel is buffered.
 
 </description>
 <parameters>
-<parameter name="channel">
-<parameter_description> a #GIOChannel
-</parameter_description>
-</parameter>
-<parameter name="buffered">
-<parameter_description> whether to set the channel buffered or unbuffered
-</parameter_description>
-</parameter>
 </parameters>
-<return></return>
+<return> A random number.
+</return>
 </function>
 
 <function name="g_markup_printf_escaped">
@@ -1968,29 +2180,19 @@ Since: 2.4
 </return>
 </function>
 
-<function name="g_utf8_find_prev_char">
+<function name="g_key_file_new">
 <description>
-Given a position @p with a UTF-8 encoded string @str, find the start
-of the previous UTF-8 character starting before @p. Returns %NULL if no
-UTF-8 characters are present in @p before @str.
-
-@p does not have to be at the beginning of a UTF-8 character. No check
-is made to see if the character found is actually valid other than
-it starts with an appropriate byte.
+Creates a new empty #GKeyFile object. Use g_key_file_load_from_file(),
+g_key_file_load_from_data() or g_key_file_load_from_data_dirs() to
+read an existing key file.
 
 
 </description>
 <parameters>
-<parameter name="str">
-<parameter_description> pointer to the beginning of a UTF-8 encoded string
-</parameter_description>
-</parameter>
-<parameter name="p">
-<parameter_description> pointer to some position within @str
-</parameter_description>
-</parameter>
 </parameters>
-<return> a pointer to the found character or %NULL.
+<return> an empty #GKeyFile.
+
+Since: 2.6
 </return>
 </function>
 
@@ -2007,6 +2209,21 @@ the result is zero, free the context and free all associated memory.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_listenv">
+<description>
+Gets the names of all variables set in the environment.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a %NULL-terminated list of strings which must be freed
+with g_strfreev().
+
+Since: 2.8
+</return>
 </function>
 
 <function name="g_random_int">
@@ -2145,6 +2362,37 @@ Adds a new element at the tail of the queue.
 <return></return>
 </function>
 
+<function name="g_access">
+<description>
+A wrapper for the POSIX access() function. This function is used to
+test a pathname for one or several of read, write or execute
+permissions, or just existence. On Windows, the underlying access()
+function in the C library only checks the READONLY attribute, and
+does not look at the ACL at all. Software that needs to handle file
+permissions on Windows more exactly should use the Win32 API.
+
+See the C library manual for more details about access().
+
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> as in access()
+</parameter_description>
+</parameter>
+</parameters>
+<return> zero if the pathname refers to an existing file system
+object that has all the tested permissions, or -1 otherwise or on
+error.
+
+Since: 2.8
+</return>
+</function>
+
 <function name="g_key_file_has_group">
 <description>
 Looks whether the key file has the group @group_name.
@@ -2167,6 +2415,34 @@ Since: 2.6
 </return>
 </function>
 
+<function name="g_memmove">
+<description>
+Copies a block of memory @len bytes long, from @src to @dest.
+The source and destination areas may overlap.
+
+In order to use this function, you must include 
+&amp;lt;filename&amp;gt;string.h&amp;lt;/filename&amp;gt; yourself, because this macro will 
+typically simply resolve to memmove() and GLib does not include 
+&amp;lt;filename&amp;gt;string.h&amp;lt;/filename&amp;gt; for you.
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> the destination address to copy the bytes to.
+</parameter_description>
+</parameter>
+<parameter name="src">
+<parameter_description> the source address to copy the bytes from.
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> the number of bytes to copy.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_queue_pop_head">
 <description>
 Removes the first element of the queue.
@@ -2184,21 +2460,20 @@ is empty.
 </return>
 </function>
 
-<function name="g_unichar_isalnum">
+<function name="g_queue_peek_head">
 <description>
-Determines whether a character is alphanumeric.
-Given some UTF-8 text, obtain a character value
-with g_utf8_get_char().
+Returns the first element of the queue.
 
 
 </description>
 <parameters>
-<parameter name="c">
-<parameter_description> a Unicode character
+<parameter name="queue">
+<parameter_description> a #GQueue.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @c is an alphanumeric character
+<return> the data of the first element in the queue, or %NULL if the queue
+is empty.
 </return>
 </function>
 
@@ -2232,22 +2507,27 @@ Since: 2.6
 <return></return>
 </function>
 
-<function name="g_get_system_data_dirs">
+<function name="g_io_channel_set_flags">
 <description>
-Returns an ordered list of base directories in which to access 
-system-wide application data.
-
-On Unix platforms this is determined using the mechanisms described in
-the &amp;lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&amp;gt;
-XDG Base Directory Specification&amp;lt;/ulink&amp;gt;
+Sets the (writeable) flags in @channel to (@flags &amp; %G_IO_CHANNEL_SET_MASK).
 
 
 </description>
 <parameters>
+<parameter name="channel">
+<parameter_description> a #GIOChannel.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the flags to set on the IO channel.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> A location to return an error of type #GIOChannelError.
+</parameter_description>
+</parameter>
 </parameters>
-<return> a %NULL-terminated array of strings owned by GLib that must 
-not be modified or freed.
-Since: 2.6
+<return> the status of the operation. 
 </return>
 </function>
 
@@ -2366,20 +2646,21 @@ Since: 2.4
 <return></return>
 </function>
 
-<function name="g_queue_peek_head">
+<function name="g_unichar_isalnum">
 <description>
-Returns the first element of the queue.
+Determines whether a character is alphanumeric.
+Given some UTF-8 text, obtain a character value
+with g_utf8_get_char().
 
 
 </description>
 <parameters>
-<parameter name="queue">
-<parameter_description> a #GQueue.
+<parameter name="c">
+<parameter_description> a Unicode character
 </parameter_description>
 </parameter>
 </parameters>
-<return> the data of the first element in the queue, or %NULL if the queue
-is empty.
+<return> %TRUE if @c is an alphanumeric character
 </return>
 </function>
 
@@ -2439,42 +2720,6 @@ terminating nul character).
 </parameters>
 <return> the number of characters which would be produced if the buffer 
 was large enough.
-</return>
-</function>
-
-<function name="g_key_file_get_value">
-<description>
-Returns the value associated with @key under @group_name.  
-
-In the event the key cannot be found, %NULL is returned and 
-@error is set to #G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the 
-event that the @group_name cannot be found, %NULL is returned 
-and @error is set to #G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
-
-
-</description>
-<parameters>
-<parameter name="key_file">
-<parameter_description> a #GKeyFile
-</parameter_description>
-</parameter>
-<parameter name="group_name">
-<parameter_description> a group name
-</parameter_description>
-</parameter>
-<parameter name="key">
-<parameter_description> a key
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> return location for a #GError, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> a string or %NULL if the specified key cannot be
-found.
-
-Since: 2.6
 </return>
 </function>
 
@@ -2561,6 +2806,47 @@ the last character used in the conversion.
 </parameter>
 </parameters>
 <return> the #gdouble value.
+</return>
+</function>
+
+<function name="g_get_system_data_dirs">
+<description>
+Returns an ordered list of base directories in which to access 
+system-wide application data.
+
+On UNIX platforms this is determined using the mechanisms described in
+the &amp;lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&amp;gt;
+XDG Base Directory Specification&amp;lt;/ulink&amp;gt;
+
+On Windows the first elements in the list are the Application Data
+and Documents folders for All Users. (These can be determined only
+on Windows 2000 or later and are not present in the list on other
+Windows versions.) See documentation for CSIDL_COMMON_APPDATA and
+CSIDL_COMMON_DOCUMENTS.
+
+Then follows the &quot;share&quot; subfolder in the installation folder for
+the package containing the DLL that calls this function, if it can
+be determined.
+
+Finally the list contains the &quot;share&quot; subfolder in the installation
+folder for GLib, and in the installation folder for the package the
+application&apos;s .exe file belongs to.
+
+The installation folders above are determined by looking up the
+folder where the module (DLL or EXE) in question is located. If the
+folder&apos;s name is &quot;bin&quot;, its parent is used, otherwise the folder
+itself.
+
+Note that on Windows the returned list can vary depending on where
+this function is called.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a %NULL-terminated array of strings owned by GLib that must 
+not be modified or freed.
+Since: 2.6
 </return>
 </function>
 
@@ -2690,8 +2976,9 @@ be found then the untranslated value is returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string or %NULL if the specified key cannot be
-found.
+<return> a newly allocated string or %NULL if the specified 
+key cannot be found.
+
 Since: 2.6
 </return>
 </function>
@@ -2723,6 +3010,36 @@ to @haystack_len.
 </return>
 </function>
 
+<function name="g_chmod">
+<description>
+A wrapper for the POSIX chmod() function. The chmod() function is
+used to set the permissions of a file system object. Note that on
+Windows the file protection mechanism is not at all POSIX-like, and
+the underlying chmod() function in the C library just sets or
+clears the READONLY attribute. It does not touch any ACL. Software
+that needs to manage file permissions on Windows exactly should
+use the Win32 API.
+
+See the C library manual for more details about chmod().
+
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> as in chmod()
+</parameter_description>
+</parameter>
+</parameters>
+<return> zero if the operation succeeded, -1 on error.
+
+Since: 2.8
+</return>
+</function>
+
 <function name="g_unichar_isxdigit">
 <description>
 Determines if a character is a hexidecimal digit.
@@ -2742,8 +3059,7 @@ Determines if a character is a hexidecimal digit.
 <function name="g_key_file_set_boolean">
 <description>
 Associates a new boolean value with @key under @group_name.
-If @key cannot be found then it is created. If @group_name
-is %NULL, the start group is used.
+If @key cannot be found then it is created. 
 
 Since: 2.6
 
@@ -2767,6 +3083,24 @@ Since: 2.6
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_int_hash">
+<description>
+Converts a pointer to a #gint to a hash value.
+It can be passed to g_hash_table_new() as the @hash_func parameter, 
+when using pointers to integers values as keys in a #GHashTable.
+
+
+</description>
+<parameters>
+<parameter name="v">
+<parameter_description> a pointer to a #gint key
+</parameter_description>
+</parameter>
+</parameters>
+<return> a hash value corresponding to the key.
+</return>
 </function>
 
 <function name="g_ucs4_to_utf8">
@@ -2917,25 +3251,20 @@ the number of elements in @queue, the link is added to the end of
 <return></return>
 </function>
 
-<function name="g_str_has_prefix">
+<function name="g_queue_peek_tail">
 <description>
-Looks whether the string @str begins with @prefix.
+Returns the last element of the queue.
 
 
 </description>
 <parameters>
-<parameter name="str">
-<parameter_description> a nul-terminated string.
-</parameter_description>
-</parameter>
-<parameter name="prefix">
-<parameter_description> the nul-terminated prefix to look for.
+<parameter name="queue">
+<parameter_description> a #GQueue.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @str begins with @prefix, %FALSE otherwise.
-
-Since: 2.2
+<return> the data of the last element in the queue, or %NULL if the queue
+is empty.
 </return>
 </function>
 
@@ -3099,7 +3428,7 @@ See the C library manual for more details about stat().
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="buf">
@@ -3115,35 +3444,59 @@ Since: 2.6
 </return>
 </function>
 
-<function name="g_utf8_casefold">
+<function name="g_filename_display_basename">
 <description>
-Converts a string into a form that is independent of case. The
-result will not correspond to any particular case, but can be
-compared for equality or ordered with the results of calling
-g_utf8_casefold() on other strings.
+Returns the display basename for the particular filename, guaranteed
+to be valid UTF-8. The display name might not be identical to the filename,
+for instance there might be problems converting it to UTF-8, and some files
+can be translated in the display
 
-Note that calling g_utf8_casefold() followed by g_utf8_collate() is
-only an approximation to the correct linguistic case insensitive
-ordering, though it is a fairly good one. Getting this exactly
-right would require a more sophisticated collation function that
-takes case sensitivity into account. GLib does not currently
-provide such a function.
+You must pass the whole absolute pathname to this functions so that
+translation of well known locations can be done.
+
+This function is preferred over g_filename_display_name() if you know the
+whole path, as it allows translation.
 
 
 </description>
 <parameters>
-<parameter name="str">
-<parameter_description> a UTF-8 encoded string
-</parameter_description>
-</parameter>
-<parameter name="len">
-<parameter_description> length of @str, in bytes, or -1 if @str is nul-terminated.
+<parameter name="filename">
+<parameter_description> an absolute pathname in the GLib file name encoding
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string, that is a
-case independent form of @str.
+<return> a newly allocated string containing
+a rendition of the basename of the filename in valid UTF-8
+
+Since: 2.6
 </return>
+</function>
+
+<function name="g_datalist_set_flags">
+<description>
+Turns on flag values for a data list. This function is used
+to keep a small number of boolean flags in an object with
+a data list without using any additional space. It is
+not generally useful except in circumstances where space
+is very tight. (It is used in the base #GObject type, for
+example.)
+
+</description>
+<parameters>
+<parameter name="datalist">
+<parameter_description> pointer to the location that holds a list
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the flags to turn on. The values of the flags are
+restricted by %G_DATALIST_FLAGS_MASK (currently
+3; giving two possible boolean flags).
+A value for @flags that doesn&apos;t fit within the mask is
+an error.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_utf8_validate">
@@ -3205,10 +3558,31 @@ increments the cache size.
 </return>
 </function>
 
+<function name="g_tree_new">
+<description>
+Creates a new #GTree.
+
+
+</description>
+<parameters>
+<parameter name="key_compare_func">
+<parameter_description> the function used to order the nodes in the #GTree.
+It should return values similar to the standard strcmp() function -
+0 if the two arguments are equal, a negative value if the first argument 
+comes before the second, or a positive value if the first argument comes 
+after the second.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GTree.
+</return>
+</function>
+
 <function name="g_utf8_collate_key">
 <description>
 Converts a string into a collation key that can be compared
-with other collation keys using strcmp(). 
+with other collation keys produced by the same function using 
+strcmp(). 
 The results of comparing the collation keys of two strings 
 with strcmp() will always be the same as 
 comparing the two original keys with g_utf8_collate().
@@ -3334,7 +3708,22 @@ be a relative path.
 
 <function name="g_convert_with_iconv">
 <description>
-Converts a string from one character set to another.
+Converts a string from one character set to another. 
+
+Note that you should use g_iconv() for streaming 
+conversions&amp;lt;footnote id=&quot;streaming-state&quot;&amp;gt;
+&amp;lt;para&amp;gt;
+Despite the fact that @byes_read can return information about partial 
+characters, the &amp;lt;literal&amp;gt;g_convert_...&amp;lt;/literal&amp;gt; functions
+are not generally suitable for streaming. If the underlying converter 
+being used maintains internal state, then this won&apos;t be preserved 
+across successive calls to g_convert(), g_convert_with_iconv() or 
+g_convert_with_fallback(). (An example of this is the GNU C converter 
+for CP1255 which does not emit a base character until it knows that 
+the next character is not a mark that could combine with the base 
+character.)
+&amp;lt;/para&amp;gt;
+&amp;lt;/footnote&amp;gt;. 
 
 
 </description>
@@ -3344,7 +3733,8 @@ Converts a string from one character set to another.
 </parameter_description>
 </parameter>
 <parameter name="len">
-<parameter_description>           the length of the string
+<parameter_description>           the length of the string, or -1 if the string is 
+nul-terminated&amp;lt;footnoteref linkend=&quot;nul-unsafe&quot;/&amp;gt;. 
 </parameter_description>
 </parameter>
 <parameter name="converter">
@@ -3671,6 +4061,43 @@ simply calls the g_spawn_async_with_pipes() without any pipes.
 </return>
 </function>
 
+<function name="g_win32_locale_filename_from_utf8">
+<description>
+Converts a filename from UTF-8 to the system codepage.
+
+On NT-based Windows, on NTFS file systems, file names are in
+Unicode. It is quite possible that Unicode file names contain
+characters not representable in the system codepage. (For instance,
+Greek or Cyrillic characters on Western European or US Windows
+installations, or various less common CJK characters on CJK Windows
+installations.)
+
+In such a case, and if the filename refers to an existing file, and
+the file system stores alternate short (8.3) names for directory
+entries, the short form of the filename is returned. Note that the
+&quot;short&quot; name might in fact be longer than the Unicode name if the
+Unicode name has very short pathname components containing
+non-ASCII characters. If no system codepage name for the file is
+possible, %NULL is returned.
+
+The return value is dynamically allocated and should be freed with
+g_free() when no longer needed.
+
+
+</description>
+<parameters>
+<parameter name="utf8filename">
+<parameter_description> a UTF-8 encoded filename.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The converted filename, or %NULL on conversion
+failure and lack of short names.
+
+Since: 2.8
+</return>
+</function>
+
 <function name="g_io_channel_read_line_string">
 <description>
 Reads a line from a #GIOChannel, using a #GString as a buffer.
@@ -3751,32 +4178,19 @@ Since: 2.4
 </return>
 </function>
 
-<function name="g_child_watch_source_new">
+<function name="g_random_set_seed">
 <description>
-Creates a new child_watch source.
-
-The source will not initially be associated with any #GMainContext
-and must be added to one with g_source_attach() before it will be
-executed.
-
-Note that on platforms where #GPid must be explicitely closed
-(see g_spawn_close_pid()) @pid must not be closed while the
-source is still active. Typically, you will want to call
-g_spawn_close_pid() in the callback function for the source.
-
+Sets the seed for the global random number generator, which is used
+by the &amp;lt;function&amp;gt;g_random_*&amp;lt;/function&amp;gt; functions, to @seed.
 
 </description>
 <parameters>
-<parameter name="pid">
-<parameter_description> process id of a child process to watch. On Windows, a HANDLE
-for the process to watch (which actually doesn&apos;t have to be a child).
+<parameter name="seed">
+<parameter_description> a value to reinitialize the global random number generator.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the newly-created child watch source
-
-Since: 2.4
-</return>
+<return></return>
 </function>
 
 <function name="g_option_group_new">
@@ -3820,6 +4234,22 @@ Since: 2.6
 </return>
 </function>
 
+<function name="g_mapped_file_free">
+<description>
+Unmaps the buffer of @file and frees it. 
+
+Since: 2.8
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GMappedFile
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_thread_pool_get_max_unused_threads">
 <description>
 Returns the maximal allowed number of unused threads.
@@ -3845,6 +4275,29 @@ Converts an &amp;lt;literal&amp;gt;errno&amp;lt;/literal&amp;gt; error number to
 </parameter>
 </parameters>
 <return> a #GIOChannelError error number, e.g. %G_IO_CHANNEL_ERROR_INVAL.
+</return>
+</function>
+
+<function name="g_int_equal">
+<description>
+Compares the two #gint values being pointed to and returns 
+%TRUE if they are equal.
+It can be passed to g_hash_table_new() as the @key_equal_func
+parameter, when using pointers to integers as keys in a #GHashTable.
+
+
+</description>
+<parameters>
+<parameter name="v1">
+<parameter_description> a pointer to a #gint key.
+</parameter_description>
+</parameter>
+<parameter name="v2">
+<parameter_description> a pointer to a #gint key to compare with @v1.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the two keys match.
 </return>
 </function>
 
@@ -3939,22 +4392,57 @@ Since: 2.4
 </return>
 </function>
 
-<function name="g_get_system_config_dirs">
+<function name="g_key_file_get_boolean">
 <description>
-Returns an ordered list of base directories in which to access 
-system-wide configuration information.
+Returns the value associated with @key under @group_name as a
+boolean. 
 
-On Unix platforms this is determined using the mechanisms described in
-the &amp;lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&amp;gt;
-XDG Base Directory Specification&amp;lt;/ulink&amp;gt;
+If @key cannot be found then the return value is undefined and
+@error is set to #G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if
+the value associated with @key cannot be interpreted as a boolean
+then the return value is also undefined and @error is set to
+#G_KEY_FILE_ERROR_INVALID_VALUE.
 
 
 </description>
 <parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
 </parameters>
-<return> a %NULL-terminated array of strings owned by GLib that must 
-not be modified or freed.
+<return> the value associated with the key as a boolean
 Since: 2.6
+</return>
+</function>
+
+<function name="g_path_is_absolute">
+<description>
+Returns %TRUE if the given @file_name is an absolute file name,
+i.e. it contains a full path from the root directory such as &quot;/usr/local&quot;
+on UNIX or &quot;C:\windows&quot; on Windows systems.
+
+
+</description>
+<parameters>
+<parameter name="file_name">
+<parameter_description> a file name.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @file_name is an absolute path. 
 </return>
 </function>
 
@@ -3974,21 +4462,31 @@ Checks to see if the main loop is currently being run via g_main_loop_run().
 </return>
 </function>
 
-<function name="g_source_remove_by_user_data">
+<function name="g_filename_to_uri">
 <description>
-Removes a source from the default main loop context given the user
-data for the callback. If multiple sources exist with the same user
-data, only one will be destroyed.
+Converts an absolute filename to an escaped ASCII-encoded URI.
 
 
 </description>
 <parameters>
-<parameter name="user_data">
-<parameter_description> the user_data for the callback.
+<parameter name="filename">
+<parameter_description> an absolute filename specified in the GLib file name encoding,
+which is the on-disk file name bytes on Unix, and UTF-8 on 
+Windows
+</parameter_description>
+</parameter>
+<parameter name="hostname">
+<parameter_description> A UTF-8 encoded hostname, or %NULL for none.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store the error occuring, or %NULL to ignore
+errors. Any of the errors in #GConvertError may occur.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if a source was found and removed. 
+<return> a newly-allocated string holding the resulting
+URI, or %NULL on an error.
 </return>
 </function>
 
@@ -4031,22 +4529,26 @@ the g_strncasecmp() docs - use g_ascii_strup() or g_utf8_strup() instead.
 </return>
 </function>
 
-<function name="g_date_get_iso8601_week_of_year">
+<function name="g_tree_steal">
 <description>
-Returns the week of the year, where weeks are interpreted according
-to ISO 8601. 
+Removes a key and its associated value from a #GTree without calling 
+the key and value destroy functions.
+
+If the key does not exist in the #GTree, the function does nothing.
 
 
 </description>
 <parameters>
-<parameter name="date">
-<parameter_description> a valid #GDate
+<parameter name="tree">
+<parameter_description> a #GTree.
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the key to remove.
 </parameter_description>
 </parameter>
 </parameters>
-<return> ISO 8601 week number of the year.
-
-Since: 2.6
+<return> %TRUE if the key was found (prior to 2.8, this function returned nothing)
 </return>
 </function>
 
@@ -4074,7 +4576,7 @@ itself. If that DLL isn&apos;t loaded, the function proceeds as if
 @dll_name was %NULL.
 
 If both @package and @dll_name are %NULL, the directory from where
-the main executable of the process was loaded is uses instead in
+the main executable of the process was loaded is used instead in
 the same way as above.
 
 
@@ -4096,16 +4598,23 @@ needed any longer.
 </return>
 </function>
 
-<function name="g_thread_pool_stop_unused_threads">
+<function name="g_option_context_get_help_enabled">
 <description>
-Stops all currently unused threads. This does not change the
-maximal number of unused threads. This function can be used to
-regularly stop all unused threads e.g. from g_timeout_add().
+Returns whether automatic &amp;lt;option&amp;gt;--help&amp;lt;/option&amp;gt; generation
+is turned on for @context. See g_option_context_set_help_enabled().
+
 
 </description>
 <parameters>
+<parameter name="context">
+<parameter_description> a #GOptionContext
+</parameter_description>
+</parameter>
 </parameters>
-<return></return>
+<return> %TRUE if automatic help generation is turned on.
+
+Since: 2.6
+</return>
 </function>
 
 <function name="g_hash_table_size">
@@ -4168,38 +4677,26 @@ Gets the priority of a source.
 </return>
 </function>
 
-<function name="g_source_set_callback">
+<function name="g_queue_find">
 <description>
-Sets the callback function for a source. The callback for a source is
-called from the source&apos;s dispatch function.
+Finds the first link in @queue which contains @data.
 
-The exact type of @func depends on the type of source; ie. you
-should not count on @func being called with @data as its first
-parameter.
-
-Typically, you won&apos;t use this function. Instead use functions specific
-to the type of source you are using.
 
 </description>
 <parameters>
-<parameter name="source">
-<parameter_description> the source
-</parameter_description>
-</parameter>
-<parameter name="func">
-<parameter_description> a callback function
+<parameter name="queue">
+<parameter_description> a #GQueue
 </parameter_description>
 </parameter>
 <parameter name="data">
-<parameter_description> the data to pass to callback function
-</parameter_description>
-</parameter>
-<parameter name="notify">
-<parameter_description> a function to call when @data is no longer in use, or %NULL.
+<parameter_description> data to find
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> The first link in @queue which contains @data.
+
+Since: 2.4
+</return>
 </function>
 
 <function name="g_queue_pop_nth_link">
@@ -4266,7 +4763,7 @@ available.
 <function name="g_key_file_get_integer_list">
 <description>
 Returns the values associated with @key under @group_name as
-integers. If @group_name is %NULL, the start group is used.
+integers. 
 
 If @key cannot be found then the return value is undefined and
 @error is set to #G_KEY_FILE_ERROR_KEY_NOT_FOUND. Likewise, if
@@ -4456,33 +4953,30 @@ closed with close(). In case of errors, -1 is returned.
 </return>
 </function>
 
-<function name="g_tree_insert">
+<function name="g_utf8_get_char_validated">
 <description>
-Inserts a key/value pair into a #GTree. If the given key already exists 
-in the #GTree its corresponding value is set to the new value. If you 
-supplied a value_destroy_func when creating the #GTree, the old value is 
-freed using that function. If you supplied a @key_destroy_func when 
-creating the #GTree, the passed key is freed using that function.
+Convert a sequence of bytes encoded as UTF-8 to a Unicode character.
+This function checks for incomplete characters, for invalid characters
+such as characters that are out of the range of Unicode, and for
+overlong encodings of valid characters.
 
-The tree is automatically &apos;balanced&apos; as new key/value pairs are added,
-so that the distance from the root to every leaf is as small as possible.
 
 </description>
 <parameters>
-<parameter name="tree">
-<parameter_description> a #GTree.
+<parameter name="p">
+<parameter_description> a pointer to Unicode character encoded as UTF-8
 </parameter_description>
 </parameter>
-<parameter name="key">
-<parameter_description> the key to insert.
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> the value corresponding to the key.
+<parameter name="max_len">
+<parameter_description> the maximum number of bytes to read, or -1, for no maximum.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the resulting character. If @p points to a partial
+sequence at the end of a string that could begin a valid 
+character, returns (gunichar)-2; otherwise, if @p does not point 
+to a valid UTF-8 encoded Unicode character, returns (gunichar)-1.
+</return>
 </function>
 
 <function name="g_utf8_to_ucs4_fast">
@@ -4574,19 +5068,22 @@ element comes after the first.
 <return></return>
 </function>
 
-<function name="g_main_loop_get_context">
+<function name="g_get_user_config_dir">
 <description>
-Returns the #GMainContext of @loop.
+Returns a base directory in which to store user-specific application 
+configuration information such as user preferences and settings. 
+
+On UNIX platforms this is determined using the mechanisms described in
+the &amp;lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&amp;gt;
+XDG Base Directory Specification&amp;lt;/ulink&amp;gt;
 
 
 </description>
 <parameters>
-<parameter name="loop">
-<parameter_description> a #GMainLoop.
-</parameter_description>
-</parameter>
 </parameters>
-<return> the #GMainContext of @loop
+<return> a string owned by GLib that must not be modified 
+or freed.
+Since: 2.6
 </return>
 </function>
 
@@ -4830,31 +5327,47 @@ Increases the reference count on a source by one.
 </return>
 </function>
 
-<function name="g_vfprintf">
+<function name="g_filename_to_utf8">
 <description>
-An implementation of the standard fprintf() function which supports 
-positional parameters, as specified in the Single Unix Specification.
+Converts a string which is in the encoding used by GLib for
+filenames into a UTF-8 string. Note that on Windows GLib uses UTF-8
+for filenames.
 
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> the stream to write to.
+<parameter name="opsysstring">
+<parameter_description>   a string in the encoding for filenames
 </parameter_description>
 </parameter>
-<parameter name="format">
-<parameter_description> a standard printf() format string, but notice 
-&amp;lt;link linkend=&quot;string-precision&quot;&amp;gt;string precision pitfalls&amp;lt;/link&amp;gt;.
+<parameter name="len">
+<parameter_description>           the length of the string, or -1 if the string is
+nul-terminated&amp;lt;footnoteref linkend=&quot;nul-unsafe&quot;/&amp;gt;. 
 </parameter_description>
 </parameter>
-<parameter name="args">
-<parameter_description> the list of arguments to insert in the output.
+<parameter name="bytes_read">
+<parameter_description>    location to store the number of bytes in the
+input string that were successfully converted, or %NULL.
+Even if the conversion was successful, this may be 
+less than @len if there were partial characters
+at the end of the input. If the error
+#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
+stored will the byte offset after the last valid
+input sequence.
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> the number of bytes stored in the output buffer (not 
+including the terminating nul).
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description>         location to store the error occuring, or %NULL to ignore
+errors. Any of the errors in #GConvertError may occur.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the number of characters printed.
-
-Since: 2.2
+<return> The converted string, or %NULL on an error.
 </return>
 </function>
 
@@ -4909,36 +5422,21 @@ this thread is now the owner of @context.
 </return>
 </function>
 
-<function name="g_key_file_set_comment">
+<function name="g_source_set_can_recurse">
 <description>
-Places a comment above @key from @group_name.
-@group_name. If @key is %NULL then @comment will
-be written above @group_name.  If both @key
-and @group_name are NULL, then @comment will
-be written above the first group in the file.
-
-Since: 2.6
+Sets whether a source can be called recursively. If @can_recurse is
+%TRUE, then while the source is being dispatched then this source
+will be processed normally. Otherwise, all processing of this
+source is blocked until the dispatch function returns.
 
 </description>
 <parameters>
-<parameter name="key_file">
-<parameter_description> a #GKeyFile
+<parameter name="source">
+<parameter_description> a #GSource
 </parameter_description>
 </parameter>
-<parameter name="group_name">
-<parameter_description> a group name, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="key">
-<parameter_description> a key
-</parameter_description>
-</parameter>
-<parameter name="comment">
-<parameter_description> a comment
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> return location for a #GError
+<parameter name="can_recurse">
+<parameter_description> whether recursion is allowed for this source
 </parameter_description>
 </parameter>
 </parameters>
@@ -4952,6 +5450,30 @@ Since: 2.6
 <parameters>
 </parameters>
 <return> The quark used as %G_IO_CHANNEL_ERROR
+</return>
+</function>
+
+<function name="g_printf">
+<description>
+An implementation of the standard printf() function which supports 
+positional parameters, as specified in the Single Unix Specification.
+
+
+</description>
+<parameters>
+<parameter name="format">
+<parameter_description> a standard printf() format string, but notice 
+&amp;lt;link linkend=&quot;string-precision&quot;&amp;gt;string precision pitfalls&amp;lt;/link&amp;gt;.
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> the arguments to insert in the output.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of characters printed.
+
+Since: 2.2
 </return>
 </function>
 
@@ -4977,40 +5499,6 @@ Since: 2.6
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="g_hash_table_new_full">
-<description>
-Creates a new #GHashTable like g_hash_table_new() and allows to specify
-functions to free the memory allocated for the key and value that get 
-called when removing the entry from the #GHashTable.
-
-
-</description>
-<parameters>
-<parameter name="hash_func">
-<parameter_description> a function to create a hash value from a key.
-</parameter_description>
-</parameter>
-<parameter name="key_equal_func">
-<parameter_description> a function to check two keys for equality.
-</parameter_description>
-</parameter>
-<parameter name="key_destroy_func">
-<parameter_description> a function to free the memory allocated for the key 
-used when removing the entry from the #GHashTable or %NULL if you 
-don&apos;t want to supply such a function.
-</parameter_description>
-</parameter>
-<parameter name="value_destroy_func">
-<parameter_description> a function to free the memory allocated for the 
-value used when removing the entry from the #GHashTable or %NULL if 
-you don&apos;t want to supply such a function.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GHashTable.
-</return>
 </function>
 
 <function name="g_hash_table_foreach_remove">
@@ -5041,22 +5529,25 @@ keys and values.
 </return>
 </function>
 
-<function name="g_unichar_isprint">
+<function name="g_rand_new_with_seed_array">
 <description>
-Determines whether a character is printable.
-Unlike g_unichar_isgraph(), returns %TRUE for spaces.
-Given some UTF-8 text, obtain a character value with
-g_utf8_get_char().
+Creates a new random number generator initialized with @seed.
 
 
 </description>
 <parameters>
-<parameter name="c">
-<parameter_description> a Unicode character
+<parameter name="seed">
+<parameter_description> an array of seeds to initialize the random number generator.
+</parameter_description>
+</parameter>
+<parameter name="seed_length">
+<parameter_description> an array of seeds to initialize the random number generator.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @c is printable
+<return> the new #GRand.
+
+Since: 2.4
 </return>
 </function>
 
@@ -5119,12 +5610,13 @@ system) in the current locale into a UTF-8 string.
 </description>
 <parameters>
 <parameter name="opsysstring">
-<parameter_description>   a string in the encoding of the current locale
+<parameter_description>   a string in the encoding of the current locale. On Windows
+this means the system codepage.
 </parameter_description>
 </parameter>
 <parameter name="len">
 <parameter_description>           the length of the string, or -1 if the string is
-nul-terminated.
+nul-terminated&amp;lt;footnoteref linkend=&quot;nul-unsafe&quot;/&amp;gt;. 
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
@@ -5182,8 +5674,8 @@ and @error is set to #G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string or %NULL if the specified key cannot be
-found.
+<return> a newly allocated string or %NULL if the specified 
+key cannot be found.
 
 Since: 2.6
 </return>
@@ -5208,6 +5700,22 @@ this source.
 <return></return>
 </function>
 
+<function name="g_get_real_name">
+<description>
+Gets the real name of the user. This usually comes from the user&apos;s entry 
+in the &amp;lt;filename&amp;gt;passwd&amp;lt;/filename&amp;gt; file. The encoding of the returned 
+string is system-defined. (On Windows, it is, however, always UTF-8.) 
+If the real user name cannot be determined, the string &quot;Unknown&quot; is 
+returned.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the user&apos;s real name.
+</return>
+</function>
+
 <function name="g_strfreev">
 <description>
 Frees a %NULL-terminated array of strings, and the array itself.
@@ -5223,19 +5731,31 @@ If called on a %NULL value, g_strfreev() simply returns.
 <return></return>
 </function>
 
-<function name="g_unichar_type">
+<function name="g_vfprintf">
 <description>
-Classifies a Unicode character by type.
+An implementation of the standard fprintf() function which supports 
+positional parameters, as specified in the Single Unix Specification.
 
 
 </description>
 <parameters>
-<parameter name="c">
-<parameter_description> a Unicode character
+<parameter name="file">
+<parameter_description> the stream to write to.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> a standard printf() format string, but notice 
+&amp;lt;link linkend=&quot;string-precision&quot;&amp;gt;string precision pitfalls&amp;lt;/link&amp;gt;.
+</parameter_description>
+</parameter>
+<parameter name="args">
+<parameter_description> the list of arguments to insert in the output.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the type of the character.
+<return> the number of characters printed.
+
+Since: 2.2
 </return>
 </function>
 
@@ -5691,21 +6211,6 @@ of the separator are ignored.
 </return>
 </function>
 
-<function name="g_random_set_seed">
-<description>
-Sets the seed for the global random number generator, which is used
-by the &amp;lt;function&amp;gt;g_random_*&amp;lt;/function&amp;gt; functions, to @seed.
-
-</description>
-<parameters>
-<parameter name="seed">
-<parameter_description> a value to reinitialize the global random number generator.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="g_source_set_priority">
 <description>
 Sets the priority of a source. While the main loop is being
@@ -5805,20 +6310,47 @@ mapping from ID to source is done by g_main_context_find_source_by_id().
 </return>
 </function>
 
-<function name="g_markup_parse_context_free">
+<function name="g_mapped_file_get_contents">
 <description>
-Frees a #GMarkupParseContext. Can&apos;t be called from inside
-one of the #GMarkupParser functions.
+Returns the contents of a #GMappedFile. 
+
+Note that the contents may not be zero-terminated,
+even if the #GMappedFile is backed by a text file.
 
 
 </description>
 <parameters>
-<parameter name="context">
-<parameter_description> a #GMarkupParseContext
+<parameter name="file">
+<parameter_description> a #GMappedFile
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the contents of @file.
+
+Since: 2.8
+</return>
+</function>
+
+<function name="g_direct_equal">
+<description>
+Compares two #gpointer arguments and returns %TRUE if they are equal.
+It can be passed to g_hash_table_new() as the @key_equal_func
+parameter, when using pointers as keys in a #GHashTable.
+
+
+</description>
+<parameters>
+<parameter name="v1">
+<parameter_description> a key.
+</parameter_description>
+</parameter>
+<parameter name="v2">
+<parameter_description> a key to compare with @v1.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the two keys match.
+</return>
 </function>
 
 <function name="g_hash_table_new">
@@ -5866,32 +6398,6 @@ Gets the number of nodes in a #GTree.
 </return>
 </function>
 
-<function name="g_ascii_strcasecmp">
-<description>
-Compare two strings, ignoring the case of ASCII characters.
-
-Unlike the BSD strcasecmp() function, this only recognizes standard
-ASCII letters and ignores the locale, treating all non-ASCII
-characters as if they are not letters.
-
-
-</description>
-<parameters>
-<parameter name="s1">
-<parameter_description> string to compare with @s2.
-</parameter_description>
-</parameter>
-<parameter name="s2">
-<parameter_description> string to compare with @s1.
-</parameter_description>
-</parameter>
-</parameters>
-<return> an integer less than, equal to, or greater than
-zero if @s1 is found, respectively, to be less than,
-to match, or to be greater than @s2.
-</return>
-</function>
-
 <function name="g_win32_getlocale">
 <description>
 The setlocale() function in the Microsoft C library uses locale
@@ -5910,21 +6416,48 @@ g_free().
 </return>
 </function>
 
+<function name="g_tree_new_with_data">
+<description>
+Creates a new #GTree with a comparison function that accepts user data.
+See g_tree_new() for more details.
+
+
+</description>
+<parameters>
+<parameter name="key_compare_func">
+<parameter_description> qsort()-style comparison function.
+</parameter_description>
+</parameter>
+<parameter name="key_compare_data">
+<parameter_description> data to pass to comparison function.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GTree.
+</return>
+</function>
+
 <function name="g_getenv">
 <description>
-Returns an environment variable.
+Returns the value of an environment variable. The name and value
+are in the GLib file name encoding. On UNIX, this means the actual
+bytes which might or might not be in some consistent character set
+and encoding. On Windows, it is in UTF-8. On Windows, in case the
+environment variable&apos;s value contains references to other
+environment variables, they are expanded.
 
 
 </description>
 <parameters>
 <parameter name="variable">
-<parameter_description> the environment variable to get.
+<parameter_description> the environment variable to get, in the GLib file name encoding.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the value of the environment variable, or %NULL if the environment
-variable is not found. The returned string may be overwritten by the next call to g_getenv(),
-g_setenv() or g_unsetenv().
+<return> the value of the environment variable, or %NULL if
+the environment variable is not found. The returned string may be
+overwritten by the next call to g_getenv(), g_setenv() or
+g_unsetenv().
 </return>
 </function>
 
@@ -5945,32 +6478,27 @@ Since: 2.2
 </return>
 </function>
 
-<function name="g_rename">
+<function name="g_mkdir_with_parents">
 <description>
-A wrapper for the POSIX rename() function. The rename() function 
-renames a file, moving it between directories if required.
-
-See your C library manual for more details about how rename() works
-on your system. Note in particular that on Windows, it is in
-general not possible to rename a file if a file with the new name
-already exists. Also it is not possible in general to rename an
-open file.
+Create a directory if it doesn&apos;t already exist. Create intermediate
+parent directories as needed, too.
 
 
 </description>
 <parameters>
-<parameter name="oldfilename">
+<parameter name="pathname">
 <parameter_description> a pathname in the GLib file name encoding
 </parameter_description>
 </parameter>
-<parameter name="newfilename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter name="mode">
+<parameter_description> permissions to use for newly created directories
 </parameter_description>
 </parameter>
 </parameters>
-<return> 0 if the renaming succeeded, -1 if an error occurred
+<return> 0 if the directory already exists, or was successfully
+created. Returns -1 if an error occurred, with errno set.
 
-Since: 2.6
+Since: 2.8
 </return>
 </function>
 
@@ -6152,12 +6680,15 @@ Since: 2.6
 <function name="g_file_get_contents">
 <description>
 Reads an entire file into allocated memory, with good error
-checking. If @error is set, %FALSE is returned, and @contents is set
-to %NULL. If %TRUE is returned, @error will not be set, and @contents
-will be set to the file contents.  The string stored in @contents
-will be nul-terminated, so for text files you can pass %NULL for the
-@length argument.  The error domain is #G_FILE_ERROR. Possible
-error codes are those in the #GFileError enumeration.
+checking. 
+
+If the call was successful, it returns %TRUE and sets @contents to the file 
+contents and @length to the length of the file contents in bytes. The string 
+stored in @contents will be nul-terminated, so for text files you can pass 
+%NULL for the @length argument. If the call was not successful, it returns 
+%FALSE and sets @error. The error domain is #G_FILE_ERROR. Possible error  
+codes are those in the #GFileError enumeration. In the error case, 
+@contents is set to %NULL and @length is set to zero.
 
 
 </description>
@@ -6171,15 +6702,15 @@ error codes are those in the #GFileError enumeration.
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> location to store length in bytes of the contents
+<parameter_description> location to store length in bytes of the contents, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE on success, %FALSE if error is set
+<return> %TRUE on success, %FALSE if an error occurred
 </return>
 </function>
 
@@ -6295,7 +6826,7 @@ See the C library manual for more details about fopen().
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -6304,26 +6835,10 @@ opened
 </parameter_description>
 </parameter>
 </parameters>
-<return> A &amp;lt;typename&amp;gt;FILE&amp;lt;/typename&amp;gt; pointer if the file was successfully
+<return> A &amp;lt;type&amp;gt;FILE&amp;lt;/type&amp;gt; pointer if the file was successfully
 opened, or %NULL if an error occurred
 
 Since: 2.6
-</return>
-</function>
-
-<function name="g_error_copy">
-<description>
-Makes a copy of @error.
-
-
-</description>
-<parameters>
-<parameter name="error">
-<parameter_description> a #GError
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GError
 </return>
 </function>
 
@@ -6342,6 +6857,43 @@ g_utf8_get_char().
 </parameter>
 </parameters>
 <return> %TRUE if @c is a control character
+</return>
+</function>
+
+<function name="g_mapped_file_new">
+<description>
+Maps a file into memory. On UNIX, this is using the mmap() function.
+
+If @writable is %TRUE, the mapped buffer may be modified, otherwise
+it is an error to modify the mapped buffer. Modifications to the buffer 
+are not visible to other processes mapping the same file, and are not 
+written back to the file.
+
+Note that modifications of the underlying file might affect the contents
+of the #GMappedFile. Therefore, mapping should only be used if the file 
+will not be modified, or if all modifications of the file are done
+atomically (e.g. using g_file_set_contents()). 
+
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> The path of the file to load, in the GLib filename encoding
+</parameter_description>
+</parameter>
+<parameter name="writable">
+<parameter_description> wether the mapping should be writable
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated #GMappedFile which must be freed
+with g_mapped_file_free(), or %NULL if the mapping failed. 
+
+Since: 2.8
 </return>
 </function>
 
@@ -6375,48 +6927,78 @@ Deprecated: Use g_io_channel_read_chars() instead.
 </return>
 </function>
 
-<function name="g_rand_new_with_seed_array">
+<function name="g_utf8_pointer_to_offset">
 <description>
-Creates a new random number generator initialized with @seed.
+Converts from a pointer to position within a string to a integer
+character offset.
 
 
 </description>
 <parameters>
-<parameter name="seed">
-<parameter_description> an array of seeds to initialize the random number generator.
+<parameter name="str">
+<parameter_description> a UTF-8 encoded string
 </parameter_description>
 </parameter>
-<parameter name="seed_length">
-<parameter_description> an array of seeds to initialize the random number generator.
+<parameter name="pos">
+<parameter_description> a pointer to a position within @str
 </parameter_description>
 </parameter>
 </parameters>
-<return> the new #GRand.
-
-Since: 2.4
+<return> the resulting character offset
 </return>
 </function>
 
-<function name="g_queue_find">
+<function name="g_unichar_isprint">
 <description>
-Finds the first link in @queue which contains @data.
+Determines whether a character is printable.
+Unlike g_unichar_isgraph(), returns %TRUE for spaces.
+Given some UTF-8 text, obtain a character value with
+g_utf8_get_char().
 
 
 </description>
 <parameters>
-<parameter name="queue">
-<parameter_description> a #GQueue
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> data to find
+<parameter name="c">
+<parameter_description> a Unicode character
 </parameter_description>
 </parameter>
 </parameters>
-<return> The first link in @queue which contains @data.
-
-Since: 2.4
+<return> %TRUE if @c is printable
 </return>
+</function>
+
+<function name="g_source_set_callback">
+<description>
+Sets the callback function for a source. The callback for a source is
+called from the source&apos;s dispatch function.
+
+The exact type of @func depends on the type of source; ie. you
+should not count on @func being called with @data as its first
+parameter.
+
+Typically, you won&apos;t use this function. Instead use functions specific
+to the type of source you are using.
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> the source
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a callback function
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> a function to call when @data is no longer in use, or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_source_remove">
@@ -6441,22 +7023,19 @@ See also g_source_destroy().
 </return>
 </function>
 
-<function name="g_get_user_config_dir">
+<function name="g_main_loop_get_context">
 <description>
-Returns a base directory in which to store user-specific application 
-configuration information such as user preferences and settings. 
-
-On Unix platforms this is determined using the mechanisms described in
-the &amp;lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&amp;gt;
-XDG Base Directory Specification&amp;lt;/ulink&amp;gt;
+Returns the #GMainContext of @loop.
 
 
 </description>
 <parameters>
+<parameter name="loop">
+<parameter_description> a #GMainLoop.
+</parameter_description>
+</parameter>
 </parameters>
-<return> a string owned by GLib that must not be modified 
-or freed.
-Since: 2.6
+<return> the #GMainContext of @loop
 </return>
 </function>
 
@@ -6501,21 +7080,36 @@ converted to uppercase.
 </return>
 </function>
 
-<function name="g_source_set_can_recurse">
+<function name="g_key_file_set_comment">
 <description>
-Sets whether a source can be called recursively. If @can_recurse is
-%TRUE, then while the source is being dispatched then this source
-will be processed normally. Otherwise, all processing of this
-source is blocked until the dispatch function returns.
+Places a comment above @key from @group_name.
+@group_name. If @key is %NULL then @comment will
+be written above @group_name.  If both @key
+and @group_name are NULL, then @comment will
+be written above the first group in the file.
+
+Since: 2.6
 
 </description>
 <parameters>
-<parameter name="source">
-<parameter_description> a #GSource
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
 </parameter_description>
 </parameter>
-<parameter name="can_recurse">
-<parameter_description> whether recursion is allowed for this source
+<parameter name="group_name">
+<parameter_description> a group name, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="comment">
+<parameter_description> a comment
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
 </parameter_description>
 </parameter>
 </parameters>
@@ -6553,27 +7147,32 @@ g_io_channel_set_encoding () for details.
 </return>
 </function>
 
-<function name="g_printf">
+<function name="g_io_channel_new_file">
 <description>
-An implementation of the standard printf() function which supports 
-positional parameters, as specified in the Single Unix Specification.
+Open a file @filename as a #GIOChannel using mode @mode. This
+channel will be closed when the last reference to it is dropped,
+so there is no need to call g_io_channel_close() (though doing
+so will not cause problems, as long as no attempt is made to
+access the channel after it is closed).
 
 
 </description>
 <parameters>
-<parameter name="format">
-<parameter_description> a standard printf() format string, but notice 
-&amp;lt;link linkend=&quot;string-precision&quot;&amp;gt;string precision pitfalls&amp;lt;/link&amp;gt;.
+<parameter name="filename">
+<parameter_description> A string containing the name of a file.
 </parameter_description>
 </parameter>
-<parameter name="Varargs">
-<parameter_description> the arguments to insert in the output.
+<parameter name="mode">
+<parameter_description> One of &quot;r&quot;, &quot;w&quot;, &quot;a&quot;, &quot;r+&quot;, &quot;w+&quot;, &quot;a+&quot;. These have
+the same meaning as in fopen().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> A location to return an error of type %G_FILE_ERROR.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the number of characters printed.
-
-Since: 2.2
+<return> A #GIOChannel on success, %NULL on failure.
 </return>
 </function>
 
@@ -6605,10 +7204,13 @@ Since: 2.4
 
 <function name="g_setenv">
 <description>
-Sets an environment variable.
+Sets an environment variable. Both the variable&apos;s name and value
+should be in the GLib file name encoding. On UNIX, this means that
+they can be any sequence of bytes. On Windows, they should be in
+UTF-8.
 
-Note that on some systems, the memory used for the variable and its value 
-can&apos;t be reclaimed later.
+Note that on some systems, when variables are overwritten, the memory 
+used for the previous variables and its value isn&apos;t reclaimed.
 
 
 </description>
@@ -6663,6 +7265,59 @@ for example before calling g_hash_table_remove().
 </return>
 </function>
 
+<function name="g_datalist_unset_flags">
+<description>
+Turns off flag values for a data list. See g_datalist_unset_flags()
+
+</description>
+<parameters>
+<parameter name="datalist">
+<parameter_description> pointer to the location that holds a list
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the flags to turn off. The values of the flags are
+restricted by %G_DATALIST_FLAGS_MASK (currently
+3: giving two possible boolean flags).
+A value for @flags that doesn&apos;t fit within the mask is
+an error.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_utf8_collate_key_for_filename">
+<description>
+Converts a string into a collation key that can be compared
+with other collation keys produced by the same function using strcmp(). 
+
+In order to sort filenames correctly, this function treats the dot &apos;.&apos; 
+as a special case. Most dictionary orderings seem to consider it
+insignificant, thus producing the ordering &quot;event.c&quot; &quot;eventgenerator.c&quot;
+&quot;event.h&quot; instead of &quot;event.c&quot; &quot;event.h&quot; &quot;eventgenerator.c&quot;. Also, we
+would like to treat numbers intelligently so that &quot;file1&quot; &quot;file10&quot; &quot;file5&quot;
+is sorted as &quot;file1&quot; &quot;file5&quot; &quot;file10&quot;.
+
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a UTF-8 encoded string.
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> length of @str, in bytes, or -1 if @str is nul-terminated.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string. This string should
+be freed with g_free() when you are done with it.
+
+Since: 2.8
+</return>
+</function>
+
 <function name="g_convert_with_fallback">
 <description>
 Converts a string from one character set to another, possibly
@@ -6673,6 +7328,9 @@ systems may do a approximate conversion from @from_codeset
 to @to_codeset in their iconv() functions, 
 in which case GLib will simply return that approximate conversion.
 
+Note that you should use g_iconv() for streaming 
+conversions&amp;lt;footnoteref linkend=&quot;streaming-state&quot;/&amp;gt;.
+
 
 </description>
 <parameters>
@@ -6681,7 +7339,8 @@ in which case GLib will simply return that approximate conversion.
 </parameter_description>
 </parameter>
 <parameter name="len">
-<parameter_description>          the length of the string
+<parameter_description>          the length of the string, or -1 if the string is 
+nul-terminated&amp;lt;footnoteref linkend=&quot;nul-unsafe&quot;/&amp;gt;. 
 </parameter_description>
 </parameter>
 <parameter name="to_codeset">
@@ -6694,10 +7353,10 @@ in which case GLib will simply return that approximate conversion.
 </parameter>
 <parameter name="fallback">
 <parameter_description>     UTF-8 string to use in place of character not
-present in the target encoding. (This must be
-in the target encoding), if %NULL, characters
-not in the target encoding will be represented
-as Unicode escapes \uxxxx or \Uxxxxyyyy.
+present in the target encoding. (The string must be
+representable in the target encoding). 
+                  If %NULL, characters not in the target encoding will 
+                  be represented as Unicode escapes \uxxxx or \Uxxxxyyyy.
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
@@ -6767,18 +7426,6 @@ is called as many times as it was acquired.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="g_random_double">
-<description>
-Returns a random #gdouble equally distributed over the range [0..1).
-
-
-</description>
-<parameters>
-</parameters>
-<return> A random number.
-</return>
 </function>
 
 <function name="g_string_ascii_down">
@@ -7004,7 +7651,7 @@ See the C library manual for more details about open().
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -7041,20 +7688,54 @@ A different allocator can be set using g_mem_set_vtable().
 </return>
 </function>
 
-<function name="g_queue_peek_tail">
+<function name="g_str_has_prefix">
 <description>
-Returns the last element of the queue.
+Looks whether the string @str begins with @prefix.
 
 
 </description>
 <parameters>
-<parameter name="queue">
-<parameter_description> a #GQueue.
+<parameter name="str">
+<parameter_description> a nul-terminated string.
+</parameter_description>
+</parameter>
+<parameter name="prefix">
+<parameter_description> the nul-terminated prefix to look for.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the data of the last element in the queue, or %NULL if the queue
-is empty.
+<return> %TRUE if @str begins with @prefix, %FALSE otherwise.
+
+Since: 2.2
+</return>
+</function>
+
+<function name="g_parse_debug_string">
+<description>
+Parses a string containing debugging options separated 
+by &apos;:&apos; into a %guint containing bit flags. This is used 
+within GDK and GTK+ to parse the debug options passed on the
+command line or through environment variables.
+
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> a list of debug options separated by &apos;:&apos; or &quot;all&quot; 
+to set all flags.
+</parameter_description>
+</parameter>
+<parameter name="keys">
+<parameter_description> pointer to an array of #GDebugKey which associate 
+strings with bit flags.
+</parameter_description>
+</parameter>
+<parameter name="nkeys">
+<parameter_description> the number of #GDebugKey&amp;lt;!-- --&amp;gt;s in the array.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the combined set of bit flags.
 </return>
 </function>
 
@@ -7080,8 +7761,9 @@ g_utf8_get_char().
 <description>
 Removes an environment variable from the environment.
 
-Note that on some systems, the memory used for the variable and its value 
-can&apos;t be reclaimed. Furthermore, this function can&apos;t be guaranteed to operate in a 
+Note that on some systems, when variables are overwritten, the memory 
+used for the previous variables and its value isn&apos;t reclaimed.
+Furthermore, this function can&apos;t be guaranteed to operate in a 
 threadsafe way.
 
 Since: 2.4 
@@ -7200,12 +7882,29 @@ Since: 2.4
 </return>
 </function>
 
+<function name="g_get_prgname">
+<description>
+Gets the name of the program. This name should &amp;lt;emphasis&amp;gt;not&amp;lt;/emphasis&amp;gt; 
+be localized, contrast with g_get_application_name().
+(If you are using GDK or GTK+ the program name is set in gdk_init(), 
+which is called by gtk_init(). The program name is found by taking 
+the last component of &amp;lt;literal&amp;gt;argv[0]&amp;lt;/literal&amp;gt;.)
+
+
+</description>
+<parameters>
+</parameters>
+<return> the name of the program. The returned string belongs 
+to GLib and must not be modified or freed.
+</return>
+</function>
+
 <function name="g_get_user_cache_dir">
 <description>
 Returns a base directory in which to store non-essential, cached
 data specific to particular user.
 
-On Unix platforms this is determined using the mechanisms described in
+On UNIX platforms this is determined using the mechanisms described in
 the &amp;lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&amp;gt;
 XDG Base Directory Specification&amp;lt;/ulink&amp;gt;
 
@@ -7297,20 +7996,27 @@ is not very important since calling g_main_loop_run() will set this to
 </return>
 </function>
 
-<function name="g_source_get_can_recurse">
+<function name="g_io_channel_get_flags">
 <description>
-Checks whether a source is allowed to be called recursively.
-see g_source_set_can_recurse().
+Gets the current flags for a #GIOChannel, including read-only
+flags such as %G_IO_FLAG_IS_READABLE.
+
+The values of the flags %G_IO_FLAG_IS_READABLE and %G_IO_FLAG_IS_WRITEABLE
+are cached for internal use by the channel when it is created.
+If they should change at some later point (e.g. partial shutdown
+of a socket with the UNIX shutdown() function), the user
+should immediately call g_io_channel_get_flags () to update
+the internal values of these flags.
 
 
 </description>
 <parameters>
-<parameter name="source">
-<parameter_description> a #GSource
+<parameter name="channel">
+<parameter_description> a #GIOChannel
 </parameter_description>
 </parameter>
 </parameters>
-<return> whether recursion is allowed.
+<return> the flags which are set on the channel
 </return>
 </function>
 
@@ -7463,23 +8169,20 @@ must not be modified or freed.
 </return>
 </function>
 
-<function name="g_tree_height">
+<function name="g_async_queue_ref">
 <description>
-Gets the height of a #GTree.
-
-If the #GTree contains no nodes, the height is 0.
-If the #GTree contains only one root node the height is 1.
-If the root node has children the height is 2, etc.
+Increases the reference count of the asynchronous @queue by 1. You
+do not need to hold the lock to call this function.
 
 
 </description>
 <parameters>
-<parameter name="tree">
-<parameter_description> a #GTree.
+<parameter name="queue">
+<parameter_description> a #GAsyncQueue.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the height of the #GTree.
+<return> the @queue that was passed in (since 2.6)
 </return>
 </function>
 
@@ -7519,6 +8222,21 @@ domain. Free the returned vector with g_strfreev().
 </return>
 </function>
 
+<function name="g_get_user_name">
+<description>
+Gets the user name of the current user. The encoding of the returned
+string is system-defined. On UNIX, it might be the preferred file name
+encoding, or something else, and there is no guarantee that it is even
+consistent on a machine. On Windows, it is always UTF-8.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the user name of the current user.
+</return>
+</function>
+
 <function name="g_main_loop_quit">
 <description>
 Stops a #GMainLoop from running. Any calls to g_main_loop_run()
@@ -7538,7 +8256,6 @@ for the loop will return.
 <description>
 Associates a list of integer values with @key under
 @group_name.  If @key cannot be found then it is created.
-If @group_name is %NULL the start group is used.
 
 Since: 2.6
 
@@ -7650,31 +8367,34 @@ Increases the reference count of the asynchronous @queue by 1.
 <return></return>
 </function>
 
-<function name="g_filename_display_basename">
+<function name="g_utf8_casefold">
 <description>
-Returns the display basename for the particular filename, guaranteed
-to be valid UTF-8. The display name might not be identical to the filename,
-for instance there might be problems converting it to UTF-8, and some files
-can be translated in the display
+Converts a string into a form that is independent of case. The
+result will not correspond to any particular case, but can be
+compared for equality or ordered with the results of calling
+g_utf8_casefold() on other strings.
 
-You must pass the whole absolute pathname to this functions so that
-translation of well known locations can be done.
-
-This function is preferred over g_filename_display_name() if you know the
-whole path, as it allows translation.
+Note that calling g_utf8_casefold() followed by g_utf8_collate() is
+only an approximation to the correct linguistic case insensitive
+ordering, though it is a fairly good one. Getting this exactly
+right would require a more sophisticated collation function that
+takes case sensitivity into account. GLib does not currently
+provide such a function.
 
 
 </description>
 <parameters>
-<parameter name="filename">
-<parameter_description> an absolute pathname in the GLib file name encoding
+<parameter name="str">
+<parameter_description> a UTF-8 encoded string
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> length of @str, in bytes, or -1 if @str is nul-terminated.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string containing
-a rendition of the basename of the filename in valid UTF-8
-
-Since: 2.6
+<return> a newly allocated string, that is a
+case independent form of @str.
 </return>
 </function>
 
@@ -7758,24 +8478,54 @@ If @c is not an ASCII lower case letter,
 </return>
 </function>
 
-<function name="g_shell_quote">
+<function name="g_queue_is_empty">
 <description>
-Quotes a string so that the shell (/bin/sh) will interpret the
-quoted string to mean @unquoted_string. If you pass a filename to
-the shell, for example, you should first quote it with this
-function.  The return value must be freed with g_free(). The
-quoting style used is undefined (single or double quotes may be
-used).
+Returns %TRUE if the queue is empty.
 
 
 </description>
 <parameters>
-<parameter name="unquoted_string">
-<parameter_description> a literal string
+<parameter name="queue">
+<parameter_description> a #GQueue.
 </parameter_description>
 </parameter>
 </parameters>
-<return> quoted string
+<return> %TRUE if the queue is empty.
+</return>
+</function>
+
+<function name="g_chdir">
+<description>
+A wrapper for the POSIX chdir() function. The function changes the
+current directory of the process to @path.
+
+See your C library manual for more details about chdir().
+
+
+</description>
+<parameters>
+<parameter name="path">
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+</parameter_description>
+</parameter>
+</parameters>
+<return> 0 on success, -1 if an error occurred.
+
+Since: 2.8
+</return>
+</function>
+
+<function name="g_get_current_dir">
+<description>
+Gets the current directory.
+The returned string should be freed when no longer needed. The encoding 
+of the returned string is system defined. On Windows, it is always UTF-8.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the current directory.
 </return>
 </function>
 
@@ -8008,8 +8758,7 @@ received before @end_time.
 <function name="g_key_file_set_integer">
 <description>
 Associates a new integer value with @key under @group_name.
-If @key cannot be found then it is created. If @group_name
-is %NULL, the start group is used.
+If @key cannot be found then it is created.
 
 Since: 2.6
 
@@ -8033,49 +8782,6 @@ Since: 2.6
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="g_filename_to_utf8">
-<description>
-Converts a string which is in the encoding used by GLib for filenames
-into a UTF-8 string.
-
-
-</description>
-<parameters>
-<parameter name="opsysstring">
-<parameter_description>   a string in the encoding for filenames
-</parameter_description>
-</parameter>
-<parameter name="len">
-<parameter_description>           the length of the string, or -1 if the string is
-nul-terminated.
-</parameter_description>
-</parameter>
-<parameter name="bytes_read">
-<parameter_description>    location to store the number of bytes in the
-input string that were successfully converted, or %NULL.
-Even if the conversion was successful, this may be 
-less than @len if there were partial characters
-at the end of the input. If the error
-#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
-stored will the byte offset after the last valid
-input sequence.
-</parameter_description>
-</parameter>
-<parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description>         location to store the error occuring, or %NULL to ignore
-errors. Any of the errors in #GConvertError may occur.
-</parameter_description>
-</parameter>
-</parameters>
-<return> The converted string, or %NULL on an error.
-</return>
 </function>
 
 <function name="g_get_codeset">
@@ -8122,38 +8828,29 @@ Since: 2.4
 </return>
 </function>
 
-<function name="g_thread_pool_free">
+<function name="g_get_language_names">
 <description>
-Frees all resources allocated for @pool.
+Computes a list of applicable locale names, which can be used to 
+e.g. construct locale-dependent filenames or search paths. The returned 
+list is sorted from most desirable to least desirable and always contains 
+the default locale &quot;C&quot;.
 
-If @immediate is %TRUE, no new task is processed for
-@pool. Otherwise @pool is not freed before the last task is
-processed. Note however, that no thread of this pool is
-interrupted, while processing a task. Instead at least all still
-running threads can finish their tasks before the @pool is freed.
+For example, if LANGUAGE=de:en_US, then the returned list is
+&quot;de&quot;, &quot;en_US&quot;, &quot;en&quot;, &quot;C&quot;.
 
-If @wait is %TRUE, the functions does not return before all tasks
-to be processed (dependent on @immediate, whether all or only the
-currently running) are ready. Otherwise the function returns immediately.
+This function consults the environment variables &amp;lt;envar&amp;gt;LANGUAGE&amp;lt;/envar&amp;gt;, 
+&amp;lt;envar&amp;gt;LC_ALL&amp;lt;/envar&amp;gt;, &amp;lt;envar&amp;gt;LC_MESSAGES&amp;lt;/envar&amp;gt; and &amp;lt;envar&amp;gt;LANG&amp;lt;/envar&amp;gt; 
+to find the list of locales specified by the user.
 
-After calling this function @pool must not be used anymore. 
 
 </description>
 <parameters>
-<parameter name="pool">
-<parameter_description> a #GThreadPool
-</parameter_description>
-</parameter>
-<parameter name="immediate">
-<parameter_description> should @pool shut down immediately?
-</parameter_description>
-</parameter>
-<parameter name="wait">
-<parameter_description> should the function wait for all tasks to be finished?
-</parameter_description>
-</parameter>
 </parameters>
-<return></return>
+<return> a %NULL-terminated array of strings owned by GLib 
+that must not be modified or freed.
+
+Since: 2.6
+</return>
 </function>
 
 <function name="g_hash_table_foreach_steal">
@@ -8184,13 +8881,12 @@ If the function returns %TRUE, then the key/value pair is removed from the
 
 <function name="g_key_file_get_comment">
 <description>
-Retreives a comment above @key from @group_name.
+Retrieves a comment above @key from @group_name.
 @group_name. If @key is %NULL then @comment will
 be read from above @group_name.  If both @key
 and @group_name are NULL, then @comment will
 be read from above the first group in the file.
 
-Since: 2.6
 
 </description>
 <parameters>
@@ -8212,22 +8908,59 @@ Since: 2.6
 </parameter>
 </parameters>
 <return> a comment that should be freed with g_free()
+
+Since: 2.6
 </return>
 </function>
 
-<function name="g_idle_remove_by_data">
+<function name="g_creat">
 <description>
-Removes the idle function with the given data.
+A wrapper for the POSIX creat() function. The creat() function is
+used to convert a pathname into a file descriptor, creating a file
+if necessar. Note that on POSIX systems file descriptors are
+implemented by the operating system. On Windows, it&apos;s the C library
+that implements creat() and file descriptors. The actual Windows
+API for opening files is something different.
+
+See the C library manual for more details about creat().
 
 
 </description>
 <parameters>
-<parameter name="data">
-<parameter_description> the data for the idle source&apos;s callback.
+<parameter name="filename">
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> as in creat()
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if an idle source was found and removed.
+<return> a new file descriptor, or -1 if an error occurred. The
+return value can be used exactly like the return value from creat().
+
+Since: 2.8
+</return>
+</function>
+
+<function name="g_win32_error_message">
+<description>
+Translate a Win32 error code (as returned by GetLastError()) into
+the corresponding message. The message is either language neutral,
+or in the thread&apos;s language, or the user&apos;s language, the system&apos;s
+language, or US English (see docs for FormatMessage()). The
+returned string is in UTF-8. It should be deallocated with
+g_free().
+
+
+</description>
+<parameters>
+<parameter name="error">
+<parameter_description> error code.
+</parameter_description>
+</parameter>
+</parameters>
+<return> newly-allocated error message
 </return>
 </function>
 
@@ -8276,30 +9009,33 @@ error occurs, %NULL will be returned and
 </return>
 </function>
 
-<function name="g_utf8_get_char_validated">
+<function name="g_tree_insert">
 <description>
-Convert a sequence of bytes encoded as UTF-8 to a Unicode character.
-This function checks for incomplete characters, for invalid characters
-such as characters that are out of the range of Unicode, and for
-overlong encodings of valid characters.
+Inserts a key/value pair into a #GTree. If the given key already exists 
+in the #GTree its corresponding value is set to the new value. If you 
+supplied a value_destroy_func when creating the #GTree, the old value is 
+freed using that function. If you supplied a @key_destroy_func when 
+creating the #GTree, the passed key is freed using that function.
 
+The tree is automatically &apos;balanced&apos; as new key/value pairs are added,
+so that the distance from the root to every leaf is as small as possible.
 
 </description>
 <parameters>
-<parameter name="p">
-<parameter_description> a pointer to Unicode character encoded as UTF-8
+<parameter name="tree">
+<parameter_description> a #GTree.
 </parameter_description>
 </parameter>
-<parameter name="max_len">
-<parameter_description> the maximum number of bytes to read, or -1, for no maximum.
+<parameter name="key">
+<parameter_description> the key to insert.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the value corresponding to the key.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the resulting character. If @p points to a partial
-sequence at the end of a string that could begin a valid 
-character, returns (gunichar)-2; otherwise, if @p does not point 
-to a valid UTF-8 encoded Unicode character, returns (gunichar)-1.
-</return>
+<return></return>
 </function>
 
 <function name="g_async_queue_unlock">
@@ -8372,6 +9108,24 @@ is empty.
 </return>
 </function>
 
+<function name="g_path_skip_root">
+<description>
+Returns a pointer into @file_name after the root component, i.e. after
+the &quot;/&quot; in UNIX or &quot;C:\&quot; under Windows. If @file_name is not an absolute
+path it returns %NULL.
+
+
+</description>
+<parameters>
+<parameter name="file_name">
+<parameter_description> a file name.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer into @file_name after the root component.
+</return>
+</function>
+
 <function name="g_unichar_xdigit_value">
 <description>
 Determines the numeric value of a character as a hexidecimal
@@ -8416,6 +9170,40 @@ Since: 2.6
 </return>
 </function>
 
+<function name="g_path_get_dirname">
+<description>
+Gets the directory components of a file name.  If the file name has no
+directory components &quot;.&quot; is returned.  The returned string should be
+freed when no longer needed.
+
+
+</description>
+<parameters>
+<parameter name="file_name">
+<parameter_description> the name of the file.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the directory components of the file.
+</return>
+</function>
+
+<function name="g_unichar_type">
+<description>
+Classifies a Unicode character by type.
+
+
+</description>
+<parameters>
+<parameter name="c">
+<parameter_description> a Unicode character
+</parameter_description>
+</parameter>
+</parameters>
+<return> the type of the character.
+</return>
+</function>
+
 <function name="g_filename_from_uri">
 <description>
 Converts an escaped ASCII-encoded URI to a local filename in the
@@ -8445,23 +9233,45 @@ filename, or %NULL on an error.
 </return>
 </function>
 
-<function name="g_option_context_get_help_enabled">
+<function name="g_async_queue_timed_pop">
 <description>
-Returns whether automatic &amp;lt;option&amp;gt;--help&amp;lt;/option&amp;gt; generation
-is turned on for @context. See g_option_context_set_help_enabled().
+Pops data from the @queue. If no data is received before @end_time,
+%NULL is returned.
+
+To easily calculate @end_time a combination of g_get_current_time()
+and g_time_val_add() can be used.
 
 
 </description>
 <parameters>
-<parameter name="context">
-<parameter_description> a #GOptionContext
+<parameter name="queue">
+<parameter_description> a #GAsyncQueue.
+</parameter_description>
+</parameter>
+<parameter name="end_time">
+<parameter_description> a #GTimeVal, determining the final time.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if automatic help generation is turned on.
-
-Since: 2.6
+<return> data from the queue or %NULL, when no data is
+received before @end_time.
 </return>
+</function>
+
+<function name="g_set_prgname">
+<description>
+Sets the name of the program. This name should &amp;lt;emphasis&amp;gt;not&amp;lt;/emphasis&amp;gt; 
+be localized, contrast with g_set_application_name(). Note that for 
+thread-safety reasons this function can only be called once.
+
+</description>
+<parameters>
+<parameter name="prgname">
+<parameter_description> the name of the program.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_source_get_context">
@@ -8673,24 +9483,28 @@ pid must be closed using g_spawn_close_pid().
 </return>
 </function>
 
-<function name="g_utf8_pointer_to_offset">
+<function name="g_io_channel_write_unichar">
 <description>
-Converts from a pointer to position within a string to a integer
-character offset.
+This function cannot be called on a channel with %NULL encoding.
 
 
 </description>
 <parameters>
-<parameter name="str">
-<parameter_description> a UTF-8 encoded string
+<parameter name="channel">
+<parameter_description> a #GIOChannel
 </parameter_description>
 </parameter>
-<parameter name="pos">
-<parameter_description> a pointer to a position within @str
+<parameter name="thechar">
+<parameter_description> a character
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> A location to return an error of type #GConvertError
+or #GIOChannelError
 </parameter_description>
 </parameter>
 </parameters>
-<return> the resulting character offset
+<return> a #GIOStatus
 </return>
 </function>
 
@@ -8763,7 +9577,7 @@ for full details on the other parameters.
 </parameter_description>
 </parameter>
 <parameter name="exit_status">
-<parameter_description> child exit status, as returned by waitpid()
+<parameter_description> return location for child exit status, as returned by waitpid()
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -9006,24 +9820,36 @@ Returns a random #gint32 equally distributed over the range
 </return>
 </function>
 
-<function name="g_win32_error_message">
+<function name="g_datalist_get_flags">
 <description>
-Translate a Win32 error code (as returned by GetLastError()) into
-the corresponding message. The message is either language neutral,
-or in the thread&apos;s language, or the user&apos;s language, the system&apos;s
-language, or US English (see docs for FormatMessage()). The
-returned string is in UTF-8. It should be deallocated with
-g_free().
+Gets flags values packed in together with the datalist.
+See g_datalist_set_flags().
 
 
 </description>
 <parameters>
-<parameter name="error">
-<parameter_description> error code.
+<parameter name="datalist">
+<parameter_description> pointer to the location that holds a list
 </parameter_description>
 </parameter>
 </parameters>
-<return> newly-allocated error message
+<return> the flags of the datalist
+</return>
+</function>
+
+<function name="g_idle_remove_by_data">
+<description>
+Removes the idle function with the given data.
+
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> the data for the idle source&apos;s callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if an idle source was found and removed.
 </return>
 </function>
 
@@ -9075,7 +9901,7 @@ are open to some process, or mapped into memory.
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 </parameters>
@@ -9102,37 +9928,47 @@ Returns whether @channel is buffered.
 </return>
 </function>
 
-<function name="g_io_channel_read_to_end">
+<function name="g_locale_from_utf8">
 <description>
-Reads all the remaining data from the file.
+Converts a string from UTF-8 to the encoding used for strings by
+the C runtime (usually the same as that used by the operating
+system) in the current locale.
 
 
 </description>
 <parameters>
-<parameter name="channel">
-<parameter_description> a #GIOChannel
+<parameter name="utf8string">
+<parameter_description>    a UTF-8 encoded string 
 </parameter_description>
 </parameter>
-<parameter name="str_return">
-<parameter_description> Location to store a pointer to a string holding
-the remaining data in the #GIOChannel. This data should
-be freed with g_free() when no longer needed. This
-data is terminated by an extra nul character, but there 
-may be other nuls in the intervening data.
+<parameter name="len">
+<parameter_description>           the length of the string, or -1 if the string is
+nul-terminated&amp;lt;footnoteref linkend=&quot;nul-unsafe&quot;/&amp;gt;. 
 </parameter_description>
 </parameter>
-<parameter name="length">
-<parameter_description> Location to store length of the data
+<parameter name="bytes_read">
+<parameter_description>    location to store the number of bytes in the
+input string that were successfully converted, or %NULL.
+Even if the conversion was successful, this may be 
+less than @len if there were partial characters
+at the end of the input. If the error
+#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
+stored will the byte offset after the last valid
+input sequence.
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> the number of bytes stored in the output buffer (not 
+including the terminating nul).
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> A location to return an error of type #GConvertError
-or #GIOChannelError
+<parameter_description>         location to store the error occuring, or %NULL to ignore
+errors. Any of the errors in #GConvertError may occur.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %G_IO_STATUS_NORMAL on success. 
-This function never returns %G_IO_STATUS_EOF.
+<return> The converted string, or %NULL on an error.
 </return>
 </function>
 
@@ -9276,6 +10112,28 @@ there is more work to do.
 </return>
 </function>
 
+<function name="g_key_file_set_list_separator">
+<description>
+Sets the character which is used to separate
+values in lists. Typically &apos;;&apos; or &apos;,&apos; are used
+as separators. The default list separator is &apos;;&apos;.
+
+Since: 2.6
+
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile 
+</parameter_description>
+</parameter>
+<parameter name="separator">
+<parameter_description> the separator
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_rand_double_range">
 <description>
 Returns the next random #gdouble from @rand_ equally distributed over
@@ -9371,6 +10229,19 @@ otherwise.
 </return>
 </function>
 
+<function name="_glib_get_locale_dir">
+<description>
+Return the path to the lib\locale subfolder of the GLib
+installation folder. The path is in the system codepage. We have to
+use system codepage as bindtextdomain() doesn&apos;t have a UTF-8
+interface.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_filename_display_name">
 <description>
 Converts a filename into a valid UTF-8 string. The 
@@ -9447,7 +10318,7 @@ in the on-disk encoding. On Windows in UTF-8
 <parameter name="error">
 <parameter_description> return location for a #GError, or %NULL.
 If non-%NULL, an error will be set if and only if
-g_dir_open_fails.
+g_dir_open() fails.
 </parameter_description>
 </parameter>
 </parameters>
@@ -9471,7 +10342,7 @@ See the C library manual for more details about lstat().
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="buf">
@@ -9616,6 +10487,22 @@ of records that need to be stored.
 </return>
 </function>
 
+<function name="g_get_home_dir">
+<description>
+Gets the current user&apos;s home directory. 
+
+Note that in contrast to traditional UNIX tools, this function 
+prefers &amp;lt;filename&amp;gt;passwd&amp;lt;/filename&amp;gt; entries over the &amp;lt;envar&amp;gt;HOME&amp;lt;/envar&amp;gt; 
+environment variable.
+
+
+</description>
+<parameters>
+</parameters>
+<return> the current user&apos;s home directory.
+</return>
+</function>
+
 <function name="g_queue_free">
 <description>
 Frees the memory allocated for the #GQueue.
@@ -9632,8 +10519,9 @@ Frees the memory allocated for the #GQueue.
 
 <function name="g_key_file_load_from_data">
 <description>
-Loads a key file from memory into an empty #GKeyFile structure.  
-If the object cannot be created then %error is set to a #GKeyFileError.
+Loads a key file from memory into an empty #GKeyFile structure.  If
+the object cannot be created then %error is set to a
+#GKeyFileError. 
 
 
 </description>
@@ -9682,23 +10570,39 @@ semantics that exactly match g_ascii_toupper.
 </return>
 </function>
 
-<function name="g_tree_new">
+<function name="g_key_file_get_value">
 <description>
-Creates a new #GTree.
+Returns the value associated with @key under @group_name.  
+
+In the event the key cannot be found, %NULL is returned and 
+@error is set to #G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the 
+event that the @group_name cannot be found, %NULL is returned 
+and @error is set to #G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
 
 
 </description>
 <parameters>
-<parameter name="key_compare_func">
-<parameter_description> the function used to order the nodes in the #GTree.
-It should return values similar to the standard strcmp() function -
-0 if the two arguments are equal, a negative value if the first argument 
-comes before the second, or a positive value if the first argument comes 
-after the second.
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GTree.
+<return> a newly allocated string or %NULL if the specified 
+key cannot be found.
+
+Since: 2.6
 </return>
 </function>
 
@@ -9892,7 +10796,7 @@ Note, that for a dangling symbolic link g_file_test() will return
 %TRUE for %G_FILE_TEST_IS_SYMLINK and %FALSE for all other flags.
 
 You should never use g_file_test() to test whether it is safe
-to perform an operaton, because there is always the possibility
+to perform an operation, because there is always the possibility
 of the condition changing before you actually perform the operation.
 For example, you might think you could use %G_FILE_TEST_IS_SYMLINK
 to know whether it is is safe to write to a file without being
@@ -9910,14 +10814,20 @@ Another thing to note is that %G_FILE_TEST_EXISTS and
 %G_FILE_TEST_IS_EXECUTABLE are implemented using the access()
 system call. This usually doesn&apos;t matter, but if your program
 is setuid or setgid it means that these tests will give you
-the answer for the real user ID and group ID , rather than the
+the answer for the real user ID and group ID, rather than the
 effective user ID and group ID.
+
+On Windows, there are no symlinks, so testing for
+%G_FILE_TEST_IS_SYMLINK will always return %FALSE. Testing for
+%G_FILE_TEST_IS_EXECUTABLE will just check that the file exists and
+its name indicates that it is executable, checking for well-known
+extensions and those listed in the %PATHEXT environment variable.
 
 
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a filename to test
+<parameter_description> a filename to test in the GLib file name encoding
 </parameter_description>
 </parameter>
 <parameter name="test">
@@ -9929,38 +10839,26 @@ effective user ID and group ID.
 </return>
 </function>
 
-<function name="g_ascii_formatd">
+<function name="g_async_queue_length_unlocked">
 <description>
-Converts a #gdouble to a string, using the &apos;.&apos; as
-decimal point. To format the number you pass in
-a printf()-style format string. Allowed conversion
-specifiers are &apos;e&apos;, &apos;E&apos;, &apos;f&apos;, &apos;F&apos;, &apos;g&apos; and &apos;G&apos;. 
-
-If you just want to want to serialize the value into a
-string, use g_ascii_dtostr().
+Returns the length of the queue, negative values mean waiting
+threads, positive values mean available entries in the
+@queue. Actually this function returns the number of data items in
+the queue minus the number of waiting threads. Thus a return value
+of 0 could mean &apos;n&apos; entries in the queue and &apos;n&apos; thread waiting.
+That can happen due to locking of the queue or due to
+scheduling. This function must be called while holding the @queue&apos;s
+lock.
 
 
 </description>
 <parameters>
-<parameter name="buffer">
-<parameter_description> A buffer to place the resulting string in
-</parameter_description>
-</parameter>
-<parameter name="buf_len">
-<parameter_description> The length of the buffer.
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> The printf()-style format to use for the
-code to use for converting. 
-</parameter_description>
-</parameter>
-<parameter name="d">
-<parameter_description> The #gdouble to convert
+<parameter name="queue">
+<parameter_description> a #GAsyncQueue.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The pointer to the buffer with the converted string.
+<return> the length of the @queue.
 </return>
 </function>
 
@@ -10095,35 +10993,19 @@ error occurs, %NULL will be returned and
 </return>
 </function>
 
-<function name="g_tree_search">
+<function name="g_error_copy">
 <description>
-Searches a #GTree using @search_func.
-
-The @search_func is called with a pointer to the key of a key/value pair in the tree,
-and the passed in @user_data. If @search_func returns 0 for a key/value pair, then
-g_tree_search_func() will return the value of that pair. If @search_func returns -1,
-searching will proceed among the key/value pairs that have a smaller key; if @search_func
-returns 1, searching will proceed among the key/value pairs that have a larger key.
+Makes a copy of @error.
 
 
 </description>
 <parameters>
-<parameter name="tree">
-<parameter_description> a #GTree.
-</parameter_description>
-</parameter>
-<parameter name="search_func">
-<parameter_description> a function used to search the #GTree. 
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> the data passed as the second argument to the @search_func 
-function.
+<parameter name="error">
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return> the value corresponding to the found key, or %NULL if the key 
-was not found.
+<return> a new #GError
 </return>
 </function>
 
@@ -10206,8 +11088,7 @@ that context.
 <description>
 Associates a list of string values for @key and @locale under
 @group_name.  If the translation for @key cannot be found then
-it is created. If @group_name is %NULL, the start group is
-used.
+it is created. 
 
 Since: 2.6
 
@@ -10277,6 +11158,8 @@ Removes a key/value pair from a #GTree.
 If the #GTree was created using g_tree_new_full(), the key and value 
 are freed using the supplied destroy functions, otherwise you have to 
 make sure that any dynamically allocated values are freed yourself.
+If the key does not exist in the #GTree, the function does nothing.
+
 
 </description>
 <parameters>
@@ -10289,7 +11172,8 @@ make sure that any dynamically allocated values are freed yourself.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the key was found (prior to 2.8, this function returned nothing)
+</return>
 </function>
 
 <function name="g_rmdir">
@@ -10304,7 +11188,7 @@ on your system.
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 </parameters>
@@ -10325,6 +11209,20 @@ Creates a new asynchronous queue with the initial reference count of 1.
 </parameters>
 <return> the new #GAsyncQueue.
 </return>
+</function>
+
+<function name="g_atexit">
+<description>
+Specifies a function to be called at normal program termination.
+
+</description>
+<parameters>
+<parameter name="func">
+<parameter_description> the function to call on normal program termination.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_utf8_collate">
@@ -10348,33 +11246,8 @@ sorting instead of sorting the original strings.
 </parameter_description>
 </parameter>
 </parameters>
-<return> -1 if @str1 compares before @str2, 0 if they
-compare equal, 1 if @str1 compares after @str2.
-</return>
-</function>
-
-<function name="g_async_queue_timed_pop">
-<description>
-Pops data from the @queue. If no data is received before @end_time,
-%NULL is returned.
-
-To easily calculate @end_time a combination of g_get_current_time()
-and g_time_val_add() can be used.
-
-
-</description>
-<parameters>
-<parameter name="queue">
-<parameter_description> a #GAsyncQueue.
-</parameter_description>
-</parameter>
-<parameter name="end_time">
-<parameter_description> a #GTimeVal, determining the final time.
-</parameter_description>
-</parameter>
-</parameters>
-<return> data from the queue or %NULL, when no data is
-received before @end_time.
+<return> &amp;lt; 0 if @str1 compares before @str2, 
+0 if they compare equal, &amp;gt; 0 if @str1 compares after @str2.
 </return>
 </function>
 
@@ -10439,50 +11312,41 @@ Since: 2.2
 </return>
 </function>
 
-<function name="g_filename_to_uri">
+<function name="g_source_remove_by_user_data">
 <description>
-Converts an absolute filename to an escaped ASCII-encoded URI.
+Removes a source from the default main loop context given the user
+data for the callback. If multiple sources exist with the same user
+data, only one will be destroyed.
 
 
 </description>
 <parameters>
-<parameter name="filename">
-<parameter_description> an absolute filename specified in the encoding
-used for filenames by the operating system.
-</parameter_description>
-</parameter>
-<parameter name="hostname">
-<parameter_description> A UTF-8 encoded hostname, or %NULL for none.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> location to store the error occuring, or %NULL to ignore
-errors. Any of the errors in #GConvertError may occur.
+<parameter name="user_data">
+<parameter_description> the user_data for the callback.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string holding the resulting
-URI, or %NULL on an error.
+<return> %TRUE if a source was found and removed. 
 </return>
 </function>
 
-<function name="g_tree_steal">
+<function name="g_date_get_iso8601_week_of_year">
 <description>
-Removes a key and its associated value from a #GTree without calling 
-the key and value destroy functions.
+Returns the week of the year, where weeks are interpreted according
+to ISO 8601. 
+
 
 </description>
 <parameters>
-<parameter name="tree">
-<parameter_description> a #GTree.
-</parameter_description>
-</parameter>
-<parameter name="key">
-<parameter_description> the key to remove.
+<parameter name="date">
+<parameter_description> a valid #GDate
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> ISO 8601 week number of the year.
+
+Since: 2.6
+</return>
 </function>
 
 <function name="g_tree_foreach">
@@ -10762,24 +11626,36 @@ search for it ourselves.
 <return></return>
 </function>
 
-<function name="g_tree_new_with_data">
+<function name="g_child_watch_source_new">
 <description>
-Creates a new #GTree with a comparison function that accepts user data.
-See g_tree_new() for more details.
+Creates a new child_watch source.
+
+The source will not initially be associated with any #GMainContext
+and must be added to one with g_source_attach() before it will be
+executed.
+
+Note that on platforms where #GPid must be explicitely closed
+(see g_spawn_close_pid()) @pid must not be closed while the
+source is still active. Typically, you will want to call
+g_spawn_close_pid() in the callback function for the source.
+
+Note further that using g_child_watch_source_new() is not 
+compatible with calling &amp;lt;literal&amp;gt;waitpid(-1)&amp;lt;/literal&amp;gt; in 
+the application. Calling waitpid() for individual pids will
+still work fine. 
 
 
 </description>
 <parameters>
-<parameter name="key_compare_func">
-<parameter_description> qsort()-style comparison function.
-</parameter_description>
-</parameter>
-<parameter name="key_compare_data">
-<parameter_description> data to pass to comparison function.
+<parameter name="pid">
+<parameter_description> process id of a child process to watch. On Windows, a HANDLE
+for the process to watch (which actually doesn&apos;t have to be a child).
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GTree.
+<return> the newly-created child watch source
+
+Since: 2.4
 </return>
 </function>
 
@@ -10826,7 +11702,7 @@ Calls the given function for each of the key/value pairs in the
 pair, and the given @user_data parameter.  The hash table may not
 be modified while iterating over it (you can&apos;t add/remove
 items). To remove all items matching a predicate, use
-g_hash_table_remove().
+g_hash_table_foreach_remove().
 
 </description>
 <parameters>
@@ -10850,8 +11726,7 @@ g_hash_table_remove().
 <description>
 Returns the values associated with @key under @group_name
 translated in the given @locale if available.  If @locale is
-%NULL then the current locale is assumed. If @group_name is
-%NULL, then the start group is used.
+%NULL then the current locale is assumed.
 
 If @key cannot be found then %NULL is returned and @error is set to
 #G_KEY_FILE_ERROR_KEY_NOT_FOUND. If the values associated
@@ -11065,8 +11940,10 @@ called.
 
 If the parsing is successful, any parsed arguments are
 removed from the array and @argc and @argv are updated 
-accordingly. In case of an error, @argc and @argv are
-left unmodified.
+accordingly. A &apos;--&apos; option is stripped from @argv
+unless there are unparsed options before and after it, 
+or some of the options after it start with &apos;-&apos;. In case 
+of an error, @argc and @argv are left unmodified. 
 
 If automatic &amp;lt;option&amp;gt;--help&amp;lt;/option&amp;gt; support is enabled
 (see g_option_context_set_help_enabled()), and the 
@@ -11101,44 +11978,77 @@ Since: 2.6
 </return>
 </function>
 
-<function name="g_queue_is_empty">
+<function name="g_strsplit">
 <description>
-Returns %TRUE if the queue is empty.
+Splits a string into a maximum of @max_tokens pieces, using the given
+@delimiter. If @max_tokens is reached, the remainder of @string is appended
+to the last token. 
+
+As a special case, the result of splitting the empty string &quot;&quot; is an empty
+vector, not a vector containing a single string. The reason for this
+special case is that being able to represent a empty vector is typically
+more useful than consistent handling of empty elements. If you do need
+to represent empty elements, you&apos;ll need to check for the empty string
+before calling g_strsplit().
 
 
 </description>
 <parameters>
-<parameter name="queue">
-<parameter_description> a #GQueue.
+<parameter name="string">
+<parameter_description> a string to split.
+</parameter_description>
+</parameter>
+<parameter name="delimiter">
+<parameter_description> a string which specifies the places at which to split the string.
+The delimiter is not included in any of the resulting strings, unless
+@max_tokens is reached.
+</parameter_description>
+</parameter>
+<parameter name="max_tokens">
+<parameter_description> the maximum number of pieces to split @string into. If this is
+less than 1, the string is split completely.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the queue is empty.
+<return> a newly-allocated %NULL-terminated array of strings. Use 
+g_strfreev() to free it.
 </return>
 </function>
 
-<function name="g_io_channel_set_flags">
+<function name="g_shell_quote">
 <description>
-Sets the (writeable) flags in @channel to (@flags &amp; %G_IO_CHANNEL_SET_MASK).
+Quotes a string so that the shell (/bin/sh) will interpret the
+quoted string to mean @unquoted_string. If you pass a filename to
+the shell, for example, you should first quote it with this
+function.  The return value must be freed with g_free(). The
+quoting style used is undefined (single or double quotes may be
+used).
 
 
 </description>
 <parameters>
-<parameter name="channel">
-<parameter_description> a #GIOChannel.
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> the flags to set on the IO channel.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> A location to return an error of type #GIOChannelError.
+<parameter name="unquoted_string">
+<parameter_description> a literal string
 </parameter_description>
 </parameter>
 </parameters>
-<return> the status of the operation. 
+<return> quoted string
 </return>
+</function>
+
+<function name="g_error_free">
+<description>
+Frees a #GError and associated resources.
+
+
+</description>
+<parameters>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_remove">
@@ -11159,7 +12069,7 @@ open to some process, or mapped into memory.
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 </parameters>
@@ -11210,6 +12120,10 @@ implications, so consider using g_spawn_sync() directly if
 appropriate. Possible errors are those from g_spawn_sync() and those
 from g_shell_parse_argv().
 
+If @exit_status is non-%NULL, the exit status of the child is stored there as
+it would be returned by waitpid(); standard UNIX macros such as WIFEXITED()
+and WEXITSTATUS() must be used to evaluate the exit status.
+
 On Windows, please note the implications of g_shell_parse_argv()
 parsing @command_line. Space is a separator, and backslashes are
 special. Thus you cannot simply pass a @command_line containing
@@ -11234,7 +12148,7 @@ separator. You need to enclose such paths with single quotes, like
 </parameter_description>
 </parameter>
 <parameter name="exit_status">
-<parameter_description> return location for child exit status
+<parameter_description> return location for child exit status, as returned by waitpid()
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -11243,6 +12157,26 @@ separator. You need to enclose such paths with single quotes, like
 </parameter>
 </parameters>
 <return> %TRUE on success, %FALSE if an error was set
+</return>
+</function>
+
+<function name="g_build_filenamev">
+<description>
+Behaves exactly like g_build_filename(), but takes the path elements 
+as a string array, instead of varargs. This function is mainly
+meant for language bindings.
+
+
+</description>
+<parameters>
+<parameter name="args">
+<parameter_description> %NULL-terminated array of strings containing the path elements.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly-allocated string that must be freed with g_free().
+
+Since: 2.8
 </return>
 </function>
 
@@ -11289,17 +12223,26 @@ or #GIOChannelError
 </return>
 </function>
 
-<function name="g_io_channel_get_flags">
+<function name="g_source_get_can_recurse">
 <description>
-Gets the current flags for a #GIOChannel, including read-only
-flags such as %G_IO_FLAG_IS_READABLE.
+Checks whether a source is allowed to be called recursively.
+see g_source_set_can_recurse().
 
-The values of the flags %G_IO_FLAG_IS_READABLE and %G_IO_FLAG_IS_WRITEABLE
-are cached for internal use by the channel when it is created.
-If they should change at some later point (e.g. partial shutdown
-of a socket with the UNIX shutdown() function), the user
-should immediately call g_io_channel_get_flags () to update
-the internal values of these flags.
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether recursion is allowed.
+</return>
+</function>
+
+<function name="g_io_channel_read_to_end">
+<description>
+Reads all the remaining data from the file.
 
 
 </description>
@@ -11308,111 +12251,88 @@ the internal values of these flags.
 <parameter_description> a #GIOChannel
 </parameter_description>
 </parameter>
-</parameters>
-<return> the flags which are set on the channel
-</return>
-</function>
-
-<function name="g_locale_from_utf8">
-<description>
-Converts a string from UTF-8 to the encoding used for strings by
-the C runtime (usually the same as that used by the operating
-system) in the current locale.
-
-
-</description>
-<parameters>
-<parameter name="utf8string">
-<parameter_description>    a UTF-8 encoded string 
+<parameter name="str_return">
+<parameter_description> Location to store a pointer to a string holding
+the remaining data in the #GIOChannel. This data should
+be freed with g_free() when no longer needed. This
+data is terminated by an extra nul character, but there 
+may be other nuls in the intervening data.
 </parameter_description>
 </parameter>
-<parameter name="len">
-<parameter_description>           the length of the string, or -1 if the string is
-nul-terminated.
-</parameter_description>
-</parameter>
-<parameter name="bytes_read">
-<parameter_description>    location to store the number of bytes in the
-input string that were successfully converted, or %NULL.
-Even if the conversion was successful, this may be 
-less than @len if there were partial characters
-at the end of the input. If the error
-#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
-stored will the byte offset after the last valid
-input sequence.
-</parameter_description>
-</parameter>
-<parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
+<parameter name="length">
+<parameter_description> Location to store length of the data
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description>         location to store the error occuring, or %NULL to ignore
-errors. Any of the errors in #GConvertError may occur.
+<parameter_description> A location to return an error of type #GConvertError
+or #GIOChannelError
 </parameter_description>
 </parameter>
 </parameters>
-<return> The converted string, or %NULL on an error.
+<return> %G_IO_STATUS_NORMAL on success. 
+This function never returns %G_IO_STATUS_EOF.
 </return>
 </function>
 
-<function name="g_key_file_set_list_separator">
+<function name="g_io_channel_set_buffered">
 <description>
-Sets the character which is used to separate
-values in lists. Typically &apos;;&apos; or &apos;,&apos; are used
-as separators. The default list separator is &apos;;&apos;.
+The buffering state can only be set if the channel&apos;s encoding
+is %NULL. For any other encoding, the channel must be buffered.
 
-Since: 2.6
+A buffered channel can only be set unbuffered if the channel&apos;s
+internal buffers have been flushed. Newly created channels or
+channels which have returned %G_IO_STATUS_EOF
+not require such a flush. For write-only channels, a call to
+g_io_channel_flush () is sufficient. For all other channels,
+the buffers may be flushed by a call to g_io_channel_seek_position ().
+This includes the possibility of seeking with seek type %G_SEEK_CUR
+and an offset of zero. Note that this means that socket-based
+channels cannot be set unbuffered once they have had data
+read from them.
+
+On unbuffered channels, it is safe to mix read and write
+calls from the new and old APIs, if this is necessary for
+maintaining old code.
+
+The default state of the channel is buffered.
 
 </description>
 <parameters>
-<parameter name="key_file">
-<parameter_description> a #GKeyFile 
+<parameter name="channel">
+<parameter_description> a #GIOChannel
 </parameter_description>
 </parameter>
-<parameter name="separator">
-<parameter_description> the separator
+<parameter name="buffered">
+<parameter_description> whether to set the channel buffered or unbuffered
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="g_strsplit">
+<function name="g_ascii_strcasecmp">
 <description>
-Splits a string into a maximum of @max_tokens pieces, using the given
-@delimiter. If @max_tokens is reached, the remainder of @string is appended
-to the last token. 
+Compare two strings, ignoring the case of ASCII characters.
 
-As a special case, the result of splitting the empty string &quot;&quot; is an empty
-vector, not a vector containing a single string. The reason for this
-special case is that being able to represent a empty vector is typically
-more useful than consistent handling of empty elements. If you do need
-to represent empty elements, you&apos;ll need to check for the empty string
-before calling g_strsplit().
+Unlike the BSD strcasecmp() function, this only recognizes standard
+ASCII letters and ignores the locale, treating all non-ASCII
+characters as if they are not letters.
 
 
 </description>
 <parameters>
-<parameter name="string">
-<parameter_description> a string to split.
+<parameter name="s1">
+<parameter_description> string to compare with @s2.
 </parameter_description>
 </parameter>
-<parameter name="delimiter">
-<parameter_description> a string which specifies the places at which to split the string.
-The delimiter is not included in any of the resulting strings, unless
-@max_tokens is reached.
-</parameter_description>
-</parameter>
-<parameter name="max_tokens">
-<parameter_description> the maximum number of pieces to split @string into. If this is
-less than 1, the string is split completely.
+<parameter name="s2">
+<parameter_description> string to compare with @s1.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated %NULL-terminated array of strings. Use 
-g_strfreev() to free it.
+<return> an integer less than, equal to, or greater than
+zero if @s1 is found, respectively, to be less than,
+to match, or to be greater than @s2.
 </return>
 </function>
 
@@ -11448,6 +12368,24 @@ timeout is recalculated based on the current time and the given interval
 </parameter>
 </parameters>
 <return> the id of event source.
+</return>
+</function>
+
+<function name="g_mapped_file_get_length">
+<description>
+Returns the length of the contents of a #GMappedFile.
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GMappedFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> the length of the contents of @file.
+
+Since: 2.8
 </return>
 </function>
 
@@ -11553,7 +12491,7 @@ See the C library manual for more details about mkdir().
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding
+<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -11586,6 +12524,24 @@ digraph is U+01F2 LATIN CAPITAL LETTTER D WITH SMALL LETTER Z.
 </parameter>
 </parameters>
 <return> %TRUE if the character is titlecase
+</return>
+</function>
+
+<function name="g_direct_hash">
+<description>
+Converts a gpointer to a hash value.
+It can be passed to g_hash_table_new() as the @hash_func parameter, 
+when using pointers as keys in a #GHashTable.
+
+
+</description>
+<parameters>
+<parameter name="v">
+<parameter_description> a #gpointer key
+</parameter_description>
+</parameter>
+</parameters>
+<return> a hash value corresponding to the key.
 </return>
 </function>
 
@@ -11630,19 +12586,29 @@ Since: 2.4
 <return></return>
 </function>
 
-<function name="g_key_file_new">
+<function name="g_utf8_find_prev_char">
 <description>
-Creates a new empty #GKeyFile object. Use g_key_file_load_from_file(),
-g_key_file_load_from_data() or g_key_file_load_from_data_dirs() to
-read an existing key file.
+Given a position @p with a UTF-8 encoded string @str, find the start
+of the previous UTF-8 character starting before @p. Returns %NULL if no
+UTF-8 characters are present in @p before @str.
+
+@p does not have to be at the beginning of a UTF-8 character. No check
+is made to see if the character found is actually valid other than
+it starts with an appropriate byte.
 
 
 </description>
 <parameters>
+<parameter name="str">
+<parameter_description> pointer to the beginning of a UTF-8 encoded string
+</parameter_description>
+</parameter>
+<parameter name="p">
+<parameter_description> pointer to some position within @str
+</parameter_description>
+</parameter>
 </parameters>
-<return> an empty #GKeyFile.
-
-Since: 2.6
+<return> a pointer to the found character or %NULL.
 </return>
 </function>
 
