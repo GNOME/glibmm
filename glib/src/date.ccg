@@ -23,12 +23,12 @@
 
 #include <ctime>
 #include <algorithm>
+
 #include <glibmm/convert.h>
 #include <glibmm/utility.h>
 
 #include <glibmmconfig.h>
 GLIBMM_USING_STD(max)
-
 
 namespace Glib
 {
@@ -67,7 +67,24 @@ void Date::set_parse(const Glib::ustring& str)
 
 void Date::set_time(GTime time)
 {
+  //This method, and the C function that it wraps, are deprecated.
   g_date_set_time(&gobject_, time);
+}
+
+void Date::set_time(time_t timet)
+{
+  g_date_set_time_t(&gobject_, timet);
+}
+
+void Date::set_time_current()
+{
+  //As suggested in the C documentation:
+  g_date_set_time_t(&gobject_, time_t(0));
+}
+
+void Date::set_time(const GTimeVal& timeval)
+{
+  g_date_set_time_val(&gobject_, const_cast<GTimeVal*>(&timeval));
 }
 
 void Date::set_month(Date::Month month)
