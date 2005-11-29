@@ -213,6 +213,17 @@ GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING()
 # Evaluate the --enable-warnings=level option.
 GTKMM_ARG_ENABLE_WARNINGS()
 
+# Add an --enable-use-deprecations configure option:
+AC_ARG_ENABLE(deprecations,
+              [AC_HELP_STRING([--enable-use-deprecations],
+                              [warn about deprecated usages [default=no]])],,
+              [enable_deprecations=no])
+              
+if test "x$enable_use_deprecations" = "xyes"; then
+   DISABLE_DEPRECATED_CFLAGS="-DG_DISABLE_DEPRECATED"
+   AC_SUBST(DISABLE_DEPRECATED_CFLAGS)
+fi
+
 
 # Add an --enable-deprecated-api option:
 AC_ARG_ENABLE(deprecated-api, [AC_HELP_STRING([--enable-deprecated-api],
