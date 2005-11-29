@@ -16,6 +16,7 @@ my %exceptions = ();
 my %namespaces = (); # hashmap of lists of strings.
 my %basenames = ();
 my %win32_nowrap = ();
+my %deprecated = ();
 
 # Loop through command line arguments, setting variables:
 while ($ARGV[0] =~ /^-/)
@@ -132,6 +133,10 @@ while ($ARGV[0])
     {
       $win32_nowrap{$cppname} = 1;
     }
+    elsif (/_DEPRECATED/)
+    {
+      $deprecated{$cppname} = 1;
+    }
   }
 
   # Store header filename so that we can #include it later:
@@ -183,6 +188,12 @@ print "\n//Declarations of the *_get_type() functions:\n\n";
 my $i = 0;
 foreach $i (sort keys %objects)
 {
+  if( $deprecated{$i} eq 1 )
+  {
+    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
+    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
+  }
+
   #On Win32, these classes are not compiled:
   if( $win32_nowrap{$i} eq 1 )
   {
@@ -190,10 +201,15 @@ foreach $i (sort keys %objects)
   }
   
   print "GType $basenames{$i}_get_type(void);\n";
-  
+
   if( $win32_nowrap{$i} eq 1 )
   {
     print "#endif //G_OS_WIN32\n"
+  }
+
+  if( $deprecated{$i} eq 1 )
+  {
+    print "#endif // *_DISABLE_DEPRECATED\n"
   }
 }
 
@@ -213,6 +229,12 @@ print "\n//Declarations of the *_Class::wrap_new() methods, instead of including
 my $i = 0;
 foreach $i (sort keys %objects)
 {
+  if( $deprecated{$i} eq 1 )
+  {
+    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
+    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
+  }
+
   #On Win32, these classes are not compiled:
   if( $win32_nowrap{$i} eq 1 )
   {
@@ -232,6 +254,11 @@ foreach $i (sort keys %objects)
   if( $win32_nowrap{$i} eq 1 )
   {
     print "#endif //G_OS_WIN32\n"
+  }
+
+  if( $deprecated{$i} eq 1 )
+  {
+    print "#endif // *_DISABLE_DEPRECATED\n"
   }
 }
 
@@ -286,6 +313,12 @@ print "// Map gtypes to gtkmm wrapper-creation functions:\n";
 
 foreach $i (sort keys %objects)
 {
+  if( $deprecated{$i} eq 1 )
+  {
+    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
+    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
+  }
+
   #On Win32, these classes are not compiled:
   if( $win32_nowrap{$i} eq 1 )
   {
@@ -304,6 +337,11 @@ foreach $i (sort keys %objects)
   {
     print "#endif //G_OS_WIN32\n"
   }
+
+  if( $deprecated{$i} eq 1 )
+  {
+    print "#endif // *_DISABLE_DEPRECATED\n"
+  }
 }
 
 print "\n";
@@ -311,6 +349,12 @@ print "  // Register the gtkmm gtypes:\n";
 
 foreach $i (sort keys %objects)
 {
+  if( $deprecated{$i} eq 1 )
+  {
+    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
+    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
+  }
+
   #On Win32, these classes are not compiled:
   if( $win32_nowrap{$i} eq 1 )
   {
@@ -328,6 +372,11 @@ foreach $i (sort keys %objects)
   if( $win32_nowrap{$i} eq 1 )
   {
     print "#endif //G_OS_WIN32\n"
+  }
+
+  if( $deprecated{$i} eq 1 )
+  {
+    print "#endif // *_DISABLE_DEPRECATED\n"
   }
 }
 
