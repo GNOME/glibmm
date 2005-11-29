@@ -213,6 +213,20 @@ GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING()
 # Evaluate the --enable-warnings=level option.
 GTKMM_ARG_ENABLE_WARNINGS()
 
+
+# Add an --enable-deprecated-api option:
+AC_ARG_ENABLE(deprecated-api, [AC_HELP_STRING([--enable-deprecated-api],
+                                        [include (build) deprecated API in the libraries [default=yes]])],,
+                        [enable_deprecated_api=yes])
+if test "x$enable_deprecated_api" = "xyes"; then
+AC_MSG_WARN([Deprecated API will be built, for backwards-compatibility.])
+else
+  DISABLE_DEPRECATED_API_CFLAGS="-DGLIBMM_DISABLE_DEPRECATED"
+AC_SUBST(DISABLE_DEPRECATED_API_CFLAGS)
+AC_MSG_WARN([Deprecated API will not be built, breaking backwards-compatibility. Do not use this build for distribution packages.])
+fi
+
+
 # Dummy conditional just to make automake-1.4 happy.
 # We need an always-false condition in docs/Makefile.am.
 AM_CONDITIONAL(GTKMM_FALSE,[false])
