@@ -756,17 +756,23 @@ sub on_wrap_method($)
     }
   }
 
-  # Extra ref needed?
-  while(scalar(@args) > 2) # If the optional ref/err arguments are there.
+  # Extra stuff needed?
+  while(scalar(@args) > 2) # If the optional ref/err/deprecated arguments are there.
   {
     my $argRef = string_trim(pop @args);
     if($argRef eq "refreturn")
     {
       $$objCfunc{rettype_needs_ref} = 1;
     }
-      if($argRef eq "errthrow")
+    
+    if($argRef eq "errthrow")
     {
       $$objCfunc{throw_any_errors} = 1;
+    }
+
+    if($argRef eq "deprecated")
+    {
+      $$objCfunc{deprecated} = 1;
     }
   }
    

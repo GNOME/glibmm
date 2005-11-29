@@ -249,14 +249,32 @@ sub output_wrap_meth($$$$$$)
   # Doxygen documentation before the method declaration:
   $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
 
+  # Allow the generated .h/.cc code to have an #ifndef around it.
+  my $deprecated = "";
+  if($$objCDefsFunc{deprecated})
+  {
+    $deprecated = "errthrow"
+  }
+
   #Declaration:
+  if($deprecated ne "")
+  {
+    $self->append("_DEPRECATE_IFDEF_START\n");
+  }
+
   $self->append("  ${cppMethodDecl};");
+
+  if($deprecated ne "")
+  {
+    $self->append("\n_DEPRECATE_IFDEF_END\n");
+  }
 
   my $refneeded = "";
   if($$objCDefsFunc{rettype_needs_ref})
   {
     $refneeded = "refreturn"
   }
+
   my $errthrow = "";
   if($$objCDefsFunc{throw_any_errors})
   {
@@ -266,7 +284,7 @@ sub output_wrap_meth($$$$$$)
   #Implementation:
   my $str;
   if ($$objCppfunc{static}) {
-    $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s)dnl\n",
+    $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $$objCDefsFunc{c_name},
       $$objCppfunc{rettype},
@@ -274,9 +292,10 @@ sub output_wrap_meth($$$$$$)
       $objCppfunc->args_types_and_names(),
       convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 1, $line_num, $errthrow), #1 means it's static, so it has 'object'.
       $refneeded,
-      $errthrow);
+      $errthrow,
+      $deprecated);
   } else {
-    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
+    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $$objCDefsFunc{c_name},
       $$objCppfunc{rettype},
@@ -285,7 +304,8 @@ sub output_wrap_meth($$$$$$)
       convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 0, $line_num, $errthrow),
       $$objCppfunc{const},
       $refneeded,
-      $errthrow);
+      $errthrow,
+      $deprecated);
   }
 
 
