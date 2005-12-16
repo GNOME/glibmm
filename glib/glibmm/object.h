@@ -188,7 +188,7 @@ struct TypeTraits< Glib::RefPtr<T> >
   }
 };
 
-//This confuse the SUN Forte compiler, so we ifdef it out:
+//This confuses the SUN Forte compiler, so we ifdef it out:
 #ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for pointers to const GObject instances.
