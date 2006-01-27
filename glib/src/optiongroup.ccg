@@ -161,17 +161,20 @@ void OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg ar
     CppOptionEntry cppEntry;
     cppEntry.carg_type_ = arg_type;
     cppEntry.allocate_c_arg();
-    
+
     cppEntry.cpparg_ = cpp_arg;
-    
+
     //Remember the C++/C mapping so that we can use it later:
     map_entries_[name] = cppEntry;
-  
+
     //Give the information to the C API:
+
     cppEntry.entry_ = new OptionEntry(entry); //g_option_group_add_entry() does not take its own copy, so we must keep the instance alive.*/
+    //cppEntry.entry_ is deleted in release_c_arg(), so this would be a leak if OptionContext::parse() is never called.
+
     cppEntry.entry_->gobj()->arg = arg_type;
     cppEntry.entry_->gobj()->arg_data = cppEntry.carg_;
-    
+ 
     add_entry(*(cppEntry.entry_));
   }
 }
