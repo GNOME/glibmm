@@ -252,14 +252,16 @@ sub lookup_documentation($$)
 
 
   DocsParser::convert_docs_to_cpp($objFunction, \$text);
-  DocsParser::append_parameter_docs($objFunction, \$text);
-  DocsParser::append_return_docs($objFunction, \$text);
 
   #Add note about deprecation if we have specified that in our _WRAP_METHOD() call:
   if($deprecation_docs ne "")
   {
     $text .= "\n\@deprecated $deprecation_docs";
   }
+
+  DocsParser::append_parameter_docs($objFunction, \$text);
+  DocsParser::append_return_docs($objFunction, \$text);
+
 
   # Escape the space after "i.e." or "e.g." in the brief description.
   $text =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
