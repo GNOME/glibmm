@@ -232,38 +232,43 @@ sub parse_on_cdata($$)
 
 
 # $strCommentBlock lookup_documentation($strFunctionName)
-sub lookup_documentation($)
+sub lookup_documentation($$)
 {
-  my ($functionName) = @_;
-   
+  my ($functionName, $deprecation_docs) = @_;
+
   my $objFunction = $DocsParser::hasharrayFunctions{$functionName};
   if(!$objFunction)
   {
     #print "DocsParser.pm: Warning: function not found: $functionName\n";
     return ""
   }
-  
+
   my $text = $$objFunction{description};
 
   if(length($text) eq 0)
   {
     print "DocsParser.pm: Warning: No C docs for function: \"$functionName\"\n";
   }
-  
-      
+
+
   DocsParser::convert_docs_to_cpp($objFunction, \$text);
   DocsParser::append_parameter_docs($objFunction, \$text);
   DocsParser::append_return_docs($objFunction, \$text);
 
-    
+  #Add note about deprecation if we have specified that in our _WRAP_METHOD() call:
+  if($deprecation_docs ne "")
+  {
+    $text .= "\n\@deprecated $deprecation_docs";
+  }
+
   # Escape the space after "i.e." or "e.g." in the brief description.
   $text =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
-      
+
   # Convert to Doxygen-style comment.
   $text =~ s/\n/\n${DocsParser::commentMiddleStart}/g;
   $text =  $DocsParser::commentStart . $text;
   $text .= "\n${DocsParser::commentEnd}\n";
-      
+
   return $text;
 }
 

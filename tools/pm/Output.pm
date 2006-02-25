@@ -246,21 +246,22 @@ sub output_wrap_meth($$$$$$)
   my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl, $documentation) = @_;
   my $objDefsParser = $$self{objDefsParser};
 
-  # Doxygen documentation before the method declaration:
-  $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
-
-  # Allow the generated .h/.cc code to have an #ifndef around it.
+  # Allow the generated .h/.cc code to have an #ifndef around it, and add deprecation docs to the generated documentation.
   my $deprecated = "";
   if($$objCDefsFunc{deprecated})
   {
-    $deprecated = "errthrow"
+    $deprecated = "deprecated";
   }
 
   #Declaration:
   if($deprecated ne "")
   {
-    $self->append("_DEPRECATE_IFDEF_START\n");
+    $self->append("\n_DEPRECATE_IFDEF_START");
   }
+
+  # Doxygen documentation before the method declaration:
+  $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
+
 
   $self->append("  ${cppMethodDecl};");
 

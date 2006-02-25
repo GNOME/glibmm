@@ -757,27 +757,33 @@ sub on_wrap_method($)
   }
 
   # Extra stuff needed?
+  $$objCfunc{deprecated} = "";
+  my $deprecation_docs = "";
   while(scalar(@args) > 2) # If the optional ref/err/deprecated arguments are there.
   {
     my $argRef = string_trim(pop @args);
+    #print "debug arg=$argRef\n";
     if($argRef eq "refreturn")
     {
       $$objCfunc{rettype_needs_ref} = 1;
     }
-    
-    if($argRef eq "errthrow")
+    elsif($argRef eq "errthrow")
     {
       $$objCfunc{throw_any_errors} = 1;
     }
-
-    if($argRef eq "deprecated")
+    elsif($argRef =~ /^deprecated(.*)/) #If deprecated is at the start.
     {
-      $$objCfunc{deprecated} = 1;
+      $$objCfunc{deprecated} = "deprecated";
+
+      if($1 ne "")
+      {
+        $deprecation_docs = string_unquote(string_trim($1));
+      }
     }
   }
-   
+
   my $commentblock = "";
-  $commentblock = DocsParser::lookup_documentation($argCFunctionName);
+  $commentblock = DocsParser::lookup_documentation($argCFunctionName, $deprecation_docs);
 
   $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock);
 }
@@ -814,7 +820,7 @@ sub on_wrap_method_docs_only($)
   $argCFunctionName = string_trim($argCFunctionName);
 
   #Get the c function's details:
-  
+
   #Checks that it's not empty and that it contains no whitespace.
   if ($argCFunctionName =~ /^\S+$/ ) 
   {
@@ -839,7 +845,7 @@ sub on_wrap_method_docs_only($)
   }
 
   my $commentblock = "";
-  $commentblock = DocsParser::lookup_documentation($argCFunctionName);
+  $commentblock = DocsParser::lookup_documentation($argCFunctionName, "");
 
   $objOutputter->output_wrap_meth_docs_only($filename, $line_num, $commentblock);
 }
