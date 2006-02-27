@@ -233,11 +233,11 @@ public:
 #endif /* GLIBMM_HAVE_SUN_REVERSE_ITERATOR */
 
 #ifdef GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
-  static const size_type npos = std::string::npos;
+  static GLIBMM_API const size_type npos = std::string::npos;
 #else
   //The IRIX MipsPro compiler says "The indicated constant value is not known",
   //so we need to initalize the static member data elsewhere.
-  static const size_type npos;
+  static GLIBMM_API const size_type npos;
 #endif
 
   /*! Default constructor, which creates an empty string.
