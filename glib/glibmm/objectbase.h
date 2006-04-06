@@ -28,6 +28,8 @@
 #include <glibmmconfig.h>
 #include <glibmm/debug.h>
 
+#include <glibmmconfig.h>
+
 GLIBMM_USING_STD(type_info)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -50,7 +52,7 @@ class GSigConnectionNode;
  * constructor runs before all others, either implicitly or explicitly.  Each of
  * the available constructors initializes custom_type_name_ in a different way.
  */
-class ObjectBase : virtual public sigc::trackable
+class GLIBMM_API ObjectBase : virtual public sigc::trackable
 {
 protected:
   /** This default constructor is called implicitly from the constructor of user-derived
