@@ -75,7 +75,7 @@ namespace
 //
 // We can reimplement this later if necessary.
 
-unsigned int property_to_id(Glib::ObjectBase& object, Glib::PropertyBase& property)
+static unsigned int property_to_id(Glib::ObjectBase& object, Glib::PropertyBase& property)
 {
   void *const base_ptr = dynamic_cast<void*>(&object);
   void *const prop_ptr = &property;

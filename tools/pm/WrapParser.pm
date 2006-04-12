@@ -771,6 +771,10 @@ sub on_wrap_method($)
     {
       $$objCfunc{throw_any_errors} = 1;
     }
+    elsif($argRef eq "constversion")
+    {
+      $$objCfunc{constversion} = 1;
+    }
     elsif($argRef =~ /^deprecated(.*)/) #If deprecated is at the start.
     {
       $$objCfunc{deprecated} = "deprecated";

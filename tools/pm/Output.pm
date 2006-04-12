@@ -282,6 +282,12 @@ sub output_wrap_meth($$$$$$)
     $errthrow = "errthrow"
   }
 
+  my $constversion = ""; #Whether it is just a const overload (so it can reuse code)
+  if($$objCDefsFunc{constversion})
+  {
+    $constversion = "constversion"
+  }
+
   #Implementation:
   my $str;
   if ($$objCppfunc{static}) {
@@ -296,7 +302,7 @@ sub output_wrap_meth($$$$$$)
       $errthrow,
       $deprecated);
   } else {
-    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
+    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\')dnl\n",
       $$objCppfunc{name},
       $$objCDefsFunc{c_name},
       $$objCppfunc{rettype},
@@ -306,7 +312,10 @@ sub output_wrap_meth($$$$$$)
       $$objCppfunc{const},
       $refneeded,
       $errthrow,
-      $deprecated);
+      $deprecated,
+      $constversion,
+      $objCppfunc->args_names_only(),
+      );
   }
 
 

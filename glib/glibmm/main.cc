@@ -226,7 +226,7 @@ static gboolean glibmm_iosource_callback(GIOChannel*, GIOCondition condition, vo
 static gboolean glibmm_child_watch_callback(GPid pid, gint child_status, void* data)
 {
   SourceConnectionNode *const conn_data = static_cast<SourceConnectionNode*>(data);
-  
+
   try {
     //Recreate the specific slot from the generic slot node.
     (*static_cast<sigc::slot<void, GPid, int>*>(conn_data->get_slot()))(pid, child_status);

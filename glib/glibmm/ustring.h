@@ -570,7 +570,7 @@ public:
 //! @{
 
   /*! Returns a new UTF-8 string with all characters characters converted to
-   * their lowercase equivalent, while honoring the current locale.  The
+   * their uppercase equivalent, while honoring the current locale.  The
    * resulting string may change in the number of bytes as well as in the
    * number of characters.  For instance, the German sharp&nbsp;s
    * <tt>&quot;&szlig;&quot;</tt> will be replaced by two characters
