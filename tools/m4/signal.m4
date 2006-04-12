@@ -23,7 +23,7 @@ ifelse($2`'_NUM($3)`'$5`'_NUM($6),`void0void0',`dnl
 dnl
 dnl Use predefined callback for SignalProxy0<void>, to reduce code size.
 
-static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
+const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 {
   "$1",
   (GCallback) &Glib::SignalProxyNormal::slot0_void_callback,
@@ -32,7 +32,7 @@ static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 ',`dnl else
 
 ifelse($8,`1',,`dnl Do not generate the implementation if it should be custom:
-static $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
+$2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
 {
   using namespace __NAMESPACE__;
   typedef sigc::slot< $5`'_COMMA_PREFIX($6) > SlotType;
@@ -62,7 +62,7 @@ ifelse($2,void,,`dnl else
 }
 ifelse($2,void,,`dnl else
 
-static $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`' void* data)
+$2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`' void* data)
 {
   using namespace __NAMESPACE__;
   typedef sigc::slot< void`'_COMMA_PREFIX($6) > SlotType;
@@ -87,7 +87,7 @@ static $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SU
 ')dnl endif
 ')dnl endif
 
-static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
+const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 {
   "$1",
   (GCallback) &__CPPNAME__`'_signal_$4_callback,
