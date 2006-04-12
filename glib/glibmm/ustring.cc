@@ -140,7 +140,7 @@ ustring::size_type utf8_char_offset(const std::string& str, ustring::size_type o
 // Helper to implement ustring::find_first_of() and find_first_not_of().
 // Returns the UTF-8 character offset, or ustring::npos if not found.
 //
-ustring::size_type utf8_find_first_of(const std::string& str, ustring::size_type offset,
+static ustring::size_type utf8_find_first_of(const std::string& str, ustring::size_type offset,
                                       const char* utf8_match, long utf8_match_size,
                                       bool find_not_of)
 {
@@ -176,7 +176,7 @@ ustring::size_type utf8_find_first_of(const std::string& str, ustring::size_type
 // Helper to implement ustring::find_last_of() and find_last_not_of().
 // Returns the UTF-8 character offset, or ustring::npos if not found.
 //
-ustring::size_type utf8_find_last_of(const std::string& str, ustring::size_type offset,
+static ustring::size_type utf8_find_last_of(const std::string& str, ustring::size_type offset,
                                      const char* utf8_match, long utf8_match_size,
                                      bool find_not_of)
 {

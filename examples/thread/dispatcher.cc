@@ -170,7 +170,7 @@ void Application::on_progress_finished(ThreadProgress* thread_progress)
     thread_progress->join();
 
     std::cout << "Thread " << thread_progress->id() 
-	      << ": finished." << std::endl;
+              << ": finished." << std::endl;
   }
 
   if(progress_list_.empty())

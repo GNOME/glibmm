@@ -31,7 +31,7 @@ namespace
 // char array rather than a string literal allows for fast pointer comparison,
 // which is otherwise not guaranteed to work.
 
-const char anonymous_custom_type_name[] = "gtkmm__anonymous_custom_type";
+static const char anonymous_custom_type_name[] = "gtkmm__anonymous_custom_type";
 
 } // anonymous namespace
 
