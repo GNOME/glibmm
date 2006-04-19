@@ -246,27 +246,52 @@ sub output_wrap_meth($$$$$$)
   my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl, $documentation) = @_;
   my $objDefsParser = $$self{objDefsParser};
 
+  # Allow the generated .h/.cc code to have an #ifndef around it, and add deprecation docs to the generated documentation.
+  my $deprecated = "";
+  if($$objCDefsFunc{deprecated})
+  {
+    $deprecated = "deprecated";
+  }
+
+  #Declaration:
+  if($deprecated ne "")
+  {
+    $self->append("\n_DEPRECATE_IFDEF_START");
+  }
+
   # Doxygen documentation before the method declaration:
   $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
 
-  #Declaration:
+
   $self->append("  ${cppMethodDecl};");
+
+  if($deprecated ne "")
+  {
+    $self->append("\n_DEPRECATE_IFDEF_END\n");
+  }
 
   my $refneeded = "";
   if($$objCDefsFunc{rettype_needs_ref})
   {
     $refneeded = "refreturn"
   }
+
   my $errthrow = "";
   if($$objCDefsFunc{throw_any_errors})
   {
     $errthrow = "errthrow"
   }
 
+  my $constversion = ""; #Whether it is just a const overload (so it can reuse code)
+  if($$objCDefsFunc{constversion})
+  {
+    $constversion = "constversion"
+  }
+
   #Implementation:
   my $str;
   if ($$objCppfunc{static}) {
-    $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s)dnl\n",
+    $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $$objCDefsFunc{c_name},
       $$objCppfunc{rettype},
@@ -274,9 +299,10 @@ sub output_wrap_meth($$$$$$)
       $objCppfunc->args_types_and_names(),
       convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 1, $line_num, $errthrow), #1 means it's static, so it has 'object'.
       $refneeded,
-      $errthrow);
+      $errthrow,
+      $deprecated);
   } else {
-    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
+    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\')dnl\n",
       $$objCppfunc{name},
       $$objCDefsFunc{c_name},
       $$objCppfunc{rettype},
@@ -285,7 +311,11 @@ sub output_wrap_meth($$$$$$)
       convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 0, $line_num, $errthrow),
       $$objCppfunc{const},
       $refneeded,
-      $errthrow);
+      $errthrow,
+      $deprecated,
+      $constversion,
+      $objCppfunc->args_names_only(),
+      );
   }
 
 
@@ -495,8 +525,8 @@ sub output_wrap_property($$$$$$)
     $self->append($str);
     $self->append("\n");
 
-    # If the property is not already read-only, then add a second const accessor for a read-only propertyproxy:
-    if($proxy_suffix ne "_ReadOnly")
+    # If the property is not already read-only, and the property can be read, then add a second const accessor for a read-only propertyproxy:
+    if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
     {
       my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s)dnl\n",
         $name,

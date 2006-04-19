@@ -54,6 +54,14 @@ define(`__BOOL_UNMANAGEABLE__',`$1')
 _POP()
 ')
 
+dnl Optionally ifdef-out the whole .h and .cc files:
+define(`_DEPRECATED',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_DEPRECATED__',`$1')
+_POP()
+')
+
 dnl Gnome::Canvas::CanvasAA::CanvasAA() needs access to the
 dnl normally-private canvas_class_ member variable. See comments there.
 define(`_GMMPROC_PROTECTED_GCLASS',`dnl
@@ -69,11 +77,13 @@ dnl _END_CLASS_GTKOBJECT()
 dnl   denotes the end of a class
 dnl
 define(`_END_CLASS_GTKOBJECT',`
+
 _SECTION(SECTION_HEADER1)
 _STRUCT_PROTOTYPE()
 
 __NAMESPACE_BEGIN__ class __CPPNAME__`'_Class; __NAMESPACE_END__
 _SECTION(SECTION_HEADER3)
+
 namespace Glib
 {
   /** @relates __NAMESPACE__::__CPPNAME__
@@ -82,7 +92,8 @@ namespace Glib
    * @result A C++ instance that wraps this C instance.
    */
   __NAMESPACE__::__CPPNAME__`'* wrap(__CNAME__`'* object, bool take_copy = false);
-}
+} //namespace Glib
+
 dnl
 dnl
 _SECTION(SECTION_PHEADER)

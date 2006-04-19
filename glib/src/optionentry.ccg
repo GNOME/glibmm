@@ -26,7 +26,6 @@ namespace Glib
 {
 
 OptionEntry::OptionEntry()
-: gobject_( new GOptionEntry() )
 {
   gobject_ = g_new0(GOptionEntry, 1);
 }
@@ -42,7 +41,7 @@ OptionEntry::~OptionEntry()
 OptionEntry::OptionEntry(const OptionEntry& src)
 {
   gobject_ = g_new0(GOptionEntry, 1);
-  
+
   operator=(src);
 }
 
@@ -52,29 +51,29 @@ OptionEntry& OptionEntry::operator=(const OptionEntry& src)
   {
     if(gobject_->long_name)
       g_free(const_cast<char*>(gobject_->long_name));
-      
+
     gobject_->long_name = g_strdup(src.gobject_->long_name);
 
     gobject_->short_name = src.gobject_->short_name; //It's just one char.
-    
+
     gobject_->flags = src.gobject_->flags;
     gobject_->arg = src.gobject_->arg;
     gobject_->arg_data = src.gobject_->arg_data; //Shared, because it's not owned by any instance of this class anyway.
-    
+
     if(gobject_->description)
       g_free(const_cast<char*>(gobject_->description));    
-    
+
     gobject_->description = g_strdup(src.gobject_->description);
-    
+
     if(gobject_->arg_description)
       g_free(const_cast<char*>(gobject_->arg_description));
-        
+
     gobject_->arg_description = g_strdup(src.gobject_->arg_description);
   }
-  
+
   return *this;
 }
-   
+
 
 } // namespace Glib
 

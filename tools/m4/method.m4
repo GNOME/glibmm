@@ -9,13 +9,15 @@ dnl
 
 dnl
 dnl method 
-dnl            $1      $2     $3         $4       $5    $6    $7     $8        $9
-dnl  _METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,const,refreturn,errthrow)
+dnl            $1      $2     $3         $4       $5    $6    $7     $8        $9        $10         $11     $12
+dnl  _METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,const,refreturn,errthrow,deprecated,constversion,arglist_without_types)
 define(`_METHOD',`dnl
 _PUSH(SECTION_CC)
+ifelse(`$10',,,`_DEPRECATE_IFDEF_START')
 $3 __CPPNAME__::$1`'($5)ifelse(`$7',1,` const')
 {
-ifelse(`$8'`$9',,dnl
+ifelse(`$11',,dnl
+`  ifelse(`$8'`$9',,dnl
 `  ifelse(`$3',void,,`return ')_CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');
 ', dnl
 `ifelse(`$9',,,`  GError *error = 0;')
@@ -27,16 +29,19 @@ ifelse(`$8',,,`dnl
 ')dnl
 ifelse(`$3',void,,`  return retvalue;')
 ')dnl
+',`  return const_cast<__CPPNAME__*>(this)->$1($12);')
 }
-
+ifelse(`$10',,,`_DEPRECATE_IFDEF_END
+')
 _POP()')
 
 dnl
 dnl static method
-dnl                  $1       $2     $3         $4      $5     $6      $7      $8
-dnl  _STATIC_METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,refreturn,errthrow))
+dnl                  $1       $2     $3         $4      $5     $6      $7      $8         $9
+dnl  _STATIC_METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,refreturn,errthrow,deprecated))
 define(`_STATIC_METHOD',`dnl
 _PUSH(SECTION_CC)
+ifelse(`$9',,,`_DEPRECATE_IFDEF_START') dnl
 $3 __CPPNAME__::$1($5)
 {
 ifelse(`$7'`$8',,dnl
@@ -52,7 +57,8 @@ ifelse(`$7',,,`dnl
 ifelse(`$3',void,,`  return retvalue;')
 ')dnl
 }
-
+ifelse(`$9',,,`_DEPRECATE_IFDEF_END
+')
 _POP()')
 
 
