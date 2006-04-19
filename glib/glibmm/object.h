@@ -28,6 +28,8 @@
 #include <glibmm/containerhandle_shared.h> //Because its specializations may be here.
 #include <glibmm/value.h>
 
+#include <glibmmconfig.h>
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C"
 {
@@ -84,7 +86,7 @@ private:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 
-class Object : virtual public ObjectBase
+class GLIBMM_API Object : virtual public ObjectBase
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -188,7 +190,7 @@ struct TypeTraits< Glib::RefPtr<T> >
   }
 };
 
-//This confuse the SUN Forte compiler, so we ifdef it out:
+//This confuses the SUN Forte compiler, so we ifdef it out:
 #ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for pointers to const GObject instances.
