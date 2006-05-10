@@ -178,7 +178,7 @@ public:
 
   reference operator*()  const
   {
-    g_assert(node_);
+    //Commented out because it causes an annoying "statement has no effect" g++ warning: g_assert(node_);
     return reinterpret_cast<T&>( node_ ? node_->data : glibmm_null_pointer );
   }
 
