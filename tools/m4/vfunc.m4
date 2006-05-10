@@ -33,8 +33,10 @@ _IMPORT(SECTION_CHECK)
   // being overridden:
   if(obj && obj->is_derived_())
   {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try // Trap C++ exceptions which would normally be lost because this is a C callback.
     {
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
       // Call the virtual member method, which derived classes might override.
 ifelse($4,void,`dnl
       obj->$1`'($7);
@@ -45,11 +47,13 @@ ifelse($9,refreturn_ctype,`dnl Assume Glib::unwrap_copy() is correct if refretur
       return _CONVERT($3,$4,`obj->$1`'($7)');
 ')dnl
 ')dnl
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
       Glib::exception_handlers_invoke`'();
     }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
   else
   {
@@ -72,20 +76,6 @@ ifelse($4,void,,`dnl
 ')dnl
 }
 
-_POP()')
-
-
-#                $1      $2       $3           $4
-# _VFUNC_H(vfunc_name, rettype, `<cppargs>', is_const)
-#
-define(`_VFUNC_H',`dnl
-_PUSH(SECTION_H_VFUNCS)
-ifelse($4,`1',`dnl
-virtual $2 $1`'($3) const;
-',`dnl
-virtual $2 $1`'($3);
-')
- 
 _POP()')
 
 #                $1        $2        $3           $4          $5            $6         $7          $8
@@ -117,6 +107,21 @@ ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requeste
   return RType`'();
 ')dnl
 }
+
+_POP()')
+
+
+#                $1      $2       $3           $4
+# _VFUNC_H(vfunc_name, rettype, `<cppargs>', is_const)
+# Only used for custom vfuncs.
+#
+define(`_VFUNC_H',`dnl
+_PUSH(SECTION_H_VFUNCS)
+ifelse($4,`1',`dnl
+virtual $2 $1`'($3) const;
+',`dnl
+virtual $2 $1`'($3);
+')
 
 _POP()')
 
