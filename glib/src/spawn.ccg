@@ -35,14 +35,18 @@ extern "C"
  */
 void child_setup_callback(void* user_data)
 {
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     (*reinterpret_cast<sigc::slot<void>*>(user_data))();
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 void copy_output_buf(std::string* dest, const char* buf)

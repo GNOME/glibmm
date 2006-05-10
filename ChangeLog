@@ -1,3 +1,67 @@
+2006-04-05  Murray Cumming  <murrayc@murrayc.com>
+
+	* configure.in:
+	* scripts/reduced.m4: Added --enable-api-exceptions option. When this 
+	is used, methods that would normally throw an exception will now take 
+	an extra std::auto_ptr<Glib::Error> argument that should be checked with 
+	auto_ptr::get().
+	* glib/glibmmconfig.h.in: Undef the GLIBMM_EXCEPTIONS_ENABLED, 
+	so it will be defined.
+	* tools/m4/gerror.m4: throw_func() returns an auto_ptr of a 
+	Glib::Error when exceptions are disabled.
+	* tools/m4/method.m4:
+	* tools/pm/Output.pm: on_wrap_method(): Added alternative API with 
+	#ifdefs
+	* tools/m4/signal.m4:
+	* tools/m4/signalproxy_custom.m4:
+	* tools/m4/vfunc.m4: Put #ifdefs around the exception re-throwing 
+	try/catch blocks.
+	* glib/glibmm/dispatcher.cc:
+	* glib/glibmm/dispatcher.h:
+	* glib/glibmm/error.cc:
+	* glib/glibmm/error.h:
+	* glib/glibmm/exceptionhandler.cc:
+	* glib/glibmm/exceptionhandler.h:
+	* glib/glibmm/main.cc:
+	* glib/glibmm/signalproxy.cc:
+	* glib/glibmm/streamiochannel.cc:
+	* glib/glibmm/stringutils.cc:
+	* glib/glibmm/threadpool.cc:
+	* glib/src/iochannel.ccg:
+	* glib/src/iochannel.hg:
+	* glib/src/markup.ccg:
+	* glib/src/spawn.ccg:
+	* glib/src/thread.ccg: Put #ifdefs around try/catch blocks, and 
+	use alternative API when appropriate.
+	* examples/iochannel_stream/fdstream.cc:
+	* examples/markup/parser.cc:
+	* examples/options/main.cc: Adapted examples to 
+	the alternative API, with #ifdefs
+	* tools/m4/convert_base.m4: Avoid any conversion if the result is 
+	void, to allow _WRAP_METHOD() to ignore bool results, so we can 
+	generate some methods that are currently hand-coded.
+
+2006-04-06  Murray Cumming,  <murrayc@murrayc.com>
+
+	* configure.in:
+	* scripts/reduced.m4:
+	* scripts/Makefile.am:
+	* tools/m4/property.m4:
+	* tools/m4/vfunc.m4:
+	* tools/pm/Output.pm:
+	* glib/glibmmconfig.h.in: Added --enable-api-properties which defaults to yes.
+	When this option is used, the property_*() proxies are not generated, so 
+	they are not included/built in the API. Likewise, the ProperyProxy classes 
+	are not built in glibmm itself. Likewise, added --enable-api-vfuncs. 
+	This saves about 300K in the code size of libgtkmm.
+	* glib/glibmm/class.cc:
+	* glib/glibmm/objectbase.h:
+	* glib/glibmm/property.cc:
+	* glib/glibmm/property.h:
+	* glib/glibmm/propertyproxy.h:
+	* glib/glibmm/propertyproxy_base.cc:
+	* glib/glibmm/propertyprox
+
 2.6.2:
 
 2006-04-19  Murray Cumming  <murrayc@murrayc.com>

@@ -21,6 +21,9 @@
  */
 
 #include <glibmm/propertyproxy_base.h>
+
+#ifdef GLIBMM_PROPERTIES_ENABLED
+
 #include <glibmm/signalproxy_connectionnode.h>
 #include <glibmm/object.h>
 #include <glibmm/private/object_p.h>
@@ -149,3 +152,4 @@ void PropertyProxy_Base::reset_property_()
 
 } // namespace Glib
 
+#endif //GLIBMM_PROPERTIES_ENABLED

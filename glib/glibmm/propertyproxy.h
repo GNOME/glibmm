@@ -24,6 +24,7 @@
 
 #include <glibmm/propertyproxy_base.h>
 
+#ifdef GLIBMM_PROPERTIES_ENABLED
 
 namespace Glib
 {
@@ -174,6 +175,7 @@ T PropertyProxy_ReadOnly<T>::get_value() const
 
 } // namespace Glib
 
+#endif //GLIBMM_PROPERTIES_ENABLED
 
 #endif /* _GLIBMM_PROPERTYPROXY_H */
 
