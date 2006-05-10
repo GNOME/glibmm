@@ -224,24 +224,11 @@ if test "x$enable_use_deprecations" = "xyes"; then
    AC_SUBST(DISABLE_DEPRECATED_CFLAGS)
 fi
 
-# Offer the ability to omit some API from the library, 
-# to reduce the code size:
-GLIBMM_ARG_ENABLE_API_EXCEPTIONS()
-
-# Add an --enable-deprecated-api option:
-AC_ARG_ENABLE(deprecated-api, [AC_HELP_STRING([--enable-deprecated-api],
-                                        [include (build) deprecated API in the libraries [default=yes]])],,
-                        [enable_deprecated_api=yes])
-if test "x$enable_deprecated_api" = "xyes"; then
-AC_MSG_WARN([Deprecated API will be built, for backwards-compatibility.])
-else
-  DISABLE_DEPRECATED_API_CFLAGS="-DGLIBMM_DISABLE_DEPRECATED"
-AC_SUBST(DISABLE_DEPRECATED_API_CFLAGS)
-AC_MSG_WARN([Deprecated API will not be built, breaking backwards-compatibility. Do not use this build for distribution packages.])
-fi
 
 #Offer the ability to omit some API from the library, 
 #to reduce the code size:
+GLIBMM_ARG_ENABLE_API_DEPRECATED()
+GLIBMM_ARG_ENABLE_API_EXCEPTIONS()
 GLIBMM_ARG_ENABLE_API_PROPERTIES()
 GLIBMM_ARG_ENABLE_API_VFUNCS()
 
