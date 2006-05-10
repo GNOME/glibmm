@@ -171,13 +171,23 @@ IOChannel::~IOChannel()
   }
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<IOChannel> IOChannel::create_from_file(const std::string& filename, const std::string& mode)
+#else
+Glib::RefPtr<IOChannel> IOChannel::create_from_file(const std::string& filename, const std::string& mode, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
-  GError* error = 0;
-  GIOChannel *const channel = g_io_channel_new_file(filename.c_str(), mode.c_str(), &error);
+  GError* gerror = 0;
+  GIOChannel *const channel = g_io_channel_new_file(filename.c_str(), mode.c_str(), &gerror);
 
-  if(error)
-    Glib::Error::throw_exception(error);
+  if(gerror)
+  {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(gerror);
+    #else
+    error = Glib::Error::throw_exception(gerror);
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
 
   return Glib::wrap(channel, false);
 }
@@ -201,22 +211,40 @@ Glib::RefPtr<IOChannel> IOChannel::create_from_win32_socket(int socket)
 
 #endif /* G_OS_WIN32 */
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 IOStatus IOChannel::write(const Glib::ustring& str)
+#else
+IOStatus IOChannel::write(const Glib::ustring& str, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   gsize bytes_written = 0;
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   return write(str.data(), str.bytes(), bytes_written);
+#else
+  return write(str.data(), str.bytes(), bytes_written, error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 IOStatus IOChannel::read_line(Glib::ustring& line)
+#else
+IOStatus IOChannel::read_line(Glib::ustring& line, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   Glib::ScopedPtr<char> buf;
-  GError* error = 0;
+  GError* gerror = 0;
   gsize   bytes = 0;
 
-  const GIOStatus status = g_io_channel_read_line(gobj(), buf.addr(), &bytes, 0, &error);
+  const GIOStatus status = g_io_channel_read_line(gobj(), buf.addr(), &bytes, 0, &gerror);
 
-  if(error)
-    Glib::Error::throw_exception(error);
+  if(gerror)
+  {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(gerror);
+    #else
+    error = Glib::Error::throw_exception(gerror);
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
 
   if(buf.get())
     line.assign(buf.get(), buf.get() + bytes);
@@ -226,16 +254,26 @@ IOStatus IOChannel::read_line(Glib::ustring& line)
   return (IOStatus) status;
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 IOStatus IOChannel::read_to_end(Glib::ustring& str)
+#else
+IOStatus IOChannel::read_to_end(Glib::ustring& str, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   Glib::ScopedPtr<char> buf;
-  GError* error = 0;
+  GError* gerror = 0;
   gsize   bytes = 0;
 
-  const GIOStatus status = g_io_channel_read_to_end(gobj(), buf.addr(), &bytes, &error);
+  const GIOStatus status = g_io_channel_read_to_end(gobj(), buf.addr(), &bytes, &gerror);
 
-  if(error)
-    Glib::Error::throw_exception(error);
+  if(gerror)
+  {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(gerror);
+    #else
+    error = Glib::Error::throw_exception(gerror);
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
 
   if(buf.get())
     str.assign(buf.get(), buf.get() + bytes);
@@ -245,16 +283,26 @@ IOStatus IOChannel::read_to_end(Glib::ustring& str)
   return (IOStatus) status;
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 IOStatus IOChannel::read(Glib::ustring& str, gsize count)
+#else
+IOStatus IOChannel::read(Glib::ustring& str, gsize count, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   Glib::ScopedPtr<char> buf (g_new(char, count));
-  GError* error = 0;
+  GError* gerror = 0;
   gsize   bytes = 0;
 
-  const GIOStatus status = g_io_channel_read_chars(gobj(), buf.get(), count, &bytes, &error);
+  const GIOStatus status = g_io_channel_read_chars(gobj(), buf.get(), count, &bytes, &gerror);
 
-  if(error)
-    Glib::Error::throw_exception(error);
+ if(gerror)
+  {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(gerror);
+    #else
+    error = Glib::Error::throw_exception(gerror);
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
 
   if(buf.get())
     str.assign(buf.get(), buf.get() + bytes);
@@ -264,15 +312,25 @@ IOStatus IOChannel::read(Glib::ustring& str, gsize count)
   return (IOStatus) status;
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 IOStatus IOChannel::set_encoding(const std::string& encoding)
+#else
+IOStatus IOChannel::set_encoding(const std::string& encoding, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
-  GError* error = 0;
+  GError* gerror = 0;
 
   const GIOStatus status = g_io_channel_set_encoding(
-      gobj(), (encoding.empty()) ? 0 : encoding.c_str(), &error);
+      gobj(), (encoding.empty()) ? 0 : encoding.c_str(), &gerror);
 
-  if(error)
-    Glib::Error::throw_exception(error);
+  if(gerror)
+  {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(gerror);
+    #else
+    error = Glib::Error::throw_exception(gerror);
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+  }
 
   return (IOStatus) status;
 }
@@ -391,9 +449,12 @@ GIOStatus GlibmmIOChannel::io_read(GIOChannel* channel, char* buf, gsize count,
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (GIOStatus) wrapper->read_vfunc(buf, count, *bytes_read);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(Glib::Error& error)
   {
@@ -403,6 +464,7 @@ GIOStatus GlibmmIOChannel::io_read(GIOChannel* channel, char* buf, gsize count,
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return G_IO_STATUS_ERROR;
 }
@@ -413,9 +475,12 @@ GIOStatus GlibmmIOChannel::io_write(GIOChannel* channel, const char* buf, gsize 
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (GIOStatus) wrapper->write_vfunc(buf, count, *bytes_written);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(Glib::Error& error)
   {
@@ -425,6 +490,7 @@ GIOStatus GlibmmIOChannel::io_write(GIOChannel* channel, const char* buf, gsize 
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return G_IO_STATUS_ERROR;
 }
@@ -434,9 +500,12 @@ GIOStatus GlibmmIOChannel::io_seek(GIOChannel* channel, gint64 offset, GSeekType
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (GIOStatus) wrapper->seek_vfunc(offset, (SeekType) type);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(Glib::Error& error)
   {
@@ -446,6 +515,7 @@ GIOStatus GlibmmIOChannel::io_seek(GIOChannel* channel, gint64 offset, GSeekType
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return G_IO_STATUS_ERROR;
 }
@@ -455,9 +525,12 @@ GIOStatus GlibmmIOChannel::io_close(GIOChannel* channel, GError** err)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (GIOStatus) wrapper->close_vfunc();
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(Glib::Error& error)
   {
@@ -467,6 +540,8 @@ GIOStatus GlibmmIOChannel::io_close(GIOChannel* channel, GError** err)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+ 
 
   return G_IO_STATUS_ERROR;
 }
@@ -476,15 +551,19 @@ GSource* GlibmmIOChannel::io_create_watch(GIOChannel* channel, GIOCondition cond
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     const Glib::RefPtr<Source> source = wrapper->create_watch_vfunc((IOCondition) condition);
     return (source) ? source->gobj_copy() : 0;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return 0;
 }
@@ -506,9 +585,12 @@ GIOStatus GlibmmIOChannel::io_set_flags(GIOChannel* channel, GIOFlags flags, GEr
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (GIOStatus) wrapper->set_flags_vfunc((IOFlags) flags);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(Glib::Error& error)
   {
@@ -518,6 +600,7 @@ GIOStatus GlibmmIOChannel::io_set_flags(GIOChannel* channel, GIOFlags flags, GEr
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return G_IO_STATUS_ERROR;
 }
@@ -527,14 +610,18 @@ GIOFlags GlibmmIOChannel::io_get_flags(GIOChannel* channel)
 {
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     return (GIOFlags) wrapper->get_flags_vfunc();
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return GIOFlags(0);
 }

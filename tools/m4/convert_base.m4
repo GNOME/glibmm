@@ -14,14 +14,16 @@ popdef(`__E1')popdef(`__E2')`'')
 define(`CF__EQ',`$3')
 
 #
-#  _CONVERT(ctype, cpptype, name, wrap_line)
+#  _CONVERT(fromtype, totype, name, wrap_line)
 #    Print the conversion from ctype to cpptype
 define(`_CONVERT',`dnl
+m4_ifelse(`$2',void,,`dnl
 pushdef(`__COV',`CF`'__HASH2(`$1',`$2')')dnl
 m4_ifdef(__COV,`m4_indir(__COV,`$1',`$2',`$3')',`
 m4_errprint(`No conversion from $1 to $2 defined (line: $4, parameter name: $3)
 ')
 m4_m4exit(1)
+')`'dnl
 ')`'dnl
 ')
 
