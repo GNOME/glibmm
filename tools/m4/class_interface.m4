@@ -58,7 +58,9 @@ protected:
 _IMPORT(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
 
   //Callbacks (virtual functions):
+#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PH_VFUNCS)
+#endif //GLIBMM_VFUNCS_ENABLED
 };
 ')
 
@@ -90,11 +92,16 @@ void __CPPNAME__`'_Class::iface_init_function(void* g_iface, void*)
   //This is a temporary fix until I find out why I can not seem to derive a GtkFileChooser interface. murrayc
   g_assert(klass != 0); 
 
+#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PCC_CLASS_INIT_VFUNCS)
+#endif //GLIBMM_VFUNCS_ENABLED
+
 _IMPORT(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
 }
 
+#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PCC_VFUNCS)
+#endif //GLIBMM_VFUNCS_ENABLED
 
 _IMPORT(SECTION_PCC_DEFAULT_SIGNAL_HANDLERS)
 ')

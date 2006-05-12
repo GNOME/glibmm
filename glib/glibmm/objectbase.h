@@ -23,6 +23,8 @@
 
 #include <glibmm/signalproxy.h>
 #include <glibmm/propertyproxy.h>
+#include <glibmm/ustring.h>
+#include <glibmm/value.h>
 #include <sigc++/trackable.h>
 #include <typeinfo>
 #include <glibmmconfig.h>

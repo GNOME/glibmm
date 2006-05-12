@@ -1193,13 +1193,25 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
 {
   std::string locale_string;
   is >> locale_string;
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   utf8_string = Glib::locale_to_utf8(locale_string);
+  #else
+  std::auto_ptr<Glib::Error> error; //TODO: Check this? 
+  utf8_string = Glib::locale_to_utf8(locale_string, error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
   return is;
 }
 
 std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string)
 {
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   os << Glib::locale_from_utf8(utf8_string);
+  #else
+  std::auto_ptr<Glib::Error> error; //TODO: Check this? 
+  os << Glib::locale_from_utf8(utf8_string, error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
   return os;
 }
 

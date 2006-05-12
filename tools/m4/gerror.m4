@@ -27,7 +27,14 @@ $4
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   static void throw_func(GError* gobject);
+#else
+  //When not using exceptions, we just pass the Exception object around without throwing it:
+  static std::auto_ptr<Glib::Error> throw_func(GError* gobject);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
   friend void wrap_init(); // uses throw_func()
 #endif
 };
@@ -69,10 +76,18 @@ __NAMESPACE__::__CPPNAME__::Code __NAMESPACE__::__CPPNAME__::code() const
   return static_cast<Code>(Glib::Error::code());
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void __NAMESPACE__::__CPPNAME__::throw_func(GError* gobject)
 {
   throw __NAMESPACE__::__CPPNAME__`'(gobject);
 }
+#else
+//When not using exceptions, we just pass the Exception object around without throwing it:
+std::auto_ptr<Glib::Error> __NAMESPACE__::__CPPNAME__::throw_func(GError* gobject)
+{
+  return std::auto_ptr<Glib::Error>(new __NAMESPACE__::__CPPNAME__`'(gobject));
+}
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 m4_ifelse($5,`NO_GTYPE',,`dnl else
 // static

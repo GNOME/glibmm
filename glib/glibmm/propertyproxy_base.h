@@ -22,9 +22,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
+
+#ifdef GLIBMM_PROPERTIES_ENABLED
+
 #include <glibmm/value.h>
 #include <glibmm/signalproxy.h>
-
 
 namespace Glib
 {
@@ -79,6 +82,8 @@ private:
 };
 
 } // namespace Glib
+
+#endif //GLIBMM_PROPERTIES_ENABLED
 
 #endif /* _GLIBMM_PROPERTYPROXY_BASE_H */
 

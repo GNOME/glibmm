@@ -48,7 +48,14 @@ void fdstreambuf::create_iochannel(int fd, bool manage)
   if(fd >= 0)
   {
     iochannel_ = Glib::IOChannel::create_from_fd(fd);
+
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     iochannel_->set_encoding("");
+    #else
+    std::auto_ptr<Glib::Error> ex;
+    iochannel_->set_encoding("", ex);
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
+   
     iochannel_->set_buffered(true);
     iochannel_->set_close_on_unref(manage);
   }  
@@ -76,6 +83,7 @@ int fdstreambuf::sync()
   if (!iochannel_)
     return -1;
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     iochannel_->flush();
@@ -86,6 +94,16 @@ int fdstreambuf::sync()
     error_condition.code = io_error.code();
     return -1;
   }
+  #else
+  std::auto_ptr<Glib::Error> io_error;
+  iochannel_->flush(io_error);
+  if(io_error.get())
+  {
+    error_condition.error = true;
+    error_condition.code = (Glib::IOChannelError::Code)io_error->code();
+    return -1;
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return 0;
 }
@@ -95,6 +113,7 @@ void fdstreambuf::close_iochannel()
   iochannel_->set_close_on_unref(false);
   reset();
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     iochannel_->close(true);
@@ -104,6 +123,16 @@ void fdstreambuf::close_iochannel()
     error_condition.error = true;
     error_condition.code = io_error.code();
   }
+  #else
+  std::auto_ptr<Glib::Error> io_error;
+  iochannel_->close(true, io_error);
+  if(io_error.get())
+  {
+    error_condition.error = true;
+    error_condition.code = (Glib::IOChannelError::Code)io_error->code();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
 }
 
 // the standard requires this to return either the character
@@ -112,6 +141,7 @@ fdstreambuf::traits_type::int_type fdstreambuf::overflow(int_type c)
 {
   if(!traits_type::eq_int_type(c, traits_type::eof()))
   {
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
       gsize result = 0;
@@ -124,6 +154,18 @@ fdstreambuf::traits_type::int_type fdstreambuf::overflow(int_type c)
       error_condition.code = io_error.code();
       return traits_type::eof();
     }
+    #else
+    std::auto_ptr<Glib::Error> io_error;
+    gsize result = 0;
+    char write_char = c;
+    iochannel_->write(&write_char, 1, result, io_error);
+    if(io_error.get())
+    {
+      error_condition.error = true;
+      error_condition.code = (Glib::IOChannelError::Code)io_error->code();
+      return traits_type::eof();;
+    }
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
   return traits_type::not_eof(c);
 }
@@ -138,6 +180,7 @@ std::streamsize fdstreambuf::xsputn(const char* source, std::streamsize num)
   // will only do a short write in the event of stream failure, so there is no
   // need to check result and have a second bite (byte) at it as would be
   // necessary with Unix write()
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     iochannel_->write(source, num, result);
@@ -148,6 +191,16 @@ std::streamsize fdstreambuf::xsputn(const char* source, std::streamsize num)
     error_condition.code = io_error.code();
     result = 0;
   }
+  #else
+  std::auto_ptr<Glib::Error> io_error;
+  iochannel_->write(source, num, result, io_error);
+  if(io_error.get())
+  {
+    error_condition.error = true;
+    error_condition.code = (Glib::IOChannelError::Code)io_error->code();
+    result = 0;
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return result;
 }
@@ -165,6 +218,7 @@ fdstreambuf::traits_type::int_type fdstreambuf::underflow()
 
   // now insert a character into the bump position
   gsize result = 0;
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     iochannel_->read(putback_buffer + 1, 1, result);
@@ -175,6 +229,16 @@ fdstreambuf::traits_type::int_type fdstreambuf::underflow()
     error_condition.code = io_error.code();
     return traits_type::eof();
   }
+  #else
+  std::auto_ptr<Glib::Error> io_error;
+  iochannel_->read(putback_buffer + 1, 1, result, io_error);
+  if(io_error.get())
+  {
+    error_condition.error = true;
+    error_condition.code = (Glib::IOChannelError::Code)io_error->code();
+    return traits_type::eof();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   // some other error - is this possible?  In case it is, cater for it
   if (result == 0)
@@ -218,22 +282,42 @@ std::streamsize fdstreambuf::xsgetn(char* dest, std::streamsize num)
 
     // read up to everything else we need with Glib::IOChannel::read()
     gsize result = 0;
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
+    #else
+    std::auto_ptr<Glib::Error> io_error;
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
       do
       {
+        #ifdef GLIBMM_EXCEPTIONS_ENABLED
 	iochannel_->read(dest + chars_read,
 			 num - chars_read,
 			 result);
+        #else
+        iochannel_->read(dest + chars_read,
+			 num - chars_read,
+			 result, io_error);
+        #endif //GLIBMM_EXCEPTIONS_ENABLED
+
 	if (result > 0)
           chars_read += result;
       }
       while (result > 0 && result < static_cast<gsize>(num - chars_read));
+    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(Glib::IOChannelError& io_error)
+    #else
+    if(io_error.get())
+    #endif //GLIBMM_EXCEPTIONS_ENABLED
     {
       error_condition.error = true;
+  
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       error_condition.code = io_error.code();
+      #else
+      error_condition.code = (Glib::IOChannelError::Code)io_error->code();
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
       return chars_read;
     }
 

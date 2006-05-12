@@ -63,13 +63,20 @@ sub args_types_and_names($)
   my $param_types = $$self{param_types};
   my @out;
 
+  #debugging:
+  #if($#$param_types)
+  #{
+  #  return "NOARGS";
+  #}
+
   for ($i = 0; $i < $#$param_types + 1; $i++)
   {
     my $str = sprintf("%s %s", $$param_types[$i], $$param_names[$i]);
     push(@out, $str);
   }
 
-  return join(", ", @out);
+  my $result =  join(", ", @out);
+  return $result;
 }
 
 # $string args_names_only_without_object($)

@@ -18,8 +18,8 @@ AC_PREREQ(2.50)
 #  Version and initialization
 #########################################################################
 GLIBMM_MAJOR_VERSION=2
-GLIBMM_MINOR_VERSION=10
-GLIBMM_MICRO_VERSION=1
+GLIBMM_MINOR_VERSION=11
+GLIBMM_MICRO_VERSION=0
 GLIBMM_VERSION=$GLIBMM_MAJOR_VERSION.$GLIBMM_MINOR_VERSION.$GLIBMM_MICRO_VERSION
 GLIBMM_RELEASE=$GLIBMM_MAJOR_VERSION.$GLIBMM_MINOR_VERSION
 AC_DEFINE_UNQUOTED(GLIBMM_MAJOR_VERSION, $GLIBMM_MAJOR_VERSION)
@@ -38,7 +38,7 @@ AC_SUBST(GLIBMM_RELEASE)
 #  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
 #                 better
 # CURRENT : REVISION : AGE
-LIBGLIBMM_SO_VERSION=1:22:0
+LIBGLIBMM_SO_VERSION=1:23:0
 AC_SUBST(LIBGLIBMM_SO_VERSION)
 
 AC_CONFIG_AUX_DIR(scripts)
@@ -224,18 +224,12 @@ if test "x$enable_use_deprecations" = "xyes"; then
    AC_SUBST(DISABLE_DEPRECATED_CFLAGS)
 fi
 
-
-# Add an --enable-deprecated-api option:
-AC_ARG_ENABLE(deprecated-api, [AC_HELP_STRING([--enable-deprecated-api],
-                                        [include (build) deprecated API in the libraries [default=yes]])],,
-                        [enable_deprecated_api=yes])
-if test "x$enable_deprecated_api" = "xyes"; then
-AC_MSG_WARN([Deprecated API will be built, for backwards-compatibility.])
-else
-  DISABLE_DEPRECATED_API_CFLAGS="-DGLIBMM_DISABLE_DEPRECATED"
-AC_SUBST(DISABLE_DEPRECATED_API_CFLAGS)
-AC_MSG_WARN([Deprecated API will not be built, breaking backwards-compatibility. Do not use this build for distribution packages.])
-fi
+#Offer the ability to omit some API from the library, 
+#to reduce the code size:
+GLIBMM_ARG_ENABLE_API_DEPRECATED()
+GLIBMM_ARG_ENABLE_API_EXCEPTIONS()
+GLIBMM_ARG_ENABLE_API_PROPERTIES()
+GLIBMM_ARG_ENABLE_API_VFUNCS()
 
 
 # Dummy conditional just to make automake-1.4 happy.

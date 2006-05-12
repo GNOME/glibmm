@@ -189,15 +189,19 @@ static gboolean glibmm_source_callback(void* data)
 {
   SourceConnectionNode *const conn_data = static_cast<SourceConnectionNode*>(data);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     // Recreate the specific slot from the generic slot node.
     return (*static_cast<sigc::slot<bool>*>(conn_data->get_slot()))();
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
   return 0;
 }
 
@@ -206,16 +210,20 @@ static gboolean glibmm_iosource_callback(GIOChannel*, GIOCondition condition, vo
   SourceCallbackData *const callback_data = static_cast<SourceCallbackData*>(data);
   g_return_val_if_fail(callback_data->node != 0, 0);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     // Recreate the specific slot from the generic slot node.
     return (*static_cast<sigc::slot<bool, Glib::IOCondition>*>(callback_data->node->get_slot()))
                                   ((Glib::IOCondition) condition);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
   return 0;
 }
 
@@ -227,15 +235,18 @@ static gboolean glibmm_child_watch_callback(GPid pid, gint child_status, void* d
 {
   SourceConnectionNode *const conn_data = static_cast<SourceConnectionNode*>(data);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     //Recreate the specific slot from the generic slot node.
     (*static_cast<sigc::slot<void, GPid, int>*>(conn_data->get_slot()))(pid, child_status);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
-
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
   return 0;
 }
 
@@ -806,30 +817,40 @@ Source* Source::get_wrapper(GSource* source)
 // static
 gboolean Source::prepare_vfunc(GSource* source, int* timeout)
 {
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Source *const self = get_wrapper(source);
     return self->prepare(*timeout);
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
   return 0;
 }
 
 // static
 gboolean Source::check_vfunc(GSource* source)
 {
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Source *const self = get_wrapper(source);
     return self->check();
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
   return 0;
 }
 
@@ -841,15 +862,19 @@ gboolean Source::dispatch_vfunc(GSource*, GSourceFunc callback, void* user_data)
   g_return_val_if_fail(callback == &glibmm_dummy_source_callback, 0);
   g_return_val_if_fail(callback_data != 0 && callback_data->node != 0, 0);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Source *const self = callback_data->wrapper;
     return self->dispatch(callback_data->node->get_slot());
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
   return 0;
 }
 

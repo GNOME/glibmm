@@ -280,7 +280,13 @@ Glib::ustring Date::format_string(const Glib::ustring& format) const
   struct tm tm_data;
   g_date_to_struct_tm(&gobject_, &tm_data);
 
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   const std::string locale_format = locale_from_utf8(format);
+  #else
+  std::auto_ptr<Glib::Error> error; //TODO: Check it?
+  const std::string locale_format = locale_from_utf8(format, error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
   gsize bufsize = std::max<gsize>(2 * locale_format.size(), 128);
 
   do
@@ -295,7 +301,12 @@ Glib::ustring Date::format_string(const Glib::ustring& format) const
     if(len != 0 || buf.get()[0] == '\0')
     {
       g_assert(len < bufsize);
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       return locale_to_utf8(std::string(buf.get(), len));
+      #else
+      std::auto_ptr<Glib::Error> error; //TODO: Check it?
+      return locale_to_utf8(std::string(buf.get(), len), error);
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
   while((bufsize *= 2) <= 65536);
