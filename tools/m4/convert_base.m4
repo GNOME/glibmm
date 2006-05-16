@@ -17,7 +17,7 @@ define(`CF__EQ',`$3')
 #  _CONVERT(fromtype, totype, name, wrap_line)
 #    Print the conversion from ctype to cpptype
 define(`_CONVERT',`dnl
-m4_ifelse(`$2',void,,`dnl
+m4_ifelse(`$2',void,`$3',`dnl
 pushdef(`__COV',`CF`'__HASH2(`$1',`$2')')dnl
 m4_ifdef(__COV,`m4_indir(__COV,`$1',`$2',`$3')',`
 m4_errprint(`No conversion from $1 to $2 defined (line: $4, parameter name: $3)
