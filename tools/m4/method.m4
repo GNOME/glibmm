@@ -14,23 +14,23 @@ dnl  _METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,const,refreturn,err
 define(`_METHOD',`dnl
 _PUSH(SECTION_CC)
 ifelse(`$10',,,`_DEPRECATE_IFDEF_START
-') dnl
+')dnl
 ifelse(`$9',,,`#ifdef GLIBMM_EXCEPTIONS_ENABLED'
-) dnl
+)dnl
 $3 __CPPNAME__::$1`'($5)ifelse(`$7',1,` const')
 ifelse(`$9',,,`#else
 $3 __CPPNAME__::$1`'(`'$5`'ifelse(($5),(),`',`, ')std::auto_ptr<Glib::Error>& error)ifelse(`$7',1,` const')
 #endif //GLIBMM_EXCEPTIONS_ENABLED
-') dnl
+')dnl
 {
 ifelse(`$11',,dnl
-`  ifelse(`$8'`$9',,dnl If it is not errthrow or refreturn
+`ifelse(`$8'`$9',,dnl If it is not errthrow or refreturn
 `ifelse(`$3',void,dnl If it returns voids:
 `$2(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6);' dnl It it returns non-void:
-,`return _CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');')' dnl End if it returns voids.
+,`  return _CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');')'dnl End if it returns voids.
 ,dnl If is errthrow or refreturn
 `ifelse(`$9',,,`  GError* gerror = 0;')
-  ifelse(`$3',void,,``$3' retvalue = _CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');')dnl
+  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');dnl
 ifelse(`$9',,,`
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -59,18 +59,18 @@ dnl  _STATIC_METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,refreturn,er
 define(`_STATIC_METHOD',`dnl
 _PUSH(SECTION_CC)
 ifelse(`$9',,,`_DEPRECATE_IFDEF_START
-') dnl
+')dnl
 ifelse(`$8',,,`#ifdef GLIBMM_EXCEPTIONS_ENABLED
-') dnl
+')dnl
 $3 __CPPNAME__::$1($5)
 ifelse(`$8',,,`#else
 $3 __CPPNAME__::$1(`'$5`'ifelse(($5),(),`',`, ')std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
-') dnl
+')dnl
 {
 ifelse(`$7'`$8',,dnl
-`  ifelse(`$3',void,,`return ')_CONVERT($4,$3,`$2`'($6)');
-', dnl
+`ifelse(`$3',void,,`  return ')_CONVERT($4,$3,`$2`'($6)');
+',dnl
 `ifelse(`$8',,,`  GError* gerror = 0;')
   ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'($6)');
 ifelse(`$8',,,`
