@@ -24,13 +24,13 @@ $3 __CPPNAME__::$1`'(`'$5`'ifelse(($5),(),`',`, ')std::auto_ptr<Glib::Error>& er
 ')dnl
 {
 ifelse(`$11',,dnl
-`  ifelse(`$8'`$9',,dnl If it is not errthrow or refreturn
+`ifelse(`$8'`$9',,dnl If it is not errthrow or refreturn
 `ifelse(`$3',void,dnl If it returns voids:
 `$2(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6);' dnl It it returns non-void:
-,`return _CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');')'dnl End if it returns voids.
+,`  return _CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');')'dnl End if it returns voids.
 ,dnl If is errthrow or refreturn
 `ifelse(`$9',,,`  GError* gerror = 0;')
-  ifelse(`$3',void,,``$3' retvalue = _CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');')dnl
+  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');dnl
 ifelse(`$9',,,`
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -69,7 +69,7 @@ $3 __CPPNAME__::$1(`'$5`'ifelse(($5),(),`',`, ')std::auto_ptr<Glib::Error>& erro
 ')dnl
 {
 ifelse(`$7'`$8',,dnl
-`  ifelse(`$3',void,,`return ')_CONVERT($4,$3,`$2`'($6)');
+`ifelse(`$3',void,,`  return ')_CONVERT($4,$3,`$2`'($6)');
 ',dnl
 `ifelse(`$8',,,`  GError* gerror = 0;')
   ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'($6)');
