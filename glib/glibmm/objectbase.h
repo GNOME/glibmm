@@ -165,7 +165,7 @@ private:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-template <class PropertyType>
+template <class PropertyType> inline
 void ObjectBase::set_property(const Glib::ustring& property_name, const PropertyType& value)
 {
   Glib::Value<PropertyType> property_value;
@@ -175,7 +175,7 @@ void ObjectBase::set_property(const Glib::ustring& property_name, const Property
   this->set_property_value(property_name, property_value);
 }
 
-template <class PropertyType>
+template <class PropertyType> inline
 void ObjectBase::get_property(const Glib::ustring& property_name, PropertyType& value) const
 {
   Glib::Value<PropertyType> property_value;
