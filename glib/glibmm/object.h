@@ -20,6 +20,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+//X11 defines DestroyNotify and some other non-prefixed stuff, and it's too late to change that now,
+//so let's give people a clue about the compilation errors that they will see:
+#ifdef DestroyNotify
+  #error "X11/Xlib.h seems to have been included before this header. Due to some commonly-named macros in X11/Xlib.h, it may only be included after any glibmm, gdkmm, or gtkmm headers."
+#endif //DestroyNotify
+
 #include <glibmm/objectbase.h>
 #include <glibmm/wrap.h>
 #include <glibmm/quark.h>
