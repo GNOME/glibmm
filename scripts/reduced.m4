@@ -57,3 +57,23 @@ AC_DEFUN([GLIBMM_ARG_ENABLE_API_EXCEPTIONS],
   }
   fi
 ])
+
+## GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS()
+##
+## Provide the --enable-api-default-signal-handlers configure argument, enabled
+## by default.
+##
+AC_DEFUN([GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS],
+[
+  AC_ARG_ENABLE([api-exceptions],
+      [  --enable-api-default-signal-handlers  Build default signal handlers API.
+                              [[default=yes]]],
+      [glibmm_enable_api_default_signal_handlers="$enableval"],
+      [glibmm_enable_api_default_signal_handlers='yes'])
+
+  if test "x$glibmm_enable_api_default_signal_handlers" = "xyes"; then
+  {
+    AC_DEFINE([GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED],[1], [Defined when the --enable-api-default-signal-handlers configure argument was given])
+  }
+  fi
+])
