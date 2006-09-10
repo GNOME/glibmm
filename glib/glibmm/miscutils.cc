@@ -115,6 +115,21 @@ std::string get_current_dir()
   return std::string(buf.get());
 }
 
+std::string get_user_data_dir()
+{
+  return std::string(g_get_user_data_dir());
+}
+
+std::string get_user_config_dir()
+{
+  return std::string(g_get_user_config_dir());
+}
+
+std::string get_user_cache_dir()
+{
+  return std::string(g_get_user_cache_dir());
+}
+
 bool path_is_absolute(const std::string& filename)
 {
   return g_path_is_absolute(filename.c_str());

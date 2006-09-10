@@ -154,6 +154,36 @@ std::string get_tmp_dir();
  */
 std::string get_current_dir();
 
+/** Returns a base directory in which to access application data such as icons
+ * that is customized for a particular user.
+ *
+ * On UNIX platforms this is determined using the mechanisms described in the
+ * XDG Base Directory Specification
+ *
+ * @since glibmm 2.14
+ */
+std::string get_user_data_dir();
+
+/** Returns a base directory in which to store user-specific application
+ * configuration information such as user preferences and settings.
+ *
+ * On UNIX platforms this is determined using the mechanisms described in the
+ * XDG Base Directory Specification
+ *
+ * @since glibmm 2.14
+ */
+std::string get_user_config_dir();
+
+/** Returns a base directory in which to store non-essential, cached data
+ * specific to particular user.
+ *
+ * On UNIX platforms this is determined using the mechanisms described in the
+ * XDG Base Directory Specification
+ *
+ * @since glibmm 2.14
+ */
+std::string get_user_cache_dir();
+
 /** Returns @c true if the given @a filename is an absolute file name, i.e.\ it
  * contains a full path from the root directory such as <tt>"/usr/local"</tt>
  * on UNIX or <tt>"C:\\windows"</tt> on Windows systems.

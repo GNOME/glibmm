@@ -11,7 +11,7 @@ EXTRA_DIST = README Doxyfile.in \
              html glibmm_doxygen_tags libstdc++.tag.xml
 #Ideally, libstdc++.tag.xml would be installed by gcc, instead of being copied into every project.
 
-html/index.html: $(doxygen_configfile_source) $(beautify_docs_source)
+html/index.html: $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/glib/glibmm/*.h
 	-rm -rf html
 	image_path=""; \
 	dir="`pkg-config --silence-errors --variable=prefix gtk+-2.0`/share/gtk-doc/html/gtk"; \
