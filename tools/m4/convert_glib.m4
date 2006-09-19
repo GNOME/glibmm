@@ -22,6 +22,7 @@ _CONV_GLIB_ENUM(IOFlags)
 _CONV_GLIB_ENUM(IOCondition)
 _CONV_GLIB_ENUM(SeekType)
 _CONV_GLIB_ENUM(OptionArg)
+_CONV_GLIB_ENUM(KeyFileFlags)
 
 _CONVERSION(`gunichar&',`gunichar*',`&($3)')
 _CONVERSION(`gsize&',`gsize*',`&($3)')

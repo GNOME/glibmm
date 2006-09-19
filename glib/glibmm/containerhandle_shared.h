@@ -314,6 +314,36 @@ struct TypeTraits<std::string>
     { g_free(const_cast<CTypeNonConst>(str)); }
 };
 
+/** Specialization for bool
+ * @ingroup ContHelpers
+ */
+template <>
+struct TypeTraits<bool>
+{
+  typedef bool          CppType;
+  typedef gboolean*     CType;
+  typedef gboolean*     CTypeNonConst;
+
+  static CType to_c_type (CppType val) { return (int*)GINT_TO_POINTER(val); }
+  static CType to_c_type (CType ptr)   { return ptr;                        }  
+
+  static CppType to_cpp_type(CType ptr)
+  { 
+    if(ptr)
+    {
+	  //We use this for gboolean too, because it is actually an int.
+	  return GPOINTER_TO_INT(ptr);
+	}
+	else
+	  return CppType();
+  }
+
+  static void release_c_type(CType /* ptr */)
+  {
+
+  }
+};
+
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 

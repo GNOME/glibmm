@@ -38,6 +38,7 @@
 #include <glibmm/interface.h>
 #include <glibmm/iochannel.h>
 #include <glibmm/init.h>
+#include <glibmm/keyfile.h>
 #include <glibmm/streamiochannel.h>
 #include <glibmm/listhandle.h>
 #include <glibmm/main.h>

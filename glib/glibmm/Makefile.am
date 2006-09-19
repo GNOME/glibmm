@@ -62,6 +62,7 @@ sublib_files_extra_general_h = \
   i18n.h \
   interface.h \
   iochannel.h \
+  keyfile.h \
   listhandle.h \
   main.h \
   miscutils.h \
