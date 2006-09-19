@@ -78,13 +78,31 @@ sub error
   printf STDERR "Output.pm: $format",@_;
 }
 
+sub ifdef($$)
+{
+	my ($self, $ifdef) = @_;
+	if ($ifdef)
+	{
+		$self->append("\n#ifdef $ifdef\n");
+	}
+}
+
+sub endif($$)
+{
+	my ($self, $ifdef) = @_;
+	if ($ifdef)
+	{
+		$self->append("\n#endif // $ifdef\n");
+	}
+}
+
 ### Convert _WRAP to a virtual 
 # _VFUNC_H(signame,rettype,`<cppargs>')
 # _VFUNC_PH(gtkname,crettype,cargs and names)
 # void output_wrap_vfunc_h($filename, $line_num, $objCppfunc, $objCDefsFunc)
-sub output_wrap_vfunc_h($$$$$)
+sub output_wrap_vfunc_h($$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef) = @_;
 
 #Old code. We removed _VFUNC_H from the .m4 file
 #  my $str = sprintf("_VFUNC_H(%s,%s,\`%s\',%s)dnl\n",
@@ -102,24 +120,27 @@ sub output_wrap_vfunc_h($$$$$)
   }
 
   $self->append("#ifdef GLIBMM_VFUNCS_ENABLED\n");
+  $self->ifdef($ifdef);
   $self->append("  $cppVfuncDecl;\n");
+  $self->endif($ifdef);
   $self->append("#endif //GLIBMM_VFUNCS_ENABLED\n");
 
   #The default callback, which will call *_vfunc, which will then call the base default callback.
   #Declares the callback in the private *Class class and sets it in the class_init function.
 
-  my $str = sprintf("_VFUNC_PH(%s,%s,\`%s\')dnl\n",
+  my $str = sprintf("_VFUNC_PH(%s,%s,\`%s\',%s)dnl\n",
     $$objCDefsFunc{name},
     $$objCDefsFunc{rettype},
     $objCDefsFunc->args_types_and_names(),
+    $ifdef
    );
   $self->append($str);
 }
 
 # _VFUNC_CC(signame,gtkname,rettype,crettype,`<cppargs>',`<cargs>')
-sub output_wrap_vfunc_cc($$$$$$)
+sub output_wrap_vfunc_cc($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $ifdef) = @_;
 
   my $cname = $$objDefsSignal{name};
 
@@ -130,7 +151,7 @@ sub output_wrap_vfunc_cc($$$$$$)
   my $refreturn = "";
   $refreturn = "refreturn" if($$objCppfunc{rettype_needs_ref});
 
-  my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s)dnl\n",
+  my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
     $$objCppfunc{name},
     $cname,
     $$objCppfunc{rettype},
@@ -138,7 +159,8 @@ sub output_wrap_vfunc_cc($$$$$$)
     $objCppfunc->args_types_and_names(),
     convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num), #$objCppfunc->args_names_only(),
     $objCppfunc->get_is_const(),
-    $refreturn);
+    $refreturn,
+    $ifdef);
 
   $self->append($str);
 
@@ -147,7 +169,7 @@ sub output_wrap_vfunc_cc($$$$$$)
   my $refreturn_ctype = "";
   $refreturn_ctype = "refreturn_ctype" if($$objDefsSignal{rettype_needs_ref});
 
-  my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s)dnl\n",
+  my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s)dnl\n",
     $$objCppfunc{name},
     $cname,
     $$objCppfunc{rettype},
@@ -156,23 +178,25 @@ sub output_wrap_vfunc_cc($$$$$$)
     $objDefsSignal->args_names_only(),
     convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num),
     ${$objDefsSignal->get_param_names()}[0],
-    $refreturn_ctype);
+    $refreturn_ctype,
+    $ifdef);
 
   $self->append($str);
 }
 
 ### Convert _WRAP to a virtual
-# _SIGNAL_H(signame,rettype,`<cppargs>')
-# _SIGNAL_PH(gtkname,crettype,cargs and names)
-# void output_wrap_default_signal_handler_h($filename, $line_num, $objCppfunc, $objCDefsFunc, @args)
-sub output_wrap_default_signal_handler_h($$$$$$)
+# _SIGNAL_H(signame,rettype, ifdef, `<cppargs>')
+# _SIGNAL_PH(gtkname,crettype, ifdef, cargs and names)
+# void output_wrap_default_signal_handler_h($filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef. @args)
+sub output_wrap_default_signal_handler_h($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $bImplement) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef) = @_;
 
-  my $str = sprintf("_SIGNAL_H(%s,%s,\`%s\')dnl\n",
+  my $str = sprintf("_SIGNAL_H(%s,%s,\`%s\',%s)dnl\n",
     $$objCppfunc{name},
     $$objCppfunc{rettype},
-    $objCppfunc->args_types_and_names()
+    $objCppfunc->args_types_and_names(),
+    $ifdef
    );
   $self->append($str);
 
@@ -180,18 +204,19 @@ sub output_wrap_default_signal_handler_h($$$$$$)
   #The default callback, which will call *_impl, which will then call the base default callback.
   #Declares the callback in the private *Class class and sets it in the class_init function.
 
-  $str = sprintf("_SIGNAL_PH(%s,%s,\`%s\')dnl\n",
+  $str = sprintf("_SIGNAL_PH(%s,%s,\`%s\',%s)dnl\n",
     $$objCDefsFunc{name},
     $$objCDefsFunc{rettype},
-    $objCDefsFunc->args_types_and_names()
+    $objCDefsFunc->args_types_and_names(),
+    $ifdef
    );
   $self->append($str);
 }
 
 # _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>')
-sub output_wrap_default_signal_handler_cc($$$$$$$$)
+sub output_wrap_default_signal_handler_cc($$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement, $bCustomCCallback, $bRefreturn) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement, $bCustomCCallback, $bRefreturn, $ifdef) = @_;
   my $cname = $$objDefsSignal{name};
   # $cname = $1 if ($args[3] =~ /"(.*)"/); #TODO: What's this about?
 
@@ -201,7 +226,7 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$)
     my $refreturn = "";
     $refreturn = "refreturn" if($bRefreturn eq 1);
   
-    my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s, %s)dnl\n",
+    my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -209,7 +234,8 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$)
       $objCppfunc->args_types_and_names(),
       convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num), #$objCppfunc->args_names_only(),
       $$objCppfunc{const},
-      $refreturn);
+      $refreturn,
+      $ifdef);
     $self->append($str);
   }
 
@@ -227,7 +253,7 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$)
 
   if($bCustomCCallback ne 1)
   {
-    my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s)dnl\n",
+    my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -235,17 +261,18 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$)
       $objDefsSignal->args_types_and_names(),
       $objDefsSignal->args_names_only(),
       convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num),
-      ${$objDefsSignal->get_param_names()}[0]);
+      ${$objDefsSignal->get_param_names()}[0],
+      $ifdef);
     $self->append($str);
   }
 }
 
 ### Convert _WRAP to a method
 #  _METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,const)
-#  void output_wrap_meth($filename, $line_num, $objCppFunc, $objCDefsFunc, $cppMethodDecl, $documentation)
-sub output_wrap_meth($$$$$$)
+#  void output_wrap_meth($filename, $line_num, $objCppFunc, $objCDefsFunc, $cppMethodDecl, $documentation, $ifdef)
+sub output_wrap_meth($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl, $documentation) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl, $documentation, $ifdef) = @_;
   my $objDefsParser = $$self{objDefsParser};
 
   # Allow the generated .h/.cc code to have an #ifndef around it, and add deprecation docs to the generated documentation.
@@ -263,6 +290,8 @@ sub output_wrap_meth($$$$$$)
 
   # Doxygen documentation before the method declaration:
   $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
+
+ $self->ifdef($ifdef);
 
   if($$objCDefsFunc{throw_any_errors})
   {
@@ -302,7 +331,10 @@ sub output_wrap_meth($$$$$$)
 
      $self->append("\n#endif //GLIBMM_EXCEPTIONS_ENABLED\n");
   }
+  
+  $self->endif($ifdef);
 
+  
   if($deprecated ne "")
   {
     $self->append("\n_DEPRECATE_IFDEF_END\n");
@@ -329,7 +361,7 @@ sub output_wrap_meth($$$$$$)
   #Implementation:
   my $str;
   if ($$objCppfunc{static}) {
-    $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
+    $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $$objCDefsFunc{c_name},
       $$objCppfunc{rettype},
@@ -338,9 +370,10 @@ sub output_wrap_meth($$$$$$)
       convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 1, $line_num, $errthrow), #1 means it's static, so it has 'object'.
       $refneeded,
       $errthrow,
-      $deprecated);
+      $deprecated,
+      $ifdef);
   } else {
-    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\')dnl\n",
+    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s)dnl\n",
       $$objCppfunc{name},
       $$objCDefsFunc{c_name},
       $$objCppfunc{rettype},
@@ -353,10 +386,9 @@ sub output_wrap_meth($$$$$$)
       $deprecated,
       $constversion,
       $objCppfunc->args_names_only(),
+      $ifdef
       );
   }
-
-
   $self->append($str);
 }
 
@@ -417,13 +449,13 @@ sub output_wrap_create($$$)
 # custom_signalproxy_name is "" when no type conversion is required - a normal templates SignalProxy will be used instead.
 sub output_wrap_sig_decl($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback) = @_;
+  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef) = @_;
 
 # _SIGNAL_PROXY(c_signal_name, c_return_type, `<c_arg_types_and_names>',
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
 #               refdoc_comment)
 
-  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\')dnl\n",
+  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',%s,%s)dnl\n",
     $signal_name,
     $$objCSignal{rettype},
     $objCSignal->args_types_and_names_without_object(),
@@ -432,7 +464,8 @@ sub output_wrap_sig_decl($$$$$$$)
     $objCppfunc->args_types_only(),
     convert_args_c_to_cpp($objCSignal, $objCppfunc, $line_num),
     $bCustomCCallback, #When this is true, it will not write the *_callback implementation for you.
-    $objCppfunc->get_refdoc_comment()
+    $objCppfunc->get_refdoc_comment(),
+    $ifdef
   );
 
   $self->append($str);
@@ -881,5 +914,15 @@ sub output_wrap_corba_method($$$$)
   $self->append($str);
 }
 
+sub output_implements_interface($$)
+{
+  my ($self, $interface, $ifdef) = @_;
+
+  my $str = sprintf("_IMPLEMENTS_INTERFACE_CC(%s, %s)dnl\n",
+  	$interface,
+  	$ifdef);
+
+  $self->append($str);
+}
 
 1; # indicate proper module load.
