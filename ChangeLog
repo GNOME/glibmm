@@ -1,3 +1,32 @@
+2006-09-14  Johannes Schmid <jhs@gnome.org>
+
+	* tools/m4/class_shared.m4: Change _IMPLEMENTS_INTERFACE to 
+	_IMPLEMENTS_INTERFACE_CC so we can have more control over it, 
+	by generating the _IMPLEMENTS_INTERFACE_CC from the WrapParser.pm.
+	* tools/m4/method.m4:
+	* tools/m4/signal.m4:
+	* tools/m4/vfunc.m4: Added optional parameters that result in 
+	#ifdefs around methods, signals, vfuncs, etc.
+	* tools/pm/Output.pm: Addef ifdef() and endif().
+	output_wrap_vfunc_h(), output_wrap_vfunc_cc(),
+	output_wrap_default_signal_handler_h(), 
+	output_wrap_default_signal_handler_cc(),
+	output_wrap_meth(),
+	output_wrap_create(),
+	output_wrap_sig_decl(): Support optional ifdefs around  
+	declarations and implementations, by calling ifdef() and endif(), 
+	or by passing the extra argument to the m4 macros.
+	* tools/pm/WrapParser.pm: parse_and_build_output(): 
+	Parse _IMPLEMENTS_INTERFACE, and call the new on_implements_interface() 
+	method, which uses the new output_implements_interface() method, 
+	so it can have an optional ifdef parameter.
+	on_wrap_method(), on_wrap_create(), on_wrap_vfunc(), output_wrap_signal(),
+	output_wrap_vfunc(): Handle the optional ifdef (with a parameter) option 
+	for the _WRAP*() macros.
+
+	This adds support for disabling certain features by using the new
+	"ifdef" argument for methods, vfuncs, signals and interfaces.
+
 2006-09-05  Jonathon Jongsma  <jonathon.jongsma@gmail.com>
 
 	* docs/reference/Makefile.am: rebuild docs when a .h files changes in

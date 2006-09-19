@@ -119,6 +119,7 @@ sub parse_and_build_output($)
 
     if ($token eq "_WRAP_ENUM")   { $self->on_wrap_enum(); next;}
     if ($token eq "_WRAP_GERROR") { $self->on_wrap_gerror(); next;}
+    if ($token eq "_IMPLEMENTS_INTERFACE") { $self->on_implements_interface(); next;}
 
     my $prefix_class = "_CLASS_"; # e.g. _CLASS_GTKOBJECT
     my $token_prefix = substr($token, 0, length($prefix_class));
@@ -759,6 +760,7 @@ sub on_wrap_method($)
   # Extra stuff needed?
   $$objCfunc{deprecated} = "";
   my $deprecation_docs = "";
+  my $ifdef;
   while(scalar(@args) > 2) # If the optional ref/err/deprecated arguments are there.
   {
     my $argRef = string_trim(pop @args);
@@ -784,12 +786,16 @@ sub on_wrap_method($)
         $deprecation_docs = string_unquote(string_trim($1));
       }
     }
+    elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
+    {
+    	$ifdef = $1;
+    }
   }
 
   my $commentblock = "";
   $commentblock = DocsParser::lookup_documentation($argCFunctionName, $deprecation_docs);
 
-  $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock);
+  $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock, $ifdef);
 }
 
 # void on_wrap_method_docs_only()
@@ -914,6 +920,38 @@ sub on_wrap_ctor($)
   $objOutputter->output_wrap_ctor($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl);
 }
 
+sub on_implements_interface($$)
+{
+  my ($self) = @_;
+  
+  if( !($self->check_for_eof()) )
+  {
+   return;
+  }
+
+  my $filename = $$self{filename};
+  my $line_num = $$self{line_num};
+
+  my $str = $self->extract_bracketed_text();
+  my @args = string_split_commas($str);
+
+  # handle first argument
+  my $interface = $args[0];
+
+  # Extra stuff needed?
+  my $ifdef; 
+  while(scalar(@args) > 1) # If the optional ref/err/deprecated arguments are there.
+  {
+  	my $argRef = string_trim(pop @args);
+    if($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
+    {
+    	$ifdef = $1;
+    }
+  }
+  my $objOutputter = $$self{objOutputter};
+  $objOutputter->output_implements_interface($interface, $ifdef);	
+} 
+
 sub on_wrap_create($)
 {
   my ($self) = @_;
@@ -951,6 +989,7 @@ sub on_wrap_signal($)
   my $bNoDefaultHandler = 0;
   my $bCustomCCallback = 0;
   my $bRefreturn = 0;
+  my $ifdef;
   
   while(scalar(@args) > 2) # If optional arguments are there.
   {
@@ -974,10 +1013,15 @@ sub on_wrap_signal($)
     {
       $bRefreturn = 1;
     }
+    
+  	elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
+    {
+    	$ifdef = $1;
+    }
   }
 
 
-  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn);
+  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef);
 }
 
 # void on_wrap_vfunc()
@@ -1001,6 +1045,7 @@ sub on_wrap_vfunc($)
 
   my $refreturn = 0;
   my $refreturn_ctype = 0;
+  my $ifdef = "";
 
   # Extra ref needed?
   while(scalar(@args) > 2) # If the optional ref/err arguments are there.
@@ -1011,10 +1056,14 @@ sub on_wrap_vfunc($)
       { $refreturn = 1; }
     elsif($argRef eq "refreturn_ctype")
       { $refreturn_ctype = 1; }
+  elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
+    {
+    	$ifdef = $1;
+    }
   }
 
   $self->output_wrap_vfunc($argCppDecl, $argCName, $refreturn, $refreturn_ctype,
-                           $$self{filename}, $$self{line_num});
+                           $$self{filename}, $$self{line_num}, $ifdef);
 }
 
 sub on_wrap_enum($)
@@ -1143,7 +1192,7 @@ sub output_wrap_check($$$$$$)
 # Also used for vfunc.
 sub output_wrap_signal($$$$$$$$)
 {
-  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn) = @_;
+  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef) = @_;
   
   #Some checks:
   $self->output_wrap_check($CppDecl, $signal_name, $filename, $line_num, "WRAP_SIGNAL");
@@ -1175,23 +1224,23 @@ sub output_wrap_signal($$$$$$$$)
     }
   }
 
-  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name, $bCustomCCallback);
+  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name, $bCustomCCallback, $ifdef);
 
   if($bNoDefaultHandler eq 0)
   {
-    $objOutputter->output_wrap_default_signal_handler_h($filename, $line_num, $objCppSignal, $objCSignal);
+    $objOutputter->output_wrap_default_signal_handler_h($filename, $line_num, $objCppSignal, $objCSignal, $ifdef);
 
     my $bImplement = 1;
     if($bCustomDefaultHandler) { $bImplement = 0; }
-    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement, $bCustomCCallback, $bRefreturn);
+    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement, $bCustomCCallback, $bRefreturn, $ifdef);
   }
 }
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num)
 # Also used for vfunc.
-sub output_wrap_vfunc($$$$$$$)
+sub output_wrap_vfunc($$$$$$$$)
 {
-  my ($self, $CppDecl, $vfunc_name, $refreturn, $refreturn_ctype, $filename, $line_num) = @_;
+  my ($self, $CppDecl, $vfunc_name, $refreturn, $refreturn_ctype, $filename, $line_num, $ifdef) = @_;
 
   #Some checks:
   $self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, "VFUNC");
@@ -1226,8 +1275,8 @@ sub output_wrap_vfunc($$$$$$$)
 
   $$objCVfunc{rettype_needs_ref} = $refreturn_ctype;
 
-  $objOutputter->output_wrap_vfunc_h($filename, $line_num, $objCppVfunc, $objCVfunc);
-  $objOutputter->output_wrap_vfunc_cc($filename, $line_num, $objCppVfunc, $objCVfunc);
+  $objOutputter->output_wrap_vfunc_h($filename, $line_num, $objCppVfunc, $objCVfunc,$ifdef);
+  $objOutputter->output_wrap_vfunc_cc($filename, $line_num, $objCppVfunc, $objCVfunc, $ifdef);
 }
 
 # give some sort of weights to sorting attibutes

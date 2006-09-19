@@ -4,19 +4,29 @@ dnl Create a callback and set it in our derived G*Class.
 dnl
 define(`_VFUNC_PH',`dnl
 _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+ifelse(`$4',,,`#ifdef $4'
+)dnl
   klass->$1 = `&'$1_vfunc_callback;
+ifelse(`$4',,,`#endif // $4
+')dnl
 _SECTION(SECTION_PH_VFUNCS)
+ifelse(`$4',,,`#ifdef $4'
+)dnl
   static $2 $1_vfunc_callback`'($3);
+ifelse(`$4',,,`#endif // $4
+')dnl
 _POP()')
 
 
 dnl               $1      $2       $3        $4
 dnl _VFUNC_PCC(cppname,gtkname,cpprettype,crettype,
-dnl                        $5                $6          $7            $8        $9
-dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype)
+dnl                        $5                $6          $7            $8        $9					$10
+dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef)
 dnl
 define(`_VFUNC_PCC',`dnl
 _PUSH(SECTION_PCC_VFUNCS)
+ifelse(`$10',,,`#ifdef $10'
+)dnl
 $4 __CPPNAME__`'_Class::$2_vfunc_callback`'($5)
 {
 dnl  We cast twice to allow for multiple-inheritance casts, which might 
@@ -75,14 +85,17 @@ ifelse($4,void,,`dnl
   return RType`'();
 ')dnl
 }
-
+ifelse(`$10',,,`#endif // $10
+')dnl
 _POP()')
 
-#                $1        $2        $3           $4          $5            $6         $7          $8
-# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn)
+#                $1        $2        $3           $4          $5            $6         $7          $8			$9
+# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn, $ifdef)
 #
 define(`_VFUNC_CC',`dnl
 _PUSH(SECTION_CC_VFUNCS)
+ifelse(`$9',,,`#ifdef $9'
+)dnl
 $3 __NAMESPACE__::__CPPNAME__::$1`'($5) ifelse($7,1,const,)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
@@ -107,22 +120,26 @@ ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requeste
   return RType`'();
 ')dnl
 }
-
+ifelse(`$9',,,`#endif // $9
+')dnl
 _POP()')
 
 
-#                $1      $2       $3           $4
-# _VFUNC_H(vfunc_name, rettype, `<cppargs>', is_const)
+#                $1      $2       $3           $4		$5
+# _VFUNC_H(vfunc_name, rettype, `<cppargs>', is_const, ifndef)
 # Only used for custom vfuncs.
 #
 define(`_VFUNC_H',`dnl
 _PUSH(SECTION_H_VFUNCS)
+ifelse(`$5',,,`#ifdef $5'
+)dnl
 ifelse($4,`1',`dnl
 virtual $2 $1`'($3) const;
 ',`dnl
 virtual $2 $1`'($3);
 ')
-
+ifelse(`$5',,,`#endif // $5
+')dnl
 _POP()')
 
 
