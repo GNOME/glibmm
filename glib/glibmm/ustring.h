@@ -269,13 +269,13 @@ public:
   /*! Construct a ustring as a copy of a substring.
    * @param src %Source ustring.
    * @param i Index of first character to copy from.
-   * @param n Number of characters to copy (defaults to copying the remainder).
+   * @param n Number of UTF-8 characters to copy (defaults to copying the remainder).
    */
   ustring(const ustring& src, size_type i, size_type n=npos);
 
   /*! Construct a ustring as a partial copy of a C string.
    * @param src %Source C string encoded as UTF-8.
-   * @param n Number of characters to copy.
+   * @param n Number of UTF-8 characters to copy.
    */
   ustring(const char* src, size_type n);
 
