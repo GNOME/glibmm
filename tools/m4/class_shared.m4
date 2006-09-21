@@ -31,9 +31,14 @@ _IMPORT(SECTION_H_DEFAULT_SIGNAL_HANDLERS)
 dnl
 dnl
 dnl
-define(`_IMPLEMENTS_INTERFACE',`dnl
+define(`_IMPLEMENTS_INTERFACE_CC',`dnl
 _PUSH(SECTION_CC_IMPLEMENTS_INTERFACES)
+ifelse(`$2',,,`#ifdef $2'
+)dnl
   $1`'::add_interface(get_type());
+ifelse(`$2',,,`
+#endif // $2
+')dnl
 _POP()
 ')
 
