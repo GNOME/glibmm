@@ -10,14 +10,23 @@ dnl               $4 = cpp_signal_name,
 dnl               $5 = cpp_return_type,
 dnl               $6 = `<cpp_arg_types>',
 dnl               $7 = `<c_args_to_cpp>',
-dnl               $8 = `custom_c_callback (boolean)')
-dnl               $9 = `refdoc_comment')
+dnl               $8 = `custom_c_callback (boolean)',
+dnl               $9 = `refdoc_comment',
+dnl				  $10 = ifdef)
 
 define(`_SIGNAL_PROXY',`
 $9
+
+ifelse(`$10',,,`#ifdef $10'
+)dnl
   Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'();
+ifelse(`$10',,,`#endif // $10
+')dnl
 dnl
 _PUSH(SECTION_ANONYMOUS_NAMESPACE)
+
+ifelse(`$10',,,`#ifdef $10'
+)dnl
 dnl
 ifelse($2`'_NUM($3)`'$5`'_NUM($6),`void0void0',`dnl
 dnl
@@ -103,11 +112,19 @@ static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 };
 ')dnl endif
 
+ifelse(`$10',,,`#endif // $10
+')dnl
+
 _SECTION(SECTION_CC_SIGNALPROXIES)
+
+ifelse(`$10',,,`#ifdef $10'
+)dnl
 Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > __CPPNAME__::signal_$4`'()
 {
   return Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) >(this, &__CPPNAME__`'_signal_$4_info);
 }
+ifelse(`$10',,,`#endif // $10
+')dnl
 
 _POP()')
 
@@ -118,20 +135,30 @@ dnl Create a callback and set it in our derived G*Class.
 dnl
 define(`_SIGNAL_PH',`dnl
 _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
+ifelse(`$4',,,`#ifdef $4'
+)dnl
   klass->$1 = `&'$1_callback;
+ifelse(`$4',,,`#endif // $4
+')dnl
 _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
+ifelse(`$4',,,`#ifdef $4'
+)dnl
   static $2 $1_callback`'($3);
+ifelse(`$4',,,`#endif // $4
+')dnl
 _POP()')
 
 
 
 dnl                $1      $2       $3        $4
 dnl _SIGNAL_PCC(cppname,gname,cpprettype,crettype,
-dnl                        $5                $6          $7            $8
-dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg)
+dnl                        $5                $6          $7            $8			$9
+dnl                  `<cargs and names>',`<cnames>',`<cpparg names>', firstarg, <ifndef>)
 dnl
 define(`_SIGNAL_PCC',`dnl
 _PUSH(SECTION_PCC_DEFAULT_SIGNAL_HANDLERS)
+ifelse(`$9',,,`#ifdef $9'
+)dnl
 $4 __CPPNAME__`'_Class::$2_callback`'($5)
 {
 dnl  We cast twice to allow for multiple-inheritance casts, which might 
@@ -186,23 +213,30 @@ ifelse($4,void,,`dnl
   return RType`'();
 ')dnl
 }
-
+ifelse(`$9',,,`#endif // $9
+')dnl
 _POP()')
 
 
-dnl                    $1      $2       $3 
-dnl _SIGNAL_H(signame,rettype,`<cppargs>')
+dnl               $1      $2       $3 		$4
+dnl _SIGNAL_H(signame, rettype, `<cppargs>', <ifdef>)
 dnl
 define(`_SIGNAL_H',`dnl
 _PUSH(SECTION_H_DEFAULT_SIGNAL_HANDLERS)
+ifelse(`$4',,,`#ifdef $4'
+)dnl
   virtual $2 on_$1`'($3);
+ifelse(`$4',,,`#endif // $4
+')dnl
 _POP()')
 
-dnl              $1      $2     $3     $4         $5          $6            $7      $8
-dnl _SIGNAL_CC(signame,gname,rettype,crettype,`<cppargs>',`<carg_names>', const, refreturn)
+dnl              $1      $2     $3     $4         $5          $6            $7      $8			$9
+dnl _SIGNAL_CC(signame,gname,rettype,crettype,`<cppargs>',`<carg_names>', const, refreturn, <ifdef>)
 dnl
 define(`_SIGNAL_CC',`dnl
 _PUSH(SECTION_CC_DEFAULT_SIGNAL_HANDLERS)
+ifelse(`$9',,,`#ifdef $9'
+)dnl
 $3 __NAMESPACE__::__CPPNAME__::on_$1`'($5)
 {
   BaseClassType *const base = static_cast<BaseClassType*>(
@@ -227,6 +261,7 @@ ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requeste
   return RType`'();
 ')dnl
 }
-
+ifelse(`$9',,,`#endif // $9
+')dnl
 _POP()')
 
