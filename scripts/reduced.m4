@@ -92,7 +92,7 @@ AC_DEFUN([GLIBMM_ARG_ENABLE_API_DEPRECATED],
 ##
 AC_DEFUN([GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS],
 [
-  AC_ARG_ENABLE([api-exceptions],
+  AC_ARG_ENABLE([api-default-signal-handlers],
       [  --enable-api-default-signal-handlers  Build default signal handlers API.
                               [[default=yes]]],
       [glibmm_enable_api_default_signal_handlers="$enableval"],
