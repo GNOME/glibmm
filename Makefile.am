@@ -48,7 +48,7 @@ post-html-recursive:
 	done
 
 post-html-local: glibmm-docs.tar.gz
-	rsync $(rsync_args) glibmm-docs.tar.gz $$USER@shell.sourceforge.net:$(web_path_gtkmm2)
+	rsync $(rsync_args) glibmm-docs.tar.gz $$USER@$(web_host):$(web_path_gtkmm)
 
 post-html: post-html-recursive post-html-local
 

@@ -29,7 +29,7 @@ glibmm-reference-html.tar.bz2: html/index.html
 	tar cf - html | bzip2 -c >$@
 
 post-html: html/index.html
-	rsync $(rsync_args) -r html/ $$USER@shell.sourceforge.net:$(web_path_reference)/html/
+	rsync $(rsync_args) -r html/ $$USER@$(web_host):$(web_path_reference)/html/
 
 doc-clean:
 	-rm -rf html
