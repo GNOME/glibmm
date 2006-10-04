@@ -76,7 +76,7 @@ public:
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   static void throw_exception(GError* gobject) G_GNUC_NORETURN;
 #else
-  static std::auto_ptr<Glib::Error> throw_exception(GError* gobject) G_GNUC_NORETURN;
+  static std::auto_ptr<Glib::Error> throw_exception(GError* gobject);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
