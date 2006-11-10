@@ -1,4 +1,4 @@
-#! /scratchbox/tools/bin/perl
+#! /usr/bin/perl
 #
 # docs/reference/beautify_docs.pl.  Generated from beautify_docs.pl.in by configure.
 #
