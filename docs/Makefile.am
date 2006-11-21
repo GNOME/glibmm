@@ -17,7 +17,7 @@ post-html-recursive:
 	done
 
 post-html-local: 
-	scp $$SSH_OPT $^ $$USER@shell.sourceforge.net:$(web_path_docs)
+	scp $$SSH_OPT $^ $$USER@$(web_host):$(web_path_docs)
 
 post-html: post-html-recursive post-html-local
 
