@@ -77,8 +77,8 @@ GLIB_VALUE_BASIC(long, long, G_MINLONG, G_MAXLONG)
 GLIB_VALUE_BASIC(unsigned long, ulong, 0, G_MAXULONG)
 GLIB_VALUE_BASIC(long_long, int64, G_GINT64_CONSTANT[](0x8000000000000000), G_GINT64_CONSTANT[](0x7fffffffffffffff))
 GLIB_VALUE_BASIC(unsigned_long_long, uint64, G_GINT64_CONSTANT[](0U), G_GINT64_CONSTANT[](0xffffffffffffffffU))
-GLIB_VALUE_BASIC(float, float, G_MINFLOAT, G_MAXFLOAT)
-GLIB_VALUE_BASIC(double, double, G_MINDOUBLE, G_MAXDOUBLE)
+GLIB_VALUE_BASIC(float, float, -G_MAXFLOAT, G_MAXFLOAT)
+GLIB_VALUE_BASIC(double, double, -G_MAXDOUBLE, G_MAXDOUBLE)
 GLIB_VALUE_BASIC(void*, pointer)
 } // namespace Glib
 
