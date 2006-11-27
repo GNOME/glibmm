@@ -69,7 +69,7 @@ sub parse
 
     s/','/\%\%COMMA\%\%/;
     s/'}'/\%\%RBRACE\%\%/;
-    if (/^typedef enum/ )
+    if (/^\s*typedef enum/ )
     {
       print ";; From $file\n\n" if (!$from);
       $from=1;
