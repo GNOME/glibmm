@@ -109,6 +109,11 @@ public:
   template <class PropertyType>
   void get_property(const Glib::ustring& property_name, PropertyType& value) const;
 
+  /** You can use the signal_changed() signal of the property proxy instead, 
+   * but this is necessary when using the reduced API.
+   */
+  void connect_property_changed(const Glib::ustring& property_name, const sigc::slot<void>& slot);
+
   /** Increment the reference count for this object.
    * You should never need to do this manually - use the object via a RefPtr instead.
    */
@@ -165,7 +170,7 @@ private:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-template <class PropertyType>
+template <class PropertyType> inline
 void ObjectBase::set_property(const Glib::ustring& property_name, const PropertyType& value)
 {
   Glib::Value<PropertyType> property_value;
@@ -175,7 +180,7 @@ void ObjectBase::set_property(const Glib::ustring& property_name, const Property
   this->set_property_value(property_name, property_value);
 }
 
-template <class PropertyType>
+template <class PropertyType> inline
 void ObjectBase::get_property(const Glib::ustring& property_name, PropertyType& value) const
 {
   Glib::Value<PropertyType> property_value;

@@ -24,13 +24,13 @@
 
 #include <glibmmconfig.h>
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
-
 #include <glibmm/value.h>
 #include <glibmm/signalproxy.h>
 
 namespace Glib
 {
+
+#ifdef GLIBMM_PROPERTIES_ENABLED
 
 class ObjectBase;
 
@@ -47,7 +47,6 @@ public:
   sigc::connection connect(const SlotType& sl);
 
 protected:
-  static void callback(GObject* object, GParamSpec* pspec, gpointer data);
 
   const char* property_name_; //Should be a static string literal.
 
@@ -74,6 +73,7 @@ protected:
   void reset_property_();
 
   ObjectBase* obj_; //The C++ wrapper instance of which this PropertyProxy is a member.
+
   const char* property_name_; //Should be a static string literal.
 
 private:
@@ -81,9 +81,31 @@ private:
   PropertyProxy_Base& operator=(const PropertyProxy_Base&);
 };
 
+#endif //GLIBMM_PROPERTIES_ENABLED
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+class SignalProxyProperty;
+
+/** PropertyProxyConnectionNode is a connection node for use with SignalProxyProperty.
+  * It's like ProxyConnectionNode, but it contains the property name too.
+  * This is not public API.
+  */
+class PropertyProxyConnectionNode : public SignalProxyConnectionNode
+{
+public:
+  friend class SignalProxyProperty;
+
+  PropertyProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject);
+
+  static void callback(GObject* object, GParamSpec* pspec, gpointer data);
+};
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
 } // namespace Glib
 
-#endif //GLIBMM_PROPERTIES_ENABLED
+
 
 #endif /* _GLIBMM_PROPERTYPROXY_BASE_H */
 
