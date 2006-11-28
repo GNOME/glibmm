@@ -1,3 +1,20 @@
+2006-11-28  Daniel Elstner  <danielk@openismus.com>
+
+	* tools/pm/GtkDefs.pm (read_defs): Allow an empty pair of
+	parentheses in the innermost match.  This fixes the problem of
+	gmmproc choking on "()" in the documentation strings.  This would
+	still break on unmatched parentheses, though.  Of course the
+	parser should just skip over quoted strings, but I wasn't able
+	to get that to work.
+	* glib/src/glib_enums.defs (GNormalizeMode): Manually fix the
+	improperly parsed value of G_NORMALIZE_NFD.  Fortunately this
+	doesn't change anything since the "#error" token was interpreted
+	as zero, which happens to be the right value.
+	* glib/src/glib_functions.defs (g_iconv): Manually convert to
+	a function definition, as it was improperly parsed as a method
+	with a zero-length name (!) of object GIConv.  This fixes the
+	annoying gmmproc warning about an allegedly unwrapped method.
+
 2006-11-28  Murray Cumming  <murrayc@murrayc.com>
 
 	* glib/glibmm/propertyproxy_base.cc: Don't ifdef out 
