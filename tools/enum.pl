@@ -4,6 +4,7 @@
 # thus we must extract it ourselves.
 # Usage: ./enum.pl /gnome/head/cvs/gconf/gconf/*.h > gconf_enums.defs
 
+use warnings;
 
 my %token;
 $module="none";
@@ -207,12 +208,14 @@ sub form_names
  
   my $len=length($$c_name[0]) - 1;
   my $j;
-  for ($j=0;$j<$#c_name;$j++)
+
+  NAME: for ($j=0;$j<$#c_name;$j++)
   {
     while (substr($$c_name[$j],$len-1,1) ne "_" ||
            substr($$c_name[$j],0,$len) ne substr($$c_name[$j+1],0,$len))
     {
       $len--;
+      last NAME if ($len <= 0);
     }
     #print substr($$c_name[$j],0,$len),"\n";
   }
