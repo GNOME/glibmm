@@ -79,6 +79,10 @@ sub parse_values($$)
 {
   my ($self, $value) = @_;
 
+  my $elem_names  = [];
+  my $elem_values = [];
+  my $common_prefix = undef;
+
   # break up the value statements
   foreach(split(/\s*'*[()]\s*/, $value))
   {
@@ -88,17 +92,35 @@ sub parse_values($$)
     {
       my ($name, $value) = ($1, $2);
 
-      # cut off the module prefix, e.g. GTK_
-      $name =~ s/^[^_]+_//;
+      # detect whether there is module prefix common to all names, e.g. GTK_
+      my $prefix = $1 if ($name =~ /^([^_]+_)/);
 
-      push(@{$$self{elem_names}}, $name);
-      push(@{$$self{elem_values}}, $value);
+      if (not defined($common_prefix))
+      {
+        $common_prefix = $prefix;
+      }
+      elsif ($prefix ne $common_prefix)
+      {
+        $common_prefix = "";
+      }
+
+      push(@$elem_names, $name);
+      push(@$elem_values, $value);
     }
     else
     {
       GtkDefs::error("Unknown value statement ($_) in $$self{c_type}\n");
     }
   }
+
+  if ($common_prefix)
+  {
+    # cut off the module prefix, e.g. GTK_
+    s/^$common_prefix// foreach (@$elem_names);
+  }
+
+  $$self{elem_names}  = $elem_names;
+  $$self{elem_values} = $elem_values;
 }
 
 sub beautify_values($)
