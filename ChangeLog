@@ -1,3 +1,34 @@
+2007-01-20  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	* glib/glibmm/miscutils.cc: Clean up the code a bit.
+	(get_application_name): Remove the code that checked the string for
+	valid UTF-8, and attempted conversion if not valid.  I must have
+	been on crack when I wrote this, as the combination of conditions
+	that would cause the string to be invalid UTF-8 is quite unlikely.
+	If this is a valid concern at all, it should be filed as a GLib bug
+	and not worked around in glibmm.
+	(build_filename(const std::string&, const std::string&)): Just call
+	the plain g_build_filename() instead of building a temporary array
+	and passing that via ArrayHandle to the build_filename() overload
+	for containers.
+	(build_path): Remove the already deactivated custom implementation
+	from the time before g_build_pathv() was added to GLib.
+
+	* glib/glibmm/object.{cc,h}: Improve/fix a couple of comments.
+	(ConstructParams::ConstructParams): Add G_GNUC_NULL_TERMINATED
+	function attribute to make the compiler complain if the variadic
+	argument list is not terminated by a NULL pointer.
+
+	* glib/glibmm/ustring.{cc,h} (utf8_find_last_of): Avoid applying
+	bitwise logical operators directly to (possibly signed) operands
+	of char type.  In order to avoid relying on implementation-defined
+	behavior, make sure that the operands are of unsigned integer type.
+	(ustring::is_ascii): Likewise,
+	(ustring_Iterator<T>::operator--): Likewise.
+	(get_unichar_from_std_iterator): De-obfuscate this highly optimized
+	piece of code, as the current stable release of GCC (4.1.2-pre on
+	my system) generates better assembler output without the voodoo.
+
 2.13.3:
 
 2006-11-28  Daniel Elstner  <danielk@openismus.com>

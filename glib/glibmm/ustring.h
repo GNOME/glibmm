@@ -729,7 +729,7 @@ const ustring_Iterator<T> ustring_Iterator<T>::operator++(int)
 template <class T> inline
 ustring_Iterator<T>& ustring_Iterator<T>::operator--()
 {
-  do --pos_; while((*pos_ & '\xC0') == '\x80');
+  do --pos_; while((static_cast<unsigned char>(*pos_) & 0xC0u) == 0x80);
   return *this;
 }
 
