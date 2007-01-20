@@ -1,5 +1,35 @@
 2007-01-20  Daniel Elstner  <daniel.kitta@gmail.com>
 
+	* glib/glibmm/dispatcher.{cc,h}: Early spring cleaning.  Also add
+	a paragraph about Dispatcher on win32 to the documentation.
+	(DispatchNotifyData): Remove the 'tag' member from the struct that
+	was always set to 0xdeadbeef in order to detect memory corruption.
+	This is pointless, as we already check the DispatchNotifier pointer
+	sent across the pipe, which is a far better indicator of corruption
+	anyway.
+	(warn_failed_pipe_io): Remove the err_no parameter and retrieve
+	errno respectively GetLastError() within the function instead.
+	(DispatchNotifier::conn_io_handler_): Remove, as we now inherit
+	from sigc::trackable.  I verified that this doesn't cause problems
+	with threading in this particular case.
+	(DispatchNotifier::DispatchNotifier): If creating the pipe failed
+	and exceptions are disabled, call at least warn_failed_pipe_io()
+	instead of doing nothing at all.
+	(DispatchNotifier::*): Rework the win32 implementation so that it
+	matches more closely the Dispatcher semantics on Unix.  This still
+	needs testing by someone on win32, though.  So far I only verified
+	that it compiles with dummy definitions of the win32 API.  Also,
+	I accidentally located the real cause of the race condition Cedric
+	experienced in bug #109966.  It was a bug in my patch, rather than
+	in the example code.
+
+	* examples/thread/dispatcher.cc: Cleanup.  In particular, get rid
+	of the Glib::RefPtr<> abuse with non-Glib::Object types.  I don't
+	believe we endorse such usage officially, so it shouldn't be in
+	the examples.
+
+2007-01-20  Daniel Elstner  <daniel.kitta@gmail.com>
+
 	* glib/glibmm/miscutils.cc: Clean up the code a bit.
 	(get_application_name): Remove the code that checked the string for
 	valid UTF-8, and attempted conversion if not valid.  I must have

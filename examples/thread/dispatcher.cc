@@ -1,6 +1,6 @@
 /*
  * Glib::Dispatcher example -- cross thread signalling
- * by Daniel Elstner  <daniel.elstner@gmx.net>
+ * by Daniel Elstner  <daniel.kitta@gmail.com>
  *
  * modified to only use glibmm
  * by J. Abelardo Gutierrez <jabelardo@cantv.net>
@@ -13,29 +13,38 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
-#include <list>
-#include <memory>
-
+#include <vector>
 
 namespace
 {
 
-class ThreadProgress : public sigc::trackable
+/*
+ * Note that it does not make sense for this class to inherit from
+ * sigc::trackable, as doing so would only give a false sense of security.
+ * Once the thread launch has been triggered, the object has to stay alive
+ * until the thread has been joined again.  The code running in the thread
+ * assumes the existence of the object.  If it is destroyed earlier, the
+ * program will crash, with sigc::trackable or without it.
+ */
+class ThreadProgress
 {
 public:
   explicit ThreadProgress(int id);
   virtual ~ThreadProgress();
 
+  int  id() const;
   void launch();
   void join();
+  bool unfinished() const;
 
   sigc::signal<void>& signal_finished();
-  int id() const;
-
-  virtual void reference() const { ++ref_count_; }
-  virtual void unreference() const { if (!(--ref_count_)) delete this; }
 
 private:
+  enum { ITERATIONS = 100 };
+
+  // Note that the thread does not write to the member data at all.  It only
+  // reads signal_increment_, which is only written to before the thread is
+  // lauched.  Therefore, no locking is required.
   Glib::Thread*       thread_;
   int                 id_;
   unsigned int        progress_;
@@ -44,9 +53,6 @@ private:
 
   void progress_increment();
   void thread_function();
-
-  mutable int ref_count_;
- 
 };
 
 class Application : public sigc::trackable
@@ -55,33 +61,43 @@ public:
   Application();
   virtual ~Application();
 
-  void launch_threads();
   void run();
 
 private:
   Glib::RefPtr<Glib::MainLoop>  main_loop_;
-  std::list<ThreadProgress*>    progress_list_;
-  std::list<Glib::RefPtr<ThreadProgress> > progress_ref_list_;
+  std::vector<ThreadProgress*>  progress_threads_;
 
+  void launch_threads();
   void on_progress_finished(ThreadProgress* thread_progress);
 };
 
+template <class T>
+class DeletePtr : public std::unary_function<void, T>
+{
+public:
+  void operator()(T ptr) const { delete ptr; }
+};
 
 ThreadProgress::ThreadProgress(int id)
 :
   thread_   (0),
   id_       (id),
-  progress_ (0),
-  ref_count_(0)
+  progress_ (0)
 {
-  // Increment the reference count
-  reference();
   // Connect to the cross-thread signal.
   signal_increment_.connect(sigc::mem_fun(*this, &ThreadProgress::progress_increment));
 }
 
 ThreadProgress::~ThreadProgress()
-{}
+{
+  // It is an error if the thread is still running at this point.
+  g_return_if_fail(thread_ == 0);
+}
+
+int ThreadProgress::id() const
+{
+  return id_;
+}
 
 void ThreadProgress::launch()
 {
@@ -92,6 +108,12 @@ void ThreadProgress::launch()
 void ThreadProgress::join()
 {
   thread_->join();
+  thread_ = 0;
+}
+
+bool ThreadProgress::unfinished() const
+{
+  return (progress_ < ITERATIONS);
 }
 
 sigc::signal<void>& ThreadProgress::signal_finished()
@@ -99,32 +121,22 @@ sigc::signal<void>& ThreadProgress::signal_finished()
   return signal_finished_;
 }
 
-int ThreadProgress::id() const
-{
-  return id_;
-}
-
 void ThreadProgress::progress_increment()
 {
-  // Use an integer because floating point arithmetic is inaccurate --
-  // we want to finish *exactly* after the 100th increment.
   ++progress_;
-
   std::cout << "Thread " << id_ << ": " << progress_ << '%' << std::endl;
 
-  if(progress_ >= 100)
+  if (progress_ >= ITERATIONS)
     signal_finished_();
 }
 
 void ThreadProgress::thread_function()
 {
   Glib::Rand rand;
-  int usecs = 5000;
 
-  for(int i = 0; i < 100; ++i)
+  for (int i = 0; i < ITERATIONS; ++i)
   {
-    usecs = rand.get_int_range(std::max(0, usecs - 1000 - i), std::min(20000, usecs + 1000 + i));
-    Glib::usleep(usecs);
+    Glib::usleep(rand.get_int_range(2000, 20000));
 
     // Tell the main thread to increment the progress value.
     signal_increment_();
@@ -133,65 +145,82 @@ void ThreadProgress::thread_function()
 
 Application::Application()
 :
-  main_loop_ (Glib::MainLoop::create())
+  main_loop_        (Glib::MainLoop::create()),
+  progress_threads_ (5)
 {
-  std::cout << "Thread Dispatcher Example." << std::endl;
-
-  for(int i = 1; i <= 5; ++i)
+  // Note that unless you're targetting an embedded platform, you can assume
+  // exceptions to be enabled.  The #ifdef is only here to make the example
+  // compile in either case; you may ignore it otherwise.
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+#endif
   {
-    ThreadProgress* progress=new ThreadProgress(i);
-    progress_list_.push_back(progress);
-    progress_ref_list_.push_back(Glib::RefPtr<ThreadProgress>(progress));
+    for (std::vector<ThreadProgress*>::size_type i = 0; i < progress_threads_.size(); ++i)
+    {
+      ThreadProgress *const progress = new ThreadProgress(i + 1);
+      progress_threads_[i] = progress;
 
-    progress->signal_finished().connect(
-        sigc::bind<1>(sigc::mem_fun(*this, &Application::on_progress_finished), progress));
+      progress->signal_finished().connect(
+          sigc::bind<1>(sigc::mem_fun(*this, &Application::on_progress_finished), progress));
+    }
   }
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  catch (...)
+  {
+    // In your own code, you should preferably use a smart pointer
+    // to ensure exception safety.
+    std::for_each(progress_threads_.begin(), progress_threads_.end(),
+                  DeletePtr<ThreadProgress*>());
+    throw;
+  }
+#endif
 }
 
 Application::~Application()
 {
-}
-
-void Application::launch_threads()
-{
-  std::for_each(progress_list_.begin(), progress_list_.end(),
-                std::mem_fun(&ThreadProgress::launch));
+  std::for_each(progress_threads_.begin(), progress_threads_.end(),
+                DeletePtr<ThreadProgress*>());
 }
 
 void Application::run()
 {
+  // Install a one-shot idle handler to launch the threads.
+  Glib::signal_idle().connect(
+      sigc::bind_return(sigc::mem_fun(*this, &Application::launch_threads), false));
+
   main_loop_->run();
+}
+
+void Application::launch_threads()
+{
+  std::cout << "Launching " << progress_threads_.size() << " threads:" << std::endl;
+
+  std::for_each(progress_threads_.begin(), progress_threads_.end(),
+                std::mem_fun(&ThreadProgress::launch));
 }
 
 void Application::on_progress_finished(ThreadProgress* thread_progress)
 {
+  thread_progress->join();
+
+  std::cout << "Thread " << thread_progress->id() << ": finished." << std::endl;
+
+  // Quit if it was the last thread to be joined.
+  if (std::find_if(progress_threads_.begin(), progress_threads_.end(),
+                   std::mem_fun(&ThreadProgress::unfinished)) == progress_threads_.end())
   {
-    progress_list_.remove(thread_progress);
-    thread_progress->join();
-
-    std::cout << "Thread " << thread_progress->id() 
-              << ": finished." << std::endl;
-  }
-
-  if(progress_list_.empty())
     main_loop_->quit();
+  }
 }
 
 } // anonymous namespace
-
 
 int main(int, char**)
 {
   Glib::thread_init();
 
   Application application;
-
-  // Install a one-shot idle handler to launch the threads
-  Glib::signal_idle().connect(
-      sigc::bind_return(sigc::mem_fun(application, &Application::launch_threads), false));
-
   application.run();
 
   return 0;
 }
-
