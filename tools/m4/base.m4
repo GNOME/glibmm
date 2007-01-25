@@ -27,6 +27,7 @@ _PREFIX_BUILTIN(`maketemp')
 _PREFIX_BUILTIN(`syscmd')
 _PREFIX_BUILTIN(`substr')
 _PREFIX_BUILTIN(`sysval')
+_PREFIX_BUILTIN(`mkstemp')
 
 dnl
 dnl  More alternative names for m4 macros, not undefined (yet!).
