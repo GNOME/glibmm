@@ -58,6 +58,7 @@ ExampleOptionGroup::ExampleOptionGroup()
   entry3.set_long_name("goo");
   entry3.set_short_name('g');
   entry3.set_description("The Goo");
+  m_arg_goo = "default-goo-value"; //We can choose a default to be used if the user doesn't specify this option.
   add_entry(entry3, m_arg_goo);
   
   Glib::OptionEntry entry4;
@@ -75,12 +76,16 @@ ExampleOptionGroup::ExampleOptionGroup()
 bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
 {
   //This is called before the m_arg_* instances are given their values.
+  // You do not need to override this method. This is just here to show you how,
+  // in case you want to do any extra processing.
   return Glib::OptionGroup::on_pre_parse(context, group);
 }
 
 bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
 {
   //This is called after the m_arg_* instances are given their values.
+  // You do not need to override this method. This is just here to show you how,
+  // in case you want to do any extra processing.
   return Glib::OptionGroup::on_post_parse(context, group);
 }
 
