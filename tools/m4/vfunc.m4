@@ -23,16 +23,19 @@ dnl _VFUNC_PCC(cppname,gtkname,cpprettype,crettype,
 dnl                        $5                $6          $7            $8        $9					$10
 dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef)
 dnl
+dnl Note: _get_current_wrapper_inline() could be used throughout for performance instead of _get_current_wrapper(),
+dnl and is_derived_() instead of is_derived_(),
+dnl but it is not yet clear whether that would be a worthwhile performance optimization.
 define(`_VFUNC_PCC',`dnl
 _PUSH(SECTION_PCC_VFUNCS)
 ifelse(`$10',,,`#ifdef $10'
 )dnl
 $4 __CPPNAME__`'_Class::$2_vfunc_callback`'($5)
 {
-dnl  We cast twice to allow for multiple-inheritance casts, which might 
-dnl  change the value.  We have to use a dynamic_cast because we do not 
-dnl  know the actual type from which to cast up.
-  CppObjectType *const obj = dynamic_cast<CppObjectType*>(
+dnl  First, do a simple cast to ObjectBase. We will have to do a dynamic_cast
+dnl  eventually, but it is not necessary to check whether we need to call
+dnl  the vfunc.
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper`'((GObject*)$8));
 
 _IMPORT(SECTION_CHECK)
@@ -41,44 +44,50 @@ _IMPORT(SECTION_CHECK)
   // generated classes can use this optimisation, which avoids the unnecessary
   // parameter conversions if there is no possibility of the virtual function
   // being overridden:
-  if(obj && obj->is_derived_())
+  if(obj_base && obj_base->is_derived_())
   {
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
-    try // Trap C++ exceptions which would normally be lost because this is a C callback.
+dnl  We need to do a dynamic cast to get the real object type, to call the
+dnl  C++ vfunc on it.
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
     {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
-      // Call the virtual member method, which derived classes might override.
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
 ifelse($4,void,`dnl
-      obj->$1`'($7);
+        obj->$1`'($7);
+        return;
 ',`dnl
 ifelse($9,refreturn_ctype,`dnl Assume Glib::unwrap_copy() is correct if refreturn_ctype is requested.
-      return Glib::unwrap_copy`'(`obj->$1'($7));
+        return Glib::unwrap_copy`'(`obj->$1'($7));
 ',`dnl
-      return _CONVERT($3,$4,`obj->$1`'($7)');
+        return _CONVERT($3,$4,`obj->$1`'($7)');
 ')dnl
 ')dnl
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke`'();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
-    catch(...)
-    {
-      Glib::exception_handlers_invoke`'();
-    }
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
-  else
-  {
-    BaseClassType *const base = static_cast<BaseClassType*>(
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
-        _IFACE_PARENT_FROM_OBJECT($8)dnl
+      _IFACE_PARENT_FROM_OBJECT($8)dnl
 ',`dnl
-        _PARENT_GCLASS_FROM_OBJECT($8)dnl
-')    );
-dnl    g_assert(base != 0);
+      _PARENT_GCLASS_FROM_OBJECT($8)dnl
+')  );
+dnl  g_assert(base != 0);
 
-    // Call the original underlying C function:
-    if(base && base->$2)
-      ifelse($4,void,,`return ')(*base->$2)`'($6);
-  }
+  // Call the original underlying C function:
+  if(base && base->$2)
+    ifelse($4,void,,`return ')(*base->$2)`'($6);
+
 ifelse($4,void,,`dnl
 
   typedef $4 RType;
