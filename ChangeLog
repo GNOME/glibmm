@@ -1,3 +1,21 @@
+2007-03-17  Armin Burgmeier  <armin@openismus.com>
+
+	* tools/m4/signal.m4:
+	* tools/m4/vfunc.m4: 
+	Use static_cast in vfuncs and signal handlers to cast the
+	wrapper object to ObjectBase*. This is enough to check whether the object is
+	from a derived type or not. A slow dynamic_cast has only to be performed if it
+	is derived, and the C++ vfunc needs to be called.
+	* glib/glibmm/objectbase.h: This requires ObjectBase::is_derived_ to be public, 
+	because it is called on a ObjectBase* rather than the actual type.
+	This causes a slight speed up of vfuncs and default signal handler invokation.
+
+	Also added commented-out inline versions of ObjectBase::_get_current_wrapper() and 
+	ObjectBase::is_derived(), which could be used in the generated code if we find 
+	that this has significant performance benefits. Note that these methods must be 
+	additional to the non-inline methods, because inline methods are not usually exported in the 
+	shared library. 
+
 2.12.7:
 
 2007-03-03  Murray Cumming  <murrayc@murrayc.com>

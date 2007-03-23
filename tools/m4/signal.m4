@@ -161,10 +161,10 @@ ifelse(`$9',,,`#ifdef $9'
 )dnl
 $4 __CPPNAME__`'_Class::$2_callback`'($5)
 {
-dnl  We cast twice to allow for multiple-inheritance casts, which might 
-dnl  change the value.  We have to use a dynamic_cast because we do not 
-dnl  know the actual type from which to cast up.
-  CppObjectType *const obj = dynamic_cast<CppObjectType*>(
+dnl  First, do a simple cast to ObjectBase. We will have to do a dynamic_cast
+dnl  eventually, but it is not necessary to check whether we need to call
+dnl  the vfunc.
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper`'((GObject*)$8));
 
 _IMPORT(SECTION_CHECK)
@@ -173,29 +173,35 @@ _IMPORT(SECTION_CHECK)
   // generated classes can use this optimisation, which avoids the unnecessary
   // parameter conversions if there is no possibility of the virtual function
   // being overridden:
-  if(obj && obj->is_derived_())
+  if(obj_base && obj_base->is_derived_())
   {
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
-    try // Trap C++ exceptions which would normally be lost because this is a C callback.
+dnl  We need to do a dynamic cast to get the real object type, to call the
+dnl  C++ vfunc on it.
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
     {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
-      // Call the virtual member method, which derived classes might override.
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
+        // Call the virtual member method, which derived classes might override.
 ifelse($4,void,`dnl
-      obj->on_$1`'($7);
+        obj->on_$1`'($7);
+        return;
 ',`dnl
-      return _CONVERT($3,$4,`obj->on_$1`'($7)');
+        return _CONVERT($3,$4,`obj->on_$1`'($7)');
 ')dnl
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      #ifdef GLIBMM_EXCEPTIONS_ENABLED
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke`'();
+      }
+      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
-    catch(...)
-    {
-      Glib::exception_handlers_invoke`'();
-    }
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
-  else
-  {
-    BaseClassType *const base = static_cast<BaseClassType*>(
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
         _IFACE_PARENT_FROM_OBJECT($8)dnl
 ',`dnl
@@ -203,10 +209,9 @@ ifdef(`__BOOL_IS_INTERFACE__',`dnl
 ')    );
 dnl    g_assert(base != 0);
 
-    // Call the original underlying C function:
-    if(base && base->$2)
-      ifelse($4,void,,`return ')(*base->$2)`'($6);
-  }
+  // Call the original underlying C function:
+  if(base && base->$2)
+    ifelse($4,void,,`return ')(*base->$2)`'($6);
 ifelse($4,void,,`dnl
 
   typedef $4 RType;
