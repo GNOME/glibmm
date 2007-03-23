@@ -21,13 +21,11 @@
  */
 
 #include <glib/gmacros.h>
+#include <glib/gmem.h>
 #include <glibmm/ustring.h>
 
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-extern "C" void g_free(void*);
-
 
 /* Occasionally, a struct variable has to be initialized after its definition,
  * i.e. when using structs as class member data.  For convenience, the macro
