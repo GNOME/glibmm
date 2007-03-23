@@ -36,8 +36,8 @@ public:
   : gparent_(0)
   {}
 
-  HelperList(GObject* gparent)
-  : gparent_(gparent)
+  HelperList(GObject* gp) //We use gp instead of gparent because that can cause warnings about a shadowed member.
+  : gparent_(gp)
   {}
 
   virtual ~HelperList()
