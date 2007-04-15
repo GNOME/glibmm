@@ -447,15 +447,41 @@ sub output_wrap_create($$$)
 
 # void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback)
 # custom_signalproxy_name is "" when no type conversion is required - a normal templates SignalProxy will be used instead.
-sub output_wrap_sig_decl($$$$$$$)
+sub output_wrap_sig_decl($$$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef) = @_;
+  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous) = @_;
 
 # _SIGNAL_PROXY(c_signal_name, c_return_type, `<c_arg_types_and_names>',
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
 #               refdoc_comment)
 
-  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',%s,%s)dnl\n",
+  my $doxycomment = $objCppfunc->get_refdoc_comment();
+
+  # If there was already a previous doxygen comment, we want to merge this
+  # one with the previous so it is one big comment. If it were two separate
+  # comments, doxygen would ignore the first one. If
+  # $merge_doxycomment_with_previous is nonzero, the first comment is
+  # already open but not yet closed.
+  if($merge_doxycomment_with_previous)
+  {
+    # Strip leading whitespace
+    $doxycomment =~ s/^\s+//;
+    # We don't have something to add, so just close the comment.
+    if($doxycomment eq "")
+    {
+      $doxycomment = "   */";
+    }
+    else
+    {
+      # Append the new comment, but remove the first three leading characters
+      # (which are /**) that mark the beginning of the comment.
+      $doxycomment = substr($doxycomment, 3);
+      $doxycomment =~ s/^\s+//;
+      $doxycomment = "   " . $doxycomment;
+    }
+  }
+
+  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',%s)dnl\n",
     $signal_name,
     $$objCSignal{rettype},
     $objCSignal->args_types_and_names_without_object(),
@@ -464,7 +490,7 @@ sub output_wrap_sig_decl($$$$$$$)
     $objCppfunc->args_types_only(),
     convert_args_c_to_cpp($objCSignal, $objCppfunc, $line_num),
     $bCustomCCallback, #When this is true, it will not write the *_callback implementation for you.
-    $objCppfunc->get_refdoc_comment(),
+    $doxycomment,
     $ifdef
   );
 
