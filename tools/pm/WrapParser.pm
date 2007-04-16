@@ -98,6 +98,7 @@ sub parse_and_build_output($)
     if ($token eq '"')         { $objOutputter->append($self->on_string_literal()); next; }
     if ($token eq '//')        { $objOutputter->append($self->on_comment_cpp()); next; }
     if ($token eq '/*')        { $objOutputter->append($self->on_comment_c()); next; }
+    if ($token eq '/**')       { $self->on_comment_doxygen(); next; }
 
     # handle #m4begin ... #m4end
     if ($token eq "#m4begin")  { $objOutputter->append($self->on_m4_section()); next;}
@@ -111,7 +112,7 @@ sub parse_and_build_output($)
     if ($token eq "_WRAP_METHOD")     { $self->on_wrap_method(); next;}
     if ($token eq "_WRAP_METHOD_DOCS_ONLY")     { $self->on_wrap_method_docs_only(); next;}
     if ($token eq "_WRAP_CORBA_METHOD")     { $self->on_wrap_corba_method(); next;} #Used in libbonobo*mm.
-    if ($token eq "_WRAP_SIGNAL") { $self->on_wrap_signal(); next;}
+    if ($token eq "_WRAP_SIGNAL") { $self->on_wrap_signal(0); next;}
     if ($token eq "_WRAP_PROPERTY") { $self->on_wrap_property(); next;}
     if ($token eq "_WRAP_VFUNC") { $self->on_wrap_vfunc(); next;}
     if ($token eq "_WRAP_CTOR")   { $self->on_wrap_ctor(); next;}
@@ -194,6 +195,43 @@ sub extract_token($)
   return "";
 }
 
+### Returns the next token, but does not remove it from the queue, so that
+# extract_token will return it again.
+# $string peek_token()
+sub peek_token($)
+{
+  my ($self) = @_;
+
+  while ( scalar(@tokens) )
+  {
+    $_ = $tokens[0];
+
+    # skip empty tokens
+    if(!defined($_) or $_ eq "")
+    {
+      shift @tokens;
+    }
+    # eat line statements. TODO: e.g.?
+    elsif ( /^#l (\S+)\n/)
+    {
+      $$self{line_num} = $1;
+      shift @tokens;
+    }
+    # eat file statements. TODO: e.g.?
+    elsif ( /^#f (\S+)\n/)
+    {
+      $$self{filename} = $1;
+      shift @tokens;
+    }
+    else
+    {
+      return $_;
+    }
+  }
+
+  return "";
+}
+
 # bool tokens_remaining()
 sub tokens_remaining($)
 {
@@ -272,6 +310,63 @@ sub on_comment_c($)
     {
       push (@out,"\'*/");
       return join("",@out)
+    }
+
+    push (@out,$_);
+  }
+}
+
+sub on_comment_doxygen($)
+{
+  my ($self) = @_;
+
+  my $objOutputter = $$self{objOutputter};
+
+  my @out;
+  push (@out,"/**\`");
+  while ( scalar(@tokens) )
+  {
+    $_ = $self->extract_token();
+    if ($_ eq "`") { push(@out,"\'__BT__\`"); next; }
+    if ($_ eq "'") { push(@out,"\'__FT__\`"); next; }
+
+    if ($_ eq "*/")
+    {
+      push (@out,"\'*");
+      $objOutputter->append(join("", @out));
+
+      # Find next non-whitespace token, but remember whitespace so that we
+      # can print it if the next real token is not _WRAP_SIGNAL
+      my @whitespace;
+      my $next_token = $self->peek_token();
+      while ($next_token =~ /^\s*$/)
+      {
+        push(@whitespace, $self->extract_token());
+	$next_token = $self->peek_token();
+      }
+
+      # If the next token is a signal, do not close this comment, to merge
+      # this doxygen comment with the one from the signal.
+      if($next_token eq '_WRAP_SIGNAL')
+      {
+	# Extract token and process
+	$self->extract_token();
+	# Tell wrap_signal to merge automatically generated comment with
+	# already existing comment. This is why we do not close the comment
+	# here.
+        $self->on_wrap_signal(1);
+      }
+      else
+      {
+        # Something else then signal follows, so close comment normally
+        $objOutputter->append("/");
+	# And append whitespace we ignored so far
+        $objOutputter->append(join("", @whitespace));
+	# Do not extract the token so that parse_and_build_output() will
+	# process it.
+      }
+
+      last;
     }
 
     push (@out,$_);
@@ -651,13 +746,14 @@ sub read_file($$$)
 
   # Break the file into tokens.  Token is
   #      any group of #, A to z, 0 to 9, _
+  #      /**
   #      /*
   #      *.
   #      //
   #      any char proceeded by \
   #      symbols ;{}"`'()
   #      newline
-  @tokens = split(/(\#[lf] \S+\n)|([#A-Za-z0-9_]+)|(\/\*)|(\*\/)|(\/\/)|(\\.)|([;{}"'`()])|(\n)/,
+  @tokens = split(/(\#[lf] \S+\n)|([#A-Za-z0-9_]+)|(\/\*\*)|(\/\*)|(\*\/)|(\/\/)|(\\.)|([;{}"'`()])|(\n)/,
                          $strIn);
 }
 
@@ -967,9 +1063,9 @@ sub on_wrap_create($)
   $objOutputter->output_wrap_create($str, $self);
 }
 
-sub on_wrap_signal($)
+sub on_wrap_signal($$)
 {
-  my ($self) = @_;
+  my ($self, $merge_doxycomment_with_previous) = @_;
 
   if( !($self->check_for_eof()) )
   {
@@ -1021,7 +1117,7 @@ sub on_wrap_signal($)
   }
 
 
-  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef);
+  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous);
 }
 
 # void on_wrap_vfunc()
@@ -1190,9 +1286,9 @@ sub output_wrap_check($$$$$$)
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn)
 # Also used for vfunc.
-sub output_wrap_signal($$$$$$$$)
+sub output_wrap_signal($$$$$$$$$)
 {
-  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef) = @_;
+  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous) = @_;
   
   #Some checks:
   $self->output_wrap_check($CppDecl, $signal_name, $filename, $line_num, "WRAP_SIGNAL");
@@ -1224,7 +1320,7 @@ sub output_wrap_signal($$$$$$$$)
     }
   }
 
-  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name, $bCustomCCallback, $ifdef);
+  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous);
 
   if($bNoDefaultHandler eq 0)
   {

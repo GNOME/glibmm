@@ -15,7 +15,7 @@ dnl               $9 = `refdoc_comment',
 dnl				  $10 = ifdef)
 
 define(`_SIGNAL_PROXY',`
-$9
+   $9
 
 ifelse(`$10',,,`#ifdef $10'
 )dnl
