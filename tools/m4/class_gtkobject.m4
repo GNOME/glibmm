@@ -55,7 +55,7 @@ _POP()
 ')
 
 dnl Optionally ifdef-out the whole .h and .cc files:
-define(`_DEPRECATED',`dnl
+define(`_IS_DEPRECATED',`dnl
 _PUSH()
 dnl Define this macro to be tested for later.
 define(`__BOOL_DEPRECATED__',`$1')
