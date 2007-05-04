@@ -321,7 +321,7 @@ sub get_refdoc_comment($)
   my $str = "  /**\n";
 
   $str .= "   * \@par Prototype:\n";
-  $str .= "   * <tt>$$self{rettype} \%$$self{name}(";
+  $str .= "   * <tt>$$self{rettype} on_my_\%$$self{name}(";
 
   my $param_names = $$self{param_names};
   my $param_types = $$self{param_types};
