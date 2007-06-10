@@ -22,8 +22,6 @@
 
 #include <glibmm/propertyproxy_base.h>
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
-
 #include <glibmm/signalproxy_connectionnode.h>
 #include <glibmm/object.h>
 #include <glibmm/private/object_p.h>
@@ -44,6 +42,8 @@ void PropertyProxyConnectionNode::callback(GObject*, GParamSpec* pspec, gpointer
       (*static_cast<sigc::slot<void>*>(slot))();
   }
 }
+
+#ifdef GLIBMM_PROPERTIES_ENABLED
 
 //SignalProxyProperty implementation:
 
@@ -124,6 +124,7 @@ void PropertyProxy_Base::reset_property_()
   g_object_set_property(obj_->gobj(), property_name_, value.gobj());
 }
 
+#endif //GLIBMM_PROPERTIES_ENABLED
+
 } // namespace Glib
 
-#endif //GLIBMM_PROPERTIES_ENABLED
