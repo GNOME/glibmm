@@ -54,6 +54,7 @@
 #include <glibmm/propertyproxy.h>
 #include <glibmm/quark.h>
 #include <glibmm/random.h>
+#include <glibmm/regex.h>
 #include <glibmm/refptr.h>
 #include <glibmm/shell.h>
 #include <glibmm/signalproxy_connectionnode.h>

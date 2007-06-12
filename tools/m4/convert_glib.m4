@@ -23,6 +23,8 @@ _CONV_GLIB_ENUM(IOCondition)
 _CONV_GLIB_ENUM(SeekType)
 _CONV_GLIB_ENUM(OptionArg)
 _CONV_GLIB_ENUM(KeyFileFlags)
+_CONV_GLIB_ENUM(RegexCompileFlags)
+_CONV_GLIB_ENUM(RegexMatchFlags)
 
 _CONVERSION(`gunichar&',`gunichar*',`&($3)')
 _CONVERSION(`gsize&',`gsize*',`&($3)')
@@ -52,6 +54,9 @@ _CONVERSION(`const Glib::RefPtr<Glib::Object>&',`GObject*',__CONVERT_REFPTR_TO_P
 _CONVERSION(`const Glib::RefPtr<const Glib::Object>&',`GObject*',__CONVERT_CONST_REFPTR_TO_P_SUN(Glib::Object))
 _CONVERSION(`GObject*',`Glib::RefPtr<Glib::Object>',`Glib::wrap($3)')
 _CONVERSION(`GObject*',`Glib::RefPtr<const Glib::Object>',`Glib::wrap($3)')
+
+_CONVERSION(`GRegex*',`Glib::RefPtr<Regex>',`Glib::wrap($3)')
+_CONVERSION(`GRegex*',`Glib::RefPtr<const Regex>',`Glib::wrap($3)')
 
 _CONVERSION(`Glib::ValueBase&',`GValue*',`($3).gobj()')
 _CONVERSION(`const Glib::ValueBase&',`const GValue*',`($3).gobj()')
