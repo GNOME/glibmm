@@ -1,4 +1,4 @@
-example_dirs = markup options thread iochannel_stream child_watch
+example_dirs = markup options thread iochannel_stream child_watch regex
 
 # These use gtkmm stuff:
 # thread

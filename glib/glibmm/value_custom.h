@@ -18,6 +18,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef _GLIBMM_VALUE_CUSTOM_H
+#define _GLIBMM_VALUE_CUSTOM_H
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifndef _GLIBMM_VALUE_H_INCLUDE_VALUE_CUSTOM_H
 #error "glibmm/value_custom.h cannot be included directly"
@@ -286,4 +289,7 @@ void Value<T>::value_copy_func(const GValue* src_value, GValue* dest_value)
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib
+
+#endif //_GLIBMM_VALUE_CUSTOM_H
+
 

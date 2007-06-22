@@ -50,6 +50,13 @@ class Regex
   _IGNORE(g_regex_ref, g_regex_unref)
 public:
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+   static Glib::RefPtr<Glib::Regex> create(const Glib::ustring& pattern, RegexCompileFlags compile_options = (RegexCompileFlags)0, RegexMatchFlags match_options = (RegexMatchFlags)0);
+#else
+   static Glib::RefPtr<Glib::Regex> create(const Glib::ustring& pattern, RegexCompileFlags compile_options = (RegexCompileFlags)0, RegexMatchFlags match_options = (RegexMatchFlags)0, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  
+
   _WRAP_METHOD(Glib::ustring get_pattern() const, g_regex_get_pattern)
   _WRAP_METHOD(int get_max_backref() const, g_regex_get_max_backref)
   _WRAP_METHOD(int get_capture_count() const, g_regex_get_capture_count)
@@ -58,7 +65,7 @@ public:
   //TODO: _WRAP_METHOD(static Glib::ustring escape_string(const Glib::ustring& string, gint length) const, g_regex_escape_string)
 
 /* Matching. */
-  _WRAP_METHOD(static bool match_simple(const Glib::ustring& pattern, const Glib::ustring& string, RegexCompileFlags compile_options, RegexMatchFlags match_options = (RegexMatchFlags)0), g_regex_match_simple)
+  _WRAP_METHOD(static bool match_simple(const Glib::ustring& pattern, const Glib::ustring& string, RegexCompileFlags compile_options = (RegexCompileFlags)0, RegexMatchFlags match_options = (RegexMatchFlags)0), g_regex_match_simple)
 
   //TODO: _WRAP_METHOD(bool match(const Glib::ustring& string, RegexMatchFlags match_options = (RegexMatchFlags)0, GMatchInfo **match_info = 0), g_regex_match)
   bool match(const Glib::ustring& string, RegexMatchFlags match_options = (RegexMatchFlags)0);
@@ -98,7 +105,7 @@ public:
 
   #m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
 
-  _WRAP_METHOD(static Glib::StringArrayHandle split_simple(const Glib::ustring& pattern, const Glib::ustring& string, RegexCompileFlags compile_options, RegexMatchFlags match_options = (RegexMatchFlags)0), g_regex_split_simple)
+  _WRAP_METHOD(static Glib::StringArrayHandle split_simple(const Glib::ustring& pattern, const Glib::ustring& string, RegexCompileFlags compile_options = (RegexCompileFlags)0, RegexMatchFlags match_options = (RegexMatchFlags)0), g_regex_split_simple)
   _WRAP_METHOD(Glib::StringArrayHandle split(const Glib::ustring& string, RegexMatchFlags match_options = (RegexMatchFlags)0), g_regex_split)
 
   _WRAP_METHOD(Glib::StringArrayHandle split_full(const gchar* string, gssize string_len, int start_position, RegexMatchFlags match_options = (RegexMatchFlags)0, int max_tokens = 0) const, g_regex_split_full, errthrow)
