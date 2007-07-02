@@ -371,6 +371,10 @@ sub convert_tags_to_doxygen($)
     s"Since: 2\.6"\@newin2p6"mg;
     s"Since: 2\.8"\@newin2p8"mg;
     s"Since: 2\.10"\@newin2p10"mg;
+    s"Since: 2\.12"\@newin2p12"mg;
+    s"Since: 2\.14"\@newin2p14"mg;
+    s"Since: 2\.16"\@newin2p16"mg;
+    s"Since: 2\.18"\@newin2p18"mg;
 
     s"\b-&gt;\b"->"g;
 
