@@ -74,6 +74,16 @@ public:
   bool load_from_data(const Glib::ustring& data, KeyFileFlags flags = Glib::KEY_FILE_NONE);
   _IGNORE(g_key_file_load_from_data)
 
+  //TODO: 
+  /*
+  gboolean g_key_file_load_from_dirs          (GKeyFile             *key_file,
+					     const gchar	  *file,
+					     const gchar	 **search_dirs,
+					     gchar		 **full_path,
+					     GKeyFileFlags         flags,
+					     GError              **error);
+  */
+
   /** Looks for a KeyFile named @a file in the paths returned from
    * g_get_user_data_dir() and g_get_system_data_dirs() and loads them
    * into the keyfile object, placing the full path to the file in
@@ -133,6 +143,19 @@ public:
 
   _WRAP_METHOD(int get_integer(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_integer, errthrow)
 
+  /** Gets the value in the first group, under @a key, interpreting it as
+   * a double.
+   * @param key The name of the key
+   * @return The value of @a key as an double
+   * @throws Glib::KeyFileError
+   *
+   * @newin2p14
+   */
+   double get_double(const Glib::ustring& key) const;
+
+  _WRAP_METHOD(double get_double(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_double, errthrow)
+  _WRAP_METHOD(void set_double(const Glib::ustring& group_name, const Glib::ustring& key, double value), g_key_file_set_double)
+
   /** Returns the values associated with @a key under @a group_name
    * @param group_name The name of a group
    * @param key The name of a key
@@ -180,6 +203,15 @@ public:
   Glib::ArrayHandle<int> get_integer_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
   _IGNORE(g_key_file_get_integer_list)
 
+  /** Returns the values associated with @a key under @a group_name
+   * @param group_name The name of a group
+   * @param key The name of a key
+   * @return A list of doubles
+   * @throws Glib::KeyFileError
+   */
+  Glib::ArrayHandle<double> get_double_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
+  _IGNORE(g_key_file_get_double_list)
+
   /** Get comment from top of file
    * @return The comment
    */
@@ -222,7 +254,7 @@ public:
   _IGNORE(g_key_file_set_locale_string_list)
 
   /** Sets a list of booleans for the @a key under @a group_name.
-   * If either the @a key or @a group_name cannot be found they are created
+   * If either the @a key or @a group_name cannot be found they are created.
    * @param group_name The name of a group
    * @param key The name of a key
    * @param list A list holding object of type bool
@@ -231,13 +263,25 @@ public:
   _IGNORE(g_key_file_set_boolean_list)
 	
   /** Sets a list of integers for the @a key under @a group_name.
-   * If either the @a key or @a group_name cannot be found they are created
+   * If either the @a key or @a group_name cannot be found they are created.
    * @param group_name The name of a group
    * @param key The name of a key
    * @param list A list holding object of type int
    */
   void set_integer_list(const Glib::ustring& group_name, const Glib::ustring& key, Glib::ArrayHandle<int>& list);
   _IGNORE(g_key_file_set_integer_list)
+
+  /** Sets a list of doubles for the @a key under @a group_name.
+   * If either the @a key or @a group_name cannot be found they are created.
+   * @param group_name The name of a group
+   * @param key The name of a key
+   * @param list A list holding object of type int
+   *
+   * @newin2p14
+   */
+  void set_double_list(const Glib::ustring& group_name, const Glib::ustring& key, Glib::ArrayHandle<double>& list);
+  _IGNORE(g_key_file_set_double_list)
+
 
   /** Places @a comment at the start of the file, before the first group.
    * @param comment The Comment
