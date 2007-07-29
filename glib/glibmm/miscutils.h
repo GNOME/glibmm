@@ -168,7 +168,7 @@ std::string get_current_dir();
  * Return value: the path to the specified special directory.
  * @param directory Te logical id of special directory
  * 
- * @newinp214
+ * @newin2p14
  */
 std::string get_user_special_dir(GUserDirectory directory);
 
@@ -178,7 +178,7 @@ std::string get_user_special_dir(GUserDirectory directory);
  * On UNIX platforms this is determined using the mechanisms described in the
  * XDG Base Directory Specification
  *
- * @newinp2p14
+ * @newin2p14
  */
 std::string get_user_data_dir();
 
@@ -188,7 +188,7 @@ std::string get_user_data_dir();
  * On UNIX platforms this is determined using the mechanisms described in the
  * XDG Base Directory Specification
  *
- * @newinp2p14
+ * @newin2p14
  */
 std::string get_user_config_dir();
 
@@ -198,7 +198,7 @@ std::string get_user_config_dir();
  * On UNIX platforms this is determined using the mechanisms described in the
  * XDG Base Directory Specification
  *
- * @newinp2p14
+ * @newin2p14
  */
 std::string get_user_cache_dir();
 
