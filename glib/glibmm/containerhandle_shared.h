@@ -314,40 +314,22 @@ struct TypeTraits<std::string>
     { g_free(const_cast<CTypeNonConst>(str)); }
 };
 
-/** Specialization for bool
+/** Specialization for bool.
  * @ingroup ContHelpers
  */
 template <>
 struct TypeTraits<bool>
 {
-  typedef bool          CppType;
-  typedef gboolean*     CType;
-  typedef gboolean*     CTypeNonConst;
+  typedef bool     CppType;
+  typedef gboolean CType;
+  typedef gboolean CTypeNonConst;
 
-  static CType to_c_type (CppType val) { return (int*)GINT_TO_POINTER(val); }
-  static CType to_c_type (CType ptr)   { return ptr;                        }  
-
-  static CppType to_cpp_type(CType ptr)
-  { 
-    if(ptr)
-    {
-	  //We use this for gboolean too, because it is actually an int.
-	  return GPOINTER_TO_INT(ptr);
-	}
-	else
-	  return CppType();
-  }
-
-  static void release_c_type(CType /* ptr */)
-  {
-
-  }
+  static CType   to_c_type      (CppType item) { return static_cast<CType>(item); }
+  static CType   to_c_type      (CType   item) { return item; }
+  static CppType to_cpp_type    (CType   item) { return (item != 0); }
+  static void    release_c_type (CType) {}
 };
 
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifndef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
 
 /* The STL containers in Sun's libCstd don't support templated sequence
@@ -368,6 +350,4 @@ void fill_container(Cont& container, In pbegin, In pend)
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_CONTAINERHANDLE_SHARED_H */
-
