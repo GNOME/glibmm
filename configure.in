@@ -11,8 +11,10 @@
 #  Copyright 1999 gtkmm Development Team
 #  Copyright 1998 Stephan Kulow 
 #
-AC_INIT(glib/glibmmconfig.h.in)
-AC_PREREQ(2.50)
+AC_INIT([glibmm], [2.13.9])
+AC_PREREQ([2.58])
+AC_CONFIG_SRCDIR([glib/glibmmconfig.h.in])
+AC_CONFIG_MACRO_DIR([scripts])
 
 #########################################################################
 #  Version and initialization
@@ -43,12 +45,8 @@ AC_SUBST(LIBGLIBMM_SO_VERSION)
 
 AC_CONFIG_AUX_DIR(scripts)
 
-dnl For automake.
-VERSION=$GLIBMM_VERSION
-PACKAGE=glibmm
-
 dnl Initialize automake stuff
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+AM_INIT_AUTOMAKE([1.7 gnu])
 
 dnl Specify a configuration file (no autoheader)
 AM_CONFIG_HEADER(config.h glib/glibmmconfig.h)
@@ -187,6 +185,13 @@ if test "x$config_error" = xyes ; then
   AC_MSG_ERROR([Your compiler is not powerful enough to compile gtkmm. If it should be, see config.log for more information of why it failed.])
 fi
 AC_MSG_RESULT([yes])
+
+AC_CHECK_SIZEOF([wchar_t])
+DK_CHECK_FEATURE([wide stream],
+[
+  AC_LANG_PROGRAM([[#include <sstream>]],
+                  [[std::wostringstream s; (void) s.str();]])
+])
 
 GLIBMM_CXX_HAS_NAMESPACE_STD()
 GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS()
