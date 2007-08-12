@@ -698,20 +698,9 @@ private:
   
   //The Tru64 compiler needs these partial specializations to be declared here,
   //as well as defined later. That's probably correct. murrayc.
-  template <class In>
-  struct SequenceToString<In, char>;
-
-  template <class In>
-  struct SequenceToString<In, gunichar>;
+  template <class In> struct SequenceToString<In, char>;
+  template <class In> struct SequenceToString<In, gunichar>;
   
-  /*
-  template <>
-  struct ustring::SequenceToString<Glib::ustring::iterator, gunichar>;
-
-  template <>
-  struct ustring::SequenceToString<Glib::ustring::const_iterator, gunichar>;
-  */
-
   class FormatStream;
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
@@ -770,7 +759,8 @@ public:
   FormatStream();
   ~FormatStream();
 
-  StreamType& stream() { return stream_; }
+  template <class T> inline void stream(const T& value);
+  inline void stream(const char* value);
   ustring to_string() const;
 };
 
@@ -941,6 +931,19 @@ ustring::SequenceToString<In,gunichar>::SequenceToString(In pbegin, In pend)
   }
 }
 
+/**** Glib::ustring::FormatStream ******************************************/
+
+template <class T> inline
+void ustring::FormatStream::stream(const T& value)
+{
+  stream_ << value;
+}
+
+inline
+void ustring::FormatStream::stream(const char* value)
+{
+  stream_ << ustring(value);
+}
 
 /**** Glib::ustring ********************************************************/
 
@@ -1086,7 +1089,7 @@ template <class T1> inline // static
 ustring ustring::format(const T1& a1)
 {
   ustring::FormatStream buf;
-  buf.stream() << a1;
+  buf.stream(a1);
   return buf.to_string();
 }
 
@@ -1094,7 +1097,8 @@ template <class T1, class T2> inline // static
 ustring ustring::format(const T1& a1, const T2& a2)
 {
   ustring::FormatStream buf;
-  buf.stream() << a1 << a2;
+  buf.stream(a1);
+  buf.stream(a2);
   return buf.to_string();
 }
 
@@ -1102,7 +1106,9 @@ template <class T1, class T2, class T3> inline // static
 ustring ustring::format(const T1& a1, const T2& a2, const T3& a3)
 {
   ustring::FormatStream buf;
-  buf.stream() << a1 << a2 << a3;
+  buf.stream(a1);
+  buf.stream(a2);
+  buf.stream(a3);
   return buf.to_string();
 }
 
@@ -1110,7 +1116,10 @@ template <class T1, class T2, class T3, class T4> inline // static
 ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4)
 {
   ustring::FormatStream buf;
-  buf.stream() << a1 << a2 << a3 << a4;
+  buf.stream(a1);
+  buf.stream(a2);
+  buf.stream(a3);
+  buf.stream(a4);
   return buf.to_string();
 }
 
@@ -1118,7 +1127,11 @@ template <class T1, class T2, class T3, class T4, class T5> inline // static
 ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5)
 {
   ustring::FormatStream buf;
-  buf.stream() << a1 << a2 << a3 << a4 << a5;
+  buf.stream(a1);
+  buf.stream(a2);
+  buf.stream(a3);
+  buf.stream(a4);
+  buf.stream(a5);
   return buf.to_string();
 }
 
@@ -1127,7 +1140,12 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, 
                         const T3& a6)
 {
   ustring::FormatStream buf;
-  buf.stream() << a1 << a2 << a3 << a4 << a5 << a6;
+  buf.stream(a1);
+  buf.stream(a2);
+  buf.stream(a3);
+  buf.stream(a4);
+  buf.stream(a5);
+  buf.stream(a6);
   return buf.to_string();
 }
 

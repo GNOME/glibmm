@@ -1,5 +1,22 @@
 2007-08-12  Daniel Elstner  <danielk@openismus.com>
 
+	* build_shared/Makefile_build.am_fragment (all_includes): Add
+	-I$(top_builddir) in order to allow <config.h> to be included.
+
+	* glib/glibmm/ustring.{cc,h}: Include <config.h> for the
+	definition of SIZEOF_WCHAR_T.
+	(ustring::FormatStream::stream): Replace accessor with template
+	method that passes its argument onto the stream.  Add overload
+	for "const char*" to enable the use of UTF-8 string literals as
+	arguments to ustring::format().
+	(ustring::FormatStream::FormatStream): Handle exceptions on
+	failure to initialize the locale gracefully.
+	(ustring::format): Adapt to the modified stream() method.
+	(operator<<): Add missing call to ustring::raw() to get the
+	number of bytes instead of code points.  Oops.
+
+2007-08-12  Daniel Elstner  <danielk@openismus.com>
+
 	* glib/glibmm/ustring.{cc,h}: Add preliminary implementation of
 	a message compose and format API (bug #399216).  The API design
 	is not final and still open for discussion.

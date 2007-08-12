@@ -28,9 +28,12 @@
 #include <iostream>
 #include <cstring>
 
+#include <config.h>
 #include <glibmmconfig.h>
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+# include <stdexcept>
+#endif
 GLIBMM_USING_STD(find)
-
 
 namespace
 {
@@ -1251,8 +1254,20 @@ ustring::FormatStream::FormatStream()
 :
   stream_ ()
 {
-  // Use the default locale of the environment.
+  // Try to use the default locale of the environment,
+  // but don't abort if it cannot be initialized.
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+    stream_.imbue(std::locale(""));
+  }
+  catch (const std::runtime_error& error)
+  {
+    g_warning("%s: %s", G_STRFUNC, error.what());
+  }
+#else
   stream_.imbue(std::locale(""));
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 }
 
 ustring::FormatStream::~FormatStream()
@@ -1333,8 +1348,8 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
 std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string)
 {
   GError* error = 0;
-  const ScopedPtr<char> buf (g_locale_from_utf8(utf8_string.data(),
-                                                utf8_string.size(), 0, 0, &error));
+  const ScopedPtr<char> buf (g_locale_from_utf8(utf8_string.raw().data(),
+                                                utf8_string.raw().size(), 0, 0, &error));
   if (error)
   {
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -1413,6 +1428,9 @@ std::wostream& operator<<(std::wostream& os, const ustring& utf8_string)
   const ScopedPtr<gunichar2> buf (g_utf8_to_utf16(utf8_string.raw().data(),
                                                   utf8_string.raw().size(), 0, 0, &error));
 #else
+  // TODO: For some reason the conversion from UTF-8 to WCHAR_T doesn't work
+  // with g_convert(), while iconv on the command line handles it just fine.
+  // Maybe a bug in GLib?
   const ScopedPtr<char> buf (g_convert(utf8_string.raw().data(), utf8_string.raw().size(),
                                        "WCHAR_T", "UTF-8", 0, 0, &error));
 #endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
