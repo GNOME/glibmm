@@ -27,6 +27,7 @@
 
 #include <iosfwd>
 #include <iterator>
+#include <sstream>
 #include <string>
 
 #include <glibmmconfig.h>
@@ -593,6 +594,96 @@ public:
   ustring casefold() const;
 
 //! @}
+//! @name Message formatting.
+//! @{
+
+  /*! Substitute placeholders in a format string with the referenced arguments.
+   * The template string should be in <tt>qt-format</tt>, that is
+   * <tt>"%1"</tt>, <tt>"%2"</tt>, ..., <tt>"%9"</tt> are used as placeholders
+   * and <tt>"%%"</tt> denotes a literal <tt>"%"</tt>.  Substitutions may be
+   * reordered.
+   * @par Example:
+   * @code
+   * using Glib::ustring;
+   * const int percentage = 50;
+   * const ustring text = ustring::compose("%1%% done", ustring::format(percentage));
+   * @endcode
+   * @param format A template string in <tt>qt-format</tt>.
+   * @param s1 The string to substitute for <tt>"%1"</tt>.
+   * @return The substituted message string.
+   * @throw Glib::ConvertError
+   */
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1);
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1, const ustring& s2);
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1, const ustring& s2, const ustring& s3);
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1, const ustring& s2, const ustring& s3,
+                  const ustring& s4);
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1, const ustring& s2, const ustring& s3,
+                  const ustring& s4, const ustring& s5);
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1, const ustring& s2, const ustring& s3,
+                  const ustring& s4, const ustring& s5, const ustring& s6);
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1, const ustring& s2, const ustring& s3,
+                  const ustring& s4, const ustring& s5, const ustring& s6,
+                  const ustring& s7);
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1, const ustring& s2, const ustring& s3,
+                  const ustring& s4, const ustring& s5, const ustring& s6,
+                  const ustring& s7, const ustring& s8);
+  static inline
+  ustring compose(const Glib::ustring& format,
+                  const ustring& s1, const ustring& s2, const ustring& s3,
+                  const ustring& s4, const ustring& s5, const ustring& s6,
+                  const ustring& s7, const ustring& s8, const ustring& s9);
+
+  /*! Format the argument to its string representation.
+   * Applies the arguments in order to an std::wostringstream and returns the
+   * resulting string.  I/O manipulators may also be used as arguments.  This
+   * greatly simplifies the common task of converting a number to a string:
+   * @code
+   * using Glib::ustring;
+   * const double value = 1.23;
+   * const ustring text = ustring::format(std::setprecision(2), value);
+   * @endcode
+   * ustring::format() can be used in conjunction with ustring::compose()
+   * to produce internationalized messages for display to the user.
+   * @param a1 A streamable value or an I/O manipulator.
+   * @return The string representation of the argument stream.
+   * @throw Glib::ConvertError
+   */
+  template <class T1> static inline
+  ustring format(const T1& a1);
+
+  template <class T1, class T2> static inline
+  ustring format(const T1& a1, const T2& a2);
+
+  template <class T1, class T2, class T3> static inline
+  ustring format(const T1& a1, const T2& a2, const T3& a3);
+
+  template <class T1, class T2, class T3, class T4> static inline
+  ustring format(const T1& a1, const T2& a2, const T3& a3, const T1& a4);
+
+  template <class T1, class T2, class T3, class T4, class T5> static inline
+  ustring format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5);
+
+  template <class T1, class T2, class T3, class T4, class T5, class T6> static inline
+  ustring format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5,
+                 const T3& a6);
+//! @}
 
 private:
 
@@ -620,10 +711,14 @@ private:
   template <>
   struct ustring::SequenceToString<Glib::ustring::const_iterator, gunichar>;
   */
-  
+
+  class FormatStream;
+
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   std::string string_;
+
+  static ustring compose_argv(const Glib::ustring& format, int argc, const ustring* const* argv);
 };
 
 
@@ -657,6 +752,28 @@ struct ustring::SequenceToString<Glib::ustring::const_iterator, gunichar> : publ
   SequenceToString(Glib::ustring::const_iterator pbegin, Glib::ustring::const_iterator pend);
 };
 
+class ustring::FormatStream
+{
+private:
+#ifdef GLIBMM_HAVE_WIDE_STREAM
+  typedef std::wostringstream StreamType;
+#else
+  typedef std::ostringstream StreamType;
+#endif
+  StreamType stream_;
+
+  // noncopyable
+  FormatStream(const ustring::FormatStream&);
+  FormatStream& operator=(const ustring::FormatStream&);
+
+public:
+  FormatStream();
+  ~FormatStream();
+
+  StreamType& stream() { return stream_; }
+  ustring to_string() const;
+};
+
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 
@@ -672,6 +789,21 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string);
  */
 std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string);
 
+#ifdef GLIBMM_HAVE_WIDE_STREAM
+
+/** Wide stream input operator.
+ * @relates Glib::ustring
+ * @throw Glib::ConvertError
+ */
+std::wistream& operator>>(std::wistream& is, ustring& utf8_string);
+
+/** Wide stream output operator.
+ * @relates Glib::ustring
+ * @throw Glib::ConvertError
+ */
+std::wostream& operator<<(std::wostream& os, const ustring& utf8_string);
+
+#endif /* GLIBMM_HAVE_WIDE_STREAM */
 
 /***************************************************************************/
 /*  Inline implementation                                                  */
@@ -867,6 +999,136 @@ inline
 const std::string& ustring::raw() const
 {
   return string_;
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1)
+{
+  const ustring *const argv[] = { &s1 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1, const ustring& s2)
+{
+  const ustring *const argv[] = { &s1, &s2 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1, const ustring& s2, const ustring& s3)
+{
+  const ustring *const argv[] = { &s1, &s2, &s3 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1, const ustring& s2, const ustring& s3,
+                         const ustring& s4)
+{
+  const ustring *const argv[] = { &s1, &s2, &s3, &s4 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1, const ustring& s2, const ustring& s3,
+                         const ustring& s4, const ustring& s5)
+{
+  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1, const ustring& s2, const ustring& s3,
+                         const ustring& s4, const ustring& s5, const ustring& s6)
+{
+  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5, &s6 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1, const ustring& s2, const ustring& s3,
+                         const ustring& s4, const ustring& s5, const ustring& s6,
+                         const ustring& s7)
+{
+  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5, &s6, &s7 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1, const ustring& s2, const ustring& s3,
+                         const ustring& s4, const ustring& s5, const ustring& s6,
+                         const ustring& s7, const ustring& s8)
+{
+  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5, &s6, &s7, &s8 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+inline // static
+ustring ustring::compose(const Glib::ustring& format,
+                         const ustring& s1, const ustring& s2, const ustring& s3,
+                         const ustring& s4, const ustring& s5, const ustring& s6,
+                         const ustring& s7, const ustring& s8, const ustring& s9)
+{
+  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5, &s6, &s7, &s8, &s9 };
+  return compose_argv(format, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1> inline // static
+ustring ustring::format(const T1& a1)
+{
+  ustring::FormatStream buf;
+  buf.stream() << a1;
+  return buf.to_string();
+}
+
+template <class T1, class T2> inline // static
+ustring ustring::format(const T1& a1, const T2& a2)
+{
+  ustring::FormatStream buf;
+  buf.stream() << a1 << a2;
+  return buf.to_string();
+}
+
+template <class T1, class T2, class T3> inline // static
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3)
+{
+  ustring::FormatStream buf;
+  buf.stream() << a1 << a2 << a3;
+  return buf.to_string();
+}
+
+template <class T1, class T2, class T3, class T4> inline // static
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4)
+{
+  ustring::FormatStream buf;
+  buf.stream() << a1 << a2 << a3 << a4;
+  return buf.to_string();
+}
+
+template <class T1, class T2, class T3, class T4, class T5> inline // static
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5)
+{
+  ustring::FormatStream buf;
+  buf.stream() << a1 << a2 << a3 << a4 << a5;
+  return buf.to_string();
+}
+
+template <class T1, class T2, class T3, class T4, class T5, class T6> inline // static
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5,
+                        const T3& a6)
+{
+  ustring::FormatStream buf;
+  buf.stream() << a1 << a2 << a3 << a4 << a5 << a6;
+  return buf.to_string();
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

@@ -22,9 +22,11 @@
 #include <glibmm/convert.h>
 #include <glibmm/error.h>
 #include <glibmm/utility.h>
+#include <glib.h>
 
 #include <algorithm>
 #include <iostream>
+#include <cstring>
 
 #include <glibmmconfig.h>
 GLIBMM_USING_STD(find)
@@ -1176,6 +1178,58 @@ std::string ustring::casefold_collate_key() const
   return std::string(ScopedPtr<char>(key_buf).get());
 }
 
+/**** Glib::ustring -- Message formatting **********************************/
+
+// static
+ustring ustring::compose_argv(const Glib::ustring& format, int argc, const ustring* const* argv)
+{
+  std::string::size_type result_size = format.raw().size();
+
+  // Guesstimate the final string size.
+  for (int i = 0; i < argc; ++i)
+    result_size += argv[i]->raw().size();
+
+  std::string result;
+  result.reserve(result_size);
+
+  const char* const pformat = format.raw().c_str();
+  const char* start = pformat;
+
+  while (const char* const stop = std::strchr(start, '%'))
+  {
+    if (stop[1] == '%')
+    {
+      result.append(start, stop - start + 1);
+      start = stop + 2;
+    }
+    else
+    {
+      const int index = Ascii::digit_value(stop[1]) - 1;
+
+      if (index >= 0 && index < argc)
+      {
+        result.append(start, stop - start);
+        result += argv[index]->raw();
+        start = stop + 2;
+      }
+      else
+      {
+        const char* const next = (stop[1] != '\0') ? g_utf8_next_char(stop + 1) : (stop + 1);
+
+        // Copy invalid substitutions literally to the output.
+        result.append(start, next - start);
+
+        g_warning("invalid substitution \"%s\" in format string \"%s\"",
+                  result.c_str() + result.size() - (next - stop), pformat);
+        start = next;
+      }
+    }
+  }
+
+  result.append(start, pformat + format.raw().size() - start);
+
+  return result;
+}
 
 /**** Glib::ustring::SequenceToString **************************************/
 
@@ -1191,34 +1245,201 @@ ustring::SequenceToString<Glib::ustring::const_iterator,gunichar>
   std::string(pbegin.base(), pend.base())
 {}
 
+/**** Glib::ustring::FormatStream ******************************************/
+
+ustring::FormatStream::FormatStream()
+:
+  stream_ ()
+{
+  // Use the default locale of the environment.
+  stream_.imbue(std::locale(""));
+}
+
+ustring::FormatStream::~FormatStream()
+{}
+
+ustring ustring::FormatStream::to_string() const
+{
+  GError* error = 0;
+
+#ifdef GLIBMM_HAVE_WIDE_STREAM
+  const std::wstring str = stream_.str();
+
+# if defined(__STDC_ISO_10646__) && SIZEOF_WCHAR_T == 4
+  // Avoid going through iconv if wchar_t always contains UCS-4.
+  glong n_bytes = 0;
+  const ScopedPtr<char> buf (g_ucs4_to_utf8(reinterpret_cast<const gunichar*>(str.data()),
+                                            str.size(), 0, &n_bytes, &error));
+# elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
+  // Avoid going through iconv if wchar_t always contains UTF-16.
+  glong n_bytes = 0;
+  const ScopedPtr<char> buf (g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(str.data()),
+                                             str.size(), 0, &n_bytes, &error));
+# else
+  gsize n_bytes = 0;
+  const ScopedPtr<char> buf (g_convert(reinterpret_cast<const char*>(str.data()),
+                                       str.size() * sizeof(std::wstring::value_type),
+                                       "UTF-8", "WCHAR_T", 0, &n_bytes, &error));
+# endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
+
+#else /* !GLIBMM_HAVE_WIDE_STREAM */
+  const std::string str = stream_.str();
+
+  gsize n_bytes = 0;
+  const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), 0, &n_bytes, &error));
+#endif /* !GLIBMM_HAVE_WIDE_STREAM */
+
+  if (error)
+  {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(error);
+#else
+    g_warning("%s: %s", G_STRFUNC, error->message);
+    g_error_free(error);
+    return ustring();
+#endif
+  }
+
+  return ustring(buf.get(), buf.get() + n_bytes);
+}
 
 /**** Glib::ustring -- stream I/O operators ********************************/
 
 std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
 {
-  std::string locale_string;
-  is >> locale_string;
+  std::string str;
+  is >> str;
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  utf8_string = Glib::locale_to_utf8(locale_string);
-  #else
-  std::auto_ptr<Glib::Error> error; //TODO: Check this? 
-  utf8_string = Glib::locale_to_utf8(locale_string, error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
+  GError* error = 0;
+  gsize n_bytes = 0;
+  const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), 0, &n_bytes, &error));
+
+  if (error)
+  {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(error);
+#else
+    g_warning("%s: %s", G_STRFUNC, error->message);
+    g_error_free(error);
+    return is;
+#endif
+  }
+
+  utf8_string.assign(buf.get(), buf.get() + n_bytes);
+
   return is;
 }
 
 std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string)
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  os << Glib::locale_from_utf8(utf8_string);
-  #else
-  std::auto_ptr<Glib::Error> error; //TODO: Check this? 
-  os << Glib::locale_from_utf8(utf8_string, error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
+  GError* error = 0;
+  const ScopedPtr<char> buf (g_locale_from_utf8(utf8_string.data(),
+                                                utf8_string.size(), 0, 0, &error));
+  if (error)
+  {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(error);
+#else
+    g_warning("%s: %s", G_STRFUNC, error->message);
+    g_error_free(error);
+    return os;
+#endif
+  }
+
+  // This won't work if the string contains NUL characters.  Unfortunately,
+  // std::ostream::write() ignores format flags, so we cannot use that.
+  // The only option would be to create a temporary std::string.  However,
+  // even then GCC's libstdc++-v3 prints only the characters up to the first
+  // NUL.  Given this, there doesn't seem much of a point in allowing NUL in
+  // formatted output.  The semantics would be unclear anyway: what's the
+  // screen width of a NUL?
+  os << buf.get();
 
   return os;
 }
 
-} // namespace Glib
+#ifdef GLIBMM_HAVE_WIDE_STREAM
 
+std::wistream& operator>>(std::wistream& is, ustring& utf8_string)
+{
+  GError* error = 0;
+
+  std::wstring wstr;
+  is >> wstr;
+
+#if defined(__STDC_ISO_10646__) && SIZEOF_WCHAR_T == 4
+  // Avoid going through iconv if wchar_t always contains UCS-4.
+  glong n_bytes = 0;
+  const ScopedPtr<char> buf (g_ucs4_to_utf8(reinterpret_cast<const gunichar*>(wstr.data()),
+                                            wstr.size(), 0, &n_bytes, &error));
+#elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
+  // Avoid going through iconv if wchar_t always contains UTF-16.
+  glong n_bytes = 0;
+  const ScopedPtr<char> buf (g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(wstr.data()),
+                                             wstr.size(), 0, &n_bytes, &error));
+#else
+  gsize n_bytes = 0;
+  const ScopedPtr<char> buf (g_convert(reinterpret_cast<const char*>(wstr.data()),
+                                       wstr.size() * sizeof(std::wstring::value_type),
+                                       "UTF-8", "WCHAR_T", 0, &n_bytes, &error));
+#endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
+
+  if (error)
+  {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(error);
+#else
+    g_warning("%s: %s", G_STRFUNC, error->message);
+    g_error_free(error);
+    return is;
+#endif
+  }
+
+  utf8_string.assign(buf.get(), buf.get() + n_bytes);
+
+  return is;
+}
+
+std::wostream& operator<<(std::wostream& os, const ustring& utf8_string)
+{
+  GError* error = 0;
+
+#if defined(__STDC_ISO_10646__) && SIZEOF_WCHAR_T == 4
+  // Avoid going through iconv if wchar_t always contains UCS-4.
+  const ScopedPtr<gunichar> buf (g_utf8_to_ucs4(utf8_string.raw().data(),
+                                                utf8_string.raw().size(), 0, 0, &error));
+#elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
+  // Avoid going through iconv if wchar_t always contains UTF-16.
+  const ScopedPtr<gunichar2> buf (g_utf8_to_utf16(utf8_string.raw().data(),
+                                                  utf8_string.raw().size(), 0, 0, &error));
+#else
+  const ScopedPtr<char> buf (g_convert(utf8_string.raw().data(), utf8_string.raw().size(),
+                                       "WCHAR_T", "UTF-8", 0, 0, &error));
+#endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
+
+  if (error)
+  {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::Error::throw_exception(error);
+#else
+    g_warning("%s: %s", G_STRFUNC, error->message);
+    g_error_free(error);
+    return os;
+#endif
+  }
+
+  // This won't work if the string contains NUL characters.  Unfortunately,
+  // std::wostream::write() ignores format flags, so we cannot use that.
+  // The only option would be to create a temporary std::wstring.  However,
+  // even then GCC's libstdc++-v3 prints only the characters up to the first
+  // NUL.  Given this, there doesn't seem much of a point in allowing NUL in
+  // formatted output.  The semantics would be unclear anyway: what's the
+  // screen width of a NUL?
+  os << reinterpret_cast<wchar_t*>(buf.get());
+
+  return os;
+}
+
+#endif /* GLIBMM_HAVE_WIDE_STREAM */
+
+} // namespace Glib
