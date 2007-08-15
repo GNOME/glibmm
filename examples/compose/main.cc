@@ -32,14 +32,11 @@ void show_examples()
   const int    i = int(a / (a + b) * 40.0);
 
   std::cout
-    << ustring::compose("%1 is lower than %2.",
-                        ustring::format(a), ustring::format(b))
+    << ustring::compose("%1 is lower than %2.", a, b)
     << std::endl
-    << ustring::compose("%2 is greater than %1.",
-                        ustring::format(a), ustring::format(b))
+    << ustring::compose("%2 is greater than %1.", a, b)
     << std::endl
-    << ustring::compose("%1 € are %3 %% of %2 €.",
-                        ustring::format(a), ustring::format(b),
+    << ustring::compose("%1 € are %3 %% of %2 €.", a, b,
                         ustring::format(std::fixed, std::setprecision(1), a / b * 100.0))
     << std::endl
     << ustring::compose("a : b = [%1|%2]",

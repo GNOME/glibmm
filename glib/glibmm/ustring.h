@@ -606,49 +606,66 @@ public:
    * @code
    * using Glib::ustring;
    * const int percentage = 50;
-   * const ustring text = ustring::compose("%1%% done", ustring::format(percentage));
+   * const ustring text = ustring::compose("%1%% done", percentage);
    * @endcode
-   * @param format A template string in <tt>qt-format</tt>.
-   * @param s1 The string to substitute for <tt>"%1"</tt>.
+   * @param fmt A template string in <tt>qt-format</tt>.
+   * @param a1 The argument to substitute for <tt>"%1"</tt>.
    * @return The substituted message string.
    * @throw Glib::ConvertError
    */
+  template <class T1>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1);
+  ustring compose(const ustring& fmt, const T1& a1);
+
+  template <class T1, class T2>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1, const ustring& s2);
+  ustring compose(const ustring& fmt, const T1& a1, const T2& a2);
+
+  template <class T1, class T2, class T3>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1, const ustring& s2, const ustring& s3);
+  ustring compose(const ustring& fmt,
+                  const T1& a1, const T2& a2, const T3& a3);
+
+  template <class T1, class T2, class T3, class T4>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1, const ustring& s2, const ustring& s3,
-                  const ustring& s4);
+  ustring compose(const ustring& fmt,
+                  const T1& a1, const T2& a2, const T3& a3,
+                  const T4& a4);
+
+  template <class T1, class T2, class T3, class T4, class T5>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1, const ustring& s2, const ustring& s3,
-                  const ustring& s4, const ustring& s5);
+  ustring compose(const ustring& fmt,
+                  const T1& a1, const T2& a2, const T3& a3,
+                  const T4& a4, const T5& a5);
+
+  template <class T1, class T2, class T3, class T4, class T5, class T6>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1, const ustring& s2, const ustring& s3,
-                  const ustring& s4, const ustring& s5, const ustring& s6);
+  ustring compose(const ustring& fmt,
+                  const T1& a1, const T2& a2, const T3& a3,
+                  const T4& a4, const T5& a5, const T6& a6);
+
+  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1, const ustring& s2, const ustring& s3,
-                  const ustring& s4, const ustring& s5, const ustring& s6,
-                  const ustring& s7);
+  ustring compose(const ustring& fmt,
+                  const T1& a1, const T2& a2, const T3& a3,
+                  const T4& a4, const T5& a5, const T6& a6,
+                  const T7& a7);
+
+  template <class T1, class T2, class T3, class T4,
+            class T5, class T6, class T7, class T8>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1, const ustring& s2, const ustring& s3,
-                  const ustring& s4, const ustring& s5, const ustring& s6,
-                  const ustring& s7, const ustring& s8);
+  ustring compose(const ustring& fmt,
+                  const T1& a1, const T2& a2, const T3& a3,
+                  const T4& a4, const T5& a5, const T6& a6,
+                  const T7& a7, const T8& a8);
+
+  template <class T1, class T2, class T3, class T4, class T5,
+            class T6, class T7, class T8, class T9>
   static inline
-  ustring compose(const Glib::ustring& format,
-                  const ustring& s1, const ustring& s2, const ustring& s3,
-                  const ustring& s4, const ustring& s5, const ustring& s6,
-                  const ustring& s7, const ustring& s8, const ustring& s9);
+  ustring compose(const ustring& fmt,
+                  const T1& a1, const T2& a2, const T3& a3,
+                  const T4& a4, const T5& a5, const T6& a6,
+                  const T7& a7, const T8& a8, const T9& a9);
 
   /*! Format the argument to its string representation.
    * Applies the arguments in order to an std::wostringstream and returns the
@@ -665,24 +682,31 @@ public:
    * @return The string representation of the argument stream.
    * @throw Glib::ConvertError
    */
-  template <class T1> static inline
+  template <class T1>
+  static inline
   ustring format(const T1& a1);
 
-  template <class T1, class T2> static inline
+  template <class T1, class T2>
+  static inline
   ustring format(const T1& a1, const T2& a2);
 
-  template <class T1, class T2, class T3> static inline
+  template <class T1, class T2, class T3>
+  static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3);
 
-  template <class T1, class T2, class T3, class T4> static inline
+  template <class T1, class T2, class T3, class T4>
+  static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3, const T1& a4);
 
-  template <class T1, class T2, class T3, class T4, class T5> static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5);
+  template <class T1, class T2, class T3, class T4, class T5>
+  static inline
+  ustring format(const T1& a1, const T2& a2, const T3& a3,
+                 const T1& a4, const T2& a5);
 
-  template <class T1, class T2, class T3, class T4, class T5, class T6> static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5,
-                 const T3& a6);
+  template <class T1, class T2, class T3, class T4, class T5, class T6>
+  static inline
+  ustring format(const T1& a1, const T2& a2, const T3& a3,
+                 const T1& a4, const T2& a5, const T3& a6);
 //! @}
 
 private:
@@ -700,14 +724,15 @@ private:
   //as well as defined later. That's probably correct. murrayc.
   template <class In> struct SequenceToString<In, char>;
   template <class In> struct SequenceToString<In, gunichar>;
-  
+
+  template <class T> class Stringify;
   class FormatStream;
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   std::string string_;
 
-  static ustring compose_argv(const Glib::ustring& format, int argc, const ustring* const* argv);
+  static ustring compose_argv(const ustring& fmt, int argc, const ustring* const* argv);
 };
 
 
@@ -1004,88 +1029,8 @@ const std::string& ustring::raw() const
   return string_;
 }
 
+template <class T1>
 inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1)
-{
-  const ustring *const argv[] = { &s1 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1, const ustring& s2)
-{
-  const ustring *const argv[] = { &s1, &s2 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1, const ustring& s2, const ustring& s3)
-{
-  const ustring *const argv[] = { &s1, &s2, &s3 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1, const ustring& s2, const ustring& s3,
-                         const ustring& s4)
-{
-  const ustring *const argv[] = { &s1, &s2, &s3, &s4 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1, const ustring& s2, const ustring& s3,
-                         const ustring& s4, const ustring& s5)
-{
-  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1, const ustring& s2, const ustring& s3,
-                         const ustring& s4, const ustring& s5, const ustring& s6)
-{
-  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5, &s6 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1, const ustring& s2, const ustring& s3,
-                         const ustring& s4, const ustring& s5, const ustring& s6,
-                         const ustring& s7)
-{
-  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5, &s6, &s7 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1, const ustring& s2, const ustring& s3,
-                         const ustring& s4, const ustring& s5, const ustring& s6,
-                         const ustring& s7, const ustring& s8)
-{
-  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5, &s6, &s7, &s8 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-inline // static
-ustring ustring::compose(const Glib::ustring& format,
-                         const ustring& s1, const ustring& s2, const ustring& s3,
-                         const ustring& s4, const ustring& s5, const ustring& s6,
-                         const ustring& s7, const ustring& s8, const ustring& s9)
-{
-  const ustring *const argv[] = { &s1, &s2, &s3, &s4, &s5, &s6, &s7, &s8, &s9 };
-  return compose_argv(format, G_N_ELEMENTS(argv), argv);
-}
-
-template <class T1> inline // static
 ustring ustring::format(const T1& a1)
 {
   ustring::FormatStream buf;
@@ -1093,7 +1038,8 @@ ustring ustring::format(const T1& a1)
   return buf.to_string();
 }
 
-template <class T1, class T2> inline // static
+template <class T1, class T2>
+inline // static
 ustring ustring::format(const T1& a1, const T2& a2)
 {
   ustring::FormatStream buf;
@@ -1102,7 +1048,8 @@ ustring ustring::format(const T1& a1, const T2& a2)
   return buf.to_string();
 }
 
-template <class T1, class T2, class T3> inline // static
+template <class T1, class T2, class T3>
+inline // static
 ustring ustring::format(const T1& a1, const T2& a2, const T3& a3)
 {
   ustring::FormatStream buf;
@@ -1112,7 +1059,8 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3)
   return buf.to_string();
 }
 
-template <class T1, class T2, class T3, class T4> inline // static
+template <class T1, class T2, class T3, class T4>
+inline // static
 ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4)
 {
   ustring::FormatStream buf;
@@ -1123,8 +1071,10 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4)
   return buf.to_string();
 }
 
-template <class T1, class T2, class T3, class T4, class T5> inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5)
+template <class T1, class T2, class T3, class T4, class T5>
+inline // static
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
+                        const T1& a4, const T2& a5)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1135,9 +1085,10 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, 
   return buf.to_string();
 }
 
-template <class T1, class T2, class T3, class T4, class T5, class T6> inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, const T2& a5,
-                        const T3& a6)
+template <class T1, class T2, class T3, class T4, class T5, class T6>
+inline // static
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
+                        const T1& a4, const T2& a5, const T3& a6)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1147,6 +1098,175 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4, 
   buf.stream(a5);
   buf.stream(a6);
   return buf.to_string();
+}
+
+template <class T>
+class ustring::Stringify
+{
+private:
+  ustring string_;
+
+public:
+  explicit Stringify(const T& arg) : string_ (ustring::format(arg)) {}
+  explicit Stringify(const char* arg) : string_ (arg) {}
+  const ustring* ptr() const { return &string_; }
+};
+
+template <>
+class ustring::Stringify<ustring>
+{
+private:
+  const ustring& string_;
+
+public:
+  explicit Stringify(const ustring& arg) : string_ (arg) {}
+  const ustring* ptr() const { return &string_; }
+};
+
+template <class T1>
+inline // static
+ustring ustring::compose(const ustring& fmt, const T1& a1)
+{
+  const ustring::Stringify<T1> s1 (a1);
+
+  const ustring *const argv[] = { s1.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1, class T2>
+inline // static
+ustring ustring::compose(const ustring& fmt, const T1& a1, const T2& a2)
+{
+  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T2> s2 (a2);
+
+  const ustring *const argv[] = { s1.ptr(), s2.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1, class T2, class T3>
+inline // static
+ustring ustring::compose(const ustring& fmt,
+                         const T1& a1, const T2& a2, const T3& a3)
+{
+  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T2> s2 (a2);
+  const ustring::Stringify<T3> s3 (a3);
+
+  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1, class T2, class T3, class T4>
+inline // static
+ustring ustring::compose(const ustring& fmt,
+                         const T1& a1, const T2& a2, const T3& a3, const T4& a4)
+{
+  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T2> s2 (a2);
+  const ustring::Stringify<T3> s3 (a3);
+  const ustring::Stringify<T4> s4 (a4);
+
+  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1, class T2, class T3, class T4, class T5>
+inline // static
+ustring ustring::compose(const ustring& fmt,
+                         const T1& a1, const T2& a2, const T3& a3,
+                         const T4& a4, const T5& a5)
+{
+  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T2> s2 (a2);
+  const ustring::Stringify<T3> s3 (a3);
+  const ustring::Stringify<T4> s4 (a4);
+  const ustring::Stringify<T5> s5 (a5);
+
+  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1, class T2, class T3, class T4, class T5, class T6>
+inline // static
+ustring ustring::compose(const ustring& fmt,
+                         const T1& a1, const T2& a2, const T3& a3,
+                         const T4& a4, const T5& a5, const T6& a6)
+{
+  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T2> s2 (a2);
+  const ustring::Stringify<T3> s3 (a3);
+  const ustring::Stringify<T4> s4 (a4);
+  const ustring::Stringify<T5> s5 (a5);
+  const ustring::Stringify<T6> s6 (a6);
+
+  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
+                                  s5.ptr(), s6.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+inline // static
+ustring ustring::compose(const ustring& fmt,
+                         const T1& a1, const T2& a2, const T3& a3,
+                         const T4& a4, const T5& a5, const T6& a6, const T7& a7)
+{
+  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T2> s2 (a2);
+  const ustring::Stringify<T3> s3 (a3);
+  const ustring::Stringify<T4> s4 (a4);
+  const ustring::Stringify<T5> s5 (a5);
+  const ustring::Stringify<T6> s6 (a6);
+  const ustring::Stringify<T7> s7 (a7);
+
+  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
+                                  s5.ptr(), s6.ptr(), s7.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1, class T2, class T3, class T4,
+          class T5, class T6, class T7, class T8>
+inline // static
+ustring ustring::compose(const ustring& fmt,
+                         const T1& a1, const T2& a2, const T3& a3,
+                         const T4& a4, const T5& a5, const T6& a6,
+                         const T7& a7, const T8& a8)
+{
+  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T2> s2 (a2);
+  const ustring::Stringify<T3> s3 (a3);
+  const ustring::Stringify<T4> s4 (a4);
+  const ustring::Stringify<T5> s5 (a5);
+  const ustring::Stringify<T6> s6 (a6);
+  const ustring::Stringify<T7> s7 (a7);
+  const ustring::Stringify<T8> s8 (a8);
+
+  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
+                                  s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+}
+
+template <class T1, class T2, class T3, class T4, class T5,
+          class T6, class T7, class T8, class T9>
+inline // static
+ustring ustring::compose(const ustring& fmt,
+                         const T1& a1, const T2& a2, const T3& a3,
+                         const T4& a4, const T5& a5, const T6& a6,
+                         const T7& a7, const T8& a8, const T9& a9)
+{
+  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T2> s2 (a2);
+  const ustring::Stringify<T3> s3 (a3);
+  const ustring::Stringify<T4> s4 (a4);
+  const ustring::Stringify<T5> s5 (a5);
+  const ustring::Stringify<T6> s6 (a6);
+  const ustring::Stringify<T7> s7 (a7);
+  const ustring::Stringify<T8> s8 (a8);
+  const ustring::Stringify<T9> s9 (a9);
+
+  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
+                                  s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr(), s9.ptr() };
+  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

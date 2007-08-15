@@ -1184,9 +1184,9 @@ std::string ustring::casefold_collate_key() const
 /**** Glib::ustring -- Message formatting **********************************/
 
 // static
-ustring ustring::compose_argv(const Glib::ustring& format, int argc, const ustring* const* argv)
+ustring ustring::compose_argv(const Glib::ustring& fmt, int argc, const ustring* const* argv)
 {
-  std::string::size_type result_size = format.raw().size();
+  std::string::size_type result_size = fmt.raw().size();
 
   // Guesstimate the final string size.
   for (int i = 0; i < argc; ++i)
@@ -1195,8 +1195,8 @@ ustring ustring::compose_argv(const Glib::ustring& format, int argc, const ustri
   std::string result;
   result.reserve(result_size);
 
-  const char* const pformat = format.raw().c_str();
-  const char* start = pformat;
+  const char* const pfmt = fmt.raw().c_str();
+  const char* start = pfmt;
 
   while (const char* const stop = std::strchr(start, '%'))
   {
@@ -1222,14 +1222,14 @@ ustring ustring::compose_argv(const Glib::ustring& format, int argc, const ustri
         // Copy invalid substitutions literally to the output.
         result.append(start, next - start);
 
-        g_warning("invalid substitution \"%s\" in format string \"%s\"",
-                  result.c_str() + result.size() - (next - stop), pformat);
+        g_warning("invalid substitution \"%s\" in fmt string \"%s\"",
+                  result.c_str() + result.size() - (next - stop), pfmt);
         start = next;
       }
     }
   }
 
-  result.append(start, pformat + format.raw().size() - start);
+  result.append(start, pfmt + fmt.raw().size() - start);
 
   return result;
 }
