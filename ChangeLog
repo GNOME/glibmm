@@ -1,75 +1,9 @@
-2007-08-12  Daniel Elstner  <danielk@openismus.com>
+2007-08-16  Jonathon Jongsma  <jjongsma@gnome.org>
 
-	* examples/compose: New example demonstrating the message
-	compose and format features.
-	* examples/compose/main.cc: New file.
-	* examples/compose/Makefile.am: New file.
-
-	* examples/Makefile.am (example_dirs): Add compose directory.
-	* configure.in (AC_CONFIG_FILES): Add examples/compose/Makefile.
-
-2007-08-12  Daniel Elstner  <danielk@openismus.com>
-
-	* build_shared/Makefile_build.am_fragment (all_includes): Add
-	-I$(top_builddir) in order to allow <config.h> to be included.
-
-	* glib/glibmm/ustring.{cc,h}: Include <config.h> for the
-	definition of SIZEOF_WCHAR_T.
-	(ustring::FormatStream::stream): Replace accessor with template
-	method that passes its argument onto the stream.  Add overload
-	for "const char*" to enable the use of UTF-8 string literals as
-	arguments to ustring::format().
-	(ustring::FormatStream::FormatStream): Handle exceptions on
-	failure to initialize the locale gracefully.
-	(ustring::format): Adapt to the modified stream() method.
-	(operator<<): Add missing call to ustring::raw() to get the
-	number of bytes instead of code points.  Oops.
-
-2007-08-12  Daniel Elstner  <danielk@openismus.com>
-
-	* glib/glibmm/ustring.{cc,h}: Add preliminary implementation of
-	a message compose and format API (bug #399216).  The API design
-	is not final and still open for discussion.
-	(ustring::compose): New set of static methods for composing
-	internationalized text messages by substituting placeholders
-	in a template string.
-	(ustring::format): New set of static methods for locale-dependent
-	formatting of numbers and other streamable objects to strings.
-	(ustring::compose_argv): New static method which implements the
-	common functionality of the compose() overloads.
-	(ustring::FormatStream): New helper class which implements the
-	type-independent functionality of the format() templates.
-	(operator>>): New operator overload for std::wistream.
-	(operator<<): New operator overload for std::wostream.
-
-2007-08-12  Daniel Elstner  <danielk@openismus.com>
-
-	* scripts/dk-feature.m4: New file, defining M4 utility macros for
-	feature testing.  These macros are part of my personal autoconf
-	library and are not specific to glibmm, as indicated by the "DK_"
-	namespace prefix.
-
-	* configure.in (AC_INIT): Switch to the non-deprecated usage of
-	AC_INIT() by passing project name and version number as arguments.
-	This is necessary to define a couple of auxiliary macros.
-	(AC_PREREQ): Bump Autoconf version requirement to 2.58.
-	(AC_CONFIG_SRCDIR): Point to project-specific source file.
-	(AC_CONFIG_MACRO_DIR): Declare scripts/ as M4 directory.
-	(AM_INIT_AUTOMAKE): Switch to non-deprecated usage.
-	(AC_CHECK_SIZEOF): Use to determine the size of wchar_t.
-	(DK_CHECK_FEATURE): Use new feature test macro to check for
-	support of wide-character streams.
-
-	* config.h.in (SIZEOF_WCHAR_T): Add #undef template.
-	* glib/glibmmconfig.h.in (GLIBMM_HAVE_WIDE_STREAM): Likewise.
-
-2007-08-04  Daniel Elstner  <daniel.kitta@gmail.com>
-
-	* containerhandle_shared.h (TypeTraits<bool>): Rewrite completely
-	broken type adapter (bug #406960).
-	* src/keyfile.{ccg,hg}: Fix the implementation to correctly use
-	ArrayHandle<>.  Fix compilation with the new ArrayHandle<bool>
-	code.
+	* docs/reference/glibmm_footer.html_fragment,
+	docs/reference/glibmm_header.html_fragment: added <div> to doxygen header
+	and footer to make it easier to integrate with library.gnome.org, per a
+	request by Frederic Peters
 
 2.13.9:
 
