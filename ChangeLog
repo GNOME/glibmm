@@ -1,3 +1,22 @@
+2007-09-03  Daniel Elstner  <danielk@openismus.com>
+
+	* glib/glibmm/ustring.cc (ustring::FormatStream::FormatStream): Use
+	the global C++ locale instead of forcing the environment's locale
+	onto the formatting stream.  This lifts an unnecessary restriction
+	at the cost of requiring users to call std::locale::global().
+	* glib/glibmm/ustring.h (ustring): Advertise the new compose and
+	format API in the class documentation.
+	(ustring::format): Correct a couple of cut'n'paste mistakes -- ouch.
+	Also add two more overloads so that format() now takes up to eight
+	arguments.  Extent the method documentation, too.
+	(ustring::Stringify): Explicitly declare the class as noncopyable.
+	(ustring::compose): Qualify calls to method ustring::compose_argv()
+	in order to avoid surprising name lookup results in the context of
+	the template instantiation.
+
+	* docs/reference/Doxyfile.in (PREDEFINED): Add GLIBMM_HAVE_WIDESTREAM
+	so that the wide stream I/O operators show up in the documentation.
+
 2007-08-16  Jonathon Jongsma  <jjongsma@gnome.org>
 
 	* docs/reference/glibmm_footer.html_fragment,

@@ -189,6 +189,18 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  * label->set_text(Glib::locale_to_utf8(output.str()));
  * @endcode
  *
+ * @par Formatted output and internationalization
+ * @par
+ * The methods ustring::compose() and ustring::format() provide a convenient
+ * and powerful alternative to string streams, as shown in the example below.
+ * Refer to the method documentation of compose() and format() for details.
+ * @code
+ * using Glib::ustring;
+ *
+ * ustring message = ustring::compose("%1 is lower than 0x%2.",
+ *                                    12, ustring::format(std::hex, 16));
+ * @endcode
+ *
  * @par Implementation notes
  * @par
  * Glib::ustring does not inherit from std::string, because std::string was
@@ -670,14 +682,27 @@ public:
   /*! Format the argument to its string representation.
    * Applies the arguments in order to an std::wostringstream and returns the
    * resulting string.  I/O manipulators may also be used as arguments.  This
-   * greatly simplifies the common task of converting a number to a string:
+   * greatly simplifies the common task of converting a number to a string, as
+   * demonstrated by the example below.  The format() methods can also be used
+   * in conjunction with compose() to facilitate localization of user-visible
+   * messages.
    * @code
    * using Glib::ustring;
-   * const double value = 1.23;
-   * const ustring text = ustring::format(std::setprecision(2), value);
+   * double value = 22.0 / 7.0;
+   * ustring text = ustring::format(std::fixed, std::setprecision(2), value);
    * @endcode
-   * ustring::format() can be used in conjunction with ustring::compose()
-   * to produce internationalized messages for display to the user.
+   * @note The use of a wide character stream in the implementation of format()
+   * is almost completely transparent.  However, one of the instances where the
+   * use of wide streams becomes visible is when the std::setfill() stream
+   * manipulator is used.  In order for std::setfill() to work the argument
+   * must be of type <tt>wchar_t</tt>.  This can be achieved by using the
+   * <tt>L</tt> prefix with a character literal, as shown in the example.
+   * @code
+   * using Glib::ustring;
+   * // Insert leading zeroes to fill in at least six digits
+   * ustring text = ustring::format(std::setfill(L'0'), std::setw(6), 123);
+   * @endcode
+   *
    * @param a1 A streamable value or an I/O manipulator.
    * @return The string representation of the argument stream.
    * @throw Glib::ConvertError
@@ -696,17 +721,29 @@ public:
 
   template <class T1, class T2, class T3, class T4>
   static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3, const T1& a4);
+  ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4);
 
   template <class T1, class T2, class T3, class T4, class T5>
   static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3,
-                 const T1& a4, const T2& a5);
+                 const T4& a4, const T5& a5);
 
   template <class T1, class T2, class T3, class T4, class T5, class T6>
   static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3,
-                 const T1& a4, const T2& a5, const T3& a6);
+                 const T4& a4, const T5& a5, const T6& a6);
+
+  template <class T1, class T2, class T3, class T4,
+            class T5, class T6, class T7>
+  static inline
+  ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
+                 const T5& a5, const T6& a6, const T7& a7);
+
+  template <class T1, class T2, class T3, class T4,
+            class T5, class T6, class T7, class T8>
+  static inline
+  ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
+                 const T5& a5, const T6& a6, const T7& a7, const T8& a8);
 //! @}
 
 private:
@@ -1061,7 +1098,7 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3)
 
 template <class T1, class T2, class T3, class T4>
 inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4)
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1074,7 +1111,7 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T1& a4)
 template <class T1, class T2, class T3, class T4, class T5>
 inline // static
 ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
-                        const T1& a4, const T2& a5)
+                        const T4& a4, const T5& a5)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1088,7 +1125,7 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
 template <class T1, class T2, class T3, class T4, class T5, class T6>
 inline // static
 ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
-                        const T1& a4, const T2& a5, const T3& a6)
+                        const T4& a4, const T5& a5, const T6& a6)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1100,16 +1137,55 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
   return buf.to_string();
 }
 
+template <class T1, class T2, class T3, class T4,
+          class T5, class T6, class T7>
+inline // static
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
+                        const T5& a5, const T6& a6, const T7& a7)
+{
+  ustring::FormatStream buf;
+  buf.stream(a1);
+  buf.stream(a2);
+  buf.stream(a3);
+  buf.stream(a4);
+  buf.stream(a5);
+  buf.stream(a6);
+  buf.stream(a7);
+  return buf.to_string();
+}
+
+template <class T1, class T2, class T3, class T4,
+          class T5, class T6, class T7, class T8>
+inline // static
+ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
+                        const T5& a5, const T6& a6, const T7& a7, const T8& a8)
+{
+  ustring::FormatStream buf;
+  buf.stream(a1);
+  buf.stream(a2);
+  buf.stream(a3);
+  buf.stream(a4);
+  buf.stream(a5);
+  buf.stream(a6);
+  buf.stream(a7);
+  buf.stream(a8);
+  return buf.to_string();
+}
+
 template <class T>
 class ustring::Stringify
 {
 private:
   ustring string_;
 
+  // noncopyable
+  Stringify(const ustring::Stringify<T>&);
+  Stringify<T>& operator=(const ustring::Stringify<T>&);
+
 public:
-  explicit Stringify(const T& arg) : string_ (ustring::format(arg)) {}
-  explicit Stringify(const char* arg) : string_ (arg) {}
-  const ustring* ptr() const { return &string_; }
+  explicit inline Stringify(const T& arg) : string_ (ustring::format(arg)) {}
+  explicit inline Stringify(const char* arg) : string_ (arg) {}
+  inline const ustring* ptr() const { return &string_; }
 };
 
 template <>
@@ -1118,9 +1194,13 @@ class ustring::Stringify<ustring>
 private:
   const ustring& string_;
 
+  // noncopyable
+  Stringify(const ustring::Stringify<ustring>&);
+  Stringify<ustring>& operator=(const ustring::Stringify<ustring>&);
+
 public:
-  explicit Stringify(const ustring& arg) : string_ (arg) {}
-  const ustring* ptr() const { return &string_; }
+  explicit inline Stringify(const ustring& arg) : string_ (arg) {}
+  inline const ustring* ptr() const { return &string_; }
 };
 
 template <class T1>
@@ -1130,7 +1210,7 @@ ustring ustring::compose(const ustring& fmt, const T1& a1)
   const ustring::Stringify<T1> s1 (a1);
 
   const ustring *const argv[] = { s1.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2>
@@ -1141,7 +1221,7 @@ ustring ustring::compose(const ustring& fmt, const T1& a1, const T2& a2)
   const ustring::Stringify<T2> s2 (a2);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3>
@@ -1154,7 +1234,7 @@ ustring ustring::compose(const ustring& fmt,
   const ustring::Stringify<T3> s3 (a3);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4>
@@ -1168,7 +1248,7 @@ ustring ustring::compose(const ustring& fmt,
   const ustring::Stringify<T4> s4 (a4);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4, class T5>
@@ -1184,7 +1264,7 @@ ustring ustring::compose(const ustring& fmt,
   const ustring::Stringify<T5> s5 (a5);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6>
@@ -1202,7 +1282,7 @@ ustring ustring::compose(const ustring& fmt,
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
                                   s5.ptr(), s6.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
@@ -1221,7 +1301,7 @@ ustring ustring::compose(const ustring& fmt,
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
                                   s5.ptr(), s6.ptr(), s7.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4,
@@ -1243,7 +1323,7 @@ ustring ustring::compose(const ustring& fmt,
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
                                   s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4, class T5,
@@ -1266,7 +1346,7 @@ ustring ustring::compose(const ustring& fmt,
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
                                   s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr(), s9.ptr() };
-  return compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

@@ -1253,22 +1253,7 @@ ustring::SequenceToString<Glib::ustring::const_iterator,gunichar>
 ustring::FormatStream::FormatStream()
 :
   stream_ ()
-{
-  // Try to use the default locale of the environment,
-  // but don't abort if it cannot be initialized.
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-  try
-  {
-    stream_.imbue(std::locale(""));
-  }
-  catch (const std::runtime_error& error)
-  {
-    g_warning("%s: %s", G_STRFUNC, error.what());
-  }
-#else
-  stream_.imbue(std::locale(""));
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
-}
+{}
 
 ustring::FormatStream::~FormatStream()
 {}
