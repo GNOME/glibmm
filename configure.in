@@ -11,17 +11,15 @@
 #  Copyright 1999 gtkmm Development Team
 #  Copyright 1998 Stephan Kulow 
 #
-AC_INIT([glibmm], [2.13.9])
-AC_PREREQ([2.58])
-AC_CONFIG_SRCDIR([glib/glibmmconfig.h.in])
-AC_CONFIG_MACRO_DIR([scripts])
+AC_INIT(glib/glibmmconfig.h.in)
+AC_PREREQ(2.50)
 
 #########################################################################
 #  Version and initialization
 #########################################################################
 GLIBMM_MAJOR_VERSION=2
-GLIBMM_MINOR_VERSION=13
-GLIBMM_MICRO_VERSION=9
+GLIBMM_MINOR_VERSION=14
+GLIBMM_MICRO_VERSION=0
 GLIBMM_VERSION=$GLIBMM_MAJOR_VERSION.$GLIBMM_MINOR_VERSION.$GLIBMM_MICRO_VERSION
 GLIBMM_RELEASE=$GLIBMM_MAJOR_VERSION.$GLIBMM_MINOR_VERSION
 AC_DEFINE_UNQUOTED([GLIBMM_MAJOR_VERSION], $GLIBMM_MAJOR_VERSION, [Major Version])
@@ -45,8 +43,12 @@ AC_SUBST(LIBGLIBMM_SO_VERSION)
 
 AC_CONFIG_AUX_DIR(scripts)
 
+dnl For automake.
+VERSION=$GLIBMM_VERSION
+PACKAGE=glibmm
+
 dnl Initialize automake stuff
-AM_INIT_AUTOMAKE([1.7 gnu])
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
 dnl Specify a configuration file (no autoheader)
 AM_CONFIG_HEADER(config.h glib/glibmmconfig.h)
@@ -186,13 +188,6 @@ if test "x$config_error" = xyes ; then
 fi
 AC_MSG_RESULT([yes])
 
-AC_CHECK_SIZEOF([wchar_t])
-DK_CHECK_FEATURE([wide stream],
-[
-  AC_LANG_PROGRAM([[#include <sstream>]],
-                  [[std::wostringstream s; (void) s.str();]])
-])
-
 GLIBMM_CXX_HAS_NAMESPACE_STD()
 GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS()
 GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR()
@@ -271,7 +266,6 @@ AC_CONFIG_FILES([
     tests/glibmm_value/Makefile
 
   examples/Makefile
-    examples/compose/Makefile
     examples/markup/Makefile
     examples/options/Makefile
     examples/thread/Makefile
