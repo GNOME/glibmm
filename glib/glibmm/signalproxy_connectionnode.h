@@ -24,12 +24,17 @@
  */
 
 #include <sigc++/sigc++.h>
-#include <glibmm/wrap.h>
+#include <glib/gtypes.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GObject GObject;
+typedef struct _GClosure GClosure;
+#endif //DOXYGEN_SHOULD_SKIP_THIS
 
 namespace Glib
 {
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 /** SignalProxyConnectionNode is a connection node for use with SignalProxy.
   * It lives between the layer of Gtk+ and libsigc++.
@@ -62,6 +67,8 @@ public:
 protected:
   GObject* object_;
 };
+
+#endif //DOXYGEN_SHOULD_SKIP_THIS
 
 } /* namespace Glib */
 

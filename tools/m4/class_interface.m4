@@ -162,7 +162,7 @@ namespace Glib
 
 Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__`'* object, bool take_copy)
 {
-  return Glib::RefPtr<__NAMESPACE__::__CPPNAME__>( dynamic_cast<__NAMESPACE__::__CPPNAME__*> (Glib::wrap_auto ((GObject*)(object), take_copy)) );
+  return Glib::RefPtr<__NAMESPACE__::__CPPNAME__>( dynamic_cast<__NAMESPACE__::__CPPNAME__*> (Glib::wrap_auto_interface<__NAMESPACE__::__CPPNAME__> ((GObject*)(object), take_copy)) );
   //We use dynamic_cast<> in case of multiple inheritance.
 }
 
@@ -237,8 +237,14 @@ private:
 
 protected:
   __CPPNAME__`'(); // you must derive from this class
+
+public:
+  // This is public so that C++ wrapper instances can be
+  // created for C instances of unwrapped types.
+  // For instance, if an unexpected C type implements the C interface. 
   explicit __CPPNAME__`'(__CNAME__* castitem);
 
+protected:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 public:
