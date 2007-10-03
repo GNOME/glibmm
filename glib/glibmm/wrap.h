@@ -50,9 +50,9 @@ Glib::ObjectBase* wrap_auto(GObject* object, bool take_copy = false);
 
 /** Create a C++ instance of a known C++ type that is mostly closely associated with the GType of the C object.
  * @param object The C object which should be placed in a new C++ instance.
- * @param exact_type_only If this is true then only create a C++ object if we know of a C++ type that exactly matches the C object's GType.
+ * @param interface_gtype The returned instance will implement this interface. Otherwise it will be NULL.
  */
-Glib::ObjectBase* wrap_create_new_wrapper(GObject* object, bool exact_type_only = false);
+Glib::ObjectBase* wrap_create_new_wrapper_for_interface(GObject* object, GType interface_gtype);
 
 // Return the current C++ wrapper instance of the GObject,
 // or automatically generate a new wrapper if there's none.
@@ -70,7 +70,7 @@ TInterface* wrap_auto_interface(GObject* object, bool take_copy = false)
     // There's not already a wrapper: generate a new C++ instance.
     // We use exact_type_only=true avoid creating Glib::Object for interfaces of unknown implementation,
     // because we do not want a C++ object that does not dynamic_cast to the expected interface type.
-    pCppObject = wrap_create_new_wrapper(object, true /* exact_type_only */);
+    pCppObject = wrap_create_new_wrapper_for_interface(object, TInterface::get_base_type());
   }
 
   //If no exact wrapper was created, 
