@@ -28,10 +28,20 @@ std::string get_properties(GType gtype)
   std::string strObjectName = g_type_name(gtype);
 
   //Get the list of properties:
-  GObjectClass* pGClass = G_OBJECT_CLASS(g_type_class_ref(gtype));
-
+  GParamSpec** ppParamSpec = 0;
   guint iCount = 0;
-  GParamSpec** ppParamSpec = g_object_class_list_properties (pGClass, &iCount);
+  if(G_TYPE_IS_OBJECT(gtype))
+  {
+    GObjectClass* pGClass = G_OBJECT_CLASS(g_type_class_ref(gtype));
+    ppParamSpec = g_object_class_list_properties (pGClass, &iCount);
+    g_type_class_unref(pGClass);
+  }
+  else if (G_TYPE_IS_INTERFACE(gtype))
+  {
+    gpointer pGInterface = g_type_default_interface_ref(gtype);
+    ppParamSpec = g_object_interface_list_properties(pGInterface, &iCount);
+    g_type_default_interface_unref(pGInterface);
+  }
 
   for(guint i = 0; i < iCount; i++)
   {
@@ -69,7 +79,6 @@ std::string get_properties(GType gtype)
   }
 
   g_free(ppParamSpec);
-  g_type_class_unref(pGClass); //to match the g_type_class_ref() above.	
 
   return strResult;
 }
@@ -205,10 +214,11 @@ std::string get_defs(GType gtype)
   std::string strObjectName = g_type_name(gtype);
   std::string strDefs = ";; From " + strObjectName + "\n\n";
 
-  strDefs += get_signals(gtype);
-
-  if(G_TYPE_IS_OBJECT(gtype))
+  if(G_TYPE_IS_OBJECT(gtype) || G_TYPE_IS_INTERFACE(gtype))
+  {
+    strDefs += get_signals(gtype);
     strDefs += get_properties(gtype);
+  }
 
   return strDefs;
 }
