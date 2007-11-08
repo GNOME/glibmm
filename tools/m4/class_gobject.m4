@@ -173,7 +173,7 @@ __CPPNAME__::__CPPNAME__`'(const Glib::ConstructParams& construct_params)
 :
   __CPPPARENT__`'(construct_params)
 {
-INITIALLY_UNOWNED_SINK
+_INITIALLY_UNOWNED_SINK
 }
 
 __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem)

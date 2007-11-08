@@ -5,12 +5,11 @@ dnl
 
 dnl Code to sink a GInitiallyUnowned:
 dnl
-m4_define(`INITIALLY_UNOWNED_SINK',`dnl
+m4_define(`_INITIALLY_UNOWNED_SINK',`dnl
 ifdef(`__BOOL_DERIVES_INITIALLY_UNOWNED__',`dnl
    if(gobject_ && g_object_is_floating (gobject_))
      g_object_ref_sink(gobject_); //Stops it from being floating.
-',`not initially unowned')dnl
-')
+',`')')
 
 dnl Declares and implements the default constructor
 dnl
@@ -25,7 +24,7 @@ __CPPNAME__::__CPPNAME__`'()
 {
   _IMPORT(SECTION_CC_INITIALIZE_CLASS_EXTRA)
 
-INITIALLY_UNOWNED_SINK
+_INITIALLY_UNOWNED_SINK
 }
 
 _POP()')
@@ -45,7 +44,7 @@ __CPPNAME__::$1`'($3)
 {
   _IMPORT(SECTION_CC_INITIALIZE_CLASS_EXTRA)
 
-INITIALLY_UNOWNED_SINK
+_INITIALLY_UNOWNED_SINK
 }
 
 _POP()')
