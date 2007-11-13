@@ -117,7 +117,7 @@ public:
   inline operator bool() const;
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
-  /// @deprecated Use reset() instead because this leads to confusion with clear() methods on the underlying class instead. For instance, people use .clear() when they mean ->clear().
+  /// @deprecated Use reset() instead because this leads to confusion with clear() methods on the underlying class. For instance, people use .clear() when they mean ->clear().
   inline void clear();
 #endif //GLIBMM_DISABLE_DEPRECATED
 
