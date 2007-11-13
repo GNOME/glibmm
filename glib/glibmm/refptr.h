@@ -116,9 +116,13 @@ public:
    */
   inline operator bool() const;
 
-  /// Set underlying instance to 0, decrementing reference count of existing instance appropriately.
+#ifndef GLIBMM_DISABLE_DEPRECATED
+  /// @deprecated Use reset() instead because this leads to confusion with clear() methods on the underlying class instead. For instance, people use .clear() when they mean ->clear().
   inline void clear();
+#endif //GLIBMM_DISABLE_DEPRECATED
 
+  /// Set underlying instance to 0, decrementing reference count of existing instance appropriately.
+  inline void reset();
 
   /** Dynamic cast to derived class.
    *
@@ -279,8 +283,16 @@ RefPtr<T_CppObject>::operator bool() const
   return (pCppObject_ != 0);
 }
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 template <class T_CppObject> inline
 void RefPtr<T_CppObject>::clear()
+{
+  reset();
+}
+#endif //GLIBMM_DISABLE_DEPRECATED
+
+template <class T_CppObject> inline
+void RefPtr<T_CppObject>::reset()
 {
   RefPtr<T_CppObject> temp; // swap with an empty RefPtr<> to clear *this
   this->swap(temp);
