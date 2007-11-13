@@ -121,7 +121,9 @@ public:
   inline void clear();
 #endif //GLIBMM_DISABLE_DEPRECATED
 
-  /// Set underlying instance to 0, decrementing reference count of existing instance appropriately.
+  /** Set underlying instance to 0, decrementing reference count of existing instance appropriately.
+   * @newin2p16
+   */
   inline void reset();
 
   /** Dynamic cast to derived class.
