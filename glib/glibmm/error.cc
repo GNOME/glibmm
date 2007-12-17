@@ -21,7 +21,7 @@
  */
 
 #include <glib/gerror.h>
-#include <glib/gmessages.h>
+#include <glib/gtestutils.h>
 
 #include <map>
 #include <glibmmconfig.h>
