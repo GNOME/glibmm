@@ -20,7 +20,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/gtestutils.h>
+#include <glib/gmessages.h>
 #include <glibmm/exception.h>
 
 
