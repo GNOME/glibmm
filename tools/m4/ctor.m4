@@ -3,6 +3,14 @@ dnl
 dnl M4 macros for constructor generation.
 dnl
 
+dnl Code to sink a GInitiallyUnowned:
+dnl
+m4_define(`_INITIALLY_UNOWNED_SINK',`dnl
+ifdef(`__BOOL_DERIVES_INITIALLY_UNOWNED__',`dnl
+   if(gobject_ && g_object_is_floating (gobject_))
+     g_object_ref_sink(gobject_); //Stops it from being floating.
+',`')')
+
 dnl Declares and implements the default constructor
 dnl
 m4_define(`_CTOR_DEFAULT',`dnl
@@ -15,6 +23,8 @@ __CPPNAME__::__CPPNAME__`'()
   __CPPPARENT__`'(Glib::ConstructParams(__BASE__`'_class_.init()))
 {
   _IMPORT(SECTION_CC_INITIALIZE_CLASS_EXTRA)
+
+_INITIALLY_UNOWNED_SINK
 }
 
 _POP()')
@@ -33,6 +43,8 @@ __CPPNAME__::$1`'($3)
   __CPPPARENT__`'(Glib::ConstructParams(__BASE__`'_class_.init()m4_ifelse(`$4',,,`, $4, static_cast<char*>(0)')))
 {
   _IMPORT(SECTION_CC_INITIALIZE_CLASS_EXTRA)
+
+_INITIALLY_UNOWNED_SINK
 }
 
 _POP()')
