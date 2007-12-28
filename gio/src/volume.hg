@@ -1,0 +1,94 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2007 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gio.h>
+
+#include <glibmm/interface.h>
+#include <glibmm/asyncresult.h>
+#include <glibmm/cancellable.h>
+#include <glibmm/drive.h>
+#include <glibmm/icon.h>
+#include <glibmm/mountoperation.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+
+namespace Gio {
+
+// Making a forward declaration here to avoid circular dependency.
+// file.hg already includes volume.h.
+class File;
+
+class Volume : public Glib::Interface
+{
+  _CLASS_INTERFACE(Volume, GVolume, G_DRIVE, GVolumeIface)
+public:
+  _WRAP_METHOD(std::string get_name() const, g_volume_get_name)
+
+  _WRAP_METHOD(std::string get_uuid() const, g_volume_get_uuid)
+
+  _WRAP_METHOD(Glib::RefPtr<Icon> get_icon(),
+               g_volume_get_icon,
+               refreturn)
+
+  _WRAP_METHOD(Glib::RefPtr<Icon> get_icon() const,
+               g_volume_get_icon,
+               refreturn, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<Drive> get_drive(),
+               g_volume_get_drive,
+               refreturn)
+
+  _WRAP_METHOD(Glib::RefPtr<Drive> get_drive() const,
+               g_volume_get_drive,
+               refreturn, constversion)
+
+  _WRAP_METHOD(bool can_mount() const, g_volume_can_mount)
+
+  _WRAP_METHOD(bool can_eject() const, g_volume_can_eject)
+
+   _IGNORE(g_volume_mount)
+  void mount(const Glib::RefPtr<MountOperation>& mount_operation,
+             const Glib::RefPtr<Cancellable>& cancellable,
+             const SlotAsyncReady& slot);
+
+  void mount(const Glib::RefPtr<MountOperation>& mount_operation,
+             const SlotAsyncReady& slot);
+
+  _WRAP_METHOD(bool mount_finish(Glib::RefPtr<AsyncResult>& result),
+               g_volume_mount_finish,
+               errthrow)
+
+  _IGNORE(g_volume_eject)
+  void eject(const Glib::RefPtr<Cancellable>& cancellable,
+             const SlotAsyncReady& slot);
+
+  void eject(const SlotAsyncReady& slot);
+
+  _WRAP_METHOD(bool eject_finish(Glib::RefPtr<AsyncResult>& result),
+               g_volume_eject_finish,
+               errthrow)
+
+  _WRAP_SIGNAL(void changed(), "changed")
+
+  /* vfuncs */
+  //TODO
+};
+
+} // namespace Gio
