@@ -1,3 +1,72 @@
+2.15.0:
+
+* Glib::RefPtr: Deprecate clear(), replacing it with 
+  reset(), because people often do treemodel.clear() when they 
+  mean treemodel->clear(). reset() is consistent with std::auto_ptr<>.
+  But the method is still there so the compiler still can't help 
+  you to avoid the mistake.
+  (Murray Cumming)
+* gmmproc:
+  - Refuse to generate a wrapper for a construct-only 
+  property which is also write-only, and display a warning.
+  (Daniel Elstner, bug #436789)
+  - Added _DERIVES_INITIALLY_UNOWNED to sink floating 
+  references in constructor of classes that wrap 
+  GInitiallyUnowned-derived GTypes. Plus _INITIALLY_UNOWNED_SINK 
+  for hand-written constructors.
+  (Murray Cumming)
+* Build:
+- Fix build for glib 2.15 by including 
+  gtestutils.h instead of gmessages.h to get g_assert(), 
+  though I am angry that this API break has been allowed.
+  (Murray Cumming)
+- Fix build for pre-releases of gcc 4.3 - also an include 
+  issue. (Sebastien Bacher, #498438)
+
+2.14.2:
+
+* Build: Hopefully fix the build on NetBSD-4.99.6/amd64.
+  Bug #386990. (was already in 2.12.7) (Murray Cumming)
+* gmmproc: Added support for the new _CONFIGINCLUDE() macro.
+  (Armin Burgmeier)
+
+2.14.1:
+
+* Glib::wrap(): Don't fail when wrapping an interface that 
+  is implemented by an unrecognized type.
+  gmmproc-generated code now uses the new wrap_auto_interface(), 
+  so newly-generated source code will require this latest glibmm 
+  version.
+* Increase version number check for glib.
+  (Rémi Cardona)
+
+2.14:
+
+Changes sinze 2.12:
+
+* New Regex class, allowing string searching with regular expressions.
+  (Murray Cumming, Daniel Elstner)
+* New KeyFile class.
+  (Rob Page, Jonathan Jongsma, Murray Cumming)
+* Main: Added SignalTimeout::connect_seconds().
+  (Murray Cumming)
+* OptionContext: Added get/set_summary(), get/set_description(), 
+  set_translation_domain() and set_translate_func().
+  (Jonathan Jongsma)
+* Added Glib::get_user_special_dir(), get_user_data_dir(),
+  get_user_config_dir(), and get_user_cache_dir().
+  (Jonathan Jongsma, Murray Cumming)
+* Improved documentation.
+  (Johannes Schmid, Jonathan Jongsma, Ralf Stephan)
+
+2.14.0:
+
+* Regex:
+  - Add escape_string().
+  - match_full(): Rename to match().
+  - match_all_full(): Rename to match_all().
+  - split_full(): Rename to split().
+
 2.13.9:
 
 * KeyFile: Added Added get_double(), set_double(), get_double_list() 
