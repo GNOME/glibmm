@@ -624,38 +624,58 @@ public:
    * @param a1 The argument to substitute for <tt>"%1"</tt>.
    * @return The substituted message string.
    * @throw Glib::ConvertError
+   *
+   * @newin2p16
    */
   template <class T1>
   static inline
   ustring compose(const ustring& fmt, const T1& a1);
 
+  /* See the documentation for compose(const ustring& fmt, const T1& a1).
+   * @newin2p16
+   */
   template <class T1, class T2>
   static inline
   ustring compose(const ustring& fmt, const T1& a1, const T2& a2);
 
+  /* See the documentation for compose(const ustring& fmt, const T1& a1).
+   * @newin2p16
+   */
   template <class T1, class T2, class T3>
   static inline
   ustring compose(const ustring& fmt,
                   const T1& a1, const T2& a2, const T3& a3);
 
+  /* See the documentation for compose(const ustring& fmt, const T1& a1).
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4>
   static inline
   ustring compose(const ustring& fmt,
                   const T1& a1, const T2& a2, const T3& a3,
                   const T4& a4);
 
+  /* See the documentation for compose(const ustring& fmt, const T1& a1).
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4, class T5>
   static inline
   ustring compose(const ustring& fmt,
                   const T1& a1, const T2& a2, const T3& a3,
                   const T4& a4, const T5& a5);
 
+  /* See the documentation for compose(const ustring& fmt, const T1& a1).
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4, class T5, class T6>
   static inline
   ustring compose(const ustring& fmt,
                   const T1& a1, const T2& a2, const T3& a3,
                   const T4& a4, const T5& a5, const T6& a6);
 
+  /* See the documentation for compose(const ustring& fmt, const T1& a1).
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
   static inline
   ustring compose(const ustring& fmt,
@@ -663,6 +683,9 @@ public:
                   const T4& a4, const T5& a5, const T6& a6,
                   const T7& a7);
 
+  /* See the documentation for compose(const ustring& fmt, const T1& a1).
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7, class T8>
   static inline
@@ -671,6 +694,9 @@ public:
                   const T4& a4, const T5& a5, const T6& a6,
                   const T7& a7, const T8& a8);
 
+  /* See the documentation for compose(const ustring& fmt, const T1& a1).
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4, class T5,
             class T6, class T7, class T8, class T9>
   static inline
@@ -706,39 +732,69 @@ public:
    * @param a1 A streamable value or an I/O manipulator.
    * @return The string representation of the argument stream.
    * @throw Glib::ConvertError
+   *
+   * @newin2p16
    */
   template <class T1>
   static inline
   ustring format(const T1& a1);
 
+  /* See the documentation for format(const T1& a1).
+   *
+   * @newin2p16
+   */
   template <class T1, class T2>
   static inline
   ustring format(const T1& a1, const T2& a2);
 
+  /* See the documentation for format(const T1& a1).
+   *
+   * @newin2p16
+   */
   template <class T1, class T2, class T3>
   static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3);
 
+  /* See the documentation for format(const T1& a1).
+   *
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4>
   static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4);
 
+  /* See the documentation for format(const T1& a1).
+   *
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4, class T5>
   static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3,
                  const T4& a4, const T5& a5);
 
+  /* See the documentation for format(const T1& a1).
+   *
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4, class T5, class T6>
   static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3,
                  const T4& a4, const T5& a5, const T6& a6);
 
+  /* See the documentation for format(const T1& a1).
+   *
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7>
   static inline
   ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
                  const T5& a5, const T6& a6, const T7& a7);
 
+  /* See the documentation for format(const T1& a1).
+   *
+   * @newin2p16
+   */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7, class T8>
   static inline
@@ -765,11 +821,11 @@ private:
   template <class T> class Stringify;
   class FormatStream;
 
+  static ustring compose_argv(const ustring& fmt, int argc, const ustring* const* argv);
+
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   std::string string_;
-
-  static ustring compose_argv(const ustring& fmt, int argc, const ustring* const* argv);
 };
 
 
