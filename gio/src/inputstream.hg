@@ -1,0 +1,100 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2007 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gio.h>
+
+#include <glibmm/object.h>
+
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio {
+
+class InputStream : public Glib::Object
+{
+  _CLASS_GOBJECT(InputStream, GInputStream, G_INPUT_STREAM, Glib::Object, GObject)
+
+public:
+  // I think it's ok to pass Cancellables as const as internally they
+  // are used only by g_push/pop_current_cancellable (markoa)
+  // Btw all cancellable parameters are optional - TODO see how that
+  // should translate here (overloads for all?).
+  _WRAP_METHOD(gssize read(void* buffer,
+                           gsize count,
+                           const Glib::RefPtr<Cancellable>& cancellable),
+               g_input_stream_read,
+               errthrow)
+
+  _WRAP_METHOD(bool read_all(void* buffer,
+                             gsize count,
+                             gsize& bytes_read,
+                             const Glib::RefPtr<Cancellable>& cancellable),
+               g_input_stream_read_all,
+               errthrow)
+
+  _WRAP_METHOD(gssize skip(gsize count,
+                           const Glib::RefPtr<Cancellable>& cancellable),
+               g_input_stream_skip,
+               errthrow)
+
+  _WRAP_METHOD(bool close(const Glib::RefPtr<Cancellable>& cancellable),
+               g_input_stream_close,
+               errthrow)
+
+  _IGNORE(g_input_stream_read_async)
+
+  void read_async(void* buffer,
+                  gsize count,
+                  int io_priority,
+                  Glib::RefPtr<Cancellable>& cancellable,
+                  const SlotAsyncReady& slot);
+
+  _WRAP_METHOD(gssize read_finish(Glib::RefPtr<AsyncResult>& result),
+               g_input_stream_read_finish,
+               errthrow)
+
+  _IGNORE(g_input_stream_skip_async)
+  void skip_async(gsize count,
+                  int io_priority,
+                  Glib::RefPtr<Cancellable>& cancellable,
+                  const SlotAsyncReady& slot);
+
+  _WRAP_METHOD(gssize skip_finish(Glib::RefPtr<AsyncResult>& result),
+               g_input_stream_skip_finish,
+               errthrow)
+
+  _IGNORE(g_input_stream_close_async)
+  void close_async(int io_priority,
+                   Glib::RefPtr<Cancellable>& cancellable,
+                   const SlotAsyncReady& slot);
+
+  _WRAP_METHOD(gboolean close_finish(Glib::RefPtr<AsyncResult>& result),
+               g_input_stream_close_finish,
+               errthrow)
+
+  // These are private inside the module (for implementations)
+  _IGNORE(g_input_stream_has_pending,
+          g_input_stream_is_closed,
+          g_input_stream_set_pending)
+};
+
+} // namespace Gio
