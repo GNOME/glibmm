@@ -115,6 +115,7 @@ public:
    */
   void connect_property_changed(const Glib::ustring& property_name, const sigc::slot<void>& slot);
 
+  //TODO: Why are these virtual?
   /** Increment the reference count for this object.
    * You should never need to do this manually - use the object via a RefPtr instead.
    */
