@@ -32,6 +32,19 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
+//TODO: Consider wrapping this like a std::iterator (or at least renaming it), though the asyncness probably makes that unsuitable.
+
+/** Enumerated Files Routines.
+ * FileEnumerator allows you to operate on a set of Gio::Files, returning a Gio::FileInfo instance for each file enumerated 
+ * (e.g. Gio::File::enumerate_children() will return a FileEnumerator for each of the children within a directory).
+ *
+ * To get the next file's information from a Gio::FileEnumerator, use next_file() or its asynchronous version, next_file_async(). 
+ * Note that the asynchronous version will return a list of Gio::FileInfos, whereas the synchronous version will only return the next 
+ * file in the enumerator.
+ *
+ * To close a Gio::FileEnumerator, use FileEnumerator::close(), or its asynchronous version, close_async(). Once a FileEnumerator is closed, 
+ * no further actions may be performed on it.
+ */
 class FileEnumerator : public Glib::Object
 {
   _CLASS_GOBJECT(FileEnumerator, GFileEnumerator, G_FILE_ENUMERATOR, Glib::Object, GObject)
@@ -45,15 +58,47 @@ public:
                g_file_enumerator_close,
                errthrow)
 
-  _IGNORE(g_file_enumerator_next_files_async)
+
+  /** Request information for a number of files from the enumerator asynchronously. 
+   * When all I/O for the operation is finished the callback slot will be called with the requested information.
+   *
+   * The callback could be called with less than num_files files in case of error or at the end of the enumerator. 
+   * In case of a partial error the callback will be called with any succeeding items and no error, and on the next request the error will be reported. 
+   * If a request is cancelled the callback will be called with ERROR_CANCELLED.
+   *
+   * During an async request no other sync and async calls are allowed, and will result in ERROR_PENDING errors.
+   *
+   * Any outstanding I/O request with higher priority (lower numerical value) will be executed before an outstanding request with lower priority. 
+   * The default priority is PRIORITY_DEFAULT.
+   * @param num_files The number of file info objects to request.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable An cancellable object which can be used to cancel the request.
+   * @param slot A callback to call when the request is satisfied.
+   */
   void next_files_async(int num_files,
                         int io_priority,
                         const Glib::RefPtr<Cancellable>& cancellable,
                         const SlotAsyncReady& slot);
 
+  /** Request information for a number of files from the enumerator asynchronously. 
+   * When all I/O for the operation is finished the callback slot will be called with the requested information.
+   *
+   * The callback could be called with less than num_files files in case of error or at the end of the enumerator. 
+   * In case of a partial error the callback will be called with any succeeding items and no error, and on the next request the error will be reported. 
+   * If a request is cancelled the callback will be called with ERROR_CANCELLED.
+   *
+   * During an async request no other sync and async calls are allowed, and will result in ERROR_PENDING errors.
+   *
+   * Any outstanding I/O request with higher priority (lower numerical value) will be executed before an outstanding request with lower priority. 
+   * The default priority is PRIORITY_DEFAULT.
+   * @param num_files The number of file info objects to request.
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback to call when the request is satisfied.
+   */
   void next_files_async(int num_files,
                         int io_priority,
                         const SlotAsyncReady& slot);
+  _IGNORE(g_file_enumerator_next_files_async)
 
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<FileInfo> > next_files_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_enumerator_next_files_finish,
@@ -61,13 +106,23 @@ public:
   //TODO: next_files_finish: what does the resulting list contain?
   // FileInfo
 
-  _IGNORE(g_file_enumerator_close_async)
-  void close_async(int io_priority,
-                   const Glib::RefPtr<Cancellable>& cancellable,
-                   const SlotAsyncReady& slot);
 
-  void close_async(int io_priority,
-                   const SlotAsyncReady& slot);
+
+  /** Asynchronously closes the file enumerator.
+   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * If the operation was cancelled, the error ERROR_CANCELLED will be returned in close_finish().
+   *
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback to call when the request is satisfied.
+   */
+  void close_async(int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+
+  /** Asynchronously closes the file enumerator.
+   *
+   * @param io_priority The I/O priority of the request.
+   */
+  void close_async(int io_priority, const SlotAsyncReady& slot);
+  _IGNORE(g_file_enumerator_close_async)
 
   _WRAP_METHOD(bool close_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_enumerator_close_finish,

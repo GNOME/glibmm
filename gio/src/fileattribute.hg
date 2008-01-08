@@ -26,11 +26,16 @@ _DEFS(giomm,gio)
 namespace Gio
 {
 
+//TODO: Fix the need for NO_GTYPE.
 _WRAP_ENUM(FileAttributeType, GFileAttributeType, NO_GTYPE)
-_WRAP_ENUM(FileAttributeFlags, GFileAttributeFlags, NO_GTYPE)
+_WRAP_ENUM(FileAttributeInfoFlags, GFileAttributeInfoFlags, NO_GTYPE)
 _WRAP_ENUM(FileAttributeStatus, GFileAttributeStatus, NO_GTYPE)
 
 // GFileAttributeInfo struct hand-wrapped
+// TODO: Use _CLASS_GENERIC?
+
+/** Information about a specific attribute - see FileAttributeInfoList.
+ */
 class FileAttributeInfo
 {
 public:
@@ -43,14 +48,35 @@ public:
 
   std::string get_name() const;
   FileAttributeType get_type() const;
-  FileAttributeFlags get_flags() const;
+  FileAttributeInfoFlags get_flags() const;
 
 protected:
   std::string m_name;
   FileAttributeType m_type;
-  FileAttributeFlags m_flags;
+  FileAttributeInfoFlags m_flags;
 };
 
+
+/** Key-Value paired file attributes.
+ * File attributes in GIO consist of a list of key-value pairs.
+ *
+ * Keys are strings that contain a key namespace and a key name, separated by a colon, e.g. "namespace:keyname". 
+ * Namespaces are included to sort key-value pairs by namespaces for relevance. Keys can be retreived using wildcards, 
+ * e.g. "standard::*" will return all of the keys in the "standard" namespace.
+ *
+ * Values are stored within the list in Gio::FileAttributeValue structures. Values can store different types, listed in the enum 
+ * Gio::FileAttributeType. Upon creation of a Gio::FileAttributeValue, the type will be set to Gio::FILE_ATTRIBUTE_TYPE_INVALID.
+ *
+ * The list of possible attributes for a filesystem (pointed to by a Gio::File) is availible as a Gio::FileAttributeInfoList. 
+ * This list is queryable by key names as indicated earlier.
+ *
+ * Classes that implement Gio::FileIface will create a Gio::FileAttributeInfoList and install default keys and values for their given file 
+ * system, architecture, and other possible implementation details (e.g., on a UNIX system, a file attribute key will be registered for 
+ * the user id for a given file).
+ *
+ * See http://library.gnome.org/devel/gio/unstable/gio-GFileAttribute.html for the list of default namespaces and the list of default keys.
+ */
+ */
 class FileAttributeInfoList
 {
   _CLASS_OPAQUE_REFCOUNTED(FileAttributeInfoList, GFileAttributeInfoList,
@@ -58,7 +84,14 @@ class FileAttributeInfoList
                            g_file_attribute_info_list_ref,
                            g_file_attribute_info_list_unref)
 public:
+
+  //TODO: Add FileAttributeInfo::empty() or similar so we can represent a NULL GFileAttributeInfo*.
+  /** Gets the file attribute with the name name from list. 
+   * @param name The name of the attribute to lookup.
+   * @result A FileAttributeInfo for the name.
+   */
   FileAttributeInfo lookup(const std::string& name) const;
+
   /*TODO: conversion missing
   _WRAP_METHOD(void add(const std::string& name, FileAttributeType type, FileAttributeInfoFlags flags),
                g_file_attribute_info_list_add)

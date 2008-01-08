@@ -41,6 +41,7 @@ _WRAP_GERROR(OptionError, GOptionError, G_OPTION_ERROR, NO_GTYPE)
 class OptionContext
 {
   _CLASS_GENERIC(OptionContext, GOptionContext)
+  _IGNORE(g_option_context_free)
 public:
 
   /** Creates a new option context.
@@ -87,6 +88,11 @@ public:
   //const OptionGroup& get_main_group() const;
   _IGNORE(g_option_context_get_main_group)
 
+  #m4 _CONVERSION(`const OptionGroup&',`GOptionGroup*',`const_cast<GOptionGroup*>(($3).gobj())')
+  _WRAP_METHOD(Glib::ustring get_help(bool main_help, const OptionGroup& group) const, g_option_context_get_help)
+ 
+  //TODO: Documentation.
+  Glib::ustring get_help(bool main_help = true) const;
 
   GOptionContext*       gobj()       { return gobject_; }
   const GOptionContext* gobj() const { return gobject_; }

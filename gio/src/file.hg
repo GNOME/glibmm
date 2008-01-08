@@ -41,6 +41,28 @@ _WRAP_ENUM(FileCreateFlags, GFileCreateFlags, NO_GTYPE)
 _WRAP_ENUM(FileCopyFlags, GFileCopyFlags, NO_GTYPE)
 _WRAP_ENUM(FileMonitorFlags, GFileMonitorFlags, NO_GTYPE)
 
+/** File and directory handling.
+ * Gio::File is a high level abstraction for manipulating files on a virtual file system. Gio::Files are lightweight, immutable objects that do no 
+ * I/O upon creation. It is necessary to understand that a Gio::File object does not represent a file, merely a handle to a file. All file I/O is 
+ * implemented as streaming operations (see Gio::InputStream and Gio::OutputStream).
+ *
+ * A GioFile can be constructed from a path, URI, or a command line argument.
+ *
+ * You can move through the filesystem with Gio::File handles with get_parent() to get a handle to the parent directory, 
+ * get_child() to get a handle to a child within a directory, and resolve_relative_path() to resolve a relative path between two Gio::Files.
+ *
+ * Many Gio::File operations have both synchronous and asynchronous versions to suit your application. Asynchronous versions of synchronous 
+ * functions simply have _async() appended to their function names. The asynchronous I/O functions call a SlotAsyncReady callback slot which is 
+ * then used to finalize the operation, producing a AsyncResult which is then passed to the function's matching _finish() operation.
+ *
+ * Some Gio::File operations do not have synchronous analogs, as they may take a very long time to finish, and blocking may leave an application 
+ * unusable. Notable cases include: mount_mountable() to mount a mountable file, unmount_mountable() to unmount a mountable file, 
+ * and eject_mountable() to eject a mountable file.
+ * 
+ * One notable feature of Gio::Files are entity tags, or "etags" for short. Entity tags are somewhat like a more abstract version of the 
+ * traditional mtime, and can be used to quickly determine if the file has been modified from the version on the file system. 
+ * See the HTTP 1.1 specification for HTTP Etag headers, which are a very similar concept.
+ */ 
 class File : public Glib::Interface
 {
   _CLASS_INTERFACE(File, GFile, G_FILE, GFileIface)
@@ -50,6 +72,8 @@ public:
   _IGNORE(g_file_new_for_uri)
   _IGNORE(g_file_new_for_commandline_arg)
   _IGNORE(g_file_parse_name)
+
+//TODO: Documentation for the methods.
 
   // Although this is an interface, it is possible to create objects using
   // its static create* members. In the implementation, these would lead
