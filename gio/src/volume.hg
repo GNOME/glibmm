@@ -29,7 +29,8 @@
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
 
-namespace Gio {
+namespace Gio
+{
 
 // Making a forward declaration here to avoid circular dependency.
 // file.hg already includes volume.h.
@@ -40,44 +41,36 @@ class Volume : public Glib::Interface
   _CLASS_INTERFACE(Volume, GVolume, G_DRIVE, GVolumeIface)
 public:
   _WRAP_METHOD(std::string get_name() const, g_volume_get_name)
-
   _WRAP_METHOD(std::string get_uuid() const, g_volume_get_uuid)
 
   _WRAP_METHOD(Glib::RefPtr<Icon> get_icon(),
                g_volume_get_icon,
                refreturn)
-
-  _WRAP_METHOD(Glib::RefPtr<Icon> get_icon() const,
+  _WRAP_METHOD(Glib::RefPtr<const Icon> get_icon() const,
                g_volume_get_icon,
                refreturn, constversion)
 
   _WRAP_METHOD(Glib::RefPtr<Drive> get_drive(),
                g_volume_get_drive,
                refreturn)
-
-  _WRAP_METHOD(Glib::RefPtr<Drive> get_drive() const,
+  _WRAP_METHOD(Glib::RefPtr<const Drive> get_drive() const,
                g_volume_get_drive,
                refreturn, constversion)
 
   _WRAP_METHOD(bool can_mount() const, g_volume_can_mount)
-
   _WRAP_METHOD(bool can_eject() const, g_volume_can_eject)
 
-   _IGNORE(g_volume_mount)
-  void mount(const Glib::RefPtr<MountOperation>& mount_operation,
-             const Glib::RefPtr<Cancellable>& cancellable,
-             const SlotAsyncReady& slot);
+  _IGNORE(g_volume_mount)
+  void mount(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
-  void mount(const Glib::RefPtr<MountOperation>& mount_operation,
-             const SlotAsyncReady& slot);
+  void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot);
 
   _WRAP_METHOD(bool mount_finish(Glib::RefPtr<AsyncResult>& result),
                g_volume_mount_finish,
                errthrow)
 
   _IGNORE(g_volume_eject)
-  void eject(const Glib::RefPtr<Cancellable>& cancellable,
-             const SlotAsyncReady& slot);
+  void eject(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
   void eject(const SlotAsyncReady& slot);
 
