@@ -30,6 +30,15 @@ _PINCLUDE(glibmm/private/inputstream_p.h)
 namespace Gio
 {
 
+//TODO: This implements Seekable.
+
+/** FileInputStream provides input streams that take their content from a file.
+ *
+ * FileInputStream implements Seekable, which allows the input stream to jump to arbitrary positions in the file, 
+ * provided the filesystem of the file allows it. In addition to the generic Seekable API, FileInputStream has its own API 
+ * for seeking and positioning. To find the position of a file input stream, use tell(). To find out if a file input stream supports 
+ * seeking, use can_seek(). To position a file input stream, use seek().
+ */
 class FileInputStream : public InputStream
 {
   _CLASS_GOBJECT(FileInputStream, GFileInputStream, G_FILE_INPUT_STREAM, Glib::InputStream, GInputStream)
@@ -39,11 +48,24 @@ public:
                g_file_input_stream_query_info,
                errthrow)
 
-  _IGNORE(g_file_input_stream_query_info_async)
+
+  /** Queries the stream information asynchronously. For the synchronous version of this function, see query_info().
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be set.
+   *
+   * When the operation is finished, @a slot will be called. You can then call query_info_finish() to get the result of the operation.
+   *
+   * @param attributes A file attribute query string.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void query_info_async(const std::string& attributes,
                         int io_priority,
                         Glib::RefPtr<Cancellable>& cancellable,
                         const SlotAsyncReady& slot);
+  _IGNORE(g_file_input_stream_query_info_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileInfo> query_info_finish(Glib::RefPtr<AsyncResult>& result),
                g_file_input_stream_query_info_finish,
@@ -51,9 +73,22 @@ public:
 
   _WRAP_METHOD(goffset tell() const, g_file_input_stream_tell)
   _WRAP_METHOD(bool can_seek() const, g_file_input_stream_can_seek)
+
   _WRAP_METHOD(bool seek(goffset offset, Glib::SeekType type, const Glib::RefPtr<Cancellable>& cancellable),
                g_file_input_stream_seek,
                errthrow)
+
+  /** Seeks in the file input stream.
+   * 
+   * @param offset An offset to seek.
+   * @param type A SeekType.
+   * @result true if the stream was successfully seeked to the position. false on error. 
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool FileInputStream::seek(goffset offset, Glib::SeekType type)
+  #else
+  bool FileInputStream::seek(goffset offset, Glib::SeekType type, std::auto_ptr<Glib::Error>& error)
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 };
 
 } // namespace Gio

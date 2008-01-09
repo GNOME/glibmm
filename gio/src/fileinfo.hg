@@ -35,12 +35,15 @@ _WRAP_ENUM(FileType, GFileType, NO_GTYPE)
 
 //TODO: attribute strings
 
+/** FileAttributeMatcher allows for searching through a FileInfo for attributes.
+ */
 class FileAttributeMatcher
 {
   _CLASS_OPAQUE_REFCOUNTED(FileAttributeMatcher, GFileAttributeMatcher,
                            NONE, g_file_attribute_matcher_ref, g_file_attribute_matcher_unref)
 
 public:
+  //TODO: Documentation.
   static Glib::RefPtr<FileAttributeMatcher> create(const std::string& attributes);
 
   _WRAP_METHOD(bool matches(const std::string& full_name) const, g_file_attribute_matcher_matches)
@@ -49,6 +52,15 @@ public:
   _WRAP_METHOD(std::string enumerate_next(), g_file_attribute_matcher_enumerate_next)
 };
 
+/** FileInfo implements methods for getting information that all files should contain, and allows for manipulation of extended attributes.
+ * See FileAttribute for more information on how GIO handles file attributes.
+ *
+ * To obtain a FileInfo for a File, use File::query_info() (or its async variant).
+ * To obtain a FileInfo for a file input or output stream, use FileInput::stream_query_info() or FileOutput::stream_query_info() 
+ * (or their async variants).
+ *
+ * FileAttributeMatcher allows for searching through a FileInfo for attributes.
+ */
 class FileInfo : public Glib::Object
 {
   _CLASS_GOBJECT(FileInfo, GFileInfo, G_FILE_INFO, Glib::Object, GObject)
@@ -117,7 +129,10 @@ public:
 
   _WRAP_METHOD(std::string get_content_type() const, g_file_info_get_content_type)
   _WRAP_METHOD(goffset get_size() const, g_file_info_get_size)
+
+  //TODO: Change this to a return value?
   _WRAP_METHOD(void get_modification_time(Glib::TimeVal& mtime) const, g_file_info_get_modification_time)
+
   _WRAP_METHOD(std::string get_symlink_target() const, g_file_info_get_symlink_target)
   _WRAP_METHOD(std::string get_etag() const, g_file_info_get_etag)
   _WRAP_METHOD(gint32 get_sort_order() const, g_file_info_get_sort_order)
@@ -138,9 +153,10 @@ public:
 
   // TODO: how can you set size of a file?!
   // In implementation this is just setting a struct field...
+  // See bug #508378. murrayc.
   _WRAP_METHOD(void set_size(goffset size), g_file_info_set_size)
 
-  _WRAP_METHOD(void set_modification_time(Glib::TimeVal& mtime), g_file_info_set_modification_time)
+  _WRAP_METHOD(void set_modification_time(const Glib::TimeVal& mtime), g_file_info_set_modification_time)
   _WRAP_METHOD(void set_symlink_target(const std::string& symlink_target), g_file_info_set_symlink_target)
   _WRAP_METHOD(void set_sort_order(gint32 sort_order), g_file_info_set_sort_order)
 };
