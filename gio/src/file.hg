@@ -80,8 +80,30 @@ public:
   // to functions of the default GVfs implementation, which, in case of
   // this class' create methods, would rely on concrete GFile implementations
   // such as GLocalFile and GDummyFile.
+
+  /** Constructs a File for a given path.
+   * This operation never fails, but the returned object might not support any I/O operation if path is malformed.
+   *
+   * @param path A string containing a relative or absolute path.
+   * @result A new instantiation of an appropriate Gio::File class.
+   */
   static Glib::RefPtr<File> create_for_path(const std::string& path);
+
+  /** Constructs a File for a given URI.
+   * This operation never fails, but the returned object might not support any I/O operation if path is malformed.
+   *
+   * @param uri A string containing a URI.
+   * @result A new instantiation of an appropriate Gio::File class.
+   */
   static Glib::RefPtr<File> create_for_uri(const std::string& uri);
+
+  /** Constructs a File for a given argument from the command line. 
+   * The value of @a arg can be either a URI, an absolute path or a relative path resolved relative to the current working directory. 
+   * This operation never fails, but the returned object might not support any I/O operation if arg points to a malformed path.
+   *
+   * @param arg A string containing a relative or absolute path.
+   * @result A new instantiation of an appropriate Gio::File class.
+   */
   static Glib::RefPtr<File> create_for_commandline_arg(const std::string& arg);
 
   // parse_name is a UTF8-guaranteed "nice" string that can both
@@ -98,6 +120,7 @@ public:
   _WRAP_METHOD(guint hash() const, g_file_hash)
 
   //TODO: Add a comment about why this is virtual:
+  //TODO: Documentation.
   _IGNORE(g_file_equal)
   virtual bool equal(const Glib::RefPtr<File>& other) const;
 
@@ -160,28 +183,92 @@ public:
                g_file_replace,
                refreturn, errthrow)
 
-  _IGNORE(g_file_append_to_async)
+
+  //TODO: Rearrange the parameters (and in all the other similar functions) so we can have default paramter values?
+
+  /** Asynchronously opens the file for appending.
+   * For more details, see append_to() which is the synchronous version of this call.
+   * 
+   * When the operation is finished, @a slot will be called. You can then call append_to_finish() to get the result of the operation.
+   * @param flags a set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void append_to_async(FileCreateFlags flags, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Asynchronously opens the file for appending.
+   * For more details, see append_to() which is the synchronous version of this call.
+   * 
+   * When the operation is finished, @a slot will be called. You can then call append_to_finish() to get the result of the operation.
+   * @param flags a set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void append_to_async(FileCreateFlags flags, int io_priority, const SlotAsyncReady& slot);
+  _IGNORE(g_file_append_to_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> append_to_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_append_to_finish,
                refreturn, errthrow)
 
-  _IGNORE(g_file_create_async)
+
+  //TODO: create() can't be the correct name. murrayc.
+  /** Asynchronously creates a new file and returns an output stream for writing to it. The file must not already exist.
+   * For more details, see create() which is the synchronous version of this call.
+   *
+   * When the operation is finished, @a slot will be called. You can then call create_finish() to get the result of the operation.
+   * 
+   * @param flags a set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void create_async(FileCreateFlags flags, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Asynchronously creates a new file and returns an output stream for writing to it. The file must not already exist.
+   * For more details, see create() which is the synchronous version of this call.
+   *
+   * When the operation is finished, @a slot will be called. You can then call create_finish() to get the result of the operation.
+   * 
+   * @param flags a set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void create_async(FileCreateFlags flags, int io_priority, const SlotAsyncReady& slot);
+  _IGNORE(g_file_create_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_create_finish,
                refreturn, errthrow)
 
-  _IGNORE(g_file_replace_async)
+  //TODO: The etag parameter in g_file_replace_sync() can be NULL (documented in g_file_replace()).
+
+  /** Asyncronously overwrites the file, replacing the contents, possibly creating a backup copy of the file first.
+   * For more details, see replace() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call replace_finish() to get the result of the operation.
+   *
+   * @param etag An entity tag for the current GFile.
+   * @param make_backup true if a backup of the existing file should be made.
+   * @param flags A set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void replace_async(const std::string& etag, bool make_backup, FileCreateFlags flags, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Asyncronously overwrites the file, replacing the contents, possibly creating a backup copy of the file first.
+   * For more details, see replace() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call replace_finish() to get the result of the operation.
+   *
+   * @param etag An entity tag for the current GFile.
+   * @param make_backup true if a backup of the existing file should be made.
+   * @param flags A set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void replace_async(const std::string& etag, bool make_backup, FileCreateFlags flags, int io_priority, const SlotAsyncReady& slot);
+  _IGNORE(g_file_replace_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> replace_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_replace_finish,
@@ -192,8 +279,30 @@ public:
                refreturn, errthrow)
 
   _IGNORE(g_file_query_info_async)
+
+  /** Asynchronously gets the requested information about specified file. The result is a FileInfo object that contains key-value attributes (such as type or size for the file).
+   *
+   * For more details, see query_info(() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call query_info_finish() to get the result of the operation.
+   *
+   * @param attributes An attribute query string.
+   * @param flags A set of FileQueryInfoFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void query_info_async(const std::string& attributes, FileQueryInfoFlags flags, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Asynchronously gets the requested information about specified file. The result is a FileInfo object that contains key-value attributes (such as type or size for the file).
+   *
+   * For more details, see query_info(() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call query_info_finish() to get the result of the operation.
+   *
+   * @param attributes An attribute query string.
+   * @param flags A set of FileQueryInfoFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void query_info_async(const std::string& attributes, FileQueryInfoFlags flags, int io_priority, const SlotAsyncReady& slot);
 
   _WRAP_METHOD(Glib::RefPtr<FileInfo> query_info_finish(const Glib::RefPtr<AsyncResult>& result),
@@ -208,10 +317,33 @@ public:
                g_file_enumerate_children,
                errthrow)
 
-  _IGNORE(g_file_enumerate_children_async)
+
+
+  /** Asynchronously gets the requested information about the files in a directory. The result is a GFileEnumerator object that will give out GFileInfo objects for all the files in the directory.
+   *
+   * For more details, see enumerate_children() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call enumerate_children_finish() to get the result of the operation.
+   *
+   * @param attributes An attribute query string.
+   * @param flags A set of FileQueryInfoFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void enumerate_children_async(const std::string& attributes, FileQueryInfoFlags flags, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Asynchronously gets the requested information about the files in a directory. The result is a GFileEnumerator object that will give out GFileInfo objects for all the files in the directory.
+   *
+   * For more details, see enumerate_children() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call enumerate_children_finish() to get the result of the operation.
+   *
+   * @param attributes An attribute query string.
+   * @param flags A set of FileQueryInfoFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void enumerate_children_async(const std::string& attributes, FileQueryInfoFlags flags, int io_priority, const SlotAsyncReady& slot);
+  _IGNORE(g_file_enumerate_children_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileEnumerator> enumerate_children_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_enumerate_children_finish,
@@ -221,10 +353,27 @@ public:
                g_file_set_display_name,
                refreturn, errthrow)
 
-  _IGNORE(g_file_set_display_name_async)
+
+
+  /** Asynchronously sets the display name for a given Gio::File. For the synchronous version of this function, see set_display_name().
+   * When the operation is finished, @a slot will be called. You can then call set_display_name_finish() to get the result of the operation.
+   *
+   * @param display_name A string.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void set_display_name_async(const std::string& display_name, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Asynchronously sets the display name for a given Gio::File. For the synchronous version of this function, see set_display_name().
+   * When the operation is finished, @a slot will be called. You can then call set_display_name_finish() to get the result of the operation.
+   *
+   * @param display_name A string.
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void set_display_name_async(const std::string& display_name, int io_priority, const SlotAsyncReady& slot);
+  _IGNORE(g_file_set_display_name_async)
 
   _WRAP_METHOD(Glib::RefPtr<File> set_display_name_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_set_display_name_finish,
@@ -239,13 +388,13 @@ public:
                g_file_trash,
                errthrow)
 
-  _IGNORE(g_file_copy)
 
   /** A signal handler would be, for instance:
    * void on_file_progress(goffset current_num_bytes, goffset total_num_bytes);
    */
   typedef sigc::slot<void, goffset, goffset> SlotFileProgress;
 
+  //TODO: Documentation:
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileProgress& slot);
 
@@ -255,9 +404,11 @@ public:
 
   bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const SlotFileProgress& slot, std::auto_ptr<Glib::Error>& error);
 #endif // GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_copy)
 
-  _IGNORE(g_file_move)
 
+
+  //TODO: Documentation:
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileProgress& slot);
 
@@ -267,6 +418,7 @@ public:
 
   bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const SlotFileProgress& slot, std::auto_ptr<Glib::Error>& error);
 #endif // GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_move)
 
   _WRAP_METHOD(bool make_directory(const Glib::RefPtr<Cancellable>& cancellable),
                g_file_make_directory,
@@ -288,11 +440,32 @@ public:
                g_file_set_attributes_from_info,
                errthrow)
 
-  _IGNORE(g_file_set_attributes_async)
+
+  /** Asynchronously sets the attributes of file with info.
+   *
+   * For more details, see set_attributes_from_info() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call set_attributes_finish() to get the result of the operation.
+   *
+   * @param info A FileInfo.
+   * @param flags A set of FileQueryInfoFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void set_attributes_async(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Asynchronously sets the attributes of file with info.
+   *
+   * For more details, see set_attributes_from_info() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call set_attributes_finish() to get the result of the operation.
+   *
+   * @param info A FileInfo.
+   * @param flags A set of FileQueryInfoFlags.
+   * @param io_priority The I/O priority of the request.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void set_attributes_async(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags, int io_priority, const SlotAsyncReady& slot);
-
+  _IGNORE(g_file_set_attributes_async)
   _IGNORE(g_file_set_attributes_finish) // takes GFileInfo**
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -325,28 +498,95 @@ public:
                g_file_set_attribute_int64,
                errthrow)
 
-  _IGNORE(g_file_mount_mountable)
+
+  /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance, 
+   * passwords are needed during authentication.
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
+   *
+   * @param mount_operation A MountOperation.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance, 
+   * passwords are needed during authentication.
+   *
+   * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
+   *
+   * @param mount_operation A MountOperation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot);
+
+  /** Mounts a file of type FILE_TYPE_MOUNTABLE without user interaction.
+   *
+   * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
+  void mount_mountable(const SlotAsyncReady& slot);
+  _IGNORE(g_file_mount_mountable)
 
   _WRAP_METHOD(Glib::RefPtr<File> mount_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_mount_mountable_finish,
                refreturn, errthrow)
 
-  _IGNORE(g_file_unmount_mountable)
+  /** Unmounts a file of type FILE_TYPE_MOUNTABLE.
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * When the operation is finished, @a slot will be called. You can then call unmount_mountable_finish() to get the result of the operation.
+   *
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void unmount_mountable(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Unmounts a file of type FILE_TYPE_MOUNTABLE.
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * When the operation is finished, @a slot will be called. You can then call unmount_mountable_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void unmount_mountable(const SlotAsyncReady& slot);
+  _IGNORE(g_file_unmount_mountable)
 
   _WRAP_METHOD(bool unmount_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_unmount_mountable_finish,
                errthrow)
 
-  _IGNORE(g_file_eject_mountable)
+  /** Starts an asynchronous eject on a mountable.
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * When the operation is finished, @a slot will be called. You can then call eject_mountable_finish() to get the result of the operation.
+   *
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void eject_mountable(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
+  /** Starts an asynchronous eject on a mountable.
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * When the operation is finished, @a slot will be called. You can then call eject_mountable_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void eject_mountable(const SlotAsyncReady& slot);
+  _IGNORE(g_file_eject_mountable)
 
   _WRAP_METHOD(bool eject_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_eject_mountable_finish,
@@ -354,6 +594,7 @@ public:
 
   // TODO: g_file_monitor_*
 
+  //TODO: Documentation.
   //TODO: atm I don't understand what's etag_out:
   // "a pointer to the current entity tag for the document" - sounds like it
   // should be kept as char**
@@ -370,17 +611,42 @@ public:
                g_file_load_contents_finish,
                errthrow)
 
-  _IGNORE(g_file_load_partial_contents_async)
-  void load_partial_contents_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
   /** A signal handler would be, for instance:
    * bool on_read_more(const char* file_contents, goffset file_size);
    */
   typedef sigc::slot<bool, const char*, goffset> SlotReadMore;
 
+  //Note that slot_read_more can be NULL but that would not be a useful method overload, because the documentation says that it would 
+  //then be equivalent to load_contents_async.
+
+  /** Reads the partial contents of a file.
+   * The @a slot_read_more callback slot should be used to stop reading from the file when appropriate. This operation can be finished by load_partial_contents_finish().
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * When the operation is finished, @a slot will be called. You can then call load_partial_contents_finish() to get the result of the operation.
+   *
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot_read_more A callback to receive partial data and to specify whether further data should be read.
+   * @param slot_async_ready A callback slot which will be called when the request is satisfied.
+   */
   void load_partial_contents_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotReadMore& slot_read_more, const SlotAsyncReady& slot_async_ready);
 
+  /** Reads the partial contents of a file.
+   * The @a slot_read_more callback slot should be used to stop reading from the file when appropriate. This operation can be finished by load_partial_contents_finish().
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * When the operation is finished, @a slot will be called. You can then call load_partial_contents_finish() to get the result of the operation.
+   *
+   * @param slot_read_more A callback to receive partial data and to specify whether further data should be read.
+   * @param slot_async_ready A callback slot which will be called when the request is satisfied.
+   */
   void load_partial_contents_async(const SlotReadMore& slot_read_more, const SlotAsyncReady& slot_async_ready);
+  _IGNORE(g_file_load_partial_contents_async)
 
   //TODO: atm I don't understand what's etag_out:
   // "a pointer to the current entity tag for the document" - sounds like it

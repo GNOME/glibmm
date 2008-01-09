@@ -693,6 +693,21 @@ File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation,
 }
 
 void
+File::mount_mountable(const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_mount_mountable(gobj(),
+                         NULL,
+                         NULL,
+                         &SignalProxy_async_callback,
+                         slot_copy);
+}
+
+void
 File::unmount_mountable(const Glib::RefPtr<Cancellable>& cancellable,
                         const SlotAsyncReady& slot)
 {
