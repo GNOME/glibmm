@@ -18,3 +18,74 @@
  */
 
 #include <gio/gio.h>
+
+namespace Gio
+{
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<AppInfo>
+AppInfo::create_from_commandline(const std::string& commandline,
+                                 const std::string& application_name,
+                                 AppInfoCreateFlags flags)
+#else
+Glib::RefPtr<AppInfo>
+AppInfo::create_from_commandline(const std::string& commandline,
+                                 const std::string& application_name,
+                                 AppInfoCreateFlags flags,
+                                 std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GAppInfo* capp_info = 0;
+  GError* gerror = 0;
+
+  capp_info = g_app_info_create_from_commandline(commandline.c_str(),
+                                                 application_name.c_str(),
+                                                 static_cast<GAppInfoCreateFlags>(flags),
+                                                 &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if (error)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return Glib::wrap(capp_info);
+}
+
+bool AppInfo::equal(const Glib::RefPtr<AppInfo>& other) const
+{
+  return static_cast<bool>(
+    g_app_info_equal(const_cast<GAppInfo*>(this->gobj()),
+                     const_cast<GAppInfo*>(other->gobj())));
+}
+
+Glib::ListHandle< Glib::RefPtr<AppInfo> > AppInfo::get_all()
+{
+  return Glib::ListHandle< Glib::RefPtr<AppInfo> >(g_app_info_get_all(), Glib::OWNERSHIP_SHALLOW);
+}
+
+Glib::ListHandle< Glib::RefPtr<AppInfo> > AppInfo::get_all_for_type(const std::string& content_type)
+{
+  return Glib::ListHandle< Glib::RefPtr<AppInfo> >(
+    g_app_info_get_all_for_type(content_type.c_str()), Glib::OWNERSHIP_SHALLOW);
+}
+
+Glib::RefPtr<AppInfo> AppInfo::get_default_for_type(const std::string& content_type,
+                                                    bool must_support_uris)
+{
+  GAppInfo* cinfo = 0;
+  cinfo = g_app_info_get_default_for_type(content_type.c_str(),
+                                          static_cast<gboolean>(must_support_uris));
+  return Glib::wrap(cinfo);
+}
+
+Glib::RefPtr<AppInfo> AppInfo::get_default_for_uri_scheme(const std::string& uri_scheme)
+{
+  GAppInfo* cinfo = 0;
+  cinfo = g_app_info_get_default_for_uri_scheme(uri_scheme.c_str());
+  return Glib::wrap(cinfo);
+}
+
+} // namespace Gio

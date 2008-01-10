@@ -36,6 +36,7 @@ _CONV_ENUM(G,FileMonitorFlags)
 _CONV_ENUM(G,FileQueryInfoFlags)
 _CONV_ENUM(G,FileType)
 _CONV_ENUM(G,OutputStreamSpliceFlags)
+_CONV_ENUM(G,AppInfoCreateFlags)
 
 _CONVERSION(`gunichar&',`gunichar*',`&($3)')
 _CONVERSION(`gsize&',`gsize*',`&($3)')
@@ -82,6 +83,12 @@ _CONVERSION(`const GValue*', `const Glib::ValueBase&', `*reinterpret_cast<const 
 
 _CONVERSION(`OptionGroup&',`GOptionGroup*',`($3).gobj()')
 #_CONVERSION(`GOptionGroup*',`OptionGroup',`Glib::wrap(($3), true /* take_copy */)')
+
+# AppInfo
+_CONVERSION(`GAppInfo*',`Glib::RefPtr<AppInfo>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
+_CONVERSION(`const Glib::RefPtr<AppLaunchContext>&',`GAppLaunchContext*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<AppInfo>&',`GAppInfo*',__CONVERT_REFPTR_TO_P)
 
 # AsyncResult
 _CONVERSION(`Glib::RefPtr<Glib::Object>',`GObject*',__CONVERT_REFPTR_TO_P)
