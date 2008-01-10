@@ -25,8 +25,28 @@ int main (int argc, char** argv)
 {
   g_type_init ();
 
-//  std::cout << get_defs(G_TYPE_FILE)
-//            << std::endl;
-   
+  std::cout << get_defs(G_TYPE_ASYNC_RESULT)
+            << get_defs(G_TYPE_CANCELLABLE)
+            << get_defs(G_TYPE_DRIVE)
+            << get_defs(G_TYPE_FILE)
+            << get_defs(G_TYPE_FILE_ENUMERATOR)
+            << get_defs(G_TYPE_FILE_INFO)
+            << get_defs(G_TYPE_FILE_ICON)
+//            << get_defs(G_TYPE_FILE_ATTRIBUTE_INFO_LIST)
+//            << get_defs(G_TYPE_FILE_ATTRIBUTE_MATCHER)
+            << get_defs(G_TYPE_FILE_INPUT_STREAM)
+            << get_defs(G_TYPE_FILE_OUTPUT_STREAM)
+
+            << get_defs(G_TYPE_INPUT_STREAM)
+            << get_defs(G_TYPE_LOADABLE_ICON)
+            << get_defs(G_TYPE_MOUNT_OPERATION)
+            << get_defs(G_TYPE_SIMPLE_ASYNC_RESULT)
+
+            //TODO: This causes a g_warning:
+            //GLib-GObject-CRITICAL **: g_param_spec_pool_list: assertion `pool != NULL' failed"
+            << get_defs(G_TYPE_VOLUME)
+
+            << std::endl;
+  
   return 0;
 }

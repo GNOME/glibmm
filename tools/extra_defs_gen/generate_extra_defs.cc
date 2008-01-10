@@ -35,13 +35,30 @@ std::string get_properties(GType gtype)
     GObjectClass* pGClass = G_OBJECT_CLASS(g_type_class_ref(gtype));
     ppParamSpec = g_object_class_list_properties (pGClass, &iCount);
     g_type_class_unref(pGClass);
+
+    if(!ppParamSpec)
+    {
+      strResult += ";; Warning: g_object_class_list_properties() returned NULL for " + std::string(g_type_name(gtype)) + "\n";
+    }
   }
   else if (G_TYPE_IS_INTERFACE(gtype))
   {
     gpointer pGInterface = g_type_default_interface_ref(gtype);
-    ppParamSpec = g_object_interface_list_properties(pGInterface, &iCount);
-    g_type_default_interface_unref(pGInterface);
+    if(pGInterface) //We check because this fails for G_TYPE_VOLUME, for some reason.
+    {
+      ppParamSpec = g_object_interface_list_properties(pGInterface, &iCount);
+      g_type_default_interface_unref(pGInterface);
+
+      if(!ppParamSpec)
+      {
+        strResult +=  ";; Warning: g_object_interface_list_properties() returned NULL for " + std::string(g_type_name(gtype)) + "\n";
+      }
+    }
   }
+
+  //This extra check avoids an occasional crash, for instance for GVolume
+  if(!ppParamSpec)
+    iCount = 0;
 
   for(guint i = 0; i < iCount; i++)
   {
