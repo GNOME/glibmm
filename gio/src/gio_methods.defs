@@ -92,27 +92,6 @@
   (gtype-id "G_TYPE_LOADABLE_ICON")
 )
 
-(define-object DirectoryMonitor
-  (in-module "GLocal")
-  (parent "GFileMonitor")
-  (c-name "GLocalDirectoryMonitor")
-  (gtype-id "G_TYPE_LOCAL_DIRECTORY_MONITOR")
-)
-
-(define-object FileInputStream
-  (in-module "GLocal")
-  (parent "GFileInputStream")
-  (c-name "GLocalFileInputStream")
-  (gtype-id "G_TYPE_LOCAL_FILE_INPUT_STREAM")
-)
-
-(define-object FileMonitor
-  (in-module "GLocal")
-  (parent "GFileMonitor")
-  (c-name "GLocalFileMonitor")
-  (gtype-id "G_TYPE_LOCAL_FILE_MONITOR")
-)
-
 (define-object InputStream
   (in-module "GMemory")
   (parent "GInputStream")
@@ -168,31 +147,10 @@
   (gtype-id "G_TYPE_FILE_OUTPUT_STREAM")
 )
 
-(define-object FileOutputStream
-  (in-module "GLocal")
-  (parent "GFileOutputStream")
-  (c-name "GLocalFileOutputStream")
-  (gtype-id "G_TYPE_LOCAL_FILE_OUTPUT_STREAM")
-)
-
 (define-object e
   (in-module "GSeekabl")
   (c-name "GSeekable")
   (gtype-id "G_TYPE_SEEKABLE")
-)
-
-(define-object InputStream
-  (in-module "GUnix")
-  (parent "GInputStream")
-  (c-name "GUnixInputStream")
-  (gtype-id "G_TYPE_UNIX_INPUT_STREAM")
-)
-
-(define-object OutputStream
-  (in-module "GUnix")
-  (parent "GOutputStream")
-  (c-name "GUnixOutputStream")
-  (gtype-id "G_TYPE_UNIX_OUTPUT_STREAM")
 )
 
 (define-object s
@@ -443,6 +401,17 @@
   )
 )
 
+(define-enum OperationResult
+  (in-module "GMount")
+  (c-name "GMountOperationResult")
+  (gtype-id "G_TYPE_MOUNT_OPERATION_RESULT")
+  (values
+    '("handled" "G_MOUNT_OPERATION_HANDLED")
+    '("aborted" "G_MOUNT_OPERATION_ABORTED")
+    '("unhandled" "G_MOUNT_OPERATION_UNHANDLED")
+  )
+)
+
 (define-flags StreamSpliceFlags
   (in-module "GOutput")
   (c-name "GOutputStreamSpliceFlags")
@@ -673,10 +642,6 @@
     '("const-char*" "startup_notify_id")
   )
 )
-
-
-
-;; From gasynchelper.h
 
 
 
@@ -1013,10 +978,6 @@
 
 
 
-;; From gcontenttypeprivate.h
-
-
-
 ;; From gdatainputstream.h
 
 (define-function g_data_input_stream_get_type
@@ -1279,46 +1240,6 @@
 
 
 
-;; From gdesktopappinfo.h
-
-(define-function g_desktop_app_info_get_type
-  (c-name "g_desktop_app_info_get_type")
-  (return-type "GType")
-)
-
-(define-function g_desktop_app_info_new_from_filename
-  (c-name "g_desktop_app_info_new_from_filename")
-  (return-type "GDesktopAppInfo*")
-  (parameters
-    '("const-char*" "filename")
-  )
-)
-
-(define-function g_desktop_app_info_new
-  (c-name "g_desktop_app_info_new")
-  (is-constructor-of "GDesktopAppInfo")
-  (return-type "GDesktopAppInfo*")
-  (parameters
-    '("const-char*" "desktop_id")
-  )
-)
-
-(define-method get_is_hidden
-  (of-object "GDesktopAppInfo")
-  (c-name "g_desktop_app_info_get_is_hidden")
-  (return-type "gboolean")
-)
-
-(define-function g_desktop_app_info_set_desktop_env
-  (c-name "g_desktop_app_info_set_desktop_env")
-  (return-type "none")
-  (parameters
-    '("const-char*" "desktop_env")
-  )
-)
-
-
-
 ;; From gdrive.h
 
 (define-function g_drive_get_type
@@ -1425,10 +1346,6 @@
 
 
 
-;; From gdummyfile.h
-
-
-
 ;; From gfileattribute.h
 
 (define-function g_file_attribute_info_list_new
@@ -1474,10 +1391,6 @@
     '("GFileAttributeInfoFlags" "flags")
   )
 )
-
-
-
-;; From gfileattribute-priv.h
 
 
 
@@ -3442,10 +3355,6 @@
 
 
 
-;; From gioalias.h
-
-
-
 ;; From gioenumtypes.h
 
 (define-function g_app_info_create_flags_get_type
@@ -3528,6 +3437,11 @@
   (return-type "GType")
 )
 
+(define-function g_mount_operation_result_get_type
+  (c-name "g_mount_operation_result_get_type")
+  (return-type "GType")
+)
+
 (define-function g_output_stream_splice_flags_get_type
   (c-name "g_output_stream_splice_flags_get_type")
   (return-type "GType")
@@ -3553,10 +3467,6 @@
 
 
 ;; From gio.h
-
-
-
-;; From gio-marshal.h
 
 
 
@@ -3595,10 +3505,6 @@
   (c-name "g_io_module_unload")
   (return-type "none")
 )
-
-
-
-;; From giomodule-priv.h
 
 
 
@@ -3686,48 +3592,6 @@
     '("GError**" "error")
   )
 )
-
-
-
-;; From glocaldirectorymonitor.h
-
-(define-function g_local_directory_monitor_get_type
-  (c-name "g_local_directory_monitor_get_type")
-  (return-type "GType")
-)
-
-
-
-;; From glocalfileenumerator.h
-
-
-
-;; From glocalfile.h
-
-
-
-;; From glocalfileinfo.h
-
-
-
-;; From glocalfileinputstream.h
-
-
-
-;; From glocalfilemonitor.h
-
-(define-function g_local_file_monitor_get_type
-  (c-name "g_local_file_monitor_get_type")
-  (return-type "GType")
-)
-
-
-
-;; From glocalfileoutputstream.h
-
-
-
-;; From glocalvfs.h
 
 
 
@@ -4031,13 +3895,9 @@
   (c-name "g_mount_operation_reply")
   (return-type "none")
   (parameters
-    '("gboolean" "abort")
+    '("GMountOperationResult" "result")
   )
 )
-
-
-
-;; From gmountprivate.h
 
 
 
@@ -4232,10 +4092,6 @@
   (c-name "g_output_stream_clear_pending")
   (return-type "none")
 )
-
-
-
-;; From gpollfilemonitor.h
 
 
 
@@ -4502,6 +4358,14 @@
   )
 )
 
+(define-function g_themed_icon_new_with_default_fallbacks
+  (c-name "g_themed_icon_new_with_default_fallbacks")
+  (return-type "GIcon*")
+  (parameters
+    '("const-char*" "iconname")
+  )
+)
+
 (define-function g_themed_icon_new_from_names
   (c-name "g_themed_icon_new_from_names")
   (return-type "GIcon*")
@@ -4510,274 +4374,6 @@
     '("int" "len")
   )
 )
-
-
-
-;; From gunionvolumemonitor.h
-
-
-
-;; From gunixinputstream.h
-
-(define-function g_unix_input_stream_get_type
-  (c-name "g_unix_input_stream_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_input_stream_new
-  (c-name "g_unix_input_stream_new")
-  (is-constructor-of "GUnixInputStream")
-  (return-type "GInputStream*")
-  (parameters
-    '("int" "fd")
-    '("gboolean" "close_fd_at_close")
-  )
-)
-
-
-
-;; From gunixmount.h
-
-
-
-;; From gunixmounts.h
-
-(define-function g_unix_mount_free
-  (c-name "g_unix_mount_free")
-  (return-type "none")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-method free
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_free")
-  (return-type "none")
-)
-
-(define-function g_unix_mount_compare
-  (c-name "g_unix_mount_compare")
-  (return-type "gint")
-  (parameters
-    '("GUnixMountEntry*" "mount1")
-    '("GUnixMountEntry*" "mount2")
-  )
-)
-
-(define-function g_unix_mount_get_mount_path
-  (c-name "g_unix_mount_get_mount_path")
-  (return-type "const-char*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_get_device_path
-  (c-name "g_unix_mount_get_device_path")
-  (return-type "const-char*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_get_fs_type
-  (c-name "g_unix_mount_get_fs_type")
-  (return-type "const-char*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_is_readonly
-  (c-name "g_unix_mount_is_readonly")
-  (return-type "gboolean")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_is_system_internal
-  (c-name "g_unix_mount_is_system_internal")
-  (return-type "gboolean")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_guess_can_eject
-  (c-name "g_unix_mount_guess_can_eject")
-  (return-type "gboolean")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_guess_name
-  (c-name "g_unix_mount_guess_name")
-  (return-type "char*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_guess_icon
-  (c-name "g_unix_mount_guess_icon")
-  (return-type "GIcon*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-method compare
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_compare")
-  (return-type "gint")
-  (parameters
-    '("GUnixMountPoint*" "mount2")
-  )
-)
-
-(define-method get_mount_path
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_get_mount_path")
-  (return-type "const-char*")
-)
-
-(define-method get_device_path
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_get_device_path")
-  (return-type "const-char*")
-)
-
-(define-method get_fs_type
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_get_fs_type")
-  (return-type "const-char*")
-)
-
-(define-method is_readonly
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_is_readonly")
-  (return-type "gboolean")
-)
-
-(define-method is_user_mountable
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_is_user_mountable")
-  (return-type "gboolean")
-)
-
-(define-method is_loopback
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_is_loopback")
-  (return-type "gboolean")
-)
-
-(define-method guess_can_eject
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_guess_can_eject")
-  (return-type "gboolean")
-)
-
-(define-method guess_name
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_guess_name")
-  (return-type "char*")
-)
-
-(define-method guess_icon
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_guess_icon")
-  (return-type "GIcon*")
-)
-
-(define-function g_unix_mount_points_get
-  (c-name "g_unix_mount_points_get")
-  (return-type "GList*")
-  (parameters
-    '("guint64*" "time_read")
-  )
-)
-
-(define-function g_unix_mounts_get
-  (c-name "g_unix_mounts_get")
-  (return-type "GList*")
-  (parameters
-    '("guint64*" "time_read")
-  )
-)
-
-(define-function g_unix_mount_at
-  (c-name "g_unix_mount_at")
-  (return-type "GUnixMountEntry*")
-  (parameters
-    '("const-char*" "mount_path")
-    '("guint64*" "time_read")
-  )
-)
-
-(define-function g_unix_mounts_changed_since
-  (c-name "g_unix_mounts_changed_since")
-  (return-type "gboolean")
-  (parameters
-    '("guint64" "time")
-  )
-)
-
-(define-function g_unix_mount_points_changed_since
-  (c-name "g_unix_mount_points_changed_since")
-  (return-type "gboolean")
-  (parameters
-    '("guint64" "time")
-  )
-)
-
-(define-function g_unix_mount_monitor_get_type
-  (c-name "g_unix_mount_monitor_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_mount_monitor_new
-  (c-name "g_unix_mount_monitor_new")
-  (is-constructor-of "GUnixMountMonitor")
-  (return-type "GUnixMountMonitor*")
-)
-
-(define-function g_unix_is_mount_path_system_internal
-  (c-name "g_unix_is_mount_path_system_internal")
-  (return-type "gboolean")
-  (parameters
-    '("const-char*" "mount_path")
-  )
-)
-
-
-
-;; From gunixoutputstream.h
-
-(define-function g_unix_output_stream_get_type
-  (c-name "g_unix_output_stream_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_output_stream_new
-  (c-name "g_unix_output_stream_new")
-  (is-constructor-of "GUnixOutputStream")
-  (return-type "GOutputStream*")
-  (parameters
-    '("int" "fd")
-    '("gboolean" "close_fd_at_close")
-  )
-)
-
-
-
-;; From gunixvolume.h
-
-
-
-;; From gunixvolumemonitor.h
 
 
 
@@ -4982,15 +4578,6 @@
   (parameters
     '("GMount*" "mount")
   )
-)
-
-
-
-;; From gwin32appinfo.h
-
-(define-function g_win32_app_info_get_type
-  (c-name "g_win32_app_info_get_type")
-  (return-type "GType")
 )
 
 

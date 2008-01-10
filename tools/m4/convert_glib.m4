@@ -27,6 +27,7 @@ _CONV_GLIB_ENUM(RegexCompileFlags)
 _CONV_GLIB_ENUM(RegexMatchFlags)
 
 _CONV_ENUM(G,PasswordSave)
+_CONV_ENUM(G,MountOperationResult)
 _CONV_ENUM(G,FileAttributeType)
 _CONV_ENUM(G,FileAttributeInfoFlags)
 _CONV_ENUM(G,FileCopyFlags)
