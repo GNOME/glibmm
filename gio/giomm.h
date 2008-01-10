@@ -29,7 +29,7 @@
 #include <giomm/fileinfo.h>
 #include <giomm/fileinputstream.h>
 #include <giomm/fileoutputstream.h>
-#include <giomm/icon>
+#include <giomm/icon.h>
 #include <giomm/init.h>
 #include <giomm/inputstream.h>
 #include <giomm/mountoperation.h>
