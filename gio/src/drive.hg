@@ -83,8 +83,17 @@ public:
   void eject(GMountUnmountFlags flags, const SlotAsyncReady& slot);
   _IGNORE(g_drive_eject)
 
-  _WRAP_METHOD(bool eject_finish(Glib::RefPtr<AsyncResult>& result),
+  _WRAP_METHOD(bool eject_finish(const Glib::RefPtr<AsyncResult>& result),
                g_drive_eject_finish,
+               errthrow)
+
+  _IGNORE(g_drive_poll_for_media)
+  void poll_for_media(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+
+  void poll_for_media(const SlotAsyncReady& slot);
+
+  _WRAP_METHOD(bool poll_for_media_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_drive_poll_for_media_finish,
                errthrow)
 
   /* vfuncs */
