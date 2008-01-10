@@ -659,10 +659,8 @@ File::set_attributes_finish(const Glib::RefPtr<AsyncResult>& result,
 
   return res;
 }
-void
-File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation,
-                         const Glib::RefPtr<Cancellable>& cancellable,
-                         const SlotAsyncReady& slot)
+
+void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -676,9 +674,7 @@ File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation,
                          slot_copy);
 }
 
-void
-File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation,
-                      const SlotAsyncReady& slot)
+void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -692,8 +688,7 @@ File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation,
                          slot_copy);
 }
 
-void
-File::mount_mountable(const SlotAsyncReady& slot)
+void File::mount_mountable(const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -707,9 +702,7 @@ File::mount_mountable(const SlotAsyncReady& slot)
                          slot_copy);
 }
 
-void
-File::unmount_mountable(const Glib::RefPtr<Cancellable>& cancellable,
-                        const SlotAsyncReady& slot)
+void File::unmount_mountable(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -717,13 +710,14 @@ File::unmount_mountable(const Glib::RefPtr<Cancellable>& cancellable,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_unmount_mountable(gobj(),
+                           flags, 
                            cancellable->gobj(),
                            &SignalProxy_async_callback,
                            slot_copy);
 }
 
 void
-File::unmount_mountable(const SlotAsyncReady& slot)
+File::unmount_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -731,14 +725,14 @@ File::unmount_mountable(const SlotAsyncReady& slot)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_unmount_mountable(gobj(),
+                           flags, 
                            NULL,
                            &SignalProxy_async_callback,
                            slot_copy);
 }
 
 void
-File::eject_mountable(const Glib::RefPtr<Cancellable>& cancellable,
-                      const SlotAsyncReady& slot)
+File::eject_mountable(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -746,13 +740,14 @@ File::eject_mountable(const Glib::RefPtr<Cancellable>& cancellable,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_eject_mountable(gobj(),
+                         flags, 
                          cancellable->gobj(),
                          &SignalProxy_async_callback,
                          slot_copy);
 }
 
 void
-File::eject_mountable(const SlotAsyncReady& slot)
+File::eject_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -760,6 +755,7 @@ File::eject_mountable(const SlotAsyncReady& slot)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_eject_mountable(gobj(),
+                         flags, 
                          NULL,
                          &SignalProxy_async_callback,
                          slot_copy);

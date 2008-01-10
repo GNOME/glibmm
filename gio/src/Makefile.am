@@ -3,7 +3,7 @@
 
 sublib_name = giomm
 sublib_namespace = Gio
-sublib_parentdir = gio
+sublib_parentdir = giomm
 files_defs = gio.defs gio_methods.defs gio_signals.defs gio_enums.defs \
              gio_docs.xml gio_docs_override.xml
 

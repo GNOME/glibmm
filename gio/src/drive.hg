@@ -61,17 +61,20 @@ public:
   // as these are owned by the volume monitor
 
 
+  //TODO: Use MountUnmountFlags instead of GMountUnmountFlags - we need to wrap some more stuff to see where this should best be declared.
+
   /** Ejects the drive.
+   * @param flags Flags affecting the unmount if required for eject.
    * @param cancellable A cancellable object which can be used to cancel the eject.
    * @param slot A callback which will be called when the eject is completed or canceled.
    */
-  void eject(const Glib::RefPtr<Cancellable>& cancellable,
-             const SlotAsyncReady& slot);
+  void eject(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
   /** Ejects the drive.
+   * @param flags Flags affecting the unmount if required for eject.
    * @param slot A callback which will be called when the eject is completed.
    */
-  void eject(const SlotAsyncReady& slot);
+  void eject(GMountUnmountFlags flags, const SlotAsyncReady& slot);
   _IGNORE(g_drive_eject)
 
   _WRAP_METHOD(bool eject_finish(Glib::RefPtr<AsyncResult>& result),

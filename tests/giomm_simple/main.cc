@@ -1,8 +1,13 @@
+#include <giomm.h>
+#include <iostream>
 
-#include <glibmm.h>
-
-int main(int, char**)
+int main(int argc, char** argv)
 {
+  Glib::init();
+  Gio::init();
+   
+  Glib::RefPtr<Gio::File> file = Gio::File::create_for_path("/home/murrayc/test.txt");
+ 
   return 0;
 }
 

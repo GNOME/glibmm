@@ -18,18 +18,19 @@
  */
 
 #include "init.h"
+
 namespace Gio
 {
 
-void
-init ()
+void init()
 {
-    static bool s_init = false ;
-    if (!s_init) {
-        Glib::init () ;
-        Gio::wrap_init () ;
-        s_init = true ;
-    }
+  static bool s_init = false ;
+  if(!s_init)
+  {
+    Glib::init();
+    Gio::wrap_init();
+    s_init = true;
+  }
 }
 
-}
+} //namespace Gio

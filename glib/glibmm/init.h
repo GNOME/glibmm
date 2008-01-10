@@ -26,7 +26,7 @@ namespace Glib
 
 /** Initialize glibmm.
  * You may call this more than once.
- * You do nott need to call this if you are using Glib::MainLoop or Gtk::Main,
+ * You do not need to call this if you are using Glib::MainLoop or Gtk::Main,
  * because they call it for you.
  */
 void init();
