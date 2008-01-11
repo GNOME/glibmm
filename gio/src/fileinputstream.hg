@@ -19,10 +19,11 @@
 
 #include <gio/gio.h>
 
-#include <glibmm/iochannel.h>
-#include <glibmm/object.h>
 #include <giomm/fileinfo.h>
 #include <giomm/inputstream.h>
+#include <giomm/seekable.h>
+#include <glibmm/iochannel.h>
+#include <glibmm/object.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(giomm/private/inputstream_p.h)
@@ -39,9 +40,12 @@ namespace Gio
  * for seeking and positioning. To find the position of a file input stream, use tell(). To find out if a file input stream supports 
  * seeking, use can_seek(). To position a file input stream, use seek().
  */
-class FileInputStream : public InputStream
+class FileInputStream 
+: public Gio::InputStream, 
+  public Seekable
 {
   _CLASS_GOBJECT(FileInputStream, GFileInputStream, G_FILE_INPUT_STREAM, Gio::InputStream, GInputStream)
+  _IMPLEMENTS_INTERFACE(Seekable)
 
 public:
   _WRAP_METHOD(Glib::RefPtr<FileInfo> query_info(const std::string& attributes, const Glib::RefPtr<Cancellable>& cancellable),

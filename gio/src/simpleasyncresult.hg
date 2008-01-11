@@ -28,6 +28,39 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
+//TODO: Is this used in the rest of the API at all? If not, it seems like semi-private API that we should not wrap for now. Murray.
+
+/** Implements AsyncResult for simple cases. Most of the time, this will be all an application needs, and will be used transparently. Because of this, 
+ * SimpleAsyncResult is used throughout GIO for handling asynchronous functions.
+ *
+ * Most of the time, an application will not need to know of the details of this API; it is handled transparently, and any necessary operations are handled 
+ * by AsyncResult's interface. However, if implementing a new GIO module, for writing language bindings, or for complex applications that need better 
+ * control of how asynchronous operations are completed, it is important to understand this functionality.
+ * 
+ * SimpleAsyncResult handles SlotAsyncReady, error reporting, operation cancellation and the final state of an operation, completely transparent to 
+ * the application. Results can be returned as a pointer e.g. for functions that return data that is collected asynchronously, a boolean value for checking 
+ * the success or failure of an operation, or a gssize for operations which return the number of bytes modified by the operation; all of the simple return 
+ * cases are covered.
+ * 
+ * SimpleAsyncResults are tagged with the calling function to ensure that asynchronous functions and their finishing functions are used together correctly.
+ * 
+ * To create a new SimpleAsyncResult, call create(). If the result needs to be created for a GError, use 
+ * create_from_error(). If a GError is not available (e.g. the asynchronous operation's doesn't take a GError argument), but the result 
+ * still needs to be created for an error condition, use g_simple_async_result_new_error() (or g_simple_async_result_set_error_va() if your application or 
+ * binding requires passing a variable argument list directly), and the error can then be propegated through the use of 
+ * g_simple_async_result_propagate_error().
+ * 
+ * An asynchronous operation can be made to ignore a cancellation event by calling set_handle_cancellation() with false.
+ * 
+ * SimpleAsyncResult can integrate into GLib's event loop, GMainLoop, or it can use GThreads if available. complete() will finish an 
+ * I/O task directly within the main event loop. complete_in_idle() will integrate the I/O task into the main event loop as an idle 
+ * function and run_in_thread() will run the job in a separate thread.
+ * 
+ * To set the results of an asynchronous function, set_op_res() methods are provided, setting the operation's result to a gpointer, bool, or gssize,.
+ * 
+ * Likewise, to get the result of an asynchronous function, get_op_res_gpointer(), get_op_res_bool(), and 
+ * get_op_res_gssize() are provided, getting the operation's result as a gpointer, bool, and gssize, respectively.
+ */
 class SimpleAsyncResult : public Glib::Object, public AsyncResult
 {
   _CLASS_GOBJECT(SimpleAsyncResult, GSimpleAsyncResult, G_SIMPLE_ASYNC_RESULT, Glib::Object, GObject)

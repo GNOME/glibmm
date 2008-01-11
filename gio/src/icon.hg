@@ -27,6 +27,14 @@ _PINCLUDE(glibmm/private/interface_p.h)
 namespace Gio
 {
 
+/** This is a very minimal interface for icons. It provides functions for checking the equality of two icons and hashing of icons.
+ * Glib::Icon does not provide the actual pixmap for the icon as this is out of GIO's scope. However implementations of Icon may contain the name of an 
+ * icon (see ThemedIcon), or the path to an icon (see LoadableIcon).
+ *
+ * To obtain a hash of an Icon instance, see hash().
+ *
+ * To check if two Icon instances are equal, see equal().
+ */
 class Icon : public Glib::Interface
 {
   _CLASS_INTERFACE(Icon, GIcon, G_ICON, GIconIface)
@@ -45,6 +53,11 @@ public:
   // do we need to have equal_vfunc()? Or rather, why would we want
   // to have it generally...
 };
+
+//TODO: I'm not very happy about these operator==. 
+//RefPtr already has operator== that just checks the pointers for equality, 
+//and this would be adding an implicit change of behaviour to those.
+//murrayc.
 
 /** @relates Gio::Icon */
 inline bool operator==(const Glib::RefPtr<Icon>& lhs,

@@ -36,6 +36,18 @@ namespace Gio
 // file.hg already includes volume.h.
 class File;
 
+/** The Volume interface represents user-visible objects that can be mounted.
+ * 
+ * Mounting a Volume instance is an asynchronous operation. For more information about asynchronous operations, see AsyncReady and SimpleAsyncReady. To 
+ * mount a GVolume, first call mount(), optionally providing a MountOperation object and a SlotAsyncReady callback.
+ * 
+ * Typically, you will not want to provide a MountOperation if automounting all volumes when a desktop session starts since it's not desirable to 
+ * put up a lot of dialogs asking for credentials.
+ * 
+ * The callback will be fired when the operation has resolved (either with success or failure), and a AsyncReady structure will be passed to the callback. 
+ * That callback should then call g_volume_mount_finish() with the GVolume instance and the GAsyncReady data to see if the operation was completed 
+ * successfully. If an error is present when finish() is called, then it will be filled with any error information.
+ */
 class Volume : public Glib::Interface
 {
   _CLASS_INTERFACE(Volume, GVolume, G_DRIVE, GVolumeIface)
@@ -60,10 +72,12 @@ public:
   _WRAP_METHOD(bool can_mount() const, g_volume_can_mount)
   _WRAP_METHOD(bool can_eject() const, g_volume_can_eject)
 
-  _IGNORE(g_volume_mount)
+  //TODO: Documentation.
+
   void mount(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
   void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot);
+  _IGNORE(g_volume_mount)
 
   _WRAP_METHOD(bool mount_finish(const Glib::RefPtr<AsyncResult>& result),
                g_volume_mount_finish,
