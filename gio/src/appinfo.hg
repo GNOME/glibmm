@@ -39,6 +39,11 @@ _WRAP_ENUM(AppInfoCreateFlags, GAppInfoCreateFlags, NO_GTYPE)
 
 class AppInfo;
 
+/** This is used to handle, for instance, startup notification and launching of the new application on the same screen as the launching window.
+ * See also AppInfo.
+ *
+ * @newin2p16
+ */
 class AppLaunchContext : public Glib::Object
 {
   _CLASS_GOBJECT(AppLaunchContext, GAppLaunchContext, G_APP_LAUNCH_CONTEXT, Glib::Object, GObject)
@@ -49,16 +54,20 @@ protected:
 public:
   _WRAP_CREATE()
 
-  _WRAP_METHOD(std::string get_display(const Glib::RefPtr<AppInfo>& info,
-                                       const Glib::ListHandle<std::string>& files),
+  _WRAP_METHOD(std::string get_display(const Glib::RefPtr<AppInfo>& info, const Glib::ListHandle<std::string>& files),
                g_app_launch_context_get_display)
-  _WRAP_METHOD(std::string get_startup_notify_id(const Glib::RefPtr<AppInfo>& info,
-                                                 const Glib::ListHandle<std::string>& files),
+  _WRAP_METHOD(std::string get_startup_notify_id(const Glib::RefPtr<AppInfo>& info, const Glib::ListHandle<std::string>& files),
                g_app_launch_context_get_startup_notify_id)
   _WRAP_METHOD(void launch_failed(const std::string& startup_notify_id),
                g_app_launch_context_launch_failed)
 };
 
+/** Application information, to describe applications installed on the system, 
+ * and launch them.
+ * See also AppLaunchContext.
+ *
+ * @newin2p16
+ */
 class AppInfo : public Glib::Interface
 {
   _CLASS_INTERFACE(AppInfo, GAppInfo, G_APP_INFO, GAppInfoIface)
@@ -78,6 +87,8 @@ public:
   _IGNORE(g_app_info_dup)
   _IGNORE(g_app_info_equal)
 
+  // TODO: Decide whether this is a good idea. murrayc
+  // TODO: Documentation.
   // I declare this as virtual so that it is possible to override
   // the method in possible derived classes. markoa
   virtual bool equal(const Glib::RefPtr<AppInfo>& other) const;
@@ -122,13 +133,14 @@ public:
 
   static Glib::ListHandle< Glib::RefPtr<AppInfo> > get_all_for_type(const std::string& content_type);
 
-  static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type,
-                                                    bool must_support_uris = true);
+  static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type, bool must_support_uris = true);
 
   static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme);
 
   //TODO: vfuncs?
 };
+
+//TODO: Probably remove these (and others elsewhere) because they will lead to confusion with the regular RefPtr operator==. murrayc.
 
 /** @relates Gio::AppInfo */
 inline bool operator==(const Glib::RefPtr<AppInfo>& lhs, const Glib::RefPtr<AppInfo>& rhs)
@@ -139,3 +151,4 @@ inline bool operator!=(const Glib::RefPtr<AppInfo>& lhs, const Glib::RefPtr<AppI
 { return ! lhs->equal(rhs); }
 
 } // namespace Gio
+
