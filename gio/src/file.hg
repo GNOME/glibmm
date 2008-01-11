@@ -174,7 +174,10 @@ public:
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> append_to(FileCreateFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
                g_file_append_to,
                refreturn, errthrow)
-  _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create(FileCreateFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
+
+  //We renamed this to create_file from (g_file_create()), to avoid confusion with static create() methods, 
+  //but I would still like to choose a different word, but can't think of a good one. murrayc.
+  _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create_file(FileCreateFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
                g_file_create,
                refreturn, errthrow)
 
@@ -213,32 +216,34 @@ public:
                refreturn, errthrow)
 
 
-  //TODO: create() can't be the correct name. murrayc.
+  //We renamed this to create_file_async from (g_file_create_async()), to avoid confusion with static create() methods, 
+  //but I would still like to choose a different word, but can't think of a good one. murrayc. See also create_file().
+
   /** Asynchronously creates a new file and returns an output stream for writing to it. The file must not already exist.
    * For more details, see create() which is the synchronous version of this call.
    *
-   * When the operation is finished, @a slot will be called. You can then call create_finish() to get the result of the operation.
+   * When the operation is finished, @a slot will be called. You can then call create_file_finish() to get the result of the operation.
    * 
    * @param flags a set of FileCreateFlags.
    * @param io_priority The I/O priority of the request.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void create_async(FileCreateFlags flags, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  void create_file_async(FileCreateFlags flags, int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
   /** Asynchronously creates a new file and returns an output stream for writing to it. The file must not already exist.
    * For more details, see create() which is the synchronous version of this call.
    *
-   * When the operation is finished, @a slot will be called. You can then call create_finish() to get the result of the operation.
+   * When the operation is finished, @a slot will be called. You can then call create_file_finish() to get the result of the operation.
    * 
    * @param flags a set of FileCreateFlags.
    * @param io_priority The I/O priority of the request.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void create_async(FileCreateFlags flags, int io_priority, const SlotAsyncReady& slot);
+  void create_file_async(FileCreateFlags flags, int io_priority, const SlotAsyncReady& slot);
   _IGNORE(g_file_create_async)
 
-  _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create_finish(const Glib::RefPtr<AsyncResult>& result),
+  _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create_file_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_create_finish,
                refreturn, errthrow)
 
