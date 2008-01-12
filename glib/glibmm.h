@@ -66,6 +66,7 @@
 #include <glibmm/threadpool.h>
 #include <glibmm/timer.h>
 #include <glibmm/timeval.h>
+#include <glibmm/uriutils.h>
 #include <glibmm/ustring.h>
 #include <glibmm/value.h>
 #include <glibmm/wrap.h>
