@@ -32,30 +32,55 @@ namespace Glib
  * Various uri-related functions.
  */
 
-//TODO: Documentation: See http://bugzilla.gnome.org/show_bug.cgi?id=508773
 
-/**
+/** Unescapes a whole escaped string.
+ *
+ * @param escaped_string An escaped string to be unescaped.
+ * @param illegal_characters A string of illegal characters not to be allowed.
+ * @result An unescaped version of @a escaped_string.
+ * 
  * @ingroup UriUtils
  * @newin2p16
  */
-std::string uri_unescape_string(const std::string& escaped_string, const std::string& illegal_characters);
+std::string uri_unescape_string(const std::string& escaped_string, const std::string& illegal_characters = std::string());
 
 //TODO: Use iterator? 
 //char *   g_uri_unescape_segment      (const char *escaped_string,
 //				      const char *escaped_string_end,
 //				      const char *illegal_characters);
 
-/**
+/** Gets the scheme portion of a URI. RFC 3986 decodes the scheme as:
+ * @code
+ * URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ] 
+ * @endcode
+ * Common schemes include "file", "http", "svn+ssh", etc.
+ *
+ * @param uri
+ * @result The "Scheme" component of the URI, or an empty string on error. 
+ * 
  * @ingroup UriUtils
  * @newin2p16
  */
 std::string uri_get_scheme(const std::string& uri);
 
-/**
+/** Escapes a string for use in a URI.
+ *
+ * Normally all characters that are not "unreserved" (i.e. ASCII alphanumerical
+ * characters plus dash, dot, underscore and tilde) are escaped.
+ * But if you specify characters in @a reserved_chars_allowed they are not
+ * escaped. This is useful for the "reserved" characters in the URI
+ * specification, since those are allowed unescaped in some portions of
+ * a URI.
+ *
+ * @param unescaped The unescaped input string.
+ * @param reserved_chars_allowed A string of reserved characters that are allowed to be used.
+ * @param allow_utf8 true if the result can include UTF-8 characters.
+ * @result An escaped version of @a unescaped.
+ *
  * @ingroup UriUtils
  * @newin2p16
  */
-std::string uri_escape_string(const std::string& unescaped, const std::string& reserved_chars_allowed, bool allow_utf8 = true);
+std::string uri_escape_string(const std::string& unescaped, const std::string& reserved_chars_allowed = std::string(), bool allow_utf8 = true);
 
 } // namespace Glib
 
