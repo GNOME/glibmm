@@ -85,14 +85,23 @@ public:
   void eject(const SlotAsyncReady& slot, GMountUnmountFlags flags = G_MOUNT_UNMOUNT_NONE);
   _IGNORE(g_drive_eject)
 
+  /** Ejects the drive.
+   * @param slot A callback which will be called when the eject is completed.
+   * @param flags Flags affecting the unmount if required for eject.
+   */
+  void eject(GMountUnmountFlags flags = G_MOUNT_UNMOUNT_NONE);
+
   _WRAP_METHOD(bool eject_finish(const Glib::RefPtr<AsyncResult>& result),
                g_drive_eject_finish,
                errthrow)
 
-  _IGNORE(g_drive_poll_for_media)
-  void poll_for_media(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  //TODO: Documentation:
+  void poll_for_media(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
 
   void poll_for_media(const SlotAsyncReady& slot);
+
+  void poll_for_media();
+  _IGNORE(g_drive_poll_for_media)
 
   _WRAP_METHOD(bool poll_for_media_finish(const Glib::RefPtr<AsyncResult>& result),
                g_drive_poll_for_media_finish,

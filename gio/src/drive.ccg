@@ -78,8 +78,16 @@ void Drive::eject(const SlotAsyncReady& slot, GMountUnmountFlags flags)
                 slot_copy);
 }
 
-void Drive::poll_for_media(const Glib::RefPtr<Cancellable>& cancellable,
-                           const SlotAsyncReady& slot)
+void Drive::eject(GMountUnmountFlags flags)
+{
+  g_drive_eject(gobj(),
+                flags, 
+                NULL, // cancellable
+                NULL,
+                NULL);
+}
+
+void Drive::poll_for_media(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -103,6 +111,14 @@ void Drive::poll_for_media(const SlotAsyncReady& slot)
                          NULL, // cancellable
                          &SignalProxy_async_callback,
                          slot_copy);
+}
+
+void Drive::poll_for_media()
+{
+  g_drive_poll_for_media(gobj(),
+                         NULL, // cancellable
+                         NULL,
+                         NULL);
 }
 
 } // namespace Gio
