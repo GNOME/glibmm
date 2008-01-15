@@ -72,15 +72,12 @@ public:
    *
    * Any outstanding I/O request with higher priority (lower numerical value) will be executed before an outstanding request with lower priority. 
    * The default priority is PRIORITY_DEFAULT.
+   * @param slot A callback to call when the request is satisfied.
+   * @param cancellable An cancellable object which can be used to cancel the request.
    * @param num_files The number of file info objects to request.
    * @param io_priority The I/O priority of the request.
-   * @param cancellable An cancellable object which can be used to cancel the request.
-   * @param slot A callback to call when the request is satisfied.
    */
-  void next_files_async(int num_files,
-                        int io_priority,
-                        const Glib::RefPtr<Cancellable>& cancellable,
-                        const SlotAsyncReady& slot);
+  void next_files_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int num_files = 1, int io_priority = G_PRIORITY_DEFAULT);
 
   /** Request information for a number of files from the enumerator asynchronously. 
    * When all I/O for the operation is finished the callback slot will be called with the requested information.
@@ -93,13 +90,11 @@ public:
    *
    * Any outstanding I/O request with higher priority (lower numerical value) will be executed before an outstanding request with lower priority. 
    * The default priority is PRIORITY_DEFAULT.
+   * @param slot A callback to call when the request is satisfied.
    * @param num_files The number of file info objects to request.
    * @param io_priority The I/O priority of the request.
-   * @param slot A callback to call when the request is satisfied.
    */
-  void next_files_async(int num_files,
-                        int io_priority,
-                        const SlotAsyncReady& slot);
+  void next_files_async(const SlotAsyncReady& slot, int num_files = 1, int io_priority = G_PRIORITY_DEFAULT);
   _IGNORE(g_file_enumerator_next_files_async)
 
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<FileInfo> > next_files_finish(const Glib::RefPtr<AsyncResult>& result),

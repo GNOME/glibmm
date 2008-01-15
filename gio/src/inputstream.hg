@@ -59,23 +59,26 @@ public:
                g_input_stream_close,
                errthrow)
 
-  _IGNORE(g_input_stream_read_async)
 
-  void read_async(void* buffer, gsize count,  int io_priority, Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  //TODO: Documentation.
+  void read_async(void* buffer, gsize count, const SlotAsyncReady& slot, Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
+  _IGNORE(g_input_stream_read_async)
 
   _WRAP_METHOD(gssize read_finish(const Glib::RefPtr<AsyncResult>& result),
                g_input_stream_read_finish,
                errthrow)
 
+  //TODO: Use std::size_type instead of gsize?
+  void skip_async(gsize count, const SlotAsyncReady& slot, Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
   _IGNORE(g_input_stream_skip_async)
-  void skip_async(gsize count, int io_priority, Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
   _WRAP_METHOD(gssize skip_finish(const Glib::RefPtr<AsyncResult>& result),
                g_input_stream_skip_finish,
                errthrow)
 
+  //TODO: Can Cancellable be NULL?
+  void close_async(const SlotAsyncReady& slot, Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
   _IGNORE(g_input_stream_close_async)
-  void close_async(int io_priority, Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
   _WRAP_METHOD(gboolean close_finish(const Glib::RefPtr<AsyncResult>& result),
                g_input_stream_close_finish,

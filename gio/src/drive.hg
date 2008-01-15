@@ -72,17 +72,17 @@ public:
   //TODO: Use MountUnmountFlags instead of GMountUnmountFlags - we need to wrap some more stuff to see where this should best be declared.
 
   /** Ejects the drive.
+   * @param slot A callback which will be called when the eject is completed or canceled.
    * @param flags Flags affecting the unmount if required for eject.
    * @param cancellable A cancellable object which can be used to cancel the eject.
-   * @param slot A callback which will be called when the eject is completed or canceled.
    */
-  void eject(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  void eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, GMountUnmountFlags flags = G_MOUNT_UNMOUNT_NONE);
 
   /** Ejects the drive.
-   * @param flags Flags affecting the unmount if required for eject.
    * @param slot A callback which will be called when the eject is completed.
+   * @param flags Flags affecting the unmount if required for eject.
    */
-  void eject(GMountUnmountFlags flags, const SlotAsyncReady& slot);
+  void eject(const SlotAsyncReady& slot, GMountUnmountFlags flags = G_MOUNT_UNMOUNT_NONE);
   _IGNORE(g_drive_eject)
 
   _WRAP_METHOD(bool eject_finish(const Glib::RefPtr<AsyncResult>& result),

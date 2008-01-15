@@ -170,9 +170,22 @@ File::equal(const Glib::RefPtr<File>& other) const
 }
 
 void
-File::read_async(int io_priority,
-                 Glib::RefPtr<Cancellable>& cancellable,
-                 const SlotAsyncReady& slot)
+File::read_async(const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_read_async(gobj(),
+                    io_priority,
+                    NULL,
+                    &SignalProxy_async_callback,
+                    slot_copy);
+}
+
+void
+File::read_async(const SlotAsyncReady& slot, Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -187,10 +200,7 @@ File::read_async(int io_priority,
 }
 
 void
-File::append_to_async(FileCreateFlags flags,
-                      int io_priority,
-                      const Glib::RefPtr<Cancellable>& cancellable,
-                      const SlotAsyncReady& slot)
+File::append_to_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -206,9 +216,7 @@ File::append_to_async(FileCreateFlags flags,
 }
 
 void
-File::append_to_async(FileCreateFlags flags,
-                      int io_priority,
-                      const SlotAsyncReady& slot)
+File::append_to_async(const SlotAsyncReady& slot, FileCreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -224,10 +232,7 @@ File::append_to_async(FileCreateFlags flags,
 }
 
 void
-File::create_file_async(FileCreateFlags flags,
-                   int io_priority,
-                   const Glib::RefPtr<Cancellable>& cancellable,
-                   const SlotAsyncReady& slot)
+File::create_file_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -243,9 +248,7 @@ File::create_file_async(FileCreateFlags flags,
 }
 
 void
-File::create_file_async(FileCreateFlags flags,
-                   int io_priority,
-                   const SlotAsyncReady& slot)
+File::create_file_async(const SlotAsyncReady& slot, FileCreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -261,12 +264,7 @@ File::create_file_async(FileCreateFlags flags,
 }
 
 void
-File::replace_async(const std::string& etag,
-                    bool make_backup,
-                    FileCreateFlags flags,
-                    int io_priority,
-                    const Glib::RefPtr<Cancellable>& cancellable,
-                    const SlotAsyncReady& slot)
+File::replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -284,11 +282,7 @@ File::replace_async(const std::string& etag,
 }
 
 void
-File::replace_async(const std::string& etag,
-                    bool make_backup,
-                    FileCreateFlags flags,
-                    int io_priority,
-                    const SlotAsyncReady& slot)
+File::replace_async(const SlotAsyncReady& slot, const std::string& etag, bool make_backup, FileCreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -306,11 +300,7 @@ File::replace_async(const std::string& etag,
 }
 
 void
-File::query_info_async(const std::string& attributes,
-                       FileQueryInfoFlags flags,
-                       int io_priority,
-                       const Glib::RefPtr<Cancellable>& cancellable,
-                       const SlotAsyncReady& slot)
+File::query_info_async(const std::string& attributes, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -327,10 +317,7 @@ File::query_info_async(const std::string& attributes,
 }
 
 void
-File::query_info_async(const std::string& attributes,
-                       FileQueryInfoFlags flags,
-                       int io_priority,
-                       const SlotAsyncReady& slot)
+File::query_info_async(const std::string& attributes, const SlotAsyncReady& slot, FileQueryInfoFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -347,11 +334,7 @@ File::query_info_async(const std::string& attributes,
 }
 
 void
-File::enumerate_children_async(const std::string& attributes,
-                               FileQueryInfoFlags flags,
-                               int io_priority,
-                               const Glib::RefPtr<Cancellable>& cancellable,
-                               const SlotAsyncReady& slot)
+File::enumerate_children_async(const std::string& attributes, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -368,10 +351,7 @@ File::enumerate_children_async(const std::string& attributes,
 }
 
 void
-File::enumerate_children_async(const std::string& attributes,
-                               FileQueryInfoFlags flags,
-                               int io_priority,
-                               const SlotAsyncReady& slot)
+File::enumerate_children_async(const std::string& attributes, const SlotAsyncReady& slot, FileQueryInfoFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -388,10 +368,7 @@ File::enumerate_children_async(const std::string& attributes,
 }
 
 void
-File::set_display_name_async(const std::string& display_name,
-                             int io_priority,
-                             const Glib::RefPtr<Cancellable>& cancellable,
-                             const SlotAsyncReady& slot)
+File::set_display_name_async(const std::string& display_name, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -407,9 +384,7 @@ File::set_display_name_async(const std::string& display_name,
 }
 
 void
-File::set_display_name_async(const std::string& display_name,
-                             int io_priority,
-                             const SlotAsyncReady& slot)
+File::set_display_name_async(const std::string& display_name, const SlotAsyncReady& slot, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -589,11 +564,7 @@ File::move(const Glib::RefPtr<File>& destination,
 }
 
 void
-File::set_attributes_async(const Glib::RefPtr<FileInfo>& info,
-                           FileQueryInfoFlags flags,
-                           int io_priority,
-                           const Glib::RefPtr<Cancellable>& cancellable,
-                           const SlotAsyncReady& slot)
+File::set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -610,10 +581,7 @@ File::set_attributes_async(const Glib::RefPtr<FileInfo>& info,
 }
 
 void
-File::set_attributes_async(const Glib::RefPtr<FileInfo>& info,
-                           FileQueryInfoFlags flags,
-                           int io_priority,
-                           const SlotAsyncReady& slot)
+File::set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncReady& slot, FileQueryInfoFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -762,8 +730,7 @@ File::eject_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot)
 }
 
 void
-File::load_contents_async(const Glib::RefPtr<Cancellable>& cancellable,
-                          const SlotAsyncReady& slot)
+File::load_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -791,9 +758,7 @@ File::load_contents_async(const SlotAsyncReady& slot)
 }
 
 void
-File::load_partial_contents_async(const Glib::RefPtr<Cancellable>& cancellable,
-                                  const SlotReadMore& slot_read_more,
-                                  const SlotAsyncReady& slot_async_ready)
+File::load_partial_contents_async(const SlotReadMore& slot_read_more, const SlotAsyncReady& slot_async_ready, const Glib::RefPtr<Cancellable>& cancellable)
 {
   // Create a new pair which will hold copies of passed slots.
   LoadPartialSlots* slots = new LoadPartialSlots();
