@@ -19,8 +19,10 @@
 
 _DEFS(glibmm,glib)
 
-#include <glibmm/ustring.h>
+#include <string>
 #include <glibmmconfig.h>
+
+GLIBMM_USING_STD(string)
 
 
 namespace Glib
@@ -30,6 +32,8 @@ namespace Glib
  * Various uri-related functions.
  */
 
+//Note that the illegal_characters and reserved_chars_allowed parameters are bytes and may not be UTF-8 
+//so they are not Glib::ustring. See http://bugzilla.gnome.org/show_bug.cgi?id=508773
 
 /** Unescapes a whole escaped string.
  * If any of the characters in @a illegal_characters or the character zero appears
@@ -45,7 +49,7 @@ namespace Glib
  * @ingroup UriUtils
  * @newin2p16
  */
-std::string uri_unescape_string(const Glib::ustring& escaped_string, const Glib::ustring& illegal_characters = Glib::ustring());
+std::string uri_unescape_string(const std::string& escaped_string, const std::string& illegal_characters = std::string());
 
 //TODO: Use iterator? 
 //char *   g_uri_unescape_segment      (const char *escaped_string,
@@ -83,7 +87,7 @@ std::string uri_get_scheme(const std::string& uri);
  * @ingroup UriUtils
  * @newin2p16
  */
-std::string uri_escape_string(const std::string& unescaped, const Glib::ustring& reserved_chars_allowed = Glib::ustring(), bool allow_utf8 = true);
+std::string uri_escape_string(const std::string& unescaped, const std::string& reserved_chars_allowed = std::string(), bool allow_utf8 = true);
 
 } // namespace Glib
 
