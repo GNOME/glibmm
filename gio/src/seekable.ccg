@@ -19,3 +19,49 @@
 
 #include <gio/gio.h>
 
+namespace Gio
+{
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool Seekable::seek(goffset offset, Glib::SeekType type)
+#else
+bool Seekable::seek(goffset offset, Glib::SeekType type, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_seekable_seek(gobj(), offset, ((GSeekType)(type)), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool Seekable::truncate(goffset offset)
+#else
+bool Seekable::truncate(goffset offset, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_seekable_truncate(gobj(), offset, NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+
+} // namespace Gio
+

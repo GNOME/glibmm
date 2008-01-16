@@ -18,7 +18,7 @@
  */
 
 #include <gio/gio.h>
-
+#include <giomm/cancellable.h>
 #include <glibmm/interface.h>
 
 _DEFS(giomm,gio)
@@ -34,10 +34,55 @@ namespace Gio
  */
 class Seekable : public Glib::Interface
 {
-  _CLASS_INTERFACE(Seekable, GFSeekable, G_Seekable, GSeekableIface)
+  _CLASS_INTERFACE(Seekable, GSeekable, G_Seekable, GSeekableIface)
 
 public:
-  //TODO: methods, properties, vfuncs, signals.
+  _WRAP_METHOD(goffset tell() const, g_seekable_tell)
+  _WRAP_METHOD(bool can_seek() const, g_seekable_can_seek)
+
+  _WRAP_METHOD(bool seek(goffset offset, Glib::SeekType type, const Glib::RefPtr<Cancellable>& cancellable), g_seekable_seek, errthrow)
+
+  //TODO: Document the exception: http://bugzilla.gnome.org/show_bug.cgi?id=509990
+  /** Seeks in the stream by the given @a offset, modified by @a type .
+   * 
+   * @param offset A #goffset.
+   * @param type A G::SeekType.
+   * @return <tt>true</tt> if successful. If an error
+   * has occurred, this function will return <tt>false</tt>.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool seek(goffset offset, Glib::SeekType type);
+#else
+  bool seek(goffset offset, Glib::SeekType type, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  _WRAP_METHOD(bool can_truncate() const, g_seekable_can_truncate)
+
+  _WRAP_METHOD(bool truncate(goffset offset, const Glib::RefPtr<Cancellable>& cancellable), g_seekable_truncate, errthrow)
+
+  //TODO: Document the exception: http://bugzilla.gnome.org/show_bug.cgi?id=509990
+  /** Truncates a stream with a given #offset. 
+   * 
+   * @param offset A #goffset.
+   * @return <tt>true</tt> if successful. If an error
+   * has occured, this function will return <tt>false</tt>.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool truncate(goffset offset);
+#else
+  bool truncate(goffset offset, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+//TODO: Write the .defs for these:
+  _WRAP_VFUNC(goffset tell() const, tell)
+  _WRAP_VFUNC(goffset can_seek(), can_seek)
+  _WRAP_VFUNC(goffset seek(goffset offset, Glib::SeekType type, const Glib::RefPtr<Cancellable>& cancellable, GError** error), seek)
+  _WRAP_VFUNC(goffset can_truncate(), can_truncate)
+
+  //TODO: Rename to truncate()?
+  _WRAP_VFUNC(goffset truncate_fn(goffset offset, const Glib::RefPtr<Cancellable>& cancellable, GError** error), truncate_fn)
+
+  //There are no properties or signals.
 };
 
 } // namespace Gio
