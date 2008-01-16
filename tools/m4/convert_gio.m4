@@ -35,7 +35,7 @@ _CONVERSION(`return-char*',`std::string',`Glib::convert_return_gchar_ptr_to_stds
 _CONVERSION(`Glib::RefPtr<File>',`GFile*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GFile*',`Glib::RefPtr<File>',`Glib::wrap($3)')
-_CONVERSION(`GFile*',`const Glib::RefPtr<File>&',`Glib::wrap($3, true)')
+
 
 # FileAttribute
 _CONVERSION(`GFileAttributeValue*',`FileAttributeValue',`Glib::wrap($3)')
@@ -57,6 +57,9 @@ _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<FileInfo> >',__FL2H_SHALLOW
 
 # FileInputStream
 _CONVERSION(`GFileInputStream*',`Glib::RefPtr<FileInputStream>',`Glib::wrap($3)')
+
+# FileMonitor
+_CONVERSION(`GFileMonitor*',`Glib::RefPtr<FileMonitor>',`Glib::wrap($3)')
 
 # FileOutputStream
 _CONVERSION(`GFileOutputStream*',`Glib::RefPtr<FileOutputStream>',`Glib::wrap($3)')

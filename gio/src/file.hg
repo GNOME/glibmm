@@ -26,6 +26,7 @@
 #include <giomm/fileenumerator.h>
 #include <giomm/fileinfo.h>
 #include <giomm/fileinputstream.h>
+#include <giomm/filemonitor.h>
 #include <giomm/fileoutputstream.h>
 #include <giomm/mountoperation.h>
 #include <giomm/volume.h>
@@ -611,7 +612,10 @@ public:
                g_file_eject_mountable_finish,
                errthrow)
 
-  // TODO: g_file_monitor_*
+  //TODO: The GError isn't being passed to the C functoin, for some reason. murrayc.
+  //_WRAP_METHOD(Glib::RefPtr<FileMonitor> monitor_directory(FileMonitorFlags flags, const Glib::RefPtr<Cancellable>& cancellable), g_file_monitor_directory, errthrow)
+  //_WRAP_METHOD(Glib::RefPtr<FileMonitor> monitor_file(FileMonitorFlags flags, const Glib::RefPtr<Cancellable>& cancellable), g_file_monitor_file, errthrow)
+
 
   //TODO: Documentation.
   //TODO: atm I don't understand what's etag_out:
@@ -710,6 +714,8 @@ public:
 //   _WRAP_VFUNC(Glib::RefPtr<File> get_child_for_display_name(const std::string& display_name) const,
 //               "get_child_for_display_name",
 //               errthrow)
+
+#m4 _CONVERSION(`GFile*',`const Glib::RefPtr<File>&',`Glib::wrap($3, true)')
 
   _WRAP_VFUNC(bool contains_file(const Glib::RefPtr<File>& descendant) const,
               "contains_file")
