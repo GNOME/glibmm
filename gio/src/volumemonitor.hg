@@ -17,46 +17,41 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-//#include <giomm/file.h>
-#include <glibmm/object.h>
+#include <giomm/volume.h>
+#include <giomm/mount.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
-_PINCLUDE(gio/gio.h)
 
 namespace Gio
 {
 
-_WRAP_ENUM(FileMonitorEvent, GFileMonitorEvent, NO_GTYPE)
-
-class File;
+_WRAP_ENUM(VolumeMonitorEvent, GVolumeMonitorEvent, NO_GTYPE)
 
 /** Monitors a file or directory for changes.
  * TODO: Documentation: See http://bugzilla.gnome.org/show_bug.cgi?id=509994.
  * @newin2p16
  */
-class FileMonitor : public Glib::Object
+class VolumeMonitor : public Glib::Object
 {
-  _CLASS_GOBJECT(FileMonitor, GFileMonitor, G_FILE_MONITOR, Glib::Object, GObject)
+  _CLASS_GOBJECT(VolumeMonitor, GVolumeMonitor, G_VOLUME_MONITOR, Glib::Object, GObject)
 protected:
 
 public:
+
+  _WRAP_METHOD(static Glib::RefPtr<VolumeMonitor> get(), g_volume_monitor_get)
+//TODO: GList *         g_volume_monitor_get_connected_drives    (GVolumeMonitor  *volume_monitor);
+//TODO: GList *         g_volume_monitor_get_volumes             (GVolumeMonitor  *volume_monitor);
+//TODO: GList *         g_volume_monitor_get_mounts              (GVolumeMonitor  *volume_monitor);
+  _WRAP_METHOD(Glib::RefPtr<Volume> get_volume_for_uuid(const std::string& uuid), g_volume_monitor_get_volume_for_uuid, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<Mount> get_mount_for_uuid(const std::string& uuid), g_volume_monitor_get_mount_for_uuid, refreturn)
+
+  _WRAP_METHOD(static Glib::RefPtr<Volume> adopt_orphan_mount(const Glib::RefPtr<Mount>& mount), g_volume_monitor_adopt_orphan_mount)
+
   
-  _WRAP_METHOD(bool cancel(), g_file_monitor_cancel)
-  _WRAP_METHOD(bool is_cancelled() const, g_file_monitor_is_cancelled)
-  _WRAP_METHOD(void set_rate_limit(int limit_msecs), g_file_monitor_set_rate_limit)
+  //TODO: vfuncs and signals.
 
-  //g_file_monitor_emit_event is for implementations.
-  _IGNORE(g_file_monitor_emit_event)
-
-#m4 _CONVERSION(`GFile*',`const Glib::RefPtr<File>&',`Glib::wrap($3, true)')
-  _WRAP_SIGNAL(void changed(const Glib::RefPtr<File>& file, const Glib::RefPtr<File>& other_file, FileMonitorEvent event_type), "changed")
-  
-  //TODO: Write .defs for the vfunc:
-  _WRAP_VFUNC(bool cancel(), cancel);
-
-  _WRAP_PROPERTY("rate-limit", int)
-  _WRAP_PROPERTY("cancelled", bool)
+  //There are no properties.
 };
 
 } // namespace Gio

@@ -40,6 +40,7 @@ int main (int argc, char** argv)
 
             << get_defs(G_TYPE_INPUT_STREAM)
             << get_defs(G_TYPE_LOADABLE_ICON)
+            << get_defs(G_TYPE_MOUNT)
             << get_defs(G_TYPE_MOUNT_OPERATION)
             << get_defs(G_TYPE_SIMPLE_ASYNC_RESULT)
 

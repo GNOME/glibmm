@@ -5,6 +5,7 @@ _CONV_ENUM(G,FileAttributeInfoFlags)
 _CONV_ENUM(G,FileCopyFlags)
 _CONV_ENUM(G,FileCreateFlags)
 _CONV_ENUM(G,FileMonitorFlags)
+_CONV_ENUM(G,FileMonitorEvent)
 _CONV_ENUM(G,FileQueryInfoFlags)
 _CONV_ENUM(G,FileType)
 _CONV_ENUM(G,OutputStreamSpliceFlags)
@@ -71,9 +72,17 @@ _CONVERSION(`const Glib::RefPtr<Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P)
 # InputStream
 _CONVERSION(`const Glib::RefPtr<InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
 
+#Mount
+_CONVERSION(`GMount*',`Glib::RefPtr<Mount>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
+
 # MountOptions
 _CONVERSION(`GPasswordSave',`PasswordSave',`($2)$3')
 _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 
 #Volume
 _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')
+
+# VolumeMonitor
+_CONVERSION(`GVolumeMonitor*',`Glib::RefPtr<VolumeMonitor>',`Glib::wrap($3)')
+
