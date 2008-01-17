@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <giomm/drive.h>
 #include <giomm/volume.h>
 #include <giomm/mount.h>
 
@@ -40,9 +41,16 @@ protected:
 public:
 
   _WRAP_METHOD(static Glib::RefPtr<VolumeMonitor> get(), g_volume_monitor_get)
-//TODO: GList *         g_volume_monitor_get_connected_drives    (GVolumeMonitor  *volume_monitor);
-//TODO: GList *         g_volume_monitor_get_volumes             (GVolumeMonitor  *volume_monitor);
-//TODO: GList *         g_volume_monitor_get_mounts              (GVolumeMonitor  *volume_monitor);
+
+#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Drive> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Drive> > get_connected_drives(), g_volume_monitor_get_connected_drives);
+
+#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Volume> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Volume> > get_volumes(), g_volume_monitor_get_volumes);
+
+#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Mount> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Mount> > get_mounts(), g_volume_monitor_get_mounts);
+
   _WRAP_METHOD(Glib::RefPtr<Volume> get_volume_for_uuid(const std::string& uuid), g_volume_monitor_get_volume_for_uuid, refreturn)
   _WRAP_METHOD(Glib::RefPtr<Mount> get_mount_for_uuid(const std::string& uuid), g_volume_monitor_get_mount_for_uuid, refreturn)
 
