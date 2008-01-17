@@ -50,7 +50,7 @@ namespace Gio
 {
 
 void
-FileInputStream::query_info_async(const std::string& attributes, const SlotAsyncReady& slot, Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+FileInputStream::query_info_async(const std::string& attributes, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -61,6 +61,22 @@ FileInputStream::query_info_async(const std::string& attributes, const SlotAsync
                                        const_cast<char*>(attributes.c_str()),
                                        io_priority,
                                        cancellable->gobj(),
+                                       &SignalProxy_query_async_callback,
+                                       slot_copy);
+}
+
+void
+FileInputStream::query_info_async(const std::string& attributes, const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_input_stream_query_info_async(gobj(),
+                                       const_cast<char*>(attributes.c_str()),
+                                       io_priority,
+                                       NULL,
                                        &SignalProxy_query_async_callback,
                                        slot_copy);
 }
@@ -84,6 +100,5 @@ bool FileInputStream::seek(goffset offset, Glib::SeekType type, std::auto_ptr<Gl
   return retvalue;
 
 }
-
 
 } // namespace Gio

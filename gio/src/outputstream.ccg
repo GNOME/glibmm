@@ -67,6 +67,23 @@ OutputStream::write_async(const void* buffer, gsize count, const SlotAsyncReady&
 }
 
 void
+OutputStream::write_async(const void* buffer, gsize count, const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_output_stream_write_async(gobj(),
+                              buffer,
+                              count,
+                              io_priority,
+                              NULL,
+                              &SignalProxy_async_callback,
+                              slot_copy);
+}
+
+void
 OutputStream::splice_async(const Glib::RefPtr<InputStream>& source, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, OutputStreamSpliceFlags flags, int io_priority)
 {
   // Create a copy of the slot.
@@ -79,6 +96,23 @@ OutputStream::splice_async(const Glib::RefPtr<InputStream>& source, const SlotAs
                                static_cast<GOutputStreamSpliceFlags>(flags),
                                io_priority,
                                cancellable->gobj(),
+                               &SignalProxy_async_callback,
+                               slot_copy);
+}
+
+void
+OutputStream::splice_async(const Glib::RefPtr<InputStream>& source, const SlotAsyncReady& slot, OutputStreamSpliceFlags flags, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_output_stream_splice_async(gobj(),
+                               source->gobj(),
+                               static_cast<GOutputStreamSpliceFlags>(flags),
+                               io_priority,
+                               NULL,
                                &SignalProxy_async_callback,
                                slot_copy);
 }
