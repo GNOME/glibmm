@@ -670,7 +670,7 @@ void File::mount_mountable(const SlotAsyncReady& slot)
                          slot_copy);
 }
 
-void File::unmount_mountable(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
+void File::unmount_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -678,14 +678,14 @@ void File::unmount_mountable(GMountUnmountFlags flags, const Glib::RefPtr<Cancel
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_unmount_mountable(gobj(),
-                           flags, 
+                           static_cast<GMountUnmountFlags>(flags), 
                            cancellable->gobj(),
                            &SignalProxy_async_callback,
                            slot_copy);
 }
 
 void
-File::unmount_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot)
+File::unmount_mountable(const SlotAsyncReady& slot, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -693,14 +693,25 @@ File::unmount_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_unmount_mountable(gobj(),
-                           flags, 
+                           static_cast<GMountUnmountFlags>(flags), 
                            NULL,
                            &SignalProxy_async_callback,
                            slot_copy);
 }
 
 void
-File::eject_mountable(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
+File::unmount_mountable(MountUnmountFlags flags)
+{
+  g_file_unmount_mountable(gobj(),
+                           static_cast<GMountUnmountFlags>(flags), 
+                           NULL,
+                           NULL,
+                           NULL);
+}
+
+
+void
+File::eject_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -708,14 +719,14 @@ File::eject_mountable(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>&
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_eject_mountable(gobj(),
-                         flags, 
+                         static_cast<GMountUnmountFlags>(flags), 
                          cancellable->gobj(),
                          &SignalProxy_async_callback,
                          slot_copy);
 }
 
 void
-File::eject_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot)
+File::eject_mountable(const SlotAsyncReady& slot, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -723,10 +734,20 @@ File::eject_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_eject_mountable(gobj(),
-                         flags, 
+                         static_cast<GMountUnmountFlags>(flags), 
                          NULL,
                          &SignalProxy_async_callback,
                          slot_copy);
+}
+
+void
+File::eject_mountable(MountUnmountFlags flags)
+{
+  g_file_eject_mountable(gobj(),
+                         static_cast<GMountUnmountFlags>(flags), 
+                         NULL,
+                         NULL,
+                         NULL);
 }
 
 void

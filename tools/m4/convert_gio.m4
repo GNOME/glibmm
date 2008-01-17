@@ -1,5 +1,6 @@
 _CONV_ENUM(G,PasswordSave)
 _CONV_ENUM(G,MountOperationResult)
+_CONV_ENUM(G,MountUnmountFlags)
 _CONV_ENUM(G,FileAttributeType)
 _CONV_ENUM(G,FileAttributeInfoFlags)
 _CONV_ENUM(G,FileCopyFlags)

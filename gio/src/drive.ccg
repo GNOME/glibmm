@@ -50,7 +50,7 @@ SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data)
 namespace Gio
 {
 
-void Drive::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, GMountUnmountFlags flags)
+void Drive::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -58,13 +58,13 @@ void Drive::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& c
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_drive_eject(gobj(),
-                flags, 
+                static_cast<GMountUnmountFlags>(flags), 
                 cancellable->gobj(),
                 &SignalProxy_async_callback,
                 slot_copy);
 }
 
-void Drive::eject(const SlotAsyncReady& slot, GMountUnmountFlags flags)
+void Drive::eject(const SlotAsyncReady& slot, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -72,16 +72,16 @@ void Drive::eject(const SlotAsyncReady& slot, GMountUnmountFlags flags)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_drive_eject(gobj(),
-                flags, 
+                static_cast<GMountUnmountFlags>(flags), 
                 NULL, // cancellable
                 &SignalProxy_async_callback,
                 slot_copy);
 }
 
-void Drive::eject(GMountUnmountFlags flags)
+void Drive::eject(MountUnmountFlags flags)
 {
   g_drive_eject(gobj(),
-                flags, 
+                static_cast<GMountUnmountFlags>(flags), 
                 NULL, // cancellable
                 NULL,
                 NULL);

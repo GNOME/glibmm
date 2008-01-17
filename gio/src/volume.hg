@@ -19,12 +19,10 @@
 
 #include <gio/gio.h>
 
-#include <glibmm/interface.h>
-#include <giomm/asyncresult.h>
-#include <giomm/cancellable.h>
-#include <giomm/drive.h>
-#include <giomm/icon.h>
+#include <giomm/file.h>
 #include <giomm/mountoperation.h>
+//#include <giomm/drive.h>
+//#include <giomm/icon.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
@@ -35,6 +33,7 @@ namespace Gio
 // Making a forward declaration here to avoid circular dependency.
 // file.hg already includes volume.h.
 class File;
+class Drive;
 
 /** The Volume interface represents user-visible objects that can be mounted.
  * 
@@ -91,12 +90,11 @@ public:
                errthrow)
 
   //TODO: Documentation.
-  //TODO: Use MountUnmountFlags instead of GMountUnmountFlags.
-  void eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, GMountUnmountFlags flags = G_MOUNT_UNMOUNT_NONE);
+  void eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
 
-  void eject(const SlotAsyncReady& slot, GMountUnmountFlags flags = G_MOUNT_UNMOUNT_NONE);
+  void eject(const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
 
-  void eject(GMountUnmountFlags flags = G_MOUNT_UNMOUNT_NONE);
+  void eject(MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
   _IGNORE(g_volume_eject)
 
   _WRAP_METHOD(bool eject_finish(const Glib::RefPtr<AsyncResult>& result),

@@ -17,10 +17,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gio/gio.h>
+
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
 #include <giomm/file.h>
+#include <giomm/drive.h>
+#include <gio/gio.h>
 
 namespace {
 
@@ -102,7 +104,7 @@ Volume::mount()
 }
 
 
-void Volume::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, GMountUnmountFlags flags)
+void Volume::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -110,13 +112,13 @@ void Volume::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& 
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_volume_eject(gobj(),
-                 flags, 
+                 static_cast<GMountUnmountFlags>(flags), 
                  cancellable->gobj(),
                  &SignalProxy_async_callback,
                  slot_copy);
 }
 
-void Volume::eject(const SlotAsyncReady& slot, GMountUnmountFlags flags)
+void Volume::eject(const SlotAsyncReady& slot, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -124,16 +126,16 @@ void Volume::eject(const SlotAsyncReady& slot, GMountUnmountFlags flags)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_volume_eject(gobj(),
-                 flags, 
+                 static_cast<GMountUnmountFlags>(flags), 
                  NULL,
                  &SignalProxy_async_callback,
                  slot_copy);
 }
 
-void Volume::eject(GMountUnmountFlags flags)
+void Volume::eject(MountUnmountFlags flags)
 {
   g_volume_eject(gobj(),
-                 flags, 
+                 static_cast<GMountUnmountFlags>(flags), 
                  NULL,
                  NULL,
                  NULL);

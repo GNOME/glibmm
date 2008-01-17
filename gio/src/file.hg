@@ -29,7 +29,7 @@
 #include <giomm/filemonitor.h>
 #include <giomm/fileoutputstream.h>
 #include <giomm/mountoperation.h>
-#include <giomm/volume.h>
+//#include <giomm/volume.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
@@ -37,10 +37,13 @@ _PINCLUDE(glibmm/private/interface_p.h)
 namespace Gio
 {
 
+class Volume;
+
 _WRAP_ENUM(FileQueryInfoFlags, GFileQueryInfoFlags, NO_GTYPE)
 _WRAP_ENUM(FileCreateFlags, GFileCreateFlags, NO_GTYPE)
 _WRAP_ENUM(FileCopyFlags, GFileCopyFlags, NO_GTYPE)
 _WRAP_ENUM(FileMonitorFlags, GFileMonitorFlags, NO_GTYPE)
+_WRAP_ENUM(MountUnmountFlags, GMountUnmountFlags, NO_GTYPE)
 
 /** File and directory handling.
  * Gio::File is a high level abstraction for manipulating files on a virtual file system. Gio::Files are lightweight, immutable objects that do no 
@@ -559,23 +562,26 @@ public:
    *
    * When the operation is finished, @a slot will be called. You can then call unmount_mountable_finish() to get the result of the operation.
    *
-   * @param flags Flags affecting the operation.
-   * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param flags Flags affecting the operation.
    */
-  void unmount_mountable(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  void unmount_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
 
   /** Unmounts a file of type FILE_TYPE_MOUNTABLE.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
-   *
    * When the operation is finished, @a slot will be called. You can then call unmount_mountable_finish() to get the result of the operation.
    *
-   * @param flags Flags affecting the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
+   * @param flags Flags affecting the operation.
    */
-  void unmount_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot);
+  void unmount_mountable(const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+
+  /** Unmounts a file of type FILE_TYPE_MOUNTABLE.
+   *
+   * @param flags Flags affecting the operation.
+   */
+  void unmount_mountable(MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
   _IGNORE(g_file_unmount_mountable)
 
   _WRAP_METHOD(bool unmount_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
@@ -593,19 +599,22 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void eject_mountable(GMountUnmountFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  void eject_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
 
   /** Starts an asynchronous eject on a mountable.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
-   *
    * When the operation is finished, @a slot will be called. You can then call eject_mountable_finish() to get the result of the operation.
    *
-   * @param flags Flags affecting the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
+   * @param flags Flags affecting the operation.
    */
-  void eject_mountable(GMountUnmountFlags flags, const SlotAsyncReady& slot);
+  void eject_mountable(const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+
+  /** Starts an asynchronous eject on a mountable.
+   *
+   * @param flags Flags affecting the operation.
+   */
+  void eject_mountable(MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
   _IGNORE(g_file_eject_mountable)
 
   _WRAP_METHOD(bool eject_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
