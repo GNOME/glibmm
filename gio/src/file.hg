@@ -79,8 +79,6 @@ public:
   _IGNORE(g_file_new_for_commandline_arg)
   _IGNORE(g_file_parse_name)
 
-//TODO: Documentation for the methods.
-
   // Although this is an interface, it is possible to create objects using
   // its static create* members. In the implementation, these would lead
   // to functions of the default GVfs implementation, which, in case of
@@ -169,9 +167,24 @@ public:
                g_file_read,
                refreturn, constversion, errthrow)
 
-  //TODO: Documentation:
-  void read_async(const SlotAsyncReady& slot, int io_priority = G_PRIORITY_DEFAULT);
+  /** Asynchronously opens the file for reading.
+   * For more details, see read() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call read_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param io_priority The I/O priority of the request.
+   */
   void read_async(const SlotAsyncReady& slot, Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
+
+  /** Asynchronously opens the file for reading.
+   * For more details, see read() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call read_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param io_priority The I/O priority of the request.
+   */
+  void read_async(const SlotAsyncReady& slot, int io_priority = G_PRIORITY_DEFAULT);
   _IGNORE(g_file_read_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileInputStream> read_finish(const Glib::RefPtr<AsyncResult>& result),
@@ -187,13 +200,87 @@ public:
                g_file_create,
                refreturn, errthrow)
 
-  // TODO: see what etags are for. It seems that it can be null.
-  _WRAP_METHOD(Glib::RefPtr<FileOutputStream> replace(const std::string& etag, bool make_backup, FileCreateFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
-               g_file_replace,
-               refreturn, errthrow)
+
+  //TODO: Rephrase this documentation in terms of _throwing_ exceptions instead of returning errors. And what exception is thrown?
+
+  /** Returns an output stream for overwriting the file, possibly creating a backup copy of the file first.
+   * This will try to replace the file in the safest way possible so that any errors during the writing will 
+   * not affect an already existing copy of the file. For instance, for local files it may write to a 
+   * temporary file and then atomically rename over the destination when the stream is closed.
+   *
+   * By default files created are generally readable by everyone, but if you pass FILE_CREATE_PRIVATE in 
+   * @a flags the file will be made readable only to the current user, to the level that is supported on the 
+   * target filesystem.
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   *
+   * If you pass in an etag value, then this value is compared to the current entity tag of the file, 
+   * and if they differ an IO_ERROR_WRONG_ETAG error is returned. This generally means that the file has 
+   * been changed since you last read it. You can get the new etag from FileOutputStream::get_etag() 
+   * after you've finished writing and closed the FileOutputStream. When you load a new file you can 
+   * use FileInputStream::query_info() to get the etag of the file.
+   *
+   * If @a make_backup is true, this function will attempt to make a backup of the current file before 
+   * overwriting it. If this fails a IO_ERROR_CANT_CREATE_BACKUP error will be returned. If you want to replace 
+   * anyway, try again with @a make_backup set to false.
+   *
+   * If the file is a directory the IO_ERROR_IS_DIRECTORY error will be returned, and if the file is some 
+   * other form of non-regular file then a IO_ERROR_NOT_REGULAR_FILE error will be returned. Some file 
+   * systems don't allow all file names, and may return an IO_ERROR_INVALID_FILENAME error, and if the 
+   * name is to long IO_ERROR_FILENAME_TOO_LONG will be returned. Other errors are possible too, and 
+   * depend on what kind of filesystem the file is on.
+   * 
+   * @param etag An optional entity tag for the current Glib::File.
+   * @param make_backup <tt>true</tt> if a backup should be created.
+   * @param flags A set of FileCreateFlags.
+   * @return A FileOutputStream.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileOutputStream> replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileOutputStream> replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
-  //TODO: Rearrange the parameters (and in all the other similar functions) so we can have default paramter values?
+  /** Returns an output stream for overwriting the file, possibly creating a backup copy of the file first.
+   * This will try to replace the file in the safest way possible so that any errors during the writing will 
+   * not affect an already existing copy of the file. For instance, for local files it may write to a 
+   * temporary file and then atomically rename over the destination when the stream is closed.
+   *
+   * By default files created are generally readable by everyone, but if you pass FILE_CREATE_PRIVATE in 
+   * @a flags the file will be made readable only to the current user, to the level that is supported on the 
+   * target filesystem.
+   *
+   * If you pass in an etag value, then this value is compared to the current entity tag of the file, 
+   * and if they differ an IO_ERROR_WRONG_ETAG error is returned. This generally means that the file has 
+   * been changed since you last read it. You can get the new etag from FileOutputStream::get_etag() 
+   * after you've finished writing and closed the FileOutputStream. When you load a new file you can 
+   * use FileInputStream::query_info() to get the etag of the file.
+   *
+   * If @a make_backup is true, this function will attempt to make a backup of the current file before 
+   * overwriting it. If this fails a IO_ERROR_CANT_CREATE_BACKUP error will be returned. If you want to replace 
+   * anyway, try again with @a make_backup set to false.
+   *
+   * If the file is a directory the IO_ERROR_IS_DIRECTORY error will be returned, and if the file is some 
+   * other form of non-regular file then a IO_ERROR_NOT_REGULAR_FILE error will be returned. Some file 
+   * systems don't allow all file names, and may return an IO_ERROR_INVALID_FILENAME error, and if the 
+   * name is to long IO_ERROR_FILENAME_TOO_LONG will be returned. Other errors are possible too, and 
+   * depend on what kind of filesystem the file is on.
+   * 
+   * @param etag An optional entity tag for the current Glib::File.
+   * @param make_backup <tt>true</tt> if a backup should be created.
+   * @param flags A set of FileCreateFlags.
+   * @return A FileOutputStream.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileOutputStream> replace(const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileOutputStream> replace(const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  _IGNORE(g_file_replace)
+
 
   /** Asynchronously opens the file for appending.
    * For more details, see append_to() which is the synchronous version of this call.
@@ -252,8 +339,6 @@ public:
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create_file_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_create_finish,
                refreturn, errthrow)
-
-  //TODO: The etag parameter in g_file_replace_sync() can be NULL (documented in g_file_replace()).
 
   /** Asyncronously overwrites the file, replacing the contents, possibly creating a backup copy of the file first.
    * For more details, see replace() which is the synchronous version of this call.
@@ -364,9 +449,32 @@ public:
                g_file_enumerate_children_finish,
                errthrow)
 
-  _WRAP_METHOD(Glib::RefPtr<File> set_display_name(const std::string& display_name, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(Glib::RefPtr<File> set_display_name(const Glib::ustring& display_name, const Glib::RefPtr<Cancellable>& cancellable),
                g_file_set_display_name,
                refreturn, errthrow)
+
+  /** Renames the file to the specified display name.
+   * 
+   * The display name is converted from UTF8 to the correct encoding for the target
+   * filesystem if possible and the file is renamed to this.
+   * 
+   * If you want to implement a rename operation in the user interface the edit name
+   * (G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME) should be used as the initial value in the rename
+   * widget, and then the result after editing should be passed to set_display_name().
+   * 
+   * On success the resulting converted filename is returned.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error G::IO_ERROR_CANCELLED will be returned.
+   *
+   * @param display_name A string.
+   * @return A Glib::File specifying what @a file  was renamed to, or an empty RefPtr if there was an error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<File> set_display_name(const Glib::ustring& display_name);
+#else
+  Glib::RefPtr<File> set_display_name(const Glib::ustring& display_name, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
   //TODO: Use ustring for the display name?
@@ -379,7 +487,7 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param io_priority The I/O priority of the request.
    */
-  void set_display_name_async(const std::string& display_name, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
+  void set_display_name_async(const Glib::ustring& display_name, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
 
   /** Asynchronously sets the display name for a given Gio::File. For the synchronous version of this function, see set_display_name().
    * When the operation is finished, @a slot will be called. You can then call set_display_name_finish() to get the result of the operation.
@@ -388,7 +496,7 @@ public:
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param io_priority The I/O priority of the request.
    */
-  void set_display_name_async(const std::string& display_name, const SlotAsyncReady& slot, int io_priority = G_PRIORITY_DEFAULT);
+  void set_display_name_async(const Glib::ustring& display_name, const SlotAsyncReady& slot, int io_priority = G_PRIORITY_DEFAULT);
   _IGNORE(g_file_set_display_name_async)
 
   _WRAP_METHOD(Glib::RefPtr<File> set_display_name_finish(const Glib::RefPtr<AsyncResult>& result),
@@ -410,29 +518,84 @@ public:
    */
   typedef sigc::slot<void, goffset, goffset> SlotFileProgress;
 
-  //TODO: Documentation:
+  //TODO: Rephrase this in terms of exceptions rather than errors. And what exceptions are thrown?
+  /** Copies the file source to the location specified by destination. Can not handle recursive copies of directories.
+   * If the flag FILE_COPY_OVERWRITE is specified an already existing destination file is overwritten.
+   * If the flag FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   *
+   * The operation can be monitored via the @a slot callback.
+   *
+   * If the source file does not exist then the IO_ERROR_NOT_FOUND error is returned, independent on the status of the destination.
+   *
+   * If FILE_COPY_OVERWRITE is not specified and the target exists, then the error IO_ERROR_EXISTS is returned.
+   *
+   * If trying to overwrite a file over a directory the IO_ERROR_IS_DIRECTORY error is returned. 
+   * If trying to overwrite a directory with a directory the IO_ERROR_WOULD_MERGE error is returned.
+   *
+   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, 
+   * then the IO_ERROR_WOULD_RECURSE error is returned.
+   *
+   * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
+   */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileProgress& slot);
-
-  bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const SlotFileProgress& slot);
+  bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE);
 #else
-  bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const Glib::RefPtr<Cancellable>& cancellable,  const SlotFileProgress& slot, std::auto_ptr<Glib::Error>& error);
+  bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE, std::auto_ptr<Glib::Error>& error);
+#endif
 
-  bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const SlotFileProgress& slot, std::auto_ptr<Glib::Error>& error);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags = FILE_COPY_NONE);
+#else
+  bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FILE_COPY_NONE);
+#else
+  bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif // GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_copy)
 
 
-
-  //TODO: Documentation:
+  //TODO: Rephrase this in terms of exceptions rather than errors. And what exceptions are thrown?
+  /** Tries to move the file or directory source to the location specified by destination. If native move operations are supported then this is 
+   * used, otherwise a copy and delete fallback is used. The native implementation may support moving directories (for instance on moves inside 
+   * the same filesystem), but the fallback code does not.
+   *
+   * If the flag FILE_COPY_OVERWRITE is specified an already existing destination file is overwritten.
+   * 
+   * If the flag FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   *
+   * The operation can be monitored via the @a slot callback.
+   * If the source file does not exist then the IO_ERROR_NOT_FOUND error is returned, independent on the status of the destination.
+   * 
+   * If G_FILE_COPY_OVERWRITE is not specified and the target exists, then the error G_IO_ERROR_EXISTS is returned.
+   * 
+   * If trying to overwrite a file over a directory the IO_ERROR_IS_DIRECTORY error is returned. 
+   * If trying to overwrite a directory with a directory the IO_ERROR_WOULD_MERGE error is returned.
+   * 
+   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, then the IO_ERROR_WOULD_RECURSE error may be returned (if the native move operation isn't available).
+   */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileProgress& slot);
-
-  bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const SlotFileProgress& slot);
+  bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE);
 #else
-  bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileProgress& slot, std::auto_ptr<Glib::Error>& error);
+  bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE, std::auto_ptr<Glib::Error>& error);
+#endif
 
-  bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, const SlotFileProgress& slot, std::auto_ptr<Glib::Error>& error);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags = FILE_COPY_NONE);
+#else
+  bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FILE_COPY_NONE);
+#else
+  bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif // GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_move)
 

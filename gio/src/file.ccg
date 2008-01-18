@@ -73,10 +73,8 @@ SignalProxy_file_progress_callback(goffset current_num_bytes,
   delete the_slot;
 }
 
-// TODO: here it is supposed that the callback is invoked multiple times.
-// If not, then it should be deleted here, not in async_packed_callback.
 static gboolean
-SignalProxy_read_more_callback(const char* file_contents, goffset file_size, gpointer data)
+SignalProxy_load_partial_contents_read_more_callback(const char* file_contents, goffset file_size, gpointer data)
 {
   LoadPartialSlots* slot_pair = static_cast<LoadPartialSlots*>(data);
   Gio::File::SlotReadMore* the_slot = slot_pair->first;
@@ -105,7 +103,7 @@ SignalProxy_read_more_callback(const char* file_contents, goffset file_size, gpo
 // the slot is packed in a pair. The operation is assumed to be finished
 // after the callback is triggered, so we delete that pair here.
 static void
-SignalProxy_async_packed_callback(GObject*, GAsyncResult* res, void* data)
+SignalProxy_load_partial_contents_ready_callback(GObject*, GAsyncResult* res, void* data)
 {
   LoadPartialSlots* slot_pair = static_cast<LoadPartialSlots*>(data);
   Gio::SlotAsyncReady* the_slot = slot_pair->second;
@@ -367,8 +365,30 @@ File::enumerate_children_async(const std::string& attributes, const SlotAsyncRea
                                   slot_copy);
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<File> File::set_display_name(const Glib::ustring& display_name)
+#else
+Glib::RefPtr<File> File::set_display_name(const Glib::ustring& display_name, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<File> retvalue = Glib::wrap(g_file_set_display_name(gobj(), display_name.c_str(), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+
+}
+
 void
-File::set_display_name_async(const std::string& display_name, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+File::set_display_name_async(const Glib::ustring& display_name, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -384,7 +404,7 @@ File::set_display_name_async(const std::string& display_name, const SlotAsyncRea
 }
 
 void
-File::set_display_name_async(const std::string& display_name, const SlotAsyncReady& slot, int io_priority)
+File::set_display_name_async(const Glib::ustring& display_name, const SlotAsyncReady& slot, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -401,17 +421,10 @@ File::set_display_name_async(const std::string& display_name, const SlotAsyncRea
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
-File::copy(const Glib::RefPtr<File>& destination,
-           FileCopyFlags flags,
-           const Glib::RefPtr<Cancellable>& cancellable,
-           const SlotFileProgress& slot)
+File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
 #else
 bool
-File::copy(const Glib::RefPtr<File>& destination,
-           FileCopyFlags flags,
-           const Glib::RefPtr<Cancellable>& cancellable,
-           const SlotFileProgress& slot,
-           std::auto_ptr<Glib::Error>& error)
+File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
 #endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
@@ -443,16 +456,11 @@ File::copy(const Glib::RefPtr<File>& destination,
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
-File::copy(const Glib::RefPtr<File>& destination,
-           FileCopyFlags flags,
-           const SlotFileProgress& slot)
+File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags)
 #else
 bool
-File::copy(const Glib::RefPtr<File>& destination,
-           FileCopyFlags flags,
-           const SlotFileProgress& slot,
-           std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
+File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -483,17 +491,38 @@ File::copy(const Glib::RefPtr<File>& destination,
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
-File::move(const Glib::RefPtr<File>& destination,
-           FileCopyFlags flags,
-           const Glib::RefPtr<Cancellable>& cancellable,
-           const SlotFileProgress& slot)
+File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
 #else
 bool
-File::move(const Glib::RefPtr<File>& destination,
-           FileCopyFlags flags,
-           const Glib::RefPtr<Cancellable>& cancellable,
-           const SlotFileProgress& slot,
-           std::auto_ptr<Glib::Error>& error)
+File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool res = g_file_copy(gobj(),
+                    destination->gobj(),
+                    static_cast<GFileCopyFlags>(flags),
+                    NULL,
+                    NULL,
+                    NULL,
+                    &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if (gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return res;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool
+File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
+#else
+bool
+File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
 #endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
@@ -525,16 +554,11 @@ File::move(const Glib::RefPtr<File>& destination,
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
-File::move(const Glib::RefPtr<File>& destination,
-           FileCopyFlags flags,
-           const SlotFileProgress& slot)
+File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags)
 #else
 bool
-File::move(const Glib::RefPtr<File>& destination,
-           FileCopyFlags flags,
-           const SlotFileProgress& slot,
-           std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
+File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -550,6 +574,36 @@ File::move(const Glib::RefPtr<File>& destination,
                     NULL,
                     &SignalProxy_file_progress_callback,
                     slot_copy,
+                    &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if (gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return res;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool
+File::move(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
+#else
+bool
+File::move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool res;
+
+  res = g_file_move(gobj(),
+                    destination->gobj(),
+                    static_cast<GFileCopyFlags>(flags),
+                    NULL,
+                    NULL,
+                    NULL,
                     &gerror);
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -782,6 +836,7 @@ void
 File::load_partial_contents_async(const SlotReadMore& slot_read_more, const SlotAsyncReady& slot_async_ready, const Glib::RefPtr<Cancellable>& cancellable)
 {
   // Create a new pair which will hold copies of passed slots.
+  // This will be deleted in the SignalProxy_load_partial_contents_ready_callback() callback
   LoadPartialSlots* slots = new LoadPartialSlots();
   SlotReadMore* slot_read_more_copy = new SlotReadMore(slot_read_more);
   SlotAsyncReady* slot_async_copy = new SlotAsyncReady(slot_async_ready);
@@ -791,8 +846,8 @@ File::load_partial_contents_async(const SlotReadMore& slot_read_more, const Slot
 
   g_file_load_partial_contents_async(gobj(),
                                      cancellable->gobj(),
-                                     &SignalProxy_read_more_callback,
-                                     &SignalProxy_async_packed_callback,
+                                     &SignalProxy_load_partial_contents_read_more_callback,
+                                     &SignalProxy_load_partial_contents_ready_callback,
                                      slots);
 }
 
@@ -801,6 +856,7 @@ File::load_partial_contents_async(const SlotReadMore& slot_read_more,
                                   const SlotAsyncReady& slot_async_ready)
 {
   // Create a new pair which will hold copies of passed slots.
+  // This will be deleted in the SignalProxy_load_partial_contents_ready_callback() callback
   LoadPartialSlots* slots = new LoadPartialSlots();
   SlotReadMore* slot_read_more_copy = new SlotReadMore(slot_read_more);
   SlotAsyncReady* slot_async_copy = new SlotAsyncReady(slot_async_ready);
@@ -810,8 +866,8 @@ File::load_partial_contents_async(const SlotReadMore& slot_read_more,
 
   g_file_load_partial_contents_async(gobj(),
                                      NULL,
-                                     &SignalProxy_read_more_callback,
-                                     &SignalProxy_async_packed_callback,
+                                     &SignalProxy_load_partial_contents_read_more_callback,
+                                     &SignalProxy_load_partial_contents_ready_callback,
                                      slots);
 }
 
@@ -862,6 +918,48 @@ File::replace_contents_async(const char* contents,
                                 NULL,
                                 &SignalProxy_async_callback,
                                 slot_copy);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags)
+#else
+Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_backup, FileCreateFlags flags)
+#else
+Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
 }
 
 } // namespace Gio
