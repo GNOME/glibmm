@@ -73,14 +73,31 @@ public:
   _WRAP_METHOD(bool can_mount() const, g_volume_can_mount)
   _WRAP_METHOD(bool can_eject() const, g_volume_can_eject)
 
-  //TODO: Documentation.
-
+  /** Mounts a volume.
+   * This is an asynchronous operation, and is finished by calling mount_finish() with the AsyncResult data returned in the callback slot.
+   *
+   * @param slot A callback which will be called when the operation is completed or canceled.
+   * @param cancellable A cancellable object which can be used to cancel the operation.
+   * @param mount_operation A mount operation.
+   */
   void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
 
+  /** Mounts a volume.
+   * This is an asynchronous operation, and is finished by calling mount_finish() with the AsyncResult data returned in the callback slot.
+   *
+   * @param slot A callback which will be called when the operation is completed or canceled.
+   * @param mount_operation A mount operation.
+   */
   void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot);
 
+  /** Mounts a volume.
+   * 
+   * @param mount_operation A mount operation.
+   */
   void mount(const Glib::RefPtr<MountOperation>& mount_operation);
 
+  /** Mounts a volume.
+   */
   void mount();
 
   _IGNORE(g_volume_mount)
@@ -89,11 +106,28 @@ public:
                g_volume_mount_finish,
                errthrow)
 
-  //TODO: Documentation.
+  /** Ejects a volume. 
+   * This is an asynchronous operation, and is finished by calling eject_finish() with the AsyncResult data returned in the callback slot.
+   *
+   * @param slot A callback which will be called when the operation is completed or canceled.
+   * @param cancellable A cancellable object which can be used to cancel the operation.
+   * @param flags Flags affecting the unmount if required for eject.
+   */
   void eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
 
+  /** Ejects a volume. 
+   * This is an asynchronous operation, and is finished by calling eject_finish() with the AsyncResult data returned in the callback slot.
+   *
+   * @param slot A callback which will be called when the operation is completed or canceled.
+   * @param flags Flags affecting the unmount if required for eject.
+   */
   void eject(const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
 
+  /** Ejects a volume. 
+   * This is an asynchronous operation, and is finished by calling eject_finish() with the AsyncResult data returned in the callback slot.
+   *
+   * @param flags Flags affecting the unmount if required for eject.
+   */
   void eject(MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
   _IGNORE(g_volume_eject)
 
