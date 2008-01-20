@@ -45,8 +45,15 @@ class FileAttributeMatcher
                            NONE, g_file_attribute_matcher_ref, g_file_attribute_matcher_unref)
 
 public:
-  //TODO: Documentation.
-  static Glib::RefPtr<FileAttributeMatcher> create(const std::string& attributes);
+  /** Creates a new file attribute matcher, which matches attributes against a given string. 
+   * The attribute string should be formatted with specific keys separated from namespaces with a double colon. 
+   * Several "namespace::key" strings may be concatenated with a single comma (e.g. "standard::type,standard::is-hidden"). 
+   * The wildcard "*" may be used to match all keys and namespaces, or "namespace::*" will match all keys in a given namespace.
+   *
+   * @param attributes The attributes string.
+   * @result a new FileAttributeMatcher.
+   */
+  static Glib::RefPtr<FileAttributeMatcher> create(const std::string& attributes = "*");
 
   _WRAP_METHOD(bool matches(const std::string& full_name) const, g_file_attribute_matcher_matches)
   _WRAP_METHOD(bool matches_only(const std::string& full_name) const, g_file_attribute_matcher_matches_only)

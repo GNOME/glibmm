@@ -175,7 +175,7 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param io_priority The I/O priority of the request.
    */
-  void read_async(const SlotAsyncReady& slot, Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
+  void read_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
 
   /** Asynchronously opens the file for reading.
    * For more details, see read() which is the synchronous version of this call.
@@ -655,8 +655,6 @@ public:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
-  //TODO: Use ustring for the display name?
-
   /** Asynchronously sets the display name for a given Gio::File. For the synchronous version of this function, see set_display_name().
    * When the operation is finished, @a slot will be called. You can then call set_display_name_finish() to get the result of the operation.
    *
@@ -975,9 +973,28 @@ public:
                g_file_load_contents,
                errthrow)
 
-  //TODO: Documentation:
+  /** Starts an asynchronous load of the file's contents.
+   * For more details, see load_contents() which is the synchronous version of this call.
+   *
+   * When the load operation has completed, the @a slot will be called. To finish the operation, 
+   * call load_contents_finish() with the AsyncResult provided to the @a slot.
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object.
+   */
   void load_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
 
+  /** Starts an asynchronous load of the file's contents.
+   * For more details, see load_contents() which is the synchronous version of this call.
+   *
+   * When the load operation has completed, the @a slot will be called. To finish the operation, 
+   * call load_contents_finish() with the AsyncResult provided to the @a slot.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
   void load_contents_async(const SlotAsyncReady& slot);
   _IGNORE(g_file_load_contents_async)
 
@@ -1055,7 +1072,7 @@ public:
   _WRAP_VFUNC(std::string get_uri() const, "get_uri")
   _WRAP_VFUNC(std::string get_parse_name() const, "get_parse_name")
 
-  _WRAP_VFUNC(Glib::RefPtr<File> get_parent() const, "get_parent")
+  //TODO: Careful of refcounting: _WRAP_VFUNC(Glib::RefPtr<File> get_parent() const, "get_parent")
 
   // TODO: GFileIface does not define get_child(). Perhaps it's not intentional.
   //  _WRAP_VFUNC(Glib::RefPtr<File> get_child(const std::string& name) const, "get_child")
@@ -1067,26 +1084,16 @@ public:
 
 #m4 _CONVERSION(`GFile*',`const Glib::RefPtr<File>&',`Glib::wrap($3, true)')
 
-  _WRAP_VFUNC(bool contains_file(const Glib::RefPtr<File>& descendant) const,
-              "contains_file")
+  _WRAP_VFUNC(bool contains_file(const Glib::RefPtr<File>& descendant) const, "contains_file")
 
-  _WRAP_VFUNC(std::string get_relative_path(const Glib::RefPtr<File>& descendant) const,
-              "get_relative_path")
+  _WRAP_VFUNC(std::string get_relative_path(const Glib::RefPtr<File>& descendant) const, "get_relative_path")
 
-  _WRAP_VFUNC(Glib::RefPtr<File> resolve_relative_path(const std::string& relative_path) const,
-              "resolve_relative_path")
+  //TODO: Careful of refcounting:   _WRAP_VFUNC(Glib::RefPtr<File> resolve_relative_path(const std::string& relative_path) const, "resolve_relative_path")
 
   _WRAP_VFUNC(bool is_native() const, "is_native")
   _WRAP_VFUNC(bool has_uri_scheme(const std::string& uri_scheme) const, "has_uri_scheme")
 };
 
-/** @relates Gio::File */
-inline bool operator==(const Glib::RefPtr<File>& lhs, const Glib::RefPtr<File>& rhs)
-{ return lhs->equal(rhs); }
-
-/** @relates Gio::File */
-inline bool operator!=(const Glib::RefPtr<File>& lhs, const Glib::RefPtr<File>& rhs)
-{ return ! lhs->equal(rhs); }
 
 } // namespace Gio
 
