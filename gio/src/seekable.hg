@@ -29,6 +29,11 @@ namespace Gio
 
 /** Stream seeking interface.
  * Seekable is implemented by streams (implementations of InputStream or OutputStream) that support seeking.
+ * To find the position of a stream, use tell(). To find 
+ * out if a stream supports seeking, use can_seek(). To position a 
+ * stream, use seek(). To find out if a stream supports 
+ * truncating, use can_truncate(). To truncate a stream, use 
+ * truncate().
  *
  * @newin2p16
  */
@@ -75,12 +80,12 @@ public:
 
 //TODO: Write the .defs for these:
   _WRAP_VFUNC(goffset tell() const, tell)
-  _WRAP_VFUNC(goffset can_seek(), can_seek)
+  _WRAP_VFUNC(goffset can_seek() const, can_seek)
   _WRAP_VFUNC(goffset seek(goffset offset, Glib::SeekType type, const Glib::RefPtr<Cancellable>& cancellable, GError** error), seek)
-  _WRAP_VFUNC(goffset can_truncate(), can_truncate)
+  _WRAP_VFUNC(goffset can_truncate() const, can_truncate)
 
-  //TODO: Rename to truncate()?
-  _WRAP_VFUNC(goffset truncate_fn(goffset offset, const Glib::RefPtr<Cancellable>& cancellable, GError** error), truncate_fn)
+  //Renamed to truncate() - we don't know why it's called truncate_fn in C.
+  _WRAP_VFUNC(goffset truncate(goffset offset, const Glib::RefPtr<Cancellable>& cancellable, GError** error), truncate_fn)
 
   //There are no properties or signals.
 };

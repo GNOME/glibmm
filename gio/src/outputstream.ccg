@@ -127,7 +127,22 @@ OutputStream::flush_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancell
 
   g_output_stream_flush_async(gobj(),
                               io_priority,
-                              cancellable->gobj(),
+                              const_cast<GCancellable*>(Glib::unwrap(cancellable)),
+                              &SignalProxy_async_callback,
+                              slot_copy);
+}
+
+void
+OutputStream::flush_async(const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_output_stream_flush_async(gobj(),
+                              io_priority,
+                              NULL,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -142,9 +157,215 @@ OutputStream::close_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancell
 
   g_output_stream_close_async(gobj(),
                               io_priority,
-                              cancellable->gobj(),
+                              const_cast<GCancellable*>(Glib::unwrap(cancellable)),
                               &SignalProxy_async_callback,
                               slot_copy);
+}
+
+void
+OutputStream::close_async(const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_output_stream_close_async(gobj(),
+                              io_priority,
+                              NULL,
+                              &SignalProxy_async_callback,
+                              slot_copy);
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize OutputStream::write(const void* buffer, gsize count)
+#else
+gssize OutputStream::write(const void* buffer, gsize count, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gssize retvalue = g_output_stream_write(gobj(), buffer, count, NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize OutputStream::write(const std::string& buffer, const Glib::RefPtr<Cancellable>& cancellable)
+#else
+gssize OutputStream::write(const std::string&, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gssize retvalue = g_output_stream_write(gobj(), buffer.c_str(), buffer.size(), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize OutputStream::write(const std::string& buffer)
+#else
+gssize OutputStream::write(const std::string&, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gssize retvalue = g_output_stream_write(gobj(), buffer.c_str(), buffer.size(), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool OutputStream::write_all(const void* buffer, gsize count, gsize& bytes_written)
+#else
+bool OutputStream::write_all(const void* buffer, gsize count, gsize& bytes_written, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_output_stream_write_all(gobj(), buffer, count, &(bytes_written), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written, const Glib::RefPtr<Cancellable>& cancellable)
+#else
+bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_output_stream_write_all(gobj(), buffer.c_str(), buffer.size(), &(bytes_written), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written)
+#else
+bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_output_stream_write_all(gobj(), buffer.c_str(), buffer.size(), &(bytes_written), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, const Glib::RefPtr<Cancellable>& cancellable, OutputStreamSpliceFlags flags)
+#else
+gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, const Glib::RefPtr<Cancellable>& cancellable, OutputStreamSpliceFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gssize retvalue = g_output_stream_splice(gobj(), const_cast<GInputStream*>(Glib::unwrap(source)), ((GOutputStreamSpliceFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, OutputStreamSpliceFlags flags)
+#else
+gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, OutputStreamSpliceFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gssize retvalue = g_output_stream_splice(gobj(), const_cast<GInputStream*>(Glib::unwrap(source)), ((GOutputStreamSpliceFlags)(flags)), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool OutputStream::flush()
+#else
+bool OutputStream::flush(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_output_stream_flush(gobj(), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool OutputStream::close()
+#else
+bool OutputStream::close(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_output_stream_close(gobj(), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
 }
 
 } // namespace Gio
