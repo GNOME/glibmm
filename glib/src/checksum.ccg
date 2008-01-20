@@ -30,10 +30,14 @@ Checksum::Checksum(ChecksumType type)
 {
 }
 
-
-gssize Checksum::get_length(ChecksumType type)
+Checksum::operator bool() const
 {
-  return g_checksum_type_get_length((GChecksumType)type);
+  return gobject_ != 0;
+}
+
+gssize Checksum::get_length(ChecksumType checksum_type)
+{
+  return g_checksum_type_get_length((GChecksumType)checksum_type);
 }
 
 std::string Checksum::compute_checksum(ChecksumType type, const std::string& data)

@@ -29,9 +29,20 @@ extern "C" { typedef struct _GChecksum GChecksum; }
 namespace Glib
 {
 
+/** Computes the checksum for data.
+ * This is a generic API for computing checksums (or "digests") for a sequence of arbitrary bytes, 
+ * using various hashing algorithms like MD5, SHA-1 and SHA-256. Checksums are commonly used in various environments and specifications.
+ *
+ * glibmm supports incremental checksums by calling g_checksum_update() as long as there's data available and then using get_string() 
+ * or get_digest() to compute the checksum and return it either as a string in hexadecimal form, or as a raw sequence of bytes. 
+ * To compute the checksum for binary blobs and NULL-terminated strings in one go, use the static compute_checksum() convenience functions().
+ *
+ * @newin2p16
+ */
 class Checksum
 {
   _CLASS_OPAQUE_COPYABLE(Checksum, GChecksum, NONE, g_checksum_copy, g_checksum_free)
+  _IGNORE(g_checksum_copy, g_checksum_free)
 public:
 
   /**
@@ -52,14 +63,17 @@ public:
 
 #m4 _CONVERSION(`ChecksumType', `GChecksumType', `(($2)$3)')
 
-  /**
-   * Create a checksum object for a given checksum type.
+  /** Creates a new Checksum, using the checksum algorithm @a checksum_type. 
+   * If the checksum_type is not known, then operator bool() will return false.
    *
    * @param type checksum type, one of defined above.
-   *
-   * @return new checksum object.
    */
-  Checksum(ChecksumType checksum_type);
+  explicit Checksum(ChecksumType checksum_type);
+
+  /** Returns true if the Checksum object is valid.
+   * This will return false, for instance, if an unsupported checksum type was provided to the constructor.
+   */
+  operator bool() const;
   
   _WRAP_METHOD(void update(const guchar* data, gsize length), g_checksum_update)
 
@@ -82,16 +96,18 @@ public:
    * @param checksum_type A ChecksumType
    * @param str The string to compute the checksum of.
    * @result The checksum as a hexadecimal string.
-   *
-   * @newin2p16
    */
   static std::string compute_checksum(ChecksumType type, const std::string& str);
   _IGNORE(g_compute_checksum_for_string)
 
-  /* TODO: Can not use _WRAP_METHOD because for some reason it takes ChecksumType
-   * as pointer, treating it as object. This problem is related to code
-   * generated from h2def, where def treat ChecksumType as object */
-  static gssize get_length(ChecksumType type);
+
+  //We don't use _WRAP_METHOD because this is not really a GCheckSum function:
+  /** Gets the length in bytes of digests of type @a checksum_type.
+   *
+   * @param checksum_type A ChecksumType.
+   * @result The checksum length, or -1 if @a checksum_type is not supported.
+   */
+  static gssize get_length(ChecksumType checksum_type);
 };
 
 } //namespace Glib
