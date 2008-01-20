@@ -370,13 +370,106 @@ public:
                g_file_replace_finish,
                refreturn, errthrow)
 
-  //TOOD: Add a version without the Cancellable?
-  _WRAP_METHOD(Glib::RefPtr<FileInfo> query_info(const std::string& attributes, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
-               g_file_query_info,
-               refreturn, errthrow)
+  /** Gets the requested information about the file. The result
+   * is a FileInfo object that contains key-value attributes (such as the  type or size
+   * of the file).
+   *
+   * The @a attribute value is a string that specifies the file attributes that
+   * should be gathered. It is not an error if it's not possible to read a particular
+   * requested attribute from a file - it just won't be set. @a attribute should
+   * be a comma-separated list of attribute or attribute wildcards. The wildcard "*"
+   * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
+   * namespace. An example attribute query be "standard::*,owner::user".
+   * The standard attributes are available as defines, like #G_FILE_ATTRIBUTE_STANDARD_NAME.
+   * 
+   * The operation can be cancelled by
+   * triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   *
+   * For symlinks, normally the information about the target of the
+   * symlink is returned, rather than information about the symlink itself.
+   * However if you pass FILE_QUERY_INFO_NOFOLLOW_SYMLINKS in @a flags the
+   * information about the symlink itself will be returned. Also, for symlinks
+   * that point to non-existing files the information about the symlink itself
+   * will be returned.
+   *
+   * If the file does not exist, the IO_ERROR_NOT_FOUND error will be returned.
+   * Other errors are possible too, and depend on what kind of filesystem the file is on.
+   *
+   * @param cancellable A Cancellable object.
+   * @param attributes: An attribute query string.
+   * @param flags: A set of FileQueryInfoFlags.
+   * @result a FileInfo for the given @file, or an empty RefPtr on error.
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileInfo> query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE) const;
+  #else
+  Glib::RefPtr<FileInfo> query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error) const;
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  //TOOD: Add a version without the Cancellable?
-  _WRAP_METHOD(bool query_exists(const Glib::RefPtr<Cancellable>& cancellable), g_file_query_exists)
+  /** Gets the requested information about the file. The result
+   * is a FileInfo object that contains key-value attributes (such as the  type or size
+   * of the file).
+   *
+   * The @a attribute value is a string that specifies the file attributes that
+   * should be gathered. It is not an error if it's not possible to read a particular
+   * requested attribute from a file - it just won't be set. @a attribute should
+   * be a comma-separated list of attribute or attribute wildcards. The wildcard "*"
+   * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
+   * namespace. An example attribute query be "standard::*,owner::user".
+   * The standard attributes are available as defines, like #G_FILE_ATTRIBUTE_STANDARD_NAME.
+   *
+   * For symlinks, normally the information about the target of the
+   * symlink is returned, rather than information about the symlink itself.
+   * However if you pass FILE_QUERY_INFO_NOFOLLOW_SYMLINKS in @a flags the
+   * information about the symlink itself will be returned. Also, for symlinks
+   * that point to non-existing files the information about the symlink itself
+   * will be returned.
+   *
+   * If the file does not exist, the IO_ERROR_NOT_FOUND error will be returned.
+   * Other errors are possible too, and depend on what kind of filesystem the file is on.
+   *
+   * @param attributes: An attribute query string.
+   * @param flags: A set of FileQueryInfoFlags.
+   * @result a FileInfo for the given @file, or an empty RefPtr on error.
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileInfo> query_info(const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE) const;
+  #else
+  Glib::RefPtr<FileInfo> query_info(const std::string& attributes, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error) const;
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  _IGNORE(g_file_query_info)
+
+  _WRAP_METHOD(bool query_exists(const Glib::RefPtr<Cancellable>& cancellable) const, g_file_query_exists)
+
+
+  /** Utility function to check if a particular file exists. This is
+   * implemented using query_info() and as such does blocking I/O.
+   *
+   * Note that in many cases it is racy to first check for file existance
+   * and then execute something based on the outcome of that, because the
+   * file might have been created or removed inbetween the operations. The
+   * general approach to handling that is to not check, but just do the
+   * operation and handle the errors as they come.
+   *
+   * As an example of race-free checking, take the case of reading a file, and
+   * if it doesn't exist, creating it. There are two racy versions: read it, and
+   * on error create it; and: check if it exists, if not create it. These
+   * can both result in two processes creating the file (with perhaps a partially
+   * written file as the result). The correct approach is to always try to create
+   * the file with g_file_create() which will either atomically create the file
+   * or fail with an IO_ERROR_EXISTS error.
+   *
+   * However, in many cases an existance check is useful in a user
+   * interface, for instance to make a menu item sensitive/insensitive, so that
+   * you don't have to fool users that something is possible and then just show
+   * and error dialog. If you do this, you should make sure to also handle the
+   * errors that can happen due to races when you execute the operation.
+   * 
+   * @result true if the file exists (and can be detected without error), false otherwise (or if cancelled).
+   */
+  bool query_exists() const;
 
 
   /** Asynchronously gets the requested information about specified file. The result is a FileInfo object that contains key-value attributes (such as type or size for the file).
@@ -390,7 +483,7 @@ public:
    * @param flags A set of FileQueryInfoFlags.
    * @param io_priority The I/O priority of the request.
    */
-  void query_info_async(const std::string& attributes, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
+  void query_info_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT) const;
 
   /** Asynchronously gets the requested information about specified file. The result is a FileInfo object that contains key-value attributes (such as type or size for the file).
    *
@@ -402,20 +495,105 @@ public:
    * @param flags A set of FileQueryInfoFlags.
    * @param io_priority The I/O priority of the request.
    */
-  void query_info_async(const std::string& attributes, const SlotAsyncReady& slot, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
+  void query_info_async(const SlotAsyncReady& slot, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT) const;
   _IGNORE(g_file_query_info_async)
+
 
   _WRAP_METHOD(Glib::RefPtr<FileInfo> query_info_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_query_info_finish,
                refreturn, errthrow)
 
-  _WRAP_METHOD(Glib::RefPtr<FileInfo> query_filesystem_info(const std::string& attributes, const Glib::RefPtr<Cancellable>& cancellable),
-               g_file_query_filesystem_info,
-               refreturn, errthrow)
+  /** Similar to g_file_query_info(), but obtains information
+   * about the filesystem the @a file  is on, rather than the file itself.
+   * For instance the amount of space availible and the type of
+   * the filesystem.
+   * 
+   * The @a attribute  value is a string that specifies the file attributes that
+   * should be gathered. It is not an error if its not possible to read a particular
+   * requested attribute from a file, it just won't be set. @a attribute  should
+   * be a comma-separated list of attribute or attribute wildcards. The wildcard "*"
+   * means all attributes, and a wildcard like "fs:*" means all attributes in the fs
+   * namespace. The standard namespace for filesystem attributes is "fs".
+   * Common attributes of interest are FILE_ATTRIBUTE_FILESYSTEM_SIZE
+   * (the total size of the filesystem in bytes), FILE_ATTRIBUTE_FILESYSTEM_FREE (number of
+   * bytes availible), and FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
+   * 
+   * If @a cancellable  is not <tt>0</tt>, then the operation can be cancelled by
+   * triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * 
+   * If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
+   * Other errors are possible too, and depend on what kind of filesystem the file is on.
+   * @param cancellable A Cancellable object.
+   * @param attributes An attribute query string.
+   * @return A FileInfo or an empty RefPtr if there was an error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileInfo> query_filesystem_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*");
+#else
+  Glib::RefPtr<FileInfo> query_filesystem_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_query_filesystem_info)
 
-  _WRAP_METHOD(Glib::RefPtr<FileEnumerator> enumerate_children(const std::string& attributes, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
-               g_file_enumerate_children,
-               errthrow)
+
+  /** Gets the requested information about the files in a directory. The result
+   * is a FileEnumerator object that will give out FileInfo objects for
+   * all the files in the directory.
+   * 
+   * The @a attribute  value is a string that specifies the file attributes that
+   * should be gathered. It is not an error if its not possible to read a particular
+   * requested attribute from a file, it just won't be set. @a attribute  should
+   * be a comma-separated list of attribute or attribute wildcards. The wildcard "*"
+   * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
+   * namespace. An example attribute query be "standard::*,owner::user".
+   * The standard attributes are availible as defines, like FILE_ATTRIBUTE_STANDARD_NAME.
+   * 
+   * The operation can be cancelled by
+   * triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * 
+   * If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
+   * If the file is not a directory, the G_FILE_ERROR_NOTDIR error will be returned.
+   * Other errors are possible too.
+   *
+   * @param cancellable A Cancellable object.
+   * @param attributes An attribute query string.
+   * @param flags A set of FileQueryInfoFlags.
+   * @return A FileEnumerator if successful, <tt>0</tt> on error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileEnumerator> enumerate_children(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE);
+#else
+  Glib::RefPtr<FileEnumerator> enumerate_children(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_enumerate_children)
+
+  /** Gets the requested information about the files in a directory. The result
+   * is a FileEnumerator object that will give out FileInfo objects for
+   * all the files in the directory.
+   * 
+   * The @a attribute  value is a string that specifies the file attributes that
+   * should be gathered. It is not an error if its not possible to read a particular
+   * requested attribute from a file, it just won't be set. @a attribute  should
+   * be a comma-separated list of attribute or attribute wildcards. The wildcard "*"
+   * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
+   * namespace. An example attribute query be "standard::*,owner::user".
+   * The standard attributes are availible as defines, like FILE_ATTRIBUTE_STANDARD_NAME.
+   * 
+   * If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
+   * If the file is not a directory, the G_FILE_ERROR_NOTDIR error will be returned.
+   * Other errors are possible too.
+   *
+   * @param attributes An attribute query string.
+   * @param flags A set of FileQueryInfoFlags.
+   * @return A FileEnumerator if successful, <tt>0</tt> on error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileEnumerator> enumerate_children(const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE);
+#else
+  Glib::RefPtr<FileEnumerator> enumerate_children(const std::string& attributes, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_enumerate_children)
 
 
 
@@ -430,19 +608,19 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void enumerate_children_async(const std::string& attributes, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
+  void enumerate_children_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
 
   /** Asynchronously gets the requested information about the files in a directory. The result is a GFileEnumerator object that will give out GFileInfo objects for all the files in the directory.
    *
    * For more details, see enumerate_children() which is the synchronous version of this call.
    * When the operation is finished, @a slot will be called. You can then call enumerate_children_finish() to get the result of the operation.
    *
+   * @param slot A callback slot which will be called when the request is satisfied.
    * @param attributes An attribute query string.
    * @param flags A set of FileQueryInfoFlags.
    * @param io_priority The I/O priority of the request.
-   * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void enumerate_children_async(const std::string& attributes, const SlotAsyncReady& slot, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
+  void enumerate_children_async(const SlotAsyncReady& slot, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
   _IGNORE(g_file_enumerate_children_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileEnumerator> enumerate_children_finish(const Glib::RefPtr<AsyncResult>& result),
@@ -465,7 +643,7 @@ public:
    * On success the resulting converted filename is returned.
    * 
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error G::IO_ERROR_CANCELLED will be returned.
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned.
    *
    * @param display_name A string.
    * @return A Glib::File specifying what @a file  was renamed to, or an empty RefPtr if there was an error.
