@@ -112,8 +112,18 @@ public:
 
   /** You can use the signal_changed() signal of the property proxy instead, 
    * but this is necessary when using the reduced API.
+   *
+   * See also connect_property_changed_with_return().
    */
   void connect_property_changed(const Glib::ustring& property_name, const sigc::slot<void>& slot);
+
+  /** You can use the signal_changed() signal of the property proxy instead, 
+   * but this is necessary when using the reduced API.
+   *
+   * This method was added because connect_property_changed() does not return a sigc::connection, 
+   * and we could not break the ABI by changing that function.
+   */
+  sigc::connection connect_property_changed_with_return(const Glib::ustring& property_name, const sigc::slot<void>& slot);
 
   //TODO: Why are these virtual?
   /** Increment the reference count for this object.

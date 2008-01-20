@@ -258,6 +258,11 @@ void ObjectBase::get_property_value(const Glib::ustring& property_name, Glib::Va
 
 void ObjectBase::connect_property_changed(const Glib::ustring& property_name, const sigc::slot<void>& slot)
 {
+  connect_property_changed_with_return(property_name, slot);
+}
+
+sigc::connection ObjectBase::connect_property_changed_with_return(const Glib::ustring& property_name, const sigc::slot<void>& slot)
+{
   // Create a proxy to hold our connection info
   // This will be deleted by destroy_notify_handler.
   PropertyProxyConnectionNode* pConnectionNode = new PropertyProxyConnectionNode(slot, gobj());
@@ -271,7 +276,10 @@ void ObjectBase::connect_property_changed(const Glib::ustring& property_name, co
          notify_signal_name.c_str(), (GCallback)(&PropertyProxyConnectionNode::callback), pConnectionNode, 
          &PropertyProxyConnectionNode::destroy_notify_handler,
          G_CONNECT_AFTER);
+
+  return sigc::connection(pConnectionNode->slot_);
 }
+
 
 
 bool _gobject_cppinstance_already_deleted(GObject* gobject)
