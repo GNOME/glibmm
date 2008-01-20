@@ -752,6 +752,18 @@
 )
 
 
+(define-enum Type
+  (in-module "GChecksum")
+  (c-name "GChecksumType")
+  (gtype-id "G_TYPE_CHECKSUM_TYPE")
+  (values
+    '("md5" "G_CHECKSUM_MD5")
+    '("sha1" "G_CHECKSUM_SHA1")
+    '("sha256" "G_CHECKSUM_SHA256")
+  )
+)
+
+
 ;; From galias.h
 
 
@@ -1909,6 +1921,82 @@
   )
 )
 
+
+
+;; From gchecksum.h
+
+(define-method get_length
+  (of-object "GChecksumType")
+  (c-name "g_checksum_type_get_length")
+  (return-type "gssize")
+)
+
+(define-function g_checksum_new
+  (c-name "g_checksum_new")
+  (is-constructor-of "GChecksum")
+  (return-type "GChecksum*")
+  (parameters
+    '("GChecksumType" "checksum_type")
+  )
+)
+
+(define-method copy
+  (of-object "GChecksum")
+  (c-name "g_checksum_copy")
+  (return-type "GChecksum*")
+)
+
+(define-method free
+  (of-object "GChecksum")
+  (c-name "g_checksum_free")
+  (return-type "none")
+)
+
+(define-method update
+  (of-object "GChecksum")
+  (c-name "g_checksum_update")
+  (return-type "none")
+  (parameters
+    '("const-guchar*" "data")
+    '("gsize" "length")
+  )
+)
+
+(define-method get_string
+  (of-object "GChecksum")
+  (c-name "g_checksum_get_string")
+  (return-type "const-gchar*")
+)
+
+(define-method get_digest
+  (of-object "GChecksum")
+  (c-name "g_checksum_get_digest")
+  (return-type "none")
+  (parameters
+    '("guint8*" "buffer")
+    '("gsize*" "digest_len")
+  )
+)
+
+(define-function g_compute_checksum_for_data
+  (c-name "g_compute_checksum_for_data")
+  (return-type "gchar*")
+  (parameters
+    '("GChecksumType" "checksum_type")
+    '("const-guchar*" "data")
+    '("gsize" "length")
+  )
+)
+
+(define-function g_compute_checksum_for_string
+  (c-name "g_compute_checksum_for_string")
+  (return-type "gchar*")
+  (parameters
+    '("GChecksumType" "checksum_type")
+    '("const-gchar*" "str")
+    '("gsize" "length")
+  )
+)
 
 
 ;; From gcompletion.h

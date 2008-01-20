@@ -1,0 +1,98 @@
+/* $Id$ */
+
+/* Copyright (C) 2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(glibmm,glib)
+
+#include <glib/gtypes.h>
+#include <string>
+
+#ifndef DOXYGEN_SHOUD_SKIP_THIS
+extern "C" { typedef struct _GChecksum GChecksum; }
+#endif
+
+namespace Glib
+{
+
+class Checksum
+{
+  _CLASS_OPAQUE_COPYABLE(Checksum, GChecksum, NONE, g_checksum_copy, g_checksum_free)
+public:
+
+  /**
+   * ChecksumType:
+   * @CHECKSUM_MD5: Use the MD5 hashing algorithm
+   * @CHECKSUM_SHA1: Use the SHA-1 hashing algorithm
+   * @CHECKSUM_SHA256: Use the SHA-256 hashing algorithm
+   *
+   * The hashing algorithm to be used by Checksum when performing the
+   * digest of some data.
+   *
+   * Note that the ChecksumType enumeration may be extended at a later 
+   * date to include new hashing algorithm types. 
+   *
+   * @newin2p16
+   */
+  _WRAP_ENUM(ChecksumType, GChecksumType, NO_GTYPE)
+
+#m4 _CONVERSION(`ChecksumType', `GChecksumType', `(($2)$3)')
+
+  /**
+   * Create a checksum object for a given checksum type.
+   *
+   * @param type checksum type, one of defined above.
+   *
+   * @return new checksum object.
+   */
+  Checksum(ChecksumType checksum_type);
+  
+  _WRAP_METHOD(void update(const guchar* data, gsize length), g_checksum_update)
+
+  /** Feeds data into an existing Checksum.
+   * The checksum must still be open, that is get_string() or get_digest() must not have been called on the checksum.
+   * 
+   * @param data Buffer used to compute the checksum
+   */
+  void update(const std::string& data);
+
+  _WRAP_METHOD(void get_digest(guint8 *buffer, gsize *digest_len) const, g_checksum_get_digest)
+
+  _WRAP_METHOD(std::string get_string() const, g_checksum_get_string)
+
+ 
+  _WRAP_METHOD(static std::string compute_checksum(ChecksumType type, const guchar* data, gsize length), g_compute_checksum_for_data)
+
+  /** Computes the checksum of a string.
+   * 
+   * @param checksum_type A ChecksumType
+   * @param str The string to compute the checksum of.
+   * @result The checksum as a hexadecimal string.
+   *
+   * @newin2p16
+   */
+  static std::string compute_checksum(ChecksumType type, const std::string& str);
+  _IGNORE(g_compute_checksum_for_string)
+
+  /* TODO: Can not use _WRAP_METHOD because for some reason it takes ChecksumType
+   * as pointer, treating it as object. This problem is related to code
+   * generated from h2def, where def treat ChecksumType as object */
+  static gssize get_length(ChecksumType type);
+};
+
+} //namespace Glib
+
