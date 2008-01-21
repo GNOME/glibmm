@@ -960,9 +960,71 @@ public:
                g_file_eject_mountable_finish,
                errthrow)
 
-  //TODO: The GError isn't being passed to the C functoin, for some reason. murrayc.
-  //_WRAP_METHOD(Glib::RefPtr<FileMonitor> monitor_directory(FileMonitorFlags flags, const Glib::RefPtr<Cancellable>& cancellable), g_file_monitor_directory, errthrow)
-  //_WRAP_METHOD(Glib::RefPtr<FileMonitor> monitor_file(FileMonitorFlags flags, const Glib::RefPtr<Cancellable>& cancellable), g_file_monitor_file, errthrow)
+ 
+  /** Obtains a directory monitor for the given file.
+   * This may fail if directory monitoring is not supported.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   *
+   * @param cancellable A Cancellable object.
+   * @param flags A set of FileMonitorFlags.
+   * @return A FileMonitor for the file , 
+   * or <tt>0</tt> on error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileMonitor> monitor_directory(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags = FILE_MONITOR_NONE);
+#else
+  Glib::RefPtr<FileMonitor> monitor_directory(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Obtains a directory monitor for the given file.
+   * This may fail if directory monitoring is not supported.
+   * 
+   * @param flags A set of FileMonitorFlags.
+   * @return A FileMonitor for the file , 
+   * or <tt>0</tt> on error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileMonitor> monitor_directory(FileMonitorFlags flags = FILE_MONITOR_NONE);
+#else
+  Glib::RefPtr<FileMonitor> monitor_directory(FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_monitor_directory)
+
+  _WRAP_METHOD(Glib::RefPtr<FileMonitor> monitor_file(FileMonitorFlags flags, const Glib::RefPtr<Cancellable>& cancellable), g_file_monitor_file, errthrow)
+
+  /** Obtains a file monitor for the given file. If no file notification
+   * mechanism exists, then regular polling of the file is used.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   *
+   * @param flags A set of FileMonitorFlags.
+   * @param A Cancellable object.
+   * @return A FileMonitor for the file.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileMonitor> monitor_file(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags = FILE_MONITOR_NONE);
+#else
+  Glib::RefPtr<FileMonitor> monitor_file(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Obtains a file monitor for the given file. If no file notification
+   * mechanism exists, then regular polling of the file is used.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   *
+   * @param flags A set of FileMonitorFlags.
+   * @param A Cancellable object.
+   * @return A FileMonitor for the file.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileMonitor> monitor_file(FileMonitorFlags flags = FILE_MONITOR_NONE);
+#else
+  Glib::RefPtr<FileMonitor> monitor_file(FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
   //TODO: Documentation.

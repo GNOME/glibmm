@@ -1070,4 +1070,80 @@ Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_
   return retvalue;
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileMonitor> File::monitor_directory(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
+#else
+Glib::RefPtr<FileMonitor> File::monitor_directory(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileMonitor> File::monitor_directory(FileMonitorFlags flags)
+#else
+Glib::RefPtr<FileMonitor> File::monitor_directory(FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileMonitor> File::monitor_file(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
+#else
+Glib::RefPtr<FileMonitor> File::monitor_file(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags,  std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags)
+#else
+Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags,  std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
 } // namespace Gio

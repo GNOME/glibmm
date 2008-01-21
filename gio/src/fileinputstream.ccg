@@ -49,8 +49,46 @@ SignalProxy_query_async_callback(GObject*, GAsyncResult* res, void* data)
 namespace Gio
 {
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileInfo> FileInputStream::query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes)
+#else
+Glib::RefPtr<FileInfo> FileInputStream::query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_input_stream_query_info(gobj(), g_strdup((attributes).c_str()), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileInfo> FileInputStream::query_info(const std::string& attributes)
+#else
+Glib::RefPtr<FileInfo> FileInputStream::query_info(const std::string& attributes, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_input_stream_query_info(gobj(), g_strdup((attributes).c_str()), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
 void
-FileInputStream::query_info_async(const std::string& attributes, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+FileInputStream::query_info_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -66,7 +104,7 @@ FileInputStream::query_info_async(const std::string& attributes, const SlotAsync
 }
 
 void
-FileInputStream::query_info_async(const std::string& attributes, const SlotAsyncReady& slot, int io_priority)
+FileInputStream::query_info_async(const SlotAsyncReady& slot, const std::string& attributes, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
