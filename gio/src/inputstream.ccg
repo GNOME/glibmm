@@ -20,7 +20,8 @@
 #include <gio/gio.h>
 #include <giomm/asyncresult.h>
 
-namespace {
+namespace
+{
 
 static void
 SignalProxy_input_stream_async_callback(GObject*, GAsyncResult* res, void* data)
@@ -46,7 +47,86 @@ SignalProxy_input_stream_async_callback(GObject*, GAsyncResult* res, void* data)
 
 } // anonymous namespace
 
-namespace Gio {
+
+namespace Gio
+{
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize InputStream::read(void* buffer, gsize count)
+#else
+gssize InputStream::read(void* buffer, gsize count, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gssize retvalue = g_input_stream_read(gobj(), buffer, count, NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool InputStream::read_all(void* buffer, gsize count, gsize& bytes_read)
+#else
+bool InputStream::read_all(void* buffer, gsize count, gsize& bytes_read, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_input_stream_read_all(gobj(), buffer, count, &(bytes_read), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize InputStream::skip(gsize count)
+#else
+gssize InputStream::skip(gsize count, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gssize retvalue = g_input_stream_skip(gobj(), count, NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool InputStream::close()
+#else
+bool InputStream::close(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_input_stream_close(gobj(), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
 
 void
 InputStream::read_async(void* buffer, gsize count, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
@@ -66,6 +146,24 @@ InputStream::read_async(void* buffer, gsize count, const SlotAsyncReady& slot, c
 }
 
 void
+InputStream::read_async(void* buffer, gsize count, const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_input_stream_read_async(gobj(),
+                            buffer,
+                            count,
+                            io_priority,
+                            NULL,
+                            &SignalProxy_input_stream_async_callback,
+                            slot_copy);
+}
+
+
+void
 InputStream::skip_async(gsize count, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
@@ -77,6 +175,22 @@ InputStream::skip_async(gsize count, const SlotAsyncReady& slot, const Glib::Ref
                             count,
                             io_priority,
                             cancellable->gobj(),
+                            &SignalProxy_input_stream_async_callback,
+                            slot_copy);
+}
+
+void
+InputStream::skip_async(gsize count, const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_input_stream_skip_async(gobj(),
+                            count,
+                            io_priority,
+                            NULL,
                             &SignalProxy_input_stream_async_callback,
                             slot_copy);
 }
@@ -95,5 +209,21 @@ InputStream::close_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancella
                              &SignalProxy_input_stream_async_callback,
                              slot_copy);
 }
+
+void
+InputStream::close_async(const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_input_stream_close_async(gobj(),
+                             io_priority,
+                             NULL,
+                             &SignalProxy_input_stream_async_callback,
+                             slot_copy);
+}
+
 
 } // namespace Gio
