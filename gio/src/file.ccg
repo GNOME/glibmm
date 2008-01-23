@@ -1146,4 +1146,25 @@ Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags,  std::auto_
   return retvalue;
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileInputStream> File::read()
+#else
+Glib::RefPtr<FileInputStream> File::read(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileInputStream> retvalue = Glib::wrap(g_file_read(gobj(), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
 } // namespace Gio
