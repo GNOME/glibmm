@@ -56,9 +56,32 @@ public:
                g_file_enumerator_next_file,
                refreturn, errthrow)
 
+  /** 
+   * @return A FileInfo or an empty RefPtr on error or end of enumerator.
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileInfo> next_file();
+  #else
+  Glib::RefPtr<FileInfo> next_file(std::auto_ptr<Glib::Error>& error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
   _WRAP_METHOD(bool close(const Glib::RefPtr<Cancellable>& cancellable),
                g_file_enumerator_close,
                errthrow)
+
+  /** Releases all resources used by this enumerator, making the
+   * enumerator return IO_ERROR_CLOSED on all calls.
+   * 
+   * This will be automatically called when the last reference
+   * is dropped, but you might want to call this method to make sure resources
+   * are released as early as possible.
+   * @return #<tt>true</tt> on success or an empty RefPtr on error.
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool close();
+  #else
+  bool close(std::auto_ptr<Glib::Error>& error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
   /** Request information for a number of files from the enumerator asynchronously. 
