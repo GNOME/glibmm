@@ -20,22 +20,31 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <giomm/appinfo.h>
 #include <giomm/asyncresult.h>
 #include <giomm/cancellable.h>
 #include <giomm/drive.h>
 #include <giomm/error.h>
 #include <giomm/fileattribute.h>
+#include <giomm/fileenumerator.h>
 #include <giomm/file.h>
 #include <giomm/fileicon.h>
 #include <giomm/fileinfo.h>
 #include <giomm/fileinputstream.h>
+#include <giomm/filemonitor.h>
 #include <giomm/fileoutputstream.h>
+#include <giomm/filterinputstream.h>
 #include <giomm/icon.h>
 #include <giomm/init.h>
 #include <giomm/inputstream.h>
+#include <giomm/loadableicon.h>
+#include <giomm/mount.h>
 #include <giomm/mountoperation.h>
 #include <giomm/outputstream.h>
+#include <giomm/seekable.h>
 #include <giomm/simpleasyncresult.h>
+#include <giomm/volume.h>
+#include <giomm/volumemonitor.h>
 
 #endif /* #ifndef _GIOMM_H */
 
