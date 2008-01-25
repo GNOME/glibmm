@@ -64,12 +64,17 @@ _CONVERSION(`GFileMonitor*',`Glib::RefPtr<FileMonitor>',`Glib::wrap($3)')
 # FileOutputStream
 _CONVERSION(`GFileOutputStream*',`Glib::RefPtr<FileOutputStream>',`Glib::wrap($3)')
 
+# FilterInputStream
+#_CONVERSION(`GFilterInputStream*',`Glib::RefPtr<FilterInputStream>',`Glib::wrap($3)')
+
+
 # Icon
 _CONVERSION(`GIcon*',`Glib::RefPtr<Icon>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P)
 
 # InputStream
 _CONVERSION(`const Glib::RefPtr<InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`GInputStream*',`Glib::RefPtr<InputStream>',`Glib::wrap($3)')
 
 #Mount
 _CONVERSION(`GMount*',`Glib::RefPtr<Mount>',`Glib::wrap($3)')
