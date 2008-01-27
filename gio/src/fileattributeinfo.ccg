@@ -19,13 +19,12 @@
 
 #include <gio/gio.h>
 
-namespace Gio {
-
-// FileAttributeInfo
+namespace Gio
+{
 
 FileAttributeInfo::FileAttributeInfo(const GFileAttributeInfo* ginfo)
   :
-  m_name(ginfo->name),
+  m_name(ginfo->name ? ginfo->name : ""),
   m_type(static_cast<FileAttributeType>(ginfo->type)),
   m_flags(static_cast<FileAttributeInfoFlags>(ginfo->flags))
 {
@@ -67,22 +66,5 @@ FileAttributeInfo::get_flags() const
   return m_flags;
 }
 
-// FileAttributeInfoList
-
-bool FileAttributeInfoList::empty() const
-{
-  return gobj() == 0;
-}
-
-FileAttributeInfo
-FileAttributeInfoList::lookup(const std::string& name) const
-{
-  GFileAttributeInfoList* cobject = const_cast<GFileAttributeInfoList*>(gobj());
-  const GFileAttributeInfo* cinfo =
-    g_file_attribute_info_list_lookup (cobject, name.c_str());
-
-  FileAttributeInfo info(cinfo);
-  return info;
-}
-
 } // namespace Gio
+

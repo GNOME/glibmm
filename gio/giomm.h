@@ -25,7 +25,7 @@
 #include <giomm/cancellable.h>
 #include <giomm/drive.h>
 #include <giomm/error.h>
-#include <giomm/fileattribute.h>
+#include <giomm/fileattributeinfolist.h>
 #include <giomm/fileenumerator.h>
 #include <giomm/file.h>
 #include <giomm/fileicon.h>

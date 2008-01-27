@@ -350,7 +350,7 @@ sub convert_tags_to_doxygen($)
 
     # Some argument names are suffixed by "_" -- strip this.
     # gtk-doc uses @thearg, but doxygen uses @a thearg.
-    s" ?\@([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?\b" \@a $1 "g;
+    s" ?\@([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?\b" \@a $1"g;
     s"^Note ?\d?: "\@note "mg;
 
     s"&lt;/?programlisting&gt;""g;
@@ -410,6 +410,7 @@ sub substitute_identifiers($$)
     # Undo wrong substitutions.
     s/\bHas::/HAS_/g;
     s/\bNo::/NO_/g;
+    s/\bG:://g; #Rename G::Something to Something. Doesn't seem to work. murrayc.
 
     # Replace C function names with C++ counterparts.
     s/\b([a-z]+_[a-z][a-z\d_]+) ?\(\)/&DocsParser::substitute_function($doc_func, $1)/eg;

@@ -17,47 +17,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <string>
-#include <gio/gio.h> //TODO: avoid this include
-#include <glibmm/object.h>
+#include <giomm/fileattributeinfo.h>
 
 _DEFS(giomm,gio)
 
 namespace Gio
 {
-
-//TODO: Fix the need for NO_GTYPE.
-_WRAP_ENUM(FileAttributeType, GFileAttributeType, NO_GTYPE)
-_WRAP_ENUM(FileAttributeInfoFlags, GFileAttributeInfoFlags, NO_GTYPE)
-_WRAP_ENUM(FileAttributeStatus, GFileAttributeStatus, NO_GTYPE)
-
-// GFileAttributeInfo struct hand-wrapped
-// TODO: Use _CLASS_GENERIC?
-
-/** Information about a specific attribute - see FileAttributeInfoList.
- *
- * @newin2p16
- */
-class FileAttributeInfo
-{
-public:
-  explicit FileAttributeInfo(const GFileAttributeInfo* ginfo);
-
-  FileAttributeInfo(const FileAttributeInfo& other);
-  FileAttributeInfo& operator=(const FileAttributeInfo& other);
-
-  ~FileAttributeInfo();
-
-  std::string get_name() const;
-  FileAttributeType get_type() const;
-  FileAttributeInfoFlags get_flags() const;
-
-protected:
-  std::string m_name;
-  FileAttributeType m_type;
-  FileAttributeInfoFlags m_flags;
-};
-
 
 /** Key-Value paired file attributes.
  * File attributes in GIO consist of a list of key-value pairs.
@@ -88,6 +53,11 @@ class FileAttributeInfoList
                            g_file_attribute_info_list_unref)
   _IGNORE(g_file_attribute_info_list_new, g_file_attribute_info_list_ref, g_file_attribute_info_list_unref)
 public:
+
+  /** Whether the FileAttributeInfoList is valid and non empty.
+   * @result true if this FileAttributeInfoList is not empty.
+   */
+  operator bool() const;
 
   /** Whether the FileAttributeInfoList is empty or invalid.
    * @result true if this FileAttributeInfoList is empty.
