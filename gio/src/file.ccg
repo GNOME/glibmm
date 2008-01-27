@@ -159,14 +159,6 @@ File::create_for_parse_name(const Glib::ustring& parse_name)
   return Glib::wrap(G_FILE(cfile));
 }
 
-bool
-File::equal(const Glib::RefPtr<File>& other) const
-{
-  return static_cast<bool>(
-    g_file_equal(const_cast<GFile*>(this->gobj()),
-                 const_cast<GFile*>(other->gobj())));
-}
-
 void
 File::read_async(const SlotAsyncReady& slot, int io_priority)
 {
@@ -979,14 +971,106 @@ File::load_partial_contents_async(const SlotReadMore& slot_read_more,
                                      slots);
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void File::replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags)
+#else
+void File::replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* c_etag_new = NULL;
+  g_file_replace_contents(gobj(), contents, length, etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(c_etag_new)
+    new_etag = c_etag_new;
+  else
+    new_etag = std::string();
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void File::replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags)
+#else
+void File::replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* c_etag_new = NULL;
+  g_file_replace_contents(gobj(), contents, length, etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(c_etag_new)
+    new_etag = c_etag_new;
+  else
+    new_etag = std::string();
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags)
+#else
+void File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* c_etag_new = NULL;
+  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(c_etag_new)
+    new_etag = c_etag_new;
+  else
+    new_etag = std::string();
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags)
+#else
+void File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* c_etag_new = NULL;
+  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(c_etag_new)
+    new_etag = c_etag_new;
+  else
+    new_etag = std::string();
+}
+
 void
-File::replace_contents_async(const char* contents,
-                             gsize length,
-                             const char* etag,
-                             bool make_backup,
-                             FileCreateFlags flags,
+File::replace_contents_async(const SlotAsyncReady& slot,
                              const Glib::RefPtr<Cancellable>& cancellable,
-                             const SlotAsyncReady& slot)
+                             const char* contents,
+                             gsize length,
+                             const std::string& etag,
+                             bool make_backup,
+                             FileCreateFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -996,7 +1080,7 @@ File::replace_contents_async(const char* contents,
   g_file_replace_contents_async(gobj(),
                                 contents,
                                 length,
-                                etag,
+                                etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
                                 cancellable->gobj(),
@@ -1005,12 +1089,12 @@ File::replace_contents_async(const char* contents,
 }
 
 void
-File::replace_contents_async(const char* contents,
+File::replace_contents_async(const SlotAsyncReady& slot,
+                             const char* contents,
                              gsize length,
-                             const char* etag,
+                             const std::string& etag,
                              bool make_backup,
-                             FileCreateFlags flags,
-                             const SlotAsyncReady& slot)
+                             FileCreateFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1020,13 +1104,102 @@ File::replace_contents_async(const char* contents,
   g_file_replace_contents_async(gobj(),
                                 contents,
                                 length,
-                                etag,
+                                etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
                                 NULL,
                                 &SignalProxy_async_callback,
                                 slot_copy);
 }
+
+void
+File::replace_contents_async(const SlotAsyncReady& slot,
+                             const Glib::RefPtr<Cancellable>& cancellable,
+                             const std::string& contents,
+                             const std::string& etag,
+                             bool make_backup,
+                             FileCreateFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_replace_contents_async(gobj(),
+                                contents.c_str(),
+                                contents.size(),
+                                etag.c_str(),
+                                make_backup,
+                                static_cast<GFileCreateFlags>(flags),
+                                cancellable->gobj(),
+                                &SignalProxy_async_callback,
+                                slot_copy);
+}
+
+void
+File::replace_contents_async(const SlotAsyncReady& slot,
+                             const std::string& contents,
+                             const std::string& etag,
+                             bool make_backup,
+                             FileCreateFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_replace_contents_async(gobj(),
+                                contents.c_str(),
+                                contents.size(),
+                                etag.c_str(),
+                                make_backup,
+                                static_cast<GFileCreateFlags>(flags),
+                                NULL,
+                                &SignalProxy_async_callback,
+                                slot_copy);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& new_etag)
+#else
+void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& new_etag, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* c_new_etag = NULL;
+  g_file_replace_contents_finish(gobj(), Glib::unwrap(result), &c_new_etag, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(c_new_etag)
+    new_etag = c_new_etag;
+  else
+   new_etag = std::string();
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result)
+#else
+void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  g_file_replace_contents_finish(gobj(), Glib::unwrap(result), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags)

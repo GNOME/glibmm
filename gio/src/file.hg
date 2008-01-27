@@ -123,10 +123,8 @@ public:
   // (g_hash_table_new in C).
   _WRAP_METHOD(guint hash() const, g_file_hash)
 
-  //TODO: Add a comment about why this is virtual:
-  //TODO: Documentation.
-  _IGNORE(g_file_equal)
-  virtual bool equal(const Glib::RefPtr<File>& other) const;
+  //Not that the implementation of equal() is already virtual via equal_vfunc().
+  _WRAP_METHOD(bool equal(const Glib::RefPtr<File>& other) const, g_file_equal)
 
   _WRAP_METHOD(std::string get_basename() const, g_file_get_basename)
   _WRAP_METHOD(std::string get_path() const, g_file_get_path)
@@ -412,7 +410,7 @@ public:
    * @param cancellable A Cancellable object.
    * @param attributes: An attribute query string.
    * @param flags: A set of FileQueryInfoFlags.
-   * @result a FileInfo for the given @file, or an empty RefPtr on error.
+   * @result a FileInfo for the file, or an empty RefPtr on error.
    */
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<FileInfo> query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE) const;
@@ -444,7 +442,7 @@ public:
    *
    * @param attributes: An attribute query string.
    * @param flags: A set of FileQueryInfoFlags.
-   * @result a FileInfo for the given @file, or an empty RefPtr on error.
+   * @result a FileInfo for the file, or an empty RefPtr on error.
    */
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<FileInfo> query_info(const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE) const;
@@ -517,7 +515,7 @@ public:
                refreturn, errthrow)
 
   /** Similar to g_file_query_info(), but obtains information
-   * about the filesystem the @a file  is on, rather than the file itself.
+   * about the filesystem the file is on, rather than the file itself.
    * For instance the amount of space availible and the type of
    * the filesystem.
    * 
@@ -659,7 +657,7 @@ public:
    * was cancelled, the error IO_ERROR_CANCELLED will be returned.
    *
    * @param display_name A string.
-   * @return A Glib::File specifying what @a file  was renamed to, or an empty RefPtr if there was an error.
+   * @return A Glib::File specifying what the file was renamed to, or an empty RefPtr if there was an error.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<File> set_display_name(const Glib::ustring& display_name);
@@ -1121,26 +1119,237 @@ public:
                g_file_load_partial_contents_finish,
                errthrow)
 
-  //TODO: Use std::string instead of char*? Rearrange parameters to use default values?
-  _WRAP_METHOD(void replace_contents(const char* contents, gsize length, const char* etag, bool make_backup, FileCreateFlags flags, char** new_etag, const Glib::RefPtr<Cancellable>& cancellable),
-               g_file_replace_contents,
-               errthrow)
-  //TODO: Use std::string instead of char*? Rearrange parameters to use default values?
+  /** Replaces the contents of @a file with @a contents of @a length bytes.
+   *  
+   * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
+   * the error IO_ERROR_WRONG_ETAG will be returned.
+   * 
+   * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
+   * 
+   * The operation can be cancelled by
+   * triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * 
+   * The returned @a new_etag  can be used to verify that the file hasn't changed the
+   * next time it is saved over.
+   * @param contents A string containing the new contents for the file.
+   * @param length The length of @a contents in bytes.
+   * @param etag The old entity tag 
+   * for the document.
+   * @param make_backup <tt>true</tt> if a backup should be created.
+   * @param flags A set of FileCreateFlags.
+   * @param new_etag A location to a new entity tag
+   * for the document.
+   * @param cancellable A Cancellable object.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  void replace_contents_async(const char* contents, gsize length, const char* etag, bool make_backup, FileCreateFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  /** Replaces the contents of @a file with @a contents of @a length bytes.
+   *  
+   * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
+   * the error IO_ERROR_WRONG_ETAG will be returned.
+   * 
+   * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of @a file.
+   * 
+   * The returned @a new_etag  can be used to verify that the file hasn't changed the
+   * next time it is saved over.
+   * @param contents A string containing the new contents for the file.
+   * @param length The length of @a contents in bytes.
+   * @param etag The old entity tag 
+   * for the document.
+   * @param make_backup <tt>true</tt> if a backup should be created.
+   * @param flags A set of FileCreateFlags.
+   * @param new_etag A location to a new entity tag
+   * for the document.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  void replace_contents_async(const char* contents, gsize length, const char* etag, bool make_backup, FileCreateFlags flags, const SlotAsyncReady& slot);
+  /** Replaces the contents of @a file with @a contents.
+   *  
+   * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
+   * the error IO_ERROR_WRONG_ETAG will be returned.
+   * 
+   * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
+   * 
+   * The operation can be cancelled by
+   * triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * 
+   * The returned @a new_etag  can be used to verify that the file hasn't changed the
+   * next time it is saved over.
+   * @param contents A string containing the new contents for the file.
+   * @param etag The old entity tag 
+   * for the document.
+   * @param make_backup <tt>true</tt> if a backup should be created.
+   * @param flags A set of FileCreateFlags.
+   * @param new_etag A location to a new entity tag
+   * for the document.
+   * @param cancellable A Cancellable object.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Replaces the contents of @a file with @a contents.
+   *  
+   * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
+   * the error IO_ERROR_WRONG_ETAG will be returned.
+   * 
+   * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of @a file.
+   * 
+   * The returned @a new_etag  can be used to verify that the file hasn't changed the
+   * next time it is saved over.
+   * @param contents A string containing the new contents for the file.
+   * @param etag The old entity tag 
+   * for the document.
+   * @param make_backup <tt>true</tt> if a backup should be created.
+   * @param flags A set of FileCreateFlags.
+   * @param new_etag A location to a new entity tag
+   * for the document.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_replace_contents)
+
+
+  //TODO: Documentation
+
+
+
+ /** Starts an asynchronous replacement of the file with the given 
+  * @contents of @length bytes. @etag will replace the document's 
+  * current entity tag.
+  * 
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with replace_contents_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+  * 
+  * If @a make_backup is true, this function will attempt to 
+  * make a backup of the file.
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param cancellable A Cancellable object.
+  * @param contents String of contents to replace the file with.
+  * @param length The length of @a contents in bytes.
+  * @param etag a new entity tag for the file.
+  * @param make_backup true if a backup should be created.
+  * @param flags A set of FileCreateFlags.
+  */
+  void replace_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const char* contents, gsize length, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+
+ /** Starts an asynchronous replacement of the file with the given 
+  * @contents of @length bytes. @etag will replace the document's 
+  * current entity tag.
+  * 
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with replace_contents_finish().
+  * 
+  * If @a make_backup is true, this function will attempt to 
+  * make a backup of the file.
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param contents String of contents to replace the file with.
+  * @param length The length of @a contents in bytes.
+  * @param etag a new entity tag for the file.
+  * @param make_backup true if a backup should be created.
+  * @param flags A set of FileCreateFlags.
+  */
+  void replace_contents_async(const SlotAsyncReady& slot, const char* contents, gsize length, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+
+ /** Starts an asynchronous replacement of the file with the given 
+  * @contents of @length bytes. @etag will replace the document's 
+  * current entity tag.
+  * 
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with replace_contents_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+  * 
+  * If @a make_backup is true, this function will attempt to 
+  * make a backup of the file.
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param cancellable A Cancellable object.
+  * @param contents String of contents to replace the file with.
+  * @param etag a new entity tag for the file.
+  * @param make_backup true if a backup should be created.
+  * @param flags A set of FileCreateFlags.
+  */
+  void replace_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+
+ /** Starts an asynchronous replacement of the file with the given 
+  * @a contents. @a etag will replace the document's 
+  * current entity tag.
+  * 
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with replace_contents_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+  * 
+  * If @a make_backup is true, this function will attempt to 
+  * make a backup of the file.
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param contents String of contents to replace the file with.
+  * @param etag a new entity tag for the file.
+  * @param make_backup true if a backup should be created.
+  * @param flags A set of FileCreateFlags.
+  */
+  void replace_contents_async(const SlotAsyncReady& slot, const std::string& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+
   _IGNORE(g_file_replace_contents_async)
 
-  _WRAP_METHOD(void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result,  char** new_etag),
-               g_file_replace_contents_finish,
-               errthrow)
+  /** Finishes an asynchronous replace of the given @a file . See
+   * replace_contents_async(). Sets @a new_etag to the new entity 
+   * tag for the document.
+   * @param result A AsyncResult.
+   * @param new_etag A location of a new entity tag 
+   * for the document.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& etag);
+#else
+  void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& etag, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Finishes an asynchronous replace of the given @a file . See
+   * replace_contents_async(). Sets @a new_etag to the new entity 
+   * tag for the document.
+   * @param result A AsyncResult.
+   * for the document.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result);
+#else
+  void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_replace_contents_finish)
 
   // *** vfuncs ***
 
   _WRAP_VFUNC(Glib::RefPtr<File> dup(), "dup")
   _WRAP_VFUNC(guint hash() const, "hash")
-  // no equal() vfunc, there's handwritten virtual equal()
+  //TODO: equal() vfunc
 
   _WRAP_VFUNC(std::string get_basename() const, "get_basename")
   _WRAP_VFUNC(std::string get_path() const, "get_path")
