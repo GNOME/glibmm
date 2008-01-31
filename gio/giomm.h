@@ -45,6 +45,7 @@
 #include <giomm/simpleasyncresult.h>
 #include <giomm/volume.h>
 #include <giomm/volumemonitor.h>
+#include <giomm/contenttype.h>
 
 #endif /* #ifndef _GIOMM_H */
 
