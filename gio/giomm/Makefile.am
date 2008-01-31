@@ -13,7 +13,7 @@ sublib_win32_dlls_libs	=
 
 sublib_files_extra_posix_cc =
 sublib_files_extra_win32_cc =
-sublib_files_extra_general_cc = init.cc
+sublib_files_extra_general_cc = init.cc contenttype.cc
 sublib_files_extra_general_deprecated_cc = 
 
 sublib_files_extra_posix_h =
