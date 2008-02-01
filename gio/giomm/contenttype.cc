@@ -23,55 +23,77 @@
 namespace Gio
 {
 
-bool content_type_equals(const Glib::ustring& type1,
-                         const Glib::ustring& type2)
+bool content_type_equals(const Glib::ustring& type1, const Glib::ustring& type2)
 {
-    return g_content_type_equals(type1.c_str(), type2.c_str());
+  return g_content_type_equals(type1.c_str(), type2.c_str());
 }
 
-bool content_type_is_a(const Glib::ustring& type,
-                       const Glib::ustring& supertype)
+bool content_type_is_a(const Glib::ustring& type, const Glib::ustring& supertype)
 {
-    return g_content_type_is_a(type.c_str(), supertype.c_str());
+  return g_content_type_is_a(type.c_str(), supertype.c_str());
 }
 
 bool content_type_is_unknown(const Glib::ustring& type)
 {
-    return g_content_type_is_unknown(type.c_str());
+  return g_content_type_is_unknown(type.c_str());
 }
 
 Glib::ustring content_type_get_description(const Glib::ustring& type)
 {
-    return Glib::ustring(g_content_type_get_description(type.c_str()));
+  return Glib::convert_return_gchar_ptr_to_ustring(g_content_type_get_description(type.c_str()));
 }
 
 Glib::ustring content_type_get_mime_type(const Glib::ustring& type)
 {
-    return Glib::ustring(g_content_type_get_mime_type(type.c_str()));
+  return Glib::convert_return_gchar_ptr_to_ustring(g_content_type_get_mime_type(type.c_str()));
 }
 
 Glib::RefPtr<Gio::Icon> content_type_get_icon(const Glib::ustring& type)
 {
-    return Glib::wrap(g_content_type_get_icon(type.c_str()));
+  //TODO: Does g_content_type_get_icon() return a reference?
+  //It currently has no implementation so it's hard to know. murrayc.
+  return Glib::wrap(g_content_type_get_icon(type.c_str()));
 }
 
 bool content_type_can_be_executable(const Glib::ustring& type)
 {
-    return g_content_type_can_be_executable(type.c_str());
+  return g_content_type_can_be_executable(type.c_str());
 }
 
 Glib::ustring content_type_guess(const std::string& filename,
-                                 const std::basic_string<guchar>& data,
-                                 bool& result_uncertain)
+  const std::basic_string<guchar>& data, bool& result_uncertain)
 {
-    return Glib::ustring(g_content_type_guess(filename.c_str(), data.c_str(),
-                data.size(), reinterpret_cast<gboolean*>(&result_uncertain)));
+  gboolean c_result_uncertain = FALSE;
+  gchar* cresult = g_content_type_guess(filename.c_str(), data.c_str(),
+    data.size(), &c_result_uncertain);
+  result_uncertain = c_result_uncertain;
+  return Glib::convert_return_gchar_ptr_to_ustring(cresult);
 }
 
-Glib::ListHandle<Glib::ustring> content_types_get_registered(void)
+Glib::ustring content_type_guess(const std::string& filename,
+  const guchar* data, gsize data_size, bool& result_uncertain)
+{
+  gboolean c_result_uncertain = FALSE;
+  gchar* cresult = g_content_type_guess(filename.c_str(), data,
+    data_size, &c_result_uncertain);
+  result_uncertain = c_result_uncertain;
+  return Glib::convert_return_gchar_ptr_to_ustring(cresult);
+}
+
+Glib::ustring content_type_guess(const std::string& filename,
+  const std::string& data, bool& result_uncertain)
+{
+  gboolean c_result_uncertain = FALSE;
+  gchar* cresult = g_content_type_guess(filename.c_str(), (const guchar*)data.c_str(),
+    data.size(), &c_result_uncertain);
+  result_uncertain = c_result_uncertain;
+  return Glib::convert_return_gchar_ptr_to_ustring(cresult);
+}
+
+Glib::ListHandle<Glib::ustring> content_types_get_registered()
 {
   return Glib::ListHandle<Glib::ustring>(g_content_types_get_registered(),
-      Glib::OWNERSHIP_DEEP);
+    Glib::OWNERSHIP_DEEP);
 }
 
 } // namespace Gio

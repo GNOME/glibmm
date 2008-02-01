@@ -29,23 +29,23 @@ namespace Gio
 
 /**
  * Compares two content types for equality.
-
- * @param type1 a content type string.
- * @param type2 a content type string.
+ *
+ * @param type1 A content type string.
+ * @param type2 A content type string.
  *
  * @return true if the two strings are identical or equivalent, false otherwise.
- **/
+ */
 bool content_type_equals(const Glib::ustring& type1,
                          const Glib::ustring& type2);
 
 /**
- * Determines if @type is a subset of @supertype.
+ * Determines if @a type is a subset of @a supertype.
  *
- * @param type a content type string.
- * @param supertype a string.
-
+ * @param type A content type string.
+ * @param supertype A string.
+ *
  * @return true if @type is a kind of @supertype, false otherwise.
- **/
+ */
 bool content_type_is_a(const Glib::ustring& type,
                        const Glib::ustring& supertype);
 
@@ -54,37 +54,37 @@ bool content_type_is_a(const Glib::ustring& type,
  * On unix this is the "application/octet-stream" mimetype,
  * while on win32 it is "*".
  *
- * @param type a content type string.
+ * @param type A content type string.
  *
  * @return true if the type is the unknown type.
- **/
+ */
 bool content_type_is_unknown(const Glib::ustring& type);
 
 /**
  * Gets the human readable description of the content type.
  *
- * @param type a content type string.
+ * @param type A content type string.
  *
  * @return a short description of the content type @type.
- **/
+ */
 Glib::ustring content_type_get_description(const Glib::ustring& type);
 
 /**
  * Gets the mime-type for the content type. If one is registered
  *
- * @param type a content type string.
+ * @param type A content type string.
  *
  * @return the registered mime-type for the given @type, or NULL if unknown.
- **/
+ */
 Glib::ustring content_type_get_mime_type(const Glib::ustring& type);
 
 /**
- * @param type a content type string.
+ * @param type A content type string.
  *
  * Gets the icon for a content type.
  *
  * @return Icon corresponding to the content type.
- **/
+ */
 Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
 
 /**
@@ -94,24 +94,37 @@ Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
  * @param type a content type string.
  *
  * @return true if the file type corresponds to a type that can be executable,
- * true otherwise.
- **/
+ * false otherwise.
+ */
 bool content_type_can_be_executable(const Glib::ustring& type);
 
 /**
  * Guesses the content type based on example data. If the function is uncertain,
- * @result_uncertain will be set to true
+ * @a result_uncertain will be set to true
  *
  * @param filename a string.
- * @param data a stream of data.
- * @param data_size the size of @data.
- * @param result_uncertain a flag indicating the certainty of the result.
- *
- * Returns: a string indicating a guessed content type for the
+ * @param data A stream of data.
+ * @param data_size The size of @data.
+ * @param result_uncertain A flag indicating the certainty of the result.
+ * @return A string indicating a guessed content type for the
  * given data.
- **/
+ */
 Glib::ustring content_type_guess(const std::string& filename,
-                                 const std::basic_string<guchar>& data,
+                                 const guchar* data, gsize data_size, 
+                                 bool& result_uncertain);
+
+/**
+ * Guesses the content type based on example data. If the function is uncertain,
+ * @a result_uncertain will be set to true
+ *
+ * @param filename a string.
+ * @param data A stream of data.
+ * @param result_uncertain A flag indicating the certainty of the result.
+ * @return A string indicating a guessed content type for the
+ * given data.
+ */
+Glib::ustring content_type_guess(const std::string& filename,
+                                 const std::string& data, 
                                  bool& result_uncertain);
 
 /**
@@ -119,8 +132,8 @@ Glib::ustring content_type_guess(const std::string& filename,
  * known to the system.
  *
  * @return List of the registered content types.
- **/
-Glib::ListHandle<Glib::ustring> content_types_get_registered(void);
+ */
+Glib::ListHandle<Glib::ustring> content_types_get_registered();
 
 } // namespace Gio
 #endif // _GIOMM_CONTENTTYPE_H
