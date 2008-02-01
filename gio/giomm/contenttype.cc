@@ -20,6 +20,9 @@
 #include <giomm/contenttype.h>
 #include <gio/gio.h>
 
+namespace Gio
+{
+
 bool content_type_equals(const Glib::ustring& type1,
                          const Glib::ustring& type2)
 {
@@ -71,3 +74,4 @@ Glib::ListHandle<Glib::ustring> content_types_get_registered(void)
       Glib::OWNERSHIP_DEEP);
 }
 
+} // namespace Gio
