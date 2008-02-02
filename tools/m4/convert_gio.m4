@@ -11,6 +11,8 @@ _CONV_ENUM(G,FileQueryInfoFlags)
 _CONV_ENUM(G,FileType)
 _CONV_ENUM(G,OutputStreamSpliceFlags)
 _CONV_ENUM(G,AppInfoCreateFlags)
+_CONV_ENUM(G,DataStreamByteOrder)
+_CONV_ENUM(G,DataStreamNewlineType)
 
 
 # AppInfo
