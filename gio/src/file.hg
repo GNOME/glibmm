@@ -215,9 +215,65 @@ public:
 
   //We renamed this to create_file from (g_file_create()), to avoid confusion with static create() methods, 
   //but I would still like to choose a different word, but can't think of a good one. murrayc.
-  _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create_file(FileCreateFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
-               g_file_create,
-               refreturn, errthrow)
+
+  /** Creates a new file and returns an output stream for writing to it.
+   * The file must not already exists.
+   * 
+   * By default files created are generally readable by everyone,
+   * but if you pass FILE_CREATE_PRIVATE in @a flags the file
+   * will be made readable only to the current user, to the level that
+   * is supported on the target filesystem.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * 
+   * If a file with this name already exists the IO_ERROR_EXISTS error
+   * will be returned. If the file is a directory the G_IO_ERROR_IS_DIRECTORY
+   * error will be returned.
+   * Some filesystems don't allow all filenames, and may
+   * return an IO_ERROR_INVALID_FILENAME error, and if the name
+   * is to long IO_ERROR_FILENAME_TOO_LONG will be returned.
+   * Other errors are possible too, and depend on what kind of
+   * filesystem the file is on.
+   *
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param flags a set of FileCreateFlags.
+   * @return A FileOutputStream for the newly created file, or 
+   * <tt>0</tt> on error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileOutputStream> create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileOutputStream> create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FILE_CREATE_NONE, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Creates a new file and returns an output stream for writing to it.
+   * The file must not already exists.
+   * 
+   * By default files created are generally readable by everyone,
+   * but if you pass FILE_CREATE_PRIVATE in @a flags the file
+   * will be made readable only to the current user, to the level that
+   * is supported on the target filesystem.
+   * 
+   * If a file with this name already exists the IO_ERROR_EXISTS error
+   * will be returned. If the file is a directory the G_IO_ERROR_IS_DIRECTORY
+   * error will be returned.
+   * Some filesystems don't allow all filenames, and may
+   * return an IO_ERROR_INVALID_FILENAME error, and if the name
+   * is to long IO_ERROR_FILENAME_TOO_LONG will be returned.
+   * Other errors are possible too, and depend on what kind of
+   * filesystem the file is on.
+   *
+   * @param flags a set of FileCreateFlags.
+   * @return A FileOutputStream for the newly created file, or 
+   * <tt>0</tt> on error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileOutputStream> create_file(FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileOutputStream> create_file(FileCreateFlags flags = FILE_CREATE_NONE, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_create)
 
 
   //TODO: Rephrase this documentation in terms of _throwing_ exceptions instead of returning errors. And what exception is thrown?
@@ -739,9 +795,32 @@ public:
                 g_file_delete,
                 errthrow)
 
+  /** Deletes a file.
+   * 
+   * @return <tt>true</tt> if the file was deleted. <tt>false</tt> otherwise.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool remove();
+#else
+  bool remove(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
   _WRAP_METHOD(bool trash(const Glib::RefPtr<Cancellable>& cancellable),
                g_file_trash,
                errthrow)
+
+  /** Sends the file to the "Trashcan", if possible. This is similar to
+   * deleting it, but the user can recover it before emptying the trashcan.
+   * Not all filesystems support trashing, so this call can return the
+   * IO_ERROR_NOT_SUPPORTED error.
+   *
+   * @return <tt>true</tt> on successful trash, <tt>false</tt> otherwise.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool trash();
+#else
+  bool trash(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
   /** A signal handler would be, for instance:
@@ -835,17 +914,61 @@ public:
                g_file_make_directory,
                errthrow)
 
+  /** Creates a directory.
+   * 
+   * @return <tt>true</tt> on successful creation, <tt>false</tt> otherwise.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool make_directory();
+#else
+  bool make_directory(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
   _WRAP_METHOD(bool make_symbolic_link(const std::string& symlink_value, const Glib::RefPtr<Cancellable>& cancellable),
                g_file_make_symbolic_link,
                errthrow)
+
+  /** Creates a symbolic link.
+   * 
+   * @param symlink_value A string with the value of the new symlink.
+   * @return <tt>true</tt> on the creation of a new symlink, <tt>false</tt> otherwise.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool make_symbolic_link(const std::string& symlink_value);
+#else
+  bool make_symbolic_link(const std::string& symlink_value, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   _WRAP_METHOD(Glib::RefPtr<FileAttributeInfoList> query_settable_attributes(const Glib::RefPtr<Cancellable>& cancellable),
                g_file_query_settable_attributes,
                errthrow)
 
+  /** Obtain the list of settable attributes for the file.
+   * 
+   * Returns: a FileAttributeInfoList describing the settable attributes.
+   * @return A FileAttributeInfoList describing the settable attributes.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileAttributeInfoList> query_settable_attributes();
+#else
+  Glib::RefPtr<FileAttributeInfoList> query_settable_attributes(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
   _WRAP_METHOD(Glib::RefPtr<FileAttributeInfoList> query_writable_namespaces(const Glib::RefPtr<Cancellable>& cancellable),
                g_file_query_writable_namespaces,
                errthrow)
+
+  /** Obtain the list of attribute namespaces where new attributes 
+   * can be created by a user. An example of this is extended
+   * attributes (in the "xattr" namespace).
+   * 
+   * @return A FileAttributeInfoList describing the writable namespaces.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileAttributeInfoList> query_writable_namespaces();
+#else
+  Glib::RefPtr<FileAttributeInfoList> query_writable_namespaces(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
   /* This seems to be very generic (see the gpointer parameter),
@@ -939,6 +1062,7 @@ public:
   bool set_attributes_finish(const Glib::RefPtr<AsyncResult>& result, const Glib::RefPtr<FileInfo>& info, std::auto_ptr<Glib::Error>& error);
 #endif // GLIBMM_EXCEPTIONS_ENABLED
 
+  //TODO: Add overloads without the cancellable:
   _WRAP_METHOD(bool set_attribute_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
                g_file_set_attribute_string,
                errthrow)
@@ -972,10 +1096,10 @@ public:
    * IO_ERROR_CANCELLED will be returned.
    *
    * @param mount_operation A MountOperation.
-   * @param cancellable A Cancellable object.
    * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object.
    */
-  void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
 
   /** Starts a @mount_operation, mounting the volume that contains the file. 
    * 
@@ -1019,7 +1143,7 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
 
   /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance, 
    * passwords are needed during authentication.
@@ -1299,7 +1423,7 @@ public:
                g_file_load_partial_contents_finish,
                errthrow)
 
-  /** Replaces the contents of @a file with @a contents of @a length bytes.
+  /** Replaces the contents of the file with @a contents of @a length bytes.
    *  
    * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
    * the error IO_ERROR_WRONG_ETAG will be returned.
@@ -1328,12 +1452,12 @@ public:
   void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  /** Replaces the contents of @a file with @a contents of @a length bytes.
+  /** Replaces the contents of the file with @a contents of @a length bytes.
    *  
    * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
    * the error IO_ERROR_WRONG_ETAG will be returned.
    * 
-   * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of @a file.
+   * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
    * 
    * The returned @a new_etag  can be used to verify that the file hasn't changed the
    * next time it is saved over.
@@ -1352,7 +1476,7 @@ public:
   void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  /** Replaces the contents of @a file with @a contents.
+  /** Replaces the contents of the file with @a contents.
    *  
    * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
    * the error IO_ERROR_WRONG_ETAG will be returned.
@@ -1380,12 +1504,12 @@ public:
   void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  /** Replaces the contents of @a file with @a contents.
+  /** Replaces the contents of the file with @a contents.
    *  
    * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
    * the error IO_ERROR_WRONG_ETAG will be returned.
    * 
-   * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of @a file.
+   * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
    * 
    * The returned @a new_etag  can be used to verify that the file hasn't changed the
    * next time it is saved over.
@@ -1495,7 +1619,7 @@ public:
 
   _IGNORE(g_file_replace_contents_async)
 
-  /** Finishes an asynchronous replace of the given @a file . See
+  /** Finishes an asynchronous replace of the given file . See
    * replace_contents_async(). Sets @a new_etag to the new entity 
    * tag for the document.
    * @param result A AsyncResult.
@@ -1508,7 +1632,7 @@ public:
   void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& etag, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  /** Finishes an asynchronous replace of the given @a file . See
+  /** Finishes an asynchronous replace of the given file . See
    * replace_contents_async(). Sets @a new_etag to the new entity 
    * tag for the document.
    * @param result A AsyncResult.
