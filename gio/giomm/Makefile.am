@@ -29,3 +29,5 @@ libgiomm_2_4_la_LDFLAGS	= $(common_ldflags)
 libgiomm_2_4_la_LIBADD	= $(GIOMM_LIBS) \
                           $(top_builddir)/glib/glibmm/libglibmm-2.4.la
 
+# this header should be distributed, but not installed
+EXTRA_DIST=slot_async.h
