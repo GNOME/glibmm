@@ -291,14 +291,17 @@ sub append_parameter_docs($$)
 
   foreach my $param (@param_names)
   {
-    my $desc = $$param_descriptions->{$param};
-    
-    $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
-    DocsParser::convert_docs_to_cpp($obj_function, \$desc);
-    if(length($desc) > 0)
+    if ($param ne "error" ) #We wrap GErrors as exceptions, so ignore these.
     {
-      $desc  .= '.' unless($desc =~ /(?:^|\.)$/);
-      $$text .= "\n\@param ${param} \u${desc}";
+      my $desc = $$param_descriptions->{$param};
+    
+      $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
+      DocsParser::convert_docs_to_cpp($obj_function, \$desc);
+      if(length($desc) > 0)
+      {
+        $desc  .= '.' unless($desc =~ /(?:^|\.)$/);
+        $$text .= "\n\@param ${param} \u${desc}";
+      }
     }
   }
 }
