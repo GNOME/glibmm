@@ -110,6 +110,10 @@ public:
   guint64 read_uint64(std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
+  // FIXME: In C, these functions return NULL if there is an error (i.e. end of
+  // stream reached), but if we use std::string, we don't have a way to tell an
+  // empty string from NULL.  Perhaps we should use raw pointers as in C, but
+  // that would mean we need to worry about freeing the C string...
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   std::string read_line(const Glib::RefPtr<Cancellable>& cancellable);
 #else

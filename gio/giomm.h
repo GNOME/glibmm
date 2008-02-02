@@ -22,7 +22,9 @@
 
 #include <giomm/appinfo.h>
 #include <giomm/asyncresult.h>
+#include <giomm/bufferedinputstream.h>
 #include <giomm/cancellable.h>
+#include <giomm/datainputstream.h>
 #include <giomm/drive.h>
 #include <giomm/error.h>
 #include <giomm/fileattributeinfolist.h>
