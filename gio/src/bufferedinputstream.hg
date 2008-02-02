@@ -50,31 +50,37 @@ public:
   gssize fill(gssize count, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-/**
- * Reads data into @stream's buffer asynchronously, up to @count size.
- * @io_priority can be used to prioritize reads. For the synchronous version of
- * this function, see fill().
- *
- * @param slot A #GAsyncReadyCallback.
- * @param count: the number of bytes to read
- * @param io_priority the I/O priority of the request.
- * @param cancellable Cancellable object
- **/
-  void fill_async(const SlotAsyncReady& slot,
-                  gssize count,
-                  const Glib::RefPtr<Cancellable>& cancellable,
-                  int io_priority=G_PRIORITY_DEFAULT);
-
-  /** non-cancellable version of fill_async()
+  /** Reads data into the stream's buffer asynchronously, up to @a count size.
+   * @ia o_priority can be used to prioritize reads. For the synchronous version of
+   * this function, see fill().
+   *
+   * @param slot A AsyncReadyCallback.
+   * @param count The number of bytes to read.
+   * @param cancellable Cancellable object.
+   * @param io_priority the I/O priority of the request.
    */
   void fill_async(const SlotAsyncReady& slot,
                   gssize count,
-                  int io_priority=G_PRIORITY_DEFAULT);
+                  const Glib::RefPtr<Cancellable>& cancellable,
+                  int io_priority = G_PRIORITY_DEFAULT);
+
+  /** Reads data into the stream's buffer asynchronously, up to @a count size.
+   * @ia o_priority can be used to prioritize reads. For the synchronous version of
+   * this function, see fill().
+   *
+   * @param slot A AsyncReadyCallback.
+   * @param count The number of bytes to read.
+   * @param io_priority the I/O priority of the request.
+   */
+  void fill_async(const SlotAsyncReady& slot,
+                  gssize count,
+                  int io_priority = G_PRIORITY_DEFAULT);
 
   _WRAP_METHOD(gssize fill_finish(const Glib::RefPtr<AsyncResult>& result), g_buffered_input_stream_fill_finish, errthrow)
 
   _WRAP_METHOD(int read_byte(const Glib::RefPtr<Cancellable>& cancellable), g_buffered_input_stream_read_byte, errthrow)
-  /** non-cancellable version of read_byte
+
+  /** Non-cancellable version of read_byte.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   int read_byte();
@@ -82,7 +88,8 @@ public:
   int read_byte(std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  protected:
+protected:
+#m4 _CONVERSION(`GCancellable*', `const Glib::RefPtr<Cancellable>&', `Glib::wrap($3, true)')
   _WRAP_VFUNC(gssize fill(gssize count, const Glib::RefPtr<Cancellable>& cancellable, GError** error), "fill")
   // TODO: wrap async vfuncs
 };
