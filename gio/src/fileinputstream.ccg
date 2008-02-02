@@ -18,33 +18,8 @@
  */
 
 #include <gio/gio.h>
+#include "slot_async.h"
 #include <glibmm/exceptionhandler.h>
-
-namespace {
-
-static void
-SignalProxy_query_async_callback(GObject*, GAsyncResult* res, void* data)
-{
-  Gio::SlotAsyncReady* the_slot = static_cast<Gio::SlotAsyncReady*>(data);
-
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  try
-  {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-    Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
-    (*the_slot)(result);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-
-  delete the_slot;
-}
-
-} // anonymous namespace
 
 namespace Gio
 {
@@ -99,7 +74,7 @@ FileInputStream::query_info_async(const SlotAsyncReady& slot, const Glib::RefPtr
                                        const_cast<char*>(attributes.c_str()),
                                        io_priority,
                                        cancellable->gobj(),
-                                       &SignalProxy_query_async_callback,
+                                       &SignalProxy_async_callback,
                                        slot_copy);
 }
 
@@ -115,7 +90,7 @@ FileInputStream::query_info_async(const SlotAsyncReady& slot, const std::string&
                                        const_cast<char*>(attributes.c_str()),
                                        io_priority,
                                        NULL,
-                                       &SignalProxy_query_async_callback,
+                                       &SignalProxy_async_callback,
                                        slot_copy);
 }
 

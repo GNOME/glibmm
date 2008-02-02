@@ -19,34 +19,7 @@
 
 #include <gio/gio.h>
 #include <giomm/asyncresult.h>
-
-namespace
-{
-
-static void
-SignalProxy_input_stream_async_callback(GObject*, GAsyncResult* res, void* data)
-{
-  Gio::SlotAsyncReady* the_slot = static_cast<Gio::SlotAsyncReady*>(data);
-
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  try
-  {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-    Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
-    (*the_slot)(result);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
-  }
-  catch(...)
-  {
-    Glib::exception_handlers_invoke();
-  }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
-
-  delete the_slot;
-}
-
-} // anonymous namespace
-
+#include "slot_async.h"
 
 namespace Gio
 {
@@ -141,7 +114,7 @@ InputStream::read_async(void* buffer, gsize count, const SlotAsyncReady& slot, c
                             count,
                             io_priority,
                             cancellable->gobj(),
-                            &SignalProxy_input_stream_async_callback,
+                            &SignalProxy_async_callback,
                             slot_copy);
 }
 
@@ -158,7 +131,7 @@ InputStream::read_async(void* buffer, gsize count, const SlotAsyncReady& slot, i
                             count,
                             io_priority,
                             NULL,
-                            &SignalProxy_input_stream_async_callback,
+                            &SignalProxy_async_callback,
                             slot_copy);
 }
 
@@ -175,7 +148,7 @@ InputStream::skip_async(gsize count, const SlotAsyncReady& slot, const Glib::Ref
                             count,
                             io_priority,
                             cancellable->gobj(),
-                            &SignalProxy_input_stream_async_callback,
+                            &SignalProxy_async_callback,
                             slot_copy);
 }
 
@@ -191,7 +164,7 @@ InputStream::skip_async(gsize count, const SlotAsyncReady& slot, int io_priority
                             count,
                             io_priority,
                             NULL,
-                            &SignalProxy_input_stream_async_callback,
+                            &SignalProxy_async_callback,
                             slot_copy);
 }
 
@@ -206,7 +179,7 @@ InputStream::close_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancella
   g_input_stream_close_async(gobj(),
                              io_priority,
                              cancellable->gobj(),
-                             &SignalProxy_input_stream_async_callback,
+                             &SignalProxy_async_callback,
                              slot_copy);
 }
 
@@ -221,7 +194,7 @@ InputStream::close_async(const SlotAsyncReady& slot, int io_priority)
   g_input_stream_close_async(gobj(),
                              io_priority,
                              NULL,
-                             &SignalProxy_input_stream_async_callback,
+                             &SignalProxy_async_callback,
                              slot_copy);
 }
 
