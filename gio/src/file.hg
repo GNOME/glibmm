@@ -39,6 +39,7 @@ typedef struct _GFileIface GFileIface;
 namespace Gio
 {
 
+class Mount;
 class Volume;
 
 _WRAP_ENUM(FileQueryInfoFlags, GFileQueryInfoFlags, NO_GTYPE)
@@ -76,10 +77,11 @@ class File : public Glib::Interface
   _CLASS_INTERFACE(File, GFile, G_FILE, GFileIface)
 
 public:
-  _IGNORE(g_file_new_for_path)
-  _IGNORE(g_file_new_for_uri)
-  _IGNORE(g_file_new_for_commandline_arg)
-  _IGNORE(g_file_parse_name)
+
+
+
+
+  _IGNORE(g_file_icon_new) //g_file_icon_new is not a GFile method.
 
   // Although this is an interface, it is possible to create objects using
   // its static create* members. In the implementation, these would lead
@@ -94,6 +96,7 @@ public:
    * @result A new instantiation of an appropriate Gio::File class.
    */
   static Glib::RefPtr<File> create_for_path(const std::string& path);
+  _IGNORE(g_file_new_for_path)
 
   /** Constructs a File for a given URI.
    * This operation never fails, but the returned object might not support any I/O operation if path is malformed.
@@ -102,6 +105,7 @@ public:
    * @result A new instantiation of an appropriate Gio::File class.
    */
   static Glib::RefPtr<File> create_for_uri(const std::string& uri);
+  _IGNORE(g_file_new_for_uri)
 
   /** Constructs a File for a given argument from the command line. 
    * The value of @a arg can be either a URI, an absolute path or a relative path resolved relative to the current working directory. 
@@ -111,6 +115,7 @@ public:
    * @result A new instantiation of an appropriate Gio::File class.
    */
   static Glib::RefPtr<File> create_for_commandline_arg(const std::string& arg);
+  _IGNORE(g_file_new_for_commandline_arg)
 
   // parse_name is a UTF8-guaranteed "nice" string that can both
   // be resolved to a GFile (via create_for_parse_name) and put in
@@ -118,6 +123,7 @@ public:
   // filename (if it starts with a /), or an IRI (i.e. a URI that allows
   // UTF8-encoded unicode chars instead of escaping them).
   static Glib::RefPtr<File> create_for_parse_name(const Glib::ustring& parse_name);
+  _IGNORE(g_file_parse_name)
 
   _WRAP_METHOD(Glib::RefPtr<File> dup() const, g_file_dup)
 
@@ -548,6 +554,42 @@ public:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_query_filesystem_info)
 
+  _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount(const Glib::RefPtr<Cancellable>& cancellable), 
+               g_file_find_enclosing_mount, retreturn, errthrow)
+
+
+
+  /** Asynchronously gets the mount for the file.
+   *
+   * For more details, see find_enclosing_mount() which is
+   * the synchronous version of this call.
+   *
+   * When the operation is finished, @a slot will be called. You can then call
+   * find_enclosing_mount_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object.
+   * @param io_priority The I/O priority of the request.
+   */
+  void find_enclosing_mount_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = G_PRIORITY_DEFAULT);
+
+  /** Asynchronously gets the mount for the file.
+   *
+   * For more details, see find_enclosing_mount() which is
+   * the synchronous version of this call.
+   *
+   * When the operation is finished, @a slot will be called. You can then call
+   * find_enclosing_mount_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param io_priority The I/O priority of the request.
+   */
+  void find_enclosing_mount_async(const SlotAsyncReady& slot, int io_priority = G_PRIORITY_DEFAULT);
+  _IGNORE(g_file_find_enclosing_mount_async)
+
+  _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount_finish(const Glib::RefPtr<AsyncResult>& result), 
+               g_file_find_enclosing_mount_finish, refreturn, errthrow)
+
 
   /** Gets the requested information about the files in a directory. The result
    * is a FileEnumerator object that will give out FileInfo objects for
@@ -615,11 +657,11 @@ public:
    * For more details, see enumerate_children() which is the synchronous version of this call.
    * When the operation is finished, @a slot will be called. You can then call enumerate_children_finish() to get the result of the operation.
    *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param attributes An attribute query string.
    * @param flags A set of FileQueryInfoFlags.
    * @param io_priority The I/O priority of the request.
-   * @param cancellable A Cancellable object which can be used to cancel the operation.
-   * @param slot A callback slot which will be called when the request is satisfied.
    */
   void enumerate_children_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
 
@@ -734,6 +776,7 @@ public:
   bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE, std::auto_ptr<Glib::Error>& error);
 #endif
 
+  //TODO: Documentation.
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags = FILE_COPY_NONE);
 #else
@@ -804,9 +847,63 @@ public:
                g_file_query_writable_namespaces,
                errthrow)
 
-  _WRAP_METHOD(bool set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
-               g_file_set_attributes_from_info,
-               errthrow)
+
+  /* This seems to be very generic (see the gpointer parameter),
+     in a C kind of way. Hopefully we don't need it. murrayc
+     gboolean                g_file_set_attribute              (GFile                      *file,
+							   const char                 *attribute,
+							   GFileAttributeType          type,
+							   gpointer                    value_p,
+							   GFileQueryInfoFlags         flags,
+							   GCancellable               *cancellable,
+							   GError                    **error);
+   */
+
+  /** Tries to set all attributes in the FileInfo on the target values, 
+   * not stopping on the first error.
+   * 
+   * If there is any error during this operation then a error will be set to
+   * the first error. Error on particular fields are flagged by setting 
+   * the "status" field in the attribute value to 
+   * FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can also detect
+   * further errors.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * @param info A FileInfo.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param flags A set of FileQueryInfoFlags.
+   * @return <tt>true</tt> if there was any error, <tt>false</tt> otherwise.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE);
+#else
+  bool set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Tries to set all attributes in the FileInfo on the target values, 
+   * not stopping on the first error.
+   * 
+   * If there is any error during this operation then a error will be set to
+   * the first error. Error on particular fields are flagged by setting 
+   * the "status" field in the attribute value to 
+   * FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can also detect
+   * further errors.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * @param info A FileInfo.
+   * @param flags A set of FileQueryInfoFlags.
+   * @return <tt>true</tt> if there was any error, <tt>false</tt> otherwise.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE);
+#else
+  bool set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_set_attributes_from_info)
 
 
   /** Asynchronously sets the attributes of file with info.
@@ -815,10 +912,10 @@ public:
    * When the operation is finished, @a slot will be called. You can then call set_attributes_finish() to get the result of the operation.
    *
    * @param info A FileInfo.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param flags A set of FileQueryInfoFlags.
    * @param io_priority The I/O priority of the request.
-   * @param cancellable A Cancellable object which can be used to cancel the operation.
-   * @param slot A callback slot which will be called when the request is satisfied.
    */
   void set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
 
@@ -828,9 +925,9 @@ public:
    * When the operation is finished, @a slot will be called. You can then call set_attributes_finish() to get the result of the operation.
    *
    * @param info A FileInfo.
+   * @param slot A callback slot which will be called when the request is satisfied.
    * @param flags A set of FileQueryInfoFlags.
    * @param io_priority The I/O priority of the request.
-   * @param slot A callback slot which will be called when the request is satisfied.
    */
   void set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncReady& slot, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE, int io_priority = G_PRIORITY_DEFAULT);
   _IGNORE(g_file_set_attributes_async)
@@ -866,6 +963,49 @@ public:
                g_file_set_attribute_int64,
                errthrow)
 
+  /** Starts a @mount_operation, mounting the volume that contains the file. 
+   * 
+   * When this operation has completed, @a slot will be called with, 
+   * and the operation can be finalized with mount_enclosing_volume_finish().
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
+   * IO_ERROR_CANCELLED will be returned.
+   *
+   * @param mount_operation A MountOperation.
+   * @param cancellable A Cancellable object.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
+  void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+
+  /** Starts a @mount_operation, mounting the volume that contains the file. 
+   * 
+   * When this operation has completed, @a slot will be called with, 
+   * and the operation can be finalized with mount_enclosing_volume_finish().
+   *
+   * @param mount_operation A MountOperation.
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
+  void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot);
+
+  /** Starts a @mount_operation, mounting the volume that contains the file. 
+   * 
+   * When this operation has completed, @a slot will be called with, 
+   * and the operation can be finalized with mount_enclosing_volume_finish().
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   */
+  void mount_enclosing_volume(const SlotAsyncReady& slot);
+  _IGNORE(g_file_mount_enclosing_volume)
+
+  /** Starts a @mount_operation, mounting the volume that contains the file. 
+   *
+   */
+  void mount_enclosing_volume();
+  _IGNORE(g_file_mount_enclosing _volume)
+
+  _WRAP_METHOD(bool mount_enclosing_volume_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_mount_enclosing_volume_finish,
+               errthrow)
 
   /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance, 
    * passwords are needed during authentication.
@@ -875,7 +1015,6 @@ public:
    *
    * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
    *
-   * @param flags Flags affecting the operation.
    * @param mount_operation A MountOperation.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
@@ -887,7 +1026,6 @@ public:
    *
    * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
    *
-   * @param flags Flags affecting the operation.
    * @param mount_operation A MountOperation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
@@ -897,10 +1035,13 @@ public:
    *
    * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
    *
-   * @param flags Flags affecting the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
   void mount_mountable(const SlotAsyncReady& slot);
+
+  /** Mounts a file of type FILE_TYPE_MOUNTABLE without user interaction.
+   */
+  void mount_mountable();
   _IGNORE(g_file_mount_mountable)
 
   _WRAP_METHOD(Glib::RefPtr<File> mount_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
@@ -973,6 +1114,43 @@ public:
                g_file_eject_mountable_finish,
                errthrow)
 
+  /** Copies the file attributes from @source to @destination. 
+   *
+   * Normally only a subset of the file attributes are copied,
+   * those that are copies in a normal file copy operation
+   * (which for instance does not include e.g. mtime). However
+   * if FILE_COPY_ALL_METADATA is specified in @a flags, then
+   * all the metadata that is possible to copy is copied.
+   *
+   * @param destination A File to copy attributes to.
+   * @param cancellable A Cancellable object.
+   * @param flags A set of FileMonitorFlags.
+   * @result true if the attributes were copied successfully, false otherwise.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE);
+#else
+  bool copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE, std::auto_ptr<Glib::Error>& error);
+#endif
+
+  /** Copies the file attributes from @source to @destination. 
+   *
+   * Normally only a subset of the file attributes are copied,
+   * those that are copies in a normal file copy operation
+   * (which for instance does not include e.g. mtime). However
+   * if FILE_COPY_ALL_METADATA is specified in @a flags, then
+   * all the metadata that is possible to copy is copied.
+   *
+   * @param destination A File to copy attributes to.
+   * @param flags A set of FileMonitorFlags.
+   * @result true if the attributes were copied successfully, false otherwise.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FILE_COPY_NONE);
+#else
+  bool copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FILE_COPY_NONE, std::auto_ptr<Glib::Error>& error);
+#endif
+  _IGNORE(g_file_copy_attributes)
  
   /** Obtains a directory monitor for the given file.
    * This may fail if directory monitoring is not supported.
@@ -982,7 +1160,7 @@ public:
    *
    * @param cancellable A Cancellable object.
    * @param flags A set of FileMonitorFlags.
-   * @return A FileMonitor for the file , 
+   * @return A FileMonitor for the file.
    * or <tt>0</tt> on error.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -995,7 +1173,7 @@ public:
    * This may fail if directory monitoring is not supported.
    * 
    * @param flags A set of FileMonitorFlags.
-   * @return A FileMonitor for the file , 
+   * @return A FileMonitor for the file.
    * or <tt>0</tt> on error.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -1225,10 +1403,6 @@ public:
   void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_replace_contents)
-
-
-  //TODO: Documentation
-
 
 
  /** Starts an asynchronous replacement of the file with the given 

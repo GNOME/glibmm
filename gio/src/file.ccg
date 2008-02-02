@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <giomm/mount.h>
 #include <gio/gio.h>
 #include <utility>
 #include <glibmm/error.h>
@@ -825,6 +826,15 @@ void File::mount_mountable(const SlotAsyncReady& slot)
                          slot_copy);
 }
 
+void File::mount_mountable()
+{
+  g_file_mount_mountable(gobj(),
+                         NULL,
+                         NULL,
+                         NULL,
+                         NULL);
+}
+
 void File::unmount_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
@@ -864,6 +874,56 @@ File::unmount_mountable(MountUnmountFlags flags)
                            NULL);
 }
 
+void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_mount_enclosing_volume(gobj(),
+                         mount_operation->gobj(),
+                         cancellable->gobj(),
+                         &SignalProxy_async_callback,
+                         slot_copy);
+}
+
+void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_mount_enclosing_volume(gobj(),
+                         mount_operation->gobj(),
+                         NULL,
+                         &SignalProxy_async_callback,
+                         slot_copy);
+}
+
+void File::mount_enclosing_volume(const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_mount_enclosing_volume(gobj(),
+                         NULL,
+                         NULL,
+                         &SignalProxy_async_callback,
+                         slot_copy);
+}
+
+void File::mount_enclosing_volume()
+{
+  g_file_mount_enclosing_volume(gobj(),
+                         NULL,
+                         NULL,
+                         NULL,
+                         NULL);
+}
 
 void
 File::eject_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
@@ -1339,6 +1399,128 @@ Glib::RefPtr<FileInputStream> File::read(std::auto_ptr<Glib::Error>& error)
   if(retvalue)
     retvalue->reference(); //The function does not do a ref for us.
   return retvalue;
+}
+
+void File::find_enclosing_mount_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_find_enclosing_mount_async(gobj(),
+                    io_priority,
+                    cancellable->gobj(),
+                    &SignalProxy_async_callback,
+                    slot_copy);
+}
+
+void File::find_enclosing_mount_async(const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_find_enclosing_mount_async(gobj(),
+                    io_priority,
+                    NULL,
+                    &SignalProxy_async_callback,
+                    slot_copy);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags)
+#else
+bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_file_set_attributes_from_info(gobj(), Glib::unwrap(info), ((GFileQueryInfoFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags)
+#else
+bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_file_set_attributes_from_info(gobj(), Glib::unwrap(info), ((GFileQueryInfoFlags)(flags)), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool
+File::copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
+#else
+bool
+File::copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool res;
+
+  res = g_file_copy_attributes(gobj(),
+                    destination->gobj(),
+                    static_cast<GFileCopyFlags>(flags),
+                    cancellable->gobj(),
+                    &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if (gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return res;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool
+File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
+#else
+bool
+File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool res;
+
+  res = g_file_copy_attributes(gobj(),
+                    destination->gobj(),
+                    static_cast<GFileCopyFlags>(flags),
+                    NULL,
+                    &gerror);
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if (gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if (gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return res;
 }
 
 } // namespace Gio
