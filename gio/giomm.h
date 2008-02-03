@@ -23,6 +23,7 @@
 #include <giomm/appinfo.h>
 #include <giomm/asyncresult.h>
 #include <giomm/bufferedinputstream.h>
+#include <giomm/bufferedoutputstream.h>
 #include <giomm/cancellable.h>
 #include <giomm/datainputstream.h>
 #include <giomm/drive.h>
@@ -36,6 +37,7 @@
 #include <giomm/filemonitor.h>
 #include <giomm/fileoutputstream.h>
 #include <giomm/filterinputstream.h>
+#include <giomm/filteroutputstream.h>
 #include <giomm/icon.h>
 #include <giomm/init.h>
 #include <giomm/inputstream.h>

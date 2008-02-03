@@ -90,6 +90,10 @@ _CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GPasswordSave',`PasswordSave',`($2)$3')
 _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 
+# OutputStream
+_CONVERSION(`GOutputStream*',`Glib::RefPtr<OutputStream>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<OutputStream>&',`GOutputStream*',__CONVERT_CONST_REFPTR_TO_P)
+
 #Volume
 _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')
 
