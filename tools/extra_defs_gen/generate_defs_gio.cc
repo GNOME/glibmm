@@ -27,6 +27,10 @@ int main (int argc, char** argv)
 
   std::cout << get_defs(G_TYPE_ASYNC_RESULT)
             << get_defs(G_TYPE_CANCELLABLE)
+            << get_defs(G_TYPE_BUFFERED_INPUT_STREAM)
+            << get_defs(G_TYPE_BUFFERED_OUTPUT_STREAM)
+            << get_defs(G_TYPE_DATA_INPUT_STREAM)
+            << get_defs(G_TYPE_DATA_OUTPUT_STREAM)
             << get_defs(G_TYPE_DRIVE)
             << get_defs(G_TYPE_FILE)
             << get_defs(G_TYPE_FILE_ENUMERATOR)
@@ -37,16 +41,23 @@ int main (int argc, char** argv)
 //            << get_defs(G_TYPE_FILE_ATTRIBUTE_MATCHER)
             << get_defs(G_TYPE_FILE_INPUT_STREAM)
             << get_defs(G_TYPE_FILE_OUTPUT_STREAM)
+            << get_defs(G_TYPE_FILTER_INPUT_STREAM)
+            << get_defs(G_TYPE_FILTER_OUTPUT_STREAM)
 
             << get_defs(G_TYPE_INPUT_STREAM)
             << get_defs(G_TYPE_LOADABLE_ICON)
+            << get_defs(G_TYPE_MEMORY_INPUT_STREAM)
+            << get_defs(G_TYPE_MEMORY_OUTPUT_STREAM)
             << get_defs(G_TYPE_MOUNT)
             << get_defs(G_TYPE_MOUNT_OPERATION)
+            << get_defs(G_TYPE_SEEKABLE)
             << get_defs(G_TYPE_SIMPLE_ASYNC_RESULT)
 
             //TODO: This causes a g_warning:
             //GLib-GObject-CRITICAL **: g_param_spec_pool_list: assertion `pool != NULL' failed"
             << get_defs(G_TYPE_VOLUME)
+
+            << get_defs(G_TYPE_VOLUME_MONITOR)
 
             << std::endl;
   

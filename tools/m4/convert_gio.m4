@@ -1,4 +1,5 @@
 _CONV_ENUM(G,PasswordSave)
+_CONV_ENUM(G,AskPasswordFlags)
 _CONV_ENUM(G,MountOperationResult)
 _CONV_ENUM(G,MountUnmountFlags)
 _CONV_ENUM(G,FileAttributeType)
@@ -90,6 +91,9 @@ _CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GPasswordSave',`PasswordSave',`($2)$3')
 _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 
+#MountOperation
+#_CONVERSION(`GAskPasswordFlags',`AskPasswordFlags',`($2)$3')
+
 # OutputStream
 _CONVERSION(`GOutputStream*',`Glib::RefPtr<OutputStream>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<OutputStream>&',`GOutputStream*',__CONVERT_CONST_REFPTR_TO_P)
@@ -99,4 +103,7 @@ _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')
 
 # VolumeMonitor
 _CONVERSION(`GVolumeMonitor*',`Glib::RefPtr<VolumeMonitor>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Drive>&',`GDrive*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<Volume>&',`GVolume*',__CONVERT_CONST_REFPTR_TO_P)
 

@@ -21,11 +21,12 @@
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(gio/gio.h)
 
 namespace Gio
 {
 
-_WRAP_ENUM(PasswordFlags, GPasswordFlags, NO_GTYPE)
+_WRAP_ENUM(AskPasswordFlags, GAskPasswordFlags, NO_GTYPE)
 _WRAP_ENUM(PasswordSave, GPasswordSave, NO_GTYPE)
 _WRAP_ENUM(MountOperationResult, GMountOperationResult, NO_GTYPE)
 
@@ -74,6 +75,22 @@ public:
   _WRAP_METHOD(int get_choice() const, g_mount_operation_get_choice)
   _WRAP_METHOD(void set_choice(int choice), g_mount_operation_set_choice)
   _WRAP_METHOD(void reply(MountOperationResult result), g_mount_operation_reply)
+
+#m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+  _WRAP_SIGNAL(void ask_password(const Glib::ustring& message, const Glib::ustring& default_user, const Glib::ustring& default_domain, AskPasswordFlags flags), ask_password)
+  //TODO:_WRAP_SIGNAL(void ask_question(const Glib::ustring& message, const Glib::ustring& choices[]), ask_question)
+  _WRAP_SIGNAL(void reply(MountOperationResult result), reply)
+
+
+  _WRAP_PROPERTY("username", Glib::ustring)
+  _WRAP_PROPERTY("password", Glib::ustring)
+  _WRAP_PROPERTY("anonymous", bool)
+  _WRAP_PROPERTY("domain", Glib::ustring)
+  _WRAP_PROPERTY("password-save", PasswordSave)
+  _WRAP_PROPERTY("choice", int)
+
+  //TODO: vfuncs
+
 };
 
 } // namespace Gio

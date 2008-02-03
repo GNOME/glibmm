@@ -626,7 +626,7 @@ public:
                g_file_query_info_finish,
                refreturn, errthrow)
 
-  /** Similar to g_file_query_info(), but obtains information
+  /** Similar to query_info(), but obtains information
    * about the filesystem the file is on, rather than the file itself.
    * For instance the amount of space availible and the type of
    * the filesystem.
@@ -655,6 +655,33 @@ public:
   Glib::RefPtr<FileInfo> query_filesystem_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*");
 #else
   Glib::RefPtr<FileInfo> query_filesystem_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Similar to query_info(), but obtains information
+   * about the filesystem the file is on, rather than the file itself.
+   * For instance the amount of space availible and the type of
+   * the filesystem.
+   * 
+   * The @a attribute  value is a string that specifies the file attributes that
+   * should be gathered. It is not an error if its not possible to read a particular
+   * requested attribute from a file, it just won't be set. @a attribute  should
+   * be a comma-separated list of attribute or attribute wildcards. The wildcard "*"
+   * means all attributes, and a wildcard like "fs:*" means all attributes in the fs
+   * namespace. The standard namespace for filesystem attributes is "fs".
+   * Common attributes of interest are FILE_ATTRIBUTE_FILESYSTEM_SIZE
+   * (the total size of the filesystem in bytes), FILE_ATTRIBUTE_FILESYSTEM_FREE (number of
+   * bytes availible), and FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
+   * 
+   * 
+   * If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
+   * Other errors are possible too, and depend on what kind of filesystem the file is on.
+   * @param attributes An attribute query string.
+   * @return A FileInfo or an empty RefPtr if there was an error.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileInfo> query_filesystem_info(const std::string& attributes = "*");
+#else
+  Glib::RefPtr<FileInfo> query_filesystem_info(const std::string& attributes, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_query_filesystem_info)
 
