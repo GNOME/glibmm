@@ -26,7 +26,9 @@
 #include <giomm/bufferedoutputstream.h>
 #include <giomm/cancellable.h>
 #include <giomm/datainputstream.h>
+#include <giomm/dataoutputstream.h>
 #include <giomm/drive.h>
+#include <giomm/enums.h>
 #include <giomm/error.h>
 #include <giomm/fileattributeinfolist.h>
 #include <giomm/fileenumerator.h>
