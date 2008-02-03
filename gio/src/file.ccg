@@ -1658,4 +1658,66 @@ Glib::RefPtr<FileAttributeInfoList> File::query_writable_namespaces(std::auto_pt
   return retvalue;
 }
 
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileOutputStream> File::append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
+#else
+Glib::RefPtr<FileOutputStream> File::append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileOutputStream> File::append_to(FileCreateFlags flags)
+#else
+Glib::RefPtr<FileOutputStream> File::append_to(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<Mount> File::find_enclosing_mount()
+#else
+Glib::RefPtr<Mount> File::find_enclosing_mount(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<Mount> retvalue = Glib::wrap(g_file_find_enclosing_mount(gobj(), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
 } // namespace Gio

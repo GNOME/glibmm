@@ -209,9 +209,57 @@ public:
   _WRAP_METHOD(Glib::RefPtr<FileInputStream> read_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_read_finish,
                refreturn, errthrow)
-  _WRAP_METHOD(Glib::RefPtr<FileOutputStream> append_to(FileCreateFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
-               g_file_append_to,
-               refreturn, errthrow)
+
+
+  /** Gets an output stream for appending data to the file. If
+   * the file doesn't already exist it is created.
+   * 
+   * By default files created are generally readable by everyone,
+   * but if you pass FILE_CREATE_PRIVATE in @a flags the file
+   * will be made readable only to the current user, to the level that
+   * is supported on the target filesystem.
+   * 
+   * The operation can be cancelled by
+   * triggering the cancellable object from another thread. If the operation
+   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * 
+   * Some filesystems don't allow all filenames, and may
+   * return an G_IO_ERROR_INVALID_FILENAME error.
+   * If the file is a directory the G_IO_ERROR_IS_DIRECTORY error will be
+   * returned. Other errors are possible too, and depend on what kind of
+   * filesystem the file is on.
+   * @param flags A set of FileCreateFlags.
+   * @param cancellable Optional Cancellable object.
+   * @return A FileOutputStream.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileOutputStream> append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileOutputStream> append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Gets an output stream for appending data to the file. If
+   * the file doesn't already exist it is created.
+   * 
+   * By default files created are generally readable by everyone,
+   * but if you pass FILE_CREATE_PRIVATE in @a flags the file
+   * will be made readable only to the current user, to the level that
+   * is supported on the target filesystem.
+   * 
+   * Some filesystems don't allow all filenames, and may
+   * return an G_IO_ERROR_INVALID_FILENAME error.
+   * If the file is a directory the G_IO_ERROR_IS_DIRECTORY error will be
+   * returned. Other errors are possible too, and depend on what kind of
+   * filesystem the file is on.
+   * @param flags A set of FileCreateFlags.
+   * @return A FileOutputStream.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileOutputStream> append_to(FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileOutputStream> append_to(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_append_to)
 
   //We renamed this to create_file from (g_file_create()), to avoid confusion with static create() methods, 
   //but I would still like to choose a different word, but can't think of a good one. murrayc.
@@ -613,6 +661,20 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount(const Glib::RefPtr<Cancellable>& cancellable), 
                g_file_find_enclosing_mount, retreturn, errthrow)
 
+  /** Gets a Mount for the File. 
+   * 
+   * If the FileIface for the file does not have a mount (e.g. possibly a 
+   * remote share), an error will be set to IO_ERROR_NOT_FOUND and an empty RefPtr 
+   * will be returned.
+   *
+   * @param cancellable Cancellable object.
+   * @return A Mount where the file is located.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<Mount> find_enclosing_mount();
+#else
+  Glib::RefPtr<Mount> find_enclosing_mount(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
   /** Asynchronously gets the mount for the file.
@@ -1307,8 +1369,6 @@ public:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_monitor_directory)
 
-  _WRAP_METHOD(Glib::RefPtr<FileMonitor> monitor_file(FileMonitorFlags flags, const Glib::RefPtr<Cancellable>& cancellable), g_file_monitor_file, errthrow)
-
   /** Obtains a file monitor for the given file. If no file notification
    * mechanism exists, then regular polling of the file is used.
    * 
@@ -1340,6 +1400,7 @@ public:
 #else
   Glib::RefPtr<FileMonitor> monitor_file(FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_monitor_file)
 
 
   //TODO: Documentation.
