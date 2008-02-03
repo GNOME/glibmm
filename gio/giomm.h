@@ -44,6 +44,7 @@
 #include <giomm/init.h>
 #include <giomm/inputstream.h>
 #include <giomm/loadableicon.h>
+#include <giomm/memoryinputstream.h>
 #include <giomm/mount.h>
 #include <giomm/mountoperation.h>
 #include <giomm/outputstream.h>
