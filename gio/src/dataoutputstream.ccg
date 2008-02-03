@@ -162,11 +162,10 @@ bool DataOutputStream::put_string(std::string str, std::auto_ptr<Glib::Error>& e
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retval =
-      Glib::convert_return_gchar_ptr_to_stdstring(g_data_output_stream_put_string(gobj(),
-                  str.c_str (),
-                  NULL,
-                  &gerror));
+  bool retval = g_data_output_stream_put_string(gobj(),
+                                                str.c_str (),
+                                                NULL,
+                                                &gerror);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
