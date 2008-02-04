@@ -18,8 +18,101 @@
  */
 
 #include <gio/gio.h>
+#include "slot_async.h"
 
 namespace Gio {
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<InputStream>
+LoadableIcon::load(int size, Glib::ustring& type, const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Glib::RefPtr<InputStream>
+LoadableIcon::load(int size, Glib::ustring& type, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  char* c_type;
+  GError* gerror = 0;
+  Glib::RefPtr<InputStream> retval =
+      Glib::wrap(g_loadable_icon_load(gobj(),
+                 size,
+                 &c_type,
+                 cancellable->gobj(),
+                 &gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  type = c_type;
+  g_free(c_type);
+  if(retval)
+    retval->reference(); //The function does not do a ref for us.
+  return retval;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<InputStream>
+LoadableIcon::load(int size, Glib::ustring& type)
+#else
+Glib::RefPtr<InputStream>
+LoadableIcon::load(int size, Glib::ustring& type, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  char* c_type;
+  GError* gerror = 0;
+  Glib::RefPtr<InputStream> retval =
+      Glib::wrap(g_loadable_icon_load(gobj(),
+                 size,
+                 &c_type,
+                 NULL,
+                 &gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  type = c_type;
+  g_free(c_type);
+  if(retval)
+    retval->reference(); //The function does not do a ref for us.
+  return retval;
+}
+
+void
+LoadableIcon::load_async(int size, const SlotAsyncReady& slot, const
+                         Glib::RefPtr<Cancellable>& cancellable)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_loadable_icon_load_async(gobj(),
+                             size,
+                             cancellable->gobj(),
+                             &SignalProxy_async_callback,
+                             slot_copy);
+}
+
+void
+LoadableIcon::load_async(int size, const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_loadable_icon_load_async(gobj(),
+                             size,
+                             NULL,
+                             &SignalProxy_async_callback,
+                             slot_copy);
+}
 
 } // namespace Gio
