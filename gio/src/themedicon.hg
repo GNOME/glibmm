@@ -1,0 +1,62 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2007 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/file.h>
+#include <giomm/icon.h>
+#include <giomm/loadableicon.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** Icon theming support
+ * ThemedIcon is an implementation of Gio::Icon that supports icon themes.
+ * ThemedIcon contains a list of all of the icons present in an icon
+ * theme, so that icons can be looked up quickly. ThemedIcon does
+ * not provide actual pixmaps for icons, just the icon names.
+ * Ideally something like Gtk::IconTheme::choose_icon() should be used to
+ * resolve the list of names so that fallback icons work nicely with
+ * themes that inherit other themes.
+ *
+ * @newin2p16
+ */
+class ThemedIcon
+: public Glib::Object,
+  public Icon
+{
+  _CLASS_GOBJECT(ThemedIcon, GThemedIcon, G_THEMED_ICON, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Icon)
+
+protected:
+  _WRAP_CTOR(ThemedIcon(const std::string& iconname), g_themed_icon_new)
+
+public:
+  _WRAP_CREATE(const std::string& iconname)
+  //TODO: GIcon *g_themed_icon_new_with_default_fallbacks (const char *iconname);
+  //TODO: GIcon *g_themed_icon_new_from_names (char **iconnames, int len);
+
+  //TODO: const char * const *g_themed_icon_get_names (GThemedIcon *icon);
+
+  //There are no signals or properties.
+};
+
+} // namespace Gio

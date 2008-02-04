@@ -37,6 +37,7 @@ int main (int argc, char** argv)
             << get_defs(G_TYPE_FILE_INFO)
             << get_defs(G_TYPE_FILE_ICON)
             << get_defs(G_TYPE_FILE_MONITOR)
+            << get_defs(G_TYPE_FILENAME_COMPLETER)
 //            << get_defs(G_TYPE_FILE_ATTRIBUTE_INFO_LIST)
 //            << get_defs(G_TYPE_FILE_ATTRIBUTE_MATCHER)
             << get_defs(G_TYPE_FILE_INPUT_STREAM)
@@ -52,6 +53,7 @@ int main (int argc, char** argv)
             << get_defs(G_TYPE_MOUNT_OPERATION)
             << get_defs(G_TYPE_SEEKABLE)
             << get_defs(G_TYPE_SIMPLE_ASYNC_RESULT)
+            << get_defs(G_TYPE_THEMED_ICON)
 
             //TODO: This causes a g_warning:
             //GLib-GObject-CRITICAL **: g_param_spec_pool_list: assertion `pool != NULL' failed"
