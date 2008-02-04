@@ -619,6 +619,100 @@ File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto
   return res;
 }
 
+void
+File::copy_async(const Glib::RefPtr<File>& destination,
+                 const SlotFileProgress& slot_progress,
+                 const SlotAsyncReady& slot_ready,
+                 const Glib::RefPtr<Cancellable>& cancellable,
+                 FileCopyFlags flags,
+                 int io_priority)
+{
+  // Create copies of slots.
+  // Pointers to them will be passed through the callbacks' data parameter
+  // and deleted in the corresponding callback.
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+  SlotFileProgress* slot_progress_copy = new SlotFileProgress(slot_progress);
+
+  g_file_copy_async(gobj(),
+                    destination->gobj(),
+                    static_cast<GFileCopyFlags>(flags),
+                    io_priority,
+                    cancellable->gobj(),
+                    &SignalProxy_file_progress_callback,
+                    slot_progress_copy,
+                    &SignalProxy_async_callback,
+                    slot_ready_copy);
+}
+
+void
+File::copy_async(const Glib::RefPtr<File>& destination,
+                 const SlotAsyncReady& slot_ready,
+                 const Glib::RefPtr<Cancellable>& cancellable,
+                 FileCopyFlags flags,
+                 int io_priority)
+{
+  // Create copies of slots.
+  // Pointers to them will be passed through the callbacks' data parameter
+  // and deleted in the corresponding callback.
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  g_file_copy_async(gobj(),
+                    destination->gobj(),
+                    static_cast<GFileCopyFlags>(flags),
+                    io_priority,
+                    cancellable->gobj(),
+                    NULL,
+                    NULL,
+                    &SignalProxy_async_callback,
+                    slot_ready_copy);
+}
+
+void
+File::copy_async(const Glib::RefPtr<File>& destination,
+                 const SlotFileProgress& slot_progress,
+                 const SlotAsyncReady& slot_ready,
+                 FileCopyFlags flags,
+                 int io_priority)
+{
+  // Create copies of slots.
+  // Pointers to them will be passed through the callbacks' data parameter
+  // and deleted in the corresponding callback.
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+  SlotFileProgress* slot_progress_copy = new SlotFileProgress(slot_progress);
+
+  g_file_copy_async(gobj(),
+                    destination->gobj(),
+                    static_cast<GFileCopyFlags>(flags),
+                    io_priority,
+                    NULL,
+                    &SignalProxy_file_progress_callback,
+                    slot_progress_copy,
+                    &SignalProxy_async_callback,
+                    slot_ready_copy);
+}
+
+void
+File::copy_async(const Glib::RefPtr<File>& destination,
+                 const SlotAsyncReady& slot_ready,
+                 FileCopyFlags flags,
+                 int io_priority)
+{
+  // Create copies of slots.
+  // Pointers to them will be passed through the callbacks' data parameter
+  // and deleted in the corresponding callback.
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  g_file_copy_async(gobj(),
+                    destination->gobj(),
+                    static_cast<GFileCopyFlags>(flags),
+                    io_priority,
+                    NULL,
+                    NULL,
+                    NULL,
+                    &SignalProxy_async_callback,
+                    slot_ready_copy);
+}
+
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)

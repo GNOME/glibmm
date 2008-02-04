@@ -19,6 +19,7 @@
 
 #include <glibmm/error.h>
 #include <glibmm/interface.h>
+#include <giomm/appinfo.h>
 #include <giomm/asyncresult.h>
 #include <giomm/fileattributeinfolist.h>
 #include <giomm/fileenumerator.h>
@@ -958,6 +959,74 @@ public:
 #endif // GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_copy)
 
+  /** Copies the file to the location specified by @destination asynchronously.
+   * For details of the behaviour, see copy().
+   *
+   * When the operation is finished, @slot_ready will be called.
+   * You can then call copy_finish() to get the result of the operation.
+   *
+   * The function specified by @slot_progress will be called just like
+   * in copy(), however the callback will run in the main loop, not in
+   * the thread that is doing the I/O operation.
+   *
+   * @param destination Destination File
+   * @param slot_progress The callback slot to be called with progress information
+   * @param slot_ready A SlotAsyncReady to call when the request is satisfied
+   * @param cancellable A Cancellable object which can be used to cancel the operation
+   * @param flags Set of FileCopyFlags
+   * @param io_priority The I/O priority of the request
+   */
+  void copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress, const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE, int io_priority = G_PRIORITY_DEFAULT);
+
+  /** Copies the file to the location specified by @destination asynchronously.
+   * For details of the behaviour, see copy().
+   *
+   * When the operation is finished, @slot_ready will be called.
+   * You can then call copy_finish() to get the result of the operation.
+   *
+   * @param destination Destination File
+   * @param slot_ready A SlotAsyncReady to call when the request is satisfied
+   * @param cancellable A Cancellable object which can be used to cancel the operation
+   * @param flags Set of FileCopyFlags
+   * @param io_priority The I/O priority of the request
+   */
+  void copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE, int io_priority = G_PRIORITY_DEFAULT);
+
+  /** Copies the file to the location specified by @destination asynchronously.
+   * For details of the behaviour, see copy().
+   *
+   * When the operation is finished, @slot_ready will be called.
+   * You can then call copy_finish() to get the result of the operation.
+   *
+   * The function specified by @slot_progress will be called just like
+   * in copy(), however the callback will run in the main loop, not in
+   * the thread that is doing the I/O operation.
+   *
+   * @param destination Destination File
+   * @param slot_progress The callback slot to be called with progress information
+   * @param slot_ready A SlotAsyncReady to call when the request is satisfied
+   * @param flags Set of FileCopyFlags
+   * @param io_priority The I/O priority of the request
+   */
+  void copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress, const SlotAsyncReady& slot_ready, FileCopyFlags flags = FILE_COPY_NONE, int io_priority = G_PRIORITY_DEFAULT);
+
+  /** Copies the file to the location specified by @destination asynchronously.
+   * For details of the behaviour, see copy().
+   *
+   * When the operation is finished, @slot_ready will be called.
+   * You can then call copy_finish() to get the result of the operation.
+   *
+   * @param destination Destination File
+   * @param slot_ready A SlotAsyncReady to call when the request is satisfied
+   * @param flags Set of FileCopyFlags
+   * @param io_priority The I/O priority of the request
+   */
+  void copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& slot_ready, FileCopyFlags flags = FILE_COPY_NONE, int io_priority = G_PRIORITY_DEFAULT);
+  _IGNORE(g_file_copy_async)
+
+  _WRAP_METHOD(bool copy_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_copy_finish,
+               errthrow)
 
   //TODO: Rephrase this in terms of exceptions rather than errors. And what exceptions are thrown?
   /** Tries to move the file or directory source to the location specified by destination. If native move operations are supported then this is 
@@ -1517,6 +1586,9 @@ public:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_monitor_file)
 
+  _WRAP_METHOD(Glib::RefPtr<AppInfo> query_default_handler(const Glib::RefPtr<Cancellable>& cancellable),
+               g_file_query_default_handler,
+               refreturn, errthrow)
 
   //TODO: Documentation.
   //TODO: atm I don't understand what's etag_out:
