@@ -17,33 +17,29 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/object.h>
+#include <giomm/inputstream.h>
 
 _DEFS(giomm,gio)
-_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(giomm/private/inputstream_p.h)
 
 namespace Gio
 {
 
-// Forward declarations
-class File;
-
 /**
- * Entry point for using GIO functionality.
+ * UnixInputStream implements InputStream for reading from a unix file
+ * descriptor, including asynchronous operations. The file descriptor much be
+ * selectable, so it doesn't work with opened files.
  *
  * @newin2p16
  */
-class Vfs : public Glib::Object
+class UnixInputStream : public Gio::InputStream
 {
-  _CLASS_GOBJECT(Vfs, GVfs, G_VFS, Glib::Object, GObject)
+  _CLASS_GOBJECT(UnixInputStream, GUnixInputStream, G_UNIX_INPUT_STREAM, Gio::InputStream, GInputStream)
+
+  _WRAP_CTOR(UnixInputStream(int fd, bool close_fd_at_close), g_unix_input_stream_new)
 
 public:
-  _WRAP_METHOD(static Glib::RefPtr<Vfs> get_default(), g_vfs_get_default)
-  _WRAP_METHOD(static Glib::RefPtr<Vfs> get_local(), g_vfs_get_local)
-  _WRAP_METHOD(Glib::RefPtr<File> file_for_path(const std::string& path), g_vfs_get_file_for_path)
-  _WRAP_METHOD(Glib::RefPtr<File> file_for_uri(const std::string& uri), g_vfs_get_file_for_uri)
-  _WRAP_METHOD(Glib::RefPtr<File> parse_name(const std::string& parse_name), g_vfs_parse_name)
-  _WRAP_METHOD(bool is_active(), g_vfs_is_active)
+  _WRAP_CREATE(int fd, bool close_fd_at_close)
 };
 
 } // namespace Gio

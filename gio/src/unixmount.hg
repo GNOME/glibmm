@@ -18,6 +18,7 @@
  */
 
 #include <glibmm/object.h>
+#include <giomm/mount.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -25,25 +26,17 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-// Forward declarations
-class File;
-
 /**
- * Entry point for using GIO functionality.
+ * Routines for managing mounted UNIX mount points and paths.
  *
  * @newin2p16
  */
-class Vfs : public Glib::Object
+class UnixMount
+: public Glib::Object,
+  public Mount
 {
-  _CLASS_GOBJECT(Vfs, GVfs, G_VFS, Glib::Object, GObject)
-
-public:
-  _WRAP_METHOD(static Glib::RefPtr<Vfs> get_default(), g_vfs_get_default)
-  _WRAP_METHOD(static Glib::RefPtr<Vfs> get_local(), g_vfs_get_local)
-  _WRAP_METHOD(Glib::RefPtr<File> file_for_path(const std::string& path), g_vfs_get_file_for_path)
-  _WRAP_METHOD(Glib::RefPtr<File> file_for_uri(const std::string& uri), g_vfs_get_file_for_uri)
-  _WRAP_METHOD(Glib::RefPtr<File> parse_name(const std::string& parse_name), g_vfs_parse_name)
-  _WRAP_METHOD(bool is_active(), g_vfs_is_active)
+  _CLASS_GOBJECT(UnixMount, GUnixMount, G_UNIX_MOUNT, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Mount)
 };
 
 } // namespace Gio
