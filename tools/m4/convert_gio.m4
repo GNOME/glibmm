@@ -107,3 +107,6 @@ _CONVERSION(`const Glib::RefPtr<Drive>&',`GDrive*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Volume>&',`GVolume*',__CONVERT_CONST_REFPTR_TO_P)
 
+#Vfs
+_CONVERSION(`GVfs*', `Glib::RefPtr<Vfs>', `Glib::wrap($3)')
+

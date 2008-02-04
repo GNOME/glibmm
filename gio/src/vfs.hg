@@ -1,0 +1,49 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2007 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/**
+ * Entry point for using GIO functionality.
+ *
+ * @newin2p16
+ */
+class File;
+
+class Vfs : public Glib::Object
+{
+  _CLASS_GOBJECT(Vfs, GVfs, G_VFS, Glib::Object, GObject)
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<Vfs> get_default(), g_vfs_get_default)
+  _WRAP_METHOD(static Glib::RefPtr<Vfs> get_local(), g_vfs_get_local)
+  _WRAP_METHOD(Glib::RefPtr<File> file_for_path(const std::string& path), g_vfs_get_file_for_path)
+  _WRAP_METHOD(Glib::RefPtr<File> file_for_uri(const std::string& uri), g_vfs_get_file_for_uri)
+  _WRAP_METHOD(Glib::RefPtr<File> parse_name(const std::string& parse_name), g_vfs_parse_name)
+  _WRAP_METHOD(bool is_active(), g_vfs_is_active)
+};
+
+} // namespace Gio
+
