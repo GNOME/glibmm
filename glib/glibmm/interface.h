@@ -41,7 +41,20 @@ public:
   typedef GTypeInterface  BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+  /** Called by constructors of derived classes. Provide the result of 
+   * the Class object's init() function to ensure that it is properly 
+   * initialized.
+   * 
+   * @param interface_class The Class object for the derived type.
+   */
   explicit Interface(const Glib::Interface_Class& interface_class);
+
+  /** Called by constructors of derived classes.
+   * 
+   * @param cast_item A C instance that will be wrapped by the new 
+   * C++ instance. This does not take a reference, so call reference() 
+   * if necessary.
+   */
   explicit Interface(GObject* castitem);
   virtual ~Interface();
 
