@@ -1955,4 +1955,25 @@ Glib::RefPtr<Mount> File::find_enclosing_mount(std::auto_ptr<Glib::Error>& error
   return retvalue;
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<AppInfo> File::query_default_handler()
+#else
+Glib::RefPtr<AppInfo> File::query_default_handler(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<AppInfo> retvalue = Glib::wrap(g_file_query_default_handler(gobj(), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
 } // namespace Gio

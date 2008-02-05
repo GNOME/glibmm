@@ -1590,6 +1590,17 @@ public:
                g_file_query_default_handler,
                refreturn, errthrow)
 
+/** Returns the AppInfo that is registered as the default
+ * application to handle the file specified by the file.
+ *
+ * @result A AppInfo if the handle was found, or an empty RefPtr if there were errors.
+ **/
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<AppInfo> query_default_handler();
+#else
+  Glib::RefPtr<AppInfo> query_default_handler(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
   //TODO: Documentation.
   //TODO: atm I don't understand what's etag_out:
   // "a pointer to the current entity tag for the document" - sounds like it
