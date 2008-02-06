@@ -137,7 +137,13 @@ PKG_CHECK_MODULES(GLIBMM, sigc++-2.0 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${
 AC_SUBST(GLIBMM_CFLAGS)
 AC_SUBST(GLIBMM_LIBS)
 
-PKG_CHECK_MODULES(GIOMM, sigc++-2.0 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version} gio-2.0 >= ${gtkmm_min_glib_version})
+
+# Only check for gio-unix-2.0 on non-win32 platform, because that API is Unix-specific. 
+if test x"$os_win32" = xyes; then
+  PKG_CHECK_MODULES(GIOMM, sigc++-2.0 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version} gio-2.0 >= ${gtkmm_min_glib_version})
+else
+  PKG_CHECK_MODULES(GIOMM, sigc++-2.0 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version} gio-2.0 >= ${gtkmm_min_glib_version} gio-unix-2.0 >= ${gtkmm_min_glib_version})
+fi
 AC_SUBST(GIOMM_CFLAGS)
 AC_SUBST(GIOMM_LIBS)
 
