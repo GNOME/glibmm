@@ -1,5 +1,5 @@
 // -*- c++ -*-
-/* $Id$ */
+/* $Id: iochannel.ccg,v 1.6 2006/10/04 12:04:09 murrayc Exp $ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
  *
@@ -443,12 +443,15 @@ Glib::RefPtr<IOChannel> wrap(GIOChannel* gobject, bool take_copy)
 
 /**** Glib::GlibmmIOChannel ************************************************/
 
-// static
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 GIOStatus GlibmmIOChannel::io_read(GIOChannel* channel, char* buf, gsize count,
                                    gsize* bytes_read, GError** err)
+#else
+//Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
+GIOStatus GlibmmIOChannel::io_read(GIOChannel* channel, char* buf, gsize count,
+                                   gsize* bytes_read, GError** /* err */)
+#endif
 {
-  if(!&err) err = err; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -471,12 +474,15 @@ GIOStatus GlibmmIOChannel::io_read(GIOChannel* channel, char* buf, gsize count,
   return G_IO_STATUS_ERROR;
 }
 
-// static
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 GIOStatus GlibmmIOChannel::io_write(GIOChannel* channel, const char* buf, gsize count,
                                     gsize* bytes_written, GError** err)
+#else
+//Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
+GIOStatus GlibmmIOChannel::io_write(GIOChannel* channel, const char* buf, gsize count,
+                                    gsize* bytes_written, GError** /* err */)
+#endif
 {
-  if(!&err) err = err; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -499,11 +505,13 @@ GIOStatus GlibmmIOChannel::io_write(GIOChannel* channel, const char* buf, gsize 
   return G_IO_STATUS_ERROR;
 }
 
-// static
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 GIOStatus GlibmmIOChannel::io_seek(GIOChannel* channel, gint64 offset, GSeekType type, GError** err)
+#else
+//Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
+GIOStatus GlibmmIOChannel::io_seek(GIOChannel* channel, gint64 offset, GSeekType type, GError** /* err */)
+#endif
 {
-  if(!&err) err = err; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -526,11 +534,13 @@ GIOStatus GlibmmIOChannel::io_seek(GIOChannel* channel, gint64 offset, GSeekType
   return G_IO_STATUS_ERROR;
 }
 
-// static
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 GIOStatus GlibmmIOChannel::io_close(GIOChannel* channel, GError** err)
+#else
+//Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
+GIOStatus GlibmmIOChannel::io_close(GIOChannel* channel, GError** /* err */)
+#endif
 {
-  if(!&err) err = err; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -588,11 +598,13 @@ void GlibmmIOChannel::io_free(GIOChannel* channel)
   g_free(channel);
 }
 
-// static
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 GIOStatus GlibmmIOChannel::io_set_flags(GIOChannel* channel, GIOFlags flags, GError** err)
+#else
+//Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
+GIOStatus GlibmmIOChannel::io_set_flags(GIOChannel* channel, GIOFlags flags, GError** /* err */)
+#endif
 {
-  if(!&err) err = err; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper;
 
   #ifdef GLIBMM_EXCEPTIONS_ENABLED

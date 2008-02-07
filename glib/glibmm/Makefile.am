@@ -72,6 +72,7 @@ sublib_files_extra_general_h = \
   object.h \
   objectbase.h \
   pattern.h \
+  priorities.h \
   property.h \
   propertyproxy.h \
   propertyproxy_base.h \

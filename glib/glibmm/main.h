@@ -30,6 +30,7 @@
 #include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/timeval.h>
+#include <glibmm/priorities.h>
 
 GLIBMM_USING_STD(vector)
 
@@ -46,41 +47,6 @@ class IOChannel;
  * Manages all available sources of events.
  * @{
  */
-
-enum
-{
-  /*! Use this for high priority event sources.  It is not used within
-   * GLib or GTK+.<br><br>
-   */
-  PRIORITY_HIGH = -100,
-
-  /*! Use this for default priority event sources.  In glibmm this
-   * priority is used by default when installing timeout handlers with
-   * SignalTimeout::connect().  In GDK this priority is used for events
-   * from the X server.<br><br>
-   */
-  PRIORITY_DEFAULT = 0,
-
-  /*! Use this for high priority idle functions.  GTK+ uses
-   * <tt>PRIORITY_HIGH_IDLE&nbsp;+&nbsp;10</tt> for resizing operations, and
-   * <tt>PRIORITY_HIGH_IDLE&nbsp;+&nbsp;20</tt> for redrawing operations.
-   * (This is done to ensure that any pending resizes are processed before
-   * any pending redraws, so that widgets are not redrawn twice unnecessarily.)
-   * <br><br>
-   */
-  PRIORITY_HIGH_IDLE = 100,
-
-  /*! Use this for default priority idle functions.  In glibmm this priority is
-   * used by default when installing idle handlers with SignalIdle::connect().
-   * <br><br>
-   */
-  PRIORITY_DEFAULT_IDLE = 200,
-
-  /*! Use this for very low priority background tasks.  It is not used within
-   * GLib or GTK+.
-   */
-  PRIORITY_LOW = 300
-};
 
 
 /** A bitwise combination representing an I/O condition to watch for on an
