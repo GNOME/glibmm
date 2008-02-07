@@ -157,17 +157,16 @@ guint64 DataInputStream::read_uint64(std::auto_ptr<Glib::Error>& error)
 }
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
-std::string DataInputStream::read_line(const Glib::RefPtr<Cancellable>& cancellable)
+bool DataInputStream::read_line(std::string& line, const Glib::RefPtr<Cancellable>& cancellable)
 #else
-std::string DataInputStream::read_line(const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+bool DataInputStream::read_line(std::string& line, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  std::string s =
-      Glib::convert_return_gchar_ptr_to_stdstring(g_data_input_stream_read_line(gobj(),
-                  NULL, // pass NULL since we can easily determine the length from the returned std::string
-                  cancellable->gobj(),
-                  &gerror));
+  char* c_line = g_data_input_stream_read_line(gobj(),
+                                               NULL, // pass NULL since we can easily determine the length from the returned std::string
+                                               cancellable->gobj(),
+                                               &gerror);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -175,21 +174,26 @@ std::string DataInputStream::read_line(const Glib::RefPtr<Cancellable>& cancella
   if(gerror)
     error = ::Glib::Error::throw_exception(gerror);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
-    return s;
+    if (c_line) {
+        line = c_line;
+        g_free (c_line);
+        return true;
+    }
+    // end of stream reached, return failure status
+    return false;
 }
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
-std::string DataInputStream::read_line()
+bool DataInputStream::read_line(std::string& line)
 #else
-std::string DataInputStream::read_line(std::auto_ptr<Glib::Error>& error)
+bool DataInputStream::read_line(std::string& line, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  std::string s =
-      Glib::convert_return_gchar_ptr_to_stdstring(g_data_input_stream_read_line(gobj(),
-                  NULL, // pass NULL since we can easily determine the length from the returned std::string
-                  NULL,
-                  &gerror));
+  char* c_line = g_data_input_stream_read_line(gobj(),
+                                               NULL, // pass NULL since we can easily determine the length from the returned std::string
+                                               NULL,
+                                               &gerror);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -197,23 +201,28 @@ std::string DataInputStream::read_line(std::auto_ptr<Glib::Error>& error)
   if(gerror)
     error = ::Glib::Error::throw_exception(gerror);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
-    return s;
+    if (c_line) {
+        line = c_line;
+        g_free(c_line);
+        return true;
+    }
+    // end of stream reached, return failure status
+    return false;
 }
 
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
-std::string DataInputStream::read_until(const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable)
+bool DataInputStream::read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable)
 #else
-std::string DataInputStream::read_until(const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+bool DataInputStream::read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  std::string s =
-      Glib::convert_return_gchar_ptr_to_stdstring(g_data_input_stream_read_until(gobj(),
-                  stop_chars.c_str(),
-                  NULL, // pass NULL since we can easily determine the length from the returned std::string
-                  cancellable->gobj(),
-                  &gerror));
+  char* c_str = g_data_input_stream_read_until(gobj(),
+                                               stop_chars.c_str(),
+                                               NULL, // pass NULL since we can easily determine the length from the returned std::string
+                                               cancellable->gobj(),
+                                               &gerror);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -221,24 +230,29 @@ std::string DataInputStream::read_until(const std::string& stop_chars, const Gli
   if(gerror)
     error = ::Glib::Error::throw_exception(gerror);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
-    return s;
+    if (c_str) {
+        data = c_str;
+        g_free (c_str);
+        return true;
+    }
+    // end of stream reached, return failure status
+    return false;
 }
 
 /** non-cancellable version of read_until()
  */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
-std::string DataInputStream::read_until(const std::string& stop_chars)
+bool DataInputStream::read_until(std::string& data, const std::string& stop_chars)
 #else
-std::string DataInputStream::read_until(const std::string& stop_chars, std::auto_ptr<Glib::Error>& error)
+bool DataInputStream::read_until(std::string& data, const std::string& stop_chars, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  std::string s =
-      Glib::convert_return_gchar_ptr_to_stdstring(g_data_input_stream_read_until(gobj(),
-                  stop_chars.c_str(),
-                  NULL, // pass NULL since we can easily determine the length from the returned std::string
-                  NULL,
-                  &gerror));
+  char* c_str = g_data_input_stream_read_until(gobj(),
+                                               stop_chars.c_str(),
+                                               NULL, // pass NULL since we can easily determine the length from the returned std::string
+                                               NULL,
+                                               &gerror);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -246,7 +260,13 @@ std::string DataInputStream::read_until(const std::string& stop_chars, std::auto
   if(gerror)
     error = ::Glib::Error::throw_exception(gerror);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
-    return s;
+    if (c_str) {
+        data = c_str;
+        g_free (c_str);
+        return true;
+    }
+    // end of stream reached, return failure status
+    return false;
 }
 
 } // namespace Gio
