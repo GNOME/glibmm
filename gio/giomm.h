@@ -49,7 +49,6 @@
 #include <giomm/mountoperation.h>
 #include <giomm/outputstream.h>
 #include <giomm/seekable.h>
-#include <giomm/simpleasyncresult.h>
 #include <giomm/volume.h>
 #include <giomm/volumemonitor.h>
 #include <giomm/contenttype.h>
