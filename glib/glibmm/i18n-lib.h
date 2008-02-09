@@ -1,6 +1,6 @@
 // -*- c++ -*-
-#ifndef _GLIBMM_I18N_H
-#define _GLIBMM_I18N_H
+#ifndef _GLIBMM_I18N_LIB_H
+#define _GLIBMM_I18N_LIB_H
 
 /* $Id$ */
 
@@ -24,7 +24,7 @@
 // Include this file to define internationalization macros such as _().
 // This file must be included by the application, after system headers such as <iostream>.
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
-#endif /* _GLIBMM_I18N_H */
+#endif /* _GLIBMM_I18N_LIB_H */
 

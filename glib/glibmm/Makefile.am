@@ -62,6 +62,7 @@ sublib_files_extra_general_h = \
   exceptionhandler.h \
   helperlist.h \
   init.h \
+  i18n-lib.h \
   i18n.h \
   interface.h \
   iochannel.h \
