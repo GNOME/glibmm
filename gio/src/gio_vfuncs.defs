@@ -1,6 +1,7 @@
 ;; -*- scheme -*-
 ; virtual function definitions
 ; define-vfunc is g*mm-specific
+; These are hand-written.
 
 ; GAsyncResult
 
@@ -308,3 +309,157 @@
   '("GError**" "error")
  )
 )
+
+; GVolume
+
+(define-vfunc get_name
+ (of-object "GVolume")
+ (return-type "char*")
+)
+
+(define-vfunc get_icon
+ (of-object "GVolume")
+ (return-type "GIcon*")
+)
+
+(define-vfunc get_uuid
+ (of-object "GVolume")
+ (return-type "char*")
+)
+
+(define-vfunc get_drive
+ (of-object "GVolume")
+ (return-type "GDrive*")
+)
+
+(define-vfunc get_mount
+ (of-object "GVolume")
+ (return-type "GMount*")
+)
+
+(define-vfunc can_mount
+ (of-object "GVolume")
+ (return-type "gboolean")
+)
+
+(define-vfunc can_eject
+ (of-object "GVolume")
+ (return-type "gboolean")
+)
+
+(define-vfunc mount_fn
+ (of-object "GVolume")
+ (return-type "void")
+ (parameters
+  '("GMountOperation*" "mount_operation")
+  '("GCancellable*" "cancellable")
+  '("GAsyncReadyCallback" "callback")
+  '("gpointer" "user_data")
+ )
+)
+
+(define-vfunc mount_finish
+ (of-object "GVolume")
+ (return-type "gboolean")
+ (parameters
+  '("GAsyncResult*" "result")
+  '("GError**" "error")
+ )
+)
+
+
+(define-vfunc eject
+ (of-object "GVolume")
+ (return-type "void")
+ (parameters
+  '("GMountUnmountFlags" "flags")
+  '("GCancellable*" "cancellable")
+  '("GAsyncReadyCallback" "callback")
+  '("gpointer" "user_data")
+ )
+)
+
+(define-vfunc eject_finish
+ (of-object "GVolume")
+ (return-type "gboolean")
+ (parameters
+  '("GAsyncResult*" "result")
+  '("GError**" "error")
+ )
+)
+
+(define-vfunc get_identifier
+ (of-object "GVolume")
+ (return-type "char*")
+ (parameters
+  '("const-char*" "kind")
+ )
+)
+
+(define-vfunc enumerate_identifiers
+ (of-object "GVolume")
+ (return-type "char**")
+)
+
+(define-vfunc should_automount
+ (of-object "GVolume")
+ (return-type "gboolean")
+)
+
+
+; GVolumeMonitor
+
+; This doesn't even take a GVolumeMonitor.
+; Maybe it is not a real vfunc. murrayc.
+(define-vfunc is_supported
+ (of-object "GVolumeMonitor")
+ (return-type "gboolean")
+)
+
+(define-vfunc get_connected_drives
+ (of-object "GVolumeMonitor")
+ (return-type "GList*")
+)
+
+(define-vfunc get_connected_drives
+ (of-object "GVolumeMonitor")
+ (return-type "GList*")
+)
+
+(define-vfunc get_volumes
+ (of-object "GVolumeMonitor")
+ (return-type "GList*")
+)
+
+(define-vfunc get_mounts
+ (of-object "GVolumeMonitor")
+ (return-type "GList*")
+)
+
+(define-vfunc get_volume_for_uuid
+ (of-object "GVolumeMonitor")
+ (return-type "GVolume*")
+ (parameters
+  '("const-char*" "uuid")
+ )
+)
+
+(define-vfunc get_mount_for_uuid
+ (of-object "GVolumeMonitor")
+ (return-type "GMount*")
+ (parameters
+  '("const-char*" "uuid")
+ )
+)
+
+; This doesn't take a GVolumeMonitor.
+; Maybe it is not a real vfunc. murrayc
+(define-vfunc adopt_orphan_mount
+ (of-object "GVolumeMonitor")
+ (return-type "GVolume*")
+ (parameters
+  '("GMount*" "mount")
+ )
+)
+
+

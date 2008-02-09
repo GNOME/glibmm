@@ -73,7 +73,18 @@ public:
   _WRAP_SIGNAL(void drive_disconnected(const Glib::RefPtr<Drive>& drive), drive_disconnected)
   _WRAP_SIGNAL(void drive_changed(const Glib::RefPtr<Drive>& drive), drive_changed)
 
-  //TODO: vfuncs
+  gboolean (*is_supported)          (void);
+
+  //TODO: Use ListHandle?
+  _WRAP_VFUNC(GList* get_volumes(), get_volumes)
+  _WRAP_VFUNC(GList* get_mounts(), get_mounts)
+
+#m4 _CONVERSION(`Glib::RefPtr<Volume>',`GVolume*',__CONVERT_CONST_REFPTR_TO_P)
+  _WRAP_VFUNC(Glib::RefPtr<Volume> get_volume_for_uuid(const std::string& uuid), get_volume_for_uuid)
+
+#m4 _CONVERSION(`Glib::RefPtr<Mount>',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
+  _WRAP_VFUNC(Glib::RefPtr<Mount> get_mount_for_uuid(const std::string& uuid), get_mount_for_uuid)
+
 
   //There are no properties.
 };
