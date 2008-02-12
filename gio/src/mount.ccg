@@ -63,7 +63,7 @@ void Mount::unmount(MountUnmountFlags flags)
 }
 
 
-void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -71,13 +71,14 @@ void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsy
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_mount_remount(gobj(),
+                  static_cast<GMountMountFlags>(flags),
                   operation->gobj(),
                   cancellable->gobj(), 
                   &SignalProxy_async_callback,
                   slot_copy);
 }
 
-void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsyncReady& slot)
+void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsyncReady& slot, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -85,24 +86,27 @@ void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsy
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_mount_remount(gobj(),
+                  static_cast<GMountMountFlags>(flags),
                   operation->gobj(),
                   NULL, 
                   &SignalProxy_async_callback,
                   slot_copy);
 }
 
-void Mount::remount(const Glib::RefPtr<MountOperation>& operation)
+void Mount::remount(const Glib::RefPtr<MountOperation>& operation, MountMountFlags flags)
 {
   g_mount_remount(gobj(),
+                  static_cast<GMountMountFlags>(flags),
                   operation->gobj(),
                   NULL, 
                   NULL,
                   NULL);
 }
 
-void Mount::remount()
+void Mount::remount(MountMountFlags flags)
 {
   g_mount_remount(gobj(),
+                  static_cast<GMountMountFlags>(flags),
                   NULL,
                   NULL, 
                   NULL,

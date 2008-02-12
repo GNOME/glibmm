@@ -48,6 +48,7 @@ _WRAP_ENUM(FileCreateFlags, GFileCreateFlags, NO_GTYPE)
 _WRAP_ENUM(FileCopyFlags, GFileCopyFlags, NO_GTYPE)
 _WRAP_ENUM(FileMonitorFlags, GFileMonitorFlags, NO_GTYPE)
 _WRAP_ENUM(MountUnmountFlags, GMountUnmountFlags, NO_GTYPE)
+_WRAP_ENUM(MountMountFlags, GMountMountFlags, NO_GTYPE)
 
 /** File and directory handling.
  * Gio::File is a high level abstraction for manipulating files on a virtual file system. Gio::Files are lightweight, immutable objects that do no 
@@ -1345,7 +1346,7 @@ public:
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param cancellable A Cancellable object.
    */
-  void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+  void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Starts a @mount_operation, mounting the volume that contains the file. 
    * 
@@ -1355,7 +1356,7 @@ public:
    * @param mount_operation A MountOperation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot);
+  void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Starts a @mount_operation, mounting the volume that contains the file. 
    * 
@@ -1364,13 +1365,13 @@ public:
    *
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void mount_enclosing_volume(const SlotAsyncReady& slot);
+  void mount_enclosing_volume(const SlotAsyncReady& slot, MountMountFlags flags = MOUNT_MOUNT_NONE);
   _IGNORE(g_file_mount_enclosing_volume)
 
   /** Starts a @mount_operation, mounting the volume that contains the file. 
    *
    */
-  void mount_enclosing_volume();
+  void mount_enclosing_volume(MountMountFlags flags = MOUNT_MOUNT_NONE);
   _IGNORE(g_file_mount_enclosing _volume)
 
   _WRAP_METHOD(bool mount_enclosing_volume_finish(const Glib::RefPtr<AsyncResult>& result),
@@ -1389,7 +1390,7 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+  void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance, 
    * passwords are needed during authentication.
@@ -1399,7 +1400,7 @@ public:
    * @param mount_operation A MountOperation.
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot);
+  void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Mounts a file of type FILE_TYPE_MOUNTABLE without user interaction.
    *
@@ -1407,11 +1408,11 @@ public:
    *
    * @param slot A callback slot which will be called when the request is satisfied.
    */
-  void mount_mountable(const SlotAsyncReady& slot);
+  void mount_mountable(const SlotAsyncReady& slot, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Mounts a file of type FILE_TYPE_MOUNTABLE without user interaction.
    */
-  void mount_mountable();
+  void mount_mountable(MountMountFlags flags = MOUNT_MOUNT_NONE);
   _IGNORE(g_file_mount_mountable)
 
   _WRAP_METHOD(Glib::RefPtr<File> mount_mountable_finish(const Glib::RefPtr<AsyncResult>& result),

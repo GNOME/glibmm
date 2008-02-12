@@ -90,7 +90,7 @@ public:
    * @param cancellable A cancellable object which can be used to cancel the operation.
    * @param mount_operation A mount operation.
    */
-  void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+  void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Mounts a volume.
    * This is an asynchronous operation, and is finished by calling mount_finish() with the AsyncResult data returned in the callback slot.
@@ -98,17 +98,17 @@ public:
    * @param slot A callback which will be called when the operation is completed or canceled.
    * @param mount_operation A mount operation.
    */
-  void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot);
+  void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Mounts a volume.
    * 
    * @param mount_operation A mount operation.
    */
-  void mount(const Glib::RefPtr<MountOperation>& mount_operation);
+  void mount(const Glib::RefPtr<MountOperation>& mount_operation, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Mounts a volume.
    */
-  void mount();
+  void mount(MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   _IGNORE(g_volume_mount)
 
@@ -167,7 +167,7 @@ public:
 
   _WRAP_VFUNC(bool can_mount(), can_mount)
   _WRAP_VFUNC(bool can_eject(), can_eject)
-  _WRAP_VFUNC(void mount_fn(GMountOperation* mount_operation, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), mount_fn) //TODO: Rename to mount()?       
+  _WRAP_VFUNC(void mount_fn(GMountMountFlags flags, GMountOperation* mount_operation, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), mount_fn) //TODO: Rename to mount()?       
   _WRAP_VFUNC(bool mount_finish(GAsyncResult* result, GError** error), mount_finish)
   _WRAP_VFUNC(void eject(GMountUnmountFlags flags, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), eject)
   _WRAP_VFUNC(bool eject_finish(GAsyncResult* result, GError** error), eject_finish)

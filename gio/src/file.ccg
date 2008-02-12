@@ -998,7 +998,7 @@ bool File::set_attribute_int64(const std::string& attribute, gint64 value, FileQ
 
 }
 
-void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1006,13 +1006,14 @@ void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, 
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_mountable(gobj(),
+                         static_cast<GMountMountFlags>(flags),
                          mount_operation->gobj(),
                          cancellable->gobj(),
                          &SignalProxy_async_callback,
                          slot_copy);
 }
 
-void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot)
+void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1020,13 +1021,14 @@ void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, 
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_mountable(gobj(),
+                         static_cast<GMountMountFlags>(flags),
                          mount_operation->gobj(),
                          NULL,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
 
-void File::mount_mountable(const SlotAsyncReady& slot)
+void File::mount_mountable(const SlotAsyncReady& slot, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1034,15 +1036,17 @@ void File::mount_mountable(const SlotAsyncReady& slot)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_mountable(gobj(),
+                         static_cast<GMountMountFlags>(flags),
                          NULL,
                          NULL,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
 
-void File::mount_mountable()
+void File::mount_mountable(MountMountFlags flags)
 {
   g_file_mount_mountable(gobj(),
+                         static_cast<GMountMountFlags>(flags),
                          NULL,
                          NULL,
                          NULL,
@@ -1088,7 +1092,7 @@ File::unmount_mountable(MountUnmountFlags flags)
                            NULL);
 }
 
-void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1096,13 +1100,14 @@ void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_oper
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_enclosing_volume(gobj(),
+                         static_cast<GMountMountFlags>(flags),
                          mount_operation->gobj(),
                          cancellable->gobj(),
                          &SignalProxy_async_callback,
                          slot_copy);
 }
 
-void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot)
+void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1110,13 +1115,14 @@ void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_oper
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_enclosing_volume(gobj(),
+                         static_cast<GMountMountFlags>(flags),
                          mount_operation->gobj(),
                          NULL,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
 
-void File::mount_enclosing_volume(const SlotAsyncReady& slot)
+void File::mount_enclosing_volume(const SlotAsyncReady& slot, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1124,15 +1130,17 @@ void File::mount_enclosing_volume(const SlotAsyncReady& slot)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_mount_enclosing_volume(gobj(),
+                         static_cast<GMountMountFlags>(flags),
                          NULL,
                          NULL,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
 
-void File::mount_enclosing_volume()
+void File::mount_enclosing_volume(MountMountFlags flags)
 {
   g_file_mount_enclosing_volume(gobj(),
+                         static_cast<GMountMountFlags>(flags),
                          NULL,
                          NULL,
                          NULL,

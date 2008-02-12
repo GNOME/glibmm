@@ -28,7 +28,7 @@
 namespace Gio {
 
 void
-Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -36,6 +36,7 @@ Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsy
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_volume_mount(gobj(),
+                 static_cast<GMountMountFlags>(flags),
                  mount_operation->gobj(),
                  cancellable->gobj(),
                  &SignalProxy_async_callback,
@@ -44,7 +45,7 @@ Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsy
 }
 
 void
-Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot)
+Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -52,6 +53,7 @@ Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsy
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_volume_mount(gobj(),
+                 static_cast<GMountMountFlags>(flags),
                  mount_operation->gobj(),
                  NULL, // cancellable
                  &SignalProxy_async_callback,
@@ -59,9 +61,10 @@ Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsy
 }
 
 void
-Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation)
+Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, MountMountFlags flags)
 {
   g_volume_mount(gobj(),
+                 static_cast<GMountMountFlags>(flags),
                  mount_operation->gobj(),
                  NULL, // cancellable
                  NULL,
@@ -69,9 +72,10 @@ Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation)
 }
 
 void
-Volume::mount()
+Volume::mount(MountMountFlags flags)
 {
   g_volume_mount(gobj(),
+                 static_cast<GMountMountFlags>(flags),
                  NULL,
                  NULL, // cancellable
                  NULL,
