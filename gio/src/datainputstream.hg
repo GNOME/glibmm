@@ -36,7 +36,9 @@ class DataInputStream : public Gio::BufferedInputStream
 {
   _CLASS_GOBJECT(DataInputStream, GDataInputStream, G_DATA_INPUT_STREAM, Gio::BufferedInputStream, GBufferedInputStream)
 
+protected:
   _WRAP_CTOR(DataInputStream(const Glib::RefPtr<InputStream>& base_stream), g_data_input_stream_new)
+
 public:
 
   _WRAP_CREATE(const Glib::RefPtr<InputStream>& base_stream)
@@ -113,6 +115,8 @@ public:
   guint64 read_uint64(std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
+  _IGNORE(g_data_input_stream_read_line)
+
   // FIXME: In C, these functions return NULL if there is an error (i.e. end of
   // stream reached), but if we use std::string, we don't have a way to tell an
   // empty string from NULL.  Perhaps we should use raw pointers as in C, but
@@ -131,6 +135,7 @@ public:
   bool read_line(std::string& line, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
+  _IGNORE(g_data_input_stream_read_until)
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable);

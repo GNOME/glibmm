@@ -78,7 +78,11 @@ public:
 
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
   _WRAP_SIGNAL(void ask_password(const Glib::ustring& message, const Glib::ustring& default_user, const Glib::ustring& default_domain, AskPasswordFlags flags), ask_password)
-  //TODO:_WRAP_SIGNAL(void ask_question(const Glib::ustring& message, const Glib::ustring& choices[]), ask_question)
+#m4 _CONVERSION(`const Glib::StringArrayHandle&',`GStrv*',`const_cast<GStrv*>(($3).data())')
+#m4 _CONVERSION(`GStrv*',`const Glib::StringArrayHandle&',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
+  // TODO: The signal def is wrong - it states that choices are GStrv* (gchar***)
+  // but actually they are const char*[]
+  //  _WRAP_SIGNAL(void ask_question(const Glib::ustring& message, const Glib::StringArrayHandle& choices), ask_question)
   _WRAP_SIGNAL(void reply(MountOperationResult result), reply)
 
 
