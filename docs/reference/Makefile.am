@@ -6,12 +6,18 @@ beautify_docs = $(srcdir)/beautify_docs.pl
 devhelp_file = glibmm-2.4.devhelp
 devhelp_stylesheet = doxygen_to_devhelp.xsl
 
+referencedir = $(gtkmm_docdir)/reference/html
+devhelpdir = $(datadir)/devhelp/books/glibmm-2.4
+
+stylesheetdir = $(gtkmm_docdir)
+stylesheet_DATA = $(devhelp_stylesheet)
+
 include $(top_srcdir)/docs/Makefile_web.am_fragment
 web_path_reference = $(web_path_docs)reference
 
 EXTRA_DIST = README Doxyfile.in \
              glibmm_header.html_fragment glibmm_footer.html_fragment beautify_docs.pl \
-             html glibmm_doxygen_tags libstdc++.tag.xml doxygen_to_devhelp.xsl $(devhelp_file)
+             html glibmm_doxygen_tags libstdc++.tag.xml $(devhelp_stylesheet) $(devhelp_file)
 #Ideally, libstdc++.tag.xml would be installed by gcc, instead of being copied into every project.
 
 # the xml output is made along with the html output
@@ -19,7 +25,10 @@ xml/index.xml: html/index.html
 
 # Build a DevHelp reference from the doxygen xml
 $(devhelp_file): xml/index.xml $(devhelp_stylesheet)
-	xsltproc -o $@ $(devhelp_stylesheet) xml/index.xml
+	xsltproc --stringparam book_title "glibmm 2.4 Reference Manual" \
+		--stringparam book_name "glibmm 2.4" \
+		--stringparam reference_prefix "$(referencedir)" \
+		-o $@ $(devhelp_stylesheet) xml/index.xml
 
 html/index.html: $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/glib/glibmm/*.h
 	-rm -rf html
@@ -48,9 +57,6 @@ doc-clean:
 	-rm -f glibmm_doxygen_tags
 	-rm -f glibmm-reference-html.tar.gz glibmm-reference-html.tar.bz2
 
-referencedir = $(gtkmm_docdir)/reference/html
-devhelpdir = $(datadir)/devhelp/books/glibmm-2.4
-
 install-reference: html/index.html $(devhelp_file)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(referencedir)
@@ -73,7 +79,7 @@ uninstall-reference: html/index.html
 
 # Install beautify_docs.pl, next to gmmproc.
 gmmproc_bin_SCRIPTS = $(beautify_docs)
-gmmproc_bindir = $(libdir)/glibmm-2.4/proc
+gmmproc_bindir = $(GMMPROC_DIR)
 
 all-local: html/index.html
 

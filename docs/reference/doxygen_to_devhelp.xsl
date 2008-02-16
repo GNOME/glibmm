@@ -5,11 +5,15 @@
 
 <xsl:output method="xml" version="1.0" indent="yes"/>
 
-<xsl:param name="reference_prefix">../../../doc/glibmm-2.4/docs/reference/html/</xsl:param>
+<!-- these are parameters so that this stylesheet can be used by multiple
+libraries.  Pass them in on the commandline -->
+<xsl:param name="book_title"/>
+<xsl:param name="book_name"/>
+<xsl:param name="reference_prefix"/>
 
 <xsl:template match="/">
-  <book title="glibmm 2.4 library Reference Manual"
-        name="glibmm 2.4"
+    <book title="{$book_title}"
+        name="{$book_name}"
         link="{$reference_prefix}/index.html">
   <chapters>
     <sub name="Classes" link="{$reference_prefix}classes.html">
