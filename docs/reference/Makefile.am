@@ -28,7 +28,7 @@ xml/index.xml: html/index.html
 $(devhelp_file): xml/index.xml $(devhelp_stylesheet)
 	xsltproc --stringparam book_title "glibmm 2.4 Reference Manual" \
 		--stringparam book_name "glibmm 2.4" \
-		--stringparam reference_prefix "$(referencedir)" \
+		--stringparam reference_prefix "../../../doc/glibmm-2.4/docs/reference/html/" \
 		-o $@ $(devhelp_stylesheet) xml/index.xml
 
 html/index.html: $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/glib/glibmm/*.h
@@ -82,7 +82,7 @@ uninstall-reference: html/index.html
 gmmproc_bin_SCRIPTS = $(beautify_docs)
 gmmproc_bindir = $(GMMPROC_DIR)
 
-all-local: html/index.html
+all-local: html/index.html $(devhelp_file)
 
 install-data-local: install-reference
 
