@@ -9,7 +9,8 @@ devhelp_stylesheet = doxygen_to_devhelp.xsl
 referencedir = $(gtkmm_docdir)/reference/html
 devhelpdir = $(datadir)/devhelp/books/glibmm-2.4
 
-stylesheetdir = $(gtkmm_docdir)
+#install the devhelp stylesheet to be used by other libraries as well
+stylesheetdir = $(GMMPROC_DIR)
 stylesheet_DATA = $(devhelp_stylesheet)
 
 include $(top_srcdir)/docs/Makefile_web.am_fragment
