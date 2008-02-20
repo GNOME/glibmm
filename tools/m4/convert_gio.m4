@@ -41,7 +41,8 @@ _CONVERSION(`GDrive*',`Glib::RefPtr<Drive>',`Glib::wrap($3)')
 # File
 _CONVERSION(`return-char*',`std::string',`Glib::convert_return_gchar_ptr_to_stdstring($3)')
 _CONVERSION(`Glib::RefPtr<File>',`GFile*',__CONVERT_REFPTR_TO_P)
-_CONVERSION(`const Glib::RefPtr<File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<File>&',`GFile*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GFile*',`Glib::RefPtr<File>',`Glib::wrap($3)')
 
 

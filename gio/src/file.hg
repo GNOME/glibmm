@@ -134,7 +134,7 @@ public:
   _WRAP_METHOD(guint hash() const, g_file_hash)
 
   //Not that the implementation of equal() is already virtual via equal_vfunc().
-  _WRAP_METHOD(bool equal(const Glib::RefPtr<File>& other) const, g_file_equal)
+  _WRAP_METHOD(bool equal(const Glib::RefPtr<const File>& other) const, g_file_equal)
 
   _WRAP_METHOD(std::string get_basename() const, g_file_get_basename)
   _WRAP_METHOD(std::string get_path() const, g_file_get_path)
@@ -157,9 +157,9 @@ public:
                g_file_get_child_for_display_name,
                errthrow)
 
-  _WRAP_METHOD(bool contains_file(const Glib::RefPtr<File>& descendant) const,
+  _WRAP_METHOD(bool contains_file(const Glib::RefPtr<const File>& descendant) const,
                g_file_contains_file)
-  _WRAP_METHOD(std::string get_relative_path(const Glib::RefPtr<File>& descendant) const,
+  _WRAP_METHOD(std::string get_relative_path(const Glib::RefPtr<const File>& descendant) const,
                g_file_get_relative_path)
   _WRAP_METHOD(Glib::RefPtr<File> resolve_relative_path(const std::string& relative_path) const,
                g_file_resolve_relative_path)
@@ -1907,7 +1907,7 @@ public:
 
   // *** vfuncs ***
 
-  _WRAP_VFUNC(Glib::RefPtr<File> dup(), "dup")
+  _WRAP_VFUNC(Glib::RefPtr<File> dup() const, "dup")
   _WRAP_VFUNC(guint hash() const, "hash")
   //TODO: equal() vfunc
 
@@ -1926,13 +1926,13 @@ public:
 //               "get_child_for_display_name",
 //               errthrow)
 
-#m4 _CONVERSION(`GFile*',`const Glib::RefPtr<File>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GFile*',`const Glib::RefPtr<const File>&',`Glib::wrap($3, true)')
 
-  _WRAP_VFUNC(bool contains_file(const Glib::RefPtr<File>& descendant) const, "contains_file")
+  _WRAP_VFUNC(bool contains_file(const Glib::RefPtr<const File>& descendant) const, "contains_file")
 
-  _WRAP_VFUNC(std::string get_relative_path(const Glib::RefPtr<File>& descendant) const, "get_relative_path")
+  _WRAP_VFUNC(std::string get_relative_path(const Glib::RefPtr<const File>& descendant) const, "get_relative_path")
 
-  //TODO: Careful of refcounting:   _WRAP_VFUNC(Glib::RefPtr<File> resolve_relative_path(const std::string& relative_path) const, "resolve_relative_path")
+  //TODO: Careful of refcounting:   _WRAP_VFUNC(Glib::RefPtr<const File> resolve_relative_path(const std::string& relative_path) const, "resolve_relative_path")
 
   _WRAP_VFUNC(bool is_native() const, "is_native")
   _WRAP_VFUNC(bool has_uri_scheme(const std::string& uri_scheme) const, "has_uri_scheme")
