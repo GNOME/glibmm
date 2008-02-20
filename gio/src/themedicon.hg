@@ -51,10 +51,14 @@ protected:
 
 public:
   _WRAP_CREATE(const std::string& iconname)
+
+  //See http://bugzilla.gnome.org/show_bug.cgi?id=517676 about the constructors. murrayc.
   //TODO: GIcon *g_themed_icon_new_with_default_fallbacks (const char *iconname);
   //TODO: GIcon *g_themed_icon_new_from_names (char **iconnames, int len);
 
-  //TODO: const char * const *g_themed_icon_get_names (GThemedIcon *icon);
+#m4 _CONVERSION(`const char*const*',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
+  //TODO: gmmproc complains about the wrong number of arguments, but I can't see why. murrayc.
+  //_WRAP_METHOD(Glib::StringArrayHandle get_names() const, g_themed_icon_get_names)
 
   //There are no signals or properties.
 };

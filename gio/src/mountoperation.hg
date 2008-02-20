@@ -76,13 +76,15 @@ public:
   _WRAP_METHOD(void set_choice(int choice), g_mount_operation_set_choice)
   _WRAP_METHOD(void reply(MountOperationResult result), g_mount_operation_reply)
 
+
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
   _WRAP_SIGNAL(void ask_password(const Glib::ustring& message, const Glib::ustring& default_user, const Glib::ustring& default_domain, AskPasswordFlags flags), ask_password)
-#m4 _CONVERSION(`const Glib::StringArrayHandle&',`GStrv*',`const_cast<GStrv*>(($3).data())')
-#m4 _CONVERSION(`GStrv*',`const Glib::StringArrayHandle&',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
-  // TODO: The signal def is wrong - it states that choices are GStrv* (gchar***)
-  // but actually they are const char*[]
-  //  _WRAP_SIGNAL(void ask_question(const Glib::ustring& message, const Glib::StringArrayHandle& choices), ask_question)
+
+  //TODO: We really need some test to make sure that our use of StringArrayHandle is correct. murrayc.
+#m4 _CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
+#m4 _CONVERSION(`const gchar**',`const Glib::StringArrayHandle&',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_SIGNAL(void ask_question(const Glib::ustring& message, const Glib::StringArrayHandle& choices), ask_question)
+
   _WRAP_SIGNAL(void reply(MountOperationResult result), reply)
 
 
@@ -92,9 +94,6 @@ public:
   _WRAP_PROPERTY("domain", Glib::ustring)
   _WRAP_PROPERTY("password-save", PasswordSave)
   _WRAP_PROPERTY("choice", int)
-
-  //TODO: vfuncs
-
 };
 
 } // namespace Gio
