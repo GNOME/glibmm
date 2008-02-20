@@ -21,34 +21,31 @@ EXTRA_DIST = README Doxyfile.in \
              html glibmm_doxygen_tags libstdc++.tag.xml $(devhelp_stylesheet) $(devhelp_file)
 #Ideally, libstdc++.tag.xml would be installed by gcc, instead of being copied into every project.
 
-# the xml output is made along with the html output
-xml/index.xml: html/index.html
+
+HTML_INDEX=html/index.html
+XML_INDEX=xml/index.xml
 
 # Build a DevHelp reference from the doxygen xml
-$(devhelp_file): xml/index.xml $(devhelp_stylesheet)
+$(devhelp_file): $(XML_INDEX) $(devhelp_stylesheet)
 	xsltproc --stringparam book_title "glibmm 2.4 Reference Manual" \
 		--stringparam book_name "glibmm 2.4" \
 		--stringparam reference_prefix "../../../doc/glibmm-2.4/docs/reference/html/" \
-		-o $@ $(devhelp_stylesheet) xml/index.xml
+		-o $@ $(devhelp_stylesheet) $(XML_INDEX)
 
-html/index.html: $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/glib/glibmm/*.h
+$(HTML_INDEX) $(XML_INDEX): $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/glib/glibmm/*.h
 	-rm -rf html
-	image_path=""; \
-	dir="`pkg-config --silence-errors --variable=prefix gtk+-2.0`/share/gtk-doc/html/gtk"; \
-	test -d "$$dir" && image_path="$$dir"; \
-	dir="$(top_srcdir)/../gtk+/gtk/stock-icons"; \
-	test -d "$$dir" && image_path="$$image_path $$dir"; \
-	DOXYGEN_IMAGE_PATH="$${DOXYGEN_IMAGE_PATH:=$$image_path}" doxygen $(doxygen_configfile)
-	$(PERL_PATH) $(beautify_docs) html
+	-rm -rf xml
+	doxygen $(doxygen_configfile)
+	$(PERL_PATH) $(beautify_docs) html && touch $@
 
 
-glibmm-reference-html.tar.gz: html/index.html
+glibmm-reference-html.tar.gz: $(HTML_INDEX)
 	tar cf - html | gzip -c --best >$@
 
-glibmm-reference-html.tar.bz2: html/index.html
+glibmm-reference-html.tar.bz2: $(HTML_INDEX)
 	tar cf - html | bzip2 -c >$@
 
-post-html: html/index.html
+post-html: $(HTML_INDEX)
 	rsync $(rsync_args) -r html/ $$USER@$(web_host):$(web_path_reference)/html/
 
 doc-clean:
@@ -58,7 +55,7 @@ doc-clean:
 	-rm -f glibmm_doxygen_tags
 	-rm -f glibmm-reference-html.tar.gz glibmm-reference-html.tar.bz2
 
-install-reference: html/index.html $(devhelp_file)
+install-reference: $(HTML_INDEX) $(devhelp_file)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(referencedir)
 	@dir='$(<D)'; for p in $$dir/*.html $$dir/*.css $$dir/*.png $$dir/*.dot ; do \
@@ -69,7 +66,7 @@ install-reference: html/index.html $(devhelp_file)
 	$(mkinstalldirs) $(DESTDIR)$(devhelpdir)
 	$(INSTALL_DATA) $(srcdir)/$(devhelp_file) $(DESTDIR)$(devhelpdir)/$$f;
 
-uninstall-reference: html/index.html
+uninstall-reference: $(HTML_INDEX)
 	@$(NORMAL_UNINSTALL)
 	@dir='$(<D)'; for p in $$dir/*.html $$dir/*.css $$dir/*.png $$dir/*.dot ; do \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
@@ -82,7 +79,7 @@ uninstall-reference: html/index.html
 gmmproc_bin_SCRIPTS = $(beautify_docs)
 gmmproc_bindir = $(GMMPROC_DIR)
 
-all-local: html/index.html $(devhelp_file)
+all-local: $(HTML_INDEX) $(devhelp_file)
 
 install-data-local: install-reference
 
