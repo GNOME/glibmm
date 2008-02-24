@@ -18,7 +18,8 @@ web_path_reference = $(web_path_docs)reference
 
 EXTRA_DIST = README Doxyfile.in \
              glibmm_header.html_fragment glibmm_footer.html_fragment beautify_docs.pl \
-             html glibmm_doxygen_tags libstdc++.tag.xml $(devhelp_stylesheet) $(devhelp_file)
+             html glibmm_doxygen_tags libstdc++.tag.xml $(devhelp_stylesheet) $(devhelp_file) \
+             xml/index.xml #Just to satisfy the dependency when building from the tarball.
 #Ideally, libstdc++.tag.xml would be installed by gcc, instead of being copied into every project.
 
 
