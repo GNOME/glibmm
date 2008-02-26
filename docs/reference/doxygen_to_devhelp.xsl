@@ -16,12 +16,12 @@ libraries.  Pass them in on the commandline -->
         name="{$book_name}"
         link="{$reference_prefix}/index.html">
   <chapters>
-    <sub name="Classes" link="{$reference_prefix}classes.html">
+      <sub name="Classes" link="{$reference_prefix}/classes.html">
       <xsl:apply-templates select="doxygenindex/compound[@kind='class']">
         <xsl:sort select="."/>
       </xsl:apply-templates>
     </sub>
-    <sub name="Namespaces" link="{$reference_prefix}namespaces.html">
+    <sub name="Namespaces" link="{$reference_prefix}/namespaces.html">
       <xsl:apply-templates select="doxygenindex/compound[@kind='namespace']">
         <xsl:sort select="."/>
       </xsl:apply-templates>
@@ -38,7 +38,7 @@ libraries.  Pass them in on the commandline -->
 <xsl:template match="compound">
   <xsl:param name="name"><xsl:value-of select="name"/></xsl:param>
   <xsl:param name="link"><xsl:value-of select="@refid"/>.html</xsl:param>
-  <sub name="{$name}" link="{$reference_prefix}{$link}">
+  <sub name="{$name}" link="{$reference_prefix}/{$link}">
   <xsl:apply-templates select="member" mode="as-sub">
     <xsl:sort select="."/>
   </xsl:apply-templates>
@@ -55,7 +55,7 @@ libraries.  Pass them in on the commandline -->
   <xsl:variable name="link">
     <xsl:call-template name="get-member-link" />
   </xsl:variable>
-  <function name="{$fqn}" link="{$reference_prefix}{$link}"/>
+  <function name="{$fqn}" link="{$reference_prefix}/{$link}"/>
 </xsl:template>
 
 <xsl:template match="member" mode="as-sub">
@@ -65,7 +65,7 @@ libraries.  Pass them in on the commandline -->
   <xsl:variable name="link">
     <xsl:call-template name="get-member-link" />
   </xsl:variable>
-  <sub name="{$fqn}" link="{$reference_prefix}{$link}"/>
+  <sub name="{$fqn}" link="{$reference_prefix}/{$link}"/>
 </xsl:template>
 
 

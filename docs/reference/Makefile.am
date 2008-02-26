@@ -30,7 +30,7 @@ XML_INDEX=xml/index.xml
 $(devhelp_file): $(XML_INDEX) $(devhelp_stylesheet)
 	xsltproc --stringparam book_title "glibmm 2.4 Reference Manual" \
 		--stringparam book_name "glibmm 2.4" \
-		--stringparam reference_prefix "../../../doc/glibmm-2.4/docs/reference/html/" \
+		--stringparam reference_prefix "../../../doc/glibmm-2.4/docs/reference/html" \
 		-o $@ $(devhelp_stylesheet) $(XML_INDEX)
 
 $(HTML_INDEX) $(XML_INDEX): $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/glib/glibmm/*.h
