@@ -44,7 +44,7 @@ bool content_type_equals(const Glib::ustring& type1,
  * @param type A content type string.
  * @param supertype A string.
  *
- * @return true if @type is a kind of @supertype, false otherwise.
+ * @return true if @a type is a kind of @a supertype, false otherwise.
  */
 bool content_type_is_a(const Glib::ustring& type,
                        const Glib::ustring& supertype);
@@ -65,7 +65,7 @@ bool content_type_is_unknown(const Glib::ustring& type);
  *
  * @param type A content type string.
  *
- * @return a short description of the content type @type.
+ * @return a short description of the content type @a type.
  */
 Glib::ustring content_type_get_description(const Glib::ustring& type);
 
@@ -74,7 +74,7 @@ Glib::ustring content_type_get_description(const Glib::ustring& type);
  *
  * @param type A content type string.
  *
- * @return the registered mime-type for the given @type, or NULL if unknown.
+ * @return the registered mime-type for the given @a type, or NULL if unknown.
  */
 Glib::ustring content_type_get_mime_type(const Glib::ustring& type);
 
@@ -104,7 +104,7 @@ bool content_type_can_be_executable(const Glib::ustring& type);
  *
  * @param filename a string.
  * @param data A stream of data.
- * @param data_size The size of @data.
+ * @param data_size The size of @a data.
  * @param result_uncertain A flag indicating the certainty of the result.
  * @return A string indicating a guessed content type for the
  * given data.
