@@ -381,6 +381,17 @@
   )
 )
 
+(define-enum PreviewType
+  (in-module "GFilesystem")
+  (c-name "GFilesystemPreviewType")
+  (gtype-id "G_TYPE_FILESYSTEM_PREVIEW_TYPE")
+  (values
+    '("if-always" "G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS")
+    '("if-local" "G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL")
+    '("never" "G_FILESYSTEM_PREVIEW_TYPE_NEVER")
+  )
+)
+
 (define-enum MonitorEvent
   (in-module "GFile")
   (c-name "GFileMonitorEvent")
@@ -1995,6 +2006,29 @@
   )
 )
 
+(define-method query_filesystem_info_async
+  (of-object "GFile")
+  (c-name "g_file_query_filesystem_info_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "attributes")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method query_filesystem_info_finish
+  (of-object "GFile")
+  (c-name "g_file_query_filesystem_info_finish")
+  (return-type "GFileInfo*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
 (define-method find_enclosing_mount
   (of-object "GFile")
   (c-name "g_file_find_enclosing_mount")
@@ -3585,6 +3619,11 @@
   (return-type "GType")
 )
 
+(define-function g_filesystem_preview_type_get_type
+  (c-name "g_filesystem_preview_type_get_type")
+  (return-type "GType")
+)
+
 (define-function g_file_monitor_event_get_type
   (c-name "g_file_monitor_event_get_type")
   (return-type "GType")
@@ -4680,6 +4719,15 @@
   (parameters
     '("char**" "iconnames")
     '("int" "len")
+  )
+)
+
+(define-method append_name
+  (of-object "GThemedIcon")
+  (c-name "g_themed_icon_append_name")
+  (return-type "none")
+  (parameters
+    '("const-char*" "iconname")
   )
 )
 

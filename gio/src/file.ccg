@@ -395,6 +395,38 @@ Glib::RefPtr<FileInfo> File::query_filesystem_info(const std::string& attributes
   return retvalue;
 }
 
+void
+File::query_filesystem_info_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, int io_priority) const
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_query_filesystem_info_async(const_cast<GFile*>(gobj()),
+                          attributes.c_str(),
+                          io_priority,
+                          cancellable->gobj(),
+                          &SignalProxy_async_callback,
+                          slot_copy);
+}
+
+void
+File::query_filesystem_info_async(const SlotAsyncReady& slot, const std::string& attributes, int io_priority) const
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_query_filesystem_info_async(const_cast<GFile*>(gobj()),
+                          attributes.c_str(),
+                          io_priority,
+                          NULL, // cancellable
+                          &SignalProxy_async_callback,
+                          slot_copy);
+}
+
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileEnumerator> File::enumerate_children(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags)
 #else
