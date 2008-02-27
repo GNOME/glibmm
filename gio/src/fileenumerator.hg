@@ -68,7 +68,7 @@ public:
                errthrow)
 
   /** Releases all resources used by this enumerator, making the
-   * enumerator return IO_ERROR_CLOSED on all calls.
+   * enumerator throw a Gio::Error with CLOSED on all calls.
    * 
    * This will be automatically called when the last reference
    * is dropped, but you might want to call this method to make sure resources
@@ -130,7 +130,7 @@ public:
    * See close(), which is the synchronous version of this function.
    *
    * The operation can be cancelled by triggering the cancellable object from another thread. 
-   * If the operation was cancelled, the error ERROR_CANCELLED will be returned in close_finish().
+   * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown by close_finish().
    *
    * @param io_priority The I/O priority of the request.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
@@ -155,8 +155,6 @@ public:
   _WRAP_METHOD(bool is_closed() const, g_file_enumerator_is_closed)
   _WRAP_METHOD(bool has_pending() const, g_file_enumerator_has_pending)
   _WRAP_METHOD(void set_pending(bool pending = true), g_file_enumerator_set_pending)
-
-  // TODO: vfuncs
 };
 
 } // namespace Gio

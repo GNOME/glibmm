@@ -47,14 +47,14 @@ public:
    *  @a buffer. Will block during this read.
    * 
    * If count is zero returns zero and does nothing. A value of @a count 
-   * larger than MAXSSIZE will cause an IO_ERROR_INVALID_ARGUMENT error.
+   * larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
    * 
    * On success, the number of bytes read into the buffer is returned.
    * It is not an error if this is not the same as the requested size, as it
    * can happen e.g. near the end of a file. Zero is returned on end of file
    * (or if @a count is zero), but never otherwise.
    * 
-   * On error -1 is returned and @a error is set accordingly.
+   * On error -1 is returned.
    * @param buffer A buffer to read data into (which should be at least count bytes long).
    * @param count The number of bytes that will be read from the stream.
    * @return Number of bytes read, or -1 on error.
@@ -86,8 +86,8 @@ public:
    * stream, <tt>true</tt> is returned, and @a bytes_read is set to the number of bytes
    * read into @a buffer .
    * 
-   * If there is an error during the operation <tt>false</tt> is returned and @a error 
-   * is set to indicate the error status, @a bytes_read is updated to contain
+   * If there is an error during the operation <tt>false</tt> is returned and a Gio::Error 
+   * is thrown to indicate the error status, @a bytes_read is updated to contain
    * the number of bytes read into @a buffer before the error occured.
    * @param buffer A buffer to read data into (which should be at least count bytes long).
    * @param count The number of bytes that will be read from the stream.
@@ -131,7 +131,7 @@ public:
 
   /** Closes the stream, releasing resources related to it.
    * 
-   * Once the stream is closed, all other operations will return IO_ERROR_CLOSED.
+   * Once the stream is closed, all other operations will throw a Gio::Error with CLOSED.
    * Closing a stream multiple times will not return an error.
    * 
    * Streams will be automatically closed when the last reference
@@ -144,7 +144,7 @@ public:
    * 
    * On failure the first error that happened will be reported, but the close
    * operation will finish as much as possible. A stream that failed to
-   * close will still return IO_ERROR_CLOSED all operations. Still, it
+   * close will still throw a Gio::Error with CLOSED for all operations. Still, it
    * is important to check and report the error to the user.
    * 
    * @return <tt>true</tt> on success, <tt>false</tt> on failure.
@@ -161,9 +161,9 @@ public:
    * operation.
    *
    * During an async request no other sync and async calls are allowed, and will
-   * result in IO_ERROR_PENDING errors. 
+   * result in Gio::Error with PENDING being thrown. 
    *
-   * A value of @a count larger than MAXSSIZE will cause an IO_ERROR_INVALID_ARGUMENT error.
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
    *
    * On success, the number of bytes read into the buffer will be passed to the
    * @a slot callback. It is not an error if this is not the same as the requested size, as it
@@ -193,9 +193,9 @@ public:
    * operation.
    *
    * During an async request no other sync and async calls are allowed, and will
-   * result in IO_ERROR_PENDING errors. 
+   * result in a Gio::Error with PENDING being thrown. 
    *
-   * A value of @a count larger than MAXSSIZE will cause an IO_ERROR_INVALID_ARGUMENT error.
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
    *
    * On success, the number of bytes read into the buffer will be passed to the
    * @a slot callback. It is not an error if this is not the same as the requested size, as it
@@ -230,9 +230,9 @@ public:
    * You can then call skip_finish() to get the result of the operation.
    *
    * During an async request no other sync and async calls are allowed, and will
-   * result in IO_ERROR_PENDING errors. 
+   * result in Gio::Error with PENDING being thrown. 
    *
-   * A value of @a count larger than MAXSSIZE will cause an IO_ERROR_INVALID_ARGUMENT error.
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
    *
    * On success, the number of bytes skipped will be passed to the
    * callback. It is not an error if this is not the same as the requested size, as it
@@ -260,9 +260,9 @@ public:
    * You can then call skip_finish() to get the result of the operation.
    *
    * During an async request no other sync and async calls are allowed, and will
-   * result in IO_ERROR_PENDING errors. 
+   * result in Gio::Error with PENDING being thrown. 
    *
-   * A value of @a count larger than MAXSSIZE will cause an IO_ERROR_INVALID_ARGUMENT error.
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
    *
    * On success, the number of bytes skipped will be passed to the
    * callback. It is not an error if this is not the same as the requested size, as it

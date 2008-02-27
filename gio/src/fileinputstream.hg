@@ -50,7 +50,7 @@ public:
    * while querying the stream. For the asynchronous (non-blocking) version 
    * of this function, see query_info_async(). While the 
    * stream is blocked, the stream will set the pending flag internally, and 
-   * any other operations on the stream will fail with IO_ERROR_PENDING.
+   * any other operations on the stream will throw a Gio::Error with PENDING.
    *
    * @param attributes A file attribute query string.
    * @param cancellable A Cancellable object.
@@ -66,7 +66,7 @@ public:
    * while querying the stream. For the asynchronous (non-blocking) version 
    * of this function, see query_info_async(). While the 
    * stream is blocked, the stream will set the pending flag internally, and 
-   * any other operations on the stream will fail with IO_ERROR_PENDING.
+   * any other operations on the stream will throw a Gio::Error with PENDING.
    *
    * @param attributes A file attribute query string.
    * @return A FileInfo, or an empty RefPtr on error.
@@ -81,8 +81,8 @@ public:
 
   /** Queries the stream information asynchronously. For the synchronous version of this function, see query_info().
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be set.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call query_info_finish() to get the result of the operation.
    *

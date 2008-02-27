@@ -49,24 +49,22 @@ class FileOutputStream
   _IMPLEMENTS_INTERFACE(Seekable)
 
 public:
-  //TODO: vfuncs and overloads without Cancellable
-
 
   /** Queries a file output stream for the given @a attributes . 
    * This function blocks while querying the stream. For the asynchronous 
    * version of this function, see query_info_async(). 
    * While the stream is blocked, the stream will set the pending flag 
-   * internally, and any other operations on the stream will fail with 
-   * IO_ERROR_PENDING.
+   * internally, and any other operations on the stream will throw a Gio::Error with 
+   * PENDING.
    * 
-   * Can fail if the stream was already closed (with an 
-   * IO_ERROR_CLOSED error), the stream has pending operations (with an IO_ERROR_PENDING error),
+   * Can fail if the stream was already closed (with a 
+   * CLOSED error), the stream has pending operations (with a PENDING error),
    * or if querying info is not supported for 
-   * the stream's interface (with an IO_ERROR_NOT_SUPPORTED error). In
+   * the stream's interface (with a NOT_SUPPORTED error). In
    * all cases of failure, an empty RefPtr will be returned.
    * 
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be set, and an empty RefPtr will 
+   * was cancelled, a Gio::Error with CANCELLED may be thrown, and an empty RefPtr will 
    * be returned.
    *
    * @param cancellable A Cancellable object.
@@ -83,17 +81,17 @@ public:
    * This function blocks while querying the stream. For the asynchronous 
    * version of this function, see query_info_async(). 
    * While the stream is blocked, the stream will set the pending flag 
-   * internally, and any other operations on the stream will fail with 
-   * IO_ERROR_PENDING.
+   * internally, and any other operations on the stream will throw a Gio::Error with 
+   * PENDING.
    * 
-   * Can fail if the stream was already closed (with an 
-   * IO_ERROR_CLOSED error), the stream has pending operations (with an IO_ERROR_PENDING error),
+   * Can fail if the stream was already closed (with a CLOSED error), 
+   * the stream has pending operations (with an PENDING error),
    * or if querying info is not supported for 
-   * the stream's interface (with an IO_ERROR_NOT_SUPPORTED error). In
+   * the stream's interface (with a NOT_SUPPORTED error). In
    * all cases of failure, an empty RefPtr will be returned.
    * 
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be set, and an empty RefPtr will 
+   * was cancelled, a Gio::Error with CANCELLED may be thrown, and an empty RefPtr will 
    * be returned.
    *
    * @param cancellable A Cancellable object.
@@ -119,7 +117,7 @@ public:
    * 
    * If @a cancellable is not %NULL, then the operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error %G_IO_ERROR_CANCELLED will be set
+   * was cancelled, a Gio::Error with CANCELLED may be thrown
    * 
    * @param slot Callback to call when the request is satisfied.
    * @param cancellable A Cancellable object.

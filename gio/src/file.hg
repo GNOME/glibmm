@@ -177,8 +177,8 @@ public:
   /** Opens a file for reading. The result is a FileInputStream that
    * can be used to read the contents of the file.
    * 
-   * If the file does not exist, the IO_ERROR_NOT_FOUND error will be returned.
-   * If the file is a directory, theIO_ERROR_IS_DIRECTORY error will be returned.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
+   * If the file is a directory, a Gio::Error with IS_DIRECTORY will be thrown.
    * Other errors are possible too, and depend on what kind of filesystem the file is on.
    * @return FileInputStream or an empty RefPtr on error.
    */
@@ -223,12 +223,12 @@ public:
    * 
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
    * 
    * Some filesystems don't allow all filenames, and may
-   * return an G_IO_ERROR_INVALID_FILENAME error.
-   * If the file is a directory the G_IO_ERROR_IS_DIRECTORY error will be
-   * returned. Other errors are possible too, and depend on what kind of
+   * throw a Gio::Error with INVALID_FILENAME.
+   * If the file is a directory a Gio::Error with IS_DIRECTORY will be
+   * thrown. Other errors are possible too, and depend on what kind of
    * filesystem the file is on.
    * @param flags A set of FileCreateFlags.
    * @param cancellable Optional Cancellable object.
@@ -249,9 +249,9 @@ public:
    * is supported on the target filesystem.
    * 
    * Some filesystems don't allow all filenames, and may
-   * return an G_IO_ERROR_INVALID_FILENAME error.
-   * If the file is a directory the G_IO_ERROR_IS_DIRECTORY error will be
-   * returned. Other errors are possible too, and depend on what kind of
+   * throw a Gio::Error with INVALID_FILENAME.
+   * If the file is a directory a Gio::Error with IS_DIRECTORY will be 
+   * thrown. Other errors are possible too, and depend on what kind of
    * filesystem the file is on.
    * @param flags A set of FileCreateFlags.
    * @return A FileOutputStream.
@@ -275,14 +275,15 @@ public:
    * is supported on the target filesystem.
    * 
    * The operation can be cancelled by triggering the cancellable object from another thread. 
-   * If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    * 
-   * If a file with this name already exists the IO_ERROR_EXISTS error
-   * will be returned. If the file is a directory the G_IO_ERROR_IS_DIRECTORY
-   * error will be returned.
+   * If a file with this name already exists a Gio::Error with EXISTS 
+   * will be thrown. If the file is a directory a Gio::Error with IS_DIRECTORY
+   * will be thrown.
+   *
    * Some filesystems don't allow all filenames, and may
-   * return an IO_ERROR_INVALID_FILENAME error, and if the name
-   * is to long IO_ERROR_FILENAME_TOO_LONG will be returned.
+   * throw a Gio::Error with INVALID_FILENAME, and if the name
+   * is to longa Gio::Error with FILENAME_TOO_LONG will be thrown.
    * Other errors are possible too, and depend on what kind of
    * filesystem the file is on.
    *
@@ -305,12 +306,13 @@ public:
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
    * 
-   * If a file with this name already exists the IO_ERROR_EXISTS error
-   * will be returned. If the file is a directory the G_IO_ERROR_IS_DIRECTORY
-   * error will be returned.
+   * If a file with this name already exists a Gio::Error with EXISTS 
+   * will be thrown. If the file is a directory a Gio::Error with IS_DIRECTORY
+   * will be thrown.
+   *
    * Some filesystems don't allow all filenames, and may
-   * return an IO_ERROR_INVALID_FILENAME error, and if the name
-   * is to long IO_ERROR_FILENAME_TOO_LONG will be returned.
+   * throw a Gio::Error with INVALID_FILENAME, and if the name
+   * is to longa Gio::Error with FILENAME_TOO_LONG will be thrown.
    * Other errors are possible too, and depend on what kind of
    * filesystem the file is on.
    *
@@ -326,8 +328,6 @@ public:
   _IGNORE(g_file_create)
 
 
-  //TODO: Rephrase this documentation in terms of _throwing_ exceptions instead of returning errors. And what exception is thrown?
-
   /** Returns an output stream for overwriting the file, possibly creating a backup copy of the file first.
    * This will try to replace the file in the safest way possible so that any errors during the writing will 
    * not affect an already existing copy of the file. For instance, for local files it may write to a 
@@ -338,22 +338,22 @@ public:
    * target filesystem.
    *
    * The operation can be cancelled by triggering the cancellable object from another thread. 
-   * If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * If you pass in an etag value, then this value is compared to the current entity tag of the file, 
-   * and if they differ an IO_ERROR_WRONG_ETAG error is returned. This generally means that the file has 
+   * and if they differ a Gio::Error with WRONG_ETAG will be thrown. This generally means that the file has 
    * been changed since you last read it. You can get the new etag from FileOutputStream::get_etag() 
    * after you've finished writing and closed the FileOutputStream. When you load a new file you can 
    * use FileInputStream::query_info() to get the etag of the file.
    *
    * If @a make_backup is true, this function will attempt to make a backup of the current file before 
-   * overwriting it. If this fails a IO_ERROR_CANT_CREATE_BACKUP error will be returned. If you want to replace 
+   * overwriting it. If this fails aa Gio::Error with CANT_CREATE_BACKUP will be thrown. If you want to replace 
    * anyway, try again with @a make_backup set to false.
    *
-   * If the file is a directory the IO_ERROR_IS_DIRECTORY error will be returned, and if the file is some 
-   * other form of non-regular file then a IO_ERROR_NOT_REGULAR_FILE error will be returned. Some file 
-   * systems don't allow all file names, and may return an IO_ERROR_INVALID_FILENAME error, and if the 
-   * name is to long IO_ERROR_FILENAME_TOO_LONG will be returned. Other errors are possible too, and 
+   * If the file is a directory a Gio::Error with IS_DIRECTORY will be thrown, and if the file is some 
+   * other form of non-regular file then aa Gio::Error with NOT_REGULAR_FILE will be thrown. Some file 
+   * systems don't allow all file names, and may throw a Gio::Error with INVALID_FILENAME, and if the 
+   * name is to longa Gio::Error with FILENAME_TOO_LONG will be thrown. Other errors are possible too, and 
    * depend on what kind of filesystem the file is on.
    * 
    * @param etag An optional entity tag for the current Glib::File.
@@ -378,19 +378,19 @@ public:
    * target filesystem.
    *
    * If you pass in an etag value, then this value is compared to the current entity tag of the file, 
-   * and if they differ an IO_ERROR_WRONG_ETAG error is returned. This generally means that the file has 
+   * and if they differ a Gio::Error with WRONG_ETAG will be thrown. This generally means that the file has 
    * been changed since you last read it. You can get the new etag from FileOutputStream::get_etag() 
    * after you've finished writing and closed the FileOutputStream. When you load a new file you can 
    * use FileInputStream::query_info() to get the etag of the file.
    *
    * If @a make_backup is true, this function will attempt to make a backup of the current file before 
-   * overwriting it. If this fails a IO_ERROR_CANT_CREATE_BACKUP error will be returned. If you want to replace 
+   * overwriting it. If this fails aa Gio::Error with CANT_CREATE_BACKUP will be thrown. If you want to replace 
    * anyway, try again with @a make_backup set to false.
    *
-   * If the file is a directory the IO_ERROR_IS_DIRECTORY error will be returned, and if the file is some 
-   * other form of non-regular file then a IO_ERROR_NOT_REGULAR_FILE error will be returned. Some file 
-   * systems don't allow all file names, and may return an IO_ERROR_INVALID_FILENAME error, and if the 
-   * name is to long IO_ERROR_FILENAME_TOO_LONG will be returned. Other errors are possible too, and 
+   * If the file is a directory a Gio::Error with IS_DIRECTORY will be thrown, and if the file is some 
+   * other form of non-regular file then aa Gio::Error with NOT_REGULAR_FILE will be thrown. Some file 
+   * systems don't allow all file names, and may throw a Gio::Error with INVALID_FILENAME, and if the 
+   * name is to longa Gio::Error with FILENAME_TOO_LONG will be thrown. Other errors are possible too, and 
    * depend on what kind of filesystem the file is on.
    * 
    * @param etag An optional entity tag for the current Glib::File.
@@ -509,7 +509,7 @@ public:
    * 
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
    *
    * For symlinks, normally the information about the target of the
    * symlink is returned, rather than information about the symlink itself.
@@ -518,7 +518,7 @@ public:
    * that point to non-existing files the information about the symlink itself
    * will be returned.
    *
-   * If the file does not exist, the IO_ERROR_NOT_FOUND error will be returned.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
    * Other errors are possible too, and depend on what kind of filesystem the file is on.
    *
    * @param cancellable A Cancellable object.
@@ -551,7 +551,7 @@ public:
    * that point to non-existing files the information about the symlink itself
    * will be returned.
    *
-   * If the file does not exist, the IO_ERROR_NOT_FOUND error will be returned.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
    * Other errors are possible too, and depend on what kind of filesystem the file is on.
    *
    * @param attributes: An attribute query string.
@@ -584,7 +584,7 @@ public:
    * can both result in two processes creating the file (with perhaps a partially
    * written file as the result). The correct approach is to always try to create
    * the file with g_file_create() which will either atomically create the file
-   * or fail with an IO_ERROR_EXISTS error.
+   * or throw a Gio::Error with EXISTS.
    *
    * However, in many cases an existance check is useful in a user
    * interface, for instance to make a menu item sensitive/insensitive, so that
@@ -645,9 +645,9 @@ public:
    * 
    * If @a cancellable  is not <tt>0</tt>, then the operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
    * 
-   * If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
    * Other errors are possible too, and depend on what kind of filesystem the file is on.
    * @param cancellable A Cancellable object.
    * @param attributes An attribute query string.
@@ -675,7 +675,7 @@ public:
    * bytes availible), and FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
    * 
    * 
-   * If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
    * Other errors are possible too, and depend on what kind of filesystem the file is on.
    * @param attributes An attribute query string.
    * @return A FileInfo or an empty RefPtr if there was an error.
@@ -732,7 +732,7 @@ public:
   /** Gets a Mount for the File. 
    * 
    * If the FileIface for the file does not have a mount (e.g. possibly a 
-   * remote share), an error will be set to IO_ERROR_NOT_FOUND and an empty RefPtr 
+   * remote share), an Gio::Error wtih NOT_FOUND will be thrown and an empty RefPtr 
    * will be returned.
    *
    * @param cancellable Cancellable object.
@@ -791,10 +791,10 @@ public:
    * 
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
    * 
-   * If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
-   * If the file is not a directory, the G_FILE_ERROR_NOTDIR error will be returned.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
+   * If the file is not a directory, a Glib::FileError with NOTDIR will be thrown.
    * Other errors are possible too.
    *
    * @param cancellable A Cancellable object.
@@ -821,8 +821,8 @@ public:
    * namespace. An example attribute query be "standard::*,owner::user".
    * The standard attributes are availible as defines, like FILE_ATTRIBUTE_STANDARD_NAME.
    * 
-   * If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
-   * If the file is not a directory, the G_FILE_ERROR_NOTDIR error will be returned.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
+   * If the file is not a directory, a Glib::FileError with NOTDIR will be thrown.
    * Other errors are possible too.
    *
    * @param attributes An attribute query string.
@@ -884,7 +884,7 @@ public:
    * On success the resulting converted filename is returned.
    * 
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * @param display_name A string.
    * @return A Glib::File specifying what the file was renamed to, or an empty RefPtr if there was an error.
@@ -941,8 +941,8 @@ public:
 
   /** Sends the file to the "Trashcan", if possible. This is similar to
    * deleting it, but the user can recover it before emptying the trashcan.
-   * Not all filesystems support trashing, so this call can return the
-   * IO_ERROR_NOT_SUPPORTED error.
+   * Not all filesystems support trashing, so this call can throw a Gio::Error
+   * with NOT_SUPPORTED.
    *
    * @return <tt>true</tt> on successful trash, <tt>false</tt> otherwise.
    */
@@ -958,24 +958,23 @@ public:
    */
   typedef sigc::slot<void, goffset, goffset> SlotFileProgress;
 
-  //TODO: Rephrase this in terms of exceptions rather than errors. And what exceptions are thrown?
   /** Copies the file source to the location specified by destination. Can not handle recursive copies of directories.
    * If the flag FILE_COPY_OVERWRITE is specified an already existing destination file is overwritten.
    * If the flag FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * The operation can be monitored via the @a slot callback.
    *
-   * If the source file does not exist then the IO_ERROR_NOT_FOUND error is returned, independent on the status of the destination.
+   * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
    *
-   * If FILE_COPY_OVERWRITE is not specified and the target exists, then the error IO_ERROR_EXISTS is returned.
+   * If FILE_COPY_OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    *
-   * If trying to overwrite a file over a directory the IO_ERROR_IS_DIRECTORY error is returned. 
-   * If trying to overwrite a directory with a directory the IO_ERROR_WOULD_MERGE error is returned.
+   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown. 
+   * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    *
    * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, 
-   * then the IO_ERROR_WOULD_RECURSE error is returned.
+   * then a Gio::Error with WOULD_RECURSE will be thrown.
    *
    * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
    */
@@ -1068,7 +1067,6 @@ public:
                g_file_copy_finish,
                errthrow)
 
-  //TODO: Rephrase this in terms of exceptions rather than errors. And what exceptions are thrown?
   /** Tries to move the file or directory source to the location specified by destination. If native move operations are supported then this is 
    * used, otherwise a copy and delete fallback is used. The native implementation may support moving directories (for instance on moves inside 
    * the same filesystem), but the fallback code does not.
@@ -1077,17 +1075,17 @@ public:
    * 
    * If the flag FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
    * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * The operation can be monitored via the @a slot callback.
-   * If the source file does not exist then the IO_ERROR_NOT_FOUND error is returned, independent on the status of the destination.
+   * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
    * 
-   * If G_FILE_COPY_OVERWRITE is not specified and the target exists, then the error G_IO_ERROR_EXISTS is returned.
+   * If G_FILE_COPY_OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    * 
-   * If trying to overwrite a file over a directory the IO_ERROR_IS_DIRECTORY error is returned. 
-   * If trying to overwrite a directory with a directory the IO_ERROR_WOULD_MERGE error is returned.
+   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown. 
+   * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    * 
-   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, then the IO_ERROR_WOULD_RECURSE error may be returned (if the native move operation isn't available).
+   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, then a Gio::Error with WOULD_RECURSE may be thrown (if the native move operation isn't available).
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE);
@@ -1183,14 +1181,14 @@ public:
   /** Tries to set all attributes in the FileInfo on the target values, 
    * not stopping on the first error.
    * 
-   * If there is any error during this operation then a error will be set to
-   * the first error. Error on particular fields are flagged by setting 
+   * If there is any error during this operation then a Gio::Error will be thrown.
+   * Error on particular fields are flagged by setting 
    * the "status" field in the attribute value to 
    * FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can also detect
    * further errors.
    * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,  
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * @param info A FileInfo.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
@@ -1206,14 +1204,14 @@ public:
   /** Tries to set all attributes in the FileInfo on the target values, 
    * not stopping on the first error.
    * 
-   * If there is any error during this operation then a error will be set to
-   * the first error. Error on particular fields are flagged by setting 
+   * If there is any error during this operation then a Gio::Error will be thrown.
+   * Error on particular fields are flagged by setting 
    * the "status" field in the attribute value to 
    * FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can also detect
    * further errors.
    * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * @param info A FileInfo.
    * @param flags A set of FileQueryInfoFlags.
@@ -1378,8 +1376,8 @@ public:
    * When this operation has completed, @a slot will be called with, 
    * and the operation can be finalized with mount_enclosing_volume_finish().
    * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * @param mount_operation A MountOperation.
    * @param slot A callback slot which will be called when the request is satisfied.
@@ -1420,8 +1418,8 @@ public:
   /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance, 
    * passwords are needed during authentication.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
    *
@@ -1460,8 +1458,8 @@ public:
 
   /** Unmounts a file of type FILE_TYPE_MOUNTABLE.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call unmount_mountable_finish() to get the result of the operation.
    *
@@ -1493,8 +1491,8 @@ public:
 
   /** Starts an asynchronous eject on a mountable.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call eject_mountable_finish() to get the result of the operation.
    *
@@ -1566,7 +1564,7 @@ public:
    * This may fail if directory monitoring is not supported.
    * 
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * @param cancellable A Cancellable object.
    * @param flags A set of FileMonitorFlags.
@@ -1597,7 +1595,7 @@ public:
    * mechanism exists, then regular polling of the file is used.
    * 
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * @param flags A set of FileMonitorFlags.
    * @param A Cancellable object.
@@ -1613,7 +1611,7 @@ public:
    * mechanism exists, then regular polling of the file is used.
    * 
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * @param flags A set of FileMonitorFlags.
    * @param A Cancellable object.
@@ -1656,7 +1654,7 @@ public:
    * call load_contents_finish() with the AsyncResult provided to the @a slot.
    *
    * The operation can be cancelled by triggering the cancellable object from another thread. 
-   * If the operation was cancelled, the error IO_ERROR_CANCELLED will be returned.
+   * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param cancellable A Cancellable object.
@@ -1690,8 +1688,8 @@ public:
   /** Reads the partial contents of a file.
    * The @a slot_read_more callback slot should be used to stop reading from the file when appropriate. This operation can be finished by load_partial_contents_finish().
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call load_partial_contents_finish() to get the result of the operation.
    *
@@ -1704,8 +1702,8 @@ public:
   /** Reads the partial contents of a file.
    * The @a slot_read_more callback slot should be used to stop reading from the file when appropriate. This operation can be finished by load_partial_contents_finish().
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, the error 
-   * IO_ERROR_CANCELLED will be returned.
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call load_partial_contents_finish() to get the result of the operation.
    *
@@ -1725,13 +1723,13 @@ public:
   /** Replaces the contents of the file with @a contents of @a length bytes.
    *  
    * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
-   * the error IO_ERROR_WRONG_ETAG will be returned.
+   * a Gio::Error with WRONG_ETAG will be thrown.
    * 
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
    * 
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
    * 
    * The returned @a new_etag  can be used to verify that the file hasn't changed the
    * next time it is saved over.
@@ -1754,7 +1752,7 @@ public:
   /** Replaces the contents of the file with @a contents of @a length bytes.
    *  
    * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
-   * the error IO_ERROR_WRONG_ETAG will be returned.
+   * a Gio::Error with WRONG_ETAG will be thrown.
    * 
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
    * 
@@ -1778,13 +1776,13 @@ public:
   /** Replaces the contents of the file with @a contents.
    *  
    * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
-   * the error IO_ERROR_WRONG_ETAG will be returned.
+   * a Gio::Error with WRONG_ETAG will be thrown.
    * 
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
    * 
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
    * 
    * The returned @a new_etag  can be used to verify that the file hasn't changed the
    * next time it is saved over.
@@ -1806,7 +1804,7 @@ public:
   /** Replaces the contents of the file with @a contents.
    *  
    * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
-   * the error IO_ERROR_WRONG_ETAG will be returned.
+   * a Gio::Error with WRONG_ETAG will be thrown.
    * 
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
    * 
@@ -1837,7 +1835,7 @@ public:
   * 
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
   * 
   * If @a make_backup is true, this function will attempt to 
   * make a backup of the file.
@@ -1880,7 +1878,7 @@ public:
   * 
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
   * 
   * If @a make_backup is true, this function will attempt to 
   * make a backup of the file.
@@ -1903,7 +1901,7 @@ public:
   * 
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, the error IO_ERROR_CANCELLED will be returned. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
   * 
   * If @a make_backup is true, this function will attempt to 
   * make a backup of the file.
@@ -1955,12 +1953,12 @@ public:
   //_WRAP_VFUNC(std::string get_uri() const, "get_uri")
   //_WRAP_VFUNC(std::string get_parse_name() const, "get_parse_name")
 
-  //TODO: Careful of refcounting: //_WRAP_VFUNC(Glib::RefPtr<File> get_parent() const, "get_parent")
+  //Careful of refcounting: //_WRAP_VFUNC(Glib::RefPtr<File> get_parent() const, "get_parent")
 
-  // TODO: GFileIface does not define get_child(). Perhaps it's not intentional.
+  // GFileIface does not define get_child(). Perhaps it's not intentional.
   //  //_WRAP_VFUNC(Glib::RefPtr<File> get_child(const std::string& name) const, "get_child")
 
-  // TODO: howto wrap a vfunc that takes a GError**
+  // howto wrap a vfunc that takes a GError**
 //   //_WRAP_VFUNC(Glib::RefPtr<File> get_child_for_display_name(const Glib::ustring& display_name) const,
 //               "get_child_for_display_name",
 //               errthrow)
@@ -1971,7 +1969,7 @@ public:
 
   //_WRAP_VFUNC(std::string get_relative_path(const Glib::RefPtr<const File>& descendant) const, "get_relative_path")
 
-  //TODO: Careful of refcounting:   //_WRAP_VFUNC(Glib::RefPtr<const File> resolve_relative_path(const std::string& relative_path) const, "resolve_relative_path")
+  //Careful of refcounting:   //_WRAP_VFUNC(Glib::RefPtr<const File> resolve_relative_path(const std::string& relative_path) const, "resolve_relative_path")
 
   //_WRAP_VFUNC(bool is_native() const, "is_native")
   //_WRAP_VFUNC(bool has_uri_scheme(const std::string& uri_scheme) const, "has_uri_scheme")
