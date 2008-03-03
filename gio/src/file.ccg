@@ -1293,7 +1293,7 @@ void File::replace_contents(const char* contents, gsize length, const std::strin
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gchar* c_etag_new = NULL;
+  gchar* c_etag_new = 0;
   g_file_replace_contents(gobj(), contents, length, etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -1316,7 +1316,7 @@ void File::replace_contents(const char* contents, gsize length, const std::strin
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gchar* c_etag_new = NULL;
+  gchar* c_etag_new = 0;
   g_file_replace_contents(gobj(), contents, length, etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -1339,7 +1339,7 @@ void File::replace_contents(const std::string& contents, const std::string& etag
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gchar* c_etag_new = NULL;
+  gchar* c_etag_new = 0;
   g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -1362,7 +1362,7 @@ void File::replace_contents(const std::string& contents, const std::string& etag
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gchar* c_etag_new = NULL;
+  gchar* c_etag_new = 0;
   g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -1481,7 +1481,7 @@ void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gchar* c_new_etag = NULL;
+  gchar* c_new_etag = 0;
   g_file_replace_contents_finish(gobj(), Glib::unwrap(result), &c_new_etag, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -2013,6 +2013,94 @@ Glib::RefPtr<AppInfo> File::query_default_handler(std::auto_ptr<Glib::Error>& er
 
   if(retvalue)
     retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool File::load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::string& etag_out)
+#else
+bool File::load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* cetag_out = 0;
+  bool retvalue = g_file_load_contents(gobj(), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &contents, &(length), &cetag_out, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  etag_out = Glib::convert_return_gchar_ptr_to_stdstring(cetag_out);
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool File::load_contents(char*& contents, gsize& length, std::string& etag_out)
+#else
+bool File::load_contents(char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* cetag_out = 0;
+  bool retvalue = g_file_load_contents(gobj(), NULL, &contents, &(length), &cetag_out, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  etag_out = Glib::convert_return_gchar_ptr_to_stdstring(cetag_out);
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool File::load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out)
+#else
+bool File::load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* cetag_out = 0;
+  bool retvalue = g_file_load_contents_finish(gobj(), Glib::unwrap(result), &contents, &(length), &cetag_out, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  etag_out = Glib::convert_return_gchar_ptr_to_stdstring(cetag_out);
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool File::load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out)
+#else
+bool File::load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gchar* cetag_out = 0;
+  bool retvalue = g_file_load_partial_contents_finish(gobj(), Glib::unwrap(result), &contents, &(length), &cetag_out, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  etag_out = Glib::convert_return_gchar_ptr_to_stdstring(cetag_out);
+
   return retvalue;
 }
 
