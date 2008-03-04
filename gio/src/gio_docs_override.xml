@@ -1692,5 +1692,46 @@ or %NULL on error.
 </return>
 </function>
 
+<function name="g_file_query_exists">
+<description>
+Utility function to check if a particular file exists. This is
+implemented using query_info() and as such does blocking I/O.
+
+Note that in many cases it is racy to first check for file existence
+and then execute something based on the outcome of that, because the
+file might have been created or removed in between the operations. The
+general approach to handling that is to not check, but just do the
+operation and handle the errors as they come.
+
+As an example of race-free checking, take the case of reading a file, and
+if it doesn&apos;t exist, creating it. There are two racy versions: read it, and
+on error create it; and: check if it exists, if not create it. These
+can both result in two processes creating the file (with perhaps a partially
+written file as the result). The correct approach is to always try to create
+the file with File::create() which will either atomically create the file
+or fail with a Gio::Error exception with EXISTS.
+
+However, in many cases an existence check is useful in a user
+interface, for instance to make a menu item sensitive/insensitive, so that
+you don&apos;t have to fool users that something is possible and then just show
+and error dialog. If you do this, you should make sure to also handle the
+errors that can happen due to races when you execute the operation.
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the file exists (and can be detected without error), %FALSE otherwise (or if cancelled).
+</return>
+</function>
+
 
 </root>
