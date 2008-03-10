@@ -29,6 +29,8 @@
 #include <cstdarg>
 #include <cstring>
 
+#include <string.h>
+
 //Weak references:
 //I'm not sure what the point of these are apart from being a hacky way out of circular references,
 //but maybe we could make it easier to use them by making a Java Reference Object -style class like so:
