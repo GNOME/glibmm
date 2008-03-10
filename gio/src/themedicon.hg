@@ -47,13 +47,13 @@ class ThemedIcon
   _IMPLEMENTS_INTERFACE(Icon)
 
 protected:
-  _WRAP_CTOR(ThemedIcon(const std::string& iconname), g_themed_icon_new)
+  //TODO: Documentation:
+  explicit ThemedIcon(const std::string& iconname, bool use_default_callbacks = false);
+  _IGNORE(g_themed_icon_new, g_themed_icon_new_with_default_fallbacks)
 
 public:
-  _WRAP_CREATE(const std::string& iconname)
+  _WRAP_CREATE(const std::string& iconname, bool use_default_callbacks = false)
 
-  //See http://bugzilla.gnome.org/show_bug.cgi?id=517676 about the constructors. murrayc.
-  //TODO: GIcon *g_themed_icon_new_with_default_fallbacks (const char *iconname);
   //TODO: GIcon *g_themed_icon_new_from_names (char **iconnames, int len);
 
   _WRAP_METHOD(void append_name(const std::string& iconname), g_themed_icon_append_name)
@@ -63,7 +63,11 @@ public:
   //_WRAP_METHOD(Glib::StringArrayHandle get_names() const, g_themed_icon_get_names)
 
 
-  //There are no signals or properties.
+  //There are no signals.
+
+  _WRAP_PROPERTY("name", std::string)
+  //An array: This is awkward to wrap_WRAP_PROPERTY("names", )
+  _WRAP_PROPERTY("use-default-fallbacks", bool)
 };
 
 } // namespace Gio
