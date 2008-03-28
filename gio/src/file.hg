@@ -290,8 +290,7 @@ public:
    *
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param flags a set of FileCreateFlags.
-   * @return A FileOutputStream for the newly created file, or 
-   * <tt>0</tt> on error.
+   * @return A FileOutputStream for the newly created file.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<FileOutputStream> create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FILE_CREATE_NONE);
@@ -318,8 +317,7 @@ public:
    * filesystem the file is on.
    *
    * @param flags a set of FileCreateFlags.
-   * @return A FileOutputStream for the newly created file, or 
-   * <tt>0</tt> on error.
+   * @return A FileOutputStream for the newly created file.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<FileOutputStream> create_file(FileCreateFlags flags = FILE_CREATE_NONE);
@@ -644,7 +642,7 @@ public:
    * (the total size of the filesystem in bytes), FILE_ATTRIBUTE_FILESYSTEM_FREE (number of
    * bytes availible), and FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
    * 
-   * If @a cancellable  is not <tt>0</tt>, then the operation can be cancelled by
+   * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
    * was cancelled, a Gio::Error with CANCELLED will be thrown. 
    * 
@@ -801,7 +799,7 @@ public:
    * @param cancellable A Cancellable object.
    * @param attributes An attribute query string.
    * @param flags A set of FileQueryInfoFlags.
-   * @return A FileEnumerator if successful, <tt>0</tt> on error.
+   * @return A FileEnumerator if successful.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<FileEnumerator> enumerate_children(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE);
@@ -828,7 +826,7 @@ public:
    *
    * @param attributes An attribute query string.
    * @param flags A set of FileQueryInfoFlags.
-   * @return A FileEnumerator if successful, <tt>0</tt> on error.
+   * @return A FileEnumerator if successful.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<FileEnumerator> enumerate_children(const std::string& attributes = "*", FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE);
@@ -1570,7 +1568,6 @@ public:
    * @param cancellable A Cancellable object.
    * @param flags A set of FileMonitorFlags.
    * @return A FileMonitor for the file.
-   * or <tt>0</tt> on error.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<FileMonitor> monitor_directory(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags = FILE_MONITOR_NONE);
@@ -1583,7 +1580,6 @@ public:
    * 
    * @param flags A set of FileMonitorFlags.
    * @return A FileMonitor for the file.
-   * or <tt>0</tt> on error.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::RefPtr<FileMonitor> monitor_directory(FileMonitorFlags flags = FILE_MONITOR_NONE);
@@ -1766,7 +1762,7 @@ public:
 
   /** Replaces the contents of the file with @a contents of @a length bytes.
    *  
-   * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
+   * If @a etag is specified (not an empty string) any existing file must have that etag, or
    * a Gio::Error with WRONG_ETAG will be thrown.
    * 
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
@@ -1795,7 +1791,7 @@ public:
 
   /** Replaces the contents of the file with @a contents of @a length bytes.
    *  
-   * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
+   * If @a etag is specified (not an empty string) any existing file must have that etag, or
    * a Gio::Error with WRONG_ETAG will be thrown.
    * 
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
@@ -1819,7 +1815,7 @@ public:
 
   /** Replaces the contents of the file with @a contents.
    *  
-   * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
+   * If @a etag is specified (not an empty string) any existing file must have that etag, or
    * a Gio::Error with WRONG_ETAG will be thrown.
    * 
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
@@ -1847,7 +1843,7 @@ public:
 
   /** Replaces the contents of the file with @a contents.
    *  
-   * If @a etag is specified (not <tt>0</tt>) any existing file must have that etag, or
+   * If @a etag is specified (not an empty string) any existing file must have that etag, or
    * a Gio::Error with WRONG_ETAG will be thrown.
    * 
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
@@ -1868,6 +1864,9 @@ public:
   void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_replace_contents)
+
+
+  //TODO: Add replace_contents() without the etags?
 
 
  /** Starts an asynchronous replacement of the file with the given 
