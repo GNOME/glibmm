@@ -110,7 +110,8 @@ public:
   {
     size_type j = 0;
     iterator i;
-    for(i = begin(), j = 0; i != end(), j < l; ++i, ++j);
+    for(i = begin(), j = 0; i != end(), j < l; ++i, ++j)
+      ;
     return (*i);
   }
 
