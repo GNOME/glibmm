@@ -71,9 +71,50 @@ tag-release: distcheck
 		&& echo "Try running `svn update`." && false)
 	@echo "Release Tagged."
 
-release: tag-release
+upload-release: tag-release
 	scp $(DIST_ARCHIVES) master.gnome.org:
 	@echo "Tarball uploaded.  Now run install-module on master.gnome.org"
+	@echo "[hint: make install-module]"
 
-.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild release tag-release
+RELEASE_ANNOUNCE_LIST = gnome-announce-list@gnome.org, gtkmm-list@gnome.org
+release-announce: upload-release
+	@echo "Please send the following announcement to:"
+	@echo "$(RELEASE_ANNOUNCE_LIST)"
+	@echo ""
+	@echo "Subject: ANNOUNCE: $(PACKAGE) $(VERSION) released"
+	@echo ""
+	@echo "============================== CUT HERE =============================="
+	@echo "*** About $(PACKAGE)"
+	@echo ""
+	@echo "    $(PACKAGE) is a C++ API for glib, used by gtkmm."
+	@echo ""
+	@echo "    $(PACKAGE) 2.16 wraps new API in glib 2.16, including the new gio library, "
+	@echo "    and is API/ABI-compatibile with glibmm 2.14, 2.12, 2.10, 2.8, 2.6 and "
+	@echo "    2.4. It is a version of the glibmm-2.4 API."
+	@echo ""
+	@echo "    gtkmm and $(PACKAGE) stay in-sync with GTK+ by following the official GNOME release schedule:"
+	@echo "    http://www.gnome.org/start/unstable/"
+	@echo ""
+	@echo "    Bindings for the rest of the GNOME Platform are also available, and are also "
+	@echo "    API-stable."
+	@echo ""
+	@echo "    http://www.gtkmm.org"
+	@echo ""
+	@echo "*** Development "
+	@echo ""
+	@echo "    There is active discussion on the mailing list: "
+	@echo "    http://www.gtkmm.org/mailinglist.shtml"
+	@echo "    and in the #c++ channel on irc.gnome.org"
+	@echo ""
+	@echo "*** Changes:"
+	@echo ""
+	@echo "    --- INSERT NEWS HERE ---"
+	@echo "============================== CUT HERE =============================="
+
+install-module:
+	ssh master.gnome.org install-module $(DIST_ARCHIVES)
+
+release: release-announce
+
+.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild release tag-release upload-release release-announce install-module
 
