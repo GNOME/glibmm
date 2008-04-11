@@ -1,5 +1,5 @@
 // -*- c++ -*-
-/* $Id$ */
+/* $Id: optionentry.ccg,v 1.8 2006/03/08 12:23:03 murrayc Exp $ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
  *
@@ -74,6 +74,39 @@ OptionEntry& OptionEntry::operator=(const OptionEntry& src)
   return *this;
 }
 
+void OptionEntry::set_long_name(const Glib::ustring& value)
+{
+  if(gobject_->long_name)
+  {
+    g_free((gchar*)(gobject_->long_name));
+    gobject_->long_name = NULL;
+  }
+
+  gobject_->long_name = (value).empty() ? NULL : g_strdup((value).c_str());
+}
+
+void OptionEntry::set_description(const Glib::ustring& value)
+{
+  if(gobject_->description)
+  {
+    g_free((gchar*)(gobject_->description));
+    gobject_->description = NULL;
+  }
+
+  gobj()->description = (value).empty() ? NULL : g_strdup((value).c_str());
+}
+
+void OptionEntry::set_arg_description(const Glib::ustring& value)
+{
+  if(gobject_->arg_description)
+  {
+    g_free((gchar*)(gobject_->arg_description));
+    gobject_->arg_description = NULL;
+  }
+
+  gobj()->arg_description = (value).empty() ? NULL : g_strdup((value).c_str());
+}
+ 
 
 } // namespace Glib
 
