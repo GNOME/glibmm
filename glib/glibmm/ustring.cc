@@ -683,7 +683,10 @@ ustring& ustring::erase()
 
 ustring::iterator ustring::erase(ustring::iterator p)
 {
-  return iterator(string_.erase(p.base()));
+  ustring::iterator iter_end = p;
+  ++iter_end;
+
+  return iterator(string_.erase(p.base(), iter_end.base()));
 }
 
 ustring::iterator ustring::erase(ustring::iterator pbegin, ustring::iterator pend)
