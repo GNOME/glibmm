@@ -36,6 +36,7 @@ public:
   Glib::ustring m_arg_goo;
   bool m_arg_boolean;
   Glib::OptionGroup::vecustrings m_arg_list;
+  Glib::OptionGroup::vecustrings m_remaining_list;
 };
 
 ExampleOptionGroup::ExampleOptionGroup()
@@ -69,8 +70,14 @@ ExampleOptionGroup::ExampleOptionGroup()
   Glib::OptionEntry entry5;
   entry5.set_long_name("list");
   entry5.set_short_name('l');
-  entry5.set_description("The List");
+  entry5.set_description("A List");
   add_entry(entry5, m_arg_list);
+
+  Glib::OptionEntry entry_remaining;
+  entry_remaining.set_long_name(G_OPTION_REMAINING);
+  entry_remaining.set_arg_description(G_OPTION_REMAINING);
+
+  add_entry(entry_remaining, m_remaining_list);
 }
 
 bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
@@ -136,6 +143,14 @@ int main(int argc, char** argv)
   //This one shows the results of multiple instance of the same option, such as --list=1 --list=a --list=b
   std::cout << "  list = ";
   for(Glib::OptionGroup::vecustrings::const_iterator iter = group.m_arg_list.begin(); iter != group.m_arg_list.end(); ++iter)
+  {
+    std::cout << *iter << ", ";
+  }
+  std::cout << std::endl;
+
+  //This one shows the remaining arguments on the command line, which had no name= form:
+  std::cout << "  remaining = ";
+  for(Glib::OptionGroup::vecustrings::const_iterator iter = group.m_remaining_list.begin(); iter != group.m_remaining_list.end(); ++iter)
   {
     std::cout << *iter << ", ";
   }

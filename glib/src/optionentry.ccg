@@ -82,7 +82,10 @@ void OptionEntry::set_long_name(const Glib::ustring& value)
     gobject_->long_name = NULL;
   }
 
-  gobject_->long_name = (value).empty() ? NULL : g_strdup((value).c_str());
+  //Note that we do not use NULL for an empty string, 
+  //because G_OPTION_REMAINING is actually a "", so it actually has a distinct meaning:
+  //TODO: Wrap G_OPTION_REMAINING in C++ somehow, maybe as an explicit set_long_name(void) or set_is_remaining()? murrayc. 
+  gobj()->long_name = (value).c_str() ? g_strdup((value).c_str()) : NULL;
 }
 
 void OptionEntry::set_description(const Glib::ustring& value)
