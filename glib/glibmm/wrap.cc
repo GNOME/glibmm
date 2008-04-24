@@ -187,7 +187,7 @@ ObjectBase* wrap_auto(GObject* object, bool take_copy)
 
     if(!pCppObject)
     {
-      g_warning("failed to wrap type of '%s'", G_OBJECT_TYPE_NAME(object));
+      g_warning("Failed to wrap object of type '%s'. Hint: this error is commonly caused by failing to call a library init() function.", G_OBJECT_TYPE_NAME(object));
       return 0;
     }
   }
