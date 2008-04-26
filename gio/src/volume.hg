@@ -181,3 +181,44 @@ public:
 };
 
 } // namespace Gio
+
+namespace Glib
+{
+
+//Pre-declare this so we can use it in TypeTrait:
+Glib::RefPtr<Gio::Volume> wrap(GVolume* object, bool take_copy);
+
+namespace Container_Helpers
+{
+
+/** This specialization of TypeTraits exists 
+ * because the default use of Glib::wrap(GObject*), 
+ * instead of a specific Glib::wrap(GSomeInterface*),
+ * would not return a wrapper for an interface.
+ */ 
+template <>
+struct TypeTraits< Glib::RefPtr<Gio::Volume> >
+{
+  typedef Glib::RefPtr<Gio::Volume> CppType;
+  typedef GVolume* CType;
+  typedef GVolume* CTypeNonConst;
+
+  static CType   to_c_type      (const CppType& item)
+  { return Glib::unwrap (item); }
+
+  static CppType to_cpp_type    (const CType& item)
+  {
+    //Use a specific Glib::wrap() function, 
+    //because CType has the specific type (not just GObject):
+    return Glib::wrap(item, true /* take_copy */);
+  }
+
+  static void    release_c_type (CType item)
+  {
+    GLIBMM_DEBUG_UNREFERENCE(0, item);
+    g_object_unref(item);
+  }
+};
+
+} // Container_Helpers
+} // Glib
