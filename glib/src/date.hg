@@ -51,18 +51,57 @@ public:
   static const Year    BAD_YEAR   = 0;
   static const guint32 BAD_JULIAN = 0;
 
+  /** Construct an undefined date.
+   */
   Date();
+
+  /** Construct a date with given day, month and year.
+   * @param day The day.
+   * @param month The month.
+   * @param year The year.
+   */
   Date(Day day, Month month, Year year);
+
+  /** Construct a date from a julian day.
+   * @param julian_day The julian day (guint32).
+   */
   explicit Date(guint32 julian_day);
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  explicit Date(const GDate& castitem);
-#endif
-
-  void clear();
-  /** Clear the date. The cleared dates will not represent an existing date, but will not contain garbage.
-   * @param month Month to set.
+  /** Construct a Glib::Date from a GDate. The GDate is kept by Glib::Date and
+   * then destroyed when Glib::Date is destroyed.
+   * @param castitem The GDate.
    */
+  explicit Date(const GDate& castitem);
+
+  /** Construct a Glib::Date from another.
+   * @param other the other Glib::Date.
+   */
+  Date(const Date& other);
+
+  /** Assign another date to this one. For example:
+   * @code
+   * ...
+   * Glib::Date my_date;
+   * my_date = other_date;
+   * @endcode
+   * @param other The other Glib::Date.
+   */
+  Date& operator=(const Date& other);
+
+  /// Provides access to the underlying C instance.
+  GDate*       gobj()       { return &gobject_; }
+
+  /// Provides access to the underlying C instance.
+  const GDate* gobj() const { return &gobject_; }
+
+private:
+  GDate gobject_;
+
+public:
+  /** Clear the date. The cleared dates will not represent an existing date,
+   * but will not contain garbage.
+   */
+  void clear();
 
   /** Parses a user-inputted string str, and try to figure out what date it represents, taking the current locale into account. If the string is successfully parsed, the date will be valid after the call. Otherwise, it will be invalid.   
    * This function is not appropriate for file formats and the like; it isn't very precise, and its exact behavior varies with the locale. It's intended to be a heuristic routine that guesses what the user means by a given string (and it does work pretty well in that capacity).   
@@ -110,6 +149,8 @@ public:
    */
   void set_time(const GTimeVal& timeval);
 
+  /** Set Glib::Date to current time.
+   */
   void set_time_current();
 
   /** Sets the month of the year. If the resulting day-month-year triplet is invalid, the date will be invalid.
@@ -369,14 +410,6 @@ public:
    * @return true if the date is a valid one. 
    */
   static bool valid_dmy(Day day, Month month, Year year);
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GDate*       gobj()       { return &gobject_; }
-  const GDate* gobj() const { return &gobject_; }
-#endif
-
-private:
-  GDate gobject_;
 };
 
 
