@@ -1,4 +1,4 @@
-test_dirs = glibmm_value giomm_simple glibmm_date
+test_dirs = glibmm_value glibmm_tree glibmm_date giomm_simple 
 
 SUBDIRS = $(test_dirs)
 EXTRA_DIST = Makefile.am_fragment
