@@ -58,13 +58,12 @@ class Tree
 {
   _CLASS_GENERIC(Tree, GNode)
 public:
-  //TODO: Avoid exposing GNode in the API? murrayc
-  typedef GNode* iterator;
+  typedef gpointer iterator;
   typedef sigc::slot<bool, T&>* TraverseFunc;
   typedef sigc::slot<void, T&>* ForeachFunc;
-  typedef std::map<GNode*,Tree<T>*> NodeMap;
+  typedef std::map<gpointer, Tree<T>*> NodeMap;
 
-  /** Creates a new GNode containing the given data. 
+  /** Creates a new Tree containing the given data. 
    * Used to create the first node in a tree.
    */
   Tree()
@@ -276,7 +275,7 @@ public:
   }
   _IGNORE(g_node_traverse);
 
-  /** Calls a function for each of the children of a GNode.
+  /** Calls a function for each of the children of a Tree.
    * Note that it doesn't descend beneath the child nodes.
    *
    * @param flags Wwhich types of children are to be visited: One of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
@@ -288,17 +287,17 @@ public:
   }
   _IGNORE(g_node_children_foreach)
 
-  /** Finds the first child of a GNode with the given data.
+  /** Finds the first child of a Tree with the given data.
    *
    * @param flags Which types of children are to be visited, one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
-   * @param data user data to pass to the function //TODO: This seems useless.
+   * @param data The data for which to search
    * @return the found child, or NULL if the data is not found
    */
   Tree<T>* find_child(TraverseFlags flags, const T& data) const
   {
-    sigc::slot<void,iterator,const T&,iterator> real_slot = sigc::ptr_fun(compare_child);
-    sigc::slot<void,iterator> bound_slot;
-    iterator child = NULL;
+    sigc::slot<void,GNode*,const T&,GNode*> real_slot = sigc::ptr_fun(compare_child);
+    sigc::slot<void,GNode*> bound_slot;
+    GNode* child = NULL;
 
     bound_slot = sigc::bind(real_slot, data, child);
     g_node_children_foreach(gobject_, (GTraverseFlags)flags, wrap_compare_child, reinterpret_cast<gpointer>(&bound_slot));
@@ -316,9 +315,9 @@ public:
    */
   Tree<T>* find(TraverseType order, TraverseFlags flags, const T& data) const
   {
-    sigc::slot<gboolean,iterator,const T&,iterator*> real_slot = sigc::ptr_fun(compare_node);
-    sigc::slot<gboolean,iterator> bound_slot;
-    iterator child = NULL;
+    sigc::slot<gboolean,GNode*,const T&,GNode**> real_slot = sigc::ptr_fun(compare_node);
+    sigc::slot<gboolean,GNode*> bound_slot;
+    GNode* child = NULL;
 
     bound_slot = sigc::bind(real_slot, data, &child);
     
@@ -326,8 +325,8 @@ public:
 
     if(NULL == child){ return NULL; }
   
-    iterator cursor = child;
-    unsigned int depth = g_node_depth(child) - g_node_depth(gobject_);
+    GNode *cursor = child;
+    unsigned int depth = g_node_depth(cursor) - g_node_depth(gobject_);
     std::stack<iterator, std::deque<iterator> > stack;
     Tree<T> *treecursor = const_cast<Tree<T>*>(this);
   
@@ -556,18 +555,6 @@ public:
     return (children_.end() == i)? NULL: i->second;
   }
 
-  /** Accessor for this node's parent
-   * Don't use this. //TODO: Remove API (or hide it) if it should not be used.
-   *
-   * @param newparent A new parent for this node, 
-   * NULL to get the current parent.
-   * @return The node's parent.
-   */
-  Tree<T>* parent(Tree<T> *newparent = NULL)
-  {
-    return (NULL == newparent)? parent_: (parent_ = newparent);
-  }
-
   /// For auto-wrapping
   GNode*       gobj()       { return gobject_; }
   const GNode* gobj() const { return gobject_; }
@@ -583,6 +570,17 @@ protected:
   /// Some metadata must be stored
   NodeMap children_;
   Tree<T> *parent_;
+
+  /** Accessor for this node's parent
+   *
+   * @param newparent A new parent for this node, 
+   * NULL to get the current parent.
+   * @return The node's parent.
+   */
+  Tree<T>* parent(Tree<T> *newparent = NULL)
+  {
+    return (NULL == newparent)? parent_: (parent_ = newparent);
+  }
 
   /// Wrapper for invoking a TraverseFunc
   static gboolean wrap_traverse_slot(GNode *node, gpointer slot)
