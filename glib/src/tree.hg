@@ -67,20 +67,22 @@ public:
    * Used to create the first node in a tree.
    */
   Tree()
+  : gobject_ (0),
+    owns_gobject_(false),
+    parent_(this)
   {
-    gobject_ = NULL;
-    owns_gobject_ = false;
-    parent_ = this;
-  };
+  }
 
   explicit Tree(T& data)
   {
-    T *tmp = new T();
+    T* tmp = new T();
     *tmp = data;
+
     gobject_ = g_node_new(reinterpret_cast<gpointer>(tmp));
     owns_gobject_ = true;
     parent_ = this;
-  };
+  }
+
   _IGNORE(g_node_new)
 
   /** Removes the instance and its children from the tree,
@@ -104,7 +106,7 @@ public:
       delete reinterpret_cast<T*>(gobject_->data);
       g_node_destroy(gobject_);
     }
-  };
+  }
   _IGNORE(g_node_destroy)
 
 
@@ -232,7 +234,7 @@ public:
    */
   Tree<T>* prepend_data(T& data)
   {
-    Tree<T> *node = new Tree<T>(data);
+    Tree<T>* node = new Tree<T>(data);
     prepend(*node);
     return node;
   }
@@ -291,16 +293,16 @@ public:
    *
    * @param flags Which types of children are to be visited, one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
    * @param data The data for which to search
-   * @return the found child, or NULL if the data is not found
+   * @return the found child, or 0 if the data is not found
    */
   Tree<T>* find_child(TraverseFlags flags, const T& data) const
   {
-    sigc::slot<void,GNode*,const T&,GNode*> real_slot = sigc::ptr_fun(compare_child);
-    sigc::slot<void,GNode*> bound_slot;
-    GNode* child = NULL;
+    sigc::slot<void, GNode*, const T&, GNode*> real_slot = sigc::ptr_fun(on_compare_child);
 
-    bound_slot = sigc::bind(real_slot, data, child);
-    g_node_children_foreach(gobject_, (GTraverseFlags)flags, wrap_compare_child, reinterpret_cast<gpointer>(&bound_slot));
+    GNode* child = 0;
+    type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, data, child);
+
+    g_node_children_foreach(gobject_, (GTraverseFlags)flags, on_wrap_compare_child, reinterpret_cast<gpointer>(&bound_slot));
     
     return lookup(child);
   }
@@ -311,24 +313,25 @@ public:
    * @param order The order in which nodes are visited: 
    * TRAVERSE_IN_ORDER, TRAVERSE_PRE_ORDER, TRAVERSE_POST_ORDER, or TRAVERSE_LEVEL_ORDER
    * @param flags Which types of children are to be visited: one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
-   * @return The found node, or NULL if the data is not found.
+   * @return The found node, or 0 if the data is not found.
    */
   Tree<T>* find(TraverseType order, TraverseFlags flags, const T& data) const
   {
-    sigc::slot<gboolean,GNode*,const T&,GNode**> real_slot = sigc::ptr_fun(compare_node);
-    sigc::slot<gboolean,GNode*> bound_slot;
-    GNode* child = NULL;
+    //We use a sigc::slot for the C callback, so we can bind some extra data.
+    sigc::slot<gboolean, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_node);
 
-    bound_slot = sigc::bind(real_slot, data, &child);
+    GNode* child = 0;
+    type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, data, &child);
     
-    g_node_traverse(gobject_, (GTraverseType)order, (GTraverseFlags)flags, -1, wrap_compare_node, reinterpret_cast<gpointer>(&bound_slot));
+    g_node_traverse(gobject_, (GTraverseType)order, (GTraverseFlags)flags, -1, on_wrap_compare_node, reinterpret_cast<gpointer>(&bound_slot));
 
-    if(NULL == child){ return NULL; }
+    if(0 == child)
+      return 0;
   
-    GNode *cursor = child;
+    GNode* cursor = child;
     unsigned int depth = g_node_depth(cursor) - g_node_depth(gobject_);
     std::stack<iterator, std::deque<iterator> > stack;
-    Tree<T> *treecursor = const_cast<Tree<T>*>(this);
+    Tree<T>* treecursor = const_cast<Tree<T>*>(this);
   
     for(unsigned int i = 0; i < depth; ++i)
     {
@@ -339,7 +342,8 @@ public:
     for(;!stack.empty();stack.pop())
     {
       treecursor = treecursor->lookup(stack.top());
-      if(NULL == treecursor){ return NULL; }
+      if(0 == treecursor)
+        return 0;
     }
   
     return treecursor;
@@ -355,8 +359,8 @@ public:
   int index_of(const T& data) const
   {
     int index = 0;
-    for(Tree<T> *i = nth_child(index);
-      i != NULL; i = nth_child(++index))
+    for(Tree<T>* i = nth_child(index);
+      i != 0; i = nth_child(++index))
     {
       if((i->data()) == data)
       {
@@ -382,7 +386,7 @@ public:
 
   /** Gets the first child.
    *
-   * @return The first child, or NULL if the node has no children. 
+   * @return The first child, or 0 if the node has no children. 
    */
   Tree<T>* first_child() const
   {
@@ -392,7 +396,7 @@ public:
 
   /** Gets the last child.
    *
-   * @return The last child, or NULL if the node has no children.
+   * @return The last child, or 0 if the node has no children.
    */
   Tree<T>* last_child() const
   {
@@ -402,7 +406,7 @@ public:
 
   /** Gets the nth child.
    *
-   * @return The nth child, or NULL if n is too large.
+   * @return The nth child, or 0 if n is too large.
    */
   Tree<T>* nth_child(int n) const
   {
@@ -411,7 +415,7 @@ public:
   _IGNORE(g_node_nth_child)
 
   /** Gets the first sibling
-   * @return The first sibling, or NULL if the node has no siblings.
+   * @return The first sibling, or 0 if the node has no siblings.
    */
   Tree<T>* first_sibling() const
   {
@@ -421,7 +425,7 @@ public:
 
   /** Gets the previous sibling.
    *
-   * @return The previous sibling, or NULL if the node has no siblings.
+   * @return The previous sibling, or 0 if the node has no siblings.
    */
   Tree<T>* prev_sibling() const
   {
@@ -431,7 +435,7 @@ public:
 
   /** Gets the next sibling
    *
-   * @return The next sibling, or NULL if the node has no siblings.
+   * @return The next sibling, or 0 if the node has no siblings.
    */
   Tree<T>* next_sibling() const
   {
@@ -441,7 +445,7 @@ public:
 
   /** Gets the last sibling.
    *
-   * @return The last sibling, or NULL if the node has no siblings.
+   * @return The last sibling, or 0 if the node has no siblings.
    */
   Tree<T>* last_sibling() const
   {
@@ -542,93 +546,104 @@ public:
   }
 
   /// Accessor for this node's data
-  T& data() const{ return *(reinterpret_cast<T*>(gobject_->data)); }
+  T& data() const
+  {
+    return *(reinterpret_cast<T*>(gobject_->data));
+  }
 
   /** Lookup a child by its iterator.
    *
    * @param child The iterator of the desired child.
-   * @return The child if found, else NULL.
+   * @return The child if found, else 0.
    */
   Tree<T>* lookup(const iterator child) const
   {
     typename NodeMap::const_iterator i = children_.find(child);
-    return (children_.end() == i)? NULL: i->second;
+    return (children_.end() == i)? 0: i->second;
   }
 
-  /// For auto-wrapping
+  // For auto-wrapping
   GNode*       gobj()       { return gobject_; }
   const GNode* gobj() const { return gobject_; }
 
-  /// Leaving these unimplemented for now
+  // Leaving these unimplemented for now
   _IGNORE(g_node_copy)
   _IGNORE(g_node_copy_deep)
 
 protected:
-  GNode *gobject_;
-  bool owns_gobject_;
 
-  /// Some metadata must be stored
-  NodeMap children_;
-  Tree<T> *parent_;
-
-  /** Accessor for this node's parent
+  /** Accessor for this node's parent.
    *
-   * @param newparent A new parent for this node, 
-   * NULL to get the current parent.
+   * @param newparent Provides a new parent for this node. Use 0 to get the current parent.
    * @return The node's parent.
    */
-  Tree<T>* parent(Tree<T> *newparent = NULL)
+  Tree<T>* parent(Tree<T> *newparent = 0)
   {
-    return (NULL == newparent)? parent_: (parent_ = newparent);
+    return (0 == newparent) ? parent_: (parent_ = newparent);
   }
 
-  /// Wrapper for invoking a TraverseFunc
-  static gboolean wrap_traverse_slot(GNode *node, gpointer slot)
+  /// Wrapper for invoking a TraverseFunc.
+  static gboolean wrap_traverse_slot(GNode* node, gpointer slot)
   {
     TraverseFunc tf = reinterpret_cast<TraverseFunc>(slot);
-    return ((*tf)(*(reinterpret_cast<T*>(node->data))))? 1: 0;
+    if(tf)
+      return ((*tf)(*(reinterpret_cast<T*>(node->data)))) ? TRUE : FALSE;
+    else
+      return FALSE;
   }
 
-  /// Wrapper for invoking a ForeachFunc
-  static void wrap_foreach_slot(GNode *node, gpointer slot)
+  /// Wrapper for invoking a ForeachFunc.
+  static void wrap_foreach_slot(GNode* node, gpointer slot)
   {
     ForeachFunc ff = reinterpret_cast<ForeachFunc>(slot);
-    (*ff)(*(reinterpret_cast<T*>(node->data)));
+    if(ff)
+      (*ff)(*(reinterpret_cast<T*>(node->data)));
   }
 
   /// Method for comparing a single child (Internal use).
-  static void compare_child(GNode *node, const T& needle, GNode *result)
+  static void on_compare_child(GNode* node, const T& needle, GNode* result)
   {
-    if((NULL != result) && ((*(reinterpret_cast<T*>(node->data))) == needle))
+    if((0 != result) && ((*(reinterpret_cast<T*>(node->data))) == needle))
     {
       result = node;
     }
   }
 
   /// Wrapper for invoking a sigc::slot<void,GNode*> (Internal use).
-  static void wrap_compare_child(GNode *node, gpointer slot)
+  static void on_wrap_compare_child(GNode* node, gpointer data)
   {
-    sigc::slot<void,GNode*> *tmp = reinterpret_cast<sigc::slot<void,GNode*>*>(slot);
-    (*tmp)(node);
+    type_foreach_gnode_slot* slot = reinterpret_cast<type_foreach_gnode_slot*>(data);
+    (*slot)(node);
   }
 
   /// Method for comparing a single node (Internal use).
-  static gboolean compare_node(GNode *node, const T& needle, GNode **result)
+  static gboolean on_compare_node(GNode* node, const T& needle, GNode** result)
   {
     if((*(reinterpret_cast<T*>(node->data))) == needle)
     {
       *result = node;
       return TRUE;
     }
+
     return FALSE;
   }
 
   /// Wrapper for invoking a sigc::slot<gboolean,GNode*> (Internal use).
-  static gboolean wrap_compare_node(GNode *node, gpointer slot)
+  static gboolean on_wrap_compare_node(GNode* node, gpointer data)
   {
-    sigc::slot<gboolean,GNode*> *tmp = reinterpret_cast<sigc::slot<gboolean,GNode*>*>(slot);
-    return (*tmp)(node);
+    type_traverse_gnode_slot* slot = reinterpret_cast<type_traverse_gnode_slot*>(data);
+    return (*slot)(node);
   }
+
+  typedef sigc::slot<gboolean, GNode*> type_traverse_gnode_slot;
+  typedef sigc::slot<void, GNode*> type_foreach_gnode_slot;
+
+  GNode* gobject_;
+  bool owns_gobject_;
+
+  // Some metadata must be stored.
+  NodeMap children_;
+  Tree<T>* parent_;
 };
 
 } // namespace Glib
