@@ -243,7 +243,7 @@ File::replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>&
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_replace_async(gobj(),
-                       etag.c_str(),
+                       etag.empty() ? NULL : etag.c_str(),
                        make_backup,
                        static_cast<GFileCreateFlags>(flags),
                        io_priority,
@@ -261,7 +261,7 @@ File::replace_async(const SlotAsyncReady& slot, const std::string& etag, bool ma
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_replace_async(gobj(),
-                       etag.c_str(),
+                       etag.empty() ? NULL : etag.c_str(),
                        make_backup,
                        static_cast<GFileCreateFlags>(flags),
                        io_priority,
@@ -1513,7 +1513,7 @@ Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& ca
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1532,7 +1532,7 @@ Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
