@@ -1284,7 +1284,7 @@ void File::replace_contents(const char* contents, gsize length, const std::strin
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
-  g_file_replace_contents(gobj(), contents, length, etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+  g_file_replace_contents(gobj(), contents, length, etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1307,7 +1307,7 @@ void File::replace_contents(const char* contents, gsize length, const std::strin
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
-  g_file_replace_contents(gobj(), contents, length, etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
+  g_file_replace_contents(gobj(), contents, length, etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1330,7 +1330,7 @@ void File::replace_contents(const std::string& contents, const std::string& etag
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
-  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1353,7 +1353,7 @@ void File::replace_contents(const std::string& contents, const std::string& etag
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
-  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
+  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1385,7 +1385,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   g_file_replace_contents_async(gobj(),
                                 contents,
                                 length,
-                                etag.c_str(),
+                                etag.empty() ? NULL : etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
                                 cancellable->gobj(),
@@ -1409,7 +1409,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   g_file_replace_contents_async(gobj(),
                                 contents,
                                 length,
-                                etag.c_str(),
+                                etag.empty() ? NULL : etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
                                 NULL,
@@ -1433,7 +1433,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   g_file_replace_contents_async(gobj(),
                                 contents.c_str(),
                                 contents.size(),
-                                etag.c_str(),
+                                etag.empty() ? NULL : etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
                                 cancellable->gobj(),
@@ -1456,7 +1456,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   g_file_replace_contents_async(gobj(),
                                 contents.c_str(),
                                 contents.size(),
-                                etag.c_str(),
+                                etag.empty() ? NULL : etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
                                 NULL,
