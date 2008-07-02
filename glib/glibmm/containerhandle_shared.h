@@ -54,11 +54,16 @@ namespace Glib
 /**
  * @ingroup ContHandles
  */
+ 
+//! Ownership of the container
+/*! Defines how and if the container will release the list and 
+ * its elemens when it is destroyed 
+ */
 enum OwnershipType
 {
-  OWNERSHIP_NONE = 0,
-  OWNERSHIP_SHALLOW, //Release the list, but not its elements, when the container is deleted
-  OWNERSHIP_DEEP //Release the list, and its elements, when the container is deleted.
+  OWNERSHIP_NONE = 0, /*!< Do not release anything */
+  OWNERSHIP_SHALLOW, /*!< Release the list, but not its elements, when the container is deleted */
+  OWNERSHIP_DEEP /*!< Release the list, and its elements, when the container is deleted. */
 };
 
 
