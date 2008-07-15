@@ -1043,6 +1043,14 @@
   )
 )
 
+(define-function g_content_type_from_mime_type
+  (c-name "g_content_type_from_mime_type")
+  (return-type "char*")
+  (parameters
+    '("const-char*" "mime_type")
+  )
+)
+
 (define-function g_content_type_guess
   (c-name "g_content_type_guess")
   (return-type "char*")
@@ -1339,6 +1347,14 @@
   (return-type "GDesktopAppInfo*")
   (parameters
     '("const-char*" "filename")
+  )
+)
+
+(define-function g_desktop_app_info_new_from_keyfile
+  (c-name "g_desktop_app_info_new_from_keyfile")
+  (return-type "GDesktopAppInfo*")
+  (parameters
+    '("GKeyFile*" "key_file")
   )
 )
 
@@ -1651,6 +1667,12 @@
   )
 )
 
+(define-method get_container
+  (of-object "GFileEnumerator")
+  (c-name "g_file_enumerator_get_container")
+  (return-type "GFile*")
+)
+
 
 
 ;; From gfile.h
@@ -1959,6 +1981,16 @@
   )
 )
 
+(define-method query_file_type
+  (of-object "GFile")
+  (c-name "g_file_query_file_type")
+  (return-type "GFileType")
+  (parameters
+    '("GFileQueryInfoFlags" "flags")
+    '("GCancellable*" "cancellable")
+  )
+)
+
 (define-method query_info
   (of-object "GFile")
   (c-name "g_file_query_info")
@@ -2208,6 +2240,16 @@
 (define-method make_directory
   (of-object "GFile")
   (c-name "g_file_make_directory")
+  (return-type "gboolean")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method make_directory_with_parents
+  (of-object "GFile")
+  (c-name "g_file_make_directory_with_parents")
   (return-type "gboolean")
   (parameters
     '("GCancellable*" "cancellable")
@@ -2491,6 +2533,17 @@
 (define-method monitor_file
   (of-object "GFile")
   (c-name "g_file_monitor_file")
+  (return-type "GFileMonitor*")
+  (parameters
+    '("GFileMonitorFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method monitor
+  (of-object "GFile")
+  (c-name "g_file_monitor")
   (return-type "GFileMonitor*")
   (parameters
     '("GFileMonitorFlags" "flags")
@@ -3552,6 +3605,10 @@
 
 
 
+;; From gioenums.h
+
+
+
 ;; From gioenumtypes.h
 
 (define-function g_app_info_create_flags_get_type
@@ -3566,6 +3623,21 @@
 
 (define-function g_data_stream_newline_type_get_type
   (c-name "g_data_stream_newline_type_get_type")
+  (return-type "GType")
+)
+
+(define-function g_file_attribute_type_get_type
+  (c-name "g_file_attribute_type_get_type")
+  (return-type "GType")
+)
+
+(define-function g_file_attribute_info_flags_get_type
+  (c-name "g_file_attribute_info_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_file_attribute_status_get_type
+  (c-name "g_file_attribute_status_get_type")
   (return-type "GType")
 )
 
@@ -3596,21 +3668,6 @@
 
 (define-function g_file_monitor_flags_get_type
   (c-name "g_file_monitor_flags_get_type")
-  (return-type "GType")
-)
-
-(define-function g_file_attribute_type_get_type
-  (c-name "g_file_attribute_type_get_type")
-  (return-type "GType")
-)
-
-(define-function g_file_attribute_info_flags_get_type
-  (c-name "g_file_attribute_info_flags_get_type")
-  (return-type "GType")
-)
-
-(define-function g_file_attribute_status_get_type
-  (c-name "g_file_attribute_status_get_type")
   (return-type "GType")
 )
 
@@ -3847,6 +3904,10 @@
 
 
 
+;; From giotypes.h
+
+
+
 ;; From gloadableicon.h
 
 (define-function g_loadable_icon_get_type
@@ -4000,6 +4061,12 @@
   (return-type "gsize")
 )
 
+(define-method get_data_size
+  (of-object "GMemoryOutputStream")
+  (c-name "g_memory_output_stream_get_data_size")
+  (return-type "gsize")
+)
+
 
 
 ;; From gmount.h
@@ -4118,6 +4185,28 @@
   (of-object "GMount")
   (c-name "g_mount_remount_finish")
   (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method guess_content_type
+  (of-object "GMount")
+  (c-name "g_mount_guess_content_type")
+  (return-type "none")
+  (parameters
+    '("gboolean" "force_rescan")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method guess_content_type_finish
+  (of-object "GMount")
+  (c-name "g_mount_guess_content_type_finish")
+  (return-type "gchar**")
   (parameters
     '("GAsyncResult*" "result")
     '("GError**" "error")
@@ -4722,6 +4811,15 @@
   )
 )
 
+(define-method prepend_name
+  (of-object "GThemedIcon")
+  (c-name "g_themed_icon_prepend_name")
+  (return-type "none")
+  (parameters
+    '("const-char*" "iconname")
+  )
+)
+
 (define-method append_name
   (of-object "GThemedIcon")
   (c-name "g_themed_icon_append_name")
@@ -4972,6 +5070,15 @@
   (return-type "GUnixMountMonitor*")
 )
 
+(define-method set_rate_limit
+  (of-object "GUnixMountMonitor")
+  (c-name "g_unix_mount_monitor_set_rate_limit")
+  (return-type "none")
+  (parameters
+    '("int" "limit_msec")
+  )
+)
+
 (define-function g_unix_is_mount_path_system_internal
   (c-name "g_unix_is_mount_path_system_internal")
   (return-type "gboolean")
@@ -5176,6 +5283,12 @@
   (return-type "char**")
 )
 
+(define-method get_activation_root
+  (of-object "GVolume")
+  (c-name "g_volume_get_activation_root")
+  (return-type "GFile*")
+)
+
 
 
 ;; From gvolumemonitor.h
@@ -5242,5 +5355,13 @@
   (c-name "g_win32_app_info_get_type")
   (return-type "GType")
 )
+
+
+
+;; From gwin32mount.h
+
+
+
+;; From gwin32volumemonitor.h
 
 
