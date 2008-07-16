@@ -151,6 +151,43 @@ void Mount::eject(MountUnmountFlags flags)
 }
 
 
+void Mount::guess_content_type(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, bool force_rescan)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_mount_guess_content_type(gobj(),
+                  force_rescan,
+                  cancellable->gobj(), 
+                  &SignalProxy_async_callback,
+                  slot_copy);
+}
+
+void Mount::guess_content_type(const SlotAsyncReady& slot, bool force_rescan)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_mount_guess_content_type(gobj(),
+                  force_rescan,
+                  NULL, 
+                  &SignalProxy_async_callback,
+                  slot_copy);
+}
+
+void Mount::guess_content_type(bool force_rescan)
+{
+  g_mount_guess_content_type(gobj(),
+                  force_rescan,
+                  NULL, 
+                  NULL,
+                  NULL);
+}
+
 
 } // namespace Gio
 

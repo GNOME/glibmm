@@ -567,7 +567,6 @@ public:
 
   _WRAP_METHOD(bool query_exists(const Glib::RefPtr<Cancellable>& cancellable) const, g_file_query_exists)
 
-
   /** Utility function to check if a particular file exists. This is
    * implemented using query_info() and as such does blocking I/O.
    *
@@ -595,6 +594,21 @@ public:
    */
   bool query_exists() const;
 
+
+  _WRAP_METHOD(FileType query_file_type(FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable) const, g_file_query_file_type)
+
+  /** Utility function to inspect the #GFileType of a file. This is
+   * implemented using query_info() and as such does blocking I/O.
+   *
+   * The primary use case of this method is to check if a file is a regular file,
+   * directory, or symlink.
+   * 
+   * @param flags: a set of FileQueryInfoFlags passed to query_info().
+   * @results The FileType of the file, or FILE_TYPE_UNKNOWN if the file does not exist.
+   *
+   * @newin2p18
+   */
+   FileType query_file_type(FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE) const;
 
   /** Asynchronously gets the requested information about specified file. The result is a FileInfo object that contains key-value attributes (such as type or size for the file).
    *
@@ -1109,7 +1123,13 @@ public:
                g_file_make_directory,
                errthrow)
 
-  /** Creates a directory.
+  /** Creates a directory. 
+   * Note that this will only create a child directory of the immediate parent 
+   * directory of the path or URI given by the File. To recursively create 
+   * directories, see make_directory_with_parents(). This function will fail if 
+   * the parent directory does not exist, throwing an exception with 
+   * IO_ERROR_NOT_FOUND. If the file system doesn't support creating directories, 
+   * this function will fail, throwing an exception with IO_ERROR_NOT_SUPPORTED. 
    * 
    * @return <tt>true</tt> on successful creation, <tt>false</tt> otherwise.
    */
@@ -1117,6 +1137,25 @@ public:
   bool make_directory();
 #else
   bool make_directory(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+
+  _WRAP_METHOD(bool make_directory_with_parents(const Glib::RefPtr<Cancellable>& cancellable),
+               g_file_make_directory_with_parents,
+               errthrow)
+
+  /** Creates a directory and any parent directories that may not exist, similar to 'mkdir -p'. 
+   * If the file system does not support creating directories, this function will fail, 
+   * throwing an exception with IO_ERROR_NOT_SUPPORTED.
+   * 
+   * @return <tt>true</tt> on successful creation, <tt>false</tt> otherwise.
+   *
+   * @newin2p18
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool make_directory_with_parents();
+#else
+  bool make_directory_with_parents(std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   _WRAP_METHOD(bool make_symbolic_link(const std::string& symlink_value, const Glib::RefPtr<Cancellable>& cancellable),
@@ -1620,6 +1659,45 @@ public:
   Glib::RefPtr<FileMonitor> monitor_file(FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_monitor_file)
+
+
+  /** Obtains a file monitor for the given file. If no file notification
+   * mechanism exists, then regular polling of the file is used.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
+   *
+   * @param flags A set of FileMonitorFlags.
+   * @param A Cancellable object.
+   * @return A FileMonitor for the file.
+   *
+   * @newin2p18
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileMonitor> monitor(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags = FILE_MONITOR_NONE);
+#else
+  Glib::RefPtr<FileMonitor> monitor(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Obtains a file monitor for the given file. If no file notification
+   * mechanism exists, then regular polling of the file is used.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
+   *
+   * @param flags A set of FileMonitorFlags.
+   * @param A Cancellable object.
+   * @return A FileMonitor for the file.
+   *
+   * @newin2p18
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileMonitor> monitor(FileMonitorFlags flags = FILE_MONITOR_NONE);
+#else
+  Glib::RefPtr<FileMonitor> monitor(FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_monitor)
+
 
   _WRAP_METHOD(Glib::RefPtr<AppInfo> query_default_handler(const Glib::RefPtr<Cancellable>& cancellable),
                g_file_query_default_handler,

@@ -47,6 +47,7 @@ _CONVERSION(`Glib::RefPtr<File>',`GFile*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<File>&',`GFile*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::File))
 _CONVERSION(`GFile*',`Glib::RefPtr<File>',`Glib::wrap($3)')
+_CONVERSION(`GFile*',`Glib::RefPtr<const File>',`Glib::wrap($3)')
 
 
 # FileAttribute

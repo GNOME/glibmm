@@ -313,6 +313,10 @@ bool File::query_exists() const
   return g_file_query_exists(const_cast<GFile*>(gobj()), NULL);
 }
 
+FileType File::query_file_type(FileQueryInfoFlags flags) const
+{
+  return (FileType)g_file_query_file_type(const_cast<GFile*>(gobj()), (GFileQueryInfoFlags)flags, NULL);
+}
 
 void
 File::query_info_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags, int io_priority) const
@@ -1619,6 +1623,46 @@ Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags,  std::auto_
 
   return retvalue;
 }
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileMonitor> File::monitor(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
+#else
+Glib::RefPtr<FileMonitor> File::monitor(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags,  std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileMonitor> File::monitor(FileMonitorFlags flags)
+#else
+Glib::RefPtr<FileMonitor> File::monitor(FileMonitorFlags flags,  std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileInputStream> File::read()

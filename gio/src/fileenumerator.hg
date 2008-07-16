@@ -23,12 +23,15 @@
 #include <giomm/asyncresult.h>
 #include <giomm/cancellable.h>
 #include <giomm/fileinfo.h>
+//#include <giomm/file.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gio
 {
+
+class File;
 
 //TODO: Consider wrapping this like a std::iterator (or at least renaming it), though the asyncness probably makes that unsuitable.
 
@@ -155,6 +158,9 @@ public:
   _WRAP_METHOD(bool is_closed() const, g_file_enumerator_is_closed)
   _WRAP_METHOD(bool has_pending() const, g_file_enumerator_has_pending)
   _WRAP_METHOD(void set_pending(bool pending = true), g_file_enumerator_set_pending)
+
+  _WRAP_METHOD(Glib::RefPtr<File> get_container(), g_file_enumerator_get_container, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const File> get_container() const, g_file_enumerator_get_container, refreturn)
 };
 
 } // namespace Gio
