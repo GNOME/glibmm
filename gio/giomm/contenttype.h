@@ -22,6 +22,7 @@
 #include <glibmm/ustring.h>
 #include <glibmm/listhandle.h>
 #include <giomm/icon.h>
+#include <giomm/file.h>
 #include <string>
 
 namespace Gio
@@ -126,6 +127,22 @@ Glib::ustring content_type_guess(const std::string& filename,
 Glib::ustring content_type_guess(const std::string& filename,
                                  const std::string& data, 
                                  bool& result_uncertain);
+
+/** Tries to guess the type of the tree with root @a root, by
+ * looking at the files it contains. The result is a list
+ * of content types, with the best guess coming first.
+ *
+ * The types returned all have the form x-content/foo, e.g.
+ * x-content/audio-cdda (for audio CDs) or x-content/image-dcf 
+ * (for a camera memory card). See the <ulink url="http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec">shared-mime-info</ulink>
+ * specification for more on x-content types.
+ *
+ * @param root The root of the tree to guess a type for.
+ * @return List of zero or more content types.
+ *
+ * @newin2p18
+ */
+Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const File>& root);
 
 /**
  * Gets a list of strings containing all the registered content types

@@ -90,6 +90,12 @@ Glib::ustring content_type_guess(const std::string& filename,
   return Glib::convert_return_gchar_ptr_to_ustring(cresult);
 }
 
+Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const File>& root)
+{
+  return Glib::StringArrayHandle(g_content_type_guess_for_tree(const_cast<GFile*>(root->gobj())),
+    Glib::OWNERSHIP_DEEP);
+}
+
 Glib::ListHandle<Glib::ustring> content_types_get_registered()
 {
   return Glib::ListHandle<Glib::ustring>(g_content_types_get_registered(),
