@@ -46,6 +46,7 @@
 #include <glibmm/markup.h>
 #include <glibmm/miscutils.h>
 #include <glibmm/module.h>
+#include <glibmm/nodetree.h>
 #include <glibmm/objectbase.h>
 #include <glibmm/object.h>
 #include <glibmm/optioncontext.h>
@@ -67,7 +68,6 @@
 #include <glibmm/threadpool.h>
 #include <glibmm/timer.h>
 #include <glibmm/timeval.h>
-#include <glibmm/tree.h>
 #include <glibmm/uriutils.h>
 #include <glibmm/ustring.h>
 #include <glibmm/value.h>
