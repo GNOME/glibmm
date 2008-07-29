@@ -31,7 +31,7 @@ _DEFS(glibmm,glib)
 namespace Glib
 {
 
-_WRAP_ENUM(TraverseFlags, GTraverseFlags, NO_GTYPE)
+//TODO: NO_GTYPE shouldn't be necessary.
 _WRAP_ENUM(TraverseType, GTraverseType, NO_GTYPE)
 
 /** N-ary Trees — trees of data with any number of branches
@@ -230,8 +230,21 @@ public:
   {
     return wrap(g_node_get_root(gobj()));
   }
-
   _IGNORE(g_node_get_root)
+
+
+  /** Specifies which nodes are visited during several of the NodeTree methods,
+   *  including traverse() and find().
+   *
+   * @ingroup glibmmEnums
+   */
+  enum TraverseFlags
+  {
+    TRAVERSE_LEAVES = G_TRAVERSE_LEAVES,
+    TRAVERSE_NON_LEAVES = G_TRAVERSE_NON_LEAVES,
+    TRAVERSE_ALL = G_TRAVERSE_ALL,
+    TRAVERSE_MASK = G_TRAVERSE_MASK
+  };
 
   /** Traverses a tree starting at the current node.
    * It calls the given function for each node visited. 
