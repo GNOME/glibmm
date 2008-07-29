@@ -41,7 +41,6 @@ sublib_files_extra_general_cc = \
   threadpool.cc \
   timer.cc \
   timeval.cc \
-  tree.cc \
   ustring.cc \
   utility.cc \
   value.cc \
