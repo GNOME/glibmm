@@ -36,58 +36,56 @@ int main()
   tc.append(te);
   te.prepend_data(f);
 
-  const type_nodetree_string::TraverseFlags flags = 
-     type_nodetree_string::TraverseFlags(type_nodetree_string::TRAVERSE_LEAVES | type_nodetree_string::TRAVERSE_NON_LEAVES);
 
   std::cout << "Breadth-first:" << std::endl;
-  ta.traverse(Glib::LEVEL_ORDER, flags, INT_MAX, echoslot);
+  ta.traverse(echoslot, Glib::LEVEL_ORDER);
   std::cout << std::endl;
 
   std::cout << "Depth-first (pre):" << std::endl;
-  ta.traverse(Glib::PRE_ORDER, flags, INT_MAX, echoslot);
+  ta.traverse(echoslot, Glib::PRE_ORDER);
   std::cout << std::endl;
 
   std::cout << "Depth-first (in):" << std::endl;
-  ta.traverse(Glib::IN_ORDER, flags, INT_MAX, echoslot);
+  ta.traverse(echoslot, Glib::IN_ORDER);
   std::cout << std::endl;
 
   std::cout << "Depth-first (post):" << std::endl;
-  ta.traverse(Glib::POST_ORDER, flags, INT_MAX, echoslot);
+  ta.traverse(echoslot, Glib::POST_ORDER);
   std::cout << std::endl;
 
   std::cout << "Leaf children of 'a':" << std::endl;
-  ta.foreach(type_nodetree_string::TRAVERSE_ALL, sigc::bind<bool>(sigc::ptr_fun(echol), true));
+  ta.foreach(sigc::bind<bool>(sigc::ptr_fun(echol), true));
   std::cout << std::endl;
 
   std::cout << "Non-leaf children of 'a':" << std::endl;
-  ta.foreach(type_nodetree_string::TRAVERSE_ALL, sigc::bind<bool>(sigc::ptr_fun(echol), false));
+  ta.foreach(sigc::bind<bool>(sigc::ptr_fun(echol), false));
   std::cout << std::endl;
 
-  type_nodetree_string* tmp = ta.find(Glib::IN_ORDER, flags, e);
+  type_nodetree_string* tmp = ta.find(e, Glib::IN_ORDER);
   if(!tmp)
     std::cout << e << " not found" << std::endl;
   else
     std::cout << "Found " << (tmp->data()) << std::endl;
 
-  tmp = ta.find(Glib::IN_ORDER, flags, a);
+  tmp = ta.find(a, Glib::IN_ORDER);
   if(!tmp)
     std::cout << a << " not found" << std::endl;
   else
     std::cout << "Found " << (tmp->data()) << std::endl;
 
-  tmp = ta.find(Glib::IN_ORDER, flags, "f");
+  tmp = ta.find("f", Glib::IN_ORDER);
   if(!tmp)
     std::cout << a << " not found" << std::endl;
   else
     std::cout << "Found " << (tmp->data()) << std::endl;
 
-  tmp = ta.find_child(flags, e);
+  tmp = ta.find_child(e);
   if(!tmp)
     std::cout << e << " is not a child of " << (ta.data()) << std::endl;
   else
     std::cout << "Mistakenly found " << e << " in " << (ta.data()) << "'s children" << std::endl;
 
-  tmp = ta.find_child(flags, c);
+  tmp = ta.find_child(c);
   if(!tmp)
     std::cout << c << " is the number " << ta.child_index(c) << " child of " << (ta.data()) << std::endl;
   else
