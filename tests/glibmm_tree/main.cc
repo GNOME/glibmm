@@ -1,13 +1,13 @@
 #include <iostream>
 #include <glibmm.h>
 
-bool echo(Glib::Tree<std::string>& i)
+bool echo(Glib::NodeTree<std::string>& i)
 {
   std::cout << i.data() << ' ';
   return false;
 }
 
-void echol(Glib::Tree<std::string>& i, bool is_leaf)
+void echol(Glib::NodeTree<std::string>& i, bool is_leaf)
 {
   if(i.is_leaf() == is_leaf)
     std::cout << i.data() << ' ';
@@ -23,12 +23,12 @@ int main()
               e("e"),
               f("f");
 
-  Glib::Tree<std::string> ta(a),
+  Glib::NodeTree<std::string> ta(a),
                           tb(b),
                           tc(c),
                           te(e);
 
-  sigc::slot<bool, Glib::Tree<std::string>&> echoslot = sigc::ptr_fun(echo);
+  sigc::slot<bool, Glib::NodeTree<std::string>&> echoslot = sigc::ptr_fun(echo);
 
 
   ta.insert(0, tc);
@@ -61,7 +61,7 @@ int main()
   ta.foreach(Glib::TRAVERSE_ALL, sigc::bind<bool>(sigc::ptr_fun(echol), false));
   std::cout << std::endl;
 
-  Glib::Tree<std::string> *tmp = ta.find(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, e);
+  Glib::NodeTree<std::string>* tmp = ta.find(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, e);
   if(!tmp)
     std::cout << e << " not found" << std::endl;
   else

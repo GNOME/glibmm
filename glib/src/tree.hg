@@ -35,7 +35,7 @@ _WRAP_ENUM(TraverseFlags, GTraverseFlags, NO_GTYPE)
 _WRAP_ENUM(TraverseType, GTraverseType, NO_GTYPE)
 
 /** N-ary Trees — trees of data with any number of branches
- * The Tree class and its associated functions provide an N-ary tree data structure, in which nodes in the tree can contain arbitrary data.
+ * The NodeTree class and its associated functions provide an N-ary tree data structure, in which nodes in the tree can contain arbitrary data.
  * 
  * To insert a node into a tree use insert(), insert_before(), append() or prepend().
  * 
@@ -54,24 +54,24 @@ _WRAP_ENUM(TraverseType, GTraverseType, NO_GTYPE)
  * @newin2p18
  */
 template <typename T> 
-class Tree
+class NodeTree
 {
-  _CLASS_GENERIC(Tree, GNode)
+  _CLASS_GENERIC(NodeTree, GNode)
 public:
-  typedef sigc::slot<bool, Tree<T>&> TraverseFunc;
-  typedef sigc::slot<void, Tree<T>&> ForeachFunc;
+  typedef sigc::slot<bool, NodeTree<T>&> TraverseFunc;
+  typedef sigc::slot<void, NodeTree<T>&> ForeachFunc;
 
 private:
-  static Tree<T>* wrap(GNode* node)
+  static NodeTree<T>* wrap(GNode* node)
   {
     if (!node)
       return 0;
 
-    return reinterpret_cast<Tree<T>* >(node->data);
+    return reinterpret_cast<NodeTree<T>* >(node->data);
   }
 
 public:
-  explicit Tree(T& data) :
+  explicit NodeTree(T& data) :
     data_(data)
   {
     //Store the this pointer in the GNode so we can discover this wrapper later:
@@ -82,47 +82,47 @@ public:
   /** Removes the instance and its children from the tree,
    * freeing any memory allocated.
    */
-  ~Tree()
+  ~NodeTree()
   {
     g_node_destroy(gobj());
   };
   _IGNORE(g_node_destroy)
 
 
-  /** Inserts a Tree beneath the parent at the given position.
+  /** Inserts a NodeTree beneath the parent at the given position.
    *
    * @param position the position to place node at, with respect to its siblings 
    * If position is -1, node is inserted as the last child of parent
-   * @param node the Tree to insert
-   * @return the inserted Tree
+   * @param node the NodeTree to insert
+   * @return the inserted NodeTree
    */
-  Tree<T>& insert(int position, Tree<T>& node)
+  NodeTree<T>& insert(int position, NodeTree<T>& node)
   {
     g_node_insert(gobj(), position, node.gobj());
     return node;
   }
   _IGNORE(g_node_insert)
 
-  /** Inserts a Tree beneath the parent before the given sibling.
+  /** Inserts a NodeTree beneath the parent before the given sibling.
    *
-   * @param sibling the sibling Tree to place node before.
-   * @param node the Tree to insert
-   * @return the inserted Tree
+   * @param sibling the sibling NodeTree to place node before.
+   * @param node the NodeTree to insert
+   * @return the inserted NodeTree
    */
-  Tree<T>& insert_before(Tree<T>& sibling, Tree<T>& node)
+  NodeTree<T>& insert_before(NodeTree<T>& sibling, NodeTree<T>& node)
   {
     g_node_insert_before(gobj(), sibling.gobj(), node.gobj());
     return node;
   }
   _IGNORE(g_node_insert_before)
 
-  /** Inserts a Tree beneath the parent after the given sibling.
+  /** Inserts a NodeTree beneath the parent after the given sibling.
    *
-   * @param sibling the sibling Tree to place node after.
-   * @param node the Tree to insert
-   * @return the inserted Tree
+   * @param sibling the sibling NodeTree to place node after.
+   * @param node the NodeTree to insert
+   * @return the inserted NodeTree
    */
-  Tree<T>& insert_after(Tree<T>& sibling, Tree<T>& node)
+  NodeTree<T>& insert_after(NodeTree<T>& sibling, NodeTree<T>& node)
   {
     g_node_insert_after(gobj(), sibling.gobj(), node.gobj());
     return node;
@@ -130,80 +130,80 @@ public:
   _IGNORE(g_node_insert_after)
 
 
-  /** Inserts a Tree as the last child.
+  /** Inserts a NodeTree as the last child.
    *
-   * @param node the Tree to append
-   * @return the new Tree
+   * @param node the NodeTree to append
+   * @return the new NodeTree
    */
-  Tree<T>& append(Tree<T>& node)
+  NodeTree<T>& append(NodeTree<T>& node)
   {
     g_node_append(gobj(), node.gobj());
     return node;
   }
   _IGNORE(g_node_append)
 
-  /** Inserts a Tree as the first child.
+  /** Inserts a NodeTree as the first child.
    *
-   * @param data the data for the Tree
-   * @return the Tree
+   * @param data the data for the NodeTree
+   * @return the NodeTree
    */
-  Tree<T>& prepend(Tree<T>& node)
+  NodeTree<T>& prepend(NodeTree<T>& node)
   {
     g_node_prepend(gobj(), node.gobj());
     return node;
   }
   _IGNORE(g_node_prepend)
 
-  /** Inserts a new Tree at the given position.
+  /** Inserts a new NodeTree at the given position.
    *
-   * @param position the position to place the new Tree at. 
-   * If position is -1, the new Tree is inserted as the last child of parent
-   * @param data the data for the new Tree
-   * @return the new Tree
+   * @param position the position to place the new NodeTree at. 
+   * If position is -1, the new NodeTree is inserted as the last child of parent
+   * @param data the data for the new NodeTree
+   * @return the new NodeTree
    */
-  Tree<T>* insert_data(int position, T& data)
+  NodeTree<T>* insert_data(int position, T& data)
   {
-    Tree<T>* node = new Tree<T>(data);
+    NodeTree<T>* node = new NodeTree<T>(data);
     insert(position, *node);
     return node;
   }
   _IGNORE(g_node_insert_data)
 
-  /** Inserts a new Tree before the given sibling.
+  /** Inserts a new NodeTree before the given sibling.
    *
-   * @param sibling the sibling Tree to place node before. 
-   * @param data the data for the new Tree
-   * @return the new Tree
+   * @param sibling the sibling NodeTree to place node before. 
+   * @param data the data for the new NodeTree
+   * @return the new NodeTree
    */
-  Tree<T>* insert_data_before(Tree<T>& sibling, T& data)
+  NodeTree<T>* insert_data_before(NodeTree<T>& sibling, T& data)
   {
-    Tree<T>* node = new Tree<T>(data);
+    NodeTree<T>* node = new NodeTree<T>(data);
     insert_before(sibling, *node);
     return node;
   }
   _IGNORE(g_node_insert_data_before)
 
-  /** Inserts a new Tree as the last child.
+  /** Inserts a new NodeTree as the last child.
    *
-   * @param data the data for the new Tree
-   * @return the new Tree
+   * @param data the data for the new NodeTree
+   * @return the new NodeTree
    */
-  Tree<T>* append_data(T& data)
+  NodeTree<T>* append_data(T& data)
   {
-    Tree<T>* node = new Tree<T>(data);
+    NodeTree<T>* node = new NodeTree<T>(data);
     append(*node);
     return node;
   }
   _IGNORE(g_node_append_data)
 
-  /** Inserts a new Tree as the first child.
+  /** Inserts a new NodeTree as the first child.
    *
-   * @param data the data for the new Tree
-   * @return the new Tree
+   * @param data the data for the new NodeTree
+   * @return the new NodeTree
    */
-  Tree<T>* prepend_data(T& data)
+  NodeTree<T>* prepend_data(T& data)
   {
-    Tree<T>* node = new Tree<T>(data);
+    NodeTree<T>* node = new NodeTree<T>(data);
     prepend(*node);
     return node;
   }
@@ -221,12 +221,12 @@ public:
    *
    * @return A pointer to the root of the tree.
    */
-  Tree<T>* get_root()
+  NodeTree<T>* get_root()
   {
     return wrap(g_node_get_root(gobj()));
   }
 
-  const Tree<T>* get_root() const
+  const NodeTree<T>* get_root() const
   {
     return wrap(g_node_get_root(gobj()));
   }
@@ -253,7 +253,7 @@ public:
   }
   _IGNORE(g_node_traverse);
 
-  /** Calls a function for each of the children of a Tree.
+  /** Calls a function for each of the children of a NodeTree.
    * Note that it doesn't descend beneath the child nodes.
    *
    * @param flags Wwhich types of children are to be visited: One of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
@@ -266,13 +266,13 @@ public:
   }
   _IGNORE(g_node_children_foreach)
 
-  /** Finds the first child of a Tree with the given data.
+  /** Finds the first child of a NodeTree with the given data.
    *
    * @param flags Which types of children are to be visited, one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
    * @param data The data for which to search.
    * @return the found child, or 0 if the data is not found
    */
-  Tree<T>* find_child(TraverseFlags flags, const T& data)
+  NodeTree<T>* find_child(TraverseFlags flags, const T& data)
   {
     sigc::slot<void, GNode*, const T&, GNode*> real_slot = sigc::ptr_fun(on_compare_child);
 
@@ -284,15 +284,15 @@ public:
     return wrap(child);
   }
 
-  /** Finds the first child of a Tree with the given data.
+  /** Finds the first child of a NodeTree with the given data.
    *
    * @param flags Which types of children are to be visited, one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
    * @param data The data for which to search.
    * @return the found child, or 0 if the data is not found
    */
-  const Tree<T>* find_child(TraverseFlags flags, const T& data) const
+  const NodeTree<T>* find_child(TraverseFlags flags, const T& data) const
   {
-    return const_cast<Tree<T>*>(this)->find_child(flags, data);
+    return const_cast<NodeTree<T>*>(this)->find_child(flags, data);
   }
 
   _IGNORE(g_node_find_child)
@@ -304,7 +304,7 @@ public:
    * @param data The data for which to search.
    * @return The found node, or 0 if the data is not found.
    */
-  Tree<T>* find(TraverseType order, TraverseFlags flags, const T& data)
+  NodeTree<T>* find(TraverseType order, TraverseFlags flags, const T& data)
   {
     //We use a sigc::slot for the C callback, so we can bind some extra data.
     sigc::slot<gboolean, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_node);
@@ -323,9 +323,9 @@ public:
    * @param data The data for which to search.
    * @return The found node, or 0 if the data is not found.
    */
-  const Tree<T>* find(TraverseType order, TraverseFlags flags, const T& data) const
+  const NodeTree<T>* find(TraverseType order, TraverseFlags flags, const T& data) const
   {
-    return const_cast<Tree<T>*>(this)->find(order, flags, data);
+    return const_cast<NodeTree<T>*>(this)->find(order, flags, data);
   }
   _IGNORE(g_node_find)
 
@@ -338,7 +338,7 @@ public:
   {
     int n = 0;
 
-    for(const Tree<T>* i = first_child();  i != 0; i = i->next_sibling())
+    for(const NodeTree<T>* i = first_child();  i != 0; i = i->next_sibling())
     {
       if((i->data()) == data)
         return n;
@@ -357,7 +357,7 @@ public:
    * @param child A child
    * @return The position of @a child with respect to its siblings.
    */
-  int child_position(const Tree<T>& child) const
+  int child_position(const NodeTree<T>& child) const
   {
     return g_node_child_position(gobj(), const_cast<GNode*>(child.gobj()));
   }
@@ -367,7 +367,7 @@ public:
    *
    * @return The first child, or 0 if the node has no children. 
    */
-  Tree<T>* first_child()
+  NodeTree<T>* first_child()
   {
     return wrap(g_node_first_child(gobj()));
   }
@@ -376,9 +376,9 @@ public:
    *
    * @return The first child, or 0 if the node has no children. 
    */
-  const Tree<T>* first_child() const
+  const NodeTree<T>* first_child() const
   {
-    return const_cast<Tree<T>*>(this)->first_child();
+    return const_cast<NodeTree<T>*>(this)->first_child();
   }
   _IGNORE(g_node_first_child)
 
@@ -386,7 +386,7 @@ public:
    *
    * @return The last child, or 0 if the node has no children.
    */
-  Tree<T>* last_child()
+  NodeTree<T>* last_child()
   {
     return wrap(g_node_last_child(gobj()));
   }
@@ -395,9 +395,9 @@ public:
    *
    * @return The last child, or 0 if the node has no children.
    */
-  const Tree<T>* last_child() const
+  const NodeTree<T>* last_child() const
   {
-    return const_cast<Tree<T>*>(this)->last_child();
+    return const_cast<NodeTree<T>*>(this)->last_child();
   }
   _IGNORE(g_node_last_child)
 
@@ -405,7 +405,7 @@ public:
    *
    * @return The nth child, or 0 if n is too large.
    */
-  Tree<T>* nth_child(int n) 
+  NodeTree<T>* nth_child(int n) 
   {
     return wrap(g_node_nth_child(gobj(), n));
   }
@@ -414,16 +414,16 @@ public:
    *
    * @return The nth child, or 0 if n is too large.
    */
-  const Tree<T>* nth_child(int n) const
+  const NodeTree<T>* nth_child(int n) const
   {
-    return const_cast<Tree<T>*>(this)->nth_child(n);
+    return const_cast<NodeTree<T>*>(this)->nth_child(n);
   }
   _IGNORE(g_node_nth_child)
   
   /** Gets the first sibling
    * @return The first sibling, or 0 if the node has no siblings.
    */
-  Tree<T>* first_sibling()
+  NodeTree<T>* first_sibling()
   {
     return wrap(g_node_first_sibling(gobj()));
   }
@@ -431,9 +431,9 @@ public:
   /** Gets the first sibling
    * @return The first sibling, or 0 if the node has no siblings.
    */
-  const Tree<T>* first_sibling() const
+  const NodeTree<T>* first_sibling() const
   {
-    return const_cast<Tree<T>*>(this)->first_sibling();
+    return const_cast<NodeTree<T>*>(this)->first_sibling();
   }
   _IGNORE(g_node_first_sibling)
 
@@ -441,7 +441,7 @@ public:
    *
    * @return The previous sibling, or 0 if the node has no siblings.
    */
-  Tree<T>* prev_sibling()
+  NodeTree<T>* prev_sibling()
   {
     return wrap(g_node_prev_sibling(gobj()));
   }
@@ -450,9 +450,9 @@ public:
    *
    * @return The previous sibling, or 0 if the node has no siblings.
    */
-  const Tree<T>* prev_sibling() const
+  const NodeTree<T>* prev_sibling() const
   {
-    return const_cast<Tree<T>*>(this)->prev_sibling();
+    return const_cast<NodeTree<T>*>(this)->prev_sibling();
   }
   _IGNORE(g_node_prev_sibling)
 
@@ -460,7 +460,7 @@ public:
    *
    * @return The next sibling, or 0 if the node has no siblings.
    */
-  Tree<T>* next_sibling()
+  NodeTree<T>* next_sibling()
   {
     return wrap(g_node_next_sibling(gobj()));
   }
@@ -469,9 +469,9 @@ public:
    *
    * @return The next sibling, or 0 if the node has no siblings.
    */
-  const Tree<T>* next_sibling() const
+  const NodeTree<T>* next_sibling() const
   {
-    return const_cast<Tree<T>*>(this)->next_sibling();
+    return const_cast<NodeTree<T>*>(this)->next_sibling();
   }
   _IGNORE(g_node_next_sibling)
 
@@ -479,7 +479,7 @@ public:
    *
    * @return The last sibling, or 0 if the node has no siblings.
    */
-  Tree<T>* last_sibling()
+  NodeTree<T>* last_sibling()
   {
     return wrap(g_node_last_sibling(gobj()));
   }
@@ -488,9 +488,9 @@ public:
    *
    * @return The last sibling, or 0 if the node has no siblings.
    */
-  const Tree<T>* last_sibling() const
+  const NodeTree<T>* last_sibling() const
   {
-    return const_cast<Tree<T>*>(this)->last_sibling();
+    return const_cast<NodeTree<T>*>(this)->last_sibling();
   }
   _IGNORE(g_node_last_sibling)
 
@@ -552,7 +552,7 @@ public:
    * @param descendant A node.
    * @return true if this is an ancestor of descendant.
    */
-  bool is_ancestor(const Tree<T>& descendant) const
+  bool is_ancestor(const NodeTree<T>& descendant) const
   {
     return g_node_is_ancestor(gobj(), const_cast<GNode*>(descendant.gobj()));
   }
@@ -572,7 +572,7 @@ public:
 
   /** Unlinks a node from a tree, resulting in two separate trees.
    */
-  void unlink(Tree<T>& child)
+  void unlink(NodeTree<T>& child)
   {
     g_node_unlink(child.gobj());
   }
@@ -594,7 +594,7 @@ public:
    *
    * @return The node's parent.
    */
-  const Tree<T>* parent() const
+  const NodeTree<T>* parent() const
   {
     return wrap(gobj()->parent);
   }
