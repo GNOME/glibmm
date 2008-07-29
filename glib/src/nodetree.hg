@@ -31,9 +31,20 @@ _DEFS(glibmm,glib)
 namespace Glib
 {
 
-//TODO: NO_GTYPE shouldn't be necessary.
-//TODO: Add a prefix? Otherwise, it's just Glib::IN_ORDER, etc.
-_WRAP_ENUM(TraverseType, GTraverseType, NO_GTYPE)
+//Hand-written, instead of using _WRAP_ENUM, 
+//because the C enum values don't have a prefix.
+
+/** Specifies the type of traveral performed by methods such as NodeTree::_traverse() and NodeTree::find().
+ * 
+ * @ingroup glibmmEnums
+ */
+enum TraverseType
+{
+  TRAVERSE_IN_ORDER = G_IN_ORDER, /*!< Visits a node's left child first, then the node itself, then its right child. This is the one to use if you want the output sorted according to the compare function.  */
+  TRAVERSE_PRE_ORDER = G_PRE_ORDER, /*!< Visits a node, then its children. */
+  TRAVERSE_POST_ORDER = G_POST_ORDER, /*!< Visits the node's children, then the node itself. */
+  TRAVERSE_LEVEL_ORDER = G_LEVEL_ORDER /*!< For NodeTree, it vists the root node first, then its children, then its grandchildren, and so on. Note that this is less efficient than the other orders. This is not implemented for Glib::Tree. */
+};
 
 /** N-ary Trees — trees of data with any number of branches
  * The NodeTree class and its associated functions provide an N-ary tree data structure, in which nodes in the tree can contain arbitrary data.
@@ -241,18 +252,18 @@ public:
    */
   enum TraverseFlags
   {
-    TRAVERSE_LEAVES = G_TRAVERSE_LEAVES,
-    TRAVERSE_NON_LEAVES = G_TRAVERSE_NON_LEAVES,
-    TRAVERSE_ALL = G_TRAVERSE_ALL,
-    TRAVERSE_MASK = G_TRAVERSE_MASK
+    TRAVERSE_LEAVES = G_TRAVERSE_LEAVES, /*!< Only leaf nodes should be visited. */
+    TRAVERSE_NON_LEAVES = G_TRAVERSE_NON_LEAVES, /*!< Only non-leaf nodes should be visited. */
+    TRAVERSE_ALL = G_TRAVERSE_ALL, /*!< All nodes should be visited. */
+    TRAVERSE_MASK = G_TRAVERSE_MASK /*!< A mask of all traverse flags. */
   };
 
   /** Traverses a tree starting at the current node.
    * It calls the given function for each node visited. 
    * The traversal can be halted at any point by returning true from @a func.
    *
-   * @param order The order in which nodes are visited: IN_ORDER, TRAVERSE_PRE_ORDER, TRAVERSE_POST_ORDER, or TRAVERSE_LEVEL_ORDER.
-   * @param flags Which types of children are to be visited: One of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
+   * @param order The order in which nodes are visited.
+   * @param flags Which types of children are to be visited.
    * @param max_depth The maximum depth of the traversal. 
    * Nodes below this depth will not be visited. 
    * If max_depth is -1 all nodes in the tree are visited.
@@ -260,7 +271,7 @@ public:
    * If max_depth is 2, the root and its children are visited. And so on.
    * @param func the slot to invoke for each visited child
    */
-  void traverse(const TraverseFunc& func, TraverseType order = IN_ORDER, TraverseFlags flags = TRAVERSE_ALL, int max_depth = -1)
+  void traverse(const TraverseFunc& func, TraverseType order = TRAVERSE_IN_ORDER, TraverseFlags flags = TRAVERSE_ALL, int max_depth = -1)
   {
     TraverseFunc func_copy = func;
     g_node_traverse(gobj(), (GTraverseType)order, (GTraverseFlags)flags, max_depth, c_callback_traverse, reinterpret_cast<gpointer>(&func_copy));
@@ -270,7 +281,7 @@ public:
   /** Calls a function for each of the children of a NodeTree.
    * Note that it doesn't descend beneath the child nodes.
    *
-   * @param flags Wwhich types of children are to be visited: One of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
+   * @param flags Wwhich types of children are to be visited.
    * @param func The slot to invoke for each visited node.
    */
   void foreach(const ForeachFunc& func, TraverseFlags flags = TRAVERSE_ALL)
@@ -318,7 +329,7 @@ public:
    * @param data The data for which to search.
    * @return The found node, or 0 if the data is not found.
    */
-  NodeTree<T>* find(const T& data, TraverseType order = IN_ORDER, TraverseFlags flags = TRAVERSE_ALL)
+  NodeTree<T>* find(const T& data, TraverseType order = TRAVERSE_IN_ORDER, TraverseFlags flags = TRAVERSE_ALL)
   {
     //We use a sigc::slot for the C callback, so we can bind some extra data.
     sigc::slot<gboolean, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_node);
@@ -332,12 +343,12 @@ public:
 
   /** Finds a node in a tree.
    *
-   * @param order The order in which nodes are visited: IN_ORDER, TRAVERSE_PRE_ORDER, TRAVERSE_POST_ORDER, or TRAVERSE_LEVEL_ORDER
-   * @param flags Which types of children are to be visited: one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
+   * @param order The order in which nodes are visited.
+   * @param flags Which types of children are to be visited.
    * @param data The data for which to search.
    * @return The found node, or 0 if the data is not found.
    */
-  const NodeTree<T>* find(const T& data, TraverseType order = IN_ORDER, TraverseFlags flags = TRAVERSE_ALL) const
+  const NodeTree<T>* find(const T& data, TraverseType order = TRAVERSE_IN_ORDER, TraverseFlags flags = TRAVERSE_ALL) const
   {
     return const_cast<NodeTree<T>*>(this)->find(order, flags, data);
   }

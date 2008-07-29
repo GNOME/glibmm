@@ -38,19 +38,19 @@ int main()
 
 
   std::cout << "Breadth-first:" << std::endl;
-  ta.traverse(echoslot, Glib::LEVEL_ORDER);
+  ta.traverse(echoslot, Glib::TRAVERSE_LEVEL_ORDER);
   std::cout << std::endl;
 
   std::cout << "Depth-first (pre):" << std::endl;
-  ta.traverse(echoslot, Glib::PRE_ORDER);
+  ta.traverse(echoslot, Glib::TRAVERSE_PRE_ORDER);
   std::cout << std::endl;
 
   std::cout << "Depth-first (in):" << std::endl;
-  ta.traverse(echoslot, Glib::IN_ORDER);
+  ta.traverse(echoslot, Glib::TRAVERSE_IN_ORDER);
   std::cout << std::endl;
 
   std::cout << "Depth-first (post):" << std::endl;
-  ta.traverse(echoslot, Glib::POST_ORDER);
+  ta.traverse(echoslot, Glib::TRAVERSE_POST_ORDER);
   std::cout << std::endl;
 
   std::cout << "Leaf children of 'a':" << std::endl;
@@ -61,19 +61,19 @@ int main()
   ta.foreach(sigc::bind<bool>(sigc::ptr_fun(echol), false));
   std::cout << std::endl;
 
-  type_nodetree_string* tmp = ta.find(e, Glib::IN_ORDER);
+  type_nodetree_string* tmp = ta.find(e);
   if(!tmp)
     std::cout << e << " not found" << std::endl;
   else
     std::cout << "Found " << (tmp->data()) << std::endl;
 
-  tmp = ta.find(a, Glib::IN_ORDER);
+  tmp = ta.find(a);
   if(!tmp)
     std::cout << a << " not found" << std::endl;
   else
     std::cout << "Found " << (tmp->data()) << std::endl;
 
-  tmp = ta.find("f", Glib::IN_ORDER);
+  tmp = ta.find("f");
   if(!tmp)
     std::cout << a << " not found" << std::endl;
   else
