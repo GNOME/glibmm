@@ -2,15 +2,16 @@
 
 #include <glibmm.h>
 
-bool echo(std::string& i)
+bool echo(Glib::Tree<std::string>& i)
 {
-  std::cout << i << ' ';
+  std::cout << i.data() << ' ';
   return false;
 }
 
-void echof(std::string& i)
+void echol(Glib::Tree<std::string>& i, bool is_leaf)
 {
-  std::cout << i << ' ';
+  if(i.is_leaf() == is_leaf)
+    std::cout << i.data() << ' ';
 }
 
 
@@ -28,8 +29,7 @@ int main()
                           tc(c),
                           te(e);
 
-  sigc::slot<bool, std::string&> echoslot = sigc::ptr_fun(echo);
-  sigc::slot<void, std::string&>echofslot = sigc::ptr_fun(echof);
+  sigc::slot<bool, Glib::Tree<std::string>&> echoslot = sigc::ptr_fun(echo);
 
 
   ta.insert(0, tc);
@@ -39,19 +39,27 @@ int main()
   te.prepend_data(f);
 
   std::cout << "Breadth-first:" << std::endl;
-  ta.traverse(Glib::LEVEL_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, INT_MAX, &echoslot);
+  ta.traverse(Glib::LEVEL_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, INT_MAX, echoslot);
   std::cout << std::endl;
 
   std::cout << "Depth-first (pre):" << std::endl;
-  ta.traverse(Glib::PRE_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, INT_MAX, &echoslot);
+  ta.traverse(Glib::PRE_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, INT_MAX, echoslot);
   std::cout << std::endl;
 
   std::cout << "Depth-first (in):" << std::endl;
-  ta.traverse(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, INT_MAX, &echoslot);
+  ta.traverse(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, INT_MAX, echoslot);
   std::cout << std::endl;
 
   std::cout << "Depth-first (post):" << std::endl;
-  ta.traverse(Glib::POST_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, INT_MAX, &echoslot);
+  ta.traverse(Glib::POST_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, INT_MAX, echoslot);
+  std::cout << std::endl;
+
+  std::cout << "Leaf children of 'a':" << std::endl;
+  ta.foreach(Glib::TRAVERSE_ALL, sigc::bind<bool>(sigc::ptr_fun(echol), true));
+  std::cout << std::endl;
+
+  std::cout << "Non-leaf children of 'a':" << std::endl;
+  ta.foreach(Glib::TRAVERSE_ALL, sigc::bind<bool>(sigc::ptr_fun(echol), false));
   std::cout << std::endl;
 
   Glib::Tree<std::string> *tmp = ta.find(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, e);
@@ -62,13 +70,17 @@ int main()
   if(NULL == tmp){ std::cout << a << " not found" << std::endl; }
   else{ std::cout << "Found " << (tmp->data()) << std::endl; }
 
+  tmp = ta.find(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, "f");
+  if(NULL == tmp){ std::cout << a << " not found" << std::endl; }
+  else{ std::cout << "Found " << (tmp->data()) << std::endl; }
+
   tmp = ta.find_child(Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, e);
   if(NULL == tmp){ std::cout << e << " is not a child of " << (ta.data()) << std::endl; }
   else{ std::cout << "Mistakenly found " << e << " in " << (ta.data()) << "'s children" << std::endl; }
 
   tmp = ta.find_child(Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, c);
   if(NULL == tmp) { 
-    std::cout << c << " is the number " << ta.index_of(c) << " child of " << (ta.data()) << std::endl;
+    std::cout << c << " is the number " << ta.child_index(c) << " child of " << (ta.data()) << std::endl;
   }
   else{ std::cout << "Mistakenly didn't find " << c << " in " << (ta.data()) << "'s children" << std::endl; }
 

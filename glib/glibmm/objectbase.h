@@ -136,10 +136,10 @@ public:
    */
   virtual void unreference() const;
 
-  ///Provides access to the underlying C GtkObject.
+  ///Provides access to the underlying C GObject.
   inline GObject*       gobj()       { return gobject_; }
 
-  ///Provides access to the underlying C GtkObject.
+  ///Provides access to the underlying C GObject.
   inline const GObject* gobj() const { return gobject_; }
 
   /// Give a ref-ed copy to someone. Use for direct struct access.
