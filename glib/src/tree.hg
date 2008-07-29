@@ -62,18 +62,19 @@ public:
   typedef sigc::slot<void, Tree<T>&> ForeachFunc;
 
 private:
-  static Tree<T>* wrap(GNode *node)
+  static Tree<T>* wrap(GNode* node)
   {
     if (!node)
       return 0;
 
-    return reinterpret_cast<Tree<T> *>(node->data);
+    return reinterpret_cast<Tree<T>* >(node->data);
   }
 
 public:
   explicit Tree(T& data) :
     data_(data)
   {
+    //Store the this pointer in the GNode so we can discover this wrapper later:
     gobject_ = g_node_new(reinterpret_cast<gpointer>(this));
   };
   _IGNORE(g_node_new)
@@ -162,7 +163,7 @@ public:
    */
   Tree<T>* insert_data(int position, T& data)
   {
-    Tree<T> *node = new Tree<T>(data);
+    Tree<T>* node = new Tree<T>(data);
     insert(position, *node);
     return node;
   }
@@ -176,7 +177,7 @@ public:
    */
   Tree<T>* insert_data_before(Tree<T>& sibling, T& data)
   {
-    Tree<T> *node = new Tree<T>(data);
+    Tree<T>* node = new Tree<T>(data);
     insert_before(sibling, *node);
     return node;
   }
@@ -189,7 +190,7 @@ public:
    */
   Tree<T>* append_data(T& data)
   {
-    Tree<T> *node = new Tree<T>(data);
+    Tree<T>* node = new Tree<T>(data);
     append(*node);
     return node;
   }
@@ -220,10 +221,16 @@ public:
    *
    * @return A pointer to the root of the tree.
    */
-  Tree<T>* root() const
+  Tree<T>* get_root()
   {
     return wrap(g_node_get_root(gobj()));
   }
+
+  const Tree<T>* get_root() const
+  {
+    return wrap(g_node_get_root(gobj()));
+  }
+
   _IGNORE(g_node_get_root)
 
   /** Traverses a tree starting at the current node.
@@ -242,7 +249,7 @@ public:
   void traverse(TraverseType order, TraverseFlags flags, int max_depth, const TraverseFunc &func)
   {
     TraverseFunc func_copy = func;
-    g_node_traverse(gobj(), (GTraverseType)order, (GTraverseFlags)flags, max_depth, wrap_traverse_slot, reinterpret_cast<gpointer>(&func_copy));
+    g_node_traverse(gobj(), (GTraverseType)order, (GTraverseFlags)flags, max_depth, c_callback_traverse, reinterpret_cast<gpointer>(&func_copy));
   }
   _IGNORE(g_node_traverse);
 
@@ -255,64 +262,87 @@ public:
   void foreach(TraverseFlags flags, const ForeachFunc &func)
   {
     ForeachFunc func_copy = func;
-    g_node_children_foreach(gobj(), (GTraverseFlags)flags, wrap_foreach_slot, reinterpret_cast<gpointer>(&func_copy));
+    g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach, reinterpret_cast<gpointer>(&func_copy));
   }
   _IGNORE(g_node_children_foreach)
 
   /** Finds the first child of a Tree with the given data.
    *
    * @param flags Which types of children are to be visited, one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
-   * @param data The data for which to search
+   * @param data The data for which to search.
    * @return the found child, or 0 if the data is not found
    */
-  Tree<T>* find_child(TraverseFlags flags, const T& data) const
+  Tree<T>* find_child(TraverseFlags flags, const T& data)
   {
     sigc::slot<void, GNode*, const T&, GNode*> real_slot = sigc::ptr_fun(on_compare_child);
 
     GNode* child = 0;
     type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, data, child);
 
-    g_node_children_foreach(gobj(), (GTraverseFlags)flags, on_wrap_compare_child, reinterpret_cast<gpointer>(&bound_slot));
+    g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach_compare_child, reinterpret_cast<gpointer>(&bound_slot));
     
     return wrap(child);
   }
+
+  /** Finds the first child of a Tree with the given data.
+   *
+   * @param flags Which types of children are to be visited, one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
+   * @param data The data for which to search.
+   * @return the found child, or 0 if the data is not found
+   */
+  const Tree<T>* find_child(TraverseFlags flags, const T& data) const
+  {
+    return const_cast<Tree<T>*>(this)->find_child(flags, data);
+  }
+
   _IGNORE(g_node_find_child)
 
   /** Finds a node in a tree.
    *
-   * @param order The order in which nodes are visited: 
-   * TRAVERSE_IN_ORDER, TRAVERSE_PRE_ORDER, TRAVERSE_POST_ORDER, or TRAVERSE_LEVEL_ORDER
+   * @param order The order in which nodes are visited: TRAVERSE_IN_ORDER, TRAVERSE_PRE_ORDER, TRAVERSE_POST_ORDER, or TRAVERSE_LEVEL_ORDER
    * @param flags Which types of children are to be visited: one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
+   * @param data The data for which to search.
    * @return The found node, or 0 if the data is not found.
    */
-  Tree<T>* find(TraverseType order, TraverseFlags flags, const T& data) const
+  Tree<T>* find(TraverseType order, TraverseFlags flags, const T& data)
   {
     //We use a sigc::slot for the C callback, so we can bind some extra data.
     sigc::slot<gboolean, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_node);
     GNode* child = 0;
     type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, data, &child);
 
-    g_node_traverse(gobject_, (GTraverseType)order, (GTraverseFlags)flags, -1, on_wrap_compare_node, reinterpret_cast<gpointer>(&bound_slot));
+    g_node_traverse(gobject_, (GTraverseType)order, (GTraverseFlags)flags, -1, c_callback_traverse_compare_node, reinterpret_cast<gpointer>(&bound_slot));
 
     return wrap(child);
+  }
+
+  /** Finds a node in a tree.
+   *
+   * @param order The order in which nodes are visited: TRAVERSE_IN_ORDER, TRAVERSE_PRE_ORDER, TRAVERSE_POST_ORDER, or TRAVERSE_LEVEL_ORDER
+   * @param flags Which types of children are to be visited: one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES.
+   * @param data The data for which to search.
+   * @return The found node, or 0 if the data is not found.
+   */
+  const Tree<T>* find(TraverseType order, TraverseFlags flags, const T& data) const
+  {
+    return const_cast<Tree<T>*>(this)->find(order, flags, data);
   }
   _IGNORE(g_node_find)
 
   /** Gets the position of the first child which contains the given data.
    *
    * @param data The data to find.
-   * @return The index of the child which contains data, 
-   * or -1 if the data is not found.
+   * @return The index of the child which contains data, or -1 if the data is not found.
    */
   int child_index(const T& data) const
   {
     int n = 0;
 
-    for(Tree<T>* i = first_child();
-      i != 0; i = i->next_sibling())
+    for(const Tree<T>* i = first_child();  i != 0; i = i->next_sibling())
     {
       if((i->data()) == data)
         return n;
+
       n++;
     }
 
@@ -337,9 +367,18 @@ public:
    *
    * @return The first child, or 0 if the node has no children. 
    */
-  Tree<T>* first_child() const
+  Tree<T>* first_child()
   {
     return wrap(g_node_first_child(gobj()));
+  }
+
+  /** Gets the first child.
+   *
+   * @return The first child, or 0 if the node has no children. 
+   */
+  const Tree<T>* first_child() const
+  {
+    return const_cast<Tree<T>*>(this)->first_child();
   }
   _IGNORE(g_node_first_child)
 
@@ -347,9 +386,18 @@ public:
    *
    * @return The last child, or 0 if the node has no children.
    */
-  Tree<T>* last_child() const
+  Tree<T>* last_child()
   {
     return wrap(g_node_last_child(gobj()));
+  }
+
+  /** Gets the last child.
+   *
+   * @return The last child, or 0 if the node has no children.
+   */
+  const Tree<T>* last_child() const
+  {
+    return const_cast<Tree<T>*>(this)->last_child();
   }
   _IGNORE(g_node_last_child)
 
@@ -357,18 +405,35 @@ public:
    *
    * @return The nth child, or 0 if n is too large.
    */
-  Tree<T>* nth_child(int n) const
+  Tree<T>* nth_child(int n) 
   {
     return wrap(g_node_nth_child(gobj(), n));
+  }
+
+  /** Gets the nth child.
+   *
+   * @return The nth child, or 0 if n is too large.
+   */
+  const Tree<T>* nth_child(int n) const
+  {
+    return const_cast<Tree<T>*>(this)->nth_child(n);
   }
   _IGNORE(g_node_nth_child)
   
   /** Gets the first sibling
    * @return The first sibling, or 0 if the node has no siblings.
    */
-  Tree<T>* first_sibling() const
+  Tree<T>* first_sibling()
   {
     return wrap(g_node_first_sibling(gobj()));
+  }
+
+  /** Gets the first sibling
+   * @return The first sibling, or 0 if the node has no siblings.
+   */
+  const Tree<T>* first_sibling() const
+  {
+    return const_cast<Tree<T>*>(this)->first_sibling();
   }
   _IGNORE(g_node_first_sibling)
 
@@ -376,9 +441,18 @@ public:
    *
    * @return The previous sibling, or 0 if the node has no siblings.
    */
-  Tree<T>* prev_sibling() const
+  Tree<T>* prev_sibling()
   {
     return wrap(g_node_prev_sibling(gobj()));
+  }
+
+  /** Gets the previous sibling.
+   *
+   * @return The previous sibling, or 0 if the node has no siblings.
+   */
+  const Tree<T>* prev_sibling() const
+  {
+    return const_cast<Tree<T>*>(this)->prev_sibling();
   }
   _IGNORE(g_node_prev_sibling)
 
@@ -386,9 +460,18 @@ public:
    *
    * @return The next sibling, or 0 if the node has no siblings.
    */
-  Tree<T>* next_sibling() const
+  Tree<T>* next_sibling()
   {
     return wrap(g_node_next_sibling(gobj()));
+  }
+
+  /** Gets the next sibling
+   *
+   * @return The next sibling, or 0 if the node has no siblings.
+   */
+  const Tree<T>* next_sibling() const
+  {
+    return const_cast<Tree<T>*>(this)->next_sibling();
   }
   _IGNORE(g_node_next_sibling)
 
@@ -396,9 +479,18 @@ public:
    *
    * @return The last sibling, or 0 if the node has no siblings.
    */
-  Tree<T>* last_sibling() const
+  Tree<T>* last_sibling()
   {
     return wrap(g_node_last_sibling(gobj()));
+  }
+
+  /** Gets the last sibling.
+   *
+   * @return The last sibling, or 0 if the node has no siblings.
+   */
+  const Tree<T>* last_sibling() const
+  {
+    return const_cast<Tree<T>*>(this)->last_sibling();
   }
   _IGNORE(g_node_last_sibling)
 
@@ -426,7 +518,7 @@ public:
    *
    * @return the depth of this node
    */
-  unsigned int depth() const
+  guint depth() const
   {
     return g_node_depth(gobj());
   }
@@ -437,7 +529,7 @@ public:
    * @param flags Which types of children are to be counted: one of TRAVERSE_ALL, TRAVERSE_LEAVES and TRAVERSE_NON_LEAVES
    * @return The number of nodes in the tree.
    */
-  unsigned int node_count(TraverseFlags flags) const
+  guint node_count(TraverseFlags flags) const
   {
     return g_node_n_nodes(gobj(), (GTraverseFlags)flags);
   }
@@ -447,7 +539,7 @@ public:
    *
    * @return The number of children.
    */
-  unsigned int child_count() const
+  guint child_count() const
   {
     return g_node_n_children(gobj());
   }
@@ -472,9 +564,9 @@ public:
    *
    * @return The maximum height of all branches.
    */
-  unsigned int max_height() const
+  guint get_max_height() const
   {
-    return g_node_max_height(gobj());
+    return g_node_max_height(const_cast<GNode*>(gobj()));
   }
   _IGNORE(g_node_max_height)
 
@@ -487,7 +579,13 @@ public:
   _IGNORE(g_node_unlink)
 
   /// Accessor for this node's data
-  T& data() const
+  T& data()
+  {
+    return data_;
+  }
+
+  /// Accessor for this node's data
+  const T& data() const
   {
     return data_;
   }
@@ -502,28 +600,36 @@ public:
   }
 
 
-  /// For auto-wrapping
-  GNode* gobj() const
+  /// Provides access to the underlying C GObject.
+  GNode* gobj()
   {
     return gobject_;
   }
+
+  /// Provides access to the underlying C GObject.
+  const GNode* gobj() const
+  {
+    return gobject_;
+  }
+
   // Leaving these unimplemented for now
   _IGNORE(g_node_copy)
   _IGNORE(g_node_copy_deep)
 
 protected:
-  GNode *gobject_;
-  T &data_;
+  GNode* gobject_;
+  T& data_;
 
+private:
   /// Wrapper for invoking a TraverseFunc.
-  static gboolean wrap_traverse_slot(GNode* node, gpointer slot)
+  static gboolean c_callback_traverse(GNode* node, gpointer slot)
   {
     const TraverseFunc* tf = reinterpret_cast<const TraverseFunc*>(slot);
     return (*tf)(*wrap(node));
   }
 
   /// Wrapper for invoking a ForeachFunc.
-  static void wrap_foreach_slot(GNode* node, gpointer slot)
+  static void c_callback_foreach(GNode* node, gpointer slot)
   {
     const ForeachFunc* ff = reinterpret_cast<const ForeachFunc*>(slot);
     (*ff)(*wrap(node));
@@ -539,9 +645,9 @@ protected:
   }
 
   /// Wrapper for invoking a sigc::slot<void,GNode*> (Internal use).
-  static void on_wrap_compare_child(GNode* node, gpointer data)
+  static void c_callback_foreach_compare_child(GNode* node, gpointer data)
   {
-    const ForeachFunc *slot = reinterpret_cast<const ForeachFunc *>(data);
+    const ForeachFunc* slot = reinterpret_cast<const ForeachFunc*>(data);
     (*slot)(*wrap(node));
   }
 
@@ -557,9 +663,9 @@ protected:
   }
 
   /// Wrapper for invoking a sigc::slot<gboolean,GNode*> (Internal use).
-  static gboolean on_wrap_compare_node(GNode* node, gpointer data)
+  static gboolean c_callback_traverse_compare_node(GNode* node, gpointer data)
   {
-    const TraverseFunc *slot = reinterpret_cast<const TraverseFunc *>(data);
+    const TraverseFunc* slot = reinterpret_cast<const TraverseFunc*>(data);
     return (*slot)(*wrap(node));
   }
 

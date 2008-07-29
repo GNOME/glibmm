@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include <glibmm.h>
 
 bool echo(Glib::Tree<std::string>& i)
@@ -63,41 +62,51 @@ int main()
   std::cout << std::endl;
 
   Glib::Tree<std::string> *tmp = ta.find(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, e);
-  if(NULL == tmp){ std::cout << e << " not found" << std::endl; }
-  else{ std::cout << "Found " << (tmp->data()) << std::endl; }
+  if(!tmp)
+    std::cout << e << " not found" << std::endl;
+  else
+    std::cout << "Found " << (tmp->data()) << std::endl;
 
   tmp = ta.find(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, a);
-  if(NULL == tmp){ std::cout << a << " not found" << std::endl; }
-  else{ std::cout << "Found " << (tmp->data()) << std::endl; }
+  if(!tmp)
+    std::cout << a << " not found" << std::endl;
+  else
+    std::cout << "Found " << (tmp->data()) << std::endl;
 
   tmp = ta.find(Glib::IN_ORDER, Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, "f");
-  if(NULL == tmp){ std::cout << a << " not found" << std::endl; }
-  else{ std::cout << "Found " << (tmp->data()) << std::endl; }
+  if(!tmp)
+    std::cout << a << " not found" << std::endl;
+  else
+    std::cout << "Found " << (tmp->data()) << std::endl;
 
   tmp = ta.find_child(Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, e);
-  if(NULL == tmp){ std::cout << e << " is not a child of " << (ta.data()) << std::endl; }
-  else{ std::cout << "Mistakenly found " << e << " in " << (ta.data()) << "'s children" << std::endl; }
+  if(!tmp)
+    std::cout << e << " is not a child of " << (ta.data()) << std::endl;
+  else
+    std::cout << "Mistakenly found " << e << " in " << (ta.data()) << "'s children" << std::endl;
 
   tmp = ta.find_child(Glib::TRAVERSE_LEAVES | Glib::TRAVERSE_NON_LEAVES, c);
-  if(NULL == tmp) { 
+  if(!tmp)
     std::cout << c << " is the number " << ta.child_index(c) << " child of " << (ta.data()) << std::endl;
-  }
-  else{ std::cout << "Mistakenly didn't find " << c << " in " << (ta.data()) << "'s children" << std::endl; }
+  else
+   std::cout << "Mistakenly didn't find " << c << " in " << (ta.data()) << "'s children" << std::endl;
 
   tmp = tc.next_sibling();
-  if(NULL == tmp){ std::cout << tc.data() << "'s next sibling is NULL" << std::endl; }
-  else{ std::cout << tc.data() << "'s next sibling is " << tmp->data() << std::endl; }
+  if(!tmp)
+    std::cout << tc.data() << "'s next sibling is NULL" << std::endl;
+  else
+    std::cout << tc.data() << "'s next sibling is " << tmp->data() << std::endl;
 
-  tmp = ta.root();
+  tmp = ta.get_root();
   std::cout << "Root is " << (tmp->data()) << std::endl;
-  std::cout << "Depth is " << tmp->max_height() << std::endl;
+  std::cout << "Depth is " << tmp->get_max_height() << std::endl;
 
   ta.unlink(tc);
-  std::cout << "New depth is " << tmp->max_height() << std::endl;
+  std::cout << "New depth is " << tmp->get_max_height() << std::endl;
 
-  tmp = tc.root();
+  tmp = tc.get_root();
   std::cout << "Pruned root is " << (tmp->data()) << std::endl;
-  std::cout << "Pruned depth is " << tmp->max_height() << std::endl;
+  std::cout << "Pruned depth is " << tmp->get_max_height() << std::endl;
 
   return 0;
 }
