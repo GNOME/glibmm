@@ -1273,8 +1273,8 @@ template <class T1, class T2>
 inline // static
 ustring ustring::compose(const ustring& fmt, const T1& a1, const T2& a2)
 {
-  const ustring::Stringify<T1> s1 (a1);
-  const ustring::Stringify<T2> s2 (a2);
+  const ustring::Stringify<T1> s1(a1);
+  const ustring::Stringify<T2> s2(a2);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
@@ -1285,9 +1285,9 @@ inline // static
 ustring ustring::compose(const ustring& fmt,
                          const T1& a1, const T2& a2, const T3& a3)
 {
-  const ustring::Stringify<T1> s1 (a1);
-  const ustring::Stringify<T2> s2 (a2);
-  const ustring::Stringify<T3> s3 (a3);
+  const ustring::Stringify<T1> s1(a1);
+  const ustring::Stringify<T2> s2(a2);
+  const ustring::Stringify<T3> s3(a3);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
@@ -1298,10 +1298,10 @@ inline // static
 ustring ustring::compose(const ustring& fmt,
                          const T1& a1, const T2& a2, const T3& a3, const T4& a4)
 {
-  const ustring::Stringify<T1> s1 (a1);
-  const ustring::Stringify<T2> s2 (a2);
-  const ustring::Stringify<T3> s3 (a3);
-  const ustring::Stringify<T4> s4 (a4);
+  const ustring::Stringify<T1> s1(a1);
+  const ustring::Stringify<T2> s2(a2);
+  const ustring::Stringify<T3> s3(a3);
+  const ustring::Stringify<T4> s4(a4);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
@@ -1313,11 +1313,11 @@ ustring ustring::compose(const ustring& fmt,
                          const T1& a1, const T2& a2, const T3& a3,
                          const T4& a4, const T5& a5)
 {
-  const ustring::Stringify<T1> s1 (a1);
-  const ustring::Stringify<T2> s2 (a2);
-  const ustring::Stringify<T3> s3 (a3);
-  const ustring::Stringify<T4> s4 (a4);
-  const ustring::Stringify<T5> s5 (a5);
+  const ustring::Stringify<T1> s1(a1);
+  const ustring::Stringify<T2> s2(a2);
+  const ustring::Stringify<T3> s3(a3);
+  const ustring::Stringify<T4> s4(a4);
+  const ustring::Stringify<T5> s5(a5);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
@@ -1329,12 +1329,12 @@ ustring ustring::compose(const ustring& fmt,
                          const T1& a1, const T2& a2, const T3& a3,
                          const T4& a4, const T5& a5, const T6& a6)
 {
-  const ustring::Stringify<T1> s1 (a1);
-  const ustring::Stringify<T2> s2 (a2);
-  const ustring::Stringify<T3> s3 (a3);
-  const ustring::Stringify<T4> s4 (a4);
-  const ustring::Stringify<T5> s5 (a5);
-  const ustring::Stringify<T6> s6 (a6);
+  const ustring::Stringify<T1> s1(a1);
+  const ustring::Stringify<T2> s2(a2);
+  const ustring::Stringify<T3> s3(a3);
+  const ustring::Stringify<T4> s4(a4);
+  const ustring::Stringify<T5> s5(a5);
+  const ustring::Stringify<T6> s6(a6);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
                                   s5.ptr(), s6.ptr() };
@@ -1347,13 +1347,13 @@ ustring ustring::compose(const ustring& fmt,
                          const T1& a1, const T2& a2, const T3& a3,
                          const T4& a4, const T5& a5, const T6& a6, const T7& a7)
 {
-  const ustring::Stringify<T1> s1 (a1);
-  const ustring::Stringify<T2> s2 (a2);
-  const ustring::Stringify<T3> s3 (a3);
-  const ustring::Stringify<T4> s4 (a4);
-  const ustring::Stringify<T5> s5 (a5);
-  const ustring::Stringify<T6> s6 (a6);
-  const ustring::Stringify<T7> s7 (a7);
+  const ustring::Stringify<T1> s1(a1);
+  const ustring::Stringify<T2> s2(a2);
+  const ustring::Stringify<T3> s3(a3);
+  const ustring::Stringify<T4> s4(a4);
+  const ustring::Stringify<T5> s5(a5);
+  const ustring::Stringify<T6> s6(a6);
+  const ustring::Stringify<T7> s7(a7);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
                                   s5.ptr(), s6.ptr(), s7.ptr() };
@@ -1368,14 +1368,14 @@ ustring ustring::compose(const ustring& fmt,
                          const T4& a4, const T5& a5, const T6& a6,
                          const T7& a7, const T8& a8)
 {
-  const ustring::Stringify<T1> s1 (a1);
-  const ustring::Stringify<T2> s2 (a2);
-  const ustring::Stringify<T3> s3 (a3);
-  const ustring::Stringify<T4> s4 (a4);
-  const ustring::Stringify<T5> s5 (a5);
-  const ustring::Stringify<T6> s6 (a6);
-  const ustring::Stringify<T7> s7 (a7);
-  const ustring::Stringify<T8> s8 (a8);
+  const ustring::Stringify<T1> s1(a1);
+  const ustring::Stringify<T2> s2(a2);
+  const ustring::Stringify<T3> s3(a3);
+  const ustring::Stringify<T4> s4(a4);
+  const ustring::Stringify<T5> s5(a5);
+  const ustring::Stringify<T6> s6(a6);
+  const ustring::Stringify<T7> s7(a7);
+  const ustring::Stringify<T8> s8(a8);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
                                   s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr() };
@@ -1390,15 +1390,15 @@ ustring ustring::compose(const ustring& fmt,
                          const T4& a4, const T5& a5, const T6& a6,
                          const T7& a7, const T8& a8, const T9& a9)
 {
-  const ustring::Stringify<T1> s1 (a1);
-  const ustring::Stringify<T2> s2 (a2);
-  const ustring::Stringify<T3> s3 (a3);
-  const ustring::Stringify<T4> s4 (a4);
-  const ustring::Stringify<T5> s5 (a5);
-  const ustring::Stringify<T6> s6 (a6);
-  const ustring::Stringify<T7> s7 (a7);
-  const ustring::Stringify<T8> s8 (a8);
-  const ustring::Stringify<T9> s9 (a9);
+  const ustring::Stringify<T1> s1(a1);
+  const ustring::Stringify<T2> s2(a2);
+  const ustring::Stringify<T3> s3(a3);
+  const ustring::Stringify<T4> s4(a4);
+  const ustring::Stringify<T5> s5(a5);
+  const ustring::Stringify<T6> s6(a6);
+  const ustring::Stringify<T7> s7(a7);
+  const ustring::Stringify<T8> s8(a8);
+  const ustring::Stringify<T9> s9(a9);
 
   const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
                                   s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr(), s9.ptr() };
@@ -1500,31 +1500,59 @@ inline bool operator>=(const char* lhs, const ustring& rhs)
 
 /** @relates Glib::ustring */
 inline ustring operator+(const ustring& lhs, const ustring& rhs)
-  { ustring temp (lhs); temp += rhs; return temp; }
+{
+  ustring temp(lhs);
+  temp += rhs;
+  return temp;
+}
 
 /** @relates Glib::ustring */
 inline ustring operator+(const ustring& lhs, const char* rhs)
-  { ustring temp (lhs); temp += rhs; return temp; }
+{
+  ustring temp(lhs);
+  temp += rhs;
+  return temp;
+}
 
 /** @relates Glib::ustring */
 inline ustring operator+(const char* lhs, const ustring& rhs)
-  { ustring temp (lhs); temp += rhs; return temp; }
+{
+  ustring temp(lhs);
+  temp += rhs;
+  return temp;
+}
 
 /** @relates Glib::ustring */
 inline ustring operator+(const ustring& lhs, gunichar rhs)
-  { ustring temp (lhs); temp += rhs; return temp; }
+{
+  ustring temp(lhs);
+  temp += rhs;
+  return temp;
+}
 
 /** @relates Glib::ustring */
 inline ustring operator+(gunichar lhs, const ustring& rhs)
-  { ustring temp (1, lhs); temp += rhs; return temp; }
+{
+  ustring temp(1, lhs);
+  temp += rhs;
+  return temp;
+}
 
 /** @relates Glib::ustring */
 inline ustring operator+(const ustring& lhs, char rhs)
-  { ustring temp (lhs); temp += rhs; return temp; }
+{
+  ustring temp(lhs);
+  temp += rhs;
+  return temp;
+}
 
 /** @relates Glib::ustring */
 inline ustring operator+(char lhs, const ustring& rhs)
-  { ustring temp (1, lhs); temp += rhs; return temp; }
+{
+  ustring temp(1, lhs);
+  temp += rhs;
+  return temp;
+}
 
 } // namespace Glib
 
