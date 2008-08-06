@@ -1240,7 +1240,7 @@ private:
 
 public:
   explicit inline Stringify(const T& arg) : string_ (ustring::format(arg)) {}
-  explicit inline Stringify(const char* arg) : string_ (arg) {}
+  explicit inline Stringify(const char* arg) : string_(arg) {}
   inline const ustring* ptr() const { return &string_; }
 };
 
@@ -1255,7 +1255,7 @@ private:
   Stringify<ustring>& operator=(const ustring::Stringify<ustring>&);
 
 public:
-  explicit inline Stringify(const ustring& arg) : string_ (arg) {}
+  explicit inline Stringify(const ustring& arg) : string_(arg) {}
   inline const ustring* ptr() const { return &string_; }
 };
 
@@ -1263,7 +1263,7 @@ template <class T1>
 inline // static
 ustring ustring::compose(const ustring& fmt, const T1& a1)
 {
-  const ustring::Stringify<T1> s1 (a1);
+  const ustring::Stringify<T1> s1(a1);
 
   const ustring *const argv[] = { s1.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
