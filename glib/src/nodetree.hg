@@ -100,6 +100,17 @@ public:
   };
   _IGNORE(g_node_destroy)
 
+  /// Provides access to the underlying C GObject.
+  inline GNode* gobj()
+  {
+    return gobject_;
+  }
+
+  /// Provides access to the underlying C GObject.
+  inline const GNode* gobj() const
+  {
+    return gobject_;
+  }
 
   /** Inserts a NodeTree beneath the parent at the given position.
    *
@@ -624,28 +635,16 @@ public:
     return wrap(gobj()->parent);
   }
 
-
-  /// Provides access to the underlying C GObject.
-  GNode* gobj()
-  {
-    return gobject_;
-  }
-
-  /// Provides access to the underlying C GObject.
-  const GNode* gobj() const
-  {
-    return gobject_;
-  }
-
   // Leaving these unimplemented for now
   _IGNORE(g_node_copy)
   _IGNORE(g_node_copy_deep)
 
-protected:
+
+private:
+
   GNode* gobject_;
   T& data_;
 
-private:
   /// Wrapper for invoking a TraverseFunc.
   static gboolean c_callback_traverse(GNode* node, gpointer slot)
   {
