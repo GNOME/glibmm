@@ -1228,6 +1228,8 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
   return buf.to_string();
 }
 
+/** An inner class used by ustring.
+ */
 template <class T>
 class ustring::Stringify
 {
@@ -1240,10 +1242,14 @@ private:
 
 public:
   explicit inline Stringify(const T& arg) : string_ (ustring::format(arg)) {}
+
+  //TODO: Why is this here? See the template specialization:
   explicit inline Stringify(const char* arg) : string_(arg) {}
+
   inline const ustring* ptr() const { return &string_; }
 };
 
+/// A template specialization for Stringify<ustring>:
 template <>
 class ustring::Stringify<ustring>
 {
@@ -1258,6 +1264,45 @@ public:
   explicit inline Stringify(const ustring& arg) : string_(arg) {}
   inline const ustring* ptr() const { return &string_; }
 };
+
+/** A template specialization for Stringify<const char*>,
+ * because the regular template has ambiguous constructor overloads for char*.
+ */ 
+template <>
+class ustring::Stringify<const char*>
+{
+private:
+  const ustring& string_;
+
+  // noncopyable
+  Stringify(const ustring::Stringify<const char*>&);
+  Stringify<ustring>& operator=(const ustring::Stringify<const char*>&);
+
+public:
+  explicit inline Stringify(const char* arg) : string_(arg) {}
+  inline const ustring* ptr() const { return &string_; }
+};
+
+/* TODO: I can't seem to specify a template specialization for Stringify with a string literal. murrayc.
+
+ * A template specialization for Stringify<char[N]> (for string literals),
+ * because the regular template has ambiguous constructor overloads for char*.
+
+template <std::size_t N>
+class ustring::Stringify<const char[N]>
+{
+private:
+  const ustring& string_;
+
+  // noncopyable
+  Stringify(const ustring::Stringify<const char[N]>&);
+  Stringify<ustring>& operator=(const ustring::Stringify<const char[N]>&);
+
+public:
+  explicit inline Stringify(const char arg[N]) : string_(arg) {}
+  inline const ustring* ptr() const { return &string_; }
+};
+*/
 
 template <class T1>
 inline // static
