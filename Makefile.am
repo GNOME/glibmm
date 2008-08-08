@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS	= -I scripts
 
-SUBDIRS		= tools glib gio examples scripts tests MSVC_Net2003 docs
+SUBDIRS		= tools glib gio examples scripts tests MSVC_Net2005 docs
 DIST_SUBDIRS	= $(SUBDIRS)
 
 EXTRA_DIST	= build_shared/Makefile_build.am_fragment \
