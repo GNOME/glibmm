@@ -347,7 +347,7 @@ public:
     GNode* child = 0;
     type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, data, &child);
 
-    g_node_traverse(gobject_, (GTraverseType)order, (GTraverseFlags)flags, -1, c_callback_traverse_compare_node, reinterpret_cast<gpointer>(&bound_slot));
+    g_node_traverse(const_cast<GNode*>(gobj()), (GTraverseType)order, (GTraverseFlags)flags, -1, c_callback_traverse_compare_node, reinterpret_cast<gpointer>(&bound_slot));
 
     return wrap(child);
   }
@@ -395,7 +395,7 @@ public:
    */
   int child_position(const NodeTree<T>& child) const
   {
-    return g_node_child_position(gobj(), const_cast<GNode*>(child.gobj()));
+    return g_node_child_position(const_cast<GNode*>(gobj()), const_cast<GNode*>(child.gobj()));
   }
   _IGNORE(g_node_child_position)
 
@@ -536,7 +536,7 @@ public:
    */
   bool is_leaf() const
   {
-    return G_NODE_IS_LEAF(gobj());
+    return G_NODE_IS_LEAF(const_cast<GNode*>(gobj()));
   }
 
   /** Returns true if this is the root node.
@@ -545,7 +545,7 @@ public:
    */
   bool is_root() const
   {
-    return G_NODE_IS_ROOT(gobj());
+    return G_NODE_IS_ROOT(const_cast<GNode*>(gobj()));
   }
 
   /** Gets the depth of this node.
@@ -556,7 +556,7 @@ public:
    */
   guint depth() const
   {
-    return g_node_depth(gobj());
+    return g_node_depth(const_cast<GNode*>(gobj()));
   }
   _IGNORE(g_node_depth)
 
@@ -567,7 +567,7 @@ public:
    */
   guint node_count(TraverseFlags flags = TRAVERSE_ALL) const
   {
-    return g_node_n_nodes(gobj(), (GTraverseFlags)flags);
+    return g_node_n_nodes(const_cast<GNode*>(gobj()), (GTraverseFlags)flags);
   }
   _IGNORE(g_node_n_nodes)
 
@@ -577,7 +577,7 @@ public:
    */
   guint child_count() const
   {
-    return g_node_n_children(gobj());
+    return g_node_n_children(const_cast<GNode*>(gobj()));
   }
   _IGNORE(g_node_n_children)
 
@@ -590,7 +590,7 @@ public:
    */
   bool is_ancestor(const NodeTree<T>& descendant) const
   {
-    return g_node_is_ancestor(gobj(), const_cast<GNode*>(descendant.gobj()));
+    return g_node_is_ancestor(const_cast<GNode*>(gobj()), const_cast<GNode*>(descendant.gobj()));
   }
   _IGNORE(g_node_is_ancestor)
 
