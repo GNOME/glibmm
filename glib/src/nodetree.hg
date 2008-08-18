@@ -310,10 +310,10 @@ public:
    */
   NodeTree<T>* find_child(const T& data, TraverseFlags flags = TRAVERSE_ALL)
   {
-    sigc::slot<void, GNode*, const T&, GNode*> real_slot = sigc::ptr_fun(on_compare_child);
+    sigc::slot<void, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_child);
 
     GNode* child = 0;
-    type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, data, child);
+    type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, data, &child);
 
     g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach_compare_child, reinterpret_cast<gpointer>(&bound_slot));
     
@@ -660,11 +660,11 @@ private:
   }
 
   /// Method for comparing a single child (Internal use).
-  static void on_compare_child(GNode* node, const T& needle, GNode* result)
+  static void on_compare_child(GNode* node, const T& needle, GNode** result)
   {
     if((0 != result) && (wrap(node)->data() == needle))
     {
-      result = node;
+      *result = node;
     }
   }
 
