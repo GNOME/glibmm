@@ -3,110 +3,148 @@
 
 typedef Glib::NodeTree<std::string> type_nodetree_string;
 
-bool echo(type_nodetree_string& i)
+static bool node_build_string(type_nodetree_string& node, std::string& string)
 {
-  std::cout << i.data() << ' ';
+  string += node.data();
+
   return false;
 }
 
-void echol(type_nodetree_string& i, bool is_leaf)
-{
-  if(i.is_leaf() == is_leaf)
-    std::cout << i.data() << ' ';
-}
-
-
 int main()
 {
-  std::string a("a"),
-              b("b"),
-              c("c"),
-              d("d"),
-              e("e"),
-              f("f");
+  std::list<std::string> alma;
+  std::string tstring, cstring;
+  type_nodetree_string* root;
+  type_nodetree_string* node;
+  type_nodetree_string* node_B;
+  type_nodetree_string* node_D;
+  type_nodetree_string* node_F;
+  type_nodetree_string* node_G;
+  type_nodetree_string* node_J;
+  std::string str_A("A");
+  std::string str_B("B");
+  std::string str_C("C");
+  std::string str_D("D");
+  std::string str_E("E");
+  std::string str_F("F");
+  std::string str_G("G");
+  std::string str_H("H");
+  std::string str_I("I");
+  std::string str_J("J");
+  std::string str_K("K");
+  std::string str_empty;
 
-  type_nodetree_string ta(a), tb(b), tc(c), te(e);
+  root = new type_nodetree_string(str_A);
+  g_assert(root->depth() == 1 && root->get_max_height() == 1);
 
-  sigc::slot<bool, type_nodetree_string&> echoslot = sigc::ptr_fun(echo);
+  node_B = new type_nodetree_string(str_B);
+  root->append(*node_B);
+  g_assert(root->first_child() == node_B);
 
+  node_B->append_data(str_E);
+  node_B->prepend_data(str_C);
+  node_D = &node_B->insert(1, *(new type_nodetree_string(str_D)));
 
-  ta.insert(0, tc);
-  ta.prepend(tb);
-  ta.append_data(d);
-  tc.append(te);
-  te.prepend_data(f);
+  node_F = new type_nodetree_string(str_F);
+  root->append(*node_F);
+  g_assert(root->first_child()->next_sibling() == node_F);
 
+  node_G = new type_nodetree_string(str_G);
+  node_F->append(*node_G);
+  node_J = new type_nodetree_string(str_J);
+  node_G->prepend(*node_J);
+  node_G->insert(42, *(new type_nodetree_string(str_K)));
+  node_G->insert_data(0, str_H);
+  node_G->insert(1, *(new type_nodetree_string(str_I)));
 
-  std::cout << "Breadth-first:" << std::endl;
-  ta.traverse(echoslot, Glib::TRAVERSE_LEVEL_ORDER);
-  std::cout << std::endl;
+  g_assert(root->depth() == 1);
+  g_assert(root->get_max_height() == 4);
+  g_assert(node_G->first_child()->next_sibling()->depth() == 4);
+  g_assert(root->node_count(type_nodetree_string::TRAVERSE_LEAVES) == 7);
+  g_assert(root->node_count(type_nodetree_string::TRAVERSE_NON_LEAVES) == 4);
+  g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) == 11);
+  g_assert(node_F->get_max_height() == 3);
+  g_assert(node_G->child_count() == 4);
+  g_assert(root->find_child(str_F, type_nodetree_string::TRAVERSE_ALL) == node_F);
+  g_assert(root->find(str_I, Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_NON_LEAVES) == NULL);
+  g_assert(root->find(str_J, Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_LEAVES) == node_J);
 
-  std::cout << "Depth-first (pre):" << std::endl;
-  ta.traverse(echoslot, Glib::TRAVERSE_PRE_ORDER);
-  std::cout << std::endl;
+  for(guint i = 0; i < node_B->child_count(); i++)
+    {
+      node = node_B->nth_child(i);
+      g_assert(node->data() == std::string(1, ('C' + i)));
+    }
+  
+  for(guint i = 0; i < node_G->child_count(); i++)
+    g_assert(node_G->child_position(*node_G->nth_child(i)) == (int)i);
 
-  std::cout << "Depth-first (in):" << std::endl;
-  ta.traverse(echoslot, Glib::TRAVERSE_IN_ORDER);
-  std::cout << std::endl;
+  /* we have built:                    A
+   *                                 /   \
+   *                               B       F
+   *                             / | \       \
+   *                           C   D   E       G
+   *                                         / /\ \
+   *                                       H  I  J  K
+   *
+   * for in-order traversal, 'G' is considered to be the "left"
+   * child of 'F', which will cause 'F' to be the last node visited.
+   */
 
-  std::cout << "Depth-first (post):" << std::endl;
-  ta.traverse(echoslot, Glib::TRAVERSE_POST_ORDER);
-  std::cout << std::endl;
+  tstring.clear();
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_PRE_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  g_assert(tstring == "ABCDEFGHIJK");
+  tstring.clear();
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_POST_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  g_assert(tstring == "CDEBHIJKGFA");
+  tstring.clear();
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  g_assert(tstring == "CBDEAHGIJKF");
+  tstring.clear();
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  g_assert(tstring == "ABFCDEGHIJK");
+  tstring.clear();
+  
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_LEAVES, -1);
+  g_assert(tstring == "CDEHIJK");
+  tstring.clear();
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_PRE_ORDER, type_nodetree_string::TRAVERSE_NON_LEAVES, -1);
+  g_assert(tstring == "ABFG");
+  tstring.clear();
 
-  std::cout << "Leaf children of 'a':" << std::endl;
-  ta.foreach(sigc::bind<bool>(sigc::ptr_fun(echol), true));
-  std::cout << std::endl;
+  node_B->reverse_children();
+  node_G->reverse_children();
 
-  std::cout << "Non-leaf children of 'a':" << std::endl;
-  ta.foreach(sigc::bind<bool>(sigc::ptr_fun(echol), false));
-  std::cout << std::endl;
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  g_assert(tstring == "ABFEDCGKJIH");
+  tstring.clear();
 
-  type_nodetree_string* tmp = ta.find(e);
-  if(!tmp)
-    std::cout << e << " not found" << std::endl;
-  else
-    std::cout << "Found " << (tmp->data()) << std::endl;
+  /* TODO:
+  node = root->copy();
+  g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) == node->node_count(type_nodetree_string::TRAVERSE_ALL));
+  g_assert(root->get_max_height() == node->get_max_height());
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  node->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(cstring)), Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  g_assert(tstring == cstring);
 
-  tmp = ta.find(a);
-  if(!tmp)
-    std::cout << a << " not found" << std::endl;
-  else
-    std::cout << "Found " << (tmp->data()) << std::endl;
+  delete node;
+  */
+  delete root;
 
-  tmp = ta.find("f");
-  if(!tmp)
-    std::cout << a << " not found" << std::endl;
-  else
-    std::cout << "Found " << (tmp->data()) << std::endl;
+  /* allocation tests */
 
-  tmp = ta.find_child(e);
-  if(!tmp)
-    std::cout << e << " is not a child of " << (ta.data()) << std::endl;
-  else
-    std::cout << "Mistakenly found " << e << " in " << (ta.data()) << "'s children" << std::endl;
+  root = new type_nodetree_string(str_empty);
+  node = root;
 
-  tmp = ta.find_child(c);
-  if(!tmp)
-    std::cout << c << " is the number " << ta.child_index(c) << " child of " << (ta.data()) << std::endl;
-  else
-   std::cout << "Mistakenly didn't find " << c << " in " << (ta.data()) << "'s children" << std::endl;
+  for(guint i = 0; i < 2048; i++)
+    {
+      node->append(*(new type_nodetree_string(str_empty)));
+      if((i % 5) == 4)
+        node = node->first_child()->next_sibling();
+    }
+  g_assert(root->get_max_height() > 100);
+  g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) == 1 + 2048);
 
-  tmp = tc.next_sibling();
-  if(!tmp)
-    std::cout << tc.data() << "'s next sibling is NULL" << std::endl;
-  else
-    std::cout << tc.data() << "'s next sibling is " << tmp->data() << std::endl;
-
-  tmp = ta.get_root();
-  std::cout << "Root is " << (tmp->data()) << std::endl;
-  std::cout << "Depth is " << tmp->get_max_height() << std::endl;
-
-  ta.unlink(tc);
-  std::cout << "New depth is " << tmp->get_max_height() << std::endl;
-
-  tmp = tc.get_root();
-  std::cout << "Pruned root is " << (tmp->data()) << std::endl;
-  std::cout << "Pruned depth is " << tmp->get_max_height() << std::endl;
+  delete root;
 
   return 0;
 }
