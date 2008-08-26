@@ -83,7 +83,7 @@ private:
   }
 
 public:
-  explicit NodeTree(T& data) :
+  explicit NodeTree(const T& data) :
     data_(data)
   {
     //Store the this pointer in the GNode so we can discover this wrapper later:
@@ -96,9 +96,28 @@ public:
    */
   ~NodeTree()
   {
-    g_node_destroy(gobj());
+    if(!is_root())
+      unlink();
+
+    //Free the children (not with g_node_destroy to avoid the leaking of C++ warpper objects).
+    while(NodeTree<T>* i = first_child())
+      delete i;
+
+    //Free the wrapped object.
+    g_slice_free(GNode, gobject_);
   };
   _IGNORE(g_node_destroy)
+
+  NodeTree(const NodeTree<T>& node) :
+    data_(node.data_)
+  {
+    //Store the this pointer in the GNode so we can discover the wrapped object later.
+    gobject_ = g_node_new(reinterpret_cast<gpointer>(this));
+
+    //Prepend the copied children of @node to the constructing node.
+    for(const NodeTree<T>* i = node.last_child();  i != 0; i = i->prev_sibling())
+      prepend(*(new NodeTree<T>(*i)));
+  }
 
   /// Provides access to the underlying C GObject.
   inline GNode* gobj()
@@ -184,7 +203,7 @@ public:
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
-  NodeTree<T>* insert_data(int position, T& data)
+  NodeTree<T>* insert_data(int position, const T& data)
   {
     NodeTree<T>* node = new NodeTree<T>(data);
     insert(position, *node);
@@ -198,7 +217,7 @@ public:
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
-  NodeTree<T>* insert_data_before(NodeTree<T>& sibling, T& data)
+  NodeTree<T>* insert_data_before(NodeTree<T>& sibling, const T& data)
   {
     NodeTree<T>* node = new NodeTree<T>(data);
     insert_before(sibling, *node);
@@ -211,7 +230,7 @@ public:
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
-  NodeTree<T>* append_data(T& data)
+  NodeTree<T>* append_data(const T& data)
   {
     NodeTree<T>* node = new NodeTree<T>(data);
     append(*node);
@@ -224,7 +243,7 @@ public:
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
-  NodeTree<T>* prepend_data(T& data)
+  NodeTree<T>* prepend_data(const T& data)
   {
     NodeTree<T>* node = new NodeTree<T>(data);
     prepend(*node);
@@ -608,11 +627,24 @@ public:
 
   /** Unlinks a node from a tree, resulting in two separate trees.
    */
-  void unlink(NodeTree<T>& child)
+  void unlink()
   {
-    g_node_unlink(child.gobj());
+    g_node_unlink(gobj());
   }
   _IGNORE(g_node_unlink)
+
+#if 0 //Commented-out because people can just use the copy constructor.
+  /** Recursively copies a node and it's data.
+   *
+   * Returns: a new node containing the copies of the data.
+   */
+  NodeTree<T>* copy_deep() const
+  {
+    //Use copy constructor instead of g_node_copy_deep to create C++ wrappers also not only the wrapped C objects.
+    return new NodeTree<T>(*this);
+  }
+#endif
+  _IGNORE(g_node_copy_deep)
 
   /// Accessor for this node's data
   T& data()
@@ -637,13 +669,12 @@ public:
 
   // Leaving these unimplemented for now
   _IGNORE(g_node_copy)
-  _IGNORE(g_node_copy_deep)
 
 
 private:
 
   GNode* gobject_;
-  T& data_;
+  T data_;
 
   /// Wrapper for invoking a TraverseFunc.
   static gboolean c_callback_traverse(GNode* node, gpointer slot)

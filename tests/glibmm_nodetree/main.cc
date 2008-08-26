@@ -118,8 +118,8 @@ int main()
   g_assert(tstring == "ABFEDCGKJIH");
   tstring.clear();
 
-  /* TODO:
-  node = root->copy();
+
+  node = root; //A deep copy.
   g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) == node->node_count(type_nodetree_string::TRAVERSE_ALL));
   g_assert(root->get_max_height() == node->get_max_height());
   root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
@@ -127,7 +127,7 @@ int main()
   g_assert(tstring == cstring);
 
   delete node;
-  */
+
   delete root;
 
   /* allocation tests */
