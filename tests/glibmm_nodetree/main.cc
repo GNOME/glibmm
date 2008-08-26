@@ -119,7 +119,7 @@ int main()
   tstring.clear();
 
 
-  node = root; //A deep copy.
+  node = new type_nodetree_string(*root); //A deep copy.
   g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) == node->node_count(type_nodetree_string::TRAVERSE_ALL));
   g_assert(root->get_max_height() == node->get_max_height());
   root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
