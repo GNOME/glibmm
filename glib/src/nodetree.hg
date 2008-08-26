@@ -88,7 +88,7 @@ public:
   {
     //Store the this pointer in the GNode so we can discover this wrapper later:
     gobject_ = g_node_new(reinterpret_cast<gpointer>(this));
-  };
+  }
   _IGNORE(g_node_new)
 
   /** Removes the instance and its children from the tree,
@@ -96,16 +96,8 @@ public:
    */
   ~NodeTree()
   {
-    if(!is_root())
-      unlink();
-
-    //Free the children (not with g_node_destroy to avoid the leaking of C++ warpper objects).
-    while(NodeTree<T>* i = first_child())
-      delete i;
-
-    //Free the wrapped object.
-    g_slice_free(GNode, gobject_);
-  };
+    clear();
+  }
   _IGNORE(g_node_destroy)
 
   NodeTree(const NodeTree<T>& node) :
@@ -117,6 +109,22 @@ public:
     //Prepend the copied children of @node to the constructing node.
     for(const NodeTree<T>* i = node.last_child();  i != 0; i = i->prev_sibling())
       prepend(*(new NodeTree<T>(*i)));
+  }
+
+  NodeTree<T>& operator=(const NodeTree<T>& node)
+  {
+    clear();
+
+    //Do the same as the copy constructor:
+
+    //Store the this pointer in the GNode so we can discover the wrapped object later.
+    gobject_ = g_node_new(reinterpret_cast<gpointer>(this));
+
+    //Prepend the copied children of @node to the constructing node.
+    for(const NodeTree<T>* i = node.last_child();  i != 0; i = i->prev_sibling())
+      prepend(*(new NodeTree<T>(*i)));
+
+    return *this;
   }
 
   /// Provides access to the underlying C GObject.
@@ -332,6 +340,7 @@ public:
     sigc::slot<void, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_child);
 
     GNode* child = 0;
+    typedef sigc::slot<void, GNode*> type_foreach_gnode_slot;
     type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, data, &child);
 
     g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach_compare_child, reinterpret_cast<gpointer>(&bound_slot));
@@ -364,6 +373,8 @@ public:
     //We use a sigc::slot for the C callback, so we can bind some extra data.
     sigc::slot<gboolean, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_node);
     GNode* child = 0;
+
+    typedef sigc::slot<gboolean, GNode*> type_traverse_gnode_slot;
     type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, data, &child);
 
     g_node_traverse(const_cast<GNode*>(gobj()), (GTraverseType)order, (GTraverseFlags)flags, -1, c_callback_traverse_compare_node, reinterpret_cast<gpointer>(&bound_slot));
@@ -667,14 +678,29 @@ public:
     return wrap(gobj()->parent);
   }
 
-  // Leaving these unimplemented for now
+  // Do not wrap this shallow copy function, because it is not useful:
   _IGNORE(g_node_copy)
 
 
 private:
 
-  GNode* gobject_;
-  T data_;
+  ///Delete all the underlying objects and data.
+  void clear()
+  {
+    if(!gobject_)
+      return;
+
+    if(!is_root())
+      unlink();
+
+    //Free the children (not just with g_node_destroy(), to avoid the leaking of C++ wrapper objects):
+    while(NodeTree<T>* i = first_child())
+      delete i;
+
+    //Free the wrapped object:
+    g_slice_free(GNode, gobject_);
+  }
+
 
   /// Wrapper for invoking a TraverseFunc.
   static gboolean c_callback_traverse(GNode* node, gpointer slot)
@@ -724,8 +750,9 @@ private:
     return (*slot)(*wrap(node));
   }
 
-  typedef sigc::slot<gboolean, GNode*> type_traverse_gnode_slot;
-  typedef sigc::slot<void, GNode*> type_foreach_gnode_slot;
+
+  GNode* gobject_;
+  T data_;
 };
 
 } // namespace Glib
