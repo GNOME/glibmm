@@ -28,7 +28,10 @@
 #include <iostream>
 #include <cstring>
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
 #include <glibmmconfig.h>
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 # include <stdexcept>
