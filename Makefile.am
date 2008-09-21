@@ -69,7 +69,7 @@ SVN_ROOT=`svn info |grep "$(ROOT_KEY)" |sed -e "s/$(ROOT_KEY)\s*//"`
 tag-release: distcheck
 	@svn cp -r$(SVN_REV) -m "tag $(PACKAGE) $(VERSION)" $(SVN_PATH) $(SVN_ROOT)/tags/$(PACKAGE)-$(VERSION) \
 		|| (echo "Tagging failed.  Do you have local changes that are not committed?" \
-		&& echo "Try running `svn update`." && false)
+		&& echo "Try running 'svn update'." && false)
 	@echo "Release Tagged."
 
 upload-release: tag-release
