@@ -354,6 +354,10 @@ sub convert_tags_to_doxygen($)
     # Some argument names are suffixed by "_" -- strip this.
     # gtk-doc uses @thearg, but doxygen uses @a thearg.
     s" ?\@([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?\b" \@a $1"g;
+
+    # Don't convert doxygen's @throws and @param, so these can be used in the
+    # docs_override.xml:
+    s" \@a (throws|param)" \@$1"g;
     s"^Note ?\d?: "\@note "mg;
 
     s"&lt;/?programlisting&gt;""g;
