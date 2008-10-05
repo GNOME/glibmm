@@ -1,6 +1,18 @@
+// Some libraries define HOST_NOT_FOUND.  Make sure we can still compile fine
+// even if this is the case:
+#define HOST_NOT_FOUND 1
+
 #include <giomm.h>
 #include <iostream>
 #include <string.h>
+
+// This is just to test a workaround in the error.h header.  We save and #undef
+// HOST_NOT_FOUND if it was defined by another header, and then restore it at
+// the end of the header.  Here I'm just making sure that our temporary value
+// doesn't remain set
+#ifdef GIOMM_SAVED_HOST_NOT_FOUND
+#error Forgot to #undef GIOMM_SAVED_HOST_NOT_FOUND
+#endif
 
 int main(int argc, char** argv)
 {

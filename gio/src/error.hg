@@ -19,6 +19,16 @@
 
 #include <glibmm/interface.h>
 
+// There have been issues with other libraries defining HOST_NOT_FOUND (e.g.
+// netdb.h).  As a workaround, we added the alternate name HOST_WAS_NOT_FOUND.
+// Portable code should not use HOST_NOT_FOUND.  Undefining it here (and
+// restoring it below) will allow programs to compile even if they include
+// netdb.h.  See Bug #529496
+#ifdef HOST_NOT_FOUND
+#define GIOMM_SAVED_HOST_NOT_FOUND HOST_NOT_FOUND
+#undef HOST_NOT_FOUND
+#endif // HOST_NOT_FOUND
+
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
 
@@ -35,3 +45,8 @@ _WRAP_GERROR(Error, GIOErrorEnum, G_IO_ERROR, NO_GTYPE)
 
 } // namespace Gio
 
+#ifdef GIOMM_SAVED_HOST_NOT_FOUND
+// restore the previously-defined HOST_NOT_FOUND macro
+#define HOST_NOT_FOUND GIOMM_SAVED_HOST_NOT_FOUND
+#undef GIOMM_SAVED_HOST_NOT_FOUND
+#endif // GIOMM_SAVED_HOST_NOT_FOUND
