@@ -135,9 +135,12 @@ std::string get_signals(GType gtype)
   std::string strObjectName = g_type_name(gtype);
 
   gpointer gclass_ref = 0;
+  gpointer ginterface_ref = 0;
 
   if(G_TYPE_IS_OBJECT(gtype))
     gclass_ref = g_type_class_ref(gtype); //Ensures that class_init() is called.
+  else if(G_TYPE_IS_INTERFACE(gtype))
+    ginterface_ref = g_type_default_interface_ref(gtype); //install signals.
 
   //Get the list of signals:
   guint iCount = 0;
@@ -220,6 +223,8 @@ std::string get_signals(GType gtype)
 
   if(gclass_ref)
     g_type_class_unref(gclass_ref); //to match the g_type_class_ref() above.
+  else if(ginterface_ref)
+    g_type_default_interface_unref(ginterface_ref); // for interface ref above.
 
   return strResult;
 }
