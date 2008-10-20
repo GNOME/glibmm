@@ -8,7 +8,7 @@ int main(int, char**)
 
   const char *constant_string = "constant string";
   std::cout << Glib::ustring::compose("Compose strings: %1", constant_string) << std::endl;
-  //TODO: Make this work. See ustring.h: std::cout << Glib::ustring::compose("Compose strings: %1 and %2", constant_string, "string_literal") << std::endl;
+  std::cout << Glib::ustring::compose("Compose strings: %1 and %2", constant_string, "string_literal") << std::endl;
 
   std::cout << Glib::ustring::compose("Compose strings: %1 and %2", 123, 123.4567) << std::endl;
 

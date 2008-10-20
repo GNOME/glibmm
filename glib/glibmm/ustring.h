@@ -1272,7 +1272,7 @@ template <>
 class ustring::Stringify<const char*>
 {
 private:
-  const ustring& string_;
+  const ustring string_;
 
   // noncopyable
   Stringify(const ustring::Stringify<const char*>&);
@@ -1283,26 +1283,23 @@ public:
   inline const ustring* ptr() const { return &string_; }
 };
 
-/* TODO: I can't seem to specify a template specialization for Stringify with a string literal. murrayc.
-
- * A template specialization for Stringify<char[N]> (for string literals),
+/** A template specialization for Stringify<char[N]> (for string literals),
  * because the regular template has ambiguous constructor overloads for char*.
-
+ */
 template <std::size_t N>
-class ustring::Stringify<const char[N]>
+class ustring::Stringify<char[N]>
 {
 private:
-  const ustring& string_;
+  const ustring string_;
 
   // noncopyable
-  Stringify(const ustring::Stringify<const char[N]>&);
-  Stringify<ustring>& operator=(const ustring::Stringify<const char[N]>&);
+  Stringify(const ustring::Stringify<char[N]>&);
+  Stringify<ustring>& operator=(const ustring::Stringify<char[N]>&);
 
 public:
   explicit inline Stringify(const char arg[N]) : string_(arg) {}
   inline const ustring* ptr() const { return &string_; }
 };
-*/
 
 template <class T1>
 inline // static
