@@ -78,44 +78,51 @@ upload-release: tag-release
 	@echo "[hint: make install-module]"
 
 RELEASE_ANNOUNCE_LIST = gnome-announce-list@gnome.org, gtkmm-list@gnome.org
-release-announce: upload-release
+release-announce:
 	@echo "Please send the following announcement to:"
 	@echo "$(RELEASE_ANNOUNCE_LIST)"
 	@echo ""
 	@echo "Subject: ANNOUNCE: $(PACKAGE) $(VERSION) released"
 	@echo ""
 	@echo "============================== CUT HERE =============================="
-	@echo "*** About $(PACKAGE)"
+	@echo "* ABOUT $(PACKAGE) *"
 	@echo ""
-	@echo "    $(PACKAGE) is a C++ API for glib, used by gtkmm."
+	@echo "  $(PACKAGE) is a C++ API for glib and gio.  It is useful on its own "
+	@echo "  and is a dependency of gtkmm, the C++ API for GTK+."
 	@echo ""
-	@echo "    $(PACKAGE) wraps new API in glib, including the gio library, "
-	@echo "    and is API/ABI-compatibile with older versions of glibmm back to "
-	@echo "    version 2.4. It is a version of the glibmm-2.4 API."
+	@echo "  $(PACKAGE) $(GLIBMM_RELEASE) wraps new API in glib $(GLIBMM_RELEASE), including the gio library, "
+	@echo "  and is API/ABI-compatibile with older versions of glibmm back to "
+	@echo "  version 2.4. It is a version of the glibmm-2.4 API."
 	@echo ""
-	@echo "    gtkmm and $(PACKAGE) stay in-sync with GTK+ by following the official GNOME release schedule:"
+	@echo "  For more information, please visit http://gtkmm.org/"
+	@echo ""
+	@echo "* DOWNLOAD *"
+	@echo ""
+	@echo "  Source packages for $(PACKAGE) (as well as API-stable bindings for the "
+	@echo "  rest of the GNOME platform) can be downloaded from:"
+	@echo ""
+	@echo "    http://www.gtkmm.org/download.shtml"
+	@echo ""
+	@echo "* DEVELOPMENT *"
+	@echo ""
+	@echo "  There is active discussion on the mailing list: "
+	@echo "  http://www.gtkmm.org/mailinglist.shtml"
+	@echo "  and in the #c++ channel on irc.gnome.org"
+	@echo ""
+	@echo "  gtkmm and $(PACKAGE) stay in-sync with GTK+ by following the official "
+	@echo "  GNOME release schedule:"
+	@echo ""
 	@echo "    http://www.gnome.org/start/unstable/"
 	@echo ""
-	@echo "    Bindings for the rest of the GNOME Platform are also available, and are also "
-	@echo "    API-stable."
+	@echo "* CHANGES *"
 	@echo ""
-	@echo "    http://www.gtkmm.org"
-	@echo ""
-	@echo "*** Development "
-	@echo ""
-	@echo "    There is active discussion on the mailing list: "
-	@echo "    http://www.gtkmm.org/mailinglist.shtml"
-	@echo "    and in the #c++ channel on irc.gnome.org"
-	@echo ""
-	@echo "*** Changes:"
-	@echo ""
-	@echo "    --- INSERT NEWS HERE ---"
+	@echo "  --- INSERT NEWS HERE ---"
 	@echo "============================== CUT HERE =============================="
 
 install-module:
 	ssh master.gnome.org install-module $(DIST_ARCHIVES)
 
-release: release-announce
+release: upload-release release-announce
 
 .PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild release tag-release upload-release release-announce install-module
 
