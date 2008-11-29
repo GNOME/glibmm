@@ -88,8 +88,8 @@ public:
     clone();
   }
 
-  explicit NodeTree(const T& data) :
-    data_(data)
+  explicit NodeTree(const T& the_data) :
+    data_(the_data)
   {
     clone();
   }
@@ -207,9 +207,9 @@ public:
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
-  NodeTree<T>* insert_data(int position, const T& data)
+  NodeTree<T>* insert_data(int position, const T& the_data)
   {
-    NodeTree<T>* node = new NodeTree<T>(data);
+    NodeTree<T>* node = new NodeTree<T>(the_data);
     insert(position, *node);
     return node;
   }
@@ -221,9 +221,9 @@ public:
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
-  NodeTree<T>* insert_data_before(NodeTree<T>& sibling, const T& data)
+  NodeTree<T>* insert_data_before(NodeTree<T>& sibling, const T& the_data)
   {
-    NodeTree<T>* node = new NodeTree<T>(data);
+    NodeTree<T>* node = new NodeTree<T>(the_data);
     insert_before(sibling, *node);
     return node;
   }
@@ -234,9 +234,9 @@ public:
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
-  NodeTree<T>* append_data(const T& data)
+  NodeTree<T>* append_data(const T& the_data)
   {
-    NodeTree<T>* node = new NodeTree<T>(data);
+    NodeTree<T>* node = new NodeTree<T>(the_data);
     append(*node);
     return node;
   }
@@ -247,9 +247,9 @@ public:
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
-  NodeTree<T>* prepend_data(const T& data)
+  NodeTree<T>* prepend_data(const T& the_data)
   {
-    NodeTree<T>* node = new NodeTree<T>(data);
+    NodeTree<T>* node = new NodeTree<T>(the_data);
     prepend(*node);
     return node;
   }
@@ -331,13 +331,13 @@ public:
    * @param data The data for which to search.
    * @return the found child, or 0 if the data is not found
    */
-  NodeTree<T>* find_child(const T& data, TraverseFlags flags = TRAVERSE_ALL)
+  NodeTree<T>* find_child(const T& the_data, TraverseFlags flags = TRAVERSE_ALL)
   {
     sigc::slot<void, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_child);
 
     GNode* child = 0;
     typedef sigc::slot<void, GNode*> type_foreach_gnode_slot;
-    type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, data, &child);
+    type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
 
     g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach_compare_child, reinterpret_cast<gpointer>(&bound_slot));
     
@@ -350,9 +350,9 @@ public:
    * @param data The data for which to search.
    * @return the found child, or 0 if the data is not found
    */
-  const NodeTree<T>* find_child(const T& data, TraverseFlags flags = TRAVERSE_ALL) const
+  const NodeTree<T>* find_child(const T& the_data, TraverseFlags flags = TRAVERSE_ALL) const
   {
-    return const_cast<NodeTree<T>*>(this)->find_child(flags, data);
+    return const_cast<NodeTree<T>*>(this)->find_child(flags, the_data);
   }
 
   _IGNORE(g_node_find_child)
@@ -364,14 +364,14 @@ public:
    * @param data The data for which to search.
    * @return The found node, or 0 if the data is not found.
    */
-  NodeTree<T>* find(const T& data, TraverseType order = TRAVERSE_IN_ORDER, TraverseFlags flags = TRAVERSE_ALL)
+  NodeTree<T>* find(const T& the_data, TraverseType order = TRAVERSE_IN_ORDER, TraverseFlags flags = TRAVERSE_ALL)
   {
     //We use a sigc::slot for the C callback, so we can bind some extra data.
     sigc::slot<gboolean, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_node);
     GNode* child = 0;
 
     typedef sigc::slot<gboolean, GNode*> type_traverse_gnode_slot;
-    type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, data, &child);
+    type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
 
     g_node_traverse(const_cast<GNode*>(gobj()), (GTraverseType)order, (GTraverseFlags)flags, -1, c_callback_traverse_compare_node, reinterpret_cast<gpointer>(&bound_slot));
 
@@ -385,9 +385,9 @@ public:
    * @param data The data for which to search.
    * @return The found node, or 0 if the data is not found.
    */
-  const NodeTree<T>* find(const T& data, TraverseType order = TRAVERSE_IN_ORDER, TraverseFlags flags = TRAVERSE_ALL) const
+  const NodeTree<T>* find(const T& the_data, TraverseType order = TRAVERSE_IN_ORDER, TraverseFlags flags = TRAVERSE_ALL) const
   {
-    return const_cast<NodeTree<T>*>(this)->find(order, flags, data);
+    return const_cast<NodeTree<T>*>(this)->find(order, flags, the_data);
   }
   _IGNORE(g_node_find)
 
@@ -396,13 +396,13 @@ public:
    * @param data The data to find.
    * @return The index of the child which contains data, or -1 if the data is not found.
    */
-  int child_index(const T& data) const
+  int child_index(const T& the_data) const
   {
     int n = 0;
 
     for(const NodeTree<T>* i = first_child();  i != 0; i = i->next_sibling())
     {
-      if((i->data()) == data)
+      if((i->data()) == the_data)
         return n;
 
       n++;
