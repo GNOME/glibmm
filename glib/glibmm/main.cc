@@ -24,7 +24,6 @@
 #include <glibmm/wrap.h>
 #include <glibmm/iochannel.h>
 
-#include <glib/gmessages.h>
 #include <algorithm>
 
 GLIBMM_USING_STD(min)

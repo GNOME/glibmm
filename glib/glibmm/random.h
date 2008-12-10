@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/gtypes.h>
+#include <glib.h>
 
 extern "C" { typedef struct _GRand GRand; }
 

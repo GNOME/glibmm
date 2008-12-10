@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/gquark.h>
+#include <glib.h>
 #include <glibmm/ustring.h>
 
 

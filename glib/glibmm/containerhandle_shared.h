@@ -29,7 +29,6 @@
 #include <list>
 
 #include <glib-object.h>
-#include <glib/gmem.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <glibmm/wrap.h>

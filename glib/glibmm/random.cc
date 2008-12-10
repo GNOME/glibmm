@@ -21,7 +21,6 @@
  */
 
 #include <glibmm/random.h>
-#include <glib/grand.h>
 
 
 namespace Glib

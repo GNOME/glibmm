@@ -20,7 +20,6 @@
  */
 
 #include <glibmm/utility.h>
-#include <glib/gstrfuncs.h>
 
 
 void Glib::append_canonical_typename(std::string& dest, const char* type_name)

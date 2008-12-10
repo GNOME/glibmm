@@ -26,7 +26,7 @@
 # error "X11/Xlib.h seems to have been included before this header. Due to some commonly-named macros in X11/Xlib.h, it may only be included after any glibmm, gdkmm, or gtkmm headers."
 #endif
 
-#include <glib/gmacros.h> /* for G_GNUC_NULL_TERMINATED */
+#include <glib.h> /* for G_GNUC_NULL_TERMINATED */
 #include <glibmm/objectbase.h>
 #include <glibmm/wrap.h>
 #include <glibmm/quark.h>

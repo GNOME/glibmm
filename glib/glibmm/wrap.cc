@@ -21,8 +21,7 @@
  */
 
 #include <glib-object.h>
-#include <glib/gtypes.h>
-#include <glib/gmacros.h>
+#include <glib.h>
 
 #include <vector>
 #include <glibmm/object.h>

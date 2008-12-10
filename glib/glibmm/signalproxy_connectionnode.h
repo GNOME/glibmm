@@ -24,7 +24,7 @@
  */
 
 #include <sigc++/sigc++.h>
-#include <glib/gtypes.h>
+#include <glib.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GObject GObject;

@@ -21,14 +21,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/gmacros.h>
+#include <glib.h>
 #include <glibmmconfig.h>
 
 // Some stuff that's useful when debugging gtkmm internals:
 
 #ifdef GLIBMM_DEBUG_REFCOUNTING
-
-#include <glib/gmessages.h>
 
 /* We can't use G_GNUC_PRETTY_FUNCTION because it's always disabled in C++,
  * even though __PRETTY_FUNCTION__ works fine in C++ as well if you use it

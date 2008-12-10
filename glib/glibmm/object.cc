@@ -22,7 +22,6 @@
 #include <glibmm/private/object_p.h>
 #include <glibmm/property.h>
 
-#include <glib.h>
 #include <glib-object.h>
 #include <gobject/gvaluecollector.h>
 

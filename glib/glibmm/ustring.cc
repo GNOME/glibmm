@@ -22,7 +22,6 @@
 #include <glibmm/convert.h>
 #include <glibmm/error.h>
 #include <glibmm/utility.h>
-#include <glib.h>
 
 #include <algorithm>
 #include <iostream>

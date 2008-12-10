@@ -21,8 +21,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/gmacros.h>
-#include <glib/gunicode.h>
+#include <glib.h>
 #include <glibmm/unicode.h>
 
 #include <iosfwd>

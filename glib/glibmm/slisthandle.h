@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/gslist.h>
+#include <glib.h>
 #include <glibmm/containerhandle_shared.h>
 
 

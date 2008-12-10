@@ -23,8 +23,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/gtypes.h>
-#include <glib/gtimer.h>
+#include <glib.h>
 
 namespace Glib
 {

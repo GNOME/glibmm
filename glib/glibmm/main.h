@@ -21,8 +21,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib/giochannel.h>
-#include <glib/gmain.h>
+#include <glib.h>
 
 #include <vector>
 #include <sigc++/sigc++.h>

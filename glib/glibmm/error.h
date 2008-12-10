@@ -24,7 +24,7 @@
 extern "C" { typedef struct _GError GError; }
 #endif
 
-#include <glib/gquark.h>
+#include <glib.h>
 #include <glibmm/exception.h>
 #include <glibmmconfig.h> //For GLIBMM_EXCEPTIONS_ENABLED
 
