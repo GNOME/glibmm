@@ -1,0 +1,58 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2008 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <giomm/outputstream.h>
+#include <giomm/seekable.h>
+#include <glibmm/object.h>
+// TODO: remove this if possible -- it's here for the GReallocFunc definition
+#include <gio/gio.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(giomm/private/outputstream_p.h)
+
+namespace Gio
+{
+
+//TODO: Proper documentation:
+
+/** Streaming output operations on memory chunks
+ *
+ * @ingroup Streams
+ *
+ * @newin2p20
+ */
+class MemoryOutputStream :
+    public OutputStream,
+    public Seekable
+{
+  _CLASS_GOBJECT(MemoryOutputStream, GMemoryOutputStream, G_FILTER_OUTPUT_STREAM, Gio::OutputStream, GOutputStream)
+  _IMPLEMENTS_INTERFACE(Seekable)
+protected:
+  // TODO: more C++-like interface using sigc++
+  _WRAP_CTOR(MemoryOutputStream(gpointer data, gsize len, GReallocFunc realloc_fn, GDestroyNotify destroy), g_memory_output_stream_new)
+
+public:
+  // TODO: more C++-like interface using sigc++
+  _WRAP_CREATE(gpointer data, gsize len, GReallocFunc realloc_fn, GDestroyNotify destroy)
+  _WRAP_METHOD(gpointer get_data(), g_memory_output_stream_get_data)
+  _WRAP_METHOD(gsize get_size() const, g_memory_output_stream_get_size)
+  _WRAP_METHOD(gsize get_data_size() const, g_memory_output_stream_get_data_size)
+};
+
+} // namespace Gio
