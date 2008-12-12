@@ -98,27 +98,6 @@
   (gtype-id "G_TYPE_LOADABLE_ICON")
 )
 
-(define-object DirectoryMonitor
-  (in-module "GLocal")
-  (parent "GFileMonitor")
-  (c-name "GLocalDirectoryMonitor")
-  (gtype-id "G_TYPE_LOCAL_DIRECTORY_MONITOR")
-)
-
-(define-object FileInputStream
-  (in-module "GLocal")
-  (parent "GFileInputStream")
-  (c-name "GLocalFileInputStream")
-  (gtype-id "G_TYPE_LOCAL_FILE_INPUT_STREAM")
-)
-
-(define-object FileMonitor
-  (in-module "GLocal")
-  (parent "GFileMonitor")
-  (c-name "GLocalFileMonitor")
-  (gtype-id "G_TYPE_LOCAL_FILE_MONITOR")
-)
-
 (define-object InputStream
   (in-module "GMemory")
   (parent "GInputStream")
@@ -161,6 +140,13 @@
 )
 
 (define-object OutputStream
+  (in-module "GBuffered")
+  (parent "GFilterOutputStream")
+  (c-name "GBufferedOutputStream")
+  (gtype-id "G_TYPE_BUFFERED_OUTPUT_STREAM")
+)
+
+(define-object OutputStream
   (in-module "GData")
   (parent "GFilterOutputStream")
   (c-name "GDataOutputStream")
@@ -172,13 +158,6 @@
   (parent "GOutputStream")
   (c-name "GFileOutputStream")
   (gtype-id "G_TYPE_FILE_OUTPUT_STREAM")
-)
-
-(define-object FileOutputStream
-  (in-module "GLocal")
-  (parent "GFileOutputStream")
-  (c-name "GLocalFileOutputStream")
-  (gtype-id "G_TYPE_LOCAL_FILE_OUTPUT_STREAM")
 )
 
 (define-object e
@@ -308,8 +287,8 @@
   (c-name "GFileQueryInfoFlags")
   (gtype-id "G_TYPE_FILE_QUERY_INFO_FLAGS")
   (values
-    '("ne" "G_FILE_QUERY_INFO_NONE")
-    '("follow-symlinks" "G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS")
+    '("none" "G_FILE_QUERY_INFO_NONE")
+    '("nofollow-symlinks" "G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS")
   )
 )
 
@@ -328,7 +307,7 @@
   (c-name "GMountMountFlags")
   (gtype-id "G_TYPE_MOUNT_MOUNT_FLAGS")
   (values
-    '("e" "G_MOUNT_MOUNT_NONE")
+    '("none" "G_MOUNT_MOUNT_NONE")
   )
 )
 
@@ -353,6 +332,7 @@
     '("nofollow-symlinks" "G_FILE_COPY_NOFOLLOW_SYMLINKS")
     '("all-metadata" "G_FILE_COPY_ALL_METADATA")
     '("no-fallback-for-move" "G_FILE_COPY_NO_FALLBACK_FOR_MOVE")
+    '("target-default-perms" "G_FILE_COPY_TARGET_DEFAULT_PERMS")
   )
 )
 
@@ -492,16 +472,23 @@
   )
 )
 
+(define-enum Origin
+  (in-module "GEmblem")
+  (c-name "GEmblemOrigin")
+  (gtype-id "G_TYPE_EMBLEM_ORIGIN")
+  (values
+    '("unknown" "G_EMBLEM_ORIGIN_UNKNOWN")
+    '("device" "G_EMBLEM_ORIGIN_DEVICE")
+    '("livemetadata" "G_EMBLEM_ORIGIN_LIVEMETADATA")
+    '("tag" "G_EMBLEM_ORIGIN_TAG")
+  )
+)
+
 
 ;; From gappinfo.h
 
 (define-function g_app_info_get_type
   (c-name "g_app_info_get_type")
-  (return-type "GType")
-)
-
-(define-function g_app_launch_context_get_type
-  (c-name "g_app_launch_context_get_type")
   (return-type "GType")
 )
 
@@ -552,6 +539,12 @@
 (define-method get_executable
   (of-object "GAppInfo")
   (c-name "g_app_info_get_executable")
+  (return-type "const-char*")
+)
+
+(define-method get_commandline
+  (of-object "GAppInfo")
+  (c-name "g_app_info_get_commandline")
   (return-type "const-char*")
 )
 
@@ -647,6 +640,18 @@
   )
 )
 
+(define-method can_delete
+  (of-object "GAppInfo")
+  (c-name "g_app_info_can_delete")
+  (return-type "gboolean")
+)
+
+(define-method delete
+  (of-object "GAppInfo")
+  (c-name "g_app_info_delete")
+  (return-type "gboolean")
+)
+
 (define-function g_app_info_get_all
   (c-name "g_app_info_get_all")
   (return-type "GList*")
@@ -655,6 +660,14 @@
 (define-function g_app_info_get_all_for_type
   (c-name "g_app_info_get_all_for_type")
   (return-type "GList*")
+  (parameters
+    '("const-char*" "content_type")
+  )
+)
+
+(define-function g_app_info_reset_type_associations
+  (c-name "g_app_info_reset_type_associations")
+  (return-type "none")
   (parameters
     '("const-char*" "content_type")
   )
@@ -685,6 +698,11 @@
     '("GAppLaunchContext*" "launch_context")
     '("GError**" "error")
   )
+)
+
+(define-function g_app_launch_context_get_type
+  (c-name "g_app_launch_context_get_type")
+  (return-type "GType")
 )
 
 (define-function g_app_launch_context_new
@@ -721,10 +739,6 @@
     '("const-char*" "startup_notify_id")
   )
 )
-
-
-
-;; From gasynchelper.h
 
 
 
@@ -952,6 +966,15 @@
   (return-type "int")
 )
 
+(define-method make_pollfd
+  (of-object "GCancellable")
+  (c-name "g_cancellable_make_pollfd")
+  (return-type "none")
+  (parameters
+    '("GPollFD*" "pollfd")
+  )
+)
+
 (define-function g_cancellable_get_current
   (c-name "g_cancellable_get_current")
   (return-type "GCancellable*")
@@ -1074,10 +1097,6 @@
   (c-name "g_content_types_get_registered")
   (return-type "GList*")
 )
-
-
-
-;; From gcontenttypeprivate.h
 
 
 
@@ -1343,68 +1362,6 @@
 
 
 
-;; From gdesktopappinfo.h
-
-(define-function g_desktop_app_info_get_type
-  (c-name "g_desktop_app_info_get_type")
-  (return-type "GType")
-)
-
-(define-function g_desktop_app_info_new_from_filename
-  (c-name "g_desktop_app_info_new_from_filename")
-  (return-type "GDesktopAppInfo*")
-  (parameters
-    '("const-char*" "filename")
-  )
-)
-
-(define-function g_desktop_app_info_new_from_keyfile
-  (c-name "g_desktop_app_info_new_from_keyfile")
-  (return-type "GDesktopAppInfo*")
-  (parameters
-    '("GKeyFile*" "key_file")
-  )
-)
-
-(define-function g_desktop_app_info_new
-  (c-name "g_desktop_app_info_new")
-  (is-constructor-of "GDesktopAppInfo")
-  (return-type "GDesktopAppInfo*")
-  (parameters
-    '("const-char*" "desktop_id")
-  )
-)
-
-(define-method get_is_hidden
-  (of-object "GDesktopAppInfo")
-  (c-name "g_desktop_app_info_get_is_hidden")
-  (return-type "gboolean")
-)
-
-(define-function g_desktop_app_info_set_desktop_env
-  (c-name "g_desktop_app_info_set_desktop_env")
-  (return-type "none")
-  (parameters
-    '("const-char*" "desktop_env")
-  )
-)
-
-(define-function g_desktop_app_info_lookup_get_type
-  (c-name "g_desktop_app_info_lookup_get_type")
-  (return-type "GType")
-)
-
-(define-method get_default_for_uri_scheme
-  (of-object "GDesktopAppInfoLookup")
-  (c-name "g_desktop_app_info_lookup_get_default_for_uri_scheme")
-  (return-type "GAppInfo*")
-  (parameters
-    '("const-char*" "uri_scheme")
-  )
-)
-
-
-
 ;; From gdrive.h
 
 (define-function g_drive_get_type
@@ -1526,11 +1483,91 @@
 
 
 
-;; From gdummyfile.h
+;; From gemblemedicon.h
+
+(define-function g_emblemed_icon_get_type
+  (c-name "g_emblemed_icon_get_type")
+  (return-type "GType")
+)
+
+(define-function g_emblemed_icon_new
+  (c-name "g_emblemed_icon_new")
+  (is-constructor-of "GEmblemedIcon")
+  (return-type "GIcon*")
+  (parameters
+    '("GIcon*" "icon")
+    '("GEmblem*" "emblem")
+  )
+)
+
+(define-method get_icon
+  (of-object "GEmblemedIcon")
+  (c-name "g_emblemed_icon_get_icon")
+  (return-type "GIcon*")
+)
+
+(define-method get_emblems
+  (of-object "GEmblemedIcon")
+  (c-name "g_emblemed_icon_get_emblems")
+  (return-type "GList*")
+)
+
+(define-method add_emblem
+  (of-object "GEmblemedIcon")
+  (c-name "g_emblemed_icon_add_emblem")
+  (return-type "none")
+  (parameters
+    '("GEmblem*" "emblem")
+  )
+)
+
+
+
+;; From gemblem.h
+
+(define-function g_emblem_get_type
+  (c-name "g_emblem_get_type")
+  (return-type "GType")
+)
+
+(define-function g_emblem_new
+  (c-name "g_emblem_new")
+  (is-constructor-of "GEmblem")
+  (return-type "GEmblem*")
+  (parameters
+    '("GIcon*" "icon")
+  )
+)
+
+(define-function g_emblem_new_with_origin
+  (c-name "g_emblem_new_with_origin")
+  (return-type "GEmblem*")
+  (parameters
+    '("GIcon*" "icon")
+    '("GEmblemOrigin" "origin")
+  )
+)
+
+(define-method get_icon
+  (of-object "GEmblem")
+  (c-name "g_emblem_get_icon")
+  (return-type "GIcon*")
+)
+
+(define-method get_origin
+  (of-object "GEmblem")
+  (c-name "g_emblem_get_origin")
+  (return-type "GEmblemOrigin")
+)
 
 
 
 ;; From gfileattribute.h
+
+(define-function g_file_attribute_info_list_get_type
+  (c-name "g_file_attribute_info_list_get_type")
+  (return-type "GType")
+)
 
 (define-function g_file_attribute_info_list_new
   (c-name "g_file_attribute_info_list_new")
@@ -1575,10 +1612,6 @@
     '("GFileAttributeInfoFlags" "flags")
   )
 )
-
-
-
-;; From gfileattribute-priv.h
 
 
 
@@ -3456,6 +3489,21 @@
   )
 )
 
+(define-method to_string
+  (of-object "GIcon")
+  (c-name "g_icon_to_string")
+  (return-type "gchar*")
+)
+
+(define-function g_icon_new_for_string
+  (c-name "g_icon_new_for_string")
+  (return-type "GIcon*")
+  (parameters
+    '("const-gchar*" "str")
+    '("GError**" "error")
+  )
+)
+
 
 
 ;; From ginputstream.h
@@ -3609,10 +3657,6 @@
 
 
 
-;; From gioalias.h
-
-
-
 ;; From gioenums.h
 
 
@@ -3719,6 +3763,11 @@
   (return-type "GType")
 )
 
+(define-function g_emblem_origin_get_type
+  (c-name "g_emblem_origin_get_type")
+  (return-type "GType")
+)
+
 
 
 ;; From gioerror.h
@@ -3742,10 +3791,6 @@
 
 
 
-;; From gio-marshal.h
-
-
-
 ;; From giomodule.h
 
 (define-function g_io_module_get_type
@@ -3766,7 +3811,7 @@
   (c-name "g_io_modules_load_all_in_directory")
   (return-type "GList*")
   (parameters
-    '("const-char*" "dirname")
+    '("const-gchar*" "dirname")
   )
 )
 
@@ -3865,10 +3910,6 @@
 
 
 
-;; From giomodule-priv.h
-
-
-
 ;; From gioscheduler.h
 
 (define-function g_io_scheduler_push_job
@@ -3957,48 +3998,6 @@
     '("GError**" "error")
   )
 )
-
-
-
-;; From glocaldirectorymonitor.h
-
-(define-function g_local_directory_monitor_get_type
-  (c-name "g_local_directory_monitor_get_type")
-  (return-type "GType")
-)
-
-
-
-;; From glocalfileenumerator.h
-
-
-
-;; From glocalfile.h
-
-
-
-;; From glocalfileinfo.h
-
-
-
-;; From glocalfileinputstream.h
-
-
-
-;; From glocalfilemonitor.h
-
-(define-function g_local_file_monitor_get_type
-  (c-name "g_local_file_monitor_get_type")
-  (return-type "GType")
-)
-
-
-
-;; From glocalfileoutputstream.h
-
-
-
-;; From glocalvfs.h
 
 
 
@@ -4221,6 +4220,35 @@
   )
 )
 
+(define-method guess_content_type_sync
+  (of-object "GMount")
+  (c-name "g_mount_guess_content_type_sync")
+  (return-type "gchar**")
+  (parameters
+    '("gboolean" "force_rescan")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method is_shadowed
+  (of-object "GMount")
+  (c-name "g_mount_is_shadowed")
+  (return-type "gboolean")
+)
+
+(define-method shadow
+  (of-object "GMount")
+  (c-name "g_mount_shadow")
+  (return-type "none")
+)
+
+(define-method unshadow
+  (of-object "GMount")
+  (c-name "g_mount_unshadow")
+  (return-type "none")
+)
+
 
 
 ;; From gmountoperation.h
@@ -4334,10 +4362,6 @@
     '("GMountOperationResult" "result")
   )
 )
-
-
-
-;; From gmountprivate.h
 
 
 
@@ -4532,10 +4556,6 @@
   (c-name "g_output_stream_clear_pending")
   (return-type "none")
 )
-
-
-
-;; From gpollfilemonitor.h
 
 
 
@@ -4839,7 +4859,298 @@
 
 
 
-;; From gunionvolumemonitor.h
+;; From gvfs.h
+
+(define-function g_vfs_get_type
+  (c-name "g_vfs_get_type")
+  (return-type "GType")
+)
+
+(define-method is_active
+  (of-object "GVfs")
+  (c-name "g_vfs_is_active")
+  (return-type "gboolean")
+)
+
+(define-method get_file_for_path
+  (of-object "GVfs")
+  (c-name "g_vfs_get_file_for_path")
+  (return-type "GFile*")
+  (parameters
+    '("const-char*" "path")
+  )
+)
+
+(define-method get_file_for_uri
+  (of-object "GVfs")
+  (c-name "g_vfs_get_file_for_uri")
+  (return-type "GFile*")
+  (parameters
+    '("const-char*" "uri")
+  )
+)
+
+(define-method parse_name
+  (of-object "GVfs")
+  (c-name "g_vfs_parse_name")
+  (return-type "GFile*")
+  (parameters
+    '("const-char*" "parse_name")
+  )
+)
+
+(define-function g_vfs_get_default
+  (c-name "g_vfs_get_default")
+  (return-type "GVfs*")
+)
+
+(define-function g_vfs_get_local
+  (c-name "g_vfs_get_local")
+  (return-type "GVfs*")
+)
+
+
+
+;; From gvolume.h
+
+(define-function g_volume_get_type
+  (c-name "g_volume_get_type")
+  (return-type "GType")
+)
+
+(define-method get_name
+  (of-object "GVolume")
+  (c-name "g_volume_get_name")
+  (return-type "char*")
+)
+
+(define-method get_icon
+  (of-object "GVolume")
+  (c-name "g_volume_get_icon")
+  (return-type "GIcon*")
+)
+
+(define-method get_uuid
+  (of-object "GVolume")
+  (c-name "g_volume_get_uuid")
+  (return-type "char*")
+)
+
+(define-method get_drive
+  (of-object "GVolume")
+  (c-name "g_volume_get_drive")
+  (return-type "GDrive*")
+)
+
+(define-method get_mount
+  (of-object "GVolume")
+  (c-name "g_volume_get_mount")
+  (return-type "GMount*")
+)
+
+(define-method can_mount
+  (of-object "GVolume")
+  (c-name "g_volume_can_mount")
+  (return-type "gboolean")
+)
+
+(define-method can_eject
+  (of-object "GVolume")
+  (c-name "g_volume_can_eject")
+  (return-type "gboolean")
+)
+
+(define-method should_automount
+  (of-object "GVolume")
+  (c-name "g_volume_should_automount")
+  (return-type "gboolean")
+)
+
+(define-method mount
+  (of-object "GVolume")
+  (c-name "g_volume_mount")
+  (return-type "none")
+  (parameters
+    '("GMountMountFlags" "flags")
+    '("GMountOperation*" "mount_operation")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method mount_finish
+  (of-object "GVolume")
+  (c-name "g_volume_mount_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method eject
+  (of-object "GVolume")
+  (c-name "g_volume_eject")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method eject_finish
+  (of-object "GVolume")
+  (c-name "g_volume_eject_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_identifier
+  (of-object "GVolume")
+  (c-name "g_volume_get_identifier")
+  (return-type "char*")
+  (parameters
+    '("const-char*" "kind")
+  )
+)
+
+(define-method enumerate_identifiers
+  (of-object "GVolume")
+  (c-name "g_volume_enumerate_identifiers")
+  (return-type "char**")
+)
+
+(define-method get_activation_root
+  (of-object "GVolume")
+  (c-name "g_volume_get_activation_root")
+  (return-type "GFile*")
+)
+
+
+
+;; From gvolumemonitor.h
+
+(define-function g_volume_monitor_get_type
+  (c-name "g_volume_monitor_get_type")
+  (return-type "GType")
+)
+
+(define-function g_volume_monitor_get
+  (c-name "g_volume_monitor_get")
+  (return-type "GVolumeMonitor*")
+)
+
+(define-method get_connected_drives
+  (of-object "GVolumeMonitor")
+  (c-name "g_volume_monitor_get_connected_drives")
+  (return-type "GList*")
+)
+
+(define-method get_volumes
+  (of-object "GVolumeMonitor")
+  (c-name "g_volume_monitor_get_volumes")
+  (return-type "GList*")
+)
+
+(define-method get_mounts
+  (of-object "GVolumeMonitor")
+  (c-name "g_volume_monitor_get_mounts")
+  (return-type "GList*")
+)
+
+(define-method get_volume_for_uuid
+  (of-object "GVolumeMonitor")
+  (c-name "g_volume_monitor_get_volume_for_uuid")
+  (return-type "GVolume*")
+  (parameters
+    '("const-char*" "uuid")
+  )
+)
+
+(define-method get_mount_for_uuid
+  (of-object "GVolumeMonitor")
+  (c-name "g_volume_monitor_get_mount_for_uuid")
+  (return-type "GMount*")
+  (parameters
+    '("const-char*" "uuid")
+  )
+)
+
+(define-function g_volume_monitor_adopt_orphan_mount
+  (c-name "g_volume_monitor_adopt_orphan_mount")
+  (return-type "GVolume*")
+  (parameters
+    '("GMount*" "mount")
+  )
+)
+
+
+
+;; From gdesktopappinfo.h
+
+(define-function g_desktop_app_info_get_type
+  (c-name "g_desktop_app_info_get_type")
+  (return-type "GType")
+)
+
+(define-function g_desktop_app_info_new_from_filename
+  (c-name "g_desktop_app_info_new_from_filename")
+  (return-type "GDesktopAppInfo*")
+  (parameters
+    '("const-char*" "filename")
+  )
+)
+
+(define-function g_desktop_app_info_new_from_keyfile
+  (c-name "g_desktop_app_info_new_from_keyfile")
+  (return-type "GDesktopAppInfo*")
+  (parameters
+    '("GKeyFile*" "key_file")
+  )
+)
+
+(define-function g_desktop_app_info_new
+  (c-name "g_desktop_app_info_new")
+  (is-constructor-of "GDesktopAppInfo")
+  (return-type "GDesktopAppInfo*")
+  (parameters
+    '("const-char*" "desktop_id")
+  )
+)
+
+(define-method get_is_hidden
+  (of-object "GDesktopAppInfo")
+  (c-name "g_desktop_app_info_get_is_hidden")
+  (return-type "gboolean")
+)
+
+(define-function g_desktop_app_info_set_desktop_env
+  (c-name "g_desktop_app_info_set_desktop_env")
+  (return-type "none")
+  (parameters
+    '("const-char*" "desktop_env")
+  )
+)
+
+(define-function g_desktop_app_info_lookup_get_type
+  (c-name "g_desktop_app_info_lookup_get_type")
+  (return-type "GType")
+)
+
+(define-method get_default_for_uri_scheme
+  (of-object "GDesktopAppInfoLookup")
+  (c-name "g_desktop_app_info_lookup_get_default_for_uri_scheme")
+  (return-type "GAppInfo*")
+  (parameters
+    '("const-char*" "uri_scheme")
+  )
+)
 
 
 
@@ -4859,10 +5170,6 @@
     '("gboolean" "close_fd_at_close")
   )
 )
-
-
-
-;; From gunixmount.h
 
 
 
@@ -5113,263 +5420,5 @@
     '("gboolean" "close_fd_at_close")
   )
 )
-
-
-
-;; From gunixvolume.h
-
-
-
-;; From gunixvolumemonitor.h
-
-
-
-;; From gvfs.h
-
-(define-function g_vfs_get_type
-  (c-name "g_vfs_get_type")
-  (return-type "GType")
-)
-
-(define-method is_active
-  (of-object "GVfs")
-  (c-name "g_vfs_is_active")
-  (return-type "gboolean")
-)
-
-(define-method get_file_for_path
-  (of-object "GVfs")
-  (c-name "g_vfs_get_file_for_path")
-  (return-type "GFile*")
-  (parameters
-    '("const-char*" "path")
-  )
-)
-
-(define-method get_file_for_uri
-  (of-object "GVfs")
-  (c-name "g_vfs_get_file_for_uri")
-  (return-type "GFile*")
-  (parameters
-    '("const-char*" "uri")
-  )
-)
-
-(define-method parse_name
-  (of-object "GVfs")
-  (c-name "g_vfs_parse_name")
-  (return-type "GFile*")
-  (parameters
-    '("const-char*" "parse_name")
-  )
-)
-
-(define-function g_vfs_get_default
-  (c-name "g_vfs_get_default")
-  (return-type "GVfs*")
-)
-
-(define-function g_vfs_get_local
-  (c-name "g_vfs_get_local")
-  (return-type "GVfs*")
-)
-
-
-
-;; From gvolume.h
-
-(define-function g_volume_get_type
-  (c-name "g_volume_get_type")
-  (return-type "GType")
-)
-
-(define-method get_name
-  (of-object "GVolume")
-  (c-name "g_volume_get_name")
-  (return-type "char*")
-)
-
-(define-method get_icon
-  (of-object "GVolume")
-  (c-name "g_volume_get_icon")
-  (return-type "GIcon*")
-)
-
-(define-method get_uuid
-  (of-object "GVolume")
-  (c-name "g_volume_get_uuid")
-  (return-type "char*")
-)
-
-(define-method get_drive
-  (of-object "GVolume")
-  (c-name "g_volume_get_drive")
-  (return-type "GDrive*")
-)
-
-(define-method get_mount
-  (of-object "GVolume")
-  (c-name "g_volume_get_mount")
-  (return-type "GMount*")
-)
-
-(define-method can_mount
-  (of-object "GVolume")
-  (c-name "g_volume_can_mount")
-  (return-type "gboolean")
-)
-
-(define-method can_eject
-  (of-object "GVolume")
-  (c-name "g_volume_can_eject")
-  (return-type "gboolean")
-)
-
-(define-method should_automount
-  (of-object "GVolume")
-  (c-name "g_volume_should_automount")
-  (return-type "gboolean")
-)
-
-(define-method mount
-  (of-object "GVolume")
-  (c-name "g_volume_mount")
-  (return-type "none")
-  (parameters
-    '("GMountMountFlags" "flags")
-    '("GMountOperation*" "mount_operation")
-    '("GCancellable*" "cancellable")
-    '("GAsyncReadyCallback" "callback")
-    '("gpointer" "user_data")
-  )
-)
-
-(define-method mount_finish
-  (of-object "GVolume")
-  (c-name "g_volume_mount_finish")
-  (return-type "gboolean")
-  (parameters
-    '("GAsyncResult*" "result")
-    '("GError**" "error")
-  )
-)
-
-(define-method eject
-  (of-object "GVolume")
-  (c-name "g_volume_eject")
-  (return-type "none")
-  (parameters
-    '("GMountUnmountFlags" "flags")
-    '("GCancellable*" "cancellable")
-    '("GAsyncReadyCallback" "callback")
-    '("gpointer" "user_data")
-  )
-)
-
-(define-method eject_finish
-  (of-object "GVolume")
-  (c-name "g_volume_eject_finish")
-  (return-type "gboolean")
-  (parameters
-    '("GAsyncResult*" "result")
-    '("GError**" "error")
-  )
-)
-
-(define-method get_identifier
-  (of-object "GVolume")
-  (c-name "g_volume_get_identifier")
-  (return-type "char*")
-  (parameters
-    '("const-char*" "kind")
-  )
-)
-
-(define-method enumerate_identifiers
-  (of-object "GVolume")
-  (c-name "g_volume_enumerate_identifiers")
-  (return-type "char**")
-)
-
-(define-method get_activation_root
-  (of-object "GVolume")
-  (c-name "g_volume_get_activation_root")
-  (return-type "GFile*")
-)
-
-
-
-;; From gvolumemonitor.h
-
-(define-function g_volume_monitor_get_type
-  (c-name "g_volume_monitor_get_type")
-  (return-type "GType")
-)
-
-(define-function g_volume_monitor_get
-  (c-name "g_volume_monitor_get")
-  (return-type "GVolumeMonitor*")
-)
-
-(define-method get_connected_drives
-  (of-object "GVolumeMonitor")
-  (c-name "g_volume_monitor_get_connected_drives")
-  (return-type "GList*")
-)
-
-(define-method get_volumes
-  (of-object "GVolumeMonitor")
-  (c-name "g_volume_monitor_get_volumes")
-  (return-type "GList*")
-)
-
-(define-method get_mounts
-  (of-object "GVolumeMonitor")
-  (c-name "g_volume_monitor_get_mounts")
-  (return-type "GList*")
-)
-
-(define-method get_volume_for_uuid
-  (of-object "GVolumeMonitor")
-  (c-name "g_volume_monitor_get_volume_for_uuid")
-  (return-type "GVolume*")
-  (parameters
-    '("const-char*" "uuid")
-  )
-)
-
-(define-method get_mount_for_uuid
-  (of-object "GVolumeMonitor")
-  (c-name "g_volume_monitor_get_mount_for_uuid")
-  (return-type "GMount*")
-  (parameters
-    '("const-char*" "uuid")
-  )
-)
-
-(define-function g_volume_monitor_adopt_orphan_mount
-  (c-name "g_volume_monitor_adopt_orphan_mount")
-  (return-type "GVolume*")
-  (parameters
-    '("GMount*" "mount")
-  )
-)
-
-
-
-;; From gwin32appinfo.h
-
-(define-function g_win32_app_info_get_type
-  (c-name "g_win32_app_info_get_type")
-  (return-type "GType")
-)
-
-
-
-;; From gwin32mount.h
-
-
-
-;; From gwin32volumemonitor.h
 
 

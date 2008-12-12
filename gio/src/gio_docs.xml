@@ -26,6 +26,48 @@ its @type and @flags.
 <return></return>
 </function>
 
+<function name="g_mount_guess_content_type">
+<description>
+Tries to guess the type of content stored on @mount. Returns one or
+more textual identifiers of well-known content types (typically
+prefixed with &quot;x-content/&quot;), e.g. x-content/image-dcf for camera 
+memory cards. See the &amp;lt;ulink url=&quot;http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec&quot;&amp;gt;shared-mime-info&amp;lt;/ulink&amp;gt;
+specification for more on x-content types.
+
+This is an asynchronous operation (see
+g_mount_guess_content_type_sync() for the synchronous version), and
+is finished by calling g_mount_guess_content_type_finish() with the
+@mount and #GAsyncResult data returned in the @callback.
+
+Since: 2.18
+
+</description>
+<parameters>
+<parameter name="mount">
+<parameter_description> a #GMount
+</parameter_description>
+</parameter>
+<parameter name="force_rescan">
+<parameter_description> Whether to force a rescan of the content. 
+Otherwise a cached result will be used if available
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_output_stream_flush_async">
 <description>
 Flushes a stream asynchronously.
@@ -61,20 +103,6 @@ result of the operation.
 <return></return>
 </function>
 
-<function name="g_input_stream_clear_pending">
-<description>
-Clears the pending flag on @stream.
-
-</description>
-<parameters>
-<parameter name="stream">
-<parameter_description> input stream
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="g_file_attribute_info_list_ref">
 <description>
 References a file attribute info list.
@@ -91,19 +119,21 @@ References a file attribute info list.
 </return>
 </function>
 
-<function name="g_file_enumerator_is_closed">
+<function name="g_content_type_from_mime_type">
 <description>
-Checks if the file enumerator has been closed.
+Tries to find a content type based on the mime type name.
 
 
 </description>
 <parameters>
-<parameter name="enumerator">
-<parameter_description> a #GFileEnumerator.
+<parameter name="mime_type">
+<parameter_description> a mime type string.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @enumerator is closed.
+<return> Newly allocated string with content type or NULL when does not know.
+
+Since: 2.18
 </return>
 </function>
 
@@ -145,7 +175,7 @@ ignore.
 <description>
 Ejects a mount. This is an asynchronous operation, and is 
 finished by calling g_mount_eject_finish() with the @mount 
-and #GAsyncResults data returned in the @callback.
+and #GAsyncResult data returned in the @callback.
 
 </description>
 <parameters>
@@ -208,7 +238,8 @@ Checks if @drive is capabable of automatically detecting media changes.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @drive is capabable of automatically detecting media changes, %FALSE otherwise.
+<return> %TRUE if the @drive is capabable of automatically detecting 
+media changes, %FALSE otherwise.
 </return>
 </function>
 
@@ -228,13 +259,38 @@ Resets @cancellable to its uncancelled state.
 
 <function name="g_unix_mount_monitor_new">
 <description>
-Gets a new #GUnixMountMonitor.
+Gets a new #GUnixMountMonitor. The default rate limit for which the
+monitor will report consecutive changes for the mount and mount
+point entry files is the default for a #GFileMonitor. Use
+g_unix_mount_monitor_set_rate_limit() to change this.
 
 
 </description>
 <parameters>
 </parameters>
 <return> a #GUnixMountMonitor. 
+</return>
+</function>
+
+<function name="g_app_info_delete">
+<description>
+Tries to delete an #GAppInfo. 
+
+On some platforms, there may be a difference between user-defined
+#GAppInfo&amp;lt;!-- --&amp;gt;s which can be deleted, and system-wide ones which
+cannot. See g_app_info_can_delete().
+
+
+</description>
+<parameters>
+<parameter name="appinfo">
+<parameter_description> a #GAppInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @appinfo has been deleted
+
+Since: 2.20
 </return>
 </function>
 
@@ -279,30 +335,37 @@ Gets the file&apos;s size.
 </return>
 </function>
 
-<function name="g_file_info_set_attribute">
+<function name="g_file_input_stream_query_info">
 <description>
-Sets the @attribute to contain the given value, if possible.
+Queries a file input stream the given @attributes. This function blocks 
+while querying the stream. For the asynchronous (non-blocking) version 
+of this function, see g_file_input_stream_query_info_async(). While the 
+stream is blocked, the stream will set the pending flag internally, and 
+any other operations on the stream will fail with %G_IO_ERROR_PENDING.
+
 
 </description>
 <parameters>
-<parameter name="info">
-<parameter_description> a #GFileInfo.
+<parameter name="stream">
+<parameter_description> a #GFileInputStream.
 </parameter_description>
 </parameter>
-<parameter name="attribute">
-<parameter_description> a file attribute key.
+<parameter name="attributes">
+<parameter_description> a file attribute query string.
 </parameter_description>
 </parameter>
-<parameter name="type">
-<parameter_description> a #GFileAttributeType
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore. 
 </parameter_description>
 </parameter>
-<parameter name="value_p">
-<parameter_description> pointer to the value
+<parameter name="error">
+<parameter_description> a #GError location to store the error occuring, or %NULL to 
+ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a #GFileInfo, or %NULL on error.
+</return>
 </function>
 
 <function name="g_file_make_symbolic_link">
@@ -399,6 +462,22 @@ Sets the mount operation&apos;s domain.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_file_enumerator_is_closed">
+<description>
+Checks if the file enumerator has been closed.
+
+
+</description>
+<parameters>
+<parameter name="enumerator">
+<parameter_description> a #GFileEnumerator.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @enumerator is closed.
+</return>
 </function>
 
 <function name="g_file_info_set_sort_order">
@@ -665,33 +744,19 @@ Creates a new file attribute info list.
 </return>
 </function>
 
-<function name="g_file_get_parse_name">
+<function name="g_unix_mount_guess_should_display">
 <description>
-Gets the parse name of the @file.
-A parse name is a UTF-8 string that describes the
-file such that one can get the #GFile back using
-g_file_parse_name().
-
-This is generally used to show the #GFile as a nice
-full-pathname kind of string in a user interface,
-like in a location entry.
-
-For local files with names that can safely be converted
-to UTF8 the pathname is used, otherwise the IRI is used
-(a form of URI that allows UTF8 characters unescaped).
-
-This call does no blocking i/o.
+Guesses whether a Unix mount should be displayed in the UI.
 
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> input #GFile.
+<parameter name="mount_entry">
+<parameter_description> a #GUnixMountEntry
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the #GFile&apos;s parse name. The returned 
-string should be freed with g_free() when no longer needed.
+<return> %TRUE if @mount_entry is deemed to be displayable.
 </return>
 </function>
 
@@ -756,6 +821,25 @@ Clears the status information from @info.
 <return></return>
 </function>
 
+<function name="g_mount_unshadow">
+<description>
+Decrements the shadow count on @mount. Usually used by
+#GVolumeMonitor implementations when destroying a shadow mount for
+@mount, see g_mount_is_shadowed() for more information. The caller
+will need to emit the #GMount::changed signal on @mount manually.
+
+Since: 2.20
+
+</description>
+<parameters>
+<parameter name="mount">
+<parameter_description> A #GMount.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_file_eject_mountable">
 <description>
 Starts an asynchronous eject on a mountable.  
@@ -807,6 +891,43 @@ Checks if a file is a backup file.
 </parameters>
 <return> %TRUE if file is a backup file, %FALSE otherwise.
 </return>
+</function>
+
+<function name="g_file_find_enclosing_mount_async">
+<description>
+Asynchronously gets the mount for the file.
+
+For more details, see g_file_find_enclosing_mount() which is
+the synchronous version of this call.
+
+When the operation is finished, @callback will be called. You can then call
+g_file_find_enclosing_mount_finish() to get the result of the operation.
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the &amp;lt;link linkend=&quot;io-priority&quot;&amp;gt;I/O priority&amp;lt;/link&amp;gt; 
+of the request.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_unix_volume_set_mount">
@@ -864,20 +985,15 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 <return></return>
 </function>
 
-<function name="g_file_info_get_file_type">
+<function name="g_vfs_get_local">
 <description>
-Gets a file&apos;s type (whether it is a regular file, symlink, etc). 
-This is different from the file&apos;s content type, see g_file_info_get_content_type().
+Gets the local #GVfs for the system.
 
 
 </description>
 <parameters>
-<parameter name="info">
-<parameter_description> a #GFileInfo.
-</parameter_description>
-</parameter>
 </parameters>
-<return> a #GFileType for the given file.
+<return> a #GVfs.
 </return>
 </function>
 
@@ -977,6 +1093,7 @@ g_file_query_filesystem_info_async().
 </parameter>
 </parameters>
 <return> #GFileInfo for given @file or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -1197,6 +1314,7 @@ g_file_set_display_name_async().
 </parameter>
 </parameters>
 <return> a #GFile or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -1233,33 +1351,21 @@ Frees a unix mount point.
 <return></return>
 </function>
 
-<function name="g_app_launch_context_get_startup_notify_id">
+<function name="g_emblem_get_origin">
 <description>
-Initiates startup notification for the applicaiont and returns the
-DESKTOP_STARTUP_ID for the launched operation, if supported.
-
-Startup notification IDs are defined in the FreeDesktop.Org Startup 
-Notifications standard, at 
-&amp;lt;ulink url=&quot;http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt&quot;/&amp;gt;.
+Gets the origin of the emblem.
 
 
 </description>
 <parameters>
-<parameter name="context">
-<parameter_description> a #GAppLaunchContext.
-</parameter_description>
-</parameter>
-<parameter name="info">
-<parameter_description> a #GAppInfo.
-</parameter_description>
-</parameter>
-<parameter name="files">
-<parameter_description> a #GList of files.
+<parameter name="emblem">
+<parameter_description> a #GEmblem 
 </parameter_description>
 </parameter>
 </parameters>
-<return> a startup notification ID for the application, or %NULL if 
-not supported.
+<return> the origin of the emblem
+
+Since: 2.18
 </return>
 </function>
 
@@ -1285,6 +1391,7 @@ See g_file_query_info_async().
 </parameter>
 </parameters>
 <return> #GFileInfo for given @file or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -1310,6 +1417,7 @@ See g_file_find_enclosing_mount_async().
 </parameter>
 </parameters>
 <return> #GMount for given @file or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -1373,11 +1481,64 @@ Sets the application as the default handler for a given type.
 
 <function name="GCancellable">
 <description>
-Emitted when the operation has been cancelled from another thread.
+Emitted when the operation has been cancelled.
 
-Can be used by implementations of cancellable operations. This will
-be emitted in the thread that tried to cancel the operation, not the
-thread the is running the operation.
+Can be used by implementations of cancellable operations. If the
+operation is cancelled from another thread, the signal will be
+emitted in the thread that cancelled the operation, not the
+thread that is running the operation.
+
+Note that disconnecting from this signal (or any signal) in a
+multi-threaded program is prone to race conditions, and it is
+possible that a signal handler may be invoked even
+&amp;lt;emphasis&amp;gt;after&amp;lt;/emphasis&amp;gt; a call to
+g_signal_handler_disconnect() for that handler has already
+returned. Therefore, code such as the following is wrong in a
+multi-threaded program:
+
+|[
+my_data = my_data_new (...);
+id = g_signal_connect (cancellable, &quot;cancelled&quot;,
+G_CALLBACK (cancelled_handler), my_data);
+
+/&amp;lt;!-- --&amp;gt;* cancellable operation here... *&amp;lt;!-- --&amp;gt;/
+
+g_signal_handler_disconnect (cancellable, id);
+my_data_free (my_data);  /&amp;lt;!-- --&amp;gt;* WRONG! *&amp;lt;!-- --&amp;gt;/
+/&amp;lt;!-- --&amp;gt;* if g_cancellable_cancel() is called from another
+* thread, cancelled_handler() may be running at this point,
+* so it&apos;s not safe to free my_data.
+*&amp;lt;!-- --&amp;gt;/
+]|
+
+The correct way to free data (or otherwise clean up temporary
+state) in this situation is to use g_signal_connect_data() (or
+g_signal_connect_closure()) to connect to the signal, and do the
+cleanup from a #GClosureNotify, which will not be called until
+after the signal handler is both removed and not running:
+
+|[
+static void
+cancelled_disconnect_notify (gpointer my_data, GClosure *closure)
+{
+my_data_free (my_data);
+}
+
+...
+
+my_data = my_data_new (...);
+id = g_signal_connect_data (cancellable, &quot;cancelled&quot;,
+G_CALLBACK (cancelled_handler), my_data,
+cancelled_disconnect_notify, 0);
+
+/&amp;lt;!-- --&amp;gt;* cancellable operation here... *&amp;lt;!-- --&amp;gt;/
+
+g_signal_handler_disconnect (cancellable, id);
+/&amp;lt;!-- --&amp;gt;* cancelled_disconnect_notify() may or may not have
+* already been called at this point, so the code has to treat
+* my_data as though it has been freed.
+*&amp;lt;!-- --&amp;gt;/
+]|
 
 </description>
 <parameters>
@@ -1389,25 +1550,39 @@ thread the is running the operation.
 <return></return>
 </function>
 
-<function name="g_unix_mount_at">
+<function name="g_file_monitor">
 <description>
-Gets a #GUnixMountEntry for a given mount path. If @time_read
-is set, it will be filled with a unix timestamp for checking
-if the mounts have changed since with g_unix_mounts_changed_since().
+Obtains a file or directory monitor for the given file, depending
+on the type of the file.
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
 
 
 </description>
 <parameters>
-<parameter name="mount_path">
-<parameter_description> path for a possible unix mount.
+<parameter name="file">
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
-<parameter name="time_read">
-<parameter_description> guint64 to contain a timestamp.
+<parameter name="flags">
+<parameter_description> a set of #GFileMonitorFlags
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GUnixMount. 
+<return> a #GFileMonitor for the given @file, or %NULL on error.
+Free the returned object with g_object_unref().
+
+Since: 2.18
 </return>
 </function>
 
@@ -1517,7 +1692,7 @@ its elements have been unreffed with g_object_unref().
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of #GVolume&amp;lt;!-- --&amp;gt;s.
+<return> a #GList of #GVolume objects.
 </return>
 </function>
 
@@ -1545,9 +1720,29 @@ Creates a new #GMemoryInputStream with data in memory of a given size.
 </return>
 </function>
 
-<function name="g_file_info_get_is_hidden">
+<function name="g_desktop_app_info_new_from_keyfile">
 <description>
-Checks if a file is hidden.
+Creates a new #GDesktopAppInfo.
+
+
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> an opened #GKeyFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GDesktopAppInfo or %NULL on error.
+
+Since: 2.18
+</return>
+</function>
+
+<function name="g_file_info_get_attribute_uint32">
+<description>
+Gets an unsigned 32-bit integer contained within the attribute. If the 
+attribute does not contain an unsigned 32-bit integer, or is invalid, 
+0 will be returned.
 
 
 </description>
@@ -1556,8 +1751,12 @@ Checks if a file is hidden.
 <parameter_description> a #GFileInfo.
 </parameter_description>
 </parameter>
+<parameter name="attribute">
+<parameter_description> a file attribute key.
+</parameter_description>
+</parameter>
 </parameters>
-<return> %TRUE if the file is a hidden file, %FALSE otherwise.
+<return> an unsigned 32-bit integer from the attribute. 
 </return>
 </function>
 
@@ -1646,22 +1845,46 @@ Checks if two #GAppInfos are equal.
 </return>
 </function>
 
-<function name="g_unix_mount_guess_name">
+<function name="g_mount_remount">
 <description>
-Guesses the name of a Unix mount. 
-The result is a translated string.
+Remounts a mount. This is an asynchronous operation, and is 
+finished by calling g_mount_remount_finish() with the @mount 
+and #GAsyncResults data returned in the @callback.
 
+Remounting is useful when some setting affecting the operation
+of the volume has been changed, as these may need a remount to
+take affect. While this is semantically equivalent with unmounting
+and then remounting not all backends might need to actually be
+unmounted.
 
 </description>
 <parameters>
-<parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
+<parameter name="mount">
+<parameter_description> a #GMount.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags affecting the operation
+</parameter_description>
+</parameter>
+<parameter name="mount_operation">
+<parameter_description> a #GMountOperation or %NULL to avoid user interaction.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback, or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to @callback.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly allocated string that must
-be freed with g_free()
-</return>
+<return></return>
 </function>
 
 <function name="g_output_stream_is_closed">
@@ -1680,23 +1903,21 @@ Checks if an output stream has already been closed.
 </return>
 </function>
 
-<function name="g_file_get_path">
+<function name="g_vfs_get_supported_uri_schemes">
 <description>
-Gets the local pathname for #GFile, if one exists. 
-
-This call does no blocking i/o.
+Gets a list of URI schemes supported by @vfs.
 
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> input #GFile.
+<parameter name="vfs">
+<parameter_description> a #GVfs.
 </parameter_description>
 </parameter>
 </parameters>
-<return> string containing the #GFile&apos;s path, or %NULL if 
-no such path exists. The returned string should be 
-freed with g_free() when no longer needed.
+<return> a %NULL-terminated array of strings.
+The returned array belongs to GIO and must 
+not be freed or modified.
 </return>
 </function>
 
@@ -1740,37 +1961,30 @@ of the request.
 <return></return>
 </function>
 
-<function name="g_file_input_stream_query_info">
+<function name="g_file_info_set_attribute">
 <description>
-Queries a file input stream the given @attributes. This function blocks 
-while querying the stream. For the asynchronous (non-blocking) version 
-of this function, see g_file_input_stream_query_info_async(). While the 
-stream is blocked, the stream will set the pending flag internally, and 
-any other operations on the stream will fail with %G_IO_ERROR_PENDING.
-
+Sets the @attribute to contain the given value, if possible.
 
 </description>
 <parameters>
-<parameter name="stream">
-<parameter_description> a #GFileInputStream.
+<parameter name="info">
+<parameter_description> a #GFileInfo.
 </parameter_description>
 </parameter>
-<parameter name="attributes">
-<parameter_description> a file attribute query string.
+<parameter name="attribute">
+<parameter_description> a file attribute key.
 </parameter_description>
 </parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
+<parameter name="type">
+<parameter_description> a #GFileAttributeType
 </parameter_description>
 </parameter>
-<parameter name="error">
-<parameter_description> a #GError location to store the error occuring, or %NULL to 
-ignore.
+<parameter name="value_p">
+<parameter_description> pointer to the value
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileInfo, or %NULL on error.
-</return>
+<return></return>
 </function>
 
 <function name="g_volume_can_mount">
@@ -1820,8 +2034,8 @@ triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
 
 Some file systems don&apos;t allow all file names, and may
-return an G_IO_ERROR_INVALID_FILENAME error.
-If the file is a directory the G_IO_ERROR_IS_DIRECTORY error will be
+return an %G_IO_ERROR_INVALID_FILENAME error.
+If the file is a directory the %G_IO_ERROR_IS_DIRECTORY error will be
 returned. Other errors are possible too, and depend on what kind of
 filesystem the file is on.
 
@@ -1845,7 +2059,8 @@ filesystem the file is on.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileOutputStream.
+<return> a #GFileOutputStream, or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -1859,6 +2074,42 @@ Gets the volume monitor used by gio.
 </parameters>
 <return> a reference to the #GVolumeMonitor used by gio. Call
 g_object_unref() when done with it.
+</return>
+</function>
+
+<function name="g_file_make_directory_with_parents">
+<description>
+Creates a directory and any parent directories that may not exist similar to
+&apos;mkdir -p&apos;. If the file system does not support creating directories, this
+function will fail, setting @error to %G_IO_ERROR_NOT_SUPPORTED.
+
+For a local #GFile the newly created directories will have the default
+(current) ownership and permissions of the current process.
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL 
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if all directories have been successfully created, %FALSE
+otherwise.
+
+Since: 2.18
 </return>
 </function>
 
@@ -1881,19 +2132,45 @@ Returns: read-only buffer
 </return>
 </function>
 
-<function name="GDrive">
+<function name="g_file_set_attribute_string">
 <description>
-Emitted when the physical eject button (if any) of a drive have been pressed.
+Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_STRING to @value. 
+If @attribute is of a different type, this operation will fail.
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
 
 
 </description>
 <parameters>
-<parameter name="drive">
-<parameter_description> a #GDrive.
+<parameter name="file">
+<parameter_description> input #GFile.
+</parameter_description>
+</parameter>
+<parameter name="attribute">
+<parameter_description> a string containing the attribute&apos;s name.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a string containing the attribute&apos;s value.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> #GFileQueryInfoFlags.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the @attribute was successfully set, %FALSE otherwise.
+</return>
 </function>
 
 <function name="g_file_mount_enclosing_volume_finish">
@@ -1945,14 +2222,13 @@ ignore.
 </return>
 </function>
 
-<function name="g_file_set_attribute_int32">
+<function name="g_file_query_file_type">
 <description>
-Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_INT32 to @value. 
-If @attribute is of a different type, this operation will fail.
+Utility function to inspect the #GFileType of a file. This is
+implemented using g_file_query_info() and as such does blocking I/O.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+The primary use case of this method is to check if a file is a regular file,
+directory, or symlink.
 
 
 </description>
@@ -1961,29 +2237,19 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 <parameter_description> input #GFile.
 </parameter_description>
 </parameter>
-<parameter name="attribute">
-<parameter_description> a string containing the attribute&apos;s name.
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> a #gint32 containing the attribute&apos;s new value.
-</parameter_description>
-</parameter>
 <parameter name="flags">
-<parameter_description> a #GFileQueryInfoFlags.
+<parameter_description> a set of #GFileQueryInfoFlags passed to g_file_query_info().
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
 <parameter_description> optional #GCancellable object, %NULL to ignore.
 </parameter_description>
 </parameter>
-<parameter name="error">
-<parameter_description> a #GError, or %NULL
-</parameter_description>
-</parameter>
 </parameters>
-<return> %TRUE if the @attribute was successfully set to @value 
-in the @file, %FALSE otherwise. 
+<return> The #GFileType of the file and #G_FILE_TYPE_UNKNOWN if the file
+does not exist
+
+Since: 2.18
 </return>
 </function>
 
@@ -2031,8 +2297,29 @@ Gets the root directory on @mount.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile.
+<return> a #GFile. 
+The returned object should be unreffed with 
+g_object_unref() when no longer needed.
 </return>
+</function>
+
+<function name="g_cancellable_make_pollfd">
+<description>
+Creates a #GPollFD corresponding to @cancellable; this can be passed
+to g_poll() and used to poll for cancellation.
+
+</description>
+<parameters>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable.
+</parameter_description>
+</parameter>
+<parameter name="pollfd">
+<parameter_description> a pointer to a #GPollFD
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_file_icon_get_file">
@@ -2051,24 +2338,19 @@ Gets the #GFile associated with the given @icon.
 </return>
 </function>
 
-<function name="g_unix_input_stream_new">
+<function name="g_file_info_get_symlink_target">
 <description>
-Creates a new #GUnixInputStream for the given @fd. If @close_fd_at_close
-is %TRUE, the file descriptor will be closed when the stream is closed.
+Gets the symlink target for a given #GFileInfo.
 
 
 </description>
 <parameters>
-<parameter name="fd">
-<parameter_description> unix file descriptor.
-</parameter_description>
-</parameter>
-<parameter name="close_fd_at_close">
-<parameter_description> a #gboolean.
+<parameter name="info">
+<parameter_description> a #GFileInfo.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GUnixInputStream. 
+<return> a string containing the symlink target.
 </return>
 </function>
 
@@ -2097,45 +2379,19 @@ if an error occurred.
 </return>
 </function>
 
-<function name="g_app_info_launch">
+<function name="g_mount_operation_get_password_save">
 <description>
-Launches the application. Passes @files to the launched application 
-as arguments, using the optional @launch_context to get information
-about the details of the launcher (like what screen it is on).
-On error, @error will be set accordingly.
-
-To lauch the application without arguments pass a %NULL @files list.
-
-Note that even if the launch is successful the application launched
-can fail to start if it runs into problems during startup. There is
-no way to detect this.
-
-Some URIs can be changed when passed through a GFile (for instance
-unsupported uris with strange formats like mailto:), so if you have
-a textual uri you want to pass in as argument, consider using
-g_app_info_launch_uris() instead.
+Gets the state of saving passwords for the mount operation.
 
 
 </description>
 <parameters>
-<parameter name="appinfo">
-<parameter_description> a #GAppInfo.
-</parameter_description>
-</parameter>
-<parameter name="files">
-<parameter_description> a #GList of #GFile objects.
-</parameter_description>
-</parameter>
-<parameter name="launch_context">
-<parameter_description> a #GAppLaunchContext.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError.
+<parameter name="op">
+<parameter_description> a #GMountOperation.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE on successful launch, %FALSE otherwise. 
+<return> a #GPasswordSave flag. 
 </return>
 </function>
 
@@ -2215,7 +2471,7 @@ Creates a new #GDesktopAppInfo.
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a string containing a file name.
+<parameter_description> the path of a desktop file, in the GLib filename encoding
 </parameter_description>
 </parameter>
 </parameters>
@@ -2272,7 +2528,8 @@ Checks if a drive can be polled for media changes.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @drive can be polled for media changes. %FALSE otherwise.
+<return> %TRUE if the @drive can be polled for media changes,
+%FALSE otherwise.
 </return>
 </function>
 
@@ -2382,17 +2639,24 @@ or %NULL to ignore.
 </return>
 </function>
 
-<function name="g_dummy_file_new">
+<function name="g_filename_completer_get_completions">
 <description>
+Gets an array of completion strings for a given initial text.
+
 
 </description>
 <parameters>
-<parameter name="uri">
-<parameter_description> Universal Resource Identifier for the dummy file object.
+<parameter name="completer">
+<parameter_description> the filename completer.
+</parameter_description>
+</parameter>
+<parameter name="initial_text">
+<parameter_description> text to be completed.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GFile. 
+<return> array of strings with possible completions for @initial_text.
+This array must be freed by g_strfreev() when finished. 
 </return>
 </function>
 
@@ -2446,41 +2710,70 @@ g_io_scheduler_push_job() or by using refcounting for @user_data.
 <return></return>
 </function>
 
-<function name="g_filename_completer_get_completions">
+<function name="g_dummy_file_new">
 <description>
-Gets an array of completion strings for a given initial text.
-
 
 </description>
 <parameters>
-<parameter name="completer">
-<parameter_description> the filename completer.
-</parameter_description>
-</parameter>
-<parameter name="initial_text">
-<parameter_description> text to be completed.
+<parameter name="uri">
+<parameter_description> Universal Resource Identifier for the dummy file object.
 </parameter_description>
 </parameter>
 </parameters>
-<return> array of strings with possible completions for @initial_text.
-This array must be freed by g_strfreev() when finished. 
+<return> a new #GFile. 
 </return>
 </function>
 
-<function name="g_data_output_stream_get_byte_order">
+<function name="g_mount_is_shadowed">
 <description>
-Gets the byte order for the stream.
+Determines if @mount is shadowed. Applications or libraries should
+avoid displaying @mount in the user interface if it is shadowed.
+
+A mount is said to be shadowed if there exists one or more user
+visible objects (currently #GMount objects) with a root that is
+inside the root of @mount.
+
+One application of shadow mounts is when exposing a single file
+system that is used to address several logical volumes. In this
+situation, a #GVolumeMonitor implementation would create two
+#GVolume objects (for example, one for the camera functionality of
+the device and one for a SD card reader on the device) with
+activation URIs &amp;lt;literal&amp;gt;gphoto2://[usb:001,002]/store1/&amp;lt;/literal&amp;gt;
+and &amp;lt;literal&amp;gt;gphoto2://[usb:001,002]/store2/&amp;lt;/literal&amp;gt;. When the
+underlying mount (with root
+&amp;lt;literal&amp;gt;gphoto2://[usb:001,002]/&amp;lt;/literal&amp;gt;) is mounted, said
+#GVolumeMonitor implementation would create two #GMount objects
+(each with their root matching the corresponding volume activation
+root) that would shadow the original mount.
+
+The proxy monitor in GVfs 2.26 and later, automatically creates and
+manage shadow mounts (and shadows the underlying mount) if the
+activation root on a #GVolume is set.
 
 
 </description>
 <parameters>
-<parameter name="stream">
-<parameter_description> a #GDataOutputStream.
+<parameter name="mount">
+<parameter_description> A #GMount.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GDataStreamByteOrder for the @stream.
+<return> %TRUE if @mount is shadowed.
+
+Since: 2.20
 </return>
+</function>
+
+<function name="fen_add">
+<description>
+Won&apos;t hold a ref, we have a timout callback to clean unused fdata.
+If there is no value for a key, add it and return it; else return the old
+one.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_simple_async_result_set_from_error">
@@ -2538,28 +2831,44 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile specifying what @file was renamed to, or %NULL if there was an error.
+<return> a #GFile specifying what @file was renamed to, or %NULL 
+if there was an error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
-<function name="g_file_info_set_attribute_int64">
+<function name="g_io_scheduler_push_job">
 <description>
-Sets the @attribute to contain the given @attr_value, 
-if possible.
+Schedules the I/O job to run. 
 
+@notify will be called on @user_data after @job_func has returned,
+regardless whether the job was cancelled or has run to completion.
+
+If @cancellable is not %NULL, it can be used to cancel the I/O job
+by calling g_cancellable_cancel() or by calling 
+g_io_scheduler_cancel_all_jobs().
 
 </description>
 <parameters>
-<parameter name="info">
-<parameter_description> a #GFileInfo.
+<parameter name="job_func">
+<parameter_description> a #GIOSchedulerJobFunc.
 </parameter_description>
 </parameter>
-<parameter name="attribute">
-<parameter_description> attribute name to set.
+<parameter name="user_data">
+<parameter_description> data to pass to @job_func
 </parameter_description>
 </parameter>
-<parameter name="attr_value">
-<parameter_description> int64 value to set attribute to.
+<parameter name="notify">
+<parameter_description> a #GDestroyNotify for @user_data, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the &amp;lt;link linkend=&quot;gioscheduler&quot;&amp;gt;I/O priority&amp;lt;/link&amp;gt; 
+of the request.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
 </parameter_description>
 </parameter>
 </parameters>
@@ -2736,34 +3045,23 @@ multi-byte entities (such as integers) to the stream.
 <return></return>
 </function>
 
-<function name="g_file_get_child_for_display_name">
+<function name="g_buffered_output_stream_new_sized">
 <description>
-Gets the child of @file for a given @display_name (i.e. a UTF8
-version of the name). If this function fails, it returns %NULL and @error will be 
-set. This is very useful when constructing a GFile for a new file
-and the user entered the filename in the user interface, for instance
-when you select a directory and type a filename in the file selector.
-
-This call does no blocking i/o.
+Creates a new buffered output stream with a given buffer size.
 
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> input #GFile.
+<parameter name="base_stream">
+<parameter_description> a #GOutputStream.
 </parameter_description>
 </parameter>
-<parameter name="display_name">
-<parameter_description> string to a possible child.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> #GError.
+<parameter name="size">
+<parameter_description> a #gsize.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile to the specified child, or 
-%NULL if the display name couldn&apos;t be converted.  
+<return> a #GOutputStream with an internal buffer set to @size.
 </return>
 </function>
 
@@ -2838,38 +3136,24 @@ Removes a supported type from an application, if possible.
 </return>
 </function>
 
-<function name="g_io_scheduler_push_job">
+<function name="g_file_info_set_attribute_int64">
 <description>
-Schedules the I/O job to run. 
+Sets the @attribute to contain the given @attr_value, 
+if possible.
 
-@notify will be called on @user_data after @job_func has returned,
-regardless whether the job was cancelled or has run to completion.
-
-If @cancellable is not %NULL, it can be used to cancel the I/O job
-by calling g_cancellable_cancel() or by calling 
-g_io_scheduler_cancel_all_jobs().
 
 </description>
 <parameters>
-<parameter name="job_func">
-<parameter_description> a #GIOSchedulerJobFunc.
+<parameter name="info">
+<parameter_description> a #GFileInfo.
 </parameter_description>
 </parameter>
-<parameter name="user_data">
-<parameter_description> data to pass to @job_func
+<parameter name="attribute">
+<parameter_description> attribute name to set.
 </parameter_description>
 </parameter>
-<parameter name="notify">
-<parameter_description> a #GDestroyNotify for @user_data, or %NULL
-</parameter_description>
-</parameter>
-<parameter name="io_priority">
-<parameter_description> the &amp;lt;link linkend=&quot;gioscheduler&quot;&amp;gt;I/O priority&amp;lt;/link&amp;gt; 
-of the request.
-</parameter_description>
-</parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter name="attr_value">
+<parameter_description> int64 value to set attribute to.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3008,22 +3292,57 @@ Sets the mount operation&apos;s password to @password.
 <return></return>
 </function>
 
-<function name="g_mount_operation_set_anonymous">
+<function name="g_winhttp_file_output_stream_new">
 <description>
-Sets the mount operation to use an anonymous user if @anonymous is %TRUE.
 
 </description>
 <parameters>
-<parameter name="op">
-<parameter_description> a #GMountOperation.
+<parameter name="file">
+<parameter_description> the GWinHttpFile being read
 </parameter_description>
 </parameter>
-<parameter name="anonymous">
-<parameter_description> boolean value.
+<parameter name="connection">
+<parameter_description> handle to the HTTP connection, as from WinHttpConnect()
+</parameter_description>
+</parameter>
+<parameter name="request">
+<parameter_description> handle to the HTTP request, as from WinHttpOpenRequest
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> #GFileOutputStream for the given request
+</return>
+</function>
+
+<function name="g_file_query_writable_namespaces">
+<description>
+Obtain the list of attribute namespaces where new attributes 
+can be created by a user. An example of this is extended
+attributes (in the &quot;xattr&quot; namespace).
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GFileAttributeInfoList describing the writable namespaces.
+When you are done with it, release it with g_file_attribute_info_list_unref()
+</return>
 </function>
 
 <function name="g_file_info_set_attribute_uint32">
@@ -3062,7 +3381,7 @@ Gets the name of @volume.
 </parameter>
 </parameters>
 <return> the name for the given @volume. The returned string should 
-be freed when no longer needed.
+be freed with g_free() when no longer needed.
 </return>
 </function>
 
@@ -3104,19 +3423,25 @@ if possible.
 <return></return>
 </function>
 
-<function name="g_unix_mount_point_get_fs_type">
+<function name="g_emblem_new_with_origin">
 <description>
-Gets the file system type for the mount point.
+Creates a new emblem for @icon.
 
 
 </description>
 <parameters>
-<parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter name="icon">
+<parameter_description> a GIcon containing the icon.
+</parameter_description>
+</parameter>
+<parameter name="origin">
+<parameter_description> a GEmblemOrigin enum defining the emblem&apos;s origin
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the file system type.
+<return> a new #GEmblem.
+
+Since: 2.18
 </return>
 </function>
 
@@ -3179,6 +3504,26 @@ Gets the operation result boolean from within the asynchronous result.
 <return> %TRUE if the operation&apos;s result was %TRUE, %FALSE 
 if the operation&apos;s result was %FALSE. 
 </return>
+</function>
+
+<function name="fdata_add_event">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
+<function name="port_add_internal">
+<description>
+&amp;lt; private &amp;gt;
+Unsafe, need lock fen_lock.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_simple_async_result_set_op_res_gssize">
@@ -3312,6 +3657,7 @@ Other errors are possible too, and depend on what kind of filesystem the file is
 </parameter>
 </parameters>
 <return> a #GFileInfo for the given @file, or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -3351,7 +3697,7 @@ its elements have been unreffed with g_object_unref().
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GList containing any #GVolume&amp;lt;!----&amp;gt;s on the given @drive.
+<return> #GList containing any #GVolume objects on the given @drive.
 </return>
 </function>
 
@@ -3384,6 +3730,17 @@ Should be called only once; subsequent calls are ignored.
 <return></return>
 </function>
 
+<function name="g_winhttp_vfs_new">
+<description>
+Returns: a new #GVfs handle.
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GVfs handle.
+</return>
+</function>
+
 <function name="GMount">
 <description>
 This signal is emitted when the #GMount have been
@@ -3393,6 +3750,10 @@ finalized.
 
 </description>
 <parameters>
+<parameter name="mount">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
@@ -3551,7 +3912,7 @@ Sets the state of saving passwords for the mount operation.
 <description>
 Utility function that launches the default application 
 registered to handle the specified uri. Synchronous I/O
-is done on the uri to detext the type of the file if
+is done on the uri to detect the type of the file if
 required.
 
 
@@ -3574,19 +3935,19 @@ required.
 </return>
 </function>
 
-<function name="g_file_attribute_info_list_dup">
+<function name="g_io_extension_get_priority">
 <description>
-Makes a duplicate of a file attribute info list.
+Gets the priority with which @extension was registered.
 
 
 </description>
 <parameters>
-<parameter name="list">
-<parameter_description> a #GFileAttributeInfoList to duplicate.
+<parameter name="extension">
+<parameter_description> a #GIOExtension
 </parameter_description>
 </parameter>
 </parameters>
-<return> a copy of the given @list. 
+<return> the priority of @extension
 </return>
 </function>
 
@@ -3614,6 +3975,8 @@ Gets the file descriptor for a cancellable job. This can be used to
 implement cancellable operations on Unix systems. The returned fd will
 turn readable when @cancellable is cancelled.
 
+See also g_cancellable_make_pollfd().
+
 
 </description>
 <parameters>
@@ -3627,27 +3990,19 @@ is not supported, or on errors.
 </return>
 </function>
 
-<function name="g_buffered_input_stream_fill_finish">
+<function name="g_io_error_from_errno">
 <description>
-Finishes an asynchronous read.
+Converts errno.h error codes into GIO error codes.
 
 
 </description>
 <parameters>
-<parameter name="stream">
-<parameter_description> a #GBufferedInputStream.
-</parameter_description>
-</parameter>
-<parameter name="result">
-<parameter_description> a #GAsyncResult.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError.
+<parameter name="err_no">
+<parameter_description> Error number as defined in errno.h.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #gssize of the read stream, or %-1 on an error. 
+<return> #GIOErrorEnum value for the given errno.h error number.
 </return>
 </function>
 
@@ -3664,6 +4019,8 @@ Gets the icon for @mount.
 </parameter>
 </parameters>
 <return> a #GIcon.
+The returned object should be unreffed with 
+g_object_unref() when no longer needed.
 </return>
 </function>
 
@@ -3717,7 +4074,16 @@ icon2 = g_themed_icon_new_with_default_fallbacks (&quot;gnome-dev-cdrom-audio&qu
 
 <function name="g_file_make_directory">
 <description>
-Creates a directory.
+Creates a directory. Note that this will only create a child directory of
+the immediate parent directory of the path or URI given by the #GFile. To 
+recursively create directories, see g_file_make_directory_with_parents().
+This function will fail if the parent directory does not exist, setting 
+@error to %G_IO_ERROR_NOT_FOUND. If the file system doesn&apos;t support creating
+directories, this function will fail, setting @error to 
+%G_IO_ERROR_NOT_SUPPORTED.
+
+For a local #GFile the newly created directory will have the default
+(current) ownership and permissions of the current process.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -3751,11 +4117,29 @@ Checks if a drive can be ejected.
 </description>
 <parameters>
 <parameter name="drive">
-<parameter_description> pointer to a #GDrive.
+<parameter_description> a #GDrive.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @drive can be ejected. %FALSE otherwise.
+<return> %TRUE if the @drive can be ejected, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_file_enumerator_get_container">
+<description>
+Get the #GFile container which is being enumerated.
+
+
+</description>
+<parameters>
+<parameter name="enumerator">
+<parameter_description> a #GFileEnumerator
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GFile which is being enumerated.
+
+Since: 2.18.
 </return>
 </function>
 
@@ -3800,6 +4184,12 @@ is to return #GVolume objects representing entries in the users
 </parameters>
 <return> the #GVolume object that is the parent for @mount or %NULL
 if no wants to adopt the #GMount.
+
+Deprecated: 2.20: Instead of using this function, #GVolumeMonitor
+implementations should instead create shadow mounts with the URI of
+the mount they intend to adopt. See the proxy volume monitor in
+gvfs for an example of this. Also see g_mount_is_shadowed(),
+g_mount_shadow() and g_mount_unshadow() functions.
 </return>
 </function>
 
@@ -3825,6 +4215,36 @@ ignore.
 </parameter>
 </parameters>
 <return> %TRUE if stream was successfully closed, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_volume_mount_finish">
+<description>
+Finishes mounting a volume. If any errors occured during the operation,
+@error will be set to contain the errors and %FALSE will be returned.
+
+If the mount operation succeeded, g_volume_get_mount() on @volume
+is guaranteed to return the mount right after calling this
+function; there&apos;s no need to listen for the &apos;mount-added&apos; signal on
+#GVolumeMonitor.
+
+
+</description>
+<parameters>
+<parameter name="volume">
+<parameter_description> a #GVolume
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store an error, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE, %FALSE if operation failed.
 </return>
 </function>
 
@@ -3922,15 +4342,74 @@ Return value: a #GList containing the desktop ids which claim
 <parameter_description> a mime type.
 </parameter_description>
 </parameter>
+<parameter name="except">
+<parameter_description> NULL or a strv list
+</parameter_description>
+</parameter>
 </parameters>
 <return> a #GList containing the desktop ids which claim
 to handle @mime_type.
 </return>
 </function>
 
+<function name="g_emblemed_icon_add_emblem">
+<description>
+Adds @emblem to the #GList of #GEmblem &amp;lt;!-- --&amp;gt;s.
+
+Since: 2.18
+
+</description>
+<parameters>
+<parameter name="emblemed">
+<parameter_description> a #GEmblemedIcon
+</parameter_description>
+</parameter>
+<parameter name="emblem">
+<parameter_description> a #GEmblem
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_emblem_get_icon">
+<description>
+Gives back the icon from @emblem.
+
+
+</description>
+<parameters>
+<parameter name="emblem">
+<parameter_description> a #GEmblem from which the icon should be extracted.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GIcon. The returned object belongs to the emblem
+and should not be modified or freed.
+
+Since: 2.18
+</return>
+</function>
+
+<function name="g_unix_mount_point_is_readonly">
+<description>
+Checks if a unix mount point is read only.
+
+
+</description>
+<parameters>
+<parameter name="mount_point">
+<parameter_description> a #GUnixMountPoint.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if a mount point is read only.
+</return>
+</function>
+
 <function name="g_file_enumerator_next_file">
 <description>
-Return value: A #GFileInfo or %NULL on error or end of enumerator
+Return value: A #GFileInfo or %NULL on error or end of enumerator.
 
 </description>
 <parameters>
@@ -3947,7 +4426,8 @@ Return value: A #GFileInfo or %NULL on error or end of enumerator
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GFileInfo or %NULL on error or end of enumerator
+<return> A #GFileInfo or %NULL on error or end of enumerator.
+Free the returned object with g_object_unref() when no longer needed.
 </return>
 </function>
 
@@ -4007,42 +4487,20 @@ or less than @mount2, respectively.
 </return>
 </function>
 
-<function name="g_drive_get_identifier">
+<function name="g_file_info_get_display_name">
 <description>
-Gets the identifier of the given kind for @drive.
+Gets a display name for a file.
 
 
 </description>
 <parameters>
-<parameter name="drive">
-<parameter_description> a #GDrive
-</parameter_description>
-</parameter>
-<parameter name="kind">
-<parameter_description> the kind of identifier to return
+<parameter name="info">
+<parameter_description> a #GFileInfo.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string containing the
-requested identfier, or %NULL if the #GDrive
-doesn&apos;t have this kind of identifier
+<return> a string containing the display name.
 </return>
-</function>
-
-<function name="g_file_attribute_matcher_unref">
-<description>
-Unreferences @matcher. If the reference count falls below 1, 
-the @matcher is automatically freed.
-
-
-</description>
-<parameters>
-<parameter name="matcher">
-<parameter_description> a #GFileAttributeMatcher.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
 </function>
 
 <function name="g_file_info_get_attribute_int32">
@@ -4064,6 +4522,23 @@ attribute does not contain a signed 32-bit integer, or is invalid,
 </parameter>
 </parameters>
 <return> a signed 32-bit integer from the attribute.
+</return>
+</function>
+
+<function name="g_buffered_input_stream_new">
+<description>
+Creates a new #GInputStream from the given @base_stream, with 
+a buffer set to the default size (4 kilobytes).
+
+
+</description>
+<parameters>
+<parameter name="base_stream">
+<parameter_description> a #GInputStream.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GInputStream for the given @base_stream.
 </return>
 </function>
 
@@ -4132,17 +4607,20 @@ Gets the mount for the @volume.
 </parameter>
 </parameters>
 <return> a #GMount or %NULL if @volume isn&apos;t mounted.
+The returned object should be unreffed with g_object_unref()
+when no longer needed.
 </return>
 </function>
 
 <function name="g_file_has_prefix">
 <description>
-Checks whether @file has the prefix specified by @prefix. In other word, if the
-names of inital elements of @file&amp;lt;!-- --&amp;gt;s pathname match @prefix.
+Checks whether @file has the prefix specified by @prefix. In other word, 
+if the names of inital elements of @file&amp;lt;!-- --&amp;gt;s pathname match @prefix.
 
-This call does no i/o, as it works purely on names. As such it can sometimes
-return %FALSE even if @file is inside a @prefix (from a filesystem point of view),
-because the prefix of @file is an alias of @prefix.
+This call does no i/o, as it works purely on names. As such it can 
+sometimes return %FALSE even if @file is inside a @prefix (from a 
+filesystem point of view), because the prefix of @file is an alias 
+of @prefix.
 
 
 </description>
@@ -4156,7 +4634,8 @@ because the prefix of @file is an alias of @prefix.
 </parameter_description>
 </parameter>
 </parameters>
-<return>  %TRUE if the @files&apos;s parent, grandparent, etc is @prefix. %FALSE otherwise.
+<return>  %TRUE if the @files&apos;s parent, grandparent, etc is @prefix. 
+%FALSE otherwise.
 </return>
 </function>
 
@@ -4166,6 +4645,10 @@ Emitted when the unix mount points have changed.
 
 </description>
 <parameters>
+<parameter name="monitor">
+<parameter_description> the object on which the signal is emitted
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
@@ -4186,13 +4669,18 @@ using that object to get the #GDrive.
 </parameter>
 </parameters>
 <return> a #GDrive or %NULL if @mount is not associated with a volume or a drive.
+The returned object should be unreffed with 
+g_object_unref() when no longer needed.
 </return>
 </function>
 
 <function name="g_drive_eject">
 <description>
-Ejects a drive.
+Asynchronously ejects a drive.
 
+When the operation is finished, @callback will be called.
+You can then call g_drive_eject_finish() to obtain the
+result of the operation.
 
 </description>
 <parameters>
@@ -4213,26 +4701,40 @@ Ejects a drive.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> a #gpointer.
+<parameter_description> user data to pass to @callback
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="g_unix_mount_guess_should_display">
+<function name="g_file_get_parse_name">
 <description>
-Guesses whether a Unix mount should be displayed in the UI.
+Gets the parse name of the @file.
+A parse name is a UTF-8 string that describes the
+file such that one can get the #GFile back using
+g_file_parse_name().
+
+This is generally used to show the #GFile as a nice
+full-pathname kind of string in a user interface,
+like in a location entry.
+
+For local files with names that can safely be converted
+to UTF8 the pathname is used, otherwise the IRI is used
+(a form of URI that allows UTF8 characters unescaped).
+
+This call does no blocking i/o.
 
 
 </description>
 <parameters>
-<parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
+<parameter name="file">
+<parameter_description> input #GFile.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @mount_entry is deemed to be displayable.
+<return> a string containing the #GFile&apos;s parse name. The returned 
+string should be freed with g_free() when no longer needed.
 </return>
 </function>
 
@@ -4253,6 +4755,7 @@ Finds a #GMount object by it&apos;s UUID (see g_mount_get_uuid())
 </parameter>
 </parameters>
 <return> a #GMount or %NULL if no such mount is available.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -4270,19 +4773,31 @@ Finds a #GMount object by it&apos;s UUID (see g_mount_get_uuid())
 </return>
 </function>
 
-<function name="g_filter_input_stream_get_base_stream">
+<function name="g_icon_new_for_string">
 <description>
-Gets the base stream for the filter stream.
+Generate a #GIcon instance from @str. This function can fail if
+@str is not valid - see g_icon_to_string() for discussion.
+
+If your application or library provides one or more #GIcon
+implementations you need to ensure that each #GType is registered
+with the type system prior to calling g_icon_new_for_string().
 
 
 </description>
 <parameters>
-<parameter name="stream">
-<parameter_description> a #GFilterInputStream.
+<parameter name="str">
+<parameter_description> A string obtained via g_icon_to_string().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GInputStream.
+<return> An object implementing the #GIcon interface or %NULL if
+@error is set.
+
+Since: 2.20
 </return>
 </function>
 
@@ -4357,46 +4872,6 @@ of the request.
 <return></return>
 </function>
 
-<function name="g_simple_async_report_error_in_idle">
-<description>
-Reports an error in an asynchronous function in an idle function by 
-directly setting the contents of the #GAsyncResult with the given error
-information.
-
-</description>
-<parameters>
-<parameter name="object">
-<parameter_description> a #GObject.
-</parameter_description>
-</parameter>
-<parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback. 
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data passed to @callback.
-</parameter_description>
-</parameter>
-<parameter name="domain">
-<parameter_description> a #GQuark containing the error domain (usually #G_IO_ERROR).
-</parameter_description>
-</parameter>
-<parameter name="code">
-<parameter_description> a specific error code.
-</parameter_description>
-</parameter>
-<parameter name="format">
-<parameter_description> a formatted error reporting string.
-</parameter_description>
-</parameter>
-<parameter name="Varargs">
-<parameter_description> a list of variables to fill in @format.
-</parameter_description>
-</parameter>
-</parameters>
-<return></return>
-</function>
-
 <function name="g_unix_volume_new">
 <description>
 
@@ -4438,7 +4913,7 @@ poll for changes.
 
 <function name="g_cancellable_set_error_if_cancelled">
 <description>
-If the @cancelalble is cancelled, sets the error to notify
+If the @cancellable is cancelled, sets the error to notify
 that the operation was cancelled.
 
 
@@ -4457,30 +4932,23 @@ that the operation was cancelled.
 </return>
 </function>
 
-<function name="g_file_get_child">
+<function name="g_file_info_set_modification_time">
 <description>
-Gets a child of @file with basename equal to @name.
-
-Note that the file with that specific name might not exist, but
-you can still have a #GFile that points to it. You can use this
-for instance to create that file.
-
-This call does no blocking i/o.
-
+Sets the %G_FILE_ATTRIBUTE_TIME_MODIFIED attribute in the file
+info to the given time value.
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> input #GFile.
+<parameter name="info">
+<parameter_description> a #GFileInfo.
 </parameter_description>
 </parameter>
-<parameter name="name">
-<parameter_description> string containing the child&apos;s basename.
+<parameter name="mtime">
+<parameter_description> a #GTimeVal.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile to a child specified by @name.
-</return>
+<return></return>
 </function>
 
 <function name="g_file_create_finish">
@@ -4505,6 +4973,7 @@ g_file_create_async().
 </parameter>
 </parameters>
 <return> a #GFileOutputStream or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -4547,62 +5016,104 @@ classes. However, if you override one you must override all.
 <return></return>
 </function>
 
-<function name="g_mount_operation_get_password_save">
+<function name="g_app_info_launch">
 <description>
-Gets the state of saving passwords for the mount operation.
+Launches the application. Passes @files to the launched application 
+as arguments, using the optional @launch_context to get information
+about the details of the launcher (like what screen it is on).
+On error, @error will be set accordingly.
+
+To lauch the application without arguments pass a %NULL @files list.
+
+Note that even if the launch is successful the application launched
+can fail to start if it runs into problems during startup. There is
+no way to detect this.
+
+Some URIs can be changed when passed through a GFile (for instance
+unsupported uris with strange formats like mailto:), so if you have
+a textual uri you want to pass in as argument, consider using
+g_app_info_launch_uris() instead.
 
 
 </description>
 <parameters>
-<parameter name="op">
-<parameter_description> a #GMountOperation.
+<parameter name="appinfo">
+<parameter_description> a #GAppInfo
+</parameter_description>
+</parameter>
+<parameter name="files">
+<parameter_description> a #GList of #GFile objects
+</parameter_description>
+</parameter>
+<parameter name="launch_context">
+<parameter_description> a #GAppLaunchContext or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GPasswordSave flag. 
+<return> %TRUE on successful launch, %FALSE otherwise. 
 </return>
 </function>
 
-<function name="g_buffered_input_stream_new">
+<function name="g_data_input_stream_read_uint64">
 <description>
-Creates a new #GInputStream from the given @base_stream, with 
-a buffer set to the default size (4 kilobytes).
+Reads an unsigned 64-bit/8-byte value from @stream.
+
+In order to get the correct byte order for this read operation, 
+see g_data_stream_get_byte_order().
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
 
 
 </description>
 <parameters>
-<parameter name="base_stream">
-<parameter_description> a #GInputStream.
+<parameter name="stream">
+<parameter_description> a given #GDataInputStream.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GInputStream for the given @base_stream.
+<return> an unsigned 64-bit/8-byte read from @stream or %0 if 
+an error occurred. 
 </return>
 </function>
 
 <function name="g_content_type_guess">
 <description>
 Guesses the content type based on example data. If the function is 
-uncertain, @result_uncertain will be set to %TRUE.
+uncertain, @result_uncertain will be set to %TRUE. Either @filename
+or @data may be %NULL, in which case the guess will be based solely
+on the other argument.
 
 
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a string.
+<parameter_description> a string, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="data">
-<parameter_description> a stream of data.
+<parameter_description> a stream of data, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="data_size">
-<parameter_description> the size of @data.
+<parameter_description> the size of @data
 </parameter_description>
 </parameter>
 <parameter name="result_uncertain">
-<parameter_description> a flag indicating the certainty of the 
-result.
+<parameter_description> a flag indicating the certainty of the result
 </parameter_description>
 </parameter>
 </parameters>
@@ -4658,6 +5169,22 @@ Checks if the file enumerator has pending operations.
 </return>
 </function>
 
+<function name="g_data_output_stream_get_byte_order">
+<description>
+Gets the byte order for the stream.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GDataOutputStream.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GDataStreamByteOrder for the @stream.
+</return>
+</function>
+
 <function name="g_file_new_for_uri">
 <description>
 Constructs a #GFile for a given URI. This operation never 
@@ -4677,35 +5204,22 @@ not supported.
 </return>
 </function>
 
-<function name="g_file_query_writable_namespaces">
+<function name="g_mount_operation_set_anonymous">
 <description>
-Obtain the list of attribute namespaces where new attributes 
-can be created by a user. An example of this is extended
-attributes (in the &quot;xattr&quot; namespace).
-
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
-
+Sets the mount operation to use an anonymous user if @anonymous is %TRUE.
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> input #GFile.
+<parameter name="op">
+<parameter_description> a #GMountOperation.
 </parameter_description>
 </parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError, or %NULL
+<parameter name="anonymous">
+<parameter_description> boolean value.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileAttributeInfoList describing the writable namespaces.
-When you are done with it, release it with g_file_attribute_info_list_unref()
-</return>
+<return></return>
 </function>
 
 <function name="Adds">
@@ -4719,21 +5233,11 @@ When you are done with it, release it with g_file_attribute_info_list_unref()
 
 <function name="SECTION">
 <description>
-#GIcon is a very minimal interface for icons. It provides functions 
-for checking the equality of two icons and hashing of icons.
-
-#GIcon does not provide the actual pixmap for the icon as this is out 
-of GIO&apos;s scope, however implementations of #GIcon may contain the name 
-of an icon (see #GThemedIcon), or the path to an icon (see #GLoadableIcon). 
-
-To obtain a hash of a #GIcon, see g_icon_hash().
-
-To check if two #GIcons are equal, see g_icon_equal().
 
 </description>
 <parameters>
 <parameter name="short_description">
-<parameter_description> Interface for icons
+<parameter_description> Filter Input Stream
 </parameter_description>
 </parameter>
 <parameter name="include">
@@ -4742,6 +5246,31 @@ To check if two #GIcons are equal, see g_icon_equal().
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_output_stream_flush_finish">
+<description>
+Finishes flushing an output stream.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a GAsyncResult.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occuring, or %NULL to 
+ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if flush operation suceeded, %FALSE otherwise.
+</return>
 </function>
 
 <function name="_g_local_directory_monitor_new">
@@ -4764,7 +5293,9 @@ To check if two #GIcons are equal, see g_icon_equal().
 
 <function name="GVolumeMonitor">
 <description>
-Emitted when a drive changes.
+Emitted when the eject button is pressed on @drive.
+
+Since: 2.18
 
 </description>
 <parameters>
@@ -4773,7 +5304,7 @@ Emitted when a drive changes.
 </parameter_description>
 </parameter>
 <parameter name="drive">
-<parameter_description> the drive that changed
+<parameter_description> the drive where the eject button was pressed
 </parameter_description>
 </parameter>
 </parameters>
@@ -4812,8 +5343,11 @@ g_io_scheduler_push_job().
 
 <function name="g_drive_poll_for_media">
 <description>
-Polls @drive to see if media has been inserted or removed.
+Asynchronously polls @drive to see if media has been inserted or removed.
 
+When the operation is finished, @callback will be called.
+You can then call g_drive_poll_for_media_finish() to obtain the
+result of the operation.
 
 </description>
 <parameters>
@@ -4830,7 +5364,7 @@ Polls @drive to see if media has been inserted or removed.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> a #gpointer.
+<parameter_description> user data to pass to @callback
 </parameter_description>
 </parameter>
 </parameters>
@@ -4888,6 +5422,26 @@ with g_unix_mounts_changed_since().
 </return>
 </function>
 
+<function name="g_app_info_get_commandline">
+<description>
+Gets the commandline with which the application will be
+started.  
+
+
+</description>
+<parameters>
+<parameter name="appinfo">
+<parameter_description> a #GAppInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> a string containing the @appinfo&apos;s commandline, 
+or %NULL if this information is not available
+
+Since: 2.20
+</return>
+</function>
+
 <function name="g_simple_async_result_set_handle_cancellation">
 <description>
 Sets whether to handle cancellation within the asynchronous operation.
@@ -4925,6 +5479,7 @@ This call does no blocking i/o.
 </parameters>
 <return> a #GFile structure to the parent of the given
 #GFile or %NULL if there is no parent. 
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -4986,16 +5541,19 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </return>
 </function>
 
-<function name="g_file_create_async">
+<function name="g_file_load_partial_contents_async">
 <description>
-Asynchronously creates a new file and returns an output stream for writing to it.
-The file must not already exists.
+Reads the partial contents of a file. A #GFileReadMoreCallback should be 
+used to stop reading from the file when appropriate, else this function
+will behave exactly as g_file_load_contents_async(). This operation 
+can be finished by g_file_load_partial_contents_finish().
 
-For more details, see g_file_create() which is
-the synchronous version of this call.
+Users of this function should be aware that @user_data is passed to 
+both the @read_more_callback and the @callback.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_create_finish() to get the result of the operation.
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
 
 </description>
 <parameters>
@@ -5003,17 +5561,12 @@ g_file_create_finish() to get the result of the operation.
 <parameter_description> input #GFile.
 </parameter_description>
 </parameter>
-<parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
-</parameter_description>
-</parameter>
-<parameter name="io_priority">
-<parameter_description> the &amp;lt;link linkend=&quot;io-priority&quot;&amp;gt;I/O priority&amp;lt;/link&amp;gt; 
-of the request.
-</parameter_description>
-</parameter>
 <parameter name="cancellable">
 <parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="read_more_callback">
+<parameter_description> a #GFileReadMoreCallback to receive partial data and to specify whether further data should be read.
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -5021,7 +5574,7 @@ of the request.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> the data to pass to callback function
+<parameter_description> the data to pass to the callback functions.
 </parameter_description>
 </parameter>
 </parameters>
@@ -5095,8 +5648,8 @@ This call does no blocking i/o.
 </parameter>
 </parameters>
 <return> string with the relative path from @descendant 
-to @parent, or %NULL if @descendant doesn&apos;t have @parent as prefix. The returned string should be freed with 
-g_free() when no longer needed.
+to @parent, or %NULL if @descendant doesn&apos;t have @parent as prefix. 
+The returned string should be freed with g_free() when no longer needed.
 </return>
 </function>
 
@@ -5137,44 +5690,76 @@ of the OS.
 </return>
 </function>
 
-<function name="g_file_info_get_etag">
+<function name="g_cancellable_get_current">
 <description>
-Gets the &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt; for a given 
-#GFileInfo. See %G_FILE_ATTRIBUTE_ETAG_VALUE.
+Gets the top cancellable from the stack.
 
 
 </description>
 <parameters>
-<parameter name="info">
-<parameter_description> a #GFileInfo.
-</parameter_description>
-</parameter>
 </parameters>
-<return> a string containing the value of the &quot;etag:value&quot; attribute.
+<return> a #GCancellable from the top of the stack, or %NULL
+if the stack is empty. 
 </return>
 </function>
 
-<function name="g_volume_mount_finish">
+<function name="g_file_copy_attributes">
 <description>
-Finishes mounting a volume.
+Copies the file attributes from @source to @destination. 
+
+Normally only a subset of the file attributes are copied,
+those that are copies in a normal file copy operation
+(which for instance does not include e.g. mtime). However
+if #G_FILE_COPY_ALL_METADATA is specified in @flags, then
+all the metadata that is possible to copy is copied.
 
 
 </description>
 <parameters>
-<parameter name="volume">
-<parameter_description> pointer to a #GVolume.
+<parameter name="source">
+<parameter_description> a #GFile with attributes.
 </parameter_description>
 </parameter>
-<parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter name="destination">
+<parameter_description> a #GFile to copy attributes to.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> a set of #GFileCopyFlags.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> a #GError, %NULL to ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE, %FALSE if operation failed.
+<return> %TRUE if the attributes were copied successfully, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_emblemed_icon_new">
+<description>
+Creates a new emblemed icon for @icon with the emblem @emblem.
+
+
+</description>
+<parameters>
+<parameter name="icon">
+<parameter_description> a #GIcon
+</parameter_description>
+</parameter>
+<parameter name="emblem">
+<parameter_description> a #GEmblem
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GIcon
+
+Since: 2.18
 </return>
 </function>
 
@@ -5191,6 +5776,53 @@ Gets the icon for the application.
 </parameter>
 </parameters>
 <return> the default #GIcon for @appinfo.
+</return>
+</function>
+
+<function name="g_volume_get_activation_root">
+<description>
+Gets the activation root for a #GVolume if it is known ahead of
+mount time. Returns %NULL otherwise. If not %NULL and if @volume
+is mounted, then the result of g_mount_get_root() on the
+#GMount object obtained from g_volume_get_mount() will always
+either be equal or a prefix of what this function returns. In
+other words, in code
+
+&amp;lt;programlisting&amp;gt;
+GMount *mount;
+GFile *mount_root
+GFile *volume_activation_root;
+
+mount = g_volume_get_mount (volume); /&amp;ast; mounted, so never NULL &amp;ast;/
+mount_root = g_mount_get_root (mount);
+volume_activation_root = g_volume_get_activation_root(volume); /&amp;ast; assume not NULL &amp;ast;/
+&amp;lt;/programlisting&amp;gt;
+
+then the expression
+
+&amp;lt;programlisting&amp;gt;
+(g_file_has_prefix (volume_activation_root, mount_root) ||
+      g_file_equal (volume_activation_root, mount_root))
+&amp;lt;/programlisting&amp;gt;
+
+will always be %TRUE.
+
+Activation roots are typically used in #GVolumeMonitor
+implementations to find the underlying mount to shadow, see
+g_mount_is_shadowed() for more details.
+
+
+</description>
+<parameters>
+<parameter name="volume">
+<parameter_description> a #GVolume
+</parameter_description>
+</parameter>
+</parameters>
+<return> the activation root of @volume or %NULL. Use
+g_object_unref() to free.
+
+Since: 2.18
 </return>
 </function>
 
@@ -5227,7 +5859,7 @@ its elements have been unreffed with g_object_unref().
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of connected #GDrive&amp;lt;!-- --&amp;gt;s
+<return> a #GList of connected #GDrive objects.
 </return>
 </function>
 
@@ -5244,7 +5876,9 @@ Returns: a new #GVfs handle.
 
 <function name="g_volume_eject">
 <description>
-Ejects a volume.
+Ejects a volume. This is an asynchronous operation, and is
+finished by calling g_volume_eject_finish() with the @volume
+and #GAsyncResult returned in the @callback.
 
 </description>
 <parameters>
@@ -5265,26 +5899,26 @@ Ejects a volume.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> a #gpointer.
+<parameter_description> user data that gets passed to @callback
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
 </function>
 
-<function name="g_unix_mount_point_get_mount_path">
+<function name="g_poll_file_monitor_new">
 <description>
-Gets the mount path for a unix mount point.
+Polls @file for changes.
 
 
 </description>
 <parameters>
-<parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter name="file">
+<parameter_description> a #GFile.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the mount path.
+<return> a new #GFileMonitor for the given #GFile. 
 </return>
 </function>
 
@@ -5341,15 +5975,36 @@ or less than @mount2, respectively.
 </return>
 </function>
 
-<function name="g_vfs_get_local">
+<function name="g_unix_mount_guess_icon">
 <description>
-Gets the local #GVfs for the system.
+Guesses the icon of a Unix mount. 
 
 
 </description>
 <parameters>
+<parameter name="mount_entry">
+<parameter_description> a #GUnixMountEntry
+</parameter_description>
+</parameter>
 </parameters>
-<return> a #GVfs.
+<return> a #GIcon
+</return>
+</function>
+
+<function name="g_file_info_get_file_type">
+<description>
+Gets a file&apos;s type (whether it is a regular file, symlink, etc). 
+This is different from the file&apos;s content type, see g_file_info_get_content_type().
+
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GFileType for the given file.
 </return>
 </function>
 
@@ -5422,29 +6077,19 @@ in the @file, %FALSE otherwise.
 </return>
 </function>
 
-<function name="g_output_stream_flush_finish">
+<function name="g_file_info_unset_attribute_mask">
 <description>
-Finishes flushing an output stream.
-
+Unsets a mask set by g_file_info_set_attribute_mask(), if one
+is set.
 
 </description>
 <parameters>
-<parameter name="stream">
-<parameter_description> a #GOutputStream.
-</parameter_description>
-</parameter>
-<parameter name="result">
-<parameter_description> a GAsyncResult.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError location to store the error occuring, or %NULL to 
-ignore.
+<parameter name="info">
+<parameter_description> #GFileInfo.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if flush operation suceeded, %FALSE otherwise.
-</return>
+<return></return>
 </function>
 
 <function name="g_drive_is_media_removable">
@@ -5476,6 +6121,8 @@ Gets the icon for @volume.
 </parameter>
 </parameters>
 <return> a #GIcon.
+The returned object should be unreffed with g_object_unref()
+when no longer needed.
 </return>
 </function>
 
@@ -5788,7 +6435,7 @@ Finishes ejecting a drive.
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -5850,19 +6497,16 @@ Gets the size of the input buffer.
 </return>
 </function>
 
-<function name="g_file_load_partial_contents_async">
+<function name="g_file_create_async">
 <description>
-Reads the partial contents of a file. A #GFileReadMoreCallback should be 
-used to stop reading from the file when appropriate, else this function
-will behave exactly as g_file_load_contents_async(). This operation 
-can be finished by g_file_load_partial_contents_finish().
+Asynchronously creates a new file and returns an output stream for writing to it.
+The file must not already exist.
 
-Users of this function should be aware that @user_data is passed to 
-both the @read_more_callback and the @callback.
+For more details, see g_file_create() which is
+the synchronous version of this call.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+When the operation is finished, @callback will be called. You can then call
+g_file_create_finish() to get the result of the operation.
 
 </description>
 <parameters>
@@ -5870,12 +6514,17 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 <parameter_description> input #GFile.
 </parameter_description>
 </parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter name="flags">
+<parameter_description> a set of #GFileCreateFlags.
 </parameter_description>
 </parameter>
-<parameter name="read_more_callback">
-<parameter_description> a #GFileReadMoreCallback to receive partial data and to specify whether further data should be read.
+<parameter name="io_priority">
+<parameter_description> the &amp;lt;link linkend=&quot;io-priority&quot;&amp;gt;I/O priority&amp;lt;/link&amp;gt; 
+of the request.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -5883,11 +6532,30 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> the data to pass to the callback functions.
+<parameter_description> the data to pass to callback function
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_app_info_can_delete">
+<description>
+Obtains the information whether the GAppInfo can be deleted.
+See g_app_info_delete().
+
+
+</description>
+<parameters>
+<parameter name="appinfo">
+<parameter_description> a #GAppInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @appinfo can be deleted
+
+Since: 2.20
+</return>
 </function>
 
 <function name="g_output_stream_splice_finish">
@@ -5915,6 +6583,28 @@ ignore.
 </return>
 </function>
 
+<function name="g_winhttp_file_input_stream_new">
+<description>
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> the GWinHttpFile being read
+</parameter_description>
+</parameter>
+<parameter name="connection">
+<parameter_description> handle to the HTTP connection, as from WinHttpConnect()
+</parameter_description>
+</parameter>
+<parameter name="request">
+<parameter_description> handle to the HTTP request, as from WinHttpOpenRequest
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GFileInputStream for the given request
+</return>
+</function>
+
 <function name="_g_mount_get_for_mount_path">
 <description>
 
@@ -5933,26 +6623,44 @@ ignore.
 </return>
 </function>
 
-<function name="g_filename_completer_get_completion_suffix">
+<function name="g_simple_async_report_error_in_idle">
 <description>
-Obtains a completion for @initial_text from @completer.
-
+Reports an error in an asynchronous function in an idle function by 
+directly setting the contents of the #GAsyncResult with the given error
+information.
 
 </description>
 <parameters>
-<parameter name="completer">
-<parameter_description> the filename completer.
+<parameter name="object">
+<parameter_description> a #GObject.
 </parameter_description>
 </parameter>
-<parameter name="initial_text">
-<parameter_description> text to be completed.
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback. 
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to @callback.
+</parameter_description>
+</parameter>
+<parameter name="domain">
+<parameter_description> a #GQuark containing the error domain (usually #G_IO_ERROR).
+</parameter_description>
+</parameter>
+<parameter name="code">
+<parameter_description> a specific error code.
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> a formatted error reporting string.
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> a list of variables to fill in @format.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a completed string, or %NULL if no completion exists. 
-This string is not owned by GIO, so remember to g_free() it 
-when finished.
-</return>
+<return></return>
 </function>
 
 <function name="g_file_icon_new">
@@ -5976,8 +6684,8 @@ Creates a new icon for a file.
 Gets a #GFile for @uri.
 
 This operation never fails, but the returned object
-might not support any I/O operation if the uri
-is malformed or if the uri type is not supported.
+might not support any I/O operation if the URI 
+is malformed or if the URI scheme is not supported.
 
 
 </description>
@@ -5987,12 +6695,12 @@ is malformed or if the uri type is not supported.
 </parameter_description>
 </parameter>
 <parameter name="uri">
-<parameter_description> a string containing a URI path.
+<parameter_description> a string containing a URI 
 </parameter_description>
 </parameter>
 </parameters>
 <return> a #GFile. 
-
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -6031,7 +6739,8 @@ Gets a #GFile for @path.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile.
+<return> a #GFile. 
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -6161,6 +6870,7 @@ Gets the icon for @drive.
 </parameter>
 </parameters>
 <return> #GIcon for the @drive.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -6186,6 +6896,7 @@ See g_file_enumerate_children_async().
 </parameter>
 </parameters>
 <return> a #GFileEnumerator or %NULL if an error occurred.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -6223,6 +6934,11 @@ Checks if an input stream has pending actions.
 <description>
 Append a name to the list of icons from within @icon.
 
+&amp;lt;note&amp;gt;&amp;lt;para&amp;gt;
+Note that doing so invalidates the hash computed by prior calls
+to g_icon_hash().
+&amp;lt;/para&amp;gt;&amp;lt;/note&amp;gt;
+
 </description>
 <parameters>
 <parameter name="icon">
@@ -6259,58 +6975,6 @@ not contain a byte string, %NULL will be returned.
 </return>
 </function>
 
-<function name="g_buffered_output_stream_new_sized">
-<description>
-Creates a new buffered output stream with a given buffer size.
-
-
-</description>
-<parameters>
-<parameter name="base_stream">
-<parameter_description> a #GOutputStream.
-</parameter_description>
-</parameter>
-<parameter name="size">
-<parameter_description> a #gsize.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GOutputStream with an internal buffer set to @size.
-</return>
-</function>
-
-<function name="g_data_input_stream_read_uint64">
-<description>
-Reads an unsigned 64-bit/8-byte value from @stream.
-
-In order to get the correct byte order for this read operation, 
-see g_data_stream_get_byte_order().
-
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
-
-
-</description>
-<parameters>
-<parameter name="stream">
-<parameter_description> a given #GDataInputStream.
-</parameter_description>
-</parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> #GError for error reporting.
-</parameter_description>
-</parameter>
-</parameters>
-<return> an unsigned 64-bit/8-byte read from @stream or %0 if 
-an error occurred. 
-</return>
-</function>
-
 <function name="g_unix_volume_unset_mount">
 <description>
 
@@ -6326,6 +6990,24 @@ an error occurred.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_emblemed_icon_get_emblems">
+<description>
+Gets the list of emblems for the @icon.
+
+
+</description>
+<parameters>
+<parameter name="emblemed">
+<parameter_description> a #GEmblemedIcon
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GList of #GEmblem &amp;lt;!-- --&amp;gt;s that is owned by @emblemed
+
+Since: 2.18
+</return>
 </function>
 
 <function name="g_data_output_stream_put_uint64">
@@ -6450,17 +7132,43 @@ Gets the type associated with @extension.
 </return>
 </function>
 
-<function name="g_cancellable_get_current">
+<function name="g_file_info_get_etag">
 <description>
-Gets the top cancellable from the stack.
+Gets the &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt; for a given 
+#GFileInfo. See %G_FILE_ATTRIBUTE_ETAG_VALUE.
 
 
 </description>
 <parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
 </parameters>
-<return> a #GCancellable from the top of the stack, or %NULL
-if the stack is empty. 
+<return> a string containing the value of the &quot;etag:value&quot; attribute.
 </return>
+</function>
+
+<function name="g_unix_mount_monitor_set_rate_limit">
+<description>
+Sets the rate limit to which the @mount_monitor will report
+consecutive change events to the mount and mount point entry files.
+
+Since: 2.18
+
+</description>
+<parameters>
+<parameter name="mount_monitor">
+<parameter_description> a #GUnixMountMonitor
+</parameter_description>
+</parameter>
+<parameter name="limit_msec">
+<parameter_description> a integer with the limit in milliseconds to
+poll for changes.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_file_copy">
@@ -6663,8 +7371,9 @@ ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of #GFileInfo&amp;lt;!----&amp;gt;s. You must free the list with g_list_free
-and unref the infos with g_object_unref when your done with them.
+<return> a #GList of #GFileInfo&amp;lt;!----&amp;gt;s. You must free the list with 
+g_list_free() and unref the infos with g_object_unref when you&apos;re 
+done with them.
 </return>
 </function>
 
@@ -6728,7 +7437,7 @@ its elements have been unreffed with g_object_unref().
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of #GMount&amp;lt;!-- --&amp;gt;s
+<return> a #GList of #GMount objects.
 </return>
 </function>
 
@@ -6755,10 +7464,17 @@ the data to the underlying stream.
 
 <function name="g_memory_output_stream_get_size">
 <description>
-Gets the size of the loaded data from the @ostream.
+Gets the size of the currently allocated data area (availible from
+g_memory_output_stream_get_data()). If the stream isn&apos;t
+growable (no realloc was passed to g_memory_output_stream_new()) then
+this is the maximum size of the stream and further writes
+will return %G_IO_ERROR_NO_SPACE.
 
-Note that the returned size may become invalid on the next
-write or truncate operation on the stream.
+Note that for growable streams the returned size may become invalid on
+the next write or truncate operation on the stream.
+
+If you want the number of bytes currently written to the stream, use
+g_memory_output_stream_get_data_size().
 
 
 </description>
@@ -6768,7 +7484,7 @@ write or truncate operation on the stream.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the size of the stream&apos;s data
+<return> the number of bytes allocated for the data buffer
 </return>
 </function>
 
@@ -6788,6 +7504,16 @@ Checks if a unix mount is a system path.
 </return>
 </function>
 
+<function name="missing_add">
+<description>
+Unsafe, need lock fen_lock.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_file_info_get_content_type">
 <description>
 Gets the file&apos;s content type.
@@ -6800,7 +7526,7 @@ Gets the file&apos;s content type.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the file&apos;s content type.s
+<return> a string containing the file&apos;s content type.
 </return>
 </function>
 
@@ -6868,23 +7594,47 @@ Gets the device path for a unix mount point.
 </return>
 </function>
 
-<function name="g_file_info_set_modification_time">
+<function name="g_filter_input_stream_get_base_stream">
 <description>
-Sets the %G_FILE_ATTRIBUTE_TIME_MODIFIED attribute in the file
-info to the given time value.
+Gets the base stream for the filter stream.
+
 
 </description>
 <parameters>
-<parameter name="info">
-<parameter_description> a #GFileInfo.
-</parameter_description>
-</parameter>
-<parameter name="mtime">
-<parameter_description> a #GTimeVal.
+<parameter name="stream">
+<parameter_description> a #GFilterInputStream.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a #GInputStream.
+</return>
+</function>
+
+<function name="g_file_get_child">
+<description>
+Gets a child of @file with basename equal to @name.
+
+Note that the file with that specific name might not exist, but
+you can still have a #GFile that points to it. You can use this
+for instance to create that file.
+
+This call does no blocking i/o.
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> string containing the child&apos;s basename.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GFile to a child specified by @name.
+Free the returned object with g_object_unref().
+</return>
 </function>
 
 <function name="g_file_info_remove_attribute">
@@ -6921,20 +7671,51 @@ Creates a new data input stream for the @base_stream.
 </return>
 </function>
 
-<function name="g_app_info_get_executable">
+<function name="g_themed_icon_new">
 <description>
-Gets the executable&apos;s name for the installed application.
+Creates a new themed icon for @iconname.
 
 
 </description>
 <parameters>
-<parameter name="appinfo">
-<parameter_description> a #GAppInfo.
+<parameter name="iconname">
+<parameter_description> a string containing an icon name.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the @appinfo&apos;s application 
-binary&apos;s name.
+<return> a new #GThemedIcon.
+</return>
+</function>
+
+<function name="g_file_get_child_for_display_name">
+<description>
+Gets the child of @file for a given @display_name (i.e. a UTF8
+version of the name). If this function fails, it returns %NULL and @error will be 
+set. This is very useful when constructing a GFile for a new file
+and the user entered the filename in the user interface, for instance
+when you select a directory and type a filename in the file selector.
+
+This call does no blocking i/o.
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile.
+</parameter_description>
+</parameter>
+<parameter name="display_name">
+<parameter_description> string to a possible child.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GFile to the specified child, or 
+%NULL if the display name couldn&apos;t be converted.  
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -7055,7 +7836,18 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter>
 </parameters>
 <return> a #GMount where the @file is located or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
+</function>
+
+<function name="GFileIcon">
+<description>
+The file containing the icon.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_app_info_set_as_default_for_extension">
@@ -7130,6 +7922,22 @@ the number of bytes read into @buffer before the error occurred.
 </return>
 </function>
 
+<function name="g_unix_mount_point_get_fs_type">
+<description>
+Gets the file system type for the mount point.
+
+
+</description>
+<parameters>
+<parameter name="mount_point">
+<parameter_description> a #GUnixMountPoint.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a string containing the file system type.
+</return>
+</function>
+
 <function name="g_input_stream_close_finish">
 <description>
 Finishes closing a stream asynchronously, started from g_input_stream_close_async().
@@ -7186,6 +7994,8 @@ Gets the volume for the @mount.
 </parameter>
 </parameters>
 <return> a #GVolume or %NULL if @mount is not associated with a volume.
+The returned object should be unreffed with 
+g_object_unref() when no longer needed.
 </return>
 </function>
 
@@ -7379,19 +8189,19 @@ an error occurred.
 </return>
 </function>
 
-<function name="g_poll_file_monitor_new">
+<function name="g_unix_mount_point_get_mount_path">
 <description>
-Polls @file for changes.
+Gets the mount path for a unix mount point.
 
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> a #GFile.
+<parameter name="mount_point">
+<parameter_description> a #GUnixMountPoint.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GFileMonitor for the given #GFile. 
+<return> a string containing the mount path.
 </return>
 </function>
 
@@ -7411,6 +8221,8 @@ available.
 </parameter>
 </parameters>
 <return> the UUID for @mount or %NULL if no UUID can be computed.
+The returned string should be freed with g_free()
+when no longer needed.
 </return>
 </function>
 
@@ -7459,6 +8271,7 @@ This call does no blocking i/o.
 </parameters>
 <return> #GFile to the resolved path. %NULL if @relative_path 
 is %NULL or if @file is invalid.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -7509,6 +8322,15 @@ g_buffered_input_stream_fill_async().
 <return> the number of bytes read into @stream&apos;s buffer, up to @count, 
 or -1 on error.
 </return>
+</function>
+
+<function name="delete">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_data_input_stream_read_int32">
@@ -7584,6 +8406,7 @@ g_file_append_to_async().
 </parameter>
 </parameters>
 <return> a valid #GFileOutputStream or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -7701,6 +8524,7 @@ current #GFile, or #NULL to ignore.
 </parameter>
 </parameters>
 <return> a #GFileOutputStream or %NULL on error. 
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -7755,45 +8579,15 @@ all keys in the unix namespace.&amp;lt;/entry&amp;gt;&amp;lt;/row&amp;gt;
 </return>
 </function>
 
-<function name="g_file_set_attribute_string">
+<function name="port_remove">
 <description>
-Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_STRING to @value. 
-If @attribute is of a different type, this operation will fail.
-
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
-
+&amp;lt; private &amp;gt;
+Unsafe, need lock fen_lock.
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> input #GFile.
-</parameter_description>
-</parameter>
-<parameter name="attribute">
-<parameter_description> a string containing the attribute&apos;s name.
-</parameter_description>
-</parameter>
-<parameter name="value">
-<parameter_description> a string containing the attribute&apos;s value.
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> #GFileQueryInfoFlags.
-</parameter_description>
-</parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError, or %NULL
-</parameter_description>
-</parameter>
 </parameters>
-<return> %TRUE if the @attribute was successfully set, %FALSE otherwise.
-</return>
+<return></return>
 </function>
 
 <function name="g_io_modules_load_all_in_directory">
@@ -7816,6 +8610,15 @@ with g_list_free().
 </return>
 </function>
 
+<function name="Get">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_io_extension_point_get_extensions">
 <description>
 Gets a list of all extensions that implement this extension point.
@@ -7836,7 +8639,9 @@ GIO and should not be modified
 
 <function name="g_volume_mount">
 <description>
-Mounts a volume.
+Mounts a volume. This is an asynchronous operation, and is
+finished by calling g_volume_mount_finish() with the @volume
+and #GAsyncResult returned in the @callback.
 
 </description>
 <parameters>
@@ -7861,7 +8666,7 @@ Mounts a volume.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> a #gpointer.
+<parameter_description> user data that gets passed to @callback
 </parameter_description>
 </parameter>
 </parameters>
@@ -7918,7 +8723,8 @@ Checks if a unix mount is mounted read only.
 
 <function name="g_volume_eject_finish">
 <description>
-Finishes ejecting a volume.
+Finishes ejecting a volume. If any errors occured during the operation,
+@error will be set to contain the errors and %FALSE will be returned.
 
 
 </description>
@@ -7932,7 +8738,7 @@ Finishes ejecting a volume.
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> a #GError location to store an error, or %NULL to ignore
 </parameter_description>
 </parameter>
 </parameters>
@@ -8018,7 +8824,7 @@ mount operation. See the #GMountOperation::ask-question signal.
 <function name="g_file_create">
 <description>
 Creates a new file and returns an output stream for writing to it.
-The file must not already exists.
+The file must not already exist.
 
 By default files created are generally readable by everyone,
 but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
@@ -8059,6 +8865,7 @@ filesystem the file is on.
 </parameters>
 <return> a #GFileOutputStream for the newly created file, or 
 %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -8106,9 +8913,10 @@ Gets the human readable description of the content type.
 
 <function name="g_file_load_contents">
 <description>
-Loads the content of the file into memory, returning the size of
-the data. The data is always zero terminated, but this is not
-included in the resultant @length.
+Loads the content of the file into memory. The data is always 
+zero-terminated, but this is not included in the resultant @length.
+The returned @content should be freed with g_free() when no longer
+needed.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -8130,11 +8938,13 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> a location to place the length of the contents of the file.
+<parameter_description> a location to place the length of the contents of the file,
+or %NULL if the length is not needed
 </parameter_description>
 </parameter>
 <parameter name="etag_out">
-<parameter_description> a location to place the current entity tag for the file.
+<parameter_description> a location to place the current entity tag for the file,
+or %NULL if the entity tag is not needed
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -8143,7 +8953,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter>
 </parameters>
 <return> %TRUE if the @file&apos;s contents were successfully loaded.
-%FALSE if there were errors..
+%FALSE if there were errors.
 </return>
 </function>
 
@@ -8227,71 +9037,6 @@ data will reach the target.
 </return>
 </function>
 
-<function name="g_file_replace_contents">
-<description>
-Replaces the contents of @file with @contents of @length bytes.
- 
-If @etag is specified (not %NULL) any existing file must have that etag, or
-the error %G_IO_ERROR_WRONG_ETAG will be returned.
-
-If @make_backup is %TRUE, this function will attempt to make a backup of @file.
-
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
-
-The returned @new_etag can be used to verify that the file hasn&apos;t changed the
-next time it is saved over.
-
-
-</description>
-<parameters>
-<parameter name="file">
-<parameter_description> input #GFile.
-</parameter_description>
-</parameter>
-<parameter name="contents">
-<parameter_description> a string containing the new contents for @file.
-</parameter_description>
-</parameter>
-<parameter name="length">
-<parameter_description> the length of @contents in bytes.
-</parameter_description>
-</parameter>
-<parameter name="etag">
-<parameter_description> the old &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt; 
-for the document.
-</parameter_description>
-</parameter>
-<parameter name="make_backup">
-<parameter_description> %TRUE if a backup should be created.
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
-</parameter_description>
-</parameter>
-<parameter name="new_etag">
-<parameter_description> a location to a new &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt;
-for the document. This should be freed with g_free() when no longer 
-needed.
-</parameter_description>
-</parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if successful. If an error
-has occurred, this function will return %FALSE and set @error
-appropriately if present.
-</return>
-</function>
-
 <function name="g_volume_monitor_get_volume_for_uuid">
 <description>
 Finds a #GVolume object by it&apos;s UUID (see g_volume_get_uuid())
@@ -8309,75 +9054,92 @@ Finds a #GVolume object by it&apos;s UUID (see g_volume_get_uuid())
 </parameter>
 </parameters>
 <return> a #GVolume or %NULL if no such volume is available.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
-<function name="g_app_info_launch_uris">
+<function name="g_mount_unmount_finish">
 <description>
-Launches the application. Passes @uris to the launched application 
-as arguments, using the optional @launch_context to get information
-about the details of the launcher (like what screen it is on).
-On error, @error will be set accordingly.
-
-To lauch the application without arguments pass a %NULL @uris list.
-
-Note that even if the launch is successful the application launched
-can fail to start if it runs into problems during startup. There is
-no way to detect this.
+Finishes unmounting a mount. If any errors occurred during the operation, 
+@error will be set to contain the errors and %FALSE will be returned.
 
 
 </description>
 <parameters>
-<parameter name="appinfo">
-<parameter_description> a #GAppInfo.
+<parameter name="mount">
+<parameter_description> a #GMount.
 </parameter_description>
 </parameter>
-<parameter name="uris">
-<parameter_description> a #GList containing URIs to launch. 
-</parameter_description>
-</parameter>
-<parameter name="launch_context">
-<parameter_description> a #GAppLaunchContext.
+<parameter name="result">
+<parameter_description> a #GAsyncResult.
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> a #GError location to store the error occuring, or %NULL to 
+ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE on successful launch, %FALSE otherwise. 
+<return> %TRUE if the mount was successfully unmounted. %FALSE otherwise.
 </return>
 </function>
 
-<function name="g_unix_mount_guess_icon">
+<function name="g_file_attribute_matcher_unref">
 <description>
-Guesses the icon of a Unix mount. 
+Unreferences @matcher. If the reference count falls below 1, 
+the @matcher is automatically freed.
 
 
 </description>
 <parameters>
-<parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
-</parameter_description>
-</parameter>
-</parameters>
-<return> a #GIcon
-</return>
-</function>
-
-<function name="g_file_info_unset_attribute_mask">
-<description>
-Unsets a mask set by g_file_info_set_attribute_mask(), if one
-is set.
-
-</description>
-<parameters>
-<parameter name="info">
-<parameter_description> #GFileInfo.
+<parameter name="matcher">
+<parameter_description> a #GFileAttributeMatcher.
 </parameter_description>
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_file_set_attribute_int32">
+<description>
+Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_INT32 to @value. 
+If @attribute is of a different type, this operation will fail.
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile.
+</parameter_description>
+</parameter>
+<parameter name="attribute">
+<parameter_description> a string containing the attribute&apos;s name.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> a #gint32 containing the attribute&apos;s new value.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> a #GFileQueryInfoFlags.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @attribute was successfully set to @value 
+in the @file, %FALSE otherwise. 
+</return>
 </function>
 
 <function name="Cancels">
@@ -8387,6 +9149,28 @@ is set.
 <parameters>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_unix_mount_at">
+<description>
+Gets a #GUnixMountEntry for a given mount path. If @time_read
+is set, it will be filled with a unix timestamp for checking
+if the mounts have changed since with g_unix_mounts_changed_since().
+
+
+</description>
+<parameters>
+<parameter name="mount_path">
+<parameter_description> path for a possible unix mount.
+</parameter_description>
+</parameter>
+<parameter name="time_read">
+<parameter_description> guint64 to contain a timestamp.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GUnixMount. 
+</return>
 </function>
 
 <function name="g_simple_async_result_get_op_res_gssize">
@@ -8501,12 +9285,13 @@ with g_file_mount_mountable().
 </parameter>
 </parameters>
 <return> a #GFile or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
 <function name="g_drive_poll_for_media_finish">
 <description>
-Finishes poll_for_mediaing a drive.
+Finishes an operation started with g_drive_poll_for_media() on a drive.
 
 
 </description>
@@ -8520,7 +9305,7 @@ Finishes poll_for_mediaing a drive.
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -8529,37 +9314,30 @@ Finishes poll_for_mediaing a drive.
 </return>
 </function>
 
-<function name="g_file_find_enclosing_mount_async">
+<function name="g_file_monitor_emit_event">
 <description>
-Asynchronously gets the mount for the file.
+Emits the #GFileMonitor::changed signal if a change
+has taken place. Should be called from file monitor 
+implementations only.
 
-For more details, see g_file_find_enclosing_mount() which is
-the synchronous version of this call.
-
-When the operation is finished, @callback will be called. You can then call
-g_file_find_enclosing_mount_finish() to get the result of the operation.
+The signal will be emitted from an idle handler.
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> a #GFile
+<parameter name="monitor">
+<parameter_description> a #GFileMonitor.
 </parameter_description>
 </parameter>
-<parameter name="io_priority">
-<parameter_description> the &amp;lt;link linkend=&quot;io-priority&quot;&amp;gt;I/O priority&amp;lt;/link&amp;gt; 
-of the request.
+<parameter name="child">
+<parameter_description> a #GFile.
 </parameter_description>
 </parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter name="other_file">
+<parameter_description> a #GFile.
 </parameter_description>
 </parameter>
-<parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> the data to pass to callback function
+<parameter name="event_type">
+<parameter_description> a set of #GFileMonitorEvent flags.
 </parameter_description>
 </parameter>
 </parameters>
@@ -8631,8 +9409,10 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string with the line that was read in (including the newlines).
-Set @length to a #gsize to get the length of the read line. Returns %NULL on an error.
+<return> a string with the line that was read in (without the newlines).
+Set @length to a #gsize to get the length of the read line.
+On an error, it will return %NULL and @error will be set. If there&apos;s no
+content to read, it will still return %NULL, but @error won&apos;t be set.
 </return>
 </function>
 
@@ -8672,6 +9452,17 @@ When you&apos;re done with the string it must be freed with g_free().
 <return></return>
 </function>
 
+<function name="get_viewable_logical_drives">
+<description>
+Return value: bitmask with same meaning as returned by GetLogicalDrives()
+
+</description>
+<parameters>
+</parameters>
+<return> bitmask with same meaning as returned by GetLogicalDrives()
+</return>
+</function>
+
 <function name="g_file_info_set_attribute_mask">
 <description>
 Sets @mask on @info to match specific attribute types.
@@ -8694,7 +9485,7 @@ Sets @mask on @info to match specific attribute types.
 <description>
 Unmounts a mount. This is an asynchronous operation, and is 
 finished by calling g_mount_unmount_finish() with the @mount 
-and #GAsyncResults data returned in the @callback.
+and #GAsyncResult data returned in the @callback.
 
 </description>
 <parameters>
@@ -8744,6 +9535,15 @@ Returns: a #GAppInfo if the handle was found, %NULL if there were errors.
 <return> a #GAppInfo if the handle was found, %NULL if there were errors.
 When you are done with it, release it with g_object_unref()
 </return>
+</function>
+
+<function name="Adjust">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_app_info_supports_files">
@@ -8813,19 +9613,19 @@ See %G_FILE_ATTRIBUTE_STANDARD_ICON.
 <return></return>
 </function>
 
-<function name="g_io_extension_get_priority">
+<function name="g_file_attribute_info_list_dup">
 <description>
-Gets the priority with which @extension was registered.
+Makes a duplicate of a file attribute info list.
 
 
 </description>
 <parameters>
-<parameter name="extension">
-<parameter_description> a #GIOExtension
+<parameter name="list">
+<parameter_description> a #GFileAttributeInfoList to duplicate.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the priority of @extension
+<return> a copy of the given @list. 
 </return>
 </function>
 
@@ -8930,19 +9730,21 @@ the application startup notification started in g_app_launch_context_get_startup
 <return></return>
 </function>
 
-<function name="g_unix_mount_guess_can_eject">
+<function name="g_emblem_new">
 <description>
-Guesses whether a Unix mount can be ejected.
+Creates a new emblem for @icon.
 
 
 </description>
 <parameters>
-<parameter name="mount_entry">
-<parameter_description> a #GUnixMountEntry
+<parameter name="icon">
+<parameter_description> a GIcon containing the icon.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @mount_entry is deemed to be ejectable.
+<return> a new #GEmblem.
+
+Since: 2.18
 </return>
 </function>
 
@@ -9041,6 +9843,16 @@ Gets the device path for a unix mount.
 </return>
 </function>
 
+<function name="If">
+<description>
+Unsafe, need lock.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_file_info_set_is_hidden">
 <description>
 Sets the &quot;is_hidden&quot; attribute in a #GFileInfo according to @is_symlink.
@@ -9109,23 +9921,44 @@ On error -1 is returned and @error is set accordingly.
 </return>
 </function>
 
-<function name="g_themed_icon_new_from_names">
+<function name="g_themed_icon_prepend_name">
 <description>
-Creates a new themed icon for @iconnames.
+Prepend a name to the list of icons from within @icon.
+
+&amp;lt;note&amp;gt;&amp;lt;para&amp;gt;
+Note that doing so invalidates the hash computed by prior calls
+to g_icon_hash().
+&amp;lt;/para&amp;gt;&amp;lt;/note&amp;gt;
+
+Since: 2.18
+
+</description>
+<parameters>
+<parameter name="icon">
+<parameter_description> a #GThemedIcon
+</parameter_description>
+</parameter>
+<parameter name="iconname">
+<parameter_description> name of icon to prepend to list of icons from within @icon.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_attribute_matcher_ref">
+<description>
+References a file attribute matcher.
 
 
 </description>
 <parameters>
-<parameter name="iconnames">
-<parameter_description> an array of strings containing icon names.
-</parameter_description>
-</parameter>
-<parameter name="len">
-<parameter_description> the number of elements in the @iconnames array.
+<parameter name="matcher">
+<parameter_description> a #GFileAttributeMatcher.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GThemedIcon.
+<return> a #GFileAttributeMatcher.
 </return>
 </function>
 
@@ -9138,7 +9971,7 @@ with a buffer set to @size.
 </description>
 <parameters>
 <parameter name="base_stream">
-<parameter_description> a #GOutputStream.
+<parameter_description> a #GInputStream.
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -9150,19 +9983,27 @@ with a buffer set to @size.
 </return>
 </function>
 
-<function name="g_io_error_from_errno">
+<function name="g_buffered_input_stream_fill_finish">
 <description>
-Converts errno.h error codes into GIO error codes.
+Finishes an asynchronous read.
 
 
 </description>
 <parameters>
-<parameter name="err_no">
-<parameter_description> Error number as defined in errno.h.
+<parameter name="stream">
+<parameter_description> a #GBufferedInputStream.
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError.
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GIOErrorEnum value for the given errno.h error number.
+<return> a #gssize of the read stream, or %-1 on an error. 
 </return>
 </function>
 
@@ -9229,7 +10070,27 @@ Other errors are possible too.
 </parameter>
 </parameters>
 <return> A #GFileEnumerator if successful, %NULL on error. 
+Free the returned object with g_object_unref().
 </return>
+</function>
+
+<function name="g_app_info_reset_type_associations">
+<description>
+Removes all changes to the type associations done by
+g_app_info_set_as_default_for_type(), 
+g_app_info_set_as_default_for_extension(), 
+g_app_info_add_supports_type() of g_app_info_remove_supports_type().
+
+Since: 2.20
+
+</description>
+<parameters>
+<parameter name="content_type">
+<parameter_description> a content type 
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_output_stream_clear_pending">
@@ -9373,6 +10234,24 @@ an error occurred.
 </return>
 </function>
 
+<function name="g_emblemed_icon_get_icon">
+<description>
+Gets the main icon for @emblemed.
+
+
+</description>
+<parameters>
+<parameter name="emblemed">
+<parameter_description> a #GEmblemedIcon
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GIcon that is owned by @emblemed
+
+Since: 2.18
+</return>
+</function>
+
 <function name="g_volume_get_uuid">
 <description>
 Gets the UUID for the @volume. The reference is typically based on
@@ -9389,6 +10268,8 @@ available.
 </parameter>
 </parameters>
 <return> the UUID for @volume or %NULL if no UUID can be computed.
+The returned string should be freed with g_free() 
+when no longer needed.
 </return>
 </function>
 
@@ -9436,30 +10317,14 @@ Gets the mime-type for the content type. If one is registered
 </return>
 </function>
 
-<function name="g_file_monitor_emit_event">
+<function name="g_input_stream_clear_pending">
 <description>
-Emits the #GFileMonitor::changed signal if a change
-has taken place. Should be called from file monitor 
-implementations only.
-
-The signal will be emitted from an idle handler.
+Clears the pending flag on @stream.
 
 </description>
 <parameters>
-<parameter name="monitor">
-<parameter_description> a #GFileMonitor.
-</parameter_description>
-</parameter>
-<parameter name="child">
-<parameter_description> a #GFile.
-</parameter_description>
-</parameter>
-<parameter name="other_file">
-<parameter_description> a #GFile.
-</parameter_description>
-</parameter>
-<parameter name="event_type">
-<parameter_description> a set of #GFileMonitorEvent flags.
+<parameter name="stream">
+<parameter_description> input stream
 </parameter_description>
 </parameter>
 </parameters>
@@ -9503,8 +10368,9 @@ Gets the name of @mount.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the name for the given @mount. The returned string should 
-be freed when no longer needed.
+<return> the name for the given @mount. 
+The returned string should be freed with g_free()
+when no longer needed.
 </return>
 </function>
 
@@ -9615,11 +10481,9 @@ the &amp;lt;literal&amp;gt;Hidden&amp;lt;/literal&amp;gt; key set.
 </return>
 </function>
 
-<function name="g_file_info_get_attribute_uint32">
+<function name="g_file_info_get_is_hidden">
 <description>
-Gets an unsigned 32-bit integer contained within the attribute. If the 
-attribute does not contain an unsigned 32-bit integer, or is invalid, 
-0 will be returned.
+Checks if a file is hidden.
 
 
 </description>
@@ -9628,12 +10492,8 @@ attribute does not contain an unsigned 32-bit integer, or is invalid,
 <parameter_description> a #GFileInfo.
 </parameter_description>
 </parameter>
-<parameter name="attribute">
-<parameter_description> a file attribute key.
-</parameter_description>
-</parameter>
 </parameters>
-<return> an unsigned 32-bit integer from the attribute. 
+<return> %TRUE if the file is a hidden file, %FALSE otherwise.
 </return>
 </function>
 
@@ -9680,6 +10540,8 @@ Gets the drive for the @volume.
 </parameter>
 </parameters>
 <return> a #GDrive or %NULL if @volume is not associated with a drive.
+The returned object should be unreffed with g_object_unref()
+when no longer needed.
 </return>
 </function>
 
@@ -9752,12 +10614,20 @@ Checks if the buffer automatically grows as data is added.
 
 <function name="g_cancellable_cancel">
 <description>
-Will set @cancellable to cancelled, and will emit the CANCELLED
-signal.
+Will set @cancellable to cancelled, and will emit the
+#GCancellable::cancelled signal. (However, see the warning about
+race conditions in the documentation for that signal if you are
+planning to connect to it.)
 
-This function is thread-safe. In other words, you can safely call it from
-another thread than the one running an operation that was passed
-the @cancellable.
+This function is thread-safe. In other words, you can safely call
+it from a thread other than the one running the operation that was
+passed the @cancellable.
+
+The convention within gio is that cancelling an asynchronous
+operation causes it to complete asynchronously. That is, if you
+cancel the operation from the same thread in which it is running,
+then the operation&apos;s #GAsyncReadyCallback will not be invoked until
+the application returns to the main loop.
 
 </description>
 <parameters>
@@ -9786,37 +10656,19 @@ no more attribute exist.
 </return>
 </function>
 
-<function name="g_input_stream_close">
+<function name="g_data_output_stream_put_uint16">
 <description>
-Closes the stream, releasing resources related to it.
-
-Once the stream is closed, all other operations will return %G_IO_ERROR_CLOSED.
-Closing a stream multiple times will not return an error.
-
-Streams will be automatically closed when the last reference
-is dropped, but you might want to call this function to make sure 
-resources are released as early as possible.
-
-Some streams might keep the backing store of the stream (e.g. a file descriptor)
-open after the stream is closed. See the documentation for the individual
-stream for details.
-
-On failure the first error that happened will be reported, but the close
-operation will finish as much as possible. A stream that failed to
-close will still return %G_IO_ERROR_CLOSED for all operations. Still, it
-is important to check and report the error to the user.
-
-If @cancellable is not NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
-Cancelling a close will still leave the stream closed, but some streams
-can use a faster close that doesn&apos;t block to e.g. check errors. 
+Puts an unsigned 16-bit integer into the output stream.
 
 
 </description>
 <parameters>
 <parameter name="stream">
-<parameter_description> A #GInputStream.
+<parameter_description> a #GDataOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> a #guint16.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
@@ -9824,11 +10676,50 @@ can use a faster close that doesn&apos;t block to e.g. check errors.
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> location to store the error occuring, or %NULL to ignore
+<parameter_description> a #GError, %NULL to ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE on success, %FALSE on failure
+<return> %TRUE if @data was successfully added to the @stream.
+</return>
+</function>
+
+<function name="g_icon_to_string">
+<description>
+Generates a textual representation of @icon that can be used for
+serialization such as when passing @icon to a different process or
+saving it to persistent storage. Use g_icon_new_for_string() to
+get @icon back from the returned string.
+
+The encoding of the returned string is proprietary to #GIcon except
+in the following two cases
+
+&amp;lt;itemizedlist&amp;gt;
+&amp;lt;listitem&amp;gt;&amp;lt;para&amp;gt;
+If @icon is a #GFileIcon, the returned string is a native path
+(such as &amp;lt;literal&amp;gt;/path/to/my icon.png&amp;lt;/literal&amp;gt;) without escaping
+if the #GFile for @icon is a native file.  If the file is not
+native, the returned string is the result of g_file_get_uri()
+(such as &amp;lt;literal&amp;gt;sftp://path/to/my%%20icon.png&amp;lt;/literal&amp;gt;).
+&amp;lt;/para&amp;gt;&amp;lt;/listitem&amp;gt;
+&amp;lt;listitem&amp;gt;&amp;lt;para&amp;gt;
+If @icon is a #GThemedIcon with exactly one name, the encoding is
+simply the name (such as &amp;lt;literal&amp;gt;network-server&amp;lt;/literal&amp;gt;).
+&amp;lt;/para&amp;gt;&amp;lt;/listitem&amp;gt;
+&amp;lt;/itemizedlist&amp;gt;
+
+
+</description>
+<parameters>
+<parameter name="icon">
+<parameter_description> a #GIcon.
+</parameter_description>
+</parameter>
+</parameters>
+<return> An allocated NUL-terminated UTF8 string or %NULL if @icon can&apos;t
+be serialized. Use g_free() to free.
+
+Since: 2.20
 </return>
 </function>
 
@@ -10011,36 +10902,20 @@ Gets the mount path for a unix mount.
 </return>
 </function>
 
-<function name="g_output_stream_splice">
+<function name="g_app_info_get_all_for_type">
 <description>
-Splices an input stream into an output stream.
+Gets a list of all #GAppInfo s for a given content type.
 
 
 </description>
 <parameters>
-<parameter name="stream">
-<parameter_description> a #GOutputStream.
-</parameter_description>
-</parameter>
-<parameter name="source">
-<parameter_description> a #GInputStream.
-</parameter_description>
-</parameter>
-<parameter name="flags">
-<parameter_description> a set of #GOutputStreamSpliceFlags.
-</parameter_description>
-</parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError location to store the error occuring, or %NULL to 
-ignore.
+<parameter name="content_type">
+<parameter_description> the content type to find a #GAppInfo for
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #gssize containing the size of the data spliced.
+<return> #GList of #GAppInfo s for given @content_type
+or %NULL on error.
 </return>
 </function>
 
@@ -10120,6 +10995,46 @@ falls to zero, the @list is deleted.
 <return></return>
 </function>
 
+<function name="g_mount_guess_content_type_sync">
+<description>
+Tries to guess the type of content stored on @mount. Returns one or
+more textual identifiers of well-known content types (typically
+prefixed with &quot;x-content/&quot;), e.g. x-content/image-dcf for camera 
+memory cards. See the &amp;lt;ulink url=&quot;http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec&quot;&amp;gt;shared-mime-info&amp;lt;/ulink&amp;gt;
+specification for more on x-content types.
+
+This is an synchronous operation and as such may block doing IO;
+see g_mount_guess_content_type() for the asynchronous version.
+
+
+</description>
+<parameters>
+<parameter name="mount">
+<parameter_description> a #GMount
+</parameter_description>
+</parameter>
+<parameter name="force_rescan">
+<parameter_description> Whether to force a rescan of the content.
+Otherwise a cached result will be used if available
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occuring, or %NULL to
+ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> a %NULL-terminated array of content types or %NULL on error.
+Caller should free this array with g_strfreev() when done with it.
+
+Since: 2.18
+</return>
+</function>
+
 <function name="g_input_stream_skip_async">
 <description>
 Request an asynchronous skip of @count bytes from the stream into the buffer
@@ -10177,6 +11092,38 @@ of the request.
 <return></return>
 </function>
 
+<function name="g_mount_guess_content_type_finish">
+<description>
+Finishes guessing content types of @mount. If any errors occured
+during the operation, @error will be set to contain the errors and
+%FALSE will be returned. In particular, you may get an 
+%G_IO_ERROR_NOT_SUPPORTED if the mount does not support content 
+guessing.
+
+
+</description>
+<parameters>
+<parameter name="mount">
+<parameter_description> a #GMount
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occuring, or %NULL to 
+ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> a %NULL-terminated array of content types or %NULL on error. 
+Caller should free this array with g_strfreev() when done with it.
+
+Since: 2.18
+</return>
+</function>
+
 <function name="g_file_new_for_path">
 <description>
 Constructs a #GFile for a given path. This operation never
@@ -10195,41 +11142,33 @@ operation if @path is malformed.
 </return>
 </function>
 
-<function name="g_file_copy_attributes">
+<function name="g_app_launch_context_get_startup_notify_id">
 <description>
-Copies the file attributes from @source to @destination. 
+Initiates startup notification for the application and returns the
+DESKTOP_STARTUP_ID for the launched operation, if supported.
 
-Normally only a subset of the file attributes are copied,
-those that are copies in a normal file copy operation
-(which for instance does not include e.g. mtime). However
-if #G_FILE_COPY_ALL_METADATA is specified in @flags, then
-all the metadata that is possible to copy is copied.
+Startup notification IDs are defined in the &amp;lt;ulink
+url=&quot;http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt&quot;&amp;gt;
+FreeDesktop.Org Startup Notifications standard&amp;lt;/ulink&amp;gt;.
 
 
 </description>
 <parameters>
-<parameter name="source">
-<parameter_description> a #GFile with attributes.
+<parameter name="context">
+<parameter_description> a #GAppLaunchContext
 </parameter_description>
 </parameter>
-<parameter name="destination">
-<parameter_description> a #GFile to copy attributes to.
+<parameter name="info">
+<parameter_description> a #GAppInfo
 </parameter_description>
 </parameter>
-<parameter name="flags">
-<parameter_description> a set of #GFileCopyFlags.
-</parameter_description>
-</parameter>
-<parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError, %NULL to ignore.
+<parameter name="files">
+<parameter_description> a #GList of of #GFile objects
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the attributes were copied successfully, %FALSE otherwise.
+<return> a startup notification ID for the application, or %NULL if 
+not supported.
 </return>
 </function>
 
@@ -10238,9 +11177,9 @@ all the metadata that is possible to copy is copied.
 Utility function to check if a particular file exists. This is
 implemented using g_file_query_info() and as such does blocking I/O.
 
-Note that in many cases it is racy to first check for file existance
+Note that in many cases it is racy to first check for file existence
 and then execute something based on the outcome of that, because the
-file might have been created or removed inbetween the operations. The
+file might have been created or removed in between the operations. The
 general approach to handling that is to not check, but just do the
 operation and handle the errors as they come.
 
@@ -10252,7 +11191,7 @@ written file as the result). The correct approach is to always try to create
 the file with g_file_create() which will either atomically create the file
 or fail with a G_IO_ERROR_EXISTS error.
 
-However, in many cases an existance check is useful in a user
+However, in many cases an existence check is useful in a user
 interface, for instance to make a menu item sensitive/insensitive, so that
 you don&apos;t have to fool users that something is possible and then just show
 and error dialog. If you do this, you should make sure to also handle the
@@ -10357,49 +11296,73 @@ Other errors are possible too, and depend on what kind of filesystem the file is
 </parameter>
 </parameters>
 <return> a #GFileInfo or %NULL if there was an error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
-<function name="g_mount_remount">
+<function name="g_file_replace_contents">
 <description>
-Remounts a mount. This is an asynchronous operation, and is 
-finished by calling g_mount_remount_finish() with the @mount 
-and #GAsyncResults data returned in the @callback.
+Replaces the contents of @file with @contents of @length bytes.
+ 
+If @etag is specified (not %NULL) any existing file must have that etag, or
+the error %G_IO_ERROR_WRONG_ETAG will be returned.
 
-Remounting is useful when some setting affecting the operation
-of the volume has been changed, as these may need a remount to
-take affect. While this is semantically equivalent with unmounting
-and then remounting not all backends might need to actually be
-unmounted.
+If @make_backup is %TRUE, this function will attempt to make a backup of @file.
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+
+The returned @new_etag can be used to verify that the file hasn&apos;t changed the
+next time it is saved over.
+
 
 </description>
 <parameters>
-<parameter name="mount">
-<parameter_description> a #GMount.
+<parameter name="file">
+<parameter_description> input #GFile.
+</parameter_description>
+</parameter>
+<parameter name="contents">
+<parameter_description> a string containing the new contents for @file.
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of @contents in bytes.
+</parameter_description>
+</parameter>
+<parameter name="etag">
+<parameter_description> the old &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt; 
+for the document, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="make_backup">
+<parameter_description> %TRUE if a backup should be created.
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> flags affecting the operation
+<parameter_description> a set of #GFileCreateFlags.
 </parameter_description>
 </parameter>
-<parameter name="mount_operation">
-<parameter_description> a #GMountOperation or %NULL to avoid user interaction.
+<parameter name="new_etag">
+<parameter_description> a location to a new &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt;
+for the document. This should be freed with g_free() when no longer 
+needed, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
 <parameter_description> optional #GCancellable object, %NULL to ignore.
 </parameter_description>
 </parameter>
-<parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback, or %NULL.
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data passed to @callback.
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if successful. If an error
+has occurred, this function will return %FALSE and set @error
+appropriately if present.
+</return>
 </function>
 
 <function name="g_file_read_finish">
@@ -10424,22 +11387,46 @@ g_file_read_async().
 </parameter>
 </parameters>
 <return> a #GFileInputStream or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
-<function name="g_file_info_get_symlink_target">
+<function name="g_unix_input_stream_new">
 <description>
-Gets the symlink target for a given #GFileInfo.
+Creates a new #GUnixInputStream for the given @fd. If @close_fd_at_close
+is %TRUE, the file descriptor will be closed when the stream is closed.
 
 
 </description>
 <parameters>
-<parameter name="info">
-<parameter_description> a #GFileInfo.
+<parameter name="fd">
+<parameter_description> unix file descriptor.
+</parameter_description>
+</parameter>
+<parameter name="close_fd_at_close">
+<parameter_description> a #gboolean.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the symlink target.
+<return> a #GUnixInputStream. 
+</return>
+</function>
+
+<function name="g_unix_mount_guess_name">
+<description>
+Guesses the name of a Unix mount. 
+The result is a translated string.
+
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a #GUnixMountEntry
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly allocated string that must
+be freed with g_free()
 </return>
 </function>
 
@@ -10472,7 +11459,10 @@ Runs the asynchronous job in a separated thread.
 <function name="g_file_load_partial_contents_finish">
 <description>
 Finishes an asynchronous partial load operation that was started
-with g_file_load_partial_contents_async().
+with g_file_load_partial_contents_async(). The data is always 
+zero-terminated, but this is not included in the resultant @length.
+The returned @content should be freed with g_free() when no longer
+needed.
 
 
 </description>
@@ -10490,11 +11480,13 @@ with g_file_load_partial_contents_async().
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> a location to place the length of the contents of the file.
+<parameter_description> a location to place the length of the contents of the file,
+or %NULL if the length is not needed
 </parameter_description>
 </parameter>
 <parameter name="etag_out">
-<parameter_description> a location to place the current entity tag for the file.
+<parameter_description> a location to place the current entity tag for the file,
+or %NULL if the entity tag is not needed
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -10605,19 +11597,23 @@ written to the stream
 </return>
 </function>
 
-<function name="g_vfs_get_supported_uri_schemes">
+<function name="g_file_get_path">
 <description>
-Gets a list of URI schemes supported by @vfs.
+Gets the local pathname for #GFile, if one exists. 
+
+This call does no blocking i/o.
 
 
 </description>
 <parameters>
-<parameter name="vfs">
-<parameter_description> a #GVfs.
+<parameter name="file">
+<parameter_description> input #GFile.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a list of strings.
+<return> string containing the #GFile&apos;s path, or %NULL if 
+no such path exists. The returned string should be 
+freed with g_free() when no longer needed.
 </return>
 </function>
 
@@ -10650,7 +11646,8 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileMonitor for the given @file.
+<return> a #GFileMonitor for the given @file, or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -10859,19 +11856,25 @@ of the request.
 <return></return>
 </function>
 
-<function name="g_unix_mount_point_is_readonly">
+<function name="g_filename_completer_get_completion_suffix">
 <description>
-Checks if a unix mount point is read only.
+Obtains a completion for @initial_text from @completer.
 
 
 </description>
 <parameters>
-<parameter name="mount_point">
-<parameter_description> a #GUnixMountPoint.
+<parameter name="completer">
+<parameter_description> the filename completer.
+</parameter_description>
+</parameter>
+<parameter name="initial_text">
+<parameter_description> text to be completed.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if a mount point is read only.
+<return> a completed string, or %NULL if no completion exists. 
+This string is not owned by GIO, so remember to g_free() it 
+when finished.
 </return>
 </function>
 
@@ -10905,6 +11908,7 @@ Other errors are possible too, and depend on what kind of filesystem the file is
 </parameter>
 </parameters>
 <return> #GFileInputStream or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -10955,15 +11959,15 @@ application.
 </description>
 <parameters>
 <parameter name="context">
-<parameter_description> a #GAppLaunchContext.  
+<parameter_description> a #GAppLaunchContext
 </parameter_description>
 </parameter>
 <parameter name="info">
-<parameter_description> a #GAppInfo. 
+<parameter_description> a #GAppInfo
 </parameter_description>
 </parameter>
 <parameter name="files">
-<parameter_description> a #GList of files.
+<parameter_description> a #GList of #GFile objects
 </parameter_description>
 </parameter>
 </parameters>
@@ -10985,6 +11989,22 @@ set to True.
 </parameter>
 </parameters>
 <return> %TRUE if hidden, %FALSE otherwise. 
+</return>
+</function>
+
+<function name="g_buffered_input_stream_get_available">
+<description>
+Gets the size of the available data within the stream.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> #GBufferedInputStream.
+</parameter_description>
+</parameter>
+</parameters>
+<return> size of the available stream. 
 </return>
 </function>
 
@@ -11049,6 +12069,7 @@ be parsed by the #GVfs module.
 </parameter>
 </parameters>
 <return> a #GFile for the given @parse_name.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -11110,6 +12131,73 @@ Creates a #GSimpleAsyncResult from an error condition.
 </parameter>
 </parameters>
 <return> a #GSimpleAsyncResult.
+</return>
+</function>
+
+<function name="GThemedIcon">
+<description>
+Whether to use the default fallbacks found by shortening the icon name 
+at &apos;-&apos; characters. If the &quot;names&quot; array has more than one element, 
+ignores any past the first.
+
+For example, if the icon name was &quot;gnome-dev-cdrom-audio&quot;, the array 
+would become
+|[
+{
+&quot;gnome-dev-cdrom-audio&quot;,
+&quot;gnome-dev-cdrom&quot;,
+&quot;gnome-dev&quot;,
+&quot;gnome&quot;,
+NULL
+};
+]|
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
+<function name="GDrive">
+<description>
+Emitted when the physical eject button (if any) of a drive has
+been pressed.
+
+</description>
+<parameters>
+<parameter name="drive">
+<parameter_description> a #GDrive.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_content_type_guess_for_tree">
+<description>
+Tries to guess the type of the tree with root @root, by
+looking at the files it contains. The result is an array
+of content types, with the best guess coming first.
+
+The types returned all have the form x-content/foo, e.g.
+x-content/audio-cdda (for audio CDs) or x-content/image-dcf 
+(for a camera memory card). See the &amp;lt;ulink url=&quot;http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec&quot;&amp;gt;shared-mime-info&amp;lt;/ulink&amp;gt;
+specification for more on x-content types.
+
+This function is useful in the implementation of g_mount_guess_content_type().
+
+
+</description>
+<parameters>
+<parameter name="root">
+<parameter_description> the root of the tree to guess a type for
+</parameter_description>
+</parameter>
+</parameters>
+<return> an %NULL-terminated array of zero or more content types, or %NULL. 
+Free with g_strfreev()
+
+Since: 2.18
 </return>
 </function>
 
@@ -11191,19 +12279,20 @@ See %G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER.
 </return>
 </function>
 
-<function name="g_themed_icon_new">
+<function name="g_app_info_get_executable">
 <description>
-Creates a new themed icon for @iconname.
+Gets the executable&apos;s name for the installed application.
 
 
 </description>
 <parameters>
-<parameter name="iconname">
-<parameter_description> a string containing an icon name.
+<parameter name="appinfo">
+<parameter_description> a #GAppInfo
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GThemedIcon.
+<return> a string containing the @appinfo&apos;s application 
+binary&apos;s name
 </return>
 </function>
 
@@ -11211,7 +12300,8 @@ Creates a new themed icon for @iconname.
 <description>
 Finishes an asynchronous load of the @file&apos;s contents. 
 The contents are placed in @contents, and @length is set to the 
-size of the @contents string. If @etag_out is present, it will be 
+size of the @contents string. The @content should be freed with
+g_free() when no longer needed. If @etag_out is present, it will be 
 set to the new entity tag for the @file.
 
 
@@ -11230,11 +12320,13 @@ set to the new entity tag for the @file.
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> a location to place the length of the contents of the file.
+<parameter_description> a location to place the length of the contents of the file,
+or %NULL if the length is not needed
 </parameter_description>
 </parameter>
 <parameter name="etag_out">
-<parameter_description> a location to place the current entity tag for the file.
+<parameter_description> a location to place the current entity tag for the file,
+or %NULL if the entity tag is not needed
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -11247,28 +12339,22 @@ present, it will be set appropriately.
 </return>
 </function>
 
-<function name="g_input_stream_read_finish">
+<function name="g_file_get_uri">
 <description>
-Finishes an asynchronous stream read operation. 
+Gets the URI for the @file.
+
+This call does no blocking i/o.
 
 
 </description>
 <parameters>
-<parameter name="stream">
-<parameter_description> a #GInputStream.
-</parameter_description>
-</parameter>
-<parameter name="result">
-<parameter_description> a #GAsyncResult.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError location to store the error occuring, or %NULL to 
-ignore.
+<parameter name="file">
+<parameter_description> input #GFile.
 </parameter_description>
 </parameter>
 </parameters>
-<return> number of bytes read in, or -1 on error.
+<return> a string containing the #GFile&apos;s URI.
+The returned string should be freed with g_free() when no longer needed.
 </return>
 </function>
 
@@ -11292,7 +12378,7 @@ tag for the document, if present.
 <parameter name="new_etag">
 <parameter_description> a location of a new &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt; 
 for the document. This should be freed with g_free() when it is no 
-longer needed.
+longer needed, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -11320,20 +12406,30 @@ Tells the current position within the stream.
 </return>
 </function>
 
-<function name="g_buffered_input_stream_get_available">
+<function name="g_unix_mount_guess_can_eject">
 <description>
-Gets the size of the available data within the stream.
+Guesses whether a Unix mount can be ejected.
 
 
 </description>
 <parameters>
-<parameter name="stream">
-<parameter_description> #GBufferedInputStream.
+<parameter name="mount_entry">
+<parameter_description> a #GUnixMountEntry
 </parameter_description>
 </parameter>
 </parameters>
-<return> size of the available stream. 
+<return> %TRUE if @mount_entry is deemed to be ejectable.
 </return>
+</function>
+
+<function name="missing_remove">
+<description>
+Unsafe, need lock fen_lock.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_memory_output_stream_new">
@@ -11379,19 +12475,25 @@ or %NULL
 </return>
 </function>
 
-<function name="g_file_info_get_display_name">
+<function name="g_drive_get_identifier">
 <description>
-Gets a display name for a file.
+Gets the identifier of the given kind for @drive.
 
 
 </description>
 <parameters>
-<parameter name="info">
-<parameter_description> a #GFileInfo.
+<parameter name="drive">
+<parameter_description> a #GDrive
+</parameter_description>
+</parameter>
+<parameter name="kind">
+<parameter_description> the kind of identifier to return
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the display name.
+<return> a newly allocated string containing the
+requested identfier, or %NULL if the #GDrive
+doesn&apos;t have this kind of identifier.
 </return>
 </function>
 
@@ -11442,8 +12544,8 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileMonitor for the given @file, 
-or %NULL on error.
+<return> a #GFileMonitor for the given @file, or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -11463,7 +12565,7 @@ This call does no blocking i/o.
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GFile that is a duplicate of the given #GFile. 
+<return> a new #GFile that is a duplicate of the given #GFile. 
 </return>
 </function>
 
@@ -11533,7 +12635,7 @@ make a backup of @file.
 </parameter_description>
 </parameter>
 <parameter name="etag">
-<parameter_description> a new &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt; for the @file.
+<parameter_description> a new &amp;lt;link linkend=&quot;gfile-etag&quot;&amp;gt;entity tag&amp;lt;/link&amp;gt; for the @file, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="make_backup">
@@ -11560,29 +12662,40 @@ make a backup of @file.
 <return></return>
 </function>
 
-<function name="g_mount_unmount_finish">
+<function name="g_app_info_launch_uris">
 <description>
-Finishes unmounting a mount. If any errors occurred during the operation, 
-@error will be set to contain the errors and %FALSE will be returned.
+Launches the application. Passes @uris to the launched application 
+as arguments, using the optional @launch_context to get information
+about the details of the launcher (like what screen it is on).
+On error, @error will be set accordingly.
+
+To lauch the application without arguments pass a %NULL @uris list.
+
+Note that even if the launch is successful the application launched
+can fail to start if it runs into problems during startup. There is
+no way to detect this.
 
 
 </description>
 <parameters>
-<parameter name="mount">
-<parameter_description> a #GMount.
+<parameter name="appinfo">
+<parameter_description> a #GAppInfo
 </parameter_description>
 </parameter>
-<parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter name="uris">
+<parameter_description> a #GList containing URIs to launch. 
+</parameter_description>
+</parameter>
+<parameter name="launch_context">
+<parameter_description> a #GAppLaunchContext or %NULL
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError location to store the error occuring, or %NULL to 
-ignore.
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the mount was successfully unmounted. %FALSE otherwise.
+<return> %TRUE on successful launch, %FALSE otherwise. 
 </return>
 </function>
 
@@ -11641,20 +12754,51 @@ not contain a #GObject, %NULL will be returned.
 </return>
 </function>
 
-<function name="g_file_attribute_matcher_ref">
+<function name="g_memory_output_stream_get_data_size">
 <description>
-References a file attribute matcher.
+Returns: the number of bytes written to the stream
+
+</description>
+<parameters>
+<parameter name="ostream">
+<parameter_description> a #GMemoryOutputStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of bytes written to the stream
+
+Since: 2.18
+</return>
+</function>
+
+<function name="g_themed_icon_new_from_names">
+<description>
+Creates a new themed icon for @iconnames.
 
 
 </description>
 <parameters>
-<parameter name="matcher">
-<parameter_description> a #GFileAttributeMatcher.
+<parameter name="iconnames">
+<parameter_description> an array of strings containing icon names.
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> the length of the @iconnames array, or -1 if @iconnames is 
+%NULL-terminated
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileAttributeMatcher.
+<return> a new #GThemedIcon
 </return>
+</function>
+
+<function name="depth">
+<description>
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="GFilenameCompleter">
@@ -11689,6 +12833,7 @@ g_file_replace_async().
 </parameter>
 </parameters>
 <return> a #GFileOutputStream, or %NULL on error.
+Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -11726,19 +12871,55 @@ is %TRUE, the fd will be closed when the output stream is destroyed.
 </return>
 </function>
 
-<function name="g_data_output_stream_put_uint16">
+<function name="_g_winhttp_file_new">
 <description>
-Puts an unsigned 16-bit integer into the output stream.
+
+</description>
+<parameters>
+<parameter name="vfs">
+<parameter_description> GWinHttpVfs to use
+</parameter_description>
+</parameter>
+<parameter name="uri">
+<parameter_description> URI of the GWinHttpFile to create.
+</parameter_description>
+</parameter>
+</parameters>
+<return> new winhttp #GFile.
+</return>
+</function>
+
+<function name="g_input_stream_close">
+<description>
+Closes the stream, releasing resources related to it.
+
+Once the stream is closed, all other operations will return %G_IO_ERROR_CLOSED.
+Closing a stream multiple times will not return an error.
+
+Streams will be automatically closed when the last reference
+is dropped, but you might want to call this function to make sure 
+resources are released as early as possible.
+
+Some streams might keep the backing store of the stream (e.g. a file descriptor)
+open after the stream is closed. See the documentation for the individual
+stream for details.
+
+On failure the first error that happened will be reported, but the close
+operation will finish as much as possible. A stream that failed to
+close will still return %G_IO_ERROR_CLOSED for all operations. Still, it
+is important to check and report the error to the user.
+
+If @cancellable is not NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
+Cancelling a close will still leave the stream closed, but some streams
+can use a faster close that doesn&apos;t block to e.g. check errors. 
 
 
 </description>
 <parameters>
 <parameter name="stream">
-<parameter_description> a #GDataOutputStream.
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> a #guint16.
+<parameter_description> A #GInputStream.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
@@ -11746,11 +12927,11 @@ Puts an unsigned 16-bit integer into the output stream.
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, %NULL to ignore.
+<parameter_description> location to store the error occuring, or %NULL to ignore
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @data was successfully added to the @stream.
+<return> %TRUE on success, %FALSE on failure
 </return>
 </function>
 
@@ -11794,20 +12975,36 @@ Creates a new #GSimpleAsyncResult with a set error.
 </return>
 </function>
 
-<function name="g_app_info_get_all_for_type">
+<function name="g_output_stream_splice">
 <description>
-Gets a list of all #GAppInfo s for a given content type.
+Splices an input stream into an output stream.
 
 
 </description>
 <parameters>
-<parameter name="content_type">
-<parameter_description> the content type to find a #GAppInfo for
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="source">
+<parameter_description> a #GInputStream.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> a set of #GOutputStreamSpliceFlags.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore. 
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occuring, or %NULL to 
+ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GList of #GAppInfo s for given @content_type
-or %NULL on error.
+<return> a #gssize containing the size of the data spliced.
 </return>
 </function>
 
@@ -11938,29 +13135,34 @@ in @result.
 <return></return>
 </function>
 
-<function name="g_file_get_uri">
+<function name="g_input_stream_read_finish">
 <description>
-Gets the URI for the @file.
-
-This call does no blocking i/o.
+Finishes an asynchronous stream read operation. 
 
 
 </description>
 <parameters>
-<parameter name="file">
-<parameter_description> input #GFile.
+<parameter name="stream">
+<parameter_description> a #GInputStream.
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occuring, or %NULL to 
+ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the #GFile&apos;s URI.
-The returned string should be freed with g_free() when no longer needed.
+<return> number of bytes read in, or -1 on error.
 </return>
 </function>
 
 <function name="g_mount_operation_set_username">
 <description>
 Sets the user name within @op to @username.
-
 
 </description>
 <parameters>
@@ -11970,6 +13172,47 @@ Sets the user name within @op to @username.
 </parameter>
 <parameter name="username">
 <parameter_description> input username.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="_g_win32_mount_new">
+<description>
+
+</description>
+<parameters>
+<parameter name="volume_monitor">
+<parameter_description> a #GVolumeMonitor.
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> a win32 path.
+</parameter_description>
+</parameter>
+<parameter name="volume">
+<parameter_description> ususally NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GWin32Mount for the given win32 path.
+</return>
+</function>
+
+<function name="g_mount_shadow">
+<description>
+Increments the shadow count on @mount. Usually used by
+#GVolumeMonitor implementations when creating a shadow mount for
+@mount, see g_mount_is_shadowed() for more information. The caller
+will need to emit the #GMount::changed signal on @mount manually.
+
+Since: 2.20
+
+</description>
+<parameters>
+<parameter name="mount">
+<parameter_description> A #GMount.
 </parameter_description>
 </parameter>
 </parameters>
