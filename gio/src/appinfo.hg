@@ -91,7 +91,7 @@ public:
                                                        std::auto_ptr<Glib::Error>& error);
 #endif // GLIBMM_EXCEPTIONS_ENABLED
 
-  _IGNORE(g_app_info_dup)
+  //_IGNORE(g_app_info_dup)
   _IGNORE(g_app_info_equal)
 
   // Note that the implementation of equal() is virtual via equal_vfunc().
@@ -101,6 +101,7 @@ public:
   _WRAP_METHOD(std::string get_name() const, g_app_info_get_name)
   _WRAP_METHOD(std::string get_description() const, g_app_info_get_description)
   _WRAP_METHOD(std::string get_executable() const, g_app_info_get_executable)
+  _WRAP_METHOD(std::string get_commandline() const, g_app_info_get_commandline)
 
   _WRAP_METHOD(Glib::RefPtr<Icon> get_icon(), g_app_info_get_icon, refreturn)
   _WRAP_METHOD(const Glib::RefPtr<const Icon> get_icon() const,
@@ -118,6 +119,9 @@ public:
                g_app_info_launch_uris,
                errthrow)
   _WRAP_METHOD(bool should_show() const, g_app_info_should_show)
+  // FIXME: use better terminology than delete/do_delete
+  _WRAP_METHOD(bool can_delete() const, g_app_info_can_delete)
+  _WRAP_METHOD(bool do_delete(), g_app_info_delete)
 
   _WRAP_METHOD(bool set_as_default_for_type(const std::string& content_type),
                g_app_info_set_as_default_for_type,
@@ -132,14 +136,19 @@ public:
   _WRAP_METHOD(bool remove_supports_type(const std::string& content_type),
                g_app_info_remove_supports_type,
                errthrow)
-
-  static Glib::ListHandle< Glib::RefPtr<AppInfo> > get_all();
-
-  static Glib::ListHandle< Glib::RefPtr<AppInfo> > get_all_for_type(const std::string& content_type);
-
-  static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type, bool must_support_uris = true);
-
-  static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme);
+#m4 _CONVERSION(`GList*',`Glib::ListHandle<Glib::RefPtr<AppInfo> >',`Glib::ListHandle<Glib::RefPtr<AppInfo> >($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(static Glib::ListHandle<Glib::RefPtr<AppInfo> > get_all(), g_app_info_get_all)
+  _WRAP_METHOD(static Glib::ListHandle<Glib::RefPtr<AppInfo> > get_all_for_type(const std::string& content_type), g_app_info_get_all_for_type)
+  _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type, bool must_support_uris = true), g_app_info_get_default_for_type)
+  _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme), g_app_info_get_default_for_uri_scheme)
+  _WRAP_METHOD(static void reset_type_associations(const std::string& content_type), g_app_info_reset_type_associations)
+  _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context), g_app_info_launch_default_for_uri, errthrow)
+  // same as above but without optional AppLaunchContext
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  static bool launch_default_for_uri(const std::string& uri);
+#else
+  static bool launch_default_for_uri(const std::string& uri, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 protected:
   //_WRAP_VFUNC(Glib::RefPtr<AppInfo> dup(), "dup")

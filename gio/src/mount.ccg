@@ -34,7 +34,7 @@ void Mount::unmount(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>&
 
   g_mount_unmount(gobj(),
                   GMountUnmountFlags(flags),
-                  cancellable->gobj(), 
+                  cancellable->gobj(),
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -48,7 +48,7 @@ void Mount::unmount(const SlotAsyncReady& slot, MountUnmountFlags flags)
 
   g_mount_unmount(gobj(),
                   GMountUnmountFlags(flags),
-                  NULL, 
+                  NULL,
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -57,7 +57,7 @@ void Mount::unmount(MountUnmountFlags flags)
 {
   g_mount_unmount(gobj(),
                   GMountUnmountFlags(flags),
-                  NULL, 
+                  NULL,
                   NULL,
                   NULL);
 }
@@ -73,7 +73,7 @@ void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsy
   g_mount_remount(gobj(),
                   static_cast<GMountMountFlags>(flags),
                   operation->gobj(),
-                  cancellable->gobj(), 
+                  cancellable->gobj(),
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -88,7 +88,7 @@ void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsy
   g_mount_remount(gobj(),
                   static_cast<GMountMountFlags>(flags),
                   operation->gobj(),
-                  NULL, 
+                  NULL,
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -98,7 +98,7 @@ void Mount::remount(const Glib::RefPtr<MountOperation>& operation, MountMountFla
   g_mount_remount(gobj(),
                   static_cast<GMountMountFlags>(flags),
                   operation->gobj(),
-                  NULL, 
+                  NULL,
                   NULL,
                   NULL);
 }
@@ -108,7 +108,7 @@ void Mount::remount(MountMountFlags flags)
   g_mount_remount(gobj(),
                   static_cast<GMountMountFlags>(flags),
                   NULL,
-                  NULL, 
+                  NULL,
                   NULL,
                   NULL);
 }
@@ -122,7 +122,7 @@ void Mount::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& c
 
   g_mount_eject(gobj(),
                   GMountUnmountFlags(flags),
-                  cancellable->gobj(), 
+                  cancellable->gobj(),
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -136,7 +136,7 @@ void Mount::eject(const SlotAsyncReady& slot, MountUnmountFlags flags)
 
   g_mount_eject(gobj(),
                   GMountUnmountFlags(flags),
-                  NULL, 
+                  NULL,
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -145,7 +145,7 @@ void Mount::eject(MountUnmountFlags flags)
 {
   g_mount_eject(gobj(),
                   GMountUnmountFlags(flags),
-                  NULL, 
+                  NULL,
                   NULL,
                   NULL);
 }
@@ -160,7 +160,7 @@ void Mount::guess_content_type(const SlotAsyncReady& slot, const Glib::RefPtr<Ca
 
   g_mount_guess_content_type(gobj(),
                   force_rescan,
-                  cancellable->gobj(), 
+                  cancellable->gobj(),
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -174,7 +174,7 @@ void Mount::guess_content_type(const SlotAsyncReady& slot, bool force_rescan)
 
   g_mount_guess_content_type(gobj(),
                   force_rescan,
-                  NULL, 
+                  NULL,
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -183,9 +183,40 @@ void Mount::guess_content_type(bool force_rescan)
 {
   g_mount_guess_content_type(gobj(),
                   force_rescan,
-                  NULL, 
+                  NULL,
                   NULL,
                   NULL);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void Mount::guess_content_type_sync(const Glib::RefPtr<Cancellable>& cancellable, bool force_rescan)
+#else
+void Mount::guess_content_type_sync(const Glib::RefPtr<Cancellable>& cancellable, bool force_rescan, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+    GError* gerror = 0;
+    g_mount_guess_content_type_sync(gobj(), force_rescan, cancellable->gobj(),
+                                    &gerror);
+  if(gerror)
+#ifndef GLIBMM_EXCEPTIONS_ENABLED
+      error =
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+          ::Glib::Error::throw_exception(gerror);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+void Mount::guess_content_type_sync(bool force_rescan)
+#else
+void Mount::guess_content_type_sync(bool force_rescan, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+    GError* gerror = 0;
+    g_mount_guess_content_type_sync(gobj(), force_rescan, NULL, &gerror);
+  if(gerror)
+#ifndef GLIBMM_EXCEPTIONS_ENABLED
+      error =
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+          ::Glib::Error::throw_exception(gerror);
 }
 
 
