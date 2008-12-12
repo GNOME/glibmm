@@ -39,13 +39,11 @@ class DesktopAppInfo
   _IMPLEMENTS_INTERFACE(AppInfo)
   _GTKMMPROC_WIN32_NO_WRAP
 
-protected:
-  _WRAP_CTOR(DesktopAppInfo(const std::string& desktop_id), g_desktop_app_info_new)
-
 public:
-  _WRAP_CREATE(const std::string& desktop_id)
-
-  //TODO: Use _WRAP_CREATE(), but how do we override the constructor for this? murrayc. 
+  // TODO: should use _WRAP_CREATE(), but these functions do more than just call
+  // g_object_new() because there's quite a bit of error-handling to do
+  _WRAP_METHOD(static Glib::RefPtr<DesktopAppInfo> create(const std::string& desktop_id), g_desktop_app_info_new)
+  _WRAP_METHOD(static Glib::RefPtr<DesktopAppInfo> create_from_keyfile(Glib::KeyFile& key_file), g_desktop_app_info_new_from_keyfile)
   _WRAP_METHOD(static Glib::RefPtr<DesktopAppInfo> create_from_filename(const std::string& filename), g_desktop_app_info_new_from_filename)
 
   _WRAP_METHOD(bool is_hidden() const, g_desktop_app_info_get_is_hidden)
