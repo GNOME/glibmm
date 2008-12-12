@@ -160,6 +160,20 @@ public:
   sigc::connection connect(const sigc::slot<bool>& slot, unsigned int interval,
                            int priority = PRIORITY_DEFAULT);
 
+ /** Connects an timeout handler that runs only once.
+  * This method takes a function pointer to a function with a void return
+  * and no parameters. After running once it is not called again.
+  *
+  * @see connect
+  * @param slot A slot to call when @a interval has elapsed. For example:
+  * @code
+  * void on_timeout_once()
+  * @endcode
+  * @param interval The timeout in milliseconds.
+  * @param priority The priority of the new event source. 
+  */
+  void connect_once(const sigc::slot<void>& slot, unsigned int interval,
+                    int priority = PRIORITY_DEFAULT);
 
   /** Connects a timeout handler with whole second granularity.
    *
@@ -191,6 +205,23 @@ public:
   sigc::connection connect_seconds(const sigc::slot<bool>& slot, unsigned int interval,
                            int priority = PRIORITY_DEFAULT);
 
+ /** Connects an timeout handler that runs only once with whole second
+  *  granularity.
+  *
+  * This method takes a function pointer to a function with a void return
+  * and no parameters. After running once it is not called again.
+  *
+  * @see connect_seconds
+  * @param slot A slot to call when @a interval has elapsed. For example:
+  * @code
+  * void on_timeout_once()
+  * @endcode
+  * @param interval The timeout in milliseconds.
+  * @param priority The priority of the new event source. 
+  */
+  void connect_seconds_once(const sigc::slot<void>& slot, unsigned int interval,
+                            int priority = PRIORITY_DEFAULT);
+
 private:
   GMainContext* context_;
 
@@ -221,6 +252,12 @@ public:
    * @return A connection handle, which can be used to disconnect the handler.
    */
   sigc::connection connect(const sigc::slot<bool>& slot, int priority = PRIORITY_DEFAULT_IDLE);
+
+ /** Connects an idle handler that runs only once.
+  * This method takes a function pointer to a function with a void return
+  * and no parameters. After running once it is not called again.
+  */
+  void connect_once(const sigc::slot<void>& slot, int priority = PRIORITY_DEFAULT_IDLE);
 
 private:
   GMainContext* context_;

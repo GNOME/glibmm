@@ -310,6 +310,12 @@ sigc::connection SignalTimeout::connect(const sigc::slot<bool>& slot,
   return connection;
 }
 
+void SignalTimeout::connect_once(const sigc::slot<void>& slot, 
+                                 unsigned int interval, int priority)
+{
+    connect(sigc::bind_return(slot, false), interval, priority);
+}
+
 /* Note that this is our equivalent of g_timeout_add_seconds(). */
 sigc::connection SignalTimeout::connect_seconds(const sigc::slot<bool>& slot,
                                         unsigned int interval, int priority)
@@ -331,6 +337,12 @@ sigc::connection SignalTimeout::connect_seconds(const sigc::slot<bool>& slot,
 
   conn_node->install(source);
   return connection;
+}
+
+void SignalTimeout::connect_seconds_once(const sigc::slot<void>& slot, 
+                                         unsigned int interval, int priority)
+{
+    connect_seconds(sigc::bind_return(slot, false), interval, priority);
 }
 
 SignalTimeout signal_timeout()
@@ -366,6 +378,11 @@ sigc::connection SignalIdle::connect(const sigc::slot<bool>& slot, int priority)
 
   conn_node->install(source);
   return connection;
+}
+
+void SignalIdle::connect_once(const sigc::slot<void>& slot, int priority)
+{
+    connect(sigc::bind_return(slot, false), priority);
 }
 
 SignalIdle signal_idle()
