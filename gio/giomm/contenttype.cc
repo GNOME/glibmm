@@ -60,6 +60,11 @@ bool content_type_can_be_executable(const Glib::ustring& type)
   return g_content_type_can_be_executable(type.c_str());
 }
 
+Glib::ustring content_type_from_mime_type(const Glib::ustring& mime_type)
+{
+  return Glib::convert_return_gchar_ptr_to_ustring(g_content_type_from_mime_type(mime_type.c_str()));
+}
+
 Glib::ustring content_type_guess(const std::string& filename,
   const std::basic_string<guchar>& data, bool& result_uncertain)
 {

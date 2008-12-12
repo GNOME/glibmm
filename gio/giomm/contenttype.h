@@ -99,6 +99,15 @@ Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
  */
 bool content_type_can_be_executable(const Glib::ustring& type);
 
+/** Tries to find a content type based on the mime type name.
+ *
+ * @param mime_type a mime type string.
+ * @returns string with content type or empty when it does not know.
+ *
+ * @newin2p20
+ */
+Glib::ustring content_type_from_mime_type(const Glib::ustring& mime_type);
+
 /**
  * Guesses the content type based on example data. If the function is uncertain,
  * @a result_uncertain will be set to true
