@@ -1,0 +1,63 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2007 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/icon.h>
+#include <giomm/emblem.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** Icons with Emblems
+ *
+ * EmblemedIcon is an implementation of Icon that supports adding an emblem to
+ * an icon. Adding multiple emblems to an icon is ensured via add_emblem().
+ *
+ * Note that EmblemedIcon allows no control over the position of the emblems.
+ * See also Emblem for more information.
+ *
+ * @newin2p20
+ */
+class EmblemedIcon
+: public Glib::Object,
+  public Icon
+{
+  _CLASS_GOBJECT(EmblemedIcon, GEmblemedIcon, G_EMBLEMED_ICON, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Icon)
+
+protected:
+  //TODO: Documentation:
+ _WRAP_CTOR(EmblemedIcon(const Glib::RefPtr<Icon>& icon, const Glib::RefPtr<Emblem>& emblem), g_emblemed_icon_new)
+
+public:
+  _WRAP_CREATE(const Glib::RefPtr<Icon>& icon, const Glib::RefPtr<Emblem>& emblem)
+
+  _WRAP_METHOD(Glib::RefPtr<Icon> get_icon(), g_emblemed_icon_get_icon);
+  _WRAP_METHOD(Glib::RefPtr<const Icon> get_icon() const, g_emblemed_icon_get_icon, constversion);
+#m4 _CONVERSION(`GList*',`Glib::ListHandle<Glib::RefPtr<Emblem> >',`$2($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::ListHandle<Glib::RefPtr<Emblem> > get_emblems(), g_emblemed_icon_get_emblems);
+  // TODO: need constversion?
+  //_WRAP_METHOD(Glib::ListHandle<Glib::RefPtr<const Emblem> > get_emblems() const, g_emblemed_icon_get_emblems, constversion);
+  _WRAP_METHOD(void add_emblem(const Glib::RefPtr<Emblem>& emblem), g_emblemed_icon_add_emblem);
+};
+
+} // namespace Gio

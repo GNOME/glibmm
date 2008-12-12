@@ -1,0 +1,64 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2007 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/icon.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+_WRAP_ENUM(EmblemOrigin, GEmblemOrigin, NO_GTYPE)
+
+/** An object for emblems
+ *
+ * Emblem is an implementation of GIcon that supports having an emblem, which
+ * is an icon with additional properties. It can than be added to a
+ * EmblemedIcon.
+ *
+ * Currently, only metainformation about the emblem's origin is supported. More
+ * may be added in the future.
+ *
+ * @newin2p20
+ */
+class Emblem
+: public Glib::Object,
+  public Icon
+{
+  _CLASS_GOBJECT(Emblem, GEmblem, G_EMBLEM, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Icon)
+
+protected:
+  //TODO: Documentation:
+ _WRAP_CTOR(Emblem(const Glib::RefPtr<Icon>& icon), g_emblem_new)
+ _WRAP_CTOR(Emblem(const Glib::RefPtr<Icon>& icon, EmblemOrigin origin), g_emblem_new_with_origin)
+
+public:
+  _WRAP_CREATE(const Glib::RefPtr<Icon>& icon)
+  _WRAP_CREATE(const Glib::RefPtr<Icon>& icon, EmblemOrigin origin)
+
+  _WRAP_METHOD(Glib::RefPtr<Icon> get_icon(), g_emblem_get_icon)
+  _WRAP_METHOD(Glib::RefPtr<const Icon> get_icon() const, g_emblem_get_icon, constversion)
+  _WRAP_METHOD(EmblemOrigin get_origin() const, g_emblem_get_origin)
+
+};
+
+} // namespace Gio
