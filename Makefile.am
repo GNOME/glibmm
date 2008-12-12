@@ -124,5 +124,42 @@ install-module:
 
 release: upload-release release-announce
 
-.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild release tag-release upload-release release-announce install-module
+#FIXME: use generic paths, rather than my particular paths
+H2DEF = env python /opt/gnome2/share/pygobject/2.0/codegen/h2def.py
+DEFS_INC_DIR = /opt/gnome2/include
+GEN_ENUM = env perl ./tools/enum.pl
+GEN_EXTRA_DEFS_GLIB = ./tools/extra_defs_gen/generate_extra_defs
+GEN_EXTRA_DEFS_GIO = ./tools/extra_defs_gen/generate_defs_gio
+DOCEXTRACT = /home/jonathon/gnome-build/pygobject/codegen/docextract_to_xml.py
+
+defs: glib-defs gio-defs docextract
+	@echo
+	@echo "*** Make sure to examine the .defs files to make sure they look reasonable"
+	@echo
+
+glib-defs:
+	$(H2DEF) $(DEFS_INC_DIR)/glib-2.0/glib/*.h > glib/src/glib_functions.defs
+	$(H2DEF) $(DEFS_INC_DIR)/glib-2.0/gobject/*.h > glib/src/gobject_functions.defs
+	$(H2DEF) $(DEFS_INC_DIR)/glib-2.0/gmodule.h > glib/src/gmodule_functions.defs
+	$(GEN_ENUM) $(DEFS_INC_DIR)/glib-2.0/glib/*.h > glib/src/glib_enums.defs
+	$(GEN_ENUM) $(DEFS_INC_DIR)/glib-2.0/gobject/*.h > glib/src/gobject_enums.defs
+	$(GEN_ENUM) $(DEFS_INC_DIR)/glib-2.0/gmodule.h > glib/src/gmodule_enums.defs
+
+gio-defs:
+	$(H2DEF) $(DEFS_INC_DIR)/glib-2.0/gio/*.h \
+		$(DEFS_INC_DIR)/gio-unix-2.0/gio/*.h > gio/src/gio_methods.defs
+	$(GEN_ENUM) $(DEFS_INC_DIR)/glib-2.0/gio/*.h \
+		$(DEFS_INC_DIR)/gio-unix-2.0/gio/*.h > gio/src/gio_enums.defs
+	$(GEN_EXTRA_DEFS_GIO) > gio/src/gio_signals.defs
+
+docextract:
+	$(DOCEXTRACT) -s ../glib/glib \
+		-s ../glib/docs/reference/glib \
+		-s ../glib/gobject \
+		-s ../glib/docs/reference/gobject > glib/src/glib_docs.xml
+	$(DOCEXTRACT) -s ../glib/gio \
+		-s ../glib/docs/reference/gio > gio/src/gio_docs.xml
+
+
+.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild release tag-release upload-release release-announce install-module defs glib-defs gio-defs docextract
 
