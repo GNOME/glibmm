@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 
   try
   {
-    Glib::RefPtr<Gio::File> file = Gio::File::create_for_path("/home/murrayc/test.txt");
+    Glib::RefPtr<Gio::File> file = Gio::File::create_for_path("/etc/fstab");
     if(!file)
       std::cerr << "Gio::File::create_for_path() returned an empty RefPtr." << std::endl;
 
