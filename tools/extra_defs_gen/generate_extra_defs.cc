@@ -100,11 +100,16 @@ std::string get_properties(GType gtype)
   return strResult;
 }
 
-std::string get_type_name(GType gtype) //Adds a * if necessary.
+bool gtype_is_a_pointer(GType gtype)
+{
+  return (g_type_is_a(gtype, G_TYPE_OBJECT) || g_type_is_a(gtype, G_TYPE_BOXED));
+}
+
+std::string get_type_name(GType gtype, GTypeIsAPointerFunc is_a_pointer_func) //Adds a * if necessary.
 {
   std::string strTypeName = g_type_name(gtype);
 
-  if( g_type_is_a(gtype, G_TYPE_OBJECT) || g_type_is_a(gtype, G_TYPE_BOXED) )
+  if (is_a_pointer_func && is_a_pointer_func(gtype))
     strTypeName += "*";  //Add * to show that it's a pointer.
   else if( g_type_is_a(gtype, G_TYPE_STRING) )
     strTypeName = "gchar*"; //g_type_name() returns "gchararray".
@@ -112,9 +117,9 @@ std::string get_type_name(GType gtype) //Adds a * if necessary.
   return strTypeName;
 }
 
-std::string get_type_name_parameter(GType gtype)
+std::string get_type_name_parameter(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
 {
-  std::string strTypeName = get_type_name(gtype);
+  std::string strTypeName = get_type_name(gtype, is_a_pointer_func);
 
   //All signal parameters that are registered as GTK_TYPE_STRING are actually const gchar*.
   if(strTypeName == "gchar*")
@@ -123,13 +128,13 @@ std::string get_type_name_parameter(GType gtype)
   return strTypeName;
 }
 
-std::string get_type_name_signal(GType gtype)
+std::string get_type_name_signal(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
 {
-  return get_type_name_parameter(gtype); //At the moment, it needs the same stuff.
+  return get_type_name_parameter(gtype, is_a_pointer_func); //At the moment, it needs the same stuff.
 }
 
 
-std::string get_signals(GType gtype)
+std::string get_signals(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
 {
   std::string strResult;
   std::string strObjectName = g_type_name(gtype);
@@ -165,7 +170,7 @@ std::string get_signals(GType gtype)
       g_signal_query(signal_id, &signalQuery);
 
       //Return type:
-      std::string strReturnTypeName = get_type_name_signal( signalQuery.return_type & ~G_SIGNAL_TYPE_STATIC_SCOPE ); //The type is mangled with a flag. Hacky.
+      std::string strReturnTypeName = get_type_name_signal( signalQuery.return_type & ~G_SIGNAL_TYPE_STATIC_SCOPE, is_a_pointer_func ); //The type is mangled with a flag. Hacky.
       //bool bReturnTypeHasStaticScope = (signalQuery.return_type & G_SIGNAL_TYPE_STATIC_SCOPE) == G_SIGNAL_TYPE_STATIC_SCOPE;
       strResult += "  (return-type \"" + strReturnTypeName + "\")\n";
 
@@ -206,7 +211,7 @@ std::string get_signals(GType gtype)
           pchNum = 0;
 
           //Just like above, for the return type:
-          std::string strTypeName = get_type_name_signal( typeParamMangled & ~G_SIGNAL_TYPE_STATIC_SCOPE ); //The type is mangled with a flag. Hacky.
+          std::string strTypeName = get_type_name_signal( typeParamMangled & ~G_SIGNAL_TYPE_STATIC_SCOPE, is_a_pointer_func ); //The type is mangled with a flag. Hacky.
           //bool bReturnTypeHasStaticScope = (typeParamMangled & G_SIGNAL_TYPE_STATIC_SCOPE) == G_SIGNAL_TYPE_STATIC_SCOPE;
 
           strResult += "    '(\"" + strTypeName + "\" \"" + strParamName + "\")\n";
@@ -231,14 +236,14 @@ std::string get_signals(GType gtype)
 
 
 
-std::string get_defs(GType gtype)
+std::string get_defs(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
 {
   std::string strObjectName = g_type_name(gtype);
   std::string strDefs = ";; From " + strObjectName + "\n\n";
 
   if(G_TYPE_IS_OBJECT(gtype) || G_TYPE_IS_INTERFACE(gtype))
   {
-    strDefs += get_signals(gtype);
+    strDefs += get_signals(gtype, is_a_pointer_func);
     strDefs += get_properties(gtype);
   }
 
