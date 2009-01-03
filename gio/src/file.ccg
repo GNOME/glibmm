@@ -1901,6 +1901,25 @@ bool File::make_directory(std::auto_ptr<Glib::Error>& error)
 }
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool File::make_directory_with_parents()
+#else
+bool File::make_directory_with_parents(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  const bool retvalue = g_file_make_directory_with_parents(gobj(), NULL, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::make_symbolic_link(const std::string& symlink_value)
 #else
 bool File::make_symbolic_link(const std::string& symlink_value, std::auto_ptr<Glib::Error>& error)
