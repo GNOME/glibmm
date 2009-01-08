@@ -608,6 +608,13 @@ public:
 //! @name Message formatting.
 //! @{
 
+  /* Returns fmt as is, but checks for invalid references in the format string.
+   * @newin2p18
+   */
+  template <class T1>
+  static inline
+  ustring compose(const ustring& fmt);
+
   /*! Substitute placeholders in a format string with the referenced arguments.
    * The template string should be in <tt>qt-format</tt>, that is
    * <tt>"%1"</tt>, <tt>"%2"</tt>, ..., <tt>"%9"</tt> are used as placeholders
@@ -1299,6 +1306,13 @@ public:
   explicit inline Stringify(const char arg[N]) : string_(arg) {}
   inline const ustring* ptr() const { return &string_; }
 };
+
+template <class T1>
+inline // static
+ustring ustring::compose(const ustring& fmt)
+{
+  return ustring::compose_argv(fmt, 0, 0);
+}
 
 template <class T1>
 inline // static
