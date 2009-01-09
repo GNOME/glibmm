@@ -78,9 +78,15 @@ TInterface* wrap_auto_interface(GObject* object, bool take_copy = false)
   //so we at least get the expected type:
   TInterface* result = 0;
   if(pCppObject)
-     result = dynamic_cast<TInterface*>(pCppObject);
+  {
+    result = dynamic_cast<TInterface*>(pCppObject);
+    if(!result)
+    {
+      g_warning("Glib::wrap_auto_interface(): The C++ instance (%s) does not dynamic_cast to the interface.\n", typeid(*pCppObject).name());
+    }
+  }
   else
-     result = new TInterface((typename TInterface::BaseObjectType*)object);
+    result = new TInterface((typename TInterface::BaseObjectType*)object);
 
   // take_copy=true is used where the GTK+ function doesn't do
   // an extra ref for us, and always for plain struct members.
