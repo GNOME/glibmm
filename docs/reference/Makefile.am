@@ -31,7 +31,7 @@ $(devhelp_file): $(XML_INDEX) $(devhelp_stylesheet)
 	xsltproc --stringparam book_title "glibmm 2.4 Reference Manual" \
 		--stringparam book_name "glibmm 2.4" \
 		--stringparam reference_prefix "../../../doc/glibmm-2.4/docs/reference/html" \
-		-o $@ $(devhelp_stylesheet) $(XML_INDEX)
+		-o $@ $(srcdir)/$(devhelp_stylesheet) $(XML_INDEX)
 
 $(HTML_INDEX) $(XML_INDEX): $(doxygen_configfile_source) $(beautify_docs_source) $(top_srcdir)/glib/glibmm/*.h $(top_srcdir)/gio/giomm/*.h
 	-rm -rf html
@@ -65,7 +65,7 @@ install-reference: $(HTML_INDEX) $(devhelp_file)
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(referencedir)/$$f; \
 	done
 	$(mkinstalldirs) $(DESTDIR)$(devhelpdir)
-	$(INSTALL_DATA) $(srcdir)/$(devhelp_file) $(DESTDIR)$(devhelpdir)/$$f;
+	$(INSTALL_DATA) $(devhelp_file) $(DESTDIR)$(devhelpdir)/$$f;
 
 uninstall-reference: $(HTML_INDEX)
 	@$(NORMAL_UNINSTALL)
