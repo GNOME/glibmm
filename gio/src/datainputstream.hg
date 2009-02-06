@@ -100,6 +100,7 @@ public:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   _WRAP_METHOD(gint64 read_int64(const Glib::RefPtr<Cancellable>& cancellable), g_data_input_stream_read_int64, errthrow)
+
   /** non-cancellable version of read_int64()
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -118,19 +119,30 @@ public:
   guint64 read_uint64(std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  _IGNORE(g_data_input_stream_read_line)
 
-  // FIXME: In C, these functions return NULL if there is an error (i.e. end of
-  // stream reached), but if we use std::string, we don't have a way to tell an
-  // empty string from NULL.  Perhaps we should use raw pointers as in C, but
-  // that would mean we need to worry about freeing the C string...
+  //Note that we return a bool because we can't use std::string to distinguish between an empty string and a NULL.
+
+  /** Reads a line from the data input stream.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from 
+   * another thread. If the operation
+   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+   *
+   * @param data A string to fill with the read data (without the newlines).
+   * @param cancellable A cancellable object.
+   * @result true if the read succeeded without error.
+   */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool read_line(std::string& line, const Glib::RefPtr<Cancellable>& cancellable);
 #else
   bool read_line(std::string& line, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_data_input_stream_read_line)
 
-  /** non-cancellable version of read_line()
+  /** A non-cancellable version of read_line().
+   *
+   * @param data A string to fill with the read data (without the newlines).
+   * @result true if the read succeeded without error.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool read_line(std::string& line);
@@ -138,21 +150,80 @@ public:
   bool read_line(std::string& line, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
-  _IGNORE(g_data_input_stream_read_until)
+  /** The asynchronous version of read_until(). It is 
+   * an error to have two outstanding calls to this function.
+   *
+   * @param slot The slot to call when the request is satisfied. 
+   * @param cancellable A cancellable object.
+   * @param io_priority The I/O priority of the request. 
+   * @result true if the read succeeded without error.
+   */
+  void read_line_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_data_input_stream_read_line_async)
 
+  /** Finish an asynchronous call started by read_line_async().
+   *
+   * @param result The AsyncResult that was provided to the callback slot.
+   * @param data A string to fill with the read data.
+   * @result true if the read succeeded without error.
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool read_line_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data);
+  #else
+  bool read_line_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data, std::auto_ptr<Glib::Error>& error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_data_input_stream_read_line_finish)
+
+  /** Reads a string from the data input stream, up to the first 
+   * occurrence of any of the stop characters.
+   *
+   * @param data A string to fill with the read data.
+   * @param stop_chars Characters to terminate the read.
+   * @param cancellable A cancellable object.
+   * @result true if the read succeeded without error.
+   */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable);
 #else
   bool read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_data_input_stream_read_until)
 
-  /** non-cancellable version of read_until()
+  /** A non-cancellable version of read_until().
+   * @param stop_chars Characters to terminate the read.
+   * @param data A string to fill with the read data.
+   * @result true if the read succeeded without error.
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool read_until(std::string& data, const std::string& stop_chars);
 #else
   bool read_until(std::string& data, const std::string& stop_chars, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** The asynchronous version of read_until(). It is 
+   * an error to have two outstanding calls to this function.
+   *
+   * @param stop_chars Characters to terminate the read.
+   * @param slot The slot to call when the request is satisfied. 
+   * @param cancellable A cancellable object.
+   * @param io_priority The I/O priority of the request. 
+   * @result true if the read succeeded without error.
+   */
+  void read_until_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_data_input_stream_read_until_async)
+
+  /** Finish an asynchronous call started by read_until_async().
+   *
+   * @param result The AsyncResult that was provided to the callback slot.
+   * @param data A string to fill with the read data.
+   * @result true if the read succeeded without error.
+   */
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data);
+  #else
+  bool read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data, std::auto_ptr<Glib::Error>& error);
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_data_input_stream_read_until_finish)
 
   _WRAP_PROPERTY("byte-order", DataStreamByteOrder)
   _WRAP_PROPERTY("newline-type", DataStreamNewlineType)

@@ -210,6 +210,47 @@ bool DataInputStream::read_line(std::string& line, std::auto_ptr<Glib::Error>& e
     return false;
 }
 
+void DataInputStream::read_line_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_data_input_stream_read_line_async(gobj(),
+                            io_priority,
+                            cancellable->gobj(),
+                            &SignalProxy_async_callback,
+                            slot_copy);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool DataInputStream::read_line_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
+#else
+bool DataInputStream::read_line_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gsize size = 0;
+  gchar* buffer = g_data_input_stream_read_line_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  bool retval = false;
+  if(buffer && size)
+  {
+    retval = (buffer != 0);
+    data = std::string(buffer, size);
+    g_free (buffer);
+  }
+  
+  return retval;
+}
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool DataInputStream::read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable)
@@ -269,4 +310,47 @@ bool DataInputStream::read_until(std::string& data, const std::string& stop_char
     return false;
 }
 
+void DataInputStream::read_until_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_data_input_stream_read_until_async(gobj(), stop_chars.c_str(), 
+                            io_priority,
+                            cancellable->gobj(),
+                            &SignalProxy_async_callback,
+                            slot_copy);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool DataInputStream::read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
+#else
+bool DataInputStream::read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  gsize size = 0;
+  gchar* buffer = g_data_input_stream_read_until_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  bool retval = false;
+  if(buffer && size)
+  {
+    retval = (buffer != 0);
+    data = std::string(buffer, size);
+    g_free (buffer);
+  }
+  
+  return retval;
+}
+
+  
 } // namespace Gio
