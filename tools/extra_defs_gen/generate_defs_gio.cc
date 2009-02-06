@@ -20,6 +20,8 @@
 #include "generate_extra_defs.h"
 #include <iostream>
 #include <gio/gio.h>
+#include <gio/gunixinputstream.h>
+#include <gio/gunixoutputstream.h>
 
 int main (int argc, char** argv)
 {
@@ -44,6 +46,9 @@ int main (int argc, char** argv)
             << get_defs(G_TYPE_FILE_OUTPUT_STREAM)
             << get_defs(G_TYPE_FILTER_INPUT_STREAM)
             << get_defs(G_TYPE_FILTER_OUTPUT_STREAM)
+
+            << get_defs(G_TYPE_UNIX_INPUT_STREAM)
+            << get_defs(G_TYPE_UNIX_OUTPUT_STREAM)
 
             << get_defs(G_TYPE_INPUT_STREAM)
             << get_defs(G_TYPE_LOADABLE_ICON)
