@@ -28,7 +28,7 @@
 
 #ifdef GLIBMM_DEBUG_REFCOUNTING
 
-/* We can't use G_GNUC_PRETTY_FUNCTION because it's always disabled in C++,
+/* We can't use the equivalent GLib macro because it's always disabled in C++,
  * even though __PRETTY_FUNCTION__ works fine in C++ as well if you use it
  * right (i.e. concatenation with string literals isn't allowed).
  */

@@ -83,8 +83,6 @@ void ObjectBase::initialize(GObject* castitem)
     return; // Don't initialize the wrapper twice.
   }
 
-  //g_print("%s : %s\n", G_GNUC_PRETTY_FUNCTION, G_OBJECT_TYPE_NAME(castitem));
-
   gobject_ = castitem;
   _set_current_wrapper(castitem);
 }
