@@ -56,7 +56,11 @@ doc-clean:
 	-rm -f glibmm_doxygen_tags
 	-rm -f glibmm-reference-html.tar.gz glibmm-reference-html.tar.bz2
 
-install-reference: $(HTML_INDEX) $(devhelp_file)
+install-devhelp: $(devhelp_file)
+	$(mkinstalldirs) $(DESTDIR)$(devhelpdir)
+	$(INSTALL_DATA) $< $(DESTDIR)$(devhelpdir)/$$f;
+
+install-html: $(HTML_INDEX)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(referencedir)
 	@dir='$(<D)'; for p in $$dir/*.html $$dir/*.css $$dir/*.png $$dir/*.dot ; do \
@@ -64,8 +68,8 @@ install-reference: $(HTML_INDEX) $(devhelp_file)
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(referencedir)/$$f"; \
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(referencedir)/$$f; \
 	done
-	$(mkinstalldirs) $(DESTDIR)$(devhelpdir)
-	$(INSTALL_DATA) $(devhelp_file) $(DESTDIR)$(devhelpdir)/$$f;
+
+install-reference: install-html install-devhelp
 
 uninstall-reference: $(HTML_INDEX)
 	@$(NORMAL_UNINSTALL)
