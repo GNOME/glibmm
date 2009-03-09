@@ -21,6 +21,7 @@
 
 
 #include "generate_extra_defs.h"
+#include <algorithm>
 
 std::string get_properties(GType gtype)
 {
@@ -66,11 +67,13 @@ std::string get_properties(GType gtype)
     if(pParamSpec)
     {
       //Name and type:
-      std::string strName = g_param_spec_get_name(pParamSpec);
-      std::string strTypeName = G_PARAM_SPEC_TYPE_NAME(pParamSpec);
-      
+      const std::string strName = g_param_spec_get_name(pParamSpec);
+      const std::string strTypeName = G_PARAM_SPEC_TYPE_NAME(pParamSpec);
+
       const gchar* pchBlurb = g_param_spec_get_blurb(pParamSpec);
-      std::string strDocs = (pchBlurb ? pchBlurb : std::string());
+      std::string strDocs = (pchBlurb) ? pchBlurb : "";
+      // Quick hack to get rid of nested double quotes:
+      std::replace(strDocs.begin(), strDocs.end(), '"', '\'');
 
       strResult += "(define-property " + strName + "\n";
       strResult += "  (of-object \"" + strObjectName + "\")\n";
