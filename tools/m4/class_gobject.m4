@@ -32,6 +32,15 @@ define(`__BOOL_CUSTOM_DTOR__',`$1')
 _POP()
 ')
 
+dnl For classes that need custom code in their cast and construct_params
+dnl constructor.
+define(`_CUSTOM_CTOR_CAST',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_CUSTOM_CTOR_CAST__',`$1')
+_POP()
+')
+
 dnl Gdk::Pixmap_Class::wrap_new() needs a custom implementation, in order
 dnl to create a Gdk::Bitmap object if appropriate.  See comments there.
 define(`_CUSTOM_WRAP_NEW',`dnl
@@ -169,6 +178,8 @@ __CNAME__* __CPPNAME__::gobj_copy()
   return gobj();
 }
 
+ifdef(`__BOOL_CUSTOM_CTOR_CAST__',`dnl
+',`dnl
 __CPPNAME__::__CPPNAME__`'(const Glib::ConstructParams& construct_params)
 :
   __CPPPARENT__`'(construct_params)
@@ -180,6 +191,8 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem)
 :
   __CPPPARENT__`'(__PCAST__`'(castitem))
 {}
+
+')dnl
 
 ifdef(`__BOOL_CUSTOM_DTOR__',`dnl
 ',`dnl
