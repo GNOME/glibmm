@@ -17,31 +17,35 @@
 
 #include <glibmm.h>
 #include <iostream>
+#include <iomanip>
 
-Glib::ustring bool_text (bool val)
-{
-	return val ? "true" : "false";
-}
-
-int main(int argc, char** argv)
+int main(int, char**)
 {
   Glib::init();
-  
-  /* Reusing one regex pattern: */ 
-  Glib::RefPtr<Glib::Regex> regex = Glib::Regex::create ("(a)?(b)");
+
+  /* Reusing one regex pattern: */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<Glib::Regex> regex = Glib::Regex::create("(a)?(b)");
+#else
+  std::auto_ptr<Glib::Error> error;
+  Glib::RefPtr<Glib::Regex> regex = Glib::Regex::create("(a)?(b)",
+                                                        Glib::RegexCompileFlags(),
+                                                        Glib::RegexMatchFlags(),
+                                                        error);
+#endif
   std::cout << "Pattern=" << regex->get_pattern() 
      << ", with string=abcd, result=" 
-     << bool_text( regex->match("abcd") )
+     << std::boolalpha << regex->match("abcd")
      << std::endl;
   std::cout << "Pattern=" << regex->get_pattern()
      << ", with string=1234, result=" 
-     << bool_text( regex->match("1234") )
+     << std::boolalpha << regex->match("1234")
      << std::endl;
   std::cout << std::endl;
 
   /* Using the static function without a regex instance: */
   std::cout << "Pattern=b* with string=abcd, result=" 
-    << bool_text( Glib::Regex::match_simple("b*", "abcd") )
+    << std::boolalpha << Glib::Regex::match_simple("b*", "abcd")
     << std::endl;
 
   return 0;

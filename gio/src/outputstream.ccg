@@ -53,7 +53,7 @@ OutputStream::write_async(const void* buffer, gsize count, const SlotAsyncReady&
                               buffer,
                               count,
                               io_priority,
-                              NULL,
+                              0,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -87,7 +87,7 @@ OutputStream::splice_async(const Glib::RefPtr<InputStream>& source, const SlotAs
                                source->gobj(),
                                static_cast<GOutputStreamSpliceFlags>(flags),
                                io_priority,
-                               NULL,
+                               0,
                                &SignalProxy_async_callback,
                                slot_copy);
 }
@@ -102,7 +102,7 @@ OutputStream::flush_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancell
 
   g_output_stream_flush_async(gobj(),
                               io_priority,
-                              const_cast<GCancellable*>(Glib::unwrap(cancellable)),
+                              Glib::unwrap(cancellable),
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -117,7 +117,7 @@ OutputStream::flush_async(const SlotAsyncReady& slot, int io_priority)
 
   g_output_stream_flush_async(gobj(),
                               io_priority,
-                              NULL,
+                              0,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -132,7 +132,7 @@ OutputStream::close_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancell
 
   g_output_stream_close_async(gobj(),
                               io_priority,
-                              const_cast<GCancellable*>(Glib::unwrap(cancellable)),
+                              Glib::unwrap(cancellable),
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -147,7 +147,7 @@ OutputStream::close_async(const SlotAsyncReady& slot, int io_priority)
 
   g_output_stream_close_async(gobj(),
                               io_priority,
-                              NULL,
+                              0,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -160,7 +160,7 @@ gssize OutputStream::write(const void* buffer, gsize count, std::auto_ptr<Glib::
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gssize retvalue = g_output_stream_write(gobj(), buffer, count, NULL, &(gerror));
+  gssize retvalue = g_output_stream_write(gobj(), buffer, count, 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -175,11 +175,11 @@ gssize OutputStream::write(const void* buffer, gsize count, std::auto_ptr<Glib::
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 gssize OutputStream::write(const std::string& buffer, const Glib::RefPtr<Cancellable>& cancellable)
 #else
-gssize OutputStream::write(const std::string&, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+gssize OutputStream::write(const std::string& buffer, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gssize retvalue = g_output_stream_write(gobj(), buffer.c_str(), buffer.size(), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+  gssize retvalue = g_output_stream_write(gobj(), buffer.data(), buffer.size(), Glib::unwrap(cancellable), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -194,11 +194,11 @@ gssize OutputStream::write(const std::string&, const Glib::RefPtr<Cancellable>& 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 gssize OutputStream::write(const std::string& buffer)
 #else
-gssize OutputStream::write(const std::string&, std::auto_ptr<Glib::Error>& error)
+gssize OutputStream::write(const std::string& buffer, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gssize retvalue = g_output_stream_write(gobj(), buffer.c_str(), buffer.size(), NULL, &(gerror));
+  gssize retvalue = g_output_stream_write(gobj(), buffer.data(), buffer.size(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -217,7 +217,7 @@ bool OutputStream::write_all(const void* buffer, gsize count, gsize& bytes_writt
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_output_stream_write_all(gobj(), buffer, count, &(bytes_written), NULL, &(gerror));
+  bool retvalue = g_output_stream_write_all(gobj(), buffer, count, &(bytes_written), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -236,7 +236,7 @@ bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written, co
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_output_stream_write_all(gobj(), buffer.c_str(), buffer.size(), &(bytes_written), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+  bool retvalue = g_output_stream_write_all(gobj(), buffer.data(), buffer.size(), &(bytes_written), Glib::unwrap(cancellable), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -255,7 +255,7 @@ bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written, st
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_output_stream_write_all(gobj(), buffer.c_str(), buffer.size(), &(bytes_written), NULL, &(gerror));
+  bool retvalue = g_output_stream_write_all(gobj(), buffer.data(), buffer.size(), &(bytes_written), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -274,7 +274,7 @@ gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, const Glib:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gssize retvalue = g_output_stream_splice(gobj(), const_cast<GInputStream*>(Glib::unwrap(source)), ((GOutputStreamSpliceFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+  gssize retvalue = g_output_stream_splice(gobj(), Glib::unwrap(source), ((GOutputStreamSpliceFlags)(flags)), Glib::unwrap(cancellable), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -293,7 +293,7 @@ gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, OutputStrea
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gssize retvalue = g_output_stream_splice(gobj(), const_cast<GInputStream*>(Glib::unwrap(source)), ((GOutputStreamSpliceFlags)(flags)), NULL, &(gerror));
+  gssize retvalue = g_output_stream_splice(gobj(), Glib::unwrap(source), ((GOutputStreamSpliceFlags)(flags)), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -312,7 +312,7 @@ bool OutputStream::flush(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_output_stream_flush(gobj(), NULL, &(gerror));
+  bool retvalue = g_output_stream_flush(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -331,7 +331,7 @@ bool OutputStream::close(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_output_stream_close(gobj(), NULL, &(gerror));
+  bool retvalue = g_output_stream_close(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
