@@ -19,33 +19,24 @@
 #include <iostream>
 
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
-  // This example should be executed like so:
-  // ./example the_ini_file.ini
-  
   Glib::init();
-   
-  std::string filepath = "./example.ini";
+
+  const std::string filepath = "./example.ini";
 
   Glib::KeyFile keyfile;
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   // An exception will be thrown if the file is not there, or if the file is incorrectly formatted:
   try
   {
-    const bool loaded = keyfile.load_from_file(filepath);
-    if(!loaded)
-      std::cerr << "Could not load keyfile." << std::endl;
+    keyfile.load_from_file(filepath);
   }
-  catch(const Glib::FileError& ex)
+  catch(const Glib::Error& ex)
   {
     std::cerr << "Exception while loading key file: " << ex.what() << std::endl;
-    return -1;
-  }
-  catch(const Glib::KeyFileError& ex)
-  {
-    std::cerr << "Exception while loading key file: " << ex.what() << std::endl;
-    return -1;
+    return 1;
   }
 
   // Try to get a value that is not in the file:
@@ -58,7 +49,6 @@ int main(int argc, char** argv)
   catch(const Glib::KeyFileError& ex)
   {
     std::cerr << "Exception while getting value: " << ex.what() << std::endl;
-    //return -1;
   }
 
   // Try to get a value that is in the file:
@@ -71,26 +61,60 @@ int main(int argc, char** argv)
   catch(const Glib::KeyFileError& ex)
   {
     std::cerr << "Exception while getting value: " << ex.what() << std::endl;
-    //return -1;
   }
 
   // Try to get a list of integers that is in the file:
   // An exception will be thrown if the value is not in the file:
   try
   {
-    typedef std::list<int> type_list_integers;
-    const type_list_integers value_list = keyfile.get_integer_list("Another Group", "Numbers");
-    for(type_list_integers::const_iterator iter = value_list.begin(); iter != value_list.end(); ++iter)
-    {
-      const int value = *iter;
-      std::cout << "Number list value: item=" << value << std::endl;
-    }
+    const std::vector<int> values = keyfile.get_integer_list("Another Group", "Numbers");
+
+    for(std::vector<int>::const_iterator p = values.begin(); p != values.end(); ++p)
+      std::cout << "Number list value: item=" << *p << std::endl;
   }
   catch(const Glib::KeyFileError& ex)
   {
     std::cerr << "Exception while getting list value: " << ex.what() << std::endl;
-    //return -1;
   }
+#else /* !GLIBMM_EXCEPTIONS_ENABLED */
+  std::auto_ptr<Glib::Error> ex;
+
+  if(!keyfile.load_from_file(filepath, Glib::KeyFileFlags(), ex))
+  {
+    std::cerr << "Exception while loading key file: " << ex->what() << std::endl;
+    return 1;
+  }
+
+  // Try to get a value that is not in the file:
+  {
+    const Glib::ustring value = keyfile.get_value("somegroup", "somekey", ex);
+    if (!ex.get())
+      std::cout << "somekey value=" << value << std::endl;
+    else
+      std::cerr << "Exception while getting value: " << ex->what() << std::endl;
+  }
+
+  // Try to get a value that is in the file:
+  {
+    const Glib::ustring value = keyfile.get_value("First Group", "Welcome", ex);
+    if (!ex.get())
+      std::cout << "Welcome value=" << value << std::endl;
+    else
+      std::cerr << "Exception while getting value: " << ex->what() << std::endl;
+  }
+
+  // Try to get a list of integers that is in the file:
+  {
+    const std::vector<int> values = keyfile.get_integer_list("Another Group", "Numbers", ex);
+    if (!ex.get())
+    {
+      for(std::vector<int>::const_iterator p = values.begin(); p != values.end(); ++p)
+        std::cout << "Number list value: item=" << *p << std::endl;
+    }
+    else
+      std::cerr << "Exception while getting list value: " << ex->what() << std::endl;
+  }
+#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
   return 0;
 }
