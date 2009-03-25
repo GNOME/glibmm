@@ -443,6 +443,9 @@ sub substitute_function($$)
   {
     # Not perfect, but better than nothing.
     $name =~ s/^g_/Glib::/;
+
+    # Hard-code the hack for this because it is not dealt with by other code:
+    $name =~ s/^gtk_accel_map_/Gtk::AccelMap::/;
   }
 
   return $name . "()";
