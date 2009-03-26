@@ -8,5 +8,5 @@ EXTRA_DIST = glibmmconfig.h glibmm.vcproj glibmm.rc
 # wht respect to the .h.in file, to prevent an error with 'make distcheck'.
 # See http://sources.redhat.com/automake/automake.html#distcleancheck
 
-glibmmconfig.h: $(top_srcdir)/glib/glibmmconfig.h.in $(top_srcdir)/configure.in
+glibmmconfig.h: $(top_srcdir)/glib/glibmmconfig.h.in $(top_srcdir)/configure.ac
 	cp -f $(top_builddir)/glib/glibmmconfig.h $@
