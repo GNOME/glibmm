@@ -8,5 +8,5 @@ EXTRA_DIST = giommconfig.h giomm.vcproj giomm.rc
 # wht respect to the .h.in file, to prevent an error with 'make distcheck'.
 # See http://sources.redhat.com/automake/automake.html#distcleancheck
 
-giommconfig.h: $(top_srcdir)/gio/giommconfig.h.in $(top_srcdir)/configure.in
+giommconfig.h: $(top_srcdir)/gio/giommconfig.h.in $(top_srcdir)/configure.ac
 	cp -f $(top_builddir)/gio/giommconfig.h $@
