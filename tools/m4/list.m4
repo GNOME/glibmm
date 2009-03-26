@@ -166,14 +166,16 @@ namespace __LIST_NAMESPACE__
 __LISTNAME__::iterator __LISTNAME__::find(const_reference w)
 {
   iterator i = begin();
-  for(i = begin(); i != end() && (i->ifelse($1,,,$1()->)gobj() != w.ifelse($1,,,$1()->)gobj()); i++);
+  while (i != end() && (i->ifelse($1,,,$1()->)gobj() != w.ifelse($1,,,$1()->)gobj()))
+    ++i;
   return i;
 }
 
 __LISTNAME__::iterator __LISTNAME__::find(Widget& w)
 {
-  iterator i;
-  for(i = begin(); i != end() && ((GtkWidget*)i->ifelse($1,,,$1()->)gobj() != w.gobj()); i++);
+  iterator i = begin();
+  while (i != end() && ((GtkWidget*)i->ifelse($1,,,$1()->)gobj() != w.gobj()))
+    ++i;
   return i;
 }
 
