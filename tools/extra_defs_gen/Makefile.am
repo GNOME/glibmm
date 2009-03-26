@@ -21,7 +21,7 @@ sublib_include_HEADERS	= $(files_h)
 # Build the generate_properties_defs utility executable.
 # This is not used to build the rest of glibmm.
 
-INCLUDES = $(GLIBMM_CFLAGS) $(GIOMM_CFLAGS)
+INCLUDES = $(GLIBMM_WXXFLAGS) $(GLIBMM_CFLAGS) $(GIOMM_CFLAGS)
 LIBS = $(GLIBMM_LIBS) $(GIOMM_LIBS)
 
 noinst_PROGRAMS = generate_extra_defs generate_defs_gio
