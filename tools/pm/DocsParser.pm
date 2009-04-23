@@ -438,19 +438,52 @@ sub substitute_function($$)
 
       DocsParser::build_method_name($doc_func, $module, $class, \$name);
     }
+    else
+    {
+      print "Translated $name into ";    
+      non_object_method_name($doc_func, \$name);
+      print "$name\n";
+    }
   }
   else
   {
     # Not perfect, but better than nothing.
     $name =~ s/^g_/Glib::/;
-
-    # Hard-code the hack for this because it is not dealt with by other code:
-    $name =~ s/^gtk_accel_map_/Gtk::AccelMap::/;
   }
 
   return $name . "()";
 }
 
+sub non_object_method_name($$)
+{
+  my ($doc_func, $name) = @_;
+  if ($$name =~ "gtk_")
+  {
+    my %gtk_objects = ("gtk_accel_map" => "AccelMap",
+                       "gtk_clipboard" => "Clipboard",
+                       "gtk_file_filter" => "FileFilter",
+                       "gtk_icon_set" => "IconSet",
+                       "gtk_icon_source" => "IconSource",
+                       "gtk_icon_info" => "IconInfo",
+                       "gtk_page_setup" => "PageSetup",
+                       "gtk_recent_info" => "RecentInfo",
+                       "gtk_tooltip" => "Tooltip",
+                       "gtk_text_iter" => "TextIter",
+                       "gtk_target_list" => "TargetList",
+                       "gtk_drag_source" => "DragSource",
+                       "gtk_print_settings" => "PrintSettings",
+                       "gtk_recent_filter" => "RecentFilter");
+    foreach my $key (keys(%gtk_objects))
+    {
+      if ($$name =~ $key)
+      {
+        DocsParser::build_method_name($doc_func, "Gtk", $gtk_objects{$key}, $name);
+        return;
+      }
+    }
+  }
+  print STDERR "Documentation: Class/Namespace for $$name not found\n";
+}   
 
 sub lookup_object_of_method($$)
 {
@@ -478,7 +511,7 @@ sub lookup_object_of_method($$)
 
     pop(@parts);
   }
-
+  
   return undef;
 }
 
