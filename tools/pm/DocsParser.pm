@@ -440,7 +440,7 @@ sub substitute_function($$)
     }
     else
     {
-      print "Translated $name into ";    
+      print "Documentation: Translated $name into ";  
       non_object_method_name($doc_func, \$name);
       print "$name\n";
     }
@@ -457,7 +457,7 @@ sub substitute_function($$)
 sub non_object_method_name($$)
 {
   my ($doc_func, $name) = @_;
-  if ($$name =~ "gtk_")
+  if ($$name =~ "^gtk_")
   {
     my %gtk_objects = ("gtk_accel_map" => "AccelMap",
                        "gtk_clipboard" => "Clipboard",
@@ -475,7 +475,7 @@ sub non_object_method_name($$)
                        "gtk_recent_filter" => "RecentFilter");
     foreach my $key (keys(%gtk_objects))
     {
-      if ($$name =~ $key)
+      if ($$name =~ "^$key")
       {
         DocsParser::build_method_name($doc_func, "Gtk", $gtk_objects{$key}, $name);
         return;
