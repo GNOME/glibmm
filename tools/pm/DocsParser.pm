@@ -468,7 +468,6 @@ sub non_object_method_name($$)
                        "gtk_page_setup" => "PageSetup",
                        "gtk_recent_info" => "RecentInfo",
                        "gtk_tooltip" => "Tooltip",
-                       "gtk_text_iter" => "TextIter",
                        "gtk_target_list" => "TargetList",
                        "gtk_drag_source" => "DragSource",
                        "gtk_print_settings" => "PrintSettings",
