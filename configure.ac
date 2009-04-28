@@ -318,6 +318,7 @@ AC_CONFIG_FILES([
     examples/keyfile/Makefile
     examples/markup/Makefile
     examples/options/Makefile
+    examples/properties/Makefile
     examples/thread/Makefile
     examples/iochannel_stream/Makefile
     examples/child_watch/Makefile

@@ -1,4 +1,4 @@
-example_dirs = child_watch compose iochannel_stream markup options regex thread keyfile
+example_dirs = child_watch compose iochannel_stream markup options properties regex thread keyfile
 
 # These use gtkmm stuff:
 # thread
