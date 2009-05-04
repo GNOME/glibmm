@@ -1,7 +1,7 @@
 doxygen_configfile = Doxyfile
 doxygen_configfile_source = $(srcdir)/Doxyfile.in
 beautify_docs_source = $(srcdir)/beautify_docs.pl.in
-beautify_docs = $(srcdir)/beautify_docs.pl
+beautify_docs = beautify_docs.pl
 
 devhelp_file = glibmm-2.4.devhelp
 devhelp_stylesheet = doxygen_to_devhelp.xsl
