@@ -991,43 +991,43 @@ const ustring_Iterator<T> ustring_Iterator<T>::operator--(int)
 
 
 /** @relates Glib::ustring_Iterator */
-template <class T> inline
-bool operator==(const ustring_Iterator<T>& lhs, const ustring_Iterator<T>& rhs)
+inline
+bool operator==(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() == rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-template <class T> inline
-bool operator!=(const ustring_Iterator<T>& lhs, const ustring_Iterator<T>& rhs)
+inline
+bool operator!=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() != rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-template <class T> inline
-bool operator<(const ustring_Iterator<T>& lhs, const ustring_Iterator<T>& rhs)
+inline
+bool operator<(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() < rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-template <class T> inline
-bool operator>(const ustring_Iterator<T>& lhs, const ustring_Iterator<T>& rhs)
+inline
+bool operator>(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() > rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-template <class T> inline
-bool operator<=(const ustring_Iterator<T>& lhs, const ustring_Iterator<T>& rhs)
+inline
+bool operator<=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() <= rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-template <class T> inline
-bool operator>=(const ustring_Iterator<T>& lhs, const ustring_Iterator<T>& rhs)
+inline
+bool operator>=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() >= rhs.base());
 }
