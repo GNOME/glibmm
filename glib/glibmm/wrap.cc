@@ -82,6 +82,12 @@ void wrap_register_cleanup()
 //
 void wrap_register(GType type, WrapNewFunction func)
 {
+  //0 is not a valid GType.
+  //It would lead to a critical warning in g_type_set_qdata().
+  //We allow this, failing silently, to make life easier for gstreamermm.
+  if(type == 0)
+    return;
+
   const guint idx = wrap_func_table->size();
   wrap_func_table->push_back(func);
 

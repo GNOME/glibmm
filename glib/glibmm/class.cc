@@ -32,6 +32,12 @@ void Class::register_derived_type(GType base_type)
   if(gtype_)
     return; // already initialized
 
+  //0 is not a valid GType.
+  //It would lead to a crash later.
+  //We allow this, failing silently, to make life easier for gstreamermm.
+  if(base_type == 0)
+    return; // already initialized
+
   GTypeQuery base_query = { 0, 0, 0, 0, };
   g_type_query(base_type, &base_query);
 
@@ -49,10 +55,15 @@ void Class::register_derived_type(GType base_type)
     0, // value_table
   };
 
-  Glib::ustring derived_name = "gtkmm__";
-  derived_name += base_query.type_name;
+  if(!(base_query.type_name))
+  {
+    g_critical("Class::register_derived_type(): base_query.type_name is NULL.");
+    return;
+  }
 
-  gtype_ = g_type_register_static(base_type, derived_name.c_str(), &derived_info, GTypeFlags(0));
+  gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, NULL);
+  gtype_ = g_type_register_static(base_type, derived_name, &derived_info, GTypeFlags(0));
+  g_free(derived_name);
 }
 
 GType Class::clone_custom_type(const char* custom_type_name) const
