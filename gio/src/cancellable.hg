@@ -39,6 +39,8 @@ protected:
   _CTOR_DEFAULT
 
 public:
+  typedef sigc::slot<void> SlotCancelledCallback;
+
   _WRAP_CREATE()
 
   _WRAP_METHOD(bool is_cancelled() const, g_cancellable_is_cancelled)
@@ -61,6 +63,11 @@ public:
 
   // TODO: is this useful in the C++ API?
   //_WRAP_METHOD(void make_pollfd(PollFD* pollfd), g_cancellable_make_pollfd)
+
+  _WRAP_METHOD_DOCS_ONLY(g_cancellable_connect)
+  gulong connect(const SlotCancelledCallback& callback);
+  _IGNORE(g_cancellable_connect)
+  _WRAP_METHOD(void disconnect(gulong handler_id), g_cancellable_disconnect)
 
   _WRAP_SIGNAL(void cancelled(), cancelled)
 };

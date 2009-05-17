@@ -21,5 +21,32 @@
 
 namespace Gio {
 
+extern "C" {
+
+void delete_slot(gpointer data)
+{
+    Cancellable::SlotCancelledCallback* callback =
+        reinterpret_cast<Cancellable::SlotCancelledCallback*>(data);
+    delete callback;
+}
+
+void slot_cancelled_proxy(GCancellable * /*cancellable*/, gpointer data)
+{
+    Cancellable::SlotCancelledCallback* callback =
+        reinterpret_cast<Cancellable::SlotCancelledCallback*>(data);
+    (*callback)();
+}
+
+} // extern "C"
+
+gulong
+Cancellable::connect(const SlotCancelledCallback& callback)
+{
+    SlotCancelledCallback* slot_copy = new SlotCancelledCallback(callback);
+    return g_cancellable_connect (gobj(),
+                                  G_CALLBACK(slot_cancelled_proxy),
+                                  slot_copy,
+                                  &delete_slot);
+}
 
 } // namespace Gio
