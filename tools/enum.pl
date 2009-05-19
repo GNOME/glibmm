@@ -103,7 +103,7 @@ sub process
 
   my $entity = "enum";
   $c_name =~ /^([A-Z][a-z]*)/;
-  $module = $1;
+  $module = $1 if ($module eq "none");
   $def =~ s/$module//;
 
   @c_name=();
