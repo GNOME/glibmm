@@ -16,6 +16,7 @@ _CONV_ENUM(G,AppInfoCreateFlags)
 _CONV_ENUM(G,DataStreamByteOrder)
 _CONV_ENUM(G,DataStreamNewlineType)
 _CONV_ENUM(G,EmblemOrigin)
+_CONV_ENUM(G,SocketFamily)
 
 
 # AppInfo
