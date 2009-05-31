@@ -30,6 +30,7 @@
 /* compiler feature tests that are used during compile time and run-time
    by gtk-- only. tests used by gdk-- and gtk-- should go into
    gdk--config.h.in */
+#undef GIOMM_STATIC_LIB
 #undef GIOMM_CXX_HAVE_MUTABLE
 #undef GIOMM_CXX_HAVE_NAMESPACES
 //#undef GIOMM_CXX_GAUB
@@ -64,6 +65,11 @@
 #  define GIOMM_USING_STD(Symbol) namespace std { using ::Symbol; }
 #else
 #  define GIOMM_USING_STD(Symbol) /* empty */
+#endif
+
+// Enable DLL-specific stuff only when not building a static library
+#if !defined(__CYGWIN__) && defined(__MINGW32__) && !defined(GIOMM_STATIC_LIB)
+  #define GIOMM_DLL
 #endif
 
 #ifdef GIOMM_DLL
