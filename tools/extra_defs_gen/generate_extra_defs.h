@@ -24,10 +24,31 @@
 #include <iostream>
 #include <string>
 
-std::string get_defs(GType gtype);
+/** Function pointer type for functions that determine if a GType is a pointer
+ * type.
+ */
+typedef bool (*GTypeIsAPointerFunc)(GType gtype);
+
+/** Default extra defs utility function to determine if a GType is a pointer
+ * type.
+ * @param gtype The GType.
+ * @return true if the GType is a GObject or a boxed type, false otherwise.
+ */
+bool gtype_is_a_pointer(GType gtype);
+
+std::string get_defs(GType gtype,
+                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
 
 std::string get_properties(GType gtype);
-std::string get_type_name(GType gtype);
-std::string get_type_name_parameter(GType gtype);
-std::string get_type_name_signal(GType gtype);
-std::string get_signals(GType gtype);
+
+std::string get_type_name(GType gtype,
+                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
+
+std::string get_type_name_parameter(GType gtype,
+                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
+
+std::string get_type_name_signal(GType gtype,
+                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
+
+std::string get_signals(GType gtype,
+                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
