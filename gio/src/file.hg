@@ -1731,6 +1731,22 @@ public:
 #else
   bool load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error);
 #endif
+  /** Loads the content of the file into memory, returning the size of the data. 
+   * The data is always zero terminated, but this is not included in the resultant @a length.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * If the operation was cancelled, a Gio::Error exception with CANCELLED will be returned.
+   *
+   * @param cancellable A cancellable object.
+   * @param contents A location to place the contents of the file. 
+   * @param length A location to place the length of the contents of the file.
+   * @newin2p22
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length);
+#else
+  bool load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::auto_ptr<Glib::Error>& error);
+#endif
   //TODO: Something better than char*& for contents?
   /** Loads the content of the file into memory, returning the size of the data. 
    * The data is always zero terminated, but this is not included in the resultant @a length.
@@ -1744,6 +1760,18 @@ public:
 #else
   bool load_contents(char*& contents, gsize& length, std::string& etag_out,
                      std::auto_ptr<Glib::Error>& error);
+#endif
+  /** Loads the content of the file into memory, returning the size of the data. 
+   * The data is always zero terminated, but this is not included in the resultant @a length.
+   *
+   * @param contents A location to place the contents of the file. 
+   * @param length A location to place the length of the contents of the file.
+   * @newin2p22
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool load_contents(char*& contents, gsize& length);
+#else
+  bool load_contents(char*& contents, gsize& length, std::auto_ptr<Glib::Error>& error);
 #endif
   _IGNORE(g_file_load_contents)
 
@@ -1787,6 +1815,23 @@ public:
   bool load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out);
 #else
   bool load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Finishes an asynchronous load of the @a file's contents. 
+   * The contents are placed in @a contents, and @a length is set to the 
+   * size of the @a contents string. If @a etag_out is present, it will be 
+   * set to the new entity tag for the @a file.
+   * @param res A AsyncResult.
+   * @param contents A location to place the contents of the file.
+   * @param length A location to place the length of the contents of the file.
+   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is 
+   * present, it will be set appropriately.
+   * @newin2p22
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length);
+#else
+  bool load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_load_contents_finish)
 
@@ -1841,6 +1886,21 @@ public:
   bool load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out);
 #else
   bool load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Finishes an asynchronous partial load operation that was started
+   * with load_partial_contents_async().
+   * @param res A AsyncResult.
+   * @param contents A location to place the contents of the file.
+   * @param length A location to place the length of the contents of the file.
+   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is 
+   * present, it will be set appropriately.
+   * @newin2p22
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  bool load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length);
+#else
+  bool load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_load_partial_contents_finish)
 
