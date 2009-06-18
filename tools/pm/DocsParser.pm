@@ -501,7 +501,7 @@ sub lookup_object_of_method($$)
     else
     {
       print "DocsParser.pm:lookup_object_of_method(): Warning: GtkDefs::lookup_object() failed for function name=" . $name . "\n";
-      print "  This may be a missing define-object in a *_docs.xml file."
+      print "  This may be a missing define-object in a *.defs file."
     }
   }
 
