@@ -13,7 +13,7 @@
 #
 
 pushdef([GLIBMM_MAJOR_VERSION],     [2])
-pushdef([GLIBMM_MINOR_VERSION],     [20])
+pushdef([GLIBMM_MINOR_VERSION],     [21])
 pushdef([GLIBMM_MICRO_VERSION],     [0])
 pushdef([GLIBMM_EXTRA_VERSION],     [])
 pushdef([GLIBMM_VERSION], GLIBMM_MAJOR_VERSION.GLIBMM_MINOR_VERSION.GLIBMM_MICRO_VERSION[]GLIBMM_EXTRA_VERSION)
@@ -138,7 +138,7 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 #  Dependancy checks
 #########################################################################
 gtkmm_min_sigc_version=2.0.0
-gtkmm_min_glib_version=2.19.8
+gtkmm_min_glib_version=2.21.1
 
 PKG_CHECK_MODULES(GLIBMM, sigc++-2.0 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version})
 AC_SUBST(GLIBMM_CFLAGS)
