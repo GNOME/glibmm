@@ -440,9 +440,9 @@ sub substitute_function($$)
     }
     else
     {
-      print "Documentation: Translated $name into ";  
+      print "Documentation: Transformed C name $name into ";  
       non_object_method_name($doc_func, \$name);
-      print "$name\n";
+      print "C++ name $name\n";
     }
   }
   else
@@ -481,6 +481,7 @@ sub non_object_method_name($$)
       }
     }
   }
+  
   print STDERR "Documentation: Class/Namespace for $$name not found\n";
 }   
 
@@ -490,8 +491,18 @@ sub lookup_object_of_method($$)
 
   if($object ne "")
   {
+    my $result = GtkDefs::lookup_object($object);
+
     # We already know the C object name, because $name is a non-static method.
-    return GtkDefs::lookup_object($object);
+    if(defined($result) and ($result ne ""))
+    {
+      return $result;
+    }
+    else
+    {
+      print "DocsParser.pm:lookup_object_of_method(): Warning: GtkDefs::lookup_object() failed for function name=" . $name . "\n";
+      print "  This may be a missing define-object in a *_docs.xml file."
+    }
   }
 
   my @parts = split(/_/, $name);

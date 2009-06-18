@@ -298,7 +298,22 @@ sub lookup_enum($)
 sub lookup_object($)
 {
   no warnings;
-  return $GtkDefs::objects{$_[0]};
+  
+  my $c_name = $_[0];
+  my $result = $GtkDefs::objects{$c_name};
+  
+  if (not defined($result))
+  {
+    print "GtkDefs:lookup_object(): can't find object with name=" . $c_name . "\n";
+    
+    # debug output:
+    # foreach my $key (keys %GtkDefs::objects)
+    # {
+    #  print "  possible name=" . $key . "\n";
+    # }
+  }
+
+  return $result;
 }
 
 # $objProperty lookup_property($name, $parent_object_name)
