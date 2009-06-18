@@ -112,6 +112,10 @@ _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 _CONVERSION(`GOutputStream*',`Glib::RefPtr<OutputStream>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<OutputStream>&',`GOutputStream*',__CONVERT_CONST_REFPTR_TO_P)
 
+#SocketAddress
+_CONVERSION(`GSocketAddress*',`Glib::RefPtr<SocketAddress>',`Glib::wrap($3)')
+_CONVERSION(`GSocketAddressEnumerator*',`Glib::RefPtr<SocketAddressEnumerator>',`Glib::wrap($3)')
+
 #Volume
 _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')
 
