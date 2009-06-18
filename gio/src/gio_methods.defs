@@ -445,8 +445,8 @@
   (c-name "GFileQueryInfoFlags")
   (gtype-id "G_TYPE_FILE_QUERY_INFO_FLAGS")
   (values
-    '("none" "G_FILE_QUERY_INFO_NONE")
-    '("nofollow-symlinks" "G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS")
+    '("ne" "G_FILE_QUERY_INFO_NONE")
+    '("follow-symlinks" "G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS")
   )
 )
 
@@ -466,7 +466,7 @@
   (c-name "GMountMountFlags")
   (gtype-id "G_TYPE_MOUNT_MOUNT_FLAGS")
   (values
-    '("none" "G_MOUNT_MOUNT_NONE")
+    '("e" "G_MOUNT_MOUNT_NONE")
   )
 )
 
@@ -477,6 +477,28 @@
   (values
     '("none" "G_MOUNT_UNMOUNT_NONE")
     '("force" "G_MOUNT_UNMOUNT_FORCE")
+  )
+)
+
+(define-enum StartFlags
+  (in-module "GDrive")
+  (c-name "GDriveStartFlags")
+  (gtype-id "G_TYPE_DRIVE_START_FLAGS")
+  (values
+    '("e" "G_DRIVE_START_NONE")
+  )
+)
+
+(define-enum StartStopType
+  (in-module "GDrive")
+  (c-name "GDriveStartStopType")
+  (gtype-id "G_TYPE_DRIVE_START_STOP_TYPE")
+  (values
+    '("unknown" "G_DRIVE_START_STOP_TYPE_UNKNOWN")
+    '("shutdown" "G_DRIVE_START_STOP_TYPE_SHUTDOWN")
+    '("network" "G_DRIVE_START_STOP_TYPE_NETWORK")
+    '("multidisk" "G_DRIVE_START_STOP_TYPE_MULTIDISK")
+    '("password" "G_DRIVE_START_STOP_TYPE_PASSWORD")
   )
 )
 
@@ -662,10 +684,10 @@
   (c-name "GSocketFamily")
   (gtype-id "G_TYPE_SOCKET_FAMILY")
   (values
-    '("invalid" "G_SOCKET_FAMILY_INVALID")
-    '("unix" "G_SOCKET_FAMILY_UNIX")
-    '("ipv4" "G_SOCKET_FAMILY_IPV4")
-    '("ipv6" "G_SOCKET_FAMILY_IPV6")
+    '("g-socket-family-invalid" "G_SOCKET_FAMILY_INVALID")
+    '("#ifdef" "#ifdef")
+    '("#endif" "#endif")
+    '("g-socket-family-ipv6" "G_SOCKET_FAMILY_IPV6")
   )
 )
 
@@ -686,10 +708,23 @@
   (c-name "GSocketMsgFlags")
   (gtype-id "G_TYPE_SOCKET_MSG_FLAGS")
   (values
-    '("invalid" "G_SOCKET_MSG_INVALID")
+    '("none" "G_SOCKET_MSG_NONE")
     '("oob" "G_SOCKET_MSG_OOB")
     '("peek" "G_SOCKET_MSG_PEEK")
     '("dontroute" "G_SOCKET_MSG_DONTROUTE")
+  )
+)
+
+(define-enum Protocol
+  (in-module "GSocket")
+  (c-name "GSocketProtocol")
+  (gtype-id "G_TYPE_SOCKET_PROTOCOL")
+  (values
+    '("unknown" "G_SOCKET_PROTOCOL_UNKNOWN")
+    '("default" "G_SOCKET_PROTOCOL_DEFAULT")
+    '("tcp" "G_SOCKET_PROTOCOL_TCP")
+    '("udp" "G_SOCKET_PROTOCOL_UDP")
+    '("sctp" "G_SOCKET_PROTOCOL_SCTP")
   )
 )
 
@@ -1838,6 +1873,69 @@
   (of-object "GDrive")
   (c-name "g_drive_enumerate_identifiers")
   (return-type "char**")
+)
+
+(define-method get_start_stop_type
+  (of-object "GDrive")
+  (c-name "g_drive_get_start_stop_type")
+  (return-type "GDriveStartStopType")
+)
+
+(define-method can_start
+  (of-object "GDrive")
+  (c-name "g_drive_can_start")
+  (return-type "gboolean")
+)
+
+(define-method start
+  (of-object "GDrive")
+  (c-name "g_drive_start")
+  (return-type "none")
+  (parameters
+    '("GDriveStartFlags" "flags")
+    '("GMountOperation*" "start_operation")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method start_finish
+  (of-object "GDrive")
+  (c-name "g_drive_start_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method can_stop
+  (of-object "GDrive")
+  (c-name "g_drive_can_stop")
+  (return-type "gboolean")
+)
+
+(define-method stop
+  (of-object "GDrive")
+  (c-name "g_drive_stop")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method stop_finish
+  (of-object "GDrive")
+  (c-name "g_drive_stop_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
 )
 
 
@@ -3056,6 +3154,51 @@
   )
 )
 
+(define-method start_mountable
+  (of-object "GFile")
+  (c-name "g_file_start_mountable")
+  (return-type "none")
+  (parameters
+    '("GDriveStartFlags" "flags")
+    '("GMountOperation*" "start_operation")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method start_mountable_finish
+  (of-object "GFile")
+  (c-name "g_file_start_mountable_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method stop_mountable
+  (of-object "GFile")
+  (c-name "g_file_stop_mountable")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method stop_mountable_finish
+  (of-object "GFile")
+  (c-name "g_file_stop_mountable_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
 (define-method query_default_handler
   (of-object "GFile")
   (c-name "g_file_query_default_handler")
@@ -4100,6 +4243,12 @@
   (return-type "const-guint8*")
 )
 
+(define-method get_native_size
+  (of-object "GInetAddress")
+  (c-name "g_inet_address_get_native_size")
+  (return-type "gsize")
+)
+
 (define-method get_family
   (of-object "GInetAddress")
   (c-name "g_inet_address_get_family")
@@ -4461,6 +4610,16 @@
   (return-type "GType")
 )
 
+(define-function g_drive_start_flags_get_type
+  (c-name "g_drive_start_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_drive_start_stop_type_get_type
+  (c-name "g_drive_start_stop_type_get_type")
+  (return-type "GType")
+)
+
 (define-function g_file_copy_flags_get_type
   (c-name "g_file_copy_flags_get_type")
   (return-type "GType")
@@ -4533,6 +4692,11 @@
 
 (define-function g_socket_msg_flags_get_type
   (c-name "g_socket_msg_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_socket_protocol_get_type
+  (c-name "g_socket_protocol_get_type")
   (return-type "GType")
 )
 
@@ -5243,7 +5407,7 @@
   (c-name "g_network_address_parse")
   (return-type "GSocketConnectable*")
   (parameters
-    '("const-char*" "host_and_port")
+    '("const-gchar*" "host_and_port")
     '("guint16" "default_port")
     '("GError**" "error")
   )
@@ -5956,6 +6120,7 @@
   (parameters
     '("gpointer" "dest")
     '("gsize" "destlen")
+    '("GError**" "error")
   )
 )
 
@@ -6013,7 +6178,7 @@
 (define-method get_protocol
   (of-object "GSocketClient")
   (c-name "g_socket_client_get_protocol")
-  (return-type "const-char*")
+  (return-type "GSocketProtocol")
 )
 
 (define-method set_protocol
@@ -6021,7 +6186,7 @@
   (c-name "g_socket_client_set_protocol")
   (return-type "none")
   (parameters
-    '("const-char*" "protocol")
+    '("GSocketProtocol" "protocol")
   )
 )
 
@@ -6056,8 +6221,20 @@
   (c-name "g_socket_client_connect_to_host")
   (return-type "GSocketConnection*")
   (parameters
-    '("const-char*" "hostname")
-    '("int" "port")
+    '("const-gchar*" "host_and_port")
+    '("guint16" "default_port")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method connect_to_service
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_connect_to_service")
+  (return-type "GSocketConnection*")
+  (parameters
+    '("const-gchar*" "domain")
+    '("const-gchar*" "service")
     '("GCancellable*" "cancellable")
     '("GError**" "error")
   )
@@ -6090,8 +6267,8 @@
   (c-name "g_socket_client_connect_to_host_async")
   (return-type "none")
   (parameters
-    '("const-char*" "hostname")
-    '("int" "port")
+    '("const-gchar*" "host_and_port")
+    '("guint16" "default_port")
     '("GCancellable*" "cancellable")
     '("GAsyncReadyCallback" "callback")
     '("gpointer" "user_data")
@@ -6101,6 +6278,29 @@
 (define-method connect_to_host_finish
   (of-object "GSocketClient")
   (c-name "g_socket_client_connect_to_host_finish")
+  (return-type "GSocketConnection*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method connect_to_service_async
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_connect_to_service_async")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "domain")
+    '("const-gchar*" "service")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method connect_to_service_finish
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_connect_to_service_finish")
   (return-type "GSocketConnection*")
   (parameters
     '("GAsyncResult*" "result")
@@ -6173,7 +6373,7 @@
   (parameters
     '("GSocketFamily" "family")
     '("GSocketType" "type")
-    '("gint" "protocol")
+    '("gint" "protocol_id")
   )
 )
 
@@ -6246,7 +6446,7 @@
   (parameters
     '("GSocketFamily" "family")
     '("GSocketType" "type")
-    '("gint" "protocol_id")
+    '("GSocketProtocol" "protocol")
     '("GError**" "error")
   )
 )
@@ -6278,16 +6478,10 @@
   (return-type "GSocketType")
 )
 
-(define-method get_protocol_id
+(define-method get_protocol
   (of-object "GSocket")
-  (c-name "g_socket_get_protocol_id")
-  (return-type "gint")
-)
-
-(define-method get_protocol_name
-  (of-object "GSocket")
-  (c-name "g_socket_get_protocol_name")
-  (return-type "char*")
+  (c-name "g_socket_get_protocol")
+  (return-type "GSocketProtocol")
 )
 
 (define-method get_local_address
@@ -6320,21 +6514,6 @@
 (define-method get_blocking
   (of-object "GSocket")
   (c-name "g_socket_get_blocking")
-  (return-type "gboolean")
-)
-
-(define-method set_reuse_address
-  (of-object "GSocket")
-  (c-name "g_socket_set_reuse_address")
-  (return-type "none")
-  (parameters
-    '("gboolean" "reuse")
-  )
-)
-
-(define-method get_reuse_address
-  (of-object "GSocket")
-  (c-name "g_socket_get_reuse_address")
   (return-type "gboolean")
 )
 
@@ -6395,9 +6574,9 @@
   )
 )
 
-(define-method check_pending_error
+(define-method check_connect_result
   (of-object "GSocket")
-  (c-name "g_socket_check_pending_error")
+  (c-name "g_socket_check_connect_result")
   (return-type "gboolean")
   (parameters
     '("GError**" "error")
@@ -6488,25 +6667,6 @@
   )
 )
 
-(define-method receive_control_message
-  (of-object "GSocket")
-  (c-name "g_socket_receive_control_message")
-  (return-type "GSocketControlMessage*")
-  (parameters
-    '("GError**" "error")
-  )
-)
-
-(define-method send_control_message
-  (of-object "GSocket")
-  (c-name "g_socket_send_control_message")
-  (return-type "gboolean")
-  (parameters
-    '("GSocketControlMessage*" "message")
-    '("GError**" "error")
-  )
-)
-
 (define-method receive_message
   (of-object "GSocket")
   (c-name "g_socket_receive_message")
@@ -6546,6 +6706,17 @@
   )
 )
 
+(define-method shutdown
+  (of-object "GSocket")
+  (c-name "g_socket_shutdown")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "shutdown_read")
+    '("gboolean" "shutdown_write")
+    '("GError**" "error")
+  )
+)
+
 (define-method is_closed
   (of-object "GSocket")
   (c-name "g_socket_is_closed")
@@ -6562,12 +6733,10 @@
   )
 )
 
-(define-function g_socket_protocol_id_lookup_by_name
-  (c-name "g_socket_protocol_id_lookup_by_name")
-  (return-type "gint")
-  (parameters
-    '("const-char*" "protocol_name")
-  )
+(define-method speaks_ipv4
+  (of-object "GSocket")
+  (c-name "g_socket_speaks_ipv4")
+  (return-type "gboolean")
 )
 
 
@@ -6612,8 +6781,9 @@
   (parameters
     '("GSocketAddress*" "address")
     '("GSocketType" "type")
-    '("const-char*" "protocol")
+    '("GSocketProtocol" "protocol")
     '("GObject*" "source_object")
+    '("GSocketAddress**" "effective_address")
     '("GError**" "error")
   )
 )
@@ -6623,7 +6793,7 @@
   (c-name "g_socket_listener_add_inet_port")
   (return-type "gboolean")
   (parameters
-    '("int" "port")
+    '("guint16" "port")
     '("GObject*" "source_object")
     '("GError**" "error")
   )
@@ -6808,6 +6978,21 @@
   (return-type "GType")
 )
 
+(define-method set_graceful_disconnect
+  (of-object "GTcpConnection")
+  (c-name "g_tcp_connection_set_graceful_disconnect")
+  (return-type "none")
+  (parameters
+    '("gboolean" "graceful_disconnect")
+  )
+)
+
+(define-method get_graceful_disconnect
+  (of-object "GTcpConnection")
+  (c-name "g_tcp_connection_get_graceful_disconnect")
+  (return-type "gboolean")
+)
+
 
 
 ;; From gthemedicon.h
@@ -6874,6 +7059,9 @@
   (c-name "g_threaded_socket_service_new")
   (is-constructor-of "GThreadedSocketService")
   (return-type "GSocketService*")
+  (parameters
+    '("int" "max_threads")
+  )
 )
 
 
@@ -7562,6 +7750,38 @@
   (parameters
     '("const-gchar*" "path")
   )
+)
+
+(define-function g_unix_socket_address_new_abstract
+  (c-name "g_unix_socket_address_new_abstract")
+  (return-type "GSocketAddress*")
+  (parameters
+    '("const-gchar*" "path")
+    '("int" "path_len")
+  )
+)
+
+(define-method get_path
+  (of-object "GUnixSocketAddress")
+  (c-name "g_unix_socket_address_get_path")
+  (return-type "const-char*")
+)
+
+(define-method get_path_len
+  (of-object "GUnixSocketAddress")
+  (c-name "g_unix_socket_address_get_path_len")
+  (return-type "gsize")
+)
+
+(define-method get_is_abstract
+  (of-object "GUnixSocketAddress")
+  (c-name "g_unix_socket_address_get_is_abstract")
+  (return-type "gboolean")
+)
+
+(define-function g_unix_socket_address_abstract_names_supported
+  (c-name "g_unix_socket_address_abstract_names_supported")
+  (return-type "gboolean")
 )
 
 
