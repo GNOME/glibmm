@@ -1,0 +1,55 @@
+/* Copyright (C) 2009 Jonathon Jongsma
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(giomm,gio)
+
+namespace Gio
+{
+
+/** DNS SRV record target
+ *
+ * SRV (service) records are used by some network protocols to provide
+ * service-specific aliasing and load-balancing. For example, XMPP (Jabber) uses
+ * SRV records to locate the XMPP server for a domain; rather than connecting
+ * directly to "example.com" or assuming a specific server hostname like
+ * "xmpp.example.com", an XMPP client would look up the "xmpp-client" SRV record
+ * for "example.com", and then connect to whatever host was pointed to by that
+ * record.
+ *
+ * You can use Resolver::lookup_service() or Resolver::lookup_service_async()
+ * to find the SrvTargets for a given service. However, if you are simply
+ * planning to connect to the remote service, you can use NetworkService's
+ * SocketConnectable interface and not need to worry about SrvTarget at all.
+ *
+ * @newin2p22
+ */
+class SrvTarget
+{
+  _CLASS_BOXEDTYPE(SrvTarget, GSrvTarget, NONE, g_srv_target_copy, g_srv_target_free)
+public:
+  SrvTarget(const Glib::ustring& hostname, guint16 port, guint16 priority, guint16 weight);
+
+  _IGNORE(g_srv_target_copy, g_srv_target_free)
+
+  _WRAP_METHOD(Glib::ustring get_hostname() const, g_srv_target_get_hostname)
+  _WRAP_METHOD(guint16 get_port() const, g_srv_target_get_port)
+  _WRAP_METHOD(guint16 get_priority() const, g_srv_target_get_priority)
+  _WRAP_METHOD(guint16 get_weight() const, g_srv_target_get_weight)
+
+};
+
+} // namespace Gio
