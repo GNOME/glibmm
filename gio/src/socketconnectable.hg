@@ -43,10 +43,16 @@ class SocketAddressEnumerator : public Glib::Object
   _CLASS_GOBJECT(SocketAddressEnumerator, GSocketAddressEnumerator, G_SOCKET_ADDRESS_ENUMERATOR, Glib::Object, GObject)
 
 public:
-      // TODO: overloads without cancellable
       _WRAP_METHOD(Glib::RefPtr<SocketAddress> next(const Glib::RefPtr<Cancellable>& cancellable), g_socket_address_enumerator_next, errthrow)
-      // TODO: overloads without cancellable
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+          Glib::RefPtr<SocketAddress> next();
+#else
+          Glib::RefPtr<SocketAddress> next(std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
       void next_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+      void next_async(const SlotAsyncReady& slot);
+
       _WRAP_METHOD(Glib::RefPtr<SocketAddress> next_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_address_enumerator_next_finish, errthrow)
 };
 

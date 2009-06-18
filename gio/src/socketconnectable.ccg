@@ -38,4 +38,25 @@ namespace Gio {
                                                slot_copy);
     }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+    Glib::RefPtr<SocketAddress>
+    SocketAddressEnumerator::next()
+#else
+    Glib::RefPtr<SocketAddress>
+    SocketAddressEnumerator::next(std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+    {
+      GError* gerror = 0;
+      Glib::RefPtr<SocketAddress> retvalue = Glib::wrap(g_socket_address_enumerator_next(gobj(), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+      if(gerror)
+        ::Glib::Error::throw_exception(gerror);
+#else
+      if(gerror)
+        error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+      return retvalue;
+
+    }
 } // namespace Gio
