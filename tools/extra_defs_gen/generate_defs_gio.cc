@@ -71,6 +71,14 @@ int main (int argc, char** argv)
 
             << get_defs(G_TYPE_VOLUME_MONITOR)
 
+            // network IO classes
+            << get_defs(G_TYPE_INET_ADDRESS)
+            << get_defs(G_TYPE_INET_SOCKET_ADDRESS)
+            << get_defs(G_TYPE_SOCKET_ADDRESS)
+            << get_defs(G_TYPE_SOCKET_ADDRESS_ENUMERATOR)
+            << get_defs(G_TYPE_SOCKET_CONNECTABLE)
+            << get_defs(G_TYPE_SRV_TARGET)
+
             << std::endl;
   
   return 0;

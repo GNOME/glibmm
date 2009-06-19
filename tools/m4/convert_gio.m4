@@ -92,6 +92,7 @@ _CONVERSION(`const Glib::RefPtr<Emblem>&',`GEmblem*',__CONVERT_CONST_REFPTR_TO_P
 
 # InetAddress
 _CONVERSION(`const Glib::RefPtr<InetAddress>&',`GInetAddress*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`GInetAddress*',`Glib::RefPtr<InetAddress>',`Glib::wrap($3)')
 
 # InputStream
 _CONVERSION(`const Glib::RefPtr<InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
