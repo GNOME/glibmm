@@ -79,6 +79,7 @@ int main (int argc, char** argv)
             << get_defs(G_TYPE_SOCKET_CONNECTABLE)
             << get_defs(G_TYPE_SRV_TARGET)
             << get_defs(G_TYPE_RESOLVER)
+            << get_defs(G_TYPE_NETWORK_ADDRESS)
 
             << std::endl;
   
