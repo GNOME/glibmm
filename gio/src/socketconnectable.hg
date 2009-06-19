@@ -18,12 +18,10 @@
  */
 
 #include <glibmm/interface.h>
-#include <giomm/cancellable.h>
-#include <giomm/asyncresult.h>
+#include <giomm/socketaddressenumerator.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
-_PINCLUDE(glibmm/private/object_p.h)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GSocketConnectableIface GSocketConnectableIface;
@@ -31,30 +29,6 @@ typedef struct _GSocketConnectableIface GSocketConnectableIface;
 
 namespace Gio
 {
-
-class SocketAddress;
-
-/** Enumerator type for objects that contain or generate SocketAddresses
- *
- * @newin2p22
- */
-class SocketAddressEnumerator : public Glib::Object
-{
-  _CLASS_GOBJECT(SocketAddressEnumerator, GSocketAddressEnumerator, G_SOCKET_ADDRESS_ENUMERATOR, Glib::Object, GObject)
-
-public:
-      _WRAP_METHOD(Glib::RefPtr<SocketAddress> next(const Glib::RefPtr<Cancellable>& cancellable), g_socket_address_enumerator_next, errthrow)
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-          Glib::RefPtr<SocketAddress> next();
-#else
-          Glib::RefPtr<SocketAddress> next(std::auto_ptr<Glib::Error>& error);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
-
-      void next_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
-      void next_async(const SlotAsyncReady& slot);
-
-      _WRAP_METHOD(Glib::RefPtr<SocketAddress> next_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_address_enumerator_next_finish, errthrow)
-};
 
 /** Interface for potential socket endpoints
  *

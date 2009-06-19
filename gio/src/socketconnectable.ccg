@@ -18,45 +18,6 @@
  */
 
 #include <gio/gio.h>
-#include <giomm/socketaddress.h>
-#include "slot_async.h"
 
 namespace Gio {
-
-    void
-    SocketAddressEnumerator::next_async(const Glib::RefPtr<Cancellable>& cancellable,
-                                        const SlotAsyncReady& slot)
-    {
-        // Create a copy of the slot.
-        // A pointer to it will be passed through the callback's data parameter
-        // and deleted in the callback.
-        SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
-
-        g_socket_address_enumerator_next_async(gobj(),
-                                               cancellable->gobj(),
-                                               &SignalProxy_async_callback,
-                                               slot_copy);
-    }
-
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-    Glib::RefPtr<SocketAddress>
-    SocketAddressEnumerator::next()
-#else
-    Glib::RefPtr<SocketAddress>
-    SocketAddressEnumerator::next(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
-    {
-      GError* gerror = 0;
-      Glib::RefPtr<SocketAddress> retvalue = Glib::wrap(g_socket_address_enumerator_next(gobj(), NULL, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
-      if(gerror)
-        ::Glib::Error::throw_exception(gerror);
-#else
-      if(gerror)
-        error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
-
-      return retvalue;
-
-    }
 } // namespace Gio
