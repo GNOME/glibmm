@@ -396,5 +396,47 @@ int file_open_tmp(std::string& name_used);
  */
 std::string file_get_contents(const std::string& filename);
 
+/** Writes all of @a contents to a file named @a filename, with good error checking.
+ *
+ * @param filename name of a file to write @a contents to, in the GLib file name
+ *   encoding
+ * @param contents string to write to the file
+ * @param length length of @a contents, or -1 if @a contents is a nul-terminated string
+ *
+ * If a file called @a filename already exists it will be overwritten.
+ *
+ * This write is atomic in the sense that it is first written to a temporary
+ * file which is then renamed to the final name. Notes:
+ * <ol>
+ * <li>
+ *    On Unix, if @a filename already exists hard links to @filename will break.
+ *    Also since the file is recreated, existing permissions, access control
+ *    lists, metadata etc. may be lost. If @filename is a symbolic link,
+ *    the link itself will be replaced, not the linked file.
+ * </li>
+ * <li>
+ *   On Windows renaming a file will not remove an existing file with the
+ *   new name, so on Windows there is a race condition between the existing
+ *   file being removed and the temporary file being renamed.
+ * </li>
+ * <li>
+ *   On Windows there is no way to remove a file that is open to some
+ *   process, or mapped into memory. Thus, this function will fail if
+ *   @filename already exists and is open.
+ * </li>
+ * </ol>
+ *
+ * If the call was not successful, an exception is thrown.
+ * Possible error codes are those in the FileError enumeration.
+ *
+ * @newin2p22
+ **/
+void file_set_contents (const std::string& filename, const gchar *contents, gssize length);
+/** A variant of file_set_contents which accepts a standard C++ string
+ *
+ * @newin2p22
+ * */
+void file_set_contents (const std::string& filename, const std::string& contents);
+
 } // namespace Glib
 

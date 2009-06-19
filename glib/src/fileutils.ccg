@@ -179,5 +179,24 @@ std::string file_get_contents(const std::string& filename)
   return std::string(contents.get(), length);
 }
 
+void
+file_set_contents(const std::string& filename,
+                  const gchar *contents,
+                  gssize length)
+{
+  GError* error  = 0;
+
+  g_file_set_contents(filename.c_str(), contents, length, &error);
+
+  if(error)
+    Glib::Error::throw_exception(error);
+}
+
+void
+file_set_contents (const std::string& filename, const std::string& contents)
+{
+    file_set_contents(filename, contents.c_str(), contents.size());
+}
+
 } // namespace Glib
 
