@@ -78,6 +78,7 @@ int main (int argc, char** argv)
             << get_defs(G_TYPE_SOCKET_ADDRESS_ENUMERATOR)
             << get_defs(G_TYPE_SOCKET_CONNECTABLE)
             << get_defs(G_TYPE_SRV_TARGET)
+            << get_defs(G_TYPE_RESOLVER)
 
             << std::endl;
   
