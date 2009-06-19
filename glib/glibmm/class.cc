@@ -4,16 +4,16 @@
 /* Copyright (C) 1998-2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Library General Public
+ * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
@@ -29,7 +29,18 @@ namespace Glib
 
 void Class::register_derived_type(GType base_type)
 {
+  return register_derived_type(base_type, 0);
+}
+
+void Class::register_derived_type(GType base_type, GTypeModule* module)
+{
   if(gtype_)
+    return; // already initialized
+
+  //0 is not a valid GType.
+  //It would lead to a crash later.
+  //We allow this, failing silently, to make life easier for gstreamermm.
+  if(base_type == 0)
     return; // already initialized
 
   GTypeQuery base_query = { 0, 0, 0, 0, };
@@ -49,10 +60,20 @@ void Class::register_derived_type(GType base_type)
     0, // value_table
   };
 
-  Glib::ustring derived_name = "gtkmm__";
-  derived_name += base_query.type_name;
+  if(!(base_query.type_name))
+  {
+    g_critical("Class::register_derived_type(): base_query.type_name is NULL.");
+    return;
+  }
 
-  gtype_ = g_type_register_static(base_type, derived_name.c_str(), &derived_info, GTypeFlags(0));
+  gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, NULL);
+  
+  if(module)
+    gtype_ = g_type_module_register_type(module, base_type, derived_name, &derived_info, GTypeFlags(0));
+  else
+    gtype_ = g_type_register_static(base_type, derived_name, &derived_info, GTypeFlags(0));
+
+  g_free(derived_name);
 }
 
 GType Class::clone_custom_type(const char* custom_type_name) const

@@ -210,6 +210,11 @@ protected:
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   static GType get_type()      G_GNUC_CONST;
+
+ifdef(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`
+  static GType get_type(GTypeModule* module)      G_GNUC_CONST;
+',`')
+
   static GType get_base_type() G_GNUC_CONST;
 #endif
 
