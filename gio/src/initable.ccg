@@ -1,0 +1,45 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2009 Jonathon Jongsma
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gio.h>
+
+namespace Gio {
+  void
+  Initable::init(const Glib::RefPtr<Cancellable>& cancellable)
+  {
+      GError *error = 0;
+
+      g_initable_init (gobj (), cancellable->gobj (), &error);
+
+      if (error)
+          ::Glib::Error::throw_exception (error);
+  }
+
+  void
+  Initable::init()
+  {
+      GError *error = 0;
+
+      g_initable_init (gobj (), 0, &error);
+
+      if (error)
+          ::Glib::Error::throw_exception (error);
+  }
+
+} // namespace Gio
