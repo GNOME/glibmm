@@ -1,0 +1,61 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2007 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/socketconnectable.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** A GSocketConnectable for resolving SRV records
+ *
+ * Like NetworkAddress does with hostnames, NetworkService provides an easy
+ * way to resolve a SRV record, and then attempt to connect to one of the hosts
+ * that implements that service, handling service priority/weighting, multiple
+ * IP addresses, and multiple address families.
+ *
+ * See SrvTarget for more information about SRV records, and see
+ * SocketConnectable for and example of using the connectable interface.
+ *
+ * @newin2p22
+ */
+class NetworkService : public Glib::Object,
+    public SocketConnectable
+{
+  _CLASS_GOBJECT(NetworkService, GNetworkService, G_NETWORK_SERVICE, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(SocketConnectable)
+
+  _WRAP_CTOR(NetworkService(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain), g_network_service_new)
+
+public:
+  _WRAP_CREATE(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain)
+
+  _WRAP_METHOD(Glib::ustring get_service() const, g_network_service_get_service)
+  _WRAP_METHOD(Glib::ustring get_protocol() const, g_network_service_get_protocol)
+  _WRAP_METHOD(Glib::ustring get_domain() const, g_network_service_get_domain)
+
+  _WRAP_PROPERTY("hostname", Glib::ustring)
+  _WRAP_PROPERTY("protocol", Glib::ustring)
+  _WRAP_PROPERTY("service", Glib::ustring)
+};
+
+} // namespace Gio
