@@ -1,0 +1,150 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2009 Jonathon Jongsma
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/initable.h>
+#include <giomm/socketconnectable.h>
+#include <giomm/socketaddress.h>
+#include <giomm/enums.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+_WRAP_ENUM(SocketType, GSocketType)
+_WRAP_ENUM(SocketProtocol, GSocketProtocol)
+_WRAP_ENUM(SocketMsgFlags, GSocketMsgFlags)
+
+/** Low-level socket object
+ *
+ * A Socket is a low-level networking primitive. It is a more or less direct
+ * mapping of the BSD socket API in a portable GObject based API. It supports
+ * both the UNIX socket implementations and winsock2 on Windows.
+ *
+ * Socket is the platform independent base upon which the higher level network
+ * primitives are based. Applications are not typically meant to use it
+ * directly, but rather through classes like SocketClient, SocketService and
+ * SocketConnection. However there may be cases where direct use of Socket is
+ * useful.
+ *
+ * (FIXME: update this doc for giomm)
+ * Socket implements the Initable interface, so if it is manually constructed by
+ * e.g. g_object_new() you must call g_initable_init() and check the results
+ * before using the object. This is done automatically in g_socket_new() and
+ * g_socket_new_from_fd(), so these functions can return NULL.
+ *
+ * Sockets operate in two general modes, blocking or non-blocking. When in
+ * blocking mode all operations block until the requested operation is finished
+ * or there is an error. In non-blocking mode all calls that would block return
+ * immediately with a G_IO_ERROR_WOULD_BLOCK error. To know when a call would
+ * successfully run you can call condition_check(), or condition_wait(). You can
+ * also use create_source() and attach it to a Glib::MainContext to get
+ * callbacks when I/O is possible. Note that all sockets are always set to non
+ * blocking mode in the system, and blocking mode is emulated in Socket.
+ *
+ * When working in non-blocking mode applications should always be able to
+ * handle getting a G_IO_ERROR_WOULD_BLOCK error even when some other function
+ * said that I/O was possible. This can easily happen in case of a race
+ * condition in the application, but it can also happen for other reasons. For
+ * instance, on Windows a socket is always seen as writable until a write
+ * returns G_IO_ERROR_WOULD_BLOCK.
+ *
+ * Sockets can be either connection oriented or datagram based. For connection
+ * oriented types you must first establish a connection by either connecting to
+ * an address or accepting a connection from another address. For connectionless
+ * socket types the target/source address is specified or received in each I/O
+ * operation.
+ *
+ * All socket file descriptors are set to be close-on-exec.
+ *
+ * Note that creating a Socket causes the signal SIGPIPE to be ignored for the
+ * remainder of the program. If you are writing a command-line utility that uses
+ * Socket, you may need to take into account the fact that your program will not
+ * automatically be killed if it tries to write to stdout after it has been
+ * closed.
+ *
+ * @newin2p22
+ */
+class Socket : public Glib::Object,
+    public Initable
+{
+  _CLASS_GOBJECT(Socket, GSocket, G_SOCKET, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Initable)
+
+  // FIXME: figure out initable constructors
+
+public:
+
+  _WRAP_METHOD(void bind(const Glib::RefPtr<SocketAddress>& address, bool allow_reuse), g_socket_bind, errthrow)
+  _WRAP_METHOD(void listen(), g_socket_listen, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<Socket> accept(), g_socket_accept, errthrow)
+  _WRAP_METHOD(void connect(const Glib::RefPtr<SocketAddress>& address), g_socket_connect, errthrow)
+  // FIXME: it doesn't really seem like this is a proper use of exceptions...
+  _WRAP_METHOD(void check_connect_result(), g_socket_check_connect_result, errthrow)
+  // TODO: std::string overload?
+  _WRAP_METHOD(gssize receive(char* buffer, gsize size), g_socket_receive, errthrow)
+  // TODO: std::string overload?
+  // TODO: need to do manually?
+  //_WRAP_METHOD(gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size), g_socket_receive_from, errthrow)
+  // TODO: wrap receive_message -- figure out this GInputVector thing
+  // TODO: std::string overload?
+  _WRAP_METHOD(gssize send(const gchar* buffer, gsize size), g_socket_send, errthrow)
+  // TODO: std::string overload?
+  _WRAP_METHOD(gssize send_to(const Glib::RefPtr<SocketAddress>& address, const char* buffer, gsize size), g_socket_send_to, errthrow)
+  // TODO: wrap send_message -- figure out this GOutputVector thing
+  _WRAP_METHOD(void close(), g_socket_close, errthrow)
+  _WRAP_METHOD(bool is_closed(), g_socket_is_closed)
+  _WRAP_METHOD(void shutdown(bool shutdown_read, bool shutdown_write), g_socket_shutdown, errthrow)
+  _WRAP_METHOD(bool is_connected(), g_socket_is_connected)
+  // TODO: non-cancellable version
+  // This won't work because Glib::Source is abstract, and Glib::IOSource has no
+  // constructor that takes a GSource*
+//#m4 _CONVERSION(`GSource*',`Glib::RefPtr<Glib::Source>',`Glib::RefPtr<Glib::Source>(new ::Glib::Source($3))')
+  //_WRAP_METHOD(Glib::RefPtr<Glib::Source> create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable), g_socket_create_source)
+  _WRAP_METHOD(Glib::IOCondition condition_check(Glib::IOCondition condition), g_socket_condition_check)
+  // TODO: non-cancellable version
+  _WRAP_METHOD(void condition_wait(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable), g_socket_condition_wait, errthrow)
+  _WRAP_METHOD(void set_listen_backlog(int backlog), g_socket_set_listen_backlog)
+  _WRAP_METHOD(int get_listen_backlog() const, g_socket_get_listen_backlog)
+  _WRAP_METHOD(void set_blocking(bool blocking), g_socket_set_blocking)
+  _WRAP_METHOD(bool get_blocking() const, g_socket_get_blocking)
+  _WRAP_METHOD(void set_keepalive(bool keepalive), g_socket_set_keepalive)
+  _WRAP_METHOD(bool get_keepalive() const, g_socket_get_keepalive)
+  _WRAP_METHOD(SocketFamily get_family() const, g_socket_get_family)
+  _WRAP_METHOD(int get_fd() const, g_socket_get_fd)
+  _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_local_address() const, g_socket_get_local_address, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_remote_address() const, g_socket_get_remote_address, errthrow)
+  _WRAP_METHOD(SocketProtocol get_protocol() const, g_socket_get_protocol)
+  _WRAP_METHOD(SocketType get_socket_type() const, g_socket_get_socket_type)
+  _WRAP_METHOD(bool speaks_ipv4() const, g_socket_speaks_ipv4)
+
+  _WRAP_PROPERTY("blocking", bool)
+  _WRAP_PROPERTY("family", SocketFamily)
+  _WRAP_PROPERTY("fd", int)
+  _WRAP_PROPERTY("keepalive", bool)
+  _WRAP_PROPERTY("listen-backlog", int)
+  _WRAP_PROPERTY("local-address", Glib::RefPtr<SocketAddress>)
+  _WRAP_PROPERTY("remote-address", Glib::RefPtr<SocketAddress>)
+  _WRAP_PROPERTY("protocol", SocketProtocol)
+  _WRAP_PROPERTY("type", SocketType)
+};
+
+} // namespace Gio

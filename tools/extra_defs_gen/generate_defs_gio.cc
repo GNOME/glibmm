@@ -81,6 +81,7 @@ int main (int argc, char** argv)
             << get_defs(G_TYPE_RESOLVER)
             << get_defs(G_TYPE_NETWORK_ADDRESS)
             << get_defs(G_TYPE_NETWORK_SERVICE)
+            << get_defs(G_TYPE_SOCKET)
 
             << std::endl;
   

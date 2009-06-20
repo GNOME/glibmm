@@ -17,6 +17,9 @@ _CONV_ENUM(G,DataStreamByteOrder)
 _CONV_ENUM(G,DataStreamNewlineType)
 _CONV_ENUM(G,EmblemOrigin)
 _CONV_ENUM(G,SocketFamily)
+_CONV_ENUM(G,SocketType)
+_CONV_ENUM(G,SocketProtocol)
+_CONV_ENUM(G,SocketMsgFlags)
 
 
 # AppInfo
@@ -113,8 +116,14 @@ _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 _CONVERSION(`GOutputStream*',`Glib::RefPtr<OutputStream>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<OutputStream>&',`GOutputStream*',__CONVERT_CONST_REFPTR_TO_P)
 
+#Socket
+_CONVERSION(`const Glib::RefPtr<Socket>&',`GSocket*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`GSocket*',`Glib::RefPtr<Socket>',`Glib::wrap($3)')
+
 #SocketAddress
 _CONVERSION(`GSocketAddress*',`Glib::RefPtr<SocketAddress>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<SocketAddress>&',`GSocketAddress*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`Glib::RefPtr<SocketAddress>&',`GSocketAddress*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GSocketAddressEnumerator*',`Glib::RefPtr<SocketAddressEnumerator>',`Glib::wrap($3)')
 
 #Volume
