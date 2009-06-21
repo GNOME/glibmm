@@ -57,7 +57,7 @@ void on_lastname_changed ()
 void on_age_changed ()
 { std::cout << "- age changed!" << std::endl; }
 
-int main (int argc, char** argv)
+int main(int, char**)
 {
     Glib::init ();
     Person p;

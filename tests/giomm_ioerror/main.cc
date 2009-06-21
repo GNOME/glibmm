@@ -14,7 +14,7 @@
 #error Forgot to #undef GIOMM_SAVED_HOST_NOT_FOUND
 #endif
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
   Glib::init();
   Gio::init();
