@@ -71,6 +71,7 @@
 #include <glibmm/uriutils.h>
 #include <glibmm/ustring.h>
 #include <glibmm/value.h>
+#include <glibmm/valuearray.h>
 #include <glibmm/wrap.h>
 
 #endif /* _GLIBMM_H */
