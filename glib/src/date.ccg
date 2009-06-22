@@ -59,12 +59,13 @@ Date::Date(const GDate& castitem)
 Date::Date(const Date& other)
 {
   g_date_clear(&gobject_, 1);
-  g_date_set_julian(&gobject_, other.get_julian());
+  if (g_date_valid(&other.gobject_))
+    g_date_set_julian(&gobject_, other.get_julian());
 }
 
 Date& Date::operator=(const Date& other)
 {
-  if (&other != this)
+  if (&other != this && g_date_valid(&other.gobject_))
     g_date_set_julian(&gobject_, other.get_julian());
 
   return *this;
