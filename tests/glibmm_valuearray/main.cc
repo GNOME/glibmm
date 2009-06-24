@@ -1,8 +1,6 @@
 #include <glibmm.h>
 #include <iostream>
 
-#define VALUES 10
-
 int on_compare(const Glib::ValueBase& v1, const Glib::ValueBase& v2)
 {
   const Glib::Value<int> intVal1 = static_cast< const Glib::Value<int>& >(v1);
@@ -21,6 +19,8 @@ int on_compare(const Glib::ValueBase& v1, const Glib::ValueBase& v2)
 
 int main(int, char**)
 {
+  const int VALUES = 10;
+
   Glib::init();
 
   Glib::Value<int> value[VALUES];
