@@ -50,6 +50,17 @@ define(`__BOOL_DO_NOT_DERIVE_GTYPE__',`$1')
 _POP()
 ')
 
+dnl GVolumeMonitor can be broken/impeded by defining a sub-type.
+define(`_DYNAMIC_GTYPE_REGISTRATION',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`$1')
+_POP()
+')
+
+
+
+
 dnl
 dnl
 dnl
@@ -72,6 +83,10 @@ ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   const Glib::Class& init();
+
+ifdef(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`
+  const Glib::Class& init(GTypeModule* module);
+',`')
 
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
 ',`dnl
@@ -126,6 +141,34 @@ _IMPORT(SECTION_CC_IMPLEMENTS_INTERFACES)
 
   return *this;
 }
+
+ifdef(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`
+const Glib::Class& __CPPNAME__`'_Class::init(GTypeModule* module)
+{
+  if(!gtype_) // create the GType if necessary
+  {
+ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
+    // Do not derive a GType, or use a derived klass:
+    gtype_ = CppClassParent::CppObjectType::get_type();
+',`dnl
+    // Glib::Class has to know the class init function to clone custom types.
+    class_init_func_ = &__CPPNAME__`'_Class::class_init_function;
+
+    // This is actually just optimized away, apparently with no harm.
+    // Make sure that the parent type has been created.
+    //CppClassParent::CppObjectType::get_type();
+
+    // Create the wrapper type, with the same class/instance size as the base type.
+    register_derived_type(_LOWER(__CCAST__)_get_type(), module);
+
+    // Add derived versions of interfaces, if the C type implements any interfaces:
+_IMPORT(SECTION_CC_IMPLEMENTS_INTERFACES)
+')
+  }
+
+  return *this;
+',`')
+
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
 ',`dnl
 
@@ -165,6 +208,15 @@ GType __CPPNAME__::get_type()
 {
   return __BASE__`'_class_.init().get_type();
 }
+
+ifdef(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`
+GType __CPPNAME__::get_type(GTypeModule* module)
+{
+  return __BASE__`'_class_.init(module).get_type();
+}
+'dnl
+,`'dnl
+)
 
 GType __CPPNAME__::get_base_type()
 {

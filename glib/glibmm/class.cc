@@ -29,6 +29,11 @@ namespace Glib
 
 void Class::register_derived_type(GType base_type)
 {
+  return register_derived_type(base_type, 0);
+}
+
+void Class::register_derived_type(GType base_type, GTypeModule* module)
+{
   if(gtype_)
     return; // already initialized
 
@@ -62,7 +67,12 @@ void Class::register_derived_type(GType base_type)
   }
 
   gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, NULL);
-  gtype_ = g_type_register_static(base_type, derived_name, &derived_info, GTypeFlags(0));
+  
+  if(module)
+    gtype_ = g_type_module_register_type(module, base_type, derived_name, &derived_info, GTypeFlags(0));
+  else
+    gtype_ = g_type_register_static(base_type, derived_name, &derived_info, GTypeFlags(0));
+
   g_free(derived_name);
 }
 

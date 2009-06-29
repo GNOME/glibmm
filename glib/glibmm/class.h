@@ -57,7 +57,14 @@ protected:
   GType           gtype_;
   GClassInitFunc  class_init_func_;
 
+  /** Register a GType, derived from the @a base_type.
+   */
   void register_derived_type(GType base_type);
+
+  /** Register a GType, derived from the @a base_type.
+   * @param module If this is not 0 then g_type_module_register_type() will be used. Otherwise g_type_register_static() will be used.
+   */
+  void register_derived_type(GType base_type, GTypeModule* module);
 
 private:
   static void custom_class_init_function(void* g_class, void* class_data);
