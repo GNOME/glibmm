@@ -132,6 +132,11 @@ void OptionGroup::add_entry(const OptionEntry& entry, int& arg)
   add_entry_with_wrapper(entry, G_OPTION_ARG_INT, &arg);
 }
 
+void OptionGroup::add_entry(const OptionEntry& entry, double& arg)
+{
+  add_entry_with_wrapper(entry, G_OPTION_ARG_DOUBLE, &arg);
+}
+
 void OptionGroup::add_entry(const OptionEntry& entry, Glib::ustring& arg)
 {
   add_entry_with_wrapper(entry, G_OPTION_ARG_STRING, &arg);
@@ -240,6 +245,14 @@ void OptionGroup::CppOptionEntry::allocate_c_arg()
 
       break;
     }
+    case G_OPTION_ARG_DOUBLE:
+    {
+      double* typed_arg = new double;
+      *typed_arg = 0.0;
+      carg_ = typed_arg;
+
+      break;
+    }
     case G_OPTION_ARG_STRING_ARRAY:
     case G_OPTION_ARG_FILENAME_ARRAY:
     {
@@ -271,6 +284,11 @@ void OptionGroup::CppOptionEntry::set_c_arg_default(void* cpp_arg)
     case G_OPTION_ARG_INT:
     {
       *static_cast<int*>(carg_) = *static_cast<int*>(cpp_arg);
+      break;
+    }
+    case G_OPTION_ARG_DOUBLE:
+    {
+      *static_cast<double*>(carg_) = *static_cast<double*>(cpp_arg);
       break;
     }
     case G_OPTION_ARG_NONE:
@@ -369,6 +387,13 @@ void OptionGroup::CppOptionEntry::release_c_arg()
 
         break;
       }
+      case G_OPTION_ARG_DOUBLE:
+      {
+        double* typed_arg = static_cast<double*>(carg_);
+        delete typed_arg;
+
+        break;
+      }
       case G_OPTION_ARG_STRING_ARRAY:
       case G_OPTION_ARG_FILENAME_ARRAY:
       {
@@ -431,7 +456,12 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
       *((int*)cpparg_) = *(static_cast<int*>(carg_));
       break;
     }
-        case G_OPTION_ARG_STRING_ARRAY:
+    case G_OPTION_ARG_DOUBLE:
+    {
+      *((double*)cpparg_) = *(static_cast<double*>(carg_));
+      break;
+    }
+    case G_OPTION_ARG_STRING_ARRAY:
     {
       char*** typed_arg = static_cast<char***>(carg_);
       vecustrings* typed_cpp_arg = static_cast<vecustrings*>(cpparg_);
