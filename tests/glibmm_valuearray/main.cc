@@ -3,8 +3,8 @@
 
 int on_compare(const Glib::ValueBase& v1, const Glib::ValueBase& v2)
 {
-  const Glib::Value<int> intVal1 = static_cast< const Glib::Value<int>& >(v1);
-  const Glib::Value<int> intVal2 = static_cast< const Glib::Value<int>& >(v2);
+  const Glib::Value<int>& intVal1 = static_cast< const Glib::Value<int>& >(v1);
+  const Glib::Value<int>& intVal2 = static_cast< const Glib::Value<int>& >(v2);
 
   int int1 = intVal1.get();
   int int2 = intVal2.get();
