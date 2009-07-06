@@ -1,3 +1,15 @@
+2009-07-06  Daniel Elstner  <danielk@openismus.com>
+
+	Treat empty Glib::spawn*() working dir as unset
+
+	* glib/src/spawn.ccg (Glib::spawn_async_with_pipes): If the
+	working_directory argument is the empty string, pass a 0 pointer
+	to the GLib C API to make it inherit the parent's working directory.
+	This is fine as the empty string is not a valid directory name, and
+	our documentation already says that it will be interpreted that way.
+	(Glib::spawn_async): ditto,
+	(Glib::spawn_sync): ditto.
+
 2009-07-03  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	* tests/glibmm_valuearray/main.cc: Use references to store casts in
