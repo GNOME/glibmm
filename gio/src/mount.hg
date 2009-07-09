@@ -74,31 +74,17 @@ public:
   _WRAP_METHOD(bool can_unmount() const, g_mount_can_unmount)
   _WRAP_METHOD(bool can_eject() const, g_mount_can_eject)
 
-  /** Unmounts a mount. 
-   * This is an asynchronous operation, and is finished by calling unmount_finish() with the AsyncResult data returned in the callback slot.
-   *
-   * @param slot A callback which will be called when the operation is completed or canceled.
-   * @param cancellable A cancellable object which can be used to cancel the operation.
-   * @param flags Flags affecting the unmount.
-   */
   void unmount(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
-
-  /** Unmounts a mount. 
-   * This is an asynchronous operation, and is finished by calling unmount_finish() with the AsyncResult data returned in the callback slot.
-   *
-   * @param slot A callback which will be called when the operation is completed or canceled.
-   * @param flags Flags affecting the unmount.
-   */
   void unmount(const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
-
-  /** Unmounts a mount.
-   *
-   * @param cancellable A cancellable object which can be used to cancel the operation.
-   */
   void unmount(MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void unmount(const Glib::RefPtr<MountOperation>& mount_operation, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void unmount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void unmount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
   _IGNORE(g_mount_unmount)
+  _IGNORE(g_mount_unmount_with_operation)
 
-  _WRAP_METHOD(bool unmount_finish(const Glib::RefPtr<AsyncResult>& result), g_mount_unmount_finish, errthrow)
+  _WRAP_METHOD(bool unmount_finish(const Glib::RefPtr<AsyncResult>& result), g_mount_unmount_with_operation_finish, errthrow)
+  _IGNORE(g_mount_unmount_finish)
 
   /** Remounts a mount.
    * This is an asynchronous operation, and is finished by calling mount_finish() with the AsyncResult data returned in the callback slot.
@@ -147,32 +133,17 @@ public:
 
   _WRAP_METHOD(bool remount_finish(const Glib::RefPtr<AsyncResult>& result), g_mount_remount_finish, errthrow)
 
-  /** Ejects a mount. 
-   * This is an asynchronous operation, and is finished by calling eject_finish() with the AsyncResult data returned in the callback slot.
-   *
-   * @param slot A callback which will be called when the operation is completed or canceled.
-   * @param cancellable A cancellable object which can be used to cancel the operation.
-   * @param flags Flags affecting the unmount if required for eject.
-   */
   void eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
-
-  /** Ejects a mount. 
-   * This is an asynchronous operation, and is finished by calling eject_finish() with the AsyncResult data returned in the callback slot.
-   *
-   * @param slot A callback which will be called when the operation is completed or canceled.
-   * @param flags Flags affecting the unmount if required for eject.
-   */
   void eject(const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
-
-  /** Ejects a mount. 
-   *
-   * @param flags Flags affecting the unmount if required for eject.
-   */
   void eject(MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void eject(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void eject(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void eject(const Glib::RefPtr<MountOperation>& mount_operation, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
   _IGNORE(g_mount_eject)
+  _IGNORE(g_mount_eject_with_operation)
 
-  _WRAP_METHOD(bool eject_finish(const Glib::RefPtr<AsyncResult>& result), g_mount_eject_finish, errthrow)
-
+  _WRAP_METHOD(bool eject_finish(const Glib::RefPtr<AsyncResult>& result), g_mount_eject_with_operation_finish, errthrow)
+  _IGNORE(g_mount_eject_finish)
 
 
 
@@ -240,6 +211,7 @@ public:
 
   _WRAP_SIGNAL(void changed(), changed)
   _WRAP_SIGNAL(void unmounted(), unmounted)
+  _WRAP_SIGNAL(void pre_unmount(), pre_unmount, no_default_handler)
 
   //There are no properties.
 };
