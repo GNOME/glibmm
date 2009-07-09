@@ -96,5 +96,80 @@ void Drive::poll_for_media()
                          NULL);
 }
 
+void
+Drive::stop(const Glib::RefPtr<MountOperation>& mount_operation,
+            const Glib::RefPtr<Cancellable>& cancellable,
+            const SlotAsyncReady& slot,
+            MountUnmountFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_drive_stop(gobj(),
+               static_cast<GMountUnmountFlags>(flags),
+               mount_operation->gobj(),
+               cancellable->gobj(),
+               &SignalProxy_async_callback,
+               slot_copy);
+}
+
+void
+Drive::stop(const Glib::RefPtr<MountOperation>& mount_operation,
+            const SlotAsyncReady& slot,
+            MountUnmountFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_drive_stop(gobj(),
+               static_cast<GMountUnmountFlags>(flags),
+               mount_operation->gobj(),
+               NULL,
+               &SignalProxy_async_callback,
+               slot_copy);
+}
+
+
+void
+Drive::start(const Glib::RefPtr<MountOperation>& mount_operation,
+             const Glib::RefPtr<Cancellable>& cancellable,
+             const SlotAsyncReady& slot,
+             DriveStartFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_drive_start(gobj(),
+                static_cast<GDriveStartFlags>(flags),
+                mount_operation->gobj(),
+                cancellable->gobj(),
+                &SignalProxy_async_callback,
+                slot_copy);
+}
+
+void
+Drive::start(const Glib::RefPtr<MountOperation>& mount_operation,
+             const SlotAsyncReady& slot,
+             DriveStartFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_drive_start(gobj(),
+                static_cast<GDriveStartFlags>(flags),
+                mount_operation->gobj(),
+                NULL,
+                &SignalProxy_async_callback,
+                slot_copy);
+}
+
 } // namespace Gio
 

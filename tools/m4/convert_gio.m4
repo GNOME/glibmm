@@ -20,6 +20,7 @@ _CONV_ENUM(G,SocketFamily)
 _CONV_ENUM(G,SocketType)
 _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketMsgFlags)
+_CONV_ENUM(G,DriveStartFlags)
 
 
 # AppInfo
