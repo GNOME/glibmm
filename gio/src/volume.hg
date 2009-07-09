@@ -117,34 +117,19 @@ public:
                g_volume_mount_finish,
                errthrow)
 
-  /** Ejects a volume. 
-   * This is an asynchronous operation, and is finished by calling eject_finish() with the AsyncResult data returned in the callback slot.
-   *
-   * @param slot A callback which will be called when the operation is completed or canceled.
-   * @param cancellable A cancellable object which can be used to cancel the operation.
-   * @param flags Flags affecting the unmount if required for eject.
-   */
   void eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
-
-  /** Ejects a volume. 
-   * This is an asynchronous operation, and is finished by calling eject_finish() with the AsyncResult data returned in the callback slot.
-   *
-   * @param slot A callback which will be called when the operation is completed or canceled.
-   * @param flags Flags affecting the unmount if required for eject.
-   */
   void eject(const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
-
-  /** Ejects a volume. 
-   * This is an asynchronous operation, and is finished by calling eject_finish() with the AsyncResult data returned in the callback slot.
-   *
-   * @param flags Flags affecting the unmount if required for eject.
-   */
   void eject(MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void eject(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void eject(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  void eject(const Glib::RefPtr<MountOperation>& mount_operation, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
   _IGNORE(g_volume_eject)
+  _IGNORE(g_volume_eject_with_operation)
 
   _WRAP_METHOD(bool eject_finish(const Glib::RefPtr<AsyncResult>& result),
-               g_volume_eject_finish,
+               g_volume_eject_with_operation_finish,
                errthrow)
+  _IGNORE(g_volume_eject_finish)
 
   _WRAP_METHOD(std::string get_identifier(const std::string& kind) const,
                g_volume_get_identifier)
