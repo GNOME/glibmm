@@ -60,16 +60,10 @@ doc-clean: doc-clean-recursive
 doc-rebuild:
 	(cd docs && $(MAKE) $(AM_MAKEFLAGS) doc-rebuild)
 
-SVN_REV=`svnversion -n`
-URL_KEY=URL:
-SVN_PATH=`svn info |grep "$(URL_KEY)" |sed -e "s/$(URL_KEY)\s*//"`
-ROOT_KEY=Repository Root:
-SVN_ROOT=`svn info |grep "$(ROOT_KEY)" |sed -e "s/$(ROOT_KEY)\s*//"`
+GIT = $(top_srcdir)/scripts/missing --run git
 
 tag-release: distcheck
-	@svn cp -r$(SVN_REV) -m "tag $(PACKAGE) $(VERSION)" $(SVN_PATH) $(SVN_ROOT)/tags/$(PACKAGE)-$(VERSION) \
-		|| (echo "Tagging failed.  Do you have local changes that are not committed?" \
-		&& echo "Try running 'svn update'." && false)
+	$(GIT) tag -s -m "$(PACKAGE) release $(VERSION)" v$(VERSION)
 	@echo "Release Tagged."
 
 upload-release: tag-release
