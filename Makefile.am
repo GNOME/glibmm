@@ -63,7 +63,7 @@ doc-rebuild:
 GIT = $(top_srcdir)/scripts/missing --run git
 
 tag-release: distcheck
-	$(GIT) tag -s -m "$(PACKAGE) release $(VERSION)" v$(VERSION)
+	$(GIT) tag -s -m "$(PACKAGE) release $(VERSION)" $(PACKAGE)-$(VERSION)
 	@echo "Release Tagged."
 
 upload-release: tag-release
