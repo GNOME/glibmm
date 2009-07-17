@@ -327,6 +327,7 @@ AC_CONFIG_FILES([
     examples/iochannel_stream/Makefile
     examples/child_watch/Makefile
     examples/regex/Makefile
+    examples/network_io/Makefile
 
   scripts/Makefile
 
