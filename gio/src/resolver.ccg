@@ -18,6 +18,7 @@
  */
 
 #include <gio/gio.h>
+#include "slot_async.h"
 
 namespace Gio
 {
@@ -90,6 +91,95 @@ ListHandle_SrvTarget Resolver::lookup_service(const Glib::ustring& service, cons
 
   return retvalue;
 
+}
+
+void
+Resolver::lookup_by_name_async(const Glib::ustring& hostname,
+                               const SlotAsyncReady& slot,
+                               const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_by_name_async (gobj(),
+                                   hostname.c_str(),
+                                   cancellable->gobj(),
+                                   &SignalProxy_async_callback,
+                                   slot_copy);
+}
+
+void
+Resolver::lookup_by_name_async(const Glib::ustring& hostname,
+                               const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_by_name_async (gobj(),
+                                   hostname.c_str(),
+                                   0,
+                                   &SignalProxy_async_callback,
+                                   slot_copy);
+}
+
+void
+Resolver::lookup_by_address_async(const Glib::RefPtr<InetAddress>& address,
+                                  const SlotAsyncReady& slot,
+                                  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_by_address_async (gobj(),
+                                      address->gobj(),
+                                      cancellable->gobj(),
+                                      &SignalProxy_async_callback,
+                                      slot_copy);
+}
+
+void
+Resolver::lookup_by_address_async(const Glib::RefPtr<InetAddress>& address,
+                                  const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_by_address_async (gobj(),
+                                      address->gobj(),
+                                      0,
+                                      &SignalProxy_async_callback,
+                                      slot_copy);
+}
+
+void
+Resolver::lookup_service_async(const Glib::ustring& service,
+                               const Glib::ustring& protocol,
+                               const Glib::ustring& domain,
+                               const SlotAsyncReady& slot,
+                               const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_service_async (gobj(),
+                                   service.c_str(),
+                                   protocol.c_str(),
+                                   domain.c_str(),
+                                   cancellable->gobj(),
+                                   &SignalProxy_async_callback,
+                                   slot_copy);
+}
+
+void
+Resolver::lookup_service_async(const Glib::ustring& service,
+                               const Glib::ustring& protocol,
+                               const Glib::ustring& domain,
+                               const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_service_async (gobj(),
+                                   service.c_str(),
+                                   protocol.c_str(),
+                                   domain.c_str(),
+                                   0,
+                                   &SignalProxy_async_callback,
+                                   slot_copy);
 }
 
 } //namespace Gio
