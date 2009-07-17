@@ -21,6 +21,8 @@ _CONV_ENUM(G,SocketType)
 _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketMsgFlags)
 _CONV_ENUM(G,DriveStartFlags)
+_CONV_ENUM(G,DriveStartFlags)
+_CONV_ENUM(G,DriveStartStopType)
 
 
 # AppInfo
