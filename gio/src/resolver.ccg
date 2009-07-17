@@ -32,4 +32,64 @@ void Resolver::set_default(const Glib::RefPtr<Resolver>& resolver)
     g_resolver_set_default(Glib::unwrap(resolver));
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::ListHandle< Glib::RefPtr<InetAddress> > Resolver::lookup_by_name(const Glib::ustring& hostname)
+#else
+Glib::ListHandle< Glib::RefPtr<InetAddress> > Resolver::lookup_by_name(const Glib::ustring& hostname, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::ListHandle< Glib::RefPtr<InetAddress> > retvalue = Glib::ListHandle< Glib::RefPtr<InetAddress> >(g_resolver_lookup_by_name(gobj(), hostname.c_str(), 0, &(gerror)), Glib::OWNERSHIP_SHALLOW);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::ustring Resolver::lookup_by_address(const Glib::RefPtr<InetAddress>& address)
+#else
+Glib::ustring Resolver::lookup_by_address(const Glib::RefPtr<InetAddress>& address, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::ustring retvalue = Glib::convert_return_gchar_ptr_to_ustring(g_resolver_lookup_by_address(gobj(), const_cast<GInetAddress*>(Glib::unwrap(address)), 0, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+ListHandle_SrvTarget Resolver::lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain)
+#else
+ListHandle_SrvTarget Resolver::lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  ListHandle_SrvTarget retvalue = ListHandle_SrvTarget(g_resolver_lookup_service(gobj(), service.c_str(), protocol.c_str(), domain.c_str(), 0, &(gerror)), Glib::OWNERSHIP_SHALLOW);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+
+}
+
 } //namespace Gio
