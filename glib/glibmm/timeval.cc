@@ -30,6 +30,11 @@ void TimeVal::assign_current_time()
 {
   g_get_current_time(this);
 }
+ 
+bool TimeVal::assign_from_iso8601(const Glib::ustring& iso_date)
+{
+  return g_time_val_from_iso8601(iso_date.c_str(), this);
+}
 
 void TimeVal::add(const TimeVal& rhs)
 {
@@ -110,6 +115,18 @@ void TimeVal::add_microseconds(long microseconds)
 void TimeVal::subtract_microseconds(long microseconds)
 {
   g_time_val_add(this, -1 * microseconds);
+}
+
+Glib::ustring TimeVal::as_iso8601() const
+{
+  gchar *retval = g_time_val_to_iso8601(const_cast<Glib::TimeVal*>(this));
+  if (retval)
+  {
+    Glib::ustring iso_date(retval);
+    g_free(retval);
+    return iso_date;
+  }
+  return Glib::ustring();
 }
 
 } // namespace Glib

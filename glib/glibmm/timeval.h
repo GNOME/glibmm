@@ -24,6 +24,7 @@
  */
 
 #include <glib.h>
+#include <glibmm/ustring.h>
 
 namespace Glib
 {
@@ -46,6 +47,15 @@ struct TimeVal : public GTimeVal
    * works also on Win32. 
    */
   void assign_current_time();
+  
+  /** Converts a string containing an ISO 8601 encoded date and time
+   * to a Glib::TimeVal and puts it in TimeVal instance.
+   * @param iso_date ISO 8601 encoded string.
+   * @return <tt>true</tt> if conversion was successful.
+   *
+   * @newin2p22
+   */
+  bool assign_from_iso8601(const Glib::ustring& iso_date);
 
   void add(const TimeVal& rhs);
   void subtract(const TimeVal& rhs);
@@ -67,6 +77,13 @@ struct TimeVal : public GTimeVal
    * to a double representation, whose unit is seconds.
    */
   inline double as_double() const;
+
+  /** Returns an ISO 8601 encoded string, relative to the Coordinated
+   * Universal Time (UTC).
+   *
+   * @newin2p22
+   */
+  Glib::ustring as_iso8601() const;
 
   inline bool negative() const;
 
