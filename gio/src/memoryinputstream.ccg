@@ -24,13 +24,27 @@ namespace Gio
 
 void MemoryInputStream::add_data(const std::string& data)
 {
-  g_memory_input_stream_add_data(gobj(), data.c_str(), data.size(), NULL);
+  char *data_copy = g_strdup (data.c_str ());
+  g_memory_input_stream_add_data(gobj(), data_copy, -1, g_free);
 }
 
 
 void MemoryInputStream::add_data(const void* data, gssize len)
 {
-  g_memory_input_stream_add_data(gobj(), data, len, NULL);
+  char *data_copy = 0;
+
+  // copy the data so that the caller doesn't need to keep the data alive
+  if (len > 0)
+    data_copy = g_strdup (data);
+  else
+    data_copy = g_strndup (data, len);
+
+  g_memory_input_stream_add_data(gobj(), data_copy, len, g_free);
+}
+
+void MemoryInputStream::add_data(const void* data, gssize len, GDestroyNotify destroy)
+{
+  g_memory_input_stream_add_data(gobj(), data, len, destroy);
 }
 
 } // namespace Gio

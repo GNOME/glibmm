@@ -1,3 +1,18 @@
+2009-07-26  Jonathon Jongsma  <jonathon@quotidian.org>
+
+	* gio/src/memoryinputstream.ccg:
+	* gio/src/memoryinputstream.hg: fix MemoryInputStream::add_data() so
+	  that it copies the memory internally.  This function was basically
+	  unusable before except with statically allocated memory.
+	  Otherwise the memory would have been leaked (if the caller did not
+	  free it) or the memory could have been corrupted (if the caller
+	  freed it before the MemoryInputStream was finished using it).  The
+	  std::string version was susceptible to memory corruption as well,
+	  so we take a copy of that string as well.  To avoid needing to
+	  always copy the memory, I also introduced an overload which
+	  accepts a GDestroyNotify function that will free the memory when
+	  the object is finished with it. Fixes Bug #589683.
+
 2009-07-26  Krzesimir Nowak  <krnowak@svn.gnome.org>
 
 	* glib/glibmm/timeval.cc:
