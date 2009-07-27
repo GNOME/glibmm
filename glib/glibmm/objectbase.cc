@@ -278,6 +278,16 @@ sigc::connection ObjectBase::connect_property_changed_with_return(const Glib::us
   return sigc::connection(pConnectionNode->slot_);
 }
 
+void ObjectBase::freeze_notify()
+{
+  g_object_freeze_notify (gobj());
+}
+
+void ObjectBase::thaw_notify()
+{
+  g_object_thaw_notify (gobj());
+}
+
 
 
 bool _gobject_cppinstance_already_deleted(GObject* gobject)

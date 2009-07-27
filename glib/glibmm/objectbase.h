@@ -125,6 +125,24 @@ public:
    */
   sigc::connection connect_property_changed_with_return(const Glib::ustring& property_name, const sigc::slot<void>& slot);
 
+  /** Increases the freeze count on object. If the freeze count is non-zero, the
+   * emission of "notify" signals on object is stopped. The signals are queued
+   * until the freeze count is decreased to zero.
+   *
+   * This is necessary for accessors that modify multiple properties to prevent
+   * premature notification while the object is still being modified.
+   */
+  void freeze_notify();
+
+  /** 
+   * Reverts the effect of a previous call to freeze_notify(). The freeze count
+   * is decreased on object and when it reaches zero, all queued "notify"
+   * signals are emitted.
+   *
+   * It is an error to call this function when the freeze count is zero.
+   */
+  void thaw_notify();
+
   //TODO: Why are these virtual?
   /** Increment the reference count for this object.
    * You should never need to do this manually - use the object via a RefPtr instead.
