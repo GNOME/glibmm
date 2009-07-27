@@ -35,9 +35,9 @@ void MemoryInputStream::add_data(const void* data, gssize len)
 
   // copy the data so that the caller doesn't need to keep the data alive
   if (len > 0)
-    data_copy = g_strdup (data);
+    data_copy = g_strdup (static_cast<const gchar*>(data));
   else
-    data_copy = g_strndup (data, len);
+    data_copy = g_strndup (static_cast<const gchar*>(data), len);
 
   g_memory_input_stream_add_data(gobj(), data_copy, len, g_free);
 }
