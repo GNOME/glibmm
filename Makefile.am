@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS	= -I scripts
+ACLOCAL_AMFLAGS	= -I scripts ${ACLOCAL_FLAGS}
 
 SUBDIRS		= tools glib gio examples scripts tests MSVC_Net2005 MSVC_Net2008 docs
 DIST_SUBDIRS	= $(SUBDIRS)

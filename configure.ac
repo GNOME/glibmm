@@ -12,212 +12,87 @@
 #  Copyright 1998 Stephan Kulow 
 #
 
-pushdef([GLIBMM_MAJOR_VERSION],     [2])
-pushdef([GLIBMM_MINOR_VERSION],     [21])
-pushdef([GLIBMM_MICRO_VERSION],     [3])
-pushdef([GLIBMM_EXTRA_VERSION],     [])
-pushdef([GLIBMM_VERSION], GLIBMM_MAJOR_VERSION.GLIBMM_MINOR_VERSION.GLIBMM_MICRO_VERSION[]GLIBMM_EXTRA_VERSION)
+AC_INIT([glibmm], [2.21.3], [http://bugzilla.gnome.org/enter_bug.cgi?product=glibmm],
+        [glibmm], [http://www.gtkmm.org/])
+AC_PREREQ([2.59])
+m4_pattern_forbid([^_?MM_])
 
-AC_INIT([glibmm], GLIBMM_VERSION, [gtkmm-list@gnome.org])
-AC_PREREQ([2.58])
-AC_CONFIG_SRCDIR([glib/glibmmconfig.h.in])
+AC_CONFIG_SRCDIR([glib/glibmm.h])
+AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([scripts])
+AC_CONFIG_HEADERS([config.h glib/glibmmconfig.h gio/giommconfig.h])
 
-#########################################################################
-#  Version and initialization
-#########################################################################
-[GLIBMM_MAJOR_VERSION]=GLIBMM_MAJOR_VERSION
-[GLIBMM_MINOR_VERSION]=GLIBMM_MINOR_VERSION
-[GLIBMM_MICRO_VERSION]=GLIBMM_MICRO_VERSION
-[GLIBMM_EXTRA_VERSION]=GLIBMM_EXTRA_VERSION
-[GLIBMM_VERSION]=GLIBMM_VERSION
-popdef([GLIBMM_MAJOR_VERSION])
-popdef([GLIBMM_MINOR_VERSION])
-popdef([GLIBMM_MICRO_VERSION])
-popdef([GLIBMM_EXTRA_VERSION])
-popdef([GLIBMM_VERSION])
-GLIBMM_RELEASE=$GLIBMM_MAJOR_VERSION.$GLIBMM_MINOR_VERSION
-AC_DEFINE_UNQUOTED(GLIBMM_MAJOR_VERSION, $GLIBMM_MAJOR_VERSION, [Major version of gtkmm])
-AC_DEFINE_UNQUOTED(GLIBMM_MINOR_VERSION, $GLIBMM_MINOR_VERSION, [Minor version of gtkmm])
-AC_DEFINE_UNQUOTED(GLIBMM_MICRO_VERSION, $GLIBMM_MICRO_VERSION, [Micro version of gtkmm])
-AC_SUBST(GLIBMM_MAJOR_VERSION)
-AC_SUBST(GLIBMM_MINOR_VERSION)
-AC_SUBST(GLIBMM_MICRO_VERSION)
-AC_SUBST(GLIBMM_VERSION)
-AC_SUBST(GLIBMM_RELEASE)
-
-#
-# +1 : ? : +1  == new interface that does not break old one
-# +1 : ? : 0   == new interface that breaks old one
-#  ? : ? : 0   == no new interfaces, but breaks apps
-#  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
-#                 better
-# CURRENT : REVISION : AGE
-LIBGLIBMM_SO_VERSION=3:0:2
-AC_SUBST(LIBGLIBMM_SO_VERSION)
-
-AC_CONFIG_AUX_DIR(scripts)
-
-dnl Initialize automake stuff
-AM_INIT_AUTOMAKE([1.7 gnu])
-
-dnl Specify a configuration file (no autoheader)
-AM_CONFIG_HEADER(config.h glib/glibmmconfig.h gio/giommconfig.h)
+AM_INIT_AUTOMAKE([1.9 -Wno-portability dist-bzip2 no-define nostdinc tar-ustar])
 AM_MAINTAINER_MODE
-AL_ACLOCAL_INCLUDE(scripts)
+AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
+MM_INIT_MODULE([glibmm-2.4], m4_expand([AC_PACKAGE_VERSION]))
+MM_INIT_MODULE([giomm-2.4],  m4_expand([AC_PACKAGE_VERSION]))
 
-#########################################################################
-#  Configure arguments 
-#########################################################################
+# http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+AC_SUBST([LIBGLIBMM_SO_VERSION], [3:0:2])
 
-#########################################################################
-#  Environment Checks
-#########################################################################
-AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_MAKE_SET
-AC_CANONICAL_BUILD
-AC_CANONICAL_HOST
-
-dnl Used for enabling the "-no-undefined" flag while generating DLLs
-dnl Copied from the official gtk+-2 configure.in
-AC_MSG_CHECKING([for some Win32 platform])
-case "$host" in
-  *-*-mingw*|*-*-cygwin*)
-    platform_win32=yes
-    ;;
-  *)
-    platform_win32=no
-    ;;
-esac
-AC_MSG_RESULT([$platform_win32])
-AM_CONDITIONAL(PLATFORM_WIN32, test "$platform_win32" = "yes")
-
-AC_MSG_CHECKING([for native Win32])
-case "$host" in
-  *-*-mingw*)
-    os_win32=yes
-    ;;
-  *)
-    os_win32=no
-    ;;
-esac
-AC_MSG_RESULT([$os_win32])
-AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
-
-# Disable static libraries by default
+AC_PROG_CXX
 AC_DISABLE_STATIC
-
-if test x$enable_static = "xyes"; then
-	AC_DEFINE([GLIBMM_STATIC_LIB],[1], [Defined when glibmm is built as a static library])
-	AC_DEFINE([GIOMM_STATIC_LIB],[1], [Defined when giomm is built as a static library])
-fi
-
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-AL_PROG_GNU_M4(AC_MSG_ERROR([dnl
-SUN m4 does not work for building gtkmm. 
-Please install GNU m4.]))
+AC_MSG_CHECKING([for Windows operating system])
+AS_CASE([$host_os], [cygwin*|mingw*], [glibmm_platform_win32=yes], [glibmm_platform_win32=no])
+AC_MSG_RESULT([$glibmm_platform_win32])
+AM_CONDITIONAL([PLATFORM_WIN32], [test "x$glibmm_platform_win32" = xyes])
 
-AL_PROG_GNU_MAKE(AC_MSG_ERROR([dnl
-SUN make does not work for building gtkmm.
-Please install GNU make.]))
+AC_MSG_CHECKING([for native Win32 host environment])
+AS_CASE([$host_os], [mingw*], [glibmm_os_win32=yes], [glibmm_os_win32=no])
+AC_MSG_RESULT([$glibmm_os_win32])
+AM_CONDITIONAL([OS_WIN32], [test "x$glibmm_os_win32" = xyes])
 
-GLIBMM_CHECK_PERL([5.6.0])
+AS_IF([test "x$enable_static" = xyes],
+[
+  AC_DEFINE([GLIBMM_STATIC_LIB], [1], [Defined when glibmm is built as a static library])
+  AC_DEFINE([GIOMM_STATIC_LIB],  [1], [Defined when giomm is built as a static library])
+])
 
-#########################################################################
-#  Function checks
-#########################################################################
-
-# functions used in demos/gtk-demo. Undefined in config.h !
 AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 
-#########################################################################
-#  Dependancy checks
-#########################################################################
-gtkmm_min_sigc_version=2.0.0
-gtkmm_min_glib_version=2.21.1
+GLIBMM_MODULES='sigc++-2.0 >= 2.0 glib-2.0 >= 2.21.1 gobject-2.0 >= 2.21.1 gmodule-2.0 >= 2.21.1'
+PKG_CHECK_MODULES([GLIBMM], [$GLIBMM_MODULES])
 
-PKG_CHECK_MODULES(GLIBMM, sigc++-2.0 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version})
-AC_SUBST(GLIBMM_CFLAGS)
-AC_SUBST(GLIBMM_LIBS)
+GIOMM_MODULES="$GLIBMM_MODULES gio-2.0 >= 2.21.1"
+test "x$glibmm_os_win32" = xyes || GIOMM_MODULES="$GIOMM_MODULES gio-unix-2.0 >= 2.21.1"
+PKG_CHECK_MODULES([GIOMM], [$GIOMM_MODULES])
 
+MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
+MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 
-# Only check for gio-unix-2.0 on non-win32 platform, because that API is Unix-specific. 
-if test x"$os_win32" = xyes; then
-  PKG_CHECK_MODULES(GIOMM, sigc++-2.0 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version} gio-2.0 >= ${gtkmm_min_glib_version})
-else
-  PKG_CHECK_MODULES(GIOMM, sigc++-2.0 >= ${gtkmm_min_sigc_version} glib-2.0 >= ${gtkmm_min_glib_version} gobject-2.0 >= ${gtkmm_min_glib_version} gmodule-2.0 >= ${gtkmm_min_glib_version} gio-2.0 >= ${gtkmm_min_glib_version} gio-unix-2.0 >= ${gtkmm_min_glib_version})
-fi
-AC_SUBST(GIOMM_CFLAGS)
-AC_SUBST(GIOMM_LIBS)
+# Location to install gmmproc tools
+# TODO: There is no reason for this to be a substitution variable
+AC_SUBST([GMMPROC_DIR], ['${libdir}/glibmm-2.4/proc'])
 
-# gthread isn't a requirement, but we should use its CFLAGS if available.
-PKG_CHECK_MODULES(GTHREAD, gthread-2.0 >= ${gtkmm_min_glib_version},[],[GTHREAD_CFLAGS=''; GTHREAD_LIBS=''])
-AC_SUBST(GTHREAD_CFLAGS)
-AC_SUBST(GTHREAD_LIBS)
+AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 
-#location to install gmmproc tools
-GMMPROC_DIR=[${libdir}/glibmm-2.4/proc]
-AC_SUBST([GMMPROC_DIR])
-
-#########################################################################
-#  C++ checks
-#########################################################################
-AC_PROG_CXX
+# TODO: Temporary hack
+AC_PATH_PROG([PERL_PATH], [perl], [perl])
 
 # Check for the SUN Forte compiler, and define GLIBMM_COMPILER_SUN_FORTE in the header.
 GLIBMM_PROG_CXX_SUN
 
 # Ensure MSVC-compatible struct packing convention is used when
 # compiling for Win32 with gcc.
-# What flag to depends on gcc version: gcc3 uses "-mms-bitfields", while
-# gcc2 uses "-fnative-struct".
-if test x"$os_win32" = xyes; then
-  if test x"$GCC" = xyes -a x"$GXX" = xyes; then
-    msnative_struct=''
-    AC_MSG_CHECKING([how to get MSVC-compatible struct packing])
-    if test -z "$ac_cv_prog_CC"; then
-      our_gcc="$CC"
-    else
-      our_gcc="$ac_cv_prog_CC"
-    fi
-    case `$our_gcc --version | sed -e 's,\..*,.,' -e q` in
-      2.)
-	if $our_gcc -v --help 2>/dev/null | grep fnative-struct >/dev/null; then
-	  msnative_struct='-fnative-struct'
-	fi
-	;;
-      *)
-	if $our_gcc -v --help 2>/dev/null | grep ms-bitfields >/dev/null; then
-	  msnative_struct='-mms-bitfields'
-	fi
-	;;
-    esac
-    if test x"$msnative_struct" = x ; then
-      AC_MSG_RESULT([no way])
-      AC_MSG_WARN([produced libraries might be incompatible with MSVC-compiled code])
-    else
-      CXXFLAGS="$CXXFLAGS $msnative_struct"
-      AC_MSG_RESULT([${msnative_struct}])
-    fi
-  fi
-fi
+# TODO: Disabled for now. I don't think this should be enabled by the
+# libraries themselves on behalf of the user.  That makes no sense as
+# it is a platform-wide ABI choice.
 
 AC_LANG([C++])
 
-AC_CXX_BOOL(,config_error=yes)
-AC_CXX_NAMESPACES(,config_error=yes)
-AC_CXX_MUTABLE(,config_error=yes)
+# TODO: I think we can just get rid of these checks.
+glibmm_config_error=no
+AC_CXX_BOOL(,       [glibmm_config_error=yes])
+AC_CXX_NAMESPACES(, [glibmm_config_error=yes])
+AC_CXX_MUTABLE(,    [glibmm_config_error=yes])
 
-AC_MSG_CHECKING(if C++ environment provides all required features)
-if test "x$config_error" = xyes ; then
-  AC_MSG_RESULT([no])
-  AC_MSG_ERROR([Your compiler is not powerful enough to compile gtkmm. If it should be, see config.log for more information of why it failed.])
-fi
-AC_MSG_RESULT([yes])
+AS_IF([test "x$glibmm_config_error" = xyes],
+      [AC_MSG_FAILURE([[Your compiler is not powerful enough to compile glibmm.]])])
 
 AC_CHECK_SIZEOF([wchar_t])
 DK_CHECK_FEATURE([wide stream],
@@ -226,63 +101,49 @@ DK_CHECK_FEATURE([wide stream],
                   [[std::wostringstream s; (void) s.str();]])
 ])
 
-GLIBMM_CXX_HAS_NAMESPACE_STD()
-GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS()
-GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR()
-GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS()
-GLIBMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES()
-GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS()
-GLIBMM_CXX_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION()
-GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS()
-GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC()
-GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS()
-GLIBMM_C_STD_TIME_T_IS_NOT_INT32()
-
+GLIBMM_CXX_HAS_NAMESPACE_STD
+GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS
+GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR
+GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS
+GLIBMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES
+GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS
+GLIBMM_CXX_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
+GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
+GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS
+GLIBMM_C_STD_TIME_T_IS_NOT_INT32
 
 # Create a list of input directories for Doxygen.
+# TODO: kill
 GTKMM_DOXYGEN_INPUT_SUBDIRS([glib gio])
 
 # Check whether --enable-debug-refcounting was given.
-GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING()
+GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING
 
 # Evaluate the --enable-warnings=level option.
-DK_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
+MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
                        [-Wall],
-                       [-pedantic -Wall -Wextra])
+                       [-pedantic -Wall -Wextra],
+                       [G])
 
-# Add an --enable-use-deprecations configure option:
-AC_ARG_ENABLE(deprecations,
-              [AC_HELP_STRING([--enable-use-deprecations],
-                              [warn about deprecated usages [default=no]])],,
-              [enable_deprecations=no])
-
-AS_IF([test "x$enable_use_deprecations" = xyes],
-[
-DISABLE_DEPRECATED_CFLAGS='-DG_DISABLE_DEPRECATED'
-],[
-DISABLE_DEPRECATED_CFLAGS=
-])
-AC_SUBST([DISABLE_DEPRECATED_CFLAGS])
+# TODO: kill dummy
+AC_SUBST([DISABLE_DEPRECATED_CFLAGS], [[]])
 
 #Offer the ability to omit some API from the library, 
 #to reduce the code size:
-GLIBMM_ARG_ENABLE_API_DEPRECATED()
-GLIBMM_ARG_ENABLE_API_EXCEPTIONS()
-GLIBMM_ARG_ENABLE_API_PROPERTIES()
-GLIBMM_ARG_ENABLE_API_VFUNCS()
+GLIBMM_ARG_ENABLE_API_DEPRECATED
+GLIBMM_ARG_ENABLE_API_EXCEPTIONS
+GLIBMM_ARG_ENABLE_API_PROPERTIES
+GLIBMM_ARG_ENABLE_API_VFUNCS
 
 # Offer the ability to omit some API from the library, 
 # to reduce the code size:
-GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS()
+GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS
 
 # Dummy conditional just to make automake-1.4 happy.
 # We need an always-false condition in docs/Makefile.am.
+# TODO: kill
 AM_CONDITIONAL(GTKMM_FALSE,[false])
-
-# HACK:  Assign a dummy in order to prevent execution of autoheader by the
-# maintainer-mode rules.  That would fail since we aren't using autoheader.
-AUTOHEADER=':'
-
 
 AC_CONFIG_FILES([
   Makefile
@@ -374,6 +235,4 @@ AC_CONFIG_FILES([
       MSVC_Net2008/tests/glibmm_value/Makefile
       MSVC_Net2008/tests/giomm_simple/Makefile
 ])
-
-AC_OUTPUT()
-
+AC_OUTPUT
