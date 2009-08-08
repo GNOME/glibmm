@@ -1,16 +1,19 @@
-# Configure.in
-#
-#  This file tests for various compiler features needed to configure 
-#  the gtkmm package.  Original skeleton was provided by Stephan Kulow.
-#  All tests were written by Tero Pulkkinen, Mirko Streckenbach, and 
-#  Karl Nelson.
-#
-#  NOTE! IF YOU DO CHANGES HERE, CHECK IF YOU NEED TO MODIFY .m4 TOO!!!
-#
-#  Copyright 2001 Free Software Foundation
-#  Copyright 1999 gtkmm Development Team
-#  Copyright 1998 Stephan Kulow 
-#
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of glibmm.
+##
+## glibmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## glibmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_INIT([glibmm], [2.21.3], [http://bugzilla.gnome.org/enter_bug.cgi?product=glibmm],
         [glibmm], [http://www.gtkmm.org/])
@@ -55,12 +58,13 @@ AS_IF([test "x$enable_static" = xyes],
 
 AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 
-GLIBMM_MODULES='sigc++-2.0 >= 2.0 glib-2.0 >= 2.21.1 gobject-2.0 >= 2.21.1 gmodule-2.0 >= 2.21.1'
-PKG_CHECK_MODULES([GLIBMM], [$GLIBMM_MODULES])
+glibreq='2.0 >= 2.21.1'
+GLIBMM_MODULES="sigc++-2.0 >= 2.0 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
+GIOMM_MODULES="$GLIBMM_MODULES gio-$glibreq"
+test "x$glibmm_os_win32" = xyes || GIOMM_MODULES="$GIOMM_MODULES gio-unix-$glibreq"
 
-GIOMM_MODULES="$GLIBMM_MODULES gio-2.0 >= 2.21.1"
-test "x$glibmm_os_win32" = xyes || GIOMM_MODULES="$GIOMM_MODULES gio-unix-2.0 >= 2.21.1"
-PKG_CHECK_MODULES([GIOMM], [$GIOMM_MODULES])
+PKG_CHECK_MODULES([GLIBMM], [$GLIBMM_MODULES])
+PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
 
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
@@ -117,6 +121,10 @@ GLIBMM_C_STD_TIME_T_IS_NOT_INT32
 # TODO: kill
 GTKMM_DOXYGEN_INPUT_SUBDIRS([glib gio])
 
+MM_ARG_ENABLE_DOCUMENTATION
+MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
+MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
+
 # Check whether --enable-debug-refcounting was given.
 GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING
 
@@ -148,13 +156,11 @@ AM_CONDITIONAL(GTKMM_FALSE,[false])
 AC_CONFIG_FILES([
   Makefile
 
-  glib/Makefile
   glib/glibmm-2.4.pc
     glib/src/Makefile
     glib/glibmm/Makefile
       glib/glibmm/private/Makefile
   
-  gio/Makefile
   gio/giomm-2.4.pc
     gio/src/Makefile
     gio/giomm/Makefile
