@@ -193,8 +193,6 @@ AC_CONFIG_FILES([
     examples/regex/Makefile
     examples/network_io/Makefile
 
-  scripts/Makefile
-
   docs/Makefile
     docs/images/Makefile
     docs/reference/Makefile

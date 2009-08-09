@@ -44,3 +44,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 nodist_pkgconfig_DATA = glib/$(GLIBMM_MODULE_NAME).pc gio/$(GIOMM_MODULE_NAME).pc
 
 dist_noinst_DATA = README.win32 COPYING.tools glib/README gio/README
+
+# TODO: Obsolete; remove after grace period.
+aclocal_macrodir = $(datadir)/aclocal
+dist_aclocal_macro_DATA = scripts/glibmm_check_perl.m4
