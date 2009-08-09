@@ -1,34 +1,43 @@
-## Copyright (c) 2001
-## The gtkmm development team.
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of glibmm.
+##
+## glibmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## glibmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = images reference internal
+include $(top_srcdir)/glib/src/filelist.am
+include $(top_srcdir)/glib/glibmm/filelist.am
 
-EXTRA_DIST = Makefile_web.am_fragment
+book_name = $(GLIBMM_MODULE_NAME)
+doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(files_built_h))
 
-gtkmm_doc_DATA = 
+# Override utility locations to point to the local files.
+doc_install         = $(PERL) -- $(srcdir)/doc-install.pl
+doc_postprocess     = $(PERL) -- $(srcdir)/doc-postprocess.pl
+tagfile_to_devhelp2 = $(srcdir)/tagfile-to-devhelp2.xsl
 
-include $(top_srcdir)/docs/Makefile_web.am_fragment
+doctooldir = $(pkgdatadir)/doctool
+dist_doctool_DATA = doc-postprocess.pl doc-install.pl tagfile-to-devhelp2.xsl
 
-# Post to the website.
+docimagesdir = $(libdocdir)/images
+dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif
 
-post-html-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) post-html); \
-	done
+include $(top_srcdir)/build/doc-reference.am
 
-post-html-local: 
-	scp $$SSH_OPT $^ $$USER@$(web_host):$(web_path_docs)
-
-post-html: post-html-recursive post-html-local
-
-doc-clean-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) doc-clean); \
-	done
-
-doc-clean: doc-clean-recursive
-
-doc-rebuild: doc-clean all
-
-.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild
-
+dist_noinst_DATA +=				\
+	internal/documentation_generation.txt	\
+	internal/gmmproc_internals.txt		\
+	internal/using_gmmproc.txt		\
+	internal/gtk_entry.dia			\
+	reference/glibmm_header.html_fragment	\
+	reference/glibmm_footer.html_fragment

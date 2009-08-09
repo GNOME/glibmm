@@ -174,11 +174,7 @@ AC_CONFIG_FILES([
   examples/Makefile
 
   docs/Makefile
-    docs/images/Makefile
-    docs/reference/Makefile
     docs/reference/Doxyfile
-    docs/reference/beautify_docs.pl
-    docs/internal/Makefile
 ])
 
 AC_CONFIG_FILES([
