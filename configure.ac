@@ -18,7 +18,6 @@
 AC_INIT([glibmm], [2.21.3], [http://bugzilla.gnome.org/enter_bug.cgi?product=glibmm],
         [glibmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
-m4_pattern_forbid([^_?MM_])
 
 AC_CONFIG_SRCDIR([glib/glibmm.h])
 AC_CONFIG_AUX_DIR([build])
@@ -69,14 +68,7 @@ PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 
-# Location to install gmmproc tools
-# TODO: There is no reason for this to be a substitution variable
-AC_SUBST([GMMPROC_DIR], ['${libdir}/glibmm-2.4/proc'])
-
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
-
-# TODO: Temporary hack
-AC_PATH_PROG([PERL_PATH], [perl], [perl])
 
 # Check for the SUN Forte compiler, and define GLIBMM_COMPILER_SUN_FORTE in the header.
 GLIBMM_PROG_CXX_SUN
@@ -117,10 +109,6 @@ GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS
 GLIBMM_C_STD_TIME_T_IS_NOT_INT32
 
-# Create a list of input directories for Doxygen.
-# TODO: kill
-GTKMM_DOXYGEN_INPUT_SUBDIRS([glib gio])
-
 MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
@@ -134,9 +122,6 @@ MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
                        [-pedantic -Wall -Wextra],
                        [G])
 
-# TODO: kill dummy
-AC_SUBST([DISABLE_DEPRECATED_CFLAGS], [[]])
-
 #Offer the ability to omit some API from the library, 
 #to reduce the code size:
 GLIBMM_ARG_ENABLE_API_DEPRECATED
@@ -148,68 +133,32 @@ GLIBMM_ARG_ENABLE_API_VFUNCS
 # to reduce the code size:
 GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS
 
-# Dummy conditional just to make automake-1.4 happy.
-# We need an always-false condition in docs/Makefile.am.
-# TODO: kill
-AM_CONDITIONAL(GTKMM_FALSE,[false])
+AC_CONFIG_FILES([Makefile
+                 tools/Makefile
+                 tools/gmmproc
+                 tools/generate_wrap_init.pl
+                 glib/glibmm-2.4.pc
+                 glib/src/Makefile
+                 glib/glibmm/Makefile
+                 gio/giomm-2.4.pc
+                 gio/src/Makefile
+                 gio/giomm/Makefile
+                 tests/Makefile
+                 examples/Makefile
+                 docs/Makefile
+                 docs/reference/Doxyfile
+                 MSVC_Net2005/glibmm/glibmm.rc
+                 MSVC_Net2005/giomm/giomm.rc
+                 MSVC_Net2008/glibmm/glibmm.rc
+                 MSVC_Net2008/giomm/giomm.rc])
 
-AC_CONFIG_FILES([
-  Makefile
-
-  glib/glibmm-2.4.pc
-    glib/src/Makefile
-    glib/glibmm/Makefile
-  
-  gio/giomm-2.4.pc
-    gio/src/Makefile
-    gio/giomm/Makefile
-
-  tools/Makefile
-  tools/gmmproc
-  tools/generate_wrap_init.pl
-])
-
-AC_CONFIG_FILES([
-  tests/Makefile
-  examples/Makefile
-
-  docs/Makefile
-    docs/reference/Doxyfile
-])
-
-AC_CONFIG_FILES([
-  MSVC_Net2005/Makefile
-    MSVC_Net2005/gendef/Makefile
-    MSVC_Net2005/glibmm/Makefile
-    MSVC_Net2005/glibmm/glibmm.rc
-    MSVC_Net2005/giomm/Makefile
-    MSVC_Net2005/giomm/giomm.rc
-    MSVC_Net2005/examples/Makefile
-      MSVC_Net2005/examples/dispatcher/Makefile
-      MSVC_Net2005/examples/dispatcher2/Makefile
-      MSVC_Net2005/examples/markup/Makefile
-      MSVC_Net2005/examples/options/Makefile
-      MSVC_Net2005/examples/thread/Makefile      
-      MSVC_Net2005/examples/thread_pool/Makefile
-    MSVC_Net2005/tests/Makefile
-      MSVC_Net2005/tests/glibmm_value/Makefile
-      MSVC_Net2005/tests/giomm_simple/Makefile
-
-  MSVC_Net2008/Makefile
-    MSVC_Net2008/gendef/Makefile
-    MSVC_Net2008/glibmm/Makefile
-    MSVC_Net2008/glibmm/glibmm.rc
-    MSVC_Net2008/giomm/Makefile
-    MSVC_Net2008/giomm/giomm.rc
-    MSVC_Net2008/examples/Makefile
-      MSVC_Net2008/examples/dispatcher/Makefile
-      MSVC_Net2008/examples/dispatcher2/Makefile
-      MSVC_Net2008/examples/markup/Makefile
-      MSVC_Net2008/examples/options/Makefile
-      MSVC_Net2008/examples/thread/Makefile      
-      MSVC_Net2008/examples/thread_pool/Makefile
-    MSVC_Net2008/tests/Makefile
-      MSVC_Net2008/tests/glibmm_value/Makefile
-      MSVC_Net2008/tests/giomm_simple/Makefile
-])
+# Copy the generated configuration headers into the MSVC project directories.
+AC_CONFIG_COMMANDS([MSVC_Net2005/glibmm/glibmmconfig.h],
+                   [cp -f glib/glibmmconfig.h MSVC_Net2005/glibmm/glibmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2005/giomm/giommconfig.h],
+                   [cp -f gio/giommconfig.h MSVC_Net2005/giomm/giommconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2008/glibmm/glibmmconfig.h],
+                   [cp -f glib/glibmmconfig.h MSVC_Net2008/glibmm/glibmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2008/giomm/giommconfig.h],
+                   [cp -f gio/giommconfig.h MSVC_Net2008/giomm/giommconfig.h])
 AC_OUTPUT

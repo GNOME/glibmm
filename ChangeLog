@@ -1,5 +1,30 @@
 2009-08-09  Daniel Elstner  <danielk@openismus.com>
 
+	Get rid of all Makefile.am in the MSVC dirs
+
+	* MSVC_Net2005/**/Makefile.am: Delete recursive build files.
+	* MSVC_Net2008/**/Makefile.am: ditto.
+	* MSVC_Net2005/filelist.am: New file.  Recursively list all
+	files that should go into the distribution.
+	* MSVC_Net2008/filelist.am: ditto.
+	* configure.ac (AC_CONFIG_FILES): Remove all Makefile outputs
+	to the MSVC subdirectories.  Combine all the remaining output
+	files into a single argument to just one AC_CONFIG_FILES call.
+	Follow through with a number of TODO comments and remove some
+	old cruft which is no longer used anywhere in the module.
+	(AC_CONFIG_COMMANDS): Copy the configuration header files into
+	the MSVC subdirectories by making config.status execute custom
+	configuration commands.  This is easier than doing it at the
+	Makefile level, where it was previously implemented.
+	* Makefile.am: Include the filelist.am files from the MSVC
+	subdirectories.
+	(SUBDIRS): Remove MSVC_Net200[58] directories from the list.
+	(dist_noinst_DATA): Distribute the MSVC project files.
+	* tools/gmmproc.in: Substitute @PERL@ instead of @PERL_PATH@.
+	* tools/generate_wrap_init.pl.in: ditto.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
 	Bring back the giomm reference documentation
 
 	* glib/{src,glibmm}/filelist.am: Add namespace prefix glibmm_

@@ -28,7 +28,7 @@ doc_subdirs = docs
 else
 doc_subdirs =
 endif
-SUBDIRS = $(src_subdirs) glib/glibmm gio/giomm tests examples $(doc_subdirs) MSVC_Net2005 MSVC_Net2008
+SUBDIRS = $(src_subdirs) glib/glibmm gio/giomm tests examples $(doc_subdirs)
 
 glibmm_includedir = $(includedir)/$(GLIBMM_MODULE_NAME)
 glibmm_include_HEADERS = glib/glibmm.h
@@ -43,7 +43,12 @@ nodist_giomm_libinclude_HEADERS = gio/giommconfig.h
 pkgconfigdir = $(libdir)/pkgconfig
 nodist_pkgconfig_DATA = glib/$(GLIBMM_MODULE_NAME).pc gio/$(GIOMM_MODULE_NAME).pc
 
-dist_noinst_DATA = README.win32 COPYING.tools glib/README gio/README
+include $(srcdir)/MSVC_Net2005/filelist.am
+include $(srcdir)/MSVC_Net2008/filelist.am
+
+text_files = COPYING.tools README.win32 glib/README gio/README
+msvc_files = $(msvc_net2005_data:%=MSVC_Net2005/%) $(msvc_net2008_data:%=MSVC_Net2008/%)
+dist_noinst_DATA = $(text_files) $(msvc_files)
 
 # TODO: Obsolete; remove after grace period.
 aclocal_macrodir = $(datadir)/aclocal
