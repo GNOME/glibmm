@@ -50,6 +50,11 @@ text_files = COPYING.tools README.win32 glib/README gio/README
 msvc_files = $(msvc_net2005_data:%=MSVC_Net2005/%) $(msvc_net2008_data:%=MSVC_Net2008/%)
 dist_noinst_DATA = $(text_files) $(msvc_files)
 
+DISTCLEANFILES = MSVC_Net2005/glibmm/glibmmconfig.h	\
+		 MSVC_Net2005/giomm/giommconfig.h	\
+		 MSVC_Net2008/glibmm/glibmmconfig.h	\
+		 MSVC_Net2008/giomm/giommconfig.h
+
 # TODO: Obsolete; remove after grace period.
 aclocal_macrodir = $(datadir)/aclocal
 dist_aclocal_macro_DATA = scripts/glibmm_check_perl.m4
