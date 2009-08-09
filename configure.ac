@@ -169,9 +169,6 @@ AC_CONFIG_FILES([
   tools/Makefile
   tools/gmmproc
   tools/generate_wrap_init.pl
-    tools/m4/Makefile
-    tools/pm/Makefile
-    tools/extra_defs_gen/Makefile
 ])
 
 AC_CONFIG_FILES([
