@@ -171,13 +171,6 @@ AC_CONFIG_FILES([
 
 AC_CONFIG_FILES([
   tests/Makefile
-    tests/glibmm_value/Makefile
-    tests/glibmm_nodetree/Makefile
-    tests/glibmm_date/Makefile
-    tests/glibmm_ustring_compose/Makefile
-    tests/glibmm_valuearray/Makefile
-    tests/giomm_simple/Makefile
-    tests/giomm_ioerror/Makefile
 
   examples/Makefile
     examples/compose/Makefile
