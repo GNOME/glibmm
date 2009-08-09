@@ -1,5 +1,21 @@
 2009-08-09  Daniel Elstner  <danielk@openismus.com>
 
+	Work around Automake cleverness failure
+
+	* gio/giomm/filelist.am (giomm_files_built_ph): Use the GNU
+	make $(patsubst ...) function instead of $(var:%=foo%bar) if
+	a simple $(var:.a=.b) is not sufficient.  Apparently Automake
+	is able to expand some of these constructs statically, but in
+	some cases it will actually produce the wrong result.  Using
+	$(patsubst ...) helps to avoid the problem because Automake
+	does not attempt to expand it.
+	* glib/glibmm/filelist.am (glibmm_files_built_ph): Use the
+	$(patsubst ...) function here, too.
+	* gio/src/filelist.am (giomm_files_used_hg): Define another
+	intermediate variable to avoid repetition.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
 	Get rid of all Makefile.am in the MSVC dirs
 
 	* MSVC_Net2005/**/Makefile.am: Delete recursive build files.
