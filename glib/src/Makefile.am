@@ -1,22 +1,36 @@
-## Copyright (c) 2002
-## The gtkmm development team.
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of glibmm.
+##
+## glibmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## glibmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-sublib_name = glibmm
-sublib_namespace = Glib
-sublib_parentdir = glibmm
-files_defs = glib.defs glib_enums.defs glib_functions.defs gobject.defs gobject_enums.defs gobject_functions.defs  gmodule_enums.defs gmodule_functions.defs glib_docs.xml glib_docs_override.xml
+# Override code generator commands to use the uninstalled tools.
+gmmproc       = $(PERL) -- $(top_builddir)/tools/gmmproc
+gen_wrap_init = $(PERL) -- $(top_builddir)/tools/generate_wrap_init.pl
 
-include $(top_srcdir)/build_shared/Makefile_gensrc.am_fragment
+binding_name    = glibmm
+wrap_init_flags = --namespace=Glib --parent_dir=glibmm
+codegen_srcdir  = $(top_srcdir)/tools
 
-glibmm_files_m4 = signalproxy.h.m4 value_basictypes.cc.m4 value_basictypes.h.m4
+include $(srcdir)/filelist.am
+include $(top_srcdir)/tools/m4/filelist.am
+include $(top_srcdir)/build/generate-binding.am
 
-files_stamp	+= $(glibmm_files_m4:%.m4=$(gensrc_destdir)/%)
-EXTRA_DIST	+= $(glibmm_files_m4) template.macros.m4
+files_src_m4 = $(files_cc_m4) $(files_h_m4)
 
+other_built_sources += $(files_src_m4:%.m4=$(binding_outputdir)/%)
+dist_noinst_DATA    += $(files_src_m4) template.macros.m4
 
-$(gensrc_destdir)/%.cc: %.cc.m4 template.macros.m4
+$(binding_outputdir)/%: %.m4 template.macros.m4
 	$(M4) -I$(srcdir) $< >$@
-
-$(gensrc_destdir)/%.h: %.h.m4 template.macros.m4
-	$(M4) -I$(srcdir) $< >$@
-

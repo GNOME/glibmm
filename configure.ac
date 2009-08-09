@@ -159,7 +159,6 @@ AC_CONFIG_FILES([
   glib/glibmm-2.4.pc
     glib/src/Makefile
     glib/glibmm/Makefile
-      glib/glibmm/private/Makefile
   
   gio/giomm-2.4.pc
     gio/src/Makefile
