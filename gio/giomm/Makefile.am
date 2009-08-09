@@ -1,33 +1,36 @@
-## Copyright (c) 2007
-## The gtkmm development team.
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of glibmm.
+##
+## glibmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## glibmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS			= private
+lib_LTLIBRARIES = libgiomm-2.4.la
 
-sublib_name		= giomm
-sublib_libname		= giomm-2.4
-sublib_libversion       = $(LIBGLIBMM_SO_VERSION)
-sublib_namespace	= Gio
-sublib_cflags		= $(GIOMM_CFLAGS)
-sublib_topdir = gio
-sublib_win32_dlls_libs	=
+include $(srcdir)/../src/filelist.am
+include $(srcdir)/filelist.am
+include $(top_srcdir)/build/compile-binding.am
 
-sublib_files_extra_posix_cc =
-sublib_files_extra_win32_cc =
-sublib_files_extra_general_cc = init.cc contenttype.cc slot_async.cc
-sublib_files_extra_general_deprecated_cc = 
+dist_noinst_HEADERS = slot_async.h
 
-sublib_files_extra_posix_h =
-sublib_files_extra_win32_h =
-sublib_files_extra_general_h = init.h contenttype.h
-sublib_files_extra_general_deprecated_h = 
+local_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
+local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags)
 
-include $(top_srcdir)/build_shared/Makefile_build.am_fragment
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GIOMM_CFLAGS)
+AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 
-lib_LTLIBRARIES		= libgiomm-2.4.la
-libgiomm_2_4_la_SOURCES	= $(files_built_cc) $(files_extra_cc)
-libgiomm_2_4_la_LDFLAGS	= $(common_ldflags)
-libgiomm_2_4_la_LIBADD	= $(GIOMM_LIBS) \
-                          $(top_builddir)/glib/glibmm/libglibmm-2.4.la
+local_libadd = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
 
-# this header should be distributed, but not installed
-EXTRA_DIST=slot_async.h
+libgiomm_2_4_la_SOURCES = $(binding_sources)
+libgiomm_2_4_la_LDFLAGS = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
+libgiomm_2_4_la_LIBADD  = $(GIOMM_LIBS) $(local_libadd)

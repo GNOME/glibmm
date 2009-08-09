@@ -163,7 +163,6 @@ AC_CONFIG_FILES([
   gio/giomm-2.4.pc
     gio/src/Makefile
     gio/giomm/Makefile
-      gio/giomm/private/Makefile
 
   tools/Makefile
   tools/gmmproc
