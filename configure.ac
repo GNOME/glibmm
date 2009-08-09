@@ -171,18 +171,7 @@ AC_CONFIG_FILES([
 
 AC_CONFIG_FILES([
   tests/Makefile
-
   examples/Makefile
-    examples/compose/Makefile
-    examples/keyfile/Makefile
-    examples/markup/Makefile
-    examples/options/Makefile
-    examples/properties/Makefile
-    examples/thread/Makefile
-    examples/iochannel_stream/Makefile
-    examples/child_watch/Makefile
-    examples/regex/Makefile
-    examples/network_io/Makefile
 
   docs/Makefile
     docs/images/Makefile
