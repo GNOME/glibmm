@@ -17,9 +17,15 @@
 
 include $(top_srcdir)/glib/src/filelist.am
 include $(top_srcdir)/glib/glibmm/filelist.am
+include $(top_srcdir)/gio/src/filelist.am
+include $(top_srcdir)/gio/giomm/filelist.am
+
+glibmm_files_h = $(glibmm_files_built_h) $(glibmm_files_extra_h)
+giomm_files_h  = $(giomm_files_built_h) $(giomm_files_extra_h)
 
 book_name = $(GLIBMM_MODULE_NAME)
-doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(files_built_h))
+doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(glibmm_files_h)) \
+            $(addprefix $(top_srcdir)/gio/giomm/,$(giomm_files_h))
 
 # Override utility locations to point to the local files.
 doc_install         = $(PERL) -- $(srcdir)/doc-install.pl

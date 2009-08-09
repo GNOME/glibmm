@@ -19,6 +19,14 @@ lib_LTLIBRARIES = libglibmm-2.4.la
 
 include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
+
+files_built_cc = $(glibmm_files_built_cc)
+files_built_h  = $(glibmm_files_built_h)
+files_built_ph = $(glibmm_files_built_ph)
+files_extra_cc = $(glibmm_files_extra_cc)
+files_extra_h  = $(glibmm_files_extra_h)
+files_extra_ph = $(glibmm_files_extra_ph)
+
 include $(top_srcdir)/build/compile-binding.am
 
 AM_CPPFLAGS = $(binding_includes) $(binding_cppflags) $(GTHREAD_CFLAGS) $(GLIBMM_CFLAGS)

@@ -19,6 +19,14 @@ lib_LTLIBRARIES = libgiomm-2.4.la
 
 include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
+
+files_built_cc = $(giomm_files_built_cc)
+files_built_h  = $(giomm_files_built_h)
+files_built_ph = $(giomm_files_built_ph)
+files_extra_cc = $(giomm_files_extra_cc)
+files_extra_h  = $(giomm_files_extra_h)
+files_extra_ph = $(giomm_files_extra_ph)
+
 include $(top_srcdir)/build/compile-binding.am
 
 dist_noinst_HEADERS = slot_async.h

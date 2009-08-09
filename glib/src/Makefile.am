@@ -25,9 +25,14 @@ codegen_srcdir  = $(top_srcdir)/tools
 
 include $(srcdir)/filelist.am
 include $(top_srcdir)/tools/m4/filelist.am
+
+files_defs = $(glibmm_files_defs)
+files_ccg  = $(glibmm_files_ccg)
+files_hg   = $(glibmm_files_hg)
+
 include $(top_srcdir)/build/generate-binding.am
 
-files_src_m4 = $(files_cc_m4) $(files_h_m4)
+files_src_m4 = $(glibmm_files_cc_m4) $(glibmm_files_h_m4)
 
 other_built_sources += $(files_src_m4:%.m4=$(binding_outputdir)/%)
 dist_noinst_DATA    += $(files_src_m4) template.macros.m4
