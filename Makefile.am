@@ -46,9 +46,11 @@ nodist_pkgconfig_DATA = glib/$(GLIBMM_MODULE_NAME).pc gio/$(GIOMM_MODULE_NAME).p
 include $(srcdir)/MSVC_Net2005/filelist.am
 include $(srcdir)/MSVC_Net2008/filelist.am
 
-text_files = COPYING.tools README.win32 glib/README gio/README
+text_files = COPYING.tools README.SUN README.win32 glib/README gio/README
 msvc_files = $(msvc_net2005_data:%=MSVC_Net2005/%) $(msvc_net2008_data:%=MSVC_Net2008/%)
+
 dist_noinst_DATA = $(text_files) $(msvc_files)
+dist_noinst_SCRIPTS = autogen.sh
 
 DISTCLEANFILES = MSVC_Net2005/glibmm/glibmmconfig.h	\
 		 MSVC_Net2005/giomm/giommconfig.h	\
