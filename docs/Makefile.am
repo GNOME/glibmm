@@ -20,12 +20,16 @@ include $(top_srcdir)/glib/glibmm/filelist.am
 include $(top_srcdir)/gio/src/filelist.am
 include $(top_srcdir)/gio/giomm/filelist.am
 
-glibmm_files_h = $(glibmm_files_built_h) $(glibmm_files_extra_h)
-giomm_files_h  = $(giomm_files_built_h) $(giomm_files_extra_h)
+glibmm_files_h = $(filter-out wrap_init.h,$(glibmm_files_built_h) $(glibmm_files_extra_h))
+giomm_files_h  = $(filter-out wrap_init.h,$(giomm_files_built_h) $(giomm_files_extra_h))
 
 book_name = $(GLIBMM_MODULE_NAME)
 doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(glibmm_files_h)) \
             $(addprefix $(top_srcdir)/gio/giomm/,$(giomm_files_h))
+
+# Override the web location to use the old-style path with redundant
+# directory components.
+htmlrefpub = http://www.gtkmm.org/docs/$(book_name)/docs/reference/html
 
 # Override utility locations to point to the local files.
 doc_install         = $(PERL) -- $(srcdir)/doc-install.pl
