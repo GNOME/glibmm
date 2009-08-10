@@ -1,4 +1,3 @@
-cv_cxx_has_namespace_std
 ## GLIBMM_CXX_HAS_NAMESPACE_STD()
 ##
 ## Test whether libstdc++ declares namespace std.  For safety,

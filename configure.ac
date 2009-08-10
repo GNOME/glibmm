@@ -93,7 +93,9 @@ DK_CHECK_FEATURE([wide stream],
                   [[std::wostringstream s; (void) s.str();]])
 ])
 
+# TODO: This is completely pointless nowadays.
 GLIBMM_CXX_HAS_NAMESPACE_STD
+
 GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS
 GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR
 GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS

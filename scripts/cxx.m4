@@ -133,15 +133,11 @@ AC_TRY_COMPILE(
     func = &foo::doit<int>; //Compiler bugs usually show here.
     (void)func;
   }
-],[],[
-  glibmm_cxx_member_functions_member_templates=yes
-  AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[1],[does the C++ compiler allow member functions to refer to member templates])
+],[],[glibmm_cxx_member_functions_member_templates=yes
+  AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES], [1],
+            [does the C++ compiler allow member functions to refer to member templates])
+], [glibmm_cxx_member_functions_member_templates=no])
   AC_MSG_RESULT([$glibmm_cxx_member_functions_member_templates])
-],[
-  glibmm_cxx_member_functions_member_templates=no
-  AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES],[0])
-  AC_MSG_RESULT([$glibmm_cxx_member_functions_member_templates])
-])
 ])
 
 ## GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS()
