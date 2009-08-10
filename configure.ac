@@ -40,15 +40,10 @@ AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-AC_MSG_CHECKING([for Windows operating system])
-AS_CASE([$host_os], [cygwin*|mingw*], [glibmm_platform_win32=yes], [glibmm_platform_win32=no])
-AC_MSG_RESULT([$glibmm_platform_win32])
-AM_CONDITIONAL([PLATFORM_WIN32], [test "x$glibmm_platform_win32" = xyes])
-
-AC_MSG_CHECKING([for native Win32 host environment])
-AS_CASE([$host_os], [mingw*], [glibmm_os_win32=yes], [glibmm_os_win32=no])
-AC_MSG_RESULT([$glibmm_os_win32])
-AM_CONDITIONAL([OS_WIN32], [test "x$glibmm_os_win32" = xyes])
+AC_MSG_CHECKING([for native Windows host])
+AS_CASE([$host_os], [mingw*], [glibmm_host_windows=yes], [glibmm_host_windows=no])
+AC_MSG_RESULT([$glibmm_host_windows])
+AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$glibmm_host_windows" = xyes])
 
 AS_IF([test "x$enable_static" = xyes],
 [
@@ -61,13 +56,13 @@ AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 glibreq='2.0 >= 2.21.1'
 GLIBMM_MODULES="sigc++-2.0 >= 2.0 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
 GIOMM_MODULES="$GLIBMM_MODULES gio-$glibreq"
-test "x$glibmm_os_win32" = xyes || GIOMM_MODULES="$GIOMM_MODULES gio-unix-$glibreq"
+test "x$glibmm_host_windows" = xyes || GIOMM_MODULES="$GIOMM_MODULES gio-unix-$glibreq"
 
 PKG_CHECK_MODULES([GLIBMM], [$GLIBMM_MODULES])
 PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
 
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
-MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
+MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs-only-other --libs-only-l gthread-2.0])
 
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 
