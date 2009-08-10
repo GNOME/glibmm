@@ -30,6 +30,7 @@ AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 MM_INIT_MODULE([glibmm-2.4], m4_expand([AC_PACKAGE_VERSION]))
 MM_INIT_MODULE([giomm-2.4],  m4_expand([AC_PACKAGE_VERSION]))
+MM_CONFIG_DOCTOOL_DIR([docs])
 
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 AC_SUBST([LIBGLIBMM_SO_VERSION], [3:0:2])
