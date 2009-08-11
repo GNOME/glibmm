@@ -32,7 +32,7 @@ doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(glibmm_files_h)) \
 htmlrefpub = http://www.gtkmm.org/docs/$(book_name)/docs/reference/html
 
 doctooldir = $(datadir)/$(GLIBMM_MODULE_NAME)/doctool
-dist_doctool_DATA = doc-postprocess.pl doc-install.pl tagfile-to-devhelp2.xsl
+dist_doctool_DATA = doc-install.pl doc-postprocess.pl tagfile-to-devhelp2.xsl
 
 docimagesdir = $(libdocdir)/images
 dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif
