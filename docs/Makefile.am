@@ -31,11 +31,6 @@ doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(glibmm_files_h)) \
 # directory components.
 htmlrefpub = http://www.gtkmm.org/docs/$(book_name)/docs/reference/html
 
-# Override utility locations to point to the local files.
-doc_install         = $(PERL) -- $(srcdir)/doc-install.pl
-doc_postprocess     = $(PERL) -- $(srcdir)/doc-postprocess.pl
-tagfile_to_devhelp2 = $(srcdir)/tagfile-to-devhelp2.xsl
-
 doctooldir = $(datadir)/$(GLIBMM_MODULE_NAME)/doctool
 dist_doctool_DATA = doc-postprocess.pl doc-install.pl tagfile-to-devhelp2.xsl
 
