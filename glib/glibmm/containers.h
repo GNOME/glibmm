@@ -117,12 +117,12 @@ public:
     return tmp;
   }
 
-  reference operator*()  const 
+  reference operator*() const
   {
     return *(pointer)( node_ ? node_->data : glibmm_null_pointer );
   }
-  
-  pointer operator -> () const { return &operator*(); }
+
+  pointer operator->() const { return &*this; }
 };
 
 ///For instance, SList_Iterator< Gtk::Widget >
@@ -168,18 +168,18 @@ public:
     return tmp;
   }
 
-  reference operator*()  const
+  reference operator*() const
   {
-    //g++ complains that this statement has no effect: g_assert(node_);
     return reinterpret_cast<T&>( node_ ? node_->data : glibmm_null_pointer );
   }
 
-  pointer operator -> () const { return &operator*(); }
+  pointer operator->() const { return &*this; }
 };
 
 
 // This iterator variation returns T_IFace (wrapped from T_Impl)
-//  For instance,  List_Cpp_Iterator<GtkWidget, Gtk::Widget> is a little like std::list<Gtk::Widget>::iterator
+// For instance,  List_Cpp_Iterator<GtkWidget, Gtk::Widget> is
+// a little like std::list<Gtk::Widget>::iterator
 template<class T_Impl, class T_IFace>
 class List_Cpp_Iterator : public List_Iterator_Base<T_IFace>
 {
@@ -219,21 +219,19 @@ public:
       //because we can not use a specific Glib::wrap(T_Impl) overload here,
       //because that would be "dependent", and g++ 3.4 does not allow that.
       //The specific Glib::wrap() overloads don't do anything special anyway.
-      GObject* cobj = static_cast<GObject*>( (*node_).data );
-      
-      #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
-      return *(dynamic_cast<pointer>(Glib::wrap_auto(cobj, false /* take_copy */)));
-      #else
+      GObject* cobj = static_cast<GObject*>(node_->data);
+
+#ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+      return *dynamic_cast<pointer>(Glib::wrap_auto(cobj, false));
+#else
       //We really do need to use dynamic_cast<>, so I expect problems if this code is used. murrayc.
-      return *(static_cast<pointer>(Glib::wrap_auto(cobj, false /* take_copy */)));
-      #endif
-      
+      return *static_cast<pointer>(Glib::wrap_auto(cobj, false));
+#endif
     }
-    
-    return *(pointer)glibmm_null_pointer;
+    return *static_cast<pointer>(0); // boom!
   }
 
-  pointer operator->() const { return &operator*(); }
+  pointer operator->() const { return &*this; }
 
   Self&  operator++()
   {
@@ -268,7 +266,6 @@ public:
     --*this;
     return tmp;
   }
-
 };
 
 template <class T_Base>
@@ -353,7 +350,7 @@ public:
   Self operator--(int) {Self src = *this; T_Base::operator--(); return src;}
 
   reference operator*() const { return T_Base::operator*(); }
-  pointer operator->()   const { return T_Base::operator->(); }
+  pointer operator->() const { return T_Base::operator->(); }
 };
 
 } // namespace Glib
@@ -361,4 +358,3 @@ public:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 #endif /* _GLIBMM_CONTAINERS_H */
-
