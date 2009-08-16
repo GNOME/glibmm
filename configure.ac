@@ -136,9 +136,11 @@ AC_CONFIG_FILES([Makefile
                  tools/gmmproc
                  tools/generate_wrap_init.pl
                  glib/glibmm-2.4.pc
+                 glib/glibmm-2.4-uninstalled.pc
                  glib/src/Makefile
                  glib/glibmm/Makefile
                  gio/giomm-2.4.pc
+                 gio/giomm-2.4-uninstalled.pc
                  gio/src/Makefile
                  gio/giomm/Makefile
                  tests/Makefile
