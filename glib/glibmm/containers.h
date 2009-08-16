@@ -122,7 +122,7 @@ public:
     return *(pointer)( node_ ? node_->data : glibmm_null_pointer );
   }
 
-  pointer operator->() const { return &*this; }
+  pointer operator->() const { return &**this; }
 };
 
 ///For instance, SList_Iterator< Gtk::Widget >
@@ -173,7 +173,7 @@ public:
     return reinterpret_cast<T&>( node_ ? node_->data : glibmm_null_pointer );
   }
 
-  pointer operator->() const { return &*this; }
+  pointer operator->() const { return &**this; }
 };
 
 
@@ -231,7 +231,7 @@ public:
     return *static_cast<pointer>(0); // boom!
   }
 
-  pointer operator->() const { return &*this; }
+  pointer operator->() const { return &**this; }
 
   Self&  operator++()
   {
