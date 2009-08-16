@@ -62,9 +62,9 @@ void foo::thebug()
 void (foo::*func)();
 func = &foo::doit<int>;
 (void)func;
-]],
+]])],
     [glibmm_cv_cxx_member_functions_member_templates=yes],
-    [glibmm_cv_cxx_member_functions_member_templates=no])])])
+    [glibmm_cv_cxx_member_functions_member_templates=no])])
 
 AS_IF([test "x$glibmm_cv_cxx_member_functions_member_templates" = xyes],
       [AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES], [1],
@@ -111,9 +111,9 @@ Traits< Foo<const int> > cfit;
 (void) it.whoami();
 (void) fit.whoami();
 (void) cfit.whoami();
-]],
+]])],
     [glibmm_cv_cxx_can_disambiguate_const_template_specializations=yes],
-    [glibmm_cv_cxx_can_disambiguate_const_template_specializations=no])])])
+    [glibmm_cv_cxx_can_disambiguate_const_template_specializations=no])])
 
 AS_IF([test "x$glibmm_cv_cxx_can_disambiguate_const_template_specializations" = xyes],
       [AC_DEFINE([GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS], [1],
@@ -148,9 +148,9 @@ class SomeTemplate
     return (dynamic_cast<T*>(some_function()) != 0);
   }
 };
-]],,
+]], [])],
     [glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition=yes],
-    [glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition=no])])])
+    [glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition=no])])
 
 AS_IF([test "x$glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition" = xyes],
       [AC_DEFINE([GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION], [1],
@@ -182,9 +182,9 @@ void somefunction(int) {}
 ]], [[
 somestruct something;
 something.callback = &somefunction;
-]],
+]])],
     [glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks=yes],
-    [glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks=no])])])
+    [glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks=no])])
 
 AS_IF([test "x$glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks" = xyes],
       [AC_DEFINE([GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS], [1],
@@ -228,9 +228,9 @@ void do_something()
 }
 
 } // namespace test
-]],,
+]], [])],
     [glibmm_cv_cxx_can_use_namespaces_inside_externc=yes],
-    [glibmm_cv_cxx_can_use_namespaces_inside_externc=no])])])
+    [glibmm_cv_cxx_can_use_namespaces_inside_externc=no])])
 
 AS_IF([test "x$glibmm_cv_cxx_can_use_namespaces_inside_externc" = xyes],
       [AC_DEFINE([GLIBMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC], [1],
