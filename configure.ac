@@ -21,7 +21,7 @@ AC_PREREQ([2.59])
 
 AC_CONFIG_SRCDIR([glib/glibmm.h])
 AC_CONFIG_AUX_DIR([build])
-AC_CONFIG_MACRO_DIR([scripts])
+AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_HEADERS([config.h glib/glibmmconfig.h gio/giommconfig.h])
 
 AM_INIT_AUTOMAKE([1.9 -Wno-portability dist-bzip2 no-define nostdinc tar-pax])

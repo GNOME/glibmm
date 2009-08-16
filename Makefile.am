@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS	= -I scripts ${ACLOCAL_FLAGS}
+ACLOCAL_AMFLAGS	= -I build ${ACLOCAL_FLAGS}
 DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
 if MAINTAINER_MODE
@@ -57,4 +57,4 @@ DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files))
 
 # TODO: Obsolete; remove after grace period.
 aclocal_macrodir = $(datadir)/aclocal
-dist_aclocal_macro_DATA = scripts/glibmm_check_perl.m4
+dist_aclocal_macro_DATA = build/glibmm_check_perl.m4
