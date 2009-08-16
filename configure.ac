@@ -62,11 +62,12 @@ PKG_CHECK_MODULES([GLIBMM], [$GLIBMM_MODULES])
 PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
 
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
-MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs-only-other --libs-only-l gthread-2.0])
+MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 
-# Check for the SUN Forte compiler, and define GLIBMM_COMPILER_SUN_FORTE in the header.
+# Check for the SUN Forte compiler, and define GLIBMM_COMPILER_SUN_FORTE
+# in the header.
 GLIBMM_PROG_CXX_SUN
 
 AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
