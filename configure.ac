@@ -46,13 +46,12 @@ AS_CASE([$host_os], [mingw*], [glibmm_host_windows=yes], [glibmm_host_windows=no
 AC_MSG_RESULT([$glibmm_host_windows])
 AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$glibmm_host_windows" = xyes])
 
+# TODO: This makes no sense. --danielk
 AS_IF([test "x$enable_static" = xyes],
 [
-  AC_DEFINE([GLIBMM_STATIC_LIB], [1], [Defined when glibmm is built as a static library])
-  AC_DEFINE([GIOMM_STATIC_LIB],  [1], [Defined when giomm is built as a static library])
+  AC_DEFINE([GLIBMM_STATIC_LIB], [1], [Define if glibmm is built as a static library])
+  AC_DEFINE([GIOMM_STATIC_LIB],  [1], [Define if giomm is built as a static library])
 ])
-
-AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 
 glibreq='2.0 >= 2.21.1'
 GLIBMM_MODULES="sigc++-2.0 >= 2.0 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
@@ -70,6 +69,8 @@ AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 # Check for the SUN Forte compiler, and define GLIBMM_COMPILER_SUN_FORTE in the header.
 GLIBMM_PROG_CXX_SUN
 
+AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
+
 # Ensure MSVC-compatible struct packing convention is used when
 # compiling for Win32 with gcc.
 # TODO: Disabled for now. I don't think this should be enabled by the
@@ -78,24 +79,12 @@ GLIBMM_PROG_CXX_SUN
 
 AC_LANG([C++])
 
-# TODO: I think we can just get rid of these checks.
-glibmm_config_error=no
-AC_CXX_BOOL(,       [glibmm_config_error=yes])
-AC_CXX_NAMESPACES(, [glibmm_config_error=yes])
-AC_CXX_MUTABLE(,    [glibmm_config_error=yes])
-
-AS_IF([test "x$glibmm_config_error" = xyes],
-      [AC_MSG_FAILURE([[Your compiler is not powerful enough to compile glibmm.]])])
-
 AC_CHECK_SIZEOF([wchar_t])
 DK_CHECK_FEATURE([wide stream],
 [
   AC_LANG_PROGRAM([[#include <sstream>]],
                   [[std::wostringstream s; (void) s.str();]])
 ])
-
-# TODO: This is completely pointless nowadays.
-GLIBMM_CXX_HAS_NAMESPACE_STD
 
 GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS
 GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR
