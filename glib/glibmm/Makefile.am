@@ -29,7 +29,9 @@ files_extra_ph = $(glibmm_files_extra_ph)
 
 include $(top_srcdir)/build/compile-binding.am
 
-AM_CPPFLAGS = $(binding_includes) $(binding_cppflags) $(GTHREAD_CFLAGS) $(GLIBMM_CFLAGS)
+local_cppflags = $(binding_includes) $(binding_cppflags) -DGLIBMM_BUILD=1
+
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GLIBMM_CFLAGS)
 AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 
 libglibmm_2_4_la_SOURCES = $(binding_sources)

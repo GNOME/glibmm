@@ -32,7 +32,7 @@ include $(top_srcdir)/build/compile-binding.am
 dist_noinst_HEADERS = slot_async.h
 
 local_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
-local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags)
+local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags) -DGIOMM_BUILD=1
 
 AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GIOMM_CFLAGS)
 AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
