@@ -1,7 +1,6 @@
 // -*- c++ -*-
 #ifndef _GLIBMM_VALUE_H
 #define _GLIBMM_VALUE_H
-/* $Id$ */
 
 /* Copyright 2002 The gtkmm Development Team
  *
@@ -20,10 +19,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib-object.h>
+#include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
-
+#include <glib-object.h>
 
 namespace Glib
 {

@@ -1,7 +1,6 @@
 // -*- c++ -*-
 #ifndef _GLIBMM_UTILITY_H
 #define _GLIBMM_UTILITY_H
-/* $Id$ */
 
 /* Copyright 2002 The gtkmm Development Team
  *
@@ -20,9 +19,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
+#include <glibmmconfig.h>
 #include <glibmm/ustring.h>
-
+#include <glib.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -111,6 +110,4 @@ void append_canonical_typename(std::string& dest, const char* type_name);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
-
 #endif /* _GLIBMM_UTILITY_H */
-

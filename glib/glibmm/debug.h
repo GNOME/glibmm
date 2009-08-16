@@ -2,8 +2,6 @@
 #ifndef _GLIBMM_DEBUG_H
 #define _GLIBMM_DEBUG_H
 
-/* $Id$ */
-
 /* Copyright 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -21,8 +19,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
 #include <glibmmconfig.h>
+#include <glib.h>
 
 // Some stuff that's useful when debugging gtkmm internals:
 

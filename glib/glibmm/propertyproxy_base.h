@@ -1,7 +1,6 @@
 // -*- c++ -*-
 #ifndef _GLIBMM_PROPERTYPROXY_BASE_H
 #define _GLIBMM_PROPERTYPROXY_BASE_H
-/* $Id$ */
 
 /* propertyproxy_base.h
  *
@@ -23,7 +22,6 @@
  */
 
 #include <glibmmconfig.h>
-
 #include <glibmm/value.h>
 #include <glibmm/signalproxy.h>
 

@@ -27,12 +27,9 @@
 #endif
 #endif
 
+#include <glibmmconfig.h>
 #include <new>
 #include <typeinfo>
-#include <glibmmconfig.h>
-
-GLIBMM_USING_STD(nothrow)
-
 
 namespace Glib
 {

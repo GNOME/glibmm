@@ -2,8 +2,6 @@
 #ifndef _GLIBMM_MAIN_H
 #define _GLIBMM_MAIN_H
 
-/* $Id$ */
-
 /* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -21,18 +19,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
-
-#include <vector>
-#include <sigc++/sigc++.h>
-
 #include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/timeval.h>
 #include <glibmm/priorities.h>
-
-GLIBMM_USING_STD(vector)
-
+#include <sigc++/sigc++.h>
+#include <glib.h>
+#include <vector>
 
 namespace Glib
 {
@@ -41,12 +34,10 @@ class Cond;
 class Mutex;
 class IOChannel;
 
-
 /** @defgroup MainLoop The Main Event Loop
  * Manages all available sources of events.
  * @{
  */
-
 
 /** A bitwise combination representing an I/O condition to watch for on an
  * event source.

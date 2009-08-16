@@ -1,5 +1,4 @@
 // -*- c++ -*-
-/* $Id$ */
 
 /* exceptionhandler.cc
  *
@@ -20,17 +19,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
-#include <exception>
-#include <list>
-
 #include <glibmmconfig.h>
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/thread.h>
-
-GLIBMM_USING_STD(exception)
-GLIBMM_USING_STD(list)
+#include <glib.h>
+#include <exception>
+#include <list>
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 

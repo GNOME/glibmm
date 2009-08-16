@@ -2,8 +2,6 @@
 #ifndef _GLIBMM_CONTAINERS_H
 #define _GLIBMM_CONTAINERS_H
 
-/* $Id$ */
-
 /* containers.h
  *
  * Copyright (C) 1998-2002 The gtkmm Development Team
@@ -23,15 +21,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
-#include <glibmm/sarray.h> /* for backward compatibility */
-
-#include <iterator>
 #include <glibmmconfig.h>
-
-GLIBMM_USING_STD(bidirectional_iterator_tag)
-GLIBMM_USING_STD(forward_iterator_tag)
-
+#include <glibmm/sarray.h> /* for backward compatibility */
+#include <glib.h>
+#include <iterator>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

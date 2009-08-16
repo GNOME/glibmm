@@ -21,28 +21,17 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
+#include <glibmmconfig.h>
 #include <glibmm/unicode.h>
+#include <glib.h>
 
 #include <iosfwd>
 #include <iterator>
 #include <sstream>
 #include <string>
-
-#include <glibmmconfig.h>
-GLIBMM_USING_STD(bidirectional_iterator_tag)
-GLIBMM_USING_STD(reverse_iterator)
-GLIBMM_USING_STD(string)
-GLIBMM_USING_STD(istream)
-GLIBMM_USING_STD(ostream)
-
-#ifdef GLIBMM_HAVE_STD_ITERATOR_TRAITS
-GLIBMM_USING_STD(iterator_traits)
-#else
+#ifndef GLIBMM_HAVE_STD_ITERATOR_TRAITS
 #include <cstddef> /* for ptrdiff_t */
-GLIBMM_USING_STD(random_access_iterator_tag)
 #endif
-
 
 namespace Glib
 {

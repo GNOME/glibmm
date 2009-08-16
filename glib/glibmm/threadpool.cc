@@ -1,5 +1,4 @@
 // -*- c++ -*-
-/* $Id$ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
  *
@@ -18,14 +17,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/exceptionhandler.h>
 #include <glib.h>
 #include <list>
-#include <glibmmconfig.h>
-
-GLIBMM_USING_STD(list)
-
 
 namespace Glib
 {

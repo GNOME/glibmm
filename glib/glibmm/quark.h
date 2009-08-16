@@ -1,7 +1,6 @@
 // -*- c++ -*-
 #ifndef _GLIBMM_QUARK_H
 #define _GLIBMM_QUARK_H
-/* $Id$ */
 
 /* quark.h
  *
@@ -22,9 +21,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
+#include <glibmmconfig.h>
 #include <glibmm/ustring.h>
-
+#include <glib.h>
 
 namespace Glib
 {
