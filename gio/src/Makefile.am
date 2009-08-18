@@ -16,7 +16,7 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
 # Override code generator commands to use the uninstalled tools.
-gmmproc       = $(PERL) -- $(top_builddir)/tools/gmmproc
+gmmproc = $(PERL) -I$(top_srcdir)/tools/pm -- $(top_builddir)/tools/gmmproc
 gen_wrap_init = $(PERL) -- $(top_builddir)/tools/generate_wrap_init.pl
 
 binding_name    = giomm

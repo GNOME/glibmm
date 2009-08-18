@@ -16,7 +16,7 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
 # Override code generator commands to use the uninstalled tools.
-gmmproc       = $(PERL) -- $(top_builddir)/tools/gmmproc
+gmmproc = $(PERL) -I$(top_srcdir)/tools/pm -- $(top_builddir)/tools/gmmproc
 gen_wrap_init = $(PERL) -- $(top_builddir)/tools/generate_wrap_init.pl
 
 binding_name    = glibmm
@@ -34,7 +34,7 @@ include $(top_srcdir)/build/generate-binding.am
 
 files_src_m4 = $(glibmm_files_cc_m4) $(glibmm_files_h_m4)
 
-other_built_sources += $(files_src_m4:%.m4=$(binding_outputdir)/%)
+other_built_sources += $(patsubst %.m4,$(binding_outputdir)/%,$(files_src_m4))
 dist_noinst_DATA    += $(files_src_m4) template.macros.m4
 
 $(binding_outputdir)/%: %.m4 template.macros.m4
