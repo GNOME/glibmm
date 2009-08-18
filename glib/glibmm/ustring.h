@@ -598,7 +598,7 @@ public:
 //! @{
 
   /* Returns fmt as is, but checks for invalid references in the format string.
-   * @newin2p18
+   * @since{2,18}
    */
   template <class T1>
   static inline
@@ -620,21 +620,21 @@ public:
    * @return The substituted message string.
    * @throw Glib::ConvertError
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1>
   static inline
   ustring compose(const ustring& fmt, const T1& a1);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2>
   static inline
   ustring compose(const ustring& fmt, const T1& a1, const T2& a2);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3>
   static inline
@@ -642,7 +642,7 @@ public:
                   const T1& a1, const T2& a2, const T3& a3);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4>
   static inline
@@ -651,7 +651,7 @@ public:
                   const T4& a4);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5>
   static inline
@@ -660,7 +660,7 @@ public:
                   const T4& a4, const T5& a5);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6>
   static inline
@@ -669,7 +669,7 @@ public:
                   const T4& a4, const T5& a5, const T6& a6);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
   static inline
@@ -679,7 +679,7 @@ public:
                   const T7& a7);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7, class T8>
@@ -690,7 +690,7 @@ public:
                   const T7& a7, const T8& a8);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5,
             class T6, class T7, class T8, class T9>
@@ -728,7 +728,7 @@ public:
    * @return The string representation of the argument stream.
    * @throw Glib::ConvertError
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1>
   static inline
@@ -736,7 +736,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2>
   static inline
@@ -744,7 +744,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3>
   static inline
@@ -752,7 +752,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4>
   static inline
@@ -760,7 +760,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5>
   static inline
@@ -769,7 +769,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6>
   static inline
@@ -778,7 +778,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7>
@@ -788,7 +788,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @since{2,16}
    */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7, class T8>

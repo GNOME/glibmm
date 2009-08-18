@@ -121,7 +121,7 @@ public:
 #endif //GLIBMM_DISABLE_DEPRECATED
 
   /** Set underlying instance to 0, decrementing reference count of existing instance appropriately.
-   * @newin2p16
+   * @since{2,16}
    */
   inline void reset();
 
