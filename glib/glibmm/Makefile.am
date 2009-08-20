@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-lib_LTLIBRARIES = libglibmm-2.4.la
+lib_LTLIBRARIES = libglibmm-@GLIBMM_API_VERSION@.la
 
 include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
@@ -34,6 +34,6 @@ local_cppflags = $(binding_includes) $(binding_cppflags) -DGLIBMM_BUILD=1
 AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GLIBMM_CFLAGS)
 AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 
-libglibmm_2_4_la_SOURCES = $(binding_sources)
-libglibmm_2_4_la_LDFLAGS = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
-libglibmm_2_4_la_LIBADD  = $(GLIBMM_LIBS)
+libglibmm_@GLIBMM_API_VERSION@_la_SOURCES = $(binding_sources)
+libglibmm_@GLIBMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
+libglibmm_@GLIBMM_API_VERSION@_la_LIBADD  = $(GLIBMM_LIBS)

@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-lib_LTLIBRARIES = libgiomm-2.4.la
+lib_LTLIBRARIES = libgiomm-@GIOMM_API_VERSION@.la
 
 include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
@@ -39,6 +39,6 @@ AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 
 local_libadd = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
 
-libgiomm_2_4_la_SOURCES = $(binding_sources)
-libgiomm_2_4_la_LDFLAGS = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
-libgiomm_2_4_la_LIBADD  = $(GIOMM_LIBS) $(local_libadd)
+libgiomm_@GIOMM_API_VERSION@_la_SOURCES = $(binding_sources)
+libgiomm_@GIOMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
+libgiomm_@GIOMM_API_VERSION@_la_LIBADD  = $(GIOMM_LIBS) $(local_libadd)
