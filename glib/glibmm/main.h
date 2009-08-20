@@ -191,7 +191,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    *
-   * @since{2,14}
+   * @newin{2,14}
    */
   sigc::connection connect_seconds(const sigc::slot<bool>& slot, unsigned int interval,
                            int priority = PRIORITY_DEFAULT);

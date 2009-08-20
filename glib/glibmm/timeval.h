@@ -53,7 +53,7 @@ struct TimeVal : public GTimeVal
    * @param iso_date ISO 8601 encoded string.
    * @return <tt>true</tt> if conversion was successful.
    *
-   * @since{2,22}
+   * @newin{2,22}
    */
   bool assign_from_iso8601(const Glib::ustring& iso_date);
 
@@ -81,7 +81,7 @@ struct TimeVal : public GTimeVal
   /** Returns an ISO 8601 encoded string, relative to the Coordinated
    * Universal Time (UTC).
    *
-   * @since{2,22}
+   * @newin{2,22}
    */
   Glib::ustring as_iso8601() const;
 

@@ -371,8 +371,8 @@ sub convert_tags_to_doxygen($)
     # Remove all para tags (from tmpl sgml files).
     s"&lt;/?para&gt;""g;
 
-    # Use our Doxygen @since alias:
-    s/\bSince:\s*(\d+)\.(\d+)\b/\@since{$1,$2}/g;
+    # Use our Doxygen @newin alias:
+    s/\bSince:\s*(\d+)\.(\d+)\b/\@newin{$1,$2}/g;
 
     s"\b-&gt;\b"->"g;
 
