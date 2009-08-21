@@ -40,6 +40,8 @@ AC_PROG_CXX
 AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
+MM_PATH_PERL
+AS_IF([test "x$USE_MAINTAINER_MODE" != xno], [MM_CHECK_PERL])
 
 AC_MSG_CHECKING([for native Windows host])
 AS_CASE([$host_os], [mingw*], [glibmm_host_windows=yes], [glibmm_host_windows=no])
