@@ -28,7 +28,7 @@ AM_INIT_AUTOMAKE([1.9 -Wno-portability dist-bzip2 no-define nostdinc tar-pax])
 AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
-MM_PREREQ([0.4])
+MM_PREREQ([0.6])
 MM_INIT_MODULE([glibmm-2.4])
 MM_INIT_MODULE([giomm-2.4])
 MM_CONFIG_DOCTOOL_DIR([docs])
@@ -113,15 +113,12 @@ MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
                        [-pedantic -Wall -Wextra],
                        [G])
 
-#Offer the ability to omit some API from the library, 
-#to reduce the code size:
-GLIBMM_ARG_ENABLE_API_DEPRECATED
+# Offer the ability to omit some API from the library,
+# to reduce the code size:
+MM_ARG_DISABLE_DEPRECATED_API([GLIBMM GIOMM])
 GLIBMM_ARG_ENABLE_API_EXCEPTIONS
 GLIBMM_ARG_ENABLE_API_PROPERTIES
 GLIBMM_ARG_ENABLE_API_VFUNCS
-
-# Offer the ability to omit some API from the library, 
-# to reduce the code size:
 GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS
 
 AC_CONFIG_FILES([Makefile

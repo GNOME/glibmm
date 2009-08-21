@@ -58,33 +58,6 @@ AC_DEFUN([GLIBMM_ARG_ENABLE_API_EXCEPTIONS],
   fi
 ])
 
-## GLIBMM_ARG_ENABLE_API_DEPRECATED()
-##
-## Provide the --enable-deprecated-api configure argument, enabled
-## by default.
-##
-AC_DEFUN([GLIBMM_ARG_ENABLE_API_DEPRECATED],
-[
-  AC_ARG_ENABLE(deprecated-api, 
-      [  --enable-deprecated-api  Include (build) deprecated API in the libraries.
-                              [[default=yes]]],
-      [glibmm_enable_api_deprecated="$enableval"],
-      [glibmm_enable_api_deprecated='yes'])
-
-  if test "x$glibmm_enable_api_deprecated" = "xyes"; then
-  {
-    AC_MSG_WARN([Deprecated API will be built, for backwards-compatibility.])
-  }
-  else
-  {
-    AC_MSG_WARN([Deprecated API will not be built, breaking backwards-compatibility. Do not use this build for distribution packages.])
-    DISABLE_DEPRECATED_API_CFLAGS="-DGLIBMM_DISABLE_DEPRECATED"
-    AC_SUBST(DISABLE_DEPRECATED_API_CFLAGS)
-  }
-  fi
-])
-
-
 ## GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS()
 ##
 ## Provide the --enable-api-default-signal-handlers configure argument, enabled
