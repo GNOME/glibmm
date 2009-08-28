@@ -39,6 +39,4 @@ dist_noinst_DATA +=				\
 	internal/documentation_generation.txt	\
 	internal/gmmproc_internals.txt		\
 	internal/using_gmmproc.txt		\
-	internal/gtk_entry.dia			\
-	reference/glibmm_header.html_fragment	\
-	reference/glibmm_footer.html_fragment
+	internal/gtk_entry.dia
