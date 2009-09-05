@@ -242,10 +242,6 @@ GLIBMM_C_STD_TIME_T_IS_NOT_INT32()
 # Create a list of input directories for Doxygen.
 GTKMM_DOXYGEN_INPUT_SUBDIRS([glib gio])
 
-# Check whether to build the full docs into the generated source.
-# This will be much slower.
-GTKMM_ARG_ENABLE_FULLDOCS()
-
 # Check whether --enable-debug-refcounting was given.
 GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING()
 
