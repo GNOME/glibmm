@@ -60,7 +60,7 @@ void on_age_changed ()
 { std::cout << "- age changed!" << std::endl; }
 #endif // GLIBMM_PROPERTIES_ENABLED
 
-int main (int argc, char** argv)
+int main(int, char**)
 {
 #ifdef GLIBMM_PROPERTIES_ENABLED
     Glib::init ();

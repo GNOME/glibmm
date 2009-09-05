@@ -26,7 +26,7 @@
 # include <gio/gunixoutputstream.h>
 #endif
 
-int main (int argc, char** argv)
+int main(int, char**)
 {
   g_type_init ();
 
