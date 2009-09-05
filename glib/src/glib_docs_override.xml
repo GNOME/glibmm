@@ -88,8 +88,9 @@
 
 <function name="g_key_file_get_double">
 <description>
-Return value: the value associated with the key as a double, or
+Return value: the value associated with the key as a double.
 
+\throw Glib::KeyFileError
 </description>
 <parameters>
 <parameter name="key_file">
@@ -152,8 +153,8 @@ Since: 2.14
 Loads a key file into an empty KeyFile instance.
 If the file could not be loaded then a FileError or KeyFileError exception is thrown.
 
-@throw Glib::FileError
-@throw Glib::KeyFileError
+\throw Glib::FileError
+\throw Glib::KeyFileError
 </description>
 <parameters>
 <parameter name="key_file">
@@ -183,8 +184,8 @@ Since: 2.6
 <description>
 Returns the value associated with @key under @group_name.
 
-@throw Glib::FileError in the event the key cannot be found (with the Glib::KEY_FILE_ERROR_KEY_NOT_FOUND code).
-@throw Glib::KeyFileError in the event that the @group_name cannot be found (with the Glib::KEY_FILE_ERROR_GROUP_NOT_FOUND).
+\throw Glib::FileError in the event the key cannot be found (with the Glib::KEY_FILE_ERROR_KEY_NOT_FOUND code).
+\throw Glib::KeyFileError in the event that the @group_name cannot be found (with the Glib::KEY_FILE_ERROR_GROUP_NOT_FOUND).
 </description>
 <parameters>
 <parameter name="key_file">
@@ -210,6 +211,344 @@ Since: 2.6
 </return>
 </function>
 
+<function name="g_key_file_get_comment">
+<description>
+Retrieves a comment above @key from @group_name.
+If @key is %NULL then @comment will be read from above 
+@group_name. If both @key and @group_name are %NULL, then 
+@comment will be read from above the first group in the file.
+Use the overrides for a %NULL @key or @group.
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> The comment
+
+Since: 2.6
+</return>
+</function>
+
+<function name="g_key_file_set_comment">
+<description>
+Places a comment above @key from @group_name.
+If @key is %NULL then @comment will be written above @group_name.  
+If both @key and @group_name  are %NULL, then @comment will be 
+written above the first group in the file.
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="comment">
+<parameter_description> a comment
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_key_file_remove_comment">
+<description>
+Removes a comment above @key from @group_name.
+If @key is %NULL then @comment will be removed above @group_name. 
+If both @key and @group_name are %NULL, then @comment will
+be removed above the first group in the file.
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_key_file_has_key">
+<description>
+Looks whether the key file has the key @key in the group
+@group_name. 
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key name
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @key is a part of @group_name, %FALSE
+otherwise.
+
+Since: 2.6
+</return>
+</function>
+
+<function name="g_key_file_get_value">
+<description>
+Return value: a newly allocated string or %NULL.
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string or %NULL if the specified 
+key cannot be found.
+
+Since: 2.6
+</return>
+</function>
+
+<function name="g_key_file_get_string">
+<description>
+Return value: a newly allocated string or %NULL.
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string or %NULL if the specified 
+key cannot be found.
+
+Since: 2.6
+</return>
+</function>
+
+<function name="g_key_file_get_locale_string">
+<description>
+Return value: a newly allocated string or %NULL.
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="locale">
+<parameter_description> a locale identifier or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string or %NULL if the specified 
+key cannot be found.
+
+Since: 2.6
+</return>
+</function>
+
+<function name="g_key_file_get_boolean">
+<description>
+Return value: the value associated with the key as a boolean.
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value associated with the key as a boolean, 
+or %FALSE if the key was not found or could not be parsed.
+
+Since: 2.6
+</return>
+</function>
+
+<function name="g_key_file_get_integer">
+<description>
+Return value: the value associated with the key as an integer.
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value associated with the key as an integer, or
+0 if the key was not found or could not be parsed.
+
+Since: 2.6
+</return>
+</function>
+
+<function name="g_key_file_remove_group">
+<description>
+Removes the specified group, @group_name, 
+from the key file. 
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_key_file_remove_key">
+<description>
+Removes @key in @group_name from the key file. 
+
+\throw Glib::KeyFileError
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key name to remove
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
 
 </root>
-

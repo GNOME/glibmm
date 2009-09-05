@@ -116,7 +116,6 @@ public:
   KeyFile(GKeyFile* castitem, bool takes_ownership = false);
 
 public:
-	
   _WRAP_METHOD(bool load_from_file(const std::string& filename, KeyFileFlags flags = Glib::KEY_FILE_NONE), g_key_file_load_from_file, errthrow)
 
   /** Loads a KeyFile from memory
@@ -125,8 +124,11 @@ public:
    * @return true if the KeyFile was successfully loaded, false otherwise
    * @throw Glib::KeyFileError
    */
-
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool load_from_data(const Glib::ustring& data, KeyFileFlags flags = Glib::KEY_FILE_NONE);
+#else
+  bool load_from_data(const Glib::ustring& data, KeyFileFlags flags = Glib::KEY_FILE_NONE, std:auto_ptr<Glib::Error>& error);
+#endif
   _IGNORE(g_key_file_load_from_data)
 
   //TODO: 
@@ -150,13 +152,22 @@ public:
    * @throw Glib::KeyFileError
    * @throw Glib::FileError
    */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool load_from_data_dirs(const std::string& file, std::string& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE);
+#else
+  bool load_from_data_dirs(const std::string& file, std::string& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE, std:auto_ptr<Glib::Error>& error);
+#endif
   _IGNORE(g_key_file_load_from_data_dirs)
 
   /** Outputs the KeyFile as a string
    * @return A string object holding the contents of KeyFile
+   * @throw Glib::KeyFileError
    */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ustring to_data();
+#else
+  Glib::ustring to_data(std:auto_ptr<Glib::Error>& error);
+#endif
   _IGNORE(g_key_file_to_data)
 
   _WRAP_METHOD(Glib::ustring get_start_group() const, g_key_file_get_start_group)
@@ -170,8 +181,13 @@ public:
   /** Gets a list of all keys from the group @a group_name.
    * @param group_name The name of a group
    * @returns A list containing the names of the keys in @a group_name
+   * @throw Glib::KeyFileError
    */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ArrayHandle<Glib::ustring> get_keys(const Glib::ustring& group_name) const;
+#else
+  Glib::ArrayHandle<Glib::ustring> get_keys(const Glib::ustring& group_name, std:auto_ptr<Glib::Error>& error) const;
+#endif
   _IGNORE(g_key_file_get_keys)
 
   _WRAP_METHOD(bool has_group(const Glib::ustring& group_name) const, g_key_file_has_group)
@@ -181,9 +197,16 @@ public:
   _WRAP_METHOD(Glib::ustring get_string(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_string, errthrow)
 
   /** Gets the value associated with @a key under @a group_name translated
-  * into the current locale.
+   * into the current locale.
+   * @return the value as a Glib::ustring
+   * @throw Glib::KeyFileError
   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ustring get_locale_string(const Glib::ustring& group_name, const Glib::ustring& key) const;
+#else
+  Glib::ustring get_locale_string(const Glib::ustring& group_name, const Glib::ustring& key, std:auto_ptr<Glib::Error>& error) const;
+#endif
+  _IGNORE(g_key_file_get_locale_string)
 
   _WRAP_METHOD(Glib::ustring get_locale_string(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale) const, g_key_file_get_locale_string, errthrow)
   _WRAP_METHOD(bool get_boolean(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_boolean, errthrow)
@@ -192,7 +215,7 @@ public:
    * an integer.
    * @param key The name of the key
    * @return The value of @a key as an integer
-   * @throws Glib::KeyFileError
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   int get_integer(const Glib::ustring& key) const;
@@ -205,7 +228,7 @@ public:
    * a double.
    * @param key The name of the key
    * @return The value of @a key as an double
-   * @throws Glib::KeyFileError
+   * @throw Glib::KeyFileError
    *
    * @newin2p14
    */
@@ -231,7 +254,7 @@ public:
    * @param group_name The name of a group
    * @param key The name of a key
    * @return A list containing the values requested
-   * @throws Glib::KeyFileError
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ArrayHandle<Glib::ustring> get_string_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
@@ -245,7 +268,7 @@ public:
    * @param group_name The name of a group
    * @param key The name of a key
    * @return A list containing the values requested
-   * @throws Glib::KeyFileError
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ArrayHandle<Glib::ustring> get_locale_string_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
@@ -259,7 +282,7 @@ public:
    * @param key The name of a key
    * @param locale The name of a locale
    * @return A list containing the values requested
-   * @throws Glib::KeyFileError
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ArrayHandle<Glib::ustring> get_locale_string_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale) const;
@@ -272,7 +295,7 @@ public:
    * @param group_name The name of a group
    * @param key The name of a key
    * @return A list of booleans
-   * @throws Glib::KeyFileError
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ArrayHandle<bool> get_boolean_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
@@ -286,7 +309,7 @@ public:
    * @param group_name The name of a group
    * @param key The name of a key
    * @return A list of integers
-   * @throws Glib::KeyFileError
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ArrayHandle<int> get_integer_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
@@ -300,7 +323,7 @@ public:
    * @param group_name The name of a group
    * @param key The name of a key
    * @return A list of doubles
-   * @throws Glib::KeyFileError
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ArrayHandle<double> get_double_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
@@ -312,6 +335,7 @@ public:
 
   /** Get comment from top of file
    * @return The comment
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ustring get_comment() const;
@@ -322,6 +346,7 @@ public:
   /** Get comment from above a group
    * @param group_name The group
    * @return The comment
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ustring get_comment(const Glib::ustring& group_name) const;
@@ -391,6 +416,7 @@ public:
 
   /** Places @a comment at the start of the file, before the first group.
    * @param comment The Comment
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   void set_comment(const Glib::ustring& comment);
@@ -401,6 +427,7 @@ public:
   /** Places @a comment above @a group_name.
    * @param group_name The Group the comment should be above
    * @param comment The comment
+   * @throw Glib::KeyFileError
    */
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   void set_comment(const Glib::ustring& group_name, const Glib::ustring& comment);
@@ -409,11 +436,6 @@ public:
                    std::auto_ptr<Glib::Error>& error);
 #endif
 
-  /** Places a comment above @a key from @a group_name.
-   * @param key Key comment should be above
-   * @param group_name Group comment is in
-   * @param comment The comment
-   */
   _WRAP_METHOD(void set_comment(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& comment), g_key_file_set_comment, errthrow)
 
   _WRAP_METHOD(void remove_comment(const Glib::ustring& group_name, const Glib::ustring& key), g_key_file_remove_comment, errthrow)
