@@ -97,7 +97,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
   GError* gerror = 0;
 
   g_spawn_async_with_pipes(
-      working_directory.c_str(),
+      (working_directory.empty()) ? 0 : working_directory.c_str(),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
@@ -141,7 +141,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
   GError* gerror = 0;
 
   g_spawn_async_with_pipes(
-      working_directory.c_str(),
+      (working_directory.empty()) ? 0 : working_directory.c_str(),
       const_cast<char**>(argv.data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
@@ -180,7 +180,7 @@ void spawn_async(const std::string& working_directory,
   GError* gerror = 0;
 
   g_spawn_async(
-      working_directory.c_str(),
+      (working_directory.empty()) ? 0 : working_directory.c_str(),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
@@ -217,7 +217,7 @@ void spawn_async(const std::string& working_directory,
   GError* gerror = 0;
 
   g_spawn_async(
-      working_directory.c_str(),
+      (working_directory.empty()) ? 0 : working_directory.c_str(),
       const_cast<char**>(argv.data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
@@ -262,7 +262,7 @@ void spawn_sync(const std::string& working_directory,
   GError* gerror = 0;
 
   g_spawn_sync(
-      working_directory.c_str(),
+      (working_directory.empty()) ? 0 : working_directory.c_str(),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
@@ -311,7 +311,7 @@ void spawn_sync(const std::string& working_directory,
   GError* gerror = 0;
 
   g_spawn_sync(
-      working_directory.c_str(),
+      (working_directory.empty()) ? 0 : working_directory.c_str(),
       const_cast<char**>(argv.data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
