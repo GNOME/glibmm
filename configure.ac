@@ -110,8 +110,7 @@ GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING
 # Evaluate the --enable-warnings=level option.
 MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
                        [-Wall],
-                       [-pedantic -Wall -Wextra],
-                       [G])
+                       [-pedantic -Wall -Wextra])
 
 # Offer the ability to omit some API from the library,
 # to reduce the code size:
