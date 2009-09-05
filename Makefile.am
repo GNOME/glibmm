@@ -19,7 +19,7 @@ ACLOCAL_AMFLAGS	= -I build ${ACLOCAL_FLAGS}
 DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
 if MAINTAINER_MODE
-src_subdirs = tools glib/src gio/src
+src_subdirs = glib/src gio/src
 else
 src_subdirs =
 endif
@@ -28,7 +28,7 @@ doc_subdirs = docs
 else
 doc_subdirs =
 endif
-SUBDIRS = $(src_subdirs) glib/glibmm gio/giomm tests examples $(doc_subdirs)
+SUBDIRS = tools $(src_subdirs) glib/glibmm gio/giomm tests examples $(doc_subdirs)
 
 glibmm_includedir = $(includedir)/$(GLIBMM_MODULE_NAME)
 glibmm_include_HEADERS = glib/glibmm.h
