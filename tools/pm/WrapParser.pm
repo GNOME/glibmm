@@ -543,6 +543,14 @@ sub on_class($$)
   exit(-1);
 }
 
+# remove surround spaces from the string
+sub trim($)
+{
+    my $string = shift;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    return $string;
+}
 
 # order to read the defs file
 # void on_defs()
@@ -552,6 +560,9 @@ sub on_defs($)
 
   my $str = $self->extract_bracketed_text();
   my ($module, $defsfile) = split(/,/, $str); #e.g. _DEFS(gtkmm,gtk), where gtkmm is the module name, and gtk is the defs file name.
+  $module = trim($module);
+  $defsfile = trim($defsfile);
+
   # $$self{section} = $section;  #Save it so that we can reuse it in read_defs_included.
   $$self{module} = $module; #Use it later in call to output_temp_g1().
 
