@@ -27,10 +27,6 @@ book_name = $(GLIBMM_MODULE_NAME)
 doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(glibmm_files_h)) \
             $(addprefix $(top_srcdir)/gio/giomm/,$(giomm_files_h))
 
-# Override the web location to use the old-style path with redundant
-# directory components.
-htmlrefpub = http://www.gtkmm.org/docs/$(book_name)/docs/reference/html/
-
 doctooldir = $(datadir)/$(GLIBMM_MODULE_NAME)/doctool
 dist_doctool_DATA = doc-install.pl doc-postprocess.pl tagfile-to-devhelp2.xsl
 

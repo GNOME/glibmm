@@ -5,6 +5,7 @@
 # Usage: ./enum.pl /gnome/head/cvs/gconf/gconf/*.h > gconf_enums.defs
 
 use warnings;
+use File::Spec;
 
 my %token;
 $module="none";
@@ -27,10 +28,8 @@ foreach $file (@ARGV)
 
 exit;
 
-
-
 # parse enums from C
-sub parse
+sub parse ($)
 {
   my ($file)=@_;
 
@@ -46,7 +45,7 @@ sub parse
     if($comment)
     {
       # end of multiline comment
-      $comment = 0 if(/\*\//);
+      $comment = 0 if(m!\*/!);
       next;
     }
 
@@ -58,10 +57,10 @@ sub parse
     next if($deprecated > 0);
 
     # filter single-line comments
-    s/\/\*.*\*\///g;
+    s!/\*.*?\*/!!g;
 
     # begin of multiline comment
-    if(/\/\*/)
+    if(m!/\*!)
     {
       $comment = 1;
       next;
@@ -71,7 +70,8 @@ sub parse
     s/'}'/\%\%RBRACE\%\%/;
     if (/^\s*typedef enum/ )
     {
-      print ";; From $file\n\n" if (!$from);
+      my $basename = File::Spec->splitpath($file);
+      print(';; From ', $basename, "\n\n") if (!$from);
       $from=1;
       $enum=1;
       next;
@@ -87,9 +87,8 @@ sub parse
   }
 }
 
-
 # convert enums to lisp
-sub process
+sub process ($$)
 {
   my ($line,$def)=@_;
 
@@ -98,13 +97,13 @@ sub process
   my $c_name=$def;
 
   $line=~s/\s+/ /g;
-  $line=~s/\/\*.*\*\///g;
+  $line=~s!/\*.*\*/!!g;
   $line=~s/\s*{\s*//;
 
   my $entity = "enum";
   $c_name =~ /^([A-Z][a-z]*)/;
   $module = $1 if ($module eq "none");
-  $def =~ s/$module//;
+  $def =~ s/\Q$module\E//;
 
   @c_name=();
   @name=();
