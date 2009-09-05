@@ -106,7 +106,14 @@ esac
 AC_MSG_RESULT([$os_win32])
 AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
+# Disable static libraries by default
 AC_DISABLE_STATIC
+
+if test x$enable_static = "xyes"; then
+	AC_DEFINE([GLIBMM_STATIC_LIB],[1], [Defined when glibmm is built as a static library])
+	AC_DEFINE([GIOMM_STATIC_LIB],[1], [Defined when giomm is built as a static library])
+fi
+
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 

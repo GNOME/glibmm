@@ -17,7 +17,6 @@
 #define GLIBMM_CONFIGURE
 #elif defined(__MINGW32__)
 #define GLIBMM_WIN32
-#define GLIBMM_DLL
 #define GLIBMM_CONFIGURE
 #else
 //AIX clR compiler complains about this even though it doesn't get this far:
@@ -28,6 +27,7 @@
 #endif /* _WIN32 */
 
 #ifdef GLIBMM_CONFIGURE
+#undef GLIBMM_STATIC_LIB
 #undef GLIBMM_CXX_HAVE_MUTABLE
 #undef GLIBMM_CXX_HAVE_NAMESPACES
 #undef GLIBMM_HAVE_WIDE_STREAM
@@ -73,6 +73,11 @@
 #  define GLIBMM_USING_STD(Symbol) namespace std { using ::Symbol; }
 #else
 #  define GLIBMM_USING_STD(Symbol) /* empty */
+#endif
+
+// Enable DLL-specific stuff only when not building a static library
+#if !defined(__CYGWIN__) && defined(__MINGW32__) && !defined(GLIBMM_STATIC_LIB)
+  #define GLIBMM_DLL
 #endif
 
 #ifdef GLIBMM_DLL

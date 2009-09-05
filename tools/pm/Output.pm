@@ -30,7 +30,7 @@ sub new
   $$self{out} = [];
 
   $$self{source} = "";
-  $$self{tmpdir} = "/tmp";
+  $$self{tmpdir} = File::Spec->tmpdir();
   $$self{destdir} = "";
   $$self{objDefsParser} = undef; # It will be set in set_defsparser()
 
@@ -668,7 +668,7 @@ sub make_g2_from_g1($)
   my ($self) = @_;
 
   # Execute m4 to get *.g2 file:
-  system("$$self{m4path} $$self{m4args} '$$self{tmpdir}/gtkmmproc_$$.g1' > '$$self{tmpdir}/gtkmmproc_$$.g2'");
+  system("$$self{m4path} $$self{m4args} \"$$self{tmpdir}/gtkmmproc_$$.g1\" > \"$$self{tmpdir}/gtkmmproc_$$.g2\"");
   return ($? >> 8);
 }
 
@@ -715,7 +715,12 @@ sub write_sections_to_files()
   foreach($fname_h, $fname_ph, $fname_cc)
   {
     # overwrite the source file only if it has actually changed
-    system("cmp -s '$_.tmp' '$_' || cp '$_.tmp' '$_' ; rm -f '$_.tmp'");
+
+    # Win32 does fail at this, so we do the two steps separately:
+    #system("cmp -s '$_.tmp' '$_' || cp '$_.tmp' '$_'" ; rm -f '$_.tmp');
+
+    system("cmp -s '$_.tmp' '$_' || cp '$_.tmp' '$_'");
+    system("rm -f '$_.tmp'");
   }
 }
 
