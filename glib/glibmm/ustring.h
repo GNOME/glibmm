@@ -21,28 +21,17 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
+#include <glibmmconfig.h>
 #include <glibmm/unicode.h>
+#include <glib.h>
 
 #include <iosfwd>
 #include <iterator>
 #include <sstream>
 #include <string>
-
-#include <glibmmconfig.h>
-GLIBMM_USING_STD(bidirectional_iterator_tag)
-GLIBMM_USING_STD(reverse_iterator)
-GLIBMM_USING_STD(string)
-GLIBMM_USING_STD(istream)
-GLIBMM_USING_STD(ostream)
-
-#ifdef GLIBMM_HAVE_STD_ITERATOR_TRAITS
-GLIBMM_USING_STD(iterator_traits)
-#else
+#ifndef GLIBMM_HAVE_STD_ITERATOR_TRAITS
 #include <cstddef> /* for ptrdiff_t */
-GLIBMM_USING_STD(random_access_iterator_tag)
 #endif
-
 
 namespace Glib
 {
@@ -609,7 +598,7 @@ public:
 //! @{
 
   /* Returns fmt as is, but checks for invalid references in the format string.
-   * @newin2p18
+   * @newin{2,18}
    */
   template <class T1>
   static inline
@@ -631,21 +620,21 @@ public:
    * @return The substituted message string.
    * @throw Glib::ConvertError
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1>
   static inline
   ustring compose(const ustring& fmt, const T1& a1);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2>
   static inline
   ustring compose(const ustring& fmt, const T1& a1, const T2& a2);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3>
   static inline
@@ -653,7 +642,7 @@ public:
                   const T1& a1, const T2& a2, const T3& a3);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4>
   static inline
@@ -662,7 +651,7 @@ public:
                   const T4& a4);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5>
   static inline
@@ -671,7 +660,7 @@ public:
                   const T4& a4, const T5& a5);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6>
   static inline
@@ -680,7 +669,7 @@ public:
                   const T4& a4, const T5& a5, const T6& a6);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
   static inline
@@ -690,7 +679,7 @@ public:
                   const T7& a7);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7, class T8>
@@ -701,7 +690,7 @@ public:
                   const T7& a7, const T8& a8);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5,
             class T6, class T7, class T8, class T9>
@@ -739,7 +728,7 @@ public:
    * @return The string representation of the argument stream.
    * @throw Glib::ConvertError
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1>
   static inline
@@ -747,7 +736,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2>
   static inline
@@ -755,7 +744,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3>
   static inline
@@ -763,7 +752,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4>
   static inline
@@ -771,7 +760,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5>
   static inline
@@ -780,7 +769,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6>
   static inline
@@ -789,7 +778,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7>
@@ -799,7 +788,7 @@ public:
 
   /* See the documentation for format(const T1& a1).
    *
-   * @newin2p16
+   * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4,
             class T5, class T6, class T7, class T8>

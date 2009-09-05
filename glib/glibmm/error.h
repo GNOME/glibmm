@@ -1,7 +1,6 @@
 // -*- c++ -*-
 #ifndef _GLIBMM_ERROR_H
 #define _GLIBMM_ERROR_H
-/* $Id$ */
 
 /* Copyright 2002 The gtkmm Development Team
  *
@@ -20,13 +19,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-extern "C" { typedef struct _GError GError; }
-#endif
-
-#include <glib.h>
+#include <glibmmconfig.h>
 #include <glibmm/exception.h>
-#include <glibmmconfig.h> //For GLIBMM_EXCEPTIONS_ENABLED
+#include <glib.h>
 
 #ifndef GLIBMM_EXCEPTIONS_ENABLED
 //When not usinge exceptions, we pass auto_ptrs of the exceptions objects around instead. 

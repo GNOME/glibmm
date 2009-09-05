@@ -1,104 +1,39 @@
-## Copyright (c) 2001
-## The gtkmm development team.
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of glibmm.
+##
+## glibmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## glibmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = private
+lib_LTLIBRARIES = libglibmm-@GLIBMM_API_VERSION@.la
 
-sublib_name = glibmm
-sublib_libname = glibmm-2.4
-sublib_libversion = $(LIBGLIBMM_SO_VERSION)
-sublib_namespace = Glib
-sublib_cflags = $(GLIBMM_CFLAGS)
-sublib_topdir = glib
-sublib_win32_dlls_libs	=
+include $(srcdir)/../src/filelist.am
+include $(srcdir)/filelist.am
 
-sublib_files_extra_posix_cc =
-sublib_files_extra_win32_cc =
+files_built_cc = $(glibmm_files_built_cc)
+files_built_h  = $(glibmm_files_built_h)
+files_built_ph = $(glibmm_files_built_ph)
+files_extra_cc = $(glibmm_files_extra_cc)
+files_extra_h  = $(glibmm_files_extra_h)
+files_extra_ph = $(glibmm_files_extra_ph)
 
-sublib_files_extra_general_cc = \
-  class.cc \
-  containers.cc \
-  debug.cc \
-  dispatcher.cc \
-  error.cc \
-  exception.cc \
-  exceptionhandler.cc \
-  init.cc \
-  interface.cc \
-  main.cc \
-  miscutils.cc \
-  object.cc \
-  objectbase.cc \
-  pattern.cc \
-  property.cc \
-  propertyproxy.cc \
-  propertyproxy_base.cc \
-  quark.cc \
-  random.cc \
-  signalproxy.cc \
-  signalproxy_connectionnode.cc  \
-  streamiochannel.cc \
-  stringutils.cc \
-  threadpool.cc \
-  timer.cc \
-  timeval.cc \
-  ustring.cc \
-  utility.cc \
-  value.cc \
-  value_custom.cc \
-  wrap.cc
+include $(top_srcdir)/build/compile-binding.am
 
-sublib_files_extra_posix_h =
-sublib_files_extra_win32_h =
+local_cppflags = $(binding_includes) $(binding_cppflags) -DGLIBMM_BUILD=1
 
-sublib_files_extra_general_h = \
-  arrayhandle.h \
-  class.h \
-  containerhandle_shared.h  \
-  containers.h \
-  debug.h \
-  dispatcher.h \
-  error.h \
-  exception.h \
-  exceptionhandler.h \
-  helperlist.h \
-  init.h \
-  i18n-lib.h \
-  i18n.h \
-  interface.h \
-  listhandle.h \
-  main.h \
-  miscutils.h \
-  object.h \
-  objectbase.h \
-  pattern.h \
-  priorities.h \
-  property.h \
-  propertyproxy.h \
-  propertyproxy_base.h \
-  quark.h \
-  random.h \
-  refptr.h \
-  sarray.h \
-  signalproxy_connectionnode.h  \
-  slisthandle.h \
-  streamiochannel.h \
-  stringutils.h \
-  threadpool.h \
-  timer.h \
-  timeval.h \
-  ustring.h \
-  utility.h \
-  value.h \
-  value_custom.h \
-  wrap.h
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GLIBMM_CFLAGS)
+AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 
-include $(top_srcdir)/build_shared/Makefile_build.am_fragment
-
-sublib_files_extra_general_cc += value_basictypes.cc
-sublib_files_extra_general_h += signalproxy.h value_basictypes.h
-
-lib_LTLIBRARIES = libglibmm-2.4.la
-libglibmm_2_4_la_SOURCES = $(files_built_cc) $(files_extra_cc)
-libglibmm_2_4_la_LDFLAGS = $(common_ldflags)
-libglibmm_2_4_la_LIBADD = $(GLIBMM_LIBS)
-
+libglibmm_@GLIBMM_API_VERSION@_la_SOURCES = $(binding_sources)
+libglibmm_@GLIBMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
+libglibmm_@GLIBMM_API_VERSION@_la_LIBADD  = $(GLIBMM_LIBS)

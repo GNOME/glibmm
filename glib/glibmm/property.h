@@ -1,7 +1,6 @@
 // -*- c++ -*-
 #ifndef _GLIBMM_PROPERTY_H
 #define _GLIBMM_PROPERTY_H
-/* $Id$ */
 
 /* Copyright 2002 The gtkmm Development Team
  *
@@ -20,6 +19,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 #include <glibmm/propertyproxy.h>
 
 #ifdef GLIBMM_PROPERTIES_ENABLED

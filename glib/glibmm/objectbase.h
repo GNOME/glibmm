@@ -2,8 +2,6 @@
 #ifndef _GLIBMM_OBJECTBASE_H
 #define _GLIBMM_OBJECTBASE_H
 
-/* $Id$ */
-
 /* Copyright 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -21,24 +19,20 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 #include <glibmm/signalproxy.h>
 #include <glibmm/propertyproxy.h>
 #include <glibmm/ustring.h>
 #include <glibmm/value.h>
 #include <glibmm/quark.h>
-#include <sigc++/trackable.h>
-#include <typeinfo>
 #include <glibmmconfig.h>
 #include <glibmm/debug.h>
-
-#include <glibmmconfig.h>
-
-GLIBMM_USING_STD(type_info)
+#include <sigc++/trackable.h>
+#include <typeinfo>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" { typedef struct _GObject GObject; }
 #endif
-
 
 namespace Glib
 {

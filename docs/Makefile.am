@@ -1,34 +1,48 @@
-## Copyright (c) 2001
-## The gtkmm development team.
+## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of glibmm.
+##
+## glibmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## glibmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = images reference internal
+include $(top_srcdir)/glib/src/filelist.am
+include $(top_srcdir)/glib/glibmm/filelist.am
+include $(top_srcdir)/gio/src/filelist.am
+include $(top_srcdir)/gio/giomm/filelist.am
 
-EXTRA_DIST = Makefile_web.am_fragment
+glibmm_files_h = $(filter-out wrap_init.h,$(glibmm_files_built_h) $(glibmm_files_extra_h))
+giomm_files_h  = $(filter-out wrap_init.h,$(giomm_files_built_h) $(giomm_files_extra_h))
 
-gtkmm_doc_DATA = 
+book_name = $(GLIBMM_MODULE_NAME)
+doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(glibmm_files_h)) \
+            $(addprefix $(top_srcdir)/gio/giomm/,$(giomm_files_h))
 
-include $(top_srcdir)/docs/Makefile_web.am_fragment
+# Override the web location to use the old-style path with redundant
+# directory components.
+htmlrefpub = http://www.gtkmm.org/docs/$(book_name)/docs/reference/html/
 
-# Post to the website.
+doctooldir = $(datadir)/$(GLIBMM_MODULE_NAME)/doctool
+dist_doctool_DATA = doc-install.pl doc-postprocess.pl tagfile-to-devhelp2.xsl
 
-post-html-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) post-html); \
-	done
+docimagesdir = $(libdocdir)/images
+dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif
 
-post-html-local: 
-	scp $$SSH_OPT $^ $$USER@$(web_host):$(web_path_docs)
+include $(top_srcdir)/build/doc-reference.am
 
-post-html: post-html-recursive post-html-local
-
-doc-clean-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) doc-clean); \
-	done
-
-doc-clean: doc-clean-recursive
-
-doc-rebuild: doc-clean all
-
-.PHONY: post-html post-html-local post-html-recursive doc-clean doc-clean-recursive doc-rebuild
-
+dist_noinst_DATA +=				\
+	internal/documentation_generation.txt	\
+	internal/gmmproc_internals.txt		\
+	internal/using_gmmproc.txt		\
+	internal/gtk_entry.dia			\
+	reference/glibmm_header.html_fragment	\
+	reference/glibmm_footer.html_fragment

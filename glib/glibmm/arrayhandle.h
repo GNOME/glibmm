@@ -2,8 +2,6 @@
 #ifndef _GLIBMM_ARRAYHANDLE_H
 #define _GLIBMM_ARRAYHANDLE_H
 
-/* $Id$ */
-
 /* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -21,8 +19,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 #include <glibmm/containerhandle_shared.h>
-
 
 namespace Glib
 {

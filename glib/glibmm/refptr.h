@@ -2,8 +2,6 @@
 #ifndef _GLIBMM_REFPTR_H
 #define _GLIBMM_REFPTR_H
 
-/* $Id$ */
-
 /* Copyright 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -21,6 +19,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 
 namespace Glib
 {
@@ -122,7 +121,7 @@ public:
 #endif //GLIBMM_DISABLE_DEPRECATED
 
   /** Set underlying instance to 0, decrementing reference count of existing instance appropriately.
-   * @newin2p16
+   * @newin{2,16}
    */
   inline void reset();
 

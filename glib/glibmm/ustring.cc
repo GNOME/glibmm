@@ -18,6 +18,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 #include <glibmm/ustring.h>
 #include <glibmm/convert.h>
 #include <glibmm/error.h>
@@ -26,16 +27,12 @@
 #include <algorithm>
 #include <iostream>
 #include <cstring>
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <glibmmconfig.h>
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 # include <stdexcept>
 #endif
-GLIBMM_USING_STD(find)
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 namespace
 {

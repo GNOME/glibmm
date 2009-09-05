@@ -22,9 +22,6 @@
 #include <fstream>
 #include <iostream>
 
-GLIBMM_USING_STD(ios)
-
-
 namespace Glib
 {
 

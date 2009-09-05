@@ -1,7 +1,6 @@
 // -*- c++ -*-
 #ifndef _GLIBMM_PROPERTYPROXY_H
 #define _GLIBMM_PROPERTYPROXY_H
-/* $Id$ */
 
 /* propertyproxy.h
  *
@@ -22,6 +21,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 #include <glibmm/propertyproxy_base.h>
 
 #ifdef GLIBMM_PROPERTIES_ENABLED

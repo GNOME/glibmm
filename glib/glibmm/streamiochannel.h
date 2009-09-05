@@ -1,5 +1,4 @@
 // -*- c++ -*-
-/* $Id$ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
  *
@@ -21,14 +20,9 @@
 #ifndef _GLIBMM_STREAMIOCHANNEL_H
 #define _GLIBMM_STREAMIOCHANNEL_H
 
-#include <glibmm/iochannel.h>
 #include <glibmmconfig.h>
+#include <glibmm/iochannel.h>
 #include <iosfwd>
-
-GLIBMM_USING_STD(istream)
-GLIBMM_USING_STD(ostream)
-GLIBMM_USING_STD(iostream)
-
 
 namespace Glib
 {
@@ -62,6 +56,4 @@ protected:
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_STREAMIOCHANNEL_H */
-

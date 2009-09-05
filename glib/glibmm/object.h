@@ -1,7 +1,6 @@
 // -*- c++ -*-
 #ifndef _GLIBMM_OBJECT_H
 #define _GLIBMM_OBJECT_H
-/* $Id$ */
 
 /* Copyright 2002 The gtkmm Development Team
  *
@@ -26,7 +25,7 @@
 # error "X11/Xlib.h seems to have been included before this header. Due to some commonly-named macros in X11/Xlib.h, it may only be included after any glibmm, gdkmm, or gtkmm headers."
 #endif
 
-#include <glib.h> /* for G_GNUC_NULL_TERMINATED */
+#include <glibmmconfig.h>
 #include <glibmm/objectbase.h>
 #include <glibmm/wrap.h>
 #include <glibmm/quark.h>
@@ -34,8 +33,7 @@
 #include <glibmm/utility.h> /* Could be private, but that would be tedious. */
 #include <glibmm/containerhandle_shared.h> /* Because its specializations may be here. */
 #include <glibmm/value.h>
-
-#include <glibmmconfig.h>
+#include <glib.h> /* for G_GNUC_NULL_TERMINATED */
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C"

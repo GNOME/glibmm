@@ -20,17 +20,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib-object.h>
-#include <glib.h>
-
-#include <vector>
+#include <glibmmconfig.h>
 #include <glibmm/object.h>
 #include <glibmm/quark.h>
 #include <glibmm/wrap.h>
-
-#include <glibmmconfig.h>
-GLIBMM_USING_STD(vector)
-
+#include <vector>
+#include <glib.h>
+#include <glib-object.h>
 
 namespace
 {

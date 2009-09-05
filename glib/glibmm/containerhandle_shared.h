@@ -2,8 +2,6 @@
 #ifndef _GLIBMM_CONTAINERHANDLE_SHARED_H
 #define _GLIBMM_CONTAINERHANDLE_SHARED_H
 
-/* $Id$ */
-
 /* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -21,28 +19,19 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+#include <glibmm/wrap.h>
+#include <glibmm/debug.h>
+#include <glib-object.h>
+
 #include <cstddef>
 #include <algorithm>
 #include <iterator>
 #include <vector>
 #include <deque>
 #include <list>
-
-#include <glib-object.h>
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <glibmm/wrap.h>
-#include <glibmm/debug.h>
-
-#include <glibmmconfig.h>
-GLIBMM_USING_STD(forward_iterator_tag)
-GLIBMM_USING_STD(random_access_iterator_tag)
-GLIBMM_USING_STD(distance)
-GLIBMM_USING_STD(copy)
-GLIBMM_USING_STD(vector)
-GLIBMM_USING_STD(deque)
-GLIBMM_USING_STD(list)
-
 
 namespace Glib
 {

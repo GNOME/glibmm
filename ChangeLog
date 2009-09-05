@@ -1,3 +1,581 @@
+2009-08-21  Daniel Elstner  <danielk@openismus.com>
+
+	Move #undef G_DISABLE_DEPRECATED out of header
+
+	* glib/src/date.hg: Push the #undef G_DISABLE_DEPRECATED into the
+	new SECTION_CC_PRE_INCLUDES rather than the public header file.
+
+2009-08-21  Daniel Elstner  <danielk@openismus.com>
+
+	Add SECTION_CC_PRE_INCLUDES section to gmmproc
+
+	* tools/m4/base.m4: Define new SECTION_CC_PRE_INCLUDES and import
+	it at the top of the generated source file.  This new section can
+	be used to insert custom code at the beginning of the translation
+	unit as seen by the compiler.
+
+2009-08-21  Daniel Elstner  <danielk@openismus.com>
+
+	Use mm-common macro for --disable-deprecated-api
+
+	* configure.ac: Replace GLIBMM_ARG_ENABLE_API_DEPRECATED() with
+	the new MM_ARG_DISABLE_DEPRECATED_API() macro from mm-common.
+	(MM_PREREQ): Raise requirement to mm-common 0.6.
+	* build/reduced.m4 (GLIBMM_ARG_ENABLE_API_DEPRECATED): Remove
+	obsolete macro definition.
+	* glib/glibmmconfig.h.in (GLIBMM_DISABLE_DEPRECATED): Copy #undef
+	statement from config.h.in template.
+	* gio/giommconfig.h.in (GIOMM_DISABLE_DEPRECATED): ditto.
+
+2009-08-21  Daniel Elstner  <danielk@openismus.com>
+
+	Insist on working Perl in maintainer mode
+
+	* configure.ac: Call MM_CHECK_PERL in maintainer mode in order
+	to verify early that the Perl interpreter is working.
+
+2009-08-20  Daniel Elstner  <danielk@openismus.com>
+
+	Rename @since back to @newin
+
+	* docs/reference/Doxyfile.in (ALIASES): Rename the @since alias
+	back to its old name @newin, but otherwise keep the parameters.
+	Apparently there is a @since command predefined in Doxygen which
+	I hadn't noticed.  It does seem to get overridden silently, but
+	it is better not to rely on this.
+	* tools/pm/DocsParser.pm (convert_tags_to_doxygen): Output @newin
+	instead of @since.
+	* {glib,gio}/src/*.hg, {glib,gio}/{glib,gio}mm/*.h: Replace all
+	uses of @since with @newin.
+
+2009-08-20  Daniel Elstner  <danielk@openismus.com>
+
+	Predefine GIOMM_API for Doxygen
+
+	* docs/reference/Doxyfile.in (PREDEFINED): Define GIOMM_API to the
+	empty expansion, so that it won't show up in the documentation.
+
+2009-08-20  Daniel Elstner  <danielk@openismus.com>
+
+	Substitute API version in filenames dynamically
+
+	* glib/glibmm.pc.in: Rename file from glib/glibmm-2.4.pc.in.
+	* glib/glibmm-uninstalled.pc.in: Rename file from
+	glib/glibmm-2.4-uninstalled.pc.in.
+	* gio/giomm.pc.in: Rename file from gio/giomm-2.4.pc.in.
+	* gio/giomm-uninstalled.pc.in: Rename file from
+	gio/giomm-2.4-uninstalled.pc.in.
+	* configure.ac (AC_CONFIG_FILES): Insert ${GLIBMM_MODULE_NAME}
+	and ${GIOMM_MODULE_NAME} into output filenames and remove the
+	hard-coded version from the input filenames.
+	* glib/glibmm/Makefile.am (lib_LTLIBRARIES): Substitute
+	@GLIBMM_API_VERSION@ into the libtool archive name as well as
+	the variable names derived from it instead of hard-coding the
+	API version.
+
+2009-08-20  Daniel Elstner  <danielk@openismus.com>
+
+	Do not hard-code API version in resource files
+
+	* MSVC_Net200[58]/glibmm/glibmm.rc.in: Use newer @PACKAGE_VERSION@
+	substitution in place of @VERSION@.  Substitute @GLIBMM_MODULE_NAME@
+	instead of hardcoding the API version.
+	* MSVC_Net200[58]/giomm/giomm.rc.in: Use newer @PACKAGE_VERSION@
+	substitution in place of @VERSION@.  Substitute @GIOMM_MODULE_NAME@
+	instead of hardcoding the API version.  Replace @GLIBMM_*_VERSION@
+	substitutions with their @GIOMM_*_VERSION@ equivalents.
+
+2009-08-19  Daniel Elstner  <danielk@openismus.com>
+
+	Predefine GLIBMM_API for Doxygen
+
+	* docs/reference/Doxyfile.in (PREDEFINED): Define GLIBMM_API to the
+	empty expansion, so that it won't show up in the documentation.
+
+2009-08-18  Daniel Elstner  <danielk@openismus.com>
+
+	Prepend tools/pm/ to Perl include path
+
+	* g{lib,io}/src/Makefile.am (gmmproc): Pass -I$(top_srcdir)/tools/pm
+	to the Perl interpreter when invoking the local gmmproc, so that it
+	will pick up the modules from the source tree instead of an existing
+	glibmm installation.
+	* tools/gmmproc.in (BEGIN): Substitute @GLIBMM_MODULE_NAME@ instead
+	of hard-coding the location.
+
+2009-08-18  Daniel Elstner  <danielk@openismus.com>
+
+	Implement parametric Doxygen alias @since{m,n}
+
+	* docs/reference/Doxyfile.in (ALIASES): Define a parametrized alias
+	@since{major,minor} to replace the old @newin?p?* aliases which had
+	to be defined manually for every version number used.
+	(PREDEFINED): Predefine G_GNUC_NORETURN, G_GNUC_NULL_TERMINATED and
+	G_GNUC_PURE to the empty expansion.  Remove GTKMM_* macros.
+	* tools/pm/DocsParser.pm (convert_tags_to_doxygen): Change "Since:"
+	substitution to output the new generic @since alias.
+	* {glib,gio}/src/*.hg, {glib,gio}/{glib,gio}mm/*.h: Change all uses
+	of @newin?p?* to @since{major,minor}.
+
+2009-08-17  Daniel Elstner  <danielk@openismus.com>
+
+	Append slash to overridden $(htmlrefpub)
+
+	* docs/Makefile.am (htmlrefpub): Append trailing slash for
+	consistency with the non-overridden value.
+
+2009-08-17  Daniel Elstner  <danielk@openismus.com>
+
+	Exclude GTimeVal and nil from the documentation
+
+	* docs/reference/Doxyfile.in (EXCLUDE_SYMBOLS): Add GTimeVal and
+	nil to the list of symbols to exclude from the documentation.
+
+2009-08-17  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Reenable JAVADOC_AUTOBRIEF mode of Doxygen
+
+	* docs/reference/Doxyfile.in (JAVADOC_AUTOBRIEF): Change value
+	back to 'YES'.  I accidentally turned off the setting during the
+	build infrastructure transition.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Unbreak List_Iterator::operator->()
+
+	* glib/glibmm/containers.h ({S,}List_Iterator::operator->):
+	Use &**this, not &*this.  Oops.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Define GLIBMM_USING_STD() as dummy no-op
+
+	* glib/glibmmconfig.h.in (GLIBMM_USING_STD): Resurrect macro
+	for backwards compatibility, but unconditionally define it to
+	the empty expansion.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Define GLIBMM_BUILD and GIOMM_BUILD
+
+	* glib/glibmm/Makefile.am (local_cppflags): Add -DGLIBMM_BUILD=1.
+	* gio/giomm/Makefile.am (local_cppflags): Add -DGIOMM_BUILD=1.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Slightly clean up List_Iterator helper classes
+
+	* glib/glibmm/containers.h ({S,}List_Iterator): Smooth out
+	a number of eye sores I had stumbled upon in the code.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Correct nesting mistakes in Autoconf macros
+
+	* build/cxx.m4: Fix the incorrect nesting of parentheses with
+	about every other AC_COMPILE_IFELSE/AC_LANG_PROGRAM construct.
+	My fault, ooops.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Clean up g{lib,io}mmconfig.h.in templates
+
+	* glib/glibmmconfig.h.in: Rewrite, copying large chunks from
+	the autoheader-generated config.h.in template.
+	* gio/giommconfig.h.in: Remove everything that belongs to glibmm
+	and include glibmmconfig.h.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Set GTHREAD_LIBS to the full --libs value again
+
+	* configure.ac (GTHREAD_LIBS): Go back to pkg-config --libs
+	to retrieve the linker flags to use with threaded programs.
+	For some reason --libs-only-other does not include -pthread.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Get rid of all uses of GLIBMM_USING_STD()
+
+	* glib/src/*.{ccg,hg}: Remove all uses of GLIBMM_USING_STD().
+	We definitely do not need this anymore, and probably never
+	did.  We never covered all symbols from namespace std anyway
+	and never got any complaint about it.  Also, be careful to
+	always include the glibmmconfig.h header when it is needed.
+	* glib/glibmm/*.{cc,h}: ditto.
+	* glib/glibmmconfig.h.in: Clean up and re-indent.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Clean up C++ compiler test Autoconf macros
+
+	* build/cxx.m4: Clean up M4 code and switch to non-deprecated
+	Autoconf macros.
+	(AC_CXX_NAMESPACES), (AC_CXX_BOOL), (AC_CXX_MUTABLE): Remove
+	obsolete feature check macros.
+	* configure.ac: Remove AC_CXX_NAMESPACES(), AC_CXX_BOOL(),
+	AC_CXX_MUTABLE() and GLIBMM_CXX_HAS_NAMESPACE_STD checks.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Remove now optional macro arguments
+
+	* configure.ac: Insert MM_PREREQ([0.4]) macro call.
+	(MM_INIT_MODULE): Remove the now optional second macro argument.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Move M4 files from scripts/ over to build/
+
+	* scripts/*.m4: Move files over to the build/ directory, in order
+	to be more consistent with the directory layout of other binding
+	modules that switched to the new build organization.
+	* Makefile.am (ACLOCAL_AMFLAGS): Search build/ for M4 files.
+	(dist_aclocal_macro_DATA): Adjust directory prefix to build/.
+	* configure.ac (AC_CONFIG_MACRO_DIR): Place third-party Autoconf
+	macros into the build/ directory.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Use hammer method to avoid admitting to be wrong
+
+	* glib/README, gio/README: Oops, looks like I was wrong in my
+	assumption that these files would be distributed automatically by
+	Automake.  In order to save face, I thought I might just delete
+	them then, as their content is not very useful anyway.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Stop distributing README files manually
+
+	* Makefile.am (text_files): Remove glib/README and gio/README as
+	files named README are distributed automatically by Automake.
+	(msvc_files): Use the more readable and safer $(addprefix ...)
+	function of GNU make instead of a $(foo:%=prefix/%) substitution.
+	(DISTCLEANFILES): Use $(filter %mmconfig.h,$(msvc_files)) instead
+	of listing the generated configuration header files manually.
+
+2009-08-16  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Provide g{lib,io}mm-2.4-uninstalled.pc files
+
+	* glib/glibmm-2.4-uninstalled.pc.in: New file to provide a pkg-config
+	configuration for building against an uninstalled glibmm library.
+	* gio/giomm-2.4-uninstalled.pc.in: ditto for giomm.
+	* glib/glibmm-2.4.pc.in (htmlrefpub): Append slash to URL.
+	* gio/giomm-2.4.pc.in (htmlrefpub): ditto.
+	* configure.ac (AC_CONFIG_FILES): List glib/glibmm-2.4-uninstalled.pc
+	and gio/giomm-2.4-uninstalled.pc output files.
+
+2009-08-11  Daniel Elstner  <danielk@openismus.com>
+
+	Add missing datadir substitution to .pc file
+
+	* glib/glibmm-2.4.pc.in (datadir): Substitute value, as it is
+	used as a component of doctooldir later in the file.
+	* gio/giomm-2.4.pc.in (datadir): Substitute value, just in case.
+	* docs/Makefile.am: Remove overrides of the documentation
+	utilities, since MM_CONFIG_DOCTOOL_DIR() already takes care
+	of setting MMDOCTOOLDIR to the local directory.
+
+2009-08-10  Daniel Elstner  <danielk@openismus.com>
+
+	Get rid of some old Autoconf macro cruft
+
+	* scripts/dk-warn.m4: Delete file, since the functionality is now
+	provided by MM_ARG_ENABLE_WARNINGS() from the mm-common module.
+	* scripts/docgen.m4: Delete obsolete file.
+	* scripts/cxx_std.m4: Remove stray text snippet from the top of the
+	file.  Probably a cut'n'paste accident.
+	* scripts/cxx.m4 (GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES): Do not
+	AC_DEFINE to 0 in the else branch, as that will do the wrong thing
+	when #ifdef is used instead of #if.
+	* scripts/README: Delete file consisting solely of whitespace.
+	* configure.ac: Add note on pointless test for namespace std.
+
+2009-08-10  Daniel Elstner  <danielk@openismus.com>
+
+	Clean up configure check for Windows host
+
+	* configure.ac (OS_WIN32): Rename conditional to HOST_WINDOWS_NATIVE
+	because the OS vs platform terminology confused the hell out of me.
+	Remove the check for a non-native Windows host such as Cygwin, since
+	the corresponding conditional is not used anymore.
+
+2009-08-10  Daniel Elstner  <danielk@openismus.com>
+
+	Have mm-common-prepare install the doc utils
+
+	* configure.ac: Call MM_CONFIG_DOCTOOL_DIR([docs]) to set
+	up the destination directory for mm-common-prepare to copy
+	the documentation utilities to.
+	* docs/doc-install.pl: Delete file.
+	* docs/doc-postprocess.pl: ditto,
+	* docs/tagfile-to-devhelp2.xsl: ditto.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Distribute README.SUN and autogen.sh
+
+	* Makefile.am (text_files): Add README.SUN.
+	(dist_noinst_SCRIPTS): List autogen.sh.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Use versioned directory for documentation tools
+
+	* docs/Makefile.am (doctooldir): Use the versioned module
+	name instead of the package name as $(datadir) subdirectory.
+	* glib/glibmm-2.4.pc.in (doctooldir): Change the variable
+	value accordingly.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Provide documentation location via pkg-config
+
+	* glib/glibmm-2.4.pc.in: Clean up and modernize the values,
+	and make use of more configure variable substitutions.
+	(datarootdir): Substitute @datarootdir@.
+	(gmmprocdir): Remove the @GMMPROC_DIR@ substitution and expand
+	${libdir} indirectly.
+	(doctooldir): New variable pointing to the location of the
+	installed utilities for building the reference documentation.
+	(docdir), (doxytagfile), (htmlrefdir), (htmlrefpub): Provide
+	meta information on the installed reference documentation in
+	these new pkg-config variables.
+	* gio/giomm-2.4.pc.in: Clean up and modernize the values,
+	and make use of more configure variable substitutions.
+	(datarootdir): Substitute @datarootdir@.
+	(docdir), (doxytagfile), (htmlrefdir), (htmlrefpub): Provide
+	meta information on the installed reference documentation in
+	these new pkg-config variables.  The values are identical to
+	the glibmm-2.4 ones because the documentation is bundled.
+	* docs/Makefile.am (hmtlrefpub): Override the public web URL
+	of the reference documentation, since the currently uploaded
+	documentation still has the redundant docs/ component in the
+	base path.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Get make distcheck to pass cleanly
+
+	* Makefile.am (DISTCLEANFILES): List the configuration header
+	copies made by the AC_CONFIG_COMMANDS() as files to delete.
+	* configure.ac (AM_INIT_AUTOMAKE): Switch to POSIX archive
+	format (pax) for tar, because just as with libsigc++ the
+	filenames generated by Doxygen exceed the tar-ustar limit.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Work around Automake cleverness failure
+
+	* gio/giomm/filelist.am (giomm_files_built_ph): Use the GNU
+	make $(patsubst ...) function instead of $(var:%=foo%bar) if
+	a simple $(var:.a=.b) is not sufficient.  Apparently Automake
+	is able to expand some of these constructs statically, but in
+	some cases it will actually produce the wrong result.  Using
+	$(patsubst ...) helps to avoid the problem because Automake
+	does not attempt to expand it.
+	* glib/glibmm/filelist.am (glibmm_files_built_ph): Use the
+	$(patsubst ...) function here, too.
+	* gio/src/filelist.am (giomm_files_used_hg): Define another
+	intermediate variable to avoid repetition.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Get rid of all Makefile.am in the MSVC dirs
+
+	* MSVC_Net2005/**/Makefile.am: Delete recursive build files.
+	* MSVC_Net2008/**/Makefile.am: ditto.
+	* MSVC_Net2005/filelist.am: New file.  Recursively list all
+	files that should go into the distribution.
+	* MSVC_Net2008/filelist.am: ditto.
+	* configure.ac (AC_CONFIG_FILES): Remove all Makefile outputs
+	to the MSVC subdirectories.  Combine all the remaining output
+	files into a single argument to just one AC_CONFIG_FILES call.
+	Follow through with a number of TODO comments and remove some
+	old cruft which is no longer used anywhere in the module.
+	(AC_CONFIG_COMMANDS): Copy the configuration header files into
+	the MSVC subdirectories by making config.status execute custom
+	configuration commands.  This is easier than doing it at the
+	Makefile level, where it was previously implemented.
+	* Makefile.am: Include the filelist.am files from the MSVC
+	subdirectories.
+	(SUBDIRS): Remove MSVC_Net200[58] directories from the list.
+	(dist_noinst_DATA): Distribute the MSVC project files.
+	* tools/gmmproc.in: Substitute @PERL@ instead of @PERL_PATH@.
+	* tools/generate_wrap_init.pl.in: ditto.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Bring back the giomm reference documentation
+
+	* glib/{src,glibmm}/filelist.am: Add namespace prefix glibmm_
+	to variable names, so that the file lists of glibmm and giomm
+	can be included together without conflicts.
+	* gio/{src,giomm}/filelist.am: Add namespace prefix giomm_ to
+	variable names.
+	* glib/{src,glibmm}/Makefile.am: Copy the namespace-prefixed
+	make variables to non-prefixed variables, so that the Automake
+	include files from mm-common will pick up the values.
+	* gio/{src,giomm}/Makefile.am: ditto.
+	* docs/Makefile.am: Include file lists of giomm.
+	(doc_input): List the header files of both glibmm and giomm.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Begin move to new documentation infrastructure
+
+	* configure.ac (AC_CONFIG_FILES): Remove the old build files
+	docs/{images,internal,reference}/Makefile from the list.  Also
+	remove the obsolete docs/reference/beautify_docs.pl.
+	* docs/Makefile.am: Big overhaul.  Reimplement on top of the
+	new documentation infrastructure provided with the mm-common
+	module.  Build, distribute and install files which used to be
+	handled by the subdirectories' Makefiles directly from here.
+	Note that the generated reference documentation at the moment
+	only covers glibmm without giomm.  Remedy follows.
+	* docs/reference/Doxyfile.in: Replace configuration with the
+	modernized version from librsvgmm, appropriately modified for
+	glibmm.  Make use of the new substitutions provided by the
+	mm-common Autoconf magic.
+	* docs/doc-install.pl: Copy script from mm-common.  Install
+	it into $(pkgdatadir)/doctool.
+	* docs/doc-postprocess.pl: ditto,
+	* docs/tagfile-to-devhelp2.xsl: ditto.
+	* docs/images/Makefile.am: Delete subdirectory Makefile.
+	* docs/internal/Makefile.am: ditto,
+	* docs/reference/Makefile.am: ditto.
+	* docs/reference/README: Delete file, as it documents exactly
+	the things I just ripped.
+	* docs/reference/beautify_docs.pl.in: Delete obsolete file.
+	* docs/reference/doxygen_to_devhelp.xsl: ditto,
+	* docs/reference/libstdc++.tag.xml: ditto.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Convert examples/ sub-tree to non-recursive build
+
+	* examples/Makefile.am: Rewrite to a non-recursive build of
+	all example programs with a single control file.  Hook the
+	build of the example programs to the make check target.
+	* examples/Makefile.am_fragment: Delete obsolete file.
+	* examples/*/Makefile.am: Delete obsolete files.
+	* examples/README: Delete file, as it was empty anyway apart
+	from a single whitespace character.
+	* configure.ac (AC_CONFIG_FILES): Remove examples/*/Makefile
+	output files from the list.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Convert tests/ sub-tree to non-recursive build
+
+	* tests/Makefile.am: Rewrite to a non-recursive build of all
+	test programs with a single control file.  Hook the the build
+	of the test programs to the make check target.
+	* tests/Makefile.am_fragment: Delete obsolete file.
+	* tests/*/Makefile.am: Delete obsolete files.
+	* configure.ac (AC_CONFIG_FILES): Remove tests/*/Makefile
+	output files from the list.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Delete now unused build_shared/ subdirectory
+
+	* build_shared/*.am_fragment: Delete files, as they are no
+	longer used anywhere.
+	* tools/Makefile_list_of_sources.am_fragment: Delete file,
+	* tools/m4/Makefile_list_of_sources.am_fragment: ditto,
+	* tools/pm/Makefile_list_of_sources.am_fragment: ditto.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Convert gio/ sub-tree to new build system
+
+	* gio/src/filelist.am: New file for defining the lists of
+	gmmproc input files.
+	* gio/src/Makefile.am: Clean up and modernize.  Integrate
+	with the new generate-binding.am build file from mm-common.
+	* gio/giomm/filelist.am: New file for the lists of source
+	code files, both generated and static.  Also list files from
+	the private/ subdirectory here.
+	* gio/giomm/Makefile.am: Clean up and modernize.  Integrate
+	with the new compile-binding.am build file from mm-common.
+	* configure.ac (AC_CONFIG_FILES): Remove the output file
+	gio/giomm/private/Makefile from the list.
+	* gio/giomm/private/Makefile.am: Delete file.
+	* gio/src/Makefile_list_of_hg.am_fragment: Delete file.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Convert glib/ sub-tree to new build system
+
+	* glib/src/filelist.am: New file for defining the lists of
+	gmmproc input files and M4 template files.
+	* glib/src/Makefile.am: Clean up and modernize.  Integrate
+	with the new generate-binding.am build file from mm-common.
+	* glib/glibmm/filelist.am: New file for the lists of source
+	code files, both generated and static.  Also list files from
+	the private/ subdirectory here.
+	* glib/glibmm/Makefile.am: Clean up and modernize.  Integrate
+	with the new compile-binding.am build file from mm-common.
+	* configure.ac (AC_CONFIG_FILES): Remove the output file
+	glib/glibmm/private/Makefile from the list.
+	* glib/glibmm/private/Makefile.am: Delete file.
+	* glib/src/Makefile_list_of_hg.am_fragment: Delete file.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Do not recurse into scripts/ subdirectory
+
+	* Makefile.am: Install scripts/glibmm_check_perl.m4 from here.
+	* scripts/Makefile.am: Delete file.
+	* configure.ac (AC_CONFIG_FILES): Remove scripts/Makefile.
+
+2009-08-09  Daniel Elstner  <danielk@openismus.com>
+
+	Convert tools/ directory to new build system
+
+	* configure.ac (AC_CONFIG_FILES): Remove the output files
+	tools/{extra_defs_gen,m4,pm}/Makefile from the list.
+	* tools/Makefile.am: Clean up.  Build, distribute and install the
+	contents of all three subdirectories.  Rename generate_extra_defs
+	executable to generate_defs_glib.
+	* tools/m4/filelist.am: New file to hold the list of M4 files.
+	* tools/pm/filelist.am: New file to hold the list of Perl modules.
+	* tools/{extra_defs_gen,m4,pm}/Makefile.am: Delete files.
+
+2009-08-08  Daniel Elstner  <danielk@openismus.com>
+
+	Remove glib/Makefile.am and gio/Makefile.am
+
+	* Makefile.am: Move things from glib/Makefile.am and gio/Makefile.am
+	to the toplevel.  Remove the improvised custom convenience rules for
+	now.
+	(SUBDIRS): Enter the glib/src, gio/src, glib/glibmm and gio/giomm
+	subdirectories directly from the toplevel.  Use indirect variables
+	to define the conditionally entered subdirectories.
+	* configure.ac: Call macros from mm-common for preparing the build of
+	the reference documentation.  Remove {glib,gio}/Makefile.am from the
+	AC_CONFIG_FILES list.  Avoid repeating the version requirement for all
+	the basic g* libraries when constructing the list of dependencies for
+	pkg-config.
+	* {glib,gio}/Makefile.am: Remove files.
+
+2009-08-07  Daniel Elstner  <danielk@openismus.com>
+
+	Begin transition to new build infrastructure
+
+	* autogen.sh: Replace script with a minimalistic wrapper around
+	mm-common-prepare, autoreconf and configure.
+	* Makefile.am (ACLOCAL_AMFLAGS): Pick up ${ACLOCAL_FLAGS} from the
+	environment, so that autoreconf can do its magic.
+	* configure.ac: Modernize.  Cut loads of old cruft.  Make use of
+	magic mm-common macros to simplify things.  Declare build/ as the
+	destination for auxiliary build files.  Add TODO comments to flag
+	the pieces that still need cutting.  Re-enable autoheader.
+	* config.h.in: Remove file, and have autoheader generate it.
+
 2009-07-17  David King  <davidk@openismus.com>
 
 	* examples/properties/properties_example.cc: Only compile the

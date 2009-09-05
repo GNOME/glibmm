@@ -18,17 +18,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/utility.h>
 #include <glib.h>
 #include <cerrno>
 #include <stdexcept>
-#include <glibmmconfig.h>
-
-GLIBMM_USING_STD(out_of_range)
-GLIBMM_USING_STD(overflow_error)
-GLIBMM_USING_STD(underflow_error)
-
 
 bool Glib::str_has_prefix(const std::string& str, const std::string& prefix)
 {

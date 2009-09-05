@@ -1,4 +1,4 @@
-#! @PERL_PATH@
+#! @PERL@
 #
 # @configure_input@
 #
@@ -43,12 +43,11 @@ BEGIN {
   my $exec_prefix = "@exec_prefix@";
   my $libdir = "@libdir@";
 
-  # This line must match the install directory in m4/Makefile.am
-  $main::procdir = "$libdir/glibmm-2.4/proc";
+  # This line must match the install directory
+  $main::procdir = $libdir . '/@GLIBMM_MODULE_NAME@/proc';
   $main::m4path = "@M4@";
 
-  # This line must match install dir from pm/Makefile.am
-  push @INC,"$main::procdir/pm";
+  push(@INC, $main::procdir . '/pm');
 }
 
 use strict;
@@ -59,20 +58,14 @@ use WrapParser;
 
 # initialize globals 
 @main::macrodirs = ();
-$main::srcdir = ".";
-$main::defsdir = ".";
-$main::source = "";
-$main::debug = 0;
+$main::srcdir    = '.';
+$main::defsdir   = '.';
+$main::source    = '';
 $main::unwrapped = 1;
-
-{ # checking the environment for a set variable can trigger a warning
-  no warnings;
-  $main::debug = 1 if ($ENV{'GMMPROC_DEBUG'} eq 1);
-}
+$main::debug     = (exists $ENV{'GMMPROC_DEBUG'}) ? $ENV{'GMMPROC_DEBUG'} : '';
 
 # prototypes
 sub parse_command_line_args();
-
 
 #main()
 parse_command_line_args();
@@ -227,13 +220,12 @@ sub parse_command_line_args()
 
   if ($#ARGV != 1)
   {
-    print STDERR "Invalid number of arguments (", $#ARGV+2, ")\n";
+    print STDERR ('Invalid number of arguments (', $#ARGV + 2, ")\n");
     print_usage();
   }
 
   $main::srcdir = $ARGV[0];
   $main::source = $_;
 
-  push @main::macrodirs,"$main::procdir/m4";
+  push @main::macrodirs, $main::procdir . '/m4';
 }
-

@@ -371,17 +371,8 @@ sub convert_tags_to_doxygen($)
     # Remove all para tags (from tmpl sgml files).
     s"&lt;/?para&gt;""g;
 
-    # Use our doxgen since/newin tags:
-    # TODO: Do this generically, regardless of the number:
-    s"Since: 2\.2"\@newin2p2"mg;
-    s"Since: 2\.4"\@newin2p4"mg;
-    s"Since: 2\.6"\@newin2p6"mg;
-    s"Since: 2\.8"\@newin2p8"mg;
-    s"Since: 2\.10"\@newin2p10"mg;
-    s"Since: 2\.12"\@newin2p12"mg;
-    s"Since: 2\.14"\@newin2p14"mg;
-    s"Since: 2\.16"\@newin2p16"mg;
-    s"Since: 2\.18"\@newin2p18"mg;
+    # Use our Doxygen @newin alias:
+    s/\bSince:\s*(\d+)\.(\d+)\b/\@newin{$1,$2}/g;
 
     s"\b-&gt;\b"->"g;
 

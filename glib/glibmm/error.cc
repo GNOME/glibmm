@@ -1,5 +1,4 @@
 // -*- c++ -*-
-/* $Id$ */
 
 /* error.cc
  *
@@ -20,16 +19,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-//#include <glib/gtestutils.h> //For g_assert() in glib >= 2.15.0
-//#include <glib/gmessages.h> //For g_assert() in glib < 2.15.0
-#include <glib.h> //For g_assert() in all versions of glib.
-
-#include <map>
 #include <glibmmconfig.h>
 #include <glibmm/error.h>
 #include <glibmm/wrap_init.h>
-
-GLIBMM_USING_STD(map)
+#include <glib.h>
+#include <map>
 
 namespace
 {

@@ -2,8 +2,6 @@
 #ifndef _GLIBMM_EXCEPTIONHANDLER_H
 #define _GLIBMM_EXCEPTIONHANDLER_H
 
-/* $Id$ */
-
 /* exceptionhandler.h
  *
  * Copyright 2002 The gtkmm Development Team
@@ -23,8 +21,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <sigc++/sigc++.h>
 #include <glibmmconfig.h>
+#include <sigc++/sigc++.h>
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 

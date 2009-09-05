@@ -104,7 +104,7 @@ bool content_type_can_be_executable(const Glib::ustring& type);
  * @param mime_type a mime type string.
  * @returns string with content type or empty when it does not know.
  *
- * @newin2p20
+ * @newin{2,20}
  */
 Glib::ustring content_type_from_mime_type(const Glib::ustring& mime_type);
 
@@ -149,7 +149,7 @@ Glib::ustring content_type_guess(const std::string& filename,
  * @param root The root of the tree to guess a type for.
  * @return List of zero or more content types.
  *
- * @newin2p18
+ * @newin{2,18}
  */
 Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const File>& root);
 

@@ -23,11 +23,7 @@
 #include <glibmm/thread.h>
 #include <glibmm/wrap.h>
 #include <glibmm/iochannel.h>
-
 #include <algorithm>
-
-GLIBMM_USING_STD(min)
-
 
 namespace
 {
