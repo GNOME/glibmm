@@ -28,7 +28,7 @@ doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(glibmm_files_h)) \
             $(addprefix $(top_srcdir)/gio/giomm/,$(giomm_files_h))
 
 doctooldir = $(datadir)/$(GLIBMM_MODULE_NAME)/doctool
-dist_doctool_DATA = doc-install.pl doc-postprocess.pl tagfile-to-devhelp2.xsl
+dist_doctool_DATA = doc-install.pl doc-postprocess.pl doxygen.css tagfile-to-devhelp2.xsl
 
 docimagesdir = $(libdocdir)/images
 dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif
@@ -39,6 +39,4 @@ dist_noinst_DATA +=				\
 	internal/documentation_generation.txt	\
 	internal/gmmproc_internals.txt		\
 	internal/using_gmmproc.txt		\
-	internal/gtk_entry.dia			\
-	reference/glibmm_header.html_fragment	\
-	reference/glibmm_footer.html_fragment
+	internal/gtk_entry.dia
