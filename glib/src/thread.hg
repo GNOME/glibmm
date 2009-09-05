@@ -589,28 +589,28 @@ private:
  * they can signal the @a Cond, such that the waiting thread is woken up.
  * @par Usage example:
  * @code
- * Glib::Cond data_cond;
+ * Glib::Cond  data_cond;
  * Glib::Mutex data_mutex;
- * void* current_data = NULL;
- * 
- * void push_data (void* data)
+ * void* current_data = 0;
+ *
+ * void push_data(void* data)
  * {
- *   data_mutex.lock();
+ *   Glib::Mutex::Lock lock (data_mutex);
+ *
  *   current_data = data;
  *   data_cond.signal();
- *   data_mutex.unlock();
  * }
- * 
- * void* pop_data ()
+ *
+ * void* pop_data()
  * {
- *   void* data;
- * 
- *   data_mutex.lock();
+ *   Glib::Mutex::Lock lock (data_mutex);
+ *
  *   while (!current_data)
- *       data_cond.wait(data_mutex);
- *   data = current_data;
- *   current_data = NULL;
- *   data_mutex.unlock();
+ *     data_cond.wait(data_mutex);
+ *
+ *   void *const data = current_data;
+ *   current_data = 0;
+ *
  *   return data;
  * }
  * @endcode
