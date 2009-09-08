@@ -48,8 +48,6 @@
 #include <giomm/filterinputstream.h>
 #include <giomm/filteroutputstream.h>
 #include <giomm/icon.h>
-#include <giomm/inetaddress.h>
-#include <giomm/inetsocketaddress.h>
 #include <giomm/init.h>
 #include <giomm/inputstream.h>
 #include <giomm/iostream.h>
@@ -58,14 +56,8 @@
 #include <giomm/memoryoutputstream.h>
 #include <giomm/mount.h>
 #include <giomm/mountoperation.h>
-#include <giomm/networkaddress.h>
 #include <giomm/outputstream.h>
-#include <giomm/resolver.h>
 #include <giomm/seekable.h>
-#include <giomm/socketaddressenumerator.h>
-#include <giomm/socketaddress.h>
-#include <giomm/socketconnectable.h>
-#include <giomm/srvtarget.h>
 #include <giomm/themedicon.h>
 #include <giomm/unixinputstream.h>
 #include <giomm/unixoutputstream.h>

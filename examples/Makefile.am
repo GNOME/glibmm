@@ -23,7 +23,6 @@ check_PROGRAMS =			\
 	iochannel_stream/example	\
 	keyfile/example			\
 	markup/parser			\
-	network_io/resolve		\
 	options/example			\
 	properties/example		\
 	regex/example			\
