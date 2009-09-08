@@ -1,3 +1,16 @@
+2009-09-08  Daniel Elstner  <danielk@openismus.com>
+
+	Implement Gio::Socket ctors using Gio::Initable
+
+	* gio/src/gio_vfuncs.defs: Add GInitableClass::init() vfunc.
+	* gio/src/initable.{ccg,hg} (Initable::init): Use _WRAP_METHOD().
+	(Initable::init_vfunc): Wrap GInitableClass::init() vfunc.
+	* gio/src/socket.{ccg,hg} (Socket::Socket): Wrap constructors
+	manually.  Call Initable::init() from the constructor body.
+	(Socket::create), (Socket::create_from_fd): Forward to constructors.
+	* tools/m4/convert_gio.m4: Add conversion from GCancellable* to
+	const Glib::RefPtr<Cancellable>&.
+
 2009-09-07  Daniel Elstner  <danielk@openismus.com>
 
 	Officially deprecate GLIBMM_CHECK_PERL macro

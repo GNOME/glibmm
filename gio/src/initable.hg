@@ -55,16 +55,11 @@ class Initable : public Glib::Interface
 {
   _CLASS_INTERFACE(Initable, GInitable, G_INITABLE, GInitableIface)
 
-public:
-  _WRAP_METHOD_DOCS_ONLY(g_initable_init)
-  void init(const Glib::RefPtr<Cancellable>& cancellable);
-  /** non-cancellable variant of init() */
-  void init();
+protected:
+  _WRAP_METHOD(void init(const Glib::RefPtr<Cancellable>& cancellable),
+               g_initable_init, errthrow)
 
-  // FIXME: this interface (and classes derived from it) really needs some
-  // additional thought for the binding since it seems to imply that we need to
-  // call g_initable_new() or g_derived_new() (which can fail with a GError)
-  // rather than calling g_object_new() like we usually do in gtkmm
+  _WRAP_VFUNC(bool init(const Glib::RefPtr<Cancellable>& cancellable, GError** error), "init")
 };
 
 } // namespace Gio

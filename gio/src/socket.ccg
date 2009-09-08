@@ -24,6 +24,35 @@
 namespace Gio
 {
 
+Socket::Socket(SocketFamily family, SocketType type, SocketProtocol protocol,
+               const Glib::RefPtr<Cancellable>& cancellable)
+:
+  _CONSTRUCT("family", int(family), "type", int(type), "protocol", int(protocol))
+{
+  init(cancellable);
+}
+
+Socket::Socket(int fd, const Glib::RefPtr<Cancellable>& cancellable)
+:
+  _CONSTRUCT("fd", fd)
+{
+  init(cancellable);
+}
+
+// static
+Glib::RefPtr<Socket> Socket::create(SocketFamily family, SocketType type, SocketProtocol protocol,
+                                    const Glib::RefPtr<Cancellable>& cancellable)
+{
+  return Glib::RefPtr<Socket>(new Socket(family, type, protocol, cancellable));
+}
+
+// static
+Glib::RefPtr<Socket> Socket::create_from_fd(int fd, const Glib::RefPtr<Cancellable>& cancellable)
+{
+  return Glib::RefPtr<Socket>(new Socket(fd, cancellable));
+}
+
+
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 void Socket::connect(const Glib::RefPtr<SocketAddress>& address)
 #else
