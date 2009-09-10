@@ -122,9 +122,7 @@ sub parse_and_build_output($)
     if ($token eq "_WRAP_GERROR") { $self->on_wrap_gerror(); next;}
     if ($token eq "_IMPLEMENTS_INTERFACE") { $self->on_implements_interface(); next;}
 
-    my $prefix_class = "_CLASS_"; # e.g. _CLASS_GTKOBJECT
-    my $token_prefix = substr($token, 0, length($prefix_class));
-    if ($token_prefix eq $prefix_class)
+    if ($token =~ m/\A_CLASS_/s)
     {
       $self->on_class($token);
       next;
@@ -236,7 +234,7 @@ sub peek_token($)
 sub tokens_remaining($)
 {
   my ($self) = @_;
-  return scalar(@tokens)!=0;
+  return $#tokens >= 0;
 }
 
 
@@ -432,7 +430,7 @@ sub on_namespace($)
 
   # we need to peek ahead to figure out what type of namespace 
   # declaration this is.
-  while ( $number < scalar(@tokens) )
+  while ( $number <= $#tokens )
   {
     $token = $tokens[$number];
     $number++;
@@ -524,7 +522,7 @@ sub on_class($$)
   
   # When we hit _CLASS, we walk backwards through the output to find "class"
   my $token;
-  while ( scalar(@{$$objOutputter{out}}) > 0)
+  while ( scalar(@{$$objOutputter{out}}))
   {
     $token = pop @{$$objOutputter{out}};
     unshift(@back, $token);
@@ -596,7 +594,7 @@ sub on_close_brace($)
   $objOutputter->append("}"); #We append it here instead of after we return, so that we can end the namespace after it.
 
   $self->on_end_namespace()
-    if ( (scalar(@{$$self{in_namespace}}) > 0) && (@{$$self{in_namespace}}[0] == $$self{level}) );
+    if ( scalar(@{$$self{in_namespace}}) && (@{$$self{in_namespace}}[0] == $$self{level}) );
 
   $$self{level}--;
 }
@@ -716,39 +714,38 @@ sub read_file($$$)
 {
   my ($self, $srcdir, $source) = @_;
 
-  my $line;
-  my @in;
+  my $lineno = 1;
+  my @in = ();
 
   if ( ! -r "${srcdir}/${source}.hg")
   {
     print "Unable to find header file $srcdir/$source.hg\n";
-    exit(-1); 
+    exit(1);
   }
 
   # Read header file:
   open(FILE, "${srcdir}/${source}.hg");
-#  push(@in, "#f ${source}.hg\n"); #TODO: What does #f do?
-  $line = 1;
+  push(@in, "#f ${source}.hg\n");
   while (<FILE>)
     {
-#      push(@in, "#l $line\n"); #TODO: What does #l do?
+      push(@in, "#l $lineno\n");
       push(@in, $_);
-      $line++;
+      ++$lineno;
     }
   close(FILE);
-  push(@in, "\n_SECTION(SECTION_SRC_CUSTOM)\n");
+  push(@in, "\n", "_SECTION(SECTION_SRC_CUSTOM)\n");
 
   # Source file is optional.
   if ( -r "${srcdir}/${source}.ccg")
   {
     open(FILE, "${srcdir}/${source}.ccg");
-    $line = 1;
-#    push(@in, "#f ${source}.ccg\n"); #TODO: What does #f do?
+    $lineno = 1;
+    push(@in, "#f ${source}.ccg\n");
     while (<FILE>)
       {
-#        push(@in, "#l $line\n"); #TODO: What does #l do?
+        push(@in, "#l $lineno\n");
         push(@in, $_);
-        $line++;
+        ++$lineno;
       }
     close(FILE);
   }
@@ -868,7 +865,7 @@ sub on_wrap_method($)
   $$objCfunc{deprecated} = "";
   my $deprecation_docs = "";
   my $ifdef;
-  while(scalar(@args) > 2) # If the optional ref/err/deprecated arguments are there.
+  while($#args >= 2) # If the optional ref/err/deprecated arguments are there.
   {
     my $argRef = string_trim(pop @args);
     #print "debug arg=$argRef\n";
@@ -952,7 +949,7 @@ sub on_wrap_method_docs_only($)
   }
 
   # Extra ref needed?
-  while(scalar(@args) > 1) # If the optional ref/err arguments are there.
+  while($#args >= 1) # If the optional ref/err arguments are there.
   {
     my $argRef = string_trim(pop @args);
     if($argRef eq "errthrow")
@@ -1047,7 +1044,7 @@ sub on_implements_interface($$)
 
   # Extra stuff needed?
   my $ifdef; 
-  while(scalar(@args) > 1) # If the optional ref/err/deprecated arguments are there.
+  while($#args >= 1) # If the optional ref/err/deprecated arguments are there.
   {
   	my $argRef = string_trim(pop @args);
     if($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
@@ -1098,7 +1095,7 @@ sub on_wrap_signal($$)
   my $bRefreturn = 0;
   my $ifdef;
   
-  while(scalar(@args) > 2) # If optional arguments are there.
+  while($#args >= 2) # If optional arguments are there.
   {
     my $argRef = string_trim(pop @args);
     if($argRef eq "custom_default_handler")
@@ -1155,7 +1152,7 @@ sub on_wrap_vfunc($)
   my $ifdef = "";
 
   # Extra ref needed?
-  while(scalar(@args) > 2) # If the optional ref/err arguments are there.
+  while($#args >= 2) # If the optional ref/err arguments are there.
   {
     my $argRef = string_trim(pop @args);
 
@@ -1186,7 +1183,7 @@ sub on_wrap_enum($)
   # remove it from the output and pass it to the m4 _ENUM macro instead.
   my $comment = "";
 
-  if(scalar(@$out) >= 2)
+  if($#$out > 0)
   {
     # steal the last two tokens
     my @back = splice(@$out, -2);
@@ -1260,7 +1257,7 @@ sub on_wrap_property($)
   #Convert the property name to a canonical form, as it is inside gobject.
   #Otherwise, gobject might not recognise the name, 
   #and we will not recognise the property name when we get notification that the value changes.
-  $argPropertyName =~ s/_/-/g; #g means replace all.
+  $argPropertyName =~ tr/_/-/;
 
   my $argCppType = $args[1];
   $argCppType = string_trim($argCppType);
