@@ -1,5 +1,27 @@
 2009-09-10  Daniel Elstner  <danielk@openismus.com>
 
+	Fix broken test for empty _WRAP_METHOD argument
+
+	* tools/pm/DocsParser.pm: Escape variable values substituted into
+	regular expressions.
+	* tools/pm/Output.pm (output_wrap_property): Transliterate using
+	tr/// instead of s///g.
+	* tools/pm/WrapParser.pm: Correct a number of worst offenders among
+	all the bad Perl code.
+	(on_wrap_{ctor,method,corba_method}): Instead of testing whether
+	the prototype argument does not consist solely of non-whitespace
+	characters, actually do what the accompanying comment claimed and
+	test whether the argument is empty or consists only of whitespace.
+	The only reason this age-old bug was never triggered is that there
+	is always at least one whitespace character in a prototype, namely
+	between the return type and the function name.  The only exception
+	would be the default constructor, which however just so happens to
+	have its own special _CTOR_DEFAULT macro.
+	In a nutshell, the bug itself was broken and failed to properly
+	break things.
+
+2009-09-10  Daniel Elstner  <danielk@openismus.com>
+
 	Re-enable input file line markers in gmmproc
 
 	* tools/pm/WrapParser.pm: Replace hairy uses of scalar(@array)

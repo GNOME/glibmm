@@ -173,15 +173,15 @@ sub extract_token($)
     # skip empty tokens
     next if ( !defined($_) or $_ eq "" );
 
-    # eat line statements. TODO: e.g.?
-    if ( /^#l (\S+)\n/)
+    # eat line statements
+    if (m/^#l (\S+)\n/)
     {
       $$self{line_num} = $1;
       next;
     }
 
-    # eat file statements. TODO: e.g.?
-    if ( /^#f (\S+)\n/)
+    # eat file statements
+    if (m/^#f (\S+)\n/)
     {
       $$self{filename} = $1;
       next;
@@ -209,13 +209,13 @@ sub peek_token($)
     {
       shift @tokens;
     }
-    # eat line statements. TODO: e.g.?
+    # eat line statements
     elsif ( /^#l (\S+)\n/)
     {
       $$self{line_num} = $1;
       shift @tokens;
     }
-    # eat file statements. TODO: e.g.?
+    # eat file statements
     elsif ( /^#f (\S+)\n/)
     {
       $$self{filename} = $1;
@@ -337,7 +337,7 @@ sub on_comment_doxygen($)
       # can print it if the next real token is not _WRAP_SIGNAL
       my @whitespace;
       my $next_token = $self->peek_token();
-      while ($next_token =~ /^\s*$/)
+      while ($next_token !~ /\S/)
       {
         push(@whitespace, $self->extract_token());
 	$next_token = $self->peek_token();
@@ -356,12 +356,12 @@ sub on_comment_doxygen($)
       }
       else
       {
-        # Something else then signal follows, so close comment normally
+        # Something other than signal follows, so close comment normally
         $objOutputter->append("/");
-	# And append whitespace we ignored so far
+        # And append whitespace we ignored so far
         $objOutputter->append(join("", @whitespace));
-	# Do not extract the token so that parse_and_build_output() will
-	# process it.
+        # Do not extract the token so that parse_and_build_output() will
+        # process it.
       }
 
       last;
@@ -790,7 +790,7 @@ sub check_for_eof($)
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
 
-  if (!(scalar(@tokens)))
+  unless (scalar(@tokens))
   {
     print STDERR "$filename:$line_num:hit eof in _WRAP\n";
     return 0; #EOF
@@ -805,10 +805,7 @@ sub on_wrap_method($)
   my ($self) = @_;
   my $objOutputter = $$self{objOutputter};
 
-  if( !($self->check_for_eof()) )
-  {
-   return;
-  }
+  return unless ($self->check_for_eof());
 
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
@@ -818,7 +815,7 @@ sub on_wrap_method($)
 
   my $entity_type = "method";
 
-  if (!$$self{in_class})
+  unless ($$self{in_class})
     {
       print STDERR "$filename:$line_num:_WRAP macro encountered outside class\n";
       return;
@@ -829,17 +826,14 @@ sub on_wrap_method($)
 
   # handle first argument
   my $argCppMethodDecl = $args[0];
-  if ($argCppMethodDecl =~ /^\S+$/ ) #Checks that it's not empty and that it contains no whitespace.
+  if ($argCppMethodDecl !~ m/\S/s)
   {
-    print STDERR "$filename:$line_num:_WRAP can't handle unspecified method $argCppMethodDecl\n";
+    print STDERR "$filename:$line_num:_WRAP_METHOD: missing prototype\n";
     return;
   }
-  else
-  {
-    #Parse the method decaration and build an object that holds the details:
-    $objCppfunc = &Function::new($argCppMethodDecl, $self);
-  }
 
+  #Parse the method decaration and build an object that holds the details:
+  $objCppfunc = &Function::new($argCppMethodDecl, $self);
 
   # handle second argument:
 
@@ -848,8 +842,8 @@ sub on_wrap_method($)
 
   #Get the c function's details:
 
-  #Checks that it's not empty and that it contains no whitespace.
-  if ($argCFunctionName =~ /^\S+$/ )
+  # Checks that it's not empty and that it contains no whitespace.
+  if ($argCFunctionName =~ m/^\S+$/s)
   {
     #c-name. e.g. gtk_clist_set_column_title
     $objCfunc = GtkDefs::lookup_function($argCFunctionName);
@@ -933,10 +927,10 @@ sub on_wrap_method_docs_only($)
   my $argCFunctionName = $args[0];
   $argCFunctionName = string_trim($argCFunctionName);
 
-  #Get the c function's details:
+  # Get the C function's details:
 
-  #Checks that it's not empty and that it contains no whitespace.
-  if ($argCFunctionName =~ /^\S+$/ ) 
+  # Checks that it's not empty or contains whitespace
+  if ($argCFunctionName =~ m/^\S+$/s)
   {
     #c-name. e.g. gtk_clist_set_column_title
     $objCfunc = GtkDefs::lookup_function($argCFunctionName);
@@ -993,25 +987,22 @@ sub on_wrap_ctor($)
 
   # handle first argument
   my $argCppMethodDecl = $args[0];
-  if ($argCppMethodDecl =~ /^\S+$/ ) #Checks that it's not empty and that it contains no whitespace.
+  if ($argCppMethodDecl !~ m/\S/s)
     {
-      print STDERR "$filename:$line_num:_WRAP_CTOR can't handle unspecified method $argCppMethodDecl\n";
+      print STDERR "$filename:$line_num:_WRAP_CTOR: missing prototype\n";
       return;
     }
-  else
-    {
-      #Parse the method decaration and build an object that holds the details:
-      $objCppfunc = &Function::new_ctor($argCppMethodDecl, $self);
-    }
 
+  #Parse the method decaration and build an object that holds the details:
+  $objCppfunc = &Function::new_ctor($argCppMethodDecl, $self);
 
   # handle second argument:
 
   my $argCFunctionName = $args[1];
   $argCFunctionName = string_trim($argCFunctionName);
 
-  #Get the c function's details:
-  if ($argCFunctionName =~ /^\S+$/ ) #Checks that it's not empty and that it contains no whitespace.
+  #Get the C function's details:
+  if ($argCFunctionName =~ m/^\S+$/s)
   {
     $objCfunc = GtkDefs::lookup_function($argCFunctionName); #c-name. e.g. gtk_clist_set_column_title
     if(!$objCfunc) #If the lookup failed:
@@ -1221,7 +1212,7 @@ sub on_wrap_gerror($)
 {
   my ($self) = @_;
 
-  return if(!$self->check_for_eof());
+  return unless ($self->check_for_eof());
 
   # get the arguments
   my @args = string_split_commas($self->extract_bracketed_text());
@@ -1241,10 +1232,7 @@ sub on_wrap_property($)
   my ($self) = @_;
   my $objOutputter = $$self{objOutputter};
 
-  if( !($self->check_for_eof()) )
-  {
-    return;
-  }
+  return unless ($self->check_for_eof());
 
   my $str = $self->extract_bracketed_text();
   my @args = string_split_commas($str);
@@ -1276,20 +1264,17 @@ sub output_wrap_check($$$$$$)
 
   #Some checks:
 
-
-  if (!$$self{in_class})
+  unless ($$self{in_class})
   {
     print STDERR "$filename:$line_num: $macro_name macro encountered outside class\n";
-    return;
+    return 1;
   }
-
-  if ($CppDecl =~ /^\S+$/ ) #If it's not empty and it contains no whitespace.
+  if ($CppDecl !~ m/\S/s)
   {
-    print STDERR "$filename:$line_num:$macro_name can't handle unspecified entity $CppDecl\n";
-    return;
+    print STDERR "$filename:$line_num:$macro_name: missing prototype\n";
+    return 1;
   }
-
-
+  return '';
 }
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn)
@@ -1299,8 +1284,8 @@ sub output_wrap_signal($$$$$$$$$)
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous) = @_;
   
   #Some checks:
-  $self->output_wrap_check($CppDecl, $signal_name, $filename, $line_num, "WRAP_SIGNAL");
-
+  return if ($self->output_wrap_check($CppDecl, $signal_name,
+                                      $filename, $line_num, "_WRAP_SIGNAL"));
   # handle first argument
 
   #Parse the method decaration and build an object that holds the details:
@@ -1314,7 +1299,7 @@ sub output_wrap_signal($$$$$$$$$)
   my $objOutputter = $$self{objOutputter};
 
   #Get the c function's details:
-  if ($signal_name ne "" ) #If it's not empty and it contains no whitespace.
+  if ($signal_name ne '')
   {
     $objCSignal = GtkDefs::lookup_signal($$self{c_class}, $signal_name);
 
@@ -1347,7 +1332,7 @@ sub output_wrap_vfunc($$$$$$$$)
   my ($self, $CppDecl, $vfunc_name, $refreturn, $refreturn_ctype, $filename, $line_num, $ifdef) = @_;
 
   #Some checks:
-  $self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, "VFUNC");
+  return if ($self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, '_WRAP_VFUNC'));
 
   # handle first argument
 
@@ -1361,7 +1346,7 @@ sub output_wrap_vfunc($$$$$$$$)
   my $objOutputter = $$self{objOutputter};
 
   #Get the c function's details:
-  if ($vfunc_name =~ /^\S+$/ ) #If it's not empty and it contains no whitespace.
+  if ($vfunc_name =~ m/^\S+$/s) # if it's not empty and contains no whitespace
   {
     $objCVfunc = GtkDefs::lookup_signal($$self{c_class},$vfunc_name);
     if(!$objCVfunc) #If the lookup failed:
@@ -1405,10 +1390,7 @@ sub on_wrap_corba_method($)
   my ($self) = @_;
   my $objOutputter = $$self{objOutputter};
 
-  if( !($self->check_for_eof()) )
-  {
-   return;
-  }
+  return unless ($self->check_for_eof());
 
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
@@ -1424,22 +1406,18 @@ sub on_wrap_corba_method($)
       return;
     }
 
-  my $objCfunc;
   my $objCppfunc;
 
   # handle first argument
   my $argCppMethodDecl = $args[0];
-  if ($argCppMethodDecl =~ /^\S+$/ ) #Checks that it's not empty and that it contains no whitespace.
+  if ($argCppMethodDecl !~ m/\S/s)
   {
-    print STDERR "$filename:$line_num:_WRAP can't handle unspecified method $argCppMethodDecl\n";
+    print STDERR "$filename:$line_num:_WRAP_CORBA_METHOD: missing prototype\n";
     return;
   }
-  else
-  {
-    #Parse the method decaration and build an object that holds the details:
-    $objCppfunc = &Function::new($argCppMethodDecl, $self);
-  }
 
+  # Parse the method decaration and build an object that holds the details:
+  $objCppfunc = &Function::new($argCppMethodDecl, $self);
   $objOutputter->output_wrap_corba_method($filename, $line_num, $objCppfunc);
 }
 

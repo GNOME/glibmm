@@ -616,7 +616,7 @@ sub output_wrap_property($$$$$$)
 
     # Convert - to _ so we can use it in C++ method and variable names:
     my $name_underscored = $name;
-    $name_underscored =~ s/-/_/g;
+    $name_underscored =~ tr/-/_/;
 
     my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s)dnl\n",
       $name,
