@@ -799,6 +799,41 @@ sub check_for_eof($)
   return 1; # No EOF
 }
 
+# Look back for a Doxygen comment.  If there is one,
+# remove it from the output and return it as a string.
+sub extract_preceding_documentation ($)
+{
+  my ($self) = @_;
+  my $outputter = $$self{objOutputter};
+  my $out = \@{$$outputter{out}};
+
+  my $comment = '';
+
+  if ($#$out >= 2)
+  {
+    # steal the last three tokens
+    my @back = splice(@$out, -3);
+    local $_ = join('', @back);
+
+    # Check for /*[*!] ... */ or //[/!] comments.  The closing */ _must_
+    # be the last token of the previous line.  Apart from this restriction,
+    # anything else should work, including multi-line comments.
+
+    if (m#\A/\s*\*(?:\*`|`!)(.+)'\*/\s*\z#s or m#\A\s*//`[/!](.+)'\s*\z#s)
+    {
+      $comment = $1;
+      $comment =~ s/\s+$//;
+    }
+    else
+    {
+      # restore stolen tokens
+      push(@$out, @back);
+    }
+  }
+
+  return $comment;
+}
+
 # void on_wrap_method()
 sub on_wrap_method($)
 {
@@ -810,6 +845,7 @@ sub on_wrap_method($)
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
 
+  my $commentblock = $self->extract_preceding_documentation();
   my $str = $self->extract_bracketed_text();
   my @args = string_split_commas($str);
 
@@ -890,8 +926,14 @@ sub on_wrap_method($)
     }
   }
 
-  my $commentblock = "";
-  $commentblock = DocsParser::lookup_documentation($argCFunctionName, $deprecation_docs);
+  if ($commentblock ne '')
+  {
+    $commentblock = '  /**' . $commentblock . "\n   */\n";
+  }
+  else
+  {
+    $commentblock = DocsParser::lookup_documentation($argCFunctionName, $deprecation_docs);
+  }
 
   $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock, $ifdef);
 }
@@ -902,10 +944,7 @@ sub on_wrap_method_docs_only($)
   my ($self) = @_;
   my $objOutputter = $$self{objOutputter};
 
-  if( !($self->check_for_eof()) )
-  {
-   return;
-  }
+  return unless ($self->check_for_eof());
 
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
@@ -1165,36 +1204,10 @@ sub on_wrap_enum($)
 {
   my ($self) = @_;
 
-  return if(!$self->check_for_eof());
+  return unless ($self->check_for_eof());
 
   my $outputter = $$self{objOutputter};
-  my $out = \@{$$outputter{out}};
-
-  # Look back for a Doxygen comment for this _WRAP_ENUM.  If there is one,
-  # remove it from the output and pass it to the m4 _ENUM macro instead.
-  my $comment = "";
-
-  if($#$out > 0)
-  {
-    # steal the last two tokens
-    my @back = splice(@$out, -2);
-    local $_ = $back[0];
-
-    # Check for /*[*!] ... */ or //[/!] comments.  The closing */ _must_
-    # be the last token of the previous line.  Apart from this restriction,
-    # anything else should work, including multi-line comments.
-
-    if($back[1] eq "\n" && (m#^/\*`[*!](.+)'\*/#s || m#^//`[/!](.+)'$#))
-    {
-      $comment = $1;
-      $comment =~ s/\s+$//;
-    }
-    else
-    {
-      # restore stolen tokens
-      push(@$out, @back);
-    }
-  }
+  my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
   my @args = string_split_commas($self->extract_bracketed_text());
