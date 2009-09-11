@@ -821,8 +821,8 @@ sub extract_preceding_documentation ($)
 
     if (m#\A/\s*\*(?:\*`|`!)(.+)'\*/\s*\z#s or m#\A\s*//`[/!](.+)'\s*\z#s)
     {
-      $comment = $1;
-      $comment =~ s/\s+$//;
+      $comment = '`' . $1;
+      $comment =~ s/\s*$/'/;
     }
     else
     {
