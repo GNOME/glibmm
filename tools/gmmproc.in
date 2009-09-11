@@ -93,61 +93,54 @@ $objOutputter->output_temp_g1($$objWrapParser{module}); # e.g. "gtk"
 # Execute m4 to get *.g2 file:
 {
   my $exitcode = $objOutputter->make_g2_from_g1();
-  if ($exitcode != 0)
+  if ($exitcode)
   {
-    if (!$main::debug)
-    {
-      $objOutputter->remove_temp_files();
-    }
+    $objOutputter->remove_temp_files() unless ($main::debug);
+
     print STDERR "m4 failed with exit code $exitcode.  Aborting...\n";
-    exit ($exitcode);
+    exit($exitcode);
   }
 }
 
 # Section out the resulting output
 $objOutputter->write_sections_to_files();
-
-# Remove temp files.
-if (!$main::debug)
-{
-  $objOutputter->remove_temp_files();
-}
+$objOutputter->remove_temp_files() unless ($main::debug);
 
 #Warn about any unwrapped function/signals:
 if ($main::unwrapped)
 { 
   my @unwrapped = GtkDefs::get_unwrapped();
+  @unwrapped = grep { exists $$_{entity_type} } @unwrapped;
+
   if (@unwrapped)
   {
-    no warnings;
+    my @methods = grep { $$_{entity_type} eq 'method' and $$_{c_name} !~ m/^_/s } @unwrapped;
+    my @signals = grep { $$_{entity_type} eq 'signal' } @unwrapped;
+    my @properties = grep { $$_{entity_type} eq 'property' } @unwrapped;
 
-    my @methods =
-      grep {$$_{entity_type} eq "method" & $$_{c_name}!~/^_/ } @unwrapped;
-    my @signals =
-      grep {$$_{entity_type} eq "signal"} @unwrapped;
-    my @properties =
-      grep {$$_{entity_type} eq "property"} @unwrapped;
+    local $, = "\ngmmproc:   ";
+    local $\ = "\n";
 
     if (@methods)
-    { 
-      print "Unwrapped functions:\n";
-      map { print "  $$_{c_name}\n"} @methods;
+    {
+      print STDERR ('gmmproc: Unwrapped functions:',
+                    map($$_{c_name}, @methods));
     }
     if (@properties)
-    { 
-      print "Unwrapped properties:\n";
-      map { print "  $$_{class}::$$_{name}\n"} @properties;
+    {
+      print STDERR ('gmmproc: Unwrapped properties:',
+                    map($$_{class} . '::' . $$_{name}, @properties));
     }
     if (@signals)
     { 
-      print "Unwrapped signals:\n";
-      map { print "  $$_{class}::$$_{name}\n"} @signals;
+      print STDERR ('gmmproc: Unwrapped signals:',
+                    map($$_{class} . '::' . $$_{name}, @signals));
     }
   }
 }
 
 # end of program
-exit();
+exit;
 
 
 ####################################################################
@@ -174,7 +167,7 @@ sub print_usage()
 
 Note: This will read srcdir/name.{hg,ccg} file and generates destdir/name.cc
 ';
-  exit (1);
+  exit(1);
 }
 
 # void parse_command_line_args()
