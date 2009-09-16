@@ -78,7 +78,7 @@ sub read_defs($$$)
   $DocsParser::CurrentFile = "$path/$filename";
   if ( ! -r $DocsParser::CurrentFile)
   {
-     print "DocsParser.pm: Warning: Can't read file \"" . $DocsParser::CurrentFile . "\".\n";
+     print STDERR "DocsParser.pm: Warning: Can't read file \"" . $DocsParser::CurrentFile . "\".\n";
      return;
   }
   # Parse
@@ -86,23 +86,22 @@ sub read_defs($$$)
   if( $@ )
   {
     $@ =~ s/at \/.*?$//s;
-    print "\nError in \"" . $DocsParser::CurrentFile . "\":$@\n";
+    print STDERR "\nError in \"" . $DocsParser::CurrentFile . "\":$@\n";
     return;
   }
 
   # C++ overide documentation:
-  $DocsParser::CurrentFile = "$path/$filename_override";
-  if ( ! -r $DocsParser::CurrentFile)
-  {
-     print "DocsParser.pm: Warning: Can't read file \"" . $DocsParser::CurrentFile . "\".\n";
-     return;
-  }
+  $DocsParser::CurrentFile = $path . '/' . $filename_override;
+
+  # It is not an error if the documentation override file does not exist.
+  return unless (-r $DocsParser::CurrentFile);
+
   # Parse
   eval { $objParser->parsefile($DocsParser::CurrentFile) };
   if( $@ )
   {
     $@ =~ s/at \/.*?$//s;
-    print "\nError in \"" . $DocsParser::CurrentFile . "\":$@";
+    print STDERR "\nError in \"" . $DocsParser::CurrentFile . "\":$@";
     return;
   }
 }
