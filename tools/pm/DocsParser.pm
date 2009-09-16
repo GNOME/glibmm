@@ -448,7 +448,7 @@ sub substitute_function($$)
 sub non_object_method_name($$)
 {
   my ($doc_func, $name) = @_;
-  if ($$name =~ "^gtk_")
+  if ($$name =~ m/^gtk_/)
   {
     my %gtk_objects = ("gtk_accel_map" => "AccelMap",
                        "gtk_clipboard" => "Clipboard",
@@ -465,7 +465,7 @@ sub non_object_method_name($$)
                        "gtk_recent_filter" => "RecentFilter");
     foreach my $key (keys(%gtk_objects))
     {
-      if ($$name =~ "^$key")
+      if ($$name =~ m/^\Q$key\E/)
       {
         DocsParser::build_method_name($doc_func, "Gtk", $gtk_objects{$key}, $name);
         return;
@@ -492,7 +492,7 @@ sub lookup_object_of_method($$)
   foreach(@parts) { $_ = (length > 2) ? ucfirst : uc; }
 
   # Do a bit of try'n'error.
-  while(scalar(@parts) > 1)
+  while($#parts >= 1)
   {
     my $try = join("", @parts);
 
@@ -515,10 +515,10 @@ sub build_method_name($$$$)
   $prefix =~ s/([a-z])([A-Z])/$1_$2/g;
   $prefix = lc($prefix) . '_';
 
-  if($$name =~ /^$prefix/)
+  if($$name =~ m/^\Q$prefix\E/)
   {
     my $scope = "";
-    $scope = "${module}::${class}::" unless($doc_func =~ /^$prefix/);
+    $scope = "${module}::${class}::" unless($doc_func =~ m/^\Q$prefix\E/);
 
     substr($$name, 0, length($prefix)) = $scope;
   }

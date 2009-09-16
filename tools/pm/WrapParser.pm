@@ -122,9 +122,7 @@ sub parse_and_build_output($)
     if ($token eq "_WRAP_GERROR") { $self->on_wrap_gerror(); next;}
     if ($token eq "_IMPLEMENTS_INTERFACE") { $self->on_implements_interface(); next;}
 
-    my $prefix_class = "_CLASS_"; # e.g. _CLASS_GTKOBJECT
-    my $token_prefix = substr($token, 0, length($prefix_class));
-    if ($token_prefix eq $prefix_class)
+    if ($token =~ m/\A_CLASS_/s)
     {
       $self->on_class($token);
       next;
@@ -175,15 +173,15 @@ sub extract_token($)
     # skip empty tokens
     next if ( !defined($_) or $_ eq "" );
 
-    # eat line statements. TODO: e.g.?
-    if ( /^#l (\S+)\n/)
+    # eat line statements
+    if (m/^#l (\S+)\n/)
     {
       $$self{line_num} = $1;
       next;
     }
 
-    # eat file statements. TODO: e.g.?
-    if ( /^#f (\S+)\n/)
+    # eat file statements
+    if (m/^#f (\S+)\n/)
     {
       $$self{filename} = $1;
       next;
@@ -211,13 +209,13 @@ sub peek_token($)
     {
       shift @tokens;
     }
-    # eat line statements. TODO: e.g.?
+    # eat line statements
     elsif ( /^#l (\S+)\n/)
     {
       $$self{line_num} = $1;
       shift @tokens;
     }
-    # eat file statements. TODO: e.g.?
+    # eat file statements
     elsif ( /^#f (\S+)\n/)
     {
       $$self{filename} = $1;
@@ -236,7 +234,7 @@ sub peek_token($)
 sub tokens_remaining($)
 {
   my ($self) = @_;
-  return scalar(@tokens)!=0;
+  return $#tokens >= 0;
 }
 
 
@@ -339,7 +337,7 @@ sub on_comment_doxygen($)
       # can print it if the next real token is not _WRAP_SIGNAL
       my @whitespace;
       my $next_token = $self->peek_token();
-      while ($next_token =~ /^\s*$/)
+      while ($next_token !~ /\S/)
       {
         push(@whitespace, $self->extract_token());
 	$next_token = $self->peek_token();
@@ -358,12 +356,12 @@ sub on_comment_doxygen($)
       }
       else
       {
-        # Something else then signal follows, so close comment normally
+        # Something other than signal follows, so close comment normally
         $objOutputter->append("/");
-	# And append whitespace we ignored so far
+        # And append whitespace we ignored so far
         $objOutputter->append(join("", @whitespace));
-	# Do not extract the token so that parse_and_build_output() will
-	# process it.
+        # Do not extract the token so that parse_and_build_output() will
+        # process it.
       }
 
       last;
@@ -432,7 +430,7 @@ sub on_namespace($)
 
   # we need to peek ahead to figure out what type of namespace 
   # declaration this is.
-  while ( $number < scalar(@tokens) )
+  while ( $number <= $#tokens )
   {
     $token = $tokens[$number];
     $number++;
@@ -524,7 +522,7 @@ sub on_class($$)
   
   # When we hit _CLASS, we walk backwards through the output to find "class"
   my $token;
-  while ( scalar(@{$$objOutputter{out}}) > 0)
+  while ( scalar(@{$$objOutputter{out}}))
   {
     $token = pop @{$$objOutputter{out}};
     unshift(@back, $token);
@@ -596,7 +594,7 @@ sub on_close_brace($)
   $objOutputter->append("}"); #We append it here instead of after we return, so that we can end the namespace after it.
 
   $self->on_end_namespace()
-    if ( (scalar(@{$$self{in_namespace}}) > 0) && (@{$$self{in_namespace}}[0] == $$self{level}) );
+    if ( scalar(@{$$self{in_namespace}}) && (@{$$self{in_namespace}}[0] == $$self{level}) );
 
   $$self{level}--;
 }
@@ -716,39 +714,38 @@ sub read_file($$$)
 {
   my ($self, $srcdir, $source) = @_;
 
-  my $line;
-  my @in;
+  my $lineno = 1;
+  my @in = ();
 
   if ( ! -r "${srcdir}/${source}.hg")
   {
     print "Unable to find header file $srcdir/$source.hg\n";
-    exit(-1); 
+    exit(1);
   }
 
   # Read header file:
   open(FILE, "${srcdir}/${source}.hg");
-#  push(@in, "#f ${source}.hg\n"); #TODO: What does #f do?
-  $line = 1;
+  push(@in, "#f ${source}.hg\n");
   while (<FILE>)
     {
-#      push(@in, "#l $line\n"); #TODO: What does #l do?
+      push(@in, "#l $lineno\n");
       push(@in, $_);
-      $line++;
+      ++$lineno;
     }
   close(FILE);
-  push(@in, "\n_SECTION(SECTION_SRC_CUSTOM)\n");
+  push(@in, "\n", "_SECTION(SECTION_SRC_CUSTOM)\n");
 
   # Source file is optional.
   if ( -r "${srcdir}/${source}.ccg")
   {
     open(FILE, "${srcdir}/${source}.ccg");
-    $line = 1;
-#    push(@in, "#f ${source}.ccg\n"); #TODO: What does #f do?
+    $lineno = 1;
+    push(@in, "#f ${source}.ccg\n");
     while (<FILE>)
       {
-#        push(@in, "#l $line\n"); #TODO: What does #l do?
+        push(@in, "#l $lineno\n");
         push(@in, $_);
-        $line++;
+        ++$lineno;
       }
     close(FILE);
   }
@@ -793,7 +790,7 @@ sub check_for_eof($)
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
 
-  if (!(scalar(@tokens)))
+  unless (scalar(@tokens))
   {
     print STDERR "$filename:$line_num:hit eof in _WRAP\n";
     return 0; #EOF
@@ -802,26 +799,59 @@ sub check_for_eof($)
   return 1; # No EOF
 }
 
+# Look back for a Doxygen comment.  If there is one,
+# remove it from the output and return it as a string.
+sub extract_preceding_documentation ($)
+{
+  my ($self) = @_;
+  my $outputter = $$self{objOutputter};
+  my $out = \@{$$outputter{out}};
+
+  my $comment = '';
+
+  if ($#$out >= 2)
+  {
+    # steal the last three tokens
+    my @back = splice(@$out, -3);
+    local $_ = join('', @back);
+
+    # Check for /*[*!] ... */ or //[/!] comments.  The closing */ _must_
+    # be the last token of the previous line.  Apart from this restriction,
+    # anything else should work, including multi-line comments.
+
+    if (m#\A/\s*\*(?:\*`|`!)(.+)'\*/\s*\z#s or m#\A\s*//`[/!](.+)'\s*\z#s)
+    {
+      $comment = '`' . $1;
+      $comment =~ s/\s*$/'/;
+    }
+    else
+    {
+      # restore stolen tokens
+      push(@$out, @back);
+    }
+  }
+
+  return $comment;
+}
+
 # void on_wrap_method()
 sub on_wrap_method($)
 {
   my ($self) = @_;
   my $objOutputter = $$self{objOutputter};
 
-  if( !($self->check_for_eof()) )
-  {
-   return;
-  }
+  return unless ($self->check_for_eof());
 
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
 
+  my $commentblock = $self->extract_preceding_documentation();
   my $str = $self->extract_bracketed_text();
   my @args = string_split_commas($str);
 
   my $entity_type = "method";
 
-  if (!$$self{in_class})
+  unless ($$self{in_class})
     {
       print STDERR "$filename:$line_num:_WRAP macro encountered outside class\n";
       return;
@@ -832,17 +862,14 @@ sub on_wrap_method($)
 
   # handle first argument
   my $argCppMethodDecl = $args[0];
-  if ($argCppMethodDecl =~ /^\S+$/ ) #Checks that it's not empty and that it contains no whitespace.
+  if ($argCppMethodDecl !~ m/\S/s)
   {
-    print STDERR "$filename:$line_num:_WRAP can't handle unspecified method $argCppMethodDecl\n";
+    print STDERR "$filename:$line_num:_WRAP_METHOD: missing prototype\n";
     return;
   }
-  else
-  {
-    #Parse the method decaration and build an object that holds the details:
-    $objCppfunc = &Function::new($argCppMethodDecl, $self);
-  }
 
+  #Parse the method decaration and build an object that holds the details:
+  $objCppfunc = &Function::new($argCppMethodDecl, $self);
 
   # handle second argument:
 
@@ -851,8 +878,8 @@ sub on_wrap_method($)
 
   #Get the c function's details:
 
-  #Checks that it's not empty and that it contains no whitespace.
-  if ($argCFunctionName =~ /^\S+$/ )
+  # Checks that it's not empty and that it contains no whitespace.
+  if ($argCFunctionName =~ m/^\S+$/s)
   {
     #c-name. e.g. gtk_clist_set_column_title
     $objCfunc = GtkDefs::lookup_function($argCFunctionName);
@@ -868,7 +895,7 @@ sub on_wrap_method($)
   $$objCfunc{deprecated} = "";
   my $deprecation_docs = "";
   my $ifdef;
-  while(scalar(@args) > 2) # If the optional ref/err/deprecated arguments are there.
+  while($#args >= 2) # If the optional ref/err/deprecated arguments are there.
   {
     my $argRef = string_trim(pop @args);
     #print "debug arg=$argRef\n";
@@ -899,8 +926,14 @@ sub on_wrap_method($)
     }
   }
 
-  my $commentblock = "";
-  $commentblock = DocsParser::lookup_documentation($argCFunctionName, $deprecation_docs);
+  if ($commentblock ne '')
+  {
+    $commentblock = '  /**' . $commentblock . "\n   */\n";
+  }
+  else
+  {
+    $commentblock = DocsParser::lookup_documentation($argCFunctionName, $deprecation_docs);
+  }
 
   $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock, $ifdef);
 }
@@ -911,10 +944,7 @@ sub on_wrap_method_docs_only($)
   my ($self) = @_;
   my $objOutputter = $$self{objOutputter};
 
-  if( !($self->check_for_eof()) )
-  {
-   return;
-  }
+  return unless ($self->check_for_eof());
 
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
@@ -936,10 +966,10 @@ sub on_wrap_method_docs_only($)
   my $argCFunctionName = $args[0];
   $argCFunctionName = string_trim($argCFunctionName);
 
-  #Get the c function's details:
+  # Get the C function's details:
 
-  #Checks that it's not empty and that it contains no whitespace.
-  if ($argCFunctionName =~ /^\S+$/ ) 
+  # Checks that it's not empty or contains whitespace
+  if ($argCFunctionName =~ m/^\S+$/s)
   {
     #c-name. e.g. gtk_clist_set_column_title
     $objCfunc = GtkDefs::lookup_function($argCFunctionName);
@@ -952,7 +982,7 @@ sub on_wrap_method_docs_only($)
   }
 
   # Extra ref needed?
-  while(scalar(@args) > 1) # If the optional ref/err arguments are there.
+  while($#args >= 1) # If the optional ref/err arguments are there.
   {
     my $argRef = string_trim(pop @args);
     if($argRef eq "errthrow")
@@ -996,25 +1026,22 @@ sub on_wrap_ctor($)
 
   # handle first argument
   my $argCppMethodDecl = $args[0];
-  if ($argCppMethodDecl =~ /^\S+$/ ) #Checks that it's not empty and that it contains no whitespace.
+  if ($argCppMethodDecl !~ m/\S/s)
     {
-      print STDERR "$filename:$line_num:_WRAP_CTOR can't handle unspecified method $argCppMethodDecl\n";
+      print STDERR "$filename:$line_num:_WRAP_CTOR: missing prototype\n";
       return;
     }
-  else
-    {
-      #Parse the method decaration and build an object that holds the details:
-      $objCppfunc = &Function::new_ctor($argCppMethodDecl, $self);
-    }
 
+  #Parse the method decaration and build an object that holds the details:
+  $objCppfunc = &Function::new_ctor($argCppMethodDecl, $self);
 
   # handle second argument:
 
   my $argCFunctionName = $args[1];
   $argCFunctionName = string_trim($argCFunctionName);
 
-  #Get the c function's details:
-  if ($argCFunctionName =~ /^\S+$/ ) #Checks that it's not empty and that it contains no whitespace.
+  #Get the C function's details:
+  if ($argCFunctionName =~ m/^\S+$/s)
   {
     $objCfunc = GtkDefs::lookup_function($argCFunctionName); #c-name. e.g. gtk_clist_set_column_title
     if(!$objCfunc) #If the lookup failed:
@@ -1047,7 +1074,7 @@ sub on_implements_interface($$)
 
   # Extra stuff needed?
   my $ifdef; 
-  while(scalar(@args) > 1) # If the optional ref/err/deprecated arguments are there.
+  while($#args >= 1) # If the optional ref/err/deprecated arguments are there.
   {
   	my $argRef = string_trim(pop @args);
     if($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
@@ -1098,7 +1125,7 @@ sub on_wrap_signal($$)
   my $bRefreturn = 0;
   my $ifdef;
   
-  while(scalar(@args) > 2) # If optional arguments are there.
+  while($#args >= 2) # If optional arguments are there.
   {
     my $argRef = string_trim(pop @args);
     if($argRef eq "custom_default_handler")
@@ -1155,7 +1182,7 @@ sub on_wrap_vfunc($)
   my $ifdef = "";
 
   # Extra ref needed?
-  while(scalar(@args) > 2) # If the optional ref/err arguments are there.
+  while($#args >= 2) # If the optional ref/err arguments are there.
   {
     my $argRef = string_trim(pop @args);
 
@@ -1177,36 +1204,10 @@ sub on_wrap_enum($)
 {
   my ($self) = @_;
 
-  return if(!$self->check_for_eof());
+  return unless ($self->check_for_eof());
 
   my $outputter = $$self{objOutputter};
-  my $out = \@{$$outputter{out}};
-
-  # Look back for a Doxygen comment for this _WRAP_ENUM.  If there is one,
-  # remove it from the output and pass it to the m4 _ENUM macro instead.
-  my $comment = "";
-
-  if(scalar(@$out) >= 2)
-  {
-    # steal the last two tokens
-    my @back = splice(@$out, -2);
-    local $_ = $back[0];
-
-    # Check for /*[*!] ... */ or //[/!] comments.  The closing */ _must_
-    # be the last token of the previous line.  Apart from this restriction,
-    # anything else should work, including multi-line comments.
-
-    if($back[1] eq "\n" && (m#^/\*`[*!](.+)'\*/#s || m#^//`[/!](.+)'$#))
-    {
-      $comment = $1;
-      $comment =~ s/\s+$//;
-    }
-    else
-    {
-      # restore stolen tokens
-      push(@$out, @back);
-    }
-  }
+  my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
   my @args = string_split_commas($self->extract_bracketed_text());
@@ -1224,7 +1225,7 @@ sub on_wrap_gerror($)
 {
   my ($self) = @_;
 
-  return if(!$self->check_for_eof());
+  return unless ($self->check_for_eof());
 
   # get the arguments
   my @args = string_split_commas($self->extract_bracketed_text());
@@ -1244,10 +1245,7 @@ sub on_wrap_property($)
   my ($self) = @_;
   my $objOutputter = $$self{objOutputter};
 
-  if( !($self->check_for_eof()) )
-  {
-    return;
-  }
+  return unless ($self->check_for_eof());
 
   my $str = $self->extract_bracketed_text();
   my @args = string_split_commas($str);
@@ -1260,7 +1258,7 @@ sub on_wrap_property($)
   #Convert the property name to a canonical form, as it is inside gobject.
   #Otherwise, gobject might not recognise the name, 
   #and we will not recognise the property name when we get notification that the value changes.
-  $argPropertyName =~ s/_/-/g; #g means replace all.
+  $argPropertyName =~ tr/_/-/;
 
   my $argCppType = $args[1];
   $argCppType = string_trim($argCppType);
@@ -1279,20 +1277,17 @@ sub output_wrap_check($$$$$$)
 
   #Some checks:
 
-
-  if (!$$self{in_class})
+  unless ($$self{in_class})
   {
     print STDERR "$filename:$line_num: $macro_name macro encountered outside class\n";
-    return;
+    return 1;
   }
-
-  if ($CppDecl =~ /^\S+$/ ) #If it's not empty and it contains no whitespace.
+  if ($CppDecl !~ m/\S/s)
   {
-    print STDERR "$filename:$line_num:$macro_name can't handle unspecified entity $CppDecl\n";
-    return;
+    print STDERR "$filename:$line_num:$macro_name: missing prototype\n";
+    return 1;
   }
-
-
+  return '';
 }
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn)
@@ -1302,8 +1297,8 @@ sub output_wrap_signal($$$$$$$$$)
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous) = @_;
   
   #Some checks:
-  $self->output_wrap_check($CppDecl, $signal_name, $filename, $line_num, "WRAP_SIGNAL");
-
+  return if ($self->output_wrap_check($CppDecl, $signal_name,
+                                      $filename, $line_num, "_WRAP_SIGNAL"));
   # handle first argument
 
   #Parse the method decaration and build an object that holds the details:
@@ -1317,7 +1312,7 @@ sub output_wrap_signal($$$$$$$$$)
   my $objOutputter = $$self{objOutputter};
 
   #Get the c function's details:
-  if ($signal_name ne "" ) #If it's not empty and it contains no whitespace.
+  if ($signal_name ne '')
   {
     $objCSignal = GtkDefs::lookup_signal($$self{c_class}, $signal_name);
 
@@ -1350,7 +1345,7 @@ sub output_wrap_vfunc($$$$$$$$)
   my ($self, $CppDecl, $vfunc_name, $refreturn, $refreturn_ctype, $filename, $line_num, $ifdef) = @_;
 
   #Some checks:
-  $self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, "VFUNC");
+  return if ($self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, '_WRAP_VFUNC'));
 
   # handle first argument
 
@@ -1364,7 +1359,7 @@ sub output_wrap_vfunc($$$$$$$$)
   my $objOutputter = $$self{objOutputter};
 
   #Get the c function's details:
-  if ($vfunc_name =~ /^\S+$/ ) #If it's not empty and it contains no whitespace.
+  if ($vfunc_name =~ m/^\S+$/s) # if it's not empty and contains no whitespace
   {
     $objCVfunc = GtkDefs::lookup_signal($$self{c_class},$vfunc_name);
     if(!$objCVfunc) #If the lookup failed:
@@ -1408,10 +1403,7 @@ sub on_wrap_corba_method($)
   my ($self) = @_;
   my $objOutputter = $$self{objOutputter};
 
-  if( !($self->check_for_eof()) )
-  {
-   return;
-  }
+  return unless ($self->check_for_eof());
 
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
@@ -1427,22 +1419,18 @@ sub on_wrap_corba_method($)
       return;
     }
 
-  my $objCfunc;
   my $objCppfunc;
 
   # handle first argument
   my $argCppMethodDecl = $args[0];
-  if ($argCppMethodDecl =~ /^\S+$/ ) #Checks that it's not empty and that it contains no whitespace.
+  if ($argCppMethodDecl !~ m/\S/s)
   {
-    print STDERR "$filename:$line_num:_WRAP can't handle unspecified method $argCppMethodDecl\n";
+    print STDERR "$filename:$line_num:_WRAP_CORBA_METHOD: missing prototype\n";
     return;
   }
-  else
-  {
-    #Parse the method decaration and build an object that holds the details:
-    $objCppfunc = &Function::new($argCppMethodDecl, $self);
-  }
 
+  # Parse the method decaration and build an object that holds the details:
+  $objCppfunc = &Function::new($argCppMethodDecl, $self);
   $objOutputter->output_wrap_corba_method($filename, $line_num, $objCppfunc);
 }
 
