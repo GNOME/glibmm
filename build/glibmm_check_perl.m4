@@ -8,7 +8,8 @@ dnl
 ## Helper macro of GLIBMM_CHECK_PERL().  It generates a cache variable
 ## name that includes the version number, in order to avoid clashes.
 ##
-AC_DEFUN([GLIBMM_CV_PERL_VERSION],[glibmm_cv_perl_version_[]m4_translit([$1],[.${}],[____])])
+m4_define([GLIBMM_CV_PERL_VERSION],
+          [glibmm_cv_perl_version_[]m4_translit([$1], [.${}], [____])])
 
 
 ## GLIBMM_CHECK_PERL(version)
@@ -17,7 +18,9 @@ AC_DEFUN([GLIBMM_CV_PERL_VERSION],[glibmm_cv_perl_version_[]m4_translit([$1],[.$
 ## and maintainer-mode is enabled, abort with an error message.  If not
 ## in maintainer-mode, set PERL_PATH=perl on failure.
 ##
-AC_DEFUN([GLIBMM_CHECK_PERL],
+## Deprecated: Use MM_CHECK_PERL from mm-common or omit entirely.
+##
+AU_DEFUN([GLIBMM_CHECK_PERL],
 [
   glibmm_perl_result=no
 
@@ -50,5 +53,5 @@ AC_DEFUN([GLIBMM_CHECK_PERL],
   fi
 
   AC_SUBST([PERL_PATH])
-])
-
+],
+[[Use MM_CHECK_PERL from mm-common or omit entirely.]])
