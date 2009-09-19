@@ -38,4 +38,4 @@ other_built_sources += $(patsubst %.m4,$(binding_outputdir)/%,$(files_src_m4))
 dist_noinst_DATA    += $(files_src_m4) template.macros.m4
 
 $(binding_outputdir)/%: %.m4 template.macros.m4
-	$(M4) -I$(srcdir) $< >$@
+	$(AM_V_GEN)$(M4) -I$(srcdir) $< >$@
