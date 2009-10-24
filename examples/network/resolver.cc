@@ -1,0 +1,529 @@
+/* GIO - GLib Input, Output and Streaming Library
+ *
+ * Copyright (C) 2008 Red Hat, Inc.
+ * Copyright (C) 2009 Jonathon Jongsma
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General
+ * Public License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307, USA.
+ */
+
+#include "config.h"
+#include <giomm.h>
+#include <iostream>
+
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <gio/gio.h>
+
+static Glib::RefPtr<Gio::Resolver> resolver;
+static Glib::RefPtr<Gio::Cancellable> cancellable;
+static Glib::RefPtr<Glib::MainLoop> loop;
+static int nlookups = 0;
+
+static void G_GNUC_NORETURN
+usage (void)
+{
+    std::cerr
+        << "Usage: resolver [-t] [-s] [hostname | IP | service/protocol/domain ] ...\n"
+        << "       resolver [-t] [-s] -c [hostname | IP | service/protocol/domain ]\n"
+        << "       Use -t to enable threading.\n"
+        << "       Use -s to do synchronous lookups.\n"
+        << "       Both together will result in simultaneous lookups in multiple threads\n"
+        << "       Use -c (and only a single resolvable argument) to test GSocketConnectable.\n";
+    exit (1);
+}
+
+G_LOCK_DEFINE_STATIC (response);
+
+static bool
+idle_quit ()
+{
+    loop->quit ();
+    return false;
+}
+
+static void
+done_lookup (void)
+{
+  nlookups--;
+  if (nlookups == 0)
+    {
+      /* In the sync case we need to make sure we don't call
+       * g_main_loop_quit before the loop is actually running...
+       */
+        Glib::signal_idle ().connect (sigc::ptr_fun (idle_quit));
+    }
+}
+
+static void
+print_resolved_name (const Glib::ustring& phys,
+                     const Glib::ustring& name)
+{
+  G_LOCK (response);
+  std::cout
+      << Glib::ustring::compose ("Address: %1\n", phys)
+      << Glib::ustring::compose ("Name:    %1\n", name)
+      << std::endl;
+
+  done_lookup ();
+  G_UNLOCK (response);
+}
+
+static void
+print_resolved_addresses (const Glib::ustring& name,
+                          const std::list<Glib::RefPtr<Gio::InetAddress> >& addresses)
+{
+    G_LOCK (response);
+    std::cout << Glib::ustring::compose ("Name:    %1\n", name);
+    for (std::list<Glib::RefPtr<Gio::InetAddress> >::const_iterator iter = addresses.begin ();
+         iter != addresses.end (); ++iter)
+    {
+        std::cout << Glib::ustring::compose ("Address: %1\n", (*iter)->to_string ());
+    }
+    std::cout << std::endl;
+
+    done_lookup ();
+    G_UNLOCK (response);
+}
+
+static void
+print_resolved_service (const Glib::ustring& service,
+                        const std::list<Gio::SrvTarget>& targets)
+{
+    G_LOCK (response);
+    std::cout << Glib::ustring::compose ("Service: %1\n", service);
+    for (std::list<Gio::SrvTarget>::const_iterator iter = targets.begin ();
+         iter != targets.end (); ++iter)
+    {
+        std::cout <<
+            Glib::ustring::compose ("%1:%u (pri %u, weight %u)\n",
+                                    iter->get_hostname (),
+                                    iter->get_port (),
+                                    iter->get_priority (),
+                                    iter->get_weight ());
+    }
+    std::cout << std::endl;
+
+    done_lookup ();
+    G_UNLOCK (response);
+}
+
+static void
+lookup_one_sync (const Glib::ustring& arg)
+{
+    if (arg.find ('/') != std::string::npos)
+    {
+        std::list<Gio::SrvTarget> targets;
+        /* service/protocol/domain */
+        std::vector<Glib::ustring> parts;
+        size_t pos = 0;
+        for (int i = 0; i < 3; ++i)
+        {
+            size_t newpos = arg.find ('/', pos);
+            if (pos == std::string::npos)
+                usage ();
+            parts.push_back (arg.substr (pos, newpos - pos));
+            pos = newpos;
+        }
+
+        try
+        {
+            targets = resolver->lookup_service (parts[0], parts[1], parts[2],
+                                                cancellable);
+            print_resolved_service (arg, targets);
+        }
+        catch (const Gio::ResolverError& err)
+        {
+            std::cerr << err.what () << std::endl;
+        }
+    }
+    else if (Gio::hostname_is_ip_address (arg))
+    {
+        Glib::RefPtr<Gio::InetAddress> addr = Gio::InetAddress::create (arg);
+        try
+        {
+            Glib::ustring name = resolver->lookup_by_address (addr, cancellable);
+            print_resolved_name (arg, name);
+        }
+        catch (const Gio::ResolverError& err)
+        {
+            std::cerr << err.what () << std::endl;
+        }
+    }
+    else
+    {
+        std::list<Glib::RefPtr<Gio::InetAddress> > addresses;
+
+        try
+        {
+            addresses = resolver->lookup_by_name (arg, cancellable);
+            print_resolved_addresses (arg, addresses);
+        }
+        catch (const Gio::ResolverError& err)
+        {
+            std::cerr << err.what () << std::endl;
+        }
+    }
+}
+
+static void
+lookup_thread (const Glib::ustring& arg)
+{
+  lookup_one_sync (arg);
+}
+
+static void
+start_threaded_lookups (char **argv, int argc)
+{
+    int i;
+
+    for (i = 0; i < argc; i++)
+        Glib::Thread::create (sigc::bind (sigc::ptr_fun (lookup_thread),
+                                          argv[i]),
+                              false);
+}
+
+static void
+start_sync_lookups (char **argv, int argc)
+{
+    int i;
+
+    for (i = 0; i < argc; i++)
+        lookup_one_sync (argv[i]);
+}
+
+static void
+lookup_by_addr_callback (Glib::RefPtr<Gio::AsyncResult> result,
+                         const Glib::ustring& phys)
+{
+    try
+    {
+        print_resolved_name (phys, resolver->lookup_by_address_finish (result));
+    }
+    catch (const Gio::ResolverError& err)
+    {
+        std::cerr << err.what () << std::endl;
+        done_lookup ();
+    }
+}
+
+static void
+lookup_by_name_callback (Glib::RefPtr<Gio::AsyncResult> result,
+                         const Glib::ustring& name)
+{
+    try
+    {
+        print_resolved_addresses (name, resolver->lookup_by_name_finish (result));
+    }
+    catch (const Gio::ResolverError& err)
+    {
+        std::cerr << err.what () << std::endl;
+    }
+}
+
+static void
+lookup_service_callback (Glib::RefPtr<Gio::AsyncResult> result,
+                         const Glib::ustring& service)
+{
+  try
+  {
+      print_resolved_service (service,
+                              resolver->lookup_service_finish (result));
+  }
+  catch (const Gio::ResolverError& err)
+  {
+      std::cerr << err.what () << std::endl;
+  }
+}
+
+static void
+start_async_lookups (char **argv, int argc)
+{
+    for (int i = 0; i < argc; i++)
+    {
+        Glib::ustring arg (argv[i]);
+        if (arg.find ('/') != std::string::npos)
+        {
+            /* service/protocol/domain */
+            std::vector<Glib::ustring> parts;
+            size_t pos = 0;
+            for (int j = 0; j < 3; ++j)
+            {
+                size_t newpos = arg.find ('/', pos);
+                if (pos == std::string::npos)
+                    usage ();
+                parts.push_back (arg.substr (pos, newpos - pos));
+                pos = newpos;
+            }
+
+            resolver->lookup_service_async (parts[0], parts[1], parts[2],
+                                            sigc::bind (sigc::ptr_fun
+                                                        (lookup_service_callback),
+                                                        Glib::ustring (argv[i])),
+                                            cancellable
+                                            );
+        }
+        else if (Gio::hostname_is_ip_address (argv[i]))
+        {
+            Glib::RefPtr<Gio::InetAddress> addr = Gio::InetAddress::create (argv[i]);
+
+            resolver->lookup_by_address_async (addr,
+                                               sigc::bind (sigc::ptr_fun
+                                                           (lookup_by_addr_callback),
+                                                           argv[i]),
+                                               cancellable);
+        }
+        else
+        {
+            resolver->lookup_by_name_async (argv[i],
+                                            sigc::bind (sigc::ptr_fun
+                                                        (lookup_by_name_callback),
+                                                        argv[i]),
+                                            cancellable);
+        }
+
+        /* Stress-test the reloading code */
+        //g_signal_emit_by_name (resolver, "reload");
+    }
+}
+
+static void
+print_connectable_sockaddr (Glib::RefPtr<Gio::SocketAddress> sockaddr)
+{
+    Glib::ustring phys;
+    Glib::RefPtr<Gio::InetSocketAddress> isa =
+        Glib::RefPtr<Gio::InetSocketAddress>::cast_dynamic (sockaddr);
+
+    if (!isa)
+    {
+        std::cerr <<
+            Glib::ustring::compose ("Error: Unexpected sockaddr type '%1'\n",
+                                    g_type_name_from_instance ((GTypeInstance *)sockaddr->gobj ()));
+    }
+    else
+    {
+        phys = isa->get_address ()->to_string ();
+        std::cout << Glib::ustring::compose ("Address: %1%2%3:%4\n",
+                phys.find (':') != std::string::npos ? "[" : "",
+                phys,
+                phys.find (':') != std::string::npos ? "]" : "",
+                isa->get_port ());
+    }
+}
+
+static void
+do_sync_connectable (Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator)
+{
+    Glib::RefPtr<Gio::SocketAddress> sockaddr;
+
+    while ((sockaddr = enumerator->next (cancellable)))
+        print_connectable_sockaddr (sockaddr);
+
+    done_lookup ();
+}
+
+static void do_async_connectable (Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator);
+
+static void
+got_next_async (Glib::RefPtr<Gio::AsyncResult> result,
+                Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator)
+{
+    g_debug ("%s: enumerator: %p (%d)", G_STRFUNC, enumerator->gobj (), G_OBJECT (enumerator->gobj ())->ref_count);
+    try
+    {
+        Glib::RefPtr<Gio::SocketAddress> sockaddr = enumerator->next_finish (result);
+        if (sockaddr)
+        {
+            print_connectable_sockaddr (sockaddr);
+            do_async_connectable (enumerator);
+        }
+        else
+        {
+            done_lookup ();
+        }
+    }
+    catch (const Gio::ResolverError& err)
+    {
+        std::cerr << err.what () << std::endl;
+    }
+}
+
+Glib::RefPtr<Gio::SocketAddressEnumerator> global_enumerator;
+static void
+do_async_connectable (Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator)
+{
+    g_debug ("%s: enumerator: %p (%d)", G_STRFUNC, enumerator->gobj (), G_OBJECT (enumerator->gobj ())->ref_count);
+    enumerator->next_async (cancellable,
+                            sigc::bind (sigc::ptr_fun (got_next_async),
+                                        enumerator));
+}
+
+Glib::RefPtr<Gio::SocketConnectable> global_connectable;
+
+static void
+do_connectable (const std::string& arg, gboolean synchronous)
+{
+    std::vector<std::string> parts;
+    Glib::RefPtr<Gio::SocketConnectable> connectable;
+    Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator;
+
+    if (arg.find ('/') != std::string::npos)
+    {
+        /* service/protocol/domain */
+        size_t pos = 0;
+        for (int i = 0; i < 3; ++i)
+        {
+            size_t newpos = arg.find ('/', pos);
+            if (pos == std::string::npos)
+                usage ();
+            parts.push_back (arg.substr (pos, newpos - pos));
+            pos = newpos;
+        }
+
+        connectable = Gio::NetworkService::create (parts[0], parts[1], parts[2]);
+    }
+    else
+    {
+        std::string host, port_str;
+        guint16 port;
+
+        size_t pos = arg.find (':');
+        if (pos != std::string::npos)
+        {
+            host = arg.substr (0, pos);
+            port_str = arg.substr(pos);
+            port = strtoul (port_str.c_str (), NULL, 10);
+        }
+        else
+            port = 0;
+
+        if (Gio::hostname_is_ip_address (host))
+        {
+            Glib::RefPtr<Gio::InetAddress> addr = Gio::InetAddress::create (host);
+            connectable = Gio::InetSocketAddress::create (addr, port);
+        }
+        else
+            connectable = Gio::NetworkAddress::create (arg, port);
+    }
+
+    enumerator = connectable->enumerate ();
+    g_debug ("%s: enumerator: %p (%d)", G_STRFUNC, enumerator->gobj (), G_OBJECT (enumerator->gobj ())->ref_count);
+
+    if (synchronous)
+        do_sync_connectable (enumerator);
+    else
+        do_async_connectable (enumerator);
+}
+
+#ifdef G_OS_UNIX
+static int cancel_fds[2];
+
+static void
+interrupted (int sig)
+{
+  signal (SIGINT, SIG_DFL);
+  write (cancel_fds[1], "x", 1);
+}
+
+static bool
+async_cancel (Glib::IOCondition /*cond*/, Glib::RefPtr<Gio::Cancellable> cancellable)
+{
+    cancellable->cancel ();
+    return false;
+}
+#endif
+
+int
+main (int argc, char **argv)
+{
+    bool threaded = false, synchronous = false;
+    bool use_connectable = false;
+#ifdef G_OS_UNIX
+    Glib::RefPtr<Glib::IOChannel> chan;
+    sigc::connection watch_conn;
+#endif
+
+    /* We can't use Glib::OptionContext because we use the arguments to
+     * decide whether or not to call g_thread_init().
+     */
+    while (argc >= 2 && argv[1][0] == '-')
+    {
+        if (!strcmp (argv[1], "-t"))
+        {
+            Glib::thread_init ();
+            threaded = true;
+        }
+        else if (!strcmp (argv[1], "-s"))
+            synchronous = true;
+        else if (!strcmp (argv[1], "-c"))
+            use_connectable = true;
+        else
+            usage ();
+
+        argv++;
+        argc--;
+    }
+    Gio::init ();
+
+    if (argc < 2 || (argc > 2 && use_connectable))
+        usage ();
+
+    resolver = Gio::Resolver::get_default ();
+
+    cancellable = Gio::Cancellable::create ();
+
+#ifdef G_OS_UNIX
+    /* Set up cancellation; we want to cancel if the user ^C's the
+     * program, but we can't cancel directly from an interrupt.
+     */
+    signal (SIGINT, interrupted);
+
+    if (pipe (cancel_fds) == -1)
+    {
+        perror ("pipe");
+        exit (1);
+    }
+    chan = Glib::IOChannel::create_from_fd (cancel_fds[0]);
+    Glib::RefPtr<Glib::IOSource> source = chan->create_watch (Glib::IO_IN);
+    watch_conn = source->connect (sigc::bind (sigc::ptr_fun (async_cancel), cancellable));
+#endif
+
+    nlookups = argc - 1;
+    loop = Glib::MainLoop::create (true);
+
+    if (use_connectable)
+        do_connectable (argv[1], synchronous);
+    else
+    {
+        if (threaded && synchronous)
+            start_threaded_lookups (argv + 1, argc - 1);
+        else if (synchronous)
+            start_sync_lookups (argv + 1, argc - 1);
+        else
+            start_async_lookups (argv + 1, argc - 1);
+    }
+
+    loop->run ();
+
+#ifdef G_OS_UNIX
+    watch_conn.disconnect ();
+#endif
+
+    return 0;
+}

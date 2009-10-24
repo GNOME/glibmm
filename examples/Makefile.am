@@ -23,6 +23,7 @@ check_PROGRAMS =			\
 	iochannel_stream/example	\
 	keyfile/example			\
 	markup/parser			\
+	network/resolver		\
 	options/example			\
 	properties/example		\
 	regex/example			\
@@ -67,5 +68,5 @@ thread_thread_LDADD        = $(thread_ldadd)
 thread_threadpool_SOURCES  = thread/threadpool.cc
 thread_threadpool_LDADD    = $(thread_ldadd)
 
-network_io_resolve_SOURCES = network_io/resolve.cc
-network_io_resolve_LDADD   = $(giomm_ldadd)
+network_resolver_SOURCES   = network/resolver.cc
+network_resolver_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
