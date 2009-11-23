@@ -147,8 +147,14 @@ ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
   static Glib::RefPtr<__CPPNAME__> create();
 ')dnl endif __OPAQUE_FUNC_NEW
 
-  // For use with Glib::RefPtr<> only.
+  /** Increment the reference count for this object.
+   * You should never need to do this manually - use the object via a RefPtr instead.
+   */
   void reference()   const;
+
+  /** Decrement the reference count for this object.
+   * You should never need to do this manually - use the object via a RefPtr instead.
+   */
   void unreference() const;
 
   ///Provides access to the underlying C instance.
