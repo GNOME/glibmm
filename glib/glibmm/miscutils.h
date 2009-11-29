@@ -280,6 +280,114 @@ std::string build_filename(const Glib::ArrayHandle<std::string>& elements);
  */
 std::string build_filename(const std::string& elem1, const std::string& elem2);
 
+/** Creates a filename from three elements using the correct separator for filenames.
+ * No attempt is made to force the resulting filename to be an absolute path.
+ * If the first element is a relative path, the result will be a relative path.
+ * @param elem1 First path element.
+ * @param elem2 Second path element.
+ * @param elem3 Third path element.
+ * @return The resulting path.
+ */
+std::string build_filename(const std::string& elem1, const std::string& elem2,
+                           const std::string& elem3);
+
+
+/** Creates a filename from four elements using the correct separator for filenames.
+ * No attempt is made to force the resulting filename to be an absolute path.
+ * If the first element is a relative path, the result will be a relative path.
+ * @param elem1 First path element.
+ * @param elem2 Second path element.
+ * @param elem3 Third path element.
+ * @param elem4 Fourth path element.
+ * @return The resulting path.
+ */
+std::string build_filename(const std::string& elem1, const std::string& elem2,
+                           const std::string& elem3, const std::string& elem4);
+
+/** Creates a filename from five elements using the correct separator for filenames.
+ * No attempt is made to force the resulting filename to be an absolute path.
+ * If the first element is a relative path, the result will be a relative path.
+ * @param elem1 First path element.
+ * @param elem2 Second path element.
+ * @param elem3 Third path element.
+ * @param elem4 Fourth path element.
+ * @param elem5 Fifth path element.
+ * @return The resulting path.
+ */
+std::string build_filename(const std::string& elem1, const std::string& elem2,
+                           const std::string& elem3, const std::string& elem4,
+                           const std::string& elem5);
+
+/** Creates a filename from six elements using the correct separator for filenames.
+ * No attempt is made to force the resulting filename to be an absolute path.
+ * If the first element is a relative path, the result will be a relative path.
+ * @param elem1 First path element.
+ * @param elem2 Second path element.
+ * @param elem3 Third path element.
+ * @param elem4 Fourth path element.
+ * @param elem5 Fifth path element.
+ * @param elem6 Sixth path element.
+ * @return The resulting path.
+ */
+std::string build_filename(const std::string& elem1, const std::string& elem2,
+                           const std::string& elem3, const std::string& elem4,
+                           const std::string& elem5, const std::string& elem6);
+
+/** Creates a filename from seven elements using the correct separator for filenames.
+ * No attempt is made to force the resulting filename to be an absolute path.
+ * If the first element is a relative path, the result will be a relative path.
+ * @param elem1 First path element.
+ * @param elem2 Second path element.
+ * @param elem3 Third path element.
+ * @param elem4 Fourth path element.
+ * @param elem5 Fifth path element.
+ * @param elem6 Sixth path element.
+ * @param elem7 Seventh path element.
+ * @return The resulting path.
+ */
+std::string build_filename(const std::string& elem1, const std::string& elem2,
+                           const std::string& elem3, const std::string& elem4,
+                           const std::string& elem5, const std::string& elem6,
+                           const std::string& elem7);
+
+/** Creates a filename from eight elements using the correct separator for filenames.
+ * No attempt is made to force the resulting filename to be an absolute path.
+ * If the first element is a relative path, the result will be a relative path.
+ * @param elem1 First path element.
+ * @param elem2 Second path element.
+ * @param elem3 Third path element.
+ * @param elem4 Fourth path element.
+ * @param elem5 Fifth path element.
+ * @param elem6 Sixth path element.
+ * @param elem7 Seventh path element.
+ * @param elem8 Eighth path element.
+ * @return The resulting path.
+ */
+std::string build_filename(const std::string& elem1, const std::string& elem2,
+                           const std::string& elem3, const std::string& elem4,
+                           const std::string& elem5, const std::string& elem6,
+                           const std::string& elem7, const std::string& elem8);
+
+/** Creates a filename from nine elements using the correct separator for filenames.
+ * No attempt is made to force the resulting filename to be an absolute path.
+ * If the first element is a relative path, the result will be a relative path.
+ * @param elem1 First path element.
+ * @param elem2 Second path element.
+ * @param elem3 Third path element.
+ * @param elem4 Fourth path element.
+ * @param elem5 Fifth path element.
+ * @param elem6 Sixth path element.
+ * @param elem7 Seventh path element.
+ * @param elem8 Eighth path element.
+ * @param elem9 Ninth path element.
+ * @return The resulting path.
+ */
+std::string build_filename(const std::string& elem1, const std::string& elem2,
+                           const std::string& elem3, const std::string& elem4,
+                           const std::string& elem5, const std::string& elem6,
+                           const std::string& elem7, const std::string& elem8,
+                           const std::string& elem9);
+
 /** Creates a path from a series of elements using @a separator as the
  * separator between elements.
  *
