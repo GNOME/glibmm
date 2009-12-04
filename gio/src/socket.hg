@@ -93,18 +93,48 @@ class Socket : public Glib::Object, public Initable
   _IMPLEMENTS_INTERFACE(Initable)
 
 protected:
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   Socket(SocketFamily family, SocketType type, SocketProtocol protocol,
          const Glib::RefPtr<Cancellable>& cancellable);
+#else
+  Socket(SocketFamily family, SocketType type, SocketProtocol protocol,
+         std::auto_ptr<Glib::Error>& error,
+         const Glib::RefPtr<Cancellable>& cancellable);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   Socket(int fd, const Glib::RefPtr<Cancellable>& cancellable);
+#else
+  Socket(int fd, std::auto_ptr<Glib::Error>& error,
+         const Glib::RefPtr<Cancellable>& cancellable);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 public:
   _WRAP_METHOD_DOCS_ONLY(g_socket_new)
+  /** @throw Glib::Error
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   static Glib::RefPtr<Socket>
   create(SocketFamily family, SocketType type, SocketProtocol protocol,
          const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+#else
+  static Glib::RefPtr<Socket>
+  create(SocketFamily family, SocketType type, SocketProtocol protocol,
+         std::auto_ptr<Glib::Error>& error,
+         const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
   _WRAP_METHOD_DOCS_ONLY(g_socket_new_from_fd)
+  /** @throw Glib::Error
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   static Glib::RefPtr<Socket> create_from_fd(int fd, const Glib::RefPtr<Cancellable>&
                                              cancellable = Glib::RefPtr<Cancellable>());
+#else
+  static Glib::RefPtr<Socket> create_from_fd(int fd, std::auto_ptr<Glib::Error>& error,
+                                             const Glib::RefPtr<Cancellable>&
+                                             cancellable = Glib::RefPtr<Cancellable>());
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   _WRAP_METHOD(void bind(const Glib::RefPtr<SocketAddress>& address, bool allow_reuse), g_socket_bind, errthrow)
   _WRAP_METHOD(void listen(), g_socket_listen, errthrow)

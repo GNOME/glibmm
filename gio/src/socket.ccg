@@ -24,32 +24,70 @@
 namespace Gio
 {
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Socket::Socket(SocketFamily family, SocketType type, SocketProtocol protocol,
                const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Socket::Socket(SocketFamily family, SocketType type, SocketProtocol protocol,
+               std::auto_ptr<Glib::Error>& error,
+               const Glib::RefPtr<Cancellable>& cancellable)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 :
   _CONSTRUCT("family", int(family), "type", int(type), "protocol", int(protocol))
 {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   init(cancellable);
+#else
+  init(cancellable, error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Socket::Socket(int fd, const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Socket::Socket(int fd, std::auto_ptr<Glib::Error>& error, 
+               const Glib::RefPtr<Cancellable>& cancellable)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 :
   _CONSTRUCT("fd", fd)
 {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   init(cancellable);
+#else
+  init(cancellable, error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 // static
 Glib::RefPtr<Socket> Socket::create(SocketFamily family, SocketType type, SocketProtocol protocol,
                                     const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Glib::RefPtr<Socket> Socket::create(SocketFamily family, SocketType type, SocketProtocol protocol,
+                                    std::auto_ptr<Glib::Error>& error,
+                                    const Glib::RefPtr<Cancellable>& cancellable)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   return Glib::RefPtr<Socket>(new Socket(family, type, protocol, cancellable));
+#else
+  return Glib::RefPtr<Socket>(new Socket(family, type, protocol, error, cancellable));
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
 // static
 Glib::RefPtr<Socket> Socket::create_from_fd(int fd, const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Glib::RefPtr<Socket> Socket::create_from_fd(int fd, std::auto_ptr<Glib::Error>& error,
+                                            const Glib::RefPtr<Cancellable>& cancellable)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
   return Glib::RefPtr<Socket>(new Socket(fd, cancellable));
+#else
+  return Glib::RefPtr<Socket>(new Socket(fd, error, cancellable));
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 
