@@ -28,7 +28,9 @@
 #include <giomm/contenttype.h>
 #include <giomm/datainputstream.h>
 #include <giomm/dataoutputstream.h>
-#include <giomm/desktopappinfo.h>
+#ifndef G_OS_WIN32
+# include <giomm/desktopappinfo.h>
+#endif
 #include <giomm/drive.h>
 #include <giomm/emblemedicon.h>
 #include <giomm/emblem.h>
@@ -70,8 +72,10 @@
 #include <giomm/socketconnectable.h>
 #include <giomm/srvtarget.h>
 #include <giomm/themedicon.h>
-#include <giomm/unixinputstream.h>
-#include <giomm/unixoutputstream.h>
+#ifndef G_OS_WIN32
+# include <giomm/unixinputstream.h>
+# include <giomm/unixoutputstream.h>
+#endif
 #include <giomm/volume.h>
 #include <giomm/volumemonitor.h>
 
