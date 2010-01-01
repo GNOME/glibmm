@@ -201,4 +201,50 @@ void Socket::condition_wait(Glib::IOCondition condition, std::auto_ptr<Glib::Err
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable)
+#else
+gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GSocketAddress* caddr = 0;
+  gssize retvalue = g_socket_receive_from(gobj(), &caddr, buffer, size, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if (caddr)
+      address = Glib::wrap (caddr);
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size)
+#else
+gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GSocketAddress* caddr = 0;
+  gssize retvalue = g_socket_receive_from(gobj(), &caddr, buffer, size, 0, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  if (caddr)
+      address = Glib::wrap (caddr);
+
+  return retvalue;
+}
+
 } // namespace Gio

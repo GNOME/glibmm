@@ -165,7 +165,16 @@ public:
 
   // TODO: std::string overload?
   // TODO: need to do manually?
-  //_WRAP_METHOD(gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size), g_socket_receive_from, errthrow)
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable);
+#else
+  gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size);
+#else
+  gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
   // TODO: wrap receive_message -- figure out this GInputVector thing
   // TODO: std::string overload?
 
