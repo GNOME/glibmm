@@ -46,16 +46,13 @@ class InetAddress
   _CLASS_GOBJECT(InetAddress, GInetAddress, G_INET_ADDRESS, Glib::Object, GObject)
 
 protected:
- _WRAP_CTOR(InetAddress(const Glib::ustring& string), g_inet_address_new_from_string)
  _WRAP_CTOR(InetAddress(const guint8 *bytes, SocketFamily family), g_inet_address_new_from_bytes)
- _WRAP_CTOR(InetAddress(SocketFamily family), g_inet_address_new_any)
- // TODO: new_loopback has the same signature as new_any
 
 public:
   static Glib::RefPtr<InetAddress> create(const Glib::ustring& string);
   _WRAP_CREATE(const guint8 *bytes, SocketFamily family)
-  _WRAP_CREATE(SocketFamily family)
-  // TODO: create for new_loopback
+  static Glib::RefPtr<InetAddress> create_any(SocketFamily family);
+  static Glib::RefPtr<InetAddress> create_loopback(SocketFamily family);
 
   _WRAP_METHOD(const guint8* to_bytes() const, g_inet_address_to_bytes)
   _WRAP_METHOD(Glib::ustring to_string() const, g_inet_address_to_string)

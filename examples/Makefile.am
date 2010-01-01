@@ -25,6 +25,7 @@ check_PROGRAMS =			\
 	markup/parser			\
 	network/resolver		\
 	network/socket-client	\
+	network/socket-server	\
 	options/example			\
 	properties/example		\
 	regex/example			\
@@ -73,3 +74,5 @@ network_resolver_SOURCES   = network/resolver.cc
 network_resolver_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
 network_socket_client_SOURCES   = network/socket-client.cc
 network_socket_client_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
+network_socket_server_SOURCES   = network/socket-server.cc
+network_socket_server_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
