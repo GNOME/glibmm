@@ -112,7 +112,7 @@ print_resolved_service (const Glib::ustring& service,
          iter != targets.end (); ++iter)
     {
         std::cout <<
-            Glib::ustring::compose ("%1:%u (pri %u, weight %u)\n",
+            Glib::ustring::compose ("%1:%2 (pri %3, weight %4)\n",
                                     iter->get_hostname (),
                                     iter->get_port (),
                                     iter->get_priority (),
@@ -124,6 +124,25 @@ print_resolved_service (const Glib::ustring& service,
     G_UNLOCK (response);
 }
 
+static std::vector<Glib::ustring>
+split_service_parts (const Glib::ustring& arg)
+{
+    std::vector<Glib::ustring> parts;
+    size_t delim1 = 0;
+    size_t delim2 = 0;
+    delim1 = arg.find ('/', 0);
+    if (delim1 == std::string::npos)
+        return parts;
+    delim2 = arg.find ('/', delim1 + 1);
+    if (delim2 == std::string::npos)
+        return parts;
+    parts.push_back (arg.substr (0, delim1));
+    parts.push_back (arg.substr (delim1 + 1, delim2 - delim1 - 1));
+    parts.push_back (arg.substr (delim2 + 1));
+
+    return parts;
+}
+
 static void
 lookup_one_sync (const Glib::ustring& arg)
 {
@@ -131,15 +150,10 @@ lookup_one_sync (const Glib::ustring& arg)
     {
         std::list<Gio::SrvTarget> targets;
         /* service/protocol/domain */
-        std::vector<Glib::ustring> parts;
-        size_t pos = 0;
-        for (int i = 0; i < 3; ++i)
-        {
-            size_t newpos = arg.find ('/', pos);
-            if (pos == std::string::npos)
-                usage ();
-            parts.push_back (arg.substr (pos, newpos - pos));
-            pos = newpos;
+        std::vector<Glib::ustring> parts = split_service_parts (arg);
+        if (parts.size () != 3) {
+            usage ();
+            return;
         }
 
         try
@@ -261,15 +275,10 @@ start_async_lookups (char **argv, int argc)
         if (arg.find ('/') != std::string::npos)
         {
             /* service/protocol/domain */
-            std::vector<Glib::ustring> parts;
-            size_t pos = 0;
-            for (int j = 0; j < 3; ++j)
-            {
-                size_t newpos = arg.find ('/', pos);
-                if (pos == std::string::npos)
-                    usage ();
-                parts.push_back (arg.substr (pos, newpos - pos));
-                pos = newpos;
+            std::vector<Glib::ustring> parts = split_service_parts (arg);
+            if (parts.size () != 3) {
+                usage ();
+                return;
             }
 
             resolver->lookup_service_async (parts[0], parts[1], parts[2],
@@ -377,21 +386,17 @@ Glib::RefPtr<Gio::SocketConnectable> global_connectable;
 static void
 do_connectable (const std::string& arg, gboolean synchronous)
 {
-    std::vector<std::string> parts;
+    std::vector<Glib::ustring> parts;
     Glib::RefPtr<Gio::SocketConnectable> connectable;
     Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator;
 
     if (arg.find ('/') != std::string::npos)
     {
         /* service/protocol/domain */
-        size_t pos = 0;
-        for (int i = 0; i < 3; ++i)
-        {
-            size_t newpos = arg.find ('/', pos);
-            if (pos == std::string::npos)
-                usage ();
-            parts.push_back (arg.substr (pos, newpos - pos));
-            pos = newpos;
+        parts = split_service_parts (arg);
+        if (parts.size () != 3) {
+            usage ();
+            return;
         }
 
         connectable = Gio::NetworkService::create (parts[0], parts[1], parts[2]);
