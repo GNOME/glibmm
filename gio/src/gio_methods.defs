@@ -32,6 +32,12 @@
   (gtype-id "G_TYPE_CANCELLABLE")
 )
 
+(define-object r
+  (in-module "GConverte")
+  (c-name "GConverter")
+  (gtype-id "G_TYPE_CONVERTER")
+)
+
 (define-object AppInfoLookup
   (in-module "GDesktop")
   (c-name "GDesktopAppInfoLookup")
@@ -126,6 +132,13 @@
 )
 
 (define-object InputStream
+  (in-module "GConverter")
+  (parent "GFilterInputStream")
+  (c-name "GConverterInputStream")
+  (gtype-id "G_TYPE_CONVERTER_INPUT_STREAM")
+)
+
+(define-object InputStream
   (in-module "GFile")
   (parent "GInputStream")
   (c-name "GFileInputStream")
@@ -198,6 +211,13 @@
   (parent "GFilterOutputStream")
   (c-name "GBufferedOutputStream")
   (gtype-id "G_TYPE_BUFFERED_OUTPUT_STREAM")
+)
+
+(define-object OutputStream
+  (in-module "GConverter")
+  (parent "GFilterOutputStream")
+  (c-name "GConverterOutputStream")
+  (gtype-id "G_TYPE_CONVERTER_OUTPUT_STREAM")
 )
 
 (define-object OutputStream
@@ -317,6 +337,13 @@
   (gtype-id "G_TYPE_UNIX_CONNECTION")
 )
 
+(define-object FDList
+  (in-module "GUnix")
+  (parent "GObject")
+  (c-name "GUnixFDList")
+  (gtype-id "G_TYPE_UNIX_FD_LIST")
+)
+
 (define-object FDMessage
   (in-module "GUnix")
   (parent "GSocketControlMessage")
@@ -343,6 +370,13 @@
   (parent "GSocketAddress")
   (c-name "GUnixSocketAddress")
   (gtype-id "G_TYPE_UNIX_SOCKET_ADDRESS")
+)
+
+(define-object 8InputStream
+  (in-module "GUtf")
+  (parent "GFilterInputStream")
+  (c-name "GUtf8InputStream")
+  (gtype-id "G_TYPE_UTF8_INPUT_STREAM")
 )
 
 (define-object s
@@ -382,6 +416,29 @@
     '("none" "G_APP_INFO_CREATE_NONE")
     '("needs-terminal" "G_APP_INFO_CREATE_NEEDS_TERMINAL")
     '("supports-uris" "G_APP_INFO_CREATE_SUPPORTS_URIS")
+  )
+)
+
+(define-flags Flags
+  (in-module "GConverter")
+  (c-name "GConverterFlags")
+  (gtype-id "G_TYPE_CONVERTER_FLAGS")
+  (values
+    '("no-flags" "G_CONVERTER_NO_FLAGS")
+    '("input-at-end" "G_CONVERTER_INPUT_AT_END")
+    '("flush" "G_CONVERTER_FLUSH")
+  )
+)
+
+(define-enum Result
+  (in-module "GConverter")
+  (c-name "GConverterResult")
+  (gtype-id "G_TYPE_CONVERTER_RESULT")
+  (values
+    '("error" "G_CONVERTER_ERROR")
+    '("converted" "G_CONVERTER_CONVERTED")
+    '("finished" "G_CONVERTER_FINISHED")
+    '("flushed" "G_CONVERTER_FLUSHED")
   )
 )
 
@@ -453,8 +510,8 @@
   (c-name "GFileQueryInfoFlags")
   (gtype-id "G_TYPE_FILE_QUERY_INFO_FLAGS")
   (values
-    '("ne" "G_FILE_QUERY_INFO_NONE")
-    '("follow-symlinks" "G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS")
+    '("none" "G_FILE_QUERY_INFO_NONE")
+    '("nofollow-symlinks" "G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS")
   )
 )
 
@@ -474,7 +531,7 @@
   (c-name "GMountMountFlags")
   (gtype-id "G_TYPE_MOUNT_MOUNT_FLAGS")
   (values
-    '("e" "G_MOUNT_MOUNT_NONE")
+    '("none" "G_MOUNT_MOUNT_NONE")
   )
 )
 
@@ -493,7 +550,7 @@
   (c-name "GDriveStartFlags")
   (gtype-id "G_TYPE_DRIVE_START_FLAGS")
   (values
-    '("e" "G_DRIVE_START_NONE")
+    '("none" "G_DRIVE_START_NONE")
   )
 )
 
@@ -615,6 +672,8 @@
     '("too-many-open-files" "G_IO_ERROR_TOO_MANY_OPEN_FILES")
     '("not-initialized" "G_IO_ERROR_NOT_INITIALIZED")
     '("address-in-use" "G_IO_ERROR_ADDRESS_IN_USE")
+    '("partial-input" "G_IO_ERROR_PARTIAL_INPUT")
+    '("invalid-data" "G_IO_ERROR_INVALID_DATA")
   )
 )
 
@@ -692,10 +751,10 @@
   (c-name "GSocketFamily")
   (gtype-id "G_TYPE_SOCKET_FAMILY")
   (values
-    '("g-socket-family-invalid" "G_SOCKET_FAMILY_INVALID")
-    '("#ifdef" "#ifdef")
-    '("#endif" "#endif")
-    '("g-socket-family-ipv6" "G_SOCKET_FAMILY_IPV6")
+    '("invalid" "G_SOCKET_FAMILY_INVALID")
+    '("unix" "G_SOCKET_FAMILY_UNIX")
+    '("ipv4" "G_SOCKET_FAMILY_IPV4")
+    '("ipv6" "G_SOCKET_FAMILY_IPV6")
   )
 )
 
@@ -733,6 +792,17 @@
     '("tcp" "G_SOCKET_PROTOCOL_TCP")
     '("udp" "G_SOCKET_PROTOCOL_UDP")
     '("sctp" "G_SOCKET_PROTOCOL_SCTP")
+  )
+)
+
+(define-enum CompressorFormat
+  (in-module "GZlib")
+  (c-name "GZlibCompressorFormat")
+  (gtype-id "G_TYPE_ZLIB_COMPRESSOR_FORMAT")
+  (values
+    '("zlib" "G_ZLIB_COMPRESSOR_FORMAT_ZLIB")
+    '("gzip" "G_ZLIB_COMPRESSOR_FORMAT_GZIP")
+    '("raw" "G_ZLIB_COMPRESSOR_FORMAT_RAW")
   )
 )
 
@@ -779,6 +849,12 @@
 (define-method get_name
   (of-object "GAppInfo")
   (c-name "g_app_info_get_name")
+  (return-type "const-char*")
+)
+
+(define-method get_display_name
+  (of-object "GAppInfo")
+  (c-name "g_app_info_get_display_name")
   (return-type "const-char*")
 )
 
@@ -1304,10 +1380,16 @@
 (define-method make_pollfd
   (of-object "GCancellable")
   (c-name "g_cancellable_make_pollfd")
-  (return-type "none")
+  (return-type "gboolean")
   (parameters
     '("GPollFD*" "pollfd")
   )
+)
+
+(define-method release_fd
+  (of-object "GCancellable")
+  (c-name "g_cancellable_release_fd")
+  (return-type "none")
 )
 
 (define-function g_cancellable_get_current
@@ -1357,6 +1439,46 @@
   (of-object "GCancellable")
   (c-name "g_cancellable_cancel")
   (return-type "none")
+)
+
+
+
+;; From gcharsetconverter.h
+
+(define-function g_charset_converter_get_type
+  (c-name "g_charset_converter_get_type")
+  (return-type "GType")
+)
+
+(define-method set_converter_new
+  (of-object "gchar")
+  (c-name "g_charset_converter_new")
+  (return-type "GCharsetConverter*")
+  (parameters
+    '("const-gchar*" "from_charset")
+    '("GError**" "error")
+  )
+)
+
+(define-method set_use_fallback
+  (of-object "GCharsetConverter")
+  (c-name "g_charset_converter_set_use_fallback")
+  (return-type "none")
+  (parameters
+    '("gboolean" "use_fallback")
+  )
+)
+
+(define-method get_use_fallback
+  (of-object "GCharsetConverter")
+  (c-name "g_charset_converter_get_use_fallback")
+  (return-type "gboolean")
+)
+
+(define-method get_num_fallbacks
+  (of-object "GCharsetConverter")
+  (c-name "g_charset_converter_get_num_fallbacks")
+  (return-type "guint")
 )
 
 
@@ -1451,6 +1573,87 @@
 (define-function g_content_types_get_registered
   (c-name "g_content_types_get_registered")
   (return-type "GList*")
+)
+
+
+
+;; From gconverter.h
+
+(define-function g_converter_get_type
+  (c-name "g_converter_get_type")
+  (return-type "GType")
+)
+
+(define-method convert
+  (of-object "GConverter")
+  (c-name "g_converter_convert")
+  (return-type "GConverterResult")
+  (parameters
+    '("const-void*" "inbuf")
+    '("gsize" "inbuf_size")
+    '("void*" "outbuf")
+    '("gsize" "outbuf_size")
+    '("GConverterFlags" "flags")
+    '("gsize*" "bytes_read")
+    '("gsize*" "bytes_written")
+    '("GError**" "error")
+  )
+)
+
+(define-method reset
+  (of-object "GConverter")
+  (c-name "g_converter_reset")
+  (return-type "none")
+)
+
+
+
+;; From gconverterinputstream.h
+
+(define-function g_converter_input_stream_get_type
+  (c-name "g_converter_input_stream_get_type")
+  (return-type "GType")
+)
+
+(define-function g_converter_input_stream_new
+  (c-name "g_converter_input_stream_new")
+  (is-constructor-of "GConverterInputStream")
+  (return-type "GInputStream*")
+  (parameters
+    '("GInputStream*" "base_stream")
+    '("GConverter*" "converter")
+  )
+)
+
+(define-method get_converter
+  (of-object "GConverterInputStream")
+  (c-name "g_converter_input_stream_get_converter")
+  (return-type "GConverter*")
+)
+
+
+
+;; From gconverteroutputstream.h
+
+(define-function g_converter_output_stream_get_type
+  (c-name "g_converter_output_stream_get_type")
+  (return-type "GType")
+)
+
+(define-function g_converter_output_stream_new
+  (c-name "g_converter_output_stream_new")
+  (is-constructor-of "GConverterOutputStream")
+  (return-type "GOutputStream*")
+  (parameters
+    '("GOutputStream*" "base_stream")
+    '("GConverter*" "converter")
+  )
+)
+
+(define-method get_converter
+  (of-object "GConverterOutputStream")
+  (c-name "g_converter_output_stream_get_converter")
+  (return-type "GConverter*")
 )
 
 
@@ -2301,6 +2504,15 @@
   (of-object "GFile")
   (c-name "g_file_get_parent")
   (return-type "GFile*")
+)
+
+(define-method has_parent
+  (of-object "GFile")
+  (c-name "g_file_has_parent")
+  (return-type "gboolean")
+  (parameters
+    '("GFile*" "parent")
+  )
 )
 
 (define-method get_child
@@ -4715,6 +4927,16 @@
   (return-type "GType")
 )
 
+(define-function g_converter_flags_get_type
+  (c-name "g_converter_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_converter_result_get_type
+  (c-name "g_converter_result_get_type")
+  (return-type "GType")
+)
+
 (define-function g_data_stream_byte_order_get_type
   (c-name "g_data_stream_byte_order_get_type")
   (return-type "GType")
@@ -4847,6 +5069,11 @@
 
 (define-function g_socket_protocol_get_type
   (c-name "g_socket_protocol_get_type")
+  (return-type "GType")
+)
+
+(define-function g_zlib_compressor_format_get_type
+  (c-name "g_zlib_compressor_format_get_type")
   (return-type "GType")
 )
 
@@ -5248,6 +5475,12 @@
 (define-method get_root
   (of-object "GMount")
   (c-name "g_mount_get_root")
+  (return-type "GFile*")
+)
+
+(define-method get_default_location
+  (of-object "GMount")
+  (c-name "g_mount_get_default_location")
   (return-type "GFile*")
 )
 
@@ -5823,6 +6056,12 @@
   (return-type "gboolean")
 )
 
+(define-method is_closing
+  (of-object "GOutputStream")
+  (c-name "g_output_stream_is_closing")
+  (return-type "gboolean")
+)
+
 (define-method has_pending
   (of-object "GOutputStream")
   (c-name "g_output_stream_has_pending")
@@ -6173,7 +6412,7 @@
   (c-name "g_simple_async_result_set_from_error")
   (return-type "none")
   (parameters
-    '("GError*" "error")
+    '("const-GError*" "error")
   )
 )
 
@@ -7003,6 +7242,16 @@
   )
 )
 
+(define-method add_any_inet_port
+  (of-object "GSocketListener")
+  (c-name "g_socket_listener_add_any_inet_port")
+  (return-type "guint16")
+  (parameters
+    '("GObject*" "source_object")
+    '("GError**" "error")
+  )
+)
+
 (define-method accept_socket
   (of-object "GSocketListener")
   (c-name "g_socket_listener_accept_socket")
@@ -7270,6 +7519,24 @@
 
 
 
+;; From gutf8inputstream.h
+
+(define-function g_utf8_input_stream_get_type
+  (c-name "g_utf8_input_stream_get_type")
+  (return-type "GType")
+)
+
+(define-function g_utf8_input_stream_new
+  (c-name "g_utf8_input_stream_new")
+  (is-constructor-of "GUtf8InputStream")
+  (return-type "GInputStream*")
+  (parameters
+    '("GInputStream*" "base_stream")
+  )
+)
+
+
+
 ;; From gvfs.h
 
 (define-function g_vfs_get_type
@@ -7526,6 +7793,43 @@
 
 
 
+;; From gzlibcompressor.h
+
+(define-function g_zlib_compressor_get_type
+  (c-name "g_zlib_compressor_get_type")
+  (return-type "GType")
+)
+
+(define-function g_zlib_compressor_new
+  (c-name "g_zlib_compressor_new")
+  (is-constructor-of "GZlibCompressor")
+  (return-type "GZlibCompressor*")
+  (parameters
+    '("GZlibCompressorFormat" "format")
+    '("int" "level")
+  )
+)
+
+
+
+;; From gzlibdecompressor.h
+
+(define-function g_zlib_decompressor_get_type
+  (c-name "g_zlib_decompressor_get_type")
+  (return-type "GType")
+)
+
+(define-function g_zlib_decompressor_new
+  (c-name "g_zlib_decompressor_new")
+  (is-constructor-of "GZlibDecompressor")
+  (return-type "GZlibDecompressor*")
+  (parameters
+    '("GZlibCompressorFormat" "format")
+  )
+)
+
+
+
 ;; From gdesktopappinfo.h
 
 (define-function g_desktop_app_info_get_type
@@ -7618,6 +7922,74 @@
 
 
 
+;; From gunixfdlist.h
+
+(define-function g_unix_fd_list_get_type
+  (c-name "g_unix_fd_list_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_fd_list_new
+  (c-name "g_unix_fd_list_new")
+  (is-constructor-of "GUnixFdList")
+  (return-type "GUnixFDList*")
+)
+
+(define-function g_unix_fd_list_new_from_array
+  (c-name "g_unix_fd_list_new_from_array")
+  (return-type "GUnixFDList*")
+  (parameters
+    '("const-gint*" "fds")
+    '("gint" "n_fds")
+  )
+)
+
+(define-method append
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_append")
+  (return-type "gint")
+  (parameters
+    '("gint" "fd")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_length
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_get_length")
+  (return-type "gint")
+)
+
+(define-method get
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_get")
+  (return-type "gint")
+  (parameters
+    '("gint" "index_")
+    '("GError**" "error")
+  )
+)
+
+(define-method peek_fds
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_peek_fds")
+  (return-type "const-gint*")
+  (parameters
+    '("gint*" "length")
+  )
+)
+
+(define-method steal_fds
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_steal_fds")
+  (return-type "gint*")
+  (parameters
+    '("gint*" "length")
+  )
+)
+
+
+
 ;; From gunixfdmessage.h
 
 (define-function g_unix_fd_message_get_type
@@ -7625,10 +7997,24 @@
   (return-type "GType")
 )
 
+(define-function g_unix_fd_message_new_with_fd_list
+  (c-name "g_unix_fd_message_new_with_fd_list")
+  (return-type "GSocketControlMessage*")
+  (parameters
+    '("GUnixFDList*" "fd_list")
+  )
+)
+
 (define-function g_unix_fd_message_new
   (c-name "g_unix_fd_message_new")
   (is-constructor-of "GUnixFdMessage")
   (return-type "GSocketControlMessage*")
+)
+
+(define-method get_fd_list
+  (of-object "GUnixFDMessage")
+  (c-name "g_unix_fd_message_get_fd_list")
+  (return-type "GUnixFDList*")
 )
 
 (define-method steal_fds
