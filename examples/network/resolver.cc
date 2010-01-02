@@ -344,7 +344,6 @@ static void
 got_next_async (Glib::RefPtr<Gio::AsyncResult> result,
                 Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator)
 {
-    g_debug ("%s: enumerator: %p (%d)", G_STRFUNC, enumerator->gobj (), G_OBJECT (enumerator->gobj ())->ref_count);
     try
     {
         Glib::RefPtr<Gio::SocketAddress> sockaddr = enumerator->next_finish (result);
@@ -368,7 +367,6 @@ Glib::RefPtr<Gio::SocketAddressEnumerator> global_enumerator;
 static void
 do_async_connectable (Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator)
 {
-    g_debug ("%s: enumerator: %p (%d)", G_STRFUNC, enumerator->gobj (), G_OBJECT (enumerator->gobj ())->ref_count);
     enumerator->next_async (cancellable,
                             sigc::bind (sigc::ptr_fun (got_next_async),
                                         enumerator));
@@ -423,7 +421,6 @@ do_connectable (const std::string& arg, gboolean synchronous)
     }
 
     enumerator = connectable->enumerate ();
-    g_debug ("%s: enumerator: %p (%d)", G_STRFUNC, enumerator->gobj (), G_OBJECT (enumerator->gobj ())->ref_count);
 
     if (synchronous)
         do_sync_connectable (enumerator);
