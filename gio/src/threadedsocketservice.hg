@@ -1,0 +1,67 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 Jonathon Jongsma
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <giomm/socketservice.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(giomm/private/socketservice_p.h)
+
+namespace Gio
+{
+
+/** @defgroup NetworkIO Portable Network I/O Functionality
+ */
+
+/**
+ * A threaded GSocketService
+ *
+ * A ThreadedSocketService is a simple subclass of SocketService
+ * that handles incoming connections by creating a worker thread and
+ * dispatching the connection to it by emitting the ::run signal in
+ * the new thread.
+ *
+ * The signal handler may perform blocking IO and need not return
+ * until the connection is closed.
+ *
+ * The service is implemented using a thread pool, so there is a
+ * limited amount of threads availible to serve incomming requests.
+ * The service automatically stops the SocketService from accepting
+ * new connections when all threads are busy.
+ *
+ * As with SocketService, you may connect to ThreadedSocketService:run,
+ * or subclass and override the default handler.
+ *
+ * @newin{2,24}
+ * @ingroup NetworkIO
+ */
+class ThreadedSocketService : public Gio::SocketService
+{
+    _CLASS_GOBJECT(ThreadedSocketService, GThreadedSocketService, G_THREADED_SOCKET_SERVICE, Gio::SocketService, GSocketService)
+
+protected:
+    _WRAP_CTOR(ThreadedSocketService(int max_threads), g_threaded_socket_service_new)
+
+public:
+    _WRAP_CREATE(int max_threads)
+
+    _WRAP_SIGNAL(bool run(const Glib::RefPtr<SocketConnection>& connection, const Glib::RefPtr<Glib::Object>& source_object), "run")
+    _WRAP_PROPERTY("max-threads", int)
+};
+
+} // namespace Gio

@@ -89,6 +89,7 @@ int main(int, char**)
             << get_defs(G_TYPE_UNIX_CONNECTION)
             << get_defs(G_TYPE_SOCKET_LISTENER)
             << get_defs(G_TYPE_SOCKET_SERVICE)
+            << get_defs(G_TYPE_THREADED_SOCKET_SERVICE)
 
             << std::endl;
   
