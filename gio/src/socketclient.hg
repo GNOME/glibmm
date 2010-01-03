@@ -1,0 +1,93 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 Jonathon Jongsma
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+#include <giomm/socketconnectable.h>
+#include <giomm/enums.h>
+#include <giomm/socket.h>
+#include <giomm/socketconnection.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** @defgroup NetworkIO Portable Network I/O Functionality
+ */
+
+/**
+ * Helper for connecting to a network service
+ * @see_also SocketConnection, SocketListener
+ *
+ * SocketClient is a high-level utility class for connecting to a
+ * network host using a connection oriented socket type.
+ *
+ * You create a SocketClient object, set any options you want, then
+ * call a sync or async connect operation, which returns a #GSocketConnection
+ * subclass on success.
+ *
+ * The type of the SocketConnection object returned depends on the type of
+ * the underlying socket that is in use. For instance, for a TCP/IP connection
+ * it will be a TcpConnection.
+ *
+ * @newin{2,24}
+ * @ingroup NetworkIO
+ */
+class SocketClient : public Glib::Object
+{
+    _CLASS_GOBJECT(SocketClient, GSocketClient, G_SOCKET_CLIENT, Glib::Object, GObject)
+
+protected:
+    _CTOR_DEFAULT
+
+public:
+_WRAP_CREATE()
+_WRAP_METHOD(SocketFamily get_family() const, g_socket_client_get_family)
+_WRAP_METHOD(void set_family(SocketFamily family), g_socket_client_set_family)
+_WRAP_METHOD(SocketType get_socket_type() const, g_socket_client_get_socket_type)
+_WRAP_METHOD(void set_socket_type(SocketType type), g_socket_client_set_socket_type)
+_WRAP_METHOD(SocketProtocol get_protocol() const, g_socket_client_get_protocol)
+_WRAP_METHOD(void set_protocol(SocketProtocol protocol), g_socket_client_set_protocol)
+_WRAP_METHOD(Glib::RefPtr<SocketAddress> get_local_address(), g_socket_client_get_local_address)
+_WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_local_address() const, g_socket_client_get_local_address, constversion)
+_WRAP_METHOD(void set_local_address(const Glib::RefPtr<SocketAddress>& address), g_socket_client_set_local_address)
+
+// TODO: non-cancellable version
+_WRAP_METHOD(Glib::RefPtr<SocketConnection> connect(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect, errthrow)
+// TODO: non-cancellable version
+_WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_host(const Glib::ustring& host_and_port, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect_to_host, errthrow)
+// TODO: non-cancellable version
+_WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, const Glib::ustring& service, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect_to_service, errthrow)
+// TODO: non-cancellable version
+void connect_async(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+_WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_finish, errthrow)
+// TODO: non-cancellable version
+void connect_to_host_async(const Glib::ustring& host_and_port, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+_WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_host_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_to_host_finish, errthrow)
+
+// TODO: non-cancellable version
+void connect_to_service_async(const Glib::ustring& domain, const Glib::ustring& service, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+_WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_service_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_to_service_finish, errthrow)
+
+};
+
+} // namespace Gio

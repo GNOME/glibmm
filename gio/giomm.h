@@ -69,10 +69,14 @@
 #include <giomm/socket.h>
 #include <giomm/socketaddress.h>
 #include <giomm/socketaddressenumerator.h>
+#include <giomm/socketclient.h>
 #include <giomm/socketconnectable.h>
+#include <giomm/socketconnection.h>
 #include <giomm/srvtarget.h>
+#include <giomm/tcpconnection.h>
 #include <giomm/themedicon.h>
 #ifndef G_OS_WIN32
+# include <giomm/unixconnection.h>
 # include <giomm/unixinputstream.h>
 # include <giomm/unixoutputstream.h>
 #endif
