@@ -24,6 +24,7 @@
 #ifndef G_OS_WIN32
 # include <gio/gunixinputstream.h>
 # include <gio/gunixoutputstream.h>
+# include <gio/gunixconnection.h>
 #endif
 
 int main(int, char**)
@@ -82,6 +83,12 @@ int main(int, char**)
             << get_defs(G_TYPE_NETWORK_ADDRESS)
             << get_defs(G_TYPE_NETWORK_SERVICE)
             << get_defs(G_TYPE_SOCKET)
+            << get_defs(G_TYPE_SOCKET_CLIENT)
+            << get_defs(G_TYPE_SOCKET_CONNECTION)
+            << get_defs(G_TYPE_TCP_CONNECTION)
+            << get_defs(G_TYPE_UNIX_CONNECTION)
+            << get_defs(G_TYPE_SOCKET_LISTENER)
+            << get_defs(G_TYPE_SOCKET_SERVICE)
 
             << std::endl;
   

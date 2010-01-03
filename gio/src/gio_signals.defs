@@ -397,6 +397,17 @@
   (when "last")
 )
 
+(define-signal show-processes
+  (of-object "GMountOperation")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("const-gchar*" "p0")
+    '("GArray*" "p1")
+    '("GStrv*" "p2")
+  )
+)
+
 (define-property username
   (of-object "GMountOperation")
   (prop-type "GParamString")
@@ -766,6 +777,12 @@
 
 ;; From GResolver
 
+(define-signal reload
+  (of-object "GResolver")
+  (return-type "void")
+  (when "last")
+)
+
 ;; From GNetworkAddress
 
 (define-property hostname
@@ -895,6 +912,199 @@
   (docs "The remote address the socket is connected to")
   (readable #t)
   (writable #f)
+  (construct-only #f)
+)
+
+;; From GSocketClient
+
+(define-property family
+  (of-object "GSocketClient")
+  (prop-type "GParamEnum")
+  (docs "The sockets address family to use for socket construction")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property type
+  (of-object "GSocketClient")
+  (prop-type "GParamEnum")
+  (docs "The sockets type to use for socket construction")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property protocol
+  (of-object "GSocketClient")
+  (prop-type "GParamEnum")
+  (docs "The protocol to use for socket construction, or 0 for default")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property local-address
+  (of-object "GSocketClient")
+  (prop-type "GParamObject")
+  (docs "The local address constructed sockets will be bound to")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GSocketConnection
+
+(define-property input-stream
+  (of-object "GSocketConnection")
+  (prop-type "GParamObject")
+  (docs "The GInputStream to read from")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property output-stream
+  (of-object "GSocketConnection")
+  (prop-type "GParamObject")
+  (docs "The GOutputStream to write to")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property closed
+  (of-object "GSocketConnection")
+  (prop-type "GParamBoolean")
+  (docs "Is the stream closed")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property socket
+  (of-object "GSocketConnection")
+  (prop-type "GParamObject")
+  (docs "The underlying GSocket")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+;; From GTcpConnection
+
+(define-property input-stream
+  (of-object "GTcpConnection")
+  (prop-type "GParamObject")
+  (docs "The GInputStream to read from")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property output-stream
+  (of-object "GTcpConnection")
+  (prop-type "GParamObject")
+  (docs "The GOutputStream to write to")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property closed
+  (of-object "GTcpConnection")
+  (prop-type "GParamBoolean")
+  (docs "Is the stream closed")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property socket
+  (of-object "GTcpConnection")
+  (prop-type "GParamObject")
+  (docs "The underlying GSocket")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property graceful-disconnect
+  (of-object "GTcpConnection")
+  (prop-type "GParamBoolean")
+  (docs "Whether or not close does a graceful disconnect")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GUnixConnection
+
+(define-property input-stream
+  (of-object "GUnixConnection")
+  (prop-type "GParamObject")
+  (docs "The GInputStream to read from")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property output-stream
+  (of-object "GUnixConnection")
+  (prop-type "GParamObject")
+  (docs "The GOutputStream to write to")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property closed
+  (of-object "GUnixConnection")
+  (prop-type "GParamBoolean")
+  (docs "Is the stream closed")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property socket
+  (of-object "GUnixConnection")
+  (prop-type "GParamObject")
+  (docs "The underlying GSocket")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+;; From GSocketListener
+
+(define-property listen-backlog
+  (of-object "GSocketListener")
+  (prop-type "GParamInt")
+  (docs "outstanding connections in the listen queue")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GSocketService
+
+(define-signal incoming
+  (of-object "GSocketService")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("GSocketConnection*" "p0")
+    '("GObject*" "p1")
+  )
+)
+
+(define-property listen-backlog
+  (of-object "GSocketService")
+  (prop-type "GParamInt")
+  (docs "outstanding connections in the listen queue")
+  (readable #t)
+  (writable #t)
   (construct-only #f)
 )
 
