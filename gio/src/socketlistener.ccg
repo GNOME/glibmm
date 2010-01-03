@@ -1,0 +1,484 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 Jonathon Jongsma
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gio.h>
+#include "slot_async.h"
+
+namespace Gio
+{
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool SocketListener::add_socket(const Glib::RefPtr<Socket>& socket)
+#else
+bool SocketListener::add_socket(const Glib::RefPtr<Socket>& socket, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+        GError* gerror = 0;
+        bool retval;
+        retval = g_socket_listener_add_socket (gobj(),
+                                               socket->gobj(),
+                                               0,
+                                               &gerror);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+        if(gerror)
+                ::Glib::Error::throw_exception(gerror);
+#else
+        if(gerror)
+                error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+        return retval;
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool SocketListener::add_address(const Glib::RefPtr<SocketAddress>& address, SocketType type, SocketProtocol protocol, const Glib::RefPtr<Glib::Object>& source_object, Glib::RefPtr<SocketAddress>& effective_address)
+#else
+bool SocketListener::add_address(const Glib::RefPtr<SocketAddress>& address, SocketType type, SocketProtocol protocol, const Glib::RefPtr<Glib::Object>& source_object, Glib::RefPtr<SocketAddress>& effective_address, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retval;
+  GSocketAddress *retaddr = NULL;
+  retval = g_socket_listener_add_address (gobj(),
+                                          address->gobj(),
+                                          static_cast<GSocketType>(type),
+                                          static_cast<GSocketProtocol>(protocol),
+                                          source_object->gobj(),
+                                          &retaddr,
+                                          &gerror);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  if (retaddr)
+    effective_address = Glib::wrap(retaddr);
+  return retval;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool SocketListener::add_address(const Glib::RefPtr<SocketAddress>& address, SocketType type, SocketProtocol protocol, Glib::RefPtr<SocketAddress>& effective_address)
+#else
+bool SocketListener::add_address(const Glib::RefPtr<SocketAddress>& address, SocketType type, SocketProtocol protocol, Glib::RefPtr<SocketAddress>& effective_address, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retval;
+  GSocketAddress *retaddr = NULL;
+  retval = g_socket_listener_add_address (gobj(),
+                                          address->gobj(),
+                                          static_cast<GSocketType>(type),
+                                          static_cast<GSocketProtocol>(protocol),
+                                          0,
+                                          &retaddr,
+                                          &gerror);
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  if (retaddr)
+    effective_address = Glib::wrap(retaddr);
+  return retval;
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+bool SocketListener::add_inet_port(guint16 port)
+#else
+bool SocketListener::add_inet_port(guint16 port, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  bool retvalue = g_socket_listener_add_inet_port(gobj(), port, 0, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+guint16 SocketListener::add_any_inet_port()
+#else
+guint16 SocketListener::add_any_inet_port(std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  guint16 retvalue = g_socket_listener_add_any_inet_port(gobj(), 0, &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<Socket> SocketListener::accept_socket(Glib::RefPtr<Glib::Object>& source_object, const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Glib::RefPtr<Socket> SocketListener::accept_socket(Glib::RefPtr<Glib::Object>& source_object, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GObject *retobj;
+  GSocket* retvalue = g_socket_listener_accept_socket(gobj(),
+                                                      &retobj,
+                                                      cancellable->gobj(),
+                                                      &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  if (retobj)
+    source_object = Glib::wrap(retobj);
+
+  return Glib::wrap(retvalue);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<Socket> SocketListener::accept_socket(Glib::RefPtr<Glib::Object>& source_object)
+#else
+Glib::RefPtr<Socket> SocketListener::accept_socket(Glib::RefPtr<Glib::Object>& source_object, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GObject *retobj;
+  GSocket* retvalue = g_socket_listener_accept_socket(gobj(),
+                                                      &retobj,
+                                                      0,
+                                                      &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  if (retobj)
+    source_object = Glib::wrap(retobj);
+
+  return Glib::wrap(retvalue);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<Socket> SocketListener::accept_socket(const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Glib::RefPtr<Socket> SocketListener::accept_socket(const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GSocket* retvalue = g_socket_listener_accept_socket(gobj(),
+                                                      0,
+                                                      cancellable->gobj(),
+                                                      &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return Glib::wrap(retvalue);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<Socket> SocketListener::accept_socket()
+#else
+Glib::RefPtr<Socket> SocketListener::accept_socket(std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GSocket* retvalue = g_socket_listener_accept_socket(gobj(),
+                                                      0,
+                                                      0,
+                                                      &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return Glib::wrap(retvalue);
+}
+
+
+void SocketListener::accept_socket_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_listener_accept_socket_async(gobj(),
+                                        cancellable->gobj(),
+                                        &SignalProxy_async_callback,
+                                        slot_copy);
+}
+
+void SocketListener::accept_socket_async(const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_listener_accept_socket_async(gobj(),
+                                        0,
+                                        &SignalProxy_async_callback,
+                                        slot_copy);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<Socket> SocketListener::accept_socket_finish(const Glib::RefPtr<AsyncResult>& result, Glib::RefPtr<Glib::Object>& source_object)
+#else
+Glib::RefPtr<Socket> SocketListener::accept_socket_finish(const Glib::RefPtr<AsyncResult>& result, Glib::RefPtr<Glib::Object>& source_object, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GObject *retobj = 0;
+  GSocket* retvalue = g_socket_listener_accept_socket_finish(gobj(),
+                                                             result->gobj(),
+                                                             &retobj,
+                                                             &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  if (retobj)
+    source_object = Glib::wrap(retobj);
+
+  return Glib::wrap(retvalue);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<Socket> SocketListener::accept_socket_finish(const Glib::RefPtr<AsyncResult>& result)
+#else
+Glib::RefPtr<Socket> SocketListener::accept_socket_finish(const Glib::RefPtr<AsyncResult>& result, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GSocket* retvalue = g_socket_listener_accept_socket_finish(gobj(),
+                                                             result->gobj(),
+                                                             0,
+                                                             &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return Glib::wrap(retvalue);
+}
+
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketListener::accept(Glib::RefPtr<Object>& source_object, const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Glib::RefPtr<SocketConnection> SocketListener::accept(Glib::RefPtr<Object>& source_object, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GObject *retobj = 0;
+  GSocketConnection* retvalue = g_socket_listener_accept(gobj(),
+                                                         &retobj,
+                                                         cancellable->gobj(),
+                                                         &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  if (retobj)
+    source_object = Glib::wrap(retobj);
+
+  return Glib::wrap(retvalue);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketListener::accept(Glib::RefPtr<Object>& source_object)
+#else
+Glib::RefPtr<SocketConnection> SocketListener::accept(Glib::RefPtr<Object>& source_object, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GObject *retobj = 0;
+  GSocketConnection* retvalue = g_socket_listener_accept(gobj(),
+                                                         &retobj,
+                                                         0,
+                                                         &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  if (retobj)
+    source_object = Glib::wrap(retobj);
+
+  return Glib::wrap(retvalue);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketListener::accept(const Glib::RefPtr<Cancellable>& cancellable)
+#else
+Glib::RefPtr<SocketConnection> SocketListener::accept(const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GSocketConnection* retvalue = g_socket_listener_accept(gobj(),
+                                                         0,
+                                                         cancellable->gobj(),
+                                                         &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return Glib::wrap(retvalue);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketListener::accept()
+#else
+Glib::RefPtr<SocketConnection> SocketListener::accept(std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GSocketConnection* retvalue = g_socket_listener_accept(gobj(),
+                                                         0,
+                                                         0,
+                                                         &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return Glib::wrap(retvalue);
+}
+
+
+void SocketListener::accept_async(const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_listener_accept_async(gobj(),
+                                 0,
+                                 &SignalProxy_async_callback,
+                                 slot_copy);
+}
+
+void SocketListener::accept_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_listener_accept_async(gobj(),
+                                 cancellable->gobj(),
+                                 &SignalProxy_async_callback,
+                                 slot_copy);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketListener::accept_finish(const Glib::RefPtr<AsyncResult>& result, Glib::RefPtr<Glib::Object>& source_object)
+#else
+Glib::RefPtr<SocketConnection> SocketListener::accept_finish(const Glib::RefPtr<AsyncResult>& result, Glib::RefPtr<Glib::Object>& source_object, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GObject *retobj = 0;
+  GSocketConnection* retvalue = g_socket_listener_accept_finish(gobj(),
+                                                                result->gobj(),
+                                                                &retobj,
+                                                                &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  if (retobj)
+    source_object = Glib::wrap(retobj);
+
+  return Glib::wrap(retvalue);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketListener::accept_finish(const Glib::RefPtr<AsyncResult>& result)
+#else
+Glib::RefPtr<SocketConnection> SocketListener::accept_finish(const Glib::RefPtr<AsyncResult>& result, std::auto_ptr<Glib::Error>& error)
+#endif // GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  GSocketConnection* retvalue = g_socket_listener_accept_finish(gobj(),
+                                                                result->gobj(),
+                                                                0,
+                                                                &(gerror));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return Glib::wrap(retvalue);
+}
+
+} // namespace Gio
