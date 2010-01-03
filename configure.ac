@@ -36,7 +36,7 @@ MM_INIT_MODULE([giomm-2.4])
 MM_CONFIG_DOCTOOL_DIR([docs])
 
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
-AC_SUBST([LIBGLIBMM_SO_VERSION], [3:0:2])
+AC_SUBST([LIBGLIBMM_SO_VERSION], [4:0:3])
 
 AC_PROG_CXX
 AC_DISABLE_STATIC
