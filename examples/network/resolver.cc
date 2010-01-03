@@ -437,7 +437,7 @@ do_connectable (const std::string& arg, gboolean synchronous)
 static int cancel_fds[2];
 
 static void
-interrupted (int sig)
+interrupted (int /*sig*/)
 {
   signal (SIGINT, SIG_DFL);
   write (cancel_fds[1], "x", 1);

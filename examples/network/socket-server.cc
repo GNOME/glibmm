@@ -27,7 +27,7 @@ static GOptionEntry cmd_entries[] = {
    "Enable non-blocking i/o", NULL},
   {"use-source", 's', 0, G_OPTION_ARG_NONE, &use_source,
    "Use GSource to wait for non-blocking i/o", NULL},
-  {NULL}
+  {0, 0, 0, G_OPTION_ARG_NONE, 0, 0, 0}
 };
 
 Glib::ustring
@@ -49,8 +49,8 @@ socket_address_to_string (const Glib::RefPtr<Gio::SocketAddress>& address)
 }
 
 static bool
-source_ready (gpointer data,
-              GIOCondition condition)
+source_ready (gpointer /*data*/,
+              GIOCondition /*condition*/)
 {
   loop->quit ();
   return false;
@@ -137,7 +137,6 @@ main (int argc,
         socket_type = Gio::SOCKET_TYPE_STREAM;
 
     try {
-#warning "Gio::SocketFamily bug"
         socket = Gio::Socket::create ((Gio::SocketFamily)G_SOCKET_FAMILY_IPV4, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
     } catch (const Gio::Error& error)
     {
