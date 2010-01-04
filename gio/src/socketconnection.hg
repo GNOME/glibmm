@@ -62,9 +62,12 @@ _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_local_address(), g_socket_connectio
 _WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_local_address() const, g_socket_connection_get_local_address, constversion, errthrow)
 _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_remote_address(), g_socket_connection_get_remote_address, errthrow)
 _WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_remote_address() const, g_socket_connection_get_remote_address, constversion, errthrow)
+
+// Not sure that registering new GTypes with the factory is useful for the C++ binding
 //_WRAP_METHOD(void factory_register_type(GType g_type, GSocketFamily family, GSocketType type, gint protocol);
 //_WRAP_METHOD(GType factory_lookup_type(GSocketFamily family, GSocketType type, gint protocol_id);
-//_WRAP_METHOD(Glib::RefPtr<SocketConnection> factory_create_connection(GSocket *socket);
+
+_WRAP_METHOD(static Glib::RefPtr<SocketConnection> create(const Glib::RefPtr<Socket>& socket), g_socket_connection_factory_create_connection)
 
 _WRAP_PROPERTY("socket", Glib::RefPtr<Socket>)
 _WRAP_PROPERTY("graceful-disconnect", bool)
