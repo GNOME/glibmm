@@ -29,12 +29,12 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-/** @defgroup NetworkIO Portable Network I/O Functionality
- */
-
 _WRAP_ENUM(SocketType, GSocketType)
 _WRAP_ENUM(SocketProtocol, GSocketProtocol)
 _WRAP_ENUM(SocketMsgFlags, GSocketMsgFlags)
+
+/** @defgroup NetworkIO Portable Network I/O Functionality
+ */
 
 /** Low-level socket object
  *
@@ -48,27 +48,24 @@ _WRAP_ENUM(SocketMsgFlags, GSocketMsgFlags)
  * SocketConnection. However there may be cases where direct use of Socket is
  * useful.
  *
- * (FIXME: update this doc for giomm)
- * Socket implements the Initable interface, so if it is manually constructed by
- * e.g. g_object_new() you must call g_initable_init() and check the results
- * before using the object. This is done automatically in g_socket_new() and
- * g_socket_new_from_fd(), so these functions can return NULL.
+ * Socket implements the Initable interface, and since initialization can fail,
+ * the constructor may throw an exception.
  *
  * Sockets operate in two general modes, blocking or non-blocking. When in
  * blocking mode all operations block until the requested operation is finished
  * or there is an error. In non-blocking mode all calls that would block return
- * immediately with a G_IO_ERROR_WOULD_BLOCK error. To know when a call would
+ * immediately with a Gio::Error::WOULD_BLOCK error. To know when a call would
  * successfully run you can call condition_check(), or condition_wait(). You can
  * also use create_source() and attach it to a Glib::MainContext to get
  * callbacks when I/O is possible. Note that all sockets are always set to non
  * blocking mode in the system, and blocking mode is emulated in Socket.
  *
  * When working in non-blocking mode applications should always be able to
- * handle getting a G_IO_ERROR_WOULD_BLOCK error even when some other function
+ * handle getting a Gio::Error::WOULD_BLOCK error even when some other function
  * said that I/O was possible. This can easily happen in case of a race
  * condition in the application, but it can also happen for other reasons. For
  * instance, on Windows a socket is always seen as writable until a write
- * returns G_IO_ERROR_WOULD_BLOCK.
+ * returns Gio::Error::WOULD_BLOCK.
  *
  * Sockets can be either connection oriented or datagram based. For connection
  * oriented types you must first establish a connection by either connecting to
@@ -84,7 +81,7 @@ _WRAP_ENUM(SocketMsgFlags, GSocketMsgFlags)
  * automatically be killed if it tries to write to stdout after it has been
  * closed.
  *
- * @newin{2,22}
+ * @newin{2,24}
  * @ingroup NetworkIO
  */
 class Socket : public Glib::Object, public Initable

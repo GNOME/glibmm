@@ -31,18 +31,16 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-/** @defgroup NetworkIO Portable Network I/O Functionality
- */
-
 /**
  * Helper for connecting to a network service
- * @see_also SocketConnection, SocketListener
+ *
+ * @see SocketConnection, SocketListener
  *
  * SocketClient is a high-level utility class for connecting to a
  * network host using a connection oriented socket type.
  *
  * You create a SocketClient object, set any options you want, then
- * call a sync or async connect operation, which returns a #GSocketConnection
+ * call a sync or async connect operation, which returns a SocketConnection
  * subclass on success.
  *
  * The type of the SocketConnection object returned depends on the type of
@@ -92,14 +90,20 @@ Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, c
 Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, const Glib::ustring& service, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
+_IGNORE(g_socket_client_connect_async)
+_WRAP_METHOD_DOCS_ONLY(g_socket_client_connect_async)
 void connect_async(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 void connect_async(const Glib::RefPtr<SocketConnectable>& connectable, const SlotAsyncReady& slot);
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_finish, errthrow)
 
+_IGNORE(g_socket_client_connect_to_host_async)
+_WRAP_METHOD_DOCS_ONLY(g_socket_client_connect_to_host_async)
 void connect_to_host_async(const Glib::ustring& host_and_port, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 void connect_to_host_async(const Glib::ustring& host_and_port, guint16 default_port, const SlotAsyncReady& slot);
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_host_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_to_host_finish, errthrow)
 
+_IGNORE(g_socket_client_connect_to_service_async)
+_WRAP_METHOD_DOCS_ONLY(g_socket_client_connect_to_service_async)
 void connect_to_service_async(const Glib::ustring& domain, const Glib::ustring& service, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 void connect_to_service_async(const Glib::ustring& domain, const Glib::ustring& service, const SlotAsyncReady& slot);
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_service_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_to_service_finish, errthrow)
