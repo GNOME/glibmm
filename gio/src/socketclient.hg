@@ -71,21 +71,37 @@ _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_local_address(), g_socket_client_ge
 _WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_local_address() const, g_socket_client_get_local_address, constversion)
 _WRAP_METHOD(void set_local_address(const Glib::RefPtr<SocketAddress>& address), g_socket_client_set_local_address)
 
-// TODO: non-cancellable version
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect, errthrow)
-// TODO: non-cancellable version
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> connect(const Glib::RefPtr<SocketConnectable>& connectable);
+#else
+Glib::RefPtr<SocketConnection> connect(const Glib::RefPtr<SocketConnectable>& connectable, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_host(const Glib::ustring& host_and_port, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect_to_host, errthrow)
-// TODO: non-cancellable version
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> connect_to_host(const Glib::ustring& host_and_port, guint16 default_port);
+#else
+Glib::RefPtr<SocketConnection> connect_to_host(const Glib::ustring& host_and_port, guint16 default_port, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, const Glib::ustring& service, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect_to_service, errthrow)
-// TODO: non-cancellable version
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, const Glib::ustring& service);
+#else
+Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, const Glib::ustring& service, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
 void connect_async(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+void connect_async(const Glib::RefPtr<SocketConnectable>& connectable, const SlotAsyncReady& slot);
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_finish, errthrow)
-// TODO: non-cancellable version
+
 void connect_to_host_async(const Glib::ustring& host_and_port, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+void connect_to_host_async(const Glib::ustring& host_and_port, guint16 default_port, const SlotAsyncReady& slot);
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_host_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_to_host_finish, errthrow)
 
-// TODO: non-cancellable version
 void connect_to_service_async(const Glib::ustring& domain, const Glib::ustring& service, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+void connect_to_service_async(const Glib::ustring& domain, const Glib::ustring& service, const SlotAsyncReady& slot);
 _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_service_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_client_connect_to_service_finish, errthrow)
 
 _WRAP_PROPERTY("family", SocketFamily)

@@ -42,6 +42,22 @@ SocketClient::connect_async(const Glib::RefPtr<SocketConnectable>& connectable,
 }
 
 void
+SocketClient::connect_async(const Glib::RefPtr<SocketConnectable>& connectable,
+                            const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_client_connect_async (gobj(),
+                                 connectable->gobj (),
+                                 0,
+                                 &SignalProxy_async_callback,
+                                 slot_copy);
+}
+
+void
 SocketClient::connect_to_host_async(const Glib::ustring& host_and_port,
                                     guint16 default_port,
                                     const Glib::RefPtr<Cancellable>& cancellable,
@@ -56,6 +72,24 @@ SocketClient::connect_to_host_async(const Glib::ustring& host_and_port,
                                          host_and_port.c_str (),
                                          default_port,
                                          cancellable->gobj(),
+                                         &SignalProxy_async_callback,
+                                         slot_copy);
+}
+
+void
+SocketClient::connect_to_host_async(const Glib::ustring& host_and_port,
+                                    guint16 default_port,
+                                    const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_client_connect_to_host_async (gobj(),
+                                         host_and_port.c_str (),
+                                         default_port,
+                                         0,
                                          &SignalProxy_async_callback,
                                          slot_copy);
 }
@@ -79,5 +113,82 @@ SocketClient::connect_to_service_async(const Glib::ustring& domain,
                                             slot_copy);
 }
 
+void
+SocketClient::connect_to_service_async(const Glib::ustring& domain,
+                                       const Glib::ustring& service,
+                                       const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_client_connect_to_service_async (gobj(),
+                                            domain.c_str (),
+                                            service.c_str (),
+                                            0,
+                                            &SignalProxy_async_callback,
+                                            slot_copy);
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketClient::connect(const Glib::RefPtr<SocketConnectable>& connectable)
+#else
+Glib::RefPtr<SocketConnection> SocketClient::connect(const Glib::RefPtr<SocketConnectable>& connectable, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<SocketConnection> retvalue = Glib::wrap(g_socket_client_connect(gobj(), const_cast<GSocketConnectable*>(Glib::unwrap(connectable)), 0, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketClient::connect_to_host(const Glib::ustring& host_and_port, guint16 default_port)
+#else
+Glib::RefPtr<SocketConnection> SocketClient::connect_to_host(const Glib::ustring& host_and_port, guint16 default_port, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<SocketConnection> retvalue = Glib::wrap(g_socket_client_connect_to_host(gobj(), host_and_port.c_str(), default_port, 0, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<SocketConnection> SocketClient::connect_to_service(const Glib::ustring& domain, const Glib::ustring& service)
+#else
+Glib::RefPtr<SocketConnection> SocketClient::connect_to_service(const Glib::ustring& domain, const Glib::ustring& service, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<SocketConnection> retvalue = Glib::wrap(g_socket_client_connect_to_service(gobj(), domain.c_str(), service.c_str(), 0, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+
+}
 
 } // namespace Gio
