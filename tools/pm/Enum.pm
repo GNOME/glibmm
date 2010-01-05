@@ -31,6 +31,106 @@ our @EXPORT_OK;
 #       bool mark;
 #    }
 
+#
+# private functions:
+#
+
+sub split_enum_tokens($)
+{
+  my ($token_string) = @_;
+  my @tokens = ();
+  # index of first opening double quotes between parens - beginning of a new
+  # token.
+  my $begin_token = 0;
+  # index of last closing double quotes between parens - end of a token.
+  my $end_token = 0;
+  # whether we are inside double quotes.
+  my $inside_dquotes = 0;
+  # whether we are inside double and then single quotes (for situations like
+  # "'"'").
+  my $inside_squotes = 0;
+  my $len = length($token_string);
+  # whether we found opening paren and we are expecting an opening double
+  # quotes.
+  my $near_begin = 0;
+  # count of double quotes pairs between parens.
+  my $dq_count = 0;
+  # whether previous char was a backslash - important only when being between
+  # double quotes.
+  my $backslash = 0;
+  for (my $index = 0; $index < $len; $index++)
+  {
+    my $char = substr($token_string, $index, 1);
+    if ($inside_dquotes)
+    {
+      # if prevous char was backslash, then current char is not important -
+      # we are still inside double or double/single quotes anyway.
+      if ($backslash)
+      {
+        $backslash = 0;
+      }
+      # if current char is backslash.
+      elsif ($char eq '\\')
+      {
+        $backslash = 1;
+      }
+      # if current char is unescaped double quotes and we are not inside single
+      # ones - means, we are going outside string. We mark this place as an end
+      # of the token in case we find a closing paren after this.
+      elsif ($char eq '"' and not $inside_squotes)
+      {
+        $inside_dquotes = 0;
+        $end_token = $index;
+      }
+      # if current char is single quote then switch being inside single quotes
+      # state.
+      elsif ($char eq '\'')
+      {
+        $inside_squotes = not $inside_squotes;
+      }
+    }
+    # current char is opening paren - this means we are near the beginning of
+    # a token (first double quotes after this paren).
+    elsif ($char eq '(')
+    {
+      $near_begin = 1;
+    }
+    # current char is closing paren - this means we reached end of a token at
+    # last closing double quotes.
+    elsif ($char eq ')')
+    {
+      my $token_len = $end_token + 1 - $begin_token;
+      my $token = substr($token_string, $begin_token, $token_len);
+      # there should be three pairs of double quotes.
+      if ($dq_count == 3)
+      {
+        push(@tokens, $token);
+      }
+      else
+      {
+        print STDERR "Wrong value statement while parsing ($token)\n";
+      }
+      $dq_count = 0;
+    }
+    # current char is opening double quotes - this can be a beginning of
+    # a token.
+    elsif ($char eq '"')
+    {
+      if ($near_begin)
+      {
+        $begin_token = $index;
+        $near_begin = 0;
+      }
+      $inside_dquotes = 1;
+      $dq_count++;
+    }
+  }
+  return @tokens;
+}
+
+#
+# end of private functions.
+#
 
 sub new
 {
@@ -82,13 +182,11 @@ sub parse_values($$)
   my $elem_names  = [];
   my $elem_values = [];
   my $common_prefix = undef;
-
-  # break up the value statements
-  foreach(split(/\s*'*[()]\s*/, $value))
+  # break up the value statements - it works with parens inside double quotes
+  # and handles triples like '("dq-token", "MY_SCANNER_DQ_TOKEN", "'"'").
+  foreach (split_enum_tokens($value))
   {
-    next if($_ eq "");
-
-    if(/^"\S+" "(\S+)" "([^"]+)"$/)
+    if (/^"\S+" "(\S+)" "(.+)"$/)
     {
       my ($name, $value) = ($1, $2);
 
@@ -143,6 +241,7 @@ sub beautify_values($)
   # Continuous?  (Aliases to prior enum values are allowed.)
   foreach my $value (@$elem_values)
   {
+    return if ($value =~ /[G-WY-Zg-wy-z_]/);
     return if(($value < $first) || ($value > $prev + 1));
     $prev = $value;
   }

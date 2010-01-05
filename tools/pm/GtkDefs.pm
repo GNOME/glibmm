@@ -95,25 +95,31 @@ sub read_defs($$;$)
   # break the tokens into lisp phrases up to three levels deep.
   #   WARNING: reading the following perl statement may induce seizures,
   #   please flush eyes with water immediately, and consult a mortician.
-  my @tokens = split(
-    m/(
-        \(
-        (?:
-            [^()]*
-            \(
-            (?:
-                [^()]*
-                \(
-                [^()]*
-                \)
-            )*
-            [^()]*
-            \)
-        )*
-        [^()]*
-        \)
-    )/x,
-    read_file($path, $filename));
+  #
+  # this regexp is weak - it does not work on multiple and/or unpaired parens
+  # inside double quotes - those shouldn't be ever considered. i replaced this
+  # splitting with my own function, which does the job very well - krnowak.
+#  my @tokens = split(
+#    m/(
+#        \(
+#        (?:
+#            [^()]*
+#            \(
+#            (?:
+#                [^()]*
+#                \(
+#                [^()]*
+#                \)
+#            )*
+#            [^()]*
+#            \)
+#        )*
+#        [^()]*
+#        \)
+#    )/x,
+#    read_file($path, $filename));
+
+  my @tokens = split_tokens(read_file($path, $filename));
 
   # scan through top level tokens
   while ($#tokens > -1)
@@ -161,6 +167,103 @@ sub read_defs($$;$)
   }
 }
 
+sub split_tokens($)
+{
+  my ($token_string) = @_;
+  my @tokens = ();
+  # whether we are inside double quotes.
+  my $inside_dquotes = 0;
+  # whether we are inside double and then single quotes (for situations like
+  # "'"'").
+  my $inside_squotes = 0;
+  # number of yet unpaired opening parens.
+  my $parens = 0;
+  my $len = length($token_string);
+  # whether previous char was a backslash - important only when being between
+  # double quotes.
+  my $backslash = 0;
+  # index of first opening paren - beginning of a new token.
+  my $begin_token = 0;
+
+  for (my $index = 0; $index < $len; $index++)
+  {
+    my $char = substr($token_string, $index, 1);
+    # if we are inside double quotes.
+    if ($inside_dquotes)
+    {
+      # if prevous char was backslash, then current char is not important -
+      # we are still inside double or double/single quotes anyway.
+      if ($backslash)
+      {
+        $backslash = 0;
+      }
+      # if current char is backslash.
+      elsif ($char eq '\\')
+      {
+        $backslash = 1;
+      }
+      # if current char is unescaped double quotes and we are not inside single
+      # ones - means, we are going outside string.
+      elsif ($char eq '"' and not $inside_squotes)
+      {
+        $inside_dquotes = 0;
+      }
+      # if current char is unescaped single quote, then we have two cases:
+      # 1. it just plain apostrophe.
+      # 2. it is a piece of a C code:
+      #  a) opening quotes,
+      #  b) closing quotes.
+      # if there is near (2 or 3 indexes away) second quote, then it is 2a,
+      # if 2a occured earlier, then it is 2b.
+      # otherwise is 1.
+      elsif ($char eq '\'')
+      {
+        # if we are already inside single quotes, it is 2b.
+        if ($inside_squotes)
+        {
+          $inside_squotes = 0;
+        }
+        else
+        {
+          # if there is closing quotes near, it is 2a.
+          if (substr($token_string, $index, 4) =~ /^'\\?.'/)
+          {
+            $inside_squotes = 1;
+          }
+          # else it is just 1.
+        }
+      }
+    }
+    # double quotes - beginning of a string.
+    elsif ($char eq '"')
+    {
+      $inside_dquotes = 1;
+    }
+    # opening paren - if paren count is 0 then this is a beginning of a token.
+    elsif ($char eq '(')
+    {
+      unless ($parens)
+      {
+        $begin_token = $index;
+      }
+      $parens++;
+    }
+    # closing paren - if paren count is 1 then this is an end of a token, so we
+    # extract it from token string and push into token list.
+    elsif ($char eq ')')
+    {
+      $parens--;
+      unless ($parens)
+      {
+        my $token_len = $index + 1 - $begin_token;
+        my $token = substr($token_string, $begin_token, $token_len);
+        push(@tokens, $token);
+      }
+    }
+    # do nothing on other chars.
+  }
+  return @tokens;
+}
 
 sub read_file($$)
 {
