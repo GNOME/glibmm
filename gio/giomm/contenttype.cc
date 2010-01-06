@@ -69,7 +69,8 @@ Glib::ustring content_type_guess(const std::string& filename,
   const std::basic_string<guchar>& data, bool& result_uncertain)
 {
   gboolean c_result_uncertain = FALSE;
-  gchar* cresult = g_content_type_guess(filename.c_str(), data.c_str(),
+  const gchar *c_filename = filename.empty () ? NULL : filename.c_str ();
+  gchar* cresult = g_content_type_guess(c_filename, data.c_str(),
     data.size(), &c_result_uncertain);
   result_uncertain = c_result_uncertain;
   return Glib::convert_return_gchar_ptr_to_ustring(cresult);
@@ -79,7 +80,8 @@ Glib::ustring content_type_guess(const std::string& filename,
   const guchar* data, gsize data_size, bool& result_uncertain)
 {
   gboolean c_result_uncertain = FALSE;
-  gchar* cresult = g_content_type_guess(filename.c_str(), data,
+  const gchar *c_filename = filename.empty () ? NULL : filename.c_str ();
+  gchar* cresult = g_content_type_guess(c_filename, data,
     data_size, &c_result_uncertain);
   result_uncertain = c_result_uncertain;
   return Glib::convert_return_gchar_ptr_to_ustring(cresult);
@@ -89,7 +91,8 @@ Glib::ustring content_type_guess(const std::string& filename,
   const std::string& data, bool& result_uncertain)
 {
   gboolean c_result_uncertain = FALSE;
-  gchar* cresult = g_content_type_guess(filename.c_str(), (const guchar*)data.c_str(),
+  const gchar *c_filename = filename.empty () ? NULL : filename.c_str ();
+  gchar* cresult = g_content_type_guess(c_filename, (const guchar*)data.c_str(),
     data.size(), &c_result_uncertain);
   result_uncertain = c_result_uncertain;
   return Glib::convert_return_gchar_ptr_to_ustring(cresult);
