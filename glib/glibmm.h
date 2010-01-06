@@ -25,7 +25,7 @@
 #include <glibmmconfig.h>
 //#include <glibmm/i18n.h> //This must be included by the application, after system headers such as <iostream>.
 #include <glibmm/arrayhandle.h>
-#include <glibmm/btree.h>
+#include <glibmm/balancedtree.h>
 #include <glibmm/checksum.h>
 #include <glibmm/class.h>
 #include <glibmm/containerhandle_shared.h>
