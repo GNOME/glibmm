@@ -1,0 +1,335 @@
+/* Copyright (C) 2007 glibmm development team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(glibmm,glib)
+
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+#include <glibmm/error.h>
+#include <glibmm/arrayhandle.h>
+#include <glib/gtree.h>
+
+namespace Glib
+{
+/** N-ary Trees — trees of data with any number of branches
+ * The BalancedTree class and its associated functions provide a balancedctree data structure, in which trees in the tree can contain arbitrary data.
+ *
+ * @newin2p24
+ */
+template <typename K, typename V> 
+class BalancedTree
+{
+  _CLASS_GENERIC(BalancedTree, GTree)
+public:
+  typedef sigc::slot<bool, const K&, const V&> TraverseFunc;
+  typedef sigc::slot<int, const K&, const K&> CompareFunc;
+
+  BalancedTree() :
+    key_compare_slot(sigc::ptr_fun(key_compare))
+  {
+    gobject_ = g_tree_new_full(on_compare_tree, &key_compare_slot, on_destroy_key, on_destroy_value);
+  }
+
+  BalancedTree(const CompareFunc &key_compare_slot_) :
+    key_compare_slot(key_compare_slot_)
+  {
+    gobject_ = g_tree_new_full(on_compare_tree, &key_compare_slot, on_destroy_key, on_destroy_value);
+  }
+
+  ~BalancedTree()
+  {
+    g_tree_destroy(gobject_);
+  }
+  _IGNORE(g_tree_destroy)
+
+  /// Provides access to the underlying C GObject.
+  inline GTree* gobj()
+  {
+    return gobject_;
+  }
+
+  /// Provides access to the underlying C GObject.
+  inline const GTree* gobj() const
+  {
+    return gobject_;
+  }
+
+/**
+ * insert:
+ * @key: the key to insert.
+ * @value: the value corresponding to the key.
+ * 
+ * Inserts a key/value pair into a #GTree. If the given key already exists 
+ * in the #GTree its corresponding value is set to the new value. If you 
+ * supplied a value_destroy_func when creating the #GTree, the old value is 
+ * freed using that function. If you supplied a @key_destroy_func when 
+ * creating the #GTree, the passed key is freed using that function.
+ *
+ * The tree is automatically 'balanced' as new key/value pairs are added,
+ * so that the distance from the root to every leaf is as small as possible.
+ **/
+  void insert(const K &key, const V &value)
+  {
+    g_tree_insert(gobj(), reinterpret_cast<void *>(new K(key)), reinterpret_cast<void *>(new V(value)));
+  }
+  _IGNORE(g_tree_insert)
+
+/**
+ * replace:
+ * @key: the key to insert.
+ * @value: the value corresponding to the key.
+ * 
+ * Inserts a new key and value into a #GTree similar to g_tree_insert(). 
+ * The difference is that if the key already exists in the #GTree, it gets 
+ * replaced by the new key. If you supplied a @value_destroy_func when 
+ * creating the #GTree, the old value is freed using that function. If you 
+ * supplied a @key_destroy_func when creating the #GTree, the old key is 
+ * freed using that function. 
+ *
+ * The tree is automatically 'balanced' as new key/value pairs are added,
+ * so that the distance from the root to every leaf is as small as possible.
+ **/
+  void replace(const K &key, const V &value)
+  {
+    g_tree_replace(gobj(), new K(key), new V(value));
+  }
+  _IGNORE(g_tree_replace)
+
+/**
+ * remove:
+ * @key: the key to remove.
+ * 
+ * Removes a key/value pair from a #GTree.
+ *
+ * If the #GTree was created using g_tree_new_full(), the key and value 
+ * are freed using the supplied destroy functions, otherwise you have to 
+ * make sure that any dynamically allocated values are freed yourself.
+ * If the key does not exist in the #GTree, the function does nothing.
+ *
+ * Returns: %TRUE if the key was found (prior to 2.8, this function returned 
+ *   nothing)
+ **/
+  bool remove(const K &key)
+  {
+    return g_tree_remove(const_cast<GTree*>(gobj()), &key);
+  }
+  _IGNORE(g_tree_remove)
+
+/**
+ * steal:
+ * @key: the key to remove.
+ * 
+ * Removes a key and its associated value from a #GTree without calling 
+ * the key and value destroy functions.
+ *
+ * If the key does not exist in the #GTree, the function does nothing.
+ *
+ * Returns: %TRUE if the key was found (prior to 2.8, this function returned 
+ *    nothing)
+ **/
+  bool steal(const K &key)
+  {
+    return g_tree_steal(gobj(), &key);
+  }
+  _IGNORE(g_tree_steal)
+
+/**
+ * lookup:
+ * @key: the key to look up.
+ * 
+ * Gets the value corresponding to the given key. Since a #GTree is 
+ * automatically balanced as key/value pairs are added, key lookup is very 
+ * fast.
+ *
+ * Return value: the value corresponding to the key, or %NULL if the key was
+ * not found.
+ **/
+  V* lookup(const K &key)
+  {
+    return reinterpret_cast<V *>(g_tree_lookup(gobj(), &key));
+  }
+  _IGNORE(g_tree_lookup)
+
+  const V* lookup(const K &key) const
+  {
+    return reinterpret_cast<const V *>(g_tree_lookup(gobj(), &key));
+  }
+  _IGNORE(g_tree_lookup)
+
+/**
+ * height:
+ * 
+ * Gets the height of a #GTree.
+ *
+ * If the #GTree contains no nodes, the height is 0.
+ * If the #GTree contains only one root node the height is 1.
+ * If the root node has children the height is 2, etc.
+ * 
+ * Return value: the height of the #GTree.
+ **/
+  gint height() const
+  {
+    return g_tree_height(const_cast<GTree*>(gobj()));
+  }
+  _IGNORE(g_tree_height)
+
+/**
+ * nnodes:
+ * 
+ * Gets the number of nodes in a #GTree.
+ * 
+ * Return value: the number of nodes in the #GTree.
+ **/
+  gint nnodes() const
+  {
+    return g_tree_nnodes(const_cast<GTree*>(gobj()));
+  }
+  _IGNORE(g_tree_nnodes)
+
+/**
+ * foreach:
+ * @func: the function to call for each node visited. If this function
+ *   returns true, the traversal is stopped.
+ * 
+ * Calls the given function for each of the key/value pairs in the #GTree.
+ * The function is passed the key and value of each pair. The tree is
+ * traversed in sorted order.
+ *
+ * The tree may not be modified while iterating over it (you can't 
+ * add/remove items). To remove all items matching a predicate, you need 
+ * to add each item to a list in your #TraverseFunc as you walk over 
+ * the tree, then walk the list and remove each item.
+ **/
+  void foreach(const TraverseFunc& func)
+  {
+    TraverseFunc func_copy = func;
+    g_tree_foreach(gobj(), c_callback_traverse, reinterpret_cast<gpointer>(&func_copy));
+  }
+  _IGNORE(g_tree_foreach);
+
+/**
+ * search:
+ * @search_func: a function used to search the #GTree. 
+ * @user_data: the data passed as the second argument to the @search_func 
+ * function.
+ * 
+ * Searches a #GTree using @search_func.
+ *
+ * The @search_func is called with a pointer to the key of a key/value pair in 
+ * the tree, and the passed in @user_data. If @search_func returns 0 for a 
+ * key/value pair, then g_tree_search_func() will return the value of that 
+ * pair. If @search_func returns -1,  searching will proceed among the 
+ * key/value pairs that have a smaller key; if @search_func returns 1, 
+ * searching will proceed among the key/value pairs that have a larger key.
+ *
+ * Return value: the value corresponding to the found key, or %NULL if the key 
+ * was not found.
+ **/
+  V* search(const CompareFunc &func, const K& key)
+  {
+    sigc::slot<int, const K&, const CompareFunc&, const K&> real_slot = sigc::ptr_fun(on_compare_key);
+    sigc::slot<int, const K&> bound_slot = sigc::bind(real_slot, func, key);
+    gpointer value = g_tree_search(gobj(), c_callback_search, reinterpret_cast<gconstpointer>(&bound_slot)); 
+    
+    return reinterpret_cast<V*>(value);
+  }
+
+ /**
+ * search:
+ * @search_func: a function used to search the #GTree. 
+ * @user_data: the data passed as the second argument to the @search_func 
+ * function.
+ * 
+ * Searches a #GTree using @search_func.
+ *
+ * The @search_func is called with a pointer to the key of a key/value pair in 
+ * the tree, and the passed in @user_data. If @search_func returns 0 for a 
+ * key/value pair, then g_tree_search_func() will return the value of that 
+ * pair. If @search_func returns -1,  searching will proceed among the 
+ * key/value pairs that have a smaller key; if @search_func returns 1, 
+ * searching will proceed among the key/value pairs that have a larger key.
+ *
+ * Return value: the value corresponding to the found key, or %NULL if the key 
+ * was not found.
+ **/
+ const V* search(const CompareFunc &func, const K& key) const
+  {
+    return const_cast<BalancedTree<K, V>*>(this)->search(func, key);
+  }
+
+private:
+  /// Method for comparing keys by func (Internal use).
+  static gint on_compare_key(const K& key_a, const CompareFunc& func, const K& key_b)
+  {
+    return func(key_a, key_b);
+  }
+
+  /// Wrapper for invoking GCompareFunc.
+  static gint c_callback_search(gconstpointer a, gconstpointer b)
+  {
+    const sigc::slot<int, const K&>* slot = reinterpret_cast<const sigc::slot<int, const K&> *>(b);
+    return (*slot)(*reinterpret_cast<const K*>(a));
+  }
+
+  /// Wrapper for invoking GTraverseFunc.
+  static gboolean c_callback_traverse(gpointer key, gpointer value, gpointer slot)
+  {
+    const TraverseFunc* tf = reinterpret_cast<const TraverseFunc*>(slot);
+    return (*tf)(*reinterpret_cast<const K*>(key), *reinterpret_cast<const V*>(value));
+  }
+
+  /// Method for comparing key values (Internal use).
+  static gint on_compare_tree(gconstpointer a, gconstpointer b, gpointer data)
+  {
+    const K& key_a = *reinterpret_cast<const K*>(a);
+    const K& key_b = *reinterpret_cast<const K*>(b);
+    const CompareFunc& func = *reinterpret_cast<const CompareFunc*>(data);
+
+    return func(key_a, key_b);
+  }
+
+  /// Method for destroying keys (Internal use).
+  static void on_destroy_key(gpointer data)
+  {
+    K* key = reinterpret_cast<K*>(data);
+    delete key;
+  }
+
+  /// Method for destroying values (Internal use).
+  static void on_destroy_value(gpointer data)
+  {
+    V* value = reinterpret_cast<V*>(data);
+    delete value;
+  }
+
+  /// Key compare function when it is not by the user (Internal use).
+  static int key_compare(const K& key_a, const K& key_b)
+  {
+    if(key_a < key_b)
+      return -1;
+
+    if(key_a > key_b)
+      return 1;
+
+    return 0;
+  }
+
+  GTree* gobject_;
+  CompareFunc key_compare_slot;
+};
+
+} // namespace Glib

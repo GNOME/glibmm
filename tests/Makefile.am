@@ -20,6 +20,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 check_PROGRAMS =			\
 	giomm_ioerror/test		\
 	giomm_simple/test		\
+	glibmm_btree/test		\
 	glibmm_date/test		\
 	glibmm_nodetree/test		\
 	glibmm_ustring_compose/test	\
@@ -44,6 +45,7 @@ giomm_ioerror_test_LDADD   = $(giomm_ldadd)
 giomm_simple_test_SOURCES  = giomm_simple/main.cc
 giomm_simple_test_LDADD    = $(giomm_ldadd)
 
+glibmm_btree_test_SOURCES           = glibmm_btree/main.cc
 glibmm_date_test_SOURCES            = glibmm_date/main.cc
 glibmm_nodetree_test_SOURCES        = glibmm_nodetree/main.cc
 glibmm_ustring_compose_test_SOURCES = glibmm_ustring_compose/main.cc
