@@ -110,11 +110,20 @@ public:
   //Note that this returns a reference, unlike most GTK+ get_*() functions,
   //so we don't need to use refreturn.
   _WRAP_METHOD(Glib::RefPtr<Glib::Object> get_source_object(),
-               g_async_result_get_source_object)
+               g_async_result_get_source_object, deprecated "Use get_source_object_base()")
   _WRAP_METHOD(Glib::RefPtr<const Glib::Object> get_source_object() const,
-               g_async_result_get_source_object, constversion)
+               g_async_result_get_source_object, constversion, deprecated "Use get_source_object_base()")
 
-  _WRAP_VFUNC(Glib::RefPtr<Glib::Object> get_source_object(),
+  //Note that this returns a reference, unlike most GTK+ get_*() functions,
+  //so we don't need to use refreturn.
+  Glib::RefPtr<Glib::ObjectBase> get_source_object_base();
+  Glib::RefPtr<const Glib::ObjectBase> get_source_object_base() const;
+
+
+  // TODO: For some reason, the compiler cannot find an unwrap() for ObjectBase.
+  //#m4 _CONVERSION(`Glib::RefPtr<Glib::ObjectBase>',`GObject*',__CONVERT_REFPTR_TO_P)
+#m4 _CONVERSION(`Glib::RefPtr<Glib::ObjectBase>',`GObject*',`unwrap_objectbase_custom($3)')
+  _WRAP_VFUNC(Glib::RefPtr<Glib::ObjectBase> get_source_object(),
               "get_source_object")
 };
 

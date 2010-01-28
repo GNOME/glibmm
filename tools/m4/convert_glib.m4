@@ -63,6 +63,9 @@ _CONVERSION(`const Glib::RefPtr<const Glib::Object>&',`GObject*',__CONVERT_CONST
 _CONVERSION(`GObject*',`Glib::RefPtr<Glib::Object>',`Glib::wrap($3)')
 _CONVERSION(`GObject*',`Glib::RefPtr<const Glib::Object>',`Glib::wrap($3)')
 
+_CONVERSION(`GObject*',`Glib::RefPtr<Glib::ObjectBase>',`Glib::wrap($3)')
+_CONVERSION(`GObject*',`Glib::RefPtr<const Glib::ObjectBase>',`Glib::wrap($3)')
+
 _CONVERSION(`GRegex*',`Glib::RefPtr<Regex>',`Glib::wrap($3)')
 _CONVERSION(`GRegex*',`Glib::RefPtr<const Regex>',`Glib::wrap($3)')
 

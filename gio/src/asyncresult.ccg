@@ -19,3 +19,26 @@
 
 //#include <gio/gasyncresult.h> //We are not allowed to include individual headers.
 #include <gio/gio.h>
+
+namespace Gio
+{
+
+static GObject* unwrap_objectbase_custom(const Glib::RefPtr<Glib::ObjectBase>& cpp_instance)
+{
+  return (cpp_instance ? cpp_instance->gobj() : 0);
+}
+
+Glib::RefPtr<Glib::ObjectBase> AsyncResult::get_source_object_base()
+{
+  GObject* cobj = g_async_result_get_source_object(gobj());
+  ObjectBase* cppobj = Glib::wrap_auto(cobj); //ObjectBase::_get_current_wrapper(cobj);
+  return Glib::RefPtr<Glib::ObjectBase>(cppobj); //g_async_result_get_source_object() gives us a ref, unusually.
+  //TODO: For some reason this fails: Glib::wrap(cobj);
+}
+
+Glib::RefPtr<const Glib::ObjectBase> AsyncResult::get_source_object_base() const
+{
+  return const_cast<AsyncResult*>(this)->get_source_object_base();
+}
+
+} //namespace Gio

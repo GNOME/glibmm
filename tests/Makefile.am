@@ -20,12 +20,13 @@ AUTOMAKE_OPTIONS = subdir-objects
 check_PROGRAMS =			\
 	giomm_ioerror/test		\
 	giomm_simple/test		\
+	giomm_asyncresult_sourceobject/test \
 	glibmm_btree/test		\
 	glibmm_date/test		\
 	glibmm_nodetree/test		\
 	glibmm_ustring_compose/test	\
 	glibmm_value/test		\
-	glibmm_valuearray/test
+	glibmm_valuearray/test		
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
@@ -42,8 +43,12 @@ giomm_ldadd = $(GIOMM_LIBS) $(local_libglibmm) $(local_libgiomm)
 
 giomm_ioerror_test_SOURCES = giomm_ioerror/main.cc
 giomm_ioerror_test_LDADD   = $(giomm_ldadd)
+
 giomm_simple_test_SOURCES  = giomm_simple/main.cc
 giomm_simple_test_LDADD    = $(giomm_ldadd)
+
+giomm_asyncresult_sourceobject_test_SOURCES  = giomm_asyncresult_sourceobject/main.cc
+giomm_asyncresult_sourceobject_test_LDADD    = $(giomm_ldadd)
 
 glibmm_btree_test_SOURCES           = glibmm_btree/main.cc
 glibmm_date_test_SOURCES            = glibmm_date/main.cc
