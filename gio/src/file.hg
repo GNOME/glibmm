@@ -33,6 +33,7 @@
 #include <giomm/filemonitor.h>
 #include <giomm/fileoutputstream.h>
 #include <giomm/mountoperation.h>
+#include <giomm/drive.h>
 #include <giomm/error.h> //Because this is thrown by some of these methods.
 //#include <giomm/volume.h>
 
@@ -53,8 +54,7 @@ _WRAP_ENUM(FileQueryInfoFlags, GFileQueryInfoFlags, NO_GTYPE)
 _WRAP_ENUM(FileCreateFlags, GFileCreateFlags, NO_GTYPE)
 _WRAP_ENUM(FileCopyFlags, GFileCopyFlags, NO_GTYPE)
 _WRAP_ENUM(FileMonitorFlags, GFileMonitorFlags, NO_GTYPE)
-_WRAP_ENUM(MountUnmountFlags, GMountUnmountFlags, NO_GTYPE)
-_WRAP_ENUM(MountMountFlags, GMountMountFlags, NO_GTYPE)
+
 
 /** File and directory handling.
  * Gio::File is a high level abstraction for manipulating files on a virtual file system. Gio::Files are lightweight, immutable objects that do no 
@@ -396,7 +396,7 @@ public:
 #else
   Glib::RefPtr<FileIOStream> create_file_readwrite(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
-  _IGNORE(g_file_create)
+  _IGNORE(g_file_create_readwrite)
 
 
 
@@ -2030,6 +2030,134 @@ public:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_monitor)
 
+ //TODO: The documentation for these start/stop/poll_mountable functions needs to be improved once we've figured out what they do and what the C documentation means. murrayc.
+
+ /** Starts a file of type Mountable.
+  * Using @a start_operation, you can request callbacks when, for instance,
+  * passwords are needed during authentication.
+  *
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with start_mountable_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param cancellable A Cancellable object.
+  * @param flags Flags affecting the operation
+  *
+  * @newin2p24
+  */
+  void start_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<MountOperation>& start_operation, DriveStartFlags flags = DRIVE_START_NONE);
+
+ /** Starts a file of type Mountable.
+  * Using @a start_operation, you can request callbacks when, for instance,
+  * passwords are needed during authentication.
+  *
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with start_mountable_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param cancellable A Cancellable object.
+  * @param flags Flags affecting the operation
+  *
+  * @newin2p24
+  */
+  void start_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<MountOperation>& start_operation, DriveStartFlags flags =  DRIVE_START_NONE);
+  _IGNORE(g_file_start_mountable)
+
+  _WRAP_METHOD(bool start_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_start_mountable_finish, errthrow)
+
+
+ /** Stops a file of type Mountable.
+  * Using @a start_operation, you can request callbacks when, for instance,
+  * passwords are needed during authentication.
+  *
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with stop_mountable_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param cancellable A Cancellable object.
+  * @param flags Flags affecting the operation
+  *
+  * @newin2p24
+  */
+  void stop_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<MountOperation>& start_operation, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+
+
+ /** Stops a file of type Mountable.
+  * Using @a start_operation, you can request callbacks when, for instance,
+  * passwords are needed during authentication.
+  *
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with stop_mountable_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param start_operation A Cancellable object.
+  * @param flags Flags affecting the operation
+  *
+  * @newin2p24
+  */
+  void stop_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<MountOperation>& start_operation, MountUnmountFlags flags = MOUNT_UNMOUNT_NONE);
+  _IGNORE(g_file_stop_mountable)
+
+  _WRAP_METHOD(bool stop_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_stop_mountable_finish, errthrow)
+
+
+ /** Polls a file of type Mountable.
+  * Using @a start_operation, you can request callbacks when, for instance,
+  * passwords are needed during authentication.
+  *
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with stop_mountable_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param cancellable A Cancellable object.
+  *
+  * @newin2p24
+  */
+  void poll_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+
+
+ /** Polls a file of type Mountable.
+  * Using @a start_operation, you can request callbacks when, for instance,
+  * passwords are needed during authentication.
+  *
+  * When this operation has completed, @a slot will be called 
+  * and the operation can be finalized with stop_mountable_finish().
+  * 
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  *
+  * @newin2p24
+  */
+  void poll_mountable(const SlotAsyncReady& slot);
+  _IGNORE(g_file_poll_mountable)
+
+  _WRAP_METHOD(bool poll_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_poll_mountable_finish, errthrow)
 
   _WRAP_METHOD(Glib::RefPtr<AppInfo> query_default_handler(const Glib::RefPtr<Cancellable>& cancellable),
                g_file_query_default_handler,

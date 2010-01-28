@@ -1896,6 +1896,92 @@ Glib::RefPtr<FileMonitor> File::monitor(FileMonitorFlags flags,  std::auto_ptr<G
   return retvalue;
 }
 
+void File::start_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<MountOperation>& start_operation, DriveStartFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_start_mountable(gobj(),
+    ((GDriveStartFlags)(flags)),
+    Glib::unwrap(start_operation),
+    Glib::unwrap(cancellable),
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+void File::start_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<MountOperation>& start_operation, DriveStartFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_start_mountable(gobj(),
+    ((GDriveStartFlags)(flags)),
+    Glib::unwrap(start_operation),
+    0,
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+void File::stop_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<MountOperation>& start_operation, MountUnmountFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_stop_mountable(gobj(),
+    ((GMountUnmountFlags)(flags)),
+    Glib::unwrap(start_operation),
+    Glib::unwrap(cancellable),
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+void File::stop_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<MountOperation>& start_operation, MountUnmountFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_stop_mountable(gobj(),
+    ((GMountUnmountFlags)(flags)),
+    Glib::unwrap(start_operation),
+    0,
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+
+void File::poll_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_poll_mountable(gobj(),
+    Glib::unwrap(cancellable),
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+void File::poll_mountable(const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_poll_mountable(gobj(),
+    0,
+    &SignalProxy_async_callback,
+    slot_copy);
+}
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileInputStream> File::read()
