@@ -29,6 +29,7 @@
 #include <giomm/fileenumerator.h>
 #include <giomm/fileinfo.h>
 #include <giomm/fileinputstream.h>
+#include <giomm/fileiostream.h>
 #include <giomm/filemonitor.h>
 #include <giomm/fileoutputstream.h>
 #include <giomm/mountoperation.h>
@@ -497,6 +498,149 @@ public:
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> replace_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_replace_finish,
                refreturn, errthrow)
+
+
+  _WRAP_METHOD(Glib::RefPtr<FileIOStream> open_readwrite(const Glib::RefPtr<Cancellable>& cancellable),
+               g_file_open_readwrite,
+               refreturn, errthrow)
+
+  /** Opens an existing file for reading and writing.
+   * The result is a FileIOStream that can be used to read and write the contents of the file.
+   *
+   * For more details, see open_readwrite() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call open_readwrite_finish() to get the result of the operation.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
+   * If the file is a directory, a Gio::Error with IS_DIRECTORY will be thrown.
+   * Other errors are possible too, and depend on what kind of filesystem the file is on.
+   *
+   * Note that in many non-local file cases read and write streams are not supported,
+   * so make sure you really need to do read and write streaming, rather than
+   * just opening for reading or writing.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param io_priority The I/O priority of the request.
+   *
+   * @newin2p22
+   */
+  void open_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  /** Opens an existing file for reading and writing.
+   * The result is a FileIOStream that can be used to read and write the contents of the file.
+   *
+   * For more details, see open_readwrite() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call open_readwrite_finish() to get the result of the operation.
+   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
+   * If the file is a directory, a Gio::Error with IS_DIRECTORY will be thrown.
+   * Other errors are possible too, and depend on what kind of filesystem the file is on.
+   *
+   * Note that in many non-local file cases read and write streams are not supported,
+   * so make sure you really need to do read and write streaming, rather than
+   * just opening for reading or writing.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param io_priority The I/O priority of the request.
+   *
+   * @newin2p22
+   */
+  void open_readwrite_async(const SlotAsyncReady& slot, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_file_open_readwrite_async)
+
+  _WRAP_METHOD(Glib::RefPtr<FileIOStream> open_readwrite_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_replace_readwrite_finish,
+               refreturn, errthrow)
+
+
+  /** Returns an output stream for overwriting the file in readwrite mode, possibly creating a backup copy of the file first.
+   * 
+   * If the file doesn't exist, it will be created.
+   *
+   * For details about the behaviour, see replace() which does the same thing but returns an output stream only.
+   *
+   * Note that in many non-local file cases read and write streams are not supported, 
+   * so make sure you really need to do read and write streaming,
+   * rather than just opening for reading or writing.
+   * 
+   * @param etag An optional entity tag for the current Glib::File.
+   * @param make_backup <tt>true</tt> if a backup should be created.
+   * @param flags A set of FileCreateFlags.
+   * @return A FileOutputStream.
+   *
+   * @newin2p22
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileIOStream> replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileIOStream> replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+
+  /**  /** Returns an output stream for overwriting the file in readwrite mode, possibly creating a backup copy of the file first.
+   * 
+   * If the file doesn't exist, it will be created.
+   *
+   * For details about the behaviour, see replace() which does the same thing but returns an output stream only.
+   *
+   * Note that in many non-local file cases read and write streams are not supported, 
+   * so make sure you really need to do read and write streaming,
+   * rather than just opening for reading or writing.
+   * 
+   * @param etag An optional entity tag for the current Glib::File.
+   * @param make_backup <tt>true</tt> if a backup should be created.
+   * @param flags A set of FileCreateFlags.
+   * @return A FileOutputStream.
+   *
+   * @newin2p22
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileIOStream> replace_readwrite(const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileIOStream> replace_readwrite(const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  _IGNORE(g_file_replace_readwrite)
+
+
+  /** Asyncronously overwrites the file in read-write mode, replacing the contents, possibly creating a backup copy of the file first.
+   *
+   * For more details, see replace_readwrite() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call replace_readwrite_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param etag An entity tag for the current Gio::File.
+   * @param make_backup true if a backup of the existing file should be made.
+   * @param flags A set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   *
+   * @newin2p22
+   */
+  void replace_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  /** Asyncronously overwrites the file in read-write mode, replacing the contents, possibly creating a backup copy of the file first.
+   *
+   * For more details, see replace_readwrite() which is the synchronous version of this call.
+   * When the operation is finished, @a slot will be called. You can then call replace_readwrite_finish() to get the result of the operation.
+   *
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param etag An entity tag for the current Gio::File.
+   * @param make_backup true if a backup of the existing file should be made.
+   * @param flags A set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   *
+   * @newin2p22
+   */
+  void replace_readwrite_async(const SlotAsyncReady& slot, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_file_replace_async)
+
+  _WRAP_METHOD(Glib::RefPtr<FileIOStream> replace_readwrite_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_replace_readwrite_finish,
+               refreturn, errthrow)
+
+
+
+
+
 
   /** Gets the requested information about the file. The result
    * is a FileInfo object that contains key-value attributes (such as the  type or size

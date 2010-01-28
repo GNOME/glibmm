@@ -89,6 +89,8 @@ _CONVERSION(`GFileOutputStream*',`Glib::RefPtr<FileOutputStream>',`Glib::wrap($3
 # FilterInputStream
 #_CONVERSION(`GFilterInputStream*',`Glib::RefPtr<FilterInputStream>',`Glib::wrap($3)')
 
+_CONVERSION(`GFileIOStream*',`Glib::RefPtr<FileIOStream>',`Glib::wrap($3)')
+
 
 # Icon
 _CONVERSION(`GIcon*',`Glib::RefPtr<Icon>',`Glib::wrap($3)')
