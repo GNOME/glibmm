@@ -269,11 +269,11 @@ public:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_append_to)
 
-  //We renamed this to create_file from (g_file_create()), to avoid confusion with static create() methods, 
+  //We renamed this to create_file from (g_file_create() and g_file_create_readwrite), to avoid confusion with static create() methods, 
   //but I would still like to choose a different word, but can't think of a good one. murrayc.
 
   /** Creates a new file and returns an output stream for writing to it.
-   * The file must not already exists.
+   * The file must not already exist.
    * 
    * By default files created are generally readable by everyone,
    * but if you pass FILE_CREATE_PRIVATE in @a flags the file
@@ -304,7 +304,7 @@ public:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   /** Creates a new file and returns an output stream for writing to it.
-   * The file must not already exists.
+   * The file must not already exist.
    * 
    * By default files created are generally readable by everyone,
    * but if you pass FILE_CREATE_PRIVATE in @a flags the file
@@ -330,6 +330,74 @@ public:
   Glib::RefPtr<FileOutputStream> create_file(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
 #endif //GLIBMM_EXCEPTIONS_ENABLED
   _IGNORE(g_file_create)
+
+  /** Creates a new file and returns a stream for reading and writing to it.
+   * The file must not already exist.
+   * 
+   * By default files created are generally readable by everyone,
+   * but if you pass FILE_CREATE_PRIVATE in @a flags the file
+   * will be made readable only to the current user, to the level that
+   * is supported on the target filesystem.
+   * 
+   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
+   * 
+   * If a file with this name already exists a Gio::Error with EXISTS 
+   * will be thrown. If the file is a directory a Gio::Error with IS_DIRECTORY
+   * will be thrown.
+   *
+   * Some filesystems don't allow all filenames, and may
+   * throw a Gio::Error with INVALID_FILENAME, and if the name
+   * is to longa Gio::Error with FILENAME_TOO_LONG will be thrown.
+   * Other errors are possible too, and depend on what kind of
+   * filesystem the file is on.
+   *
+   * Note that in many non-local file cases read and write streams are not
+   * supported, so make sure you really need to do read and write streaming,
+   * rather than just opening for reading or writing.
+   *
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param flags a set of FileCreateFlags.
+   * @return A FileOutputStream for the newly created file.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileIOStream> create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileIOStream> create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  /** Creates a new file and returns a stream for reading and writing to it.
+   * The file must not already exist.
+   * 
+   * By default files created are generally readable by everyone,
+   * but if you pass FILE_CREATE_PRIVATE in @a flags the file
+   * will be made readable only to the current user, to the level that
+   * is supported on the target filesystem.
+   * 
+   * If a file with this name already exists a Gio::Error with EXISTS 
+   * will be thrown. If the file is a directory a Gio::Error with IS_DIRECTORY
+   * will be thrown.
+   *
+   * Some filesystems don't allow all filenames, and may
+   * throw a Gio::Error with INVALID_FILENAME, and if the name
+   * is to longa Gio::Error with FILENAME_TOO_LONG will be thrown.
+   * Other errors are possible too, and depend on what kind of
+   * filesystem the file is on.
+   *
+   * Note that in many non-local file cases read and write streams are not
+   * supported, so make sure you really need to do read and write streaming,
+   * rather than just opening for reading or writing.
+   *
+   * @param flags a set of FileCreateFlags.
+   * @return A FileOutputStream for the newly created file.
+   */
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  Glib::RefPtr<FileIOStream> create_file_readwrite(FileCreateFlags flags = FILE_CREATE_NONE);
+#else
+  Glib::RefPtr<FileIOStream> create_file_readwrite(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+  _IGNORE(g_file_create)
+
 
 
   /** Returns an output stream for overwriting the file, possibly creating a backup copy of the file first.
@@ -438,7 +506,7 @@ public:
                refreturn, errthrow)
 
 
-  //We renamed this to create_file_async from (g_file_create_async()), to avoid confusion with static create() methods, 
+  //We renamed this to create_file_async from (g_file_create_async() and g_file_create_readwrite_async), to avoid confusion with static create() methods, 
   //but I would still like to choose a different word, but can't think of a good one. murrayc. See also create_file().
 
   /** Asynchronously creates a new file and returns an output stream for writing to it. The file must not already exist.
@@ -446,10 +514,10 @@ public:
    *
    * When the operation is finished, @a slot will be called. You can then call create_file_finish() to get the result of the operation.
    * 
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param flags a set of FileCreateFlags.
    * @param io_priority The I/O priority of the request.
-   * @param cancellable A Cancellable object which can be used to cancel the operation.
-   * @param slot A callback slot which will be called when the request is satisfied.
    */
   void create_file_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FILE_CREATE_NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
@@ -458,9 +526,9 @@ public:
    *
    * When the operation is finished, @a slot will be called. You can then call create_file_finish() to get the result of the operation.
    * 
+   * @param slot A callback slot which will be called when the request is satisfied.
    * @param flags a set of FileCreateFlags.
    * @param io_priority The I/O priority of the request.
-   * @param slot A callback slot which will be called when the request is satisfied.
    */
   void create_file_async(const SlotAsyncReady& slot, FileCreateFlags flags = FILE_CREATE_NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_create_async)
@@ -468,6 +536,40 @@ public:
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create_file_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_create_finish,
                refreturn, errthrow)
+
+
+  /** Asynchronously creates a new file and returns a stream for reading and
+   * writing to it. The file must not already exist.
+   *
+   * For more details, see create_file_readwrite() which is the synchronous version of this call.
+   *
+   * When the operation is finished, @a slot will be called. You can then call create_file_readwrite_finish() to get the result of the operation.
+   * 
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param flags a set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   */
+  void create_file_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FILE_CREATE_NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  /** Asynchronously creates a new file and returns a stream for reading and
+   * writing to it. The file must not already exist.
+   *
+   * For more details, see create_file_readwrite() which is the synchronous version of this call.
+   *
+   * When the operation is finished, @a slot will be called. You can then call create_file_readwrite_finish() to get the result of the operation.
+   * 
+   * @param slot A callback slot which will be called when the request is satisfied.
+   * @param flags a set of FileCreateFlags.
+   * @param io_priority The I/O priority of the request.
+   */
+  void create_file_readwrite_async(const SlotAsyncReady& slot, FileCreateFlags flags = FILE_CREATE_NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_file_create_readwrite_async)
+
+  _WRAP_METHOD(Glib::RefPtr<FileIOStream> create_file_readwrite_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_create_readwrite_finish,
+               refreturn, errthrow)
+
 
   /** Asyncronously overwrites the file, replacing the contents, possibly creating a backup copy of the file first.
    * For more details, see replace() which is the synchronous version of this call.

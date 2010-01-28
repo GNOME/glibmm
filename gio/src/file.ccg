@@ -235,6 +235,39 @@ File::create_file_async(const SlotAsyncReady& slot, FileCreateFlags flags, int i
 }
 
 void
+File::create_file_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_create_async(gobj(),
+                      static_cast<GFileCreateFlags>(flags),
+                      io_priority,
+                      cancellable->gobj(),
+                      &SignalProxy_async_callback,
+                      slot_copy);
+}
+
+void
+File::create_file_readwrite_async(const SlotAsyncReady& slot, FileCreateFlags flags, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_create_readwrite_async(gobj(),
+                      static_cast<GFileCreateFlags>(flags),
+                      io_priority,
+                      NULL, // cancellable
+                      &SignalProxy_async_callback,
+                      slot_copy);
+}
+
+
+void
 File::replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
@@ -2032,6 +2065,44 @@ Glib::RefPtr<FileOutputStream> File::create_file(FileCreateFlags flags, std::aut
 {
   GError* gerror = 0;
   Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileIOStream> File::create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
+#else
+Glib::RefPtr<FileIOStream> File::create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+#else
+  if(gerror)
+    error = ::Glib::Error::throw_exception(gerror);
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return retvalue;
+}
+
+#ifdef GLIBMM_EXCEPTIONS_ENABLED
+Glib::RefPtr<FileIOStream> File::create_file_readwrite(FileCreateFlags flags)
+#else
+Glib::RefPtr<FileIOStream> File::create_file_readwrite(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
+#endif //GLIBMM_EXCEPTIONS_ENABLED
+{
+  GError* gerror = 0;
+  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
