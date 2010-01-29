@@ -34,7 +34,7 @@ gssize BufferedInputStream::fill(gssize count, std::auto_ptr<Glib::Error>& error
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gssize retvalue = g_buffered_input_stream_fill(const_cast<GBufferedInputStream*>(gobj()), count, NULL, &(gerror));
+  const gssize retvalue = g_buffered_input_stream_fill(const_cast<GBufferedInputStream*>(gobj()), count, 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -76,7 +76,7 @@ void BufferedInputStream::fill_async(const SlotAsyncReady& slot,
     g_buffered_input_stream_fill_async(gobj(),
             count,
             io_priority,
-            NULL,
+            0,
             &SignalProxy_async_callback,
             slot_copy);
 }
@@ -88,7 +88,7 @@ int BufferedInputStream::read_byte(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  int retvalue = g_buffered_input_stream_read_byte(gobj(), NULL, &(gerror));
+  const int retvalue = g_buffered_input_stream_read_byte(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);

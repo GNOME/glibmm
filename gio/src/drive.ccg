@@ -127,7 +127,7 @@ void Drive::poll_for_media(const SlotAsyncReady& slot)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_drive_poll_for_media(gobj(),
-                         NULL, // cancellable
+                         0, // cancellable
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -135,9 +135,9 @@ void Drive::poll_for_media(const SlotAsyncReady& slot)
 void Drive::poll_for_media()
 {
   g_drive_poll_for_media(gobj(),
-                         NULL, // cancellable
-                         NULL,
-                         NULL);
+                         0, // cancellable
+                         0,
+                         0);
 }
 
 void
@@ -172,7 +172,7 @@ Drive::stop(const Glib::RefPtr<MountOperation>& mount_operation,
   g_drive_stop(gobj(),
                static_cast<GMountUnmountFlags>(flags),
                Glib::unwrap(mount_operation),
-               NULL,
+               0,
                &SignalProxy_async_callback,
                slot_copy);
 }
@@ -210,7 +210,7 @@ Drive::start(const Glib::RefPtr<MountOperation>& mount_operation,
   g_drive_start(gobj(),
                 static_cast<GDriveStartFlags>(flags),
                 Glib::unwrap(mount_operation),
-                NULL,
+                0,
                 &SignalProxy_async_callback,
                 slot_copy);
 }

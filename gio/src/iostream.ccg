@@ -33,7 +33,7 @@ bool IOStream::close(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_io_stream_close(gobj(), NULL, &(gerror));
+  bool retvalue = g_io_stream_close(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -71,7 +71,7 @@ IOStream::close_async(const SlotAsyncReady& slot, int io_priority)
 
   g_io_stream_close_async(gobj(),
                           io_priority,
-                          NULL,
+                          0,
                           &SignalProxy_async_callback,
                           slot_copy);
 }

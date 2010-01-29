@@ -50,7 +50,7 @@ Glib::RefPtr<FileInfo> FileIOStream::query_info(const std::string& attributes, s
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_io_stream_query_info(gobj(), g_strdup((attributes).c_str()), NULL, &(gerror)));
+  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_io_stream_query_info(gobj(), g_strdup((attributes).c_str()), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -89,7 +89,7 @@ FileIOStream::query_info_async(const SlotAsyncReady& slot, const std::string& at
   g_file_io_stream_query_info_async(gobj(),
                                     const_cast<char*>(attributes.c_str()),
                                     io_priority,
-                                    NULL,
+                                    0,
                                     &SignalProxy_async_callback,
                                     slot_copy);
 }

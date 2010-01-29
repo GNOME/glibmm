@@ -53,7 +53,7 @@ FileEnumerator::next_files_async(const SlotAsyncReady& slot, int num_files, int 
   g_file_enumerator_next_files_async(gobj(),
                                      num_files,
                                      io_priority,
-                                     NULL, // cancellable
+                                     0, // cancellable
                                      &SignalProxy_async_callback,
                                      slot_copy);
 }
@@ -86,7 +86,7 @@ FileEnumerator::close_async(int io_priority,
 
   g_file_enumerator_close_async(gobj(),
                                 io_priority,
-                                NULL, // cancellable
+                                0, // cancellable
                                 &SignalProxy_async_callback,
                                 slot_copy);
 }
@@ -98,7 +98,7 @@ Glib::RefPtr<FileInfo> FileEnumerator::next_file(std::auto_ptr<Glib::Error>& err
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_enumerator_next_file(gobj(), NULL, &(gerror)));
+  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_enumerator_next_file(gobj(), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -117,7 +117,7 @@ bool FileEnumerator::close(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_enumerator_close(gobj(), NULL, &(gerror));
+  bool retvalue = g_file_enumerator_close(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);

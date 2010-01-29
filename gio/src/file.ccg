@@ -150,7 +150,7 @@ File::read_async(const SlotAsyncReady& slot, int io_priority)
 
   g_file_read_async(gobj(),
                     io_priority,
-                    NULL,
+                    0,
                     &SignalProxy_async_callback,
                     slot_copy);
 }
@@ -197,7 +197,7 @@ File::append_to_async(const SlotAsyncReady& slot, FileCreateFlags flags, int io_
   g_file_append_to_async(gobj(),
                          static_cast<GFileCreateFlags>(flags),
                          io_priority,
-                         NULL, // cancellable
+                         0, // cancellable
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -229,7 +229,7 @@ File::create_file_async(const SlotAsyncReady& slot, FileCreateFlags flags, int i
   g_file_create_async(gobj(),
                       static_cast<GFileCreateFlags>(flags),
                       io_priority,
-                      NULL, // cancellable
+                      0, // cancellable
                       &SignalProxy_async_callback,
                       slot_copy);
 }
@@ -261,7 +261,7 @@ File::create_file_readwrite_async(const SlotAsyncReady& slot, FileCreateFlags fl
   g_file_create_readwrite_async(gobj(),
                       static_cast<GFileCreateFlags>(flags),
                       io_priority,
-                      NULL, // cancellable
+                      0, // cancellable
                       &SignalProxy_async_callback,
                       slot_copy);
 }
@@ -276,7 +276,7 @@ File::replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>&
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_replace_async(gobj(),
-                       etag.empty() ? NULL : etag.c_str(),
+                       etag.empty() ? 0 : etag.c_str(),
                        make_backup,
                        static_cast<GFileCreateFlags>(flags),
                        io_priority,
@@ -294,11 +294,11 @@ File::replace_async(const SlotAsyncReady& slot, const std::string& etag, bool ma
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_replace_async(gobj(),
-                       etag.empty() ? NULL : etag.c_str(),
+                       etag.empty() ? 0 : etag.c_str(),
                        make_backup,
                        static_cast<GFileCreateFlags>(flags),
                        io_priority,
-                       NULL, // cancellable
+                       0, // cancellable
                        &SignalProxy_async_callback,
                        slot_copy);
 }
@@ -313,7 +313,7 @@ File::open_readwrite_async(const SlotAsyncReady& slot, int io_priority)
 
   g_file_open_readwrite_async(gobj(),
                     io_priority,
-                    NULL,
+                    0,
                     &SignalProxy_async_callback,
                     slot_copy);
 }
@@ -342,7 +342,7 @@ File::replace_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Can
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_replace_readwrite_async(gobj(),
-                       etag.empty() ? NULL : etag.c_str(),
+                       etag.empty() ? 0 : etag.c_str(),
                        make_backup,
                        static_cast<GFileCreateFlags>(flags),
                        io_priority,
@@ -360,11 +360,11 @@ File::replace_readwrite_async(const SlotAsyncReady& slot, const std::string& eta
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_replace_readwrite_async(gobj(),
-                       etag.empty() ? NULL : etag.c_str(),
+                       etag.empty() ? 0 : etag.c_str(),
                        make_backup,
                        static_cast<GFileCreateFlags>(flags),
                        io_priority,
-                       NULL, // cancellable
+                       0, // cancellable
                        &SignalProxy_async_callback,
                        slot_copy);
 }
@@ -395,7 +395,7 @@ Glib::RefPtr<FileInfo> File::query_info(const std::string& attributes, FileQuery
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_info(const_cast<GFile*>(gobj()), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_info(const_cast<GFile*>(gobj()), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -409,12 +409,12 @@ Glib::RefPtr<FileInfo> File::query_info(const std::string& attributes, FileQuery
 
 bool File::query_exists() const
 {
-  return g_file_query_exists(const_cast<GFile*>(gobj()), NULL);
+  return g_file_query_exists(const_cast<GFile*>(gobj()), 0);
 }
 
 FileType File::query_file_type(FileQueryInfoFlags flags) const
 {
-  return (FileType)g_file_query_file_type(const_cast<GFile*>(gobj()), (GFileQueryInfoFlags)flags, NULL);
+  return (FileType)g_file_query_file_type(const_cast<GFile*>(gobj()), (GFileQueryInfoFlags)flags, 0);
 }
 
 void
@@ -446,7 +446,7 @@ File::query_info_async(const SlotAsyncReady& slot, const std::string& attributes
                           attributes.c_str(),
                           static_cast<GFileQueryInfoFlags>(flags),
                           io_priority,
-                          NULL, // cancellable
+                          0, // cancellable
                           &SignalProxy_async_callback,
                           slot_copy);
 }
@@ -478,7 +478,7 @@ Glib::RefPtr<FileInfo> File::query_filesystem_info(const std::string& attributes
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_filesystem_info(gobj(), attributes.c_str(), NULL, &(gerror)));
+  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_filesystem_info(gobj(), attributes.c_str(), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -517,7 +517,7 @@ File::query_filesystem_info_async(const SlotAsyncReady& slot, const std::string&
   g_file_query_filesystem_info_async(const_cast<GFile*>(gobj()),
                           attributes.c_str(),
                           io_priority,
-                          NULL, // cancellable
+                          0, // cancellable
                           &SignalProxy_async_callback,
                           slot_copy);
 }
@@ -548,7 +548,7 @@ Glib::RefPtr<FileEnumerator> File::enumerate_children(const std::string& attribu
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileEnumerator> retvalue = Glib::wrap(g_file_enumerate_children(gobj(), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileEnumerator> retvalue = Glib::wrap(g_file_enumerate_children(gobj(), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -589,7 +589,7 @@ File::enumerate_children_async(const SlotAsyncReady& slot, const std::string& at
                                   attributes.c_str(),
                                   static_cast<GFileQueryInfoFlags>(flags),
                                   io_priority,
-                                  NULL,
+                                  0,
                                   &SignalProxy_async_callback,
                                   slot_copy);
 }
@@ -601,7 +601,7 @@ Glib::RefPtr<File> File::set_display_name(const Glib::ustring& display_name, std
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<File> retvalue = Glib::wrap(g_file_set_display_name(gobj(), display_name.c_str(), NULL, &(gerror)));
+  Glib::RefPtr<File> retvalue = Glib::wrap(g_file_set_display_name(gobj(), display_name.c_str(), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -641,7 +641,7 @@ File::set_display_name_async(const Glib::ustring& display_name, const SlotAsyncR
   g_file_set_display_name_async(gobj(),
                                 display_name.c_str(),
                                 io_priority,
-                                NULL,
+                                0,
                                 &SignalProxy_async_callback,
                                 slot_copy);
 }
@@ -700,7 +700,7 @@ File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
   res = g_file_copy(gobj(),
                     Glib::unwrap(destination),
                     static_cast<GFileCopyFlags>(flags),
-                    NULL,
+                    0,
                     &SignalProxy_file_progress_callback,
                     slot_copy,
                     &gerror);
@@ -728,9 +728,9 @@ File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto
   bool res = g_file_copy(gobj(),
                     Glib::unwrap(destination),
                     static_cast<GFileCopyFlags>(flags),
-                    NULL,
-                    NULL,
-                    NULL,
+                    0,
+                    0,
+                    0,
                     &gerror);
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -786,8 +786,8 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                     static_cast<GFileCopyFlags>(flags),
                     io_priority,
                     Glib::unwrap(cancellable),
-                    NULL,
-                    NULL,
+                    0,
+                    0,
                     &SignalProxy_async_callback,
                     slot_ready_copy);
 }
@@ -809,7 +809,7 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                     Glib::unwrap(destination),
                     static_cast<GFileCopyFlags>(flags),
                     io_priority,
-                    NULL,
+                    0,
                     &SignalProxy_file_progress_callback,
                     slot_progress_copy,
                     &SignalProxy_async_callback,
@@ -831,9 +831,9 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                     Glib::unwrap(destination),
                     static_cast<GFileCopyFlags>(flags),
                     io_priority,
-                    NULL,
-                    NULL,
-                    NULL,
+                    0,
+                    0,
+                    0,
                     &SignalProxy_async_callback,
                     slot_ready_copy);
 }
@@ -892,7 +892,7 @@ File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
   res = g_file_move(gobj(),
                     Glib::unwrap(destination),
                     static_cast<GFileCopyFlags>(flags),
-                    NULL,
+                    0,
                     &SignalProxy_file_progress_callback,
                     slot_copy,
                     &gerror);
@@ -922,9 +922,9 @@ File::move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto
   res = g_file_move(gobj(),
                     Glib::unwrap(destination),
                     static_cast<GFileCopyFlags>(flags),
-                    NULL,
-                    NULL,
-                    NULL,
+                    0,
+                    0,
+                    0,
                     &gerror);
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -967,7 +967,7 @@ File::set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncRe
                               Glib::unwrap(info),
                               static_cast<GFileQueryInfoFlags>(flags),
                               io_priority,
-                              NULL,
+                              0,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -1010,7 +1010,7 @@ bool File::set_attribute_string(const std::string& attribute, const std::string&
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_string(gobj(), attribute.c_str(), value.c_str(), ((GFileQueryInfoFlags)(flags)), NULL, &(gerror));
+  bool retvalue = g_file_set_attribute_string(gobj(), attribute.c_str(), value.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1030,7 +1030,7 @@ bool File::set_attribute_byte_string(const std::string& attribute, const std::st
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_byte_string(gobj(), attribute.c_str(), value.c_str(), ((GFileQueryInfoFlags)(flags)), NULL, &(gerror));
+  bool retvalue = g_file_set_attribute_byte_string(gobj(), attribute.c_str(), value.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1050,7 +1050,7 @@ bool File::set_attribute_uint32(const std::string& attribute, guint32 value, Fil
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_uint32(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), NULL, &(gerror));
+  bool retvalue = g_file_set_attribute_uint32(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1070,7 +1070,7 @@ bool File::set_attribute_int32(const std::string& attribute, gint32 value, FileQ
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_int32(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), NULL, &(gerror));
+  bool retvalue = g_file_set_attribute_int32(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1090,7 +1090,7 @@ bool File::set_attribute_uint64(const std::string& attribute, guint64 value, Fil
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_uint64(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), NULL, &(gerror));
+  bool retvalue = g_file_set_attribute_uint64(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1110,7 +1110,7 @@ bool File::set_attribute_int64(const std::string& attribute, gint64 value, FileQ
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_int64(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), NULL, &(gerror));
+  bool retvalue = g_file_set_attribute_int64(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1148,7 +1148,7 @@ void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, 
   g_file_mount_mountable(gobj(),
                          static_cast<GMountMountFlags>(flags),
                          Glib::unwrap(mount_operation),
-                         NULL,
+                         0,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -1162,8 +1162,8 @@ void File::mount_mountable(const SlotAsyncReady& slot, MountMountFlags flags)
 
   g_file_mount_mountable(gobj(),
                          static_cast<GMountMountFlags>(flags),
-                         NULL,
-                         NULL,
+                         0,
+                         0,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -1172,10 +1172,10 @@ void File::mount_mountable(MountMountFlags flags)
 {
   g_file_mount_mountable(gobj(),
                          static_cast<GMountMountFlags>(flags),
-                         NULL,
-                         NULL,
-                         NULL,
-                         NULL);
+                         0,
+                         0,
+                         0,
+                         0);
 }
 
 void File::unmount_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
@@ -1204,7 +1204,7 @@ File::unmount_mountable(const SlotAsyncReady& slot, MountUnmountFlags flags)
   g_file_unmount_mountable_with_operation(gobj(),
                            static_cast<GMountUnmountFlags>(flags),
                            0,
-                           NULL,
+                           0,
                            &SignalProxy_async_callback,
                            slot_copy);
 }
@@ -1215,9 +1215,9 @@ File::unmount_mountable(MountUnmountFlags flags)
   g_file_unmount_mountable_with_operation(gobj(),
                            static_cast<GMountUnmountFlags>(flags), 
                            0,
-                           NULL,
-                           NULL,
-                           NULL);
+                           0,
+                           0,
+                           0);
 }
 
 void File::unmount_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<MountOperation>& mount_operation, MountUnmountFlags flags)
@@ -1246,7 +1246,7 @@ File::unmount_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<MountOper
   g_file_unmount_mountable_with_operation(gobj(),
                            static_cast<GMountUnmountFlags>(flags),
                            Glib::unwrap(mount_operation),
-                           NULL,
+                           0,
                            &SignalProxy_async_callback,
                            slot_copy);
 }
@@ -1257,9 +1257,9 @@ File::unmount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, Mou
   g_file_unmount_mountable_with_operation(gobj(),
                            static_cast<GMountUnmountFlags>(flags), 
                            Glib::unwrap(mount_operation),
-                           NULL,
-                           NULL,
-                           NULL);
+                           0,
+                           0,
+                           0);
 }
 
 
@@ -1289,7 +1289,7 @@ void File::mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_oper
   g_file_mount_enclosing_volume(gobj(),
                          static_cast<GMountMountFlags>(flags),
                          Glib::unwrap(mount_operation),
-                         NULL,
+                         0,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -1303,8 +1303,8 @@ void File::mount_enclosing_volume(const SlotAsyncReady& slot, MountMountFlags fl
 
   g_file_mount_enclosing_volume(gobj(),
                          static_cast<GMountMountFlags>(flags),
-                         NULL,
-                         NULL,
+                         0,
+                         0,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -1313,10 +1313,10 @@ void File::mount_enclosing_volume(MountMountFlags flags)
 {
   g_file_mount_enclosing_volume(gobj(),
                          static_cast<GMountMountFlags>(flags),
-                         NULL,
-                         NULL,
-                         NULL,
-                         NULL);
+                         0,
+                         0,
+                         0,
+                         0);
 }
 
 void
@@ -1346,7 +1346,7 @@ File::eject_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<MountOperat
   g_file_eject_mountable_with_operation(gobj(),
                          static_cast<GMountUnmountFlags>(flags),
                          Glib::unwrap(mount_operation),
-                         NULL,
+                         0,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -1357,9 +1357,9 @@ File::eject_mountable(const Glib::RefPtr<MountOperation>& mount_operation, Mount
   g_file_eject_mountable_with_operation(gobj(),
                          static_cast<GMountUnmountFlags>(flags),
                          Glib::unwrap(mount_operation),
-                         NULL,
-                         NULL,
-                         NULL);
+                         0,
+                         0,
+                         0);
 }
 
 void
@@ -1389,7 +1389,7 @@ File::eject_mountable(const SlotAsyncReady& slot, MountUnmountFlags flags)
   g_file_eject_mountable_with_operation(gobj(),
                          static_cast<GMountUnmountFlags>(flags),
                          0,
-                         NULL,
+                         0,
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -1400,9 +1400,9 @@ File::eject_mountable(MountUnmountFlags flags)
   g_file_eject_mountable_with_operation(gobj(),
                          static_cast<GMountUnmountFlags>(flags),
                          0,
-                         NULL,
-                         NULL,
-                         NULL);
+                         0,
+                         0,
+                         0);
 }
 
 void
@@ -1428,7 +1428,7 @@ File::load_contents_async(const SlotAsyncReady& slot)
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_file_load_contents_async(gobj(),
-                             NULL,
+                             0,
                              &SignalProxy_async_callback,
                              slot_copy);
 }
@@ -1466,7 +1466,7 @@ File::load_partial_contents_async(const SlotReadMore& slot_read_more,
   slots->second = slot_async_copy;
 
   g_file_load_partial_contents_async(gobj(),
-                                     NULL,
+                                     0,
                                      &SignalProxy_load_partial_contents_read_more_callback,
                                      &SignalProxy_load_partial_contents_ready_callback,
                                      slots);
@@ -1480,7 +1480,7 @@ void File::replace_contents(const char* contents, gsize length, const std::strin
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
-  g_file_replace_contents(gobj(), contents, length, etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+  g_file_replace_contents(gobj(), contents, length, etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1503,7 +1503,7 @@ void File::replace_contents(const char* contents, gsize length, const std::strin
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
-  g_file_replace_contents(gobj(), contents, length, etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
+  g_file_replace_contents(gobj(), contents, length, etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1526,7 +1526,7 @@ void File::replace_contents(const std::string& contents, const std::string& etag
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
-  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
+  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1549,7 +1549,7 @@ void File::replace_contents(const std::string& contents, const std::string& etag
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
-  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, NULL, &(gerror));
+  g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1581,7 +1581,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   g_file_replace_contents_async(gobj(),
                                 contents,
                                 length,
-                                etag.empty() ? NULL : etag.c_str(),
+                                etag.empty() ? 0 : etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
                                 Glib::unwrap(cancellable),
@@ -1605,10 +1605,10 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   g_file_replace_contents_async(gobj(),
                                 contents,
                                 length,
-                                etag.empty() ? NULL : etag.c_str(),
+                                etag.empty() ? 0 : etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
-                                NULL,
+                                0,
                                 &SignalProxy_async_callback,
                                 slot_copy);
 }
@@ -1629,7 +1629,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   g_file_replace_contents_async(gobj(),
                                 contents.c_str(),
                                 contents.size(),
-                                etag.empty() ? NULL : etag.c_str(),
+                                etag.empty() ? 0 : etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
                                 Glib::unwrap(cancellable),
@@ -1652,10 +1652,10 @@ File::replace_contents_async(const SlotAsyncReady& slot,
   g_file_replace_contents_async(gobj(),
                                 contents.c_str(),
                                 contents.size(),
-                                etag.empty() ? NULL : etag.c_str(),
+                                etag.empty() ? 0 : etag.c_str(),
                                 make_backup,
                                 static_cast<GFileCreateFlags>(flags),
-                                NULL,
+                                0,
                                 &SignalProxy_async_callback,
                                 slot_copy);
 }
@@ -1691,7 +1691,7 @@ void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std:
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  g_file_replace_contents_finish(gobj(), Glib::unwrap(result), NULL, &(gerror));
+  g_file_replace_contents_finish(gobj(), Glib::unwrap(result), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1709,7 +1709,7 @@ Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& ca
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1728,7 +1728,7 @@ Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1748,7 +1748,7 @@ Glib::RefPtr<FileIOStream> File::replace_readwrite(const Glib::RefPtr<Cancellabl
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1767,7 +1767,7 @@ Glib::RefPtr<FileIOStream> File::replace_readwrite(const std::string& etag, bool
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? NULL : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1807,7 +1807,7 @@ Glib::RefPtr<FileMonitor> File::monitor_directory(FileMonitorFlags flags, std::a
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1845,7 +1845,7 @@ Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags,  std::auto_
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1884,7 +1884,7 @@ Glib::RefPtr<FileMonitor> File::monitor(FileMonitorFlags flags,  std::auto_ptr<G
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1990,7 +1990,7 @@ Glib::RefPtr<FileInputStream> File::read(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInputStream> retvalue = Glib::wrap(g_file_read(gobj(), NULL, &(gerror)));
+  Glib::RefPtr<FileInputStream> retvalue = Glib::wrap(g_file_read(gobj(), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2025,7 +2025,7 @@ void File::find_enclosing_mount_async(const SlotAsyncReady& slot, int io_priorit
 
   g_file_find_enclosing_mount_async(gobj(),
                     io_priority,
-                    NULL,
+                    0,
                     &SignalProxy_async_callback,
                     slot_copy);
 }
@@ -2056,7 +2056,7 @@ bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQuer
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_set_attributes_from_info(gobj(), Glib::unwrap(info), ((GFileQueryInfoFlags)(flags)), NULL, &(gerror));
+  bool retvalue = g_file_set_attributes_from_info(gobj(), Glib::unwrap(info), ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2110,7 +2110,7 @@ File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags
   res = g_file_copy_attributes(gobj(),
                     Glib::unwrap(destination),
                     static_cast<GFileCopyFlags>(flags),
-                    NULL,
+                    0,
                     &gerror);
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
@@ -2150,7 +2150,7 @@ Glib::RefPtr<FileOutputStream> File::create_file(FileCreateFlags flags, std::aut
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2188,7 +2188,7 @@ Glib::RefPtr<FileIOStream> File::create_file_readwrite(FileCreateFlags flags, st
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2207,7 +2207,7 @@ bool File::remove(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_delete(gobj(), NULL, &(gerror));
+  bool retvalue = g_file_delete(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2226,7 +2226,7 @@ bool File::trash(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_trash(gobj(), NULL, &(gerror));
+  bool retvalue = g_file_trash(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2245,7 +2245,7 @@ bool File::make_directory(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_make_directory(gobj(), NULL, &(gerror));
+  bool retvalue = g_file_make_directory(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2264,7 +2264,7 @@ bool File::make_directory_with_parents(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  const bool retvalue = g_file_make_directory_with_parents(gobj(), NULL, &(gerror));
+  const bool retvalue = g_file_make_directory_with_parents(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2283,7 +2283,7 @@ bool File::make_symbolic_link(const std::string& symlink_value, std::auto_ptr<Gl
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_make_symbolic_link(gobj(), symlink_value.c_str(), NULL, &(gerror));
+  bool retvalue = g_file_make_symbolic_link(gobj(), symlink_value.c_str(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2302,7 +2302,7 @@ Glib::RefPtr<FileAttributeInfoList> File::query_settable_attributes(std::auto_pt
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileAttributeInfoList> retvalue = Glib::wrap(g_file_query_settable_attributes(gobj(), NULL, &(gerror)));
+  Glib::RefPtr<FileAttributeInfoList> retvalue = Glib::wrap(g_file_query_settable_attributes(gobj(), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2321,7 +2321,7 @@ Glib::RefPtr<FileAttributeInfoList> File::query_writable_namespaces(std::auto_pt
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileAttributeInfoList> retvalue = Glib::wrap(g_file_query_writable_namespaces(gobj(), NULL, &(gerror)));
+  Glib::RefPtr<FileAttributeInfoList> retvalue = Glib::wrap(g_file_query_writable_namespaces(gobj(), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2360,7 +2360,7 @@ Glib::RefPtr<FileOutputStream> File::append_to(FileCreateFlags flags, std::auto_
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), NULL, &(gerror)));
+  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2379,7 +2379,7 @@ Glib::RefPtr<Mount> File::find_enclosing_mount(std::auto_ptr<Glib::Error>& error
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<Mount> retvalue = Glib::wrap(g_file_find_enclosing_mount(gobj(), NULL, &(gerror)));
+  Glib::RefPtr<Mount> retvalue = Glib::wrap(g_file_find_enclosing_mount(gobj(), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2398,7 +2398,7 @@ Glib::RefPtr<AppInfo> File::query_default_handler(std::auto_ptr<Glib::Error>& er
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  Glib::RefPtr<AppInfo> retvalue = Glib::wrap(g_file_query_default_handler(gobj(), NULL, &(gerror)));
+  Glib::RefPtr<AppInfo> retvalue = Glib::wrap(g_file_query_default_handler(gobj(), 0, &(gerror)));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2459,7 +2459,7 @@ bool File::load_contents(char*& contents, gsize& length, std::string& etag_out, 
 {
   GError* gerror = 0;
   gchar* cetag_out = 0;
-  bool retvalue = g_file_load_contents(gobj(), NULL, &contents, &(length), &cetag_out, &(gerror));
+  bool retvalue = g_file_load_contents(gobj(), 0, &contents, &(length), &cetag_out, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -2480,7 +2480,7 @@ bool File::load_contents(char*& contents, gsize& length, std::auto_ptr<Glib::Err
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_file_load_contents(gobj(), NULL, &contents, &(length), 0, &(gerror));
+  bool retvalue = g_file_load_contents(gobj(), 0, &contents, &(length), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);

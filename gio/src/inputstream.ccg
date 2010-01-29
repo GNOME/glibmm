@@ -31,7 +31,7 @@ gssize InputStream::read(void* buffer, gsize count, std::auto_ptr<Glib::Error>& 
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gssize retvalue = g_input_stream_read(gobj(), buffer, count, NULL, &(gerror));
+  gssize retvalue = g_input_stream_read(gobj(), buffer, count, 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -51,7 +51,7 @@ bool InputStream::read_all(void* buffer, gsize count, gsize& bytes_read, std::au
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_input_stream_read_all(gobj(), buffer, count, &(bytes_read), NULL, &(gerror));
+  bool retvalue = g_input_stream_read_all(gobj(), buffer, count, &(bytes_read), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -70,7 +70,7 @@ gssize InputStream::skip(gsize count, std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  gssize retvalue = g_input_stream_skip(gobj(), count, NULL, &(gerror));
+  gssize retvalue = g_input_stream_skip(gobj(), count, 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -89,7 +89,7 @@ bool InputStream::close(std::auto_ptr<Glib::Error>& error)
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
-  bool retvalue = g_input_stream_close(gobj(), NULL, &(gerror));
+  bool retvalue = g_input_stream_close(gobj(), 0, &(gerror));
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -130,7 +130,7 @@ InputStream::read_async(void* buffer, gsize count, const SlotAsyncReady& slot, i
                             buffer,
                             count,
                             io_priority,
-                            NULL,
+                            0,
                             &SignalProxy_async_callback,
                             slot_copy);
 }
@@ -163,7 +163,7 @@ InputStream::skip_async(gsize count, const SlotAsyncReady& slot, int io_priority
   g_input_stream_skip_async(gobj(),
                             count,
                             io_priority,
-                            NULL,
+                            0,
                             &SignalProxy_async_callback,
                             slot_copy);
 }
@@ -193,7 +193,7 @@ InputStream::close_async(const SlotAsyncReady& slot, int io_priority)
 
   g_input_stream_close_async(gobj(),
                              io_priority,
-                             NULL,
+                             0,
                              &SignalProxy_async_callback,
                              slot_copy);
 }
