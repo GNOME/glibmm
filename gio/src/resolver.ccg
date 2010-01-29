@@ -102,7 +102,7 @@ Resolver::lookup_by_name_async(const Glib::ustring& hostname,
 
   g_resolver_lookup_by_name_async (gobj(),
                                    hostname.c_str(),
-                                   cancellable->gobj(),
+                                   Glib::unwrap(cancellable),
                                    &SignalProxy_async_callback,
                                    slot_copy);
 }
@@ -128,8 +128,8 @@ Resolver::lookup_by_address_async(const Glib::RefPtr<InetAddress>& address,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_resolver_lookup_by_address_async (gobj(),
-                                      address->gobj(),
-                                      cancellable->gobj(),
+                                      Glib::unwrap(address),
+                                      Glib::unwrap(cancellable),
                                       &SignalProxy_async_callback,
                                       slot_copy);
 }
@@ -141,7 +141,7 @@ Resolver::lookup_by_address_async(const Glib::RefPtr<InetAddress>& address,
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
   g_resolver_lookup_by_address_async (gobj(),
-                                      address->gobj(),
+                                      Glib::unwrap(address),
                                       0,
                                       &SignalProxy_async_callback,
                                       slot_copy);
@@ -160,7 +160,7 @@ Resolver::lookup_service_async(const Glib::ustring& service,
                                    service.c_str(),
                                    protocol.c_str(),
                                    domain.c_str(),
-                                   cancellable->gobj(),
+                                   Glib::unwrap(cancellable),
                                    &SignalProxy_async_callback,
                                    slot_copy);
 }

@@ -37,8 +37,8 @@ Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsy
 
   g_volume_mount(gobj(),
                  static_cast<GMountMountFlags>(flags),
-                 mount_operation->gobj(),
-                 cancellable->gobj(),
+                 Glib::unwrap(mount_operation),
+                 Glib::unwrap(cancellable),
                  &SignalProxy_async_callback,
                  slot_copy);
 
@@ -54,7 +54,7 @@ Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsy
 
   g_volume_mount(gobj(),
                  static_cast<GMountMountFlags>(flags),
-                 mount_operation->gobj(),
+                 Glib::unwrap(mount_operation),
                  NULL, // cancellable
                  &SignalProxy_async_callback,
                  slot_copy);
@@ -65,7 +65,7 @@ Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, MountMountFla
 {
   g_volume_mount(gobj(),
                  static_cast<GMountMountFlags>(flags),
-                 mount_operation->gobj(),
+                 Glib::unwrap(mount_operation),
                  NULL, // cancellable
                  NULL,
                  NULL);
@@ -93,7 +93,7 @@ void Volume::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& 
   g_volume_eject_with_operation(gobj(),
                                 static_cast<GMountUnmountFlags>(flags), 
                                 0, // mount_operation
-                                cancellable->gobj(),
+                                Glib::unwrap(cancellable),
                                 &SignalProxy_async_callback,
                                 slot_copy);
 }
@@ -132,8 +132,8 @@ void Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, const Sl
 
   g_volume_eject_with_operation(gobj(),
                                 static_cast<GMountUnmountFlags>(flags), 
-                                mount_operation->gobj(),
-                                cancellable->gobj(),
+                                Glib::unwrap(mount_operation),
+                                Glib::unwrap(cancellable),
                                 &SignalProxy_async_callback,
                                 slot_copy);
 }
@@ -147,7 +147,7 @@ void Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, const Sl
 
   g_volume_eject_with_operation(gobj(),
                                 static_cast<GMountUnmountFlags>(flags), 
-                                mount_operation->gobj(),
+                                Glib::unwrap(mount_operation),
                                 0, // cancellable
                                 &SignalProxy_async_callback,
                                 slot_copy);
@@ -157,7 +157,7 @@ void Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, MountUnm
 {
     g_volume_eject_with_operation(gobj(),
                                   static_cast<GMountUnmountFlags>(flags), 
-                                  mount_operation->gobj(),
+                                  Glib::unwrap(mount_operation),
                                   0, // cancellable
                                   0, // callback
                                   0); // data

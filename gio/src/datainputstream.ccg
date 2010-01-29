@@ -165,7 +165,7 @@ bool DataInputStream::read_line(std::string& line, const Glib::RefPtr<Cancellabl
   GError* gerror = 0;
   char* c_line = g_data_input_stream_read_line(gobj(),
                                                NULL, // pass NULL since we can easily determine the length from the returned std::string
-                                               cancellable->gobj(),
+                                               Glib::unwrap(cancellable),
                                                &gerror);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -219,7 +219,7 @@ void DataInputStream::read_line_async(const SlotAsyncReady& slot, const Glib::Re
 
   g_data_input_stream_read_line_async(gobj(),
                             io_priority,
-                            cancellable->gobj(),
+                            Glib::unwrap(cancellable),
                             &SignalProxy_async_callback,
                             slot_copy);
 }
@@ -262,7 +262,7 @@ bool DataInputStream::read_until(std::string& data, const std::string& stop_char
   char* c_str = g_data_input_stream_read_until(gobj(),
                                                stop_chars.c_str(),
                                                NULL, // pass NULL since we can easily determine the length from the returned std::string
-                                               cancellable->gobj(),
+                                               Glib::unwrap(cancellable),
                                                &gerror);
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
@@ -319,7 +319,7 @@ void DataInputStream::read_until_async(const std::string& stop_chars, const Slot
 
   g_data_input_stream_read_until_async(gobj(), stop_chars.c_str(), 
                             io_priority,
-                            cancellable->gobj(),
+                            Glib::unwrap(cancellable),
                             &SignalProxy_async_callback,
                             slot_copy);
 }

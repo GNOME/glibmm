@@ -35,7 +35,7 @@ void Mount::unmount(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>&
   g_mount_unmount_with_operation(gobj(),
                                  GMountUnmountFlags(flags),
                                  0, // mount_operation
-                                 cancellable->gobj(),
+                                 Glib::unwrap(cancellable),
                                  &SignalProxy_async_callback,
                                  slot_copy);
 }
@@ -75,8 +75,8 @@ void Mount::unmount(const Glib::RefPtr<MountOperation>& mount_operation,
 
   g_mount_unmount_with_operation(gobj(),
                                  GMountUnmountFlags(flags),
-                                 mount_operation->gobj(),
-                                 cancellable->gobj(),
+                                 Glib::unwrap(mount_operation),
+                                 Glib::unwrap(cancellable),
                                  &SignalProxy_async_callback,
                                  slot_copy);
 }
@@ -91,7 +91,7 @@ void Mount::unmount(const Glib::RefPtr<MountOperation>& mount_operation,
 
   g_mount_unmount_with_operation(gobj(),
                                  GMountUnmountFlags(flags),
-                                 mount_operation->gobj(),
+                                 Glib::unwrap(mount_operation),
                                  0, // cancellable
                                  &SignalProxy_async_callback,
                                  slot_copy);
@@ -102,7 +102,7 @@ void Mount::unmount(const Glib::RefPtr<MountOperation>& mount_operation,
 {
   g_mount_unmount_with_operation(gobj(),
                                  GMountUnmountFlags(flags),
-                                 mount_operation->gobj(),
+                                 Glib::unwrap(mount_operation),
                                  0, // cancellable
                                  0, // callback
                                  0); // data
@@ -118,8 +118,8 @@ void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsy
 
   g_mount_remount(gobj(),
                   static_cast<GMountMountFlags>(flags),
-                  operation->gobj(),
-                  cancellable->gobj(),
+                  Glib::unwrap(operation),
+                  Glib::unwrap(cancellable),
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -133,7 +133,7 @@ void Mount::remount(const Glib::RefPtr<MountOperation>& operation, const SlotAsy
 
   g_mount_remount(gobj(),
                   static_cast<GMountMountFlags>(flags),
-                  operation->gobj(),
+                  Glib::unwrap(operation),
                   NULL,
                   &SignalProxy_async_callback,
                   slot_copy);
@@ -143,7 +143,7 @@ void Mount::remount(const Glib::RefPtr<MountOperation>& operation, MountMountFla
 {
   g_mount_remount(gobj(),
                   static_cast<GMountMountFlags>(flags),
-                  operation->gobj(),
+                  Glib::unwrap(operation),
                   NULL,
                   NULL,
                   NULL);
@@ -169,7 +169,7 @@ void Mount::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& c
   g_mount_eject_with_operation(gobj(),
                                GMountUnmountFlags(flags),
                                0, // mount_operation
-                               cancellable->gobj(),
+                               Glib::unwrap(cancellable),
                                &SignalProxy_async_callback,
                                slot_copy);
 }
@@ -208,8 +208,8 @@ void Mount::eject(const Glib::RefPtr<MountOperation>& mount_operation, const Slo
 
   g_mount_eject_with_operation(gobj(),
                                GMountUnmountFlags(flags),
-                               mount_operation->gobj(),
-                               cancellable->gobj(),
+                               Glib::unwrap(mount_operation),
+                               Glib::unwrap(cancellable),
                                &SignalProxy_async_callback,
                                slot_copy);
 }
@@ -223,7 +223,7 @@ void Mount::eject(const Glib::RefPtr<MountOperation>& mount_operation, const Slo
 
   g_mount_eject_with_operation(gobj(),
                                GMountUnmountFlags(flags),
-                               mount_operation->gobj(),
+                               Glib::unwrap(mount_operation),
                                0, // cancellable
                                &SignalProxy_async_callback,
                                slot_copy);
@@ -233,7 +233,7 @@ void Mount::eject(const Glib::RefPtr<MountOperation>& mount_operation, MountUnmo
 {
   g_mount_eject_with_operation(gobj(),
                   GMountUnmountFlags(flags),
-                  mount_operation->gobj(),
+                  Glib::unwrap(mount_operation),
                   0, // cancellable
                   0, // callback
                   0); // data
@@ -249,7 +249,7 @@ void Mount::guess_content_type(const SlotAsyncReady& slot, const Glib::RefPtr<Ca
 
   g_mount_guess_content_type(gobj(),
                   force_rescan,
-                  cancellable->gobj(),
+                  Glib::unwrap(cancellable),
                   &SignalProxy_async_callback,
                   slot_copy);
 }
@@ -284,7 +284,7 @@ void Mount::guess_content_type_sync(const Glib::RefPtr<Cancellable>& cancellable
 #endif //GLIBMM_EXCEPTIONS_ENABLED
 {
     GError* gerror = 0;
-    g_mount_guess_content_type_sync(gobj(), force_rescan, cancellable->gobj(),
+    g_mount_guess_content_type_sync(gobj(), force_rescan, Glib::unwrap(cancellable),
                                     &gerror);
   if(gerror)
 #ifndef GLIBMM_EXCEPTIONS_ENABLED
