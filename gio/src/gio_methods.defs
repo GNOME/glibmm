@@ -151,6 +151,34 @@
   (gtype-id "G_TYPE_LOADABLE_ICON")
 )
 
+(define-object DirectoryMonitor
+  (in-module "GLocal")
+  (parent "GFileMonitor")
+  (c-name "GLocalDirectoryMonitor")
+  (gtype-id "G_TYPE_LOCAL_DIRECTORY_MONITOR")
+)
+
+(define-object FileIOStream
+  (in-module "GLocal")
+  (parent "GFileIOStream")
+  (c-name "GLocalFileIOStream")
+  (gtype-id "G_TYPE_LOCAL_FILE_IO_STREAM")
+)
+
+(define-object FileInputStream
+  (in-module "GLocal")
+  (parent "GFileInputStream")
+  (c-name "GLocalFileInputStream")
+  (gtype-id "G_TYPE_LOCAL_FILE_INPUT_STREAM")
+)
+
+(define-object FileMonitor
+  (in-module "GLocal")
+  (parent "GFileMonitor")
+  (c-name "GLocalFileMonitor")
+  (gtype-id "G_TYPE_LOCAL_FILE_MONITOR")
+)
+
 (define-object InputStream
   (in-module "GMemory")
   (parent "GInputStream")
@@ -234,6 +262,13 @@
   (gtype-id "G_TYPE_FILE_OUTPUT_STREAM")
 )
 
+(define-object FileOutputStream
+  (in-module "GLocal")
+  (parent "GFileOutputStream")
+  (c-name "GLocalFileOutputStream")
+  (gtype-id "G_TYPE_LOCAL_FILE_OUTPUT_STREAM")
+)
+
 (define-object r
   (in-module "GResolve")
   (parent "GObject")
@@ -302,11 +337,25 @@
   (gtype-id "G_TYPE_SOCKET_CONTROL_MESSAGE")
 )
 
+(define-object InputStream
+  (in-module "GSocket")
+  (parent "GInputStream")
+  (c-name "GSocketInputStream")
+  (gtype-id "G_TYPE_SOCKET_INPUT_STREAM")
+)
+
 (define-object Listener
   (in-module "GSocket")
   (parent "GObject")
   (c-name "GSocketListener")
   (gtype-id "G_TYPE_SOCKET_LISTENER")
+)
+
+(define-object OutputStream
+  (in-module "GSocket")
+  (parent "GOutputStream")
+  (c-name "GSocketOutputStream")
+  (gtype-id "G_TYPE_SOCKET_OUTPUT_STREAM")
 )
 
 (define-object Service
@@ -321,6 +370,13 @@
   (parent "GSocketConnection")
   (c-name "GTcpConnection")
   (gtype-id "G_TYPE_TCP_CONNECTION")
+)
+
+(define-object Resolver
+  (in-module "GThreaded")
+  (parent "GResolver")
+  (c-name "GThreadedResolver")
+  (gtype-id "G_TYPE_THREADED_RESOLVER")
 )
 
 (define-object SocketService
@@ -365,6 +421,13 @@
   (gtype-id "G_TYPE_UNIX_OUTPUT_STREAM")
 )
 
+(define-object Resolver
+  (in-module "GUnix")
+  (parent "GThreadedResolver")
+  (c-name "GUnixResolver")
+  (gtype-id "G_TYPE_UNIX_RESOLVER")
+)
+
 (define-object SocketAddress
   (in-module "GUnix")
   (parent "GSocketAddress")
@@ -404,6 +467,13 @@
   (parent "GVolumeMonitor")
   (c-name "GNativeVolumeMonitor")
   (gtype-id "G_TYPE_NATIVE_VOLUME_MONITOR")
+)
+
+(define-object 32Resolver
+  (in-module "GWin")
+  (parent "GThreadedResolver")
+  (c-name "GWin32Resolver")
+  (gtype-id "G_TYPE_WIN32_RESOLVER")
 )
 
 ;; Enumerations and flags ...
@@ -1070,6 +1140,10 @@
 
 
 
+;; From gasynchelper.h
+
+
+
 ;; From gasyncinitable.h
 
 (define-function g_async_initable_get_type
@@ -1577,6 +1651,10 @@
 
 
 
+;; From gcontenttypeprivate.h
+
+
+
 ;; From gconverter.h
 
 (define-function g_converter_get_type
@@ -1967,6 +2045,68 @@
 
 
 
+;; From gdesktopappinfo.h
+
+(define-function g_desktop_app_info_get_type
+  (c-name "g_desktop_app_info_get_type")
+  (return-type "GType")
+)
+
+(define-function g_desktop_app_info_new_from_filename
+  (c-name "g_desktop_app_info_new_from_filename")
+  (return-type "GDesktopAppInfo*")
+  (parameters
+    '("const-char*" "filename")
+  )
+)
+
+(define-function g_desktop_app_info_new_from_keyfile
+  (c-name "g_desktop_app_info_new_from_keyfile")
+  (return-type "GDesktopAppInfo*")
+  (parameters
+    '("GKeyFile*" "key_file")
+  )
+)
+
+(define-function g_desktop_app_info_new
+  (c-name "g_desktop_app_info_new")
+  (is-constructor-of "GDesktopAppInfo")
+  (return-type "GDesktopAppInfo*")
+  (parameters
+    '("const-char*" "desktop_id")
+  )
+)
+
+(define-method get_is_hidden
+  (of-object "GDesktopAppInfo")
+  (c-name "g_desktop_app_info_get_is_hidden")
+  (return-type "gboolean")
+)
+
+(define-function g_desktop_app_info_set_desktop_env
+  (c-name "g_desktop_app_info_set_desktop_env")
+  (return-type "none")
+  (parameters
+    '("const-char*" "desktop_env")
+  )
+)
+
+(define-function g_desktop_app_info_lookup_get_type
+  (c-name "g_desktop_app_info_lookup_get_type")
+  (return-type "GType")
+)
+
+(define-method get_default_for_uri_scheme
+  (of-object "GDesktopAppInfoLookup")
+  (c-name "g_desktop_app_info_lookup_get_default_for_uri_scheme")
+  (return-type "GAppInfo*")
+  (parameters
+    '("const-char*" "uri_scheme")
+  )
+)
+
+
+
 ;; From gdrive.h
 
 (define-function g_drive_get_type
@@ -2181,6 +2321,10 @@
 
 
 
+;; From gdummyfile.h
+
+
+
 ;; From gemblemedicon.h
 
 (define-function g_emblemed_icon_get_type
@@ -2310,6 +2454,10 @@
     '("GFileAttributeInfoFlags" "flags")
   )
 )
+
+
+
+;; From gfileattribute-priv.h
 
 
 
@@ -4228,6 +4376,10 @@
 
 
 
+;; From gfileinfo-priv.h
+
+
+
 ;; From gfileinputstream.h
 
 (define-function g_file_input_stream_get_type
@@ -4916,6 +5068,10 @@
 
 
 
+;; From gioalias.h
+
+
+
 ;; From gioenums.h
 
 
@@ -5100,6 +5256,10 @@
 
 
 
+;; From gio-marshal.h
+
+
+
 ;; From giomodule.h
 
 (define-function g_io_module_get_type
@@ -5113,6 +5273,14 @@
   (return-type "GIOModule*")
   (parameters
     '("const-gchar*" "filename")
+  )
+)
+
+(define-function g_io_modules_scan_all_in_directory
+  (c-name "g_io_modules_scan_all_in_directory")
+  (return-type "none")
+  (parameters
+    '("const-char*" "dirname")
   )
 )
 
@@ -5216,6 +5384,15 @@
   (c-name "g_io_module_unload")
   (return-type "none")
 )
+
+(define-function g_io_module_query
+  (c-name "g_io_module_query")
+  (return-type "char**")
+)
+
+
+
+;; From giomodule-priv.h
 
 
 
@@ -5390,6 +5567,52 @@
 
 
 
+;; From glocaldirectorymonitor.h
+
+(define-function g_local_directory_monitor_get_type
+  (c-name "g_local_directory_monitor_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From glocalfileenumerator.h
+
+
+
+;; From glocalfile.h
+
+
+
+;; From glocalfileinfo.h
+
+
+
+;; From glocalfileinputstream.h
+
+
+
+;; From glocalfileiostream.h
+
+
+
+;; From glocalfilemonitor.h
+
+(define-function g_local_file_monitor_get_type
+  (c-name "g_local_file_monitor_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From glocalfileoutputstream.h
+
+
+
+;; From glocalvfs.h
+
+
+
 ;; From gmemoryinputstream.h
 
 (define-function g_memory_input_stream_get_type
@@ -5439,9 +5662,9 @@
   (return-type "GOutputStream*")
   (parameters
     '("gpointer" "data")
-    '("gsize" "len")
-    '("GReallocFunc" "realloc_fn")
-    '("GDestroyNotify" "destroy")
+    '("gsize" "size")
+    '("GReallocFunc" "realloc_function")
+    '("GDestroyNotify" "destroy_function")
   )
 )
 
@@ -5806,6 +6029,10 @@
 
 
 
+;; From gmountprivate.h
+
+
+
 ;; From gnativevolumemonitor.h
 
 (define-function g_native_volume_monitor_get_type
@@ -5853,6 +6080,10 @@
   (c-name "g_network_address_get_port")
   (return-type "guint16")
 )
+
+
+
+;; From gnetworkingprivate.h
 
 
 
@@ -6082,6 +6313,10 @@
   (c-name "g_output_stream_clear_pending")
   (return-type "none")
 )
+
+
+
+;; From gpollfilemonitor.h
 
 
 
@@ -7184,6 +7419,10 @@
 
 
 
+;; From gsocketinputstream.h
+
+
+
 ;; From gsocketlistener.h
 
 (define-function g_socket_listener_get_type
@@ -7323,6 +7562,10 @@
   (c-name "g_socket_listener_close")
   (return-type "none")
 )
+
+
+
+;; From gsocketoutputstream.h
 
 
 
@@ -7501,6 +7744,15 @@
 
 
 
+;; From gthreadedresolver.h
+
+(define-function g_threaded_resolver_get_type
+  (c-name "g_threaded_resolver_get_type")
+  (return-type "GType")
+)
+
+
+
 ;; From gthreadedsocketservice.h
 
 (define-function g_threaded_socket_service_get_type
@@ -7516,6 +7768,538 @@
     '("int" "max_threads")
   )
 )
+
+
+
+;; From gunionvolumemonitor.h
+
+
+
+;; From gunixconnection.h
+
+(define-function g_unix_connection_get_type
+  (c-name "g_unix_connection_get_type")
+  (return-type "GType")
+)
+
+(define-method send_fd
+  (of-object "GUnixConnection")
+  (c-name "g_unix_connection_send_fd")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "fd")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method receive_fd
+  (of-object "GUnixConnection")
+  (c-name "g_unix_connection_receive_fd")
+  (return-type "gint")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gunixfdlist.h
+
+(define-function g_unix_fd_list_get_type
+  (c-name "g_unix_fd_list_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_fd_list_new
+  (c-name "g_unix_fd_list_new")
+  (is-constructor-of "GUnixFdList")
+  (return-type "GUnixFDList*")
+)
+
+(define-function g_unix_fd_list_new_from_array
+  (c-name "g_unix_fd_list_new_from_array")
+  (return-type "GUnixFDList*")
+  (parameters
+    '("const-gint*" "fds")
+    '("gint" "n_fds")
+  )
+)
+
+(define-method append
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_append")
+  (return-type "gint")
+  (parameters
+    '("gint" "fd")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_length
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_get_length")
+  (return-type "gint")
+)
+
+(define-method get
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_get")
+  (return-type "gint")
+  (parameters
+    '("gint" "index_")
+    '("GError**" "error")
+  )
+)
+
+(define-method peek_fds
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_peek_fds")
+  (return-type "const-gint*")
+  (parameters
+    '("gint*" "length")
+  )
+)
+
+(define-method steal_fds
+  (of-object "GUnixFDList")
+  (c-name "g_unix_fd_list_steal_fds")
+  (return-type "gint*")
+  (parameters
+    '("gint*" "length")
+  )
+)
+
+
+
+;; From gunixfdmessage.h
+
+(define-function g_unix_fd_message_get_type
+  (c-name "g_unix_fd_message_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_fd_message_new_with_fd_list
+  (c-name "g_unix_fd_message_new_with_fd_list")
+  (return-type "GSocketControlMessage*")
+  (parameters
+    '("GUnixFDList*" "fd_list")
+  )
+)
+
+(define-function g_unix_fd_message_new
+  (c-name "g_unix_fd_message_new")
+  (is-constructor-of "GUnixFdMessage")
+  (return-type "GSocketControlMessage*")
+)
+
+(define-method get_fd_list
+  (of-object "GUnixFDMessage")
+  (c-name "g_unix_fd_message_get_fd_list")
+  (return-type "GUnixFDList*")
+)
+
+(define-method steal_fds
+  (of-object "GUnixFDMessage")
+  (c-name "g_unix_fd_message_steal_fds")
+  (return-type "gint*")
+  (parameters
+    '("gint*" "length")
+  )
+)
+
+(define-method append_fd
+  (of-object "GUnixFDMessage")
+  (c-name "g_unix_fd_message_append_fd")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "fd")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gunixinputstream.h
+
+(define-function g_unix_input_stream_get_type
+  (c-name "g_unix_input_stream_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_input_stream_new
+  (c-name "g_unix_input_stream_new")
+  (is-constructor-of "GUnixInputStream")
+  (return-type "GInputStream*")
+  (parameters
+    '("gint" "fd")
+    '("gboolean" "close_fd")
+  )
+)
+
+(define-method set_close_fd
+  (of-object "GUnixInputStream")
+  (c-name "g_unix_input_stream_set_close_fd")
+  (return-type "none")
+  (parameters
+    '("gboolean" "close_fd")
+  )
+)
+
+(define-method get_close_fd
+  (of-object "GUnixInputStream")
+  (c-name "g_unix_input_stream_get_close_fd")
+  (return-type "gboolean")
+)
+
+(define-method get_fd
+  (of-object "GUnixInputStream")
+  (c-name "g_unix_input_stream_get_fd")
+  (return-type "gint")
+)
+
+
+
+;; From gunixmount.h
+
+
+
+;; From gunixmounts.h
+
+(define-function g_unix_mount_free
+  (c-name "g_unix_mount_free")
+  (return-type "none")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-method free
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_free")
+  (return-type "none")
+)
+
+(define-function g_unix_mount_compare
+  (c-name "g_unix_mount_compare")
+  (return-type "gint")
+  (parameters
+    '("GUnixMountEntry*" "mount1")
+    '("GUnixMountEntry*" "mount2")
+  )
+)
+
+(define-function g_unix_mount_get_mount_path
+  (c-name "g_unix_mount_get_mount_path")
+  (return-type "const-char*")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-function g_unix_mount_get_device_path
+  (c-name "g_unix_mount_get_device_path")
+  (return-type "const-char*")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-function g_unix_mount_get_fs_type
+  (c-name "g_unix_mount_get_fs_type")
+  (return-type "const-char*")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-function g_unix_mount_is_readonly
+  (c-name "g_unix_mount_is_readonly")
+  (return-type "gboolean")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-function g_unix_mount_is_system_internal
+  (c-name "g_unix_mount_is_system_internal")
+  (return-type "gboolean")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-function g_unix_mount_guess_can_eject
+  (c-name "g_unix_mount_guess_can_eject")
+  (return-type "gboolean")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-function g_unix_mount_guess_should_display
+  (c-name "g_unix_mount_guess_should_display")
+  (return-type "gboolean")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-function g_unix_mount_guess_name
+  (c-name "g_unix_mount_guess_name")
+  (return-type "char*")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-function g_unix_mount_guess_icon
+  (c-name "g_unix_mount_guess_icon")
+  (return-type "GIcon*")
+  (parameters
+    '("GUnixMountEntry*" "mount_entry")
+  )
+)
+
+(define-method compare
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_compare")
+  (return-type "gint")
+  (parameters
+    '("GUnixMountPoint*" "mount2")
+  )
+)
+
+(define-method get_mount_path
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_get_mount_path")
+  (return-type "const-char*")
+)
+
+(define-method get_device_path
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_get_device_path")
+  (return-type "const-char*")
+)
+
+(define-method get_fs_type
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_get_fs_type")
+  (return-type "const-char*")
+)
+
+(define-method is_readonly
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_is_readonly")
+  (return-type "gboolean")
+)
+
+(define-method is_user_mountable
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_is_user_mountable")
+  (return-type "gboolean")
+)
+
+(define-method is_loopback
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_is_loopback")
+  (return-type "gboolean")
+)
+
+(define-method guess_can_eject
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_guess_can_eject")
+  (return-type "gboolean")
+)
+
+(define-method guess_name
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_guess_name")
+  (return-type "char*")
+)
+
+(define-method guess_icon
+  (of-object "GUnixMountPoint")
+  (c-name "g_unix_mount_point_guess_icon")
+  (return-type "GIcon*")
+)
+
+(define-function g_unix_mount_points_get
+  (c-name "g_unix_mount_points_get")
+  (return-type "GList*")
+  (parameters
+    '("guint64*" "time_read")
+  )
+)
+
+(define-function g_unix_mounts_get
+  (c-name "g_unix_mounts_get")
+  (return-type "GList*")
+  (parameters
+    '("guint64*" "time_read")
+  )
+)
+
+(define-function g_unix_mount_at
+  (c-name "g_unix_mount_at")
+  (return-type "GUnixMountEntry*")
+  (parameters
+    '("const-char*" "mount_path")
+    '("guint64*" "time_read")
+  )
+)
+
+(define-function g_unix_mounts_changed_since
+  (c-name "g_unix_mounts_changed_since")
+  (return-type "gboolean")
+  (parameters
+    '("guint64" "time")
+  )
+)
+
+(define-function g_unix_mount_points_changed_since
+  (c-name "g_unix_mount_points_changed_since")
+  (return-type "gboolean")
+  (parameters
+    '("guint64" "time")
+  )
+)
+
+(define-function g_unix_mount_monitor_get_type
+  (c-name "g_unix_mount_monitor_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_mount_monitor_new
+  (c-name "g_unix_mount_monitor_new")
+  (is-constructor-of "GUnixMountMonitor")
+  (return-type "GUnixMountMonitor*")
+)
+
+(define-method set_rate_limit
+  (of-object "GUnixMountMonitor")
+  (c-name "g_unix_mount_monitor_set_rate_limit")
+  (return-type "none")
+  (parameters
+    '("int" "limit_msec")
+  )
+)
+
+(define-function g_unix_is_mount_path_system_internal
+  (c-name "g_unix_is_mount_path_system_internal")
+  (return-type "gboolean")
+  (parameters
+    '("const-char*" "mount_path")
+  )
+)
+
+
+
+;; From gunixoutputstream.h
+
+(define-function g_unix_output_stream_get_type
+  (c-name "g_unix_output_stream_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_output_stream_new
+  (c-name "g_unix_output_stream_new")
+  (is-constructor-of "GUnixOutputStream")
+  (return-type "GOutputStream*")
+  (parameters
+    '("gint" "fd")
+    '("gboolean" "close_fd")
+  )
+)
+
+(define-method set_close_fd
+  (of-object "GUnixOutputStream")
+  (c-name "g_unix_output_stream_set_close_fd")
+  (return-type "none")
+  (parameters
+    '("gboolean" "close_fd")
+  )
+)
+
+(define-method get_close_fd
+  (of-object "GUnixOutputStream")
+  (c-name "g_unix_output_stream_get_close_fd")
+  (return-type "gboolean")
+)
+
+(define-method get_fd
+  (of-object "GUnixOutputStream")
+  (c-name "g_unix_output_stream_get_fd")
+  (return-type "gint")
+)
+
+
+
+;; From gunixresolver.h
+
+(define-function g_unix_resolver_get_type
+  (c-name "g_unix_resolver_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gunixsocketaddress.h
+
+(define-function g_unix_socket_address_get_type
+  (c-name "g_unix_socket_address_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_socket_address_new
+  (c-name "g_unix_socket_address_new")
+  (is-constructor-of "GUnixSocketAddress")
+  (return-type "GSocketAddress*")
+  (parameters
+    '("const-gchar*" "path")
+  )
+)
+
+(define-function g_unix_socket_address_new_abstract
+  (c-name "g_unix_socket_address_new_abstract")
+  (return-type "GSocketAddress*")
+  (parameters
+    '("const-gchar*" "path")
+    '("int" "path_len")
+  )
+)
+
+(define-method get_path
+  (of-object "GUnixSocketAddress")
+  (c-name "g_unix_socket_address_get_path")
+  (return-type "const-char*")
+)
+
+(define-method get_path_len
+  (of-object "GUnixSocketAddress")
+  (c-name "g_unix_socket_address_get_path_len")
+  (return-type "gsize")
+)
+
+(define-method get_is_abstract
+  (of-object "GUnixSocketAddress")
+  (c-name "g_unix_socket_address_get_is_abstract")
+  (return-type "gboolean")
+)
+
+(define-function g_unix_socket_address_abstract_names_supported
+  (c-name "g_unix_socket_address_abstract_names_supported")
+  (return-type "gboolean")
+)
+
+
+
+;; From gunixvolume.h
+
+
+
+;; From gunixvolumemonitor.h
 
 
 
@@ -7793,6 +8577,32 @@
 
 
 
+;; From gwin32appinfo.h
+
+(define-function g_win32_app_info_get_type
+  (c-name "g_win32_app_info_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gwin32mount.h
+
+
+
+;; From gwin32resolver.h
+
+(define-function g_win32_resolver_get_type
+  (c-name "g_win32_resolver_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gwin32volumemonitor.h
+
+
+
 ;; From gzlibcompressor.h
 
 (define-function g_zlib_compressor_get_type
@@ -7826,575 +8636,6 @@
   (parameters
     '("GZlibCompressorFormat" "format")
   )
-)
-
-
-
-;; From gdesktopappinfo.h
-
-(define-function g_desktop_app_info_get_type
-  (c-name "g_desktop_app_info_get_type")
-  (return-type "GType")
-)
-
-(define-function g_desktop_app_info_new_from_filename
-  (c-name "g_desktop_app_info_new_from_filename")
-  (return-type "GDesktopAppInfo*")
-  (parameters
-    '("const-char*" "filename")
-  )
-)
-
-(define-function g_desktop_app_info_new_from_keyfile
-  (c-name "g_desktop_app_info_new_from_keyfile")
-  (return-type "GDesktopAppInfo*")
-  (parameters
-    '("GKeyFile*" "key_file")
-  )
-)
-
-(define-function g_desktop_app_info_new
-  (c-name "g_desktop_app_info_new")
-  (is-constructor-of "GDesktopAppInfo")
-  (return-type "GDesktopAppInfo*")
-  (parameters
-    '("const-char*" "desktop_id")
-  )
-)
-
-(define-method get_is_hidden
-  (of-object "GDesktopAppInfo")
-  (c-name "g_desktop_app_info_get_is_hidden")
-  (return-type "gboolean")
-)
-
-(define-function g_desktop_app_info_set_desktop_env
-  (c-name "g_desktop_app_info_set_desktop_env")
-  (return-type "none")
-  (parameters
-    '("const-char*" "desktop_env")
-  )
-)
-
-(define-function g_desktop_app_info_lookup_get_type
-  (c-name "g_desktop_app_info_lookup_get_type")
-  (return-type "GType")
-)
-
-(define-method get_default_for_uri_scheme
-  (of-object "GDesktopAppInfoLookup")
-  (c-name "g_desktop_app_info_lookup_get_default_for_uri_scheme")
-  (return-type "GAppInfo*")
-  (parameters
-    '("const-char*" "uri_scheme")
-  )
-)
-
-
-
-;; From gunixconnection.h
-
-(define-function g_unix_connection_get_type
-  (c-name "g_unix_connection_get_type")
-  (return-type "GType")
-)
-
-(define-method send_fd
-  (of-object "GUnixConnection")
-  (c-name "g_unix_connection_send_fd")
-  (return-type "gboolean")
-  (parameters
-    '("gint" "fd")
-    '("GCancellable*" "cancellable")
-    '("GError**" "error")
-  )
-)
-
-(define-method receive_fd
-  (of-object "GUnixConnection")
-  (c-name "g_unix_connection_receive_fd")
-  (return-type "gint")
-  (parameters
-    '("GCancellable*" "cancellable")
-    '("GError**" "error")
-  )
-)
-
-
-
-;; From gunixfdlist.h
-
-(define-function g_unix_fd_list_get_type
-  (c-name "g_unix_fd_list_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_fd_list_new
-  (c-name "g_unix_fd_list_new")
-  (is-constructor-of "GUnixFdList")
-  (return-type "GUnixFDList*")
-)
-
-(define-function g_unix_fd_list_new_from_array
-  (c-name "g_unix_fd_list_new_from_array")
-  (return-type "GUnixFDList*")
-  (parameters
-    '("const-gint*" "fds")
-    '("gint" "n_fds")
-  )
-)
-
-(define-method append
-  (of-object "GUnixFDList")
-  (c-name "g_unix_fd_list_append")
-  (return-type "gint")
-  (parameters
-    '("gint" "fd")
-    '("GError**" "error")
-  )
-)
-
-(define-method get_length
-  (of-object "GUnixFDList")
-  (c-name "g_unix_fd_list_get_length")
-  (return-type "gint")
-)
-
-(define-method get
-  (of-object "GUnixFDList")
-  (c-name "g_unix_fd_list_get")
-  (return-type "gint")
-  (parameters
-    '("gint" "index_")
-    '("GError**" "error")
-  )
-)
-
-(define-method peek_fds
-  (of-object "GUnixFDList")
-  (c-name "g_unix_fd_list_peek_fds")
-  (return-type "const-gint*")
-  (parameters
-    '("gint*" "length")
-  )
-)
-
-(define-method steal_fds
-  (of-object "GUnixFDList")
-  (c-name "g_unix_fd_list_steal_fds")
-  (return-type "gint*")
-  (parameters
-    '("gint*" "length")
-  )
-)
-
-
-
-;; From gunixfdmessage.h
-
-(define-function g_unix_fd_message_get_type
-  (c-name "g_unix_fd_message_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_fd_message_new_with_fd_list
-  (c-name "g_unix_fd_message_new_with_fd_list")
-  (return-type "GSocketControlMessage*")
-  (parameters
-    '("GUnixFDList*" "fd_list")
-  )
-)
-
-(define-function g_unix_fd_message_new
-  (c-name "g_unix_fd_message_new")
-  (is-constructor-of "GUnixFdMessage")
-  (return-type "GSocketControlMessage*")
-)
-
-(define-method get_fd_list
-  (of-object "GUnixFDMessage")
-  (c-name "g_unix_fd_message_get_fd_list")
-  (return-type "GUnixFDList*")
-)
-
-(define-method steal_fds
-  (of-object "GUnixFDMessage")
-  (c-name "g_unix_fd_message_steal_fds")
-  (return-type "gint*")
-  (parameters
-    '("gint*" "length")
-  )
-)
-
-(define-method append_fd
-  (of-object "GUnixFDMessage")
-  (c-name "g_unix_fd_message_append_fd")
-  (return-type "gboolean")
-  (parameters
-    '("gint" "fd")
-    '("GError**" "error")
-  )
-)
-
-
-
-;; From gunixinputstream.h
-
-(define-function g_unix_input_stream_get_type
-  (c-name "g_unix_input_stream_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_input_stream_new
-  (c-name "g_unix_input_stream_new")
-  (is-constructor-of "GUnixInputStream")
-  (return-type "GInputStream*")
-  (parameters
-    '("gint" "fd")
-    '("gboolean" "close_fd")
-  )
-)
-
-(define-method set_close_fd
-  (of-object "GUnixInputStream")
-  (c-name "g_unix_input_stream_set_close_fd")
-  (return-type "none")
-  (parameters
-    '("gboolean" "close_fd")
-  )
-)
-
-(define-method get_close_fd
-  (of-object "GUnixInputStream")
-  (c-name "g_unix_input_stream_get_close_fd")
-  (return-type "gboolean")
-)
-
-(define-method get_fd
-  (of-object "GUnixInputStream")
-  (c-name "g_unix_input_stream_get_fd")
-  (return-type "gint")
-)
-
-
-
-;; From gunixmounts.h
-
-(define-function g_unix_mount_free
-  (c-name "g_unix_mount_free")
-  (return-type "none")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-method free
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_free")
-  (return-type "none")
-)
-
-(define-function g_unix_mount_compare
-  (c-name "g_unix_mount_compare")
-  (return-type "gint")
-  (parameters
-    '("GUnixMountEntry*" "mount1")
-    '("GUnixMountEntry*" "mount2")
-  )
-)
-
-(define-function g_unix_mount_get_mount_path
-  (c-name "g_unix_mount_get_mount_path")
-  (return-type "const-char*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_get_device_path
-  (c-name "g_unix_mount_get_device_path")
-  (return-type "const-char*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_get_fs_type
-  (c-name "g_unix_mount_get_fs_type")
-  (return-type "const-char*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_is_readonly
-  (c-name "g_unix_mount_is_readonly")
-  (return-type "gboolean")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_is_system_internal
-  (c-name "g_unix_mount_is_system_internal")
-  (return-type "gboolean")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_guess_can_eject
-  (c-name "g_unix_mount_guess_can_eject")
-  (return-type "gboolean")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_guess_should_display
-  (c-name "g_unix_mount_guess_should_display")
-  (return-type "gboolean")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_guess_name
-  (c-name "g_unix_mount_guess_name")
-  (return-type "char*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-function g_unix_mount_guess_icon
-  (c-name "g_unix_mount_guess_icon")
-  (return-type "GIcon*")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
-
-(define-method compare
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_compare")
-  (return-type "gint")
-  (parameters
-    '("GUnixMountPoint*" "mount2")
-  )
-)
-
-(define-method get_mount_path
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_get_mount_path")
-  (return-type "const-char*")
-)
-
-(define-method get_device_path
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_get_device_path")
-  (return-type "const-char*")
-)
-
-(define-method get_fs_type
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_get_fs_type")
-  (return-type "const-char*")
-)
-
-(define-method is_readonly
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_is_readonly")
-  (return-type "gboolean")
-)
-
-(define-method is_user_mountable
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_is_user_mountable")
-  (return-type "gboolean")
-)
-
-(define-method is_loopback
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_is_loopback")
-  (return-type "gboolean")
-)
-
-(define-method guess_can_eject
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_guess_can_eject")
-  (return-type "gboolean")
-)
-
-(define-method guess_name
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_guess_name")
-  (return-type "char*")
-)
-
-(define-method guess_icon
-  (of-object "GUnixMountPoint")
-  (c-name "g_unix_mount_point_guess_icon")
-  (return-type "GIcon*")
-)
-
-(define-function g_unix_mount_points_get
-  (c-name "g_unix_mount_points_get")
-  (return-type "GList*")
-  (parameters
-    '("guint64*" "time_read")
-  )
-)
-
-(define-function g_unix_mounts_get
-  (c-name "g_unix_mounts_get")
-  (return-type "GList*")
-  (parameters
-    '("guint64*" "time_read")
-  )
-)
-
-(define-function g_unix_mount_at
-  (c-name "g_unix_mount_at")
-  (return-type "GUnixMountEntry*")
-  (parameters
-    '("const-char*" "mount_path")
-    '("guint64*" "time_read")
-  )
-)
-
-(define-function g_unix_mounts_changed_since
-  (c-name "g_unix_mounts_changed_since")
-  (return-type "gboolean")
-  (parameters
-    '("guint64" "time")
-  )
-)
-
-(define-function g_unix_mount_points_changed_since
-  (c-name "g_unix_mount_points_changed_since")
-  (return-type "gboolean")
-  (parameters
-    '("guint64" "time")
-  )
-)
-
-(define-function g_unix_mount_monitor_get_type
-  (c-name "g_unix_mount_monitor_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_mount_monitor_new
-  (c-name "g_unix_mount_monitor_new")
-  (is-constructor-of "GUnixMountMonitor")
-  (return-type "GUnixMountMonitor*")
-)
-
-(define-method set_rate_limit
-  (of-object "GUnixMountMonitor")
-  (c-name "g_unix_mount_monitor_set_rate_limit")
-  (return-type "none")
-  (parameters
-    '("int" "limit_msec")
-  )
-)
-
-(define-function g_unix_is_mount_path_system_internal
-  (c-name "g_unix_is_mount_path_system_internal")
-  (return-type "gboolean")
-  (parameters
-    '("const-char*" "mount_path")
-  )
-)
-
-
-
-;; From gunixoutputstream.h
-
-(define-function g_unix_output_stream_get_type
-  (c-name "g_unix_output_stream_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_output_stream_new
-  (c-name "g_unix_output_stream_new")
-  (is-constructor-of "GUnixOutputStream")
-  (return-type "GOutputStream*")
-  (parameters
-    '("gint" "fd")
-    '("gboolean" "close_fd")
-  )
-)
-
-(define-method set_close_fd
-  (of-object "GUnixOutputStream")
-  (c-name "g_unix_output_stream_set_close_fd")
-  (return-type "none")
-  (parameters
-    '("gboolean" "close_fd")
-  )
-)
-
-(define-method get_close_fd
-  (of-object "GUnixOutputStream")
-  (c-name "g_unix_output_stream_get_close_fd")
-  (return-type "gboolean")
-)
-
-(define-method get_fd
-  (of-object "GUnixOutputStream")
-  (c-name "g_unix_output_stream_get_fd")
-  (return-type "gint")
-)
-
-
-
-;; From gunixsocketaddress.h
-
-(define-function g_unix_socket_address_get_type
-  (c-name "g_unix_socket_address_get_type")
-  (return-type "GType")
-)
-
-(define-function g_unix_socket_address_new
-  (c-name "g_unix_socket_address_new")
-  (is-constructor-of "GUnixSocketAddress")
-  (return-type "GSocketAddress*")
-  (parameters
-    '("const-gchar*" "path")
-  )
-)
-
-(define-function g_unix_socket_address_new_abstract
-  (c-name "g_unix_socket_address_new_abstract")
-  (return-type "GSocketAddress*")
-  (parameters
-    '("const-gchar*" "path")
-    '("int" "path_len")
-  )
-)
-
-(define-method get_path
-  (of-object "GUnixSocketAddress")
-  (c-name "g_unix_socket_address_get_path")
-  (return-type "const-char*")
-)
-
-(define-method get_path_len
-  (of-object "GUnixSocketAddress")
-  (c-name "g_unix_socket_address_get_path_len")
-  (return-type "gsize")
-)
-
-(define-method get_is_abstract
-  (of-object "GUnixSocketAddress")
-  (c-name "g_unix_socket_address_get_is_abstract")
-  (return-type "gboolean")
-)
-
-(define-function g_unix_socket_address_abstract_names_supported
-  (c-name "g_unix_socket_address_abstract_names_supported")
-  (return-type "gboolean")
 )
 
 
