@@ -45,14 +45,21 @@ class MemoryOutputStream :
   _IMPLEMENTS_INTERFACE(Seekable)
 protected:
   // TODO: more C++-like interface using sigc++
-  _WRAP_CTOR(MemoryOutputStream(gpointer data, gsize size, GReallocFunc realloc_function, GDestroyNotify destroy_function), g_memory_output_stream_new)
+  _WRAP_CTOR(MemoryOutputStream(void* data, gsize size, GReallocFunc realloc_function, GDestroyNotify destroy_function), g_memory_output_stream_new)
 
 public:
   // TODO: more C++-like interface using sigc++
-  _WRAP_CREATE(gpointer data, gsize size, GReallocFunc realloc_function, GDestroyNotify destroy_function)
-  _WRAP_METHOD(gpointer get_data(), g_memory_output_stream_get_data)
+  _WRAP_CREATE(void* data, gsize size, GReallocFunc realloc_function, GDestroyNotify destroy_function)
+  _WRAP_METHOD(void* get_data(), g_memory_output_stream_get_data)
   _WRAP_METHOD(gsize get_size() const, g_memory_output_stream_get_size)
   _WRAP_METHOD(gsize get_data_size() const, g_memory_output_stream_get_data_size)
+  
+  _WRAP_PROPERTY("data", void*)
+  _WRAP_PROPERTY("data-size", gulong)
+  //Too C-like:   _WRAP_PROPERTY("destroy-function", void*)
+  //Too C-like:   _WRAP_PROPERTY("realloc-function"         gpointer              : Read / Write / Construct Only
+  _WRAP_PROPERTY("size", gulong)
+  
 };
 
 } // namespace Gio
