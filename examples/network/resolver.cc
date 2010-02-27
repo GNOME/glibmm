@@ -19,14 +19,15 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include "config.h"
+#include <config.h>
 #include <giomm.h>
 #include <iostream>
 
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cerrno>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 
 #include <gio/gio.h>
@@ -434,13 +435,15 @@ do_connectable (const std::string& arg, gboolean synchronous)
 }
 
 #ifdef G_OS_UNIX
-static int cancel_fds[2];
+static volatile int cancel_fd;
 
 static void
 interrupted (int /*sig*/)
 {
-  signal (SIGINT, SIG_DFL);
-  write (cancel_fds[1], "x", 1);
+  const int save_errno = errno;
+  while (write(cancel_fd, "", 1) < 0 && errno == EINTR)
+  {}
+  errno = save_errno;
 }
 
 static bool
@@ -494,13 +497,16 @@ main (int argc, char **argv)
     /* Set up cancellation; we want to cancel if the user ^C's the
      * program, but we can't cancel directly from an interrupt.
      */
-    signal (SIGINT, interrupted);
+    int cancel_fds[2];
 
-    if (pipe (cancel_fds) == -1)
+    if (pipe (cancel_fds) < 0)
     {
         perror ("pipe");
         exit (1);
     }
+    cancel_fd = cancel_fds[1];
+    signal (SIGINT, interrupted);
+
     chan = Glib::IOChannel::create_from_fd (cancel_fds[0]);
     Glib::RefPtr<Glib::IOSource> source = chan->create_watch (Glib::IO_IN);
     watch_conn = source->connect (sigc::bind (sigc::ptr_fun (async_cancel), cancellable));

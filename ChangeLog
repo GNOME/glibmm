@@ -1,3 +1,14 @@
+2010-02-27  Daniel Elstner  <daniel.kitta@gmail.com>
+
+	Avoid compiler warning in resolver example
+
+	* examples/network/resolver.cc (interrupted): Check the return value
+	of the write() call to avoid a warning from GCC.  Save and restore
+	the value of errno to make the signal handler reentrant.  Get rid of
+	the signal() call to re-establish the default handler, as there is
+	not much of a point in doing so for this handler.
+	(main): Create the pipe before installing the signal handler.
+
 2010-02-22  Michael  <space3000@gmail.com>
 
 	Gio::MemoryInputStream::add_data(): Minor documentation fix.
