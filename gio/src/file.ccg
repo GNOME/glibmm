@@ -27,6 +27,7 @@
 namespace
 {
 
+typedef std::pair<Gio::File::SlotFileProgress*, Gio::SlotAsyncReady*> CopySlots;
 typedef std::pair<Gio::File::SlotReadMore*, Gio::SlotAsyncReady*> LoadPartialSlots;
 
 static void
@@ -50,8 +51,37 @@ SignalProxy_file_progress_callback(goffset current_num_bytes,
     Glib::exception_handlers_invoke();
   }
   #endif //GLIBMM_EXCEPTIONS_ENABLED
+}
+
+// Same as SignalProxy_async_callback, except that this one knows that
+// the slot is packed in a pair. The operation is assumed to be finished
+// after the callback is triggered, so we delete that pair here.
+static void
+SignalProxy_file_ready_callback(GObject*, GAsyncResult* res, void* data)
+{
+  CopySlots* slot_pair = static_cast<CopySlots*>(data);
+  Gio::SlotAsyncReady* the_slot = slot_pair->second;
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    if(*the_slot)
+    {
+      Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
+      (*the_slot)(result);
+    }
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   delete the_slot;
+  delete slot_pair->first; // progress slot
+  delete slot_pair;
 }
 
 static gboolean
@@ -670,6 +700,8 @@ File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
                     slot_copy,
                     &gerror);
 
+  delete slot_copy;
+
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -704,6 +736,8 @@ File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
                     &SignalProxy_file_progress_callback,
                     slot_copy,
                     &gerror);
+
+  delete slot_copy;
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
@@ -752,11 +786,14 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                  FileCopyFlags flags,
                  int io_priority)
 {
-  // Create copies of slots.
-  // Pointers to them will be passed through the callbacks' data parameter
-  // and deleted in the corresponding callback.
-  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+  // Create a new pair which will hold copies of passed slots.
+  // This will be deleted in the SignalProxy_file_ready_callback() callback
+  CopySlots* slots = new CopySlots();
   SlotFileProgress* slot_progress_copy = new SlotFileProgress(slot_progress);
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  slots->first = slot_progress_copy;
+  slots->second = slot_ready_copy;
 
   g_file_copy_async(gobj(),
                     Glib::unwrap(destination),
@@ -765,8 +802,8 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                     Glib::unwrap(cancellable),
                     &SignalProxy_file_progress_callback,
                     slot_progress_copy,
-                    &SignalProxy_async_callback,
-                    slot_ready_copy);
+                    &SignalProxy_file_ready_callback,
+                    slots);
 }
 
 void
@@ -799,11 +836,14 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                  FileCopyFlags flags,
                  int io_priority)
 {
-  // Create copies of slots.
-  // Pointers to them will be passed through the callbacks' data parameter
-  // and deleted in the corresponding callback.
-  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+  // Create a new pair which will hold copies of passed slots.
+  // This will be deleted in the SignalProxy_file_ready_callback() callback
+  CopySlots* slots = new CopySlots();
   SlotFileProgress* slot_progress_copy = new SlotFileProgress(slot_progress);
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  slots->first = slot_progress_copy;
+  slots->second = slot_ready_copy;
 
   g_file_copy_async(gobj(),
                     Glib::unwrap(destination),
@@ -812,8 +852,8 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                     0,
                     &SignalProxy_file_progress_callback,
                     slot_progress_copy,
-                    &SignalProxy_async_callback,
-                    slot_ready_copy);
+                    &SignalProxy_file_ready_callback,
+                    slots);
 }
 
 void
@@ -862,6 +902,8 @@ File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
                     slot_copy,
                     &gerror);
 
+  delete slot_copy;
+
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -896,6 +938,8 @@ File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
                     &SignalProxy_file_progress_callback,
                     slot_copy,
                     &gerror);
+
+  delete slot_copy;
 
 #ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
