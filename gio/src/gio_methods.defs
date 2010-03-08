@@ -56,6 +56,12 @@
   (gtype-id "G_TYPE_FILE")
 )
 
+(define-object DescriptorBased
+  (in-module "GFile")
+  (c-name "GFileDescriptorBased")
+  (gtype-id "G_TYPE_FILE_DESCRIPTOR_BASED")
+)
+
 (define-object Enumerator
   (in-module "GFile")
   (parent "GObject")
@@ -435,13 +441,6 @@
   (gtype-id "G_TYPE_UNIX_SOCKET_ADDRESS")
 )
 
-(define-object 8InputStream
-  (in-module "GUtf")
-  (parent "GFilterInputStream")
-  (c-name "GUtf8InputStream")
-  (gtype-id "G_TYPE_UTF8_INPUT_STREAM")
-)
-
 (define-object s
   (in-module "GVf")
   (parent "GObject")
@@ -659,6 +658,7 @@
   (values
     '("none" "G_FILE_MONITOR_NONE")
     '("watch-mounts" "G_FILE_MONITOR_WATCH_MOUNTS")
+    '("send-moved" "G_FILE_MONITOR_SEND_MOVED")
   )
 )
 
@@ -700,6 +700,7 @@
     '("attribute-changed" "G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED")
     '("pre-unmount" "G_FILE_MONITOR_EVENT_PRE_UNMOUNT")
     '("unmounted" "G_FILE_MONITOR_EVENT_UNMOUNTED")
+    '("moved" "G_FILE_MONITOR_EVENT_MOVED")
   )
 )
 
@@ -2458,6 +2459,21 @@
 
 
 ;; From gfileattribute-priv.h
+
+
+
+;; From gfiledescriptorbased.h
+
+(define-function g_file_descriptor_based_get_type
+  (c-name "g_file_descriptor_based_get_type")
+  (return-type "GType")
+)
+
+(define-method get_fd
+  (of-object "GFileDescriptorBased")
+  (c-name "g_file_descriptor_based_get_fd")
+  (return-type "int")
+)
 
 
 
@@ -8300,24 +8316,6 @@
 
 
 ;; From gunixvolumemonitor.h
-
-
-
-;; From gutf8inputstream.h
-
-(define-function g_utf8_input_stream_get_type
-  (c-name "g_utf8_input_stream_get_type")
-  (return-type "GType")
-)
-
-(define-function g_utf8_input_stream_new
-  (c-name "g_utf8_input_stream_new")
-  (is-constructor-of "GUtf8InputStream")
-  (return-type "GInputStream*")
-  (parameters
-    '("GInputStream*" "base_stream")
-  )
-)
 
 
 

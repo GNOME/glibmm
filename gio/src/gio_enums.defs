@@ -1,4 +1,4 @@
-;; From /home/jonathon/.jhbuild-prefix/include/glib-2.0/gio/gioenums.h
+;; From gioenums.h
 
 (define-flags-extended AppInfoCreateFlags
   (in-module "G")
@@ -7,6 +7,27 @@
     '("none" "G_APP_INFO_CREATE_NONE" "0")
     '("needs-terminal" "G_APP_INFO_CREATE_NEEDS_TERMINAL" "1 << 0")
     '("supports-uris" "G_APP_INFO_CREATE_SUPPORTS_URIS" "1 << 1")
+  )
+)
+
+(define-flags-extended ConverterFlags
+  (in-module "G")
+  (c-name "GConverterFlags")
+  (values
+    '("no-flags" "G_CONVERTER_NO_FLAGS" "0")
+    '("input-at-end" "G_CONVERTER_INPUT_AT_END" "1 << 0")
+    '("flush" "G_CONVERTER_FLUSH" "1 << 1")
+  )
+)
+
+(define-enum-extended ConverterResult
+  (in-module "G")
+  (c-name "GConverterResult")
+  (values
+    '("error" "G_CONVERTER_ERROR" "0")
+    '("converted" "G_CONVERTER_CONVERTED" "1")
+    '("finished" "G_CONVERTER_FINISHED" "2")
+    '("flushed" "G_CONVERTER_FLUSHED" "3")
   )
 )
 
@@ -144,6 +165,7 @@
   (values
     '("none" "G_FILE_MONITOR_NONE" "0")
     '("watch-mounts" "G_FILE_MONITOR_WATCH_MOUNTS" "1 << 0")
+    '("send-moved" "G_FILE_MONITOR_SEND_MOVED" "1 << 1")
   )
 )
 
@@ -182,6 +204,7 @@
     '("attribute-changed" "G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED" "4")
     '("pre-unmount" "G_FILE_MONITOR_EVENT_PRE_UNMOUNT" "5")
     '("unmounted" "G_FILE_MONITOR_EVENT_UNMOUNTED" "6")
+    '("moved" "G_FILE_MONITOR_EVENT_MOVED" "7")
   )
 )
 
@@ -218,12 +241,13 @@
     '("busy" "G_IO_ERROR_BUSY" "26")
     '("would-block" "G_IO_ERROR_WOULD_BLOCK" "27")
     '("host-not-found" "G_IO_ERROR_HOST_NOT_FOUND" "28")
-    '("host-was-not-found" "G_IO_ERROR_HOST_WAS_NOT_FOUND" "28")
     '("would-merge" "G_IO_ERROR_WOULD_MERGE" "29")
     '("failed-handled" "G_IO_ERROR_FAILED_HANDLED" "30")
     '("too-many-open-files" "G_IO_ERROR_TOO_MANY_OPEN_FILES" "31")
     '("not-initialized" "G_IO_ERROR_NOT_INITIALIZED" "32")
     '("address-in-use" "G_IO_ERROR_ADDRESS_IN_USE" "33")
+    '("partial-input" "G_IO_ERROR_PARTIAL_INPUT" "34")
+    '("invalid-data" "G_IO_ERROR_INVALID_DATA" "35")
   )
 )
 
@@ -310,6 +334,17 @@
   )
 )
 
+(define-enum-extended SocketMsgFlags
+  (in-module "G")
+  (c-name "GSocketMsgFlags")
+  (values
+    '("none" "G_SOCKET_MSG_NONE" "0")
+    '("oob" "G_SOCKET_MSG_OOB" "#error")
+    '("peek" "G_SOCKET_MSG_PEEK" "#error")
+    '("dontroute" "G_SOCKET_MSG_DONTROUTE" "#error")
+  )
+)
+
 (define-enum-extended SocketProtocol
   (in-module "G")
   (c-name "GSocketProtocol")
@@ -319,6 +354,16 @@
     '("tcp" "G_SOCKET_PROTOCOL_TCP" "6")
     '("udp" "G_SOCKET_PROTOCOL_UDP" "17")
     '("sctp" "G_SOCKET_PROTOCOL_SCTP" "132")
+  )
+)
+
+(define-enum-extended ZlibCompressorFormat
+  (in-module "G")
+  (c-name "GZlibCompressorFormat")
+  (values
+    '("zlib" "G_ZLIB_COMPRESSOR_FORMAT_ZLIB" "0")
+    '("gzip" "G_ZLIB_COMPRESSOR_FORMAT_GZIP" "1")
+    '("raw" "G_ZLIB_COMPRESSOR_FORMAT_RAW" "2")
   )
 )
 
