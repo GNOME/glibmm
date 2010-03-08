@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([glibmm], [2.23.2],
+AC_INIT([glibmm], [2.23.3],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=glibmm],
         [glibmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -112,7 +112,7 @@ GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING
 # Evaluate the --enable-warnings=level option.
 MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
                        [-Wall],
-                       [-pedantic -Wall -Wextra],
+                       [-pedantic -Wall -Wextra -Wno-long-long],
                        [G])
 
 # Offer the ability to omit some API from the library,
