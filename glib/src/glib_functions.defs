@@ -18,16 +18,6 @@
   )
 )
 
-(define-flags ArrayFlags
-  (in-module "GBSearch")
-  (c-name "GBSearchArrayFlags")
-  (gtype-id "G_TYPE_B_SEARCH_ARRAY_FLAGS")
-  (values
-    '("align-power2" "G_BSEARCH_ARRAY_ALIGN_POWER2")
-    '("auto-shrink" "G_BSEARCH_ARRAY_AUTO_SHRINK")
-  )
-)
-
 (define-enum Type
   (in-module "GChecksum")
   (c-name "GChecksumType")
@@ -98,16 +88,6 @@
     '("october" "G_DATE_OCTOBER")
     '("november" "G_DATE_NOVEMBER")
     '("december" "G_DATE_DECEMBER")
-  )
-)
-
-(define-flags Flag
-  (in-module "GDebug")
-  (c-name "GDebugFlag")
-  (gtype-id "G_TYPE_DEBUG_FLAG")
-  (values
-    '("warnings" "G_DEBUG_FATAL_WARNINGS")
-    '("criticals" "G_DEBUG_FATAL_CRITICALS")
   )
 )
 
@@ -857,10 +837,6 @@
 )
 
 
-;; From galias.h
-
-
-
 ;; From galloca.h
 
 (define-function alloca
@@ -1602,37 +1578,6 @@
 
 
 
-;; From gbitlock.h
-
-(define-function g_bit_lock
-  (c-name "g_bit_lock")
-  (return-type "none")
-  (parameters
-    '("volatile-gint*" "lock")
-    '("gint" "lock_bit")
-  )
-)
-
-(define-function g_bit_trylock
-  (c-name "g_bit_trylock")
-  (return-type "gboolean")
-  (parameters
-    '("volatile-gint*" "lock")
-    '("gint" "lock_bit")
-  )
-)
-
-(define-function g_bit_unlock
-  (c-name "g_bit_unlock")
-  (return-type "none")
-  (parameters
-    '("volatile-gint*" "lock")
-    '("gint" "lock_bit")
-  )
-)
-
-
-
 ;; From gbookmarkfile.h
 
 (define-function g_bookmark_file_error_quark
@@ -2040,26 +1985,6 @@
 
 
 
-;; From gbsearcharray.h
-
-(define-function if
-  (c-name "if")
-  (return-type "else")
-  (parameters
-    '("cmp-<" "0")
-  )
-)
-
-(define-function MIN
-  (c-name "MIN")
-  (return-type "return")
-  (parameters
-    '("barray->n_nodes-+" "1")
-  )
-)
-
-
-
 ;; From gcache.h
 
 (define-function g_cache_new
@@ -2291,6 +2216,18 @@
   (parameters
     '("const-gchar*" "to_codeset")
     '("const-gchar*" "from_codeset")
+  )
+)
+
+(define-method
+  (of-object "GIConv")
+  (c-name "g_iconv")
+  (return-type "gsize")
+  (parameters
+    '("gchar**" "inbuf")
+    '("gsize*" "inbytes_left")
+    '("gchar**" "outbuf")
+    '("gsize*" "outbytes_left")
   )
 )
 
@@ -2573,10 +2510,6 @@
     '("gpointer" "user_data")
   )
 )
-
-
-
-;; From gdatasetprivate.h
 
 
 
@@ -2969,10 +2902,6 @@
     '("const-GDate*" "date")
   )
 )
-
-
-
-;; From gdebug.h
 
 
 
@@ -4675,26 +4604,6 @@
 
 
 
-;; From glib.h
-
-
-
-;; From glibintl.h
-
-(define-function glib_gettext
-  (c-name "glib_gettext")
-  (return-type "const-gchar*")
-  (parameters
-    '("const-gchar*" "str")
-  )
-)
-
-
-
-;; From glib-object.h
-
-
-
 ;; From glist.h
 
 (define-function g_list_alloc
@@ -6001,10 +5910,6 @@
 
 
 
-;; From gmirroringtable.h
-
-
-
 ;; From gnode.h
 
 (define-function g_node_new
@@ -6614,10 +6519,6 @@
     '("va_list" "args")
   )
 )
-
-
-
-;; From gprintfint.h
 
 
 
@@ -7725,10 +7626,6 @@
   )
   (varargs #t)
 )
-
-
-
-;; From gscripttable.h
 
 
 
@@ -9527,6 +9424,24 @@
   (return-type "int")
 )
 
+(define-function g_test_add_func
+  (c-name "g_test_add_func")
+  (return-type "none")
+  (parameters
+    '("const-char*" "testpath")
+    '("funcptr" "test_func")
+  )
+)
+
+(define-function g_test_add_data_func
+  (c-name "g_test_add_data_func")
+  (return-type "none")
+  (parameters
+    '("const-char*" "testpath")
+    '("gconstpointer" "test_data")
+    '("funcptr" "test_func")
+  )
+)
 
 (define-function g_test_message
   (c-name "g_test_message")
@@ -9629,6 +9544,17 @@
   (parameters
     '("double" "range_start")
     '("double" "range_end")
+  )
+)
+
+(define-function g_test_create_case
+  (c-name "g_test_create_case")
+  (return-type "GTestCase*")
+  (parameters
+    '("const-char*" "test_name")
+    '("gsize" "data_size")
+    '("gconstpointer" "test_data")
+    '("funcptr" "data_setup")
   )
 )
 
@@ -9751,6 +9677,17 @@
     '("GError*" "error")
     '("GQuark" "error_domain")
     '("int" "error_code")
+  )
+)
+
+(define-function g_test_add_vtable
+  (c-name "g_test_add_vtable")
+  (return-type "none")
+  (parameters
+    '("const-char*" "testpath")
+    '("gsize" "data_size")
+    '("gconstpointer" "test_data")
+    '("funcptr" "data_setup")
   )
 )
 
@@ -10168,15 +10105,6 @@
 
 
 
-;; From gthreadprivate.h
-
-(define-function g_thread_init_glib
-  (c-name "g_thread_init_glib")
-  (return-type "none")
-)
-
-
-
 ;; From gtimer.h
 
 (define-function g_timer_new
@@ -10411,14 +10339,6 @@
 
 
 ;; From gtypes.h
-
-
-
-;; From gunibreak.h
-
-
-
-;; From gunichartables.h
 
 
 
@@ -10897,18 +10817,6 @@
 
 
 
-;; From gunicodeprivate.h
-
-
-
-;; From gunicomp.h
-
-
-
-;; From gunidecomp.h
-
-
-
 ;; From gurifuncs.h
 
 (define-function g_uri_unescape_string
@@ -11026,6 +10934,14 @@
 (define-function g_get_system_data_dirs
   (c-name "g_get_system_data_dirs")
   (return-type "const-gchar**")
+)
+
+(define-function g_win32_get_system_data_dirs_for_module
+  (c-name "g_win32_get_system_data_dirs_for_module")
+  (return-type "const-gchar**")
+  (parameters
+    '("funcptr" "address_of_function")
+  )
 )
 
 (define-function g_get_language_names
@@ -11157,6 +11073,14 @@
   (return-type "gchar**")
 )
 
+(define-function g_atexit
+  (c-name "g_atexit")
+  (return-type "none")
+  (parameters
+    '("GVoidFunc" "func")
+  )
+)
+
 (define-function g_find_program_in_path
   (c-name "g_find_program_in_path")
   (return-type "gchar*")
@@ -11172,209 +11096,6 @@
     '("guint" "required_major")
     '("guint" "required_minor")
     '("guint" "required_micro")
-  )
-)
-
-
-
-;; From gvarianttype.h
-
-(define-function g_variant_type_string_is_valid
-  (c-name "g_variant_type_string_is_valid")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "type_string")
-  )
-)
-
-(define-function g_variant_type_string_scan
-  (c-name "g_variant_type_string_scan")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "string")
-    '("const-gchar*" "limit")
-    '("const-gchar**" "endptr")
-  )
-)
-
-(define-method free
-  (of-object "GVariantType")
-  (c-name "g_variant_type_free")
-  (return-type "none")
-)
-
-(define-method copy
-  (of-object "GVariantType")
-  (c-name "g_variant_type_copy")
-  (return-type "GVariantType*")
-)
-
-(define-function g_variant_type_new
-  (c-name "g_variant_type_new")
-  (is-constructor-of "GVariantType")
-  (return-type "GVariantType*")
-  (parameters
-    '("const-gchar*" "type_string")
-  )
-)
-
-(define-method get_string_length
-  (of-object "GVariantType")
-  (c-name "g_variant_type_get_string_length")
-  (return-type "gsize")
-)
-
-(define-method peek_string
-  (of-object "GVariantType")
-  (c-name "g_variant_type_peek_string")
-  (return-type "const-gchar*")
-)
-
-(define-method dup_string
-  (of-object "GVariantType")
-  (c-name "g_variant_type_dup_string")
-  (return-type "gchar*")
-)
-
-(define-method is_definite
-  (of-object "GVariantType")
-  (c-name "g_variant_type_is_definite")
-  (return-type "gboolean")
-)
-
-(define-method is_container
-  (of-object "GVariantType")
-  (c-name "g_variant_type_is_container")
-  (return-type "gboolean")
-)
-
-(define-method is_basic
-  (of-object "GVariantType")
-  (c-name "g_variant_type_is_basic")
-  (return-type "gboolean")
-)
-
-(define-method is_maybe
-  (of-object "GVariantType")
-  (c-name "g_variant_type_is_maybe")
-  (return-type "gboolean")
-)
-
-(define-method is_array
-  (of-object "GVariantType")
-  (c-name "g_variant_type_is_array")
-  (return-type "gboolean")
-)
-
-(define-method is_tuple
-  (of-object "GVariantType")
-  (c-name "g_variant_type_is_tuple")
-  (return-type "gboolean")
-)
-
-(define-method is_dict_entry
-  (of-object "GVariantType")
-  (c-name "g_variant_type_is_dict_entry")
-  (return-type "gboolean")
-)
-
-(define-function g_variant_type_hash
-  (c-name "g_variant_type_hash")
-  (return-type "guint")
-  (parameters
-    '("gconstpointer" "type")
-  )
-)
-
-(define-function g_variant_type_equal
-  (c-name "g_variant_type_equal")
-  (return-type "gboolean")
-  (parameters
-    '("gconstpointer" "type1")
-    '("gconstpointer" "type2")
-  )
-)
-
-(define-method is_subtype_of
-  (of-object "GVariantType")
-  (c-name "g_variant_type_is_subtype_of")
-  (return-type "gboolean")
-  (parameters
-    '("const-GVariantType*" "supertype")
-  )
-)
-
-(define-method element
-  (of-object "GVariantType")
-  (c-name "g_variant_type_element")
-  (return-type "const-GVariantType*")
-)
-
-(define-method first
-  (of-object "GVariantType")
-  (c-name "g_variant_type_first")
-  (return-type "const-GVariantType*")
-)
-
-(define-method next
-  (of-object "GVariantType")
-  (c-name "g_variant_type_next")
-  (return-type "const-GVariantType*")
-)
-
-(define-method n_items
-  (of-object "GVariantType")
-  (c-name "g_variant_type_n_items")
-  (return-type "gsize")
-)
-
-(define-method key
-  (of-object "GVariantType")
-  (c-name "g_variant_type_key")
-  (return-type "const-GVariantType*")
-)
-
-(define-method value
-  (of-object "GVariantType")
-  (c-name "g_variant_type_value")
-  (return-type "const-GVariantType*")
-)
-
-(define-method new_array
-  (of-object "GVariantType")
-  (c-name "g_variant_type_new_array")
-  (return-type "GVariantType*")
-)
-
-(define-method new_maybe
-  (of-object "GVariantType")
-  (c-name "g_variant_type_new_maybe")
-  (return-type "GVariantType*")
-)
-
-(define-function g_variant_type_new_tuple
-  (c-name "g_variant_type_new_tuple")
-  (return-type "GVariantType*")
-  (parameters
-    '("const-GVariantType*-const*" "items")
-    '("gint" "length")
-  )
-)
-
-(define-method new_dict_entry
-  (of-object "GVariantType")
-  (c-name "g_variant_type_new_dict_entry")
-  (return-type "GVariantType*")
-  (parameters
-    '("const-GVariantType*" "value")
-  )
-)
-
-(define-function g_variant_type_checked_
-  (c-name "g_variant_type_checked_")
-  (return-type "const-GVariantType*")
-  (parameters
-    '("const-gchar" "*")
   )
 )
 
@@ -11443,5 +11164,3 @@
     '("const-gchar*" "utf8filename")
   )
 )
-
-
