@@ -1,4 +1,4 @@
-## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+## Copyright (c) 2009, 2010  Openismus GmbH  <http://www.openismus.com/>
 ##
 ## This file is part of glibmm.
 ##
@@ -38,8 +38,8 @@ AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 local_libglibmm = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
 local_libgiomm  = $(top_builddir)/gio/giomm/libgiomm-$(GIOMM_API_VERSION).la
 
-LDADD = $(GLIBMM_LIBS) $(local_libglibmm)
-giomm_ldadd = $(GIOMM_LIBS) $(local_libglibmm) $(local_libgiomm)
+LDADD = $(local_libglibmm) $(GLIBMM_LIBS)
+giomm_ldadd = $(local_libglibmm) $(local_libgiomm) $(GIOMM_LIBS)
 
 giomm_ioerror_test_SOURCES = giomm_ioerror/main.cc
 giomm_ioerror_test_LDADD   = $(giomm_ldadd)
