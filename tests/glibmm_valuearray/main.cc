@@ -46,7 +46,7 @@ int main(int, char**)
       break;
     }
 
-    Glib::Value<int>& int_val = static_cast< Glib::Value<int>& >(value);
+    Glib::Value<int> int_val = static_cast< Glib::Value<int>& >(value);
     std::cout << int_val.get() << " ";
   }
   std::cout << std::endl; // End of line for list of array elements.
@@ -68,7 +68,7 @@ int main(int, char**)
       break;
     }
 
-    Glib::Value<int>& int_val = static_cast< Glib::Value<int>& >(value);
+    Glib::Value<int> int_val = static_cast< Glib::Value<int>& >(value);
     std::cout << int_val.get() << " ";
   }
   std::cout << std::endl; // End of line for list of array elements.
