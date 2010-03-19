@@ -244,7 +244,7 @@ public:
   /*! Default constructor, which creates an empty string.
    */
   ustring();
-  
+
   ~ustring();
 
   /*! Construct a ustring as a copy of another ustring.
@@ -254,7 +254,7 @@ public:
 
   /*! Assign the value of another string to this string.
    * @param other A source string.
-   */ 
+   */
   ustring& operator=(const ustring& other);
 
   /*! Swap contents with another string.
@@ -288,19 +288,19 @@ public:
   /*! Construct a ustring as multiple characters.
    * @param n Number of characters.
    * @param uc UCS-4 code point to use.
-   */  
+   */
   ustring(size_type n, gunichar uc);
 
   /*! Construct a ustring as multiple characters.
    * @param n Number of characters.
    * @param c ASCII character to use.
-   */  
+   */
   ustring(size_type n, char c);
 
   /*! Construct a ustring as a copy of a range.
    * @param pbegin Start of range.
    * @param pend End of range.
-   */  
+   */
   template <class In> ustring(In pbegin, In pend);
 
 
@@ -496,7 +496,7 @@ public:
   /** Returns the number of characters in the string, not including any null-termination.
    * @result The number of UTF-8 characters.
    *
-   * @see bytes(), empty() 
+   * @see bytes(), empty()
    */
   size_type size()   const;
 
@@ -505,7 +505,7 @@ public:
   /** This is the same as size().
    */
   size_type length() const;
-  
+
   /** Returns the number of bytes in the string, not including any null-termination.
    * @result The number of bytes.
    *
@@ -807,7 +807,7 @@ private:
   template <class In, class ValueType = typename Glib::IteratorTraits<In>::value_type>
 #endif
   struct SequenceToString;
-  
+
   //The Tru64 compiler needs these partial specializations to be declared here,
   //as well as defined later. That's probably correct. murrayc.
   template <class In> struct SequenceToString<In, char>;
@@ -873,7 +873,12 @@ public:
   ~FormatStream();
 
   template <class T> inline void stream(const T& value);
+
   inline void stream(const char* value);
+
+  //This overload exists to avoid the templated stream() being called for non-const char*.
+  inline void stream(char* value);
+
   ustring to_string() const;
 };
 
@@ -1054,6 +1059,12 @@ void ustring::FormatStream::stream(const T& value)
 
 inline
 void ustring::FormatStream::stream(const char* value)
+{
+  stream_ << ustring(value);
+}
+
+inline
+void ustring::FormatStream::stream(char* value)
 {
   stream_ << ustring(value);
 }
@@ -1262,7 +1273,7 @@ public:
 
 /** A template specialization for Stringify<const char*>,
  * because the regular template has ambiguous constructor overloads for char*.
- */ 
+ */
 template <>
 class ustring::Stringify<const char*>
 {
@@ -1602,4 +1613,3 @@ inline ustring operator+(char lhs, const ustring& rhs)
 
 
 #endif /* _GLIBMM_USTRING_H */
-
