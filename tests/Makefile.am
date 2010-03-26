@@ -25,8 +25,9 @@ check_PROGRAMS =			\
 	glibmm_date/test		\
 	glibmm_nodetree/test		\
 	glibmm_ustring_compose/test	\
+	glibmm_ustring_format/test	\
 	glibmm_value/test		\
-	glibmm_valuearray/test		
+	glibmm_valuearray/test
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
@@ -54,5 +55,6 @@ glibmm_btree_test_SOURCES           = glibmm_btree/main.cc
 glibmm_date_test_SOURCES            = glibmm_date/main.cc
 glibmm_nodetree_test_SOURCES        = glibmm_nodetree/main.cc
 glibmm_ustring_compose_test_SOURCES = glibmm_ustring_compose/main.cc
+glibmm_ustring_format_test_SOURCES = glibmm_ustring_format/main.cc
 glibmm_value_test_SOURCES           = glibmm_value/glibmm_value.cc glibmm_value/main.cc
 glibmm_valuearray_test_SOURCES      = glibmm_valuearray/main.cc
