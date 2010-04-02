@@ -122,7 +122,8 @@ main (int argc,
 
     if (argc != 2)
     {
-        std::cerr << Glib::ustring::compose ("%1: %2\n", argv[0], "Need to specify hostname");
+        const char* error_message = "Need to specify hostname";
+        std::cerr << Glib::ustring::compose ("%1: %2\n", argv[0], error_message);
         return 1;
     }
 

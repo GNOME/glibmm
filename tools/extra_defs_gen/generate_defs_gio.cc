@@ -86,7 +86,9 @@ int main(int, char**)
             << get_defs(G_TYPE_SOCKET_CLIENT)
             << get_defs(G_TYPE_SOCKET_CONNECTION)
             << get_defs(G_TYPE_TCP_CONNECTION)
+#ifndef G_OS_WIN32
             << get_defs(G_TYPE_UNIX_CONNECTION)
+#endif
             << get_defs(G_TYPE_SOCKET_LISTENER)
             << get_defs(G_TYPE_SOCKET_SERVICE)
             << get_defs(G_TYPE_THREADED_SOCKET_SERVICE)

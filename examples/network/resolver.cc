@@ -19,7 +19,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <config.h>
+#ifndef _WIN32
+# include <config.h>
+#endif
 #include <giomm.h>
 #include <iostream>
 
@@ -28,7 +30,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <unistd.h>
+
+#ifndef G_OS_WIN32
+# include <unistd.h>
+#endif
 
 #include <gio/gio.h>
 
