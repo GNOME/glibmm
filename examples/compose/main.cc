@@ -36,11 +36,15 @@ void show_examples()
     << std::endl
     << ustring::compose("%2 is greater than %1.", a, b)
     << std::endl
+    // ustring::format does only work with std::fixed with MSVC2008 or above.
+    // See https://bugzilla.gnome.org/show_bug.cgi?id=599340
+#if !defined(_MSC_VER) || _MSC_VER >= 1500
     << ustring::compose("%1 € are %3 %% of %2 €.", a, b,
-                        ustring::format(std::fixed, std::setprecision(1), a / b * 100.0))
+    ustring::format(std::fixed, std::setprecision(1), a / b * 100.0))
     << std::endl
+#endif
     << ustring::compose("a : b = [%1|%2]",
-                        ustring::format(std::setfill(L'a'), std::setw(i), ""),
+    ustring::format(std::setfill(L'a'), std::setw(i), ""),
                         ustring::format(std::setfill(L'b'), std::setw(40 - i), ""))
     << std::endl;
 }
