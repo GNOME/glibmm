@@ -22,6 +22,31 @@
 #ifndef _GLIBMM_H
 #define _GLIBMM_H
 
+/** @mainpage glibmm Reference Manual
+ *
+ * @section description Description
+ *
+ * glibmm is the official C++ interface for the popular library Glib.
+ *
+ * @section features Features
+ *
+ * - A UTF-8 string class that has the interface of std::string.
+ * - A reference-counting smartpointer for easy memory management.
+ * - Intermediate types for compatibility with STL containers.
+ *
+ * @section license License
+ *
+ * glibmm is free software distributed under the GNU Lesser General Public
+ * License (LGPL).
+ *
+ * @section releases Release Schedule
+ *
+ * glibmm follows the official GNOME Platform Bindings release schedule. This
+ * guarantees API/ABI-stability and new releases on a predictable schedule,
+ * delivering C++ API for the underlying Glib and GNOME APIs as soon as
+ * possible.
+ */
+
 #include <glibmmconfig.h>
 //#include <glibmm/i18n.h> //This must be included by the application, after system headers such as <iostream>.
 #include <glibmm/arrayhandle.h>

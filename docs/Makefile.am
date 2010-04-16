@@ -25,7 +25,8 @@ giomm_files_h  = $(filter-out wrap_init.h,$(giomm_files_built_h) $(giomm_files_e
 
 book_name = $(GLIBMM_MODULE_NAME)
 doc_input = $(addprefix $(top_srcdir)/glib/glibmm/,$(glibmm_files_h)) \
-            $(addprefix $(top_srcdir)/gio/giomm/,$(giomm_files_h))
+            $(addprefix $(top_srcdir)/gio/giomm/,$(giomm_files_h)) \
+            $(top_srcdir)/glib/glibmm.h
 
 doctooldir = $(datadir)/$(GLIBMM_MODULE_NAME)/doctool
 dist_doctool_DATA = doc-install.pl doc-postprocess.pl doxygen.css tagfile-to-devhelp2.xsl
