@@ -1,0 +1,27 @@
+#include <gio/gio.h>
+
+namespace Gio
+{
+
+Glib::RefPtr<Settings> Settings::create_with_context(const Glib::ustring& schema,
+                                                     const Glib::ustring& context)
+{
+    return Glib::RefPtr<Settings>(new Settings(g_settings_new_with_context(schema.c_str(), context.c_str())));
+}
+
+void Settings::bind(const Glib::ustring& key,
+                    const Glib::PropertyProxy_Base& property_proxy,
+                    SettingsBindFlags flags)
+{
+    bind(key, property_proxy.get_object(), property_proxy.get_name(), flags);
+}
+
+void Settings::bind_writable(const Glib::ustring& key,
+                             const Glib::PropertyProxy_Base& property_proxy,
+                             bool inverted)
+{
+    bind_writable(key, property_proxy.get_object(), property_proxy.get_name(), inverted);
+}
+
+
+}

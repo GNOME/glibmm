@@ -23,6 +23,7 @@ _CONV_ENUM(G,SocketMsgFlags)
 _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartStopType)
+_CONV_ENUM(G,SettingsBindFlags)
 
 
 # AppInfo
@@ -124,6 +125,9 @@ _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 # OutputStream
 _CONVERSION(`GOutputStream*',`Glib::RefPtr<OutputStream>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<OutputStream>&',`GOutputStream*',__CONVERT_CONST_REFPTR_TO_P)
+
+#Settings
+_CONVERSION(`GSettings*',`Glib::RefPtr<Settings>',`Glib::wrap($3)')
 
 #Socket
 _CONVERSION(`const Glib::RefPtr<Socket>&',`GSocket*',__CONVERT_CONST_REFPTR_TO_P)

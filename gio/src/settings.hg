@@ -1,0 +1,86 @@
+/* Copyright (C) 2010 Jonathon Jongsma
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+  _WRAP_ENUM(SettingsBindFlags, GSettingsBindFlags)
+
+/** A high-level API for application settings
+ *
+ * The Settings class provides a convenient API for storing and retrieving
+ * application settings.
+ *
+ * @newin{2,26}
+ */
+class Settings : public Glib::Object
+{
+  _CLASS_GOBJECT(Settings, GSettings, G_SETTINGS, Glib::Object, GObject)
+
+protected:
+  _WRAP_CTOR(Settings(const Glib::ustring& schema), g_settings_new)
+  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::ustring& path), g_settings_new_with_path)
+  // can't wrap both new_with_path and new_with_context since they both have the
+  // same signature...
+  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::ustring& context, const Glib::ustring& path), g_settings_new_with_context_and_path)
+
+public:
+  _WRAP_CREATE(const Glib::ustring& schema)
+  _WRAP_CREATE(const Glib::ustring& schema, const Glib::ustring& path)
+  _WRAP_CREATE(const Glib::ustring& schema, const Glib::ustring& context, const Glib::ustring& path)
+  static Glib::RefPtr<Settings> create_with_context(const Glib::ustring& schema, const Glib::ustring& context);
+
+  // FIXME: implement the GVariant stuff
+
+  _WRAP_METHOD(int get_int(const Glib::ustring& key) const, g_settings_get_int)
+  _WRAP_METHOD(void set_int(const Glib::ustring& key, int value), g_settings_set_int)
+  _WRAP_METHOD(bool get_boolean(const Glib::ustring& key) const, g_settings_get_boolean)
+  _WRAP_METHOD(void set_boolean(const Glib::ustring& key, bool value), g_settings_set_boolean)
+  _WRAP_METHOD(Glib::ustring get_string(const Glib::ustring& key) const, g_settings_get_string)
+  _WRAP_METHOD(void set_string(const Glib::ustring& key, const Glib::ustring& value), g_settings_set_string)
+  _WRAP_METHOD(double get_double(const Glib::ustring& key) const, g_settings_get_double)
+  _WRAP_METHOD(void set_double(const Glib::ustring& key, double value), g_settings_set_double)
+  // FIXME: get/set strv
+
+  _WRAP_METHOD(Glib::RefPtr<Settings> get_child(const Glib::ustring& name), g_settings_get_child)
+  _WRAP_METHOD(bool is_writable(const Glib::ustring& key) const, g_settings_is_writable)
+
+  _WRAP_METHOD(void delay(), g_settings_delay)
+  _WRAP_METHOD(void apply(), g_settings_apply)
+  _WRAP_METHOD(void revert(), g_settings_revert)
+  _WRAP_METHOD(bool get_has_unapplied(), g_settings_get_has_unapplied)
+
+#m4 _CONVERSION(`Glib::ObjectBase*',`gpointer',(gpointer)$3->gobj())
+  _WRAP_METHOD(void bind(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, SettingsBindFlags flags=SETTINGS_BIND_DEFAULT), g_settings_bind)
+  void bind(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, SettingsBindFlags flags=SETTINGS_BIND_DEFAULT);
+  // FIXME: implement bind_with_mapping
+  _WRAP_METHOD(void bind_writable(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, bool inverted=false), g_settings_bind_writable)
+  void bind_writable(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, bool inverted=false);
+  // FIXME: unbind is not actually a class method
+
+#m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+  _WRAP_SIGNAL(void writable_changed(const Glib::ustring& key), writable_changed)
+  _WRAP_SIGNAL(void changed(const Glib::ustring& key), changed)
+
+};
+
+} // namespace Gio
