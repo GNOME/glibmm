@@ -66,6 +66,7 @@
 #include <giomm/outputstream.h>
 #include <giomm/resolver.h>
 #include <giomm/seekable.h>
+#include <giomm/settings.h>
 #include <giomm/socket.h>
 #include <giomm/socketaddress.h>
 #include <giomm/socketaddressenumerator.h>

@@ -29,17 +29,19 @@ check_PROGRAMS =			\
 	options/example			\
 	properties/example		\
 	regex/example			\
+	settings/settings		\
 	thread/dispatcher		\
 	thread/dispatcher2		\
 	thread/thread			\
-	thread/threadpool
+	thread/threadpool		\
+	gschemas.compiled
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
 local_cppflags  = -I$(top_builddir) $(glibmm_includes) $(giomm_includes)
 
-AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GIOMM_CFLAGS)
-AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
+AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS)
+AM_CXXFLAGS = $(GIOMM_CFLAGS) $(GLIBMM_WXXFLAGS)
 
 local_libglibmm = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
 local_libgiomm  = $(top_builddir)/gio/giomm/libgiomm-$(GIOMM_API_VERSION).la
@@ -76,3 +78,9 @@ network_socket_client_SOURCES   = network/socket-client.cc
 network_socket_client_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
 network_socket_server_SOURCES   = network/socket-server.cc
 network_socket_server_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
+
+gschemas.compiled: $(wildcard settings/*.gschema.xml)
+	gschema-compile settings/
+
+settings_settings_SOURCES = settings/settings.cc
+settings_settings_LDADD   = $(giomm_ldadd)
