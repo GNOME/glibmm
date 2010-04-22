@@ -71,6 +71,16 @@ void unsetenv(const std::string& variable)
   g_unsetenv(variable.c_str());
 }
 
+Glib::ArrayHandle<std::string> listenv()
+{
+  char **value = g_listenv();
+  char **end = value;
+  while(*end){
+    ++end;
+  }
+  return Glib::ArrayHandle<std::string>(value, end-value, Glib::OWNERSHIP_DEEP);
+}
+
 std::string get_user_name()
 {
   return convert_const_gchar_ptr_to_stdstring(g_get_user_name());
