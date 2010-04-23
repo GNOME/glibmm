@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* glibmm - a C++ wrapper for the GLib toolkit
  *
  * Copyright 2002 The gtkmm Development Team
@@ -26,7 +24,9 @@
  *
  * @section description Description
  *
- * glibmm is the official C++ interface for the popular library Glib.
+ * glibmm is the official C++ interface for the popular library %Glib. See also
+ * the <em>Programming with gtkmm</em> book for a tutorial on programming with
+ * gtkmm and glibmm: http://library.gnome.org/devel/gtkmm-tutorial/stable/
  *
  * @section features Features
  *
@@ -34,17 +34,28 @@
  * - A reference-counting smartpointer for easy memory management.
  * - Intermediate types for compatibility with STL containers.
  *
- * @section license License
+ * @section basics Basic usage
  *
- * glibmm is free software distributed under the GNU Lesser General Public
- * License (LGPL).
- *
- * @section releases Release Schedule
- *
- * glibmm follows the official GNOME Platform Bindings release schedule. This
- * guarantees API/ABI-stability and new releases on a predictable schedule,
- * delivering C++ API for the underlying Glib and GNOME APIs as soon as
- * possible.
+ * Include the glibmm header:
+ * @code
+ * #include <glibmm.h>
+ * @endcode
+ * This includes every header installed by glibmm, so can slow down
+ * compilation, but suffices for this simple example. Assuming that your
+ * program source file is @c program.cc, compile it with:
+ * @code
+ * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.4`
+ * @endcode
+ * Alternatively, if using autoconf, use the following in @c configure.ac:
+ * @code
+ * PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4])
+ * @endcode
+ * Then use the generated @c GLIBMM_CFLAGS and @c GLIBMM_LIBS variables in the
+ * project Makefile.am files. For example:
+ * @code
+ * program_CPPFLAGS = $(GLIBMM_CFLAGS)
+ * program_LDADD = $(GLIBMM_LIBS)
+ * @endcode
  */
 
 #include <glibmmconfig.h>
@@ -101,4 +112,3 @@
 #include <glibmm/wrap.h>
 
 #endif /* _GLIBMM_H */
-
