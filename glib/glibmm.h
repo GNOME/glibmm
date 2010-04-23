@@ -25,8 +25,9 @@
  * @section description Description
  *
  * glibmm is the official C++ interface for the popular library %Glib. See also
- * the <em>Programming with gtkmm</em> book for a tutorial on programming with
- * gtkmm and glibmm: http://library.gnome.org/devel/gtkmm-tutorial/stable/
+ * the <a href="http://library.gnome.org/devel/gtkmm-tutorial/stable/">
+ * Programming with gtkmm</a> book for a tutorial on programming with gtkmm and
+ * glibmm.
  *
  * @section features Features
  *
@@ -34,18 +35,19 @@
  * - A reference-counting smartpointer for easy memory management.
  * - Intermediate types for compatibility with STL containers.
  *
- * @section basics Basic usage
+ * @section basics Basic Usage
  *
  * Include the glibmm header:
  * @code
  * #include <glibmm.h>
  * @endcode
- * This includes every header installed by glibmm, so can slow down
- * compilation, but suffices for this simple example. Assuming that your
- * program source file is @c program.cc, compile it with:
+ * (You may include individual headers, such as @c glibmm/ustring.h instead.)
+ *
+ * If your  source file is @c program.cc, you can compile it with:
  * @code
  * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.4`
  * @endcode
+ *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
  * @code
  * PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4])
