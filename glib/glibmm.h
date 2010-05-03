@@ -24,33 +24,50 @@
  *
  * @section description Description
  *
- * glibmm is the official C++ interface for the popular library %Glib. See also
- * the <a href="http://library.gnome.org/devel/gtkmm-tutorial/stable/">
+ * glibmm is the official C++ interface for the popular cross-platform library %Glib. 
+ * It provides non-UI API that is not available in standard C++ and makes it 
+ * possible for gtkmm to wrap GObject-based APIs.
+ * See also the <a href="http://library.gnome.org/devel/gtkmm-tutorial/stable/">
  * Programming with gtkmm</a> book for a tutorial on programming with gtkmm and
  * glibmm.
  *
  * @section features Features
  *
- * - A UTF-8 string class that has the interface of std::string.
- * - A reference-counting smartpointer for easy memory management.
- * - Intermediate types for compatibility with STL containers.
+ * - Glib::ustring: A UTF-8 string class that can be used interchangably with std::string. Plus @ref StringUtils
+ * - Glib::RefPtr: A reference-counting smartpointer, for use with Glib::ObjectBase or similar
+ * - @ref CharsetConv
+ * - Glib::Regex: Regular expression string matching.
+ * - Glib::KeyFile: Parsing and writing of key files (similar to .ini files)
+ * - Glib::Checksum
+ * - Glib::Date, Glib::Timer, Glib::TimeVal
+ * - Glib::Dispatcher: Inter-thread communication
+ * - @ref FileUtils and @ref UriUtils
+ * - @ref MainLoop
+ * - @ref Spawn
+ * - @ref Threads
+ * - @ref MiscUtils
+ *
+ * giomm (part of the glibmm project) also contains:
+ * - Asynchronous IO. See Gio::File and the @ref Streams.
+ * - @ref NetworkIO
  *
  * @section basics Basic Usage
  *
- * Include the glibmm header:
+ * Include the glibmm header, plus giomm if necessary:
  * @code
  * #include <glibmm.h>
+ * #include <giomm.h>
  * @endcode
  * (You may include individual headers, such as @c glibmm/ustring.h instead.)
  *
  * If your  source file is @c program.cc, you can compile it with:
  * @code
- * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.4`
+ * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.4 giomm-2.4`
  * @endcode
  *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
  * @code
- * PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4])
+ * PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4 giomm-2.4])
  * @endcode
  * Then use the generated @c GLIBMM_CFLAGS and @c GLIBMM_LIBS variables in the
  * project Makefile.am files. For example:
