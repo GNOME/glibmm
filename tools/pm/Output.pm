@@ -618,7 +618,14 @@ sub output_wrap_property($$$$$$)
     my $name_underscored = $name;
     $name_underscored =~ tr/-/_/;
 
-    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s)dnl\n",
+      # For the docs of the property (the final argument of the sprintf), the
+      # m4 quotes are changed, the new quotes are then used to quote the docs
+      # and then the quotes are changed back to the standard quotes.  This is
+      # done so that if there are commas in the docs, the contents after the
+      # docs are not lost (m4 thinks the contents after the comma is another
+      # agument to the macro).  Using the standard quotes leaves a trailing
+      # single quote for some undetermined reason.
+    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,changequote([,])[%s]changequote(`,'))dnl\n",
       $name,
       $name_underscored,
       $cpp_type,
@@ -631,7 +638,15 @@ sub output_wrap_property($$$$$$)
     # If the property is not already read-only, and the property can be read, then add a second const accessor for a read-only propertyproxy:
     if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
     {
-      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s)dnl\n",
+
+      # For the docs of the property (the final argument of the sprintf), the
+      # m4 quotes are changed, the new quotes are then used to quote the docs
+      # and then the quotes are changed back to the standard quotes.  This is
+      # done so that if there are commas in the docs, the contents after the
+      # docs are not lost (m4 thinks the contents after the comma is another
+      # agument to the macro).  Using the standard quotes leaves a trailing
+      # single quote for some undetermined reason.
+      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,changequote([,])[%s]changequote(`,'))dnl\n",
         $name,
         $name_underscored,
         $cpp_type,
@@ -640,8 +655,6 @@ sub output_wrap_property($$$$$$)
       );
       $self->append($str);
     }
-
-    
   }
 }
 
