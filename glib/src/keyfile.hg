@@ -132,15 +132,9 @@ public:
 #endif
   _IGNORE(g_key_file_load_from_data)
 
-  //TODO: 
-  /*
-  gboolean g_key_file_load_from_dirs          (GKeyFile             *key_file,
-					     const gchar	  *file,
-					     const gchar	 **search_dirs,
-					     gchar		 **full_path,
-					     GKeyFileFlags         flags,
-					     GError              **error);
-  */
+#m4 _CONVERSION(`const Glib::ArrayHandle<std::string>&', `const gchar**', `const_cast<const gchar**>($3.data())')
+#m4 _CONVERSION(`Glib::ArrayHandle<std::string>&', `gchar**', `const_cast<gchar**>($3.data())')
+  _WRAP_METHOD(bool load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, Glib::ArrayHandle<std::string>& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE), g_key_file_load_from_dirs, errthrow)
 
   /** Looks for a KeyFile named @a file in the paths returned from
    * g_get_user_data_dir() and g_get_system_data_dirs() and loads them
