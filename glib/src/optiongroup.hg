@@ -20,6 +20,7 @@
 _DEFS(glibmm,glib)
 
 #include <glibmm/ustring.h>
+#include <sigc++/slot.h>
 #include <map>
 #include <vector>
 #include <glib.h> //TODO: Try to hide this.
@@ -46,6 +47,10 @@ class OptionGroup
 {
   _CLASS_GENERIC(OptionGroup, GOptionGroup)
 public:
+  /** For example Glib::ustring on_translate(const Glib::ustring& original);.
+   */
+  typedef sigc::slot<Glib::ustring, const Glib::ustring&> SlotTranslate;
+
   OptionGroup(const Glib::ustring& name, const Glib::ustring& description, const Glib::ustring& help_description = Glib::ustring());
 
   /** This always takes ownership of the underlying GOptionGroup, 
@@ -77,12 +82,20 @@ public:
   void add_entry(const OptionEntry& entry, vecustrings& arg);
   void add_entry_filename(const OptionEntry& entry, vecstrings& arg);
 
-/* TODO:
-void          g_option_group_set_translate_func     (GOptionGroup       *group,
-						     GTranslateFunc      func,
-						     gpointer            data,
-						     GDestroyNotify      destroy_notify);
-*/
+  /** Sets the slot which is used to translate user-visible strings, for --help
+   * output. Different groups can use a different SlotTranslate. If a translate
+   * slot is not set, strings are not translated.
+   *
+   * If you are using gettext(), you only need to set the translation domain,
+   * see set_translation_domain().
+   *
+   * @param slot the slot to be used for translation.
+   *
+   * @newin{2,26}
+   */
+  void set_translate_slot(const SlotTranslate& slot);
+  _IGNORE(g_option_group_set_translate_func)
+
   _WRAP_METHOD(void set_translation_domain(const Glib::ustring& domain), g_option_group_set_translation_domain)
 
   GOptionGroup*       gobj()       { return gobject_; }

@@ -21,6 +21,7 @@
 #include <glibmm/optionentry.h>
 #include <glibmm/optioncontext.h>
 #include <glibmm/utility.h>
+#include <glibmm/exceptionhandler.h>
 //#include <glibmm/containers.h>
 #include <glib.h> // g_malloc
 
@@ -67,6 +68,33 @@ static void g_callback_error(GOptionContext* context, GOptionGroup* /* group */,
   OptionGroup* option_group = static_cast<OptionGroup*>(data);
   if(option_group)
     return option_group->on_error(cppContext, *option_group);
+}
+
+const gchar* OptionGroup_Translate_glibmm_callback(const gchar* string,
+  gpointer data)
+{
+  Glib::OptionGroup::SlotTranslate* the_slot =
+    static_cast<Glib::OptionGroup::SlotTranslate*>(data);
+
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  try
+  {
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+    return g_strdup((*the_slot)(Glib::ustring(string)).c_str());
+  #ifdef GLIBMM_EXCEPTIONS_ENABLED
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  #endif //GLIBMM_EXCEPTIONS_ENABLED
+
+  return 0;
+}
+
+static void OptionGroup_Translate_glibmm_callback_destroy(void* data)
+{
+  delete static_cast<Glib::OptionGroup::SlotTranslate*>(data);
 }
 
 } /* extern "C" */
@@ -211,6 +239,17 @@ bool OptionGroup::on_post_parse(OptionContext& /* context */, OptionGroup& /* gr
 
 void OptionGroup::on_error(OptionContext& /* context */, OptionGroup& /* group */)
 {
+}
+
+void OptionGroup::set_translate_slot(const SlotTranslate& slot)
+{
+  // Create a copy of the slot. A pointer to this will be passed through the
+  // callback's data parameter.  It will be deleted when
+  // OptionGroup_Translate_glibmm_callback_destroy() is called.
+  SlotTranslate* slot_copy = new SlotTranslate(slot);
+  g_option_group_set_translate_func(gobj(),
+    &OptionGroup_Translate_glibmm_callback, slot_copy,
+    &OptionGroup_Translate_glibmm_callback_destroy);
 }
 
 
