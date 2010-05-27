@@ -80,6 +80,7 @@ const gchar* OptionGroup_Translate_glibmm_callback(const gchar* string,
   try
   {
   #endif //GLIBMM_EXCEPTIONS_ENABLED
+    // The C docs says that the char* belongs to Glib.
     return g_strdup((*the_slot)(Glib::ustring(string)).c_str());
   #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
@@ -241,7 +242,7 @@ void OptionGroup::on_error(OptionContext& /* context */, OptionGroup& /* group *
 {
 }
 
-void OptionGroup::set_translate_slot(const SlotTranslate& slot)
+void OptionGroup::set_translate_func(const SlotTranslate& slot)
 {
   // Create a copy of the slot. A pointer to this will be passed through the
   // callback's data parameter.  It will be deleted when
