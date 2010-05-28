@@ -59,9 +59,31 @@ public:
   _WRAP_METHOD(void set_string(const Glib::ustring& key, const Glib::ustring& value), g_settings_set_string)
   _WRAP_METHOD(double get_double(const Glib::ustring& key) const, g_settings_get_double)
   _WRAP_METHOD(void set_double(const Glib::ustring& key, double value), g_settings_set_double)
-  // FIXME: get/set strv
+
+  /** Gets the value that is stored at key in the settings.
+   * It is a programmer error to pass a @a key that isn't valid for settings or
+   * is not of type 'string array'.
+   *
+   * @param key The key to get the value for.
+   * @return a newly-allocated, <tt>0</tt>-terminated array of strings.
+   */
+  Glib::ArrayHandle<Glib::ustring> get_strv(const Glib::ustring& key) const;
+  _IGNORE(g_settings_get_strv)
+
+  /** Sets @a key in the settings to @a value.
+   * It is a programmer error to pass a @a key  that isn't valid for settings
+   * or is not of type 'string array'.
+   *
+   * @param key The name of the key to set.
+   * @param value The value to set it to.
+   * @return <tt>true</tt> if setting the key succeeded, <tt>false</tt> if the
+   * key was not writable.
+   */
+  bool set_strv(const Glib::ustring& key,
+    const Glib::ArrayHandle<Glib::ustring>& value);
 
   _WRAP_METHOD(Glib::RefPtr<Settings> get_child(const Glib::ustring& name), g_settings_get_child)
+  _WRAP_METHOD(Glib::RefPtr<const Settings> get_child(const Glib::ustring& name) const, g_settings_get_child, constversion)
   _WRAP_METHOD(bool is_writable(const Glib::ustring& key) const, g_settings_is_writable)
 
   _WRAP_METHOD(void delay(), g_settings_delay)
@@ -77,10 +99,13 @@ public:
   void bind_writable(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, bool inverted=false);
   // FIXME: unbind is not actually a class method
 
-#m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
-  _WRAP_SIGNAL(void writable_changed(const Glib::ustring& key), writable_changed)
-  _WRAP_SIGNAL(void changed(const Glib::ustring& key), changed)
+  //TODO?: _WRAP_SIGNAL(bool change_event(const Glib::ArrayHandle<Glib::QueryQuark>& keys, int n_keys), "change-event")
 
+#m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
+  _WRAP_SIGNAL(void changed(const Glib::ustring& key), "changed")
+
+  //TODO?: _WRAP_SIGNAL(bool writable_change_event(guint key), "writable-change-event")
+  _WRAP_SIGNAL(void writable_changed(const Glib::ustring& key), writable_changed)
 };
 
 } // namespace Gio
