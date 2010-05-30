@@ -157,7 +157,7 @@ TimeVal& TimeVal::operator-=(long seconds)
 inline
 double TimeVal::as_double() const
 {
-  return tv_sec + ((double) tv_usec / (double) G_USEC_PER_SEC);
+  return double(tv_sec) + double(tv_usec) / double(G_USEC_PER_SEC);
 }
 
 inline
