@@ -23,18 +23,10 @@
 namespace Gio
 {
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<AppInfo>
 AppInfo::create_from_commandline(const std::string& commandline,
                                  const std::string& application_name,
                                  AppInfoCreateFlags flags)
-#else
-Glib::RefPtr<AppInfo>
-AppInfo::create_from_commandline(const std::string& commandline,
-                                 const std::string& application_name,
-                                 AppInfoCreateFlags flags,
-                                 std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GAppInfo* capp_info = 0;
   GError* gerror = 0;
@@ -45,31 +37,18 @@ AppInfo::create_from_commandline(const std::string& commandline,
                                                  &gerror);
 
   if (gerror)
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     ::Glib::Error::throw_exception(gerror);
-#else
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return Glib::wrap(capp_info);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool AppInfo::launch_default_for_uri(const std::string& uri)
-#else
-bool AppInfo::launch_default_for_uri(const std::string& uri, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   const bool retvalue = g_app_info_launch_default_for_uri(uri.c_str(), 0, &(gerror));
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }

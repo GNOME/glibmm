@@ -17,13 +17,7 @@ ifelse(`$10',,,`_DEPRECATE_IFDEF_START
 ')dnl
 ifelse(`$13',,,`#ifdef $13'
 )dnl
-ifelse(`$9',,,`#ifdef GLIBMM_EXCEPTIONS_ENABLED'
-)dnl
 $3 __CPPNAME__::$1`'($5)ifelse(`$7',1,` const')
-ifelse(`$9',,,`#else
-$3 __CPPNAME__::$1`'(`'$5`'ifelse(($5),(),`',`, ')std::auto_ptr<Glib::Error>& error)ifelse(`$7',1,` const')
-#endif //GLIBMM_EXCEPTIONS_ENABLED
-')dnl
 {
 ifelse(`$11',,dnl
 `ifelse(`$8'`$9',,dnl If it is not errthrow or refreturn
@@ -34,13 +28,8 @@ ifelse(`$11',,dnl
 `ifelse(`$9',,,`  GError* gerror = 0;')
   ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');dnl
 ifelse(`$9',,,`
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 ')
 ifelse(`$8',,,`dnl
   if(retvalue)
@@ -68,13 +57,7 @@ ifelse(`$9',,,`_DEPRECATE_IFDEF_START
 ')dnl
 ifelse(`$10',,,`#ifdef $10'
 )dnl
-ifelse(`$8',,,`#ifdef GLIBMM_EXCEPTIONS_ENABLED
-')dnl
 $3 __CPPNAME__::$1($5)
-ifelse(`$8',,,`#else
-$3 __CPPNAME__::$1(`'$5`'ifelse(($5),(),`',`, ')std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
-')dnl
 {
 ifelse(`$7'`$8',,dnl
 `ifelse(`$3',void,,`  return ')_CONVERT($4,$3,`$2`'($6)');
@@ -82,13 +65,8 @@ ifelse(`$7'`$8',,dnl
 `ifelse(`$8',,,`  GError* gerror = 0;')
   ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'($6)');
 ifelse(`$8',,,`
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 ')
 ifelse(`$7',,,`dnl
   if(retvalue)

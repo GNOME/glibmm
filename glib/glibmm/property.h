@@ -22,7 +22,6 @@
 #include <glibmmconfig.h>
 #include <glibmm/propertyproxy.h>
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
 
 #include <glibmm/value.h>
 
@@ -168,7 +167,6 @@ Glib::PropertyProxy<T> Property<T>::get_proxy()
 
 } // namespace Glib
 
-#endif //GLIBMM_PROPERTIES_ENABLED
 
 #endif /* _GLIBMM_PROPERTY_H */
 

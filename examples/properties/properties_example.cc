@@ -19,7 +19,6 @@
 #include <iostream>
 
 // This example will not work without properties support
-#ifdef GLIBMM_PROPERTIES_ENABLED
 // A class that contains properties must inherit from Glib::Object (or a class
 // that inherits from Glib::Object)
 class Person : public Glib::Object
@@ -58,11 +57,9 @@ void on_lastname_changed ()
 { std::cout << "- lastname changed!" << std::endl; }
 void on_age_changed ()
 { std::cout << "- age changed!" << std::endl; }
-#endif // GLIBMM_PROPERTIES_ENABLED
 
 int main(int, char**)
 {
-#ifdef GLIBMM_PROPERTIES_ENABLED
     Glib::init ();
     Person p;
     // Register some handlers that will be called when the values of the
@@ -82,5 +79,4 @@ int main(int, char**)
     std::cout << "Done changing the properties of 'p'" << std::endl;
 
     return 0;
-#endif // GLIBMM_PROPERTIES_ENABLED
 }

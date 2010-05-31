@@ -28,7 +28,6 @@
 namespace Glib
 {
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
 
 class ObjectBase;
 
@@ -79,7 +78,6 @@ private:
   PropertyProxy_Base& operator=(const PropertyProxy_Base&);
 };
 
-#endif //GLIBMM_PROPERTIES_ENABLED
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

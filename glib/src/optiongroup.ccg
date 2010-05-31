@@ -76,19 +76,15 @@ const gchar* OptionGroup_Translate_glibmm_callback(const gchar* string,
   Glib::OptionGroup::SlotTranslate* the_slot =
     static_cast<Glib::OptionGroup::SlotTranslate*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     // The C docs says that the char* belongs to Glib.
     return g_strdup((*the_slot)(Glib::ustring(string)).c_str());
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return 0;
 }

@@ -20,7 +20,6 @@
 
 #include <glibmm/property.h>
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
 
 #include <glibmm/object.h>
 #include <cstddef>
@@ -199,5 +198,4 @@ void PropertyBase::notify()
 
 } // namespace Glib
 
-#endif //GLIBMM_PROPERTIES_ENABLED
 

@@ -24,13 +24,8 @@
 namespace Gio
 {
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<InputStream>
 LoadableIcon::load(int size, Glib::ustring& type, const Glib::RefPtr<Cancellable>& cancellable)
-#else
-Glib::RefPtr<InputStream>
-LoadableIcon::load(int size, Glib::ustring& type, const Glib::RefPtr<Cancellable>& cancellable, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   char* c_type;
   GError* gerror = 0;
@@ -40,13 +35,8 @@ LoadableIcon::load(int size, Glib::ustring& type, const Glib::RefPtr<Cancellable
                  &c_type,
                  Glib::unwrap(cancellable),
                  &gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   type = c_type;
   g_free(c_type);
@@ -55,13 +45,8 @@ LoadableIcon::load(int size, Glib::ustring& type, const Glib::RefPtr<Cancellable
   return retval;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<InputStream>
 LoadableIcon::load(int size, Glib::ustring& type)
-#else
-Glib::RefPtr<InputStream>
-LoadableIcon::load(int size, Glib::ustring& type, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   char* c_type;
   GError* gerror = 0;
@@ -71,13 +56,8 @@ LoadableIcon::load(int size, Glib::ustring& type, std::auto_ptr<Glib::Error>& er
                  &c_type,
                  0,
                  &gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   type = c_type;
   g_free(c_type);

@@ -119,11 +119,9 @@ sub output_wrap_vfunc_h($$$$$$)
     $cppVfuncDecl .= " const";
   }
 
-  $self->append("#ifdef GLIBMM_VFUNCS_ENABLED\n");
   $self->ifdef($ifdef);
   $self->append("  $cppVfuncDecl;\n");
   $self->endif($ifdef);
-  $self->append("#endif //GLIBMM_VFUNCS_ENABLED\n");
 
   #The default callback, which will call *_vfunc, which will then call the base default callback.
   #Declares the callback in the private *Class class and sets it in the class_init function.
@@ -291,46 +289,9 @@ sub output_wrap_meth($$$$$$$)
   # Doxygen documentation before the method declaration:
   $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
 
- $self->ifdef($ifdef);
-
-  if($$objCDefsFunc{throw_any_errors})
-  {
-     $self->append("#ifdef GLIBMM_EXCEPTIONS_ENABLED\n");
-  }
+  $self->ifdef($ifdef);
 
   $self->append("  ${cppMethodDecl};");
-
-  if($$objCDefsFunc{throw_any_errors})
-  {
-     $self->append("\n#else\n");
-
-     # #Add an error argument, by searching for ) at the end and replacing it:
-     # my $declWithErrorArg = ${cppMethodDecl};
-     # $declWithErrorArg =~ s/\)$/, std::auto_ptr<Glib::Error>& error\)/g;
-
-     #Recreate the declaration, to remove the default values, which we can't have as well as an error parameter at the end: 
-     my $declWithErrorArg = $$objCppfunc{rettype} . " " . $$objCppfunc{name} . "(" . $objCppfunc->args_types_and_names() . ", std::auto_ptr<Glib::Error>& error)";
-
-     if($$objCppfunc{static})
-     {
-       $declWithErrorArg = "static " . $declWithErrorArg;
-     }
-
-     if($objCppfunc->get_is_const() eq 1)
-     {
-       if($$objCppfunc{static} ne 1) #It can't be const and static at the same time.
-       {
-         $declWithErrorArg = $declWithErrorArg . " const";
-       }
-     }
-
-     #remove any superfluous ,:
-     $declWithErrorArg =~ s/\(, /\(/g;
-
-     $self->append("  ${declWithErrorArg};");
-
-     $self->append("\n#endif //GLIBMM_EXCEPTIONS_ENABLED\n");
-  }
   
   $self->endif($ifdef);
 

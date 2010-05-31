@@ -17,9 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 #include <exception>
-#endif
 
 #include <string>
 
@@ -80,16 +78,9 @@ class AppInfo : public Glib::Interface
   _CLASS_INTERFACE(AppInfo, GAppInfo, G_APP_INFO, GAppInfoIface)
 
 public:
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   static Glib::RefPtr<AppInfo> create_from_commandline(const std::string& commandline,
                                                        const std::string& application_name,
                                                        AppInfoCreateFlags flags);
-#else
-  static Glib::RefPtr<AppInfo> create_from_commandline(const std::string& commandline,
-                                                       const std::string& application_name,
-                                                       AppInfoCreateFlags flags,
-                                                       std::auto_ptr<Glib::Error>& error);
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 
   //_IGNORE(g_app_info_dup)
   _IGNORE(g_app_info_equal)
@@ -144,11 +135,7 @@ public:
   _WRAP_METHOD(static void reset_type_associations(const std::string& content_type), g_app_info_reset_type_associations)
   _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context), g_app_info_launch_default_for_uri, errthrow)
   // same as above but without optional AppLaunchContext
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   static bool launch_default_for_uri(const std::string& uri);
-#else
-  static bool launch_default_for_uri(const std::string& uri, std::auto_ptr<Glib::Error>& error);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 protected:
   //_WRAP_VFUNC(Glib::RefPtr<AppInfo> dup(), "dup")

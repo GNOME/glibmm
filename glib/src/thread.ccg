@@ -32,13 +32,10 @@ static void* call_thread_entry_slot(void* data)
 {
   sigc::slot_base *const slot = reinterpret_cast<sigc::slot_base*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     // Recreate the specific slot, and drop the reference obtained by create().
     (*static_cast<sigc::slot<void>*>(slot))();
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(Glib::Thread::Exit&)
   {
@@ -49,7 +46,6 @@ static void* call_thread_entry_slot(void* data)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   delete slot;
   return 0;

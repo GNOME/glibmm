@@ -277,34 +277,20 @@ void Mount::guess_content_type(bool force_rescan)
                   0);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void Mount::guess_content_type_sync(const Glib::RefPtr<Cancellable>& cancellable, bool force_rescan)
-#else
-void Mount::guess_content_type_sync(const Glib::RefPtr<Cancellable>& cancellable, bool force_rescan, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
     GError* gerror = 0;
     g_mount_guess_content_type_sync(gobj(), force_rescan, Glib::unwrap(cancellable),
                                     &gerror);
   if(gerror)
-#ifndef GLIBMM_EXCEPTIONS_ENABLED
-      error =
-#endif //GLIBMM_EXCEPTIONS_ENABLED
           ::Glib::Error::throw_exception(gerror);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void Mount::guess_content_type_sync(bool force_rescan)
-#else
-void Mount::guess_content_type_sync(bool force_rescan, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
     GError* gerror = 0;
     g_mount_guess_content_type_sync(gobj(), force_rescan, 0, &gerror);
   if(gerror)
-#ifndef GLIBMM_EXCEPTIONS_ENABLED
-      error =
-#endif //GLIBMM_EXCEPTIONS_ENABLED
           ::Glib::Error::throw_exception(gerror);
 }
 

@@ -27,7 +27,6 @@ int main(int, char**)
 
   Glib::KeyFile keyfile;
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   // An exception will be thrown if the file is not there, or if the file is incorrectly formatted:
   try
   {
@@ -76,45 +75,6 @@ int main(int, char**)
   {
     std::cerr << "Exception while getting list value: " << ex.what() << std::endl;
   }
-#else /* !GLIBMM_EXCEPTIONS_ENABLED */
-  std::auto_ptr<Glib::Error> ex;
-
-  if(!keyfile.load_from_file(filepath, Glib::KeyFileFlags(), ex))
-  {
-    std::cerr << "Exception while loading key file: " << ex->what() << std::endl;
-    return 1;
-  }
-
-  // Try to get a value that is not in the file:
-  {
-    const Glib::ustring value = keyfile.get_value("somegroup", "somekey", ex);
-    if (!ex.get())
-      std::cout << "somekey value=" << value << std::endl;
-    else
-      std::cerr << "Exception while getting value: " << ex->what() << std::endl;
-  }
-
-  // Try to get a value that is in the file:
-  {
-    const Glib::ustring value = keyfile.get_value("First Group", "Welcome", ex);
-    if (!ex.get())
-      std::cout << "Welcome value=" << value << std::endl;
-    else
-      std::cerr << "Exception while getting value: " << ex->what() << std::endl;
-  }
-
-  // Try to get a list of integers that is in the file:
-  {
-    const std::vector<int> values = keyfile.get_integer_list("Another Group", "Numbers", ex);
-    if (!ex.get())
-    {
-      for(std::vector<int>::const_iterator p = values.begin(); p != values.end(); ++p)
-        std::cout << "Number list value: item=" << *p << std::endl;
-    }
-    else
-      std::cerr << "Exception while getting list value: " << ex->what() << std::endl;
-  }
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
   return 0;
 }

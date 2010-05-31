@@ -29,21 +29,12 @@ Icon::equal(const Glib::RefPtr<Icon>& other) const
                  const_cast<GIcon*>(other->gobj())));
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<Icon> Icon::create(const std::string& str)
-#else
-Glib::RefPtr<Icon> Icon::create(const std::string& str, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   GIcon* icon = g_icon_new_for_string(str.c_str(), &gerror);
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return Glib::wrap(icon);
 }

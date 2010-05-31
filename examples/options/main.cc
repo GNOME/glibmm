@@ -116,7 +116,6 @@ int main(int argc, char** argv)
   ExampleOptionGroup group;
   context.set_main_group(group);
   
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
     context.parse(argc, argv);
@@ -125,14 +124,6 @@ int main(int argc, char** argv)
   {
     std::cout << "Exception: " << ex.what() << std::endl;
   }
-  #else
-  std::auto_ptr<Glib::Error> ex;
-  context.parse(argc, argv, ex);
-  if(ex.get())
-  {
-    std::cout << "Exception: " << ex->what() << std::endl;
-  }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   std::cout << "parsed values: " << std::endl <<
     "  foo = " << group.m_arg_foo << std::endl << 

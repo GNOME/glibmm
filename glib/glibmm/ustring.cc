@@ -27,9 +27,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cstring>
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 # include <stdexcept>
-#endif
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -1284,22 +1282,11 @@ ustring ustring::FormatStream::to_string() const
                                        "UTF-8", "WCHAR_T", 0, &n_bytes, &error));
 # endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
 
-#else /* !GLIBMM_HAVE_WIDE_STREAM */
-  const std::string str = stream_.str();
-
-  gsize n_bytes = 0;
-  const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), 0, &n_bytes, &error));
-#endif /* !GLIBMM_HAVE_WIDE_STREAM */
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if (error)
   {
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     Glib::Error::throw_exception(error);
-#else
-    g_warning("%s: %s", G_STRFUNC, error->message);
-    g_error_free(error);
-    return ustring();
-#endif
   }
 
   return ustring(buf.get(), buf.get() + n_bytes);
@@ -1318,13 +1305,7 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
 
   if (error)
   {
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     Glib::Error::throw_exception(error);
-#else
-    g_warning("%s: %s", G_STRFUNC, error->message);
-    g_error_free(error);
-    return is;
-#endif
   }
 
   utf8_string.assign(buf.get(), buf.get() + n_bytes);
@@ -1339,13 +1320,7 @@ std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string)
                                                 utf8_string.raw().size(), 0, 0, &error));
   if (error)
   {
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     Glib::Error::throw_exception(error);
-#else
-    g_warning("%s: %s", G_STRFUNC, error->message);
-    g_error_free(error);
-    return os;
-#endif
   }
 
   // This won't work if the string contains NUL characters.  Unfortunately,
@@ -1379,22 +1354,11 @@ std::wistream& operator>>(std::wistream& is, ustring& utf8_string)
   glong n_bytes = 0;
   const ScopedPtr<char> buf (g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(wstr.data()),
                                              wstr.size(), 0, &n_bytes, &error));
-#else
-  gsize n_bytes = 0;
-  const ScopedPtr<char> buf (g_convert(reinterpret_cast<const char*>(wstr.data()),
-                                       wstr.size() * sizeof(std::wstring::value_type),
-                                       "UTF-8", "WCHAR_T", 0, &n_bytes, &error));
-#endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if (error)
   {
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     Glib::Error::throw_exception(error);
-#else
-    g_warning("%s: %s", G_STRFUNC, error->message);
-    g_error_free(error);
-    return is;
-#endif
   }
 
   utf8_string.assign(buf.get(), buf.get() + n_bytes);
@@ -1414,23 +1378,11 @@ std::wostream& operator<<(std::wostream& os, const ustring& utf8_string)
   // Avoid going through iconv if wchar_t always contains UTF-16.
   const ScopedPtr<gunichar2> buf (g_utf8_to_utf16(utf8_string.raw().data(),
                                                   utf8_string.raw().size(), 0, 0, &error));
-#else
-  // TODO: For some reason the conversion from UTF-8 to WCHAR_T doesn't work
-  // with g_convert(), while iconv on the command line handles it just fine.
-  // Maybe a bug in GLib?
-  const ScopedPtr<char> buf (g_convert(utf8_string.raw().data(), utf8_string.raw().size(),
-                                       "WCHAR_T", "UTF-8", 0, 0, &error));
-#endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
+#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if (error)
   {
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
     Glib::Error::throw_exception(error);
-#else
-    g_warning("%s: %s", G_STRFUNC, error->message);
-    g_error_free(error);
-    return os;
-#endif
   }
 
   // This won't work if the string contains NUL characters.  Unfortunately,

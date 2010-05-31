@@ -98,15 +98,11 @@ void ParserCallbacks::start_element(GMarkupParseContext* context,
                                     void*                user_data,
                                     GError**             error)
 {
-  (void)error; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
   g_return_if_fail(context == cpp_context.gobj());
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Parser::AttributeMap attributes;
 
     if(attribute_names && attribute_values)
@@ -121,7 +117,6 @@ void ParserCallbacks::start_element(GMarkupParseContext* context,
     }
 
     cpp_context.get_parser()->on_start_element(cpp_context, element_name, attributes);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(MarkupError& err)
   {
@@ -131,7 +126,6 @@ void ParserCallbacks::start_element(GMarkupParseContext* context,
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 void ParserCallbacks::end_element(GMarkupParseContext* context,
@@ -139,17 +133,12 @@ void ParserCallbacks::end_element(GMarkupParseContext* context,
                                   void*                user_data,
                                   GError**             error)
 {
-  (void)error; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
   g_return_if_fail(context == cpp_context.gobj());
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     cpp_context.get_parser()->on_end_element(cpp_context, element_name);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(MarkupError& err)
   {
@@ -159,7 +148,6 @@ void ParserCallbacks::end_element(GMarkupParseContext* context,
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 void ParserCallbacks::text(GMarkupParseContext* context,
@@ -168,17 +156,12 @@ void ParserCallbacks::text(GMarkupParseContext* context,
                            void*                user_data,
                            GError**             error)
 {
-  (void)error; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
   g_return_if_fail(context == cpp_context.gobj());
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     cpp_context.get_parser()->on_text(cpp_context, Glib::ustring(text, text + text_len));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(MarkupError& err)
   {
@@ -188,7 +171,6 @@ void ParserCallbacks::text(GMarkupParseContext* context,
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 void ParserCallbacks::passthrough(GMarkupParseContext* context,
@@ -197,18 +179,13 @@ void ParserCallbacks::passthrough(GMarkupParseContext* context,
                                   void*                user_data,
                                   GError**             error)
 {
-  (void)error; //Avoid an unused parameter warning when GLIBMM_EXCEPTIONS_ENABLED is used.
-
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
   g_return_if_fail(context == cpp_context.gobj());
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     cpp_context.get_parser()->on_passthrough(
         cpp_context, Glib::ustring(passthrough_text, passthrough_text + text_len));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(MarkupError& err)
   {
@@ -218,7 +195,6 @@ void ParserCallbacks::passthrough(GMarkupParseContext* context,
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 void ParserCallbacks::error(GMarkupParseContext* context,
@@ -230,18 +206,14 @@ void ParserCallbacks::error(GMarkupParseContext* context,
   g_return_if_fail(context == cpp_context.gobj());
   g_return_if_fail(error->domain == G_MARKUP_ERROR);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     cpp_context.get_parser()->on_error(cpp_context, MarkupError(g_error_copy(error)));
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 

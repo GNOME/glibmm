@@ -151,9 +151,7 @@ Application::Application()
   // Note that unless you're targetting an embedded platform, you can assume
   // exceptions to be enabled.  The #ifdef is only here to make the example
   // compile in either case; you may ignore it otherwise.
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
-#endif
   {
     for (std::vector<ThreadProgress*>::size_type i = 0; i < progress_threads_.size(); ++i)
     {
@@ -164,7 +162,6 @@ Application::Application()
           sigc::bind<1>(sigc::mem_fun(*this, &Application::on_progress_finished), progress));
     }
   }
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   catch (...)
   {
     // In your own code, you should preferably use a smart pointer
@@ -173,7 +170,6 @@ Application::Application()
                   DeletePtr<ThreadProgress*>());
     throw;
   }
-#endif
 }
 
 Application::~Application()

@@ -118,10 +118,12 @@ MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
 # Offer the ability to omit some API from the library,
 # to reduce the code size:
 MM_ARG_DISABLE_DEPRECATED_API([GLIBMM GIOMM])
-GLIBMM_ARG_ENABLE_API_EXCEPTIONS
-GLIBMM_ARG_ENABLE_API_PROPERTIES
-GLIBMM_ARG_ENABLE_API_VFUNCS
-GLIBMM_ARG_ENABLE_API_DEFAULT_SIGNAL_HANDLERS
+
+# These are just defined to avoid breaking old code:
+AC_DEFINE([GLIBMM_EXCEPTIONS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
+AC_DEFINE([GLIBMM_PROPERTIES_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
+AC_DEFINE([GLIBMM_VFUNCS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
+AC_DEFINE([GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile

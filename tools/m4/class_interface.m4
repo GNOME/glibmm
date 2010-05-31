@@ -52,17 +52,13 @@ public:
 
 protected:
 
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
   //Callbacks (default signal handlers):
   //These will call the *_impl member methods, which will then call the existing default signal callbacks, if any.
   //You could prevent the original default signal handlers being called by overriding the *_impl method.
 _IMPORT(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
-#endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 
   //Callbacks (virtual functions):
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PH_VFUNCS)
-#endif //GLIBMM_VFUNCS_ENABLED
 };
 ')
 
@@ -94,22 +90,14 @@ void __CPPNAME__`'_Class::iface_init_function(void* g_iface, void*)
   //This is a temporary fix until I find out why I can not seem to derive a GtkFileChooser interface. murrayc
   g_assert(klass != 0); 
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PCC_CLASS_INIT_VFUNCS)
-#endif //GLIBMM_VFUNCS_ENABLED
 
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 _IMPORT(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
-#endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 }
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PCC_VFUNCS)
-#endif //GLIBMM_VFUNCS_ENABLED
 
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 _IMPORT(SECTION_PCC_DEFAULT_SIGNAL_HANDLERS)
-#endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 ')
 
 

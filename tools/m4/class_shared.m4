@@ -11,20 +11,14 @@ define(`_H_VFUNCS_AND_SIGNALS',`dnl
 
 public:
   //C++ methods used to invoke GTK+ virtual functions:
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_H_VFUNCS_CPPWRAPPER)
-#endif //GLIBMM_VFUNCS_ENABLED
 
 protected:
   //GTK+ Virtual Functions (override these to change behaviour):
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_H_VFUNCS)
-#endif //GLIBMM_VFUNCS_ENABLED
 
   //Default Signal Handlers::
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 _IMPORT(SECTION_H_DEFAULT_SIGNAL_HANDLERS)
-#endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 ')
 
 
@@ -97,17 +91,13 @@ ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
 
 protected:
 
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
   //Callbacks (default signal handlers):
   //These will call the *_impl member methods, which will then call the existing default signal callbacks, if any.
   //You could prevent the original default signal handlers being called by overriding the *_impl method.
 _IMPORT(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
-#endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 
   //Callbacks (virtual functions):
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PH_VFUNCS)
-#endif //GLIBMM_VFUNCS_ENABLED
 };
 ')
 
@@ -177,23 +167,15 @@ void __CPPNAME__`'_Class::class_init_function(void* g_class, void* class_data)
   BaseClassType *const klass = static_cast<BaseClassType*>(g_class);
   CppClassParent::class_init_function(klass, class_data);
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PCC_CLASS_INIT_VFUNCS)
-#endif //GLIBMM_VFUNCS_ENABLED
 
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 _IMPORT(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
-#endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 }
 ')dnl
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_PCC_VFUNCS)
-#endif //GLIBMM_VFUNCS_ENABLED
 
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 _IMPORT(SECTION_PCC_DEFAULT_SIGNAL_HANDLERS)
-#endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 ')
 
 
@@ -231,14 +213,10 @@ _IMPORT(SECTION_CC_SIGNALPROXIES)
 
 _IMPORT(SECTION_CC_PROPERTYPROXIES)
 
-#ifdef GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 _IMPORT(SECTION_CC_DEFAULT_SIGNAL_HANDLERS)
-#endif //GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED
 
-#ifdef GLIBMM_VFUNCS_ENABLED
 _IMPORT(SECTION_CC_VFUNCS)
 _IMPORT(SECTION_CC_VFUNCS_CPPWRAPPER)
-#endif //GLIBMM_VFUNCS_ENABLED
 ')
 
 dnl _PARENT_GCLASS_FROM_OBJECT(object_instance_name)

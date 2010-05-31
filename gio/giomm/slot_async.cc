@@ -27,19 +27,15 @@ SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data)
 {
   Gio::SlotAsyncReady* the_slot = static_cast<Gio::SlotAsyncReady*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
     (*the_slot)(result);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   delete the_slot;
 }

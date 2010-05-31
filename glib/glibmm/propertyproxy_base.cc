@@ -44,7 +44,6 @@ void PropertyProxyConnectionNode::callback(GObject*, GParamSpec* pspec, gpointer
   }
 }
 
-#ifdef GLIBMM_PROPERTIES_ENABLED
 
 //SignalProxyProperty implementation:
 
@@ -125,7 +124,6 @@ void PropertyProxy_Base::reset_property_()
   g_object_set_property(obj_->gobj(), property_name_, value.gobj());
 }
 
-#endif //GLIBMM_PROPERTIES_ENABLED
 
 } // namespace Glib
 

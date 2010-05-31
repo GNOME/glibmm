@@ -97,11 +97,7 @@ class Regex
   _IGNORE(g_regex_ref, g_regex_unref)
 public:
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   static Glib::RefPtr<Glib::Regex> create(const Glib::ustring& pattern, RegexCompileFlags compile_options = static_cast<RegexCompileFlags>(0), RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0));
-#else
-  static Glib::RefPtr<Glib::Regex> create(const Glib::ustring& pattern, RegexCompileFlags compile_options, RegexMatchFlags match_options, std::auto_ptr<Glib::Error>& error);
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
   
   _WRAP_METHOD(Glib::ustring get_pattern() const, g_regex_get_pattern)
   _WRAP_METHOD(int get_max_backref() const, g_regex_get_max_backref)
@@ -118,34 +114,18 @@ public:
   //TODO: Wrap GMatchInfo as an iterator:
   //_WRAP_METHOD(bool match_full(const gchar* string, gssize string_len, int start_position, RegexMatchFlags match_options = (RegexMatchFlags)0, GMatchInfo** match_info = 0), g_regex_match_full, errthrow)
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool match(const Glib::ustring& string, int start_position, RegexMatchFlags match_options);
-#else
-  bool match(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, std::auto_ptr<Glib::Error>& error);
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool match(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options);
-#else
-  bool match(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options, std::auto_ptr<Glib::Error>& error);
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
   //TODO: _WRAP_METHOD(bool match_all(const Glib::ustring& string, RegexMatchFlags match_options = (RegexMatchFlags)0, GMatchInfo ** match_info = 0), g_regex_match_all)
   bool match_all(const Glib::ustring& string, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0));
 
   //TODO: _WRAP_METHOD(bool match_all_full(const gchar* string, gssize string_len, int start_position, RegexMatchFlags match_options = (RegexMatchFlags)0, GMatchInfo** match_info = 0), g_regex_match_all_full, errthrow)
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool match_all(const Glib::ustring& string, int start_position, RegexMatchFlags match_options);
-#else
-  bool match_all(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, std::auto_ptr<Glib::Error>& error);
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   bool match_all(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options);
-#else
-  bool match_all(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options, std::auto_ptr<Glib::Error>& error);
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
 #m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
 
@@ -154,25 +134,13 @@ public:
 
   _WRAP_METHOD(Glib::StringArrayHandle split(const gchar* string, gssize string_len, int start_position, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0), int max_tokens = 0) const, g_regex_split_full, errthrow)
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::StringArrayHandle split(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, int max_tokens) const;
-#else
-  Glib::StringArrayHandle split(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, int max_tokens, std::auto_ptr<Glib::Error>& error) const;
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
   _WRAP_METHOD(Glib::ustring replace(const gchar* string, gssize string_len, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_replace, errthrow)
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ustring replace(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options);
-#else
-  Glib::ustring replace(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options, std::auto_ptr<Glib::Error>& error);
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
   _WRAP_METHOD(Glib::ustring replace_literal(const gchar *string, gssize string_len, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_replace_literal, errthrow)
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   Glib::ustring replace_literal(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options);
-#else
-  Glib::ustring replace_literal(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options, std::auto_ptr<Glib::Error>& error);
-#endif /* !GLIBMM_EXCEPTIONS_ENABLED */
 
   _WRAP_METHOD(Glib::ustring replace_eval(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options, GRegexEvalCallback eval,  gpointer user_data), g_regex_replace_eval, errthrow)
   _WRAP_METHOD(static bool check_replacement(const Glib::ustring& replacement, gboolean* has_references), g_regex_check_replacement, errthrow)

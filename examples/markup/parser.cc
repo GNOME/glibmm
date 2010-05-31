@@ -23,20 +23,11 @@
 namespace
 {
 
-#ifndef GLIBMM_EXCEPTIONS_ENABLED
-//This is an alternative, to use when we have disabled exceptions:
-std::auto_ptr<Glib::Error> processing_error;
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
 void file_get_contents(const std::string& filename, Glib::ustring& contents)
 {
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   const Glib::RefPtr<Glib::IOChannel> channel = Glib::IOChannel::create_from_file(filename, "r");
   channel->read_to_end(contents);
-  #else
-  const Glib::RefPtr<Glib::IOChannel> channel = Glib::IOChannel::create_from_file(filename, "r", processing_error);
-  channel->read_to_end(contents, processing_error);
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 Glib::ustring trim_whitespace(const Glib::ustring& text)
@@ -146,29 +137,19 @@ int main(int argc, char** argv)
   DumpParser parser;
   Glib::Markup::ParseContext context (parser);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Glib::ustring contents;
     file_get_contents(argv[1], contents);
 
     context.parse(contents);
     context.end_parse();
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(const Glib::Error& error)
   {
     std::cerr << argv[1] << ": " << error.what() << std::endl;
     return 1;
   }
-  #else
-  if(processing_error.get())
-  {
-    std::cerr << argv[1] << ": " << processing_error->what() << std::endl;
-    return 1;
-  }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
 
   return 0;

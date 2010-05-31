@@ -37,20 +37,16 @@ SignalProxy_file_progress_callback(goffset current_num_bytes,
 {
   Gio::File::SlotFileProgress* the_slot = static_cast<Gio::File::SlotFileProgress*>(data);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
     (*the_slot)(current_num_bytes, total_num_bytes);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 // Same as SignalProxy_async_callback, except that this one knows that
@@ -62,22 +58,18 @@ SignalProxy_file_ready_callback(GObject*, GAsyncResult* res, void* data)
   CopySlots* slot_pair = static_cast<CopySlots*>(data);
   Gio::SlotAsyncReady* the_slot = slot_pair->second;
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     if(*the_slot)
     {
       Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
       (*the_slot)(result);
     }
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   delete the_slot;
   delete slot_pair->first; // progress slot
@@ -92,20 +84,16 @@ SignalProxy_load_partial_contents_read_more_callback(const char* file_contents, 
 
   bool result = false;
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
     result = (*the_slot)(file_contents, file_size);
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return result;
 }
@@ -119,19 +107,15 @@ SignalProxy_load_partial_contents_ready_callback(GObject*, GAsyncResult* res, vo
   LoadPartialSlots* slot_pair = static_cast<LoadPartialSlots*>(data);
   Gio::SlotAsyncReady* the_slot = slot_pair->second;
 
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   try
   {
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
     Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
     (*the_slot)(result);
-  #ifdef GLIBMM_EXCEPTIONS_ENABLED
   }
   catch(...)
   {
     Glib::exception_handlers_invoke();
   }
-  #endif //GLIBMM_EXCEPTIONS_ENABLED
 
   delete the_slot;
   delete slot_pair->first; // read_more slot
@@ -399,40 +383,22 @@ File::replace_readwrite_async(const SlotAsyncReady& slot, const std::string& eta
                        slot_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileInfo> File::query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags) const
-#else
-Glib::RefPtr<FileInfo> File::query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error) const
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_info(const_cast<GFile*>(gobj()), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileInfo> File::query_info(const std::string& attributes, FileQueryInfoFlags flags) const
-#else
-Glib::RefPtr<FileInfo> File::query_info(const std::string& attributes, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error) const
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_info(const_cast<GFile*>(gobj()), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
@@ -482,40 +448,22 @@ File::query_info_async(const SlotAsyncReady& slot, const std::string& attributes
 }
 
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileInfo> File::query_filesystem_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes)
-#else
-Glib::RefPtr<FileInfo> File::query_filesystem_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_filesystem_info(gobj(), attributes.c_str(), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileInfo> File::query_filesystem_info(const std::string& attributes)
-#else
-Glib::RefPtr<FileInfo> File::query_filesystem_info(const std::string& attributes, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_filesystem_info(gobj(), attributes.c_str(), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
@@ -552,40 +500,22 @@ File::query_filesystem_info_async(const SlotAsyncReady& slot, const std::string&
                           slot_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileEnumerator> File::enumerate_children(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags)
-#else
-Glib::RefPtr<FileEnumerator> File::enumerate_children(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileEnumerator> retvalue = Glib::wrap(g_file_enumerate_children(gobj(), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileEnumerator> File::enumerate_children(const std::string& attributes, FileQueryInfoFlags flags)
-#else
-Glib::RefPtr<FileEnumerator> File::enumerate_children(const std::string& attributes, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileEnumerator> retvalue = Glib::wrap(g_file_enumerate_children(gobj(), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
@@ -624,21 +554,12 @@ File::enumerate_children_async(const SlotAsyncReady& slot, const std::string& at
                                   slot_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<File> File::set_display_name(const Glib::ustring& display_name)
-#else
-Glib::RefPtr<File> File::set_display_name(const Glib::ustring& display_name, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<File> retvalue = Glib::wrap(g_file_set_display_name(gobj(), display_name.c_str(), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 
@@ -676,13 +597,8 @@ File::set_display_name_async(const Glib::ustring& display_name, const SlotAsyncR
                                 slot_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
-#else
-bool
-File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -702,24 +618,14 @@ File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
 
   delete slot_copy;
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags)
-#else
-bool
-File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -739,24 +645,14 @@ File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
 
   delete slot_copy;
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
-#else
-bool
-File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res = g_file_copy(gobj(),
@@ -767,13 +663,8 @@ File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto
                     0,
                     &gerror);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
@@ -878,13 +769,8 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                     slot_ready_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
-#else
-bool
-File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -904,24 +790,14 @@ File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
 
   delete slot_copy;
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags)
-#else
-bool
-File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -941,24 +817,14 @@ File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
 
   delete slot_copy;
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::move(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
-#else
-bool
-File::move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -971,13 +837,8 @@ File::move(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto
                     0,
                     &gerror);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
@@ -1016,16 +877,9 @@ File::set_attributes_async(const Glib::RefPtr<FileInfo>& info, const SlotAsyncRe
                               slot_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::set_attributes_finish(const Glib::RefPtr<AsyncResult>& result,
                             const Glib::RefPtr<FileInfo>& info)
-#else
-bool
-File::set_attributes_finish(const Glib::RefPtr<AsyncResult>& result,
-                            const Glib::RefPtr<FileInfo>& info,
-                            std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   GFileInfo* cinfo = Glib::unwrap(info);
@@ -1036,132 +890,73 @@ File::set_attributes_finish(const Glib::RefPtr<AsyncResult>& result,
                                      &cinfo,
                                      &gerror);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::set_attribute_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags)
-#else
-bool File::set_attribute_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_set_attribute_string(gobj(), attribute.c_str(), value.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::set_attribute_byte_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags)
-#else
-bool File::set_attribute_byte_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_set_attribute_byte_string(gobj(), attribute.c_str(), value.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::set_attribute_uint32(const std::string& attribute, guint32 value, FileQueryInfoFlags flags)
-#else
-bool File::set_attribute_uint32(const std::string& attribute, guint32 value, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_set_attribute_uint32(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::set_attribute_int32(const std::string& attribute, gint32 value, FileQueryInfoFlags flags)
-#else
-bool File::set_attribute_int32(const std::string& attribute, gint32 value, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_set_attribute_int32(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::set_attribute_uint64(const std::string& attribute, guint64 value, FileQueryInfoFlags flags)
-#else
-bool File::set_attribute_uint64(const std::string& attribute, guint64 value, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_set_attribute_uint64(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::set_attribute_int64(const std::string& attribute, gint64 value, FileQueryInfoFlags flags)
-#else
-bool File::set_attribute_int64(const std::string& attribute, gint64 value, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_set_attribute_int64(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 
@@ -1516,22 +1311,13 @@ File::load_partial_contents_async(const SlotReadMore& slot_read_more,
                                      slots);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void File::replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags)
-#else
-void File::replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
   g_file_replace_contents(gobj(), contents, length, etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if(c_etag_new)
     new_etag = c_etag_new;
@@ -1539,22 +1325,13 @@ void File::replace_contents(const char* contents, gsize length, const std::strin
     new_etag = std::string();
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void File::replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags)
-#else
-void File::replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
   g_file_replace_contents(gobj(), contents, length, etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if(c_etag_new)
     new_etag = c_etag_new;
@@ -1562,22 +1339,13 @@ void File::replace_contents(const char* contents, gsize length, const std::strin
     new_etag = std::string();
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags)
-#else
-void File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
   g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if(c_etag_new)
     new_etag = c_etag_new;
@@ -1585,22 +1353,13 @@ void File::replace_contents(const std::string& contents, const std::string& etag
     new_etag = std::string();
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags)
-#else
-void File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* c_etag_new = 0;
   g_file_replace_contents(gobj(), contents.c_str(), contents.size(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), &c_etag_new, 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if(c_etag_new)
     new_etag = c_etag_new;
@@ -1704,22 +1463,13 @@ File::replace_contents_async(const SlotAsyncReady& slot,
                                 slot_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& new_etag)
-#else
-void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& new_etag, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* c_new_etag = 0;
   g_file_replace_contents_finish(gobj(), Glib::unwrap(result), &c_new_etag, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   if(c_new_etag)
     new_etag = c_new_etag;
@@ -1728,214 +1478,115 @@ void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std:
 }
 
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result)
-#else
-void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   g_file_replace_contents_finish(gobj(), Glib::unwrap(result), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 }
 
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags)
-#else
-Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_backup, FileCreateFlags flags)
-#else
-Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileIOStream> File::replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags)
-#else
-Glib::RefPtr<FileIOStream> File::replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileIOStream> File::replace_readwrite(const std::string& etag, bool make_backup, FileCreateFlags flags)
-#else
-Glib::RefPtr<FileIOStream> File::replace_readwrite(const std::string& etag, bool make_backup, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
 
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileMonitor> File::monitor_directory(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
-#else
-Glib::RefPtr<FileMonitor> File::monitor_directory(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileMonitor> File::monitor_directory(FileMonitorFlags flags)
-#else
-Glib::RefPtr<FileMonitor> File::monitor_directory(FileMonitorFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileMonitor> File::monitor_file(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
-#else
-Glib::RefPtr<FileMonitor> File::monitor_file(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags,  std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags)
-#else
-Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags,  std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileMonitor> File::monitor(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
-#else
-Glib::RefPtr<FileMonitor> File::monitor(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags,  std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileMonitor> File::monitor(FileMonitorFlags flags)
-#else
-Glib::RefPtr<FileMonitor> File::monitor(FileMonitorFlags flags,  std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
@@ -2027,21 +1678,12 @@ void File::poll_mountable(const SlotAsyncReady& slot)
     slot_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileInputStream> File::read()
-#else
-Glib::RefPtr<FileInputStream> File::read(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileInputStream> retvalue = Glib::wrap(g_file_read(gobj(), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
@@ -2074,51 +1716,28 @@ void File::find_enclosing_mount_async(const SlotAsyncReady& slot, int io_priorit
                     slot_copy);
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags)
-#else
-bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_set_attributes_from_info(gobj(), Glib::unwrap(info), ((GFileQueryInfoFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags)
-#else
-bool File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQueryInfoFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_set_attributes_from_info(gobj(), Glib::unwrap(info), ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
-#else
-bool
-File::copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -2129,24 +1748,14 @@ File::copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<
                     Glib::unwrap(cancellable),
                     &gerror);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool
 File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
-#else
-bool
-File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif // GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool res;
@@ -2157,463 +1766,251 @@ File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags
                     0,
                     &gerror);
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if (gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return res;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileOutputStream> File::create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
-#else
-Glib::RefPtr<FileOutputStream> File::create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileOutputStream> File::create_file(FileCreateFlags flags)
-#else
-Glib::RefPtr<FileOutputStream> File::create_file(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileIOStream> File::create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
-#else
-Glib::RefPtr<FileIOStream> File::create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileIOStream> File::create_file_readwrite(FileCreateFlags flags)
-#else
-Glib::RefPtr<FileIOStream> File::create_file_readwrite(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::remove()
-#else
-bool File::remove(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_delete(gobj(), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::trash()
-#else
-bool File::trash(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_trash(gobj(), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::make_directory()
-#else
-bool File::make_directory(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_make_directory(gobj(), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::make_directory_with_parents()
-#else
-bool File::make_directory_with_parents(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   const bool retvalue = g_file_make_directory_with_parents(gobj(), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::make_symbolic_link(const std::string& symlink_value)
-#else
-bool File::make_symbolic_link(const std::string& symlink_value, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_make_symbolic_link(gobj(), symlink_value.c_str(), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileAttributeInfoList> File::query_settable_attributes()
-#else
-Glib::RefPtr<FileAttributeInfoList> File::query_settable_attributes(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileAttributeInfoList> retvalue = Glib::wrap(g_file_query_settable_attributes(gobj(), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileAttributeInfoList> File::query_writable_namespaces()
-#else
-Glib::RefPtr<FileAttributeInfoList> File::query_writable_namespaces(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileAttributeInfoList> retvalue = Glib::wrap(g_file_query_writable_namespaces(gobj(), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileOutputStream> File::append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
-#else
-Glib::RefPtr<FileOutputStream> File::append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<FileOutputStream> File::append_to(FileCreateFlags flags)
-#else
-Glib::RefPtr<FileOutputStream> File::append_to(FileCreateFlags flags, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<Mount> File::find_enclosing_mount()
-#else
-Glib::RefPtr<Mount> File::find_enclosing_mount(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<Mount> retvalue = Glib::wrap(g_file_find_enclosing_mount(gobj(), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 Glib::RefPtr<AppInfo> File::query_default_handler()
-#else
-Glib::RefPtr<AppInfo> File::query_default_handler(std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   Glib::RefPtr<AppInfo> retvalue = Glib::wrap(g_file_query_default_handler(gobj(), 0, &(gerror)));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::string& etag_out)
-#else
-bool File::load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* cetag_out = 0;
   bool retvalue = g_file_load_contents(gobj(), Glib::unwrap(cancellable), &contents, &(length), &cetag_out, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   etag_out = Glib::convert_return_gchar_ptr_to_stdstring(cetag_out);
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length)
-#else
-bool File::load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_load_contents(gobj(), Glib::unwrap(cancellable), &contents, &(length), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::load_contents(char*& contents, gsize& length, std::string& etag_out)
-#else
-bool File::load_contents(char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* cetag_out = 0;
   bool retvalue = g_file_load_contents(gobj(), 0, &contents, &(length), &cetag_out, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   etag_out = Glib::convert_return_gchar_ptr_to_stdstring(cetag_out);
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::load_contents(char*& contents, gsize& length)
-#else
-bool File::load_contents(char*& contents, gsize& length, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_load_contents(gobj(), 0, &contents, &(length), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out)
-#else
-bool File::load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* cetag_out = 0;
   bool retvalue = g_file_load_contents_finish(gobj(), Glib::unwrap(result), &contents, &(length), &cetag_out, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   etag_out = Glib::convert_return_gchar_ptr_to_stdstring(cetag_out);
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length)
-#else
-bool File::load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_load_contents_finish(gobj(), Glib::unwrap(result), &contents, &(length), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out)
-#else
-bool File::load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   gchar* cetag_out = 0;
   bool retvalue = g_file_load_partial_contents_finish(gobj(), Glib::unwrap(result), &contents, &(length), &cetag_out, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   etag_out = Glib::convert_return_gchar_ptr_to_stdstring(cetag_out);
 
   return retvalue;
 }
 
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
 bool File::load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length)
-#else
-bool File::load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::auto_ptr<Glib::Error>& error)
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 {
   GError* gerror = 0;
   bool retvalue = g_file_load_partial_contents_finish(gobj(), Glib::unwrap(result), &contents, &(length), 0, &(gerror));
-#ifdef GLIBMM_EXCEPTIONS_ENABLED
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-#else
-  if(gerror)
-    error = ::Glib::Error::throw_exception(gerror);
-#endif //GLIBMM_EXCEPTIONS_ENABLED
 
   return retvalue;
 }
