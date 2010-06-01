@@ -33,8 +33,7 @@ check_PROGRAMS =			\
 	thread/dispatcher		\
 	thread/dispatcher2		\
 	thread/thread			\
-	thread/threadpool		\
-	gschemas.compiled
+	thread/threadpool
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
@@ -79,8 +78,8 @@ network_socket_client_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
 network_socket_server_SOURCES   = network/socket-server.cc
 network_socket_server_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
 
-gschemas.compiled: $(wildcard settings/*.gschema.xml)
-	gschema-compile settings/
+gsettings_SCHEMAS = $(wildcard settings/*.gschema.xml)
+@GSETTINGS_RULES@
 
 settings_settings_SOURCES = settings/settings.cc
 settings_settings_LDADD   = $(giomm_ldadd)
