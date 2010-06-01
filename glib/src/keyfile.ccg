@@ -124,11 +124,49 @@ Glib::ustring KeyFile::get_locale_string(const Glib::ustring& group_name,
   return Glib::convert_return_gchar_ptr_to_ustring(str);
 }
 
+bool KeyFile::get_boolean(const Glib::ustring& key) const
+{
+  GError* gerror = 0;
+  const bool value =
+    static_cast<bool>(g_key_file_get_boolean(const_cast<GKeyFile*>(gobj()), 
+    0, key.c_str(), &gerror));
+  if(gerror)
+    Glib::Error::throw_exception(gerror);
+
+  return value;
+}
+
 int KeyFile::get_integer(const Glib::ustring& key) const
 {
   GError* gerror = 0;
   const int value = g_key_file_get_integer(const_cast<GKeyFile*>(gobj()),
                                            0, key.c_str(), &gerror);
+  if(gerror)
+    Glib::Error::throw_exception(gerror);
+
+  return value;
+}
+
+gint64 KeyFile::get_int64(const Glib::ustring& key) const
+{
+  GError* gerror = 0;
+
+  const gint64 value = g_key_file_get_int64(const_cast<GKeyFile*>(gobj()), 0,
+    key.c_str(), &gerror);
+
+  if(gerror)
+    Glib::Error::throw_exception(gerror);
+
+  return value;
+}
+
+guint64 KeyFile::get_uint64(const Glib::ustring& key) const
+{
+  GError* gerror = 0;
+
+  const guint64 value = g_key_file_get_uint64(const_cast<GKeyFile*>(gobj()),
+    0, key.c_str(), &gerror);
+
   if(gerror)
     Glib::Error::throw_exception(gerror);
 

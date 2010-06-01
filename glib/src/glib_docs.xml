@@ -496,6 +496,33 @@ it is always UTF-8. The return value is never %NULL.
 </return>
 </function>
 
+<function name="g_node_copy_deep">
+<description>
+Recursively copies a #GNode and its data.
+
+Since: 2.4
+
+</description>
+<parameters>
+<parameter name="node">
+<parameter_description> a #GNode
+</parameter_description>
+</parameter>
+<parameter name="copy_func">
+<parameter_description> the function which is called to copy the data inside each node,
+or %NULL to use the original data.
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> data to pass to @copy_func
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GNode containing copies of the data in @node.
+
+</return>
+</function>
+
 <function name="g_variant_ref_sink">
 <description>
 #GVariant uses a floating reference count system.  All functions with
@@ -1111,38 +1138,12 @@ or freed.
 
 <function name="g_dgettext">
 <description>
-This function is a wrapper of dgettext() which does not translate
-the message if the default domain as set with textdomain() has no
-translations for the current locale.
+This is a variant of g_dgettext() that allows specifying a locale
+category instead of always using %LC_MESSAGES. See g_dgettext() for
+more information about how this functions differs from calling
+dcgettext() directly.
 
-The advantage of using this function over dgettext() proper is that
-libraries using this function (like GTK+) will not use translations
-if the application using the library does not have translations for
-the current locale.  This results in a consistent English-only
-interface instead of one having partial translations.  For this
-feature to work, the call to textdomain() and setlocale() should
-precede any g_dgettext() invocations.  For GTK+, it means calling
-textdomain() before gtk_init or its variants.
-
-This function disables translations if and only if upon its first
-call all the following conditions hold:
-&lt;itemizedlist&gt;
-&lt;listitem&gt;@domain is not %NULL&lt;/listitem&gt;
-&lt;listitem&gt;textdomain() has been called to set a default text domain&lt;/listitem&gt;
-&lt;listitem&gt;there is no translations available for the default text domain
-and the current locale&lt;/listitem&gt;
-&lt;listitem&gt;current locale is not &quot;C&quot; or any English locales (those
-starting with &quot;en_&quot;)&lt;/listitem&gt;
-&lt;/itemizedlist&gt;
-
-Note that this behavior may not be desired for example if an application
-has its untranslated messages in a language other than English.  In those
-cases the application should call textdomain() after initializing GTK+.
-
-Applications should normally not use this function directly,
-but use the _() macro for translations.
-
-Since: 2.18
+Since: 2.26
 
 </description>
 <parameters>
@@ -1155,8 +1156,12 @@ the domain set with textdomain()
 <parameter_description> message to translate
 </parameter_description>
 </parameter>
+<parameter name="category">
+<parameter_description> a locale category
+</parameter_description>
+</parameter>
 </parameters>
-<return> The translated string
+<return> the translated string for the given locale category
 
 </return>
 </function>
@@ -1679,7 +1684,7 @@ might themselves contain markup.
 const char *store = &quot;Fortnum &amp; Mason&quot;;
 const char *item = &quot;Tea&quot;;
 char *output;
- 
+&#160;
 output = g_markup_printf_escaped (&quot;&lt;purchase&gt;&quot;
 &quot;&lt;store&gt;%s&lt;/store&gt;&quot;
 &quot;&lt;item&gt;%s&lt;/item&gt;&quot;
@@ -3181,6 +3186,26 @@ in the given field.
 </parameters>
 <return> the number of records deleted.
 </return>
+</function>
+
+<function name="g_cache_remove">
+<description>
+Decreases the reference count of the given value. If it drops to 0
+then the value and its corresponding key are destroyed, using the
+@value_destroy_func and @key_destroy_func passed to g_cache_new().
+
+</description>
+<parameters>
+<parameter name="cache">
+<parameter_description> a #GCache.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the value to remove.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_io_channel_write">
@@ -5405,6 +5430,39 @@ Since: 2.24
 </return>
 </function>
 
+<function name="g_variant_get_byte_array">
+<description>
+Gets the contents of an array of bytes #GVariant.
+
+If @length is non-%NULL then it points to a location at which to
+store the length of the array and nul bytes contained within the
+array have no special meaning.
+
+If @length is %NULL then the caller has no way to determine what the
+length of the returned data might be.  In this case, the function
+ensures that the last byte of the array is a nul byte and, if it is
+not, returns %NULL instead.  In this way, the caller is assured that
+any non-%NULL pointer that is returned will be nul-terminated.
+
+The return value remains valid as long as @value exists.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> an array of bytes #GVariant
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of the result, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the byte data, or %NULL
+</return>
+</function>
+
 <function name="g_cclosure_marshal_VOID__ENUM">
 <description>
 A marshaller for a #GCClosure with a callback of type
@@ -5717,6 +5775,35 @@ the returned string
 </parameters>
 <return> %TRUE on success, %FALSE if an error occurred
 </return>
+</function>
+
+<function name="g_key_file_set_uint64">
+<description>
+Associates a new integer value with @key under @group_name.
+If @key cannot be found then it is created.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> an integer value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_hash_table_iter_next">
@@ -6348,7 +6435,7 @@ print_uppercase_words (const gchar *string)
 / * Print all uppercase-only words. * /
 GRegex *regex;
 GMatchInfo *match_info;
- 
+&#160;
 regex = g_regex_new (&quot;[A-Z]+&quot;, 0, 0, NULL);
 g_regex_match (regex, string, 0, &amp;match_info);
 while (g_match_info_matches (match_info))
@@ -7292,24 +7379,37 @@ Since: 2.6
 <return></return>
 </function>
 
-<function name="g_cache_remove">
+<function name="g_key_file_get_int64">
 <description>
-Decreases the reference count of the given value. If it drops to 0
-then the value and its corresponding key are destroyed, using the
-@value_destroy_func and @key_destroy_func passed to g_cache_new().
+Returns the value associated with @key under @group_name as a signed
+64-bit integer. This is similar to g_key_file_get_integer() but can return
+64-bit results without truncation.
+
+Since: 2.26
 
 </description>
 <parameters>
-<parameter name="cache">
-<parameter_description> a #GCache.
+<parameter name="key_file">
+<parameter_description> a non-%NULL #GKeyFile
 </parameter_description>
 </parameter>
-<parameter name="value">
-<parameter_description> the value to remove.
+<parameter name="group_name">
+<parameter_description> a non-%NULL group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a non-%NULL key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the value associated with the key as a signed 64-bit integer, or
+0 if the key was not found or could not be parsed.
+
+</return>
 </function>
 
 <function name="g_get_language_names">
@@ -8007,6 +8107,8 @@ Returns the string value of a #GVariant instance with a string
 type.  This includes the types %G_VARIANT_TYPE_STRING,
 %G_VARIANT_TYPE_OBJECT_PATH and %G_VARIANT_TYPE_SIGNATURE.
 
+The string will always be utf8 encoded.
+
 If @length is non-%NULL then the length of the string (in bytes) is
 returned there.  For trusted values, this information is already
 known.  For untrusted values, a strlen() will be performed.
@@ -8029,7 +8131,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> the constant string
+<return> the constant string, utf8 encoded
 </return>
 </function>
 
@@ -9112,6 +9214,22 @@ Set the contents of a %G_TYPE_BOOLEAN #GValue to @v_boolean.
 <return></return>
 </function>
 
+<function name="g_thread_supported">
+<description>
+This function returns %TRUE if the thread system is initialized, and
+%FALSE if it is not.
+
+&lt;note&gt;&lt;para&gt;This function is actually a macro. Apart from taking the
+address of it you can however use it as if it was a
+function.&lt;/para&gt;&lt;/note&gt;
+
+</description>
+<parameters>
+</parameters>
+<return> %TRUE, if the thread system is initialized.
+</return>
+</function>
+
 <function name="g_value_set_string_take_ownership">
 <description>
 This is an internal function introduced mainly for C marshallers.
@@ -9217,6 +9335,47 @@ URI, or %NULL on an error.
 </return>
 </function>
 
+<function name="g_variant_compare">
+<description>
+Compares @one and @two.
+
+The types of @one and @two are #gconstpointer only to allow use of
+this function with #GTree, #GPtrArray, etc.  They must each be a
+#GVariant.
+
+Comparison is only defined for basic types (ie: booleans, numbers,
+strings).  For booleans, %FALSE is less than %TRUE.  Numbers are
+ordered in the usual way.  Strings are in ASCII lexographical order.
+
+It is a programmer error to attempt to compare container values or
+two values that have types that are not exactly equal.  For example,
+you can not compare a 32-bit signed integer with a 32-bit unsigned
+integer.  Also note that this function is not particularly
+well-behaved when it comes to comparison of doubles; in particular,
+the handling of incomparable values (ie: NaN) is undefined.
+
+If you only require an equality comparison, g_variant_equal() is more
+general.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="one">
+<parameter_description> a basic-typed #GVariant instance
+</parameter_description>
+</parameter>
+<parameter name="two">
+<parameter_description> a #GVariant instance of the same type
+</parameter_description>
+</parameter>
+</parameters>
+<return> negative value if a &lt; b;
+zero if a = b;
+positive value if a &gt; b.
+</return>
+</function>
+
 <function name="g_uri_escape_string">
 <description>
 Escapes a string for use in a URI.
@@ -9238,7 +9397,7 @@ Since: 2.16
 </parameter>
 <parameter name="reserved_chars_allowed">
 <parameter_description> a string of reserved characters that are
-allowed to be used.
+allowed to be used, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="allow_utf8">
@@ -9706,7 +9865,7 @@ print_uppercase_words (const gchar *string)
 GRegex *regex;
 GMatchInfo *match_info;
 GError *error = NULL;
- 
+&#160;
 regex = g_regex_new (&quot;[A-Z]+&quot;, 0, 0, NULL);
 g_regex_match_full (regex, string, -1, 0, 0, &amp;match_info, &amp;error);
 while (g_match_info_matches (match_info))
@@ -10689,14 +10848,10 @@ the comparison routine accepts a user data argument.
 <description>
 Ends the builder process and returns the constructed value.
 
-This call automatically reduces the reference count on @builder by
-one, unless it has previously had g_variant_builder_no_autofree()
-called on it.  Unless you've taken other actions, this is usually
-sufficient to free @builder.
-
-Even if additional references are held, it is not permissible to use
-@builder in any way after this call except for further reference
-counting operations.
+It is not permissible to use @builder in any way after this call
+except for reference counting operations (in the case of a
+heap-allocated #GVariantBuilder) or by reinitialising it with
+g_variant_builder_init() (in the case of stack-allocated).
 
 It is an error to call this function in any way that would create an
 inconsistent value to be constructed (ie: insufficient number of
@@ -10974,30 +11129,44 @@ data may be fed to the #GMarkupParseContext; all errors are fatal.
 </return>
 </function>
 
-<function name="g_node_copy_deep">
+<function name="g_io_add_watch_full">
 <description>
-Recursively copies a #GNode and its data.
+Adds the #GIOChannel into the default main loop context
+with the given priority.
 
-Since: 2.4
+This internally creates a main loop source using g_io_create_watch()
+and attaches it to the main loop context with g_source_attach().
+You can do these steps manuallt if you need greater control.
+
 
 </description>
 <parameters>
-<parameter name="node">
-<parameter_description> a #GNode
+<parameter name="channel">
+<parameter_description> a #GIOChannel
 </parameter_description>
 </parameter>
-<parameter name="copy_func">
-<parameter_description> the function which is called to copy the data inside each node,
-or %NULL to use the original data.
+<parameter name="priority">
+<parameter_description> the priority of the #GIOChannel source
 </parameter_description>
 </parameter>
-<parameter name="data">
-<parameter_description> data to pass to @copy_func
+<parameter name="condition">
+<parameter_description> the condition to watch for
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> the function to call when the condition is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @func
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> the function to call when the source is removed
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GNode containing copies of the data in @node.
-
+<return> the event source id
 </return>
 </function>
 
@@ -12931,6 +13100,20 @@ the C library checks only the FAT-style READONLY attribute and does
 not look at the ACL at all. Thus on Windows the protection bits in
 the st_mode field are a fabrication of little use.
 
+On Windows the Microsoft C libraries have several variants of the
+&lt;structname&gt;stat&lt;/structname&gt; struct and stat() function with names
+like &quot;_stat&quot;, &quot;_stat32&quot;, &quot;_stat32i64&quot; and &quot;_stat64i32&quot;. The one
+used here is for 32-bit code the one with 32-bit size and time
+fields, specifically called &quot;_stat32&quot;.
+
+In Microsoft's compiler, by default &quot;struct stat&quot; means one with
+64-bit time fields while in MinGW &quot;struct stat&quot; is the legacy one
+with 32-bit fields. To hopefully clear up this messs, the gstdio.h
+header defines a type GStatBuf which is the appropriate struct type
+depending on the platform and/or compiler being used. On POSIX it
+is just &quot;struct stat&quot;, but note that even on POSIX platforms,
+&quot;stat&quot; might be a macro.
+
 See your C library manual for more details about stat().
 
 Since: 2.6
@@ -14561,6 +14744,29 @@ Since: 2.4
 <return></return>
 </function>
 
+<function name="g_source_set_name_by_id">
+<description>
+Sets the name of a source using its ID.
+
+This is a convenience utility to set source names from the return
+value of g_idle_add(), g_timeout_add(), etc.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="tag">
+<parameter_description> a #GSource ID
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> debug name for the source
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_string_append_c">
 <description>
 Adds a byte onto the end of a #GString, expanding 
@@ -14722,6 +14928,8 @@ lock @lock for reading.
 Similar to g_variant_get_string() except that instead of returning
 a constant string, the string is duplicated.
 
+The string will always be utf8 encoded.
+
 The return value must be freed using g_free().
 
 Since: 2.24
@@ -14737,7 +14945,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string
+<return> a newly allocated string, utf8 encoded
 </return>
 </function>
 
@@ -16902,6 +17110,36 @@ Since: 2.6
 </return>
 </function>
 
+<function name="g_source_set_name">
+<description>
+Sets a name for the source, used in debugging and profiling.
+The name defaults to #NULL.
+
+The source name should describe in a human-readable way
+what the source does. For example, &quot;X11 event queue&quot;
+or &quot;GTK+ repaint idle handler&quot; or whatever it is.
+
+It is permitted to call this function multiple times, but is not
+recommended due to the potential performance impact.  For example,
+one could change the name in the &quot;check&quot; function of a #GSourceFuncs 
+to include details like the event type in the source name.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> debug name for the source
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_value_set_uint64">
 <description>
 Set the contents of a %G_TYPE_UINT64 #GValue to @v_uint64.
@@ -17864,7 +18102,7 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="reserved_chars_allowed">
-<parameter_description> a string of reserved characters allowed to be used
+<parameter_description> a string of reserved characters allowed to be used, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="allow_utf8">
@@ -18989,13 +19227,13 @@ was not found.
 
 <function name="g_string_insert_len">
 <description>
-Inserts @len bytes of @val into @string at @pos.  
-Because @len is provided, @val may contain embedded 
-nuls and need not be nul-terminated. If @pos is -1, 
+Inserts @len bytes of @val into @string at @pos.
+Because @len is provided, @val may contain embedded
+nuls and need not be nul-terminated. If @pos is -1,
 bytes are inserted at the end of the string.
 
-Since this function does not stop at nul bytes, it is 
-the caller's responsibility to ensure that @val has at 
+Since this function does not stop at nul bytes, it is
+the caller's responsibility to ensure that @val has at
 least @len addressable bytes.
 
 
@@ -19006,7 +19244,7 @@ least @len addressable bytes.
 </parameter_description>
 </parameter>
 <parameter name="pos">
-<parameter_description> position in @string where insertion should 
+<parameter_description> position in @string where insertion should
 happen, or -1 for at the end
 </parameter_description>
 </parameter>
@@ -20102,6 +20340,42 @@ The current implementation uses Quick-Sort as sorting algorithm.
 </parameters>
 <return> the #GValueArray passed in as @value_array
 </return>
+</function>
+
+<function name="g_cclosure_marshal_VOID__UCHAR">
+<description>
+A marshaller for a #GCClosure with a callback of type
+&lt;literal&gt;void (*callback) (gpointer instance, guchar arg1, gpointer user_data)&lt;/literal&gt;.
+
+</description>
+<parameters>
+<parameter name="closure">
+<parameter_description> the #GClosure to which the marshaller belongs
+</parameter_description>
+</parameter>
+<parameter name="return_value">
+<parameter_description> ignored
+</parameter_description>
+</parameter>
+<parameter name="n_param_values">
+<parameter_description> 2
+</parameter_description>
+</parameter>
+<parameter name="param_values">
+<parameter_description> a #GValue array holding the instance and the #guchar parameter
+</parameter_description>
+</parameter>
+<parameter name="invocation_hint">
+<parameter_description> the invocation hint given as the last argument
+to g_closure_invoke()
+</parameter_description>
+</parameter>
+<parameter name="marshal_data">
+<parameter_description> additional data specified when registering the marshaller
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_variant_get_child_value">
@@ -21402,19 +21676,22 @@ Since: 2.24
 </return>
 </function>
 
-<function name="g_thread_supported">
+<function name="g_source_get_name">
 <description>
-This function returns %TRUE if the thread system is initialized, and
-%FALSE if it is not.
+Gets a name for the source, used in debugging and profiling.
+The name may be #NULL if it has never been set with
+g_source_set_name().
 
-&lt;note&gt;&lt;para&gt;This function is actually a macro. Apart from taking the
-address of it you can however use it as if it was a
-function.&lt;/para&gt;&lt;/note&gt;
+Since: 2.26
 
 </description>
 <parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
 </parameters>
-<return> %TRUE, if the thread system is initialized.
+<return> the name of the source
 </return>
 </function>
 
@@ -23392,36 +23669,21 @@ or %FALSE if the key was not found or could not be parsed.
 </return>
 </function>
 
-<function name="g_variant_new">
+<function name="g_value_array_new">
 <description>
-Creates a new #GVariant instance.
+Allocate and initialize a new #GValueArray, optionally preserve space
+for @n_prealloced elements. New arrays always contain 0 elements,
+regardless of the value of @n_prealloced.
 
-Think of this function as an analogue to g_strdup_printf().
-
-The type of the created instance and the arguments that are
-expected by this function are determined by @format_string.  See the
-section on &lt;link linkend='gvariant-format-strings'&gt;GVariant Format
-Strings&lt;/link&gt;.  Please note that the syntax of the format string is
-very likely to be extended in the future.
-
-The first character of the format string must not be '*' '?' '@' or
-'r'; in essence, a new #GVariant must always be constructed by this
-function (and not merely passed through it unmodified).
-
-Since: 2.24
 
 </description>
 <parameters>
-<parameter name="format_string">
-<parameter_description> a #GVariant format string
-</parameter_description>
-</parameter>
-<parameter name="Varargs">
-<parameter_description> arguments, as per @format_string
+<parameter name="n_prealloced">
+<parameter_description> number of values to preallocate space for
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new floating #GVariant instance
+<return> a newly allocated #GValueArray with 0 values
 </return>
 </function>
 
@@ -23706,22 +23968,33 @@ Destroys the #GCond.
 <return></return>
 </function>
 
-<function name="g_value_array_new">
+<function name="g_key_file_set_int64">
 <description>
-Allocate and initialize a new #GValueArray, optionally preserve space
-for @n_prealloced elements. New arrays always contain 0 elements,
-regardless of the value of @n_prealloced.
+Associates a new integer value with @key under @group_name.
+If @key cannot be found then it is created.
 
+Since: 2.26
 
 </description>
 <parameters>
-<parameter name="n_prealloced">
-<parameter_description> number of values to preallocate space for
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> an integer value
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated #GValueArray with 0 values
-</return>
+<return></return>
 </function>
 
 <function name="g_strv_length">
@@ -24765,6 +25038,24 @@ Since: 2.8
 </parameters>
 <return> 0 if the directory already exists, or was successfully
 created. Returns -1 if an error occurred, with errno set.
+
+</return>
+</function>
+
+<function name="g_regex_get_compile_flags">
+<description>
+Returns the compile options that @regex was created with.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="regex">
+<parameter_description> a #GRegex
+</parameter_description>
+</parameter>
+</parameters>
+<return> flags from #GRegexCompileFlags
 
 </return>
 </function>
@@ -27132,6 +27423,24 @@ Since: 2.6
 </return>
 </function>
 
+<function name="g_regex_get_match_flags">
+<description>
+Returns the match options that @regex was created with.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="regex">
+<parameter_description> a #GRegex
+</parameter_description>
+</parameter>
+</parameters>
+<return> flags from #GRegexMatchFlags
+
+</return>
+</function>
+
 <function name="g_utf16_to_ucs4">
 <description>
 Convert a string from UTF-16 to UCS-4. The result will be
@@ -28574,8 +28883,7 @@ make_pointless_dictionary (void)
 GVariantBuilder *builder;
 int i;
 
-builder = g_variant_builder_new (G_VARIANT_TYPE_CLASS_ARRAY,
-NULL);
+builder = g_variant_builder_new (G_VARIANT_TYPE_ARRAY);
 for (i = 0; i &lt; 16; i++)
 {
 gchar buf[3];
@@ -31339,7 +31647,7 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="type">
-<parameter_description> a #GVariantType
+<parameter_description> a definite #GVariantType
 </parameter_description>
 </parameter>
 <parameter name="data">
@@ -33325,8 +33633,8 @@ The original intended use of @package was for a short identifier of
 the package, typically the same identifier as used for
 &lt;literal&gt;GETTEXT_PACKAGE&lt;/literal&gt; in software configured using GNU
 autotools. The function first looks in the Windows Registry for the
-value &lt;literal&gt;InstallationDirectory&lt;/literal&gt; in the key
-&lt;literal&gt;HKLM\Software\@package&lt;/literal&gt;, and if that value
+value &lt;literal&gt;&#35;InstallationDirectory&lt;/literal&gt; in the key
+&lt;literal&gt;&#35;HKLM\Software\@package&lt;/literal&gt;, and if that value
 exists and is a string, returns that.
 
 It is strongly recommended that packagers of GLib-using libraries
@@ -33919,6 +34227,39 @@ Frees the memory allocated for the #GRand.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_key_file_get_uint64">
+<description>
+Returns the value associated with @key under @group_name as an unsigned
+64-bit integer. This is similar to g_key_file_get_integer() but can return
+large positive results without truncation.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a non-%NULL #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a non-%NULL group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a non-%NULL key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value associated with the key as an unsigned 64-bit integer,
+or 0 if the key was not found or could not be parsed.
+
+</return>
 </function>
 
 <function name="g_key_file_get_groups">
@@ -34589,6 +34930,39 @@ Get the contents of a %G_TYPE_ENUM #GValue.
 </return>
 </function>
 
+<function name="g_variant_new">
+<description>
+Creates a new #GVariant instance.
+
+Think of this function as an analogue to g_strdup_printf().
+
+The type of the created instance and the arguments that are
+expected by this function are determined by @format_string.  See the
+section on &lt;link linkend='gvariant-format-strings'&gt;GVariant Format
+Strings&lt;/link&gt;.  Please note that the syntax of the format string is
+very likely to be extended in the future.
+
+The first character of the format string must not be '*' '?' '@' or
+'r'; in essence, a new #GVariant must always be constructed by this
+function (and not merely passed through it unmodified).
+
+Since: 2.24
+
+</description>
+<parameters>
+<parameter name="format_string">
+<parameter_description> a #GVariant format string
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> arguments, as per @format_string
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new floating #GVariant instance
+</return>
+</function>
+
 <function name="g_datalist_foreach">
 <description>
 Calls the given function for each data element of the datalist. The
@@ -34717,35 +35091,6 @@ a subparser is pushed.
 </parameter>
 </parameters>
 <return></return>
-</function>
-
-<function name="g_private_new">
-<description>
-Creates a new #GPrivate. If @destructor is non-%NULL, it is a
-pointer to a destructor function. Whenever a thread ends and the
-corresponding pointer keyed to this instance of #GPrivate is
-non-%NULL, the destructor is called with this pointer as the
-argument.
-
-&lt;note&gt;&lt;para&gt;@destructor is used quite differently from @notify in
-g_static_private_set().&lt;/para&gt;&lt;/note&gt;
-
-&lt;note&gt;&lt;para&gt;A #GPrivate can not be freed. Reuse it instead, if you
-can, to avoid shortage, or use #GStaticPrivate.&lt;/para&gt;&lt;/note&gt;
-
-&lt;note&gt;&lt;para&gt;This function will abort if g_thread_init() has not been
-called yet.&lt;/para&gt;&lt;/note&gt;
-
-</description>
-<parameters>
-<parameter name="destructor">
-<parameter_description> a function to destroy the data keyed to #GPrivate when
-a thread ends.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GPrivate.
-</return>
 </function>
 
 <function name="g_direct_equal">
@@ -34880,40 +35225,33 @@ It is usually used after g_slist_remove_link().
 <return></return>
 </function>
 
-<function name="g_cclosure_marshal_VOID__UCHAR">
+<function name="g_private_new">
 <description>
-A marshaller for a #GCClosure with a callback of type
-&lt;literal&gt;void (*callback) (gpointer instance, guchar arg1, gpointer user_data)&lt;/literal&gt;.
+Creates a new #GPrivate. If @destructor is non-%NULL, it is a
+pointer to a destructor function. Whenever a thread ends and the
+corresponding pointer keyed to this instance of #GPrivate is
+non-%NULL, the destructor is called with this pointer as the
+argument.
+
+&lt;note&gt;&lt;para&gt;@destructor is used quite differently from @notify in
+g_static_private_set().&lt;/para&gt;&lt;/note&gt;
+
+&lt;note&gt;&lt;para&gt;A #GPrivate can not be freed. Reuse it instead, if you
+can, to avoid shortage, or use #GStaticPrivate.&lt;/para&gt;&lt;/note&gt;
+
+&lt;note&gt;&lt;para&gt;This function will abort if g_thread_init() has not been
+called yet.&lt;/para&gt;&lt;/note&gt;
 
 </description>
 <parameters>
-<parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
-</parameter_description>
-</parameter>
-<parameter name="return_value">
-<parameter_description> ignored
-</parameter_description>
-</parameter>
-<parameter name="n_param_values">
-<parameter_description> 2
-</parameter_description>
-</parameter>
-<parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #guchar parameter
-</parameter_description>
-</parameter>
-<parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
-</parameter_description>
-</parameter>
-<parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter name="destructor">
+<parameter_description> a function to destroy the data keyed to #GPrivate when
+a thread ends.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a new #GPrivate.
+</return>
 </function>
 
 <function name="g_array_prepend_vals">
@@ -35535,6 +35873,33 @@ URI cannot be found.
 </return>
 </function>
 
+<function name="g_variant_new_byte_array">
+<description>
+Constructs an array of bytes #GVariant from the given array of bytes.
+
+If @length is -1 then @array is taken to be a normal C string (in the
+sense that it is terminated by a nul character).  The nul character
+is included in the array.  If length is not -1 then it gives the
+length of @array which may then contain nul chracters with no special
+meaning.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a pointer to an array of bytes
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of @array, or -1
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new floating #GVariant instance
+</return>
+</function>
+
 <function name="g_strrstr_len">
 <description>
 Searches the string @haystack for the last occurrence
@@ -35630,12 +35995,14 @@ Flushes the write buffer for the GIOChannel.
 <description>
 Creates a string #GVariant with the contents of @string.
 
+@string must be valid utf8.
+
 Since: 2.24
 
 </description>
 <parameters>
 <parameter name="string">
-<parameter_description> a normal C nul-terminated string
+<parameter_description> a normal utf8 nul-terminated string
 </parameter_description>
 </parameter>
 </parameters>
@@ -36665,47 +37032,6 @@ Get the contents of a %G_TYPE_OBJECT derived #GValue.
 </parameter>
 </parameters>
 <return> object contents of @value
-</return>
-</function>
-
-<function name="g_io_add_watch_full">
-<description>
-Adds the #GIOChannel into the default main loop context
-with the given priority.
-
-This internally creates a main loop source using g_io_create_watch()
-and attaches it to the main loop context with g_source_attach().
-You can do these steps manuallt if you need greater control.
-
-
-</description>
-<parameters>
-<parameter name="channel">
-<parameter_description> a #GIOChannel
-</parameter_description>
-</parameter>
-<parameter name="priority">
-<parameter_description> the priority of the #GIOChannel source
-</parameter_description>
-</parameter>
-<parameter name="condition">
-<parameter_description> the condition to watch for
-</parameter_description>
-</parameter>
-<parameter name="func">
-<parameter_description> the function to call when the condition is satisfied
-</parameter_description>
-</parameter>
-<parameter name="user_data">
-<parameter_description> user data to pass to @func
-</parameter_description>
-</parameter>
-<parameter name="notify">
-<parameter_description> the function to call when the source is removed
-</parameter_description>
-</parameter>
-</parameters>
-<return> the event source id
 </return>
 </function>
 

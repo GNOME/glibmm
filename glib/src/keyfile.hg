@@ -97,6 +97,9 @@ class KeyFile
   _CLASS_GENERIC(KeyFile, GKeyFile)
 public:
 
+  //TODO: Maybe replace all the get_*/set_* methods with some generic get/set
+  //methods when it is possible.
+
   /** Creates a new, empty KeyFile object.
    */
   KeyFile();
@@ -184,6 +187,16 @@ public:
   _IGNORE(g_key_file_get_locale_string)
 
   _WRAP_METHOD(Glib::ustring get_locale_string(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale) const, g_key_file_get_locale_string, errthrow)
+
+  /** Gets the value in the first group, under @a key, interpreting it as
+   * a boolean.
+   * @param key The name of the key.
+   * @return The value of @a key as a boolean.
+   * @throw Glib::KeyFileError.
+   * @newin{2,6}
+   */
+  bool get_boolean(const Glib::ustring& key) const;
+
   _WRAP_METHOD(bool get_boolean(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_boolean, errthrow)
 
   /** Gets the value in the first group, under @a key, interpreting it as
@@ -191,9 +204,37 @@ public:
    * @param key The name of the key
    * @return The value of @a key as an integer
    * @throw Glib::KeyFileError
+   * @newin{2,6}
    */
   int get_integer(const Glib::ustring& key) const;
+
   _WRAP_METHOD(int get_integer(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_integer, errthrow)
+
+  /** Gets the value in the first group, under @a key, interpreting it as
+   * a signed 64-bit integer. This is similar to get_integer() but can return
+   * 64-bit results without truncation.
+   * @param key The name of the key.
+   * @return The value of @a key as a signed 64-bit integer, or <tt>0</tt> if
+   * the key was not found or could not be parsed.
+   * @throw Glib::KeyFileError.
+   * @newin{2,26}
+   */
+  gint64 get_int64(const Glib::ustring& key) const;
+
+  _WRAP_METHOD(gint64 get_int64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_int64, errthrow)
+
+  /** Gets the value in the first group, under @a key, interpreting it as
+   * an unsigned 64-bit integer. This is similar to get_integer() but can
+   * return large positive results without truncation.
+   * @param key The name of the key.
+   * @return The value of @a key as an unsigned 64-bit integer, or <tt>0</tt>
+   * if the key was not found or could not be parsed.
+   * @throw Glib::KeyFileError.
+   * @newin{2,26}
+   */
+  guint64 get_uint64(const Glib::ustring& key) const;
+
+  _WRAP_METHOD(guint64 get_uint64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_uint64, errthrow)
 
   /** Gets the value in the first group, under @a key, interpreting it as
    * a double.
@@ -204,6 +245,7 @@ public:
    * @newin{2,14}
    */
   double get_double(const Glib::ustring& key) const;
+
   _WRAP_METHOD(double get_double(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_double, errthrow)
 
   _WRAP_METHOD(void set_double(const Glib::ustring& group_name, const Glib::ustring& key, double value), g_key_file_set_double)
@@ -294,6 +336,8 @@ public:
   _WRAP_METHOD(void set_locale_string(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale, const Glib::ustring& string), g_key_file_set_locale_string)
   _WRAP_METHOD(void set_boolean(const Glib::ustring& group_name, const Glib::ustring& key, bool value), g_key_file_set_boolean)
   _WRAP_METHOD(void set_integer(const Glib::ustring& group_name, const Glib::ustring& key, int value), g_key_file_set_integer)
+  _WRAP_METHOD(void set_int64(const Glib::ustring& group_name, const Glib::ustring& key, gint64 value), g_key_file_set_int64)
+  _WRAP_METHOD(void set_uint64(const Glib::ustring& group_name, const Glib::ustring& key, guint64 value), g_key_file_set_uint64)
 	
   /** Sets a list of string values for @a key under @a group_name. If 
    * key cannot be found it is created. If @a group_name cannot be found
