@@ -9,15 +9,15 @@ Glib::RefPtr<Settings> Settings::create_with_context(const Glib::ustring& schema
     return Glib::RefPtr<Settings>(new Settings(g_settings_new_with_context(schema.c_str(), context.c_str())));
 }
 
-Glib::ArrayHandle<Glib::ustring> Settings::get_strv(const Glib::ustring& key)
-  const
+Glib::ArrayHandle<Glib::ustring>
+  Settings::get_string_array(const Glib::ustring& key) const
 {
   gchar** result = g_settings_get_strv(const_cast<GSettings*>(gobj()),
     key.c_str(), 0);
   return Glib::ArrayHandle<Glib::ustring>(result, Glib::OWNERSHIP_DEEP);
 }
 
-bool Settings::set_strv(const Glib::ustring& key,
+bool Settings::set_string_array(const Glib::ustring& key,
   const Glib::ArrayHandle<Glib::ustring>& value)
 {
   return g_settings_set_strv(gobj(), key.c_str(), value.data(), value.size());
