@@ -38,7 +38,7 @@ static void on_key_changed(const Glib::ustring& key, const Glib::RefPtr<Gio::Set
         std::cerr << "Unknown key\n";
 }
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** argv)
 {
     Glib::init();
 
