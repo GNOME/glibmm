@@ -15,7 +15,7 @@ dnl // Define a new Doxygen group if this is the first enum in the file.
 dnl
 m4_ifdef(`__DOCGROUP_'__MODULE_CANONICAL__`_ENUMS__',,`dnl else
 m4_define(`__DOCGROUP_'__MODULE_CANONICAL__`_ENUMS__')dnl
-/** @addtogroup '__MODULE_CANONICAL__`Enums Enums and Flags */
+/** @addtogroup '__MODULE_CANONICAL__`Enums __MODULE_CANONICAL__ Enums and Flags */
 
 ')dnl endif
 dnl
