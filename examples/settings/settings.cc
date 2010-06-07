@@ -22,36 +22,36 @@
 #include <giomm.h>
 #include <iostream>
 
-const char* STRING_KEY = "test-string";
-const char* INT_KEY = "test-int";
+const char *const STRING_KEY = "test-string";
+const char *const INT_KEY = "test-int";
 
 static void on_key_changed(const Glib::ustring& key, const Glib::RefPtr<Gio::Settings>& settings)
 {
     std::cout << Glib::ustring::compose("'%1' changed\n", key);
-    if (key == STRING_KEY)
+    if (key.raw() == STRING_KEY)
         std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
                                             key, settings->get_string(key));
-    else if (key == INT_KEY)
+    else if (key.raw() == INT_KEY)
         std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
                                             key, settings->get_int(key));
     else
         std::cerr << "Unknown key\n";
 }
 
-int main(int /* argc */, char** argv)
+int main(int, char**)
 {
-    Glib::init();
+    std::locale::global(std::locale(""));
+    Gio::init();
 
     // this is only a demo so we don't want to rely on an installed schema.
     // Instead we set some environment variables that allow us to test things
     // from the source directory.  We need to strip off the .libs/ directory
     // first (thus the '..').  Generally you would install your schemas to the system schema
     // directory
-    std::string dirname = Glib::build_filename(Glib::path_get_dirname(argv[0]), "..");
-    Glib::setenv ("GSETTINGS_SCHEMA_DIR", dirname, TRUE);
-    Glib::setenv ("GSETTINGS_BACKEND", "memory", TRUE);
+    Glib::setenv("GSETTINGS_SCHEMA_DIR", ".", true);
+    Glib::setenv("GSETTINGS_BACKEND", "memory", true);
 
-    Glib::RefPtr<Gio::Settings> settings =
+    const Glib::RefPtr<Gio::Settings> settings =
         Gio::Settings::create("org.gtkmm.demo");
 
     settings->signal_changed().connect(sigc::bind(sigc::ptr_fun(&on_key_changed), settings));

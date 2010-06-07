@@ -24,8 +24,8 @@ check_PROGRAMS =			\
 	keyfile/example			\
 	markup/parser			\
 	network/resolver		\
-	network/socket-client	\
-	network/socket-server	\
+	network/socket-client		\
+	network/socket-server		\
 	options/example			\
 	properties/example		\
 	regex/example			\
@@ -72,14 +72,19 @@ thread_threadpool_SOURCES  = thread/threadpool.cc
 thread_threadpool_LDADD    = $(thread_ldadd)
 
 network_resolver_SOURCES   = network/resolver.cc
-network_resolver_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
-network_socket_client_SOURCES   = network/socket-client.cc
-network_socket_client_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
-network_socket_server_SOURCES   = network/socket-server.cc
-network_socket_server_LDADD     = $(giomm_ldadd) $(GTHREAD_LIBS)
-
-gsettings_SCHEMAS = $(wildcard settings/*.gschema.xml)
-@GSETTINGS_RULES@
+network_resolver_LDADD     = $(giomm_ldadd)
+network_socket_client_SOURCES = network/socket-client.cc
+network_socket_client_LDADD   = $(giomm_ldadd)
+network_socket_server_SOURCES = network/socket-server.cc
+network_socket_server_LDADD   = $(giomm_ldadd)
 
 settings_settings_SOURCES = settings/settings.cc
 settings_settings_LDADD   = $(giomm_ldadd)
+
+dist_noinst_DATA = settings/org.gtkmm.demo.gschema.xml
+CLEANFILES = settings/gschemas.compiled
+
+settings/gschemas.compiled: $(srcdir)/settings/org.gtkmm.demo.gschema.xml
+	$(AM_V_GEN)glib-compile-schemas --targetdir=settings $(srcdir)/settings
+
+all-local: settings/gschemas.compiled

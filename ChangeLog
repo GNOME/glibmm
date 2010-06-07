@@ -1,3 +1,21 @@
+2010-06-07  Daniel Elstner  <danielk@openismus.com>
+
+	Do not install the schema of the gsettings example
+
+	* examples/Makefile.am: Do not install the schema file of the settings
+	example to the user's system.  Instead, compile the binary shema cache
+	in a local directory and have the example use that.  As a side effect,
+	this also resolves the "make distcheck" failure when trying to install
+	the schema.
+	* examples/settings/settings.cc (main): Do not try to determine the
+	schema directory from the executable name, as it depends too much on
+	the libtool setup with the hidden .libs directory being part of the
+	path name.  Requiring the user to change to the example directory is
+	good enough.  Also, initialize the C++ locale on program startup, and
+	call Gio::init() instead of Glib::init().
+	(on_key_changed): Call ustring::raw() to suppress the locale-aware
+	comparison ustring performs by default.
+
 2010-06-06  Murray Cumming  <murrayc@murrayc.com>
 
 	Documentation: Mention module names in Enums and Flags doxygen groups.
