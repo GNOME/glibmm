@@ -24,8 +24,8 @@
  *
  * @section description Description
  *
- * glibmm is the official C++ interface for the popular cross-platform library %Glib. 
- * It provides non-UI API that is not available in standard C++ and makes it 
+ * glibmm is the official C++ interface for the popular cross-platform library %Glib.
+ * It provides non-UI API that is not available in standard C++ and makes it
  * possible for gtkmm to wrap GObject-based APIs.
  * See also the <a href="http://library.gnome.org/devel/gtkmm-tutorial/stable/">
  * Programming with gtkmm</a> book for a tutorial on programming with gtkmm and
@@ -96,7 +96,6 @@
 #include <glibmm/iochannel.h>
 #include <glibmm/init.h>
 #include <glibmm/keyfile.h>
-#include <glibmm/streamiochannel.h>
 #include <glibmm/listhandle.h>
 #include <glibmm/main.h>
 #include <glibmm/markup.h>

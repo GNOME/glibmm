@@ -19,11 +19,6 @@
 
 _DEFS(glibmm,glib)
 
-#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
-/* So we can use deprecated functions in our deprecated methods */
-#undef G_DISABLE_DEPRECATED
-#m4 _POP()
-
 #include <glibmmconfig.h>
 #include <glibmm/ustring.h>
 #include <glib.h>
@@ -114,23 +109,6 @@ public:
    * @param str String to parse.
    */
   void set_parse (const Glib::ustring& str);
-
-
-  _DEPRECATE_IFDEF_START
-  
-  //Avoid a build problem in the case that time_t is equivalent to guint32 (GTime is also guint32)
-  //That would make the set_time() method overload impossible.
-  #ifdef GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32
-  /** Sets the value of a date from a GTime (time_t) value. 
-   *
-   * @param time GTime value to set.
-   *
-   * @deprecated Please use set_time(time_t) or set_time(const GTimeVal&).
-   */
-  void set_time(GTime time);
-  #endif //GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32
-
-  _DEPRECATE_IFDEF_END
 
 
   /** Sets the value of a date from a <type>time_t</type> value. 
