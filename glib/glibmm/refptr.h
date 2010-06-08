@@ -55,7 +55,7 @@ public:
    * Afterwards it will be null and use of -> will cause a segmentation fault.
    */
   inline RefPtr();
-  
+
   /// Destructor - decrements reference count.
   inline ~RefPtr();
 
@@ -94,7 +94,7 @@ public:
 
   /// Tests whether the RefPtr<> point to the same underlying instance.
   inline bool operator==(const RefPtr<T_CppObject>& src) const;
-  
+
   /// See operator==().
   inline bool operator!=(const RefPtr<T_CppObject>& src) const;
 
@@ -115,11 +115,6 @@ public:
    */
   inline operator bool() const;
 
-#ifndef GLIBMM_DISABLE_DEPRECATED
-  /// @deprecated Use reset() instead because this leads to confusion with clear() methods on the underlying class. For instance, people use .clear() when they mean ->clear().
-  inline void clear();
-#endif //GLIBMM_DISABLE_DEPRECATED
-
   /** Set underlying instance to 0, decrementing reference count of existing instance appropriately.
    * @newin{2,16}
    */
@@ -137,7 +132,7 @@ public:
 
   /** Static cast to derived class.
    *
-   * Like the dynamic cast; the notation is 
+   * Like the dynamic cast; the notation is
    * @code
    *   ptr_derived = RefPtr<Derived>::cast_static(ptr_base);
    * @endcode
@@ -284,14 +279,6 @@ RefPtr<T_CppObject>::operator bool() const
   return (pCppObject_ != 0);
 }
 
-#ifndef GLIBMM_DISABLE_DEPRECATED
-template <class T_CppObject> inline
-void RefPtr<T_CppObject>::clear()
-{
-  reset();
-}
-#endif //GLIBMM_DISABLE_DEPRECATED
-
 template <class T_CppObject> inline
 void RefPtr<T_CppObject>::reset()
 {
@@ -351,4 +338,3 @@ void swap(RefPtr<T_CppObject>& lhs, RefPtr<T_CppObject>& rhs)
 
 
 #endif /* _GLIBMM_REFPTR_H */
-
