@@ -37,12 +37,12 @@ namespace Glib
  */
 _WRAP_GERROR(KeyFileError, GKeyFileError, G_KEY_FILE_ERROR, NO_GTYPE)
 
-/** This class lets you parse, edit or create files containing groups of key-value pairs, which we call key files 
- * for lack of a better name. Several freedesktop.org specifications use key files now, e.g the Desktop Entry 
+/** This class lets you parse, edit or create files containing groups of key-value pairs, which we call key files
+ * for lack of a better name. Several freedesktop.org specifications use key files now, e.g the Desktop Entry
  * Specification and the Icon Theme Specification.
  *
- * The syntax of key files is described in detail in the Desktop Entry Specification, here is a quick summary: Key  
- * files consists of groups of key-value pairs, interspersed with comments. 
+ * The syntax of key files is described in detail in the Desktop Entry Specification, here is a quick summary: Key
+ * files consists of groups of key-value pairs, interspersed with comments.
  *
  * @code
  * # this is just an example
@@ -67,28 +67,28 @@ _WRAP_GERROR(KeyFileError, GKeyFileError, G_KEY_FILE_ERROR, NO_GTYPE)
  *
  * Lines beginning with a '#' and blank lines are considered comments.
  *
- * Groups are started by a header line containing the group name enclosed in '[' and ']', and ended implicitly by 
+ * Groups are started by a header line containing the group name enclosed in '[' and ']', and ended implicitly by
  * the start of the next group or the end of the file. Each key-value pair must be contained in a group.
- * 
- * Key-value pairs generally have the form key=value, with the exception of localized strings, which have the form 
- * key[locale]=value. Space before and after the '=' character are ignored. Newline, tab, carriage return and 
- * backslash characters in value are escaped as \\n, \\t, \\r, and \\\\, respectively. To preserve leading spaces in 
+ *
+ * Key-value pairs generally have the form key=value, with the exception of localized strings, which have the form
+ * key[locale]=value. Space before and after the '=' character are ignored. Newline, tab, carriage return and
+ * backslash characters in value are escaped as \\n, \\t, \\r, and \\\\, respectively. To preserve leading spaces in
  * values, these can also be escaped as \\s.
- * 
- * Key files can store strings (possibly with localized variants), integers, booleans and lists of these. Lists are 
- * separated by a separator character, typically ';' or ','. To use the list separator character in a value in a 
+ *
+ * Key files can store strings (possibly with localized variants), integers, booleans and lists of these. Lists are
+ * separated by a separator character, typically ';' or ','. To use the list separator character in a value in a
  * list, it has to be escaped by prefixing it with a backslash.
- * 
- * This syntax is obviously inspired by the .ini files commonly met on Windows, but there are some important 
+ *
+ * This syntax is obviously inspired by the .ini files commonly met on Windows, but there are some important
  * differences:
  * - .ini files use the ';' character to begin comments, key files use the '#' character.
  * - Key files allow only comments before the first group.
  * - Key files are always encoded in UTF-8.
  * - Key and Group names are case-sensitive, for example a group called [GROUP] is a different group from [group].
- * 
- * Note that in contrast to the Desktop Entry Specification, groups in key files may contain the same key multiple 
- * times; the last entry wins. Key files may also contain multiple groups with the same name; they are merged 
- * together. Another difference is that keys and group names in key files are not restricted to ASCII characters. 
+ *
+ * Note that in contrast to the Desktop Entry Specification, groups in key files may contain the same key multiple
+ * times; the last entry wins. Key files may also contain multiple groups with the same name; they are merged
+ * together. Another difference is that keys and group names in key files are not restricted to ASCII characters.
  *
  * @newin{2,14}
  */
@@ -110,7 +110,7 @@ public:
   _IGNORE(g_key_file_free)
 
   /** Creates a glibmm KeyFile wrapper for a GKeyFile object.
-   * Note, when using this that when the wrapper is deleted, 
+   * Note, when using this that when the wrapper is deleted,
    * it will not automatically deleted the GKeyFile unless you
    * set the delete_c_instance boolean to true.
    * @param castitem The C instance to wrap
@@ -120,7 +120,7 @@ public:
   KeyFile(GKeyFile* castitem, bool takes_ownership = false);
 
 public:
-  _WRAP_METHOD(bool load_from_file(const std::string& filename, KeyFileFlags flags = Glib::KEY_FILE_NONE), g_key_file_load_from_file, errthrow)
+  _WRAP_METHOD(void load_from_file(const std::string& filename, KeyFileFlags flags = Glib::KEY_FILE_NONE), g_key_file_load_from_file, errthrow)
 
   /** Loads a KeyFile from memory
    * @param data The data to use as a KeyFile
@@ -128,7 +128,7 @@ public:
    * @return true if the KeyFile was successfully loaded, false otherwise
    * @throw Glib::KeyFileError
    */
-  bool load_from_data(const Glib::ustring& data, KeyFileFlags flags = Glib::KEY_FILE_NONE);
+  void load_from_data(const Glib::ustring& data, KeyFileFlags flags = Glib::KEY_FILE_NONE);
   _IGNORE(g_key_file_load_from_data)
 
 #m4 _CONVERSION(`const Glib::ArrayHandle<std::string>&', `const gchar**', `const_cast<const gchar**>($3.data())')
@@ -146,7 +146,7 @@ public:
    * @throw Glib::KeyFileError
    * @throw Glib::FileError
    */
-  bool load_from_data_dirs(const std::string& file, std::string& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE);
+  void load_from_data_dirs(const std::string& file, std::string& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE);
   _IGNORE(g_key_file_load_from_data_dirs)
 
   /** Outputs the KeyFile as a string
@@ -157,7 +157,7 @@ public:
   _IGNORE(g_key_file_to_data)
 
   _WRAP_METHOD(Glib::ustring get_start_group() const, g_key_file_get_start_group)
-	
+
   /** Gets a list of all groups in the KeyFile
    * @returns A list containing the names of the groups
    */
@@ -174,7 +174,7 @@ public:
 
   _WRAP_METHOD(bool has_group(const Glib::ustring& group_name) const, g_key_file_has_group)
   _WRAP_METHOD(bool has_key(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_has_key, errthrow)
-	
+
   _WRAP_METHOD(Glib::ustring get_value(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_value, errthrow)
   _WRAP_METHOD(Glib::ustring get_string(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_string, errthrow)
 
@@ -252,7 +252,7 @@ public:
 
   /** Associates a new double value with @a key under the start group.
    * If @a key  cannot be found then it is created.
-   * 
+   *
    * @newin{2,12}
    * @param key A key.
    * @param value An double value.
@@ -267,7 +267,7 @@ public:
    */
   Glib::ArrayHandle<Glib::ustring> get_string_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
   _IGNORE(g_key_file_get_string_list)
-	
+
   /** Returns the values associated with @a key under @a group_name
    * translated into the current locale, if available.
    * @param group_name The name of a group
@@ -329,7 +329,7 @@ public:
   Glib::ustring get_comment(const Glib::ustring& group_name) const;
 
   _WRAP_METHOD(Glib::ustring get_comment(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_comment, errthrow)
-	
+
   _WRAP_METHOD(void set_list_separator(gchar separator), g_key_file_set_list_separator)
   _WRAP_METHOD(void set_value(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& value), g_key_file_set_value)
   _WRAP_METHOD(void set_string(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& string), g_key_file_set_string)
@@ -338,8 +338,8 @@ public:
   _WRAP_METHOD(void set_integer(const Glib::ustring& group_name, const Glib::ustring& key, int value), g_key_file_set_integer)
   _WRAP_METHOD(void set_int64(const Glib::ustring& group_name, const Glib::ustring& key, gint64 value), g_key_file_set_int64)
   _WRAP_METHOD(void set_uint64(const Glib::ustring& group_name, const Glib::ustring& key, guint64 value), g_key_file_set_uint64)
-	
-  /** Sets a list of string values for @a key under @a group_name. If 
+
+  /** Sets a list of string values for @a key under @a group_name. If
    * key cannot be found it is created. If @a group_name cannot be found
    * it is created.
    * @param group_name The name of a group
@@ -368,7 +368,7 @@ public:
    */
   void set_boolean_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ArrayHandle<bool>& list);
   _IGNORE(g_key_file_set_boolean_list)
-	
+
   /** Sets a list of integers for the @a key under @a group_name.
    * If either the @a key or @a group_name cannot be found they are created.
    * @param group_name The name of a group
@@ -423,4 +423,3 @@ private:
 };
 
 } // namespace Glib
-

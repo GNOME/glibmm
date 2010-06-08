@@ -38,7 +38,7 @@ KeyFile::~KeyFile()
     g_key_file_free(gobject_);
 }
 
-bool KeyFile::load_from_data(const Glib::ustring& data, KeyFileFlags flags)
+void KeyFile::load_from_data(const Glib::ustring& data, KeyFileFlags flags)
 {
   GError* gerror = 0;
 
@@ -49,11 +49,9 @@ bool KeyFile::load_from_data(const Glib::ustring& data, KeyFileFlags flags)
 
   if(gerror)
     Glib::Error::throw_exception(gerror);
-
-  return (result != 0);
 }
 
-bool KeyFile::load_from_data_dirs(const std::string& file, std::string& full_path, KeyFileFlags flags)
+void KeyFile::load_from_data_dirs(const std::string& file, std::string& full_path, KeyFileFlags flags)
 {
   GError* gerror = 0;
   char* full_path_c = 0;
@@ -70,8 +68,6 @@ bool KeyFile::load_from_data_dirs(const std::string& file, std::string& full_pat
     full_path = Glib::ScopedPtr<char>(full_path_c).get();
   else
     full_path.erase();
-
-  return (result != 0);
 }
 
 Glib::ustring KeyFile::to_data()
@@ -128,7 +124,7 @@ bool KeyFile::get_boolean(const Glib::ustring& key) const
 {
   GError* gerror = 0;
   const bool value =
-    static_cast<bool>(g_key_file_get_boolean(const_cast<GKeyFile*>(gobj()), 
+    static_cast<bool>(g_key_file_get_boolean(const_cast<GKeyFile*>(gobj()),
     0, key.c_str(), &gerror));
   if(gerror)
     Glib::Error::throw_exception(gerror);
@@ -186,7 +182,7 @@ double KeyFile::get_double(const Glib::ustring& key) const
 
 void KeyFile::set_double(const Glib::ustring& key, double value)
 {
-  g_key_file_set_double(gobj(), 0, key.c_str(), value); 
+  g_key_file_set_double(gobj(), 0, key.c_str(), value);
 }
 
 # define GLIBMM_ERROR_ARG
