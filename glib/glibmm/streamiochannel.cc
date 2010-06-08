@@ -25,6 +25,8 @@
 namespace Glib
 {
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
+
 // static
 Glib::RefPtr<StreamIOChannel> StreamIOChannel::create(std::istream& stream)
 {
@@ -189,5 +191,6 @@ Glib::RefPtr<Glib::Source> StreamIOChannel::create_watch_vfunc(IOCondition)
   return Glib::RefPtr<Glib::Source>();
 }
 
-} // namespace Glib
+#endif //GLIBMM_DISABLE_DEPRECATED
 
+} // namespace Glib

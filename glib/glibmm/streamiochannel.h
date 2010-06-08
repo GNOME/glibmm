@@ -27,8 +27,9 @@
 namespace Glib
 {
 
-/** This whole class is deprecated in glibmm&nbsp;2.2.
- * See the Glib::IOChannel documentation for an explanation.
+#ifndef GLIBMM_DISABLE_DEPRECATED
+
+/** @deprecated This whole class was deprecated in glibmm 2.2 - See the Glib::IOChannel documentation for an explanation.
  */
 class StreamIOChannel : public Glib::IOChannel
 {
@@ -53,6 +54,8 @@ protected:
   virtual IOFlags  get_flags_vfunc();
   virtual Glib::RefPtr<Glib::Source> create_watch_vfunc(IOCondition cond);
 };
+
+#endif //#GLIBMM_DISABLE_DEPRECATED
 
 } // namespace Glib
 
