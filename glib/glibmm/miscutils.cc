@@ -106,9 +106,9 @@ std::string get_current_dir()
   return convert_return_gchar_ptr_to_stdstring(g_get_current_dir());
 }
 
-std::string get_user_special_dir(GUserDirectory directory)
+std::string get_user_special_dir(UserDirectory directory)
 {
-  return convert_const_gchar_ptr_to_stdstring(g_get_user_special_dir(directory));
+  return convert_const_gchar_ptr_to_stdstring(g_get_user_special_dir((GUserDirectory)directory));
 }
 
 std::string get_user_data_dir()

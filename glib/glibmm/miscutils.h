@@ -168,9 +168,6 @@ std::string get_tmp_dir();
  */
 std::string get_current_dir();
 
-//TODO: We could create a C++ enum to wrap the C GUserDirectory enum,
-//but we would have to either be very careful, or define the enum 
-//values in terms of the C enums anyway.
 /** Returns the full path of a special directory using its logical id.
  *
  * On Unix this is done using the XDG special user directories.
@@ -184,7 +181,7 @@ std::string get_current_dir();
  * 
  * @newin{2,14}
  */
-std::string get_user_special_dir(GUserDirectory directory);
+std::string get_user_special_dir(UserDirectory directory);
 
 /** Returns a base directory in which to access application data such as icons
  * that is customized for a particular user.
