@@ -1,0 +1,66 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+#include <glibmm/interface.h>
+#include <glibmm/object.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+//Allow us to use g_settings_backend_get_type.
+//TODO: Find out if we should be able to implement backends outside of gio.
+//And if not, add an option to _CLASS_INTERFACE to avoid using it.
+#define G_SETTINGS_ENABLE_BACKEND 1
+#include <gio/gsettingsbackend.h>
+#include <gio/gio.h>
+#m4 _POP()
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GSettingsBackendClass GSettingsBackendClass;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+/** TODO
+ */
+class SettingsBackend : public Glib::Interface
+{
+  _CLASS_INTERFACE(SettingsBackend, GSettingsBackend, G_SETTINGS_BACKEND, GSettingsBackendClass)
+
+public:
+
+  _WRAP_METHOD(void backend_changed(const Glib::ustring& key, gpointer origin_tag), g_settings_backend_changed)
+  _WRAP_METHOD(void path_changed(const Glib::ustring& path, gpointer origin_tag), g_settings_backend_path_changed)
+
+  //TODO: Use an ArrayHandle?
+  //_WRAP_METHOD(void keys_changed(const Glib::ustring& path, gchar const * const *items, gpointer origin_tag), g_settings_backend_keys_changed)
+
+  _WRAP_METHOD(void path_writable_changed(const Glib::ustring& path), g_settings_backend_path_writable_changed)
+  _WRAP_METHOD(void writable_changed(const Glib::ustring& key), g_settings_backend_writable_changed)
+
+  //TODO: Use the glibmm wrapper of GTree:
+  _WRAP_METHOD(void hanged_tree(GTree *tree, gpointer origin_tag), g_settings_backend_changed_tree)
+
+    //TODO: Vfuncs?
+};
+
+} // namespace Gio

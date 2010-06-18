@@ -128,6 +128,7 @@ _CONVERSION(`const Glib::RefPtr<OutputStream>&',`GOutputStream*',__CONVERT_CONST
 #Settings
 _CONVERSION(`GSettings*',`Glib::RefPtr<Settings>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::StringArrayHandle&',`const gchar*-const*',`($3).data()')
+_CONVERSION(`const Glib::RefPtr<SettingsBackend>&',`GSettingsBackend*',__CONVERT_REFPTR_TO_P)
 
 #Socket
 _CONVERSION(`const Glib::RefPtr<Socket>&',`GSocket*',__CONVERT_CONST_REFPTR_TO_P)
@@ -158,4 +159,3 @@ _CONVERSION(`const Glib::RefPtr<Volume>&',`GVolume*',__CONVERT_CONST_REFPTR_TO_P
 
 #Vfs
 _CONVERSION(`GVfs*', `Glib::RefPtr<Vfs>', `Glib::wrap($3)')
-

@@ -13,6 +13,13 @@
   (gtype-id "G_TYPE_APP_LAUNCH_CONTEXT")
 )
 
+(define-object n
+  (in-module "GApplicatio")
+  (parent "GObject")
+  (c-name "GApplication")
+  (gtype-id "G_TYPE_APPLICATION")
+)
+
 (define-object Initable
   (in-module "GAsync")
   (c-name "GAsyncInitable")
@@ -36,6 +43,55 @@
   (in-module "GConverte")
   (c-name "GConverter")
   (gtype-id "G_TYPE_CONVERTER")
+)
+
+(define-object s
+  (in-module "GCredential")
+  (parent "GObject")
+  (c-name "GCredentials")
+  (gtype-id "G_TYPE_CREDENTIALS")
+)
+
+(define-object AuthObserver
+  (in-module "GDBus")
+  (parent "GObject")
+  (c-name "GDBusAuthObserver")
+  (gtype-id "G_TYPE_D_BUS_AUTH_OBSERVER")
+)
+
+(define-object Connection
+  (in-module "GDBus")
+  (parent "GObject")
+  (c-name "GDBusConnection")
+  (gtype-id "G_TYPE_D_BUS_CONNECTION")
+)
+
+(define-object Message
+  (in-module "GDBus")
+  (parent "GObject")
+  (c-name "GDBusMessage")
+  (gtype-id "G_TYPE_D_BUS_MESSAGE")
+)
+
+(define-object MethodInvocation
+  (in-module "GDBus")
+  (parent "GObject")
+  (c-name "GDBusMethodInvocation")
+  (gtype-id "G_TYPE_D_BUS_METHOD_INVOCATION")
+)
+
+(define-object Proxy
+  (in-module "GDBus")
+  (parent "GObject")
+  (c-name "GDBusProxy")
+  (gtype-id "G_TYPE_D_BUS_PROXY")
+)
+
+(define-object Server
+  (in-module "GDBus")
+  (parent "GObject")
+  (c-name "GDBusServer")
+  (gtype-id "G_TYPE_D_BUS_SERVER")
 )
 
 (define-object AppInfoLookup
@@ -240,6 +296,13 @@
   (gtype-id "G_TYPE_FILE_OUTPUT_STREAM")
 )
 
+(define-object n
+  (in-module "GPermissio")
+  (parent "GObject")
+  (c-name "GPermission")
+  (gtype-id "G_TYPE_PERMISSION")
+)
+
 (define-object r
   (in-module "GResolve")
   (parent "GObject")
@@ -355,6 +418,13 @@
   (parent "GSocketConnection")
   (c-name "GUnixConnection")
   (gtype-id "G_TYPE_UNIX_CONNECTION")
+)
+
+(define-object CredentialsMessage
+  (in-module "GUnix")
+  (parent "GSocketControlMessage")
+  (c-name "GUnixCredentialsMessage")
+  (gtype-id "G_TYPE_UNIX_CREDENTIALS_MESSAGE")
 )
 
 (define-object FDList
@@ -696,6 +766,7 @@
     '("address-in-use" "G_IO_ERROR_ADDRESS_IN_USE")
     '("partial-input" "G_IO_ERROR_PARTIAL_INPUT")
     '("invalid-data" "G_IO_ERROR_INVALID_DATA")
+    '("dbus-error" "G_IO_ERROR_DBUS_ERROR")
   )
 )
 
@@ -825,6 +896,220 @@
     '("zlib" "G_ZLIB_COMPRESSOR_FORMAT_ZLIB")
     '("gzip" "G_ZLIB_COMPRESSOR_FORMAT_GZIP")
     '("raw" "G_ZLIB_COMPRESSOR_FORMAT_RAW")
+  )
+)
+
+(define-enum SocketAddressType
+  (in-module "GUnix")
+  (c-name "GUnixSocketAddressType")
+  (gtype-id "G_TYPE_UNIX_SOCKET_ADDRESS_TYPE")
+  (values
+    '("invalid" "G_UNIX_SOCKET_ADDRESS_INVALID")
+    '("anonymous" "G_UNIX_SOCKET_ADDRESS_ANONYMOUS")
+    '("path" "G_UNIX_SOCKET_ADDRESS_PATH")
+    '("abstract" "G_UNIX_SOCKET_ADDRESS_ABSTRACT")
+    '("abstract-padded" "G_UNIX_SOCKET_ADDRESS_ABSTRACT_PADDED")
+  )
+)
+
+(define-enum Type
+  (in-module "GBus")
+  (c-name "GBusType")
+  (gtype-id "G_TYPE_BUS_TYPE")
+  (values
+    '("starter" "G_BUS_TYPE_STARTER")
+    '("none" "G_BUS_TYPE_NONE")
+    '("system" "G_BUS_TYPE_SYSTEM")
+    '("session" "G_BUS_TYPE_SESSION")
+  )
+)
+
+(define-flags NameOwnerFlags
+  (in-module "GBus")
+  (c-name "GBusNameOwnerFlags")
+  (gtype-id "G_TYPE_BUS_NAME_OWNER_FLAGS")
+  (values
+    '("none" "G_BUS_NAME_OWNER_FLAGS_NONE")
+    '("allow-replacement" "G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT")
+    '("replace" "G_BUS_NAME_OWNER_FLAGS_REPLACE")
+  )
+)
+
+(define-flags NameWatcherFlags
+  (in-module "GBus")
+  (c-name "GBusNameWatcherFlags")
+  (gtype-id "G_TYPE_BUS_NAME_WATCHER_FLAGS")
+  (values
+    '("none" "G_BUS_NAME_WATCHER_FLAGS_NONE")
+    '("auto-start" "G_BUS_NAME_WATCHER_FLAGS_AUTO_START")
+  )
+)
+
+(define-flags ProxyFlags
+  (in-module "GDBus")
+  (c-name "GDBusProxyFlags")
+  (gtype-id "G_TYPE_D_BUS_PROXY_FLAGS")
+  (values
+    '("none" "G_DBUS_PROXY_FLAGS_NONE")
+    '("do-not-load-properties" "G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES")
+    '("do-not-connect-signals" "G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS")
+    '("do-not-auto-start" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START")
+  )
+)
+
+(define-enum Error
+  (in-module "GDBus")
+  (c-name "GDBusError")
+  (gtype-id "G_TYPE_D_BUS_ERROR")
+  (values
+    '("failed" "G_DBUS_ERROR_FAILED")
+    '("no-memory" "G_DBUS_ERROR_NO_MEMORY")
+    '("service-unknown" "G_DBUS_ERROR_SERVICE_UNKNOWN")
+    '("name-has-no-owner" "G_DBUS_ERROR_NAME_HAS_NO_OWNER")
+    '("no-reply" "G_DBUS_ERROR_NO_REPLY")
+    '("io-error" "G_DBUS_ERROR_IO_ERROR")
+    '("bad-address" "G_DBUS_ERROR_BAD_ADDRESS")
+    '("not-supported" "G_DBUS_ERROR_NOT_SUPPORTED")
+    '("limits-exceeded" "G_DBUS_ERROR_LIMITS_EXCEEDED")
+    '("access-denied" "G_DBUS_ERROR_ACCESS_DENIED")
+    '("auth-failed" "G_DBUS_ERROR_AUTH_FAILED")
+    '("no-server" "G_DBUS_ERROR_NO_SERVER")
+    '("timeout" "G_DBUS_ERROR_TIMEOUT")
+    '("no-network" "G_DBUS_ERROR_NO_NETWORK")
+    '("address-in-use" "G_DBUS_ERROR_ADDRESS_IN_USE")
+    '("disconnected" "G_DBUS_ERROR_DISCONNECTED")
+    '("invalid-args" "G_DBUS_ERROR_INVALID_ARGS")
+    '("file-not-found" "G_DBUS_ERROR_FILE_NOT_FOUND")
+    '("file-exists" "G_DBUS_ERROR_FILE_EXISTS")
+    '("unknown-method" "G_DBUS_ERROR_UNKNOWN_METHOD")
+    '("timed-out" "G_DBUS_ERROR_TIMED_OUT")
+    '("match-rule-not-found" "G_DBUS_ERROR_MATCH_RULE_NOT_FOUND")
+    '("match-rule-invalid" "G_DBUS_ERROR_MATCH_RULE_INVALID")
+    '("spawn-exec-failed" "G_DBUS_ERROR_SPAWN_EXEC_FAILED")
+    '("spawn-fork-failed" "G_DBUS_ERROR_SPAWN_FORK_FAILED")
+    '("spawn-child-exited" "G_DBUS_ERROR_SPAWN_CHILD_EXITED")
+    '("spawn-child-signaled" "G_DBUS_ERROR_SPAWN_CHILD_SIGNALED")
+    '("spawn-failed" "G_DBUS_ERROR_SPAWN_FAILED")
+    '("spawn-setup-failed" "G_DBUS_ERROR_SPAWN_SETUP_FAILED")
+    '("spawn-config-invalid" "G_DBUS_ERROR_SPAWN_CONFIG_INVALID")
+    '("spawn-service-invalid" "G_DBUS_ERROR_SPAWN_SERVICE_INVALID")
+    '("spawn-service-not-found" "G_DBUS_ERROR_SPAWN_SERVICE_NOT_FOUND")
+    '("spawn-permissions-invalid" "G_DBUS_ERROR_SPAWN_PERMISSIONS_INVALID")
+    '("spawn-file-invalid" "G_DBUS_ERROR_SPAWN_FILE_INVALID")
+    '("spawn-no-memory" "G_DBUS_ERROR_SPAWN_NO_MEMORY")
+    '("unix-process-id-unknown" "G_DBUS_ERROR_UNIX_PROCESS_ID_UNKNOWN")
+    '("invalid-signature" "G_DBUS_ERROR_INVALID_SIGNATURE")
+    '("invalid-file-content" "G_DBUS_ERROR_INVALID_FILE_CONTENT")
+    '("selinux-security-context-unknown" "G_DBUS_ERROR_SELINUX_SECURITY_CONTEXT_UNKNOWN")
+    '("adt-audit-data-unknown" "G_DBUS_ERROR_ADT_AUDIT_DATA_UNKNOWN")
+    '("object-path-in-use" "G_DBUS_ERROR_OBJECT_PATH_IN_USE")
+  )
+)
+
+(define-flags ConnectionFlags
+  (in-module "GDBus")
+  (c-name "GDBusConnectionFlags")
+  (gtype-id "G_TYPE_D_BUS_CONNECTION_FLAGS")
+  (values
+    '("none" "G_DBUS_CONNECTION_FLAGS_NONE")
+    '("authentication-client" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT")
+    '("authentication-server" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER")
+    '("authentication-allow-anonymous" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS")
+    '("message-bus-connection" "G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION")
+  )
+)
+
+(define-flags CapabilityFlags
+  (in-module "GDBus")
+  (c-name "GDBusCapabilityFlags")
+  (gtype-id "G_TYPE_D_BUS_CAPABILITY_FLAGS")
+  (values
+    '("none" "G_DBUS_CAPABILITY_FLAGS_NONE")
+    '("unix-fd-passing" "G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING")
+  )
+)
+
+(define-flags CallFlags
+  (in-module "GDBus")
+  (c-name "GDBusCallFlags")
+  (gtype-id "G_TYPE_D_BUS_CALL_FLAGS")
+  (values
+    '("none" "G_DBUS_CALL_FLAGS_NONE")
+    '("no-auto-start" "G_DBUS_CALL_FLAGS_NO_AUTO_START")
+  )
+)
+
+(define-enum MessageType
+  (in-module "GDBus")
+  (c-name "GDBusMessageType")
+  (gtype-id "G_TYPE_D_BUS_MESSAGE_TYPE")
+  (values
+    '("invalid" "G_DBUS_MESSAGE_TYPE_INVALID")
+    '("method-call" "G_DBUS_MESSAGE_TYPE_METHOD_CALL")
+    '("method-return" "G_DBUS_MESSAGE_TYPE_METHOD_RETURN")
+    '("error" "G_DBUS_MESSAGE_TYPE_ERROR")
+    '("signal" "G_DBUS_MESSAGE_TYPE_SIGNAL")
+  )
+)
+
+(define-flags MessageFlags
+  (in-module "GDBus")
+  (c-name "GDBusMessageFlags")
+  (gtype-id "G_TYPE_D_BUS_MESSAGE_FLAGS")
+  (values
+    '("none" "G_DBUS_MESSAGE_FLAGS_NONE")
+    '("no-reply-expected" "G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED")
+    '("no-auto-start" "G_DBUS_MESSAGE_FLAGS_NO_AUTO_START")
+  )
+)
+
+(define-enum MessageHeaderField
+  (in-module "GDBus")
+  (c-name "GDBusMessageHeaderField")
+  (gtype-id "G_TYPE_D_BUS_MESSAGE_HEADER_FIELD")
+  (values
+    '("invalid" "G_DBUS_MESSAGE_HEADER_FIELD_INVALID")
+    '("path" "G_DBUS_MESSAGE_HEADER_FIELD_PATH")
+    '("interface" "G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE")
+    '("member" "G_DBUS_MESSAGE_HEADER_FIELD_MEMBER")
+    '("error-name" "G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME")
+    '("reply-serial" "G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL")
+    '("destination" "G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION")
+    '("sender" "G_DBUS_MESSAGE_HEADER_FIELD_SENDER")
+    '("signature" "G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE")
+    '("num-unix-fds" "G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS")
+  )
+)
+
+(define-flags PropertyInfoFlags
+  (in-module "GDBus")
+  (c-name "GDBusPropertyInfoFlags")
+  (gtype-id "G_TYPE_D_BUS_PROPERTY_INFO_FLAGS")
+  (values
+    '("none" "G_DBUS_PROPERTY_INFO_FLAGS_NONE")
+    '("readable" "G_DBUS_PROPERTY_INFO_FLAGS_READABLE")
+    '("writable" "G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE")
+  )
+)
+
+(define-flags SubtreeFlags
+  (in-module "GDBus")
+  (c-name "GDBusSubtreeFlags")
+  (gtype-id "G_TYPE_D_BUS_SUBTREE_FLAGS")
+  (values
+    '("none" "G_DBUS_SUBTREE_FLAGS_NONE")
+    '("dispatch-to-unenumerated-nodes" "G_DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES")
+  )
+)
+
+(define-flags ServerFlags
+  (in-module "GDBus")
+  (c-name "GDBusServerFlags")
+  (gtype-id "G_TYPE_D_BUS_SERVER_FLAGS")
+  (values
+    '("none" "G_DBUS_SERVER_FLAGS_NONE")
+    '("run-in-thread" "G_DBUS_SERVER_FLAGS_RUN_IN_THREAD")
+    '("authentication-allow-anonymous" "G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS")
   )
 )
 
@@ -1101,6 +1386,151 @@
   (parameters
     '("const-char*" "startup_notify_id")
   )
+)
+
+
+
+;; From gapplication.h
+
+(define-function g_application_get_type
+  (c-name "g_application_get_type")
+  (return-type "GType")
+)
+
+(define-function g_application_new
+  (c-name "g_application_new")
+  (is-constructor-of "GApplication")
+  (return-type "GApplication*")
+  (parameters
+    '("const-gchar*" "appid")
+    '("int" "argc")
+    '("char**" "argv")
+  )
+)
+
+(define-function g_application_try_new
+  (c-name "g_application_try_new")
+  (is-constructor-of "GApplicationTry")
+  (return-type "GApplication*")
+  (parameters
+    '("const-gchar*" "appid")
+    '("int" "argc")
+    '("char**" "argv")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_application_unregistered_try_new
+  (c-name "g_application_unregistered_try_new")
+  (is-constructor-of "GApplicationUnregisteredTry")
+  (return-type "GApplication*")
+  (parameters
+    '("const-gchar*" "appid")
+    '("int" "argc")
+    '("char**" "argv")
+    '("GError**" "error")
+  )
+)
+
+(define-method register
+  (of-object "GApplication")
+  (c-name "g_application_register")
+  (return-type "gboolean")
+)
+
+(define-function g_application_get_instance
+  (c-name "g_application_get_instance")
+  (return-type "GApplication*")
+)
+
+(define-method get_id
+  (of-object "GApplication")
+  (c-name "g_application_get_id")
+  (return-type "const-gchar*")
+)
+
+(define-method add_action
+  (of-object "GApplication")
+  (c-name "g_application_add_action")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+    '("const-gchar*" "description")
+  )
+)
+
+(define-method remove_action
+  (of-object "GApplication")
+  (c-name "g_application_remove_action")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method list_actions
+  (of-object "GApplication")
+  (c-name "g_application_list_actions")
+  (return-type "gchar**")
+)
+
+(define-method set_action_enabled
+  (of-object "GApplication")
+  (c-name "g_application_set_action_enabled")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+    '("gboolean" "enabled")
+  )
+)
+
+(define-method get_action_enabled
+  (of-object "GApplication")
+  (c-name "g_application_get_action_enabled")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method get_action_description
+  (of-object "GApplication")
+  (c-name "g_application_get_action_description")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method invoke_action
+  (of-object "GApplication")
+  (c-name "g_application_invoke_action")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+    '("GVariant*" "platform_data")
+  )
+)
+
+(define-method run
+  (of-object "GApplication")
+  (c-name "g_application_run")
+  (return-type "none")
+)
+
+(define-method quit_with_data
+  (of-object "GApplication")
+  (c-name "g_application_quit_with_data")
+  (return-type "gboolean")
+  (parameters
+    '("GVariant*" "platform_data")
+  )
+)
+
+(define-method is_remote
+  (of-object "GApplication")
+  (c-name "g_application_is_remote")
+  (return-type "gboolean")
 )
 
 
@@ -1693,6 +2123,71 @@
 
 
 
+;; From gcredentials.h
+
+(define-function g_credentials_get_type
+  (c-name "g_credentials_get_type")
+  (return-type "GType")
+)
+
+(define-function g_credentials_new
+  (c-name "g_credentials_new")
+  (is-constructor-of "GCredentials")
+  (return-type "GCredentials*")
+)
+
+(define-method to_string
+  (of-object "GCredentials")
+  (c-name "g_credentials_to_string")
+  (return-type "gchar*")
+)
+
+(define-method get_native
+  (of-object "GCredentials")
+  (c-name "g_credentials_get_native")
+  (return-type "gpointer")
+)
+
+(define-method set_native
+  (of-object "GCredentials")
+  (c-name "g_credentials_set_native")
+  (return-type "none")
+  (parameters
+    '("gpointer" "native")
+  )
+)
+
+(define-method is_same_user
+  (of-object "GCredentials")
+  (c-name "g_credentials_is_same_user")
+  (return-type "gboolean")
+  (parameters
+    '("GCredentials*" "other_credentials")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_unix_user
+  (of-object "GCredentials")
+  (c-name "g_credentials_get_unix_user")
+  (return-type "uid_t")
+  (parameters
+    '("GError**" "error")
+  )
+)
+
+(define-method set_unix_user
+  (of-object "GCredentials")
+  (c-name "g_credentials_set_unix_user")
+  (return-type "gboolean")
+  (parameters
+    '("uid_t" "uid")
+    '("GError**" "error")
+  )
+)
+
+
+
 ;; From gdatainputstream.h
 
 (define-function g_data_input_stream_get_type
@@ -1997,6 +2492,1774 @@
     '("const-char*" "str")
     '("GCancellable*" "cancellable")
     '("GError**" "error")
+  )
+)
+
+
+
+;; From gdbusaddress.h
+
+(define-function g_dbus_is_address
+  (c-name "g_dbus_is_address")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+  )
+)
+
+(define-function g_dbus_is_supported_address
+  (c-name "g_dbus_is_supported_address")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_address_get_stream
+  (c-name "g_dbus_address_get_stream")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "address")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_dbus_address_get_stream_finish
+  (c-name "g_dbus_address_get_stream_finish")
+  (return-type "GIOStream*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("gchar**" "out_guid")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_address_get_stream_sync
+  (c-name "g_dbus_address_get_stream_sync")
+  (return-type "GIOStream*")
+  (parameters
+    '("const-gchar*" "address")
+    '("gchar**" "out_guid")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_address_get_for_bus_sync
+  (c-name "g_dbus_address_get_for_bus_sync")
+  (return-type "gchar*")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gdbusauthobserver.h
+
+(define-function g_dbus_auth_observer_get_type
+  (c-name "g_dbus_auth_observer_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_auth_observer_new
+  (c-name "g_dbus_auth_observer_new")
+  (is-constructor-of "GDbusAuthObserver")
+  (return-type "GDBusAuthObserver*")
+)
+
+(define-method authorize_authenticated_peer
+  (of-object "GDBusAuthObserver")
+  (c-name "g_dbus_auth_observer_authorize_authenticated_peer")
+  (return-type "gboolean")
+  (parameters
+    '("GIOStream*" "stream")
+    '("GCredentials*" "credentials")
+  )
+)
+
+
+
+;; From gdbusconnection.h
+
+(define-function g_dbus_connection_get_type
+  (c-name "g_dbus_connection_get_type")
+  (return-type "GType")
+)
+
+(define-function g_bus_get
+  (c-name "g_bus_get")
+  (return-type "none")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_bus_get_finish
+  (c-name "g_bus_get_finish")
+  (return-type "GDBusConnection*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_bus_get_sync
+  (c-name "g_bus_get_sync")
+  (return-type "GDBusConnection*")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_connection_new
+  (c-name "g_dbus_connection_new")
+  (return-type "none")
+  (parameters
+    '("GIOStream*" "stream")
+    '("const-gchar*" "guid")
+    '("GDBusConnectionFlags" "flags")
+    '("GDBusAuthObserver*" "observer")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_dbus_connection_new_finish
+  (c-name "g_dbus_connection_new_finish")
+  (return-type "GDBusConnection*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_connection_new_sync
+  (c-name "g_dbus_connection_new_sync")
+  (return-type "GDBusConnection*")
+  (parameters
+    '("GIOStream*" "stream")
+    '("const-gchar*" "guid")
+    '("GDBusConnectionFlags" "flags")
+    '("GDBusAuthObserver*" "observer")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_connection_new_for_address
+  (c-name "g_dbus_connection_new_for_address")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "address")
+    '("GDBusConnectionFlags" "flags")
+    '("GDBusAuthObserver*" "observer")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_dbus_connection_new_for_address_finish
+  (c-name "g_dbus_connection_new_for_address_finish")
+  (return-type "GDBusConnection*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_connection_new_for_address_sync
+  (c-name "g_dbus_connection_new_for_address_sync")
+  (return-type "GDBusConnection*")
+  (parameters
+    '("const-gchar*" "address")
+    '("GDBusConnectionFlags" "flags")
+    '("GDBusAuthObserver*" "observer")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method is_closed
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_is_closed")
+  (return-type "gboolean")
+)
+
+(define-method close
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_close")
+  (return-type "none")
+)
+
+(define-method get_stream
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_get_stream")
+  (return-type "GIOStream*")
+)
+
+(define-method get_guid
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_get_guid")
+  (return-type "const-gchar*")
+)
+
+(define-method get_unique_name
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_get_unique_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_peer_credentials
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_get_peer_credentials")
+  (return-type "GCredentials*")
+)
+
+(define-method get_exit_on_close
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_get_exit_on_close")
+  (return-type "gboolean")
+)
+
+(define-method set_exit_on_close
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_set_exit_on_close")
+  (return-type "none")
+  (parameters
+    '("gboolean" "exit_on_close")
+  )
+)
+
+(define-method get_capabilities
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_get_capabilities")
+  (return-type "GDBusCapabilityFlags")
+)
+
+(define-method send_message
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_send_message")
+  (return-type "gboolean")
+  (parameters
+    '("GDBusMessage*" "message")
+    '("volatile-guint32*" "out_serial")
+    '("GError**" "error")
+  )
+)
+
+(define-method send_message_with_reply
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_send_message_with_reply")
+  (return-type "none")
+  (parameters
+    '("GDBusMessage*" "message")
+    '("gint" "timeout_msec")
+    '("volatile-guint32*" "out_serial")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method send_message_with_reply_finish
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_send_message_with_reply_finish")
+  (return-type "GDBusMessage*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method send_message_with_reply_sync
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_send_message_with_reply_sync")
+  (return-type "GDBusMessage*")
+  (parameters
+    '("GDBusMessage*" "message")
+    '("gint" "timeout_msec")
+    '("volatile-guint32*" "out_serial")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method emit_signal
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_emit_signal")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "destination_bus_name")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("const-gchar*" "signal_name")
+    '("GVariant*" "parameters")
+    '("GError**" "error")
+  )
+)
+
+(define-method call
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_call")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "bus_name")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("const-gchar*" "method_name")
+    '("GVariant*" "parameters")
+    '("const-GVariantType*" "reply_type")
+    '("GDBusCallFlags" "flags")
+    '("gint" "timeout_msec")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_finish
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_call_finish")
+  (return-type "GVariant*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_sync
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_call_sync")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "bus_name")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("const-gchar*" "method_name")
+    '("GVariant*" "parameters")
+    '("const-GVariantType*" "reply_type")
+    '("GDBusCallFlags" "flags")
+    '("gint" "timeout_msec")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method register_object
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_register_object")
+  (return-type "guint")
+  (parameters
+    '("const-gchar*" "object_path")
+    '("const-GDBusInterfaceInfo*" "introspection_data")
+    '("const-GDBusInterfaceVTable*" "vtable")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+    '("GError**" "error")
+  )
+)
+
+(define-method unregister_object
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_unregister_object")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "registration_id")
+  )
+)
+
+(define-method register_subtree
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_register_subtree")
+  (return-type "guint")
+  (parameters
+    '("const-gchar*" "object_path")
+    '("const-GDBusSubtreeVTable*" "vtable")
+    '("GDBusSubtreeFlags" "flags")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+    '("GError**" "error")
+  )
+)
+
+(define-method unregister_subtree
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_unregister_subtree")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "registration_id")
+  )
+)
+
+(define-method signal_subscribe
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_signal_subscribe")
+  (return-type "guint")
+  (parameters
+    '("const-gchar*" "sender")
+    '("const-gchar*" "interface_name")
+    '("const-gchar*" "member")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "arg0")
+    '("GDBusSignalCallback" "callback")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+  )
+)
+
+(define-method signal_unsubscribe
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_signal_unsubscribe")
+  (return-type "none")
+  (parameters
+    '("guint" "subscription_id")
+  )
+)
+
+(define-method add_filter
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_add_filter")
+  (return-type "guint")
+  (parameters
+    '("GDBusMessageFilterFunction" "filter_function")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+  )
+)
+
+(define-method remove_filter
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_remove_filter")
+  (return-type "none")
+  (parameters
+    '("guint" "filter_id")
+  )
+)
+
+
+
+;; From gdbuserror.h
+
+(define-function g_dbus_error_quark
+  (c-name "g_dbus_error_quark")
+  (return-type "GQuark")
+)
+
+(define-function g_dbus_error_is_remote_error
+  (c-name "g_dbus_error_is_remote_error")
+  (return-type "gboolean")
+  (parameters
+    '("const-GError*" "error")
+  )
+)
+
+(define-function g_dbus_error_get_remote_error
+  (c-name "g_dbus_error_get_remote_error")
+  (return-type "gchar*")
+  (parameters
+    '("const-GError*" "error")
+  )
+)
+
+(define-function g_dbus_error_strip_remote_error
+  (c-name "g_dbus_error_strip_remote_error")
+  (return-type "gboolean")
+  (parameters
+    '("GError*" "error")
+  )
+)
+
+(define-function g_dbus_error_register_error
+  (c-name "g_dbus_error_register_error")
+  (return-type "gboolean")
+  (parameters
+    '("GQuark" "error_domain")
+    '("gint" "error_code")
+    '("const-gchar*" "dbus_error_name")
+  )
+)
+
+(define-function g_dbus_error_unregister_error
+  (c-name "g_dbus_error_unregister_error")
+  (return-type "gboolean")
+  (parameters
+    '("GQuark" "error_domain")
+    '("gint" "error_code")
+    '("const-gchar*" "dbus_error_name")
+  )
+)
+
+(define-function g_dbus_error_register_error_domain
+  (c-name "g_dbus_error_register_error_domain")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "error_domain_quark_name")
+    '("volatile-gsize*" "quark_volatile")
+    '("const-GDBusErrorEntry*" "entries")
+    '("guint" "num_entries")
+  )
+)
+
+(define-function g_dbus_error_new_for_dbus_error
+  (c-name "g_dbus_error_new_for_dbus_error")
+  (return-type "GError*")
+  (parameters
+    '("const-gchar*" "dbus_error_name")
+    '("const-gchar*" "dbus_error_message")
+  )
+)
+
+(define-function g_dbus_error_set_dbus_error
+  (c-name "g_dbus_error_set_dbus_error")
+  (return-type "none")
+  (parameters
+    '("GError**" "error")
+    '("const-gchar*" "dbus_error_name")
+    '("const-gchar*" "dbus_error_message")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_dbus_error_set_dbus_error_valist
+  (c-name "g_dbus_error_set_dbus_error_valist")
+  (return-type "none")
+  (parameters
+    '("GError**" "error")
+    '("const-gchar*" "dbus_error_name")
+    '("const-gchar*" "dbus_error_message")
+    '("const-gchar*" "format")
+    '("va_list" "var_args")
+  )
+)
+
+(define-function g_dbus_error_encode_gerror
+  (c-name "g_dbus_error_encode_gerror")
+  (return-type "gchar*")
+  (parameters
+    '("const-GError*" "error")
+  )
+)
+
+
+
+;; From gdbusintrospection.h
+
+(define-function g_dbus_annotation_info_lookup
+  (c-name "g_dbus_annotation_info_lookup")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-GDBusAnnotationInfo**" "annotations")
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method lookup_method
+  (of-object "GDBusInterfaceInfo")
+  (c-name "g_dbus_interface_info_lookup_method")
+  (return-type "const-GDBusMethodInfo*")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method lookup_signal
+  (of-object "GDBusInterfaceInfo")
+  (c-name "g_dbus_interface_info_lookup_signal")
+  (return-type "const-GDBusSignalInfo*")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method lookup_property
+  (of-object "GDBusInterfaceInfo")
+  (c-name "g_dbus_interface_info_lookup_property")
+  (return-type "const-GDBusPropertyInfo*")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method generate_xml
+  (of-object "GDBusInterfaceInfo")
+  (c-name "g_dbus_interface_info_generate_xml")
+  (return-type "none")
+  (parameters
+    '("guint" "indent")
+    '("GString*" "string_builder")
+  )
+)
+
+(define-function g_dbus_node_info_new_for_xml
+  (c-name "g_dbus_node_info_new_for_xml")
+  (return-type "GDBusNodeInfo*")
+  (parameters
+    '("const-gchar*" "xml_data")
+    '("GError**" "error")
+  )
+)
+
+(define-method lookup_interface
+  (of-object "GDBusNodeInfo")
+  (c-name "g_dbus_node_info_lookup_interface")
+  (return-type "const-GDBusInterfaceInfo*")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method generate_xml
+  (of-object "GDBusNodeInfo")
+  (c-name "g_dbus_node_info_generate_xml")
+  (return-type "none")
+  (parameters
+    '("guint" "indent")
+    '("GString*" "string_builder")
+  )
+)
+
+(define-method ref
+  (of-object "GDBusNodeInfo")
+  (c-name "g_dbus_node_info_ref")
+  (return-type "GDBusNodeInfo*")
+)
+
+(define-method ref
+  (of-object "GDBusInterfaceInfo")
+  (c-name "g_dbus_interface_info_ref")
+  (return-type "GDBusInterfaceInfo*")
+)
+
+(define-method ref
+  (of-object "GDBusMethodInfo")
+  (c-name "g_dbus_method_info_ref")
+  (return-type "GDBusMethodInfo*")
+)
+
+(define-method ref
+  (of-object "GDBusSignalInfo")
+  (c-name "g_dbus_signal_info_ref")
+  (return-type "GDBusSignalInfo*")
+)
+
+(define-method ref
+  (of-object "GDBusPropertyInfo")
+  (c-name "g_dbus_property_info_ref")
+  (return-type "GDBusPropertyInfo*")
+)
+
+(define-method ref
+  (of-object "GDBusArgInfo")
+  (c-name "g_dbus_arg_info_ref")
+  (return-type "GDBusArgInfo*")
+)
+
+(define-method ref
+  (of-object "GDBusAnnotationInfo")
+  (c-name "g_dbus_annotation_info_ref")
+  (return-type "GDBusAnnotationInfo*")
+)
+
+(define-method unref
+  (of-object "GDBusNodeInfo")
+  (c-name "g_dbus_node_info_unref")
+  (return-type "none")
+)
+
+(define-method unref
+  (of-object "GDBusInterfaceInfo")
+  (c-name "g_dbus_interface_info_unref")
+  (return-type "none")
+)
+
+(define-method unref
+  (of-object "GDBusMethodInfo")
+  (c-name "g_dbus_method_info_unref")
+  (return-type "none")
+)
+
+(define-method unref
+  (of-object "GDBusSignalInfo")
+  (c-name "g_dbus_signal_info_unref")
+  (return-type "none")
+)
+
+(define-method unref
+  (of-object "GDBusPropertyInfo")
+  (c-name "g_dbus_property_info_unref")
+  (return-type "none")
+)
+
+(define-method unref
+  (of-object "GDBusArgInfo")
+  (c-name "g_dbus_arg_info_unref")
+  (return-type "none")
+)
+
+(define-method unref
+  (of-object "GDBusAnnotationInfo")
+  (c-name "g_dbus_annotation_info_unref")
+  (return-type "none")
+)
+
+(define-function g_dbus_node_info_get_type
+  (c-name "g_dbus_node_info_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_interface_info_get_type
+  (c-name "g_dbus_interface_info_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_method_info_get_type
+  (c-name "g_dbus_method_info_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_signal_info_get_type
+  (c-name "g_dbus_signal_info_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_property_info_get_type
+  (c-name "g_dbus_property_info_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_arg_info_get_type
+  (c-name "g_dbus_arg_info_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_annotation_info_get_type
+  (c-name "g_dbus_annotation_info_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gdbusmessage.h
+
+(define-function g_dbus_message_get_type
+  (c-name "g_dbus_message_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_message_new
+  (c-name "g_dbus_message_new")
+  (is-constructor-of "GDbusMessage")
+  (return-type "GDBusMessage*")
+)
+
+(define-function g_dbus_message_new_signal
+  (c-name "g_dbus_message_new_signal")
+  (return-type "GDBusMessage*")
+  (parameters
+    '("const-gchar*" "path")
+    '("const-gchar*" "interface_")
+    '("const-gchar*" "signal")
+  )
+)
+
+(define-function g_dbus_message_new_method_call
+  (c-name "g_dbus_message_new_method_call")
+  (return-type "GDBusMessage*")
+  (parameters
+    '("const-gchar*" "name")
+    '("const-gchar*" "path")
+    '("const-gchar*" "interface_")
+    '("const-gchar*" "method")
+  )
+)
+
+(define-method new_method_reply
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_new_method_reply")
+  (return-type "GDBusMessage*")
+)
+
+(define-method new_method_error
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_new_method_error")
+  (return-type "GDBusMessage*")
+  (parameters
+    '("const-gchar*" "error_name")
+    '("const-gchar*" "error_message_format")
+  )
+  (varargs #t)
+)
+
+(define-method new_method_error_valist
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_new_method_error_valist")
+  (return-type "GDBusMessage*")
+  (parameters
+    '("const-gchar*" "error_name")
+    '("const-gchar*" "error_message_format")
+    '("va_list" "var_args")
+  )
+)
+
+(define-method new_method_error_literal
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_new_method_error_literal")
+  (return-type "GDBusMessage*")
+  (parameters
+    '("const-gchar*" "error_name")
+    '("const-gchar*" "error_message")
+  )
+)
+
+(define-method print
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_print")
+  (return-type "gchar*")
+  (parameters
+    '("guint" "indent")
+  )
+)
+
+(define-method get_message_type
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_message_type")
+  (return-type "GDBusMessageType")
+)
+
+(define-method set_message_type
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_message_type")
+  (return-type "none")
+  (parameters
+    '("GDBusMessageType" "type")
+  )
+)
+
+(define-method get_flags
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_flags")
+  (return-type "GDBusMessageFlags")
+)
+
+(define-method set_flags
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_flags")
+  (return-type "none")
+  (parameters
+    '("GDBusMessageFlags" "flags")
+  )
+)
+
+(define-method get_serial
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_serial")
+  (return-type "guint32")
+)
+
+(define-method set_serial
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_serial")
+  (return-type "none")
+  (parameters
+    '("guint32" "serial")
+  )
+)
+
+(define-method get_header
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_header")
+  (return-type "GVariant*")
+  (parameters
+    '("GDBusMessageHeaderField" "header_field")
+  )
+)
+
+(define-method set_header
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_header")
+  (return-type "none")
+  (parameters
+    '("GDBusMessageHeaderField" "header_field")
+    '("GVariant*" "value")
+  )
+)
+
+(define-method get_header_fields
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_header_fields")
+  (return-type "guchar*")
+)
+
+(define-method get_body
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_body")
+  (return-type "GVariant*")
+)
+
+(define-method set_body
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_body")
+  (return-type "none")
+  (parameters
+    '("GVariant*" "body")
+  )
+)
+
+(define-method get_unix_fd_list
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_unix_fd_list")
+  (return-type "GUnixFDList*")
+)
+
+(define-method set_unix_fd_list
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_unix_fd_list")
+  (return-type "none")
+  (parameters
+    '("GUnixFDList*" "fd_list")
+  )
+)
+
+(define-method get_reply_serial
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_reply_serial")
+  (return-type "guint32")
+)
+
+(define-method set_reply_serial
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_reply_serial")
+  (return-type "none")
+  (parameters
+    '("guint32" "value")
+  )
+)
+
+(define-method get_interface
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_interface")
+  (return-type "const-gchar*")
+)
+
+(define-method set_interface
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_interface")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_member
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_member")
+  (return-type "const-gchar*")
+)
+
+(define-method set_member
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_member")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_path
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_path")
+  (return-type "const-gchar*")
+)
+
+(define-method set_path
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_path")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_sender
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_sender")
+  (return-type "const-gchar*")
+)
+
+(define-method set_sender
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_sender")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_destination
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_destination")
+  (return-type "const-gchar*")
+)
+
+(define-method set_destination
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_destination")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_error_name
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_error_name")
+  (return-type "const-gchar*")
+)
+
+(define-method set_error_name
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_error_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_signature
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_signature")
+  (return-type "const-gchar*")
+)
+
+(define-method set_signature
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_signature")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "value")
+  )
+)
+
+(define-method get_num_unix_fds
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_num_unix_fds")
+  (return-type "guint32")
+)
+
+(define-method set_num_unix_fds
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_num_unix_fds")
+  (return-type "none")
+  (parameters
+    '("guint32" "value")
+  )
+)
+
+(define-method get_arg0
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_arg0")
+  (return-type "const-gchar*")
+)
+
+(define-function g_dbus_message_new_from_blob
+  (c-name "g_dbus_message_new_from_blob")
+  (return-type "GDBusMessage*")
+  (parameters
+    '("guchar*" "blob")
+    '("gsize" "blob_len")
+    '("GDBusCapabilityFlags" "capabilities")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_message_bytes_needed
+  (c-name "g_dbus_message_bytes_needed")
+  (return-type "gssize")
+  (parameters
+    '("guchar*" "blob")
+    '("gsize" "blob_len")
+    '("GError**" "error")
+  )
+)
+
+(define-method to_blob
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_to_blob")
+  (return-type "guchar*")
+  (parameters
+    '("gsize*" "out_size")
+    '("GDBusCapabilityFlags" "capabilities")
+    '("GError**" "error")
+  )
+)
+
+(define-method to_gerror
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_to_gerror")
+  (return-type "gboolean")
+  (parameters
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gdbusmethodinvocation.h
+
+(define-function g_dbus_method_invocation_get_type
+  (c-name "g_dbus_method_invocation_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_method_invocation_new
+  (c-name "g_dbus_method_invocation_new")
+  (is-constructor-of "GDbusMethodInvocation")
+  (return-type "GDBusMethodInvocation*")
+  (parameters
+    '("const-gchar*" "sender")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("const-gchar*" "method_name")
+    '("const-GDBusMethodInfo*" "method_info")
+    '("GDBusConnection*" "connection")
+    '("GDBusMessage*" "message")
+    '("GVariant*" "parameters")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method get_sender
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_sender")
+  (return-type "const-gchar*")
+)
+
+(define-method get_object_path
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_object_path")
+  (return-type "const-gchar*")
+)
+
+(define-method get_interface_name
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_interface_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_method_name
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_method_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_method_info
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_method_info")
+  (return-type "const-GDBusMethodInfo*")
+)
+
+(define-method get_connection
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_connection")
+  (return-type "GDBusConnection*")
+)
+
+(define-method get_message
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_message")
+  (return-type "GDBusMessage*")
+)
+
+(define-method get_parameters
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_parameters")
+  (return-type "GVariant*")
+)
+
+(define-method get_user_data
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_user_data")
+  (return-type "gpointer")
+)
+
+(define-method return_value
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_return_value")
+  (return-type "none")
+  (parameters
+    '("GVariant*" "parameters")
+  )
+)
+
+(define-method return_error
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_return_error")
+  (return-type "none")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-method return_error_valist
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_return_error_valist")
+  (return-type "none")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("const-gchar*" "format")
+    '("va_list" "var_args")
+  )
+)
+
+(define-method return_error_literal
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_return_error_literal")
+  (return-type "none")
+  (parameters
+    '("GQuark" "domain")
+    '("gint" "code")
+    '("const-gchar*" "message")
+  )
+)
+
+(define-method return_gerror
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_return_gerror")
+  (return-type "none")
+  (parameters
+    '("const-GError*" "error")
+  )
+)
+
+(define-method return_dbus_error
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_return_dbus_error")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "error_name")
+    '("const-gchar*" "error_message")
+  )
+)
+
+
+
+;; From gdbusnameowning.h
+
+(define-function g_bus_own_name
+  (c-name "g_bus_own_name")
+  (return-type "guint")
+  (parameters
+    '("GBusType" "bus_type")
+    '("const-gchar*" "name")
+    '("GBusNameOwnerFlags" "flags")
+    '("GBusAcquiredCallback" "bus_acquired_handler")
+    '("GBusNameAcquiredCallback" "name_acquired_handler")
+    '("GBusNameLostCallback" "name_lost_handler")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+  )
+)
+
+(define-function g_bus_own_name_on_connection
+  (c-name "g_bus_own_name_on_connection")
+  (return-type "guint")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("const-gchar*" "name")
+    '("GBusNameOwnerFlags" "flags")
+    '("GBusNameAcquiredCallback" "name_acquired_handler")
+    '("GBusNameLostCallback" "name_lost_handler")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+  )
+)
+
+(define-function g_bus_own_name_with_closures
+  (c-name "g_bus_own_name_with_closures")
+  (return-type "guint")
+  (parameters
+    '("GBusType" "bus_type")
+    '("const-gchar*" "name")
+    '("GBusNameOwnerFlags" "flags")
+    '("GClosure*" "bus_acquired_closure")
+    '("GClosure*" "name_acquired_closure")
+    '("GClosure*" "name_lost_closure")
+  )
+)
+
+(define-function g_bus_own_name_on_connection_with_closures
+  (c-name "g_bus_own_name_on_connection_with_closures")
+  (return-type "guint")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("const-gchar*" "name")
+    '("GBusNameOwnerFlags" "flags")
+    '("GClosure*" "name_acquired_closure")
+    '("GClosure*" "name_lost_closure")
+  )
+)
+
+(define-function g_bus_unown_name
+  (c-name "g_bus_unown_name")
+  (return-type "none")
+  (parameters
+    '("guint" "owner_id")
+  )
+)
+
+
+
+;; From gdbusnamewatching.h
+
+(define-function g_bus_watch_name
+  (c-name "g_bus_watch_name")
+  (return-type "guint")
+  (parameters
+    '("GBusType" "bus_type")
+    '("const-gchar*" "name")
+    '("GBusNameWatcherFlags" "flags")
+    '("GBusNameAppearedCallback" "name_appeared_handler")
+    '("GBusNameVanishedCallback" "name_vanished_handler")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+  )
+)
+
+(define-function g_bus_watch_name_on_connection
+  (c-name "g_bus_watch_name_on_connection")
+  (return-type "guint")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("const-gchar*" "name")
+    '("GBusNameWatcherFlags" "flags")
+    '("GBusNameAppearedCallback" "name_appeared_handler")
+    '("GBusNameVanishedCallback" "name_vanished_handler")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+  )
+)
+
+(define-function g_bus_watch_name_with_closures
+  (c-name "g_bus_watch_name_with_closures")
+  (return-type "guint")
+  (parameters
+    '("GBusType" "bus_type")
+    '("const-gchar*" "name")
+    '("GBusNameWatcherFlags" "flags")
+    '("GClosure*" "name_appeared_closure")
+    '("GClosure*" "name_vanished_closure")
+  )
+)
+
+(define-function g_bus_watch_name_on_connection_with_closures
+  (c-name "g_bus_watch_name_on_connection_with_closures")
+  (return-type "guint")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("const-gchar*" "name")
+    '("GBusNameWatcherFlags" "flags")
+    '("GClosure*" "name_appeared_closure")
+    '("GClosure*" "name_vanished_closure")
+  )
+)
+
+(define-function g_bus_unwatch_name
+  (c-name "g_bus_unwatch_name")
+  (return-type "none")
+  (parameters
+    '("guint" "watcher_id")
+  )
+)
+
+
+
+;; From gdbusproxy.h
+
+(define-function g_dbus_proxy_get_type
+  (c-name "g_dbus_proxy_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_proxy_new
+  (c-name "g_dbus_proxy_new")
+  (return-type "none")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("GDBusProxyFlags" "flags")
+    '("GDBusInterfaceInfo*" "info")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_dbus_proxy_new_finish
+  (c-name "g_dbus_proxy_new_finish")
+  (return-type "GDBusProxy*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_proxy_new_sync
+  (c-name "g_dbus_proxy_new_sync")
+  (return-type "GDBusProxy*")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("GDBusProxyFlags" "flags")
+    '("GDBusInterfaceInfo*" "info")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_proxy_new_for_bus
+  (c-name "g_dbus_proxy_new_for_bus")
+  (return-type "none")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GDBusProxyFlags" "flags")
+    '("GDBusInterfaceInfo*" "info")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_dbus_proxy_new_for_bus_finish
+  (c-name "g_dbus_proxy_new_for_bus_finish")
+  (return-type "GDBusProxy*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_dbus_proxy_new_for_bus_sync
+  (c-name "g_dbus_proxy_new_for_bus_sync")
+  (return-type "GDBusProxy*")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GDBusProxyFlags" "flags")
+    '("GDBusInterfaceInfo*" "info")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_connection
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_connection")
+  (return-type "GDBusConnection*")
+)
+
+(define-method get_flags
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_flags")
+  (return-type "GDBusProxyFlags")
+)
+
+(define-method get_name
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_name_owner
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_name_owner")
+  (return-type "gchar*")
+)
+
+(define-method get_object_path
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_object_path")
+  (return-type "const-gchar*")
+)
+
+(define-method get_interface_name
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_interface_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_default_timeout
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_default_timeout")
+  (return-type "gint")
+)
+
+(define-method set_default_timeout
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_set_default_timeout")
+  (return-type "none")
+  (parameters
+    '("gint" "timeout_msec")
+  )
+)
+
+(define-method get_interface_info
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_interface_info")
+  (return-type "GDBusInterfaceInfo*")
+)
+
+(define-method set_interface_info
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_set_interface_info")
+  (return-type "none")
+  (parameters
+    '("GDBusInterfaceInfo*" "info")
+  )
+)
+
+(define-method get_cached_property
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_cached_property")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "property_name")
+  )
+)
+
+(define-method set_cached_property
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_set_cached_property")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "property_name")
+    '("GVariant*" "value")
+  )
+)
+
+(define-method get_cached_property_names
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_get_cached_property_names")
+  (return-type "gchar**")
+)
+
+(define-method call
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_call")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "method_name")
+    '("GVariant*" "parameters")
+    '("GDBusCallFlags" "flags")
+    '("gint" "timeout_msec")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_finish
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_call_finish")
+  (return-type "GVariant*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_sync
+  (of-object "GDBusProxy")
+  (c-name "g_dbus_proxy_call_sync")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "method_name")
+    '("GVariant*" "parameters")
+    '("GDBusCallFlags" "flags")
+    '("gint" "timeout_msec")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gdbusproxywatching.h
+
+(define-function g_bus_watch_proxy
+  (c-name "g_bus_watch_proxy")
+  (return-type "guint")
+  (parameters
+    '("GBusType" "bus_type")
+    '("const-gchar*" "name")
+    '("GBusNameWatcherFlags" "flags")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("GType" "interface_type")
+    '("GDBusProxyFlags" "proxy_flags")
+    '("GBusProxyAppearedCallback" "proxy_appeared_handler")
+    '("GBusProxyVanishedCallback" "proxy_vanished_handler")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+  )
+)
+
+(define-function g_bus_watch_proxy_on_connection
+  (c-name "g_bus_watch_proxy_on_connection")
+  (return-type "guint")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("const-gchar*" "name")
+    '("GBusNameWatcherFlags" "flags")
+    '("const-gchar*" "object_path")
+    '("const-gchar*" "interface_name")
+    '("GType" "interface_type")
+    '("GDBusProxyFlags" "proxy_flags")
+    '("GBusProxyAppearedCallback" "proxy_appeared_handler")
+    '("GBusProxyVanishedCallback" "proxy_vanished_handler")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free_func")
+  )
+)
+
+(define-function g_bus_unwatch_proxy
+  (c-name "g_bus_unwatch_proxy")
+  (return-type "none")
+  (parameters
+    '("guint" "watcher_id")
+  )
+)
+
+
+
+;; From gdbusserver.h
+
+(define-function g_dbus_server_get_type
+  (c-name "g_dbus_server_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_server_new_sync
+  (c-name "g_dbus_server_new_sync")
+  (return-type "GDBusServer*")
+  (parameters
+    '("const-gchar*" "address")
+    '("GDBusServerFlags" "flags")
+    '("const-gchar*" "guid")
+    '("GDBusAuthObserver*" "observer")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_client_address
+  (of-object "GDBusServer")
+  (c-name "g_dbus_server_get_client_address")
+  (return-type "const-gchar*")
+)
+
+(define-method get_guid
+  (of-object "GDBusServer")
+  (c-name "g_dbus_server_get_guid")
+  (return-type "const-gchar*")
+)
+
+(define-method get_flags
+  (of-object "GDBusServer")
+  (c-name "g_dbus_server_get_flags")
+  (return-type "GDBusServerFlags")
+)
+
+(define-method start
+  (of-object "GDBusServer")
+  (c-name "g_dbus_server_start")
+  (return-type "none")
+)
+
+(define-method stop
+  (of-object "GDBusServer")
+  (c-name "g_dbus_server_stop")
+  (return-type "none")
+)
+
+(define-method is_active
+  (of-object "GDBusServer")
+  (c-name "g_dbus_server_is_active")
+  (return-type "gboolean")
+)
+
+
+
+;; From gdbusutils.h
+
+(define-function g_dbus_is_guid
+  (c-name "g_dbus_is_guid")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+  )
+)
+
+(define-function g_dbus_generate_guid
+  (c-name "g_dbus_generate_guid")
+  (return-type "gchar*")
+)
+
+(define-function g_dbus_is_name
+  (c-name "g_dbus_is_name")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+  )
+)
+
+(define-function g_dbus_is_unique_name
+  (c-name "g_dbus_is_unique_name")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+  )
+)
+
+(define-function g_dbus_is_member_name
+  (c-name "g_dbus_is_member_name")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+  )
+)
+
+(define-function g_dbus_is_interface_name
+  (c-name "g_dbus_is_interface_name")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
   )
 )
 
@@ -4207,6 +6470,11 @@
   )
 )
 
+(define-function g_file_attribute_matcher_get_type
+  (c-name "g_file_attribute_matcher_get_type")
+  (return-type "GType")
+)
+
 (define-function g_file_attribute_matcher_new
   (c-name "g_file_attribute_matcher_new")
   (is-constructor-of "GFileAttributeMatcher")
@@ -5109,6 +7377,81 @@
 
 (define-function g_zlib_compressor_format_get_type
   (c-name "g_zlib_compressor_format_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_socket_address_type_get_type
+  (c-name "g_unix_socket_address_type_get_type")
+  (return-type "GType")
+)
+
+(define-function g_bus_type_get_type
+  (c-name "g_bus_type_get_type")
+  (return-type "GType")
+)
+
+(define-function g_bus_name_owner_flags_get_type
+  (c-name "g_bus_name_owner_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_bus_name_watcher_flags_get_type
+  (c-name "g_bus_name_watcher_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_proxy_flags_get_type
+  (c-name "g_dbus_proxy_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_error_get_type
+  (c-name "g_dbus_error_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_connection_flags_get_type
+  (c-name "g_dbus_connection_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_capability_flags_get_type
+  (c-name "g_dbus_capability_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_call_flags_get_type
+  (c-name "g_dbus_call_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_message_type_get_type
+  (c-name "g_dbus_message_type_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_message_flags_get_type
+  (c-name "g_dbus_message_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_message_header_field_get_type
+  (c-name "g_dbus_message_header_field_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_property_info_flags_get_type
+  (c-name "g_dbus_property_info_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_subtree_flags_get_type
+  (c-name "g_dbus_subtree_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_server_flags_get_type
+  (c-name "g_dbus_server_flags_get_type")
   (return-type "GType")
 )
 
@@ -6146,6 +8489,106 @@
 
 
 
+;; From gpermission.h
+
+(define-function g_permission_get_type
+  (c-name "g_permission_get_type")
+  (return-type "GType")
+)
+
+(define-method acquire
+  (of-object "GPermission")
+  (c-name "g_permission_acquire")
+  (return-type "gboolean")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method acquire_async
+  (of-object "GPermission")
+  (c-name "g_permission_acquire_async")
+  (return-type "none")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method acquire_finish
+  (of-object "GPermission")
+  (c-name "g_permission_acquire_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method release
+  (of-object "GPermission")
+  (c-name "g_permission_release")
+  (return-type "gboolean")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method release_async
+  (of-object "GPermission")
+  (c-name "g_permission_release_async")
+  (return-type "none")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method release_finish
+  (of-object "GPermission")
+  (c-name "g_permission_release_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_allowed
+  (of-object "GPermission")
+  (c-name "g_permission_get_allowed")
+  (return-type "gboolean")
+)
+
+(define-method get_can_acquire
+  (of-object "GPermission")
+  (c-name "g_permission_get_can_acquire")
+  (return-type "gboolean")
+)
+
+(define-method get_can_release
+  (of-object "GPermission")
+  (c-name "g_permission_get_can_release")
+  (return-type "gboolean")
+)
+
+(define-method impl_update
+  (of-object "GPermission")
+  (c-name "g_permission_impl_update")
+  (return-type "none")
+  (parameters
+    '("gboolean" "allowed")
+    '("gboolean" "can_acquire")
+    '("gboolean" "can_release")
+  )
+)
+
+
+
 ;; From gresolver.h
 
 (define-function g_resolver_get_type
@@ -6347,24 +8790,6 @@
   (return-type "GType")
 )
 
-(define-function g_settings_backend_setup
-  (c-name "g_settings_backend_setup")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "context")
-    '("GSettingsBackend*" "backend")
-  )
-)
-
-(define-function g_settings_backend_setup_keyfile
-  (c-name "g_settings_backend_setup_keyfile")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "context")
-    '("const-gchar*" "filename")
-  )
-)
-
 (define-method changed
   (of-object "GSettingsBackend")
   (c-name "g_settings_backend_changed")
@@ -6382,6 +8807,17 @@
   (parameters
     '("const-gchar*" "path")
     '("gpointer" "origin_tag")
+  )
+)
+
+(define-function g_settings_backend_flatten_tree
+  (c-name "g_settings_backend_flatten_tree")
+  (return-type "none")
+  (parameters
+    '("GTree*" "tree")
+    '("gchar**" "path")
+    '("const-gchar***" "keys")
+    '("GVariant***" "values")
   )
 )
 
@@ -6424,6 +8860,15 @@
   )
 )
 
+(define-function g_keyfile_settings_backend_new
+  (c-name "g_keyfile_settings_backend_new")
+  (is-constructor-of "GKeyfileSettingsBackend")
+  (return-type "GSettingsBackend*")
+  (parameters
+    '("const-gchar*" "filename")
+  )
+)
+
 
 
 ;; From gsettings.h
@@ -6451,29 +8896,21 @@
   )
 )
 
-(define-function g_settings_supports_context
-  (c-name "g_settings_supports_context")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "context")
-  )
-)
-
-(define-function g_settings_new_with_context
-  (c-name "g_settings_new_with_context")
+(define-function g_settings_new_with_backend
+  (c-name "g_settings_new_with_backend")
   (return-type "GSettings*")
   (parameters
     '("const-gchar*" "schema")
-    '("const-gchar*" "context")
+    '("GSettingsBackend*" "backend")
   )
 )
 
-(define-function g_settings_new_with_context_and_path
-  (c-name "g_settings_new_with_context_and_path")
+(define-function g_settings_new_with_backend_and_path
+  (c-name "g_settings_new_with_backend_and_path")
   (return-type "GSettings*")
   (parameters
     '("const-gchar*" "schema")
-    '("const-gchar*" "context")
+    '("GSettingsBackend*" "backend")
     '("const-gchar*" "path")
   )
 )
@@ -6614,6 +9051,25 @@
   )
 )
 
+(define-method get_enum
+  (of-object "GSettings")
+  (c-name "g_settings_get_enum")
+  (return-type "gint")
+  (parameters
+    '("const-gchar*" "key")
+  )
+)
+
+(define-method set_enum
+  (of-object "GSettings")
+  (c-name "g_settings_set_enum")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "key")
+    '("gint" "value")
+  )
+)
+
 (define-method get_child
   (of-object "GSettings")
   (c-name "g_settings_get_child")
@@ -6654,6 +9110,11 @@
   (of-object "GSettings")
   (c-name "g_settings_get_has_unapplied")
   (return-type "gboolean")
+)
+
+(define-function g_settings_sync
+  (c-name "g_settings_sync")
+  (return-type "none")
 )
 
 (define-method bind
@@ -6909,6 +9370,24 @@
     '("GAsyncReadyCallback" "callback")
     '("gpointer" "user_data")
     '("GError*" "error")
+  )
+)
+
+
+
+;; From gsimplepermission.h
+
+(define-function g_simple_permission_get_type
+  (c-name "g_simple_permission_get_type")
+  (return-type "GType")
+)
+
+(define-function g_simple_permission_new
+  (c-name "g_simple_permission_new")
+  (is-constructor-of "GSimplePermission")
+  (return-type "GPermission*")
+  (parameters
+    '("gboolean" "allowed")
   )
 )
 
@@ -7407,6 +9886,21 @@
   (return-type "none")
   (parameters
     '("gint" "backlog")
+  )
+)
+
+(define-method get_timeout
+  (of-object "GSocket")
+  (c-name "g_socket_get_timeout")
+  (return-type "guint")
+)
+
+(define-method set_timeout
+  (of-object "GSocket")
+  (c-name "g_socket_set_timeout")
+  (return-type "none")
+  (parameters
+    '("guint" "timeout")
   )
 )
 
@@ -8369,6 +10863,60 @@
   )
 )
 
+(define-method send_credentials
+  (of-object "GUnixConnection")
+  (c-name "g_unix_connection_send_credentials")
+  (return-type "gboolean")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method receive_credentials
+  (of-object "GUnixConnection")
+  (c-name "g_unix_connection_receive_credentials")
+  (return-type "GCredentials*")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gunixcredentialsmessage.h
+
+(define-function g_unix_credentials_message_get_type
+  (c-name "g_unix_credentials_message_get_type")
+  (return-type "GType")
+)
+
+(define-function g_unix_credentials_message_new
+  (c-name "g_unix_credentials_message_new")
+  (is-constructor-of "GUnixCredentialsMessage")
+  (return-type "GSocketControlMessage*")
+)
+
+(define-function g_unix_credentials_message_new_with_credentials
+  (c-name "g_unix_credentials_message_new_with_credentials")
+  (return-type "GSocketControlMessage*")
+  (parameters
+    '("GCredentials*" "credentials")
+  )
+)
+
+(define-method get_credentials
+  (of-object "GUnixCredentialsMessage")
+  (c-name "g_unix_credentials_message_get_credentials")
+  (return-type "GCredentials*")
+)
+
+(define-function g_unix_credentials_message_is_supported
+  (c-name "g_unix_credentials_message_is_supported")
+  (return-type "gboolean")
+)
+
 
 
 ;; From gunixfdlist.h
@@ -8819,7 +11367,17 @@
   (return-type "GSocketAddress*")
   (parameters
     '("const-gchar*" "path")
-    '("int" "path_len")
+    '("gint" "path_len")
+  )
+)
+
+(define-function g_unix_socket_address_new_with_type
+  (c-name "g_unix_socket_address_new_with_type")
+  (return-type "GSocketAddress*")
+  (parameters
+    '("const-gchar*" "path")
+    '("gint" "path_len")
+    '("GUnixSocketAddressType" "type")
   )
 )
 
@@ -8833,6 +11391,12 @@
   (of-object "GUnixSocketAddress")
   (c-name "g_unix_socket_address_get_path_len")
   (return-type "gsize")
+)
+
+(define-method get_address_type
+  (of-object "GUnixSocketAddress")
+  (c-name "g_unix_socket_address_get_address_type")
+  (return-type "GUnixSocketAddressType")
 )
 
 (define-method get_is_abstract

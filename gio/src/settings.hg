@@ -16,6 +16,7 @@
  */
 
 #include <glibmm/object.h>
+#include <giomm/settingsbackend.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -39,15 +40,14 @@ class Settings : public Glib::Object
 protected:
   _WRAP_CTOR(Settings(const Glib::ustring& schema), g_settings_new)
   _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::ustring& path), g_settings_new_with_path)
-  // can't wrap both new_with_path and new_with_context since they both have the
-  // same signature...
-  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::ustring& context, const Glib::ustring& path), g_settings_new_with_context_and_path)
+  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend), g_settings_new_with_backend)
+  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path), g_settings_new_with_backend_and_path)
 
 public:
   _WRAP_CREATE(const Glib::ustring& schema)
   _WRAP_CREATE(const Glib::ustring& schema, const Glib::ustring& path)
-  _WRAP_CREATE(const Glib::ustring& schema, const Glib::ustring& context, const Glib::ustring& path)
-  static Glib::RefPtr<Settings> create_with_context(const Glib::ustring& schema, const Glib::ustring& context);
+  _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend)
+  _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
 
   // FIXME: implement the GVariant stuff
 
