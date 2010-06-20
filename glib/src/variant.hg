@@ -1,7 +1,4 @@
-#ifndef _GLIBMM_VARIANT_H
-#define _GLIBMM_VARIANT_H
-
-/* Copyright 2010 The gtkmm Development Team
+/* Copyright 2010 The glibmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,9 +15,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+_DEFS(glibmm,glib)
+
 #include <glibmmconfig.h>
+#include <glib/gvariant.h>
 #include <glibmm/ustring.h>
-#include <glib-object.h>
 
 namespace Glib
 {
@@ -35,58 +34,48 @@ namespace Glib
  * API</a>.
  */
 
-/**
+/** The base class used to wrap glib's GVariant API.
+ * @newin{2,26}
  * @ingroup glibmmVariant
  */
 class VariantBase
 {
+  _CLASS_GENERIC(VariantBase, GVariant)
+  _IGNORE(g_variant_ref, g_variant_ref_sink, g_variant_unref,
+    g_variant_get, g_variant_get_va)
 public:
   /** Default constructor.
-   * @newin{2,26}
    */
   VariantBase();
 
   /** Constructs a VariantBase from a GVariant.
-   * @newin{2,26}
+   * @param casitem The GVariant.
    */
   explicit VariantBase(GVariant* castitem);
 
   /** Copy constructor.  Since GVariant is reference counted, the copy
    * constructor simply copies the underlying GVariant* and increases its
    * reference count.
-   * @newin{2,26}
    */
   VariantBase(const VariantBase& other);
 
   /** Assignment operator.  Since GVariant is reference counted, assignment
    * simply copies the underlying GVariant* and increases its reference count.
-   * @newin{2,26}
    */
   VariantBase& operator=(const VariantBase& other);
 
   /** Get the underlying GVariant.
    * @return The underlying GVariant.
-   * @newin{2,26}
    */
   GVariant*       gobj()       { return gobject_; }
 
   /** Get the underlying GVariant.
    * @return The underlying GVariant.
-   * @newin{2,26}
    */
   const GVariant* gobj() const { return gobject_; }
 
-  /** Tells if the variant contains another variant.
-   * @return Whether the variant is container.
-   * @newin{2,26}
-   */
-  bool is_container() const;
-    
-  /** Tells the class of the variant.
-   * @return The class of the variant.
-   * @newin{2,26}
-   */
-  GVariantClass classify() const;
+  _WRAP_METHOD(bool is_container() const, g_variant_is_container)
+  _WRAP_METHOD(GVariantClass classify() const, g_variant_classify)
 
   virtual ~VariantBase();
 
@@ -95,6 +84,7 @@ protected:
 };
 
 /** Template class from which other Glib::Variant<> specializations derive.
+ * @newin{2,26}
  * @ingroup glibmmVariant
  */
 template <class T>
@@ -105,9 +95,16 @@ public:
 };
 
 
+// Each specialization has (or should have) a variant_type() method that gets
+// the type so the C function can be ignored.
+_IGNORE(g_variant_get_type)
+
 /****************** Specializations ***********************************/
 
-/// @ingroup glibmmVariant
+/** Specialization of Glib::Variant containing a Glib::VariantBase.
+ * @newin{2,26}
+ * @ingroup glibmmVariant
+ */
 template <>
 class Variant<VariantBase> : public VariantBase
 {
@@ -116,11 +113,18 @@ class Variant<VariantBase> : public VariantBase
   Variant<VariantBase>() : VariantBase() { }
   Variant<VariantBase>(GVariant* castitem) : VariantBase(castitem) { }
   static const GVariantType* variant_type() G_GNUC_CONST;
+
   static Variant<VariantBase> create(Glib::VariantBase& data);
+  _IGNORE(g_variant_new_variant)
+
   VariantBase get() const;
+  _IGNORE(g_variant_get_variant)
 };
 
-/// @ingroup glibmmVariant
+/** Specialization of Glib::Variant containing a Glib::ustring.
+ * @newin{2,26}
+ * @ingroup glibmmVariant
+ */
 template <>
 class Variant<Glib::ustring> : public VariantBase
 {
@@ -130,17 +134,27 @@ class Variant<Glib::ustring> : public VariantBase
   Variant<Glib::ustring>(GVariant* castitem) : VariantBase(castitem) { }
   static const GVariantType* variant_type() G_GNUC_CONST;
   static Variant<Glib::ustring> create(const Glib::ustring& data);
+
   Glib::ustring get() const;
+  _IGNORE(g_variant_get_string, g_variant_dup_string)
 };
 
 } // namespace Glib
 
+
+_IGNORE(
+  g_variant_get_boolean,
+  g_variant_get_uint16,
+  g_variant_get_int64,
+  g_variant_get_int32,
+  g_variant_get_int16,
+  g_variant_get_uint32,
+  g_variant_get_uint64,
+  g_variant_get_double
+)
 
 /* Include generated specializations of Glib::Variant<> for fundamental types:
  */
 #define _GLIBMM_VARIANT_H_INCLUDE_VARIANT_BASICTYPES_H
 #include <glibmm/variant_basictypes.h>
 #undef _GLIBMM_VARIANT_H_INCLUDE_VARIANT_BASICTYPES_H
-
-
-#endif /* _GLIBMM_VARIANT_H */

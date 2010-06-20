@@ -28,7 +28,8 @@ dnl
 define([GLIB_VARIANT_BASIC],[dnl
 LINE(]__line__[)dnl
 
-/**
+/** Specialization of Glib::Variant containing a $1 type.
+ * @newin{2,26}
  * @ingroup glibmmVariant
  */
 template <>
@@ -37,10 +38,28 @@ class Variant<$1> : public VariantBase
 public:
   typedef g$2 CType;
 
+  /// Default constructor.
   Variant<$1>() : VariantBase() { }
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   */
   Variant<$1>(GVariant* castitem) : VariantBase(castitem) { }
+
+  /** Gets the GVariantType.
+   * @return The GVariantType.
+   */
   static const GVariantType* variant_type() G_GNUC_CONST;
+
+  /** Creates a new Glib::Variant<$1>.
+   * @param data The value of the new Glib::Variant<$1>.
+   * @return The new Glib::Variant<$1>.
+   */
   static Variant<$1> create($1 data);
+
+  /** Gets the value of the Glib::Variant<$1>.
+   * @return The $1 value of the Glib::Variant<$1>.
+   */
   $1 get() const;
 };
 ])
