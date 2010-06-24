@@ -16,55 +16,11 @@
  */
 
 #include <glibmm/variant.h>
+#include <glib/gvariant.h>
 
 namespace Glib
 {
 
-/**** Glib::VariantBase ****************************************************/
-
-VariantBase::VariantBase()
-  : gobject_(0)
-{
-}
-
-VariantBase::VariantBase(GVariant *castitem)
-  : gobject_(castitem)
-{
-  //TODO: It would be nice to remove a possible floating reference but the C
-  //API makes it difficult.
-  if(castitem)
-    g_variant_ref(castitem);
-}
-
-VariantBase::VariantBase(const VariantBase& other)
-{
-  // The copy constructor simply copies the underlying GVariant* and increases
-  // its reference.  The reference is decreased upon destruction.
-  gobject_ = other.gobject_;
-
-  if(gobject_)
-    g_variant_ref(gobject_);
-}
-
-VariantBase& VariantBase::operator=(const VariantBase& other)
-{
-  // Check against self-assignment and simply copy the underlying GVariant*,
-  // increasing its reference.
-  if( this != &other)
-  {
-    gobject_ = other.gobject_;
-
-    if(gobject_)
-      g_variant_ref(gobject_);
-  }
-  return *this;
-}
-
-VariantBase::~VariantBase()
-{
-  if(gobject_)
-    g_variant_unref(gobject_);
-}
 
 /****************** Specializations ***********************************/
 
@@ -74,9 +30,9 @@ const GVariantType* Variant<VariantBase>::variant_type()
   return G_VARIANT_TYPE_VARIANT;
 }
 
-Variant<VariantBase> Variant<VariantBase>::create(VariantBase& data)
+Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
 {
-  return Variant<VariantBase>(g_variant_new_variant(data.gobj()));
+  return Variant<VariantBase>(g_variant_new_variant(const_cast<GVariant*>(data.gobj())));
 }
 
 VariantBase Variant<VariantBase>::get() const

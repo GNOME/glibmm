@@ -18,7 +18,6 @@
 _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
-#include <glib/gvariant.h>
 #include <glibmm/ustring.h>
 
 namespace Glib
@@ -40,47 +39,13 @@ namespace Glib
  */
 class VariantBase
 {
-  _CLASS_GENERIC(VariantBase, GVariant)
+  _CLASS_OPAQUE_COPYABLE(VariantBase, GVariant, NONE, g_variant_ref_sink, g_variant_unref)
   _IGNORE(g_variant_ref, g_variant_ref_sink, g_variant_unref,
     g_variant_get, g_variant_get_va)
 public:
-  /** Default constructor.
-   */
-  VariantBase();
-
-  /** Constructs a VariantBase from a GVariant.
-   * @param casitem The GVariant.
-   */
-  explicit VariantBase(GVariant* castitem);
-
-  /** Copy constructor.  Since GVariant is reference counted, the copy
-   * constructor simply copies the underlying GVariant* and increases its
-   * reference count.
-   */
-  VariantBase(const VariantBase& other);
-
-  /** Assignment operator.  Since GVariant is reference counted, assignment
-   * simply copies the underlying GVariant* and increases its reference count.
-   */
-  VariantBase& operator=(const VariantBase& other);
-
-  /** Get the underlying GVariant.
-   * @return The underlying GVariant.
-   */
-  GVariant*       gobj()       { return gobject_; }
-
-  /** Get the underlying GVariant.
-   * @return The underlying GVariant.
-   */
-  const GVariant* gobj() const { return gobject_; }
 
   _WRAP_METHOD(bool is_container() const, g_variant_is_container)
   _WRAP_METHOD(GVariantClass classify() const, g_variant_classify)
-
-  virtual ~VariantBase();
-
-protected:
-  GVariant* gobject_;
 };
 
 /** Template class from which other Glib::Variant<> specializations derive.
@@ -96,7 +61,7 @@ public:
 
 
 // Each specialization has (or should have) a variant_type() method that gets
-// the type so the C function can be ignored.
+// the type. So the C g_variant_get_type() function can be ignored.
 _IGNORE(g_variant_get_type)
 
 /****************** Specializations ***********************************/
@@ -114,7 +79,8 @@ class Variant<VariantBase> : public VariantBase
   Variant<VariantBase>(GVariant* castitem) : VariantBase(castitem) { }
   static const GVariantType* variant_type() G_GNUC_CONST;
 
-  static Variant<VariantBase> create(Glib::VariantBase& data);
+  //This must have a create() method because otherwise it would be a copy constructor.
+  static Variant<VariantBase> create(const Glib::VariantBase& data);
   _IGNORE(g_variant_new_variant)
 
   VariantBase get() const;

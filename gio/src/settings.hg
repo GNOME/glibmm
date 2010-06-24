@@ -16,6 +16,7 @@
  */
 
 #include <glibmm/object.h>
+#include <glibmm/variant.h>
 #include <giomm/settingsbackend.h>
 
 _DEFS(giomm,gio)
@@ -50,6 +51,9 @@ public:
   _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
 
   // FIXME: implement the GVariant stuff
+
+  _WRAP_METHOD(bool set_value(const Glib::ustring& key, const Glib::VariantBase& value),  g_settings_set_value)
+  _WRAP_METHOD(Glib::VariantBase get_value(const Glib::ustring& key), g_settings_get_value)
 
   _WRAP_METHOD(int get_int(const Glib::ustring& key) const, g_settings_get_int)
   _WRAP_METHOD(void set_int(const Glib::ustring& key, int value), g_settings_set_int)
