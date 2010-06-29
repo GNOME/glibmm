@@ -24,6 +24,7 @@ _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartStopType)
 _CONV_ENUM(G,SettingsBindFlags)
+_CONV_ENUM(G,DBusCapabilityFlags)
 
 
 # AppInfo
@@ -100,6 +101,9 @@ _CONVERSION(`Glib::RefPtr<Icon>',`GIcon*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<const Icon>',`GIcon*',__CONVERT_CONST_REFPTR_TO_P)
 
 _CONVERSION(`const Glib::RefPtr<Emblem>&',`GEmblem*',__CONVERT_CONST_REFPTR_TO_P)
+
+_CONVERSION(`GIOStream*',`Glib::RefPtr<Gio::IOStream>',`Glib::wrap($3)')
+_CONVERSION(`GIOStream*',`Glib::RefPtr<const Gio::IOStream>',`Glib::wrap($3)')
 
 # InetAddress
 _CONVERSION(`const Glib::RefPtr<InetAddress>&',`GInetAddress*',__CONVERT_CONST_REFPTR_TO_P)
