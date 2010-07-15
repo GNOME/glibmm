@@ -19,6 +19,7 @@
 
 #include <glibmm/object.h>
 #include <giomm/iostream.h>
+#include <giomm/asyncresult.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -41,8 +42,48 @@ protected:
 public:
 
   _WRAP_METHOD(bool is_closed() const, g_dbus_connection_is_closed)
-  _WRAP_METHOD(void close(), g_dbus_connection_close)
   
+  //TODO: Documentation.
+  void close();
+  
+  //TODO: Documentation.
+  void close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+  
+  //TODO: Documentation.
+  void close(const SlotAsyncReady& slot);
+  _IGNORE(g_dbus_connection_close)
+  
+  _WRAP_METHOD(bool close_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_dbus_connection_close_finish, errthrow)
+               
+  //TODO: Documentation.
+  void close_sync();
+  
+  //TODO: Documentation.
+  _WRAP_METHOD(void close_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_close_sync, errthrow)
+
+
+  //TODO: Documentation.
+  void flush();
+  
+  //TODO: Documentation.
+  void flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+  
+  //TODO: Documentation.
+  void flush(const SlotAsyncReady& slot);
+  _IGNORE(g_dbus_connection_flush)
+  
+  _WRAP_METHOD(bool flush_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_dbus_connection_flush_finish, errthrow)
+               
+  //TODO: Documentation.
+  void flush_sync();
+  
+  //TODO: Documentation.
+  _WRAP_METHOD(void flush_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_flush_sync, errthrow)
+
+
+                 
   _WRAP_METHOD(Glib::RefPtr<Gio::IOStream> get_stream(), g_dbus_connection_get_stream, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const IOStream> get_stream() const, g_dbus_connection_get_stream, refreturn, constversion)
   
@@ -50,7 +91,7 @@ public:
   _WRAP_METHOD(Glib::ustring get_unique_name() const, g_dbus_connection_get_unique_name)
   //TODO:_WRAP_METHOD(GCredentials    *g_dbus_connection_get_peer_credentials(), g_dbus_connection_get_peer_credentials )
   _WRAP_METHOD(bool get_exit_on_close() const, g_dbus_connection_get_exit_on_close)
-  _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), _dbus_connection_set_exit_on_close)
+  _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), g_dbus_connection_set_exit_on_close)
   _WRAP_METHOD(DBusCapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)
 };
 
