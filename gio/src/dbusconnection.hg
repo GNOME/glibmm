@@ -20,6 +20,7 @@
 #include <glibmm/object.h>
 #include <giomm/iostream.h>
 #include <giomm/asyncresult.h>
+#include <giomm/credentials.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -42,7 +43,7 @@ protected:
 public:
 
   _WRAP_METHOD(bool is_closed() const, g_dbus_connection_is_closed)
-  
+
   //TODO: Documentation.
   void close();
   
@@ -83,13 +84,15 @@ public:
   _WRAP_METHOD(void flush_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_flush_sync, errthrow)
 
 
-                 
-  _WRAP_METHOD(Glib::RefPtr<Gio::IOStream> get_stream(), g_dbus_connection_get_stream, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<IOStream> get_stream(), g_dbus_connection_get_stream, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const IOStream> get_stream() const, g_dbus_connection_get_stream, refreturn, constversion)
   
   _WRAP_METHOD(Glib::ustring get_guid() const, g_dbus_connection_get_guid)
   _WRAP_METHOD(Glib::ustring get_unique_name() const, g_dbus_connection_get_unique_name)
-  //TODO:_WRAP_METHOD(GCredentials    *g_dbus_connection_get_peer_credentials(), g_dbus_connection_get_peer_credentials )
+  
+  _WRAP_METHOD(Glib::RefPtr<Credentials> get_peer_credentials(), g_dbus_connection_get_peer_credentials, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Credentials> get_peer_credentials() const, g_dbus_connection_get_peer_credentials, refreturn, constversion)
+  
   _WRAP_METHOD(bool get_exit_on_close() const, g_dbus_connection_get_exit_on_close)
   _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), g_dbus_connection_set_exit_on_close)
   _WRAP_METHOD(DBusCapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)
