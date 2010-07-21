@@ -21,6 +21,7 @@
 #include <giomm/iostream.h>
 #include <giomm/asyncresult.h>
 #include <giomm/credentials.h>
+#include <giomm/dbusmessage.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -30,6 +31,7 @@ namespace Gio
 {
 
 _WRAP_ENUM(DBusCapabilityFlags, GDBusCapabilityFlags, NO_GTYPE)
+_WRAP_ENUM(DBusSendMessageFlags, GDBusSendMessageFlags, NO_GTYPE)
 
 /** TODO
  *
@@ -42,7 +44,6 @@ protected:
 
 public:
 
-  _WRAP_METHOD(bool is_closed() const, g_dbus_connection_is_closed)
 
   //TODO: Documentation.
   void close();
@@ -83,7 +84,13 @@ public:
   //TODO: Documentation.
   _WRAP_METHOD(void flush_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_flush_sync, errthrow)
 
-
+  //TODO: In the C API, out_serial is volatile, but gmmproc can't parse that.
+  #m4 _CONVERSION(`guint32*',`volatile guint32*',`($3)')
+  _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32* out_serial), g_dbus_connection_send_message, errthrow)
+                                                                   
+  _WRAP_METHOD(void start_message_processing(), g_dbus_connection_start_message_processing)
+  _WRAP_METHOD(bool is_closed() const, g_dbus_connection_is_closed)
+  
   _WRAP_METHOD(Glib::RefPtr<IOStream> get_stream(), g_dbus_connection_get_stream, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const IOStream> get_stream() const, g_dbus_connection_get_stream, refreturn, constversion)
   

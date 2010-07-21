@@ -24,7 +24,9 @@ _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartStopType)
 _CONV_ENUM(G,SettingsBindFlags)
+_CONV_ENUM(G,CredentialsType)
 _CONV_ENUM(G,DBusCapabilityFlags)
+_CONV_ENUM(G,DBusSendMessageFlags)
 
 
 # AppInfo
@@ -51,6 +53,8 @@ _CONVERSION(`GCancellable*', `const Glib::RefPtr<Cancellable>&', `Glib::wrap($3)
 _CONVERSION(`const Glib::RefPtr<const Credentials>&',`GCredentials*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Credentials))
 _CONVERSION(`GCredentials*',`Glib::RefPtr<Credentials>',`Glib::wrap($3)')
 _CONVERSION(`GCredentials*',`Glib::RefPtr<const Credentials>',`Glib::wrap($3)')
+
+_CONVERSION(`const Glib::RefPtr<DBusMessage>&',`GDBusMessage*',__CONVERT_REFPTR_TO_P)
 
 # DesktopAppInfo
 _CONVERSION(`GDesktopAppInfo*', `Glib::RefPtr<DesktopAppInfo>', `Glib::wrap($3)')

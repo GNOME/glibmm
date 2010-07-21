@@ -45,13 +45,6 @@
   (gtype-id "G_TYPE_CONVERTER")
 )
 
-(define-object s
-  (in-module "GCredential")
-  (parent "GObject")
-  (c-name "GCredentials")
-  (gtype-id "G_TYPE_CREDENTIALS")
-)
-
 (define-object Proxy
   (in-module "GDBus")
   (parent "GObject")
@@ -1009,6 +1002,35 @@
     '("none" "G_DBUS_SERVER_FLAGS_NONE")
     '("run-in-thread" "G_DBUS_SERVER_FLAGS_RUN_IN_THREAD")
     '("authentication-allow-anonymous" "G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS")
+  )
+)
+
+(define-enum SignalFlags
+  (in-module "GDBus")
+  (c-name "GDBusSignalFlags")
+  (gtype-id "G_TYPE_D_BUS_SIGNAL_FLAGS")
+  (values
+    '("none" "G_DBUS_SIGNAL_FLAGS_NONE")
+  )
+)
+
+(define-flags SendMessageFlags
+  (in-module "GDBus")
+  (c-name "GDBusSendMessageFlags")
+  (gtype-id "G_TYPE_D_BUS_SEND_MESSAGE_FLAGS")
+  (values
+    '("none" "G_DBUS_SEND_MESSAGE_FLAGS_NONE")
+    '("preserve-serial" "G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL")
+  )
+)
+
+(define-enum Type
+  (in-module "GCredentials")
+  (c-name "GCredentialsType")
+  (gtype-id "G_TYPE_CREDENTIALS_TYPE")
+  (values
+    '("invalid" "G_CREDENTIALS_TYPE_INVALID")
+    '("linux-ucred" "G_CREDENTIALS_TYPE_LINUX_UCRED")
   )
 )
 
@@ -2045,6 +2067,9 @@
   (of-object "GCredentials")
   (c-name "g_credentials_get_native")
   (return-type "gpointer")
+  (parameters
+    '("GCredentialsType" "native_type")
+  )
 )
 
 (define-method set_native
@@ -2052,6 +2077,7 @@
   (c-name "g_credentials_set_native")
   (return-type "none")
   (parameters
+    '("GCredentialsType" "native_type")
     '("gpointer" "native")
   )
 )
@@ -2716,6 +2742,7 @@
   (return-type "gboolean")
   (parameters
     '("GDBusMessage*" "message")
+    '("GDBusSendMessageFlags" "flags")
     '("volatile-guint32*" "out_serial")
     '("GError**" "error")
   )
@@ -2727,6 +2754,7 @@
   (return-type "none")
   (parameters
     '("GDBusMessage*" "message")
+    '("GDBusSendMessageFlags" "flags")
     '("gint" "timeout_msec")
     '("volatile-guint32*" "out_serial")
     '("GCancellable*" "cancellable")
@@ -2751,6 +2779,7 @@
   (return-type "GDBusMessage*")
   (parameters
     '("GDBusMessage*" "message")
+    '("GDBusSendMessageFlags" "flags")
     '("gint" "timeout_msec")
     '("volatile-guint32*" "out_serial")
     '("GCancellable*" "cancellable")
@@ -2825,7 +2854,7 @@
   (return-type "guint")
   (parameters
     '("const-gchar*" "object_path")
-    '("const-GDBusInterfaceInfo*" "interface_info")
+    '("GDBusInterfaceInfo*" "interface_info")
     '("const-GDBusInterfaceVTable*" "vtable")
     '("gpointer" "user_data")
     '("GDestroyNotify" "user_data_free_func")
@@ -2875,6 +2904,7 @@
     '("const-gchar*" "member")
     '("const-gchar*" "object_path")
     '("const-gchar*" "arg0")
+    '("GDBusSignalFlags" "flags")
     '("GDBusSignalCallback" "callback")
     '("gpointer" "user_data")
     '("GDestroyNotify" "user_data_free_func")
@@ -3023,7 +3053,7 @@
   (c-name "g_dbus_annotation_info_lookup")
   (return-type "const-gchar*")
   (parameters
-    '("const-GDBusAnnotationInfo**" "annotations")
+    '("GDBusAnnotationInfo**" "annotations")
     '("const-gchar*" "name")
   )
 )
@@ -3031,7 +3061,7 @@
 (define-method lookup_method
   (of-object "GDBusInterfaceInfo")
   (c-name "g_dbus_interface_info_lookup_method")
-  (return-type "const-GDBusMethodInfo*")
+  (return-type "GDBusMethodInfo*")
   (parameters
     '("const-gchar*" "name")
   )
@@ -3040,7 +3070,7 @@
 (define-method lookup_signal
   (of-object "GDBusInterfaceInfo")
   (c-name "g_dbus_interface_info_lookup_signal")
-  (return-type "const-GDBusSignalInfo*")
+  (return-type "GDBusSignalInfo*")
   (parameters
     '("const-gchar*" "name")
   )
@@ -3049,7 +3079,7 @@
 (define-method lookup_property
   (of-object "GDBusInterfaceInfo")
   (c-name "g_dbus_interface_info_lookup_property")
-  (return-type "const-GDBusPropertyInfo*")
+  (return-type "GDBusPropertyInfo*")
   (parameters
     '("const-gchar*" "name")
   )
@@ -3077,7 +3107,7 @@
 (define-method lookup_interface
   (of-object "GDBusNodeInfo")
   (c-name "g_dbus_node_info_lookup_interface")
-  (return-type "const-GDBusInterfaceInfo*")
+  (return-type "GDBusInterfaceInfo*")
   (parameters
     '("const-gchar*" "name")
   )
@@ -7416,6 +7446,21 @@
   (return-type "GType")
 )
 
+(define-function g_dbus_signal_flags_get_type
+  (c-name "g_dbus_signal_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_send_message_flags_get_type
+  (c-name "g_dbus_send_message_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_credentials_type_get_type
+  (c-name "g_credentials_type_get_type")
+  (return-type "GType")
+)
+
 (define-function g_settings_bind_flags_get_type
   (c-name "g_settings_bind_flags_get_type")
   (return-type "GType")
@@ -10101,6 +10146,15 @@
   (of-object "GSocket")
   (c-name "g_socket_speaks_ipv4")
   (return-type "gboolean")
+)
+
+(define-method get_credentials
+  (of-object "GSocket")
+  (c-name "g_socket_get_credentials")
+  (return-type "GCredentials*")
+  (parameters
+    '("GError**" "error")
+  )
 )
 
 
