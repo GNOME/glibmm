@@ -3,6 +3,15 @@
 namespace Gio
 {
 
+void Settings::get_value(const Glib::ustring& key, Glib::VariantBase& value)
+{
+  GVariant* const g_value = g_settings_get_value(gobj(), key.c_str());
+  if(!g_value)
+    return;
+
+  value.init(g_value, false /* don't take a reference */);
+}
+
 void Settings::bind(const Glib::ustring& key,
                     const Glib::PropertyProxy_Base& property_proxy,
                     SettingsBindFlags flags)

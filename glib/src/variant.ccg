@@ -25,6 +25,16 @@ namespace Glib
 
 /****************** Specializations ***********************************/
 
+void VariantBase::init(const GVariant* cobject, bool take_a_reference)
+{
+  if(gobject_)
+    g_variant_unref(gobject_);
+
+  gobject_ = const_cast<GVariant*>(cobject);
+  if(take_a_reference)
+    g_variant_ref(gobject_);
+}
+
 // static
 const GVariantType* Variant<VariantBase>::variant_type()
 {

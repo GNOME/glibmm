@@ -32,7 +32,14 @@ static void on_key_changed(const Glib::ustring& key, const Glib::RefPtr<Gio::Set
   {
     Glib::ustring str = settings->get_string(key);
     std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
-                      key, str);    
+                      key, str);
+                      
+    //Or:
+    Glib::Variant<Glib::ustring> variant;
+    settings->get_value(key, variant);
+    str = variant.get();
+    std::cout << Glib::ustring::compose("New value, via variant, of '%1': '%2'\n",
+                      key, str);
   }
   else if (key == INT_KEY)
   {
