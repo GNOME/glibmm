@@ -46,6 +46,19 @@ public:
 
   _WRAP_METHOD(bool is_container() const, g_variant_is_container)
   _WRAP_METHOD(GVariantClass classify() const, g_variant_classify)
+  
+  _WRAP_METHOD(Glib::ustring print(bool type_annotate = false) const, g_variant_print)
+  _IGNORE(g_variant_print_string);
+
+  _IGNORE(g_variant_hash)
+  
+  #m4 _CONVERSION(`const VariantBase&',`gconstpointer',`const_cast<GVariant*>(($3).gobj())')
+  _WRAP_METHOD(guint hash() const, g_variant_hash)
+  _WRAP_METHOD(bool equal(const VariantBase& other) const, g_variant_equal)
+
+  _WRAP_METHOD(VariantBase get_normal_form() const, g_variant_get_normal_form)
+  _WRAP_METHOD(bool is_normal_form() const, g_variant_is_normal_form)
+  _WRAP_METHOD(VariantBase byteswap() const, g_variant_byteswap)
 };
 
 /** Template class from which other Glib::Variant<> specializations derive.
@@ -73,10 +86,17 @@ _IGNORE(g_variant_get_type)
 template <>
 class Variant<VariantBase> : public VariantBase
 {
+public:
   typedef GVariant* CType;
 
-  Variant<VariantBase>() : VariantBase() { }
-  Variant<VariantBase>(GVariant* castitem) : VariantBase(castitem) { }
+  Variant<VariantBase>()
+  : VariantBase()
+  {}
+  
+  explicit Variant<VariantBase>(GVariant* castitem)
+  : VariantBase(castitem)
+  {}
+  
   static const GVariantType* variant_type() G_GNUC_CONST;
 
   //This must have a create() method because otherwise it would be a copy constructor.
@@ -94,10 +114,17 @@ class Variant<VariantBase> : public VariantBase
 template <>
 class Variant<Glib::ustring> : public VariantBase
 {
+public:
   typedef char* CType;
 
-  Variant<Glib::ustring>() : VariantBase() { }
-  Variant<Glib::ustring>(GVariant* castitem) : VariantBase(castitem) { }
+  Variant<Glib::ustring>()
+  : VariantBase()
+  {}
+  
+  explicit Variant<Glib::ustring>(GVariant* castitem)
+  : VariantBase(castitem)
+  {}
+  
   static const GVariantType* variant_type() G_GNUC_CONST;
   static Variant<Glib::ustring> create(const Glib::ustring& data);
 

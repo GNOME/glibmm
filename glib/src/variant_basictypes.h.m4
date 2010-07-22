@@ -39,12 +39,16 @@ public:
   typedef g$2 CType;
 
   /// Default constructor.
-  Variant<$1>() : VariantBase() { }
+  Variant<$1>()
+  : VariantBase()
+  {}
 
   /** GVariant constructor.
    * @param castitem The GVariant to wrap.
    */
-  Variant<$1>(GVariant* castitem) : VariantBase(castitem) { }
+  explicit Variant<$1>(GVariant* castitem)
+  : VariantBase(castitem)
+  {}
 
   /** Gets the GVariantType.
    * @return The GVariantType.
@@ -65,7 +69,7 @@ public:
 ])
 
 divert[]dnl
-// This is a generated file, do not edit.  Generated from __file__
+// This is a generated file. Do not edit it.  Generated from __file__
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifndef _GLIBMM_VARIANT_H_INCLUDE_VARIANT_BASICTYPES_H

@@ -148,6 +148,7 @@ _CONVERSION(`const Glib::RefPtr<SettingsBackend>&',`GSettingsBackend*',__CONVERT
 
 
 _CONVERSION(`GVariant*',`Glib::VariantBase',`Glib::wrap($3, true)')
+_CONVERSION(`GVariant*',`VariantBase',`Glib::wrap($3, true)')
 _CONVERSION(`const Glib::VariantBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
 
 #Socket
