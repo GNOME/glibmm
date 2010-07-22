@@ -41,8 +41,13 @@ public:
 
   _WRAP_CREATE()
 
+  // TODO: We can't use _WRAP_CTOR() and _WRAP_CREATE() because the C functions do more than just call g_object_new():
+  // http://bugzilla.gnome.org/show_bug.cgi?id=624977
+  // TODO: Should these paramters be ustring or std::string?
+  _WRAP_METHOD(static Glib::RefPtr<DBusMessage> create_signal(const Glib::ustring& path, const Glib::ustring& interface, const Glib::ustring& signal), g_dbus_message_new_signal)
+  _WRAP_METHOD(static Glib::RefPtr<DBusMessage> create_method_call(const Glib::ustring& name, const Glib::ustring& path, const Glib::ustring& interface, const Glib::ustring& method), g_dbus_message_new_method_call)
+  _WRAP_METHOD(static Glib::RefPtr<DBusMessage> create_method_reply(const Glib::RefPtr<DBusMessage>& method_call_message), g_dbus_message_new_method_reply)
 };
 
 
 } // namespace Gio
-
