@@ -27,7 +27,8 @@ _CONV_ENUM(G,SettingsBindFlags)
 _CONV_ENUM(G,CredentialsType)
 _CONV_ENUM(G,DBusCapabilityFlags)
 _CONV_ENUM(G,DBusSendMessageFlags)
-
+_CONV_ENUM(G,DBusMessageType)
+_CONV_ENUM(G,DBusMessageFlags)
 
 # AppInfo
 _CONVERSION(`GAppInfo*',`Glib::RefPtr<AppInfo>',`Glib::wrap($3)')
