@@ -28,13 +28,13 @@ const char *const INT_KEY = "test-int";
 static void on_key_changed(const Glib::ustring& key, const Glib::RefPtr<Gio::Settings>& settings)
 {
   std::cout << Glib::ustring::compose("'%1' changed\n", key);
-  if (key.raw() == STRING_KEY)
+  if (key == STRING_KEY)
   {
     Glib::ustring str = settings->get_string(key);
     std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
                       key, str);    
   }
-  else if (key.raw() == INT_KEY)
+  else if (key == INT_KEY)
   {
     std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
                       key, settings->get_int(key));
