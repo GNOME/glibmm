@@ -18,6 +18,7 @@
  */
 
 #include <glibmm/object.h>
+#include <glibmm/variant.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -27,6 +28,7 @@ namespace Gio
 
 _WRAP_ENUM(DBusMessageType, GDBusMessageType, NO_GTYPE)
 _WRAP_ENUM(DBusMessageFlags, GDBusMessageFlags, NO_GTYPE)
+_WRAP_ENUM(DBusMessageHeaderField, GDBusMessageHeaderField, NO_GTYPE)
 
 /** TODO
  *
@@ -60,12 +62,13 @@ public:
   _WRAP_METHOD(guint32 get_serial() const, g_dbus_message_get_serial)
   _WRAP_METHOD(void set_serial(guint32 serial), g_dbus_message_set_serial)
 
+  //TODO: Documentation:
+  void get_header(Glib::VariantBase& value, DBusMessageHeaderField header_field) const;
+  _IGNORE(g_dbus_message_get_header)
+  
+  _WRAP_METHOD(void set_header(DBusMessageHeaderField header_field, const Glib::VariantBase& value), g_dbus_message_set_header)
+  
 /* TODO:
-  _WRAP_METHOD(GVariant                 *g_dbus_message_get_header         (
- GDBusMessageHeaderField   header_field);
-  _WRAP_METHOD(void g_dbus_message_set_header         (
- GDBusMessageHeaderField   header_field,
- GVariant                 *value);
 
   _WRAP_METHOD(guchar                   *g_dbus_message_get_header_fields  (), )
   _WRAP_METHOD(GVariant                 *g_dbus_message_get_body           (), )
