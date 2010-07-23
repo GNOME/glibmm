@@ -664,6 +664,18 @@
   )
 )
 
+;; From GDBusAuthObserver
+
+(define-signal authorize-authenticated-peer
+  (of-object "GDBusAuthObserver")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("GIOStream*" "p0")
+    '("GCredentials*" "p1")
+  )
+)
+
 ;; From GInetAddress
 
 (define-property family
@@ -925,10 +937,10 @@
   (construct-only #t)
 )
 
-(define-property context
+(define-property backend
   (of-object "GSettings")
-  (prop-type "GParamString")
-  (docs "The name of the context for this settings object")
+  (prop-type "GParamObject")
+  (docs "The GSettingsBackend for this settings object")
   (readable #t)
   (writable #t)
   (construct-only #t)
@@ -1032,6 +1044,15 @@
   (docs "The remote address the socket is connected to")
   (readable #t)
   (writable #f)
+  (construct-only #f)
+)
+
+(define-property timeout
+  (of-object "GSocket")
+  (prop-type "GParamUInt")
+  (docs "The timeout in seconds on socket I/O")
+  (readable #t)
+  (writable #t)
   (construct-only #f)
 )
 

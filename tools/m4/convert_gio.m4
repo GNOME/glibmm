@@ -117,6 +117,7 @@ _CONVERSION(`GIOStream*',`Glib::RefPtr<Gio::IOStream>',`Glib::wrap($3)')
 _CONVERSION(`GIOStream*',`Glib::RefPtr<IOStream>',`Glib::wrap($3)')
 _CONVERSION(`GIOStream*',`Glib::RefPtr<const Gio::IOStream>',`Glib::wrap($3)')
 _CONVERSION(`GIOStream*',`Glib::RefPtr<const IOStream>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const IOStream>&',`GIOStream*',`const_cast<GIOStream*>(Glib::unwrap($3))')
 
 # InetAddress
 _CONVERSION(`const Glib::RefPtr<InetAddress>&',`GInetAddress*',__CONVERT_CONST_REFPTR_TO_P)

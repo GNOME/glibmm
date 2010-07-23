@@ -73,6 +73,7 @@ int main(int, char**)
             << get_defs(G_TYPE_VOLUME_MONITOR)
 
             // network IO classes
+            << get_defs(G_TYPE_DBUS_AUTH_OBSERVER)
             << get_defs(G_TYPE_INET_ADDRESS)
             << get_defs(G_TYPE_INET_SOCKET_ADDRESS)
             << get_defs(G_TYPE_SOCKET_ADDRESS)
