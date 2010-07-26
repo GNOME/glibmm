@@ -1,0 +1,98 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+
+/** UnixFDList - An object containing a set of UNIX file descriptors.
+ * A UnixFDList contains a list of file descriptors. It owns the file
+ * descriptors that it contains, closing them when finalized.
+ *
+ * It may be wrapped in a UnixFDMessage and sent over a Socket in the
+ * G_SOCKET_ADDRESS_UNIX family by using Gio::Socket::send() and received
+ * using Gio::Socket::receive().
+ *
+ * Note that <tt><gio/gunixfdlist.h></tt> belongs to the UNIX-specific GIO
+ * interfaces, thus you have to use the <tt>gio-unix-2.0.pc</tt> pkg-config
+ * file when using it.
+ *
+ * @newin{2,24}
+ */
+class UnixFDList : public Glib::Object
+{
+  _CLASS_GOBJECT(UnixFDList, GUnixFDList, G_UNIX_FD_LIST, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT
+  _IGNORE(g_unix_fd_list_new)
+
+  UnixFDList(const Glib::ArrayHandle<int>& fds);
+
+#m4 _CONVERSION(`const Glib::ArrayHandle<int>&', `const gint*', `$3.data()')
+  _WRAP_CTOR(UnixFDList(const Glib::ArrayHandle<int>& fds, int n_fds), g_unix_fd_list_new_from_array)
+
+public:
+  _WRAP_METHOD_DOCS_ONLY(g_unix_fd_list_new)
+  _WRAP_CREATE()
+
+  /** Creates a new UnixFDList containing the file descriptors given in @a
+   * fds.  The file descriptors become the property of the new list and may no
+   * longer be used by the caller. The array itself is owned by the caller.
+   *
+   * Each file descriptor in the array should be set to close-on-exec.
+   */
+  _WRAP_CREATE(const Glib::ArrayHandle<int>& fds)
+
+  _WRAP_METHOD_DOCS_ONLY(g_unix_fd_list_new_from_array)
+  _WRAP_CREATE(const Glib::ArrayHandle<int>& fds, int n_fds)
+
+  _WRAP_METHOD(int get_length() const, g_unix_fd_list_get_length)
+  _WRAP_METHOD(int get(int index) const, g_unix_fd_list_get, errthrow)
+
+  /** Returns the array of file descriptors that is contained in this object.
+   *
+   * After this call, the descriptors remain the property of the list. The
+   * caller must not close them. The array is valid only until list is changed
+   * in any way.
+   * @return the list of file descriptors.
+   */
+  Glib::ArrayHandle<int> peek_fds() const;
+
+  /** Returns the array of file descriptors that is contained in this object.
+   *
+   * After this call, the descriptors are no longer contained in the list.
+   * Further calls will return an empty list (unless more descriptors have
+   * been added).
+   *
+   * The caller is responsible for closing all of the file descriptors. The
+   * file descriptors in the array are set to close-on-exec.
+   * @return the list of file descriptors.
+   */
+  Glib::ArrayHandle<int> steal_fds();
+
+  _WRAP_METHOD(int append(int fd), g_unix_fd_list_append, errthrow)
+};
+
+} // namespace Gio
