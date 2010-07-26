@@ -19,6 +19,7 @@
 
 #include <gio/gio.h>
 #include <giomm/dbusconnection.h>
+#include <giomm/dbusauthobserver.h>
 
 namespace Gio
 {
@@ -26,6 +27,11 @@ namespace Gio
 DBusServer::DBusServer(const Glib::ustring& address, DBusServerFlags flags,
   const Glib::ustring& guid, const Glib::RefPtr<DBusAuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable)
+  : _CONSTRUCT("address",
+    (address.empty() ? static_cast<char*>(0) : address.c_str()),
+    "flags", static_cast<GDBusServerFlags>(flags),
+    "guid", (guid.empty() ? static_cast<char*>(0) : guid.c_str()),
+    "authentication-observer", Glib::unwrap(observer))
 {
   init(cancellable);
 }
