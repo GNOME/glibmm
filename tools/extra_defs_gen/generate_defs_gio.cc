@@ -74,6 +74,7 @@ int main(int, char**)
 
             // network IO classes
             << get_defs(G_TYPE_DBUS_AUTH_OBSERVER)
+            << get_defs(G_TYPE_DBUS_SERVER)
             << get_defs(G_TYPE_INET_ADDRESS)
             << get_defs(G_TYPE_INET_SOCKET_ADDRESS)
             << get_defs(G_TYPE_SOCKET_ADDRESS)
