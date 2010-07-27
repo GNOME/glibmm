@@ -3,10 +3,13 @@
 namespace Gio
 {
 
-Glib::RefPtr<Settings> Settings::create_with_context(const Glib::ustring& schema,
-                                                     const Glib::ustring& context)
+void Settings::get_value(const Glib::ustring& key, Glib::VariantBase& value) const
 {
-    return Glib::RefPtr<Settings>(new Settings(g_settings_new_with_context(schema.c_str(), context.c_str())));
+  GVariant* const g_value = g_settings_get_value(const_cast<GSettings*>(gobj()), key.c_str());
+  if(!g_value)
+    return;
+
+  value.init(g_value, false /* don't take a reference */);
 }
 
 void Settings::bind(const Glib::ustring& key,

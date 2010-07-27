@@ -16,6 +16,8 @@
  */
 
 #include <glibmm/object.h>
+#include <glibmm/variant.h>
+#include <giomm/settingsbackend.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -39,17 +41,23 @@ class Settings : public Glib::Object
 protected:
   _WRAP_CTOR(Settings(const Glib::ustring& schema), g_settings_new)
   _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::ustring& path), g_settings_new_with_path)
-  // can't wrap both new_with_path and new_with_context since they both have the
-  // same signature...
-  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::ustring& context, const Glib::ustring& path), g_settings_new_with_context_and_path)
+  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend), g_settings_new_with_backend)
+  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path), g_settings_new_with_backend_and_path)
 
 public:
   _WRAP_CREATE(const Glib::ustring& schema)
   _WRAP_CREATE(const Glib::ustring& schema, const Glib::ustring& path)
-  _WRAP_CREATE(const Glib::ustring& schema, const Glib::ustring& context, const Glib::ustring& path)
-  static Glib::RefPtr<Settings> create_with_context(const Glib::ustring& schema, const Glib::ustring& context);
+  _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend)
+  _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
 
   // FIXME: implement the GVariant stuff
+
+  _WRAP_METHOD(bool set_value(const Glib::ustring& key, const Glib::VariantBase& value),  g_settings_set_value)
+  
+  /** TODO: Documentation.
+   */
+  void get_value(const Glib::ustring& key, Glib::VariantBase& value) const;
+  _IGNORE(g_settings_get_value)
 
   _WRAP_METHOD(int get_int(const Glib::ustring& key) const, g_settings_get_int)
   _WRAP_METHOD(void set_int(const Glib::ustring& key, int value), g_settings_set_int)
@@ -65,6 +73,11 @@ public:
 
   _WRAP_METHOD(bool set_string_array(const Glib::ustring& key,  const Glib::StringArrayHandle& value), g_settings_set_strv)
 
+  _WRAP_METHOD(int get_enum(const Glib::ustring& key) const, g_settings_get_enum )
+  _WRAP_METHOD(bool get_enum(const Glib::ustring& key, int value), g_settings_set_enum)
+  _WRAP_METHOD(guint get_flags(const Glib::ustring& key) const, g_settings_get_flags)
+  _WRAP_METHOD(bool get_flags(const Glib::ustring& key, guint value), g_settings_set_flags)
+                                                                         
   // Ignore varargs functions.
   _IGNORE(g_settings_get, g_settings_set)
 
