@@ -18,17 +18,40 @@
  */
 
 #include <gio/gio.h>
+#ifdef G_OS_UNIX
+#include <giomm/unixfdlist.h>
+#endif //G_OS_UNIX
 
 namespace Gio
 {
 
-void DBusMessage::get_header(Glib::VariantBase& value, DBusMessageHeaderField header_field) const
+void DBusMessage::get_body(Glib::VariantBase& value) const
 {
-  GVariant* const g_value = g_dbus_message_get_header(const_cast<GDBusMessage*>(gobj()), ((GDBusMessageHeaderField)(header_field)));
+  GVariant* const g_value =
+    g_dbus_message_get_body(const_cast<GDBusMessage*>(gobj()));
+
   if(!g_value)
     return;
 
   value.init(g_value, true /* take a reference */);
+}
+
+void DBusMessage::get_header(Glib::VariantBase& value,
+  DBusMessageHeaderField header_field) const
+{
+  GVariant* const g_value =
+    g_dbus_message_get_header(const_cast<GDBusMessage*>(gobj()),
+    ((GDBusMessageHeaderField)(header_field)));
+
+  if(!g_value)
+    return;
+
+  value.init(g_value, true /* take a reference */);
+}
+
+void DBusMessage::unset_unix_fd_list()
+{
+  g_dbus_message_set_unix_fd_list(gobj(), 0);
 }
   
 } // namespace Gio
