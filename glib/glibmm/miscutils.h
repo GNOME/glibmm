@@ -23,6 +23,7 @@
 
 #include <glibmm/arrayhandle.h>
 #include <glibmm/ustring.h>
+#include <glibmm/enums.h>
 
 
 namespace Glib
