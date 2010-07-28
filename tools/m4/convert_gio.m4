@@ -60,6 +60,7 @@ _CONVERSION(`GCredentials*',`Glib::RefPtr<const Credentials>',`Glib::wrap($3)')
 
 # DBusConnection
 _CONVERSION(`const Glib::RefPtr<DBusConnection>&',`GDBusConnection*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GDBusConnection*',`Glib::RefPtr<DBusConnection>',Glib::wrap($3))
 
 # DBusMessage
 _CONVERSION(`const Glib::RefPtr<DBusMessage>&',`GDBusMessage*',__CONVERT_REFPTR_TO_P)
@@ -117,8 +118,10 @@ _CONVERSION(`const Glib::RefPtr<Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<Icon>',`GIcon*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<const Icon>',`GIcon*',__CONVERT_CONST_REFPTR_TO_P)
 
+# Emblem
 _CONVERSION(`const Glib::RefPtr<Emblem>&',`GEmblem*',__CONVERT_CONST_REFPTR_TO_P)
 
+# IOStream
 _CONVERSION(`GIOStream*',`Glib::RefPtr<Gio::IOStream>',`Glib::wrap($3)')
 _CONVERSION(`GIOStream*',`Glib::RefPtr<IOStream>',`Glib::wrap($3)')
 _CONVERSION(`GIOStream*',`Glib::RefPtr<const Gio::IOStream>',`Glib::wrap($3)')
@@ -134,7 +137,7 @@ _CONVERSION(`const Glib::RefPtr<InputStream>&',`GInputStream*',__CONVERT_CONST_R
 _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GInputStream*',`Glib::RefPtr<InputStream>',`Glib::wrap($3)')
 
-#Mount
+# Mount
 _CONVERSION(`GMount*',`Glib::RefPtr<Mount>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
 
