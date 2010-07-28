@@ -79,3 +79,6 @@ _CONVERSION(`OptionGroup&',`GOptionGroup*',`($3).gobj()')
 #_CONVERSION(`GOptionGroup*',`OptionGroup',`Glib::wrap(($3), true /* take_copy */)')
 
 _CONVERSION(`Glib::KeyFile&',`GKeyFile*',`($3).gobj()')
+
+_CONVERSION(`const VariantType&',`const GVariantType*',`($3).gobj()')
+_CONVERSION(`const GVariantType*',`VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
