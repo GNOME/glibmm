@@ -88,4 +88,17 @@ void DBusConnection::flush_sync()
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 }
+
+void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  volatile guint32 out_serial;
+  g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
+                                      static_cast<GDBusSendMessageFlags>(message->get_flags()),
+                                      timeout_msec, &out_serial,
+                                      Glib::unwrap(cancellable), &SignalProxy_async_callback,
+                                      slot_copy);
+  message->set_serial(out_serial);
+}
+
 } // namespace Gio
