@@ -1,30 +1,36 @@
-_CONV_ENUM(G,PasswordSave)
-_CONV_ENUM(G,AskPasswordFlags)
-_CONV_ENUM(G,MountOperationResult)
-_CONV_ENUM(G,MountUnmountFlags)
-_CONV_ENUM(G,MountMountFlags)
-_CONV_ENUM(G,FileAttributeType)
-_CONV_ENUM(G,FileAttributeInfoFlags)
-_CONV_ENUM(G,FileCopyFlags)
-_CONV_ENUM(G,FileCreateFlags)
-_CONV_ENUM(G,FileMonitorFlags)
-_CONV_ENUM(G,FileMonitorEvent)
-_CONV_ENUM(G,FileQueryInfoFlags)
-_CONV_ENUM(G,FileType)
-_CONV_ENUM(G,OutputStreamSpliceFlags)
 _CONV_ENUM(G,AppInfoCreateFlags)
+_CONV_ENUM(G,AskPasswordFlags)
+_CONV_ENUM(G,CredentialsType)
 _CONV_ENUM(G,DataStreamByteOrder)
 _CONV_ENUM(G,DataStreamNewlineType)
-_CONV_ENUM(G,EmblemOrigin)
-_CONV_ENUM(G,SocketFamily)
-_CONV_ENUM(G,SocketType)
-_CONV_ENUM(G,SocketProtocol)
-_CONV_ENUM(G,SocketMsgFlags)
+_CONV_ENUM(G,DBusCapabilityFlags)
+_CONV_ENUM(G,DBusMessageFlags)
+_CONV_ENUM(G,DBusMessageHeaderField)
+_CONV_ENUM(G,DBusMessageType)
+_CONV_ENUM(G,DBusSendMessageFlags)
+_CONV_ENUM(G,DBusServerFlags)
 _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartStopType)
+_CONV_ENUM(G,EmblemOrigin)
+_CONV_ENUM(G,FileAttributeInfoFlags)
+_CONV_ENUM(G,FileAttributeType)
+_CONV_ENUM(G,FileCopyFlags)
+_CONV_ENUM(G,FileCreateFlags)
+_CONV_ENUM(G,FileMonitorEvent)
+_CONV_ENUM(G,FileMonitorFlags)
+_CONV_ENUM(G,FileQueryInfoFlags)
+_CONV_ENUM(G,FileType)
+_CONV_ENUM(G,MountMountFlags)
+_CONV_ENUM(G,MountOperationResult)
+_CONV_ENUM(G,MountUnmountFlags)
+_CONV_ENUM(G,OutputStreamSpliceFlags)
+_CONV_ENUM(G,PasswordSave)
 _CONV_ENUM(G,SettingsBindFlags)
-
+_CONV_ENUM(G,SocketFamily)
+_CONV_ENUM(G,SocketMsgFlags)
+_CONV_ENUM(G,SocketProtocol)
+_CONV_ENUM(G,SocketType)
 
 # AppInfo
 _CONVERSION(`GAppInfo*',`Glib::RefPtr<AppInfo>',`Glib::wrap($3)')
@@ -47,6 +53,20 @@ _CONVERSION(`const Glib::RefPtr<Gio::Cancellable>&',`GCancellable*',__CONVERT_CO
 _CONVERSION(`GCancellable*', `Glib::RefPtr<Cancellable>', `Glib::wrap($3)')
 _CONVERSION(`GCancellable*', `const Glib::RefPtr<Cancellable>&', `Glib::wrap($3)')
 
+# Credentials
+_CONVERSION(`const Glib::RefPtr<const Credentials>&',`GCredentials*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Credentials))
+_CONVERSION(`GCredentials*',`Glib::RefPtr<Credentials>',`Glib::wrap($3)')
+_CONVERSION(`GCredentials*',`Glib::RefPtr<const Credentials>',`Glib::wrap($3)')
+
+# DBusConnection
+_CONVERSION(`const Glib::RefPtr<DBusConnection>&',`GDBusConnection*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GDBusConnection*',`Glib::RefPtr<DBusConnection>',Glib::wrap($3))
+
+# DBusMessage
+_CONVERSION(`const Glib::RefPtr<DBusMessage>&',`GDBusMessage*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`GDBusMessage*',`Glib::RefPtr<DBusMessage>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const DBusMessage>&',`GDBusMessage*',__CONVERT_CONST_REFPTR_TO_P)
+
 # DesktopAppInfo
 _CONVERSION(`GDesktopAppInfo*', `Glib::RefPtr<DesktopAppInfo>', `Glib::wrap($3)')
 
@@ -60,7 +80,6 @@ _CONVERSION(`const Glib::RefPtr<File>&',`GFile*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const File>&',`GFile*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::File))
 _CONVERSION(`GFile*',`Glib::RefPtr<File>',`Glib::wrap($3)')
 _CONVERSION(`GFile*',`Glib::RefPtr<const File>',`Glib::wrap($3)')
-
 
 # FileAttribute
 _CONVERSION(`GFileAttributeValue*',`FileAttributeValue',`Glib::wrap($3)')
@@ -99,7 +118,15 @@ _CONVERSION(`const Glib::RefPtr<Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<Icon>',`GIcon*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<const Icon>',`GIcon*',__CONVERT_CONST_REFPTR_TO_P)
 
+# Emblem
 _CONVERSION(`const Glib::RefPtr<Emblem>&',`GEmblem*',__CONVERT_CONST_REFPTR_TO_P)
+
+# IOStream
+_CONVERSION(`GIOStream*',`Glib::RefPtr<Gio::IOStream>',`Glib::wrap($3)')
+_CONVERSION(`GIOStream*',`Glib::RefPtr<IOStream>',`Glib::wrap($3)')
+_CONVERSION(`GIOStream*',`Glib::RefPtr<const Gio::IOStream>',`Glib::wrap($3)')
+_CONVERSION(`GIOStream*',`Glib::RefPtr<const IOStream>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const IOStream>&',`GIOStream*',`const_cast<GIOStream*>(Glib::unwrap($3))')
 
 # InetAddress
 _CONVERSION(`const Glib::RefPtr<InetAddress>&',`GInetAddress*',__CONVERT_CONST_REFPTR_TO_P)
@@ -110,7 +137,7 @@ _CONVERSION(`const Glib::RefPtr<InputStream>&',`GInputStream*',__CONVERT_CONST_R
 _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GInputStream*',`Glib::RefPtr<InputStream>',`Glib::wrap($3)')
 
-#Mount
+# Mount
 _CONVERSION(`GMount*',`Glib::RefPtr<Mount>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
 
@@ -152,6 +179,10 @@ _CONVERSION(`GSocketConnection*',`Glib::RefPtr<SocketConnection>',`Glib::wrap($3
 _CONVERSION(`GSocketConnection*',`const Glib::RefPtr<SocketConnection>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<SocketConnection>&',`GSocketConnection*',__CONVERT_CONST_REFPTR_TO_P)
 
+#UnixFDList
+_CONVERSION(`GUnixFDList*',`Glib::RefPtr<UnixFDList>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<UnixFDList>&',`GUnixFDList*',`Glib::unwrap($3)')
+
 #Volume
 _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')
 
@@ -163,4 +194,3 @@ _CONVERSION(`const Glib::RefPtr<Volume>&',`GVolume*',__CONVERT_CONST_REFPTR_TO_P
 
 #Vfs
 _CONVERSION(`GVfs*', `Glib::RefPtr<Vfs>', `Glib::wrap($3)')
-

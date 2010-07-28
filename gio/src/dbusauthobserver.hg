@@ -1,0 +1,57 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/credentials.h>
+#include <giomm/iostream.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+//TODO: Add example from the C API docs in class docs.
+/** DBusAuthObserver - Object used for authenticating connections.
+ * The DBusAuthObserver type provides a mechanism for participating in how a
+ * DBusServer (or a DBusConnection) authenticates remote peers.  Simply
+ * instantiate a DBusAuthObserver and connect to the signals you are
+ * interested in. Note that new signals may be added in the future.
+ *
+ * @newin{2,26}
+ */
+class DBusAuthObserver : public Glib::Object
+{
+  _CLASS_GOBJECT(DBusAuthObserver, GDBusAuthObserver, G_DBUS_AUTH_OBSERVER, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT
+  _IGNORE(g_dbus_auth_observer_new)
+
+public:
+  _WRAP_CREATE()
+
+  _WRAP_METHOD(bool authorize_authenticated_peer(const Glib::RefPtr<const IOStream>& stream, const Glib::RefPtr<const Credentials>& credentials), g_dbus_auth_observer_authorize_authenticated_peer)
+
+#m4 _CONVERSION(`GIOStream*', `const Glib::RefPtr<const IOStream>&', `Glib::wrap($3, true)')
+#m4 _CONVERSION(`GCredentials*', `const Glib::RefPtr<const Credentials>&', `Glib::wrap($3, true)')
+  _WRAP_SIGNAL(bool authorize_authenticated_peer(const Glib::RefPtr<const IOStream>& stream, const Glib::RefPtr<const Credentials>& credentials), "authorize-authenticated-peer", no_default_handler)
+};
+
+} // namespace Gio

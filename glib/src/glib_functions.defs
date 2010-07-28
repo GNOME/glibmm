@@ -607,7 +607,7 @@
   (c-name "GThreadError")
   (gtype-id "G_TYPE_THREAD_ERROR")
   (values
-    '("n" "G_THREAD_ERROR_AGAIN")
+    '("again" "G_THREAD_ERROR_AGAIN")
   )
 )
 
@@ -800,6 +800,21 @@
     '("carian" "G_UNICODE_SCRIPT_CARIAN")
     '("lycian" "G_UNICODE_SCRIPT_LYCIAN")
     '("lydian" "G_UNICODE_SCRIPT_LYDIAN")
+    '("avestan" "G_UNICODE_SCRIPT_AVESTAN")
+    '("bamum" "G_UNICODE_SCRIPT_BAMUM")
+    '("egyptian-hieroglyphs" "G_UNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS")
+    '("imperial-aramaic" "G_UNICODE_SCRIPT_IMPERIAL_ARAMAIC")
+    '("inscriptional-pahlavi" "G_UNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI")
+    '("inscriptional-parthian" "G_UNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN")
+    '("javanese" "G_UNICODE_SCRIPT_JAVANESE")
+    '("kaithi" "G_UNICODE_SCRIPT_KAITHI")
+    '("lisu" "G_UNICODE_SCRIPT_LISU")
+    '("meetei-mayek" "G_UNICODE_SCRIPT_MEETEI_MAYEK")
+    '("old-south-arabian" "G_UNICODE_SCRIPT_OLD_SOUTH_ARABIAN")
+    '("old-turkish" "G_UNICODE_SCRIPT_OLD_TURKISH")
+    '("samaritan" "G_UNICODE_SCRIPT_SAMARITAN")
+    '("tai-tham" "G_UNICODE_SCRIPT_TAI_THAM")
+    '("tai-viet" "G_UNICODE_SCRIPT_TAI_VIET")
   )
 )
 
@@ -859,6 +874,15 @@
     '("array" "G_VARIANT_CLASS_ARRAY")
     '("tuple" "G_VARIANT_CLASS_TUPLE")
     '("dict-entry" "G_VARIANT_CLASS_DICT_ENTRY")
+  )
+)
+
+(define-enum ParseError
+  (in-module "GVariant")
+  (c-name "GVariantParseError")
+  (gtype-id "G_TYPE_VARIANT_PARSE_ERROR")
+  (values
+    '("failed" "G_VARIANT_PARSE_ERROR_FAILED")
   )
 )
 
@@ -2273,18 +2297,6 @@
   (parameters
     '("const-gchar*" "to_codeset")
     '("const-gchar*" "from_codeset")
-  )
-)
-
-(define-method 
-  (of-object "GIConv")
-  (c-name "g_iconv")
-  (return-type "gsize")
-  (parameters
-    '("gchar**" "inbuf")
-    '("gsize*" "inbytes_left")
-    '("gchar**" "outbuf")
-    '("gsize*" "outbytes_left")
   )
 )
 
@@ -9632,7 +9644,7 @@
   (return-type "none")
   (parameters
     '("const-char*" "testpath")
-    '("somefunc" "test_func")
+    '("GTestFunc" "test_func")
   )
 )
 
@@ -9642,7 +9654,7 @@
   (parameters
     '("const-char*" "testpath")
     '("gconstpointer" "test_data")
-    '("somefunc" "test_func")
+    '("GTestDataFunc" "test_func")
   )
 )
 
@@ -9757,7 +9769,9 @@
     '("const-char*" "test_name")
     '("gsize" "data_size")
     '("gconstpointer" "test_data")
-    '("somefunc" "data_setup")
+    '("GTestFixtureFunc" "data_setup")
+    '("GTestFixtureFunc" "data_test")
+    '("GTestFixtureFunc" "data_teardown")
   )
 )
 
@@ -9877,7 +9891,7 @@
     '("int" "line")
     '("const-char*" "func")
     '("const-char*" "expr")
-    '("GError*" "error")
+    '("const-GError*" "error")
     '("GQuark" "error_domain")
     '("int" "error_code")
   )
@@ -9890,7 +9904,9 @@
     '("const-char*" "testpath")
     '("gsize" "data_size")
     '("gconstpointer" "test_data")
-    '("somefunc" "data_setup")
+    '("GTestFixtureFunc" "data_setup")
+    '("GTestFixtureFunc" "data_test")
+    '("GTestFixtureFunc" "data_teardown")
   )
 )
 
@@ -11134,6 +11150,24 @@
   (return-type "const-gchar*")
 )
 
+(define-function g_get_system_data_dirs
+  (c-name "g_get_system_data_dirs")
+  (return-type "const-gchar**")
+)
+
+(define-function g_win32_get_system_data_dirs_for_module
+  (c-name "g_win32_get_system_data_dirs_for_module")
+  (return-type "const-gchar**")
+  (parameters
+    '("somefunc*" "address_of_function")
+  )
+)
+
+(define-function g_get_language_names
+  (c-name "g_get_language_names")
+  (return-type "const-gchar**")
+)
+
 (define-function g_get_user_special_dir
   (c-name "g_get_user_special_dir")
   (return-type "const-gchar*")
@@ -11306,6 +11340,12 @@
   (return-type "GVariant*")
 )
 
+(define-method is_floating
+  (of-object "GVariant")
+  (c-name "g_variant_is_floating")
+  (return-type "gboolean")
+)
+
 (define-method get_type
   (of-object "GVariant")
   (c-name "g_variant_get_type")
@@ -11465,17 +11505,25 @@
   (return-type "GVariant*")
 )
 
-(define-function g_variant_new_byte_array
-  (c-name "g_variant_new_byte_array")
+(define-function g_variant_new_strv
+  (c-name "g_variant_new_strv")
   (return-type "GVariant*")
   (parameters
-    '("gconstpointer" "array")
+    '("const-gchar*-const*" "strv")
     '("gssize" "length")
   )
 )
 
-(define-function g_variant_new_strv
-  (c-name "g_variant_new_strv")
+(define-function g_variant_new_bytestring
+  (c-name "g_variant_new_bytestring")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "string")
+  )
+)
+
+(define-function g_variant_new_bytestring_array
+  (c-name "g_variant_new_bytestring_array")
   (return-type "GVariant*")
   (parameters
     '("const-gchar*-const*" "strv")
@@ -11567,15 +11615,6 @@
   )
 )
 
-(define-method get_byte_array
-  (of-object "GVariant")
-  (c-name "g_variant_get_byte_array")
-  (return-type "gconstpointer")
-  (parameters
-    '("gsize*" "length")
-  )
-)
-
 (define-method get_strv
   (of-object "GVariant")
   (c-name "g_variant_get_strv")
@@ -11588,6 +11627,39 @@
 (define-method dup_strv
   (of-object "GVariant")
   (c-name "g_variant_dup_strv")
+  (return-type "gchar**")
+  (parameters
+    '("gsize*" "length")
+  )
+)
+
+(define-method get_bytestring
+  (of-object "GVariant")
+  (c-name "g_variant_get_bytestring")
+  (return-type "const-gchar*")
+)
+
+(define-method dup_bytestring
+  (of-object "GVariant")
+  (c-name "g_variant_dup_bytestring")
+  (return-type "gchar*")
+  (parameters
+    '("gsize*" "length")
+  )
+)
+
+(define-method get_bytestring_array
+  (of-object "GVariant")
+  (c-name "g_variant_get_bytestring_array")
+  (return-type "const-gchar**")
+  (parameters
+    '("gsize*" "length")
+  )
+)
+
+(define-method dup_bytestring_array
+  (of-object "GVariant")
+  (c-name "g_variant_dup_bytestring_array")
   (return-type "gchar**")
   (parameters
     '("gsize*" "length")
@@ -11897,6 +11969,16 @@
   (return-type "none")
   (parameters
     '("const-gchar*" "format_string")
+  )
+  (varargs #t)
+)
+
+(define-method add_parsed
+  (of-object "GVariantBuilder")
+  (c-name "g_variant_builder_add_parsed")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "format")
   )
   (varargs #t)
 )

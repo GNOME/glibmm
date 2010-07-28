@@ -1,0 +1,46 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gunixfdlist.h>
+
+namespace Gio
+{
+
+UnixFDList::UnixFDList(const Glib::ArrayHandle<int>& fds)
+: _CONSTRUCT("fds", fds.data(), "n_fds", fds.size())
+{}
+
+const Glib::ArrayHandle<int> UnixFDList::peek_fds() const
+{
+  int length = 0;
+  const int* fds = g_unix_fd_list_peek_fds(const_cast<GUnixFDList*>(gobj()),
+    &length);
+  // (length - 1) is used because the array is terminated with a -1.
+  return Glib::ArrayHandle<int>(fds, length - 1, Glib::OWNERSHIP_NONE);
+}
+
+Glib::ArrayHandle<int> UnixFDList::steal_fds()
+{
+  int length = 0;
+  const int* fds = g_unix_fd_list_steal_fds(gobj(), &length);
+  // (length - 1) is used because the array is terminated with a -1.
+  return Glib::ArrayHandle<int>(fds, length - 1, Glib::OWNERSHIP_DEEP);
+}
+
+} // namespace Gio

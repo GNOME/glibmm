@@ -1,0 +1,90 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <glibmm/variant.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+class DBusConnection;
+class DBusMessage;
+
+/** DBusMethodInvocation - Object for handling remote calls.
+ * Instances of the DBusMethodInvocation class are used when handling D-Bus
+ * method calls. It provides a way to asynchronously return results and
+ * errors.
+ *
+ * The normal way to obtain a DBusMethodInvocation object is to receive it as
+ * an argument to the SlotMethodCall that was passed to
+ * Gio::DBusConnection::register_object().
+ *
+ * @newin{2,26}
+ */
+class DBusMethodInvocation : public Glib::Object
+{
+  _CLASS_GOBJECT(DBusMethodInvocation, GDBusMethodInvocation, G_DBUS_METHOD_INVOCATION, Glib::Object, GObject)
+
+protected:
+   _CTOR_DEFAULT
+
+public:
+  _WRAP_METHOD(Glib::ustring get_sender() const, g_dbus_method_invocation_get_sender)
+  _WRAP_METHOD(Glib::ustring get_object_path() const, g_dbus_method_invocation_get_object_path)
+  _WRAP_METHOD(Glib::ustring get_interface_name() const, g_dbus_method_invocation_get_interface_name)
+  _WRAP_METHOD(Glib::ustring get_method_name() const, g_dbus_method_invocation_get_method_name)
+
+  //TODO?:_WRAP_METHOD(const GDBusMethodInfo* get_method_info(), g_dbus_method_invocation_get_method_info)
+
+  _WRAP_METHOD(Glib::RefPtr<DBusConnection> get_connection(), g_dbus_method_invocation_get_connection)
+  _WRAP_METHOD(Glib::RefPtr<const DBusConnection> get_connection() const, g_dbus_method_invocation_get_connection, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<DBusMessage> get_message(), g_dbus_method_invocation_get_message)
+  _WRAP_METHOD(Glib::RefPtr<const DBusMessage> get_message() const, g_dbus_method_invocation_get_message, constversion)
+
+  /** Gets the parameters of the method invocation.
+   *
+   * @param value The location in which to return the parameters.
+   *
+   * @newin{2,26}
+   */
+  void get_parameters(Glib::VariantBase& value) const;
+  _IGNORE(g_dbus_method_invocation_get_parameters)
+
+  _WRAP_METHOD(void return_value(const Glib::VariantBase& parameters), g_dbus_method_invocation_return_value)
+
+#m4 _CONVERSION(`const Glib::ustring&', `GQuark', `Glib::QueryQuark($3).id()')
+  _WRAP_METHOD(void return_error_literal(const Glib::ustring& domain, int code, const Glib::ustring& message), g_dbus_method_invocation_return_error_literal)
+
+#m4 _CONVERSION(`const Glib::Error&', `const GError*', `$3.gobj()')
+  _WRAP_METHOD(void return_gerror(const Glib::Error& error), g_dbus_method_invocation_return_gerror)
+
+  _WRAP_METHOD(void return_dbus_error(const Glib::ustring& error_name, const Glib::ustring& error_message), g_dbus_method_invocation_return_dbus_error)
+
+  // Ignore vararg methods and ones that don't make sense for C++ API.
+  _IGNORE(g_dbus_method_invocation_return_error,
+    g_dbus_method_invocation_return_error_valist,
+    g_dbus_method_invocation_get_user_data)
+
+};
+
+} // namespace Gio

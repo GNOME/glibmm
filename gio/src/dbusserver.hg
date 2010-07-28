@@ -1,0 +1,77 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/initable.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+_WRAP_ENUM(DBusServerFlags, GDBusServerFlags, NO_GTYPE)
+
+class DBusAuthObserver;
+class DBusConnection;
+
+//TODO: Add example from the C API in class docs.
+/** DBusServer - Helper for accepting connections.
+ * DBusServer is a helper for listening to and accepting D-Bus connections.
+ * Since DBusServer implements the Initable interface, its constructors can
+ * throw an exception if construction fails.
+ *
+ * @newin{2,26}
+ */
+class DBusServer : public Glib::Object, public Initable
+{
+  _CLASS_GOBJECT(DBusServer, GDBusServer, G_DBUS_SERVER, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Initable)
+
+protected:
+  DBusServer(const Glib::ustring& address, DBusServerFlags flags,
+    const Glib::ustring& guid, const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<Cancellable>& cancellable);
+
+public:
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_server_new_sync)
+  static Glib::RefPtr<DBusServer> create(const Glib::ustring& address,
+    DBusServerFlags flags, const Glib::ustring& guid,
+    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<Cancellable>& cancellable);
+
+  _WRAP_METHOD(void start(), g_dbus_server_start)
+  _WRAP_METHOD(void stop(), g_dbus_server_stop)
+  _WRAP_METHOD(bool is_active() const, g_dbus_server_is_active)
+  _WRAP_METHOD(Glib::ustring get_guid() const, g_dbus_server_get_guid)
+  _WRAP_METHOD(DBusServerFlags get_flags() const, g_dbus_server_get_flags)
+  _WRAP_METHOD(Glib::ustring get_client_address() const, g_dbus_server_get_client_address)
+
+  _WRAP_PROPERTY("active", Glib::ustring)
+  _WRAP_PROPERTY("address", Glib::ustring)
+  _WRAP_PROPERTY("authentication-observer", Glib::RefPtr<DBusAuthObserver>)
+  _WRAP_PROPERTY("client-address", Glib::ustring)
+  _WRAP_PROPERTY("flags", DBusServerFlags)
+  _WRAP_PROPERTY("guid", Glib::ustring)
+
+#m4 _CONVERSION(`GDBusConnection*', `const Glib::RefPtr<DBusConnection>&', `Glib::wrap($3, true)')
+  _WRAP_SIGNAL(void new_connection(const Glib::RefPtr<DBusConnection>& connection), "new-connection", no_default_handler)
+};
+
+} // namespace Gio

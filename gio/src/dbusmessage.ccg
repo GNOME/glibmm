@@ -1,0 +1,57 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gio.h>
+#ifdef G_OS_UNIX
+#include <giomm/unixfdlist.h>
+#endif //G_OS_UNIX
+
+namespace Gio
+{
+
+void DBusMessage::get_body(Glib::VariantBase& value) const
+{
+  GVariant* const g_value =
+    g_dbus_message_get_body(const_cast<GDBusMessage*>(gobj()));
+
+  if(!g_value)
+    return;
+
+  value.init(g_value, true /* take a reference */);
+}
+
+void DBusMessage::get_header(Glib::VariantBase& value,
+  DBusMessageHeaderField header_field) const
+{
+  GVariant* const g_value =
+    g_dbus_message_get_header(const_cast<GDBusMessage*>(gobj()),
+    ((GDBusMessageHeaderField)(header_field)));
+
+  if(!g_value)
+    return;
+
+  value.init(g_value, true /* take a reference */);
+}
+
+void DBusMessage::unset_unix_fd_list()
+{
+  g_dbus_message_set_unix_fd_list(gobj(), 0);
+}
+  
+} // namespace Gio

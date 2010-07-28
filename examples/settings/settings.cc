@@ -27,42 +27,54 @@ const char *const INT_KEY = "test-int";
 
 static void on_key_changed(const Glib::ustring& key, const Glib::RefPtr<Gio::Settings>& settings)
 {
-    std::cout << Glib::ustring::compose("'%1' changed\n", key);
-    if (key.raw() == STRING_KEY)
-        std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
-                                            key, settings->get_string(key));
-    else if (key.raw() == INT_KEY)
-        std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
-                                            key, settings->get_int(key));
-    else
-        std::cerr << "Unknown key\n";
+  std::cout << Glib::ustring::compose("'%1' changed\n", key);
+  if (key == STRING_KEY)
+  {
+    Glib::ustring str = settings->get_string(key);
+    std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
+                      key, str);
+                      
+    //Or:
+    Glib::Variant<Glib::ustring> variant;
+    settings->get_value(key, variant);
+    str = variant.get();
+    std::cout << Glib::ustring::compose("New value, via variant, of '%1': '%2'\n",
+                      key, str);
+  }
+  else if (key == INT_KEY)
+  {
+    std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
+                      key, settings->get_int(key));
+  }
+  else
+    std::cerr << "Unknown key\n";
 }
 
 int main(int, char**)
 {
-    std::locale::global(std::locale(""));
-    Gio::init();
+  std::locale::global(std::locale(""));
+  Gio::init();
 
-    // this is only a demo so we don't want to rely on an installed schema.
-    // Instead we set some environment variables that allow us to test things
-    // from the source directory.  We need to strip off the .libs/ directory
-    // first (thus the '..').  Generally you would install your schemas to the system schema
-    // directory
-    Glib::setenv("GSETTINGS_SCHEMA_DIR", ".", true);
-    Glib::setenv("GSETTINGS_BACKEND", "memory", true);
+  // this is only a demo so we don't want to rely on an installed schema.
+  // Instead we set some environment variables that allow us to test things
+  // from the source directory.  We need to strip off the .libs/ directory
+  // first (thus the '..').  Generally you would install your schemas to the system schema
+  // directory
+  Glib::setenv("GSETTINGS_SCHEMA_DIR", ".", true);
+  Glib::setenv("GSETTINGS_BACKEND", "memory", true);
 
-    const Glib::RefPtr<Gio::Settings> settings =
-        Gio::Settings::create("org.gtkmm.demo");
+  const Glib::RefPtr<Gio::Settings> settings =
+    Gio::Settings::create("org.gtkmm.demo");
 
-    settings->signal_changed().connect(sigc::bind(sigc::ptr_fun(&on_key_changed), settings));
+  settings->signal_changed().connect(sigc::bind(sigc::ptr_fun(&on_key_changed), settings));
 
-    std::cout << Glib::ustring::compose("Initial value of '%1': '%2'\n",
-                                        STRING_KEY, settings->get_string(STRING_KEY));
-    settings->set_string(STRING_KEY, "Hoopoe");
+  std::cout << Glib::ustring::compose("Initial value of '%1': '%2'\n",
+                    STRING_KEY, settings->get_string(STRING_KEY));
+  settings->set_string(STRING_KEY, "Hoopoe");
 
-    std::cout << Glib::ustring::compose("Initial value of '%1': '%2'\n",
-                                        INT_KEY, settings->get_int(INT_KEY));
-    settings->set_int(INT_KEY, 18);
+  std::cout << Glib::ustring::compose("Initial value of '%1': '%2'\n",
+                    INT_KEY, settings->get_int(INT_KEY));
+  settings->set_int(INT_KEY, 18);
 
-    return 0;
+  return 0;
 }

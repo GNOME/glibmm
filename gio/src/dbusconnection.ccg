@@ -1,0 +1,91 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gio.h>
+#include "slot_async.h"
+
+namespace Gio
+{
+
+void DBusConnection::close()
+{
+  g_dbus_connection_close(gobj(), 0, 0, 0);
+}
+
+void DBusConnection::close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_close(gobj(),
+                    Glib::unwrap(cancellable),
+                    &SignalProxy_async_callback,
+                    slot_copy);
+}
+
+void DBusConnection::close(const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_close(gobj(),
+                    0,
+                    &SignalProxy_async_callback,
+                    slot_copy);
+}
+
+void DBusConnection::close_sync()
+{
+  GError* gerror = 0;
+  g_dbus_connection_close_sync(gobj(), 0, &(gerror));
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+}
+
+void DBusConnection::flush()
+{
+  g_dbus_connection_flush(gobj(), 0, 0, 0);
+}
+
+void DBusConnection::flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_flush(gobj(),
+                    Glib::unwrap(cancellable),
+                    &SignalProxy_async_callback,
+                    slot_copy);
+}
+
+void DBusConnection::flush(const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_flush(gobj(),
+                    0,
+                    &SignalProxy_async_callback,
+                    slot_copy);
+}
+
+void DBusConnection::flush_sync()
+{
+  GError* gerror = 0;
+  g_dbus_connection_flush_sync(gobj(), 0, &(gerror));
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+}
+} // namespace Gio

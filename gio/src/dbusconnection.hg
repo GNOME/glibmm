@@ -1,0 +1,110 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/iostream.h>
+#include <giomm/asyncresult.h>
+#include <giomm/credentials.h>
+#include <giomm/dbusmessage.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+//TODO: Use a GDbus namespace, and remove the DBus prefixes.
+namespace Gio
+{
+
+_WRAP_ENUM(DBusCapabilityFlags, GDBusCapabilityFlags, NO_GTYPE)
+_WRAP_ENUM(DBusSendMessageFlags, GDBusSendMessageFlags, NO_GTYPE)
+
+/** TODO
+ *
+ * @newin{2,26}
+ */
+class DBusConnection : public Glib::Object
+{
+protected:
+  _CLASS_GOBJECT(DBusConnection, GDBusConnection, G_DBUS_CONNECTION, Glib::Object, GObject)
+
+public:
+
+
+  //TODO: Documentation.
+  void close();
+  
+  //TODO: Documentation.
+  void close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+  
+  //TODO: Documentation.
+  void close(const SlotAsyncReady& slot);
+  _IGNORE(g_dbus_connection_close)
+  
+  _WRAP_METHOD(bool close_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_dbus_connection_close_finish, errthrow)
+               
+  //TODO: Documentation.
+  void close_sync();
+  
+  //TODO: Documentation.
+  _WRAP_METHOD(void close_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_close_sync, errthrow)
+
+
+  //TODO: Documentation.
+  void flush();
+  
+  //TODO: Documentation.
+  void flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+  
+  //TODO: Documentation.
+  void flush(const SlotAsyncReady& slot);
+  _IGNORE(g_dbus_connection_flush)
+  
+  _WRAP_METHOD(bool flush_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_dbus_connection_flush_finish, errthrow)
+               
+  //TODO: Documentation.
+  void flush_sync();
+  
+  //TODO: Documentation.
+  _WRAP_METHOD(void flush_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_flush_sync, errthrow)
+
+  //TODO: In the C API, out_serial is volatile, but gmmproc can't parse that.
+  #m4 _CONVERSION(`guint32*',`volatile guint32*',`($3)')
+  _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32* out_serial), g_dbus_connection_send_message, errthrow)
+                                                                   
+  _WRAP_METHOD(void start_message_processing(), g_dbus_connection_start_message_processing)
+  _WRAP_METHOD(bool is_closed() const, g_dbus_connection_is_closed)
+  
+  _WRAP_METHOD(Glib::RefPtr<IOStream> get_stream(), g_dbus_connection_get_stream, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const IOStream> get_stream() const, g_dbus_connection_get_stream, refreturn, constversion)
+  
+  _WRAP_METHOD(Glib::ustring get_guid() const, g_dbus_connection_get_guid)
+  _WRAP_METHOD(Glib::ustring get_unique_name() const, g_dbus_connection_get_unique_name)
+  
+  _WRAP_METHOD(Glib::RefPtr<Credentials> get_peer_credentials(), g_dbus_connection_get_peer_credentials, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Credentials> get_peer_credentials() const, g_dbus_connection_get_peer_credentials, refreturn, constversion)
+  
+  _WRAP_METHOD(bool get_exit_on_close() const, g_dbus_connection_get_exit_on_close)
+  _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), g_dbus_connection_set_exit_on_close)
+  _WRAP_METHOD(DBusCapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)
+};
+
+
+} // namespace Gio
+

@@ -74,6 +74,297 @@
     * glib/glibmm/filelist.am:
 	* glib/glibmm/streamiochannel.[h|cc]: Remove this deprecated derived class.
 
+2010-07-27  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Add Gio::DBusMethodInvocation.
+
+	* gio/src/dbusmethodinvocation.{ccg,hg}:
+	* gio/src/filelist.am: Add source files for Gio::DBusMethodInvocation.
+	* tools/m4/convert_gio.m4: Add necessary conversions.
+	* gio/src/unixfdlist.hg: Add missing @newin{}'s.
+	* gio/src/dbusauthobserver.hg: Typo.
+
+2010-07-27  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::Message: Wrap several methods.
+
+	* gio/src/dbusmessage.ccg:
+	* gio/src/dbusmessage.hg: Wrap create_method_error_literal(),
+	get_body(), set_body(), [get|set|unset]_unix_fd_list().  Reordered
+	method declarations according to the C declarations.  Added class and
+	method docs.
+	* tools/m4/convert_gio.m4: Added conversions for new methods above.
+
+2010-07-27  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::UnixFDList: peek_fds(): Made return const for emphasis.
+
+	* gio/src/unixfdlist.ccg:
+	* gio/src/unixfdlist.hg: Remove redundant paragraph in class docs.
+	(peek_fds): Made return const to emphasize that the file descriptors
+	should not be modified.  
+	(steal_fds): Remove unnecessary const_cast<>.
+
+2010-07-26  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::UnixFDList: Add params and returns in create() method docs.
+
+	* gio/src/unixfdlist.hg (create): Add @param and @return to the method
+	docs for clarity.
+
+2010-07-26  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Add Gio::UnixFDList.
+
+	* gio/src/unixfdlist.ccg:
+	* gio/src/unixfdlist.hg:
+	* gio/src/filelist.am: Add the UnixFDList source files.
+
+	* gio/src/dbusserver.hg (DBusServer): Add a description line to the
+	class header.
+
+2010-07-26  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::DBusServer: Use the _CONSTRUCT macro in the constructor.
+
+	* gio/src/dbusserver.ccg (DBusServer): Use the _CONSTRUCT macro in the
+	constructor so that its instances are constructed properly.
+
+2010-07-25  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Add Gio::DBusServer.
+
+	* gio/src/dbusserver.ccg:
+	* gio/src/dbusserver.hg:
+	* gio/src/filelist.am: Add the new sources for Gio::DBusServer.
+
+	* tools/extra_defs_gen/generate_defs_gio.cc:
+	* gio/src/gio_signals.defs: Add the GDBusServer type to the extra defs
+	generation utility and regenerate the signal defs file to get the
+	signals and properties of GDBusServer.
+
+	* tools/m4/convert_gio.m4: Add conversions for GDBusServer.
+	Alphabetize the enum conversions.
+
+	* gio/src/dbusauthobserver.hg: Typos.
+
+2010-07-25  Murray Cumming  <murrayc@murrayc.com>
+
+	DBusAuthObserver: Fix the build with latest glib.
+
+	* gio/src/dbusauthobserver.hg: authorize_authenticated_peer signal: 
+	Use no_default_handler, so we don't try to access the (totally private) 
+	GDBusAuthObserverClass struct.
+
+2010-07-23  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::DBusAuthObserver: Make parameters constant.
+
+	* gio/src/dbusauthobserver.[hg|ccg]:
+	* gio/src/filelist.am: Add the source files, this time making sure the
+	parameters in the methods and signals are constant because this class
+	is only meant to observe authentications of remote peers and tell if
+	the connection is valid based on the parameters.  It doesn't look like
+	the parameters should be changed in the signal handlers.
+
+	* gio/src/gio_signals.defs:
+	* tools/extra_defs_gen/generate_defs_gio.cc: Add changes not included
+	in the addition of the Gio::DBusAuthObserver API.
+
+	* tools/m4/convert_gio.m4: Fix the conversions so that they convert
+	from const parameters to non-const for the C API.
+
+2010-07-23  Murray Cumming  <murrayc@murrayc.com>
+
+	Fix warnings.
+
+	* gio/src/settings.hg:
+	* glib/src/variant.hg: Remove extra ;s.
+
+2010-07-23  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Add Gio::DBusAuthObserver.
+
+	* gio/src/dbusauthobserver.[hg|ccg]:
+	* gio/src/filelist.am: Add the source files of Gio::DBusAuthObserver
+	and add them to the compile list.
+
+	* tools/extra_defs_gen/generate_defs_gio.cc:
+	* gio/src/gio_signals.defs: Add the G_TYPE_DBUS_AUTH_OBSERVER to the
+	extra defs gio utility and regenerate the signals defs file with the
+	utility to get the signals and properties of GDBusAuthObserver.
+
+2010-07-22  Murray Cumming  <murrayc@murrayc.com>
+
+	DBusMessage: Add get_header() and set_header().
+
+	* gio/src/dbusmessage.[hg|ccg]: Add get_header(), using a VariantBase output 
+	parameter, and set_header().
+	* gio/src/settings.[hg|ccg]: get_value(): Make this const too.
+	* tools/m4/convert_gio.m4: Added conversions.
+
+2010-07-22  Murray Cumming  <murrayc@murrayc.com>
+
+	Variant<>: Make this usable as an ouput parameter.
+
+	* glib/src/variant.[hg|ccg]: VariantBase: Added init(), like Value::init().
+	This just changes the gobject_, with appropriate unref and ref.
+	* gio/src/settings.[hg|ccg]: get_value(): Use an output parameter for the 
+	VariantBase, instead of a return value, as we do for Value, allowing the 
+	caller to use a derived (templated) type.
+	* examples/settings/settings.cc: Show how Variant<> can be used.
+
+2010-07-22  Murray Cumming  <murrayc@murrayc.com>
+
+	Settings example: Minor change.
+
+	* examples/settings/settings.cc: Remove the unnecessary use of 
+	Glib::ustring::raw().
+
+2010-07-22  Murray Cumming  <murrayc@murrayc.com>
+
+	Variant: Added some methods.
+
+	* glib/src/variant.[hg|ccg]: ValueBase: Wrap some simple functions 
+	with _WRAP_METHOD().
+	* glib/src/variant_basictypes.h.m4: Syntax changes, and make the castitem 
+	constructor explicit.
+	* tools/m4/convert_gio.m4: Added necessary conversion.
+	
+	We need to decide how to use this in get*() methods and add some tests.
+
+2010-07-22  Murray Cumming  <murrayc@murrayc.com>
+
+	giomm: DBusMessage: Added several  methods.
+
+	* gio/src/dbusmessage.hg: Wrapped the simple functions.
+	* tools/m4/convert_gio.m4: Added necessary conversions.
+
+2010-07-22  Murray Cumming  <murrayc@murrayc.com>
+
+	giomm: DBusMessage: Added create_*() methods.
+
+	* gio/src/dbusmessage.hg: Added create_signal(), create_method_call() and
+  create_method_reply().
+	* tools/m4/convert_gio.m4: Added necessary conversion.
+
+2010-07-21  Murray Cumming  <murrayc@murrayc.com>
+
+	Added DBusMessage and DBusConnection::send_message().
+
+	* gio/src/gio_methods.defs: Regenerated.
+	* gio/src/filelist.am:
+	* gio/src/dbusmessage.[hg|ccg]: New wrapper for GMessage, with no methods
+	yet.
+	* gio/src/dbusconnection.hg: Added send_message().
+	* tools/m4/convert_gio.m4: Added necessary conversions.
+	* gio/src/credentials.hg: Uncommented out some methods now that the .defs
+	are correct.
+	* gio/src/socket.hg: Added get_credentials().
+
+2010-07-21  Murray Cumming  <murrayc@murrayc.com>
+
+	giomm: Added Credentials and DBusConnection::get_peer_credentials().
+
+	* gio/src/gio_enums.defs: Regenerated.
+	* gio/src/filelist.am:
+	* gio/src/credentials.[hg|ccg]: New wrapper for GCredentials.
+	* gio/src/dbusconnection.hg: Added get_peer_credentials().
+
+2010-07-15  Murray Cumming  <murrayc@murrayc.com>
+
+	Fix the build for a GDBusConnection API change.
+
+	* gio/src/gio_methods.defs:
+	* gio/src/gio_unix_functions.defs:
+	* glib/src/glib_functions.defs:
+	* glib/src/gobject_functions.defs: Regenerate.
+	* glib/src/gdbusconnection.[hg|ccg]: Made close() async, adding close_finish()
+	and close_sync().
+	Added flush(), flush_finish() and flush_sync().
+
+2010-06-29  Murray Cumming  <murrayc@murrayc.com>
+
+	Added DBusConnection
+
+	* gio/src/gio_enums.defs: Regenerated with tools/enums.pl.
+	* gio/src/filelist.am:
+	* gio/src/dbusconnection.[hg|ccg]: Added DBusConnection with just the
+	simplest methods.
+	I might put this in a GDBus namespace, and maybe even in a separate library.
+
+2010-06-24  Murray Cumming  <murrayc@murrayc.com>
+
+	Simplify VariantBase .hg code and use it in Settings.
+
+	* glib/src/variant.[hg|ccg]: Use CLASS_OPAQUE_COPYABLE() instead of
+    _CLASS_GENERIC() to avoid writing some stuff manually. This seems to be OK.
+    Do not include the C header in our .h file.
+	* tools/m4/convert_gio.m4: Added GVariantBase conversions.
+	* gio/src/settings.hg: Added get_value() and set_value().
+
+2010-06-22  Murray Cumming  <murrayc@murrayc.com>
+
+    Clean up glib_functions.defs.
+
+	* glib/src/glib_functions.defs: Remove bad definitions of function-pointers
+    that cause annoying warnings during the build.
+
+2010-06-19  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Glib::Variant<>: Use gmmproc files so wrapping is not done manually.
+
+	* glib/src/glib_functions.defs: Regenerate to get the GVariant
+	functions.
+	* glib/src/variant.ccg:
+	* glib/src/variant.hg:
+	* glib/src/filelist.am: Add the new .hg and .ccg files and mention
+	them.  Wrapping is now done using gmmproc instead of handwriting the
+	methods.
+	* glib/glibmm/variant.cc:
+	* glib/glibmm/variant.h:
+	* glib/glibmm/filelist.am: Remove these files and their mentions
+	because now they are written as .hg and .ccg files.
+	* glib/src/variant_basictypes.h.m4: Add docs.
+
+2010-06-19  Koop Mast  <kwm@freebsd.org>
+
+	Restore lost #else block to fix build without __STDC_ISO_10646__
+
+	* glib/glibmm/ustring.cc: Add back an #else block that was probably lost
+	while automatically removing the no-exceptions #if/#else code.
+
+2010-06-18  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Preliminary implementation of Glib::Variant<> classes.
+
+	* glib/glibmm/variant.cc:
+	* glib/glibmm/variant.h:
+	* glib/src/variant_basictypes.cc.m4:
+	* glib/src/variant_basictypes.h.m4: Add an initial implementation of
+	of the Glib::Variant<> classes which wrap glib's GVariant API.
+
+2.25.2:
+
+2010-06-18  Murray Cumming  <murrayc@murrayc.com>
+
+	Settings: Fix the build with the latest glib.
+
+	* gio/src/settingsbackend.[hg|ccg]: Add this interface. Notice the
+    comment about the semi-private get_type() function.
+    * gio/src/filelist.am: Mention the new files.
+    * gio/src/settings.hg: Adapt to the changed glib API, using
+    a SettingsBackend backend instead of a string context.
+
+2010-06-08  Murray Cumming  <murrayc@murrayc.com>
+
+	Use GLIBMM_DISABLE_DEPRECATED on StreamIoChannel.
+
+	* glib/glibmm/streamiochannel.[h|cc]: Put #ifndef GLIBMM_DISABLE_DEPRECATED
+    around this long-since-deprecated class.
+
+2.25.1:
+
 2010-06-07  Daniel Elstner  <danielk@openismus.com>
 
 	Do not install the schema of the gsettings example
