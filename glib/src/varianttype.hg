@@ -18,7 +18,12 @@
 _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
-#include <glibmm/ustring.h>
+#include <glib-object.h> //For gsize
+#include <string>
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GVariantType GVariantType;
+#endif //DOXYGEN_SHOULD_SKIP_THIS
 
 namespace Glib
 {
@@ -37,11 +42,23 @@ public:
    */
   explicit VariantType(const GVariantType* castitem);
   
+  //TODO: Docuementation
+  explicit VariantType(const std::string& type_string);
+  
   VariantType& operator=(const GVariantType* castitem);
+  
+  
+  _WRAP_METHOD(static VariantType create_array(const VariantType& element), g_variant_type_new_array)
+  _WRAP_METHOD(static VariantType create_maybe(const VariantType& element), g_variant_type_new_maybe)
+  
+  //TODO: Use a single list parameter:
+  //_WRAP_METHOD(static VariantType create_tuple(const GVariantType * const *items, gint length), g_variant_type_new_tuple)
+
+  _WRAP_METHOD(static VariantType create_dict_entry(const VariantType& key, const VariantType& value), g_variant_type_new_dict_entry)
   
   //TODO: Use something instead of gsize?
   _WRAP_METHOD(gsize _get_string_length() const, g_variant_type_get_string_length)
-  _WRAP_METHOD(Glib::ustring get_string() const, g_variant_type_peek_string)
+  _WRAP_METHOD(std::string get_string() const, g_variant_type_peek_string)
   _IGNORE(g_variant_type_dup_string)
 
   _WRAP_METHOD(bool is_definite() const, g_variant_type_is_definite)
@@ -53,7 +70,10 @@ public:
   _WRAP_METHOD(bool is_dict_entry() const, g_variant_type_is_dict_entry)
   _WRAP_METHOD(bool is_variant() const, g_variant_type_is_variant)
 
-/* subtypes */
+  #m4 _CONVERSION(`const VariantType&',`gconstpointer',`const_cast<GVariantType*>(($3).gobj())')
+  _WRAP_METHOD(guint hash() const, g_variant_type_hash)
+  _WRAP_METHOD(bool equal(const VariantType& other) const, g_variant_type_equal)
+  
   _WRAP_METHOD(bool is_subtype_of(const VariantType& supertype) const, g_variant_type_is_subtype_of)
   
   _WRAP_METHOD(VariantType element() const, g_variant_type_element)
