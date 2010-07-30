@@ -23,26 +23,34 @@
 namespace Gio
 {
 
-/*
-Glib::RefPtr<AppInfo>
-Application::create_from_commandline(const std::string& commandline,
-                                 const std::string& application_name,
-                                 AppInfoCreateFlags flags)
+Glib::RefPtr<Application> Application::create(const Glib::ustring& appid)
 {
-  GAppInfo* capp_info = 0;
+  return Glib::wrap(g_application_new(appid.c_str(), 0, 0));
+}
+
+
+Glib::RefPtr<Application> Application::create_try(const Glib::ustring& appid)
+{
   GError* gerror = 0;
+  Glib::RefPtr<Application> retvalue = Glib::wrap(g_application_try_new(appid.c_str(), 0, 0, &(gerror)));
 
-  capp_info = g_app_info_create_from_commandline(commandline.c_str(),
-                                                 application_name.c_str(),
-                                                 static_cast<GAppInfoCreateFlags>(flags),
-                                                 &gerror);
-
-  if (gerror)
+  if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
-  return Glib::wrap(capp_info);
+  return retvalue;
 }
-*/
+
+
+Glib::RefPtr<Application> Application::create_unregistered_try(const Glib::ustring& appid)
+{
+  GError* gerror = 0;
+  Glib::RefPtr<Application> retvalue = Glib::wrap(g_application_unregistered_try_new(appid.c_str(), 0, 0, &(gerror)));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return retvalue;
+}
 
 
 } // namespace Gio
