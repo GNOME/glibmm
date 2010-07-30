@@ -67,10 +67,48 @@ public:
   _WRAP_METHOD(guint hash() const, g_variant_hash)
   _WRAP_METHOD(bool equal(const VariantBase& other) const, g_variant_equal)
 
-  //TODO: Use VariantBase as an output parameter:
-  _WRAP_METHOD(VariantBase get_normal_form() const, g_variant_get_normal_form)
+  /** Gets a VariantBase instance that has the same value as this variant and
+   * is trusted to be in normal form.
+   *
+   * If this variant is already trusted to be in normal form then a new
+   * reference to the variant is returned.
+   *
+   * If this variant is not already trusted, then it is scanned to check if it
+   * is in normal form. If it is found to be in normal form then it is marked
+   * as trusted and a new reference to it is returned.
+   *
+   * If this variant is found not to be in normal form then a new trusted
+   * VariantBase is created with the same value as this variant.
+   *
+   * It makes sense to call this function if you've received variant data from
+   * untrusted sources and you want to ensure your serialised output is
+   * definitely in normal form.
+   *
+   * @param result A Location in which to store the trusted VariantBase.
+   * @newin{2,24}
+   */
+  void get_normal_form(VariantBase& result) const;
+  _IGNORE(g_variant_get_normal_form)
+
   _WRAP_METHOD(bool is_normal_form() const, g_variant_is_normal_form)
-  _WRAP_METHOD(VariantBase byteswap() const, g_variant_byteswap)
+
+  /** Performs a byteswapping operation on the contents of this variant. The
+   * result is that all multi-byte numeric data contained in the variant is
+   * byteswapped. That includes 16, 32, and 64bit signed and unsigned integers
+   * as well as file handles and double precision floating point values.
+   *
+   * This function is an identity mapping on any value that does not contain
+   * multi-byte numeric data. That include strings, booleans, bytes and
+   * containers containing only these things (recursively).
+   *
+   * The returned value is always in normal form and is marked as trusted.
+   *
+   * @param result : A Location in which to store the byteswapped form of this
+   * variant.
+   * @newin{2,24}
+   */
+   void byteswap(VariantBase& result) const;
+   _IGNORE(g_variant_byteswap)
 };
 
 /** Template class from which other Glib::Variant<> specializations derive.
