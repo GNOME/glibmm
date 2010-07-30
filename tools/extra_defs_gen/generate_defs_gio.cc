@@ -19,7 +19,10 @@
 
 #include "generate_extra_defs.h"
 #include <iostream>
+
+#define G_SETTINGS_ENABLE_BACKEND 1
 #include <gio/gio.h>
+#include <gio/gsettingsbackend.h>
 
 #ifndef G_OS_WIN32
 # include <gio/gunixinputstream.h>
@@ -32,6 +35,7 @@ int main(int, char**)
   g_type_init ();
 
   std::cout << get_defs(G_TYPE_ASYNC_RESULT)
+            << get_defs(G_TYPE_APPLICATION)
             << get_defs(G_TYPE_CANCELLABLE)
             << get_defs(G_TYPE_BUFFERED_INPUT_STREAM)
             << get_defs(G_TYPE_BUFFERED_OUTPUT_STREAM)
@@ -63,6 +67,8 @@ int main(int, char**)
             << get_defs(G_TYPE_MOUNT)
             << get_defs(G_TYPE_MOUNT_OPERATION)
             << get_defs(G_TYPE_SEEKABLE)
+            << get_defs(G_TYPE_SETTINGS)
+            << get_defs(G_TYPE_SETTINGS_BACKEND)
             << get_defs(G_TYPE_SIMPLE_ASYNC_RESULT)
             << get_defs(G_TYPE_THEMED_ICON)
 
