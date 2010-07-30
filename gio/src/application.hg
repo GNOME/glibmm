@@ -1,0 +1,74 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2007 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <glibmm/variant.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** TODO
+ *
+ * @newin{2,26}
+ */
+class Application : public Glib::Object
+{
+  _CLASS_GOBJECT(Application, GApplication, G_APPLICATION, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  //_WRAP_CREATE()
+
+  _WRAP_METHOD(static Glib::RefPtr<Application> create(const Glib::ustring& appid, int argc, char** argv), g_application_new)
+
+  _WRAP_METHOD(static Glib::RefPtr<Application> create_try(const Glib::ustring& appid,  int argc, char** argv), g_application_try_new, errthrow)
+
+  _WRAP_METHOD(static Glib::RefPtr<Application> create_unregistered_try(const Glib::ustring& appid, int argc, char** argv), g_application_unregistered_try_new, errthrow)
+
+  //Renamed from register() because that is a C++ keyword.
+  _WRAP_METHOD(bool register_application(), g_application_register)
+
+  _WRAP_METHOD(static Glib::RefPtr<Application> get_instance(), g_application_get_instance, refreturn)
+  _WRAP_METHOD(Glib::ustring get_id() const, g_application_get_id)
+
+  _WRAP_METHOD(void add_action(const Glib::ustring& name, const Glib::ustring& description), g_application_add_action)
+  _WRAP_METHOD(void remove_action(const Glib::ustring& name), g_application_remove_action)
+  
+   #m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(Glib::StringArrayHandle list_actions() const, g_application_list_actions)
+  
+  _WRAP_METHOD(void set_action_enabled(const Glib::ustring& name, bool enabled = true), g_application_set_action_enabled)
+  _WRAP_METHOD(bool get_action_enabled(const Glib::ustring& name) const, g_application_get_action_enabled)
+  _WRAP_METHOD(Glib::ustring get_action_description(const Glib::ustring& name), g_application_get_action_description)
+  _WRAP_METHOD(void invoke_action(const Glib::ustring& name, const Glib::VariantBase& platform_data), g_application_invoke_action)
+
+  _WRAP_METHOD(void run(), g_application_run)
+  _WRAP_METHOD(bool quit_with_data(const Glib::VariantBase& platform_data), g_application_quit_with_data)
+
+  _WRAP_METHOD(bool is_remote() const, g_application_is_remote)
+};
+
+
+} // namespace Gio
+
