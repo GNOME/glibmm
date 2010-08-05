@@ -56,6 +56,7 @@ _CONVERSION(`GCancellable*', `Glib::RefPtr<Cancellable>', `Glib::wrap($3)')
 _CONVERSION(`GCancellable*', `const Glib::RefPtr<Cancellable>&', `Glib::wrap($3)')
 
 # Credentials
+_CONVERSION(`const Glib::RefPtr<Credentials>&',`GCredentials*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Credentials))
 _CONVERSION(`const Glib::RefPtr<const Credentials>&',`GCredentials*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Credentials))
 _CONVERSION(`GCredentials*',`Glib::RefPtr<Credentials>',`Glib::wrap($3)')
 _CONVERSION(`GCredentials*',`Glib::RefPtr<const Credentials>',`Glib::wrap($3)')
@@ -181,6 +182,9 @@ _CONVERSION(`const Glib::RefPtr<SocketConnectable>&',`GSocketConnectable*',__CON
 _CONVERSION(`GSocketConnection*',`Glib::RefPtr<SocketConnection>',`Glib::wrap($3)')
 _CONVERSION(`GSocketConnection*',`const Glib::RefPtr<SocketConnection>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<SocketConnection>&',`GSocketConnection*',__CONVERT_CONST_REFPTR_TO_P)
+
+#SocketControlMessage
+_CONVERSION(`GSocketControlMessage*',`Glib::RefPtr<SocketControlMessage>',`Glib::wrap($3)')
 
 #UnixFDList
 _CONVERSION(`GUnixFDList*',`Glib::RefPtr<UnixFDList>',`Glib::wrap($3)')

@@ -56,6 +56,8 @@ int main(int, char**)
             << get_defs(G_TYPE_FILTER_OUTPUT_STREAM)
 
 #ifndef G_OS_WIN32
+            // << get_defs(G_TYPE_UNIX_CREDENTIALS_MESSAGE)
+            // << get_defs(G_TYPE_UNIX_FD_MESSAGE)
             << get_defs(G_TYPE_UNIX_INPUT_STREAM)
             << get_defs(G_TYPE_UNIX_OUTPUT_STREAM)
 #endif

@@ -1,0 +1,81 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <giomm/socketcontrolmessage.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(giomm/private/socketcontrolmessage_p.h)
+
+namespace Gio
+{
+
+class UnixFDList;
+
+/** UnixFDMessage — A GSocketControlMessage containing a GUnixFDList.
+ * This SocketControlMessage contains a UnixFDList. It may be sent using
+ * Gio::Socket::send() and received using Gio::Socket::receive() over
+ * UNIX sockets (ie: sockets in the Gio::SOCKET_ADDRESS_UNIX family). The file
+ * descriptors are copied between processes by the kernel.
+ *
+ * For an easier way to send and receive file descriptors over stream-oriented
+ * UNIX sockets, see Gio::UnixConnection::send_fd() and
+ * Gio::UnixConnection::receive_fd(). 
+ *
+ * @newin{2,26}
+ */
+class UnixFDMessage : public SocketControlMessage
+{
+  _CLASS_GOBJECT(UnixFDMessage, GUnixFDMessage, G_UNIX_FD_MESSAGE, Gio::SocketControlMessage, GSocketControlMessage)
+
+protected:
+  _CTOR_DEFAULT
+  _WRAP_CTOR(UnixFDMessage(const Glib::RefPtr<UnixFDList>& fd_list), g_unix_fd_message_new_with_fd_list)
+
+public:
+  _WRAP_METHOD_DOCS_ONLY(g_unix_fd_message_new)
+  _WRAP_CREATE()
+
+  _WRAP_METHOD_DOCS_ONLY(g_unix_fd_message_new_with_fd_list)
+  _WRAP_CREATE(const Glib::RefPtr<UnixFDList>& fd_list)
+
+  _WRAP_METHOD(Glib::RefPtr<UnixFDList> get_fd_list(), g_unix_fd_message_get_fd_list)
+  _WRAP_METHOD(Glib::RefPtr<const UnixFDList> get_fd_list() const, g_unix_fd_message_get_fd_list, constversion)
+
+  _WRAP_METHOD(bool append_fd(int fd), g_unix_fd_message_append_fd, errthrow)
+
+
+  /** Returns the array of file descriptors that is contained in this object.
+   *
+   * After this call, the descriptors are no longer contained in message.
+   * Further calls will return an empty list (unless more descriptors have
+   * been added).
+   *
+   * The caller is responsible for closing all of the file descriptors.
+   *
+   * @return An array of file descriptors.
+   *
+   * @newin{2,22}
+   */
+  Glib::ArrayHandle<int> steal_fds();
+  _IGNORE(g_unix_fd_message_steal_fds)
+
+  _WRAP_PROPERTY(Glib::RefPtr<UnixFDList>, "fd-list")
+};
+
+} // namespace Gio

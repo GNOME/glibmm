@@ -1,0 +1,74 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** SocketControlMessage - A Socket control message.
+ * A SocketControlMessage is a special-purpose utility message that can be
+ * sent to or received from a Socket. These types of messages are often
+ * called "ancillary data".
+ *
+ * The message can represent some sort of special instruction to or
+ * information from the socket or can represent a special kind of transfer to
+ * the peer (for example, sending a file description over a UNIX socket).
+ *
+ * These messages are sent with Gio::Socket::send() and received with
+ * Gio::Socket::receive().
+ *
+ * To extend the set of control message that can be sent, subclass this class
+ * and override the get_size, get_level, get_type and serialize methods.
+ *
+ * To extend the set of control messages that can be received, subclass this
+ * class and implement the deserialize method. Also, make sure your class is
+ * registered with the GType typesystem before calling
+ * Gio::Socket::receive() to read such a message.
+ *
+ * @newin{2,22}
+ */
+class SocketControlMessage : public Glib::Object
+{
+  _CLASS_GOBJECT(SocketControlMessage, GSocketControlMessage, G_SOCKET_CONTROL_MESSAGE, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  //TODO?: _WRAP_METHOD(static Glib::RefPtr<SocketControlMessage> deserialize(int level, int type, gsize size, gpointer data), g_socket_control_message_deserialize)
+  _WRAP_METHOD(int get_level() const, g_socket_control_message_get_level)
+  _WRAP_METHOD(int get_msg_type() const, g_socket_control_message_get_msg_type)
+  _WRAP_METHOD(gsize get_size() const, g_socket_control_message_get_size)
+  _WRAP_METHOD(void serialize(gpointer data), g_socket_control_message_serialize)
+
+  // The deserialize vfunc does not have a GSocketControlMessage for its first
+  // parameter so it is difficult to wrap.
+  //_WRAP_VFUNC(Glib::RefPtr<SocketControlMessage> deserialize(int level, int type, gsize size, gpointer data), "deserialize")
+
+  _WRAP_VFUNC(gsize get_size() const, "get_size")
+  _WRAP_VFUNC(int get_level() const, "get_level")
+  _WRAP_VFUNC(int get_type() const, "get_type")
+  _WRAP_VFUNC(void serialize(gpointer data), "serialize")
+};
+
+} // namespace Gio
