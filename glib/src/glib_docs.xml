@@ -152,6 +152,25 @@ Use g_strfreev() to free it.
 </return>
 </function>
 
+<function name="g_atomic_pointer_get">
+<description>
+Reads the value of the pointer pointed to by @atomic.
+Also acts as a memory barrier.
+
+Since: 2.4
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to a #gpointer.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value to add to *@atomic.
+
+</return>
+</function>
+
 <function name="g_variant_equal">
 <description>
 Checks if @one and @two have the same type and value.
@@ -1124,7 +1143,11 @@ as icons that is customized for a particular user.
 
 On UNIX platforms this is determined using the mechanisms described in
 the &lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&gt;
-XDG Base Directory Specification&lt;/ulink&gt;
+XDG Base Directory Specification&lt;/ulink&gt;.
+In this case the directory retrieved will be XDG_DATA_HOME.
+
+On Windows is the virtual folder that represents the My Documents
+desktop item. See documentation for CSIDL_PERSONAL.
 
 Since: 2.6
 
@@ -1138,12 +1161,38 @@ or freed.
 
 <function name="g_dgettext">
 <description>
-This is a variant of g_dgettext() that allows specifying a locale
-category instead of always using %LC_MESSAGES. See g_dgettext() for
-more information about how this functions differs from calling
-dcgettext() directly.
+This function is a wrapper of dgettext() which does not translate
+the message if the default domain as set with textdomain() has no
+translations for the current locale.
 
-Since: 2.26
+The advantage of using this function over dgettext() proper is that
+libraries using this function (like GTK+) will not use translations
+if the application using the library does not have translations for
+the current locale.  This results in a consistent English-only
+interface instead of one having partial translations.  For this
+feature to work, the call to textdomain() and setlocale() should
+precede any g_dgettext() invocations.  For GTK+, it means calling
+textdomain() before gtk_init or its variants.
+
+This function disables translations if and only if upon its first
+call all the following conditions hold:
+&lt;itemizedlist&gt;
+&lt;listitem&gt;@domain is not %NULL&lt;/listitem&gt;
+&lt;listitem&gt;textdomain() has been called to set a default text domain&lt;/listitem&gt;
+&lt;listitem&gt;there is no translations available for the default text domain
+and the current locale&lt;/listitem&gt;
+&lt;listitem&gt;current locale is not &quot;C&quot; or any English locales (those
+starting with &quot;en_&quot;)&lt;/listitem&gt;
+&lt;/itemizedlist&gt;
+
+Note that this behavior may not be desired for example if an application
+has its untranslated messages in a language other than English.  In those
+cases the application should call textdomain() after initializing GTK+.
+
+Applications should normally not use this function directly,
+but use the _() macro for translations.
+
+Since: 2.18
 
 </description>
 <parameters>
@@ -1156,12 +1205,8 @@ the domain set with textdomain()
 <parameter_description> message to translate
 </parameter_description>
 </parameter>
-<parameter name="category">
-<parameter_description> a locale category
-</parameter_description>
-</parameter>
 </parameters>
-<return> the translated string for the given locale category
+<return> The translated string
 
 </return>
 </function>
@@ -1476,6 +1521,27 @@ g_hash_table_lookup_extended().
 </parameter>
 </parameters>
 <return> the associated value, or %NULL if the key is not found.
+</return>
+</function>
+
+<function name="g_path_get_basename">
+<description>
+Gets the last component of the filename. If @file_name ends with a 
+directory separator it gets the component before the last slash. If 
+@file_name consists only of directory separators (and on Windows, 
+possibly a drive letter), a single separator is returned. If
+@file_name is empty, it gets &quot;.&quot;.
+
+
+</description>
+<parameters>
+<parameter name="file_name">
+<parameter_description> the name of the file.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string containing the last component of 
+the filename.
 </return>
 </function>
 
@@ -2068,51 +2134,33 @@ Since: 2.14
 <return></return>
 </function>
 
-<function name="g_signal_handlers_unblock_matched">
+<function name="g_variant_dup_bytestring_array">
 <description>
-Unblocks all handlers on an instance that match a certain selection
-criteria. The criteria mask is passed as an OR-ed combination of
-#GSignalMatchType flags, and the criteria values are passed as arguments.
-Passing at least one of the %G_SIGNAL_MATCH_CLOSURE, %G_SIGNAL_MATCH_FUNC
-or %G_SIGNAL_MATCH_DATA match flags is required for successful matches.
-If no handlers were found, 0 is returned, the number of unblocked handlers
-otherwise. The match criteria should not apply to any handlers that are
-not currently blocked.
+Gets the contents of an array of array of bytes #GVariant.  This call
+makes a deep copy; the return result should be released with
+g_strfreev().
 
+If @length is non-%NULL then the number of elements in the result is
+stored there.  In any case, the resulting array will be
+%NULL-terminated.
+
+For an empty array, @length will be set to 0 and a pointer to a
+%NULL pointer will be returned.
+
+Since: 2.26
 
 </description>
 <parameters>
-<parameter name="instance">
-<parameter_description> The instance to unblock handlers from.
+<parameter name="value">
+<parameter_description> an array of array of bytes #GVariant ('aay')
 </parameter_description>
 </parameter>
-<parameter name="mask">
-<parameter_description> Mask indicating which of @signal_id, @detail, @closure, @func
-and/or @data the handlers have to match.
-</parameter_description>
-</parameter>
-<parameter name="signal_id">
-<parameter_description> Signal the handlers have to be connected to.
-</parameter_description>
-</parameter>
-<parameter name="detail">
-<parameter_description> Signal detail the handlers have to be connected to.
-</parameter_description>
-</parameter>
-<parameter name="closure">
-<parameter_description> The closure the handlers will invoke.
-</parameter_description>
-</parameter>
-<parameter name="func">
-<parameter_description> The C closure callback of the handlers (useless for non-C closures).
-</parameter_description>
-</parameter>
-<parameter name="data">
-<parameter_description> The closure data of the handlers' closures.
+<parameter name="length">
+<parameter_description> the length of the result, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> The number of handlers that matched.
+<return> an array of strings
 </return>
 </function>
 
@@ -2167,6 +2215,7 @@ system-wide application data.
 On UNIX platforms this is determined using the mechanisms described in
 the &lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&gt;
 XDG Base Directory Specification&lt;/ulink&gt;
+In this case the list of directories retrieved will be XDG_DATA_DIRS.
 
 On Windows the first elements in the list are the Application Data
 and Documents folders for All Users. (These can be determined only
@@ -2616,7 +2665,8 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> an array of constant strings
+<return> an array of constant
+strings
 </return>
 </function>
 
@@ -2809,6 +2859,8 @@ You should use this function instead of g_completion_complete() if your
 items are UTF-8 strings.
 
 Since: 2.4
+
+Deprecated: 2.26: Rarely used API
 
 </description>
 <parameters>
@@ -3168,6 +3220,8 @@ or %NULL if the #GList has no elements
 <description>
 Deletes any records from a #GRelation that have the given key value
 in the given field.
+
+Deprecated: 2.26: Rarely used API
 
 </description>
 <parameters>
@@ -3792,9 +3846,9 @@ Replaces all occurrences of the pattern in @regex with the
 replacement text. @replacement is replaced literally, to
 include backreferences use g_regex_replace().
 
-Setting @start_position differs from just passing over a 
-shortened string and setting #G_REGEX_MATCH_NOTBOL in the 
-case of a pattern that begins with any kind of lookbehind 
+Setting @start_position differs from just passing over a
+shortened string and setting #G_REGEX_MATCH_NOTBOL in the
+case of a pattern that begins with any kind of lookbehind
 assertion, such as &quot;\b&quot;.
 
 Since: 2.14
@@ -3938,6 +3992,30 @@ Since: 2.24
 </parameter>
 </parameters>
 <return> a #gint32
+</return>
+</function>
+
+<function name="g_variant_new_bytestring_array">
+<description>
+Constructs an array of bytestring #GVariant from the given array of
+strings.
+
+If @length is -1 then @strv is %NULL-terminated.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="strv">
+<parameter_description> an array of strings
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of @strv, or -1
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new floating #GVariant instance
 </return>
 </function>
 
@@ -4542,6 +4620,34 @@ A convenience macro to get the next element in a #GSList.
 </return>
 </function>
 
+<function name="g_atomic_pointer_compare_and_exchange">
+<description>
+Compares @oldval with the pointer pointed to by @atomic and
+if they are equal, atomically exchanges *@atomic with @newval.
+Also acts as a memory barrier.
+
+Since: 2.4
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to a #gpointer
+</parameter_description>
+</parameter>
+<parameter name="oldval">
+<parameter_description> the assumed old value of *@atomic
+</parameter_description>
+</parameter>
+<parameter name="newval">
+<parameter_description> the new value of *@atomic
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE, if *@atomic was equal @oldval. %FALSE otherwise.
+
+</return>
+</function>
+
 <function name="g_strndup">
 <description>
 Duplicates the first @n bytes of a string, returning a newly-allocated
@@ -4599,6 +4705,8 @@ required to update user data pointers with a destroy notifier.
 <description>
 Creates an index on the given field. Note that this must be called
 before any records are added to the #GRelation.
+
+Deprecated: 2.26: Rarely used API
 
 </description>
 <parameters>
@@ -4693,41 +4801,41 @@ Since: 2.4
 
 <function name="g_regex_match_all_full">
 <description>
-Using the standard algorithm for regular expression matching only 
-the longest match in the string is retrieved, it is not possibile 
+Using the standard algorithm for regular expression matching only
+the longest match in the string is retrieved, it is not possibile
 to obtain all the available matches. For instance matching
-&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot; against the pattern &quot;&lt;.*&gt;&quot; 
+&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot; against the pattern &quot;&lt;.*&gt;&quot;
 you get &quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;.
 
 This function uses a different algorithm (called DFA, i.e. deterministic
 finite automaton), so it can retrieve all the possible matches, all
 starting at the same point in the string. For instance matching
-&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot; against the pattern &quot;&lt;.*&gt;&quot; 
+&quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot; against the pattern &quot;&lt;.*&gt;&quot;
 you would obtain three matches: &quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;,
 &quot;&lt;a&gt; &lt;b&gt;&quot; and &quot;&lt;a&gt;&quot;.
 
 The number of matched strings is retrieved using
-g_match_info_get_match_count(). To obtain the matched strings and 
-their position you can use, respectively, g_match_info_fetch() and 
-g_match_info_fetch_pos(). Note that the strings are returned in 
-reverse order of length; that is, the longest matching string is 
+g_match_info_get_match_count(). To obtain the matched strings and
+their position you can use, respectively, g_match_info_fetch() and
+g_match_info_fetch_pos(). Note that the strings are returned in
+reverse order of length; that is, the longest matching string is
 given first.
 
-Note that the DFA algorithm is slower than the standard one and it 
+Note that the DFA algorithm is slower than the standard one and it
 is not able to capture substrings, so backreferences do not work.
 
-Setting @start_position differs from just passing over a shortened 
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern 
+Setting @start_position differs from just passing over a shortened
+string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
-A #GMatchInfo structure, used to get information on the match, is 
-stored in @match_info if not %NULL. Note that if @match_info is 
-not %NULL then it is created even if the function returns %FALSE, 
-i.e. you must free it regardless if regular expression actually 
+A #GMatchInfo structure, used to get information on the match, is
+stored in @match_info if not %NULL. Note that if @match_info is
+not %NULL then it is created even if the function returns %FALSE,
+i.e. you must free it regardless if regular expression actually
 matched.
 
-@string is not copied and is used in #GMatchInfo internally. If 
-you use any #GMatchInfo method (except g_match_info_free()) after 
+@string is not copied and is used in #GMatchInfo internally. If
+you use any #GMatchInfo method (except g_match_info_free()) after
 freeing or modifying @string then the behaviour is undefined.
 
 Since: 2.14
@@ -4755,8 +4863,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="match_info">
-<parameter_description> pointer to location where to store the #GMatchInfo, 
-or %NULL if you do not need it
+<parameter_description> pointer to location where to store
+the #GMatchInfo, or %NULL if you do not need it
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -4850,6 +4958,25 @@ For the children of the root node the depth is 2. And so on.
 </parameter>
 </parameters>
 <return> the depth of the #GNode
+</return>
+</function>
+
+<function name="g_value_dup_variant">
+<description>
+Get the contents of a variant #GValue, increasing its refcount.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a valid #GValue of type %G_TYPE_VARIANT
+</parameter_description>
+</parameter>
+</parameters>
+<return> variant contents of @value, should be unrefed using
+g_variant_unref() when no longer needed
+
 </return>
 </function>
 
@@ -4967,6 +5094,44 @@ Get the contents of a %G_TYPE_BOOLEAN #GValue.
 </return>
 </function>
 
+<function name="g_cclosure_marshal_VOID__VARIANT">
+<description>
+A marshaller for a #GCClosure with a callback of type
+&lt;literal&gt;void (*callback) (gpointer instance, GVariant *arg1, gpointer user_data)&lt;/literal&gt;.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="closure">
+<parameter_description> the #GClosure to which the marshaller belongs
+</parameter_description>
+</parameter>
+<parameter name="return_value">
+<parameter_description> ignored
+</parameter_description>
+</parameter>
+<parameter name="n_param_values">
+<parameter_description> 2
+</parameter_description>
+</parameter>
+<parameter name="param_values">
+<parameter_description> a #GValue array holding the instance and the #GVariant* parameter
+</parameter_description>
+</parameter>
+<parameter name="invocation_hint">
+<parameter_description> the invocation hint given as the last argument
+to g_closure_invoke()
+</parameter_description>
+</parameter>
+<parameter name="marshal_data">
+<parameter_description> additional data specified when registering the marshaller
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_key_file_free">
 <description>
 Frees a #GKeyFile.
@@ -5060,7 +5225,9 @@ containing 0.
 
 <function name="g_value_array_prepend">
 <description>
-Insert a copy of @value as first element of @value_array.
+Insert a copy of @value as first element of @value_array. If @value is
+%NULL, an uninitialized value is prepended.
+
 
 
 </description>
@@ -5070,7 +5237,7 @@ Insert a copy of @value as first element of @value_array.
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> #GValue to copy into #GValueArray
+<parameter_description> #GValue to copy into #GValueArray, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -5427,39 +5594,6 @@ Since: 2.24
 </parameter>
 </parameters>
 <return> a new variant #GVariant instance
-</return>
-</function>
-
-<function name="g_variant_get_byte_array">
-<description>
-Gets the contents of an array of bytes #GVariant.
-
-If @length is non-%NULL then it points to a location at which to
-store the length of the array and nul bytes contained within the
-array have no special meaning.
-
-If @length is %NULL then the caller has no way to determine what the
-length of the returned data might be.  In this case, the function
-ensures that the last byte of the array is a nul byte and, if it is
-not, returns %NULL instead.  In this way, the caller is assured that
-any non-%NULL pointer that is returned will be nul-terminated.
-
-The return value remains valid as long as @value exists.
-
-Since: 2.26
-
-</description>
-<parameters>
-<parameter name="value">
-<parameter_description> an array of bytes #GVariant
-</parameter_description>
-</parameter>
-<parameter name="length">
-<parameter_description> the length of the result, or %NULL
-</parameter_description>
-</parameter>
-</parameters>
-<return> a pointer to the byte data, or %NULL
 </return>
 </function>
 
@@ -6020,22 +6154,22 @@ event = &amp;g_array_index (events, EDayViewEvent, 3);
 </return>
 </function>
 
-<function name="g_value_set_flags">
+<function name="g_value_get_variant">
 <description>
-Set the contents of a %G_TYPE_FLAGS #GValue to @v_flags.
+Get the contents of a variant #GValue.
+
+Since: 2.26
 
 </description>
 <parameters>
 <parameter name="value">
-<parameter_description> a valid #GValue whose type is derived from %G_TYPE_FLAGS
-</parameter_description>
-</parameter>
-<parameter name="v_flags">
-<parameter_description> flags value to be set
+<parameter_description> a valid #GValue of type %G_TYPE_VARIANT
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> variant contents of @value
+
+</return>
 </function>
 
 <function name="g_checksum_get_string">
@@ -6118,7 +6252,8 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="children">
-<parameter_description> an array of #GVariant pointers, the children
+<parameter_description> an array of
+#GVariant pointers, the children
 </parameter_description>
 </parameter>
 <parameter name="n_children">
@@ -6204,8 +6339,11 @@ for it.
 Concatenates all of the given strings into one long string.
 The returned string should be freed with g_free() when no longer needed.
 
+Note that this function is usually not the right function to use to
+assemble a translated message from pieces, since proper translation
+often requires the pieces to be reordered.
 
-&lt;warning&gt;&lt;para&gt;The variable argument list &lt;emphasis&gt;must&lt;/emphasis&gt; end 
+&lt;warning&gt;&lt;para&gt;The variable argument list &lt;emphasis&gt;must&lt;/emphasis&gt; end
 with %NULL. If you forget the %NULL, g_strconcat() will start appending
 random memory junk to your string.&lt;/para&gt;&lt;/warning&gt;
 
@@ -6415,17 +6553,17 @@ Since: 2.12
 
 <function name="g_regex_match">
 <description>
-Scans for a match in string for the pattern in @regex. 
-The @match_options are combined with the match options specified 
-when the @regex structure was created, letting you have more 
+Scans for a match in string for the pattern in @regex.
+The @match_options are combined with the match options specified
+when the @regex structure was created, letting you have more
 flexibility in reusing #GRegex structures.
 
-A #GMatchInfo structure, used to get information on the match, 
-is stored in @match_info if not %NULL. Note that if @match_info 
-is not %NULL then it is created even if the function returns %FALSE, 
+A #GMatchInfo structure, used to get information on the match,
+is stored in @match_info if not %NULL. Note that if @match_info
+is not %NULL then it is created even if the function returns %FALSE,
 i.e. you must free it regardless if regular expression actually matched.
 
-To retrieve all the non-overlapping matches of the pattern in 
+To retrieve all the non-overlapping matches of the pattern in
 string you can use g_match_info_next().
 
 |[
@@ -6450,8 +6588,8 @@ g_regex_unref (regex);
 }
 ]|
 
-@string is not copied and is used in #GMatchInfo internally. If 
-you use any #GMatchInfo method (except g_match_info_free()) after 
+@string is not copied and is used in #GMatchInfo internally. If
+you use any #GMatchInfo method (except g_match_info_free()) after
 freeing or modifying @string then the behaviour is undefined.
 
 Since: 2.14
@@ -6471,8 +6609,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="match_info">
-<parameter_description> pointer to location where to store the #GMatchInfo, 
-or %NULL if you do not need it
+<parameter_description> pointer to location where to store
+the #GMatchInfo, or %NULL if you do not need it
 </parameter_description>
 </parameter>
 </parameters>
@@ -6662,9 +6800,63 @@ g_utf8_get_char().
 </return>
 </function>
 
+<function name="g_object_bind_property_with_closures">
+<description>
+Creates a binding between @source_property on @source and @target_property
+on @target, allowing you to set the transformation functions to be used by
+the binding.
+
+This function is the language bindings friendly version of
+g_object_bind_property_full(), using #GClosure&lt;!-- --&gt;s instead of
+function pointers.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> the source #GObject
+</parameter_description>
+</parameter>
+<parameter name="source_property">
+<parameter_description> the property on @source to bind
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the target #GObject
+</parameter_description>
+</parameter>
+<parameter name="target_property">
+<parameter_description> the property on @target to bind
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags to pass to #GBinding
+</parameter_description>
+</parameter>
+<parameter name="transform_to">
+<parameter_description> a #GClosure wrapping the transformation function
+from the @source to the @target, or %NULL to use the default
+</parameter_description>
+</parameter>
+<parameter name="transform_from">
+<parameter_description> a #GClosure wrapping the transformation function
+from the @target to the @source, or %NULL to use the default
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GBinding instance representing the
+binding between the two #GObject instances. The binding is released
+whenever the #GBinding reference count reaches zero.
+
+</return>
+</function>
+
 <function name="g_completion_add_items">
 <description>
 Adds items to the #GCompletion.
+
+Deprecated: 2.26: Rarely used API
 
 </description>
 <parameters>
@@ -7263,6 +7455,81 @@ a user data argument.
 </return>
 </function>
 
+<function name="g_object_bind_property">
+<description>
+Creates a binding between @source_property on @source and @target_property
+on @target. Whenever the @source_property is changed the @target_property is
+updated using the same value. For instance:
+
+|[
+g_object_bind_property (action, &quot;active&quot;, widget, &quot;sensitive&quot;, 0);
+]|
+
+Will result in the &quot;sensitive&quot; property of the widget #GObject instance to be
+updated with the same value of the &quot;active&quot; property of the action #GObject
+instance.
+
+If @flags contains %G_BINDING_BIDIRECTIONAL then the binding will be mutual:
+if @target_property on @target changes then the @source_property on @source
+will be updated as well.
+
+The binding will automatically be removed when either the @source or the
+@target instances are finalized. To remove the binding without affecting the
+@source and the @target you can just call g_object_unref() on the returned
+#GBinding instance.
+
+A #GObject can have multiple bindings.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> the source #GObject
+</parameter_description>
+</parameter>
+<parameter name="source_property">
+<parameter_description> the property on @source to bind
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the target #GObject
+</parameter_description>
+</parameter>
+<parameter name="target_property">
+<parameter_description> the property on @target to bind
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags to pass to #GBinding
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GBinding instance representing the
+binding between the two #GObject instances. The binding is released
+whenever the #GBinding reference count reaches zero.
+
+</return>
+</function>
+
+<function name="g_binding_get_source">
+<description>
+Retrieves the #GObject instance used as the source of the binding
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="binding">
+<parameter_description> a #GBinding
+</parameter_description>
+</parameter>
+</parameters>
+<return> the source #GObject
+
+</return>
+</function>
+
 <function name="g_key_file_to_data">
 <description>
 This function outputs @key_file as a string.  
@@ -7307,7 +7574,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the previous match operation succeeded, 
+<return> %TRUE if the previous match operation succeeded,
 %FALSE otherwise
 
 </return>
@@ -7788,6 +8055,8 @@ or has no lowercase equivalent @c is returned unchanged.
 <description>
 Frees all memory used by the #GCompletion.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="cmp">
@@ -7838,24 +8107,6 @@ a negative offset in this case.
 </parameter>
 </parameters>
 <return> the resulting character offset
-</return>
-</function>
-
-<function name="g_unichar_xdigit_value">
-<description>
-Determines the numeric value of a character as a hexidecimal
-digit.
-
-
-</description>
-<parameters>
-<parameter name="c">
-<parameter_description> a Unicode character
-</parameter_description>
-</parameter>
-</parameters>
-<return> If @c is a hex digit (according to
-g_unichar_isxdigit()), its numeric value. Otherwise, -1.
 </return>
 </function>
 
@@ -8127,7 +8378,8 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> a pointer to a #gsize, to store the length
+<parameter_description> a pointer to a #gsize,
+to store the length
 </parameter_description>
 </parameter>
 </parameters>
@@ -8568,7 +8820,7 @@ hold the string
 <function name="g_variant_is_signature">
 <description>
 Determines if a given string is a valid DBus type signature.  You
-should ensure that a string is a valid DBus object path before
+should ensure that a string is a valid DBus type signature before
 passing it to g_variant_new_signature().
 
 DBus type signatures consist of zero or more definite #GVariantType
@@ -8761,6 +9013,10 @@ the first '|' character is returned.
 <function name="g_object_notify">
 <description>
 Emits a &quot;notify&quot; signal for the property @property_name on @object.
+
+When possible, eg. when signaling a property change from within the class
+that registered the property, you should use g_object_notify_by_pspec()
+instead.
 
 </description>
 <parameters>
@@ -9114,7 +9370,8 @@ Makes a copy of @error.
 
 <function name="g_value_array_append">
 <description>
-Insert a copy of @value as last element of @value_array.
+Insert a copy of @value as last element of @value_array. If @value is
+%NULL, an uninitialized value is appended.
 
 
 </description>
@@ -9124,7 +9381,7 @@ Insert a copy of @value as last element of @value_array.
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> #GValue to copy into #GValueArray
+<parameter_description> #GValue to copy into #GValueArray, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -9835,26 +10092,26 @@ Since: 2.12
 
 <function name="g_regex_match_full">
 <description>
-Scans for a match in string for the pattern in @regex. 
-The @match_options are combined with the match options specified 
-when the @regex structure was created, letting you have more 
+Scans for a match in string for the pattern in @regex.
+The @match_options are combined with the match options specified
+when the @regex structure was created, letting you have more
 flexibility in reusing #GRegex structures.
 
-Setting @start_position differs from just passing over a shortened 
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern 
+Setting @start_position differs from just passing over a shortened
+string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
-A #GMatchInfo structure, used to get information on the match, is 
-stored in @match_info if not %NULL. Note that if @match_info is 
-not %NULL then it is created even if the function returns %FALSE, 
-i.e. you must free it regardless if regular expression actually 
+A #GMatchInfo structure, used to get information on the match, is
+stored in @match_info if not %NULL. Note that if @match_info is
+not %NULL then it is created even if the function returns %FALSE,
+i.e. you must free it regardless if regular expression actually
 matched.
 
-@string is not copied and is used in #GMatchInfo internally. If 
-you use any #GMatchInfo method (except g_match_info_free()) after 
+@string is not copied and is used in #GMatchInfo internally. If
+you use any #GMatchInfo method (except g_match_info_free()) after
 freeing or modifying @string then the behaviour is undefined.
 
-To retrieve all the non-overlapping matches of the pattern in 
+To retrieve all the non-overlapping matches of the pattern in
 string you can use g_match_info_next().
 
 |[
@@ -9910,8 +10167,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="match_info">
-<parameter_description> pointer to location where to store the #GMatchInfo, 
-or %NULL if you do not need it
+<parameter_description> pointer to location where to store
+the #GMatchInfo, or %NULL if you do not need it
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -10172,6 +10429,27 @@ without freeing it.
 </parameters>
 <return> the new head of @list
 </return>
+</function>
+
+<function name="g_value_set_variant">
+<description>
+Set the contents of a variant #GValue to @variant.
+If the variant is floating, it is consumed.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a valid #GValue of type %G_TYPE_VARIANT
+</parameter_description>
+</parameter>
+<parameter name="variant">
+<parameter_description> a #GVariant, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_strsplit">
@@ -11034,6 +11312,54 @@ will return the first entry again.
 <return></return>
 </function>
 
+<function name="g_signal_handlers_unblock_matched">
+<description>
+Unblocks all handlers on an instance that match a certain selection
+criteria. The criteria mask is passed as an OR-ed combination of
+#GSignalMatchType flags, and the criteria values are passed as arguments.
+Passing at least one of the %G_SIGNAL_MATCH_CLOSURE, %G_SIGNAL_MATCH_FUNC
+or %G_SIGNAL_MATCH_DATA match flags is required for successful matches.
+If no handlers were found, 0 is returned, the number of unblocked handlers
+otherwise. The match criteria should not apply to any handlers that are
+not currently blocked.
+
+
+</description>
+<parameters>
+<parameter name="instance">
+<parameter_description> The instance to unblock handlers from.
+</parameter_description>
+</parameter>
+<parameter name="mask">
+<parameter_description> Mask indicating which of @signal_id, @detail, @closure, @func
+and/or @data the handlers have to match.
+</parameter_description>
+</parameter>
+<parameter name="signal_id">
+<parameter_description> Signal the handlers have to be connected to.
+</parameter_description>
+</parameter>
+<parameter name="detail">
+<parameter_description> Signal detail the handlers have to be connected to.
+</parameter_description>
+</parameter>
+<parameter name="closure">
+<parameter_description> The closure the handlers will invoke.
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> The C closure callback of the handlers (useless for non-C closures).
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> The closure data of the handlers' closures.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The number of handlers that matched.
+</return>
+</function>
+
 <function name="g_key_file_has_key">
 <description>
 Looks whether the key file has the key @key in the group
@@ -11255,9 +11581,9 @@ inside @dest)
 </parameter_description>
 </parameter>
 </parameters>
-<return>size of attempted result, which is
-MIN (dest_size, strlen (original dest)) + strlen (src),
-so if retval &gt;= dest_size, truncation occurred.
+<return> size of attempted result, which is MIN (dest_size, strlen
+(original dest)) + strlen (src), so if retval &gt;= dest_size,
+truncation occurred.
 </return>
 </function>
 
@@ -11462,6 +11788,8 @@ Gets a field from the records returned by g_relation_select(). It
 returns the given field of the record at the given index. The
 returned value should not be changed.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="tuples">
@@ -11567,24 +11895,26 @@ function.
 </return>
 </function>
 
-<function name="g_list_nth">
+<function name="g_signal_type_cclosure_new">
 <description>
-Gets the element at the given position in a #GList.
+Creates a new closure which invokes the function found at the offset
+@struct_offset in the class structure of the interface or classed type
+identified by @itype.
 
 
 </description>
 <parameters>
-<parameter name="list">
-<parameter_description> a #GList
+<parameter name="itype">
+<parameter_description> the #GType identifier of an interface or classed type
 </parameter_description>
 </parameter>
-<parameter name="n">
-<parameter_description> the position of the element, counting from 0
+<parameter name="struct_offset">
+<parameter_description> the offset of the member function of @itype's class
+structure which is to be invoked by the new closure
 </parameter_description>
 </parameter>
 </parameters>
-<return> the element, or %NULL if the position is off 
-the end of the #GList
+<return> a new #GCClosure
 </return>
 </function>
 
@@ -11654,6 +11984,50 @@ Since: 2.12
 </return>
 </function>
 
+<function name="g_param_spec_variant">
+<description>
+Creates a new #GParamSpecVariant instance specifying a #GVariant
+property.
+
+If @default_value is floating, it is consumed.
+
+See g_param_spec_internal() for details on property names.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="name">
+<parameter_description> canonical name of the property specified
+</parameter_description>
+</parameter>
+<parameter name="nick">
+<parameter_description> nick name for the property specified
+</parameter_description>
+</parameter>
+<parameter name="blurb">
+<parameter_description> description of the property specified
+</parameter_description>
+</parameter>
+<parameter name="type">
+<parameter_description> a #GVariantType
+</parameter_description>
+</parameter>
+<parameter name="default_value">
+<parameter_description> a #GVariant of type @type to use as the
+default value, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags for the property specified
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created #GParamSpec
+
+</return>
+</function>
+
 <function name="g_source_unref">
 <description>
 Decreases the reference count of a source by one. If the
@@ -11674,6 +12048,8 @@ memory will be destroyed.
 <description>
 Inserts a record into a #GRelation.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="relation">
@@ -11684,6 +12060,27 @@ Inserts a record into a #GRelation.
 <parameter_description> the fields of the record to add. These must match the
 number of fields in the #GRelation, and of type #gpointer
 or #gconstpointer.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_atomic_int_add">
+<description>
+Atomically adds @val to the integer pointed to by @atomic.
+Also acts as a memory barrier.
+
+Since: 2.4
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to an integer
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> the value to add to *@atomic
 </parameter_description>
 </parameter>
 </parameters>
@@ -12205,6 +12602,9 @@ function with a string constant for the format string and the same
 string constant must be used each time.  Mixing calls to this
 function and g_variant_iter_next() or g_variant_iter_next_value() on
 the same iterator is not recommended.
+
+See the section on &lt;link linkend='gvariant-format-strings'&gt;GVariant
+Format Strings&lt;/link&gt;.
 
 &lt;example&gt;
 &lt;title&gt;Memory management with g_variant_iter_loop()&lt;/title&gt;
@@ -12839,6 +13239,31 @@ See g_param_spec_internal() for details on property names.
 </return>
 </function>
 
+<function name="g_variant_dup_bytestring">
+<description>
+Similar to g_variant_get_bytestring() except that instead of
+returning a constant string, the string is duplicated.
+
+The return value must be freed using g_free().
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> an array-of-bytes #GVariant instance
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> a pointer to a #gsize, to store
+the length (not including the nul terminator)
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string
+</return>
+</function>
+
 <function name="g_value_set_long">
 <description>
 Set the contents of a %G_TYPE_LONG #GValue to @v_long.
@@ -12990,6 +13415,36 @@ and unwanted results.&lt;/para&gt;&lt;/note&gt;
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_dcgettext">
+<description>
+This is a variant of g_dgettext() that allows specifying a locale
+category instead of always using %LC_MESSAGES. See g_dgettext() for
+more information about how this functions differs from calling
+dcgettext() directly.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="domain">
+<parameter_description> the translation domain to use, or %NULL to use
+the domain set with textdomain()
+</parameter_description>
+</parameter>
+<parameter name="msgid">
+<parameter_description> message to translate
+</parameter_description>
+</parameter>
+<parameter name="category">
+<parameter_description> a locale category
+</parameter_description>
+</parameter>
+</parameters>
+<return> the translated string for the given locale category
+
+</return>
 </function>
 
 <function name="g_strstr_len">
@@ -13575,6 +14030,24 @@ to a #GOptionContext or freed with g_option_group_free().
 </return>
 </function>
 
+<function name="g_binding_get_target">
+<description>
+Retrieves the #GObject instance used as the target of the binding
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="binding">
+<parameter_description> a #GBinding
+</parameter_description>
+</parameter>
+</parameters>
+<return> the target #GObject
+
+</return>
+</function>
+
 <function name="g_thread_pool_get_max_unused_threads">
 <description>
 Returns the maximal allowed number of unused threads.
@@ -13924,6 +14397,25 @@ Since: 2.12
 </return>
 </function>
 
+<function name="g_binding_get_source_property">
+<description>
+Retrieves the name of the property of #GBinding:source used as the source
+of the binding
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="binding">
+<parameter_description> a #GBinding
+</parameter_description>
+</parameter>
+</parameters>
+<return> the name of the source property
+
+</return>
+</function>
+
 <function name="g_queue_pop_nth_link">
 <description>
 Removes and returns the link at the given position.
@@ -14014,7 +14506,7 @@ Inserts a byte into a #GString, expanding it if necessary.
 <description>
 Parses @format and returns the result.
 
-@format must be a text format #GVariant with one extention: at any
+@format must be a text format #GVariant with one extension: at any
 point that a value may appear in the text, a '%' character followed
 by a GVariant format string (as per g_variant_new()) may appear.  In
 that case, the same arguments are collected from the argument list as
@@ -14585,6 +15077,8 @@ Returns %TRUE if a record with the given values exists in a
 #GRelation. Note that the values are compared directly, so that, for
 example, two copies of the same string will not match.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="relation">
@@ -14996,7 +15490,8 @@ the range [@begin..@end-1].
 
 <function name="g_value_array_insert">
 <description>
-Insert a copy of @value at specified position into @value_array.
+Insert a copy of @value at specified position into @value_array. If @value
+is %NULL, an uninitialized value is inserted.
 
 
 </description>
@@ -15010,7 +15505,7 @@ Insert a copy of @value at specified position into @value_array.
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> #GValue to copy into #GValueArray
+<parameter_description> #GValue to copy into #GValueArray, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -15388,8 +15883,7 @@ be used as the #GCompletion items.
 Constructs an array of strings #GVariant from the given array of
 strings.
 
-If @length is not -1 then it gives the maximum length of @strv.  In
-any case, a %NULL pointer in @strv is taken as a terminator.
+If @length is -1 then @strv is %NULL-terminated.
 
 Since: 2.24
 
@@ -16018,7 +16512,13 @@ configuration information such as user preferences and settings.
 
 On UNIX platforms this is determined using the mechanisms described in
 the &lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&gt;
-XDG Base Directory Specification&lt;/ulink&gt;
+XDG Base Directory Specification&lt;/ulink&gt;.
+In this case the directory retrieved will be XDG_CONFIG_HOME.
+
+On Windows is the directory that serves as a common repository for
+application-specific data. A typical path is
+C:\Documents and Settings\username\Application. See documentation for
+CSIDL_APPDATA.
 
 Since: 2.6
 
@@ -16532,6 +17032,36 @@ Since: 2.4
 <return></return>
 </function>
 
+<function name="g_variant_get_bytestring_array">
+<description>
+Gets the contents of an array of array of bytes #GVariant.  This call
+makes a shallow copy; the return result should be released with
+g_free(), but the individual strings must not be modified.
+
+If @length is non-%NULL then the number of elements in the result is
+stored there.  In any case, the resulting array will be
+%NULL-terminated.
+
+For an empty array, @length will be set to 0 and a pointer to a
+%NULL pointer will be returned.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> an array of array of bytes #GVariant ('aay')
+</parameter_description>
+</parameter>
+<parameter name="length">
+<parameter_description> the length of the result, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> an array of constant strings
+</return>
+</function>
+
 <function name="g_io_add_watch">
 <description>
 Adds the #GIOChannel into the default main loop context
@@ -16558,6 +17088,28 @@ with the default priority.
 </parameter>
 </parameters>
 <return> the event source id
+</return>
+</function>
+
+<function name="g_variant_new_bytestring">
+<description>
+Creates an array-of-bytes #GVariant with the contents of @string.
+This function is just like g_variant_new_string() except that the
+string need not be valid utf8.
+
+The nul terminator character at the end of the string is stored in
+the array.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> a normal nul-terminated string in no particular encoding
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new bytestring #GVariant instance
 </return>
 </function>
 
@@ -16724,6 +17276,8 @@ number_list = g_slist_append (number_list, GINT_TO_POINTER (14));
 Returns all of the tuples which have the given key in the given
 field. Use g_tuples_index() to access the returned records. The
 returned records should be freed with g_tuples_destroy().
+
+Deprecated: 2.26: Rarely used API
 
 </description>
 <parameters>
@@ -17308,15 +17862,15 @@ g_match_info_is_partial_match().
 
 When using partial matching you cannot use g_match_info_fetch*().
 
-Because of the way certain internal optimizations are implemented 
-the partial matching algorithm cannot be used with all patterns. 
-So repeated single characters such as &quot;a{2,4}&quot; and repeated single 
-meta-sequences such as &quot;\d+&quot; are not permitted if the maximum number 
-of occurrences is greater than one. Optional items such as &quot;\d?&quot; 
-(where the maximum is one) are permitted. Quantifiers with any values 
-are permitted after parentheses, so the invalid examples above can be 
-coded thus &quot;(a){2,4}&quot; and &quot;(\d)+&quot;. If #G_REGEX_MATCH_PARTIAL is set 
-for a pattern that does not conform to the restrictions, matching 
+Because of the way certain internal optimizations are implemented
+the partial matching algorithm cannot be used with all patterns.
+So repeated single characters such as &quot;a{2,4}&quot; and repeated single
+meta-sequences such as &quot;\d+&quot; are not permitted if the maximum number
+of occurrences is greater than one. Optional items such as &quot;\d?&quot;
+(where the maximum is one) are permitted. Quantifiers with any values
+are permitted after parentheses, so the invalid examples above can be
+coded thus &quot;(a){2,4}&quot; and &quot;(\d)+&quot;. If #G_REGEX_MATCH_PARTIAL is set
+for a pattern that does not conform to the restrictions, matching
 functions return an error.
 
 Since: 2.14
@@ -17376,9 +17930,9 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a %NULL-terminated array of gchar * pointers. It must be 
-freed using g_strfreev(). If the previous match failed %NULL is
-returned
+<return> a %NULL-terminated array of gchar * pointers.
+It must be freed using g_strfreev(). If the previous match failed
+%NULL is returned
 
 </return>
 </function>
@@ -17478,6 +18032,30 @@ Since: 2.6
 <return> a new file descriptor, or -1 if an error occurred. The
 return value can be used exactly like the return value from open().
 
+</return>
+</function>
+
+<function name="g_variant_is_floating">
+<description>
+Checks whether @value has a floating reference count.
+
+This function should only ever be used to assert that a given variant
+is or is not floating, or for debug purposes. To acquire a reference
+to a variant that might be floating, always use g_variant_ref_sink().
+
+See g_variant_ref_sink() for more information about floating reference
+counts.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a #GVariant
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether @value is floating
 </return>
 </function>
 
@@ -18667,6 +19245,8 @@ Since: 2.6
 Sets the function to use for string comparisons. The default string
 comparison function is strncmp().
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="cmp">
@@ -18807,6 +19387,8 @@ Sets the value of a date from a #GTimeVal value.  Note that the
 @tv_usec member is ignored, because #GDate can't make use of the
 additional precision.
 
+The time to date conversion is done using the user's current timezone.
+
 Since: 2.10
 
 </description>
@@ -18834,6 +19416,9 @@ All of the pointers given on the variable arguments list of this
 function are assumed to point at uninitialised memory.  It is the
 responsibility of the caller to free all of the values returned by
 the unpacking process.
+
+See the section on &lt;link linkend='gvariant-format-strings'&gt;GVariant
+Format Strings&lt;/link&gt;.
 
 &lt;example&gt;
 &lt;title&gt;Memory management with g_variant_iter_next()&lt;/title&gt;
@@ -18916,6 +19501,8 @@ Destroys the #GRelation, freeing all memory allocated. However, it
 does not free memory allocated for the tuple data, so you should
 free that first if appropriate.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="relation">
@@ -18928,14 +19515,14 @@ free that first if appropriate.
 
 <function name="g_regex_check_replacement">
 <description>
-Checks whether @replacement is a valid replacement string 
-(see g_regex_replace()), i.e. that all escape sequences in 
+Checks whether @replacement is a valid replacement string
+(see g_regex_replace()), i.e. that all escape sequences in
 it are valid.
 
-If @has_references is not %NULL then @replacement is checked 
+If @has_references is not %NULL then @replacement is checked
 for pattern references. For instance, replacement text 'foo\n'
 does not contain references and may be evaluated without information
-about actual match, but '\0\1' (whole match followed by first 
+about actual match, but '\0\1' (whole match followed by first
 subpattern) requires valid #GMatchInfo object.
 
 Since: 2.14
@@ -19448,6 +20035,25 @@ Since: 2.6
 </return>
 </function>
 
+<function name="g_atomic_int_get">
+<description>
+Reads the value of the integer pointed to by @atomic.
+Also acts as a memory barrier.
+
+Since: 2.4
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to an integer
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value of *@atomic
+
+</return>
+</function>
+
 <function name="g_main_context_pending">
 <description>
 Checks if any sources have pending events for the given context.
@@ -19877,6 +20483,7 @@ without a return value.
 <description>
 Compares @str1 and @str2 like strcmp(). Handles %NULL 
 gracefully by sorting it before non-%NULL strings.
+Comparing two %NULL pointers returns 0.
 
 Since: 2.16
 
@@ -20117,12 +20724,12 @@ or %NULL if the #GList has no elements
 
 <function name="g_regex_escape_string">
 <description>
-Escapes the special characters used for regular expressions 
-in @string, for instance &quot;a.b*c&quot; becomes &quot;a\.b\*c&quot;. This 
+Escapes the special characters used for regular expressions
+in @string, for instance &quot;a.b*c&quot; becomes &quot;a\.b\*c&quot;. This
 function is useful to dynamically generate regular expressions.
 
-@string can contain nul characters that are replaced with &quot;\0&quot;, 
-in this case remember to specify the correct length of @string 
+@string can contain nul characters that are replaced with &quot;\0&quot;,
+in this case remember to specify the correct length of @string
 in @length.
 
 Since: 2.14
@@ -20544,7 +21151,8 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="endptr">
-<parameter_description> location to store the end pointer, or %NULL
+<parameter_description> location to store the end pointer,
+or %NULL
 </parameter_description>
 </parameter>
 <parameter name="app">
@@ -20559,6 +21167,8 @@ Since: 2.24
 <function name="g_completion_remove_items">
 <description>
 Removes items from a #GCompletion.
+
+Deprecated: 2.26: Rarely used API
 
 </description>
 <parameters>
@@ -20664,21 +21274,21 @@ Since: 2.22
 <function name="g_snprintf">
 <description>
 A safer form of the standard sprintf() function. The output is guaranteed
-to not exceed @n characters (including the terminating nul character), so 
+to not exceed @n characters (including the terminating nul character), so
 it is easy to ensure that a buffer overflow cannot occur.
 
 See also g_strdup_printf().
 
-In versions of GLib prior to 1.2.3, this function may return -1 if the 
-output was truncated, and the truncated string may not be nul-terminated. 
-In versions prior to 1.3.12, this function returns the length of the output 
+In versions of GLib prior to 1.2.3, this function may return -1 if the
+output was truncated, and the truncated string may not be nul-terminated.
+In versions prior to 1.3.12, this function returns the length of the output
 string.
 
 The return value of g_snprintf() conforms to the snprintf()
-function as standardized in ISO C99. Note that this is different from 
+function as standardized in ISO C99. Note that this is different from
 traditional snprintf(), which returns the length of the output string.
 
-The format string may contain positional parameters, as specified in 
+The format string may contain positional parameters, as specified in
 the Single Unix Specification.
 
 
@@ -20689,12 +21299,12 @@ the Single Unix Specification.
 </parameter_description>
 </parameter>
 <parameter name="n">
-<parameter_description> the maximum number of bytes to produce (including the 
+<parameter_description> the maximum number of bytes to produce (including the
 terminating nul character).
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> a standard printf() format string, but notice 
+<parameter_description> a standard printf() format string, but notice
 &lt;link linkend=&quot;string-precision&quot;&gt;string precision pitfalls&lt;/link&gt;.
 </parameter_description>
 </parameter>
@@ -20831,7 +21441,15 @@ system-wide configuration information.
 
 On UNIX platforms this is determined using the mechanisms described in
 the &lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&gt;
-XDG Base Directory Specification&lt;/ulink&gt;
+XDG Base Directory Specification&lt;/ulink&gt;.
+In this case the list of directories retrieved will be XDG_CONFIG_DIRS.
+
+On Windows is the directory that contains application data for all users.
+A typical path is C:\Documents and Settings\All Users\Application Data.
+This folder is used for application data that is not user specific.
+For example, an application can store a spell-check dictionary, a database
+of clip art, or a log file in the CSIDL_COMMON_APPDATA folder.
+This information will not roam and is available to anyone using the computer.
 
 Since: 2.6
 
@@ -20934,7 +21552,8 @@ Since: 2.24
 </parameter_description>
 </parameter>
 <parameter name="endptr">
-<parameter_description> location to store the end pointer, or %NULL
+<parameter_description> location to store the end pointer,
+or %NULL
 </parameter_description>
 </parameter>
 <parameter name="app">
@@ -21000,6 +21619,17 @@ the pool.
 <return> a newly allocated array containing pointers to all
 #GParamSpec&lt;!-- --&gt;s owned by @owner_type in the pool
 </return>
+</function>
+
+<function name="g_variant_get_gtype">
+<description>
+Since: 2.24
+Deprecated: 2.26
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_key_file_get_integer_list">
@@ -21442,6 +22072,34 @@ Set the contents of a %G_TYPE_INT64 #GValue to @v_int64.
 <return></return>
 </function>
 
+<function name="g_atomic_int_compare_and_exchange">
+<description>
+Compares @oldval with the integer pointed to by @atomic and
+if they are equal, atomically exchanges *@atomic with @newval.
+Also acts as a memory barrier.
+
+Since: 2.4
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to an integer
+</parameter_description>
+</parameter>
+<parameter name="oldval">
+<parameter_description> the assumed old value of *@atomic
+</parameter_description>
+</parameter>
+<parameter name="newval">
+<parameter_description> the new value of *@atomic
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE, if *@atomic was equal @oldval. %FALSE otherwise.
+
+</return>
+</function>
+
 <function name="g_unichar_validate">
 <description>
 Checks whether @ch is a valid Unicode character. Some possible
@@ -21527,7 +22185,7 @@ See g_param_spec_internal() for details on property names.
 <function name="g_cclosure_marshal_VOID__OBJECT">
 <description>
 A marshaller for a #GCClosure with a callback of type
-&lt;literal&gt;void (*callback) (gpointer instance, GOBject *arg1, gpointer user_data)&lt;/literal&gt;.
+&lt;literal&gt;void (*callback) (gpointer instance, GObject *arg1, gpointer user_data)&lt;/literal&gt;.
 
 </description>
 <parameters>
@@ -22105,11 +22763,11 @@ freed, you should also free the #GStaticPrivate.
 <function name="g_regex_replace">
 <description>
 Replaces all occurrences of the pattern in @regex with the
-replacement text. Backreferences of the form '\number' or 
-'\g&lt;number&gt;' in the replacement text are interpolated by the 
-number-th captured subexpression of the match, '\g&lt;name&gt;' refers 
-to the captured subexpression with the given name. '\0' refers to the 
-complete match, but '\0' followed by a number is the octal representation 
+replacement text. Backreferences of the form '\number' or
+'\g&lt;number&gt;' in the replacement text are interpolated by the
+number-th captured subexpression of the match, '\g&lt;name&gt;' refers
+to the captured subexpression with the given name. '\0' refers to the
+complete match, but '\0' followed by a number is the octal representation
 of a character. To include a literal '\' in the replacement, write '\\'.
 There are also escapes that changes the case of the following text:
 
@@ -22147,8 +22805,8 @@ The @replacement string must be UTF-8 encoded even if #G_REGEX_RAW was
 passed to g_regex_new(). If you want to use not UTF-8 encoded stings
 you can use g_regex_replace_literal().
 
-Setting @start_position differs from just passing over a shortened 
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern that 
+Setting @start_position differs from just passing over a shortened
+string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern that
 begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
 Since: 2.14
@@ -22366,8 +23024,8 @@ characters wherever it matches the empty string between characters.
 For example splitting &quot;ab c&quot; using as a separator &quot;\s*&quot;, you will get
 &quot;a&quot;, &quot;b&quot; and &quot;c&quot;.
 
-Setting @start_position differs from just passing over a shortened 
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern 
+Setting @start_position differs from just passing over a shortened
+string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
 Since: 2.14
@@ -22395,7 +23053,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="max_tokens">
-<parameter_description> the maximum number of tokens to split @string into. 
+<parameter_description> the maximum number of tokens to split @string into.
 If this is less than 1, the string is split completely
 </parameter_description>
 </parameter>
@@ -22484,8 +23142,8 @@ Since: 2.8
 <description>
 Retrieves the text matching the capturing parentheses named @name.
 
-If @name is a valid sub pattern name but it didn't match anything 
-(e.g. sub pattern &quot;X&quot;, matching &quot;b&quot; against &quot;(?P&lt;X&gt;a)?b&quot;) 
+If @name is a valid sub pattern name but it didn't match anything
+(e.g. sub pattern &quot;X&quot;, matching &quot;b&quot; against &quot;(?P&lt;X&gt;a)?b&quot;)
 then an empty string is returned.
 
 The string is fetched from the string passed to the match function,
@@ -22504,8 +23162,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> The matched substring, or %NULL if an error occurred.
-You have to free the string yourself
+<return> The matched substring, or %NULL if an error
+occurred. You have to free the string yourself
 
 </return>
 </function>
@@ -22851,11 +23509,11 @@ converted to lowercase.
 
 <function name="g_match_info_get_match_count">
 <description>
-Retrieves the number of matched substrings (including substring 0, 
-that is the whole matched text), so 1 is returned if the pattern 
+Retrieves the number of matched substrings (including substring 0,
+that is the whole matched text), so 1 is returned if the pattern
 has no substrings in it and 0 is returned if the match failed.
 
-If the last match was obtained using the DFA algorithm, that is 
+If the last match was obtained using the DFA algorithm, that is
 using g_regex_match_all() or g_regex_match_all_full(), the retrieved
 count is not that of the number of capturing parentheses but that of
 the number of matched substrings.
@@ -23076,7 +23734,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> an array of constant strings
+<return> an array of strings
 </return>
 </function>
 
@@ -23268,6 +23926,27 @@ Adds a new element at the tail of the queue.
 <parameter name="link_">
 <parameter_description> a single #GList element, &lt;emphasis&gt;not&lt;/emphasis&gt; a list with
 more than one element.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_atomic_int_set">
+<description>
+Sets the value of the integer pointed to by @atomic.
+Also acts as a memory barrier.
+
+Since: 2.10
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to an integer
+</parameter_description>
+</parameter>
+<parameter name="newval">
+<parameter_description> the new value
 </parameter_description>
 </parameter>
 </parameters>
@@ -24109,6 +24788,8 @@ Gets the number of nodes in a tree.
 Returns the number of tuples in a #GRelation that have the given
 value in the given field.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="relation">
@@ -24244,19 +24925,20 @@ Since: 2.10
 
 <function name="g_variant_new_maybe">
 <description>
-Depending on if @value is %NULL, either wraps @value inside of a
+Depending on if @child is %NULL, either wraps @child inside of a
 maybe container or creates a Nothing instance for the given @type.
 
-At least one of @type and @value must be non-%NULL.  If @type is
-non-%NULL then it must be a definite type.  If they are both
-non-%NULL then @type must be the type of @value.
+At least one of @child_type and @child must be non-%NULL.
+If @child_type is non-%NULL then it must be a definite type.
+If they are both non-%NULL then @child_type must be the type
+of @child.
 
 Since: 2.24
 
 </description>
 <parameters>
 <parameter name="child_type">
-<parameter_description> the #GVariantType of the child
+<parameter_description> the #GVariantType of the child, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="child">
@@ -24413,40 +25095,28 @@ the last character used in the conversion.
 </return>
 </function>
 
-<function name="g_cclosure_marshal_VOID__INT">
+<function name="g_utf8_strlen">
 <description>
-A marshaller for a #GCClosure with a callback of type
-&lt;literal&gt;void (*callback) (gpointer instance, gint arg1, gpointer user_data)&lt;/literal&gt;.
+Computes the length of the string in characters, not including
+the terminating nul character.
+
 
 </description>
 <parameters>
-<parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter name="p">
+<parameter_description> pointer to the start of a UTF-8 encoded string
 </parameter_description>
 </parameter>
-<parameter name="return_value">
-<parameter_description> ignored
-</parameter_description>
-</parameter>
-<parameter name="n_param_values">
-<parameter_description> 2
-</parameter_description>
-</parameter>
-<parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gint parameter
-</parameter_description>
-</parameter>
-<parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
-</parameter_description>
-</parameter>
-<parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter name="max">
+<parameter_description> the maximum number of bytes to examine. If @max
+is less than 0, then the string is assumed to be
+nul-terminated. If @max is 0, @p will not be examined and
+may be %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> the length of the string in characters
+</return>
 </function>
 
 <function name="g_tuples_destroy">
@@ -24455,6 +25125,8 @@ Frees the records which were returned by g_relation_select(). This
 should always be called after g_relation_select() when you are
 finished with the records. The records are not removed from the
 #GRelation.
+
+Deprecated: 2.26: Rarely used API
 
 </description>
 <parameters>
@@ -24483,32 +25155,21 @@ Since: 2.22
 <return></return>
 </function>
 
-<function name="g_uri_unescape_string">
+<function name="g_unichar_xdigit_value">
 <description>
-Unescapes a whole escaped string.
+Determines the numeric value of a character as a hexidecimal
+digit.
 
-If any of the characters in @illegal_characters or the character zero appears
-as an escaped character in @escaped_string then that is an error and %NULL
-will be returned. This is useful it you want to avoid for instance having a
-slash being expanded in an escaped path element, which might confuse pathname
-handling.
-
-Since: 2.16
 
 </description>
 <parameters>
-<parameter name="escaped_string">
-<parameter_description> an escaped string to be unescaped.
-</parameter_description>
-</parameter>
-<parameter name="illegal_characters">
-<parameter_description> an optional string of illegal characters not to be allowed.
+<parameter name="c">
+<parameter_description> a Unicode character
 </parameter_description>
 </parameter>
 </parameters>
-<return> an unescaped version of @escaped_string. The returned string 
-should be freed when no longer needed.
-
+<return> If @c is a hex digit (according to
+g_unichar_isxdigit()), its numeric value. Otherwise, -1.
 </return>
 </function>
 
@@ -24708,32 +25369,32 @@ name/value pairs, followed by %NULL
 
 <function name="g_regex_split_simple">
 <description>
-Breaks the string on the pattern, and returns an array of 
-the tokens. If the pattern contains capturing parentheses, 
-then the text for each of the substrings will also be returned. 
-If the pattern does not match anywhere in the string, then the 
+Breaks the string on the pattern, and returns an array of
+the tokens. If the pattern contains capturing parentheses,
+then the text for each of the substrings will also be returned.
+If the pattern does not match anywhere in the string, then the
 whole string is returned as the first token.
 
-This function is equivalent to g_regex_split() but it does 
-not require to compile the pattern with g_regex_new(), avoiding 
-some lines of code when you need just to do a split without 
+This function is equivalent to g_regex_split() but it does
+not require to compile the pattern with g_regex_new(), avoiding
+some lines of code when you need just to do a split without
 extracting substrings, capture counts, and so on.
 
 If this function is to be called on the same @pattern more than
 once, it's more efficient to compile the pattern once with
 g_regex_new() and then use g_regex_split().
 
-As a special case, the result of splitting the empty string &quot;&quot; 
-is an empty vector, not a vector containing a single string. 
-The reason for this special case is that being able to represent 
-a empty vector is typically more useful than consistent handling 
-of empty elements. If you do need to represent empty elements, 
-you'll need to check for the empty string before calling this 
+As a special case, the result of splitting the empty string &quot;&quot;
+is an empty vector, not a vector containing a single string.
+The reason for this special case is that being able to represent
+a empty vector is typically more useful than consistent handling
+of empty elements. If you do need to represent empty elements,
+you'll need to check for the empty string before calling this
 function.
 
-A pattern that can match empty strings splits @string into 
-separate characters wherever it matches the empty string between 
-characters. For example splitting &quot;ab c&quot; using as a separator 
+A pattern that can match empty strings splits @string into
+separate characters wherever it matches the empty string between
+characters. For example splitting &quot;ab c&quot; using as a separator
 &quot;\s*&quot;, you will get &quot;a&quot;, &quot;b&quot; and &quot;c&quot;.
 
 Since: 2.14
@@ -25944,6 +26605,8 @@ arrays of this property, may be %NULL
 Attempts to complete the string @prefix using the #GCompletion
 target items.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="cmp">
@@ -26086,6 +26749,84 @@ Free a #GValueArray including its contents.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_object_bind_property_full">
+<description>
+Complete version of g_object_bind_property().
+
+Creates a binding between @source_property on @source and @target_property
+on @target, allowing you to set the transformation functions to be used by
+the binding.
+
+If @flags contains %G_BINDING_BIDIRECTIONAL then the binding will be mutual:
+if @target_property on @target changes then the @source_property on @source
+will be updated as well. The @transform_from function is only used in case
+of bidirectional bindings, otherwise it will be ignored
+
+The binding will automatically be removed when either the @source or the
+@target instances are finalized. To remove the binding without affecting the
+@source and the @target you can just call g_object_unref() on the returned
+#GBinding instance.
+
+A #GObject can have multiple bindings.
+
+&lt;note&gt;The same @user_data parameter will be used for both @transform_to
+and @transform_from transformation functions; the @notify function will
+be called once, when the binding is removed. If you need different data
+for each transformation function, please use
+g_object_bind_property_with_closures() instead.&lt;/note&gt;
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> the source #GObject
+</parameter_description>
+</parameter>
+<parameter name="source_property">
+<parameter_description> the property on @source to bind
+</parameter_description>
+</parameter>
+<parameter name="target">
+<parameter_description> the target #GObject
+</parameter_description>
+</parameter>
+<parameter name="target_property">
+<parameter_description> the property on @target to bind
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags to pass to #GBinding
+</parameter_description>
+</parameter>
+<parameter name="transform_to">
+<parameter_description> the transformation function
+from the @source to the @target, or %NULL to use the default
+</parameter_description>
+</parameter>
+<parameter name="transform_from">
+<parameter_description> the transformation function
+from the @target to the @source, or %NULL to use the default
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> custom data to be passed to the transformation functions,
+or %NULL
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> function to be called when disposing the binding, to free the
+resources used by the transformation functions
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GBinding instance representing the
+binding between the two #GObject instances. The binding is released
+whenever the #GBinding reference count reaches zero.
+
+</return>
 </function>
 
 <function name="g_object_get_data">
@@ -26443,7 +27184,13 @@ data specific to particular user.
 
 On UNIX platforms this is determined using the mechanisms described in
 the &lt;ulink url=&quot;http://www.freedesktop.org/Standards/basedir-spec&quot;&gt;
-XDG Base Directory Specification&lt;/ulink&gt;
+XDG Base Directory Specification&lt;/ulink&gt;.
+In this case the directory retrieved will be XDG_CACHE_HOME.
+
+On Windows is the directory that serves as a common repository for
+temporary Internet files. A typical path is
+C:\Documents and Settings\username\Local Settings\Temporary Internet Files.
+See documentation for CSIDL_INTERNET_CACHE.
 
 Since: 2.6
 
@@ -27005,28 +27752,40 @@ Since: 2.8
 </return>
 </function>
 
-<function name="g_utf8_strlen">
+<function name="g_cclosure_marshal_VOID__INT">
 <description>
-Computes the length of the string in characters, not including
-the terminating nul character.
-
+A marshaller for a #GCClosure with a callback of type
+&lt;literal&gt;void (*callback) (gpointer instance, gint arg1, gpointer user_data)&lt;/literal&gt;.
 
 </description>
 <parameters>
-<parameter name="p">
-<parameter_description> pointer to the start of a UTF-8 encoded string
+<parameter name="closure">
+<parameter_description> the #GClosure to which the marshaller belongs
 </parameter_description>
 </parameter>
-<parameter name="max">
-<parameter_description> the maximum number of bytes to examine. If @max
-is less than 0, then the string is assumed to be
-nul-terminated. If @max is 0, @p will not be examined and
-may be %NULL.
+<parameter name="return_value">
+<parameter_description> ignored
+</parameter_description>
+</parameter>
+<parameter name="n_param_values">
+<parameter_description> 2
+</parameter_description>
+</parameter>
+<parameter name="param_values">
+<parameter_description> a #GValue array holding the instance and the #gint parameter
+</parameter_description>
+</parameter>
+<parameter name="invocation_hint">
+<parameter_description> the invocation hint given as the last argument
+to g_closure_invoke()
+</parameter_description>
+</parameter>
+<parameter name="marshal_data">
+<parameter_description> additional data specified when registering the marshaller
 </parameter_description>
 </parameter>
 </parameters>
-<return> the length of the string in characters
-</return>
+<return></return>
 </function>
 
 <function name="g_source_remove_by_funcs_user_data">
@@ -28567,7 +29326,7 @@ g_ascii_isdigit()), its numeric value. Otherwise, -1.
 
 <function name="g_regex_get_pattern">
 <description>
-Gets the pattern string associated with @regex, i.e. a copy of 
+Gets the pattern string associated with @regex, i.e. a copy of
 the string passed to g_regex_new().
 
 Since: 2.14
@@ -28605,8 +29364,8 @@ Since 2.24
 
 <function name="g_regex_new">
 <description>
-Compiles the regular expression to an internal form, and does 
-the initial setup of the #GRegex structure.  
+Compiles the regular expression to an internal form, and does
+the initial setup of the #GRegex structure.
 
 Since: 2.14
 
@@ -28617,7 +29376,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="compile_options">
-<parameter_description> compile options for the regular expression, or 0 
+<parameter_description> compile options for the regular expression, or 0
 </parameter_description>
 </parameter>
 <parameter name="match_options">
@@ -28629,32 +29388,30 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GRegex structure. Call g_regex_unref() when you 
+<return> a #GRegex structure. Call g_regex_unref() when you
 are done with it
 
 </return>
 </function>
 
-<function name="g_signal_type_cclosure_new">
+<function name="g_list_nth">
 <description>
-Creates a new closure which invokes the function found at the offset
-@struct_offset in the class structure of the interface or classed type
-identified by @itype.
+Gets the element at the given position in a #GList.
 
 
 </description>
 <parameters>
-<parameter name="itype">
-<parameter_description> the #GType identifier of an interface or classed type
+<parameter name="list">
+<parameter_description> a #GList
 </parameter_description>
 </parameter>
-<parameter name="struct_offset">
-<parameter_description> the offset of the member function of @itype's class
-structure which is to be invoked by the new closure
+<parameter name="n">
+<parameter_description> the position of the element, counting from 0
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GCClosure
+<return> the element, or %NULL if the position is off 
+the end of the #GList
 </return>
 </function>
 
@@ -29458,21 +30215,26 @@ be redirected, or %NULL if none.
 
 <function name="g_sprintf">
 <description>
-An implementation of the standard sprintf() function which supports 
+An implementation of the standard sprintf() function which supports
 positional parameters, as specified in the Single Unix Specification.
+
+Note that it is usually better to use g_snprintf(), to avoid the
+risk of buffer overflow.
+
+See also g_strdup_printf().
 
 Since: 2.2
 
 </description>
 <parameters>
 <parameter name="string">
-<parameter_description> A pointer to a memory buffer to contain the resulting string. It 
-is up to the caller to ensure that the allocated buffer is large 
+<parameter_description> A pointer to a memory buffer to contain the resulting string. It
+is up to the caller to ensure that the allocated buffer is large
 enough to hold the formatted result
 </parameter_description>
 </parameter>
 <parameter name="format">
-<parameter_description> a standard printf() format string, but notice 
+<parameter_description> a standard printf() format string, but notice
 &lt;link linkend=&quot;string-precision&quot;&gt;string precision pitfalls&lt;/link&gt;.
 </parameter_description>
 </parameter>
@@ -29574,6 +30336,27 @@ Since: 2.6
 <return> %TRUE if the group was removed, %FALSE otherwise
 
 </return>
+</function>
+
+<function name="g_atomic_pointer_set">
+<description>
+Sets the value of the pointer pointed to by @atomic.
+Also acts as a memory barrier.
+
+Since: 2.10
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to a #gpointer
+</parameter_description>
+</parameter>
+<parameter name="newval">
+<parameter_description> the new value
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_mutex_unlock">
@@ -29681,6 +30464,8 @@ Works like g_mutex_trylock(), but for a #GStaticMutex.
 <description>
 Removes all items from the #GCompletion.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="cmp">
@@ -29740,12 +30525,11 @@ Note that this function doesn't protect whitespace and line endings
 from being processed according to the XML rules for normalization
 of line endings and attribute values.
 
-Note also that if given a string containing them, this function
-will produce character references in the range of &amp;#x1; ..
-&amp;#x1f; for all control sequences except for tabstop, newline
-and carriage return.  The character references in this range are
-not valid XML 1.0, but they are valid XML 1.1 and will be accepted
-by the GMarkup parser.
+Note also that this function will produce character references in
+the range of &amp;#x1; ... &amp;#x1f; for all control sequences
+except for tabstop, newline and carriage return.  The character
+references in this range are not valid XML 1.0, but they are
+valid XML 1.1 and will be accepted by the GMarkup parser.
 
 
 </description>
@@ -30384,6 +31168,51 @@ GLib and should not be modified or freed.
 </return>
 </function>
 
+<function name="g_variant_builder_add_parsed">
+<description>
+Adds to a #GVariantBuilder.
+
+This call is a convenience wrapper that is exactly equivalent to
+calling g_variant_new_parsed() followed by
+g_variant_builder_add_value().
+
+This function might be used as follows:
+
+&lt;programlisting&gt;
+GVariant *
+make_pointless_dictionary (void)
+{
+GVariantBuilder *builder;
+int i;
+
+builder = g_variant_builder_new (G_VARIANT_TYPE_ARRAY);
+g_variant_builder_add_parsed (builder, &quot;{'width', &lt;%i&gt;}&quot;, 600);
+g_variant_builder_add_parsed (builder, &quot;{'title', &lt;%s&gt;}&quot;, &quot;foo&quot;);
+g_variant_builder_add_parsed (builder, &quot;{'transparency', &lt;0.5&gt;}&quot;);
+return g_variant_builder_end (builder);
+}
+&lt;/programlisting&gt;
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="builder">
+<parameter_description> a #GVariantBuilder
+</parameter_description>
+</parameter>
+<parameter name="format">
+<parameter_description> a text format #GVariant
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> arguments as per @format
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_strcasecmp">
 <description>
 A case-insensitive string comparison, corresponding to the standard
@@ -30681,18 +31510,18 @@ before threading system intialization.
 
 <function name="g_match_info_fetch">
 <description>
-Retrieves the text matching the @match_num&lt;!-- --&gt;'th capturing 
-parentheses. 0 is the full text of the match, 1 is the first paren 
+Retrieves the text matching the @match_num&lt;!-- --&gt;'th capturing
+parentheses. 0 is the full text of the match, 1 is the first paren
 set, 2 the second, and so on.
 
-If @match_num is a valid sub pattern but it didn't match anything 
-(e.g. sub pattern 1, matching &quot;b&quot; against &quot;(a)?b&quot;) then an empty 
+If @match_num is a valid sub pattern but it didn't match anything
+(e.g. sub pattern 1, matching &quot;b&quot; against &quot;(a)?b&quot;) then an empty
 string is returned.
 
 If the match was obtained using the DFA algorithm, that is using
 g_regex_match_all() or g_regex_match_all_full(), the retrieved
 string is not that of a set of parentheses but that of a matched
-substring. Substrings are matched in reverse order of length, so 
+substring. Substrings are matched in reverse order of length, so
 0 is the longest match.
 
 The string is fetched from the string passed to the match function,
@@ -30711,8 +31540,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> The matched substring, or %NULL if an error occurred.
-You have to free the string yourself
+<return> The matched substring, or %NULL if an error
+occurred. You have to free the string yourself
 
 </return>
 </function>
@@ -31899,6 +32728,24 @@ Adds a new element at the tail of the queue.
 <return></return>
 </function>
 
+<function name="g_binding_get_flags">
+<description>
+Retrieves the flags passed when constructing the #GBinding
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="binding">
+<parameter_description> a #GBinding
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GBindingFlags used by the #GBinding
+
+</return>
+</function>
+
 <function name="g_access">
 <description>
 A wrapper for the POSIX access() function. This function is used to
@@ -32450,6 +33297,25 @@ to the string.
 </return>
 </function>
 
+<function name="g_binding_get_target_property">
+<description>
+Retrieves the name of the property of #GBinding:target used as the target
+of the binding
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="binding">
+<parameter_description> a #GBinding
+</parameter_description>
+</parameter>
+</parameters>
+<return> the name of the target property
+
+</return>
+</function>
+
 <function name="g_param_spec_uint64">
 <description>
 Creates a new #GParamSpecUInt64 instance specifying a %G_TYPE_UINT64
@@ -32811,6 +33677,8 @@ is empty.
 Outputs information about all records in a #GRelation, as well as
 the indexes. It is for debugging.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="relation">
@@ -32966,6 +33834,39 @@ positive and NUL is met before @max_len bytes have been read.
 </parameters>
 <return> %TRUE if the text was valid UTF-8
 </return>
+</function>
+
+<function name="g_value_take_variant">
+<description>
+Set the contents of a variant #GValue to @variant, and takes over
+the ownership of the caller's reference to @variant;
+the caller doesn't have to unref it any more (i.e. the reference
+count of the variant is not increased).
+
+It is a programmer error to pass a floating variant to this function.
+In particular this means that callbacks in closures, and signal handlers
+for signals of return type %G_TYPE_VARIANT, must never return floating
+variants.
+
+If you want the #GValue to hold its own reference to @variant, use
+g_value_set_variant() instead.
+
+This is an internal function introduced mainly for C marshallers.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a valid #GValue of type %G_TYPE_VARIANT
+</parameter_description>
+</parameter>
+<parameter name="variant">
+<parameter_description> a #GVariant, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_utf8_collate_key">
@@ -33798,6 +34699,24 @@ without a return value
 </parameters>
 <return> the signal id
 </return>
+</function>
+
+<function name="g_value_set_flags">
+<description>
+Set the contents of a %G_TYPE_FLAGS #GValue to @v_flags.
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a valid #GValue whose type is derived from %G_TYPE_FLAGS
+</parameter_description>
+</parameter>
+<parameter name="v_flags">
+<parameter_description> flags value to be set
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_io_channel_set_close_on_unref">
@@ -35405,8 +36324,8 @@ corresponding #GMutex for @mutex.
 <description>
 Retrieves the position in bytes of the capturing parentheses named @name.
 
-If @name is a valid sub pattern name but it didn't match anything 
-(e.g. sub pattern &quot;X&quot;, matching &quot;b&quot; against &quot;(?P&lt;X&gt;a)?b&quot;) 
+If @name is a valid sub pattern name but it didn't match anything
+(e.g. sub pattern &quot;X&quot;, matching &quot;b&quot; against &quot;(?P&lt;X&gt;a)?b&quot;)
 then @start_pos and @end_pos are set to -1 and %TRUE is returned.
 
 Since: 2.14
@@ -35422,18 +36341,51 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="start_pos">
-<parameter_description> pointer to location where to store the start position
+<parameter_description> pointer to location where to store
+the start position, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="end_pos">
-<parameter_description> pointer to location where to store the end position
+<parameter_description> pointer to location where to store
+the end position, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the position was fetched, %FALSE otherwise. If 
-the position cannot be fetched, @start_pos and @end_pos are left
-unchanged
+<return> %TRUE if the position was fetched, %FALSE otherwise.
+If the position cannot be fetched, @start_pos and @end_pos
+are left unchanged.
 
+</return>
+</function>
+
+<function name="g_variant_get_bytestring">
+<description>
+Returns the string value of a #GVariant instance with an
+array-of-bytes type.  The string has no particular encoding.
+
+If the array does not end with a nul terminator character, the empty
+string is returned.  For this reason, you can always trust that a
+non-%NULL nul-terminated string will be returned by this function.
+
+If the array contains a nul terminator character somewhere other than
+the last byte then the returned string is the string, up to the first
+such nul character.
+
+It is an error to call this function with a @value that is not an
+array of bytes.
+
+The return value remains valid as long as @value exists.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> an array-of-bytes #GVariant instance
+</parameter_description>
+</parameter>
+</parameters>
+<return> the constant string
 </return>
 </function>
 
@@ -35719,18 +36671,18 @@ Since: 2.24
 
 <function name="g_regex_replace_eval">
 <description>
-Replaces occurrences of the pattern in regex with the output of 
+Replaces occurrences of the pattern in regex with the output of
 @eval for that occurrence.
 
-Setting @start_position differs from just passing over a shortened 
-string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern 
+Setting @start_position differs from just passing over a shortened
+string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
 The following example uses g_regex_replace_eval() to replace multiple
 strings at once:
 |[
-static gboolean 
-eval_cb (const GMatchInfo *info,          
+static gboolean
+eval_cb (const GMatchInfo *info,
 GString          *res,
 gpointer          data)
 {
@@ -35771,10 +36723,7 @@ Since: 2.14
 <parameters>
 <parameter name="regex">
 <parameter_description> a #GRegex structure from g_regex_new()
-</parameter_description>
-</parameter>
-<parameter name="string">
-<parameter_description> string to perform matches against
+@string (array length=string_len): string to perform matches against
 </parameter_description>
 </parameter>
 <parameter name="string_len">
@@ -35870,33 +36819,6 @@ Since: 2.12
 <return> a newly allocated string or %NULL if the specified
 URI cannot be found.
 
-</return>
-</function>
-
-<function name="g_variant_new_byte_array">
-<description>
-Constructs an array of bytes #GVariant from the given array of bytes.
-
-If @length is -1 then @array is taken to be a normal C string (in the
-sense that it is terminated by a nul character).  The nul character
-is included in the array.  If length is not -1 then it gives the
-length of @array which may then contain nul chracters with no special
-meaning.
-
-Since: 2.26
-
-</description>
-<parameters>
-<parameter name="array">
-<parameter_description> a pointer to an array of bytes
-</parameter_description>
-</parameter>
-<parameter name="length">
-<parameter_description> the length of @array, or -1
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new floating #GVariant instance
 </return>
 </function>
 
@@ -36106,18 +37028,18 @@ is undefined.
 
 <function name="g_match_info_fetch_pos">
 <description>
-Retrieves the position in bytes of the @match_num&lt;!-- --&gt;'th capturing 
-parentheses. 0 is the full text of the match, 1 is the first 
+Retrieves the position in bytes of the @match_num&lt;!-- --&gt;'th capturing
+parentheses. 0 is the full text of the match, 1 is the first
 paren set, 2 the second, and so on.
 
-If @match_num is a valid sub pattern but it didn't match anything 
-(e.g. sub pattern 1, matching &quot;b&quot; against &quot;(a)?b&quot;) then @start_pos 
+If @match_num is a valid sub pattern but it didn't match anything
+(e.g. sub pattern 1, matching &quot;b&quot; against &quot;(a)?b&quot;) then @start_pos
 and @end_pos are set to -1 and %TRUE is returned.
 
 If the match was obtained using the DFA algorithm, that is using
 g_regex_match_all() or g_regex_match_all_full(), the retrieved
 position is not that of a set of parentheses but that of a matched
-substring. Substrings are matched in reverse order of length, so 
+substring. Substrings are matched in reverse order of length, so
 0 is the longest match.
 
 Since: 2.14
@@ -36133,16 +37055,18 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="start_pos">
-<parameter_description> pointer to location where to store the start position
+<parameter_description> pointer to location where to store
+the start position, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="end_pos">
-<parameter_description> pointer to location where to store the end position
+<parameter_description> pointer to location where to store
+the end position, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the position was fetched, %FALSE otherwise. If 
-the position cannot be fetched, @start_pos and @end_pos are left 
+<return> %TRUE if the position was fetched, %FALSE otherwise. If
+the position cannot be fetched, @start_pos and @end_pos are left
 unchanged
 
 </return>
@@ -36339,6 +37263,63 @@ g_array_remove_index().
 </parameters>
 <return> the #GArray.
 </return>
+</function>
+
+<function name="g_object_notify_by_pspec">
+<description>
+Emits a &quot;notify&quot; signal for the property specified by @pspec on @object.
+
+This function omits the property name lookup, hence it is faster than
+g_object_notify().
+
+One way to avoid using g_object_notify() from within the
+class that registered the properties, and using g_object_notify_by_pspec()
+instead, is to store the GParamSpec used with
+g_object_class_install_property() inside a static array, e.g.:
+
+|[
+enum
+{
+PROP_0,
+PROP_FOO,
+PROP_LAST
+};
+
+static GParamSpec *properties[PROP_LAST];
+
+static void
+my_object_class_init (MyObjectClass *klass)
+{
+properties[PROP_FOO] = g_param_spec_int (&quot;foo&quot;, &quot;Foo&quot;, &quot;The foo&quot;,
+0, 100,
+50,
+G_PARAM_READWRITE);
+g_object_class_install_property (gobject_class,
+PROP_FOO,
+properties[PROP_FOO]);
+}
+]|
+
+and then notify a change on the &quot;foo&quot; property with:
+
+|[
+g_object_notify_by_pspec (self, properties[PROP_FOO]);
+]|
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> a #GObject
+</parameter_description>
+</parameter>
+<parameter name="pspec">
+<parameter_description> the #GParamSpec of a property installed on the class of @object.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_test_rand_int_range">
@@ -37053,24 +38034,32 @@ Since: 2.14
 </return>
 </function>
 
-<function name="g_path_get_basename">
+<function name="g_uri_unescape_string">
 <description>
-Gets the last component of the filename. If @file_name ends with a 
-directory separator it gets the component before the last slash. If 
-@file_name consists only of directory separators (and on Windows, 
-possibly a drive letter), a single separator is returned. If
-@file_name is empty, it gets &quot;.&quot;.
+Unescapes a whole escaped string.
 
+If any of the characters in @illegal_characters or the character zero appears
+as an escaped character in @escaped_string then that is an error and %NULL
+will be returned. This is useful it you want to avoid for instance having a
+slash being expanded in an escaped path element, which might confuse pathname
+handling.
+
+Since: 2.16
 
 </description>
 <parameters>
-<parameter name="file_name">
-<parameter_description> the name of the file.
+<parameter name="escaped_string">
+<parameter_description> an escaped string to be unescaped.
+</parameter_description>
+</parameter>
+<parameter name="illegal_characters">
+<parameter_description> an optional string of illegal characters not to be allowed.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string containing the last component of 
-the filename.
+<return> an unescaped version of @escaped_string. The returned string 
+should be freed when no longer needed.
+
 </return>
 </function>
 
@@ -37358,6 +38347,30 @@ g_object_set_qdata_full().
 </parameter>
 </parameters>
 <return> The user data pointer set, or %NULL
+</return>
+</function>
+
+<function name="g_atomic_int_exchange_and_add">
+<description>
+Atomically adds @val to the integer pointed to by @atomic.
+It returns the value of *@atomic just before the addition
+took place. Also acts as a memory barrier.
+
+Since: 2.4
+
+</description>
+<parameters>
+<parameter name="atomic">
+<parameter_description> a pointer to an integer
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> the value to add to *@atomic
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value of *@atomic before the addition.
+
 </return>
 </function>
 
@@ -37936,6 +38949,8 @@ if the call was interrupted.
 Creates a new #GRelation with the given number of fields. Note that
 currently the number of fields must be 2.
 
+Deprecated: 2.26: Rarely used API
+
 </description>
 <parameters>
 <parameter name="fields">
@@ -38401,6 +39416,44 @@ when registering @notify_func
 </parameter>
 <parameter name="notify_func">
 <parameter_description> the callback function to remove
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_cclosure_marshal_BOOLEAN__OBJECT_BOXED_BOXED">
+<description>
+A marshaller for a #GCClosure with a callback of type
+&lt;literal&gt;gboolean (*callback) (gpointer instance, GBoxed *arg1, GBoxed *arg2, gpointer user_data)&lt;/literal&gt;.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="closure">
+<parameter_description> the #GClosure to which the marshaller belongs
+</parameter_description>
+</parameter>
+<parameter name="return_value">
+<parameter_description> a #GValue, which can store the returned string
+</parameter_description>
+</parameter>
+<parameter name="n_param_values">
+<parameter_description> 3
+</parameter_description>
+</parameter>
+<parameter name="param_values">
+<parameter_description> a #GValue array holding instance, arg1 and arg2
+</parameter_description>
+</parameter>
+<parameter name="invocation_hint">
+<parameter_description> the invocation hint given as the last argument
+to g_closure_invoke()
+</parameter_description>
+</parameter>
+<parameter name="marshal_data">
+<parameter_description> additional data specified when registering the marshaller
 </parameter_description>
 </parameter>
 </parameters>
@@ -39005,7 +40058,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> The number of the subexpression or -1 if @name 
+<return> The number of the subexpression or -1 if @name
 does not exists
 
 </return>
@@ -39443,19 +40496,19 @@ Since: 2.12
 
 <function name="g_regex_match_all">
 <description>
-Using the standard algorithm for regular expression matching only 
-the longest match in the string is retrieved. This function uses 
+Using the standard algorithm for regular expression matching only
+the longest match in the string is retrieved. This function uses
 a different algorithm so it can retrieve all the possible matches.
 For more documentation see g_regex_match_all_full().
 
-A #GMatchInfo structure, used to get information on the match, is 
-stored in @match_info if not %NULL. Note that if @match_info is 
-not %NULL then it is created even if the function returns %FALSE, 
-i.e. you must free it regardless if regular expression actually 
+A #GMatchInfo structure, used to get information on the match, is
+stored in @match_info if not %NULL. Note that if @match_info is
+not %NULL then it is created even if the function returns %FALSE,
+i.e. you must free it regardless if regular expression actually
 matched.
 
-@string is not copied and is used in #GMatchInfo internally. If 
-you use any #GMatchInfo method (except g_match_info_free()) after 
+@string is not copied and is used in #GMatchInfo internally. If
+you use any #GMatchInfo method (except g_match_info_free()) after
 freeing or modifying @string then the behaviour is undefined.
 
 Since: 2.14
@@ -39475,8 +40528,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="match_info">
-<parameter_description> pointer to location where to store the #GMatchInfo, 
-or %NULL if you do not need it
+<parameter_description> pointer to location where to store
+the #GMatchInfo, or %NULL if you do not need it
 </parameter_description>
 </parameter>
 </parameters>
