@@ -25,6 +25,9 @@
 #include <gio/gsettingsbackend.h>
 
 #ifndef G_OS_WIN32
+//TODO: Uncomment when bug #627013 is resolved.
+//#include <gio/gunixcredentialsmessage.h>
+# include <gio/gunixfdmessage.h>
 # include <gio/gunixinputstream.h>
 # include <gio/gunixoutputstream.h>
 # include <gio/gunixconnection.h>
@@ -56,8 +59,9 @@ int main(int, char**)
             << get_defs(G_TYPE_FILTER_OUTPUT_STREAM)
 
 #ifndef G_OS_WIN32
-            // << get_defs(G_TYPE_UNIX_CREDENTIALS_MESSAGE)
-            // << get_defs(G_TYPE_UNIX_FD_MESSAGE)
+            //TODO: Uncomment when bug #627013 is resolved.
+            //<< get_defs(G_TYPE_UNIX_CREDENTIALS_MESSAGE)
+            << get_defs(G_TYPE_UNIX_FD_MESSAGE)
             << get_defs(G_TYPE_UNIX_INPUT_STREAM)
             << get_defs(G_TYPE_UNIX_OUTPUT_STREAM)
 #endif

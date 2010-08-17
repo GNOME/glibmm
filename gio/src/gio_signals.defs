@@ -1,5 +1,90 @@
 ;; From GAsyncResult
 
+;; From GApplication
+
+(define-signal quit-with-data
+  (of-object "GApplication")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("GVariant" "p0")
+  )
+)
+
+(define-signal action-with-data
+  (of-object "GApplication")
+  (return-type "void")
+  (when "first")
+  (parameters
+    '("const-gchar*" "p0")
+    '("GVariant" "p1")
+  )
+)
+
+(define-signal prepare-activation
+  (of-object "GApplication")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GVariant" "p0")
+    '("GVariant" "p1")
+  )
+)
+
+(define-property application-id
+  (of-object "GApplication")
+  (prop-type "GParamString")
+  (docs "Identifier for this application")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property register
+  (of-object "GApplication")
+  (prop-type "GParamBoolean")
+  (docs "If false, do not ")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property default-quit
+  (of-object "GApplication")
+  (prop-type "GParamBoolean")
+  (docs "Exit the process by default")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property is-remote
+  (of-object "GApplication")
+  (prop-type "GParamBoolean")
+  (docs "Whether this application is a proxy for another process")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property argv
+  (of-object "GApplication")
+  (prop-type "GParamVariant")
+  (docs "System argument vector with type signature aay")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property platform-data
+  (of-object "GApplication")
+  (prop-type "GParamVariant")
+  (docs "Environmental data, must have type signature a{sv}")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
 ;; From GCancellable
 
 (define-signal cancelled
@@ -286,6 +371,17 @@
   (construct-only #t)
 )
 
+;; From GUnixFDMessage
+
+(define-property fd-list
+  (of-object "GUnixFDMessage")
+  (prop-type "GParamObject")
+  (docs "The GUnixFDList object to send with the message")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
 ;; From GUnixInputStream
 
 (define-property fd
@@ -509,6 +605,83 @@
 
 ;; From GSeekable
 
+;; From GSettings
+
+(define-signal changed
+  (of-object "GSettings")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("const-gchar*" "p0")
+  )
+)
+
+(define-signal change-event
+  (of-object "GSettings")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("gpointer" "p0")
+    '("gint" "p1")
+  )
+)
+
+(define-signal writable-changed
+  (of-object "GSettings")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("const-gchar*" "p0")
+  )
+)
+
+(define-signal writable-change-event
+  (of-object "GSettings")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("guint" "p0")
+  )
+)
+
+(define-property schema
+  (of-object "GSettings")
+  (prop-type "GParamString")
+  (docs "The name of the schema for this settings object")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property backend
+  (of-object "GSettings")
+  (prop-type "GParamObject")
+  (docs "The GSettingsBackend for this settings object")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property path
+  (of-object "GSettings")
+  (prop-type "GParamString")
+  (docs "The path within the backend where the settings are")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property has-unapplied
+  (of-object "GSettings")
+  (prop-type "GParamBoolean")
+  (docs "TRUE if there are outstanding changes to apply()")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+;; From GSettingsBackend
+
 ;; From GSimpleAsyncResult
 
 ;; From GThemedIcon
@@ -725,7 +898,7 @@
 
 (define-property active
   (of-object "GDBusServer")
-  (prop-type "GParamString")
+  (prop-type "GParamBoolean")
   (docs "Whether the server is currently active")
   (readable #t)
   (writable #f)
@@ -1154,6 +1327,15 @@
   (of-object "GSocketClient")
   (prop-type "GParamObject")
   (docs "The local address constructed sockets will be bound to")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property timeout
+  (of-object "GSocketClient")
+  (prop-type "GParamUInt")
+  (docs "The I/O timeout for sockets, or 0 for none")
   (readable #t)
   (writable #t)
   (construct-only #f)
