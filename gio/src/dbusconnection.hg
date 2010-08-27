@@ -18,6 +18,7 @@
  */
 
 #include <glibmm/object.h>
+#include <giomm/initable.h>
 #include <giomm/iostream.h>
 #include <giomm/asyncresult.h>
 #include <giomm/credentials.h>
@@ -32,7 +33,10 @@ namespace Gio
 
 _WRAP_ENUM(BusType, GBusType)
 _WRAP_ENUM(DBusCapabilityFlags, GDBusCapabilityFlags, NO_GTYPE)
+_WRAP_ENUM(DBusConnectionFlags, GDBusConnectionFlags, NO_GTYPE)
 _WRAP_ENUM(DBusSendMessageFlags, GDBusSendMessageFlags, NO_GTYPE)
+
+class DBusAuthObserver;
 
 //TODO: Add example from C API in class docs.
 /** DBusConnection - D-Bus Connections.
@@ -47,13 +51,38 @@ _WRAP_ENUM(DBusSendMessageFlags, GDBusSendMessageFlags, NO_GTYPE)
  *
  * @newin{2,26}
  */
-class DBusConnection : public Glib::Object
+class DBusConnection : public Glib::Object, public Initable
 {
 protected:
   _CLASS_GOBJECT(DBusConnection, GDBusConnection, G_DBUS_CONNECTION, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Initable)
+
+protected:
+  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid, DBusConnectionFlags flags,
+    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<Cancellable>& cancellable);
+
+  DBusConnection(const Glib::ustring& address, DBusConnectionFlags flags,
+    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<Cancellable>& cancellable);
 
 public:
 
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_sync)
+  /** @throw Glib::Error.
+   */
+  Glib::RefPtr<DBusConnection> create(const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid, DBusConnectionFlags flags,
+    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address_sync)
+  /** @throw Glib::Error.
+   */
+  Glib::RefPtr<DBusConnection> create(const Glib::ustring& address,
+    DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
 
   //TODO: Documentation.
   void close();

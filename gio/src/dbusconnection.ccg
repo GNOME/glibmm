@@ -18,10 +18,55 @@
  */
 
 #include <gio/gio.h>
+#include <giomm/dbusauthobserver.h>
 #include "slot_async.h"
 
 namespace Gio
 {
+
+DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid, DBusConnectionFlags flags,
+  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<Cancellable>& cancellable)
+:
+  _CONSTRUCT("stream", Glib::unwrap(stream),
+    "guid", (guid.empty() ? 0 : guid.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "observer", Glib::unwrap(observer))
+{
+  init(cancellable);
+}
+
+DBusConnection::DBusConnection(const Glib::ustring& address,
+  DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<Cancellable>& cancellable)
+:
+  _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "observer", Glib::unwrap(observer))
+{
+  init(cancellable);
+}
+
+Glib::RefPtr<DBusConnection> DBusConnection::create(
+  const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid, DBusConnectionFlags flags,
+  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid, flags,
+    observer, cancellable));
+}
+
+Glib::RefPtr<DBusConnection> DBusConnection::create(
+  const Glib::ustring& address,
+  DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  return Glib::RefPtr<DBusConnection>(new DBusConnection(address, flags,
+    observer, cancellable));
+}
+
 
 void DBusConnection::close()
 {
