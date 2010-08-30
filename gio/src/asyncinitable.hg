@@ -22,6 +22,7 @@
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gio/gio.h)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GAsyncInitableIface GAsyncInitableIface;
@@ -125,6 +126,28 @@ protected:
     int io_priority = Glib::PRIORITY_DEFAULT);
 
   _WRAP_METHOD(bool init_finish(const Glib::RefPtr<AsyncResult>& result), g_async_initable_init_finish, errthrow)
+
+  virtual void init_async_vfunc(const SlotAsyncReady& slot,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    int io_priority = Glib::PRIORITY_DEFAULT);
+
+  /** @throw Glib::Errror.
+   */
+    virtual bool init_finish_vfunc(const Glib::RefPtr<AsyncResult>& res);
+  
+protected:
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_VFUNCS)
+  klass->init_async = &init_async_vfunc_callback;
+  klass->init_finish = &init_finish_vfunc_callback;
+  _SECTION(SECTION_PH_VFUNCS)
+  static void init_async_vfunc_callback(GAsyncInitable* self,
+    int io_priority, GCancellable* cancellable, GAsyncReadyCallback callback,
+    gpointer user_data);
+  static gboolean init_finish_vfunc_callback(GAsyncInitable* self,
+    GAsyncResult* res, GError** error);
+  _POP()
+#m4end
 };
 
 } // namespace Gio
