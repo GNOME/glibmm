@@ -128,6 +128,8 @@
 #include <glibmm/ustring.h>
 #include <glibmm/value.h>
 #include <glibmm/valuearray.h>
+#include <glibmm/variant.h>
+#include <glibmm/varianttype.h>
 #include <glibmm/wrap.h>
 
 #endif /* _GLIBMM_H */

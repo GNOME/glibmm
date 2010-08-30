@@ -21,6 +21,7 @@
  */
 
 #include <giomm/appinfo.h>
+#include <giomm/application.h>
 #include <giomm/asyncresult.h>
 #include <giomm/bufferedinputstream.h>
 #include <giomm/bufferedoutputstream.h>
@@ -28,6 +29,12 @@
 #include <giomm/contenttype.h>
 #include <giomm/datainputstream.h>
 #include <giomm/dataoutputstream.h>
+#include <giomm/dbusauthobserver.h>
+#include <giomm/dbusconnection.h>
+#include <giomm/dbusmessage.h>
+#include <giomm/dbusmethodinvocation.h>
+#include <giomm/dbusownname.h>
+#include <giomm/dbusserver.h>
 #ifndef G_OS_WIN32
 # include <giomm/desktopappinfo.h>
 #endif
@@ -73,11 +80,15 @@
 #include <giomm/socketclient.h>
 #include <giomm/socketconnectable.h>
 #include <giomm/socketconnection.h>
+#include <giomm/socketcontrolmessage.h>
 #include <giomm/srvtarget.h>
 #include <giomm/tcpconnection.h>
 #include <giomm/themedicon.h>
 #ifndef G_OS_WIN32
 # include <giomm/unixconnection.h>
+# include <giomm/unixcredentialsmessage.h>
+# include <giomm/unixfdlist.h>
+# include <giomm/unixfdmessage.h>
 # include <giomm/unixinputstream.h>
 # include <giomm/unixoutputstream.h>
 #endif
