@@ -68,12 +68,13 @@ void AsyncInitable_Class::init_async_vfunc_callback(GAsyncInitable* self,
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
       #endif //GLIBMM_EXCEPTIONS_ENABLED
-        // Call the virtual member method, which derived classes might override.
         // Get the slot.
         Gio::SlotAsyncReady* the_slot =
           static_cast<Gio::SlotAsyncReady*>(user_data);
 
-        obj->init_async_vfunc(*the_slot, Glib::wrap(cancellable), io_priority);
+        // Call the virtual member method, which derived classes might override.
+        obj->init_async_vfunc(*the_slot, Glib::wrap(cancellable, true),
+          io_priority);
         return;
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
@@ -105,17 +106,13 @@ g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) /
 
   if(base && base->init_async)
   {
-    // Create a copy of the slot.
-    // A pointer to it will be passed through the callback's data parameter
-    // and deleted in the callback.
-    SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
-
     (*base->init_async)(gobj(), io_priority,
       const_cast<GCancellable*>(Glib::unwrap(cancellable)),
-      &SignalProxy_async_callback, slot_copy);
+      &SignalProxy_async_callback, const_cast<SlotAsyncReady*>(&slot));
   }
 }
-gboolean AsyncInitable_Class::init_finish_vfunc_callback(GAsyncInitable* self, GAsyncResult* res, GError** error)
+gboolean AsyncInitable_Class::init_finish_vfunc_callback(GAsyncInitable* self,
+  GAsyncResult* res, GError** error)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
