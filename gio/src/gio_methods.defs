@@ -276,6 +276,20 @@
   (gtype-id "G_TYPE_SETTINGS_BACKEND")
 )
 
+(define-object Action
+  (in-module "GSimple")
+  (parent "GObject")
+  (c-name "GSimpleAction")
+  (gtype-id "G_TYPE_SIMPLE_ACTION")
+)
+
+(define-object ActionGroup
+  (in-module "GSimple")
+  (parent "GObject")
+  (c-name "GSimpleActionGroup")
+  (gtype-id "G_TYPE_SIMPLE_ACTION_GROUP")
+)
+
 (define-object t
   (in-module "GSocke")
   (parent "GObject")
@@ -297,11 +311,25 @@
   (gtype-id "G_TYPE_INET_SOCKET_ADDRESS")
 )
 
+(define-object Address
+  (in-module "GProxy")
+  (parent "GInetSocketAddress")
+  (c-name "GProxyAddress")
+  (gtype-id "G_TYPE_PROXY_ADDRESS")
+)
+
 (define-object AddressEnumerator
   (in-module "GSocket")
   (parent "GObject")
   (c-name "GSocketAddressEnumerator")
   (gtype-id "G_TYPE_SOCKET_ADDRESS_ENUMERATOR")
+)
+
+(define-object AddressEnumerator
+  (in-module "GProxy")
+  (parent "GSocketAddressEnumerator")
+  (c-name "GProxyAddressEnumerator")
+  (gtype-id "G_TYPE_PROXY_ADDRESS_ENUMERATOR")
 )
 
 (define-object Client
@@ -658,6 +686,13 @@
     '("partial-input" "G_IO_ERROR_PARTIAL_INPUT")
     '("invalid-data" "G_IO_ERROR_INVALID_DATA")
     '("dbus-error" "G_IO_ERROR_DBUS_ERROR")
+    '("host-unreachable" "G_IO_ERROR_HOST_UNREACHABLE")
+    '("network-unreachable" "G_IO_ERROR_NETWORK_UNREACHABLE")
+    '("connection-refused" "G_IO_ERROR_CONNECTION_REFUSED")
+    '("proxy-failed" "G_IO_ERROR_PROXY_FAILED")
+    '("proxy-auth-failed" "G_IO_ERROR_PROXY_AUTH_FAILED")
+    '("proxy-need-auth" "G_IO_ERROR_PROXY_NEED_AUTH")
+    '("proxy-not-allowed" "G_IO_ERROR_PROXY_NOT_ALLOWED")
   )
 )
 
@@ -1034,6 +1069,27 @@
   )
 )
 
+(define-enum MessageByteOrder
+  (in-module "GDBus")
+  (c-name "GDBusMessageByteOrder")
+  (gtype-id "G_TYPE_D_BUS_MESSAGE_BYTE_ORDER")
+  (values
+    '("big-endian" "G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN")
+    '("little-endian" "G_DBUS_MESSAGE_BYTE_ORDER_LITTLE_ENDIAN")
+  )
+)
+
+(define-enum MessageFilterResult
+  (in-module "GDBus")
+  (c-name "GDBusMessageFilterResult")
+  (gtype-id "G_TYPE_D_BUS_MESSAGE_FILTER_RESULT")
+  (values
+    '("no-effect" "G_DBUS_MESSAGE_FILTER_RESULT_NO_EFFECT")
+    '("message-consumed" "G_DBUS_MESSAGE_FILTER_RESULT_MESSAGE_CONSUMED")
+    '("message-altered" "G_DBUS_MESSAGE_FILTER_RESULT_MESSAGE_ALTERED")
+  )
+)
+
 (define-flags BindFlags
   (in-module "GSettings")
   (c-name "GSettingsBindFlags")
@@ -1044,8 +1100,199 @@
     '("set" "G_SETTINGS_BIND_SET")
     '("no-sensitivity" "G_SETTINGS_BIND_NO_SENSITIVITY")
     '("get-no-changes" "G_SETTINGS_BIND_GET_NO_CHANGES")
+    '("invert-boolean" "G_SETTINGS_BIND_INVERT_BOOLEAN")
   )
 )
+
+
+;; From gactiongroup.h
+
+(define-function g_action_group_get_type
+  (c-name "g_action_group_get_type")
+  (return-type "GType")
+)
+
+(define-method has_action
+  (of-object "GActionGroup")
+  (c-name "g_action_group_has_action")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method list_actions
+  (of-object "GActionGroup")
+  (c-name "g_action_group_list_actions")
+  (return-type "gchar**")
+)
+
+(define-method get_parameter_type
+  (of-object "GActionGroup")
+  (c-name "g_action_group_get_parameter_type")
+  (return-type "const-GVariantType*")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method get_state_type
+  (of-object "GActionGroup")
+  (c-name "g_action_group_get_state_type")
+  (return-type "const-GVariantType*")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method get_state_hint
+  (of-object "GActionGroup")
+  (c-name "g_action_group_get_state_hint")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method get_enabled
+  (of-object "GActionGroup")
+  (c-name "g_action_group_get_enabled")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method get_state
+  (of-object "GActionGroup")
+  (c-name "g_action_group_get_state")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method set_state
+  (of-object "GActionGroup")
+  (c-name "g_action_group_set_state")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "action_name")
+    '("GVariant*" "value")
+  )
+)
+
+(define-method activate
+  (of-object "GActionGroup")
+  (c-name "g_action_group_activate")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "action_name")
+    '("GVariant*" "parameter")
+  )
+)
+
+(define-method action_added
+  (of-object "GActionGroup")
+  (c-name "g_action_group_action_added")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method action_removed
+  (of-object "GActionGroup")
+  (c-name "g_action_group_action_removed")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method action_enabled_changed
+  (of-object "GActionGroup")
+  (c-name "g_action_group_action_enabled_changed")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "action_name")
+    '("gboolean" "enabled")
+  )
+)
+
+(define-method action_state_changed
+  (of-object "GActionGroup")
+  (c-name "g_action_group_action_state_changed")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "action_name")
+    '("GVariant*" "state")
+  )
+)
+
+
+
+;; From gaction.h
+
+(define-function g_action_get_type
+  (c-name "g_action_get_type")
+  (return-type "GType")
+)
+
+(define-method get_name
+  (of-object "GAction")
+  (c-name "g_action_get_name")
+  (return-type "const-gchar*")
+)
+
+(define-method get_parameter_type
+  (of-object "GAction")
+  (c-name "g_action_get_parameter_type")
+  (return-type "const-GVariantType*")
+)
+
+(define-method get_state_type
+  (of-object "GAction")
+  (c-name "g_action_get_state_type")
+  (return-type "const-GVariantType*")
+)
+
+(define-method get_state_hint
+  (of-object "GAction")
+  (c-name "g_action_get_state_hint")
+  (return-type "GVariant*")
+)
+
+(define-method get_enabled
+  (of-object "GAction")
+  (c-name "g_action_get_enabled")
+  (return-type "gboolean")
+)
+
+(define-method get_state
+  (of-object "GAction")
+  (c-name "g_action_get_state")
+  (return-type "GVariant*")
+)
+
+(define-method set_state
+  (of-object "GAction")
+  (c-name "g_action_set_state")
+  (return-type "none")
+  (parameters
+    '("GVariant*" "value")
+  )
+)
+
+(define-method activate
+  (of-object "GAction")
+  (c-name "g_action_activate")
+  (return-type "none")
+  (parameters
+    '("GVariant*" "parameter")
+  )
+)
+
 
 
 ;; From gappinfo.h
@@ -3325,6 +3572,21 @@
   )
 )
 
+(define-method get_byte_order
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_get_byte_order")
+  (return-type "GDBusMessageByteOrder")
+)
+
+(define-method set_byte_order
+  (of-object "GDBusMessage")
+  (c-name "g_dbus_message_set_byte_order")
+  (return-type "none")
+  (parameters
+    '("GDBusMessageByteOrder" "byte_order")
+  )
+)
+
 (define-method get_message_type
   (of-object "GDBusMessage")
   (c-name "g_dbus_message_get_message_type")
@@ -3614,23 +3876,6 @@
 (define-function g_dbus_method_invocation_get_type
   (c-name "g_dbus_method_invocation_get_type")
   (return-type "GType")
-)
-
-(define-function g_dbus_method_invocation_new
-  (c-name "g_dbus_method_invocation_new")
-  (is-constructor-of "GDbusMethodInvocation")
-  (return-type "GDBusMethodInvocation*")
-  (parameters
-    '("const-gchar*" "sender")
-    '("const-gchar*" "object_path")
-    '("const-gchar*" "interface_name")
-    '("const-gchar*" "method_name")
-    '("const-GDBusMethodInfo*" "method_info")
-    '("GDBusConnection*" "connection")
-    '("GDBusMessage*" "message")
-    '("GVariant*" "parameters")
-    '("gpointer" "user_data")
-  )
 )
 
 (define-method get_sender
@@ -7461,6 +7706,16 @@
   (return-type "GType")
 )
 
+(define-function g_dbus_message_byte_order_get_type
+  (c-name "g_dbus_message_byte_order_get_type")
+  (return-type "GType")
+)
+
+(define-function g_dbus_message_filter_result_get_type
+  (c-name "g_dbus_message_filter_result_get_type")
+  (return-type "GType")
+)
+
 (define-function g_settings_bind_flags_get_type
   (c-name "g_settings_bind_flags_get_type")
   (return-type "GType")
@@ -7873,6 +8128,12 @@
   (return-type "gsize")
 )
 
+(define-method steal_data
+  (of-object "GMemoryOutputStream")
+  (c-name "g_memory_output_stream_steal_data")
+  (return-type "gpointer")
+)
+
 
 
 ;; From gmount.h
@@ -8252,6 +8513,16 @@
   )
 )
 
+(define-function g_network_address_parse_uri
+  (c-name "g_network_address_parse_uri")
+  (return-type "GSocketConnectable*")
+  (parameters
+    '("const-gchar*" "uri")
+    '("guint16" "default_port")
+    '("GError**" "error")
+  )
+)
+
 (define-method get_hostname
   (of-object "GNetworkAddress")
   (c-name "g_network_address_get_hostname")
@@ -8262,6 +8533,12 @@
   (of-object "GNetworkAddress")
   (c-name "g_network_address_get_port")
   (return-type "guint16")
+)
+
+(define-method get_scheme
+  (of-object "GNetworkAddress")
+  (c-name "g_network_address_get_scheme")
+  (return-type "const-gchar*")
 )
 
 
@@ -8300,6 +8577,21 @@
   (of-object "GNetworkService")
   (c-name "g_network_service_get_domain")
   (return-type "const-gchar*")
+)
+
+(define-method get_scheme
+  (of-object "GNetworkService")
+  (c-name "g_network_service_get_scheme")
+  (return-type "const-gchar*")
+)
+
+(define-method set_scheme
+  (of-object "GNetworkService")
+  (c-name "g_network_service_set_scheme")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "scheme")
+  )
 )
 
 
@@ -8590,6 +8882,180 @@
     '("gboolean" "allowed")
     '("gboolean" "can_acquire")
     '("gboolean" "can_release")
+  )
+)
+
+
+
+;; From gproxyaddressenumerator.h
+
+(define-function g_proxy_address_enumerator_get_type
+  (c-name "g_proxy_address_enumerator_get_type")
+  (return-type "GType")
+)
+
+
+
+;; From gproxyaddress.h
+
+(define-function g_proxy_address_get_type
+  (c-name "g_proxy_address_get_type")
+  (return-type "GType")
+)
+
+(define-function g_proxy_address_new
+  (c-name "g_proxy_address_new")
+  (is-constructor-of "GProxyAddress")
+  (return-type "GSocketAddress*")
+  (parameters
+    '("GInetAddress*" "inetaddr")
+    '("guint16" "port")
+    '("const-gchar*" "protocol")
+    '("const-gchar*" "dest_hostname")
+    '("guint16" "dest_port")
+    '("const-gchar*" "username")
+    '("const-gchar*" "password")
+  )
+)
+
+(define-method get_protocol
+  (of-object "GProxyAddress")
+  (c-name "g_proxy_address_get_protocol")
+  (return-type "const-gchar*")
+)
+
+(define-method get_destination_hostname
+  (of-object "GProxyAddress")
+  (c-name "g_proxy_address_get_destination_hostname")
+  (return-type "const-gchar*")
+)
+
+(define-method get_destination_port
+  (of-object "GProxyAddress")
+  (c-name "g_proxy_address_get_destination_port")
+  (return-type "guint16")
+)
+
+(define-method get_username
+  (of-object "GProxyAddress")
+  (c-name "g_proxy_address_get_username")
+  (return-type "const-gchar*")
+)
+
+(define-method get_password
+  (of-object "GProxyAddress")
+  (c-name "g_proxy_address_get_password")
+  (return-type "const-gchar*")
+)
+
+
+
+;; From gproxy.h
+
+(define-function g_proxy_get_type
+  (c-name "g_proxy_get_type")
+  (return-type "GType")
+)
+
+(define-function g_proxy_get_default_for_protocol
+  (c-name "g_proxy_get_default_for_protocol")
+  (return-type "GProxy*")
+  (parameters
+    '("const-gchar*" "protocol")
+  )
+)
+
+(define-method connect
+  (of-object "GProxy")
+  (c-name "g_proxy_connect")
+  (return-type "GIOStream*")
+  (parameters
+    '("GIOStream*" "connection")
+    '("GProxyAddress*" "proxy_address")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method connect_async
+  (of-object "GProxy")
+  (c-name "g_proxy_connect_async")
+  (return-type "none")
+  (parameters
+    '("GIOStream*" "connection")
+    '("GProxyAddress*" "proxy_address")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method connect_finish
+  (of-object "GProxy")
+  (c-name "g_proxy_connect_finish")
+  (return-type "GIOStream*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method supports_hostname
+  (of-object "GProxy")
+  (c-name "g_proxy_supports_hostname")
+  (return-type "gboolean")
+)
+
+
+
+;; From gproxyresolver.h
+
+(define-function g_proxy_resolver_get_type
+  (c-name "g_proxy_resolver_get_type")
+  (return-type "GType")
+)
+
+(define-function g_proxy_resolver_get_default
+  (c-name "g_proxy_resolver_get_default")
+  (return-type "GProxyResolver*")
+)
+
+(define-method is_supported
+  (of-object "GProxyResolver")
+  (c-name "g_proxy_resolver_is_supported")
+  (return-type "gboolean")
+)
+
+(define-method lookup
+  (of-object "GProxyResolver")
+  (c-name "g_proxy_resolver_lookup")
+  (return-type "gchar**")
+  (parameters
+    '("const-gchar*" "uri")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method lookup_async
+  (of-object "GProxyResolver")
+  (c-name "g_proxy_resolver_lookup_async")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "uri")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method lookup_finish
+  (of-object "GProxyResolver")
+  (c-name "g_proxy_resolver_lookup_finish")
+  (return-type "gchar**")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
   )
 )
 
@@ -8970,6 +9436,15 @@
   (varargs #t)
 )
 
+(define-method reset
+  (of-object "GSettings")
+  (c-name "g_settings_reset")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "key")
+  )
+)
+
 (define-method get_int
   (of-object "GSettings")
   (c-name "g_settings_get_int")
@@ -9207,6 +9682,86 @@
     '("const-gchar*" "key")
     '("GSettingsGetMapping" "mapping")
     '("gpointer" "user_data")
+  )
+)
+
+
+
+;; From gsimpleactiongroup.h
+
+(define-function g_simple_action_group_get_type
+  (c-name "g_simple_action_group_get_type")
+  (return-type "GType")
+)
+
+(define-function g_simple_action_group_new
+  (c-name "g_simple_action_group_new")
+  (is-constructor-of "GSimpleActionGroup")
+  (return-type "GSimpleActionGroup*")
+)
+
+(define-method lookup
+  (of-object "GSimpleActionGroup")
+  (c-name "g_simple_action_group_lookup")
+  (return-type "GAction*")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-method insert
+  (of-object "GSimpleActionGroup")
+  (c-name "g_simple_action_group_insert")
+  (return-type "none")
+  (parameters
+    '("GAction*" "action")
+  )
+)
+
+(define-method remove
+  (of-object "GSimpleActionGroup")
+  (c-name "g_simple_action_group_remove")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+
+
+;; From gsimpleaction.h
+
+(define-function g_simple_action_get_type
+  (c-name "g_simple_action_get_type")
+  (return-type "GType")
+)
+
+(define-function g_simple_action_new
+  (c-name "g_simple_action_new")
+  (is-constructor-of "GSimpleAction")
+  (return-type "GSimpleAction*")
+  (parameters
+    '("const-gchar*" "name")
+    '("const-GVariantType*" "parameter_type")
+  )
+)
+
+(define-function g_simple_action_new_stateful
+  (c-name "g_simple_action_new_stateful")
+  (return-type "GSimpleAction*")
+  (parameters
+    '("const-gchar*" "name")
+    '("const-GVariantType*" "parameter_type")
+    '("GVariant*" "state")
+  )
+)
+
+(define-method set_enabled
+  (of-object "GSimpleAction")
+  (c-name "g_simple_action_set_enabled")
+  (return-type "none")
+  (parameters
+    '("gboolean" "enabled")
   )
 )
 
@@ -9591,6 +10146,36 @@
   )
 )
 
+(define-method get_timeout
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_get_timeout")
+  (return-type "guint")
+)
+
+(define-method set_timeout
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_set_timeout")
+  (return-type "none")
+  (parameters
+    '("guint" "timeout")
+  )
+)
+
+(define-method get_enable_proxy
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_get_enable_proxy")
+  (return-type "gboolean")
+)
+
+(define-method set_enable_proxy
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_set_enable_proxy")
+  (return-type "none")
+  (parameters
+    '("gboolean" "enable")
+  )
+)
+
 (define-method connect
   (of-object "GSocketClient")
   (c-name "g_socket_client_connect")
@@ -9621,6 +10206,18 @@
   (parameters
     '("const-gchar*" "domain")
     '("const-gchar*" "service")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method connect_to_uri
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_connect_to_uri")
+  (return-type "GSocketConnection*")
+  (parameters
+    '("const-gchar*" "uri")
+    '("guint16" "default_port")
     '("GCancellable*" "cancellable")
     '("GError**" "error")
   )
@@ -9694,6 +10291,38 @@
   )
 )
 
+(define-method connect_to_uri_async
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_connect_to_uri_async")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "uri")
+    '("guint16" "default_port")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method connect_to_uri_finish
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_connect_to_uri_finish")
+  (return-type "GSocketConnection*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method add_application_proxy
+  (of-object "GSocketClient")
+  (c-name "g_socket_client_add_application_proxy")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "protocol")
+  )
+)
+
 
 
 ;; From gsocketconnectable.h
@@ -9706,6 +10335,12 @@
 (define-method enumerate
   (of-object "GSocketConnectable")
   (c-name "g_socket_connectable_enumerate")
+  (return-type "GSocketAddressEnumerator*")
+)
+
+(define-method proxy_enumerate
+  (of-object "GSocketConnectable")
+  (c-name "g_socket_connectable_proxy_enumerate")
   (return-type "GSocketAddressEnumerator*")
 )
 
@@ -10153,6 +10788,32 @@
   (c-name "g_socket_get_credentials")
   (return-type "GCredentials*")
   (parameters
+    '("GError**" "error")
+  )
+)
+
+(define-method receive_with_blocking
+  (of-object "GSocket")
+  (c-name "g_socket_receive_with_blocking")
+  (return-type "gssize")
+  (parameters
+    '("gchar*" "buffer")
+    '("gsize" "size")
+    '("gboolean" "blocking")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method send_with_blocking
+  (of-object "GSocket")
+  (c-name "g_socket_send_with_blocking")
+  (return-type "gssize")
+  (parameters
+    '("const-gchar*" "buffer")
+    '("gsize" "size")
+    '("gboolean" "blocking")
+    '("GCancellable*" "cancellable")
     '("GError**" "error")
   )
 )
@@ -10767,6 +11428,21 @@
   )
 )
 
+(define-method get_file_info
+  (of-object "GZlibCompressor")
+  (c-name "g_zlib_compressor_get_file_info")
+  (return-type "GFileInfo*")
+)
+
+(define-method set_file_info
+  (of-object "GZlibCompressor")
+  (c-name "g_zlib_compressor_set_file_info")
+  (return-type "none")
+  (parameters
+    '("GFileInfo*" "file_info")
+  )
+)
+
 
 
 ;; From gzlibdecompressor.h
@@ -10783,6 +11459,12 @@
   (parameters
     '("GZlibCompressorFormat" "format")
   )
+)
+
+(define-method get_file_info
+  (of-object "GZlibDecompressor")
+  (c-name "g_zlib_decompressor_get_file_info")
+  (return-type "GFileInfo*")
 )
 
 

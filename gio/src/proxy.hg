@@ -1,0 +1,71 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/error.h>
+#include <glibmm/interface.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+#include <giomm/proxyaddress.h>
+#include <giomm/iostream.h>
+//#include <giomm/error.h> //Because this is thrown by some of these methods.
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GProxyInterface GProxyInterface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+
+/** TODO: Documentation
+ *
+ * @newin{2,26}
+ */ 
+class Proxy : public Glib::Interface
+{
+  _CLASS_INTERFACE(Proxy, GProxy, G_PROXY, GProxyInterface)
+
+public:
+
+  _WRAP_METHOD(static Glib::RefPtr<Proxy> get_default_for_protocol(const Glib::ustring& protocol), g_proxy_get_default_for_protocol)
+
+  _WRAP_METHOD(Glib::RefPtr<IOStream> connect(const Glib::RefPtr<IOStream>& connection,
+    const Glib::RefPtr<const ProxyAddress>& proxy_adress, const Glib::RefPtr<Cancellable>& cancellable), g_proxy_connect, errthrow)
+
+/* TODO:
+void       g_proxy_connect_async     (GProxy               *proxy,
+				      GIOStream            *connection,
+				      GProxyAddress        *proxy_address,
+				      GCancellable         *cancellable,
+				      GAsyncReadyCallback   callback,
+				      gpointer              user_data);
+*/
+
+  _WRAP_METHOD(Glib::RefPtr<IOStream> connect_finish(const Glib::RefPtr<AsyncResult>& result), g_proxy_resolver_connect_finish, errthrow)
+  
+  _WRAP_METHOD(bool supports_hostname() const, g_proxy_supports_hostname)
+
+};
+
+
+} // namespace Gio
+

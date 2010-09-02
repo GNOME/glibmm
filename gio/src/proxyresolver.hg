@@ -1,0 +1,67 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/error.h>
+#include <glibmm/interface.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
+//#include <giomm/error.h> //Because this is thrown by some of these methods.
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GProxyResolverInterface GProxyResolverInterface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+
+/** TODO: Documentation
+ *
+ * @newin{2,26}
+ */ 
+class ProxyResolver : public Glib::Interface
+{
+  _CLASS_INTERFACE(ProxyResolver, GProxyResolver, G_PROXY_RESOLVER, GProxyResolverInterface)
+
+public:
+
+  _WRAP_METHOD(static Glib::RefPtr<ProxyResolver> get_default(), g_proxy_resolver_get_default)
+  
+  _WRAP_METHOD(bool is_supported() const, g_proxy_resolver_is_supported)
+
+  //TODO: Use std::string instead of ustring (StringArrayHandle uses ustring)?:
+#m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(Glib::StringArrayHandle lookup(const Glib::ustring& uri,
+						 const Glib::RefPtr<Cancellable>& cancellable), g_proxy_resolver_lookup, errthrow)
+	
+	//TODO: Documentation
+	Glib::StringArrayHandle lookup(const Glib::ustring& uri);
+						 
+  //TODO: _WRAP_METHOD(void lookup_async(const std::string& uri, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot), g_proxy_resolver_lookup_async)
+
+  _WRAP_METHOD(Glib::StringArrayHandle lookup_finish(const Glib::RefPtr<AsyncResult>& result), g_proxy_resolver_lookup_finish, errthrow)
+
+};
+
+
+} // namespace Gio
+

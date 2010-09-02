@@ -71,6 +71,8 @@
 #include <giomm/networkaddress.h>
 #include <giomm/networkservice.h>
 #include <giomm/outputstream.h>
+#include <giomm/proxy.h>
+#include <giomm/proxyresolver.h>
 #include <giomm/resolver.h>
 #include <giomm/seekable.h>
 #include <giomm/settings.h>

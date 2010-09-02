@@ -129,6 +129,7 @@ _CONVERSION(`GIOStream*',`Glib::RefPtr<Gio::IOStream>',`Glib::wrap($3)')
 _CONVERSION(`GIOStream*',`Glib::RefPtr<IOStream>',`Glib::wrap($3)')
 _CONVERSION(`GIOStream*',`Glib::RefPtr<const Gio::IOStream>',`Glib::wrap($3)')
 _CONVERSION(`GIOStream*',`Glib::RefPtr<const IOStream>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<IOStream>&',`GIOStream*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<const IOStream>&',`GIOStream*',`const_cast<GIOStream*>(Glib::unwrap($3))')
 
 # InetAddress
@@ -154,6 +155,11 @@ _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 # OutputStream
 _CONVERSION(`GOutputStream*',`Glib::RefPtr<OutputStream>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<OutputStream>&',`GOutputStream*',__CONVERT_CONST_REFPTR_TO_P)
+
+_CONVERSION(`GProxyResolver*',`Glib::RefPtr<ProxyResolver>',`Glib::wrap($3)')
+_CONVERSION(`GProxy*',`Glib::RefPtr<Proxy>',`Glib::wrap($3)')
+
+_CONVERSION(`const Glib::RefPtr<const ProxyAddress>&',`GProxyAddress*',__CONVERT_CONST_REFPTR_TO_P)
 
 #Settings
 _CONVERSION(`GSettings*',`Glib::RefPtr<Settings>',`Glib::wrap($3)')
