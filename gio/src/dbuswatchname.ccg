@@ -1,0 +1,115 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gio.h>
+
+namespace
+{
+
+// Structure to hold the slots registred with watch_name().
+struct WatchSlots
+{
+  Gio::DBus::SlotNameAppeared* name_appeared_slot;
+  Gio::DBus::SlotNameVanished* name_vanished_slot;
+};
+
+extern "C"
+{
+
+static void Bus_Name_Appeared_giomm_callback(GDBusConnection* connection,
+  const gchar* name, const char* name_owner, gpointer data)
+{
+  WatchSlots* slots = static_cast<WatchSlots*>(data);
+  Gio::DBus::SlotNameAppeared* the_slot = slots->name_appeared_slot;
+
+  try
+  {
+    (*the_slot)(Glib::wrap(connection, true), Glib::ustring(name),
+      Glib::ustring(name_owner));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+static void Bus_Name_Vanished_giomm_callback(GDBusConnection* connection,
+  const gchar* name, gpointer data)
+{
+  WatchSlots* slots = static_cast<WatchSlots*>(data);
+  Gio::DBus::SlotNameVanished* the_slot = slots->name_vanished_slot;
+
+  try
+  {
+    (*the_slot)(Glib::wrap(connection, true), Glib::ustring(name));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+static void Bus_Watch_Name_giomm_callback_destroy(void* data)
+{
+  WatchSlots* slots =  static_cast<WatchSlots*>(data);
+
+  if(slots->name_appeared_slot)
+    delete slots->name_appeared_slot;
+
+  if(slots->name_vanished_slot)
+    delete slots->name_vanished_slot;
+
+  delete slots;
+}
+
+} // extern "C"
+
+} // anonymous namespace
+
+
+namespace Gio
+{
+
+namespace DBus
+{
+
+guint watch_name(BusType bus_type, const Glib::ustring& name,
+  BusNameWatcherFlags flags, const SlotNameAppeared& name_appeared_slot,
+  const SlotNameVanished& name_vanished_slot)
+{
+  struct WatchSlots* slots = new WatchSlots;
+
+  // Make copies of the slots which will be deleted on destroy notification.
+  slots->name_appeared_slot = new SlotNameAppeared(name_appeared_slot);
+  slots->name_vanished_slot = new SlotNameVanished(name_vanished_slot);
+
+  return g_bus_watch_name(static_cast<GBusType>(bus_type), name.c_str(),
+    static_cast<GBusNameWatcherFlags>(flags), 
+    &Bus_Name_Appeared_giomm_callback, &Bus_Name_Vanished_giomm_callback,
+    slots, &Bus_Watch_Name_giomm_callback_destroy);
+}
+
+void unwatch_name(guint watcher_id)
+{
+  g_bus_unwatch_name(watcher_id);
+}
+
+} // namespace DBus
+
+} // namespace Gio
