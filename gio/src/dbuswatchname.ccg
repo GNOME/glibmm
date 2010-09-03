@@ -105,6 +105,23 @@ guint watch_name(BusType bus_type, const Glib::ustring& name,
     slots, &Bus_Watch_Name_giomm_callback_destroy);
 }
 
+guint watch_name(const Glib::RefPtr<DBusConnection>& connection,
+const Glib::ustring& name, BusNameWatcherFlags flags,
+const SlotNameAppeared& name_appeared_slot,
+  const SlotNameVanished& name_vanished_slot)
+{
+  struct WatchSlots* slots = new WatchSlots;
+
+  // Make copies of the slots which will be deleted on destroy notification.
+  slots->name_appeared_slot = new SlotNameAppeared(name_appeared_slot);
+  slots->name_vanished_slot = new SlotNameVanished(name_vanished_slot);
+
+  return g_bus_watch_name_on_connection(Glib::unwrap(connection),
+    name.c_str(), static_cast<GBusNameWatcherFlags>(flags), 
+    &Bus_Name_Appeared_giomm_callback, &Bus_Name_Vanished_giomm_callback,
+    slots, &Bus_Watch_Name_giomm_callback_destroy);
+}
+
 void unwatch_name(guint watcher_id)
 {
   g_bus_unwatch_name(watcher_id);
