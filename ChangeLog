@@ -1,5 +1,25 @@
 2010-09-03  Murray Cumming  <murrayc@murrayc.com>
 
+	gmmproc: Fix the annoying warnings about documentation.
+
+	* tools/pm/GtkDefs.pm: lookup_object(): Do not print a warning when the 
+	object is found, because this is used when guessing an object name while 
+	breaking apart a function name in DocsParser.pm.
+	* gio/src/filelist.am:
+	* gio/src/gio.defs:
+	* gio/src/gio_extra_objects.defs:
+	* glib/src/filelist.am:
+	* glib/src/glib.defs:
+	* glib/src/glib_extra_objects.defs: Added the *extra_objects.defs files, 
+	with hand-coded define-object sections, for objects that hide their *Class
+	or *Iface struct declarations, which stops h2defs.py from generating 
+	define-object sections.
+	These allows DocsParser.pm to know how to split mentions of C functions into 
+	the object and the method, so it can guess the C++ method name to mention 
+	instead.
+
+2010-09-03  Murray Cumming  <murrayc@murrayc.com>
+
 	giomm: Added remaining Proxy and ProxyResolver methods.
 
 	* gio/src/proxy.[hg|ccg]: Added connect_async().
