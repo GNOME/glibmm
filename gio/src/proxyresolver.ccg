@@ -36,4 +36,32 @@ Glib::StringArrayHandle ProxyResolver::lookup(const Glib::ustring& uri)
   return retvalue;
 }
 
+void ProxyResolver::lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_proxy_resolver_lookup_async(gobj(),
+    uri.c_str(),
+    Glib::unwrap(cancellable),
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+  
+void ProxyResolver::lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_proxy_resolver_lookup_async(gobj(),
+    uri.c_str(),
+    0,
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
 } //namespace Gio
