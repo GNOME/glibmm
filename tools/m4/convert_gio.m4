@@ -7,6 +7,7 @@ _CONV_ENUM(G,DBusCapabilityFlags)
 _CONV_ENUM(G,DBusMessageFlags)
 _CONV_ENUM(G,DBusMessageHeaderField)
 _CONV_ENUM(G,DBusMessageType)
+_CONV_ENUM(G,DBusProxyFlags)
 _CONV_ENUM(G,DBusSendMessageFlags)
 _CONV_ENUM(G,DBusServerFlags)
 _CONV_ENUM(G,DriveStartFlags)
@@ -64,11 +65,15 @@ _CONVERSION(`GCredentials*',`Glib::RefPtr<const Credentials>',`Glib::wrap($3)')
 # DBusConnection
 _CONVERSION(`const Glib::RefPtr<DBusConnection>&',`GDBusConnection*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`GDBusConnection*',`Glib::RefPtr<DBusConnection>',Glib::wrap($3))
+_CONVERSION(`GDBusConnection*',`Glib::RefPtr<const DBusConnection>',Glib::wrap($3))
 
 # DBusMessage
 _CONVERSION(`const Glib::RefPtr<DBusMessage>&',`GDBusMessage*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`GDBusMessage*',`Glib::RefPtr<DBusMessage>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<const DBusMessage>&',`GDBusMessage*',__CONVERT_CONST_REFPTR_TO_P)
+
+# DBusProxy
+_CONVERSION(`GDBusProxy*',`Glib::RefPtr<DBusProxy>',`Glib::wrap($3)')
 
 # DesktopAppInfo
 _CONVERSION(`GDesktopAppInfo*', `Glib::RefPtr<DesktopAppInfo>', `Glib::wrap($3)')

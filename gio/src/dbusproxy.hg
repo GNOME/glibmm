@@ -1,0 +1,162 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/initable.h>
+#include <giomm/asyncinitable.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+_WRAP_ENUM(DBusProxyFlags, GDBusProxyFlags, NO_GTYPE)
+
+class AsyncResult;
+class DBusConnection;
+
+/** DBusProxy - Client-side proxies.
+ * DBusProxy is a base class used for proxies to access a D-Bus interface on
+ * a remote object. A DBusProxy can be constructed for both well-known and
+ * unique names.
+ *
+ * By default, DBusProxy will cache all properties (and listen to changes) of
+ * the remote object, and proxy all signals that gets emitted. This behaviour
+ * can be changed by passing suitable DBusProxyFlags when the proxy is
+ * created. If the proxy is for a well-known name, the property cache is
+ * flushed when the name owner vanishes and reloaded when a name owner
+ * appears.
+ *
+ * If a DBusProxy is used for a well-known name, the owner of the name is
+ * tracked and can be read from property_g_name_owner(). Connect to the
+ * signal_notify() signal to get notified of changes. Additionally, only
+ * signals and property changes emitted from the current name owner are
+ * considered. This avoids a number of race conditions when the name is lost
+ * by one owner and claimed by another.
+ *
+ * The generic signal_g_properties_changed() and signal_g_signal() signals are
+ * not very convenient to work with. Therefore, the recommended way of working
+ * with proxies is to subclass DBusProxy, and have more natural properties and
+ * signals in your derived class.
+ *
+ * The C API docs has more information and an example.
+ *
+ * @newin{2,26}
+ */
+class DBusProxy
+: public Glib::Object,
+  public Initable,
+  public AsyncInitable
+{
+  _CLASS_GOBJECT(DBusProxy, GDBusProxy, G_DBUS_PROXY, Glib::Object, GObject)
+
+protected:
+
+/* TODO
+  DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
+    DBusProxyFlags flags, GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::ustring& object_path, const Glib::ustring& interface_name,
+    const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+
+  DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
+    DBusProxyFlags flags, GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::ustring& object_path, const Glib::ustring& interface_name,
+    const Glib::RefPtr<Cancellable>& cancellable);
+
+  DBusProxy(BusType bus_type, DBusProxyFlags flags,
+    GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::ustring& object_path, const Glib::ustring& interface_name,
+    const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+
+  DBusProxy(BusType bus_type, DBusProxyFlags flags, GDBusInterfaceInfo* info,
+    const Glib::ustring& name, const Glib::ustring& object_path,
+    const Glib::ustring& interface_name,
+    const Glib::RefPtr<Cancellable>& cancellable);
+*/
+
+public:
+
+/* TODO
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new)
+  static void create(const Glib::RefPtr<DBusConnection>& connection,
+    DBusProxyFlags flags, GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::ustring& object_path, const Glib::ustring& interface_name,
+    const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_sync)
+  static Glib::RefPtr<DBusProxy>
+  create(const Glib::RefPtr<DBusConnection>& connection, DBusProxyFlags flags,
+    GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::ustring& object_path, const Glib::ustring& interface_name,
+    const Glib::RefPtr<Cancellable>& cancellable);
+
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_for_bus)
+  static void create(BusType bus_type, DBusProxyFlags flags,
+    GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::ustring& object_path, const Glib::ustring& interface_name,
+    const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+*/
+
+  // g_dbus_proxy_new_for_bus_finish() just calls g_dbus_proxy_new_finish() so
+  // it is safe to use one create_finish() method for both asynchronous
+  // creates.
+  _WRAP_METHOD(static Glib::RefPtr<DBusProxy> create_finish(const Glib::RefPtr<AsyncResult>& result), g_dbus_proxy_new_finish, errthrow)
+
+/* TODO
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new__for_bus_sync)
+  static Glib::RefPtr<DBusProxy>
+  create(BusType bus_type, DBusProxyFlags flags, GDBusInterfaceInfo* info,
+    const Glib::ustring& name, const Glib::ustring& object_path,
+    const Glib::ustring& interface_name,
+    const Glib::RefPtr<Cancellable>& cancellable);
+*/
+
+  _WRAP_METHOD(DBusProxyFlags get_flags() const, g_dbus_proxy_get_flags)
+
+  _WRAP_METHOD(Glib::RefPtr<DBusConnection> get_connection(), g_dbus_proxy_get_connection)
+  _WRAP_METHOD(Glib::RefPtr<const DBusConnection> get_connection() const, g_dbus_proxy_get_connection)
+
+  _WRAP_METHOD(Glib::ustring get_name() const, g_dbus_proxy_get_name)
+  _WRAP_METHOD(Glib::ustring get_name_owner() const, g_dbus_proxy_get_name_owner)
+  _WRAP_METHOD(Glib::ustring get_object_path() const, g_dbus_proxy_get_object_path)
+  _WRAP_METHOD(Glib::ustring get_interface_name() const, g_dbus_proxy_get_interface_name)
+
+  _WRAP_METHOD(int get_default_timeout() const, g_dbus_proxy_get_default_timeout)
+  _WRAP_METHOD(void set_default_timeout(int timeout_msec), g_dbus_proxy_set_default_timeout)
+
+  //TODO: _WRAP_METHOD(Variant* get_cached_property(const gchar* property_name), g_dbus_proxy_get_cached_property)
+  _WRAP_METHOD(void set_cached_property(const Glib::ustring& property_name, const Glib::VariantBase& value), g_dbus_proxy_set_cached_property)
+
+#m4 _CONVERSION(`gchar**', `Glib::StringArrayHandle', `Glib::StringArrayHandle($3)')
+  _WRAP_METHOD(Glib::StringArrayHandle get_cached_property_names() const, g_dbus_proxy_get_cached_property_names)
+
+/* TODO:
+  _WRAP_METHOD(oid set_interface_info(GDBusInterfaceInfo* info), g_dbus_proxy_set_interface_info)
+  _WRAP_METHOD(DBusInterfaceInfo* get_interface_info(), g_dbus_proxy_get_interface_info)
+  _WRAP_METHOD(void call(const gchar* method_name, GVariant* parameters, GDBusCallFlags flags, gint timeout_msec, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), g_dbus_proxy_call)
+  _WRAP_METHOD(GVariant* call_finish(GAsyncResult* res, GError** error),
+g_dbus_proxy_call_finish)
+  _WRAP_METHOD(GVariant* call_sync(const gchar* method_name, GVariant* parameters, GDBusCallFlags flags, gint timeout_msec, GCancellable* cancellable, GError** error), g_dbus_proxy_call_sync)
+ */
+
+ //TODO: Properties and signals.
+};
+
+} // namespace Gio
