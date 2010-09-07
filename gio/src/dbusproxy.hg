@@ -32,7 +32,7 @@ _WRAP_ENUM(DBusProxyFlags, GDBusProxyFlags, NO_GTYPE)
 
 class AsyncResult;
 class DBusConnection;
-struct GDBusInterfaceInfo;
+class DBusInterfaceInfo;
 
 /** DBusProxy - Client-side proxies.
  * DBusProxy is a base class used for proxies to access a D-Bus interface on
@@ -71,24 +71,24 @@ class DBusProxy
 
 protected:
   DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
-    DBusProxyFlags flags, const GDBusInterfaceInfo* info,
+    DBusProxyFlags flags, const Glib::RefPtr<DBusInterfaceInfo>& info,
     const Glib::ustring& name, const Glib::ustring& object_path,
     const Glib::ustring& interface_name, const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable);
 
   DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
-    DBusProxyFlags flags, const GDBusInterfaceInfo* info,
+    DBusProxyFlags flags, const Glib::RefPtr<DBusInterfaceInfo>& info,
     const Glib::ustring& name, const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
     const Glib::RefPtr<Cancellable>& cancellable);
 
   DBusProxy(BusType bus_type, DBusProxyFlags flags,
-    const GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::RefPtr<DBusInterfaceInfo>& info, const Glib::ustring& name,
     const Glib::ustring& object_path, const Glib::ustring& interface_name,
     const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
 
   DBusProxy(BusType bus_type, DBusProxyFlags flags,
-    const GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::RefPtr<DBusInterfaceInfo>& info, const Glib::ustring& name,
     const Glib::ustring& object_path, const Glib::ustring& interface_name,
     const Glib::RefPtr<Cancellable>& cancellable);
 
@@ -96,7 +96,7 @@ public:
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new)
   static void create(const Glib::RefPtr<DBusConnection>& connection,
-    DBusProxyFlags flags, const GDBusInterfaceInfo* info,
+    DBusProxyFlags flags, const Glib::RefPtr<DBusInterfaceInfo>& info,
     const Glib::ustring& name, const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
     const SlotAsyncReady& slot,
@@ -105,13 +105,13 @@ public:
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_sync)
   static Glib::RefPtr<DBusProxy>
   create(const Glib::RefPtr<DBusConnection>& connection, DBusProxyFlags flags,
-    const GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::RefPtr<DBusInterfaceInfo>& info, const Glib::ustring& name,
     const Glib::ustring& object_path, const Glib::ustring& interface_name,
     const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_for_bus)
   static void create(BusType bus_type, DBusProxyFlags flags,
-    const GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::RefPtr<DBusInterfaceInfo>& info, const Glib::ustring& name,
     const Glib::ustring& object_path, const Glib::ustring& interface_name,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
@@ -126,7 +126,7 @@ public:
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new__for_bus_sync)
   static Glib::RefPtr<DBusProxy>
   create(BusType bus_type, DBusProxyFlags flags,
-    const GDBusInterfaceInfo* info, const Glib::ustring& name,
+    const Glib::RefPtr<DBusInterfaceInfo>& info, const Glib::ustring& name,
     const Glib::ustring& object_path, const Glib::ustring& interface_name,
     const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
 
@@ -149,9 +149,11 @@ public:
 #m4 _CONVERSION(`gchar**', `Glib::StringArrayHandle', `Glib::StringArrayHandle($3)')
   _WRAP_METHOD(Glib::StringArrayHandle get_cached_property_names() const, g_dbus_proxy_get_cached_property_names)
 
+  _WRAP_METHOD(void set_interface_info(const Glib::RefPtr<DBusInterfaceInfo>& info), g_dbus_proxy_set_interface_info)
+  _WRAP_METHOD(Glib::RefPtr<DBusInterfaceInfo> get_interface_info(), g_dbus_proxy_get_interface_info)
+  _WRAP_METHOD(Glib::RefPtr<const DBusInterfaceInfo> get_interface_info() const, g_dbus_proxy_get_interface_info, constversion)
+
 /* TODO:
-  _WRAP_METHOD(oid set_interface_info(GDBusInterfaceInfo* info), g_dbus_proxy_set_interface_info)
-  _WRAP_METHOD(DBusInterfaceInfo* get_interface_info(), g_dbus_proxy_get_interface_info)
   _WRAP_METHOD(void call(const gchar* method_name, GVariant* parameters, GDBusCallFlags flags, gint timeout_msec, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), g_dbus_proxy_call)
   _WRAP_METHOD(GVariant* call_finish(GAsyncResult* res, GError** error),
 g_dbus_proxy_call_finish)

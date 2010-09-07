@@ -20,19 +20,21 @@
 #include <gio/gio.h>
 #include <giomm/asyncresult.h>
 #include <giomm/dbusconnection.h>
+#include <giomm/dbusintrospection.h>
 
 namespace Gio
 {
 
 DBusProxy::DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
-  DBusProxyFlags flags, const GDBusInterfaceInfo* info,
+  DBusProxyFlags flags, const Glib::RefPtr<DBusInterfaceInfo>& info,
   const Glib::ustring& name, const Glib::ustring& object_path,
   const Glib::ustring& interface_name, const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable)
 :
 _CONSTRUCT("g-connection", Glib::unwrap(connection),
   "g-flags", static_cast<GDBusProxyFlags>(flags),
-  "g-interface-info", info, "name", (name.empty() ? 0 : name.c_str()),
+  "g-interface-info", Glib::unwrap(info),
+  "name", (name.empty() ? 0 : name.c_str()),
   "g-object-path", (object_path.empty() ? 0 : object_path.c_str()),
   "g-interface-name", (interface_name.empty() ? 0 : interface_name.c_str()))
 {
@@ -40,14 +42,15 @@ _CONSTRUCT("g-connection", Glib::unwrap(connection),
 }
 
 DBusProxy::DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
-  DBusProxyFlags flags, const GDBusInterfaceInfo* info,
+  DBusProxyFlags flags, const Glib::RefPtr<DBusInterfaceInfo>& info,
   const Glib::ustring& name, const Glib::ustring& object_path,
   const Glib::ustring& interface_name,
   const Glib::RefPtr<Cancellable>& cancellable)
 :
 _CONSTRUCT("g-connection", Glib::unwrap(connection),
   "g-flags", static_cast<GDBusProxyFlags>(flags),
-  "g-interface-info", info, "name", (name.empty() ? 0 : name.c_str()),
+  "g-interface-info", Glib::unwrap(info),
+  "name", (name.empty() ? 0 : name.c_str()),
   "g-object-path", (object_path.empty() ? 0 : object_path.c_str()),
   "g-interface-name", (interface_name.empty() ? 0 : interface_name.c_str()))
 {
@@ -55,13 +58,14 @@ _CONSTRUCT("g-connection", Glib::unwrap(connection),
 }
 
 DBusProxy::DBusProxy(BusType bus_type, DBusProxyFlags flags,
-  const GDBusInterfaceInfo* info, const Glib::ustring& name,
+  const Glib::RefPtr<DBusInterfaceInfo>& info, const Glib::ustring& name,
   const Glib::ustring& object_path, const Glib::ustring& interface_name,
   const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 :
 _CONSTRUCT("g-bus-type", static_cast<GBusType>(bus_type),
   "g-flags", static_cast<GDBusProxyFlags>(flags),
-  "g-interface-info", info, "name", (name.empty() ? 0 : name.c_str()),
+  "g-interface-info", Glib::unwrap(info),
+  "name", (name.empty() ? 0 : name.c_str()),
   "g-object-path", (object_path.empty() ? 0 : object_path.c_str()),
   "g-interface-name", (interface_name.empty() ? 0 : interface_name.c_str()))
 {
@@ -69,13 +73,14 @@ _CONSTRUCT("g-bus-type", static_cast<GBusType>(bus_type),
 }
 
 DBusProxy::DBusProxy(BusType bus_type, DBusProxyFlags flags,
-  const GDBusInterfaceInfo* info, const Glib::ustring& name,
+  const Glib::RefPtr<DBusInterfaceInfo>& info, const Glib::ustring& name,
   const Glib::ustring& object_path, const Glib::ustring& interface_name,
   const Glib::RefPtr<Cancellable>& cancellable)
 :
 _CONSTRUCT("g-bus-type", static_cast<GBusType>(bus_type),
   "g-flags", static_cast<GDBusProxyFlags>(flags),
-  "g-interface-info", info, "name", (name.empty() ? 0 : name.c_str()),
+  "g-interface-info", Glib::unwrap(info),
+  "name", (name.empty() ? 0 : name.c_str()),
   "g-object-path", (object_path.empty() ? 0 : object_path.c_str()),
   "g-interface-name", (interface_name.empty() ? 0 : interface_name.c_str()))
 {
@@ -83,7 +88,7 @@ _CONSTRUCT("g-bus-type", static_cast<GBusType>(bus_type),
 }
 
 void DBusProxy::create(const Glib::RefPtr<DBusConnection>& connection,
-  DBusProxyFlags flags, const GDBusInterfaceInfo* info,
+  DBusProxyFlags flags, const Glib::RefPtr<DBusInterfaceInfo>& info,
   const Glib::ustring& name, const Glib::ustring& object_path,
   const Glib::ustring& interface_name,
   const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
@@ -98,7 +103,7 @@ void DBusProxy::create(const Glib::RefPtr<DBusConnection>& connection,
 
 Glib::RefPtr<DBusProxy>
 DBusProxy::create(const Glib::RefPtr<DBusConnection>& connection,
-  DBusProxyFlags flags, const GDBusInterfaceInfo* info,
+  DBusProxyFlags flags, const Glib::RefPtr<DBusInterfaceInfo>& info,
   const Glib::ustring& name, const Glib::ustring& object_path,
   const Glib::ustring& interface_name,
   const Glib::RefPtr<Cancellable>& cancellable)
@@ -108,7 +113,7 @@ DBusProxy::create(const Glib::RefPtr<DBusConnection>& connection,
 }
 
 void DBusProxy::create(BusType bus_type, DBusProxyFlags flags,
-  const GDBusInterfaceInfo* info, const Glib::ustring& name,
+  const Glib::RefPtr<DBusInterfaceInfo>& info, const Glib::ustring& name,
   const Glib::ustring& object_path, const Glib::ustring& interface_name,
   const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
@@ -121,7 +126,7 @@ void DBusProxy::create(BusType bus_type, DBusProxyFlags flags,
 }
 
 Glib::RefPtr<DBusProxy> DBusProxy::create(BusType bus_type,
-  DBusProxyFlags flags, const GDBusInterfaceInfo* info,
+  DBusProxyFlags flags, const Glib::RefPtr<DBusInterfaceInfo>& info,
   const Glib::ustring& name, const Glib::ustring& object_path,
   const Glib::ustring& interface_name,
   const Glib::RefPtr<Cancellable>& cancellable)
