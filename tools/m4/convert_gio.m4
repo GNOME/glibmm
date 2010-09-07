@@ -72,6 +72,13 @@ _CONVERSION(`const Glib::RefPtr<DBusMessage>&',`GDBusMessage*',__CONVERT_REFPTR_
 _CONVERSION(`GDBusMessage*',`Glib::RefPtr<DBusMessage>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<const DBusMessage>&',`GDBusMessage*',__CONVERT_CONST_REFPTR_TO_P)
 
+# DBus*Info
+_CONVERSION(`GDBusMethodInfo*',`Glib::RefPtr<DBusMethodInfo>',`Glib::wrap($3)')
+_CONVERSION(`GDBusSignalInfo*',`Glib::RefPtr<DBusSignalInfo>',`Glib::wrap($3)')
+_CONVERSION(`GDBusPropertyInfo*',`Glib::RefPtr<DBusPropertyInfo>',`Glib::wrap($3)')
+_CONVERSION(`GDBusNodeInfo*',`Glib::RefPtr<DBusNodeInfo>',`Glib::wrap($3)')
+_CONVERSION(`GDBusInterfaceInfo*',`Glib::RefPtr<DBusInterfaceInfo>',`Glib::wrap($3)')
+
 # DBusProxy
 _CONVERSION(`GDBusProxy*',`Glib::RefPtr<DBusProxy>',`Glib::wrap($3)')
 
