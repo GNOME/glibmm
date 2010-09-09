@@ -80,7 +80,6 @@ _CONVERSION(`GDBusNodeInfo*',`Glib::RefPtr<DBusNodeInfo>',`Glib::wrap($3)')
 _CONVERSION(`GDBusInterfaceInfo*',`Glib::RefPtr<DBusInterfaceInfo>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<DBusInterfaceInfo>&',`GDBusInterfaceInfo*',`Glib::unwrap($3)')
 _CONVERSION(`GDBusInterfaceInfo*',`const Glib::RefPtr<DBusInterfaceInfo>',`Glib::wrap($3)')
-_CONVERSION(`const GDBusMethodInfo*', `Glib::RefPtr<DBusMethodInfo>', `Glib::wrap(const_cast<GDBusMethodInfo*>($3))')
 
 # DBusProxy
 _CONVERSION(`GDBusProxy*',`Glib::RefPtr<DBusProxy>',`Glib::wrap($3)')
