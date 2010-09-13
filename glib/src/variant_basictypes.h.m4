@@ -23,7 +23,11 @@ dnl  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 include(template.macros.m4)
 
 dnl
-dnl GLIB_VARIANT_BASIC(bool, boolean)
+dnl For instance, GLIB_VARIANT_BASIC(c++ type, c type, c type name)
+dnl parameters:
+dnl c++ type: The C++ type for the specialization, such as bool
+dnl c type: The C type used by the C API, such as gboolean.
+dnl c type name: The text used in the C API functions and macros, such as boolean, in g_variant_get_boolean() and G_VARIANT_TYPE_BOOLEAN.
 dnl
 define([GLIB_VARIANT_BASIC],[dnl
 LINE(]__line__[)dnl
@@ -36,7 +40,7 @@ template <>
 class Variant<$1> : public VariantBase
 {
 public:
-  typedef g$2 CType;
+  typedef $2 CType;
 
   /// Default constructor.
   Variant<$1>()
@@ -79,14 +83,14 @@ divert[]dnl
 
 namespace Glib
 {
-GLIB_VARIANT_BASIC(bool, boolean)
-dnl GLIB_VARIANT_BASIC(unsigned char, byte)
-GLIB_VARIANT_BASIC(gint16, int16)
-GLIB_VARIANT_BASIC(guint16, uint16)
-GLIB_VARIANT_BASIC(gint32, int32)
-GLIB_VARIANT_BASIC(guint32, uint32)
-GLIB_VARIANT_BASIC(gint64, int64)
-GLIB_VARIANT_BASIC(guint64, uint64)
-dnl GLIB_VARIANT_BASIC(gint32, handle)
-GLIB_VARIANT_BASIC(double, double)
+GLIB_VARIANT_BASIC(bool, gboolean, boolean)
+GLIB_VARIANT_BASIC(unsigned char, guchar, byte)
+GLIB_VARIANT_BASIC(gint16, gint16, int16)
+GLIB_VARIANT_BASIC(guint16, guint16, uint16)
+GLIB_VARIANT_BASIC(gint32, gint32, int32)
+GLIB_VARIANT_BASIC(guint32, guint32, uint32)
+GLIB_VARIANT_BASIC(gint64, gint64, int64)
+GLIB_VARIANT_BASIC(guint64, guint64, uint64)
+dnl This would redeclare the <int> specialization: GLIB_VARIANT_BASIC(gint32, guint32, handle)
+GLIB_VARIANT_BASIC(double, gdouble, double)
 } // namespace Glib
