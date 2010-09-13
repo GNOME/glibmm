@@ -399,7 +399,14 @@
 ;;   G_IO_ERROR_ADDRESS_IN_USE,
 ;;   G_IO_ERROR_PARTIAL_INPUT,
 ;;   G_IO_ERROR_INVALID_DATA,
-;;   G_IO_ERROR_DBUS_ERROR
+;;   G_IO_ERROR_DBUS_ERROR,
+;;   G_IO_ERROR_HOST_UNREACHABLE,
+;;   G_IO_ERROR_NETWORK_UNREACHABLE,
+;;   G_IO_ERROR_CONNECTION_REFUSED,
+;;   G_IO_ERROR_PROXY_FAILED,
+;;   G_IO_ERROR_PROXY_AUTH_FAILED,
+;;   G_IO_ERROR_PROXY_NEED_AUTH,
+;;   G_IO_ERROR_PROXY_NOT_ALLOWED
 ;; } GIOErrorEnum;
 
 (define-enum-extended IOErrorEnum
@@ -435,7 +442,6 @@
     '("busy" "G_IO_ERROR_BUSY" "26")
     '("would-block" "G_IO_ERROR_WOULD_BLOCK" "27")
     '("host-not-found" "G_IO_ERROR_HOST_NOT_FOUND" "28")
-    '("host-not-found" "G_IO_ERROR_HOST_WAS_NOT_FOUND" "28")
     '("would-merge" "G_IO_ERROR_WOULD_MERGE" "29")
     '("failed-handled" "G_IO_ERROR_FAILED_HANDLED" "30")
     '("too-many-open-files" "G_IO_ERROR_TOO_MANY_OPEN_FILES" "31")
@@ -444,6 +450,13 @@
     '("partial-input" "G_IO_ERROR_PARTIAL_INPUT" "34")
     '("invalid-data" "G_IO_ERROR_INVALID_DATA" "35")
     '("dbus-error" "G_IO_ERROR_DBUS_ERROR" "36")
+    '("host-unreachable" "G_IO_ERROR_HOST_UNREACHABLE" "37")
+    '("network-unreachable" "G_IO_ERROR_NETWORK_UNREACHABLE" "38")
+    '("connection-refused" "G_IO_ERROR_CONNECTION_REFUSED" "39")
+    '("proxy-failed" "G_IO_ERROR_PROXY_FAILED" "40")
+    '("proxy-auth-failed" "G_IO_ERROR_PROXY_AUTH_FAILED" "41")
+    '("proxy-need-auth" "G_IO_ERROR_PROXY_NEED_AUTH" "42")
+    '("proxy-not-allowed" "G_IO_ERROR_PROXY_NOT_ALLOWED" "43")
   )
 )
 
@@ -1021,7 +1034,7 @@
 ;; Original typedef:
 ;; typedef enum /*< flags >*/
 ;; {
-;;   G_DBUS_SIGNAL_FLAGS_NONE = 0,
+;;   G_DBUS_SIGNAL_FLAGS_NONE = 0
 ;; } GDBusSignalFlags;
 
 (define-flags-extended DBusSignalFlags
@@ -1052,7 +1065,8 @@
 ;; typedef enum
 ;; {
 ;;   G_CREDENTIALS_TYPE_INVALID,
-;;   G_CREDENTIALS_TYPE_LINUX_UCRED
+;;   G_CREDENTIALS_TYPE_LINUX_UCRED,
+;;   G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED
 ;; } GCredentialsType;
 
 (define-enum-extended CredentialsType
@@ -1061,6 +1075,23 @@
   (values
     '("invalid" "G_CREDENTIALS_TYPE_INVALID" "0")
     '("linux-ucred" "G_CREDENTIALS_TYPE_LINUX_UCRED" "1")
+    '("freebsd-cmsgcred" "G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED" "2")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN    = 'B',
+;;   G_DBUS_MESSAGE_BYTE_ORDER_LITTLE_ENDIAN = 'l'
+;; } GDBusMessageByteOrder;
+
+(define-enum-extended DBusMessageByteOrder
+  (in-module "G")
+  (c-name "GDBusMessageByteOrder")
+  (values
+    '("big-endian" "G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN" "'B'")
+    '("little-endian" "G_DBUS_MESSAGE_BYTE_ORDER_LITTLE_ENDIAN" "'l'")
   )
 )
 
@@ -1073,7 +1104,8 @@
 ;;   G_SETTINGS_BIND_GET            = (1<<0),
 ;;   G_SETTINGS_BIND_SET            = (1<<1),
 ;;   G_SETTINGS_BIND_NO_SENSITIVITY = (1<<2),
-;;   G_SETTINGS_BIND_GET_NO_CHANGES = (1<<3)
+;;   G_SETTINGS_BIND_GET_NO_CHANGES = (1<<3),
+;;   G_SETTINGS_BIND_INVERT_BOOLEAN = (1<<4)
 ;; } GSettingsBindFlags;
 
 (define-flags-extended SettingsBindFlags
@@ -1085,6 +1117,6 @@
     '("set" "G_SETTINGS_BIND_SET" "(1<<1)")
     '("no-sensitivity" "G_SETTINGS_BIND_NO_SENSITIVITY" "(1<<2)")
     '("get-no-changes" "G_SETTINGS_BIND_GET_NO_CHANGES" "(1<<3)")
+    '("invert-boolean" "G_SETTINGS_BIND_INVERT_BOOLEAN" "(1<<4)")
   )
 )
-

@@ -19,6 +19,7 @@
 
 #include <glibmm/object.h>
 #include <glibmm/variant.h>
+#include <glibmm/utility.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -29,6 +30,7 @@ namespace Gio
 _WRAP_ENUM(DBusMessageType, GDBusMessageType, NO_GTYPE)
 _WRAP_ENUM(DBusMessageFlags, GDBusMessageFlags, NO_GTYPE)
 _WRAP_ENUM(DBusMessageHeaderField, GDBusMessageHeaderField, NO_GTYPE)
+_WRAP_ENUM(DBusCapabilityFlags, GDBusCapabilityFlags, NO_GTYPE)
 
 class UnixFDList;
 
@@ -58,10 +60,28 @@ public:
   _WRAP_METHOD(static Glib::RefPtr<DBusMessage> create_method_reply(const Glib::RefPtr<DBusMessage>& method_call_message), g_dbus_message_new_method_reply)
   _WRAP_METHOD(static Glib::RefPtr<DBusMessage> create_method_error_literal(const Glib::RefPtr<const DBusMessage>& method_call_message, const Glib::ustring& error_name, const Glib::ustring& error_message), g_dbus_message_new_method_error_literal)
 
+
+  _WRAP_METHOD(static Glib::RefPtr<DBusMessage> create_from_blob(const guchar* blob,  gsize blob_len, DBusCapabilityFlags capabilities = DBUS_CAPABILITY_FLAGS_NONE), g_dbus_message_new_from_blob, errthrow)
+
+
   _WRAP_METHOD(Glib::ustring print(guint indent), g_dbus_message_print)
 
   _WRAP_METHOD(DBusMessageType get_message_type() const, g_dbus_message_get_message_type)
   _WRAP_METHOD(void set_message_type(DBusMessageType type), g_dbus_message_set_message_type)
+
+  //gmmproc can't handle the character literals, and this won't be expanded in future,
+  //so we just wrap it by hand.
+  enum ByteOrder
+  {
+    BYTE_ORDER_BIG_ENDIAN    = 'B',
+    BYTE_ORDER_LITTLE_ENDIAN = 'l'
+  };
+
+  #m4 _CONVERSION(`ByteOrder',`GDBusMessageByteOrder',`(GDBusMessageByteOrder)($3)')
+  #m4 _CONVERSION(`GDBusMessageByteOrder',`ByteOrder',`(ByteOrder)($3)')
+
+  _WRAP_METHOD(ByteOrder get_byte_order() const, g_dbus_message_get_byte_order)
+  _WRAP_METHOD(void set_byte_order(ByteOrder byte_order), g_dbus_message_set_byte_order)
 
   _WRAP_METHOD(guint32 get_serial() const, g_dbus_message_get_serial)
   _WRAP_METHOD(void set_serial(guint32 serial), g_dbus_message_set_serial)
@@ -98,8 +118,11 @@ public:
    */
   void get_header(Glib::VariantBase& value, DBusMessageHeaderField header_field) const;
   _IGNORE(g_dbus_message_get_header)
-  
+
   _WRAP_METHOD(void set_header(DBusMessageHeaderField header_field, const Glib::VariantBase& value), g_dbus_message_set_header)
+
+  #m4 _CONVERSION(`guchar*',`Glib::ArrayHandle<guchar>',`Glib::ArrayHandle<guchar>($3)')
+  _WRAP_METHOD(Glib::ArrayHandle<guchar> get_header_fields() const, g_dbus_message_get_header_fields)
 
   _WRAP_METHOD(Glib::ustring get_destination() const, g_dbus_message_get_destination)
   _WRAP_METHOD(void set_destination(const Glib::ustring& value), g_dbus_message_set_destination)
@@ -126,6 +149,12 @@ public:
   _WRAP_METHOD(void set_signature(const Glib::ustring& value), g_dbus_message_set_signature)
 
   _WRAP_METHOD(Glib::ustring get_arg0() const, g_dbus_message_get_arg0)
+
+  _WRAP_METHOD(static gssize bytes_needed(const guchar* blob, gsize blob_len), g_dbus_message_bytes_needed, errthrow)
+
+  _WRAP_METHOD(guchar* to_blob(gsize& out_size, DBusCapabilityFlags capabilities = DBUS_CAPABILITY_FLAGS_NONE), g_dbus_message_to_blob, errthrow)
+
+  _WRAP_METHOD(void to_exception(), g_dbus_message_to_gerror, errthrow)
 };
 
 
