@@ -27,6 +27,32 @@ namespace Gio
 DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   const Glib::ustring& guid, DBusConnectionFlags flags,
   const Glib::RefPtr<DBusAuthObserver>& observer,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
+:
+  _CONSTRUCT("stream", Glib::unwrap(stream),
+    "guid", (guid.empty() ? 0 : guid.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", Glib::unwrap(observer))
+{
+  init_async(slot, cancellable);
+}
+
+DBusConnection::DBusConnection(const Glib::ustring& address,
+  DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
+:
+  _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "observer", Glib::unwrap(observer))
+{
+  init_async(slot, cancellable);
+}
+
+DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid, DBusConnectionFlags flags,
+  const Glib::RefPtr<DBusAuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
@@ -48,6 +74,33 @@ DBusConnection::DBusConnection(const Glib::ustring& address,
   init(cancellable);
 }
 
+void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid, DBusConnectionFlags flags,
+  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  // Create the connection, taking an extra reference without returning it.
+  // The extra reference is taken so the connection is not destroyed when it
+  // goes out of scope.  The finished connection will be returned in the slot
+  // by calling create_finish().
+  Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid, flags,
+    observer, cancellable))->reference();
+}
+
+void DBusConnection::create_for_address(const Glib::ustring& address,
+  DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  // Create the connection, taking an extra reference without returning it.
+  // The extra reference is taken so the connection is not destroyed when it
+  // goes out of scope.  The finished connection will be returned in the slot
+  // by calling create_finish().
+  Glib::RefPtr<DBusConnection>(new DBusConnection(address, flags,
+    observer, cancellable))->reference();
+}
+
 Glib::RefPtr<DBusConnection> DBusConnection::create(
   const Glib::RefPtr<IOStream>& stream,
   const Glib::ustring& guid, DBusConnectionFlags flags,
@@ -58,13 +111,22 @@ Glib::RefPtr<DBusConnection> DBusConnection::create(
     observer, cancellable));
 }
 
-Glib::RefPtr<DBusConnection> DBusConnection::create(
+Glib::RefPtr<DBusConnection> DBusConnection::create_for_address(
   const Glib::ustring& address,
   DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
   return Glib::RefPtr<DBusConnection>(new DBusConnection(address, flags,
     observer, cancellable));
+}
+
+void DBusConnection::get(BusType bus_type, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_bus_get(static_cast<GBusType>(bus_type), Glib::unwrap(cancellable),
+    &SignalProxy_async_callback, slot_copy);
 }
 
 
@@ -134,7 +196,7 @@ void DBusConnection::flush_sync()
     ::Glib::Error::throw_exception(gerror);
 }
 
-void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
+void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
   volatile guint32 out_serial;
