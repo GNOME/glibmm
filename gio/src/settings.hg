@@ -90,6 +90,15 @@ public:
   _WRAP_METHOD(void revert(), g_settings_revert)
   _WRAP_METHOD(bool get_has_unapplied() const, g_settings_get_has_unapplied)
 
+  _WRAP_METHOD(void reset(const Glib::ustring& key), g_settings_reset)
+
+  //TODO: _WRAP_METHOD(Glib::StringArrayHandle list_schemas() const, g_settings_list_schemas)
+
+  _WRAP_METHOD(Glib::StringArrayHandle list_children() const, g_settings_list_children)
+  _WRAP_METHOD(Glib::StringArrayHandle list_keys() const, g_settings_list_keys)
+  _WRAP_METHOD(bool get_destroyed() const, g_settings_get_destroyed)
+
+
 #m4 _CONVERSION(`Glib::ObjectBase*',`gpointer',(gpointer)$3->gobj())
   _WRAP_METHOD(void bind(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, SettingsBindFlags flags=SETTINGS_BIND_DEFAULT), g_settings_bind)
   void bind(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, SettingsBindFlags flags=SETTINGS_BIND_DEFAULT);
@@ -103,7 +112,7 @@ public:
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
   _WRAP_SIGNAL(void changed(const Glib::ustring& key), "changed")
 
-  //TODO?: _WRAP_SIGNAL(bool writable_change_event(guint key), "writable-change-event")
+  _WRAP_SIGNAL(bool writable_change_event(guint key), "writable-change-event")
   _WRAP_SIGNAL(void writable_changed(const Glib::ustring& key), writable_changed)
 };
 
