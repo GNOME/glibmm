@@ -41,21 +41,24 @@ public:
   /** Copy the C item into a new VariantType instance.
    */
   explicit VariantType(const GVariantType* castitem);
-  
+
   //TODO: Docuementation
   explicit VariantType(const std::string& type_string);
-  
+
   VariantType& operator=(const GVariantType* castitem);
-  
-  
+
+
+//The C parameters are actually const, but gmmproc doesn't understand that,
+//so we add a m4 conversion to satisfy it:
+#m4 _CONVERSION(`const VariantType&',`GVariantType*',`($3).gobj()')
   _WRAP_METHOD(static VariantType create_array(const VariantType& element), g_variant_type_new_array)
   _WRAP_METHOD(static VariantType create_maybe(const VariantType& element), g_variant_type_new_maybe)
-  
+
   //TODO: Use a single list parameter:
   //_WRAP_METHOD(static VariantType create_tuple(const GVariantType * const *items, gint length), g_variant_type_new_tuple)
 
   _WRAP_METHOD(static VariantType create_dict_entry(const VariantType& key, const VariantType& value), g_variant_type_new_dict_entry)
-  
+
   //TODO: Use something instead of gsize?
   _WRAP_METHOD(gsize _get_string_length() const, g_variant_type_get_string_length)
   _WRAP_METHOD(std::string get_string() const, g_variant_type_peek_string)
@@ -73,9 +76,9 @@ public:
   #m4 _CONVERSION(`const VariantType&',`gconstpointer',`const_cast<GVariantType*>(($3).gobj())')
   _WRAP_METHOD(guint hash() const, g_variant_type_hash)
   _WRAP_METHOD(bool equal(const VariantType& other) const, g_variant_type_equal)
-  
+
   _WRAP_METHOD(bool is_subtype_of(const VariantType& supertype) const, g_variant_type_is_subtype_of)
-  
+
   _WRAP_METHOD(VariantType element() const, g_variant_type_element)
   _WRAP_METHOD(VariantType first() const, g_variant_type_first)
   _WRAP_METHOD(VariantType next () const, g_variant_type_next)
