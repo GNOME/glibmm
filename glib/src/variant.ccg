@@ -27,6 +27,8 @@ void VariantBase::get_normal_form(VariantBase& result) const
   GVariant* const g_value =
     g_variant_get_normal_form(const_cast<GVariant*>(gobj()));
 
+  //The C function never returns NULL, according to its docuemenation,
+  //so we don't need a bool return value.
   result.init(g_value); // g_value is already referenced.
 }
 
@@ -35,6 +37,21 @@ void VariantBase::byteswap(VariantBase& result) const
   GVariant* const g_value = g_variant_byteswap(const_cast<GVariant*>(gobj()));
   result.init(g_value); // g_value is already referenced.
 }
+
+bool VariantBase::get_maybe(Glib::VariantBase& maybe) const
+{
+  GVariant* const g_value =
+    g_variant_get_maybe(const_cast<GVariant*>(gobj()));
+
+  if(g_value)
+  {
+    maybe.init(g_value); // g_value is already referenced.
+    return true;
+  }
+  else
+    return false;
+}
+
 
 
 /****************** Specializations ***********************************/

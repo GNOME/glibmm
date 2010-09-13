@@ -59,10 +59,20 @@ public:
   _WRAP_METHOD(bool is_of_type(const VariantType& type) const, g_variant_is_of_type)
   _WRAP_METHOD(bool is_container() const, g_variant_is_container)
   _WRAP_METHOD(GVariantClass classify() const, g_variant_classify)
-  
+
+  bool get_maybe(Glib::VariantBase& maybe) const;
+  _IGNORE(g_variant_get_maybe)
+
+  //TODO: Somehow put this method only in specializations that use container types?:
+  _WRAP_METHOD(gsize get_n_children() const, g_variant_n_children)
+
+  _WRAP_METHOD(gsize get_size() const, g_variant_get_size)
+  _WRAP_METHOD(gconstpointer get_data(), g_variant_get_data)
+  _WRAP_METHOD(void store(gpointer data) const, g_variant_store)
+
   _WRAP_METHOD(Glib::ustring print(bool type_annotate = false) const, g_variant_print)
   _IGNORE(g_variant_print_string)
-  
+
   #m4 _CONVERSION(`const VariantBase&',`gconstpointer',`const_cast<GVariant*>(($3).gobj())')
   _WRAP_METHOD(guint hash() const, g_variant_hash)
   _WRAP_METHOD(bool equal(const VariantBase& other) const, g_variant_equal)
@@ -142,11 +152,11 @@ public:
   Variant<VariantBase>()
   : VariantBase()
   {}
-  
+
   explicit Variant<VariantBase>(GVariant* castitem)
   : VariantBase(castitem)
   {}
-  
+
   static const GVariantType* variant_type() G_GNUC_CONST;
 
   //This must have a create() method because otherwise it would be a copy constructor.
@@ -170,11 +180,11 @@ public:
   Variant<Glib::ustring>()
   : VariantBase()
   {}
-  
+
   explicit Variant<Glib::ustring>(GVariant* castitem)
   : VariantBase(castitem)
   {}
-  
+
   static const GVariantType* variant_type() G_GNUC_CONST;
   static Variant<Glib::ustring> create(const Glib::ustring& data);
 
@@ -185,6 +195,7 @@ public:
 } // namespace Glib
 
 
+//We ignore g_variant_get_*() methods that are wrapped by Variant<> specializations, such as in variant_basictypes.h.m4.
 _IGNORE(
   g_variant_get_boolean,
   g_variant_get_uint16,
