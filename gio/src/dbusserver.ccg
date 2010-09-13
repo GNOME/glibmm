@@ -24,9 +24,9 @@
 namespace Gio
 {
 
-DBusServer::DBusServer(const Glib::ustring& address, DBusServerFlags flags,
+DBusServer::DBusServer(const Glib::ustring& address,
   const Glib::ustring& guid, const Glib::RefPtr<DBusAuthObserver>& observer,
-  const Glib::RefPtr<Cancellable>& cancellable)
+  const Glib::RefPtr<Cancellable>& cancellable, DBusServerFlags flags)
   : _CONSTRUCT("address",
     (address.empty() ? static_cast<char*>(0) : address.c_str()),
     "flags", static_cast<GDBusServerFlags>(flags),
@@ -37,12 +37,11 @@ DBusServer::DBusServer(const Glib::ustring& address, DBusServerFlags flags,
 }
 
 Glib::RefPtr<DBusServer> DBusServer::create(const Glib::ustring& address,
-  DBusServerFlags flags, const Glib::ustring& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
-  const Glib::RefPtr<Cancellable>& cancellable)
+  const Glib::ustring& guid, const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<Cancellable>& cancellable, DBusServerFlags flags)
 {
-  return Glib::RefPtr<DBusServer>(new DBusServer(address, flags, guid,
-    observer, cancellable));
+  return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
+    cancellable, flags));
 }
 
 } // namespace Gio

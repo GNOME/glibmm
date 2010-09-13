@@ -45,16 +45,16 @@ class DBusServer : public Glib::Object, public Initable
   _IMPLEMENTS_INTERFACE(Initable)
 
 protected:
-  DBusServer(const Glib::ustring& address, DBusServerFlags flags,
+  DBusServer(const Glib::ustring& address,
     const Glib::ustring& guid, const Glib::RefPtr<DBusAuthObserver>& observer,
-    const Glib::RefPtr<Cancellable>& cancellable);
+    const Glib::RefPtr<Cancellable>& cancellable, DBusServerFlags flags);
 
 public:
   _WRAP_METHOD_DOCS_ONLY(g_dbus_server_new_sync)
   static Glib::RefPtr<DBusServer> create(const Glib::ustring& address,
-    DBusServerFlags flags, const Glib::ustring& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
-    const Glib::RefPtr<Cancellable>& cancellable);
+    const Glib::ustring& guid, const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>(),
+    DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
 
   _WRAP_METHOD(void start(), g_dbus_server_start)
   _WRAP_METHOD(void stop(), g_dbus_server_stop)
