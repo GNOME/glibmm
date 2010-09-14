@@ -80,25 +80,14 @@ void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
+  // Note that this does not return anything, because it is async - see create_finish().
+
   // Create the connection, taking an extra reference without returning it.
   // The extra reference is taken so the connection is not destroyed when it
   // goes out of scope.  The finished connection will be returned in the slot
   // by calling create_finish().
   Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid, flags,
-    observer, cancellable))->reference();
-}
-
-void DBusConnection::create_for_address(const Glib::ustring& address,
-  DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable)
-{
-  // Create the connection, taking an extra reference without returning it.
-  // The extra reference is taken so the connection is not destroyed when it
-  // goes out of scope.  The finished connection will be returned in the slot
-  // by calling create_finish().
-  Glib::RefPtr<DBusConnection>(new DBusConnection(address, flags,
-    observer, cancellable))->reference();
+    observer, slot, cancellable))->reference();
 }
 
 Glib::RefPtr<DBusConnection> DBusConnection::create(
@@ -109,6 +98,22 @@ Glib::RefPtr<DBusConnection> DBusConnection::create(
 {
   return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid, flags,
     observer, cancellable));
+}
+
+
+void DBusConnection::create_for_address(const Glib::ustring& address,
+  DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  // Note that this does not return anything, because it is async - see create_finish().
+
+  // Create the connection, taking an extra reference without returning it.
+  // The extra reference is taken so the connection is not destroyed when it
+  // goes out of scope.  The finished connection will be returned in the slot
+  // by calling create_finish().
+  Glib::RefPtr<DBusConnection>(new DBusConnection(address, flags,
+    observer, slot, cancellable))->reference();
 }
 
 Glib::RefPtr<DBusConnection> DBusConnection::create_for_address(
