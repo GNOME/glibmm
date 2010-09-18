@@ -37,7 +37,6 @@ int main(int, char**)
   g_type_init ();
 
   std::cout << get_defs(G_TYPE_ASYNC_RESULT)
-            << get_defs(G_TYPE_APPLICATION)
             << get_defs(G_TYPE_CANCELLABLE)
             << get_defs(G_TYPE_BUFFERED_INPUT_STREAM)
             << get_defs(G_TYPE_BUFFERED_OUTPUT_STREAM)
