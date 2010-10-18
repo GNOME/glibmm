@@ -1282,7 +1282,12 @@ ustring ustring::FormatStream::to_string() const
                                        "UTF-8", "WCHAR_T", 0, &n_bytes, &error));
 # endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
 
-#endif //GLIBMM_EXCEPTIONS_ENABLED
+#else /* !GLIBMM_HAVE_WIDE_STREAM */
+  const std::string str = stream_.str();
+
+  gsize n_bytes = 0;
+  const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), 0, &n_bytes, &error));
+#endif /* !GLIBMM_HAVE_WIDE_STREAM */
 
   if (error)
   {
