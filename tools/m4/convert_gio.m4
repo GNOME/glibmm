@@ -1,4 +1,5 @@
 _CONV_ENUM(G,AppInfoCreateFlags)
+_CONV_ENUM(G,ApplicationFlags)
 _CONV_ENUM(G,AskPasswordFlags)
 _CONV_ENUM(G,CredentialsType)
 _CONV_ENUM(G,DataStreamByteOrder)

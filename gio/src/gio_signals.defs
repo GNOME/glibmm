@@ -2,87 +2,90 @@
 
 ;; From GApplication
 
-(define-signal quit-with-data
-  (of-object "GApplication")
-  (return-type "gboolean")
-  (when "last")
-  (parameters
-    '("GVariant*" "p0")
-  )
-)
-
-(define-signal action-with-data
+(define-signal startup
   (of-object "GApplication")
   (return-type "void")
-  (when "first")
-  (parameters
-    '("const-gchar*" "p0")
-    '("GVariant*" "p1")
-  )
+  (when "last")
 )
 
-(define-signal prepare-activation
+(define-signal activate
+  (of-object "GApplication")
+  (return-type "void")
+  (when "last")
+)
+
+(define-signal open
   (of-object "GApplication")
   (return-type "void")
   (when "last")
   (parameters
-    '("GVariant*" "p0")
-    '("GVariant*" "p1")
+    '("gpointer" "p0")
+    '("gint" "p1")
+    '("const-gchar*" "p2")
+  )
+)
+
+(define-signal command-line
+  (of-object "GApplication")
+  (return-type "gint")
+  (when "last")
+  (parameters
+    '("GApplicationCommandLine*" "p0")
   )
 )
 
 (define-property application-id
   (of-object "GApplication")
   (prop-type "GParamString")
-  (docs "Identifier for this application")
+  (docs "Unique identifier for the application")
   (readable #t)
   (writable #t)
-  (construct-only #t)
+  (construct-only #f)
 )
 
-(define-property register
+(define-property flags
   (of-object "GApplication")
-  (prop-type "GParamBoolean")
-  (docs "If false, do not ")
+  (prop-type "GParamFlags")
+  (docs "Flags specifying the behaviour of the application")
   (readable #t)
   (writable #t)
-  (construct-only #t)
+  (construct-only #f)
 )
 
-(define-property default-quit
+(define-property is-registered
   (of-object "GApplication")
   (prop-type "GParamBoolean")
-  (docs "Exit the process by default")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
-(define-property is-remote
-  (of-object "GApplication")
-  (prop-type "GParamBoolean")
-  (docs "Whether this application is a proxy for another process")
+  (docs "If g_application_register() has been called")
   (readable #t)
   (writable #f)
   (construct-only #f)
 )
 
-(define-property argv
+(define-property is-remote
   (of-object "GApplication")
-  (prop-type "GParamVariant")
-  (docs "System argument vector with type signature aay")
+  (prop-type "GParamBoolean")
+  (docs "If this application instance is remote")
   (readable #t)
-  (writable #t)
-  (construct-only #t)
+  (writable #f)
+  (construct-only #f)
 )
 
-(define-property platform-data
+(define-property inactivity-timeout
   (of-object "GApplication")
-  (prop-type "GParamVariant")
-  (docs "Environmental data, must have type signature a{sv}")
+  (prop-type "GParamBoolean")
+  (docs "time (ms) to stay alive after becoming idle")
   (readable #t)
   (writable #t)
-  (construct-only #t)
+  (construct-only #f)
+)
+
+(define-property action-group
+  (of-object "GApplication")
+  (prop-type "GParamObject")
+  (docs "the group of actions that the application exports")
+  (readable #f)
+  (writable #t)
+  (construct-only #f)
 )
 
 ;; From GCancellable
@@ -520,7 +523,7 @@
   )
 )
 
-;; p1 is actually a gchar**, 
+;; p1 is actually a gchar**,
 ;; but that is equivalent (by typedef) to gchar**,
 ;; and the declaration in gmountoperation.h adds a const.
 ;; murrayc
@@ -962,7 +965,7 @@
 
 (define-signal new-connection
   (of-object "GDBusServer")
-  (return-type "void")
+  (return-type "gboolean")
   (when "last")
   (parameters
     '("GDBusConnection*" "p0")
@@ -1236,15 +1239,6 @@
   (construct-only #t)
 )
 
-(define-property scheme
-  (of-object "GNetworkService")
-  (prop-type "GParamString")
-  (docs "Network scheme (default is to use service)")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
 (define-property domain
   (of-object "GNetworkService")
   (prop-type "GParamString")
@@ -1252,6 +1246,15 @@
   (readable #t)
   (writable #t)
   (construct-only #t)
+)
+
+(define-property scheme
+  (of-object "GNetworkService")
+  (prop-type "GParamString")
+  (docs "Network scheme (default is to use service)")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
 )
 
 ;; From GSettings
@@ -1661,5 +1664,3 @@
   (writable #t)
   (construct-only #t)
 )
-
-
