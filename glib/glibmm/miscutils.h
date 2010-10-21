@@ -104,21 +104,21 @@ std::string getenv(const std::string& variable);
  * they can be any sequence of bytes. On Windows, they should be in
  * UTF-8.
  *
- * Note that on some systems, when variables are overwritten, the memory 
+ * Note that on some systems, when variables are overwritten, the memory
  * used for the previous variables and its value isn't reclaimed.
  *
  * @param variable The environment variable to set. It must not contain '='.
  * @param value  The value to which the variable should be set.
  * @param overwrite Whether to change the variable if it already exists.
  * @result false if the environment variable couldn't be set.
- */ 
+ */
 bool setenv(const std::string& variable, const std::string& value, bool overwrite = true);
 
 /** Removes an environment variable from the environment.
  *
- * Note that on some systems, when variables are overwritten, the memory 
+ * Note that on some systems, when variables are overwritten, the memory
  * used for the previous variables and its value isn't reclaimed.
- * Furthermore, this function can't be guaranteed to operate in a 
+ * Furthermore, this function can't be guaranteed to operate in a
  * threadsafe way.
  *
  * @param variable: the environment variable to remove. It  must not contain '='.
@@ -169,7 +169,7 @@ std::string get_tmp_dir();
 std::string get_current_dir();
 
 //TODO: We could create a C++ enum to wrap the C GUserDirectory enum,
-//but we would have to either be very careful, or define the enum 
+//but we would have to either be very careful, or define the enum
 //values in terms of the C enums anyway.
 /** Returns the full path of a special directory using its logical id.
  *
@@ -181,7 +181,7 @@ std::string get_current_dir();
  *
  * Return value: the path to the specified special directory.
  * @param directory Te logical id of special directory
- * 
+ *
  * @newin{2,14}
  */
 std::string get_user_special_dir(GUserDirectory directory);
@@ -205,6 +205,20 @@ std::string get_user_data_dir();
  * @newin{2,14}
  */
 std::string get_user_config_dir();
+
+/** Returns an ordered list of base directories in which to access system-wide application data.
+ * On Unix platforms this is determined using the mechanisms described in the XDG Base Directory Specification.
+ *
+ * @newin{2,18}
+ */
+std::vector<std::string> get_system_data_dirs();
+
+/** Returns an ordered list of base directories in which to access system-wide configuration information.
+ * On Unix platforms this is determined using the mechanisms described in the XDG Base Directory Specification.
+ *
+ * @newin{2,18}
+ */
+std::vector<std::string> get_system_config_dirs();
 
 /** Returns a base directory in which to store non-essential, cached data
  * specific to particular user.
@@ -294,7 +308,7 @@ std::string build_filename(const std::string& elem1, const std::string& elem2);
  * Other than for determination of the number of leading and trailing
  * copies of the separator, elements consisting only of copies
  * of the separator are ignored.
- *                                                                             
+ *
  * @param separator A string used to separate the elements of the path.
  * @param elements A container holding the elements of the path to build.
  *   Any STL compatible container type is accepted.
@@ -331,4 +345,3 @@ std::string find_program_in_path(const std::string& program);
 
 
 #endif /* _GLIBMM_FILEUTILS_H */
-

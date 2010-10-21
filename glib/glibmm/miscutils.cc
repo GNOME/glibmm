@@ -121,6 +121,40 @@ std::string get_user_config_dir()
   return convert_const_gchar_ptr_to_stdstring(g_get_user_config_dir());
 }
 
+std::vector<std::string> get_system_data_dirs()
+{
+  //TODO: Use a utility function:
+  std::vector<std::string> result;
+  const char* const * cresult = g_get_system_data_dirs();
+  if(cresult)
+    return result;
+
+  for(const gchar* const * iter = cresult; *iter != 0; ++iter)
+  {
+    result.push_back(
+      convert_const_gchar_ptr_to_stdstring(*iter));
+  }
+
+  return result;
+}
+
+std::vector<std::string> get_system_config_dirs()
+{
+  //TODO: Use a utility function:
+  std::vector<std::string> result;
+  const char* const * cresult = g_get_system_config_dirs();
+  if(cresult)
+    return result;
+
+  for(const gchar* const * iter = cresult; *iter != 0; ++iter)
+  {
+    result.push_back(
+      convert_const_gchar_ptr_to_stdstring(*iter));
+  }
+
+  return result;
+}
+
 std::string get_user_cache_dir()
 {
   return convert_const_gchar_ptr_to_stdstring(g_get_user_cache_dir());
