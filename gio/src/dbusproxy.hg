@@ -144,7 +144,23 @@ public:
   _WRAP_METHOD(int get_default_timeout() const, g_dbus_proxy_get_default_timeout)
   _WRAP_METHOD(void set_default_timeout(int timeout_msec), g_dbus_proxy_set_default_timeout)
 
-  //TODO: _WRAP_METHOD(Variant* get_cached_property(const gchar* property_name), g_dbus_proxy_get_cached_property)
+  /** Looks up the value for a property from the cache. This call does no
+   * blocking IO.
+   *
+   * If proxy has an expected interface (see property_interface_info()), then
+   * @a property_name (for existence) is checked against it.
+   *
+   * @param property_name Property name.
+   *
+   * @param property An output parameter in which to hold to the variant
+   * instance that holds the value for @a property_name.
+   *
+   * @newin{2,26}
+   */
+  void get_cached_property(Glib::VariantBase& property,
+    const Glib::ustring& property_name) const;
+  _IGNORE(g_dbus_proxy_get_cached_property)
+
   _WRAP_METHOD(void set_cached_property(const Glib::ustring& property_name, const Glib::VariantBase& value), g_dbus_proxy_set_cached_property)
 
 #m4 _CONVERSION(`gchar**', `Glib::StringArrayHandle', `Glib::StringArrayHandle($3)')
@@ -191,6 +207,7 @@ public:
     DBusCallFlags flags = Gio::DBUS_CALL_FLAGS_NONE,
     const Glib::VariantBase& parameters = Glib::VariantBase(),
     const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+  _IGNORE(g_dbus_proxy_call_sync)
 
  _WRAP_PROPERTY("g-bus-type", BusType)
  _WRAP_PROPERTY("g-connection", Glib::RefPtr<DBusConnection>)
@@ -204,7 +221,8 @@ public:
 
 #m4 _CONVERSION(`GVariant*', `const Glib::VariantBase&', `Glib::wrap($3, true)')
 
-//TODO: It's difficult to figure out conversions from/to GStrv (gchar**) to/from std::vector<Glib::ustring>
+  //TODO: It's difficult to figure out conversions from/to GStrv (gchar**)
+  //to/from std::vector<Glib::ustring>
  //_WRAP_SIGNAL(void properties_changed(const Glib::VariantBase& changed_properties, const std::vector<Glib::ustring>& invalidated_properties), g-properties-changed)
 
  _WRAP_SIGNAL(void signal(const Glib::ustring& sender_name, const Glib::ustring& signal_name, const Glib::VariantBase& parameters), "g-signal")

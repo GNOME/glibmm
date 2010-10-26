@@ -136,6 +136,16 @@ Glib::RefPtr<DBusProxy> DBusProxy::create_for_bus(BusType bus_type,
     object_path, interface_name, cancellable));
 }
 
+void DBusProxy::get_cached_property(Glib::VariantBase& property,
+  const Glib::ustring& property_name) const
+{
+  GVariant* const g_variant =
+    g_dbus_proxy_get_cached_property(const_cast<GDBusProxy*>(gobj()),
+    property_name.c_str());
+
+  property.init(g_variant, false /* no extra reference needed */);
+}
+
 void DBusProxy::call(const Glib::ustring& method_name,
   int timeout_msec, const SlotAsyncReady& slot, DBusCallFlags flags,
   const Glib::VariantBase& parameters,
