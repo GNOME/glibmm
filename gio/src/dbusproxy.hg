@@ -161,7 +161,22 @@ g_dbus_proxy_call_finish)
   _WRAP_METHOD(GVariant* call_sync(const gchar* method_name, GVariant* parameters, GDBusCallFlags flags, gint timeout_msec, GCancellable* cancellable, GError** error), g_dbus_proxy_call_sync)
  */
 
- //TODO: Properties and signals.
+ _WRAP_PROPERTY("g-bus-type", BusType)
+ _WRAP_PROPERTY("g-connection", Glib::RefPtr<DBusConnection>)
+ _WRAP_PROPERTY("g-default-timeout", int)
+ _WRAP_PROPERTY("g-flags", DBusProxyFlags)
+ _WRAP_PROPERTY("g-interface-info", Glib::RefPtr<DBusInterfaceInfo>)
+ _WRAP_PROPERTY("g-interface-name", Glib::ustring)
+ _WRAP_PROPERTY("g-name", Glib::ustring)
+ _WRAP_PROPERTY("g-name-owner", Glib::ustring)
+ _WRAP_PROPERTY("g-object-path", Glib::ustring)
+
+#m4 _CONVERSION(`GVariant*', `const Glib::VariantBase&', `Glib::wrap($3, true)')
+
+//TODO: It's difficult to figure out conversions from/to GStrv (gchar**) to/from std::vector<Glib::ustring>
+ //_WRAP_SIGNAL(void properties_changed(const Glib::VariantBase& changed_properties, const std::vector<Glib::ustring>& invalidated_properties), g-properties-changed)
+
+ _WRAP_SIGNAL(void signal(const Glib::ustring& sender_name, const Glib::ustring& signal_name, const Glib::VariantBase& parameters), "g-signal")
 };
 
 } // namespace Gio
