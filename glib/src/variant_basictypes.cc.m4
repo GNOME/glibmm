@@ -43,7 +43,12 @@ const GVariantType* Variant<$1>::variant_type()
 
 Variant<$1> Variant<$1>::create($1 data)
 {
-  return Variant<$1>(g_variant_new_$3(data));
+  Variant<$1> result = Variant<$1>(g_variant_new_$3(data));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
 }
 
 $1 Variant<$1>::get() const

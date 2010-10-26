@@ -1,5 +1,16 @@
 2010-10-26  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	Variant: Remove floating reference on creation.
+
+	* glib/src/variant.ccg:
+	* glib/src/variant_basictypes.cc.m4: Modify all create methods of the
+	variant classes so that they remove the floating reference of the
+	newly created GVariants.  The C API sometimes 'consumes' GVariants
+	with floating references (see g_dbus_proxy_call()) so this allows C++
+	to worry about deleting GVariants when their references are all lost.
+
+2010-10-26  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	DBusProxy: Wrap properites and signals.
 
 	* tools/extra_defs_gen/generate_defs_gio.cc: Add a new section for

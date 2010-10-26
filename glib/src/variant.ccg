@@ -74,7 +74,12 @@ const GVariantType* Variant<VariantBase>::variant_type()
 
 Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
 {
-  return Variant<VariantBase>(g_variant_new_variant(const_cast<GVariant*>(data.gobj())));
+  Variant<VariantBase> result = Variant<VariantBase>(g_variant_new_variant(const_cast<GVariant*>(data.gobj())));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
 }
 
 VariantBase Variant<VariantBase>::get() const
@@ -91,7 +96,13 @@ const GVariantType* Variant<Glib::ustring>::variant_type()
 Variant<Glib::ustring>
 Variant<Glib::ustring>::create(const Glib::ustring& data)
 {
-  return Variant<Glib::ustring>(g_variant_new_string(data.c_str()));
+  Variant<Glib::ustring> result =
+    Variant<Glib::ustring>(g_variant_new_string(data.c_str()));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
 }
 
 Glib::ustring Variant<Glib::ustring>::get() const
