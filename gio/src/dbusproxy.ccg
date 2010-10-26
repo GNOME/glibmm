@@ -21,6 +21,7 @@
 #include <giomm/asyncresult.h>
 #include <giomm/dbusconnection.h>
 #include <giomm/dbusintrospection.h>
+#include <giomm/slot_async.h>
 
 namespace Gio
 {
@@ -133,6 +134,54 @@ Glib::RefPtr<DBusProxy> DBusProxy::create_for_bus(BusType bus_type,
 {
   return Glib::RefPtr<DBusProxy>(new DBusProxy(bus_type, flags, info, name,
     object_path, interface_name, cancellable));
+}
+
+void DBusProxy::call(const Glib::ustring& method_name,
+  int timeout_msec, const SlotAsyncReady& slot, DBusCallFlags flags,
+  const Glib::VariantBase& parameters,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_proxy_call(gobj(), method_name.c_str(),
+    const_cast<GVariant*>(parameters.gobj()),
+    static_cast<GDBusCallFlags>(flags), timeout_msec,
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+}
+
+void DBusProxy::call_finish(Glib::VariantBase& ret, const Glib::RefPtr<AsyncResult>& res)
+{
+  GError *g_error = 0;
+
+  GVariant* const g_variant =
+    g_dbus_proxy_call_finish(gobj(), Glib::unwrap(res), &g_error);
+
+  if(g_error)
+    ::Glib::Error::throw_exception(g_error);
+
+  ret.init(g_variant, false /* don't take extra reference */);
+}
+
+void DBusProxy::call_sync(Glib::VariantBase& result,
+  const Glib::ustring& method_name, int timeout_msec, DBusCallFlags flags,
+  const Glib::VariantBase& parameters, 
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  GError *g_error = 0;
+
+  GVariant* const g_variant =
+    g_dbus_proxy_call_sync(gobj(), method_name.c_str(), 
+    const_cast<GVariant*>(parameters.gobj()),
+    static_cast<GDBusCallFlags>(flags), timeout_msec,
+    Glib::unwrap(cancellable), &g_error);
+
+  if(g_error)
+    ::Glib::Error::throw_exception(g_error);
+
+  result.init(g_variant, false /* don't take extra reference */);
 }
 
 } // namespace Gio

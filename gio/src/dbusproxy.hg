@@ -154,12 +154,43 @@ public:
   _WRAP_METHOD(Glib::RefPtr<DBusInterfaceInfo> get_interface_info(), g_dbus_proxy_get_interface_info)
   _WRAP_METHOD(Glib::RefPtr<const DBusInterfaceInfo> get_interface_info() const, g_dbus_proxy_get_interface_info, constversion)
 
-/* TODO:
-  _WRAP_METHOD(void call(const gchar* method_name, GVariant* parameters, GDBusCallFlags flags, gint timeout_msec, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), g_dbus_proxy_call)
-  _WRAP_METHOD(GVariant* call_finish(GAsyncResult* res, GError** error),
-g_dbus_proxy_call_finish)
-  _WRAP_METHOD(GVariant* call_sync(const gchar* method_name, GVariant* parameters, GDBusCallFlags flags, gint timeout_msec, GCancellable* cancellable, GError** error), g_dbus_proxy_call_sync)
- */
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_call)
+  void call(const Glib::ustring& method_name,
+    int timeout_msec, const SlotAsyncReady& slot,
+    DBusCallFlags flags = Gio::DBUS_CALL_FLAGS_NONE,
+    const Glib::VariantBase& parameters = Glib::VariantBase(),
+    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+
+  /** Finishes an operation started with call().
+   *
+   * @param ret An output variable in which to store the return.
+   * @param res An AsyncResult obtained from the SlotAsyncReady passed to
+   * call().
+   *
+   * @throw Glib::Error.
+   */
+  void call_finish(Glib::VariantBase& ret, const Glib::RefPtr<AsyncResult>& res);
+  _IGNORE(g_dbus_proxy_call_finish)
+
+  /** Synchronously invokes the method_name method on proxy.
+   * See call(), the asynchronous version of this method for more information.
+   *
+   * @param result An output parameter in which to store the return.
+   * @param method_name Name of method to invoke.
+   * @param timeout_msec The timeout in milliseconds or -1 to use the proxy
+   * default timeout.
+   * @param flags Flags from the DBusCallFlags enumeration.
+   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * signal.
+   * @param cancellable A Cancellable.
+   *
+   * @throw Glib::Error.
+   */
+  void call_sync(Glib::VariantBase& result, const Glib::ustring& method_name,
+    int timeout_msec,
+    DBusCallFlags flags = Gio::DBUS_CALL_FLAGS_NONE,
+    const Glib::VariantBase& parameters = Glib::VariantBase(),
+    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
 
  _WRAP_PROPERTY("g-bus-type", BusType)
  _WRAP_PROPERTY("g-connection", Glib::RefPtr<DBusConnection>)
