@@ -85,7 +85,19 @@ protected:
 
 public:
 
-  /** TODO
+  /** Asynchronously connects to the message bus specified by @a bus_type.
+   *
+   * When the operation is finished, @a slot will be invoked. You can then
+   * call get_finish() to get the result of the operation.
+   *
+   * This is a asynchronous failable function. See get_sync() for the
+   * synchronous version.
+   *
+   * @param bus_type A BusType.
+   * @param slot A SlotAsyncReady to call when the request is satisfied.
+   * @param cancellable A Cancellable.
+   *
+   * @newin{2,26}
    */
   void get(BusType bus_type, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
   _IGNORE(g_bus_get)
@@ -128,52 +140,203 @@ public:
     DBusConnectionFlags flags, const Glib::RefPtr<DBusAuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
 
-  //TODO: Documentation.
+  /** Closes the connection. Note that this never causes the process to exit
+   * (this might only happen if the other end of a shared message bus
+   * connection disconnects, see property_exit_on_close()).
+   *
+   * Once the connection is closed, operations such as sending a message will
+   * return with the error Gio::IO_ERROR_CLOSED. Closing a connection will not
+   * automatically flush the connection so queued messages may be lost. Use
+   * flush() if you need such guarantees.
+   *
+   * If the connection is already closed, this method fails with
+   * Gio::IO_ERROR_CLOSED.
+   *
+   * When the connection has been closed, the "closed" signal is emitted in
+   * the thread-default main loop of the thread that connection was
+   * constructed in.
+   *
+   * This is an asynchronous method.  See close_sync() for the synchronous
+   * version.
+   *
+   * @newin{2,26}
+   */
   void close();
 
-  //TODO: Documentation.
+  /** Closes the connection. Note that this never causes the process to exit
+   * (this might only happen if the other end of a shared message bus
+   * connection disconnects, see property_exit_on_close()).
+   *
+   * Once the connection is closed, operations such as sending a message will
+   * return with the error Gio::IO_ERROR_CLOSED. Closing a connection will not
+   * automatically flush the connection so queued messages may be lost. Use
+   * flush() if you need such guarantees.
+   *
+   * If the connection is already closed, this method fails with
+   * Gio::IO_ERROR_CLOSED.
+   *
+   * When the connection has been closed, the "closed" signal is emitted in
+   * the thread-default main loop of the thread that connection was
+   * constructed in.
+   *
+   * This is an asynchronous method. When the operation is finished, @a slot
+   * will be invoked in the thread-default main loop of the thread you are
+   * calling this method from. You can then call close_finish() to get the
+   * result of the operation. See close_sync() for the synchronous version.
+   *
+   * @param slot A SlotAsyncReady to call when the request is satisfied.
+   * @param cancellable A Cancellable.
+   *
+   * @newin{2,26}
+   */
   void close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
 
-  //TODO: Documentation.
+  /** Closes the connection. Note that this never causes the process to exit
+   * (this might only happen if the other end of a shared message bus
+   * connection disconnects, see property_exit_on_close()).
+   *
+   * Once the connection is closed, operations such as sending a message will
+   * return with the error Gio::IO_ERROR_CLOSED. Closing a connection will not
+   * automatically flush the connection so queued messages may be lost. Use
+   * flush() if you need such guarantees.
+   *
+   * If the connection is already closed, this method fails with
+   * Gio::IO_ERROR_CLOSED.
+   *
+   * When the connection has been closed, the "closed" signal is emitted in
+   * the thread-default main loop of the thread that connection was
+   * constructed in.
+   *
+   * This is an asynchronous method. When the operation is finished, @a slot
+   * will be invoked in the thread-default main loop of the thread you are
+   * calling this method from. You can then call close_finish() to get the
+   * result of the operation. See close_sync() for the synchronous version.
+   *
+   * @param slot A SlotAsyncReady to call when the request is satisfied.
+   *
+   * @newin{2,26}
+   */
   void close(const SlotAsyncReady& slot);
   _IGNORE(g_dbus_connection_close)
 
   _WRAP_METHOD(bool close_finish(const Glib::RefPtr<AsyncResult>& result),
                g_dbus_connection_close_finish, errthrow)
 
-  //TODO: Documentation.
+  /** Synchronously closees the connection. The calling thread is blocked
+   * until this is done. See close() for the asynchronous version of this
+   * method and more details about what it does.
+   *
+   * @newin{2,26}
+   *
+   * @throw Glib::Error.
+   */
   void close_sync();
 
-  //TODO: Documentation.
   _WRAP_METHOD(void close_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_close_sync, errthrow)
 
-
-  //TODO: Documentation.
+  /** Asynchronously flushes the connection, that is, writes all queued
+   * outgoing message to the transport and then flushes the transport (using
+   * Gio::OutputStream::flush_async()). This is useful in programs that wants
+   * to emit a D-Bus signal and then exit immediately. Without flushing the
+   * connection, there is no guarantee that the message has been sent to the
+   * networking buffers in the OS kernel.
+   *
+   * This is an asynchronous method. See flush_sync() for the synchronous
+   * version.
+   *
+   * @newin{2,26}
+   */
   void flush();
 
-  //TODO: Documentation.
+  /** Asynchronously flushes the connection, that is, writes all queued
+   * outgoing message to the transport and then flushes the transport (using
+   * Gio::OutputStream::flush_async()). This is useful in programs that wants
+   * to emit a D-Bus signal and then exit immediately. Without flushing the
+   * connection, there is no guarantee that the message has been sent to the
+   * networking buffers in the OS kernel.
+   *
+   * This is an asynchronous method. When the operation is finished, @a slot
+   * will be invoked in the thread-default main loop of the thread you are
+   * calling this method from. You can then call flush_finish() to get the
+   * result of the operation. See flush_sync() for the synchronous version.
+   *
+   * @param slot A SlotAsyncReady to call when the request is satisfied.
+   * @param cancellable A Cancellable.
+   *
+   * @newin{2,26}
+   */
   void flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
 
-  //TODO: Documentation.
+  /** Asynchronously flushes the connection, that is, writes all queued
+   * outgoing message to the transport and then flushes the transport (using
+   * Gio::OutputStream::flush_async()). This is useful in programs that wants
+   * to emit a D-Bus signal and then exit immediately. Without flushing the
+   * connection, there is no guarantee that the message has been sent to the
+   * networking buffers in the OS kernel.
+   *
+   * This is an asynchronous method. When the operation is finished, @a slot
+   * will be invoked in the thread-default main loop of the thread you are
+   * calling this method from. You can then call flush_finish() to get the
+   * result of the operation. See flush_sync() for the synchronous version.
+   *
+   * @param slot A SlotAsyncReady to call when the request is satisfied.
+   *
+   * @newin{2,26}
+   */
   void flush(const SlotAsyncReady& slot);
   _IGNORE(g_dbus_connection_flush)
 
   _WRAP_METHOD(bool flush_finish(const Glib::RefPtr<AsyncResult>& result),
                g_dbus_connection_flush_finish, errthrow)
 
-  //TODO: Documentation.
+  /** Synchronously flushes the connection. The calling thread is blocked
+   * until this is done. See flush() for the asynchronous version of this
+   * method and more details about what it does.
+   *
+   * @newin{2,26}
+   *
+   * @throw Glib::Error.
+   */
   void flush_sync();
 
-  //TODO: Documentation.
   _WRAP_METHOD(void flush_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_flush_sync, errthrow)
 
   //TODO: In the C API, out_serial is volatile, but gmmproc can't parse that.
   #m4 _CONVERSION(`guint32*',`volatile guint32*',`($3)')
   _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32* out_serial), g_dbus_connection_send_message, errthrow)
 
-    //TODO: Documentation.
-  _IGNORE(g_dbus_connection_send_message_with_reply)
+  /** Asynchronously sends message to the peer represented by connection.
+   *
+   * Unless flags contain the Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL
+   * flag, the serial number will be assigned by connection and set on message
+   * via Gio::DBusMessage::set_serial().
+   *
+   * If the connection is closed then the operation will fail with
+   * Gio::IO_ERROR_CLOSED. If @a cancellable is canceled, the operation will
+   * fail with Gio::IO_ERROR_CANCELLED. If @a message is not well-formed, the
+   * operation fails with Gio::IO_ERROR_INVALID_ARGUMENT.
+   *
+   * This is an asynchronous method. When the operation is finished, @a slot
+   * will be invoked in the thread-default main loop of the thread you are
+   * calling this method from. You can then call
+   * send_message_with_reply_finish() to get the result of the operation. See
+   * send_message_with_reply_sync() for the synchronous version.
+   *
+   * Note that message must be unlocked, unless flags contain the
+   * Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL flag.
+   *
+   * See the C API docs for examples.
+   *
+   * @param message A DBusMessage.
+   * @param timeout_msec The timeout in milliseconds or -1 to use the default
+   * timeout.
+   * @param slot A SlotAsyncReady to call when the request is satisfied.
+   * @param cancellable A Cancellable.
+   *
+   * @newin{2,26}
+   */
   void send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+  _IGNORE(g_dbus_connection_send_message_with_reply)
 
   /// @throw Glib::Error.
   _WRAP_METHOD(Glib::RefPtr<DBusMessage> send_message_with_reply_finish(const Glib::RefPtr<AsyncResult>& result), g_dbus_connection_send_message_with_reply_finish, errthrow)
