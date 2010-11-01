@@ -18,6 +18,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#undef G_DISABLE_DEPRECATED //So we can use newly-deprecated API, to preserve our API.
 #include <glibmm/main.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/thread.h>
@@ -826,10 +827,18 @@ void Source::remove_poll(Glib::PollFD& poll_fd)
   g_source_remove_poll(gobject_, poll_fd.gobj());
 }
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 void Source::get_current_time(Glib::TimeVal& current_time)
 {
   g_source_get_current_time(gobject_, &current_time);
 }
+#endif //GLIBMM_DISABLE_DEPRECATED
+
+void Source::get_time(TimeSpec& timespec)
+{
+  g_source_get_time(gobject_, &timespec);
+}
+
 
 inline // static
 Source* Source::get_wrapper(GSource* source)

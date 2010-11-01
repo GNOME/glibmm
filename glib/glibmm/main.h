@@ -34,6 +34,8 @@ class Cond;
 class Mutex;
 class IOChannel;
 
+typedef GTimeSpec TimeSpec; //TODO: Really wrap this?
+
 /** @defgroup MainLoop The Main Event Loop
  * Manages all available sources of events.
  * @{
@@ -671,10 +673,29 @@ protected:
    */
   void remove_poll(PollFD& poll_fd);
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
   /** Gets the "current time" to be used when checking this source. The advantage of calling this function over calling get_current_time() directly is that when checking multiple sources, GLib can cache a single value instead of having to repeatedly get the system time.
-   * @param current_time Glib::TimeVal in which to store current time
+   * @param current_time Glib::TimeVal in which to store current time.
+   *
+   * @deprecated Use get_time() instead.
    */
   void get_current_time(Glib::TimeVal& current_time);
+#endif //GLIBMM_DISABLE_DEPRECATED
+
+  //TODO: Remove mention of g_get_monotonic time when we wrap it in C++.
+  /** Gets the time to be used when checking this source. The advantage of
+   * calling this function over calling g_get_monotonic_time() directly is
+   * that when checking multiple sources, GLib can cache a single value
+   * instead of having to repeatedly get the system monotonic time.
+   *
+   * The time here is the system monotonic time, if available, or some
+   * other reasonable alternative otherwise.  See g_get_monotonic_time().
+   *
+   * @param A TimeSpec in which to store the time.
+   *
+   * @newin{2,28}
+   */
+  void get_time(TimeSpec& timespec);
 
   virtual bool prepare(int& timeout) = 0;
   virtual bool check() = 0;
