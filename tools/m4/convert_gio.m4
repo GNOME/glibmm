@@ -34,6 +34,9 @@ _CONV_ENUM(G,SocketMsgFlags)
 _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketType)
 
+# ActionGroup
+_CONVERSION(`const Glib::RefPtr<ActionGroup>&',`GActionGroup*',__CONVERT_REFPTR_TO_P)
+
 # AppInfo
 _CONVERSION(`GAppInfo*',`Glib::RefPtr<AppInfo>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<AppLaunchContext>&',`GAppLaunchContext*',__CONVERT_REFPTR_TO_P)
