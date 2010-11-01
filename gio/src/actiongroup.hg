@@ -1,0 +1,70 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/interface.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gio/gio.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GActionGroupInterface GActionGroupInterface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+/** TODO
+ */
+class ActionGroup : public Glib::Interface
+{
+  _CLASS_INTERFACE(ActionGroup, GActionGroup, G_ACTION_GROUP, GActionGroupInterface)
+
+public:
+  _WRAP_METHOD(bool has_action(const Glib::ustring& action_name) const, g_action_group_has_action)
+
+  //TODO: _WRAP_METHOD(gchar** list_actions(), g_action_group_list_actions)
+
+  _WRAP_METHOD(bool get_action_enabled(const Glib::ustring& action_name) const, g_action_group_get_action_enabled)
+ 
+/* TODO:
+  _WRAP_METHOD(const GVariantType* get_action_parameter_type(const Glib::ustring& action_name), g_action_group_get_action_parameter_type)
+  GVariantType* get_action_state_type(const Glib::ustring& action_name), g_action_group_get_action_state_type)
+  _WRAP_METHOD(GVariant* get_action_state_hint(const Glib::ustring& action_name), g_action_group_get_action_state_hint)
+  _WRAP_METHOD(GVariant* get_action_state(GActionGroup* action_group, const gchar* action_name), g_action_group_get_action_state)
+*/
+
+  _WRAP_METHOD(void change_action_state(const Glib::ustring& action_name, const Glib::VariantBase& value), g_action_group_change_action_state)
+  _WRAP_METHOD(void activate_action(const Glib::ustring& action_name, const Glib::VariantBase& parameter), g_action_group_activate_action)
+  _WRAP_METHOD(void action_added(const Glib::ustring& action_name), g_action_group_action_added)
+  _WRAP_METHOD(void action_removed(const Glib::ustring& action_name), g_action_group_action_removed)
+  _WRAP_METHOD(void action_enabled_changed(const Glib::ustring& action_name, bool enabled), g_action_group_action_enabled_changed)
+  _WRAP_METHOD(void action_state_changed (const Glib::ustring& action_name, const Glib::VariantBase& state), g_action_group_action_state_changed)
+
+  _WRAP_SIGNAL(void action_added(const Glib::ustring& action_name), "action-added")
+  _WRAP_SIGNAL(void action_enabled_changed(const Glib::ustring& action_name, bool enabled), "action-enabled-changed")
+  _WRAP_SIGNAL(void action_removed(const Glib::ustring& action_name), "action-removed")
+
+#m4 _CONVERSION(`GVariant*', `const Glib::VariantBase&', `Glib::wrap($3, true)')
+  _WRAP_SIGNAL(void action_state_changed(const Glib::ustring& action_name, const Glib::VariantBase& value), "action-state-changed")
+
+//TODO: Wrap virtual functions.
+};
+
+} // namespace Gio
