@@ -62,7 +62,7 @@ void* SourceConnectionNode::notify(void* data)
   // because we set self->source_ to 0 there:
   if (self->source_)
   {
-    GSource* s = self->source_;  
+    GSource* s = self->source_;
     self->source_ = 0;
     g_source_destroy(s);
 
@@ -295,7 +295,7 @@ sigc::connection SignalTimeout::connect(const sigc::slot<bool>& slot,
   return connection;
 }
 
-void SignalTimeout::connect_once(const sigc::slot<void>& slot, 
+void SignalTimeout::connect_once(const sigc::slot<void>& slot,
                                  unsigned int interval, int priority)
 {
     connect(sigc::bind_return(slot, false), interval, priority);
@@ -324,7 +324,7 @@ sigc::connection SignalTimeout::connect_seconds(const sigc::slot<bool>& slot,
   return connection;
 }
 
-void SignalTimeout::connect_seconds_once(const sigc::slot<void>& slot, 
+void SignalTimeout::connect_seconds_once(const sigc::slot<void>& slot,
                                          unsigned int interval, int priority)
 {
     connect_seconds(sigc::bind_return(slot, false), interval, priority);
@@ -435,7 +435,7 @@ sigc::connection SignalChildWatch::connect(const sigc::slot<void, GPid, int>& sl
   const sigc::connection connection(*conn_node->get_slot());
 
   GSource *const source = g_child_watch_source_new(pid);
- 
+
   if(priority != G_PRIORITY_DEFAULT)
     g_source_set_priority(source, priority);
 
@@ -653,7 +653,7 @@ Glib::RefPtr<MainContext> MainLoop::get_context()
 int MainLoop::depth()
 {
   return g_main_depth();
-}                                             
+}
 
 void MainLoop::reference() const
 {
@@ -834,11 +834,10 @@ void Source::get_current_time(Glib::TimeVal& current_time)
 }
 #endif //GLIBMM_DISABLE_DEPRECATED
 
-void Source::get_time(TimeSpec& timespec)
+gint64 Source::get_time() const
 {
-  g_source_get_time(gobject_, &timespec);
+  return g_source_get_time(const_cast<GSource*>(gobject_));
 }
-
 
 inline // static
 Source* Source::get_wrapper(GSource* source)
@@ -1088,4 +1087,3 @@ bool IOSource::dispatch(sigc::slot_base* slot)
 }
 
 } // namespace Glib
-

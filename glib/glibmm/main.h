@@ -34,8 +34,6 @@ class Cond;
 class Mutex;
 class IOChannel;
 
-typedef GTimeSpec TimeSpec; //TODO: Really wrap this?
-
 /** @defgroup MainLoop The Main Event Loop
  * Manages all available sources of events.
  * @{
@@ -163,7 +161,7 @@ public:
   * void on_timeout_once()
   * @endcode
   * @param interval The timeout in milliseconds.
-  * @param priority The priority of the new event source. 
+  * @param priority The priority of the new event source.
   */
   void connect_once(const sigc::slot<void>& slot, unsigned int interval,
                     int priority = PRIORITY_DEFAULT);
@@ -210,7 +208,7 @@ public:
   * void on_timeout_once()
   * @endcode
   * @param interval The timeout in milliseconds.
-  * @param priority The priority of the new event source. 
+  * @param priority The priority of the new event source.
   */
   void connect_seconds_once(const sigc::slot<void>& slot, unsigned int interval,
                             int priority = PRIORITY_DEFAULT);
@@ -331,7 +329,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  sigc::connection connect(const sigc::slot<void,GPid, int>& slot, GPid pid, 
+  sigc::connection connect(const sigc::slot<void,GPid, int>& slot, GPid pid,
 int priority = PRIORITY_DEFAULT);
 private:
   GMainContext* context_;
@@ -373,16 +371,16 @@ public:
    * @return The new MainContext.
    */
   static Glib::RefPtr<MainContext> create();
-  /** Returns the default main context. 
+  /** Returns the default main context.
    * This is the main context used for main loop functions when a main loop is not explicitly specified.
    * @return The new MainContext.
    */
   static Glib::RefPtr<MainContext> get_default();
 
-  /** Runs a single iteration for the given main loop. 
-   * This involves checking to see if any event sources are ready to be processed, then if no events sources are 
-   * ready and may_block is true, waiting for a source to become ready, then dispatching the highest priority events 
-   * sources that are ready. Note that even when may_block is true, it is still possible for iteration() to return 
+  /** Runs a single iteration for the given main loop.
+   * This involves checking to see if any event sources are ready to be processed, then if no events sources are
+   * ready and may_block is true, waiting for a source to become ready, then dispatching the highest priority events
+   * sources that are ready. Note that even when may_block is true, it is still possible for iteration() to return
    * false, since the the wait may be interrupted for other reasons than an event source becoming ready.
    * @param may_block Whether the call may block.
    * @return true if events were dispatched.
@@ -398,9 +396,9 @@ public:
    */
   void wakeup();
 
-  /** Tries to become the owner of the specified context. 
-   * If some other context is the owner of the context, returns FALSE immediately. Ownership is properly recursive: 
-   * the owner can require ownership again and will release ownership when release() is called as many times as 
+  /** Tries to become the owner of the specified context.
+   * If some other context is the owner of the context, returns FALSE immediately. Ownership is properly recursive:
+   * the owner can require ownership again and will release ownership when release() is called as many times as
    * acquire().
    * You must be the owner of a context before you can call prepare(), query(), check(), dispatch().
    * @return true if the operation succeeded, and this thread is now the owner of context.
@@ -408,8 +406,8 @@ public:
   bool acquire();
 
 
-  /** Tries to become the owner of the specified context, as with acquire(). But if another thread is the owner, 
-   * atomically drop mutex and wait on cond until that owner releases ownership or until cond is signaled, then try 
+  /** Tries to become the owner of the specified context, as with acquire(). But if another thread is the owner,
+   * atomically drop mutex and wait on cond until that owner releases ownership or until cond is signaled, then try
    * again (once) to become the owner.
    * @param cond A condition variable.
    * @param mutex A mutex, currently held.
@@ -417,7 +415,7 @@ public:
    */
   bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
 
-  /** Releases ownership of a context previously acquired by this thread with acquire(). If the context was acquired 
+  /** Releases ownership of a context previously acquired by this thread with acquire(). If the context was acquired
    * multiple times, the only release ownership when release() is called as many times as it was acquired.
    */
   void release();
@@ -470,7 +468,7 @@ public:
    * @param priority The priority for this file descriptor which should be the same as the priority used for Glib::Source::attach() to ensure that the file descriptor is polled whenever the results may be needed.
    */
   void add_poll(PollFD& fd, int priority);
-  
+
   /** Removes file descriptor from the set of file descriptors to be polled for a particular context.
    * @param fd A PollFD structure holding information about a file descriptor.
    */
@@ -528,7 +526,7 @@ public:
   static Glib::RefPtr<MainLoop> create(const Glib::RefPtr<MainContext>& context,
                                        bool is_running = false);
 
-  /** Runs a main loop until quit() is called on the loop. 
+  /** Runs a main loop until quit() is called on the loop.
    * If this is called for the thread of the loop's MainContext, it will process events from the loop, otherwise it will simply wait.
    */
   void run();
@@ -554,7 +552,7 @@ public:
    */
   void reference()   const;
 
-  /** Decreases the reference count on a MainLoop object by one. 
+  /** Decreases the reference count on a MainLoop object by one.
    * If the result is zero, free the loop and free all associated memory.
    */
   void unreference() const;
@@ -597,8 +595,8 @@ public:
   unsigned int attach();
 
   //TODO: Does this destroy step make sense in C++? Should it just be something that happens in a destructor?
-  
-  /** Removes a source from its MainContext, if any, and marks it as destroyed. 
+
+  /** Removes a source from its MainContext, if any, and marks it as destroyed.
    * The source cannot be subsequently added to another context.
    */
   void destroy();
@@ -607,33 +605,33 @@ public:
    * @param priority The new priority.
    */
   void set_priority(int priority);
-  
+
   /** Gets the priority of a source.
    * @return The priority of the source.
    */
   int  get_priority() const;
 
-  /** Sets whether a source can be called recursively. 
+  /** Sets whether a source can be called recursively.
    * If @a can_recurse is true, then while the source is being dispatched then this source will be processed normally. Otherwise, all processing of this source is blocked until the dispatch function returns.
    * @param can_recurse Whether recursion is allowed for this source.
    */
   void set_can_recurse(bool can_recurse);
-  
+
   /** Checks whether a source is allowed to be called recursively. see set_can_recurse().
    * @return Whether recursion is allowed.
    */
   bool get_can_recurse() const;
 
-  /** Returns the numeric ID for a particular source. 
+  /** Returns the numeric ID for a particular source.
    * The ID of a source is unique within a particular main loop context. The reverse mapping from ID to source is done by MainContext::find_source_by_id().
    * @return The ID for the source.
    */
   unsigned int get_id() const;
 
   //TODO: Add a const version of this method?
-  /** Gets the MainContext with which the source is associated. 
+  /** Gets the MainContext with which the source is associated.
    * Calling this function on a destroyed source is an error.
-   * @return The MainContext with which the source is associated, or a null RefPtr if the context has not yet been added to a source. 
+   * @return The MainContext with which the source is associated, or a null RefPtr if the context has not yet been added to a source.
    */
   Glib::RefPtr<MainContext> get_context();
 
@@ -662,14 +660,14 @@ protected:
 
   sigc::connection connect_generic(const sigc::slot_base& slot);
 
-  /** Adds a file descriptor to the set of file descriptors polled for this source. 
+  /** Adds a file descriptor to the set of file descriptors polled for this source.
    * The event source's check function will typically test the revents field in the PollFD  and return true if events need to be processed.
    * @param poll_fd A PollFD object holding information about a file descriptor to watch.
    */
   void add_poll(PollFD& poll_fd);
-  
+
   /** Removes a file descriptor from the set of file descriptors polled for this source.
-   * @param poll_fd A PollFD object previously passed to add_poll(). 
+   * @param poll_fd A PollFD object previously passed to add_poll().
    */
   void remove_poll(PollFD& poll_fd);
 
@@ -691,11 +689,11 @@ protected:
    * The time here is the system monotonic time, if available, or some
    * other reasonable alternative otherwise.  See g_get_monotonic_time().
    *
-   * @param A TimeSpec in which to store the time.
+   * @result The monotonic time in microseconds.
    *
    * @newin{2,28}
    */
-  void get_time(TimeSpec& timespec);
+  gint64 get_time() const;
 
   virtual bool prepare(int& timeout) = 0;
   virtual bool check() = 0;
@@ -793,4 +791,3 @@ private:
 
 
 #endif /* _GLIBMM_MAIN_H */
-
