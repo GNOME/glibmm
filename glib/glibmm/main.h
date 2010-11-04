@@ -740,7 +740,9 @@ protected:
   virtual bool dispatch(sigc::slot_base* slot);
 
 private:
+  //TODO: Replace with gint64, because TimeVal is deprecated, when we can break ABI.
   Glib::TimeVal expiration_;
+
   unsigned int  interval_;
 };
 
