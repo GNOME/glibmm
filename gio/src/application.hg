@@ -31,7 +31,49 @@ _WRAP_ENUM(ApplicationFlags, GApplicationFlags, NO_GTYPE)
 
 class ActionGroup;
 
-/** TODO
+/** Application - Core application class.
+ * A Application is the foundation of an application, unique for a given
+ * application identifier. The Application class wraps some low-level
+ * platform-specific services and is intended to act as the foundation for
+ * higher-level application classes such as Gtk::Application or MxApplication.
+ * In general, you should not use this class outside of a higher level
+ * framework.
+ *
+ * One of the core features that GApplication provides is process uniqueness,
+ * in the context of a "session". The session concept is platform-dependent,
+ * but corresponds roughly to a graphical desktop login. When your application
+ * is launched again, its arguments are passed through platform communication
+ * to the already running program. The already running instance of the program
+ * is called the <i>primary instance</i>.
+ *
+ * Before using Application, you must choose an "application identifier". The
+ * expected form of an application identifier is very close to that of of a
+ * <a href="
+ * http://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names-interface">DBus
+ * bus name</a>. Examples include: "com.example.MyApp",
+ * "org.example.internal-apps.Calculator". For details on valid application
+ * identifiers, see id_is_valid().
+ *
+ * Application provides convenient life cycle management by maintaining a
+ * <i>use count</i> for the primary application instance. The use count can be
+ * changed using hold() and release(). If it drops to zero, the application
+ * exits.
+ *
+ * GApplication also implements the ActionGroup interface and lets you easily
+ * export actions by adding them with set_action_group(). When
+ * invoking an action by calling Gio::ActionGroup::activate_action() on the
+ * application, it is always invoked in the primary instance.
+ *
+ * There is a number of different entry points into a Application:
+ *
+ * - via 'Activate' (i.e. just starting the application)
+ * - via 'Open' (i.e. opening some files)
+ * - via activating an action
+ *
+ * The signal_startup() signal lets you handle the application initialization
+ * for all of these in a single place.
+ *
+ * See the C API docs for an example.
  *
  * @newin{2,26}
  */
@@ -47,7 +89,7 @@ public:
 
   _WRAP_METHOD(static Glib::RefPtr<Application> create(const Glib::ustring& appid, ApplicationFlags flags = APPLICATION_FLAGS_NONE), g_application_new)
 
-  _WRAP_METHOD(static bool is_valid(const Glib::ustring& application_id), g_application_id_is_valid) 
+  _WRAP_METHOD(static bool id_is_valid(const Glib::ustring& application_id), g_application_id_is_valid) 
 
   _WRAP_METHOD(Glib::ustring get_id() const, g_application_get_application_id)
   _WRAP_METHOD(void set_id(const Glib::ustring& application_id), g_application_set_application_id)
