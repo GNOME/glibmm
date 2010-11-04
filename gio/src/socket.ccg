@@ -137,4 +137,28 @@ gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, 
   return retvalue;
 }
 
+gssize Socket::receive_with_blocking(gchar* buffer, gsize size, bool blocking,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  GError* gerror = 0;
+  gssize const retvalue = g_socket_receive_with_blocking(gobj(), buffer, size,
+    blocking, Glib::unwrap(cancellable), &(gerror));
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return retvalue;
+}
+
+gssize Socket::send_with_blocking(gchar* buffer, gsize size, bool blocking,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  GError* gerror = 0;
+  gssize const retvalue = g_socket_send_with_blocking(gobj(), buffer, size,
+    blocking, Glib::unwrap(cancellable), &(gerror));
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return retvalue;
+}
+
 } // namespace Gio
