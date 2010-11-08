@@ -49,11 +49,25 @@ class UnixSocketAddress
   _CLASS_GOBJECT(UnixSocketAddress, GUnixSocketAddress, G_UNIX_SOCKET_ADDRESS, SocketAddress, GSocketAddress)
 
 protected:
- _WRAP_CTOR(UnixSocketAddress(const std::string& path, int path_len = -1, UnixSocketAddressType type = Gio::UNIX_SOCKET_ADDRESS_PATH), g_unix_socket_address_new_with_type)
+ _WRAP_CTOR(UnixSocketAddress(const std::string& path), g_unix_socket_address_new)
+
+ //TODO: Possibly add when g_unix_socket_address_new_with_type() does not do
+ //more than call g_object_new() (maybe file a bug).
+ //_WRAP_CTOR(UnixSocketAddress(const std::string& path, int path_len = -1, UnixSocketAddressType type = Gio::UNIX_SOCKET_ADDRESS_PATH), g_unix_socket_address_new_with_type)
 
 public:
+ _WRAP_METHOD_DOCS_ONLY(g_unix_socket_address_new)
+ _WRAP_CREATE(const std::string& path)
+
+ //TODO: Add when the above constructor is included, removing the handwritten
+ //create() method for it below.
+ //_WRAP_METHOD_DOCS_ONLY(g_unix_socket_address_new_with_type)
+ //_WRAP_CREATE(const std::string& path, int path_len = -1, UnixSocketAddressType type = Gio::UNIX_SOCKET_ADDRESS_PATH)
+
  _WRAP_METHOD_DOCS_ONLY(g_unix_socket_address_new_with_type)
- _WRAP_CREATE(const std::string& path, int path_len = -1, UnixSocketAddressType type = Gio::UNIX_SOCKET_ADDRESS_PATH)
+ static Glib::RefPtr<UnixSocketAddress> create(const std::string& path,
+   UnixSocketAddressType type = Gio::UNIX_SOCKET_ADDRESS_ABSTRACT,
+   int path_len = -1);
 
  // Deprecated.
  _IGNORE(g_unix_socket_address_get_is_abstract)
