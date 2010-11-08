@@ -185,8 +185,8 @@ void ObjectBase::destroy_notify_callback_(void* data)
   ObjectBase* cppObject = static_cast<ObjectBase*>(data); //Previously set with g_object_set_qdata_full().
 
 #ifdef GLIBMM_DEBUG_REFCOUNTING
-  g_warning("ObjectBase::destroy_notify_callback_: cppObject = %p, gobject_ = %p, gtypename = %s",
-            (void*) cppObject, (void*) cppObject->gobject_, cppObject->gobject_);
+  g_warning("ObjectBase::destroy_notify_callback_: cppObject = %p, gobject_ = %p, gtypename = %s\n",
+            (void*) cppObject, (void*) cppObject->gobject_, G_OBJECT_TYPE_NAME(cppObject->gobject_));
 #endif
 
   if(cppObject) //This will be 0 if the C++ destructor has already run.
