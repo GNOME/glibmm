@@ -1,0 +1,73 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2010 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <giomm/socketaddress.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(giomm/private/socketaddress_p.h)
+
+namespace Gio
+{
+
+_WRAP_ENUM(UnixSocketAddressType, GUnixSocketAddressType)
+
+/** UnixSocketAddress - UNIX SocketAddress.
+ * Support for UNIX-domain (also known as local) sockets.
+ *
+ * UNIX domain sockets are generally visible in the filesystem. However, some
+ * systems support abstract socket names which are not visible in the
+ * filesystem and not affected by the filesystem permissions, visibility, etc.
+ * Currently this is only supported under Linux. If you attempt to use
+ * abstract sockets on other systems, function calls may return
+ * Gio::IO_ERROR_NOT_SUPPORTED errors. You can use
+ * Gio::UnixSocketAddress::abstract_names_supported() to see if abstract names
+ * are supported.
+ *
+ * Note that @c <giomm/unixsocketaddress.h> belongs to the UNIX-specific GIO
+ * interfaces.
+ * @newin{2,28}
+ */
+class UnixSocketAddress
+: public SocketAddress
+{
+  _CLASS_GOBJECT(UnixSocketAddress, GUnixSocketAddress, G_UNIX_SOCKET_ADDRESS, SocketAddress, GSocketAddress)
+
+protected:
+ _WRAP_CTOR(UnixSocketAddress(const std::string& path, int path_len = -1, UnixSocketAddressType type = Gio::UNIX_SOCKET_ADDRESS_PATH), g_unix_socket_address_new_with_type)
+
+public:
+ _WRAP_METHOD_DOCS_ONLY(g_unix_socket_address_new_with_type)
+ _WRAP_CREATE(const std::string& path, int path_len = -1, UnixSocketAddressType type = Gio::UNIX_SOCKET_ADDRESS_PATH)
+
+ // Deprecated.
+ _IGNORE(g_unix_socket_address_get_is_abstract)
+
+ _WRAP_METHOD(UnixSocketAddressType get_address_type() const, g_unix_socket_address_get_address_type)
+ _WRAP_METHOD(std::string get_path() const, g_unix_socket_address_get_path)
+
+ //TODO?: _WRAP_METHOD(gszie get_path_len() const, g_unix_socket_address_get_path_len)
+
+ _WRAP_METHOD(static bool abstract_names_supported(), g_unix_socket_address_abstract_names_supported)
+
+ _WRAP_PROPERTY("abstract", bool)
+ _WRAP_PROPERTY("address-type", UnixSocketAddressType)
+ _WRAP_PROPERTY("path", std::string)
+};
+
+} // namespace Gio

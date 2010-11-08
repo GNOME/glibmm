@@ -33,6 +33,7 @@ _CONV_ENUM(G,SocketFamily)
 _CONV_ENUM(G,SocketMsgFlags)
 _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketType)
+_CONV_ENUM(G,UnixSocketAddressType)
 
 # ActionGroup
 _CONVERSION(`const Glib::RefPtr<ActionGroup>&',`GActionGroup*',__CONVERT_REFPTR_TO_P)

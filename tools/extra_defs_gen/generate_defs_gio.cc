@@ -25,11 +25,12 @@
 #include <gio/gsettingsbackend.h>
 
 #ifndef G_OS_WIN32
+# include <gio/gunixconnection.h>
 #include <gio/gunixcredentialsmessage.h>
 # include <gio/gunixfdmessage.h>
 # include <gio/gunixinputstream.h>
 # include <gio/gunixoutputstream.h>
-# include <gio/gunixconnection.h>
+# include <gio/gunixsocketaddress.h>
 #endif
 
 int main(int, char**)
@@ -63,6 +64,7 @@ int main(int, char**)
             << get_defs(G_TYPE_UNIX_FD_MESSAGE)
             << get_defs(G_TYPE_UNIX_INPUT_STREAM)
             << get_defs(G_TYPE_UNIX_OUTPUT_STREAM)
+            << get_defs(G_TYPE_UNIX_SOCKET_ADDRESS)
 #endif
 
             << get_defs(G_TYPE_INPUT_STREAM)
