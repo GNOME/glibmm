@@ -20,6 +20,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <giomm/actiongroup.h>
 #include <giomm/appinfo.h>
 #include <giomm/application.h>
 #include <giomm/asyncresult.h>
@@ -93,6 +94,7 @@
 # include <giomm/unixfdmessage.h>
 # include <giomm/unixinputstream.h>
 # include <giomm/unixoutputstream.h>
+# include <giomm/unixsocketaddress.h>
 #endif
 #include <giomm/volume.h>
 #include <giomm/volumemonitor.h>
