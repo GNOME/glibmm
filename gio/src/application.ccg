@@ -24,5 +24,21 @@
 namespace Gio
 {
 
+void Application::open(const type_vec_files& files, const Glib::ustring& hint)
+{
+  //TODO: Create a templated helper function for this:
+  typedef GFile* cpointer;
+  cpointer* files_array = new cpointer[files.size()];
+  guint i = 0;
+  for(type_vec_files::const_iterator iter = files.begin(); iter != files.end(); iter++)
+  {
+    type_vec_files::const_reference refPtr = *iter;
+    files_array[i] = refPtr->gobj();
+  }
+
+  g_application_open(gobj(), files_array, files.size(), hint.c_str());
+
+  delete[] files_array ;
+}
 
 } // namespace Gio

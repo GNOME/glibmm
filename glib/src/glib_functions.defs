@@ -635,6 +635,17 @@
 )
 
 (define-enum Type
+  (in-module "GTime")
+  (c-name "GTimeType")
+  (gtype-id "G_TYPE_TIME_TYPE")
+  (values
+    '("standard" "G_TIME_TYPE_STANDARD")
+    '("daylight" "G_TIME_TYPE_DAYLIGHT")
+    '("universal" "G_TIME_TYPE_UNIVERSAL")
+  )
+)
+
+(define-enum Type
   (in-module "GUnicode")
   (c-name "GUnicodeType")
   (gtype-id "G_TYPE_UNICODE_TYPE")
@@ -2306,20 +2317,6 @@
   (return-type "gint")
 )
 
-(define-function g_convert
-  (c-name "g_convert")
-  (return-type "gchar*")
-  (parameters
-    '("const-gchar*" "str")
-    '("gssize" "len")
-    '("const-gchar*" "to_codeset")
-    '("const-gchar*" "from_codeset")
-    '("gsize*" "bytes_read")
-    '("gsize*" "bytes_written")
-    '("GError**" "error")
-  )
-)
-
 (define-function g_convert_with_iconv
   (c-name "g_convert_with_iconv")
   (return-type "gchar*")
@@ -2976,65 +2973,10 @@
 
 ;; From gdatetime.h
 
-(define-function g_date_time_new_now
-  (c-name "g_date_time_new_now")
-  (return-type "GDateTime*")
-)
-
-(define-function g_date_time_new_today
-  (c-name "g_date_time_new_today")
-  (return-type "GDateTime*")
-)
-
-(define-function g_date_time_new_utc_now
-  (c-name "g_date_time_new_utc_now")
-  (return-type "GDateTime*")
-)
-
-(define-function g_date_time_new_from_date
-  (c-name "g_date_time_new_from_date")
-  (return-type "GDateTime*")
-  (parameters
-    '("gint" "year")
-    '("gint" "month")
-    '("gint" "day")
-  )
-)
-
-(define-function g_date_time_new_from_epoch
-  (c-name "g_date_time_new_from_epoch")
-  (return-type "GDateTime*")
-  (parameters
-    '("gint64" "secs")
-  )
-)
-
-(define-function g_date_time_new_from_timeval
-  (c-name "g_date_time_new_from_timeval")
-  (return-type "GDateTime*")
-  (parameters
-    '("GTimeVal*" "tv")
-  )
-)
-
-(define-function g_date_time_new_full
-  (c-name "g_date_time_new_full")
-  (return-type "GDateTime*")
-  (parameters
-    '("gint" "year")
-    '("gint" "month")
-    '("gint" "day")
-    '("gint" "hour")
-    '("gint" "minute")
-    '("gint" "second")
-    '("const-gchar*" "time_zone")
-  )
-)
-
-(define-method copy
+(define-method unref
   (of-object "GDateTime")
-  (c-name "g_date_time_copy")
-  (return-type "GDateTime*")
+  (c-name "g_date_time_unref")
+  (return-type "none")
 )
 
 (define-method ref
@@ -3043,111 +2985,95 @@
   (return-type "GDateTime*")
 )
 
-(define-method unref
-  (of-object "GDateTime")
-  (c-name "g_date_time_unref")
-  (return-type "none")
-)
-
-(define-method add
-  (of-object "GDateTime")
-  (c-name "g_date_time_add")
+(define-function g_date_time_new_now
+  (c-name "g_date_time_new_now")
   (return-type "GDateTime*")
   (parameters
-    '("GTimeSpan" "timespan")
+    '("GTimeZone*" "tz")
   )
 )
 
-(define-method add_days
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_days")
+(define-function g_date_time_new_now_local
+  (c-name "g_date_time_new_now_local")
+  (return-type "GDateTime*")
+)
+
+(define-function g_date_time_new_now_utc
+  (c-name "g_date_time_new_now_utc")
+  (return-type "GDateTime*")
+)
+
+(define-function g_date_time_new_from_unix_local
+  (c-name "g_date_time_new_from_unix_local")
   (return-type "GDateTime*")
   (parameters
-    '("gint" "days")
+    '("gint64" "t")
   )
 )
 
-(define-method add_hours
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_hours")
+(define-function g_date_time_new_from_unix_utc
+  (c-name "g_date_time_new_from_unix_utc")
   (return-type "GDateTime*")
   (parameters
-    '("gint" "hours")
+    '("gint64" "t")
   )
 )
 
-(define-method add_milliseconds
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_milliseconds")
+(define-function g_date_time_new_from_timeval_local
+  (c-name "g_date_time_new_from_timeval_local")
   (return-type "GDateTime*")
   (parameters
-    '("gint" "milliseconds")
+    '("const-GTimeVal*" "tv")
   )
 )
 
-(define-method add_minutes
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_minutes")
+(define-function g_date_time_new_from_timeval_utc
+  (c-name "g_date_time_new_from_timeval_utc")
   (return-type "GDateTime*")
   (parameters
-    '("gint" "minutes")
+    '("const-GTimeVal*" "tv")
   )
 )
 
-(define-method add_months
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_months")
+(define-function g_date_time_new
+  (c-name "g_date_time_new")
+  (is-constructor-of "GDateTime")
   (return-type "GDateTime*")
   (parameters
-    '("gint" "months")
+    '("GTimeZone*" "tz")
+    '("gint" "year")
+    '("gint" "month")
+    '("gint" "day")
+    '("gint" "hour")
+    '("gint" "minute")
+    '("gdouble" "seconds")
   )
 )
 
-(define-method add_seconds
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_seconds")
+(define-function g_date_time_new_local
+  (c-name "g_date_time_new_local")
   (return-type "GDateTime*")
   (parameters
-    '("gint" "seconds")
+    '("gint" "year")
+    '("gint" "month")
+    '("gint" "day")
+    '("gint" "hour")
+    '("gint" "minute")
+    '("gdouble" "seconds")
   )
 )
 
-(define-method add_weeks
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_weeks")
+(define-function g_date_time_new_utc
+  (c-name "g_date_time_new_utc")
   (return-type "GDateTime*")
   (parameters
-    '("gint" "weeks")
+    '("gint" "year")
+    '("gint" "month")
+    '("gint" "day")
+    '("gint" "hour")
+    '("gint" "minute")
+    '("gdouble" "seconds")
   )
-)
-
-(define-method add_years
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_years")
-  (return-type "GDateTime*")
-  (parameters
-    '("gint" "years")
-  )
-)
-
-(define-method add_full
-  (of-object "GDateTime")
-  (c-name "g_date_time_add_full")
-  (return-type "GDateTime*")
-  (parameters
-    '("gint" "years")
-    '("gint" "months")
-    '("gint" "days")
-    '("gint" "hours")
-    '("gint" "minutes")
-    '("gint" "seconds")
-  )
-)
-
-(define-method day
-  (of-object "GDateTime")
-  (c-name "g_date_time_day")
-  (return-type "GDateTime*")
 )
 
 (define-function g_date_time_compare
@@ -3156,6 +3082,23 @@
   (parameters
     '("gconstpointer" "dt1")
     '("gconstpointer" "dt2")
+  )
+)
+
+(define-method difference
+  (of-object "GDateTime")
+  (c-name "g_date_time_difference")
+  (return-type "GTimeSpan")
+  (parameters
+    '("GDateTime*" "begin")
+  )
+)
+
+(define-function g_date_time_hash
+  (c-name "g_date_time_hash")
+  (return-type "guint")
+  (parameters
+    '("gconstpointer" "datetime")
   )
 )
 
@@ -3168,34 +3111,57 @@
   )
 )
 
-(define-function g_date_time_hash
-  (c-name "g_date_time_hash")
-  (return-type "guint")
-  (parameters
-    '("gconstpointer" "datetime")
-  )
-)
-
-(define-method difference
+(define-method get_ymd
   (of-object "GDateTime")
-  (c-name "g_date_time_difference")
-  (return-type "GTimeSpan")
-  (parameters
-    '("const-GDateTime*" "end")
-  )
-)
-
-(define-method get_julian
-  (of-object "GDateTime")
-  (c-name "g_date_time_get_julian")
+  (c-name "g_date_time_get_ymd")
   (return-type "none")
   (parameters
-    '("gint*" "period")
-    '("gint*" "julian")
-    '("gint*" "hour")
-    '("gint*" "minute")
-    '("gint*" "second")
+    '("gint*" "year")
+    '("gint*" "month")
+    '("gint*" "day")
   )
+)
+
+(define-method get_year
+  (of-object "GDateTime")
+  (c-name "g_date_time_get_year")
+  (return-type "gint")
+)
+
+(define-method get_month
+  (of-object "GDateTime")
+  (c-name "g_date_time_get_month")
+  (return-type "gint")
+)
+
+(define-method get_day_of_month
+  (of-object "GDateTime")
+  (c-name "g_date_time_get_day_of_month")
+  (return-type "gint")
+)
+
+(define-method get_week_numbering_year
+  (of-object "GDateTime")
+  (c-name "g_date_time_get_week_numbering_year")
+  (return-type "gint")
+)
+
+(define-method get_week_of_year
+  (of-object "GDateTime")
+  (c-name "g_date_time_get_week_of_year")
+  (return-type "gint")
+)
+
+(define-method get_day_of_week
+  (of-object "GDateTime")
+  (c-name "g_date_time_get_day_of_week")
+  (return-type "gint")
+)
+
+(define-method get_day_of_year
+  (of-object "GDateTime")
+  (c-name "g_date_time_get_day_of_year")
+  (return-type "gint")
 )
 
 (define-method get_hour
@@ -3216,62 +3182,30 @@
   (return-type "gint")
 )
 
-(define-method get_millisecond
-  (of-object "GDateTime")
-  (c-name "g_date_time_get_millisecond")
-  (return-type "gint")
-)
-
 (define-method get_microsecond
   (of-object "GDateTime")
   (c-name "g_date_time_get_microsecond")
   (return-type "gint")
 )
 
-(define-method get_day_of_week
+(define-method get_seconds
   (of-object "GDateTime")
-  (c-name "g_date_time_get_day_of_week")
-  (return-type "gint")
+  (c-name "g_date_time_get_seconds")
+  (return-type "gdouble")
 )
 
-(define-method get_day_of_month
+(define-method to_unix
   (of-object "GDateTime")
-  (c-name "g_date_time_get_day_of_month")
-  (return-type "gint")
+  (c-name "g_date_time_to_unix")
+  (return-type "gint64")
 )
 
-(define-method get_week_of_year
+(define-method to_timeval
   (of-object "GDateTime")
-  (c-name "g_date_time_get_week_of_year")
-  (return-type "gint")
-)
-
-(define-method get_day_of_year
-  (of-object "GDateTime")
-  (c-name "g_date_time_get_day_of_year")
-  (return-type "gint")
-)
-
-(define-method get_month
-  (of-object "GDateTime")
-  (c-name "g_date_time_get_month")
-  (return-type "gint")
-)
-
-(define-method get_year
-  (of-object "GDateTime")
-  (c-name "g_date_time_get_year")
-  (return-type "gint")
-)
-
-(define-method get_dmy
-  (of-object "GDateTime")
-  (c-name "g_date_time_get_dmy")
-  (return-type "none")
+  (c-name "g_date_time_to_timeval")
+  (return-type "gboolean")
   (parameters
-    '("gint*" "day")
-    '("gint*" "month")
-    '("gint*" "year")
+    '("GTimeVal*" "tv")
   )
 )
 
@@ -3281,16 +3215,10 @@
   (return-type "GTimeSpan")
 )
 
-(define-method get_timezone_name
+(define-method get_timezone_abbreviation
   (of-object "GDateTime")
-  (c-name "g_date_time_get_timezone_name")
+  (c-name "g_date_time_get_timezone_abbreviation")
   (return-type "const-gchar*")
-)
-
-(define-method is_leap_year
-  (of-object "GDateTime")
-  (c-name "g_date_time_is_leap_year")
-  (return-type "gboolean")
 )
 
 (define-method is_daylight_savings
@@ -3299,25 +3227,19 @@
   (return-type "gboolean")
 )
 
+(define-method to_timezone
+  (of-object "GDateTime")
+  (c-name "g_date_time_to_timezone")
+  (return-type "GDateTime*")
+  (parameters
+    '("GTimeZone*" "tz")
+  )
+)
+
 (define-method to_local
   (of-object "GDateTime")
   (c-name "g_date_time_to_local")
   (return-type "GDateTime*")
-)
-
-(define-method to_epoch
-  (of-object "GDateTime")
-  (c-name "g_date_time_to_epoch")
-  (return-type "gint64")
-)
-
-(define-method to_timeval
-  (of-object "GDateTime")
-  (c-name "g_date_time_to_timeval")
-  (return-type "none")
-  (parameters
-    '("GTimeVal*" "tv")
-  )
 )
 
 (define-method to_utc
@@ -3326,9 +3248,9 @@
   (return-type "GDateTime*")
 )
 
-(define-method printf
+(define-method format
   (of-object "GDateTime")
-  (c-name "g_date_time_printf")
+  (c-name "g_date_time_format")
   (return-type "gchar*")
   (parameters
     '("const-gchar*" "format")
@@ -5099,6 +5021,15 @@
   (return-type "none")
 )
 
+(define-method free_full
+  (of-object "GList")
+  (c-name "g_list_free_full")
+  (return-type "none")
+  (parameters
+    '("GDestroyNotify" "free_func")
+  )
+)
+
 (define-method append
   (of-object "GList")
   (c-name "g_list_append")
@@ -5758,6 +5689,12 @@
   )
 )
 
+(define-method get_time
+  (of-object "GSource")
+  (c-name "g_source_get_time")
+  (return-type "gint64")
+)
+
 (define-function g_idle_source_new
   (c-name "g_idle_source_new")
   (is-constructor-of "GIdleSource")
@@ -5796,6 +5733,16 @@
   (parameters
     '("GTimeVal*" "result")
   )
+)
+
+(define-function g_get_monotonic_time
+  (c-name "g_get_monotonic_time")
+  (return-type "gint64")
+)
+
+(define-function g_get_real_time
+  (c-name "g_get_real_time")
+  (return-type "gint64")
 )
 
 (define-function g_source_remove
@@ -5917,6 +5864,28 @@
   )
 )
 
+(define-method invoke_full
+  (of-object "GMainContext")
+  (c-name "g_main_context_invoke_full")
+  (return-type "none")
+  (parameters
+    '("gint" "priority")
+    '("GSourceFunc" "function")
+    '("gpointer" "data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-method invoke
+  (of-object "GMainContext")
+  (c-name "g_main_context_invoke")
+  (return-type "none")
+  (parameters
+    '("GSourceFunc" "function")
+    '("gpointer" "data")
+  )
+)
+
 
 
 ;; From gmappedfile.h
@@ -6005,7 +5974,7 @@
   (c-name "g_markup_parse_context_push")
   (return-type "none")
   (parameters
-    '("GMarkupParser*" "parser")
+    '("const-GMarkupParser*" "parser")
     '("gpointer" "user_data")
   )
 )
@@ -8631,6 +8600,15 @@
   (return-type "none")
 )
 
+(define-method free_full
+  (of-object "GSList")
+  (c-name "g_slist_free_full")
+  (return-type "none")
+  (parameters
+    '("GDestroyNotify" "free_func")
+  )
+)
+
 (define-method append
   (of-object "GSList")
   (c-name "g_slist_append")
@@ -10768,6 +10746,88 @@
 
 
 
+;; From gtimezone.h
+
+(define-function g_time_zone_new
+  (c-name "g_time_zone_new")
+  (is-constructor-of "GTimeZone")
+  (return-type "GTimeZone*")
+  (parameters
+    '("const-gchar*" "identifier")
+  )
+)
+
+(define-function g_time_zone_new_utc
+  (c-name "g_time_zone_new_utc")
+  (return-type "GTimeZone*")
+)
+
+(define-function g_time_zone_new_local
+  (c-name "g_time_zone_new_local")
+  (return-type "GTimeZone*")
+)
+
+(define-method ref
+  (of-object "GTimeZone")
+  (c-name "g_time_zone_ref")
+  (return-type "GTimeZone*")
+)
+
+(define-method unref
+  (of-object "GTimeZone")
+  (c-name "g_time_zone_unref")
+  (return-type "none")
+)
+
+(define-method find_interval
+  (of-object "GTimeZone")
+  (c-name "g_time_zone_find_interval")
+  (return-type "gint")
+  (parameters
+    '("GTimeType" "type")
+    '("gint64" "time")
+  )
+)
+
+(define-method adjust_time
+  (of-object "GTimeZone")
+  (c-name "g_time_zone_adjust_time")
+  (return-type "gint")
+  (parameters
+    '("GTimeType" "type")
+    '("gint64*" "time")
+  )
+)
+
+(define-method get_abbreviation
+  (of-object "GTimeZone")
+  (c-name "g_time_zone_get_abbreviation")
+  (return-type "const-gchar*")
+  (parameters
+    '("gint" "interval")
+  )
+)
+
+(define-method get_offset
+  (of-object "GTimeZone")
+  (c-name "g_time_zone_get_offset")
+  (return-type "gint32")
+  (parameters
+    '("gint" "interval")
+  )
+)
+
+(define-method is_dst
+  (of-object "GTimeZone")
+  (c-name "g_time_zone_is_dst")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "interval")
+  )
+)
+
+
+
 ;; From gtree.h
 
 (define-function g_tree_new
@@ -11522,8 +11582,13 @@
   (c-name "g_win32_get_system_data_dirs_for_module")
   (return-type "const-gchar**")
   (parameters
-    '("somefunc" "address_of_function")
+    '("somepointer" "address_of_function")
   )
+)
+
+(define-function g_get_user_runtime_dir
+  (c-name "g_get_user_runtime_dir")
+  (return-type "const-gchar*")
 )
 
 (define-function g_get_language_names
@@ -11652,6 +11717,11 @@
 
 (define-function g_listenv
   (c-name "g_listenv")
+  (return-type "gchar**")
+)
+
+(define-function g_get_environ
+  (c-name "g_get_environ")
   (return-type "gchar**")
 )
 
@@ -12095,6 +12165,27 @@
   (return-type "GVariant*")
   (parameters
     '("gsize" "index_")
+  )
+)
+
+(define-method lookup
+  (of-object "GVariant")
+  (c-name "g_variant_lookup")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "key")
+    '("const-gchar*" "format_string")
+  )
+  (varargs #t)
+)
+
+(define-method lookup_value
+  (of-object "GVariant")
+  (c-name "g_variant_lookup_value")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "key")
+    '("const-GVariantType*" "type")
   )
 )
 

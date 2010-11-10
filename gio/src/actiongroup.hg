@@ -53,10 +53,12 @@ class ActionGroup : public Glib::Interface
 public:
   _WRAP_METHOD(bool has_action(const Glib::ustring& action_name) const, g_action_group_has_action)
 
-  //TODO: _WRAP_METHOD(gchar** list_actions(), g_action_group_list_actions)
+  //TODO: Use a vector instead, for this new API, before we free glibmm 2.28.
+#m4 _CONVERSION(`gchar**', `Glib::StringArrayHandle', `Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(Glib::StringArrayHandle list_actions() const, g_action_group_list_actions)
 
   _WRAP_METHOD(bool get_action_enabled(const Glib::ustring& action_name) const, g_action_group_get_action_enabled)
- 
+
 /* TODO:
   _WRAP_METHOD(const GVariantType* get_action_parameter_type(const Glib::ustring& action_name), g_action_group_get_action_parameter_type)
   GVariantType* get_action_state_type(const Glib::ustring& action_name), g_action_group_get_action_state_type)

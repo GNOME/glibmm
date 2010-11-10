@@ -32,7 +32,7 @@ namespace Gio
  * The Settings class provides a convenient API for storing and retrieving
  * application settings.
  *
- * @newin{2,26}
+ * @newin{2,28}
  */
 class Settings : public Glib::Object
 {
@@ -50,11 +50,17 @@ public:
   _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend)
   _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
 
-  // FIXME: implement the GVariant stuff
-
   _WRAP_METHOD(bool set_value(const Glib::ustring& key, const Glib::VariantBase& value),  g_settings_set_value)
 
-  /** TODO: Documentation.
+  /** TODO: Gets the value that is stored in the settings for a @key.
+   *
+   * It is a programmer error to give a @a key that isn't contained in the
+   * schema for the settings.
+   *
+   * @param  key The key to get the value for.
+   * @param A Variant of the expected type.
+   *
+   * @newin{2,28}
    */
   void get_value(const Glib::ustring& key, Glib::VariantBase& value) const;
   _IGNORE(g_settings_get_value)
@@ -96,18 +102,17 @@ public:
 
   _WRAP_METHOD(Glib::StringArrayHandle list_children() const, g_settings_list_children)
   _WRAP_METHOD(Glib::StringArrayHandle list_keys() const, g_settings_list_keys)
+  //TODO: Choose an appropriate Variant template type: GVariant* g_settings_get_range(const gchar* key)
 
-  //Not implemented. See https://bugzilla.gnome.org/show_bug.cgi?id=629621
-  //_WRAP_METHOD(bool get_destroyed() const, g_settings_get_destroyed)
-
+  _WRAP_METHOD(bool range_check(const Glib::ustring& key, const Glib::VariantBase& value) const, g_settings_range_check)
 
 #m4 _CONVERSION(`Glib::ObjectBase*',`gpointer',(gpointer)$3->gobj())
   _WRAP_METHOD(void bind(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, SettingsBindFlags flags=SETTINGS_BIND_DEFAULT), g_settings_bind)
   void bind(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, SettingsBindFlags flags=SETTINGS_BIND_DEFAULT);
-  // FIXME: implement bind_with_mapping
+  // TODO: implement bind_with_mapping
   _WRAP_METHOD(void bind_writable(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, bool inverted=false), g_settings_bind_writable)
   void bind_writable(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, bool inverted=false);
-  // FIXME: unbind is not actually a class method
+  // TODO: unbind is not actually a class method
 
   //TODO?: _WRAP_SIGNAL(bool change_event(const Glib::ArrayHandle<Glib::QueryQuark>& keys, int n_keys), "change-event")
 

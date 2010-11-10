@@ -139,7 +139,6 @@ Glib::RefPtr<SocketConnection> SocketClient::connect(const Glib::RefPtr<SocketCo
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
-
 }
 
 Glib::RefPtr<SocketConnection> SocketClient::connect_to_host(const Glib::ustring& host_and_port, guint16 default_port)
@@ -150,7 +149,6 @@ Glib::RefPtr<SocketConnection> SocketClient::connect_to_host(const Glib::ustring
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
-
 }
 
 Glib::RefPtr<SocketConnection> SocketClient::connect_to_service(const Glib::ustring& domain, const Glib::ustring& service)
@@ -161,7 +159,50 @@ Glib::RefPtr<SocketConnection> SocketClient::connect_to_service(const Glib::ustr
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
-
 }
+
+Glib::RefPtr<SocketConnection> SocketClient::connect_to_uri(const Glib::ustring& uri, guint16 default_port)
+{
+  GError* gerror = 0;
+  Glib::RefPtr<SocketConnection> retvalue = Glib::wrap(g_socket_client_connect_to_uri(gobj(), uri.c_str(), default_port, 0, &(gerror)));
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return retvalue;
+}
+
+void
+SocketClient::connect_to_uri_async(const Glib::ustring& uri, guint16 default_port,
+                                       const Glib::RefPtr<Cancellable>& cancellable,
+                                       const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_client_connect_to_uri_async (gobj(),
+    uri.c_str(), default_port,
+    Glib::unwrap(cancellable),
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
+void
+SocketClient::connect_to_uri_async(const Glib::ustring& uri, guint16 default_port,
+                                       const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_client_connect_to_uri_async (gobj(),
+    uri.c_str(), default_port,
+    0,
+    &SignalProxy_async_callback,
+    slot_copy);
+}
+
 
 } // namespace Gio

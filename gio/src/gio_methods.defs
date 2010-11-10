@@ -249,6 +249,13 @@
   (gtype-id "G_TYPE_FILE_OUTPUT_STREAM")
 )
 
+(define-object c
+  (in-module "GPeriodi")
+  (parent "GObject")
+  (c-name "GPeriodic")
+  (gtype-id "G_TYPE_PERIODIC")
+)
+
 (define-object n
   (in-module "GPermissio")
   (parent "GObject")
@@ -1047,12 +1054,13 @@
   )
 )
 
-(define-enum SignalFlags
+(define-flags SignalFlags
   (in-module "GDBus")
   (c-name "GDBusSignalFlags")
   (gtype-id "G_TYPE_D_BUS_SIGNAL_FLAGS")
   (values
     '("none" "G_DBUS_SIGNAL_FLAGS_NONE")
+    '("no-match-rule" "G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE")
   )
 )
 
@@ -1097,6 +1105,7 @@
     '("is-launcher" "G_APPLICATION_IS_LAUNCHER")
     '("handles-open" "G_APPLICATION_HANDLES_OPEN")
     '("handles-command-line" "G_APPLICATION_HANDLES_COMMAND_LINE")
+    '("send-environment" "G_APPLICATION_SEND_ENVIRONMENT")
   )
 )
 
@@ -1575,20 +1584,22 @@
   (return-type "GType")
 )
 
-(define-method get_argc_argv
-  (of-object "GApplicationCommandLine")
-  (c-name "g_application_command_line_get_argc_argv")
-  (return-type "none")
-  (parameters
-    '("int*" "argc")
-    '("char***" "argv")
-  )
-)
-
 (define-method get_arguments
   (of-object "GApplicationCommandLine")
   (c-name "g_application_command_line_get_arguments")
-  (return-type "GVariant*")
+  (return-type "gchar**")
+  (parameters
+    '("int*" "argc")
+  )
+)
+
+(define-method getenv
+  (of-object "GApplicationCommandLine")
+  (c-name "g_application_command_line_getenv")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "name")
+  )
 )
 
 (define-method get_cwd
@@ -1597,27 +1608,10 @@
   (return-type "const-gchar*")
 )
 
-(define-method get_cwd_variant
-  (of-object "GApplicationCommandLine")
-  (c-name "g_application_command_line_get_cwd_variant")
-  (return-type "GVariant*")
-)
-
 (define-method get_is_remote
   (of-object "GApplicationCommandLine")
   (c-name "g_application_command_line_get_is_remote")
   (return-type "gboolean")
-)
-
-(define-method output
-  (of-object "GApplicationCommandLine")
-  (c-name "g_application_command_line_output")
-  (return-type "none")
-  (parameters
-    '("gint" "fd")
-    '("gconstpointer" "buffer")
-    '("gssize" "length")
-  )
 )
 
 (define-method print
@@ -1787,7 +1781,7 @@
   (c-name "g_application_open")
   (return-type "none")
   (parameters
-    '("GFile**" "file")
+    '("GFile**" "files")
     '("gint" "n_files")
     '("const-gchar*" "hint")
   )
@@ -1800,15 +1794,6 @@
   (parameters
     '("int" "argc")
     '("char**" "argv")
-  )
-)
-
-(define-method run_with_arguments
-  (of-object "GApplication")
-  (c-name "g_application_run_with_arguments")
-  (return-type "int")
-  (parameters
-    '("GVariant*" "arguments")
   )
 )
 
@@ -8909,6 +8894,85 @@
 
 
 
+;; From gperiodic.h
+
+(define-function g_periodic_get_type
+  (c-name "g_periodic_get_type")
+  (return-type "GType")
+)
+
+(define-function g_periodic_new
+  (c-name "g_periodic_new")
+  (is-constructor-of "GPeriodic")
+  (return-type "GPeriodic*")
+  (parameters
+    '("guint" "hz")
+    '("gint" "high_priority")
+    '("gint" "low_priority")
+  )
+)
+
+(define-method get_hz
+  (of-object "GPeriodic")
+  (c-name "g_periodic_get_hz")
+  (return-type "guint")
+)
+
+(define-method get_high_priority
+  (of-object "GPeriodic")
+  (c-name "g_periodic_get_high_priority")
+  (return-type "gint")
+)
+
+(define-method get_low_priority
+  (of-object "GPeriodic")
+  (c-name "g_periodic_get_low_priority")
+  (return-type "gint")
+)
+
+(define-method add
+  (of-object "GPeriodic")
+  (c-name "g_periodic_add")
+  (return-type "guint")
+  (parameters
+    '("GPeriodicTickFunc" "callback")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-method remove
+  (of-object "GPeriodic")
+  (c-name "g_periodic_remove")
+  (return-type "none")
+  (parameters
+    '("guint" "tag")
+  )
+)
+
+(define-method block
+  (of-object "GPeriodic")
+  (c-name "g_periodic_block")
+  (return-type "none")
+)
+
+(define-method unblock
+  (of-object "GPeriodic")
+  (c-name "g_periodic_unblock")
+  (return-type "none")
+  (parameters
+    '("gint64" "unblock_time")
+  )
+)
+
+(define-method damaged
+  (of-object "GPeriodic")
+  (c-name "g_periodic_damaged")
+  (return-type "none")
+)
+
+
+
 ;; From gpermission.h
 
 (define-function g_permission_get_type
@@ -9954,6 +10018,17 @@
     '("GObject*" "source_object")
     '("GAsyncReadyCallback" "callback")
     '("gpointer" "user_data")
+    '("const-GError*" "error")
+  )
+)
+
+(define-function g_simple_async_result_new_take_error
+  (c-name "g_simple_async_result_new_take_error")
+  (return-type "GSimpleAsyncResult*")
+  (parameters
+    '("GObject*" "source_object")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
     '("GError*" "error")
   )
 )
@@ -10051,6 +10126,15 @@
   )
 )
 
+(define-method take_error
+  (of-object "GSimpleAsyncResult")
+  (c-name "g_simple_async_result_take_error")
+  (return-type "none")
+  (parameters
+    '("GError*" "error")
+  )
+)
+
 (define-method propagate_error
   (of-object "GSimpleAsyncResult")
   (c-name "g_simple_async_result_propagate_error")
@@ -10110,6 +10194,17 @@
 
 (define-function g_simple_async_report_gerror_in_idle
   (c-name "g_simple_async_report_gerror_in_idle")
+  (return-type "none")
+  (parameters
+    '("GObject*" "object")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+    '("const-GError*" "error")
+  )
+)
+
+(define-function g_simple_async_report_take_gerror_in_idle
+  (c-name "g_simple_async_report_take_gerror_in_idle")
   (return-type "none")
   (parameters
     '("GObject*" "object")

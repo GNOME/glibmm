@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <giomm/cancellable.h>
+#include <giomm/file.h>
 #include <glibmm/object.h>
 #include <glibmm/variant.h>
 
@@ -89,7 +89,7 @@ public:
 
   _WRAP_METHOD(static Glib::RefPtr<Application> create(const Glib::ustring& appid, ApplicationFlags flags = APPLICATION_FLAGS_NONE), g_application_new)
 
-  _WRAP_METHOD(static bool id_is_valid(const Glib::ustring& application_id), g_application_id_is_valid) 
+  _WRAP_METHOD(static bool id_is_valid(const Glib::ustring& application_id), g_application_id_is_valid)
 
   _WRAP_METHOD(Glib::ustring get_id() const, g_application_get_application_id)
   _WRAP_METHOD(void set_id(const Glib::ustring& application_id), g_application_set_application_id)
@@ -113,7 +113,26 @@ public:
   _WRAP_METHOD(void release(), g_application_release)
   _WRAP_METHOD(void activate(), g_application_activate)
 
-  //TODO: _WRAP_METHOD(void open(GFile **files, gint n_files, const Glib::ustring& hint), g_application_open)
+  typedef std::vector< Glib::RefPtr<File> > type_vec_files;
+
+  /* Opens the given files.
+   *
+   * In essence, this results in the open signal being emitted
+   * in the primary instance.
+   *
+   * @a hint is simply passed through to the open signal.  It is
+   * intended to be used by applications that have multiple modes for
+   * opening files (eg: "view" vs "edit", etc).
+   *
+   * The application must be registered before calling this mwethod
+   * and it must have the APPLICATION_HANDLES_OPEN flag set.
+   *
+   * @param files The files to open. This must be non-empty.
+   * @param hint A hint.
+   *
+   * @newin{2,28}
+   */
+  void open(const type_vec_files& files, const Glib::ustring& hint = Glib::ustring());
 
   _WRAP_METHOD(void run(int argc, char** argv), g_application_run)
   //TODO: g_application_run_with_arguments)

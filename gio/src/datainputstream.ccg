@@ -158,7 +158,7 @@ bool DataInputStream::read_line_finish(const Glib::RefPtr<AsyncResult>& result, 
     data = std::string(buffer, size);
     g_free (buffer);
   }
-  
+
   return retval;
 }
 
@@ -209,7 +209,7 @@ void DataInputStream::read_until_async(const std::string& stop_chars, const Slot
   // and deleted in the callback.
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
-  g_data_input_stream_read_until_async(gobj(), stop_chars.c_str(), 
+  g_data_input_stream_read_until_async(gobj(), stop_chars.c_str(),
                             io_priority,
                             Glib::unwrap(cancellable),
                             &SignalProxy_async_callback,
@@ -231,9 +231,86 @@ bool DataInputStream::read_until_finish(const Glib::RefPtr<AsyncResult>& result,
     data = std::string(buffer, size);
     g_free (buffer);
   }
-  
+
   return retval;
 }
 
-  
+
+bool DataInputStream::read_upto(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable)
+{
+  GError* gerror = 0;
+  char* c_str = g_data_input_stream_read_upto(gobj(),
+                                               stop_chars.c_str(), -1, /* null-terminated */
+                                               0, // pass NULL since we can easily determine the length from the returned std::string
+                                               Glib::unwrap(cancellable),
+                                               &gerror);
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+    if (c_str) {
+        data = c_str;
+        g_free (c_str);
+        return true;
+    }
+    // end of stream reached, return failure status
+    return false;
+}
+
+/** non-cancellable version of read_upto()
+ */
+bool DataInputStream::read_upto(std::string& data, const std::string& stop_chars)
+{
+  GError* gerror = 0;
+  char* c_str = g_data_input_stream_read_upto(gobj(),
+    stop_chars.c_str(), -1, /* null-terminated */
+    0, // pass NULL since we can easily determine the length from the returned std::string
+    0,
+    &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  if (c_str) {
+      data = c_str;
+      g_free (c_str);
+      return true;
+  }
+
+  // end of stream reached, return failure status
+  return false;
+}
+
+void DataInputStream::read_upto_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_data_input_stream_read_upto_async(gobj(), stop_chars.c_str(), -1, /* null-terminated */
+                            io_priority,
+                            Glib::unwrap(cancellable),
+                            &SignalProxy_async_callback,
+                            slot_copy);
+}
+
+bool DataInputStream::read_upto_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
+{
+  GError* gerror = 0;
+  gsize size = 0;
+  gchar* buffer = g_data_input_stream_read_upto_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  bool retval = false;
+  if(buffer && size)
+  {
+    retval = (buffer != 0);
+    data = std::string(buffer, size);
+    g_free (buffer);
+  }
+
+  return retval;
+}
+
+
 } // namespace Gio
