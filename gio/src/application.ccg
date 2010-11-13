@@ -41,4 +41,14 @@ void Application::open(const type_vec_files& files, const Glib::ustring& hint)
   delete[] files_array ;
 }
 
+bool Application::register_application()
+{
+  GError* gerror = 0;
+  bool retvalue = g_application_register(gobj(), NULL, &(gerror));
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return retvalue;
+}
+
 } // namespace Gio

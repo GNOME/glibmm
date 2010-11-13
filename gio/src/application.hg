@@ -82,12 +82,10 @@ class Application : public Glib::Object
   _CLASS_GOBJECT(Application, GApplication, G_APPLICATION, Glib::Object, GObject)
 
 protected:
-  _CTOR_DEFAULT()
+  _WRAP_CTOR(Application(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE), g_application_new)
 
 public:
-  //_WRAP_CREATE()
-
-  _WRAP_METHOD(static Glib::RefPtr<Application> create(const Glib::ustring& appid, ApplicationFlags flags = APPLICATION_FLAGS_NONE), g_application_new)
+  _WRAP_CREATE(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE)
 
   _WRAP_METHOD(static bool id_is_valid(const Glib::ustring& application_id), g_application_id_is_valid)
 
@@ -108,6 +106,7 @@ public:
   //TODO: Add a version with no cancellable.
   //Renamed from register() because that is a C++ keyword.
   _WRAP_METHOD(bool register_application(const Glib::RefPtr<Gio::Cancellable>& cancellable), g_application_register, errthrow)
+  bool register_application();
 
   _WRAP_METHOD(void hold(), g_application_hold)
   _WRAP_METHOD(void release(), g_application_release)
@@ -134,7 +133,7 @@ public:
    */
   void open(const type_vec_files& files, const Glib::ustring& hint = Glib::ustring());
 
-  _WRAP_METHOD(void run(int argc, char** argv), g_application_run)
+  _WRAP_METHOD(int run(int argc, char** argv), g_application_run)
   //TODO: g_application_run_with_arguments)
 
   _WRAP_PROPERTY("action-group", Glib::RefPtr<ActionGroup>)
