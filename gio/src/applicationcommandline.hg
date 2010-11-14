@@ -1,0 +1,50 @@
+/* Copyright (C) 2010 Jonathon Jongsma <jonathon@quotidian.org>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <glibmm/variant.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+class ApplicationCommandLine : public Glib::Object
+{
+  _CLASS_GOBJECT(ApplicationCommandLine, GApplicationCommandLine, G_APPLICATION_COMMAND_LINE, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+
+  _WRAP_METHOD(char** get_arguments(int& argc) const, g_application_command_line_get_arguments);
+  _WRAP_METHOD(Glib::ustring get_cwd() const, g_application_command_line_get_cwd)
+  // it seems that h2defs.py has trouble parsing the const gchar * const * type
+  //_WRAP_METHOD(std::vector<Glib::ustring> get_environ() const, g_application_command_line_get_environ)
+  _WRAP_METHOD(Glib::ustring getenv(const Glib::ustring& name) const, g_application_command_line_getenv)
+  _WRAP_METHOD(bool is_remote() const, g_application_command_line_get_is_remote)
+  //GVariant *               g_application_command_line_get_platform_data
+  _WRAP_METHOD(void set_exit_status(int exit_status), g_application_command_line_set_exit_status)
+  _WRAP_METHOD(int get_exit_status() const, g_application_command_line_get_exit_status)
+  _WRAP_METHOD(void print(const Glib::ustring& message), g_application_command_line_print)
+  _WRAP_METHOD(void printerr(const Glib::ustring& message), g_application_command_line_printerr)
+};
+
+
+} // namespace Gio

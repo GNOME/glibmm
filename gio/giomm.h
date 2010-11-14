@@ -23,6 +23,7 @@
 #include <giomm/actiongroup.h>
 #include <giomm/appinfo.h>
 #include <giomm/application.h>
+#include <giomm/applicationcommandline.h>
 #include <giomm/asyncresult.h>
 #include <giomm/bufferedinputstream.h>
 #include <giomm/bufferedoutputstream.h>
