@@ -25,8 +25,10 @@ namespace Gio
 {
 
 DBusServer::DBusServer(const Glib::ustring& address,
-  const Glib::ustring& guid, const Glib::RefPtr<DBusAuthObserver>& observer,
-  const Glib::RefPtr<Cancellable>& cancellable, DBusServerFlags flags)
+  const Glib::ustring& guid,
+  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusServerFlags flags)
   : _CONSTRUCT("address",
     (address.empty() ? static_cast<char*>(0) : address.c_str()),
     "flags", static_cast<GDBusServerFlags>(flags),
@@ -36,12 +38,36 @@ DBusServer::DBusServer(const Glib::ustring& address,
   init(cancellable);
 }
 
-Glib::RefPtr<DBusServer> DBusServer::create(const Glib::ustring& address,
-  const Glib::ustring& guid, const Glib::RefPtr<DBusAuthObserver>& observer,
-  const Glib::RefPtr<Cancellable>& cancellable, DBusServerFlags flags)
+DBusServer::DBusServer(const Glib::ustring& address,
+  const Glib::ustring& guid,
+  const Glib::RefPtr<DBusAuthObserver>& observer,
+  DBusServerFlags flags)
+  : _CONSTRUCT("address",
+    (address.empty() ? static_cast<char*>(0) : address.c_str()),
+    "flags", static_cast<GDBusServerFlags>(flags),
+    "guid", (guid.empty() ? static_cast<char*>(0) : guid.c_str()),
+    "authentication-observer", Glib::unwrap(observer))
+{
+  init(Glib::RefPtr<Cancellable>());
+}
+
+Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
+  const Glib::ustring& guid,
+  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusServerFlags flags)
 {
   return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
     cancellable, flags));
+}
+
+Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
+  const Glib::ustring& guid,
+  const Glib::RefPtr<DBusAuthObserver>& observer,
+  DBusServerFlags flags)
+{
+  return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
+    flags));
 }
 
 } // namespace Gio

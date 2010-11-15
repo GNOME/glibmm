@@ -93,35 +93,7 @@ protected:
     int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_async_initable_init_async)
 
-  /** Starts asynchronous initialization of the object implementing the
-   * interface. This must be done before any real use of the object after
-   * initial construction. If the object also implements Initable you can
-   * optionally call Gio::Initable::init() instead.
-   *
-   * When the initialization is finished, @a slot will be called. You can
-   * then call init_finish() to get the result of the initialization.
-   *
-   * If this function is not called, or returns with an error, then all
-   * operations on the object should fail, generally returning the error
-   * Gio::IO_ERROR_NOT_INITIALIZED.
-   *
-   * Implementations of this method must be idempotent: i.e. multiple calls to
-   * this function with the same argument should return the same results. Only
-   * the first call initializes the object; further calls return the result of
-   * the first call. This is so that it's safe to implement the singleton
-   * pattern in the GObject constructor function.
-   *
-   * For classes that also support the Initable interface, the default
-   * implementation of this method will run the Gio::Initable::init() method
-   * in a thread, so if you want to support asynchronous initialization via
-   * threads, just implement the AsyncInitable interface without overriding
-   * any interface methods.
-   *
-   * @param io_priority The I/O priority of the operation.
-   * @param slot a SlotAsyncReady to call when the request is satisfied.
-   *
-   * @newin{2,28}
-   */
+  /// Non-cancellable version of init_async().
   void init_async(const SlotAsyncReady& slot,
     int io_priority = Glib::PRIORITY_DEFAULT);
 
