@@ -424,6 +424,142 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Credentials> get_peer_credentials(), g_dbus_connection_get_peer_credentials, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Credentials> get_peer_credentials() const, g_dbus_connection_get_peer_credentials, refreturn, constversion)
 
+  /** Asynchronously invokes the method_name method on the @a interface_name
+   * D-Bus interface on the remote object at @a object_path owned by bus_name.
+   *
+   * If the connection is closed then the operation will fail with
+   * Gio::IO_ERROR_CLOSED. If @a cancellable is cancelled, the operation will
+   * fail with Gio::IO_ERROR_CANCELLED. If @a parameters contains a value not
+   * compatible with the D-Bus protocol, the operation fails with
+   * Gio::IO_ERROR_INVALID_ARGUMENT.
+   *
+   * If @a reply_type is non-<tt>0</tt> then the reply will be checked for
+   * having this type and an error will be raised if it does not match. Said
+   * another way, if you give a @a reply_type then any non-<tt>0</tt> return
+   * value will be of this type.
+   *
+   * This is an asynchronous method. When the operation is finished, callback
+   * will be invoked in the thread-default main loop of the thread you are
+   * calling this method from. You can then call call_finish() to get the
+   * result of the operation.  See call_sync() for the synchronous version of
+   * this function.
+   *
+   * @param object_path Path of remote object.
+   * @param interface_name D-Bus interface to invoke method on.
+   * @param method_name The name of the method to invoke.
+   * @param slot A SlotAsyncReady to call when the request is satisfied or
+   * NULL if you don't care about the result of the method invocation.
+   * @param cancellable A Cancellable or NULL.
+   * @param bus_name A unique or well-known bus name or NULL if connection is
+   * not a message bus connection.
+   * @param timeout_msec The timeout in milliseconds, -1 to use the default
+   * timeout or G_MAXINT for no timeout.
+   * @param flags Flags from the Gio::DBusCallFlags enumeration.
+   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * method or NULL if not passing parameters.
+   * @param reply_type The expected type of the reply, or NULL.
+   * @newin{2,28}
+   */
+  void call(
+    const Glib::ustring&                object_path,
+    const Glib::ustring&                interface_name,
+    const Glib::ustring&                method_name,
+    const SlotAsyncReady&               slot,
+    const Glib::RefPtr<Cancellable>&    cancellable,
+    int                                 timeout_msec = -1,
+    const Glib::ustring&                bus_name = Glib::ustring(),
+    DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
+    const Glib::VariantBase&            parameters = Glib::VariantBase(),
+    const Glib::VariantType&            reply_type = Glib::VariantType()
+  );
+  _IGNORE(g_dbus_connection_call)
+
+  /// A non-cancellable version of call().
+  void call(
+    const Glib::ustring&                object_path,
+    const Glib::ustring&                interface_name,
+    const Glib::ustring&                method_name,
+    const SlotAsyncReady&               slot,
+    int                                 timeout_msec = -1,
+    const Glib::ustring&                bus_name = Glib::ustring(),
+    DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
+    const Glib::VariantBase&            parameters = Glib::VariantBase(),
+    const Glib::VariantType&            reply_type = Glib::VariantType()
+  );
+
+  /** Finishes an operation started with g_dbus_connection_call().
+   * @param output A location in which to return a tuple with return values.
+   * @param res A AsyncResult obtained from the SlotAsyncReady passed to
+   * call().
+   * @throw Glib::Error.
+   * @newin{2,28}
+   */
+  void call_finish(
+    Glib::VariantBase&                   output,
+    const Glib::RefPtr<AsyncResult>&     res
+  );
+  _IGNORE(g_dbus_connection_call_finish)
+
+  /** Synchronously invokes the method_name method on the @a interface_name
+   * D-Bus interface on the remote object at @a object_path owned by bus_name.
+   *
+   * If the connection is closed then the operation will fail with
+   * Gio::IO_ERROR_CLOSED. If @a cancellable is cancelled, the operation will
+   * fail with Gio::IO_ERROR_CANCELLED. If @a parameters contains a value not
+   * compatible with the D-Bus protocol, the operation fails with
+   * Gio::IO_ERROR_INVALID_ARGUMENT.
+   *
+   * If @a reply_type is non-<tt>0</tt> then the reply will be checked for
+   * having this type and an error will be raised if it does not match. Said
+   * another way, if you give a @a reply_type then any non-<tt>0</tt> return
+   * value will be of this type.
+   *
+   * The calling thread is blocked until a reply is received. See call() for
+   * the asynchronous version of this method.
+   *
+   * @param output A location in which to return a tuple with return values.
+   * @param object_path Path of remote object.
+   * @param interface_name D-Bus interface to invoke method on.
+   * @param method_name The name of the method to invoke.
+   * @param cancellable A Cancellable or NULL.
+   * @param bus_name A unique or well-known bus name or NULL if connection is
+   * not a message bus connection.
+   * @param timeout_msec The timeout in milliseconds, -1 to use the default
+   * timeout or G_MAXINT for no timeout.
+   * @param flags Flags from the Gio::DBusCallFlags enumeration.
+   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * method or NULL if not passing parameters.
+   * @param reply_type The expected type of the reply, or NULL.
+   * @throw Glib::Error.
+   * @newin{2,28}
+   */
+  void call_sync(
+    Glib::VariantBase&                  output,
+    const Glib::ustring&                object_path,
+    const Glib::ustring&                interface_name,
+    const Glib::ustring&                method_name,
+    const Glib::RefPtr<Cancellable>&    cancellable,
+    int                                 timeout_msec = -1,
+    const Glib::ustring&                bus_name = Glib::ustring(),
+    DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
+    const Glib::VariantBase&            parameters = Glib::VariantBase(),
+    const Glib::VariantType&            reply_type = Glib::VariantType()
+  );
+  _IGNORE(g_dbus_connection_call_sync)
+
+  /// A non-cancellable version of call_sync().
+  void call_sync(
+    Glib::VariantBase&                  output,
+    const Glib::ustring&                object_path,
+    const Glib::ustring&                interface_name,
+    const Glib::ustring&                method_name,
+    int                                 timeout_msec = -1,
+    const Glib::ustring&                bus_name = Glib::ustring(),
+    DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
+    const Glib::VariantBase&            parameters = Glib::VariantBase(),
+    const Glib::VariantType&            reply_type = Glib::VariantType()
+  );
+
   _WRAP_METHOD(bool get_exit_on_close() const, g_dbus_connection_get_exit_on_close)
   _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), g_dbus_connection_set_exit_on_close)
   _WRAP_METHOD(DBusCapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)

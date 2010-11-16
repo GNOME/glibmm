@@ -343,4 +343,122 @@ void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& me
   message->set_serial(out_serial);
 }
 
+void DBusConnection::call(
+  const Glib::ustring&                  object_path,
+  const Glib::ustring&                  interface_name,
+  const Glib::ustring&                  method_name,
+  const SlotAsyncReady&                 slot,
+  const Glib::RefPtr<Cancellable>&      cancellable,
+  int                                   timeout_msec,
+  const Glib::ustring&                  bus_name,
+  DBusCallFlags                         flags,
+  const Glib::VariantBase&              parameters,
+  const Glib::VariantType&              reply_type
+)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_call(gobj(), bus_name.c_str(), object_path.c_str(),
+    interface_name.c_str(), method_name.c_str(),
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
+    static_cast<GDBusCallFlags>(flags), timeout_msec,
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+}
+
+// Non-cancellable version.
+void DBusConnection::call(
+  const Glib::ustring&                  object_path,
+  const Glib::ustring&                  interface_name,
+  const Glib::ustring&                  method_name,
+  const SlotAsyncReady&                 slot,
+  int                                   timeout_msec,
+  const Glib::ustring&                  bus_name,
+  DBusCallFlags                         flags,
+  const Glib::VariantBase&              parameters,
+  const Glib::VariantType&              reply_type
+)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_call(gobj(), bus_name.c_str(), object_path.c_str(),
+    interface_name.c_str(), method_name.c_str(),
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
+    static_cast<GDBusCallFlags>(flags), timeout_msec, 0,
+    &SignalProxy_async_callback, slot_copy);
+}
+
+void DBusConnection::call_finish(
+  Glib::VariantBase&                    output,
+  const Glib::RefPtr<AsyncResult>&      res
+)
+{
+  GError* gerror = 0;
+  GVariant* const gvariant =
+    g_dbus_connection_call_finish(gobj(), Glib::unwrap(res), &gerror);
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+  output.init(gvariant); // No need for extra ref.
+}
+
+void DBusConnection::call_sync(
+  Glib::VariantBase&                    output,
+  const Glib::ustring&                  object_path,
+  const Glib::ustring&                  interface_name,
+  const Glib::ustring&                  method_name,
+  const Glib::RefPtr<Cancellable>&      cancellable,
+  int                                   timeout_msec,
+  const Glib::ustring&                  bus_name,
+  DBusCallFlags                         flags,
+  const Glib::VariantBase&              parameters,
+  const Glib::VariantType&              reply_type
+)
+{
+  GError* gerror = 0;
+
+  GVariant* const gvariant =
+    g_dbus_connection_call_sync(gobj(), bus_name.c_str(), object_path.c_str(),
+    interface_name.c_str(), method_name.c_str(),
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
+    static_cast<GDBusCallFlags>(flags), timeout_msec,
+    Glib::unwrap(cancellable), &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  output.init(gvariant); // No need to take extra reference.
+}
+
+// Non-cancellable version.
+void DBusConnection::call_sync(
+  Glib::VariantBase&                    output,
+  const Glib::ustring&                  object_path,
+  const Glib::ustring&                  interface_name,
+  const Glib::ustring&                  method_name,
+  int                                   timeout_msec,
+  const Glib::ustring&                  bus_name,
+  DBusCallFlags                         flags,
+  const Glib::VariantBase&              parameters,
+  const Glib::VariantType&              reply_type
+)
+{
+  GError* gerror = 0;
+
+  GVariant* const gvariant =
+    g_dbus_connection_call_sync(gobj(), bus_name.c_str(), object_path.c_str(),
+    interface_name.c_str(), method_name.c_str(),
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
+    static_cast<GDBusCallFlags>(flags), timeout_msec, 0, &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  output.init(gvariant); // No need to take extra reference.
+}
+
 } // namespace Gio
