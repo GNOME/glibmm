@@ -31,6 +31,7 @@
 #include <giomm/contenttype.h>
 #include <giomm/datainputstream.h>
 #include <giomm/dataoutputstream.h>
+#include <giomm/dbusaddress.h>
 #include <giomm/dbusauthobserver.h>
 #include <giomm/dbusconnection.h>
 #include <giomm/dbusmessage.h>
