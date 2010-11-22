@@ -335,6 +335,11 @@ sub convert_docs_to_cpp($$)
 
     $$text =~ s/\bX\s+Window\b/X&nbsp;\%Window/g;
     $$text =~ s/\bWindow\s+manager/\%Window manager/g;
+
+    # This is so that if there is a '`' in the docs it doesn't cause a
+    # problem when M4 processing occurs.  __BT__ is a variable defined in the
+    # base.m4 file that produces a '`' without M4 errors.
+    $$text =~ s/`/__BT__/g;
 #  }
 }
 
@@ -346,9 +351,10 @@ sub convert_tags_to_doxygen($)
   for($$text)
   {
     # Replace format tags.
-    s"&lt;(/?)emphasis&gt;"<$1em>"g;
-    s"&lt;(/?)literal&gt;"<$1tt>"g;
-    s"&lt;(/?)function&gt;"<$1tt>"g;
+    s"<(/?)emphasis>"<$1em>"g;
+    s"<(/?)literal>"<$1tt>"g;
+    s"<(/?)constant>"<$1tt>"g;
+    s"<(/?)function>"<$1tt>"g;
 
     # Some argument names are suffixed by "_" -- strip this.
     # gtk-doc uses @thearg, but doxygen uses @a thearg.
@@ -359,21 +365,21 @@ sub convert_tags_to_doxygen($)
     s" \@a (throws|param)" \@$1"g;
     s"^Note ?\d?: "\@note "mg;
 
-    s"&lt;/?programlisting&gt;""g;
-    s"&lt;informalexample&gt;"\@code"g;
-    s"&lt;/informalexample&gt;"\@endcode"g;
-    s"&lt;!&gt;""g;
+    s"</?programlisting>""g;
+    s"<informalexample>"\@code"g;
+    s"</informalexample>"\@endcode"g;
+    s"<!>""g;
 
     # Remove all link tags.
-    s"&lt;/?u?link[^&]*&gt;""g;
+    s"</?u?link[^&]*>""g;
 
     # Remove all para tags (from tmpl sgml files).
-    s"&lt;/?para&gt;""g;
+    s"</?para>""g;
 
     # Use our Doxygen @newin alias:
     s/\bSince:\s*(\d+)\.(\d+)\b/\@newin{$1,$2}/g;
 
-    s"\b-&gt;\b"->"g;
+    s"\b->\b"->"g;
 
     # Doxygen is too dumb to handle &mdash;
     s"&mdash;" \@htmlonly&mdash;\@endhtmlonly "g;
