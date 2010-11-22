@@ -461,4 +461,22 @@ void DBusConnection::call_sync(
   output.init(gvariant); // No need to take extra reference.
 }
 
+void DBusConnection::emit_singal(
+  const Glib::ustring&                object_path,
+  const Glib::ustring&                interface_name,
+  const Glib::ustring&                signal_name,
+  const Glib::ustring&                destination_bus_name,
+  const Glib::VariantBase&            parameters
+)
+{
+  GError* gerror = 0;
+
+  g_dbus_connection_emit_signal(gobj(),
+    destination_bus_name.c_str(), object_path.c_str(), interface_name.c_str(),
+    signal_name.c_str(), const_cast<GVariant*>(parameters.gobj()), &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+}
+
 } // namespace Gio
