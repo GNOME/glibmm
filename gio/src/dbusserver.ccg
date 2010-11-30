@@ -57,8 +57,25 @@ Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
   const Glib::RefPtr<Cancellable>& cancellable,
   DBusServerFlags flags)
 {
-  return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
-    cancellable, flags));
+  //TODO: Use the constructor instead of the code underneath when
+  //g_dbus_server_new_sync() does not do more than call g_initable_new().
+  //return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
+    //cancellable, flags));
+
+  GError* gerror = 0;
+
+  Glib::RefPtr<DBusServer> result =
+    Glib::wrap(g_dbus_server_new_sync(address.c_str(),
+                                      static_cast<GDBusServerFlags>(flags),
+                                      guid.c_str(),
+                                      Glib::unwrap(observer),
+                                      Glib::unwrap(cancellable),
+                                      &gerror));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return result;
 }
 
 Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
@@ -66,8 +83,25 @@ Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   DBusServerFlags flags)
 {
-  return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
-    flags));
+  //TODO: Use the constructor instead of the code underneath when
+  //g_dbus_server_new_sync() does not do more than call g_initable_new().
+  //return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
+    //flags));
+
+  GError* gerror = 0;
+
+  Glib::RefPtr<DBusServer> result =
+    Glib::wrap(g_dbus_server_new_sync(address.c_str(),
+                                      static_cast<GDBusServerFlags>(flags),
+                                      guid.c_str(),
+                                      Glib::unwrap(observer),
+                                      0,
+                                      &gerror));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return result;
 }
 
 } // namespace Gio
