@@ -33,9 +33,10 @@ namespace Gio
 {
 
 _WRAP_ENUM(BusType, GBusType)
+_WRAP_ENUM(DBusCallFlags, GDBusCallFlags, NO_GTYPE)
 _WRAP_ENUM(DBusConnectionFlags, GDBusConnectionFlags, NO_GTYPE)
 _WRAP_ENUM(DBusSendMessageFlags, GDBusSendMessageFlags, NO_GTYPE)
-_WRAP_ENUM(DBusCallFlags, GDBusCallFlags, NO_GTYPE)
+_WRAP_ENUM(DBusSignalFlags, GDBusSignalFlags, NO_GTYPE)
 
 class DBusAuthObserver;
 
@@ -107,6 +108,37 @@ protected:
     DBusConnectionFlags flags);
 
 public:
+
+  /** Signature for slot used in signal_subscribe().
+   *  For example,
+   * @code
+   * void on_signal(const Glib::RefPtr<DBusConnection>&, const
+   * Glib::ustring& sender_name, const Glib::ustring& object_path, const
+   * Glib::ustring& object_path, const Glib::ustring& interface_name, const
+   * Glib::ustring& signal_name, const Glib::VariantBase& parameters);.
+   * @endcode
+   */
+  typedef sigc::slot<void, const Glib::RefPtr<DBusConnection>&,
+    const Glib::ustring&, const Glib::ustring&, const Glib::ustring&,
+    const Glib::ustring&, const Glib::VariantBase&>  SlotSignal;
+
+  /** Signature for slot used in add_filter().
+   *  For example,
+   * @code
+   * Glib::RefPtr<DBusMessage> on_message_filter(const
+   * Glib::RefPtr<DBusConnection>, const Glib::RefPtr<DBusMessage>& bool
+   * incoming);.
+   * @endcode
+   *
+   * A filter function is passed a DBusMessage and expected to return a
+   * DBusMessage too. Passive filter functions that don't modify the message
+   * can simply return the message object.  Filter functions that wants to
+   * drop a message can simply return <tt>0</tt>.  And filter function may
+   * modify a message by copying it and return the copy.
+   */
+  typedef sigc::slot<Glib::RefPtr<DBusMessage>,
+    const Glib::RefPtr<DBusConnection>&,
+    const Glib::RefPtr<DBusMessage>&, bool> SlotMessageFilter;
 
   /** Asynchronously connects to the message bus specified by @a bus_type.
    *
@@ -363,6 +395,9 @@ public:
 
   _WRAP_METHOD(void flush_sync(const Glib::RefPtr<Cancellable>& cancellable), g_dbus_connection_flush_sync, errthrow)
 
+  _WRAP_METHOD(bool get_exit_on_close() const, g_dbus_connection_get_exit_on_close)
+  _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), g_dbus_connection_set_exit_on_close)
+
   //TODO: In the C API, out_serial is volatile, but gmmproc can't parse that.
   #m4 _CONVERSION(`guint32*',`volatile guint32*',`($3)')
   _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32* out_serial), g_dbus_connection_send_message, errthrow)
@@ -420,6 +455,8 @@ public:
 
   _WRAP_METHOD(Glib::ustring get_guid() const, g_dbus_connection_get_guid)
   _WRAP_METHOD(Glib::ustring get_unique_name() const, g_dbus_connection_get_unique_name)
+
+  _WRAP_METHOD(DBusCapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)
 
   _WRAP_METHOD(Glib::RefPtr<Credentials> get_peer_credentials(), g_dbus_connection_get_peer_credentials, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Credentials> get_peer_credentials() const, g_dbus_connection_get_peer_credentials, refreturn, constversion)
@@ -584,10 +621,76 @@ public:
     const Glib::VariantBase&            parameters = Glib::VariantBase()
   );
 
-  _WRAP_METHOD(bool get_exit_on_close() const, g_dbus_connection_get_exit_on_close)
-  _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), g_dbus_connection_set_exit_on_close)
-  _WRAP_METHOD(DBusCapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)
-};
+  /** Subscribes to signals on the connection and invokes @a slot with a
+   * whenever the signal is received. Note that @a slot will be invoked in the
+   * thread-default main loop of the thread you are calling this method from.
+   *
+   * If the connection is not a message bus connection, @a sender must be
+   * <tt>0</tt>.
+   *
+   * If @a sender is a well-known name note that @a slot is invoked with the
+   * unique name for the owner of @a sender, not the well-known name as one
+   * would expect. This is because the message bus rewrites the name. As such,
+   * to avoid certain race conditions, users should be tracking the name owner
+   * of the well-known name and use that when processing the received signal.
+   *
+   * @param slot Slot to invoke when there is a signal matching the requested
+   * data.
+   * @param sender Sender name to match on (unique or well-known name) or
+   * <tt>0</tt> to listen from all senders.
+   * @param interface_name D-Bus interface name to match on or <tt>0</tt> to
+   * match on all interfaces.
+   * @param member D-Bus signal name to match on or <tt>0</tt> to match on all
+   * signals.  
+   * @param object_path Object path to match on or <tt>0</tt> to match on all
+   * object paths.  
+   * @param arg0 Contents of first string argument to match on or <tt>0</tt>
+   * to match on all kinds of arguments.  
+   * @param flags Flags describing how to subscribe to the signal (currently
+   * unused).  
+   * @return A subscription identifier that can be used with
+   * signal_unsubscribe().
+   * @newin{2,28}
+   */
+  guint signal_subscribe(
+    const SlotSignal& slot,
+    const Glib::ustring& sender = Glib::ustring(),
+    const Glib::ustring& interface_name = Glib::ustring(),
+    const Glib::ustring& member = Glib::ustring(),
+    const Glib::ustring& object_path = Glib::ustring(),
+    const Glib::ustring& arg0 = Glib::ustring(),
+    DBusSignalFlags flags = Gio::DBUS_SIGNAL_FLAGS_NONE
+  );
+  _IGNORE(g_dbus_connection_signal_subscribe)
 
+  _WRAP_METHOD(void signal_unsubscribe(guint subscription_id), g_dbus_connection_signal_unsubscribe)
+
+  /** Adds a message filter. Filters are handlers that are run on all incoming
+   * and outgoing messages, prior to standard dispatch. Filters are run in the
+   * order that they were added. The same handler can be added as a filter
+   * more than once, in which case it will be run more than once. Filters
+   * added during a filter slot won't be run on the message being processed.
+   * Filter slots are allowed to modify and even drop messages.
+   *
+   * Note that filters are run in a dedicated message handling thread so they
+   * can't block and, generally, can't do anything but signal a worker thread.
+   * Also note that filters are rarely needed - use API such as
+   * send_message_with_reply(), signal_subscribe() or call() instead.
+   *
+   * If a filter consumes an incoming message the message is not dispatched
+   * anywhere else - not even the standard dispatch machinery (that API such
+   * as signal_subscribe() and send_message_with_reply() relies on) will see
+   * the message. Similary, if a filter consumes an outgoing message, the
+   * message will not be sent to the other peer.
+   *
+   * @param slot A filter slot.  
+   * @return A filter identifier that can be used with remove_filter().
+   * @newin{2,28}
+   */
+  guint add_filter(const SlotMessageFilter& slot);
+  _IGNORE(g_dbus_connection_add_filter)
+
+  _WRAP_METHOD(void remove_filter(guint filter_id), g_dbus_connection_remove_filter)
+};
 
 } // namespace Gio

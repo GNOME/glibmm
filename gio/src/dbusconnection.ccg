@@ -21,6 +21,63 @@
 #include <giomm/dbusauthobserver.h>
 #include "slot_async.h"
 
+namespace
+{
+
+extern "C"
+{
+
+static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection, const gchar* sender_name, const gchar* object_path, const gchar* interface_name, const gchar* signal_name, GVariant* parameters, gpointer user_data)
+{
+  Gio::DBusConnection::SlotSignal* the_slot =
+    static_cast<Gio::DBusConnection::SlotSignal*>(user_data);
+
+  try
+  {
+    (*the_slot)(Glib::wrap(connection, true), Glib::ustring(sender_name),
+      Glib::ustring(object_path), Glib::ustring(interface_name),
+      Glib::ustring(signal_name), Glib::VariantBase(parameters, true));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+}
+
+static void DBusConnection_Signal_giomm_callback_destroy(void* data)
+{
+  delete static_cast<Gio::DBusConnection::SlotSignal*>(data);
+}
+
+static GDBusMessage* DBusConnection_Message_Filter_giomm_callback(GDBusConnection* connection, GDBusMessage* message, gboolean incoming, gpointer user_data)
+{
+  Gio::DBusConnection::SlotMessageFilter* the_slot =
+    static_cast<Gio::DBusConnection::SlotMessageFilter*>(user_data);
+
+  try
+  {
+    Glib::RefPtr<Gio::DBusMessage> result = (*the_slot)(
+      Glib::wrap(connection, true), Glib::wrap(message, true),
+      static_cast<bool>(incoming));
+    return (result) ? result->gobj_copy() : 0;
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return message;
+}
+
+static void DBusConnection_Message_Filter_giomm_callback_destroy(void* data)
+{
+  delete static_cast<Gio::DBusConnection::SlotMessageFilter*>(data);
+}
+
+} // extern "C"
+
+}
+
 namespace Gio
 {
 
@@ -477,6 +534,34 @@ void DBusConnection::emit_singal(
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
+}
+
+guint DBusConnection::signal_subscribe(
+  const SlotSignal& slot,
+  const Glib::ustring& sender,
+  const Glib::ustring& interface_name,
+  const Glib::ustring& member,
+  const Glib::ustring& object_path,
+  const Glib::ustring& arg0,
+  DBusSignalFlags flags
+)
+{
+  SlotSignal* slot_copy = new SlotSignal(slot);
+
+  return g_dbus_connection_signal_subscribe(gobj(), sender.c_str(),
+    interface_name.c_str(), member.c_str(), object_path.c_str(), arg0.c_str(),
+    static_cast<GDBusSignalFlags>(flags), 
+    &DBusConnection_Signal_giomm_callback, slot_copy,
+    &DBusConnection_Signal_giomm_callback_destroy);
+}
+
+guint DBusConnection::add_filter(const SlotMessageFilter& slot)
+{
+  SlotMessageFilter* slot_copy = new SlotMessageFilter(slot);
+
+  return g_dbus_connection_add_filter(gobj(),
+    &DBusConnection_Message_Filter_giomm_callback, slot_copy,
+    DBusConnection_Message_Filter_giomm_callback_destroy);
 }
 
 } // namespace Gio
