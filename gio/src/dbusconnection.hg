@@ -402,11 +402,11 @@ public:
   #m4 _CONVERSION(`guint32*',`volatile guint32*',`($3)')
   _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32* out_serial), g_dbus_connection_send_message, errthrow)
 
-  /** Asynchronously sends message to the peer represented by connection.
+  /** Asynchronously sends message to the peer represented by the connection.
    *
    * Unless flags contain the Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL
-   * flag, the serial number will be assigned by connection and set on message
-   * via Gio::DBusMessage::set_serial().
+   * flag, the serial number will be assigned by the connection and set on
+   * message via Gio::DBusMessage::set_serial().
    *
    * If the connection is closed then the operation will fail with
    * Gio::IO_ERROR_CLOSED. If @a cancellable is canceled, the operation will
@@ -446,6 +446,51 @@ public:
 
   /// @throw Glib::Error.
   _WRAP_METHOD(Glib::RefPtr<DBusMessage> send_message_with_reply_finish(const Glib::RefPtr<AsyncResult>& result), g_dbus_connection_send_message_with_reply_finish, errthrow)
+
+  /** Synchronously sends @a message to the peer represented by the connection
+   * and blocks the calling thread until a reply is received or the timeout is
+   * reached. See send_message_with_reply() for the asynchronous version of
+   * this method. 
+   *
+   * Unless flags contain the Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL
+   * flag, the serial number will be assigned by the connection and set on
+   * message via Gio::DBusMessage::set_serial().
+   *
+   * If the connection is closed then the operation will fail with
+   * Gio::IO_ERROR_CLOSED. If @a cancellable is canceled, the operation will
+   * fail with Gio::IO_ERROR_CANCELLED. If @a message is not well-formed, the
+   * operation fails with Gio::IO_ERROR_INVALID_ARGUMENT.
+   *
+   * Note that a Glib::Error is thrown if a local in-process error occured.
+   * That is to say that the returned DBusMessage object may be of type
+   * G_DBUS_MESSAGE_TYPE_ERROR. Use Gio::DBusMessage::to_exception() to
+   * transcode this to a Glib::Error.
+   *
+   * See the C API docs for examples.
+   *
+   * Note that message must be unlocked, unless flags contain the
+   * Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL flag.
+   *
+   * @param message A DBusMessage.
+   * @param cancellable A Cancellable.
+   * @param timeout_msec The timeout in milliseconds or -1 to use the default
+   * timeout.
+   * @return A locked DBusMessage that is the reply to @a message or
+   * <tt>0</tt> if a Glib::Error is thrown.
+   * @throw Glib::Error.
+   * @newin{2,28}
+   */
+  Glib::RefPtr<DBusMessage> send_message_with_reply_sync(
+    const Glib::RefPtr<DBusMessage>& message,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    gint timeout_msec
+  );
+
+  /// A non-cancellable version of send_message_with_reply_sync().
+  Glib::RefPtr<DBusMessage> send_message_with_reply_sync(
+    const Glib::RefPtr<DBusMessage>& message,
+    gint timeout_msec
+  );
 
   _WRAP_METHOD(void start_message_processing(), g_dbus_connection_start_message_processing)
   _WRAP_METHOD(bool is_closed() const, g_dbus_connection_is_closed)

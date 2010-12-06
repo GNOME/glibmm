@@ -379,7 +379,7 @@ void DBusConnection::flush_sync()
 void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
-  volatile guint32 out_serial;
+  volatile guint32 out_serial = 0;
   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
                                       static_cast<GDBusSendMessageFlags>(message->get_flags()),
                                       timeout_msec, &out_serial,
@@ -391,13 +391,54 @@ void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& me
 void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const SlotAsyncReady& slot)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
-  volatile guint32 out_serial;
+  volatile guint32 out_serial = 0;
   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
                                       static_cast<GDBusSendMessageFlags>(message->get_flags()),
                                       timeout_msec, &out_serial,
                                       0, &SignalProxy_async_callback,
                                       slot_copy);
   message->set_serial(out_serial);
+}
+
+Glib::RefPtr<DBusMessage> DBusConnection::send_message_with_reply_sync(
+  const Glib::RefPtr<DBusMessage>& message,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  gint timeout_msec
+)
+{
+  volatile guint32 out_serial = 0;
+  GError* gerror = 0;
+
+  GDBusMessage* result =
+    g_dbus_connection_send_message_with_reply_sync(gobj(),
+    Glib::unwrap(message),
+    static_cast<GDBusSendMessageFlags>(message->get_flags()),
+    timeout_msec, &out_serial, Glib::unwrap(cancellable), &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+  message->set_serial(out_serial);
+  return Glib::wrap(result);
+}
+
+Glib::RefPtr<DBusMessage> DBusConnection::send_message_with_reply_sync(
+  const Glib::RefPtr<DBusMessage>& message,
+  gint timeout_msec
+)
+{
+  volatile guint32 out_serial = 0;
+  GError* gerror = 0;
+
+  GDBusMessage* result =
+    g_dbus_connection_send_message_with_reply_sync(gobj(),
+    Glib::unwrap(message),
+    static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec,
+    &out_serial, 0, &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+  message->set_serial(out_serial);
+  return Glib::wrap(result);
 }
 
 void DBusConnection::call(
