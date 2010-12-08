@@ -27,7 +27,7 @@ int main(int, char**)
   Glib::RefPtr<Gio::DBusConnection> connection =
     Gio::DBusConnection::get_sync(Gio::BUS_TYPE_SESSION);
 
-  // Print out the unique name of the user session bus.
+  // Print out the unique name of the connection to the user session bus.
   std::cout << connection->get_unique_name() << std::endl;
 
   return 0;
