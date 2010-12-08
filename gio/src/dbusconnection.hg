@@ -154,22 +154,22 @@ public:
    *
    * @newin{2,28}
    */
-  void get(BusType bus_type, const SlotAsyncReady& slot,
+  static void get(BusType bus_type, const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable);
   _IGNORE(g_bus_get)
 
   /** Non-cancellable version of get().
    */
-  void get(BusType bus_type, const SlotAsyncReady& slot);
+  static void get(BusType bus_type, const SlotAsyncReady& slot);
+
+  _WRAP_METHOD_DOCS_ONLY( g_bus_get_finish, errthrow)
+  /// @throw Glib::Error.
+  _WRAP_METHOD(static Glib::RefPtr<DBusConnection> get_finish(const Glib::RefPtr<AsyncResult>& res), g_bus_get_finish, errthrow)
 
   _WRAP_METHOD(static Glib::RefPtr<DBusConnection> get_sync(BusType bus_type, const Glib::RefPtr<Cancellable>& cancellable), g_bus_get_sync, errthrow)
 
   /// A Non-cancellable version of get_sync().
   static Glib::RefPtr<DBusConnection> get_sync(BusType bus_type);
-
-  _WRAP_METHOD_DOCS_ONLY( g_bus_get_finish, errthrow)
-  /// @throw Glib::Error.
-  _WRAP_METHOD(static Glib::RefPtr<DBusConnection> get_finish(const Glib::RefPtr<AsyncResult>& res), g_bus_get_finish, errthrow)
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new)
   static void create(const Glib::RefPtr<IOStream>& stream,
