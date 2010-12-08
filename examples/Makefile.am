@@ -20,6 +20,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 check_PROGRAMS =			\
 	child_watch/child_watch		\
 	compose/example			\
+	dbus/client			\
 	iochannel_stream/example	\
 	keyfile/example			\
 	markup/parser			\
@@ -55,6 +56,7 @@ iochannel_stream_example_SOURCES =	\
 	iochannel_stream/fdstream.h	\
 	iochannel_stream/main.cc
 
+# glibmm examples
 compose_example_SOURCES    = compose/main.cc
 keyfile_example_SOURCES    = keyfile/main.cc
 markup_parser_SOURCES      = markup/parser.cc
@@ -70,6 +72,10 @@ thread_thread_SOURCES      = thread/thread.cc
 thread_thread_LDADD        = $(thread_ldadd)
 thread_threadpool_SOURCES  = thread/threadpool.cc
 thread_threadpool_LDADD    = $(thread_ldadd)
+
+# giomm examples
+dbus_client_SOURCES = dbus/client.cc
+dbus_client_LDADD   = $(giomm_ldadd)
 
 network_resolver_SOURCES   = network/resolver.cc
 network_resolver_LDADD     = $(giomm_ldadd)
