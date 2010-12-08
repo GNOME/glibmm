@@ -310,6 +310,20 @@ void DBusConnection::get(BusType bus_type, const SlotAsyncReady& slot)
     slot_copy);
 }
 
+//static
+Glib::RefPtr<DBusConnection> DBusConnection::get_sync(BusType bus_type)
+{
+  GError* gerror = 0;
+
+  GDBusConnection* result = g_bus_get_sync(static_cast<GBusType>(bus_type),
+    0, & gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return Glib::wrap(result);
+}
+
 void DBusConnection::close()
 {
   g_dbus_connection_close(gobj(), 0, 0, 0);
