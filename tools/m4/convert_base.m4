@@ -63,9 +63,9 @@ define(`__CONVERT_CONST_REFPTR_TO_P',`const_cast<$`'2>(Glib::unwrap($`'3))')
 define(`__CONVERT_CONST_REFPTR_TO_P_SUN',`const_cast<$`'2>(Glib::unwrap<$1>($`'3))')
 
 
-include(convert_gtk.m4)
-include(convert_pango.m4)
-include(convert_gdk.m4)
-include(convert_atk.m4)
+#include(convert_gtk.m4)
+#include(convert_pango.m4)
+#include(convert_gdk.m4)
+#include(convert_atk.m4)
 include(convert_glib.m4)
 
