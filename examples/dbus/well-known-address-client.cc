@@ -16,6 +16,7 @@
  */
 
 #include <giomm.h>
+#include <glibmm.h>
 #include <iostream>
 
 int main(int, char**)
