@@ -72,7 +72,18 @@ protected:
 
   DBusConnection(const Glib::RefPtr<IOStream>& stream,
     const Glib::ustring& guid,
+    const SlotAsyncReady& slot,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    DBusConnectionFlags flags);
+
+  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid,
     const Glib::RefPtr<DBusAuthObserver>& observer,
+    const SlotAsyncReady& slot,
+    DBusConnectionFlags flags);
+
+  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid,
     const SlotAsyncReady& slot,
     DBusConnectionFlags flags);
 
@@ -84,11 +95,25 @@ protected:
 
   DBusConnection(const Glib::RefPtr<IOStream>& stream,
     const Glib::ustring& guid,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    DBusConnectionFlags flags);
+
+  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid,
     const Glib::RefPtr<DBusAuthObserver>& observer,
+    DBusConnectionFlags flags);
+
+  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid,
     DBusConnectionFlags flags);
 
   DBusConnection(const Glib::ustring& address,
     const Glib::RefPtr<DBusAuthObserver>& observer,
+    const SlotAsyncReady& slot,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    DBusConnectionFlags flags);
+
+  DBusConnection(const Glib::ustring& address,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusConnectionFlags flags);
@@ -99,12 +124,23 @@ protected:
     DBusConnectionFlags flags);
 
   DBusConnection(const Glib::ustring& address,
+    const SlotAsyncReady& slot,
+    DBusConnectionFlags flags);
+
+  DBusConnection(const Glib::ustring& address,
     const Glib::RefPtr<DBusAuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusConnectionFlags flags);
 
   DBusConnection(const Glib::ustring& address,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    DBusConnectionFlags flags);
+
+  DBusConnection(const Glib::ustring& address,
     const Glib::RefPtr<DBusAuthObserver>& observer,
+    DBusConnectionFlags flags);
+
+  DBusConnection(const Glib::ustring& address,
     DBusConnectionFlags flags);
 
 public:
@@ -179,10 +215,23 @@ public:
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
 
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new)
+  static void create(const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid,
+    const SlotAsyncReady& slot,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+
   /// Non-cancellable version of create().
   static void create(const Glib::RefPtr<IOStream>& stream,
     const Glib::ustring& guid,
     const Glib::RefPtr<DBusAuthObserver>& observer,
+    const SlotAsyncReady& slot,
+    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+
+  /// Non-cancellable version of create().
+  static void create(const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid,
     const SlotAsyncReady& slot,
     DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
 
@@ -197,9 +246,20 @@ public:
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
 
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address)
+  static void create_for_address(const Glib::ustring& address,
+    const SlotAsyncReady& slot,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+
   /// Non-cancellable version of create_for_address().
   static void create_for_address(const Glib::ustring& address,
     const Glib::RefPtr<DBusAuthObserver>& observer,
+    const SlotAsyncReady& slot,
+    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+
+  /// Non-cancellable version of create_for_address().
+  static void create_for_address(const Glib::ustring& address,
     const SlotAsyncReady& slot,
     DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
 
@@ -216,12 +276,25 @@ public:
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
 
-  /** Non-cancellable version of create_sync().
-   */
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_sync)
+  /// @throw Glib::Error.
+  static Glib::RefPtr<DBusConnection> create_sync(
+    const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+
+  /// Non-cancellable version of create_sync().
   static Glib::RefPtr<DBusConnection> create_sync(
     const Glib::RefPtr<IOStream>& stream,
     const Glib::ustring& guid,
     const Glib::RefPtr<DBusAuthObserver>& observer,
+    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+
+  /// Non-cancellable version of create_sync().
+  static Glib::RefPtr<DBusConnection> create_sync(
+    const Glib::RefPtr<IOStream>& stream,
+    const Glib::ustring& guid,
     DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address_sync)
@@ -232,11 +305,22 @@ public:
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
 
-  /** Non-cancellable version of create_for_address_sync().
-   */
+  _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address_sync)
+  /// @throw Glib::Error.
+  static Glib::RefPtr<DBusConnection> create_for_address_sync(
+    const Glib::ustring& address,
+    const Glib::RefPtr<Cancellable>& cancellable,
+    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+
+  /// Non-cancellable version of create_for_address_sync().
   static Glib::RefPtr<DBusConnection> create_for_address_sync(
     const Glib::ustring& address,
     const Glib::RefPtr<DBusAuthObserver>& observer,
+    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+
+  /// Non-cancellable version of create_for_address_sync().
+  static Glib::RefPtr<DBusConnection> create_for_address_sync(
+    const Glib::ustring& address,
     DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
 
   /** Closes the connection. Note that this never causes the process to exit

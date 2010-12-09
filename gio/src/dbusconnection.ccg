@@ -27,7 +27,10 @@ namespace
 extern "C"
 {
 
-static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection, const gchar* sender_name, const gchar* object_path, const gchar* interface_name, const gchar* signal_name, GVariant* parameters, gpointer user_data)
+static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection,
+  const gchar* sender_name, const gchar* object_path,
+  const gchar* interface_name, const gchar* signal_name, GVariant* parameters,
+  gpointer user_data)
 {
   Gio::DBusConnection::SlotSignal* the_slot =
     static_cast<Gio::DBusConnection::SlotSignal*>(user_data);
@@ -49,7 +52,9 @@ static void DBusConnection_Signal_giomm_callback_destroy(void* data)
   delete static_cast<Gio::DBusConnection::SlotSignal*>(data);
 }
 
-static GDBusMessage* DBusConnection_Message_Filter_giomm_callback(GDBusConnection* connection, GDBusMessage* message, gboolean incoming, gpointer user_data)
+static GDBusMessage* DBusConnection_Message_Filter_giomm_callback(
+  GDBusConnection* connection, GDBusMessage* message, gboolean incoming,
+  gpointer user_data)
 {
   Gio::DBusConnection::SlotMessageFilter* the_slot =
     static_cast<Gio::DBusConnection::SlotMessageFilter*>(user_data);
@@ -98,6 +103,20 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
 
 DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   const Glib::ustring& guid,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusConnectionFlags flags)
+:
+  _CONSTRUCT("stream", Glib::unwrap(stream),
+    "guid", (guid.empty() ? 0 : guid.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
+{
+  init_async(slot, cancellable);
+}
+
+DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   const SlotAsyncReady& slot,
   DBusConnectionFlags flags)
@@ -110,6 +129,19 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init_async(slot);
 }
 
+DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid,
+  const SlotAsyncReady& slot,
+  DBusConnectionFlags flags)
+:
+  _CONSTRUCT("stream", Glib::unwrap(stream),
+    "guid", (guid.empty() ? 0 : guid.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
+{
+  init_async(slot);
+}
+
 DBusConnection::DBusConnection(const Glib::ustring& address,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   const SlotAsyncReady& slot,
@@ -118,7 +150,19 @@ DBusConnection::DBusConnection(const Glib::ustring& address,
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
-    "observer", Glib::unwrap(observer))
+    "authentication-observer", Glib::unwrap(observer))
+{
+  init_async(slot, cancellable);
+}
+
+DBusConnection::DBusConnection(const Glib::ustring& address,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusConnectionFlags flags)
+:
+  _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
 {
   init_async(slot, cancellable);
 }
@@ -130,7 +174,18 @@ DBusConnection::DBusConnection(const Glib::ustring& address,
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
-    "observer", Glib::unwrap(observer))
+    "authentication-observer", Glib::unwrap(observer))
+{
+  init_async(slot);
+}
+
+DBusConnection::DBusConnection(const Glib::ustring& address,
+  const SlotAsyncReady& slot,
+  DBusConnectionFlags flags)
+:
+  _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
 {
   init_async(slot);
 }
@@ -145,6 +200,19 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
     "guid", (guid.empty() ? 0 : guid.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
     "authentication-observer", Glib::unwrap(observer))
+{
+  init(cancellable);
+}
+
+DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusConnectionFlags flags)
+:
+  _CONSTRUCT("stream", Glib::unwrap(stream),
+    "guid", (guid.empty() ? 0 : guid.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
 {
   init(cancellable);
 }
@@ -162,6 +230,18 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init();
 }
 
+DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid,
+  DBusConnectionFlags flags)
+:
+  _CONSTRUCT("stream", Glib::unwrap(stream),
+    "guid", (guid.empty() ? 0 : guid.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
+{
+  init();
+}
+
 DBusConnection::DBusConnection(const Glib::ustring& address,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable,
@@ -169,7 +249,18 @@ DBusConnection::DBusConnection(const Glib::ustring& address,
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
-    "observer", Glib::unwrap(observer))
+    "authentication-observer", Glib::unwrap(observer))
+{
+  init(cancellable);
+}
+
+DBusConnection::DBusConnection(const Glib::ustring& address,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusConnectionFlags flags)
+:
+  _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
 {
   init(cancellable);
 }
@@ -180,7 +271,17 @@ DBusConnection::DBusConnection(const Glib::ustring& address,
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
-    "observer", Glib::unwrap(observer))
+    "authentication-observer", Glib::unwrap(observer))
+{
+  init();
+}
+
+DBusConnection::DBusConnection(const Glib::ustring& address,
+  DBusConnectionFlags flags)
+:
+  _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
+    "flags", static_cast<GDBusConnectionFlags>(flags),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
 {
   init();
 }
@@ -207,6 +308,24 @@ void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
 //static
 void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
   const Glib::ustring& guid,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusConnectionFlags flags)
+{
+  // Note that this does not return anything, because it is async - see
+  // create_finish().
+
+  // Create the connection, taking an extra reference without returning it.
+  // The extra reference is taken so the connection is not destroyed when it
+  // goes out of scope.  The finished connection will be returned in the slot
+  // by calling create_finish().
+  Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid, slot,
+    cancellable, flags))->reference();
+}
+
+//static
+void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   const SlotAsyncReady& slot,
   DBusConnectionFlags flags)
@@ -220,6 +339,23 @@ void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
   // by calling create_finish().
   Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid, observer,
     slot, flags))->reference();
+}
+
+//static
+void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid,
+  const SlotAsyncReady& slot,
+  DBusConnectionFlags flags)
+{
+  // Note that this does not return anything, because it is async - see
+  // create_finish().
+
+  // Create the connection, taking an extra reference without returning it.
+  // The extra reference is taken so the connection is not destroyed when it
+  // goes out of scope.  The finished connection will be returned in the slot
+  // by calling create_finish().
+  Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid, slot,
+    flags))->reference();
 }
 
 //static
@@ -238,11 +374,32 @@ Glib::RefPtr<DBusConnection> DBusConnection::create_sync(
 Glib::RefPtr<DBusConnection> DBusConnection::create_sync(
   const Glib::RefPtr<IOStream>& stream,
   const Glib::ustring& guid,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusConnectionFlags flags)
+{
+  return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid,
+    cancellable, flags));
+}
+
+//static
+Glib::RefPtr<DBusConnection> DBusConnection::create_sync(
+  const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   DBusConnectionFlags flags)
 {
   return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid,
     observer, flags));
+}
+
+//static
+Glib::RefPtr<DBusConnection> DBusConnection::create_sync(
+  const Glib::RefPtr<IOStream>& stream,
+  const Glib::ustring& guid,
+  DBusConnectionFlags flags)
+{
+  return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid,
+    flags));
 }
 
 //static
@@ -265,6 +422,23 @@ void DBusConnection::create_for_address(const Glib::ustring& address,
 
 //static
 void DBusConnection::create_for_address(const Glib::ustring& address,
+  const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusConnectionFlags flags)
+{
+  // Note that this does not return anything, because it is async - see
+  // create_finish().
+
+  // Create the connection, taking an extra reference without returning it.
+  // The extra reference is taken so the connection is not destroyed when it
+  // goes out of scope.  The finished connection will be returned in the slot
+  // by calling create_finish().
+  Glib::RefPtr<DBusConnection>(new DBusConnection(address, slot, cancellable,
+    flags))->reference();
+}
+
+//static
+void DBusConnection::create_for_address(const Glib::ustring& address,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   const SlotAsyncReady& slot,
   DBusConnectionFlags flags)
@@ -277,6 +451,22 @@ void DBusConnection::create_for_address(const Glib::ustring& address,
   // goes out of scope.  The finished connection will be returned in the slot
   // by calling create_finish().
   Glib::RefPtr<DBusConnection>(new DBusConnection(address, observer, slot,
+    flags))->reference();
+}
+
+//static
+void DBusConnection::create_for_address(const Glib::ustring& address,
+  const SlotAsyncReady& slot,
+  DBusConnectionFlags flags)
+{
+  // Note that this does not return anything, because it is async - see
+  // create_finish().
+
+  // Create the connection, taking an extra reference without returning it.
+  // The extra reference is taken so the connection is not destroyed when it
+  // goes out of scope.  The finished connection will be returned in the slot
+  // by calling create_finish().
+  Glib::RefPtr<DBusConnection>(new DBusConnection(address, slot,
     flags))->reference();
 }
 
@@ -294,11 +484,29 @@ Glib::RefPtr<DBusConnection> DBusConnection::create_for_address_sync(
 //static
 Glib::RefPtr<DBusConnection> DBusConnection::create_for_address_sync(
   const Glib::ustring& address,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusConnectionFlags flags)
+{
+  return Glib::RefPtr<DBusConnection>(new DBusConnection(address, cancellable,
+    flags));
+}
+
+//static
+Glib::RefPtr<DBusConnection> DBusConnection::create_for_address_sync(
+  const Glib::ustring& address,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   DBusConnectionFlags flags)
 {
   return Glib::RefPtr<DBusConnection>(new DBusConnection(address, observer,
     flags));
+}
+
+//static
+Glib::RefPtr<DBusConnection> DBusConnection::create_for_address_sync(
+  const Glib::ustring& address,
+  DBusConnectionFlags flags)
+{
+  return Glib::RefPtr<DBusConnection>(new DBusConnection(address, flags));
 }
 
 //static
