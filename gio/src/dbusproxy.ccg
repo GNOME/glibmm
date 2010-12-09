@@ -295,11 +295,12 @@ void DBusProxy::get_cached_property(Glib::VariantBase& property,
 }
 
 void DBusProxy::call(const Glib::ustring& method_name,
-  int timeout_msec,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
   const Glib::VariantBase& parameters,
-  DBusCallFlags flags)
+  int timeout_msec,
+  DBusCallFlags flags
+)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -313,10 +314,11 @@ void DBusProxy::call(const Glib::ustring& method_name,
 }
 
 void DBusProxy::call(const Glib::ustring& method_name,
-  int timeout_msec,
   const SlotAsyncReady& slot,
   const Glib::VariantBase& parameters,
-  DBusCallFlags flags)
+  int timeout_msec,
+  DBusCallFlags flags
+)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -343,9 +345,12 @@ void DBusProxy::call_finish(Glib::VariantBase& ret, const Glib::RefPtr<AsyncResu
 }
 
 void DBusProxy::call_sync(Glib::VariantBase& result,
-  const Glib::ustring& method_name, int timeout_msec, DBusCallFlags flags,
+  const Glib::ustring& method_name,
+  const Glib::RefPtr<Cancellable>& cancellable,
   const Glib::VariantBase& parameters, 
-  const Glib::RefPtr<Cancellable>& cancellable)
+  int timeout_msec,
+  DBusCallFlags flags
+)
 {
   GError *g_error = 0;
 
@@ -354,6 +359,26 @@ void DBusProxy::call_sync(Glib::VariantBase& result,
     const_cast<GVariant*>(parameters.gobj()),
     static_cast<GDBusCallFlags>(flags), timeout_msec,
     Glib::unwrap(cancellable), &g_error);
+
+  if(g_error)
+    ::Glib::Error::throw_exception(g_error);
+
+  result.init(g_variant, false /* don't take extra reference */);
+}
+
+void DBusProxy::call_sync(Glib::VariantBase& result,
+  const Glib::ustring& method_name,
+  const Glib::VariantBase& parameters, 
+  int timeout_msec,
+  DBusCallFlags flags
+)
+{
+  GError *g_error = 0;
+
+  GVariant* const g_variant =
+    g_dbus_proxy_call_sync(gobj(), method_name.c_str(), 
+    const_cast<GVariant*>(parameters.gobj()),
+    static_cast<GDBusCallFlags>(flags), timeout_msec, 0, &g_error);
 
   if(g_error)
     ::Glib::Error::throw_exception(g_error);
