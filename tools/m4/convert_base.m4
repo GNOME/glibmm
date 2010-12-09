@@ -51,6 +51,12 @@ _CONVERSION(`$1::$2', `$1$2', (($1$2)(__ARG3__)))
 # e.g. Glib::RefPtr<Gdk::Something> to GdkSomething*
 define(`__CONVERT_REFPTR_TO_P',`Glib::unwrap($`'3)')
 
+define(`__FR2P',`($`'3).gobj()')
+define(`__CFR2P',`const_cast<$`'2>($`'3.gobj())')
+define(`__FCR2P',`const_cast<$`'2>(($`'3).gobj())')
+
+define(`__FL2H_SHALLOW',`$`'2($`'3, Glib::OWNERSHIP_SHALLOW)')
+
 # e.g. Glib::RefPtr<const Gdk::Something> to GdkSomething*
 #define(`__CONVERT_CONST_REFPTR_TO_P',`const_cast<$`'2>($`'3->gobj())')
 define(`__CONVERT_CONST_REFPTR_TO_P',`const_cast<$`'2>(Glib::unwrap($`'3))')
