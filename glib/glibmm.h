@@ -50,6 +50,7 @@
  * giomm (part of the glibmm project) also contains:
  * - Asynchronous IO. See Gio::File and the @ref Streams.
  * - @ref NetworkIO
+ * - @ref DBus
  *
  * @section basics Basic Usage
  *
