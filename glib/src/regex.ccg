@@ -41,11 +41,66 @@ Glib::ustring Regex::escape_string(const Glib::ustring& string)
   return Glib::ustring(buf.get());
 }
 
+bool Regex::match(
+  const Glib::ustring& string,
+  Glib::MatchInfo& match_info,
+  RegexMatchFlags match_options
+)
+{
+  GMatchInfo* ginfo = 0;
+  bool const result = static_cast<bool>(g_regex_match(gobj(), string.c_str(),
+    static_cast<GRegexMatchFlags>(match_options), &ginfo));
+  match_info.set_gobject(ginfo);
+  return result;
+}
+
 bool Regex::match(const Glib::ustring& string, RegexMatchFlags match_options)
 {
   return g_regex_match(gobj(), string.c_str(), (GRegexMatchFlags)(match_options), 0);
 }
 
+bool Regex::match(
+  const Glib::ustring& string,
+  int start_position,
+  Glib::MatchInfo& match_info,
+  RegexMatchFlags match_options
+)
+{
+  GError* gerror = 0;
+  GMatchInfo* ginfo = 0;
+
+  bool const result = static_cast<bool>(g_regex_match_full(gobj(),
+    string.c_str(), -1, start_position,
+    static_cast<GRegexMatchFlags>(match_options), &ginfo, &gerror));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  match_info.set_gobject(ginfo);
+  return result;
+}
+
+bool Regex::match(
+  const Glib::ustring& string,
+  gssize string_len,
+  int start_position,
+  Glib::MatchInfo& match_info,
+  RegexMatchFlags match_options
+)
+{
+  GError* gerror = 0;
+  GMatchInfo* ginfo = 0;
+
+  bool const result = static_cast<bool>(g_regex_match_full(gobj(),
+    string.c_str(), string_len, start_position,
+    static_cast<GRegexMatchFlags>(match_options), &ginfo, &gerror));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  match_info.set_gobject(ginfo);
+  return result;
+}
 
 bool Regex::match(const Glib::ustring& string, int start_position, RegexMatchFlags match_options)
 {
@@ -67,12 +122,67 @@ bool Regex::match(const Glib::ustring& string, gssize string_len, int start_posi
   return retvalue;
 }
 
+bool Regex::match_all(
+  const Glib::ustring& string,
+  Glib::MatchInfo& match_info,
+  RegexMatchFlags match_options
+)
+{
+  GMatchInfo* ginfo = 0;
+  bool const result = static_cast<bool>(g_regex_match_all(gobj(),
+    string.c_str(), static_cast<GRegexMatchFlags>(match_options),
+    &ginfo));
+  match_info.set_gobject(ginfo);
+  return result;
+}
 
 bool Regex::match_all(const Glib::ustring& string, RegexMatchFlags match_options)
 {
   return g_regex_match_all(gobj(), string.c_str(), ((GRegexMatchFlags)(match_options)), 0);
 }
 
+bool Regex::match_all(
+  const Glib::ustring& string,
+  int start_position,
+  Glib::MatchInfo& match_info,
+  RegexMatchFlags match_options
+)
+{
+  GError* gerror = 0;
+  GMatchInfo* ginfo = 0;
+
+  bool const retvalue = static_cast<bool>(g_regex_match_all_full(gobj(),
+    string.c_str(), -1, start_position,
+    static_cast<GRegexMatchFlags>(match_options), &ginfo, &gerror));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  match_info.set_gobject(ginfo);
+  return retvalue;
+}
+
+bool Regex::match_all(
+  const Glib::ustring& string,
+  gssize string_len,
+  int start_position,
+  Glib::MatchInfo& match_info,
+  RegexMatchFlags match_options
+)
+{
+  GError* gerror = 0;
+  GMatchInfo* ginfo = 0;
+
+  bool const retvalue = static_cast<bool>(g_regex_match_all_full(gobj(),
+    string.c_str(), string_len, start_position,
+    static_cast<GRegexMatchFlags>(match_options), &ginfo, &gerror));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  match_info.set_gobject(ginfo);
+  return retvalue;
+}
 
 bool Regex::match_all(const Glib::ustring& string, int start_position, RegexMatchFlags match_options)
 {
@@ -93,8 +203,6 @@ bool Regex::match_all(const Glib::ustring& string, gssize string_len, int start_
 
   return retvalue;
 }
-
-
 
 Glib::ustring Regex::replace(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options)
 {
@@ -125,6 +233,34 @@ Glib::StringArrayHandle Regex::split(const Glib::ustring& string, int start_posi
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
+}
+
+
+MatchInfo::MatchInfo()
+: gobject_(0),
+  take_ownership(false)
+{
+}
+
+MatchInfo::MatchInfo(GMatchInfo* castitem, bool take_ownership)
+: gobject_(castitem),
+  take_ownership(take_ownership)
+{
+}
+
+void MatchInfo::set_gobject(GMatchInfo* castitem, bool take_ownership)
+{
+  if(gobject_ && take_ownership)
+    g_match_info_free(gobject_);
+
+  gobject_ = castitem;
+  this->take_ownership = take_ownership;
+}
+
+MatchInfo::~MatchInfo()
+{
+  if(take_ownership && gobject_)
+    g_match_info_free(gobject_);
 }
 
 } // namespace Glib
