@@ -34,10 +34,15 @@
 #include <giomm/dbusaddress.h>
 #include <giomm/dbusauthobserver.h>
 #include <giomm/dbusconnection.h>
+#include <giomm/dbuserror.h>
+#include <giomm/dbusintrospection.h>
 #include <giomm/dbusmessage.h>
 #include <giomm/dbusmethodinvocation.h>
 #include <giomm/dbusownname.h>
+#include <giomm/dbusproxy.h>
 #include <giomm/dbusserver.h>
+#include <giomm/dbusutils.h>
+#include <giomm/dbuswatchname.h>
 #ifndef G_OS_WIN32
 # include <giomm/desktopappinfo.h>
 #endif

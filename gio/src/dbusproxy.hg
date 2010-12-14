@@ -47,18 +47,15 @@ class DBusInterfaceInfo;
  * appears.
  *
  * If a DBusProxy is used for a well-known name, the owner of the name is
- * tracked and can be read from property_g_name_owner(). Connect to the
- * signal_notify() signal to get notified of changes. Additionally, only
- * signals and property changes emitted from the current name owner are
- * considered. This avoids a number of race conditions when the name is lost
- * by one owner and claimed by another.
+ * tracked and can be read from property_g_name_owner().
  *
  * The generic signal_g_properties_changed() and signal_g_signal() signals are
  * not very convenient to work with. Therefore, the recommended way of working
  * with proxies is to subclass DBusProxy, and have more natural properties and
  * signals in your derived class.
  *
- * The C API docs has more information and an example.
+ * This documentation was adapted from the C API documentation.  The C API docs
+ * has more information and an example.
  *
  * @newin{2,28}
  * @ingroup DBus
@@ -69,38 +66,40 @@ class DBusProxy
   public AsyncInitable
 {
   _CLASS_GOBJECT(DBusProxy, GDBusProxy, G_DBUS_PROXY, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Initable)
+  _IMPLEMENTS_INTERFACE(AsyncInitable)
 
 protected:
 
   DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
+    const Glib::ustring& name,
     const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    const Glib::ustring& name = Glib::ustring(),
     const Glib::RefPtr<DBusInterfaceInfo>& info = Glib::RefPtr<DBusInterfaceInfo>(),
     DBusProxyFlags flags = DBUS_PROXY_FLAGS_NONE);
 
   DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
+    const Glib::ustring& name,
     const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
     const SlotAsyncReady& slot,
-    const Glib::ustring& name = Glib::ustring(),
     const Glib::RefPtr<DBusInterfaceInfo>& info = Glib::RefPtr<DBusInterfaceInfo>(),
     DBusProxyFlags flags = DBUS_PROXY_FLAGS_NONE);
 
   DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
+    const Glib::ustring& name,
     const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
     const Glib::RefPtr<Cancellable>& cancellable,
-    const Glib::ustring& name = Glib::ustring(),
     const Glib::RefPtr<DBusInterfaceInfo>& info = Glib::RefPtr<DBusInterfaceInfo>(),
     DBusProxyFlags flags = DBUS_PROXY_FLAGS_NONE);
 
   DBusProxy(const Glib::RefPtr<DBusConnection>& connection,
+    const Glib::ustring& name,
     const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
-    const Glib::ustring& name = Glib::ustring(),
     const Glib::RefPtr<DBusInterfaceInfo>& info = Glib::RefPtr<DBusInterfaceInfo>(),
     DBusProxyFlags flags = DBUS_PROXY_FLAGS_NONE);
 
@@ -140,20 +139,20 @@ public:
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new)
   static void create(const Glib::RefPtr<DBusConnection>& connection,
+    const Glib::ustring& name,
     const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    const Glib::ustring& name = Glib::ustring(),
     const Glib::RefPtr<DBusInterfaceInfo>& info = Glib::RefPtr<DBusInterfaceInfo>(),
     DBusProxyFlags flags = DBUS_PROXY_FLAGS_NONE);
 
   /// Non-cancellable version of create().
   static void create(const Glib::RefPtr<DBusConnection>& connection,
+    const Glib::ustring& name,
     const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
     const SlotAsyncReady& slot,
-    const Glib::ustring& name = Glib::ustring(),
     const Glib::RefPtr<DBusInterfaceInfo>& info = Glib::RefPtr<DBusInterfaceInfo>(),
     DBusProxyFlags flags = DBUS_PROXY_FLAGS_NONE);
 
@@ -164,19 +163,19 @@ public:
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_sync)
   static Glib::RefPtr<DBusProxy>
   create_sync(const Glib::RefPtr<DBusConnection>& connection,
+    const Glib::ustring& name,
     const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
     const Glib::RefPtr<Cancellable>& cancellable,
-    const Glib::ustring& name = Glib::ustring(),
     const Glib::RefPtr<DBusInterfaceInfo>& info = Glib::RefPtr<DBusInterfaceInfo>(),
     DBusProxyFlags flags = DBUS_PROXY_FLAGS_NONE);
 
   /// Non-cancellable version of create_sync().
   static Glib::RefPtr<DBusProxy>
   create_sync(const Glib::RefPtr<DBusConnection>& connection,
+    const Glib::ustring& name,
     const Glib::ustring& object_path,
     const Glib::ustring& interface_name,
-    const Glib::ustring& name = Glib::ustring(),
     const Glib::RefPtr<DBusInterfaceInfo>& info = Glib::RefPtr<DBusInterfaceInfo>(),
     DBusProxyFlags flags = DBUS_PROXY_FLAGS_NONE);
 
