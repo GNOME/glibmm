@@ -35,7 +35,7 @@ namespace Glib
  */
 
 /** The base class used to wrap glib's GVariant API.
- * @newin{2,26}
+ * @newin{2,28}
  * @ingroup glibmmVariant
  */
 class VariantBase
@@ -62,9 +62,6 @@ public:
 
   bool get_maybe(Glib::VariantBase& maybe) const;
   _IGNORE(g_variant_get_maybe)
-
-  //TODO: Somehow put this method only in specializations that use container types?:
-  _WRAP_METHOD(gsize get_n_children() const, g_variant_n_children)
 
   _WRAP_METHOD(gsize get_size() const, g_variant_get_size)
   _WRAP_METHOD(gconstpointer get_data(), g_variant_get_data)
@@ -121,8 +118,8 @@ public:
    _IGNORE(g_variant_byteswap)
 };
 
-/** Template class from which other Glib::Variant<> specializations derive.
- * @newin{2,26}
+/** Template class used for the specialization of the Glib::Variant<> classes.
+ * @newin{2,28}
  * @ingroup glibmmVariant
  */
 template <class T>
@@ -140,12 +137,16 @@ _IGNORE(g_variant_get_type)
 /****************** Specializations ***********************************/
 
 /** Specialization of Glib::Variant containing a Glib::VariantBase.
- * @newin{2,26}
+ * @newin{2,28}
  * @ingroup glibmmVariant
  */
 template <>
 class Variant<VariantBase> : public VariantBase
 {
+  // Trick gmmproc into thinking this is derived from GVariant to wrap a method
+  // below.
+  _CLASS_GENERIC(Variant<VariantBase>, GVariant)
+
 public:
   typedef GVariant* CType;
 
@@ -165,10 +166,12 @@ public:
 
   VariantBase get() const;
   _IGNORE(g_variant_get_variant)
+
+  _WRAP_METHOD(gsize get_n_children() const, g_variant_n_children)
 };
 
 /** Specialization of Glib::Variant containing a Glib::ustring.
- * @newin{2,26}
+ * @newin{2,28}
  * @ingroup glibmmVariant
  */
 template <>

@@ -28,8 +28,63 @@ typedef struct _GVariantType GVariantType;
 namespace Glib
 {
 
-/** TODO
- * @newin{2,26}
+/** VariantType - The Glib::VariantBase type system.
+ * The Glib::VariantBase type system is based, in large part, on the DBus type
+ * system, with two major changes and some minor lifting of restrictions. <a
+ * href="http://dbus.freedesktop.org/doc/dbus-specification.html">The
+ * DBus specification</a>, therefore, provides a significant amount of
+ * information that is useful when working with Glib::VariantBase.
+ *
+ * The first major change with respect to the DBus type system is the
+ * introduction of maybe (or "nullable") types. Any type in Glib::VariantBase
+ * can be converted to a maybe type, in which case, "nothing" (or "null")
+ * becomes a valid value. Maybe types have been added by introducing the
+ * character "m" to type strings.
+ *
+ * The second major change is that the Glib::VariantBase type system supports
+ * the concept of "indefinite types" -- types that are less specific than the
+ * normal types found in DBus. For example, it is possible to speak of "an
+ * array of any type" in Glib::VariantBase, where the DBus type system would
+ * require you to speak of "an array of integers" or "an array of strings".
+ * Indefinite types have been added by introducing the characters "*", "?" and
+ * "r" to type strings.
+ *
+ * Finally, all arbitrary restrictions relating to the complexity of types are
+ * lifted along with the restriction that dictionary entries may only appear
+ * nested inside of arrays.
+ *
+ * Just as in DBus, Glib::VariantBase types are described with strings ("type
+ * strings"). Subject to the differences mentioned above, these strings are of
+ * the same form as those found in DBus. Note, however: DBus always works in
+ * terms of messages and therefore individual type strings appear nowhere in
+ * its interface. Instead, "signatures" are a concatenation of the strings of
+ * the type of each argument in a message. Glib::VariantBase deals with single
+ * values directly so Glib::VariantBase type strings always describe the type
+ * of exactly one value. This means that a DBus signature string is generally
+ * not a valid Glib::VariantBase type string -- except in the case that it is
+ * the signature of a message containing exactly one argument.
+ *
+ * An indefinite type is similar in spirit to what may be called an abstract
+ * type in other type systems. No value can exist that has an indefinite type
+ * as its type, but values can exist that have types that are subtypes of
+ * indefinite types. That is to say, Glib::VariantBase::get_type() will never
+ * return an indefinite type, but calling Glib::VariantBase::is_of_type() with
+ * an indefinite type may return <tt>true</tt>. For example, you can not have a
+ * value that represents "an array of no particular type", but you can have an
+ * "array of integers" which certainly matches the type of "an array of no
+ * particular type", since "array of integers" is a subtype of "array of no
+ * particular type".
+ *
+ * This is similar to how instances of abstract classes may not directly exist
+ * in other type systems, but instances of their non-abstract subtypes may. For
+ * example, in gtkmm, no object that has the type of Gtk::Bin can exist (since
+ * Gtk::Bin is an abstract class), but a Gtk::Window can certainly be
+ * instantiated, and you would say that the Gtk::Window is a Gtk::Bin (since
+ * Gtk::Window is a subclass of Gtk::Bin).
+ *
+ * For a detailed description of the Glib::VariantBase type strings see the C
+ * API docs of GVariantType.
+ * @newin{2,28}
  * @ingroup glibmmVariant
  */
 class VariantType
