@@ -1,3 +1,13 @@
+2010-12-14  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	DBus[Connection|Proxy]: Don't take extra reference on async creation.
+
+	* gio/src/dbusconnection.ccg:
+	* gio/src/dbusproxy.ccg: There's no need to put the newly constructed
+	DBusConnection|DBusProxy in a Glib::RefPtr<> and then take an extra
+	reference.  Simply constructing the object is enough to guarantee that
+	the object continues existing until the SlotAsyncReady slot is called.
+
 2010-12-13  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	DBusProxy: Reorder the parameters so that "name" is second in methods.
