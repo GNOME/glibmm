@@ -1,5 +1,18 @@
 2010-12-14  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	DBus Client Example: create a DBusProxy in preparation for method call.
+
+	* examples/dbus/well-known-address-client.cc: Asynchronously create a
+	DBusProxy which can then be used to call a method on the user's
+	session bus.  This tests asynchronous creation of objects that derive
+	from the AsyncInitable interface.  The reference counting of the newly
+	created object should be checked because in the SlotAsyncReady slot,
+	the proxy has a reference count of two when it should possibly be
+	one (the g_dbus_proxy_new_finish() docs say that in the callback,
+	unreferencing the proxy destroys it).
+
+2010-12-14  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	DBus[Connection|Proxy]: Don't take extra reference on async creation.
 
 	* gio/src/dbusconnection.ccg:
