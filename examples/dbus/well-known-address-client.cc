@@ -63,7 +63,7 @@ int main(int, char**)
     Gio::DBusConnection::get_sync(Gio::BUS_TYPE_SESSION);
 
   // Check for an unavailable connection.
-  if (!connection)
+  if(!connection)
   {
     std::cerr << "The user's session bus is not available." << std::endl;
     return 1;
