@@ -110,4 +110,27 @@ Glib::ustring Variant<Glib::ustring>::get() const
   return Glib::ustring(g_variant_get_string(gobject_, 0));
 }
 
+// static
+const GVariantType* Variant<std::string>::variant_type()
+{
+  return G_VARIANT_TYPE_BYTESTRING;
+}
+
+Variant<std::string>
+Variant<std::string>::create(const std::string& data)
+{
+  Variant<std::string> result =
+    Variant<std::string>(g_variant_new_bytestring(data.c_str()));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
+}
+
+std::string Variant<std::string>::get() const
+{
+  return std::string(g_variant_get_bytestring(gobject_));
+}
+
 } // namespace Glib

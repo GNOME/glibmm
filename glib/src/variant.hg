@@ -195,6 +195,31 @@ public:
   _IGNORE(g_variant_get_string, g_variant_dup_string)
 };
 
+/** Specialization of Glib::Variant containing a std::string.
+ * @newin{2,28}
+ * @ingroup glibmmVariant
+ */
+template <>
+class Variant<std::string> : public VariantBase
+{
+public:
+  typedef char* CType;
+
+  Variant<std::string>()
+  : VariantBase()
+  {}
+
+  explicit Variant<std::string>(GVariant* castitem)
+  : VariantBase(castitem)
+  {}
+
+  static const GVariantType* variant_type() G_GNUC_CONST;
+  static Variant<std::string> create(const std::string& data);
+
+  std::string get() const;
+  _IGNORE(g_variant_get_bytestring, g_variant_dup_bytestring)
+};
+
 } // namespace Glib
 
 
