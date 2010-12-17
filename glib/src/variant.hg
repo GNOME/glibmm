@@ -19,7 +19,9 @@ _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
 #include <glibmm/varianttype.h>
+#include <glibmm/variantiter.h>
 #include <glibmm/ustring.h>
+#include <vector>
 
 namespace Glib
 {
@@ -59,9 +61,6 @@ public:
   _WRAP_METHOD(bool is_of_type(const VariantType& type) const, g_variant_is_of_type)
   _WRAP_METHOD(bool is_container() const, g_variant_is_container)
   _WRAP_METHOD(GVariantClass classify() const, g_variant_classify)
-
-  bool get_maybe(Glib::VariantBase& maybe) const;
-  _IGNORE(g_variant_get_maybe)
 
   _WRAP_METHOD(gsize get_size() const, g_variant_get_size)
   _WRAP_METHOD(gconstpointer get_data(), g_variant_get_data)
@@ -148,26 +147,56 @@ class Variant<VariantBase> : public VariantBase
   _CLASS_GENERIC(Variant<VariantBase>, GVariant)
 
 public:
-  typedef GVariant* CType;
+  typedef GVariant*                     CType;
+  typedef VariantBase                   CppType;
+  typedef Variant<VariantBase>          CppContainerType;
 
+  /// Default constructor.
   Variant<VariantBase>()
   : VariantBase()
   {}
 
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   */
   explicit Variant<VariantBase>(GVariant* castitem)
   : VariantBase(castitem)
   {}
 
-  static const GVariantType* variant_type() G_GNUC_CONST;
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
+   * @newin{2,28}
+   */
+  static const Glib::VariantType& variant_type() G_GNUC_CONST;
 
-  //This must have a create() method because otherwise it would be a copy constructor.
+  //This must have a create() method because otherwise it would be a copy
+  //constructor.
+  /** Creates a new Glib::Variant<VariantBase>.
+   * @param data The value of the new Glib::Variant<VariantBase>.
+   * @return The new Glib::Variant<VariantBase>.
+   * @newin{2,28}
+   */
   static Variant<VariantBase> create(const Glib::VariantBase& data);
   _IGNORE(g_variant_new_variant)
 
-  VariantBase get() const;
+  /** Gets the child of the Glib::Variant<VariantBase>.
+   * @param child The location in which to store the child.
+   * @newin{2,28}
+   */
+  void get(Glib::VariantBase& child) const;
   _IGNORE(g_variant_get_variant)
 
   _WRAP_METHOD(gsize get_n_children() const, g_variant_n_children)
+
+  /** If this is a maybe-typed instance, extract its value. If the value is
+   * Nothing, then this function returns <tt>0</tt>.
+   *
+   * @param maybe A place in which to return the value (the value may be
+   * <tt>0</tt>).
+   * @newin{2,28}
+   */
+  bool get_maybe(Glib::VariantBase& maybe) const;
+  _IGNORE(g_variant_get_maybe)
 };
 
 /** Specialization of Glib::Variant containing a Glib::ustring.
@@ -180,17 +209,35 @@ class Variant<Glib::ustring> : public VariantBase
 public:
   typedef char* CType;
 
+  /// Default constructor.
   Variant<Glib::ustring>()
   : VariantBase()
   {}
 
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   */
   explicit Variant<Glib::ustring>(GVariant* castitem)
   : VariantBase(castitem)
   {}
 
-  static const GVariantType* variant_type() G_GNUC_CONST;
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
+   * @newin{2,28}
+   */
+  static const Glib::VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Glib::Variant<Glib::ustring>.
+   * @param data The value of the new Glib::Variant<Glib::ustring>.
+   * @return The new Glib::Variant<Glib::ustring>.
+   * @newin{2,28}
+   */
   static Variant<Glib::ustring> create(const Glib::ustring& data);
 
+  /** Gets the contents of the Glib::Variant<Glib::ustring>.
+   * @return The contents of the Glib::Variant<Glib::ustring>.
+   * @newin{2,28}
+   */
   Glib::ustring get() const;
   _IGNORE(g_variant_get_string, g_variant_dup_string)
 };
@@ -205,19 +252,98 @@ class Variant<std::string> : public VariantBase
 public:
   typedef char* CType;
 
+  /// Default constructor.
   Variant<std::string>()
   : VariantBase()
   {}
 
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   */
   explicit Variant<std::string>(GVariant* castitem)
   : VariantBase(castitem)
   {}
 
-  static const GVariantType* variant_type() G_GNUC_CONST;
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
+   * @newin{2,28}
+   */
+  static const Glib::VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Glib::Variant<std::string>.
+   * @param data The value of the new Glib::Variant<std::string>.
+   * @return The new Glib::Variant<std::string>.
+   * @newin{2,28}
+   */
   static Variant<std::string> create(const std::string& data);
 
+  /** Gets the contents of the Glib::Variant<std::string>.
+   * @return The contents of the Glib::Variant<std::string>.
+   * @newin{2,28}
+   */
   std::string get() const;
   _IGNORE(g_variant_get_bytestring, g_variant_dup_bytestring)
+};
+
+/** Specialization of Glib::Variant containing an array of items.
+ */
+template <class T>
+class Variant< std::vector<T> > : public Variant<VariantBase>
+{
+public:
+  typedef T                     CppType;
+  typedef std::vector<T>        CppContainerType;
+
+  /// Default constructor.
+  Variant< std::vector<T> >()
+  : Variant<VariantBase>()
+  {}
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   */
+  explicit Variant< std::vector<T> >(GVariant* castitem)
+  : Variant<VariantBase>(castitem)
+  {}
+
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
+   * @newin{2,28}
+   */
+  static const Glib::VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Glib::Variant< std::vector<T> > (a variant array).
+   * @param data The array of the new Glib::Variant< std::vector<T> >.
+   * @return The new Glib::Variant< std::vector<T> >.
+   * @newin{2,28}
+   */
+  static Variant< std::vector<T> > create(const std::vector<T>& data);
+  _IGNORE(g_variant_new_array)
+
+  /** Gets a specific element of the array.  It is an error if index_ is
+   * greater than the number of child items in the container.  See
+   * Glib::Variant<VariantBase>::n_children().
+   *
+   * This function is O(1).
+   *
+   * @param index The index of the element.
+   * @return The element at index @index.
+   * @newin{2,28}
+   */
+  T get(gsize index) const;
+
+  /** Gets the vector of the Glib::Variant< std::vector<T> >.
+   * @return The vector.
+   * @newin{2,28}
+   */
+  std::vector<T> get() const;
+  _IGNORE(get_variant_get_fixed_array)
+
+  /** Gets a VariantIter of the contained array.
+   * @return the VaraintIter.
+   * @newin{2,28}
+   */
+  VariantIter get_iter();
 };
 
 } // namespace Glib
@@ -242,3 +368,102 @@ _IGNORE(
 #define _GLIBMM_VARIANT_H_INCLUDE_VARIANT_BASICTYPES_H
 #include <glibmm/variant_basictypes.h>
 #undef _GLIBMM_VARIANT_H_INCLUDE_VARIANT_BASICTYPES_H
+
+namespace Glib
+{
+
+/*-----------------------Glib::Variant< std::vector<T> --------------------*/
+
+// static
+template<class T>
+const VariantType& Variant< std::vector<T> >::variant_type()
+{
+  static VariantType type(G_VARIANT_TYPE_ARRAY);
+  return type;
+}
+
+template<class T>
+Variant< std::vector<T> >
+Variant< std::vector<T> >::create(const  std::vector<T>& data)
+{
+  // Get the variant type of the elements as a string.
+  std::string element_variant_type =
+    static_cast<char*>(Variant<T>::variant_type().gobj());
+
+  // Get the variant type of the array as a string.
+  std::string array_variant_type = "a" + element_variant_type;
+
+  // Create a GVariantBuilder to build the array.
+  GVariantBuilder* builder =
+    g_variant_builder_new(G_VARIANT_TYPE(array_variant_type.c_str()));
+
+  // Add the elements of the vector into the builder.
+  for(typename std::vector<T>::iterator iter = data.begin(); iter < data.end();
+    iter++)
+  {
+    g_variant_builder_add(builder, element_variant_type, *iter);
+  }
+
+  // Create the variant using the builder.
+  Variant< std::vector<T> > result =
+    Variant< std::vector<T> >(g_variant_new(array_variant_type.c_str(),
+    builder));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
+}
+
+template<class T>
+T Variant< std::vector<T> >::get(gsize index) const
+{
+  GVariant* gvariant = g_variant_get_child_value(gobj(), index);
+  Glib::Variant<T> variant(gvariant, true /* take extra ref to preserve */);
+  return variant.get();
+}
+
+template<class T>
+std::vector<T> Variant< std::vector<T> >::get() const
+{
+  // Get the variant type of the elements as a string.
+  std::string element_variant_type =
+    static_cast<char*>(Variant<T>::variant_type().gobj());
+
+  // Get the variant type of the array as a string.
+  std::string array_variant_type = "a" + element_variant_type;
+
+  // Get the GVariantIter.
+  GVariantIter* g_iter = 0;
+  g_variant_get(gobj(), array_variant_type.c_str(), &g_iter);
+
+  // Wrap the GVariantIter.
+  VariantIter iter(g_iter);
+
+  std::vector<T> result;
+  Glib::Variant<T> element;
+
+  while(iter.next_value(element))
+    result.push_back(element.get());
+
+  return result;
+}
+
+template<class T>
+VariantIter Variant< std::vector<T> >::get_iter()
+{
+  // Get the variant type of the elements as a string.
+  std::string element_variant_type =
+    static_cast<char*>(Variant<T>::variant_type().gobj());
+
+  // Get the variant type of the array as a string.
+  std::string array_variant_type = "a" + element_variant_type;
+
+  // Get the GVariantIter.
+  GVariantIter* g_iter = 0;
+  g_variant_get(gobj(), array_variant_type.c_str(), &g_iter);
+
+  return VariantIter(g_iter);
+}
+
+} // namespace Glib

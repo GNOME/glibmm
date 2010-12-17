@@ -17,7 +17,7 @@
 
 #include <glibmm/variant.h>
 #include <glibmm/utility.h>
-#include <glib/gvariant.h>
+#include <glib.h>
 
 namespace Glib
 {
@@ -38,21 +38,6 @@ void VariantBase::byteswap(VariantBase& result) const
   result.init(g_value); // g_value is already referenced.
 }
 
-bool VariantBase::get_maybe(Glib::VariantBase& maybe) const
-{
-  GVariant* const g_value =
-    g_variant_get_maybe(const_cast<GVariant*>(gobj()));
-
-  if(g_value)
-  {
-    maybe.init(g_value); // g_value is already referenced.
-    return true;
-  }
-  else
-    return false;
-}
-
-
 
 /****************** Specializations ***********************************/
 
@@ -67,9 +52,10 @@ void VariantBase::init(const GVariant* cobject, bool take_a_reference)
 }
 
 // static
-const GVariantType* Variant<VariantBase>::variant_type()
+const VariantType& Variant<VariantBase>::variant_type()
 {
-  return G_VARIANT_TYPE_VARIANT;
+  static VariantType type(G_VARIANT_TYPE_VARIANT);
+  return type;
 }
 
 Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
@@ -82,15 +68,31 @@ Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
   return result;
 }
 
-VariantBase Variant<VariantBase>::get() const
+void Variant<VariantBase>::get(VariantBase& child) const
 {
-  return VariantBase(g_variant_get_variant(gobject_));
+  GVariant* const gvariant = g_variant_get_variant(gobject_);
+  child.init(gvariant);
+}
+
+bool Variant<VariantBase>::get_maybe(Glib::VariantBase& maybe) const
+{
+  GVariant* const g_value =
+    g_variant_get_maybe(const_cast<GVariant*>(gobj()));
+
+  if(g_value)
+  {
+    maybe.init(g_value); // g_value is already referenced.
+    return true;
+  }
+  else
+    return false;
 }
 
 // static
-const GVariantType* Variant<Glib::ustring>::variant_type()
+const VariantType& Variant<Glib::ustring>::variant_type()
 {
-  return G_VARIANT_TYPE_STRING;
+  static VariantType type(G_VARIANT_TYPE_STRING);
+  return type;
 }
 
 Variant<Glib::ustring>
@@ -111,9 +113,10 @@ Glib::ustring Variant<Glib::ustring>::get() const
 }
 
 // static
-const GVariantType* Variant<std::string>::variant_type()
+const VariantType& Variant<std::string>::variant_type()
 {
-  return G_VARIANT_TYPE_BYTESTRING;
+  static VariantType type(G_VARIANT_TYPE_BYTESTRING);
+  return type;
 }
 
 Variant<std::string>

@@ -54,10 +54,10 @@ public:
   : VariantBase(castitem)
   {}
 
-  /** Gets the GVariantType.
-   * @return The GVariantType.
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
    */
-  static const GVariantType* variant_type() G_GNUC_CONST;
+  static const VariantType& variant_type() G_GNUC_CONST;
 
   /** Creates a new Glib::Variant<$1>.
    * @param data The value of the new Glib::Variant<$1>.

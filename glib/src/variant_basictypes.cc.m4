@@ -36,9 +36,10 @@ dnl Please ignore the format stuff.  I was just tired and played a little.
 /**** Glib::Variant<$1> translit(format([%]eval(57-len([$1]))[s],[****/]),[ ],[*])
 
 // static
-const GVariantType* Variant<$1>::variant_type()
+const VariantType& Variant<$1>::variant_type()
 {
-  return G_VARIANT_TYPE_[]UPPER($3);
+  static VariantType type(G_VARIANT_TYPE_[]UPPER($3));
+  return type;
 }
 
 Variant<$1> Variant<$1>::create($1 data)
