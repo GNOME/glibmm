@@ -1,3 +1,38 @@
+2010-12-20  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Variant: Add a VariantStringBase and a VariantContainerBase class.
+
+	* glib/src/variant.{ccg,hg} (VariantStringBase): Implement a new class
+	from which the Glib::Variant<> string class (like
+	Glib::Variant<Glib::ustring>) now derive.  The new class has methods
+	for determining/creating object paths and signatures.  The new
+	instances are created by setting output parameters.
+	(VaraintContainerBase): Implement this new class from which variant
+	containers should derive.
+	(VariantContainerBase::get_n_children, get, get_maybe): Moved from
+	Variant<VariantBase>
+	(castitem constructors): Corrected all GVariant* castitem constructors
+	to accept a 'take_a_reference' bool parameter.
+	(Variant< std::vector<T> >::create, get, get_iter): Re-wrote these
+	methods to use the Glib::VariantType class to get variant types
+	instead of using strings.  Also Re-wrote to work specifically with
+	fixed arrays (see g_variant_get_fixed_array).  This means that this
+	class will not work with vectors of strings because
+	g_variant_get_strv() and g_variant_get_bytestring_array() need to be
+	used in those cases.
+	(std::vector<T> get): Re-wrote to use an output parameter.
+
+	* glib/src/variant_basictypes.h.m4: Corrected the castitem
+	constructors as above.
+
+	* tests/Makefile.am:
+	* tests/glibmm_variant/main.cc: Added a small test for the
+	Variant< std::vector<T> > methods.
+
+	* gio/src/dbuserror.hg:
+	* gio/src/error.hg: Wrap the GDBusError enum as a GError, moving its
+	declaration to error.hg.
+
 2010-12-16  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	Added a new Glib::Variant<> specialization to deal with arrays.

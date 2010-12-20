@@ -50,8 +50,8 @@ public:
   /** GVariant constructor.
    * @param castitem The GVariant to wrap.
    */
-  explicit Variant<$1>(GVariant* castitem)
-  : VariantBase(castitem)
+  explicit Variant<$1>(GVariant* castitem, bool take_a_reference = false)
+  : VariantBase(castitem, take_a_reference)
   {}
 
   /** Gets the Glib::VariantType.

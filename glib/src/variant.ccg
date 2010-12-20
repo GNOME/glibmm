@@ -38,6 +38,43 @@ void VariantBase::byteswap(VariantBase& result) const
   result.init(g_value); // g_value is already referenced.
 }
 
+//static
+void VariantStringBase::create_object_path(VariantStringBase& output,
+  const std::string& object_path)
+{
+  GVariant* result = 0;
+  result = g_variant_new_object_path(object_path.c_str());
+  output.init(result);
+}
+
+//static
+void VariantStringBase::create_signature(VariantStringBase& output,
+  const std::string& signature)
+{
+  GVariant* result = 0;
+  result = g_variant_new_signature(signature.c_str());
+  output.init(result);
+}
+
+void VariantContainerBase::get(VariantBase& child, gsize index) const
+{
+  GVariant* const gvariant = g_variant_get_child_value(gobject_, index);
+  child.init(gvariant);
+}
+
+bool VariantContainerBase::get_maybe(Glib::VariantBase& maybe) const
+{
+  GVariant* const g_value =
+    g_variant_get_maybe(const_cast<GVariant*>(gobj()));
+
+  if(g_value)
+  {
+    maybe.init(g_value); // g_value is already referenced.
+    return true;
+  }
+  else
+    return false;
+}
 
 /****************** Specializations ***********************************/
 
@@ -66,26 +103,6 @@ Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
   g_variant_ref_sink(result.gobj());
 
   return result;
-}
-
-void Variant<VariantBase>::get(VariantBase& child) const
-{
-  GVariant* const gvariant = g_variant_get_variant(gobject_);
-  child.init(gvariant);
-}
-
-bool Variant<VariantBase>::get_maybe(Glib::VariantBase& maybe) const
-{
-  GVariant* const g_value =
-    g_variant_get_maybe(const_cast<GVariant*>(gobj()));
-
-  if(g_value)
-  {
-    maybe.init(g_value); // g_value is already referenced.
-    return true;
-  }
-  else
-    return false;
 }
 
 // static
