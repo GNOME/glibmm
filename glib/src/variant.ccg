@@ -153,4 +153,170 @@ std::string Variant<std::string>::get() const
   return std::string(g_variant_get_bytestring(gobject_));
 }
 
+typedef std::vector<Glib::ustring> type_vec_ustring;
+
+// static
+const VariantType& Variant<type_vec_ustring>::variant_type()
+{
+  static VariantType type(G_VARIANT_TYPE_STRING_ARRAY);
+  return type;
+}
+
+Variant<type_vec_ustring>
+Variant<type_vec_ustring>::create(const type_vec_ustring& data)
+{
+  // Get the variant type of the elements.
+  VariantType element_variant_type = Variant<Glib::ustring>::variant_type();
+
+  // Get the variant type of the array.
+  VariantType array_variant_type =
+    VariantType::create_array(element_variant_type);
+
+  // Create a GVariantBuilder to build the array.
+  GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
+
+  // Add the elements of the vector into the builder.
+  for(typename type_vec_ustring::const_iterator iter = data.begin();
+   iter < data.end(); iter++)
+  {
+    g_variant_builder_add(builder,
+      reinterpret_cast<gchar*>(element_variant_type.gobj()), iter->c_str());
+  }
+
+  // Create the variant using the builder.
+  Variant<type_vec_ustring> result =
+    Variant<type_vec_ustring>(g_variant_new(
+      reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
+}
+
+Glib::ustring Variant<type_vec_ustring>::get(gsize index) const
+{
+  gsize n_elements = 0;
+
+  const gchar** array = g_variant_get_strv(const_cast<GVariant*>(gobj()),
+    &n_elements);
+
+  if(index > n_elements)
+    throw std::runtime_error(
+      "Variant< std::vector<Glib::ustring >::get(): Index out of bounds.");
+
+  return array[index];
+}
+
+type_vec_ustring Variant<type_vec_ustring>::get() const
+{
+  gsize n_elements = 0;
+
+  const gchar** array = g_variant_get_strv(const_cast<GVariant*>(gobj()),
+    &n_elements);
+
+  type_vec_ustring result(array, array + n_elements);
+  return result;
+}
+
+VariantIter Variant<type_vec_ustring>::get_iter()
+{
+  // Get the variant type of the elements.
+  VariantType element_variant_type = Variant<Glib::ustring>::variant_type();
+
+  // Get the variant type of the array.
+  VariantType array_variant_type =
+    VariantType::create_array(element_variant_type);
+
+  // Get the GVariantIter.
+  GVariantIter* g_iter = 0;
+  g_variant_get(const_cast<GVariant*>(gobj()),
+    reinterpret_cast<gchar*>(array_variant_type.gobj()), &g_iter);
+
+  return VariantIter(g_iter);
+}
+
+typedef std::vector<std::string> type_vec_string;
+
+// static
+const VariantType& Variant<type_vec_string>::variant_type()
+{
+  static VariantType type(G_VARIANT_TYPE_BYTESTRING_ARRAY);
+  return type;
+}
+
+Variant<type_vec_string>
+Variant<type_vec_string>::create(const type_vec_string& data)
+{
+  // Get the variant type of the elements.
+  VariantType element_variant_type = Variant<std::string>::variant_type();
+
+  // Get the variant type of the array.
+  VariantType array_variant_type =
+    VariantType::create_array(element_variant_type);
+
+  // Create a GVariantBuilder to build the array.
+  GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
+
+  // Add the elements of the vector into the builder.
+  for(typename type_vec_string::const_iterator iter = data.begin();
+   iter < data.end(); iter++)
+  {
+    g_variant_builder_add(builder,
+      reinterpret_cast<gchar*>(element_variant_type.gobj()), iter->c_str());
+  }
+
+  // Create the variant using the builder.
+  Variant<type_vec_string> result =
+    Variant<type_vec_string>(g_variant_new(
+      reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
+}
+
+std::string Variant<type_vec_string>::get(gsize index) const
+{
+  gsize n_elements = 0;
+
+  const gchar** array = g_variant_get_strv(const_cast<GVariant*>(gobj()),
+    &n_elements);
+
+  if(index > n_elements)
+    throw std::runtime_error(
+      "Variant< std::vector<std::string >::get(): Index out of bounds.");
+
+  return array[index];
+}
+
+type_vec_string Variant<type_vec_string>::get() const
+{
+  gsize n_elements = 0;
+
+  const gchar** array = g_variant_get_strv(const_cast<GVariant*>(gobj()),
+    &n_elements);
+
+  type_vec_string result(array, array + n_elements);
+  return result;
+}
+
+VariantIter Variant<type_vec_string>::get_iter()
+{
+  // Get the variant type of the elements.
+  VariantType element_variant_type = Variant<std::string>::variant_type();
+
+  // Get the variant type of the array.
+  VariantType array_variant_type =
+    VariantType::create_array(element_variant_type);
+
+  // Get the GVariantIter.
+  GVariantIter* g_iter = 0;
+  g_variant_get(const_cast<GVariant*>(gobj()),
+    reinterpret_cast<gchar*>(array_variant_type.gobj()), &g_iter);
+
+  return VariantIter(g_iter);
+}
+
 } // namespace Glib

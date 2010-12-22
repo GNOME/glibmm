@@ -18,9 +18,7 @@ int main(int, char**)
   Glib::Variant< std::vector<int> > integers_variant =
     Glib::Variant< std::vector<int> >::create(int_vector);
 
-  std::vector<int> int_vector2;
-
-  integers_variant.get(int_vector2);
+  std::vector<int> int_vector2 = integers_variant.get();
 
   std::cout << "The size of the copied vector is " << int_vector2.size() <<
     '.' << std::endl;
@@ -30,11 +28,13 @@ int main(int, char**)
   for(guint i = 0; i < int_vector2.size(); i++)
     std::cout << int_vector2[i] << std::endl;
 
-  std::cout << "The number of children in the iterator of the copy are " <<
-    integers_variant.get_iter().get_n_children() << '.' << std::endl;
+  std::cout << "The number of children in the iterator of the " <<
+    "variant are " << integers_variant.get_iter().get_n_children() <<
+    '.' << std::endl;
 
-  std::cout << "The 5th element in the copy is " <<
-    integers_variant.get(5) << '.' << std::endl;
+  int index = 4;
+  std::cout << "Element number " << index + 1 << " in the copy is " <<
+    integers_variant.get(index) << '.' << std::endl;
 
   return 0;
 }

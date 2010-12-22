@@ -351,7 +351,8 @@ public:
   _IGNORE(g_variant_get_string, g_variant_dup_string)
 };
 
-/** Specialization of Glib::Variant containing a std::string.
+/** Specialization of Glib::Variant containing a std::string (a non-capable
+ * UTF8 string).
  * @newin{2,28}
  * @ingroup glibmmVariant
  */
@@ -429,15 +430,15 @@ public:
    */
   static const Glib::VariantType& variant_type() G_GNUC_CONST;
 
-  /** Creates a new Glib::Variant< std::vector<T> > (a variant array).
-   * @param data The array of the new Glib::Variant< std::vector<T> >.
-   * @return The new Glib::Variant< std::vector<T> >.
+  /** Creates a new Glib::Variant from an array of numeric types.
+   * @param data The array to use for creation.
+   * @return The new Glib::Variant.
    * @newin{2,28}
    */
   static Variant< std::vector<T> > create(const std::vector<T>& data);
   _IGNORE(g_variant_new_array)
 
-  /** Gets a specific element of the array.  It is an error if index_ is
+  /** Gets a specific element of the array.  It is an error if index is
    * greater than the number of child items in the container.  See
    * Glib::Variant<VariantBase>::n_children().
    *
@@ -449,14 +450,143 @@ public:
    */
   T get(gsize index) const;
 
-  /** Gets the vector of the Glib::Variant< std::vector<T> >.
+  /** Gets the vector of the Glib::Variant.
    * @return The vector.
    * @newin{2,28}
    */
-  void get(std::vector<T>& result) const;
+  std::vector<T> get() const;
   _IGNORE(g_variant_get_fixed_array)
 
-  /** Gets a VariantIter of the contained array.
+  /** Gets a VariantIter of the Variant.
+   * @return the VaraintIter.
+   * @newin{2,28}
+   */
+  VariantIter get_iter();
+};
+
+/** Specialization of Glib::Variant containing an array of UTF-8 capable
+ * strings.
+ */
+template<>
+class Variant< std::vector<Glib::ustring> > : public VariantContainerBase
+{
+public:
+  typedef Glib::ustring                 CppType;
+  typedef std::vector<Glib::ustring>    CppContainerType;
+
+  /// Default constructor.
+  Variant< std::vector<Glib::ustring> >()
+  : VariantContainerBase()
+  {}
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
+   */
+  explicit Variant< std::vector<Glib::ustring> >(GVariant* castitem,
+    bool take_a_reference = false)
+  : VariantContainerBase(castitem, take_a_reference)
+  {}
+
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
+   * @newin{2,28}
+   */
+  static const Glib::VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Glib::Variant from an array of strings.
+   * @param data The array to use for creation.
+   * @return The new Glib::Variant.
+   * @newin{2,28}
+   */
+  static Variant< std::vector<Glib::ustring> >
+    create(const std::vector<Glib::ustring>& data);
+
+  /** Gets a specific element of the string array.  It is an error if index is
+   * greater than the number of child items in the container.  See
+   * Glib::Variant<VariantBase>::n_children().
+   *
+   * This function is O(1).
+   *
+   * @param index The index of the element.
+   * @return The element at index @index.
+   * @newin{2,28}
+   */
+  Glib::ustring get(gsize index) const;
+
+  /** Gets the string vector of the Glib::Variant.
+   * @return The vector.
+   * @newin{2,28}
+   */
+  std::vector<Glib::ustring> get() const;
+
+  /** Gets a VariantIter of the Variant.
+   * @return the VaraintIter.
+   * @newin{2,28}
+   */
+  VariantIter get_iter();
+};
+
+/** Specialization of Glib::Variant containing an array of non-UTF8 strings.
+ */
+template<>
+class Variant< std::vector<std::string> > : public VariantContainerBase
+{
+public:
+  typedef std::string                   CppType;
+  typedef std::vector<std::string>      CppContainerType;
+
+  /// Default constructor.
+  Variant< std::vector<std::string> >()
+  : VariantContainerBase()
+  {}
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
+   */
+  explicit Variant< std::vector<std::string> >(GVariant* castitem,
+    bool take_a_reference = false)
+  : VariantContainerBase(castitem, take_a_reference)
+  {}
+
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
+   * @newin{2,28}
+   */
+  static const Glib::VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Glib::Variant from an array of strings.
+   * @param data The array to use for creation.
+   * @return The new Glib::Variant.
+   * @newin{2,28}
+   */
+  static Variant< std::vector<std::string> >
+    create(const std::vector<std::string>& data);
+
+  /** Gets a specific element of the string array.  It is an error if index is
+   * greater than the number of child items in the container.  See
+   * Glib::Variant<VariantBase>::n_children().
+   *
+   * This function is O(1).
+   *
+   * @param index The index of the element.
+   * @return The element at index @index.
+   * @newin{2,28}
+   */
+  std::string get(gsize index) const;
+
+  /** Gets the string vector of the Glib::Variant.
+   * @return The vector.
+   * @newin{2,28}
+   */
+  std::vector<std::string> get() const;
+
+  /** Gets a VariantIter of the Variant.
    * @return the VaraintIter.
    * @newin{2,28}
    */
@@ -543,13 +673,13 @@ T Variant< std::vector<T> >::get(gsize index) const
 
   if(index > n_elements)
     throw std::runtime_error(
-      "T Variant< std::vector<T> > get(): Index out of bounds.");
+      "Variant< std::vector<T> >::get(): Index out of bounds.");
 
   return array[index];
 }
 
 template<class T>
-void Variant< std::vector<T> >::get(std::vector<T>& result) const
+std::vector<T> Variant< std::vector<T> >::get() const
 {
   gsize n_elements = 0;
 
@@ -557,7 +687,8 @@ void Variant< std::vector<T> >::get(std::vector<T>& result) const
     g_variant_get_fixed_array(const_cast<GVariant*>(gobj()), &n_elements,
     sizeof(T)));
 
-  result.assign(array, array + n_elements);
+  std::vector<T> result(array, array + n_elements);
+  return result;
 }
 
 template<class T>
