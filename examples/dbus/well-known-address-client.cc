@@ -46,13 +46,12 @@ void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
 
   try
   {
-    // The 'ListNames' method returns a single element tuple of string arrays
-    // so first receive the tuple as a VariantBase container (that works fine
-    // for now).
-    Glib::Variant<Glib::VariantBase> result;
+    // The proxy's call method returns a tuple of the value(s) that the method
+    // call produces so just get the tuple as a VariantContainerBase.
+    Glib::VariantContainerBase result;
     proxy->call_sync(result, "ListNames");
 
-    // Now extract the single item in the VariantBase container which is the
+    // Now extract the single item in the variant container which is the
     // array of strings (the names).
     Glib::Variant< std::vector<Glib::ustring> > names_variant;
     result.get(names_variant);
