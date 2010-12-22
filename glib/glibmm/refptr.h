@@ -155,6 +155,9 @@ public:
   template <class T_CastFrom>
   static inline RefPtr<T_CppObject> cast_const(const RefPtr<T_CastFrom>& src);
 
+  //TODO: Remove these if we replace operator bool() with operator void* after 
+  //an API/ABI break, as suggested by Daniel Elstner? murrayc.
+
   /** Compare based on the underlying instance address.
    *
    * This is needed in code that requires an ordering on
