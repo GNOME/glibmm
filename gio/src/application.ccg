@@ -21,8 +21,157 @@
 #include <giomm/file.h>
 #include <giomm/actiongroup.h>
 
+namespace
+{
+
+static void Application_signal_open_callback(GApplication* self, GFile** files, 
+  gint n_files, const gchar* hint, void* data)
+{
+  typedef sigc::slot< void, const Gio::Application::type_vec_files&, const Glib::ustring& > SlotType;
+
+  Gio::Application::type_vec_files vec_files(n_files);
+  for(int i = 0; i < n_files; ++i)
+  {
+    vec_files[i] = Glib::wrap(files[i], true);
+  }
+  
+  const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
+
+  // Do not try to call a signal on a disassociated wrapper.
+  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  {
+    try
+    {
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data)) {
+        (*static_cast<SlotType*>(slot))(vec_files, hint_str);
+        return;
+      }
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+
+  return;
+}
+
+static void Application_signal_open_notify_callback(GApplication* self, GFile** files,
+                                             gint n_files, const gchar *hint, void* data)
+{
+  using namespace Gio;
+  typedef sigc::slot< void, const Application::type_vec_files&, const Glib::ustring& > SlotType;
+
+  Application::type_vec_files vec_files(n_files);
+  for (int i = 0; i < n_files; i++)
+  {
+    vec_files[i] = Glib::wrap(files[i], true);
+  }
+  
+  const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
+
+  // Do not try to call a signal on a disassociated wrapper.
+  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  {
+    try
+    {
+      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot(data))
+      {
+        (*static_cast<SlotType*>(slot))(vec_files, hint_str);
+        return;
+      }
+    }
+    catch(...)
+    {
+      Glib::exception_handlers_invoke();
+    }
+  }
+
+  return;
+}
+
+static const Glib::SignalProxyInfo Application_signal_open_info =
+{
+  "open",
+  (GCallback) &Application_signal_open_callback,
+  (GCallback) &Application_signal_open_notify_callback
+};
+
+}
+
 namespace Gio
 {
+
+void Application_Class::open_callback(GApplication* self, GFile** files, 
+  gint n_files, const gchar *hint)
+{
+  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+
+  // Non-gtkmmproc-generated custom classes implicitly call the default
+  // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
+  // generated classes can use this optimisation, which avoids the unnecessary
+  // parameter conversions if there is no possibility of the virtual function
+  // being overridden:
+
+  if(obj_base && obj_base->is_derived_())
+  {
+    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    if(obj) // This can be NULL during destruction.
+    {
+      try // Trap C++ exceptions which would normally be lost because this is a C callback.
+      {
+        // Call the virtual member method, which derived classes might override.
+        Application::type_vec_files vec_files(n_files);
+        for (int i = 0; i < n_files; i++) {
+          vec_files[i] = Glib::wrap(files[i], true);
+        }
+        
+        const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
+  
+        obj->on_open(vec_files, hint_str);
+        return;
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke();
+      }
+    }
+  }
+  
+  BaseClassType *const base = static_cast<BaseClassType*>(
+    g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+    );
+
+  // Call the original underlying C function:
+  if(base && base->open)
+    (*base->open)(self, files, n_files, hint);
+}
+
+Glib::SignalProxy2< void, const Application::type_vec_files&, const Glib::ustring& > Application::signal_open()
+{
+  return Glib::SignalProxy2< void, const Application::type_vec_files&, const Glib::ustring& >(this, &Application_signal_open_info);
+}
+
+void Gio::Application::on_open(const Application::type_vec_files& files, const Glib::ustring& hint)
+{
+  BaseClassType *const base = static_cast<BaseClassType*>(
+      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
+  );
+
+  if(base && base->open) {
+    typedef GFile* cpointer;
+    cpointer* files_array = new cpointer[files.size()];
+    guint i = 0;
+    for(Application::type_vec_files::const_iterator iter = files.begin(); iter != files.end(); iter++)
+      {
+        Application::type_vec_files::const_reference refPtr = *iter;
+        files_array[i] = refPtr->gobj();
+      }
+
+    (*base->open)(gobj(), files_array, files.size(), hint.c_str());
+  }
+}
 
 void Application::open(const type_vec_files& files, const Glib::ustring& hint)
 {

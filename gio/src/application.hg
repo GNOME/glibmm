@@ -150,9 +150,24 @@ public:
 
   _WRAP_SIGNAL(void startup(), "startup")
   _WRAP_SIGNAL(void activate(), "activate")
-  //TODO: _WRAP_SIGNAL(void open(GFile** files, int n_files, const Glib::ustring& hint), "open")
+  
+  //We wrap the open signal without _WRAP_SIGNAL(), because we need to change its parameters.
+  //See bug https://bugzilla.gnome.org/show_bug.cgi?id=637457
+  Glib::SignalProxy2< void,  const type_vec_files&, const Glib::ustring& > signal_open();
+
 #m4 _CONVERSION(`GApplicationCommandLine*', `const Glib::RefPtr<ApplicationCommandLine>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(bool command_line(const Glib::RefPtr<ApplicationCommandLine>& command_line), "command-line")
+
+protected:
+  virtual void on_open(const type_vec_files& files, const Glib::ustring& hint);
+
+#m4begin
+  _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
+  klass->open = &open_callback;
+  _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
+  static void open_callback(GApplication* self, GFile** files, gint n_files, const gchar* hint);
+  _POP()
+#m4end
 };
 
 
