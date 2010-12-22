@@ -44,7 +44,31 @@ void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
     return;
   }
 
-  // Call the 'ListNames' method and print the results.
+  try
+  {
+    // The 'ListNames' method returns a single element tuple of string arrays
+    // so first receive the tuple as a VariantBase container (that works fine
+    // for now).
+    Glib::Variant<Glib::VariantBase> result;
+    proxy->call_sync(result, "ListNames");
+
+    // Now extract the single item in the VariantBase container which is the
+    // array of strings (the names).
+    Glib::Variant< std::vector<Glib::ustring> > names_variant;
+    result.get(names_variant);
+
+    // Get the vector of strings.
+    std::vector<Glib::ustring> names = names_variant.get();
+
+    std::cout << "The names on the message bus are:" << std::endl;
+
+    for(unsigned i = 0; i < names.size(); i++)
+      std::cout << names[i] << "." << std::endl;
+  }
+  catch (Glib::Error& error)
+  {
+    std::cerr << "Got an error: '" << error.what() << "'." << std::endl;
+  }
 
   // Connect an idle callback to the main loop to quit when the main loop is
   // idle now that the method call is finished.
@@ -68,9 +92,6 @@ int main(int, char**)
     std::cerr << "The user's session bus is not available." << std::endl;
     return 1;
   }
-
-  // Print out the unique name of the connection to the user session bus.
-  std::cout << connection->get_unique_name() << std::endl;
 
   // Create the proxy to the bus asynchronously.
   Gio::DBusProxy::create(connection, "org.freedesktop.DBus",
