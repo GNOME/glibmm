@@ -155,6 +155,26 @@ public:
   template <class T_CastFrom>
   static inline RefPtr<T_CppObject> cast_const(const RefPtr<T_CastFrom>& src);
 
+  /** Compare based on the underlying instance address.
+   *
+   * This is needed in code that requires an ordering on
+   * RefPtr<T_CppObject> instances, e.g. std::set<RefPtr<T_CppObject> >.
+   *
+   * Without these, comparing two RefPtr<T_CppObject> instances
+   * is still syntactically possible, but the result is semantically
+   * wrong, as p1 REL_OP p2 is interpreted as (bool)p1 REL_OP (bool)p2.
+   */
+  inline bool operator<(const RefPtr<T_CppObject>& src) const;
+
+  /// See operator<().
+  inline bool operator<=(const RefPtr<T_CppObject>& src) const;
+
+  /// See operator<().
+  inline bool operator>(const RefPtr<T_CppObject>& src) const;
+
+  /// See operator<().
+  inline bool operator>=(const RefPtr<T_CppObject>& src) const;
+
 private:
   T_CppObject* pCppObject_;
 };
@@ -336,6 +356,30 @@ RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_const(const RefPtr<T_CastFrom>& sr
     pCppObject->reference();
 
   return RefPtr<T_CppObject>(pCppObject);
+}
+
+template <class T_CppObject> inline
+bool RefPtr<T_CppObject>::operator<(const RefPtr<T_CppObject>& src) const
+{
+  return (pCppObject_ < src.pCppObject_);
+}
+
+template <class T_CppObject> inline
+bool RefPtr<T_CppObject>::operator<=(const RefPtr<T_CppObject>& src) const
+{
+  return (pCppObject_ <= src.pCppObject_);
+}
+
+template <class T_CppObject> inline
+bool RefPtr<T_CppObject>::operator>(const RefPtr<T_CppObject>& src) const
+{
+  return (pCppObject_ > src.pCppObject_);
+}
+
+template <class T_CppObject> inline
+bool RefPtr<T_CppObject>::operator>=(const RefPtr<T_CppObject>& src) const
+{
+  return (pCppObject_ >= src.pCppObject_);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
