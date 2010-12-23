@@ -27,8 +27,7 @@ check_PROGRAMS =			\
 	glibmm_ustring_compose/test	\
 	glibmm_ustring_format/test	\
 	glibmm_value/test		\
-	glibmm_value/test		\
-	glibmm_value/test		\
+	glibmm_valuearray/test		\
 	glibmm_variant/test
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
