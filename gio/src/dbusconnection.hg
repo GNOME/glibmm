@@ -24,6 +24,7 @@
 #include <giomm/asyncresult.h>
 #include <giomm/credentials.h>
 #include <giomm/dbusmessage.h>
+#include <gio/gio.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -39,6 +40,9 @@ _WRAP_ENUM(DBusSendMessageFlags, GDBusSendMessageFlags, NO_GTYPE)
 _WRAP_ENUM(DBusSignalFlags, GDBusSignalFlags, NO_GTYPE)
 
 class DBusAuthObserver;
+class DBusInterfaceInfo;
+class DBusInterfaceVTable;
+class DBusMethodInvocation;
 
 /// @defgroup DBus D-Bus Access Functionality
 
@@ -830,6 +834,149 @@ public:
   _IGNORE(g_dbus_connection_add_filter)
 
   _WRAP_METHOD(void remove_filter(guint filter_id), g_dbus_connection_remove_filter)
+
+  /** TODO.
+   */
+  guint register_object(const Glib::ustring& object_path,
+    const Glib::RefPtr<DBusInterfaceInfo>& interface_info,
+    const DBusInterfaceVTable& vtable);
+
+  _WRAP_METHOD(bool unregister_object(guint registration_id), g_dbus_connection_unregister_object)
+};
+
+/** DBusInterfaceVTable - A class used to represent a virtual table for
+ * handling properties and method calls for a D-Bus interface.
+ *
+ * If you want to handle getting/setting D-Bus properties asynchronously,
+ * simply register an object with the org.freedesktop.DBus.Properties D-Bus
+ * interface using Gio::DBusConnection::register_object().
+ *
+ * Only one DBusInterfaceVTable instance may be used per registration.
+ * @newin{2,28}
+ * @ingroup DBus
+ */
+class DBusInterfaceVTable
+{
+  _CLASS_GENERIC(DBusInterfaceVTable, GDBusInterfaceVTable)
+
+public:
+  /** The type for a slot which handles a method call for a D-Bus interface.
+   * for example,
+   * @code
+   * void on_interface_method_call(const Glib::RefPtr<Gio::DBusConnection>&
+   * connection, const Glib::ustring& sender, const Glib::ustring&
+   * object_path, const Glib::ustring& interface_name, const Glib::ustring&
+   * method_name, const Glib::VariantBase& parameters, const
+   * Glib::RefPtr<Gio::DBusInvocation>& invocation);
+   * @encode
+   */
+  typedef sigc::slot<
+    void,
+    const Glib::RefPtr<DBusConnection>&,
+    const Glib::ustring&,
+    const Glib::ustring&,
+    const Glib::ustring&,
+    const Glib::ustring&,
+    const Glib::VariantBase&,
+    const Glib::RefPtr<DBusMethodInvocation>&
+  > SlotInterfaceMethodCall;
+
+  /** The type for a slot which handles getting a property for a D-Bus
+   * interface.
+   * for example,
+   * @code
+   * void on_interface_get_property(Glib::VariantBase& property, const
+   * Glib::RefPtr<Gio::DBusConnection>& connection, const Glib::ustring&
+   * sender, const Glib::ustring& object_path, const Glib::ustring&
+   * interface_name, const Glib::ustring& property_name);
+   * @endcode
+   * @throw Glib::Error.
+   */
+  typedef sigc::slot<
+    void,
+    Glib::VariantBase&,
+    const Glib::RefPtr<DBusConnection>&,
+    const Glib::ustring&,
+    const Glib::ustring&,
+    const Glib::ustring&,
+    const Glib::ustring&
+  > SlotInterfaceGetProperty;
+
+  /** The type for a slot which handles setting a property for a D-Bus
+   * interface.
+   * for example,
+   * @code
+   * bool on_interface_set_property(const Glib::RefPtr<Gio::DBusConnection>&
+   * connection, const Glib::ustring& sender, const Glib::ustring&
+   * object_path, const Glib::ustring& interface_name, const Glib::ustring&
+   * property_name, const Glib::VariantBase& value);
+   * @endcode
+   * @throw Glib::Error.
+   */
+  typedef sigc::slot<
+    bool,
+    const Glib::RefPtr<DBusConnection>&,
+    const Glib::ustring&,
+    const Glib::ustring&,
+    const Glib::ustring&,
+    const Glib::ustring&,
+    const Glib::VariantBase&
+  > SlotInterfaceSetProperty;
+
+  /** Constructs a new DBusInterfaceVTable using specified slots.
+   * @param slot_method_call The slot for handling incoming method calls.
+   * @param slot_get_property The slot for getting a property.
+   * @param slot_set_property The slot for setting a property.
+   */
+  DBusInterfaceVTable(
+   const SlotInterfaceMethodCall& slot_method_call,
+   const SlotInterfaceGetProperty& slot_get_property,
+   const SlotInterfaceSetProperty& slot_set_property
+  );
+
+  /// Destructor.
+  virtual ~DBusInterfaceVTable();
+
+  /// Provides access to the underlying C object.
+  GDBusInterfaceVTable* gobj()
+    { return reinterpret_cast<GDBusInterfaceVTable*>(&gobject_); }
+
+  /// Provides access to the underlying C object.
+  const GDBusInterfaceVTable* gobj() const
+    { return reinterpret_cast<const GDBusInterfaceVTable*>(&gobject_); }
+
+
+private:
+  // Non-copyable.
+  DBusInterfaceVTable(const DBusInterfaceVTable& other);
+  DBusInterfaceVTable& operator=(const DBusInterfaceVTable& other);
+
+  friend class DBusConnection;
+
+protected:
+  // The underlying C instance.
+  GDBusInterfaceVTable          gobject_;
+
+  // Pointers to copies of the slots used to create an instance.
+  SlotInterfaceMethodCall*      slot_method_call;
+  SlotInterfaceGetProperty*     slot_get_property;
+  SlotInterfaceSetProperty*     slot_set_property;
+
+  // Boolean to signal whether the copies of the slots have been registered or
+  // not so the destructor can free them if they have not been registered.
+  bool slots_registered;
+
+protected:
+  // These are so the Gio::DBusConnection::register_object() method can have
+  // access to the copies of the slots used for creation when registering.
+  SlotInterfaceMethodCall*      get_slot_method_call() const;
+  SlotInterfaceGetProperty*     get_slot_get_property() const;
+  SlotInterfaceSetProperty*     get_slot_set_property() const;
+
+  // This method is used to signal that the copies of the slots have been
+  // registered thus not needing to be freed when a created instance of this
+  // class is destroyed.
+  void signal_slots_registered();
 };
 
 } // namespace Gio
