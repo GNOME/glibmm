@@ -34,7 +34,7 @@ LINE(]__line__[)dnl
 
 /** Specialization of Glib::Variant containing a $1 type.
  * @newin{2,26}
- * @ingroup glibmmVariant
+ * @ingroup Variant
  */
 template <>
 class Variant<$1> : public VariantBase

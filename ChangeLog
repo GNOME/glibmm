@@ -1,3 +1,28 @@
+2010-12-26  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Variant: Add dictionary entry and dictionary specializations.
+
+	* glib/src/varianttype.hg:
+	* glib/src/variant_basictypes.h.m4: Renamed the glibmmVariant doxygen
+	group to 'Variant'.
+	* glib/src/variant.{ccg,hg}: Throw a std::out_of_range exception
+	instead of a std::runtime_error one from methods that throw them
+	because of indexes being out of bounds.
+	(Variant< std::pair<K, V> >): Added this specialization to deal with a
+	dictionary entry variant type.
+	(Variant< std::map<K, V> >): Added this specialization to deal with
+	variant dictionary types.
+	(VariantContainerBase::get): Have this method throw a
+	std::out_of_range exception if the index is out of range.
+	(Variant< std::vector<Glib::ustring> >::get)
+	(Variant< std::vector<std::string> >::get): Free the shallow copy of
+	the returned string arrays in the get methods of the string variant
+	arrays as the docs of the C API say.
+
+	* gio/src/dbusconnection.hg: Added missing _IGNORE()'s.
+	* gio/src/dbusproxy.hg: Updated a TODO.
+	* examples/dbus/well-known-address-client.cc: Typo.
+
 2010-12-23  Krzesimir Nowak  <qdlacz@gmail.com>
 
 	Add a valuearray test to build.

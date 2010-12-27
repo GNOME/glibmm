@@ -21,13 +21,15 @@ _DEFS(glibmm,glib)
 #include <glibmm/varianttype.h>
 #include <glibmm/variantiter.h>
 #include <glibmm/ustring.h>
+#include <utility>
 #include <vector>
+#include <map>
 #include <stdexcept>
 
 namespace Glib
 {
 
-/** @defgroup glibmmVariant Variant Datatype
+/** @defgroup Variant Variant Datatype
  *
  * Glib::Variant<> are specialized classes that deal with strongly typed
  * variant data.  They are used to wrap glib's GVariant API.  For more
@@ -39,7 +41,7 @@ namespace Glib
 
 /** The base class used to wrap glib's GVariant API.
  * @newin{2,28}
- * @ingroup glibmmVariant
+ * @ingroup Variant
  */
 class VariantBase
 {
@@ -121,6 +123,8 @@ public:
 };
 
 /** Base class from which string variant classes derive.
+ * @newin{2,28}
+ * @ingroup Variant
  */
 class VariantStringBase : public VariantBase
 {
@@ -176,6 +180,8 @@ public:
 };
 
 /** The base class from which variant containers derive.
+ * @newin{2,28}
+ * @ingroup Variant
  */
 class VariantContainerBase : public VariantBase
 {
@@ -216,6 +222,7 @@ public:
    * @param index The index of the child to fetch.
    * @param child A location in which to store the child at the specified
    * index.
+   * @throw std::out_of_range
    * @newin{2,28}
    */
   void get(Glib::VariantBase& child, gsize index = 0) const;
@@ -240,9 +247,9 @@ public:
 
 /** Template class used for the specialization of the Glib::Variant<> classes.
  * @newin{2,28}
- * @ingroup glibmmVariant
+ * @ingroup Variant
  */
-template <class T>
+template<class T>
 class Variant : public VariantBase
 {
 public:
@@ -258,9 +265,9 @@ _IGNORE(g_variant_get_type)
 
 /** Specialization of Glib::Variant containing a Glib::VariantBase.
  * @newin{2,28}
- * @ingroup glibmmVariant
+ * @ingroup Variant
  */
-template <>
+template<>
 class Variant<VariantBase> : public VariantContainerBase
 {
 public:
@@ -293,8 +300,8 @@ public:
   //This must have a create() method because otherwise it would be a copy
   //constructor.
   /** Creates a new Glib::Variant<VariantBase>.
-   * @param data The value of the new Glib::Variant<VariantBase>.
-   * @return The new Glib::Variant<VariantBase>.
+   * @param data The value of the new Glib::Variant.
+   * @return The new Glib::Variant.
    * @newin{2,28}
    */
   static Variant<VariantBase> create(const Glib::VariantBase& data);
@@ -306,13 +313,14 @@ public:
 
 /** Specialization of Glib::Variant containing a Glib::ustring.
  * @newin{2,28}
- * @ingroup glibmmVariant
+ * @ingroup Variant
  */
-template <>
+template<>
 class Variant<Glib::ustring> : public VariantStringBase
 {
 public:
-  typedef char* CType;
+  typedef char*                 CType;
+  typedef Glib::ustring         CppType;
 
   /// Default constructor.
   Variant<Glib::ustring>()
@@ -337,14 +345,14 @@ public:
   static const Glib::VariantType& variant_type() G_GNUC_CONST;
 
   /** Creates a new Glib::Variant<Glib::ustring>.
-   * @param data The value of the new Glib::Variant<Glib::ustring>.
-   * @return The new Glib::Variant<Glib::ustring>.
+   * @param data The value of the new Glib::Variant.
+   * @return The new Glib::Variant.
    * @newin{2,28}
    */
   static Variant<Glib::ustring> create(const Glib::ustring& data);
 
-  /** Gets the contents of the Glib::Variant<Glib::ustring>.
-   * @return The contents of the Glib::Variant<Glib::ustring>.
+  /** Gets the contents of the Glib::Variant.
+   * @return The contents of the Glib::Variant.
    * @newin{2,28}
    */
   Glib::ustring get() const;
@@ -352,15 +360,16 @@ public:
 };
 
 /** Specialization of Glib::Variant containing a std::string (a non-capable
- * UTF8 string).
+ * UTF-8 string).
  * @newin{2,28}
- * @ingroup glibmmVariant
+ * @ingroup Variant
  */
-template <>
+template<>
 class Variant<std::string> : public VariantStringBase
 {
 public:
-  typedef char* CType;
+  typedef char*                 CType;
+  typedef std::string           CppType;
 
   /// Default constructor.
   Variant<std::string>()
@@ -385,23 +394,75 @@ public:
   static const Glib::VariantType& variant_type() G_GNUC_CONST;
 
   /** Creates a new Glib::Variant<std::string>.
-   * @param data The value of the new Glib::Variant<std::string>.
-   * @return The new Glib::Variant<std::string>.
+   * @param data The value of the new Glib::Variant.
+   * @return The new Glib::Variant.
    * @newin{2,28}
    */
   static Variant<std::string> create(const std::string& data);
 
-  /** Gets the contents of the Glib::Variant<std::string>.
-   * @return The contents of the Glib::Variant<std::string>.
+  /** Gets the contents of the Glib::Variant.
+   * @return The contents of the Glib::Variant.
    * @newin{2,28}
    */
   std::string get() const;
   _IGNORE(g_variant_get_bytestring, g_variant_dup_bytestring)
 };
 
-/** Specialization of Glib::Variant containing an array of items.
+/** Specialization of Glib::Variant containing a dictionary entry.  See also
+ * Glib::Variant< std::map<K, V> >.
+ * @newin{2,28}
+ * @ingroup Variant
  */
-template <class T>
+template<class K, class V>
+class Variant< std::pair<K, V> > : public VariantContainerBase
+{
+public:
+  typedef std::pair<K, V>               CppType;
+  typedef Glib::Variant<CppType>        CppContainerType;
+
+  /// Default constructor.
+  Variant< std::pair<K, V> >()
+  : VariantContainerBase()
+  {}
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
+   */
+  explicit Variant< std::pair<K, V> >(GVariant* castitem,
+    bool take_a_reference = false)
+  : VariantContainerBase(castitem, take_a_reference)
+  {}
+
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
+   * @newin{2,28}
+   */
+  static const Glib::VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Glib::Variant< std::pair<K, V> >.
+   * @param data The value of the new Glib::Variant.
+   * @return The new Glib::Variant.
+   * @newin{2,28}
+   */
+  static Variant< std::pair<K, V> > create(const std::pair<K, V>& data);
+  _IGNORE(g_variant_new_dict_entry)
+
+  /** Gets the contents of the Glib::Variant.
+   * @return The contents of the Glib::Variant.
+   * @throw std::out_of_range
+   * @newin{2,28}
+   */
+  std::pair<K, V> get() const;
+};
+
+/** Specialization of Glib::Variant containing an array of items.
+ * @newin{2,28}
+ * @ingroup Variant
+ */
+template<class T>
 class Variant< std::vector<T> > : public VariantContainerBase
 {
 public:
@@ -438,7 +499,7 @@ public:
   static Variant< std::vector<T> > create(const std::vector<T>& data);
   _IGNORE(g_variant_new_array)
 
-  /** Gets a specific element of the array.  It is an error if index is
+  /** Gets a specific element of the array.  It is an error if @a index is
    * greater than the number of child items in the container.  See
    * Glib::VariantContainerBase::get_n_children().
    *
@@ -446,6 +507,7 @@ public:
    *
    * @param index The index of the element.
    * @return The element at index @index.
+   * @throw std::out_of_range
    * @newin{2,28}
    */
   T get(gsize index) const;
@@ -466,6 +528,8 @@ public:
 
 /** Specialization of Glib::Variant containing an array of UTF-8 capable
  * strings.
+ * @newin{2,28}
+ * @ingroup Variant
  */
 template<>
 class Variant< std::vector<Glib::ustring> > : public VariantContainerBase
@@ -504,14 +568,15 @@ public:
   static Variant< std::vector<Glib::ustring> >
     create(const std::vector<Glib::ustring>& data);
 
-  /** Gets a specific element of the string array.  It is an error if index is
-   * greater than the number of child items in the container.  See
+  /** Gets a specific element of the string array.  It is an error if @a index
+   * is greater than the number of child items in the container.  See
    * Glib::VariantContainerBase::get_n_children().
    *
    * This function is O(1).
    *
    * @param index The index of the element.
    * @return The element at index @index.
+   * @throw std::out_of_range
    * @newin{2,28}
    */
   Glib::ustring get(gsize index) const;
@@ -521,6 +586,7 @@ public:
    * @newin{2,28}
    */
   std::vector<Glib::ustring> get() const;
+  _IGNORE(g_variant_get_strv, g_variant_dup_strv)
 
   /** Gets a VariantIter of the Variant.
    * @return the VaraintIter.
@@ -529,7 +595,10 @@ public:
   VariantIter get_iter();
 };
 
-/** Specialization of Glib::Variant containing an array of non-UTF8 strings.
+/** Specialization of Glib::Variant containing an array of non-UTF-8 strings
+ * (byte string arrays).
+ * @newin{2,28}
+ * @ingroup Variant
  */
 template<>
 class Variant< std::vector<std::string> > : public VariantContainerBase
@@ -568,14 +637,15 @@ public:
   static Variant< std::vector<std::string> >
     create(const std::vector<std::string>& data);
 
-  /** Gets a specific element of the string array.  It is an error if index is
-   * greater than the number of child items in the container.  See
+  /** Gets a specific element of the string array.  It is an error if @a index
+   * is greater than the number of child items in the container.  See
    * Glib::VariantContainerBase::get_n_children().
    *
    * This function is O(1).
    *
    * @param index The index of the element.
    * @return The element at index @index.
+   * @throw std::out_of_range
    * @newin{2,28}
    */
   std::string get(gsize index) const;
@@ -585,6 +655,82 @@ public:
    * @newin{2,28}
    */
   std::vector<std::string> get() const;
+  _IGNORE(g_variant_get_bytestring_array, g_variant_dup_bytestring_array)
+
+  /** Gets a VariantIter of the Variant.
+   * @return the VaraintIter.
+   * @newin{2,28}
+   */
+  VariantIter get_iter();
+}; 
+
+/** Specialization of Glib::Variant containing a dictionary (a map of (key,
+ * value) elements).
+ * @newin{2,28}
+ * @ingroup Variant
+ */
+template<class K, class V>
+class Variant< std::map<K, V> >: public VariantContainerBase
+{
+public:
+  typedef std::pair<K, V>               CppType;
+  typedef std::map<K, V>                CppContainerType;
+
+  /// Default constructor.
+  Variant< std::map<K, V> >()
+  : VariantContainerBase()
+  {}
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
+   */
+  explicit Variant< std::map<K, V> >(GVariant* castitem,
+    bool take_a_reference = false)
+  : VariantContainerBase(castitem, take_a_reference)
+  {}
+
+  /** Gets the Glib::VariantType.
+   * @return The Glib::VariantType.
+   * @newin{2,28}
+   */
+  static const Glib::VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Glib::Variant containing a dictionary from a map.
+   * @param data The map to use for creation.
+   * @return The new Glib::Variant holding a dictionary.
+   * @newin{2,28}
+   */
+  static Variant< std::map<K, V> > create(const std::map<K, V>& data);
+
+  /** Gets a specific dictionary entry from the string array.  It is an error
+   * if @a index is greater than the number of child items in the container.
+   * See Glib::VariantContainerBase::get_n_children().
+   *
+   * This function is O(1).
+   *
+   * @param index The index of the element.
+   * @return The dictionary entry at index @index.
+   * @throw std::out_of_range
+   * @newin{2,28}
+   */
+  std::pair<K, V> get(gsize index) const;
+
+  /** Looks up a value in a dictionary Variant.
+   * @param key The key to look up.
+   * @param value A location in which to store the value if found.
+   * @return <tt>true</tt> if the key is found, <tt>false</tt> otherwise.
+   */
+  bool lookup(const K& key, V& value) const;
+  _IGNORE(g_variant_lookup_value, g_variant_lookup)
+
+  /** Gets the map (the dictionary) of the Glib::Variant.
+   * @return The vector.
+   * @newin{2,28}
+   */
+  std::map<K, V> get() const;
 
   /** Gets a VariantIter of the Variant.
    * @return the VaraintIter.
@@ -619,7 +765,46 @@ _IGNORE(
 namespace Glib
 {
 
-/*-----------------------Glib::Variant< std::vector<T> --------------------*/
+/*--------------------Glib::Variant< std::pair<K, V> >---------------------*/
+
+// static
+template<class K, class V>
+const VariantType& Variant< std::pair<K, V> >::variant_type()
+{
+  static VariantType type(G_VARIANT_TYPE_DICT_ENTRY);
+  return type;
+}
+
+template<class K, class V>
+Variant< std::pair<K, V> >
+Variant< std::pair<K, V> >::create(const  std::pair<K, V>& data)
+{
+  Variant<K> key = Variant<K>::create(data.first);
+  Variant<V> value = Variant<V>::create(data.second);
+
+  Variant< std::pair<K, V> > result = Variant< std::pair<K, V> >(
+    g_variant_new_dict_entry(key.gobj(), value.gobj()));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
+}
+
+template<class K, class V>
+std::pair<K, V> Variant< std::pair<K, V> >::get() const
+{
+  // Get the key and the value (which are the first and second elements of
+  // this VariantBaseContainer respectively).
+  Variant<K> key = get(0);
+  Variant<V> value = get(1);
+
+  std::pair<K, V> result(key.get(), value.get());
+
+  return result;
+}
+
+/*---------------------Glib::Variant< std::vector<T> >---------------------*/
 
 // static
 template<class T>
@@ -672,7 +857,7 @@ T Variant< std::vector<T> >::get(gsize index) const
     sizeof(T)));
 
   if(index > n_elements)
-    throw std::runtime_error(
+    throw std::out_of_range(
       "Variant< std::vector<T> >::get(): Index out of bounds.");
 
   return array[index];
@@ -696,6 +881,112 @@ VariantIter Variant< std::vector<T> >::get_iter()
 {
   // Get the variant type of the elements.
   VariantType element_variant_type = Variant<T>::variant_type();
+
+  // Get the variant type of the array.
+  VariantType array_variant_type =
+    VariantType::create_array(element_variant_type);
+
+  // Get the GVariantIter.
+  GVariantIter* g_iter = 0;
+  g_variant_get(const_cast<GVariant*>(gobj()),
+    reinterpret_cast<gchar*>(array_variant_type.gobj()), &g_iter);
+
+  return VariantIter(g_iter);
+}
+
+/*---------------------Glib::Variant< std::map<K, V> > --------------------*/
+
+// static
+template<class K, class V>
+const VariantType& Variant< std::map<K, V> >::variant_type()
+{
+  static VariantType type(G_VARIANT_TYPE_DICTIONARY);
+  return type;
+}
+
+template<class K, class V>
+Variant< std::map<K, V> >
+Variant< std::map<K, V> >::create(const std::map<K, V>& data)
+{
+  // Get the variant type of the elements.
+  VariantType element_variant_type =
+    Variant< std::pair<K, V> >::variant_type();
+
+  // Get the variant type of the array.
+  VariantType array_variant_type =
+    VariantType::create_array(element_variant_type);
+
+  // Create a GVariantBuilder to build the array.
+  GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
+
+  // Add the elements of the vector into the builder.
+  for(typename std::map<K, V>::const_iterator iter = data.begin();
+    iter < data.end(); iter++)
+  {
+    g_variant_builder_add(builder,
+      reinterpret_cast<gchar*>(element_variant_type.gobj()), *iter);
+  }
+
+  // Create the variant using the builder.
+  Variant< std::map<K, V> > result = Variant< std::map<K, V> >(g_variant_new(
+    reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
+}
+
+template<class K, class V>
+std::pair<K, V>
+Variant< std::map<K, V> >::get(gsize index) const
+{
+  Variant< std::pair<K, V> > dict_entry;
+  VariantContainerBase::get(dict_entry, index);
+  return dict_entry.get();
+}
+
+template<class K, class V>
+bool Variant< std::map<K, V> >::lookup(const K& key, V& value) const
+{
+  // The code in this method pretty much reflects the g_variant_lookup_value()
+  // function except that it's more general to deal with keys that are not
+  // just strings.
+  VariantIter iter = get_iter();
+
+  Variant< std::pair<K, V> > entry;
+
+  while(iter.next_value(entry))
+  {
+    if(entry.first == key)
+      value = entry.second;
+    return true;
+  }
+
+  return false;
+}
+
+template<class K, class V>
+std::map<K, V> Variant< std::map<K, V> >::get() const
+{
+  std::map<K, V> result;
+  VariantIter iter = get_iter();
+  Variant< std::pair<K, V> > entry;
+
+  while(iter.next_value(entry))
+  {
+    result.insert(std::pair<K, V>(entry.first, entry.second));
+  }
+
+  return result;
+}
+
+template<class K, class V>
+VariantIter Variant< std::map<K, V> >::get_iter()
+{
+  // Get the variant type of the elements.
+  VariantType element_variant_type =
+    Variant< std::pair<K, V> >::variant_type();
 
   // Get the variant type of the array.
   VariantType array_variant_type =
