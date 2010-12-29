@@ -523,7 +523,7 @@ public:
    * @return the VaraintIter.
    * @newin{2,28}
    */
-  VariantIter get_iter();
+  VariantIter get_iter() const;
 };
 
 /** Specialization of Glib::Variant containing an array of UTF-8 capable
@@ -592,7 +592,7 @@ public:
    * @return the VaraintIter.
    * @newin{2,28}
    */
-  VariantIter get_iter();
+  VariantIter get_iter() const;
 };
 
 /** Specialization of Glib::Variant containing an array of non-UTF-8 strings
@@ -661,7 +661,7 @@ public:
    * @return the VaraintIter.
    * @newin{2,28}
    */
-  VariantIter get_iter();
+  VariantIter get_iter() const;
 }; 
 
 /** Specialization of Glib::Variant containing a dictionary (a map of (key,
@@ -736,7 +736,7 @@ public:
    * @return the VaraintIter.
    * @newin{2,28}
    */
-  VariantIter get_iter();
+  VariantIter get_iter() const;
 };
 
 } // namespace Glib
@@ -777,7 +777,7 @@ const VariantType& Variant< std::pair<K, V> >::variant_type()
 
 template<class K, class V>
 Variant< std::pair<K, V> >
-Variant< std::pair<K, V> >::create(const  std::pair<K, V>& data)
+Variant< std::pair<K, V> >::create(const std::pair<K, V>& data)
 {
   Variant<K> key = Variant<K>::create(data.first);
   Variant<V> value = Variant<V>::create(data.second);
@@ -794,10 +794,13 @@ Variant< std::pair<K, V> >::create(const  std::pair<K, V>& data)
 template<class K, class V>
 std::pair<K, V> Variant< std::pair<K, V> >::get() const
 {
-  // Get the key and the value (which are the first and second elements of
-  // this VariantBaseContainer respectively).
-  Variant<K> key = get(0);
-  Variant<V> value = get(1);
+  // Get the key (the first element of the this VariantContainerBase).
+  Variant<K> key;
+  VariantContainerBase::get(key, 0);
+
+  // Get the value (the second element of the this VariantContainerBase).
+  Variant<V> value;
+  VariantContainerBase::get(value, 1);
 
   std::pair<K, V> result(key.get(), value.get());
 
@@ -877,7 +880,7 @@ std::vector<T> Variant< std::vector<T> >::get() const
 }
 
 template<class T>
-VariantIter Variant< std::vector<T> >::get_iter()
+VariantIter Variant< std::vector<T> >::get_iter() const
 {
   // Get the variant type of the elements.
   VariantType element_variant_type = Variant<T>::variant_type();
@@ -921,10 +924,12 @@ Variant< std::map<K, V> >::create(const std::map<K, V>& data)
 
   // Add the elements of the vector into the builder.
   for(typename std::map<K, V>::const_iterator iter = data.begin();
-    iter < data.end(); iter++)
+    iter != data.end(); iter++)
   {
-    g_variant_builder_add(builder,
-      reinterpret_cast<gchar*>(element_variant_type.gobj()), *iter);
+    Variant< std::pair<K, V> > dict_entry =
+      Variant< std::pair<K, V> >::create(*iter);
+
+    g_variant_builder_add_value(builder, dict_entry.gobj());
   }
 
   // Create the variant using the builder.
@@ -958,9 +963,13 @@ bool Variant< std::map<K, V> >::lookup(const K& key, V& value) const
 
   while(iter.next_value(entry))
   {
-    if(entry.first == key)
-      value = entry.second;
-    return true;
+    std::pair<K, V> element = entry.get();
+
+    if(element.first == key)
+    {
+      value = element.second;
+      return true;
+    }
   }
 
   return false;
@@ -975,14 +984,14 @@ std::map<K, V> Variant< std::map<K, V> >::get() const
 
   while(iter.next_value(entry))
   {
-    result.insert(std::pair<K, V>(entry.first, entry.second));
+    result.insert(entry.get());
   }
 
   return result;
 }
 
 template<class K, class V>
-VariantIter Variant< std::map<K, V> >::get_iter()
+VariantIter Variant< std::map<K, V> >::get_iter() const
 {
   // Get the variant type of the elements.
   VariantType element_variant_type =
