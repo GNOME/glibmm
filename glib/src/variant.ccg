@@ -44,6 +44,7 @@ void VariantStringBase::create_object_path(VariantStringBase& output,
 {
   GVariant* result = 0;
   result = g_variant_new_object_path(object_path.c_str());
+  g_variant_ref_sink(result);
   output.init(result);
 }
 
@@ -53,6 +54,33 @@ void VariantStringBase::create_signature(VariantStringBase& output,
 {
   GVariant* result = 0;
   result = g_variant_new_signature(signature.c_str());
+  g_variant_ref_sink(result);
+  output.init(result);
+}
+
+//static
+void VariantContainerBase::create(VariantContainerBase& output,
+  const Glib::VariantType& container_type,
+  const std::vector<const VariantBase*>& children)
+{
+  g_return_if_fail(container_type.is_container());
+
+  // Create a builder to create the container (as is done in the
+  // Variant< std::map<K, V> >::create() method.
+  GVariantBuilder* builder = g_variant_builder_new(container_type.gobj());
+
+  for(std::vector<const VariantBase*>::const_iterator iter = children.begin();
+    iter < children.end(); iter++)
+  {
+    g_variant_builder_add_value(builder,
+      const_cast<GVariant*>((*iter)->gobj()));
+  }
+
+  GVariant* result = g_variant_new(
+    reinterpret_cast<char*>(const_cast<GVariantType*>(container_type.gobj())),
+    builder);
+
+  g_variant_ref_sink(result);
   output.init(result);
 }
 

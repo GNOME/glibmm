@@ -29,7 +29,7 @@ _DEFS(glibmm,glib)
 namespace Glib
 {
 
-/** @defgroup Variant Variant Datatype
+/** @defgroup Variant Variant Data Types
  *
  * Glib::Variant<> are specialized classes that deal with strongly typed
  * variant data.  They are used to wrap glib's GVariant API.  For more
@@ -208,6 +208,17 @@ public:
     bool take_a_reference = false)
   : VariantBase(castitem, take_a_reference)
   {}
+
+  /** Create a container variant from a vector of its variant children.  Since
+   * the children are variant and can be of any variant type, it is possible
+   * to create a variant tuple with this method.
+   * @param output A location in which to store the newly created variant.
+   * @param container_type The container type to be created.
+   * @param children The vector containing the children of the container.
+   */
+  static void create(VariantContainerBase& output,
+    const Glib::VariantType& container_type,
+    const std::vector<const VariantBase*>& children);
 
   _WRAP_METHOD(gsize get_n_children() const, g_variant_n_children)
 
@@ -819,7 +830,7 @@ const VariantType& Variant< std::vector<T> >::variant_type()
 
 template<class T>
 Variant< std::vector<T> >
-Variant< std::vector<T> >::create(const  std::vector<T>& data)
+Variant< std::vector<T> >::create(const std::vector<T>& data)
 {
   // Get the variant type of the elements.
   VariantType element_variant_type = Variant<T>::variant_type();
