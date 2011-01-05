@@ -47,80 +47,98 @@ namespace Gio
  */
 class SocketListener : public Glib::Object
 {
-    _CLASS_GOBJECT(SocketListener, GSocketListener, G_SOCKET_LISTENER, Glib::Object, GObject)
+  _CLASS_GOBJECT(SocketListener, GSocketListener, G_SOCKET_LISTENER, Glib::Object, GObject)
 
 protected:
-    _CTOR_DEFAULT
+  _CTOR_DEFAULT
+
 public:
-    _WRAP_CREATE()
+  _WRAP_CREATE()
 
-_WRAP_METHOD(void set_backlog(int listen_backlog), g_socket_listener_set_backlog)
+  _WRAP_METHOD(void set_backlog(int listen_backlog), g_socket_listener_set_backlog)
 
-_WRAP_METHOD(bool add_socket(const Glib::RefPtr<Socket>& socket, const Glib::RefPtr<Glib::Object>& source_object), g_socket_listener_add_socket, errthrow)
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_socket)
-bool add_socket(const Glib::RefPtr<Socket>& socket);
+  _WRAP_METHOD(bool add_socket(const Glib::RefPtr<Socket>& socket, const Glib::RefPtr<Glib::Object>& source_object), g_socket_listener_add_socket, errthrow)
 
-_IGNORE(g_socket_listener_add_address)
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_address)
+ //TODO: The use of WRAP_METHOD_DOCS_ONLY here is almost certainly not good enough. 
+ //Check the HTML actually outputed and probably hand-code them as for Gio::File.
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_socket)
+  bool add_socket(const Glib::RefPtr<Socket>& socket);
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_address)
 bool add_address(const Glib::RefPtr<SocketAddress>& address, SocketType type, SocketProtocol protocol, const Glib::RefPtr<Glib::Object>& source_object, Glib::RefPtr<SocketAddress>& effective_address);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_address)
-bool add_address(const Glib::RefPtr<SocketAddress>& address, SocketType type, SocketProtocol protocol, Glib::RefPtr<SocketAddress>& effective_address);
+  _IGNORE(g_socket_listener_add_address)
 
-_WRAP_METHOD(bool add_inet_port(guint16 port, const Glib::RefPtr<Glib::Object>& source_object), g_socket_listener_add_inet_port, errthrow)
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_inet_port)
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_address)
+  bool add_address(const Glib::RefPtr<SocketAddress>& address, SocketType type, SocketProtocol protocol, Glib::RefPtr<SocketAddress>& effective_address);
+
+  _WRAP_METHOD(bool add_inet_port(guint16 port, const Glib::RefPtr<Glib::Object>& source_object), g_socket_listener_add_inet_port, errthrow)
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_inet_port)
 bool add_inet_port(guint16 port);
 
-_WRAP_METHOD(guint16 add_any_inet_port(const Glib::RefPtr<Glib::Object>& source_object), g_socket_listener_add_any_inet_port, errthrow)
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_any_inet_port)
-guint16 add_any_inet_port();
+  _WRAP_METHOD(guint16 add_any_inet_port(const Glib::RefPtr<Glib::Object>& source_object), g_socket_listener_add_any_inet_port, errthrow)
 
-_IGNORE(g_socket_listener_accept_socket)
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_add_any_inet_port)
+  guint16 add_any_inet_port();
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
 Glib::RefPtr<Socket> accept_socket(Glib::RefPtr<Glib::Object>& source_object, const Glib::RefPtr<Cancellable>& cancellable);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
-Glib::RefPtr<Socket> accept_socket(Glib::RefPtr<Glib::Object>& source_object);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
-Glib::RefPtr<Socket> accept_socket(const Glib::RefPtr<Cancellable>& cancellable);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
-Glib::RefPtr<Socket> accept_socket();
+  _IGNORE(g_socket_listener_accept_socket)
 
-_IGNORE(g_socket_listener_accept_socket_async)
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_async)
-void accept_socket_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_async)
-void accept_socket_async(const SlotAsyncReady& slot);
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
+  Glib::RefPtr<Socket> accept_socket(Glib::RefPtr<Glib::Object>& source_object);
 
-_IGNORE(g_socket_listener_accept_socket_finish)
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_finish)
-Glib::RefPtr<Socket> accept_socket_finish(const Glib::RefPtr<AsyncResult>& result, Glib::RefPtr<Glib::Object>& source_object);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_finish)
-Glib::RefPtr<Socket> accept_socket_finish(const Glib::RefPtr<AsyncResult>& result);
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
+  Glib::RefPtr<Socket> accept_socket(const Glib::RefPtr<Cancellable>& cancellable);
 
-_IGNORE(g_socket_listener_accept)
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept)
-Glib::RefPtr<SocketConnection> accept(Glib::RefPtr<Object>& source_object, const Glib::RefPtr<Cancellable>& cancellable);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept)
-Glib::RefPtr<SocketConnection> accept(Glib::RefPtr<Object>& source_object);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept)
-Glib::RefPtr<SocketConnection> accept(const Glib::RefPtr<Cancellable>& cancellable);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept)
-Glib::RefPtr<SocketConnection> accept();
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket)
+  Glib::RefPtr<Socket> accept_socket();
 
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_async)
-void accept_async(const SlotAsyncReady& slot);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_async)
-void accept_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
-_IGNORE(g_socket_listener_accept_async)
 
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_finish)
-Glib::RefPtr<SocketConnection> accept_finish(const Glib::RefPtr<AsyncResult>& result, Glib::RefPtr<Glib::Object>& source_object);
-_WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_finish)
-Glib::RefPtr<SocketConnection> accept_finish(const Glib::RefPtr<AsyncResult>& result);
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_async)
+  void accept_socket_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  _IGNORE(g_socket_listener_accept_socket_async)
 
-_WRAP_METHOD (void close(), g_socket_listener_close)
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_async)
+  void accept_socket_async(const SlotAsyncReady& slot);
 
-_WRAP_PROPERTY("listen-backlog", int)
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_finish)
+  Glib::RefPtr<Socket> accept_socket_finish(const Glib::RefPtr<AsyncResult>& result, Glib::RefPtr<Glib::Object>& source_object);
+  _IGNORE(g_socket_listener_accept_socket_finish)
+  
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_socket_finish)
+  Glib::RefPtr<Socket> accept_socket_finish(const Glib::RefPtr<AsyncResult>& result);
 
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept)
+  Glib::RefPtr<SocketConnection> accept(Glib::RefPtr<Object>& source_object, const Glib::RefPtr<Cancellable>& cancellable);
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept)
+  Glib::RefPtr<SocketConnection> accept(Glib::RefPtr<Object>& source_object);
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept)
+  Glib::RefPtr<SocketConnection> accept(const Glib::RefPtr<Cancellable>& cancellable);
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept)
+  Glib::RefPtr<SocketConnection> accept();
+  _IGNORE(g_socket_listener_accept)
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_async)
+  void accept_async(const SlotAsyncReady& slot);
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_async)
+  void accept_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
+  _IGNORE(g_socket_listener_accept_async)
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_finish)
+  Glib::RefPtr<SocketConnection> accept_finish(const Glib::RefPtr<AsyncResult>& result, Glib::RefPtr<Glib::Object>& source_object);
+
+  _WRAP_METHOD_DOCS_ONLY(g_socket_listener_accept_finish)
+  Glib::RefPtr<SocketConnection> accept_finish(const Glib::RefPtr<AsyncResult>& result);
+
+  _WRAP_METHOD(void close(), g_socket_listener_close)
+
+  _WRAP_PROPERTY("listen-backlog", int)
 };
 
 } // namespace Gio
