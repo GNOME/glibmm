@@ -46,6 +46,7 @@ sub new
   $$self{readable} = ($1 eq "#t")       if ($def =~ s/\(readable (\S+)\)//);
   $$self{writable} = ($1 eq "#t")       if ($def =~ s/\(writable (\S+)\)//);
   $$self{construct_only} = ($1 eq "#t") if ($def =~ s/\(construct-only (\S+)\)//);
+  $$self{entity_type} = 'property';
   
   # Property documentation:
   my $propertydocs = $1                     if ($def =~ s/\(docs "([^"]*)"\)//);

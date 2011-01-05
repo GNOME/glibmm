@@ -116,7 +116,8 @@ if ($main::unwrapped)
   {
     my @methods = grep { $$_{entity_type} eq 'method' and $$_{c_name} !~ m/^_/s } @unwrapped;
     my @signals = grep { $$_{entity_type} eq 'signal' } @unwrapped;
-    my @properties = grep { $$_{entity_type} eq 'property' } @unwrapped;
+    # Don't take non-readable construct-only properties into account.
+    my @properties = grep { $$_{entity_type} eq 'property' and ( $$_{readable} or not $$_{construct_only} ) } @unwrapped;
 
     local $, = "\ngmmproc:   ";
     local $\ = "\n";
