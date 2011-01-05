@@ -43,10 +43,15 @@ class BufferedOutputStream : public Gio::FilterOutputStream
   _CLASS_GOBJECT(BufferedOutputStream, GBufferedOutputStream, G_BUFFERED_OUTPUT_STREAM, Gio::FilterOutputStream, GFilterOutputStream)
 protected:
   _WRAP_CTOR(BufferedOutputStream(const Glib::RefPtr<OutputStream>& base_stream), g_buffered_output_stream_new)
-  _WRAP_CTOR(BufferedOutputStream(const Glib::RefPtr<OutputStream>& base_stream, gsize size), g_buffered_output_stream_new_sized)
+  
+  //Note that we rename the size parameter to buffer_size because that is the actual name of the property.
+  _WRAP_CTOR(BufferedOutputStream(const Glib::RefPtr<OutputStream>& base_stream, gsize buffer_size), g_buffered_output_stream_new_sized)
+
 public:
   _WRAP_CREATE(const Glib::RefPtr<OutputStream>& base_stream)
-  static Glib::RefPtr<BufferedOutputStream> create_sized(const Glib::RefPtr<OutputStream>& base_stream, gsize size);
+  
+  //TODO: Documentation
+  static Glib::RefPtr<BufferedOutputStream> create_sized(const Glib::RefPtr<OutputStream>& base_stream, gsize buffer_size);
 
   _WRAP_METHOD(gsize get_buffer_size() const, g_buffered_output_stream_get_buffer_size)
   _WRAP_METHOD(void set_buffer_size(gsize size), g_buffered_output_stream_set_buffer_size)
