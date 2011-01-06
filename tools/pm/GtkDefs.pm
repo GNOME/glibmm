@@ -378,8 +378,36 @@ sub get_unwrapped
   my $class;
   foreach $class (@classes)
   {
+    # if this class's parent is defined then don't put its properties as unwrapped.
+    # this may not work if parent is from other library (GtkApplication's parent
+    # is GApplication, so all its properties will be marked as unwrapped)
+    my $detailed = 0;
+    my $object = $GtkDefs::objects{$class};
+    if (exists $GtkDefs::objects{$class})
+    {
+      my $object = $GtkDefs::objects{$class};
+
+      if (defined $object)
+      {
+        my $parent = $object->{parent};
+
+        # may be empty for some classes deriving a GInterface?
+        if ($parent)
+        {
+          $detailed = 1;
+        }
+      }
+    }
+    if ($detailed)
+    {
+      push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0 && not exists $GtkDefs::properties{$object->{parent} . '::' . $_->{name}}} values %GtkDefs::properties;
+    }
+    else
+    {
+      push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::properties;
+    }
+
     push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::methods;
-    push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::properties;
     push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::signals;
   }
 
