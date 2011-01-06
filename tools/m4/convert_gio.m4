@@ -207,7 +207,6 @@ _CONVERSION(`const Glib::RefPtr<SocketConnectable>&',`GSocketConnectable*',__CON
 
 #SocketConnection
 _CONVERSION(`GSocketConnection*',`Glib::RefPtr<SocketConnection>',`Glib::wrap($3)')
-_CONVERSION(`GSocketConnection*',`const Glib::RefPtr<SocketConnection>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<SocketConnection>&',`GSocketConnection*',__CONVERT_CONST_REFPTR_TO_P)
 
 #SocketControlMessage
