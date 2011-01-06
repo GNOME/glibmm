@@ -26,15 +26,6 @@
 namespace
 {
 
-// struct to hold the slots in the DBusInterfaceVTable class.  This is used to
-// pass the slots to the callbacks and later destroy them.
-struct TypeDBusInterfaceVTableSlots
-{
-  Gio::DBusInterfaceVTable::SlotInterfaceMethodCall* slot_method_call;
-  Gio::DBusInterfaceVTable::SlotInterfaceGetProperty* slot_get_property;
-  Gio::DBusInterfaceVTable::SlotInterfaceSetProperty* slot_set_property;
-};
-
 extern "C"
 {
 
@@ -95,11 +86,11 @@ static void DBusInterfaceVTable_MethodCall_giomm_callback(
   const char* interface_name, const char* method_name, GVariant* parameters,
   GDBusMethodInvocation* invocation, void* user_data)
 {
-  TypeDBusInterfaceVTableSlots* the_slots =
-    static_cast<TypeDBusInterfaceVTableSlots*>(user_data);
+  Gio::DBusInterfaceVTable* vtable =
+    static_cast<Gio::DBusInterfaceVTable*>(user_data);
 
   Gio::DBusInterfaceVTable::SlotInterfaceMethodCall* the_slot =
-    the_slots->slot_method_call;
+    vtable->get_slot_method_call();
 
   try
   {
@@ -119,11 +110,11 @@ static GVariant* DBusInterfaceVTable_GetProperty_giomm_callback(
   const char* interface_name, const char* property_name, GError**,
   void* user_data)
 {
-  TypeDBusInterfaceVTableSlots* the_slots =
-    static_cast<TypeDBusInterfaceVTableSlots*>(user_data);
+  Gio::DBusInterfaceVTable* vtable =
+    static_cast<Gio::DBusInterfaceVTable*>(user_data);
 
   Gio::DBusInterfaceVTable::SlotInterfaceGetProperty* the_slot =
-    the_slots->slot_get_property;
+    vtable->get_slot_get_property();
 
   try
   {
@@ -147,11 +138,11 @@ static gboolean DBusInterfaceVTable_SetProperty_giomm_callback(
   const char* interface_name, const char* property_name, GVariant* value,
   GError**, void* user_data)
 {
-  TypeDBusInterfaceVTableSlots* the_slots =
-    static_cast<TypeDBusInterfaceVTableSlots*>(user_data);
+  Gio::DBusInterfaceVTable* vtable =
+    static_cast<Gio::DBusInterfaceVTable*>(user_data);
 
   Gio::DBusInterfaceVTable::SlotInterfaceSetProperty* the_slot =
-    the_slots->slot_set_property;
+    vtable->get_slot_set_property();
 
   try
   {
@@ -168,16 +159,105 @@ static gboolean DBusInterfaceVTable_SetProperty_giomm_callback(
   return false;
 }
 
-static void DBusInterfaceVTable_giomm_callback_destory(void* data)
+static char** DBusSubtreeVTable_Enumerate_giomm_callback(
+  GDBusConnection* connection, const char* sender, const char* object_path,
+  void* user_data)
 {
-  TypeDBusInterfaceVTableSlots* the_slots =
-    static_cast<TypeDBusInterfaceVTableSlots*>(data);
+  Gio::DBusSubtreeVTable* vtable =
+    static_cast<Gio::DBusSubtreeVTable*>(user_data);
 
-  delete the_slots->slot_method_call;
-  delete the_slots->slot_get_property;
-  delete the_slots->slot_set_property;
+  Gio::DBusSubtreeVTable::SlotSubtreeEnumerate* the_slot =
+    vtable->get_slot_enumerate();
 
-  delete the_slots;
+  try
+  {
+    std::vector<Glib::ustring> result =
+      (*the_slot)(Glib::wrap(connection, true), Glib::ustring(sender),
+      Glib::ustring(object_path));
+
+    // This will be freed by the caller.
+    char** ret = g_new(char*, result.size());
+
+    for(std::vector<Glib::ustring>::size_type i = 0; i < result.size(); i++)
+    {
+      ret[i] = g_strdup(result[i].c_str());
+    }
+
+    return ret;
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0;
+}
+
+static GDBusInterfaceInfo** DBusSubtreeVTable_Introspect_giomm_callback(
+  GDBusConnection* connection, const char* sender, const char* object_path,
+  const char* node, void* user_data)
+{
+  Gio::DBusSubtreeVTable* vtable =
+    static_cast<Gio::DBusSubtreeVTable*>(user_data);
+
+  Gio::DBusSubtreeVTable::SlotSubtreeIntrospect* the_slot =
+    vtable->get_slot_introspect();
+
+  try
+  {
+    std::vector< Glib::RefPtr<Gio::DBusInterfaceInfo> > result =
+      (*the_slot)(Glib::wrap(connection, true), Glib::ustring(sender),
+      Glib::ustring(object_path), Glib::ustring(node));
+
+    // This will be freed by the caller, along with unreferencing its members.
+    GDBusInterfaceInfo** info = g_new(GDBusInterfaceInfo*, result.size());
+
+    for(std::vector< Glib::RefPtr<Gio::DBusInterfaceInfo> >::size_type i = 0;
+      i < result.size(); i++)
+    {
+      info[i] = static_cast<GDBusInterfaceInfo*>(
+        g_object_ref(result[i]->gobj()));
+    }
+
+    return info;
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0;
+}
+
+static const GDBusInterfaceVTable* DBusSubtreeVTable_Dispatch_giomm_callback(
+  GDBusConnection* connection, const char* sender, const char* object_path,
+  const char* interface_name, const char* node, void** out_user_data,
+  void* user_data)
+{
+  Gio::DBusSubtreeVTable* vtable =
+    static_cast<Gio::DBusSubtreeVTable*>(user_data);
+
+  Gio::DBusSubtreeVTable::SlotSubtreeDispatch* the_slot =
+    vtable->get_slot_dispatch();
+
+  try
+  {
+    const Gio::DBusInterfaceVTable* vtable =
+      (*the_slot)(Glib::wrap(connection, true), Glib::ustring(sender),
+      Glib::ustring(object_path), Glib::ustring(interface_name),
+      Glib::ustring(node));
+
+    *out_user_data = const_cast<Gio::DBusInterfaceVTable*>(vtable);
+
+    return reinterpret_cast<GDBusInterfaceVTable*>(
+      const_cast<Gio::DBusInterfaceVTable*>(vtable));
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  return 0;
 }
 
 } // extern "C"
@@ -894,25 +974,34 @@ guint DBusConnection::add_filter(const SlotMessageFilter& slot)
 
 guint DBusConnection::register_object(const Glib::ustring& object_path,
   const Glib::RefPtr<DBusInterfaceInfo>& interface_info,
-  const DBusInterfaceVTable& vtable)
+  const DBusInterfaceVTable* vtable)
 {
-  TypeDBusInterfaceVTableSlots* the_slots = new TypeDBusInterfaceVTableSlots();
-
-  the_slots->slot_method_call = vtable.get_slot_method_call();
-  the_slots->slot_get_property = vtable.get_slot_get_property();
-  the_slots->slot_set_property = vtable.get_slot_set_property();
-
   GError* gerror = 0;
 
   guint const result = g_dbus_connection_register_object(gobj(),
     object_path.c_str(), Glib::unwrap(interface_info),
-    reinterpret_cast<GDBusInterfaceVTable*>(const_cast<DBusInterfaceVTable*>(&vtable)),
-    the_slots, &DBusInterfaceVTable_giomm_callback_destory, &gerror);
+    reinterpret_cast<GDBusInterfaceVTable*>(const_cast<DBusInterfaceVTable*>(vtable)),
+    const_cast<DBusInterfaceVTable*>(vtable), 0, &gerror);
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
-  const_cast<DBusInterfaceVTable&>(vtable).signal_slots_registered();
+  return result;
+}
+
+guint DBusConnection::register_subtree(const Glib::ustring& object_path,
+  const DBusSubtreeVTable* vtable, DBusSubtreeFlags flags)
+{
+  GError* gerror = 0;
+
+  guint const result = g_dbus_connection_register_subtree(gobj(),
+    object_path.c_str(), 
+    reinterpret_cast<GDBusSubtreeVTable*>(const_cast<DBusSubtreeVTable*>(vtable)),
+    static_cast<GDBusSubtreeFlags>(flags),
+    const_cast<DBusSubtreeVTable*>(vtable), 0, &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
@@ -924,8 +1013,7 @@ DBusInterfaceVTable::DBusInterfaceVTable(
 )
 : slot_method_call(new SlotInterfaceMethodCall(slot_method_call)),
   slot_get_property(new SlotInterfaceGetProperty(slot_get_property)),
-  slot_set_property(new SlotInterfaceSetProperty(slot_set_property)),
-  slots_registered(false)
+  slot_set_property(new SlotInterfaceSetProperty(slot_set_property))
 {
   gobject_.method_call = &DBusInterfaceVTable_MethodCall_giomm_callback;
   gobject_.get_property = &DBusInterfaceVTable_GetProperty_giomm_callback;
@@ -934,12 +1022,9 @@ DBusInterfaceVTable::DBusInterfaceVTable(
 
 DBusInterfaceVTable::~DBusInterfaceVTable()
 {
-  if(!slots_registered)
-  {
-    delete slot_method_call;
-    delete slot_get_property;
-    delete slot_set_property;
-  }
+  delete slot_method_call;
+  delete slot_get_property;
+  delete slot_set_property;
 }
 
 DBusInterfaceVTable::SlotInterfaceMethodCall*
@@ -960,9 +1045,43 @@ DBusInterfaceVTable::SlotInterfaceSetProperty*
   return slot_set_property;
 }
 
-void DBusInterfaceVTable::signal_slots_registered()
+DBusSubtreeVTable::DBusSubtreeVTable(
+  const SlotSubtreeEnumerate& slot_enumerate,
+  const SlotSubtreeIntrospect& slot_introspect,
+  const SlotSubtreeDispatch& slot_dispatch
+)
+: slot_enumerate(new SlotSubtreeEnumerate(slot_enumerate)),
+  slot_introspect(new SlotSubtreeIntrospect(slot_introspect)),
+  slot_dispatch(new SlotSubtreeDispatch(slot_dispatch))
 {
-  slots_registered = true;
+  gobject_.enumerate = &DBusSubtreeVTable_Enumerate_giomm_callback;
+  gobject_.introspect = &DBusSubtreeVTable_Introspect_giomm_callback;
+  gobject_.dispatch = &DBusSubtreeVTable_Dispatch_giomm_callback;
+}
+
+DBusSubtreeVTable::~DBusSubtreeVTable()
+{
+  delete slot_enumerate;
+  delete slot_introspect;
+  delete slot_dispatch;
+}
+
+DBusSubtreeVTable::SlotSubtreeEnumerate*
+  DBusSubtreeVTable::get_slot_enumerate() const
+{
+  return slot_enumerate;
+}
+
+DBusSubtreeVTable::SlotSubtreeIntrospect*
+  DBusSubtreeVTable::get_slot_introspect() const
+{
+  return slot_introspect;
+}
+
+DBusSubtreeVTable::SlotSubtreeDispatch*
+  DBusSubtreeVTable::get_slot_dispatch() const
+{
+  return slot_dispatch;
 }
 
 } // namespace Gio
