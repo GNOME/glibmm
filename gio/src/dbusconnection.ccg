@@ -249,8 +249,7 @@ static const GDBusInterfaceVTable* DBusSubtreeVTable_Dispatch_giomm_callback(
 
     *out_user_data = const_cast<Gio::DBusInterfaceVTable*>(vtable);
 
-    return reinterpret_cast<GDBusInterfaceVTable*>(
-      const_cast<Gio::DBusInterfaceVTable*>(vtable));
+    return vtable->gobj();
   }
   catch(...)
   {
@@ -980,8 +979,7 @@ guint DBusConnection::register_object(const Glib::ustring& object_path,
 
   const guint result = g_dbus_connection_register_object(gobj(),
     object_path.c_str(), Glib::unwrap(interface_info),
-    reinterpret_cast<GDBusInterfaceVTable*>(const_cast<DBusInterfaceVTable*>(vtable)),
-    const_cast<DBusInterfaceVTable*>(vtable), 0, &gerror);
+    vtable->gobj(), const_cast<DBusInterfaceVTable*>(vtable), 0, &gerror);
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -996,8 +994,7 @@ guint DBusConnection::register_subtree(const Glib::ustring& object_path,
 
   const guint result = g_dbus_connection_register_subtree(gobj(),
     object_path.c_str(), 
-    reinterpret_cast<GDBusSubtreeVTable*>(const_cast<DBusSubtreeVTable*>(vtable)),
-    static_cast<GDBusSubtreeFlags>(flags),
+    vtable->gobj(), static_cast<GDBusSubtreeFlags>(flags),
     const_cast<DBusSubtreeVTable*>(vtable), 0, &gerror);
 
   if(gerror)
