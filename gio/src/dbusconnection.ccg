@@ -1011,9 +1011,9 @@ DBusInterfaceVTable::DBusInterfaceVTable(
   const SlotInterfaceGetProperty& slot_get_property,
   const SlotInterfaceSetProperty& slot_set_property
 )
-: slot_method_call(new SlotInterfaceMethodCall(slot_method_call)),
-  slot_get_property(new SlotInterfaceGetProperty(slot_get_property)),
-  slot_set_property(new SlotInterfaceSetProperty(slot_set_property))
+: slot_method_call_(new SlotInterfaceMethodCall(slot_method_call)),
+  slot_get_property_(new SlotInterfaceGetProperty(slot_get_property)),
+  slot_set_property_(new SlotInterfaceSetProperty(slot_set_property))
 {
   gobject_.method_call = &DBusInterfaceVTable_MethodCall_giomm_callback;
   gobject_.get_property = &DBusInterfaceVTable_GetProperty_giomm_callback;
@@ -1022,27 +1022,27 @@ DBusInterfaceVTable::DBusInterfaceVTable(
 
 DBusInterfaceVTable::~DBusInterfaceVTable()
 {
-  delete slot_method_call;
-  delete slot_get_property;
-  delete slot_set_property;
+  delete slot_method_call_;
+  delete slot_get_property_;
+  delete slot_set_property_;
 }
 
 DBusInterfaceVTable::SlotInterfaceMethodCall*
   DBusInterfaceVTable::get_slot_method_call() const
 {
-  return slot_method_call;
+  return slot_method_call_;
 }
 
 DBusInterfaceVTable::SlotInterfaceGetProperty*
   DBusInterfaceVTable::get_slot_get_property() const
 {
-  return slot_get_property;
+  return slot_get_property_;
 }
 
 DBusInterfaceVTable::SlotInterfaceSetProperty*
   DBusInterfaceVTable::get_slot_set_property() const
 {
-  return slot_set_property;
+  return slot_set_property_;
 }
 
 DBusSubtreeVTable::DBusSubtreeVTable(
@@ -1050,9 +1050,9 @@ DBusSubtreeVTable::DBusSubtreeVTable(
   const SlotSubtreeIntrospect& slot_introspect,
   const SlotSubtreeDispatch& slot_dispatch
 )
-: slot_enumerate(new SlotSubtreeEnumerate(slot_enumerate)),
-  slot_introspect(new SlotSubtreeIntrospect(slot_introspect)),
-  slot_dispatch(new SlotSubtreeDispatch(slot_dispatch))
+: slot_enumerate_(new SlotSubtreeEnumerate(slot_enumerate)),
+  slot_introspect_(new SlotSubtreeIntrospect(slot_introspect)),
+  slot_dispatch_(new SlotSubtreeDispatch(slot_dispatch))
 {
   gobject_.enumerate = &DBusSubtreeVTable_Enumerate_giomm_callback;
   gobject_.introspect = &DBusSubtreeVTable_Introspect_giomm_callback;
@@ -1061,27 +1061,27 @@ DBusSubtreeVTable::DBusSubtreeVTable(
 
 DBusSubtreeVTable::~DBusSubtreeVTable()
 {
-  delete slot_enumerate;
-  delete slot_introspect;
-  delete slot_dispatch;
+  delete slot_enumerate_;
+  delete slot_introspect_;
+  delete slot_dispatch_;
 }
 
 DBusSubtreeVTable::SlotSubtreeEnumerate*
   DBusSubtreeVTable::get_slot_enumerate() const
 {
-  return slot_enumerate;
+  return slot_enumerate_;
 }
 
 DBusSubtreeVTable::SlotSubtreeIntrospect*
   DBusSubtreeVTable::get_slot_introspect() const
 {
-  return slot_introspect;
+  return slot_introspect_;
 }
 
 DBusSubtreeVTable::SlotSubtreeDispatch*
   DBusSubtreeVTable::get_slot_dispatch() const
 {
-  return slot_dispatch;
+  return slot_dispatch_;
 }
 
 } // namespace Gio
