@@ -21,6 +21,7 @@
 #include <giomm/dbusauthobserver.h>
 #include <giomm/dbusintrospection.h>
 #include <giomm/dbusmethodinvocation.h>
+#include <giomm/error.h>
 #include "slot_async.h"
 
 namespace
@@ -107,7 +108,7 @@ static void DBusInterfaceVTable_MethodCall_giomm_callback(
 
 static GVariant* DBusInterfaceVTable_GetProperty_giomm_callback(
   GDBusConnection* connection, const char* sender, const char* object_path,
-  const char* interface_name, const char* property_name, GError**,
+  const char* interface_name, const char* property_name, GError** error,
   void* user_data)
 {
   Gio::DBusInterfaceVTable* vtable =
@@ -125,6 +126,10 @@ static GVariant* DBusInterfaceVTable_GetProperty_giomm_callback(
       Glib::ustring(interface_name), Glib::ustring(property_name));
     return result.gobj_copy();
   }
+  catch(const Gio::DBusError& ex)
+  {
+    *error = const_cast<GError*>(ex.gobj());
+  }
   catch(...)
   {
     Glib::exception_handlers_invoke();
@@ -136,7 +141,7 @@ static GVariant* DBusInterfaceVTable_GetProperty_giomm_callback(
 static gboolean DBusInterfaceVTable_SetProperty_giomm_callback(
   GDBusConnection* connection, const char* sender, const char* object_path,
   const char* interface_name, const char* property_name, GVariant* value,
-  GError**, void* user_data)
+  GError** error, void* user_data)
 {
   Gio::DBusInterfaceVTable* vtable =
     static_cast<Gio::DBusInterfaceVTable*>(user_data);
@@ -150,6 +155,10 @@ static gboolean DBusInterfaceVTable_SetProperty_giomm_callback(
       Glib::ustring(sender), Glib::ustring(object_path),
       Glib::ustring(interface_name), Glib::ustring(property_name),
       Glib::VariantBase(value, true)));
+  }
+  catch(const Gio::DBusError& ex)
+  {
+    *error = const_cast<GError*>(ex.gobj());
   }
   catch(...)
   {
