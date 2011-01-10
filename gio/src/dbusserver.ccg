@@ -40,6 +40,19 @@ DBusServer::DBusServer(const Glib::ustring& address,
 
 DBusServer::DBusServer(const Glib::ustring& address,
   const Glib::ustring& guid,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusServerFlags flags)
+  : _CONSTRUCT("address",
+    (address.empty() ? static_cast<char*>(0) : address.c_str()),
+    "flags", static_cast<GDBusServerFlags>(flags),
+    "guid", (guid.empty() ? static_cast<char*>(0) : guid.c_str()),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
+{
+  init(cancellable);
+}
+
+DBusServer::DBusServer(const Glib::ustring& address,
+  const Glib::ustring& guid,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   DBusServerFlags flags)
   : _CONSTRUCT("address",
@@ -47,6 +60,18 @@ DBusServer::DBusServer(const Glib::ustring& address,
     "flags", static_cast<GDBusServerFlags>(flags),
     "guid", (guid.empty() ? static_cast<char*>(0) : guid.c_str()),
     "authentication-observer", Glib::unwrap(observer))
+{
+  init();
+}
+
+DBusServer::DBusServer(const Glib::ustring& address,
+  const Glib::ustring& guid,
+  DBusServerFlags flags)
+  : _CONSTRUCT("address",
+    (address.empty() ? static_cast<char*>(0) : address.c_str()),
+    "flags", static_cast<GDBusServerFlags>(flags),
+    "guid", (guid.empty() ? static_cast<char*>(0) : guid.c_str()),
+    "authentication-observer", static_cast<GDBusAuthObserver*>(0))
 {
   init();
 }
@@ -80,6 +105,31 @@ Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
 
 Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
   const Glib::ustring& guid,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  DBusServerFlags flags)
+{
+  //TODO: Use the constructor instead of the code underneath when
+  //g_dbus_server_new_sync() does not do more than call g_initable_new().
+  //return Glib::RefPtr<DBusServer>(new DBusServer(address, guid,
+    //cancellable, flags));
+
+  GError* gerror = 0;
+
+  Glib::RefPtr<DBusServer> result =
+    Glib::wrap(g_dbus_server_new_sync(address.c_str(),
+                                      static_cast<GDBusServerFlags>(flags),
+                                      guid.c_str(), 0,
+                                      Glib::unwrap(cancellable),
+                                      &gerror));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return result;
+}
+
+Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
+  const Glib::ustring& guid,
   const Glib::RefPtr<DBusAuthObserver>& observer,
   DBusServerFlags flags)
 {
@@ -97,6 +147,27 @@ Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
                                       Glib::unwrap(observer),
                                       0,
                                       &gerror));
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return result;
+}
+
+Glib::RefPtr<DBusServer> DBusServer::create_sync(const Glib::ustring& address,
+  const Glib::ustring& guid,
+  DBusServerFlags flags)
+{
+  //TODO: Use the constructor instead of the code underneath when
+  //g_dbus_server_new_sync() does not do more than call g_initable_new().
+  //return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, flags));
+
+  GError* gerror = 0;
+
+  Glib::RefPtr<DBusServer> result =
+    Glib::wrap(g_dbus_server_new_sync(address.c_str(),
+                                      static_cast<GDBusServerFlags>(flags),
+                                      guid.c_str(), 0, 0, &gerror));
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);

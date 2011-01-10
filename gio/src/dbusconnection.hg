@@ -630,6 +630,8 @@ public:
    * @param object_path Path of remote object.
    * @param interface_name D-Bus interface to invoke method on.
    * @param method_name The name of the method to invoke.
+   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * method or <tt>0</tt> if not passing parameters.
    * @param slot A SlotAsyncReady to call when the request is satisfied.
    * @param cancellable A Cancellable.
    * @param bus_name A unique or well-known bus name or <tt>0</tt> if the
@@ -637,8 +639,6 @@ public:
    * @param timeout_msec The timeout in milliseconds, -1 to use the default
    * timeout or G_MAXINT for no timeout.
    * @param flags Flags from the Gio::DBusCallFlags enumeration.
-   * @param parameters A Glib::VariantBase tuple with parameters for the
-   * method or <tt>0</tt> if not passing parameters.
    * @param reply_type The expected type of the reply, or <tt>0</tt>.
    * @newin{2,28}
    */
@@ -646,12 +646,12 @@ public:
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
+    const Glib::VariantBase&            parameters,
     const SlotAsyncReady&               slot,
     const Glib::RefPtr<Cancellable>&    cancellable,
     int                                 timeout_msec = -1,
     const Glib::ustring&                bus_name = Glib::ustring(),
     DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
-    const Glib::VariantBase&            parameters = Glib::VariantBase(),
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
   _IGNORE(g_dbus_connection_call)
@@ -661,11 +661,11 @@ public:
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
+    const Glib::VariantBase&            parameters,
     const SlotAsyncReady&               slot,
     int                                 timeout_msec = -1,
     const Glib::ustring&                bus_name = Glib::ustring(),
     DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
-    const Glib::VariantBase&            parameters = Glib::VariantBase(),
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
 
@@ -704,14 +704,14 @@ public:
    * @param object_path Path of remote object.
    * @param interface_name D-Bus interface to invoke method on.
    * @param method_name The name of the method to invoke.
+   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * method or <tt>0</tt> if not passing parameters.
    * @param cancellable A Cancellable.
    * @param bus_name A unique or well-known bus name or <tt>0</tt> if the
    * connection is not a message bus connection.
    * @param timeout_msec The timeout in milliseconds, -1 to use the default
    * timeout or G_MAXINT for no timeout.
    * @param flags Flags from the Gio::DBusCallFlags enumeration.
-   * @param parameters A Glib::VariantBase tuple with parameters for the
-   * method or <tt>0</tt> if not passing parameters.
    * @param reply_type The expected type of the reply, or <tt>0</tt>.
    * @throw Glib::Error.
    * @newin{2,28}
@@ -721,11 +721,11 @@ public:
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
+    const Glib::VariantBase&            parameters,
     const Glib::RefPtr<Cancellable>&    cancellable,
     int                                 timeout_msec = -1,
     const Glib::ustring&                bus_name = Glib::ustring(),
     DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
-    const Glib::VariantBase&            parameters = Glib::VariantBase(),
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
   _IGNORE(g_dbus_connection_call_sync)
@@ -736,10 +736,10 @@ public:
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
+    const Glib::VariantBase&            parameters,
     int                                 timeout_msec = -1,
     const Glib::ustring&                bus_name = Glib::ustring(),
     DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
-    const Glib::VariantBase&            parameters = Glib::VariantBase(),
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
 
@@ -1014,7 +1014,7 @@ public:
     const Glib::VariantBase&
   > SlotInterfaceSetProperty;
 
-  /** Constructs a new DBusInterfaceVTable using specified slots.
+  /** Constructs a new DBusInterfaceVTable using the specified slots.
    * @param slot_method_call The slot for handling incoming method calls.
    * @param slot_get_property The slot for getting a property.
    * @param slot_set_property The slot for setting a property.

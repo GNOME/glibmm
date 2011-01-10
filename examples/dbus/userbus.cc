@@ -64,7 +64,7 @@ void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
     for(unsigned i = 0; i < names.size(); i++)
       std::cout << names[i] << "." << std::endl;
   }
-  catch (const Glib::Error& error)
+  catch(const Glib::Error& error)
   {
     std::cerr << "Got an error: '" << error.what() << "'." << std::endl;
   }

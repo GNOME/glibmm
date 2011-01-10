@@ -59,29 +59,25 @@ void VariantStringBase::create_signature(VariantStringBase& output,
 }
 
 //static
-void VariantContainerBase::create(VariantContainerBase& output,
-  const Glib::VariantType& container_type,
-  const std::vector<VariantBase>& children)
+VariantContainerBase
+VariantContainerBase::create_tuple(const std::vector<VariantBase>& children)
 {
-  g_return_if_fail(container_type.is_container());
+  typedef GVariant* var_ptr;
+  var_ptr* const var_array = new var_ptr[children.size()];
 
-  // Create a builder to create the container (as is done in the
-  // Variant< std::map<K, V> >::create() method.
-  GVariantBuilder* builder = g_variant_builder_new(container_type.gobj());
-
-  for(std::vector<VariantBase>::const_iterator iter = children.begin();
-    iter < children.end(); iter++)
+  for(std::vector<VariantBase>::size_type i = 0; i < children.size(); i++)
   {
-    g_variant_builder_add_value(builder,
-      const_cast<GVariant*>((*iter).gobj()));
+    var_array[i] = const_cast<GVariant*>(children[i].gobj());
   }
 
-  GVariant* result = g_variant_new(
-    reinterpret_cast<char*>(const_cast<GVariantType*>(container_type.gobj())),
-    builder);
+  VariantContainerBase result = VariantContainerBase(g_variant_new_tuple(
+    var_array, children.size()));
 
-  g_variant_ref_sink(result);
-  output.init(result);
+  g_variant_ref_sink(result.gobj());
+
+  delete[] var_array;
+
+  return result;
 }
 
 void VariantContainerBase::get(VariantBase& child, gsize index) const

@@ -20,7 +20,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 check_PROGRAMS =			\
 	child_watch/child_watch		\
 	compose/example			\
-	dbus/well-known-address-client	\
+	dbus/peer			\
+	dbus/userbus			\
 	iochannel_stream/example	\
 	keyfile/example			\
 	markup/parser			\
@@ -74,8 +75,10 @@ thread_threadpool_SOURCES  = thread/threadpool.cc
 thread_threadpool_LDADD    = $(thread_ldadd)
 
 # giomm examples
-dbus_well_known_address_client_SOURCES = dbus/well-known-address-client.cc
-dbus_well_known_address_client_LDADD   = $(giomm_ldadd)
+dbus_peer_SOURCES = dbus/peer.cc
+dbus_peer_LDADD = $(giomm_ldadd)
+dbus_userbus_SOURCES = dbus/userbus.cc
+dbus_userbus_LDADD   = $(giomm_ldadd)
 
 network_resolver_SOURCES   = network/resolver.cc
 network_resolver_LDADD     = $(giomm_ldadd)
