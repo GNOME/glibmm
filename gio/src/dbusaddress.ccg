@@ -29,12 +29,12 @@ namespace DBus
 namespace Address
 {
 
-bool is_address(const Glib::ustring& string)
+bool is_address(const std::string& string)
 {
   return static_cast<bool>(g_dbus_is_address(string.c_str()));
 }
 
-bool is_supported(const Glib::ustring& address)
+bool is_supported(const std::string& address)
 {
   GError* gerror = 0;
   bool const result = g_dbus_is_supported_address(address.c_str(), &gerror);
@@ -43,7 +43,7 @@ bool is_supported(const Glib::ustring& address)
   return result;
 }
 
-void get_stream(const Glib::ustring& address, const SlotAsyncReady slot,
+void get_stream(const std::string& address, const SlotAsyncReady slot,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
@@ -51,7 +51,7 @@ void get_stream(const Glib::ustring& address, const SlotAsyncReady slot,
     &SignalProxy_async_callback, slot_copy);
 }
 
-void get_stream(const Glib::ustring& address, const SlotAsyncReady slot)
+void get_stream(const std::string& address, const SlotAsyncReady slot)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
   g_dbus_address_get_stream(address.c_str(), 0, &SignalProxy_async_callback,
@@ -89,7 +89,7 @@ Glib::RefPtr<IOStream> get_stream_finish(const Glib::RefPtr<AsyncResult>& res)
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_sync(const Glib::ustring& address,
+Glib::RefPtr<IOStream> get_stream_sync(const std::string& address,
   const Glib::RefPtr<Cancellable>& cancellable, std::string& out_guid)
 {
   GError* gerror = 0;
@@ -106,7 +106,7 @@ Glib::RefPtr<IOStream> get_stream_sync(const Glib::ustring& address,
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_sync(const Glib::ustring& address,
+Glib::RefPtr<IOStream> get_stream_sync(const std::string& address,
   std::string& out_guid)
 {
   GError* gerror = 0;
@@ -123,7 +123,7 @@ Glib::RefPtr<IOStream> get_stream_sync(const Glib::ustring& address,
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_sync(const Glib::ustring& address,
+Glib::RefPtr<IOStream> get_stream_sync(const std::string& address,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = 0;
@@ -138,7 +138,7 @@ Glib::RefPtr<IOStream> get_stream_sync(const Glib::ustring& address,
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_sync(const Glib::ustring& address)
+Glib::RefPtr<IOStream> get_stream_sync(const std::string& address)
 {
   GError* gerror = 0;
 
@@ -151,13 +151,12 @@ Glib::RefPtr<IOStream> get_stream_sync(const Glib::ustring& address)
   return result;
 }
 
-Glib::ustring get_for_bus_sync(BusType bus_type,
+std::string get_for_bus_sync(BusType bus_type,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = 0;
 
-  Glib::ustring result =
-    Glib::ustring(g_dbus_address_get_for_bus_sync(
+  std::string result(g_dbus_address_get_for_bus_sync(
     static_cast<GBusType>(bus_type), Glib::unwrap(cancellable), &gerror));
 
   if(gerror)
@@ -166,12 +165,11 @@ Glib::ustring get_for_bus_sync(BusType bus_type,
   return result;
 }
 
-Glib::ustring get_for_bus_sync(BusType bus_type)
+std::string get_for_bus_sync(BusType bus_type)
 {
   GError* gerror = 0;
 
-  Glib::ustring result =
-    Glib::ustring(g_dbus_address_get_for_bus_sync(
+  std::string result(g_dbus_address_get_for_bus_sync(
     static_cast<GBusType>(bus_type), 0, &gerror));
 
   if(gerror)
