@@ -48,23 +48,23 @@ class DBusServer : public Glib::Object, public Initable
 protected:
 
   DBusServer(const Glib::ustring& address,
-    const Glib::ustring& guid,
+    const std::string& guid,
     const Glib::RefPtr<DBusAuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusServerFlags flags);
 
   DBusServer(const Glib::ustring& address,
-    const Glib::ustring& guid,
+    const std::string& guid,
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusServerFlags flags);
 
   DBusServer(const Glib::ustring& address,
-    const Glib::ustring& guid,
+    const std::string& guid,
     const Glib::RefPtr<DBusAuthObserver>& observer,
     DBusServerFlags flags);
 
   DBusServer(const Glib::ustring& address,
-    const Glib::ustring& guid,
+    const std::string& guid,
     DBusServerFlags flags);
 
 public:
@@ -72,7 +72,7 @@ public:
   _WRAP_METHOD_DOCS_ONLY(g_dbus_server_new_sync)
   /// @throw Glib::Error.
   static Glib::RefPtr<DBusServer> create_sync(const Glib::ustring& address,
-    const Glib::ustring& guid,
+    const std::string& guid,
     const Glib::RefPtr<DBusAuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
@@ -80,25 +80,25 @@ public:
   _WRAP_METHOD_DOCS_ONLY(g_dbus_server_new_sync)
   /// @throw Glib::Error.
   static Glib::RefPtr<DBusServer> create_sync(const Glib::ustring& address,
-    const Glib::ustring& guid,
+    const std::string& guid,
     const Glib::RefPtr<Cancellable>& cancellable,
     DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
 
   /// Non-cancellable version of create_sync().
   static Glib::RefPtr<DBusServer> create_sync(const Glib::ustring& address,
-    const Glib::ustring& guid,
+    const std::string& guid,
     const Glib::RefPtr<DBusAuthObserver>& observer,
     DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
 
   /// Non-cancellable version of create_sync().
   static Glib::RefPtr<DBusServer> create_sync(const Glib::ustring& address,
-    const Glib::ustring& guid,
+    const std::string& guid,
     DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
 
   _WRAP_METHOD(void start(), g_dbus_server_start)
   _WRAP_METHOD(void stop(), g_dbus_server_stop)
   _WRAP_METHOD(bool is_active() const, g_dbus_server_is_active)
-  _WRAP_METHOD(Glib::ustring get_guid() const, g_dbus_server_get_guid)
+  _WRAP_METHOD(std::string get_guid() const, g_dbus_server_get_guid)
   _WRAP_METHOD(DBusServerFlags get_flags() const, g_dbus_server_get_flags)
   _WRAP_METHOD(Glib::ustring get_client_address() const, g_dbus_server_get_client_address)
 
@@ -107,7 +107,7 @@ public:
   _WRAP_PROPERTY("authentication-observer", Glib::RefPtr<DBusAuthObserver>)
   _WRAP_PROPERTY("client-address", Glib::ustring)
   _WRAP_PROPERTY("flags", DBusServerFlags)
-  _WRAP_PROPERTY("guid", Glib::ustring)
+  _WRAP_PROPERTY("guid", std::string)
 
 #m4 _CONVERSION(`GDBusConnection*', `const Glib::RefPtr<DBusConnection>&', `Glib::wrap($3, true)')
   _WRAP_SIGNAL(bool new_connection(const Glib::RefPtr<DBusConnection>& connection), "new-connection", no_default_handler)
