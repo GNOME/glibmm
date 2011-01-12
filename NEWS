@@ -1,3 +1,41 @@
+2.27.91 (unstable):
+
+Gio:
+* BufferedInputStream, BufferedOutputStream: Fix create_sized().
+	(Murray Cumming) Bug #638616 (Michael Edwards)
+* DBus: Use std::string for addresses since they could be a file path.
+  Use std::string instead of Glib::ustring for address parameters just to avoid 
+  possible errors since DBus address could be a filename path as the "Addresses"
+	section of the DBus introduction seems to imply:
+	http://www.freedesktop.org/wiki/IntroductionToDBus.
+* DBus: Use std::string instead of Glib::ustring for guid's since std::string's 
+  API is probably adequate enough for their use.
+  (José Alburquerque) 
+* DBusConnection:
+  - call*() methods: Re-order parameters.
+  - Callbacks: Check for NULL GError** parameters and throw exceptions to the 
+  caller.
+  - Add [register|unregister]_subtree() methods.
+  - Fix crashes caused by inappropriate use of reinterpret_cast<>.
+  (José Alburquerque) Bug #637587 (Yannick Guesnet)
+* DBusConnectionInvocation: reference-counting fixes.
+  (Murray Cumming)
+* DBusIntrospection: Fix some reference counting.
+* DBusServer:
+  - Added create() methods.
+  - CCorrect the type of the "active" property.
+* SocketService, ThreadedSocketService: Correct ref-counting for signals.
+* Improvements to the DBus examples.
+  (José Alburquerque)
+  
+Tools: 
+* gmmproc: Warn about unwrapped properties.
+  (Krzesimir Nowak)
+* Added defs_fixer.pl, which fixes some generated .defs by applying a specified 
+  override file. This should be easier than using a patch.
+  (Krzesimir Nowak)
+
+
 2.27.5.1: (unstable):
 
 Glib:
