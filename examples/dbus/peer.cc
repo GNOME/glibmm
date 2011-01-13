@@ -15,9 +15,75 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* For some usage examples see the C API's GDBusServer's example from which
- * this example was adapted.
- */
+/*
+
+Usage examples (modulo addresses / credentials) (copied from the C API's
+GDBusServer's example).
+
+UNIX domain socket transport:
+
+ Server:
+   $ ./peer --server --address unix:abstract=myaddr
+   Server is listening at: unix:abstract=myaddr
+   Client connected.
+   Peer credentials: GCredentials:unix-user=500,unix-group=500,unix-process=13378
+   Negotiated capabilities: unix-fd-passing=1
+   Client said: Hey, it's 1273093080 already!
+
+ Client:
+   $ ./peer --address unix:abstract=myaddr
+   Connected.
+   Negotiated capabilities: unix-fd-passing=1
+   Server said: You said 'Hey, it's 1273093080 already!'. KTHXBYE!
+
+Nonce-secured TCP transport on the same host:
+
+ Server:
+   $ ./peer --server --address nonce-tcp:
+   Server is listening at: nonce-tcp:host=localhost,port=43077,noncefile=/tmp/gdbus-nonce-file-X1ZNCV
+   Client connected.
+   Peer credentials: (no credentials received)
+   Negotiated capabilities: unix-fd-passing=0
+   Client said: Hey, it's 1273093206 already!
+
+ Client:
+   $ ./peer -address nonce-tcp:host=localhost,port=43077,noncefile=/tmp/gdbus-nonce-file-X1ZNCV
+   Connected.
+   Negotiated capabilities: unix-fd-passing=0
+   Server said: You said 'Hey, it's 1273093206 already!'. KTHXBYE!
+
+TCP transport on two different hosts with a shared home directory:
+
+ Server:
+   host1 $ ./peer --server --address tcp:host=0.0.0.0
+   Server is listening at: tcp:host=0.0.0.0,port=46314
+   Client connected.
+   Peer credentials: (no credentials received)
+   Negotiated capabilities: unix-fd-passing=0
+   Client said: Hey, it's 1273093337 already!
+
+ Client:
+   host2 $ ./peer -a tcp:host=host1,port=46314
+   Connected.
+   Negotiated capabilities: unix-fd-passing=0
+   Server said: You said 'Hey, it's 1273093337 already!'. KTHXBYE!
+
+TCP transport on two different hosts without authentication:
+
+ Server:
+   host1 $ ./peer --server --address tcp:host=0.0.0.0 --allow-anonymous
+   Server is listening at: tcp:host=0.0.0.0,port=59556
+   Client connected.
+   Peer credentials: (no credentials received)
+   Negotiated capabilities: unix-fd-passing=0
+   Client said: Hey, it's 1273093652 already!
+
+ Client:
+   host2 $ ./peer -a tcp:host=host1,port=59556
+   Connected.
+   Negotiated capabilities: unix-fd-passing=0
+   Server said: You said 'Hey, it's 1273093652 already!'. KTHXBYE!
+*/
 
 #include <giomm.h>
 #include <glibmm.h>
