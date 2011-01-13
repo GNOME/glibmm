@@ -926,6 +926,18 @@ public:
 
   _WRAP_METHOD(bool unregister_subtree(guint registration_id), g_dbus_connection_unregister_subtree)
 
+  // _WRAP_PROPERTY("address", std::string) // write-only construct-only
+  //_WRAP_PROPERTY("authentication-observer", Glib::RefPtr<AuthObserver>) // write-only construct-only
+  _WRAP_PROPERTY("capabilities", DBusCapabilityFlags)
+  _WRAP_PROPERTY("closed", bool)
+  _WRAP_PROPERTY("exit-on-close", bool)
+  //_WRAP_PROPERTY("flags", DBusConnectionFlags) // write-only construct-only
+  _WRAP_PROPERTY("guid", std::string)
+  _WRAP_PROPERTY("stream", Glib::RefPtr<IOStream>)
+  _WRAP_PROPERTY("unique-name", Glib::ustring)
+
+#m4 _CONVERSION(`GError*', `const Glib::Error&', `Glib::Error($3, true)')
+  _WRAP_SIGNAL(void closed(bool remote_peer_vanished, const Glib::Error& error), "closed", no_default_handler)
 };
 
 /** DBusInterfaceVTable - A class used to represent a virtual table for

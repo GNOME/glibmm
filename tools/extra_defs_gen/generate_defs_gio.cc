@@ -113,6 +113,8 @@ int main(int, char**)
 
             // DBus classes.
             << get_defs(G_TYPE_DBUS_AUTH_OBSERVER)
+            << get_defs(G_TYPE_DBUS_CONNECTION)
+            << get_defs(G_TYPE_DBUS_MESSAGE)
             << get_defs(G_TYPE_DBUS_PROXY)
             << get_defs(G_TYPE_DBUS_SERVER)
 
