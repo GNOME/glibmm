@@ -777,7 +777,10 @@ namespace Glib
 template<class K, class V>
 const VariantType& Variant< std::pair<K, V> >::variant_type()
 {
-  static VariantType type(G_VARIANT_TYPE_DICT_ENTRY);
+  static VariantType type(
+    g_variant_type_new_dict_entry(Variant<K>::variant_type().gobj(),
+    Variant<V>::variant_type().gobj()));
+
   return type;
 }
 
@@ -819,7 +822,9 @@ std::pair<K, V> Variant< std::pair<K, V> >::get() const
 template<class T>
 const VariantType& Variant< std::vector<T> >::variant_type()
 {
-  static VariantType type(G_VARIANT_TYPE_ARRAY);
+  static VariantType type =
+    VariantType::create_array(Variant<T>::variant_type());
+
   return type;
 }
 
@@ -831,8 +836,7 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
   VariantType element_variant_type = Variant<T>::variant_type();
 
   // Get the variant type of the array.
-  VariantType array_variant_type =
-    VariantType::create_array(element_variant_type);
+  VariantType array_variant_type = Variant< std::vector<T> >::variant_type();
 
   // Create a GVariantBuilder to build the array.
   GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
@@ -892,8 +896,7 @@ VariantIter Variant< std::vector<T> >::get_iter() const
   VariantType element_variant_type = Variant<T>::variant_type();
 
   // Get the variant type of the array.
-  VariantType array_variant_type =
-    VariantType::create_array(element_variant_type);
+  VariantType array_variant_type = Variant< std::vector<T> >::variant_type();
 
   // Get the GVariantIter.
   GVariantIter* g_iter = 0;
@@ -909,7 +912,9 @@ VariantIter Variant< std::vector<T> >::get_iter() const
 template<class K, class V>
 const VariantType& Variant< std::map<K, V> >::variant_type()
 {
-  static VariantType type(G_VARIANT_TYPE_DICTIONARY);
+  static VariantType type =
+    VariantType::create_array(Variant< std::pair<K, V> >::variant_type());
+
   return type;
 }
 
@@ -922,8 +927,7 @@ Variant< std::map<K, V> >::create(const std::map<K, V>& data)
     Variant< std::pair<K, V> >::variant_type();
 
   // Get the variant type of the array.
-  VariantType array_variant_type =
-    VariantType::create_array(element_variant_type);
+  VariantType array_variant_type = Variant< std::map<K, V> >::variant_type();
 
   // Create a GVariantBuilder to build the array.
   GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
@@ -1004,8 +1008,7 @@ VariantIter Variant< std::map<K, V> >::get_iter() const
     Variant< std::pair<K, V> >::variant_type();
 
   // Get the variant type of the array.
-  VariantType array_variant_type =
-    VariantType::create_array(element_variant_type);
+  VariantType array_variant_type = Variant< std::map<K, V> >::variant_type();
 
   // Get the GVariantIter.
   GVariantIter* g_iter = 0;
