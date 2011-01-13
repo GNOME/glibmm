@@ -1,5 +1,26 @@
 2011-01-12  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	DBus Peer Example: Correct some code to complete the example.
+
+	* examples/dbus/peer.cc (keep_connection): renamed to curr_connection.
+	(on_method_call): Place the return value of the method in a tuple
+	which is then returned.
+	(curr_connection): Use this variable to manage incoming connections.
+	The C API docs says that when handling ther DBusServer's
+	signal_new_connection() a reference to the connection should be kept
+	and the handler should return true if the connection should be kept.
+	This variable keeps a reference to the current connection.  When the
+	caller finishes, it closes the connection thus allowing the server to
+	accept another connection.
+	(try/catches): Add return statements in the catches that fail so that
+	execution does not continue.
+
+	The example runs successfully with the previous commit and the patch
+	in bug #639391 filed in the glib bugzilla product page.  Hopefully the
+	request will be accepted.
+
+2011-01-12  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	DBusConnection: Check for NULL bus name in the MethodCall callback.
 
 	* gio/src/dbusconnection.ccg

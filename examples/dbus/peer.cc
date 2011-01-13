@@ -35,8 +35,9 @@ static Glib::ustring introspection_xml =
   "  </interface>"
   "</node>";
 
-// This variable is used to keep an incoming connection active.
-Glib::RefPtr<Gio::DBusConnection> keep_connection;
+// This variable is used to keep an incoming connection active until it is
+// closed.
+static Glib::RefPtr<Gio::DBusConnection> curr_connection;
 
 static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>&,
   const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
@@ -60,7 +61,13 @@ static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>&,
     Glib::Variant<Glib::ustring> answer =
       Glib::Variant<Glib::ustring>::create(response);
 
-    invocation->return_value(answer);
+    std::vector<Glib::VariantBase> var_array;
+    var_array.push_back(answer);
+
+    Glib::VariantContainerBase ret =
+      Glib::VariantContainerBase::create_tuple(var_array);
+
+    invocation->return_value(ret);
 
     std::cout << "Client said '" << param.get() << "'." << std::endl;
   }
@@ -87,9 +94,20 @@ bool on_new_connection(const Glib::RefPtr<Gio::DBusConnection>& connection)
     "Peer credentials: " << credentials_str << std::endl <<
     "Negotiated capabilities: unix-fd-passing=" << (connection->get_capabilities() & Gio::DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING) << std::endl;
 
+  // If there is already an active connection, do not accept this new one.
+  // There may be a better way to decide how to keep current incoming
+  // connections.
+  if(curr_connection && !curr_connection->is_closed())
+  {
+    std::cerr << "Unable to accept new incoming connection because one is "
+      "already active." << std::endl;
+
+    return false;
+  }
+
   // In order for the connection to stay active the reference to the
   // connection must be kept so store the connection in a global variable.
-  keep_connection = connection;
+  curr_connection = connection;
 
   guint reg_id = connection->register_object("/org/glibmm/GDBus/TestObject",
     introspection_data->lookup_interface("org.glibmm.GDBus.TestPeerInterface"),
@@ -123,6 +141,7 @@ void run_as_server(Glib::ustring address, bool allow_anonymous)
   {
     std::cerr << "Error creating server at address: " << address <<
       ": " << ex.what() << "." << std::endl;
+    return;
   }
 
   server->start();
@@ -149,6 +168,7 @@ void run_as_client(Glib::ustring address)
   {
     std::cerr << "Error connecting to D-Bus address " << address << ": " <<
       ex.what() << "." << std::endl;
+    return;
   }
 
   std::cout << "Connected. " << std::endl <<
@@ -183,11 +203,14 @@ void run_as_client(Glib::ustring address)
     result.get(child);
 
     std::cout << "The server said: " << child.get() << "." << std::endl;
+
+    connection->close_sync();
   }
   catch(const Glib::Error& ex)
   {
     std::cerr << "Error calling the server's method: " << ex.what() << "." <<
       std::endl;
+    return;
   }
 }
 
@@ -247,6 +270,7 @@ int main(int argc, char** argv)
   {
     std::cerr << "Unable to create introspection data: " << ex.what() <<
       "." << std::endl;
+    return 1;
   }
 
   if(opt_server)
