@@ -110,6 +110,27 @@ public:
   _WRAP_PROPERTY("guid", std::string)
 
 #m4 _CONVERSION(`GDBusConnection*', `const Glib::RefPtr<DBusConnection>&', `Glib::wrap($3, true)')
+  /** Emitted when a new authenticated connection has been made. Use
+   * Gio::DBusConnection::get_peer_credentials() to figure out what identity
+   * (if any), was authenticated.
+   *
+   * If you want to accept the connection, keep a global reference to the
+   * connection (by keeping it in a global RefPtr<>) and return <tt>true</tt>.
+   * When you are done with the connection call Gio::DBusConnection::close().
+   * Note that the other peer may disconnect at any time - a typical thing to
+   * do when accepting a connection is to listen to the
+   * Gio::DBusConnection::signal_closed() signal.
+   *
+   * If property_flags() contains Gio::DBUS_SERVER_FLAGS_RUN_IN_THREAD then
+   * the signal is emitted in a new thread dedicated to the connection.
+   * Otherwise the signal is emitted in the thread-default main loop of the
+   * thread that server was constructed in.
+   *
+   * You are guaranteed that signal handlers for this signal runs before
+   * incoming messages on the connection are processed. This means that it's
+   * suitable to call Gio::DBusConnection::register_object() or similar from
+   * the signal handler.
+   */
   _WRAP_SIGNAL(bool new_connection(const Glib::RefPtr<DBusConnection>& connection), "new-connection", no_default_handler)
 };
 

@@ -208,8 +208,8 @@ void run_as_client(Glib::ustring address)
   }
   catch(const Glib::Error& ex)
   {
-    std::cerr << "Error calling the server's method: " << ex.what() << "." <<
-      std::endl;
+    std::cerr << "Error communicating with the server: " << ex.what() <<
+      "." << std::endl;
     return;
   }
 }
