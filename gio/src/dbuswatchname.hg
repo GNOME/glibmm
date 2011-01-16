@@ -74,44 +74,47 @@ typedef sigc::slot<void, const Glib::RefPtr<Gio::DBusConnection>&, Glib::ustring
  *
  * @param bus_type The type of bus to watch a name on.
  * @param name The name (well-known or unique) to watch.
- * @param flags Flags from the BusNameWatcherFlags enumeration.
  * @param name_appeared_slot Slot to invoke when name is known to exist.
  * @param name_vanished_slot Slot to invoke when name is known to not
  * exist.
+ * @param flags Flags from the BusNameWatcherFlags enumeration.
  * @return An identifier (never 0) that can be used with unwatch_name() to
  * stop watching the name.
  *
  * @newin{2,28}
  * @ingroup DBus
  */
-guint watch_name(BusType bus_type, const Glib::ustring& name,
-  BusNameWatcherFlags flags, const SlotNameAppeared& name_appeared_slot,
-  const SlotNameVanished& name_vanished_slot);
+guint watch_name(
+  BusType bus_type,
+  const Glib::ustring& name,
+  const SlotNameAppeared& name_appeared_slot = SlotNameAppeared(),
+  const SlotNameVanished& name_vanished_slot = SlotNameVanished(),
+  BusNameWatcherFlags flags = Gio::DBus::BUS_NAME_WATCHER_FLAGS_NONE
+);
 _IGNORE(g_bus_watch_name)
-
-//TODO: Add overloads that don't require all the slots.
 
 /** A watch_name() function that takes a DBusConnection instead of a BusType.
  *
  * @param connection A DBusConnection.
  * @param name The name (well-known or unique) to watch.
- * @param flags Flags from the BusNameWatcherFlags enumeration.
  * @param name_appeared_slot Slot to invoke when name is known to exist.
  * @param name_vanished_slot Slot to invoke when name is known to not
  * exist.
+ * @param flags Flags from the BusNameWatcherFlags enumeration.
  * @return An identifier (never 0) that can be used with unwatch_name() to
  * stop watching the name.
  *
  * @newin{2,28}
  * @ingroup DBus
  */
-guint watch_name(const Glib::RefPtr<DBusConnection>& connection,
-  const Glib::ustring& name, BusNameWatcherFlags flags,
-  const SlotNameAppeared& name_appeared_slot,
-  const SlotNameVanished& name_vanished_slot);
+guint watch_name(
+  const Glib::RefPtr<DBusConnection>& connection,
+  const Glib::ustring& name,
+  const SlotNameAppeared& name_appeared_slot = SlotNameAppeared(),
+  const SlotNameVanished& name_vanished_slot = SlotNameVanished(),
+  BusNameWatcherFlags flags = Gio::DBus::BUS_NAME_WATCHER_FLAGS_NONE
+);
 _IGNORE(g_bus_watch_name_on_connection)
-
-//TODO: Add overloads that don't require all the slots.
 
 /** Stops watching a name.
  * @param watcher_id An identifier obtained from watch_name().
