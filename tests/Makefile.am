@@ -28,7 +28,8 @@ check_PROGRAMS =			\
 	glibmm_ustring_format/test	\
 	glibmm_value/test		\
 	glibmm_valuearray/test		\
-	glibmm_variant/test
+	glibmm_variant/test		\
+	glibmm_vector/test
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
@@ -60,3 +61,5 @@ glibmm_ustring_format_test_SOURCES = glibmm_ustring_format/main.cc
 glibmm_value_test_SOURCES           = glibmm_value/glibmm_value.cc glibmm_value/main.cc
 glibmm_valuearray_test_SOURCES      = glibmm_valuearray/main.cc
 glibmm_variant_test_SOURCES         = glibmm_variant/main.cc
+glibmm_vector_test_SOURCES          = glibmm_vector/main.cc
+glibmm_vector_test_LDADD            = $(giomm_ldadd)
