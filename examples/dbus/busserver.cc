@@ -56,10 +56,11 @@ static Glib::TimeVal curr_alarm;
 
 } // anonymous namespace
 
+/* TODO: This code does not seem to be used. murrayc.
 static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>& connection,
-  const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
-  const Glib::ustring& /* interface_name */, const Glib::ustring& method_name,
-  const Glib::VariantBase& /* parameters */,
+  const Glib::ustring& sender, const Glib::ustring& object_path,
+  const Glib::ustring& interface_name, const Glib::ustring& method_name,
+  const Glib::VariantBase& parameters,
   const Glib::RefPtr<Gio::DBusMethodInvocation>& invocation)
 {
   if(method_name == "GetTime")
@@ -148,6 +149,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>& connection,
     invocation->return_gerror(error);
   }
 }
+*/
 
 void on_get_property(Glib::VariantBase& property,
   const Glib::RefPtr<Gio::DBusConnection>& /* connection */,
@@ -176,6 +178,7 @@ void on_get_property(Glib::VariantBase& property,
   }
 }
 
+/** TODO: This code does not seem to be used. murrayc.
 bool on_set_property(const Glib::RefPtr<Gio::DBusConnection>& connection,
   const Glib::ustring& sender, const Glib::ustring& object_path,
   const Glib::ustring& interface_name, const Glib::ustring& property_name,
@@ -188,6 +191,7 @@ bool on_set_property(const Glib::RefPtr<Gio::DBusConnection>& connection,
   {
   }
 }
+*/
 
 int main(int, char**)
 {
