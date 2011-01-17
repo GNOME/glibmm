@@ -40,9 +40,9 @@ static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection,
 
   try
   {
-    (*the_slot)(Glib::wrap(connection, true), Glib::ustring(sender_name),
-      Glib::ustring(object_path), Glib::ustring(interface_name),
-      Glib::ustring(signal_name), Glib::VariantBase(parameters, true));
+    (*the_slot)(Glib::wrap(connection, true), (sender_name ? sender_name : ""),
+      (object_path ? object_path : ""), (interface_name ? interface_name : ""),
+      (signal_name ? signal_name : ""), Glib::VariantBase(parameters, true));
   }
   catch(...)
   {
@@ -95,11 +95,9 @@ static void DBusInterfaceVTable_MethodCall_giomm_callback(
 
   try
   {
-    (*the_slot)(Glib::wrap(connection, true),
-      (sender ? Glib::ustring(sender) : ""),
-      Glib::ustring(object_path), Glib::ustring(interface_name),
-      Glib::ustring(method_name), Glib::VariantBase(parameters, true),
-      Glib::wrap(invocation, true));
+    (*the_slot)(Glib::wrap(connection, true), (sender ? sender : ""),
+      object_path, interface_name, method_name,
+      Glib::VariantBase(parameters, true), Glib::wrap(invocation, true));
   }
   catch(...)
   {
@@ -122,9 +120,8 @@ static GVariant* DBusInterfaceVTable_GetProperty_giomm_callback(
   {
     Glib::VariantBase result;
 
-    (*the_slot)(result, Glib::wrap(connection, true),
-      Glib::ustring(sender), Glib::ustring(object_path),
-      Glib::ustring(interface_name), Glib::ustring(property_name));
+    (*the_slot)(result, Glib::wrap(connection, true), sender, object_path,
+      interface_name, property_name);
     return result.gobj_copy();
   }
   catch(const Glib::Error& ex)
@@ -154,8 +151,7 @@ static gboolean DBusInterfaceVTable_SetProperty_giomm_callback(
   try
   {
     return static_cast<gboolean>((*the_slot)(Glib::wrap(connection, true),
-      Glib::ustring(sender), Glib::ustring(object_path),
-      Glib::ustring(interface_name), Glib::ustring(property_name),
+      sender, object_path, interface_name, property_name,
       Glib::VariantBase(value, true)));
   }
   catch(const Glib::Error& ex)
@@ -184,8 +180,7 @@ static char** DBusSubtreeVTable_Enumerate_giomm_callback(
   try
   {
     std::vector<Glib::ustring> result =
-      (*the_slot)(Glib::wrap(connection, true), Glib::ustring(sender),
-      Glib::ustring(object_path));
+      (*the_slot)(Glib::wrap(connection, true), sender, object_path);
 
     // This will be freed by the caller.
     char** ret = g_new(char*, result.size());
@@ -218,8 +213,7 @@ static GDBusInterfaceInfo** DBusSubtreeVTable_Introspect_giomm_callback(
   try
   {
     std::vector< Glib::RefPtr<Gio::DBusInterfaceInfo> > result =
-      (*the_slot)(Glib::wrap(connection, true), Glib::ustring(sender),
-      Glib::ustring(object_path), Glib::ustring(node));
+      (*the_slot)(Glib::wrap(connection, true), sender, object_path, node);
 
     // This will be freed by the caller, along with unreferencing its members.
     GDBusInterfaceInfo** info = g_new(GDBusInterfaceInfo*, result.size());
@@ -255,9 +249,8 @@ static const GDBusInterfaceVTable* DBusSubtreeVTable_Dispatch_giomm_callback(
   try
   {
     const Gio::DBusInterfaceVTable* vtable =
-      (*the_slot)(Glib::wrap(connection, true), Glib::ustring(sender),
-      Glib::ustring(object_path), Glib::ustring(interface_name),
-      Glib::ustring(node));
+      (*the_slot)(Glib::wrap(connection, true), sender, object_path,
+      interface_name, (node ? node : ""));
 
     *out_user_data = const_cast<Gio::DBusInterfaceVTable*>(vtable);
 
@@ -752,6 +745,21 @@ void DBusConnection::flush_sync()
   g_dbus_connection_flush_sync(gobj(), 0, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
+}
+
+bool DBusConnection::send_message(const Glib::RefPtr<DBusMessage>& message,
+  DBusSendMessageFlags flags)
+{
+  GError* gerror = 0;
+
+  const bool result = g_dbus_connection_send_message(gobj(),
+    Glib::unwrap(message), static_cast<GDBusSendMessageFlags>(flags), 0,
+    &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return result;
 }
 
 void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)

@@ -1,3 +1,96 @@
+2011-01-17  Murray Cumming  <murrayc@murrayc.com>
+
+	Fix the make check build.
+
+	* examples/dbus/busserver.cc: Comment out unused methods, to fix the 
+	build. I guess this example is still in progress. Otherwise, the commented 
+	code should really be removed.
+
+2010-12-22 Murray Cumming <murrayc@murrayc.com>
+
+  gmmproc: _CLASS_GOBJECT: reverted removal of __REAL_* arguments.
+
+  This is still needed for the gtkmm-2-24 branch.
+  
+2011-01-16  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	DBus: Add initial implementation of a bus server/client example.
+
+	* examples/Makefile.am:
+	* examples/dbus/busserver.cc: Add a partial implementation of the
+	server part of a server/client example that communicate through the
+	user's bus.
+	* examples/dbus/peer.cc: Typos.
+
+2011-01-16  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	DBusConnection: Add a send_message() without an "out_serial" param.
+
+	* gio/src/dbusconnection.{ccg,hg} (send_message): Add new method
+	without the "out_serial" param.
+	* gio/src/unixfdlist.hg (append): Add exception docs to method.
+
+2011-01-16  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::DBus::[watch|own]_name(): Add default values for parameters.
+
+	* gio/src/dbusownname.{ccg,hg} (own_name):
+	* gio/src/dbuswatchname.{ccg,hg} (watch_name): Add default values for
+	the slot parameters instead of writing up overloads since there would
+	be many.  Also reorder the parameters so that the flags have default
+	values.
+
+2011-01-16  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	InetAddress: Wrap properties.
+
+	* gio/src/inetaddress.hg: Wrap the properties.
+	* gio/src/dbusconnection.hg: Typo.
+
+2011-01-15  Chris Kühl  <chrisk@openismus.com>
+
+	Added conversion from bool& to gboolean*.
+
+	* tools/m4/convert_glib.m4: Added conversion from bool& to gboolean*.
+
+2011-01-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	DBusServer: Comment out constructors because of bug #639478.
+
+	* gio/src/dbusserver.{ccg,hg}: Comment out the constructors because
+	the C new function does more than calling g_initable_new().
+
+2011-01-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Variant: Use variant_type() functions in implementation where possible.
+
+	* glib/src/variant.ccg: Use the existing variant_type() functions
+	where possible.
+	* gio/src/dbusserver.ccg: File bug #639478 about GDBusServer's new
+	function doing more than using g_initable_new().
+
+2011-01-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Variant: Have the variant_type() functions return actual types.
+
+	* glib/src/variant.hg: Correct the variant_type() functions of the
+	container derived classes to create and return actual variant types
+	and not abstract ones.  Also use the functions in the implementation
+	of the existing methods.
+
+2011-01-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	DBus: Avoid errors/exceptions in callbacks due to NULL C strings.
+
+	* gio/src/dbusconnection.ccg: Modify the callbacks so that if a C
+	string parameter might be NULL, it is passed to the slots as an empty
+	string ("").  This avoids possible exceptions from constructing a
+	Glib::ustring from NULL.
+	* gio/src/dbusconnection.hg: Typos.
+
+	* examples/dbus/peer.cc: Add the usage examples from the C API's
+	example.
+
 2011-01-13  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	DBusServer: Add docs to the signal_new_connection() signal.
@@ -172,15 +265,15 @@
 
 	DBusConnectionInvocation: Use refreturn on get methods.
 
-	* gio/src/dbusmethodinvocation.hg: This seems to be necessary, though it does 
+	* gio/src/dbusmethodinvocation.hg: This seems to be necessary, though it does
 	not fix bug #637587.
 
 2011-01-07  Murray Cumming  <murrayc@murrayc.com>
 
 	DBusConnection: Use _ suffixes on member variables.
 
-	* gio/src/dbusconnection.[hg|ccg]: Use a _ suffix on member variables to 
-	avoid confusion with method parameters of the same name, though this does not 
+	* gio/src/dbusconnection.[hg|ccg]: Use a _ suffix on member variables to
+	avoid confusion with method parameters of the same name, though this does not
 	seem to be what is causing bug #637587.
 
 2011-01-06  José Alburquerque  <jaalburqu@svn.gnome.org>
@@ -200,12 +293,12 @@
 	SocketService, ThreadedSocketService: Correct ref-counting for signals.
 
 	* tools/m4/convert_gio.m4: Remove conversions that are only for signals.
-	These should not generally be in the general m4 files, to avoid them being 
-	used implicitly in the wrong place. This is important because they use 
+	These should not generally be in the general m4 files, to avoid them being
+	used implicitly in the wrong place. This is important because they use
 	different reference-taking.
 	* gio/src/socketservice.hg:
 	* gio/src/threadedsocketservice.hg: Add corrected conversions here.
-	
+
 2010-01-06  Krzesimir Nowak  <qdlacz@gmail.com>
 
 	Gmmproc: Try harder to limit false unwrapped properties.
@@ -224,10 +317,10 @@
 	BufferedInputStream, BufferedOutputStream: Correct property name.
 
 	* gio/src/bufferedinputstream.[hg|ccg]
-	* gio/src/bufferedoutputstream.[hg|ccg]: When using create_sized(), it 
-	tried to set the wrong property. Renaming the parameter from size to 
+	* gio/src/bufferedoutputstream.[hg|ccg]: When using create_sized(), it
+	tried to set the wrong property. Renaming the parameter from size to
 	buffer_size fixes this.
-	
+
 	Bug #638616 (Michael Edwards)
 
 2011-01-05  Krzesimir Nowak  <qdlacz@gmail.com>
@@ -347,14 +440,14 @@
 	* glib/glibmm/refptr.h: Add operators <, <=, >, >=
 	that compare RefPtrs by their underlying pointer.
 	This makes RefPtr work with sorted containers (e.g. std::set<RefPtr<T> >)
-	
+
 	Bug #626858
 
 2010-12-22  Yannick Guesnet  <Yannick.Guesnet@univ-rouen.fr>
 
 	giomm: Application: Add the open signal.
 
-	* gio/src/application.[hg|ccg]: Add signal_open(), by hand-coding instead of 
+	* gio/src/application.[hg|ccg]: Add signal_open(), by hand-coding instead of
 	using _WRAP_SIGNAL(), because we need to change the number of parameters.
 
 2.27.5:
@@ -362,10 +455,10 @@
 2010-12-22  Murray Cumming  <murrayc@murrayc.com>
 
 	Variant: Fix compiler warnings.
-	
-	* glib/src/variant.ccg: Remove some uses of the typename keyword to avoid 
-	warnings about using them outside of templates (they were in template 
-	specializations, which I guess is different).  
+
+	* glib/src/variant.ccg: Remove some uses of the typename keyword to avoid
+	warnings about using them outside of templates (they were in template
+	specializations, which I guess is different).
 
 2010-12-22  José Alburquerque  <jaalburqu@svn.gnome.org>
 
@@ -590,9 +683,9 @@
 	* tools/m4/convert_gdk.m4:
 	* tools/m4/convert_gtk.m4:
 	* tools/m4/convert_gtkmm.m4:
-	* tools/m4/convert_pango.m4: Remove conversions and macros for non-glibmm 
+	* tools/m4/convert_pango.m4: Remove conversions and macros for non-glibmm
 	types. These will be moved to atkmm, pangomm and gtkmm instead.
-	
+
 2010-12-09  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	DBusProxy: Add a non-cancellable call_sync() method.
@@ -755,7 +848,7 @@
 
 	ApplicationCommandLine: Fix print() and print_err().
 
-	* gio/src/applicationcommandline.[hg|ccg]: These functions take a printf 
+	* gio/src/applicationcommandline.[hg|ccg]: These functions take a printf
 	format and arguments, as shown by compiler warnings. So I just used "%s".
 
 2010-11-15  José Alburquerque  <jaalburqu@svn.gnome.org>
@@ -8523,3 +8616,4 @@ API should also be applied to the glibmm-2-6 branch.
 	instead of 2.0 in their name.
 
 glibmm was previously part of gtkmm2.
+

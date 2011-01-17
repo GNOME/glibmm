@@ -1,6 +1,6 @@
-dnl 
+dnl
 dnl Glib C names have prefix 'G' but C++ namespace Glib
-dnl 
+dnl
 define(`_CONV_GLIB_ENUM',`dnl
 _CONVERSION(`G$1', `$1', (($1)(__ARG3__)))
 _CONVERSION(`G$1', `Glib::$1', ((Glib::$1)(__ARG3__)))
@@ -40,6 +40,7 @@ _CONVERSION(`int',`bool',`$3')
 _CONVERSION(`bool',`int',`static_cast<int>($3)')
 _CONVERSION(`unsigned int',`bool',`$3')
 _CONVERSION(`bool',`unsigned int',`static_cast<unsigned int>($3)')
+_CONVERSION(`bool&',`gboolean*',`(($2) &($3))')
 _CONVERSION(`int&',`gint*',`&($3)')
 _CONVERSION(`gint*',`int&',`*($3)')
 _CONVERSION(`guint&',`guint*',`&($3)')

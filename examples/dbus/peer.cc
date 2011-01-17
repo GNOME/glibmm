@@ -15,9 +15,75 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* For some usage examples see the C API's GDBusServer's example from which
- * this example was adapted.
- */
+/*
+
+Usage examples (modulo addresses / credentials) (copied from the C API's
+GDBusServer's example).
+
+UNIX domain socket transport:
+
+ Server:
+   $ ./peer --server --address unix:abstract=myaddr
+   Server is listening at: unix:abstract=myaddr
+   Client connected.
+   Peer credentials: GCredentials:unix-user=500,unix-group=500,unix-process=13378
+   Negotiated capabilities: unix-fd-passing=1
+   Client said: Hey, it's 1273093080 already!
+
+ Client:
+   $ ./peer --address unix:abstract=myaddr
+   Connected.
+   Negotiated capabilities: unix-fd-passing=1
+   Server said: You said 'Hey, it's 1273093080 already!'. KTHXBYE!
+
+Nonce-secured TCP transport on the same host:
+
+ Server:
+   $ ./peer --server --address nonce-tcp:
+   Server is listening at: nonce-tcp:host=localhost,port=43077,noncefile=/tmp/gdbus-nonce-file-X1ZNCV
+   Client connected.
+   Peer credentials: (no credentials received)
+   Negotiated capabilities: unix-fd-passing=0
+   Client said: Hey, it's 1273093206 already!
+
+ Client:
+   $ ./peer -address nonce-tcp:host=localhost,port=43077,noncefile=/tmp/gdbus-nonce-file-X1ZNCV
+   Connected.
+   Negotiated capabilities: unix-fd-passing=0
+   Server said: You said 'Hey, it's 1273093206 already!'. KTHXBYE!
+
+TCP transport on two different hosts with a shared home directory:
+
+ Server:
+   host1 $ ./peer --server --address tcp:host=0.0.0.0
+   Server is listening at: tcp:host=0.0.0.0,port=46314
+   Client connected.
+   Peer credentials: (no credentials received)
+   Negotiated capabilities: unix-fd-passing=0
+   Client said: Hey, it's 1273093337 already!
+
+ Client:
+   host2 $ ./peer -a tcp:host=host1,port=46314
+   Connected.
+   Negotiated capabilities: unix-fd-passing=0
+   Server said: You said 'Hey, it's 1273093337 already!'. KTHXBYE!
+
+TCP transport on two different hosts without authentication:
+
+ Server:
+   host1 $ ./peer --server --address tcp:host=0.0.0.0 --allow-anonymous
+   Server is listening at: tcp:host=0.0.0.0,port=59556
+   Client connected.
+   Peer credentials: (no credentials received)
+   Negotiated capabilities: unix-fd-passing=0
+   Client said: Hey, it's 1273093652 already!
+
+ Client:
+   host2 $ ./peer -a tcp:host=host1,port=59556
+   Connected.
+   Negotiated capabilities: unix-fd-passing=0
+   Server said: You said 'Hey, it's 1273093652 already!'. KTHXBYE!
+*/
 
 #include <giomm.h>
 #include <glibmm.h>
@@ -27,7 +93,7 @@ static Glib::RefPtr<Gio::DBusNodeInfo> introspection_data;
 
 static Glib::ustring introspection_xml =
   "<node>"
-  "  <interface name='org.glibmm.GDBus.TestPeerInterface'>"
+  "  <interface name='org.glibmm.DBus.TestPeerInterface'>"
   "    <method name='HelloWorld'>"
   "      <arg type='s' name='greeting' direction='in'/>"
   "      <arg type='s' name='response' direction='out'/>"
@@ -109,8 +175,8 @@ bool on_new_connection(const Glib::RefPtr<Gio::DBusConnection>& connection)
   // connection must be kept so store the connection in a global variable.
   curr_connection = connection;
 
-  guint reg_id = connection->register_object("/org/glibmm/GDBus/TestObject",
-    introspection_data->lookup_interface("org.glibmm.GDBus.TestPeerInterface"),
+  guint reg_id = connection->register_object("/org/glibmm/DBus/TestObject",
+    introspection_data->lookup_interface("org.glibmm.DBus.TestPeerInterface"),
     &interface_vtable);
 
   if(reg_id == 0)
@@ -195,8 +261,8 @@ void run_as_client(Glib::ustring address)
   try
   {
     Glib::VariantContainerBase result;
-    connection->call_sync(result, "/org/glibmm/GDBus/TestObject",
-      "org.glibmm.GDBus.TestPeerInterface",
+    connection->call_sync(result, "/org/glibmm/DBus/TestObject",
+      "org.glibmm.DBus.TestPeerInterface",
       "HelloWorld", parameters);
 
     Glib::Variant<Glib::ustring> child;

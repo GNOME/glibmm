@@ -13,6 +13,12 @@ define(`__CPPPARENT__',`$4')
 define(`__CPARENT__',`$5')
 define(`__PCAST__',`($5*)')
 
+dnl Some C types, e.g. GdkWindow or GdkPixmap, are a typedef to their base type,
+dnl rather than the real instance type.  That is really ugly, yes.  We get around
+dnl the problem by supporting optional __REAL_* arguments to this macro.
+define(`__REAL_CNAME__',ifelse(`$6',,__CNAME__,`$6'))
+define(`__REAL_CPARENT__',ifelse(`$7',,__CPARENT__,`$7'))
+
 
 _POP()
 _SECTION(SECTION_CLASS2)
@@ -113,7 +119,7 @@ namespace Glib
    *
    * @relates __NAMESPACE__::__CPPNAME__
    */
-  Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__`'* object, bool take_copy = false);
+  Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__REAL_CNAME__`'* object, bool take_copy = false);
 }
 ')dnl
 
@@ -137,7 +143,7 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 namespace Glib
 {
 
-Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__`'* object, bool take_copy)
+Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__REAL_CNAME__`'* object, bool take_copy)
 {
   return Glib::RefPtr<__NAMESPACE__::__CPPNAME__>( dynamic_cast<__NAMESPACE__::__CPPNAME__*> (Glib::wrap_auto ((GObject*)(object), take_copy)) );
   //We use dynamic_cast<> in case of multiple inheritance.
@@ -217,7 +223,7 @@ public:
   typedef __CPPNAME__ CppObjectType;
   typedef __CPPNAME__`'_Class CppClassType;
   typedef __CNAME__ BaseObjectType;
-  typedef __CNAME__`'Class BaseClassType;
+  typedef __REAL_CNAME__`'Class BaseClassType;
 
 m4_ifdef(`__BOOL_PROTECTED_GCLASS__',
 `protected:',`dnl else

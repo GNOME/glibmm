@@ -157,7 +157,7 @@ public:
   /** Signature for slot used in signal_subscribe().
    *  For example,
    * @code
-   * void on_signal(const Glib::RefPtr<DBusConnection>&, const
+   * void on_signal(const Glib::RefPtr<DBusConnection>& connection, const
    * Glib::ustring& sender_name, const Glib::ustring& object_path, const
    * Glib::ustring& object_path, const Glib::ustring& interface_name, const
    * Glib::ustring& signal_name, const Glib::VariantBase& parameters);.
@@ -165,14 +165,14 @@ public:
    */
   typedef sigc::slot<void, const Glib::RefPtr<DBusConnection>&,
     const Glib::ustring&, const Glib::ustring&, const Glib::ustring&,
-    const Glib::ustring&, const Glib::VariantBase&>  SlotSignal;
+    const Glib::ustring&, const Glib::VariantBase&> SlotSignal;
 
   /** Signature for slot used in add_filter().
    *  For example,
    * @code
    * Glib::RefPtr<DBusMessage> on_message_filter(const
-   * Glib::RefPtr<DBusConnection>, const Glib::RefPtr<DBusMessage>& bool
-   * incoming);.
+   * Glib::RefPtr<DBusConnection> connection, const Glib::RefPtr<DBusMessage>&
+   * message, bool incoming);.
    * @endcode
    *
    * A filter function is passed a DBusMessage and expected to return a
@@ -497,8 +497,12 @@ public:
   _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), g_dbus_connection_set_exit_on_close)
 
   //TODO: In the C API, out_serial is volatile, but gmmproc can't parse that.
-  #m4 _CONVERSION(`guint32*',`volatile guint32*',`($3)')
-  _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32* out_serial), g_dbus_connection_send_message, errthrow)
+  #m4 _CONVERSION(`guint32&',`volatile guint32*',`&($3)')
+  _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32& out_serial), g_dbus_connection_send_message, errthrow)
+
+  /// A send_message() without an "out_serial" parameter.
+  bool send_message(const Glib::RefPtr<DBusMessage>& message,
+    DBusSendMessageFlags flags = Gio::DBUS_SEND_MESSAGE_FLAGS_NONE);
 
   /** Asynchronously sends message to the peer represented by the connection.
    *
@@ -926,7 +930,7 @@ public:
 
   _WRAP_METHOD(bool unregister_subtree(guint registration_id), g_dbus_connection_unregister_subtree)
 
-  // _WRAP_PROPERTY("address", std::string) // write-only construct-only
+  //_WRAP_PROPERTY("address", std::string) // write-only construct-only
   //_WRAP_PROPERTY("authentication-observer", Glib::RefPtr<AuthObserver>) // write-only construct-only
   _WRAP_PROPERTY("capabilities", DBusCapabilityFlags)
   _WRAP_PROPERTY("closed", bool)

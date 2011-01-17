@@ -64,13 +64,13 @@ class __CPPNAME__`'_Class : public Glib::Class
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   typedef __CPPNAME__ CppObjectType;
-  typedef __CNAME__ BaseObjectType;
+  typedef __REAL_CNAME__ BaseObjectType;
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
   typedef __CPPPARENT__`'_Class CppClassParent;
 ',`dnl
-  typedef __CNAME__`'Class BaseClassType;
+  typedef __REAL_CNAME__`'Class BaseClassType;
   typedef __CPPPARENT__`'_Class CppClassParent;
-  typedef __CPARENT__`'Class BaseClassParent;
+  typedef __REAL_CPARENT__`'Class BaseClassParent;
 ')dnl
 
   friend class __CPPNAME__;
