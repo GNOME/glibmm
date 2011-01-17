@@ -497,8 +497,12 @@ public:
   _WRAP_METHOD(void set_exit_on_close(bool exit_on_close = true), g_dbus_connection_set_exit_on_close)
 
   //TODO: In the C API, out_serial is volatile, but gmmproc can't parse that.
-  #m4 _CONVERSION(`guint32*',`volatile guint32*',`($3)')
-  _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32* out_serial), g_dbus_connection_send_message, errthrow)
+  #m4 _CONVERSION(`guint32&',`volatile guint32*',`&($3)')
+  _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32& out_serial), g_dbus_connection_send_message, errthrow)
+
+  /// A send_message() without an "out_serial" parameter.
+  bool send_message(const Glib::RefPtr<DBusMessage>& message,
+    DBusSendMessageFlags flags = Gio::DBUS_SEND_MESSAGE_FLAGS_NONE);
 
   /** Asynchronously sends message to the peer represented by the connection.
    *

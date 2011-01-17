@@ -747,6 +747,21 @@ void DBusConnection::flush_sync()
     ::Glib::Error::throw_exception(gerror);
 }
 
+bool DBusConnection::send_message(const Glib::RefPtr<DBusMessage>& message,
+  DBusSendMessageFlags flags)
+{
+  GError* gerror = 0;
+
+  const bool result = g_dbus_connection_send_message(gobj(),
+    Glib::unwrap(message), static_cast<GDBusSendMessageFlags>(flags), 0,
+    &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return result;
+}
+
 void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
