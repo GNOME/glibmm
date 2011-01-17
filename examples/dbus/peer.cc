@@ -93,7 +93,7 @@ static Glib::RefPtr<Gio::DBusNodeInfo> introspection_data;
 
 static Glib::ustring introspection_xml =
   "<node>"
-  "  <interface name='org.glibmm.GDBus.TestPeerInterface'>"
+  "  <interface name='org.glibmm.DBus.TestPeerInterface'>"
   "    <method name='HelloWorld'>"
   "      <arg type='s' name='greeting' direction='in'/>"
   "      <arg type='s' name='response' direction='out'/>"
@@ -175,8 +175,8 @@ bool on_new_connection(const Glib::RefPtr<Gio::DBusConnection>& connection)
   // connection must be kept so store the connection in a global variable.
   curr_connection = connection;
 
-  guint reg_id = connection->register_object("/org/glibmm/GDBus/TestObject",
-    introspection_data->lookup_interface("org.glibmm.GDBus.TestPeerInterface"),
+  guint reg_id = connection->register_object("/org/glibmm/DBus/TestObject",
+    introspection_data->lookup_interface("org.glibmm.DBus.TestPeerInterface"),
     &interface_vtable);
 
   if(reg_id == 0)
@@ -261,8 +261,8 @@ void run_as_client(Glib::ustring address)
   try
   {
     Glib::VariantContainerBase result;
-    connection->call_sync(result, "/org/glibmm/GDBus/TestObject",
-      "org.glibmm.GDBus.TestPeerInterface",
+    connection->call_sync(result, "/org/glibmm/DBus/TestObject",
+      "org.glibmm.DBus.TestPeerInterface",
       "HelloWorld", parameters);
 
     Glib::Variant<Glib::ustring> child;
