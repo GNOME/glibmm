@@ -42,6 +42,18 @@ create_list ()
   return g_list_reverse (head);
 }
 
+GSList*
+create_slist ()
+{
+  GSList* head = 0;
+
+  for (unsigned int iter (0); iter < magic_limit; ++iter)
+  {
+    head = g_slist_prepend (head, g_credentials_new ());
+  }
+  return g_slist_reverse (head);
+}
+
 GCredentials**
 create_array ()
 {
@@ -72,6 +84,7 @@ struct Cache
 public:
   Cache()
   : glist_ (create_list ()),
+    gslist_ (create_slist ()),
     garray_ (create_array ())
   {}
 
@@ -81,6 +94,11 @@ public:
     {
       g_list_foreach (glist_, reinterpret_cast<GFunc> (g_object_unref), 0);
       g_list_free (glist_);
+    }
+    if (gslist_)
+    {
+      g_slist_foreach (gslist_, reinterpret_cast<GFunc> (g_object_unref), 0);
+      g_slist_free (gslist_);
     }
     if (garray_)
     {
@@ -97,6 +115,24 @@ public:
     unsigned int counter (1);
 
     for (GList* node (glist_); node; node = node->next, ++counter)
+    {
+      std::cout << counter << ": ";
+      if (G_IS_CREDENTIALS (node->data))
+      {
+        std::cout << node->data << ", ref: " << G_OBJECT (node->data)->ref_count <<"\n";
+      }
+      else
+      {
+        std::cout << "no C instance?\n";
+      }
+    }
+  }
+
+  void print_slist ()
+  {
+    unsigned int counter (1);
+
+    for (GSList* node (gslist_); node; node = node->next, ++counter)
     {
       std::cout << counter << ": ";
       if (G_IS_CREDENTIALS (node->data))
@@ -127,6 +163,7 @@ public:
   }
 
   GList* glist_;
+  GSList* gslist_;
   GCredentials** garray_;
 
 private:
@@ -158,6 +195,24 @@ GList*
 return_unowned_list ()
 {
   return create_list ();
+}
+
+GSList*
+return_deep_owned_slist ()
+{
+  return get_cache ().gslist_;
+}
+
+GSList*
+return_shallow_owned_slist ()
+{
+  return g_slist_copy (return_deep_owned_slist ());
+}
+
+GSList*
+return_unowned_slist ()
+{
+  return create_slist ();
 }
 
 GCredentials**
@@ -225,6 +280,56 @@ take_list_nothing (GList* list)
     cache.glist_ = list;
     cache.print_list ();
     cache.glist_ = backup;
+  }
+}
+
+/* they are probably buggy by design...
+void
+take_slist_all (GSList* slist)
+{
+  if (slist)
+  {
+    // i'm lazy.
+    Cache& cache (get_cache ());
+    GSList* backup = cache.gslist_;
+
+    cache.gslist_ = slist;
+    cache.print_slist ();
+    cache.gslist_ = backup;
+    g_slist_foreach (slist, reinterpret_cast<GFunc> (g_object_unref), 0);
+    g_slist_free (slist);
+  }
+}
+
+void
+take_list_members (GSList* slist)
+{
+  if (slist)
+  {
+    // i'm lazy.
+    Cache& cache (get_cache ());
+    GSList* backup = cache.gslist_;
+
+    cache.gslist_ = slist;
+    cache.print_slist ();
+    cache.gslist_ = backup;
+    g_slist_foreach (slist, reinterpret_cast<GFunc> (g_object_unref), 0);
+  }
+}
+*/
+
+void
+take_slist_nothing (GSList* slist)
+{
+  if (slist)
+  {
+    // i'm lazy.
+    Cache& cache (get_cache ());
+    GSList* backup = cache.gslist_;
+
+    cache.gslist_ = slist;
+    cache.print_slist ();
+    cache.gslist_ = backup;
   }
 }
 
@@ -303,6 +408,24 @@ cxx_get_none_list ()
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
+cxx_get_deep_slist ()
+{
+  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_deep_owned_slist (), Glib::OWNERSHIP_NONE);
+}
+
+std::vector<Glib::RefPtr<Gio::Credentials> >
+cxx_get_shallow_slist ()
+{
+  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_shallow_owned_slist (), Glib::OWNERSHIP_SHALLOW);
+}
+
+std::vector<Glib::RefPtr<Gio::Credentials> >
+cxx_get_none_slist ()
+{
+  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_unowned_slist (), Glib::OWNERSHIP_DEEP);
+}
+
+std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_deep_array ()
 {
   return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector (return_deep_owned_array (), Glib::OWNERSHIP_NONE);
@@ -372,6 +495,26 @@ cxx_list_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 
 /* they are probably buggy by design...
 void
+cxx_slist_take_all (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
+{
+  take_slist_all (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v, Glib::OWNERSHIP_NONE));
+}
+
+void
+cxx_slist_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
+{
+  take_slist_members (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v, Glib::OWNERSHIP_SHALLOW));
+}
+*/
+
+void
+cxx_slist_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
+{
+  take_slist_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v, Glib::OWNERSHIP_SHALLOW));
+}
+
+/* they are probably buggy by design...
+void
 cxx_array_take_all (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
   take_array_all (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v, Glib::OWNERSHIP_NONE));
@@ -400,6 +543,8 @@ main()
 
   std::cout << "Cache list before:\n";
   cache.print_list ();
+  std::cout << "Cache slist before:\n";
+  cache.print_slist ();
   std::cout << "Cache array before:\n";
   cache.print_array ();
   std::cout << "Deep list:\n";
@@ -408,6 +553,12 @@ main()
   print_vector (cxx_get_shallow_list ());
   std::cout << "None list:\n";
   print_vector (cxx_get_none_list ());
+  std::cout << "Deep slist:\n";
+  print_vector (cxx_get_deep_slist ());
+  std::cout << "Shallow slist:\n";
+  print_vector (cxx_get_shallow_slist ());
+  std::cout << "None slist:\n";
+  print_vector (cxx_get_none_slist ());
   std::cout << "Deep array:\n";
   print_vector (cxx_get_deep_array ());
   std::cout << "Shallow array:\n";
@@ -416,6 +567,8 @@ main()
   print_vector (cxx_get_none_array ());
   std::cout << "Cache list after:\n";
   cache.print_list ();
+  std::cout << "Cache slist after:\n";
+  cache.print_slist ();
   std::cout << "Cache array after:\n";
   cache.print_array ();
 
@@ -431,6 +584,12 @@ main()
   //cxx_list_take_members (v);
   std::cout << "Take list nothing:\n";
   cxx_list_take_nothing (v);
+  //std::cout << "Take slist all:\n";
+  //cxx_slist_take_all (v);
+  //std::cout << "Take slist members:\n";
+  //cxx_slist_take_members (v);
+  std::cout << "Take slist nothing:\n";
+  cxx_slist_take_nothing (v);
   // Ditto.
   //std::cout << "Take array all:\n";
   //cxx_array_take_all (v);
