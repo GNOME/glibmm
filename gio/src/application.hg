@@ -33,7 +33,7 @@ _WRAP_ENUM(ApplicationFlags, GApplicationFlags, NO_GTYPE)
 class ActionGroup;
 
 /** Application - Core application class.
- * A Application is the foundation of an application, unique for a given
+ * An Application is the foundation of an application, unique for a given
  * application identifier. The Application class wraps some low-level
  * platform-specific services and is intended to act as the foundation for
  * higher-level application classes such as Gtk::Application or MxApplication.
@@ -65,7 +65,7 @@ class ActionGroup;
  * invoking an action by calling Gio::ActionGroup::activate_action() on the
  * application, it is always invoked in the primary instance.
  *
- * There is a number of different entry points into a Application:
+ * There is a number of different entry points into an Application:
  *
  * - via 'Activate' (i.e. just starting the application)
  * - via 'Open' (i.e. opening some files)
@@ -83,10 +83,12 @@ class Application : public Glib::Object
   _CLASS_GOBJECT(Application, GApplication, G_APPLICATION, Glib::Object, GObject)
 
 protected:
-  _WRAP_CTOR(Application(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE), g_application_new)
+  //TODO: Documentation
+  explicit Application(const Glib::ustring& application_id, ApplicationFlags flags = APPLICATION_FLAGS_NONE);
+  _IGNORE(g_application_new)
 
 public:
-  _WRAP_CREATE(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE)
+  _WRAP_CREATE(const Glib::ustring& application_id, ApplicationFlags flags = APPLICATION_FLAGS_NONE)
 
   _WRAP_METHOD(static bool id_is_valid(const Glib::ustring& application_id), g_application_id_is_valid)
 
