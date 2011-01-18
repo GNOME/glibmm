@@ -23,7 +23,7 @@
 #include <glibmm/quark.h>
 #include <glibmm/objectbase.h>
 #include <glibmm/propertyproxy_base.h> //For PropertyProxyConnectionNode
-
+#include <glibmm/init.h>
 
 namespace
 {
@@ -47,21 +47,36 @@ ObjectBase::ObjectBase()
   gobject_                      (0),
   custom_type_name_             (anonymous_custom_type_name),
   cpp_destruction_in_progress_  (false)
-{}
+{
+  //Check that glibmm is initialized,
+  //so that no explicit initialization is needed before instantiating Gio::Application,
+  //whose constructor uses the GType system.
+  Glib::init();
+}
 
 ObjectBase::ObjectBase(const char* custom_type_name)
 :
   gobject_                      (0),
   custom_type_name_             (custom_type_name),
   cpp_destruction_in_progress_  (false)
-{}
+{
+  //Check that glibmm is initialized,
+  //so that no explicit initialization is needed before instantiating Gio::Application,
+  //whose constructor uses the GType system.
+  Glib::init();
+}
 
 ObjectBase::ObjectBase(const std::type_info& custom_type_info)
 :
   gobject_                      (0),
   custom_type_name_             (custom_type_info.name()),
   cpp_destruction_in_progress_  (false)
-{}
+{
+  //Check that glibmm is initialized,
+  //so that no explicit initialization is needed before instantiating Gio::Application,
+  //whose constructor uses the GType system.
+  Glib::init();
+}
 
 // initialize() actually initializes the wrapper.  Glib::ObjectBase is used
 // as virtual base class, which means the most-derived class' ctor invokes
