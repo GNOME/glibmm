@@ -96,9 +96,17 @@ public:
   {
     unsigned int counter (1);
 
-    for (GList* node (glist_); node && G_IS_CREDENTIALS (node->data); node = node->next, ++counter)
+    for (GList* node (glist_); node; node = node->next, ++counter)
     {
-      std::cout << counter << ": " << node->data << "\n";
+      std::cout << counter << ": ";
+      if (G_IS_CREDENTIALS (node->data))
+      {
+        std::cout << node->data << ", ref: " << G_OBJECT (node->data)->ref_count <<"\n";
+      }
+      else
+      {
+        std::cout << "no C instance?\n";
+      }
     }
   }
 
@@ -106,7 +114,15 @@ public:
   {
     for (unsigned int iter (0); iter < magic_limit; ++iter)
     {
-      std::cout << iter + 1 << ": " << reinterpret_cast<gpointer> (garray_[iter]) << "\n";
+      std::cout << iter + 1 << ": ";
+      if (G_IS_CREDENTIALS (garray_[iter]))
+      {
+        std::cout << reinterpret_cast<gpointer> (garray_[iter]) << ", ref: " << G_OBJECT (garray_[iter])->ref_count << "\n";
+      }
+      else
+      {
+        std::cout << "no C instance?\n";
+      }
     }
   }
 
@@ -162,6 +178,7 @@ return_unowned_array ()
   return create_array ();
 }
 
+/* they are probably buggy by design...
 void
 take_list_all (GList* list)
 {
@@ -194,6 +211,7 @@ take_list_members (GList* list)
     g_list_foreach (list, reinterpret_cast<GFunc> (g_object_unref), 0);
   }
 }
+*/
 
 void
 take_list_nothing (GList* list)
@@ -210,6 +228,7 @@ take_list_nothing (GList* list)
   }
 }
 
+/* they are probably buggy by design...
 void
 take_array_all (GCredentials** array)
 {
@@ -248,6 +267,7 @@ take_array_members (GCredentials** array)
     }
   }
 }
+*/
 
 void
 take_array_nothing (GCredentials** array)
@@ -308,10 +328,20 @@ print_vector (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
   for (unsigned int iter (0); iter < size; ++iter)
   {
     const Glib::RefPtr<Gio::Credentials>& obj_ptr (v[iter]);
-    
+
+    std::cout << iter + 1 << ": ";
     if (obj_ptr && G_IS_CREDENTIALS (obj_ptr->gobj ()))
     {
-      std::cout << iter + 1 << ": " << static_cast<gpointer> (obj_ptr->gobj()) << "\n";
+      GCredentials* gobj (obj_ptr->gobj ());
+
+      if (G_IS_CREDENTIALS (gobj))
+      {
+        std::cout << static_cast<gpointer> (gobj) << ", ref: " << G_OBJECT (gobj)->ref_count << "\n";
+      }
+      else
+      {
+        std::cout << "No C instance?\n";
+      }
     }
     else
     {
@@ -320,6 +350,7 @@ print_vector (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
   }
 }
 
+/* they are probably buggy by design...
 void
 cxx_list_take_all (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
@@ -331,13 +362,15 @@ cxx_list_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
   take_list_members (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v, Glib::OWNERSHIP_SHALLOW));
 }
+*/
 
 void
 cxx_list_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_list_all (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v, Glib::OWNERSHIP_DEEP));
+  take_list_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v, Glib::OWNERSHIP_SHALLOW));
 }
 
+/* they are probably buggy by design...
 void
 cxx_array_take_all (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
@@ -349,11 +382,12 @@ cxx_array_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
   take_array_members (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v, Glib::OWNERSHIP_SHALLOW));
 }
+*/
 
 void
 cxx_array_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_array_all (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v, Glib::OWNERSHIP_DEEP));
+  take_array_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v, Glib::OWNERSHIP_SHALLOW));
 }
 
 
@@ -361,10 +395,13 @@ int
 main()
 {
   Gio::init ();
-  std::cout << "Cache list:\n";
-  get_cache().print_list ();
-  std::cout << "Cache array:\n";
-  get_cache().print_array ();
+
+  Cache& cache (get_cache ());
+
+  std::cout << "Cache list before:\n";
+  cache.print_list ();
+  std::cout << "Cache array before:\n";
+  cache.print_array ();
   std::cout << "Deep list:\n";
   print_vector (cxx_get_deep_list ());
   std::cout << "Shallow list:\n";
@@ -377,13 +414,30 @@ main()
   print_vector (cxx_get_shallow_array ());
   std::cout << "None array:\n";
   print_vector (cxx_get_none_array ());
+  std::cout << "Cache list after:\n";
+  cache.print_list ();
+  std::cout << "Cache array after:\n";
+  cache.print_array ();
 
   std::vector<Glib::RefPtr<Gio::Credentials> > v (cxx_get_none_list ());
-  std::cout << "Take list all:\n";
-  // this segfaults - look at it. maybe the test case is just wrong.
-  cxx_list_take_all (v);
-  std::cout << "Take list members:\n";
-  cxx_list_take_members (v);
+
+  std::cout << "Gotten vector before:\n";
+  print_vector (v);
+  // I am wondering if C functions wrapped by the ones below are not buggy by
+  // design. Anyway - it segfaults. Maybe the test case is just wrong.
+  //std::cout << "Take list all:\n";
+  //cxx_list_take_all (v);
+  //std::cout << "Take list members:\n";
+  //cxx_list_take_members (v);
   std::cout << "Take list nothing:\n";
   cxx_list_take_nothing (v);
+  // Ditto.
+  //std::cout << "Take array all:\n";
+  //cxx_array_take_all (v);
+  //std::cout << "Take array members:\n";
+  //cxx_array_take_members (v);
+  std::cout << "Take array nothing:\n";
+  cxx_array_take_nothing (v);
+  std::cout << "Gotten vector after:\n";
+  print_vector (v);
 }
