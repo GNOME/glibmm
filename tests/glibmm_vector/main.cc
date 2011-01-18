@@ -330,7 +330,7 @@ print_vector (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
     const Glib::RefPtr<Gio::Credentials>& obj_ptr (v[iter]);
 
     std::cout << iter + 1 << ": ";
-    if (obj_ptr && G_IS_CREDENTIALS (obj_ptr->gobj ()))
+    if (obj_ptr)
     {
       GCredentials* gobj (obj_ptr->gobj ());
 
