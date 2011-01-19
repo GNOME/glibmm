@@ -83,7 +83,8 @@ class Application : public Glib::Object
   _CLASS_GOBJECT(Application, GApplication, G_APPLICATION, Glib::Object, GObject)
 
 protected:
-  _WRAP_CTOR(Application(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE), g_application_new)
+  explicit Application(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE);
+  _IGNORE(g_application_new)
 
 public:
   _WRAP_CREATE(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE)
@@ -168,6 +169,14 @@ protected:
   static void open_callback(GApplication* self, GFile** files, gint n_files, const gchar* hint);
   _POP()
 #m4end
+
+private:
+  /** This is just a way to call Glib::init() (which calls g_type_init()) before
+   * calling application_class_.init(), so that 
+   * g_application_get_type() will always succeed.
+   * See https://bugzilla.gnome.org/show_bug.cgi?id=639925
+   */
+  const Glib::Class& custom_class_init();
 };
 
 
