@@ -20,7 +20,6 @@
 #include <gio/gio.h>
 #include <giomm/file.h>
 #include <giomm/actiongroup.h>
-#include <giomm/init.h>
 
 namespace
 {
@@ -102,15 +101,6 @@ static const Glib::SignalProxyInfo Application_signal_open_info =
 
 namespace Gio
 {
-
-Application::Application(const Glib::ustring& application_id,  ApplicationFlags flags)
-:
-  _CONSTRUCT("application_id", application_id.c_str(), "flags", GApplicationFlags(flags))
-{
-  //Object::Object() has already called Glib::init().
-  //Here we initialize giomm too, which is likely to be needed:
-  Gio::init();
-}
 
 void Application_Class::open_callback(GApplication* self, GFile** files, 
   gint n_files, const gchar *hint)
