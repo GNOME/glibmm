@@ -324,9 +324,9 @@ public:
   static VectorType array_to_vector (const CType* array, Glib::OwnershipType ownership);
   static VectorType list_to_vector (GList* glist, Glib::OwnershipType ownership);
   static VectorType slist_to_vector (GSList* gslist, Glib::OwnershipType ownership);
-  static ArrayKeeperType vector_to_array (const VectorType& vector, Glib::OwnershipType ownership);
-  static GListKeeperType vector_to_list (const VectorType& vector, Glib::OwnershipType ownership);
-  static GSListKeeperType vector_to_slist (const VectorType& vector, Glib::OwnershipType ownership);
+  static ArrayKeeperType vector_to_array (const VectorType& vector);
+  static GListKeeperType vector_to_list (const VectorType& vector);
+  static GSListKeeperType vector_to_slist (const VectorType& vector);
 };
 
 /***************************************************************************/
@@ -717,23 +717,23 @@ VectorHandler<T, Tr>::slist_to_vector (GSList* gslist, Glib::OwnershipType owner
 
 template <typename T, class Tr>
 typename VectorHandler<T, Tr>::ArrayKeeperType
-VectorHandler<T, Tr>::vector_to_array (const VectorType& vector, Glib::OwnershipType ownership)
+VectorHandler<T, Tr>::vector_to_array (const VectorType& vector)
 {
-  return ArrayKeeperType (Glib::Container_Helpers::create_array2<Tr> (vector.begin (), vector.size ()), vector.size(), ownership);
+  return ArrayKeeperType (Glib::Container_Helpers::create_array2<Tr> (vector.begin (), vector.size ()), vector.size(), Glib::OWNERSHIP_SHALLOW);
 }
 
 template <typename T, class Tr>
 typename VectorHandler<T, Tr>::GListKeeperType
-VectorHandler<T, Tr>::vector_to_list (const VectorType& vector, Glib::OwnershipType ownership)
+VectorHandler<T, Tr>::vector_to_list (const VectorType& vector)
 {
-  return GListKeeperType (Glib::Container_Helpers::create_glist2<Tr> (vector.begin(), vector.end()), ownership);
+  return GListKeeperType (Glib::Container_Helpers::create_glist2<Tr> (vector.begin(), vector.end()), Glib::OWNERSHIP_SHALLOW);
 }
 
 template <typename T, class Tr>
 typename VectorHandler<T, Tr>::GSListKeeperType
-VectorHandler<T, Tr>::vector_to_slist (const VectorType& vector, Glib::OwnershipType ownership)
+VectorHandler<T, Tr>::vector_to_slist (const VectorType& vector)
 {
-  return GSListKeeperType (Glib::Container_Helpers::create_gslist2<Tr> (vector.begin (), vector.end ()), ownership);
+  return GSListKeeperType (Glib::Container_Helpers::create_gslist2<Tr> (vector.begin (), vector.end ()), Glib::OWNERSHIP_SHALLOW);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
