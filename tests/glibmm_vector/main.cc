@@ -490,7 +490,7 @@ cxx_list_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 void
 cxx_list_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_list_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v));
+  take_list_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v).data());
 }
 
 /* they are probably buggy by design...
@@ -510,7 +510,7 @@ cxx_slist_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 void
 cxx_slist_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_slist_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v));
+  take_slist_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v).data());
 }
 
 /* they are probably buggy by design...
@@ -530,7 +530,7 @@ cxx_array_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 void
 cxx_array_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_array_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v));
+  take_array_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v).data());
 }
 
 
