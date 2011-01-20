@@ -270,6 +270,32 @@ private:
   const GList* node_;
 };
 
+template <>
+class ListIterator<TypeTraits<bool> >
+{
+public:
+  typedef bool                        CppType;
+  typedef gboolean                    CType;
+
+  typedef std::forward_iterator_tag   iterator_category;
+  typedef CppType                     value_type;
+  typedef ptrdiff_t                   difference_type;
+  typedef value_type                  reference;
+  typedef void                        pointer;
+
+  explicit inline ListIterator(const GList* node);
+
+  inline value_type                   operator*() const;
+  inline ListIterator<TypeTraits<bool> >& operator++();
+  inline const ListIterator<TypeTraits<bool> > operator++(int);
+
+  inline bool operator==(const ListIterator<TypeTraits<bool> >& rhs) const;
+  inline bool operator!=(const ListIterator<TypeTraits<bool> >& rhs) const;
+
+private:
+  const GList* node_;
+};
+
 /**
  * @ingroup ContHelpers
  * If a method takes this as an argument, or has this as a return type, then you can use a standard
@@ -296,6 +322,32 @@ public:
 
   inline bool operator== (const SListIterator<Tr>& rhs) const;
   inline bool operator!= (const SListIterator<Tr>& rhs) const;
+
+private:
+  const GSList* node_;
+};
+
+template <>
+class SListIterator<TypeTraits<bool> >
+{
+public:
+  typedef bool                        CppType;
+  typedef gboolean                    CType;
+
+  typedef std::forward_iterator_tag   iterator_category;
+  typedef CppType                     value_type;
+  typedef ptrdiff_t                   difference_type;
+  typedef value_type                  reference;
+  typedef void                        pointer;
+
+  explicit inline SListIterator (const GSList* node);
+
+  inline value_type                   operator*() const;
+  inline SListIterator<TypeTraits<bool> >& operator++();
+  inline const SListIterator<TypeTraits<bool> > operator++(int);
+
+  inline bool operator== (const SListIterator<TypeTraits<bool> >& rhs) const;
+  inline bool operator!= (const SListIterator<TypeTraits<bool> >& rhs) const;
 
 private:
   const GSList* node_;
@@ -338,12 +390,48 @@ private:
   mutable Glib::OwnershipType ownership_;
 };
 
+template <>
+class GListKeeper<TypeTraits<bool> >
+{
+public:
+  typedef bool               CppType;
+  typedef gboolean           CType;
+
+  explicit inline GListKeeper (const GList* glist, Glib::OwnershipType ownership);
+  inline GListKeeper (const GListKeeper& keeper);
+  ~GListKeeper ();
+
+  inline GList* data() const;
+
+private:
+  GList* glist_;
+  mutable Glib::OwnershipType ownership_;
+};
+
 template <typename Tr>
 class GSListKeeper
 {
 public:
   typedef typename Tr::CppType        CppType;
   typedef typename Tr::CType          CType;
+
+  explicit inline GSListKeeper (const GSList* gslist, Glib::OwnershipType ownership);
+  inline GSListKeeper (const GSListKeeper& keeper);
+  ~GSListKeeper ();
+
+  inline GSList* data() const;
+
+private:
+  GSList* gslist_;
+  mutable Glib::OwnershipType ownership_;
+};
+
+template <>
+class GSListKeeper<TypeTraits<bool> >
+{
+public:
+  typedef bool               CppType;
+  typedef gboolean           CType;
 
   explicit inline GSListKeeper (const GSList* gslist, Glib::OwnershipType ownership);
   inline GSListKeeper (const GSListKeeper& keeper);
@@ -565,6 +653,47 @@ bool ListIterator<Tr>::operator!=(const ListIterator<Tr>& rhs) const
   return (node_ != rhs.node_);
 }
 
+/**** Glib::Container_Helpers::ListIterator<TypeTraits<bool> > ****************/
+
+inline
+ListIterator<TypeTraits<bool> >::ListIterator(const GList* node)
+:
+  node_ (node)
+{}
+
+inline
+ListIterator<TypeTraits<bool> >::value_type ListIterator<TypeTraits<bool> >::operator*() const
+{
+  return (GPOINTER_TO_INT (node_->data) ? true : false);
+}
+
+inline
+ListIterator<TypeTraits<bool> >& ListIterator<TypeTraits<bool> >::operator++()
+{
+  node_ = node_->next;
+  return *this;
+}
+
+inline
+const ListIterator<TypeTraits<bool> > ListIterator<TypeTraits<bool> >::operator++(int)
+{
+  const ListIterator<TypeTraits<bool> > tmp (*this);
+  node_ = node_->next;
+  return tmp;
+}
+
+inline
+bool ListIterator<TypeTraits<bool> >::operator==(const ListIterator<TypeTraits<bool> >& rhs) const
+{
+  return (node_ == rhs.node_);
+}
+
+inline
+bool ListIterator<TypeTraits<bool> >::operator!=(const ListIterator<TypeTraits<bool> >& rhs) const
+{
+  return (node_ != rhs.node_);
+}
+
 /**** Glib::Container_Helpers::SListIterator<> ************************/
 
 template <class Tr> inline
@@ -602,6 +731,47 @@ bool SListIterator<Tr>::operator==(const SListIterator<Tr>& rhs) const
 
 template <class Tr> inline
 bool SListIterator<Tr>::operator!=(const SListIterator<Tr>& rhs) const
+{
+  return (node_ != rhs.node_);
+}
+
+/**** Glib::Container_Helpers::SListIterator<TypeTraits<bool> > ************************/
+
+inline
+SListIterator<TypeTraits<bool> >::SListIterator(const GSList* node)
+:
+  node_ (node)
+{}
+
+inline
+SListIterator<TypeTraits<bool> >::value_type SListIterator<TypeTraits<bool> >::operator*() const
+{
+  return (GPOINTER_TO_INT(node_->data) ? true : false);
+}
+
+inline
+SListIterator<TypeTraits<bool> >& SListIterator<TypeTraits<bool> >::operator++()
+{
+  node_ = node_->next;
+  return *this;
+}
+
+inline
+const SListIterator<TypeTraits<bool> > SListIterator<TypeTraits<bool> >::operator++(int)
+{
+  const SListIterator<TypeTraits<bool> > tmp (*this);
+  node_ = node_->next;
+  return tmp;
+}
+
+inline
+bool SListIterator<TypeTraits<bool> >::operator==(const SListIterator<TypeTraits<bool> >& rhs) const
+{
+  return (node_ == rhs.node_);
+}
+
+inline
+bool SListIterator<TypeTraits<bool> >::operator!=(const SListIterator<TypeTraits<bool> >& rhs) const
 {
   return (node_ != rhs.node_);
 }
@@ -693,6 +863,35 @@ inline GList* GListKeeper<Tr>::data () const
   return glist_;
 }
 
+/**** Glib::Container_Helpers::GListKeeper<TypeTraits<bool> > ***************/
+
+inline GListKeeper<TypeTraits<bool> >::GListKeeper (const GList* glist, Glib::OwnershipType ownership)
+:
+  glist_ (const_cast<GList*> (glist)),
+  ownership_ (ownership)
+{}
+
+inline GListKeeper<TypeTraits<bool> >::GListKeeper (const GListKeeper& keeper)
+:
+  glist_ (keeper.glist_),
+  ownership_ (keeper.ownership_)
+{
+  keeper.ownership_ = Glib::OWNERSHIP_NONE;
+}
+
+GListKeeper<TypeTraits<bool> >::~GListKeeper ()
+{
+  if (glist_ && ownership_ != Glib::OWNERSHIP_NONE)
+  {
+    g_list_free (glist_);
+  }
+}
+
+inline GList* GListKeeper<TypeTraits<bool> >::data () const
+{
+  return glist_;
+}
+
 /**** Glib::Container_Helpers::GSListKeeper<> ************************/
 
 template <typename Tr>
@@ -731,6 +930,35 @@ GSListKeeper<Tr>::~GSListKeeper ()
 
 template <typename Tr>
 inline GSList* GSListKeeper<Tr>::data () const
+{
+  return gslist_;
+}
+
+/**** Glib::Container_Helpers::GSListKeeper<TypeTraits<bool> > ****************/
+
+inline GSListKeeper<TypeTraits<bool> >::GSListKeeper (const GSList* gslist, Glib::OwnershipType ownership)
+:
+  gslist_ (const_cast<GSList*> (gslist)),
+  ownership_ (ownership)
+{}
+
+inline GSListKeeper<TypeTraits<bool> >::GSListKeeper (const GSListKeeper& keeper)
+:
+  gslist_ (keeper.gslist_),
+  ownership_ (keeper.ownership_)
+{
+  keeper.ownership_ = Glib::OWNERSHIP_NONE;
+}
+
+GSListKeeper<TypeTraits<bool> >::~GSListKeeper ()
+{
+  if (gslist_ && ownership_ != Glib::OWNERSHIP_NONE)
+  {
+    g_slist_free (gslist_);
+  }
+}
+
+inline GSList* GSListKeeper<TypeTraits<bool> >::data () const
 {
   return gslist_;
 }
