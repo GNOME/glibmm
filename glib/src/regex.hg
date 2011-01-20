@@ -17,11 +17,12 @@
 
 _DEFS(glibmm,glib)
 
+#include <vector>
+
 #include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <glibmm/error.h>
-#include <glibmm/arrayhandle.h>
 #include <glib.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -185,14 +186,14 @@ public:
    */
   bool match_all(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options);
 
-#m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
+#m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::VectorHandler<Glib::ustring>::array_to_vector ($3, Glib::OWNERSHIP_DEEP)')
 
-  _WRAP_METHOD(static Glib::StringArrayHandle split_simple(const Glib::ustring& pattern, const Glib::ustring& string, RegexCompileFlags compile_options = static_cast<RegexCompileFlags>(0), RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_split_simple)
-  _WRAP_METHOD(Glib::StringArrayHandle split(const Glib::ustring& string, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_split)
+  _WRAP_METHOD(static std::vector<Glib::ustring> split_simple(const Glib::ustring& pattern, const Glib::ustring& string, RegexCompileFlags compile_options = static_cast<RegexCompileFlags>(0), RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_split_simple)
+  _WRAP_METHOD(std::vector<Glib::ustring> split(const Glib::ustring& string, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_split)
 
-  _WRAP_METHOD(Glib::StringArrayHandle split(const gchar* string, gssize string_len, int start_position, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0), int max_tokens = 0) const, g_regex_split_full, errthrow)
+  _WRAP_METHOD(std::vector<Glib::ustring> split(const gchar* string, gssize string_len, int start_position, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0), int max_tokens = 0) const, g_regex_split_full, errthrow)
 
-  Glib::StringArrayHandle split(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, int max_tokens) const;
+  std::vector<Glib::ustring> split(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, int max_tokens) const;
 
   _WRAP_METHOD(Glib::ustring replace(const gchar* string, gssize string_len, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_replace, errthrow)
   Glib::ustring replace(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options);
@@ -265,7 +266,7 @@ public:
 
   _WRAP_METHOD(bool fetch_named_pos(const Glib::ustring& name, int& start_pos, int& end_pos), g_match_info_fetch_named_pos)
 
-  _WRAP_METHOD(Glib::StringArrayHandle fetch_all(), g_match_info_fetch_all)
+  _WRAP_METHOD(std::vector<Glib::ustring> fetch_all(), g_match_info_fetch_all)
 
 protected:
   GMatchInfo* gobject_;      // The C object.

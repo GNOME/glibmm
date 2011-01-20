@@ -16,6 +16,7 @@
  */
 
 #include <glibmm/utility.h>
+#include <glibmm/vectorutils.h>
 
 namespace Glib
 {
@@ -225,10 +226,10 @@ Glib::ustring Regex::replace_literal(const Glib::ustring& string, int start_posi
   return retvalue;
 }
 
-Glib::StringArrayHandle Regex::split(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, int max_tokens) const
+std::vector<Glib::ustring> Regex::split(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, int max_tokens) const
 {
   GError* gerror = 0;
-  Glib::StringArrayHandle retvalue = Glib::StringArrayHandle(g_regex_split_full(const_cast<GRegex*>(gobj()), string.c_str(), -1, start_position, ((GRegexMatchFlags)(match_options)), max_tokens, &(gerror)), Glib::OWNERSHIP_DEEP);
+  std::vector<Glib::ustring> retvalue = Glib::VectorHandler<Glib::ustring>::array_to_vector(g_regex_split_full(const_cast<GRegex*>(gobj()), string.c_str(), -1, start_position, ((GRegexMatchFlags)(match_options)), max_tokens, &(gerror)), Glib::OWNERSHIP_DEEP);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 

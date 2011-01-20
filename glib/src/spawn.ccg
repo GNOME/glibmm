@@ -21,6 +21,7 @@
 #include <glib.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/utility.h>
+#include <glibmm/vectorutils.h>
 
 
 namespace
@@ -67,8 +68,8 @@ namespace Glib
 /**** process spawning functions *******************************************/
 
 void spawn_async_with_pipes(const std::string& working_directory,
-                            const Glib::ArrayHandle<std::string>& argv,
-                            const Glib::ArrayHandle<std::string>& envp,
+                            const std::vector<std::string>& argv,
+                            const std::vector<std::string>& envp,
                             SpawnFlags flags,
                             const sigc::slot<void>& child_setup,
                             Pid* child_pid,
@@ -82,8 +83,8 @@ void spawn_async_with_pipes(const std::string& working_directory,
 
   g_spawn_async_with_pipes(
       (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()),
-      const_cast<char**>(envp.data()),
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (argv).data()),
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (envp).data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
       (setup_slot) ? &child_setup_         : 0,
@@ -96,7 +97,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
 }
 
 void spawn_async_with_pipes(const std::string& working_directory,
-                            const Glib::ArrayHandle<std::string>& argv,
+                            const std::vector<std::string>& argv,
                             SpawnFlags flags,
                             const sigc::slot<void>& child_setup,
                             Pid* child_pid,
@@ -110,7 +111,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
 
   g_spawn_async_with_pipes(
       (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()), 0,
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (argv).data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
       (setup_slot) ? &child_setup_         : 0,
@@ -123,8 +124,8 @@ void spawn_async_with_pipes(const std::string& working_directory,
 }
 
 void spawn_async(const std::string& working_directory,
-                 const Glib::ArrayHandle<std::string>& argv,
-                 const Glib::ArrayHandle<std::string>& envp,
+                 const std::vector<std::string>& argv,
+                 const std::vector<std::string>& envp,
                  SpawnFlags flags,
                  const sigc::slot<void>& child_setup,
                  Pid* child_pid)
@@ -135,8 +136,8 @@ void spawn_async(const std::string& working_directory,
 
   g_spawn_async(
       (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()),
-      const_cast<char**>(envp.data()),
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (argv).data()),
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (envp).data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
       (setup_slot) ? &child_setup_         : 0,
@@ -148,7 +149,7 @@ void spawn_async(const std::string& working_directory,
 }
 
 void spawn_async(const std::string& working_directory,
-                 const Glib::ArrayHandle<std::string>& argv,
+                 const std::vector<std::string>& argv,
                  SpawnFlags flags,
                  const sigc::slot<void>& child_setup,
                  Pid* child_pid)
@@ -159,7 +160,7 @@ void spawn_async(const std::string& working_directory,
 
   g_spawn_async(
       (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()), 0,
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (argv).data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
       (setup_slot) ? &child_setup_         : 0,
@@ -171,8 +172,8 @@ void spawn_async(const std::string& working_directory,
 }
 
 void spawn_sync(const std::string& working_directory,
-                const Glib::ArrayHandle<std::string>& argv,
-                const Glib::ArrayHandle<std::string>& envp,
+                const std::vector<std::string>& argv,
+                const std::vector<std::string>& envp,
                 SpawnFlags flags,
                 const sigc::slot<void>& child_setup,
                 std::string* standard_output,
@@ -188,8 +189,8 @@ void spawn_sync(const std::string& working_directory,
 
   g_spawn_sync(
       (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()),
-      const_cast<char**>(envp.data()),
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (argv).data()),
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (envp).data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
       (setup_slot) ? &child_setup_         : 0,
@@ -206,7 +207,7 @@ void spawn_sync(const std::string& working_directory,
 }
 
 void spawn_sync(const std::string& working_directory,
-                const Glib::ArrayHandle<std::string>& argv,
+                const std::vector<std::string>& argv,
                 SpawnFlags flags,
                 const sigc::slot<void>& child_setup,
                 std::string* standard_output,
@@ -222,7 +223,7 @@ void spawn_sync(const std::string& working_directory,
 
   g_spawn_sync(
       (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()), 0,
+      const_cast<char**>(Glib::VectorHandler<std::string>::vector_to_array (argv).data()), 0,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : 0,
       (setup_slot) ? &child_setup_         : 0,
