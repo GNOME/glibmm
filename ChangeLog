@@ -1,13 +1,25 @@
-2011-01-18  Murray Cumming  <murrayc@murrayc.com>
+2011-01-20  Murray Cumming  <murrayc@murrayc.com>
 
-	Gio::Application: Initialize glibmm and giomm.
+	Resolver: lookup_service(), lookup_by_address(): Fix the reference counting.
 
-	* glib/glibmm/objectbase.cc: Constructors: Call Glib::init(), making it 
-	unnecessary to call this explicitly before instantiating a Glib::Object.
-	* gio/src/application.ccg: Make sure that giomm can be used as soon as a 
-	Gio::Application has been instantiated.
-	This should let use just instantiate a Gtk::Application 
-	instead of using Gtk::Main.
+	* gio/src/resolver.[hg|ccg]: Use the correct OWNERSHIP_*, based on the 
+	documentation for the C functions. We must release both the list and the 
+	items.
+	Bug #639575 (Michael Edwards)
+
+2011-01-20  Murray Cumming  <murrayc@murrayc.com>
+
+	Application: Fix the build.
+
+	* gio/src/application.ccg: Include giomm/init.h.
+
+2011-01-19  Murray Cumming  <murrayc@murrayc.com>
+
+	Application: Constructor: Initialize glibmm and giomm.
+
+	* gio/src/application.[hg|ccg]: Use a custom klass init function to 
+	make sure that glibmm and giomm are initialized when Gio::Application is 
+	instantiated, so it is then unnecssary to call them explicitly.
 
 2011-01-17  Murray Cumming  <murrayc@murrayc.com>
 
