@@ -15,6 +15,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <vector>
+
 #include <glibmm/object.h>
 #include <glibmm/variant.h>
 #include <giomm/settingsbackend.h>
@@ -74,10 +76,10 @@ public:
   _WRAP_METHOD(double get_double(const Glib::ustring& key) const, g_settings_get_double)
   _WRAP_METHOD(void set_double(const Glib::ustring& key, double value), g_settings_set_double)
 
-  #m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(Glib::StringArrayHandle get_string_array(const Glib::ustring& key) const, g_settings_get_strv)
-
-  _WRAP_METHOD(bool set_string_array(const Glib::ustring& key,  const Glib::StringArrayHandle& value), g_settings_set_strv)
+#m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> get_string_array(const Glib::ustring& key) const, g_settings_get_strv)
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const gchar*-const*',`Glib::ArrayHandler<Glib::ustring>::vector_to_array ($3).data ()')
+  _WRAP_METHOD(bool set_string_array(const Glib::ustring& key, const std::vector<Glib::ustring>& value), g_settings_set_strv)
 
   _WRAP_METHOD(int get_enum(const Glib::ustring& key) const, g_settings_get_enum )
   _WRAP_METHOD(bool get_enum(const Glib::ustring& key, int value), g_settings_set_enum)
@@ -98,10 +100,10 @@ public:
 
   _WRAP_METHOD(void reset(const Glib::ustring& key), g_settings_reset)
 
-  //TODO: _WRAP_METHOD(Glib::StringArrayHandle list_schemas() const, g_settings_list_schemas)
+  //TODO: _WRAP_METHOD(std::vector<Glib::ustring> list_schemas() const, g_settings_list_schemas)
 
-  _WRAP_METHOD(Glib::StringArrayHandle list_children() const, g_settings_list_children)
-  _WRAP_METHOD(Glib::StringArrayHandle list_keys() const, g_settings_list_keys)
+  _WRAP_METHOD(std::vector<Glib::ustring> list_children() const, g_settings_list_children)
+  _WRAP_METHOD(std::vector<Glib::ustring> list_keys() const, g_settings_list_keys)
   //TODO: Choose an appropriate Variant template type: GVariant* g_settings_get_range(const gchar* key)
 
   _WRAP_METHOD(bool range_check(const Glib::ustring& key, const Glib::VariantBase& value) const, g_settings_range_check)
@@ -114,7 +116,7 @@ public:
   void bind_writable(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, bool inverted=false);
   // TODO: unbind is not actually a class method
 
-  //TODO?: _WRAP_SIGNAL(bool change_event(const Glib::ArrayHandle<Glib::QueryQuark>& keys, int n_keys), "change-event")
+  //TODO?: _WRAP_SIGNAL(bool change_event(const std::vector<Glib::QueryQuark>& keys, int n_keys), "change-event")
 
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
   _WRAP_SIGNAL(void changed(const Glib::ustring& key), "changed")

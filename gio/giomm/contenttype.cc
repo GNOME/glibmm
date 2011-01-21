@@ -17,8 +17,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <giomm/contenttype.h>
 #include <gio/gio.h>
+
+#include <glibmm/vectorutils.h>
+
+#include <giomm/contenttype.h>
 
 namespace Gio
 {
@@ -98,15 +101,15 @@ Glib::ustring content_type_guess(const std::string& filename,
   return Glib::convert_return_gchar_ptr_to_ustring(cresult);
 }
 
-Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const File>& root)
+std::vector<Glib::ustring> content_type_guess_for_tree(const Glib::RefPtr<const File>& root)
 {
-  return Glib::StringArrayHandle(g_content_type_guess_for_tree(const_cast<GFile*>(root->gobj())),
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector (g_content_type_guess_for_tree(const_cast<GFile*>(root->gobj())),
     Glib::OWNERSHIP_DEEP);
 }
 
-Glib::ListHandle<Glib::ustring> content_types_get_registered()
+std::vector<Glib::ustring> content_types_get_registered()
 {
-  return Glib::ListHandle<Glib::ustring>(g_content_types_get_registered(),
+  return Glib::ListHandler<Glib::ustring>::list_to_vector (g_content_types_get_registered(),
     Glib::OWNERSHIP_DEEP);
 }
 

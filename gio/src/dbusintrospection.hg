@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <vector>
+
 #include <gio/gio.h>
 
 _DEFS(giomm,gio)
@@ -37,8 +39,8 @@ class DBusAnnotationInfo
   _CLASS_OPAQUE_REFCOUNTED(DBusAnnotationInfo, GDBusAnnotationInfo, NONE, g_dbus_annotation_info_ref, g_dbus_annotation_info_unref)
 
 public:
-#m4 _CONVERSION(`const Glib::ArrayHandle< Glib::RefPtr<DBusAnnotationInfo> >&', `GDBusAnnotationInfo**', `const_cast<GDBusAnnotationInfo**>($3.data())')
-  _WRAP_METHOD(static Glib::ustring info_lookup(const Glib::ArrayHandle< Glib::RefPtr<DBusAnnotationInfo> >& annotations, const Glib::ustring& name), g_dbus_annotation_info_lookup)
+#m4 _CONVERSION(`const std::vector< Glib::RefPtr<DBusAnnotationInfo> >&', `GDBusAnnotationInfo**', `const_cast<GDBusAnnotationInfo**>(Glib::ArrayHandler<Glib::RefPtr<DBusAnnotationInfo> >::vector_to_array ($3).data())')
+  _WRAP_METHOD(static Glib::ustring info_lookup(const std::vector< Glib::RefPtr<DBusAnnotationInfo> >& annotations, const Glib::ustring& name), g_dbus_annotation_info_lookup)
 };
 
 /** DBusArgInfo - Stores information about an argument for a method or a

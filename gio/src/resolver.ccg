@@ -18,6 +18,9 @@
  */
 
 #include <gio/gio.h>
+
+#include <glibmm/vectorutils.h>
+
 #include "slot_async.h"
 
 namespace Gio
@@ -33,10 +36,10 @@ void Resolver::set_default(const Glib::RefPtr<Resolver>& resolver)
     g_resolver_set_default(Glib::unwrap(resolver));
 }
 
-Glib::ListHandle< Glib::RefPtr<InetAddress> > Resolver::lookup_by_name(const Glib::ustring& hostname)
+std::vector< Glib::RefPtr<InetAddress> > Resolver::lookup_by_name(const Glib::ustring& hostname)
 {
   GError* gerror = 0;
-  Glib::ListHandle< Glib::RefPtr<InetAddress> > retvalue = Glib::ListHandle< Glib::RefPtr<InetAddress> >(g_resolver_lookup_by_name(gobj(), hostname.c_str(), 0, &(gerror)), Glib::OWNERSHIP_SHALLOW);
+  std::vector< Glib::RefPtr<InetAddress> > retvalue = Glib::ListHandler< Glib::RefPtr<InetAddress> >::list_to_vector(g_resolver_lookup_by_name(gobj(), hostname.c_str(), 0, &(gerror)), Glib::OWNERSHIP_SHALLOW);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -55,10 +58,10 @@ Glib::ustring Resolver::lookup_by_address(const Glib::RefPtr<InetAddress>& addre
 
 }
 
-ListHandle_SrvTarget Resolver::lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain)
+std::vector<Gio::SrvTarget> Resolver::lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain)
 {
   GError* gerror = 0;
-  ListHandle_SrvTarget retvalue = ListHandle_SrvTarget(g_resolver_lookup_service(gobj(), service.c_str(), protocol.c_str(), domain.c_str(), 0, &(gerror)), Glib::OWNERSHIP_SHALLOW);
+  std::vector<Gio::SrvTarget> retvalue = Glib::ListHandler<Gio::SrvTarget, SrvTargetTraits>::list_to_vector (g_resolver_lookup_service(gobj(), service.c_str(), protocol.c_str(), domain.c_str(), 0, &(gerror)), Glib::OWNERSHIP_SHALLOW);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 

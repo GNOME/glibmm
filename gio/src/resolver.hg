@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <vector>
+
 #include <glibmm/object.h>
 #include <giomm/inetaddress.h>
 #include <giomm/cancellable.h>
@@ -58,15 +60,14 @@ public:
   // g_resolver_free_addresses is just a C convenience function
   _IGNORE(g_resolver_free_addresses)
 
-#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<InetAddress> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<InetAddress> > lookup_by_name(const Glib::ustring& hostname, const Glib::RefPtr<Cancellable>& cancellable), g_resolver_lookup_by_name, errthrow)
-  Glib::ListHandle< Glib::RefPtr<InetAddress> > lookup_by_name(const Glib::ustring& hostname);
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<InetAddress> >',`Glib::ListHandler< Glib::RefPtr<InetAddress> >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<InetAddress> > lookup_by_name(const Glib::ustring& hostname, const Glib::RefPtr<Cancellable>& cancellable), g_resolver_lookup_by_name, errthrow)
+  std::vector< Glib::RefPtr<InetAddress> > lookup_by_name(const Glib::ustring& hostname);
   void lookup_by_name_async(const Glib::ustring& hostname, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
   void lookup_by_name_async(const Glib::ustring& hostname, const SlotAsyncReady& slot);
   _IGNORE(g_resolver_lookup_by_name_async)
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<InetAddress> > lookup_by_name_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_name_finish, errthrow)
+  _WRAP_METHOD(std::vector< Glib::RefPtr<InetAddress> > lookup_by_name_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_name_finish, errthrow)
 
-#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<InetAddress> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
   _WRAP_METHOD(Glib::ustring lookup_by_address(const Glib::RefPtr<InetAddress>& address, const Glib::RefPtr<Cancellable>& cancellable), g_resolver_lookup_by_address, errthrow)
   Glib::ustring lookup_by_address(const Glib::RefPtr<InetAddress>& address);
   void lookup_by_address_async(const Glib::RefPtr<InetAddress>& address, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
@@ -74,17 +75,16 @@ public:
   _IGNORE(g_resolver_lookup_by_address_async)
   _WRAP_METHOD(Glib::ustring lookup_by_address_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_address_finish, errthrow)
 
-#m4 _CONVERSION(`GList*',`ListHandle_SrvTarget',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-  _WRAP_METHOD(ListHandle_SrvTarget lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const Glib::RefPtr<Cancellable>& cancellable), g_resolver_lookup_service, errthrow)
-  ListHandle_SrvTarget lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain);
+#m4 _CONVERSION(`GList*',`std::vector<Gio::SrvTarget>',`Glib::ListHandler<Gio::SrvTarget, SrvTargetTraits>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector<Gio::SrvTarget> lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const Glib::RefPtr<Cancellable>& cancellable), g_resolver_lookup_service, errthrow)
+  std::vector<Gio::SrvTarget> lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain);
   void lookup_service_async(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
   void lookup_service_async(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const SlotAsyncReady& slot);
   _IGNORE(g_resolver_lookup_service_async)
-  _WRAP_METHOD(ListHandle_SrvTarget lookup_service_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_service_finish, errthrow)
+  _WRAP_METHOD(std::vector<Gio::SrvTarget> lookup_service_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_service_finish, errthrow)
 
 
-  //TODO: Remove no_default_handler when we can break ABI:
-  _WRAP_SIGNAL(void reload(), reload, no_default_handler)
+  _WRAP_SIGNAL(void reload(), reload)
 };
 
 std::string hostname_to_ascii (const Glib::ustring& hostname);

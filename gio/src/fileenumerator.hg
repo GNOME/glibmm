@@ -18,8 +18,6 @@
  */
 
 #include <glibmm/object.h>
-#include <glibmm/arrayhandle.h>
-#include <glibmm/listhandle.h>
 #include <giomm/asyncresult.h>
 #include <giomm/cancellable.h>
 #include <giomm/fileinfo.h>
@@ -113,8 +111,8 @@ public:
   void next_files_async(const SlotAsyncReady& slot, int num_files = 1, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_enumerator_next_files_async)
 
-#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<FileInfo> >', `$2(($3), Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<FileInfo> > next_files_finish(const Glib::RefPtr<AsyncResult>& result),
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<FileInfo> >', `Glib::ListHandler<Glib::RefPtr<FileInfo> >::list_to_vector(($3), Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<FileInfo> > next_files_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_enumerator_next_files_finish,
                errthrow)
 

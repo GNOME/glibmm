@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <vector>
+
 #include <glibmm/object.h>
 
 _DEFS(giomm,gio)
@@ -80,15 +82,14 @@ public:
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
   _WRAP_SIGNAL(void ask_password(const Glib::ustring& message, const Glib::ustring& default_user, const Glib::ustring& default_domain, AskPasswordFlags flags), ask_password)
 
-  //TODO: We really need some test to make sure that our use of StringArrayHandle is correct. murrayc.
-#m4 _CONVERSION(`const Glib::StringArrayHandle&',`const gchar**',`const_cast<const gchar**>(($3).data())')
-#m4 _CONVERSION(`const gchar**',`const Glib::StringArrayHandle&',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_SIGNAL(void ask_question(const Glib::ustring& message, const Glib::StringArrayHandle& choices), ask_question)
+  //TODO: We really need some test to make sure that our use of std::vector<Glib::ustring> is correct. murrayc.
+#m4 _CONVERSION(`const std::vector<Glib::ustring>&',`const gchar**',`const_cast<const gchar**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data())')
+#m4 _CONVERSION(`const gchar**',`const std::vector<Glib::ustring>&',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_SIGNAL(void ask_question(const Glib::ustring& message, const std::vector<Glib::ustring>& choices), ask_question)
 
   _WRAP_SIGNAL(void reply(MountOperationResult result), reply)
 
-  //TODO: Remove no_default_handler when we can break ABI:
-  _WRAP_SIGNAL(void aborted(), aborted, no_default_handler)
+  _WRAP_SIGNAL(void aborted(), aborted)
 
   //TODO: The array of char* is not very pleasant to wrap:
   //_WRAP_SIGNAL( void show_processes(const Glib::ustring& message, GArray* processes, const gchar *choices[]);

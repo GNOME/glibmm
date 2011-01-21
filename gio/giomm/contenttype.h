@@ -20,7 +20,6 @@
 #define _GIOMM_CONTENTTYPE_H
 
 #include <glibmm/ustring.h>
-#include <glibmm/listhandle.h>
 #include <giomm/icon.h>
 #include <giomm/file.h>
 #include <string>
@@ -151,7 +150,7 @@ Glib::ustring content_type_guess(const std::string& filename,
  *
  * @newin{2,18}
  */
-Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const File>& root);
+std::vector<Glib::ustring> content_type_guess_for_tree(const Glib::RefPtr<const File>& root);
 
 /**
  * Gets a list of strings containing all the registered content types
@@ -159,7 +158,7 @@ Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const Fil
  *
  * @return List of the registered content types.
  */
-Glib::ListHandle<Glib::ustring> content_types_get_registered();
+std::vector<Glib::ustring> content_types_get_registered();
 
 } // namespace Gio
 #endif // _GIOMM_CONTENTTYPE_H

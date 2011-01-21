@@ -20,6 +20,7 @@
 #include <exception>
 
 #include <string>
+#include <vector>
 
 #include <glibmm/interface.h>
 #include <glibmm/object.h>
@@ -57,11 +58,11 @@ protected:
 public:
   _WRAP_CREATE()
 
-#m4 _CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
-  _WRAP_METHOD(std::string get_display(const Glib::RefPtr<AppInfo>& info, const Glib::ListHandle< Glib::RefPtr<Gio::File> >& files),
+#m4 _CONVERSION(`const std::vector<Glib::RefPtr<Gio::File> >&',`GList*',`Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list ($3).data()')
+  _WRAP_METHOD(std::string get_display(const Glib::RefPtr<AppInfo>& info, const std::vector<Glib::RefPtr<Gio::File> >& files),
                g_app_launch_context_get_display)
 
-  _WRAP_METHOD(std::string get_startup_notify_id(const Glib::RefPtr<AppInfo>& info, const Glib::ListHandle< Glib::RefPtr<Gio::File> >& files),
+  _WRAP_METHOD(std::string get_startup_notify_id(const Glib::RefPtr<AppInfo>& info, const std::vector<Glib::RefPtr<Gio::File> >& files),
                g_app_launch_context_get_startup_notify_id)
   _WRAP_METHOD(void launch_failed(const std::string& startup_notify_id),
                g_app_launch_context_launch_failed)
@@ -99,13 +100,14 @@ public:
                g_app_info_get_icon,
                refreturn, constversion)
 
-  _WRAP_METHOD(bool launch(const Glib::ListHandle<std::string>& files,
+#m4 _CONVERSION(`const std::vector<std::string>&',`GList*',`Glib::ListHandler<std::string>::vector_to_list ($3).data()')
+  _WRAP_METHOD(bool launch(const std::vector<std::string>& files,
                            const Glib::RefPtr<AppLaunchContext>& launch_context),
                g_app_info_launch,
                errthrow)
   _WRAP_METHOD(bool supports_uris() const, g_app_info_supports_uris)
   _WRAP_METHOD(bool supports_files() const, g_app_info_supports_files)
-  _WRAP_METHOD(bool launch_uris(const Glib::ListHandle<std::string>& uris,
+  _WRAP_METHOD(bool launch_uris(const std::vector<std::string>& uris,
                                 GAppLaunchContext* launch_context),
                g_app_info_launch_uris,
                errthrow)
@@ -127,9 +129,9 @@ public:
   _WRAP_METHOD(bool remove_supports_type(const std::string& content_type),
                g_app_info_remove_supports_type,
                errthrow)
-#m4 _CONVERSION(`GList*',`Glib::ListHandle<Glib::RefPtr<AppInfo> >',`Glib::ListHandle<Glib::RefPtr<AppInfo> >($3, Glib::OWNERSHIP_SHALLOW)')
-  _WRAP_METHOD(static Glib::ListHandle<Glib::RefPtr<AppInfo> > get_all(), g_app_info_get_all)
-  _WRAP_METHOD(static Glib::ListHandle<Glib::RefPtr<AppInfo> > get_all_for_type(const std::string& content_type), g_app_info_get_all_for_type)
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<AppInfo> >',`Glib::ListHandler<Glib::RefPtr<AppInfo> >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(static std::vector<Glib::RefPtr<AppInfo> > get_all(), g_app_info_get_all)
+  _WRAP_METHOD(static std::vector<Glib::RefPtr<AppInfo> > get_all_for_type(const std::string& content_type), g_app_info_get_all_for_type)
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type, bool must_support_uris = true), g_app_info_get_default_for_type)
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme), g_app_info_get_default_for_uri_scheme)
   _WRAP_METHOD(static void reset_type_associations(const std::string& content_type), g_app_info_reset_type_associations)
@@ -145,8 +147,8 @@ protected:
   //_WRAP_VFUNC(std::string get_description() const, "get_description")
   //_WRAP_VFUNC(std::string get_executable() const, "get_executable")
   //_WRAP_VFUNC(Glib::RefPtr<Icon> get_icon() const, "get_icon")
-#m4 _CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
-#m4 _CONVERSION(`GList*',`const Glib::ListHandle<std::string>&',`Glib::ListHandle<std::string>($3, Glib::OWNERSHIP_NONE)')
+//#m4 _CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
+//#m4 _CONVERSION(`GList*',`const Glib::ListHandle<std::string>&',`Glib::ListHandle<std::string>($3, Glib::OWNERSHIP_NONE)')
   //_WRAP_VFUNC(bool launch(const Glib::ListHandle<std::string>& filenames, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch")
   //_WRAP_VFUNC(bool supports_uris() const, "supports_uris")
   //_WRAP_VFUNC(bool supports_files() const, "supports_files")

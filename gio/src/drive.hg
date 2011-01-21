@@ -60,8 +60,8 @@ public:
 
   _WRAP_METHOD(bool has_volumes() const, g_drive_has_volumes)
 
-#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Volume> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Volume> > get_volumes(), g_drive_get_volumes)
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<Volume> >',`Glib::ListHandler< Glib::RefPtr<Volume> >::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<Volume> > get_volumes(), g_drive_get_volumes)
 
   _WRAP_METHOD(bool is_media_removable() const, g_drive_is_media_removable)
   _WRAP_METHOD(bool has_media() const, g_drive_has_media)
@@ -124,8 +124,8 @@ public:
 
   _WRAP_METHOD(std::string get_identifier(const std::string& kind) const, g_drive_get_identifier)
   
-  #m4 _CONVERSION(`char**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(Glib::StringArrayHandle enumerate_identifiers() const, g_drive_enumerate_identifiers)
+  #m4 _CONVERSION(`char**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> enumerate_identifiers() const, g_drive_enumerate_identifiers)
 
   /** @newin{2,22} */
   void start(const Glib::RefPtr<MountOperation>& mount_operation, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot, DriveStartFlags flags = DRIVE_START_NONE);

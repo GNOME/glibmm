@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <vector>
+
 #include <glibmm/error.h>
 #include <glibmm/interface.h>
 #include <giomm/asyncresult.h>
@@ -52,12 +54,12 @@ public:
   _WRAP_METHOD(bool is_supported() const, g_proxy_resolver_is_supported)
 
   //TODO: Use std::string instead of ustring (StringArrayHandle uses ustring)?:
-#m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(Glib::StringArrayHandle lookup(const Glib::ustring& uri,
+#m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> lookup(const Glib::ustring& uri,
 						 const Glib::RefPtr<Cancellable>& cancellable), g_proxy_resolver_lookup, errthrow)
 	
 	//TODO: Documentation
-	Glib::StringArrayHandle lookup(const Glib::ustring& uri);
+	std::vector<Glib::ustring> lookup(const Glib::ustring& uri);
 						 
   //TODO: Documentation
   void lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
@@ -67,7 +69,7 @@ public:
 
   _IGNORE(g_proxy_resolver_lookup_async)
 
-  _WRAP_METHOD(Glib::StringArrayHandle lookup_finish(const Glib::RefPtr<AsyncResult>& result), g_proxy_resolver_lookup_finish, errthrow)
+  _WRAP_METHOD(std::vector<Glib::ustring> lookup_finish(const Glib::RefPtr<AsyncResult>& result), g_proxy_resolver_lookup_finish, errthrow)
 
 };
 

@@ -18,17 +18,20 @@
  */
 
 #include <gio/gunixfdmessage.h>
+
+#include <glibmm/vectorutils.h>
+
 #include <giomm/unixfdlist.h>
 
 namespace Gio
 {
 
-Glib::ArrayHandle<int> UnixFDMessage::steal_fds()
+std::vector<int> UnixFDMessage::steal_fds()
 {
   int length = 0;
   const int* fds = g_unix_fd_message_steal_fds(gobj(), &length);
   // (length - 1) is used because the array is terminated with a -1.
-  return Glib::ArrayHandle<int>(fds, length - 1, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<int>::array_to_vector (fds, length - 1, Glib::OWNERSHIP_DEEP);
 }
 
 } // namespace Gio

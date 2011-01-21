@@ -17,19 +17,23 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <gio/gio.h>
 #include <utility>
+
+#include <gio/gio.h>
+
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
+#include <glibmm/vectorutils.h>
+
 #include "slot_async.h"
 
 namespace Gio
 {
 
-Glib::StringArrayHandle ProxyResolver::lookup(const Glib::ustring& uri)
+std::vector<Glib::ustring> ProxyResolver::lookup(const Glib::ustring& uri)
 {
   GError* gerror = 0;
-  Glib::StringArrayHandle retvalue = Glib::StringArrayHandle(g_proxy_resolver_lookup(gobj(), uri.c_str(), 0, &(gerror)), Glib::OWNERSHIP_DEEP);
+  std::vector<Glib::ustring> retvalue = Glib::ArrayHandler<Glib::ustring>::array_to_vector(g_proxy_resolver_lookup(gobj(), uri.c_str(), 0, &(gerror)), Glib::OWNERSHIP_DEEP);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
