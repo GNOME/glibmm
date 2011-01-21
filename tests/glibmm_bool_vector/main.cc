@@ -15,7 +15,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #include <cstdlib>
+#include <ctime>
+
 #include <iostream>
+
 #include <glibmm.h>
 
 const unsigned int magic_limit (5);

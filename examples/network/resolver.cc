@@ -93,11 +93,11 @@ print_resolved_name (const Glib::ustring& phys,
 
 static void
 print_resolved_addresses (const Glib::ustring& name,
-                          const std::list<Glib::RefPtr<Gio::InetAddress> >& addresses)
+                          const std::vector<Glib::RefPtr<Gio::InetAddress> >& addresses)
 {
     G_LOCK (response);
     std::cout << Glib::ustring::compose ("Name:    %1\n", name);
-    for (std::list<Glib::RefPtr<Gio::InetAddress> >::const_iterator iter = addresses.begin ();
+    for (std::vector<Glib::RefPtr<Gio::InetAddress> >::const_iterator iter = addresses.begin ();
          iter != addresses.end (); ++iter)
     {
         std::cout << Glib::ustring::compose ("Address: %1\n", (*iter)->to_string ());
@@ -110,11 +110,11 @@ print_resolved_addresses (const Glib::ustring& name,
 
 static void
 print_resolved_service (const Glib::ustring& service,
-                        const std::list<Gio::SrvTarget>& targets)
+                        const std::vector<Gio::SrvTarget>& targets)
 {
     G_LOCK (response);
     std::cout << Glib::ustring::compose ("Service: %1\n", service);
-    for (std::list<Gio::SrvTarget>::const_iterator iter = targets.begin ();
+    for (std::vector<Gio::SrvTarget>::const_iterator iter = targets.begin ();
          iter != targets.end (); ++iter)
     {
         std::cout <<
@@ -154,7 +154,7 @@ lookup_one_sync (const Glib::ustring& arg)
 {
     if (arg.find ('/') != std::string::npos)
     {
-        std::list<Gio::SrvTarget> targets;
+        std::vector<Gio::SrvTarget> targets;
         /* service/protocol/domain */
         std::vector<Glib::ustring> parts = split_service_parts (arg);
         if (parts.size () != 3) {
@@ -188,7 +188,7 @@ lookup_one_sync (const Glib::ustring& arg)
     }
     else
     {
-        std::list<Glib::RefPtr<Gio::InetAddress> > addresses;
+        std::vector<Glib::RefPtr<Gio::InetAddress> > addresses;
 
         try
         {
