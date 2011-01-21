@@ -23,6 +23,7 @@
 
 #include <glibmm/miscutils.h>
 #include <glibmm/utility.h>
+#include <glibmm/vectorutils.h>
 #include <glib.h>
 
 
@@ -71,14 +72,9 @@ void unsetenv(const std::string& variable)
   g_unsetenv(variable.c_str());
 }
 
-Glib::ArrayHandle<std::string> listenv()
+std::vector<std::string> listenv()
 {
-  char **value = g_listenv();
-  char **end = value;
-  while(*end){
-    ++end;
-  }
-  return Glib::ArrayHandle<std::string>(value, end-value, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<std::string>::array_to_vector (g_listenv (), Glib::OWNERSHIP_DEEP);
 }
 
 std::string get_user_name()
@@ -182,9 +178,9 @@ std::string path_get_dirname(const std::string& filename)
   return convert_return_gchar_ptr_to_stdstring(g_path_get_dirname(filename.c_str()));
 }
 
-std::string build_filename(const Glib::ArrayHandle<std::string>& elements)
+std::string build_filename(const std::vector<std::string>& elements)
 {
-  return convert_return_gchar_ptr_to_stdstring(g_build_filenamev(const_cast<char**>(elements.data())));
+  return convert_return_gchar_ptr_to_stdstring(g_build_filenamev(const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array (elements).data())));
 }
 
 std::string build_filename(const std::string& elem1, const std::string& elem2)
@@ -192,9 +188,9 @@ std::string build_filename(const std::string& elem1, const std::string& elem2)
   return convert_return_gchar_ptr_to_stdstring(g_build_filename(elem1.c_str(), elem2.c_str(), static_cast<char*>(0)));
 }
 
-std::string build_path(const std::string& separator, const Glib::ArrayHandle<std::string>& elements)
+std::string build_path(const std::string& separator, const std::vector<std::string>& elements)
 {
-  return convert_return_gchar_ptr_to_stdstring(g_build_pathv(separator.c_str(), const_cast<char**>(elements.data())));
+  return convert_return_gchar_ptr_to_stdstring(g_build_pathv(separator.c_str(), const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array (elements).data())));
 }
 
 std::string find_program_in_path(const std::string& program)

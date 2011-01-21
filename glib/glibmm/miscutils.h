@@ -21,7 +21,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/arrayhandle.h>
+#include <vector>
+
 #include <glibmm/ustring.h>
 
 
@@ -134,10 +135,9 @@ void unsetenv(const std::string& variable);
  * variables in GLib-using programs you want the UTF-8 encoding that this
  * function and getenv() provide.
  *
- * @return Array of environment names (The generic ArrayHandle will be
- * implicitly converted to any STL compatible container type).
+ * @return Vector of environment names.
  */
-Glib::ArrayHandle<std::string> listenv();
+std::vector<std::string> listenv();
 
 /** Gets the user name of the current user.
  * @return The name of the current user.
@@ -269,7 +269,7 @@ std::string path_get_dirname(const std::string& filename);
  *   Any STL compatible container type is accepted.
  * @return The resulting path.
  */
-std::string build_filename(const Glib::ArrayHandle<std::string>& elements);
+std::string build_filename(const std::vector<std::string>& elements);
 
 /** Creates a filename from two elements using the correct separator for filenames.
  * No attempt is made to force the resulting filename to be an absolute path.
@@ -315,7 +315,7 @@ std::string build_filename(const std::string& elem1, const std::string& elem2);
  * @return The resulting path.
  */
 std::string build_path(const std::string& separator,
-                       const Glib::ArrayHandle<std::string>& elements);
+                       const std::vector<std::string>& elements);
 
 /** Locates the first executable named @a program in the user's path, in the
  * same way that <tt>execvp()</tt> would locate it.
