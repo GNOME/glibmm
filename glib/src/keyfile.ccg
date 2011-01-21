@@ -92,7 +92,7 @@ std::vector<Glib::ustring> KeyFile::get_groups() const
   gsize length = 0;
   char** const array = g_key_file_get_groups(const_cast<GKeyFile*>(gobj()), &length);
 
-  return Glib::VectorHandler<Glib::ustring>::array_to_vector(array, length, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector(array, length, Glib::OWNERSHIP_DEEP);
 }
 
 std::vector<Glib::ustring> KeyFile::get_keys(const Glib::ustring& group_name) const
@@ -108,7 +108,7 @@ std::vector<Glib::ustring> KeyFile::get_keys(const Glib::ustring& group_name) co
   if(gerror)
     Glib::Error::throw_exception(gerror);
 
-  return Glib::VectorHandler<Glib::ustring>::array_to_vector(array, length, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector(array, length, Glib::OWNERSHIP_DEEP);
 }
 
 Glib::ustring KeyFile::get_locale_string(const Glib::ustring& group_name,
@@ -208,7 +208,7 @@ std::vector<Glib::ustring> KeyFile::get_string_list(const Glib::ustring& group_n
 
   GLIBMM_THROW(gerror);
 
-  return Glib::VectorHandler<Glib::ustring>::array_to_vector(array, length, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector(array, length, Glib::OWNERSHIP_DEEP);
 }
 
 std::vector<Glib::ustring> KeyFile::get_locale_string_list(const Glib::ustring& group_name,
@@ -226,7 +226,7 @@ std::vector<Glib::ustring> KeyFile::get_locale_string_list(const Glib::ustring& 
 
   GLIBMM_THROW(gerror);
 
-  return Glib::VectorHandler<Glib::ustring>::array_to_vector(array, length, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector(array, length, Glib::OWNERSHIP_DEEP);
 }
 
 std::vector<bool> KeyFile::get_boolean_list(const Glib::ustring& group_name,
@@ -243,7 +243,7 @@ std::vector<bool> KeyFile::get_boolean_list(const Glib::ustring& group_name,
 
   GLIBMM_THROW(gerror);
 
-  return Glib::VectorHandler<bool>::array_to_vector(array, length, Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<bool>::array_to_vector(array, length, Glib::OWNERSHIP_SHALLOW);
 }
 
 std::vector<int> KeyFile::get_integer_list(const Glib::ustring& group_name,
@@ -260,7 +260,7 @@ std::vector<int> KeyFile::get_integer_list(const Glib::ustring& group_name,
 
   GLIBMM_THROW(gerror);
 
-  return Glib::VectorHandler<int>::array_to_vector(array, length, Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<int>::array_to_vector(array, length, Glib::OWNERSHIP_SHALLOW);
 }
 
 std::vector<double> KeyFile::get_double_list(const Glib::ustring& group_name,
@@ -275,14 +275,14 @@ std::vector<double> KeyFile::get_double_list(const Glib::ustring& group_name,
                                                    &length, &gerror);
   GLIBMM_THROW(gerror);
 
-  return Glib::VectorHandler<double>::array_to_vector(array, length, Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<double>::array_to_vector(array, length, Glib::OWNERSHIP_SHALLOW);
 }
 
 void KeyFile::set_string_list(const Glib::ustring& group_name, const Glib::ustring& key,
                               const std::vector<Glib::ustring>& list)
 {
   g_key_file_set_string_list(gobj(), (group_name.empty()) ? 0 : group_name.c_str(),
-                             key.c_str(), Glib::VectorHandler<Glib::ustring>::vector_to_array(list).data(), list.size());
+                             key.c_str(), Glib::ArrayHandler<Glib::ustring>::vector_to_array(list).data(), list.size());
 }
 
 void KeyFile::set_locale_string_list(const Glib::ustring& group_name,
@@ -290,28 +290,28 @@ void KeyFile::set_locale_string_list(const Glib::ustring& group_name,
                                      const std::vector<Glib::ustring>& list)
 {
   g_key_file_set_locale_string_list(gobj(), (group_name.empty()) ? 0 : group_name.c_str(),
-                                    key.c_str(), locale.c_str(), Glib::VectorHandler<Glib::ustring>::vector_to_array(list).data(), list.size());
+                                    key.c_str(), locale.c_str(), Glib::ArrayHandler<Glib::ustring>::vector_to_array(list).data(), list.size());
 }
 
 void KeyFile::set_integer_list(const Glib::ustring& group_name, const Glib::ustring& key,
                                const std::vector<int>& list)
 {
   g_key_file_set_integer_list(gobj(), (group_name.empty()) ? 0 : group_name.c_str(),
-                              key.c_str(), Glib::VectorHandler<int>::vector_to_array(list).data(), list.size());
+                              key.c_str(), Glib::ArrayHandler<int>::vector_to_array(list).data(), list.size());
 }
 
 void KeyFile::set_double_list(const Glib::ustring& group_name, const Glib::ustring& key,
                               const std::vector<double>& list)
 {
   g_key_file_set_double_list(gobj(), group_name.c_str(), key.c_str(),
-                             Glib::VectorHandler<double>::vector_to_array(list).data(), list.size());
+                             Glib::ArrayHandler<double>::vector_to_array(list).data(), list.size());
 }
 
 void KeyFile::set_boolean_list(const Glib::ustring& group_name, const Glib::ustring& key,
                                const std::vector<bool>& list)
 {
   g_key_file_set_boolean_list(gobj(), (group_name.empty()) ? 0 : group_name.c_str(),
-                              key.c_str(), Glib::VectorHandler<bool>::vector_to_array(list).data(), list.size());
+                              key.c_str(), Glib::ArrayHandler<bool>::vector_to_array(list).data(), list.size());
 }
 
 Glib::ustring KeyFile::get_comment() const
