@@ -392,55 +392,55 @@ take_array_nothing (GCredentials** array)
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_deep_list ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector (return_deep_owned_list (), Glib::OWNERSHIP_NONE);
+  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector (return_deep_owned_list (), Glib::OWNERSHIP_NONE);
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_shallow_list ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector (return_shallow_owned_list (), Glib::OWNERSHIP_SHALLOW);
+  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector (return_shallow_owned_list (), Glib::OWNERSHIP_SHALLOW);
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_none_list ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector (return_unowned_list (), Glib::OWNERSHIP_DEEP);
+  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector (return_unowned_list (), Glib::OWNERSHIP_DEEP);
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_deep_slist ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_deep_owned_slist (), Glib::OWNERSHIP_NONE);
+  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_deep_owned_slist (), Glib::OWNERSHIP_NONE);
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_shallow_slist ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_shallow_owned_slist (), Glib::OWNERSHIP_SHALLOW);
+  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_shallow_owned_slist (), Glib::OWNERSHIP_SHALLOW);
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_none_slist ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_unowned_slist (), Glib::OWNERSHIP_DEEP);
+  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector (return_unowned_slist (), Glib::OWNERSHIP_DEEP);
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_deep_array ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector (return_deep_owned_array (), Glib::OWNERSHIP_NONE);
+  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector (return_deep_owned_array (), Glib::OWNERSHIP_NONE);
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_shallow_array ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector (return_shallow_owned_array (), Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector (return_shallow_owned_array (), Glib::OWNERSHIP_SHALLOW);
 }
 
 std::vector<Glib::RefPtr<Gio::Credentials> >
 cxx_get_none_array ()
 {
-  return Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector (return_unowned_array (), Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector (return_unowned_array (), Glib::OWNERSHIP_DEEP);
 }
 
 void
@@ -477,60 +477,60 @@ print_vector (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 void
 cxx_list_take_all (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_list_all (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v, Glib::OWNERSHIP_NONE));
+  take_list_all (Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v).data ());
 }
 
 void
 cxx_list_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_list_members (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v, Glib::OWNERSHIP_SHALLOW));
+  take_list_members (Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v).data ());
 }
 */
 
 void
 cxx_list_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_list_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v).data());
+  take_list_nothing (Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list (v).data ());
 }
 
 /* they are probably buggy by design...
 void
 cxx_slist_take_all (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_slist_all (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v, Glib::OWNERSHIP_NONE));
+  take_slist_all (Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v).data ());
 }
 
 void
 cxx_slist_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_slist_members (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v, Glib::OWNERSHIP_SHALLOW));
+  take_slist_members (Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v).data ());
 }
 */
 
 void
 cxx_slist_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_slist_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v).data());
+  take_slist_nothing (Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist (v).data ());
 }
 
 /* they are probably buggy by design...
 void
 cxx_array_take_all (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_array_all (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v, Glib::OWNERSHIP_NONE));
+  take_array_all (Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v).data ());
 }
 
 void
 cxx_array_take_members (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_array_members (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v, Glib::OWNERSHIP_SHALLOW));
+  take_array_members (Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v).data ());
 }
 */
 
 void
 cxx_array_take_nothing (const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  take_array_nothing (Glib::VectorHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v).data());
+  take_array_nothing (Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array (v).data ());
 }
 
 
