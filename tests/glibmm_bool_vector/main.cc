@@ -30,6 +30,7 @@ setup_rand ()
 
   if (!setup)
   {
+    setup = true;
     std::srand (std::time (0));
   }
 }
@@ -60,7 +61,7 @@ c_print_bool_array (gboolean* array)
 std::vector<bool>
 cxx_get_bool_array ()
 {
-  return Glib::ArrayHandler<bool>::array_to_vector (c_get_bool_array (), Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<bool>::array_to_vector (c_get_bool_array (), magic_limit, Glib::OWNERSHIP_SHALLOW);
 }
 
 void
