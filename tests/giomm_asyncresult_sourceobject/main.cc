@@ -1,5 +1,7 @@
-#include <giomm.h>
+#include <cstdlib>
 #include <iostream>
+
+#include <giomm.h>
 
 void on_read_async(const Glib::RefPtr<Gio::AsyncResult>& result)
 {
@@ -12,7 +14,7 @@ void on_read_async(const Glib::RefPtr<Gio::AsyncResult>& result)
   std::cout << "Testing Gio::AsyncResult's get_source_object ... "
             << (result->get_source_object_base() ? "OK!" : "FAILED!") << std::endl;
 
-  exit(EXIT_SUCCESS);
+  std::exit(EXIT_SUCCESS);
 }
 
 int main(int, char**)

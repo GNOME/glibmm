@@ -15,10 +15,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <cstdlib>
 #include <iostream>
+
+#include <glibmm.h>
 
 using namespace std;
 
@@ -43,7 +46,7 @@ void ChildWatch::run()
   if(pid==0)
   {
     sleep(5);
-    exit(0);
+    std::exit(EXIT_SUCCESS);
   }
   
   std:: cout << "Child " << pid << " created" << std::endl;

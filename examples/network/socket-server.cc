@@ -1,6 +1,8 @@
+#include <cstdlib>
 #include <iostream>
-#include <giomm.h>
+
 #include <glibmm.h>
+#include <giomm.h>
 
 Glib::RefPtr<Glib::MainLoop> loop;
 
@@ -86,7 +88,7 @@ ensure_condition (const Glib::RefPtr<Gio::Socket>& socket,
         {
             std::cerr << Glib::ustring::compose("condition wait error for %1: %2\n",
                         where, error.what ());
-            exit (1);
+            std::exit (EXIT_FAILURE);
         }
     }
 }
