@@ -318,7 +318,7 @@ class ArrayHandler
 {
 public:
   typedef typename Tr::CType CType;
-  typedef typename Tr::CppType CppType;
+  typedef T CppType;
   typedef std::vector<CppType> VectorType;
   typedef typename Glib::Container_Helpers::ArrayKeeper<Tr> ArrayKeeperType;
   typedef typename Glib::Container_Helpers::ArrayIterator<Tr> ArrayIteratorType;
@@ -350,7 +350,7 @@ class ListHandler
 {
 public:
   typedef typename Tr::CType CType;
-  typedef typename Tr::CppType CppType;
+  typedef T CppType;
   typedef std::vector<CppType> VectorType;
   typedef typename Glib::Container_Helpers::GListKeeper<Tr> GListKeeperType;
   typedef typename Glib::Container_Helpers::ListIterator<Tr> ListIteratorType;
@@ -365,7 +365,7 @@ class SListHandler
 {
 public:
   typedef typename Tr::CType CType;
-  typedef typename Tr::CppType CppType;
+  typedef T CppType;
   typedef std::vector<CppType> VectorType;
   typedef typename Glib::Container_Helpers::GSListKeeper<Tr> GSListKeeperType;
   typedef typename Glib::Container_Helpers::SListIterator<Tr> SListIteratorType;
