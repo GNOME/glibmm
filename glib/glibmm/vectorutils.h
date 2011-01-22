@@ -48,6 +48,8 @@
  * Above cases are also simple - from given vector we create a C copy
  * of container and data, pass them to function and then, depending on ownership
  * transfer, we destroy nothing or container only or both container and data.
+ * But note that a) and b) cases are probably wrong by design, so we don't cover
+ * them here.
  *
  * Ad 3. Such functions are best wrapped by hand if we want to use a vector
  * here.
@@ -61,19 +63,19 @@ namespace Container_Helpers
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-// TODO: remove `2' from the function names after getting rid of *Handle
-// classes - krnowak
 // TODO: docs!
 
 /* Count the number of elements in a 0-terminated sequence.
  */
 template <class T> inline
-size_t compute_array_size2(const T* array)
+size_t compute_array_size (const T* array)
 {
-  const T* pend = array;
+  const T* pend (array);
 
-  while(*pend)
+  while (*pend)
+  {
     ++pend;
+  }
 
   return (pend - array);
 }
@@ -82,21 +84,21 @@ size_t compute_array_size2(const T* array)
  * specifies the number of elements in the input sequence.
  */
 template <class Tr>
-typename Tr::CType* create_array2(typename std::vector<typename Tr::CppType>::const_iterator pbegin, size_t size)
+typename Tr::CType* create_array (typename std::vector<typename Tr::CppType>::const_iterator pbegin, size_t size)
 {
   typedef typename Tr::CType CType;
 
-  CType *const array = static_cast<CType*>(g_malloc((size + 1) * sizeof(CType)));
-  CType *const array_end = array + size;
+  CType *const array (static_cast<CType*> (g_malloc((size + 1) * sizeof (CType))));
+  CType *const array_end (array + size);
 
-  for(CType* pdest = array; pdest != array_end; ++pdest)
+  for (CType* pdest (array); pdest != array_end; ++pdest)
   {
     // Use & to force a warning if the iterator returns a temporary object.
-    *pdest = Tr::to_c_type(*&*pbegin);
+    *pdest = Tr::to_c_type (*&*pbegin);
     ++pbegin;
   }
+  *array_end = CType ();
 
-  *array_end = CType();
   return array;
 }
 
@@ -110,16 +112,16 @@ gboolean* create_bool_array (std::vector<bool>::const_iterator pbegin,
  * This requires bidirectional iterators.
  */
 template <class Tr>
-GList* create_glist2(const typename std::vector<typename Tr::CppType>::const_iterator pbegin,
+GList* create_glist (const typename std::vector<typename Tr::CppType>::const_iterator pbegin,
                      typename std::vector<typename Tr::CppType>::const_iterator pend)
 {
-  GList* head = 0;
+  GList* head (0);
 
-  while(pend != pbegin)
+  while (pend != pbegin)
   {
     // Use & to force a warning if the iterator returns a temporary object.
-    const void *const item = Tr::to_c_type(*&*--pend);
-    head = g_list_prepend(head, const_cast<void*>(item));
+    const void *const item (Tr::to_c_type(*&*--pend));
+    head = g_list_prepend(head, const_cast<void*> (item));
   }
 
   return head;
@@ -129,16 +131,16 @@ GList* create_glist2(const typename std::vector<typename Tr::CppType>::const_ite
  * This requires bidirectional iterators.
  */
 template <class Tr>
-GSList* create_gslist2(const typename std::vector<typename Tr::CppType>::const_iterator pbegin,
+GSList* create_gslist (const typename std::vector<typename Tr::CppType>::const_iterator pbegin,
                        typename std::vector<typename Tr::CppType>::const_iterator pend)
 {
-  GSList* head = 0;
+  GSList* head (0);
 
-  while(pend != pbegin)
+  while (pend != pbegin)
   {
     // Use & to force a warning if the iterator returns a temporary object.
-    const void *const item = Tr::to_c_type(*&*--pend);
-    head = g_slist_prepend(head, const_cast<void*>(item));
+    const void *const item (Tr::to_c_type(*&*--pend));
+    head = g_slist_prepend (head, const_cast<void*> (item));
   }
 
   return head;
@@ -163,30 +165,29 @@ public:
   typedef value_type                        reference;
   typedef void                              pointer;
 
-  explicit inline ArrayIterator(const CType* pos);
+  explicit inline ArrayIterator (const CType* pos);
 
-  inline value_type operator*() const;
-  inline value_type operator[](difference_type offset) const;
+  inline value_type operator* () const;
+  inline value_type operator[] (difference_type offset) const;
 
-  inline ArrayIterator<Tr> &     operator++();
-  inline const ArrayIterator<Tr> operator++(int);
+  inline ArrayIterator<Tr> &     operator++ ();
+  inline const ArrayIterator<Tr> operator++ (int);
 
   // All this random access stuff is only there because STL algorithms
   // usually have optimized specializations for random access iterators,
   // and we don't want to give away efficiency for nothing.
-  //
-  inline ArrayIterator<Tr> &     operator+=(difference_type rhs);
-  inline ArrayIterator<Tr> &     operator-=(difference_type rhs);
+  inline ArrayIterator<Tr>&      operator+= (difference_type rhs);
+  inline ArrayIterator<Tr>&      operator-= (difference_type rhs);
   inline const ArrayIterator<Tr> operator+ (difference_type rhs) const;
   inline const ArrayIterator<Tr> operator- (difference_type rhs) const;
-  inline difference_type operator-(const ArrayIterator<Tr>& rhs) const;
+  inline difference_type operator- (const ArrayIterator<Tr>& rhs) const;
 
-  inline bool operator==(const ArrayIterator<Tr>& rhs) const;
-  inline bool operator!=(const ArrayIterator<Tr>& rhs) const;
+  inline bool operator== (const ArrayIterator<Tr>& rhs) const;
+  inline bool operator!= (const ArrayIterator<Tr>& rhs) const;
   inline bool operator< (const ArrayIterator<Tr>& rhs) const;
   inline bool operator> (const ArrayIterator<Tr>& rhs) const;
-  inline bool operator<=(const ArrayIterator<Tr>& rhs) const;
-  inline bool operator>=(const ArrayIterator<Tr>& rhs) const;
+  inline bool operator<= (const ArrayIterator<Tr>& rhs) const;
+  inline bool operator>= (const ArrayIterator<Tr>& rhs) const;
 
 private:
   const CType* pos_;
@@ -210,14 +211,14 @@ public:
   typedef value_type                  reference;
   typedef void                        pointer;
 
-  explicit inline ListIterator(const GList* node);
+  explicit inline ListIterator (const GList* node);
 
-  inline value_type                   operator*() const;
-  inline ListIterator<Tr>&            operator++();
-  inline const ListIterator<Tr>       operator++(int);
+  inline value_type                   operator* () const;
+  inline ListIterator<Tr>&            operator++ ();
+  inline const ListIterator<Tr>       operator++ (int);
 
-  inline bool operator==(const ListIterator<Tr>& rhs) const;
-  inline bool operator!=(const ListIterator<Tr>& rhs) const;
+  inline bool operator== (const ListIterator<Tr>& rhs) const;
+  inline bool operator!= (const ListIterator<Tr>& rhs) const;
 
 private:
   const GList* node_;
@@ -243,9 +244,9 @@ public:
 
   explicit inline SListIterator (const GSList* node);
 
-  inline value_type                   operator*() const;
-  inline SListIterator<Tr>&           operator++();
-  inline const SListIterator<Tr>      operator++(int);
+  inline value_type                   operator* () const;
+  inline SListIterator<Tr>&           operator++ ();
+  inline const SListIterator<Tr>      operator++ (int);
 
   inline bool operator== (const SListIterator<Tr>& rhs) const;
   inline bool operator!= (const SListIterator<Tr>& rhs) const;
@@ -265,7 +266,7 @@ public:
   inline ArrayKeeper (const ArrayKeeper& keeper);
   ~ArrayKeeper ();
 
-  inline CType* data() const;
+  inline CType* data () const;
 
 private:
   CType* array_;
@@ -284,7 +285,7 @@ public:
   inline GListKeeper (const GListKeeper& keeper);
   ~GListKeeper ();
 
-  inline GList* data() const;
+  inline GList* data () const;
 
 private:
   GList* glist_;
@@ -302,7 +303,7 @@ public:
   inline GSListKeeper (const GSListKeeper& keeper);
   ~GSListKeeper ();
 
-  inline GSList* data() const;
+  inline GSList* data () const;
 
 private:
   GSList* gslist_;
@@ -387,40 +388,40 @@ namespace Container_Helpers
 /**** Glib::Container_Helpers::ArrayIterator<> ***********************/
 
 template <class Tr> inline
-ArrayIterator<Tr>::ArrayIterator(const CType* pos)
+ArrayIterator<Tr>::ArrayIterator (const CType* pos)
 :
   pos_ (pos)
 {}
 
 template <class Tr> inline
-typename ArrayIterator<Tr>::value_type ArrayIterator<Tr>::operator*() const
+typename ArrayIterator<Tr>::value_type ArrayIterator<Tr>::operator* () const
 {
-  return Tr::to_cpp_type(*pos_);
+  return Tr::to_cpp_type (*pos_);
 }
 
 template <class Tr> inline
 typename ArrayIterator<Tr>::value_type
-ArrayIterator<Tr>::operator[](difference_type offset) const
+ArrayIterator<Tr>::operator[] (difference_type offset) const
 {
-  return Tr::to_cpp_type(pos_[offset]);
+  return Tr::to_cpp_type (pos_[offset]);
 }
 
 template <class Tr> inline
-ArrayIterator<Tr>& ArrayIterator<Tr>::operator++()
+ArrayIterator<Tr>& ArrayIterator<Tr>::operator++ ()
 {
   ++pos_;
   return *this;
 }
 
 template <class Tr> inline
-const ArrayIterator<Tr> ArrayIterator<Tr>::operator++(int)
+const ArrayIterator<Tr> ArrayIterator<Tr>::operator++ (int)
 {
-  return ArrayIterator<Tr>(pos_++);
+  return ArrayIterator<Tr> (pos_++);
 }
 
 template <class Tr> inline
 ArrayIterator<Tr>&
-ArrayIterator<Tr>::operator+=(typename ArrayIterator<Tr>::difference_type rhs)
+ArrayIterator<Tr>::operator+= (typename ArrayIterator<Tr>::difference_type rhs)
 {
   pos_ += rhs;
   return *this;
@@ -428,7 +429,7 @@ ArrayIterator<Tr>::operator+=(typename ArrayIterator<Tr>::difference_type rhs)
 
 template <class Tr> inline
 ArrayIterator<Tr>&
-ArrayIterator<Tr>::operator-=(typename ArrayIterator<Tr>::difference_type rhs)
+ArrayIterator<Tr>::operator-= (typename ArrayIterator<Tr>::difference_type rhs)
 {
   pos_ -= rhs;
   return *this;
@@ -436,57 +437,57 @@ ArrayIterator<Tr>::operator-=(typename ArrayIterator<Tr>::difference_type rhs)
 
 template <class Tr> inline
 const ArrayIterator<Tr>
-ArrayIterator<Tr>::operator+(typename ArrayIterator<Tr>::difference_type rhs) const
+ArrayIterator<Tr>::operator+ (typename ArrayIterator<Tr>::difference_type rhs) const
 {
-  return ArrayIterator<Tr>(pos_ + rhs);
+  return ArrayIterator<Tr> (pos_ + rhs);
 }
 
 template <class Tr> inline
 const ArrayIterator<Tr>
-ArrayIterator<Tr>::operator-(typename ArrayIterator<Tr>::difference_type rhs) const
+ArrayIterator<Tr>::operator- (typename ArrayIterator<Tr>::difference_type rhs) const
 {
-  return ArrayIterator<Tr>(pos_ - rhs);
+  return ArrayIterator<Tr> (pos_ - rhs);
 }
 
 template <class Tr> inline
 typename ArrayIterator<Tr>::difference_type
-ArrayIterator<Tr>::operator-(const ArrayIterator<Tr>& rhs) const
+ArrayIterator<Tr>::operator- (const ArrayIterator<Tr>& rhs) const
 {
   return (pos_ - rhs.pos_);
 }
 
 template <class Tr> inline
-bool ArrayIterator<Tr>::operator==(const ArrayIterator<Tr>& rhs) const
+bool ArrayIterator<Tr>::operator== (const ArrayIterator<Tr>& rhs) const
 {
   return (pos_ == rhs.pos_);
 }
 
 template <class Tr> inline
-bool ArrayIterator<Tr>::operator!=(const ArrayIterator<Tr>& rhs) const
+bool ArrayIterator<Tr>::operator!= (const ArrayIterator<Tr>& rhs) const
 {
   return (pos_ != rhs.pos_);
 }
 
 template <class Tr> inline
-bool ArrayIterator<Tr>::operator<(const ArrayIterator<Tr>& rhs) const
+bool ArrayIterator<Tr>::operator< (const ArrayIterator<Tr>& rhs) const
 {
   return (pos_ < rhs.pos_);
 }
 
 template <class Tr> inline
-bool ArrayIterator<Tr>::operator>(const ArrayIterator<Tr>& rhs) const
+bool ArrayIterator<Tr>::operator> (const ArrayIterator<Tr>& rhs) const
 {
   return (pos_ > rhs.pos_);
 }
 
 template <class Tr> inline
-bool ArrayIterator<Tr>::operator<=(const ArrayIterator<Tr>& rhs) const
+bool ArrayIterator<Tr>::operator<= (const ArrayIterator<Tr>& rhs) const
 {
   return (pos_ <= rhs.pos_);
 }
 
 template <class Tr> inline
-bool ArrayIterator<Tr>::operator>=(const ArrayIterator<Tr>& rhs) const
+bool ArrayIterator<Tr>::operator>= (const ArrayIterator<Tr>& rhs) const
 {
   return (pos_ >= rhs.pos_);
 }
@@ -494,26 +495,26 @@ bool ArrayIterator<Tr>::operator>=(const ArrayIterator<Tr>& rhs) const
 /**** Glib::Container_Helpers::ListIterator<> ************************/
 
 template <class Tr> inline
-ListIterator<Tr>::ListIterator(const GList* node)
+ListIterator<Tr>::ListIterator (const GList* node)
 :
   node_ (node)
 {}
 
 template <class Tr> inline
-typename ListIterator<Tr>::value_type ListIterator<Tr>::operator*() const
+typename ListIterator<Tr>::value_type ListIterator<Tr>::operator* () const
 {
-  return Tr::to_cpp_type(static_cast<typename Tr::CTypeNonConst>(node_->data));
+  return Tr::to_cpp_type (static_cast<typename Tr::CTypeNonConst> (node_->data));
 }
 
 template <class Tr> inline
-ListIterator<Tr>& ListIterator<Tr>::operator++()
+ListIterator<Tr>& ListIterator<Tr>::operator++ ()
 {
   node_ = node_->next;
   return *this;
 }
 
 template <class Tr> inline
-const ListIterator<Tr> ListIterator<Tr>::operator++(int)
+const ListIterator<Tr> ListIterator<Tr>::operator++ (int)
 {
   const ListIterator<Tr> tmp (*this);
   node_ = node_->next;
@@ -521,13 +522,13 @@ const ListIterator<Tr> ListIterator<Tr>::operator++(int)
 }
 
 template <class Tr> inline
-bool ListIterator<Tr>::operator==(const ListIterator<Tr>& rhs) const
+bool ListIterator<Tr>::operator== (const ListIterator<Tr>& rhs) const
 {
   return (node_ == rhs.node_);
 }
 
 template <class Tr> inline
-bool ListIterator<Tr>::operator!=(const ListIterator<Tr>& rhs) const
+bool ListIterator<Tr>::operator!= (const ListIterator<Tr>& rhs) const
 {
   return (node_ != rhs.node_);
 }
@@ -535,26 +536,26 @@ bool ListIterator<Tr>::operator!=(const ListIterator<Tr>& rhs) const
 /**** Glib::Container_Helpers::SListIterator<> ************************/
 
 template <class Tr> inline
-SListIterator<Tr>::SListIterator(const GSList* node)
+SListIterator<Tr>::SListIterator (const GSList* node)
 :
   node_ (node)
 {}
 
 template <class Tr> inline
-typename SListIterator<Tr>::value_type SListIterator<Tr>::operator*() const
+typename SListIterator<Tr>::value_type SListIterator<Tr>::operator* () const
 {
-  return Tr::to_cpp_type(static_cast<typename Tr::CTypeNonConst>(node_->data));
+  return Tr::to_cpp_type (static_cast<typename Tr::CTypeNonConst> (node_->data));
 }
 
 template <class Tr> inline
-SListIterator<Tr>& SListIterator<Tr>::operator++()
+SListIterator<Tr>& SListIterator<Tr>::operator++ ()
 {
   node_ = node_->next;
   return *this;
 }
 
 template <class Tr> inline
-const SListIterator<Tr> SListIterator<Tr>::operator++(int)
+const SListIterator<Tr> SListIterator<Tr>::operator++ (int)
 {
   const ListIterator<Tr> tmp (*this);
   node_ = node_->next;
@@ -562,13 +563,13 @@ const SListIterator<Tr> SListIterator<Tr>::operator++(int)
 }
 
 template <class Tr> inline
-bool SListIterator<Tr>::operator==(const SListIterator<Tr>& rhs) const
+bool SListIterator<Tr>::operator== (const SListIterator<Tr>& rhs) const
 {
   return (node_ == rhs.node_);
 }
 
 template <class Tr> inline
-bool SListIterator<Tr>::operator!=(const SListIterator<Tr>& rhs) const
+bool SListIterator<Tr>::operator!= (const SListIterator<Tr>& rhs) const
 {
   return (node_ != rhs.node_);
 }
@@ -640,6 +641,7 @@ template <typename Tr>
 GListKeeper<Tr>::~GListKeeper ()
 {
   typedef typename Tr::CTypeNonConst CTypeNonConst;
+
   if (glist_ && ownership_ != Glib::OWNERSHIP_NONE)
   {
     if (ownership_ != Glib::OWNERSHIP_SHALLOW)
@@ -726,14 +728,14 @@ template <typename T, class Tr>
 typename ArrayHandler<T, Tr>::VectorType
 ArrayHandler<T, Tr>::array_to_vector(const CType* array, Glib::OwnershipType ownership)
 {
-  return array_to_vector (array, Glib::Container_Helpers::compute_array_size2 (array), ownership);
+  return array_to_vector (array, Glib::Container_Helpers::compute_array_size (array), ownership);
 }
 
 template <typename T, class Tr>
 typename ArrayHandler<T, Tr>::ArrayKeeperType
 ArrayHandler<T, Tr>::vector_to_array (const VectorType& vector)
 {
-  return ArrayKeeperType (Glib::Container_Helpers::create_array2<Tr> (vector.begin (), vector.size ()), vector.size (), Glib::OWNERSHIP_SHALLOW);
+  return ArrayKeeperType (Glib::Container_Helpers::create_array<Tr> (vector.begin (), vector.size ()), vector.size (), Glib::OWNERSHIP_SHALLOW);
 }
 
 /**** Glib::ListHandler<> ************************/
@@ -758,7 +760,7 @@ template <typename T, class Tr>
 typename ListHandler<T, Tr>::GListKeeperType
 ListHandler<T, Tr>::vector_to_list (const VectorType& vector)
 {
-  return GListKeeperType (Glib::Container_Helpers::create_glist2<Tr> (vector.begin(), vector.end()), Glib::OWNERSHIP_SHALLOW);
+  return GListKeeperType (Glib::Container_Helpers::create_glist<Tr> (vector.begin(), vector.end()), Glib::OWNERSHIP_SHALLOW);
 }
 
 /**** Glib::SListHandler<> ************************/
@@ -783,7 +785,7 @@ template <typename T, class Tr>
 typename SListHandler<T, Tr>::GSListKeeperType
 SListHandler<T, Tr>::vector_to_slist (const VectorType& vector)
 {
-  return GSListKeeperType (Glib::Container_Helpers::create_gslist2<Tr> (vector.begin (), vector.end ()), Glib::OWNERSHIP_SHALLOW);
+  return GSListKeeperType (Glib::Container_Helpers::create_gslist<Tr> (vector.begin (), vector.end ()), Glib::OWNERSHIP_SHALLOW);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

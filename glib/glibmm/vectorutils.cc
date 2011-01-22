@@ -63,7 +63,7 @@ ArrayHandler<bool, Glib::Container_Helpers::TypeTraits<bool> >::array_to_vector 
 ArrayHandler<bool, Glib::Container_Helpers::TypeTraits<bool> >::VectorType
 ArrayHandler<bool, Glib::Container_Helpers::TypeTraits<bool> >::array_to_vector(const CType* array, Glib::OwnershipType ownership)
 {
-  return array_to_vector (array, Glib::Container_Helpers::compute_array_size2 (array), ownership);
+  return array_to_vector (array, Glib::Container_Helpers::compute_array_size (array), ownership);
 }
 
 ArrayHandler<bool, Glib::Container_Helpers::TypeTraits<bool> >::ArrayKeeperType
