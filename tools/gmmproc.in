@@ -28,28 +28,10 @@
 #
 # 'classes':
 # WrapParser: steps through .hg and .ccg files, outputting appropriate m4 code with Outputter.
-# Outputter: Used by WrapParser to ouput wrapper code. Ouputs *.g1 temp file and uses m4 to generate *.g2 from it. Then outputs .h and .cc files.
+# Outputter: Used by WrapParser to output wrapper code. Outputs *.g1 temp file and uses m4 to generate *.g2 from it. Then outputs .h and .cc files.
 # Function: Contains information about C and C++ functions and signals.
 #
 ######################################################################
-
-########################## 'main()' ##################################
-
-$main::procdir;
-$main::m4path;
-
-#BEGIN {
-#  # get prefix info from configure
-#  my $prefix = "@prefix@";
-#  my $exec_prefix = "@exec_prefix@";
-#  my $libdir = "@libdir@";
-
-#  # This line must match the install directory
-#  $main::procdir = $libdir . '/@GLIBMM_MODULE_NAME@/proc';
-#  $main::m4path = "@M4@";
-
-#  push(@INC, $main::procdir . '/pm');
-#}
 
 my $g_prefix = '@prefix@';
 my $g_exec_prefix = '@exec_prefix@';
@@ -61,107 +43,21 @@ push (@INC, $g_procdir . '/pm');
 
 use strict;
 use warnings;
-use GetOpt::Long qw(:config permute)
+use IO::File;
+use Getopt::Long qw(:config permute);
 
 require Output;
 require WrapParser;
 
-# initialize globals
-@main::macrodirs = ();
-$main::srcdir    = '.';
-$main::defsdir   = '.';
-$main::source    = '';
-$main::unwrapped = 1;
-$main::debug     = (exists $ENV{'GMMPROC_DEBUG'}) ? $ENV{'GMMPROC_DEBUG'} : '';
-
-my $glob_templates_a_r = [];
 
 # prototypes
-sub parse_command_line_args();
-sub print_help ();
-sub process_list_file ($);
+sub print_usage ();
+sub process_list_file ($$$);
 sub print_help ($);
-sub add_file_to_list ($);
+sub add_file_to_list ($$);
 sub main ();
 
 main ();
-
-#main()
-parse_command_line_args();
-
-my $objOutputter = &Output::new($main::m4path, \@main::macrodirs);
-my $objWrapParser = &WrapParser::new($objOutputter);
-
-$$objWrapParser{srcdir} = $main::srcdir;
-$$objWrapParser{defsdir} = $main::defsdir;
-$$objWrapParser{source} = $main::source;
-$$objOutputter{source} = $main::source;
-$$objOutputter{destdir} = $ARGV[1];
-
-# Merge the C docs, e.g. gtk_docs.xml
-
-# Suck the whole file into one big string, breaking it into tokens:
-$objWrapParser->read_file($main::srcdir, $main::source);
-
-# Parse output
-$objWrapParser->parse_and_build_output();
-
-# Write out *.g1 temporary file:
-$objOutputter->output_temp_g1($$objWrapParser{module}); # e.g. "gtk"
-
-# Execute m4 to get *.g2 file:
-{
-  my $exitcode = $objOutputter->make_g2_from_g1();
-  if ($exitcode)
-  {
-    $objOutputter->remove_temp_files() unless ($main::debug);
-
-    print STDERR "m4 failed with exit code $exitcode.  Aborting...\n";
-    exit($exitcode);
-  }
-}
-
-# Section out the resulting output
-$objOutputter->write_sections_to_files();
-$objOutputter->remove_temp_files() unless ($main::debug);
-
-#Warn about any unwrapped function/signals:
-if ($main::unwrapped)
-{
-  my @unwrapped = GtkDefs::get_unwrapped();
-  @unwrapped = grep { exists $$_{entity_type} } @unwrapped;
-
-  if (@unwrapped)
-  {
-    my @methods = grep { $$_{entity_type} eq 'method' and $$_{c_name} !~ m/^_/s } @unwrapped;
-    my @signals = grep { $$_{entity_type} eq 'signal' } @unwrapped;
-    # Don't take non-readable construct-only properties into account.
-    my @properties = grep { $$_{entity_type} eq 'property' and ( $$_{readable} or not $$_{construct_only} ) } @unwrapped;
-
-    local $, = "\ngmmproc:   ";
-    local $\ = "\n";
-
-    if (@methods)
-    {
-      print STDERR ('gmmproc: Unwrapped functions:',
-                    map($$_{c_name}, @methods));
-    }
-    if (@properties)
-    {
-      print STDERR ('gmmproc: Unwrapped properties:',
-                    map($$_{class} . '::' . $$_{name}, @properties));
-    }
-    if (@signals)
-    {
-      print STDERR ('gmmproc: Unwrapped signals:',
-                    map($$_{class} . '::' . $$_{name}, @signals));
-    }
-  }
-}
-
-# end of program
-exit;
-
 
 ####################################################################
 
@@ -194,7 +90,7 @@ Options:
   --unwrapped          Warn about possible unwrapped functions.
 
   -d dir
-  --defs dir           Change the directory to search for defs.
+  --defs dir           Specify the directory with defs files.
 
   -I dir
   --include dir        Specify the directory with m4 files.
@@ -208,160 +104,112 @@ explicitly as a param or both.
 EOF
 }
 
-# void parse_command_line_args()
-sub parse_command_line_args()
-{
-  GetOptions
-  print_usage() if ($#ARGV == -1);
- 
-  while ($#ARGV != -1)
-  {
-    $_ = shift @ARGV;
-
-    if (/^-/)
-    {
-      print_usage() if ( /^--help/);
-      print_usage() if ( /^-h/);
-      if (/^-I/)
-      {
-        push @main::macrodirs, shift @ARGV;
-      }
-      elsif (/^--unwrapped/)
-      {
-        $main::unwrapped = 1;
-      }
-      elsif (/^--defs/)
-      {
-        $main::defsdir = shift @ARGV;
-      }
-      elsif (/^--debug/)
-      {
-        $main::debug = 1;
-      }
-      else
-      {
-        print "unknown parameter $_\n";
-      }
-      next;
-    }
-
-    last;
-  }
-
-  # we already have one argument
-
-  if ($#ARGV != 1)
-  {
-    print STDERR ('Invalid number of arguments (', $#ARGV + 2, ")\n");
-    print_usage();
-  }
-
-  $main::srcdir = $ARGV[0];
-  $main::source = $_;
-
-  push @main::macrodirs, $main::procdir . '/m4';
-}
-
 sub print_help ($)
 {
   print_usage ();
   exit (0);
 }
 
-main ()
+sub main ()
 {
-  my $source_dir = '\\';
-  my $destination_dir = '\\';
+  my $source_dir = '';
+  my $destination_dir = '';
   my $unwrapped = 0;
-  my $defs = '';
+  my $defs_a_r = [];
   my $includes_a_r = [];
+  my $templates_a_r = [];
   my $debug = (exists $ENV{'GMMPROC_DEBUG'}) ? $ENV{'GMMPROC_DEBUG'} : 0;
   my $opt_parse_result = GetOptions ('help|h' => \&print_help,
                                      'source|s=s' => \$source_dir,
                                      'destination|d=s' => \$destination_dir,
-                                     'list|l=s' => \&process_list_file,
+                                     'list|l=s' => sub { process_list_file ($templates_a_r, shift, shift) },
                                      'unwrapped|u' => \$unwrapped,
-                                     'defs|d=s' => \$defs,
+                                     'defs|d=s@' => \$defs_a_r,
                                      'include|I=s@' => \$includes_a_r,
                                      'debug|g' => \$debug,
-                                     '<>' => \&add_file_to_list
+                                     '<>' => sub { add_file_to_list ($templates_a_r, shift); }
                                     );
 
-  if (not $opt_parse_result or $source_dir eq '\\' or $destination_dir eq '\\'
-      or @{$glob_template_list_a_r} < 1)
+  if (not $opt_parse_result or $source_dir eq '' or $destination_dir eq ''
+      or @{$templates_a_r} < 1 or @{$defs_a_r} < 1)
   {
     print_usage ();
     exit (1);
   }
   push (@{$includes_a_r}, $g_procdir . '/m4');
 
-  my $templates_a_r = $glob_template_list_a_r;
   my $objOutputter = &Output::new($g_m4path, $includes_a_r);
   my $objWrapParser = &WrapParser::new($objOutputter);
 
-  $$objWrapParser{srcdir} = $main::srcdir;
-  $$objWrapParser{defsdir} = $main::defsdir;
-  $$objWrapParser{source} = $main::source;
-  $$objOutputter{source} = $main::source;
-  $$objOutputter{destdir} = $ARGV[1];
+  $$objWrapParser{srcdir} = $source_dir;
+  $$objWrapParser{defsdir} = $defs_a_r->[0];
+  $$objOutputter{destdir} = $destination_dir;
 
-  # Merge the C docs, e.g. gtk_docs.xml
-
-  # Suck the whole file into one big string, breaking it into tokens:
-  $objWrapParser->read_file($main::srcdir, $main::source);
-
-  # Parse output
-  $objWrapParser->parse_and_build_output();
-
-  # Write out *.g1 temporary file:
-  $objOutputter->output_temp_g1($$objWrapParser{module}); # e.g. "gtk"
-
-  # Execute m4 to get *.g2 file:
+  for my $template (@{$templates_a_r})
   {
-    my $exitcode = $objOutputter->make_g2_from_g1();
-    if ($exitcode)
-    {
-      $objOutputter->remove_temp_files() unless ($main::debug);
+    print join ('', 'Processing ', $template, "...\n");
+    $$objWrapParser{source} = $template;
+    $$objOutputter{source} = $template;
 
-      print STDERR "m4 failed with exit code $exitcode.  Aborting...\n";
-      exit($exitcode);
+    # Merge the C docs, e.g. gtk_docs.xml
+
+    # Suck the whole file into one big string, breaking it into tokens:
+    $objWrapParser->read_file($source_dir, $template);
+
+    # Parse output
+    $objWrapParser->parse_and_build_output();
+
+    # Write out *.g1 temporary file:
+    $objOutputter->output_temp_g1($$objWrapParser{module}); # e.g. "gtk"
+
+    # Execute m4 to get *.g2 file:
+    {
+      my $exitcode = $objOutputter->make_g2_from_g1();
+
+      if ($exitcode)
+      {
+        $objOutputter->remove_temp_files() unless ($debug);
+
+        print STDERR "m4 failed with exit code $exitcode.  Aborting...\n";
+        exit($exitcode);
+      }
     }
-  }
 
-  # Section out the resulting output
-  $objOutputter->write_sections_to_files();
-  $objOutputter->remove_temp_files() unless ($main::debug);
+    # Section out the resulting output
+    $objOutputter->write_sections_to_files();
+    $objOutputter->remove_temp_files() unless ($debug);
 
-  #Warn about any unwrapped function/signals:
-  if ($main::unwrapped)
-  {
-    my @unwrapped = GtkDefs::get_unwrapped();
-    @unwrapped = grep { exists $$_{entity_type} } @unwrapped;
-
-    if (@unwrapped)
+    #Warn about any unwrapped function/signals:
+    if ($unwrapped)
     {
-      my @methods = grep { $$_{entity_type} eq 'method' and $$_{c_name} !~ m/^_/s } @unwrapped;
-      my @signals = grep { $$_{entity_type} eq 'signal' } @unwrapped;
-      # Don't take non-readable construct-only properties into account.
-      my @properties = grep { $$_{entity_type} eq 'property' and ( $$_{readable} or not $$_{construct_only} ) } @unwrapped;
+      my @unwrapped = GtkDefs::get_unwrapped();
+      @unwrapped = grep { exists $$_{entity_type} } @unwrapped;
 
-      local $, = "\ngmmproc:   ";
-      local $\ = "\n";
+      if (@unwrapped)
+      {
+        my @methods = grep { $$_{entity_type} eq 'method' and $$_{c_name} !~ m/^_/s } @unwrapped;
+        my @signals = grep { $$_{entity_type} eq 'signal' } @unwrapped;
+        # Don't take non-readable construct-only properties into account.
+        my @properties = grep { $$_{entity_type} eq 'property' and ( $$_{readable} or not $$_{construct_only} ) } @unwrapped;
 
-      if (@methods)
-      {
-        print STDERR ('gmmproc: Unwrapped functions:',
-                      map($$_{c_name}, @methods));
-      }
-      if (@properties)
-      {
-        print STDERR ('gmmproc: Unwrapped properties:',
-                      map($$_{class} . '::' . $$_{name}, @properties));
-      }
-      if (@signals)
-      {
-        print STDERR ('gmmproc: Unwrapped signals:',
-                      map($$_{class} . '::' . $$_{name}, @signals));
+        local $, = "\ngmmproc:   ";
+        local $\ = "\n";
+
+        if (@methods)
+        {
+          print STDERR ('gmmproc: Unwrapped functions:',
+                        map($$_{c_name}, @methods));
+        }
+        if (@properties)
+        {
+          print STDERR ('gmmproc: Unwrapped properties:',
+                        map($$_{class} . '::' . $$_{name}, @properties));
+        }
+        if (@signals)
+        {
+          print STDERR ('gmmproc: Unwrapped signals:',
+                        map($$_{class} . '::' . $$_{name}, @signals));
+        }
       }
     }
   }
@@ -369,8 +217,10 @@ main ()
   exit 0;
 }
 
-sub process_list_file ($)
+sub process_list_file ($$$)
 {
+  my $templates_a_r = shift;
+  my $option = shift;
   my $path = shift;
   my $file = IO::File->new ($path, 'r');
 
@@ -394,12 +244,15 @@ sub process_list_file ($)
     $line =~ s/^\s*(\S*)\s*$/$1/g;
     if ($line)
     {
-      push (@{$glob_templates_a_r}, $line);
+      push (@{$templates_a_r}, $line);
     }
   }
 }
 
-sub add_file_to_list ($)
+sub add_file_to_list ($$)
 {
-  push (@{$glob_templates_a_r}, shift);
+  my $templates_a_r = shift;
+  my $file = shift;
+
+  push (@{$templates_a_r}, $file);
 }
