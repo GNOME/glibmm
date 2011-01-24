@@ -132,6 +132,7 @@
 #include <glibmm/variant.h>
 #include <glibmm/variantiter.h>
 #include <glibmm/varianttype.h>
+#include <glibmm/vectorutils.h>
 #include <glibmm/wrap.h>
 
 #endif /* _GLIBMM_H */
