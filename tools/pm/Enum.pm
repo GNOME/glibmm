@@ -3,21 +3,6 @@ package Enum;
 use strict;
 use warnings;
 
-BEGIN {
-     use Exporter   ();
-     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-
-     # set the version for version checking
-     $VERSION     = 1.00;
-     @ISA         = qw(Exporter);
-     @EXPORT      = ( );
-     %EXPORT_TAGS = ( );
-     # your exported package globals go here,
-     # as well as any optionally exported functions
-     @EXPORT_OK   = ( );
-     }
-our @EXPORT_OK;
-
 # class Enum
 #    {
 #       bool flags;
@@ -132,8 +117,23 @@ sub split_enum_tokens($)
 # end of private functions.
 #
 
-sub new
+sub new ($$)
 {
+  my $type = shift;
+  my $token = shift;
+  my $class = ref ($type) or $type or "Enum";
+  my $self =
+  {
+    $g_i_p => $include_paths_a_r,
+    $g_e => {},
+    $g_o => {},
+    $g_m => {},
+    $g_s => {},
+    $g_p => {},
+    $g_a_r_f => {}
+  };
+
+  return bless ($self, $class);
   my ($def) = @_;
   my $self = {};
   bless $self;

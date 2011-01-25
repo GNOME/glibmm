@@ -4,19 +4,20 @@
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or 
+# the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-# GNU General Public License for more details. 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
 package GtkDefs;
+
 use strict;
 use warnings;
 
@@ -42,23 +43,6 @@ use FunctionBase;
 #    $ lookup_signal(object, c_name)
 #
 
-BEGIN {
-     use Exporter   ();
-     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-
-     # set the version for version checking
-     $VERSION     = 1.00;
-
-     @ISA         = qw(Exporter);
-     @EXPORT      = ( );
-     %EXPORT_TAGS = ( );
-
-     # your exported package globals go here,
-#    # as well as any optionally exported functions
-     @EXPORT_OK   = ( );
-}
-our @EXPORT_OK;
-
 #####################################
 
 use strict;
@@ -66,111 +50,14 @@ use warnings;
 
 #####################################
 
-%GtkDefs::enums = (); #Enum
-%GtkDefs::objects = (); #Object
-%GtkDefs::methods = (); #GtkDefs::Function
-%GtkDefs::signals = (); #GtkDefs::Signal
-%GtkDefs::properties = (); #Property
-
-@GtkDefs::read = ();
-@GtkDefs::file = ();
-
-
-#####################################
-#prototype to get rid of warning
-sub read_defs($$;$);
-
-sub read_defs($$;$)
-{
-  my ($path, $filename, $restrict) = @_;
-  $restrict = "" if ($#_ < 2);
-
-  # check that the file is there.
-  if ( ! -r "$path/$filename")
-  {
-     print "Error: can't read defs file $filename\n";
-     return;
-  }
-
-  # break the tokens into lisp phrases up to three levels deep.
-  #   WARNING: reading the following perl statement may induce seizures,
-  #   please flush eyes with water immediately, and consult a mortician.
-  #
-  # this regexp is weak - it does not work on multiple and/or unpaired parens
-  # inside double quotes - those shouldn't be ever considered. i replaced this
-  # splitting with my own function, which does the job very well - krnowak.
-#  my @tokens = split(
-#    m/(
-#        \(
-#        (?:
-#            [^()]*
-#            \(
-#            (?:
-#                [^()]*
-#                \(
-#                [^()]*
-#                \)
-#            )*
-#            [^()]*
-#            \)
-#        )*
-#        [^()]*
-#        \)
-#    )/x,
-#    read_file($path, $filename));
-
-  my @tokens = split_tokens(read_file($path, $filename));
-
-  # scan through top level tokens
-  while ($#tokens > -1)
-  {
-    my $token = shift @tokens;
-    next if ($token =~ /^\s*$/);
-
-    if ($token =~ /\(include (\S+)\)/)
-    {
-      read_defs($path,$1,$restrict);
-      next;
-    }
-    elsif ($token =~ /^\(define-flags-extended.*\)$/)
-    { on_enum($token); }
-    elsif ($token =~ /^\(define-enum-extended.*\)$/)
-    { on_enum($token); }
-    elsif ($token =~ /^\(define-flags.*\)$/)
-    { }
-    elsif ($token =~ /^\(define-enum.*\)$/)
-    { }
-    elsif ($token =~ /^\(define-object.*\)$/)
-    { on_object($token); }
-    elsif ($token =~ /^\(define-function.*\)$/)
-    { on_function($token); }
-    elsif ($token =~ /^\(define-method.*\)$/)
-    { on_method($token); }
-    elsif ($token =~ /^\(define-property.*\)$/)
-    { on_property($token); }
-    elsif ($token =~ /^\(define-signal.*\)$/)
-    { on_signal($token);  }
-    elsif ($token =~ /^\(define-vfunc.*\)$/)
-    { on_vfunc($token); }
-    else
-    {
-      if ( $token =~ /^\(define-(\S+) (\S+)/)
-      {
-        # FIXME need to figure out the line number.
-        print STDERR "Broken lisp definition for $1 $2.\n";
-      }
-      else
-      {
-        print "unknown token $token \n";
-      }
-    }
-  }
-}
+# token description members
+my $g_l_n = 'line_number';
+my $g_t = 'token';
 
 sub split_tokens($)
 {
-  my ($token_string) = @_;
-  my @tokens = ();
+  my $token_string = shift;
+  my $tokens_a_r = [];
   # whether we are inside double quotes.
   my $inside_dquotes = 0;
   # whether we are inside double and then single quotes (for situations like
@@ -178,18 +65,27 @@ sub split_tokens($)
   my $inside_squotes = 0;
   # number of yet unpaired opening parens.
   my $parens = 0;
-  my $len = length($token_string);
+  # length of token string
+  my $len = length ($token_string);
   # whether previous char was a backslash - important only when being between
   # double quotes.
   my $backslash = 0;
   # index of first opening paren - beginning of a new token.
   my $begin_token = 0;
+  # current line number
+  my $line_number = 1;
+  # current token line number
+  my $token_line_number = 1;
 
-  for (my $index = 0; $index < $len; $index++)
+  for (my $index = 0; $index < $len; ++$index)
   {
-    my $char = substr($token_string, $index, 1);
+    my $char = substr ($token_string, $index, 1);
     # if we are inside double quotes.
-    if ($inside_dquotes)
+    if ($char eq "\n")
+    {
+      ++$line_number;
+    }
+    elsif ($inside_dquotes)
     {
       # if prevous char was backslash, then current char is not important -
       # we are still inside double or double/single quotes anyway.
@@ -226,7 +122,7 @@ sub split_tokens($)
         else
         {
           # if there is closing quotes near, it is 2a.
-          if (substr($token_string, $index, 4) =~ /^'\\?.'/)
+          if (substr ($token_string, $index, 4) =~ /^'\\?.'/)
           {
             $inside_squotes = 1;
           }
@@ -245,6 +141,7 @@ sub split_tokens($)
       unless ($parens)
       {
         $begin_token = $index;
+        $token_line_number = $line_number;
       }
       $parens++;
     }
@@ -256,140 +153,275 @@ sub split_tokens($)
       unless ($parens)
       {
         my $token_len = $index + 1 - $begin_token;
-        my $token = substr($token_string, $begin_token, $token_len);
-        push(@tokens, $token);
+        my $token = substr ($token_string, $begin_token, $token_len);
+
+        $token =~ s/\s+/ /g;
+        push (@{$tokens_a_r}, { $g_l_n => $token_line_number, $g_t => $token });
       }
     }
     # do nothing on other chars.
   }
-  return @tokens;
+  return $tokens_a_r;
 }
 
-sub read_file($$)
+sub read_file($)
 {
-  my ($path, $filename)=@_;
+  my $file = shift;
+  my $fd = IO::File->new ($file, 'r');
   my @buf = ();
 
-  # don't read a file twice
-  foreach (@GtkDefs::read)
+  while my $line (<$fd>)
   {
-    return "" if ($_ eq "$path/$filename");
+     $line =~ s/^;.*$//; # remove comments
+     push (@buf, $line);
   }
-  push @GtkDefs::read, "$path/$filename";
+  $fd->close ();
 
-  # read file while stripping comments
-  open(FILE, "$path/$filename");
-  while (<FILE>)
+  my $contents = join('', @buf);
+
+  # simplify multiple tabs and spaces into one space, but preserve newlines.
+  $contents =~ s/[\ \t\r\f]+/ /g;
+  return $contents;
+}
+
+# member names
+my $g_i_p = 'include_paths';
+my $g_e = 'enums';
+my $g_o = 'objects';
+my $g_m = 'methods';
+my $g_s = 'signals';
+my $g_p = 'properties';
+my $g_a_r_f = 'already_read_files';
+
+sub new ($$)
+{
+  my $type = shift;
+  my $include_paths_a_r = shift;
+  my $class = ref ($type) or $type or "GtkDefs";
+  my $self =
   {
-     s/^;.*$//;  # remove comments
-     chop;      # remove new lines
-     push(@buf, $_);
+    $g_i_p => $include_paths_a_r,
+    $g_e => {},
+    $g_o => {},
+    $g_m => {},
+    $g_s => {},
+    $g_p => {},
+    $g_a_r_f => {}
+  };
+
+  return bless ($self, $class);
+}
+
+sub read_defs ($$)
+{
+  my ($self, $file) = @_;
+  my $real_path = '';
+  
+  for my $path (@{$self->{$g_i_p}})
+  {
+    my $temp_path = join ('/', $path, $file);
+
+    if (-r $temp_path)
+    {
+      $real_path = $temp_path;
+      last;
+    }
   }
-  close(FILE);
+  unless ($real_path)
+  {
+    print STDERR join (' ', 'Could not find file', $file, 'in paths:', join (':', @{$self->{$g_i_p}}), "\n");
+    exit 1;
+  }
 
-  $_ = join("", @buf);
-  s/\s+/ /g;
-  return $_;
+  if (exists ($self->{$g_a_r_f}{$real_path}))
+  {
+    return;
+  }
+  ${self}->{$g_a_r_f}{$real_path} = 1;
+
+  my $tokens_a_r = split_tokens (read_file ($real_path));
+
+  # scan through top level tokens
+  for my $token_description (@{tokens_a_r})
+  {
+    my $token = $tokendescription->{ $g_t };
+
+    next if ($token =~ /^\s*$/);
+
+    if ($token =~ /\(include (\S+)\)/)
+    {
+      $self->read_defs ($path);
+      next;
+    }
+    elsif ($token =~ /^\(define-flags-extended.*\)$/)
+    { $self->on_enum ($token); }
+    elsif ($token =~ /^\(define-enum-extended.*\)$/)
+    { $self->on_enum ($token); }
+    elsif ($token =~ /^\(define-flags.*\)$/)
+    { }
+    elsif ($token =~ /^\(define-enum.*\)$/)
+    { }
+    elsif ($token =~ /^\(define-object.*\)$/)
+    { $self->on_object ($token); }
+    elsif ($token =~ /^\(define-function.*\)$/)
+    { $self->on_function ($token); }
+    elsif ($token =~ /^\(define-method.*\)$/)
+    { $self->on_method ($token); }
+    elsif ($token =~ /^\(define-property.*\)$/)
+    { $self->on_property ($token); }
+    elsif ($token =~ /^\(define-signal.*\)$/)
+    { $self->on_signal ($token);  }
+    elsif ($token =~ /^\(define-vfunc.*\)$/)
+    { $self->on_vfunc ($token); }
+    else
+    {
+      my $line_number = $token_description->{$g_l_n};
+
+      if ( $token =~ /^\(define-(\S+) (\S+)/)
+      {
+        print STDERR join (' ', 'Unknown lisp definition for', $1, $2, 'at line:' $line_number, "\n");
+      }
+      else
+      {
+        print STDERR join ('', 'Unknown token at line: ', $line_number, "\n", $token, "\n");
+      }
+    }
+  }
 }
 
 
-sub on_enum($)
+sub on_enum ($$)
 {
-  my $thing = Enum::new(shift(@_));
-  $GtkDefs::enums{$$thing{c_type}} = $thing;
+  my $self = shift;
+  my $token = shift;
+  my $thing = Enum->new ($token);
+
+  $self->{$g_e}{$thing->get_c_type ()} = $thing;
+
+#  $GtkDefs::enums{$$thing{c_type}} = $thing;
 }
 
-sub on_object($)
+sub on_object ($$)
 {
-  my $thing = Object::new(shift(@_));
-  $GtkDefs::objects{$$thing{c_name}} = $thing;
+  my $self = shift;
+  my $token = shift;
+  my $thing = Object->new ($token);
+
+  $self->{$g_o}{$thing->get_c_name ()} = $thing;
+
+#  $GtkDefs::objects{$$thing{c_name}} = $thing;
 }
 
-sub on_function($)
+sub on_function ($$)
 {
-  my $thing = GtkDefs::Function::new(shift(@_));
-  $GtkDefs::methods{$$thing{c_name}} = $thing;
+  my $self = shift;
+  my $token = shift;
+  my $thing = GtkDefs::Function->new ($token));
+
+  $self->{$g_m}{$thing->get_c_name ()} = $thing;
 }
 
-sub on_method($)
+sub on_method ($$)
 {
-  my $thing = GtkDefs::Function::new(shift(@_));
-  $GtkDefs::methods{$$thing{c_name}} = $thing if ($thing);
+  my $self = shift;
+  my $token = shift;
+  my $thing = GtkDefs::Function->new ($token);
+
+  $self->{$g_m}{$thing->get_c_name ()} = $thing if ($thing);
 }
 
-sub on_property($)
+sub on_property ($$)
 {
-  my $thing = Property::new(shift(@_));
-  $GtkDefs::properties{"$$thing{class}::$$thing{name}"} = $thing;
+  my $self = shift;
+  my $token = shift;
+  my $thing = Property->new ($token);
+
+  $self->{$g_p}{join ('::', $thing->get_class (), $thing->get_name ())} = $thing;
 }
 
-sub on_signal($)
+sub on_signal ($$)
 {
-  my $thing = GtkDefs::Signal::new(shift(@_));
-  $GtkDefs::signals{"$$thing{class}::$$thing{name}"} = $thing;
+  my $self = shift;
+  my $token = shift;
+  my $thing = GtkDefs::Signal->new ($token);
+
+  $self->{$g_s}{join ('::', $thing->get_class (), $thing->get_name ())} = $thing;
 }
 
-sub on_vfunc($)
+sub on_vfunc ($$)
 {
-  my $thing = GtkDefs::Signal::new(shift(@_));
-  $GtkDefs::signals{"$$thing{class}::$$thing{name}"} = $thing;
+  my $self = shift;
+  my $token = shift;
+  my $thing = GtkDefs::Signal->new ($token);
+
+  $self->{$g_s}{join ('::', $thing->get_class (), $thing->get_name ())} = $thing;
 }
 
 ##########################
 
-sub get_enums
+sub get_enums ($)
 {
-  return sort {$$a{c_type} cmp $$b{c_type}} values %GtkDefs::enums;
+  my $self = shift;
+
+  return sort {$a->get_c_type () cmp $b->get_c_type ()} values %{$self->{$g_e}};
 }
-sub get_methods
+sub get_methods ($)
 {
-  return sort {$$a{c_name} cmp $$b{c_name}} values %GtkDefs::methods;
+  my $self = shift;
+
+  return sort {$a->get_c_name () cmp $b->get_c_name ()} values %{$self->{$g_m}};
 }
-sub get_signals
+sub get_signals ($)
 {
-  return sort {$$a{name} cmp $$b{name}} values %GtkDefs::signals;
+  my $self = shift;
+
+  return sort {$a->get_name () cmp $b->get_name ()} values %{$self->{$g_s}};
 }
-sub get_properties
+sub get_properties ($)
 {
-  return sort {$$a{name} cmp $$b{name}} values %GtkDefs::properties;
+  my $self = shift;
+
+  return sort {$a->get_name() cmp $b->get_name ()} values %{$self->{$g_p}};
 }
 
-sub get_marked
+sub get_marked ($)
 {
-  no warnings;
-  return grep {$$_{mark}==1} values %GtkDefs::methods; 
+  my $self = shift;
+
+  return grep {$$_->is_marked () == 1} values %{$self->{$g_m}};
 }
 
 # This searches for items wrapped by this file and then tries to locate
 # other functions/signal/properties which may have been left unmarked.
-sub get_unwrapped
+sub get_unwrapped ($)
 {
+  my $self = shift;
   # find methods which were used in for a _WRAP
   my @targets;
-  push @targets,grep {$$_{entity_type} eq "method" && $$_{mark}==1} values %GtkDefs::methods;
-  push @targets,grep {$$_{mark}==1} values %GtkDefs::signals;
-  push @targets,grep {$$_{mark}==1} values %GtkDefs::properties;
+
+  push @targets, grep {$_->get_entity_type () eq 'method' && $_->is_marked () == 1} values %{$self->{$g_m}};
+  push @targets, grep {$_->is_marked () == 1} values %{$self->{$g_s}};
+  push @targets, grep {$_->is_marked () == 1} values %{$self->{$g_p}};
 
   # find the classes which used them.
-  my @classes = join(" ", unique(map { $$_{class} } @targets));
-
+  my @classes = join (" ", unique (map { $_->get_class ()} @targets));
   # find methods which are in those classes which didn't get marked.
-  my @unwrapped;
-  my $class;
-  foreach $class (@classes)
+  my @unwrapped = ();
+
+  for my $class (@classes)
   {
     # if this class's parent is defined then don't put its properties as unwrapped.
     # this may not work if parent is from other library (GtkApplication's parent
     # is GApplication, so all its properties will be marked as unwrapped)
     my $detailed = 0;
     my $parent = undef;
-    if (exists $GtkDefs::objects{$class})
+    if (exists ($self->{$g_o}{$class}))
     {
-      my $object = $GtkDefs::objects{$class};
+      my $object = $self->{$g_o}{$class};
 
       if (defined $object)
       {
-        $parent = $object->{parent};
+        $parent = $object->get_parent ();
 
         # may be empty for some classes deriving a GInterface?
         if ($parent)
@@ -400,18 +432,18 @@ sub get_unwrapped
     }
     if ($detailed)
     {
-      push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0 && not exists $GtkDefs::properties{$parent . '::' . $_->{name}}} values %GtkDefs::properties;
+      push @unwrapped, grep {$_->get_class () eq $class and $_->is_marked () == 0 and not exists $self->{$g_p}{$parent . '::' . $_->get_name ()}} values %{$self->{$g_p}};
     }
     else
     {
-      push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::properties;
+      push @unwrapped, grep {$_->get_class () eq $class and $_->is_marked () == 0} values %{$self->{$g_p}};
     }
 
-    push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::methods;
-    push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::signals;
+    push @unwrapped, grep {$_->get_class () eq $class and $_->is_marked () == 0} values %{$self->{$g_m}};
+    push @unwrapped, grep {$_->get_class () eq $class and $_->is_marked () == 0} values %{$self->{$g_s}};
   }
 
-  return @unwrapped;
+  return \@unwrapped;
 }
 
 ##########################
@@ -429,18 +461,18 @@ sub lookup_enum($)
 sub lookup_object($)
 {
   no warnings;
-  
+
   my $c_name = $_[0];
   my $result = $GtkDefs::objects{$c_name};
-  
+
   if (not defined($result))
   {
-    # We do not print this error because it's not always an error, 
+    # We do not print this error because it's not always an error,
     # because the caller will often try several object names,
     # while guessing an object name prefix from a function name.
     #
     # print "GtkDefs:lookup_object(): can't find object with name=" . $c_name . "\n";
-    
+
     # debug output:
     # foreach my $key (keys %GtkDefs::objects)
     # {
@@ -509,14 +541,15 @@ sub error
 
 ########################################################################
 package GtkDefs::Function;
-BEGIN { @GtkDefs::Function::ISA=qw(FunctionBase); }
+
+@GtkDefs::Function::ISA = qw (FunctionBase);
 
 #  class Function : FunctionBase
 #
 #    {
 #       string name; e.g. gtk_accelerator_valid
 #       string c_name;
-#       string class e.g. GtkButton 
+#       string class e.g. GtkButton
 #
 #       string rettype;
 #       string array param_types;
@@ -582,7 +615,7 @@ sub new
   {
     #Ignore them.
   }
-  
+
   # of-object
   if ($def =~ s/\(of-object "(\S+)"\)//)
   {

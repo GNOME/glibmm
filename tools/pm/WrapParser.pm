@@ -4,13 +4,13 @@
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or 
+# the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-# GNU General Public License for more details. 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
@@ -69,6 +69,8 @@ sub new($)
   $$self{module} = ""; #e.g. "gtkmm"
 
   $$self{type} = "GTKOBJECT"; # or "BOXEDTYPE", or "GOBJECT" - wrapped differently.
+
+  $$self{already_read} = {};
 
   return $self;
 }
@@ -189,7 +191,7 @@ sub extract_token($)
 
     return $_;
    }
-     
+
   return "";
 }
 
@@ -428,7 +430,7 @@ sub on_namespace($)
   my $token;
   my $arg;
 
-  # we need to peek ahead to figure out what type of namespace 
+  # we need to peek ahead to figure out what type of namespace
   # declaration this is.
   while ( $number <= $#tokens )
   {
@@ -502,7 +504,7 @@ sub on_class($$)
   $$self{in_class} = $$self{level};
 
   #Remember the type of wrapper required, so that we can append the correct _END_CLASS_* macro later.
-  { 
+  {
     my $str = $class_command;
     $str =~ s/^_CLASS_//;
     $$self{type} = $str;
@@ -519,7 +521,7 @@ sub on_class($$)
   my @back;
   push(@back, $class_command);
   push(@back, "($str)");
-  
+
   # When we hit _CLASS, we walk backwards through the output to find "class"
   my $token;
   while ( scalar(@{$$objOutputter{out}}))
@@ -560,6 +562,14 @@ sub on_defs($)
   my ($module, $defsfile) = split(/,/, $str); #e.g. _DEFS(gtkmm,gtk), where gtkmm is the module name, and gtk is the defs file name.
   $module = trim($module);
   $defsfile = trim($defsfile);
+  my $already_parsed = $$self{already_read};
+
+  if (exists ($already_parsed->{$defsfile}))
+  {
+    print join ('', $defsfile, '.defs already parsed.', "\n");
+    return;
+  }
+  $already_parsed->{$defsfile} = 1;
 
   # $$self{section} = $section;  #Save it so that we can reuse it in read_defs_included.
   $$self{module} = $module; #Use it later in call to output_temp_g1().
@@ -622,7 +632,7 @@ sub on_end_class($)
 
 
 ########################################
-###  
+###
 # void on_end_namespace($)
 sub on_end_namespace($)
 {
@@ -691,7 +701,7 @@ sub string_split_commas($)
       $level-- if ($t eq ")");
 
       # skip , inside functions  Ie.  void (*)(int,int)
-      if ( ($t eq ",") && !$level) 
+      if ( ($t eq ",") && !$level)
         {
           push(@out, $str);
           $str="";
@@ -1057,7 +1067,7 @@ sub on_wrap_ctor($)
 sub on_implements_interface($$)
 {
   my ($self) = @_;
-  
+
   if( !($self->check_for_eof()) )
   {
    return;
@@ -1073,7 +1083,7 @@ sub on_implements_interface($$)
   my $interface = $args[0];
 
   # Extra stuff needed?
-  my $ifdef; 
+  my $ifdef;
   while($#args >= 1) # If the optional ref/err/deprecated arguments are there.
   {
   	my $argRef = string_trim(pop @args);
@@ -1084,7 +1094,7 @@ sub on_implements_interface($$)
   }
   my $objOutputter = $$self{objOutputter};
   $objOutputter->output_implements_interface($interface, $ifdef);	
-} 
+}
 
 sub on_wrap_create($)
 {
@@ -1124,7 +1134,7 @@ sub on_wrap_signal($$)
   my $bCustomCCallback = 0;
   my $bRefreturn = 0;
   my $ifdef;
-  
+
   while($#args >= 2) # If optional arguments are there.
   {
     my $argRef = string_trim(pop @args);
@@ -1147,7 +1157,7 @@ sub on_wrap_signal($$)
     {
       $bRefreturn = 1;
     }
-    
+
   	elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
     	$ifdef = $1;
@@ -1256,7 +1266,7 @@ sub on_wrap_property($)
   $argPropertyName = string_unquote($argPropertyName);
 
   #Convert the property name to a canonical form, as it is inside gobject.
-  #Otherwise, gobject might not recognise the name, 
+  #Otherwise, gobject might not recognise the name,
   #and we will not recognise the property name when we get notification that the value changes.
   $argPropertyName =~ tr/_/-/;
 
@@ -1295,7 +1305,7 @@ sub output_wrap_check($$$$$$)
 sub output_wrap_signal($$$$$$$$$)
 {
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous) = @_;
-  
+
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $signal_name,
                                       $filename, $line_num, "_WRAP_SIGNAL"));
@@ -1317,10 +1327,10 @@ sub output_wrap_signal($$$$$$$$$)
     $objCSignal = GtkDefs::lookup_signal($$self{c_class}, $signal_name);
 
     # Check for failed lookup.
-    if($objCSignal eq 0) 
+    if($objCSignal eq 0)
     {
     print STDERR "$signal_name\n";
-      $objOutputter->output_wrap_failed($signal_name, 
+      $objOutputter->output_wrap_failed($signal_name,
         " signal defs lookup failed");
       return;
     }
@@ -1382,18 +1392,18 @@ sub output_wrap_vfunc($$$$$$$$)
 }
 
 # give some sort of weights to sorting attibutes
-sub byattrib() 
+sub byattrib()
 {
   my %attrib_value = (
      "virtual_impl" ,1,
      "virtual_decl" ,2,
      # "sig_impl"     ,3,
-     "sig_decl"     ,4, 
+     "sig_decl"     ,4,
      "meth"         ,5
   );
- 
+
   # $a and $b are hidden parameters to a sorting function
-  return $attrib_value{$b} <=> $attrib_value{$a}; 
+  return $attrib_value{$b} <=> $attrib_value{$a};
 }
 
 
