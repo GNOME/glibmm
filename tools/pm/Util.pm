@@ -22,25 +22,9 @@
 # request them by module name.
 #
 package Util;
+
 use strict;
 use warnings;
-
-BEGIN {
-     use Exporter   ();
-     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-
-     # set the version for version checking
-     $VERSION     = 1.00;
-     @ISA         = qw(Exporter);
-     @EXPORT      = qw(&string_unquote &string_trim &string_canonical
-                       &trace &unique);
-     %EXPORT_TAGS = ( );
-
-     # your exported package globals go here,
-     # as well as any optionally exported functions
-     #@EXPORT_OK   = qw($Var1 %Hashit &func3);
-     }
-our @EXPORT_OK;
 
 
 #$ string_unquote($string)
@@ -75,6 +59,7 @@ sub string_canonical($)
   return $_;
 }
 
+# TODO: is this function used anywhere?
 #
 #  Back tracing utility.  
 #    Prints the call stack.

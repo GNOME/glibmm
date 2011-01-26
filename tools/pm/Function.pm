@@ -3,22 +3,7 @@ package Function;
 use strict;
 use warnings;
 use Util;
-use FunctionBase;
-
-BEGIN {
-     use Exporter   ();
-     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-
-     # set the version for version checking
-     $VERSION     = 1.00;
-     @ISA         = qw(FunctionBase);
-     @EXPORT      = qw(&func1 &func2 &func4);
-     %EXPORT_TAGS = ( );
-     # your exported package globals go here,
-     # as well as any optionally exported functions
-     @EXPORT_OK   = qw($Var1 %Hashit &func3);
-     }
-our @EXPORT_OK;
+use base qw (FunctionBase);
 
 ##################################################
 ### Function
@@ -40,6 +25,15 @@ our @EXPORT_OK;
 #       string class e.g. GtkButton ( == of-object. Useful for signal because their names are not unique.
 #       string entity_type. e.g. method or signal
 #    }
+
+sub new ($)
+{
+  my $type = shift;
+  my $class = ref ($type) or $type or "Function";
+  my $self = $class->SUPER->new ();
+
+  $self->{}
+}
 
 sub new_empty()
 {
@@ -169,7 +163,7 @@ sub parse_param($$)
   my $param_default_values = $$self{param_default_values};
 
   # clean up space and handle empty case
-  $line = string_trim($line);
+  $line = Util::string_trim($line);
   $line =~ s/\s+/ /g; # Compress whitespace.
   return if ($line =~ /^$/);
 
@@ -220,7 +214,7 @@ sub parse_param($$)
         $name = sprintf("p%s", $#$param_types + 2)
       }
 
-      $type = string_trim($type);
+      $type = Util::string_trim($type);
 
       push(@$param_types, $type);
       push(@$param_names, $name);
@@ -272,7 +266,7 @@ sub parse_param($$)
     $name = sprintf("p%s", $#$param_types + 2)
   }
 
-  $type = string_trim($type);
+  $type = Util::string_trim($type);
 
   push(@$param_types, $type);
   push(@$param_names, $name);
@@ -293,7 +287,7 @@ sub add_parameter_autoname($$)
 sub add_parameter($$$)
 {
   my ($self, $type, $name) = @_;
-  $type = string_unquote($type);
+  $type = Util::string_unquote($type);
   $type =~ s/-/ /g;
 
   my $param_names = $$self{param_names};

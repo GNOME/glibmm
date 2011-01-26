@@ -404,7 +404,7 @@ sub get_unwrapped ($)
   push @targets, grep {$_->is_marked () == 1} values %{$self->{$g_p}};
 
   # find the classes which used them.
-  my @classes = join (" ", unique (map { $_->get_class ()} @targets));
+  my @classes = join (" ", Util::unique (map { $_->get_class ()} @targets));
   # find methods which are in those classes which didn't get marked.
   my @unwrapped = ();
 

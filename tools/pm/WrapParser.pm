@@ -441,7 +441,7 @@ sub on_namespace($)
 
     if ($token eq '{')
     {
-      $arg = string_trim($arg);
+      $arg = Util::string_trim($arg);
 
       if ($$self{first_namespace})
       {
@@ -482,8 +482,8 @@ sub on_ignore_signal($)
 {
   my ($self) = @_;
   my $str = $self->extract_bracketed_text();
-  $str = string_trim($str);
-  $str = string_unquote($str);
+  $str = Util::string_trim($str);
+  $str = Util::string_unquote($str);
   my @args = split(/\s+|,/,$str);
   foreach (@args)
   {
@@ -512,8 +512,8 @@ sub on_class($$)
 
   my $str = $self->extract_bracketed_text();
   my ($class, $c_class) = split(',',$str);
-  $class = string_trim($class);
-  $c_class = string_trim($c_class);
+  $class = Util::string_trim($class);
+  $c_class = Util::string_trim($c_class);
 
   $$self{class} = $class;
   $$self{c_class} = $c_class;
@@ -884,7 +884,7 @@ sub on_wrap_method($)
   # handle second argument:
 
   my $argCFunctionName = $args[1];
-  $argCFunctionName = string_trim($argCFunctionName);
+  $argCFunctionName = Util::string_trim($argCFunctionName);
 
   #Get the c function's details:
 
@@ -907,7 +907,7 @@ sub on_wrap_method($)
   my $ifdef;
   while($#args >= 2) # If the optional ref/err/deprecated arguments are there.
   {
-    my $argRef = string_trim(pop @args);
+    my $argRef = Util::string_trim(pop @args);
     #print "debug arg=$argRef\n";
     if($argRef eq "refreturn")
     {
@@ -927,7 +927,7 @@ sub on_wrap_method($)
 
       if($1 ne "")
       {
-        $deprecation_docs = string_unquote(string_trim($1));
+        $deprecation_docs = Util::string_unquote(Util::string_trim($1));
       }
     }
     elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
@@ -974,7 +974,7 @@ sub on_wrap_method_docs_only($)
 
   # handle first argument
   my $argCFunctionName = $args[0];
-  $argCFunctionName = string_trim($argCFunctionName);
+  $argCFunctionName = Util::string_trim($argCFunctionName);
 
   # Get the C function's details:
 
@@ -994,7 +994,7 @@ sub on_wrap_method_docs_only($)
   # Extra ref needed?
   while($#args >= 1) # If the optional ref/err arguments are there.
   {
-    my $argRef = string_trim(pop @args);
+    my $argRef = Util::string_trim(pop @args);
     if($argRef eq "errthrow")
     {
       $$objCfunc{throw_any_errors} = 1;
@@ -1048,7 +1048,7 @@ sub on_wrap_ctor($)
   # handle second argument:
 
   my $argCFunctionName = $args[1];
-  $argCFunctionName = string_trim($argCFunctionName);
+  $argCFunctionName = Util::string_trim($argCFunctionName);
 
   #Get the C function's details:
   if ($argCFunctionName =~ m/^\S+$/s)
@@ -1086,10 +1086,10 @@ sub on_implements_interface($$)
   my $ifdef;
   while($#args >= 1) # If the optional ref/err/deprecated arguments are there.
   {
-  	my $argRef = string_trim(pop @args);
+    my $argRef = Util::string_trim(pop @args);
     if($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
-    	$ifdef = $1;
+      $ifdef = $1;
     }
   }
   my $objOutputter = $$self{objOutputter};
@@ -1126,8 +1126,8 @@ sub on_wrap_signal($$)
   #Get the arguments:
   my $argCppDecl = $args[0];
   my $argCName = $args[1];
-  $argCName = string_trim($argCName);
-  $argCName = string_unquote($argCName);
+  $argCName = Util::string_trim($argCName);
+  $argCName = Util::string_unquote($argCName);
 
   my $bCustomDefaultHandler = 0;
   my $bNoDefaultHandler = 0;
@@ -1137,7 +1137,7 @@ sub on_wrap_signal($$)
 
   while($#args >= 2) # If optional arguments are there.
   {
-    my $argRef = string_trim(pop @args);
+    my $argRef = Util::string_trim(pop @args);
     if($argRef eq "custom_default_handler")
     {
       $bCustomDefaultHandler = 1;
@@ -1184,8 +1184,8 @@ sub on_wrap_vfunc($)
   #Get the arguments:
   my $argCppDecl = $args[0];
   my $argCName = $args[1];
-  $argCName = string_trim($argCName);
-  $argCName = string_unquote($argCName);
+  $argCName = Util::string_trim($argCName);
+  $argCName = Util::string_unquote($argCName);
 
   my $refreturn = 0;
   my $refreturn_ctype = 0;
@@ -1194,7 +1194,7 @@ sub on_wrap_vfunc($)
   # Extra ref needed?
   while($#args >= 2) # If the optional ref/err arguments are there.
   {
-    my $argRef = string_trim(pop @args);
+    my $argRef = Util::string_trim(pop @args);
 
     if($argRef eq "refreturn")
       { $refreturn = 1; }
@@ -1222,8 +1222,8 @@ sub on_wrap_enum($)
   # get the arguments
   my @args = string_split_commas($self->extract_bracketed_text());
 
-  my $cpp_type = string_trim(shift(@args));
-  my $c_type   = string_trim(shift(@args));
+  my $cpp_type = Util::string_trim(shift(@args));
+  my $c_type   = Util::string_trim(shift(@args));
 
   # The remaining elements in @args could be flags or s#^FOO_## substitutions.
 
@@ -1240,9 +1240,9 @@ sub on_wrap_gerror($)
   # get the arguments
   my @args = string_split_commas($self->extract_bracketed_text());
 
-  my $cpp_type = string_trim(shift(@args));
-  my $c_enum   = string_trim(shift(@args));
-  my $domain   = string_trim(shift(@args));
+  my $cpp_type = Util::string_trim(shift(@args));
+  my $c_enum   = Util::string_trim(shift(@args));
+  my $domain   = Util::string_trim(shift(@args));
 
   # The remaining elements in @args could be flags or s#^FOO_## substitutions.
 
@@ -1262,8 +1262,8 @@ sub on_wrap_property($)
 
   #Get the arguments:
   my $argPropertyName = $args[0];
-  $argPropertyName = string_trim($argPropertyName);
-  $argPropertyName = string_unquote($argPropertyName);
+  $argPropertyName = Util::string_trim($argPropertyName);
+  $argPropertyName = Util::string_unquote($argPropertyName);
 
   #Convert the property name to a canonical form, as it is inside gobject.
   #Otherwise, gobject might not recognise the name,
@@ -1271,8 +1271,8 @@ sub on_wrap_property($)
   $argPropertyName =~ tr/_/-/;
 
   my $argCppType = $args[1];
-  $argCppType = string_trim($argCppType);
-  $argCppType = string_unquote($argCppType);
+  $argCppType = Util::string_trim($argCppType);
+  $argCppType = Util::string_unquote($argCppType);
 
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};

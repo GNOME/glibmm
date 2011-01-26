@@ -4,74 +4,92 @@ use strict;
 use warnings;
 use Util;
 
-BEGIN {
-     use Exporter   ();
-     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-
-     # set the version for version checking
-     $VERSION     = 1.00;
-     @ISA         = qw(Exporter);
-     @EXPORT      = qw(&func1 &func2 &func4);
-     %EXPORT_TAGS = ( );
-     # your exported package globals go here,
-     # as well as any optionally exported functions
-     @EXPORT_OK   = qw($Var1 %Hashit &func3);
-     }
-our @EXPORT_OK;
-
 ##################################################
 ### FunctionBase
 # Contains data and methods used by both Function (C++ declarations) and GtkDefs::Function (C defs descriptions)
 # Note that GtkDefs::Signal inherits from GtkDefs::Function so it get these methods too.
 #
-#  class Function : FunctionBase
+#  class FunctionBase
 #    {
 #       string array param_types;
 #       string array param_names;
-#       string array param_documentation;
-#       string return_documention;
 #    }
 
+my $g_p_t = 'param_types';
+my $g_p_n = 'param_names';
+
+sub new ($)
+{
+  my $type = shift;
+  my $class = ref ($type) or $type or "FunctionBase";
+  my $self =
+  {
+    $g_p_t => [];
+    $g_p_n => [];
+  };
+
+  bless ($self, $class);
+  return $self;
+}
+
+sub get_param_types ($)
+{
+  my $self = shift;
+
+  return $self->{$g_p_t};
+}
+
+sub set_param_types ($$)
+{
+  my $self = shift;
+  my $param_types = shift;
+
+  $self->{$g_p_t} = shift;
+}
+
+sub get_param_names ($)
+{
+  my $self = shift;
+
+  return $self->{$g_p_n};
+}
+
+sub set_param_names ($$)
+{
+  my $self = shift;
+  my $param_names = shift;
+
+  $self->{$g_p_n} = shift;
+}
 
 # $string args_types_only($)
 # comma-delimited argument types.
 sub args_types_only($)
 {
-  my ($self) = @_;
+  my $self = shift;
 
-  my $param_types = $$self{param_types};
-  return join(", ", @$param_types);
+  return join(", ", @{$self->{$g_p_t}});
 }
 
 # $string args_names_only($)
 sub args_names_only($)
 {
-  my ($self) = @_;
+  my $self = shift;
 
-  my $param_names = $$self{param_names};
-  return join(", ", @$param_names);
+  return join(", ", @{$self->{$g_p_n}});
 }
 
 # $string args_types_and_names($)
 sub args_types_and_names($)
 {
-  my ($self) = @_;
-
-  my $i;
-
-  my $param_names = $$self{param_names};
-  my $param_types = $$self{param_types};
+  my $self = shift;
+  my $param_types = $self->{$g_p_t};
+  my $param_names = $self->{$g_p_n};
   my @out;
 
-  #debugging:
-  #if($#$param_types)
-  #{
-  #  return "NOARGS";
-  #}
-
-  for ($i = 0; $i < $#$param_types + 1; $i++)
+  for (my $i = 0; $i < @{$param_types}; ++$i)
   {
-    my $str = sprintf("%s %s", $$param_types[$i], $$param_names[$i]);
+    my $str = $param_typessprintf("%s %s", $$param_types[$i], $$param_names[$i]);
     push(@out, $str);
   }
 
@@ -79,10 +97,11 @@ sub args_types_and_names($)
   return $result;
 }
 
+# TODO: is it used anywhere?
 # $string args_names_only_without_object($)
 sub args_names_only_without_object2($)
 {
-  my ($self) = @_;
+  my $self = shift;
 
   my $param_names = $$self{param_names};
 
@@ -111,7 +130,7 @@ sub args_names_only_without_object2($)
 # $string args_types_and_names_without_object($)
 sub args_types_and_names_without_object($)
 {
-  my ($self) = @_;
+  my $self = shift;
 
   my $param_names = $$self{param_names};
   my $param_types = $$self{param_types};
@@ -126,11 +145,11 @@ sub args_types_and_names_without_object($)
 
   return join(", ", @out);
 }
-
+# TODO: is it used anywhere?
 # $string args_names_only_without_object($)
 sub args_names_only_without_object($)
 {
-  my ($self) = @_;
+  my $self = shift;
 
   my $param_names = $$self{param_names};
 
@@ -158,7 +177,7 @@ sub args_names_only_without_object($)
 
 sub dump($)
 {
-  my ($self) = @_;
+  my $self = shift;
 
   my $param_types = $$self{param_types};
   my $param_names = $$self{param_names};
@@ -186,7 +205,7 @@ sub dump($)
 
 sub args_types_and_names_with_default_values($)
 {
-  my ($self) = @_;
+  my $self = shift;
 
   my $i;
 
