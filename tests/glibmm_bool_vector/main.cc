@@ -21,27 +21,27 @@
 
 #include <glibmm.h>
 
-const unsigned int magic_limit (5);
+const unsigned int magic_limit(5);
 
 void
-setup_rand ()
+setup_rand()
 {
-  static bool setup (false);
+  static bool setup(false);
 
-  if (!setup)
+  if(!setup)
   {
     setup = true;
-    std::srand (std::time (0));
+    std::srand(std::time(0));
   }
 }
 
 gboolean*
-c_get_bool_array ()
+c_get_bool_array()
 {
-  gboolean* array (static_cast<gboolean*> (g_malloc ((magic_limit + 1) * sizeof (gboolean))));
+  gboolean* array(static_cast<gboolean*>(g_malloc((magic_limit + 1) * sizeof(gboolean))));
 
-  setup_rand ();
-  for (unsigned int iter (0); iter < magic_limit; ++iter)
+  setup_rand();
+  for(unsigned int iter(0); iter < magic_limit; ++iter)
   {
     array[iter] = std::rand() % 2 ? TRUE : FALSE;
   }
@@ -50,33 +50,33 @@ c_get_bool_array ()
 }
 
 void
-c_print_bool_array (gboolean* array)
+c_print_bool_array(gboolean* array)
 {
-  for (unsigned int iter (0); iter < magic_limit; ++iter)
+  for(unsigned int iter(0); iter < magic_limit; ++iter)
   {
-    std::cout << iter << ": " << (array[iter] ? "TRUE" : "FALSE") << "\n";
+    std::cout << iter << ": " <<(array[iter] ? "TRUE" : "FALSE") << "\n";
   }
 }
 
 std::vector<bool>
-cxx_get_bool_array ()
+cxx_get_bool_array()
 {
-  return Glib::ArrayHandler<bool>::array_to_vector (c_get_bool_array (), magic_limit, Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<bool>::array_to_vector(c_get_bool_array(), magic_limit, Glib::OWNERSHIP_SHALLOW);
 }
 
 void
-cxx_print_bool_array (const std::vector<bool>& v)
+cxx_print_bool_array(const std::vector<bool>& v)
 {
-  c_print_bool_array (const_cast<gboolean*> (Glib::ArrayHandler<bool>::vector_to_array (v).data ()));
+  c_print_bool_array(const_cast<gboolean*>(Glib::ArrayHandler<bool>::vector_to_array(v).data()));
 }
 
 int main(int, char**)
 {
   Glib::init();
 
-  std::vector<bool> va (cxx_get_bool_array ());
+  std::vector<bool> va(cxx_get_bool_array());
 
-  cxx_print_bool_array (va);
+  cxx_print_bool_array(va);
 
   return 0;
 }
