@@ -119,8 +119,6 @@ struct SListSourceTraits<Tr,const Cont[N]> : SListSourceTraits<Tr,Cont[N]>
 
 /**
  * @ingroup ContHelpers
- * If a method takes this as an argument, or has this as a return type, then you can use a standard
- * container such as std::list or std::vector.
  */
 template <class Tr>
 class SListHandleIterator
@@ -151,7 +149,13 @@ private:
 } // namespace Container_Helpers
 
 
-/**
+//TODO: Remove this when we can break glibmm API.
+/** This is an intermediate type. When a method takes this, or returns this, you
+ * should use a standard C++ container of your choice, such as std::list or 
+ * std::vector.
+ *
+ * However, this is not used in new API. We now prefer to just use std::vector, 
+ * which is less flexibile, but makes the API clearer.
  * @ingroup ContHandles
  */
 template < class T, class Tr = Glib::Container_Helpers::TypeTraits<T> >

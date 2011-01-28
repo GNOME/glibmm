@@ -178,8 +178,13 @@ private:
 } // namespace Container_Helpers
 
 
-/** If a method takes this as an argument, or has this as a return type, then you can use a standard
- * container such as std::list or std::vector.
+/** This is an intermediate type. When a method takes this, or returns this, you
+ * should use a standard C++ container of your choice, such as std::list or 
+ * std::vector.
+ *
+ * However, this is not used in new API. We now prefer to just use std::vector, 
+ * which is less flexibile, but makes the API clearer.
+ *
  * @ingroup ContHandles
  */
 template < class T, class Tr = Glib::Container_Helpers::TypeTraits<T> >
@@ -234,8 +239,14 @@ private:
   ArrayHandle<T, Tr>& operator=(const ArrayHandle<T,Tr>&);
 };
 
+//TODO: Remove this when we can break glibmm API.
 /** If a method takes this as an argument, or has this as a return type, then you can use a standard
  * container such as std::list<Glib::ustring> or std::vector<Glib::ustring>.
+ *
+ *
+ * However, this is not used in new API. We now prefer to just use std::vector, 
+ * which is less flexibile, but makes the API clearer.
+ *
  * @ingroup ContHandles
  */
 typedef ArrayHandle<Glib::ustring> StringArrayHandle;
