@@ -149,9 +149,6 @@ GSList* create_gslist(const typename std::vector<typename Tr::CppType>::const_it
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 
-/**
- * @ingroup ContHelpers
- */
 template <class Tr>
 class ArrayIterator
 {
@@ -193,11 +190,6 @@ private:
   const CType* pos_;
 };
 
-/**
- * @ingroup ContHelpers
- * If a method takes this as an argument, or has this as a return type, then you can use a standard
- * container such as std::list or std::vector.
- */
 template <class Tr>
 class ListIterator
 {
@@ -224,11 +216,6 @@ private:
   const GList* node_;
 };
 
-/**
- * @ingroup ContHelpers
- * If a method takes this as an argument, or has this as a return type, then you can use a standard
- * container such as std::list or std::vector.
- */
 template <class Tr>
 class SListIterator
 {
@@ -312,8 +299,21 @@ private:
 
 } // namespace Container_Helpers
 
-// a struct instead of templated functions because standard template arguments
-// for function templates is a C++0x feature...
+// Note that this is a struct instead of templated functions because standard template arguments
+// for function templates is a C++0x feature.
+/** A utility for converting between std::vector and plain C arrays.
+ * This would normally only be used by glibmm or gtkmm itself, or similar 
+ * libraries that wrap C APIs.
+ *
+ * For instance:
+ * @code
+ * std::vector<TimeCoord> vec = Glib::ArrayHandler<TimeCoord, TimeCoordPtrTraits>::array_to_vector(array, array_size, Glib::OWNERSHIP_DEEP);
+ * @endcode
+ * or
+ * @code
+ * const char** array = Glib::ArrayHandler<Glib::ustring>::vector_to_array(vec).data ();
+ * @endcode
+ */
 template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T> >
 class ArrayHandler
 {
@@ -346,6 +346,19 @@ public:
   static ArrayKeeperType vector_to_array(const VectorType& vector);
 };
 
+/** A utility for converting between std::vector and GList.
+ * This would normally only be used by glibmm or gtkmm itself, or similar 
+ * libraries that wrap C APIs.
+ *
+ * For instance:
+ * @code
+ * Glib::ListHandler< Glib::RefPtr<Window> >::list_to_vector(gdk_window_get_children(gobj()), Glib::OWNERSHIP_SHALLOW);
+ * @endcode
+ * or
+ * @code
+ * GList* glist = Glib::ListHandler<Glib::RefPtr<Gdk::Pixbuf> >::vector_to_list(pixbufs).data();
+ * @endcode
+ */
 template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T> >
 class ListHandler
 {
@@ -361,6 +374,19 @@ public:
   static GListKeeperType vector_to_list(const VectorType& vector);
 };
 
+/** A utility for converting between std::vector and GSList.
+ * This would normally only be used by glibmm or gtkmm itself, or similar 
+ * libraries that wrap C APIs.
+ *
+ * For instance:
+ * @code
+ * std::vector< Glib::RefPtr<Display> > vec =  Glib::SListHandler<Glib::RefPtr<Display> >::slist_to_vector(gdk_display_manager_list_displays(gobj()), Glib::OWNERSHIP_SHALLOW);
+ * @endcode
+ * or
+ * @code
+ * GSList* gslist = Glib::SListHandler< Glib::RefPtr<Display> >::vector_to_slist(vec).data();
+ * @endcode
+ */
 template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T> >
 class SListHandler
 {
