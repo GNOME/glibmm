@@ -41,12 +41,25 @@ sub string_unquote($)
          
 # $ string_trim($string)
 # Removes leading and trailing white space.
-sub string_trim($)
+sub string_trim ($)
 {
   ($_) = @_;
   s/^\s+//;
   s/\s+$//;
   return $_;
+}
+
+# Removes leading and trailing white spaces and replaces all whitespace groups
+# into single spaces.
+sub string_simplify ($)
+{
+  my $str = shift;
+
+  $str =~ s/^\s+//;
+  $str =~ s/\s+$//;
+  $str =~ s/\s+/ /;
+
+  return $str;
 }
 
 #  $ string_canonical($string)

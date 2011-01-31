@@ -1445,4 +1445,4 @@ sub on_wrap_corba_method($)
 }
 
 
-1; # return package loaded okay.
+1; # indicate proper module load.

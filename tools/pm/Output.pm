@@ -642,7 +642,7 @@ sub make_g2_from_g1($)
   my ($self) = @_;
 
   # Execute m4 to get *.g2 file:
-  system("$$self{m4path} $$self{m4args} \"$$self{tmpdir}/gtkmmproc_$$.g1\" > \"$$self{tmpdir}/gtkmmproc_$$.g2\"");
+  system("$$self{m4path} $$self{m4args} \"$$self{tmpdir}/gtkmmproc_$$.g1\" > \"$$self{tmpdir}/gtkmmproc_$$.g2\""); #"
   return ($? >> 8);
 }
 
@@ -703,8 +703,8 @@ sub remove_temp_files($)
 {
   my ($self) = @_;
 
-  system("rm -f \"$$self{tmpdir}/gtkmmproc_$$.g1\"");
-  system("rm -f \"$$self{tmpdir}/gtkmmproc_$$.g2\"");
+  system("rm -f \"$$self{tmpdir}/gtkmmproc_$$.g1\"");#"
+  system("rm -f \"$$self{tmpdir}/gtkmmproc_$$.g2\"");#"
 }
 
 
