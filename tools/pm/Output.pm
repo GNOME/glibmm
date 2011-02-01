@@ -138,51 +138,58 @@ sub output_wrap_vfunc_h($$$$$$)
 # _VFUNC_CC(signame,gtkname,rettype,crettype,`<cppargs>',`<cargs>')
 sub output_wrap_vfunc_cc($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $ifdef) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objCFunc,
+      $custom_vfunc, $custom_vfunc_callback, $ifdef) = @_;
 
-  my $cname = $$objDefsSignal{name};
+  my $cname = $$objCFunc{name};
 
   # e.g. Gtk::Button::draw_indicator:
 
   #Use a different macro for Interfaces, to generate an extra convenience method.
 
-  my $refreturn = "";
-  $refreturn = "refreturn" if($$objCppfunc{rettype_needs_ref});
+  if ($custom_vfunc eq 0)
+  {
+    my $refreturn = "";
+    $refreturn = "refreturn" if($$objCppfunc{rettype_needs_ref});
 
-  my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
-    $$objCppfunc{name},
-    $cname,
-    $$objCppfunc{rettype},
-    $$objDefsSignal{rettype},
-    $objCppfunc->args_types_and_names(),
-    convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num), #$objCppfunc->args_names_only(),
-    $objCppfunc->get_is_const(),
-    $refreturn,
-    $ifdef);
+    my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
+      $$objCppfunc{name},
+      $cname,
+      $$objCppfunc{rettype},
+      $$objCFunc{rettype},
+      $objCppfunc->args_types_and_names(),
+      convert_args_cpp_to_c($objCppfunc, $objCFunc, 0, $line_num), #$objCppfunc->args_names_only(),
+      $objCppfunc->get_is_const(),
+      $refreturn,
+      $ifdef);
 
-  $self->append($str);
+    $self->append($str);
+  }
 
   # e.g. Gtk::ButtonClass::draw_indicator():
 
-  my $refreturn_ctype = "";
-  $refreturn_ctype = "refreturn_ctype" if($$objDefsSignal{rettype_needs_ref});
+  if ($custom_vfunc_callback eq 0)
+  {
+    my $refreturn_ctype = "";
+    $refreturn_ctype = "refreturn_ctype" if($$objCFunc{rettype_needs_ref});
 
-  my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s)dnl\n",
-    $$objCppfunc{name},
-    $cname,
-    $$objCppfunc{rettype},
-    $$objDefsSignal{rettype},
-    $objDefsSignal->args_types_and_names(),
-    $objDefsSignal->args_names_only(),
-    convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num),
-    ${$objDefsSignal->get_param_names()}[0],
-    $refreturn_ctype,
-    $ifdef);
+    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s)dnl\n",
+      $$objCppfunc{name},
+      $cname,
+      $$objCppfunc{rettype},
+      $$objCFunc{rettype},
+      $objCFunc->args_types_and_names(),
+      $objCFunc->args_names_only(),
+      convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num),
+      ${$objCFunc->get_param_names()}[0],
+      $refreturn_ctype,
+      $ifdef);
 
-  $self->append($str);
+    $self->append($str);
+  }
 }
 
-### Convert _WRAP to a virtual
+### Convert _WRAP to a signal
 # _SIGNAL_H(signame,rettype, ifdef, `<cppargs>')
 # _SIGNAL_PH(gtkname,crettype, ifdef, cargs and names)
 # void output_wrap_default_signal_handler_h($filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef. @args)

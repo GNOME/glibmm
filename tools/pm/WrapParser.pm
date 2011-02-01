@@ -1154,8 +1154,9 @@ sub on_wrap_signal($$)
     }
   }
 
-
-  $self->output_wrap_signal( $argCppDecl, $argCName, $$self{filename}, $$self{line_num}, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous);
+  $self->output_wrap_signal($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
+                            $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback,
+                            $bRefreturn, $ifdef, $merge_doxycomment_with_previous);
 }
 
 # void on_wrap_vfunc()
@@ -1179,25 +1180,40 @@ sub on_wrap_vfunc($)
 
   my $refreturn = 0;
   my $refreturn_ctype = 0;
+  my $custom_vfunc = 0;
+  my $custom_vfunc_callback = 0;
   my $ifdef = "";
 
-  # Extra ref needed?
-  while($#args >= 2) # If the optional ref/err arguments are there.
+  while($#args >= 2) # If optional arguments are there.
   {
     my $argRef = string_trim(pop @args);
 
+    # Extra ref needed?
     if($argRef eq "refreturn")
-      { $refreturn = 1; }
+    {
+      $refreturn = 1;
+    }
     elsif($argRef eq "refreturn_ctype")
-      { $refreturn_ctype = 1; }
-  elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
+    {
+      $refreturn_ctype = 1;
+    }
+    elsif($argRef eq "custom_vfunc")
+    {
+      $custom_vfunc = 1;
+    }
+    elsif($argRef eq "custom_vfunc_callback")
+    {
+      $custom_vfunc_callback = 1;
+    }
+    elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
     	$ifdef = $1;
     }
   }
 
-  $self->output_wrap_vfunc($argCppDecl, $argCName, $refreturn, $refreturn_ctype,
-                           $$self{filename}, $$self{line_num}, $ifdef);
+  $self->output_wrap_vfunc($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
+                           $refreturn, $refreturn_ctype, $custom_vfunc,
+                           $custom_vfunc_callback, $ifdef);
 }
 
 sub on_wrap_enum($)
@@ -1291,7 +1307,6 @@ sub output_wrap_check($$$$$$)
 }
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn)
-# Also used for vfunc.
 sub output_wrap_signal($$$$$$$$$)
 {
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous) = @_;
@@ -1301,7 +1316,7 @@ sub output_wrap_signal($$$$$$$$$)
                                       $filename, $line_num, "_WRAP_SIGNAL"));
   # handle first argument
 
-  #Parse the method decaration and build an object that holds the details:
+  #Parse the method declaration and build an object that holds the details:
   my $objCppSignal = &Function::new($CppDecl, $self);
   $$objCppSignal{class} = $$self{class}; #Remember the class name for use in Outputter::output_wrap_signal().
 
@@ -1338,18 +1353,19 @@ sub output_wrap_signal($$$$$$$$$)
   }
 }
 
-# void output_wrap($CppDecl, $signal_name, $filename, $line_num)
-# Also used for vfunc.
+# void output_wrap($CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
+#                  $custom_vfunc, $custom_vfunc_callback, $ifdef)
 sub output_wrap_vfunc($$$$$$$$)
 {
-  my ($self, $CppDecl, $vfunc_name, $refreturn, $refreturn_ctype, $filename, $line_num, $ifdef) = @_;
+  my ($self, $CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
+      $custom_vfunc, $custom_vfunc_callback, $ifdef) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, '_WRAP_VFUNC'));
 
   # handle first argument
 
-  #Parse the method decaration and build an object that holds the details:
+  #Parse the method declaration and build an object that holds the details:
   my $objCppVfunc = &Function::new($CppDecl, $self);
 
 
@@ -1373,12 +1389,13 @@ sub output_wrap_vfunc($$$$$$$$)
   # These macros are defined in vfunc.m4:
 
   $$objCppVfunc{rettype_needs_ref} = $refreturn;
-  $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" prefix, and a separate easily-named invoker method.
+  $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" suffix, and a separate easily-named invoker method.
 
   $$objCVfunc{rettype_needs_ref} = $refreturn_ctype;
 
-  $objOutputter->output_wrap_vfunc_h($filename, $line_num, $objCppVfunc, $objCVfunc,$ifdef);
-  $objOutputter->output_wrap_vfunc_cc($filename, $line_num, $objCppVfunc, $objCVfunc, $ifdef);
+  $objOutputter->output_wrap_vfunc_h($filename, $line_num, $objCppVfunc, $objCVfunc, $ifdef);
+  $objOutputter->output_wrap_vfunc_cc($filename, $line_num, $objCppVfunc, $objCVfunc,
+                                      $custom_vfunc, $custom_vfunc_callback, $ifdef);
 }
 
 # give some sort of weights to sorting attibutes
