@@ -120,6 +120,7 @@ sub parse ($$)
   }
 
   $self->set_entity ($entity);
+  $self->set_c_name ($name);
   $self->set_name ($name);
   $self->set_class ($class);
   $self->set_ret_type ($ret_type);

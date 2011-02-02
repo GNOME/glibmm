@@ -24,6 +24,17 @@ use warnings;
 
 # class Base::Entity
 # {
+# public:
+#   bool is_marked ();
+#   void set_marked (bool);
+#
+#   string get_c_name ();
+#   void set_c_name (string);
+#
+#   string get_entity ();
+#   void set_entity ();
+#
+# private:
 #   bool   marked;
 #   string entity;
 #   string c_name

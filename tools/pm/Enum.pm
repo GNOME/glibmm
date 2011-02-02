@@ -2,6 +2,7 @@ package Enum;
 
 use strict;
 use warnings;
+use base qw (Entity);
 
 # class Enum
 #    {
@@ -117,21 +118,22 @@ sub split_enum_tokens($)
 # end of private functions.
 #
 
+my $g_f = 'flags';
+my $g_t = 'type';
+my $g_e_n = 'elem_names';
+my $g_e_v = 'elem_values';
+
 sub new ($$)
 {
   my $type = shift;
   my $token = shift;
   my $class = ref ($type) or $type or "Enum";
-  my $self =
-  {
-    $g_i_p => $include_paths_a_r,
-    $g_e => {},
-    $g_o => {},
-    $g_m => {},
-    $g_s => {},
-    $g_p => {},
-    $g_a_r_f => {}
-  };
+  my $self = $class->SUPER->new ();
+
+  $self->{$g_f} = 0;
+  $self->{$g_t} = '';
+  $self->{$g_e_n} = [];
+  $self->{$g_e_v} = [];
 
   return bless ($self, $class);
   my ($def) = @_;

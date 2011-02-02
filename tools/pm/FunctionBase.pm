@@ -13,10 +13,16 @@ use Util;
 #    {
 #       string array param_types;
 #       string array param_names;
+#       string       ret_type;
+#       string       name;
+#       string       c_name;
 #    }
 
 my $g_p_t = 'param_types';
 my $g_p_n = 'param_names';
+my $g_r_t = 'ret_type';
+my $g_n = 'name';
+my $g_c_n = 'c_name'
 
 sub new ($)
 {
@@ -24,8 +30,11 @@ sub new ($)
   my $class = ref ($type) or $type or "FunctionBase";
   my $self =
   {
-    $g_p_t => [];
-    $g_p_n => [];
+    $g_p_t => [],
+    $g_p_n => [],
+    $g_r_t => '',
+    $g_n => '',
+    $g_c_n => ''
   };
 
   bless ($self, $class);
@@ -60,6 +69,58 @@ sub set_param_names ($$)
   my $param_names = shift;
 
   $self->{$g_p_n} = shift;
+}
+
+sub get_param_count ($)
+{
+  my $self = shift;
+
+  return scalar (@{$self->{$g_p_t}});
+}
+
+sub get_ret_type ($)
+{
+  my $self = shift;
+
+  return $self->{$g_r_t};
+}
+
+sub set_ret_type ($$)
+{
+  my $self = shift;
+  my $ret_type = shift;
+
+  $self->{$g_r_t} = $ret_type;
+}
+
+sub get_name ($)
+{
+  my $self = shift;
+
+  return $self->{$g_n};
+}
+
+sub set_name ($$)
+{
+  my $self = shift;
+  my $name = shift;
+
+  $self->{$g_n} = $name;
+}
+
+sub get_c_name ($)
+{
+  my $self = shift;
+
+  return $self->{$g_c_n};
+}
+
+sub set_c_name ($$)
+{
+  my $self = shift;
+  my $c_name = shift;
+
+  $self->{$g_c_n} = $c_name;
 }
 
 # $string args_types_only($)

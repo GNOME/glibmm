@@ -10,6 +10,7 @@ require Base::Enum;
 require Base::Function;
 require Base::Object;
 require Base::Property;
+require Base::Api;
 
 require Defs::Common;
 require Defs::Enum;

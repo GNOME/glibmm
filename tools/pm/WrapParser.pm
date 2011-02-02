@@ -41,6 +41,16 @@ our @EXPORT_OK;
 
 ############################################################################
 
+#TODO: write a function in main guessing backend main module based on given definitions filename - gtk.defs will give Defs, gtk.gir will give Gir
+#TODO: on construction of Base::Api a module name should be passed. it will be used to create a backend for it.
+#TODO: require $guessed_main_module::Backend;
+#TODO: on construction take Base::Api as parameter.
+#TODO: Base::Api will give an outputter to use.
+#TODO: Outputter should be split into two classes - common part and backend part.
+#TODO: When setting backend for Base::Api it should also get backend for outputter.
+#TODO: Backend should have methods like used in Base::API and a method returning an outputter backend.
+
+
 my @tokens = ();
 
 # $objWrapParser new($objOutputter)

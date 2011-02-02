@@ -81,6 +81,7 @@ sub parse ($$)
   }
 
   $self->set_name ($name);
+  $self->set_c_name ($name);
   $self->set_class ($class);
   $self->set_type ($type);
   $self->set_readable ($readable);
