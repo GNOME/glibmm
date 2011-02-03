@@ -149,9 +149,6 @@ GSList* create_gslist(const typename std::vector<typename Tr::CppType>::const_it
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 
-/**
- * @ingroup ContHelpers
- */
 template <class Tr>
 class ArrayIterator
 {
@@ -193,11 +190,6 @@ private:
   const CType* pos_;
 };
 
-/**
- * @ingroup ContHelpers
- * If a method takes this as an argument, or has this as a return type, then you can use a standard
- * container such as std::list or std::vector.
- */
 template <class Tr>
 class ListIterator
 {
@@ -224,11 +216,6 @@ private:
   const GList* node_;
 };
 
-/**
- * @ingroup ContHelpers
- * If a method takes this as an argument, or has this as a return type, then you can use a standard
- * container such as std::list or std::vector.
- */
 template <class Tr>
 class SListIterator
 {
@@ -255,6 +242,28 @@ private:
   const GSList* node_;
 };
 
+/** A keeper class for C array.
+ *
+ * Primarily used by C++ wrappers like gtkmm.
+ *
+ * Its main purpose is to free its data when they are not needed. What will be
+ * destroyed depends on passed ownership upon construction.
+ *
+ * The most common usage of Glib::ArrayKeeper is getting its data when converting
+ * std::vector to a C array:
+ * @code
+ * void G::Temp::do_something(const std::vector<int>& v)
+ * {
+ *   g_temp_do_something(gobj(), Glib::ArrayHandler<int>::vector_to_array(v).data());
+ * }
+ * @endcode
+ * Variables of this class are seldom defined directly - it is mostly used as
+ * a temporary variable returned by Glib::ArrayHandler::vector_to_array().
+ *
+ * Note that the usage above is correct with regards to C++ standard point 12.2.3.
+ * That means that data returned by data() method is valid through whole
+ * g_temp_do_something function and is destroyed, when this function returns.
+ */
 template <typename Tr>
 class ArrayKeeper
 {
@@ -262,10 +271,28 @@ public:
   typedef typename Tr::CppType        CppType;
   typedef typename Tr::CType          CType;
 
+  /** Constructs an ArrayKeeper holding @a array of size @array_size.
+   * @a ownership tells what should be destroyed with keeper destruction:
+   * <ul>
+   * <li>Glib::OWNERSHIP_NONE - keeper won't destroy data it holds.</li>
+   * <li>Glib::OWNERSHIP_SHALLOW - keeper will destroy only container it holds.</li>
+   * <li>Glib::OWNERSHIP_DEEP - keeper will destroy data and container it holds.</li>
+   * </ul>
+   *
+   * @param array - C array to hold.
+   * @param array_size - length of @a array.
+   * @param ownership - ownership definition.
+   */
   explicit inline ArrayKeeper(const CType* array, size_t array_size, Glib::OwnershipType ownership);
   inline ArrayKeeper(const ArrayKeeper& keeper);
   ~ArrayKeeper();
 
+  /** Gets data the keeper holds.
+   *
+   * Note that this data is owned by the keeper, so there is no need to free it.
+   *
+   * @return C array owned by ArrayKeeper.
+   */
   inline CType* data() const;
 
 private:
@@ -274,6 +301,28 @@ private:
   mutable Glib::OwnershipType ownership_;
 };
 
+/** A keeper class for GList.
+ *
+ * Primarily used by C++ wrappers like gtkmm.
+ *
+ * Its main purpose is to free its data when they are not needed. What will be
+ * destroyed depends on passed ownership upon construction.
+ *
+ * The most common usage of Glib::GListKeeper is getting its data when converting
+ * std::vector to a GList*:
+ * @code
+ * void G::Temp::do_something(const std::vector<int>& v)
+ * {
+ *   g_temp_do_something(gobj(), Glib::ListHandler<int>::vector_to_list(v).data());
+ * }
+ * @endcode
+ * Variables of this class are seldom defined directly - it is mostly used as
+ * a temporary variable returned by Glib::ListHandler::vector_to_list().
+ *
+ * Note that the usage above is correct with regards to C++ standard point 12.2.3.
+ * That means that data returned by data() method is valid through whole
+ * g_temp_do_something function and is destroyed, when this function returns.
+ */
 template <typename Tr>
 class GListKeeper
 {
@@ -281,10 +330,27 @@ public:
   typedef typename Tr::CppType        CppType;
   typedef typename Tr::CType          CType;
 
+  /** Constructs an GListKeeper holding @a glist.
+   * @a ownership tells what should be destroyed with keeper destruction:
+   * <ul>
+   * <li>Glib::OWNERSHIP_NONE - keeper won't destroy data it holds.</li>
+   * <li>Glib::OWNERSHIP_SHALLOW - keeper will destroy only container it holds.</li>
+   * <li>Glib::OWNERSHIP_DEEP - keeper will destroy data and container it holds.</li>
+   * </ul>
+   *
+   * @param glist - GList* to hold.
+   * @param ownership - ownership definition.
+   */
   explicit inline GListKeeper(const GList* glist, Glib::OwnershipType ownership);
   inline GListKeeper(const GListKeeper& keeper);
   ~GListKeeper();
 
+  /** Gets data the keeper holds.
+   *
+   * Note that this data is owned by the keeper, so there is no need to free it.
+   *
+   * @return GList* owned by GListKeeper.
+   */
   inline GList* data() const;
 
 private:
@@ -292,6 +358,28 @@ private:
   mutable Glib::OwnershipType ownership_;
 };
 
+/** A keeper class for GSList.
+ *
+ * Primarily used by C++ wrappers like gtkmm.
+ *
+ * Its main purpose is to free its data when they are not needed. What will be
+ * destroyed depends on passed ownership upon construction.
+ *
+ * The most common usage of Glib::GSListKeeper is getting its data when converting
+ * std::vector to a GSList*:
+ * @code
+ * void G::Temp::do_something(const std::vector<int>& v)
+ * {
+ *   g_temp_do_something(gobj(), Glib::SListHandler<int>::vector_to_slist(v).data());
+ * }
+ * @endcode
+ * Variables of this class are seldom defined directly - it is mostly used as
+ * a temporary variable returned by Glib::SListHandler::vector_to_slist().
+ *
+ * Note that the usage above is correct with regards to C++ standard point 12.2.3.
+ * That means that data returned by data() method is valid through whole
+ * g_temp_do_something function and is destroyed, when this function returns.
+ */
 template <typename Tr>
 class GSListKeeper
 {
@@ -299,10 +387,27 @@ public:
   typedef typename Tr::CppType        CppType;
   typedef typename Tr::CType          CType;
 
+  /** Constructs an GSListKeeper holding @a gslist.
+   * @a ownership tells what should be destroyed with keeper destruction:
+   * <ul>
+   * <li>Glib::OWNERSHIP_NONE - keeper won't destroy data it holds.</li>
+   * <li>Glib::OWNERSHIP_SHALLOW - keeper will destroy only container it holds.</li>
+   * <li>Glib::OWNERSHIP_DEEP - keeper will destroy data and container it holds.</li>
+   * </ul>
+   *
+   * @param gslist - GList* to hold.
+   * @param ownership - ownership definition.
+   */
   explicit inline GSListKeeper(const GSList* gslist, Glib::OwnershipType ownership);
   inline GSListKeeper(const GSListKeeper& keeper);
   ~GSListKeeper();
 
+  /** Gets data the keeper holds.
+   *
+   * Note that this data is owned by the keeper, so there is no need to free it.
+   *
+   * @return GSList* owned by GSListKeeper.
+   */
   inline GSList* data() const;
 
 private:
@@ -312,8 +417,40 @@ private:
 
 } // namespace Container_Helpers
 
-// a struct instead of templated functions because standard template arguments
-// for function templates is a C++0x feature...
+// Note that this is a struct instead of templated functions because standard template arguments
+// for function templates is a C++0x feature.
+/** A utility for converting between std::vector and plain C arrays.
+ * This would normally only be used by glibmm or gtkmm itself, or similar
+ * libraries that wrap C APIs.
+ *
+ * For instance:
+ * @code
+ * std::vector<Glib::ustring> PixbufFormat::get_mime_types() const
+ * {
+ *   return Glib::ArrayHandler<Glib::ustring>::array_to_vector(gdk_pixbuf_format_get_mime_types(const_cast<GdkPixbufFormat*>(gobj())), Glib::OWNERSHIP_DEEP);
+ * }
+ * @endcode
+ * or
+ * @code
+ * void Display::store_clipboard(const Glib::RefPtr<Gdk::Window>& clipboard_window, guint32 time_, const std::vector<Glib::ustring>& targets)
+ * {
+ *   if (!targets.size ())
+ *   {
+ *     gdk_display_store_clipboard(gobj(),
+ *                                 Glib::unwrap (clipboard_window),
+ *                                 time_,
+ *                                 Glib::ArrayHandler<Glib::ustring, AtomUstringTraits>::vector_to_array(targets).data (),
+ *                                 targets.size ());
+ *   }
+ * }
+ * @endcode
+ * Note that usage below is wrong - data() returns a pointer to data owned by
+ * a temporary ArrayKeeper returned by vector_to_array(), which is destroyed at
+ * the end of this instruction. For details, see Glib::ArrayKeeper.
+ * @code
+ * const char** array = Glib::ArrayHandler<Glib::ustring>::vector_to_array(vec).data ();
+ * @endcode
+ */
 template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T> >
 class ArrayHandler
 {
@@ -346,6 +483,31 @@ public:
   static ArrayKeeperType vector_to_array(const VectorType& vector);
 };
 
+/** A utility for converting between std::vector and GList.
+ * This would normally only be used by glibmm or gtkmm itself, or similar
+ * libraries that wrap C APIs.
+ *
+ * For instance:
+ * @code
+ * std::vector< Glib::RefPtr<Window> > Window::get_children()
+ * {
+ *   return Glib::ListHandler<Glib::RefPtr<Window> >::list_to_vector(gdk_window_get_children(gobj()), Glib::OWNERSHIP_SHALLOW);
+ * }
+ * @endcode
+ * or
+ * @code
+ * void Window::set_icon_list(const std::vector< Glib::RefPtr<Gdk::Pixbuf> >& pixbufs)
+ * {
+ *   gdk_window_set_icon_list(gobj(), Glib::ListHandler<Glib::RefPtr<Gdk::Pixbuf> >::vector_to_list(pixbufs).data ());
+ * }
+ * @endcode
+ * Note that usage below is wrong - data() returns a pointer to data owned by
+ * a temporary ListKeeper returned by vector_to_list(), which is destroyed at
+ * the end of this instruction. For details, see Glib::ListKeeper.
+ * @code
+ * GList* glist = Glib::ListHandler<Glib::RefPtr<Gdk::Pixbuf> >::vector_to_list(pixbufs).data();
+ * @endcode
+ */
 template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T> >
 class ListHandler
 {
@@ -361,6 +523,31 @@ public:
   static GListKeeperType vector_to_list(const VectorType& vector);
 };
 
+/** A utility for converting between std::vector and GSList.
+ * This would normally only be used by glibmm or gtkmm itself, or similar
+ * libraries that wrap C APIs.
+ *
+ * For instance:
+ * @code
+ * std::vector< Glib::RefPtr<Display> > DisplayManager::list_displays()
+ * {
+ *   return Glib::SListHandler<Glib::RefPtr<Display> >::slist_to_vector(gdk_display_manager_list_displays(gobj()), Glib::OWNERSHIP_SHALLOW);
+ * }
+ * @endcode
+ * or
+ * @code
+ * void Stuff::set_slist(const std::vector<int>& ints)
+ * {
+ *   g_stuff_set_slist(gobj(), Glib::SListHandler<int>::vector_to_slist(ints).data ());
+ * }
+ * @endcode
+ * Note that usage below is wrong - data() returns a pointer to data owned by
+ * a temporary SListKeeper returned by vector_to_slist(), which is destroyed at
+ * the end of this instruction. For details, see Glib::SListKeeper.
+ * @code
+ * GSList* gslist = Glib::SListHandler< Glib::RefPtr<Display> >::vector_to_slist(vec).data();
+ * @endcode
+ */
 template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T> >
 class SListHandler
 {
