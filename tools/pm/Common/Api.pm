@@ -1,4 +1,4 @@
-# gmmproc - Base::Api module
+# gmmproc - Common::Api module
 #
 # Copyright 2011 glibmm development team
 #
@@ -17,12 +17,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
 
-package Base::Api;
+package Common::Api;
 
 use strict;
 use warnings;
 
-# class Base::Api
+# class Common::Api
 # {
 #   function array get_methods ();
 #   property array get_properties ();
@@ -36,28 +36,66 @@ use warnings;
 #   function lookup_signal(object, c_name)
 # }
 
-my $g_o = 'outputter';
+
+sub deduce_backend_from_file ($)
+{
+  my $file = shift;
+
+  if ($file =~ /defs$/)
+  {
+    return 'Defs';
+  }
+  elsif ($file =~ /gir$/)
+  {
+    return 'Gir';
+  }
+  return undef;
+}
+
+#my $g_o = 'outputter';
 my $g_b = 'backend';
 
 sub new ($$$)
 {
   my $type = shift;
-  my $main_backend_module = shift;
-  my $outputter = shift;
-  my $class = (ref ($type) or $type or "Base::Api");
+  my $file = shift;
+  my $defs_a_r = shift;
+#  my $outputter = shift;
+  my $class = (ref ($type) or $type or "Common::Api");
   my $backend = undef;
+  my $main_backend_module = deduce_backend_from_file ($file);
 
-  eval ("require $main_backend_module::Backend; \$backend = $main_backend_module::Backend->new ();") or die;
-  $outputter->set_backend ($backend->get_outputter_backend ());
+  unless (eval ("require $main_backend_module::Backend; \$backend = $main_backend_module::Backend->new (\$defs_a_r);"))
+  {
+    #TODO: implement Gir backend and remove the condition below.
+    if ($main_backend_module eq 'Gir')
+    {
+      print STDERR join ('', 'Gir backend for file ', $file, "is not yet implemented\n");
+    }
+    #TODO: error!
+    exit 1;
+  }
+#  $outputter->set_backend ($backend->get_outputter_backend ());
+
+  unless ($backend->read_file ($file))
+  {
+    #TODO: error!
+    exit 1;
+  }
 
   my $self =
   {
-    $g_b => $backend,
-    $g_o => $outputter
+    $g_b => $backend
+#    $g_o => $outputter
   };
 
   bless ($self, $class);
   return $self;
+}
+
+sub read_file ($$)
+{
+  my $self = shift;
 }
 
 sub get_enums ($)
@@ -151,8 +189,6 @@ sub get_marked ($)
   return [];
 }
 
-# This searches for items wrapped by this file and then tries to locate
-# other functions/signal/properties which may have been left unmarked.
 sub get_unwrapped ($)
 {
   my $self = shift;
@@ -173,9 +209,7 @@ sub get_unwrapped ($)
   return [];
 }
 
-##########################
-
-sub lookup_enum($$$)
+sub lookup_enum ($$$)
 {
   my $self = shift;
   my $c_name = shift;
@@ -196,7 +230,7 @@ sub lookup_enum($$$)
   return undef;
 }
 
-sub lookup_object($$$)
+sub lookup_object ($$$)
 {
   my $self = shift;
   my $c_name = shift;
@@ -217,8 +251,7 @@ sub lookup_object($$$)
   return undef;
 }
 
-# $objProperty lookup_property($name, $parent_object_name)
-sub lookup_property($$$$)
+sub lookup_property ($$$$)
 {
   my $self = shift;
   my $object = shift;
@@ -240,7 +273,7 @@ sub lookup_property($$$$)
   return undef;
 }
 
-sub lookup_method($$$)
+sub lookup_method ($$$)
 {
   my $self = shift;
   my $c_name = shift;
@@ -261,7 +294,7 @@ sub lookup_method($$$)
   return undef;
 }
 
-sub lookup_function($$$)
+sub lookup_function ($$$)
 {
   my $self = shift;
   my $c_name = shift;
@@ -282,7 +315,7 @@ sub lookup_function($$$)
   return undef;
 }
 
-sub lookup_signal($$$$)
+sub lookup_signal ($$$$)
 {
   my $self = shift;
   my $object = shift;

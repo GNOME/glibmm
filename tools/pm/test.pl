@@ -10,7 +10,6 @@ require Base::Enum;
 require Base::Function;
 require Base::Object;
 require Base::Property;
-require Base::Api;
 
 require Defs::Common;
 require Defs::Enum;
@@ -19,3 +18,6 @@ require Defs::Named;
 require Defs::Object;
 require Defs::Property;
 require Defs::Signal;
+require Defs::Backend;
+
+require Common::Api;

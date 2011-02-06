@@ -9,7 +9,7 @@
 # *** WARNING: Only modify gmmproc.in. gmmproc is built. ***
 #
 # Copyright 2001, Karl Einar Nelson, Murray Cumming
-# Copyright 2011, Krzesimir Nowak
+# Copyright 2011 Krzesimir Nowak
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ use Getopt::Long qw(:config permute);
 
 require Output;
 require WrapParser;
+require Base::Api;
 
 
 # prototypes
@@ -70,30 +71,33 @@ Usage: gmmproc [options] -s|--source dir -d|--destination dir
 
 Options:
   -s dir
-  --source dir         Specify source directory with template files.
+  --source dir          Specify source directory with template files.
 
   -d dir
-  --destination dir    Specify destination directory for generated files.
+  --destination dir     Specify destination directory for generated files.
 
   -l file
-  --list file          Specify a file path containing list of templates
-                       to process.
+  --list file           Specify a file path containing list of templates
+                        to process.
 
   -h
-  --help               This usage message.
+  --help                This usage message.
 
   -g
-  --debug              Leave intermediate output arround for analysis.
-                       Alternatively, set GMMPROC_DEBUG=1 in the environment.
+  --debug               Leave intermediate output arround for analysis.
+                        Alternatively, set GMMPROC_DEBUG=1 in the environment.
 
   -u
-  --unwrapped          Warn about possible unwrapped functions.
+  --unwrapped           Warn about possible unwrapped functions.
 
   -d dir
-  --defs dir           Specify the directory with defs files.
+  --defs dir            Specify the directory with defs files.
 
   -I dir
-  --include dir        Specify the directory with m4 files.
+  --include dir         Specify the directory with m4 files.
+
+  -f file
+  --file file           Specify a definitions file to read.
 
 This will read template files from source directory and generate files
 to destination directory:
@@ -119,6 +123,7 @@ sub main ()
   my $includes_a_r = [];
   my $templates_a_r = [];
   my $debug = (exists $ENV{'GMMPROC_DEBUG'}) ? $ENV{'GMMPROC_DEBUG'} : 0;
+  my $file = '';
   my $opt_parse_result = GetOptions ('help|h' => \&print_help,
                                      'source|s=s' => \$source_dir,
                                      'destination|d=s' => \$destination_dir,
@@ -127,11 +132,12 @@ sub main ()
                                      'defs|d=s@' => \$defs_a_r,
                                      'include|I=s@' => \$includes_a_r,
                                      'debug|g' => \$debug,
+                                     'file|f' => \$file
                                      '<>' => sub { add_file_to_list ($templates_a_r, shift); }
                                     );
 
-  if (not $opt_parse_result or $source_dir eq '' or $destination_dir eq ''
-      or @{$templates_a_r} < 1 or @{$defs_a_r} < 1)
+  if (not $opt_parse_result or not $source_dir or not $destination_dir
+      or @{$templates_a_r} < 1 or @{$defs_a_r} < 1 or not $file or not $backend)
   {
     print_usage ();
     exit (1);
@@ -140,6 +146,10 @@ sub main ()
 
   my $objOutputter = &Output::new($g_m4path, $includes_a_r);
   my $objWrapParser = &WrapParser::new($objOutputter);
+
+  my $api = Base::Api->new ($file, $defs_a_r);
+
+  $objOutputter->set_backend ($api->get_outputter_backend ());
 
   $$objWrapParser{srcdir} = $source_dir;
   $$objWrapParser{defsdir} = $defs_a_r->[0];
