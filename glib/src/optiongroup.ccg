@@ -46,20 +46,6 @@ static gboolean g_callback_pre_parse(GOptionContext* context, GOptionGroup* /* g
     return false;
 }
 
-static gboolean g_callback_post_parse(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
-{
-  OptionContext cppContext(context, false /* take_ownership */);
-  //OptionGroup cppGroup(group, true /* take_copy */); //Maybe this should be option_group.
-
-  OptionGroup* option_group = static_cast<OptionGroup*>(data);
-  if(option_group)
-  {
-    return option_group->on_post_parse(cppContext, *option_group);
-  }
-  else
-    return false;
-}
-
 static void g_callback_error(GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error*/)
 {
   OptionContext cppContext(context, false /* take_ownership */);
@@ -98,13 +84,37 @@ static void OptionGroup_Translate_glibmm_callback_destroy(void* data)
 
 } //anonymous namespace
 
+//static
+gboolean OptionGroup::post_parse_callback(GOptionContext* context,
+  GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
+{
+  OptionContext cppContext(context, false /* take_ownership */);
+  //OptionGroup cppGroup(group, true /* take_copy */); //Maybe this should be option_group.
+
+  OptionGroup* option_group = static_cast<OptionGroup*>(data);
+  if(option_group)
+  {
+    //The C args have now been given values by g_option_context_parse().
+    //Convert C values to C++ values:
+
+    for(type_map_entries::iterator iter = option_group->map_entries_.begin();
+        iter != option_group->map_entries_.end(); ++iter)
+    {
+      CppOptionEntry& cpp_entry = iter->second;
+      cpp_entry.convert_c_to_cpp();
+    }
+    return option_group->on_post_parse(cppContext, *option_group);
+  }
+  else
+    return false;
+}
 
 OptionGroup::OptionGroup(const Glib::ustring& name, const Glib::ustring& description, const Glib::ustring& help_description)
 : gobject_( g_option_group_new(name.c_str(), description.c_str(), help_description.c_str(), this, 0 /* destroy_func */) ),
   has_ownership_(true)
 {
   //Connect callbacks, so that derived classes can override the virtual methods:
-  g_option_group_set_parse_hooks(gobj(), &g_callback_pre_parse, &g_callback_post_parse);
+  g_option_group_set_parse_hooks(gobj(), &g_callback_pre_parse, &post_parse_callback);
   g_option_group_set_error_hook(gobj(), &g_callback_error);
 }
 
@@ -218,19 +228,6 @@ bool OptionGroup::on_pre_parse(OptionContext& /* context */, OptionGroup& /* gro
 
 bool OptionGroup::on_post_parse(OptionContext& /* context */, OptionGroup& /* group */)
 {
-  //Call this at the start of overrides.
-
-  //TODO: Maybe put this in the C callback:
-
-  //The C args have now been given values by GOption.
-  //Convert C values to C++ values:
-
-  for(type_map_entries::iterator iter = map_entries_.begin(); iter != map_entries_.end(); ++iter)
-  {
-    CppOptionEntry& cpp_entry = iter->second;
-    cpp_entry.convert_c_to_cpp();
-  }
-
   return true;
 }
 

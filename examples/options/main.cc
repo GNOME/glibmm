@@ -29,8 +29,8 @@ public:
   virtual bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group);
   virtual void on_error(Glib::OptionContext& context, Glib::OptionGroup& group);
   
-  //These int instances should live as long as the OptionGroup to which they are added, 
-  //and as long as the OptionContext to which those OptionGroups are added.
+  //These members should live as long as the OptionGroup to which they are added, 
+  //and as long as the OptionContext to which that OptionGroup is added.
   int m_arg_foo;
   std::string m_arg_filename;
   Glib::ustring m_arg_goo;
@@ -85,7 +85,8 @@ bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::Option
   //This is called before the m_arg_* instances are given their values.
   // You do not need to override this method. This is just here to show you how,
   // in case you want to do any extra processing.
-  return Glib::OptionGroup::on_pre_parse(context, group);
+  std::cout << "on_pre_parse called" << std::endl;
+  return true;
 }
 
 bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
@@ -93,14 +94,14 @@ bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::Optio
   //This is called after the m_arg_* instances are given their values.
   // You do not need to override this method. This is just here to show you how,
   // in case you want to do any extra processing.
-  return Glib::OptionGroup::on_post_parse(context, group);
+  std::cout << "on_post_parse called" << std::endl;
+  return true;
 }
 
 void ExampleOptionGroup::on_error(Glib::OptionContext& context, Glib::OptionGroup& group)
 {
-  Glib::OptionGroup::on_error(context, group);
+  std::cout << "on_error called" << std::endl;
 }
-  
 
 
 int main(int argc, char** argv)
