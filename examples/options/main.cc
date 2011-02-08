@@ -80,7 +80,7 @@ ExampleOptionGroup::ExampleOptionGroup()
   add_entry(entry_remaining, m_remaining_list);
 }
 
-bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
+bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& /* context */, Glib::OptionGroup& /* group */)
 {
   //This is called before the m_arg_* instances are given their values.
   // You do not need to override this method. This is just here to show you how,
@@ -89,7 +89,7 @@ bool ExampleOptionGroup::on_pre_parse(Glib::OptionContext& context, Glib::Option
   return true;
 }
 
-bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group)
+bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& /* context */, Glib::OptionGroup& /* group */)
 {
   //This is called after the m_arg_* instances are given their values.
   // You do not need to override this method. This is just here to show you how,
@@ -98,7 +98,7 @@ bool ExampleOptionGroup::on_post_parse(Glib::OptionContext& context, Glib::Optio
   return true;
 }
 
-void ExampleOptionGroup::on_error(Glib::OptionContext& context, Glib::OptionGroup& group)
+void ExampleOptionGroup::on_error(Glib::OptionContext& /* context */, Glib::OptionGroup& /* group */)
 {
   std::cout << "on_error called" << std::endl;
 }
