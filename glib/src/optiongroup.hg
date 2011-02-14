@@ -51,6 +51,16 @@ public:
    */
   typedef sigc::slot<Glib::ustring, const Glib::ustring&> SlotTranslate;
 
+  /** For example bool on_option_arg_string(const Glib::ustring& option_name,
+   *  const Glib::ustring& value, bool has_value);.
+   */
+  typedef sigc::slot<bool, const Glib::ustring&, const Glib::ustring&, bool> SlotOptionArgString;
+   
+  /** For example bool on_option_arg_filename(const Glib::ustring& option_name,
+   *  const std::string& value, bool has_value);.
+   */
+  typedef sigc::slot<bool, const Glib::ustring&, const std::string&, bool> SlotOptionArgFilename;
+
   OptionGroup(const Glib::ustring& name, const Glib::ustring& description, const Glib::ustring& help_description = Glib::ustring());
 
   /** This always takes ownership of the underlying GOptionGroup, 
@@ -81,6 +91,8 @@ public:
   void add_entry_filename(const OptionEntry& entry, std::string& arg);  
   void add_entry(const OptionEntry& entry, vecustrings& arg);
   void add_entry_filename(const OptionEntry& entry, vecstrings& arg);
+  void add_entry(const OptionEntry& entry, const SlotOptionArgString& slot);
+  void add_entry_filename(const OptionEntry& entry, const SlotOptionArgFilename& slot);
 
   /** Sets the function which is used to translate user-visible strings, for
    * --help output. Different groups can use a different SlotTranslate. If a
@@ -127,6 +139,9 @@ protected:
 
   static gboolean post_parse_callback(GOptionContext* context,
     GOptionGroup* group, gpointer data, GError** error);
+
+  static gboolean option_arg_callback(const gchar* option_name, const gchar* value,
+    gpointer data, GError** error);
 
   //Map of entry names to CppOptionEntry:
   typedef std::map<Glib::ustring, CppOptionEntry> type_map_entries;
