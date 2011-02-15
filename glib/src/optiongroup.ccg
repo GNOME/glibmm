@@ -36,28 +36,33 @@ namespace //anonymous
 class OptionArgCallback
 {
 public:
-  OptionArgCallback(const OptionGroup::SlotOptionArgString& slot)
-  : slot_string(new OptionGroup::SlotOptionArgString(slot)), slot_filename(0)
+  explicit OptionArgCallback(const OptionGroup::SlotOptionArgString& slot)
+  : slot_string_(new OptionGroup::SlotOptionArgString(slot)), slot_filename_(0)
   { }
 
-  OptionArgCallback(const OptionGroup::SlotOptionArgFilename& slot)
-  : slot_string(0), slot_filename(new OptionGroup::SlotOptionArgFilename(slot))
+  explicit OptionArgCallback(const OptionGroup::SlotOptionArgFilename& slot)
+  : slot_string_(0), slot_filename_(new OptionGroup::SlotOptionArgFilename(slot))
   { }
 
-  bool is_filename_option() const { return slot_filename != 0; }
-  const OptionGroup::SlotOptionArgString* get_slot_string() const { return slot_string; }
-  const OptionGroup::SlotOptionArgFilename* get_slot_filename() const { return slot_filename; }
+  bool is_filename_option() const
+  { return slot_filename_ != 0; }
+  
+  const OptionGroup::SlotOptionArgString* get_slot_string() const
+  { return slot_string_; }
+  
+  const OptionGroup::SlotOptionArgFilename* get_slot_filename() const
+  { return slot_filename_; }
 
   ~OptionArgCallback()
   {
-    delete slot_string;
-    delete slot_filename;
+    delete slot_string_;
+    delete slot_filename_;
   }
 
 private:
   //One of these slot pointers is 0 and the other one points to a slot.
-  OptionGroup::SlotOptionArgString* slot_string;
-  OptionGroup::SlotOptionArgFilename* slot_filename;
+  OptionGroup::SlotOptionArgString* slot_string_;
+  OptionGroup::SlotOptionArgFilename* slot_filename_;
 
   //Not copyable
   OptionArgCallback(const OptionArgCallback&);
