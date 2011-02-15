@@ -20,15 +20,17 @@
  */
 
 #include "generate_extra_defs.h"
-//#include <glib/glib.h>
+#include <glib.h>
 
-int main (int, char**)
+int main()
 {
-  //glib_init(&argc, &argv);
+  g_type_init();
 
-  //std::cout << get_defs( ATK_TYPE_HYPERLINK )
-   
-  std::cout << "No glib types were examined.";
+  std::cout << get_defs( G_TYPE_DATE )
+            << get_defs( G_TYPE_IO_CHANNEL )
+            << get_defs( G_TYPE_REGEX )
+            << get_defs( G_TYPE_VARIANT )
+            << std::endl;
 
   return 0;
 }

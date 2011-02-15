@@ -111,10 +111,19 @@ int main(int, char**)
             << get_defs(G_TYPE_SOCKET_SERVICE)
             << get_defs(G_TYPE_THREADED_SOCKET_SERVICE)
 
-            // DBus classes.
+            // DBus types:
             << get_defs(G_TYPE_DBUS_AUTH_OBSERVER)
             << get_defs(G_TYPE_DBUS_CONNECTION)
+            << get_defs(G_TYPE_DBUS_ERROR)
+            << get_defs(G_TYPE_DBUS_ANNOTATION_INFO)
+            << get_defs(G_TYPE_DBUS_ARG_INFO)
+            << get_defs(G_TYPE_DBUS_METHOD_INFO)
+            << get_defs(G_TYPE_DBUS_SIGNAL_INFO)
+            << get_defs(G_TYPE_DBUS_PROPERTY_INFO)
+            << get_defs(G_TYPE_DBUS_INTERFACE_INFO)
+            << get_defs(G_TYPE_DBUS_NODE_INFO)
             << get_defs(G_TYPE_DBUS_MESSAGE)
+            << get_defs(G_TYPE_DBUS_METHOD_INVOCATION)
             << get_defs(G_TYPE_DBUS_PROXY)
             << get_defs(G_TYPE_DBUS_SERVER)
 
