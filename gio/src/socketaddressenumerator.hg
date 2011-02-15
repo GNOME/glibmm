@@ -41,14 +41,35 @@ class SocketAddressEnumerator : public Glib::Object
 public:
   _WRAP_METHOD(Glib::RefPtr<SocketAddress> next(const Glib::RefPtr<Cancellable>& cancellable), g_socket_address_enumerator_next, errthrow)
 
-  //TODO: Docs.
+  /** Retrieves the next SocketAddress from the enumerator. 
+   * Note that this may block for some amount of time. (Eg, a NetworkAddress may need to do a DNS lookup before it can return an address.)
+   * Use next_async() if you need to avoid blocking.
+   *
+   * If this enumerator is expected to yield addresses, but for some reason is unable to (eg, because of a DNS error), 
+   * then the first call to next() will throw an exception. However, if the first call to next() succeeds, then any further internal errors 
+   * will be ignored.
+   *
+   * When there are no further addresses, an exception will be thrown.
+   *
+   * @result A SocketAddress
+   */
   Glib::RefPtr<SocketAddress> next();
 
-  _IGNORE(g_socket_address_enumerator_next_async)
+  /** Asynchronously retrieves the next SocketAddress from the enumerator and then calls @a slot, 
+   * which must call next_finish() to get the result.
+   *
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @param slot A callback slot to call after the resolution completes.
+   */
   void next_async(const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
 
-  //TODO: Docs.
+  /** Asynchronously retrieves the next SocketAddress from the enumerator and then calls @a slot, 
+   * which must call next_finish() to get the result.
+   *
+   * @param slot A callback slot to call after the resolution completes.
+   */
   void next_async(const SlotAsyncReady& slot);
+  _IGNORE(g_socket_address_enumerator_next_async)
 
   _WRAP_METHOD(Glib::RefPtr<SocketAddress> next_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_address_enumerator_next_finish, errthrow)
 };

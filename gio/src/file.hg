@@ -1122,12 +1122,20 @@ public:
                g_file_set_display_name_finish,
                errthrow)
 
-  //TODO: remember to add the docs manually, as we name the method differently.
+  /** Deletes a file. 
+   * If the file is a directory, it will only be deleted if it is empty.
+   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * If the operation was cancelled, a Glib::FileError with ERROR_CANCELLED will be thrown.
+   *
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   * @return <tt>true</tt> if the file was deleted. <tt>false</tt> otherwise.
+   */
    _WRAP_METHOD(bool remove(const Glib::RefPtr<Cancellable>& cancellable),
                 g_file_delete,
                 errthrow)
 
   /** Deletes a file.
+   * If the file is a directory, it will only be deleted if it is empty.
    * 
    * @return <tt>true</tt> if the file was deleted. <tt>false</tt> otherwise.
    */
@@ -1174,9 +1182,42 @@ public:
    */
   bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE);
 
-  //TODO: Documentation.
+  /** Copies the file source to the location specified by destination. Can not handle recursive copies of directories.
+   * If the flag FILE_COPY_OVERWRITE is specified an already existing destination file is overwritten.
+   * If the flag FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
+   *
+   * The operation can be monitored via the @a slot callback.
+   *
+   * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
+   *
+   * If FILE_COPY_OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
+   *
+   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown. 
+   * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
+   *
+   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, 
+   * then a Gio::Error with WOULD_RECURSE will be thrown.
+   *
+   * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
+   */
   bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags = FILE_COPY_NONE);
 
+  /** Copies the file source to the location specified by destination. Can not handle recursive copies of directories.
+   * If the flag FILE_COPY_OVERWRITE is specified an already existing destination file is overwritten.
+   * If the flag FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
+   *
+   * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
+   *
+   * If FILE_COPY_OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
+   *
+   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown. 
+   * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
+   *
+   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, 
+   * then a Gio::Error with WOULD_RECURSE will be thrown.
+   *
+   * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
+   */
   bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FILE_COPY_NONE);
   _IGNORE(g_file_copy)
 
@@ -1997,6 +2038,7 @@ public:
    * @param etag_out A location to place the current entity tag for the file.
    */
   bool load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::string& etag_out);
+
   /** Loads the content of the file into memory, returning the size of the data. 
    * The data is always zero terminated, but this is not included in the resultant @a length.
    * 
@@ -2009,6 +2051,7 @@ public:
    * @newin{2,22}
    */
   bool load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length);
+
   //TODO: Something better than char*& for contents?
   /** Loads the content of the file into memory, returning the size of the data. 
    * The data is always zero terminated, but this is not included in the resultant @a length.
@@ -2018,6 +2061,7 @@ public:
    * @param etag_out A location to place the current entity tag for the file.
    */
   bool load_contents(char*& contents, gsize& length, std::string& etag_out);
+
   /** Loads the content of the file into memory, returning the size of the data. 
    * The data is always zero terminated, but this is not included in the resultant @a length.
    *
