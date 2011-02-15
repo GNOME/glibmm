@@ -70,10 +70,10 @@ $DocsParser::commentEnd = "   */";
 sub read_defs($$$)
 {
   my ($path, $filename, $filename_override) = @_;
-  
+
   my $objParser = new XML::Parser(ErrorContext => 0);
   $objParser->setHandlers(Start => \&parse_on_start, End => \&parse_on_end, Char => \&parse_on_cdata);
-  
+
   # C documentation:
   $DocsParser::CurrentFile = "$path/$filename";
   if ( ! -r $DocsParser::CurrentFile)
@@ -118,7 +118,7 @@ sub parse_on_start($$%)
     {
       $objParser->xpcroak("\nClose a function tag before you open another one.");
     }
-    
+
     my $functionName = $attr{name};
 
     #Reuse existing Function, if it exists:
@@ -293,7 +293,7 @@ sub append_parameter_docs($$)
     if ($param ne "error" ) #We wrap GErrors as exceptions, so ignore these.
     {
       my $desc = $$param_descriptions->{$param};
-    
+
       $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
       DocsParser::convert_docs_to_cpp($obj_function, \$desc);
       if(length($desc) > 0)
@@ -436,7 +436,7 @@ sub substitute_function($$)
     }
     else
     {
-      print "Documentation: Transformed C name $name into ";  
+      print "Documentation: Transformed C name $name into ";
       non_object_method_name($doc_func, \$name);
       print "C++ name $name\n";
     }
@@ -477,9 +477,9 @@ sub non_object_method_name($$)
       }
     }
   }
-  
+
   print STDERR "Documentation: Class/Namespace for $$name not found\n";
-}   
+}
 
 sub lookup_object_of_method($$)
 {
@@ -517,7 +517,7 @@ sub lookup_object_of_method($$)
 
     pop(@parts);
   }
-  
+
   return undef;
 }
 

@@ -47,7 +47,7 @@ sub new
   $$self{writable} = ($1 eq "#t")       if ($def =~ s/\(writable (\S+)\)//);
   $$self{construct_only} = ($1 eq "#t") if ($def =~ s/\(construct-only (\S+)\)//);
   $$self{entity_type} = 'property';
-  
+
   # Property documentation:
   my $propertydocs = $1                     if ($def =~ s/\(docs "([^"]*)"\)//);
   # Add a full-stop if there is not one already:
@@ -62,9 +62,9 @@ sub new
       }
     }
   }
-  
+
   $$self{docs} = $propertydocs;
-  
+
 
   $$self{name} =~ s/-/_/g; # change - to _
 

@@ -274,7 +274,7 @@ sub args_types_and_names_with_default_values($)
   my $param_types = $$self{param_types};
   my $param_default_values = $$self{param_default_values};
   my @out;
-  
+
   for ($i = 0; $i < $#$param_types + 1; $i++)
   {
     my $str = sprintf("%s %s", $$param_types[$i], $$param_names[$i]);
@@ -294,4 +294,3 @@ sub args_types_and_names_with_default_values($)
 }
 
 1; # indicate proper module load.
-

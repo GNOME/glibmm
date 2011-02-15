@@ -1,6 +1,6 @@
-# gtkmm - WrapParser module
+# gmmproc - Common::WrapParser module
 #
-# Copyright 2001 Free Software Foundation
+# Copyright 2011 glibmm development team
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,50 +16,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
-package WrapParser;
+
+package Common::WrapParser;
+
 use strict;
 use warnings;
-use Util;
-use GtkDefs;
-use Function;
-use DocsParser;
-
-BEGIN {
-     use Exporter   ();
-     our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-
-     # set the version for version checking
-     $VERSION     = 1.00;
-     @ISA         = qw(Exporter);
-     @EXPORT      = ( );
-     %EXPORT_TAGS = ( );
-     # your exported package globals go here,
-     # as well as any optionally exported functions
-     @EXPORT_OK   = ( );
-     }
-our @EXPORT_OK;
+use Common::Util;
+use Common::Function;
+use Common::DocsParser;
 
 ############################################################################
 
-#TODO: write a function in main guessing backend main module based on given definitions filename - gtk.defs will give Defs, gtk.gir will give Gir
-#TODO: on construction of Base::Api a module name should be passed. it will be used to create a backend for it.
-#TODO: require $guessed_main_module::Backend;
-#TODO: on construction take Base::Api as parameter.
-#TODO: Base::Api will give an outputter to use.
-#TODO: Outputter should be split into two classes - common part and backend part.
-#TODO: When setting backend for Base::Api it should also get backend for outputter.
-#TODO: Backend should have methods like used in Base::API and a method returning an outputter backend.
-
-
 my @tokens = ();
 
-# $objWrapParser new($objOutputter)
-sub new($)
-{
-  my ($objOutputter) = @_;
+my $g_a = 'api';
+my $g_
 
-  my $self = {};
-  bless $self;
+sub new($$)
+{
+  my $type = shift;
+  my $api = shift;
+  my $class = (ref ($type) or $type or 'Common::WrapParser');
+  my $self =
+  {
+    $g_m => $api
+  }
 
    #Initialize member data:
   $$self{objOutputter} = $objOutputter;
@@ -82,6 +63,7 @@ sub new($)
 
   $$self{already_read} = {};
 
+  bless ($self, $class);
   return $self;
 }
 
@@ -352,18 +334,18 @@ sub on_comment_doxygen($)
       while ($next_token !~ /\S/)
       {
         push(@whitespace, $self->extract_token());
-	$next_token = $self->peek_token();
+        $next_token = $self->peek_token();
       }
 
       # If the next token is a signal, do not close this comment, to merge
       # this doxygen comment with the one from the signal.
       if($next_token eq '_WRAP_SIGNAL')
       {
-	# Extract token and process
-	$self->extract_token();
-	# Tell wrap_signal to merge automatically generated comment with
-	# already existing comment. This is why we do not close the comment
-	# here.
+        # Extract token and process
+        $self->extract_token();
+        # Tell wrap_signal to merge automatically generated comment with
+        # already existing comment. This is why we do not close the comment
+        # here.
         $self->on_wrap_signal(1);
       }
       else
@@ -942,7 +924,7 @@ sub on_wrap_method($)
     }
     elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
-    	$ifdef = $1;
+      $ifdef = $1;
     }
   }
 
@@ -1103,7 +1085,7 @@ sub on_implements_interface($$)
     }
   }
   my $objOutputter = $$self{objOutputter};
-  $objOutputter->output_implements_interface($interface, $ifdef);	
+  $objOutputter->output_implements_interface($interface, $ifdef);
 }
 
 sub on_wrap_create($)
@@ -1168,9 +1150,9 @@ sub on_wrap_signal($$)
       $bRefreturn = 1;
     }
 
-  	elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
+    elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
-    	$ifdef = $1;
+      $ifdef = $1;
     }
   }
 
@@ -1212,7 +1194,7 @@ sub on_wrap_vfunc($)
       { $refreturn_ctype = 1; }
   elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
-    	$ifdef = $1;
+      $ifdef = $1;
     }
   }
 

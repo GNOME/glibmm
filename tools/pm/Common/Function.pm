@@ -1,9 +1,9 @@
-package Function;
+package Common::Function;
 
 use strict;
 use warnings;
-use Util;
-use base qw (FunctionBase);
+use Common::Util;
+use parent qw (Base::Function);
 
 my $gi_p_t = 'internal_param_types';
 my $gi_p_n = 'internal_param_names';
@@ -40,7 +40,7 @@ sub parse_params($$)
   for my $part (split(/(const )|([,=&*()])|(<[^,]*>)|(\s+)/, $line)) #special characters OR <something> OR whitespace.
   {
     next if (not defined ($part) or not $part);
-      
+
     if ($part eq '(') #Detect the opening bracket.
     {
        push (@str, $part);
@@ -87,7 +87,7 @@ sub parse_params($$)
       push (@{$param_types}, $type);
       push (@{$param_names}, $name);
       push (@{$param_default_values}, $value);
-      
+
       #Clear variables, ready for the next parameter.
       @str = ();
       $type= '';
@@ -383,4 +383,3 @@ sub get_is_const($)
 }
 
 1; # indicate proper module load.
-

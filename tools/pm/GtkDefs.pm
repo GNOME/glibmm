@@ -216,7 +216,7 @@ sub read_defs ($$)
 {
   my ($self, $file) = @_;
   my $real_path = '';
-  
+
   for my $path (@{$self->{$g_i_p}})
   {
     my $temp_path = join ('/', $path, $file);
@@ -751,7 +751,7 @@ sub new
 
   if ($def!~/^\s*$/)
   {
-	  GtkDefs::error("Unhandled signal/vfunc def ($def) in $$self{class}::$$self{name}");
+    GtkDefs::error("Unhandled signal/vfunc def ($def) in $$self{class}::$$self{name}");
   }
 
   return $self;

@@ -52,7 +52,7 @@ sub deduce_backend_from_file ($)
   return undef;
 }
 
-#my $g_o = 'outputter';
+my $g_o = 'outputter';
 my $g_b = 'backend';
 
 sub new ($$$)
@@ -60,7 +60,6 @@ sub new ($$$)
   my $type = shift;
   my $file = shift;
   my $defs_a_r = shift;
-#  my $outputter = shift;
   my $class = (ref ($type) or $type or "Common::Api");
   my $backend = undef;
   my $main_backend_module = deduce_backend_from_file ($file);
@@ -70,12 +69,11 @@ sub new ($$$)
     #TODO: implement Gir backend and remove the condition below.
     if ($main_backend_module eq 'Gir')
     {
-      print STDERR join ('', 'Gir backend for file ', $file, "is not yet implemented\n");
+      print STDERR join ('', 'Gir backend for file ', $file, " is not yet implemented\n");
     }
     #TODO: error!
     exit 1;
   }
-#  $outputter->set_backend ($backend->get_outputter_backend ());
 
   unless ($backend->read_file ($file))
   {
@@ -83,19 +81,22 @@ sub new ($$$)
     exit 1;
   }
 
+  my $outputter = Common::Outputter->new ($backend->get_outputter_backend ());
   my $self =
   {
-    $g_b => $backend
-#    $g_o => $outputter
+    $g_b => $backend,
+    $g_o => $outputter
   };
 
   bless ($self, $class);
   return $self;
 }
 
-sub read_file ($$)
+sub get_outputter ($)
 {
   my $self = shift;
+
+  return $self->{$g_o};
 }
 
 sub get_enums ($)

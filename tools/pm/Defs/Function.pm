@@ -130,12 +130,6 @@ sub parse ($$)
     #Ignore them.
   }
 
-  # of-object
-  if ($def =~ s/\(of-object "(\S+)"\)//)
-  {
-    #Ignore them.
-  }
-
   if ($def !~ /^\s*$/)
   {
     #GtkDefs::error("Unhandled function parameter ($def) in $$self{c_name}\n");

@@ -80,23 +80,23 @@ sub error
 
 sub ifdef($$)
 {
-	my ($self, $ifdef) = @_;
-	if ($ifdef)
-	{
-		$self->append("\n#ifdef $ifdef\n");
-	}
+  my ($self, $ifdef) = @_;
+  if ($ifdef)
+  {
+    $self->append("\n#ifdef $ifdef\n");
+  }
 }
 
 sub endif($$)
 {
-	my ($self, $ifdef) = @_;
-	if ($ifdef)
-	{
-		$self->append("\n#endif // $ifdef\n");
-	}
+  my ($self, $ifdef) = @_;
+  if ($ifdef)
+  {
+    $self->append("\n#endif // $ifdef\n");
+  }
 }
 
-### Convert _WRAP to a virtual 
+### Convert _WRAP to a virtual
 # _VFUNC_H(signame,rettype,`<cppargs>')
 # _VFUNC_PH(gtkname,crettype,cargs and names)
 # void output_wrap_vfunc_h($filename, $line_num, $objCppfunc, $objCDefsFunc)
@@ -223,7 +223,7 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
   {
     my $refreturn = "";
     $refreturn = "refreturn" if($bRefreturn eq 1);
-  
+
     my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
@@ -292,10 +292,10 @@ sub output_wrap_meth($$$$$$$)
   $self->ifdef($ifdef);
 
   $self->append("  ${cppMethodDecl};");
-  
+
   $self->endif($ifdef);
 
-  
+
   if($deprecated ne "")
   {
     $self->append("\n_DEPRECATE_IFDEF_END\n");
@@ -930,8 +930,8 @@ sub output_implements_interface($$)
   my ($self, $interface, $ifdef) = @_;
 
   my $str = sprintf("_IMPLEMENTS_INTERFACE_CC(%s, %s)dnl\n",
-  	$interface,
-  	$ifdef);
+    $interface,
+    $ifdef);
 
   $self->append($str);
 }
