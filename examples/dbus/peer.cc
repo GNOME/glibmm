@@ -89,7 +89,7 @@ TCP transport on two different hosts without authentication:
 #include <glibmm.h>
 #include <iostream>
 
-static Glib::RefPtr<Gio::DBusNodeInfo> introspection_data;
+static Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
 
 static Glib::ustring introspection_xml =
   "<node>"
@@ -103,14 +103,14 @@ static Glib::ustring introspection_xml =
 
 // This variable is used to keep an incoming connection active until it is
 // closed.
-static Glib::RefPtr<Gio::DBusConnection> curr_connection;
+static Glib::RefPtr<Gio::DBus::Connection> curr_connection;
 
-static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>&,
+static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>&,
   const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
   const Glib::ustring& /* interface_name */, const Glib::ustring& method_name,
   // Since the parameters are generally tuples, get them from the invocation.
   const Glib::VariantBase& /* parameters */,
-  const Glib::RefPtr<Gio::DBusMethodInvocation>& invocation)
+  const Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation)
 {
   if(method_name == "HelloWorld")
   {
@@ -140,10 +140,10 @@ static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>&,
 }
 
 // Create the interface VTable.
-static const Gio::DBusInterfaceVTable
+static const Gio::DBus::InterfaceVTable
   interface_vtable(sigc::ptr_fun(&on_method_call));
 
-bool on_new_connection(const Glib::RefPtr<Gio::DBusConnection>& connection)
+bool on_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
 {
   Glib::RefPtr<Gio::Credentials> credentials =
     connection->get_peer_credentials();
@@ -158,7 +158,7 @@ bool on_new_connection(const Glib::RefPtr<Gio::DBusConnection>& connection)
   std::cout <<
     "Client connected." << std::endl <<
     "Peer credentials: " << credentials_str << std::endl <<
-    "Negotiated capabilities: unix-fd-passing=" << (connection->get_capabilities() & Gio::DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING) << std::endl;
+    "Negotiated capabilities: unix-fd-passing=" << (connection->get_capabilities() & Gio::DBus::CAPABILITY_FLAGS_UNIX_FD_PASSING) << std::endl;
 
   // If there is already an active connection, do not accept this new one.
   // There may be a better way to decide how to keep current incoming
@@ -192,16 +192,16 @@ bool on_new_connection(const Glib::RefPtr<Gio::DBusConnection>& connection)
 void run_as_server(Glib::ustring address, bool allow_anonymous)
 {
   Glib::ustring guid = Gio::DBus::generate_guid();
-  Gio::DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE;
+  Gio::DBus::ServerFlags flags = Gio::DBus::SERVER_FLAGS_NONE;
 
   if(allow_anonymous)
-    flags |= Gio::DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
+    flags |= Gio::DBus::SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
 
-  Glib::RefPtr<Gio::DBusServer> server;
+  Glib::RefPtr<Gio::DBus::Server> server;
 
   try
   {
-    server = Gio::DBusServer::create_sync(address, guid, flags);
+    server = Gio::DBus::Server::create_sync(address, guid, flags);
   }
   catch(const Glib::Error& ex)
   {
@@ -223,12 +223,12 @@ void run_as_server(Glib::ustring address, bool allow_anonymous)
 
 void run_as_client(Glib::ustring address)
 {
-  Glib::RefPtr<Gio::DBusConnection> connection;
+  Glib::RefPtr<Gio::DBus::Connection> connection;
 
   try
   {
-    connection = Gio::DBusConnection::create_for_address_sync(address,
-      Gio::DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT);
+    connection = Gio::DBus::Connection::create_for_address_sync(address,
+      Gio::DBus::CONNECTION_FLAGS_AUTHENTICATION_CLIENT);
   }
   catch(const Glib::Error& ex)
   {
@@ -239,7 +239,7 @@ void run_as_client(Glib::ustring address)
 
   std::cout << "Connected. " << std::endl <<
     "Negotiated capabilities: unix-fd-passing=" <<
-    static_cast<bool>(connection->get_capabilities() & Gio::DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING) << "." << std::endl;
+    static_cast<bool>(connection->get_capabilities() & Gio::DBus::CAPABILITY_FLAGS_UNIX_FD_PASSING) << "." << std::endl;
 
   // Get the current time to send as a greeting when calling a server's method.
   Glib::TimeVal time;
@@ -330,7 +330,7 @@ int main(int argc, char** argv)
 
   try
   {
-    introspection_data = Gio::DBusNodeInfo::create_for_xml(introspection_xml);
+    introspection_data = Gio::DBus::NodeInfo::create_for_xml(introspection_xml);
   }
   catch(const Glib::Error& ex)
   {

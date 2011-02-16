@@ -1,5 +1,29 @@
 2011-02-16  Murray Cumming  <murrayc@murrayc.com>
 
+	Move the DBus classes into a Gio::DBus namespace.
+	
+	* gio/giomm.h:
+	* gio/src/dbus*.[hg|ccg]
+	* gio/src/error.hg: Rename all DBus* classes to remove the prefix, putting 
+	them in a Gio::DBus namespace.
+	This required the use of the new _GMMPROC_EXTRA_NAMESPACE macro, to avoid 
+	generating a confused wrap_init.cc.
+	Along the way, I removed unnecessary class predeclarations, instead including 
+	the relevant header, because that is more convenient for users of the API.
+	* gio/src/dbuserror.[hg|ccg]: Renamed to dbuserrorutils.[hg|ccg] and 
+	renamed the Error namespace to ErrorUtils, to avoid a clash with the 
+	Gio::DBus::Error exception.
+	* gio/src/filelist.am:
+	* tools/m4/convert_gio.m4: Changed some conversions.
+	* examples/dbus/busserver.cc:
+	* examples/dbus/peer.cc:
+	* examples/dbus/userbus.cc: Adapted.
+	
+	This is generally more organized. A prefix, instead of a namespace, looked 
+	generally wrong to C++ coders.
+
+2011-02-16  Murray Cumming  <murrayc@murrayc.com>
+
 	gmmproc: Allow some classes to be in a sub-namespace.
 	
 	* tools/m4/class_shared.m4:

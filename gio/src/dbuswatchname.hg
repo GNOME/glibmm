@@ -27,21 +27,21 @@ namespace Gio
 namespace DBus
 {
 
-_WRAP_ENUM(BusNameWatcherFlags, GBusNameWatcherFlags)
+_WRAP_ENUM(BusNameWatcherFlags, GBusNameWatcherFlags, s#^DBUS_##, NO_GTYPE)
 
 /** For example,
- * void on_name_appeared(const Glib::RefPtr<Gio::DBusConnection>& connection,
+ * void on_name_appeared(const Glib::RefPtr<Gio::DBus::Connection>& connection,
  * const Glib::ustring& name, const Glib::ustring& name_owner);
  * @ingroup DBus
  */
-typedef sigc::slot<void, const Glib::RefPtr<Gio::DBusConnection>&, Glib::ustring, const Glib::ustring&> SlotNameAppeared;
+typedef sigc::slot<void, const Glib::RefPtr<Gio::DBus::Connection>&, Glib::ustring, const Glib::ustring&> SlotNameAppeared;
 
 /** For example,
- * void on_name_vanished(const Glib::RefPtr<Gio::DBusConnection>& connection,
+ * void on_name_vanished(const Glib::RefPtr<Gio::DBus::Connection>& connection,
  * const Glib::ustring& name);
  * @ingroup DBus
  */
-typedef sigc::slot<void, const Glib::RefPtr<Gio::DBusConnection>&, Glib::ustring> SlotNameVanished;
+typedef sigc::slot<void, const Glib::RefPtr<Gio::DBus::Connection>&, Glib::ustring> SlotNameVanished;
 
 //TODO: Add example from C API in class docs?
 /** Starts watching @a name on the bus specified by @a bus_type and calls
@@ -55,7 +55,7 @@ typedef sigc::slot<void, const Glib::RefPtr<Gio::DBusConnection>&, Glib::ustring
  * unwatch_name() with the watcher id this function returns.
  *
  * If the name vanishes or appears (for example the application owning the
- * name could restart), the slot are also invoked. If the DBusConnection
+ * name could restart), the slot are also invoked. If the Connection
  * that is used for watching the name disconnects, then @a
  * name_vanished_slot is invoked since it is no longer possible to access
  * the name.
@@ -93,9 +93,9 @@ guint watch_name(
 );
 _IGNORE(g_bus_watch_name)
 
-/** A watch_name() function that takes a DBusConnection instead of a BusType.
+/** A watch_name() function that takes a Connection instead of a BusType.
  *
- * @param connection A DBusConnection.
+ * @param connection A Connection.
  * @param name The name (well-known or unique) to watch.
  * @param name_appeared_slot Slot to invoke when name is known to exist.
  * @param name_vanished_slot Slot to invoke when name is known to not
@@ -108,7 +108,7 @@ _IGNORE(g_bus_watch_name)
  * @ingroup DBus
  */
 guint watch_name(
-  const Glib::RefPtr<DBusConnection>& connection,
+  const Glib::RefPtr<Connection>& connection,
   const Glib::ustring& name,
   const SlotNameAppeared& name_appeared_slot = SlotNameAppeared(),
   const SlotNameVanished& name_vanished_slot = SlotNameVanished(),

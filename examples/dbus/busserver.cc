@@ -23,7 +23,7 @@
  * allow per-client alarms, but that is left as an exercise.
  *
  * Along with the above it provides a method to get its stdout's file
- * descriptor to test the Gio::DBusMessage API.
+ * descriptor to test the Gio::DBus::Message API.
  */
 
 #include <giomm.h>
@@ -33,7 +33,7 @@
 namespace
 {
 
-static Glib::RefPtr<Gio::DBusNodeInfo> introspection_data;
+static Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
 
 static Glib::ustring introspection_xml =
   "<node>"
@@ -57,11 +57,11 @@ static Glib::TimeVal curr_alarm;
 } // anonymous namespace
 
 /* TODO: This code does not seem to be used. murrayc.
-static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>& connection,
+static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection,
   const Glib::ustring& sender, const Glib::ustring& object_path,
   const Glib::ustring& interface_name, const Glib::ustring& method_name,
   const Glib::VariantBase& parameters,
-  const Glib::RefPtr<Gio::DBusMethodInvocation>& invocation)
+  const Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation)
 {
   if(method_name == "GetTime")
   {
@@ -100,7 +100,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>& connection,
     if(!curr_alarm.assign_from_iso8601(time_str))
     {
       // If setting alarm was not successful, return an error.
-      Gio::DBusError error(Gio::DBusError::INVALID_ARGS,
+      Gio::DBus::Error error(Gio::DBus::Error::INVALID_ARGS,
           "Alarm string is not in ISO8601 format.");
       invocation->return_gerror(error);
     }
@@ -116,8 +116,8 @@ static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>& connection,
       {
         list->append(STDOUT_FILENO);
 
-        Glib::RefPtr<Gio::DBusMessage> reply =
-          Gio::DBusMessage::create_method_reply(invocation->get_message());
+        Glib::RefPtr<Gio::DBus::Message> reply =
+          Gio::DBus::Message::create_method_reply(invocation->get_message());
 
         reply->set_unix_fd_list(list);
 
@@ -144,7 +144,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>& connection,
   else
   {
     // Non-existent method on the interface.
-    Gio::DBusError error(Gio::DBusError::UNKNOWN_METHOD,
+    Gio::DBus::Error error(Gio::DBus::Error::UNKNOWN_METHOD,
       "Method does not exist.");
     invocation->return_gerror(error);
   }
@@ -152,7 +152,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBusConnection>& connection,
 */
 
 void on_get_property(Glib::VariantBase& property,
-  const Glib::RefPtr<Gio::DBusConnection>& /* connection */,
+  const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
   const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
   const Glib::ustring& /* interface_name */, const Glib::ustring& property_name)
 {
@@ -174,12 +174,12 @@ void on_get_property(Glib::VariantBase& property,
   }
   else
   {
-    throw Gio::DBusError(Gio::DBusError::FAILED, "Unknown property name.");
+    throw Gio::DBus::Error(Gio::DBus::Error::FAILED, "Unknown property name.");
   }
 }
 
 /** TODO: This code does not seem to be used. murrayc.
-bool on_set_property(const Glib::RefPtr<Gio::DBusConnection>& connection,
+bool on_set_property(const Glib::RefPtr<Gio::DBus::Connection>& connection,
   const Glib::ustring& sender, const Glib::ustring& object_path,
   const Glib::ustring& interface_name, const Glib::ustring& property_name,
   const Glib::VariantBase& value)

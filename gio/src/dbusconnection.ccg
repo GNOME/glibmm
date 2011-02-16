@@ -35,8 +35,8 @@ static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection,
   const char* interface_name, const char* signal_name, GVariant* parameters,
   void* user_data)
 {
-  Gio::DBusConnection::SlotSignal* the_slot =
-    static_cast<Gio::DBusConnection::SlotSignal*>(user_data);
+  Gio::DBus::Connection::SlotSignal* the_slot =
+    static_cast<Gio::DBus::Connection::SlotSignal*>(user_data);
 
   try
   {
@@ -52,19 +52,19 @@ static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection,
 
 static void DBusConnection_Signal_giomm_callback_destroy(void* data)
 {
-  delete static_cast<Gio::DBusConnection::SlotSignal*>(data);
+  delete static_cast<Gio::DBus::Connection::SlotSignal*>(data);
 }
 
 static GDBusMessage* DBusConnection_Message_Filter_giomm_callback(
   GDBusConnection* connection, GDBusMessage* message, gboolean incoming,
   void* user_data)
 {
-  Gio::DBusConnection::SlotMessageFilter* the_slot =
-    static_cast<Gio::DBusConnection::SlotMessageFilter*>(user_data);
+  Gio::DBus::Connection::SlotMessageFilter* the_slot =
+    static_cast<Gio::DBus::Connection::SlotMessageFilter*>(user_data);
 
   try
   {
-    Glib::RefPtr<Gio::DBusMessage> result = (*the_slot)(
+    Glib::RefPtr<Gio::DBus::Message> result = (*the_slot)(
       Glib::wrap(connection, true), Glib::wrap(message, true),
       static_cast<bool>(incoming));
     return (result) ? result->gobj_copy() : 0;
@@ -79,7 +79,7 @@ static GDBusMessage* DBusConnection_Message_Filter_giomm_callback(
 
 static void DBusConnection_Message_Filter_giomm_callback_destroy(void* data)
 {
-  delete static_cast<Gio::DBusConnection::SlotMessageFilter*>(data);
+  delete static_cast<Gio::DBus::Connection::SlotMessageFilter*>(data);
 }
 
 static void DBusInterfaceVTable_MethodCall_giomm_callback(
@@ -87,10 +87,10 @@ static void DBusInterfaceVTable_MethodCall_giomm_callback(
   const char* interface_name, const char* method_name, GVariant* parameters,
   GDBusMethodInvocation* invocation, void* user_data)
 {
-  Gio::DBusInterfaceVTable* vtable =
-    static_cast<Gio::DBusInterfaceVTable*>(user_data);
+  Gio::DBus::InterfaceVTable* vtable =
+    static_cast<Gio::DBus::InterfaceVTable*>(user_data);
 
-  Gio::DBusInterfaceVTable::SlotInterfaceMethodCall* the_slot =
+  Gio::DBus::InterfaceVTable::SlotInterfaceMethodCall* the_slot =
     vtable->get_slot_method_call();
 
   try
@@ -110,10 +110,10 @@ static GVariant* DBusInterfaceVTable_GetProperty_giomm_callback(
   const char* interface_name, const char* property_name, GError** error,
   void* user_data)
 {
-  Gio::DBusInterfaceVTable* vtable =
-    static_cast<Gio::DBusInterfaceVTable*>(user_data);
+  Gio::DBus::InterfaceVTable* vtable =
+    static_cast<Gio::DBus::InterfaceVTable*>(user_data);
 
-  Gio::DBusInterfaceVTable::SlotInterfaceGetProperty* the_slot =
+  Gio::DBus::InterfaceVTable::SlotInterfaceGetProperty* the_slot =
     vtable->get_slot_get_property();
 
   try
@@ -142,10 +142,10 @@ static gboolean DBusInterfaceVTable_SetProperty_giomm_callback(
   const char* interface_name, const char* property_name, GVariant* value,
   GError** error, void* user_data)
 {
-  Gio::DBusInterfaceVTable* vtable =
-    static_cast<Gio::DBusInterfaceVTable*>(user_data);
+  Gio::DBus::InterfaceVTable* vtable =
+    static_cast<Gio::DBus::InterfaceVTable*>(user_data);
 
-  Gio::DBusInterfaceVTable::SlotInterfaceSetProperty* the_slot =
+  Gio::DBus::InterfaceVTable::SlotInterfaceSetProperty* the_slot =
     vtable->get_slot_set_property();
 
   try
@@ -171,10 +171,10 @@ static char** DBusSubtreeVTable_Enumerate_giomm_callback(
   GDBusConnection* connection, const char* sender, const char* object_path,
   void* user_data)
 {
-  Gio::DBusSubtreeVTable* vtable =
-    static_cast<Gio::DBusSubtreeVTable*>(user_data);
+  Gio::DBus::SubtreeVTable* vtable =
+    static_cast<Gio::DBus::SubtreeVTable*>(user_data);
 
-  Gio::DBusSubtreeVTable::SlotSubtreeEnumerate* the_slot =
+  Gio::DBus::SubtreeVTable::SlotSubtreeEnumerate* the_slot =
     vtable->get_slot_enumerate();
 
   try
@@ -204,21 +204,21 @@ static GDBusInterfaceInfo** DBusSubtreeVTable_Introspect_giomm_callback(
   GDBusConnection* connection, const char* sender, const char* object_path,
   const char* node, void* user_data)
 {
-  Gio::DBusSubtreeVTable* vtable =
-    static_cast<Gio::DBusSubtreeVTable*>(user_data);
+  Gio::DBus::SubtreeVTable* vtable =
+    static_cast<Gio::DBus::SubtreeVTable*>(user_data);
 
-  Gio::DBusSubtreeVTable::SlotSubtreeIntrospect* the_slot =
+  Gio::DBus::SubtreeVTable::SlotSubtreeIntrospect* the_slot =
     vtable->get_slot_introspect();
 
   try
   {
-    std::vector< Glib::RefPtr<Gio::DBusInterfaceInfo> > result =
+    std::vector< Glib::RefPtr<Gio::DBus::InterfaceInfo> > result =
       (*the_slot)(Glib::wrap(connection, true), sender, object_path, node);
 
     // This will be freed by the caller, along with unreferencing its members.
     GDBusInterfaceInfo** info = g_new(GDBusInterfaceInfo*, result.size());
 
-    for(std::vector< Glib::RefPtr<Gio::DBusInterfaceInfo> >::size_type i = 0;
+    for(std::vector< Glib::RefPtr<Gio::DBus::InterfaceInfo> >::size_type i = 0;
       i < result.size(); i++)
     {
       info[i] = static_cast<GDBusInterfaceInfo*>(
@@ -240,19 +240,19 @@ static const GDBusInterfaceVTable* DBusSubtreeVTable_Dispatch_giomm_callback(
   const char* interface_name, const char* node, void** out_user_data,
   void* user_data)
 {
-  Gio::DBusSubtreeVTable* vtable =
-    static_cast<Gio::DBusSubtreeVTable*>(user_data);
+  Gio::DBus::SubtreeVTable* vtable =
+    static_cast<Gio::DBus::SubtreeVTable*>(user_data);
 
-  Gio::DBusSubtreeVTable::SlotSubtreeDispatch* the_slot =
+  Gio::DBus::SubtreeVTable::SlotSubtreeDispatch* the_slot =
     vtable->get_slot_dispatch();
 
   try
   {
-    const Gio::DBusInterfaceVTable* vtable =
+    const Gio::DBus::InterfaceVTable* vtable =
       (*the_slot)(Glib::wrap(connection, true), sender, object_path,
       interface_name, (node ? node : ""));
 
-    *out_user_data = const_cast<Gio::DBusInterfaceVTable*>(vtable);
+    *out_user_data = const_cast<Gio::DBus::InterfaceVTable*>(vtable);
 
     return vtable->gobj();
   }
@@ -271,12 +271,15 @@ static const GDBusInterfaceVTable* DBusSubtreeVTable_Dispatch_giomm_callback(
 namespace Gio
 {
 
-DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+namespace DBus
+{
+
+Connection::Connection(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
     "guid", (guid.empty() ? 0 : guid.c_str()),
@@ -286,11 +289,11 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init_async(slot, cancellable);
 }
 
-DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+Connection::Connection(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
     "guid", (guid.empty() ? 0 : guid.c_str()),
@@ -300,11 +303,11 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init_async(slot, cancellable);
 }
 
-DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+Connection::Connection(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const SlotAsyncReady& slot,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
     "guid", (guid.empty() ? 0 : guid.c_str()),
@@ -314,10 +317,10 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init_async(slot);
 }
 
-DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+Connection::Connection(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
   const SlotAsyncReady& slot,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
     "guid", (guid.empty() ? 0 : guid.c_str()),
@@ -327,11 +330,11 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init_async(slot);
 }
 
-DBusConnection::DBusConnection(const std::string& address,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+Connection::Connection(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
@@ -340,10 +343,10 @@ DBusConnection::DBusConnection(const std::string& address,
   init_async(slot, cancellable);
 }
 
-DBusConnection::DBusConnection(const std::string& address,
+Connection::Connection(const std::string& address,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
@@ -352,10 +355,10 @@ DBusConnection::DBusConnection(const std::string& address,
   init_async(slot, cancellable);
 }
 
-DBusConnection::DBusConnection(const std::string& address,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+Connection::Connection(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer,
   const SlotAsyncReady& slot,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
@@ -364,9 +367,9 @@ DBusConnection::DBusConnection(const std::string& address,
   init_async(slot);
 }
 
-DBusConnection::DBusConnection(const std::string& address,
+Connection::Connection(const std::string& address,
   const SlotAsyncReady& slot,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
@@ -375,11 +378,11 @@ DBusConnection::DBusConnection(const std::string& address,
   init_async(slot);
 }
 
-DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+Connection::Connection(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
     "guid", (guid.empty() ? 0 : guid.c_str()),
@@ -389,10 +392,10 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init(cancellable);
 }
 
-DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+Connection::Connection(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
     "guid", (guid.empty() ? 0 : guid.c_str()),
@@ -402,10 +405,10 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init(cancellable);
 }
 
-DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+Connection::Connection(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
-  DBusConnectionFlags flags)
+  const Glib::RefPtr<AuthObserver>& observer,
+  ConnectionFlags flags)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
     "guid", (guid.empty() ? 0 : guid.c_str()),
@@ -415,9 +418,9 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init();
 }
 
-DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
+Connection::Connection(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("stream", Glib::unwrap(stream),
     "guid", (guid.empty() ? 0 : guid.c_str()),
@@ -427,10 +430,10 @@ DBusConnection::DBusConnection(const Glib::RefPtr<IOStream>& stream,
   init();
 }
 
-DBusConnection::DBusConnection(const std::string& address,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+Connection::Connection(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
@@ -439,9 +442,9 @@ DBusConnection::DBusConnection(const std::string& address,
   init(cancellable);
 }
 
-DBusConnection::DBusConnection(const std::string& address,
+Connection::Connection(const std::string& address,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
@@ -450,9 +453,9 @@ DBusConnection::DBusConnection(const std::string& address,
   init(cancellable);
 }
 
-DBusConnection::DBusConnection(const std::string& address,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
-  DBusConnectionFlags flags)
+Connection::Connection(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer,
+  ConnectionFlags flags)
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
@@ -461,8 +464,8 @@ DBusConnection::DBusConnection(const std::string& address,
   init();
 }
 
-DBusConnection::DBusConnection(const std::string& address,
-  DBusConnectionFlags flags)
+Connection::Connection(const std::string& address,
+  ConnectionFlags flags)
 :
   _CONSTRUCT("address", (address.empty() ? 0 : address.c_str()),
     "flags", static_cast<GDBusConnectionFlags>(flags),
@@ -472,184 +475,184 @@ DBusConnection::DBusConnection(const std::string& address,
 }
 
 //static
-void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
+void Connection::create(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
 
-  DBusConnection(stream, guid, observer, slot, cancellable, flags);
+  Connection(stream, guid, observer, slot, cancellable, flags);
 }
 
 //static
-void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
+void Connection::create(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
 
-  DBusConnection(stream, guid, slot, cancellable, flags);
+  Connection(stream, guid, slot, cancellable, flags);
 }
 
 //static
-void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
+void Connection::create(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const SlotAsyncReady& slot,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
-  DBusConnection(stream, guid, observer, slot, flags);
+  Connection(stream, guid, observer, slot, flags);
 }
 
 //static
-void DBusConnection::create(const Glib::RefPtr<IOStream>& stream,
+void Connection::create(const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
   const SlotAsyncReady& slot,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
-  DBusConnection(stream, guid, slot, flags);
+  Connection(stream, guid, slot, flags);
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::create_sync(
+Glib::RefPtr<Connection> Connection::create_sync(
   const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
-  return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid,
+  return Glib::RefPtr<Connection>(new Connection(stream, guid,
     observer, cancellable, flags));
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::create_sync(
+Glib::RefPtr<Connection> Connection::create_sync(
   const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
-  return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid,
+  return Glib::RefPtr<Connection>(new Connection(stream, guid,
     cancellable, flags));
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::create_sync(
+Glib::RefPtr<Connection> Connection::create_sync(
   const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
-  DBusConnectionFlags flags)
+  const Glib::RefPtr<AuthObserver>& observer,
+  ConnectionFlags flags)
 {
-  return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid,
+  return Glib::RefPtr<Connection>(new Connection(stream, guid,
     observer, flags));
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::create_sync(
+Glib::RefPtr<Connection> Connection::create_sync(
   const Glib::RefPtr<IOStream>& stream,
   const std::string& guid,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
-  return Glib::RefPtr<DBusConnection>(new DBusConnection(stream, guid,
+  return Glib::RefPtr<Connection>(new Connection(stream, guid,
     flags));
 }
 
 //static
-void DBusConnection::create_for_address(const std::string& address,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+void Connection::create_for_address(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
-  DBusConnection(address, observer, slot, cancellable, flags);
+  Connection(address, observer, slot, cancellable, flags);
 }
 
 //static
-void DBusConnection::create_for_address(const std::string& address,
+void Connection::create_for_address(const std::string& address,
   const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
-  DBusConnection(address, slot, cancellable, flags);
+  Connection(address, slot, cancellable, flags);
 }
 
 //static
-void DBusConnection::create_for_address(const std::string& address,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+void Connection::create_for_address(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer,
   const SlotAsyncReady& slot,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
-  DBusConnection(address, observer, slot, flags);
+  Connection(address, observer, slot, flags);
 }
 
 //static
-void DBusConnection::create_for_address(const std::string& address,
+void Connection::create_for_address(const std::string& address,
   const SlotAsyncReady& slot,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
-  DBusConnection(address, slot, flags);
+  Connection(address, slot, flags);
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::create_for_address_sync(
+Glib::RefPtr<Connection> Connection::create_for_address_sync(
   const std::string& address,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
-  return Glib::RefPtr<DBusConnection>(new DBusConnection(address, observer,
+  return Glib::RefPtr<Connection>(new Connection(address, observer,
     cancellable, flags));
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::create_for_address_sync(
+Glib::RefPtr<Connection> Connection::create_for_address_sync(
   const std::string& address,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
-  return Glib::RefPtr<DBusConnection>(new DBusConnection(address, cancellable,
+  return Glib::RefPtr<Connection>(new Connection(address, cancellable,
     flags));
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::create_for_address_sync(
+Glib::RefPtr<Connection> Connection::create_for_address_sync(
   const std::string& address,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
-  DBusConnectionFlags flags)
+  const Glib::RefPtr<AuthObserver>& observer,
+  ConnectionFlags flags)
 {
-  return Glib::RefPtr<DBusConnection>(new DBusConnection(address, observer,
+  return Glib::RefPtr<Connection>(new Connection(address, observer,
     flags));
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::create_for_address_sync(
+Glib::RefPtr<Connection> Connection::create_for_address_sync(
   const std::string& address,
-  DBusConnectionFlags flags)
+  ConnectionFlags flags)
 {
-  return Glib::RefPtr<DBusConnection>(new DBusConnection(address, flags));
+  return Glib::RefPtr<Connection>(new Connection(address, flags));
 }
 
 //static
-void DBusConnection::get(BusType bus_type, const SlotAsyncReady& slot,
+void Connection::get(BusType bus_type, const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
@@ -659,7 +662,7 @@ void DBusConnection::get(BusType bus_type, const SlotAsyncReady& slot,
 }
 
 //static
-void DBusConnection::get(BusType bus_type, const SlotAsyncReady& slot)
+void Connection::get(BusType bus_type, const SlotAsyncReady& slot)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
@@ -668,7 +671,7 @@ void DBusConnection::get(BusType bus_type, const SlotAsyncReady& slot)
 }
 
 //static
-Glib::RefPtr<DBusConnection> DBusConnection::get_sync(BusType bus_type)
+Glib::RefPtr<Connection> Connection::get_sync(BusType bus_type)
 {
   GError* gerror = 0;
 
@@ -681,12 +684,12 @@ Glib::RefPtr<DBusConnection> DBusConnection::get_sync(BusType bus_type)
   return Glib::wrap(result);
 }
 
-void DBusConnection::close()
+void Connection::close()
 {
   g_dbus_connection_close(gobj(), 0, 0, 0);
 }
 
-void DBusConnection::close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void Connection::close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
@@ -696,7 +699,7 @@ void DBusConnection::close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancel
                     slot_copy);
 }
 
-void DBusConnection::close(const SlotAsyncReady& slot)
+void Connection::close(const SlotAsyncReady& slot)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
@@ -706,7 +709,7 @@ void DBusConnection::close(const SlotAsyncReady& slot)
                     slot_copy);
 }
 
-void DBusConnection::close_sync()
+void Connection::close_sync()
 {
   GError* gerror = 0;
   g_dbus_connection_close_sync(gobj(), 0, &(gerror));
@@ -714,12 +717,12 @@ void DBusConnection::close_sync()
     ::Glib::Error::throw_exception(gerror);
 }
 
-void DBusConnection::flush()
+void Connection::flush()
 {
   g_dbus_connection_flush(gobj(), 0, 0, 0);
 }
 
-void DBusConnection::flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void Connection::flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
@@ -729,7 +732,7 @@ void DBusConnection::flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancel
                     slot_copy);
 }
 
-void DBusConnection::flush(const SlotAsyncReady& slot)
+void Connection::flush(const SlotAsyncReady& slot)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
 
@@ -739,7 +742,7 @@ void DBusConnection::flush(const SlotAsyncReady& slot)
                     slot_copy);
 }
 
-void DBusConnection::flush_sync()
+void Connection::flush_sync()
 {
   GError* gerror = 0;
   g_dbus_connection_flush_sync(gobj(), 0, &(gerror));
@@ -747,8 +750,8 @@ void DBusConnection::flush_sync()
     ::Glib::Error::throw_exception(gerror);
 }
 
-bool DBusConnection::send_message(const Glib::RefPtr<DBusMessage>& message,
-  DBusSendMessageFlags flags)
+bool Connection::send_message(const Glib::RefPtr<Message>& message,
+  SendMessageFlags flags)
 {
   GError* gerror = 0;
 
@@ -762,7 +765,7 @@ bool DBusConnection::send_message(const Glib::RefPtr<DBusMessage>& message,
   return result;
 }
 
-void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void Connection::send_message_with_reply(const Glib::RefPtr<Message>& message, int timeout_msec,const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
   volatile guint32 out_serial = 0;
@@ -774,7 +777,7 @@ void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& me
   message->set_serial(out_serial);
 }
 
-void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& message, int timeout_msec,const SlotAsyncReady& slot)
+void Connection::send_message_with_reply(const Glib::RefPtr<Message>& message, int timeout_msec,const SlotAsyncReady& slot)
 {
   SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
   volatile guint32 out_serial = 0;
@@ -786,8 +789,8 @@ void DBusConnection::send_message_with_reply(const Glib::RefPtr<DBusMessage>& me
   message->set_serial(out_serial);
 }
 
-Glib::RefPtr<DBusMessage> DBusConnection::send_message_with_reply_sync(
-  const Glib::RefPtr<DBusMessage>& message,
+Glib::RefPtr<Message> Connection::send_message_with_reply_sync(
+  const Glib::RefPtr<Message>& message,
   const Glib::RefPtr<Cancellable>& cancellable,
   gint timeout_msec
 )
@@ -807,8 +810,8 @@ Glib::RefPtr<DBusMessage> DBusConnection::send_message_with_reply_sync(
   return Glib::wrap(result);
 }
 
-Glib::RefPtr<DBusMessage> DBusConnection::send_message_with_reply_sync(
-  const Glib::RefPtr<DBusMessage>& message,
+Glib::RefPtr<Message> Connection::send_message_with_reply_sync(
+  const Glib::RefPtr<Message>& message,
   gint timeout_msec
 )
 {
@@ -827,7 +830,7 @@ Glib::RefPtr<DBusMessage> DBusConnection::send_message_with_reply_sync(
   return Glib::wrap(result);
 }
 
-void DBusConnection::call(
+void Connection::call(
   const Glib::ustring&                  object_path,
   const Glib::ustring&                  interface_name,
   const Glib::ustring&                  method_name,
@@ -836,7 +839,7 @@ void DBusConnection::call(
   const Glib::RefPtr<Cancellable>&      cancellable,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
-  DBusCallFlags                         flags,
+  CallFlags                         flags,
   const Glib::VariantType&              reply_type
 )
 {
@@ -853,7 +856,7 @@ void DBusConnection::call(
 }
 
 // Non-cancellable version.
-void DBusConnection::call(
+void Connection::call(
   const Glib::ustring&                  object_path,
   const Glib::ustring&                  interface_name,
   const Glib::ustring&                  method_name,
@@ -861,7 +864,7 @@ void DBusConnection::call(
   const SlotAsyncReady&                 slot,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
-  DBusCallFlags                         flags,
+  CallFlags                         flags,
   const Glib::VariantType&              reply_type
 )
 {
@@ -877,7 +880,7 @@ void DBusConnection::call(
     &SignalProxy_async_callback, slot_copy);
 }
 
-void DBusConnection::call_finish(
+void Connection::call_finish(
   Glib::VariantBase&                    output,
   const Glib::RefPtr<AsyncResult>&      res
 )
@@ -890,7 +893,7 @@ void DBusConnection::call_finish(
   output.init(gvariant); // No need for extra ref.
 }
 
-void DBusConnection::call_sync(
+void Connection::call_sync(
   Glib::VariantBase&                    output,
   const Glib::ustring&                  object_path,
   const Glib::ustring&                  interface_name,
@@ -899,7 +902,7 @@ void DBusConnection::call_sync(
   const Glib::RefPtr<Cancellable>&      cancellable,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
-  DBusCallFlags                         flags,
+  CallFlags                         flags,
   const Glib::VariantType&              reply_type
 )
 {
@@ -919,7 +922,7 @@ void DBusConnection::call_sync(
 }
 
 // Non-cancellable version.
-void DBusConnection::call_sync(
+void Connection::call_sync(
   Glib::VariantBase&                    output,
   const Glib::ustring&                  object_path,
   const Glib::ustring&                  interface_name,
@@ -927,7 +930,7 @@ void DBusConnection::call_sync(
   const Glib::VariantBase&              parameters,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
-  DBusCallFlags                         flags,
+  CallFlags                         flags,
   const Glib::VariantType&              reply_type
 )
 {
@@ -945,7 +948,7 @@ void DBusConnection::call_sync(
   output.init(gvariant); // No need to take extra reference.
 }
 
-void DBusConnection::emit_signal(
+void Connection::emit_signal(
   const Glib::ustring&                object_path,
   const Glib::ustring&                interface_name,
   const Glib::ustring&                signal_name,
@@ -963,14 +966,14 @@ void DBusConnection::emit_signal(
     ::Glib::Error::throw_exception(gerror);
 }
 
-guint DBusConnection::signal_subscribe(
+guint Connection::signal_subscribe(
   const SlotSignal& slot,
   const Glib::ustring& sender,
   const Glib::ustring& interface_name,
   const Glib::ustring& member,
   const Glib::ustring& object_path,
   const Glib::ustring& arg0,
-  DBusSignalFlags flags
+  SignalFlags flags
 )
 {
   SlotSignal* slot_copy = new SlotSignal(slot);
@@ -982,7 +985,7 @@ guint DBusConnection::signal_subscribe(
     &DBusConnection_Signal_giomm_callback_destroy);
 }
 
-guint DBusConnection::add_filter(const SlotMessageFilter& slot)
+guint Connection::add_filter(const SlotMessageFilter& slot)
 {
   SlotMessageFilter* slot_copy = new SlotMessageFilter(slot);
 
@@ -991,15 +994,15 @@ guint DBusConnection::add_filter(const SlotMessageFilter& slot)
     DBusConnection_Message_Filter_giomm_callback_destroy);
 }
 
-guint DBusConnection::register_object(const Glib::ustring& object_path,
-  const Glib::RefPtr<DBusInterfaceInfo>& interface_info,
-  const DBusInterfaceVTable* vtable)
+guint Connection::register_object(const Glib::ustring& object_path,
+  const Glib::RefPtr<InterfaceInfo>& interface_info,
+  const InterfaceVTable* vtable)
 {
   GError* gerror = 0;
 
   const guint result = g_dbus_connection_register_object(gobj(),
     object_path.c_str(), Glib::unwrap(interface_info),
-    vtable->gobj(), const_cast<DBusInterfaceVTable*>(vtable), 0, &gerror);
+    vtable->gobj(), const_cast<InterfaceVTable*>(vtable), 0, &gerror);
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1007,15 +1010,15 @@ guint DBusConnection::register_object(const Glib::ustring& object_path,
   return result;
 }
 
-guint DBusConnection::register_subtree(const Glib::ustring& object_path,
-  const DBusSubtreeVTable* vtable, DBusSubtreeFlags flags)
+guint Connection::register_subtree(const Glib::ustring& object_path,
+  const SubtreeVTable* vtable, SubtreeFlags flags)
 {
   GError* gerror = 0;
 
   const guint result = g_dbus_connection_register_subtree(gobj(),
     object_path.c_str(), 
     vtable->gobj(), static_cast<GDBusSubtreeFlags>(flags),
-    const_cast<DBusSubtreeVTable*>(vtable), 0, &gerror);
+    const_cast<SubtreeVTable*>(vtable), 0, &gerror);
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -1023,7 +1026,7 @@ guint DBusConnection::register_subtree(const Glib::ustring& object_path,
   return result;
 }
 
-DBusInterfaceVTable::DBusInterfaceVTable(
+InterfaceVTable::InterfaceVTable(
   const SlotInterfaceMethodCall& slot_method_call,
   const SlotInterfaceGetProperty& slot_get_property,
   const SlotInterfaceSetProperty& slot_set_property
@@ -1037,32 +1040,32 @@ DBusInterfaceVTable::DBusInterfaceVTable(
   gobject_.set_property = &DBusInterfaceVTable_SetProperty_giomm_callback;
 }
 
-DBusInterfaceVTable::~DBusInterfaceVTable()
+InterfaceVTable::~InterfaceVTable()
 {
   delete slot_method_call_;
   delete slot_get_property_;
   delete slot_set_property_;
 }
 
-DBusInterfaceVTable::SlotInterfaceMethodCall*
-  DBusInterfaceVTable::get_slot_method_call() const
+InterfaceVTable::SlotInterfaceMethodCall*
+  InterfaceVTable::get_slot_method_call() const
 {
   return slot_method_call_;
 }
 
-DBusInterfaceVTable::SlotInterfaceGetProperty*
-  DBusInterfaceVTable::get_slot_get_property() const
+InterfaceVTable::SlotInterfaceGetProperty*
+  InterfaceVTable::get_slot_get_property() const
 {
   return slot_get_property_;
 }
 
-DBusInterfaceVTable::SlotInterfaceSetProperty*
-  DBusInterfaceVTable::get_slot_set_property() const
+InterfaceVTable::SlotInterfaceSetProperty*
+  InterfaceVTable::get_slot_set_property() const
 {
   return slot_set_property_;
 }
 
-DBusSubtreeVTable::DBusSubtreeVTable(
+SubtreeVTable::SubtreeVTable(
   const SlotSubtreeEnumerate& slot_enumerate,
   const SlotSubtreeIntrospect& slot_introspect,
   const SlotSubtreeDispatch& slot_dispatch
@@ -1076,29 +1079,31 @@ DBusSubtreeVTable::DBusSubtreeVTable(
   gobject_.dispatch = &DBusSubtreeVTable_Dispatch_giomm_callback;
 }
 
-DBusSubtreeVTable::~DBusSubtreeVTable()
+SubtreeVTable::~SubtreeVTable()
 {
   delete slot_enumerate_;
   delete slot_introspect_;
   delete slot_dispatch_;
 }
 
-DBusSubtreeVTable::SlotSubtreeEnumerate*
-  DBusSubtreeVTable::get_slot_enumerate() const
+SubtreeVTable::SlotSubtreeEnumerate*
+  SubtreeVTable::get_slot_enumerate() const
 {
   return slot_enumerate_;
 }
 
-DBusSubtreeVTable::SlotSubtreeIntrospect*
-  DBusSubtreeVTable::get_slot_introspect() const
+SubtreeVTable::SlotSubtreeIntrospect*
+  SubtreeVTable::get_slot_introspect() const
 {
   return slot_introspect_;
 }
 
-DBusSubtreeVTable::SlotSubtreeDispatch*
-  DBusSubtreeVTable::get_slot_dispatch() const
+SubtreeVTable::SlotSubtreeDispatch*
+  SubtreeVTable::get_slot_dispatch() const
 {
   return slot_dispatch_;
 }
+
+} //namespace DBus
 
 } // namespace Gio

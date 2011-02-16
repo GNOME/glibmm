@@ -34,7 +34,7 @@ bool main_loop_idle()
 // method.
 void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
 {
-  Glib::RefPtr<Gio::DBusProxy> proxy = Gio::DBusProxy::create_finish(result);
+  Glib::RefPtr<Gio::DBus::Proxy> proxy = Gio::DBus::Proxy::create_finish(result);
 
   if(!proxy)
   {
@@ -82,8 +82,8 @@ int main(int, char**)
   loop = Glib::MainLoop::create();
 
   // Get the user session bus connection.
-  Glib::RefPtr<Gio::DBusConnection> connection =
-    Gio::DBusConnection::get_sync(Gio::BUS_TYPE_SESSION);
+  Glib::RefPtr<Gio::DBus::Connection> connection =
+    Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
 
   // Check for an unavailable connection.
   if(!connection)
@@ -93,7 +93,7 @@ int main(int, char**)
   }
 
   // Create the proxy to the bus asynchronously.
-  Gio::DBusProxy::create(connection, "org.freedesktop.DBus",
+  Gio::DBus::Proxy::create(connection, "org.freedesktop.DBus",
     "/org/freedesktop/DBus", "org.freedesktop.DBus",
     sigc::ptr_fun(&dbus_proxy_available));
 

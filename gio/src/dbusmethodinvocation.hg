@@ -17,6 +17,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+//#include <giomm/dbusconnection.h>
+#include <giomm/dbusmessage.h>
+#include <giomm/dbusintrospection.h>
 #include <glibmm/object.h>
 #include <glibmm/variant.h>
 
@@ -26,9 +29,12 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-class DBusConnection;
-class DBusMessage;
-class DBusMethodInfo;
+namespace DBus
+{
+
+class Connection;
+
+_GMMPROC_EXTRA_NAMESPACE(DBus)
 
 /** DBusMethodInvocation - Object for handling remote calls.
  * Instances of the DBusMethodInvocation class are used when handling D-Bus
@@ -37,14 +43,14 @@ class DBusMethodInfo;
  *
  * The normal way to obtain a DBusMethodInvocation object is to receive it as
  * an argument to the SlotMethodCall that was passed to
- * Gio::DBusConnection::register_object().
+ * Gio::DBus::Connection::register_object().
  *
  * @newin{2,28}
  * @ingroup DBus
  */
-class DBusMethodInvocation : public Glib::Object
+class MethodInvocation : public Glib::Object
 {
-  _CLASS_GOBJECT(DBusMethodInvocation, GDBusMethodInvocation, G_DBUS_METHOD_INVOCATION, Glib::Object, GObject)
+  _CLASS_GOBJECT(MethodInvocation, GDBusMethodInvocation, G_DBUS_METHOD_INVOCATION, Glib::Object, GObject)
 
 public:
   _WRAP_METHOD(Glib::ustring get_sender() const, g_dbus_method_invocation_get_sender)
@@ -52,15 +58,15 @@ public:
   _WRAP_METHOD(Glib::ustring get_interface_name() const, g_dbus_method_invocation_get_interface_name)
   _WRAP_METHOD(Glib::ustring get_method_name() const, g_dbus_method_invocation_get_method_name)
 
-#m4 _CONVERSION(`const GDBusMethodInfo*', `Glib::RefPtr<const DBusMethodInfo>', `Glib::wrap(const_cast<GDBusMethodInfo*>($3))')
+#m4 _CONVERSION(`const GDBusMethodInfo*', `Glib::RefPtr<const MethodInfo>', `Glib::wrap(const_cast<GDBusMethodInfo*>($3))')
   // The C API only returns a const GDBusMethodInfo.
-  _WRAP_METHOD(Glib::RefPtr<const DBusMethodInfo> get_method_info() const, g_dbus_method_invocation_get_method_info, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const MethodInfo> get_method_info() const, g_dbus_method_invocation_get_method_info, refreturn)
 
-  _WRAP_METHOD(Glib::RefPtr<DBusConnection> get_connection(), g_dbus_method_invocation_get_connection, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const DBusConnection> get_connection() const, g_dbus_method_invocation_get_connection, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Connection> get_connection(), g_dbus_method_invocation_get_connection, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Connection> get_connection() const, g_dbus_method_invocation_get_connection, refreturn, constversion)
 
-  _WRAP_METHOD(Glib::RefPtr<DBusMessage> get_message(), g_dbus_method_invocation_get_message, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const DBusMessage> get_message() const, g_dbus_method_invocation_get_message, refreturn, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Message> get_message(), g_dbus_method_invocation_get_message, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Message> get_message() const, g_dbus_method_invocation_get_message, refreturn, constversion)
 
   /** Gets the parameters of the method invocation.
    *
@@ -88,4 +94,5 @@ public:
 
 };
 
+} //namespace DBus
 } // namespace Gio
