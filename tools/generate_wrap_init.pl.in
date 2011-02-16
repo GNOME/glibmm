@@ -71,9 +71,12 @@ while ($ARGV[0])
   my $ccast = "";
   while (<FILE>)
   {
-    if (/CLASS_START\((\w+)\)/) #We need a new way to get the namespace.
+    # This is useful when only some classes use a sub-namespace.
+    # Alternatively, we could parse the namespace start and end parentheses,
+    # but this hack is easier.
+    if (/_GMMPROC_EXTRA_NAMESPACE\((\w+)\)/)
     {
-      print "generate_wrap_init: namespace found: $1\n";
+      # debug: print "generate_wrap_init: namespace found: $1\n";
       push(@tmpnamespace, $1);
     }
     elsif (/_CLASS_GOBJECT\s*\(/) #TODO: There is duplication of code here.

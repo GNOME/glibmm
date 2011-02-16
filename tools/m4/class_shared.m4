@@ -1,5 +1,10 @@
 dnl $Id$
 
+
+dnl This is just a hint to generate_wrap_init.pl.
+dnl It does not generate any code in the actual .h and .cc file.
+m4_define(`_GMMPROC_EXTRA_NAMESPACE',`')
+
 define(`_CLASS_START',`dnl
 _PUSH(SECTION_CLASS1)
 ')
