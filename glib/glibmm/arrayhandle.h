@@ -275,8 +275,8 @@ public:
   typedef ArrayHandle<bool, Container_Helpers::TypeTraits<bool> > Me;
   typedef Container_Helpers::TypeTraits<bool>      Tr;
 
-  typedef typename Tr::CppType  CppType;
-  typedef typename Tr::CType    CType;
+  typedef Tr::CppType  CppType;
+  typedef Tr::CType    CType;
 
   typedef CppType               value_type;
   typedef size_t                size_type;
