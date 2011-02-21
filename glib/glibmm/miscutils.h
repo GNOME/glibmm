@@ -287,6 +287,8 @@ std::string build_filename(const std::string& elem1, const std::string& elem2);
  * @param elem2 Second path element.
  * @param elem3 Third path element.
  * @return The resulting path.
+ *
+ * @newin{2,28}
  */
 std::string build_filename(const std::string& elem1, const std::string& elem2,
                            const std::string& elem3);
@@ -300,6 +302,8 @@ std::string build_filename(const std::string& elem1, const std::string& elem2,
  * @param elem3 Third path element.
  * @param elem4 Fourth path element.
  * @return The resulting path.
+ *
+ * @newin{2,28}
  */
 std::string build_filename(const std::string& elem1, const std::string& elem2,
                            const std::string& elem3, const std::string& elem4);
@@ -328,6 +332,8 @@ std::string build_filename(const std::string& elem1, const std::string& elem2,
  * @param elem5 Fifth path element.
  * @param elem6 Sixth path element.
  * @return The resulting path.
+ *
+ * @newin{2,28}
  */
 std::string build_filename(const std::string& elem1, const std::string& elem2,
                            const std::string& elem3, const std::string& elem4,
@@ -344,6 +350,8 @@ std::string build_filename(const std::string& elem1, const std::string& elem2,
  * @param elem6 Sixth path element.
  * @param elem7 Seventh path element.
  * @return The resulting path.
+ *
+ * @newin{2,28}
  */
 std::string build_filename(const std::string& elem1, const std::string& elem2,
                            const std::string& elem3, const std::string& elem4,
@@ -362,6 +370,8 @@ std::string build_filename(const std::string& elem1, const std::string& elem2,
  * @param elem7 Seventh path element.
  * @param elem8 Eighth path element.
  * @return The resulting path.
+ *
+ * @newin{2,28}
  */
 std::string build_filename(const std::string& elem1, const std::string& elem2,
                            const std::string& elem3, const std::string& elem4,
@@ -381,6 +391,8 @@ std::string build_filename(const std::string& elem1, const std::string& elem2,
  * @param elem8 Eighth path element.
  * @param elem9 Ninth path element.
  * @return The resulting path.
+ *
+ * @newin{2,28}
  */
 std::string build_filename(const std::string& elem1, const std::string& elem2,
                            const std::string& elem3, const std::string& elem4,
