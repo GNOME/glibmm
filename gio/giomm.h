@@ -34,6 +34,7 @@
 #include <giomm/dbusaddress.h>
 #include <giomm/dbusauthobserver.h>
 #include <giomm/dbusconnection.h>
+#include <giomm/dbuserror.h>
 #include <giomm/dbuserrorutils.h>
 #include <giomm/dbusintrospection.h>
 #include <giomm/dbusmessage.h>
