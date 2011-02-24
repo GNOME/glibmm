@@ -19,6 +19,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 check_PROGRAMS =				\
 	giomm_ioerror/test			\
+	giomm_ioerror_and_iodbuserror/test			\
 	giomm_simple/test			\
 	giomm_asyncresult_sourceobject/test	\
 	glibmm_btree/test			\
@@ -33,6 +34,8 @@ check_PROGRAMS =				\
 	glibmm_vector/test			\
 	glibmm_bool_vector/test			\
 	glibmm_bool_arrayhandle/test
+	
+TESTS =	giomm_ioerror_and_iodbuserror/test
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
@@ -49,6 +52,9 @@ giomm_ldadd = $(local_libglibmm) $(local_libgiomm) $(GIOMM_LIBS)
 
 giomm_ioerror_test_SOURCES = giomm_ioerror/main.cc
 giomm_ioerror_test_LDADD   = $(giomm_ldadd)
+
+giomm_ioerror_and_iodbuserror_test_SOURCES = giomm_ioerror_and_iodbuserror/main.cc
+giomm_ioerror_and_iodbuserror_test_LDADD   = $(giomm_ldadd)
 
 giomm_simple_test_SOURCES  = giomm_simple/main.cc
 giomm_simple_test_LDADD    = $(giomm_ldadd)
