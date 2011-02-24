@@ -21,6 +21,14 @@
 
 #include <glibmm.h>
 
+
+//Use this line if you want debug output:
+//std::ostream& ostr = std::cout;
+
+//This seems nicer and more useful than putting an ifdef around the use of std::cout:
+std::stringstream debug;
+std::ostream& ostr = debug;
+
 const unsigned int magic_limit (5);
 
 void
@@ -54,7 +62,7 @@ c_print_bool_array (gboolean* array)
 {
   for (unsigned int iter (0); iter < magic_limit; ++iter)
   {
-    std::cout << iter << ": " << (array[iter] ? "TRUE" : "FALSE") << "\n";
+    ostr << iter << ": " << (array[iter] ? "TRUE" : "FALSE") << "\n";
   }
 }
 
@@ -78,11 +86,11 @@ int main()
   std::list<bool> l (cxx_get_bool_array ());
   std::deque<bool> d (cxx_get_bool_array ());
 
-  std::cout << "vector:\n";
+  ostr << "vector:\n";
   cxx_print_bool_array (v);
-  std::cout << "list:\n";
+  ostr << "list:\n";
   cxx_print_bool_array (l);
-  std::cout << "deque:\n";
+  ostr << "deque:\n";
   cxx_print_bool_array (d);
 
   return 0;

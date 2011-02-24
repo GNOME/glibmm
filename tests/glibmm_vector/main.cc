@@ -28,6 +28,13 @@
 
 // utilities
 
+//Use this line if you want debug output:
+//std::ostream& ostr = std::cout;
+
+//This seems nicer and more useful than putting an ifdef around the use of std::cout:
+std::stringstream debug;
+std::ostream& ostr = debug;
+
 const unsigned int magic_limit(5);
 
 GList*
@@ -50,14 +57,14 @@ print_list(GList* list)
 
   for(GList* node(list); node; node = node->next, ++counter)
   {
-    std::cout << counter << ": ";
+    ostr << counter << ": ";
     if(G_IS_CREDENTIALS(node->data))
     {
-      std::cout << node->data << ", ref: " << G_OBJECT(node->data)->ref_count <<"\n";
+      ostr << node->data << ", ref: " << G_OBJECT(node->data)->ref_count <<"\n";
     }
     else
     {
-      std::cout << "no C instance?\n";
+      ostr << "no C instance?\n";
     }
   }
 }
@@ -82,14 +89,14 @@ print_slist(GSList* slist)
 
   for(GSList* node(slist); node; node = node->next, ++counter)
   {
-    std::cout << counter << ": ";
+    ostr << counter << ": ";
     if(G_IS_CREDENTIALS(node->data))
     {
-      std::cout << node->data << ", ref: " << G_OBJECT(node->data)->ref_count <<"\n";
+      ostr << node->data << ", ref: " << G_OBJECT(node->data)->ref_count <<"\n";
     }
     else
     {
-      std::cout << "no C instance?\n";
+      ostr << "no C instance?\n";
     }
   }
 }
@@ -113,14 +120,14 @@ print_array(GCredentials** array)
   {
     GCredentials* credentials(array[iter]);
 
-    std::cout << iter + 1 << ": ";
+    ostr << iter + 1 << ": ";
     if(G_IS_CREDENTIALS(credentials))
     {
-      std::cout << reinterpret_cast<gpointer>(credentials) << ", ref: " << G_OBJECT(credentials)->ref_count << "\n";
+      ostr << reinterpret_cast<gpointer>(credentials) << ", ref: " << G_OBJECT(credentials)->ref_count << "\n";
     }
     else
     {
-      std::cout << "no C instance?\n";
+      ostr << "no C instance?\n";
     }
   }
 }
@@ -161,23 +168,23 @@ print_vector(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
   {
     const Glib::RefPtr<Gio::Credentials>& obj_ptr(v[iter]);
 
-    std::cout << iter + 1 << ": ";
+    ostr << iter + 1 << ": ";
     if(obj_ptr)
     {
       GCredentials* gobj(obj_ptr->gobj());
 
       if(G_IS_CREDENTIALS(gobj))
       {
-        std::cout << static_cast<gpointer>(gobj) << ", ref: " << G_OBJECT(gobj)->ref_count << "\n";
+        ostr << static_cast<gpointer>(gobj) << ", ref: " << G_OBJECT(gobj)->ref_count << "\n";
       }
       else
       {
-        std::cout << "No C instance?\n";
+        ostr << "No C instance?\n";
       }
     }
     else
     {
-      std::cout << "No C++ instance?\n";
+      ostr << "No C++ instance?\n";
     }
   }
 }
@@ -520,63 +527,63 @@ main()
 
   Cache& cache(get_cache());
 
-  std::cout << "Cache list before:\n";
+  ostr << "Cache list before:\n";
   print_list(cache.get_list());
-  std::cout << "Cache slist before:\n";
+  ostr << "Cache slist before:\n";
   print_slist(cache.get_slist());
-  std::cout << "Cache array before:\n";
+  ostr << "Cache array before:\n";
   print_array(cache.get_array());
-  std::cout << "Deep owned list:\n";
+  ostr << "Deep owned list:\n";
   print_vector(cxx_get_deep_owned_list());
-  std::cout << "Shallow owned list:\n";
+  ostr << "Shallow owned list:\n";
   print_vector(cxx_get_shallow_owned_list());
-  std::cout << "Unowned list:\n";
+  ostr << "Unowned list:\n";
   print_vector(cxx_get_unowned_list());
-  std::cout << "Deep owned slist:\n";
+  ostr << "Deep owned slist:\n";
   print_vector(cxx_get_deep_owned_slist());
-  std::cout << "Shallow owned slist:\n";
+  ostr << "Shallow owned slist:\n";
   print_vector(cxx_get_shallow_owned_slist());
-  std::cout << "Unowned slist:\n";
+  ostr << "Unowned slist:\n";
   print_vector(cxx_get_unowned_slist());
-  std::cout << "Deep owned array:\n";
+  ostr << "Deep owned array:\n";
   print_vector(cxx_get_deep_owned_array());
-  std::cout << "Shallow owned array:\n";
+  ostr << "Shallow owned array:\n";
   print_vector(cxx_get_shallow_owned_array());
-  std::cout << "Unowned array:\n";
+  ostr << "Unowned array:\n";
   print_vector(cxx_get_unowned_array());
-  std::cout << "Cache list after:\n";
+  ostr << "Cache list after:\n";
   print_list(cache.get_list());
-  std::cout << "Cache slist after:\n";
+  ostr << "Cache slist after:\n";
   print_slist(cache.get_slist());
-  std::cout << "Cache array after:\n";
+  ostr << "Cache array after:\n";
   print_array(cache.get_array());
 
   std::vector<Glib::RefPtr<Gio::Credentials> > v(cxx_get_unowned_list());
 
-  std::cout << "Gotten vector before:\n";
+  ostr << "Gotten vector before:\n";
   print_vector(v);
   // I am wondering if C functions wrapped by the ones below are not buggy by
   // design. Anyway - it segfaults. Maybe the test case is just wrong.
-  //std::cout << "Take list all:\n";
+  //ostr << "Take list all:\n";
   //cxx_list_take_all(v);
-  //std::cout << "Take list members:\n";
+  //ostr << "Take list members:\n";
   //cxx_list_take_members(v);
-  std::cout << "Take list nothing:\n";
+  ostr << "Take list nothing:\n";
   cxx_list_take_nothing(v);
   // Ditto.
-  //std::cout << "Take slist all:\n";
+  //ostr << "Take slist all:\n";
   //cxx_slist_take_all(v);
-  //std::cout << "Take slist members:\n";
+  //ostr << "Take slist members:\n";
   //cxx_slist_take_members(v);
-  std::cout << "Take slist nothing:\n";
+  ostr << "Take slist nothing:\n";
   cxx_slist_take_nothing(v);
   // Ditto.
-  //std::cout << "Take array all:\n";
+  //ostr << "Take array all:\n";
   //cxx_array_take_all(v);
-  //std::cout << "Take array members:\n";
+  //ostr << "Take array members:\n";
   //cxx_array_take_members(v);
-  std::cout << "Take array nothing:\n";
+  ostr << "Take array nothing:\n";
   cxx_array_take_nothing(v);
-  std::cout << "Gotten vector after:\n";
+  ostr << "Gotten vector after:\n";
   print_vector(v);
 }

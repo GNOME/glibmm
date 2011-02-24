@@ -35,7 +35,7 @@ check_PROGRAMS =				\
 	glibmm_bool_vector/test			\
 	glibmm_bool_arrayhandle/test
 	
-TESTS =	giomm_ioerror_and_iodbuserror/test
+TESTS =	$(check_PROGRAMS)
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)

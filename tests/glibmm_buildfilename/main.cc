@@ -2,6 +2,13 @@
 #include <iostream>
 #include <string.h>
 
+//Use this line if you want debug output:
+//std::ostream& ostr = std::cout;
+
+//This seems nicer and more useful than putting an ifdef around the use of ostr:
+std::stringstream debug;
+std::ostream& ostr = debug;
+
 #define DIR "/dir1/dir_2/dir-3"
 #define FILE "dir/file.ext"
 
@@ -17,20 +24,20 @@ int main(int, char**)
   std::string path;
 
   path = Glib::build_filename(dir_1, file_3);
-  std::cout << "Path 1: " << path << std::endl;
+  ostr << "Path 1: " << path << std::endl;
 
   path = Glib::build_filename(dir_1, dir_2, FILE);
-  std::cout << "Path 2: " << path << std::endl;
+  ostr << "Path 2: " << path << std::endl;
 
   path = Glib::build_filename(dir_1, dir_2, dir_3, FILE);
-  std::cout << "Path 3: " << path << std::endl;
+  ostr << "Path 3: " << path << std::endl;
 
   path = Glib::build_filename(dir_1, dir_2, dir_3, file_1);
-  std::cout << "Path 4: " << path << std::endl;
+  ostr << "Path 4: " << path << std::endl;
 
   path = Glib::build_filename(dir_1, dir_2, dir_1, dir_3, dir_2, dir_3,
     dir_1, dir_2, file_2);
-  std::cout << "Path 5: " << path << std::endl;
+  ostr << "Path 5: " << path << std::endl;
 
   return 0;
 }

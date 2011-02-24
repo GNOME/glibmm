@@ -21,6 +21,13 @@
 
 #include <glibmm.h>
 
+//Use this line if you want debug output:
+//std::ostream& ostr = std::cout;
+
+//This seems nicer and more useful than putting an ifdef around the use of ostr:
+std::stringstream debug;
+std::ostream& ostr = debug;
+
 const unsigned int magic_limit(5);
 
 void
@@ -54,7 +61,7 @@ c_print_bool_array(gboolean* array)
 {
   for(unsigned int iter(0); iter < magic_limit; ++iter)
   {
-    std::cout << iter << ": " <<(array[iter] ? "TRUE" : "FALSE") << "\n";
+    ostr << iter << ": " <<(array[iter] ? "TRUE" : "FALSE") << "\n";
   }
 }
 
