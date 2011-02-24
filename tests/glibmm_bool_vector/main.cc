@@ -85,5 +85,5 @@ int main(int, char**)
 
   cxx_print_bool_array(va);
 
-  return 0;
+  return EXIT_SUCCESS;
 }

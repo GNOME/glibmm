@@ -93,5 +93,5 @@ int main()
   ostr << "deque:\n";
   cxx_print_bool_array (d);
 
-  return 0;
+  return EXIT_SUCCESS;
 }

@@ -65,6 +65,6 @@ int main(int, char**)
     return EXIT_FAILURE; 
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 

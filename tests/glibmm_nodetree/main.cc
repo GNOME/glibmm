@@ -134,5 +134,5 @@ int main()
 
   delete root;
 
-  return 0;
+  return EXIT_SUCCESS;
 }

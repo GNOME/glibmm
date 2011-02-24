@@ -68,7 +68,7 @@ my_p_key_compare(const type_p_key_value& key_a, const type_p_key_value& key_b)
   if(*key_a > *key_b)
     return 1;
 
-  return 0;
+  return EXIT_SUCCESS;
 } 
 
 int
@@ -226,5 +226,5 @@ main()
   pvalue = ptree->search(sigc::ptr_fun(my_p_search), &pstr3);
   g_assert(pvalue == NULL);
 
-  return 0;
+  return EXIT_SUCCESS;
 }

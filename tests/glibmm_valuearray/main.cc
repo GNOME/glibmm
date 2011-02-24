@@ -19,7 +19,7 @@ int on_compare(const Glib::ValueBase& v1, const Glib::ValueBase& v2)
   if(int1 < int2)
     return -1;
   else if(int1 == int2)
-    return 0;
+    return EXIT_SUCCESS;
   else
     return 1;
 }
@@ -82,5 +82,5 @@ int main(int, char**)
   }
   ostr << std::endl; // End of line for list of array elements.
 
-  return 0;
+  return EXIT_SUCCESS;
 }

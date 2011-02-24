@@ -107,5 +107,5 @@ int main(int, char**)
       " in the variant are: " << value << '.' << std::endl;
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }

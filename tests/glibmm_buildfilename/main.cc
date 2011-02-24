@@ -39,6 +39,6 @@ int main(int, char**)
     dir_1, dir_2, file_2);
   ostr << "Path 5: " << path << std::endl;
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 

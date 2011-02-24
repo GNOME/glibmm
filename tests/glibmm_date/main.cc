@@ -30,5 +30,5 @@ int main(int, char**)
     (int) copy_date.get_day() << "/" << copy_date.get_year() << "." <<
       std::endl;
 
-  return 0;
+  return EXIT_SUCCESS;
 }

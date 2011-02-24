@@ -31,6 +31,6 @@ int main(int, char**)
 
   //TODO: More tests.
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 

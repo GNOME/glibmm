@@ -35,5 +35,5 @@ int main(int, char**)
   file->read_async(&on_read_async);
 
   mainloop->run();
-  return 0;
+  return EXIT_SUCCESS;
 }
