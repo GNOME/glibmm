@@ -128,9 +128,20 @@ while ($ARGV[0])
       $line =~ s/\)//;
       ($cppname, $cname, $ccast) = split(/,/, $line);
 
-      $exceptions{$cppname} = $cname;
+      # Generate a unique ID for the GError.
+      # Otherwise we will overwrite Gio::Error with Gio::DBus::Error.
+      # TODO: Isn't this necessary for other classes (not just Errors)?
+      my $qualification = "";
+      foreach ( @tmpnamespace )
+      {
+         $qualification .= "::$_";
+      }
+      
+      my $qualified_cppname = $qualification . "::" . $cppname;
+      # print "debug: " . $qualified_cppname . "\n";
+      $exceptions{$qualified_cppname} = $cname;
       @{$namespaces{$cppname}} = ( @tmpnamespace ); #both are lists of strings
-      $basenames{$cppname} = lc($ccast);
+      $basenames{$qualified_cppname} = lc($ccast);
     }
     elsif (/_GTKMMPROC_WIN32_NO_WRAP/)
     {
