@@ -31,6 +31,8 @@ private:
   static void throw_func(GError* gobject);
 
   friend void wrap_init(); // uses throw_func()
+
+  _IMPORT(SECTION_H_GERROR_PRIVATE)
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 };
 

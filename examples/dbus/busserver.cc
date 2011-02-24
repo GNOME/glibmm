@@ -100,7 +100,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection
     if(!curr_alarm.assign_from_iso8601(time_str))
     {
       // If setting alarm was not successful, return an error.
-      Gio::DBusError error(Gio::DBusError::INVALID_ARGS,
+      Gio::DBus::DBusError error(Gio::DBus::DBusError::INVALID_ARGS,
           "Alarm string is not in ISO8601 format.");
       invocation->return_gerror(error);
     }
@@ -144,7 +144,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection
   else
   {
     // Non-existent method on the interface.
-    Gio::DBusError error(Gio::DBusError::UNKNOWN_METHOD,
+    Gio::DBus::DBusError error(Gio::DBus::DBusError::UNKNOWN_METHOD,
       "Method does not exist.");
     invocation->return_gerror(error);
   }
@@ -174,7 +174,7 @@ void on_get_property(Glib::VariantBase& property,
   }
   else
   {
-    throw Gio::DBusError(Gio::DBusError::FAILED, "Unknown property name.");
+    throw Gio::DBus::DBusError(Gio::DBus::DBusError::FAILED, "Unknown property name.");
   }
 }
 

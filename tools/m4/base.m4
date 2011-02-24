@@ -201,6 +201,9 @@ dnl Property Proxies:
 dnl _NEW_SECTION(SECTION_H_PROPERTYPROXIES) 
 _NEW_SECTION(SECTION_CC_PROPERTYPROXIES)
 
+dnl Just a hack for some GError wrappers:
+_NEW_SECTION(SECTION_H_GERROR_PRIVATE) dnl  In the private part of the declaration.
+
 _NEW_SECTION(SECTION_CC_INITIALIZE_CLASS_EXTRA) dnl For instance, to initialize special member data from all constructors. Not commonly used.
 
 dnl _NEW_SECTION(PROXY)

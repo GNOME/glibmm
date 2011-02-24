@@ -24,21 +24,26 @@ namespace Gio
 {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-//Let the generated friend declaration know what wrap_init() it should refer to.
-//TODO: But the generated friend declaration needs to specify the full namespace too.
+//Our custom friend declaration (see below) needs this pre-declaration.
 void wrap_init();
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-//TODO: Put this in the DBus namespace and remove the DBus prefix,
-//when we can get the generate friend declaration to be generated correctly.
-//namespace DBus
-//{
+namespace DBus
+{
 
-//This will be necessary when putting it in the DBus namespace:
-//Add the underscore so this is recognized: GMMPROC_EXTRA_NAMESPACE(DBus)
+//The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the DBus sub-namespace
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+
+#m4 _PUSH(SECTION_H_GERROR_PRIVATE)
+  //This extra line is only necessary because this class is in a sub-namespace, but we want 
+  //it to be used in the wrap_init() of the main namespace. It's an awkward hack.
+  friend void Gio::wrap_init(); // uses throw_func()
+#m4 _POP()
+
 _WRAP_GERROR(DBusError, GDBusError, G_DBUS_ERROR, NO_GTYPE)
 
-//} //namespace DBus
+} //namespace DBus
 
 } // namespace Gio
 
