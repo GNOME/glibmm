@@ -34,10 +34,16 @@ protected:
 public:
 
   _WRAP_METHOD(char** get_arguments(int& argc) const, g_application_command_line_get_arguments)
-  _WRAP_METHOD(Glib::ustring get_cwd() const, g_application_command_line_get_cwd)
+  
+  //We use std::string instead of ustring because the C documentation says that it may be non-UTF-8 data:
+  _WRAP_METHOD(std::string get_cwd() const, g_application_command_line_get_cwd)
+
   // it seems that h2defs.py has trouble parsing the const gchar * const * type
-  //_WRAP_METHOD(std::vector<Glib::ustring> get_environ() const, g_application_command_line_get_environ)
-  _WRAP_METHOD(Glib::ustring getenv(const Glib::ustring& name) const, g_application_command_line_getenv)
+  //_WRAP_METHOD(std::vector<std::string> get_environ() const, g_application_command_line_get_environ)
+  
+  //We use std::string instead of ustring because the C documentation says that it may be non-UTF-8 data:
+  _WRAP_METHOD(std::string getenv(const Glib::ustring& name) const, g_application_command_line_getenv)
+  
   _WRAP_METHOD(bool is_remote() const, g_application_command_line_get_is_remote)
   //GVariant *               g_application_command_line_get_platform_data
   _WRAP_METHOD(void set_exit_status(int exit_status), g_application_command_line_set_exit_status)
