@@ -136,6 +136,25 @@ public:
    */
   void open(const type_vec_files& files, const Glib::ustring& hint = Glib::ustring());
   _IGNORE(g_application_open)
+  
+  /* Opens the given file.
+   *
+   * In essence, this results in the open signal being emitted
+   * in the primary instance.
+   *
+   * @a hint is simply passed through to the open signal.  It is
+   * intended to be used by applications that have multiple modes for
+   * opening files (eg: "view" vs "edit", etc).
+   *
+   * The application must be registered before calling this mwethod
+   * and it must have the APPLICATION_HANDLES_OPEN flag set.
+   *
+   * @param file The file to open. This must be non-empty.
+   * @param hint A hint.
+   *
+   * @newin{2,28}
+   */
+  void open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring& hint = Glib::ustring());
 
   _WRAP_METHOD(int run(int argc, char** argv), g_application_run)
   //TODO: g_application_run_with_arguments)
