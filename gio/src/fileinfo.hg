@@ -52,9 +52,9 @@ class FileAttributeMatcher
                            NONE, g_file_attribute_matcher_ref, g_file_attribute_matcher_unref)
 
 public:
-  /** Creates a new file attribute matcher, which matches attributes against a given string. 
-   * The attribute string should be formatted with specific keys separated from namespaces with a double colon. 
-   * Several "namespace::key" strings may be concatenated with a single comma (e.g. "standard::type,standard::is-hidden"). 
+  /** Creates a new file attribute matcher, which matches attributes against a given string.
+   * The attribute string should be formatted with specific keys separated from namespaces with a double colon.
+   * Several "namespace::key" strings may be concatenated with a single comma (e.g. "standard::type,standard::is-hidden").
    * The wildcard "*" may be used to match all keys and namespaces, or "namespace::*" will match all keys in a given namespace.
    *
    * @param attributes The attributes string.
@@ -72,7 +72,7 @@ public:
  * See FileAttribute for more information on how GIO handles file attributes.
  *
  * To obtain a FileInfo for a File, use File::query_info() (or its async variant).
- * To obtain a FileInfo for a file input or output stream, use FileInput::stream_query_info() or FileOutput::stream_query_info() 
+ * To obtain a FileInfo for a file input or output stream, use FileInput::stream_query_info() or FileOutput::stream_query_info()
  * (or their async variants).
  *
  * FileAttributeMatcher allows for searching through a FileInfo for attributes.
@@ -90,11 +90,11 @@ public:
                g_file_info_copy_into)
   _WRAP_METHOD(bool has_attribute(const std::string& attribute) const,
                g_file_info_has_attribute)
-               
+
   #m4 _CONVERSION(`char**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(Glib::StringArrayHandle list_attributes(const std::string& name_space) const,
                g_file_info_list_attributes)
-               
+
   _WRAP_METHOD(FileAttributeType get_attribute_type(const std::string& attribute) const,
                g_file_info_get_attribute_type)
   _WRAP_METHOD(void remove_attribute(const std::string& attribute),
@@ -142,19 +142,28 @@ public:
   _WRAP_METHOD(bool is_backup() const, g_file_info_get_is_backup)
   _WRAP_METHOD(bool is_symlink() const, g_file_info_get_is_symlink)
   _WRAP_METHOD(std::string get_name() const, g_file_info_get_name)
+
+  //TODO: This should return a ustring instead. See https://bugzilla.gnome.org/show_bug.cgi?id=615950#c4
   _WRAP_METHOD(std::string get_display_name() const, g_file_info_get_display_name)
+
+  //TODO: This should return a ustring instead. See https://bugzilla.gnome.org/show_bug.cgi?id=615950#c4
   _WRAP_METHOD(std::string get_edit_name() const, g_file_info_get_edit_name)
 
   _WRAP_METHOD(Glib::RefPtr<Icon> get_icon(), g_file_info_get_icon, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Icon> get_icon() const, g_file_info_get_icon, refreturn, constversion)
 
+  //TODO: This should return a ustring instead. See https://bugzilla.gnome.org/show_bug.cgi?id=615950#c4
   _WRAP_METHOD(std::string get_content_type() const, g_file_info_get_content_type)
+
   _WRAP_METHOD(goffset get_size() const, g_file_info_get_size)
 
   Glib::TimeVal modification_time() const;
 
   _WRAP_METHOD(std::string get_symlink_target() const, g_file_info_get_symlink_target)
+
+  //TODO: This should return a ustring instead. See https://bugzilla.gnome.org/show_bug.cgi?id=615950#c4
   _WRAP_METHOD(std::string get_etag() const, g_file_info_get_etag)
+
   _WRAP_METHOD(gint32 get_sort_order() const, g_file_info_get_sort_order)
   _WRAP_METHOD(void set_attribute_mask(const Glib::RefPtr<FileAttributeMatcher>& mask),
                g_file_info_set_attribute_mask)
@@ -166,10 +175,18 @@ public:
   _WRAP_METHOD(void set_is_hidden(bool is_hidden = true), g_file_info_set_is_hidden)
   _WRAP_METHOD(void set_is_symlink(bool is_symlink = true), g_file_info_set_is_symlink)
   _WRAP_METHOD(void set_name(const std::string& name), g_file_info_set_name)
+
+  //TODO: This should take a ustring instead. See https://bugzilla.gnome.org/show_bug.cgi?id=615950#c4
   _WRAP_METHOD(void set_display_name(const std::string& display_name), g_file_info_set_display_name)
+
+  //TODO: This should take a ustring instead. See https://bugzilla.gnome.org/show_bug.cgi?id=615950#c4
   _WRAP_METHOD(void set_edit_name(const std::string& edit_name), g_file_info_set_edit_name)
+
   _WRAP_METHOD(void set_icon(const Glib::RefPtr<Icon>& icon), g_file_info_set_icon)
+
+  //TODO: This should take a ustring instead. See https://bugzilla.gnome.org/show_bug.cgi?id=615950#c4
   _WRAP_METHOD(void set_content_type(const std::string& content_type), g_file_info_set_content_type)
+
   _WRAP_METHOD(void set_size(goffset size), g_file_info_set_size)
 
   _WRAP_METHOD(void set_modification_time(const Glib::TimeVal& mtime), g_file_info_set_modification_time)
@@ -178,4 +195,3 @@ public:
 };
 
 } // namespace Gio
-
