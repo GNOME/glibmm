@@ -127,7 +127,7 @@ static GVariant* DBusInterfaceVTable_GetProperty_giomm_callback(
   catch(const Glib::Error& ex)
   {
     if(error)
-      *error = const_cast<GError*>(ex.gobj());
+      *error = g_error_copy(ex.gobj());
   }
   catch(...)
   {
@@ -157,7 +157,7 @@ static gboolean DBusInterfaceVTable_SetProperty_giomm_callback(
   catch(const Glib::Error& ex)
   {
     if(error)
-      *error = const_cast<GError*>(ex.gobj());
+      *error = g_error_copy(ex.gobj());
   }
   catch(...)
   {
@@ -980,7 +980,7 @@ guint Connection::signal_subscribe(
 
   return g_dbus_connection_signal_subscribe(gobj(), sender.c_str(),
     interface_name.c_str(), member.c_str(), object_path.c_str(), arg0.c_str(),
-    static_cast<GDBusSignalFlags>(flags), 
+    static_cast<GDBusSignalFlags>(flags),
     &DBusConnection_Signal_giomm_callback, slot_copy,
     &DBusConnection_Signal_giomm_callback_destroy);
 }
@@ -1016,7 +1016,7 @@ guint Connection::register_subtree(const Glib::ustring& object_path,
   GError* gerror = 0;
 
   const guint result = g_dbus_connection_register_subtree(gobj(),
-    object_path.c_str(), 
+    object_path.c_str(),
     vtable->gobj(), static_cast<GDBusSubtreeFlags>(flags),
     const_cast<SubtreeVTable*>(vtable), 0, &gerror);
 

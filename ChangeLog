@@ -1,3 +1,13 @@
+2011-03-09  Murray Cumming  <murrayc@murrayc.com>
+
+	DBus::InterfaceVTable: Use g_error_copy() where appropriate.
+
+	* gio/src/dbusconnection.ccg: DBusInterfaceVTable_SetProperty_giomm_callback(),
+	DBusInterfaceVTable_GetProperty_giomm_callback(): Copy the GError instead of
+	just copying the pointer, because it will be freed along with the parent
+	Glib::Error.
+	Bug #644008 (Yannick.Guesnet)
+
 2011-03-04  Murray Cumming  <murrayc@murrayc.com>
 
 	Gio::Application::open(file): Fix this.
@@ -8,7 +18,7 @@
 
 	Gio::Application: open(): Added a single-file method overload.
 
-	* gio/src/application.[hg|ccg]: Added an open() overload that takes a single 
+	* gio/src/application.[hg|ccg]: Added an open() overload that takes a single
 	Gio::File instead of a vector of Gio::Files.
 
 2011-03-04  Murray Cumming  <murrayc@murrayc.com>
@@ -21,7 +31,7 @@
 
 	Gio::Application: Added get_environ().
 
-	* gio/src/gio_others.defs: Add a hand-written definition for this, because 
+	* gio/src/gio_others.defs: Add a hand-written definition for this, because
 	h2defs.py ignores functions with this return type.
 	* gio/src/applicationcommandline.hg: Wrap the function.
 
@@ -29,23 +39,23 @@
 
 	ApplicationCommandLine: Use std::string instead of ustring in some API.
 
-	* gio/src/applicationcommandline.hg: The C documentation says that some 
+	* gio/src/applicationcommandline.hg: The C documentation says that some
 	return strings could be non-UTF-8.
 
 2011-02-28  Murray Cumming  <murrayc@murrayc.com>
 
-	Application: Wrap the local_command_line vfunc, though it is not finished. 
+	Application: Wrap the local_command_line vfunc, though it is not finished.
 
 	* gio/src/application.hg:
-	* gio/src/gio_vfuncs.defs: Wrap the local_command_line vfunc, though see 
-	the bug report in the comment. 
-	
+	* gio/src/gio_vfuncs.defs: Wrap the local_command_line vfunc, though see
+	the bug report in the comment.
+
 2011-02-24  Murray Cumming  <murrayc@murrayc.com>
 
 	tests: Remove remaining use of std::cout.
 
 	* tests/giomm_ioerror/main.cc:
-	* tests/giomm_simple/main.cc: Hid some use of std::cout that I missed in my 
+	* tests/giomm_simple/main.cc: Hid some use of std::cout that I missed in my
 	previous commit.
 
 2011-02-24  Murray Cumming  <murrayc@murrayc.com>
@@ -58,7 +68,7 @@
 
 	Actually run all tests, and check some failures.
 
-	* tests/Makefile.am: Add all tests to TESTS so they are really run during 
+	* tests/Makefile.am: Add all tests to TESTS so they are really run during
 	make check, instead of just built.
 	* tests/giomm_asyncresult_sourceobject/main.cc:
 	* tests/giomm_ioerror/main.cc:
@@ -70,17 +80,17 @@
 	* tests/glibmm_ustring_compose/main.cc:
 	* tests/glibmm_valuearray/main.cc:
 	* tests/glibmm_variant/main.cc:
-	* tests/glibmm_vector/main.cc: Remove all use of std::cout by default, 
+	* tests/glibmm_vector/main.cc: Remove all use of std::cout by default,
 	allowing it to be renabled by changing a line.
-	Return (or) exit with EXIT_FAILURE after any use of std::cerr, so that 
+	Return (or) exit with EXIT_FAILURE after any use of std::cerr, so that
 	make check can report it.
 
 2011-02-24  Murray Cumming  <murrayc@murrayc.com>
 
 	Restore the Gio::DBus::Error registration.
 
-	* tools/generate_wrap_init.pl.in: Use a qualified C++ name for the key in 
-	the associated-array of exceptions. This seems to work, though it feels very 
+	* tools/generate_wrap_init.pl.in: Use a qualified C++ name for the key in
+	the associated-array of exceptions. This seems to work, though it feels very
 	hacky.
 
 2011-02-24  Murray Cumming  <murrayc@murrayc.com>
@@ -89,11 +99,11 @@
 
 	* gio/src/dbuserror.hg: Rename the class to Error.
 	* examples/dbus/busserver.cc: Adapated.
-	* tests/giomm_ioerror_and_iodbuserror/main.cc: Added a test to check that 
+	* tests/giomm_ioerror_and_iodbuserror/main.cc: Added a test to check that
 	both Gio::Error and Gio::DBus::Error are working.
 	* tests/Makefile.am: Set TESTS, so that the test is actually run.
 	We should add others to this too.
-	
+
 	This current fails, so I need to fix the problem in a subsequent commit.
 
 2011-02-24  Murray Cumming  <murrayc@murrayc.com>
@@ -103,10 +113,10 @@
 	* tools/m4/base.m4: Added a SECTION_H_GERROR_PRIVATE section.
 	* tools/m4/gerror.m4: Import the SECTION_H_GERROR_PRIVATE section.
 	* gio/src/dbuserror.hg: Put this back into the DBus namespace.
-	Push a custom friend declaration into the SECTION_H_GERROR_PRIVATE section, 
-	because the standard generated friend declaration would not specify the 
+	Push a custom friend declaration into the SECTION_H_GERROR_PRIVATE section,
+	because the standard generated friend declaration would not specify the
 	correct one.
-	This still does not rename DBusError to DBus::Error, but this is a step on 
+	This still does not rename DBusError to DBus::Error, but this is a step on
 	the way.
 	* examples/dbus/busserver.cc: Adapated.
 
@@ -115,17 +125,17 @@
 	Bring back Gio::Error registration.
 
   * gio/src/error.[hg|ccg]: Move Gio::DBus::Error to
-	* gio/src/dbuserror.[hg|ccg]: and temporarily rename it to Gio::DBusError 
-	because generate_wrap_init.pl.in is wrapping only on of Gio::Error and 
-	Gio::DBus::Error. Unfortunately, we need to fix the generation to handle 
+	* gio/src/dbuserror.[hg|ccg]: and temporarily rename it to Gio::DBusError
+	because generate_wrap_init.pl.in is wrapping only on of Gio::Error and
+	Gio::DBus::Error. Unfortunately, we need to fix the generation to handle
 	this properly even when it is called Gio::DBus::DBusError.
 
 2011-02-21  Murray Cumming  <murrayc@murrayc.com>
 
 	Mark some new API.
 
-	* glib/glibmm/miscutils.h: Add @newin{2,28} to the new build_filename() 
-	overloads. 
+	* glib/glibmm/miscutils.h: Add @newin{2,28} to the new build_filename()
+	overloads.
 
 2011-02-21  Fabricio Godoy  <skarllot@gmail.com>
 
@@ -142,7 +152,7 @@
 
 	Fix the build with --enable-warnigns=fatal.
 
-	* glib/glibmm/arrayhandle.h: Remove some typename keywords to avoid this 
+	* glib/glibmm/arrayhandle.h: Remove some typename keywords to avoid this
 	compiler warning:
 	"error: using ‘typename’ outside of template"
 
@@ -171,43 +181,43 @@
 2011-02-16  Murray Cumming  <murrayc@murrayc.com>
 
 	Move the DBus classes into a Gio::DBus namespace.
-	
+
 	* gio/giomm.h:
 	* gio/src/dbus*.[hg|ccg]
-	* gio/src/error.hg: Rename all DBus* classes to remove the prefix, putting 
+	* gio/src/error.hg: Rename all DBus* classes to remove the prefix, putting
 	them in a Gio::DBus namespace.
-	This required the use of the new _GMMPROC_EXTRA_NAMESPACE macro, to avoid 
+	This required the use of the new _GMMPROC_EXTRA_NAMESPACE macro, to avoid
 	generating a confused wrap_init.cc.
-	Along the way, I removed unnecessary class predeclarations, instead including 
+	Along the way, I removed unnecessary class predeclarations, instead including
 	the relevant header, because that is more convenient for users of the API.
-	* gio/src/dbuserror.[hg|ccg]: Renamed to dbuserrorutils.[hg|ccg] and 
-	renamed the Error namespace to ErrorUtils, to avoid a clash with the 
+	* gio/src/dbuserror.[hg|ccg]: Renamed to dbuserrorutils.[hg|ccg] and
+	renamed the Error namespace to ErrorUtils, to avoid a clash with the
 	Gio::DBus::Error exception.
 	* gio/src/filelist.am:
 	* tools/m4/convert_gio.m4: Changed some conversions.
 	* examples/dbus/busserver.cc:
 	* examples/dbus/peer.cc:
 	* examples/dbus/userbus.cc: Adapted.
-	
-	This is generally more organized. A prefix, instead of a namespace, looked 
+
+	This is generally more organized. A prefix, instead of a namespace, looked
 	generally wrong to C++ coders.
 
 2011-02-16  Murray Cumming  <murrayc@murrayc.com>
 
 	gmmproc: Allow some classes to be in a sub-namespace.
-	
+
 	* tools/m4/class_shared.m4:
-	* tools/generate_wrap_init.pl.in: Add a _GMMPROC_EXTRA_NAMESPACE(thenamespace) 
-	macro, so that wrap_init.cc will have the correct pre-declarations of the 
+	* tools/generate_wrap_init.pl.in: Add a _GMMPROC_EXTRA_NAMESPACE(thenamespace)
+	macro, so that wrap_init.cc will have the correct pre-declarations of the
 	wrap_new() and get_type() functions.
-	I am suprised that we have no other way to do this already, but I cannot 
-	find one, and this hack works. 
+	I am suprised that we have no other way to do this already, but I cannot
+	find one, and this hack works.
 
 2011-02-15  Murray Cumming  <murrayc@murrayc.com>
 
 	OptionGroup: Minor code style changes.
 
-	* glib/src/optiongroup.[hg|ccg]: Use the explicit keyword and use a _ 
+	* glib/src/optiongroup.[hg|ccg]: Use the explicit keyword and use a _
 	suffix for member variables.
 
 2011-02-14  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
@@ -235,9 +245,9 @@
 	Update the .defs for signals and properties.
 
 	* tools/extra_defs_gen/generate_defs_gio.cc: Mention more GDbus types.
-	* tools/extra_defs_gen/generate_defs_glib.cc: Mention some types, though 
+	* tools/extra_defs_gen/generate_defs_glib.cc: Mention some types, though
 	none have properties or signals.
-	* gio/src/gio_signals.defs: Regenerated, though there are no new properties or 
+	* gio/src/gio_signals.defs: Regenerated, though there are no new properties or
 	signals.
 
 2011-02-15  Murray Cumming  <murrayc@murrayc.com>
@@ -256,7 +266,7 @@
 2011-02-08  Murray Cumming  <murrayc@murrayc.com>
 
 	Fix the make check build with --enable-warnings=fatal.
-	
+
 	* examples/options/main.cc: Comment-out unused method parameters.
 
 2011-02-06  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
@@ -269,7 +279,7 @@
 	* examples/options/main.cc: The on_pre_parse, on_post_parse, and on_error
 	overrides don't call the base class functions.
 	Bug 588988 (Hubert Figuiere)
-	
+
 2011-02-01  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
 
 	gmmproc: Add optional arguments custom_vfunc[_callback] to _WRAP_VFUNC.
@@ -292,8 +302,8 @@
 
 	Vector utils: Added simple documentation.
 
-	* glib/glibmm/vectorutils.h: Some simple documentation about the *Handler 
-	utility classes, though I need to correct the example code and explain the 
+	* glib/glibmm/vectorutils.h: Some simple documentation about the *Handler
+	utility classes, though I need to correct the example code and explain the
 	memory mangement when that is clear to me.
 
 2011-01-28  Murray Cumming  <murrayc@murrayc.com>
@@ -302,10 +312,10 @@
 
 	* glib/glibmm/arrayhandle.h:
 	* glib/glibmm/listhandle.h:
-	* glib/glibmm/slisthandle.h: Mention that we try not to use these now, 
-	though we cannot actually deprecate them yet without forcing other libraries 
-	such as pangomm to deprecate the methods that use them, which they cannot 
-	really do because they cannot just add a method overload without introducing 
+	* glib/glibmm/slisthandle.h: Mention that we try not to use these now,
+	though we cannot actually deprecate them yet without forcing other libraries
+	such as pangomm to deprecate the methods that use them, which they cannot
+	really do because they cannot just add a method overload without introducing
 	ambiguity.
 
 2011-01-27  Chris Kühl  <chrisk@openismus.com>
@@ -331,8 +341,8 @@
 
 	Resolver: lookup_service(), lookup_by_address(): Fix the reference counting.
 
-	* gio/src/resolver.[hg|ccg]: Use the correct OWNERSHIP_*, based on the 
-	documentation for the C functions. We must release both the list and the 
+	* gio/src/resolver.[hg|ccg]: Use the correct OWNERSHIP_*, based on the
+	documentation for the C functions. We must release both the list and the
 	items.
 	Bug #639575 (Michael Edwards)
 
@@ -346,8 +356,8 @@
 
 	Application: Constructor: Initialize glibmm and giomm.
 
-	* gio/src/application.[hg|ccg]: Use a custom klass init function to 
-	make sure that glibmm and giomm are initialized when Gio::Application is 
+	* gio/src/application.[hg|ccg]: Use a custom klass init function to
+	make sure that glibmm and giomm are initialized when Gio::Application is
 	instantiated, so it is then unnecssary to call them explicitly.
 
 2.27.91.1:
@@ -356,8 +366,8 @@
 
 	Fix the make check build.
 
-	* examples/dbus/busserver.cc: Comment out unused methods, to fix the 
-	build. I guess this example is still in progress. Otherwise, the commented 
+	* examples/dbus/busserver.cc: Comment out unused methods, to fix the
+	build. I guess this example is still in progress. Otherwise, the commented
 	code should really be removed.
 
 2010-12-22 Murray Cumming <murrayc@murrayc.com>
@@ -365,7 +375,7 @@
   gmmproc: _CLASS_GOBJECT: reverted removal of __REAL_* arguments.
 
   This is still needed for the gtkmm-2-24 branch.
-  
+
 2011-01-16  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	DBus: Add initial implementation of a bus server/client example.
@@ -8970,4 +8980,3 @@ API should also be applied to the glibmm-2-6 branch.
 	instead of 2.0 in their name.
 
 glibmm was previously part of gtkmm2.
-
