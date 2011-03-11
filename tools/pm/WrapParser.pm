@@ -19,6 +19,8 @@
 package WrapParser;
 use strict;
 use warnings;
+use open IO => ":utf8";
+
 use Util;
 use GtkDefs;
 use Function;

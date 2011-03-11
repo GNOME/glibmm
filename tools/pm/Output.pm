@@ -18,6 +18,8 @@
 #
 package Output;
 use strict;
+use open IO => ":utf8";
+
 BEGIN { @Namespace::ISA=qw(main); }
 
 # $objOutputter new()
@@ -665,7 +667,7 @@ sub write_sections_to_files()
 
   open(INPUT, '<', "$$self{tmpdir}/gtkmmproc_$$.g2"); # $$ is the process ID.
 
-  # open tempory file for each section
+  # open temporary file for each section
   open(OUTPUT_H,  '>', "$fname_h.tmp");
   open(OUTPUT_PH, '>', "$fname_ph.tmp");
   open(OUTPUT_CC, '>', "$fname_cc.tmp");
