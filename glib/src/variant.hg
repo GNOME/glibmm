@@ -25,6 +25,7 @@ _DEFS(glibmm,glib)
 #include <vector>
 #include <map>
 #include <stdexcept>
+#include <typeinfo>
 
 namespace Glib
 {
@@ -125,7 +126,30 @@ public:
    */
    void byteswap(VariantBase& result) const;
    _IGNORE(g_variant_byteswap)
+
+   template<class V_CastTo>
+   static V_CastTo cast_dynamic(const VariantBase& v)
+   throw(std::bad_cast);
+
 };
+
+template<class V_CastTo>
+V_CastTo VariantBase::cast_dynamic(const VariantBase& v)
+throw(std::bad_cast)
+{
+  if(v.gobj() == NULL)
+  {
+    return V_CastTo();
+  }
+  if(v.is_of_type(V_CastTo::variant_type()))
+  {    
+    return V_CastTo(const_cast<GVariant*>(v.gobj()), true);
+  }
+  else
+  {
+   throw std::bad_cast();
+  }
+}
 
 /** Base class from which string variant classes derive.
  * @newin{2,28}
@@ -256,6 +280,10 @@ public:
   _IGNORE(g_variant_get_maybe)
 };
 
+template<>
+VariantContainerBase VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v)
+throw(std::bad_cast);
+
 /** Template class used for the specialization of the Glib::Variant<> classes.
  * @newin{2,28}
  * @ingroup Variant
@@ -266,7 +294,6 @@ class Variant : public VariantBase
 public:
   typedef T CppType;
 };
-
 
 // Each specialization has (or should have) a variant_type() method that gets
 // the type. So the C g_variant_get_type() function can be ignored.

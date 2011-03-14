@@ -90,6 +90,25 @@ void VariantContainerBase::get(VariantBase& child, gsize index) const
   child.init(gvariant);
 }
 
+// VariantContainerBase has no method variant_type()
+template<>
+VariantContainerBase VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v)
+throw(std::bad_cast)
+{
+  if(v.gobj() == NULL)
+  {
+    return VariantContainerBase();
+  }
+  if(v.get_type().is_container())
+  {    
+    return VariantContainerBase(const_cast<GVariant*>(v.gobj()), true);
+  }
+  else
+  {
+    throw std::bad_cast();
+  }
+}
+
 bool VariantContainerBase::get_maybe(Glib::VariantBase& maybe) const
 {
   GVariant* const g_value =

@@ -8,6 +8,8 @@
 std::stringstream debug;
 std::ostream& ostr = debug;
 
+static void test_dynamic_cast();
+
 int main(int, char**)
 {
   Glib::init();
@@ -107,5 +109,52 @@ int main(int, char**)
       " in the variant are: " << value << '.' << std::endl;
   }
 
+  test_dynamic_cast();
+
   return EXIT_SUCCESS;
+}
+
+static void test_dynamic_cast()
+{
+  Glib::Variant< int > v1 = Glib::Variant< int >::create(10);
+  Glib::VariantBase& v2 = v1;
+  Glib::Variant< int > v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v2);
+  g_assert(v3.get() == 10);
+
+  Glib::VariantBase v5 = v1;
+  v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v5);
+  g_assert(v3.get() == 10);
+
+  Glib::Variant< double > v4;
+  // v4 contain a NULL GVariant: The cast succeed
+  v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v4);
+
+  v4 = Glib::Variant< double >::create(1.0);
+  try
+  {
+    v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v4);
+    g_assert_not_reached();
+  }
+  catch(const std::bad_cast& e)
+  {
+  }
+
+  // A t-uple
+  std::vector<Glib::VariantBase> vec_var(2);
+  vec_var[0] = Glib::Variant<int>::create(1);
+  vec_var[1] = Glib::Variant<Glib::ustring>::create("coucou");
+  Glib::VariantContainerBase var_tuple = Glib::VariantContainerBase::create_tuple(vec_var);
+  g_assert(var_tuple.get_type_string() == "(is)");
+  
+  v5 = var_tuple;
+  Glib::VariantContainerBase v6 = Glib::VariantBase::cast_dynamic<Glib::VariantContainerBase >(v5);
+  
+  try
+  {
+    v6 = Glib::VariantBase::cast_dynamic<Glib::VariantContainerBase >(v1);
+    g_assert_not_reached();
+  }
+  catch (const std::bad_cast& e)
+  {
+  }
 }
