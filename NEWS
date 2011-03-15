@@ -1,3 +1,26 @@
+2.27.96 (unstable):
+
+Gio:
+* Application:
+  - open(): Added a single-file method overload.
+  - The command-line signal now returns an int instead of a bool. It is a
+  main() status code.
+  - Added get_environ().
+  - Add the local_command_line vfunc,
+* ApplicationCommandLine: Use std::string instead of ustring in some API.
+  (Murray Cumming)
+* DBus::InterfaceVTable: Use g_error_copy() where appropriate, fixing a crash.
+  (Murray Cumming) Bug #644008 (Yannick.Guesnet)
+
+* Build: Do not install doctool/ scripts such as doc-install.pl.
+  These are now only installed by mm-common, and the mm-common macros find it
+  there, so no changes should be necessary in other modules if you update
+  mm-common.
+  (Murray Cumming)
+* Documentation: Avoid errors in the reference documentation due to encoding
+  confusion in our perl scripts.
+  (Kjell Ahlstedt) Bug #644037
+
 2.27.95 (unstable):
 
 Gio:
@@ -6,11 +29,11 @@ Gio:
   (Murray Cumming)
 
 Glib:
-* build_filename(): Add method overloads to take up to 9 arguments, 
+* build_filename(): Add method overloads to take up to 9 arguments,
   for convenience.
   (Fabricio Godoy) Bug #599578
 * Documentation: Mark some new API as new in 2.28.
-  (Murray Cumming) 
+  (Murray Cumming)
 
 2.27.94 (unstable):
 
@@ -26,16 +49,16 @@ Glib:
 Gio:
 * Moved all DBus* classes into a Gio::DBus namespace.
   (Murray Cumming)
-   
+
 2.27.93 (unstable):
 
-* Added ArrayHandler, ListHandler and SListHandler, to help with conversions 
+* Added ArrayHandler, ListHandler and SListHandler, to help with conversions
   to/from std::vector.
-  These replace ArrayHandle, ListHandle, and SListHandle, which allowed the 
-  use of any standard container. New APIs will use only std::vector, because 
+  These replace ArrayHandle, ListHandle, and SListHandle, which allowed the
+  use of any standard container. New APIs will use only std::vector, because
   that is less confusing to developers, though less flexible.
   (Krzesimir Nowak)
-* Application: Initialize glibmm and giomm in the constructor, for 
+* Application: Initialize glibmm and giomm in the constructor, for
   convenience.
   (Murray Cumming)
 * Resolver: lookup_service(), lookup_by_address(): Fix the reference counting.
@@ -46,12 +69,12 @@ Gio:
 2.27.91.1 (unstable):
 
 * gmmproc:
-  - _WRAP_CTOR(): Restore the optional extra parameter, because it 
+  - _WRAP_CTOR(): Restore the optional extra parameter, because it
   is still needed by gtkmm-2.4.
   (Murray Cumming)
   - Added conversion from bool& to gboolean*.
   (Chris Kühl)
-  
+
 * DBus::[watch|own]_name(): Add default values for parameters.
 * DBusConnection:
   - Add a send_message() without an "out_serial" parameter.
@@ -77,16 +100,16 @@ Gio:
 * BufferedInputStream, BufferedOutputStream: Fix create_sized().
 	(Murray Cumming) Bug #638616 (Michael Edwards)
 * DBus: Use std::string for addresses since they could be a file path.
-  Use std::string instead of Glib::ustring for address parameters just to avoid 
+  Use std::string instead of Glib::ustring for address parameters just to avoid
   possible errors since DBus address could be a filename path as the "Addresses"
 	section of the DBus introduction seems to imply:
 	http://www.freedesktop.org/wiki/IntroductionToDBus.
-* DBus: Use std::string instead of Glib::ustring for guid's since std::string's 
+* DBus: Use std::string instead of Glib::ustring for guid's since std::string's
   API is probably adequate enough for their use.
-  (José Alburquerque) 
+  (José Alburquerque)
 * DBusConnection:
   - call*() methods: Re-order parameters.
-  - Callbacks: Check for NULL GError** parameters and throw exceptions to the 
+  - Callbacks: Check for NULL GError** parameters and throw exceptions to the
   caller.
   - Add [register|unregister]_subtree() methods.
   - Fix crashes caused by inappropriate use of reinterpret_cast<>.
@@ -100,11 +123,11 @@ Gio:
 * SocketService, ThreadedSocketService: Correct ref-counting for signals.
 * Improvements to the DBus examples.
   (José Alburquerque)
-  
-Tools: 
+
+Tools:
 * gmmproc: Warn about unwrapped properties.
   (Krzesimir Nowak)
-* Added defs_fixer.pl, which fixes some generated .defs by applying a specified 
+* Added defs_fixer.pl, which fixes some generated .defs by applying a specified
   override file. This should be easier than using a patch.
   (Krzesimir Nowak)
 
@@ -122,18 +145,18 @@ Glib:
   (José Alburquerque)
 * gmmproc cleanup
   (José Alburquerque)
-  
+
 Gio:
 * Application: Added the open signal.
   (Yannick Guesnet)
 * DBusConnection: Add register/unregister_object() methods.
   (José Alburquerque) Bug #637587 (Yannick Guesnet)
-  
-	
+
+
 2.27.5: (unstable):
 
 Glib:
-* Added Variant<std::string>, Glib::Variant< array >, and 
+* Added Variant<std::string>, Glib::Variant< array >, and
   Variant< vector > specializations
 
 Gio:
@@ -141,8 +164,8 @@ Gio:
   (José Alburquerque)
 * Fox the build with mingw32.
   (José Alburquerque) Bug #636754 (t.sailer)
-  
-  
+
+
 2.27.4.1: (unstable):
 
 Gio:
@@ -159,19 +182,19 @@ Gio:
   - Add a non-cancellable call_sync() method.
 * Documentation: Add a DBus Doxygen group.
   (José Alburquerque)
-  
+
 Glib:
 * Regex: Add a MatchInfo class and use it.
   (José Alburquerque) Bug #636911 (Alexander Shaduri)
 * gmmproc: Remove m4 conversion files for gdk, gtk, atk, and pango.
-  They are now in the derived projects, which should now include 
+  They are now in the derived projects, which should now include
   convert_glibmm instead of, for instance, convert_gtkmm.
   Some modules will now need to add a line in their configure.ac so they
   can use the extra conversions from gtkmm. For instance, with
   gtksourceviewmm:
   MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir gtkmm-3.0])
   (Murray Cumming)
-	
+
 2.27.4: (unstable):
 
 Gio:
@@ -182,10 +205,10 @@ Gio:
 * DBusMethodInvocationbusmethodinvocation: Remove the default constructor
 	because it probably will not be used (there is no create() method to
 	go along with it).
-* DbusServer: create_sync(): Use g_dbus_server_new_sync() instead of the 
+* DbusServer: create_sync(): Use g_dbus_server_new_sync() instead of the
   constructors because the C function does more than call g_initable_new().
   (José Alburquerque)
-   
+
 gmmproc:
 * Improve parsing of the C documentation.
   (José Alburquerque)
@@ -199,13 +222,13 @@ Gio:
   - Return int value from run() correctly
   - Fix protected constructor signature
   (Jonathon Jongsma)
-* DBusConnection, DBusProxy, DBusServer: Add non-cancellable overloads of the 
+* DBusConnection, DBusProxy, DBusServer: Add non-cancellable overloads of the
   constructors and create methods.
   Renamed the create() synchronized methods to create_sync().
 * Initable: Add a non-cancellable overload of the init() method.
 * Documentation: Added lots of class and method documentation.
    (José Alburquerque)
-	
+
 
 2.27.3: (unstable):
 
