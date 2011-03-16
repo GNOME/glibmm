@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([glibmm], [2.27.96],
+AC_INIT([glibmm], [2.27.97],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=glibmm],
         [glibmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -30,7 +30,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
-MM_PREREQ([0.7])
+MM_PREREQ([0.9.3])
 MM_INIT_MODULE([glibmm-2.4])
 MM_INIT_MODULE([giomm-2.4])
 
