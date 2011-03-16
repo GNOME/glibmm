@@ -142,7 +142,7 @@ throw(std::bad_cast)
     return V_CastTo();
   }
   if(v.is_of_type(V_CastTo::variant_type()))
-  {    
+  {
     return V_CastTo(const_cast<GVariant*>(v.gobj()), true);
   }
   else
@@ -308,6 +308,10 @@ _IGNORE(g_variant_get_type)
 template<>
 class Variant<VariantBase> : public VariantContainerBase
 {
+  // Trick gmmproc into thinking this is derived from GVariant to wrap a
+  // some methods.
+  _CLASS_GENERIC(Variant<VariantBase>, GVariant)
+
 public:
   typedef GVariant*                     CType;
   typedef VariantBase                   CppType;
@@ -345,8 +349,7 @@ public:
   static Variant<VariantBase> create(const Glib::VariantBase& data);
   _IGNORE(g_variant_new_variant)
 
-  VariantBase get() const;
-  _IGNORE(g_variant_get_variant)
+  _WRAP_METHOD(VariantBase get() const, g_variant_get_variant)
 };
 
 /** Specialization of Glib::Variant containing a Glib::ustring.
@@ -356,6 +359,9 @@ public:
 template<>
 class Variant<Glib::ustring> : public VariantStringBase
 {
+  // Trick gmmproc into thinking this is derived from GVariant to wrap a
+  // some methods.
+  _CLASS_GENERIC(Variant<Glib::ustring>, GVariant)
 public:
   typedef char*                 CType;
   typedef Glib::ustring         CppType;
@@ -389,6 +395,7 @@ public:
    */
   static Variant<Glib::ustring> create(const Glib::ustring& data);
 
+  //We can't use WRAP_METHOD() here because g_variant_get_string() takes an extra length parameter.
   /** Gets the contents of the Glib::Variant.
    * @return The contents of the Glib::Variant.
    * @newin{2,28}
@@ -405,6 +412,9 @@ public:
 template<>
 class Variant<std::string> : public VariantStringBase
 {
+  // Trick gmmproc into thinking this is derived from GVariant to wrap a
+  // some methods.
+  _CLASS_GENERIC(Variant<std::string>, GVariant)
 public:
   typedef char*                 CType;
   typedef std::string           CppType;
@@ -438,12 +448,8 @@ public:
    */
   static Variant<std::string> create(const std::string& data);
 
-  /** Gets the contents of the Glib::Variant.
-   * @return The contents of the Glib::Variant.
-   * @newin{2,28}
-   */
-  std::string get() const;
-  _IGNORE(g_variant_get_bytestring, g_variant_dup_bytestring)
+  _WRAP_METHOD(std::string get() const, g_variant_get_bytestring)
+   _IGNORE(g_variant_dup_bytestring)
 };
 
 /** Specialization of Glib::Variant containing a dictionary entry.  See also

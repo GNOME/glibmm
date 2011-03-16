@@ -100,7 +100,7 @@ throw(std::bad_cast)
     return VariantContainerBase();
   }
   if(v.get_type().is_container())
-  {    
+  {
     return VariantContainerBase(const_cast<GVariant*>(v.gobj()), true);
   }
   else
@@ -152,11 +152,6 @@ Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
   return result;
 }
 
-VariantBase Variant<VariantBase>::get() const
-{
-  return VariantBase(g_variant_get_variant(gobject_));
-}
-
 // static
 const VariantType& Variant<Glib::ustring>::variant_type()
 {
@@ -198,11 +193,6 @@ Variant<std::string>::create(const std::string& data)
   g_variant_ref_sink(result.gobj());
 
   return result;
-}
-
-std::string Variant<std::string>::get() const
-{
-  return std::string(g_variant_get_bytestring(gobject_));
 }
 
 typedef std::vector<Glib::ustring> type_vec_ustring;
