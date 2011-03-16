@@ -333,13 +333,14 @@ public:
  _WRAP_PROPERTY("g-name-owner", Glib::ustring)
  _WRAP_PROPERTY("g-object-path", Glib::ustring)
 
-typedef std::map<Glib::ustring,Glib::VariantBase> type_map_changed_properties;
-// The BDus API ensures that the variant changed_properties is of type "DICT<STRING,VARIANT>"
-#m4 _CONVERSION(`GVariant*', `const Gio::DBus::Proxy::type_map_changed_properties&', `Glib::Variant<Gio::DBus::Proxy::type_map_changed_properties>($3, true).get()')
-#m4 _CONVERSION(`const Gio::DBus::Proxy::type_map_changed_properties&', `GVariant*', `const_cast<GVariant*>(Glib::Variant<Gio::DBus::Proxy::type_map_changed_properties>::create($3).gobj())')
-#m4 _CONVERSION(`const std::vector<Glib::ustring>&', `const gchar*const*',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data()')
-#m4 _CONVERSION(`const gchar*const*', `const std::vector<Glib::ustring>&', `Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
-  _WRAP_SIGNAL(void properties_changed(const Gio::DBus::Proxy::type_map_changed_properties& changed_properties, const std::vector<Glib::ustring>& invalidated_properties), "g-properties-changed")
+  typedef std::map<Glib::ustring, Glib::VariantBase> type_map_changed_properties;
+
+  // The DBus API ensures that the variant changed_properties is of type "DICT<STRING,VARIANT>"
+  #m4 _CONVERSION(`GVariant*', `const type_map_changed_properties&', `Glib::Variant<type_map_changed_properties>($3, true).get()')
+  #m4 _CONVERSION(`const type_map_changed_properties&', `GVariant*', `const_cast<GVariant*>(Glib::Variant<type_map_changed_properties>::create($3).gobj())')
+  #m4 _CONVERSION(`const std::vector<Glib::ustring>&', `const gchar*const*',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data()')
+  #m4 _CONVERSION(`const gchar*const*', `const std::vector<Glib::ustring>&', `Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_SIGNAL(void properties_changed(const type_map_changed_properties& changed_properties, const std::vector<Glib::ustring>& invalidated_properties), "g-properties-changed")
 
 #m4 _CONVERSION(`GVariant*', `const Glib::VariantBase&', `Glib::wrap($3, true)')
  _WRAP_SIGNAL(void signal(const Glib::ustring& sender_name, const Glib::ustring& signal_name, const Glib::VariantBase& parameters), "g-signal")
