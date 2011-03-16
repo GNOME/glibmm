@@ -157,4 +157,41 @@ static void test_dynamic_cast()
   catch (const std::bad_cast& e)
   {
   }
+
+  // A variant of type a{sv}
+  typedef std::map<Glib::ustring, Glib::VariantBase> type_map_sv;
+  typedef Glib::Variant<type_map_sv> type_dict_sv;
+  g_assert((type_dict_sv::variant_type().get_string()) == "a{sv}");
+
+  type_dict_sv var_map;
+  type_map_sv map;
+  Glib::Variant<Glib::ustring> var_string =
+    Glib::Variant<Glib::ustring>::create("test variant");
+  map["test key"] = var_string;
+  var_map = type_dict_sv::create(map);
+  g_assert(var_map.get_type_string() == "a{sv}");
+
+  Glib::VariantBase& ref_var_base = var_map;
+  type_dict_sv var_map_cast = Glib::VariantBase::cast_dynamic<type_dict_sv>(ref_var_base);
+
+  try
+  {
+    Glib::Variant<std::map<Glib::ustring, Glib::ustring> > var_wrong_map =
+      Glib::VariantBase::cast_dynamic<Glib::Variant<std::map<Glib::ustring, Glib::ustring> > >(ref_var_base);
+    g_assert_not_reached();
+  }
+  catch(const std::bad_cast& e)
+  {
+  }
+
+  type_map_sv get_map = var_map_cast.get();
+  var_string = Glib::VariantBase::cast_dynamic<Glib::Variant< Glib::ustring > >(get_map["test key"]);
+  g_assert(var_string.get() == "test variant");
+
+  // A variant of type v
+  Glib::Variant< Glib::VariantBase > var_v = Glib::Variant< Glib::VariantBase >::create(var_string);
+  g_assert(var_v.get_type_string() == "v");
+  Glib::Variant< Glib::ustring > var_s2 =
+    Glib::VariantBase::cast_dynamic<Glib::Variant< Glib::ustring > >(var_v.get());
+  g_assert(var_s2.get() == "test variant");
 }
