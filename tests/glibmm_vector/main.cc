@@ -46,7 +46,7 @@ create_list()
   {
     head = g_list_prepend(head, g_credentials_new());
   }
-  
+
   return g_list_reverse(head);
 }
 
@@ -78,7 +78,7 @@ create_slist()
   {
     head = g_slist_prepend(head, g_credentials_new());
   }
-  
+
   return g_slist_reverse(head);
 }
 

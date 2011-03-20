@@ -70,14 +70,18 @@ namespace Container_Helpers
 template <class T> inline
 size_t compute_array_size2(const T* array)
 {
-  const T* pend(array);
-
-  while(*pend)
+  if(array)
   {
-    ++pend;
+    const T* pend(array);
+
+    while(*pend)
+    {
+      ++pend;
+    }
+    return(pend - array);
   }
 
-  return(pend - array);
+  return 0;
 }
 
 /* Allocate and fill a 0-terminated array.  The size argument
@@ -899,16 +903,20 @@ template <typename T, class Tr>
 typename ArrayHandler<T, Tr>::VectorType
 ArrayHandler<T, Tr>::array_to_vector(const CType* array, size_t array_size, Glib::OwnershipType ownership)
 {
-  // it will handle destroying data depending on passed ownership.
-  ArrayKeeperType keeper(array, array_size, ownership);
+  if (array)
+  {
+    // it will handle destroying data depending on passed ownership.
+    ArrayKeeperType keeper(array, array_size, ownership);
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
-  return VectorType(ArrayIteratorType(array), ArrayIteratorType(array + array_size));
+    return VectorType(ArrayIteratorType(array), ArrayIteratorType(array + array_size));
 #else
-  VectorType temp;
-  temp.reserve(array_size);
-  Glib::Container_Helpers::fill_container(temp, ArrayIteratorType(array), ArrayIteratorType(array + array_size));
-  return temp;
+    VectorType temp;
+    temp.reserve(array_size);
+    Glib::Container_Helpers::fill_container(temp, ArrayIteratorType(array), ArrayIteratorType(array + array_size));
+    return temp;
 #endif
+  }
+  return VectorType();
 }
 
 template <typename T, class Tr>

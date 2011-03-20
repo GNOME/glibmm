@@ -208,10 +208,10 @@ private:
 
 
 /** This is an intermediate type. When a method takes this, or returns this, you
- * should use a standard C++ container of your choice, such as std::list or 
+ * should use a standard C++ container of your choice, such as std::list or
  * std::vector.
  *
- * However, this is not used in new API. We now prefer to just use std::vector, 
+ * However, this is not used in new API. We now prefer to just use std::vector,
  * which is less flexibile, but makes the API clearer.
  *
  * @ingroup ContHandles
@@ -328,7 +328,7 @@ private:
  * container such as std::list<Glib::ustring> or std::vector<Glib::ustring>.
  *
  *
- * However, this is not used in new API. We now prefer to just use std::vector, 
+ * However, this is not used in new API. We now prefer to just use std::vector,
  * which is less flexibile, but makes the API clearer.
  *
  * @ingroup ContHandles
@@ -471,7 +471,7 @@ template <class T, class Tr> inline
 ArrayHandle<T,Tr>::ArrayHandle(const typename ArrayHandle<T,Tr>::CType* array, size_t array_size,
                                Glib::OwnershipType ownership)
 :
-  size_      (array_size),
+  size_      ((array) ? array_size : 0),
   parray_    (array),
   ownership_ (ownership)
 {}
@@ -498,7 +498,7 @@ ArrayHandle<T,Tr>::ArrayHandle(const ArrayHandle<T,Tr>& other)
 template <class T, class Tr>
 ArrayHandle<T,Tr>::~ArrayHandle()
 {
-  if(ownership_ != Glib::OWNERSHIP_NONE)
+  if(parray_ && ownership_ != Glib::OWNERSHIP_NONE)
   {
     if(ownership_ != Glib::OWNERSHIP_SHALLOW)
     {
@@ -622,7 +622,7 @@ inline
 ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::ArrayHandle(const gboolean* array, size_t array_size,
                                                                     Glib::OwnershipType ownership)
 :
-  size_      (array_size),
+  size_      ((array) ? array_size : 0),
   parray_    (array),
   ownership_ (ownership)
 {}

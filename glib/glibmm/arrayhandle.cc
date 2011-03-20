@@ -22,7 +22,7 @@ namespace Glib
 
 ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::~ArrayHandle()
 {
-  if(ownership_ != Glib::OWNERSHIP_NONE)
+  if(parray_ && ownership_ != Glib::OWNERSHIP_NONE)
   {
     if(ownership_ != Glib::OWNERSHIP_SHALLOW)
     {

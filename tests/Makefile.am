@@ -1,4 +1,4 @@
-## Copyright (c) 2009, 2010  Openismus GmbH  <http://www.openismus.com/>
+## Copyright (c) 2009, 2010, 2011  Openismus GmbH  <http://www.openismus.com/>
 ##
 ## This file is part of glibmm.
 ##
@@ -19,7 +19,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 check_PROGRAMS =				\
 	giomm_ioerror/test			\
-	giomm_ioerror_and_iodbuserror/test			\
+	giomm_ioerror_and_iodbuserror/test	\
 	giomm_simple/test			\
 	giomm_asyncresult_sourceobject/test	\
 	glibmm_btree/test			\
@@ -33,7 +33,9 @@ check_PROGRAMS =				\
 	glibmm_variant/test			\
 	glibmm_vector/test			\
 	glibmm_bool_vector/test			\
-	glibmm_bool_arrayhandle/test
+	glibmm_bool_arrayhandle/test		\
+	glibmm_null_vectorutils/test		\
+	glibmm_null_containerhandle/test
 	
 TESTS =	$(check_PROGRAMS)
 
@@ -62,16 +64,20 @@ giomm_simple_test_LDADD    = $(giomm_ldadd)
 giomm_asyncresult_sourceobject_test_SOURCES  = giomm_asyncresult_sourceobject/main.cc
 giomm_asyncresult_sourceobject_test_LDADD    = $(giomm_ldadd)
 
-glibmm_btree_test_SOURCES            = glibmm_btree/main.cc
-glibmm_buildfilename_test_SOURCES    = glibmm_buildfilename/main.cc
-glibmm_date_test_SOURCES             = glibmm_date/main.cc
-glibmm_nodetree_test_SOURCES         = glibmm_nodetree/main.cc
-glibmm_ustring_compose_test_SOURCES  = glibmm_ustring_compose/main.cc
-glibmm_ustring_format_test_SOURCES   = glibmm_ustring_format/main.cc
-glibmm_value_test_SOURCES            = glibmm_value/glibmm_value.cc glibmm_value/main.cc
-glibmm_valuearray_test_SOURCES       = glibmm_valuearray/main.cc
-glibmm_variant_test_SOURCES          = glibmm_variant/main.cc
-glibmm_vector_test_SOURCES           = glibmm_vector/main.cc
-glibmm_vector_test_LDADD             = $(giomm_ldadd)
-glibmm_bool_vector_test_SOURCES      = glibmm_bool_vector/main.cc
-glibmm_bool_arrayhandle_test_SOURCES = glibmm_bool_arrayhandle/main.cc
+glibmm_btree_test_SOURCES                = glibmm_btree/main.cc
+glibmm_buildfilename_test_SOURCES        = glibmm_buildfilename/main.cc
+glibmm_date_test_SOURCES                 = glibmm_date/main.cc
+glibmm_nodetree_test_SOURCES             = glibmm_nodetree/main.cc
+glibmm_ustring_compose_test_SOURCES      = glibmm_ustring_compose/main.cc
+glibmm_ustring_format_test_SOURCES       = glibmm_ustring_format/main.cc
+glibmm_value_test_SOURCES                = glibmm_value/glibmm_value.cc glibmm_value/main.cc
+glibmm_valuearray_test_SOURCES           = glibmm_valuearray/main.cc
+glibmm_variant_test_SOURCES              = glibmm_variant/main.cc
+glibmm_vector_test_SOURCES               = glibmm_vector/main.cc
+glibmm_vector_test_LDADD                 = $(giomm_ldadd)
+glibmm_bool_vector_test_SOURCES          = glibmm_bool_vector/main.cc
+glibmm_bool_arrayhandle_test_SOURCES     = glibmm_bool_arrayhandle/main.cc
+glibmm_null_vectorutils_test_SOURCES     = glibmm_null_vectorutils/main.cc
+glibmm_null_vectorutils_test_LDADD       = $(giomm_ldadd)
+glibmm_null_containerhandle_test_SOURCES = glibmm_null_containerhandle/main.cc
+glibmm_null_containerhandle_test_LDADD   = $(giomm_ldadd)
