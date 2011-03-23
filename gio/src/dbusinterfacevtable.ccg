@@ -44,9 +44,11 @@ static void DBusInterfaceVTable_MethodCall_giomm_callback(
 
   try
   {
+    // Note that we use VariantContainerBase instead of VariantBase for the
+    // GVariant, because it is documented as being a tuple (list of values).
     (*the_slot)(Glib::wrap(connection, true), (sender ? sender : ""),
       object_path, interface_name, method_name,
-      Glib::VariantBase(parameters, true), Glib::wrap(invocation, true));
+      Glib::VariantContainerBase(parameters, true), Glib::wrap(invocation, true));
   }
   catch(...)
   {
