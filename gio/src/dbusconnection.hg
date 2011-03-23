@@ -27,6 +27,7 @@
 #include <giomm/asyncresult.h>
 #include <giomm/credentials.h>
 #include <giomm/dbusmessage.h>
+#include <giomm/dbussubtreevtable.h>
 #include <gio/gio.h>
 
 _DEFS(giomm,gio)
@@ -44,9 +45,6 @@ _WRAP_ENUM(ConnectionFlags, GDBusConnectionFlags, s#^DBUS_##, NO_GTYPE)
 _WRAP_ENUM(SendMessageFlags, GDBusSendMessageFlags, s#^DBUS_##, NO_GTYPE)
 _WRAP_ENUM(SignalFlags, GDBusSignalFlags, s#^DBUS_##, NO_GTYPE)
 _WRAP_ENUM(SubtreeFlags, GDBusSubtreeFlags, s#^DBUS_##, NO_GTYPE)
-
-class InterfaceVTable;
-class SubtreeVTable;
 
 _GMMPROC_EXTRA_NAMESPACE(DBus)
 
@@ -557,7 +555,7 @@ public:
   /** Synchronously sends @a message to the peer represented by the connection
    * and blocks the calling thread until a reply is received or the timeout is
    * reached. See send_message_with_reply() for the asynchronous version of
-   * this method. 
+   * this method.
    *
    * Unless flags contain the Gio::DBus::SEND_MESSAGE_FLAGS_PRESERVE_SERIAL
    * flag, the serial number will be assigned by the connection and set on
@@ -795,13 +793,13 @@ public:
    * @param interface_name D-Bus interface name to match on or <tt>0</tt> to
    * match on all interfaces.
    * @param member D-Bus signal name to match on or <tt>0</tt> to match on all
-   * signals.  
+   * signals.
    * @param object_path Object path to match on or <tt>0</tt> to match on all
-   * object paths.  
+   * object paths.
    * @param arg0 Contents of first string argument to match on or <tt>0</tt>
-   * to match on all kinds of arguments.  
+   * to match on all kinds of arguments.
    * @param flags Flags describing how to subscribe to the signal (currently
-   * unused).  
+   * unused).
    * @return A subscription identifier that can be used with
    * signal_unsubscribe().
    * @newin{2,28}
@@ -837,7 +835,7 @@ public:
    * the message. Similary, if a filter consumes an outgoing message, the
    * message will not be sent to the other peer.
    *
-   * @param slot A filter slot.  
+   * @param slot A filter slot.
    * @return A filter identifier that can be used with remove_filter().
    * @newin{2,28}
    */
@@ -876,9 +874,9 @@ public:
    * yourself, e.g. to handle getting and setting of properties
    * asynchronously.
    *
-   * @param object_path The object path to register at.  
-   * @param interface_info Introspection data for the interface.  
-   * @param vtable An InterfaceVTable to call into or NULL.  
+   * @param object_path The object path to register at.
+   * @param interface_info Introspection data for the interface.
+   * @param vtable An InterfaceVTable to call into or NULL.
    * @return A registration id (never 0) that can be used with
    * unregister_object() if no Glib::Error is thrown.
    * @throw Glib::Error.
@@ -918,9 +916,9 @@ public:
    * paths not registered via register_object().
    *
    *
-   * @param object_path The object path to register the subtree at.  
+   * @param object_path The object path to register the subtree at.
    * @param vtable A SubtreeVTable to enumerate, introspect and dispatch
-   * nodes in the subtree.  
+   * nodes in the subtree.
    * @param flags Flags used to fine tune the behavior of the subtree.
    * @return A subtree registration id (never 0) that can be used with
    * unregister_subtree() if no Glib::Error is thrown.
@@ -948,281 +946,6 @@ public:
   _WRAP_SIGNAL(void closed(bool remote_peer_vanished, const Glib::Error& error), "closed", no_default_handler)
 };
 
-/**This represents a virtual table for
- * handling properties and method calls for a D-Bus interface.
- *
- * If you want to handle getting/setting D-Bus properties asynchronously,
- * simply register an object with the org.freedesktop.DBus.Properties D-Bus
- * interface using Gio::DBus::Connection::register_object().
- *
- * The only correct use of this class is to declare a global instance of it
- * (or an instance local to the main function) and pass pointers to the
- * instance to the methods that require such a parameter.  The instance can be
- * used for multiple registrations and the memory it uses will be freed at the
- * end of execution.  Any other use (like creating an instance local to a
- * function and using that) may cause memory leaks or errors (if the instance
- * is destroyed too early).
- *
- * @newin{2,28}
- * @ingroup DBus
- */
-class InterfaceVTable
-{
-  _CLASS_GENERIC(InterfaceVTable, GDBusInterfaceVTable)
-
-public:
-  /** The type for a slot which handles a method call for a D-Bus interface.
-   * for example,
-   * @code
-   * void on_interface_method_call(const Glib::RefPtr<Gio::DBus::Connection>&
-   * connection, const Glib::ustring& sender, const Glib::ustring&
-   * object_path, const Glib::ustring& interface_name, const Glib::ustring&
-   * method_name, const Glib::VariantBase& parameters, const
-   * Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation);
-   * @endcode
-   */
-  typedef sigc::slot<
-    void,
-    const Glib::RefPtr<Connection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::VariantBase&,
-    const Glib::RefPtr<MethodInvocation>&
-  > SlotInterfaceMethodCall;
-
-  /** The type for a slot which handles getting a property for a D-Bus
-   * interface.
-   * for example,
-   * @code
-   * void on_interface_get_property(Glib::VariantBase& property, const
-   * Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&
-   * sender, const Glib::ustring& object_path, const Glib::ustring&
-   * interface_name, const Glib::ustring& property_name);
-   * @endcode
-   * @throw Glib::Error.
-   */
-  typedef sigc::slot<
-    void,
-    Glib::VariantBase&,
-    const Glib::RefPtr<Connection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&
-  > SlotInterfaceGetProperty;
-
-  /** The type for a slot which handles setting a property for a D-Bus
-   * interface.
-   * for example,
-   * @code
-   * bool on_interface_set_property(const Glib::RefPtr<Gio::DBus::Connection>&
-   * connection, const Glib::ustring& sender, const Glib::ustring&
-   * object_path, const Glib::ustring& interface_name, const Glib::ustring&
-   * property_name, const Glib::VariantBase& value);
-   * @endcode
-   * @throw Glib::Error.
-   */
-  typedef sigc::slot<
-    bool,
-    const Glib::RefPtr<Connection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::VariantBase&
-  > SlotInterfaceSetProperty;
-
-  /** Constructs a new InterfaceVTable using the specified slots.
-   * @param slot_method_call The slot for handling incoming method calls.
-   * @param slot_get_property The slot for getting a property.
-   * @param slot_set_property The slot for setting a property.
-   */
-  explicit InterfaceVTable(
-   const SlotInterfaceMethodCall& slot_method_call,
-   const SlotInterfaceGetProperty& slot_get_property = SlotInterfaceGetProperty(),
-   const SlotInterfaceSetProperty& slot_set_property = SlotInterfaceSetProperty()
-  );
-
-  /// Destructor.
-  virtual ~InterfaceVTable();
-
-  /// Provides access to the underlying C object.
-  GDBusInterfaceVTable* gobj()
-    { return reinterpret_cast<GDBusInterfaceVTable*>(&gobject_); }
-
-  /// Provides access to the underlying C object.
-  const GDBusInterfaceVTable* gobj() const
-    { return reinterpret_cast<const GDBusInterfaceVTable*>(&gobject_); }
-
-
-private:
-  // Non-copyable.
-  InterfaceVTable(const InterfaceVTable& other);
-  InterfaceVTable& operator=(const InterfaceVTable& other);
-
-public:
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // These are so the C callbacks and the
-  // Gio::DBus::Connection::register_object() method can have access to the
-  // copies of the slots used for creation when registering.
-  SlotInterfaceMethodCall*      get_slot_method_call() const;
-  SlotInterfaceGetProperty*     get_slot_get_property() const;
-  SlotInterfaceSetProperty*     get_slot_set_property() const;
-#endif
-
-protected:
-  // The underlying C instance.
-  GDBusInterfaceVTable          gobject_;
-
-  // Pointers to copies of the slots used to create an instance.
-  SlotInterfaceMethodCall*      slot_method_call_;
-  SlotInterfaceGetProperty*     slot_get_property_;
-  SlotInterfaceSetProperty*     slot_set_property_;
-};
-
-/** This represents a virtual table for
- * subtrees registered with Gio::DBus::Connection::register_subtree().
- *
- * The only correct use of this class is to declare a global instance of it
- * (or an instance local to the main function) and pass pointers to the
- * instance to the methods that require such a parameter.  The instance can be
- * used for multiple registrations and the memory it uses will be freed at the
- * end of execution.  Any other use (like creating an instance local to a
- * function and using that) may cause memory leaks or errors (if the instance
- * is destroyed too early).
- *
- * @newin{2,28}
- * @ingroup DBus
- */
-class SubtreeVTable
-{
-  _CLASS_GENERIC(SubtreeVTable, GDBusSubtreeVTable)
-
-public:
-  /** The type for a slot which handles enumerating child nodes.
-   *
-   * This slot is called when generating introspection data and also when
-   * preparing to dispatch incoming messages in the event that the
-   * Gio::DBus::SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES flag is not
-   * specified (ie: to verify that the object path is valid).
-   *
-   * Hierarchies are not supported; the items that you return should not
-   * contain the '/' character.
-   *
-   * For example,
-   * @code
-   * std::vector<Glib::ustring> on_subtree_enumerate(const
-   * Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&
-   * sender, const Glib::ustring& object_path);
-   * @endcode
-   */
-  typedef sigc::slot<
-    std::vector<Glib::ustring>,
-    const Glib::RefPtr<Connection>&,
-    const Glib::ustring&,
-    const Glib::ustring&
-  > SlotSubtreeEnumerate;
-
-  /** The type for a slot which handles introspecting a child node. 
-   *
-   * Subtrees are flat. @a node, if non-<tt>0</tt>, is always exactly one
-   * segment of the object path (ie: it never contains a slash).
-   *
-   * This function should return an empty vector to indicate that there is no
-   * object at this node.
-   *
-   * If this function returns a non-empty vector, the return value is expected
-   * to be a list of DBusInterfaceInfo structures describing the interfaces
-   * implemented by node.
-   *
-   * for example,
-   * @code
-   * std::vector< Glib::RefPtr<Gio::DBus::InterFaceInfo> >
-   * on_subtree_introspect(const Glib::RefPtr<Gio::DBus::Connection>&
-   * connection, const Glib::ustring& sender, const Glib::ustring&
-   * object_path, const Glib::ustring& node);
-   * @endcode
-   */
-  typedef sigc::slot<
-    std::vector< Glib::RefPtr<Gio::DBus::InterfaceInfo> >,
-    const Glib::RefPtr<Connection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&
-  > SlotSubtreeIntrospect;
-
-  /** The type for a slot which handles dispatching a remote call on a child
-   * node.
-   *
-   * Subtrees are flat. @a node, if non-<tt>0</tt>, is always exactly one
-   * segment of the object path (ie: it never contains a slash).
-   *
-   * for example,
-   * @code
-   * const Gio::DBus::InterfaceVTable* on_subtree_dispatch(const
-   * Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring&
-   * sender, const Glib::ustring& object_path, const Glib::ustring&
-   * interface_name, const Glib::ustring& node);
-   * @endcode
-   */
-  typedef sigc::slot<
-    const InterfaceVTable*,
-    const Glib::RefPtr<Connection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&
-  > SlotSubtreeDispatch;
-
-  /** Constructs a new SubtreeVTable using specified slots.
-   * @param slot_enumerate The slot for handling incoming method calls.
-   * @param slot_introspect The slot for getting a property.
-   * @param slot_dispatch The slot for setting a property.
-   */
-  explicit SubtreeVTable(
-   const SlotSubtreeEnumerate& slot_enumerate,
-   const SlotSubtreeIntrospect& slot_introspect = SlotSubtreeIntrospect(),
-   const SlotSubtreeDispatch& slot_dispatch = SlotSubtreeDispatch()
-  );
-
-  /// Destructor.
-  virtual ~SubtreeVTable();
-
-  /// Provides access to the underlying C object.
-  GDBusSubtreeVTable* gobj()
-    { return reinterpret_cast<GDBusSubtreeVTable*>(&gobject_); }
-
-  /// Provides access to the underlying C object.
-  const GDBusSubtreeVTable* gobj() const
-    { return reinterpret_cast<const GDBusSubtreeVTable*>(&gobject_); }
-
-
-private:
-  // Non-copyable.
-  SubtreeVTable(const SubtreeVTable& other);
-  SubtreeVTable& operator=(const SubtreeVTable& other);
-
-public:
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // These are so the C callbacks and the
-  // Gio::DBus::Connection::register_subtreee() method can have access to the
-  // copies of the slots used for creation when registering.
-  SlotSubtreeEnumerate*         get_slot_enumerate() const;
-  SlotSubtreeIntrospect*        get_slot_introspect() const;
-  SlotSubtreeDispatch*          get_slot_dispatch() const;
-#endif
-
-protected:
-  // The underlying C instance.
-  GDBusSubtreeVTable          gobject_;
-
-  // Pointers to copies of the slots used to create an instance.
-  SlotSubtreeEnumerate*         slot_enumerate_;
-  SlotSubtreeIntrospect*        slot_introspect_;
-  SlotSubtreeDispatch*          slot_dispatch_;
-};
 
 } //namespace DBus
 
