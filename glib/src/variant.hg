@@ -30,22 +30,52 @@ _DEFS(glibmm,glib)
 namespace Glib
 {
 
-//TODO: Write C++ versions of the documentation.
-
 /** @defgroup Variant Variant Data Types
  *
- * Variant<> are specialized classes that deal with strongly typed
- * variant data.  They are used to wrap glib's GVariant API.  For more
- * information see the <a
- * href="http://library.gnome.org/devel/glib/stable/glib-GVariant.html">glib
- * variant
- * API</a>.
+ * The Variant classes deal with strongly typed
+ * variant data. A Variant stores a value along with
+ * information about the type of that value. The range of possible
+ * values is determined by the type. The type system used is VariantType.
+ *
+ * See the VariantBase class and it's derived types, such as VariantContainerbase,
+ * and the Variant<> template type.
+ *
+ * Variant instances always have a type and a value (which are given
+ * at construction time). The type and value of a Variant
+ * can never change other than by the Variant itself being
+ * destroyed.  A Variant cannot contain a pointer.
+ *
+ * Variant is heavily optimised for dealing with data in serialised
+ * form. It works particularly well with data located in memory-mapped
+ * files. It can perform nearly all deserialisation operations in a
+ * small constant time, usually touching only a single memory page.
+ * Serialised Variant data can also be sent over the network.
+ *
+ * Variant is largely compatible with D-Bus.  Almost all types of
+ * #GVariant instances can be sent over D-Bus.  See VariantType for
+ * exceptions.
+ *
+ * There is a Python-inspired text language for describing Variant
+ * values. Variant includes a printer for this language and a parser
+ * with type inferencing.</a>.
  */
 
 //TODO: VariantBase class can be copied, so suggest how it can be dynamic casted to
 //derived types: See https://bugzilla.gnome.org/show_bug.cgi?id=644146
 
-/** The base class used to wrap glib's GVariant API.
+//TODO: Add this documentation from the API if we are confident of it for the C++ wrapper:
+// #GVariant is completely threadsafe.  A #GVariant instance can be
+// concurrently accessed in any way from any number of threads without
+// problems.
+// Note that we don't copy GVariant's documentation about Memory Use because
+// it seems easy to get out of sync and people can look at that C documentation if necessary.
+
+/** This is the base class for all Variant types.
+ *
+ * If the actual type is known at compile-time then you should use a specific
+ * Variant<>, such as Variant<int>. Otherwise, you may use get_type(),
+ * is_of_type(), or cast_dynamic().
+ *
  * @newin{2,28}
  * @ingroup Variant
  */
@@ -127,9 +157,18 @@ public:
    void byteswap(VariantBase& result) const;
    _IGNORE(g_variant_byteswap)
 
+   /** Cast to a specific variant type.
+    * For instance:
+    * @code
+    * Variant<std::string> derived = VariantBase::cast_dynamic< Variant<std::string> >(base);
+    * @endcode
+    *
+    * @param v The variant to cast to a specific type.
+    * @result The variant as a specific type.
+    * @throws std::bad_cast if the Variant was not of the expected type.
+    */
    template<class V_CastTo>
-   static V_CastTo cast_dynamic(const VariantBase& v)
-   throw(std::bad_cast);
+   static V_CastTo cast_dynamic(const VariantBase& v) throw(std::bad_cast);
 
 };
 
@@ -181,8 +220,8 @@ public:
   : VariantBase(castitem, take_a_reference)
   {}
 
-  /** Creates a DBus object path variant with the contents of @a string. @a
-   * string must be a valid DBus object path. Use is_object_path() if unsure.
+  /** Creates a D-Bus object path variant with the contents of @a string. @a
+   * string must be a valid D-Bus object path. Use is_object_path() if unsure.
    *
    * @param output A location in which to store the new object path variant
    * instance.
@@ -192,23 +231,25 @@ public:
   static void create_object_path(VariantStringBase& output,
     const std::string& object_path);
 
-  _WRAP_METHOD(static bool is_object_path(std::string string), g_variant_is_object_path)
+  _WRAP_METHOD(static bool is_object_path(const std::string& string), g_variant_is_object_path)
 
-  /** Creates a DBus type signature variant with the contents of @a string. @a
-   * string must be a valid DBus type signature. Use is_signature() if unsure.
+  /** Creates a D-Bus type signature variant with the contents of @a string. @a
+   * string must be a valid D-Bus type signature. Use is_signature() if unsure.
    *
    * @param output A location in which to store the new signature variant
    * instance.
    * @param signature A normal nul-terminated string.
    * @newin{2,28}
    */
-    static void create_signature(VariantStringBase& output,
-      const std::string& object_path);
+  static void create_signature(VariantStringBase& output,
+    const std::string& object_path);
 
-  _WRAP_METHOD(static bool is_signature(std::string string), g_variant_is_signature)
+  _WRAP_METHOD(static bool is_signature(const std::string& string), g_variant_is_signature)
 };
 
-/** The base class from which variant containers derive.
+/** The base class from which multiple-item Variants derive, such as Variants
+ * containing tuples or arrays.
+ *
  * @newin{2,28}
  * @ingroup Variant
  */
