@@ -20,10 +20,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <giomm/actiongroup.h>
 #include <giomm/appinfo.h>
-#include <giomm/application.h>
-#include <giomm/applicationcommandline.h>
 #include <giomm/asyncresult.h>
 #include <giomm/bufferedinputstream.h>
 #include <giomm/bufferedoutputstream.h>
