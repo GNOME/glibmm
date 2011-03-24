@@ -33,7 +33,14 @@ dist_docimages_DATA = images/gtkmm_logo.gif images/top.gif
 
 include $(top_srcdir)/build/doc-reference.am
 
-dist_noinst_DATA +=				\
+# These are copied here by mm-common:
+dist_noinst_DATA += \
+	doc-install.pl \
+	doc-postprocess.pl \
+	tagfile-to-devhelp2.xsl \
+	doxygen.css
+
+dist_noinst_DATA += \
 	internal/documentation_generation.txt	\
 	internal/gmmproc_internals.txt		\
 	internal/using_gmmproc.txt		\
