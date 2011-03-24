@@ -1,9 +1,9 @@
 #ifndef _GIOMM_H
 #define _GIOMM_H
 
-/* 
+/*
  * Copyright (C) 2007 The giomm Development Team
- * 
+ *
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -108,4 +108,3 @@
 #include <giomm/volumemonitor.h>
 
 #endif /* #ifndef _GIOMM_H */
-
