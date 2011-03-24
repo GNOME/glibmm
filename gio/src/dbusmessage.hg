@@ -58,7 +58,12 @@ public:
 
   // Note that we can't use _WRAP_CTOR() and _WRAP_CREATE() because the C functions do more than just call g_object_new():
   // See http://bugzilla.gnome.org/show_bug.cgi?id=624977
-  // TODO: Should these parameters be ustring or std::string?
+
+  // See here about whether the parameters should be ustring or std::string:
+  // http://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names
+  // They are generally UTF-8 that can only contain the ASCII subset, 
+  // so ustring still seems preferrable to std::string, which generally implies an unknown endoding for us.
+
   _WRAP_METHOD(static Glib::RefPtr<Message> create_signal(const Glib::ustring& path, const Glib::ustring& interface, const Glib::ustring& signal), g_dbus_message_new_signal)
   _WRAP_METHOD(static Glib::RefPtr<Message> create_method_call(const Glib::ustring& name, const Glib::ustring& path, const Glib::ustring& interface, const Glib::ustring& method), g_dbus_message_new_method_call)
   _WRAP_METHOD(static Glib::RefPtr<Message> create_method_reply(const Glib::RefPtr<Message>& method_call_message), g_dbus_message_new_method_reply)
@@ -118,7 +123,7 @@ public:
   _WRAP_METHOD(guint32 get_num_unix_fds() const, g_dbus_message_get_num_unix_fds)
   _WRAP_METHOD(void set_num_unix_fds(guint32 value), g_dbus_message_set_num_unix_fds)
 
-  //TODO: _WRAP_METHOD(guchar* get_header_fields() const, g_dbus_message_get_header_fields)
+  //TODO: _WRAP_METHOD(std::vector<whattypeshallweuse>) get_header_fields() const, g_dbus_message_get_header_fields)
 
   /** Gets a header field on the message.  The header is returned in @a value.
    * @param value Location in which to store the header.
