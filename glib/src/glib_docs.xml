@@ -7694,7 +7694,7 @@ to be valid UTF-8. The display name might not be identical to the filename,
 for instance there might be problems converting it to UTF-8, and some files
 can be translated in the display.
 
-If GLib can not make sense of the encoding of @filename, as a last resort it 
+If GLib cannot make sense of the encoding of @filename, as a last resort it 
 replaces unknown characters with U+FFFD, the Unicode replacement character.
 You can search the result for the UTF-8 encoding of this character (which is
 &quot;\357\277\275&quot; in octal notation) to find out if @filename was in an invalid
@@ -7729,7 +7729,7 @@ and use the return value of this function only for display purposes.
 Unlike g_filename_to_utf8(), the result is guaranteed to be non-%NULL 
 even if the filename actually isn't in the GLib file name encoding.
 
-If GLib can not make sense of the encoding of @filename, as a last resort it 
+If GLib cannot make sense of the encoding of @filename, as a last resort it 
 replaces unknown characters with U+FFFD, the Unicode replacement character.
 You can search the result for the UTF-8 encoding of this character (which is
 &quot;\357\277\275&quot; in octal notation) to find out if @filename was in an invalid
@@ -9052,7 +9052,8 @@ is useful if you need to free the memory allocated for the original key,
 for example before calling g_hash_table_remove().
 
 You can actually pass %NULL for @lookup_key to test
-whether the %NULL key exists.
+whether the %NULL key exists, provided the hash and equal functions
+of @hash_table are %NULL-safe.
 
 
 </description>
@@ -17630,7 +17631,7 @@ argument.
 &lt;note&gt;&lt;para&gt;@destructor is used quite differently from @notify in
 g_static_private_set().&lt;/para&gt;&lt;/note&gt;
 
-&lt;note&gt;&lt;para&gt;A #GPrivate can not be freed. Reuse it instead, if you
+&lt;note&gt;&lt;para&gt;A #GPrivate cannot be freed. Reuse it instead, if you
 can, to avoid shortage, or use #GStaticPrivate.&lt;/para&gt;&lt;/note&gt;
 
 &lt;note&gt;&lt;para&gt;This function will abort if g_thread_init() has not been
@@ -18125,7 +18126,6 @@ Since: 2.22
 <description>
 This is just like the standard C qsort() function, but
 the comparison routine accepts a user data argument.
-
 
 </description>
 <parameters>
@@ -27408,7 +27408,7 @@ tasks to be processed by a priority determined by @func, and not
 just in the order in which they were added to the pool.
 
 Note, if the maximum number of threads is more than 1, the order
-that threads are executed can not be guranteed 100%. Threads are
+that threads are executed cannot be guranteed 100%. Threads are
 scheduled by the operating system and are executed at random. It
 cannot be assumed that threads are executed in the order they are
 created. 
@@ -27636,15 +27636,15 @@ Since: 2.26
 
 <function name="g_time_zone_find_interval">
 <description>
-Finds an the interval within @tz that corresponds to the given @time.
-The meaning of @time depends on @type.
+Finds an the interval within @tz that corresponds to the given @time_.
+The meaning of @time_ depends on @type.
 
 If @type is %G_TIME_TYPE_UNIVERSAL then this function will always
 succeed (since universal time is monotonic and continuous).
 
-Otherwise @time is treated is local time.  The distinction between
+Otherwise @time_ is treated is local time.  The distinction between
 %G_TIME_TYPE_STANDARD and %G_TIME_TYPE_DAYLIGHT is ignored except in
-the case that the given @time is ambiguous.  In Toronto, for example,
+the case that the given @time_ is ambiguous.  In Toronto, for example,
 01:30 on November 7th 2010 occured twice (once inside of daylight
 savings time and the next, an hour later, outside of daylight savings
 time).  In this case, the different value of @type would result in a
@@ -27664,15 +27664,15 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="type">
-<parameter_description> the #GTimeType of @time
+<parameter_description> the #GTimeType of @time_
 </parameter_description>
 </parameter>
-<parameter name="time">
+<parameter name="time_">
 <parameter_description> a number of seconds since January 1, 1970
 </parameter_description>
 </parameter>
 </parameters>
-<return> the interval containing @time, or -1 in case of failure
+<return> the interval containing @time_, or -1 in case of failure
 
 </return>
 </function>
@@ -27984,6 +27984,10 @@ This internally creates a main loop source using
 g_timeout_source_new_seconds() and attaches it to the main loop context 
 using g_source_attach(). You can do these steps manually if you need 
 greater control. Also see g_timout_add_seconds_full().
+
+Note that the first call of the timer may not be precise for timeouts
+of one second. If you need finer precision and have such a timeout,
+you may want to use g_timeout_add() instead.
 
 Since: 2.14
 
@@ -30690,7 +30694,7 @@ It typically only makes sense to do this on a stack-allocated
 through.  This function need not be called if you call
 g_variant_builder_end() and it also doesn't need to be called on
 builders allocated with g_variant_builder_new (see
-g_variant_builder_free() for that).
+g_variant_builder_unref() for that).
 
 This function leaves the #GVariantBuilder structure set to all-zeros.
 It is valid to call this function on either an initialised
@@ -30958,7 +30962,7 @@ ordered in the usual way.  Strings are in ASCII lexographical order.
 
 It is a programmer error to attempt to compare container values or
 two values that have types that are not exactly equal.  For example,
-you can not compare a 32-bit signed integer with a 32-bit unsigned
+you cannot compare a 32-bit signed integer with a 32-bit unsigned
 integer.  Also note that this function is not particularly
 well-behaved when it comes to comparison of doubles; in particular,
 the handling of incomparable values (ie: NaN) is undefined.
@@ -31412,8 +31416,8 @@ It is an error to call this function with a @value of any type other
 than %G_VARIANT_TYPE_HANDLE.
 
 By convention, handles are indexes into an array of file descriptors
-that are sent alongside a DBus message.  If you're not interacting
-with DBus, you probably don't need them.
+that are sent alongside a D-Bus message.  If you're not interacting
+with D-Bus, you probably don't need them.
 
 Since: 2.24
 
@@ -31787,7 +31791,7 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="value">
-<parameter_description> a variant #GVariance instance
+<parameter_description> a variant #GVariant instance
 </parameter_description>
 </parameter>
 </parameters>
@@ -31887,8 +31891,8 @@ Since: 2.24
 
 <function name="g_variant_is_object_path">
 <description>
-Determines if a given string is a valid DBus object path.  You
-should ensure that a string is a valid DBus object path before
+Determines if a given string is a valid D-Bus object path.  You
+should ensure that a string is a valid D-Bus object path before
 passing it to g_variant_new_object_path().
 
 A valid object path starts with '/' followed by zero or more
@@ -31905,7 +31909,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @string is a DBus object path
+<return> %TRUE if @string is a D-Bus object path
 </return>
 </function>
 
@@ -31932,11 +31936,11 @@ Since: 2.24
 
 <function name="g_variant_is_signature">
 <description>
-Determines if a given string is a valid DBus type signature.  You
-should ensure that a string is a valid DBus type signature before
+Determines if a given string is a valid D-Bus type signature.  You
+should ensure that a string is a valid D-Bus type signature before
 passing it to g_variant_new_signature().
 
-DBus type signatures consist of zero or more definite #GVariantType
+D-Bus type signatures consist of zero or more definite #GVariantType
 strings in sequence.
 
 Since: 2.24
@@ -31948,7 +31952,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @string is a DBus type signature
+<return> %TRUE if @string is a D-Bus type signature
 </return>
 </function>
 
@@ -32618,8 +32622,8 @@ Since: 2.24
 Creates a new handle #GVariant instance.
 
 By convention, handles are indexes into an array of file descriptors
-that are sent alongside a DBus message.  If you're not interacting
-with DBus, you probably don't need them.
+that are sent alongside a D-Bus message.  If you're not interacting
+with D-Bus, you probably don't need them.
 
 Since: 2.24
 
@@ -32717,8 +32721,8 @@ Since: 2.24
 
 <function name="g_variant_new_object_path">
 <description>
-Creates a DBus object path #GVariant with the contents of @string.
-@string must be a valid DBus object path.  Use
+Creates a D-Bus object path #GVariant with the contents of @string.
+@string must be a valid D-Bus object path.  Use
 g_variant_is_object_path() if you're not sure.
 
 Since: 2.24
@@ -32815,8 +32819,8 @@ or by passing it to another g_variant_new() call.
 
 <function name="g_variant_new_signature">
 <description>
-Creates a DBus type signature #GVariant with the contents of
-@string.  @string must be a valid DBus type signature.  Use
+Creates a D-Bus type signature #GVariant with the contents of
+@string.  @string must be a valid D-Bus type signature.  Use
 g_variant_is_signature() if you're not sure.
 
 Since: 2.24
@@ -33024,7 +33028,7 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="value">
-<parameter_description> a #GVariance instance
+<parameter_description> a #GVariant instance
 </parameter_description>
 </parameter>
 </parameters>
@@ -34379,6 +34383,32 @@ of your program.
 <parameters>
 </parameters>
 <return></return>
+</function>
+
+<function name="glib_pgettext">
+<description>
+This function is a variant of glib_gettext() which supports
+a disambiguating message context. See g_dpgettext() for full
+details.
+
+This is an internal function and should only be used by
+the internals of glib (such as libgio).
+
+
+</description>
+<parameters>
+<parameter name="msgctxtid">
+<parameter_description> a combined message context and message id, separated
+by a \004 character
+</parameter_description>
+</parameter>
+<parameter name="msgidoffset">
+<parameter_description> the offset of the message id in @msgctxid
+</parameter_description>
+</parameter>
+</parameters>
+<return> the transation of @str to the current locale
+</return>
 </function>
 
 </root>

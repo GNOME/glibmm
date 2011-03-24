@@ -1415,8 +1415,8 @@ containing the arguments (the argv)
 
 <function name="g_application_command_line_get_cwd">
 <description>
-Gets the working directory of the command line invocation.  The
-string may contain non-utf8 data.
+Gets the working directory of the command line invocation.
+The string may contain non-utf8 data.
 
 It is possible that the remote application did not send a working
 directory, so this may be %NULL.
@@ -1441,8 +1441,9 @@ Since: 2.28
 <function name="g_application_command_line_get_environ">
 <description>
 Gets the contents of the 'environ' variable of the command line
-invocation, as would be returned by g_get_environ().  The strings may
-contain non-utf8 data.
+invocation, as would be returned by g_get_environ(), ie as a
+%NULL-terminated list of strings in the form 'NAME=VALUE'.
+The strings may contain non-utf8 data.
 
 The remote application usually does not send an environment.  Use
 %G_APPLICATION_SEND_ENVIRONMENT to affect that.  Even with this flag
@@ -1451,6 +1452,9 @@ to invocation messages from other applications).
 
 The return value should not be modified or freed and is valid for as
 long as @cmdline exists.
+
+See g_application_command_line_getenv() if you are only interested
+in the value of a single environment variable.
 
 Since: 2.28
 
@@ -1745,7 +1749,7 @@ application already exists (the 'primary' instance).  Calls to
 perform actions on @application will result in the actions being
 performed by the primary instance.
 
-The value of this property can not be accessed before
+The value of this property cannot be accessed before
 g_application_register() has been called.  See
 g_application_get_is_registered().
 
@@ -1792,9 +1796,9 @@ g_application_set_application_id().
 For convenience, the restrictions on application identifiers are
 reproduced here:
 &lt;itemizedlist&gt;
-&lt;listitem&gt;Application identifiers must contain only the ASCII characters &quot;[A-Z][a-z][0-9]_-&quot; and must not begin with a digit.&lt;/listitem&gt;
-&lt;listitem&gt;Application identifiers must contain at least one '.' (period) character (and thus at least two elements).&lt;/listitem&gt;
-&lt;listitem&gt;Application identifiers must not begin with a '.' (period) character.&lt;/listitem&gt;
+&lt;listitem&gt;Application identifiers must contain only the ASCII characters &quot;[A-Z][a-z][0-9]_-.&quot; and must not begin with a digit.&lt;/listitem&gt;
+&lt;listitem&gt;Application identifiers must contain at least one '.' (period) character (and thus at least three elements).&lt;/listitem&gt;
+&lt;listitem&gt;Application identifiers must not begin or end with a '.' (period) character.&lt;/listitem&gt;
 &lt;listitem&gt;Application identifiers must not contain consecutive '.' (period) characters.&lt;/listitem&gt;
 &lt;listitem&gt;Application identifiers must not exceed 255 characters.&lt;/listitem&gt;
 &lt;/itemizedlist&gt;
@@ -1881,7 +1885,7 @@ Attempts registration of the application.
 This is the point at which the application discovers if it is the
 primary instance or merely acting as a remote for an already-existing
 primary instance.  This is implemented by attempting to acquire the
-application identifier as a uniue bus name on the session bus using
+application identifier as a unique bus name on the session bus using
 GDBus.
 
 Due to the internal architecture of GDBus, method calls can be
@@ -1948,13 +1952,33 @@ call to g_application_hold().
 Runs the application.
 
 This function is intended to be run from main() and its return value
-is intended to be returned by main().
+is intended to be returned by main(). Although you are expected to pass
+the @argc, @argv parameters from main() to this function, it is possible
+to pass %NULL if @argv is not available or commandline handling is not
+required.
 
-First, the local_command_line() virtual function is invoked.  This
-function always runs on the local instance.  If that function returns
-%FALSE then the application is registered and the #GApplication::command-line
-signal is emitted in the primary instance (which may or may not be
-this instance).
+First, the local_command_line() virtual function is invoked.
+This function always runs on the local instance. It gets passed a pointer
+to a %NULL-terminated copy of @argv and is expected to remove the arguments
+that it handled (shifting up remaining arguments). See
+&lt;xref linkend=&quot;gapplication-example-cmdline2&quot;/&gt; for an example of
+parsing @argv manually. Alternatively, you may use the #GOptionContext API,
+after setting &lt;literal&gt;argc = g_strv_length (argv);&lt;/literal&gt;.
+
+The last argument to local_command_line() is a pointer to the @status
+variable which can used to set the exit status that is returned from
+g_application_run().
+
+If local_command_line() returns %TRUE, the command line is expected
+to be completely handled, including possibly registering as the primary
+instance, calling g_application_activate() or g_application_open(), etc.
+
+If local_command_line() returns %FALSE then the application is registered
+and the #GApplication::command-line signal is emitted in the primary
+instance (which may or may not be this instance). The signal handler
+gets passed a #GApplicationCommandline object that (among other things)
+contains the remaining commandline arguments that have not been handled
+by local_command_line().
 
 If the application has the %G_APPLICATION_HANDLES_COMMAND_LINE
 flag set then the default implementation of local_command_line()
@@ -1970,9 +1994,17 @@ g_application_activate() is called.  If commandline arguments are
 given and the %G_APPLICATION_HANDLES_OPEN flag is set then they
 are assumed to be filenames and g_application_open() is called.
 
+If you need to handle commandline arguments that are not filenames,
+and you don't mind commandline handling to happen in the primary
+instance, you should set %G_APPLICATION_HANDLED_COMMAND_LINE and
+process the commandline arguments in your #GApplication::command-line
+signal handler, either manually or using the #GOptionContext API.
+
 If you are interested in doing more complicated local handling of the
 commandline then you should implement your own #GApplication subclass
-and override local_command_line(). See
+and override local_command_line(). In this case, you most likely want
+to return %TRUE from your local_command_line() implementation to
+suppress the default handling. See
 &lt;xref linkend=&quot;gapplication-example-cmdline2&quot;/&gt; for an example.
 
 If, after the above is done, the use count of the application is zero
@@ -1993,11 +2025,11 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="argc">
-<parameter_description> the argc from main()
+<parameter_description> the argc from main() (or 0 if @argv is %NULL)
 </parameter_description>
 </parameter>
 <parameter name="argv">
-<parameter_description> the argv from main()
+<parameter_description> the argv from main(), or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -11503,9 +11535,9 @@ falls to zero, the @list is deleted.
 <function name="g_file_attribute_matcher_enumerate_namespace">
 <description>
 Checks if the matcher will match all of the keys in a given namespace.
-This will always return %TRUE if a wildcard character is in use (e.g. if 
+This will always return %TRUE if a wildcard character is in use (e.g. if
 matcher was created with &quot;standard::*&quot; and @ns is &quot;standard&quot;, or if matcher was created
-using &quot;*&quot; and namespace is anything.) 
+using &quot;*&quot; and namespace is anything.)
 
 TODO: this is awkwardly worded.
 
@@ -11538,14 +11570,14 @@ Gets the next matched attribute from a #GFileAttributeMatcher.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the next attribute or %NULL if 
+<return> a string containing the next attribute or %NULL if
 no more attribute exist.
 </return>
 </function>
 
 <function name="g_file_attribute_matcher_matches">
 <description>
-Checks if an attribute will be matched by an attribute matcher. If 
+Checks if an attribute will be matched by an attribute matcher. If
 the matcher was created with the &quot;*&quot; matching string, this function
 will always return %TRUE.
 
@@ -11588,17 +11620,17 @@ returns %FALSE if &quot;*&quot; was used when creating the matcher.
 
 <function name="g_file_attribute_matcher_new">
 <description>
-Creates a new file attribute matcher, which matches attributes 
-against a given string. #GFileAttributeMatcher&lt;!-- --&gt;s are reference 
-counted structures, and are created with a reference count of 1. If 
-the number of references falls to 0, the #GFileAttributeMatcher is 
+Creates a new file attribute matcher, which matches attributes
+against a given string. #GFileAttributeMatcher&lt;!-- --&gt;s are reference
+counted structures, and are created with a reference count of 1. If
+the number of references falls to 0, the #GFileAttributeMatcher is
 automatically destroyed.
 
 The @attribute string should be formatted with specific keys separated
-from namespaces with a double colon. Several &quot;namespace::key&quot; strings may be 
-concatenated with a single comma (e.g. &quot;standard::type,standard::is-hidden&quot;). 
-The wildcard &quot;*&quot; may be used to match all keys and namespaces, or 
-&quot;namespace::*&quot; will match all keys in a given namespace. 
+from namespaces with a double colon. Several &quot;namespace::key&quot; strings may be
+concatenated with a single comma (e.g. &quot;standard::type,standard::is-hidden&quot;).
+The wildcard &quot;*&quot; may be used to match all keys and namespaces, or
+&quot;namespace::*&quot; will match all keys in a given namespace.
 
 Examples of strings to use:
 &lt;table&gt;
@@ -11643,7 +11675,7 @@ References a file attribute matcher.
 
 <function name="g_file_attribute_matcher_unref">
 <description>
-Unreferences @matcher. If the reference count falls below 1, 
+Unreferences @matcher. If the reference count falls below 1,
 the @matcher is automatically freed.
 
 
@@ -13271,13 +13303,13 @@ contain a boolean value, %FALSE will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the boolean value contained within the attribute. 
+<return> the boolean value contained within the attribute.
 </return>
 </function>
 
 <function name="g_file_info_get_attribute_byte_string">
 <description>
-Gets the value of a byte string attribute. If the attribute does 
+Gets the value of a byte string attribute. If the attribute does
 not contain a byte string, %NULL will be returned.
 
 
@@ -13292,7 +13324,7 @@ not contain a byte string, %NULL will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the contents of the @attribute value as a byte string, or 
+<return> the contents of the @attribute value as a byte string, or
 %NULL otherwise.
 </return>
 </function>
@@ -13325,15 +13357,15 @@ Gets the attribute type, value and status for an attribute key.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @info has an attribute named @attribute, 
+<return> %TRUE if @info has an attribute named @attribute,
 %FALSE otherwise.
 </return>
 </function>
 
 <function name="g_file_info_get_attribute_int32">
 <description>
-Gets a signed 32-bit integer contained within the attribute. If the 
-attribute does not contain a signed 32-bit integer, or is invalid, 
+Gets a signed 32-bit integer contained within the attribute. If the
+attribute does not contain a signed 32-bit integer, or is invalid,
 0 will be returned.
 
 
@@ -13354,8 +13386,8 @@ attribute does not contain a signed 32-bit integer, or is invalid,
 
 <function name="g_file_info_get_attribute_int64">
 <description>
-Gets a signed 64-bit integer contained within the attribute. If the 
-attribute does not contain an signed 64-bit integer, or is invalid, 
+Gets a signed 64-bit integer contained within the attribute. If the
+attribute does not contain an signed 64-bit integer, or is invalid,
 0 will be returned.
 
 
@@ -13370,13 +13402,13 @@ attribute does not contain an signed 64-bit integer, or is invalid,
 </parameter_description>
 </parameter>
 </parameters>
-<return> a signed 64-bit integer from the attribute. 
+<return> a signed 64-bit integer from the attribute.
 </return>
 </function>
 
 <function name="g_file_info_get_attribute_object">
 <description>
-Gets the value of a #GObject attribute. If the attribute does 
+Gets the value of a #GObject attribute. If the attribute does
 not contain a #GObject, %NULL will be returned.
 
 
@@ -13412,7 +13444,7 @@ Gets the attribute status for an attribute key.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileAttributeStatus for the given @attribute, or 
+<return> a #GFileAttributeStatus for the given @attribute, or
 %G_FILE_ATTRIBUTE_STATUS_UNSET if the key is invalid.
 
 </return>
@@ -13420,7 +13452,7 @@ Gets the attribute status for an attribute key.
 
 <function name="g_file_info_get_attribute_string">
 <description>
-Gets the value of a string attribute. If the attribute does 
+Gets the value of a string attribute. If the attribute does
 not contain a string, %NULL will be returned.
 
 
@@ -13435,7 +13467,7 @@ not contain a string, %NULL will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the contents of the @attribute value as a string, or 
+<return> the contents of the @attribute value as a UTF-8 string, or
 %NULL otherwise.
 </return>
 </function>
@@ -13459,7 +13491,7 @@ Since: 2.22
 </parameter>
 </parameters>
 <return> the contents of the @attribute value as a stringv, or
-%NULL otherwise. Do not free.
+%NULL otherwise. Do not free. These returned strings are UTF-8.
 
 </return>
 </function>
@@ -13480,15 +13512,15 @@ Gets the attribute type for an attribute key.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileAttributeType for the given @attribute, or 
+<return> a #GFileAttributeType for the given @attribute, or
 %G_FILE_ATTRIBUTE_TYPE_INVALID if the key is not set.
 </return>
 </function>
 
 <function name="g_file_info_get_attribute_uint32">
 <description>
-Gets an unsigned 32-bit integer contained within the attribute. If the 
-attribute does not contain an unsigned 32-bit integer, or is invalid, 
+Gets an unsigned 32-bit integer contained within the attribute. If the
+attribute does not contain an unsigned 32-bit integer, or is invalid,
 0 will be returned.
 
 
@@ -13503,14 +13535,14 @@ attribute does not contain an unsigned 32-bit integer, or is invalid,
 </parameter_description>
 </parameter>
 </parameters>
-<return> an unsigned 32-bit integer from the attribute. 
+<return> an unsigned 32-bit integer from the attribute.
 </return>
 </function>
 
 <function name="g_file_info_get_attribute_uint64">
 <description>
-Gets a unsigned 64-bit integer contained within the attribute. If the 
-attribute does not contain an unsigned 64-bit integer, or is invalid, 
+Gets a unsigned 64-bit integer contained within the attribute. If the
+attribute does not contain an unsigned 64-bit integer, or is invalid,
 0 will be returned.
 
 
@@ -13525,7 +13557,7 @@ attribute does not contain an unsigned 64-bit integer, or is invalid,
 </parameter_description>
 </parameter>
 </parameters>
-<return> a unsigned 64-bit integer from the attribute. 
+<return> a unsigned 64-bit integer from the attribute.
 </return>
 </function>
 
@@ -13579,7 +13611,7 @@ Gets the edit name for a file.
 
 <function name="g_file_info_get_etag">
 <description>
-Gets the &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; for a given 
+Gets the &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; for a given
 #GFileInfo. See %G_FILE_ATTRIBUTE_ETAG_VALUE.
 
 
@@ -13596,7 +13628,7 @@ Gets the &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; for 
 
 <function name="g_file_info_get_file_type">
 <description>
-Gets a file's type (whether it is a regular file, symlink, etc). 
+Gets a file's type (whether it is a regular file, symlink, etc).
 This is different from the file's content type, see g_file_info_get_content_type().
 
 
@@ -13722,7 +13754,7 @@ Gets the file's size.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #goffset containing the file's size. 
+<return> a #goffset containing the file's size.
 </return>
 </function>
 
@@ -13775,7 +13807,7 @@ Checks if a file info structure has an attribute named @attribute.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @Ginfo has an attribute named @attribute, 
+<return> %TRUE if @Ginfo has an attribute named @attribute,
 %FALSE otherwise.
 </return>
 </function>
@@ -13820,8 +13852,8 @@ Lists the file info structure's attributes.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a null-terminated array of strings of all of the 
-possible attribute types for the given @name_space, or 
+<return> a null-terminated array of strings of all of the
+possible attribute types for the given @name_space, or
 %NULL on error.
 </return>
 </function>
@@ -13884,7 +13916,7 @@ Sets the @attribute to contain the given value, if possible.
 
 <function name="g_file_info_set_attribute_boolean">
 <description>
-Sets the @attribute to contain the given @attr_value, 
+Sets the @attribute to contain the given @attr_value,
 if possible.
 
 </description>
@@ -13907,7 +13939,7 @@ if possible.
 
 <function name="g_file_info_set_attribute_byte_string">
 <description>
-Sets the @attribute to contain the given @attr_value, 
+Sets the @attribute to contain the given @attr_value,
 if possible.
 
 </description>
@@ -13930,7 +13962,7 @@ if possible.
 
 <function name="g_file_info_set_attribute_int32">
 <description>
-Sets the @attribute to contain the given @attr_value, 
+Sets the @attribute to contain the given @attr_value,
 if possible.
 
 </description>
@@ -13953,7 +13985,7 @@ if possible.
 
 <function name="g_file_info_set_attribute_int64">
 <description>
-Sets the @attribute to contain the given @attr_value, 
+Sets the @attribute to contain the given @attr_value,
 if possible.
 
 
@@ -13995,7 +14027,7 @@ Sets @mask on @info to match specific attribute types.
 
 <function name="g_file_info_set_attribute_object">
 <description>
-Sets the @attribute to contain the given @attr_value, 
+Sets the @attribute to contain the given @attr_value,
 if possible.
 
 </description>
@@ -14049,7 +14081,7 @@ Since: 2.22
 
 <function name="g_file_info_set_attribute_string">
 <description>
-Sets the @attribute to contain the given @attr_value, 
+Sets the @attribute to contain the given @attr_value,
 if possible.
 
 </description>
@@ -14063,7 +14095,7 @@ if possible.
 </parameter_description>
 </parameter>
 <parameter name="attr_value">
-<parameter_description> a string.
+<parameter_description> a UTF-8 string.
 </parameter_description>
 </parameter>
 </parameters>
@@ -14084,11 +14116,11 @@ Sinze: 2.22
 </parameter_description>
 </parameter>
 <parameter name="attribute">
-<parameter_description> a file attribute key.
+<parameter_description> a file attribute key
 </parameter_description>
 </parameter>
 <parameter name="attr_value">
-<parameter_description> a %NULL terminated string array
+<parameter_description> a %NULL terminated array of UTF-8 strings.
 </parameter_description>
 </parameter>
 </parameters>
@@ -14097,7 +14129,7 @@ Sinze: 2.22
 
 <function name="g_file_info_set_attribute_uint32">
 <description>
-Sets the @attribute to contain the given @attr_value, 
+Sets the @attribute to contain the given @attr_value,
 if possible.
 
 </description>
@@ -14120,7 +14152,7 @@ if possible.
 
 <function name="g_file_info_set_attribute_uint64">
 <description>
-Sets the @attribute to contain the given @attr_value, 
+Sets the @attribute to contain the given @attr_value,
 if possible.
 
 </description>
@@ -14219,7 +14251,7 @@ See %G_FILE_ATTRIBUTE_STANDARD_TYPE.
 
 <function name="g_file_info_set_icon">
 <description>
-Sets the icon for a given #GFileInfo. 
+Sets the icon for a given #GFileInfo.
 See %G_FILE_ATTRIBUTE_STANDARD_ICON.
 
 </description>
@@ -14295,7 +14327,7 @@ info to the given time value.
 
 <function name="g_file_info_set_name">
 <description>
-Sets the name attribute for the current #GFileInfo. 
+Sets the name attribute for the current #GFileInfo.
 See %G_FILE_ATTRIBUTE_STANDARD_NAME.
 
 </description>
@@ -14314,7 +14346,7 @@ See %G_FILE_ATTRIBUTE_STANDARD_NAME.
 
 <function name="g_file_info_set_size">
 <description>
-Sets the %G_FILE_ATTRIBUTE_STANDARD_SIZE attribute in the file info 
+Sets the %G_FILE_ATTRIBUTE_STANDARD_SIZE attribute in the file info
 to the given size.
 
 </description>
@@ -14333,7 +14365,7 @@ to the given size.
 
 <function name="g_file_info_set_sort_order">
 <description>
-Sets the sort order attribute in the file info structure. See 
+Sets the sort order attribute in the file info structure. See
 %G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER.
 
 </description>
@@ -14352,7 +14384,7 @@ Sets the sort order attribute in the file info structure. See
 
 <function name="g_file_info_set_symlink_target">
 <description>
-Sets the %G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET attribute in the file info 
+Sets the %G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET attribute in the file info
 to the given symlink target.
 
 </description>
@@ -32834,7 +32866,7 @@ require it.
 Creates a new #GvdbTable from the contents of the file found at
 @filename.
 
-The only time this function fails is if the file can not be opened.
+The only time this function fails is if the file cannot be opened.
 In that case, the #GError that is returned will be an error from
 g_mapped_file_new().
 
