@@ -319,30 +319,17 @@ void Proxy::call(const Glib::ustring& method_name,
     0, &SignalProxy_async_callback, slot_copy);
 }
 
-void Proxy::call_finish(Glib::VariantBase& ret, const Glib::RefPtr<AsyncResult>& res)
-{
-  GError* g_error = 0;
-
-  GVariant* const g_variant =
-    g_dbus_proxy_call_finish(gobj(), Glib::unwrap(res), &g_error);
-
-  if(g_error)
-    ::Glib::Error::throw_exception(g_error);
-
-  ret.init(g_variant, false /* don't take extra reference */);
-}
-
-void Proxy::call_sync(Glib::VariantBase& result,
+Glib::VariantContainerBase Proxy::call_sync(
   const Glib::ustring& method_name,
   const Glib::RefPtr<Cancellable>& cancellable,
-  const Glib::VariantBase& parameters,
+  const Glib::VariantContainerBase& parameters,
   int timeout_msec,
   CallFlags flags
 )
 {
   GError* g_error = 0;
 
-  GVariant* const g_variant =
+  GVariant* const gvariant =
     g_dbus_proxy_call_sync(gobj(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()),
     static_cast<GDBusCallFlags>(flags), timeout_msec,
@@ -351,20 +338,19 @@ void Proxy::call_sync(Glib::VariantBase& result,
   if(g_error)
     ::Glib::Error::throw_exception(g_error);
 
-  result.init(g_variant, false /* don't take extra reference */);
+  return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
 }
 
-void Proxy::call_sync(
-  Glib::VariantBase& result,
+Glib::VariantContainerBase Proxy::call_sync(
   const Glib::ustring& method_name,
-  const Glib::VariantBase& parameters,
+  const Glib::VariantContainerBase& parameters,
   int timeout_msec,
   CallFlags flags
 )
 {
   GError* g_error = 0;
 
-  GVariant* const g_variant =
+  GVariant* const gvariant =
     g_dbus_proxy_call_sync(gobj(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()),
     static_cast<GDBusCallFlags>(flags), timeout_msec, 0, &g_error);
@@ -372,7 +358,7 @@ void Proxy::call_sync(
   if(g_error)
     ::Glib::Error::throw_exception(g_error);
 
-  result.init(g_variant, false /* don't take extra reference */);
+  return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
 }
 
 } //namespace DBus

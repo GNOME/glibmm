@@ -42,7 +42,7 @@ static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection,
   {
     (*the_slot)(Glib::wrap(connection, true), (sender_name ? sender_name : ""),
       (object_path ? object_path : ""), (interface_name ? interface_name : ""),
-      (signal_name ? signal_name : ""), Glib::VariantBase(parameters, true));
+      (signal_name ? signal_name : ""), Glib::VariantContainerBase(parameters, true));
   }
   catch(...)
   {
@@ -652,7 +652,7 @@ void Connection::call(
   const Glib::ustring&                  object_path,
   const Glib::ustring&                  interface_name,
   const Glib::ustring&                  method_name,
-  const Glib::VariantBase&              parameters,
+  const Glib::VariantContainerBase&     parameters,
   const SlotAsyncReady&                 slot,
   const Glib::RefPtr<Cancellable>&      cancellable,
   const Glib::ustring&                  bus_name,
@@ -678,7 +678,7 @@ void Connection::call(
   const Glib::ustring&                  object_path,
   const Glib::ustring&                  interface_name,
   const Glib::ustring&                  method_name,
-  const Glib::VariantBase&              parameters,
+  const Glib::VariantContainerBase&     parameters,
   const SlotAsyncReady&                 slot,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
@@ -698,25 +698,11 @@ void Connection::call(
     &SignalProxy_async_callback, slot_copy);
 }
 
-void Connection::call_finish(
-  Glib::VariantBase&                    output,
-  const Glib::RefPtr<AsyncResult>&      res
-)
-{
-  GError* gerror = 0;
-  GVariant* const gvariant =
-    g_dbus_connection_call_finish(gobj(), Glib::unwrap(res), &gerror);
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-  output.init(gvariant); // No need for extra ref.
-}
-
-void Connection::call_sync(
-  Glib::VariantBase&                    output,
+Glib::VariantContainerBase Connection::call_sync(
   const Glib::ustring&                  object_path,
   const Glib::ustring&                  interface_name,
   const Glib::ustring&                  method_name,
-  const Glib::VariantBase&              parameters,
+  const Glib::VariantContainerBase&     parameters,
   const Glib::RefPtr<Cancellable>&      cancellable,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
@@ -736,16 +722,15 @@ void Connection::call_sync(
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
-  output.init(gvariant); // No need to take extra reference.
+  return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
 }
 
 // Non-cancellable version.
-void Connection::call_sync(
-  Glib::VariantBase&                    output,
+Glib::VariantContainerBase Connection::call_sync(
   const Glib::ustring&                  object_path,
   const Glib::ustring&                  interface_name,
   const Glib::ustring&                  method_name,
-  const Glib::VariantBase&              parameters,
+  const Glib::VariantContainerBase&     parameters,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
   CallFlags                         flags,
@@ -763,7 +748,7 @@ void Connection::call_sync(
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
-  output.init(gvariant); // No need to take extra reference.
+  return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
 }
 
 void Connection::emit_signal(
@@ -771,7 +756,7 @@ void Connection::emit_signal(
   const Glib::ustring&                interface_name,
   const Glib::ustring&                signal_name,
   const Glib::ustring&                destination_bus_name,
-  const Glib::VariantBase&            parameters
+  const Glib::VariantContainerBase&   parameters
 )
 {
   GError* gerror = 0;

@@ -260,8 +260,8 @@ void run_as_client(Glib::ustring address)
 
   try
   {
-    Glib::VariantContainerBase result;
-    connection->call_sync(result, "/org/glibmm/DBus/TestObject",
+    const Glib::VariantContainerBase result =
+      connection->call_sync( "/org/glibmm/DBus/TestObject",
       "org.glibmm.DBus.TestPeerInterface",
       "HelloWorld", parameters);
 

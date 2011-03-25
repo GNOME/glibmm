@@ -281,19 +281,17 @@ public:
 
   /** Finishes an operation started with call().
    *
-   * @param ret An output variable in which to store the return.
    * @param res An AsyncResult obtained from the SlotAsyncReady passed to
    * call().
+   * @result A Variant tuple with return values.
    *
    * @throw Glib::Error.
    */
-  void call_finish(Glib::VariantBase& ret, const Glib::RefPtr<AsyncResult>& res);
-  _IGNORE(g_dbus_proxy_call_finish)
+  _WRAP_METHOD(Glib::VariantContainerBase call_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_proxy_call_finish, errthrow)
 
   /** Synchronously invokes the method_name method on proxy.
    * See call(), the asynchronous version of this method for more information.
    *
-   * @param result An output parameter in which to store the return.
    * @param method_name Name of method to invoke.
    * @param timeout_msec The timeout in milliseconds or -1 to use the proxy
    * default timeout.
@@ -301,24 +299,23 @@ public:
    * @param parameters A Glib::VariantBase tuple with parameters for the
    * signal.
    * @param cancellable A Cancellable.
+   * @result A Variant tuple with return values.
    *
    * @throw Glib::Error.
    */
-  void call_sync(
-    Glib::VariantBase& result,
+  Glib::VariantContainerBase call_sync(
     const Glib::ustring& method_name,
     const Glib::RefPtr<Cancellable>& cancellable,
-    const Glib::VariantBase& parameters = Glib::VariantBase(),
+    const Glib::VariantContainerBase& parameters = Glib::VariantContainerBase(),
     int timeout_msec = -1,
     CallFlags flags = Gio::DBus::CALL_FLAGS_NONE
   );
   _IGNORE(g_dbus_proxy_call_sync)
 
   /// A non-cancellable version of call_sync().
-  void call_sync(
-    Glib::VariantBase& result,
+  Glib::VariantContainerBase call_sync(
     const Glib::ustring& method_name,
-    const Glib::VariantBase& parameters = Glib::VariantBase(),
+    const Glib::VariantContainerBase& parameters = Glib::VariantContainerBase(),
     int timeout_msec = -1,
     CallFlags flags = Gio::DBus::CALL_FLAGS_NONE
   );
