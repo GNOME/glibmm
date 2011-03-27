@@ -265,7 +265,7 @@ public:
     const Glib::ustring& method_name,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    const Glib::VariantBase& parameters = Glib::VariantBase(),
+    const Glib::VariantContainerBase& parameters = Glib::VariantContainerBase(),
     int timeout_msec = -1,
     CallFlags flags = Gio::DBus::CALL_FLAGS_NONE
   );
@@ -274,7 +274,7 @@ public:
   void call(
     const Glib::ustring& method_name,
     const SlotAsyncReady& slot,
-    const Glib::VariantBase& parameters = Glib::VariantBase(),
+    const Glib::VariantContainerBase& parameters = Glib::VariantContainerBase(),
     int timeout_msec = -1,
     CallFlags flags = Gio::DBus::CALL_FLAGS_NONE
   );
@@ -296,7 +296,7 @@ public:
    * @param timeout_msec The timeout in milliseconds or -1 to use the proxy
    * default timeout.
    * @param flags Flags from the CallFlags enumeration.
-   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * @param parameters A Glib::VariantContainerBase tuple with parameters for the
    * signal.
    * @param cancellable A Cancellable.
    * @result A Variant tuple with return values.
@@ -339,8 +339,9 @@ public:
   #m4 _CONVERSION(`const gchar*const*', `const std::vector<Glib::ustring>&', `Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
   _WRAP_SIGNAL(void properties_changed(const type_map_changed_properties& changed_properties, const std::vector<Glib::ustring>& invalidated_properties), "g-properties-changed")
 
-#m4 _CONVERSION(`GVariant*', `const Glib::VariantBase&', `Glib::wrap($3, true)')
- _WRAP_SIGNAL(void signal(const Glib::ustring& sender_name, const Glib::ustring& signal_name, const Glib::VariantBase& parameters), "g-signal")
+#m4 _CONVERSION(`GVariant*', `const Glib::VariantContainerBase&', `Glib::VariantContainerBase($3, true)')
+#m4 _CONVERSION(`const Glib::VariantContainerBase&', `GVariant*', `const_cast<GVariant*>(($3).gobj())')
+ _WRAP_SIGNAL(void signal(const Glib::ustring& sender_name, const Glib::ustring& signal_name, const Glib::VariantContainerBase& parameters), "g-signal")
 };
 
 } //namespace
