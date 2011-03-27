@@ -25,7 +25,8 @@ _DEFS(glibmm,glib)
 
 namespace Glib
 {
-/** Balanced Binary Trees — a sorted collection of key/value pairs optimized for searching and traversing in order
+
+/** Balanced Binary Trees — a sorted collection of key/value pairs optimized for searching and traversing in order.
  * The BalancedTree structure and its associated functions provide a sorted
  * collection of key/value pairs optimized for searching and traversing in
  * order.
@@ -101,79 +102,65 @@ public:
     return gobject_;
   }
 
-/**
- * reference:
- *
- * Increments the reference count of tree by one.  It is safe to call
- * this function from any thread.
- **/
+  /** Increments the reference count of tree by one.  It is safe to call
+   * this function from any thread.
+   */
   void reference()
   {
     g_tree_ref(gobject_);
   }
   _IGNORE(g_tree_ref)
 
-/**
- * unreference:
- *
- * Decrements the reference count of tree by one. If the reference count
- * drops to 0, all keys and values will be destroyed and all memory allocated
- * by tree will be released.
- *
- * It is safe to call this function from any thread.
- **/
+  /** Decrements the reference count of tree by one. If the reference count
+   * drops to 0, all keys and values will be destroyed and all memory allocated
+   * by tree will be released.
+   *
+   * It is safe to call this function from any thread.
+   */
   void unreference()
   {
     g_tree_unref(gobject_);
   }
   _IGNORE(g_tree_unref)
 
-/**
- * insert:
- * @key: the key to insert.
- * @value: the value corresponding to the key.
- *
- * Inserts a key/value pair into a #BalancedTree. If the given key already
- * exists in the #BalancedTree its corresponding value is set to the new
- * value.
- *
- * The tree is automatically 'balanced' as new key/value pairs are added,
- * so that the distance from the root to every leaf is as small as possible.
- **/
+  /** Inserts a key/value pair into a BalancedTree. If the given key already
+   * exists in the BalancedTree its corresponding value is set to the new
+   * value.
+   *
+   * The tree is automatically 'balanced' as new key/value pairs are added,
+   * so that the distance from the root to every leaf is as small as possible.
+   *
+   * @param key The key to insert.
+   * @param value The value corresponding to the key.
+   */
   void insert(const K &key, const V &value)
   {
     g_tree_insert(gobj(), reinterpret_cast<void *>(new K(key)), reinterpret_cast<void *>(new V(value)));
   }
   _IGNORE(g_tree_insert)
 
-/**
- * remove:
- * @key: the key to remove.
- *
- * Removes a key/value pair from a #BalancedTree.
- *
- * If the key does not exist in the #BalancedTree, the function does nothing.
- *
- * Returns: %TRUE if the key was found (prior to 2.8, this function returned
- *   nothing)
- **/
+  /** Removes a key/value pair from a BalancedTree.
+   *
+   * If the key does not exist in the BalancedTree, the function does nothing.
+   *
+   * @param key The key to remove.
+   * @result true if the key was found (prior to 2.8, this function returned
+   *   nothing)
+   */
   bool remove(const K &key)
   {
     return g_tree_remove(const_cast<GTree*>(gobj()), &key);
   }
   _IGNORE(g_tree_remove)
 
-/**
- * lookup:
- * @key: the key to look up.
- *
- * Gets the value corresponding to the given key. Since a #BalancedTree is
- * automatically balanced as key/value pairs are added, key lookup is very
- * fast.
- *
- * Return value: the value corresponding to the key, or %NULL if the key was
- * not found.
- **/
+  /** Gets the value corresponding to the given key. Since a BalancedTree is
+   * automatically balanced as key/value pairs are added, key lookup is very
+   * fast.
+   *
+   * @param key The key to look up.
+   * @result The value corresponding to the key, or 0 if the key was
+   * not found.
+   */
   V* lookup(const K &key)
   {
     return reinterpret_cast<V *>(g_tree_lookup(gobj(), &key));
@@ -186,51 +173,43 @@ public:
   }
   _IGNORE(g_tree_lookup)
 
-/**
- * height:
- *
- * Gets the height of a #BalancedTree.
- *
- * If the #BalancedTree contains no nodes, the height is 0.
- * If the #BalancedTree contains only one root node the height is 1.
- * If the root node has children the height is 2, etc.
- *
- * Return value: the height of the #BalancedTree.
- **/
+  /** Gets the height of a BalancedTree.
+   *
+   * If the BalancedTree contains no nodes, the height is 0.
+   * If the BalancedTree contains only one root node the height is 1.
+   * If the root node has children the height is 2, etc.
+   *
+   * @result the height of the BalancedTree.
+   */
   gint height() const
   {
     return g_tree_height(const_cast<GTree*>(gobj()));
   }
   _IGNORE(g_tree_height)
 
-/**
- * nnodes:
- *
- * Gets the number of nodes in a #BalancedTree.
- *
- * Return value: the number of nodes in the #BalancedTree.
- **/
+  /** Gets the number of nodes in a BalancedTree.
+   *
+   * @result the number of nodes in the BalancedTree.
+   */
   gint nnodes() const
   {
     return g_tree_nnodes(const_cast<GTree*>(gobj()));
   }
   _IGNORE(g_tree_nnodes)
 
-/**
- * foreach:
- * @func: the function to call for each node visited. If this function
- *   returns true, the traversal is stopped.
- *
- * Calls the given function for each of the key/value pairs in the
- * #BalancedTree.
- * The function is passed the key and value of each pair. The tree is
- * traversed in sorted order.
- *
- * The tree may not be modified while iterating over it (you can't
- * add/remove items). To remove all items matching a predicate, you need
- * to add each item to a list in your #TraverseFunc as you walk over
- * the tree, then walk the list and remove each item.
- **/
+  /** Calls the given function for each of the key/value pairs in the
+   * BalancedTree.
+   * The function is passed the key and value of each pair. The tree is
+   * traversed in sorted order.
+   *
+   * The tree may not be modified while iterating over it (you can't
+   * add/remove items). To remove all items matching a predicate, you need
+   * to add each item to a list in your TraverseFunc as you walk over
+   * the tree, then walk the list and remove each item.
+   *
+   * @param func The function to call for each node visited. If this function
+   *   returns true, the traversal is stopped.
+   */
   void foreach(const TraverseFunc& func) const
   {
     TraverseFunc func_copy = func;
@@ -238,22 +217,19 @@ public:
   }
   _IGNORE(g_tree_foreach);
 
-/**
- * search:
- * @search_func: a function used to search the #BalancedTree.
- *
- * Searches a #BalancedTree using @search_func.
- *
- * The @search_func is called with a reference to the key of a key/value pair
- * in the tree. If @search_func returns 0 for a key/value pair, then search()
- * will return the value of that pair. If @search_func returns -1,  searching
- * will proceed among the key/value pairs that have a smaller key; if
- * @search_func returns 1, searching will proceed among the key/value pairs
- * that have a larger key.
- *
- * Return value: the value corresponding to the found key, or %NULL if the key
- * was not found.
- **/
+  /** Searches a BalancedTree using @a search_func.
+   *
+   * The @a search_func is called with a reference to the key of a key/value pair
+   * in the tree. If @a search_func returns 0 for a key/value pair, then search()
+   * will return the value of that pair. If @a search_func returns -1,  searching
+   * will proceed among the key/value pairs that have a smaller key; if
+   * @a search_func returns 1, searching will proceed among the key/value pairs
+   * that have a larger key.
+   *
+   * @param search_func A function used to search the BalancedTree.
+   * @result the value corresponding to the found key, or %NULL if the key
+   * was not found.
+   */
   V* search(const CompareFunc &search_func, const K& key)
   {
     sigc::slot<int, const K&, const CompareFunc&, const K&> real_slot = sigc::ptr_fun(on_compare_key);
@@ -263,29 +239,26 @@ public:
     return reinterpret_cast<V*>(value);
   }
 
- /**
- * search:
- * @search_func: a function used to search the #BalancedTree.
- *
- * Searches a #BalancedTree using @search_func.
- *
- * The @search_func is called with a reference to the key of a key/value pair
- * in the tree. If @search_func returns 0 for a key/value pair, then search()
- * will return the value of that pair. If @search_func returns -1,  searching
- * will proceed among the key/value pairs that have a smaller key; if
- * @search_func returns 1, searching will proceed among the key/value pairs
- * that have a larger key.
- *
- * Return value: the value corresponding to the found key, or %NULL if the key
- * was not found.
- **/
- const V* search(const CompareFunc &search_func, const K& key) const
+  /** Searches a BalancedTree using @a search_func.
+   *
+   * The @a search_func is called with a reference to the key of a key/value pair
+   * in the tree. If @a search_func returns 0 for a key/value pair, then search()
+   * will return the value of that pair. If @a search_func returns -1,  searching
+   * will proceed among the key/value pairs that have a smaller key; if
+   * @a search_func returns 1, searching will proceed among the key/value pairs
+   * that have a larger key.
+   *
+   * @param search_func A function used to search the BalancedTree.
+   * @result the value corresponding to the found key, or %NULL if the key
+   * was not found.
+   */
+  const V* search(const CompareFunc &search_func, const K& key) const
   {
     return const_cast<BalancedTree<K, V>*>(this)->search(search_func, key);
   }
   _IGNORE(g_tree_search)
 
-  /* the following functions don't make sense for the C++ wrapper */
+  // The following functions don't make sense for the C++ wrapper.
   _IGNORE(g_tree_steal)
   _IGNORE(g_tree_lookup_extended)
   _IGNORE(g_tree_replace)
