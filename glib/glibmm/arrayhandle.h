@@ -182,6 +182,9 @@ public:
 
   inline ArrayHandleIterator<Tr> &     operator++();
   inline const ArrayHandleIterator<Tr> operator++(int);
+  // these are needed by msvc 2005 when using deque.
+  inline ArrayHandleIterator<Tr> &     operator--();
+  inline const ArrayHandleIterator<Tr> operator--(int);
 
   // All this random access stuff is only there because STL algorithms
   // usually have optimized specializations for random access iterators,
@@ -300,9 +303,42 @@ public:
   inline const_iterator begin() const;
   inline const_iterator end()   const;
 
-  template <class U> inline operator std::vector<U>() const;
-  template <class U> inline operator std::deque<U>()  const;
-  template <class U> inline operator std::list<U>()   const;
+  // this is inside class definition, so msvc 2005, 2008 and 2010 can compile this code.
+  template <class U> inline operator std::vector<U>() const
+  {
+#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+    return std::vector<U>(this->begin(), this->end());
+#else
+    std::vector<U> temp;
+    temp.reserve(this->size());
+    Glib::Container_Helpers::fill_container(temp, this->begin(), this->end());
+    return temp;
+#endif
+  }
+
+  // this is inside class definition, so msvc 2005, 2008 and 2010 can compile this code.
+  template <class U> inline operator std::deque<U>() const
+  {
+#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+    return std::deque<U>(this->begin(), this->end());
+#else
+    std::deque<U> temp;
+    Glib::Container_Helpers::fill_container(temp, this->begin(), this->end());
+    return temp;
+#endif
+  }
+
+  // this is inside class definition, so msvc 2005, 2008 and 2010 can compile this code.
+  template <class U> inline operator std::list<U>() const
+  {
+#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
+    return std::list<U>(this->begin(), this->end());
+#else
+    std::list<U> temp;
+    Glib::Container_Helpers::fill_container(temp, this->begin(), this->end());
+    return temp;
+#endif
+  }
 
   template <class Cont> inline
     void assign_to(Cont& container) const;
@@ -377,6 +413,19 @@ template <class Tr> inline
 const ArrayHandleIterator<Tr> ArrayHandleIterator<Tr>::operator++(int)
 {
   return ArrayHandleIterator<Tr>(pos_++);
+}
+
+template <class Tr> inline
+ArrayHandleIterator<Tr>& ArrayHandleIterator<Tr>::operator--()
+{
+  --pos_;
+  return *this;
+}
+
+template <class Tr> inline
+const ArrayHandleIterator<Tr> ArrayHandleIterator<Tr>::operator--(int)
+{
+  return ArrayHandleIterator<Tr>(pos_--);
 }
 
 template <class Tr> inline
@@ -656,46 +705,6 @@ inline
 ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::const_iterator ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::end() const
 {
   return Glib::Container_Helpers::ArrayHandleIterator<Tr>(parray_ + size_);
-}
-
-template <class U>
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::operator std::vector<U>() const
-{
-#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
-  return std::vector<U>(this->begin(), this->end());
-#else
-  std::vector<U> temp;
-  temp.reserve(this->size());
-  Glib::Container_Helpers::fill_container(temp, this->begin(), this->end());
-  return temp;
-#endif
-}
-
-template <class U>
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::operator std::deque<U>() const
-{
-#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
-  return std::deque<U>(this->begin(), this->end());
-#else
-  std::deque<U> temp;
-  Glib::Container_Helpers::fill_container(temp, this->begin(), this->end());
-  return temp;
-#endif
-}
-
-template <class U>
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::operator std::list<U>() const
-{
-#ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
-  return std::list<U>(this->begin(), this->end());
-#else
-  std::list<U> temp;
-  Glib::Container_Helpers::fill_container(temp, this->begin(), this->end());
-  return temp;
-#endif
 }
 
 template <class Cont>
