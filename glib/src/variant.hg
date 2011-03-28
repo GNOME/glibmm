@@ -230,6 +230,7 @@ public:
    */
   static void create_object_path(VariantStringBase& output,
     const std::string& object_path);
+  _IGNORE(g_variant_new_object_path)
 
   _WRAP_METHOD(static bool is_object_path(const std::string& string), g_variant_is_object_path)
 
@@ -243,6 +244,7 @@ public:
    */
   static void create_signature(VariantStringBase& output,
     const std::string& object_path);
+  _IGNORE(g_variant_new_signature)
 
   _WRAP_METHOD(static bool is_signature(const std::string& string), g_variant_is_signature)
 };
@@ -497,6 +499,10 @@ public:
   _WRAP_METHOD(std::string get() const, g_variant_get_bytestring)
    _IGNORE(g_variant_dup_bytestring)
 };
+
+template<>
+Variant<std::string> VariantBase::cast_dynamic< Variant<std::string> >(const VariantBase& v)
+throw(std::bad_cast);
 
 /** Specialization of Variant containing a dictionary entry.  See also
  * Variant< std::map<K, V> >.

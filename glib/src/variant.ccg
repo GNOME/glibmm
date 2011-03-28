@@ -95,7 +95,7 @@ template<>
 VariantContainerBase VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v)
 throw(std::bad_cast)
 {
-  if(v.gobj() == NULL)
+  if(!v.gobj())
   {
     return VariantContainerBase();
   }
@@ -182,6 +182,30 @@ Glib::ustring Variant<Glib::ustring>::get() const
   return Glib::ustring(g_variant_get_string(gobject_, 0));
 }
 
+// Variant<std::string> makes sense for multiple types.
+// See http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-get-string
+template<>
+Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v)
+throw(std::bad_cast)
+{
+  if(!v.gobj())
+  {
+    return Variant<Glib::ustring>();
+  }
+
+  const VariantType vtype = v.get_type();
+  if( vtype.equal(VariantTypeString) ||
+      vtype.equal(VariantTypeObjectPath) ||
+      vtype.equal(VariantTypeSignature) )
+  {
+    return Variant<Glib::ustring>(const_cast<GVariant*>(v.gobj()), true);
+  }
+  else
+  {
+    throw std::bad_cast();
+  }
+}
+
 // static
 const VariantType& Variant<std::string>::variant_type()
 {
@@ -199,6 +223,31 @@ Variant<std::string>::create(const std::string& data)
   g_variant_ref_sink(result.gobj());
 
   return result;
+}
+
+// Variant<std::string> makes sense for multiple types.
+// See http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-get-string
+template<>
+Variant<std::string> VariantBase::cast_dynamic< Variant<std::string> >(const VariantBase& v)
+throw(std::bad_cast)
+{
+  if(!v.gobj())
+  {
+    return Variant<std::string>();
+  }
+
+  const VariantType vtype = v.get_type();
+  if( vtype.equal(VariantTypeString) ||
+      vtype.equal(VariantTypeByteString) ||  
+      vtype.equal(VariantTypeObjectPath) ||
+      vtype.equal(VariantTypeSignature) )
+  {
+    return Variant<std::string>(const_cast<GVariant*>(v.gobj()), true);
+  }
+  else
+  {
+    throw std::bad_cast();
+  }
 }
 
 typedef std::vector<Glib::ustring> type_vec_ustring;
