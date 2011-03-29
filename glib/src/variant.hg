@@ -293,15 +293,15 @@ public:
    * @throw std::out_of_range
    * @newin{2,28}
    */
-  void get(VariantBase& child, gsize index = 0) const;
+  void get_child(VariantBase& child, gsize index = 0) const;
   _IGNORE(g_variant_get_child, g_variant_get_child_value)
 
-  _WRAP_METHOD(VariantBase get(gsize index = 0), g_variant_get_child_value)
+  _WRAP_METHOD(VariantBase get_child(gsize index = 0), g_variant_get_child_value)
 
   /* TODO?:
   /// A get() method to return the contents of the variant in the container.
   template <class DataType>
-  DataType get(gsize index = 0) const;
+  DataType get_child(gsize index = 0) const;
   */
 
   /** If this is a maybe-typed instance, extract its value. If the value is
@@ -588,7 +588,7 @@ public:
    * @throw std::out_of_range
    * @newin{2,28}
    */
-  T get(gsize index) const;
+  T get_child(gsize index) const;
 
   /** Gets the vector of the Variant.
    * @return The vector.
@@ -652,7 +652,7 @@ public:
    * @throw std::out_of_range
    * @newin{2,28}
    */
-  Glib::ustring get(gsize index) const;
+  Glib::ustring get_child(gsize index) const;
 
   /** Gets the string vector of the Variant.
    * @return The vector.
@@ -716,7 +716,7 @@ public:
    * @throw std::out_of_range
    * @newin{2,28}
    */
-  std::string get(gsize index) const;
+  std::string get_child(gsize index) const;
 
   /** Gets the string vector of the Variant.
    * @return The vector.
@@ -784,7 +784,7 @@ public:
    * @throw std::out_of_range
    * @newin{2,28}
    */
-  std::pair<K, V> get(gsize index) const;
+  std::pair<K, V> get_child(gsize index) const;
 
   /** Looks up a value in a dictionary Variant.
    * @param key The key to look up.
@@ -867,11 +867,11 @@ std::pair<K, V> Variant< std::pair<K, V> >::get() const
 {
   // Get the key (the first element of the this VariantContainerBase).
   Variant<K> key;
-  VariantContainerBase::get(key, 0);
+  VariantContainerBase::get_child(key, 0);
 
   // Get the value (the second element of the this VariantContainerBase).
   Variant<V> value;
-  VariantContainerBase::get(value, 1);
+  VariantContainerBase::get_child(value, 1);
 
   std::pair<K, V> result(key.get(), value.get());
 
@@ -923,7 +923,7 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
 }
 
 template<class T>
-T Variant< std::vector<T> >::get(gsize index) const
+T Variant< std::vector<T> >::get_child(gsize index) const
 {
   gsize n_elements = 0;
 
@@ -1016,10 +1016,10 @@ Variant< std::map<K, V> >::create(const std::map<K, V>& data)
 
 template<class K, class V>
 std::pair<K, V>
-Variant< std::map<K, V> >::get(gsize index) const
+Variant< std::map<K, V> >::get_child(gsize index) const
 {
   Variant< std::pair<K, V> > dict_entry;
-  VariantContainerBase::get(dict_entry, index);
+  VariantContainerBase::get_child(dict_entry, index);
   return dict_entry.get();
 }
 

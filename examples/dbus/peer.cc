@@ -120,7 +120,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>&,
 
     // Get (expected) single string in tupple.
     Glib::Variant<Glib::ustring> param;
-    parameters.get(param);
+    parameters.get_child(param);
 
     Glib::ustring response = "You said: '" + param.get() + "'.";
 
@@ -266,7 +266,7 @@ void run_as_client(Glib::ustring address)
       "HelloWorld", parameters);
 
     Glib::Variant<Glib::ustring> child;
-    result.get(child);
+    result.get_child(child);
 
     std::cout << "The server said: " << child.get() << "." << std::endl;
 

@@ -53,7 +53,7 @@ void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
     // Now extract the single item in the variant container which is the
     // array of strings (the names).
     Glib::Variant< std::vector<Glib::ustring> > names_variant;
-    result.get(names_variant);
+    result.get_child(names_variant);
 
     // Get the vector of strings.
     std::vector<Glib::ustring> names = names_variant.get();

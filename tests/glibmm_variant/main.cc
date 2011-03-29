@@ -43,7 +43,7 @@ int main(int, char**)
 
   unsigned index = 4;
   ostr << "Element number " << index + 1 << " in the copy is " <<
-    integers_variant.get(index) << '.' << std::endl;
+    integers_variant.get_child(index) << '.' << std::endl;
 
   ostr << std::endl;
 
@@ -95,7 +95,7 @@ int main(int, char**)
 
   index = 3;
 
-  std::pair<unsigned, Glib::ustring> a_pair = orig_dict_variant.get(index);
+  std::pair<unsigned, Glib::ustring> a_pair = orig_dict_variant.get_child(index);
 
   ostr << "Element number " << index + 1 << " in the variant is: (" <<
     a_pair.first << ", " << a_pair.second << ")." << std::endl;
