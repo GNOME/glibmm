@@ -18,6 +18,7 @@
 #include <glibmm/variant.h>
 #include <glibmm/utility.h>
 #include <glib.h>
+//#include <iostream>
 
 namespace Glib
 {
@@ -105,6 +106,7 @@ throw(std::bad_cast)
   }
   else
   {
+    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
     throw std::bad_cast();
   }
 }
@@ -180,7 +182,7 @@ Glib::ustring Variant<Glib::ustring>::get() const
   return Glib::ustring(g_variant_get_string(gobject_, 0));
 }
 
-// Variant<std::string> makes sense for multiple types.
+// Variant<Glib::ustring> makes sense for multiple types.
 // See http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-get-string
 template<>
 Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v)
@@ -200,6 +202,7 @@ throw(std::bad_cast)
   }
   else
   {
+    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
     throw std::bad_cast();
   }
 }
@@ -235,7 +238,7 @@ throw(std::bad_cast)
 
   const VariantType vtype = v.get_type();
   if( vtype.equal(VARIANT_TYPE_STRING) ||
-      vtype.equal(VARIANT_TYPE_BYTESTRING) ||  
+      vtype.equal(VARIANT_TYPE_BYTESTRING) ||
       vtype.equal(VARIANT_TYPE_OBJECT_PATH) ||
       vtype.equal(VARIANT_TYPE_SIGNATURE) )
   {
@@ -243,8 +246,22 @@ throw(std::bad_cast)
   }
   else
   {
+    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
     throw std::bad_cast();
   }
+}
+
+std::string Variant<std::string>::get() const
+{
+  const VariantType vtype = get_type();
+
+  const char* pch = 0;
+  if(vtype.equal(VARIANT_TYPE_BYTESTRING))
+    pch = g_variant_get_string(gobject_, 0);
+  else //g_variant_get_string() cna handle strings, object paths, and signatures.
+    pch = g_variant_get_string(gobject_, 0);
+
+  return std::string(pch);
 }
 
 typedef std::vector<Glib::ustring> type_vec_ustring;

@@ -400,7 +400,8 @@ public:
   _WRAP_METHOD(VariantBase get() const, g_variant_get_variant)
 };
 
-/** Specialization of Variant containing a Glib::ustring.
+/** Specialization of Variant containing a Glib::ustring, for variants of type
+ * string, bytestring, object path, or signature.
  * @newin{2,28}
  * @ingroup Variant
  */
@@ -452,8 +453,13 @@ public:
   _IGNORE(g_variant_get_string, g_variant_dup_string)
 };
 
-/** Specialization of Variant containing a std::string (a non-capable
- * UTF-8 string).
+template<>
+Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v)
+throw(std::bad_cast);
+
+/** Specialization of Variant containing a std::string, for variants of type
+ * bytestring, object path, or signature.
+ * See also Variant<Glib::ustring> for UTF-8 strings.
  * @newin{2,28}
  * @ingroup Variant
  */
@@ -496,8 +502,9 @@ public:
    */
   static Variant<std::string> create(const std::string& data);
 
-  _WRAP_METHOD(std::string get() const, g_variant_get_bytestring)
-   _IGNORE(g_variant_dup_bytestring)
+  //TODO: Documentation.
+  std::string get() const;
+  _IGNORE(g_variant_get_bytestring, g_variant_dup_bytestring)
 };
 
 template<>

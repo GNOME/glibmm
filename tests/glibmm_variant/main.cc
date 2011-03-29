@@ -114,6 +114,101 @@ int main(int, char**)
   return EXIT_SUCCESS;
 }
 
+//Test casting of multiple types to a ustring:
+static void test_dynamic_cast_ustring_types()
+{
+  Glib::VariantBase vbase_string = Glib::wrap(
+    g_variant_new("s", "somestring"));
+
+  try
+  {
+    Glib::Variant<Glib::ustring> derived =
+      Glib::VariantBase::cast_dynamic< Glib::Variant<Glib::ustring> >(vbase_string);
+    ostr << "Casted string Glib::Variant<Glib::ustring>: " << derived.get() << std::endl;
+  }
+  catch(const std::bad_cast& e)
+  {
+    g_assert_not_reached();
+  }
+
+
+  Glib::VariantBase vbase_objectpath = Glib::wrap(
+    g_variant_new_object_path("/remote/object/path"));
+
+  try
+  {
+    Glib::Variant<Glib::ustring> derived =
+      Glib::VariantBase::cast_dynamic< Glib::Variant<Glib::ustring> >(vbase_objectpath);
+    ostr << "Casted object path Glib::Variant<Glib::ustring>: " << derived.get() << std::endl;
+  }
+  catch(const std::bad_cast& e)
+  {
+    g_assert_not_reached();
+  }
+
+  Glib::VariantBase vbase_signature = Glib::wrap(
+    g_variant_new_signature("aas"));
+
+  try
+  {
+    Glib::Variant<Glib::ustring> derived =
+      Glib::VariantBase::cast_dynamic< Glib::Variant<Glib::ustring> >(vbase_signature);
+    ostr << "Casted signature Glib::Variant<Glib::ustring>: " << derived.get() << std::endl;
+  }
+  catch(const std::bad_cast& e)
+  {
+    g_assert_not_reached();
+  }
+}
+
+
+//Test casting of multiple types to a std::string:
+static void test_dynamic_cast_string_types()
+{
+  Glib::VariantBase vbase_string = Glib::wrap(
+    g_variant_new("s", "somestring"));
+
+  try
+  {
+    Glib::Variant<std::string> derived =
+      Glib::VariantBase::cast_dynamic< Glib::Variant<std::string> >(vbase_string);
+    ostr << "Casted string Glib::Variant<std::string>: " << derived.get() << std::endl;
+  }
+  catch(const std::bad_cast& e)
+  {
+    g_assert_not_reached();
+  }
+
+
+  Glib::VariantBase vbase_objectpath = Glib::wrap(
+    g_variant_new_object_path("/remote/object/path"));
+
+  try
+  {
+    Glib::Variant<std::string> derived =
+      Glib::VariantBase::cast_dynamic< Glib::Variant<std::string> >(vbase_objectpath);
+    ostr << "Casted object path Glib::Variant<std::string>: " << derived.get() << std::endl;
+  }
+  catch(const std::bad_cast& e)
+  {
+    g_assert_not_reached();
+  }
+
+  Glib::VariantBase vbase_signature = Glib::wrap(
+    g_variant_new_signature("aas"));
+
+  try
+  {
+    Glib::Variant<std::string> derived =
+      Glib::VariantBase::cast_dynamic< Glib::Variant<std::string> >(vbase_signature);
+    ostr << "Casted signature Glib::Variant<std::string>: " << derived.get() << std::endl;
+  }
+  catch(const std::bad_cast& e)
+  {
+    g_assert_not_reached();
+  }
+}
+
 static void test_dynamic_cast()
 {
   Glib::Variant<int> v1 = Glib::Variant<int>::create(10);
@@ -139,7 +234,7 @@ static void test_dynamic_cast()
   {
   }
 
-  // A t-uple
+  // A tuple
   std::vector<Glib::VariantBase> vec_var(2);
   vec_var[0] = Glib::Variant<int>::create(1);
   vec_var[1] = Glib::Variant<Glib::ustring>::create("coucou");
@@ -194,4 +289,7 @@ static void test_dynamic_cast()
   Glib::Variant<Glib::ustring> var_s2 =
     Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring> >(var_v.get());
   g_assert(var_s2.get() == "test variant");
+
+  test_dynamic_cast_ustring_types();
+  test_dynamic_cast_string_types();
 }
