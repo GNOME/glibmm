@@ -39,6 +39,17 @@ void VariantBase::byteswap(VariantBase& result) const
   result.init(g_value); // g_value is already referenced.
 }
 
+
+VariantStringBase::VariantStringBase()
+: VariantBase()
+{
+}
+
+VariantStringBase::VariantStringBase(GVariant* castitem, bool take_a_reference)
+: VariantBase(castitem, take_a_reference)
+{
+}
+
 //static
 void VariantStringBase::create_object_path(VariantStringBase& output,
   const std::string& object_path)
@@ -57,6 +68,17 @@ void VariantStringBase::create_signature(VariantStringBase& output,
   result = g_variant_new_signature(signature.c_str());
   g_variant_ref_sink(result);
   output.init(result);
+}
+
+
+VariantContainerBase::VariantContainerBase()
+: VariantBase()
+{
+}
+
+VariantContainerBase::VariantContainerBase(GVariant* castitem, bool take_a_reference)
+: VariantBase(castitem, take_a_reference)
+{
 }
 
 //static
@@ -137,6 +159,17 @@ void VariantBase::init(const GVariant* cobject, bool take_a_reference)
     g_variant_ref(gobject_);
 }
 
+
+Variant<VariantBase>::Variant()
+: VariantContainerBase()
+{
+}
+
+Variant<VariantBase>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantContainerBase(castitem, take_a_reference)
+{
+}
+
 // static
 const VariantType& Variant<VariantBase>::variant_type()
 {
@@ -157,6 +190,17 @@ void Variant<VariantBase>::get(VariantBase& variant) const
 {
   GVariant* const gvariant = g_variant_get_variant(gobject_);
   variant.init(gvariant);
+}
+
+
+Variant<Glib::ustring>::Variant()
+: VariantStringBase()
+{
+}
+
+Variant<Glib::ustring>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantStringBase(castitem, take_a_reference)
+{
 }
 
 // static
@@ -205,6 +249,16 @@ throw(std::bad_cast)
     //std::cerr << "vtype=" << v.get_type_string() << std::endl;
     throw std::bad_cast();
   }
+}
+
+Variant<std::string>::Variant()
+: VariantStringBase()
+{
+}
+
+Variant<std::string>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantStringBase(castitem, take_a_reference)
+{
 }
 
 // static
@@ -265,6 +319,16 @@ std::string Variant<std::string>::get() const
 }
 
 typedef std::vector<Glib::ustring> type_vec_ustring;
+
+Variant<type_vec_ustring>::Variant()
+: VariantContainerBase()
+{
+}
+
+Variant<type_vec_ustring>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantContainerBase(castitem, take_a_reference)
+{
+}
 
 // static
 const VariantType& Variant<type_vec_ustring>::variant_type()
@@ -348,6 +412,16 @@ VariantIter Variant<type_vec_ustring>::get_iter() const
 }
 
 typedef std::vector<std::string> type_vec_string;
+
+Variant<type_vec_string>::Variant()
+: VariantContainerBase()
+{
+}
+
+Variant<type_vec_string>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantContainerBase(castitem, take_a_reference)
+{
+}
 
 // static
 const VariantType& Variant<type_vec_string>::variant_type()
