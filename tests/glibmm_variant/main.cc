@@ -14,7 +14,7 @@ int main(int, char**)
 {
   Glib::init();
 
-  int int_list[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  const int int_list[] = {1, 2, 3, 4, 5, 6, 7, 8};
 
   std::vector<int> int_vector(int_list,
     int_list + sizeof(int_list) / sizeof(int));
@@ -116,20 +116,20 @@ int main(int, char**)
 
 static void test_dynamic_cast()
 {
-  Glib::Variant< int > v1 = Glib::Variant< int >::create(10);
+  Glib::Variant<int> v1 = Glib::Variant<int>::create(10);
   Glib::VariantBase& v2 = v1;
-  Glib::Variant< int > v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v2);
+  Glib::Variant<int> v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v2);
   g_assert(v3.get() == 10);
 
   Glib::VariantBase v5 = v1;
   v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v5);
   g_assert(v3.get() == 10);
 
-  Glib::Variant< double > v4;
+  Glib::Variant<double> v4;
   // v4 contain a NULL GVariant: The cast succeed
   v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v4);
 
-  v4 = Glib::Variant< double >::create(1.0);
+  v4 = Glib::Variant<double>::create(1.0);
   try
   {
     v3 = Glib::VariantBase::cast_dynamic<Glib::Variant<int> >(v4);
@@ -145,16 +145,16 @@ static void test_dynamic_cast()
   vec_var[1] = Glib::Variant<Glib::ustring>::create("coucou");
   Glib::VariantContainerBase var_tuple = Glib::VariantContainerBase::create_tuple(vec_var);
   g_assert(var_tuple.get_type_string() == "(is)");
-  
+
   v5 = var_tuple;
   Glib::VariantContainerBase v6 = Glib::VariantBase::cast_dynamic<Glib::VariantContainerBase >(v5);
-  
+
   try
   {
     v6 = Glib::VariantBase::cast_dynamic<Glib::VariantContainerBase >(v1);
     g_assert_not_reached();
   }
-  catch (const std::bad_cast& e)
+  catch(const std::bad_cast& e)
   {
   }
 
@@ -185,13 +185,13 @@ static void test_dynamic_cast()
   }
 
   type_map_sv get_map = var_map_cast.get();
-  var_string = Glib::VariantBase::cast_dynamic<Glib::Variant< Glib::ustring > >(get_map["test key"]);
+  var_string = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring> >(get_map["test key"]);
   g_assert(var_string.get() == "test variant");
 
   // A variant of type v
-  Glib::Variant< Glib::VariantBase > var_v = Glib::Variant< Glib::VariantBase >::create(var_string);
+  Glib::Variant<Glib::VariantBase> var_v = Glib::Variant<Glib::VariantBase>::create(var_string);
   g_assert(var_v.get_type_string() == "v");
-  Glib::Variant< Glib::ustring > var_s2 =
-    Glib::VariantBase::cast_dynamic<Glib::Variant< Glib::ustring > >(var_v.get());
+  Glib::Variant<Glib::ustring> var_s2 =
+    Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring> >(var_v.get());
   g_assert(var_s2.get() == "test variant");
 }
