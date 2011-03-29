@@ -40,8 +40,8 @@ static void Bus_Name_Appeared_giomm_callback(GDBusConnection* connection,
 
   try
   {
-    (*the_slot)(Glib::wrap(connection, true), Glib::ustring(name),
-      Glib::ustring(name_owner));
+    (*the_slot)(Glib::wrap(connection, true), Glib::convert_const_gchar_ptr_to_ustring(name),
+      Glib::convert_const_gchar_ptr_to_ustring(name_owner));
   }
   catch(...)
   {
@@ -57,7 +57,7 @@ static void Bus_Name_Vanished_giomm_callback(GDBusConnection* connection,
 
   try
   {
-    (*the_slot)(Glib::wrap(connection, true), Glib::ustring(name));
+    (*the_slot)(Glib::wrap(connection, true), Glib::convert_const_gchar_ptr_to_ustring(name));
   }
   catch(...)
   {
@@ -104,7 +104,7 @@ guint watch_name(
   slots->name_vanished_slot = new SlotNameVanished(name_vanished_slot);
 
   return g_bus_watch_name(static_cast<GBusType>(bus_type), name.c_str(),
-    static_cast<GBusNameWatcherFlags>(flags), 
+    static_cast<GBusNameWatcherFlags>(flags),
     &Bus_Name_Appeared_giomm_callback, &Bus_Name_Vanished_giomm_callback,
     slots, &Bus_Watch_Name_giomm_callback_destroy);
 }
@@ -124,7 +124,7 @@ guint watch_name(
   slots->name_vanished_slot = new SlotNameVanished(name_vanished_slot);
 
   return g_bus_watch_name_on_connection(Glib::unwrap(connection),
-    name.c_str(), static_cast<GBusNameWatcherFlags>(flags), 
+    name.c_str(), static_cast<GBusNameWatcherFlags>(flags),
     &Bus_Name_Appeared_giomm_callback, &Bus_Name_Vanished_giomm_callback,
     slots, &Bus_Watch_Name_giomm_callback_destroy);
 }

@@ -223,7 +223,7 @@ Variant<Glib::ustring>::create(const Glib::ustring& data)
 
 Glib::ustring Variant<Glib::ustring>::get() const
 {
-  return Glib::ustring(g_variant_get_string(gobject_, 0));
+  return convert_const_gchar_ptr_to_ustring(g_variant_get_string(gobject_, 0));
 }
 
 // Variant<Glib::ustring> makes sense for multiple types.
@@ -315,7 +315,7 @@ std::string Variant<std::string>::get() const
   else //g_variant_get_string() cna handle strings, object paths, and signatures.
     pch = g_variant_get_string(gobject_, 0);
 
-  return std::string(pch);
+  return convert_const_gchar_ptr_to_stdstring(pch);
 }
 
 typedef std::vector<Glib::ustring> type_vec_ustring;
