@@ -22,7 +22,7 @@ check_PROGRAMS =			\
 	compose/example			\
 	dbus/busserver			\
 	dbus/peer			\
-	dbus/userbus			\
+	dbus/client_bus_listnames \
 	iochannel_stream/example	\
 	keyfile/example			\
 	markup/parser			\
@@ -80,8 +80,8 @@ dbus_busserver_SOURCES = dbus/busserver.cc
 dbus_busserver_LDADD   = $(giomm_ldadd)
 dbus_peer_SOURCES = dbus/peer.cc
 dbus_peer_LDADD = $(giomm_ldadd)
-dbus_userbus_SOURCES = dbus/userbus.cc
-dbus_userbus_LDADD   = $(giomm_ldadd)
+dbus_client_bus_listnames_SOURCES = dbus/client_bus_listnames.cc
+dbus_client_bus_listnames_LDADD   = $(giomm_ldadd)
 
 network_resolver_SOURCES   = network/resolver.cc
 network_resolver_LDADD     = $(giomm_ldadd)
