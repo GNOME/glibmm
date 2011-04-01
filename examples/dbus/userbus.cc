@@ -23,16 +23,16 @@
 Glib::RefPtr<Glib::MainLoop> loop;
 
 // A main loop idle callback to quit when the main loop is idle.
-bool main_loop_idle()
+bool on_main_loop_idle()
 {
   loop->quit();
   return false;
 }
 
-// A callback to finish creating a DBusProxy that was asynchronously created
+// A callback to finish creating a DBus::Proxy that was asynchronously created
 // for the user session's bus and then try to call the well known 'ListNames'
 // method.
-void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
+void on_dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
 {
   Glib::RefPtr<Gio::DBus::Proxy> proxy = Gio::DBus::Proxy::create_finish(result);
 
@@ -70,7 +70,7 @@ void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
 
   // Connect an idle callback to the main loop to quit when the main loop is
   // idle now that the method call is finished.
-  Glib::signal_idle().connect(sigc::ptr_fun(&main_loop_idle));
+  Glib::signal_idle().connect(sigc::ptr_fun(&on_main_loop_idle));
 }
 
 int main(int, char**)
@@ -94,7 +94,7 @@ int main(int, char**)
   // Create the proxy to the bus asynchronously.
   Gio::DBus::Proxy::create(connection, "org.freedesktop.DBus",
     "/org/freedesktop/DBus", "org.freedesktop.DBus",
-    sigc::ptr_fun(&dbus_proxy_available));
+    sigc::ptr_fun(&on_dbus_proxy_available));
 
   loop->run();
 
