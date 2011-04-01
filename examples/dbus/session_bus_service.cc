@@ -37,7 +37,7 @@ static Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
 
 static Glib::ustring introspection_xml =
   "<node>"
-  "  <interface name='org.glibmm.DBus.Clock'>"
+  "  <interface name='org.glibmm.DBusExample.Clock'>"
   "    <method name='GetTime'>"
   "      <arg type='s' name='iso8601' direction='out'/>"
   "    </method>"
@@ -47,12 +47,10 @@ static Glib::ustring introspection_xml =
   "  </interface>"
   "</node>";
 
+guint registered_id = 0;
+
 // Stores the current alarm.
 static Glib::TimeVal curr_alarm;
-
-// This variable is used to keep an incoming connection active until it is
-// closed.
-static Glib::RefPtr<Gio::DBus::Connection> current_connection;
 
 } // anonymous namespace
 
@@ -126,12 +124,12 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection
     }
     else
     {
-      invocation->return_dbus_error("org.glibmm.DBus.Failed", "Your message "
+      invocation->return_dbus_error("org.glibmm.DBusExample.Failed", "Your message "
         "bus daemon does not support file descriptor passing (need D-Bus >= "
         "1.3.0)");
     }
 #else
-    invocation->return_dbus_error("org.glibmm.DBus.Failed", "Your message bus "
+    invocation->return_dbus_error("org.glibmm.DBusExample.Failed", "Your message bus "
       "daemon does not support file descriptor passing (need D-Bus >= 1.3.0)");
 #endif
   }
@@ -148,53 +146,34 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection
 //TODO: Make that unnecessary.
 const Gio::DBus::InterfaceVTable interface_vtable(sigc::ptr_fun(&on_method_call));
 
-bool on_server_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
+void on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /* name */)
 {
-  Glib::RefPtr<Gio::Credentials> credentials =
-    connection->get_peer_credentials();
-
-  std::string credentials_str;
-
-  if(!credentials)
-    credentials_str = "(no credentials received)";
-  else
-    credentials_str = credentials->to_string();
-
-  std::cout <<
-    "Client connected." << std::endl <<
-    "Peer credentials: " << credentials_str << std::endl <<
-    "Negotiated capabilities: unix-fd-passing=" << (connection->get_capabilities() & Gio::DBus::CAPABILITY_FLAGS_UNIX_FD_PASSING) << std::endl;
-
-  // If there is already an active connection, do not accept this new one.
-  // There may be a better way to decide how to keep current incoming
-  // connections.
-  if(current_connection && !current_connection->is_closed())
-  {
-    std::cerr << "Unable to accept a new incoming connection because one is "
-      "already active." << std::endl;
-
-    return false;
-  }
-
-  // In order for the connection to stay active the reference to the
-  // connection must be kept, so store the connection in a global variable:
-  current_connection = connection;
+  // Export an object to the bus:
 
   // See https://bugzilla.gnome.org/show_bug.cgi?id=646417 about avoiding
   // the repetition of the interface name:
   try
   {
-    connection->register_object("/org/glibmm/DBus/TestObject",
-      introspection_data->lookup_interface("org.glibmm.DBus.Clock"),
+    registered_id = connection->register_object("/org/glibmm/DBus/TestObject",
+      introspection_data->lookup_interface("org.glibmm.DBusExample.Clock"),
       interface_vtable);
   }
   catch(const Glib::Error& ex)
   {
     std::cerr << "Registration of object failed." << std::endl;
-    return false;
   }
 
-  return true;
+  return;
+}
+
+void on_name_acquired(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */, const Glib::ustring& /* name */)
+{
+  //TODO: What is this good for? See https://bugzilla.gnome.org/show_bug.cgi?id=646427
+}
+
+void on_name_lost(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /* name */)
+{
+  connection->unregister_object(registered_id);
 }
 
 int main(int, char**)
@@ -213,31 +192,17 @@ int main(int, char**)
     return 1;
   }
 
-  Glib::RefPtr<Gio::DBus::Server> server;
+  const guint id = Gio::DBus::own_name(Gio::DBus::BUS_TYPE_SESSION,
+    "org.glibmm.DBusExample",
+    sigc::ptr_fun(&on_bus_acquired),
+    sigc::ptr_fun(&on_name_acquired),
+    sigc::ptr_fun(&on_name_lost));
 
-  const Glib::ustring address = "unix:abstract=myadd";
-  try
-  {
-    server = Gio::DBus::Server::create_sync(address,
-      Gio::DBus::generate_guid());
-  }
-  catch(const Glib::Error& ex)
-  {
-    std::cerr << "Error creating server at address: " << address <<
-      ": " << ex.what() << "." << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  server->start();
-
-  std::cout << "Server is listening at: " << server->get_client_address() <<
-    "." << std::endl;
-
-  server->signal_new_connection().connect(sigc::ptr_fun(&on_server_new_connection));
-
-  //Keep the server running until the process is killed:
+  //Keep the service running until the process is killed:
   Glib::RefPtr<Glib::MainLoop> loop = Glib::MainLoop::create();
   loop->run();
+
+  Gio::DBus::unown_name(id);
 
   return EXIT_SUCCESS;
 }
