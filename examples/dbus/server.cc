@@ -38,29 +38,26 @@ static Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
 static Glib::ustring introspection_xml =
   "<node>"
   "  <interface name='org.glibmm.DBus.Clock'>"
-  "    <method name='GetTime'>"
+  "    <method name='GetTime' />"
   "    <method name='SetAlarm'>"
   "      <arg type='s' name='iso8601' direction='in'/>"
   "    </method>"
-  "    <method name='GetStdout'>"
-  "    <signal name='OnAlarm'>"
-  "      <arg type='s' name='iso8601'/>"
-  "    </signal>"
-       // The time of the alarm as an iso8601 string.
-  "    <property type='s' name='Alarm' access='readwrite'/>"
   "  </interface>"
   "</node>";
 
 // Stores the current alarm.
 static Glib::TimeVal curr_alarm;
 
+// This variable is used to keep an incoming connection active until it is
+// closed.
+static Glib::RefPtr<Gio::DBus::Connection> current_connection;
+
 } // anonymous namespace
 
-/* TODO: This code does not seem to be used. murrayc.
 static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection,
-  const Glib::ustring& sender, const Glib::ustring& object_path,
-  const Glib::ustring& interface_name, const Glib::ustring& method_name,
-  const Glib::VariantBase& parameters,
+  const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
+  const Glib::ustring& /* interface_name */, const Glib::ustring& method_name,
+  const Glib::VariantContainerBase& parameters,
   const Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation)
 {
   if(method_name == "GetTime")
@@ -68,18 +65,13 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection
     Glib::TimeVal curr_time;
     curr_time.assign_current_time();
 
-    Glib::ustring time_str = curr_time.as_iso8601();
-
-    Glib::Variant<Glib::ustring> time_var =
+    const Glib::ustring time_str = curr_time.as_iso8601();
+    const Glib::Variant<Glib::ustring> time_var =
       Glib::Variant<Glib::ustring>::create(time_str);
-
-    // Create a variant array to create a tuple to be returned to the client.
-    std::vector<Glib::VariantBase> var_array;
-    var_array.push_back(time_var);
 
     // Create the tuple.
     Glib::VariantContainerBase response =
-      Glib::VariantContainerBase::create_tuple(var_array);
+      Glib::VariantContainerBase::create_tuple(time_var);
 
     // Return the tuple with the included time.
     invocation->return_value(response);
@@ -87,29 +79,29 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection
   else if(method_name == "SetAlarm")
   {
     // Get the parameter tuple.
-    Glib::VariantContainerBase parameters;
-    invocation->get_parameters(parameters);
+    //Glib::VariantContainerBase parameters;
+    //invocation->get_parameters(parameters);
 
     // Get the variant string.
     Glib::Variant<Glib::ustring> param;
-    parameters.get(param);
+    parameters.get_child(param);
 
     // Get the time string.
-    Glib::ustring time_str = param.get();
+    const Glib::ustring time_str = param.get();
 
     if(!curr_alarm.assign_from_iso8601(time_str))
     {
       // If setting alarm was not successful, return an error.
       Gio::DBus::Error error(Gio::DBus::Error::INVALID_ARGS,
           "Alarm string is not in ISO8601 format.");
-      invocation->return_gerror(error);
+      invocation->return_error(error);
     }
   }
   else if(method_name == "GetStdout")
   {
 #ifndef G_OS_WIN32
     if(connection->get_capabilities() &
-      Gio::DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING)
+      Gio::DBus::CAPABILITY_FLAGS_UNIX_FD_PASSING)
     {
       Glib::RefPtr<Gio::UnixFDList> list = Gio::UnixFDList::create();
       try
@@ -146,57 +138,100 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection
     // Non-existent method on the interface.
     Gio::DBus::Error error(Gio::DBus::Error::UNKNOWN_METHOD,
       "Method does not exist.");
-    invocation->return_gerror(error);
+    invocation->return_error(error);
   }
 }
-*/
 
-void on_get_property(Glib::VariantBase& property,
-  const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
-  const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
-  const Glib::ustring& /* interface_name */, const Glib::ustring& property_name)
+bool on_server_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
 {
-  if(property_name == "Alarm")
-  {
-    if(curr_alarm.valid())
-    {
-      Glib::ustring alarm_str = curr_alarm.as_iso8601();
+  Glib::RefPtr<Gio::Credentials> credentials =
+    connection->get_peer_credentials();
 
-      Glib::Variant<Glib::ustring> alarm_var =
-        Glib::Variant<Glib::ustring>::create(alarm_str);
+  std::string credentials_str;
 
-      property = alarm_var;
-    }
-    else
-    {
-      throw Gio::Error(Gio::Error::FAILED, "Alarm has not been set.");
-    }
-  }
+  if(!credentials)
+    credentials_str = "(no credentials received)";
   else
-  {
-    throw Gio::DBus::Error(Gio::DBus::Error::FAILED, "Unknown property name.");
-  }
-}
+    credentials_str = credentials->to_string();
 
-/** TODO: This code does not seem to be used. murrayc.
-bool on_set_property(const Glib::RefPtr<Gio::DBus::Connection>& connection,
-  const Glib::ustring& sender, const Glib::ustring& object_path,
-  const Glib::ustring& interface_name, const Glib::ustring& property_name,
-  const Glib::VariantBase& value)
-{
-  if(property_name == "Alarm")
+  std::cout <<
+    "Client connected." << std::endl <<
+    "Peer credentials: " << credentials_str << std::endl <<
+    "Negotiated capabilities: unix-fd-passing=" << (connection->get_capabilities() & Gio::DBus::CAPABILITY_FLAGS_UNIX_FD_PASSING) << std::endl;
+
+  // If there is already an active connection, do not accept this new one.
+  // There may be a better way to decide how to keep current incoming
+  // connections.
+  if(current_connection && !current_connection->is_closed())
   {
+    std::cerr << "Unable to accept a new incoming connection because one is "
+      "already active." << std::endl;
+
+    return false;
   }
-  else
+
+  // In order for the connection to stay active the reference to the
+  // connection must be kept, so store the connection in a global variable:
+  current_connection = connection;
+
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=646417 about avoiding
+  // the repetition of the interface name:
+  const Gio::DBus::InterfaceVTable interface_vtable(sigc::ptr_fun(&on_method_call));
+  const guint reg_id = connection->register_object("/org/glibmm/DBus/TestObject",
+    introspection_data->lookup_interface("org.glibmm.DBus.Clock"),
+    interface_vtable);
+
+  if(reg_id == 0)
   {
+    std::cerr << "Registration of object for incoming connection not "
+      "possible." << std::endl;
+    return false;
   }
+
+  return true;
 }
-*/
 
 int main(int, char**)
 {
   std::locale::global(std::locale(""));
   Gio::init();
 
-  return 0;
+ try
+  {
+    introspection_data = Gio::DBus::NodeInfo::create_for_xml(introspection_xml);
+  }
+  catch(const Glib::Error& ex)
+  {
+    std::cerr << "Unable to create introspection data: " << ex.what() <<
+      "." << std::endl;
+    return 1;
+  }
+
+  Glib::RefPtr<Gio::DBus::Server> server;
+
+  const Glib::ustring address = "unix:abstract=myadd";
+  try
+  {
+    server = Gio::DBus::Server::create_sync(address,
+      Gio::DBus::generate_guid());
+  }
+  catch(const Glib::Error& ex)
+  {
+    std::cerr << "Error creating server at address: " << address <<
+      ": " << ex.what() << "." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  server->start();
+
+  std::cout << "Server is listening at: " << server->get_client_address() <<
+    "." << std::endl;
+
+  server->signal_new_connection().connect(sigc::ptr_fun(&on_server_new_connection));
+
+  //Keep the server running until the process is killed:
+  Glib::RefPtr<Glib::MainLoop> loop = Glib::MainLoop::create();
+  loop->run();
+
+  return EXIT_SUCCESS;
 }

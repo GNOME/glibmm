@@ -68,22 +68,20 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Message> get_message(), g_dbus_method_invocation_get_message, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Message> get_message() const, g_dbus_method_invocation_get_message, refreturn, constversion)
 
-  /** Gets the parameters of the method invocation.
-   *
-   * @param value The location in which to return the parameters.
-   *
-   * @newin{2,28}
-   */
-  void get_parameters(Glib::VariantBase& value) const;
-  _IGNORE(g_dbus_method_invocation_get_parameters)
+  //We assume that this is a tuple (VariantContainerBase).
+  //See https://bugzilla.gnome.org/show_bug.cgi?id=646420
+  _WRAP_METHOD(Glib::VariantContainerBase get_parameters() const, g_dbus_method_invocation_get_parameters)
 
-  _WRAP_METHOD(void return_value(const Glib::VariantBase& parameters), g_dbus_method_invocation_return_value)
+  //TODO: Add a return_single_value() method?
+  //A return_value(VariantBase) would probably be ambiguous to people
+  //even if it isn't ambiguous to the compiler.
+  _WRAP_METHOD(void return_value(const Glib::VariantContainerBase& parameters), g_dbus_method_invocation_return_value)
 
 #m4 _CONVERSION(`const Glib::ustring&', `GQuark', `Glib::QueryQuark($3).id()')
-  _WRAP_METHOD(void return_error_literal(const Glib::ustring& domain, int code, const Glib::ustring& message), g_dbus_method_invocation_return_error_literal)
+  _WRAP_METHOD(void return_error(const Glib::ustring& domain, int code, const Glib::ustring& message), g_dbus_method_invocation_return_error_literal)
 
 #m4 _CONVERSION(`const Glib::Error&', `const GError*', `$3.gobj()')
-  _WRAP_METHOD(void return_gerror(const Glib::Error& error), g_dbus_method_invocation_return_gerror)
+  _WRAP_METHOD(void return_error(const Glib::Error& error), g_dbus_method_invocation_return_gerror)
 
   _WRAP_METHOD(void return_dbus_error(const Glib::ustring& error_name, const Glib::ustring& error_message), g_dbus_method_invocation_return_dbus_error)
 

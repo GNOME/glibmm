@@ -192,6 +192,7 @@ _CONVERSION(`const Glib::RefPtr<SettingsBackend>&',`GSettingsBackend*',__CONVERT
 _CONVERSION(`GVariant*',`VariantBase',`Glib::wrap($3, true)')
 _CONVERSION(`GVariant*',`Glib::VariantContainerBase',`Glib::VariantContainerBase($3, false)')
 _CONVERSION(`const Glib::VariantBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
+_CONVERSION(`const Glib::VariantContainerBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
 
 #Socket
 _CONVERSION(`const Glib::RefPtr<Socket>&',`GSocket*',__CONVERT_CONST_REFPTR_TO_P)

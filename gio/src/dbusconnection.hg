@@ -838,6 +838,8 @@ public:
 
   _WRAP_METHOD(void remove_filter(guint filter_id), g_dbus_connection_remove_filter)
 
+  //TODO: See https://bugzilla.gnome.org/show_bug.cgi?id=646419 about
+  //vtable being allowed to be NULL, which would need a method overload.
   /** Registers slots for exported objects at @a object_path with the D-Bus
    * interface that is described in @a interface_info.
    *
@@ -870,7 +872,7 @@ public:
    *
    * @param object_path The object path to register at.
    * @param interface_info Introspection data for the interface.
-   * @param vtable An InterfaceVTable to call into or NULL.
+   * @param vtable An InterfaceVTable to call into.
    * @return A registration id (never 0) that can be used with
    * unregister_object() if no Glib::Error is thrown.
    * @throw Glib::Error.
@@ -878,7 +880,7 @@ public:
    */
   guint register_object(const Glib::ustring& object_path,
     const Glib::RefPtr<InterfaceInfo>& interface_info,
-    const InterfaceVTable* vtable);
+    const InterfaceVTable& vtable);
   _IGNORE(g_dbus_connection_register_object)
 
   _WRAP_METHOD(bool unregister_object(guint registration_id), g_dbus_connection_unregister_object)
@@ -920,7 +922,7 @@ public:
    * @newin{2,28}
    */
   guint register_subtree(const Glib::ustring& object_path,
-    const SubtreeVTable* vtable,
+    const SubtreeVTable& vtable,
     SubtreeFlags flags = Gio::DBus::SUBTREE_FLAGS_NONE);
   _IGNORE(g_dbus_connection_register_subtree)
 

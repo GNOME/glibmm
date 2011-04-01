@@ -108,30 +108,22 @@ static Glib::RefPtr<Gio::DBus::Connection> curr_connection;
 static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>&,
   const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
   const Glib::ustring& /* interface_name */, const Glib::ustring& method_name,
-  // Since the parameters are generally tuples, get them from the invocation.
-  const Glib::VariantBase& /* parameters */,
+  const Glib::VariantContainerBase& parameters,
   const Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation)
 {
   if(method_name == "HelloWorld")
   {
-    // Get parameters.
-    Glib::VariantContainerBase parameters;
-    invocation->get_parameters(parameters);
-
     // Get (expected) single string in tupple.
     Glib::Variant<Glib::ustring> param;
     parameters.get_child(param);
 
-    Glib::ustring response = "You said: '" + param.get() + "'.";
+    const Glib::ustring response = "You said: '" + param.get() + "'.";
 
-    Glib::Variant<Glib::ustring> answer =
+    const Glib::Variant<Glib::ustring> answer =
       Glib::Variant<Glib::ustring>::create(response);
 
-    std::vector<Glib::VariantBase> var_array;
-    var_array.push_back(answer);
-
-    Glib::VariantContainerBase ret =
-      Glib::VariantContainerBase::create_tuple(var_array);
+    const Glib::VariantContainerBase ret =
+      Glib::VariantContainerBase::create_tuple(answer);
 
     invocation->return_value(ret);
 
@@ -175,9 +167,9 @@ bool on_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
   // connection must be kept so store the connection in a global variable.
   curr_connection = connection;
 
-  guint reg_id = connection->register_object("/org/glibmm/DBus/TestObject",
+  const guint reg_id = connection->register_object("/org/glibmm/DBus/TestObject",
     introspection_data->lookup_interface("org.glibmm.DBus.TestPeerInterface"),
-    &interface_vtable);
+    interface_vtable);
 
   if(reg_id == 0)
   {
@@ -249,14 +241,11 @@ void run_as_client(const Glib::ustring& address)
 
   Glib::ustring greeting("Hello, it's: "  + time.as_iso8601() + '.');
 
-  Glib::Variant<Glib::ustring> param =
+  const Glib::Variant<Glib::ustring> param =
     Glib::Variant<Glib::ustring>::create(greeting);
 
-  std::vector<Glib::VariantBase> variants;
-  variants.push_back(param);
-
-  Glib::VariantContainerBase parameters =
-    Glib::VariantContainerBase::create_tuple(variants);
+  const Glib::VariantContainerBase parameters =
+    Glib::VariantContainerBase::create_tuple(param);
 
   try
   {

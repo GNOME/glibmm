@@ -799,13 +799,13 @@ guint Connection::add_filter(const SlotMessageFilter& slot)
 
 guint Connection::register_object(const Glib::ustring& object_path,
   const Glib::RefPtr<InterfaceInfo>& interface_info,
-  const InterfaceVTable* vtable)
+  const InterfaceVTable& vtable)
 {
   GError* gerror = 0;
 
   const guint result = g_dbus_connection_register_object(gobj(),
     object_path.c_str(), Glib::unwrap(interface_info),
-    vtable->gobj(), const_cast<InterfaceVTable*>(vtable), 0, &gerror);
+    vtable.gobj(), const_cast<InterfaceVTable*>(&vtable), 0, &gerror);
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -814,14 +814,14 @@ guint Connection::register_object(const Glib::ustring& object_path,
 }
 
 guint Connection::register_subtree(const Glib::ustring& object_path,
-  const SubtreeVTable* vtable, SubtreeFlags flags)
+  const SubtreeVTable& vtable, SubtreeFlags flags)
 {
   GError* gerror = 0;
 
   const guint result = g_dbus_connection_register_subtree(gobj(),
     object_path.c_str(),
-    vtable->gobj(), static_cast<GDBusSubtreeFlags>(flags),
-    const_cast<SubtreeVTable*>(vtable), 0, &gerror);
+    vtable.gobj(), static_cast<GDBusSubtreeFlags>(flags),
+    const_cast<SubtreeVTable*>(&vtable), 0, &gerror);
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);

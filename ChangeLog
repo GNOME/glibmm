@@ -1,5 +1,28 @@
 2011-04-01  Murray Cumming  <murrayc@murrayc.com>
 
+	Gio::DBus: Minor API changes.
+
+  * gio/src/dbusconnection.[hg|ccg]: register_object(), register_subtree():
+  Take the VTable by reference, not pointer. register_object() can take a NULL
+  but that needs documentation (see the bug mentioned) and a future method
+  overload.
+  * gio/src/dbusmethodinvocation.ccg: get_parameters(): Return a
+  VariantContainerBase instead of taking a VariantBase output parameter,
+  because this is always a tuple. Well, I think so: See the bug mentioned.
+  * gio/src/dbusmethodinvocation.hg: return_value(): Take a VariantContainerBase
+  instead of a VariantBase, because this is always a tuple.
+  return_gerror(), return_error_literal(): Rename them both to return_error().
+  * glib/src/variant.hg: VariantContainerBase::create_tuple(): Add a method
+  overload that takes a single VariantBase, for convenience, so that applications
+  don't need to create a single-item vector.
+	* examples/dbus/busserver.cc: Adapted.
+	* examples/dbus/busserver.cc: Rename to server.cc and actually implement it,
+	though I am currently confused about whether this server's object should be
+	available on an existing bus. Maybe we should use Gio::DBus::own_name()
+	instead of Gio::DBus::Server.
+
+2011-04-01  Murray Cumming  <murrayc@murrayc.com>
+
 	Rename a D-Bus client example.
 
 	* examples/dbus/userbus.cc: Rename to client_bus_listnames.cc to make it
