@@ -189,7 +189,7 @@ bool on_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
   return true;
 }
 
-void run_as_server(Glib::ustring address, bool allow_anonymous)
+void run_as_server(const Glib::ustring& address, bool allow_anonymous)
 {
   Glib::ustring guid = Gio::DBus::generate_guid();
   Gio::DBus::ServerFlags flags = Gio::DBus::SERVER_FLAGS_NONE;
@@ -221,7 +221,7 @@ void run_as_server(Glib::ustring address, bool allow_anonymous)
   loop->run();
 }
 
-void run_as_client(Glib::ustring address)
+void run_as_client(const Glib::ustring& address)
 {
   Glib::RefPtr<Gio::DBus::Connection> connection;
 
