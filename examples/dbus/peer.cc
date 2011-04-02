@@ -168,7 +168,7 @@ bool on_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
   curr_connection = connection;
 
   const guint reg_id = connection->register_object("/org/glibmm/DBus/TestObject",
-    introspection_data->lookup_interface("org.glibmm.DBus.TestPeerInterface"),
+    introspection_data->lookup_interface(),
     interface_vtable);
 
   if(reg_id == 0)

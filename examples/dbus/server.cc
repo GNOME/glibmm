@@ -185,7 +185,7 @@ bool on_server_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connect
   try
   {
     connection->register_object("/org/glibmm/DBus/TestObject",
-      introspection_data->lookup_interface("org.glibmm.DBus.Clock"),
+      introspection_data->lookup_interface(),
       interface_vtable);
   }
   catch(const Glib::Error& ex)

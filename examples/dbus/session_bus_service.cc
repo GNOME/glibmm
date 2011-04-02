@@ -155,7 +155,7 @@ void on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, cons
   try
   {
     registered_id = connection->register_object("/org/glibmm/DBus/TestObject",
-      introspection_data->lookup_interface("org.glibmm.DBusExample.Clock"),
+      introspection_data->lookup_interface(),
       interface_vtable);
   }
   catch(const Glib::Error& ex)
