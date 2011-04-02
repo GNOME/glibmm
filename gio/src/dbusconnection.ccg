@@ -813,6 +813,21 @@ guint Connection::register_object(const Glib::ustring& object_path,
   return result;
 }
 
+guint Connection::register_object(const Glib::ustring& object_path,
+  const Glib::RefPtr<InterfaceInfo>& interface_info)
+{
+  GError* gerror = 0;
+
+  const guint result = g_dbus_connection_register_object(gobj(),
+    object_path.c_str(), Glib::unwrap(interface_info),
+    0, 0, 0, &gerror);
+
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+
+  return result;
+}
+
 guint Connection::register_subtree(const Glib::ustring& object_path,
   const SubtreeVTable& vtable, SubtreeFlags flags)
 {

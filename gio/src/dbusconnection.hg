@@ -838,8 +838,6 @@ public:
 
   _WRAP_METHOD(void remove_filter(guint filter_id), g_dbus_connection_remove_filter)
 
-  //TODO: See https://bugzilla.gnome.org/show_bug.cgi?id=646419 about
-  //vtable being allowed to be NULL, which would need a method overload.
   /** Registers slots for exported objects at @a object_path with the D-Bus
    * interface that is described in @a interface_info.
    *
@@ -882,6 +880,30 @@ public:
     const Glib::RefPtr<InterfaceInfo>& interface_info,
     const InterfaceVTable& vtable);
   _IGNORE(g_dbus_connection_register_object)
+  
+  /** Registers exported objects at @a object_path with the D-Bus
+   * interface that is described in @a interface_info. This method overload, 
+   * which does not take a VTable, is useful for 
+   * <a href=="http://en.wikipedia.org/wiki/Marker_interface_pattern">marker
+   * interfaces</href>.
+   *
+   * If an existing slot is already registered at @a object_path and @a
+   * interface_name, then a Glib::Error is thrown.
+   *
+   * GDBus automatically implements the standard D-Bus interfaces
+   * org.freedesktop.DBus.Properties, org.freedesktop.DBus.Introspectable and
+   * org.freedesktop.Peer, so you don't have to implement those for the
+   * objects you export.
+   *
+   * @param object_path The object path to register at.
+   * @param interface_info Introspection data for the interface.
+   * @return A registration id (never 0) that can be used with
+   * unregister_object() if no Glib::Error is thrown.
+   * @throw Glib::Error.
+   * @newin{2,28}
+   */
+  guint register_object(const Glib::ustring& object_path,
+    const Glib::RefPtr<InterfaceInfo>& interface_info);
 
   _WRAP_METHOD(bool unregister_object(guint registration_id), g_dbus_connection_unregister_object)
 
