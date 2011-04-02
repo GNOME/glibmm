@@ -21,8 +21,7 @@ check_PROGRAMS =			\
 	child_watch/child_watch		\
 	compose/example			\
 	dbus/session_bus_service \
-	dbus/server			\
-	dbus/peer			\
+	dbus/server_without_bus			\
 	dbus/client_bus_listnames \
 	iochannel_stream/example	\
 	keyfile/example			\
@@ -79,10 +78,8 @@ thread_threadpool_LDADD    = $(thread_ldadd)
 # giomm examples
 dbus_session_bus_service_SOURCES = dbus/session_bus_service.cc
 dbus_session_bus_service_LDADD   = $(giomm_ldadd)
-dbus_server_SOURCES = dbus/server.cc
-dbus_server_LDADD   = $(giomm_ldadd)
-dbus_peer_SOURCES = dbus/peer.cc
-dbus_peer_LDADD = $(giomm_ldadd)
+dbus_server_without_bus_SOURCES = dbus/server_without_bus.cc
+dbus_server_without_bus_LDADD   = $(giomm_ldadd)
 dbus_client_bus_listnames_SOURCES = dbus/client_bus_listnames.cc
 dbus_client_bus_listnames_LDADD   = $(giomm_ldadd)
 
