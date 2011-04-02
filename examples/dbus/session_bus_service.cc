@@ -54,7 +54,7 @@ static Glib::TimeVal curr_alarm;
 
 } // anonymous namespace
 
-static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection,
+static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
   const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
   const Glib::ustring& /* interface_name */, const Glib::ustring& method_name,
   const Glib::VariantContainerBase& parameters,
