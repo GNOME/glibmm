@@ -99,42 +99,6 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& connection
       invocation->return_error(error);
     }
   }
-  else if(method_name == "GetStdout")
-  {
-#ifndef G_OS_WIN32
-    if(connection->get_capabilities() &
-      Gio::DBus::CAPABILITY_FLAGS_UNIX_FD_PASSING)
-    {
-      Glib::RefPtr<Gio::UnixFDList> list = Gio::UnixFDList::create();
-      try
-      {
-        list->append(STDOUT_FILENO);
-
-        Glib::RefPtr<Gio::DBus::Message> reply =
-          Gio::DBus::Message::create_method_reply(invocation->get_message());
-
-        reply->set_unix_fd_list(list);
-
-        connection->send_message(reply);
-      }
-      catch(const Glib::Error& ex)
-      {
-        std::cerr << "Error trying to send stdout to client: " << ex.what() <<
-          std::endl;
-        return;
-      }
-    }
-    else
-    {
-      invocation->return_dbus_error("org.glibmm.DBus.Failed", "Your message "
-        "bus daemon does not support file descriptor passing (need D-Bus >= "
-        "1.3.0)");
-    }
-#else
-    invocation->return_dbus_error("org.glibmm.DBus.Failed", "Your message bus "
-      "daemon does not support file descriptor passing (need D-Bus >= 1.3.0)");
-#endif
-  }
   else
   {
     // Non-existent method on the interface.
