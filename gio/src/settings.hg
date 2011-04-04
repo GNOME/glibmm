@@ -97,8 +97,11 @@ public:
 
   _WRAP_METHOD(void reset(const Glib::ustring& key), g_settings_reset)
 
-#m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
-  _WRAP_METHOD(std::vector<Glib::ustring> list_schemas() const, g_settings_list_schemas)
+//We must hand-code this because gmmproc is confused by the static keyword with the vector.
+//#m4 _CONVERSION(`const gchar*const*',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD_DOCS_ONLY(g_settings_list_schemas)
+  static std::vector<Glib::ustring> list_schemas();
+  _IGNORE(g_settings_list_schemas)
 
 #m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(std::vector<Glib::ustring> list_children() const, g_settings_list_children)
