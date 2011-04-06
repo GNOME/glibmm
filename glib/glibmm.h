@@ -51,6 +51,7 @@
  * - Asynchronous IO. See Gio::File and the @ref Streams.
  * - @ref NetworkIO
  * - @ref DBus
+ * - Gio::Settings for application settings.
  *
  * @section basics Basic Usage
  *

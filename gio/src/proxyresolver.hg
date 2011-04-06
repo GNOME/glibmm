@@ -39,8 +39,9 @@ namespace Gio
  * resolution. ProxyResolver is used within ClientSocket through the method
  * Gio::SocketConnectable::proxy_enumerate().
  *
+ * @ingroup NetworkIO
  * @newin{2,28}
- */ 
+ */
 class ProxyResolver : public Glib::Interface
 {
   _CLASS_INTERFACE(ProxyResolver, GProxyResolver, G_PROXY_RESOLVER, GProxyResolverInterface)
@@ -48,35 +49,35 @@ class ProxyResolver : public Glib::Interface
 public:
 
   _WRAP_METHOD(static Glib::RefPtr<ProxyResolver> get_default(), g_proxy_resolver_get_default)
-  
+
   _WRAP_METHOD(bool is_supported() const, g_proxy_resolver_is_supported)
 
   //TODO: Use std::string instead of ustring (StringArrayHandle uses ustring)?:
 #m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(std::vector<Glib::ustring> lookup(const Glib::ustring& uri,
 						 const Glib::RefPtr<Cancellable>& cancellable), g_proxy_resolver_lookup, errthrow)
-	
-  /** Looks into the system proxy configuration to determine what proxy, if any, to use to connect to uri. 
+
+  /** Looks into the system proxy configuration to determine what proxy, if any, to use to connect to uri.
    * The returned proxy URIs are of the form <protocol>://[user[:password]@]host:port or direct://, where <protocol> could be http, rtsp, socks or other proxying protocol.
    *
-   * If you don't know what network protocol is being used on the socket, you should use none as the URI protocol. 
+   * If you don't know what network protocol is being used on the socket, you should use none as the URI protocol.
    * In this case, the resolver might still return a generic proxy type (such as SOCKS), but would not return protocol-specific proxy types (such as http).
    *
    * direct:// is used when no proxy is needed. Direct connection should not be attempted unless it is part of the returned array of proxies.
    *
-   * @param uri a URI representing the destination to connect to. 
+   * @param uri a URI representing the destination to connect to.
    */
   std::vector<Glib::ustring> lookup(const Glib::ustring& uri);
-						 
-  /** Asynchronous lookup of proxy. See lookup() for more details. 
-   * @param uri a URI representing the destination to connect to. 
+
+  /** Asynchronous lookup of proxy. See lookup() for more details.
+   * @param uri a URI representing the destination to connect to.
    * @param slot A callback slot to call after the resolution completes.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    */
   void lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
- 
+
   /** Asynchronous lookup of proxy. See lookup() for more details.
-   * @param uri a URI representing the destination to connect to. 
+   * @param uri a URI representing the destination to connect to.
    * @param slot A callback slot to call after the resolution completes.
    */
   void lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot);
@@ -89,4 +90,3 @@ public:
 
 
 } // namespace Gio
-
