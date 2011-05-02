@@ -10,7 +10,7 @@ my $function_prefix = "";
 my $parent_dir = ""; # e.g. gtkmm
 my $path = "gtk--";
 my $debug = 0;
-my @filenames_headers = ();
+my %filenames_headers = ();
 my %objects = ();
 my %exceptions = ();
 my %namespaces = (); # hashmap of lists of strings.
@@ -185,7 +185,7 @@ while ($ARGV[0])
   # Store header filename so that we can #include it later:
   my $filename_header = $filename;
   $filename_header =~ s/.*\/([^\/]+)\.hg/$1.h/;
-  push(@filenames_headers, $filename_header);
+  $filenames_headers{$filename_header} = $cppname;
 
   shift @ARGV;
   close(FILE);
@@ -210,9 +210,10 @@ print << "EOF";
 
 EOF
 
-foreach( @filenames_headers )
+my $i = 0;
+foreach $i (sort keys %filenames_headers)
 {
-  print "#include \"" . $_ . "\"\n";
+  print_with_guards( $filenames_headers{$i}, "#include \"" . $i . "\"\n" );
 }
 
 print "\n";
