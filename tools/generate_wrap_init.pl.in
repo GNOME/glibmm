@@ -18,6 +18,35 @@ my %basenames = ();
 my %win32_nowrap = ();
 my %deprecated = ();
 
+sub print_with_guards
+{
+  my $object = $_[0];
+  my $message = $_[1];
+  if( $deprecated{$object} eq 1 )
+  {
+    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
+    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
+  }
+
+  #On Win32, these classes are not compiled:
+  if( $win32_nowrap{$object} eq 1 )
+  {
+    print "#ifndef G_OS_WIN32\n"
+  }
+
+  print "$message";
+
+  if( $win32_nowrap{$object} eq 1 )
+  {
+    print "#endif //G_OS_WIN32\n"
+  }
+
+  if( $deprecated{$object} eq 1 )
+  {
+    print "#endif // *_DISABLE_DEPRECATED\n"
+  }
+}
+
 # Loop through command line arguments, setting variables:
 while ($ARGV[0] =~ /^-/)
 {
@@ -202,29 +231,7 @@ print "\n//Declarations of the *_get_type() functions:\n\n";
 my $i = 0;
 foreach $i (sort keys %objects)
 {
-  if( $deprecated{$i} eq 1 )
-  {
-    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
-    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
-  }
-
-  #On Win32, these classes are not compiled:
-  if( $win32_nowrap{$i} eq 1 )
-  {
-    print "#ifndef G_OS_WIN32\n"
-  }
-  
-  print "GType $basenames{$i}_get_type(void);\n";
-
-  if( $win32_nowrap{$i} eq 1 )
-  {
-    print "#endif //G_OS_WIN32\n"
-  }
-
-  if( $deprecated{$i} eq 1 )
-  {
-    print "#endif // *_DISABLE_DEPRECATED\n"
-  }
+  print_with_guards( $i, "GType $basenames{$i}_get_type(void);\n" );
 }
 
 print "\n//Declarations of the *_error_quark() functions:\n\n";
@@ -243,18 +250,6 @@ print "\n//Declarations of the *_Class::wrap_new() methods, instead of including
 my $i = 0;
 foreach $i (sort keys %objects)
 {
-  if( $deprecated{$i} eq 1 )
-  {
-    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
-    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
-  }
-
-  #On Win32, these classes are not compiled:
-  if( $win32_nowrap{$i} eq 1 )
-  {
-    print "#ifndef G_OS_WIN32\n"
-  }
-  
   my $namespace_declarations = "";
   my $namespace_close = "";
   foreach ( @{$namespaces{$i}} )
@@ -263,17 +258,7 @@ foreach $i (sort keys %objects)
     $namespace_close .= " }";
   }
 
-  print "${namespace_declarations} class ${i}_Class { public: static Glib::ObjectBase* wrap_new(GObject*); }; ${namespace_close}\n";
-  
-  if( $win32_nowrap{$i} eq 1 )
-  {
-    print "#endif //G_OS_WIN32\n"
-  }
-
-  if( $deprecated{$i} eq 1 )
-  {
-    print "#endif // *_DISABLE_DEPRECATED\n"
-  }
+  print_with_guards( $i, "${namespace_declarations} class ${i}_Class { public: static Glib::ObjectBase* wrap_new(GObject*); }; ${namespace_close}\n" );
 }
 
 # print "\n//Declarations of the *Error::throw_func() methods:\n\n";
@@ -327,35 +312,13 @@ print "// Map gtypes to gtkmm wrapper-creation functions:\n";
 
 foreach $i (sort keys %objects)
 {
-  if( $deprecated{$i} eq 1 )
-  {
-    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
-    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
-  }
-
-  #On Win32, these classes are not compiled:
-  if( $win32_nowrap{$i} eq 1 )
-  {
-    print "#ifndef G_OS_WIN32\n"
-  }
-  
   my $namespace_prefix = "";
   foreach( @{$namespaces{$i}} )
   {
     $namespace_prefix .= $_ ."::";
   }
 
-  print "  Glib::wrap_register($basenames{$i}_get_type(), &", "${namespace_prefix}${i}_Class::wrap_new);\n";
-
-  if( $win32_nowrap{$i} eq 1 )
-  {
-    print "#endif //G_OS_WIN32\n"
-  }
-
-  if( $deprecated{$i} eq 1 )
-  {
-    print "#endif // *_DISABLE_DEPRECATED\n"
-  }
+  print_with_guards( $i, "  Glib::wrap_register($basenames{$i}_get_type(), &" . "${namespace_prefix}${i}_Class::wrap_new);\n" );
 }
 
 print "\n";
@@ -363,35 +326,13 @@ print "  // Register the gtkmm gtypes:\n";
 
 foreach $i (sort keys %objects)
 {
-  if( $deprecated{$i} eq 1 )
-  {
-    # The uc(parent_dir) is a bit of a hack. One day it will get it wrong.
-    print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
-  }
-
-  #On Win32, these classes are not compiled:
-  if( $win32_nowrap{$i} eq 1 )
-  {
-    print "#ifndef G_OS_WIN32\n"
-  }
-  
   my $namespace_prefix = "";
   foreach( @{$namespaces{$i}} )
   {
     $namespace_prefix .= $_ ."::";
   }
 
-  print "  ${namespace_prefix}${i}::get_type();\n";
-
-  if( $win32_nowrap{$i} eq 1 )
-  {
-    print "#endif //G_OS_WIN32\n"
-  }
-
-  if( $deprecated{$i} eq 1 )
-  {
-    print "#endif // *_DISABLE_DEPRECATED\n"
-  }
+  print_with_guards( $i, "  ${namespace_prefix}${i}::get_type();\n" );
 }
 
 print << "EOF";
