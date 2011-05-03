@@ -97,6 +97,6 @@ dist_noinst_DATA = settings/org.gtkmm.demo.gschema.xml
 CLEANFILES = settings/gschemas.compiled
 
 settings/gschemas.compiled: $(srcdir)/settings/org.gtkmm.demo.gschema.xml
-	$(AM_V_GEN)glib-compile-schemas --targetdir=settings $(srcdir)/settings
+	$(AM_V_GEN)$(GLIB_COMPILE_SCHEMAS) --targetdir=settings $(srcdir)/settings
 
 all-local: settings/gschemas.compiled
