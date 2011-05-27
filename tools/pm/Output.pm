@@ -149,7 +149,7 @@ sub output_wrap_vfunc_cc($$$$$$$)
 
   #Use a different macro for Interfaces, to generate an extra convenience method.
 
-  if ($custom_vfunc eq 0)
+  if (!$custom_vfunc)
   {
     my $refreturn = "";
     $refreturn = "refreturn" if($$objCppfunc{rettype_needs_ref});
@@ -170,7 +170,7 @@ sub output_wrap_vfunc_cc($$$$$$$)
 
   # e.g. Gtk::ButtonClass::draw_indicator():
 
-  if ($custom_vfunc_callback eq 0)
+  if (!$custom_vfunc_callback)
   {
     my $refreturn_ctype = "";
     $refreturn_ctype = "refreturn_ctype" if($$objCFunc{rettype_needs_ref});
@@ -588,44 +588,49 @@ sub output_wrap_property($$$$$$)
     my $name_underscored = $name;
     $name_underscored =~ tr/-/_/;
 
-      # For the docs of the property (the final argument of the sprintf), the
-      # m4 quotes are changed, the new quotes are then used to quote the docs
-      # and then the quotes are changed back to the standard quotes.  This is
-      # done so that if there are commas in the docs, the contents after the
-      # docs are not lost (m4 thinks the contents after the comma is another
-      # agument to the macro).  Using the standard quotes leaves a trailing
-      # single quote for some undetermined reason.
-    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,changequote([,])[%s]changequote(`,'))dnl\n",
+    # Get the property documentation, if any, and add m4 quotes.
+    my $documentation = $objProperty->get_docs();
+    add_m4_quotes(\$documentation) if ($documentation ne "");
+
+    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,`%s')dnl\n",
       $name,
       $name_underscored,
       $cpp_type,
       $proxy_suffix,
-      $objProperty->get_docs()
+      $documentation
     );
     $self->append($str);
     $self->append("\n");
 
-    # If the property is not already read-only, and the property can be read, then add a second const accessor for a read-only propertyproxy:
+    # If the property is not already read-only, and the property can be read,
+    # then add a second const accessor for a read-only propertyproxy:
     if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
     {
-
-      # For the docs of the property (the final argument of the sprintf), the
-      # m4 quotes are changed, the new quotes are then used to quote the docs
-      # and then the quotes are changed back to the standard quotes.  This is
-      # done so that if there are commas in the docs, the contents after the
-      # docs are not lost (m4 thinks the contents after the comma is another
-      # agument to the macro).  Using the standard quotes leaves a trailing
-      # single quote for some undetermined reason.
-      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,changequote([,])[%s]changequote(`,'))dnl\n",
+      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,`%s')dnl\n",
         $name,
         $name_underscored,
         $cpp_type,
         "_ReadOnly",
-        $objProperty->get_docs()
+        $documentation
       );
       $self->append($str);
     }
   }
+}
+
+sub add_m4_quotes($)
+{
+  my ($text) = @_;
+
+  # __BT__ and __FT__ are M4 macros defined in the base.m4 file that produce
+  # a "`" and a "'" resp. without M4 errors.
+  my %m4_quotes = (
+    "`" => "'__BT__`",
+    "'" => "'__FT__`",
+  );
+
+  $$text =~ s/([`'])/$m4_quotes{$1}/g;
+  $$text = "`" . $$text . "'";
 }
 
 # vpod output_temp_g1($filename, $section) e.g. output_temp_g1(button, gtk)
