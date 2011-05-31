@@ -43,24 +43,53 @@ sub args_types_only($)
   return join(", ", @$param_types);
 }
 
-# $string args_names_only($)
+# $string args_names_only(int index = 0)
+# Gets the args names.  The optional index specifies which argument
+# list should be used out of the possible combination of arguments based on
+# whether any arguments are optional.  index = 0 ==> all the names.
 sub args_names_only($)
 {
-  my ($self) = @_;
+  my ($self, $index) = @_;
+  
+  $index = 0 unless defined($index);
 
   my $param_names = $$self{param_names};
+  my $possible_args_list = $$self{possible_args_list};
+  my @out;
+
+  my @arg_indices;
+  
+  if(defined($possible_args_list))
+  {
+    @arg_indices = split(" ", @$possible_args_list[$index]);
+  }
+  else
+  {
+    @arg_indices = (0..@$param_names - 1);
+  }
+  
+  for (my $i = 0; $i < @arg_indices; $i++)
+  {
+    push(@out, $$param_names[$arg_indices[$i]]);
+  }
   return join(", ", @$param_names);
 }
 
-# $string args_types_and_names($)
+# $string args_types_and_names(int index = 0)
+# Gets the args types and names.  The optional index specifies which argument
+# list should be used out of the possible combination of arguments based on
+# whether any arguments are optional.  index = 0 ==> all the types and names.
 sub args_types_and_names($)
 {
-  my ($self) = @_;
+  my ($self, $index) = @_;
+  
+  $index = 0 unless defined($index);
 
   my $i;
 
   my $param_names = $$self{param_names};
   my $param_types = $$self{param_types};
+  my $possible_args_list = $$self{possible_args_list};
   my @out;
 
   #debugging:
@@ -69,9 +98,21 @@ sub args_types_and_names($)
   #  return "NOARGS";
   #}
 
-  for ($i = 0; $i < $#$param_types + 1; $i++)
+  my @arg_indices;
+  
+  if(defined($possible_args_list))
   {
-    my $str = sprintf("%s %s", $$param_types[$i], $$param_names[$i]);
+    @arg_indices = split(" ", @$possible_args_list[$index]);
+  }
+  else
+  {
+    @arg_indices = (0..@$param_names - 1);
+  }
+  
+  for ($i = 0; $i < @arg_indices; $i++)
+  {
+    my $str = sprintf("%s %s", $$param_types[$arg_indices[$i]],
+      $$param_names[$arg_indices[$i]]);
     push(@out, $str);
   }
 
@@ -184,26 +225,49 @@ sub dump($)
   print "</function>\n\n";
 }
 
+# $string args_types_and_names_with_default_values(int index = 0)
+# Gets the args types and names with default values.  The optional index
+# specifies which argument list should be used out of the possible
+# combination of arguments based on whether any arguments are optional.
+# index = 0 ==> all the types and names.
 sub args_types_and_names_with_default_values($)
 {
-  my ($self) = @_;
+  my ($self, $index) = @_;
+  
+  $index = 0 unless defined $index;
 
   my $i;
 
   my $param_names = $$self{param_names};
   my $param_types = $$self{param_types};
   my $param_default_values = $$self{param_default_values};
+  my $possible_args_list = $$self{possible_args_list};
   my @out;
   
-  for ($i = 0; $i < $#$param_types + 1; $i++)
+  my @arg_indices;
+  
+  if(defined($possible_args_list))
   {
-    my $str = sprintf("%s %s", $$param_types[$i], $$param_names[$i]);
+    @arg_indices = split(" ", @$possible_args_list[$index]);
+  }
+  else
+  {
+    @arg_indices = (0..@$param_names - 1);
+  }
+  
+  for ($i = 0; $i < @arg_indices; $i++)
+  {
+    my $str = sprintf("%s %s", $$param_types[$arg_indices[$i]],
+      $$param_names[$arg_indices[$i]]);
+      
 
-    if(defined($$param_default_values[$i]))
+    if(defined($$param_default_values[$arg_indices[$i]]))
     {
-      if($$param_default_values[$i] ne "")
+      my $default_value = $$param_default_values[$arg_indices[$i]];
+      
+      if($default_value ne "")
       {
-        $str .= " = " . $$param_default_values[$i];
+        $str .= " = " . $default_value;
       }
     }
 
@@ -211,6 +275,46 @@ sub args_types_and_names_with_default_values($)
   }
 
   return join(", ", @out);
+}
+
+# $string get_declaration(int index = 0)
+# Gets the function declaration (this includes the default values of the
+# args).  The optional index specifies which argument list should be used out
+# of the possible combination of arguments based on whether any arguments are
+# optional.  index = 0 ==> all the types and names.
+sub get_declaration($)
+{
+  my ($self, $index) = @_;
+  
+  $index = 0 unless defined $index;
+  my $out = "";
+  
+  $out = "static " if($$self{static});
+  $out = $out . $$self{rettype} . " " . $$self{name} . "(" .
+    $self->args_types_and_names_with_default_values($index) . ")";
+  $out = $out . " const" if $$self{const};
+  $out = $out . ";";
+  
+  return $out;
+}
+
+# int get_num_possible_args_list();
+# Returns the number of possible argument list based on whether some args are
+# optional.
+sub get_num_possible_args_list()
+{
+  my ($self) = @_;
+
+  my $possible_args_list = $$self{possible_args_list};
+  
+  if(defined($possible_args_list))
+  {
+    return @$possible_args_list;
+  }
+  else
+  {
+    return 1;
+  }
 }
 
 1; # indicate proper module load.

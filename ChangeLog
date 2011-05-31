@@ -1,3 +1,35 @@
+2011-05-31  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: _WRAP_METHOD: Add optional parameter functionality.
+
+	* tools/pm/Function.pm (param_optional): Add new member bool array to
+	represent which parameters are optional.
+	(possible_args_list): Add new member string array containing a list of
+	the possible argument combination based on existing optional
+	parameters.
+	(possible_args_list): Added recursive function to generate the list of
+	possible parameter combinations.  The first in the list (the zeroth
+	element) always includes all the paramters.
+	(new): Modified to initialize the new members above.
+	(parse_param): Modified to see if parameters are optional by checking
+	if the name ends with '{?}'.
+	* tools/pm/FunctionBase.pm (args_names_only):
+	(args_types_and_names):
+	(args_types_and_names_with_default_values): Modified to accept an
+	optional index representing the desired argument list to use out of
+	the possible combinations.
+	(get_declaration): New subroutine returning any of the possible
+	declarations based on optional arguments.
+	(get_num_possible_args_list): New subroutine returning the number of
+	possible combination of arguments.
+	* tools/pm/Output.pm (output_wrap_meth): Modified to loop through the
+	possible arguments list and generate a _METHOD or _STATIC_METHOD for
+	all the possible combination of arguments.
+	(convert_args_cpp_to_c): Modified as above to accept an optional index
+	parameter representing the argument list for which to generate
+	_CONVERT macros.  For optional arguments a NULL is placed in the C
+	function call.
+
 2011-05-27  Kjell Ahlstedt  <kjellahl@src.gnome.org>
 
 	gmmproc: Protect documentation with m4 quotes.
