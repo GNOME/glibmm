@@ -89,6 +89,7 @@ Glib::RefPtr<`'__CPPNAME__`'> __CPPNAME__`'::create(`'$2`')
 {
   return Glib::RefPtr<`'__CPPNAME__`'>( new __CPPNAME__`'(`'$3`') );
 }
+
 _POP()
 ')
 

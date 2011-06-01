@@ -134,6 +134,8 @@ sub new_ctor($$)
   $$self{param_types} = [];
   $$self{param_names} = [];
   $$self{param_default_values} = [];
+  $$self{param_optional} = [];
+  $$self{possible_args_list} = [];
   $$self{in_module} = "";
   $$self{class} = "";
   $$self{entity_type} = "method";
@@ -151,6 +153,11 @@ sub new_ctor($$)
   {
     $objWrapParser->error("fail to parse $line\n");
   }
+  
+  # Store the list of possible argument combinations based on if arguments
+  # are optional.
+  my $possible_args_list = $$self{possible_args_list};
+  push(@$possible_args_list, $self->possible_args_list());
 
   return $self;
 }

@@ -282,8 +282,9 @@ sub output_wrap_meth($$$$$$$)
   my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl, $documentation, $ifdef) = @_;
   my $objDefsParser = $$self{objDefsParser};
 
-  for(my $arg_list = 0; $arg_list < $objCppfunc->get_num_possible_args_list();
-    $arg_list++)
+  my $num_args_list = $objCppfunc->get_num_possible_args_list();
+
+  for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
   {
   
     # Allow the generated .h/.cc code to have an #ifndef around it, and add
@@ -307,7 +308,7 @@ sub output_wrap_meth($$$$$$$)
     }
     else
     {
-      $self->append("\n\n  /// A $$objCppfunc{name}() convinience overload.\n");
+      $self->append("\n\n  /// A $$objCppfunc{name}() convenience overload.\n");
     }
   
     $self->ifdef($ifdef);
@@ -397,19 +398,29 @@ sub output_wrap_ctor($$$$$)
   my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl) = @_;
   my $objDefsParser = $$self{objDefsParser};
 
-  #Ctor Declaration:
-  #TODO: Add explicit.
-  $self->append("explicit " . $cppMethodDecl . ";");
+  my $num_args_list = $objCppfunc->get_num_possible_args_list();
 
-  #Implementation:
-  my $str = sprintf("_CTOR_IMPL(%s,%s,\`%s\',\`%s\')dnl\n",
-    $$objCppfunc{name},
-    $$objCDefsFunc{c_name},
-    $objCppfunc->args_types_and_names(),
-    get_ctor_properties($objCppfunc, $objCDefsFunc, $line_num)
-  );
+  for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
+  {
+    if ($arg_list > 0)
+    {
+      $self->append("\n\n  /// A $$objCppfunc{name}() convenience overload.\n");
+    }
+    
+    #Ctor Declaration:
+    #TODO: Add explicit.
+    $self->append("  explicit " . $objCppfunc->get_declaration($arg_list) . "\n");
 
-  $self->append($str);
+    #Implementation:
+    my $str = sprintf("_CTOR_IMPL(%s,%s,\`%s\',\`%s\')dnl\n",
+      $$objCppfunc{name},
+      $$objCDefsFunc{c_name},
+      $objCppfunc->args_types_and_names($arg_list),
+      get_ctor_properties($objCppfunc, $objCDefsFunc, $line_num, $arg_list)
+    );
+  
+    $self->append($str);
+  }
 }
 
 sub output_wrap_create($$$)
@@ -420,14 +431,25 @@ sub output_wrap_create($$$)
   my $fake_decl = "void fake_func(" . $args_type_and_name_with_default_values . ")";
 
   my $objFunction = &Function::new($fake_decl, $objWrapParser);
-  my $args_names_only = $objFunction->args_names_only();
-  my $args_type_and_name_hpp = $objFunction->args_types_and_names_with_default_values();
-  my $args_type_and_name_cpp = $objFunction->args_types_and_names();
 
-  my $str = sprintf("_CREATE_METHOD(\`%s\',\`%s\',\`%s\')dnl\n",
-              $args_type_and_name_hpp, , $args_type_and_name_cpp, $args_names_only);
+  my $num_args_list = $objFunction->get_num_possible_args_list();
 
-  $self->append($str)
+  for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
+  {
+    my $args_names_only = $objFunction->args_names_only($arg_list);
+    my $args_type_and_name_hpp =
+      $objFunction->args_types_and_names_with_default_values($arg_list);
+    my $args_type_and_name_cpp = $objFunction->args_types_and_names($arg_list);
+  
+    if ($arg_list > 0) {
+      $self->append("\n  /// A create() convenience overload.");
+    }
+    
+    my $str = sprintf("_CREATE_METHOD(\`%s\',\`%s\',\`%s\')dnl\n",
+                $args_type_and_name_hpp, , $args_type_and_name_cpp, $args_names_only);
+  
+    $self->append($str)
+  }
 }
 
 # void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback)
@@ -915,13 +937,19 @@ sub convert_args_c_to_cpp($$$)
 
 # generates the XXX in g_object_new(get_type(), XXX): A list of property names and values.
 # Uses the cpp arg name as the property name.
-# $string get_ctor_properties($objCppfunc, $objCDefsFunc, $wrap_line_number)
-sub get_ctor_properties($$$$)
+# The optional index specifies which arg list out of the possible combination
+# of arguments based on whether any arguments are optional. index = 0 ==> all
+# the arguments.
+# $string get_ctor_properties($objCppfunc, $objCDefsFunc, $wrap_line_number, $index = 0)
+sub get_ctor_properties($$$$$)
 {
- my ($objCppfunc, $objCDefsFunc, $wrap_line_number) = @_;
+ my ($objCppfunc, $objCDefsFunc, $wrap_line_number, $index) = @_;
+
+  $index = 0 unless defined $index;
 
   my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
+  my $cpp_param_optional = $$objCppfunc{param_optional};
   my $c_param_types = $$objCDefsFunc{param_types};
 
   my @result;
@@ -938,6 +966,10 @@ sub get_ctor_properties($$$$)
   }
 
 
+  # Get the desired argument list combination.
+  my $possible_args_list = $$objCppfunc{possible_args_list};
+  my @arg_indices = split(" ", @$possible_args_list[$index]);
+
   # Loop through the cpp parameters:
  my $i = 0;
 
@@ -952,6 +984,31 @@ sub get_ctor_properties($$$$)
 
    # Property name:
    push(@result, "\"" . $cppParamName . "\"");
+
+  if(!@arg_indices)
+  {
+    # If there are no more arg indices that should be included, pass
+    # NULL to the C func unless the param is not optional (applies to a
+    # possibly added GError parameter).
+    if ($$cpp_param_optional[$i])
+    {
+      push(@result, "static_cast<char*>(0)");
+      next;
+    }
+  }
+  elsif($arg_indices[0] > $i)
+  {
+    # If this argument is not in the desired argument list (The argument
+    # indices are stored in ascending order) then pass NULL to C func.
+    push(@result, "static_cast<char*>(0)");
+    next;
+  }
+  else
+  {
+    # The current argument index from the desired list is <= the current
+    # index so go to the next index.
+    shift(@arg_indices);
+  }
 
    # C property value:
    if ($cppParamType ne $cParamType) #If a type conversion is needed.

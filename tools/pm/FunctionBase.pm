@@ -72,7 +72,7 @@ sub args_names_only($)
   {
     push(@out, $$param_names[$arg_indices[$i]]);
   }
-  return join(", ", @$param_names);
+  return join(", ", @out);
 }
 
 # $string args_types_and_names(int index = 0)
@@ -290,7 +290,8 @@ sub get_declaration($)
   my $out = "";
   
   $out = "static " if($$self{static});
-  $out = $out . $$self{rettype} . " " . $$self{name} . "(" .
+  $out = $out . "$$self{rettype} " if($$self{rettype});
+  $out = $out . $$self{name} . "(" .
     $self->args_types_and_names_with_default_values($index) . ")";
   $out = $out . " const" if $$self{const};
   $out = $out . ";";
