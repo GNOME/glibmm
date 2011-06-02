@@ -992,7 +992,7 @@ sub get_ctor_properties($$$$$)
     # possibly added GError parameter).
     if ($$cpp_param_optional[$i])
     {
-      push(@result, "static_cast<char*>(0)");
+      push(@result, "NULL");
       next;
     }
   }
@@ -1000,7 +1000,7 @@ sub get_ctor_properties($$$$$)
   {
     # If this argument is not in the desired argument list (The argument
     # indices are stored in ascending order) then pass NULL to C func.
-    push(@result, "static_cast<char*>(0)");
+    push(@result, "NULL");
     next;
   }
   else
