@@ -17,7 +17,7 @@ int main()
   type_nodetree_string* root;
   type_nodetree_string* node;
   type_nodetree_string* node_B;
-  type_nodetree_string* node_D;
+  /* type_nodetree_string* node_D; */
   type_nodetree_string* node_F;
   type_nodetree_string* node_G;
   type_nodetree_string* node_J;
@@ -31,7 +31,7 @@ int main()
 
   node_B->append_data("E");
   node_B->prepend_data("C");
-  node_D = &node_B->insert(1, *(new type_nodetree_string("D")));
+  /* node_D = & */node_B->insert(1, *(new type_nodetree_string("D")));
 
   node_F = new type_nodetree_string("F");
   root->append(*node_F);
