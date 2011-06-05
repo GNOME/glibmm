@@ -835,7 +835,7 @@ sub convert_args_cpp_to_c($$$$$)
       # possibly added GError parameter).
       if ($$cpp_param_optional[$i])
       {
-        push(@result, "NULL");
+        push(@result, "0");
         next;
       }
     }
@@ -843,7 +843,7 @@ sub convert_args_cpp_to_c($$$$$)
     {
       # If this argument is not in the desired argument list (The argument
       # indices are stored in ascending order) then pass NULL to C func.
-      push(@result, "NULL");
+      push(@result, "0");
       next;
     }
     else
@@ -992,7 +992,7 @@ sub get_ctor_properties($$$$$)
     # possibly added GError parameter).
     if ($$cpp_param_optional[$i])
     {
-      push(@result, "NULL");
+      push(@result, "0");
       next;
     }
   }
@@ -1000,7 +1000,7 @@ sub get_ctor_properties($$$$$)
   {
     # If this argument is not in the desired argument list (The argument
     # indices are stored in ascending order) then pass NULL to C func.
-    push(@result, "NULL");
+    push(@result, "0");
     next;
   }
   else
