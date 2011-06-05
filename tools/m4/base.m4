@@ -88,13 +88,13 @@ dnl    lower a string
 define(`_LOWER',`m4_translit(`$*',`ABCDEFGHIJKLMNOPQRSTUVWXYZ',`abcdefghijklmnopqrstuvwxyz')')
 
 dnl 
-dnl  _QUOTE(macro)  
+dnl  _QUOTE(macro)
 dnl    If a macro generates an output with commas we need to protect it
 dnl    from being broken down and interpreted
 define(`_QUOTE',``$*'')
 
 dnl
-dnl  _NUM(arglist)   
+dnl  _NUM(arglist)
 dnl    count number of arguments
 define(`_NUM',`m4_ifelse(m4_len(`$*'),0,0,`$#')')
 

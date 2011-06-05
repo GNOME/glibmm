@@ -191,7 +191,7 @@ sub extract_token($)
 
     return $_;
    }
-     
+
   return "";
 }
 
@@ -521,7 +521,7 @@ sub on_class($$)
   my @back;
   push(@back, $class_command);
   push(@back, "($str)");
-  
+
   # When we hit _CLASS, we walk backwards through the output to find "class"
   my $token;
   while ( scalar(@{$$objOutputter{out}}))
@@ -624,7 +624,7 @@ sub on_end_class($)
 
 
 ########################################
-###  
+###
 # void on_end_namespace($)
 sub on_end_namespace($)
 {
@@ -1059,7 +1059,7 @@ sub on_wrap_ctor($)
 sub on_implements_interface($$)
 {
   my ($self) = @_;
-  
+
   if( !($self->check_for_eof()) )
   {
    return;
@@ -1126,7 +1126,7 @@ sub on_wrap_signal($$)
   my $bCustomCCallback = 0;
   my $bRefreturn = 0;
   my $ifdef;
-  
+
   while($#args >= 2) # If optional arguments are there.
   {
     my $argRef = string_trim(pop @args);
@@ -1149,7 +1149,7 @@ sub on_wrap_signal($$)
     {
       $bRefreturn = 1;
     }
-    
+
   	elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
     	$ifdef = $1;
@@ -1312,7 +1312,7 @@ sub output_wrap_check($$$$$$)
 sub output_wrap_signal($$$$$$$$$)
 {
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous) = @_;
-  
+
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $signal_name,
                                       $filename, $line_num, "_WRAP_SIGNAL"));

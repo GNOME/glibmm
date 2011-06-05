@@ -437,10 +437,10 @@ sub lookup_enum($)
 sub lookup_object($)
 {
   no warnings;
-  
+
   my $c_name = $_[0];
   my $result = $GtkDefs::objects{$c_name};
-  
+
   if (not defined($result))
   {
     # We do not print this error because it's not always an error, 
@@ -448,7 +448,7 @@ sub lookup_object($)
     # while guessing an object name prefix from a function name.
     #
     # print "GtkDefs:lookup_object(): can't find object with name=" . $c_name . "\n";
-    
+
     # debug output:
     # foreach my $key (keys %GtkDefs::objects)
     # {
@@ -590,7 +590,7 @@ sub new
   {
     #Ignore them.
   }
-  
+
   # of-object
   if ($def =~ s/\(of-object "(\S+)"\)//)
   {

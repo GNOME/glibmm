@@ -200,7 +200,7 @@ ifelse($4,void,`dnl
       #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
-  
+
   BaseClassType *const base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
         _IFACE_PARENT_FROM_OBJECT($8)dnl

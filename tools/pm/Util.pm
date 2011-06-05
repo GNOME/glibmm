@@ -48,13 +48,13 @@ our @EXPORT_OK;
 sub string_unquote($)
 {
     my ($str) = @_;
-    
+
     $str =~ s/^['`"]// ;
     $str =~ s/['`"]$// ;
  
     return $str;
 }
-         
+
 # $ string_trim($string)
 # Removes leading and trailing white space.
 sub string_trim($)
@@ -76,7 +76,7 @@ sub string_canonical($)
 }
 
 #
-#  Back tracing utility.  
+#  Back tracing utility.
 #    Prints the call stack.
 #
 #  void trace()

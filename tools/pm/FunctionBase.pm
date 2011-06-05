@@ -50,7 +50,7 @@ sub args_types_only($)
 sub args_names_only($)
 {
   my ($self, $index) = @_;
-  
+
   $index = 0 unless defined($index);
 
   my $param_names = $$self{param_names};
@@ -58,7 +58,7 @@ sub args_names_only($)
   my @out;
 
   my @arg_indices;
-  
+
   if(defined($possible_args_list))
   {
     @arg_indices = split(" ", @$possible_args_list[$index]);
@@ -67,7 +67,7 @@ sub args_names_only($)
   {
     @arg_indices = (0..@$param_names - 1);
   }
-  
+
   for (my $i = 0; $i < @arg_indices; $i++)
   {
     push(@out, $$param_names[$arg_indices[$i]]);
@@ -82,7 +82,7 @@ sub args_names_only($)
 sub args_types_and_names($)
 {
   my ($self, $index) = @_;
-  
+
   $index = 0 unless defined($index);
 
   my $i;
@@ -99,7 +99,7 @@ sub args_types_and_names($)
   #}
 
   my @arg_indices;
-  
+
   if(defined($possible_args_list))
   {
     @arg_indices = split(" ", @$possible_args_list[$index]);
@@ -108,7 +108,7 @@ sub args_types_and_names($)
   {
     @arg_indices = (0..@$param_names - 1);
   }
-  
+
   for ($i = 0; $i < @arg_indices; $i++)
   {
     my $str = sprintf("%s %s", $$param_types[$arg_indices[$i]],
@@ -233,7 +233,7 @@ sub dump($)
 sub args_types_and_names_with_default_values($)
 {
   my ($self, $index) = @_;
-  
+
   $index = 0 unless defined $index;
 
   my $i;
@@ -243,9 +243,9 @@ sub args_types_and_names_with_default_values($)
   my $param_default_values = $$self{param_default_values};
   my $possible_args_list = $$self{possible_args_list};
   my @out;
-  
+
   my @arg_indices;
-  
+
   if(defined($possible_args_list))
   {
     @arg_indices = split(" ", @$possible_args_list[$index]);
@@ -254,17 +254,17 @@ sub args_types_and_names_with_default_values($)
   {
     @arg_indices = (0..@$param_names - 1);
   }
-  
+
   for ($i = 0; $i < @arg_indices; $i++)
   {
     my $str = sprintf("%s %s", $$param_types[$arg_indices[$i]],
       $$param_names[$arg_indices[$i]]);
-      
+
 
     if(defined($$param_default_values[$arg_indices[$i]]))
     {
       my $default_value = $$param_default_values[$arg_indices[$i]];
-      
+
       if($default_value ne "")
       {
         $str .= " = " . $default_value;
@@ -285,17 +285,17 @@ sub args_types_and_names_with_default_values($)
 sub get_declaration($)
 {
   my ($self, $index) = @_;
-  
+
   $index = 0 unless defined $index;
   my $out = "";
-  
+
   $out = "static " if($$self{static});
   $out = $out . "$$self{rettype} " if($$self{rettype});
   $out = $out . $$self{name} . "(" .
     $self->args_types_and_names_with_default_values($index) . ")";
   $out = $out . " const" if $$self{const};
   $out = $out . ";";
-  
+
   return $out;
 }
 
@@ -307,7 +307,7 @@ sub get_num_possible_args_list()
   my ($self) = @_;
 
   my $possible_args_list = $$self{possible_args_list};
-  
+
   if(defined($possible_args_list))
   {
     return @$possible_args_list;

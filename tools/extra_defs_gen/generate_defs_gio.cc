@@ -128,6 +128,6 @@ int main(int, char**)
             << get_defs(G_TYPE_DBUS_SERVER)
 
             << std::endl;
-  
+
   return 0;
 }
