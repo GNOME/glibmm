@@ -232,7 +232,7 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
   {
     my $refreturn = "";
     $refreturn = "refreturn" if($bRefreturn eq 1);
-  
+
     my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
@@ -286,7 +286,6 @@ sub output_wrap_meth($$$$$$$)
 
   for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
   {
-  
     # Allow the generated .h/.cc code to have an #ifndef around it, and add
     # deprecation docs to the generated documentation.
     my $deprecated = "";
@@ -294,13 +293,13 @@ sub output_wrap_meth($$$$$$$)
     {
       $deprecated = "deprecated";
     }
-  
+
     #Declaration:
     if($deprecated ne "")
     {
       $self->append("\n_DEPRECATE_IFDEF_START");
     }
-  
+
     if($arg_list == 0)
     {
       # Doxygen documentation before the method declaration:
@@ -310,37 +309,37 @@ sub output_wrap_meth($$$$$$$)
     {
       $self->append("\n\n  /// A $$objCppfunc{name}() convenience overload.\n");
     }
-  
+
     $self->ifdef($ifdef);
-  
+
     $self->append("  " . $objCppfunc->get_declaration($arg_list));
-    
+
     $self->endif($ifdef);
-  
-    
+
+
     if($deprecated ne "")
     {
       $self->append("\n_DEPRECATE_IFDEF_END\n");
     }
-  
+
     my $refneeded = "";
     if($$objCDefsFunc{rettype_needs_ref})
     {
       $refneeded = "refreturn"
     }
-  
+
     my $errthrow = "";
     if($$objCDefsFunc{throw_any_errors})
     {
       $errthrow = "errthrow"
     }
-  
+
     my $constversion = ""; #Whether it is just a const overload (so it can reuse code)
     if($$objCDefsFunc{constversion})
     {
       $constversion = "constversion"
     }
-  
+
     #Implementation:
     my $str;
     if ($$objCppfunc{static}) {
@@ -406,7 +405,7 @@ sub output_wrap_ctor($$$$$)
     {
       $self->append("\n\n  /// A $$objCppfunc{name}() convenience overload.\n");
     }
-    
+
     #Ctor Declaration:
     #TODO: Add explicit.
     $self->append("  explicit " . $objCppfunc->get_declaration($arg_list) . "\n");
@@ -418,7 +417,7 @@ sub output_wrap_ctor($$$$$)
       $objCppfunc->args_types_and_names($arg_list),
       get_ctor_properties($objCppfunc, $objCDefsFunc, $line_num, $arg_list)
     );
-  
+
     $self->append($str);
   }
 }
@@ -440,14 +439,14 @@ sub output_wrap_create($$$)
     my $args_type_and_name_hpp =
       $objFunction->args_types_and_names_with_default_values($arg_list);
     my $args_type_and_name_cpp = $objFunction->args_types_and_names($arg_list);
-  
+
     if ($arg_list > 0) {
       $self->append("\n  /// A create() convenience overload.");
     }
-    
+
     my $str = sprintf("_CREATE_METHOD(\`%s\',\`%s\',\`%s\')dnl\n",
                 $args_type_and_name_hpp, , $args_type_and_name_cpp, $args_names_only);
-  
+
     $self->append($str)
   }
 }
@@ -775,7 +774,9 @@ sub convert_args_cpp_to_c($$$$$)
   my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
   my $cpp_param_optional = $$objCppfunc{param_optional};
+  my $cpp_param_mappings = $$objCppfunc{param_mappings};
   my $c_param_types = $$objCDefsFunc{param_types};
+  my $c_param_names = $$objCDefsFunc{param_names};
 
   my @result;
 
@@ -793,6 +794,8 @@ sub convert_args_cpp_to_c($$$$$)
     $cpp_param_names = [@{$cpp_param_names},"gerror"];
     $cpp_param_types = [@{$cpp_param_types},"GError*&"];
     $cpp_param_optional = [@{$cpp_param_optional}, 0];
+    # Map from the C gerror param name to the newly added C++ param index.
+    $$cpp_param_mappings{@$c_param_names[$num_c_args_expected]} =$num_cpp_args - 1;
   }
 
   if ( $num_cpp_args != $num_c_args_expected )
@@ -807,10 +810,9 @@ sub convert_args_cpp_to_c($$$$$)
   }
 
   # Get the desired argument list combination.
-  my $possible_args_list = $$objCppfunc{possible_args_list};
-  my @arg_indices = split(" ", @$possible_args_list[$index]);
+  my $possible_arg_list = $$objCppfunc{possible_args_list}[$index];
 
-  # Loop through the cpp parameters:
+  # Loop through the parameters:
   my $i;
   my $cpp_param_max = $num_cpp_args;
   # if( !($static) ) { $cpp_param_max++; }
@@ -820,37 +822,28 @@ sub convert_args_cpp_to_c($$$$$)
     #index of C parameter:
     my $iCParam = $i;
     if( !($static) ) { $iCParam++; }
-   
-    my $cppParamType = $$cpp_param_types[$i];
+
+    my $c_param_name = @$c_param_names[$iCParam];
+    my $cpp_param_index = $i;
+    $cpp_param_index = $$cpp_param_mappings{$c_param_name} if(defined($$cpp_param_mappings{$c_param_name}));
+
+    my $cppParamType = $$cpp_param_types[$cpp_param_index];
     $cppParamType =~ s/ &/&/g; #Remove space between type and &
     $cppParamType =~ s/ \*/*/g; #Remove space between type and *
 
-    my $cppParamName = $$cpp_param_names[$i];
+    my $cppParamName = $$cpp_param_names[$cpp_param_index];
     my $cParamType = $$c_param_types[$iCParam];
-    
-    if(!@arg_indices)
+
+    if(!($possible_arg_list =~ /\b$cpp_param_index\b/))
     {
-      # If there are no more arg indices that should be included, pass
+      # If the C++ index is not found in the list of desired parameters, pass
       # NULL to the C func unless the param is not optional (applies to a
       # possibly added GError parameter).
-      if ($$cpp_param_optional[$i])
+      if ($$cpp_param_optional[$cpp_param_index])
       {
         push(@result, "0");
         next;
       }
-    }
-    elsif($arg_indices[0] > $i)
-    {
-      # If this argument is not in the desired argument list (The argument
-      # indices are stored in ascending order) then pass NULL to C func.
-      push(@result, "0");
-      next;
-    }
-    else
-    {
-      # The current argument index from the desired list is <= the current
-      # index so go to the next index.
-      shift(@arg_indices);
     }
 
     if ($cppParamType ne $cParamType) #If a type conversion is needed.
@@ -943,14 +936,16 @@ sub convert_args_c_to_cpp($$$)
 # $string get_ctor_properties($objCppfunc, $objCDefsFunc, $wrap_line_number, $index = 0)
 sub get_ctor_properties($$$$$)
 {
- my ($objCppfunc, $objCDefsFunc, $wrap_line_number, $index) = @_;
+  my ($objCppfunc, $objCDefsFunc, $wrap_line_number, $index) = @_;
 
   $index = 0 unless defined $index;
 
   my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
   my $cpp_param_optional = $$objCppfunc{param_optional};
+  my $cpp_param_mappings = $$objCppfunc{param_mappings};
   my $c_param_types = $$objCDefsFunc{param_types};
+  my $c_param_names = $$objCDefsFunc{param_names};
 
   my @result;
 
@@ -967,53 +962,42 @@ sub get_ctor_properties($$$$$)
 
 
   # Get the desired argument list combination.
-  my $possible_args_list = $$objCppfunc{possible_args_list};
-  my @arg_indices = split(" ", @$possible_args_list[$index]);
+  my $possible_arg_list = $$objCppfunc{possible_args_list}[$index];
 
-  # Loop through the cpp parameters:
- my $i = 0;
+  # Loop through the parameters:
+  my $i = 0;
 
- for ($i = 0; $i < $num_args; $i++)
- {
-   my $cppParamType = $$cpp_param_types[$i];
-   $cppParamType =~ s/ &/&/g; #Remove space between type and &
-   $cppParamType =~ s/ \*/*/g; #Remove space between type and *
-
-   my $cppParamName = $$cpp_param_names[$i];
-   my $cParamType = $$c_param_types[$i];
-
-   # Property name:
-   push(@result, "\"" . $cppParamName . "\"");
-
-  if(!@arg_indices)
+  for ($i = 0; $i < $num_args; $i++)
   {
-    # If there are no more arg indices that should be included, pass
-    # NULL to the C func unless the param is not optional (applies to a
-    # possibly added GError parameter).
-    if ($$cpp_param_optional[$i])
+    my $c_param_name = @$c_param_names[$i];
+    my $cpp_param_index = $i;
+    $cpp_param_index = $$cpp_param_mappings{$c_param_name} if(defined($$cpp_param_mappings{$c_param_name}));
+
+    my $cppParamType = $$cpp_param_types[$cpp_param_index];
+    $cppParamType =~ s/ &/&/g; #Remove space between type and &
+    $cppParamType =~ s/ \*/*/g; #Remove space between type and *
+
+    my $cppParamName = $$cpp_param_names[$cpp_param_index];
+    my $cParamType = $$c_param_types[$i];
+
+    # Property name:
+    push(@result, "\"" . $cppParamName . "\"");
+
+    if(!($possible_arg_list =~ /\b$cpp_param_index\b/))
     {
-      push(@result, "0");
-      next;
+      # If the C++ index is not found in the list of desired parameters, pass
+      # NULL to the C func unless the param is not optional.
+      if ($$cpp_param_optional[$cpp_param_index])
+      {
+        push(@result, "0");
+        next;
+      }
     }
-  }
-  elsif($arg_indices[0] > $i)
-  {
-    # If this argument is not in the desired argument list (The argument
-    # indices are stored in ascending order) then pass NULL to C func.
-    push(@result, "0");
-    next;
-  }
-  else
-  {
-    # The current argument index from the desired list is <= the current
-    # index so go to the next index.
-    shift(@arg_indices);
-  }
 
    # C property value:
-   if ($cppParamType ne $cParamType) #If a type conversion is needed.
-   {
-     push(@result, sprintf("_CONVERT(%s,%s,%s,%s)",
+    if ($cppParamType ne $cParamType) #If a type conversion is needed.
+    {
+      push(@result, sprintf("_CONVERT(%s,%s,%s,%s)",
                   $cppParamType,
                   $cParamType,
                   $cppParamName,

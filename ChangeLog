@@ -1,3 +1,20 @@
+2011-06-06  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: _WRAP_[CREATE|CTOR|METHOD]: Support parameter reordering.
+
+	* tools/pm/Function.pm (param_mappings): Add a new hash member mapping
+	C parameter names to C++ parameter indices.  The map is specified by
+	appending a {name[?]} to the desired C++ parameter name in the C++
+	method declaration.  A '-' in place of a C parameter name means to use
+	the C++ parameter name.
+	(parse_param): Modified to detect parameter mappings and set the
+	appropriate mapping in the above new member.  No mappings occur if
+	none are specified.
+	* tools/pm/Output.pm (convert_args_cpp_to_c):
+	(get_ctor_properties): Modified to use the new C param names to C++
+	param indices mappings member above to allow reordering of parameters
+	in the C++ method declaration.
+
 2011-06-05  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	gmmproc: Do not use NULL for optional parameters or properties.
