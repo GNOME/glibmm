@@ -282,7 +282,20 @@ sub output_wrap_meth($$$$$$$)
   my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl, $documentation, $ifdef) = @_;
   my $objDefsParser = $$self{objDefsParser};
 
+  my $cpp_param_names = $$objCppfunc{param_names};
+  my $cpp_param_types = $$objCppfunc{param_types};
+  my $cpp_param_mappings = $$objCppfunc{param_mappings};
+
   my $num_args_list = $objCppfunc->get_num_possible_args_list();
+
+  my $output_var_name;
+  my $output_var_type;
+
+  if(defined($$cpp_param_mappings{"RET"}))
+  {
+    $output_var_name = $$cpp_param_names[$$cpp_param_mappings{"RET"}];
+    $output_var_type = $$cpp_param_types[$$cpp_param_mappings{"RET"}];
+  }
 
   for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
   {
@@ -343,7 +356,7 @@ sub output_wrap_meth($$$$$$$)
     #Implementation:
     my $str;
     if ($$objCppfunc{static}) {
-      $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
+      $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
         $$objCppfunc{name},
         $$objCDefsFunc{c_name},
         $$objCppfunc{rettype},
@@ -354,9 +367,13 @@ sub output_wrap_meth($$$$$$$)
         $refneeded,
         $errthrow,
         $deprecated,
-        $ifdef);
+        $ifdef,
+        $output_var_name,
+        $output_var_type,
+        $line_num
+        );
     } else {
-      $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s)dnl\n",
+      $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s,%s,%s,%s)dnl\n",
         $$objCppfunc{name},
         $$objCDefsFunc{c_name},
         $$objCppfunc{rettype},
@@ -370,7 +387,10 @@ sub output_wrap_meth($$$$$$$)
         $deprecated,
         $constversion,
         $objCppfunc->args_names_only($arg_list),
-        $ifdef
+        $ifdef,
+        $output_var_name,
+        $output_var_type,
+        $line_num
         );
     }
     $self->append($str);
@@ -785,6 +805,19 @@ sub convert_args_cpp_to_c($$$$$)
 
   my $num_cpp_args = scalar(@{$cpp_param_types});
 
+  my $has_output_param = 0;
+  my $output_param_index;
+
+  # See if there is an output parameter.  If so, temporarily decrement the
+  # number of C++ arguments so that the possible GError addition works and
+  # note the existence.
+  if(defined($$cpp_param_mappings{"RET"}))
+  {
+    $num_cpp_args--;
+    $has_output_param = 1;
+    $output_param_index = $$cpp_param_mappings{"RET"};
+  }
+
   # add implicit last error parameter;
   if ( $automatic_error ne "" &&
        $num_cpp_args == ($num_c_args_expected - 1) &&
@@ -794,8 +827,13 @@ sub convert_args_cpp_to_c($$$$$)
     $cpp_param_names = [@{$cpp_param_names},"gerror"];
     $cpp_param_types = [@{$cpp_param_types},"GError*&"];
     $cpp_param_optional = [@{$cpp_param_optional}, 0];
+
     # Map from the C gerror param name to the newly added C++ param index.
-    $$cpp_param_mappings{@$c_param_names[$num_c_args_expected]} =$num_cpp_args - 1;
+    # The correct C++ index to map to (from the C name) depends on if there
+    # is an output parameter since it will be readded.
+    my $cpp_index = $num_cpp_args - 1;
+    $cpp_index++ if($has_output_param);
+    $$cpp_param_mappings{@$c_param_names[$num_c_args_expected]} = $cpp_index;
   }
 
   if ( $num_cpp_args != $num_c_args_expected )
@@ -809,6 +847,10 @@ sub convert_args_cpp_to_c($$$$$)
     return "";
   }
 
+  # If there is an output variable it must be processed so re-increment (now)
+  # the number of C++ arguments.
+  $num_cpp_args++ if($has_output_param);
+
   # Get the desired argument list combination.
   my $possible_arg_list = $$objCppfunc{possible_args_list}[$index];
 
@@ -819,9 +861,15 @@ sub convert_args_cpp_to_c($$$$$)
 
   for ($i = 0; $i < $cpp_param_max; $i++)
   {
+    # Skip the output parameter because it is handled in output_wrap_meth().
+    next if($has_output_param && $i == $output_param_index);
+
     #index of C parameter:
     my $iCParam = $i;
     if( !($static) ) { $iCParam++; }
+
+    # Account for a possible C++ output param in the C++ arg list.
+    $iCParam-- if($has_output_param && $i > $output_param_index);
 
     my $c_param_name = @$c_param_names[$iCParam];
     my $cpp_param_index = $i;

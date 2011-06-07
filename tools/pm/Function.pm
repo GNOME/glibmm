@@ -281,7 +281,7 @@ sub parse_param($$)
       $curr_param++;
 
       # Mappings from a C name to this C++ param defaults to empty (no mapping).
-      my $mapping = "";
+      $mapping = "";
 
       $id = 0;
 

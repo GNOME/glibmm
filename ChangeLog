@@ -1,3 +1,50 @@
+2011-06-07  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: _WRAP_METHOD: Add the possibility of an output parameter.
+
+	* tools/pm/Output.pm (output_wrap_meth): Modified to test if there is
+	a parameter mapping in the current C++ function from the hypothetical
+	C name 'RET' to a C++ parameter index.  If so, that parameter is
+	treated as an output parameter.  This allows wrap statements such as:
+	
+	_WRAP_METHOD(static void get_finish(Glib::RefPtr<Connection>&
+	  conn{RET}, const Glib::RefPtr<AsyncResult>& res), g_bus_get_finish,
+	  errthrow
+	)
+
+	Where the 'conn' parameter is an output parameter.  The output
+	parameter name and type are passed to the _STATIC_METHOD and _METHOD
+	macros (along with the wrap line number).
+
+	(convert_args_cpp_to_c): Modified to process the C++ parameters
+	dealing with the possibility of an output parameter.
+
+	* tools/pm/Function.pm: Typo.
+
+	* tools/m4/method.m4 (_METHOD):
+	(_STATIC_METHOD): Both modified to accept an optional output parameter
+	name, type and wrap line number and if they exist to ensure that the
+	output parameter is correctly set to the return of the C function.  To
+	do that it uses the new _INITIALIZE macro.
+
+	* tools/m4/convert_base.m4 (_INITIALIZER):
+	(_INITIALIZE):  Add macros (similar to the _CONVERSION/_CONVERT
+	macros) used to record how to initialize a C++ type from a C type and
+	later to initialize an output parameter of the C++ type.  The
+	_INITIALIZER macro has much the same syntax as the _CONVERSION macro.
+	For example:
+
+	  _INITIALIZER(`Glib::RefPtr<Connection>&',`GDBusConnection*',
+	    `$3 = Glib::wrap($4)')
+
+	Describes how to initialize a C++ reference to a Glib::RefPtr that
+	contains a Gio::DBus::Connection from its corresponding C type.  $3
+	represents the output parameter name and $4 represents the C return.
+
+	The _INITIALIZE macro can then be appropriately used by the _METHOD
+	and _STATIC_METHOD macros to initialize the output parameters passed
+	to them by gmmproc.
+
 2011-06-06  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	gmmproc: _WRAP_[CREATE|CTOR|METHOD]: Support parameter reordering.
