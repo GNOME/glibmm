@@ -762,8 +762,11 @@ void Connection::emit_signal(
   GError* gerror = 0;
 
   g_dbus_connection_emit_signal(gobj(),
-    destination_bus_name.c_str(), object_path.c_str(), interface_name.c_str(),
-    signal_name.c_str(), const_cast<GVariant*>(parameters.gobj()), &gerror);
+    (destination_bus_name.empty() ? 0 : destination_bus_name.c_str()),
+    (object_path.empty()? 0 : object_path.c_str()),
+    (interface_name.empty() ? 0 : interface_name.c_str()),
+    (signal_name.empty() ? 0 : signal_name.c_str()),
+    const_cast<GVariant*>(parameters.gobj()), &gerror);
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
