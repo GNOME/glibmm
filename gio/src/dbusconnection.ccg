@@ -761,6 +761,10 @@ void Connection::emit_signal(
 {
   GError* gerror = 0;
 
+  // Strings are checked to see if they are empty so that NULL can be passed
+  // for those strings to the C API.  This is done because some strings such as
+  // the bus name can be NULL in the C API meaning that the signal should be
+  // emitted to all the listeners.
   g_dbus_connection_emit_signal(gobj(),
     (destination_bus_name.empty() ? 0 : destination_bus_name.c_str()),
     (object_path.empty()? 0 : object_path.c_str()),
