@@ -254,13 +254,13 @@ sub parse_param($$)
 
       # Determine if the param is optional or if a C param name should be
       # mapped to the current C++ index (if name ends with {c_name?}). (A
-      # '-' for the name means use the C++ as the C name).
-      if ($name =~ /\{\s*(\w*|-)\s*(\??)\s*\}$/)
+      # '.' for the name means use the C++ as the C name).
+      if ($name =~ /\{\s*(\w*|\.)\s*(\??)\s*\}$/)
       {
         $is_optional = 1 if($2);
         $mapping = $1 if($1);
-        $name =~ s/\{\s*(\w|-)*\??\s*\}$//;
-        $mapping = $name if($mapping eq "-");
+        $name =~ s/\{\s*(\w|\.)*\??\s*\}$//;
+        $mapping = $name if($mapping eq ".");
       }
 
       push(@$param_types, $type);
@@ -326,13 +326,13 @@ sub parse_param($$)
 
   # Determine if the param is optional or if a C param name should be
   # mapped to the current C++ index (if name ends with {c_name?}). (A
-  # '-' for the name means use the C++ as the C name).
-  if ($name =~ /\{\s*(\w*|-)\s*(\??)\s*\}$/)
+  # '.' for the name means use the C++ as the C name).
+  if ($name =~ /\{\s*(\w*|\.)\s*(\??)\s*\}$/)
   {
     $is_optional = 1 if($2);
     $mapping = $1 if($1);
-    $name =~ s/\{\s*(\w*|-)\??\s*\}$//;
-    $mapping = $name if($mapping eq "-");
+    $name =~ s/\{\s*(\w*|\.)\??\s*\}$//;
+    $mapping = $name if($mapping eq ".");
   }
 
   push(@$param_types, $type);
