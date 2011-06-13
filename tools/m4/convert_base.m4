@@ -41,7 +41,7 @@ m4_ifelse(`$3',,,`define(CF`'__HASH2(`$1',`$2'),`$3')')
 define(`_INITIALIZE',`dnl
 m4_ifelse(`$1',void,`$4',`dnl
 pushdef(`__INI',`IN`'__HASH2(`$1',`$2')')dnl
-m4_ifdef(__INI,`m4_indir(__INI,`$1',`$2',`$3', `$4')',`
+m4_ifdef(__INI,`m4_indir(__INI,m4_substr(`$1',`0',m4_decr(m4_len(`$1'))),`$2',`$3', `$4')',`
 m4_errprint(`No initialization for type $1 from type $2 defined (line: $5, output param: $3, c return: $4)
 ')
 m4_m4exit(1)
