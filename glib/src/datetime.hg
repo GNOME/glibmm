@@ -1,0 +1,79 @@
+/* Copyright (C) 2011 The glibmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(glibmm,glib)
+
+#include <glibmmconfig.h>
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+#include <glib.h>
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GDateTime GDateTime;
+#endif
+
+namespace Glib
+{
+
+class TimeVal;
+class TimeZone;
+
+/** DateTime - A structure representing Date and Time.
+ * DateTime is a structure that combines a Gregorian date and time into a
+ * single structure. It provides many conversion and methods to manipulate
+ * dates and times. Time precision is provided down to microseconds and the
+ * time can range (proleptically) from 0001-01-01 00:00:00 to 9999-12-31
+ * 23:59:59.999999. DateTime follows POSIX time in the sense that it is
+ * oblivious to leap seconds.
+ *
+ * DateTime is an immutable object; once it has been created it cannot be
+ * modified further. All modifiers will create a new DateTime. Nearly all such
+ * functions can fail due to the date or time going out of range, in which case
+ * <tt>0</tt> will be returned.
+ *
+ * DateTime is reference counted.  When the reference count drops to 0, the
+ * resources allocated by the DateTime structure are released.
+ *
+ * Many parts of the API may produce non-obvious results. As an example, adding
+ * two months to January 31st will yield March 31st whereas adding one month
+ * and then one month again will yield either March 28th or March 29th. Also
+ * note that adding 24 hours is not always the same as adding one day (since
+ * days containing daylight savings time transitions are either 23 or 25 hours
+ * in length).
+ * @newin{2,30}
+ */
+class DateTime
+{
+  _CLASS_OPAQUE_REFCOUNTED(DateTime, GDateTime, NONE, g_date_time_ref, g_date_time_unref)
+  _IGNORE(g_date_time_ref, g_date_time_unref)
+
+public:
+ _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now(const Glib::RefPtr<const TimeZone>& timezone), g_date_time_new_now)
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_local(), g_date_time_new_now_local)
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_utc(), g_date_time_new_now_utc)
+
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_local(gint64 t), g_date_time_new_from_unix_local)
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_utc(gint64 t), g_date_time_new_from_unix_utc)
+
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_local(const TimeVal& tv), g_date_time_new_from_timeval_local)
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_utc(const TimeVal& tv), g_date_time_new_from_timeval_utc)
+
+  //TODO: Wrap the create() methods not creating now instances.
+  //TODO: Wrap the the rest of the methods.
+};
+
+} // namespace Glib

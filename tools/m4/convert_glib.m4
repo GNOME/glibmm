@@ -57,14 +57,15 @@ dnl
 dnl # These are for fixmegtkconst
 _CONVERSION(`const guchar*',`guchar*',`const_cast<guchar*>($3)',`$3')
 
-_CONV_GLIB_ENUM(IOStatus)
-_CONV_GLIB_ENUM(IOFlags)
 _CONV_GLIB_ENUM(IOCondition)
-_CONV_GLIB_ENUM(SeekType)
-_CONV_GLIB_ENUM(OptionArg)
+_CONV_GLIB_ENUM(IOFlags)
+_CONV_GLIB_ENUM(IOStatus)
 _CONV_GLIB_ENUM(KeyFileFlags)
+_CONV_GLIB_ENUM(OptionArg)
 _CONV_GLIB_ENUM(RegexCompileFlags)
 _CONV_GLIB_ENUM(RegexMatchFlags)
+_CONV_GLIB_ENUM(SeekType)
+_CONV_GLIB_ENUM(TimeType)
 
 
 _CONVERSION(`gunichar&',`gunichar*',`&($3)')
@@ -99,6 +100,13 @@ _CONVERSION(`return-gchar*',`Glib::ustring',`Glib::convert_return_gchar_ptr_to_u
 _CONVERSION(`return-gchar*',`std::string',`Glib::convert_return_gchar_ptr_to_stdstring($3)')
 _CONVERSION(`return-char*',`Glib::ustring',`Glib::convert_return_gchar_ptr_to_ustring($3)')
 
+dnl DateTime
+_CONVERSION(`GDateTime*',`Glib::RefPtr<DateTime>',`Glib::wrap($3)')
+
+dnl KeyFile
+_CONVERSION(`Glib::KeyFile&',`GKeyFile*',`($3).gobj()')
+
+dnl Object
 _CONVERSION(`const Glib::RefPtr<Glib::Object>&',`GObject*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const Glib::Object>&',`GObject*',__CONVERT_CONST_REFPTR_TO_P_SUN(Glib::Object))
 _CONVERSION(`GObject*',`Glib::RefPtr<Glib::Object>',`Glib::wrap($3)')
@@ -107,20 +115,32 @@ _CONVERSION(`GObject*',`Glib::RefPtr<const Glib::Object>',`Glib::wrap($3)')
 _CONVERSION(`GObject*',`Glib::RefPtr<Glib::ObjectBase>',`Glib::wrap($3)')
 _CONVERSION(`GObject*',`Glib::RefPtr<const Glib::ObjectBase>',`Glib::wrap($3)')
 
+dnl OptionGroup
+_CONVERSION(`OptionGroup&',`GOptionGroup*',`($3).gobj()')
+#_CONVERSION(`GOptionGroup*',`OptionGroup',`Glib::wrap(($3), true /* take_copy */)')
+
+dnl Regex
 _CONVERSION(`GRegex*',`Glib::RefPtr<Regex>',`Glib::wrap($3)')
 _CONVERSION(`GRegex*',`Glib::RefPtr<const Regex>',`Glib::wrap($3)')
 
+dnl TimeVal
+_CONVERSION(`const TimeVal&',`const GTimeVal*',`&($3)')
+
+dnl TimeZone
+_CONVERSION(`GTimeZone*',`Glib::RefPtr<TimeZone>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const TimeZone>&',`GTimeZone*',`const_cast<$2>(Glib::unwrap($3))')
+
+dnl ValueBase
 _CONVERSION(`Glib::ValueBase&',`GValue*',`($3).gobj()')
 _CONVERSION(`const Glib::ValueBase&',`const GValue*',`($3).gobj()')
 _CONVERSION(`const Glib::ValueBase&',`GValue*',`const_cast<GValue*>(($3).gobj())')
 _CONVERSION(`GValue*', `Glib::ValueBase&', `*reinterpret_cast<Glib::ValueBase*>($3)')
 _CONVERSION(`const GValue*', `const Glib::ValueBase&', `*reinterpret_cast<const Glib::ValueBase*>($3)')
 
-_CONVERSION(`OptionGroup&',`GOptionGroup*',`($3).gobj()')
-#_CONVERSION(`GOptionGroup*',`OptionGroup',`Glib::wrap(($3), true /* take_copy */)')
-
-_CONVERSION(`Glib::KeyFile&',`GKeyFile*',`($3).gobj()')
-
+dnl VariantType
 _CONVERSION(`const VariantType&',`const GVariantType*',`($3).gobj()')
 _CONVERSION(`const GVariantType*',`VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
 _CONVERSION(`GVariantType*',`VariantType',`Glib::wrap(($3), true)')
+
+dnl Misillaneous
+_CONVERSION(`gint64&',`gint64*',`&($3)')
