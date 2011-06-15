@@ -32,6 +32,11 @@ namespace Glib
 class TimeVal;
 class TimeZone;
 
+/** A value representing an interval of time, in microseconds.  As GTimeSpan,
+ * its underlying type is gint64.
+ */
+typedef GTimeSpan TimeSpan;
+
 /** DateTime - A structure representing Date and Time.
  * DateTime is a structure that combines a Gregorian date and time into a
  * single structure. It provides many conversion and methods to manipulate
@@ -62,7 +67,7 @@ class DateTime
   _IGNORE(g_date_time_ref, g_date_time_unref)
 
 public:
- _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now(const Glib::RefPtr<const TimeZone>& timezone), g_date_time_new_now)
+ _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now(const Glib::RefPtr<const TimeZone>& tz), g_date_time_new_now)
   _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_local(), g_date_time_new_now_local)
   _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_utc(), g_date_time_new_now_utc)
 
@@ -72,8 +77,47 @@ public:
   _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_local(const TimeVal& tv), g_date_time_new_from_timeval_local)
   _WRAP_METHOD(static Glib::RefPtr<DateTime> create_now_utc(const TimeVal& tv), g_date_time_new_from_timeval_utc)
 
-  //TODO: Wrap the create() methods not creating now instances.
-  //TODO: Wrap the the rest of the methods.
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create(const Glib::RefPtr<const TimeZone>& tz, int year, int month, int day, int hour, int minute, double seconds), g_date_time_new)
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create_local(int year, int month, int day, int hour, int minute, double seconds), g_date_time_new_local)
+  _WRAP_METHOD(static Glib::RefPtr<DateTime> create_utc(int year, int month, int day, int hour, int minute, double seconds), g_date_time_new_utc)
+
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add(TimeSpan timespan) const, g_date_time_add)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add_years(int years) const, g_date_time_add_years)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add_months(int months) const, g_date_time_add_months)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add_weeks(int weeks) const, g_date_time_add_weeks)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add_days(int days) const, g_date_time_add_days)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add_hours(int hours) const, g_date_time_add_hours)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add_minutes(int minutes) const, g_date_time_add_minutes)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add_seconds(double seconds) const, g_date_time_add_seconds)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> add_full(int years, int months, int days, int hours, int minutes, double seconds) const, g_date_time_add_full)
+  _WRAP_METHOD(TimeSpan difference(const Glib::RefPtr<const DateTime>& other) const, g_date_time_difference)
+
+  _WRAP_METHOD(int compare(const Glib::RefPtr<const DateTime>& other) const, g_date_time_compare)
+  _WRAP_METHOD(guint hash() const, g_date_time_hash)
+  _WRAP_METHOD(bool equal(const Glib::RefPtr<const DateTime>& other) const, g_date_time_equal)
+
+  _WRAP_METHOD(void get_ymd(int& year, int& month, int& day) const, g_date_time_get_ymd)
+  _WRAP_METHOD(int get_year() const, g_date_time_get_year)
+  _WRAP_METHOD(int get_month() const, g_date_time_get_month)
+  _WRAP_METHOD(int get_day_of_month() const, g_date_time_get_day_of_month)
+  _WRAP_METHOD(int get_week_numbering_year() const, g_date_time_get_week_numbering_year)
+  _WRAP_METHOD(int get_week_of_year() const, g_date_time_get_week_of_year)
+  _WRAP_METHOD(int get_day_of_week() const, g_date_time_get_day_of_week)
+  _WRAP_METHOD(int get_day_of_year() const, g_date_time_get_day_of_year)
+  _WRAP_METHOD(int get_hour() const, g_date_time_get_hour)
+  _WRAP_METHOD(int get_minute() const, g_date_time_get_minute)
+  _WRAP_METHOD(int get_second() const, g_date_time_get_second)
+  _WRAP_METHOD(int get_microsecond() const, g_date_time_get_microsecond)
+  _WRAP_METHOD(double get_seconds() const, g_date_time_get_seconds)
+  _WRAP_METHOD(gint64 to_unix() const, g_date_time_to_unix)
+  _WRAP_METHOD(bool to_timeval(TimeVal& tv) const, g_date_time_to_timeval)
+  _WRAP_METHOD(TimeSpan get_utc_offset() const, g_date_time_get_utc_offset)
+  _WRAP_METHOD(Glib::ustring get_timezone_abbreviation() const, g_date_time_get_timezone_abbreviation)
+  _WRAP_METHOD(bool is_daylight_savings() const, g_date_time_is_daylight_savings)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> to_timezone(const Glib::RefPtr<const TimeZone>& tz) const, g_date_time_to_timezone)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> to_local() const, g_date_time_to_local)
+  _WRAP_METHOD(Glib::RefPtr<DateTime> to_utc() const, g_date_time_to_utc)
+  _WRAP_METHOD(Glib::ustring format(const Glib::ustring& format) const, g_date_time_format)
 };
 
 } // namespace Glib

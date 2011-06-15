@@ -29,11 +29,13 @@ _EQUAL(gdouble*,double*)
 _EQUAL(gfloat, float)
 _EQUAL(float*,gfloat[])
 
-_EQUAL(GdkAtom,Gdk::Atom)
 _EQUAL(const-char*,const-gchar*)
 _EQUAL(return-char*,return-gchar*)
 _EQUAL(gpointer,void*)
 _EQUAL(gconstpointer,const void*)
+
+_EQUAL(GdkAtom,Gdk::Atom)
+_EQUAL(GTimeSpan,TimeSpan)
 
 # Basic Types
 _CONVERSION(`int',`bool',`$3')
@@ -102,6 +104,7 @@ _CONVERSION(`return-char*',`Glib::ustring',`Glib::convert_return_gchar_ptr_to_us
 
 dnl DateTime
 _CONVERSION(`GDateTime*',`Glib::RefPtr<DateTime>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const DateTime>&',`GDateTime*',`const_cast<$2>(Glib::unwrap($3))')
 
 dnl KeyFile
 _CONVERSION(`Glib::KeyFile&',`GKeyFile*',`($3).gobj()')
@@ -125,6 +128,7 @@ _CONVERSION(`GRegex*',`Glib::RefPtr<const Regex>',`Glib::wrap($3)')
 
 dnl TimeVal
 _CONVERSION(`const TimeVal&',`const GTimeVal*',`&($3)')
+_CONVERSION(`TimeVal&',`GTimeVal*',`&($3)')
 
 dnl TimeZone
 _CONVERSION(`GTimeZone*',`Glib::RefPtr<TimeZone>',`Glib::wrap($3)')

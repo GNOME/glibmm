@@ -1,0 +1,163 @@
+--- glib_functions.defs	2011-06-15 16:16:57.000000000 -0400
++++ glib_functions_new.defs	2011-06-15 16:16:06.000000000 -0400
+@@ -627,7 +627,7 @@
+   (c-name "GThreadError")
+   (gtype-id "G_TYPE_THREAD_ERROR")
+   (values
+-    '("n" "G_THREAD_ERROR_AGAIN")
++    '("again" "G_THREAD_ERROR_AGAIN")
+   )
+ )
+ 
+@@ -2482,7 +2482,7 @@
+   )
+ )
+ 
+-(define-method 
++(define-method iconv
+   (of-object "GIConv")
+   (c-name "g_iconv")
+   (return-type "gsize")
+@@ -3286,12 +3286,98 @@
+   )
+ )
+ 
+-(define-function g_date_time_compare
++(define-method add
++  (of-object "GDateTime")
++  (c-name "g_date_time_add")
++  (return-type "GDateTime*")
++  (parameters
++    '("GTimeSpan" "timespan")
++  )
++)
++
++(define-method add_years
++  (of-object "GDateTime")
++  (c-name "g_date_time_add_years")
++  (return-type "GDateTime*")
++  (parameters
++    '("gint" "years")
++  )
++)
++
++(define-method add_months
++  (of-object "GDateTime")
++  (c-name "g_date_time_add_months")
++  (return-type "GDateTime*")
++  (parameters
++    '("gint" "months")
++  )
++)
++
++(define-method add_weeks
++  (of-object "GDateTime")
++  (c-name "g_date_time_add_weeks")
++  (return-type "GDateTime*")
++  (parameters
++    '("gint" "weeks")
++  )
++)
++
++(define-method add_days
++  (of-object "GDateTime")
++  (c-name "g_date_time_add_days")
++  (return-type "GDateTime*")
++  (parameters
++    '("gint" "days")
++  )
++)
++
++(define-method add_hours
++  (of-object "GDateTime")
++  (c-name "g_date_time_add_hours")
++  (return-type "GDateTime*")
++  (parameters
++    '("gint" "hours")
++  )
++)
++
++(define-method add_minutes
++  (of-object "GDateTime")
++  (c-name "g_date_time_add_minutes")
++  (return-type "GDateTime*")
++  (parameters
++    '("gint" "minutes")
++  )
++)
++
++(define-method add_seconds
++  (of-object "GDateTime")
++  (c-name "g_date_time_add_seconds")
++  (return-type "GDateTime*")
++  (parameters
++    '("gdouble" "seconds")
++  )
++)
++
++(define-method add_full
++  (of-object "GDateTime")
++  (c-name "g_date_time_add_full")
++  (return-type "GDateTime*")
++  (parameters
++    '("gint" "years")
++    '("gint" "months")
++    '("gint" "days")
++    '("gint" "hours")
++    '("gint" "minutes")
++    '("gdouble" "seconds")
++  )
++)
++
++(define-method compare
++  (of-object "GDateTime")
+   (c-name "g_date_time_compare")
+   (return-type "gint")
+   (parameters
+-    '("gconstpointer" "dt1")
+-    '("gconstpointer" "dt2")
++    '("GDateTime*" "dt2")
+   )
+ )
+ 
+@@ -3304,20 +3390,18 @@
+   )
+ )
+ 
+-(define-function g_date_time_hash
++(define-method hash
++  (of-object "GDateTime")
+   (c-name "g_date_time_hash")
+   (return-type "guint")
+-  (parameters
+-    '("gconstpointer" "datetime")
+-  )
+ )
+ 
+-(define-function g_date_time_equal
++(define-method equal
++  (of-object "GDateTime")
+   (c-name "g_date_time_equal")
+   (return-type "gboolean")
+   (parameters
+-    '("gconstpointer" "dt1")
+-    '("gconstpointer" "dt2")
++    '("GDateTime*" "dt2")
+   )
+ )
+ 
+@@ -12131,14 +12215,6 @@
+   )
+ )
+ 
+-(define-function atexit
+-  (c-name "atexit")
+-  (return-type "int")
+-  (parameters
+-    '("void" "(*")
+-  )
+-)
+-
+ (define-function g_find_program_in_path
+   (c-name "g_find_program_in_path")
+   (return-type "gchar*")
