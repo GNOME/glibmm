@@ -103,8 +103,8 @@ _CONVERSION(`return-gchar*',`std::string',`Glib::convert_return_gchar_ptr_to_std
 _CONVERSION(`return-char*',`Glib::ustring',`Glib::convert_return_gchar_ptr_to_ustring($3)')
 
 dnl DateTime
-_CONVERSION(`GDateTime*',`Glib::RefPtr<DateTime>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<const DateTime>&',`GDateTime*',`const_cast<$2>(Glib::unwrap($3))')
+_CONVERSION(`GDateTime*',`DateTime',`Glib::wrap($3)')
+_CONVERSION(`const DateTime&',`GDateTime*',`const_cast<$2>($3.gobj())')
 
 dnl KeyFile
 _CONVERSION(`Glib::KeyFile&',`GKeyFile*',`($3).gobj()')
@@ -131,8 +131,8 @@ _CONVERSION(`const TimeVal&',`const GTimeVal*',`&($3)')
 _CONVERSION(`TimeVal&',`GTimeVal*',`&($3)')
 
 dnl TimeZone
-_CONVERSION(`GTimeZone*',`Glib::RefPtr<TimeZone>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<const TimeZone>&',`GTimeZone*',`const_cast<$2>(Glib::unwrap($3))')
+_CONVERSION(`GTimeZone*',`TimeZone',`Glib::wrap($3)')
+_CONVERSION(`const TimeZone&',`GTimeZone*',`const_cast<$2>($3.gobj())')
 
 dnl ValueBase
 _CONVERSION(`Glib::ValueBase&',`GValue*',`($3).gobj()')
