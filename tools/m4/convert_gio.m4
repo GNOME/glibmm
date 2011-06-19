@@ -214,6 +214,9 @@ _CONVERSION(`const Glib::RefPtr<SocketConnection>&',`GSocketConnection*',__CONVE
 #SocketControlMessage
 _CONVERSION(`GSocketControlMessage*',`Glib::RefPtr<SocketControlMessage>',`Glib::wrap($3)')
 
+#TimeZoneMonitor
+_CONVERSION(`GTimeZoneMonitor*',`Glib::RefPtr<TimeZoneMonitor>',`Glib::wrap($3)')
+
 #UnixFDList
 _CONVERSION(`GUnixFDList*',`Glib::RefPtr<UnixFDList>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<UnixFDList>&',`GUnixFDList*',`Glib::unwrap($3)')
