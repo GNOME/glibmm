@@ -1,5 +1,19 @@
 2011-07-12  Murray Cumming  <murrayc@murrayc.com>
 
+	AppInfo::launch(): Correct the parameter type.
+
+	* gio/src/appinfo.hg: g_app_info_launch() takes a GList of GFile, not of 
+	strings. Also use a vector instead of a ListHandle, as per our new convention.
+	It is acceptable to change this API/ABI because this method could never 
+	possibly have been used by any application without crashes, so this can't 
+	make anything worse.
+	Also add an overload without the launch_context parameter, using the new {?} 
+	syntax.
+	Luckily we did not implement the vfuncs, or maybe we disabled them because of 
+	the crashes.
+
+2011-07-12  Murray Cumming  <murrayc@murrayc.com>
+
 	AppInfo::launch_uris(): Corrected (with deprecation) and add overload.
 
 	* gio/src/appinfo.[hg|ccg]: Deprecate the existing method and add one that 

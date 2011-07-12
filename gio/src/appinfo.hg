@@ -99,8 +99,10 @@ public:
                g_app_info_get_icon,
                refreturn, constversion)
 
-  _WRAP_METHOD(bool launch(const Glib::ListHandle<std::string>& files,
-                           const Glib::RefPtr<AppLaunchContext>& launch_context),
+#m4 _CONVERSION(`const std::vector< Glib::RefPtr<Gio::File> >&',`GList*',`Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list($3).data ()')
+
+  _WRAP_METHOD(bool launch(const std::vector< Glib::RefPtr<Gio::File> >& files,
+                           const Glib::RefPtr<AppLaunchContext>& launch_context{?}),
                g_app_info_launch,
                errthrow)
 
@@ -154,9 +156,9 @@ protected:
   //_WRAP_VFUNC(std::string get_description() const, "get_description")
   //_WRAP_VFUNC(std::string get_executable() const, "get_executable")
   //_WRAP_VFUNC(Glib::RefPtr<Icon> get_icon() const, "get_icon")
-#m4 _CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
-#m4 _CONVERSION(`GList*',`const Glib::ListHandle<std::string>&',`Glib::ListHandle<std::string>($3, Glib::OWNERSHIP_NONE)')
-  //_WRAP_VFUNC(bool launch(const Glib::ListHandle<std::string>& filenames, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch")
+//#m4 _CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
+//#m4 _CONVERSION(`GList*',`const Glib::ListHandle<std::string>&',`Glib::ListHandle<std::string>($3, Glib::OWNERSHIP_NONE)')
+  //_WRAP_VFUNC(bool launch(const std::vector<Gio::File>& filenames, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch")
   //_WRAP_VFUNC(bool supports_uris() const, "supports_uris")
   //_WRAP_VFUNC(bool supports_files() const, "supports_files")
   //_WRAP_VFUNC(bool launch_uris(const Glib::ListHandle<std::string>& uris, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch_uris")
