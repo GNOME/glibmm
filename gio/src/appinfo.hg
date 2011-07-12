@@ -103,12 +103,21 @@ public:
                            const Glib::RefPtr<AppLaunchContext>& launch_context),
                g_app_info_launch,
                errthrow)
+
   _WRAP_METHOD(bool supports_uris() const, g_app_info_supports_uris)
   _WRAP_METHOD(bool supports_files() const, g_app_info_supports_files)
+
   _WRAP_METHOD(bool launch_uris(const Glib::ListHandle<std::string>& uris,
                                 GAppLaunchContext* launch_context),
                g_app_info_launch_uris,
+               errthrow, deprecated "Use the method that takes an AppLaunchContext")
+
+  //TODO: I think we use Glib::ustring elsewhere for URIs:
+  _WRAP_METHOD(bool launch_uris(const Glib::ListHandle<std::string>& uris,
+                                const Glib::RefPtr<AppLaunchContext>& launch_context{?}),
+               g_app_info_launch_uris,
                errthrow)
+                 
   _WRAP_METHOD(bool should_show() const, g_app_info_should_show)
   // FIXME: use better terminology than delete/do_delete
   _WRAP_METHOD(bool can_delete() const, g_app_info_can_delete)
