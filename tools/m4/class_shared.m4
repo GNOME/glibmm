@@ -253,6 +253,7 @@ typedef struct _`'__CNAME__ __CNAME__;
 typedef struct _`'__CNAME__`'Class __CNAME__`'Class;
 ')dnl
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+undefine(`__BOOL_STRUCT_NOT_HIDDEN__')dnl
 ')
 
 dnl _GTKMMPROC_WIN32_NO_WRAP
