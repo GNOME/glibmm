@@ -82,7 +82,6 @@ int main(int, char**)
             << get_defs(G_TYPE_SETTINGS_BACKEND)
             << get_defs(G_TYPE_SIMPLE_ASYNC_RESULT)
             << get_defs(G_TYPE_THEMED_ICON)
-            << get_defs(G_TYPE_TIME_ZONE_MONITOR)
 
             //TODO: This causes a g_warning:
             //GLib-GObject-CRITICAL **: g_param_spec_pool_list: assertion `pool != NULL' failed"
