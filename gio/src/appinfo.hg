@@ -99,16 +99,107 @@ public:
                g_app_info_get_icon,
                refreturn, constversion)
 
-  _WRAP_METHOD(bool launch(const Glib::ListHandle<std::string>& files,
-                           const Glib::RefPtr<AppLaunchContext>& launch_context),
+#m4 _CONVERSION(`const std::vector< Glib::RefPtr<Gio::File> >&',`GList*',`Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list($3).data ()')
+
+  /** Launches the application. This passes the @a file to the launched application
+   * as an argument, using the optional @a launch_context to get information
+   * about the details of the launcher (like what screen it is on).
+   * On error, an exception will be thrown accordingly.
+   * 
+   * Note that even if the launch is successful the application launched
+   * can fail to start if it runs into problems during startup. There is
+   * no way to detect this.
+   * 
+   * Some URIs can be changed when passed through a GFile (for instance
+   * unsupported uris with strange formats like mailto:), so if you have
+   * a textual uri you want to pass in as argument, consider using
+   * launch_uris() instead.
+   * 
+   * On UNIX, this function sets the <envar>GIO_LAUNCHED_DESKTOP_FILE</envar>
+   * environment variable with the path of the launched desktop file and
+   * <envar>GIO_LAUNCHED_DESKTOP_FILE_PID</envar> to the process
+   * id of the launched process. This can be used to ignore
+   * <envar>GIO_LAUNCHED_DESKTOP_FILE</envar>, should it be inherited
+   * by further processes. The <envar>DISPLAY</envar> and
+   * <envar>DESKTOP_STARTUP_ID</envar> environment variables are also
+   * set, based on information provided in @a launch_context.
+   * @param files A List of File objects.
+   * @param launch_context An AppLaunchContext.
+   * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
+   *
+   * @newin{3,2}
+   */
+  bool launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& launch_context);
+  
+  /** Launches the application. This passes the @a file to the launched application
+   * as an arguments.
+   * On error, an exception will be thrown accordingly.
+   * 
+   * Note that even if the launch is successful the application launched
+   * can fail to start if it runs into problems during startup. There is
+   * no way to detect this.
+   * 
+   * Some URIs can be changed when passed through a GFile (for instance
+   * unsupported uris with strange formats like mailto:), so if you have
+   * a textual uri you want to pass in as argument, consider using
+   * launch_uris() instead.
+   * 
+   * On UNIX, this function sets the <envar>GIO_LAUNCHED_DESKTOP_FILE</envar>
+   * environment variable with the path of the launched desktop file and
+   * <envar>GIO_LAUNCHED_DESKTOP_FILE_PID</envar> to the process
+   * id of the launched process. This can be used to ignore
+   * <envar>GIO_LAUNCHED_DESKTOP_FILE</envar>, should it be inherited
+   * by further processes. The <envar>DISPLAY</envar> and
+   * <envar>DESKTOP_STARTUP_ID</envar> environment variables are also
+   * set, based on information provided in @a launch_context.
+   * @param files A File object.
+   * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
+   *
+   * @newin{3,2}
+   */
+  bool launch(const Glib::RefPtr<Gio::File>& file);
+  
+  _WRAP_METHOD(bool launch(const std::vector< Glib::RefPtr<Gio::File> >& files,
+                           const Glib::RefPtr<AppLaunchContext>& launch_context{?}),
                g_app_info_launch,
                errthrow)
+
   _WRAP_METHOD(bool supports_uris() const, g_app_info_supports_uris)
   _WRAP_METHOD(bool supports_files() const, g_app_info_supports_files)
+
   _WRAP_METHOD(bool launch_uris(const Glib::ListHandle<std::string>& uris,
                                 GAppLaunchContext* launch_context),
                g_app_info_launch_uris,
+               errthrow, deprecated "Use the method that takes an AppLaunchContext")
+
+  //TODO: I think we use Glib::ustring elsewhere for URIs:
+  _WRAP_METHOD(bool launch_uris(const Glib::ListHandle<std::string>& uris,
+                                const Glib::RefPtr<AppLaunchContext>& launch_context{?}),
+               g_app_info_launch_uris,
                errthrow)
+               
+  /** Launches the application. This passes the @a uri to the launched application
+   * as an arguments, using the optional @a launch_context to get information
+   * about the details of the launcher (like what screen it is on).
+   * On error, an exception will be thrown accordingly.
+   * 
+   * Note that even if the launch is successful the application launched
+   * can fail to start if it runs into problems during startup. There is
+   * no way to detect this.
+   * @param uris A URIs to launch.
+   * @param launch_context An AppLaunchContext.
+   * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
+   *
+   * @newin{3,2}
+   */
+  bool launch_uri(const std::string& uris, const Glib::RefPtr<AppLaunchContext>& launch_context);
+
+  /** A launch_uri() convenience overload.
+   *
+   * @newin{3,2}
+   */
+  bool launch_uri(const std::string& uris);
+  
   _WRAP_METHOD(bool should_show() const, g_app_info_should_show)
   // FIXME: use better terminology than delete/do_delete
   _WRAP_METHOD(bool can_delete() const, g_app_info_can_delete)
@@ -145,9 +236,9 @@ protected:
   //_WRAP_VFUNC(std::string get_description() const, "get_description")
   //_WRAP_VFUNC(std::string get_executable() const, "get_executable")
   //_WRAP_VFUNC(Glib::RefPtr<Icon> get_icon() const, "get_icon")
-#m4 _CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
-#m4 _CONVERSION(`GList*',`const Glib::ListHandle<std::string>&',`Glib::ListHandle<std::string>($3, Glib::OWNERSHIP_NONE)')
-  //_WRAP_VFUNC(bool launch(const Glib::ListHandle<std::string>& filenames, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch")
+//#m4 _CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
+//#m4 _CONVERSION(`GList*',`const Glib::ListHandle<std::string>&',`Glib::ListHandle<std::string>($3, Glib::OWNERSHIP_NONE)')
+  //_WRAP_VFUNC(bool launch(const std::vector<Gio::File>& filenames, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch")
   //_WRAP_VFUNC(bool supports_uris() const, "supports_uris")
   //_WRAP_VFUNC(bool supports_files() const, "supports_files")
   //_WRAP_VFUNC(bool launch_uris(const Glib::ListHandle<std::string>& uris, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch_uris")

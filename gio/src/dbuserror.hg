@@ -18,58 +18,32 @@
  */
 
 _DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
 
 namespace Gio
 {
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+//Our custom friend declaration (see below) needs this pre-declaration.
+void wrap_init();
+#endif // DOXYGEN_SHOULD_SKIP_THIS
+
 namespace DBus
 {
 
-namespace Error
-{
+//The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the DBus sub-namespace
+_GMMPROC_EXTRA_NAMESPACE(DBus)
 
-/** Checks if @a error represents an error received via D-Bus from a remote
- * peer.  If so, use get_remote_error() to get the name of the error.
- *
- * @param error A Glib::Error.  
- * @return <tt>true</tt> if error represents an error from a remote peer,
- * <tt>false</tt> otherwise. 
- * @newin{2,28}
- * @ingroup DBus
- */
-bool is_remote_error(const Glib::Error& error);
 
-/** Gets the D-Bus error name used for @a error, if any.
- *
- * This function is guaranteed to return a D-Bus error name for all
- * Glib::Error instances returned from functions handling remote method calls
- * (e.g. Gio::DBusConnection::call_finish()) unless strip_remote_error() has
- * been used on @a error.
- *
- * @param error A Glib::Error.
- * @return An allocated string or <tt>0</tt> if the D-Bus error name could not
- * be found.
- * @newin{2,28}
- * @ingroup DBus
- */
-Glib::ustring get_remote_error(const Glib::Error& error);
+#m4 _PUSH(SECTION_H_GERROR_PRIVATE)
+  //This extra line is only necessary because this class is in a sub-namespace, but we want 
+  //it to be used in the wrap_init() of the main namespace. It's an awkward hack.
+  friend void Gio::wrap_init(); // uses throw_func()
+#m4 _POP()
 
-/** Looks for extra information in the error message used to recover the D-Bus
- * error name and strips it if found. If stripped, the message field in @a
- * error will correspond exactly to what was received on the wire.
- *
- * This is typically used when presenting errors to the end user.
- *
- * @param error A Glib::Error.  
- * @return <tt>true</tt> if information was stripped, <tt>false</tt>
- * otherwise. 
- * @newin{2,28}
- * @ingroup DBus
- */
-bool strip_remote_error(Glib::Error& error);
+_WRAP_GERROR(Error, GDBusError, G_DBUS_ERROR, NO_GTYPE)
 
-} // namespace Error
-
-} // namespace DBus
+} //namespace DBus
 
 } // namespace Gio
+

@@ -20,170 +20,178 @@
 #include <glibmm/object.h>
 #include <giomm/initable.h>
 #include <giomm/asyncinitable.h>
+#include <giomm/dbusauthobserver.h>
+#include <giomm/dbusmethodinvocation.h>
+#include <giomm/dbusintrospection.h>
 #include <giomm/iostream.h>
 #include <giomm/asyncresult.h>
 #include <giomm/credentials.h>
 #include <giomm/dbusmessage.h>
+#include <giomm/dbussubtreevtable.h>
 #include <gio/gio.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
-//TODO: Use a GDbus namespace, and remove the DBus prefixes.
 namespace Gio
 {
 
+namespace DBus
+{
+
 _WRAP_ENUM(BusType, GBusType)
-_WRAP_ENUM(DBusCallFlags, GDBusCallFlags, NO_GTYPE)
-_WRAP_ENUM(DBusConnectionFlags, GDBusConnectionFlags, NO_GTYPE)
-_WRAP_ENUM(DBusSendMessageFlags, GDBusSendMessageFlags, NO_GTYPE)
-_WRAP_ENUM(DBusSignalFlags, GDBusSignalFlags, NO_GTYPE)
-_WRAP_ENUM(DBusSubtreeFlags, GDBusSubtreeFlags, NO_GTYPE)
+_WRAP_ENUM(CallFlags, GDBusCallFlags, s#^DBUS_##, NO_GTYPE)
+_WRAP_ENUM(ConnectionFlags, GDBusConnectionFlags, s#^DBUS_##, NO_GTYPE)
+_WRAP_ENUM(SendMessageFlags, GDBusSendMessageFlags, s#^DBUS_##, NO_GTYPE)
+_WRAP_ENUM(SignalFlags, GDBusSignalFlags, s#^DBUS_##, NO_GTYPE)
+_WRAP_ENUM(SubtreeFlags, GDBusSubtreeFlags, s#^DBUS_##, NO_GTYPE)
 
-class DBusAuthObserver;
-class DBusInterfaceInfo;
-class DBusInterfaceVTable;
-class DBusMethodInvocation;
-class DBusSubtreeVTable;
+_GMMPROC_EXTRA_NAMESPACE(DBus)
 
-/// @defgroup DBus D-Bus API
+
+/** @defgroup DBus D-Bus API
+ *
+ * API to use D-Bus services as a client or to implement a D-Bus service.
+ * To write client code, see Gio::DBus::Proxy. 
+ * To export objects on the bus for other clients, see Gio::DBus::own_name(), for instance.
+ */
 
 //TODO: Add example from C API in class docs.
-/** DBusConnection - D-Bus Connections.
- * The DBusConnection type is used for D-Bus connections to remote peers such
+/** A D-Bus Connection.
+ * The Connection type is used for D-Bus connections to remote peers such
  * as a message buses. It is a low-level API that offers a lot of flexibility.
  * For instance, it lets you establish a connection over any transport that
  * can by represented as an IOStream.
  *
- * This class is rarely used directly in D-Bus clients. If you are writing an
+ * This class is rarely used directly in D-Bus clients. If you are writing a
  * D-Bus client, it is often easier to use the Gio::DBus::own_name(),
- * Gio::DBus::watch_name() or DBusProxy::create_for_bus() APIs.
+ * Gio::DBus::watch_name() or Gio::DBus::Proxy::create_for_bus() APIs.
  *
  * @newin{2,28}
  * @ingroup DBus
  */
-class DBusConnection
+class Connection
 : public Glib::Object, public Initable, public AsyncInitable
 {
 protected:
-  _CLASS_GOBJECT(DBusConnection, GDBusConnection, G_DBUS_CONNECTION, Glib::Object, GObject)
+  _CLASS_GOBJECT(Connection, GDBusConnection, G_DBUS_CONNECTION, Glib::Object, GObject)
   _IMPLEMENTS_INTERFACE(Initable)
   _IMPLEMENTS_INTERFACE(AsyncInitable)
 
 protected:
 
-  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  Connection(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  Connection(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  Connection(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const SlotAsyncReady& slot,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  Connection(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
     const SlotAsyncReady& slot,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  Connection(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  Connection(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  Connection(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
-    DBusConnectionFlags flags);
+    const Glib::RefPtr<AuthObserver>& observer,
+    ConnectionFlags flags);
 
-  DBusConnection(const Glib::RefPtr<IOStream>& stream,
+  Connection(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const std::string& address,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
-    const SlotAsyncReady& slot,
-    const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags);
-
-  DBusConnection(const std::string& address,
+  Connection(const std::string& address,
+    const Glib::RefPtr<AuthObserver>& observer,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const std::string& address,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+  Connection(const std::string& address,
     const SlotAsyncReady& slot,
-    DBusConnectionFlags flags);
+    const Glib::RefPtr<Cancellable>& cancellable,
+    ConnectionFlags flags);
 
-  DBusConnection(const std::string& address,
+  Connection(const std::string& address,
+    const Glib::RefPtr<AuthObserver>& observer,
     const SlotAsyncReady& slot,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const std::string& address,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+  Connection(const std::string& address,
+    const SlotAsyncReady& slot,
+    ConnectionFlags flags);
+
+  Connection(const std::string& address,
+    const Glib::RefPtr<AuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const std::string& address,
+  Connection(const std::string& address,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags);
+    ConnectionFlags flags);
 
-  DBusConnection(const std::string& address,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
-    DBusConnectionFlags flags);
+  Connection(const std::string& address,
+    const Glib::RefPtr<AuthObserver>& observer,
+    ConnectionFlags flags);
 
-  DBusConnection(const std::string& address,
-    DBusConnectionFlags flags);
+  Connection(const std::string& address,
+    ConnectionFlags flags);
 
 public:
 
   /** Signature for slot used in signal_subscribe().
    *  For example,
    * @code
-   * void on_signal(const Glib::RefPtr<DBusConnection>& connection, const
+   * void on_signal(const Glib::RefPtr<Connection>& connection, const
    * Glib::ustring& sender_name, const Glib::ustring& object_path, const
    * Glib::ustring& object_path, const Glib::ustring& interface_name, const
-   * Glib::ustring& signal_name, const Glib::VariantBase& parameters);.
+   * Glib::ustring& signal_name, const Glib::VariantContainerBase& parameters);.
    * @endcode
    */
-  typedef sigc::slot<void, const Glib::RefPtr<DBusConnection>&,
+  typedef sigc::slot<void, const Glib::RefPtr<Connection>&,
     const Glib::ustring&, const Glib::ustring&, const Glib::ustring&,
-    const Glib::ustring&, const Glib::VariantBase&> SlotSignal;
+    const Glib::ustring&, const Glib::VariantContainerBase&> SlotSignal;
 
   /** Signature for slot used in add_filter().
    *  For example,
    * @code
-   * Glib::RefPtr<DBusMessage> on_message_filter(const
-   * Glib::RefPtr<DBusConnection> connection, const Glib::RefPtr<DBusMessage>&
+   * Glib::RefPtr<Message> on_message_filter(const
+   * Glib::RefPtr<Connection> connection, const Glib::RefPtr<Message>&
    * message, bool incoming);.
    * @endcode
    *
-   * A filter function is passed a DBusMessage and expected to return a
-   * DBusMessage too. Passive filter functions that don't modify the message
+   * A filter function is passed a Message and expected to return a
+   * Message too. Passive filter functions that don't modify the message
    * can simply return the message object.  Filter functions that wants to
    * drop a message can simply return <tt>0</tt>.  And filter function may
    * modify a message by copying it and return the copy.
    */
-  typedef sigc::slot<Glib::RefPtr<DBusMessage>,
-    const Glib::RefPtr<DBusConnection>&,
-    const Glib::RefPtr<DBusMessage>&, bool> SlotMessageFilter;
+  typedef sigc::slot<Glib::RefPtr<Message>,
+    const Glib::RefPtr<Connection>&,
+    const Glib::RefPtr<Message>&, bool> SlotMessageFilter;
 
   /** Asynchronously connects to the message bus specified by @a bus_type.
    *
@@ -209,128 +217,128 @@ public:
 
   _WRAP_METHOD_DOCS_ONLY( g_bus_get_finish, errthrow)
   /// @throw Glib::Error.
-  _WRAP_METHOD(static Glib::RefPtr<DBusConnection> get_finish(const Glib::RefPtr<AsyncResult>& res), g_bus_get_finish, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Connection> get_finish(const Glib::RefPtr<AsyncResult>& res), g_bus_get_finish, errthrow)
 
-  _WRAP_METHOD(static Glib::RefPtr<DBusConnection> get_sync(BusType bus_type, const Glib::RefPtr<Cancellable>& cancellable), g_bus_get_sync, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Connection> get_sync(BusType bus_type, const Glib::RefPtr<Cancellable>& cancellable), g_bus_get_sync, errthrow)
 
   /// A Non-cancellable version of get_sync().
-  static Glib::RefPtr<DBusConnection> get_sync(BusType bus_type);
+  static Glib::RefPtr<Connection> get_sync(BusType bus_type);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new)
   static void create(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new)
   static void create(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /// Non-cancellable version of create().
   static void create(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const SlotAsyncReady& slot,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /// Non-cancellable version of create().
   static void create(const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
     const SlotAsyncReady& slot,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_finish)
   /// @throw Glib::Error.
-  _WRAP_METHOD(static Glib::RefPtr<DBusConnection> create_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_connection_new_finish, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Connection> create_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_connection_new_finish, errthrow)
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address)
   static void create_for_address(const std::string& address,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address)
   static void create_for_address(const std::string& address,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /// Non-cancellable version of create_for_address().
   static void create_for_address(const std::string& address,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const SlotAsyncReady& slot,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /// Non-cancellable version of create_for_address().
   static void create_for_address(const std::string& address,
     const SlotAsyncReady& slot,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address_finish)
   /// @throw Glib::Error.
-  _WRAP_METHOD(static Glib::RefPtr<DBusConnection> create_for_address_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_connection_new_for_address_finish, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Connection> create_for_address_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_connection_new_for_address_finish, errthrow)
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_sync)
   /// @throw Glib::Error.
-  static Glib::RefPtr<DBusConnection> create_sync(
+  static Glib::RefPtr<Connection> create_sync(
     const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_sync)
   /// @throw Glib::Error.
-  static Glib::RefPtr<DBusConnection> create_sync(
+  static Glib::RefPtr<Connection> create_sync(
     const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /// Non-cancellable version of create_sync().
-  static Glib::RefPtr<DBusConnection> create_sync(
+  static Glib::RefPtr<Connection> create_sync(
     const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    const Glib::RefPtr<AuthObserver>& observer,
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /// Non-cancellable version of create_sync().
-  static Glib::RefPtr<DBusConnection> create_sync(
+  static Glib::RefPtr<Connection> create_sync(
     const Glib::RefPtr<IOStream>& stream,
     const std::string& guid,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address_sync)
   /// @throw Glib::Error.
-  static Glib::RefPtr<DBusConnection> create_for_address_sync(
+  static Glib::RefPtr<Connection> create_for_address_sync(
     const std::string& address,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_new_for_address_sync)
   /// @throw Glib::Error.
-  static Glib::RefPtr<DBusConnection> create_for_address_sync(
+  static Glib::RefPtr<Connection> create_for_address_sync(
     const std::string& address,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /// Non-cancellable version of create_for_address_sync().
-  static Glib::RefPtr<DBusConnection> create_for_address_sync(
+  static Glib::RefPtr<Connection> create_for_address_sync(
     const std::string& address,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    const Glib::RefPtr<AuthObserver>& observer,
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /// Non-cancellable version of create_for_address_sync().
-  static Glib::RefPtr<DBusConnection> create_for_address_sync(
+  static Glib::RefPtr<Connection> create_for_address_sync(
     const std::string& address,
-    DBusConnectionFlags flags = Gio::DBUS_CONNECTION_FLAGS_NONE);
+    ConnectionFlags flags = Gio::DBus::CONNECTION_FLAGS_NONE);
 
   /** Closes the connection. Note that this never causes the process to exit
    * (this might only happen if the other end of a shared message bus
@@ -498,17 +506,17 @@ public:
 
   //TODO: In the C API, out_serial is volatile, but gmmproc can't parse that.
   #m4 _CONVERSION(`guint32&',`volatile guint32*',`&($3)')
-  _WRAP_METHOD(bool send_message(const Glib::RefPtr<DBusMessage>& message, DBusSendMessageFlags flags, guint32& out_serial), g_dbus_connection_send_message, errthrow)
+  _WRAP_METHOD(bool send_message(const Glib::RefPtr<Message>& message, SendMessageFlags flags, guint32& out_serial), g_dbus_connection_send_message, errthrow)
 
   /// A send_message() without an "out_serial" parameter.
-  bool send_message(const Glib::RefPtr<DBusMessage>& message,
-    DBusSendMessageFlags flags = Gio::DBUS_SEND_MESSAGE_FLAGS_NONE);
+  bool send_message(const Glib::RefPtr<Message>& message,
+    SendMessageFlags flags = Gio::DBus::SEND_MESSAGE_FLAGS_NONE);
 
   /** Asynchronously sends message to the peer represented by the connection.
    *
-   * Unless flags contain the Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL
+   * Unless flags contain the Gio::DBus::SEND_MESSAGE_FLAGS_PRESERVE_SERIAL
    * flag, the serial number will be assigned by the connection and set on
-   * message via Gio::DBusMessage::set_serial().
+   * message via Gio::DBus::Message::set_serial().
    *
    * If the connection is closed then the operation will fail with
    * Gio::IO_ERROR_CLOSED. If @a cancellable is canceled, the operation will
@@ -522,11 +530,11 @@ public:
    * send_message_with_reply_sync() for the synchronous version.
    *
    * Note that message must be unlocked, unless flags contain the
-   * Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL flag.
+   * Gio::DBus::SEND_MESSAGE_FLAGS_PRESERVE_SERIAL flag.
    *
    * See the C API docs for examples.
    *
-   * @param message A DBusMessage.
+   * @param message A Message.
    * @param timeout_msec The timeout in milliseconds or -1 to use the default
    * timeout.
    * @param slot A SlotAsyncReady to call when the request is satisfied.
@@ -534,7 +542,7 @@ public:
    *
    * @newin{2,28}
    */
-  void send_message_with_reply(const Glib::RefPtr<DBusMessage>& message,
+  void send_message_with_reply(const Glib::RefPtr<Message>& message,
     int timeout_msec,
     const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable);
@@ -542,22 +550,22 @@ public:
 
   /** Non-cancellable version of send_message_with_reply().
    */
-  void send_message_with_reply(const Glib::RefPtr<DBusMessage>& message,
+  void send_message_with_reply(const Glib::RefPtr<Message>& message,
     int timeout_msec,
     const SlotAsyncReady& slot);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_send_message_with_reply_finish)
   /// @throw Glib::Error.
-  _WRAP_METHOD(Glib::RefPtr<DBusMessage> send_message_with_reply_finish(const Glib::RefPtr<AsyncResult>& result), g_dbus_connection_send_message_with_reply_finish, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<Message> send_message_with_reply_finish(const Glib::RefPtr<AsyncResult>& result), g_dbus_connection_send_message_with_reply_finish, errthrow)
 
   /** Synchronously sends @a message to the peer represented by the connection
    * and blocks the calling thread until a reply is received or the timeout is
    * reached. See send_message_with_reply() for the asynchronous version of
-   * this method. 
+   * this method.
    *
-   * Unless flags contain the Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL
+   * Unless flags contain the Gio::DBus::SEND_MESSAGE_FLAGS_PRESERVE_SERIAL
    * flag, the serial number will be assigned by the connection and set on
-   * message via Gio::DBusMessage::set_serial().
+   * message via Gio::DBus::Message::set_serial().
    *
    * If the connection is closed then the operation will fail with
    * Gio::IO_ERROR_CLOSED. If @a cancellable is canceled, the operation will
@@ -565,34 +573,34 @@ public:
    * operation fails with Gio::IO_ERROR_INVALID_ARGUMENT.
    *
    * Note that a Glib::Error is thrown if a local in-process error occured.
-   * That is to say that the returned DBusMessage object may be of type
-   * G_DBUS_MESSAGE_TYPE_ERROR. Use Gio::DBusMessage::to_exception() to
+   * That is to say that the returned Message object may be of type
+   * G_DBUS_MESSAGE_TYPE_ERROR. Use Gio::DBus::Message::to_exception() to
    * transcode this to a Glib::Error.
    *
    * See the C API docs for examples.
    *
    * Note that message must be unlocked, unless flags contain the
-   * Gio::DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL flag.
+   * Gio::DBus::SEND_MESSAGE_FLAGS_PRESERVE_SERIAL flag.
    *
-   * @param message A DBusMessage.
+   * @param message A Message.
    * @param cancellable A Cancellable.
    * @param timeout_msec The timeout in milliseconds or -1 to use the default
    * timeout.
-   * @return A locked DBusMessage that is the reply to @a message or
+   * @return A locked Message that is the reply to @a message or
    * <tt>0</tt> if a Glib::Error is thrown.
    * @throw Glib::Error.
    * @newin{2,28}
    */
-  Glib::RefPtr<DBusMessage> send_message_with_reply_sync(
-    const Glib::RefPtr<DBusMessage>& message,
+  Glib::RefPtr<Message> send_message_with_reply_sync(
+    const Glib::RefPtr<Message>& message,
     const Glib::RefPtr<Cancellable>& cancellable,
     gint timeout_msec
   );
   _IGNORE(g_dbus_connection_send_message_with_reply_sync)
 
   /// A non-cancellable version of send_message_with_reply_sync().
-  Glib::RefPtr<DBusMessage> send_message_with_reply_sync(
-    const Glib::RefPtr<DBusMessage>& message,
+  Glib::RefPtr<Message> send_message_with_reply_sync(
+    const Glib::RefPtr<Message>& message,
     gint timeout_msec
   );
 
@@ -605,7 +613,7 @@ public:
   _WRAP_METHOD(std::string get_guid() const, g_dbus_connection_get_guid)
   _WRAP_METHOD(Glib::ustring get_unique_name() const, g_dbus_connection_get_unique_name)
 
-  _WRAP_METHOD(DBusCapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)
+  _WRAP_METHOD(CapabilityFlags get_capabilities() const, g_dbus_connection_get_capabilities)
 
   _WRAP_METHOD(Glib::RefPtr<Credentials> get_peer_credentials(), g_dbus_connection_get_peer_credentials, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Credentials> get_peer_credentials() const, g_dbus_connection_get_peer_credentials, refreturn, constversion)
@@ -634,7 +642,7 @@ public:
    * @param object_path Path of remote object.
    * @param interface_name D-Bus interface to invoke method on.
    * @param method_name The name of the method to invoke.
-   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * @param parameters A Glib::VariantContainerBase tuple with parameters for the
    * method or <tt>0</tt> if not passing parameters.
    * @param slot A SlotAsyncReady to call when the request is satisfied.
    * @param cancellable A Cancellable.
@@ -642,7 +650,7 @@ public:
    * connection is not a message bus connection.
    * @param timeout_msec The timeout in milliseconds, -1 to use the default
    * timeout or G_MAXINT for no timeout.
-   * @param flags Flags from the Gio::DBusCallFlags enumeration.
+   * @param flags Flags from the Gio::DBus::CallFlags enumeration.
    * @param reply_type The expected type of the reply, or <tt>0</tt>.
    * @newin{2,28}
    */
@@ -650,12 +658,12 @@ public:
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
-    const Glib::VariantBase&            parameters,
+    const Glib::VariantContainerBase&   parameters,
     const SlotAsyncReady&               slot,
     const Glib::RefPtr<Cancellable>&    cancellable,
     const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
+    CallFlags                       flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
   _IGNORE(g_dbus_connection_call)
@@ -665,26 +673,22 @@ public:
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
-    const Glib::VariantBase&            parameters,
+    const Glib::VariantContainerBase&   parameters,
     const SlotAsyncReady&               slot,
     const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
+    CallFlags                       flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
 
   /** Finishes an operation started with call().
-   * @param output A location in which to return a tuple with return values.
    * @param res A AsyncResult obtained from the SlotAsyncReady passed to
    * call().
+   * @result A Variant tuple with return values.
    * @throw Glib::Error.
    * @newin{2,28}
    */
-  void call_finish(
-    Glib::VariantBase&                   output,
-    const Glib::RefPtr<AsyncResult>&     res
-  );
-  _IGNORE(g_dbus_connection_call_finish)
+  _WRAP_METHOD(Glib::VariantContainerBase call_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_connection_call_finish, errthrow)
 
   /** Synchronously invokes the @a method_name method on the @a interface_name
    * D-Bus interface on the remote object at @a object_path owned by @a
@@ -704,46 +708,44 @@ public:
    * The calling thread is blocked until a reply is received. See call() for
    * the asynchronous version of this method.
    *
-   * @param output A location in which to return a tuple with return values.
    * @param object_path Path of remote object.
    * @param interface_name D-Bus interface to invoke method on.
    * @param method_name The name of the method to invoke.
-   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * @param parameters A Glib::VariantContainerBase tuple with parameters for the
    * method or <tt>0</tt> if not passing parameters.
    * @param cancellable A Cancellable.
    * @param bus_name A unique or well-known bus name or <tt>0</tt> if the
    * connection is not a message bus connection.
    * @param timeout_msec The timeout in milliseconds, -1 to use the default
    * timeout or G_MAXINT for no timeout.
-   * @param flags Flags from the Gio::DBusCallFlags enumeration.
+   * @param flags Flags from the Gio::DBus::CallFlags enumeration.
    * @param reply_type The expected type of the reply, or <tt>0</tt>.
+   * @result A Variant tuple with return values.
    * @throw Glib::Error.
    * @newin{2,28}
    */
-  void call_sync(
-    Glib::VariantBase&                  output,
+  Glib::VariantContainerBase call_sync(
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
-    const Glib::VariantBase&            parameters,
+    const Glib::VariantContainerBase&   parameters,
     const Glib::RefPtr<Cancellable>&    cancellable,
     const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
+    CallFlags                       flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
   _IGNORE(g_dbus_connection_call_sync)
 
   /// A non-cancellable version of call_sync().
-  void call_sync(
-    Glib::VariantBase&                  output,
+  Glib::VariantContainerBase call_sync(
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
-    const Glib::VariantBase&            parameters,
+    const Glib::VariantContainerBase&   parameters,
     const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    DBusCallFlags                       flags = Gio::DBUS_CALL_FLAGS_NONE,
+    CallFlags                       flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
 
@@ -757,7 +759,7 @@ public:
    * @param signal_name The name of the signal to emit.
    * @param destination_bus_name The unique bus name for the destination for
    * the signal or <tt>0</tt> to emit to all listeners.
-   * @param parameters A Glib::VariantBase tuple with parameters for the
+   * @param parameters A Glib::VariantContainerBase tuple with parameters for the
    * signal or <tt>0</tt> if not passing parameters.
    * @throw Glib::Error.
    * @newin{2,28}
@@ -767,7 +769,7 @@ public:
     const Glib::ustring&                interface_name,
     const Glib::ustring&                signal_name,
     const Glib::ustring&                destination_bus_name = Glib::ustring(),
-    const Glib::VariantBase&            parameters = Glib::VariantBase()
+    const Glib::VariantContainerBase&   parameters = Glib::VariantContainerBase()
   );
   _IGNORE(g_dbus_connection_emit_signal)
 
@@ -791,13 +793,13 @@ public:
    * @param interface_name D-Bus interface name to match on or <tt>0</tt> to
    * match on all interfaces.
    * @param member D-Bus signal name to match on or <tt>0</tt> to match on all
-   * signals.  
+   * signals.
    * @param object_path Object path to match on or <tt>0</tt> to match on all
-   * object paths.  
+   * object paths.
    * @param arg0 Contents of first string argument to match on or <tt>0</tt>
-   * to match on all kinds of arguments.  
+   * to match on all kinds of arguments.
    * @param flags Flags describing how to subscribe to the signal (currently
-   * unused).  
+   * unused).
    * @return A subscription identifier that can be used with
    * signal_unsubscribe().
    * @newin{2,28}
@@ -809,7 +811,7 @@ public:
     const Glib::ustring& member = Glib::ustring(),
     const Glib::ustring& object_path = Glib::ustring(),
     const Glib::ustring& arg0 = Glib::ustring(),
-    DBusSignalFlags flags = Gio::DBUS_SIGNAL_FLAGS_NONE
+    SignalFlags flags = Gio::DBus::SIGNAL_FLAGS_NONE
   );
   _IGNORE(g_dbus_connection_signal_subscribe)
 
@@ -833,7 +835,7 @@ public:
    * the message. Similary, if a filter consumes an outgoing message, the
    * message will not be sent to the other peer.
    *
-   * @param slot A filter slot.  
+   * @param slot A filter slot.
    * @return A filter identifier that can be used with remove_filter().
    * @newin{2,28}
    */
@@ -872,18 +874,42 @@ public:
    * yourself, e.g. to handle getting and setting of properties
    * asynchronously.
    *
-   * @param object_path The object path to register at.  
-   * @param interface_info Introspection data for the interface.  
-   * @param vtable A GDBusInterfaceVTable to call into or NULL.  
+   * @param object_path The object path to register at.
+   * @param interface_info Introspection data for the interface.
+   * @param vtable An InterfaceVTable to call into.
    * @return A registration id (never 0) that can be used with
    * unregister_object() if no Glib::Error is thrown.
    * @throw Glib::Error.
    * @newin{2,28}
    */
   guint register_object(const Glib::ustring& object_path,
-    const Glib::RefPtr<DBusInterfaceInfo>& interface_info,
-    const DBusInterfaceVTable* vtable);
+    const Glib::RefPtr<InterfaceInfo>& interface_info,
+    const InterfaceVTable& vtable);
   _IGNORE(g_dbus_connection_register_object)
+  
+  /** Registers exported objects at @a object_path with the D-Bus
+   * interface that is described in @a interface_info. This method overload, 
+   * which does not take a VTable, is useful for 
+   * <a href=="http://en.wikipedia.org/wiki/Marker_interface_pattern">marker
+   * interfaces</href>.
+   *
+   * If an existing slot is already registered at @a object_path and @a
+   * interface_name, then a Glib::Error is thrown.
+   *
+   * GDBus automatically implements the standard D-Bus interfaces
+   * org.freedesktop.DBus.Properties, org.freedesktop.DBus.Introspectable and
+   * org.freedesktop.Peer, so you don't have to implement those for the
+   * objects you export.
+   *
+   * @param object_path The object path to register at.
+   * @param interface_info Introspection data for the interface.
+   * @return A registration id (never 0) that can be used with
+   * unregister_object() if no Glib::Error is thrown.
+   * @throw Glib::Error.
+   * @newin{2,28}
+   */
+  guint register_object(const Glib::ustring& object_path,
+    const Glib::RefPtr<InterfaceInfo>& interface_info);
 
   _WRAP_METHOD(bool unregister_object(guint registration_id), g_dbus_connection_unregister_object)
 
@@ -895,10 +921,10 @@ public:
    *
    * When handling remote calls into any node in the subtree, first the
    * enumerate slot is used to check if the node exists. If the node
-   * exists or the Gio::DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES flag
+   * exists or the Gio::DBus::SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES flag
    * is set the introspection slot is used to check if the node supports the
    * requested method. If so, the dispatch function is used to determine where
-   * to dispatch the call. The collected DBusInterfaceVTable will be used to
+   * to dispatch the call. The collected InterfaceVTable will be used to
    * call into the interface vtable for processing the request.
    *
    * All calls into user-provided code will be invoked in the thread-default
@@ -914,9 +940,9 @@ public:
    * paths not registered via register_object().
    *
    *
-   * @param object_path The object path to register the subtree at.  
-   * @param vtable A DBusSubtreeVTable to enumerate, introspect and dispatch
-   * nodes in the subtree.  
+   * @param object_path The object path to register the subtree at.
+   * @param vtable A SubtreeVTable to enumerate, introspect and dispatch
+   * nodes in the subtree.
    * @param flags Flags used to fine tune the behavior of the subtree.
    * @return A subtree registration id (never 0) that can be used with
    * unregister_subtree() if no Glib::Error is thrown.
@@ -924,18 +950,18 @@ public:
    * @newin{2,28}
    */
   guint register_subtree(const Glib::ustring& object_path,
-    const DBusSubtreeVTable* vtable,
-    DBusSubtreeFlags flags = Gio::DBUS_SUBTREE_FLAGS_NONE);
+    const SubtreeVTable& vtable,
+    SubtreeFlags flags = Gio::DBus::SUBTREE_FLAGS_NONE);
   _IGNORE(g_dbus_connection_register_subtree)
 
   _WRAP_METHOD(bool unregister_subtree(guint registration_id), g_dbus_connection_unregister_subtree)
 
   //_WRAP_PROPERTY("address", std::string) // write-only construct-only
   //_WRAP_PROPERTY("authentication-observer", Glib::RefPtr<AuthObserver>) // write-only construct-only
-  _WRAP_PROPERTY("capabilities", DBusCapabilityFlags)
+  _WRAP_PROPERTY("capabilities", CapabilityFlags)
   _WRAP_PROPERTY("closed", bool)
   _WRAP_PROPERTY("exit-on-close", bool)
-  //_WRAP_PROPERTY("flags", DBusConnectionFlags) // write-only construct-only
+  //_WRAP_PROPERTY("flags", ConnectionFlags) // write-only construct-only
   _WRAP_PROPERTY("guid", std::string)
   _WRAP_PROPERTY("stream", Glib::RefPtr<IOStream>)
   _WRAP_PROPERTY("unique-name", Glib::ustring)
@@ -944,280 +970,7 @@ public:
   _WRAP_SIGNAL(void closed(bool remote_peer_vanished, const Glib::Error& error), "closed", no_default_handler)
 };
 
-/** DBusInterfaceVTable - A class used to represent a virtual table for
- * handling properties and method calls for a D-Bus interface.
- *
- * If you want to handle getting/setting D-Bus properties asynchronously,
- * simply register an object with the org.freedesktop.DBus.Properties D-Bus
- * interface using Gio::DBusConnection::register_object().
- *
- * The only correct use of this class is to declare a global instance of it
- * (or an instance local to the main function) and pass pointers to the
- * instance to the methods that require such a parameter.  The instance can be
- * used for multiple registrations and the memory it uses will be freed at the
- * end of execution.  Any other use (like creating an instance local to a
- * function and using that) may cause memory leaks or errors (if the instance
- * is destroyed too early).
- *
- * @newin{2,28}
- * @ingroup DBus
- */
-class DBusInterfaceVTable
-{
-  _CLASS_GENERIC(DBusInterfaceVTable, GDBusInterfaceVTable)
 
-public:
-  /** The type for a slot which handles a method call for a D-Bus interface.
-   * for example,
-   * @code
-   * void on_interface_method_call(const Glib::RefPtr<Gio::DBusConnection>&
-   * connection, const Glib::ustring& sender, const Glib::ustring&
-   * object_path, const Glib::ustring& interface_name, const Glib::ustring&
-   * method_name, const Glib::VariantBase& parameters, const
-   * Glib::RefPtr<Gio::DBusMethodInvocation>& invocation);
-   * @endcode
-   */
-  typedef sigc::slot<
-    void,
-    const Glib::RefPtr<DBusConnection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::VariantBase&,
-    const Glib::RefPtr<DBusMethodInvocation>&
-  > SlotInterfaceMethodCall;
-
-  /** The type for a slot which handles getting a property for a D-Bus
-   * interface.
-   * for example,
-   * @code
-   * void on_interface_get_property(Glib::VariantBase& property, const
-   * Glib::RefPtr<Gio::DBusConnection>& connection, const Glib::ustring&
-   * sender, const Glib::ustring& object_path, const Glib::ustring&
-   * interface_name, const Glib::ustring& property_name);
-   * @endcode
-   * @throw Glib::Error.
-   */
-  typedef sigc::slot<
-    void,
-    Glib::VariantBase&,
-    const Glib::RefPtr<DBusConnection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&
-  > SlotInterfaceGetProperty;
-
-  /** The type for a slot which handles setting a property for a D-Bus
-   * interface.
-   * for example,
-   * @code
-   * bool on_interface_set_property(const Glib::RefPtr<Gio::DBusConnection>&
-   * connection, const Glib::ustring& sender, const Glib::ustring&
-   * object_path, const Glib::ustring& interface_name, const Glib::ustring&
-   * property_name, const Glib::VariantBase& value);
-   * @endcode
-   * @throw Glib::Error.
-   */
-  typedef sigc::slot<
-    bool,
-    const Glib::RefPtr<DBusConnection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::VariantBase&
-  > SlotInterfaceSetProperty;
-
-  /** Constructs a new DBusInterfaceVTable using the specified slots.
-   * @param slot_method_call The slot for handling incoming method calls.
-   * @param slot_get_property The slot for getting a property.
-   * @param slot_set_property The slot for setting a property.
-   */
-  explicit DBusInterfaceVTable(
-   const SlotInterfaceMethodCall& slot_method_call,
-   const SlotInterfaceGetProperty& slot_get_property = SlotInterfaceGetProperty(),
-   const SlotInterfaceSetProperty& slot_set_property = SlotInterfaceSetProperty()
-  );
-
-  /// Destructor.
-  virtual ~DBusInterfaceVTable();
-
-  /// Provides access to the underlying C object.
-  GDBusInterfaceVTable* gobj()
-    { return reinterpret_cast<GDBusInterfaceVTable*>(&gobject_); }
-
-  /// Provides access to the underlying C object.
-  const GDBusInterfaceVTable* gobj() const
-    { return reinterpret_cast<const GDBusInterfaceVTable*>(&gobject_); }
-
-
-private:
-  // Non-copyable.
-  DBusInterfaceVTable(const DBusInterfaceVTable& other);
-  DBusInterfaceVTable& operator=(const DBusInterfaceVTable& other);
-
-public:
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // These are so the C callbacks and the
-  // Gio::DBusConnection::register_object() method can have access to the
-  // copies of the slots used for creation when registering.
-  SlotInterfaceMethodCall*      get_slot_method_call() const;
-  SlotInterfaceGetProperty*     get_slot_get_property() const;
-  SlotInterfaceSetProperty*     get_slot_set_property() const;
-#endif
-
-protected:
-  // The underlying C instance.
-  GDBusInterfaceVTable          gobject_;
-
-  // Pointers to copies of the slots used to create an instance.
-  SlotInterfaceMethodCall*      slot_method_call_;
-  SlotInterfaceGetProperty*     slot_get_property_;
-  SlotInterfaceSetProperty*     slot_set_property_;
-};
-
-/** DBusSubtreeVTable - A class used to represent a virtual table for
- * subtrees registered with Gio::DBusConnection::register_subtree().
- *
- * The only correct use of this class is to declare a global instance of it
- * (or an instance local to the main function) and pass pointers to the
- * instance to the methods that require such a parameter.  The instance can be
- * used for multiple registrations and the memory it uses will be freed at the
- * end of execution.  Any other use (like creating an instance local to a
- * function and using that) may cause memory leaks or errors (if the instance
- * is destroyed too early).
- *
- * @newin{2,28}
- * @ingroup DBus
- */
-class DBusSubtreeVTable
-{
-  _CLASS_GENERIC(DBusSubtreeVTable, GDBusSubtreeVTable)
-
-public:
-  /** The type for a slot which handles enumerating child nodes.
-   *
-   * This slot is called when generating introspection data and also when
-   * preparing to dispatch incoming messages in the event that the
-   * Gio::DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES flag is not
-   * specified (ie: to verify that the object path is valid).
-   *
-   * Hierarchies are not supported; the items that you return should not
-   * contain the '/' character.
-   *
-   * For example,
-   * @code
-   * std::vector<Glib::ustring> on_subtree_enumerate(const
-   * Glib::RefPtr<Gio::DBusConnection>& connection, const Glib::ustring&
-   * sender, const Glib::ustring& object_path);
-   * @endcode
-   */
-  typedef sigc::slot<
-    std::vector<Glib::ustring>,
-    const Glib::RefPtr<DBusConnection>&,
-    const Glib::ustring&,
-    const Glib::ustring&
-  > SlotSubtreeEnumerate;
-
-  /** The type for a slot which handles introspecting a child node. 
-   *
-   * Subtrees are flat. @a node, if non-<tt>0</tt>, is always exactly one
-   * segment of the object path (ie: it never contains a slash).
-   *
-   * This function should return an empty vector to indicate that there is no
-   * object at this node.
-   *
-   * If this function returns a non-empty vector, the return value is expected
-   * to be a list of DBusInterfaceInfo structures describing the interfaces
-   * implemented by node.
-   *
-   * for example,
-   * @code
-   * std::vector< Glib::RefPtr<Gio::DBusInterFaceInfo> >
-   * on_subtree_introspect(const Glib::RefPtr<Gio::DBusConnection>&
-   * connection, const Glib::ustring& sender, const Glib::ustring&
-   * object_path, const Glib::ustring& node);
-   * @endcode
-   */
-  typedef sigc::slot<
-    std::vector< Glib::RefPtr<Gio::DBusInterfaceInfo> >,
-    const Glib::RefPtr<DBusConnection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&
-  > SlotSubtreeIntrospect;
-
-  /** The type for a slot which handles dispatching a remote call on a child
-   * node.
-   *
-   * Subtrees are flat. @a node, if non-<tt>0</tt>, is always exactly one
-   * segment of the object path (ie: it never contains a slash).
-   *
-   * for example,
-   * @code
-   * const Gio::DBusInterfaceVTable* on_subtree_dispatch(const
-   * Glib::RefPtr<Gio::DBusConnection>& connection, const Glib::ustring&
-   * sender, const Glib::ustring& object_path, const Glib::ustring&
-   * interface_name, const Glib::ustring& node);
-   * @endcode
-   */
-  typedef sigc::slot<
-    const DBusInterfaceVTable*,
-    const Glib::RefPtr<DBusConnection>&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&,
-    const Glib::ustring&
-  > SlotSubtreeDispatch;
-
-  /** Constructs a new DBusSubtreeVTable using specified slots.
-   * @param slot_enumerate The slot for handling incoming method calls.
-   * @param slot_introspect The slot for getting a property.
-   * @param slot_dispatch The slot for setting a property.
-   */
-  explicit DBusSubtreeVTable(
-   const SlotSubtreeEnumerate& slot_enumerate,
-   const SlotSubtreeIntrospect& slot_introspect = SlotSubtreeIntrospect(),
-   const SlotSubtreeDispatch& slot_dispatch = SlotSubtreeDispatch()
-  );
-
-  /// Destructor.
-  virtual ~DBusSubtreeVTable();
-
-  /// Provides access to the underlying C object.
-  GDBusSubtreeVTable* gobj()
-    { return reinterpret_cast<GDBusSubtreeVTable*>(&gobject_); }
-
-  /// Provides access to the underlying C object.
-  const GDBusSubtreeVTable* gobj() const
-    { return reinterpret_cast<const GDBusSubtreeVTable*>(&gobject_); }
-
-
-private:
-  // Non-copyable.
-  DBusSubtreeVTable(const DBusSubtreeVTable& other);
-  DBusSubtreeVTable& operator=(const DBusSubtreeVTable& other);
-
-public:
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // These are so the C callbacks and the
-  // Gio::DBusConnection::register_subtreee() method can have access to the
-  // copies of the slots used for creation when registering.
-  SlotSubtreeEnumerate*         get_slot_enumerate() const;
-  SlotSubtreeIntrospect*        get_slot_introspect() const;
-  SlotSubtreeDispatch*          get_slot_dispatch() const;
-#endif
-
-protected:
-  // The underlying C instance.
-  GDBusSubtreeVTable          gobject_;
-
-  // Pointers to copies of the slots used to create an instance.
-  SlotSubtreeEnumerate*         slot_enumerate_;
-  SlotSubtreeIntrospect*        slot_introspect_;
-  SlotSubtreeDispatch*          slot_dispatch_;
-};
+} //namespace DBus
 
 } // namespace Gio

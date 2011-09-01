@@ -45,18 +45,48 @@ class EmblemedIcon
   _IMPLEMENTS_INTERFACE(Icon)
 
 protected:
-  //TODO: Documentation:
+  //We have this constructor because g_emblemed_icon_new() may take a NULL emblem parameter.
+ /** Creates a new emblemed icon for @a icon with the emblem @a emblem.
+   * @param icon An Icon.
+   * @param emblem An Emblem.
+   *
+   * @newin{2,28}
+   */
+  explicit EmblemedIcon(const Glib::RefPtr<Icon>& icon);
+
+  /** Creates a new emblemed icon for @a icon with the emblem @a emblem.
+   * @param icon An Icon.
+   * @param emblem An Emblem.
+   */
  _WRAP_CTOR(EmblemedIcon(const Glib::RefPtr<Icon>& icon, const Glib::RefPtr<Emblem>& emblem), g_emblemed_icon_new)
 
 public:
+
+  /** Creates a new emblemed icon for @a icon with the emblem @a emblem.
+   * @param icon An Icon.
+   * @param emblem An Emblem.
+   * @result An Icon.
+   */
   _WRAP_CREATE(const Glib::RefPtr<Icon>& icon, const Glib::RefPtr<Emblem>& emblem)
+
+  /** Creates a new emblemed icon for @a icon with no emblem.
+   * @param icon An Icon.
+   * @result An Icon.
+   *
+   * @newin{2,28}
+   */
+  _WRAP_CREATE(const Glib::RefPtr<Icon>& icon)
+
 
   _WRAP_METHOD(Glib::RefPtr<Icon> get_icon(), g_emblemed_icon_get_icon)
   _WRAP_METHOD(Glib::RefPtr<const Icon> get_icon() const, g_emblemed_icon_get_icon, constversion)
+
 #m4 _CONVERSION(`GList*',`Glib::ListHandle<Glib::RefPtr<Emblem> >',`$2($3, Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(Glib::ListHandle<Glib::RefPtr<Emblem> > get_emblems(), g_emblemed_icon_get_emblems)
-  // TODO: need constversion?
-  //_WRAP_METHOD(Glib::ListHandle<Glib::RefPtr<const Emblem> > get_emblems() const, g_emblemed_icon_get_emblems, constversion)
+
+//TODO: #m4 _CONVERSION(`GList*',`Glib::ListHandle<Glib::RefPtr<const Emblem> >',`$2($3, Glib::OWNERSHIP_NONE)')
+//  _WRAP_METHOD(Glib::ListHandle<Glib::RefPtr<const Emblem> > get_emblems() const, g_emblemed_icon_get_emblems, constversion)
+
   _WRAP_METHOD(void add_emblem(const Glib::RefPtr<Emblem>& emblem), g_emblemed_icon_add_emblem)
 };
 

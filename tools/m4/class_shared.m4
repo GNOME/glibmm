@@ -1,5 +1,10 @@
 dnl $Id$
 
+
+dnl This is just a hint to generate_wrap_init.pl.
+dnl It does not generate any code in the actual .h and .cc file.
+m4_define(`_GMMPROC_EXTRA_NAMESPACE',`')
+
 define(`_CLASS_START',`dnl
 _PUSH(SECTION_CLASS1)
 ')
@@ -248,6 +253,7 @@ typedef struct _`'__CNAME__ __CNAME__;
 typedef struct _`'__CNAME__`'Class __CNAME__`'Class;
 ')dnl
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+undefine(`__BOOL_STRUCT_NOT_HIDDEN__')dnl
 ')
 
 dnl _GTKMMPROC_WIN32_NO_WRAP

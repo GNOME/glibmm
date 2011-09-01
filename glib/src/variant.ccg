@@ -18,6 +18,7 @@
 #include <glibmm/variant.h>
 #include <glibmm/utility.h>
 #include <glib.h>
+//#include <iostream>
 
 namespace Glib
 {
@@ -38,6 +39,17 @@ void VariantBase::byteswap(VariantBase& result) const
   result.init(g_value); // g_value is already referenced.
 }
 
+
+VariantStringBase::VariantStringBase()
+: VariantBase()
+{
+}
+
+VariantStringBase::VariantStringBase(GVariant* castitem, bool take_a_reference)
+: VariantBase(castitem, take_a_reference)
+{
+}
+
 //static
 void VariantStringBase::create_object_path(VariantStringBase& output,
   const std::string& object_path)
@@ -56,6 +68,17 @@ void VariantStringBase::create_signature(VariantStringBase& output,
   result = g_variant_new_signature(signature.c_str());
   g_variant_ref_sink(result);
   output.init(result);
+}
+
+
+VariantContainerBase::VariantContainerBase()
+: VariantBase()
+{
+}
+
+VariantContainerBase::VariantContainerBase(GVariant* castitem, bool take_a_reference)
+: VariantBase(castitem, take_a_reference)
+{
 }
 
 //static
@@ -80,9 +103,18 @@ VariantContainerBase::create_tuple(const std::vector<VariantBase>& children)
   return result;
 }
 
-void VariantContainerBase::get(VariantBase& child, gsize index) const
+//static
+VariantContainerBase
+VariantContainerBase::create_tuple(const VariantBase& child)
 {
-  if(index > g_variant_n_children(gobject_))
+  std::vector<VariantBase> vec;
+  vec.push_back(child);
+  return create_tuple(vec);
+}
+
+void VariantContainerBase::get_child(VariantBase& child, gsize index) const
+{
+  if(index >= g_variant_n_children(gobject_))
     throw std::out_of_range(
       "VariantContainerBase::get(): Index out of bounds.");
 
@@ -90,7 +122,27 @@ void VariantContainerBase::get(VariantBase& child, gsize index) const
   child.init(gvariant);
 }
 
-bool VariantContainerBase::get_maybe(Glib::VariantBase& maybe) const
+// VariantContainerBase has no method variant_type()
+template<>
+VariantContainerBase VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v)
+throw(std::bad_cast)
+{
+  if(!v.gobj())
+  {
+    return VariantContainerBase();
+  }
+  if(v.get_type().is_container())
+  {
+    return VariantContainerBase(const_cast<GVariant*>(v.gobj()), true);
+  }
+  else
+  {
+    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
+    throw std::bad_cast();
+  }
+}
+
+bool VariantContainerBase::get_maybe(VariantBase& maybe) const
 {
   GVariant* const g_value =
     g_variant_get_maybe(const_cast<GVariant*>(gobj()));
@@ -116,11 +168,21 @@ void VariantBase::init(const GVariant* cobject, bool take_a_reference)
     g_variant_ref(gobject_);
 }
 
+
+Variant<VariantBase>::Variant()
+: VariantContainerBase()
+{
+}
+
+Variant<VariantBase>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantContainerBase(castitem, take_a_reference)
+{
+}
+
 // static
 const VariantType& Variant<VariantBase>::variant_type()
 {
-  static VariantType type(G_VARIANT_TYPE_VARIANT);
-  return type;
+  return VARIANT_TYPE_VARIANT;
 }
 
 Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
@@ -133,11 +195,27 @@ Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
   return result;
 }
 
+void Variant<VariantBase>::get(VariantBase& variant) const
+{
+  GVariant* const gvariant = g_variant_get_variant(gobject_);
+  variant.init(gvariant);
+}
+
+
+Variant<Glib::ustring>::Variant()
+: VariantStringBase()
+{
+}
+
+Variant<Glib::ustring>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantStringBase(castitem, take_a_reference)
+{
+}
+
 // static
 const VariantType& Variant<Glib::ustring>::variant_type()
 {
-  static VariantType type(G_VARIANT_TYPE_STRING);
-  return type;
+  return VARIANT_TYPE_STRING;
 }
 
 Variant<Glib::ustring>
@@ -154,14 +232,48 @@ Variant<Glib::ustring>::create(const Glib::ustring& data)
 
 Glib::ustring Variant<Glib::ustring>::get() const
 {
-  return Glib::ustring(g_variant_get_string(gobject_, 0));
+  return convert_const_gchar_ptr_to_ustring(g_variant_get_string(gobject_, 0));
+}
+
+// Variant<Glib::ustring> makes sense for multiple types.
+// See http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-get-string
+template<>
+Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v)
+throw(std::bad_cast)
+{
+  if(!v.gobj())
+  {
+    return Variant<Glib::ustring>();
+  }
+
+  const VariantType vtype = v.get_type();
+  if( vtype.equal(VARIANT_TYPE_STRING) ||
+      vtype.equal(VARIANT_TYPE_OBJECT_PATH) ||
+      vtype.equal(VARIANT_TYPE_SIGNATURE) )
+  {
+    return Variant<Glib::ustring>(const_cast<GVariant*>(v.gobj()), true);
+  }
+  else
+  {
+    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
+    throw std::bad_cast();
+  }
+}
+
+Variant<std::string>::Variant()
+: VariantStringBase()
+{
+}
+
+Variant<std::string>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantStringBase(castitem, take_a_reference)
+{
 }
 
 // static
 const VariantType& Variant<std::string>::variant_type()
 {
-  static VariantType type(G_VARIANT_TYPE_BYTESTRING);
-  return type;
+  return VARIANT_TYPE_BYTESTRING;
 }
 
 Variant<std::string>
@@ -176,18 +288,61 @@ Variant<std::string>::create(const std::string& data)
   return result;
 }
 
+// Variant<std::string> makes sense for multiple types.
+// See http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-get-string
+template<>
+Variant<std::string> VariantBase::cast_dynamic< Variant<std::string> >(const VariantBase& v)
+throw(std::bad_cast)
+{
+  if(!v.gobj())
+  {
+    return Variant<std::string>();
+  }
+
+  const VariantType vtype = v.get_type();
+  if( vtype.equal(VARIANT_TYPE_STRING) ||
+      vtype.equal(VARIANT_TYPE_BYTESTRING) ||
+      vtype.equal(VARIANT_TYPE_OBJECT_PATH) ||
+      vtype.equal(VARIANT_TYPE_SIGNATURE) )
+  {
+    return Variant<std::string>(const_cast<GVariant*>(v.gobj()), true);
+  }
+  else
+  {
+    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
+    throw std::bad_cast();
+  }
+}
+
 std::string Variant<std::string>::get() const
 {
-  return std::string(g_variant_get_bytestring(gobject_));
+  const VariantType vtype = get_type();
+
+  const char* pch = 0;
+  if(vtype.equal(VARIANT_TYPE_BYTESTRING))
+    pch = g_variant_get_bytestring(gobject_);
+  else //g_variant_get_string() cna handle strings, object paths, and signatures.
+    pch = g_variant_get_string(gobject_, 0);
+
+  return convert_const_gchar_ptr_to_stdstring(pch);
 }
 
 typedef std::vector<Glib::ustring> type_vec_ustring;
 
+Variant<type_vec_ustring>::Variant()
+: VariantContainerBase()
+{
+}
+
+Variant<type_vec_ustring>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantContainerBase(castitem, take_a_reference)
+{
+}
+
 // static
 const VariantType& Variant<type_vec_ustring>::variant_type()
 {
-  static VariantType type(G_VARIANT_TYPE_STRING_ARRAY);
-  return type;
+  return VARIANT_TYPE_STRING_ARRAY;
 }
 
 Variant<type_vec_ustring>
@@ -221,14 +376,14 @@ Variant<type_vec_ustring>::create(const type_vec_ustring& data)
   return result;
 }
 
-Glib::ustring Variant<type_vec_ustring>::get(gsize index) const
+Glib::ustring Variant<type_vec_ustring>::get_child(gsize index) const
 {
   gsize n_elements = 0;
 
   const gchar** array = g_variant_get_strv(const_cast<GVariant*>(gobj()),
     &n_elements);
 
-  if(index > n_elements)
+  if(index >= n_elements)
     throw std::out_of_range(
       "Variant< std::vector<Glib::ustring> >::get(): Index out of bounds.");
 
@@ -267,11 +422,20 @@ VariantIter Variant<type_vec_ustring>::get_iter() const
 
 typedef std::vector<std::string> type_vec_string;
 
+Variant<type_vec_string>::Variant()
+: VariantContainerBase()
+{
+}
+
+Variant<type_vec_string>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantContainerBase(castitem, take_a_reference)
+{
+}
+
 // static
 const VariantType& Variant<type_vec_string>::variant_type()
 {
-  static VariantType type(G_VARIANT_TYPE_BYTESTRING_ARRAY);
-  return type;
+  return VARIANT_TYPE_BYTESTRING_ARRAY;
 }
 
 Variant<type_vec_string>
@@ -305,14 +469,14 @@ Variant<type_vec_string>::create(const type_vec_string& data)
   return result;
 }
 
-std::string Variant<type_vec_string>::get(gsize index) const
+std::string Variant<type_vec_string>::get_child(gsize index) const
 {
   gsize n_elements = 0;
 
   const gchar** array =
     g_variant_get_bytestring_array(const_cast<GVariant*>(gobj()), &n_elements);
 
-  if(index > n_elements)
+  if(index >= n_elements)
     throw std::out_of_range(
       "Variant< std::vector<std::string> >::get(): Index out of bounds.");
 

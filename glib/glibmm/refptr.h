@@ -155,8 +155,9 @@ public:
   template <class T_CastFrom>
   static inline RefPtr<T_CppObject> cast_const(const RefPtr<T_CastFrom>& src);
 
-  //TODO: Remove these if we replace operator bool() with operator void* after 
+  //TODO: Maybe remove these if we replace operator bool() with operator const void* after 
   //an API/ABI break, as suggested by Daniel Elstner? murrayc.
+  //See bug https://bugzilla.gnome.org/show_bug.cgi?id=626858
 
   /** Compare based on the underlying instance address.
    *

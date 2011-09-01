@@ -61,13 +61,34 @@ public:
 #m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<InetAddress> >',`$2($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<InetAddress> > lookup_by_name(const Glib::ustring& hostname, const Glib::RefPtr<Cancellable>& cancellable), g_resolver_lookup_by_name, errthrow)
   
-  //TODO: Documentation
+  /** Synchronously resolves hostname to determine its associated IP address(es). 
+   * @a hostname may be an ASCII-only or UTF-8 hostname, or the textual form of an IP address (in which case this just becomes a wrapper around InetAddress:create_from_string()).
+   *
+   * On success, this will return a list of InetAddress, sorted in order of preference. (That is, you should attempt to connect to the first address first, then the second if the first fails, etc.)
+   *
+   * If the DNS resolution fails, a ResolverError exception will be thrown.
+   *
+   * If you are planning to connect to a socket on the resolved IP address, it may be easier to create a NetworkAddress and use its SocketConnectable base class.
+   *
+   * @param hostname hostname The hostname to look up.
+   */
   Glib::ListHandle< Glib::RefPtr<InetAddress> > lookup_by_name(const Glib::ustring& hostname);
   
-  //TODO: Documentation
+  /** Begins asynchronously resolving hostname to determine its associated IP address(es), and eventually calls @a slot, which must call 
+   * lookup_by_name_finish() to get the result. See lookup_by_name() for more details.
+   *
+   * @param hostname hostname The hostname to look up.
+   * @param slot A callback slot to call after the resolution completes.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   */
   void lookup_by_name_async(const Glib::ustring& hostname, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
   
-  //TODO: Documentation
+  /** Begins asynchronously resolving hostname to determine its associated IP address(es), and eventually calls @a slot, which must call 
+   * lookup_by_name_finish() to get the result. See lookup_by_name() for more details.
+   *
+   * @param hostname hostname The hostname to look up.
+   * @param slot A callback slot to call after the resolution completes.
+   */
   void lookup_by_name_async(const Glib::ustring& hostname, const SlotAsyncReady& slot);
   _IGNORE(g_resolver_lookup_by_name_async)
   
@@ -75,11 +96,32 @@ public:
 
   _WRAP_METHOD(Glib::ustring lookup_by_address(const Glib::RefPtr<InetAddress>& address, const Glib::RefPtr<Cancellable>& cancellable), g_resolver_lookup_by_address, errthrow)
   
-  //TODO: Documentation
+  /** Synchronously reverse-resolves an address to determine its associated hostname.
+   *
+   * If the DNS resolution fails then a ResolverError exception will be thrown.
+   *
+   * @param address The address to reverse-resolve.
+   * @result A hostname (either ASCII-only, or in ASCII-encoded form), or an empty string on error. 
+   */
   Glib::ustring lookup_by_address(const Glib::RefPtr<InetAddress>& address);
+
+  /** Begins asynchronously reverse-resolving an address to determine its associated hostname, and eventually calls callback, which must call 
+   * lookup_by_address_finish() to get the final result.
+   *
+   * @param address The address to reverse-resolve.
+   * @param hostname hostname The hostname to look up.
+   * @param slot A callback slot to call after the resolution completes.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   */
   void lookup_by_address_async(const Glib::RefPtr<InetAddress>& address, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
   
-  //TODO: Documentation
+  /** Begins asynchronously reverse-resolving an address to determine its associated hostname, and eventually calls callback, which must call 
+   * lookup_by_address_finish() to get the final result.
+   *
+   * @param address The address to reverse-resolve.
+   * @param hostname hostname The hostname to look up.
+   * @param slot A callback slot to call after the resolution completes.
+   */
   void lookup_by_address_async(const Glib::RefPtr<InetAddress>& address, const SlotAsyncReady& slot);
   _IGNORE(g_resolver_lookup_by_address_async)
   
@@ -88,13 +130,41 @@ public:
 #m4 _CONVERSION(`GList*',`ListHandle_SrvTarget',`$2($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(ListHandle_SrvTarget lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const Glib::RefPtr<Cancellable>& cancellable), g_resolver_lookup_service, errthrow)
 
-  //TODO: Documentation
+  /** Synchronously performs a DNS SRV lookup for the given service and protocol in the given domain and returns an list of SrvTargets.
+   * @a domain may be an ASCII-only or UTF-8 hostname. Note also that the service and protocol arguments do not include the leading underscore that appears in the actual DNS entry.
+   *
+   * On success, this will return a list of SrvTargets, sorted in order of preference. 
+   * (That is, you should attempt to connect to the first target first, then the second if the first fails, etc.)
+   *
+   * If the DNS resolution fails a ResolverError exception will be thrown.
+   *
+   * If you are planning to connect to the service, it is usually easier to create a NetworkService and use its SocketConnectable base class interface. \
+   *
+   * @param service The service type to look up (eg, "ldap").
+   * @param protocol The networking protocol to use for service (eg, "tcp") 
+   * @param domain The DNS domain to look up the service in.
+   */
   ListHandle_SrvTarget lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain);
   
-  //TODO: Documentation
+  /** Begins asynchronously performing a DNS SRV lookup for the given service and protocol in the given domain, and eventually calls callback, 
+   * which must call lookup_service_finish() to get the final result. See glookup_service() for more details.
+   *
+   * @param service The service type to look up (eg, "ldap").
+   * @param protocol The networking protocol to use for service (eg, "tcp") 
+   * @param domain The DNS domain to look up the service in.
+   * @param slot A callback slot to call after the resolution completes.
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
+   */
   void lookup_service_async(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
   
-  //TODO: Documentation
+  /** Begins asynchronously performing a DNS SRV lookup for the given service and protocol in the given domain, and eventually calls callback, 
+   * which must call lookup_service_finish() to get the final result. See glookup_service() for more details.
+   *
+   * @param service The service type to look up (eg, "ldap").
+   * @param protocol The networking protocol to use for service (eg, "tcp") 
+   * @param domain The DNS domain to look up the service in.
+   * @param slot A callback slot to call after the resolution completes.
+   */
   void lookup_service_async(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const SlotAsyncReady& slot);
   _IGNORE(g_resolver_lookup_service_async)
 

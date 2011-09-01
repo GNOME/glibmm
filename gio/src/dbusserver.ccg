@@ -24,13 +24,16 @@
 namespace Gio
 {
 
-//TODO: Uncomment when bug #639478 is resolved.
+namespace DBus
+{
+
+//TODO: Uncomment when this bug is fixed: https://bugzilla.gnome.org/show_bug.cgi?id=639478 .
 /*
-DBusServer::DBusServer(const std::string& address,
+Server::Server(const std::string& address,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusServerFlags flags)
+  ServerFlags flags)
   : _CONSTRUCT("address",
     (address.empty() ? static_cast<char*>(0) : address.c_str()),
     "flags", static_cast<GDBusServerFlags>(flags),
@@ -40,10 +43,10 @@ DBusServer::DBusServer(const std::string& address,
   init(cancellable);
 }
 
-DBusServer::DBusServer(const std::string& address,
+Server::Server(const std::string& address,
   const std::string& guid,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusServerFlags flags)
+  ServerFlags flags)
   : _CONSTRUCT("address",
     (address.empty() ? static_cast<char*>(0) : address.c_str()),
     "flags", static_cast<GDBusServerFlags>(flags),
@@ -53,10 +56,10 @@ DBusServer::DBusServer(const std::string& address,
   init(cancellable);
 }
 
-DBusServer::DBusServer(const std::string& address,
+Server::Server(const std::string& address,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
-  DBusServerFlags flags)
+  const Glib::RefPtr<AuthObserver>& observer,
+  ServerFlags flags)
   : _CONSTRUCT("address",
     (address.empty() ? static_cast<char*>(0) : address.c_str()),
     "flags", static_cast<GDBusServerFlags>(flags),
@@ -66,9 +69,9 @@ DBusServer::DBusServer(const std::string& address,
   init();
 }
 
-DBusServer::DBusServer(const std::string& address,
+Server::Server(const std::string& address,
   const std::string& guid,
-  DBusServerFlags flags)
+  ServerFlags flags)
   : _CONSTRUCT("address",
     (address.empty() ? static_cast<char*>(0) : address.c_str()),
     "flags", static_cast<GDBusServerFlags>(flags),
@@ -79,21 +82,21 @@ DBusServer::DBusServer(const std::string& address,
 }
 */
 
-Glib::RefPtr<DBusServer> DBusServer::create_sync(const std::string& address,
+Glib::RefPtr<Server> Server::create_sync(const std::string& address,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
+  const Glib::RefPtr<AuthObserver>& observer,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusServerFlags flags)
+  ServerFlags flags)
 {
   //TODO: Use the constructor instead of the code underneath when
   //g_dbus_server_new_sync() does not do more than call g_initable_new().
   //https://bugzilla.gnome.org/show_bug.cgi?id=639478
-  //return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
+  //return Glib::RefPtr<Server>(new Server(address, guid, observer,
     //cancellable, flags));
 
   GError* gerror = 0;
 
-  Glib::RefPtr<DBusServer> result =
+  Glib::RefPtr<Server> result =
     Glib::wrap(g_dbus_server_new_sync(address.c_str(),
                                       static_cast<GDBusServerFlags>(flags),
                                       guid.c_str(),
@@ -107,20 +110,20 @@ Glib::RefPtr<DBusServer> DBusServer::create_sync(const std::string& address,
   return result;
 }
 
-Glib::RefPtr<DBusServer> DBusServer::create_sync(const std::string& address,
+Glib::RefPtr<Server> Server::create_sync(const std::string& address,
   const std::string& guid,
   const Glib::RefPtr<Cancellable>& cancellable,
-  DBusServerFlags flags)
+  ServerFlags flags)
 {
   //TODO: Use the constructor instead of the code underneath when
   //g_dbus_server_new_sync() does not do more than call g_initable_new().
   //https://bugzilla.gnome.org/show_bug.cgi?id=639478
-  //return Glib::RefPtr<DBusServer>(new DBusServer(address, guid,
+  //return Glib::RefPtr<Server>(new Server(address, guid,
     //cancellable, flags));
 
   GError* gerror = 0;
 
-  Glib::RefPtr<DBusServer> result =
+  Glib::RefPtr<Server> result =
     Glib::wrap(g_dbus_server_new_sync(address.c_str(),
                                       static_cast<GDBusServerFlags>(flags),
                                       guid.c_str(), 0,
@@ -133,20 +136,20 @@ Glib::RefPtr<DBusServer> DBusServer::create_sync(const std::string& address,
   return result;
 }
 
-Glib::RefPtr<DBusServer> DBusServer::create_sync(const std::string& address,
+Glib::RefPtr<Server> Server::create_sync(const std::string& address,
   const std::string& guid,
-  const Glib::RefPtr<DBusAuthObserver>& observer,
-  DBusServerFlags flags)
+  const Glib::RefPtr<AuthObserver>& observer,
+  ServerFlags flags)
 {
   //TODO: Use the constructor instead of the code underneath when
   //g_dbus_server_new_sync() does not do more than call g_initable_new().
   //https://bugzilla.gnome.org/show_bug.cgi?id=639478
-  //return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, observer,
+  //return Glib::RefPtr<Server>(new Server(address, guid, observer,
     //flags));
 
   GError* gerror = 0;
 
-  Glib::RefPtr<DBusServer> result =
+  Glib::RefPtr<Server> result =
     Glib::wrap(g_dbus_server_new_sync(address.c_str(),
                                       static_cast<GDBusServerFlags>(flags),
                                       guid.c_str(),
@@ -160,18 +163,18 @@ Glib::RefPtr<DBusServer> DBusServer::create_sync(const std::string& address,
   return result;
 }
 
-Glib::RefPtr<DBusServer> DBusServer::create_sync(const std::string& address,
+Glib::RefPtr<Server> Server::create_sync(const std::string& address,
   const std::string& guid,
-  DBusServerFlags flags)
+  ServerFlags flags)
 {
   //TODO: Use the constructor instead of the code underneath when
   //g_dbus_server_new_sync() does not do more than call g_initable_new().
   //https://bugzilla.gnome.org/show_bug.cgi?id=639478
-  //return Glib::RefPtr<DBusServer>(new DBusServer(address, guid, flags));
+  //return Glib::RefPtr<Server>(new Server(address, guid, flags));
 
   GError* gerror = 0;
 
-  Glib::RefPtr<DBusServer> result =
+  Glib::RefPtr<Server> result =
     Glib::wrap(g_dbus_server_new_sync(address.c_str(),
                                       static_cast<GDBusServerFlags>(flags),
                                       guid.c_str(), 0, 0, &gerror));
@@ -182,4 +185,5 @@ Glib::RefPtr<DBusServer> DBusServer::create_sync(const std::string& address,
   return result;
 }
 
+} // namespace DBus
 } // namespace Gio

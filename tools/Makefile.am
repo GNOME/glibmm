@@ -54,6 +54,13 @@ extra_defs_gen_generate_defs_gio_LDADD   = $(GIOMM_LIBS) $(lib_LTLIBRARIES)
 AM_CPPFLAGS = -I$(top_builddir) $(GTHREAD_CFLAGS) $(GIOMM_CFLAGS)
 AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 
+EXTRA_DIST = defs_gen/definitions.py \
+  defs_gen/defsparser.py \
+  defs_gen/h2def.py \
+  defs_gen/scmexpr.py \
+  defs_gen/docextract.py \
+  defs_gen/docextract_to_xml.py
+
 # Instruct GNU make to delete the targets of a rule after it failed, in
 # order to avoid the complication of handling that situation manually.
 .DELETE_ON_ERROR:

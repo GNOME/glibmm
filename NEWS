@@ -1,12 +1,298 @@
+2.29.12:
+
+2011-08-03  Murray Cumming  <murrayc@murrayc.com>
+
+* Gio::Application:
+  - Add back Gio::Application and friends so we can try to finish them.
+  - local_command_line_vfunc(): Use references for parameters.
+    See bug #643478.
+  (Murray Cumming)
+* Gio::TimeZoneMonitor: Remove because it was removed in glib.
+  (José Alburquerque)
+* Build:
+configure: Require the latest libsigc++ because our tests require it.
+	See https://bugs.launchpad.net/bugs/829596
+	(Murray Cumming)
+
+	
+2.29.11:
+
+* Gio::AppInfo:
+  - launch(): Use a vector instead of a ListHandle and assume that it contains 
+  Gio::File rather than strings. This was unusable before.
+  - Add launch() overload with no launch_context parameter.
+  - Add launch() overload taking one file, 
+  - launch_uri(): Deprecate the method taking a GAppLaunchContext*, adding 
+    one taking a Gio::AppLaunchContext instead.
+  - Add launch_uri() taking one URI.
+  (Murray Cumming)
+* Add test case for a recent fix in libsigc++ with RefPtr.
+  (Kjell Ahlstedt) Bug #564005#c14 (Alexander Shaduri)
+* tools: Add python .def generation scripts removed from PyGObject.
+  (Murray Cumming)
+* gmmproc: Allow _STRUCT_NOT_HIDDEN to be used even when multiple classes 
+  are defined in one file.
+  (José Alburquerque)
+
+2.29.10:
+
+* Gio:
+- Added DateTime, TimeZone, TimeZoneMonitor.
+  (José Alburquerque)
+
+2.28.2:
+
+* gmmproc:
+  - _WRAP_METHOD: Add optional parameter functionality.
+  - _WRAP_[CREATE|CTOR|METHOD]: Support parameter reordering.
+  - _WRAP_METHOD: Add the possibility of an output parameter.
+  (José Alburquerque)
+  - Protect documentation with m4 quotes.
+  (Kjell Ahlstedt) Bug #603930
+
+Gio:
+* DBus::Connection::emit_signal(): Replace empty strings with 0, because 
+  gio fails with "", apparently unnecessarily.
+  (José Alburquerque) Bug #645072 (Yannick Guesnet).
+
+Build:
+* Removed now-unused doctooldir variable from pkgconfig files.
+  (Kalev Lember) Bug #652461
+
+2.28.1:
+
+gmmproc:
+* Extra Defs Tool: Only generate properties that the GType owns.
+  (José Alburquerque)
+* Put guards around generated includes in wrap_init.cc to fix the wind32 build.
+  (Kalev Lember) Bug #649182
+* tools/pm/GtkDefs.pm: GtkDefs::split_tokens(): Speed improvement.
+	(Kjell Ahlstedt) Bug #644037
+
+Build:
+* Update the VS 2005, 2008, and 2010 project files.
+  (Fan, Chun-wei)
+* Examples build: Use the GLIB_COMPILE_SCHEMAS variable.
+  (Volker Grabsch) Bug #648485.
+* Gio::DBus::Message: Fixed includes for WIN32
+	(Kalev Lember)  Bug #649168
+
+Documentation:
+* Added some classes to the DBus documentation group and added class
+  overview documentation. (Murray Cumming)
+
+New API in glibmm 2.28:
+(There was no stable glibmm 2.26 release)
+
+Glib:
+* Variant: A new hierarchy of templated Variant<> types, for use with
+  Gio::Settings and Gio::DBus.
+  (José Alburquerque, Yannick Guesnet, Murray Cumming)
+* OptionGroup:
+  - Add add_entry() that takes a slot with callback function.
+  - on_post_parse() overrides no longer need to call the base class.
+  (Kjell Ahlstedt)
+* RefPtr: Make it work with sorted containers.
+  (David Kozub)
+* Regex: Added and used a MatchInfo class.
+  (José Alburquerque)
+* General:
+  - build_filename(): Add method overloads to take up to 9 arguments,
+  for convenience.
+  (Fabricio Godoy)
+  - Added get_system_data_dirs() and get_system_config_dirs().
+  (Murray Cumming)
+
+Gio:
+* Proxy, ProxyAddress and ProxyResolver.
+  (Murray Cumming)
+* Settings: For application settings, replacing GConf (or Gnome::Conf).
+  (Jonathon Jongsmam, José Alburquerque, Murray Cumming)
+* DBus: API to use or implement D-Bus services.
+  (José Alburquerque, Yannick Guesnet, Michael Edwards,
+  Martin Braure de Calignon and Murray Cumming.)
+* SocketControlMessage, UnixCredentialsMessage and UnixFDMessage.
+  (José Alburquerque)
+* Added UnixFDList.
+  (José Alburquerque)
+
+gmmproc:
+* Support for use of std::vector<> instead of ListHandle<>, SListHandle<>,
+and ArrayHandle.
+(Krzesimir Nowak)
+
+See also this list of new API:
+http://developer.gnome.org/glibmm/unstable/since_2_28.html
+
+Gio::DBus, Glib::Variant and Gio::Settings were a huge amount of difficult
+work mostly by José Alburquerque, with help from Jonathon Jongsmam,
+Yannick Guesnet, Michael Edwards, Martin Braure de Calignon and Murray Cumming.
+Some of José Alburquerque's work was funded by Openismus GmbH.
+Thank you, everyone.
+
+
+2.28.0 (stable):
+
+Gio:
+* DBus::Connection:
+  - Added a register_method() overload with no vtable.
+  - register_object(), register_subtree(): Take the VTable by reference,
+  not pointer.
+  (Murray Cumming)
+* DBus::MethodInvocation:
+  - get_parameters(): Return a VariantContainerBase instead of taking a
+  VariantBase.
+  - return_gerror(), return_error_literal(): Rename them both to return_error().
+  (Murray Cumming)
+* DBus::NodeInfo::lookup_interface(): Add a method overload with no name.
+  (Murray Cumming)
+* DBus::Proxy: Rename type_map_changed_properties to MapChangeProperties.
+  (Murray Cumming)
+* DBus::VariantContainerBase::create_tuple(): Add a method overload that takes
+  a single VariantBase,
+* Settings: Really add list_schemas().
+  (Murray Cumming)
+
+2.27.99.2 (unstable):
+
+Glib:
+* Variant:
+  - Rename get(index) to get_child(index).
+ - Variant<std::string>:
+   Allow this to be used for object paths and signatures as well as just
+   bytestrings.
+ - Variant<Glib::ustring>:
+   Allow this to be used for bytestrings, object paths and signatures as well as just
+   (UTF-8) strings.
+ - Move constructor definitions into the .cc file.
+ - Capitalize the standard types, such as VARIANT_TYPE_STRING.
+ (Murray Cumming)
+* ArrayHandle: Make it compilable with MSVC 2005, 2008, 2010.
+  (Krzesimir Nowak) Bug #645851 (Fan, Chun-wei)
+
+2.27.99.1 (unstable):
+
+Gio:
+* DBus: Use VariantContainerBase for tuple Variants.
+
+2.27.99 (unstable):
+
+This is probably the very last release before 2.28.0 which will happen very soon.
+
+Gio:
+* Removed Application, ApplicationCommandLine, and ActionGroup because
+  they are unfinished. We hope to add them back in glibmm 3.2.
+* Removed SettingsBackend because it is unfinished.
+* Settings: Removed API that used SettingsBackend.
+* Variant: Improved the documentation.
+
+Build: Remove the dependency on mm-common during the tarball build.
+
+2.27.98 (unstable):
+
+Gio:
+* DBus::InterfaceVTable: Make the tuple type clearer in SlotInterfaceMethodCall.
+
+Glib:
+* Correct some range checks to use >= instead of just >.
+  (Murray Cumming) Thanks to Michael Edwards.
+* Vectorutils, ArrayHandle: Check for NULL pointers.
+  (Krzesimir Nowak)
+
+2.27.97 (unstable):
+
+Gio:
+* DBus::Proxy: Added the properties_changed signal.
+  (Yannick Guesnet) Bug #644886
+* Variant:
+  - Added Variant<VariantBase>::get().
+  (Yannick Guesnet) Bug #644207.
+  - Added some get() method overloads.
+  (Murray Cumming)
+  - Added VariantBase::cast_dynamic().
+  (Yannick Guesnet) Bug #644146
+
+* Build: Fix the missing doc-install.pl problem.
+  mm-common is now needed for tarball builds, though this might change soon.
+  (Murray Cumming)
+
+2.27.96 (unstable):
+
+Gio:
+* Application:
+  - open(): Added a single-file method overload.
+  - The command-line signal now returns an int instead of a bool. It is a
+  main() status code.
+  - Added get_environ().
+  - Add the local_command_line vfunc,
+* ApplicationCommandLine: Use std::string instead of ustring in some API.
+  (Murray Cumming)
+* DBus::InterfaceVTable: Use g_error_copy() where appropriate, fixing a crash.
+  (Murray Cumming) Bug #644008 (Yannick.Guesnet)
+
+* Build: Do not install doctool/ scripts such as doc-install.pl.
+  These are now only installed by mm-common, and the mm-common macros find it
+  there, so no changes should be necessary in other modules if you update
+  mm-common.
+  (Murray Cumming)
+* Documentation: Avoid errors in the reference documentation due to encoding
+  confusion in our perl scripts.
+  (Kjell Ahlstedt) Bug #644037
+
+2.27.95 (unstable):
+
+Gio:
+* Throw Gio::Error again, instead of just the base Glib::Error.
+  This was broken in glibmm 2.27.94.
+  (Murray Cumming)
+
+Glib:
+* build_filename(): Add method overloads to take up to 9 arguments,
+  for convenience.
+  (Fabricio Godoy) Bug #599578
+* Documentation: Mark some new API as new in 2.28.
+  (Murray Cumming)
+
+2.27.94 (unstable):
+
+Glib:
+* OptionGroup:
+  - Add add_entry() that takes a slot with callback function.
+  (Kjell Ahlstedt) Bug #589197 (Hubert Figuiere)
+  - on_post_parse() overrides no longer need to call the base class.
+  (Kjell Ahlstedt) Bug #588988 (Hubert Figuiere)
+  - Make Glib::{Array,List,SList}Handle work with std::vector<bool>.
+  (Krzesimir Nowak) Bug 640079
+
+Gio:
+* Moved all DBus* classes into a Gio::DBus namespace.
+  (Murray Cumming)
+
+2.27.93 (unstable):
+
+* Added ArrayHandler, ListHandler and SListHandler, to help with conversions
+  to/from std::vector.
+  These replace ArrayHandle, ListHandle, and SListHandle, which allowed the
+  use of any standard container. New APIs will use only std::vector, because
+  that is less confusing to developers, though less flexible.
+  (Krzesimir Nowak)
+* Application: Initialize glibmm and giomm in the constructor, for
+  convenience.
+  (Murray Cumming)
+* Resolver: lookup_service(), lookup_by_address(): Fix the reference counting.
+  (Murray Cumming) Bug #639575 (Michael Edwards)
+* Fix the build (and of applications) with  GLIB_DISABLE_SINGLE_INCLUDES.
+  (Chris Kühl)
+
 2.27.91.1 (unstable):
 
 * gmmproc:
-  - _WRAP_CTOR(): Restore the optional extra parameter, because it 
+  - _WRAP_CTOR(): Restore the optional extra parameter, because it
   is still needed by gtkmm-2.4.
   (Murray Cumming)
   - Added conversion from bool& to gboolean*.
   (Chris Kühl)
-  
+
 * DBus::[watch|own]_name(): Add default values for parameters.
 * DBusConnection:
   - Add a send_message() without an "out_serial" parameter.
@@ -32,16 +318,16 @@ Gio:
 * BufferedInputStream, BufferedOutputStream: Fix create_sized().
 	(Murray Cumming) Bug #638616 (Michael Edwards)
 * DBus: Use std::string for addresses since they could be a file path.
-  Use std::string instead of Glib::ustring for address parameters just to avoid 
+  Use std::string instead of Glib::ustring for address parameters just to avoid
   possible errors since DBus address could be a filename path as the "Addresses"
 	section of the DBus introduction seems to imply:
 	http://www.freedesktop.org/wiki/IntroductionToDBus.
-* DBus: Use std::string instead of Glib::ustring for guid's since std::string's 
+* DBus: Use std::string instead of Glib::ustring for guid's since std::string's
   API is probably adequate enough for their use.
-  (José Alburquerque) 
+  (José Alburquerque)
 * DBusConnection:
   - call*() methods: Re-order parameters.
-  - Callbacks: Check for NULL GError** parameters and throw exceptions to the 
+  - Callbacks: Check for NULL GError** parameters and throw exceptions to the
   caller.
   - Add [register|unregister]_subtree() methods.
   - Fix crashes caused by inappropriate use of reinterpret_cast<>.
@@ -55,11 +341,11 @@ Gio:
 * SocketService, ThreadedSocketService: Correct ref-counting for signals.
 * Improvements to the DBus examples.
   (José Alburquerque)
-  
-Tools: 
+
+Tools:
 * gmmproc: Warn about unwrapped properties.
   (Krzesimir Nowak)
-* Added defs_fixer.pl, which fixes some generated .defs by applying a specified 
+* Added defs_fixer.pl, which fixes some generated .defs by applying a specified
   override file. This should be easier than using a patch.
   (Krzesimir Nowak)
 
@@ -70,25 +356,25 @@ Glib:
 * RefPtr: Make it work with sorted containers.
   (David Kozub) Bug #626858
 * Variant:
-  - Make all he get_iter() methods const.
+  - Make all the get_iter() methods const.
   - Added dictionary entry and dictionary specializations.
   - VariantContainerBase: Add a create() method from an array of variants.
   - Added tests.
   (José Alburquerque)
 * gmmproc cleanup
   (José Alburquerque)
-  
+
 Gio:
 * Application: Added the open signal.
   (Yannick Guesnet)
 * DBusConnection: Add register/unregister_object() methods.
   (José Alburquerque) Bug #637587 (Yannick Guesnet)
-  
-	
+
+
 2.27.5: (unstable):
 
 Glib:
-* Added Variant<std::string>, Glib::Variant< array >, and 
+* Added Variant<std::string>, Glib::Variant< array >, and
   Variant< vector > specializations
 
 Gio:
@@ -96,8 +382,8 @@ Gio:
   (José Alburquerque)
 * Fox the build with mingw32.
   (José Alburquerque) Bug #636754 (t.sailer)
-  
-  
+
+
 2.27.4.1: (unstable):
 
 Gio:
@@ -114,19 +400,19 @@ Gio:
   - Add a non-cancellable call_sync() method.
 * Documentation: Add a DBus Doxygen group.
   (José Alburquerque)
-  
+
 Glib:
 * Regex: Add a MatchInfo class and use it.
   (José Alburquerque) Bug #636911 (Alexander Shaduri)
 * gmmproc: Remove m4 conversion files for gdk, gtk, atk, and pango.
-  They are now in the derived projects, which should now include 
+  They are now in the derived projects, which should now include
   convert_glibmm instead of, for instance, convert_gtkmm.
   Some modules will now need to add a line in their configure.ac so they
   can use the extra conversions from gtkmm. For instance, with
   gtksourceviewmm:
   MM_PKG_CONFIG_SUBST([GMMPROC_EXTRA_M4_DIR], [--variable=gmmprocm4dir gtkmm-3.0])
   (Murray Cumming)
-	
+
 2.27.4: (unstable):
 
 Gio:
@@ -137,10 +423,10 @@ Gio:
 * DBusMethodInvocationbusmethodinvocation: Remove the default constructor
 	because it probably will not be used (there is no create() method to
 	go along with it).
-* DbusServer: create_sync(): Use g_dbus_server_new_sync() instead of the 
+* DbusServer: create_sync(): Use g_dbus_server_new_sync() instead of the
   constructors because the C function does more than call g_initable_new().
   (José Alburquerque)
-   
+
 gmmproc:
 * Improve parsing of the C documentation.
   (José Alburquerque)
@@ -154,13 +440,13 @@ Gio:
   - Return int value from run() correctly
   - Fix protected constructor signature
   (Jonathon Jongsma)
-* DBusConnection, DBusProxy, DBusServer: Add non-cancellable overloads of the 
+* DBusConnection, DBusProxy, DBusServer: Add non-cancellable overloads of the
   constructors and create methods.
   Renamed the create() synchronized methods to create_sync().
 * Initable: Add a non-cancellable overload of the init() method.
 * Documentation: Added lots of class and method documentation.
    (José Alburquerque)
-	
+
 
 2.27.3: (unstable):
 

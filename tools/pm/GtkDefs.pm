@@ -20,6 +20,7 @@ package GtkDefs;
 
 use strict;
 use warnings;
+use open IO => ":utf8";
 
 use Util;
 use Enum;
@@ -65,8 +66,6 @@ sub split_tokens($)
   my $inside_squotes = 0;
   # number of yet unpaired opening parens.
   my $parens = 0;
-  # length of token string
-  my $len = length ($token_string);
   # whether previous char was a backslash - important only when being between
   # double quotes.
   my $backslash = 0;
@@ -77,9 +76,13 @@ sub split_tokens($)
   # current token line number
   my $token_line_number = 1;
 
-  for (my $index = 0; $index < $len; ++$index)
+  # Isolate characters with special significance for the token split.
+  my @substrings = split(/([\\"'()\n])/, $token_string);
+
+  my $index = -1;
+  for my $substring (@substrings)
   {
-    my $char = substr ($token_string, $index, 1);
+    $index++;
     # if we are inside double quotes.
     if ($char eq "\n")
     {
@@ -94,13 +97,13 @@ sub split_tokens($)
         $backslash = 0;
       }
       # if current char is backslash.
-      elsif ($char eq '\\')
+      elsif ($substring eq '\\')
       {
         $backslash = 1;
       }
       # if current char is unescaped double quotes and we are not inside single
       # ones - means, we are going outside string.
-      elsif ($char eq '"' and not $inside_squotes)
+      elsif ($substring eq '"' and not $inside_squotes)
       {
         $inside_dquotes = 0;
       }
@@ -112,7 +115,7 @@ sub split_tokens($)
       # if there is near (2 or 3 indexes away) second quote, then it is 2a,
       # if 2a occured earlier, then it is 2b.
       # otherwise is 1.
-      elsif ($char eq '\'')
+      elsif ($substring eq '\'')
       {
         # if we are already inside single quotes, it is 2b.
         if ($inside_squotes)
@@ -122,7 +125,7 @@ sub split_tokens($)
         else
         {
           # if there is closing quotes near, it is 2a.
-          if (substr ($token_string, $index, 4) =~ /^'\\?.'/)
+          if (join('', @substrings[$index .. min($#substrings, $index+3)]) =~ /^'\\?.'/)
           {
             $inside_squotes = 1;
           }
@@ -131,12 +134,12 @@ sub split_tokens($)
       }
     }
     # double quotes - beginning of a string.
-    elsif ($char eq '"')
+    elsif ($substring eq '"')
     {
       $inside_dquotes = 1;
     }
     # opening paren - if paren count is 0 then this is a beginning of a token.
-    elsif ($char eq '(')
+    elsif ($substring eq '(')
     {
       unless ($parens)
       {
@@ -147,13 +150,12 @@ sub split_tokens($)
     }
     # closing paren - if paren count is 1 then this is an end of a token, so we
     # extract it from token string and push into token list.
-    elsif ($char eq ')')
+    elsif ($substring eq ')')
     {
       $parens--;
       unless ($parens)
       {
-        my $token_len = $index + 1 - $begin_token;
-        my $token = substr ($token_string, $begin_token, $token_len);
+        my $token = join('', @substrings[$begin_token .. $index]);
 
         $token =~ s/\s+/ /g;
         push (@{$tokens_a_r}, { $g_l_n => $token_line_number, $g_t => $token });

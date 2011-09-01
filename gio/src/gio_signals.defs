@@ -113,7 +113,7 @@
 (define-property inactivity-timeout
   (of-object "GApplication")
   (prop-type "GParamUInt")
-  (docs "Iime (ms) to stay alive after becoming idle")
+  (docs "Time (ms) to stay alive after becoming idle")
   (readable #t)
   (writable #t)
   (construct-only #f)
@@ -138,24 +138,6 @@
 
 ;; From GBufferedInputStream
 
-(define-property base-stream
-  (of-object "GBufferedInputStream")
-  (prop-type "GParamObject")
-  (docs "The underlying base stream on which the io ops will be done.")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
-(define-property close-base-stream
-  (of-object "GBufferedInputStream")
-  (prop-type "GParamBoolean")
-  (docs "If the base stream should be closed when the filter stream is closed.")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
 (define-property buffer-size
   (of-object "GBufferedInputStream")
   (prop-type "GParamUInt")
@@ -166,24 +148,6 @@
 )
 
 ;; From GBufferedOutputStream
-
-(define-property base-stream
-  (of-object "GBufferedOutputStream")
-  (prop-type "GParamObject")
-  (docs "The underlying base stream on which the io ops will be done.")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
-(define-property close-base-stream
-  (of-object "GBufferedOutputStream")
-  (prop-type "GParamBoolean")
-  (docs "If the base stream should be closed when the filter stream is closed.")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
 
 (define-property buffer-size
   (of-object "GBufferedOutputStream")
@@ -205,33 +169,6 @@
 
 ;; From GDataInputStream
 
-(define-property base-stream
-  (of-object "GDataInputStream")
-  (prop-type "GParamObject")
-  (docs "The underlying base stream on which the io ops will be done.")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
-(define-property close-base-stream
-  (of-object "GDataInputStream")
-  (prop-type "GParamBoolean")
-  (docs "If the base stream should be closed when the filter stream is closed.")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
-(define-property buffer-size
-  (of-object "GDataInputStream")
-  (prop-type "GParamUInt")
-  (docs "The size of the backend buffer")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
 (define-property byte-order
   (of-object "GDataInputStream")
   (prop-type "GParamEnum")
@@ -251,24 +188,6 @@
 )
 
 ;; From GDataOutputStream
-
-(define-property base-stream
-  (of-object "GDataOutputStream")
-  (prop-type "GParamObject")
-  (docs "The underlying base stream on which the io ops will be done.")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
-(define-property close-base-stream
-  (of-object "GDataOutputStream")
-  (prop-type "GParamBoolean")
-  (docs "If the base stream should be closed when the filter stream is closed.")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
 
 (define-property byte-order
   (of-object "GDataOutputStream")
@@ -391,7 +310,7 @@
   (docs "If the base stream should be closed when the filter stream is closed.")
   (readable #t)
   (writable #t)
-  (construct-only #t)
+  (construct-only #f)
 )
 
 ;; From GFilterOutputStream
@@ -477,15 +396,6 @@
 )
 
 ;; From GUnixSocketAddress
-
-(define-property family
-  (of-object "GUnixSocketAddress")
-  (prop-type "GParamEnum")
-  (docs "The family of the socket address")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
 
 (define-property path
   (of-object "GUnixSocketAddress")
@@ -610,10 +520,6 @@
   )
 )
 
-;; p1 is actually a gchar**,
-;; but that is equivalent (by typedef) to gchar**,
-;; and the declaration in gmountoperation.h adds a const.
-;; murrayc
 (define-signal ask-question
   (of-object "GMountOperation")
   (return-type "void")
@@ -707,33 +613,6 @@
 ;; From GProxy
 
 ;; From GProxyAddress
-
-(define-property family
-  (of-object "GProxyAddress")
-  (prop-type "GParamEnum")
-  (docs "The family of the socket address")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property address
-  (of-object "GProxyAddress")
-  (prop-type "GParamObject")
-  (docs "The address")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
-(define-property port
-  (of-object "GProxyAddress")
-  (prop-type "GParamUInt")
-  (docs "The port")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
 
 (define-property protocol
   (of-object "GProxyAddress")
@@ -919,6 +798,14 @@
   (readable #t)
   (writable #t)
   (construct-only #t)
+)
+
+;; From GTimeZoneMonitor
+
+(define-signal changed
+  (of-object "GTimeZoneMonitor")
+  (return-type "void")
+  (when "first")
 )
 
 ;; From GVolume
@@ -1156,15 +1043,6 @@
 )
 
 ;; From GInetSocketAddress
-
-(define-property family
-  (of-object "GInetSocketAddress")
-  (prop-type "GParamEnum")
-  (docs "The family of the socket address")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
 
 (define-property address
   (of-object "GInetSocketAddress")
@@ -1528,33 +1406,6 @@
 
 ;; From GSocketConnection
 
-(define-property input-stream
-  (of-object "GSocketConnection")
-  (prop-type "GParamObject")
-  (docs "The GInputStream to read from")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property output-stream
-  (of-object "GSocketConnection")
-  (prop-type "GParamObject")
-  (docs "The GOutputStream to write to")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property closed
-  (of-object "GSocketConnection")
-  (prop-type "GParamBoolean")
-  (docs "Is the stream closed")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
 (define-property socket
   (of-object "GSocketConnection")
   (prop-type "GParamObject")
@@ -1566,42 +1417,6 @@
 
 ;; From GTcpConnection
 
-(define-property input-stream
-  (of-object "GTcpConnection")
-  (prop-type "GParamObject")
-  (docs "The GInputStream to read from")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property output-stream
-  (of-object "GTcpConnection")
-  (prop-type "GParamObject")
-  (docs "The GOutputStream to write to")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property closed
-  (of-object "GTcpConnection")
-  (prop-type "GParamBoolean")
-  (docs "Is the stream closed")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property socket
-  (of-object "GTcpConnection")
-  (prop-type "GParamObject")
-  (docs "The underlying GSocket")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
-
 (define-property graceful-disconnect
   (of-object "GTcpConnection")
   (prop-type "GParamBoolean")
@@ -1612,42 +1427,6 @@
 )
 
 ;; From GUnixConnection
-
-(define-property input-stream
-  (of-object "GUnixConnection")
-  (prop-type "GParamObject")
-  (docs "The GInputStream to read from")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property output-stream
-  (of-object "GUnixConnection")
-  (prop-type "GParamObject")
-  (docs "The GOutputStream to write to")
-  (readable #t)
-  (writable #f)
-  (construct-only #f)
-)
-
-(define-property closed
-  (of-object "GUnixConnection")
-  (prop-type "GParamBoolean")
-  (docs "Is the stream closed")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
-(define-property socket
-  (of-object "GUnixConnection")
-  (prop-type "GParamObject")
-  (docs "The underlying GSocket")
-  (readable #t)
-  (writable #t)
-  (construct-only #t)
-)
 
 ;; From GSocketListener
 
@@ -1672,15 +1451,6 @@
   )
 )
 
-(define-property listen-backlog
-  (of-object "GSocketService")
-  (prop-type "GParamInt")
-  (docs "outstanding connections in the listen queue")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
-)
-
 ;; From GThreadedSocketService
 
 (define-signal run
@@ -1691,15 +1461,6 @@
     '("GSocketConnection*" "p0")
     '("GObject*" "p1")
   )
-)
-
-(define-property listen-backlog
-  (of-object "GThreadedSocketService")
-  (prop-type "GParamInt")
-  (docs "outstanding connections in the listen queue")
-  (readable #t)
-  (writable #t)
-  (construct-only #f)
 )
 
 (define-property max-threads
@@ -1816,6 +1577,22 @@
   (construct-only #t)
 )
 
+;; From GDBusError
+
+;; From GDBusAnnotationInfo
+
+;; From GDBusArgInfo
+
+;; From GDBusMethodInfo
+
+;; From GDBusSignalInfo
+
+;; From GDBusPropertyInfo
+
+;; From GDBusInterfaceInfo
+
+;; From GDBusNodeInfo
+
 ;; From GDBusMessage
 
 (define-property locked
@@ -1827,6 +1604,8 @@
   (construct-only #f)
 )
 
+;; From GDBusMethodInvocation
+
 ;; From GDBusProxy
 
 (define-signal g-properties-changed
@@ -1835,7 +1614,7 @@
   (when "last")
   (parameters
     '("GVariant*" "p0")
-    '("GStrv" "p1")
+    '("const-gchar*const*" "p1")
   )
 )
 

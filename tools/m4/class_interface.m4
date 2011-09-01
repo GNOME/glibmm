@@ -261,7 +261,7 @@ public:
   ///Provides access to the underlying C GObject.
   __CNAME__*       gobj()       { return reinterpret_cast<__CNAME__*>(gobject_); }
 
-  ///Provides access to the underlying C GObject.  
+  ///Provides access to the underlying C GObject.
   const __CNAME__* gobj() const { return reinterpret_cast<__CNAME__*>(gobject_); }
 
 private:

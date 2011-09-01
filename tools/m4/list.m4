@@ -37,7 +37,7 @@ dnl
 dnl   Closes a list
 define(GP_LIST_END,`dnl
 _POP()
-  
+
 class __LISTNAME__ : public Glib::HelperList< __LISTTYPE__, __LISTELEM__, __LISTITER__ >
 {
 public:

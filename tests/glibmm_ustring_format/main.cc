@@ -26,5 +26,5 @@ int main(int, char**)
   //This threw an exception before we added a ustring::FormatStream::stream(char*) overload.
   Glib::ustring::format(cptr);
 
-  return 0;
+  return EXIT_SUCCESS;
 }

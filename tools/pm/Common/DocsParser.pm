@@ -249,7 +249,6 @@ sub lookup_documentation($$)
     print "DocsParser.pm: Warning: No C docs for function: \"$functionName\"\n";
   }
 
-
   DocsParser::convert_docs_to_cpp($objFunction, \$text);
 
   #Add note about deprecation if we have specified that in our _WRAP_METHOD() call:
@@ -260,7 +259,7 @@ sub lookup_documentation($$)
 
   DocsParser::append_parameter_docs($objFunction, \$text);
   DocsParser::append_return_docs($objFunction, \$text);
-
+  DocsParser::add_m4_quotes(\$text);
 
   # Escape the space after "i.e." or "e.g." in the brief description.
   $text =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
@@ -273,6 +272,20 @@ sub lookup_documentation($$)
   return $text;
 }
 
+sub add_m4_quotes($)
+{
+  my ($text) = @_;
+
+  # __BT__ and __FT__ are M4 macros defined in the base.m4 file that produce
+  # a "`" and a "'" resp. without M4 errors.
+  my %m4_quotes = (
+    "`" => "'__BT__`",
+    "'" => "'__FT__`",
+  );
+
+  $$text =~ s/([`'])/$m4_quotes{$1}/g;
+  $$text = "`" . $$text . "'";
+}
 
 sub append_parameter_docs($$)
 {
@@ -335,11 +348,6 @@ sub convert_docs_to_cpp($$)
 
     $$text =~ s/\bX\s+Window\b/X&nbsp;\%Window/g;
     $$text =~ s/\bWindow\s+manager/\%Window manager/g;
-
-    # This is so that if there is a '`' in the docs it doesn't cause a
-    # problem when M4 processing occurs.  __BT__ is a variable defined in the
-    # base.m4 file that produces a '`' without M4 errors.
-    $$text =~ s/`/__BT__/g;
 #  }
 }
 

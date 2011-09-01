@@ -1,6 +1,13 @@
 #include <glibmm.h>
 #include <iostream>
 
+//Use this line if you want debug output:
+//std::ostream& ostr = std::cout;
+
+//This seems nicer and more useful than putting an ifdef around the use of ostr:
+std::stringstream debug;
+std::ostream& ostr = debug;
+
 int main(int, char**)
 {
   Glib::Date date;
@@ -9,7 +16,7 @@ int main(int, char**)
   date.subtract_days(1);
   date.add_years(1);
 
-  std::cout << "The date a year and a month from yesterday will be: " <<
+  ostr << "The date a year and a month from yesterday will be: " <<
     date.get_month() << "/" << (int) date.get_day() << "/" << date.get_year() <<
       "." << std::endl;
 
@@ -19,9 +26,9 @@ int main(int, char**)
 
   assigned_date = copy_date;
 
-  std::cout << "The copied date is: " << copy_date.get_month() << "/" <<
+  ostr << "The copied date is: " << copy_date.get_month() << "/" <<
     (int) copy_date.get_day() << "/" << copy_date.get_year() << "." <<
       std::endl;
 
-  return 0;
+  return EXIT_SUCCESS;
 }

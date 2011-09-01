@@ -75,7 +75,7 @@ ifelse($9,refreturn_ctype,`dnl Assume Glib::unwrap_copy() is correct if refretur
       #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
-  
+
   BaseClassType *const base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
       _IFACE_PARENT_FROM_OBJECT($8)dnl

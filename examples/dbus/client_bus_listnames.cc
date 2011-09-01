@@ -23,18 +23,18 @@
 Glib::RefPtr<Glib::MainLoop> loop;
 
 // A main loop idle callback to quit when the main loop is idle.
-bool main_loop_idle()
+bool on_main_loop_idle()
 {
   loop->quit();
   return false;
 }
 
-// A callback to finish creating a DBusProxy that was asynchronously created
+// A callback to finish creating a DBus::Proxy that was asynchronously created
 // for the user session's bus and then try to call the well known 'ListNames'
 // method.
-void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
+void on_dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
 {
-  Glib::RefPtr<Gio::DBusProxy> proxy = Gio::DBusProxy::create_finish(result);
+  Glib::RefPtr<Gio::DBus::Proxy> proxy = Gio::DBus::Proxy::create_finish(result);
 
   if(!proxy)
   {
@@ -48,13 +48,12 @@ void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
   {
     // The proxy's call method returns a tuple of the value(s) that the method
     // call produces so just get the tuple as a VariantContainerBase.
-    Glib::VariantContainerBase result;
-    proxy->call_sync(result, "ListNames");
+    const Glib::VariantContainerBase result = proxy->call_sync("ListNames");
 
     // Now extract the single item in the variant container which is the
     // array of strings (the names).
     Glib::Variant< std::vector<Glib::ustring> > names_variant;
-    result.get(names_variant);
+    result.get_child(names_variant);
 
     // Get the vector of strings.
     std::vector<Glib::ustring> names = names_variant.get();
@@ -71,7 +70,7 @@ void dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
 
   // Connect an idle callback to the main loop to quit when the main loop is
   // idle now that the method call is finished.
-  Glib::signal_idle().connect(sigc::ptr_fun(&main_loop_idle));
+  Glib::signal_idle().connect(sigc::ptr_fun(&on_main_loop_idle));
 }
 
 int main(int, char**)
@@ -82,8 +81,8 @@ int main(int, char**)
   loop = Glib::MainLoop::create();
 
   // Get the user session bus connection.
-  Glib::RefPtr<Gio::DBusConnection> connection =
-    Gio::DBusConnection::get_sync(Gio::BUS_TYPE_SESSION);
+  Glib::RefPtr<Gio::DBus::Connection> connection =
+    Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
 
   // Check for an unavailable connection.
   if(!connection)
@@ -93,9 +92,9 @@ int main(int, char**)
   }
 
   // Create the proxy to the bus asynchronously.
-  Gio::DBusProxy::create(connection, "org.freedesktop.DBus",
+  Gio::DBus::Proxy::create(connection, "org.freedesktop.DBus",
     "/org/freedesktop/DBus", "org.freedesktop.DBus",
-    sigc::ptr_fun(&dbus_proxy_available));
+    sigc::ptr_fun(&on_dbus_proxy_available));
 
   loop->run();
 

@@ -25,9 +25,12 @@
 namespace Gio
 {
 
-typedef DBusMessage::ByteOrder ByteOrder;
+namespace DBus
+{
 
-void DBusMessage::get_body(Glib::VariantBase& value) const
+typedef Message::ByteOrder ByteOrder;
+
+void Message::get_body(Glib::VariantBase& value) const
 {
   GVariant* const g_value =
     g_dbus_message_get_body(const_cast<GDBusMessage*>(gobj()));
@@ -38,8 +41,8 @@ void DBusMessage::get_body(Glib::VariantBase& value) const
   value.init(g_value, true /* take a reference */);
 }
 
-void DBusMessage::get_header(Glib::VariantBase& value,
-  DBusMessageHeaderField header_field) const
+void Message::get_header(Glib::VariantBase& value,
+  MessageHeaderField header_field) const
 {
   GVariant* const g_value =
     g_dbus_message_get_header(const_cast<GDBusMessage*>(gobj()),
@@ -52,10 +55,11 @@ void DBusMessage::get_header(Glib::VariantBase& value,
 }
 
 #ifdef G_OS_UNIX
-void DBusMessage::unset_unix_fd_list()
+void Message::unset_unix_fd_list()
 {
   g_dbus_message_set_unix_fd_list(gobj(), 0);
 }
 #endif //G_OS_UNIX
 
+} //namespace DBus
 } // namespace Gio

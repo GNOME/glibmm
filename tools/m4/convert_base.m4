@@ -35,6 +35,27 @@ define(`_CONVERSION',`
 m4_ifelse(`$3',,,`define(CF`'__HASH2(`$1',`$2'),`$3')')
 ')
 
+#
+#  _INITIALIZE(target_type, fromtype, output_param_name, c_return, wrap_line)
+#    Print an initialize statement from ctype to cpptype
+define(`_INITIALIZE',`dnl
+m4_ifelse(`$1',void,`$4',`dnl
+pushdef(`__INI',`IN`'__HASH2(`$1',`$2')')dnl
+m4_ifdef(__INI,`m4_indir(__INI,m4_substr(`$1',`0',m4_decr(m4_len(`$1'))),`$2',`$3', `$4')',`
+m4_errprint(`No initialization for type $1 from type $2 defined (line: $5, output param: $3, c return: $4)
+')
+m4_m4exit(1)
+')`'dnl
+')`'dnl
+')
+
+#
+#  Functions for populating initialization tables.
+#
+define(`_INITIALIZATION',`
+m4_ifelse(`$3',,,`define(IN`'__HASH2(`$1',`$2'),`$3')')
+')
+
 define(`_EQUAL',`define(EV`'__HASH(`$1'),`$2')')
 
 /*******************************************************************/

@@ -17,7 +17,6 @@
 
 #include <glibmm/object.h>
 #include <glibmm/variant.h>
-#include <giomm/settingsbackend.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -41,18 +40,18 @@ class Settings : public Glib::Object
 protected:
   _WRAP_CTOR(Settings(const Glib::ustring& schema), g_settings_new)
   _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::ustring& path), g_settings_new_with_path)
-  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend), g_settings_new_with_backend)
-  _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path), g_settings_new_with_backend_and_path)
+  //TODO: Requires SettingsBackend: _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend), g_settings_new_with_backend)
+  //TODO: Requires SettingsBackend: _WRAP_CTOR(Settings(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path), g_settings_new_with_backend_and_path)
 
 public:
   _WRAP_CREATE(const Glib::ustring& schema)
   _WRAP_CREATE(const Glib::ustring& schema, const Glib::ustring& path)
-  _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend)
-  _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
+  //TODO: Requires SettingsBackend: _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend)
+  //TODO: Requires SettingsBackend: _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
 
   _WRAP_METHOD(bool set_value(const Glib::ustring& key, const Glib::VariantBase& value),  g_settings_set_value)
 
-  /** TODO: Gets the value that is stored in the settings for a @key.
+  /** Gets the value that is stored in the settings for a @key.
    *
    * It is a programmer error to give a @a key that isn't contained in the
    * schema for the settings.
@@ -98,10 +97,16 @@ public:
 
   _WRAP_METHOD(void reset(const Glib::ustring& key), g_settings_reset)
 
-  //TODO: _WRAP_METHOD(Glib::StringArrayHandle list_schemas() const, g_settings_list_schemas)
+//We must hand-code this because gmmproc is confused by the static keyword with the vector.
+//#m4 _CONVERSION(`const gchar*const*',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD_DOCS_ONLY(g_settings_list_schemas)
+  static std::vector<Glib::ustring> list_schemas();
+  _IGNORE(g_settings_list_schemas)
 
-  _WRAP_METHOD(Glib::StringArrayHandle list_children() const, g_settings_list_children)
-  _WRAP_METHOD(Glib::StringArrayHandle list_keys() const, g_settings_list_keys)
+#m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> list_children() const, g_settings_list_children)
+  _WRAP_METHOD(std::vector<Glib::ustring> list_keys() const, g_settings_list_keys)
+
   //TODO: Choose an appropriate Variant template type: GVariant* g_settings_get_range(const gchar* key)
 
   _WRAP_METHOD(bool range_check(const Glib::ustring& key, const Glib::VariantBase& value) const, g_settings_range_check)

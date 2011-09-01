@@ -27,19 +27,24 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
+namespace DBus
+{
+
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
 //TODO: Add example from the C API docs in class docs.
-/** DBusAuthObserver - Object used for authenticating connections.
- * The DBusAuthObserver type provides a mechanism for participating in how a
- * DBusServer (or a DBusConnection) authenticates remote peers.  Simply
- * instantiate a DBusAuthObserver and connect to the signals you are
+/** Ah object used for authenticating connections.
+ * The AuthObserver type provides a mechanism for participating in how a
+ * Server (or a Connection) authenticates remote peers.  Simply
+ * instantiate an AuthObserver and connect to the signals you are
  * interested in. Note that new signals may be added in the future.
  *
  * @newin{2,28}
  * @ingroup DBus
  */
-class DBusAuthObserver : public Glib::Object
+class AuthObserver : public Glib::Object
 {
-  _CLASS_GOBJECT(DBusAuthObserver, GDBusAuthObserver, G_DBUS_AUTH_OBSERVER, Glib::Object, GObject)
+  _CLASS_GOBJECT(AuthObserver, GDBusAuthObserver, G_DBUS_AUTH_OBSERVER, Glib::Object, GObject)
 
 protected:
   _CTOR_DEFAULT
@@ -54,5 +59,7 @@ public:
 #m4 _CONVERSION(`GCredentials*', `const Glib::RefPtr<const Credentials>&', `Glib::wrap($3, true)')
   _WRAP_SIGNAL(bool authorize_authenticated_peer(const Glib::RefPtr<const IOStream>& stream, const Glib::RefPtr<const Credentials>& credentials), "authorize-authenticated-peer", no_default_handler)
 };
+
+} //namespace DBus
 
 } // namespace Gio

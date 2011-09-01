@@ -51,6 +51,7 @@
  * - Asynchronous IO. See Gio::File and the @ref Streams.
  * - @ref NetworkIO
  * - @ref DBus
+ * - Gio::Settings for application settings.
  *
  * @section basics Basic Usage
  *
@@ -132,6 +133,7 @@
 #include <glibmm/variant.h>
 #include <glibmm/variantiter.h>
 #include <glibmm/varianttype.h>
+#include <glibmm/vectorutils.h>
 #include <glibmm/wrap.h>
 
 #endif /* _GLIBMM_H */

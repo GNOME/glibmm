@@ -28,23 +28,23 @@ typedef struct _GVariantType GVariantType;
 namespace Glib
 {
 
-/** VariantType - The Glib::VariantBase type system.
- * The Glib::VariantBase type system is based, in large part, on the DBus type
+/** VariantType - The VariantBase type system.
+ * The VariantBase type system is based, in large part, on the D-Bus type
  * system, with two major changes and some minor lifting of restrictions. <a
  * href="http://dbus.freedesktop.org/doc/dbus-specification.html">The
- * DBus specification</a>, therefore, provides a significant amount of
- * information that is useful when working with Glib::VariantBase.
+ * D-Bus specification</a>, therefore, provides a significant amount of
+ * information that is useful when working with VariantBase.
  *
- * The first major change with respect to the DBus type system is the
- * introduction of maybe (or "nullable") types. Any type in Glib::VariantBase
+ * The first major change with respect to the D-Bus type system is the
+ * introduction of maybe (or "nullable") types. Any type in VariantBase
  * can be converted to a maybe type, in which case, "nothing" (or "null")
  * becomes a valid value. Maybe types have been added by introducing the
  * character "m" to type strings.
  *
- * The second major change is that the Glib::VariantBase type system supports
+ * The second major change is that the VariantBase type system supports
  * the concept of "indefinite types" -- types that are less specific than the
- * normal types found in DBus. For example, it is possible to speak of "an
- * array of any type" in Glib::VariantBase, where the DBus type system would
+ * normal types found in D-Bus. For example, it is possible to speak of "an
+ * array of any type" in VariantBase, where the D-Bus type system would
  * require you to speak of "an array of integers" or "an array of strings".
  * Indefinite types have been added by introducing the characters "*", "?" and
  * "r" to type strings.
@@ -53,23 +53,23 @@ namespace Glib
  * lifted along with the restriction that dictionary entries may only appear
  * nested inside of arrays.
  *
- * Just as in DBus, Glib::VariantBase types are described with strings ("type
+ * Just as in D-Bus, VariantBase types are described with strings ("type
  * strings"). Subject to the differences mentioned above, these strings are of
- * the same form as those found in DBus. Note, however: DBus always works in
+ * the same form as those found in D-Bus. Note, however: D-Bus always works in
  * terms of messages and therefore individual type strings appear nowhere in
  * its interface. Instead, "signatures" are a concatenation of the strings of
- * the type of each argument in a message. Glib::VariantBase deals with single
- * values directly so Glib::VariantBase type strings always describe the type
- * of exactly one value. This means that a DBus signature string is generally
- * not a valid Glib::VariantBase type string -- except in the case that it is
+ * the type of each argument in a message. VariantBase deals with single
+ * values directly so VariantBase type strings always describe the type
+ * of exactly one value. This means that a D-Bus signature string is generally
+ * not a valid VariantBase type string -- except in the case that it is
  * the signature of a message containing exactly one argument.
  *
  * An indefinite type is similar in spirit to what may be called an abstract
  * type in other type systems. No value can exist that has an indefinite type
  * as its type, but values can exist that have types that are subtypes of
- * indefinite types. That is to say, Glib::VariantBase::get_type() will never
- * return an indefinite type, but calling Glib::VariantBase::is_of_type() with
- * an indefinite type may return <tt>true</tt>. For example, you can not have a
+ * indefinite types. That is to say, VariantBase::get_type() will never
+ * return an indefinite type, but calling VariantBase::is_of_type() with
+ * an indefinite type may return <tt>true</tt>. For example, you cannot have a
  * value that represents "an array of no particular type", but you can have an
  * "array of integers" which certainly matches the type of "an array of no
  * particular type", since "array of integers" is a subtype of "array of no
@@ -82,8 +82,8 @@ namespace Glib
  * instantiated, and you would say that the Gtk::Window is a Gtk::Bin (since
  * Gtk::Window is a subclass of Gtk::Bin).
  *
- * For a detailed description of the Glib::VariantBase type strings see the C
- * API docs of GVariantType.
+ * See the underlying GVariantType documentation for <a href="http://library.gnome.org/devel/glib/unstable/glib-GVariantType.html#gvariant-typestrings">detailed description of the VariantBase type strings</a>.
+ *
  * @newin{2,28}
  * @ingroup Variant
  */
@@ -97,8 +97,12 @@ public:
    */
   explicit VariantType(const GVariantType* castitem);
 
-  //TODO: Docuementation
+  /** Creates a new VariantType corresponding to the type string given by @a type_string.
+    *
+    * It is a programmer error to call this function with an invalid type string. Use string_is_valid() if you are unsure.
+    */
   explicit VariantType(const std::string& type_string);
+  _IGNORE(g_variant_type_new)
 
   VariantType& operator=(const GVariantType* castitem);
 
@@ -142,55 +146,55 @@ public:
   _WRAP_METHOD(VariantType value() const, g_variant_type_value)
 };
 
-extern const VariantType VariantTypeBool;
+extern const VariantType VARIANT_TYPE_BOOL;
 
-extern const VariantType VariantTypeByte;
+extern const VariantType VARIANT_TYPE_BYTE;
 
-extern const VariantType VariantTypeInt16;
+extern const VariantType VARIANT_TYPE_INT16;
 
-extern const VariantType VariantTypeUint16;
+extern const VariantType VARIANT_TYPE_UINT16;
 
-extern const VariantType VariantTypeInt32;
+extern const VariantType VARIANT_TYPE_INT32;
 
-extern const VariantType VariantTypeUint32;
+extern const VariantType VARIANT_TYPE_UINT32;
 
-extern const VariantType VariantTypeInt64;
+extern const VariantType VARIANT_TYPE_INT64;
 
-extern const VariantType VariantTypeUint64;
+extern const VariantType VARIANT_TYPE_UINT64;
 
-extern const VariantType VariantTypeDouble;
+extern const VariantType VARIANT_TYPE_DOUBLE;
 
-extern const VariantType VariantTypeString;
+extern const VariantType VARIANT_TYPE_STRING;
 
-extern const VariantType VariantTypeObjectPath;
+extern const VariantType VARIANT_TYPE_OBJECT_PATH;
 
-extern const VariantType VariantTypeSignature;
+extern const VariantType VARIANT_TYPE_SIGNATURE;
 
-extern const VariantType VariantTypeVariant;
+extern const VariantType VARIANT_TYPE_VARIANT;
 
-extern const VariantType VariantTypeHandle;
+extern const VariantType VARIANT_TYPE_HANDLE;
 
-extern const VariantType VariantTypeUnit;
+extern const VariantType VARIANT_TYPE_UNIT;
 
-extern const VariantType VariantTypeAny;
+extern const VariantType VARIANT_TYPE_ANY;
 
-extern const VariantType VariantTypeBasic;
+extern const VariantType VARIANT_TYPE_BASIC;
 
-extern const VariantType VariantTypeMaybe;
+extern const VariantType VARIANT_TYPE_MAYBE;
 
-extern const VariantType VariantTypeArray;
+extern const VariantType VARIANT_TYPE_ARRAY;
 
-extern const VariantType VariantTypeTuple;
+extern const VariantType VARIANT_TYPE_TUPLE;
 
-extern const VariantType VariantTypeDictEntry;
+extern const VariantType VARIANT_TYPE_DICT_ENTRY;
 
-extern const VariantType VariantTypeDictionary;
+extern const VariantType VARIANT_TYPE_DICTIONARY;
 
-extern const VariantType VariantTypeStringArray;
+extern const VariantType VARIANT_TYPE_STRING_ARRAY;
 
-extern const VariantType VariantTypeByteString;
+extern const VariantType VARIANT_TYPE_BYTESTRING;
 
-extern const VariantType VariantTypeByteStringArray;
+extern const VariantType VARIANT_TYPE_BYTESTRING_ARRAY;
 
 
 

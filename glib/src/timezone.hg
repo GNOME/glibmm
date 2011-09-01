@@ -1,0 +1,72 @@
+/* Copyright (C) 2011 The glibmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_DEFS(glibmm,glib)
+
+#include <glibmmconfig.h>
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+#include <glib.h>
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GTimeZone GTimeZone;
+#endif
+
+namespace Glib
+{
+
+_WRAP_ENUM(TimeType, GTimeType, NO_GTYPE)
+
+/** TimeZone - A structure representing a time zone.
+ * TimeZone is a structure that represents a time zone, at no particular point
+ * in time. It is refcounted and immutable.
+ *
+ * A time zone contains a number of intervals. Each interval has an
+ * abbreviation to describe it, an offet to UTC and a flag indicating if the
+ * daylight savings time is in effect during that interval. A time zone always
+ * has at least one interval -- interval 0.
+ *
+ * Every UTC time is contained within exactly one interval, but a given local
+ * time may be contained within zero, one or two intervals (due to
+ * incontinuities associated with daylight savings time).
+ *
+ * An interval may refer to a specific period of time (eg: the duration of
+ * daylight savings time during 2010) or it may refer to many periods of time
+ * that share the same properties (eg: all periods of daylight savings time).
+ * It is also possible (usually for political reasons) that some properties
+ * (like the abbreviation) change between intervals without other properties
+ * changing.
+ * @newin{2,30}
+ */
+class TimeZone
+{
+  _CLASS_OPAQUE_COPYABLE(TimeZone, GTimeZone, NONE, g_time_zone_ref, g_time_zone_unref)
+  _IGNORE(g_time_zone_ref, g_time_zone_unref)
+
+public:
+  _WRAP_METHOD(static TimeZone create(const Glib::ustring& identifier), g_time_zone_new)
+  _WRAP_METHOD(static TimeZone create_local(), g_time_zone_new_local)
+  _WRAP_METHOD(static TimeZone create_utc(), g_time_zone_new_utc)
+
+  _WRAP_METHOD(int find_interval(TimeType type, gint64 time) const, g_time_zone_find_interval)
+  _WRAP_METHOD(int adjust_time(TimeType type, gint64& time) const, g_time_zone_adjust_time)
+  _WRAP_METHOD(Glib::ustring get_abbreviation(int interval) const, g_time_zone_get_abbreviation)
+  _WRAP_METHOD(gint32 get_offset(int interval) const, g_time_zone_get_offset)
+  _WRAP_METHOD(bool is_dst(int interval) const, g_time_zone_is_dst)
+};
+
+} // namespace Glib

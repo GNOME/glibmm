@@ -18,6 +18,8 @@
 #
 package Output;
 use strict;
+use open IO => ":utf8";
+
 BEGIN { @Namespace::ISA=qw(main); }
 
 # $objOutputter new()
@@ -138,51 +140,58 @@ sub output_wrap_vfunc_h($$$$$$)
 # _VFUNC_CC(signame,gtkname,rettype,crettype,`<cppargs>',`<cargs>')
 sub output_wrap_vfunc_cc($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $ifdef) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objCFunc,
+      $custom_vfunc, $custom_vfunc_callback, $ifdef) = @_;
 
-  my $cname = $$objDefsSignal{name};
+  my $cname = $$objCFunc{name};
 
   # e.g. Gtk::Button::draw_indicator:
 
   #Use a different macro for Interfaces, to generate an extra convenience method.
 
-  my $refreturn = "";
-  $refreturn = "refreturn" if($$objCppfunc{rettype_needs_ref});
+  if (!$custom_vfunc)
+  {
+    my $refreturn = "";
+    $refreturn = "refreturn" if($$objCppfunc{rettype_needs_ref});
 
-  my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
-    $$objCppfunc{name},
-    $cname,
-    $$objCppfunc{rettype},
-    $$objDefsSignal{rettype},
-    $objCppfunc->args_types_and_names(),
-    convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num), #$objCppfunc->args_names_only(),
-    $objCppfunc->get_is_const(),
-    $refreturn,
-    $ifdef);
+    my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
+      $$objCppfunc{name},
+      $cname,
+      $$objCppfunc{rettype},
+      $$objCFunc{rettype},
+      $objCppfunc->args_types_and_names(),
+      convert_args_cpp_to_c($objCppfunc, $objCFunc, 0, $line_num), #$objCppfunc->args_names_only(),
+      $objCppfunc->get_is_const(),
+      $refreturn,
+      $ifdef);
 
-  $self->append($str);
+    $self->append($str);
+  }
 
   # e.g. Gtk::ButtonClass::draw_indicator():
 
-  my $refreturn_ctype = "";
-  $refreturn_ctype = "refreturn_ctype" if($$objDefsSignal{rettype_needs_ref});
+  if (!$custom_vfunc_callback)
+  {
+    my $refreturn_ctype = "";
+    $refreturn_ctype = "refreturn_ctype" if($$objCFunc{rettype_needs_ref});
 
-  my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s)dnl\n",
-    $$objCppfunc{name},
-    $cname,
-    $$objCppfunc{rettype},
-    $$objDefsSignal{rettype},
-    $objDefsSignal->args_types_and_names(),
-    $objDefsSignal->args_names_only(),
-    convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num),
-    ${$objDefsSignal->get_param_names()}[0],
-    $refreturn_ctype,
-    $ifdef);
+    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s)dnl\n",
+      $$objCppfunc{name},
+      $cname,
+      $$objCppfunc{rettype},
+      $$objCFunc{rettype},
+      $objCFunc->args_types_and_names(),
+      $objCFunc->args_names_only(),
+      convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num),
+      ${$objCFunc->get_param_names()}[0],
+      $refreturn_ctype,
+      $ifdef);
 
-  $self->append($str);
+    $self->append($str);
+  }
 }
 
-### Convert _WRAP to a virtual
+### Convert _WRAP to a signal
 # _SIGNAL_H(signame,rettype, ifdef, `<cppargs>')
 # _SIGNAL_PH(gtkname,crettype, ifdef, cargs and names)
 # void output_wrap_default_signal_handler_h($filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef. @args)
@@ -273,84 +282,119 @@ sub output_wrap_meth($$$$$$$)
   my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl, $documentation, $ifdef) = @_;
   my $objDefsParser = $$self{objDefsParser};
 
-  # Allow the generated .h/.cc code to have an #ifndef around it, and add deprecation docs to the generated documentation.
-  my $deprecated = "";
-  if($$objCDefsFunc{deprecated})
+  my $cpp_param_names = $$objCppfunc{param_names};
+  my $cpp_param_types = $$objCppfunc{param_types};
+  my $cpp_param_mappings = $$objCppfunc{param_mappings};
+
+  my $num_args_list = $objCppfunc->get_num_possible_args_list();
+
+  my $output_var_name;
+  my $output_var_type;
+
+  if(defined($$cpp_param_mappings{"RET"}))
   {
-    $deprecated = "deprecated";
+    $output_var_name = $$cpp_param_names[$$cpp_param_mappings{"RET"}];
+    $output_var_type = $$cpp_param_types[$$cpp_param_mappings{"RET"}];
   }
 
-  #Declaration:
-  if($deprecated ne "")
+  for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
   {
-    $self->append("\n_DEPRECATE_IFDEF_START");
+    # Allow the generated .h/.cc code to have an #ifndef around it, and add
+    # deprecation docs to the generated documentation.
+    my $deprecated = "";
+    if($$objCDefsFunc{deprecated})
+    {
+      $deprecated = "deprecated";
+    }
+
+    #Declaration:
+    if($deprecated ne "")
+    {
+      $self->append("\n_DEPRECATE_IFDEF_START");
+    }
+
+    if($arg_list == 0)
+    {
+      # Doxygen documentation before the method declaration:
+      $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
+    }
+    else
+    {
+      $self->append("\n\n  /// A $$objCppfunc{name}() convenience overload.\n");
+    }
+
+    $self->ifdef($ifdef);
+
+    $self->append("  " . $objCppfunc->get_declaration($arg_list));
+
+    $self->endif($ifdef);
+
+
+    if($deprecated ne "")
+    {
+      $self->append("\n_DEPRECATE_IFDEF_END\n");
+    }
+
+    my $refneeded = "";
+    if($$objCDefsFunc{rettype_needs_ref})
+    {
+      $refneeded = "refreturn"
+    }
+
+    my $errthrow = "";
+    if($$objCDefsFunc{throw_any_errors})
+    {
+      $errthrow = "errthrow"
+    }
+
+    my $constversion = ""; #Whether it is just a const overload (so it can reuse code)
+    if($$objCDefsFunc{constversion})
+    {
+      $constversion = "constversion"
+    }
+
+    #Implementation:
+    my $str;
+    if ($$objCppfunc{static}) {
+      $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
+        $$objCppfunc{name},
+        $$objCDefsFunc{c_name},
+        $$objCppfunc{rettype},
+        $objCDefsFunc->get_return_type_for_methods(),
+        $objCppfunc->args_types_and_names($arg_list),
+        convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 1, $line_num,
+          $errthrow, $arg_list), #1 means it's static, so it has 'object'.
+        $refneeded,
+        $errthrow,
+        $deprecated,
+        $ifdef,
+        $output_var_name,
+        $output_var_type,
+        $line_num
+        );
+    } else {
+      $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s,%s,%s,%s)dnl\n",
+        $$objCppfunc{name},
+        $$objCDefsFunc{c_name},
+        $$objCppfunc{rettype},
+        $objCDefsFunc->get_return_type_for_methods(),
+        $objCppfunc->args_types_and_names($arg_list),
+        convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 0, $line_num,
+          $errthrow, $arg_list),
+        $$objCppfunc{const},
+        $refneeded,
+        $errthrow,
+        $deprecated,
+        $constversion,
+        $objCppfunc->args_names_only($arg_list),
+        $ifdef,
+        $output_var_name,
+        $output_var_type,
+        $line_num
+        );
+    }
+    $self->append($str);
   }
-
-  # Doxygen documentation before the method declaration:
-  $self->output_wrap_meth_docs_only($filename, $line_num, $documentation);
-
-  $self->ifdef($ifdef);
-
-  $self->append("  ${cppMethodDecl};");
-
-  $self->endif($ifdef);
-
-
-  if($deprecated ne "")
-  {
-    $self->append("\n_DEPRECATE_IFDEF_END\n");
-  }
-
-  my $refneeded = "";
-  if($$objCDefsFunc{rettype_needs_ref})
-  {
-    $refneeded = "refreturn"
-  }
-
-  my $errthrow = "";
-  if($$objCDefsFunc{throw_any_errors})
-  {
-    $errthrow = "errthrow"
-  }
-
-  my $constversion = ""; #Whether it is just a const overload (so it can reuse code)
-  if($$objCDefsFunc{constversion})
-  {
-    $constversion = "constversion"
-  }
-
-  #Implementation:
-  my $str;
-  if ($$objCppfunc{static}) {
-    $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
-      $$objCppfunc{name},
-      $$objCDefsFunc{c_name},
-      $$objCppfunc{rettype},
-      $objCDefsFunc->get_return_type_for_methods(),
-      $objCppfunc->args_types_and_names(),
-      convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 1, $line_num, $errthrow), #1 means it's static, so it has 'object'.
-      $refneeded,
-      $errthrow,
-      $deprecated,
-      $ifdef);
-  } else {
-    $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s)dnl\n",
-      $$objCppfunc{name},
-      $$objCDefsFunc{c_name},
-      $$objCppfunc{rettype},
-      $objCDefsFunc->get_return_type_for_methods(),
-      $objCppfunc->args_types_and_names(),
-      convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 0, $line_num, $errthrow),
-      $$objCppfunc{const},
-      $refneeded,
-      $errthrow,
-      $deprecated,
-      $constversion,
-      $objCppfunc->args_names_only(),
-      $ifdef
-      );
-  }
-  $self->append($str);
 }
 
 ### Convert _WRAP to a method
@@ -373,19 +417,29 @@ sub output_wrap_ctor($$$$$)
   my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $cppMethodDecl) = @_;
   my $objDefsParser = $$self{objDefsParser};
 
-  #Ctor Declaration:
-  #TODO: Add explicit.
-  $self->append("explicit " . $cppMethodDecl . ";");
+  my $num_args_list = $objCppfunc->get_num_possible_args_list();
 
-  #Implementation:
-  my $str = sprintf("_CTOR_IMPL(%s,%s,\`%s\',\`%s\')dnl\n",
-    $$objCppfunc{name},
-    $$objCDefsFunc{c_name},
-    $objCppfunc->args_types_and_names(),
-    get_ctor_properties($objCppfunc, $objCDefsFunc, $line_num)
-  );
+  for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
+  {
+    if ($arg_list > 0)
+    {
+      $self->append("\n\n  /// A $$objCppfunc{name}() convenience overload.\n");
+    }
 
-  $self->append($str);
+    #Ctor Declaration:
+    #TODO: Add explicit.
+    $self->append("  explicit " . $objCppfunc->get_declaration($arg_list) . "\n");
+
+    #Implementation:
+    my $str = sprintf("_CTOR_IMPL(%s,%s,\`%s\',\`%s\')dnl\n",
+      $$objCppfunc{name},
+      $$objCDefsFunc{c_name},
+      $objCppfunc->args_types_and_names($arg_list),
+      get_ctor_properties($objCppfunc, $objCDefsFunc, $line_num, $arg_list)
+    );
+
+    $self->append($str);
+  }
 }
 
 sub output_wrap_create($$$)
@@ -396,14 +450,25 @@ sub output_wrap_create($$$)
   my $fake_decl = "void fake_func(" . $args_type_and_name_with_default_values . ")";
 
   my $objFunction = &Function::new($fake_decl, $objWrapParser);
-  my $args_names_only = $objFunction->args_names_only();
-  my $args_type_and_name_hpp = $objFunction->args_types_and_names_with_default_values();
-  my $args_type_and_name_cpp = $objFunction->args_types_and_names();
 
-  my $str = sprintf("_CREATE_METHOD(\`%s\',\`%s\',\`%s\')dnl\n",
-              $args_type_and_name_hpp, , $args_type_and_name_cpp, $args_names_only);
+  my $num_args_list = $objFunction->get_num_possible_args_list();
 
-  $self->append($str)
+  for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
+  {
+    my $args_names_only = $objFunction->args_names_only($arg_list);
+    my $args_type_and_name_hpp =
+      $objFunction->args_types_and_names_with_default_values($arg_list);
+    my $args_type_and_name_cpp = $objFunction->args_types_and_names($arg_list);
+
+    if ($arg_list > 0) {
+      $self->append("\n  /// A create() convenience overload.");
+    }
+
+    my $str = sprintf("_CREATE_METHOD(\`%s\',\`%s\',\`%s\')dnl\n",
+                $args_type_and_name_hpp, , $args_type_and_name_cpp, $args_names_only);
+
+    $self->append($str)
+  }
 }
 
 # void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback)
@@ -579,44 +644,49 @@ sub output_wrap_property($$$$$$)
     my $name_underscored = $name;
     $name_underscored =~ tr/-/_/;
 
-      # For the docs of the property (the final argument of the sprintf), the
-      # m4 quotes are changed, the new quotes are then used to quote the docs
-      # and then the quotes are changed back to the standard quotes.  This is
-      # done so that if there are commas in the docs, the contents after the
-      # docs are not lost (m4 thinks the contents after the comma is another
-      # agument to the macro).  Using the standard quotes leaves a trailing
-      # single quote for some undetermined reason.
-    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,changequote([,])[%s]changequote(`,'))dnl\n",
+    # Get the property documentation, if any, and add m4 quotes.
+    my $documentation = $objProperty->get_docs();
+    add_m4_quotes(\$documentation) if ($documentation ne "");
+
+    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,`%s')dnl\n",
       $name,
       $name_underscored,
       $cpp_type,
       $proxy_suffix,
-      $objProperty->get_docs()
+      $documentation
     );
     $self->append($str);
     $self->append("\n");
 
-    # If the property is not already read-only, and the property can be read, then add a second const accessor for a read-only propertyproxy:
+    # If the property is not already read-only, and the property can be read,
+    # then add a second const accessor for a read-only propertyproxy:
     if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
     {
-
-      # For the docs of the property (the final argument of the sprintf), the
-      # m4 quotes are changed, the new quotes are then used to quote the docs
-      # and then the quotes are changed back to the standard quotes.  This is
-      # done so that if there are commas in the docs, the contents after the
-      # docs are not lost (m4 thinks the contents after the comma is another
-      # agument to the macro).  Using the standard quotes leaves a trailing
-      # single quote for some undetermined reason.
-      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,changequote([,])[%s]changequote(`,'))dnl\n",
+      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,`%s')dnl\n",
         $name,
         $name_underscored,
         $cpp_type,
         "_ReadOnly",
-        $objProperty->get_docs()
+        $documentation
       );
       $self->append($str);
     }
   }
+}
+
+sub add_m4_quotes($)
+{
+  my ($text) = @_;
+
+  # __BT__ and __FT__ are M4 macros defined in the base.m4 file that produce
+  # a "`" and a "'" resp. without M4 errors.
+  my %m4_quotes = (
+    "`" => "'__BT__`",
+    "'" => "'__FT__`",
+  );
+
+  $$text =~ s/([`'])/$m4_quotes{$1}/g;
+  $$text = "`" . $$text . "'";
 }
 
 # vpod output_temp_g1($filename, $section) e.g. output_temp_g1(button, gtk)
@@ -658,7 +728,7 @@ sub write_sections_to_files()
 
   open(INPUT, '<', "$$self{tmpdir}/gtkmmproc_$$.g2"); # $$ is the process ID.
 
-  # open tempory file for each section
+  # open temporary file for each section
   open(OUTPUT_H,  '>', "$fname_h.tmp");
   open(OUTPUT_PH, '>', "$fname_ph.tmp");
   open(OUTPUT_CC, '>', "$fname_cc.tmp");
@@ -710,16 +780,23 @@ sub remove_temp_files($)
 
 
 # procedure for generating CONVERT macros
-# $string convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, $static, $wrap_line_number,$automatic_error)
-sub convert_args_cpp_to_c($$$$;$)
+# $string convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, $static, $wrap_line_number,$automatic_error, $index = 0)
+# The optional index specifies which arg list out of the possible combination
+# of arguments based on whether any arguments are optional. index = 0 ==> all
+# the arguments.
+sub convert_args_cpp_to_c($$$$$)
 {
-  my ($objCppfunc, $objCDefsFunc, $static, $wrap_line_number, $automatic_error) = @_;
+  my ($objCppfunc, $objCDefsFunc, $static, $wrap_line_number, $automatic_error, $index) = @_;
 
   $automatic_error = "" unless defined $automatic_error;
+  $index = 0 unless defined $index;
 
   my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
+  my $cpp_param_optional = $$objCppfunc{param_optional};
+  my $cpp_param_mappings = $$objCppfunc{param_mappings};
   my $c_param_types = $$objCDefsFunc{param_types};
+  my $c_param_names = $$objCDefsFunc{param_names};
 
   my @result;
 
@@ -727,6 +804,19 @@ sub convert_args_cpp_to_c($$$$;$)
   if( !($static) ) { $num_c_args_expected--; } #The cpp method will need an Object* paramater at the start.
 
   my $num_cpp_args = scalar(@{$cpp_param_types});
+
+  my $has_output_param = 0;
+  my $output_param_index;
+
+  # See if there is an output parameter.  If so, temporarily decrement the
+  # number of C++ arguments so that the possible GError addition works and
+  # note the existence.
+  if(defined($$cpp_param_mappings{"RET"}))
+  {
+    $num_cpp_args--;
+    $has_output_param = 1;
+    $output_param_index = $$cpp_param_mappings{"RET"};
+  }
 
   # add implicit last error parameter;
   if ( $automatic_error ne "" &&
@@ -736,6 +826,14 @@ sub convert_args_cpp_to_c($$$$;$)
     $num_cpp_args++;
     $cpp_param_names = [@{$cpp_param_names},"gerror"];
     $cpp_param_types = [@{$cpp_param_types},"GError*&"];
+    $cpp_param_optional = [@{$cpp_param_optional}, 0];
+
+    # Map from the C gerror param name to the newly added C++ param index.
+    # The correct C++ index to map to (from the C name) depends on if there
+    # is an output parameter since it will be readded.
+    my $cpp_index = $num_cpp_args - 1;
+    $cpp_index++ if($has_output_param);
+    $$cpp_param_mappings{@$c_param_names[$num_c_args_expected]} = $cpp_index;
   }
 
   if ( $num_cpp_args != $num_c_args_expected )
@@ -749,30 +847,58 @@ sub convert_args_cpp_to_c($$$$;$)
     return "";
   }
 
+  # If there is an output variable it must be processed so re-increment (now)
+  # the number of C++ arguments.
+  $num_cpp_args++ if($has_output_param);
 
-  # Loop through the cpp parameters:
- my $i;
- my $cpp_param_max = $num_cpp_args;
- # if( !($static) ) { $cpp_param_max++; }
+  # Get the desired argument list combination.
+  my $possible_arg_list = $$objCppfunc{possible_args_list}[$index];
 
- for ($i = 0; $i < $cpp_param_max; $i++)
- {
-   #index of C parameter:
-   my $iCParam = $i;
-   if( !($static) ) { $iCParam++; }
+  # Loop through the parameters:
+  my $i;
+  my $cpp_param_max = $num_cpp_args;
+  # if( !($static) ) { $cpp_param_max++; }
 
-   my $cppParamType = $$cpp_param_types[$i];
-   $cppParamType =~ s/ &/&/g; #Remove space between type and &
-   $cppParamType =~ s/ \*/*/g; #Remove space between type and *
+  for ($i = 0; $i < $cpp_param_max; $i++)
+  {
+    # Skip the output parameter because it is handled in output_wrap_meth().
+    next if($has_output_param && $i == $output_param_index);
 
-   my $cppParamName = $$cpp_param_names[$i];
-   my $cParamType = $$c_param_types[$iCParam];
+    #index of C parameter:
+    my $iCParam = $i;
+    if( !($static) ) { $iCParam++; }
 
-   if ($cppParamType ne $cParamType) #If a type conversion is needed.
-   {
+    # Account for a possible C++ output param in the C++ arg list.
+    $iCParam-- if($has_output_param && $i > $output_param_index);
+
+    my $c_param_name = @$c_param_names[$iCParam];
+    my $cpp_param_index = $i;
+    $cpp_param_index = $$cpp_param_mappings{$c_param_name} if(defined($$cpp_param_mappings{$c_param_name}));
+
+    my $cppParamType = $$cpp_param_types[$cpp_param_index];
+    $cppParamType =~ s/ &/&/g; #Remove space between type and &
+    $cppParamType =~ s/ \*/*/g; #Remove space between type and *
+
+    my $cppParamName = $$cpp_param_names[$cpp_param_index];
+    my $cParamType = $$c_param_types[$iCParam];
+
+    if(!($possible_arg_list =~ /\b$cpp_param_index\b/))
+    {
+      # If the C++ index is not found in the list of desired parameters, pass
+      # NULL to the C func unless the param is not optional (applies to a
+      # possibly added GError parameter).
+      if ($$cpp_param_optional[$cpp_param_index])
+      {
+        push(@result, "0");
+        next;
+      }
+    }
+
+    if ($cppParamType ne $cParamType) #If a type conversion is needed.
+    {
 
 
-     push(@result, sprintf("_CONVERT(%s,%s,%s,%s)",
+      push(@result, sprintf("_CONVERT(%s,%s,%s,%s)",
                   $cppParamType,
                   $cParamType,
                   $cppParamName,
@@ -852,14 +978,22 @@ sub convert_args_c_to_cpp($$$)
 
 # generates the XXX in g_object_new(get_type(), XXX): A list of property names and values.
 # Uses the cpp arg name as the property name.
-# $string get_ctor_properties($objCppfunc, $objCDefsFunc, $wrap_line_number)
-sub get_ctor_properties($$$$)
+# The optional index specifies which arg list out of the possible combination
+# of arguments based on whether any arguments are optional. index = 0 ==> all
+# the arguments.
+# $string get_ctor_properties($objCppfunc, $objCDefsFunc, $wrap_line_number, $index = 0)
+sub get_ctor_properties($$$$$)
 {
- my ($objCppfunc, $objCDefsFunc, $wrap_line_number) = @_;
+  my ($objCppfunc, $objCDefsFunc, $wrap_line_number, $index) = @_;
+
+  $index = 0 unless defined $index;
 
   my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
+  my $cpp_param_optional = $$objCppfunc{param_optional};
+  my $cpp_param_mappings = $$objCppfunc{param_mappings};
   my $c_param_types = $$objCDefsFunc{param_types};
+  my $c_param_names = $$objCDefsFunc{param_names};
 
   my @result;
 
@@ -875,25 +1009,43 @@ sub get_ctor_properties($$$$)
   }
 
 
-  # Loop through the cpp parameters:
- my $i = 0;
+  # Get the desired argument list combination.
+  my $possible_arg_list = $$objCppfunc{possible_args_list}[$index];
 
- for ($i = 0; $i < $num_args; $i++)
- {
-   my $cppParamType = $$cpp_param_types[$i];
-   $cppParamType =~ s/ &/&/g; #Remove space between type and &
-   $cppParamType =~ s/ \*/*/g; #Remove space between type and *
+  # Loop through the parameters:
+  my $i = 0;
 
-   my $cppParamName = $$cpp_param_names[$i];
-   my $cParamType = $$c_param_types[$i];
+  for ($i = 0; $i < $num_args; $i++)
+  {
+    my $c_param_name = @$c_param_names[$i];
+    my $cpp_param_index = $i;
+    $cpp_param_index = $$cpp_param_mappings{$c_param_name} if(defined($$cpp_param_mappings{$c_param_name}));
 
-   # Property name:
-   push(@result, "\"" . $cppParamName . "\"");
+    my $cppParamType = $$cpp_param_types[$cpp_param_index];
+    $cppParamType =~ s/ &/&/g; #Remove space between type and &
+    $cppParamType =~ s/ \*/*/g; #Remove space between type and *
+
+    my $cppParamName = $$cpp_param_names[$cpp_param_index];
+    my $cParamType = $$c_param_types[$i];
+
+    # Property name:
+    push(@result, "\"" . $cppParamName . "\"");
+
+    if(!($possible_arg_list =~ /\b$cpp_param_index\b/))
+    {
+      # If the C++ index is not found in the list of desired parameters, pass
+      # NULL to the C func unless the param is not optional.
+      if ($$cpp_param_optional[$cpp_param_index])
+      {
+        push(@result, "0");
+        next;
+      }
+    }
 
    # C property value:
-   if ($cppParamType ne $cParamType) #If a type conversion is needed.
-   {
-     push(@result, sprintf("_CONVERT(%s,%s,%s,%s)",
+    if ($cppParamType ne $cParamType) #If a type conversion is needed.
+    {
+      push(@result, sprintf("_CONVERT(%s,%s,%s,%s)",
                   $cppParamType,
                   $cParamType,
                   $cppParamName,

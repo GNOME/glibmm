@@ -45,7 +45,7 @@ double Glib::Ascii::strtod(const std::string&      str,
                            std::string::size_type& end_index,
                            std::string::size_type  start_index)
 {
-  if(start_index > str.size())
+  if(start_index >= str.size())
   {
     throw std::out_of_range("out of range (strtod): start_index > str.size()");
   }

@@ -135,6 +135,26 @@ public:
    * @newin{2,28}
    */
   void open(const type_vec_files& files, const Glib::ustring& hint = Glib::ustring());
+  _IGNORE(g_application_open)
+  
+  /* Opens the given file.
+   *
+   * In essence, this results in the open signal being emitted
+   * in the primary instance.
+   *
+   * @a hint is simply passed through to the open signal.  It is
+   * intended to be used by applications that have multiple modes for
+   * opening files (eg: "view" vs "edit", etc).
+   *
+   * The application must be registered before calling this mwethod
+   * and it must have the APPLICATION_HANDLES_OPEN flag set.
+   *
+   * @param file The file to open. This must be non-empty.
+   * @param hint A hint.
+   *
+   * @newin{2,28}
+   */
+  void open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring& hint = Glib::ustring());
 
   _WRAP_METHOD(int run(int argc, char** argv), g_application_run)
   //TODO: g_application_run_with_arguments)
@@ -157,7 +177,7 @@ public:
   Glib::SignalProxy2< void,  const type_vec_files&, const Glib::ustring& > signal_open();
 
 #m4 _CONVERSION(`GApplicationCommandLine*', `const Glib::RefPtr<ApplicationCommandLine>&',`Glib::wrap($3, true)')
-  _WRAP_SIGNAL(bool command_line(const Glib::RefPtr<ApplicationCommandLine>& command_line), "command-line")
+  _WRAP_SIGNAL(int command_line(const Glib::RefPtr<ApplicationCommandLine>& command_line), "command-line")
 
 protected:
   virtual void on_open(const type_vec_files& files, const Glib::ustring& hint);
@@ -169,6 +189,22 @@ protected:
   static void open_callback(GApplication* self, GFile** files, gint n_files, const gchar* hint);
   _POP()
 #m4end
+
+#m4 _CONVERSION(`char**&', `gchar***',`&($3)')
+#m4 _CONVERSION(`gchar***', `char**&',`*($3)')
+  _WRAP_VFUNC(bool local_command_line(char**& arguments, int& exit_status), local_command_line)
+  
+/* TODO:
+  void                      (* before_emit)         (GApplication              *application,
+                                                     GVariant                  *platform_data);
+  void                      (* after_emit)          (GApplication              *application,
+                                                     GVariant                  *platform_data);
+  void                      (* add_platform_data)   (GApplication              *application,
+                                                     GVariantBuilder           *builder);
+  void                      (* quit_mainloop)       (GApplication              *application);
+  void                      (* run_mainloop)        (GApplication              *application);
+*/
+
 
 private:
   /** This is just a way to call Glib::init() (which calls g_type_init()) before

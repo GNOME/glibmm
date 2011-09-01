@@ -179,34 +179,26 @@ void Gio::Application::on_open(const Application::type_vec_files& files, const G
   );
 
   if(base && base->open) {
-    typedef GFile* cpointer;
-    cpointer* files_array = new cpointer[files.size()];
-    guint i = 0;
-    for(Application::type_vec_files::const_iterator iter = files.begin(); iter != files.end(); iter++)
-      {
-        Application::type_vec_files::const_reference refPtr = *iter;
-        files_array[i] = refPtr->gobj();
-      }
-
-    (*base->open)(gobj(), files_array, files.size(), hint.c_str());
+    (*base->open)(gobj(), 
+      Glib::ArrayHandler<type_vec_files::value_type>::vector_to_array(files).data(),
+      files.size(),
+      hint.c_str());
   }
 }
 
 void Application::open(const type_vec_files& files, const Glib::ustring& hint)
 {
-  //TODO: Create a templated helper function for this:
-  typedef GFile* cpointer;
-  cpointer* files_array = new cpointer[files.size()];
-  guint i = 0;
-  for(type_vec_files::const_iterator iter = files.begin(); iter != files.end(); iter++)
-  {
-    type_vec_files::const_reference refPtr = *iter;
-    files_array[i] = refPtr->gobj();
-  }
+  g_application_open(gobj(), 
+    Glib::ArrayHandler<type_vec_files::value_type>::vector_to_array(files).data(),
+    files.size(),
+    hint.c_str());
+}
 
-  g_application_open(gobj(), files_array, files.size(), hint.c_str());
-
-  delete[] files_array ;
+void Application::open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring& hint)
+{
+  type_vec_files files(1);
+  files[0] = file;
+  open(files, hint);
 }
 
 bool Application::register_application()

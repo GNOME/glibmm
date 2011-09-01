@@ -3,15 +3,24 @@
 
 void on_read_async(const Glib::RefPtr<Gio::AsyncResult>& result)
 {
-  std::cout << "Testing result ... "
-            << (result ? "OK!" : "FAILED!") << std::endl;
+  if(!result)
+  {
+    std::cerr << G_STRFUNC << ": result is empty." << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
-  std::cout << "Testing get_source_object from gobj() ... "
-            << (g_async_result_get_source_object(result->gobj()) ? "OK!" : "FAILED!") << std::endl;
-
-  std::cout << "Testing Gio::AsyncResult's get_source_object ... "
-            << (result->get_source_object_base() ? "OK!" : "FAILED!") << std::endl;
-
+  if(!g_async_result_get_source_object(result->gobj()))
+  {
+    std::cerr << G_STRFUNC << ": g_async_result_get_source_object() failed." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  if(!result->get_source_object_base())
+  {
+    std::cerr << G_STRFUNC << ": result->get_source_object_base() failed." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+ 
   exit(EXIT_SUCCESS);
 }
 
@@ -26,5 +35,5 @@ int main(int, char**)
   file->read_async(&on_read_async);
 
   mainloop->run();
-  return 0;
+  return EXIT_SUCCESS;
 }

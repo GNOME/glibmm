@@ -88,13 +88,13 @@ dnl    lower a string
 define(`_LOWER',`m4_translit(`$*',`ABCDEFGHIJKLMNOPQRSTUVWXYZ',`abcdefghijklmnopqrstuvwxyz')')
 
 dnl 
-dnl  _QUOTE(macro)  
+dnl  _QUOTE(macro)
 dnl    If a macro generates an output with commas we need to protect it
 dnl    from being broken down and interpreted
 define(`_QUOTE',``$*'')
 
 dnl
-dnl  _NUM(arglist)   
+dnl  _NUM(arglist)
 dnl    count number of arguments
 define(`_NUM',`m4_ifelse(m4_len(`$*'),0,0,`$#')')
 
@@ -200,6 +200,9 @@ _NEW_SECTION(SECTION_CC_SIGNALPROXIES) dnl signal member objects
 dnl Property Proxies:
 dnl _NEW_SECTION(SECTION_H_PROPERTYPROXIES) 
 _NEW_SECTION(SECTION_CC_PROPERTYPROXIES)
+
+dnl Just a hack for some GError wrappers:
+_NEW_SECTION(SECTION_H_GERROR_PRIVATE) dnl  In the private part of the declaration.
 
 _NEW_SECTION(SECTION_CC_INITIALIZE_CLASS_EXTRA) dnl For instance, to initialize special member data from all constructors. Not commonly used.
 

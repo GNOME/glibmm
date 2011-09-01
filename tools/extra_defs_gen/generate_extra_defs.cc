@@ -64,7 +64,11 @@ std::string get_properties(GType gtype)
   for(guint i = 0; i < iCount; i++)
   {
     GParamSpec* pParamSpec = ppParamSpec[i];
-    if(pParamSpec)
+    // Generate the property if the specified gtype actually owns the property.
+    // (Generally all properties, including any base classes' properties are
+    // retrieved by g_object_interface_list_properties() for a given gtype.
+    // The base classes' properties should not be generated).
+    if(pParamSpec && pParamSpec->owner_type == gtype)
     {
       //Name and type:
       const std::string strName = g_param_spec_get_name(pParamSpec);

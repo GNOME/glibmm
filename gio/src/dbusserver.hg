@@ -18,6 +18,8 @@
  */
 
 #include <glibmm/object.h>
+#include <giomm/dbusconnection.h>
+#include <giomm/dbusauthobserver.h>
 #include <giomm/initable.h>
 
 _DEFS(giomm,gio)
@@ -26,115 +28,126 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-_WRAP_ENUM(DBusServerFlags, GDBusServerFlags, NO_GTYPE)
+namespace DBus
+{
 
-class DBusAuthObserver;
-class DBusConnection;
+_WRAP_ENUM(ServerFlags, GDBusServerFlags, s#^DBUS_##, NO_GTYPE)
+
+_GMMPROC_EXTRA_NAMESPACE(DBus)
 
 //TODO: Add example from the C API in class docs.
-/** DBusServer - Helper for accepting connections.
- * DBusServer is a helper for listening to and accepting D-Bus connections.
- * Since DBusServer implements the Initable interface, its constructors can
+/** This is a helper for listening to and accepting D-Bus connections.
+ * Since Server derives from Initiable, its constructors can
  * throw an exception if construction fails.
+ *
+ * This can be used to create a new D-Bus server, allowing two
+ * peers to use the D-Bus protocol for their own specialized communication.
+ * A server instance provided in this way will not perform message routing or
+ * implement the org.freedesktop.DBus interface.
+ *
+ * To just export an object on a well-known name on a message bus, such as the
+ * session or system bus, you should instead use Gio::DBus::own_name().
  *
  * @newin{2,28}
  * @ingroup DBus
  */
-class DBusServer : public Glib::Object, public Initable
+class Server : public Glib::Object, public Initable
 {
-  _CLASS_GOBJECT(DBusServer, GDBusServer, G_DBUS_SERVER, Glib::Object, GObject)
+  _CLASS_GOBJECT(Server, GDBusServer, G_DBUS_SERVER, Glib::Object, GObject)
   _IMPLEMENTS_INTERFACE(Initable)
 
 protected:
 
-//TODO: Uncomment when bug #639478 is resolved.
+//TODO: Uncomment when this bug is resolved: https://bugzilla.gnome.org/show_bug.cgi?id=639478
 /*
   DBusServer(const std::string& address,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusServerFlags flags);
+    ServerFlags flags);
 
   DBusServer(const std::string& address,
     const std::string& guid,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusServerFlags flags);
+    ServerFlags flags);
 
   DBusServer(const std::string& address,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
-    DBusServerFlags flags);
+    const Glib::RefPtr<AuthObserver>& observer,
+    ServerFlags flags);
 
   DBusServer(const std::string& address,
     const std::string& guid,
-    DBusServerFlags flags);
+    ServerFlags flags);
 */
 
 public:
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_server_new_sync)
   /// @throw Glib::Error.
-  static Glib::RefPtr<DBusServer> create_sync(const std::string& address,
+  static Glib::RefPtr<Server> create_sync(const std::string& address,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
+    const Glib::RefPtr<AuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
+    ServerFlags flags = Gio::DBus::SERVER_FLAGS_NONE);
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_server_new_sync)
   /// @throw Glib::Error.
-  static Glib::RefPtr<DBusServer> create_sync(const std::string& address,
+  static Glib::RefPtr<Server> create_sync(const std::string& address,
     const std::string& guid,
     const Glib::RefPtr<Cancellable>& cancellable,
-    DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
+    ServerFlags flags = Gio::DBus::SERVER_FLAGS_NONE);
 
   /// Non-cancellable version of create_sync().
-  static Glib::RefPtr<DBusServer> create_sync(const std::string& address,
+  static Glib::RefPtr<Server> create_sync(const std::string& address,
     const std::string& guid,
-    const Glib::RefPtr<DBusAuthObserver>& observer,
-    DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
+    const Glib::RefPtr<AuthObserver>& observer,
+    ServerFlags flags = Gio::DBus::SERVER_FLAGS_NONE);
 
   /// Non-cancellable version of create_sync().
-  static Glib::RefPtr<DBusServer> create_sync(const std::string& address,
+  static Glib::RefPtr<Server> create_sync(const std::string& address,
     const std::string& guid,
-    DBusServerFlags flags = Gio::DBUS_SERVER_FLAGS_NONE);
+    ServerFlags flags = Gio::DBus::SERVER_FLAGS_NONE);
 
   _WRAP_METHOD(void start(), g_dbus_server_start)
   _WRAP_METHOD(void stop(), g_dbus_server_stop)
   _WRAP_METHOD(bool is_active() const, g_dbus_server_is_active)
   _WRAP_METHOD(std::string get_guid() const, g_dbus_server_get_guid)
-  _WRAP_METHOD(DBusServerFlags get_flags() const, g_dbus_server_get_flags)
+  _WRAP_METHOD(ServerFlags get_flags() const, g_dbus_server_get_flags)
   _WRAP_METHOD(std::string get_client_address() const, g_dbus_server_get_client_address)
 
   _WRAP_PROPERTY("active", bool)
   _WRAP_PROPERTY("address", std::string)
-  _WRAP_PROPERTY("authentication-observer", Glib::RefPtr<DBusAuthObserver>)
+  _WRAP_PROPERTY("authentication-observer", Glib::RefPtr<AuthObserver>)
   _WRAP_PROPERTY("client-address", std::string)
-  _WRAP_PROPERTY("flags", DBusServerFlags)
+  _WRAP_PROPERTY("flags", ServerFlags)
   _WRAP_PROPERTY("guid", std::string)
 
-#m4 _CONVERSION(`GDBusConnection*', `const Glib::RefPtr<DBusConnection>&', `Glib::wrap($3, true)')
+#m4 _CONVERSION(`GDBusConnection*', `const Glib::RefPtr<Connection>&', `Glib::wrap($3, true)')
   /** Emitted when a new authenticated connection has been made. Use
-   * Gio::DBusConnection::get_peer_credentials() to figure out what identity
+   * Gio::DBus::Connection::get_peer_credentials() to figure out what identity
    * (if any), was authenticated.
    *
    * If you want to accept the connection, keep a global reference to the
    * connection (by keeping it in a global RefPtr<>) and return <tt>true</tt>.
-   * When you are done with the connection call Gio::DBusConnection::close().
+   * When you are done with the connection call Gio::DBus::Connection::close().
    * Note that the other peer may disconnect at any time - a typical thing to
    * do when accepting a connection is to listen to the
-   * Gio::DBusConnection::signal_closed() signal.
+   * Gio::DBus::Connection::signal_closed() signal.
    *
-   * If property_flags() contains Gio::DBUS_SERVER_FLAGS_RUN_IN_THREAD then
+   * If property_flags() contains Gio::DBus::SERVER_FLAGS_RUN_IN_THREAD then
    * the signal is emitted in a new thread dedicated to the connection.
    * Otherwise the signal is emitted in the thread-default main loop of the
    * thread that server was constructed in.
    *
    * You are guaranteed that signal handlers for this signal runs before
    * incoming messages on the connection are processed. This means that it's
-   * suitable to call Gio::DBusConnection::register_object() or similar from
+   * suitable to call Gio::DBus::Connection::register_object() or similar from
    * the signal handler.
    */
-  _WRAP_SIGNAL(bool new_connection(const Glib::RefPtr<DBusConnection>& connection), "new-connection", no_default_handler)
+  _WRAP_SIGNAL(bool new_connection(const Glib::RefPtr<Connection>& connection), "new-connection", no_default_handler)
 };
+
+} //namespace DBus
 
 } // namespace Gio

@@ -32,16 +32,16 @@
   (c-name "GParamFlags")
   (gtype-id "G_TYPE_PARAM_FLAGS")
   (values
-    '("readable" "G_PARAM_READABLE")
-    '("writable" "G_PARAM_WRITABLE")
-    '("construct" "G_PARAM_CONSTRUCT")
-    '("construct-only" "G_PARAM_CONSTRUCT_ONLY")
-    '("lax-validation" "G_PARAM_LAX_VALIDATION")
-    '("static-name" "G_PARAM_STATIC_NAME")
-    '("private" "G_PARAM_PRIVATE")
-    '("static-nick" "G_PARAM_STATIC_NICK")
-    '("static-blurb" "G_PARAM_STATIC_BLURB")
-    '("deprecated" "G_PARAM_DEPRECATED")
+    '("g-param-readable" "G_PARAM_READABLE")
+    '("g-param-writable" "G_PARAM_WRITABLE")
+    '("g-param-construct" "G_PARAM_CONSTRUCT")
+    '("g-param-construct-only" "G_PARAM_CONSTRUCT_ONLY")
+    '("g-param-lax-validation" "G_PARAM_LAX_VALIDATION")
+    '("g-param-static-name" "G_PARAM_STATIC_NAME")
+    '("#ifndef" "#ifndef")
+    '("#endif" "#endif")
+    '("g-param-static-blurb" "G_PARAM_STATIC_BLURB")
+    '("g-param-deprecated" "G_PARAM_DEPRECATED")
   )
 )
 
@@ -57,6 +57,7 @@
     '("detailed" "G_SIGNAL_DETAILED")
     '("action" "G_SIGNAL_ACTION")
     '("no-hooks" "G_SIGNAL_NO_HOOKS")
+    '("must-collect" "G_SIGNAL_MUST_COLLECT")
   )
 )
 
@@ -117,6 +118,10 @@
     '("value-abstract" "G_TYPE_FLAG_VALUE_ABSTRACT")
   )
 )
+
+
+;; From gatomicarray.h
+
 
 
 ;; From gbinding.h
@@ -243,6 +248,24 @@
   )
 )
 
+(define-method take_boxed
+  (of-object "GValue")
+  (c-name "g_value_take_boxed")
+  (return-type "none")
+  (parameters
+    '("gconstpointer" "v_boxed")
+  )
+)
+
+(define-method set_boxed_take_ownership
+  (of-object "GValue")
+  (c-name "g_value_set_boxed_take_ownership")
+  (return-type "none")
+  (parameters
+    '("gconstpointer" "v_boxed")
+  )
+)
+
 (define-method get_boxed
   (of-object "GValue")
   (c-name "g_value_get_boxed")
@@ -265,24 +288,6 @@
   )
 )
 
-(define-method take_boxed
-  (of-object "GValue")
-  (c-name "g_value_take_boxed")
-  (return-type "none")
-  (parameters
-    '("gconstpointer" "v_boxed")
-  )
-)
-
-(define-method set_boxed_take_ownership
-  (of-object "GValue")
-  (c-name "g_value_set_boxed_take_ownership")
-  (return-type "none")
-  (parameters
-    '("gconstpointer" "v_boxed")
-  )
-)
-
 (define-function g_closure_get_type
   (c-name "g_closure_get_type")
   (return-type "GType")
@@ -295,66 +300,6 @@
 
 (define-function g_value_array_get_type
   (c-name "g_value_array_get_type")
-  (return-type "GType")
-)
-
-(define-function g_date_get_type
-  (c-name "g_date_get_type")
-  (return-type "GType")
-)
-
-(define-function g_strv_get_type
-  (c-name "g_strv_get_type")
-  (return-type "GType")
-)
-
-(define-function g_gstring_get_type
-  (c-name "g_gstring_get_type")
-  (return-type "GType")
-)
-
-(define-function g_hash_table_get_type
-  (c-name "g_hash_table_get_type")
-  (return-type "GType")
-)
-
-(define-function g_array_get_type
-  (c-name "g_array_get_type")
-  (return-type "GType")
-)
-
-(define-function g_byte_array_get_type
-  (c-name "g_byte_array_get_type")
-  (return-type "GType")
-)
-
-(define-function g_ptr_array_get_type
-  (c-name "g_ptr_array_get_type")
-  (return-type "GType")
-)
-
-(define-function g_variant_type_get_gtype
-  (c-name "g_variant_type_get_gtype")
-  (return-type "GType")
-)
-
-(define-function g_regex_get_type
-  (c-name "g_regex_get_type")
-  (return-type "GType")
-)
-
-(define-function g_error_get_type
-  (c-name "g_error_get_type")
-  (return-type "GType")
-)
-
-(define-function g_date_time_get_type
-  (c-name "g_date_time_get_type")
-  (return-type "GType")
-)
-
-(define-function g_variant_get_gtype
-  (c-name "g_variant_get_gtype")
   (return-type "GType")
 )
 
@@ -509,6 +454,19 @@
   )
 )
 
+(define-function g_cclosure_marshal_generic
+  (c-name "g_cclosure_marshal_generic")
+  (return-type "none")
+  (parameters
+    '("GClosure*" "closure")
+    '("GValue*" "return_gvalue")
+    '("guint" "n_param_values")
+    '("const-GValue*" "param_values")
+    '("gpointer" "invocation_hint")
+    '("gpointer" "marshal_data")
+  )
+)
+
 
 
 ;; From genums.h
@@ -633,6 +591,85 @@
     '("GTypeInfo*" "info")
     '("const-GFlagsValue*" "const_values")
   )
+)
+
+
+
+;; From glib-types.h
+
+(define-function g_date_get_type
+  (c-name "g_date_get_type")
+  (return-type "GType")
+)
+
+(define-function g_strv_get_type
+  (c-name "g_strv_get_type")
+  (return-type "GType")
+)
+
+(define-function g_gstring_get_type
+  (c-name "g_gstring_get_type")
+  (return-type "GType")
+)
+
+(define-function g_hash_table_get_type
+  (c-name "g_hash_table_get_type")
+  (return-type "GType")
+)
+
+(define-function g_array_get_type
+  (c-name "g_array_get_type")
+  (return-type "GType")
+)
+
+(define-function g_byte_array_get_type
+  (c-name "g_byte_array_get_type")
+  (return-type "GType")
+)
+
+(define-function g_ptr_array_get_type
+  (c-name "g_ptr_array_get_type")
+  (return-type "GType")
+)
+
+(define-function g_variant_type_get_gtype
+  (c-name "g_variant_type_get_gtype")
+  (return-type "GType")
+)
+
+(define-function g_regex_get_type
+  (c-name "g_regex_get_type")
+  (return-type "GType")
+)
+
+(define-function g_error_get_type
+  (c-name "g_error_get_type")
+  (return-type "GType")
+)
+
+(define-function g_date_time_get_type
+  (c-name "g_date_time_get_type")
+  (return-type "GType")
+)
+
+(define-function g_io_channel_get_type
+  (c-name "g_io_channel_get_type")
+  (return-type "GType")
+)
+
+(define-function g_io_condition_get_type
+  (c-name "g_io_condition_get_type")
+  (return-type "GType")
+)
+
+(define-function g_variant_builder_get_type
+  (c-name "g_variant_builder_get_type")
+  (return-type "GType")
+)
+
+(define-function g_variant_get_gtype
+  (c-name "g_variant_get_gtype")
+  (return-type "GType")
 )
 
 
@@ -1151,6 +1188,10 @@
     '("volatile-GObject**" "object_ptr")
   )
 )
+
+
+
+;; From gobject_trace.h
 
 
 
@@ -2138,14 +2179,10 @@
   )
 )
 
-(define-function g_io_channel_get_type
-  (c-name "g_io_channel_get_type")
-  (return-type "GType")
-)
-
-(define-function g_io_condition_get_type
-  (c-name "g_io_condition_get_type")
-  (return-type "GType")
+(define-method set_dummy_callback
+  (of-object "GSource")
+  (c-name "g_source_set_dummy_callback")
+  (return-type "none")
 )
 
 
@@ -2754,6 +2791,10 @@
 
 
 
+;; From gtype-private.h
+
+
+
 ;; From gvaluearray.h
 
 (define-method get_nth
@@ -3235,5 +3276,9 @@
     '("gchar*" "v_string")
   )
 )
+
+
+
+;; From stamp-gmarshal.h
 
 

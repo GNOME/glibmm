@@ -18,6 +18,16 @@
   )
 )
 
+(define-flags ArrayFlags
+  (in-module "GBSearch")
+  (c-name "GBSearchArrayFlags")
+  (gtype-id "G_TYPE_B_SEARCH_ARRAY_FLAGS")
+  (values
+    '("lign-power2" "G_BSEARCH_ARRAY_ALIGN_POWER2")
+    '("uto-shrink" "G_BSEARCH_ARRAY_AUTO_SHRINK")
+  )
+)
+
 (define-enum Type
   (in-module "GChecksum")
   (c-name "GChecksumType")
@@ -88,6 +98,16 @@
     '("october" "G_DATE_OCTOBER")
     '("november" "G_DATE_NOVEMBER")
     '("december" "G_DATE_DECEMBER")
+  )
+)
+
+(define-flags Flag
+  (in-module "GDebug")
+  (c-name "GDebugFlag")
+  (gtype-id "G_TYPE_DEBUG_FLAG")
+  (values
+    '("warnings" "G_DEBUG_FATAL_WARNINGS")
+    '("criticals" "G_DEBUG_FATAL_CRITICALS")
   )
 )
 
@@ -724,6 +744,7 @@
     '("hangul-t-jamo" "G_UNICODE_BREAK_HANGUL_T_JAMO")
     '("hangul-lv-syllable" "G_UNICODE_BREAK_HANGUL_LV_SYLLABLE")
     '("hangul-lvt-syllable" "G_UNICODE_BREAK_HANGUL_LVT_SYLLABLE")
+    '("close-paranthesis" "G_UNICODE_BREAK_CLOSE_PARANTHESIS")
   )
 )
 
@@ -822,10 +843,13 @@
     '("lisu" "G_UNICODE_SCRIPT_LISU")
     '("meetei-mayek" "G_UNICODE_SCRIPT_MEETEI_MAYEK")
     '("old-south-arabian" "G_UNICODE_SCRIPT_OLD_SOUTH_ARABIAN")
-    '("old-turkish" "G_UNICODE_SCRIPT_OLD_TURKISH")
+    '("old-turkic" "G_UNICODE_SCRIPT_OLD_TURKIC")
     '("samaritan" "G_UNICODE_SCRIPT_SAMARITAN")
     '("tai-tham" "G_UNICODE_SCRIPT_TAI_THAM")
     '("tai-viet" "G_UNICODE_SCRIPT_TAI_VIET")
+    '("batak" "G_UNICODE_SCRIPT_BATAK")
+    '("brahmi" "G_UNICODE_SCRIPT_BRAHMI")
+    '("mandaic" "G_UNICODE_SCRIPT_MANDAIC")
   )
 )
 
@@ -894,6 +918,23 @@
   (gtype-id "G_TYPE_VARIANT_PARSE_ERROR")
   (values
     '("failed" "G_VARIANT_PARSE_ERROR_FAILED")
+    '("basic-type-expected" "G_VARIANT_PARSE_ERROR_BASIC_TYPE_EXPECTED")
+    '("cannot-infer-type" "G_VARIANT_PARSE_ERROR_CANNOT_INFER_TYPE")
+    '("definite-type-expected" "G_VARIANT_PARSE_ERROR_DEFINITE_TYPE_EXPECTED")
+    '("input-not-at-end" "G_VARIANT_PARSE_ERROR_INPUT_NOT_AT_END")
+    '("invalid-character" "G_VARIANT_PARSE_ERROR_INVALID_CHARACTER")
+    '("invalid-format-string" "G_VARIANT_PARSE_ERROR_INVALID_FORMAT_STRING")
+    '("invalid-object-path" "G_VARIANT_PARSE_ERROR_INVALID_OBJECT_PATH")
+    '("invalid-signature" "G_VARIANT_PARSE_ERROR_INVALID_SIGNATURE")
+    '("invalid-type-string" "G_VARIANT_PARSE_ERROR_INVALID_TYPE_STRING")
+    '("no-common-type" "G_VARIANT_PARSE_ERROR_NO_COMMON_TYPE")
+    '("number-out-of-range" "G_VARIANT_PARSE_ERROR_NUMBER_OUT_OF_RANGE")
+    '("number-too-big" "G_VARIANT_PARSE_ERROR_NUMBER_TOO_BIG")
+    '("type-error" "G_VARIANT_PARSE_ERROR_TYPE_ERROR")
+    '("unexpected-token" "G_VARIANT_PARSE_ERROR_UNEXPECTED_TOKEN")
+    '("unknown-keyword" "G_VARIANT_PARSE_ERROR_UNKNOWN_KEYWORD")
+    '("unterminated-string-constant" "G_VARIANT_PARSE_ERROR_UNTERMINATED_STRING_CONSTANT")
+    '("value-expected" "G_VARIANT_PARSE_ERROR_VALUE_EXPECTED")
   )
 )
 
@@ -1478,49 +1519,11 @@
 
 ;; From gatomic.h
 
-(define-function g_atomic_int_exchange_and_add
-  (c-name "g_atomic_int_exchange_and_add")
-  (return-type "gint")
-  (parameters
-    '("volatile-gint-G_GNUC_MAY_ALIAS*" "atomic")
-    '("gint" "val")
-  )
-)
-
-(define-function g_atomic_int_add
-  (c-name "g_atomic_int_add")
-  (return-type "none")
-  (parameters
-    '("volatile-gint-G_GNUC_MAY_ALIAS*" "atomic")
-    '("gint" "val")
-  )
-)
-
-(define-function g_atomic_int_compare_and_exchange
-  (c-name "g_atomic_int_compare_and_exchange")
-  (return-type "gboolean")
-  (parameters
-    '("volatile-gint-G_GNUC_MAY_ALIAS*" "atomic")
-    '("gint" "oldval")
-    '("gint" "newval")
-  )
-)
-
-(define-function g_atomic_pointer_compare_and_exchange
-  (c-name "g_atomic_pointer_compare_and_exchange")
-  (return-type "gboolean")
-  (parameters
-    '("volatile-gpointer-G_GNUC_MAY_ALIAS*" "atomic")
-    '("gpointer" "oldval")
-    '("gpointer" "newval")
-  )
-)
-
 (define-function g_atomic_int_get
   (c-name "g_atomic_int_get")
   (return-type "gint")
   (parameters
-    '("volatile-gint-G_GNUC_MAY_ALIAS*" "atomic")
+    '("volatile-gint*" "atomic")
   )
 )
 
@@ -1528,8 +1531,70 @@
   (c-name "g_atomic_int_set")
   (return-type "none")
   (parameters
-    '("volatile-gint-G_GNUC_MAY_ALIAS*" "atomic")
+    '("volatile-gint*" "atomic")
     '("gint" "newval")
+  )
+)
+
+(define-function g_atomic_int_inc
+  (c-name "g_atomic_int_inc")
+  (return-type "none")
+  (parameters
+    '("volatile-gint*" "atomic")
+  )
+)
+
+(define-function g_atomic_int_dec_and_test
+  (c-name "g_atomic_int_dec_and_test")
+  (return-type "gboolean")
+  (parameters
+    '("volatile-gint*" "atomic")
+  )
+)
+
+(define-function g_atomic_int_compare_and_exchange
+  (c-name "g_atomic_int_compare_and_exchange")
+  (return-type "gboolean")
+  (parameters
+    '("volatile-gint*" "atomic")
+    '("gint" "oldval")
+    '("gint" "newval")
+  )
+)
+
+(define-function g_atomic_int_add
+  (c-name "g_atomic_int_add")
+  (return-type "gint")
+  (parameters
+    '("volatile-gint*" "atomic")
+    '("gint" "val")
+  )
+)
+
+(define-function g_atomic_int_and
+  (c-name "g_atomic_int_and")
+  (return-type "guint")
+  (parameters
+    '("volatile-guint*" "atomic")
+    '("guint" "val")
+  )
+)
+
+(define-function g_atomic_int_or
+  (c-name "g_atomic_int_or")
+  (return-type "guint")
+  (parameters
+    '("volatile-guint*" "atomic")
+    '("guint" "val")
+  )
+)
+
+(define-function g_atomic_int_xor
+  (c-name "g_atomic_int_xor")
+  (return-type "guint")
+  (parameters
+    '("volatile-guint*" "atomic")
+    '("guint" "val")
   )
 )
 
@@ -1537,7 +1602,7 @@
   (c-name "g_atomic_pointer_get")
   (return-type "gpointer")
   (parameters
-    '("volatile-gpointer-G_GNUC_MAY_ALIAS*" "atomic")
+    '("volatile-void*" "atomic")
   )
 )
 
@@ -1545,8 +1610,63 @@
   (c-name "g_atomic_pointer_set")
   (return-type "none")
   (parameters
-    '("volatile-gpointer-G_GNUC_MAY_ALIAS*" "atomic")
+    '("volatile-void*" "atomic")
     '("gpointer" "newval")
+  )
+)
+
+(define-function g_atomic_pointer_compare_and_exchange
+  (c-name "g_atomic_pointer_compare_and_exchange")
+  (return-type "gboolean")
+  (parameters
+    '("volatile-void*" "atomic")
+    '("gpointer" "oldval")
+    '("gpointer" "newval")
+  )
+)
+
+(define-function g_atomic_pointer_add
+  (c-name "g_atomic_pointer_add")
+  (return-type "gssize")
+  (parameters
+    '("volatile-void*" "atomic")
+    '("gssize" "val")
+  )
+)
+
+(define-function g_atomic_pointer_and
+  (c-name "g_atomic_pointer_and")
+  (return-type "gsize")
+  (parameters
+    '("volatile-void*" "atomic")
+    '("gsize" "val")
+  )
+)
+
+(define-function g_atomic_pointer_or
+  (c-name "g_atomic_pointer_or")
+  (return-type "gsize")
+  (parameters
+    '("volatile-void*" "atomic")
+    '("gsize" "val")
+  )
+)
+
+(define-function g_atomic_pointer_xor
+  (c-name "g_atomic_pointer_xor")
+  (return-type "gsize")
+  (parameters
+    '("volatile-void*" "atomic")
+    '("gsize" "val")
+  )
+)
+
+(define-function g_atomic_int_exchange_and_add
+  (c-name "g_atomic_int_exchange_and_add")
+  (return-type "gint")
+  (parameters
+    '("volatile-gint*" "atomic")
+    '("gint" "val")
   )
 )
 
@@ -1664,6 +1784,33 @@
   (return-type "none")
   (parameters
     '("volatile-gint*" "address")
+    '("gint" "lock_bit")
+  )
+)
+
+(define-function g_pointer_bit_lock
+  (c-name "g_pointer_bit_lock")
+  (return-type "none")
+  (parameters
+    '("volatile-void*" "address")
+    '("gint" "lock_bit")
+  )
+)
+
+(define-function g_pointer_bit_trylock
+  (c-name "g_pointer_bit_trylock")
+  (return-type "gboolean")
+  (parameters
+    '("volatile-void*" "address")
+    '("gint" "lock_bit")
+  )
+)
+
+(define-function g_pointer_bit_unlock
+  (c-name "g_pointer_bit_unlock")
+  (return-type "none")
+  (parameters
+    '("volatile-void*" "address")
     '("gint" "lock_bit")
   )
 )
@@ -2077,6 +2224,30 @@
 
 
 
+;; From gbsearcharray.h
+
+(define-function if
+  (c-name "if")
+  (return-type "else")
+  (parameters
+    '("cmp-<" "0")
+  )
+)
+
+(define-function MIN
+  (c-name "MIN")
+  (return-type "return")
+  (parameters
+    '("barray->n_nodes-+" "1")
+  )
+)
+
+
+
+;; From gbufferprivate.h
+
+
+
 ;; From gcache.h
 
 (define-function g_cache_new
@@ -2311,10 +2482,36 @@
   )
 )
 
+(define-method iconv
+  (of-object "GIConv")
+  (c-name "g_iconv")
+  (return-type "gsize")
+  (parameters
+    '("gchar**" "inbuf")
+    '("gsize*" "inbytes_left")
+    '("gchar**" "outbuf")
+    '("gsize*" "outbytes_left")
+  )
+)
+
 (define-method close
   (of-object "GIConv")
   (c-name "g_iconv_close")
   (return-type "gint")
+)
+
+(define-function g_convert
+  (c-name "g_convert")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "str")
+    '("gssize" "len")
+    '("const-gchar*" "to_codeset")
+    '("const-gchar*" "from_codeset")
+    '("gsize*" "bytes_read")
+    '("gsize*" "bytes_written")
+    '("GError**" "error")
+  )
 )
 
 (define-function g_convert_with_iconv
@@ -2547,6 +2744,15 @@
   )
 )
 
+(define-function g_datalist_get_data
+  (c-name "g_datalist_get_data")
+  (return-type "gpointer")
+  (parameters
+    '("GData**" "datalist")
+    '("const-gchar*" "key")
+  )
+)
+
 (define-function g_dataset_id_set_data_full
   (c-name "g_dataset_id_set_data_full")
   (return-type "none")
@@ -2576,6 +2782,10 @@
     '("gpointer" "user_data")
   )
 )
+
+
+
+;; From gdatasetprivate.h
 
 
 
@@ -3076,12 +3286,98 @@
   )
 )
 
-(define-function g_date_time_compare
+(define-method add
+  (of-object "GDateTime")
+  (c-name "g_date_time_add")
+  (return-type "GDateTime*")
+  (parameters
+    '("GTimeSpan" "timespan")
+  )
+)
+
+(define-method add_years
+  (of-object "GDateTime")
+  (c-name "g_date_time_add_years")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint" "years")
+  )
+)
+
+(define-method add_months
+  (of-object "GDateTime")
+  (c-name "g_date_time_add_months")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint" "months")
+  )
+)
+
+(define-method add_weeks
+  (of-object "GDateTime")
+  (c-name "g_date_time_add_weeks")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint" "weeks")
+  )
+)
+
+(define-method add_days
+  (of-object "GDateTime")
+  (c-name "g_date_time_add_days")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint" "days")
+  )
+)
+
+(define-method add_hours
+  (of-object "GDateTime")
+  (c-name "g_date_time_add_hours")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint" "hours")
+  )
+)
+
+(define-method add_minutes
+  (of-object "GDateTime")
+  (c-name "g_date_time_add_minutes")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint" "minutes")
+  )
+)
+
+(define-method add_seconds
+  (of-object "GDateTime")
+  (c-name "g_date_time_add_seconds")
+  (return-type "GDateTime*")
+  (parameters
+    '("gdouble" "seconds")
+  )
+)
+
+(define-method add_full
+  (of-object "GDateTime")
+  (c-name "g_date_time_add_full")
+  (return-type "GDateTime*")
+  (parameters
+    '("gint" "years")
+    '("gint" "months")
+    '("gint" "days")
+    '("gint" "hours")
+    '("gint" "minutes")
+    '("gdouble" "seconds")
+  )
+)
+
+(define-method compare
+  (of-object "GDateTime")
   (c-name "g_date_time_compare")
   (return-type "gint")
   (parameters
-    '("gconstpointer" "dt1")
-    '("gconstpointer" "dt2")
+    '("GDateTime*" "dt2")
   )
 )
 
@@ -3094,20 +3390,18 @@
   )
 )
 
-(define-function g_date_time_hash
+(define-method hash
+  (of-object "GDateTime")
   (c-name "g_date_time_hash")
   (return-type "guint")
-  (parameters
-    '("gconstpointer" "datetime")
-  )
 )
 
-(define-function g_date_time_equal
+(define-method equal
+  (of-object "GDateTime")
   (c-name "g_date_time_equal")
   (return-type "gboolean")
   (parameters
-    '("gconstpointer" "dt1")
-    '("gconstpointer" "dt2")
+    '("GDateTime*" "dt2")
   )
 )
 
@@ -3256,6 +3550,10 @@
     '("const-gchar*" "format")
   )
 )
+
+
+
+;; From gdebug.h
 
 
 
@@ -4645,6 +4943,18 @@
   )
 )
 
+(define-method has_key_full
+  (of-object "GKeyFile")
+  (c-name "g_key_file_has_key_full")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "group_name")
+    '("const-gchar*" "key")
+    '("gboolean*" "has_key")
+    '("GError**" "error")
+  )
+)
+
 (define-method get_value
   (of-object "GKeyFile")
   (c-name "g_key_file_get_value")
@@ -4997,6 +5307,93 @@
   (parameters
     '("const-gchar*" "group_name")
     '("GError**" "error")
+  )
+)
+
+
+
+;; From glibconfig.h
+
+
+
+;; From glib.h
+
+
+
+;; From glibintl.h
+
+(define-function glib_gettext
+  (c-name "glib_gettext")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "str")
+  )
+)
+
+(define-function glib_pgettext
+  (c-name "glib_pgettext")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "msgctxtid")
+    '("gsize" "msgidoffset")
+  )
+)
+
+
+
+;; From glib-object.h
+
+
+
+;; From glib_trace.h
+
+
+
+;; From glib-unix.h
+
+(define-function g_unix_error_quark
+  (c-name "g_unix_error_quark")
+  (return-type "GQuark")
+)
+
+(define-function g_unix_open_pipe
+  (c-name "g_unix_open_pipe")
+  (return-type "gboolean")
+  (parameters
+    '("gint*" "fds")
+    '("gint" "flags")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_unix_set_fd_nonblocking
+  (c-name "g_unix_set_fd_nonblocking")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "fd")
+    '("gboolean" "nonblock")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_unix_signal_source_new
+  (c-name "g_unix_signal_source_new")
+  (is-constructor-of "GUnixSignalSource")
+  (return-type "GSource*")
+  (parameters
+    '("gint" "signum")
+  )
+)
+
+(define-function g_unix_signal_add_watch_full
+  (c-name "g_unix_signal_add_watch_full")
+  (return-type "guint")
+  (parameters
+    '("gint" "signum")
+    '("gint" "priority")
+    '("GSourceFunc" "handler")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
   )
 )
 
@@ -5680,6 +6077,24 @@
   )
 )
 
+(define-method add_child_source
+  (of-object "GSource")
+  (c-name "g_source_add_child_source")
+  (return-type "none")
+  (parameters
+    '("GSource*" "child_source")
+  )
+)
+
+(define-method remove_child_source
+  (of-object "GSource")
+  (c-name "g_source_remove_child_source")
+  (return-type "none")
+  (parameters
+    '("GSource*" "child_source")
+  )
+)
+
 (define-method get_current_time
   (of-object "GSource")
   (c-name "g_source_get_current_time")
@@ -5885,6 +6300,10 @@
     '("gpointer" "data")
   )
 )
+
+
+
+;; From gmain-internal.h
 
 
 
@@ -6432,6 +6851,10 @@
     '("GPrintFunc" "func")
   )
 )
+
+
+
+;; From gmirroringtable.h
 
 
 
@@ -7047,6 +7470,10 @@
 
 
 
+;; From gprintfint.h
+
+
+
 ;; From gqsort.h
 
 (define-function g_qsort_with_data
@@ -7284,7 +7711,7 @@
 (define-method remove
   (of-object "GQueue")
   (c-name "g_queue_remove")
-  (return-type "none")
+  (return-type "gboolean")
   (parameters
     '("gconstpointer" "data")
   )
@@ -7293,7 +7720,7 @@
 (define-method remove_all
   (of-object "GQueue")
   (c-name "g_queue_remove_all")
-  (return-type "none")
+  (return-type "guint")
   (parameters
     '("gconstpointer" "data")
   )
@@ -8166,6 +8593,10 @@
 
 
 
+;; From gscripttable.h
+
+
+
 ;; From gsequence.h
 
 (define-function g_sequence_new
@@ -8379,6 +8810,28 @@
 (define-method search_iter
   (of-object "GSequence")
   (c-name "g_sequence_search_iter")
+  (return-type "GSequenceIter*")
+  (parameters
+    '("gpointer" "data")
+    '("GSequenceIterCompareFunc" "iter_cmp")
+    '("gpointer" "cmp_data")
+  )
+)
+
+(define-method lookup
+  (of-object "GSequence")
+  (c-name "g_sequence_lookup")
+  (return-type "GSequenceIter*")
+  (parameters
+    '("gpointer" "data")
+    '("GCompareDataFunc" "cmp_func")
+    '("gpointer" "cmp_data")
+  )
+)
+
+(define-method lookup_iter
+  (of-object "GSequence")
+  (c-name "g_sequence_lookup_iter")
   (return-type "GSequenceIter*")
   (parameters
     '("gpointer" "data")
@@ -9999,6 +10452,11 @@
   )
 )
 
+(define-function g_test_fail
+  (c-name "g_test_fail")
+  (return-type "none")
+)
+
 (define-function g_test_message
   (c-name "g_test_message")
   (return-type "none")
@@ -10665,6 +11123,15 @@
 
 
 
+;; From gthreadprivate.h
+
+(define-function g_thread_init_glib
+  (c-name "g_thread_init_glib")
+  (return-type "none")
+)
+
+
+
 ;; From gtimer.h
 
 (define-function g_timer_new
@@ -10748,6 +11215,11 @@
 
 ;; From gtimezone.h
 
+(define-function g_time_zone_refresh_local
+  (c-name "g_time_zone_refresh_local")
+  (return-type "none")
+)
+
 (define-function g_time_zone_new
   (c-name "g_time_zone_new")
   (is-constructor-of "GTimeZone")
@@ -10785,7 +11257,7 @@
   (return-type "gint")
   (parameters
     '("GTimeType" "type")
-    '("gint64" "time")
+    '("gint64" "time_")
   )
 )
 
@@ -10795,7 +11267,7 @@
   (return-type "gint")
   (parameters
     '("GTimeType" "type")
-    '("gint64*" "time")
+    '("gint64*" "time_")
   )
 )
 
@@ -10981,6 +11453,14 @@
 
 
 ;; From gtypes.h
+
+
+
+;; From gunibreak.h
+
+
+
+;; From gunichartables.h
 
 
 
@@ -11459,6 +11939,18 @@
 
 
 
+;; From gunicodeprivate.h
+
+
+
+;; From gunicomp.h
+
+
+
+;; From gunidecomp.h
+
+
+
 ;; From gurifuncs.h
 
 (define-function g_uri_unescape_string
@@ -11573,27 +12065,17 @@
   (return-type "const-gchar*")
 )
 
-(define-function g_get_system_data_dirs
-  (c-name "g_get_system_data_dirs")
-  (return-type "const-gchar**")
-)
-
-(define-function g_win32_get_system_data_dirs_for_module
-  (c-name "g_win32_get_system_data_dirs_for_module")
-  (return-type "const-gchar**")
-  (parameters
-    '("somepointer" "address_of_function")
-  )
-)
-
 (define-function g_get_user_runtime_dir
   (c-name "g_get_user_runtime_dir")
   (return-type "const-gchar*")
 )
 
-(define-function g_get_language_names
-  (c-name "g_get_language_names")
-  (return-type "const-gchar**")
+(define-function g_get_locale_variants
+  (c-name "g_get_locale_variants")
+  (return-type "gchar**")
+  (parameters
+    '("const-gchar*" "locale")
+  )
 )
 
 (define-function g_get_user_special_dir
@@ -11753,6 +12235,10 @@
 
 
 
+;; From gvariant-core.h
+
+
+
 ;; From gvariant.h
 
 (define-method unref
@@ -11816,7 +12302,7 @@
   (c-name "g_variant_new_boolean")
   (return-type "GVariant*")
   (parameters
-    '("gboolean" "boolean")
+    '("gboolean" "value")
   )
 )
 
@@ -11824,7 +12310,7 @@
   (c-name "g_variant_new_byte")
   (return-type "GVariant*")
   (parameters
-    '("guchar" "byte")
+    '("guchar" "value")
   )
 )
 
@@ -11832,7 +12318,7 @@
   (c-name "g_variant_new_int16")
   (return-type "GVariant*")
   (parameters
-    '("gint16" "int16")
+    '("gint16" "value")
   )
 )
 
@@ -11840,7 +12326,7 @@
   (c-name "g_variant_new_uint16")
   (return-type "GVariant*")
   (parameters
-    '("guint16" "uint16")
+    '("guint16" "value")
   )
 )
 
@@ -11848,7 +12334,7 @@
   (c-name "g_variant_new_int32")
   (return-type "GVariant*")
   (parameters
-    '("gint32" "int32")
+    '("gint32" "value")
   )
 )
 
@@ -11856,7 +12342,7 @@
   (c-name "g_variant_new_uint32")
   (return-type "GVariant*")
   (parameters
-    '("guint32" "uint32")
+    '("guint32" "value")
   )
 )
 
@@ -11864,7 +12350,7 @@
   (c-name "g_variant_new_int64")
   (return-type "GVariant*")
   (parameters
-    '("gint64" "int64")
+    '("gint64" "value")
   )
 )
 
@@ -11872,7 +12358,7 @@
   (c-name "g_variant_new_uint64")
   (return-type "GVariant*")
   (parameters
-    '("guint64" "uint64")
+    '("guint64" "value")
   )
 )
 
@@ -11880,7 +12366,7 @@
   (c-name "g_variant_new_handle")
   (return-type "GVariant*")
   (parameters
-    '("gint32" "handle")
+    '("gint32" "value")
   )
 )
 
@@ -11888,7 +12374,7 @@
   (c-name "g_variant_new_double")
   (return-type "GVariant*")
   (parameters
-    '("gdouble" "floating")
+    '("gdouble" "value")
   )
 )
 
@@ -12185,7 +12671,7 @@
   (return-type "GVariant*")
   (parameters
     '("const-gchar*" "key")
-    '("const-GVariantType*" "type")
+    '("const-GVariantType*" "expected_type")
   )
 )
 
@@ -12519,6 +13005,110 @@
 
 
 
+;; From gvariant-internal.h
+
+(define-function g_variant_format_string_scan
+  (c-name "g_variant_format_string_scan")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "string")
+    '("const-gchar*" "limit")
+    '("const-gchar**" "endptr")
+  )
+)
+
+(define-function g_variant_format_string_scan_type
+  (c-name "g_variant_format_string_scan_type")
+  (return-type "GVariantType*")
+  (parameters
+    '("const-gchar*" "string")
+    '("const-gchar*" "limit")
+    '("const-gchar**" "endptr")
+  )
+)
+
+
+
+;; From gvariant-serialiser.h
+
+(define-method n_children
+  (of-object "GVariantSerialised")
+  (c-name "g_variant_serialised_n_children")
+  (return-type "gsize")
+)
+
+(define-method get_child
+  (of-object "GVariantSerialised")
+  (c-name "g_variant_serialised_get_child")
+  (return-type "GVariantSerialised")
+  (parameters
+    '("gsize" "index")
+  )
+)
+
+(define-function g_variant_serialiser_needed_size
+  (c-name "g_variant_serialiser_needed_size")
+  (return-type "gsize")
+  (parameters
+    '("GVariantTypeInfo*" "info")
+    '("GVariantSerialisedFiller" "gsv_filler")
+    '("const-gpointer*" "children")
+    '("gsize" "n_children")
+  )
+)
+
+(define-function g_variant_serialiser_serialise
+  (c-name "g_variant_serialiser_serialise")
+  (return-type "none")
+  (parameters
+    '("GVariantSerialised" "container")
+    '("GVariantSerialisedFiller" "gsv_filler")
+    '("const-gpointer*" "children")
+    '("gsize" "n_children")
+  )
+)
+
+(define-method is_normal
+  (of-object "GVariantSerialised")
+  (c-name "g_variant_serialised_is_normal")
+  (return-type "gboolean")
+)
+
+(define-method byteswap
+  (of-object "GVariantSerialised")
+  (c-name "g_variant_serialised_byteswap")
+  (return-type "none")
+)
+
+(define-function g_variant_serialiser_is_string
+  (c-name "g_variant_serialiser_is_string")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "data")
+    '("gsize" "size")
+  )
+)
+
+(define-function g_variant_serialiser_is_object_path
+  (c-name "g_variant_serialiser_is_object_path")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "data")
+    '("gsize" "size")
+  )
+)
+
+(define-function g_variant_serialiser_is_signature
+  (c-name "g_variant_serialiser_is_signature")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "data")
+    '("gsize" "size")
+  )
+)
+
+
+
 ;; From gvarianttype.h
 
 (define-function g_variant_type_string_is_valid
@@ -12728,6 +13318,80 @@
 
 
 
+;; From gvarianttypeinfo.h
+
+(define-method get_type_string
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_get_type_string")
+  (return-type "const-gchar*")
+)
+
+(define-method query
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_query")
+  (return-type "none")
+  (parameters
+    '("guint*" "alignment")
+    '("gsize*" "size")
+  )
+)
+
+(define-method element
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_element")
+  (return-type "GVariantTypeInfo*")
+)
+
+(define-method query_element
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_query_element")
+  (return-type "none")
+  (parameters
+    '("guint*" "alignment")
+    '("gsize*" "size")
+  )
+)
+
+(define-method n_members
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_n_members")
+  (return-type "gsize")
+)
+
+(define-method member_info
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_member_info")
+  (return-type "const-GVariantMemberInfo*")
+  (parameters
+    '("gsize" "index")
+  )
+)
+
+(define-method info_get
+  (of-object "GVariantType")
+  (c-name "g_variant_type_info_get")
+  (return-type "GVariantTypeInfo*")
+)
+
+(define-method ref
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_ref")
+  (return-type "GVariantTypeInfo*")
+)
+
+(define-method unref
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_unref")
+  (return-type "none")
+)
+
+(define-function g_variant_type_info_assert_no_infos
+  (c-name "g_variant_type_info_assert_no_infos")
+  (return-type "none")
+)
+
+
+
 ;; From gwin32.h
 
 (define-function g_win32_ftruncate
@@ -12791,3 +13455,5 @@
     '("const-gchar*" "utf8filename")
   )
 )
+
+
