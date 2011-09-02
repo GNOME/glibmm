@@ -12,6 +12,26 @@ sub start_ignore ($$@)
 sub end_ignore ($$)
 {}
 
+sub doc_start ($$@)
+{
+  my ($self, $parser, @atts_vals) = @_;
+  my $params = extract_values_warn (['xml:whitespace'], [], \@atts_vals, 'doc');
+  my $state = $parser->get_current_state ();
+  my $xml_parser = $state->get_xml_parser ();
+
+  $self->{'doc'} = '';
+  $xml_parser->setHandlers ('Char' => sub { $self->{'doc'} .= $_[1] });
+}
+
+sub doc_end ($$)
+{
+  my ($self, $parser) = @_;
+  my $state = $parser->get_current_state ();
+  my $xml_parser = $state->get_xml_parser ();
+
+  $xml_parser->setHandlers ('Char' => undef);
+}
+
 sub extract_values($$$$)
 {
   my ($keys, $optional_keys, $atts_vals, $tag) = @_;
@@ -21,12 +41,12 @@ sub extract_values($$$$)
   my $leftover = undef;
   my $att = undef;
 
-  foreach my $key (@keys)
+  foreach my $key (@{$keys})
   {
     $params->{$key} = undef;
     $check->{$key} = undef;
   }
-  foreach my $key in (@optional_keys)
+  foreach my $key (@{$optional_keys})
   {
     $params->{$key} = undef;
   }
@@ -52,12 +72,12 @@ sub extract_values($$$$)
     }
     else
     {
-      $params{$att} = $entry;
+      $params->{$att} = $entry;
       $att = undef;
     }
   }
 
-  my @check_keys = keys (%{$check})
+  my @check_keys = keys (%{$check});
 
   if (@check_keys > 0)
   {
@@ -68,8 +88,8 @@ sub extract_values($$$$)
       $message .= "  " . $key . "\n";
     }
     # TODO: change this later maybe to exception and remove $tag parameter.
-    print STDERR $message;
-    exit (1);
+    #print STDERR $message;
+    #exit (1);
   }
 
   return ($params, $leftovers);
@@ -78,7 +98,7 @@ sub extract_values($$$$)
 sub extract_values_warn ($$$$)
 {
   my ($keys, $optional_keys, $atts_vals, $tag) = @_;
-  my ($params, $leftovers) = extract_values ($keys, $optional_keys, $atts_vals);
+  my ($params, $leftovers) = extract_values ($keys, $optional_keys, $atts_vals, $tag);
   my @leftover_keys = keys (%{$leftovers});
 
   if (@leftover_keys > 0)
@@ -90,8 +110,8 @@ sub extract_values_warn ($$$$)
       $message .= "  " . $leftover . " => " . $leftovers->{$leftover} . "\n";
     }
     # TODO: change this later maybe to exception and remove $tag parameter.
-    print STDERR $message;
-    exit (1);
+    #print STDERR $message;
+    #exit (1);
   }
 
   return $params;

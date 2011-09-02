@@ -1,4 +1,4 @@
-package Gir::Handlers::Store;
+package Gir::Handlers::Stores::Store;
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use warnings;
 sub new ($$)
 {
   my ($type, $methods) = @_;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Store');
+  my $class = (ref ($type) or $type or 'Gir::Handlers::Stores::Store');
   my $self =
   {
     'methods' => $methods

@@ -12,20 +12,21 @@ ATTR_FUNC: name c:identifier ?version? ?introspectable? ?deprecated? ?deprecated
 
 alias: name c:type
 array: ?zero-terminated? c:type ?fixed-size? ?length? // length is actually an index of parameter describing its length; fixed-size us specified for array[];
-bitfield: name ?version? glib:type-name glib:get-type c:type
-callback: name ?c:type? ?introspectable? ?version? ??deprecated?? ??deprecated-version??
-class: name, c:symbol-prefix, c:type, parent, abstract, glib:type-name, glib:get-type
+bitfield: name c:type ?version? ?glib:type-name? ?glib:get-type?
+callback: name c:type ?deprecated? ?deprecated-version? ?introspectable? ?version? ?throws?
+class: name c:symbol-prefix glib:type-name glib:get-type ?abstract? ?c:type? ?version? ?glib:type-struct? ?parent?]
+constant: name value
 constructor: name c:identifier ?version? ?deprecated? ?deprecated-version?
 c:include: {ignored}
 doc: // none important
-enumeration: name ?version? glib:type-name glib:get-type c:type
+enumeration: name c:type ?version? ?glib:type-name? ?glib:get-type? ?glib:error-quark? ?deprecated? ?deprecated-version?
 field: name ?writable? ?introspectable? ?readable? ?private?
-function: ATTR_FUNC
+function: name c:identifier ?introspectable? ?deprecated? ?deprecated-version? ?throws? ?version? ?shadowed-by? ?shadows?
 glib:signal: name when ?detailed? ?version? ??deprecated?? ??deprecated-version??
 implements: name
 implementation: {ignored}
 include: name version
-interface: name c:symbol-prefix c:type glib:type-name glib:get-type glib:type-struct ?version?
+interface: name c:symbol-prefix c:type glib:type-name glib:get-type ?glib:type-struct? ?version?
 member: name value c:identifier glib:nick
 method: ATTR_FUNC
 namespace: name, version, shared-library, c:identifier-prefixes, c:symbol-prefixes
@@ -34,11 +35,12 @@ parameters: // none
 parameter: name transfer-ownership ?allow-none? ?direction? ?caller-allocates?
 prerequisite: name
 property: name ?writable? ?construct-only? transfer-ownership ?version? ?readable? ?construct?
-record: name c:type ?disguised? ?glib:type-name? ?glib:get-type? ?c:symbol-prefix? ?glib:is-gtype-struct-for? ?version?
-repository: version
+record: name c:type ?glib:type-name? ?version? ?c:symbol-prefix? ?glib:get-type? ?glib:is-gtype-struct-for? ?disguised? ?introspectable? ?foreign?
+repository: version xmlns xmlns:c xmlns:glib
 return-value: transfer-ownership
 type: name ?c:type?
 virtual-method: name ?introspectable? ?invoker? ?version? ?throws? ??deprecated?? ??deprecated-version??
+union: name c:type ?glib:type-name? ?c:symbol-prefix? ?glib:get-type?
 
 ==============
 TAGS HIERARCHY
@@ -109,6 +111,9 @@ repository 1
 | | `-FUNC_COMMON 1
 | +-callback n
 | | `-FUNC_COMMON 1
+| +-union n
+| | +-CLASS_COMMON 1
+| | `-constructor n
 | +-alias n
 | | `-TYPE_COMMON 1
 | `-constant n
