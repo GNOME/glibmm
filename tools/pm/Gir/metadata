@@ -1,3 +1,49 @@
+==============
+TAG ATTRIBUTES
+==============
+
+// without decorations - mandatory attributes.
+// with single question marks on each side - optional attributes.
+// with double question marks on each side - my guess about existence of optional attribute.
+
+ATTR_FUNC: name c:identifier ?version? ?introspectable? ?deprecated? ?deprecated-version? ?throws?
+
+--------
+
+alias: name c:type
+array: ?zero-terminated? c:type ?fixed-size? ?length? // length is actually an index of parameter describing its length; fixed-size us specified for array[];
+bitfield: name ?version? glib:type-name glib:get-type c:type
+callback: name ?c:type? ?introspectable? ?version? ??deprecated?? ??deprecated-version??
+class: name, c:symbol-prefix, c:type, parent, abstract, glib:type-name, glib:get-type
+constructor: name c:identifier ?version? ?deprecated? ?deprecated-version?
+c:include: {ignored}
+doc: // none important
+enumeration: name ?version? glib:type-name glib:get-type c:type
+field: name ?writable? ?introspectable? ?readable? ?private?
+function: ATTR_FUNC
+glib:signal: name when ?detailed? ?version? ??deprecated?? ??deprecated-version??
+implements: name
+implementation: {ignored}
+include: name version
+interface: name c:symbol-prefix c:type glib:type-name glib:get-type glib:type-struct ?version?
+member: name value c:identifier glib:nick
+method: ATTR_FUNC
+namespace: name, version, shared-library, c:identifier-prefixes, c:symbol-prefixes
+package: {ignored}
+parameters: // none
+parameter: name transfer-ownership ?allow-none? ?direction? ?caller-allocates?
+prerequisite: name
+property: name ?writable? ?construct-only? transfer-ownership ?version? ?readable? ?construct?
+record: name c:type ?disguised? ?glib:type-name? ?glib:get-type? ?c:symbol-prefix? ?glib:is-gtype-struct-for? ?version?
+repository: version
+return-value: transfer-ownership
+type: name ?c:type?
+virtual-method: name ?introspectable? ?invoker? ?version? ?throws? ??deprecated?? ??deprecated-version??
+
+==============
+TAGS HIERARCHY
+==============
+
 PARAM_COMMON
 +-doc 1
 `-type|array 1
@@ -38,7 +84,12 @@ ENUMBIT_COMMON
 +-doc 1
 `-member n
 
+--------
+
 repository 1
++-include n
++-c:include X
++-package X
 +-namespace 1
 | +-class n
 | | +-CLASS_COMMON 1
@@ -62,4 +113,4 @@ repository 1
 | | `-TYPE_COMMON 1
 | `-constant n
 |   `-TYPE_COMMON 1
-`-implementation 1 (lolwhut? ignore)
+`-implementation X
