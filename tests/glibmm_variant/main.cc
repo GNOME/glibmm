@@ -14,6 +14,7 @@ int main(int, char**)
 {
   Glib::init();
 
+  //vector<int>:
   const int int_list[] = {1, 2, 3, 4, 5, 6, 7, 8};
 
   std::vector<int> int_vector(int_list,
@@ -46,6 +47,15 @@ int main(int, char**)
     integers_variant.get_child(index) << '.' << std::endl;
 
   ostr << std::endl;
+  
+  
+  //vector<std::string>:
+  std::vector<std::string> vec_strings;
+  vec_strings.push_back("a");
+  Glib::Variant<std::vector<std::string> > variant_vec_strings =
+    Glib::Variant<std::vector<std::string> >::create(vec_strings);
+  
+  //Dict:
 
   typedef std::pair<Glib::ustring, Glib::ustring> TypeDictEntry;
 
