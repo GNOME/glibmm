@@ -135,7 +135,6 @@ _CONVERSION(`GFileOutputStream*',`Glib::RefPtr<FileOutputStream>',`Glib::wrap($3
 
 _CONVERSION(`GFileIOStream*',`Glib::RefPtr<FileIOStream>',`Glib::wrap($3)')
 
-
 # Icon
 _CONVERSION(`GIcon*',`Glib::RefPtr<Icon>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Icon>&',`GIcon*',__CONVERT_CONST_REFPTR_TO_P)
@@ -188,12 +187,6 @@ _CONVERSION(`const Glib::StringArrayHandle&',`const gchar*-const*',`($3).data()'
 _CONVERSION(`const Glib::RefPtr<SettingsBackend>&',`GSettingsBackend*',__CONVERT_REFPTR_TO_P)
 
 
-#_CONVERSION(`GVariant*',`Glib::VariantBase',`Glib::wrap($3, true)')
-_CONVERSION(`GVariant*',`VariantBase',`Glib::wrap($3, true)')
-_CONVERSION(`GVariant*',`Glib::VariantContainerBase',`Glib::VariantContainerBase($3, false)')
-_CONVERSION(`const Glib::VariantBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
-_CONVERSION(`const Glib::VariantContainerBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
-
 #Socket
 _CONVERSION(`const Glib::RefPtr<Socket>&',`GSocket*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GSocket*',`Glib::RefPtr<Socket>',`Glib::wrap($3)')
@@ -220,6 +213,15 @@ _CONVERSION(`GTimeZoneMonitor*',`Glib::RefPtr<TimeZoneMonitor>',`Glib::wrap($3)'
 #UnixFDList
 _CONVERSION(`GUnixFDList*',`Glib::RefPtr<UnixFDList>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<UnixFDList>&',`GUnixFDList*',`Glib::unwrap($3)')
+
+#Variant
+_CONVERSION(`GVariant*',`Glib::VariantBase',`Glib::wrap($3, false)')
+_CONVERSION(`GVariant*',`Glib::VariantContainerBase',`Glib::VariantContainerBase($3, false)')
+_CONVERSION(`const Glib::VariantBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
+_CONVERSION(`const Glib::VariantContainerBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
+
+#VariantType
+_CONVERSION(`const GVariantType*',`Glib::VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
 
 #Volume
 _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')
