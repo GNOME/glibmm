@@ -1,4 +1,4 @@
-## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
+## Copyright (c) 2009, 2011  Openismus GmbH  <http://www.openismus.com/>
 ##
 ## This file is part of glibmm.
 ##
@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-#serial 20090816
+#serial 20110910
 
 ## GLIBMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES
 ##
@@ -66,9 +66,9 @@ func = &foo::doit<int>;
     [glibmm_cv_cxx_member_functions_member_templates=yes],
     [glibmm_cv_cxx_member_functions_member_templates=no])])
 
-AS_IF([test "x$glibmm_cv_cxx_member_functions_member_templates" = xyes],
-      [AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES], [1],
-                 [Define if C++ member functions may refer to member templates.])])[]dnl
+AS_VAR_IF([glibmm_cv_cxx_member_functions_member_templates], ['yes'],
+          [AC_DEFINE([GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES], [1],
+                     [Define if C++ member functions may refer to member templates.])])[]dnl
 ])
 
 ## GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS
@@ -115,9 +115,9 @@ Traits< Foo<const int> > cfit;
     [glibmm_cv_cxx_can_disambiguate_const_template_specializations=yes],
     [glibmm_cv_cxx_can_disambiguate_const_template_specializations=no])])
 
-AS_IF([test "x$glibmm_cv_cxx_can_disambiguate_const_template_specializations" = xyes],
-      [AC_DEFINE([GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS], [1],
-[Define if the compiler disambiguates template specializations for const and non-const types.])])[]dnl
+AS_VAR_IF([glibmm_cv_cxx_can_disambiguate_const_template_specializations], ['yes'],
+          [AC_DEFINE([GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS], [1],
+                     [Define if the compiler disambiguates template specializations for const and non-const types.])])[]dnl
 ])
 
 ## GLIBMM_CXX_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
@@ -152,9 +152,9 @@ class SomeTemplate
     [glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition=yes],
     [glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition=no])])
 
-AS_IF([test "x$glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition" = xyes],
-      [AC_DEFINE([GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION], [1],
-        [Define if non-instantiated templates may dynamic_cast<> to an undefined type.])])[]dnl
+AS_VAR_IF([glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definition], ['yes'],
+          [AC_DEFINE([GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION], [1],
+                     [Define if non-instantiated templates may dynamic_cast<> to an undefined type.])])[]dnl
 ])
 
 ## GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
@@ -186,9 +186,9 @@ something.callback = &somefunction;
     [glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks=yes],
     [glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks=no])])
 
-AS_IF([test "x$glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks" = xyes],
-      [AC_DEFINE([GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS], [1],
-                 [Define if extern "C" and extern "C++" function pointers are compatible.])])[]dnl
+AS_VAR_IF([glibmm_cv_cxx_can_assign_non_extern_c_functions_to_extern_c_callbacks], ['yes'],
+          [AC_DEFINE([GLIBMM_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS], [1],
+                     [Define if extern "C" and extern "C++" function pointers are compatible.])])[]dnl
 ])
 
 ## GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
@@ -232,7 +232,7 @@ void do_something()
     [glibmm_cv_cxx_can_use_namespaces_inside_externc=yes],
     [glibmm_cv_cxx_can_use_namespaces_inside_externc=no])])
 
-AS_IF([test "x$glibmm_cv_cxx_can_use_namespaces_inside_externc" = xyes],
-      [AC_DEFINE([GLIBMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC], [1],
-                 [Define if the compiler honors namespaces inside extern "C" blocks.])])[]dnl
+AS_VAR_IF([glibmm_cv_cxx_can_use_namespaces_inside_externc], ['yes'],
+          [AC_DEFINE([GLIBMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC], [1],
+                     [Define if the compiler honors namespaces inside extern "C" blocks.])])[]dnl
 ])

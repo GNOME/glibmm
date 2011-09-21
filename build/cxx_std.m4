@@ -1,3 +1,22 @@
+## Copyright (c) 2009, 2011  Openismus GmbH  <http://www.openismus.com/>
+##
+## This file is part of glibmm.
+##
+## glibmm is free software: you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation, either version 2.1 of the License,
+## or (at your option) any later version.
+##
+## glibmm is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
+
+#serial 20110910
+
 ## GLIBMM_CXX_HAS_NAMESPACE_STD()
 ##
 ## Test whether libstdc++ declares namespace std.  For safety,
@@ -10,15 +29,15 @@ AC_DEFUN([GLIBMM_CXX_HAS_NAMESPACE_STD],
 [
   AC_CACHE_CHECK(
     [whether C++ library symbols are declared in namespace std],
-    [gtkmm_cv_cxx_has_namespace_std],
+    [glibmm_cv_cxx_has_namespace_std],
   [
-    AC_TRY_COMPILE(
-    [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[
       #include <algorithm>
       #include <iterator>
       #include <iostream>
       #include <string>
-    ],[
+    ]],[[
       using std::min;
       using std::find;
       using std::copy;
@@ -26,17 +45,15 @@ AC_DEFUN([GLIBMM_CXX_HAS_NAMESPACE_STD],
       using std::string;
       using std::istream;
       using std::cout;
-    ],
-      [gtkmm_cv_cxx_has_namespace_std="yes"],
-      [gtkmm_cv_cxx_has_namespace_std="no"]
+    ]])],
+      [glibmm_cv_cxx_has_namespace_std='yes'],
+      [glibmm_cv_cxx_has_namespace_std='no']
     )
   ])
 
-  if test "x${gtkmm_cv_cxx_has_namespace_std}" = "xyes"; then
-  {
-    AC_DEFINE([GLIBMM_HAVE_NAMESPACE_STD],[1], [Defined when the libstdc++ declares the std-namespace])
-  }
-  fi
+  AS_VAR_IF([glibmm_cv_cxx_has_namespace_std], ['yes'],
+            [AC_DEFINE([GLIBMM_HAVE_NAMESPACE_STD], [1],
+                       [Defined when the libstdc++ declares the std-namespace])])[]dnl
 ])
 
 
@@ -51,27 +68,25 @@ AC_DEFUN([GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS],
 
   AC_CACHE_CHECK(
     [whether the C++ library supports std::iterator_traits],
-    [gtkmm_cv_cxx_has_std_iterator_traits],
+    [glibmm_cv_cxx_has_std_iterator_traits],
   [
-    AC_TRY_COMPILE(
-    [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[
       #include <iterator>
       #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
       #endif
-    ],[
+    ]],[[
       typedef iterator_traits<char*>::value_type ValueType;
-    ],
-      [gtkmm_cv_cxx_has_std_iterator_traits="yes"],
-      [gtkmm_cv_cxx_has_std_iterator_traits="no"]
+    ]])],
+      [glibmm_cv_cxx_has_std_iterator_traits='yes'],
+      [glibmm_cv_cxx_has_std_iterator_traits='no']
     )
   ])
 
-  if test "x${gtkmm_cv_cxx_has_std_iterator_traits}" = "xyes"; then
-  {
-    AC_DEFINE([GLIBMM_HAVE_STD_ITERATOR_TRAITS],[1], [Defined if std::iterator_traits<> is standard-conforming])
-  }
-  fi
+  AS_VAR_IF([glibmm_cv_cxx_has_std_iterator_traits], ['yes'],
+            [AC_DEFINE([GLIBMM_HAVE_STD_ITERATOR_TRAITS], [1],
+                       [Defined if std::iterator_traits<> is standard-conforming])])[]dnl
 ])
 
 
@@ -86,27 +101,25 @@ AC_DEFUN([GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR],
 
   AC_CACHE_CHECK(
     [for non-standard Sun libCstd reverse_iterator],
-    [gtkmm_cv_cxx_has_sun_reverse_iterator],
+    [glibmm_cv_cxx_has_sun_reverse_iterator],
   [
-    AC_TRY_COMPILE(
-    [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[
       #include <iterator>
       #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
       #endif
-    ],[
+    ]],[[
       typedef reverse_iterator<char*,random_access_iterator_tag,char,char&,char*,int> ReverseIter;
-    ],
-      [gtkmm_cv_cxx_has_sun_reverse_iterator="yes"],
-      [gtkmm_cv_cxx_has_sun_reverse_iterator="no"]
+    ]])],
+      [glibmm_cv_cxx_has_sun_reverse_iterator='yes'],
+      [glibmm_cv_cxx_has_sun_reverse_iterator='no']
     )
   ])
 
-  if test "x${gtkmm_cv_cxx_has_sun_reverse_iterator}" = "xyes"; then
-  {
-    AC_DEFINE([GLIBMM_HAVE_SUN_REVERSE_ITERATOR],[1], [Defined if std::reverse_iterator is in Sun libCstd style])
-  }
-  fi
+  AS_VAR_IF([glibmm_cv_cxx_has_sun_reverse_iterator], ['yes'],
+            [AC_DEFINE([GLIBMM_HAVE_SUN_REVERSE_ITERATOR], [1],
+                       [Defined if std::reverse_iterator is in Sun libCstd style])])[]dnl
 ])
 
 
@@ -121,33 +134,31 @@ AC_DEFUN([GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
 
   AC_CACHE_CHECK(
     [whether STL containers have templated sequence constructors],
-    [gtkmm_cv_cxx_has_template_sequence_ctors],
+    [glibmm_cv_cxx_has_template_sequence_ctors],
   [
-    AC_TRY_COMPILE(
-    [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[
       #include <vector>
       #include <deque>
       #include <list>
       #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
       #endif
-    ],[
+    ]],[[
       const int array[8] = { 0, };
       vector<int>  test_vector (&array[0], &array[8]);
       deque<short> test_deque  (test_vector.begin(), test_vector.end());
       list<long>   test_list   (test_deque.begin(),  test_deque.end());
       test_vector.assign(test_list.begin(), test_list.end());
-    ],
-      [gtkmm_cv_cxx_has_template_sequence_ctors="yes"],
-      [gtkmm_cv_cxx_has_template_sequence_ctors="no"]
+    ]])],
+      [glibmm_cv_cxx_has_template_sequence_ctors='yes'],
+      [glibmm_cv_cxx_has_template_sequence_ctors='no']
     )
   ])
 
-  if test "x${gtkmm_cv_cxx_has_template_sequence_ctors}" = "xyes"; then
-  {
-    AC_DEFINE([GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS],[1], [Defined if the STL containers have templated sequence ctors])
-  }
-  fi
+  AS_VAR_IF([glibmm_cv_cxx_has_template_sequence_ctors], ['yes'],
+            [AC_DEFINE([GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS], [1],
+                       [Defined if the STL containers have templated sequence ctors])])[]dnl
 ])
 
 ## GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS()
@@ -162,10 +173,10 @@ AC_DEFUN([GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS],
 
   AC_CACHE_CHECK(
     [whether the compiler allows a static member variable to be initialized inline to std::string::npos],
-    [gtkmm_cv_cxx_has_allows_static_inline_npos],
+    [glibmm_cv_cxx_has_allows_static_inline_npos],
   [
-    AC_TRY_COMPILE(
-    [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[
       #include <string>
       #include <iostream>
       
@@ -176,19 +187,15 @@ AC_DEFUN([GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS],
         //so we need to initalize the static member data elsewhere.
         static const std::string::size_type ustringnpos = std::string::npos;
       };
-    ],[
+    ]],[[
       std::cout << "npos=" << ustringtest::ustringnpos << std::endl;
-    ],
-      [gtkmm_cv_cxx_has_allows_static_inline_npos="yes"],
-      [gtkmm_cv_cxx_has_allows_static_inline_npos="no"]
+    ]])],
+      [glibmm_cv_cxx_has_allows_static_inline_npos='yes'],
+      [glibmm_cv_cxx_has_allows_static_inline_npos='no']
     )
   ])
 
-  if test "x${gtkmm_cv_cxx_has_allows_static_inline_npos}" = "xyes"; then
-  {
-    AC_DEFINE([GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS],[1], [Defined if a static member variable may be initialized inline to std::string::npos])
-  }
-  fi
+  AS_VAR_IF([glibmm_cv_cxx_has_allows_static_inline_npos], ['yes'],
+            [AC_DEFINE([GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS], [1],
+                       [Defined if a static member variable may be initialized inline to std::string::npos])])[]dnl
 ])
-
-
