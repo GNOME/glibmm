@@ -5,7 +5,8 @@ use warnings;
 
 use parent qw(Gir::Handlers::Base);
 
-use Gir::Handlers::Stores::IgnoreStores;
+use Gir::Handlers::IgnoreEndStore;
+use Gir::Handlers::IgnoreStartStore;
 
 ##
 ## public:
@@ -14,19 +15,20 @@ sub new ($)
 {
   my $type = shift;
   my $class = (ref ($type) or $type or 'Gir::Handlers::Ignore');
-  my $self = $class->SUPER::new ();
+  my $self = $class->SUPER->new ();
 
   $self->_set_handlers
   (
-    Gir::Handlers::Stores::IgnoreStartStore->new (),
-    Gir::Handlers::Stores::IgnoreEndStore->new ()
+    Gir::Handlers::IgnoreStartStore->new (),
+    Gir::Handlers::IgnoreEndStore->new ()
   );
-  $self->_set_subhandlers
-  ({
-    '*' => "Gir::Handlers::Ignore"
-  });
 
   return bless ($self, $class);
+}
+
+sub get_subhandlers_for ($$)
+{
+  return Gir::Handlers::Ignore->new ();
 }
 
 1;

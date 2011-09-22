@@ -13,8 +13,7 @@ sub _new_impl_ ($)
   my $self =
   {
     'start_handlers' => {},
-    'end_handlers' => {},
-    'subhandlers' => {}
+    'end_handlers' => {}
   };
 
   return bless ($self, $class);
@@ -29,13 +28,6 @@ sub _set_handlers ($$$)
 
   $self->{'start_handlers'} = $start_handlers;
   $self->{'end_handlers'} = $end_handlers;
-}
-
-sub _set_subhandlers ($$)
-{
-  my ($self, $subhandlers) = @_;
-
-  $self->{'subhandlers'} = $subhandlers;
 }
 
 ##
@@ -62,24 +54,7 @@ sub get_end_handlers ($)
 
 sub get_subhandlers_for ($$)
 {
-  my ($self, $elem) = @_;
-  my $subhandlers = $self->{'subhandlers'};
-  my $package = undef;
-
-  if (exists ($subhandlers->{$elem}))
-  {
-    $package = $subhandlers->{$elem};
-  }
-  elsif (exists ($subhandlers->{'*'}))
-  {
-    $package = $subhandlers->{'*'};
-  }
-
-  if (defined ($package))
-  {
-    return $package->new ();
-  }
-  return undef;
+  #TODO: error - not implemented.
 }
 
 1;

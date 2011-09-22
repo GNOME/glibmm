@@ -1,9 +1,9 @@
-package Gir::Handlers::Stores::IgnoreEndStore;
+package Gir::Handlers::IgnoreEndStore;
 
 use strict;
 use warnings;
 
-use parent qw(Gir::Handlers::Stores::Store);
+use parent qw(Gir::Handlers::Store);
 
 use Gir::Handlers::Common;
 
@@ -13,8 +13,8 @@ use Gir::Handlers::Common;
 sub new ($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Stores::IgnoreEndStore');
-  my $self = $class->SUPER::new ({});
+  my $class = (ref ($type) or $type or 'Gir::Handlers::IgnoreEndStore');
+  my $self = $class->SUPER->new ({});
 
   return bless ($self, $class);
 }

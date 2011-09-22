@@ -72,7 +72,6 @@ PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
 
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
-MM_PKG_CONFIG_SUBST([GIR_DIR], [--variable=girdir gobject-introspection-1.0])
 
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 GLIB_GSETTINGS
@@ -136,7 +135,6 @@ AC_CONFIG_FILES([Makefile
                  tools/Makefile
                  tools/gmmproc
                  tools/generate_wrap_init.pl
-                 tools/pm/Gir/Config.pm
                  glib/${GLIBMM_MODULE_NAME}.pc:glib/glibmm.pc.in
                  glib/${GLIBMM_MODULE_NAME}-uninstalled.pc:glib/glibmm-uninstalled.pc.in
                  glib/src/Makefile

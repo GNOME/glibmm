@@ -1,130 +1,62 @@
-package Gir::Parser;
+package GirParser;
 
 use strict;
 use warnings;
 
-use Encode;
-
-use Gir::Config;
-use Gir::Handlers::Stores::Store;
+use Gir::Handlers::Store;
 use Gir::State;
 
-use IO::File;
+use XML::Parser;
 
-use XML::Parser::Expat;
-
-sub _print_error ($$$)
+sub _init ($)
 {
-  my ($state, $error, $elem) = @_;
-  my $xml_parser = $state->get_xml_parser ();
-  my $msg = $state->get_parsed_file ()
-    . ':'
-    . $xml_parser->current_line ()
-    . ': '
-    . $error
-    . "\nTags stack:\n";
-  my @context = $xml_parser->context ();
+  my $self = shift;
+  my $new_state = Gir::State->new ();
+  my $state_stack = $self->{'states_stack'};
 
-  foreach my $tag (@context)
-  {
-    $msg .= '  ' . $tag . "\n";
-  }
-  if (defined ($elem))
-  {
-    $msg .= '  ' . $elem . "\n";
-  }
-  print STDERR $msg;
+  push (@{$state_stack}, $new_state);
+  $self->{'state'} = $new_state;
 }
 
-sub _get_file_contents_as_utf8 ($)
+sub _final ($)
 {
-  my $real_filename = shift;
-  my $xml = IO::File->new ($real_filename, 'r');
+  my $self = shift;
+  my $state_stack = $self->{'states_stack'};
 
-  unless (defined ($xml))
-  {
-    #TODO: error;
-    print STDERR 'Could not open file: ' . $real_filename . ".\n";
-    exit (1);
-  }
-
-  my $file_size = ($xml->stat ())[7];
-  my $contents = undef;
-
-  unless ($xml->binmode (':raw'))
-  {
-    #TODO: error;
-    print STDERR "Calling binmode on " . $real_filename . " failed.\n";
-    exit (1);
-  }
-
-  my $bytes_read = $xml->read ($contents, $file_size);
-
-  if ($bytes_read != $file_size)
-  {
-    #TODO: error;
-    if (defined ($bytes_read))
-    {
-      print STDERR 'Read ' . $bytes_read . ' bytes from ' . $real_filename . ', wanted: ' . $file_size . " bytes.\n";
-    }
-    else
-    {
-      print STDERR 'Read error from ' . $real_filename . ".\n";
-    }
-    exit (1);
-  }
-  unless ($xml->close ())
-  {
-    print STDERR 'Closing ' . $real_filename . " failed.\n";
-    exit (1);
-  }
-  return decode ('utf-8', $contents);
+  pop (@{$state_stack});
+  $self->{'state'} = $state_stack->[-1];
 }
 
 sub _start ($$$@)
 {
-  my ($self, undef, $elem, @atts_vals) = @_;
-  my $state = $self->get_current_state ();
+  my ($self, undef, $elem, @attval) = @_;
+  my $state = $self->{'current_state'};
   my $handlers = $state->get_current_handlers ();
   my $start_handlers = $handlers->get_start_handlers ();
 
-  if (defined ($start_handlers))
+  if ($start_handlers->has_method_for ($elem))
   {
-    if ($start_handlers->has_method_for ($elem))
-    {
-      my $method = $start_handlers->get_method_for ($elem);
-      my $subhandlers = $handlers->get_subhandlers_for ($elem);
+    my $method = $start_handlers->get_method_for ($elem);
+    my $subhandlers = $handlers->get_subhandlers_for ($elem);
 
-      if (defined ($subhandlers))
-      {
-        $state->push_handlers ($subhandlers);
-        return $handlers->$method ($self, @atts_vals);
-      }
-      # TODO: internal error - wrong implementation of get_subhandlers_for?
-      _print_error ($state, 'Internal error - wrong implementation of get_subhandlers_for?', $elem);
-      exit (1);
+    if (defined ($subhandlers))
+    {
+      $state->push_handlers ($subhandlers);
+      return $handlers->$method ($self, @attval);
     }
-    # TODO: unknown elem?
-    _print_error ($state, 'Unknown tag: ' . $elem . '.', $elem);
-    exit (1);
+    # TODO: internal error - wrong implementation of get_subhandlers_for?
   }
-  _print_error ($state, 'No start handlers: ' . $elem . '.', $elem);
-  exit (1);
+  # TODO: unknown elem?
 }
 
 sub _end ($$$)
 {
   my ($self, undef, $elem) = @_;
-  my $state = $self->get_current_state ();
+  my $state = $self->{'current_state'};
 
   $state->pop_handlers ();
 
   my $handlers = $state->get_current_handlers ();
-  unless (defined $handlers)
-  {
-    _print_error ($state, 'No handlers for tag: ' . $elem . '.', $elem);
-    exit (1);
-  }
   my $end_handlers = $handlers->get_end_handlers ();
 
   if ($end_handlers->has_method_for ($elem))
@@ -133,8 +65,7 @@ sub _end ($$$)
 
     return $handlers->$method ($self);
   }
-  _print_error ($state, 'Unknown tag: ' . $elem . '.', $elem);
-  exit (1);
+  # TODO: unknown elem?
 }
 
 #
@@ -149,7 +80,8 @@ sub new($)
   {
     'states_stack' => [],
     'parsed_girs' => {},
-    'api' => {}, # TODO: replace with Gir::Api->new () or something like that.
+    'state' => undef,
+    'api' => {} # TODO: replace with Gir::Api->new () or something like that.
   };
 
   return bless ($self, $class);
@@ -158,7 +90,7 @@ sub new($)
 sub _create_xml_parser ($)
 {
   my $self = shift;
-  my $xml_parser = XML::Parser::Expat->new ();
+  my $xml_parser = XML::Parser->new ();
 
   #TODO: implement commented methods.
   $xml_parser->setHandlers
@@ -167,6 +99,8 @@ sub _create_xml_parser ($)
 #    Comment => sub { $self->_comment (@_); },
 #    Default => sub { $self->_default (@_); },
     End => sub { $self->_end (@_); },
+    Final => sub { $self->_final (@_); },
+    Init => sub { $self->_init (@_); },
     Start => sub { $self ->_start (@_); },
 #    XMLDecl => sub { $self->_xmldecl (@_); }
   );
@@ -181,20 +115,11 @@ sub parse_file ($$)
 
   unless (exists ($parsed_girs->{$filename}))
   {
-    my $real_filename = File::Spec->catfile (Gir::Config::get_girdir(), $filename);
+    my $real_filename = File::Spec->catfile (GirConfig::get_girdir(), $filename);
     my $xml_parser = $self->_create_xml_parser ();
-    my $new_state = Gir::State->new ($real_filename, $xml_parser);
-    my $states_stack = $self->{'states_stack'};
 
     $parsed_girs->{$filename} = undef;
-    push (@{$states_stack}, $new_state);
-
-    my $contents = _get_file_contents_as_utf8 ($real_filename);
-
-    $xml_parser->parse ($contents);
-    $xml_parser->release ();
-    pop (@{$states_stack});
-    #print STDOUT 'Parsed ' . $real_filename . "\n";
+    $xml_parser->parsefile ($real_filename);
   }
 }
 
@@ -203,14 +128,6 @@ sub get_api ($)
   my $self = shift;
 
   return $self->{'api'};
-}
-
-sub get_current_state ($)
-{
-  my $self = shift;
-  my $states_stack = $self->{'states_stack'};
-
-  return $states_stack->[-1];
 }
 
 1;
