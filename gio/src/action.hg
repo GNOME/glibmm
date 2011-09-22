@@ -83,7 +83,24 @@ public:
   _WRAP_PROPERTY("state", Glib::VariantBase)
   _WRAP_PROPERTY("state-type", Glib::VariantType)
 
-//TODO: Wrap virtual functions.
+#m4 _CONVERSION(`Glib::ustring',`const gchar*',`$3.c_str()')
+  _WRAP_VFUNC(Glib::ustring get_name() const, "get_name")
+
+#m4 _CONVERSION(`Glib::VariantType',`const GVariantType*',`$3.gobj_copy()')
+  _WRAP_VFUNC(Glib::VariantType get_parameter_type() const, "get_parameter_type")
+  _WRAP_VFUNC(Glib::VariantType get_state_type() const, "get_state_type")
+
+#m4 _CONVERSION(`Glib::VariantBase',`GVariant*',`$3.gobj_copy()')
+
+  _WRAP_VFUNC(Glib::VariantBase get_state_hint() const, "get_state_hint")
+
+  _WRAP_VFUNC(bool get_enabled() const, "get_enabled")
+
+  _WRAP_VFUNC(Glib::VariantBase get_state() const, "get_state")
+
+#m4 _CONVERSION(`GVariant*',`const Glib::VariantBase&',`Glib::wrap($3, true)')
+  _WRAP_VFUNC(void change_state(const Glib::VariantBase& value), "change_state")
+  _WRAP_VFUNC(void activate(const Glib::VariantBase& parameter), "activate")
 };
 
 } // namespace Gio

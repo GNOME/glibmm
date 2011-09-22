@@ -78,7 +78,23 @@ public:
 #m4 _CONVERSION(`GVariant*', `const Glib::VariantBase&', `Glib::wrap($3, true)')
   _WRAP_SIGNAL(void action_state_changed(const Glib::ustring& action_name, const Glib::VariantBase& value), "action-state-changed")
 
-//TODO: Wrap virtual functions.
+  _WRAP_VFUNC(bool has_action(const Glib::ustring& name) const, "has_action")
+
+#m4 _CONVERSION(`std::vector<Glib::ustring>',`gchar**',`const_cast<gchar**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data())')
+  _WRAP_VFUNC(std::vector<Glib::ustring> list_actions() const, "list_actions")
+
+  _WRAP_VFUNC(bool get_action_enabled(const Glib::ustring& name) const, "get_action_enabled")
+
+#m4 _CONVERSION(`Glib::VariantType',`const GVariantType*',`$3.gobj_copy()')
+  _WRAP_VFUNC(Glib::VariantType get_action_parameter_type(const Glib::ustring& name) const, "get_action_parameter_type")
+  _WRAP_VFUNC(Glib::VariantType get_action_state_type(const Glib::ustring& name) const, "get_action_state_type")
+
+#m4 _CONVERSION(`Glib::VariantBase',`GVariant*',`$3.gobj_copy()')
+  _WRAP_VFUNC(Glib::VariantBase get_action_state_hint(const Glib::ustring& name) const, "get_action_state_hint")
+  _WRAP_VFUNC(Glib::VariantBase get_action_state(const Glib::ustring& name) const, "get_action_state")
+
+  _WRAP_VFUNC(void change_action_state(const Glib::ustring& name, const Glib::VariantBase& value), "change_action_state")
+  _WRAP_VFUNC(void activate_action(const Glib::ustring& name, const Glib::VariantBase& parameter), "activate_action")
 };
 
 } // namespace Gio
