@@ -36,6 +36,10 @@ _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketType)
 _CONV_ENUM(G,UnixSocketAddressType)
 
+# Action
+_CONVERSION(`GAction*',`Glib::RefPtr<Action>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Action>&',`GAction*',__CONVERT_REFPTR_TO_P)
+
 # ActionGroup
 _CONVERSION(`const Glib::RefPtr<ActionGroup>&',`GActionGroup*',__CONVERT_REFPTR_TO_P)
 
