@@ -87,9 +87,9 @@ then
   exit 1
 fi
 
-for d in "${girdir}"/*
+for d in "${girdir}"/*.gir
 do
-  if test "x${d}" = "x${girdir}"'/*'
+  if test "x${d}" = "x${girdir}"'/*.gir'
   then
     echo "No gir files in $girdir. Bailing out." >&2
     exit 1
