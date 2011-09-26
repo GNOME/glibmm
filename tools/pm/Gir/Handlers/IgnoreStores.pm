@@ -15,35 +15,9 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 ##
 
-package Gir::Handlers::IgnoreEndStore;
+package Gir::Handlers::IgnoreStores;
 
-use strict;
-use warnings;
-
-use parent qw(Gir::Handlers::Generated::Common::Store);
-
-use Gir::Handlers::Common;
-
-##
-## public:
-##
-sub new ($)
-{
-  my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::IgnoreEndStore');
-  my $self = $class->SUPER::new ({});
-
-  return bless ($self, $class);
-}
-
-sub has_method_for ($$)
-{
-  return 1;
-}
-
-sub get_method_for ($$)
-{
-  return \&Gir::Handlers::Common::end_ignore;
-}
+use Gir::Handlers::IgnoreStartStore;
+use Gir::Handlers::IgnoreEndStore;
 
 1; # indicate proper module load.
