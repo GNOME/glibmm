@@ -153,7 +153,7 @@ sub add_file_to_list($$)
   }
   else
   {
-    print STDERR nl ('Not a gir file: ' . $list . '.');
+    print STDERR nl ('Not a gir file: ' . $file . '.');
   }
 }
 
