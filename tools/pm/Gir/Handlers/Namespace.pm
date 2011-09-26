@@ -15,54 +15,76 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 ##
 
-package Gir::Handlers::Repository;
+package Gir::Handlers::Namespace;
 
 use strict;
 use warnings;
 
-use parent qw(Gir::Handlers::Generated::Repository);
+use parent qw(Gir::Handlers::Generated::Namespace);
 
-use Gir::Handlers::Ignore;
-use Gir::Handlers::Namespace;
+use Gir::Handlers::Alias;
+use Gir::Handlers::Bitfield;
+use Gir::Handlers::Callback;
+use Gir::Handlers::Class;
+use Gir::Handlers::Constant;
+use Gir::Handlers::Enumeration;
+use Gir::Handlers::Function;
+use Gir::Handlers::Interface;
+use Gir::Handlers::Record;
+use Gir::Handlers::Union;
 use Gir::Parser;
 
 ##
 ## private:
 ##
-sub _include_start_impl ($$$)
+sub _alias_start_impl ($$$)
 {
   my ($self, $parser, $params) = @_;
-
-  $parser->parse_file ($params->{'name'} . '-' . $params->{'version'} . '.gir');
 }
 
-sub _namespace_start_impl ($$$)
+sub _bitfield_start_impl ($$$)
 {
   my ($self, $parser, $params) = @_;
-  my $api = $parser->get_api ();
-  my $name = $params->{'name'};
-
-  #if ($api->has_namespace ($name))
-  #{
-    # TODO: error? every gir probably should have different namespace, right?
-  #}
-  #$api->add_namespace ($name);
-
-  my $state = $parser->get_current_state ();
-
-  print STDOUT 'Parsing ' . $state->get_parsed_file () . "\n";
-  $state->set_current_namespace ($name);
 }
 
-sub _setup_subhandlers ($)
+sub _callback_start_impl ($$$)
 {
-  my $self = shift;
+  my ($self, $parser, $params) = @_;
+}
 
-  $self->_set_subhandlers
-  ({
-    'namespace' => 'Gir::Handlers::Namespace',
-    '*' => 'Gir::Handlers::Ignore'
-  });
+sub _class_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
+
+sub _constant_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
+
+sub _enumeration_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
+
+sub _function_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
+
+sub _interface_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
+
+sub _record_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
+
+sub _union_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
 }
 
 ##
@@ -71,14 +93,9 @@ sub _setup_subhandlers ($)
 sub new ($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Repository');
+  my $class = (ref ($type) or $type or 'Gir::Handlers::Namespace');
   my $self = $class->SUPER::new ();
 
-  $self->_set_start_ignores
-  ({
-    'c:include' => undef,
-    'package' => undef
-  });
   $self->_set_end_ignores
   ({
     '*' => undef

@@ -15,43 +15,47 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 ##
 
-package Gir::Handlers::Repository;
+package Gir::Handlers::Union;
 
 use strict;
 use warnings;
 
-use parent qw(Gir::Handlers::Generated::Repository);
+use parent qw(Gir::Handlers::Generated::Union);
 
 use Gir::Handlers::Ignore;
-use Gir::Handlers::Namespace;
 use Gir::Parser;
 
 ##
 ## private:
 ##
-sub _include_start_impl ($$$)
+sub _constructor_start_impl ($$$)
 {
   my ($self, $parser, $params) = @_;
-
-  $parser->parse_file ($params->{'name'} . '-' . $params->{'version'} . '.gir');
 }
 
-sub _namespace_start_impl ($$$)
+sub _doc_start_impl ($$$)
 {
   my ($self, $parser, $params) = @_;
-  my $api = $parser->get_api ();
-  my $name = $params->{'name'};
+}
 
-  #if ($api->has_namespace ($name))
-  #{
-    # TODO: error? every gir probably should have different namespace, right?
-  #}
-  #$api->add_namespace ($name);
+sub _field_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
 
-  my $state = $parser->get_current_state ();
+sub _function_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
 
-  print STDOUT 'Parsing ' . $state->get_parsed_file () . "\n";
-  $state->set_current_namespace ($name);
+sub _method_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
+}
+
+sub _record_start_impl ($$$)
+{
+  my ($self, $parser, $params) = @_;
 }
 
 sub _setup_subhandlers ($)
@@ -60,7 +64,6 @@ sub _setup_subhandlers ($)
 
   $self->_set_subhandlers
   ({
-    'namespace' => 'Gir::Handlers::Namespace',
     '*' => 'Gir::Handlers::Ignore'
   });
 }
@@ -71,14 +74,9 @@ sub _setup_subhandlers ($)
 sub new ($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Repository');
+  my $class = (ref ($type) or $type or 'Gir::Handlers::Union');
   my $self = $class->SUPER::new ();
 
-  $self->_set_start_ignores
-  ({
-    'c:include' => undef,
-    'package' => undef
-  });
   $self->_set_end_ignores
   ({
     '*' => undef
