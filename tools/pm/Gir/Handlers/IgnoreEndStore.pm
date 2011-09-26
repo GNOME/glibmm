@@ -22,7 +22,8 @@ use warnings;
 
 use parent qw(Gir::Handlers::Generated::Common::Store);
 
-use Gir::Handlers::Common;
+sub end_ignore ($$)
+{}
 
 ##
 ## public:
@@ -43,7 +44,7 @@ sub has_method_for ($$)
 
 sub get_method_for ($$)
 {
-  return \&Gir::Handlers::Common::end_ignore;
+  return \&end_ignore;
 }
 
 1; # indicate proper module load.
