@@ -142,7 +142,7 @@ sub get_constant_params (@)
       'value'
     ],
     [
-
+      ['c:type', undef]
     ],
     \@_
   );
@@ -479,6 +479,8 @@ sub get_record_params (@)
     ],
     [
       ['c:symbol-prefix', undef],
+      ['deprecated', undef],
+      ['deprecated-version', undef],
       ['disguised', 0],
       ['foreign', 0],
       ['glib:get-type', undef],
@@ -545,11 +547,11 @@ sub get_union_params (@)
   return Gir::Handlers::Generated::Common::Misc::extract_values
   (
     [
-      'c:type',
       'name'
     ],
     [
       ['c:symbol-prefix', undef],
+      ['c:type', undef],
       ['glib:get-type', undef],
       ['glib:type-name', undef]
     ],

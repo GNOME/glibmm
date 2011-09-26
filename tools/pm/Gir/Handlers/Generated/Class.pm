@@ -34,6 +34,7 @@ use Gir::Handlers::Generated::GlibSignal;
 use Gir::Handlers::Generated::Implements;
 use Gir::Handlers::Generated::Method;
 use Gir::Handlers::Generated::Property;
+use Gir::Handlers::Generated::Union;
 use Gir::Handlers::Generated::VirtualMethod;
 
 ##
@@ -131,6 +132,18 @@ sub _property_start_impl ($$$)
   {
     #TODO: throw something.
     print STDERR 'Gir::Handlers::Generated::Class::_property_start_impl not implemented.' . "\n";
+    exit (1);
+  }
+}
+
+sub _union_start_impl ($$$)
+{
+  my $self = shift;
+
+  unless ($self->_is_start_ignored ('union'))
+  {
+    #TODO: throw something.
+    print STDERR 'Gir::Handlers::Generated::Class::_union_start_impl not implemented.' . "\n";
     exit (1);
   }
 }
@@ -243,6 +256,18 @@ sub _property_end_impl ($$)
   }
 }
 
+sub _union_end_impl ($$)
+{
+  my $self = shift;
+
+  unless ($self->_is_end_ignored ('union'))
+  {
+    #TODO: throw something.
+    print STDERR 'Gir::Handlers::Generated::Class::_union_end_impl not implemented.' . "\n";
+    exit (1);
+  }
+}
+
 sub _virtual_method_end_impl ($$)
 {
   my $self = shift;
@@ -271,6 +296,7 @@ sub _setup_handlers ($)
       'implements' => \&_implements_start,
       'method' => \&_method_start,
       'property' => \&_property_start,
+      'union' => \&_union_start,
       'virtual-method' => \&_virtual_method_start
     }),
     Gir::Handlers::Generated::Common::Store->new
@@ -283,6 +309,7 @@ sub _setup_handlers ($)
       'implements' => \&_implements_end,
       'method' => \&_method_end,
       'property' => \&_property_end,
+      'union' => \&_union_end,
       'virtual-method' => \&_virtual_method_end
     })
   );
@@ -304,6 +331,7 @@ sub _setup_subhandlers ($)
       'implements',
       'method',
       'property',
+      'union',
       'virtual-method'
     ])
   );
@@ -376,6 +404,14 @@ sub _property_start ($$@)
   $self->_property_start_impl ($parser, $params);
 }
 
+sub _union_start ($$@)
+{
+  my ($self, $parser, @atts_vals) = @_;
+  my $params = Gir::Handlers::Generated::Common::Tags::get_union_params (@atts_vals);
+
+  $self->_union_start_impl ($parser, $params);
+}
+
 sub _virtual_method_start ($$@)
 {
   my ($self, $parser, @atts_vals) = @_;
@@ -438,6 +474,13 @@ sub _property_end ($$)
   my ($self, $parser) = @_;
 
   $self->_property_end_impl ($parser);
+}
+
+sub _union_end ($$)
+{
+  my ($self, $parser) = @_;
+
+  $self->_union_end_impl ($parser);
 }
 
 sub _virtual_method_end ($$)
