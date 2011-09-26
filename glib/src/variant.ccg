@@ -18,7 +18,7 @@
 #include <glibmm/variant.h>
 #include <glibmm/utility.h>
 #include <glib.h>
-//#include <iostream>
+#include <iostream>
 
 namespace Glib
 {
@@ -362,13 +362,13 @@ Variant<type_vec_ustring>::create(const type_vec_ustring& data)
    iter < data.end(); iter++)
   {
     g_variant_builder_add(builder,
-      reinterpret_cast<gchar*>(element_variant_type.gobj()), iter->c_str());
+      element_variant_type.get_string().c_str(), iter->c_str());
   }
 
   // Create the variant using the builder.
   Variant<type_vec_ustring> result =
     Variant<type_vec_ustring>(g_variant_new(
-      reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+      array_variant_type.get_string().c_str(), builder));
 
   // Remove the floating reference (since it is newly created).
   g_variant_ref_sink(result.gobj());
@@ -415,7 +415,7 @@ VariantIter Variant<type_vec_ustring>::get_iter() const
   // Get the GVariantIter.
   GVariantIter* g_iter = 0;
   g_variant_get(const_cast<GVariant*>(gobj()),
-    reinterpret_cast<gchar*>(array_variant_type.gobj()), &g_iter);
+    array_variant_type.get_string().c_str(), &g_iter);
 
   return VariantIter(g_iter);
 }
@@ -441,27 +441,24 @@ const VariantType& Variant<type_vec_string>::variant_type()
 Variant<type_vec_string>
 Variant<type_vec_string>::create(const type_vec_string& data)
 {
-  // Get the variant type of the elements.
-  VariantType element_variant_type = Variant<std::string>::variant_type();
+  // Create a string array to add the strings of the vector to.
+  char** str_array = g_new(char*, data.size() + 1);
 
-  // Get the variant type of the array.
-  VariantType array_variant_type = Variant<type_vec_string>::variant_type();
-
-  // Create a GVariantBuilder to build the array.
-  GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
-
-  // Add the elements of the vector into the builder.
-  for(type_vec_string::const_iterator iter = data.begin();
-   iter < data.end(); iter++)
+  // Add the elements of the vector into the string array.
+  for(type_vec_string::size_type i = 0; i < data.size(); i++)
   {
-    g_variant_builder_add(builder,
-      reinterpret_cast<gchar*>(element_variant_type.gobj()), iter->c_str());
+    str_array[i] = g_strdup(data[i].c_str());
   }
+
+  // Terminate the string array.
+  str_array[data.size()] = NULL;
 
   // Create the variant using the builder.
   Variant<type_vec_string> result =
-    Variant<type_vec_string>(g_variant_new(
-      reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+    Variant<type_vec_string>(g_variant_new_bytestring_array(str_array,
+      data.size()));
+
+  g_strfreev(str_array);
 
   // Remove the floating reference (since it is newly created).
   g_variant_ref_sink(result.gobj());
@@ -500,15 +497,15 @@ type_vec_string Variant<type_vec_string>::get() const
 VariantIter Variant<type_vec_string>::get_iter() const
 {
   // Get the variant type of the elements.
-  VariantType element_variant_type = Variant<std::string>::variant_type();
+  const VariantType element_variant_type = Variant<std::string>::variant_type();
 
   // Get the variant type of the array.
-  VariantType array_variant_type = Variant<type_vec_string>::variant_type();
+  const VariantType array_variant_type = Variant<type_vec_string>::variant_type();
 
   // Get the GVariantIter.
   GVariantIter* g_iter = 0;
   g_variant_get(const_cast<GVariant*>(gobj()),
-    reinterpret_cast<gchar*>(array_variant_type.gobj()), &g_iter);
+    array_variant_type.get_string().c_str(), &g_iter);
 
   return VariantIter(g_iter);
 }

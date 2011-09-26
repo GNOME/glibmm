@@ -1,3 +1,120 @@
+2011-09-22  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Action, ActionGroup: Wrap virtual functions.
+
+	* gio/src/gio_vfuncs.defs: Add virtual function definitions for the
+	Action and ActionGroup classes.
+	* gio/src/action.hg:
+	* gio/src/actiongroup.hg: Wrap the virtual functions.
+	* tools/m4/convert_gio.m4: Correct a VariantType return conversion.
+
+2011-09-22  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	giomm: Add SimpleActionGroup.
+
+	* gio/src/simpleactiongroup.{ccg,hg}:
+	* gio/src/filelist.am: Add sources and include them in the build file
+	list.
+	* tools/m4/convert_gio.m4: Add necessary conversions.
+	* gio/src/simpleaction.hg: Added class doc title.
+
+2011-09-21  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	SimpleAction: Add create() methods.
+
+	* gio/src/simpleaction.hg: Add two forgotten create methods for the
+	class.  Also filed bug #659783 about not being able to wrap the
+	signals.
+
+2011-09-21  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	giomm: Add SimpleAction, an implementation of the Action interface.
+
+	* gio/src/simpleaction.{ccg,hg}:
+	* gio/src/filelist.am: Add the sources and include them in the list of
+	files that should be processed.
+
+	* tools/extra_defs_gen/generate_defs_gio.cc: Add G_SIMPLE_ACTION_TYPE
+	to the list of types for which properties and signals should be
+	generated.
+	* gio/src/gio_signals.defs: Regenerate with above to get the
+	properties and signals of new class.
+
+2011-09-20  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	ActionGroup: Wrap remaining methods.
+
+	* gio/src/actiongroup.hg: Add the get_action_parameter_type(),
+	get_action_state_type(), get_action_state_hint(), and
+	get_action_state() methods which were TODO's.
+
+2011-09-20  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	giomm: Add Action class wrapping GAction.
+
+	* gio/src/action.{ccg,hg}:
+	* gio/src/filelist.am: Add the new sources wrapping the methods and
+	signals of GAction and include them in the list of files to be built.
+
+	* tools/extra_defs_gen/generate_defs_gio.cc: Add G_TYPE_ACTION to
+	the list of types for which signals and properties should be
+	generated.
+	* gio/src/gio_signals.defs:
+	* gio/src/gio_methods.defs: Regenerate to get the new methods and
+	properties being wrapped.
+
+	* gio/src/gio_extra_objects.defs: Add Action to the list of extra
+	objects so gmmproc's documentation generation does not produce
+	warnings because of it.  Also added DBusNodeInfo and Proxy.
+
+	* tools/m4/convert_gio.m4: Alphabetized the conversion by groups
+	pertaining to types.  Removed the Variant return conversions which
+	take copies.
+	* glib/src/variant.hg: Moved the conversions here because they are
+	specific to the methods in this class, specifically get_child() and
+	get().
+
+2011-09-17  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: DocParser: Correct the removal of link tags.
+
+	* tools/pm/DocsParser.pm (convert_tags_to_doxygen): Make the matching
+	of the characters of a link tag not greedy so that the first
+	occurrence of the final '>' is accepted in a match instead of a
+	possible later one pertaining to a different tag altogether. Also
+	translate '|[' and ']|' to '@code' and '@endcode' respectively.
+
+	Bug #650544
+
+2.29.13:
+
+2011-09-06  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Variant< std::vector<std::string> >: Ensure correct creation.
+
+	* glib/src/variant.ccg (Variant< std::vector<std::string> >::create):
+	Use g_variant_new_bytestring_array() to create the variant instead of
+	a builder to avoid an unknown bug.
+	Bug #657030 (Aurimas Černius)
+
+2011-09-06  Murray Cumming  <murrayc@murrayc.com>
+
+	giomm: Variant< vector<std::string> > (array of bytestrings): Fixes.
+
+	* glib/src/variant.ccg: create(): Use VariantType::to_string.c_str() instead 
+	of reinterpret_cast. I have no idea why we ever used reinterpret_cast.
+	* tests/glibmm_variant/main.cc: Add a simple test for this VariantType 
+	specialization, though it still fails.
+  Bug #657030 (Aurimas Černius)
+
+2011-09-02  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	gmmproc: Correct handling of constversion etc. in _WRAP_METHOD.
+
+	* tools/pm/WrapParser.pm: The parameters refreturn, errthrow, and
+	constversion in _WRAP_METHOD was applied also to following instances
+	wrapping the same C function. Bug #657751, comment 5.
+
 2.29.12:
 
 2011-08-25  Chun-wei Fan  <fanc999@src.gnome.org>

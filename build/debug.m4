@@ -17,18 +17,20 @@
 
 #serial 20110910
 
-AC_DEFUN([GLIBMM_PROG_CXX_SUN],
+## GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING()
+##
+## Provide the --enable-debug-refcounting configure argument, disabled
+## by default.  If enabled, #define GTKMM_DEBUG_REFCOUNTING.
+##
+AC_DEFUN([GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING],
 [
-  AC_CACHE_CHECK([whether we are using SUN CC compiler],
-                 [glibmm_cv_prog_sun_cxx],
-                 [AS_IF([${CXX-g++} -V 2>&1 | grep -e 'Sun WorkShop' >/dev/null 2>&1],
-                        [glibmm_cv_prog_sun_cxx='yes'],
-                        [glibmm_cv_prog_sun_cxx='no']
-                       )
-                 ]
-                )
+  AC_ARG_ENABLE([debug-refcounting],
+      [AS_HELP_STRING([--enable-debug-refcounting],
+                      [Print a debug message on every ref/unref.@<:@default=no@:>@])],
+      [glibmm_debug_refcounting="$enableval"],
+      [glibmm_debug_refcounting='no'])
 
-  AS_VAR_IF([glibmm_cv_prog_sun_cxx], ['yes'],
-            [AC_DEFINE([GLIBMM_COMPILER_SUN_FORTE], [1],
-                       [Defined when the SUN Forte C++ compiler is being used.])])[]dnl
+  AS_VAR_IF([glibmm_debug_refcounting], ['yes'],
+            [AC_DEFINE([GLIBMM_DEBUG_REFCOUNTING], [1],
+                       [Defined when the --enable-debug-refcounting configure argument was given])])[]dnl
 ])

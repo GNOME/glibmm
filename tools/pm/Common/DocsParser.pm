@@ -374,12 +374,12 @@ sub convert_tags_to_doxygen($)
     s"^Note ?\d?: "\@note "mg;
 
     s"</?programlisting>""g;
-    s"<informalexample>"\@code"g;
-    s"</informalexample>"\@endcode"g;
+    s"<informalexample>|\|\["\@code"g;
+    s"</informalexample>|]\|"\@endcode"g;
     s"<!>""g;
 
     # Remove all link tags.
-    s"</?u?link[^&]*>""g;
+    s"</?u?link[^&]*?>""g;
 
     # Remove all para tags (from tmpl sgml files).
     s"</?para>""g;

@@ -16,7 +16,7 @@
 ## with danielk's Autostuff; if not, write to the Free Software Foundation,
 ## Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#serial 20070105
+#serial 20110910
 
 ## _DK_SH_VAR_PUSH_DEPTH(depth, variable, [value])
 ##
@@ -75,8 +75,8 @@ AC_CACHE_CHECK([for $1], [$3],
                [AC_LINK_IFELSE([$2], [$3=yes], [$3=no])])
 $4=$$3
 
-AS_IF([test "x$$4" = xyes],
-      [AC_DEFINE([$5], [1], [Define to 1 if $1 is available.])
+AS_VAR_IF($4, ['yes'],
+          [AC_DEFINE([$5], [1], [Define to 1 if $1 is available.])
 ])[]dnl
 ])
 

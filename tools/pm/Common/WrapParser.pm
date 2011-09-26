@@ -894,6 +894,9 @@ sub on_wrap_method($)
   }
 
   # Extra stuff needed?
+  $$objCfunc{rettype_needs_ref} = 0;
+  $$objCfunc{throw_any_errors} = 0;
+  $$objCfunc{constversion} = 0;
   $$objCfunc{deprecated} = "";
   my $deprecation_docs = "";
   my $ifdef;
@@ -984,6 +987,7 @@ sub on_wrap_method_docs_only($)
   }
 
   # Extra ref needed?
+  $$objCfunc{throw_any_errors} = 0;
   while($#args >= 1) # If the optional ref/err arguments are there.
   {
     my $argRef = Util::string_trim(pop @args);

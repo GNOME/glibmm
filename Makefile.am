@@ -56,7 +56,3 @@ dist_noinst_DATA = $(text_files) $(msvc_files)
 dist_noinst_SCRIPTS = autogen.sh
 
 DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files))
-
-# TODO: Obsolete; remove after grace period.
-aclocal_macrodir = $(datadir)/aclocal
-dist_aclocal_macro_DATA = build/glibmm_check_perl.m4

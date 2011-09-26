@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([glibmm], [2.29.12],
+AC_INIT([glibmm], [2.29.13],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=glibmm],
         [glibmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -44,8 +44,7 @@ AC_SUBST([LIBGLIBMM_SO_VERSION], [4:0:3])
 
 AC_PROG_CXX
 AC_DISABLE_STATIC
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
 MM_PATH_PERL
 AS_IF([test "x$USE_MAINTAINER_MODE" != xno], [MM_CHECK_PERL])
 

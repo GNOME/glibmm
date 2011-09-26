@@ -1,0 +1,82 @@
+/* Copyright (C) 2011 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/action.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GSimpleAction GSimpleAction;
+typedef GObjectClass GSimpleActionClass;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+/** SimpleAction - A simple Action implementation.
+ * A SimpleAction is the obvious simple implementation of the Action
+ * interface. This is the easiest way to create an action for purposes of
+ * adding it to a SimpleActionGroup.
+ *
+ * See also Gtk::Action.
+ *
+ * @newin{2,30}
+ */
+class SimpleAction : public Glib::Object, public Action
+{
+  _CLASS_GOBJECT(SimpleAction, GSimpleAction, G_SIMPLE_ACTION, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Action)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+#m4 _CONVERSION(`const Glib::VariantType&',`const GVariantType*',`$3.gobj()')
+
+  _WRAP_CTOR(SimpleAction(const Glib::ustring& name, const Glib::VariantType& parameter_type), g_simple_action_new)
+  _WRAP_CTOR(SimpleAction(const Glib::ustring& name, const Glib::VariantType& parameter_type, const Glib::VariantBase& sate), g_simple_action_new_stateful)
+
+public:
+  _WRAP_METHOD_DOCS_ONLY(g_simple_action_new)
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::VariantType& parameter_type)
+
+  _WRAP_METHOD_DOCS_ONLY(g_simple_action_new_stateful)
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::VariantType& parameter_type, const Glib::VariantBase& sate)
+
+  _WRAP_METHOD(void set_enabled(bool enabled), g_simple_action_set_enabled)
+  _WRAP_METHOD(void set_state(const Glib::VariantBase& value), g_simple_action_set_state)
+
+  /* These properties are already wrapped in the Action interface.
+  _WRAP_PROPERTY("enabled", bool)
+  _WRAP_PROPERTY("name", Glib::ustring)
+  _WRAP_PROPERTY("parameter-type", Glib::VariantType)
+  _WRAP_PROPERTY("state", Glib::VariantBase)
+  _WRAP_PROPERTY("state-type", Glib::VariantType)
+  */
+
+/* TODO: Signals are not wrapped because GSimpleAction does not declare a
+ * standard _GSimpleActionClass structure.
+ * See bug #659783:
+ * https://bugzilla.gnome.org/show_bug.cgi?id=659783
+#m4 _CONVERSION(`GVariant*',`const Glib::VariantBase&',`Glib::wrap($3, true)')
+
+  _WRAP_SIGNAL(void activate(const Glib::VariantBase& parameter), "activate")
+  _WRAP_SIGNAL(void change_state(const Glib::VariantBase& value), "change-state")
+*/
+};
+
+} // namespace Gio
