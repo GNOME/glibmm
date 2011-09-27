@@ -300,6 +300,11 @@ def clean_func(buf):
     pat = re.compile(r"""G_BEGIN_DECLS|BEGIN_LIBGTOP_DECLS""", re.MULTILINE)
     buf = pat.sub('', buf)
 
+    #strip G_GNUC_WARN_UNUSED_RESULT and G_INLINE_FUNC
+    pat = re.compile(r"""G_GNUC_WARN_UNUSED_RESULT|G_INLINE_FUNC""", re.MULTILINE)
+    buf = pat.sub('', buf)
+    #we are not stripping G_GNUC_INTERNAL
+
     #extern "C"
     pat = re.compile(r"""^\s*(extern)\s+\"C\"\s+{""", re.MULTILINE)
     buf = pat.sub('', buf)
