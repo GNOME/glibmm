@@ -20,7 +20,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <giomm/action.h>
+#include <giomm/actiongroup.h>
 #include <giomm/appinfo.h>
+#include <giomm/application.h>
+#include <giomm/applicationcommandline.h>
 #include <giomm/asyncresult.h>
 #include <giomm/bufferedinputstream.h>
 #include <giomm/bufferedoutputstream.h>
@@ -82,6 +86,8 @@
 #include <giomm/resolver.h>
 #include <giomm/seekable.h>
 #include <giomm/settings.h>
+#include <giomm/simpleaction.h>
+#include <giomm/simpleactiongroup.h>
 #include <giomm/socket.h>
 #include <giomm/socketaddress.h>
 #include <giomm/socketaddressenumerator.h>
