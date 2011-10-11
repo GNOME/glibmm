@@ -682,15 +682,15 @@ sub string_split_commas($)
   my @out;
   my $level = 0;
   my $str = "";
-  my @in = split(/([,()])/, $in);
+  my @in = split(/([,()<>])/, $in);
 
   while ($#in > -1)
     {
       my $t = shift @in;
 
       next if ($t eq "");
-      $level++ if ($t eq "(");
-      $level-- if ($t eq ")");
+      $level++ if ($t eq "(" or $t eq "<");
+      $level-- if ($t eq ")" or $t eq ">");
 
       # skip , inside functions  Ie.  void (*)(int,int)
       if ( ($t eq ",") && !$level) 
@@ -761,9 +761,9 @@ sub read_file($$$)
   #      *.
   #      //
   #      any char proceeded by \
-  #      symbols ;{}"`'()
+  #      symbols ;{}"`'()<>
   #      newline
-  @tokens = split(/(\#[lf] \S+\n)|([#A-Za-z0-9_]+)|(\/\*\*)|(\/\*)|(\*\/)|(\/\/)|(\\.)|([;{}"'`()])|(\n)/,
+  @tokens = split(/(\#[lf] \S+\n)|([#A-Za-z0-9_]+)|(\/\*\*)|(\/\*)|(\*\/)|(\/\/)|(\\.)|([;{}"'`()<>])|(\n)/,
                          $strIn);
 }
 

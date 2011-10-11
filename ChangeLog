@@ -1,5 +1,25 @@
 2011-10-10  José Alburquerque  <jaalburqu@svn.gnome.org>
 
+	gmmproc: _WRAP_METHOD: Allow return types to have commas.
+
+	* tools/pm/WrapParser.pm (string_split_commas): Modify so that when
+	splitting by commas, '<' and '>' are taken into account by levels as
+	is done with '(' and ')'.  This so that if a return type in a
+	_WRAP_METHOD has a comma (which is possible, e.g. with std::map<>) the
+	return type is not split incorrectly.
+	(read_file): Modified so that '<' and '>' are tokens by which to
+	split.
+	* tools/pm/Output.pm (output_wrap_meth): Add `' around the return type
+	when calling the _METHOD() and _STATIC_METHOD() M4 macros so that
+	commas don't split the return type into more than one argument.
+	* tools/m4/method.m4: Do the same (for the return type) in _METHOD()
+	and _STATIC_METHOD() when calling the _CONVERT() macro for the same
+	reason as above.
+	
+	Bug #661401
+
+2011-10-10  José Alburquerque  <jaalburqu@svn.gnome.org>
+
 	SimpleAction: Wrap the signals and properties.
 
 	* gio/src/simpleaction.hg: Wrap the signals using the

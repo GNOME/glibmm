@@ -356,7 +356,7 @@ sub output_wrap_meth($$$$$$$)
     #Implementation:
     my $str;
     if ($$objCppfunc{static}) {
-      $str = sprintf("_STATIC_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
+      $str = sprintf("_STATIC_METHOD(%s,%s,`%s\',%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
         $$objCppfunc{name},
         $$objCDefsFunc{c_name},
         $$objCppfunc{rettype},
@@ -373,7 +373,7 @@ sub output_wrap_meth($$$$$$$)
         $line_num
         );
     } else {
-      $str = sprintf("_METHOD(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s,%s,%s,%s)dnl\n",
+      $str = sprintf("_METHOD(%s,%s,`%s\',%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s,%s,%s,%s)dnl\n",
         $$objCppfunc{name},
         $$objCDefsFunc{c_name},
         $$objCppfunc{rettype},

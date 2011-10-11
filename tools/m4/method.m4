@@ -24,7 +24,7 @@ ifelse(`$11',,dnl
 `ifelse(`$14',,dnl If no output parameter is specified
 `ifelse(`$3',void,dnl If it returns voids:
 `$2(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6);' dnl It it returns non-void:
-,`  return _CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');'dnl
+,`  return _CONVERT($4,`$3',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');'dnl
 )'dnl End if it returns voids.
 dnl An output parameter is specified:
 ,`  _INITIALIZE($15,$4,`$14',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)',$16);'dnl
@@ -32,7 +32,7 @@ dnl An output parameter is specified:
 dnl If is errthrow or refreturn
 `ifelse(`$9',,,`  GError* gerror = 0;')
 ifelse(`$14',,dnl If no output parameter is specified:
-`  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');'dnl
+`  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');'dnl
 dnl An output parameter is specified:
 ,`  _INITIALIZE($15,$4,`$14',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)',$16);'dnl
 )dnl
@@ -70,14 +70,14 @@ $3 __CPPNAME__::$1($5)
 {
 ifelse(`$7'`$8',,dnl
 `ifelse(`$11',,dnl If no output parameter is specified
-`ifelse(`$3',void,,`  return ')_CONVERT($4,$3,`$2`'($6)');
+`ifelse(`$3',void,,`  return ')_CONVERT($4,`$3',`$2`'($6)');
 'dnl
 dnl An output parameter is specified:
 ,`  _INITIALIZE($12,$4,`$11',`$2`'($6)',$13);'
 )',dnl End if an output parameter is specified.
 `ifelse(`$8',,,`  GError* gerror = 0;')
 ifelse(`$11',,dnl If no output parameter is specified:
-  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,$3,`$2`'($6)');
+  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'($6)');
 dnl An output parameter is specified:
 ,`  _INITIALIZE($12,$4,`$11',`$2`'($6)',$13);'dnl
 )dnl
