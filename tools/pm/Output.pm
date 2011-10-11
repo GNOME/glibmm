@@ -291,10 +291,10 @@ sub output_wrap_meth($$$$$$$)
   my $output_var_name;
   my $output_var_type;
 
-  if(defined($$cpp_param_mappings{"RET"}))
+  if(defined($$cpp_param_mappings{"OUT"}))
   {
-    $output_var_name = $$cpp_param_names[$$cpp_param_mappings{"RET"}];
-    $output_var_type = $$cpp_param_types[$$cpp_param_mappings{"RET"}];
+    $output_var_name = $$cpp_param_names[$$cpp_param_mappings{"OUT"}];
+    $output_var_type = $$cpp_param_types[$$cpp_param_mappings{"OUT"}];
   }
 
   for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
@@ -811,11 +811,11 @@ sub convert_args_cpp_to_c($$$$$)
   # See if there is an output parameter.  If so, temporarily decrement the
   # number of C++ arguments so that the possible GError addition works and
   # note the existence.
-  if(defined($$cpp_param_mappings{"RET"}))
+  if(defined($$cpp_param_mappings{"OUT"}))
   {
     $num_cpp_args--;
     $has_output_param = 1;
-    $output_param_index = $$cpp_param_mappings{"RET"};
+    $output_param_index = $$cpp_param_mappings{"OUT"};
   }
 
   # add implicit last error parameter;
