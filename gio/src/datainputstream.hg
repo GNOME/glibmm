@@ -114,6 +114,13 @@ public:
    */
   bool read_line(std::string& line);
 
+// The below initialization is unusual because it stores the return in a 'tmp'
+// variable, sets the output parameter and then frees the return.  If this is
+// too weird, the methods can probably be just handwritten.
+# _INITIALIZATION(`std::string&',`return-char*',`char* tmp = $4; $3 = tmp; g_free(tmp)')
+
+  _WRAP_METHOD(void read_line_utf8(std::string& line{OUT}, const Glib::RefPtr<Cancellable>& cancellable{.?}, gsize& length{.?}), g_data_input_stream_read_line_utf8, errthrow)
+
   /** The asynchronous version of read_until(). It is
    * an error to have two outstanding calls to this function.
    *
@@ -133,6 +140,8 @@ public:
    */
   bool read_line_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data);
   _IGNORE(g_data_input_stream_read_line_finish)
+
+  _WRAP_METHOD(void read_line_finish_utf8(const Glib::RefPtr<AsyncResult>& result{.}, std::string& data{OUT}, gsize& length{.?}), g_data_input_stream_read_line_finish_utf8, errthrow)
 
   /** Reads a string from the data input stream, up to the first
    * occurrence of any of the stop characters.
