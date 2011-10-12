@@ -112,6 +112,22 @@ VariantContainerBase::create_tuple(const VariantBase& child)
   return create_tuple(vec);
 }
 
+//static
+VariantContainerBase
+VariantContainerBase::create_maybe(const VariantType& child_type, 
+  const VariantBase& child)
+{
+  GVariant* g_variant = g_variant_new_maybe(child_type.gobj(),
+    const_cast<GVariant*>(child.gobj()));
+
+  VariantContainerBase result = VariantContainerBase(g_variant);
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
+}
+
 void VariantContainerBase::get_child(VariantBase& child, gsize index) const
 {
   if(index >= g_variant_n_children(gobject_))
