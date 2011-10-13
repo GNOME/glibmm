@@ -77,8 +77,14 @@ public:
   //even if it isn't ambiguous to the compiler.
   _WRAP_METHOD(void return_value(const Glib::VariantContainerBase& parameters), g_dbus_method_invocation_return_value)
 
+  _WRAP_METHOD(void return_value(const Glib::VariantContainerBase& parameters, const Glib::RefPtr<UnixFDList>& fd_list), g_dbus_method_invocation_return_value_with_unix_fd_list, ifdef G_OS_UNIX)
+
 #m4 _CONVERSION(`const Glib::ustring&', `GQuark', `Glib::QueryQuark($3).id()')
   _WRAP_METHOD(void return_error(const Glib::ustring& domain, int code, const Glib::ustring& message), g_dbus_method_invocation_return_error_literal)
+
+  // This function does not have to be wrapped because it's a convenience C
+  // function to avoid having to unreference the error (in C).
+  _IGNORE(g_dbus_method_invocation_take_error)
 
 #m4 _CONVERSION(`const Glib::Error&', `const GError*', `$3.gobj()')
   _WRAP_METHOD(void return_error(const Glib::Error& error), g_dbus_method_invocation_return_gerror)
