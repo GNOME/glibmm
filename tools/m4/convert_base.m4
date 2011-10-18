@@ -7,8 +7,8 @@ define(`__HASH',`__`'m4_translit(`$*',`ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]&*, ',`abcd
 define(`__EQUIV',`m4_ifdef(EV`'__HASH(`$1'),EV`'__HASH(`$1'),`$1')')
 
 define(`__HASH2',`dnl
-pushdef(`__E1',`__EQUIV(`$1')')pushdef(`__E2',`__EQUIV(`$2')')dnl
-m4_ifelse(_QUOTE(__E1),_QUOTE(__E2),`__EQ',__HASH(__E1)`'__HASH(__E2))`'dnl
+pushdef(`__E1',__EQUIV(`$1'))pushdef(`__E2',__EQUIV(`$2'))dnl
+m4_ifelse(__E1,__E2,`__EQ',__HASH(__E1)`'__HASH(__E2))`'dnl
 popdef(`__E1')popdef(`__E2')`'')
 
 define(`CF__EQ',`$3')
