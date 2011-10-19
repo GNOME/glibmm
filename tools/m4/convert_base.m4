@@ -6,16 +6,26 @@ dnl $Id$
 define(`__HASH',`__`'m4_translit(`$*',`ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]&*, ',`abcdefghijklmnopqrstuvwxyzVBNMRSC_')`'')
 define(`__EQUIV',`m4_ifdef(EV`'__HASH(`$1'),EV`'__HASH(`$1'),`$1')')
 
+dnl __HASH2(firsttype, secondtype)
+dnl
+dnl Provides a textual combination of the two given types which can be used as
+dnl a hash to store and retrieve conversions and initializations.  It first
+dnl sees if the two types have equivalent types that should be used in their
+dnl places (using the __EQUIV macro above).  Since the types returned by
+dnl __EQUIV may contain commas (because of types such as std::map<>), quote the
+dnl call to the macro to avoid the types to be interpreted as more than one
+dnl argument to the pushdef() calls.  Also quote the expansion of the __E1 and
+dnl __E2 macros in the m4_ifelse for the same reason.
 define(`__HASH2',`dnl
-pushdef(`__E1',__EQUIV(`$1'))pushdef(`__E2',__EQUIV(`$2'))dnl
-m4_ifelse(__E1,__E2,`__EQ',__HASH(__E1)`'__HASH(__E2))`'dnl
+pushdef(`__E1',`__EQUIV(`$1')')pushdef(`__E2',`__EQUIV(`$2')')dnl
+m4_ifelse(_QUOTE(__E1),_QUOTE(__E2),`__EQ',__HASH(__E1)`'__HASH(__E2))`'dnl
 popdef(`__E1')popdef(`__E2')`'')
 
 define(`CF__EQ',`$3')
 
-#
 #  _CONVERT(fromtype, totype, name, wrap_line)
-#    Print the conversion from ctype to cpptype
+#
+#    Print the conversion from 'fromtype' to 'totype'
 define(`_CONVERT',`dnl
 m4_ifelse(`$2',void,`$3',`dnl
 pushdef(`__COV',`CF`'__HASH2(`$1',`$2')')dnl
@@ -28,6 +38,7 @@ m4_m4exit(1)
 ')
 
 
+# _CONVERSION(fromtype, totype, conversion)
 #
 #  Functions for populating the tables.
 #
@@ -35,8 +46,8 @@ define(`_CONVERSION',`
 m4_ifelse(`$3',,,`define(CF`'__HASH2(`$1',`$2'),`$3')')
 ')
 
-#
 #  _INITIALIZE(target_type, fromtype, output_param_name, c_return, wrap_line)
+#
 #    Print an initialize statement from ctype to cpptype
 define(`_INITIALIZE',`dnl
 m4_ifelse(`$1',void,`$4',`dnl
@@ -49,6 +60,7 @@ m4_m4exit(1)
 ')`'dnl
 ')
 
+# _INITIALIZATION(fromtype, totype, initialization)
 #
 #  Functions for populating initialization tables.
 #
