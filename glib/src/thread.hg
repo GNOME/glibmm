@@ -59,16 +59,13 @@ enum { THREAD_PRIORITY_NORMAL = GLIBMM_MACRO_DEFINITION_THREAD_PRIORITY_NORMAL }
  */
 #define GLIBMM_STATIC_PRIVATE_INIT { G_STATIC_PRIVATE_INIT }
 
-
 namespace Glib
 {
 
-/** Specifies the priority of a thread.
- * @note It is not guaranteed, that threads with different priorities really
- * behave accordingly. On some systems (e.g. Linux) only <tt>root</tt> can
- * increase priorities. On other systems (e.g. Solaris) there doesn't seem to
- * be different scheduling for different priorities. All in all try to avoid
- * being dependent on priorities.
+
+_DEPRECATE_IFDEF_START
+
+/** @deprecated Thread priorities no longer have any effect.
  */
 _WRAP_ENUM(ThreadPriority, GThreadPriority, NO_GTYPE)
 
@@ -84,6 +81,8 @@ _WRAP_ENUM(ThreadPriority, GThreadPriority, NO_GTYPE)
 /*! @var ThreadPriority THREAD_PRIORITY_URGENT
  * The highest priority.
  */
+ 
+_DEPRECATE_IFDEF_END
 
 
 /** @defgroup Threads Threads
@@ -95,46 +94,18 @@ _WRAP_ENUM(ThreadPriority, GThreadPriority, NO_GTYPE)
 enum NotLock { NOT_LOCK };
 enum TryLock { TRY_LOCK };
 
+_DEPRECATE_IFDEF_START
+
 /** Initializes the GLib thread system.
- * Before you use a thread related function in glibmm, you should initialize
- * the thread system.  This is done by calling Glib::thread_init().
- *
- * @note You should only call thread_init() with a non-<tt>0</tt> parameter
- * if you really know what you are doing.
- *
- * @note thread_init() must not be called directly or indirectly as
- * a callback from glibmm.  Also no mutexes may be currently locked while
- * calling thread_init().
- *
- * thread_init() might only be called once.  On the second call it will
- * abort with an error.  If you want to make sure that the thread system
- * is initialized, you can do that too:
- * @code
- * if(!Glib::thread_supported()) Glib::thread_init();
- * @endcode
- * After that line either the thread system is initialized, or the program
- * will abort if no thread system is available in GLib, i.e. either
- * @c G_THREADS_ENABLED is not defined or @c G_THREADS_IMPL_NONE is defined.
- *
- * If no thread system is available and @a vtable is <tt>0</tt> or if not all
- * elements of @a vtable are non-<tt>0</tt>, then thread_init() will abort.
- *
- * @note To use thread_init() in your program, you have to link with the
- * libraries that the command <tt>pkg-config&nbsp;--libs&nbsp;gthread-2.0</tt>
- * outputs.  This is not the case for all the other thread related functions
- * of glibmm.  Those can be used without having to link with the thread
- * libraries.  (You @em have to link with <tt>gthread-2.0</tt> if you actually
- * want to use threads in your application, though.)
- *
- * @param vtable A function table of type @c GThreadFunctions, that provides
- * the entry points to the thread system to be used.
+ * @deprecated Calling thread_init() is no longer necessary and no longer has any effect.
  */
-inline void thread_init(GThreadFunctions* vtable = 0);
+void thread_init(GThreadFunctions* vtable = 0);
 
 /** Returns whether the thread system is initialized.
  * @return @c true, if the thread system is initialized.
+ * @deprecated This is no longer useful, because the thread system is always initialized.
  */
-inline bool thread_supported();
+bool thread_supported();
 
 
 class Mutex;
@@ -243,11 +214,6 @@ public:
    */
   static Thread* self();
 
-  /** Returns whether the thread is joinable.
-   * @return Whether the thread is joinable.
-   */
-  bool joinable() const;
-
   /** Waits until the thread finishes.
    * Waits until the thread finishes, i.e. the slot, as given to create(),
    * returns or g_thread_exit() is called by the thread.  (Calling
@@ -257,6 +223,14 @@ public:
    */
   void join();
 
+_DEPRECATE_IFDEF_START
+  /** Returns whether the thread is joinable.
+   * @return Whether the thread is joinable.
+   *
+   * @deprecated All threads are now joinable.
+   */
+  bool joinable() const;
+  
   /** Changes the priority of the thread to @a priority.
    * @note It is not guaranteed, that threads with different priorities really
    * behave accordingly.  On some systems (e.g. Linux) only @c root can
@@ -264,13 +238,19 @@ public:
    * to be different scheduling for different priorities.  All in all try to
    * avoid being dependent on priorities.
    * @param priority A new priority for the thread.
+   *
+   * @deprecated Thread priorities no longer have any effect.
    */
   void set_priority(ThreadPriority priority);
 
   /** Returns the priority of the thread.
    * @return The thread's priority.
+   *
+   * @deprecated Thread priorities no longer have any effect.
    */
   ThreadPriority get_priority() const;
+
+_DEPRECATE_IFDEF_END
 
   /** Gives way to other threads waiting to be scheduled.
    * This function is often used as a method to make busy wait less evil.  But
@@ -314,6 +294,7 @@ Thread* wrap(GThread* gobject);
  * @code
  * Glib::StaticMutex mutex = GLIBMM_STATIC_MUTEX_INIT;
  * @endcode
+ *
  * A StaticMutex can be used without calling Glib::thread_init(), it will
  * silently do nothing then.  That will also work when using the implicit
  * conversion to Mutex&, thus you can safely use Mutex::Lock with a
@@ -335,12 +316,12 @@ struct StaticMutex
 #endif
 };
 
+_DEPRECATE_IFDEF_END
+
 /** Represents a mutex (mutual exclusion).
  * It can be used to protect data against shared access.  Try to use
  * Mutex::Lock instead of calling lock() and unlock() directly&nbsp;--
  * it will make your life much easier.
- *
- * @note Before creating a Glib::Mutex, Glib::thread_init() has to be called.
  *
  * @note Glib::Mutex is not recursive, i.e. a thread will deadlock, if it
  * already has locked the mutex while calling lock().  Use Glib::RecMutex
@@ -625,25 +606,17 @@ public:
    * It is good practice to hold the same lock as the waiting thread, while calling 
    * this method, though not required.
    *
-   * @note This method can also be used if @a Glib::thread_init() has not yet been 
-   * called and will do nothing then.
    */
   void signal();
 
   /** If threads are waiting for this @a Cond, all of them are woken up.
    * It is good practice to hold the same lock as the waiting thread, while calling 
    * this method, though not required.
-   *
-   * @note This method can also be used if @a Glib::thread_init() has not yet been 
-   * called and will do nothing then.
    */
   void broadcast();
 
   /** Waits until this thread is woken up on this @a Cond.
    * The mutex is unlocked before falling asleep and locked again before resuming.
-   *
-   * This method can also be used if @a Glib::thread_init() has not yet been 
-   * called and will immediately return then. 
    *
    * @param mutex a @a Mutex that is currently locked.
    * 
@@ -658,9 +631,6 @@ public:
 
   /** Waits until this thread is woken up on this @a Cond, but not longer than until the time, that is specified by @a abs_time.
    * The mutex is unlocked before falling asleep and locked again before resuming.
-   *
-   * This function can also be used, if @a Glib::thread_init() has not yet been 
-   * called and will immediately return @c true then. 
    *
    * @param mutex a @a Mutex that is currently locked.
    * @param abs_time a max time to wait.
@@ -739,26 +709,9 @@ private:
 /***************************************************************************/
 
 // internal
-void thread_init_impl();
-
-/* This function must be inline, to avoid an unnecessary dependency on
- * libgthread even if the thread system is not used.  libgthread might
- * not even be available if GLib was compiled without thread support.
+/** @deprecated This was always for internal glibmm use and is now unecessary even inside glibmm.
  */
-inline
-void thread_init(GThreadFunctions* vtable)
-{
-  g_thread_init(vtable);
-  Glib::thread_init_impl();
-}
-
-inline
-bool thread_supported()
-{
-  //MSVC++ needs the != 0 to avoid an int -> bool cast warning.
-  return (g_thread_supported() != 0);
-}
-
+void thread_init_impl();
 
 /**** Glib::Mutex::Lock ****************************************************/
 

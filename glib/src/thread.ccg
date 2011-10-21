@@ -59,13 +59,19 @@ static void* call_thread_entry_slot(void* data)
 namespace Glib
 {
 
-// internal
+_DEPRECATE_IFDEF_START
+
+// This was always meant as an internal method. It is no longer called,
+// and no longer needs to be called. We are keeping it just to avoid 
+// breaking ABI, though hopefully nobody is using it anyway.
+// TODO: Remove this when we can break ABI.
 void thread_init_impl()
 {
   // Make sure the exception map is initialized before creating any thread.
   Glib::Error::register_init();
 }
 
+_DEPRECATE_IFDEF_END
 
 /**** Glib::Thread *********************************************************/
 
@@ -117,14 +123,16 @@ Thread* Thread::self()
   return reinterpret_cast<Thread*>(g_thread_self());
 }
 
-bool Thread::joinable() const
-{
-  return gobject_.joinable;
-}
-
 void Thread::join()
 {
   g_thread_join(&gobject_);
+}
+
+_DEPRECATE_IFDEF_START
+
+bool Thread::joinable() const
+{
+  return true; //An appropriate result now that this is deprecated because all threads are now joinable.
 }
 
 void Thread::set_priority(ThreadPriority priority)
@@ -134,14 +142,30 @@ void Thread::set_priority(ThreadPriority priority)
 
 ThreadPriority Thread::get_priority() const
 {
-  return (ThreadPriority) gobject_.priority;
+  return THREAD_PRIORITY_NORMAL; //An appropriate result now that this is deprecated because the priority concept has been removed.
 }
+
+void thread_init(GThreadFunctions* vtable)
+{
+  g_thread_init(vtable);
+  Glib::thread_init_impl();
+}
+
+bool thread_supported()
+{
+  //MSVC++ needs the != 0 to avoid an int -> bool cast warning.
+  return (g_thread_supported() != 0);
+}
+
+_DEPRECATE_IFDEF_END
+
 
 // static
 void Thread::yield()
 {
   g_thread_yield();
 }
+
 
 Thread* wrap(GThread* gobject)
 {
