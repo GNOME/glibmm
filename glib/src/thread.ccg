@@ -76,25 +76,18 @@ _DEPRECATE_IFDEF_END
 /**** Glib::Thread *********************************************************/
 
 // static
-Thread* Thread::create(const sigc::slot<void>& slot, bool joinable)
+Thread* Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
 {
   // Make a copy of slot on the heap
   sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
 
-  GError* error = 0;
-
-  GThread *const thread = g_thread_create(
-      &call_thread_entry_slot, slot_copy, joinable, &error);
-
-  if(error)
-  {
-    delete slot_copy;
-    Glib::Error::throw_exception(error);
-  }
+  GThread *const thread = g_thread_new(NULL, 
+      &call_thread_entry_slot, slot_copy);
 
   return reinterpret_cast<Thread*>(thread);
 }
 
+_DEPRECATE_IFDEF_START
 // static
 Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
                        bool joinable, bool bound, ThreadPriority priority)
@@ -116,6 +109,7 @@ Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
 
   return reinterpret_cast<Thread*>(thread);
 }
+_DEPRECATE_IFDEF_END
 
 // static
 Thread* Thread::self()

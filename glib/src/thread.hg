@@ -157,12 +157,13 @@ public:
    * class concerned should not derive from sigc::trackable.
    *
    * @param slot A slot to execute in the new thread.
-   * @param joinable Should this thread be joinable?
+   * @param joinable This parameter is now ignored because Threads are now always joinable.
    * @return The new Thread* on success.
    * @throw Glib::ThreadError
    */
-  static Thread* create(const sigc::slot<void>& slot, bool joinable);
+  static Thread* create(const sigc::slot<void>& slot, bool joinable = true);
 
+_DEPRECATE_IFDEF_START
   //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
   /** Creates a new thread with the priority @a priority. The stack gets the
    * size @a stack_size or the default value for the current platform, if
@@ -205,9 +206,13 @@ public:
    * @param priority A priority for the thread.
    * @return The new Thread* on success.
    * @throw Glib::ThreadError
+   *
+   * @deprecated Use the simpler create() method instead, because all Threads 
+   * are now joinable, and bounds and priority parameters now have effect.
    */
   static Thread* create(const sigc::slot<void>& slot, unsigned long stack_size,
                         bool joinable, bool bound, ThreadPriority priority);
+_DEPRECATE_IFDEF_END
 
   /** Returns the Thread* corresponding to the calling thread.
    * @return The current thread.
