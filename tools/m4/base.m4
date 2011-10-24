@@ -281,7 +281,8 @@ _IMPORT(SECTION_HEADER_FIRST)
 _DEPRECATE_IFDEF_CLASS_START
 
 m4_ifelse(__MODULE__,glibmm,,`dnl else
-#include <glibmm.h>
+#include <glibmm/ustring.h>
+#include <sigc++/sigc++.h>
 ')dnl
 _IMPORT(SECTION_HEADER1)
 _IMPORT(SECTION_HEADER2)
