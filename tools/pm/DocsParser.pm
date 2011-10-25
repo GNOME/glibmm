@@ -264,6 +264,15 @@ sub lookup_documentation($$)
   # Escape the space after "i.e." or "e.g." in the brief description.
   $text =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
 
+  # Remove C example code.
+  my $example_removals =
+    ($text =~ s"<informalexample>.*?</informalexample>""sg);
+
+  $example_removals += ($text =~ s"\|\[.*?]\|""sg);
+
+  print STDERR "gmmproc: $functionName(): Example code discarded.\n"
+    if ($example_removals);
+
   # Convert to Doxygen-style comment.
   $text =~ s/\n/\n${DocsParser::commentMiddleStart}/g;
   $text =  $DocsParser::commentStart . $text;
@@ -374,8 +383,7 @@ sub convert_tags_to_doxygen($)
     s"^Note ?\d?: "\@note "mg;
 
     s"</?programlisting>""g;
-    s"<informalexample>|\|\["\@code"g;
-    s"</informalexample>|]\|"\@endcode"g;
+
     s"<!>""g;
 
     # Remove all link tags.
