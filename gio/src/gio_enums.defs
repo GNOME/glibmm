@@ -442,7 +442,7 @@
     '("busy" "G_IO_ERROR_BUSY" "26")
     '("would-block" "G_IO_ERROR_WOULD_BLOCK" "27")
     '("host-not-found" "G_IO_ERROR_HOST_NOT_FOUND" "28")
-     '("host-not-found" "G_IO_ERROR_HOST_WAS_NOT_FOUND" "28")
+    '("host-not-found" "G_IO_ERROR_HOST_WAS_NOT_FOUND" "28")
     '("would-merge" "G_IO_ERROR_WOULD_MERGE" "29")
     '("failed-handled" "G_IO_ERROR_FAILED_HANDLED" "30")
     '("too-many-open-files" "G_IO_ERROR_TOO_MANY_OPEN_FILES" "31")
@@ -530,6 +530,25 @@
     '("none" "G_OUTPUT_STREAM_SPLICE_NONE" "0x0")
     '("close-source" "G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE" "(1 << 0)")
     '("close-target" "G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET" "(1 << 1)")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_IO_STREAM_SPLICE_NONE          = 0,
+;;   G_IO_STREAM_SPLICE_CLOSE_STREAM1 = (1 << 0),
+;;   G_IO_STREAM_SPLICE_CLOSE_STREAM2 = (1 << 1),
+;;   G_IO_STREAM_SPLICE_WAIT_FOR_BOTH = (1 << 2)
+;; } GIOStreamSpliceFlags;
+
+(define-flags-extended IOStreamSpliceFlags
+  (in-module "G")
+  (c-name "GIOStreamSpliceFlags")
+  (values
+    '("none" "G_IO_STREAM_SPLICE_NONE" "0x0")
+    '("close-stream1" "G_IO_STREAM_SPLICE_CLOSE_STREAM1" "(1 << 0)")
+    '("close-stream2" "G_IO_STREAM_SPLICE_CLOSE_STREAM2" "(1 << 1)")
+    '("wait-for-both" "G_IO_STREAM_SPLICE_WAIT_FOR_BOTH" "(1 << 2)")
   )
 )
 
@@ -1035,14 +1054,16 @@
 ;; Original typedef:
 ;; typedef enum /*< flags >*/
 ;; {
-;;   G_DBUS_SIGNAL_FLAGS_NONE = 0
+;;   G_DBUS_SIGNAL_FLAGS_NONE = 0,
+;;   G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE = (1<<0)
 ;; } GDBusSignalFlags;
 
 (define-flags-extended DBusSignalFlags
   (in-module "G")
   (c-name "GDBusSignalFlags")
   (values
-    '("us-signal-flags-none" "G_DBUS_SIGNAL_FLAGS_NONE" "0x0")
+    '("none" "G_DBUS_SIGNAL_FLAGS_NONE" "0x0")
+    '("no-match-rule" "G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE" "(1<<0)")
   )
 )
 
@@ -1067,7 +1088,8 @@
 ;; {
 ;;   G_CREDENTIALS_TYPE_INVALID,
 ;;   G_CREDENTIALS_TYPE_LINUX_UCRED,
-;;   G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED
+;;   G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED,
+;;   G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED
 ;; } GCredentialsType;
 
 (define-enum-extended CredentialsType
@@ -1077,6 +1099,7 @@
     '("invalid" "G_CREDENTIALS_TYPE_INVALID" "0")
     '("linux-ucred" "G_CREDENTIALS_TYPE_LINUX_UCRED" "1")
     '("freebsd-cmsgcred" "G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED" "2")
+    '("openbsd-sockpeercred" "G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED" "3")
   )
 )
 
@@ -1102,9 +1125,12 @@
 ;;   G_APPLICATION_FLAGS_NONE,
 ;;   G_APPLICATION_IS_SERVICE  =          (1 << 0),
 ;;   G_APPLICATION_IS_LAUNCHER =          (1 << 1),
-;;
+;; 
 ;;   G_APPLICATION_HANDLES_OPEN =         (1 << 2),
-;;   G_APPLICATION_HANDLES_COMMAND_LINE = (1 << 3)
+;;   G_APPLICATION_HANDLES_COMMAND_LINE = (1 << 3),
+;;   G_APPLICATION_SEND_ENVIRONMENT    =  (1 << 4),
+;; 
+;;   G_APPLICATION_NON_UNIQUE =           (1 << 5)
 ;; } GApplicationFlags;
 
 (define-flags-extended ApplicationFlags
@@ -1116,6 +1142,207 @@
     '("is-launcher" "G_APPLICATION_IS_LAUNCHER" "(1 << 1)")
     '("handles-open" "G_APPLICATION_HANDLES_OPEN" "(1 << 2)")
     '("handles-command-line" "G_APPLICATION_HANDLES_COMMAND_LINE" "(1 << 3)")
+    '("send-environment" "G_APPLICATION_SEND_ENVIRONMENT" "(1 << 4)")
+    '("non-unique" "G_APPLICATION_NON_UNIQUE" "(1 << 5)")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_ERROR_UNAVAILABLE,
+;;   G_TLS_ERROR_MISC,
+;;   G_TLS_ERROR_BAD_CERTIFICATE,
+;;   G_TLS_ERROR_NOT_TLS,
+;;   G_TLS_ERROR_HANDSHAKE,
+;;   G_TLS_ERROR_CERTIFICATE_REQUIRED,
+;;   G_TLS_ERROR_EOF
+;; } GTlsError;
+
+(define-enum-extended TlsError
+  (in-module "G")
+  (c-name "GTlsError")
+  (values
+    '("unavailable" "G_TLS_ERROR_UNAVAILABLE" "0")
+    '("misc" "G_TLS_ERROR_MISC" "1")
+    '("bad-certificate" "G_TLS_ERROR_BAD_CERTIFICATE" "2")
+    '("not-tls" "G_TLS_ERROR_NOT_TLS" "3")
+    '("handshake" "G_TLS_ERROR_HANDSHAKE" "4")
+    '("certificate-required" "G_TLS_ERROR_CERTIFICATE_REQUIRED" "5")
+    '("eof" "G_TLS_ERROR_EOF" "6")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_CERTIFICATE_UNKNOWN_CA    = (1 << 0),
+;;   G_TLS_CERTIFICATE_BAD_IDENTITY  = (1 << 1),
+;;   G_TLS_CERTIFICATE_NOT_ACTIVATED = (1 << 2),
+;;   G_TLS_CERTIFICATE_EXPIRED       = (1 << 3),
+;;   G_TLS_CERTIFICATE_REVOKED       = (1 << 4),
+;;   G_TLS_CERTIFICATE_INSECURE      = (1 << 5),
+;;   G_TLS_CERTIFICATE_GENERIC_ERROR = (1 << 6),
+;; 
+;;   G_TLS_CERTIFICATE_VALIDATE_ALL  = 0x007f
+;; } GTlsCertificateFlags;
+
+(define-flags-extended TlsCertificateFlags
+  (in-module "G")
+  (c-name "GTlsCertificateFlags")
+  (values
+    '("unknown-ca" "G_TLS_CERTIFICATE_UNKNOWN_CA" "(1 << 0)")
+    '("bad-identity" "G_TLS_CERTIFICATE_BAD_IDENTITY" "(1 << 1)")
+    '("not-activated" "G_TLS_CERTIFICATE_NOT_ACTIVATED" "(1 << 2)")
+    '("expired" "G_TLS_CERTIFICATE_EXPIRED" "(1 << 3)")
+    '("revoked" "G_TLS_CERTIFICATE_REVOKED" "(1 << 4)")
+    '("insecure" "G_TLS_CERTIFICATE_INSECURE" "(1 << 5)")
+    '("generic-error" "G_TLS_CERTIFICATE_GENERIC_ERROR" "(1 << 6)")
+    '("validate-all" "G_TLS_CERTIFICATE_VALIDATE_ALL" "0x007f")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_AUTHENTICATION_NONE,
+;;   G_TLS_AUTHENTICATION_REQUESTED,
+;;   G_TLS_AUTHENTICATION_REQUIRED
+;; } GTlsAuthenticationMode;
+
+(define-enum-extended TlsAuthenticationMode
+  (in-module "G")
+  (c-name "GTlsAuthenticationMode")
+  (values
+    '("none" "G_TLS_AUTHENTICATION_NONE" "0")
+    '("requested" "G_TLS_AUTHENTICATION_REQUESTED" "1")
+    '("required" "G_TLS_AUTHENTICATION_REQUIRED" "2")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_REHANDSHAKE_NEVER,
+;;   G_TLS_REHANDSHAKE_SAFELY,
+;;   G_TLS_REHANDSHAKE_UNSAFELY
+;; } GTlsRehandshakeMode;
+
+(define-enum-extended TlsRehandshakeMode
+  (in-module "G")
+  (c-name "GTlsRehandshakeMode")
+  (values
+    '("never" "G_TLS_REHANDSHAKE_NEVER" "0")
+    '("safely" "G_TLS_REHANDSHAKE_SAFELY" "1")
+    '("unsafely" "G_TLS_REHANDSHAKE_UNSAFELY" "2")
+  )
+)
+
+;; Original typedef:
+;; typedef enum _GTlsPasswordFlags
+;; {
+;;   G_TLS_PASSWORD_NONE = 0,
+;;   G_TLS_PASSWORD_RETRY = 1 << 1,
+;;   G_TLS_PASSWORD_MANY_TRIES = 1 << 2,
+;;   G_TLS_PASSWORD_FINAL_TRY = 1 << 3
+;; } GTlsPasswordFlags;
+
+(define-flags-extended TlsPasswordFlags
+  (in-module "G")
+  (c-name "GTlsPasswordFlags")
+  (values
+    '("none" "G_TLS_PASSWORD_NONE" "0x0")
+    '("retry" "G_TLS_PASSWORD_RETRY" "1 << 1")
+    '("many-tries" "G_TLS_PASSWORD_MANY_TRIES" "1 << 2")
+    '("final-try" "G_TLS_PASSWORD_FINAL_TRY" "1 << 3")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_INTERACTION_UNHANDLED,
+;;   G_TLS_INTERACTION_HANDLED,
+;;   G_TLS_INTERACTION_FAILED
+;; } GTlsInteractionResult;
+
+(define-enum-extended TlsInteractionResult
+  (in-module "G")
+  (c-name "GTlsInteractionResult")
+  (values
+    '("unhandled" "G_TLS_INTERACTION_UNHANDLED" "0")
+    '("handled" "G_TLS_INTERACTION_HANDLED" "1")
+    '("failed" "G_TLS_INTERACTION_FAILED" "2")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   G_DBUS_INTERFACE_SKELETON_FLAGS_NONE = 0,
+;;   G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD = (1<<0)
+;; } GDBusInterfaceSkeletonFlags;
+
+(define-flags-extended DBusInterfaceSkeletonFlags
+  (in-module "G")
+  (c-name "GDBusInterfaceSkeletonFlags")
+  (values
+    '("none" "G_DBUS_INTERFACE_SKELETON_FLAGS_NONE" "0x0")
+    '("handle-method-invocations-in-thread" "G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD" "(1<<0)")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE = 0,
+;;   G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START = (1<<0)
+;; } GDBusObjectManagerClientFlags;
+
+(define-flags-extended DBusObjectManagerClientFlags
+  (in-module "G")
+  (c-name "GDBusObjectManagerClientFlags")
+  (values
+    '("none" "G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE" "0x0")
+    '("do-not-auto-start" "G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START" "(1<<0)")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_DATABASE_VERIFY_NONE = 0
+;; } GTlsDatabaseVerifyFlags;
+
+(define-flags-extended TlsDatabaseVerifyFlags
+  (in-module "G")
+  (c-name "GTlsDatabaseVerifyFlags")
+  (values
+    '("none" "G_TLS_DATABASE_VERIFY_NONE" "0x0")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TLS_DATABASE_LOOKUP_NONE = 0,
+;;   G_TLS_DATABASE_LOOKUP_KEYPAIR = 1
+;; } GTlsDatabaseLookupFlags;
+
+(define-flags-extended TlsDatabaseLookupFlags
+  (in-module "G")
+  (c-name "GTlsDatabaseLookupFlags")
+  (values
+    '("none" "G_TLS_DATABASE_LOOKUP_NONE" "0x0")
+    '("keypair" "G_TLS_DATABASE_LOOKUP_KEYPAIR" "0x1")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_IO_MODULE_SCOPE_NONE,
+;;   G_IO_MODULE_SCOPE_BLOCK_DUPLICATES
+;; } GIOModuleScopeFlags;
+
+(define-flags-extended IOModuleScopeFlags
+  (in-module "G")
+  (c-name "GIOModuleScopeFlags")
+  (values
+    '("none" "G_IO_MODULE_SCOPE_NONE" "0x0")
+    '("block-duplicates" "G_IO_MODULE_SCOPE_BLOCK_DUPLICATES" "0x1")
   )
 )
 
@@ -1144,3 +1371,4 @@
     '("invert-boolean" "G_SETTINGS_BIND_INVERT_BOOLEAN" "(1<<4)")
   )
 )
+
