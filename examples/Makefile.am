@@ -42,7 +42,7 @@ glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
 local_cppflags  = -I$(top_builddir) $(glibmm_includes) $(giomm_includes)
 
-AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS)
+AM_CPPFLAGS = $(local_cppflags)
 AM_CXXFLAGS = $(GIOMM_CFLAGS) $(GLIBMM_WXXFLAGS)
 
 local_libglibmm = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
@@ -50,7 +50,7 @@ local_libgiomm  = $(top_builddir)/gio/giomm/libgiomm-$(GIOMM_API_VERSION).la
 
 LDADD        = $(GLIBMM_LIBS) $(local_libglibmm)
 giomm_ldadd  = $(GIOMM_LIBS) $(local_libglibmm) $(local_libgiomm)
-thread_ldadd = $(GTHREAD_LIBS) $(GLIBMM_LIBS) $(local_libglibmm)
+thread_ldadd = $(GLIBMM_LIBS) $(local_libglibmm)
 
 child_watch_child_watch_SOURCES  = child_watch/main.cc
 iochannel_stream_example_SOURCES =	\

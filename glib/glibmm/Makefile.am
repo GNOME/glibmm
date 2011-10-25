@@ -31,7 +31,7 @@ include $(top_srcdir)/build/compile-binding.am
 
 local_cppflags = $(binding_includes) $(binding_cppflags) -DGLIBMM_BUILD=1
 
-AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GLIBMM_CFLAGS)
+AM_CPPFLAGS = $(local_cppflags) $(GLIBMM_CFLAGS)
 AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
 
 libglibmm_@GLIBMM_API_VERSION@_la_SOURCES = $(binding_sources)
