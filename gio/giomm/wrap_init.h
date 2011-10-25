@@ -2,8 +2,6 @@
 #ifndef _GIOMM_WRAP_INIT_H
 #define _GIOMM_WRAP_INIT_H
 
-#include <glibmm.h>
-
 /* wrap_init.h
  * 
  * Copyright (C) 2007 The gtkmm development team
@@ -25,7 +23,7 @@
 
 namespace Gio
 {
-    void wrap_init () ;
+  void wrap_init() ;
 }
 
 #endif //_GIOMM_WRAP_INIT_H
