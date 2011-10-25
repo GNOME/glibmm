@@ -141,7 +141,11 @@ ThreadPriority Thread::get_priority() const
 
 void thread_init(GThreadFunctions* vtable)
 {
-  g_thread_init(vtable);
+  //g_thread_init() is deprecated and now does nothing,
+  //so we do not even call it. That avoids a need to link to gthread-2.0, 
+  //which contains the empty g_thread_init() implementation.
+  //g_thread_init(vtable);
+  
   Glib::thread_init_impl();
 }
 
