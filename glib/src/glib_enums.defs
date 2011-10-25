@@ -28,24 +28,6 @@
   )
 )
 
-;; From gbsearcharray.h
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_BSEARCH_ARRAY_ALIGN_POWER2  = 1 << 0, /* align memory to power2 sizes */
-;;   G_BSEARCH_ARRAY_AUTO_SHRINK  = 1 << 1   /* shrink array upon removal */
-;; } GBSearchArrayFlags;
-
-(define-flags-extended BSearchArrayFlags
-  (in-module "G")
-  (c-name "GBSearchArrayFlags")
-  (values
-    '("align-power2" "G_BSEARCH_ARRAY_ALIGN_POWER2" "1 << 0")
-    '("auto-shrink" "G_BSEARCH_ARRAY_AUTO_SHRINK" "1 << 1")
-  )
-)
-
 ;; From gchecksum.h
 
 ;; Original typedef:
@@ -174,23 +156,6 @@
     '("october" "G_DATE_OCTOBER" "10")
     '("november" "G_DATE_NOVEMBER" "11")
     '("december" "G_DATE_DECEMBER" "12")
-  )
-)
-
-;; From gdebug.h
-
-;; Original typedef:
-;; typedef enum {
-;;   G_DEBUG_FATAL_WARNINGS  = 1 << 0,
-;;   G_DEBUG_FATAL_CRITICALS = 1 << 1
-;; } GDebugFlag;
-
-(define-flags-extended DebugFlag
-  (in-module "G")
-  (c-name "GDebugFlag")
-  (values
-    '("warnings" "G_DEBUG_FATAL_WARNINGS" "1 << 0")
-    '("criticals" "G_DEBUG_FATAL_CRITICALS" "1 << 1")
   )
 )
 
@@ -422,12 +387,16 @@
 ;;   G_IO_FLAG_APPEND = 1 << 0,
 ;;   G_IO_FLAG_NONBLOCK = 1 << 1,
 ;;   G_IO_FLAG_IS_READABLE = 1 << 2,	/* Read only flag */
-;;   G_IO_FLAG_IS_WRITEABLE = 1 << 3,	/* Read only flag */
+;;   G_IO_FLAG_IS_WRITABLE = 1 << 3,	/* Read only flag */
 ;;   G_IO_FLAG_IS_SEEKABLE = 1 << 4,	/* Read only flag */
 ;;   G_IO_FLAG_MASK = (1 << 5) - 1,
 ;;   G_IO_FLAG_GET_MASK = G_IO_FLAG_MASK,
 ;;   G_IO_FLAG_SET_MASK = G_IO_FLAG_APPEND | G_IO_FLAG_NONBLOCK
 ;; } GIOFlags;
+;; Note that we add is-writeable in glibmm to preserve API.
+;; They do that with a #define in glib, though an enum would have been OK:
+;; See http://git.gnome.org/browse/glib/commit/glib/giochannel.h?id=0d1a2eb4bfcd733e0c015c76fb0ca0308b8a61f0
+;; and https://bugzilla.gnome.org/show_bug.cgi?id=657045#c6
 
 (define-flags-extended IOFlags
   (in-module "G")
@@ -437,6 +406,7 @@
     '("nonblock" "G_IO_FLAG_NONBLOCK" "1 << 1")
     '("is-readable" "G_IO_FLAG_IS_READABLE" "1 << 2")
     '("is-writeable" "G_IO_FLAG_IS_WRITEABLE" "1 << 3")
+    '("is-writable" "G_IO_FLAG_IS_WRITABLE" "1 << 3")
     '("is-seekable" "G_IO_FLAG_IS_SEEKABLE" "1 << 4")
     '("mask" "G_IO_FLAG_MASK" "(1 << 5) - 1")
     '("get-mask" "G_IO_FLAG_GET_MASK" "0x1F")
@@ -1221,29 +1191,9 @@
 ;; Original typedef:
 ;; typedef enum
 ;; {
-;;   G_THREAD_PRIORITY_LOW,
-;;   G_THREAD_PRIORITY_NORMAL,
-;;   G_THREAD_PRIORITY_HIGH,
-;;   G_THREAD_PRIORITY_URGENT
-;; } GThreadPriority;
-
-(define-enum-extended ThreadPriority
-  (in-module "G")
-  (c-name "GThreadPriority")
-  (values
-    '("low" "G_THREAD_PRIORITY_LOW" "0")
-    '("normal" "G_THREAD_PRIORITY_NORMAL" "1")
-    '("high" "G_THREAD_PRIORITY_HIGH" "2")
-    '("urgent" "G_THREAD_PRIORITY_URGENT" "3")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
 ;;   G_ONCE_STATUS_NOTCALLED,
 ;;   G_ONCE_STATUS_PROGRESS,
-;;   G_ONCE_STATUS_READY  
+;;   G_ONCE_STATUS_READY
 ;; } GOnceStatus;
 
 (define-enum-extended OnceStatus
@@ -1291,7 +1241,7 @@
 ;;   G_UNICODE_OTHER_LETTER,
 ;;   G_UNICODE_TITLECASE_LETTER,
 ;;   G_UNICODE_UPPERCASE_LETTER,
-;;   G_UNICODE_COMBINING_MARK,
+;;   G_UNICODE_SPACING_MARK,
 ;;   G_UNICODE_ENCLOSING_MARK,
 ;;   G_UNICODE_NON_SPACING_MARK,
 ;;   G_UNICODE_DECIMAL_NUMBER,
@@ -1327,7 +1277,7 @@
     '("other-letter" "G_UNICODE_OTHER_LETTER" "7")
     '("titlecase-letter" "G_UNICODE_TITLECASE_LETTER" "8")
     '("uppercase-letter" "G_UNICODE_UPPERCASE_LETTER" "9")
-    '("combining-mark" "G_UNICODE_COMBINING_MARK" "10")
+    '("spacing-mark" "G_UNICODE_SPACING_MARK" "10")
     '("enclosing-mark" "G_UNICODE_ENCLOSING_MARK" "11")
     '("non-spacing-mark" "G_UNICODE_NON_SPACING_MARK" "12")
     '("decimal-number" "G_UNICODE_DECIMAL_NUMBER" "13")
@@ -1437,7 +1387,7 @@
 )
 
 ;; Original typedef:
-;; typedef enum 
+;; typedef enum
 ;; {                         /* ISO 15924 code */
 ;;   G_UNICODE_SCRIPT_INVALID_CODE = -1,
 ;;   G_UNICODE_SCRIPT_COMMON       = 0,   /* Zyyy */
@@ -1710,6 +1660,24 @@
     '("directory-templates" "G_USER_DIRECTORY_TEMPLATES" "6")
     '("directory-videos" "G_USER_DIRECTORY_VIDEOS" "7")
     '("n-directories" "G_USER_N_DIRECTORIES" "8")
+  )
+)
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   G_FORMAT_SIZE_DEFAULT     = 0,
+;;   G_FORMAT_SIZE_LONG_FORMAT = 1 << 0,
+;;   G_FORMAT_SIZE_IEC_UNITS   = 1 << 1
+;; } GFormatSizeFlags;
+
+(define-flags-extended FormatSizeFlags
+  (in-module "G")
+  (c-name "GFormatSizeFlags")
+  (values
+    '("default" "G_FORMAT_SIZE_DEFAULT" "0x0")
+    '("long-format" "G_FORMAT_SIZE_LONG_FORMAT" "1 << 0")
+    '("iec-units" "G_FORMAT_SIZE_IEC_UNITS" "1 << 1")
   )
 )
 
