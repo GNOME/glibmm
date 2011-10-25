@@ -20,6 +20,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm.h>
+
 #include <giomm/action.h>
 #include <giomm/actiongroup.h>
 #include <giomm/appinfo.h>

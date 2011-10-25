@@ -18,6 +18,7 @@
  */
 
 #include "init.h"
+#include <glibmm/init.h>
 
 namespace Gio
 {
