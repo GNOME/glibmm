@@ -23,8 +23,8 @@
 #include <glibmm/refptr.h>
 #include <glibmm/timeval.h>
 #include <glibmm/priorities.h>
+#include <glibmm/iochannel.h>
 #include <sigc++/sigc++.h>
-#include <glib.h>
 #include <vector>
 
 namespace Glib
@@ -32,63 +32,11 @@ namespace Glib
 
 class Cond;
 class Mutex;
-class IOChannel;
 
 /** @defgroup MainLoop The Main Event Loop
  * Manages all available sources of events.
  * @{
  */
-
-/** A bitwise combination representing an I/O condition to watch for on an
- * event source.
- * The flags correspond to those used by the <tt>%poll()</tt> system call
- * on UNIX (see <tt>man 2 poll</tt>).  To test for individual flags, do
- * something like this:
- * @code
- * if((condition & Glib::IO_OUT) != 0)
- *   do_some_output();
- * @endcode
- * @par Bitwise operators:
- * <tt>IOCondition operator|(IOCondition, IOCondition)</tt><br>
- * <tt>IOCondition operator&(IOCondition, IOCondition)</tt><br>
- * <tt>IOCondition operator^(IOCondition, IOCondition)</tt><br>
- * <tt>IOCondition operator~(IOCondition)</tt><br>
- * <tt>IOCondition& operator|=(IOCondition&, IOCondition)</tt><br>
- * <tt>IOCondition& operator&=(IOCondition&, IOCondition)</tt><br>
- * <tt>IOCondition& operator^=(IOCondition&, IOCondition)</tt><br>
- */
-enum IOCondition
-{
-  IO_IN   = G_IO_IN,  /*!< @hideinitializer There is data to read. */
-  IO_OUT  = G_IO_OUT, /*!< @hideinitializer Data can be written (without blocking). */
-  IO_PRI  = G_IO_PRI, /*!< @hideinitializer There is urgent data to read. */
-  IO_ERR  = G_IO_ERR, /*!< @hideinitializer %Error condition. */
-  IO_HUP  = G_IO_HUP, /*!< @hideinitializer Hung up (the connection has been broken,
-                                            usually for pipes and sockets). */
-  IO_NVAL = G_IO_NVAL /*!< @hideinitializer Invalid request. The file descriptor is not open. */
-};
-
-inline IOCondition operator|(IOCondition lhs, IOCondition rhs)
-  { return static_cast<IOCondition>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs)); }
-
-inline IOCondition operator&(IOCondition lhs, IOCondition rhs)
-  { return static_cast<IOCondition>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs)); }
-
-inline IOCondition operator^(IOCondition lhs, IOCondition rhs)
-  { return static_cast<IOCondition>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs)); }
-
-inline IOCondition operator~(IOCondition flags)
-  { return static_cast<IOCondition>(~static_cast<unsigned>(flags)); }
-
-inline IOCondition& operator|=(IOCondition& lhs, IOCondition rhs)
-  { return (lhs = static_cast<IOCondition>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs))); }
-
-inline IOCondition& operator&=(IOCondition& lhs, IOCondition rhs)
-  { return (lhs = static_cast<IOCondition>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs))); }
-
-inline IOCondition& operator^=(IOCondition& lhs, IOCondition rhs)
-  { return (lhs = static_cast<IOCondition>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs))); }
-
 
 class PollFD
 {
