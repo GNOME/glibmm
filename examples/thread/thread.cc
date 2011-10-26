@@ -4,7 +4,7 @@
 #include <glibmm/thread.h>
 #include <glibmm/random.h>
 #include <glibmm/timer.h>
-
+#include <glibmm/init.h>
 
 namespace
 {
@@ -93,7 +93,7 @@ void MessageQueue::consumer()
 
 int main(int, char**)
 {
-  Glib::thread_init();
+  Glib::init();
 
   MessageQueue queue;
 

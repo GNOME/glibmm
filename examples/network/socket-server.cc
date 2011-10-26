@@ -111,8 +111,6 @@ main (int argc,
     GOptionContext *context;
     Glib::RefPtr<Gio::Cancellable> cancellable;
 
-    Glib::thread_init (NULL);
-
     Gio::init ();
 
     context = g_option_context_new (" - Test GSocket server stuff");

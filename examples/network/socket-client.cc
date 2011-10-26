@@ -108,8 +108,6 @@ main (int argc,
     Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator;
     Glib::RefPtr<Gio::SocketConnectable> connectable;
 
-    Glib::thread_init (NULL);
-
     Gio::init ();
 
     context = g_option_context_new (" <hostname>[:port] - Test GSocket client stuff");

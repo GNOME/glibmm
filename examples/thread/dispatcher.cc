@@ -213,7 +213,7 @@ void Application::on_progress_finished(ThreadProgress* thread_progress)
 
 int main(int, char**)
 {
-  Glib::thread_init();
+  Glib::init();
 
   Application application;
   application.run();

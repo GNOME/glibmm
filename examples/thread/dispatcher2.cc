@@ -216,7 +216,7 @@ void Dispatcher::end()
 
 int main(int, char**)
 {
-  Glib::thread_init();
+  Glib::init();
   main_loop = Glib::MainLoop::create();
 
   Dispatcher dispatcher;
