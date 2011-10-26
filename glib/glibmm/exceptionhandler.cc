@@ -20,9 +20,9 @@
  */
 
 #include <glibmmconfig.h>
+#include <glibmm/thread.h>
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
-#include <glibmm/thread.h>
 #include <glib.h>
 #include <exception>
 #include <list>

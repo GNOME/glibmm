@@ -18,10 +18,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/thread.h>
+
 #undef G_DISABLE_DEPRECATED //So we can use newly-deprecated API, to preserve our API.
+
 #include <glibmm/main.h>
 #include <glibmm/exceptionhandler.h>
-#include <glibmm/thread.h>
 #include <glibmm/wrap.h>
 #include <glibmm/iochannel.h>
 #include <algorithm>

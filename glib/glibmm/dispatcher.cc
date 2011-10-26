@@ -18,11 +18,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/thread.h>
 #include <glibmm/dispatcher.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/main.h>
-#include <glibmm/thread.h>
 
 #include <cerrno>
 #include <fcntl.h>

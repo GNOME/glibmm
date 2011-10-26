@@ -1,5 +1,28 @@
 2011-10-26  Murray Cumming  <murrayc@murrayc.com>
 
+	thread.h: Allow use of this without causing deprecation compiler warnings.
+
+	* glib/src/thread.hg: undef and then redefine G_DISABLE_DEPRECATED, and
+	define GLIB_DISABLE_DEPRECATION_WARNINGS, if G_DISABLE_DEPRECATED is 
+	defined, so we can use the deprecated API in this header (though only in 
+	our own deprecated API).
+	 
+	* tools/generate_wrap_init.pl.in: Include glibmm.h instead of glib.h so 
+	we can include thread.h first (via glibmm.h) instead of only later.
+	This seems more logical than explicitly including thread.h in all 
+	(even non-glibmm) generated wrap_init.cc files.
+	
+  * tools/m4/base.m4:
+	* glib/glibmm.h:
+	* glib/glibmm/dispatcher.cc:
+	* glib/glibmm/exceptionhandler.cc:
+	* glib/glibmm/main.cc:
+	* examples/thread/thread.cc:
+	* examples/thread/threadpool.cc: Adjust the includes to include thread.h 
+	first.
+
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
 	Move IOCondition from main.h to iochannel.h and autogenerate it.
 
 	* glib/src/iochannel.hg: Use _WRAP_ENUM() for IOCondition instead of 

@@ -311,11 +311,12 @@ _IMPORT(SECTION_CC_PRE_INCLUDES)
 
 _DEPRECATE_IFDEF_CLASS_START
 
+#include <glibmm.h>
+
 #include <__MODULE__/__FILE__.h>
 #include <__MODULE__/private/__FILE__`'_p.h>
 
 _IMPORT(SECTION_CC_INCLUDES)
-#include <glibmm.h>
 
 _IMPORT(SECTION_SRC_CUSTOM)
 
