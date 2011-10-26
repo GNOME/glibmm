@@ -267,7 +267,8 @@ sub lookup_documentation($$)
   # Remove C example code.
   my $example_removals =
     ($text =~ s"<informalexample>.*?</informalexample>""sg);
-
+  $example_removals +=
+    ($text =~ s"<programlisting>.*?</programlisting>""sg);
   $example_removals += ($text =~ s"\|\[.*?]\|""sg);
 
   print STDERR "gmmproc: $functionName(): Example code discarded.\n"
