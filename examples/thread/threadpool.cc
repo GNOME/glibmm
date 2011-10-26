@@ -9,7 +9,7 @@
 namespace
 {
 
-Glib::StaticMutex mutex = GLIBMM_STATIC_MUTEX_INIT;
+Glib::Mutex mutex;
 
 void print_char(char c)
 {
@@ -31,8 +31,6 @@ void print_char(char c)
 
 int main(int, char**)
 {
-  Glib::thread_init();
-
   Glib::ThreadPool pool (10);
 
   for(char c = 'a'; c <= 'z'; ++c)
