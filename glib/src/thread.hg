@@ -60,12 +60,6 @@ enum { THREAD_PRIORITY_NORMAL = GLIBMM_MACRO_DEFINITION_THREAD_PRIORITY_NORMAL }
 #endif
 
 
-/** Initializer macro for Glib::StaticMutex.
- * @relates Glib::StaticMutex
- * @hideinitializer
- */
-#define GLIBMM_STATIC_MUTEX_INIT { G_STATIC_MUTEX_INIT }
-
 /** Initializer macro for Glib::StaticRecMutex.
  * @relates Glib::StaticRecMutex
  * @hideinitializer
@@ -118,6 +112,7 @@ void thread_init(GThreadFunctions* vtable = 0);
  */
 bool thread_supported();
 
+_DEPRECATE_IFDEF_END
 
 /** @defgroup Threads Threads
  * Thread abstraction; including threads, different mutexes,
@@ -131,7 +126,7 @@ enum TryLock { TRY_LOCK };
 class Mutex;
 class RecMutex;
 class RWLock;
-struct StaticMutex;
+
 struct StaticRecMutex;
 struct StaticRWLock;
 
@@ -312,6 +307,10 @@ class Thread::Exit
 Thread* wrap(GThread* gobject);
 
 
+_DEPRECATE_IFDEF_START
+
+struct StaticMutex;
+
 /** Like Glib::Mutex, but can be defined at compile time.
  * Use @c GLIBMM_STATIC_MUTEX_INIT to initialize a StaticMutex:
  * @code
@@ -338,6 +337,12 @@ struct StaticMutex
   GStaticMutex gobject_;
 #endif
 };
+
+/** Initializer macro for Glib::StaticMutex.
+ * @relates Glib::StaticMutex
+ * @hideinitializer
+ */
+#define GLIBMM_STATIC_MUTEX_INIT { G_STATIC_MUTEX_INIT }
 
 _DEPRECATE_IFDEF_END
 
