@@ -81,20 +81,6 @@ _WRAP_ENUM(ThreadPriority, GThreadPriority, NO_GTYPE)
 /*! @var ThreadPriority THREAD_PRIORITY_URGENT
  * The highest priority.
  */
- 
-_DEPRECATE_IFDEF_END
-
-
-/** @defgroup Threads Threads
- * Thread abstraction; including threads, different mutexes,
- * conditions and thread private data.
- * @{
- */
-
-enum NotLock { NOT_LOCK };
-enum TryLock { TRY_LOCK };
-
-_DEPRECATE_IFDEF_START
 
 /** Initializes the GLib thread system.
  * @deprecated Calling thread_init() is no longer necessary and no longer has any effect.
@@ -107,6 +93,15 @@ void thread_init(GThreadFunctions* vtable = 0);
  */
 bool thread_supported();
 
+
+/** @defgroup Threads Threads
+ * Thread abstraction; including threads, different mutexes,
+ * conditions and thread private data.
+ * @{
+ */
+
+enum NotLock { NOT_LOCK };
+enum TryLock { TRY_LOCK };
 
 class Mutex;
 class RecMutex;
@@ -163,6 +158,20 @@ public:
    */
   static Thread* create(const sigc::slot<void>& slot, bool joinable = true);
 
+  /** Returns the Thread* corresponding to the calling thread.
+   * @return The current thread.
+   */
+  static Thread* self();
+
+  /** Waits until the thread finishes.
+   * Waits until the thread finishes, i.e. the slot, as given to create(),
+   * returns or g_thread_exit() is called by the thread.  (Calling
+   * g_thread_exit() in a C++ program should be avoided.)  All resources of
+   * the thread including the Glib::Thread object are released.  The thread
+   * must have been created with <tt>joinable&nbsp;=&nbsp;true</tt>.
+   */
+  void join();
+
 _DEPRECATE_IFDEF_START
   //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
   /** Creates a new thread with the priority @a priority. The stack gets the
@@ -212,23 +221,7 @@ _DEPRECATE_IFDEF_START
    */
   static Thread* create(const sigc::slot<void>& slot, unsigned long stack_size,
                         bool joinable, bool bound, ThreadPriority priority);
-_DEPRECATE_IFDEF_END
 
-  /** Returns the Thread* corresponding to the calling thread.
-   * @return The current thread.
-   */
-  static Thread* self();
-
-  /** Waits until the thread finishes.
-   * Waits until the thread finishes, i.e. the slot, as given to create(),
-   * returns or g_thread_exit() is called by the thread.  (Calling
-   * g_thread_exit() in a C++ program should be avoided.)  All resources of
-   * the thread including the Glib::Thread object are released.  The thread
-   * must have been created with <tt>joinable&nbsp;=&nbsp;true</tt>.
-   */
-  void join();
-
-_DEPRECATE_IFDEF_START
   /** Returns whether the thread is joinable.
    * @return Whether the thread is joinable.
    *
@@ -713,10 +706,12 @@ private:
 /*  inline implementation                                                  */
 /***************************************************************************/
 
+_DEPRECATE_IFDEF_START
 // internal
 /** @deprecated This was always for internal glibmm use and is now unecessary even inside glibmm.
  */
 void thread_init_impl();
+_DEPRECATE_IFDEF_END
 
 /**** Glib::Mutex::Lock ****************************************************/
 
