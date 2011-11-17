@@ -15,7 +15,7 @@ define(`_PROPERTY_PROXY',`dnl
 dnl
 dnl Put spaces around the template parameter if necessary.
 pushdef(`__PROXY_TYPE__',`dnl
-Glib::PropertyProxy$4< _QUOTE($3) >'dnl
+Glib::PropertyProxy$4<'ifelse(regexp(_QUOTE($3),`>$'),`-1',_QUOTE($3),` '_QUOTE($3)` ')`>'dnl
 )dnl
 #ifdef GLIBMM_PROPERTIES_ENABLED
 /** $5
