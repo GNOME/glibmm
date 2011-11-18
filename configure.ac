@@ -62,7 +62,7 @@ AS_IF([test "x$enable_static" = xyes],
 
 glibreq='2.0 >= 2.31.0'
 
-GLIBMM_MODULES="sigc++-2.0 >= 2.0.10 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
+GLIBMM_MODULES="sigc++-2.0 >= 2.2.10 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
 GIOMM_MODULES="$GLIBMM_MODULES gio-$glibreq"
 test "x$glibmm_host_windows" = xyes || GIOMM_MODULES="$GIOMM_MODULES gio-unix-$glibreq"
 
