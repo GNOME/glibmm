@@ -1,3 +1,4 @@
+# -*- mode: perl; perl-indent-level: 2; indent-tabs-mode: nil -*-
 ## Copyright 2011 Krzesimir Nowak
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -22,8 +23,8 @@ use warnings;
 
 use Encode;
 
+use Gir::Repositories;
 use Gir::Config;
-use Gir::Handlers::Generated::Common::Store;
 use Gir::State;
 
 use IO::File;
@@ -33,14 +34,14 @@ use XML::Parser::Expat;
 sub _print_error ($$$)
 {
   my ($state, $error, $elem) = @_;
-  my $xml_parser = $state->get_xml_parser ();
-  my $msg = $state->get_parsed_file ()
+  my $xml_parser = $state->get_xml_parser;
+  my $msg = $state->get_parsed_file
     . ':'
-    . $xml_parser->current_line ()
+    . $xml_parser->current_line
     . ': '
     . $error
-    . "\nTags stack:\n";
-  my @context = $xml_parser->context ();
+    . "\n" . 'Tags stack: ' . "\n";
+  my @context = $xml_parser->context;
 
   foreach my $tag (@context)
   {
@@ -61,18 +62,18 @@ sub _get_file_contents_as_utf8 ($)
   unless (defined ($xml))
   {
     #TODO: error;
-    print STDERR 'Could not open file: ' . $real_filename . ".\n";
-    exit (1);
+    print STDERR 'Could not open file `' . $real_filename . '\' for reading.' . "\n";
+    exit 1;
   }
 
-  my $file_size = ($xml->stat ())[7];
+  my $file_size = ($xml->stat)[7];
   my $contents = undef;
 
   unless ($xml->binmode (':raw'))
   {
     #TODO: error;
-    print STDERR "Calling binmode on " . $real_filename . " failed.\n";
-    exit (1);
+    print STDERR 'Calling binmode on `' . $real_filename . '\' failed.' . "\n";
+    exit 1;
   }
 
   my $bytes_read = $xml->read ($contents, $file_size);
@@ -82,28 +83,83 @@ sub _get_file_contents_as_utf8 ($)
     #TODO: error;
     if (defined ($bytes_read))
     {
-      print STDERR 'Read ' . $bytes_read . ' bytes from ' . $real_filename . ', wanted: ' . $file_size . " bytes.\n";
+      print STDERR 'Read ' . $bytes_read . ' bytes from ' . $real_filename . ', wanted: ' . $file_size . ' bytes.' . "\n";
     }
     else
     {
-      print STDERR 'Read error from ' . $real_filename . ".\n";
+      print STDERR 'Read error from ' . $real_filename . '.' . "\n";
     }
-    exit (1);
+    exit 1;
   }
-  unless ($xml->close ())
+  unless ($xml->close)
   {
-    print STDERR 'Closing ' . $real_filename . " failed.\n";
-    exit (1);
+    print STDERR 'Closing ' . $real_filename . ' failed.' . "\n";
+    exit 1;
   }
   return decode ('utf-8', $contents);
+}
+
+sub _repository_end_hook ($)
+{
+  my ($self) = @_;
+  my $state = $self->get_current_state;
+  my $repository = $state->get_current_object;
+  my $repositories = $self->get_repositories;
+
+  $repositories->add_repository ($repository);
+}
+
+sub _include_end_hook ($)
+{
+  my ($self) = @_;
+  my $state = $self->get_current_state;
+  my $include = $state->get_current_object;
+
+#  print STDERR 'Include hook called!' . "\n";
+
+  $self->parse_file ($include->get_a_name . '-' . $include->get_a_version . '.gir');
+}
+
+sub _namespace_start_hook ($)
+{
+  my ($self) = @_;
+  my $state = $self->get_current_state;
+  my $file = $state->get_parsed_file;
+
+  print STDOUT 'Parsing ' . $file . '.' . "\n";
+}
+
+sub _install_hooks ($$$)
+{
+  my ($self, $tag_name, $handlers) = @_;
+  my $hooks = $self->{'hooks'};
+
+  if (exists $hooks->{$tag_name})
+  {
+    my $tag_hooks = $hooks->{$tag_name};
+
+    if (defined $tag_hooks->[0])
+    {
+#      print STDERR 'Installing start hooks for `' . $tag_name . '\' via object' . $handlers . "\n";
+      $handlers->install_start_hook ($tag_name, $self, $tag_hooks->[0]);
+    }
+    if (defined $tag_hooks->[1])
+    {
+#      print STDERR 'Installing end hooks for `' . $tag_name . '\' via object' . $handlers . "\n";
+      $handlers->install_end_hook ($tag_name, $self, $tag_hooks->[1]);
+    }
+  }
 }
 
 sub _start ($$$@)
 {
   my ($self, undef, $elem, @atts_vals) = @_;
-  my $state = $self->get_current_state ();
-  my $handlers = $state->get_current_handlers ();
-  my $start_handlers = $handlers->get_start_handlers ();
+  my $state = $self->get_current_state;
+  my $handlers = $state->get_current_handlers;
+
+  $self->_install_hooks ($elem, $handlers);
+
+  my $start_handlers = $handlers->get_start_handlers;
 
   if (defined ($start_handlers))
   {
@@ -112,37 +168,37 @@ sub _start ($$$@)
       my $method = $start_handlers->get_method_for ($elem);
       my $subhandlers = $handlers->get_subhandlers_for ($elem);
 
-      if (defined ($subhandlers))
+      if (defined $subhandlers)
       {
         $state->push_handlers ($subhandlers);
         return $handlers->$method ($self, @atts_vals);
       }
       # TODO: internal error - wrong implementation of get_subhandlers_for?
       _print_error ($state, 'Internal error - wrong implementation of get_subhandlers_for?', $elem);
-      exit (1);
+      exit 1;
     }
     # TODO: unknown elem?
     _print_error ($state, 'Unknown tag: ' . $elem . '.', $elem);
-    exit (1);
+    exit 1;
   }
   _print_error ($state, 'No start handlers: ' . $elem . '.', $elem);
-  exit (1);
+  exit 1;
 }
 
 sub _end ($$$)
 {
   my ($self, undef, $elem) = @_;
-  my $state = $self->get_current_state ();
+  my $state = $self->get_current_state;
 
-  $state->pop_handlers ();
+  $state->pop_handlers;
 
-  my $handlers = $state->get_current_handlers ();
+  my $handlers = $state->get_current_handlers;
   unless (defined $handlers)
   {
     _print_error ($state, 'No handlers for tag: ' . $elem . '.', $elem);
     exit (1);
   }
-  my $end_handlers = $handlers->get_end_handlers ();
+  my $end_handlers = $handlers->get_end_handlers;
 
   if ($end_handlers->has_method_for ($elem))
   {
@@ -161,12 +217,18 @@ sub _end ($$$)
 sub new($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'GirParser');
+  my $class = (ref ($type) or $type or 'Gir::Parser');
   my $self =
   {
     'states_stack' => [],
     'parsed_girs' => {},
-    'api' => {}, # TODO: replace with Gir::Api->new () or something like that.
+    'repositories' => Gir::Repositories->new,
+    'hooks' =>
+    {
+      'repository' => [undef, \&_repository_end_hook],
+      'include' => [undef, \&_include_end_hook],
+      'namespace' => [\&_namespace_start_hook, undef]
+    }
   };
 
   return bless ($self, $class);
@@ -175,7 +237,7 @@ sub new($)
 sub _create_xml_parser ($)
 {
   my $self = shift;
-  my $xml_parser = XML::Parser::Expat->new ();
+  my $xml_parser = XML::Parser::Expat->new;
 
   #TODO: implement commented methods.
   $xml_parser->setHandlers
@@ -198,8 +260,8 @@ sub parse_file ($$)
 
   unless (exists ($parsed_girs->{$filename}))
   {
-    my $real_filename = File::Spec->catfile (Gir::Config::get_girdir(), $filename);
-    my $xml_parser = $self->_create_xml_parser ();
+    my $real_filename = File::Spec->catfile (Gir::Config::get_girdir, $filename);
+    my $xml_parser = $self->_create_xml_parser;
     my $new_state = Gir::State->new ($real_filename, $xml_parser);
     my $states_stack = $self->{'states_stack'};
 
@@ -209,17 +271,17 @@ sub parse_file ($$)
     my $contents = _get_file_contents_as_utf8 ($real_filename);
 
     $xml_parser->parse ($contents);
-    $xml_parser->release ();
+    $xml_parser->release;
     pop (@{$states_stack});
     #print STDOUT 'Parsed ' . $real_filename . "\n";
   }
 }
 
-sub get_api ($)
+sub get_repositories ($)
 {
   my $self = shift;
 
-  return $self->{'api'};
+  return $self->{'repositories'};
 }
 
 sub get_current_state ($)
@@ -230,4 +292,4 @@ sub get_current_state ($)
   return $states_stack->[-1];
 }
 
-1;
+1; # indicate proper module load.
