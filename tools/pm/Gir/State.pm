@@ -1,3 +1,4 @@
+# -*- mode: perl; perl-indent-level: 2; indent-tabs-mode: nil -*-
 ## Copyright 2011 Krzesimir Nowak
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -19,6 +20,9 @@ package Gir::State;
 
 use strict;
 use warnings;
+
+use parent qw(Gir::Handlers::Common::State);
+
 use Gir::Handlers::TopLevel;
 
 ##
@@ -28,13 +32,12 @@ sub new ($$$)
 {
   my ($type, $parsed_file, $xml_parser) = @_;
   my $class = (ref ($type) or $type or 'Gir::State');
-  my $self =
-  {
-    'handlers_stack' => [Gir::Handlers::TopLevel->new ()],
-    'current_namespace' => undef,
-    'parsed_file' => $parsed_file,
-    'xml_parser' => $xml_parser
-  };
+  my $self = $class->SUPER::new;
+  my $toplevel_handler = Gir::Handlers::TopLevel->new;
+
+  $self->{'handlers_stack'} = [$toplevel_handler];
+  $self->{'parsed_file'} = $parsed_file;
+  $self->{'xml_parser'} = $xml_parser;
 
   return bless ($self, $class);
 }
@@ -61,20 +64,6 @@ sub get_current_handlers ($)
   my $handlers_stack = $self->{'handlers_stack'};
 
   return ${handlers_stack}->[-1];
-}
-
-sub get_current_namespace ($)
-{
-  my $self = shift;
-
-  return $self->{'current_namespace'};
-}
-
-sub set_current_namespace ($$)
-{
-  my ($self, $namespace) = @_;
-
-  $self->{'current_namespace'} = $namespace;
 }
 
 sub get_parsed_file ($)
