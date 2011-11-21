@@ -17,48 +17,37 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 ##
 
-package Gir::Handlers::Alias;
+package Gir::Handlers::Array;
 
 use strict;
 use warnings;
 
 use parent qw(Gir::Handlers::Common::Base);
 
-use Gir::Api::Attribute;
-use Gir::Api::Doc;
+use Gir::Api::Array;
 use Gir::Api::Type;
+use Gir::Api::Varargs;
 
 use Gir::Handlers::Common::Misc;
 use Gir::Handlers::Common::Store;
 use Gir::Handlers::Common::Tags;
 
-use Gir::Handlers::Attribute;
-use Gir::Handlers::Doc;
+use Gir::Handlers::Array;
 use Gir::Handlers::Type;
+use Gir::Handlers::Varargs;
 
 ##
 ## private:
 ##
-sub _attribute_start ($$@)
+sub _array_start ($$@)
 {
   my ($self, $parser, @atts_vals) = @_;
-  my $params = Gir::Handlers::Common::Tags::get_attribute_params (@atts_vals);
+  my $params = Gir::Handlers::Common::Tags::get_array_params (@atts_vals);
   my $state = $parser->get_current_state;
-  my $object = Gir::Api::Attribute->new_with_params ($params);
+  my $object = Gir::Api::Array->new_with_params ($params);
 
   $state->push_object ($object);
-  $self->_call_start_hooks ('attribute');
-}
-
-sub _doc_start ($$@)
-{
-  my ($self, $parser, @atts_vals) = @_;
-  my $params = Gir::Handlers::Common::Tags::get_doc_params (@atts_vals);
-  my $state = $parser->get_current_state;
-  my $object = Gir::Api::Doc->new_with_params ($params);
-
-  $state->push_object ($object);
-  $self->_call_start_hooks ('doc');
+  $self->_call_start_hooks ('array');
 }
 
 sub _type_start ($$@)
@@ -72,29 +61,22 @@ sub _type_start ($$@)
   $self->_call_start_hooks ('type');
 }
 
-sub _attribute_end ($$)
+sub _varargs_start ($$@)
 {
-  my ($self, $parser) = @_;
-
-  $self->_call_end_hooks ('attribute');
-
+  my ($self, $parser, @atts_vals) = @_;
+  my $params = Gir::Handlers::Common::Tags::get_varargs_params (@atts_vals);
   my $state = $parser->get_current_state;
-  my $object = $state->get_current_object;
+  my $object = Gir::Api::Varargs->new_with_params ($params);
 
-  $state->pop_object;
-
-  my $parent_object = $state->get_current_object;
-  my $count = $parent_object->get_g_attribute_count;
-  my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
-
-  $parent_object->add_g_attribute ($name, $object);
+  $state->push_object ($object);
+  $self->_call_start_hooks ('varargs');
 }
 
-sub _doc_end ($$)
+sub _array_end ($$)
 {
   my ($self, $parser) = @_;
 
-  $self->_call_end_hooks ('doc');
+  $self->_call_end_hooks ('array');
 
   my $state = $parser->get_current_state;
   my $object = $state->get_current_object;
@@ -102,10 +84,10 @@ sub _doc_end ($$)
   $state->pop_object;
 
   my $parent_object = $state->get_current_object;
-  my $count = $parent_object->get_g_doc_count;
+  my $count = $parent_object->get_g_array_count;
   my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
 
-  $parent_object->add_g_doc ($name, $object);
+  $parent_object->add_g_array ($name, $object);
 }
 
 sub _type_end ($$)
@@ -126,30 +108,48 @@ sub _type_end ($$)
   $parent_object->add_g_type ($name, $object);
 }
 
+sub _varargs_end ($$)
+{
+  my ($self, $parser) = @_;
+
+  $self->_call_end_hooks ('varargs');
+
+  my $state = $parser->get_current_state;
+  my $object = $state->get_current_object;
+
+  $state->pop_object;
+
+  my $parent_object = $state->get_current_object;
+  my $count = $parent_object->get_g_varargs_count;
+  my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
+
+  $parent_object->add_g_varargs ($name, $object);
+}
+
 ##
 ## public:
 ##
 sub new ($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Alias');
+  my $class = (ref ($type) or $type or 'Gir::Handlers::Array');
   my $start_store = Gir::Handlers::Common::Store->new
   ({
-    'attribute' => \&_attribute_start,
-    'doc' => \&_doc_start,
-    'type' => \&_type_start
+    'array' => \&_array_start,
+    'type' => \&_type_start,
+    'varargs' => \&_varargs_start
   });
   my $end_store = Gir::Handlers::Common::Store->new
   ({
-    'attribute' => \&_attribute_end,
-    'doc' => \&_doc_end,
-    'type' => \&_type_end
+    'array' => \&_array_end,
+    'type' => \&_type_end,
+    'varargs' => \&_varargs_end
   });
   my $subhandlers =
   {
-    'attribute' => 'Gir::Handlers::Attribute',
-    'doc' => 'Gir::Handlers::Doc',
-    'type' => 'Gir::Handlers::Type'
+    'array' => 'Gir::Handlers::Array',
+    'type' => 'Gir::Handlers::Type',
+    'varargs' => 'Gir::Handlers::Varargs'
   };
   my $self = $class->SUPER::new ($start_store, $end_store, $subhandlers);
 

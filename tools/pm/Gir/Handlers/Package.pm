@@ -17,52 +17,25 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 ##
 
-package Gir::Handlers::TopLevel;
+package Gir::Handlers::Package;
 
 use strict;
 use warnings;
 
 use parent qw(Gir::Handlers::Common::Base);
 
-use Gir::Api::Repository;
+
 
 use Gir::Handlers::Common::Misc;
 use Gir::Handlers::Common::Store;
 use Gir::Handlers::Common::Tags;
 
-use Gir::Handlers::Repository;
+
 
 ##
 ## private:
 ##
-sub _repository_start ($$@)
-{
-  my ($self, $parser, @atts_vals) = @_;
-  my $params = Gir::Handlers::Common::Tags::get_repository_params (@atts_vals);
-  my $state = $parser->get_current_state;
-  my $object = Gir::Api::Repository->new_with_params ($params);
 
-  $state->push_object ($object);
-  $self->_call_start_hooks ('repository');
-}
-
-sub _repository_end ($$)
-{
-  my ($self, $parser) = @_;
-
-  $self->_call_end_hooks ('repository');
-
-  my $state = $parser->get_current_state;
-  my $object = $state->get_current_object;
-
-  $state->pop_object;
-
-  my $parent_object = $state->get_current_object;
-  my $count = $parent_object->get_g_repository_count;
-  my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
-
-  $parent_object->add_g_repository ($name, $object);
-}
 
 ##
 ## public:
@@ -70,18 +43,18 @@ sub _repository_end ($$)
 sub new ($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::TopLevel');
+  my $class = (ref ($type) or $type or 'Gir::Handlers::Package');
   my $start_store = Gir::Handlers::Common::Store->new
   ({
-    'repository' => \&_repository_start
+
   });
   my $end_store = Gir::Handlers::Common::Store->new
   ({
-    'repository' => \&_repository_end
+
   });
   my $subhandlers =
   {
-    'repository' => 'Gir::Handlers::Repository'
+
   };
   my $self = $class->SUPER::new ($start_store, $end_store, $subhandlers);
 

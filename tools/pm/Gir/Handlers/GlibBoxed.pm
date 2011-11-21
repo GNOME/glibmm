@@ -17,7 +17,7 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 ##
 
-package Gir::Handlers::Alias;
+package Gir::Handlers::GlibBoxed;
 
 use strict;
 use warnings;
@@ -25,16 +25,20 @@ use warnings;
 use parent qw(Gir::Handlers::Common::Base);
 
 use Gir::Api::Attribute;
+use Gir::Api::Constructor;
 use Gir::Api::Doc;
-use Gir::Api::Type;
+use Gir::Api::Function;
+use Gir::Api::Method;
 
 use Gir::Handlers::Common::Misc;
 use Gir::Handlers::Common::Store;
 use Gir::Handlers::Common::Tags;
 
 use Gir::Handlers::Attribute;
+use Gir::Handlers::Constructor;
 use Gir::Handlers::Doc;
-use Gir::Handlers::Type;
+use Gir::Handlers::Function;
+use Gir::Handlers::Method;
 
 ##
 ## private:
@@ -50,6 +54,17 @@ sub _attribute_start ($$@)
   $self->_call_start_hooks ('attribute');
 }
 
+sub _constructor_start ($$@)
+{
+  my ($self, $parser, @atts_vals) = @_;
+  my $params = Gir::Handlers::Common::Tags::get_constructor_params (@atts_vals);
+  my $state = $parser->get_current_state;
+  my $object = Gir::Api::Constructor->new_with_params ($params);
+
+  $state->push_object ($object);
+  $self->_call_start_hooks ('constructor');
+}
+
 sub _doc_start ($$@)
 {
   my ($self, $parser, @atts_vals) = @_;
@@ -61,15 +76,26 @@ sub _doc_start ($$@)
   $self->_call_start_hooks ('doc');
 }
 
-sub _type_start ($$@)
+sub _function_start ($$@)
 {
   my ($self, $parser, @atts_vals) = @_;
-  my $params = Gir::Handlers::Common::Tags::get_type_params (@atts_vals);
+  my $params = Gir::Handlers::Common::Tags::get_function_params (@atts_vals);
   my $state = $parser->get_current_state;
-  my $object = Gir::Api::Type->new_with_params ($params);
+  my $object = Gir::Api::Function->new_with_params ($params);
 
   $state->push_object ($object);
-  $self->_call_start_hooks ('type');
+  $self->_call_start_hooks ('function');
+}
+
+sub _method_start ($$@)
+{
+  my ($self, $parser, @atts_vals) = @_;
+  my $params = Gir::Handlers::Common::Tags::get_method_params (@atts_vals);
+  my $state = $parser->get_current_state;
+  my $object = Gir::Api::Method->new_with_params ($params);
+
+  $state->push_object ($object);
+  $self->_call_start_hooks ('method');
 }
 
 sub _attribute_end ($$)
@@ -90,6 +116,24 @@ sub _attribute_end ($$)
   $parent_object->add_g_attribute ($name, $object);
 }
 
+sub _constructor_end ($$)
+{
+  my ($self, $parser) = @_;
+
+  $self->_call_end_hooks ('constructor');
+
+  my $state = $parser->get_current_state;
+  my $object = $state->get_current_object;
+
+  $state->pop_object;
+
+  my $parent_object = $state->get_current_object;
+  my $count = $parent_object->get_g_constructor_count;
+  my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
+
+  $parent_object->add_g_constructor ($name, $object);
+}
+
 sub _doc_end ($$)
 {
   my ($self, $parser) = @_;
@@ -108,11 +152,11 @@ sub _doc_end ($$)
   $parent_object->add_g_doc ($name, $object);
 }
 
-sub _type_end ($$)
+sub _function_end ($$)
 {
   my ($self, $parser) = @_;
 
-  $self->_call_end_hooks ('type');
+  $self->_call_end_hooks ('function');
 
   my $state = $parser->get_current_state;
   my $object = $state->get_current_object;
@@ -120,10 +164,28 @@ sub _type_end ($$)
   $state->pop_object;
 
   my $parent_object = $state->get_current_object;
-  my $count = $parent_object->get_g_type_count;
+  my $count = $parent_object->get_g_function_count;
   my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
 
-  $parent_object->add_g_type ($name, $object);
+  $parent_object->add_g_function ($name, $object);
+}
+
+sub _method_end ($$)
+{
+  my ($self, $parser) = @_;
+
+  $self->_call_end_hooks ('method');
+
+  my $state = $parser->get_current_state;
+  my $object = $state->get_current_object;
+
+  $state->pop_object;
+
+  my $parent_object = $state->get_current_object;
+  my $count = $parent_object->get_g_method_count;
+  my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
+
+  $parent_object->add_g_method ($name, $object);
 }
 
 ##
@@ -132,24 +194,30 @@ sub _type_end ($$)
 sub new ($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Alias');
+  my $class = (ref ($type) or $type or 'Gir::Handlers::GlibBoxed');
   my $start_store = Gir::Handlers::Common::Store->new
   ({
     'attribute' => \&_attribute_start,
+    'constructor' => \&_constructor_start,
     'doc' => \&_doc_start,
-    'type' => \&_type_start
+    'function' => \&_function_start,
+    'method' => \&_method_start
   });
   my $end_store = Gir::Handlers::Common::Store->new
   ({
     'attribute' => \&_attribute_end,
+    'constructor' => \&_constructor_end,
     'doc' => \&_doc_end,
-    'type' => \&_type_end
+    'function' => \&_function_end,
+    'method' => \&_method_end
   });
   my $subhandlers =
   {
     'attribute' => 'Gir::Handlers::Attribute',
+    'constructor' => 'Gir::Handlers::Constructor',
     'doc' => 'Gir::Handlers::Doc',
-    'type' => 'Gir::Handlers::Type'
+    'function' => 'Gir::Handlers::Function',
+    'method' => 'Gir::Handlers::Method'
   };
   my $self = $class->SUPER::new ($start_store, $end_store, $subhandlers);
 

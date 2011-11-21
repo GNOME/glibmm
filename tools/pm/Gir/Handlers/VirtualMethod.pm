@@ -17,7 +17,7 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 ##
 
-package Gir::Handlers::Alias;
+package Gir::Handlers::VirtualMethod;
 
 use strict;
 use warnings;
@@ -26,7 +26,8 @@ use parent qw(Gir::Handlers::Common::Base);
 
 use Gir::Api::Attribute;
 use Gir::Api::Doc;
-use Gir::Api::Type;
+use Gir::Api::Parameters;
+use Gir::Api::ReturnValue;
 
 use Gir::Handlers::Common::Misc;
 use Gir::Handlers::Common::Store;
@@ -34,7 +35,8 @@ use Gir::Handlers::Common::Tags;
 
 use Gir::Handlers::Attribute;
 use Gir::Handlers::Doc;
-use Gir::Handlers::Type;
+use Gir::Handlers::Parameters;
+use Gir::Handlers::ReturnValue;
 
 ##
 ## private:
@@ -61,15 +63,26 @@ sub _doc_start ($$@)
   $self->_call_start_hooks ('doc');
 }
 
-sub _type_start ($$@)
+sub _parameters_start ($$@)
 {
   my ($self, $parser, @atts_vals) = @_;
-  my $params = Gir::Handlers::Common::Tags::get_type_params (@atts_vals);
+  my $params = Gir::Handlers::Common::Tags::get_parameters_params (@atts_vals);
   my $state = $parser->get_current_state;
-  my $object = Gir::Api::Type->new_with_params ($params);
+  my $object = Gir::Api::Parameters->new_with_params ($params);
 
   $state->push_object ($object);
-  $self->_call_start_hooks ('type');
+  $self->_call_start_hooks ('parameters');
+}
+
+sub _return_value_start ($$@)
+{
+  my ($self, $parser, @atts_vals) = @_;
+  my $params = Gir::Handlers::Common::Tags::get_return_value_params (@atts_vals);
+  my $state = $parser->get_current_state;
+  my $object = Gir::Api::ReturnValue->new_with_params ($params);
+
+  $state->push_object ($object);
+  $self->_call_start_hooks ('return-value');
 }
 
 sub _attribute_end ($$)
@@ -108,11 +121,11 @@ sub _doc_end ($$)
   $parent_object->add_g_doc ($name, $object);
 }
 
-sub _type_end ($$)
+sub _parameters_end ($$)
 {
   my ($self, $parser) = @_;
 
-  $self->_call_end_hooks ('type');
+  $self->_call_end_hooks ('parameters');
 
   my $state = $parser->get_current_state;
   my $object = $state->get_current_object;
@@ -120,10 +133,28 @@ sub _type_end ($$)
   $state->pop_object;
 
   my $parent_object = $state->get_current_object;
-  my $count = $parent_object->get_g_type_count;
+  my $count = $parent_object->get_g_parameters_count;
   my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
 
-  $parent_object->add_g_type ($name, $object);
+  $parent_object->add_g_parameters ($name, $object);
+}
+
+sub _return_value_end ($$)
+{
+  my ($self, $parser) = @_;
+
+  $self->_call_end_hooks ('return-value');
+
+  my $state = $parser->get_current_state;
+  my $object = $state->get_current_object;
+
+  $state->pop_object;
+
+  my $parent_object = $state->get_current_object;
+  my $count = $parent_object->get_g_return_value_count;
+  my $name = Gir::Handlers::Common::Misc::get_object_name ($object, $count);
+
+  $parent_object->add_g_return_value ($name, $object);
 }
 
 ##
@@ -132,24 +163,27 @@ sub _type_end ($$)
 sub new ($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Alias');
+  my $class = (ref ($type) or $type or 'Gir::Handlers::VirtualMethod');
   my $start_store = Gir::Handlers::Common::Store->new
   ({
     'attribute' => \&_attribute_start,
     'doc' => \&_doc_start,
-    'type' => \&_type_start
+    'parameters' => \&_parameters_start,
+    'return-value' => \&_return_value_start
   });
   my $end_store = Gir::Handlers::Common::Store->new
   ({
     'attribute' => \&_attribute_end,
     'doc' => \&_doc_end,
-    'type' => \&_type_end
+    'parameters' => \&_parameters_end,
+    'return-value' => \&_return_value_end
   });
   my $subhandlers =
   {
     'attribute' => 'Gir::Handlers::Attribute',
     'doc' => 'Gir::Handlers::Doc',
-    'type' => 'Gir::Handlers::Type'
+    'parameters' => 'Gir::Handlers::Parameters',
+    'return-value' => 'Gir::Handlers::ReturnValue'
   };
   my $self = $class->SUPER::new ($start_store, $end_store, $subhandlers);
 
