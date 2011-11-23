@@ -30,8 +30,16 @@
 namespace Glib
 {
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 class Cond;
 class Mutex;
+#endif //GLIBMM_DISABLE_DEPRECATED
+
+namespace Threads
+{
+  class Cond;
+  class Mutex;
+}
 
 /** @defgroup MainLoop The Main Event Loop
  * Manages all available sources of events.
@@ -353,6 +361,18 @@ public:
    */
   bool acquire();
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
+  /** Tries to become the owner of the specified context, as with acquire(). But if another thread is the owner,
+   * atomically drop mutex and wait on cond until that owner releases ownership or until cond is signaled, then try
+   * again (once) to become the owner.
+   * @param cond A condition variable.
+   * @param mutex A mutex, currently held.
+   * @return true if the operation succeeded, and this thread is now the owner of context.
+   *
+   * @deprecated Use wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex) instead.
+   */
+  bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
+#endif //GLIBMM_DISABLE_DEPRECATED
 
   /** Tries to become the owner of the specified context, as with acquire(). But if another thread is the owner,
    * atomically drop mutex and wait on cond until that owner releases ownership or until cond is signaled, then try
@@ -361,7 +381,7 @@ public:
    * @param mutex A mutex, currently held.
    * @return true if the operation succeeded, and this thread is now the owner of context.
    */
-  bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
+  bool wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex);
 
   /** Releases ownership of a context previously acquired by this thread with acquire(). If the context was acquired
    * multiple times, the only release ownership when release() is called as many times as it was acquired.

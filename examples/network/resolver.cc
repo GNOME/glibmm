@@ -212,9 +212,11 @@ start_threaded_lookups (char **argv, int argc)
     int i;
 
     for (i = 0; i < argc; i++)
-        Glib::Thread::create (sigc::bind (sigc::ptr_fun (lookup_thread),
+    {
+        Glib::Threads::Thread::create (sigc::bind (sigc::ptr_fun (lookup_thread),
                                           argv[i]),
                               false);
+    }
 }
 
 static void

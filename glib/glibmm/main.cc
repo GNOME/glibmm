@@ -18,10 +18,14 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/thread.h>
-
 #undef G_DISABLE_DEPRECATED //So we can use newly-deprecated API, to preserve our API.
 #define GLIB_DISABLE_DEPRECATION_WARNINGS 1
+
+#include <glibmm/threads.h>
+
+#ifndef GLIBMM_DISABLE_DEPRECATED
+#include <glibmm/thread.h>
+#endif //GLIBMM_DISABLE_DEPRECATED
 
 #include <glibmm/main.h>
 #include <glibmm/exceptionhandler.h>
@@ -492,7 +496,14 @@ bool MainContext::acquire()
   return g_main_context_acquire(gobj());
 }
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 bool MainContext::wait(Glib::Cond& cond, Glib::Mutex& mutex)
+{
+  return g_main_context_wait(gobj(), cond.gobj(), mutex.gobj());
+}
+#endif //GLIBMM_DISABLE_DEPRECATED
+
+bool MainContext::wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex)
 {
   return g_main_context_wait(gobj(), cond.gobj(), mutex.gobj());
 }

@@ -20,6 +20,7 @@
 #include <glibmmconfig.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/exceptionhandler.h>
+#include <glibmm/threads.h>
 #include <glib.h>
 #include <list>
 
@@ -39,7 +40,7 @@ public:
   void lock_and_unlock();
 
 private:
-  Glib::Mutex                     mutex_;
+  Glib::Threads::Mutex                     mutex_;
   std::list< sigc::slot<void> >  list_;
 
   // noncopyable
@@ -55,7 +56,7 @@ ThreadPool::SlotList::~SlotList()
 
 sigc::slot<void>* ThreadPool::SlotList::push(const sigc::slot<void>& slot)
 {
-  Mutex::Lock lock (mutex_);
+  Threads::Mutex::Lock lock (mutex_);
 
   list_.push_back(slot);
   return &list_.back();
@@ -66,7 +67,7 @@ sigc::slot<void> ThreadPool::SlotList::pop(sigc::slot<void>* slot_ptr)
   sigc::slot<void> slot;
 
   {
-    Mutex::Lock lock (mutex_);
+    Threads::Mutex::Lock lock (mutex_);
 
     std::list< sigc::slot<void> >::iterator pslot = list_.begin();
     while(pslot != list_.end() && slot_ptr != &*pslot)
@@ -105,7 +106,7 @@ static void call_thread_entry_slot(void* data, void* user_data)
 
     slot();
   }
-  catch(Glib::Thread::Exit&)
+  catch(Glib::Threads::Thread::Exit&)
   {
     // Just exit from the thread.  The Thread::Exit exception
     // is our sane C++ replacement of g_thread_exit().

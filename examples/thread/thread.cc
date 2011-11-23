@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <queue>
-#include <glibmm/thread.h>
+#include <glibmm/threads.h>
 #include <glibmm/random.h>
 #include <glibmm/timer.h>
 #include <glibmm/init.h>
@@ -19,9 +19,9 @@ public:
   void consumer();
 
 private:
-  Glib::Mutex     mutex_;
-  Glib::Cond      cond_push_;
-  Glib::Cond      cond_pop_;
+  Glib::Threads::Mutex mutex_;
+  Glib::Threads::Cond cond_push_;
+  Glib::Threads::Cond cond_pop_;
   std::queue<int> queue_;
 };
 
@@ -39,7 +39,7 @@ void MessageQueue::producer()
   for(int i = 0; i < 200; ++i)
   {
     {
-      Glib::Mutex::Lock lock (mutex_);
+      Glib::Threads::Mutex::Lock lock (mutex_);
 
       while(queue_.size() >= 64)
         cond_pop_.wait(mutex_);
@@ -65,7 +65,7 @@ void MessageQueue::consumer()
   for(;;)
   {
     {
-      Glib::Mutex::Lock lock (mutex_);
+      Glib::Threads::Mutex::Lock lock (mutex_);
 
       while(queue_.empty())
         cond_push_.wait(mutex_);
@@ -97,10 +97,10 @@ int main(int, char**)
 
   MessageQueue queue;
 
-  Glib::Thread *const producer = Glib::Thread::create(
+  Glib::Threads::Thread *const producer = Glib::Threads::Thread::create(
       sigc::mem_fun(queue, &MessageQueue::producer), true);
 
-  Glib::Thread *const consumer = Glib::Thread::create(
+  Glib::Threads::Thread *const consumer = Glib::Threads::Thread::create(
       sigc::mem_fun(queue, &MessageQueue::consumer), true);
 
   producer->join();

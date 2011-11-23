@@ -18,7 +18,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/thread.h>
+#include <glibmm/threads.h>
 #include <glibmm/dispatcher.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/fileutils.h>
@@ -137,7 +137,7 @@ protected:
   explicit DispatchNotifier(const Glib::RefPtr<MainContext>& context);
 
 private:
-  static Glib::StaticPrivate<DispatchNotifier> thread_specific_instance_;
+  static Glib::Threads::Private<DispatchNotifier> thread_specific_instance_;
 
   long                          ref_count_;
   Glib::RefPtr<MainContext>     context_;
@@ -161,8 +161,7 @@ private:
 /**** Glib::DispatchNotifier ***********************************************/
 
 // static
-Glib::StaticPrivate<DispatchNotifier>
-DispatchNotifier::thread_specific_instance_ = GLIBMM_STATIC_PRIVATE_INIT;
+Glib::Threads::Private<DispatchNotifier> DispatchNotifier::thread_specific_instance_;
 
 DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
 :

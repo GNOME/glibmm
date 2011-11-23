@@ -20,7 +20,7 @@
  */
 
 #include <glibmmconfig.h>
-#include <glibmm/thread.h>
+#include <glibmm/threads.h>
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
 #include <glib.h>
@@ -35,7 +35,7 @@ typedef sigc::signal<void> HandlerList;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.
-static Glib::StaticPrivate<HandlerList> thread_specific_handler_list = GLIBMM_STATIC_PRIVATE_INIT;
+static Glib::Threads::Private<HandlerList> thread_specific_handler_list;
 
 
 static void glibmm_exception_warning(const GError* error)

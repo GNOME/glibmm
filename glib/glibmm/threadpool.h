@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/thread.h>
+#include <sigc++/sigc++.h>
 
 extern "C" { typedef struct _GThreadPool GThreadPool; }
 

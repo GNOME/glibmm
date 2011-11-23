@@ -47,9 +47,9 @@ private:
   Glib::Dispatcher  signal_increment_;  
   Glib::Dispatcher* signal_finished_ptr_;
 
-  Glib::Mutex       startup_mutex_;
-  Glib::Cond        startup_cond_;
-  Glib::Thread*     thread_;
+  Glib::Threads::Mutex       startup_mutex_;
+  Glib::Threads::Cond        startup_cond_;
+  Glib::Threads::Thread*     thread_;
   
   static type_signal_end signal_end_;
 
@@ -93,10 +93,10 @@ void ThreadTimer::launch()
   // order to access the Dispatcher object instantiated by the 2nd thread.
   // So, let's do some kind of hand-shake using a mutex and a condition
   // variable.
-  Glib::Mutex::Lock lock (startup_mutex_);
+  Glib::Threads::Mutex::Lock lock (startup_mutex_);
 
   // Create a joinable thread -- it needs to be joined, otherwise it's a memory leak.
-  thread_ = Glib::Thread::create(
+  thread_ = Glib::Threads::Thread::create(
       sigc::mem_fun(*this, &ThreadTimer::thread_function), true);
 
   // Wait for the 2nd thread's startup notification.
@@ -167,7 +167,7 @@ void ThreadTimer::thread_function()
 
   // We need to lock while creating the Dispatcher instance,
   // in order to ensure memory visibility.
-  Glib::Mutex::Lock lock (startup_mutex_);
+  Glib::Threads::Mutex::Lock lock (startup_mutex_);
 
   // create a new dispatcher, that is connected to the newly
   // created MainContext

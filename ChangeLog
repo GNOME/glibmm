@@ -1,5 +1,33 @@
 2011-11-23  Murray Cumming  <murrayc@murrayc.com>
 
+	Add Glib::Threads::* in threads.h, deprecating everything in thread.h
+
+	* glib/src/filelist.am:
+	* glib/src/thread.[hg|ccg]: Deprecate the whole file, adding 
+	deprecation doxygen comments to all API.
+	* glib/src/threads.[hg|ccg]: A new Threads namespace containing
+	equivalents for everything in thread.h, implemented using 
+	only non-deprecated glib API. This was necessary because we had
+	to break the ABI to do this.
+	* glib/glibmm.h: Include threads.h
+
+	* glib/glibmm/main.[h|cc]: Added a wait() method overload that 
+	takes the new types, deprecating the existing wait() method.
+
+	* examples/network/resolver.cc:
+	* examples/network/socket-client.cc:
+	* examples/network/socket-server.cc:
+	* examples/thread/dispatcher.cc:
+	* examples/thread/dispatcher2.cc:
+	* examples/thread/thread.cc:
+	* examples/thread/threadpool.cc:
+	* glib/glibmm/dispatcher.cc:
+	* glib/glibmm/exceptionhandler.cc:
+	* glib/glibmm/threadpool.[h|cc]: Use the new Glib::Threads::* types
+	instead of thread.h.
+
+2011-11-23  Murray Cumming  <murrayc@murrayc.com>
+
 	Avoid a deprecation warning in implelementation of deprecated API.
 
 	* glib/glibmm/main.cc: Define GLIB_DISABLE_DEPRECATION_WARNINGS

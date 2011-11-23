@@ -21,6 +21,7 @@
 #include <glibmm/exceptionhandler.h>
 #include <glib.h>
 
+_DEPRECATE_IFDEF_START
 
 namespace
 {
@@ -59,8 +60,6 @@ static void* call_thread_entry_slot(void* data)
 namespace Glib
 {
 
-_DEPRECATE_IFDEF_START
-
 // This was always meant as an internal method. It is no longer called,
 // and no longer needs to be called. We are keeping it just to avoid 
 // breaking ABI, though hopefully nobody is using it anyway.
@@ -70,8 +69,6 @@ void thread_init_impl()
   // Make sure the exception map is initialized before creating any thread.
   Glib::Error::register_init();
 }
-
-_DEPRECATE_IFDEF_END
 
 /**** Glib::Thread *********************************************************/
 
@@ -87,7 +84,6 @@ Thread* Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
   return reinterpret_cast<Thread*>(thread);
 }
 
-_DEPRECATE_IFDEF_START
 // static
 Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
                        bool joinable, bool bound, ThreadPriority priority)
@@ -109,7 +105,6 @@ Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
 
   return reinterpret_cast<Thread*>(thread);
 }
-_DEPRECATE_IFDEF_END
 
 // static
 Thread* Thread::self()
@@ -121,8 +116,6 @@ void Thread::join()
 {
   g_thread_join(&gobject_);
 }
-
-_DEPRECATE_IFDEF_START
 
 bool Thread::joinable() const
 {
@@ -154,8 +147,6 @@ bool thread_supported()
   //MSVC++ needs the != 0 to avoid an int -> bool cast warning.
   return (g_thread_supported() != 0);
 }
-
-_DEPRECATE_IFDEF_END
 
 
 // static
@@ -387,3 +378,4 @@ bool Cond::timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time)
 
 } // namespace Glib
 
+_DEPRECATE_IFDEF_END

@@ -19,124 +19,33 @@ _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
 
-_DEPRECATE_IFDEF_START
-
-// We use GThreadFunctions in the (deprecated) API, so we must temporarily undef G_DISABLE_DEPRECATED.
-// Temporarily undef G_DISABLE_DEPRECATED, redefining it later if appropriate.
-#if defined(G_DISABLE_DEPRECATED) && !defined(GLIBMM_G_DISABLE_DEPRECATED_UNDEFED)
-
-//Stop the deprecation ifdef guards around the API declarations:
-#undef G_DISABLE_DEPRECATED
-
-//Stop the compiler warnings about using the deprecated API; 
-#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
-
-#define GLIBMM_G_DISABLE_DEPRECATED_UNDEFED 1
-
-#endif
-
 #include <glib.h>
 
-// Redefine G_DISABLE_DEPRECATED if it was defined before we temporarily undefed it:
-#if defined(GLIBMM_G_DISABLE_DEPRECATED_UNDEFED)
-#define G_DISABLE_DEPRECATED 1
-#undef GLIB_DISABLE_DEPRECATION_WARNINGS
-#undef GLIBMM_G_DISABLE_DEPRECATED_UNDEFED
-#endif
-
-
 #include <glibmm/error.h>
-#include <glibmm/timeval.h>
 #include <sigc++/sigc++.h>
 
 #include <cstddef>
 
-/* Shadow THREAD_PRIORITY_NORMAL macro (from winbase.h).
- */
-#if defined(THREAD_PRIORITY_NORMAL) && !defined(GLIBMM_MACRO_SHADOW_THREAD_PRIORITY_NORMAL)
-enum { GLIBMM_MACRO_DEFINITION_THREAD_PRIORITY_NORMAL = THREAD_PRIORITY_NORMAL };
-#undef THREAD_PRIORITY_NORMAL
-enum { THREAD_PRIORITY_NORMAL = GLIBMM_MACRO_DEFINITION_THREAD_PRIORITY_NORMAL };
-#define THREAD_PRIORITY_NORMAL THREAD_PRIORITY_NORMAL
-#define GLIBMM_MACRO_SHADOW_THREAD_PRIORITY_NORMAL 1
-#endif
-
-
-/** Initializer macro for Glib::StaticRecMutex.
- * @relates Glib::StaticRecMutex
- * @hideinitializer
- *
- * @deprecated Glib::StaticRecMutex is deprecated in favour of Glib::Threads::RecMutex, which can be used statically. 
- */
-#define GLIBMM_STATIC_REC_MUTEX_INIT { G_STATIC_REC_MUTEX_INIT }
-
-/** Initializer macro for Glib::StaticRWLock.
- * @relates Glib::StaticRWLock
- * @hideinitializer
- *
- * @deprecated Glib::StaticRWLock is deprecated in favour of Glib::Threads::RWLock, which can be used statically. 
- */
-#define GLIBMM_STATIC_RW_LOCK_INIT { G_STATIC_RW_LOCK_INIT }
-
-/** Initializer macro for Glib::StaticPrivate.
- * @relates Glib::StaticPrivate
- * @hideinitializer
- *
- * @deprecated Glib::StaticPrivate is deprecated in favour of Glib::Threads::Private, which can be used statically. 
- */
-#define GLIBMM_STATIC_PRIVATE_INIT { G_STATIC_PRIVATE_INIT }
-
 namespace Glib
 {
 
-/** @deprecated Thread priorities no longer have any effect.
- */
-_WRAP_ENUM(ThreadPriority, GThreadPriority, NO_GTYPE)
+namespace Threads
+{
 
-/*! @var ThreadPriority THREAD_PRIORITY_LOW
- * A priority lower than normal.
- */
-/*! @var ThreadPriority THREAD_PRIORITY_NORMAL
- * The default priority.
- */
-/*! @var ThreadPriority THREAD_PRIORITY_HIGH
- * A priority higher than normal.
- */
-/*! @var ThreadPriority THREAD_PRIORITY_URGENT
- * The highest priority.
+/** @defgroup Threads Threads
+ * Thread abstraction; including threads, different mutexes,
+ * conditions and thread private data.
+ * @{
  */
 
-/** Initializes the GLib thread system.
- * @deprecated Calling thread_init() is no longer necessary and no longer has any effect.
- */
-void thread_init(GThreadFunctions* vtable = 0);
-
-/** Returns whether the thread system is initialized.
- * @return @c true, if the thread system is initialized.
- * @deprecated This is no longer useful, because the thread system is always initialized.
- */
-bool thread_supported();
-
-/**
- * @deprecated Use Glib::Threads::NotLock instead.
- */
 enum NotLock { NOT_LOCK };
-
-/**
- * @deprecated Use Glib::Threads::TryLock instead.
- */
 enum TryLock { TRY_LOCK };
 
 class Mutex;
 class RecMutex;
 class RWLock;
 
-struct StaticRecMutex;
-struct StaticRWLock;
-
-
 /** Exception class for thread-related errors.
- * @deprecated Use Glib::Threads::ThreadError instead.
  */
 _WRAP_GERROR(ThreadError, GThreadError, G_THREAD_ERROR, NO_GTYPE)
 
@@ -157,8 +66,6 @@ _WRAP_GERROR(ThreadError, GThreadError, G_THREAD_ERROR, NO_GTYPE)
  * @note You might have noticed that the thread entry slot doesn't have the
  * usual void* return value.  If you want to return any data from your thread
  * you can pass an additional output argument to the thread's entry slot.
- *
- * @deprecated Use Glib::Threads::Thread instead.
  */
 class Thread
 {
@@ -199,81 +106,6 @@ public:
    */
   void join();
 
-  //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
-  /** Creates a new thread with the priority @a priority. The stack gets the
-   * size @a stack_size or the default value for the current platform, if
-   * @a stack_size is <tt>0</tt>.
-   *
-   * If @a joinable is @c true, you can wait for this thread's termination by
-   * calling join().  Otherwise the thread will just disappear, when ready.
-   * If @a bound is @c true, this thread will be scheduled in the system scope,
-   * otherwise the implementation is free to do scheduling in the process
-   * scope.  The first variant is more expensive resource-wise, but generally
-   * faster.  On some systems (e.g. Linux) all threads are bound.
-   *
-   * The new thread executes the function or method @a slot points to.  You can
-   * pass additional arguments using sigc::bind().  If the thread was created
-   * successfully, it is returned.
-   *
-   * Because sigc::trackable is not thread safe, if the slot represents a
-   * non-static class method (that is, it is created by sigc::mem_fun()), the
-   * class concerned should not derive from sigc::trackable.
-   *
-   * @note It is not guaranteed, that threads with different priorities really
-   * behave accordingly.  On some systems (e.g. Linux) only root can increase
-   * priorities.  On other systems (e.g. Solaris) there doesn't seem to be
-   * different scheduling for different priorities.  All in all try to avoid
-   * being dependent on priorities.  Use <tt>Glib::THREAD_PRIORITY_NORMAL</tt>
-   * here as a default.
-   *
-   * @note Only use the extended
-   * create(const sigc::slot<void>&, unsigned long, bool, bool, ThreadPriority)
-   * function, when you really can't use the simple
-   * create(const sigc::slot<void>&, bool)
-   * instead.  The latter overload does not take @a stack_size, @a bound and
-   * @a priority as arguments, as they should only be used for cases, where
-   * it is inevitable.
-   *
-   * @param slot A slot to execute in the new thread.
-   * @param stack_size A stack size for the new thread, or <tt>0</tt>.
-   * @param joinable Should this thread be joinable?
-   * @param bound Should this thread be bound to a system thread?
-   * @param priority A priority for the thread.
-   * @return The new Thread* on success.
-   * @throw Glib::ThreadError
-   *
-   * @deprecated Use the simpler create() method instead, because all Threads 
-   * are now joinable, and bounds and priority parameters now have effect.
-   */
-  static Thread* create(const sigc::slot<void>& slot, unsigned long stack_size,
-                        bool joinable, bool bound, ThreadPriority priority);
-
-  /** Returns whether the thread is joinable.
-   * @return Whether the thread is joinable.
-   *
-   * @deprecated All threads are now joinable.
-   */
-  bool joinable() const;
-  
-  /** Changes the priority of the thread to @a priority.
-   * @note It is not guaranteed, that threads with different priorities really
-   * behave accordingly.  On some systems (e.g. Linux) only @c root can
-   * increase priorities.  On other systems (e.g. Solaris) there doesn't seem
-   * to be different scheduling for different priorities.  All in all try to
-   * avoid being dependent on priorities.
-   * @param priority A new priority for the thread.
-   *
-   * @deprecated Thread priorities no longer have any effect.
-   */
-  void set_priority(ThreadPriority priority);
-
-  /** Returns the priority of the thread.
-   * @return The thread's priority.
-   *
-   * @deprecated Thread priorities no longer have any effect.
-   */
-  ThreadPriority get_priority() const;
-
   /** Gives way to other threads waiting to be scheduled.
    * This function is often used as a method to make busy wait less evil.  But
    * in most cases, you will encounter, there are better methods to do that.
@@ -303,59 +135,12 @@ private:
  * Write this if you want to exit from a thread created by Thread::create().
  * Of course you must make sure not to catch Thread::Exit by accident, i.e.
  * when using <tt>catch(...)</tt> somewhere in your code.
- *
- * @deprecated Use Glib::Threads::Thread::Exit instead.
  */
 class Thread::Exit
 {};
 
-
-//TODO: Make sure that Glib::wrap() uses Glib::Threads::wrap() instead.
-
-/** @relates Glib::Thread
- *
- * @deprecated Use Glib::Threads::wrap(GThread*) instead.
- */
+/** @relates Glib::Thread */
 Thread* wrap(GThread* gobject);
-
-struct StaticMutex;
-
-/** Like Glib::Mutex, but can be defined at compile time.
- * Use @c GLIBMM_STATIC_MUTEX_INIT to initialize a StaticMutex:
- * @code
- * Glib::StaticMutex mutex = GLIBMM_STATIC_MUTEX_INIT;
- * @endcode
- *
- * A StaticMutex can be used without calling Glib::thread_init(), it will
- * silently do nothing then.  That will also work when using the implicit
- * conversion to Mutex&, thus you can safely use Mutex::Lock with a
- * StaticMutex.
- *
- * @deprecated Use Glib::Threads::Mutex instead, which can be used statically. 
- */
-struct StaticMutex
-{
-  void lock();
-  bool trylock();
-  void unlock();
-
-  operator Mutex&();
-
-  GStaticMutex* gobj() { return &gobject_; }
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Must be public to allow initialization at compile time.
-  GStaticMutex gobject_;
-#endif
-};
-
-/** Initializer macro for Glib::StaticMutex.
- * @relates Glib::StaticMutex
- * @hideinitializer
- *
- * @deprecated  Glib::StaticMutex is deprecated in favour of Glib::Threads::Mutex, which can be used statically. 
- */
-#define GLIBMM_STATIC_MUTEX_INIT { G_STATIC_MUTEX_INIT }
 
 /** Represents a mutex (mutual exclusion).
  * It can be used to protect data against shared access.  Try to use
@@ -365,8 +150,6 @@ struct StaticMutex
  * @note Glib::Mutex is not recursive, i.e. a thread will deadlock, if it
  * already has locked the mutex while calling lock().  Use Glib::RecMutex
  * instead, if you need recursive mutexes.
- *
- * @deprecated Use Glib::Threads::Mutex instead.
  */
 class Mutex
 {
@@ -398,10 +181,10 @@ public:
    */
   void unlock();
 
-  GMutex* gobj() { return gobject_; }
+  GMutex* gobj() { return &gobject_; }
 
 private:
-  GMutex* gobject_;
+  GMutex gobject_;
 
   // noncopyable
   Mutex(const Mutex&);
@@ -420,8 +203,6 @@ private:
  * only exception safe but also much less error-prone.  You could even
  * <tt>return</tt> while still holding the lock and it will be released
  * properly.
- *
- * @deprecated Use Glib::Threads::Mutex::Lock instead.
  */
 class Mutex::Lock
 {
@@ -445,43 +226,8 @@ private:
   Mutex::Lock& operator=(const Mutex::Lock&);
 };
 
-
-/** Like Glib::RecMutex, but can be defined at compile time.
- * Use @c GLIBMM_STATIC_REC_MUTEX_INIT to initialize a StaticRecMutex:
- * @code
- * Glib::StaticRecMutex mutex = GLIBMM_STATIC_REC_MUTEX_INIT;
- * @endcode
- * A StaticRecMutex can be used without calling Glib::thread_init(), it will
- * silently do nothing then.  That will also work when using the implicit
- * conversion to RecMutex&, thus you can safely use RecMutex::Lock with a
- * StaticRecMutex.
- *
- * @deprecated Use Glib::Threads::RecMutex instead, which can be used statically.
- */
-struct StaticRecMutex
-{
-  void lock();
-  bool trylock();
-  void unlock();
-
-  void lock_full(unsigned int depth);
-  unsigned int unlock_full();
-
-  operator RecMutex&();
-
-  GStaticRecMutex* gobj() { return &gobject_; }
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Must be public to allow initialization at compile time.
-  GStaticRecMutex gobject_;
-#endif
-};
-
-/**
- *
- * @deprecated Use Glib::Threads::RecMutex instead.
- */
-class RecMutex : public StaticRecMutex
+//TODO: Docuemenation
+class RecMutex
 {
 public:
   class Lock;
@@ -489,15 +235,24 @@ public:
   RecMutex();
   ~RecMutex();
 
+  void lock();
+  bool trylock();
+  void unlock();
+
+  GRecMutex* gobj() { return &gobject_; }
+
 private:
   // noncopyable
   RecMutex(const RecMutex&);
   RecMutex& operator=(const RecMutex&);
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  // Must be public to allow initialization at compile time.
+  GRecMutex gobject_;
+#endif
 };
 
 /** Utility class for exception-safe locking of recursive mutexes.
- *
- * @deprecated Use Glib::Threads::RecMutex instead.
  */
 class RecMutex::Lock
 {
@@ -522,43 +277,8 @@ private:
 };
 
 
-/** Like Glib::RWLock, but can be defined at compile time.
- * Use @c GLIBMM_STATIC_RW_LOCK_INIT to initialize a StaticRWLock:
- * @code
- * Glib::StaticRWLock rw_lock = GLIBMM_STATIC_RW_LOCK_INIT;
- * @endcode
- * A StaticRWLock can be used without calling Glib::thread_init(), it will
- * silently do nothing then.  That will also work when using the implicit
- * conversion to RWLock&, thus you can safely use RWLock::ReaderLock and
- * RWLock::WriterLock with a StaticRWLock.
- *
- * @deprecated Use Glib::Threads::RWLock instead, which can be used statically.
- */
-struct StaticRWLock
-{
-  void reader_lock();
-  bool reader_trylock();
-  void reader_unlock();
-
-  void writer_lock();
-  bool writer_trylock();
-  void writer_unlock();
-
-  operator RWLock&();
-
-  GStaticRWLock* gobj() { return &gobject_; }
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Must be public to allow initialization at compile time.
-  GStaticRWLock gobject_;
-#endif
-};
-
-/**
- *
- * @deprecated Use Glib::Threads::RWLock instead.
- */
-class RWLock : public StaticRWLock
+//TODO: Documentation
+class RWLock
 {
 public:
   class ReaderLock;
@@ -567,15 +287,28 @@ public:
   RWLock();
   ~RWLock();
 
+  void reader_lock();
+  bool reader_trylock();
+  void reader_unlock();
+
+  void writer_lock();
+  bool writer_trylock();
+  void writer_unlock();
+
+  GRWLock* gobj() { return &gobject_; }
+
 private:
   // noncopyable
   RWLock(const RWLock&);
   RWLock& operator=(const RWLock&);
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  // Must be public to allow initialization at compile time.
+  GRWLock gobject_;
+#endif
 };
 
 /** Utility class for exception-safe locking of read/write locks.
- *
- * @deprecated Use Glib::Threads::RWLock::ReaderLock instead.
  */
 class RWLock::ReaderLock
 {
@@ -600,8 +333,6 @@ private:
 };
 
 /** Utility class for exception-safe locking of read/write locks.
- *
- * @deprecated Use Glib::Threads::RWLock::WriterLock instead.
  */
 class RWLock::WriterLock
 {
@@ -656,9 +387,7 @@ private:
  *   return data;
  * }
  * @endcode
- *
- * @deprecated Use Glib::Threads::Cond instead.
- */
+*/
 class Cond
 {
 public:
@@ -683,7 +412,7 @@ public:
    *
    * @param mutex a @a Mutex that is currently locked.
    * 
-   * @note It is important to use the @a wait() and @a timed_wait() methods
+   * @note It is important to use the @a wait() and @a wait_until() methods
    * only inside a loop, which checks for the condition to be true as it is not 
    * guaranteed that the waiting thread will find it fulfilled, even if the signaling 
    * thread left the condition in that state. This is because another thread can have 
@@ -698,42 +427,23 @@ public:
    * @param mutex a @a Mutex that is currently locked.
    * @param abs_time a max time to wait.
    * 
-   * @note It is important to use the @a wait() and @a timed_wait() methods
+   * @note It is important to use the @a wait() and @a wait_until() methods
    * only inside a loop, which checks for the condition to be true as it is not 
    * guaranteed that the waiting thread will find it fulfilled, even if the signaling 
    * thread left the condition in that state. This is because another thread can have 
    * altered the condition, before the waiting thread got the chance to be woken up, 
    * even if the condition itself is protected by a @a Mutex.
    */
-  bool timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time);
+  bool wait_until(Mutex& mutex, gint64 end_time);
 
-  GCond* gobj() { return gobject_; }
+  GCond* gobj() { return &gobject_; }
 
 private:
-  GCond* gobject_;
+  GCond gobject_;
 
   // noncopyable
   Cond(const Cond&);
   Cond& operator=(const Cond&);
-};
-
-
-template <class T>
-struct StaticPrivate
-{
-  typedef void (*DestroyNotifyFunc) (void*);
-
-  static void delete_ptr(void* data);
-
-  inline T* get();
-  inline void set(T* data, DestroyNotifyFunc notify_func = &StaticPrivate<T>::delete_ptr);
-
-  GStaticPrivate* gobj() { return &gobject_; }
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Must be public to allow initialization at compile time.
-  GStaticPrivate gobject_;
-#endif
 };
 
 template <class T>
@@ -751,7 +461,7 @@ public:
   GPrivate* gobj() { return gobject_; }
 
 private:
-  GPrivate* gobject_;
+  GPrivate gobject_;
 
   // noncopyable
   Private(const Private<T>&);
@@ -771,10 +481,6 @@ private:
 /*  inline implementation                                                  */
 /***************************************************************************/
 
-// internal
-/** @deprecated This was always for internal glibmm use and is now unecessary even inside glibmm.
- */
-void thread_init_impl();
 
 /**** Glib::Mutex::Lock ****************************************************/
 
@@ -1015,29 +721,6 @@ bool RWLock::WriterLock::locked() const
   return locked_;
 }
 
-
-/**** Glib::StaticPrivate **************************************************/
-
-// static
-template <class T>
-void StaticPrivate<T>::delete_ptr(void* data)
-{
-  delete static_cast<T*>(data);
-}
-
-template <class T> inline
-T* StaticPrivate<T>::get()
-{
-  return static_cast<T*>(g_static_private_get(&gobject_));
-}
-
-template <class T> inline
-void StaticPrivate<T>::set(T* data, typename StaticPrivate<T>::DestroyNotifyFunc notify_func)
-{
-  g_static_private_set(&gobject_, data, notify_func);
-}
-
-
 /**** Glib::Private ********************************************************/
 
 // static
@@ -1049,20 +732,25 @@ void Private<T>::delete_ptr(void* data)
 
 template <class T> inline
 Private<T>::Private(typename Private<T>::DestructorFunc destructor_func)
-:
-  gobject_ (g_private_new(destructor_func))
-{}
+{
+  //TODO: This causes this warning:
+  //extended initializer lists only available with -std=c++0x or -std=gnu++0x
+  //See glib bug: https://bugzilla.gnome.org/show_bug.cgi?id=664618
+  //We can work around this by building like so:
+  //./configure --prefix=/opt/gnome30 'CXXFLAGS=-std=c++0x'
+  gobject_ = G_PRIVATE_INIT(destructor_func);
+}
 
 template <class T> inline
 T* Private<T>::get()
 {
-  return static_cast<T*>(g_private_get(gobject_));
+  return static_cast<T*>(g_private_get(&gobject_));
 }
 
 template <class T> inline
 void Private<T>::set(T* data)
 {
-  g_private_set(gobject_, data);
+  g_private_set(&gobject_, data);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
@@ -1070,6 +758,6 @@ void Private<T>::set(T* data)
 // For some reason gmmproc thinks that g_iconv should be wrapped here.
 _IGNORE(g_iconv)
 
-} // namespace Glib
+} //namespace Threads
 
-_DEPRECATE_IFDEF_END
+} // namespace Glib

@@ -45,7 +45,7 @@ private:
   // Note that the thread does not write to the member data at all.  It only
   // reads signal_increment_, which is only written to before the thread is
   // lauched.  Therefore, no locking is required.
-  Glib::Thread*       thread_;
+  Glib::Threads::Thread*       thread_;
   int                 id_;
   unsigned int        progress_;
   Glib::Dispatcher    signal_increment_;
@@ -102,7 +102,7 @@ int ThreadProgress::id() const
 void ThreadProgress::launch()
 {
   // Create a joinable thread.
-  thread_ = Glib::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function), true);
+  thread_ = Glib::Threads::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function), true);
 }
 
 void ThreadProgress::join()

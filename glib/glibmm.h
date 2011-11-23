@@ -86,6 +86,8 @@
 //so we can do an undef trick to still use deprecated API in the header: 
 #include <glibmm/thread.h>
 
+#include <glibmm/threads.h>
+
 #include <glibmm/arrayhandle.h>
 #include <glibmm/balancedtree.h>
 #include <glibmm/checksum.h>
