@@ -21,6 +21,7 @@
 #include <glibmm/thread.h>
 
 #undef G_DISABLE_DEPRECATED //So we can use newly-deprecated API, to preserve our API.
+#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
 
 #include <glibmm/main.h>
 #include <glibmm/exceptionhandler.h>
