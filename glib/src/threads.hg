@@ -733,12 +733,12 @@ void Private<T>::delete_ptr(void* data)
 template <class T> inline
 Private<T>::Private(typename Private<T>::DestructorFunc destructor_func)
 {
-  //TODO: This causes this warning:
-  //extended initializer lists only available with -std=c++0x or -std=gnu++0x
-  //See glib bug: https://bugzilla.gnome.org/show_bug.cgi?id=664618
-  //We can work around this by building like so:
-  //./configure --prefix=/opt/gnome30 'CXXFLAGS=-std=c++0x'
-  gobject_ = G_PRIVATE_INIT(destructor_func);
+  // gobject_ = G_PRIVATE_INIT(destructor_func);
+  // does not compile with --enable-warnings=fatal.
+  // GPrivate is a struct, and G_PRIVATE_INIT is an initializer of type { ... }.
+  // G_PRIVATE_INIT can be used only in initializations.
+  const GPrivate temp = G_PRIVATE_INIT(destructor_func);
+  gobject_ = temp;
 }
 
 template <class T> inline
