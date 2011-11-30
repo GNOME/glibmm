@@ -152,11 +152,11 @@ sub get_object_name ($$)
   my ($object, $index) = @_;
   my @name_atts =
   (
-    'c:type',
-    'c:identifier',
-    'glib:type-name',
-    'name',
-    'glib:name'
+    'attribute_c_type',
+    'attribute_c_identifier',
+    'attribute_glib_type-name',
+    'attribute_name',
+    'attribute_glib_name'
   );
 
   foreach my $name (@name_atts)
@@ -169,7 +169,7 @@ sub get_object_name ($$)
     }
   }
 
-  return ref ($object) . $index;
+  return ref ($object) . '#' . $index;
 }
 
 1; # indicate proper module load.
