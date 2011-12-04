@@ -375,6 +375,18 @@ bool Cond::timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time)
   return g_cond_timed_wait(gobject_, mutex.gobj(), const_cast<Glib::TimeVal*>(&abs_time));
 }
 
+void* StaticPrivate_get_helper(GStaticPrivate *private_key) {
+  return g_static_private_get(private_key);
+}
+
+void StaticPrivate_set_helper(GStaticPrivate *private_key, gpointer data, GDestroyNotify notify) {
+  return g_static_private_set(private_key, data, notify);
+}
+
+GPrivate* GPrivate_new_helper(GDestroyNotify notify) {
+  return g_private_new(notify);
+}
+
 
 } // namespace Glib
 

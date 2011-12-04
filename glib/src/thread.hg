@@ -1025,16 +1025,24 @@ void StaticPrivate<T>::delete_ptr(void* data)
   delete static_cast<T*>(data);
 }
 
+/** This is ony for use by glibmm itself.
+ */
+void* StaticPrivate_get_helper(GStaticPrivate *private_key);
+
 template <class T> inline
 T* StaticPrivate<T>::get()
 {
-  return static_cast<T*>(g_static_private_get(&gobject_));
+  return static_cast<T*>(StaticPrivate_get_helper(&gobject_));
 }
+
+/** This is ony for use by glibmm itself.
+ */
+void StaticPrivate_set_helper(GStaticPrivate *private_key, gpointer data, GDestroyNotify notify);
 
 template <class T> inline
 void StaticPrivate<T>::set(T* data, typename StaticPrivate<T>::DestroyNotifyFunc notify_func)
 {
-  g_static_private_set(&gobject_, data, notify_func);
+  StaticPrivate_set_helper(&gobject_, data, notify_func);
 }
 
 
@@ -1047,10 +1055,14 @@ void Private<T>::delete_ptr(void* data)
   delete static_cast<T*>(data);
 }
 
+/** This is ony for use by glibmm itself.
+ */
+GPrivate* GPrivate_new_helper(GDestroyNotify notify);
+
 template <class T> inline
 Private<T>::Private(typename Private<T>::DestructorFunc destructor_func)
 :
-  gobject_ (g_private_new(destructor_func))
+  gobject_ (GPrivate_new_helper(destructor_func))
 {}
 
 template <class T> inline
