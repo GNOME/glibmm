@@ -1,3 +1,29 @@
+2012-02-03  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: Add documentation to wrapped signals.
+
+	* tools/m4/signal.m4: Add docs to the on_*() default handlers
+	referring the users to the signal_*() docs.
+	* tools/pm/DocsParser.pm (parse_on_start):
+	(parse_on_end): Allow the <signal></signal> tags from the generated
+	XML docs to be processed in a similar way as the <function></function>
+	tags are processed.  The docs of the signals are stored as
+	"Class::a_signal_name" in the hash.
+	(append_parameter_docs): Skip the first parameter for signals also
+	because the first parameter of signals is the object for which the
+	signal is triggered.
+	(lookup_documentation): Generalize the no docs warning to include
+	signals also.
+	* tools/pm/Function.pm (get_refdoc_comment): Modify the subroutine to
+	accept the docs of the signal (that the DocsParser stores) and include
+	the prototype of the slot in the docs.
+	* tools/pm/Output.pm (output_wrap_sig_decl): Modify the subroutine to
+	look up the documentation of the signal which it then passes to
+	get_refdoc_comment() so that the documentation of the signal from the
+	generated XML is included in the declaration of the signal.
+
+	Bug #668918 (Mark)
+
 2.31.16:
 
 2012-01-30  TS  <t.sailer@alumni.ethz.ch>

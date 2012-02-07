@@ -51,7 +51,7 @@ sub string_unquote($)
 
     $str =~ s/^['`"]// ;
     $str =~ s/['`"]$// ;
- 
+
     return $str;
 }
 

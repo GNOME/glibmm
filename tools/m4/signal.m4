@@ -230,6 +230,7 @@ define(`_SIGNAL_H',`dnl
 _PUSH(SECTION_H_DEFAULT_SIGNAL_HANDLERS)
 ifelse(`$4',,,`#ifdef $4'
 )dnl
+  /// This is a default handler for the signal signal_$1`'().
   virtual $2 on_$1`'($3);
 ifelse(`$4',,,`#endif // $4
 ')dnl

@@ -20,6 +20,8 @@ package Output;
 use strict;
 use open IO => ":utf8";
 
+use DocsParser;
+
 BEGIN { @Namespace::ISA=qw(main); }
 
 # $objOutputter new()
@@ -481,7 +483,18 @@ sub output_wrap_sig_decl($$$$$$$$)
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
 #               refdoc_comment)
 
-  my $doxycomment = $objCppfunc->get_refdoc_comment();
+  # Get the signal name with underscores only (to look up docs -- they are
+  # stored that way).
+  my $underscored_signal_name = $signal_name;
+  $underscored_signal_name =~ s/-/_/g;
+
+  # Get the existing signal documentation from the parsed docs.
+  my $documentation =
+    DocsParser::lookup_documentation("$$objCSignal{class}::$underscored_signal_name", "");
+
+  # Create a merged Doxygen comment block for the signal from the looked up
+  # docs (the block will also contain a prototype of the slot as an example).
+  my $doxycomment = $objCppfunc->get_refdoc_comment($documentation);
 
   # If there was already a previous doxygen comment, we want to merge this
   # one with the previous so it is one big comment. If it were two separate

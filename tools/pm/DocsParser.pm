@@ -112,7 +112,7 @@ sub parse_on_start($$%)
 
   $tag = lc($tag);
 
-  if($tag eq "function")
+  if($tag eq "function" or $tag eq "signal")
   {
     if(defined $DocsParser::objCurrentFunction)
     {
@@ -120,6 +120,9 @@ sub parse_on_start($$%)
     }
 
     my $functionName = $attr{name};
+
+    # Change signal name from Class::a-signal-name to Class::a_signal_name.
+    $functionName =~ s/-/_/g if($tag eq "signal");
 
     #Reuse existing Function, if it exists:
     #(For instance, if this is the override parse)
@@ -191,7 +194,7 @@ sub parse_on_end($$)
 
   $tag = lc($tag);
 
-  if($tag eq "function")
+  if($tag eq "function" or $tag eq "signal")
   {
     # Store the Function structure in the array:
     my $functionName = $$DocsParser::objCurrentFunction{name};
@@ -246,7 +249,7 @@ sub lookup_documentation($$)
 
   if(length($text) eq 0)
   {
-    print "DocsParser.pm: Warning: No C docs for function: \"$functionName\"\n";
+    print "DocsParser.pm: Warning: No C docs for: \"$functionName\"\n";
   }
 
   DocsParser::convert_docs_to_cpp($objFunction, \$text);
@@ -266,10 +269,10 @@ sub lookup_documentation($$)
 
   # Remove C example code.
   my $example_removals =
-    ($text =~ s"<informalexample>.*?</informalexample>""sg);
+    ($text =~ s"<informalexample>.*?</informalexample>"\[C example ellipted]"sg);
   $example_removals +=
-    ($text =~ s"<programlisting>.*?</programlisting>""sg);
-  $example_removals += ($text =~ s"\|\[.*?]\|""sg);
+    ($text =~ s"<programlisting>.*?</programlisting>"\n[C example ellipted]"sg);
+  $example_removals += ($text =~ s"\|\[.*?]\|"\n[C example ellipted]"sg);
 
   print STDERR "gmmproc: $functionName(): Example code discarded.\n"
     if ($example_removals);
@@ -310,6 +313,9 @@ sub append_parameter_docs($$)
   # this function is mapped into this Gtk::class
   shift(@param_names) if(($defs_method && $$defs_method{class} ne "") ||
                          ($$obj_function{mapped_class} ne ""));
+
+  # Also skip first param if this is a signal.
+  shift(@param_names) if ($$obj_function{name} =~ /\w+::/);
 
   foreach my $param (@param_names)
   {

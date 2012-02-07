@@ -1414,7 +1414,7 @@ sub byattrib()
      "sig_decl"     ,4, 
      "meth"         ,5
   );
- 
+
   # $a and $b are hidden parameters to a sorting function
   return $attrib_value{$b} <=> $attrib_value{$a}; 
 }

@@ -376,15 +376,16 @@ sub add_parameter($$$)
   return $self;
 }
 
-# $string get_refdoc_comment()
-# Generate a readable prototype for signals.
-sub get_refdoc_comment($)
+# $string get_refdoc_comment($existing_signal_docs)
+# Generate a readable prototype for signals and merge the prototype into the
+# existing Doxygen comment block.
+sub get_refdoc_comment($$)
 {
-  my ($self) = @_;
+  my ($self, $documentation) = @_;
 
   my $str = "  /**\n";
 
-  $str .= "   * \@par Prototype:\n";
+  $str .= "   * \@par Slot Prototype:\n";
   $str .= "   * <tt>$$self{rettype} on_my_\%$$self{name}(";
 
   my $param_names = $$self{param_names};
@@ -399,8 +400,21 @@ sub get_refdoc_comment($)
   }
 
   $str .= ")</tt>\n";
-  $str .= "   */";
+  $str .= "   *\n";
 
+  if($documentation ne "")
+  {
+    # Remove the initial '/** ' from the existing docs and merge it.
+    $documentation =~ s/\/\*\*\s+/ \* /;
+    $str .= $documentation;
+  }
+  else
+  {
+    # Close the doc block if there's no existing docs.
+    $str .= "   */\n";
+  }
+
+  # Return the merged documentation.
   return $str;
 }
 
