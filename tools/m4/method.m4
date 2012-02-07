@@ -23,7 +23,7 @@ ifelse(`$11',,dnl
 `ifelse(`$8'`$9',,dnl If it is not errthrow or refreturn
 `ifelse(`$14',,dnl If no output parameter is specified
 `ifelse(`$3',void,dnl If it returns voids:
-`$2(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6);' dnl It it returns non-void:
+`  $2(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6);' dnl It it returns non-void:
 ,`  return _CONVERT($4,`$3',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');'dnl
 )'dnl End if it returns voids.
 dnl An output parameter is specified:
