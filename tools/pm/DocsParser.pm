@@ -400,7 +400,7 @@ sub convert_tags_to_doxygen($)
     s"</?para>""g;
 
     # Convert <itemizedlist> tags to Doxygen format.
-    s"</?itemizedlist>\n""g;
+    s"</?itemizedlist>\n?""g;
     s"<listitem>(.*?)</listitem>"- $1"sg;
 
     # Use our Doxygen @newin alias:
