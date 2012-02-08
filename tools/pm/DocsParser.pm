@@ -269,7 +269,7 @@ sub lookup_documentation($$)
 
   # Remove C example code.
   my $example_removals =
-    ($text =~ s"<informalexample>.*?</informalexample>"\[C example ellipted]"sg);
+    ($text =~ s"<informalexample>.*?</informalexample>"[C example ellipted]"sg);
   $example_removals +=
     ($text =~ s"<programlisting>.*?</programlisting>"\n[C example ellipted]"sg);
   $example_removals += ($text =~ s"\|\[.*?]\|"\n[C example ellipted]"sg);
@@ -398,6 +398,10 @@ sub convert_tags_to_doxygen($)
 
     # Remove all para tags (from tmpl sgml files).
     s"</?para>""g;
+
+    # Convert <itemizedlist> tags to Doxygen format.
+    s"</?itemizedlist>\n""g;
+    s"<listitem>(.*?)</listitem>"- $1"sg;
 
     # Use our Doxygen @newin alias:
     s/\bSince:\s*(\d+)\.(\d+)\b/\@newin{$1,$2}/g;
