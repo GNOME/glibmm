@@ -433,6 +433,26 @@ sub substitute_identifiers($$)
   {
     # TODO: handle more than one namespace
 
+    # Convert property names to C++.
+    # The standard (and correct) gtk-doc way of referring to properties.
+    s/(#[A-Z]\w+):([a-z\d-]+)/my $name = "$1::property_$2()"; $name =~ s"-"_"g; "$name";/ge;
+    # This is an incorrect format but widely used so correctly treat as a
+    # property.
+    s/(\s)::([a-z\d-]+)(\s+property)/my $name = "$1property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
+    # This one catches properties written in the gtk-doc block as for example
+    # '#GtkActivatable::related-action property'.  The correct way to write it
+    # would be 'GtkActivatable:related-action' (with a single colon and not
+    # two because the double colons are specifically for signals -- see the
+    # gtk-doc docs:
+    # http://developer.gnome.org/gtk-doc-manual/unstable/documenting_symbols.html.en)
+    # but a few are written with the double colon in the gtk+ docs so this
+    # protects against those errors.
+    s/([A-Z]\w+)::([a-z\d-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
+
+    # Convert signal names to C++.
+    s/(^|\s)::([a-z\d-]+)([^:\w]|$)/my $name = "$1signal_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
+    s/(#[A-Z]\w+)::([a-z\d-]+)([^:\w]|$)/my $name = "$1::signal_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
+
     s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/$1::$2/g; # type names
 
     s/[#%]([A-Z])([A-Z]*)_([A-Z\d_]+)\b/$1\L$2\E::$3/g; # enum values
