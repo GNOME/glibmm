@@ -450,8 +450,8 @@ sub substitute_identifiers($$)
     s/([A-Z]\w+)::([a-z\d-]+)(\s+property)/my $name = "$1::property_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
 
     # Convert signal names to C++.
-    s/(^|\s)::([a-z\d-]+)([^:\w]|$)/my $name = "$1signal_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
-    s/(#[A-Z]\w+)::([a-z\d-]+)([^:\w]|$)/my $name = "$1::signal_$2()$3"; $name =~ s"-"_"g; "$name";/ge;
+    s/(^|\s)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
+    s/(#[A-Z]\w+)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1::signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
 
     s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/$1::$2/g; # type names
 
