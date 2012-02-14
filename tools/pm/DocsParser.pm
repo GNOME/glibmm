@@ -401,7 +401,7 @@ sub convert_tags_to_doxygen($)
 
     # Convert <itemizedlist> tags to Doxygen format.
     s"</?itemizedlist>\n?""g;
-    s"<listitem>(.*?)</listitem>"- $1"sg;
+    s"<listitem>(.*?)(\n?)</listitem>(\n?)"- $1\n"sg;
 
     # Use our Doxygen @newin alias:
     s/\bSince:\s*(\d+)\.(\d+)\b/\@newin{$1,$2}/g;
