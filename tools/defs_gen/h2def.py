@@ -303,6 +303,11 @@ def clean_func(buf):
     #strip G_GNUC_WARN_UNUSED_RESULT and G_INLINE_FUNC
     pat = re.compile(r"""G_GNUC_WARN_UNUSED_RESULT|G_INLINE_FUNC""", re.MULTILINE)
     buf = pat.sub('', buf)
+
+    #strip GLIB_DEPRECATED
+    pat = re.compile(r"""GLIB_DEPRECATED""", re.MULTILINE)
+    buf = pat.sub('', buf)
+
     #we are not stripping G_GNUC_INTERNAL
 
     #extern "C"
