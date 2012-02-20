@@ -24,6 +24,34 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
+/** ApplicationCommandLine - A command-line invocation of an application.
+ * ApplicationCommandLine represents a command-line invocation of an
+ * application. It is created by Application and emitted in the "command-line"
+ * signal and virtual function.
+ *
+ * The class contains the list of arguments that the program was invoked with.
+ * It is also possible to query if the commandline invocation was local (ie:
+ * the current process is running in direct response to the invocation) or
+ * remote (ie: some other process forwarded the commandline to this process).
+ *
+ * The ApplicationCommandLine object can provide the argc and argv parameters
+ * for use with the Glib::OptionContext command-line parsing API, with the
+ * get_arguments() method.
+ *
+ * The exit status of the originally-invoked process may be set and messages
+ * can be printed to stdout or stderr of that process. The lifecycle of the
+ * originally-invoked process is tied to the lifecycle of this object (ie: the
+ * process exits when the last reference is dropped).
+ *
+ * The main use for ApplicationCommandline (and the "command-line" signal) is
+ * 'Emacs server' like use cases: You can set the EDITOR environment variable
+ * to have e.g. git use your favourite editor to edit commit messages, and if
+ * you already have an instance of the editor running, the editing will happen
+ * in the running instance, instead of opening a new one. An important aspect
+ * of this use case is that the process that gets started by git does not
+ * return until the editing is done.
+ * @newin{2,32}
+ */
 class ApplicationCommandLine : public Glib::Object
 {
   _CLASS_GOBJECT(ApplicationCommandLine, GApplicationCommandLine, G_APPLICATION_COMMAND_LINE, Glib::Object, GObject)
