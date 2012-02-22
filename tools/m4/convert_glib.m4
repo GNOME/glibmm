@@ -143,6 +143,7 @@ _CONVERSION(`const GValue*', `const Glib::ValueBase&', `*reinterpret_cast<const 
 
 dnl VariantType
 _CONVERSION(`const VariantType&',`const GVariantType*',`($3).gobj()')
+_CONVERSION(`const Glib::VariantType&',`const GVariantType*',`($3).gobj()')
 _CONVERSION(`const GVariantType*',`VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
 _CONVERSION(`GVariantType*',`VariantType',`Glib::wrap(($3), true)')
 

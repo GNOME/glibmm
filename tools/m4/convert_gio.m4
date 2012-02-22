@@ -166,6 +166,15 @@ _CONVERSION(`const Glib::RefPtr<InputStream>&',`GInputStream*',__CONVERT_CONST_R
 _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GInputStream*',`Glib::RefPtr<InputStream>',`Glib::wrap($3)')
 
+# MenuAttributeIter
+_CONVERSION(`GMenuAttributeIter*',`Glib::RefPtr<MenuAttributeIter>',`Glib::wrap($3)')
+
+# MenuLinkIter
+_CONVERSION(`GMenuLinkIter*',`Glib::RefPtr<MenuLinkIter>',`Glib::wrap($3)')
+
+# MenuModel
+_CONVERSION(`GMenuModel*',`Glib::RefPtr<MenuModel>',`Glib::wrap($3)')
+
 # Mount
 _CONVERSION(`GMount*',`Glib::RefPtr<Mount>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)
