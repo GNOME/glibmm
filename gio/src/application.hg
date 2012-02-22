@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <giomm/actiongroup.h>
 #include <giomm/actionmap.h>
 #include <giomm/applicationcommandline.h>
 #include <giomm/file.h>
@@ -30,8 +31,6 @@ namespace Gio
 {
 
 _WRAP_ENUM(ApplicationFlags, GApplicationFlags, NO_GTYPE)
-
-class ActionGroup;
 
 /** Application - Core application class.
  * An Application is the foundation of an application, unique for a given
@@ -79,9 +78,10 @@ class ActionGroup;
  *
  * @newin{2,32}
  */
-class Application : public Glib::Object, public ActionMap
+class Application : public Glib::Object, public ActionGroup, public ActionMap
 {
   _CLASS_GOBJECT(Application, GApplication, G_APPLICATION, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(ActionGroup)
   _IMPLEMENTS_INTERFACE(ActionMap)
 
 protected:
