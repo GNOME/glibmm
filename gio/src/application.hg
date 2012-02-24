@@ -159,7 +159,13 @@ public:
   void open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring& hint = Glib::ustring());
 
   _WRAP_METHOD(int run(int argc, char** argv), g_application_run)
-  //TODO: g_application_run_with_arguments)
+
+  _WRAP_METHOD(static void set_default(const Glib::RefPtr<Application>& application), g_application_set_default)
+
+  /// Unsets any existing default application.
+  static void unset_default();
+
+  _WRAP_METHOD(static Glib::RefPtr<Application> get_default(), g_application_get_default)
 
   _WRAP_PROPERTY("action-group", Glib::RefPtr<ActionGroup>)
   _WRAP_PROPERTY("application-id", Glib::ustring)
@@ -177,6 +183,7 @@ public:
   //We wrap the open signal without _WRAP_SIGNAL(), because we need to change its parameters.
   //See bug https://bugzilla.gnome.org/show_bug.cgi?id=637457
   Glib::SignalProxy2< void,  const type_vec_files&, const Glib::ustring& > signal_open();
+  _IGNORE_SIGNAL(open)
 
 #m4 _CONVERSION(`GApplicationCommandLine*', `const Glib::RefPtr<ApplicationCommandLine>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(int command_line(const Glib::RefPtr<ApplicationCommandLine>& command_line), "command-line")
@@ -196,16 +203,16 @@ protected:
 #m4 _CONVERSION(`gchar***', `char**&',`*($3)')
   _WRAP_VFUNC(bool local_command_line(char**& arguments, int& exit_status), local_command_line)
   
-/* TODO:
-  void                      (* before_emit)         (GApplication              *application,
-                                                     GVariant                  *platform_data);
-  void                      (* after_emit)          (GApplication              *application,
-                                                     GVariant                  *platform_data);
-  void                      (* add_platform_data)   (GApplication              *application,
-                                                     GVariantBuilder           *builder);
-  void                      (* quit_mainloop)       (GApplication              *application);
-  void                      (* run_mainloop)        (GApplication              *application);
-*/
+#m4 _CONVERSION(`GVariant*',`const Glib::VariantBase&',`Glib::wrap($3,true)')
+
+  _WRAP_VFUNC(void before_emit(const Glib::VariantBase& platform_data), "before_emit")
+  _WRAP_VFUNC(void after_emit(const Glib::VariantBase& platform_data), "after_emit")
+
+  //TODO: File a bug about GVariantBuilder not being registered with the GType system first
+  //_WRAP_VFUNC(void add_platform_data(Glib::VariantBuilder* builder), "add_platform_data")
+
+  _WRAP_VFUNC(void quit_mainloop(), "quit_mainloop")
+  _WRAP_VFUNC(void run_mainloop(), "run_mainloop")
 
 
 private:

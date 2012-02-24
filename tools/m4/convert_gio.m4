@@ -52,7 +52,11 @@ _CONVERSION(`Glib::RefPtr<AppInfo>',`GAppInfo*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`GAppInfo*',`const Glib::RefPtr<AppInfo>&',`Glib::wrap($3)')
 _CONVERSION(`const Glib::ListHandle< Glib::RefPtr<Gio::File> >&',`GList*',`$3.data()')
 
+# Application
 _CONVERSION(`GApplication*',`Glib::RefPtr<Application>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Application>&',`GApplication*',__CONVERT_CONST_REFPTR_TO_P)
+
+# ApplicationCommandLine
 _CONVERSION(`const Glib::RefPtr<ApplicationCommandLine>&',`GApplicationCommandLine*',__CONVERT_CONST_REFPTR_TO_P)
 
 # AsyncResult
