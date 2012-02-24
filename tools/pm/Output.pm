@@ -615,10 +615,10 @@ sub output_wrap_gerror($$$$$$$)
 }
 
 # _PROPERTY_PROXY(name, cpp_type)
-# void output_wrap_property($filename, $line_num, $name, $cpp_type)
-sub output_wrap_property($$$$$$)
+# void output_wrap_property($filename, $line_num, $name, $cpp_type, $deprecated, $deprecation_docs)
+sub output_wrap_property($$$$$$$$)
 {
-  my ($self, $filename, $line_num, $name, $cpp_type, $c_class) = @_;
+  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs) = @_;
 
   my $objDefsParser = $$self{objDefsParser};
 
@@ -658,9 +658,15 @@ sub output_wrap_property($$$$$$)
     $name_underscored =~ tr/-/_/;
 
     # Get the property documentation, if any, and add m4 quotes.
-    my $documentation = $objProperty->get_docs();
+    my $documentation = $objProperty->get_docs($deprecation_docs);
     add_m4_quotes(\$documentation) if ($documentation ne "");
 
+    #Declaration:
+    if($deprecated ne "")
+    {
+      $self->append("\n_DEPRECATE_IFDEF_START\n");
+    }
+    
     my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,`%s')dnl\n",
       $name,
       $name_underscored,
@@ -675,14 +681,20 @@ sub output_wrap_property($$$$$$)
     # then add a second const accessor for a read-only propertyproxy:
     if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
     {
-      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,`%s')dnl\n",
+      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s,`%s')dnl\n",
         $name,
         $name_underscored,
         $cpp_type,
         "_ReadOnly",
+	$deprecated,
         $documentation
       );
       $self->append($str);
+    }
+    
+    if($deprecated ne "")
+    {
+      $self->append("\n_DEPRECATE_IFDEF_END");
     }
   }
 }

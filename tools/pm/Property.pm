@@ -110,10 +110,18 @@ sub get_writable($)
   return $$self{writable};
 }
 
-sub get_docs($)
+sub get_docs($$)
 {
-  my ($self) = @_;
-  return $$self{docs};
+  my ($self, $deprecation_docs) = @_;
+  my $text = $$self{docs};
+
+  #Add note about deprecation if we have specified that in our _WRAP_METHOD() call:
+  if($deprecation_docs ne "")
+  {
+    $text .= "\n   * \@deprecated $deprecation_docs";
+  }
+
+  return $text;
 }
 
 
