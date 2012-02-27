@@ -17,7 +17,7 @@ def usage():
     sys.stderr.write('usage: docextract_to_xml.py ' +
         '[-s /src/dir | --source-dir=/src/dir] ' +
         '[-a | --with-annotations] [-p | --with-properties] ' +
-        '[-i | --with-signals ] [-n | --no-since]\n')
+        '[-i | --no-signals ] [-n | --no-since]\n')
     sys.exit(1)
 
 # Translates special texts to &... HTML acceptable format.  Also replace
@@ -62,14 +62,14 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(sys.argv[1:], "d:s:o:apin",
                                    ["source-dir=", "with-annotations",
-                                     "with-properties", "with-signals",
+                                     "with-properties", "no-signals",
                                      "no-since"])
     except getopt.error, e:
         sys.stderr.write('docextract_to_xml.py: %s\n' % e)
         usage()
     source_dirs = []
     with_annotations = False
-    with_signals = False
+    with_signals = True
     with_properties = False
     for opt, arg in opts:
         if opt in ('-s', '--source-dir'):
@@ -78,8 +78,8 @@ if __name__ == '__main__':
             with_annotations = True
         if opt in ('-p', '--with-properties'):
             with_properties = True
-        if opt in ('-i', '--with-signals'):
-            with_signals = True
+        if opt in ('-i', '--no-signals'):
+            with_signals = False
         if opt in ('-n', '--no-since'):
             docextract.no_since = True
     if len(args) != 0:
