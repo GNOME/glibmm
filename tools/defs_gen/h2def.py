@@ -304,8 +304,8 @@ def clean_func(buf):
     pat = re.compile(r"""G_GNUC_WARN_UNUSED_RESULT|G_INLINE_FUNC""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    #strip GLIB_DEPRECATED
-    pat = re.compile(r"""GLIB_DEPRECATED""", re.MULTILINE)
+    #strip *_DEPRECATED*
+    pat = re.compile(r"""[A-Z]+_DEPRECATED\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #we are not stripping G_GNUC_INTERNAL
@@ -334,6 +334,8 @@ def clean_func(buf):
     buf = re.sub(r'\s*\*\s*G_CONST_RETURN\s*\*\s*', '** ', buf)
     buf = string.replace(buf, 'G_CONST_RETURN ', 'const-')
     buf = string.replace(buf, 'const ', 'const-')
+    # This is for types such as 'const gchar* const *'
+    buf = string.replace(buf, '* const', '*-const')
 
     #strip GSEAL macros from the middle of function declarations:
     pat = re.compile(r"""GSEAL""", re.VERBOSE)
