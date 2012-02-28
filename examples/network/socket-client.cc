@@ -128,7 +128,7 @@ main (int argc,
     if (cancel_timeout)
     {
         cancellable = Gio::Cancellable::create ();
-        Glib::Threads::Thread::create (sigc::bind (sigc::ptr_fun (cancel_thread), cancellable), false);
+        Glib::Threads::Thread::create (sigc::bind (sigc::ptr_fun (cancel_thread), cancellable));
     }
 
     loop = Glib::MainLoop::create ();

@@ -98,10 +98,10 @@ int main(int, char**)
   MessageQueue queue;
 
   Glib::Threads::Thread *const producer = Glib::Threads::Thread::create(
-      sigc::mem_fun(queue, &MessageQueue::producer), true);
+      sigc::mem_fun(queue, &MessageQueue::producer));
 
   Glib::Threads::Thread *const consumer = Glib::Threads::Thread::create(
-      sigc::mem_fun(queue, &MessageQueue::consumer), true);
+      sigc::mem_fun(queue, &MessageQueue::consumer));
 
   producer->join();
   consumer->join();

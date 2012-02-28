@@ -76,8 +76,21 @@ Thread* Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
   // Make a copy of slot on the heap
   sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
 
-  GThread *const thread = g_thread_new(NULL, 
-      &call_thread_entry_slot, slot_copy);
+  GError* error = 0;
+
+  GThread *const thread = g_thread_try_new(NULL,
+      &call_thread_entry_slot, slot_copy, &error);
+
+  if(error)
+  {
+    delete slot_copy;
+    // Glib::Error::throw_exception() will probably wrap G_THREAD_ERROR in a
+    // Glib::Threads::ThreadError instance, but we want a Glib::ThreadError.
+    if (error->domain == G_THREAD_ERROR)
+      throw Glib::ThreadError(error);
+    else
+      Glib::Error::throw_exception(error);
+  }
 
   return reinterpret_cast<Thread*>(thread);
 }
@@ -98,7 +111,12 @@ Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
   if(error)
   {
     delete slot_copy;
-    Glib::Error::throw_exception(error);
+    // Glib::Error::throw_exception() will probably wrap G_THREAD_ERROR in a
+    // Glib::Threads::ThreadError instance, but we want a Glib::ThreadError.
+    if (error->domain == G_THREAD_ERROR)
+      throw Glib::ThreadError(error);
+    else
+      Glib::Error::throw_exception(error);
   }
 
   return reinterpret_cast<Thread*>(thread);

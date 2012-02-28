@@ -214,8 +214,7 @@ start_threaded_lookups (char **argv, int argc)
     for (i = 0; i < argc; i++)
     {
         Glib::Threads::Thread::create (sigc::bind (sigc::ptr_fun (lookup_thread),
-                                          argv[i]),
-                              false);
+                                          argv[i]));
     }
 }
 

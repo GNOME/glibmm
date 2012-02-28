@@ -97,7 +97,7 @@ void ThreadTimer::launch()
 
   // Create a joinable thread -- it needs to be joined, otherwise it's a memory leak.
   thread_ = Glib::Threads::Thread::create(
-      sigc::mem_fun(*this, &ThreadTimer::thread_function), true);
+      sigc::mem_fun(*this, &ThreadTimer::thread_function));
 
   // Wait for the 2nd thread's startup notification.
   while(signal_finished_ptr_ == NULL)

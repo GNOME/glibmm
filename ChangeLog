@@ -1,5 +1,24 @@
 2012-02-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
- 
+
+	Fix exceptions thrown by Thread::create() and Threads::Thread::create.
+
+	* glib/src/thread.ccg: create(): Call g_thread_try_new() instead of
+	g_thread_new(). Throw a Glib::ThreadError when appropriate, instead of calling
+	Glib::Error::throw_exception(), which would throw Glib::Threads::ThreadError.
+	* glib/src/threads.ccg:create(): Call g_thread_try_new() instead of
+	g_thread_new(). Remove parameter 'joinable'.
+	* glib/src/threads.hg: Remove parameter 'joinable'. Remove comments about
+	non-joinable threads and thread priorities.
+	* examples/network/resolver.cc:
+	* examples/network/socket-client.cc:
+	* examples/network/socket-server.cc:
+	* examples/thread/dispatcher.cc:
+	* examples/thread/dispatcher2.cc:
+	* examples/thread/thread.cc: Remove parameter 'joinable' in calls to
+	Glib::Threads::Thread::create(). Bug #640029.
+
+2012-02-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
 	Fix the build with --disable-deprecated-api.
 
 	* glib/glibmm/main.cc: Call get_time() instead of the deprecated
@@ -15,7 +34,7 @@
 	* tools/m4/class_shared.m4: Define _IS_DEPRECATED. Bug #640029.
 
 2012-02-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
- 
+
 	generate_wrap_init.pl: Improve reg. of exception classes in sub-namespaces.
 
 	* tools/generate_wrap_init.pl.in: When there are exception classes in sub-

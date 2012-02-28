@@ -53,10 +53,8 @@ _WRAP_GERROR(ThreadError, GThreadError, G_THREAD_ERROR, NO_GTYPE)
 
 /** Represents a running thread.
  * An instance of this class can only be obtained with create(), self(),
- * or wrap(GThread*).  It's not possible to delete a Thread object.  If the
- * thread is @em not joinable, its resources will be freed automatically
- * when it exits.  Otherwise, if the thread @em is joinable, you must call
- * join() to avoid a memory leak.
+ * or wrap(GThread*).  It's not possible to delete a Thread object.
+ * You must call join() to avoid a memory leak.
  *
  * @note g_thread_exit() is not wrapped, because that function exits a thread
  * without any cleanup.  That's especially dangerous in C++ code, since the
@@ -74,9 +72,8 @@ public:
   class Exit;
 
   //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
-  /** Creates a new thread with the priority <tt>THREAD_PRIORITY_NORMAL</tt>.
-   * If @a joinable is @c true, you can wait for this thread's termination by
-   * calling join().  Otherwise the thread will just disappear, when ready.
+  /** Creates a new thread.
+   * You can wait for this thread's termination by calling join().
    *
    * The new thread executes the function or method @a slot points to.  You can
    * pass additional arguments using sigc::bind().  If the thread was created
@@ -87,11 +84,10 @@ public:
    * class concerned should not derive from sigc::trackable.
    *
    * @param slot A slot to execute in the new thread.
-   * @param joinable This parameter is now ignored because Threads are now always joinable.
    * @return The new Thread* on success.
    * @throw Glib::Threads::ThreadError
    */
-  static Thread* create(const sigc::slot<void>& slot, bool joinable = true);
+  static Thread* create(const sigc::slot<void>& slot);
 
   /** Returns the Thread* corresponding to the calling thread.
    * @return The current thread.
@@ -102,8 +98,7 @@ public:
    * Waits until the thread finishes, i.e. the slot, as given to create(),
    * returns or g_thread_exit() is called by the thread.  (Calling
    * g_thread_exit() in a C++ program should be avoided.)  All resources of
-   * the thread including the Glib::Threads::Thread object are released.  The thread
-   * must have been created with <tt>joinable&nbsp;=&nbsp;true</tt>.
+   * the thread including the Glib::Threads::Thread object are released.
    */
   void join();
 
@@ -140,7 +135,7 @@ private:
 class Thread::Exit
 {};
 
-/** @relates Glib::Thread */
+/** @relates Glib::Threads::Thread */
 Thread* wrap(GThread* gobject);
 
 /** Represents a mutex (mutual exclusion).

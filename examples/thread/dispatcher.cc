@@ -102,7 +102,7 @@ int ThreadProgress::id() const
 void ThreadProgress::launch()
 {
   // Create a joinable thread.
-  thread_ = Glib::Threads::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function), true);
+  thread_ = Glib::Threads::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function));
 }
 
 void ThreadProgress::join()
