@@ -1,3 +1,26 @@
+;; From gdbusauthmechanism.h
+
+;; Original typedef:
+;; typedef enum {
+;;   G_DBUS_AUTH_MECHANISM_STATE_INVALID,
+;;   G_DBUS_AUTH_MECHANISM_STATE_WAITING_FOR_DATA,
+;;   G_DBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND,
+;;   G_DBUS_AUTH_MECHANISM_STATE_REJECTED,
+;;   G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED,
+;; } GDBusAuthMechanismState;
+
+(define-enum-extended DBusAuthMechanismState
+  (in-module "G")
+  (c-name "GDBusAuthMechanismState")
+  (values
+    '("invalid" "G_DBUS_AUTH_MECHANISM_STATE_INVALID" "0")
+    '("waiting-for-data" "G_DBUS_AUTH_MECHANISM_STATE_WAITING_FOR_DATA" "1")
+    '("have-data-to-send" "G_DBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND" "2")
+    '("rejected" "G_DBUS_AUTH_MECHANISM_STATE_REJECTED" "3")
+    '("accepted" "G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED" "4")
+  )
+)
+
 ;; From gioenums.h
 
 ;; Original typedef:
@@ -189,7 +212,7 @@
 )
 
 ;; Original typedef:
-;; typedef enum {
+;; typedef enum /*< flags >*/ {
 ;;   G_MOUNT_MOUNT_NONE = 0
 ;; } GMountMountFlags;
 
@@ -217,7 +240,7 @@
 )
 
 ;; Original typedef:
-;; typedef enum {
+;; typedef enum /*< flags >*/ {
 ;;   G_DRIVE_START_NONE = 0
 ;; } GDriveStartFlags;
 
@@ -442,7 +465,6 @@
     '("busy" "G_IO_ERROR_BUSY" "26")
     '("would-block" "G_IO_ERROR_WOULD_BLOCK" "27")
     '("host-not-found" "G_IO_ERROR_HOST_NOT_FOUND" "28")
-    '("host-not-found" "G_IO_ERROR_HOST_WAS_NOT_FOUND" "28")
     '("would-merge" "G_IO_ERROR_WOULD_MERGE" "29")
     '("failed-handled" "G_IO_ERROR_FAILED_HANDLED" "30")
     '("too-many-open-files" "G_IO_ERROR_TOO_MANY_OPEN_FILES" "31")
@@ -585,6 +607,49 @@
     '("not-found" "G_RESOLVER_ERROR_NOT_FOUND" "0")
     '("temporary-failure" "G_RESOLVER_ERROR_TEMPORARY_FAILURE" "1")
     '("internal" "G_RESOLVER_ERROR_INTERNAL" "2")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_RESOURCE_ERROR_NOT_FOUND,
+;;   G_RESOURCE_ERROR_INTERNAL
+;; } GResourceError;
+
+(define-enum-extended ResourceError
+  (in-module "G")
+  (c-name "GResourceError")
+  (values
+    '("not-found" "G_RESOURCE_ERROR_NOT_FOUND" "0")
+    '("internal" "G_RESOURCE_ERROR_INTERNAL" "1")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_RESOURCE_FLAGS_NONE       = 0,
+;;   G_RESOURCE_FLAGS_COMPRESSED = (1<<0)
+;; } GResourceFlags;
+
+(define-flags-extended ResourceFlags
+  (in-module "G")
+  (c-name "GResourceFlags")
+  (values
+    '("none" "G_RESOURCE_FLAGS_NONE" "0x0")
+    '("compressed" "G_RESOURCE_FLAGS_COMPRESSED" "(1<<0)")
+  )
+)
+
+;; Original typedef:
+;; typedef enum /*< flags >*/ {
+;;   G_RESOURCE_LOOKUP_FLAGS_NONE       = 0
+;; } GResourceLookupFlags;
+
+(define-flags-extended ResourceLookupFlags
+  (in-module "G")
+  (c-name "GResourceLookupFlags")
+  (values
+    '("none" "G_RESOURCE_LOOKUP_FLAGS_NONE" "0x0")
   )
 )
 
@@ -768,7 +833,8 @@
 ;;   G_DBUS_PROXY_FLAGS_NONE = 0,
 ;;   G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES = (1<<0),
 ;;   G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS = (1<<1),
-;;   G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START = (1<<2)
+;;   G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START = (1<<2),
+;;   G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES = (1<<3)
 ;; } GDBusProxyFlags;
 
 (define-flags-extended DBusProxyFlags
@@ -779,6 +845,7 @@
     '("do-not-load-properties" "G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES" "(1<<0)")
     '("do-not-connect-signals" "G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS" "(1<<1)")
     '("do-not-auto-start" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START" "(1<<2)")
+    '("get-invalidated-properties" "G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES" "(1<<3)")
   )
 )
 
@@ -1304,7 +1371,7 @@
 )
 
 ;; Original typedef:
-;; typedef enum {
+;; typedef enum /*< flags >*/ {
 ;;   G_TLS_DATABASE_VERIFY_NONE = 0
 ;; } GTlsDatabaseVerifyFlags;
 
@@ -1343,6 +1410,35 @@
   (values
     '("none" "G_IO_MODULE_SCOPE_NONE" "0x0")
     '("block-duplicates" "G_IO_MODULE_SCOPE_BLOCK_DUPLICATES" "0x1")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_SOCKET_CLIENT_RESOLVING,
+;;   G_SOCKET_CLIENT_RESOLVED,
+;;   G_SOCKET_CLIENT_CONNECTING,
+;;   G_SOCKET_CLIENT_CONNECTED,
+;;   G_SOCKET_CLIENT_PROXY_NEGOTIATING,
+;;   G_SOCKET_CLIENT_PROXY_NEGOTIATED,
+;;   G_SOCKET_CLIENT_TLS_HANDSHAKING,
+;;   G_SOCKET_CLIENT_TLS_HANDSHAKED,
+;;   G_SOCKET_CLIENT_COMPLETE
+;; } GSocketClientEvent;
+
+(define-enum-extended SocketClientEvent
+  (in-module "G")
+  (c-name "GSocketClientEvent")
+  (values
+    '("resolving" "G_SOCKET_CLIENT_RESOLVING" "0")
+    '("resolved" "G_SOCKET_CLIENT_RESOLVED" "1")
+    '("connecting" "G_SOCKET_CLIENT_CONNECTING" "2")
+    '("connected" "G_SOCKET_CLIENT_CONNECTED" "3")
+    '("proxy-negotiating" "G_SOCKET_CLIENT_PROXY_NEGOTIATING" "4")
+    '("proxy-negotiated" "G_SOCKET_CLIENT_PROXY_NEGOTIATED" "5")
+    '("tls-handshaking" "G_SOCKET_CLIENT_TLS_HANDSHAKING" "6")
+    '("tls-handshaked" "G_SOCKET_CLIENT_TLS_HANDSHAKED" "7")
+    '("complete" "G_SOCKET_CLIENT_COMPLETE" "8")
   )
 )
 

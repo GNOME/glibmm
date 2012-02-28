@@ -1936,7 +1936,7 @@ This function must be called while holding the @queue's lock.
 <parameter_description> a #GAsyncQueue
 </parameter_description>
 </parameter>
-<parameter name="time">
+<parameter name="timeout">
 <parameter_description> the number of microseconds to wait
 </parameter_description>
 </parameter>
@@ -11584,7 +11584,7 @@ Since: 2.32
 <parameters>
 <parameter name="envp">
 <parameter_description> an environment
-list (eg, as returned from g_get_environ())
+list that can be freed using g_strfreev() (e.g., as returned from g_get_environ())
 </parameter_description>
 </parameter>
 <parameter name="variable">
@@ -11601,7 +11601,7 @@ list (eg, as returned from g_get_environ())
 </parameter>
 </parameters>
 <return> the
-updated environment
+updated environment list. Free it using g_strfreev().
 
 </return>
 </function>
@@ -11617,7 +11617,7 @@ Since: 2.32
 <parameters>
 <parameter name="envp">
 <parameter_description> an environment
-list (eg, as returned from g_get_environ())
+list that can be freed using g_strfreev() (e.g., as returned from g_get_environ())
 </parameter_description>
 </parameter>
 <parameter name="variable">
@@ -11626,7 +11626,7 @@ list (eg, as returned from g_get_environ())
 </parameter>
 </parameters>
 <return> the
-updated environment
+updated environment list. Free it using g_strfreev().
 
 </return>
 </function>
@@ -16954,7 +16954,7 @@ Since: 2.6
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> the length of @data in bytes
+<parameter_description> the length of @data in bytes (or -1 if data is nul-terminated)
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -17055,7 +17055,7 @@ of the file, or %NULL
 <function name="g_key_file_load_from_file">
 <description>
 Loads a key file into an empty #GKeyFile structure.
-If the file could not be loaded then %error is set to 
+If the file could not be loaded then @error is set to
 either a #GFileError or #GKeyFileError.
 
 Since: 2.6
@@ -19981,7 +19981,7 @@ of the #GMappedFile. Therefore, mapping should only be used if the file
 will not be modified, or if all modifications of the file are done
 atomically (e.g. using g_file_set_contents()).
 
-Since: 2.30
+Since: 2.32
 
 </description>
 <parameters>
@@ -42547,10 +42547,11 @@ instances (if not abstract).  The value of @flags determines the nature
 <function name="g_type_register_fundamental">
 <description>
 Registers @type_id as the predefined identifier and @type_name as the
-name of a fundamental type.  The type system uses the information
-contained in the #GTypeInfo structure pointed to by @info and the
-#GTypeFundamentalInfo structure pointed to by @finfo to manage the
-type and its instances.  The value of @flags determines additional
+name of a fundamental type. If @type_id is already registered, or a type
+named @type_name is already registered, the behaviour is undefined. The type
+system uses the information contained in the #GTypeInfo structure pointed to
+by @info and the #GTypeFundamentalInfo structure pointed to by @finfo to
+manage the type and its instances. The value of @flags determines additional
 characteristics of the fundamental type.
 
 

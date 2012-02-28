@@ -2226,6 +2226,12 @@
   )
 )
 
+(define-method get_environ
+  (of-object "GApplicationCommandLine")
+  (c-name "g_application_command_line_get_environ")
+  (return-type "const-gchar*-const*")
+)
+
 (define-method getenv
   (of-object "GApplicationCommandLine")
   (c-name "g_application_command_line_getenv")
@@ -2428,6 +2434,12 @@
     '("int" "argc")
     '("char**" "argv")
   )
+)
+
+(define-method quit
+  (of-object "GApplication")
+  (c-name "g_application_quit")
+  (return-type "none")
 )
 
 (define-function g_application_get_default
@@ -6015,6 +6027,12 @@
   (return-type "const-char*")
 )
 
+(define-method get_keywords
+  (of-object "GDesktopAppInfo")
+  (c-name "g_desktop_app_info_get_keywords")
+  (return-type "const-char*-const*")
+)
+
 (define-method get_nodisplay
   (of-object "GDesktopAppInfo")
   (c-name "g_desktop_app_info_get_nodisplay")
@@ -6144,6 +6162,28 @@
   (of-object "GDrive")
   (c-name "g_drive_can_eject")
   (return-type "gboolean")
+)
+
+(define-method eject
+  (of-object "GDrive")
+  (c-name "g_drive_eject")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method eject_finish
+  (of-object "GDrive")
+  (c-name "g_drive_eject_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
 )
 
 (define-method poll_for_media
@@ -7464,6 +7504,28 @@
   )
 )
 
+(define-method unmount_mountable
+  (of-object "GFile")
+  (c-name "g_file_unmount_mountable")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method unmount_mountable_finish
+  (of-object "GFile")
+  (c-name "g_file_unmount_mountable_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
 (define-method unmount_mountable_with_operation
   (of-object "GFile")
   (c-name "g_file_unmount_mountable_with_operation")
@@ -7480,6 +7542,28 @@
 (define-method unmount_mountable_with_operation_finish
   (of-object "GFile")
   (c-name "g_file_unmount_mountable_with_operation_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method eject_mountable
+  (of-object "GFile")
+  (c-name "g_file_eject_mountable")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method eject_mountable_finish
+  (of-object "GFile")
+  (c-name "g_file_eject_mountable_finish")
   (return-type "gboolean")
   (parameters
     '("GAsyncResult*" "result")
@@ -10518,6 +10602,50 @@
   (return-type "gboolean")
 )
 
+(define-method unmount
+  (of-object "GMount")
+  (c-name "g_mount_unmount")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method unmount_finish
+  (of-object "GMount")
+  (c-name "g_mount_unmount_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method eject
+  (of-object "GMount")
+  (c-name "g_mount_eject")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method eject_finish
+  (of-object "GMount")
+  (c-name "g_mount_eject_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
 (define-method remount
   (of-object "GMount")
   (c-name "g_mount_remount")
@@ -12054,6 +12182,16 @@
 (define-function g_settings_get_type
   (c-name "g_settings_get_type")
   (return-type "GType")
+)
+
+(define-function g_settings_list_schemas
+  (c-name "g_settings_list_schemas")
+  (return-type "const-gchar*-const*")
+)
+
+(define-function g_settings_list_relocatable_schemas
+  (c-name "g_settings_list_relocatable_schemas")
+  (return-type "const-gchar*-const*")
 )
 
 (define-function g_settings_new
@@ -13701,6 +13839,18 @@
   )
 )
 
+(define-method condition_timed_wait
+  (of-object "GSocket")
+  (c-name "g_socket_condition_timed_wait")
+  (return-type "gboolean")
+  (parameters
+    '("GIOCondition" "condition")
+    '("gint64" "timeout")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
 (define-method accept
   (of-object "GSocket")
   (c-name "g_socket_accept")
@@ -14239,6 +14389,12 @@
   (parameters
     '("const-char*" "iconname")
   )
+)
+
+(define-method get_names
+  (of-object "GThemedIcon")
+  (c-name "g_themed_icon_get_names")
+  (return-type "const-gchar*-const*")
 )
 
 
@@ -15551,6 +15707,15 @@
   )
 )
 
+(define-function g_unix_socket_address_new_abstract
+  (c-name "g_unix_socket_address_new_abstract")
+  (return-type "GSocketAddress*")
+  (parameters
+    '("const-gchar*" "path")
+    '("gint" "path_len")
+  )
+)
+
 (define-function g_unix_socket_address_new_with_type
   (c-name "g_unix_socket_address_new_with_type")
   (return-type "GSocketAddress*")
@@ -15629,6 +15794,12 @@
   (parameters
     '("const-char*" "uri")
   )
+)
+
+(define-method get_supported_uri_schemes
+  (of-object "GVfs")
+  (c-name "g_vfs_get_supported_uri_schemes")
+  (return-type "const-gchar*-const*")
 )
 
 (define-method parse_name
@@ -15723,6 +15894,28 @@
 (define-method mount_finish
   (of-object "GVolume")
   (c-name "g_volume_mount_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method eject
+  (of-object "GVolume")
+  (c-name "g_volume_eject")
+  (return-type "none")
+  (parameters
+    '("GMountUnmountFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method eject_finish
+  (of-object "GVolume")
+  (c-name "g_volume_eject_finish")
   (return-type "gboolean")
   (parameters
     '("GAsyncResult*" "result")

@@ -28,6 +28,24 @@
   )
 )
 
+;; From gbsearcharray.h
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   G_BSEARCH_ARRAY_ALIGN_POWER2  = 1 << 0, /* align memory to power2 sizes */
+;;   G_BSEARCH_ARRAY_AUTO_SHRINK  = 1 << 1   /* shrink array upon removal */
+;; } GBSearchArrayFlags;
+
+(define-flags-extended BSearchArrayFlags
+  (in-module "G")
+  (c-name "GBSearchArrayFlags")
+  (values
+    '("align-power2" "G_BSEARCH_ARRAY_ALIGN_POWER2" "1 << 0")
+    '("auto-shrink" "G_BSEARCH_ARRAY_AUTO_SHRINK" "1 << 1")
+  )
+)
+
 ;; From gchecksum.h
 
 ;; Original typedef:
@@ -930,6 +948,8 @@
 ;;   
 ;;   G_TOKEN_COMMENT_SINGLE,
 ;;   G_TOKEN_COMMENT_MULTI,
+;; 
+;;   /*< private >*/
 ;;   G_TOKEN_LAST
 ;; } GTokenType;
 
@@ -1347,7 +1367,9 @@
 ;;   G_UNICODE_BREAK_HANGUL_T_JAMO,
 ;;   G_UNICODE_BREAK_HANGUL_LV_SYLLABLE,
 ;;   G_UNICODE_BREAK_HANGUL_LVT_SYLLABLE,
-;;   G_UNICODE_BREAK_CLOSE_PARANTHESIS
+;;   G_UNICODE_BREAK_CLOSE_PARANTHESIS,
+;;   G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER,
+;;   G_UNICODE_BREAK_HEBREW_LETTER
 ;; } GUnicodeBreakType;
 
 (define-enum-extended UnicodeBreakType
@@ -1391,6 +1413,8 @@
     '("hangul-lv-syllable" "G_UNICODE_BREAK_HANGUL_LV_SYLLABLE" "34")
     '("hangul-lvt-syllable" "G_UNICODE_BREAK_HANGUL_LVT_SYLLABLE" "35")
     '("close-paranthesis" "G_UNICODE_BREAK_CLOSE_PARANTHESIS" "36")
+    '("conditional-japanese-starter" "G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER" "37")
+    '("hebrew-letter" "G_UNICODE_BREAK_HEBREW_LETTER" "38")
   )
 )
 
@@ -1399,13 +1423,13 @@
 ;; {                         /* ISO 15924 code */
 ;;   G_UNICODE_SCRIPT_INVALID_CODE = -1,
 ;;   G_UNICODE_SCRIPT_COMMON       = 0,   /* Zyyy */
-;;   G_UNICODE_SCRIPT_INHERITED,          /* Qaai */
+;;   G_UNICODE_SCRIPT_INHERITED,          /* Zinh (Qaai) */
 ;;   G_UNICODE_SCRIPT_ARABIC,             /* Arab */
 ;;   G_UNICODE_SCRIPT_ARMENIAN,           /* Armn */
 ;;   G_UNICODE_SCRIPT_BENGALI,            /* Beng */
 ;;   G_UNICODE_SCRIPT_BOPOMOFO,           /* Bopo */
 ;;   G_UNICODE_SCRIPT_CHEROKEE,           /* Cher */
-;;   G_UNICODE_SCRIPT_COPTIC,             /* Qaac */
+;;   G_UNICODE_SCRIPT_COPTIC,             /* Copt (Qaac) */
 ;;   G_UNICODE_SCRIPT_CYRILLIC,           /* Cyrl (Cyrs) */
 ;;   G_UNICODE_SCRIPT_DESERET,            /* Dsrt */
 ;;   G_UNICODE_SCRIPT_DEVANAGARI,         /* Deva */
@@ -1505,7 +1529,16 @@
 ;;   /* Unicode-6.0 additions */
 ;;   G_UNICODE_SCRIPT_BATAK,                  /* Batk */
 ;;   G_UNICODE_SCRIPT_BRAHMI,                 /* Brah */
-;;   G_UNICODE_SCRIPT_MANDAIC                 /* Mand */
+;;   G_UNICODE_SCRIPT_MANDAIC,                /* Mand */
+;; 
+;;   /* Unicode-6.1 additions */
+;;   G_UNICODE_SCRIPT_CHAKMA,                 /* Cakm */
+;;   G_UNICODE_SCRIPT_MEROITIC_CURSIVE,       /* Merc */
+;;   G_UNICODE_SCRIPT_MEROITIC_HIEROGLYPHS,   /* Mero */
+;;   G_UNICODE_SCRIPT_MIAO,                   /* Plrd */
+;;   G_UNICODE_SCRIPT_SHARADA,                /* Shrd */
+;;   G_UNICODE_SCRIPT_SORA_SOMPENG,           /* Sora */
+;;   G_UNICODE_SCRIPT_TAKRI                   /* Takr */
 ;; } GUnicodeScript;
 
 (define-enum-extended UnicodeScript
@@ -1609,6 +1642,13 @@
     '("batak" "G_UNICODE_SCRIPT_BATAK" "93")
     '("brahmi" "G_UNICODE_SCRIPT_BRAHMI" "94")
     '("mandaic" "G_UNICODE_SCRIPT_MANDAIC" "95")
+    '("chakma" "G_UNICODE_SCRIPT_CHAKMA" "96")
+    '("meroitic-cursive" "G_UNICODE_SCRIPT_MEROITIC_CURSIVE" "97")
+    '("meroitic-hieroglyphs" "G_UNICODE_SCRIPT_MEROITIC_HIEROGLYPHS" "98")
+    '("miao" "G_UNICODE_SCRIPT_MIAO" "99")
+    '("sharada" "G_UNICODE_SCRIPT_SHARADA" "100")
+    '("sora-sompeng" "G_UNICODE_SCRIPT_SORA_SOMPENG" "101")
+    '("takri" "G_UNICODE_SCRIPT_TAKRI" "102")
   )
 )
 
@@ -1784,6 +1824,28 @@
     '("unknown-keyword" "G_VARIANT_PARSE_ERROR_UNKNOWN_KEYWORD" "15")
     '("unterminated-string-constant" "G_VARIANT_PARSE_ERROR_UNTERMINATED_STRING_CONSTANT" "16")
     '("value-expected" "G_VARIANT_PARSE_ERROR_VALUE_EXPECTED" "17")
+  )
+)
+
+;; From gthread.h
+
+;; Original typedef:
+;; typedef enum
+;; {
+;;   G_THREAD_PRIORITY_LOW,
+;;   G_THREAD_PRIORITY_NORMAL,
+;;   G_THREAD_PRIORITY_HIGH,
+;;   G_THREAD_PRIORITY_URGENT
+;; } GThreadPriority;
+
+(define-enum-extended ThreadPriority
+  (in-module "G")
+  (c-name "GThreadPriority")
+  (values
+    '("low" "G_THREAD_PRIORITY_LOW" "0")
+    '("normal" "G_THREAD_PRIORITY_NORMAL" "1")
+    '("high" "G_THREAD_PRIORITY_HIGH" "2")
+    '("urgent" "G_THREAD_PRIORITY_URGENT" "3")
   )
 )
 

@@ -1450,7 +1450,7 @@ activation occurs. See g_application_activate().
 <description>
 The ::command-line signal is emitted on the primary instance when
 a commandline is not handled locally. See g_application_run() and
-the #GApplicationCommandline documentation for more information.
+the #GApplicationCommandLine documentation for more information.
 
 
 </description>
@@ -2735,7 +2735,7 @@ an error).
 Each event except %G_SOCKET_CLIENT_COMPLETE may be emitted
 multiple times (or not at all) for a given connectable (in
 particular, if @client ends up attempting to connect to more than
-one address). However, if @client emits the #GSocketClient:event
+one address). However, if @client emits the #GSocketClient::event
 signal at all for a given connectable, that it will always emit
 it with %G_SOCKET_CLIENT_COMPLETE when it is done.
 
@@ -16927,7 +16927,7 @@ g_action_group_has_action(), g_action_group_get_action_enabled(),
 g_action_group_get_action_parameter_type(),
 g_action_group_get_action_state_type(),
 g_action_group_get_action_state_hint() and
-g_action_group_get_state() with a single function call.
+g_action_group_get_action_state() with a single function call.
 
 This provides two main benefits.
 
@@ -17977,7 +17977,7 @@ Since: 2.32
 <description>
 Activates the application.
 
-In essence, this results in the #GApplication::activate() signal being
+In essence, this results in the #GApplication::activate signal being
 emitted in the primary instance.
 
 The application must be registered before calling this function.
@@ -18513,6 +18513,30 @@ Since: 2.28
 <return></return>
 </function>
 
+<function name="g_application_quit">
+<description>
+Immediately quits the application.
+
+Upon return to the mainloop, g_application_run() will return,
+calling only the 'shutdown' function before doing so.
+
+The hold count is ignored.
+
+The result of calling g_application_run() again after it returns is
+unspecified.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GApplication
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_application_register">
 <description>
 Attempts registration of the application.
@@ -18612,7 +18636,7 @@ instance, calling g_application_activate() or g_application_open(), etc.
 If local_command_line() returns %FALSE then the application is registered
 and the #GApplication::command-line signal is emitted in the primary
 instance (which may or may not be this instance). The signal handler
-gets passed a #GApplicationCommandline object that (among other things)
+gets passed a #GApplicationCommandLine object that (among other things)
 contains the remaining commandline arguments that have not been handled
 by local_command_line().
 
@@ -18632,7 +18656,7 @@ are assumed to be filenames and g_application_open() is called.
 
 If you need to handle commandline arguments that are not filenames,
 and you don't mind commandline handling to happen in the primary
-instance, you should set %G_APPLICATION_HANDLED_COMMAND_LINE and
+instance, you should set %G_APPLICATION_HANDLES_COMMAND_LINE and
 process the commandline arguments in your #GApplication::command-line
 signal handler, either manually or using the #GOptionContext API.
 
@@ -20814,7 +20838,7 @@ containing the data to convert.
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a #GConvertFlags controlling the conversion details
+<parameter_description> a #GConverterFlags controlling the conversion details
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
@@ -25233,7 +25257,7 @@ Since: 2.30
 Stops exporting @interface_ on all connections it is exported on.
 
 To unexport @interface_ from only a single connection, use
-g_dbus_interface_skeleton_export_from_connection()
+g_dbus_interface_skeleton_unexport_from_connection()
 
 Since: 2.30
 
@@ -29595,7 +29619,7 @@ ignore.
 <function name="g_drive_enumerate_identifiers">
 <description>
 Gets the kinds of identifiers that @drive has. 
-Use g_drive_get_identifer() to obtain the identifiers
+Use g_drive_get_identifier() to obtain the identifiers
 themselves.
 
 
@@ -32124,7 +32148,8 @@ Clears the status information from @info.
 
 <function name="g_file_info_copy_into">
 <description>
-Copies all of the #GFileAttribute&lt;!-- --&gt;s from @src_info to @dest_info.
+Copies all of the &lt;link linkend=&quot;gio-GFileAttribute&quot;&gt;GFileAttribute&lt;/link&gt;s
+from @src_info to @dest_info.
 
 </description>
 <parameters>
@@ -32783,7 +32808,8 @@ Removes all cases of @attribute from @info if it exists.
 
 <function name="g_file_info_set_attribute">
 <description>
-Sets the @attribute to contain the given value, if possible.
+Sets the @attribute to contain the given value, if possible. To unset the
+attribute, use %G_ATTRIBUTE_TYPE_INVALID for @type.
 
 </description>
 <parameters>
@@ -34362,7 +34388,7 @@ Opens a file in the preferred directory for temporary files (as
 returned by g_get_tmp_dir()) and returns a #GFile and
 #GFileIOStream pointing to it.
 
-@template should be a string in the GLib file name encoding
+@tmpl should be a string in the GLib file name encoding
 containing a sequence of six 'X' characters, and containing no
 directory components. If it is %NULL, a default template is used.
 
@@ -37515,7 +37541,7 @@ return %FALSE and set @error appropriately if present.
 
 <function name="g_initable_new">
 <description>
-Helper function for constructing #GInitiable object. This is
+Helper function for constructing #GInitable object. This is
 similar to g_object_new() but also initializes the object
 and returns %NULL, setting an error on failure.
 
@@ -37554,7 +37580,7 @@ value pairs, and ended by %NULL.
 
 <function name="g_initable_new_valist">
 <description>
-Helper function for constructing #GInitiable object. This is
+Helper function for constructing #GInitable object. This is
 similar to g_object_new_valist() but also initializes the object
 and returns %NULL, setting an error on failure.
 
@@ -37592,7 +37618,7 @@ ignore.
 
 <function name="g_initable_newv">
 <description>
-Helper function for constructing #GInitiable object. This is
+Helper function for constructing #GInitable object. This is
 similar to g_object_newv() but also initializes the object
 and returns %NULL, setting an error on failure.
 
@@ -38432,7 +38458,7 @@ Since: 2.30
 Create a new scope for loading of IO modules. A scope can be used for
 blocking duplicate modules, or blocking a module you don't want to load.
 
-Specify the %G_IO_MODULES_SCOPE_BLOCK_DUPLICATES flag to block modules
+Specify the %G_IO_MODULE_SCOPE_BLOCK_DUPLICATES flag to block modules
 which have the same base name as a module that has already been seen
 in this scope.
 
@@ -39458,7 +39484,7 @@ Since: 2.32
 <function name="g_menu_append_submenu">
 <description>
 Convenience function for appending a submenu menu item to the end of
-@menu.  Combine g_menu_new_submenu() and g_menu_insert_item() for a
+@menu.  Combine g_menu_item_new_submenu() and g_menu_insert_item() for a
 more flexible alternative.
 
 Since: 2.32
@@ -39513,8 +39539,8 @@ effects.
 
 If successful, @name and @value are set to the name and value of the
 attribute that has just been advanced to.  At this point,
-g_menu_item_get_name() and g_menu_item_get_value() will return the
-same values again.
+g_menu_attribute_iter_get_name() and g_menu_attribute_iter_get_value() will
+return the same values again.
 
 The value returned in @name remains valid for as long as the iterator
 remains at the current position.  The value returned in @value must
@@ -39715,7 +39741,7 @@ Since: 2.32
 <function name="g_menu_insert_submenu">
 <description>
 Convenience function for inserting a submenu menu item into @menu.
-Combine g_menu_new_submenu() and g_menu_insert_item() for a more
+Combine g_menu_item_new_submenu() and g_menu_insert_item() for a more
 flexible alternative.
 
 Since: 2.32
@@ -40078,8 +40104,7 @@ If @detailed_action contains a double colon (&quot;::&quot;) then it is used as
 a separator between an action name and a target string.  In this
 case, this call is equivalent to calling
 g_menu_item_set_action_and_target() with the part before the &quot;::&quot; and
-g_menu_item_set_target_value() with a string-type #GVariant
-containing the part following the &quot;::&quot;.
+with a string-type #GVariant containing the part following the &quot;::&quot;.
 
 If @detailed_action doesn't contain &quot;::&quot; then the action is set to
 the given string (verbatim) and the target value is unset.
@@ -40088,7 +40113,7 @@ See g_menu_item_set_action_and_target() or
 g_menu_item_set_action_and_target_value() for more flexible (but
 slightly less convenient) alternatives.
 
-See also g_menu_set_action_and_target_value() for a description of
+See also g_menu_item_set_action_and_target_value() for a description of
 the semantics of the action and target attributes.
 
 Since: 2.32
@@ -40245,7 +40270,7 @@ If that fails, then %FALSE is returned and there are no other effects.
 
 If successful, @out_link and @value are set to the name and #GMenuModel
 of the link that has just been advanced to.  At this point,
-g_menu_item_get_name() and g_menu_item_get_value() will return the
+g_menu_link_iter_get_name() and g_menu_link_iter_get_value() will return the
 same values again.
 
 The value returned in @out_link remains valid for as long as the iterator
@@ -40659,7 +40684,7 @@ Since: 2.32
 <function name="g_menu_prepend_submenu">
 <description>
 Convenience function for prepending a submenu menu item to the start
-of @menu.  Combine g_menu_new_submenu() and g_menu_insert_item() for
+of @menu.  Combine g_menu_item_new_submenu() and g_menu_insert_item() for
 a more flexible alternative.
 
 Since: 2.32
@@ -41782,7 +41807,7 @@ Creates a new #GSocketConnectable for connecting to the given
 @uri. May fail and return %NULL in case parsing @uri fails.
 
 Using this rather than g_network_address_new() or
-g_network_address_parse_host() allows #GSocketClient to determine
+g_network_address_parse() allows #GSocketClient to determine
 when to use application-specific proxy protocols.
 
 Since: 2.26
@@ -48880,6 +48905,55 @@ Since: 2.22
 </return>
 </function>
 
+<function name="g_socket_condition_timed_wait">
+<description>
+Waits for up to @timeout microseconds for @condition to become true
+on @socket. If the condition is met, %TRUE is returned.
+
+If @cancellable is cancelled before the condition is met, or if
+@timeout (or the socket's #GSocket:timeout) is reached before the
+condition is met, then %FALSE is returned and @error, if non-%NULL,
+is set to the appropriate value (%G_IO_ERROR_CANCELLED or
+%G_IO_ERROR_TIMED_OUT).
+
+If you don't want a timeout, use g_socket_condition_wait().
+(Alternatively, you can pass -1 for @timeout.)
+
+Note that although @timeout is in microseconds for consistency with
+other GLib APIs, this function actually only has millisecond
+resolution, and the behavior is undefined if @timeout is not an
+exact number of milliseconds.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="socket">
+<parameter_description> a #GSocket
+</parameter_description>
+</parameter>
+<parameter name="condition">
+<parameter_description> a #GIOCondition mask to wait for
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> the maximum time (in microseconds) to wait, or -1
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError pointer, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the condition was met, %FALSE otherwise
+
+</return>
+</function>
+
 <function name="g_socket_condition_wait">
 <description>
 Waits for @condition to become true on @socket. When the condition
@@ -48890,6 +48964,8 @@ socket has a timeout set and it is reached before the condition is
 met, then %FALSE is returned and @error, if non-%NULL, is set to
 the appropriate value (%G_IO_ERROR_CANCELLED or
 %G_IO_ERROR_TIMED_OUT).
+
+See also g_socket_condition_timed_wait().
 
 Since: 2.22
 
@@ -51785,7 +51861,7 @@ unreffed when done.
 
 <function name="g_tls_backend_get_file_database_type">
 <description>
-Gets the #GTyep of @backend's #GTlsFileDatabase implementation.
+Gets the #GType of @backend's #GTlsFileDatabase implementation.
 
 Since: 2.30
 
@@ -52725,9 +52801,10 @@ Since: 2.30
 <description>
 Lookup a certificate by its handle.
 
-The handle should have been created by calling g_tls_database_create_handle()
-on a #GTlsDatabase object of the same TLS backend. The handle is designed
-to remain valid across instantiations of the database.
+The handle should have been created by calling
+g_tls_database_create_certificate_handle() on a #GTlsDatabase object of
+the same TLS backend. The handle is designed to remain valid across
+instantiations of the database.
 
 If the handle is no longer valid, or does not point to a certificate in
 this database, then %NULL will be returned.
@@ -52773,7 +52850,7 @@ Since: 2.30
 <function name="g_tls_database_lookup_certificate_for_handle_async">
 <description>
 Asynchronously lookup a certificate by its handle in the database. See
-g_tls_database_lookup_handle() for more information.
+g_tls_database_lookup_certificate_for_handle() for more information.
 
 Since: 2.30
 
@@ -52814,7 +52891,7 @@ Since: 2.30
 <function name="g_tls_database_lookup_certificate_for_handle_finish">
 <description>
 Finish an asynchronous lookup of a certificate by its handle. See
-g_tls_database_lookup_handle() for more information.
+g_tls_database_lookup_certificate_handle() for more information.
 
 If the handle is no longer valid, or does not point to a certificate in
 this database, then %NULL will be returned.
@@ -54507,7 +54584,7 @@ Frees a unix mount.
 </description>
 <parameters>
 <parameter name="mount_entry">
-<parameter_description> a #GUnixMount.
+<parameter_description> a #GUnixMountEntry.
 </parameter_description>
 </parameter>
 </parameters>
@@ -55531,7 +55608,7 @@ ignore.
 <function name="g_volume_enumerate_identifiers">
 <description>
 Gets the kinds of &lt;link linkend=&quot;volume-identifier&quot;&gt;identifiers&lt;/link&gt;
-that @volume has. Use g_volume_get_identifer() to obtain 
+that @volume has. Use g_volume_get_identifier() to obtain
 the identifiers themselves.
 
 

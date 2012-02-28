@@ -98,6 +98,12 @@
 (define-signal startup
   (of-object "GApplication")
   (return-type "void")
+  (when "first")
+)
+
+(define-signal shutdown
+  (of-object "GApplication")
+  (return-type "void")
   (when "last")
 )
 
@@ -769,7 +775,25 @@
   )
 )
 
+(define-property settings-schema
+  (of-object "GSettings")
+  (prop-type "GParamBoxed")
+  (docs "The GSettingsSchema for this settings object")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
 (define-property schema
+  (of-object "GSettings")
+  (prop-type "GParamString")
+  (docs "The name of the schema for this settings object")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property schema-id
   (of-object "GSettings")
   (prop-type "GParamString")
   (docs "The name of the schema for this settings object")
@@ -843,8 +867,8 @@
   (prop-type "GParamString")
   (docs "The name used to invoke the action")
   (readable #t)
-  (writable #f)
-  (construct-only #f)
+  (writable #t)
+  (construct-only #t)
 )
 
 (define-property parameter-type
@@ -852,8 +876,8 @@
   (prop-type "GParamBoxed")
   (docs "The type of GVariant passed to activate()")
   (readable #t)
-  (writable #f)
-  (construct-only #f)
+  (writable #t)
+  (construct-only #t)
 )
 
 (define-property enabled
@@ -861,7 +885,7 @@
   (prop-type "GParamBoolean")
   (docs "If the action can be activated")
   (readable #t)
-  (writable #f)
+  (writable #t)
   (construct-only #f)
 )
 
@@ -879,7 +903,7 @@
   (prop-type "GParamVariant")
   (docs "The state the action is in")
   (readable #t)
-  (writable #f)
+  (writable #t)
   (construct-only #f)
 )
 
@@ -1166,6 +1190,24 @@
   (construct-only #t)
 )
 
+(define-property flowinfo
+  (of-object "GInetSocketAddress")
+  (prop-type "GParamUInt")
+  (docs "IPv6 flow info")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property scope-id
+  (of-object "GInetSocketAddress")
+  (prop-type "GParamUInt")
+  (docs "IPv6 scope ID")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
 ;; From GSocketAddress
 
 (define-property family
@@ -1297,7 +1339,25 @@
   )
 )
 
+(define-property settings-schema
+  (of-object "GSettings")
+  (prop-type "GParamBoxed")
+  (docs "The GSettingsSchema for this settings object")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
 (define-property schema
+  (of-object "GSettings")
+  (prop-type "GParamString")
+  (docs "The name of the schema for this settings object")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property schema-id
   (of-object "GSettings")
   (prop-type "GParamString")
   (docs "The name of the schema for this settings object")
@@ -1434,7 +1494,54 @@
   (construct-only #f)
 )
 
+(define-property ttl
+  (of-object "GSocket")
+  (prop-type "GParamUInt")
+  (docs "Time-to-live of outgoing unicast packets")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property broadcast
+  (of-object "GSocket")
+  (prop-type "GParamBoolean")
+  (docs "Whether to allow sending to and receiving from broadcast addresses")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property multicast-loopback
+  (of-object "GSocket")
+  (prop-type "GParamBoolean")
+  (docs "Whether outgoing multicast packets loop back to the local host")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property multicast-ttl
+  (of-object "GSocket")
+  (prop-type "GParamUInt")
+  (docs "Time-to-live of outgoing multicast packets")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
 ;; From GSocketClient
+
+(define-signal event
+  (of-object "GSocketClient")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GSocketClientEvent" "p0")
+    '("GSocketConnectable*" "p1")
+    '("GIOStream*" "p2")
+  )
+)
 
 (define-property family
   (of-object "GSocketClient")
