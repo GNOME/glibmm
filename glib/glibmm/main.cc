@@ -35,6 +35,16 @@
 
 namespace
 {
+#ifdef GLIBMM_DISABLE_DEPRECATED
+void time64_to_time_val(gint64 time64, Glib::TimeVal& time_val)
+{
+  // This function is not guaranteed to convert correctly if time64 is negative.
+  const long seconds = static_cast<long>(time64 / G_GINT64_CONSTANT(1000000));
+  const long microseconds = static_cast<long>(time64 -
+                            static_cast<gint64>(seconds) * G_GINT64_CONSTANT(1000000));
+  time_val = Glib::TimeVal(seconds, microseconds);
+}
+#endif //GLIBMM_DISABLE_DEPRECATED
 
 class SourceConnectionNode
 {
@@ -955,7 +965,11 @@ TimeoutSource::~TimeoutSource()
 bool TimeoutSource::prepare(int& timeout)
 {
   Glib::TimeVal current_time;
+#ifndef GLIBMM_DISABLE_DEPRECATED
   get_current_time(current_time);
+#else
+  time64_to_time_val(get_time(), current_time);
+#endif //GLIBMM_DISABLE_DEPRECATED
 
   Glib::TimeVal remaining = expiration_;
   remaining.subtract(current_time);
@@ -992,7 +1006,11 @@ bool TimeoutSource::prepare(int& timeout)
 bool TimeoutSource::check()
 {
   Glib::TimeVal current_time;
+#ifndef GLIBMM_DISABLE_DEPRECATED
   get_current_time(current_time);
+#else
+  time64_to_time_val(get_time(), current_time);
+#endif //GLIBMM_DISABLE_DEPRECATED
 
   return (expiration_ <= current_time);
 }
@@ -1003,7 +1021,11 @@ bool TimeoutSource::dispatch(sigc::slot_base* slot)
 
   if(again)
   {
+#ifndef GLIBMM_DISABLE_DEPRECATED
     get_current_time(expiration_);
+#else
+    time64_to_time_val(get_time(), expiration_);
+#endif //GLIBMM_DISABLE_DEPRECATED
     expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
   }
 

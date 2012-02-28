@@ -16,8 +16,7 @@
  */
 
 _DEFS(glibmm,glib)
-
-#include <glibmmconfig.h>
+_CONFIGINCLUDE(glibmmconfig.h)
 
 #include <glib.h>
 
@@ -31,6 +30,8 @@ namespace Glib
 
 namespace Threads
 {
+//The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the Threads sub-namespace
+_GMMPROC_EXTRA_NAMESPACE(Threads)
 
 /** @defgroup Threads Threads
  * Thread abstraction; including threads, different mutexes,
@@ -60,7 +61,7 @@ _WRAP_GERROR(ThreadError, GThreadError, G_THREAD_ERROR, NO_GTYPE)
  * @note g_thread_exit() is not wrapped, because that function exits a thread
  * without any cleanup.  That's especially dangerous in C++ code, since the
  * destructors of automatic objects won't be invoked.  Instead, you can throw
- * a Thread::Exit exception, which will be caught by the internal thread
+ * a Threads::Thread::Exit exception, which will be caught by the internal thread
  * entry function.
  *
  * @note You might have noticed that the thread entry slot doesn't have the
@@ -79,7 +80,7 @@ public:
    *
    * The new thread executes the function or method @a slot points to.  You can
    * pass additional arguments using sigc::bind().  If the thread was created
-   * successfully, it is returned, otherwise a ThreadError exception is thrown.
+   * successfully, it is returned, otherwise a Threads::ThreadError exception is thrown.
    *
    * Because sigc::trackable is not thread safe, if the slot represents a
    * non-static class method (that is, it is created by sigc::mem_fun()), the
@@ -88,7 +89,7 @@ public:
    * @param slot A slot to execute in the new thread.
    * @param joinable This parameter is now ignored because Threads are now always joinable.
    * @return The new Thread* on success.
-   * @throw Glib::ThreadError
+   * @throw Glib::Threads::ThreadError
    */
   static Thread* create(const sigc::slot<void>& slot, bool joinable = true);
 
@@ -101,7 +102,7 @@ public:
    * Waits until the thread finishes, i.e. the slot, as given to create(),
    * returns or g_thread_exit() is called by the thread.  (Calling
    * g_thread_exit() in a C++ program should be avoided.)  All resources of
-   * the thread including the Glib::Thread object are released.  The thread
+   * the thread including the Glib::Threads::Thread object are released.  The thread
    * must have been created with <tt>joinable&nbsp;=&nbsp;true</tt>.
    */
   void join();
@@ -130,10 +131,10 @@ private:
 
 /** %Exception class used to exit from a thread.
  * @code
- * throw Glib::Thread::Exit();
+ * throw Glib::Threads::Thread::Exit();
  * @endcode
- * Write this if you want to exit from a thread created by Thread::create().
- * Of course you must make sure not to catch Thread::Exit by accident, i.e.
+ * Write this if you want to exit from a thread created by Threads::Thread::create().
+ * Of course you must make sure not to catch Threads::Thread::Exit by accident, i.e.
  * when using <tt>catch(...)</tt> somewhere in your code.
  */
 class Thread::Exit

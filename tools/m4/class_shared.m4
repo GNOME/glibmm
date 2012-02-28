@@ -266,4 +266,13 @@ define(`_GTKMMPROC_WIN32_NO_WRAP', dnl
 //and the class will not be registered in wrap_init.h or wrap_init.cc
 ')dnl
 
+dnl _IS_DEPRECATED
+dnl ifdef-out the whole .h and .cc files.
+dnl generate_wrap_init.pl will look for this in the original .hg file.
+define(`_IS_DEPRECATED',`dnl
+_PUSH()
+dnl Define this macro to be tested for later. See base.m4.
+define(`__BOOL_DEPRECATED__',`$1')
+_POP()
+')
 
