@@ -261,6 +261,70 @@ foreach my $filename_header (sort keys %objects)
   print_with_guards($filename_header, $message);
 }
 
+# wrap_init() calls throw_func() in each exception class. throw_func() is a
+# private method. wrap_init() is declared as a friend of the exception class.
+# The friends will find each other easily only if the calling wrap_init()
+# function is declared in the same namespace as the exception class.
+# If there are extra namespaces, we define extra wrap_init() functions, which
+# are called from the wrap_init() function in @namespace_whole.
+
+my %extra_namespaces = ();
+foreach my $filename_header (keys %exceptions)
+{
+  my @exceptions_in_file = @{$exceptions{$filename_header}};
+  foreach my $i (@exceptions_in_file)
+  {
+    if (@{$i} > 2)
+    {
+      my (undef, undef, @extra_namespace) = @{$i};
+      $extra_namespaces{join("::", @extra_namespace)} = 1;
+    }
+  }
+}
+
+# Generate the extra wrap_init() functions in sub-namespaces, if any.
+
+# If you suspect that code with three levels of foreach is inefficient, you are
+# probably right, but it's not important here. The exception classes are few in
+# most modules (hardly more than about 10), and the sub-namespaces are even
+# fewer (usually 0 or 1).
+
+print "\n// Register Error domains in sub-namespaces:\n" if keys %extra_namespaces > 0;
+
+foreach my $sub_namespace (sort keys %extra_namespaces)
+{
+  my @extra_namespace = split("::", $sub_namespace);
+  my $namespace_declarations = "";
+  my $namespace_close = "";
+  foreach (@extra_namespace)
+  {
+    $namespace_declarations .= "namespace $_ {\n";
+    $namespace_close = "} // $_\n$namespace_close";
+  }
+
+  print "\n$namespace_declarations";
+  print "\nvoid wrap_init()\n{\n";
+
+  foreach my $filename_header (sort keys %exceptions)
+  {
+    my @exceptions_in_file = @{$exceptions{$filename_header}};
+    my $message = "";
+    foreach my $i (@exceptions_in_file)
+    {
+      my ($cppname, $basename, @extra_namespace) = @{$i};
+      if (@extra_namespace > 0 && $sub_namespace eq join("::", @extra_namespace))
+      {
+        $message .= "  Glib::Error::register_domain(${basename}_quark(), &" .
+                    "${sub_namespace}::${cppname}::throw_func);\n";
+      }
+    }
+    print_with_guards($filename_header, $message) if $message;
+  }
+
+  print "\n} // wrap_init()\n";
+  print "\n$namespace_close";
+}
+
 # Generate namespace::wrap_init() body
 
 print "\nvoid ${function_prefix}wrap_init()\n{\n";
@@ -274,11 +338,25 @@ foreach my $filename_header (sort keys %exceptions)
   foreach my $i (@exceptions_in_file)
   {
     my ($cppname, $basename, @extra_namespace) = @{$i};
-    my $qualified_cppname = join("::", (@extra_namespace, $cppname));
-    $message .= "  Glib::Error::register_domain(${basename}_quark(), &" .
-                "${qualified_cppname}::throw_func);\n";
+    if (@extra_namespace == 0)
+    {
+      $message .= "  Glib::Error::register_domain(${basename}_quark(), &" .
+                  "${cppname}::throw_func);\n";
+    }
   }
   print_with_guards($filename_header, $message) if $message;
+}
+
+# Exception classes in sub-namespaces are registered after the ones in the main
+# namespace. If you ever change this order, check that it's ok with Glib::ThreadError
+# and Glib::Threads::ThreadError. Both these classes wrap GThreadError, and
+# Glib::ThreadError is deprecated (2012-02-27).
+
+print "\n  // Call the wrap_init() functions in sub-namespaces:\n" if keys %extra_namespaces > 0;
+
+foreach my $sub_namespace (sort keys %extra_namespaces)
+{
+  print "  ${sub_namespace}::wrap_init();\n";
 }
 
 print "\n";
