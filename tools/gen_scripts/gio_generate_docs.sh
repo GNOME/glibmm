@@ -2,8 +2,8 @@
 
 # Note that docextract_to_xml.py should be in PATH for this script to work and
 # JHBUILD_SOURCES should be defined to contain the path to the root of the
-# jhbuild sources.  The XML file will be placed in
-# $JHBUILD_SOURCES/glibmm/gio/src.
+# jhbuild sources.  The script assumes that it resides in the tools/gen_scripts
+# directory and the XML file will be placed in gio/src.
 
 if [ -z "$JHBUILD_SOURCES" -o ! -x "`which docextract_to_xml.py`" ]; then
   echo -e "JHBUILD_SOURCES must contain path to jhbuild sources and \
@@ -12,7 +12,8 @@ docextract_to_xml.py\nneeds to be executable and in PATH."
 fi
 
 PREFIX="$JHBUILD_SOURCES"
-OUT_DIR="$JHBUILD_SOURCES/glibmm/gio/src"
+ROOT_DIR="$(dirname "$0")/../.."
+OUT_DIR="$ROOT_DIR/gio/src"
 
 for dir in "$PREFIX"/glib/gio; do
   PARAMS="$PARAMS -s $dir"

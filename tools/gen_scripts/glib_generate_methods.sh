@@ -2,8 +2,8 @@
 
 # Note that h2def.py should be in PATH for this script to work and
 # JHBUILD_SOURCES should be defined to contain the path to the root of the
-# jhbuild sources.  The defs files will be placed in
-# $JHBUILD_SOURCES/glibmm/glib/src.
+# jhbuild sources.  The script assumes that it resides in the tools/gen_scripts
+# directory and the defs files will be placed in glib/src.
 
 if [ -z "$JHBUILD_SOURCES" -o ! -x "`which h2def.py`" ]; then
   echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources and \
@@ -12,7 +12,8 @@ h2def.py\nneeds to be executable and in PATH."
 fi
 
 PREFIX="$JHBUILD_SOURCES/glib"
-OUT_DIR="$JHBUILD_SOURCES/glibmm/glib/src"
+ROOT_DIR="$(dirname "$0")/../.."
+OUT_DIR="$ROOT_DIR/glib/src"
 
 h2def.py "$PREFIX"/glib/*.h "$PREFIX"/glib/deprecated/*.h > "$OUT_DIR"/glib_functions.defs
 patch "$OUT_DIR"/glib_functions.defs "$OUT_DIR"/glib_functions.defs.patch
