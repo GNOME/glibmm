@@ -249,6 +249,7 @@ protected:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 public:
+_IMPORT(SECTION_DTOR_DOCUMENTATION)
   virtual ~__CPPNAME__`'();
 
   static void add_interface(GType gtype_implementer);

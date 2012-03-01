@@ -213,6 +213,9 @@ dnl _NEW_SECTION(SECTION_PCC_OBJECT_INIT) dnl  gtk+ object_init function
 _NEW_SECTION(SECTION_CHECK)
 _NEW_SECTION(SECTION_USR)
 
+dnl Used for documenting destructors if desired.
+_NEW_SECTION(SECTION_DTOR_DOCUMENTATION)
+
 define(`_CHECK',`dnl
 _PUSH(SECTION_CHECK)
     $*

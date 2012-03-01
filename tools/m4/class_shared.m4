@@ -57,6 +57,27 @@ define(`__BOOL_DYNAMIC_GTYPE_REGISTRATION__',`$1')
 _POP()
 ')
 
+dnl This macro inserts the supplied text as a Doxygen comment block before the
+dnl automatically generated declaration of a class' destructor.  The inner
+dnl m4_ifelse() attempts to remove double quotes before and after the text if
+dnl it is a single line.  If it is not, it returns the supplied lines, removing
+dnl trailing spaces from each of them (with an m4_patsubst()).  The following
+dnl outer m4_patsubst() prepends possible multiple lines below the first one
+dnl with ' * ' by assuming that these lines are preceded by at least one space.
+dnl Finally, the outer m4_patsubst() inserts spaces after commas which are
+dnl removed by m4 in the processing.
+dnl
+dnl
+dnl
+dnl
+define(`_DOCUMENT_DTOR',`dnl
+_PUSH(SECTION_DTOR_DOCUMENTATION)
+m4_ifelse(`$*',,,`dnl
+  m4_patsubst(`m4_patsubst(`/** m4_ifelse(m4_regexp(`$*',`".*"'),-1,`m4_patsubst(`$*',`\s*$')',`m4_regexp(`$*',`"\s*\(.*\)\(\S\)\s*"',`\1\2')')',`^\s+',`   * ')',`,',`, ')
+   */
+')dnl
+_POP()
+')
 
 
 

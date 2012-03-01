@@ -167,6 +167,7 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
   __CPPNAME__`'(const __CPPNAME__& src);
   __CPPNAME__& operator=(const __CPPNAME__& src);
 
+_IMPORT(SECTION_DTOR_DOCUMENTATION)
   ~__CPPNAME__`'();
 
   __CNAME__*       gobj()       { return gobject_; }

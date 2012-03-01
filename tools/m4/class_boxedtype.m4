@@ -196,6 +196,7 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
   __CPPNAME__`'(const __CPPNAME__& other);
   __CPPNAME__& operator=(const __CPPNAME__& other);
 
+_IMPORT(SECTION_DTOR_DOCUMENTATION)
   ~__CPPNAME__`'();
 
   void swap(__CPPNAME__& other);
