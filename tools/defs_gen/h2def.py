@@ -308,6 +308,10 @@ def clean_func(buf):
     pat = re.compile(r"""[A-Z]+_DEPRECATED\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
+    #strip *_AVAILABLE_IN_*
+    pat = re.compile(r"""[A-Z]+_AVAILABLE_IN_[1-9]_[1-9]\S*""", re.MULTILINE)
+    buf = pat.sub('', buf)
+
     #we are not stripping G_GNUC_INTERNAL
 
     #extern "C"
