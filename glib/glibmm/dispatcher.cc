@@ -255,7 +255,7 @@ DispatchNotifier* DispatchNotifier::reference_instance(const Glib::RefPtr<MainCo
   if(!instance)
   {
     instance = new DispatchNotifier(context);
-    thread_specific_instance_.set(instance);
+    thread_specific_instance_.replace(instance);
   }
   else
   {
@@ -281,7 +281,7 @@ void DispatchNotifier::unreference_instance(DispatchNotifier* notifier)
     g_return_if_fail(instance->ref_count_ == 0); // could be < 0 if messed up
 
     // This causes deletion of the notifier object.
-    thread_specific_instance_.set(0);
+    thread_specific_instance_.replace(0);
   }
 }
 

@@ -442,17 +442,48 @@ private:
   Cond& operator=(const Cond&);
 };
 
+/** Thread-local data pointer.
+ *
+ * It is recommended that all instances of this class are statically allocated.
+ * The first time an instance is used (get(), set() or replace() is called)
+ * gtk+ allocates a scarce OS resource that cannot be deallocated.
+ */
 template <class T>
 class Private
 {
 public:
   typedef void (*DestructorFunc) (void*);
 
+  /** Deletes static_cast<T*>(data)
+   */
   static void delete_ptr(void* data);
 
+  /** Constructor.
+   *
+   * @param destructor_func Function pointer, or 0. If @a destructor_func is not 0
+   * and the stored data pointer is not 0, this function is called when replace()
+   * is called and when the thread exits.
+   */
   explicit inline Private(DestructorFunc destructor_func = &Private<T>::delete_ptr);
+
+  /** Gets the pointer stored in the calling thread.
+   *
+   * @return If no value has yet been set in this thread, 0 is returned.
+   */
   inline T* get();
+
+  /** Sets the pointer in the calling thread without calling <tt>destructor_func()</tt>.
+   */
   inline void set(T* data);
+
+  /** Sets the pointer in the calling thread and calls <tt>destructor_func()</tt>.
+   * If a function pointer (and not 0) was specified in the constructor, and
+   * the stored data pointer before the call to replace() is not 0, then
+   * <tt>destructor_func()</tt> is called with this old pointer value.
+   *
+   * @newin{2,32}
+   */
+  inline void replace(T* data);
 
   GPrivate* gobj() { return gobject_; }
 
@@ -747,6 +778,12 @@ template <class T> inline
 void Private<T>::set(T* data)
 {
   g_private_set(&gobject_, data);
+}
+
+template <class T> inline
+void Private<T>::replace(T* data)
+{
+  g_private_replace(&gobject_, data);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

@@ -248,7 +248,7 @@ public:
    * @throw Glib::ThreadError
    *
    * @deprecated Use the simpler create() method instead, because all Threads 
-   * are now joinable, and bounds and priority parameters now have effect.
+   * are now joinable, and bounds and priority parameters now have no effect.
    */
   static Thread* create(const sigc::slot<void>& slot, unsigned long stack_size,
                         bool joinable, bool bound, ThreadPriority priority);
@@ -723,6 +723,10 @@ private:
 };
 
 
+/** Thread-local data pointer.
+ *
+ * @deprecated Use Glib::Threads::Private instead, which can be used statically.
+ */
 template <class T>
 struct StaticPrivate
 {
@@ -741,6 +745,10 @@ struct StaticPrivate
 #endif
 };
 
+/** Thread-local data pointer.
+ *
+ * @deprecated Use Glib::Threads::Private instead.
+ */
 template <class T>
 class Private
 {
@@ -1030,7 +1038,7 @@ void StaticPrivate<T>::delete_ptr(void* data)
   delete static_cast<T*>(data);
 }
 
-/** This is ony for use by glibmm itself.
+/** This is only for use by glibmm itself.
  */
 void* StaticPrivate_get_helper(GStaticPrivate *private_key);
 
@@ -1040,7 +1048,7 @@ T* StaticPrivate<T>::get()
   return static_cast<T*>(StaticPrivate_get_helper(&gobject_));
 }
 
-/** This is ony for use by glibmm itself.
+/** This is only for use by glibmm itself.
  */
 void StaticPrivate_set_helper(GStaticPrivate *private_key, gpointer data, GDestroyNotify notify);
 
@@ -1060,7 +1068,7 @@ void Private<T>::delete_ptr(void* data)
   delete static_cast<T*>(data);
 }
 
-/** This is ony for use by glibmm itself.
+/** This is only for use by glibmm itself.
  */
 GPrivate* GPrivate_new_helper(GDestroyNotify notify);
 
