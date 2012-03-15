@@ -94,7 +94,17 @@ _CONVERSION(`GDBusPropertyInfo*',`Glib::RefPtr<PropertyInfo>',`Glib::wrap($3)')
 _CONVERSION(`GDBusNodeInfo*',`Glib::RefPtr<NodeInfo>',`Glib::wrap($3)')
 _CONVERSION(`GDBusInterfaceInfo*',`Glib::RefPtr<InterfaceInfo>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<InterfaceInfo>&',`GDBusInterfaceInfo*',`Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<InterfaceInfo>',`GDBusInterfaceInfo*',`Glib::unwrap($3)')
 _CONVERSION(`GDBusInterfaceInfo*',`const Glib::RefPtr<InterfaceInfo>',`Glib::wrap($3)')
+
+# DBusInterface
+_CONVERSION(`GDBusInterface*',`Glib::RefPtr<Gio::DBus::Interface>',`Glib::wrap($3)')
+_CONVERSION(`Glib::RefPtr<Gio::DBus::Interface>',`GDBusInterface*',`Glib::unwrap($3)')
+
+# DBusObject
+_CONVERSION(`GDBusObject*',`Glib::RefPtr<Gio::DBus::Object>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gio::DBus::Object>&',`GDBusObject*',`Glib::unwrap($3)')
+_CONVERSION(`Glib::RefPtr<Gio::DBus::Object>',`GDBusObject*',`Glib::unwrap($3)')
 
 # DBusProxy
 _CONVERSION(`GDBusProxy*',`Glib::RefPtr<Proxy>',`Glib::wrap($3)')
