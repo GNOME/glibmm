@@ -100,6 +100,7 @@ _CONVERSION(`GDBusInterfaceInfo*',`const Glib::RefPtr<InterfaceInfo>',`Glib::wra
 # DBusInterface
 _CONVERSION(`GDBusInterface*',`Glib::RefPtr<Gio::DBus::Interface>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gio::DBus::Interface>',`GDBusInterface*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<Gio::DBus::Interface>&',`GDBusInterface*',`Glib::unwrap($3)')
 
 # DBusObject
 _CONVERSION(`GDBusObject*',`Glib::RefPtr<Gio::DBus::Object>',`Glib::wrap($3)')
