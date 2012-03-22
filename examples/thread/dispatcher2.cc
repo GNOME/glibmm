@@ -10,7 +10,7 @@
  * of the program.
  *
  * Modified by J. Abelardo Gutierrez <jabelardo@cantv.net>
- * to cast all gtkmm out and make it glimm only
+ * to cast all gtkmm out and make it glibmm only
  *
  * Note:  This example is special stuff that's seldomly needed by the
  * vast majority of applications.  Don't bother working out what this
@@ -59,11 +59,10 @@ private:
   void thread_function();
 };
 
-//TODO: Rename to avoid confusion with Glib::Dispatcher. murrayc
-class Dispatcher : public sigc::trackable
+class ThreadDispatcher : public sigc::trackable
 {
 public:
-  Dispatcher();
+  ThreadDispatcher();
 
   void launch_thread();
   void end();
@@ -75,7 +74,7 @@ private:
 ThreadTimer::ThreadTimer() 
 :
   time_ (0),
-  // Create a new dispatcher that is attached to the default main context,
+  // Create a new Glib::Dispatcher that is attached to the default main context,
   signal_increment_ (),
   // This pointer will be initialized later by the 2nd thread.
   signal_finished_ptr_ (NULL)
@@ -90,7 +89,7 @@ ThreadTimer::~ThreadTimer()
 void ThreadTimer::launch()
 {
   // Unfortunately, the thread creation has to be fully synchronized in
-  // order to access the Dispatcher object instantiated by the 2nd thread.
+  // order to access the Glib::Dispatcher object instantiated by the 2nd thread.
   // So, let's do some kind of hand-shake using a mutex and a condition
   // variable.
   Glib::Threads::Mutex::Lock lock (startup_mutex_);
@@ -165,7 +164,7 @@ void ThreadTimer::thread_function()
   // newly created MainContext
   context->signal_timeout().connect(sigc::mem_fun(*this, &ThreadTimer::timeout_handler), 1000);
 
-  // We need to lock while creating the Dispatcher instance,
+  // We need to lock while creating the Glib::Dispatcher instance,
   // in order to ensure memory visibility.
   Glib::Threads::Mutex::Lock lock (startup_mutex_);
 
@@ -188,24 +187,24 @@ void ThreadTimer::thread_function()
 // initialize static member:
 ThreadTimer::type_signal_end ThreadTimer::signal_end_;
 
-Dispatcher::Dispatcher()
+ThreadDispatcher::ThreadDispatcher()
 : 
   timer_ (NULL)
 {
   std::cout << "Thread Dispatcher Example #2" << std::endl;
 
   timer_ = new ThreadTimer();
-  timer_->signal_end().connect(sigc::mem_fun(*this, &Dispatcher::end));
+  timer_->signal_end().connect(sigc::mem_fun(*this, &ThreadDispatcher::end));
   timer_->print();
 }
 
-void Dispatcher::launch_thread()
+void ThreadDispatcher::launch_thread()
 {
   // launch the timer thread
   timer_->launch();
 }
 
-void Dispatcher::end()
+void ThreadDispatcher::end()
 {
   // quit the main mainloop
   main_loop->quit();
@@ -219,11 +218,10 @@ int main(int, char**)
   Glib::init();
   main_loop = Glib::MainLoop::create();
 
-  Dispatcher dispatcher;
+  ThreadDispatcher dispatcher;
 
   // Install a one-shot idle handler to launch the threads
-  Glib::signal_idle().connect(
-      sigc::bind_return(sigc::mem_fun(dispatcher, &Dispatcher::launch_thread), false));
+  Glib::signal_idle().connect_once(sigc::mem_fun(dispatcher, &ThreadDispatcher::launch_thread));
 
   main_loop->run();
 
