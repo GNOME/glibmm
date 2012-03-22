@@ -84,7 +84,7 @@ void* SourceConnectionNode::notify(void* data)
     g_source_destroy(s);
 
     // Destroying the object triggers execution of destroy_notify_handler(),
-    // eiter immediately or later, so we leave that to do the deletion.
+    // either immediately or later, so we leave that to do the deletion.
   }
 
   return 0;
@@ -214,6 +214,26 @@ static gboolean glibmm_source_callback(void* data)
   return 0;
 }
 
+/* Only used by SignalTimeout::connect_once() and SignalIdle::connect_once().
+ * These don't use Glib::Source, to avoid the unnecessary overhead
+ * of a completely unused wrapper object.
+ */
+static gboolean glibmm_source_callback_once(void* data)
+{
+  SourceConnectionNode* const conn_data = static_cast<SourceConnectionNode*>(data);
+
+  try
+  {
+    // Recreate the specific slot from the generic slot node.
+    (*static_cast<sigc::slot<void>*>(conn_data->get_slot()))();
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return 0; // Destroy the event source after one call
+}
+
 static gboolean glibmm_iosource_callback(GIOChannel*, GIOCondition condition, void* data)
 {
   SourceCallbackData *const callback_data = static_cast<SourceCallbackData*>(data);
@@ -249,6 +269,29 @@ static gboolean glibmm_child_watch_callback(GPid pid, gint child_status, void* d
     Glib::exception_handlers_invoke();
   }
   return 0;
+}
+
+static void glibmm_signal_connect_once(const sigc::slot<void>& slot, int priority,
+                                       GSource* source, GMainContext* context)
+{
+  SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
+
+  if (priority != G_PRIORITY_DEFAULT)
+    g_source_set_priority(source, priority);
+
+  g_source_set_callback(
+    source, &glibmm_source_callback_once, conn_node,
+    &SourceConnectionNode::destroy_notify_callback);
+
+  g_source_attach(source, context);
+  // GMainContext holds a reference to source until the source is dispatched and
+  // glibmm_source_callback_once() returns 0. Even if that has happened now
+  // (in another thread), conn_node and source still exist.
+  // SourceConnectionNode::destroy_notify_callback() has not been called,
+  // because the initial reference to source remains until the following call
+  // to g_source_unref().
+  conn_node->install(source);
+  g_source_unref(source);
 }
 
 } // anonymous namespace
@@ -315,7 +358,8 @@ sigc::connection SignalTimeout::connect(const sigc::slot<bool>& slot,
 void SignalTimeout::connect_once(const sigc::slot<void>& slot,
                                  unsigned int interval, int priority)
 {
-    connect(sigc::bind_return(slot, false), interval, priority);
+  GSource* const source = g_timeout_source_new(interval);
+  glibmm_signal_connect_once(slot, priority, source, context_);
 }
 
 /* Note that this is our equivalent of g_timeout_add_seconds(). */
@@ -344,7 +388,8 @@ sigc::connection SignalTimeout::connect_seconds(const sigc::slot<bool>& slot,
 void SignalTimeout::connect_seconds_once(const sigc::slot<void>& slot,
                                          unsigned int interval, int priority)
 {
-    connect_seconds(sigc::bind_return(slot, false), interval, priority);
+  GSource* const source = g_timeout_source_new_seconds(interval);
+  glibmm_signal_connect_once(slot, priority, source, context_);
 }
 
 SignalTimeout signal_timeout()
@@ -384,7 +429,8 @@ sigc::connection SignalIdle::connect(const sigc::slot<bool>& slot, int priority)
 
 void SignalIdle::connect_once(const sigc::slot<void>& slot, int priority)
 {
-    connect(sigc::bind_return(slot, false), priority);
+  GSource* const source = g_idle_source_new();
+  glibmm_signal_connect_once(slot, priority, source, context_);
 }
 
 SignalIdle signal_idle()
@@ -795,7 +841,7 @@ Source::Source()
 {
   g_source_set_callback(
       gobject_, &glibmm_dummy_source_callback,
-      new SourceCallbackData(this), // our persistant callback data object
+      new SourceCallbackData(this), // our persistent callback data object
       &SourceCallbackData::destroy_notify_callback);
 }
 
@@ -805,7 +851,7 @@ Source::Source(GSource* cast_item, GSourceFunc callback_func)
 {
   g_source_set_callback(
       gobject_, callback_func,
-      new SourceCallbackData(this), // our persistant callback data object
+      new SourceCallbackData(this), // our persistent callback data object
       &SourceCallbackData::destroy_notify_callback);
 }
 
