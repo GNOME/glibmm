@@ -191,6 +191,10 @@ _CONVERSION(`GMenuLinkIter*',`Glib::RefPtr<MenuLinkIter>',`Glib::wrap($3)')
 _CONVERSION(`GMenuModel*',`Glib::RefPtr<MenuModel>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<MenuModel>&',`GMenuModel*',__CONVERT_CONST_REFPTR_TO_P)
 
+# MenuItem
+_CONVERSION(`GMenuItem*',`Glib::RefPtr<MenuItem>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<MenuItem>&',`GMenuItem*',__CONVERT_CONST_REFPTR_TO_P)
+
 # Mount
 _CONVERSION(`GMount*',`Glib::RefPtr<Mount>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<Mount>&',`GMount*',__CONVERT_CONST_REFPTR_TO_P)

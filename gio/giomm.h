@@ -40,6 +40,7 @@
 #include <giomm/dbuserror.h>
 #include <giomm/dbuserrorutils.h>
 #include <giomm/dbusintrospection.h>
+#include <giomm/dbusmenumodel.h>
 #include <giomm/dbusmessage.h>
 #include <giomm/dbusmethodinvocation.h>
 #include <giomm/dbusownname.h>
@@ -76,6 +77,9 @@
 #include <giomm/inputstream.h>
 #include <giomm/iostream.h>
 #include <giomm/loadableicon.h>
+#include <giomm/menu.h>
+#include <giomm/menuitem.h>
+#include <giomm/menumodel.h>
 #include <giomm/memoryinputstream.h>
 #include <giomm/memoryoutputstream.h>
 #include <giomm/mount.h>

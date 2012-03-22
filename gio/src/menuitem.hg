@@ -1,0 +1,62 @@
+/* Copyright (C) 2012 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/menumodel.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** TODO
+ *
+ * @newin{2,32}
+ */
+class MenuItem : public Glib::Object
+{
+  _CLASS_GOBJECT(MenuItem, GMenuItem, G_MENU_ITEM, Glib::Object, GObject)
+
+protected:
+  _WRAP_CTOR(MenuItem(const Glib::ustring& label, const Glib::ustring& detailed_action), g_menu_item_new)
+
+  _WRAP_CTOR(MenuItem(const Glib::ustring& label, const Glib::RefPtr<MenuModel>& submenu), g_menu_item_new_submenu)
+
+public:
+  _WRAP_CREATE(const Glib::ustring& label, const Glib::ustring& detailed_action)
+
+  _WRAP_CREATE(const Glib::ustring& label, const Glib::RefPtr<MenuModel>& submenu)
+
+            
+
+//TODO: GMenuItem * g_menu_item_new_section                 (const Glib::ustring& label,
+//                                                     const Glib::RefPtr<MenuModel>& section);
+
+  _WRAP_METHOD(void set_attribute_value(const Glib::ustring& attribute, const Glib::VariantBase& value), g_menu_item_set_attribute_value)
+  _IGNORE(g_menu_item_set_attribute)
+
+  _WRAP_METHOD(void set_link(const Glib::ustring& link, const Glib::RefPtr<MenuModel>& model), g_menu_item_set_link)
+  _WRAP_METHOD(void set_label(const Glib::ustring& label), g_menu_item_set_label)
+  _WRAP_METHOD(void set_submenu(const Glib::RefPtr<MenuModel>& submenu), g_menu_item_set_submenu)
+  _WRAP_METHOD(void set_section(const Glib::RefPtr<MenuModel>& section), g_menu_item_set_section)
+  _WRAP_METHOD(void set_action_and_target_value(const Glib::ustring& action, const Glib::VariantBase& target_value), g_menu_item_set_action_and_target_value)
+  _IGNORE(g_menu_item_set_action_and_target)
+  _WRAP_METHOD(void set_detailed_action(const Glib::ustring& detailed_action), g_menu_item_set_detailed_action)
+};
+
+} // namespace Gio
