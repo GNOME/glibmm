@@ -11,21 +11,26 @@ dnl               $5 = cpp_return_type,
 dnl               $6 = `<cpp_arg_types>',
 dnl               $7 = `<c_args_to_cpp>',
 dnl               $8 = `custom_c_callback (boolean)',
-dnl               $9 = `refdoc_comment',
-dnl				  $10 = ifdef)
+dnl               $9 = `deprecated' (boolean),
+dnl               $10 = `refdoc_comment',
+dnl               $11 = ifdef)
 
 define(`_SIGNAL_PROXY',`
-$9
+$10
 
-ifelse(`$10',,,`#ifdef $10'
+ifelse(`$11',,,`#ifdef $11'
 )dnl
+ifelse(`$9',,,`_DEPRECATE_IFDEF_START
+')dnl
   Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'();
-ifelse(`$10',,,`#endif // $10
+ifelse(`$9',,,`_DEPRECATE_IFDEF_END
+')dnl
+ifelse(`$11',,,`#endif // $11
 ')dnl
 dnl
 _PUSH(SECTION_ANONYMOUS_NAMESPACE)
 
-ifelse(`$10',,,`#ifdef $10'
+ifelse(`$11',,,`#ifdef $11'
 )dnl
 dnl
 ifelse($2`'_NUM($3)`'$5`'_NUM($6),`void0void0',`dnl
@@ -112,18 +117,18 @@ static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 };
 ')dnl endif
 
-ifelse(`$10',,,`#endif // $10
+ifelse(`$11',,,`#endif // $11
 ')dnl
 
 _SECTION(SECTION_CC_SIGNALPROXIES)
 
-ifelse(`$10',,,`#ifdef $10'
+ifelse(`$11',,,`#ifdef $11'
 )dnl
 Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > __CPPNAME__::signal_$4`'()
 {
   return Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) >(this, &__CPPNAME__`'_signal_$4_info);
 }
-ifelse(`$10',,,`#endif // $10
+ifelse(`$11',,,`#endif // $11
 ')dnl
 
 _POP()')

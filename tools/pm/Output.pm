@@ -473,11 +473,11 @@ sub output_wrap_create($$$)
   }
 }
 
-# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback)
+# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs)
 # custom_signalproxy_name is "" when no type conversion is required - a normal templates SignalProxy will be used instead.
-sub output_wrap_sig_decl($$$$$$$$)
+sub output_wrap_sig_decl($$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous) = @_;
+  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs) = @_;
 
 # _SIGNAL_PROXY(c_signal_name, c_return_type, `<c_arg_types_and_names>',
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
@@ -490,7 +490,7 @@ sub output_wrap_sig_decl($$$$$$$$)
 
   # Get the existing signal documentation from the parsed docs.
   my $documentation =
-    DocsParser::lookup_documentation("$$objCSignal{class}::$underscored_signal_name", "");
+    DocsParser::lookup_documentation("$$objCSignal{class}::$underscored_signal_name", $deprecation_docs);
 
   # Create a merged Doxygen comment block for the signal from the looked up
   # docs (the block will also contain a prototype of the slot as an example).
@@ -505,6 +505,7 @@ sub output_wrap_sig_decl($$$$$$$$)
   {
     # Strip leading whitespace
     $doxycomment =~ s/^\s+//;
+
     # We don't have something to add, so just close the comment.
     if($doxycomment eq "")
     {
@@ -529,6 +530,7 @@ sub output_wrap_sig_decl($$$$$$$$)
     $objCppfunc->args_types_only(),
     convert_args_c_to_cpp($objCSignal, $objCppfunc, $line_num),
     $bCustomCCallback, #When this is true, it will not write the *_callback implementation for you.
+    $deprecated,
     $doxycomment,
     $ifdef
   );

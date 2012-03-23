@@ -233,7 +233,7 @@ sub parse_on_cdata($$)
 }
 
 
-# $strCommentBlock lookup_documentation($strFunctionName)
+# $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs)
 sub lookup_documentation($$)
 {
   my ($functionName, $deprecation_docs) = @_;

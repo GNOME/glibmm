@@ -1130,6 +1130,8 @@ sub on_wrap_signal($$)
   my $bCustomCCallback = 0;
   my $bRefreturn = 0;
   my $ifdef;
+  my $argDeprecated = "";
+  my $deprecation_docs = "";
 
   while($#args >= 2) # If optional arguments are there.
   {
@@ -1154,7 +1156,17 @@ sub on_wrap_signal($$)
       $bRefreturn = 1;
     }
 
-  	elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
+    if($argRef =~ /^deprecated(.*)/) #If deprecated is at the start.
+    {
+      $argDeprecated = "deprecated";
+
+      if($1 ne "")
+      {
+        $deprecation_docs = string_unquote(string_trim($1));
+      }
+    }
+
+    elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
     	$ifdef = $1;
     }
@@ -1162,7 +1174,7 @@ sub on_wrap_signal($$)
 
   $self->output_wrap_signal($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                             $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback,
-                            $bRefreturn, $ifdef, $merge_doxycomment_with_previous);
+                            $bRefreturn, $ifdef, $merge_doxycomment_with_previous, $argDeprecated, $deprecation_docs);
 }
 
 # void on_wrap_vfunc()
@@ -1331,10 +1343,10 @@ sub output_wrap_check($$$$$$)
   return '';
 }
 
-# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn)
-sub output_wrap_signal($$$$$$$$$)
+# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs)
+sub output_wrap_signal($$$$$$$$$$$)
 {
-  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous) = @_;
+  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $signal_name,
@@ -1359,14 +1371,14 @@ sub output_wrap_signal($$$$$$$$$)
     # Check for failed lookup.
     if($objCSignal eq 0) 
     {
-    print STDERR "$signal_name\n";
-      $objOutputter->output_wrap_failed($signal_name, 
-        " signal defs lookup failed");
+      print STDERR "$signal_name\n";
+        $objOutputter->output_wrap_failed($signal_name, 
+          " signal defs lookup failed");
       return;
     }
   }
 
-  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous);
+  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs);
 
   if($bNoDefaultHandler eq 0)
   {
