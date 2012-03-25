@@ -1,0 +1,63 @@
+/* Copyright (C) 2007 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <exception>
+
+#include <string>
+
+#include <glibmm/interface.h>
+#include <glibmm/listhandle.h>
+#include <glibmm/object.h>
+//#include <giomm/file.h>
+#include <giomm/icon.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+class AppInfo;
+class File;
+
+/** This is used to handle, for instance, startup notification and launching of the new application on the same screen as the launching window.
+ * See also AppInfo.
+ *
+ * @newin{2,16}
+ */
+class AppLaunchContext : public Glib::Object
+{
+  _CLASS_GOBJECT(AppLaunchContext, GAppLaunchContext, G_APP_LAUNCH_CONTEXT, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT()
+
+public:
+  _WRAP_CREATE()
+
+#m4 _CONVERSION(`const Glib::ListHandle<std::string>&',`GList*',`$3.data()')
+  _WRAP_METHOD(std::string get_display(const Glib::RefPtr<AppInfo>& info, const Glib::ListHandle< Glib::RefPtr<Gio::File> >& files),
+               g_app_launch_context_get_display)
+
+  _WRAP_METHOD(std::string get_startup_notify_id(const Glib::RefPtr<AppInfo>& info, const Glib::ListHandle< Glib::RefPtr<Gio::File> >& files),
+               g_app_launch_context_get_startup_notify_id)
+  _WRAP_METHOD(void launch_failed(const std::string& startup_notify_id),
+               g_app_launch_context_launch_failed)
+};
+
+} // namespace Gio
+
