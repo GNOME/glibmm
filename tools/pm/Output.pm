@@ -84,20 +84,20 @@ sub error
 
 sub ifdef($$)
 {
-	my ($self, $ifdef) = @_;
-	if ($ifdef)
-	{
-		$self->append("\n#ifdef $ifdef\n");
-	}
+  my ($self, $ifdef) = @_;
+  if ($ifdef)
+  {
+    $self->append("\n#ifdef $ifdef\n");
+  }
 }
 
 sub endif($$)
 {
-	my ($self, $ifdef) = @_;
-	if ($ifdef)
-	{
-		$self->append("\n#endif // $ifdef\n");
-	}
+  my ($self, $ifdef) = @_;
+  if ($ifdef)
+  {
+    $self->append("\n#endif // $ifdef\n");
+  }
 }
 
 ### Convert _WRAP to a virtual 
@@ -669,11 +669,12 @@ sub output_wrap_property($$$$$$$$)
       $self->append("\n_DEPRECATE_IFDEF_START\n");
     }
     
-    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,`%s')dnl\n",
+    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s,`%s')dnl\n",
       $name,
       $name_underscored,
       $cpp_type,
       $proxy_suffix,
+      $deprecated,
       $documentation
     );
     $self->append($str);
@@ -688,7 +689,7 @@ sub output_wrap_property($$$$$$$$)
         $name_underscored,
         $cpp_type,
         "_ReadOnly",
-	$deprecated,
+        $deprecated,
         $documentation
       );
       $self->append($str);
@@ -1109,8 +1110,8 @@ sub output_implements_interface($$)
   my ($self, $interface, $ifdef) = @_;
 
   my $str = sprintf("_IMPLEMENTS_INTERFACE_CC(%s, %s)dnl\n",
-  	$interface,
-  	$ifdef);
+      $interface,
+      $ifdef);
 
   $self->append($str);
 }

@@ -6,7 +6,7 @@ dnl  Code generation sections for properties
 dnl
 dnl
 
-dnl
+dnl                  $1         $2            $3          $4           $5        $6
 dnl _PROPERTY_PROXY(name, name_underscored, cpp_type, proxy_suffix, deprecated, docs)
 dnl proxy_suffix could be "_WriteOnly" or "_ReadOnly"
 dnl The method will be const if the propertyproxy is _ReadOnly.
@@ -34,9 +34,9 @@ __PROXY_TYPE__ __CPPNAME__::property_$2`'() ifelse($4,_ReadOnly, const,)
 {
   return __PROXY_TYPE__`'(this, "$1");
 }
+#endif //GLIBMM_PROPERTIES_ENABLED
 ifelse(`$5',,,`_DEPRECATE_IFDEF_END
 ')dnl
-#endif //GLIBMM_PROPERTIES_ENABLED
 
 _POP()
 popdef(`__PROXY_TYPE__')dnl
