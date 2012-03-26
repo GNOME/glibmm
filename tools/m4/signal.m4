@@ -17,7 +17,6 @@ dnl               $11 = ifdef)
 
 define(`_SIGNAL_PROXY',`
 $10
-
 ifelse(`$11',,,`#ifdef $11'
 )dnl
 ifelse(`$9',,,`_DEPRECATE_IFDEF_START
@@ -32,6 +31,8 @@ _PUSH(SECTION_ANONYMOUS_NAMESPACE)
 
 ifelse(`$11',,,`#ifdef $11'
 )dnl
+ifelse(`$9',,,`_DEPRECATE_IFDEF_START
+')dnl
 dnl
 ifelse($2`'_NUM($3)`'$5`'_NUM($6),`void0void0',`dnl
 dnl
@@ -117,6 +118,8 @@ static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 };
 ')dnl endif
 
+ifelse(`$9',,,`_DEPRECATE_IFDEF_END
+')dnl
 ifelse(`$11',,,`#endif // $11
 ')dnl
 
@@ -124,46 +127,60 @@ _SECTION(SECTION_CC_SIGNALPROXIES)
 
 ifelse(`$11',,,`#ifdef $11'
 )dnl
+ifelse(`$9',,,`_DEPRECATE_IFDEF_START
+')dnl
 Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > __CPPNAME__::signal_$4`'()
 {
   return Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) >(this, &__CPPNAME__`'_signal_$4_info);
 }
+ifelse(`$9',,,`_DEPRECATE_IFDEF_END
+')dnl
 ifelse(`$11',,,`#endif // $11
 ')dnl
 
 _POP()')
 
 
-dnl
-dnl _SIGNAL_PH(gname, crettype, cargs and names)
+dnl              $1      $2            $3          $4       $5
+dnl _SIGNAL_PH(gname, crettype, cargs and names, ifdef, deprecated)
 dnl Create a callback and set it in our derived G*Class.
 dnl
 define(`_SIGNAL_PH',`dnl
 _PUSH(SECTION_PCC_CLASS_INIT_DEFAULT_SIGNAL_HANDLERS)
 ifelse(`$4',,,`#ifdef $4'
 )dnl
+ifelse(`$5',,,`_DEPRECATE_IFDEF_START
+')dnl
   klass->$1 = `&'$1_callback;
+ifelse(`$5',,,`_DEPRECATE_IFDEF_END
+')dnl
 ifelse(`$4',,,`#endif // $4
 ')dnl
 _SECTION(SECTION_PH_DEFAULT_SIGNAL_HANDLERS)
 ifelse(`$4',,,`#ifdef $4'
 )dnl
+ifelse(`$5',,,`_DEPRECATE_IFDEF_START
+')dnl
   static $2 $1_callback`'($3);
+ifelse(`$5',,,`_DEPRECATE_IFDEF_END
+')dnl
 ifelse(`$4',,,`#endif // $4
 ')dnl
 _POP()')
 
 
 
-dnl                $1      $2       $3        $4
-dnl _SIGNAL_PCC(cppname,gname,cpprettype,crettype,
-dnl                        $5                $6          $7            $8			$9
-dnl                  `<cargs and names>',`<cnames>',`<cpparg names>', firstarg, <ifndef>)
+dnl                $1      $2       $3        $4         $5               $6
+dnl _SIGNAL_PCC(cppname,gname,cpprettype,crettype,`<cargs and names>',`<cnames>',
+dnl                  $7            $8      $9       $10
+dnl            `<cpparg names>',firstarg,<ifdef>,deprecated)
 dnl
 define(`_SIGNAL_PCC',`dnl
 _PUSH(SECTION_PCC_DEFAULT_SIGNAL_HANDLERS)
 ifelse(`$9',,,`#ifdef $9'
 )dnl
+ifelse(`$10',,,`_DEPRECATE_IFDEF_START
+')dnl
 $4 __CPPNAME__`'_Class::$2_callback`'($5)
 {
 dnl  First, do a simple cast to ObjectBase. We will have to do a dynamic_cast
@@ -223,12 +240,14 @@ ifelse($4,void,,`dnl
   return RType`'();
 ')dnl
 }
+ifelse(`$10',,,`_DEPRECATE_IFDEF_END
+')dnl
 ifelse(`$9',,,`#endif // $9
 ')dnl
 _POP()')
 
 
-dnl               $1      $2       $3 		$4
+dnl               $1      $2       $3          $4
 dnl _SIGNAL_H(signame, rettype, `<cppargs>', <ifdef>)
 dnl
 define(`_SIGNAL_H',`dnl

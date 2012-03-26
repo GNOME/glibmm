@@ -1343,10 +1343,14 @@ sub output_wrap_check($$$$$$)
   return '';
 }
 
-# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs)
+# void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
+#                  $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
+#                  $merge_doxycomment_with_previous, $deprecated, $deprecation_docs)
 sub output_wrap_signal($$$$$$$$$$$)
 {
-  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs) = @_;
+  my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
+      $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
+      $merge_doxycomment_with_previous, $deprecated, $deprecation_docs) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $signal_name,
@@ -1378,15 +1382,20 @@ sub output_wrap_signal($$$$$$$$$$$)
     }
   }
 
-  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs);
+  $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal,
+    $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous,
+    $deprecated, $deprecation_docs);
 
   if($bNoDefaultHandler eq 0)
   {
-    $objOutputter->output_wrap_default_signal_handler_h($filename, $line_num, $objCppSignal, $objCSignal, $ifdef);
+    $objOutputter->output_wrap_default_signal_handler_h($filename, $line_num,
+      $objCppSignal, $objCSignal, $ifdef, $deprecated);
 
     my $bImplement = 1;
     if($bCustomDefaultHandler) { $bImplement = 0; }
-    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num, $objCppSignal, $objCSignal, $bImplement, $bCustomCCallback, $bRefreturn, $ifdef);
+    $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num,
+      $objCppSignal, $objCSignal, $bImplement, $bCustomCCallback, $bRefreturn,
+      $ifdef, $deprecated);
   }
 }
 

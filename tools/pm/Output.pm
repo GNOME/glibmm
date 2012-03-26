@@ -194,13 +194,16 @@ sub output_wrap_vfunc_cc($$$$$$$)
 }
 
 ### Convert _WRAP to a signal
-# _SIGNAL_H(signame,rettype, ifdef, `<cppargs>')
-# _SIGNAL_PH(gtkname,crettype, ifdef, cargs and names)
-# void output_wrap_default_signal_handler_h($filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef. @args)
+# _SIGNAL_H(signame,rettype, `<cppargs>', ifdef)
+# _SIGNAL_PH(gtkname,crettype, cargs and names, ifdef, deprecated)
+# void output_wrap_default_signal_handler_h($filename, $line_num, $objCppfunc,
+#      $objCDefsFunc, $ifdef, $deprecated)
 sub output_wrap_default_signal_handler_h($$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef, $deprecated) = @_;
 
+  # The default signal handler is a virtual function.
+  # It's not hidden by deprecation, since that would break ABI.
   my $str = sprintf("_SIGNAL_H(%s,%s,\`%s\',%s)dnl\n",
     $$objCppfunc{name},
     $$objCppfunc{rettype},
@@ -210,22 +213,24 @@ sub output_wrap_default_signal_handler_h($$$$$$$)
   $self->append($str);
 
 
-  #The default callback, which will call *_impl, which will then call the base default callback.
+  #The default callback, which will call on_* or the base default callback.
   #Declares the callback in the private *Class class and sets it in the class_init function.
-
-  $str = sprintf("_SIGNAL_PH(%s,%s,\`%s\',%s)dnl\n",
+  #This is hidden by deprecation.
+  $str = sprintf("_SIGNAL_PH(%s,%s,\`%s\',%s,%s)dnl\n",
     $$objCDefsFunc{name},
     $$objCDefsFunc{rettype},
     $objCDefsFunc->args_types_and_names(),
-    $ifdef
+    $ifdef,
+    $deprecated
    );
   $self->append($str);
 }
 
-# _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>')
+# _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>', const, refreturn, ifdef)
 sub output_wrap_default_signal_handler_cc($$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement, $bCustomCCallback, $bRefreturn, $ifdef) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement,
+      $bCustomCCallback, $bRefreturn, $ifdef, $deprecated) = @_;
   my $cname = $$objDefsSignal{name};
   # $cname = $1 if ($args[3] =~ /"(.*)"/); #TODO: What's this about?
 
@@ -235,6 +240,8 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
     my $refreturn = "";
     $refreturn = "refreturn" if($bRefreturn eq 1);
 
+    # The default signal handler is a virtual function.
+    # It's not hidden by deprecation, since that would break ABI.
     my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
@@ -262,7 +269,8 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
 
   if($bCustomCCallback ne 1)
   {
-    my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',%s)dnl\n",
+    #This is hidden by deprecation.
+    my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -271,7 +279,8 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
       $objDefsSignal->args_names_only(),
       convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num),
       ${$objDefsSignal->get_param_names()}[0],
-      $ifdef);
+      $ifdef,
+      $deprecated);
     $self->append($str);
   }
 }
