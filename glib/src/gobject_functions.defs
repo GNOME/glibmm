@@ -299,11 +299,6 @@
   (return-type "GType")
 )
 
-(define-function g_value_array_get_type
-  (c-name "g_value_array_get_type")
-  (return-type "GType")
-)
-
 
 
 ;; From gclosure.h
@@ -465,6 +460,20 @@
     '("const-GValue*" "param_values")
     '("gpointer" "invocation_hint")
     '("gpointer" "marshal_data")
+  )
+)
+
+(define-function g_cclosure_marshal_generic_va
+  (c-name "g_cclosure_marshal_generic_va")
+  (return-type "none")
+  (parameters
+    '("GClosure*" "closure")
+    '("GValue*" "return_value")
+    '("gpointer" "instance")
+    '("va_list" "args_list")
+    '("gpointer" "marshal_data")
+    '("int" "n_params")
+    '("GType*" "param_types")
   )
 )
 
@@ -1878,6 +1887,16 @@
   (varargs #t)
 )
 
+(define-function g_signal_set_va_marshaller
+  (c-name "g_signal_set_va_marshaller")
+  (return-type "none")
+  (parameters
+    '("guint" "signal_id")
+    '("GType" "instance_type")
+    '("GSignalCVaMarshaller" "va_marshaller")
+  )
+)
+
 (define-function g_signal_emitv
   (c-name "g_signal_emitv")
   (return-type "none")
@@ -2851,6 +2870,11 @@
 
 
 ;; From gvaluearray.h
+
+(define-function g_value_array_get_type
+  (c-name "g_value_array_get_type")
+  (return-type "GType")
+)
 
 (define-method get_nth
   (of-object "GValueArray")

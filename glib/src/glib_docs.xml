@@ -505,11 +505,7 @@ comparison function (returns less than zero for first arg is less
 than second arg, zero for equal, greater zero if first arg is
 greater than second arg).
 
-If two array elements compare equal, their order in the sorted array
-is undefined. If you want equal elements to keep their order (i.e.
-you want a stable sort) you can write a comparison function that,
-if two elements would otherwise compare equal, compares them by
-their addresses.
+This is guaranteed to be a stable sort since version 2.32.
 
 </description>
 <parameters>
@@ -529,6 +525,12 @@ their addresses.
 <description>
 Like g_array_sort(), but the comparison function receives an extra
 user data argument.
+
+This is guaranteed to be a stable sort since version 2.32.
+
+There used to be a comment here about making the sort stable by
+using the addresses of the elements in the comparison function.
+This did not actually work, so any such code should be removed.
 
 </description>
 <parameters>
@@ -27179,15 +27181,11 @@ comparison function (returns less than zero for first arg is less
 than second arg, zero for equal, greater than zero if irst arg is
 greater than second arg).
 
-If two array elements compare equal, their order in the sorted array
-is undefined. If you want equal elements to keep their order (i.e.
-you want a stable sort) you can write a comparison function that,
-if two elements would otherwise compare equal, compares them by
-their addresses.
-
 &lt;note&gt;&lt;para&gt;The comparison function for g_ptr_array_sort() doesn't
 take the pointers from the array as arguments, it takes pointers to
 the pointers in the array.&lt;/para&gt;&lt;/note&gt;
+
+This is guaranteed to be a stable sort since version 2.32.
 
 </description>
 <parameters>
@@ -27211,6 +27209,8 @@ user data argument.
 &lt;note&gt;&lt;para&gt;The comparison function for g_ptr_array_sort_with_data()
 doesn't take the pointers from the array as arguments, it takes
 pointers to the pointers in the array.&lt;/para&gt;&lt;/note&gt;
+
+This is guaranteed to be a stable sort since version 2.32.
 
 </description>
 <parameters>
@@ -27253,6 +27253,8 @@ Since: 2.22
 <description>
 This is just like the standard C qsort() function, but
 the comparison routine accepts a user data argument.
+
+This is guaranteed to be a stable sort since version 2.32.
 
 </description>
 <parameters>
@@ -31200,6 +31202,14 @@ It should return 0 if the items are equal, a negative value if
 the first item comes before the second, and a positive value if
 the second item comes before the first.
 
+&lt;note&gt;&lt;para&gt;
+This function will fail if the data contained in the sequence is
+unsorted.  Use g_sequence_insert_sorted() or
+g_sequence_insert_sorted_iter() to add data to your sequence or, if
+you want to add a large amount of data, call g_sequence_sort() after
+doing unsorted insertions.
+&lt;/para&gt;&lt;/note&gt;
+
 Since: 2.28
 
 </description>
@@ -31236,6 +31246,14 @@ instead of a #GCompareDataFunc as the compare function.
 It should return 0 if the iterators are equal, a negative value
 if the first iterator comes before the second, and a positive
 value if the second iterator comes before the first.
+
+&lt;note&gt;&lt;para&gt;
+This function will fail if the data contained in the sequence is
+unsorted.  Use g_sequence_insert_sorted() or
+g_sequence_insert_sorted_iter() to add data to your sequence or, if
+you want to add a large amount of data, call g_sequence_sort() after
+doing unsorted insertions.
+&lt;/para&gt;&lt;/note&gt;
 
 Since: 2.28
 
@@ -31446,6 +31464,14 @@ the second item comes before the first.
 If you are simply searching for an existing element of the sequence,
 consider using g_sequence_lookup().
 
+&lt;note&gt;&lt;para&gt;
+This function will fail if the data contained in the sequence is
+unsorted.  Use g_sequence_insert_sorted() or
+g_sequence_insert_sorted_iter() to add data to your sequence or, if
+you want to add a large amount of data, call g_sequence_sort() after
+doing unsorted insertions.
+&lt;/para&gt;&lt;/note&gt;
+
 Since: 2.14
 
 </description>
@@ -31485,6 +31511,14 @@ value if the second iterator comes before the first.
 
 If you are simply searching for an existing element of the sequence,
 consider using g_sequence_lookup_iter().
+
+&lt;note&gt;&lt;para&gt;
+This function will fail if the data contained in the sequence is
+unsorted.  Use g_sequence_insert_sorted() or
+g_sequence_insert_sorted_iter() to add data to your sequence or, if
+you want to add a large amount of data, call g_sequence_sort() after
+doing unsorted insertions.
+&lt;/para&gt;&lt;/note&gt;
 
 Since: 2.14
 
@@ -41519,6 +41553,8 @@ The following example shows attaching a private structure
 &lt;structname&gt;MyObject&lt;/structname&gt; defined in the standard GObject
 fashion.
 type's class_init() function.
+Note the use of a structure member &quot;priv&quot; to avoid the overhead
+of repeatedly calling MY_OBJECT_GET_PRIVATE().
 
 |[
 typedef struct _MyObject        MyObject;
@@ -41551,7 +41587,11 @@ MyObjectPrivate);
 static int
 my_object_get_some_field (MyObject *my_object)
 {
-MyObjectPrivate *priv = my_object-&gt;priv;
+MyObjectPrivate *priv;
+
+g_return_val_if_fail (MY_IS_OBJECT (my_object), 0);
+
+priv = my_object-&gt;priv;
 
 return priv-&gt;some_field;
 }
@@ -41936,6 +41976,8 @@ to initialize the type system and assorted other code portions
 (such as the various fundamental type implementations or the signal
 system).
 
+This function is idempotent.
+
 Since version 2.24 this also initializes the thread system
 
 </description>
@@ -41947,6 +41989,8 @@ Since version 2.24 this also initializes the thread system
 <function name="g_type_init_with_debug_flags">
 <description>
 Similar to g_type_init(), but additionally sets debug flags.
+
+This function is idempotent.
 
 </description>
 <parameters>
@@ -43956,20 +44000,22 @@ Since: 2.16
 </description>
 <parameters>
 <parameter name="escaped_string">
-<parameter_description> a string.
+<parameter_description> A string, may be %NULL
 </parameter_description>
 </parameter>
 <parameter name="escaped_string_end">
-<parameter_description> a string.
+<parameter_description> Pointer to end of @escaped_string, may be %NULL
 </parameter_description>
 </parameter>
 <parameter name="illegal_characters">
-<parameter_description> an optional string of illegal characters not to be allowed.
+<parameter_description> An optional string of illegal characters not to be allowed, may be %NULL
 </parameter_description>
 </parameter>
 </parameters>
 <return> an unescaped version of @escaped_string or %NULL on error.
-The returned string should be freed when no longer needed.
+The returned string should be freed when no longer needed.  As a
+special case if %NULL is given for @escaped_string, this function
+will return %NULL.
 
 </return>
 </function>
