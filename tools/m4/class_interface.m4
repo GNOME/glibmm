@@ -228,9 +228,14 @@ private:
   __CPPNAME__`'(const __CPPNAME__&);
   __CPPNAME__& operator=(const __CPPNAME__&);
 
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 protected:
-  __CPPNAME__`'(); // you must derive from this class
-
+  /**
+   * This class must be inherited in order to be used
+   */
+  __CPPNAME__`'();
+  
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   /** Called by constructors of derived classes. Provide the result of 
    * the Class init() function to ensure that it is properly 
    * initialized.
