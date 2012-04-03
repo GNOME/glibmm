@@ -48,23 +48,21 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
-/**
- * Base class for object properties
+/** This is the base class for Glib::Object properties.
  * 
- * This class manages the value type-agnostic bits of object properties. 
+ * This class manages the generic parts of the object properties.
+ * Derived (templated) classes handle the specific value types. 
  */
 class PropertyBase
 {
 public:
 
-  /**
-   * Returns the name of the property
+  /** Returns the name of the property.
    */
   Glib::ustring get_name() const;
   
-  /**
-   * Notifies the object containing the property that the property has changed.
-   * In other words, emits "notify" signal with the property name.
+  /** Notifies the object containing the property that the property has changed.
+   * This emits the "notify" signal, passing the property name.
    */
   void notify();
 
@@ -73,17 +71,19 @@ protected:
   Glib::ValueBase value_;
   GParamSpec*     param_spec_;
 
-  /**
-   * Constructs the property of type @a value_type for @a object. The property
-   * is not registered in the GObject object system, call install_property in
-   * order to do that. The properties are usually installed on the 
-   * initialization of the first instance of an object.
+  /** This constructs a property of type @a value_type for the @a object.
+   * The property is not registered in the GObject object system 
+   * until install_property() has been called. Derived classes do this in
+   * their constructors.
+   *
+   * The properties are usually installed during the initialization of the
+   * first instance of an object.
    */
   PropertyBase(Glib::Object& object, GType value_type);
   ~PropertyBase();
 
   /**
-   * Checks if the property has already been installed
+   * Checks if the property has already been installed.
    */
   bool lookup_property(const Glib::ustring& name);
   
@@ -93,7 +93,7 @@ protected:
   void install_property(GParamSpec* param_spec);
 
   /**
-   * Returns the name of the property
+   * Returns the name of the property.
    */
   const char* get_name_internal() const;
 
@@ -113,31 +113,29 @@ private:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 };
 
-/**
- * Represents an object property
+/** A Glib::Object property.
  * 
- * This class maps one to one to a property of an object in GObject object 
- * system. A property is a value associated to each instancy of a type and some
- * global data for each property. The global data encompasses the following 
- * information about the property:
- *  * unique name, used to identify the property
- *  * human-readable nick
- *  * short explanation
- *  * default value, minimum and maximum bounds (applicable depending on the 
- *      type of the property)
- *  * flags, defining, among other things, whether the property can be read or
- *      written
+ * This class wraps a GObject property, providing a C++ API to the GObject property
+ * system, for use with classes derived from Glib::Object or Glib::Interface.
+ *
+ * A property is a value associated with each instance of a type and some
+ * class data for each property:
+ *  * Its unique name, used to identify the property.
+ *  * A human-readable nick name.
+ *  * A short description.
+ *  * The default value and the minimum and maximum bounds (depending on the type of the property).
+ *  * Flags, defining, among other things, whether the property can be read or written.
  * 
- * The Property class currently supports only the name and default value. The
+ * This Property class currently supports only the name and default value. The
  * minimum and maximum bounds are set to the full range of the value. The nick
  * and the explanation are set to empty. The flags are set to indicate that the
  * property can be both read from and written to.
  * 
- * The global information must be installed into the GObject system once per 
- * property. This is handled automatically.
+ * The class information must be installed into the GObject system once per 
+ * property, but this is handled automatically.
  * 
  * A property can be used only as direct data member of a type, inheriting from
- * Glib::Object. A reference to the object must be passed on the construction of
+ * Glib::Object. A reference to the object must be passed to the constructor of
  * the property.
  */
 template <class T>
@@ -147,43 +145,35 @@ public:
   typedef T PropertyType;
   typedef Glib::Value<T> ValueType;
 
-  /**
-   * Constructs a property of @a object with @a name. For each instance of the 
-   * object, the same property must be constructed with the same name
+  /**  Constructs a property of the @a object with the specified @a name.
+   * For each instance of the object, the same property must be constructed with the same name
    */
   Property(Glib::Object& object, const Glib::ustring& name);
   
-  /**
-   * Constructs a property of @a object with @a name and @a default_value. For 
-   * each instance of the object, the same property must be constructed with the 
-   * same name
+  /** Constructs a property of the @a object with the specified @a name and @a default_value.
+   * For  each instance of the object, the same property must be constructed with the same name.
    */
   Property(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value);
 
-  /**
-   * Sets the value of the property to @a data. The object containing the 
-   * property is notified about the change.
+  /** Sets the value of the property to @a data.
+   * The object containing the property will be notified about the change.
    */
   inline void set_value(const PropertyType& data);
   
-  /**
-   * Returns the value of the property
+  /** Returns the value of the property.
    */
   inline PropertyType get_value() const;
 
-  /**
-   * Sets the value of the property to @a data. The object containing the 
-   * property is notified about the change.
+  /** Sets the value of the property to @a data.
+   * The object containing the property will be notified about the change.
    */
   inline Property<T>& operator=(const PropertyType& data);
   
-  /**
-   * Returs the value of the property
+  /** Returns the value of the property.
    */
   inline operator PropertyType() const;
 
-  /**
-   * Returns a proxy object that can be used to manipulate this property
+  /** Returns a proxy object that can be used to manipulate this property.
    */
   inline Glib::PropertyProxy<T> get_proxy();
 };
