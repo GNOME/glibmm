@@ -231,7 +231,7 @@ private:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 protected:
   /**
-   * This class must be inherited in order to be used
+   * You should derive from this class to use it.
    */
   __CPPNAME__`'();
   
