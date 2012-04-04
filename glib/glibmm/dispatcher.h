@@ -48,6 +48,9 @@ class DispatchNotifier;
  * @li The Dispatcher object must be instantiated by the receiver thread.
  * @li The Dispatcher object should be instantiated before creating any of the
  * sender threads, if you want to avoid extra locking.
+ * @li The Dispatcher object must be deleted by the receiver thread.
+ * @li All Dispatcher objects instantiated by the same receiver thread must
+ * use the same main context.
  *
  * Notes about performance:
  *
@@ -74,7 +77,7 @@ public:
    * @throw Glib::FileError
    */
   Dispatcher();
-  
+
   /** Create new Dispatcher instance using an arbitrary main context.
    * @throw Glib::FileError
    */
@@ -88,7 +91,7 @@ public:
 
 private:
   sigc::signal<void> signal_;
-  DispatchNotifier*   notifier_;
+  DispatchNotifier*  notifier_;
 
   // noncopyable
   Dispatcher(const Dispatcher&);
