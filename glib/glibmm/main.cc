@@ -283,14 +283,8 @@ static void glibmm_signal_connect_once(const sigc::slot<void>& slot, int priorit
     source, &glibmm_source_callback_once, conn_node,
     &SourceConnectionNode::destroy_notify_callback);
 
-  g_source_attach(source, context);
-  // GMainContext holds a reference to source until the source is dispatched and
-  // glibmm_source_callback_once() returns 0. Even if that has happened now
-  // (in another thread), conn_node and source still exist.
-  // SourceConnectionNode::destroy_notify_callback() has not been called,
-  // because the initial reference to source remains until the following call
-  // to g_source_unref().
   conn_node->install(source);
+  g_source_attach(source, context);
   g_source_unref(source);
 }
 
