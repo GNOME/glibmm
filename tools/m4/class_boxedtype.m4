@@ -21,6 +21,12 @@ define(`__BOOL_CUSTOM_DEFAULT_CTOR__',`$1')
 _POP()
 ')
 
+define(`_CUSTOM_CTOR_CAST',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_CUSTOM_CTOR_CAST__',`$1')
+_POP()
+')
 
 _POP()
 _SECTION(SECTION_CLASS2)
@@ -129,6 +135,7 @@ __CPPNAME__::__CPPNAME__`'(const __CPPNAME__& other)
   gobject_ ((other.gobject_) ? __BOXEDTYPE_FUNC_COPY`'(other.gobject_) : 0)
 {}
 
+ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
 __CPPNAME__::__CPPNAME__`'(__CNAME__* gobject, bool make_a_copy)
 :
   // For BoxedType wrappers, make_a_copy is true by default.  The static
@@ -136,6 +143,7 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* gobject, bool make_a_copy)
   // ensures identical behaviour if the default argument is used.
   gobject_ ((make_a_copy && gobject) ? __BOXEDTYPE_FUNC_COPY`'(gobject) : gobject)
 {}
+')dnl
 
 __CPPNAME__& __CPPNAME__::operator=(const __CPPNAME__`'& other)
 {
@@ -191,7 +199,9 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
   __CPPNAME__`'();
 ')dnl
 
+ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
   explicit __CPPNAME__`'(__CNAME__* gobject, bool make_a_copy = true);
+')dnl
 
   __CPPNAME__`'(const __CPPNAME__& other);
   __CPPNAME__& operator=(const __CPPNAME__& other);
