@@ -1,5 +1,5 @@
 # -*- mode: perl; perl-indent-level: 2; indent-tabs-mode: nil -*-
-# gmmproc - Common::Output module
+# gmmproc - Common::Output::GtkObject module
 #
 # Copyright 2012 glibmm development team
 #
@@ -18,21 +18,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
 
-package Common::Output;
+package Common::Output::GtkObject;
 
 use strict;
 use warnings;
-
-use Common::Output::BoxedTypeStatic;
-use Common::Output::BoxedType;
-use Common::Output::Enum;
-use Common::Output::Generic;
-use Common::Output::GError;
-use Common::Output::GObject;
-use Common::Output::GtkObject;
-use Common::Output::Interface;
-use Common::Output::OpaqueCopyable;
-use Common::Output::OpaqueRefcounted;
-use Common::Output::VFunc;
 
 1; # indicate proper module load.
