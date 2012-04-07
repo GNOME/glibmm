@@ -1,20 +1,224 @@
-- On construction of WrapParser take Common::Api as parameter.
+-*- mode: Fundamental -*-
 
-- Common::Api will give an outputter to use.
+- Add exceptions.
+  Instead of using:
+  print STDERR "message\n"; exit 1;
+  die() or Exception::Class::throw (or something) could be
+  used. See Exception::Class module.
 
-- Outputter should be split into two classes - common part and backend part.
+- Use Data::Dumper to dump all GIR objects into a file.
+  That would allow us to eval the file instead of reparsing
+  all GIR files again in next runs. I wonder if this will make
+  gmmproc bit faster.
 
-- Backend should have methods like used in Common::Api and a method returning an outputter backend.
+- Optionally, write a TypeLib parser at some point.
+  It would be best to use original gobject-introspection code.
 
-- Add exceptions, so instead of using print STDERR "message\n"; exit 1; everywhere die() could be used.
-  See Exception::Class module.
+- Split GObject handling into smaller functions.
+  Probably separate module for it could be done. Also, shared
+  stuff have to be written too.
+  IN PROGRESS.
 
-- Design an outputter backend interface.
+- Get rid of m4 stuff.
+  Maybe by implementing a "core" set of sort of plugins or
+  something - have to think about it. But that can be done
+  later - first just porting m4 code to perl should be done.
+  IN PROGRESS.
 
-- Implement outputter backend for Defs.
+- Write documentation about sections and variables.
+  Note which have to be class-prefixed, namespace-prefixed,
+  first-class-prefixed, first-namespace-prefixed and which are
+  just global.
 
-Some more details should come here.
+- Add functions caring about proper prefixing of sections and
+  variables. They would look something like this:
 
-LATER:
+  my $section_name = Common::Sections::H_FOO;
+  my $foo = Common::Output::Shared::get_section $wrap_parser
+                                                $section_name;
 
-- Get rid of m4 stuff by implementing a "core" set of sort of plugins or something - have to think about it.
+  This applies to variables too:
+
+  my $var_name = Common::Variables::FOO;
+  my $foo = Common::Output::Shared::get_var $wrap_parser,
+                                            $var_name;
+
+  DONE.
+
+- Write documentation about commands. Some of it is already
+  written in gtkmm-documentation, but those seldom used are
+  still undocumented.
+
+- Maybe introduce _MODULE command.
+  This command would tell which repository should be used for
+  class:
+  _MODULE(GtkSource)
+  Or maybe it would be better to add parameter to
+  _CLASS_GOBJECT:
+  _CLASS_GOBJECT(Buffer, GtkSourceBuffer, GtkSource)
+  Or, just check if C_TYPE - CPP_TYPE = GIR_NAMESPACE (I doubt
+  it.)
+  IN PROGRESS.
+
+- Use consistent variable names and order in Common::Output.
+  $c_name -> $c_type, $cpp_name -> $cpp_type, $c_class_name ->
+  $c_class_type, $str -> $code_string, etc.
+  IN PROGRESS.
+
+- Every CLASS macro should add some standard sections for
+  method implementations and so on. Recheck the Output code.
+  IN PROGRESS.
+
+- Add push_section() and pop_section() to section_manager.
+  Then add append_{string,conditional,section}() which would
+  be an equivalent of
+  append_{string,conditional,section}_to_section(). Just
+  a typing-saver.
+  DONE.
+
+- Add GeneralConversionsStore, which would be created by
+  WrapParser and store ConversionsStore as read-only instance.
+  This is to avoid race conditions when adding entries to
+  'specific' category. The GeneralConversionsStore could have
+  members as follows:
+  'specific' => {...},
+  'generated' => $global_and_readonly_conversions_store
+  Then ConversionsStore would have only 'generated' member.
+  Both could have most code in common, so maybe just create
+  a base class like ConversionsStoreBase from which both
+  could derive.
+  DONE.
+
+- Add gir_namespace, gir_class members to WrapParser so we do
+  not have to get it from Gir hash every time we encounter a
+  _WRAP_SMTH macro.
+  VERIFY.
+
+- Add CxxFunctionInfo convenience class taking a string and
+  splitting it into pieces. It could have some friendly
+  getters.
+  VERIFY.
+
+- Add CFunctionInfo analogous to the above. It could store
+  also information about ownership transfers.
+  VERIFY.
+
+- Add one method of getting currently parsed GIR class, C
+  class name, C++ class name, full C++ class name,
+  full C++ namespace name and full C++ namespace and class
+  name. I am already forgetting how should I get this data.
+  VERIFY.
+
+- Convert all existing code to use type getters.
+
+- Convert all existing code to use get_variable () and
+  get_section ().
+  VERIFY.
+
+- Convert all existing code to use push_{section,conditional}
+  anywhere sensible.
+  VERIFY.
+
+- Add a method to SectionManager checking if /dev/null section
+  is empty, all conditionals have variable other than
+  INVALID_VARIABLE, all sections are linked to one of main
+  sections and entries stack is empty (contains only
+  /dev/null).
+
+- Look for if else cascades and rewrite them to use given when
+  construction anywhere sensible.
+  IN PROGRESS.
+
+- Change shift/unshift pairs into push/pop pairs when it makes
+  sense.
+  IN PROGRESS.
+
+- Gir files probably can be parsed in several threads too.
+
+- Maybe add EntryPopper:
+
+  my $s_m = $wrap_parser->get_section_manager;
+
+  popper = Common::EntryPopper->push_section ($s_m,
+                                              $s);
+  popper = Common::EntryPopper->push_conditional ($s_m,
+                                                  $c);
+
+  sub DESTROY { $self->{'section_manager'}->pop_entry; }
+
+- Fixed line for warnings and errors.
+  WrapParser could have a set_fixed_line_number method and
+  then {warning,error}_with_loc methods could use this fixed
+  line number for messages. That would allow us to get rid of
+  line number parameter in {warning,error}_with_loc and rename
+  those methods to {warning,error}_on_fixed. The
+  set_fixed_line_number could be called on every macro, so we
+  do not have to do it manually in every macro implementation.
+
+- Convert all existing code to use paramzipstr, convzipstr.
+  VERIFY.
+
+- Add a common args parsing function.
+  It would take a hash with keys describing format and
+  parameter name and values being references to scalars. I
+  think that only two types of variables are needed now -
+  boolean ones and string ones. The former just checks whether
+  some parameter merely exists, while the latter checks and
+  gets a value. Example:
+
+  my @args = ...;
+  my $deprecated = 0;
+  my $ifdef = undef;
+  my $error = extract_args(\@args,
+                           {
+                             'b(deprecated)' => \$deprecated,
+                             's(ifdef)' => \$ifdef
+                           },
+                          );
+
+  if ($error)
+  {
+    # handle an error.
+  }
+  VERIFY.
+
+- Convert WrapParser to use args getter.
+  IN PROGRESS.
+
+- Support optional parameter in _WRAP_CTOR, _WRAP_METHOD.
+  These are denoted by '{?}' appended to parameter name.
+
+- Support default values.
+  These should be added to declarations.
+
+- Before executing every macro we could set a 'current_macro'
+  variable to its name.
+  VERIFY.
+
+- Maybe create some base class for WrapParser and Scanner.
+  They have some common code.
+
+- Handle repeatable names in <type> tag.
+  Those happen for following tag:
+  <type name="GLib.HashTable" c:type="GHashTable*">
+  in GLib-2.0.gir (line 5602).
+  VERIFY.
+
+- Review the Output code.
+
+- NamesStore is probably useless now.
+  Sections' and variables' visibility is inside constants now.
+  DONE.
+
+- Reorganize the code.
+  Rename Common namespace to Gmmproc. Move Gmmproc.pm one
+  namespace lower. Probably main gmmproc script will only
+  include Gmmproc. So Gir namespace would be under Gmmproc
+  namespace.
+
+- Add a test C code and its C++ wrapper templates to check
+  wrapping correctness.
+
+- git grep -n 'TODO' tools/pm
+
+- Cleanup this TODO. :-)
