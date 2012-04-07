@@ -1,4 +1,5 @@
 #! @PERL@
+# -*- mode: perl; perl-indent-level: 2; indent-tabs-mode: nil -*-
 #
 # @configure_input@
 #
@@ -8,8 +9,8 @@
 #
 # *** WARNING: Only modify gmmproc.in. gmmproc is built. ***
 #
-# Copyright 2001, Karl Einar Nelson, Murray Cumming
-# Copyright 2011 Krzesimir Nowak
+# Copyright 2001 Karl Einar Nelson, Murray Cumming
+# Copyright 2011, 2012 Krzesimir Nowak
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,31 +26,21 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
-#
-# 'classes':
-# WrapParser: steps through .hg and .ccg files, outputting appropriate m4 code with Outputter.
-# Outputter: Used by WrapParser to output wrapper code. Outputs *.g1 temp file and uses m4 to generate *.g2 from it. Then outputs .h and .cc files.
-# Function: Contains information about C and C++ functions and signals.
-#
 ######################################################################
 
-my $g_prefix = '@prefix@';
-my $g_exec_prefix = '@exec_prefix@';
-my $g_libdir = '@libdir@';
+# TODO: Maybe, at some point, this will be moved to mm-common, so path maybe
+# TODO continued: will be fixed instead of generated during configure stage.
 my $g_procdir = $g_libdir . '/@GLIBMM_MODULE_NAME@/proc';
-my $g_m4path = '@M4@';
 
-push (@INC, $g_procdir . '/pm');
+push @INC, $g_procdir . '/pm';
 
 use strict;
 use warnings;
 use IO::File;
 use Getopt::Long qw(:config permute);
 
-require Common::Output;
-require Common::WrapParser;
-require Common::Api;
-
+require Gir::Repositories;
+require Common::Gmmproc;
 
 # prototypes
 sub print_usage ();
@@ -90,14 +81,12 @@ Options:
   -u
   --unwrapped           Warn about possible unwrapped functions.
 
-  -d dir
-  --defs dir            Specify the directory with defs files.
+  -d basename
+  --gir basename        Specify the gir file base name. Examples: Gio-2.0.gir,
+                        Gtk-3.0.gir.
 
-  -I dir
-  --include dir         Specify the directory with m4 files.
-
-  -f file
-  --file file           Specify a definitions file to read.
+  -m module
+  --mm-module module    Specify a name of mm module. Examples: glibmm, gtkmm.
 
 This will read template files from source directory and generate files
 to destination directory:
@@ -116,129 +105,77 @@ sub print_help ($)
 
 sub main ()
 {
-  my $source_dir = '';
-  my $destination_dir = '';
+  my $source_dir = undef;
+  my $destination_dir = undef;
   my $unwrapped = 0;
-  my $defs_a_r = [];
-  my $includes_a_r = [];
-  my $templates_a_r = [];
+  my $gir_basename = undef;
+  my $templates = [];
+  my $include_paths = [];
   my $debug = (exists $ENV{'GMMPROC_DEBUG'}) ? $ENV{'GMMPROC_DEBUG'} : 0;
-  my $file = '';
-  my $opt_parse_result = GetOptions ('help|h' => \&print_help,
-                                     'source|s=s' => \$source_dir,
-                                     'destination|d=s' => \$destination_dir,
-                                     'list|l=s' => sub { process_list_file ($templates_a_r, shift, shift) },
-                                     'unwrapped|u' => \$unwrapped,
-                                     'defs|d=s@' => \$defs_a_r,
-                                     'include|I=s@' => \$includes_a_r,
-                                     'debug|g' => \$debug,
-                                     'file|f' => \$file
-                                     '<>' => sub { add_file_to_list ($templates_a_r, shift); }
-                                    );
+  my $mm_module = undef;
+  my $opt_parse_result = GetOptions
+  (
+    'help|h' => \&print_help,
+    'source|s=s' => \$source_dir,
+    'destination|d=s' => \$destination_dir,
+    'list|l=s' => sub { process_list_file ($templates, shift, shift) },
+    'unwrapped|u' => \$unwrapped,
+    'gir|d=s' => \$gir_basename,
+    'include|i=@s' => \$include_paths,
+    'debug|g' => \$debug,
+    'mm-module|m=s' => \$mm_module
+    '<>' => sub { add_file_to_list ($templates, shift); }
+  );
 
-  if (not $opt_parse_result or not $source_dir or not $destination_dir
-      or @{$templates_a_r} < 1 or @{$defs_a_r} < 1 or not $file or not $backend)
+  if (not $opt_parse_result or not $source_dir or not $destination_dir or
+      not $mm_module or @{$templates} < 1 or not $gir_basename or
+      @{$include_paths} < 1)
   {
-    print_usage ();
-    exit (1);
+    print_usage;
+    exit 1;
   }
-  push (@{$includes_a_r}, $g_procdir . '/m4');
 
   eval
   {
-    my $api = Base::Api->new ($file, $defs_a_r);
-    my $outputter = $api->get_outputter ();
+    my $gir_parser = Gir::Parser->new;
 
-    $outputter->set_paths ($g_m4path, $includes_a_r);
-    $outputter->set_destination_dir ($destination_dir);
+    $gir_parser->parse_file ($gir_basename);
 
-    my $wrap_parser = Common::WrapParser->new ($api);
+    my $repositories = $gir_parser->get_repositories;
+    my $gmmproc = Common::Gmmproc->new ($repositories, $mm_module, $include_paths);
 
-    $wrap_parser->set_source_dir ($source_dir);
+    $gmmproc->set_source_dir ($source_dir);
+    $gmmproc->set_destination_dir ($destination_dir);
 
     for my $template (@{$templates_a_r})
     {
-      print join ('', 'Processing ', $template, "...\n");
-      $wrap_parser->set_source_base ($template);
-      $outputter->set_destination_base ($template);
-
-      # Suck the whole file into one big string, breaking it into tokens:
-      $wrap_parser->read_file($template);
-
-      # Parse output
-      $objWrapParser->parse_and_build_output();
-
-#      # Write out *.g1 temporary file:
-#      $objOutputter->output_temp_g1($$objWrapParser{module}); # e.g. "gtk"
-
-#      # Execute m4 to get *.g2 file:
-#      {
-#        my $exitcode = $objOutputter->make_g2_from_g1();
-
-#        if ($exitcode)
-#        {
-#          $objOutputter->remove_temp_files() unless ($debug);
-
-#          print STDERR "m4 failed with exit code $exitcode.  Aborting...\n";
-#          exit($exitcode);
-#        }
-#      }
-
-#      # Section out the resulting output
-#      $objOutputter->write_sections_to_files();
-      $outputter->remove_temp_files() unless ($debug);
-
-      #Warn about any unwrapped function/signals:
-      #TODO: info about unwrapped information should be written to a logfile.
-      if ($unwrapped)
-      {
-        my @unwrapped = GtkDefs::get_unwrapped();
-        @unwrapped = grep { exists $$_{entity_type} } @unwrapped;
-
-        if (@unwrapped)
-        {
-          my @methods = grep { $$_{entity_type} eq 'method' and $$_{c_name} !~ m/^_/s } @unwrapped;
-          my @signals = grep { $$_{entity_type} eq 'signal' } @unwrapped;
-          # Don't take non-readable construct-only properties into account.
-          my @properties = grep { $$_{entity_type} eq 'property' and ( $$_{readable} or not $$_{construct_only} ) } @unwrapped;
-
-          local $, = "\ngmmproc:   ";
-          local $\ = "\n";
-
-          if (@methods)
-          {
-            print STDERR ('gmmproc: Unwrapped functions:',
-                          map($$_{c_name}, @methods));
-          }
-          if (@properties)
-          {
-            print STDERR ('gmmproc: Unwrapped properties:',
-                          map($$_{class} . '::' . $$_{name}, @properties));
-          }
-          if (@signals)
-          {
-            print STDERR ('gmmproc: Unwrapped signals:',
-                          map($$_{class} . '::' . $$_{name}, @signals));
-          }
-        }
-      }
+      $gmmproc->add_base ($template);
     }
+
+    $gmmproc->parse_and_generate;
+
+# TODO: info about unwrapped information should be written to a logfile.
+    if ($unwrapped)
+    {
+# TODO: warn about unwrapped stuff.
+    }
+
   }
-  #TODO: catch the exception.
+# TODO: catch the exception.
 
   exit 0;
 }
 
 sub process_list_file ($$$)
 {
-  my $templates_a_r = shift;
+  my $templates = shift;
   my $option = shift;
   my $path = shift;
   my $file = IO::File->new ($path, 'r');
 
-  unless (defined ($file))
+  unless (defined $file)
   {
-    print STDERR join ('', 'Couldn\'t open file: ', $path, "\n");
+    print STDERR 'Could not open file: ' . $path . "\n";
     exit 1;
   }
 
@@ -249,22 +186,22 @@ sub process_list_file ($$$)
       next;
     }
     # strip everything from the beginning of the line to the `='.
-    $line =~ s/.*=//g;
+    $line =~ s/^.*=//g;
     # strip trailing backslash.
     $line =~ s/\\$//g;
     # strip leading and trailing whitespaces.
     $line =~ s/^\s*(\S*)\s*$/$1/g;
     if ($line)
     {
-      push (@{$templates_a_r}, $line);
+      push @{$templates}, $line;
     }
   }
 }
 
 sub add_file_to_list ($$)
 {
-  my $templates_a_r = shift;
+  my $templates = shift;
   my $file = shift;
 
-  push (@{$templates_a_r}, $file);
+  push @{$templates}, $file;
 }
