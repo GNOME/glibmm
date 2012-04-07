@@ -21,7 +21,7 @@ package Gir::State;
 use strict;
 use warnings;
 
-use parent qw(Gir::Handlers::Common::State);
+use parent qw (Gir::Handlers::Common::State);
 
 use Gir::Handlers::TopLevel;
 
@@ -31,7 +31,7 @@ use Gir::Handlers::TopLevel;
 sub new ($$$)
 {
   my ($type, $parsed_file, $xml_parser) = @_;
-  my $class = (ref ($type) or $type or 'Gir::State');
+  my $class = (ref $type or $type or 'Gir::State');
   my $self = $class->SUPER::new;
   my $toplevel_handler = Gir::Handlers::TopLevel->new;
 
@@ -39,7 +39,7 @@ sub new ($$$)
   $self->{'parsed_file'} = $parsed_file;
   $self->{'xml_parser'} = $xml_parser;
 
-  return bless ($self, $class);
+  return bless $self, $class;
 }
 
 sub push_handlers ($$)
@@ -47,7 +47,7 @@ sub push_handlers ($$)
   my ($self, $handlers) = @_;
   my $handlers_stack = $self->{'handlers_stack'};
 
-  push (@{$handlers_stack}, $handlers);
+  push @{$handlers_stack}, $handlers;
 }
 
 sub pop_handlers ($)
@@ -55,7 +55,7 @@ sub pop_handlers ($)
   my $self = shift;
   my $handlers_stack = $self->{'handlers_stack'};
 
-  pop (@{$handlers_stack});
+  pop @{$handlers_stack};
 }
 
 sub get_current_handlers ($)

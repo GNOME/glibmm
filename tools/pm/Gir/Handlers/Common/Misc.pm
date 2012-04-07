@@ -28,85 +28,73 @@ use Gir::Api::Common::Base;
 ##
 
 ##
-## Takes an array of mandatory-key->mandatory-value pairs, an array
-## of optional-key->default-value pairs and an array with names and values
-## returned by Expat parser and returns a hash with final key->value pairs. Note
-## that nonexistence of a key in atts_vals array that is specified in mandatory
-## keys array is fatal. Also is existence of a key that is specified in neither
-## mandatory keys array nor optional keys array. Also, if mandatory key has
-## a mandatory value specified then it is fatal when actual value differs from
+## Takes an array of mandatory-key->mandatory-value pairs, an array of
+## optional-key->default-value pairs and a hash with names and values returned
+## by Expat parser and returns a hash with final key->value pairs. Note that
+## nonexistence of a key in atts_vals array that is specified in mandatory keys
+## array is fatal. Also is existence of a key that is specified in neither
+## mandatory keys array nor optional keys array. Also, if mandatory key has a
+## mandatory value specified then it is fatal when actual value differs from
 ## it. If any optional key does not exist in atts_vals array then the one from
 ## array of optional-key->default_value pairs is taken.
 ##
-sub extract_values($$$)
+sub extract_values ($$%)
 {
-  my ($keys, $optional_keys, $atts_vals) = @_;
-  my $params = {};
+  my ($keys, $optional_keys, %atts_vals) = @_;
+  my %params = ();
   my %check = ();
   my %leftovers = ();
-  my $leftover = undef;
-  my $att = undef;
-  my $check_value = 0;
+  my %set = ();
 
   foreach my $pair (@{$keys})
   {
     my $key = $pair->[0];
 
-    $params->{$key} = $pair->[1];
+    $params{$key} = $pair->[1];
     $check{$key} = undef;
   }
+
   foreach my $pair (@{$optional_keys})
   {
-    $params->{$pair->[0]} = $pair->[1];
+    $params{$pair->[0]} = $pair->[1];
   }
 
-  foreach my $entry (@{$atts_vals})
+  while (my ($attribute, $value) = each %atts_vals)
   {
-    if (defined ($leftover))
+    if (exists $params{$attribute})
     {
-      $leftovers{$leftover} = $entry;
-      $leftover = undef;
-    }
-    elsif (not defined ($att))
-    {
-      if (exists ($params->{$entry}))
+      if (exists $set{$attribute})
       {
-        $att = $entry;
-        if (exists $check{$att})
-        {
-          delete ($check{$att});
-          $check_value = 1;
-        }
+        print STDERR 'Attribute `' . $attribute . ' is given twice.' . "\n";
+        exit 1;
       }
-      else
+      $set{$attribute} = undef;
+      if (exists $check{$attribute})
       {
-        $leftover = $entry;
-      }
-    }
-    else
-    {
-      if ($check_value)
-      {
-        $check_value = 0;
-        unless (defined $params->{$att})
+        delete $check{$attribute};
+
+        unless (defined $params{$attribute})
         {
-          $params->{$att} = $entry;
+          $params{$attribute} = $value;
         }
-        elsif ($params->{$att} ne $entry)
+        elsif ($params{$attribute} ne $value)
         {
-          print STDERR 'Expected value `' . $params->{$att} . '\' for `' . $att . '\', got `' . $entry  . '\'.' . "\n";
+          print STDERR 'Expected value `' . $params{$attribute} . '\' for `' . $attribute . '\', got `' . $value  . '\'.' . "\n";
           exit 1;
         }
       }
       else
       {
-        $params->{$att} = $entry;
+        $params{$attribute} = $value;
       }
-      $att = undef;
+    }
+    else
+    {
+      $leftovers{$attribute} = $value;
     }
   }
 
-  my @check_keys = sort keys (%check);
+  my @check_keys = sort keys %check;
   my $message = '';
 
   if (@check_keys > 0)
@@ -125,7 +113,7 @@ sub extract_values($$$)
   {
     $message .= 'Leftover attributes:' . "\n";
 
-    foreach $leftover (@leftover_keys)
+    foreach my $leftover (@leftover_keys)
     {
       $message .= "  " . $leftover . " => " . $leftovers{$leftover} . "\n";
     }
@@ -133,43 +121,54 @@ sub extract_values($$$)
 
   if ($message)
   {
-    # TODO: throw an error.
+# TODO: throw an error.
     print STDERR $message;
     exit 1;
   }
 
-  return $params;
+  return \%params;
 }
 
 ##
-## Takes an object and its index in array. Tries to find out object's name.
-## If it fails, then it just generates a name using given index. This function
+## Takes an object and its index in array. Tries to find out object's name. If
+## it fails, then it just generates a name using given index. This function
 ## tries to use (if possible) an original type name - it prefers `GtkWidget'
 ## over `Widget' or `gtk_widget_new' over `new'.
+##
+## <type> tag is an exception. It has both "c:type" and "name" attributes, but
+## these are not used. <type> is always named like instance without any naming
+## attributes, that is - Gir::Api::Type#${index}. This is because <type> tag can
+## be non-unique child. This happens for GLib.HashTable, which has two <type>
+## children. This is not very important, because <type> tags rather should not
+## be accessed by its name, but instead by its index.
 ##
 sub get_object_name ($$)
 {
   my ($object, $index) = @_;
-  my @name_atts =
-  (
-    'attribute_c_type',
-    'attribute_c_identifier',
-    'attribute_glib_type-name',
-    'attribute_name',
-    'attribute_glib_name'
-  );
 
-  foreach my $name (@name_atts)
+  unless ($object->isa ('Gir::Api::Type'))
   {
-    if ($object->_has_attribute ($name))
-    {
-      my $object_name = $object->_get_attribute ($name);
+    my @name_atts =
+    (
+      'attribute_c_type',
+      'attribute_c_identifier',
+      'attribute_glib_type-name',
+      'attribute_name',
+      'attribute_glib_name'
+    );
 
-      return $object_name if (defined $object_name and $object_name ne '');
+    foreach my $name (@name_atts)
+    {
+      if ($object->_has_attribute ($name))
+      {
+        my $object_name = $object->_get_attribute ($name);
+
+        return $object_name if (defined $object_name and $object_name ne '');
+      }
     }
   }
 
-  return ref ($object) . '#' . $index;
+  return join '#', (ref $object), $index;
 }
 
 1; # indicate proper module load.

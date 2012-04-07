@@ -35,9 +35,9 @@ sub _get_group_member_by_name ($$$)
   my ($self, $group_name, $member_name) = @_;
   my $groups = $self->{'groups'};
 
-  unless (exists ($groups->{$group_name}))
+  unless (exists $groups->{$group_name})
   {
-    # TODO: throw error.
+# TODO: throw error.
     print STDERR 'No such group: ' . $group_name . '.' . "\n";
     exit 1;
   }
@@ -45,7 +45,7 @@ sub _get_group_member_by_name ($$$)
   my $group = $groups->{$group_name};
   my $unordered = $group->{'unordered'};
 
-  if (exists ($unordered->{$member_name}))
+  if (exists $unordered->{$member_name})
   {
     return $group->{'ordered'}[$unordered->{$member_name}];
   }
@@ -56,16 +56,16 @@ sub _get_group_member_by_name ($$$)
 ## Takes group name and index of a member and tries to retrieve a member
 ## at given index from a group. Note that asking for a member of nonexistent
 ## group or noexistent index is fatal. This method always returns a valid
-## member.
+## member otherwise.
 ##
 sub _get_group_member_by_index ($$$)
 {
   my ($self, $group_name, $index) = @_;
   my $groups = $self->{'groups'};
 
-  unless (exists ($groups->{$group_name}))
+  unless (exists $groups->{$group_name})
   {
-    # TODO: throw error.
+# TODO: throw error.
     print STDERR 'No such group: ' . $group_name .  '.' . "\n";
     exit 1;
   }
@@ -75,7 +75,7 @@ sub _get_group_member_by_index ($$$)
 
   unless ($index < @{$ordered})
   {
-    # TODO: throw error.
+# TODO: throw error.
     print STDERR 'No member under index ' . $index . ' in group ' . $group_name . '.' . "\n";
     exit 1;
   }
@@ -85,16 +85,16 @@ sub _get_group_member_by_index ($$$)
 ##
 ## Takes group name and returns a count of members in the group. Note that asking
 ## for a count of nonexistent group is fatal. This method always return a correct
-## count.
+## count otherwise.
 ##
 sub _get_group_member_count ($$)
 {
   my ($self, $group_name) = @_;
   my $groups = $self->{'groups'};
 
-  unless (exists ($groups->{$group_name}))
+  unless (exists $groups->{$group_name})
   {
-    # TODO: throw error.
+# TODO: throw error.
     print STDERR 'No such group: ' . $group_name . '.' . "\n";
     exit 1;
   }
@@ -112,9 +112,9 @@ sub _add_member_to_group ($$$$)
   my ($self, $group_name, $member_name, $member) = @_;
   my $groups = $self->{'groups'};
 
-  unless (exists ($groups->{$group_name}))
+  unless (exists $groups->{$group_name})
   {
-    # TODO: throw error.
+# TODO: throw error.
     print STDERR 'No such group: ' . $group_name . '.' . "\n";
     exit 1;
   }
@@ -122,9 +122,9 @@ sub _add_member_to_group ($$$$)
   my $group = $groups->{$group_name};
   my $unordered = $group->{'unordered'};
 
-  if (exists ($unordered->{$member_name}))
+  if (exists $unordered->{$member_name})
   {
-    # TODO: throw error.
+# TODO: throw error.
     print STDERR 'Member ' . $member_name . ' already exists in group: ' . $group_name . '.' . "\n";
     exit 1;
   }
@@ -132,7 +132,7 @@ sub _add_member_to_group ($$$$)
   my $ordered = $group->{'ordered'};
   my $new_index = @{$ordered};
 
-  push (@{$ordered}, $member);
+  push @{$ordered}, $member;
   $unordered->{$member_name} = $new_index;
 }
 
@@ -145,9 +145,9 @@ sub _get_attribute ($$)
   my ($self, $attribute_name) = @_;
   my $attributes = $self->{'attributes'};
 
-  unless (exists ($attributes->{$attribute_name}))
+  unless (exists $attributes->{$attribute_name})
   {
-    # TODO: throw error.
+# TODO: throw error.
     print STDERR 'No such attribute: ' . $attribute_name . '.' . "\n";
     exit 1;
   }
@@ -164,9 +164,9 @@ sub _set_attribute ($$$)
   my ($self, $attribute_name, $attribute_value) = @_;
   my $attributes = $self->{'attributes'};
 
-  unless (exists ($attributes->{$attribute_name}))
+  unless (exists $attributes->{$attribute_name})
   {
-    # TODO: throw error.
+# TODO: throw error.
     print STDERR 'No such attribute: ' . $attribute_name . '.' . "\n";
     exit 1;
   }
@@ -182,7 +182,7 @@ sub _has_attribute ($$)
   my ($self, $attribute_name) = @_;
   my $attributes = $self->{'attributes'};
 
-  return exists ($attributes->{$attribute_name});
+  return exists $attributes->{$attribute_name};
 }
 
 ##
@@ -197,7 +197,7 @@ sub _has_attribute ($$)
 sub new ($$$)
 {
   my ($type, $groups, $attributes) = @_;
-  my $class = (ref ($type) or $type or 'Gir::Api::Common::Base');
+  my $class = (ref $type or $type or 'Gir::Api::Common::Base');
   my %member_groups = map { $_ => {'ordered' => [], 'unordered' => {}}; } @{$groups};
   my %member_attributes = map { $_ => undef } @{$attributes};
   my $self =
@@ -208,7 +208,7 @@ sub new ($$$)
     'attributes' => \%member_attributes
   };
 
-  bless ($self, $class);
+  bless $self, $class;
   return $self;
 }
 

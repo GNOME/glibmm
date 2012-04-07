@@ -29,13 +29,13 @@ use Gir::Api::TopLevel;
 sub new ($$$)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Common::State');
+  my $class = (ref $type or $type or 'Gir::Handlers::Common::State');
   my $self =
   {
     'object_stack' => [Gir::Api::TopLevel->new]
   };
 
-  return bless ($self, $class);
+  return bless $self, $class;
 }
 
 sub push_object ($$)
@@ -43,7 +43,7 @@ sub push_object ($$)
   my ($self, $object) = @_;
   my $object_stack = $self->{'object_stack'};
 
-  push (@{$object_stack}, $object);
+  push @{$object_stack}, $object;
 }
 
 sub pop_object ($)
@@ -51,7 +51,7 @@ sub pop_object ($)
   my $self = shift;
   my $object_stack = $self->{'object_stack'};
 
-  pop (@{$object_stack});
+  pop @{$object_stack};
 }
 
 sub get_current_object ($)

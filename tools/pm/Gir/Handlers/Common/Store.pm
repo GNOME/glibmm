@@ -27,13 +27,13 @@ use warnings;
 sub new ($$)
 {
   my ($type, $methods) = @_;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Common::Store');
+  my $class = (ref $type or $type or 'Gir::Handlers::Common::Store');
   my $self =
   {
     'methods' => $methods
   };
 
-  return bless ($self, $class);
+  return bless $self, $class;
 }
 
 sub has_method_for ($$)
@@ -41,7 +41,7 @@ sub has_method_for ($$)
   my ($self, $elem) = @_;
   my $methods = $self->{'methods'};
 
-  return exists ($methods->{$elem});
+  return exists $methods->{$elem};
 }
 
 sub get_method_for ($$)
@@ -54,7 +54,7 @@ sub get_method_for ($$)
 
     return $methods->{$elem};
   }
-  # TODO: error.
+# TODO: error.
 }
 
 1;

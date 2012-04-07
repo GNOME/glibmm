@@ -24,13 +24,13 @@ use warnings;
 sub new ($)
 {
   my $type = shift;
-  my $class = (ref ($type) or $type or 'Gir::Repositories');
+  my $class = (ref $type or $type or 'Gir::Repositories');
   my $self =
   {
     'repositories' => {}
   };
 
-  return bless ($self, $class);
+  return bless $self, $class;
 }
 
 sub add_repository ($$)

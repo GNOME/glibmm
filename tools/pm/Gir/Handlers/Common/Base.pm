@@ -75,7 +75,7 @@ sub _call_end_hooks ($$)
 sub new ($$$)
 {
   my ($type, $start_store, $end_store, $subhandlers) = @_;
-  my $class = (ref ($type) or $type or 'Gir::Handlers::Common::Base');
+  my $class = (ref $type or $type or 'Gir::Handlers::Common::Base');
   my $self =
   {
     'start_handlers' => $start_store,
@@ -85,7 +85,7 @@ sub new ($$$)
     'subhandlers' => $subhandlers
   };
 
-  return bless ($self, $class);
+  return bless $self, $class;
 }
 
 sub install_start_hook ($$$$)
@@ -137,7 +137,7 @@ sub get_subhandlers_for ($$)
   my ($self, $elem) = @_;
   my $subhandlers = $self->{'subhandlers'};
 
-  if (exists ($subhandlers->{$elem}))
+  if (exists $subhandlers->{$elem})
   {
     my $package = $subhandlers->{$elem};
     my $instance = $package->new;
