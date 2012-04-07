@@ -1,7 +1,7 @@
 # -*- mode: perl; perl-indent-level: 2; indent-tabs-mode: nil -*-
-# gmmproc - Common::WrapParser module
+# gmmproc - Common::CFunctionInfo module
 #
-# Copyright 2011 glibmm development team
+# Copyright 2012 glibmm development team
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,60 +18,37 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
 
-package Common::Sections::Section;
+package Common::CFunctionInfo;
 
 use strict;
 use warnings;
 
-use Common::Sections::Entries;
+use parent qw (Common::CallableInfo);
 
-sub new ($$)
+sub _get_name_from_gir ($$)
 {
-  my ($type, $name) = @_;
-  my $class = (ref $type or $type or 'Common::Sections::Section');
-  my $self =
-  {
-    'name' => $name,
-    'entries' => Common::Sections::Entries->new,
-    'linked' => undef
-  };
+  my (undef, $gir_function) = @_;
+
+  return $gir_function->get_a_c_identifier;
+}
+
+sub new_from_gir ($$)
+{
+  my ($type, $gir_function) = @_;
+  my $class = (ref $type or $type or 'Common::CFunctionInfo');
+  my $self = $class->SUPER::new ($gir_function);
+  my $throws = $gir_function->get_a_throws;
+
+  $self->{'throws'} = $throws;
 
   return bless $self, $class;
 }
 
-sub get_name ($)
+sub get_throws ($)
 {
   my ($self) = @_;
 
-  return $self->{'name'};
-}
-
-sub get_entries ($)
-{
-  my ($self) = @_;
-
-  return $self->{'entries'};
-}
-
-sub clear ($)
-{
-  my ($self) = @_;
-
-  $self->{'entries'} = Common::Sections::Entries->new;
-}
-
-sub is_linked ($)
-{
-  my ($self) = @_;
-
-  return $self->{'linked'};
-}
-
-sub set_linked ($$)
-{
-  my ($self, $main_section) = @_;
-
-  $self->{'linked'} = $main_section;
+  return $self->{'throws'};
 }
 
 1; # indicate proper module load.

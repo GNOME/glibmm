@@ -21,11 +21,10 @@
 # Functions in this module are exported so there is no need to
 # request them by module name.
 #
-package Util;
+package Common::Util;
 
 use strict;
 use warnings;
-
 
 #$ string_unquote($string)
 # Removes leading and trailing quotes.
@@ -57,7 +56,7 @@ sub string_simplify ($)
 
   $str =~ s/^\s+//;
   $str =~ s/\s+$//;
-  $str =~ s/\s+/ /;
+  $str =~ s/\s+/ /g;
 
   return $str;
 }

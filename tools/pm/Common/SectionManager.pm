@@ -29,11 +29,7 @@ use Common::Sections::Section;
 use Common::Sections::Conditional;
 use constant
 {
-  'SECTION_H' => 'SECTION_MAIN_H',
-  'SECTION_CC' => 'SECTION_MAIN_CC',
-  'SECTION_P_H' => 'SECTION_MAIN_P_H',
-  'SECTION_DEV_NULL' => 'SECTION_MAIN_DEV_NULL',
-  'VARIABLE_UNKNOWN' => 'NO_SUCH_VARIABLE_FOR_NOW'
+  'VARIABLE_UNKNOWN' => 'NO_SUCH_VARIABLE_FOR_NOW',
 };
 
 sub _get_section ($$)
@@ -62,9 +58,9 @@ sub _get_conditional ($$)
   return $conditionals->{$conditional_name};
 }
 
-sub _append_stuff_to_entries ($$$$)
+sub _append_stuff_to_entries ($$$$$)
 {
-  my ($self, $type, $stuff, $entries) = @_;
+  my ($self, $type, $stuff, $entries, $is_linked) = @_;
 
   given ($type)
   {
@@ -76,12 +72,20 @@ sub _append_stuff_to_entries ($$$$)
     {
       my $section = $self->_get_section ($stuff);
 
+      if (defined $is_linked)
+      {
+        $section->set_linked ($is_linked);
+      }
       $entries->append_section ($section);
     }
     when (Common::Sections::Entries::CONDITIONAL ())
     {
       my $conditional = $self->_get_conditional ($stuff);
 
+      if (defined $is_linked)
+      {
+        $conditional->set_linked ($is_linked);
+      }
       $entries->append_conditional ($conditional);
     }
     default
@@ -92,45 +96,95 @@ sub _append_stuff_to_entries ($$$$)
   }
 }
 
+sub _get_entries_and_linking_from_section ($$)
+{
+  my ($self, $section_name) = @_;
+  my $section = $self->_get_section ($section_name);
+
+  return ($section->get_entries, $section->is_linked);
+}
+
+sub _get_entries_and_linking_from_conditional ($$$)
+{
+  my ($self, $conditional_name, $bool) = @_;
+  my $conditional = $self->_get_conditional ($conditional_name);
+
+  if ($bool)
+  {
+    $bool = Common::Sections::Conditional::TRUE ();
+  }
+  else
+  {
+    $bool = Common::Sections::Conditional::FALSE ();
+  }
+
+  return ($conditional->get_entries ($bool), $conditional->is_linked);
+}
+
 sub _append_stuff_to_section ($$$$)
 {
   my ($self, $type, $stuff, $section_name) = @_;
-  my $section = $self->_get_section ($section_name);
-  my $entries = $section->get_entries;
+  my ($entries, $is_linked) = $self->_get_entries_and_linking_from_section ($section_name);
 
-  $self->append_stuff_to_entries ($type, $stuff, $entries);
+  $self->_append_stuff_to_entries ($type, $stuff, $entries, $is_linked);
 }
 
 sub _append_stuff_to_conditional ($$$$$)
 {
   my ($self, $type, $stuff, $conditional_name, $bool) = @_;
+  my ($entries, $is_linked) = $self->_get_entries_and_linking_from_conditional ($conditional_name, $bool);
 
-  if ($bool)
-  {
-    $bool = Common::Sections::Entries::TRUE ();
-  }
-  else
-  {
-    $bool = Common::Sections::Entries::FALSE ();
-  }
+  $self->_append_stuff_to_entries ($type, $stuff, $entries, $is_linked);
+}
 
-  my $conditional = $self->_get_conditional ($conditional_name);
-  my $entries = $conditional->get_entries ($bool);
+sub _get_entries_stack ($)
+{
+  my ($self) = @_;
 
-  $self->append_stuff_to_entries ($type, $stuff, $entries);
+  return $self->{'entries_stack'};
+}
+
+sub _push_entry ($$$)
+{
+  my ($self, $entry, $is_linked) = @_;
+  my $entries_stack = $self->_get_entries_stack;
+
+  push @{$entries_stack}, [$entry, $is_linked];
+}
+
+sub _append_generic ($$$)
+{
+  my ($self, $stuff, $stuff_type) = @_;
+  my $entries_stack = $self->_get_entries_stack;
+  my $entry = $entries_stack->[-1];
+
+  $self->_append_stuff_to_entries ($stuff_type, $stuff, $entry->[0], $entry->[1]);
+}
+
+sub _get_variables ($)
+{
+  my ($self) = @_;
+
+  return $self->{'variables'};
 }
 
 sub new ($)
 {
   my ($type) = @_;
-  my $class = (ref ($type) or $type or 'Common::SectionManager');
-  my $main_h_section = Common::Sections::Section->new (SECTION_H);
-  my $main_cc_section = Common::Sections::Section->new (SECTION_CC);
-  my $main_p_h_section = Common::Sections::Section->new (SECTION_P_H);
-  my $main_dev_null_section = Common::Sections::Section->new (SECTION_DEV_NULL);
+  my $class = (ref $type or $type or 'Common::SectionManager');
+  my $main_h_section = Common::Sections::Section->new (Common::Sections::H);
+  my $main_cc_section = Common::Sections::Section->new (Common::Sections::CC);
+  my $main_p_h_section = Common::Sections::Section->new (Common::Sections::P_H);
+  my $main_dev_null_section = Common::Sections::Section->new (Common::Sections::DEV_NULL);
+
+  $main_h_section->set_linked (Common::Sections::H);
+  $main_cc_section->set_linked (Common::Sections::CC);
+  $main_p_h_section->set_linked (Common::Sections::P_H);
+  $main_dev_null_section->set_linked (Common::Sections::DEV_NULL);
+
   my $self =
   {
-    'toplevel_sections' =>
+    'main_sections' =>
     {
       $main_h_section->get_name => $main_h_section,
       $main_cc_section->get_name => $main_cc_section,
@@ -145,16 +199,21 @@ sub new ($)
       $main_dev_null_section->get_name => $main_dev_null_section
     },
     'conditionals' => {},
-    'variables' => {}
+    'variables' => {},
+    'entries_stack' => []
   };
 
-  return bless $self, $class;
+  $self = bless $self, $class;
+
+  $self->push_section ($main_dev_null_section->get_name);
+
+  return $self;
 }
 
 sub get_variable ($$)
 {
   my ($self, $name) = @_;
-  my $variables = $self->{'variables'};
+  my $variables = $self->_get_variables;
 
   unless (exists $variables->{$name})
   {
@@ -167,7 +226,7 @@ sub get_variable ($$)
 sub set_variable ($$$)
 {
   my ($self, $name, $value) = @_;
-  my $variables = $self->{'variables'};
+  my $variables = $self->_get_variables;
 
   if ($value)
   {
@@ -179,52 +238,46 @@ sub set_variable ($$$)
   }
 }
 
-##
-## string, section name
-##
 sub append_string_to_section ($$$)
 {
-  shift->_append_stuff_to_section (Common::Sections::Entries::STRING (), shift, shift);
+  my ($self, $string, $target_section_name) = @_;
+
+  $self->_append_stuff_to_section (Common::Sections::Entries::STRING (), $string, $target_section_name);
 }
 
-##
-## section name, section name
-##
 sub append_section_to_section ($$$)
 {
-  shift->_append_stuff_to_section (Common::Sections::Entries::SECTION (), shift, shift);
+  my ($self, $section_name, $target_section_name) = @_;
+
+  $self->_append_stuff_to_section (Common::Sections::Entries::SECTION (), $section_name, $target_section_name);
 }
 
-##
-## conditional name, section name
-##
 sub append_conditional_to_section ($$$)
 {
-  shift->_append_stuff_to_section (Common::Sections::Entries::CONDITIONAL (), shift, shift);
+  my ($self, $conditional_name, $target_section_name) = @_;
+
+  $self->_append_stuff_to_section (Common::Sections::Entries::CONDITIONAL (), $conditional_name, $target_section_name);
 }
 
-##
-## string, conditional name, bool value
-##
 sub append_string_to_conditional ($$$$)
 {
-  shift->_append_stuff_to_conditional (Common::Sections::Entries::STRING (), shift, shift, shift);
+  my ($self, $string, $target_conditional_name, $bool) = @_;
+
+  $self->_append_stuff_to_conditional (Common::Sections::Entries::STRING (), $string, $target_conditional_name, $bool);
 }
 
-##
-## section name, conditional name, bool value
-##
 sub append_section_to_conditional ($$$$)
 {
-  shift->_append_stuff_to_conditional (Common::Sections::Entries::SECTION (), shift, shift, shift);
+  my ($self, $section_name, $target_conditional_name, $bool) = @_;
+
+  $self->_append_stuff_to_conditional (Common::Sections::Entries::SECTION (), $section_name, $target_conditional_name, $bool);
 }
 
-##
-## conditional name, conditional name, bool value
-##
 sub append_conditional_to_conditional ($$$$)
 {
-  shift->_append_stuff_to_conditional (Common::Sections::Entries::CONDITIONAL (), shift, shift, shift);
+  my ($self, $conditional_name, $target_conditional_name, $bool) = @_;
+
+  $self->_append_stuff_to_conditional (Common::Sections::Entries::CONDITIONAL (), $conditional_name, $target_conditional_name, $bool);
 }
 
 sub set_variable_for_conditional ($$$)
@@ -300,6 +353,70 @@ sub write_main_section_to_file ($$$)
   }
   $section->clear;
   $fd->close;
+}
+
+sub is_section_linked_to_main_section ($$)
+{
+  my ($self, $section_name) = @_;
+  my $section = $self->_get_section ($section_name);
+
+  return $section->is_linked;
+}
+
+sub is_conditional_linked_to_main_section ($$)
+{
+  my ($self, $conditional_name) = @_;
+  my $conditional = $self->_get_conditional ($conditional_name);
+
+  return $conditional->is_linked;
+}
+
+sub push_section ($$)
+{
+  my ($self, $section_name) = @_;
+  my ($entries, $is_linked) = $self->_get_entries_and_linking_from_section ($section_name);
+
+  $self->_push_entry ($entries, $is_linked);
+}
+
+sub push_conditional ($$$)
+{
+  my ($self, $conditional_name, $bool) = @_;
+  my ($entries, $is_linked) = $self->_get_entries_and_linking_from_conditional ($conditional_name, $bool);
+
+  $self->_push_entry ($entries, $is_linked);
+}
+
+sub pop_entry ($)
+{
+  my ($self) = @_;
+  my $entries_stack = $self->_get_entries_stack;
+
+  if (@{$entries_stack} > 1)
+  {
+    pop @{$entries_stack};
+  }
+}
+
+sub append_string ($$)
+{
+  my ($self, $string) = @_;
+
+  $self->_append_generic (Common::Sections::Entries::STRING (), $string);
+}
+
+sub append_section ($$)
+{
+  my ($self, $section) = @_;
+
+  $self->_append_generic (Common::Sections::Entries::SECTION (), $section);
+}
+
+sub append_conditional ($$)
+{
+  my ($self, $conditional) = @_;
+
+  $self->_append_generic (Common::Sections::Entries::CONDITIONAL (), $conditional);
 }
 
 1; # indicate proper module load.

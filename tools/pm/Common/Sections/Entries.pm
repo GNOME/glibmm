@@ -32,7 +32,7 @@ use constant
 sub new ($)
 {
   my ($type) = @_;
-  my $class = (ref ($type) or $type or 'Common::Sections::Entries');
+  my $class = (ref $type or $type or 'Common::Sections::Entries');
   my $self = [];
 
   return bless $self, $class;
@@ -67,4 +67,4 @@ sub get_copy ($)
   return \@copy;
 }
 
-1; #indicate proper module load.
+1; # indicate proper module load.

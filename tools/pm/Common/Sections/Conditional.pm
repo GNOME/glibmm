@@ -33,13 +33,14 @@ use constant
 sub new ($$$)
 {
   my ($type, $name, $bool_variable_name) = @_;
-  my $class = (ref ($type) or $type or 'Common::Sections::Conditional');
+  my $class = (ref $type or $type or 'Common::Sections::Conditional');
   my $self =
   {
     'name' => $name,
     'false_entries' => Common::Sections::Entries->new,
     'true_entries' => Common::Sections::Entries->new,
-    'bool_variable_name' => $bool_variable_name
+    'bool_variable_name' => $bool_variable_name,
+    'linked' => undef
   };
 
   return bless $self, $class;
@@ -82,7 +83,7 @@ sub get_entries ($$)
     }
     default
     {
-      # TODO: throw an error.
+# TODO: throw an error.
       print STDERR 'Unknown value for conditional, use Common::Sections::Conditional::{TRUE,FALSE}' . "\n";
       exit 1;
     }
@@ -97,4 +98,18 @@ sub clear ($)
   $self->{'true_entries'} = Common::Sections::Entries->new;
 }
 
-1; #indicate proper module load.
+sub is_linked ($)
+{
+  my ($self) = @_;
+
+  return $self->{'linked'};
+}
+
+sub set_linked ($$)
+{
+  my ($self, $main_section) = @_;
+
+  $self->{'linked'} = $main_section;
+}
+
+1; # indicate proper module load.
