@@ -71,7 +71,7 @@ PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
 
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
-MM_PKG_CONFIG_SUBST([GIR_DIR], [--variable=girdir gobject-introspection-1.0])
+MM_PKG_CONFIG_SUBST([GIRDIR], [--variable=girdir gobject-introspection-1.0])
 
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 GLIB_GSETTINGS
