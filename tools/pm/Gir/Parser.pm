@@ -261,7 +261,26 @@ sub parse_file ($$)
 
   unless (exists $parsed_girs->{$filename})
   {
-    my $real_filename = File::Spec->catfile (Gir::Config::get_girdir, $filename);
+    my $girdirs = Gir::Config::get_girdirs;
+    my $real_filename = undef;
+
+    foreach my $girdir (@{$girdirs})
+    {
+      my $maybe_real_filename = File::Spec->catfile (Gir::Config::get_girdir, $filename);
+
+      if (-r $maybe_real_filename)
+      {
+        $real_filename = $maybe_real_filename;
+        last;
+      }
+    }
+
+    unless (defined $real_filename)
+    {
+# TODO: throw a runtime error.
+      die; # with horrible death!
+    }
+
     my $xml_parser = $self->_create_xml_parser;
     my $new_state = Gir::State->new ($real_filename, $xml_parser);
     my $states_stack = $self->{'states_stack'};
