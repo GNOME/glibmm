@@ -30,9 +30,13 @@ sub new_from_string ($$)
   my ($type, $string) = @_;
   my $class = (ref $type or $type or 'Common::CxxFunctionInfo');
   my $cxx_parts = Common::Shared::parse_function_declaration $string;
+  my $static = ($cxx_parts->[0] =~ /\bstatic\b/);
+  my $ret = $cxx_parts->[1];
+  my $name = $cxx_parts->[2];
   my $params = Common::Shared::parse_params $cxx_parts->[3];
   my $param_types = [];
   my $param_names = [];
+  my $const = ($cxx_parts->[4] =~ /\bconst\b/);
 
   foreach my $desc (@{$params})
   {
@@ -44,12 +48,12 @@ sub new_from_string ($$)
 
   my $self =
   {
-    'static' => ($cxx_parts->[0] =~ /\bstatic\b/),
-    'ret' => $cxx_parts->[1],
-    'name' => $cxx_parts->[2],
+    'static' => $static,
+    'ret' => $ret,
+    'name' => $name,
     'param_types' => $param_types,
     'param_names' => $param_names,
-    'const' => ($cxx_parts->[4] =~ /\bconst\b/)
+    'const' => $const
   };
 
   return bless $self, $class;

@@ -25,18 +25,32 @@ use warnings;
 
 use Common::Sections::Entries;
 
-sub new ($$)
+sub _generic_new ($$$)
 {
-  my ($type, $name) = @_;
+  my ($type, $name, $linked) = @_;
   my $class = (ref $type or $type or 'Common::Sections::Section');
   my $self =
   {
     'name' => $name,
     'entries' => Common::Sections::Entries->new,
-    'linked' => undef
+    'linked' => $linked
   };
 
   return bless $self, $class;
+}
+
+sub new ($$)
+{
+  my ($type, $name) = @_;
+
+  return _generic_new $type, $name, undef;
+}
+
+sub new_main ($$)
+{
+  my ($type, $name) = @_;
+
+  return _generic_new $type, $name, $name;
 }
 
 sub get_name ($)

@@ -72,7 +72,7 @@ sub _add_new_to ($$$$$)
     $c_to_cpp->{$c_stuff} = $cpp_stuff;
   }
 
-  my $cpp_sub_types = Common::Shared::split_cpp_types_to_sub_types $cpp_stuff;
+  my $cpp_sub_types = Common::Shared::split_cpp_type_to_sub_types $cpp_stuff;
 
   foreach my $cpp_sub_stuff (@{$cpp_sub_types})
   {
@@ -180,7 +180,7 @@ sub _get_read_files ($)
 {
   my ($self) = @_;
 
-  return $self->get_read_files;
+  return $self->{'read_files'};
 }
 
 sub _get_c_to_cpp ($$)

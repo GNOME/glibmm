@@ -87,7 +87,7 @@ sub _output_cc ($$$$$$$$$$$$$)
   {
     if ($errthrow)
     {
-      $code_string += $error_init_string .
+      $code_string .= $error_init_string .
                       (nl) .
                       (nl '    ', $c_func_invocation, ';') .
                       (nl) .
@@ -97,7 +97,7 @@ sub _output_cc ($$$$$$$$$$$$$)
     }
     else
     {
-      $code_string += (nl '    ', $c_func_invocation, ';') .
+      $code_string .= (nl '    ', $c_func_invocation, ';') .
                       (nl '    return;');
     }
   }
@@ -107,7 +107,7 @@ sub _output_cc ($$$$$$$$$$$$$)
 
     if ($errthrow)
     {
-      $code_string += $error_init_string .
+      $code_string .= $error_init_string .
                       (nl '    ', $c_return_type, ' temp_retval(', $c_func_invocation, ');') .
                       (nl) .
                       $errthrow_string .
@@ -118,12 +118,12 @@ sub _output_cc ($$$$$$$$$$$$$)
     {
       $conv = $conversions_store->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, $c_func_invocation);
     }
-    $code_string += nl ('    return ' . $conv . ';');
+    $code_string .= nl ('    return ' . $conv . ';');
     $last_return = (nl) .
                    (nl '  typedef ' . $cpp_return_type . ' RType;') .
                    (nl '  return RType();');
   }
-  $code_string += (nl '  }') .
+  $code_string .= (nl '  }') .
                   (nl $last_return . '}') .
                   Common::Output::Shared::endif $ifdef;
 
@@ -205,13 +205,13 @@ sub _output_p_cc ($$$$$$$$$$$$)
 
   if ($errthrow)
   {
-    $code_string += (nl '      catch (const Glib::Error& error)') .
+    $code_string .= (nl '      catch (const Glib::Error& error)') .
                     (nl '      {') .
                     (nl '        error.propagate(gerror);') .
                     (nl '      }');
   }
 
-  $code_string += (nl '      catch (...)') .
+  $code_string .= (nl '      catch (...)') .
                   (nl '      {') .
                   (nl '        Glib::exception_handlers_invoke();') .
                   (nl '      }') .

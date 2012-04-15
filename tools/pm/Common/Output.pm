@@ -25,14 +25,17 @@ use warnings;
 
 use Common::Output::BoxedTypeStatic;
 use Common::Output::BoxedType;
+use Common::Output::Ctor;
 use Common::Output::Enum;
 use Common::Output::Generic;
 use Common::Output::GError;
 use Common::Output::GObject;
 use Common::Output::GtkObject;
 use Common::Output::Interface;
+use Common::Output::Method;
 use Common::Output::OpaqueCopyable;
 use Common::Output::OpaqueRefcounted;
+use Common::Output::Property;
 use Common::Output::VFunc;
 
 1; # indicate proper module load.

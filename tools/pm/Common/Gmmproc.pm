@@ -25,6 +25,7 @@ use warnings;
 
 use IO::File;
 
+use Common::Scanner;
 use Common::Sections;
 use Common::SectionManager;
 use Common::TokensStore;
@@ -157,13 +158,12 @@ sub _parse_all_bases ($)
   my ($self) = @_;
   my $bases = $self->get_bases;
   my $type_info_store = $self->get_type_info_store;
-  my $section_managers = $self->get_section_managers;
   my $repositories = $self->get_repositories;
   my $conversions_store = $self->get_conversions_store;
   my $mm_module = $self->get_mm_module;
 
   # parallelize
-  foreach my $base (@{$bases})
+  foreach my $base (sort keys %{$bases})
   {
     my $tokens_store = $bases->{$base};
     my $tokens_hg = $tokens_store->get_hg_tokens;
@@ -173,7 +173,8 @@ sub _parse_all_bases ($)
                                                $type_info_store,
                                                $repositories,
                                                $conversions_store,
-                                               $mm_module);
+                                               $mm_module,
+                                               $base);
 
     $wrap_parser->parse;
     $tokens_store->set_section_manager ($wrap_parser->get_section_manager);

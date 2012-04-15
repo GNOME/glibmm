@@ -168,13 +168,13 @@ sub _output_cc ($$$$$$$)
                  nl(':');
   if (defined $new_func and $new_func != '' and $new_func != 'NONE')
   {
-    $code_string += nl ('gobject_ (' . $new_func . '())');
+    $code_string .= nl ('gobject_ (' . $new_func . '())');
   }
   else
   {
-    $code_string += nl ('gobject_ (0) // Allows creation of invalid wrapper, e.g. for output arguments to methods.');
+    $code_string .= nl ('gobject_ (0) // Allows creation of invalid wrapper, e.g. for output arguments to methods.');
   }
-  $code_string += nl ('{}');
+  $code_string .= nl ('{}');
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($variable, $conditional);

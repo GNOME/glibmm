@@ -266,7 +266,7 @@ sub parse_file ($$)
 
     foreach my $girdir (@{$girdirs})
     {
-      my $maybe_real_filename = File::Spec->catfile (Gir::Config::get_girdir, $filename);
+      my $maybe_real_filename = File::Spec->catfile ($girdir, $filename);
 
       if (-r $maybe_real_filename)
       {
@@ -278,7 +278,8 @@ sub parse_file ($$)
     unless (defined $real_filename)
     {
 # TODO: throw a runtime error.
-      die; # with horrible death!
+      my $message = join '', 'Could not find ', $filename, ' in followin paths:', "\n", (join "\n", @{$girdirs}), "\n";
+      die $message; # with horrible death!
     }
 
     my $xml_parser = $self->_create_xml_parser;

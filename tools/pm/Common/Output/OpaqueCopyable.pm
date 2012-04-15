@@ -96,13 +96,13 @@ sub _output_cc ($$$$$$)
 
   if (defined $new_func and $new_func ne '' and $new_func ne 'NONE')
   {
-    $code_string += nl ('  gobject_(' . $new_func . '())');
+    $code_string .= nl ('  gobject_(' . $new_func . '())');
   }
   else
   {
-    $code_string += nl ('  gobject_(0) // Allows creation of invalid wrapper, e.g. for output arguments to methods.');
+    $code_string .= nl ('  gobject_(0) // Allows creation of invalid wrapper, e.g. for output arguments to methods.');
   }
-  $code_string += nl ();
+  $code_string .= nl ();
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
   $section_manager->push_section ($section);
   $section_manager->append_conditional ($conditional);
@@ -137,7 +137,7 @@ sub _output_cc ($$$$$$)
                  nl ();
   if (defined $copy_func and $copy_func ne '' and $copy_func ne 'NONE')
   {
-    $code_string += nl ($full_cpp_type . '& ' . $full_cpp_type . '::operator=(const ' . $full_cpp_type . '& src)') .
+    $code_string .= nl ($full_cpp_type . '& ' . $full_cpp_type . '::operator=(const ' . $full_cpp_type . '& src)') .
                     nl ('{') .
                     nl ('  ' . $c_type . '* const new_gobject = (src.gobject_) ? ' . $copy_func . '(src.gobject_) : 0;') .
                     nl () .
@@ -152,7 +152,7 @@ sub _output_cc ($$$$$$)
                     nl ('}') .
                     nl ();
   }
-  $code_string += nl ($full_cpp_type . '::~' . $cpp_type . '()') .
+  $code_string .= nl ($full_cpp_type . '::~' . $cpp_type . '()') .
                   nl ('{') .
                   nl ('  if (gobject_)') .
                   nl ('  {') .

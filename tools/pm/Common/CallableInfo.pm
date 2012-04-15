@@ -23,9 +23,9 @@ package Common::CallableInfo;
 use strict;
 use warnings;
 
-sub _parse_typed ($)
+sub _parse_typed ($$)
 {
-  my ($gir_typed) = @_;
+  my ($self, $gir_typed) = @_;
 
   if ($gir_typed->get_g_type_count > 0)
   {
@@ -43,12 +43,15 @@ sub _parse_typed ($)
   {
     return '...';
   }
-  else die;
+  else
+  {
+    die;
+  }
 }
 
-sub _parse_parameters ($)
+sub _parse_parameters ($$)
 {
-  my ($gir_function) = @_;
+  my ($self, $gir_function) = @_;
   my $param_types = [];
   my $param_names = [];
   my $param_transfers = [];
@@ -62,8 +65,9 @@ sub _parse_parameters ($)
     {
       my $gir_parameter = $gir_parameters->get_g_parameter_by_index ($iter);
       my $name = $gir_parameter->get_a_name;
-      my $transfer = Common::ConversionsStore::transfer_from_string $gir_parameter->get_a_transfer_ownership;
-      my $type = _parse_parameter $gir_parameter;
+      my $gir_transfer = $gir_parameter->get_a_transfer_ownership;
+      my $transfer = Common::ConversionsStore::transfer_from_string $gir_transfer;
+      my $type = $self->_parse_parameter ($gir_parameter);
 
 # TODO: error.
       die unless ($type);
@@ -94,22 +98,20 @@ sub new_from_gir ($$)
   my ($type, $gir_callable) = @_;
   my $class = (ref $type or $type or 'Common::CallableInfo');
   # Bless now, so we can use virtual methods.
-  my $self = bless $class, $type;
+  my $self = bless {}, $class;
   my $gir_return = $gir_callable->get_g_return_value_by_index (0);
   my $ret = $self->_parse_return_value ($gir_return);
-  my $ret_transfer = Common::ConversionsStore::transfer_from_string $gir_return->get_a_transfer_ownership;
-  my $name = $self->_get_name_from_gir ($gir_callable)
+  my $gir_ret_transfer = $gir_return->get_a_transfer_ownership;
+  my $ret_transfer = Common::ConversionsStore::transfer_from_string $gir_ret_transfer;
+  my $name = $self->_get_name_from_gir ($gir_callable);
   my ($param_types, $param_names, $param_transfers) = $self->_parse_parameters ($gir_callable);
 
-  my $self =
-  {
-    'ret' => $ret,
-    'ret_transfer' => $ret_transfer,
-    'name' => $name,
-    'param_types' => $param_types,
-    'param_names' => $param_names,
-    'param_transfers' => $param_transfers,
-  };
+  $self->{'ret'} = $ret;
+  $self->{'ret_transfer'} = $ret_transfer;
+  $self->{'name'} = $name;
+  $self->{'param_types'} = $param_types;
+  $self->{'param_names'} = $param_names;
+  $self->{'param_transfers'} = $param_transfers;
 
   return $self;
 }

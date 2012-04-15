@@ -25,6 +25,9 @@ use warnings;
 
 use IO::File;
 
+use Common::CxxFunctionInfo;
+use Common::CFunctionInfo;
+use Common::SignalInfo;
 use Common::Util;
 use Common::SectionManager;
 use Common::Shared;
@@ -86,7 +89,7 @@ sub _on_wrap_corba_method ($)
 {
   my ($self) = @_;
 
-  $self->extract_bracketed_text;
+  $self->_extract_bracketed_text;
   # my $objOutputter = $$self{objOutputter};
 
   # return unless ($self->check_for_eof());
@@ -94,7 +97,7 @@ sub _on_wrap_corba_method ($)
   # my $filename = $$self{filename};
   # my $line_num = $$self{line_num};
 
-  # my $str = $self->extract_bracketed_text();
+  # my $str = $self->_extract_bracketed_text();
   # my @args = string_split_commas($str);
 
   # my $entity_type = "method";
@@ -485,31 +488,31 @@ sub _on_close_brace ($)
   # check if we are closing the class brace
   if (@{$class_levels} and $class_levels->[-1] == $level)
   {
-    pop @{$class_levels};
-    pop @{$classes};
-
-    unless (@{$classes})
+    if (@{$classes} == 1)
     {
       my $section = Common::Output::Shared::get_section $self, Common::Sections::H_AFTER_FIRST_CLASS;
 
       $self->_on_ending_brace;
       $section_manager->append_section_to_section ($section, $main_section);
     }
+
+    pop @{$class_levels};
+    pop @{$classes};
     $self->_pop_gir_entity;
   }
   # check if we are closing the namespace brace
   elsif (@{$namespace_levels} and $namespace_levels->[-1] == $level)
   {
-    pop @{$namespaces};
-    pop @{$namespace_levels};
-
-    unless (@{$namespaces})
+    if (@{$namespaces} == 1)
     {
       my $section = Common::Output::Shared::get_section $self, Common::Sections::H_AFTER_FIRST_NAMESPACE;
 
       $self->_on_ending_brace;
       $section_manager->append_section_to_section ($section, $main_section);
     }
+
+    pop @{$namespaces};
+    pop @{$namespace_levels};
   }
 
   $self->dec_level;
@@ -638,7 +641,7 @@ sub _on_defs ($)
   my ($self) = @_;
 
   $self->fixed_warning ('Deprecated.');
-  $self->extract_bracketed_text;
+  $self->_extract_bracketed_text;
 }
 
 # TODO: implement it.
@@ -647,7 +650,7 @@ sub _on_ignore ($)
   my ($self) = @_;
 
   $self->fixed_warning ('Not yet implemented.');
-  $self->extract_bracketed_text;
+  $self->_extract_bracketed_text;
 #  my @args = split(/\s+|,/,$str);
 #  foreach (@args)
 #  {
@@ -662,7 +665,7 @@ sub _on_ignore_signal ($)
   my ($self) = @_;
 
   $self->fixed_warning ('Not yet implemented.');
-  $self->extract_bracketed_text;
+  $self->_extract_bracketed_text;
 #  $str = Common::Util::string_trim($str);
 #  $str = Common::Util::string_unquote($str);
 #  my @args = split(/\s+|,/,$str);
@@ -676,7 +679,7 @@ sub _on_ignore_signal ($)
 sub _on_wrap_method ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args < 2)
   {
@@ -799,7 +802,7 @@ sub _on_wrap_method_docs_only ($)
 {
   my ($self) = @_;
 
-  $self->extract_bracketed_text;
+  $self->_extract_bracketed_text;
   $self->fixed_warning ('Not yet implemented.');
   # my $objOutputter = $$self{objOutputter};
 
@@ -808,7 +811,7 @@ sub _on_wrap_method_docs_only ($)
   # my $filename = $$self{filename};
   # my $line_num = $$self{line_num};
 
-  # my $str = $self->extract_bracketed_text();
+  # my $str = $self->_extract_bracketed_text();
   # my @args = string_split_commas($str);
 
   # my $entity_type = "method";
@@ -863,7 +866,7 @@ sub _on_wrap_method_docs_only ($)
 sub _on_wrap_signal ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args < 2)
   {
@@ -954,7 +957,7 @@ sub _on_wrap_signal ($)
 sub _on_wrap_property ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args < 2)
   {
@@ -967,7 +970,7 @@ sub _on_wrap_property ($)
   # Catch useless parameters.
   $self->_handle_get_args_results (Common::Shared::get_args \@args, {});
 
-  if ($prop_c_name =~ /_/ or $prop_c_name !~ /$".*"^/)
+  if ($prop_c_name =~ /_/ or $prop_c_name !~ /^"\w+"$/)
   {
     $self->fixed_warning ('First parameter should be like C string (in double quotes) with dashes instead of underlines - e.g. "g-name-owner".');
   }
@@ -1018,7 +1021,7 @@ sub _on_wrap_property ($)
 sub _on_wrap_vfunc ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args < 2)
   {
@@ -1116,7 +1119,7 @@ sub _on_wrap_vfunc ($)
 sub _on_wrap_ctor ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args < 2)
   {
@@ -1147,13 +1150,12 @@ sub _on_wrap_ctor ($)
   my $c_constructor = Common::CFunctionInfo->new_from_gir ($gir_constructor);
   my $c_param_names = $c_constructor->get_param_names;
   my $cxx_param_names = $cxx_function->get_param_names;
-  my @c_prop_names = ();
+  my $c_params_count = @{$c_param_names};
+  my $cxx_params_count = @{$cxx_param_names};
 
-  die if scalar(@{$c_param_names}) != scalar(@{$cxx_param_names});
-  if (@{$c_param_names})
-  {
-    @c_prop_names = map { $self->get_prop_name ($gir_class, $c_param_names->[$_], $cxx_param_names->[$_]) } 0 .. @{$c_param_names};
-  }
+  die if $c_params_count != $cxx_params_count;
+
+  my @c_prop_names = map { $self->_get_prop_name ($gir_class, $c_param_names->[$_], $cxx_param_names->[$_]) } 0 .. ($c_params_count - 1);
 
   Common::Output::Ctor::wrap_ctor $self,
                                   $c_constructor->get_param_types,
@@ -1166,7 +1168,7 @@ sub _on_wrap_ctor ($)
 sub _on_wrap_create ($)
 {
   my ($self) = @_;
-  my $params = Common::Shared::parse_params $self->extract_bracketed_text;
+  my $params = Common::Shared::parse_params $self->_extract_bracketed_text;
   my $types = [];
   my $names = [];
 
@@ -1186,7 +1188,7 @@ sub _on_wrap_enum ($)
   my $module = $self->get_module;
   my $repository = $repositories->get_repository ($module);
   my $namespace = $repository->get_g_namespace_by_name ($module);
-  my @args = Common::Shared::string_split_commas ($self->extract_bracketed_text);
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text);
 
   if (@args < 2)
   {
@@ -1245,7 +1247,7 @@ sub _on_wrap_gerror ($)
   my $module = $self->get_module;
   my $repository = $repositories->get_repository ($module);
   my $namespace = $repository->get_g_namespace_by_name ($module);
-  my @args = Common::Shared::string_split_commas ($self->extract_bracketed_text);
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text);
 
   if (@args < 2)
   {
@@ -1306,7 +1308,7 @@ sub _on_wrap_gerror ($)
 sub _on_implements_interface ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args < 2)
   {
@@ -1328,7 +1330,7 @@ sub _on_implements_interface ($)
 sub _on_class_generic ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args < 2)
   {
@@ -1373,7 +1375,7 @@ sub _on_class_generic ($)
 sub _on_class_g_object ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args > 2)
   {
@@ -1498,7 +1500,7 @@ sub _on_class_g_object ($)
     for my $gir_parent_prefix (@gir_parent_prefixes)
     {
       my $temp_parent_class_type = $gir_parent_prefix . $gir_parent_type_struct;
-      my $gir_parent_class_struct = $namespace->get_g_record_by_name ($temp_parent_class_type);
+      my $gir_parent_class_struct = $parent_namespace->get_g_record_by_name ($temp_parent_class_type);
 
       if (defined $gir_parent_class_struct)
       {
@@ -1558,10 +1560,12 @@ sub _on_class_g_object ($)
   }
 
   my $type_info_store = $self->get_type_info_store;
+# TODO: write an info about adding mapping when returned value
+# TODO continued: is undefined.
   my $cpp_parent_type = $type_info_store->c_to_cpp ($c_parent_type);
 
-  $self->push_gir_class ($gir_class);
-  $self->push_c_class ($c_type);
+  $self->_push_gir_class ($gir_class);
+  $self->_push_c_class ($c_type);
 
   Common::Output::GObject::output $self,
                                   $c_type,
@@ -1582,7 +1586,7 @@ sub _on_class_gtk_object ($)
 sub _on_class_boxed_type ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args > 5)
   {
@@ -1754,7 +1758,7 @@ sub _on_class_boxed_type ($)
 sub _on_class_boxed_type_static ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args > 2)
   {
@@ -1803,7 +1807,7 @@ sub _on_class_boxed_type_static ($)
 sub _on_class_interface ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args > 2)
   {
@@ -1953,7 +1957,7 @@ sub _on_class_interface ($)
   my $type_info_store = $self->get_type_info_store;
   my $cpp_parent_name = $type_info_store->c_to_cpp ($c_parent_name);
 
-  $self->push_gir_class ($gir_class);
+  $self->_push_gir_class ($gir_class);
 
   Common::Output::Interface::output $self,
                                     $c_name,
@@ -1969,7 +1973,7 @@ sub _on_class_interface ($)
 sub _on_class_opaque_copyable ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args > 5)
   {
@@ -2135,7 +2139,7 @@ sub _on_class_opaque_copyable ($)
 sub _on_class_opaque_refcounted ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args > 5)
   {
@@ -2307,6 +2311,7 @@ sub _on_namespace_keyword ($)
   my $in_s_comment = 0;
   my $in_m_comment = 0;
 
+# TODO: why _extract_token is not used here?
   # we need to peek ahead to figure out what type of namespace
   # declaration this is.
   foreach my $token (@{$tokens})
@@ -2342,8 +2347,10 @@ sub _on_namespace_keyword ($)
       my $namespace_levels = $self->get_namespace_levels;
 
       $name = Common::Util::string_trim ($name);
+      push @{$namespaces}, $name;
+      push @{$namespace_levels}, $level + 1;
 
-      unless (@{$namespaces})
+      if (@{$namespaces} == 1)
       {
         $self->generate_first_namespace_number;
 
@@ -2352,8 +2359,6 @@ sub _on_namespace_keyword ($)
         $section_manager->append_section_to_section ($section, $main_section);
       }
 
-      push @{$namespaces}, $name;
-      push @{$namespace_levels}, $level + 1;
       $done = 1;
     }
     elsif ($token eq ';')
@@ -2383,7 +2388,7 @@ sub _on_insert_section ($)
   my ($self) = @_;
   my $section_manager = $self->get_section_manager;
   my $main_section = $self->get_main_section;
-  my $str = Common::Util::string_trim $self->extract_bracketed_text;
+  my $str = Common::Util::string_trim $self->_extract_bracketed_text;
 
   $section_manager->append_section_to_section ($str, $main_section);
 }
@@ -2435,8 +2440,10 @@ sub _on_class_keyword ($)
       my $class_levels = $self->get_class_levels;
 
       $name =~ s/\s+//g;
+      push @{$classes}, $name;
+      push @{$class_levels}, $level + 1;
 
-      unless (@{$classes})
+      if (@{$classes} == 1)
       {
         $self->generate_first_class_number;
 
@@ -2445,8 +2452,6 @@ sub _on_class_keyword ($)
         $section_manager->append_section_to_section ($section, $main_section);
       }
 
-      push @{$classes}, $name;
-      push @{$class_levels}, $level + 1;
       $done = 1;
     }
     elsif ($token eq ';')
@@ -2477,7 +2482,7 @@ sub _on_class_keyword ($)
 sub _on_module ($)
 {
   my ($self) = @_;
-  my $str = Common::Util::string_trim $self->extract_bracketed_text;
+  my $str = Common::Util::string_trim $self->_extract_bracketed_text;
 
   $self->{'module'} = $str;
 }
@@ -2486,27 +2491,71 @@ sub _on_module ($)
 ### HANDLERS ABOVE
 ###
 
+sub get_stage_section_tuples ($)
+{
+  my ($self) = @_;
+
+  return $self->{'stage_section_tuples'}
+}
+
+sub set_filename ($$)
+{
+  my ($self, $filename) = @_;
+
+  $self->{'filename'} = $filename;
+}
+
+sub get_filename ($)
+{
+  my ($self) = @_;
+
+  return $self->{'filename'};
+}
+
+sub get_base ($)
+{
+  my ($self) = @_;
+
+  return $self->{'base'};
+}
+
+# TODO: private
 sub _switch_to_stage ($$)
 {
   my ($self, $stage) = @_;
-  my $pairs = $self->get_stage_section_pairs;
+  my $pairs = $self->get_stage_section_tuples;
 
   if (exists $pairs->{$stage})
   {
+    my $tuple = $pairs->{$stage};
+    my $main_section = $tuple->[0][0];
+    my $tokens = $tuple->[1];
+    my $ext = $tuple->[2];
+    my $filename = join '.', $self->get_base, $ext;
+
     $self->set_parsing_stage ($stage);
     $self->set_main_section ($pairs->{$stage}[0][0]);
     $self->set_tokens ($self->{$pairs->{$stage}[1]});
+    $self->set_filename ($filename);
   }
   else
   {
 # TODO: internal error.
+    die;
   }
 }
 
-# public
-sub new ($$$$$$)
+sub get_repositories ($)
 {
-  my ($type, $tokens_hg, $tokens_ccg, $type_info_store, $repositories, $conversions_store, $mm_module) = @_;
+  my ($self) = @_;
+
+  return $self->{'repositories'};
+}
+
+# public
+sub new ($$$$$$$)
+{
+  my ($type, $tokens_hg, $tokens_ccg, $type_info_store, $repositories, $conversions_store, $mm_module, $base) = @_;
   my $class = (ref $type or $type or 'Common::WrapParser');
   my $self =
   {
@@ -2516,8 +2565,6 @@ sub new ($$$$$$)
     'level' => 0,
     'classes' => [],
     'class_levels' => [],
-    'first_namespace' => '',
-    'first_class' => '',
     'namespaces' => [],
     'namespace_levels' => [],
     'module' => '',
@@ -2529,18 +2576,20 @@ sub new ($$$$$$)
     'parsing_stage' => STAGE_INVALID,
     'main_section' => Common::Sections::DEV_NULL->[0],
     'section_manager' => Common::SectionManager->new,
-    'stage_section_pairs' =>
+    'stage_section_tuples' =>
     {
-      STAGE_HG() => [Common::Sections::H, 'tokens_hg'],
-      STAGE_CCG() => [Common::Sections::CC, 'tokens_ccg'],
-      STAGE_INVALID() => [Common::Sections::DEV_NULL, 'tokens_null']
+      STAGE_HG() => [Common::Sections::H, 'tokens_hg', 'hg'],
+      STAGE_CCG() => [Common::Sections::CC, 'tokens_ccg', 'ccg'],
+      STAGE_INVALID() => [Common::Sections::DEV_NULL, 'tokens_null', 'BAD']
     },
     'type_info_store' => $type_info_store,
     'counter' => 0,
     'conversions_store' => Common::ConversionsStore->new_local ($conversions_store),
     'gir_stack' => [],
     'c_stack' => [],
-    'mm_module' => $mm_module
+    'mm_module' => $mm_module,
+    'base' => $base,
+    'filename' => undef
   };
 
   $self = bless $self, $class;
@@ -2588,6 +2637,13 @@ sub new ($$$$$$)
   };
 
   return $self;
+}
+
+sub get_type_info_store ($)
+{
+  my ($self) = @_;
+
+  return $self->{'type_info_store'};
 }
 
 sub get_number ($)
@@ -2804,6 +2860,8 @@ sub parse ($)
 
       if (exists $handlers->{$token})
       {
+        print 'Currently parsing: ' . $token . "\n";
+
         my $pair = $handlers->{$token};
         my $object = $pair->[0];
         my $handler = $pair->[1];

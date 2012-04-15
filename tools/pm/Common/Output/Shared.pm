@@ -77,6 +77,30 @@ sub close_namespaces ($)
   return $code_string;
 }
 
+sub get_first_class ($)
+{
+  my ($wrap_parser) = @_;
+  my $classes = $wrap_parser->get_classes;
+
+  if (@{$classes})
+  {
+    return $classes->[0];
+  }
+  die;
+}
+
+sub get_first_namespace ($)
+{
+  my ($wrap_parser) = @_;
+  my $namespaces = $wrap_parser->get_namespaces;
+
+  if (@{$namespaces})
+  {
+    return $namespaces->[0];
+  }
+  die;
+}
+
 # returns VteTerminal
 sub get_c_type ($)
 {
@@ -124,7 +148,7 @@ sub get_complete_cpp_type ($)
 {
   my ($wrap_parser) = @_;
   my $namespaces = get_full_namespace $wrap_parser;
-  my $classes = get_full_cpp_class $wrap_parser;
+  my $classes = get_full_cpp_type $wrap_parser;
 
   return join '::', $namespaces, $classes;
 }
@@ -294,24 +318,24 @@ sub wrap_proto ($$$$$$)
   my ($wrap_parser, $c_name, $result_type, $take_copy, $open, $const) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $result = undef;
-  my $full_cpp_name = get_full_cpp_name $wrap_parser;
+  my $complete_cpp_type = get_complete_cpp_type $wrap_parser;
 
 # TODO: make result type constant
   if ($result_type eq 'refptr')
   {
-    $result = 'Glib::RefPtr< ' . $full_cpp_name . ' >';
+    $result = 'Glib::RefPtr< ' . $complete_cpp_type . ' >';
   }
   elsif ($result_type eq 'ref')
   {
-    $result = $full_cpp_name . '&';
+    $result = $complete_cpp_type . '&';
   }
   elsif ($result_type eq 'ptr')
   {
-    $result = $full_cpp_name . '*';
+    $result = $complete_cpp_type . '*';
   }
   elsif ($result_type eq 'plain')
   {
-    $result = $full_cpp_name;
+    $result = $complete_cpp_type;
   }
   else
   {
@@ -331,14 +355,14 @@ sub wrap_proto ($$$$$$)
     $params_doc = nl ($params_doc) .
                   nl (' * @param take_copy @c false if the result should take ownership') .
                   ' * of the C instance. @c true if it should take a new copy or reference.';
-    $params += ', bool take_copy = ';
+    $params .= ', bool take_copy = ';
     if ($take_copy eq 'yes')
     {
-      $params += 'true';
+      $params .= 'true';
     }
     elsif ($take_copy eq 'no')
     {
-      $params += 'false';
+      $params .= 'false';
     }
     else
     {
@@ -352,23 +376,23 @@ sub wrap_proto ($$$$$$)
 
   if ($open)
   {
-    $code_string += nl ('namespace Glib') .
+    $code_string .= nl ('namespace Glib') .
                     nl ('{') .
                     nl ();
   }
 
-  $code_string += nl ('/** A Glib::wrap() method for this object.') .
+  $code_string .= nl ('/** A Glib::wrap() method for this object.') .
                   nl (' *') .
                   nl ($params_doc) .
                   nl (' * @result A C++ instance that wraps this C instance') .
                   nl (' *') .
-                  nl (' * @relates ' . $full_cpp_name) .
+                  nl (' * @relates ' . $complete_cpp_type) .
                   nl (' */') .
                   nl ($result . ' wrap(' . $params . ');') .
                   nl ();
   if ($open)
   {
-    $code_string += nl ('} //namespace Glib') .
+    $code_string .= nl ('} //namespace Glib') .
                     nl ();
   }
 
@@ -428,13 +452,13 @@ sub gobj_protos_str ($$$$)
                    '  ' . $c_name . '* gobj_copy()';
     if ($copy_proto eq 'const')
     {
-      $code_string += ' const';
+      $code_string .= ' const';
     }
     elsif ($copy_proto ne 'yes')
     {
       die;
     }
-    $code_string += ';';
+    $code_string .= ';';
   }
   return $code_string;
 }
@@ -541,7 +565,7 @@ sub paramzipstr ($$)
 
 # TODO: throw runtime error or internal error or whatever.
   die if $count != scalar(@{$array2});
-  return join ', ', map { join ' ', $array1->[$_], $array2->[$_] } 0 .. $count;
+  return join ', ', map { join ' ', $array1->[$_], $array2->[$_] } 0 .. $count - 1;
 }
 
 sub get_parent_from_object ($$)
@@ -576,7 +600,7 @@ sub convzipstr ($$$$$)
 
 # TODO: throw runtime error or internal error or whatever.
   die if $from_types_count != $to_types_count or $to_types_count != $transfers_count or $transfers_count != $from_names_count;
-  return join ', ', map { $conversions_store->get_conversion ($from_types->[$_], $to_types->[$_], $transfers->[$_], $from_names->[$_]) } 0 .. $from_types_count;
+  return join ', ', map { $conversions_store->get_conversion ($from_types->[$_], $to_types->[$_], $transfers->[$_], $from_names->[$_]) } 0 .. $from_types_count - 1;
 }
 
 sub deprecate_start ($)

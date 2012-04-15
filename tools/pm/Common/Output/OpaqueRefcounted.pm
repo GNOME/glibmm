@@ -41,7 +41,7 @@ sub _output_h_in_class ($$$$)
 
   if (defined $new_func and $new_func ne '' and $new_func ne 'NONE')
   {
-    $code_string += nl ('  static Glib::RefPtr< ' . $cpp_type . ' > create();') .
+    $code_string .= nl ('  static Glib::RefPtr< ' . $cpp_type . ' > create();') .
                     nl ();
   }
 
@@ -51,7 +51,7 @@ sub _output_h_in_class ($$$$)
   my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
   my $main_section = $wrap_parser->get_main_section;
 
-  $code_string += nl ('  /** Increment the reference count for this object.') .
+  $code_string .= nl ('  /** Increment the reference count for this object.') .
                   nl ('   * You should never need to do this manually - use the object via a RefPtr instead.') .
                   nl ('   */') .
                   nl ('  void reference() const;') .
@@ -132,7 +132,7 @@ sub _output_cc ($$$$$)
                     nl ();
   if (defined $new_func and $new_func ne '' and $new_func ne 'NONE')
   {
-    $code_string += nl ('// static') .
+    $code_string .= nl ('// static') .
                     nl ('Glib::RefPtr< ' . $full_cpp_type . ' > ' . $full_cpp_type . '::create()') .
                     nl ('{') .
                     nl ('  // See the comment at the top of this file, if you want to know why the cast works.') .
@@ -141,7 +141,7 @@ sub _output_cc ($$$$$)
                     nl ();
   }
 
-  $code_string += nl ('void ' . $full_cpp_type . '::reference() const') .
+  $code_string .= nl ('void ' . $full_cpp_type . '::reference() const') .
                   nl ('{') .
                   nl ('  // See the comment at the top of this file, if you want to know why the cast works.') .
                   nl ('  ' . $ref_func . '(reinterpret_cast< ' . $c_type . '* >(const_cast< ' . $full_cpp_type .  '* >(this)));') .

@@ -90,7 +90,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
 
   if ($ret_void and not @{$c_param_types} and $cpp_return_type eq 'void' and not @{$cpp_param_types})
   {
-    $code_string += nl ('// Use predefined callback for SignalProxy0<void> to reduce code size.') .
+    $code_string .= nl ('// Use predefined callback for SignalProxy0<void> to reduce code size.') .
                     nl ('const Glib::SignalProxyInfo ' . $proxy_info . ' =') .
                     nl ('{') .
                     nl ('  ' . $c_signal_string . ',') .
@@ -134,7 +134,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
                        nl ('  typedef ' . $c_return_type . ' RType;') .
                        nl ('  return RType();');
       }
-      $code_string += nl ($c_return_type . ' ' . $signal_callback . '(' . $c_type . '* self, ' . $c_params_str . ', gpointer data)') .
+      $code_string .= nl ($c_return_type . ' ' . $signal_callback . '(' . $c_type . '* self, ' . $c_params_str . ', gpointer data)') .
                       nl ('{') .
                       nl ('  using namespace ' . (Common::Output::Shared::get_full_namespace $wrap_parser) . ';') .
                       nl ('  typedef sigc::slot< ' . $cpp_return_type . ', ' . $cpp_param_types_str . ' > SlotType;') .
@@ -160,7 +160,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
                       nl ();
       unless ($ret_void)
       {
-        $code_string += nl ($c_return_type . ' ' . $signal_notify . '(' . $c_type . '* self, ' . $c_params_str . ', gpointer data)') .
+        $code_string .= nl ($c_return_type . ' ' . $signal_notify . '(' . $c_type . '* self, ' . $c_params_str . ', gpointer data)') .
                         nl ('{') .
                         nl ('  using namespace ' . (Common::Output::Shared::get_full_namespace $wrap_parser) . ';') .
                         nl ('  typedef sigc::slot< void, ' . $cpp_param_types_str . ' > SlotType;') .
@@ -187,7 +187,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
                         nl ();
       }
     }
-    $code_string += nl ('const Glib::SignalProxyInfo ' . $proxy_info . ' =') .
+    $code_string .= nl ('const Glib::SignalProxyInfo ' . $proxy_info . ' =') .
                     nl ('{') .
                     nl ('  ' . $c_signal_string . ',') .
                     nl ('  G_CALLBACK(&' . $signal_callback . '),') .
@@ -196,7 +196,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
                     nl ();
   }
 
-  $code_string += Common::Output::Shared::endif $ifdef;
+  $code_string .= Common::Output::Shared::endif $ifdef;
 
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_UNNAMED_NAMESPACE;
 
@@ -224,7 +224,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
     my $c_func_invocation = '(*base->' . $c_signal_name . ')(gobj(), ' . $cpp_to_c_params_str . ')';
     my $last_return = '';
 
-    $code_string += nl ($cpp_return_type . ' ' . $full_cpp_type . '::on_' . $cpp_signal_name . '(' . $cpp_params_str . ')') .
+    $code_string .= nl ($cpp_return_type . ' ' . $full_cpp_type . '::on_' . $cpp_signal_name . '(' . $cpp_params_str . ')') .
                     nl ('{') .
                     nl ('  BaseClassType* const base(static_cast<BaseClassType*>(' . $parent_from_object . '));') .
                     nl () .
@@ -233,20 +233,20 @@ sub _output_cc ($$$$$$$$$$$$$$)
 
     if ($ret_void)
     {
-      $code_string += nl ('    ' . $c_func_invocation . ';') .
+      $code_string .= nl ('    ' . $c_func_invocation . ';') .
     }
     else
     {
       my $conv = $conversions_store->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, $c_func_invocation);
 
-      $code_string += nl ('    return ' . $conv . ';');
+      $code_string .= nl ('    return ' . $conv . ';');
       $last_return = nl () .
                      nl ('  typedef ' . $cpp_return_type . ' RType;') .
                      nl ('  return RType();');
 
     }
 
-    $code_string += nl ('  }') .
+    $code_string .= nl ('  }') .
                     nl($last_return . '}') .
                     Common::Output::Shared::endif $ifdef;
 

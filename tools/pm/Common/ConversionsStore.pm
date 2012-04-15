@@ -128,6 +128,27 @@ sub _add_generic ($$$$$$$)
 # TODO: what should be done with duplicates?
 }
 
+sub _get_mm_module ($)
+{
+  my ($self) = @_;
+
+  return $self->{'mm_module'};
+}
+
+sub _get_include_paths ($)
+{
+  my ($self) = @_;
+
+  return $self->{'include_paths'};
+}
+
+sub _get_read_files ($)
+{
+  my ($self) = @_;
+
+  return $self->{'read_files'};
+}
+
 sub new_local ($$)
 {
   my ($type, $global_store) = @_;
@@ -142,6 +163,7 @@ sub new_global ($$$)
 
   $self->{'mm_module'} = $mm_module;
   $self->{'include_paths'} = $include_paths;
+  $self->{'read_files'} = {};
 
   return $self;
 }
@@ -212,6 +234,13 @@ sub get_conversion ($$$$$)
       $conversion = $other->get_conversion ($from, $to, $transfer, $name);
     }
   }
+  unless (defined $conversion)
+  {
+# TODO: Throw an error or something? Or should the lack of
+# TODO continued: conversion handled by caller? Rather the
+# TODO continued: former.
+    die 'Could not find conversion from `' . $from . '\' to `' . $to . '\' with transfer `' . (transfer_to_string $transfer) . '\'.' . "\n";
+  }
 
   return $conversion;
 }
@@ -247,8 +276,6 @@ sub add_from_file ($$)
           }
 
           my @lines = $fd->getlines;
-          my $c_to_cpp = $self->_get_c_to_cpp (1);
-          my $cpp_to_c = $self->_get_cpp_to_c (1);
           my $line_num = 0;
           my $from = undef;
           my $to = undef;
@@ -273,7 +300,7 @@ sub add_from_file ($$)
             }
             elsif (defined $from and defined $to)
             {
-              if ($line =~ /\s*(\w)+\s*:\s*(.*)$/)
+              if ($line =~ /\s*(\w+)\s*:\s*(.*)$/)
               {
                 my $transfer_str = $1;
                 my $transfer = $2;
@@ -306,6 +333,10 @@ sub add_from_file ($$)
                 }
 # TODO: parsing error - no transfer specified.
                 die unless $added;
+
+                $from = undef;
+                $to = undef;
+                $transfers = [undef, undef, undef];
               }
             }
             elsif ($line =~ /^(.+?)\s*=>\s*(.+):$/)

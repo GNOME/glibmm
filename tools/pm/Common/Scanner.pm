@@ -141,7 +141,7 @@ sub _on_string_with_end ($$)
 
   while (@{$tokens})
   {
-    my $token = $self->extract_token;
+    my $token = $self->_extract_token;
 
     if ($token eq $end)
     {
@@ -192,7 +192,7 @@ sub _append ($$$)
 sub _get_params ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
 
   if (@args < 2)
   {

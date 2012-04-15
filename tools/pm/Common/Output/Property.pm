@@ -39,7 +39,7 @@ sub _output_h ($$$$)
                     (nl '   * @return A PropertyProxy that allows you to get or set the property of the value, or receive notification when') .
                     (nl '   * the value of the property changes.') .
                     (nl '   */') .
-                    (nl '  ' . $proxy_type . ' property_' . $prop_cpp_name . '()' . $method_suffixP);
+                    (nl '  ' . $proxy_type . ' property_' . $prop_cpp_name . '()' . $method_suffix);
 
   $section_manager->append_string_to_section ($code_string, $main_section);
 }
@@ -54,7 +54,7 @@ sub _output_cc ($$$$$)
   my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
   my $code_string = (nl $proxy_type . ' ' . $full_cpp_type . '::property_' . $prop_cpp_name . '()' . $method_suffix) .
                     (nl '{') .
-                    (nl '  ' . $proxy_type . '(this, "' . $prop_c_name'");') .
+                    (nl '  ' . $proxy_type . '(this, "' . $prop_c_name . '");') .
                     (nl '}') .
                     (nl);
 

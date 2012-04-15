@@ -36,7 +36,7 @@ sub new_from_gir ($$)
 {
   my ($type, $gir_function) = @_;
   my $class = (ref $type or $type or 'Common::CFunctionInfo');
-  my $self = $class->SUPER::new ($gir_function);
+  my $self = $class->SUPER::new_from_gir ($gir_function);
   my $throws = $gir_function->get_a_throws;
 
   $self->{'throws'} = $throws;

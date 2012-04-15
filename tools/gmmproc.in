@@ -39,6 +39,7 @@ use warnings;
 use IO::File;
 use Getopt::Long qw(:config permute);
 
+require Gir::Parser;
 require Gir::Repositories;
 require Common::Gmmproc;
 
@@ -81,7 +82,7 @@ Options:
   -u
   --unwrapped           Warn about possible unwrapped functions.
 
-  -d basename
+  -r basename
   --gir basename        Specify the gir file base name. Examples: Gio-2.0.gir,
                         Gtk-3.0.gir.
 
@@ -120,13 +121,14 @@ sub main ()
     'destination|d=s' => \$destination_dir,
     'list|l=s' => sub { process_list_file ($templates, shift, shift) },
     'unwrapped|u' => \$unwrapped,
-    'gir|d=s' => \$gir_basename,
-    'include|i=@s' => \$include_paths,
+    'gir|r=s' => \$gir_basename,
+    'include|i=s@' => \$include_paths,
     'debug|g' => \$debug,
     'mm-module|m=s' => \$mm_module
     '<>' => sub { add_file_to_list ($templates, shift); }
   );
 
+# TODO: print what is wrong.
   if (not $opt_parse_result or not $source_dir or not $destination_dir or
       not $mm_module or @{$templates} < 1 or not $gir_basename or
       @{$include_paths} < 1)
@@ -159,8 +161,8 @@ sub main ()
     {
 # TODO: warn about unwrapped stuff.
     }
-
-  }
+  };
+  die $@ if $@;
 # TODO: catch the exception.
 
   exit 0;

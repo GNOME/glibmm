@@ -154,11 +154,13 @@ sub _push_entry ($$$)
 
 sub _append_generic ($$$)
 {
-  my ($self, $stuff, $stuff_type) = @_;
+  my ($self, $type, $stuff) = @_;
   my $entries_stack = $self->_get_entries_stack;
   my $entry = $entries_stack->[-1];
+  my $entries = $entry->[0];
+  my $is_linked = $entry->[1];
 
-  $self->_append_stuff_to_entries ($stuff_type, $stuff, $entry->[0], $entry->[1]);
+  $self->_append_stuff_to_entries ($type, $stuff, $entries, $is_linked);
 }
 
 sub _get_variables ($)
@@ -168,19 +170,21 @@ sub _get_variables ($)
   return $self->{'variables'};
 }
 
+sub _get_main_sections ($)
+{
+  my ($self) = @_;
+
+  return $self->{'main_sections'};
+}
+
 sub new ($)
 {
   my ($type) = @_;
   my $class = (ref $type or $type or 'Common::SectionManager');
-  my $main_h_section = Common::Sections::Section->new (Common::Sections::H);
-  my $main_cc_section = Common::Sections::Section->new (Common::Sections::CC);
-  my $main_p_h_section = Common::Sections::Section->new (Common::Sections::P_H);
-  my $main_dev_null_section = Common::Sections::Section->new (Common::Sections::DEV_NULL);
-
-  $main_h_section->set_linked (Common::Sections::H);
-  $main_cc_section->set_linked (Common::Sections::CC);
-  $main_p_h_section->set_linked (Common::Sections::P_H);
-  $main_dev_null_section->set_linked (Common::Sections::DEV_NULL);
+  my $main_h_section = Common::Sections::Section->new_main (Common::Sections::H->[0]);
+  my $main_cc_section = Common::Sections::Section->new_main (Common::Sections::CC->[0]);
+  my $main_p_h_section = Common::Sections::Section->new_main (Common::Sections::P_H->[0]);
+  my $main_dev_null_section = Common::Sections::Section->new_main (Common::Sections::DEV_NULL->[0]);
 
   my $self =
   {
@@ -290,12 +294,13 @@ sub set_variable_for_conditional ($$$)
 
 sub write_main_section_to_file ($$$)
 {
-  my ($self, $section_name, $file_name) = @_;
-  my $toplevel_sections = $self->{'toplevel_sections'};
+  my ($self, $section_constant, $file_name) = @_;
+  my $section_name = $section_constant->[0];
+  my $main_sections = $self->_get_main_sections;
 
-  unless (exists $toplevel_sections->{$section_name})
+  unless (exists $main_sections->{$section_name})
   {
-    print STDERR 'No such toplevel section: `' . $section_name . '\'.';
+    print STDERR 'No such main section: `' . $section_name . '\'.' . "\n";
     exit 1;
   }
 
@@ -307,7 +312,7 @@ sub write_main_section_to_file ($$$)
     exit 1;
   }
 
-  my $section = $toplevel_sections->{$section_name};
+  my $section = $main_sections->{$section_name};
   my $entries = $section->get_entries;
 
   for (my $iter = 0; $iter < @{$entries}; ++$iter)

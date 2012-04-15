@@ -151,7 +151,7 @@ sub string_split_commas ($)
     }
     elsif ($token eq ',' and not $level)
     {
-      push @out, $str;
+      push @out, Common::Util::string_trim $str;
       $str = '';
       next;
     }
@@ -159,7 +159,7 @@ sub string_split_commas ($)
     $str .= $token;
   }
 
-  push @out, $str;
+  push @out, Common::Util::string_trim $str;
   return @out;
 }
 
@@ -252,6 +252,25 @@ sub string_split_func_params ($)
   return \@out;
 }
 
+sub _type_fixup ($)
+{
+  my ($type) = @_;
+
+  while ($type =~ /\s+[&*]+/)
+  {
+    $type =~ s/\s+([*&]+)/$1 /g;
+  }
+  while ($type =~ /<\S/)
+  {
+    $type =~ s/<(\S)/< $1/g;
+  }
+  while ($type =~ /\S>/)
+  {
+    $type =~ s/(\S)>/$1 >/g;
+  }
+  $type = Common::Util::string_simplify $type;
+}
+
 # - split params with something similar to string_split_commas
 # - split every part with `='
 # - second part, if defined, is default value
@@ -263,6 +282,8 @@ sub parse_params ($)
 
   $line =~ s/^\s*\(\s*//;
   $line =~ s/\s*\)\s*$//;
+
+  return [] unless $line;
 
   my $parts = string_split_func_params ($line);
   my @params = ();
@@ -284,21 +305,23 @@ sub parse_params ($)
       $type = $1;
       $name = $2;
 
-      while ($type =~ /\s+[&*]+/)
-      {
-        $type =~ s/\s+([*&]+)/$1 /g;
-      }
-      $type = Common::Util::string_simplify $type;
+      $type = _type_fixup $type;
     }
     else
     {
       return [];
     }
+
     push @params, {'type' => $type, 'name' => $name, 'value' => $value};
   }
   return \@params;
 }
 
+# TODO: Do some basic checks after parsing. For example check
+# TODO continued: if there are any parens (to catch a case
+# TODO continued: when we want to wrap a method with no
+# TODO continued: parameters, but we actually forgot to append
+# TODO continued: `()' to method name.
 # - start scanning string from its end.
 # - string from end of string to last closing paren should be saved as $after
 # - string from last closing paren to its opening counterpart should be stored as $params
@@ -488,6 +511,7 @@ sub parse_function_declaration ($)
   my $name = Common::Util::string_simplify (join '', reverse @name_parts);
   my $ret_type = Common::Util::string_simplify (join '', reverse @tokens);
 
+  $ret_type = _type_fixup $ret_type;
   @name_parts = undef;
   return [$before, $ret_type, $name, $params, $after];
 }
@@ -569,9 +593,9 @@ sub get_args ($$)
   {
     my $ref_type = undef;
 
-    if ($desc =~ /^(o?)([abs])\([\w-]+\)$/)
+    if ($desc =~ /^(o?)([abs])\(([\w-]+)\)$/)
     {
-      my $obsolete = (defined $1);
+      my $obsolete = ($1 eq 'o');
       my $type = $2;
       my $param = $3;
 

@@ -337,8 +337,8 @@ sub _output_p_cc ($$$$)
   my ($wrap_parser, $c_type, $c_type_class, $get_type_func) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $full_cpp_class_type = Common::Output::Shared::get_full_cpp_class_type $wrap_parser;
-  my $code_string = nl ('const Glib::Class& ' . $full_cpp_class_type . '::init()') .
+  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
+  my $code_string = nl ('const Glib::Class& ' . $cpp_class_type . '::init()') .
                     nl ('{') .
                     nl ('  if (!gtype_) // create the GType if necessary') .
                     nl ('  {');
@@ -353,7 +353,7 @@ sub _output_p_cc ($$$$)
   $code_string = nl ('    gtype_ = CppClassParent::CppObjectType::get_type();');
   $section_manager->append_string_to_conditional ($code_string, $conditional, 1);
   $code_string = nl ('    // Glib::Class has to know the class init function to clone custom types.') .
-                 nl ('    class_init_func_ = &' . $full_cpp_class_type . '::class_init_function;') .
+                 nl ('    class_init_func_ = &' . $cpp_class_type . '::class_init_function;') .
                  nl () .
                  nl ('    // This is actually just optimized away, apparently with no harm.') .
                  nl ('    // Make sure that the parent type has been created.') .
@@ -381,7 +381,7 @@ sub _output_p_cc ($$$$)
 
   my $dynamic_gtype_registration_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::DYNAMIC_GTYPE_REGISTRATION;
 
-  $code_string = nl ('const Glib::Class& ' . $full_cpp_class_type . '::init(GTypeModule* module)') .
+  $code_string = nl ('const Glib::Class& ' . $cpp_class_type . '::init(GTypeModule* module)') .
                  nl ('{') .
                  nl ('  if (!gtype_) // create the GType if necessary') .
                  nl ('  {');
@@ -394,7 +394,7 @@ sub _output_p_cc ($$$$)
                  nl ('    gtype_ = CppClassParent::CppObjectType::get_type();');
   $section_manager->append_string_to_conditional ($code_string, $subconditional, 1);
   $code_string = nl ('    // Glib::Class has to know the class init function to clone custom types.') .
-                 nl ('    class_init_func_ = &' . $full_cpp_class_type . '::class_init_function;') .
+                 nl ('    class_init_func_ = &' . $cpp_class_type . '::class_init_function;') .
                  nl () .
                  nl ('    // This is actually just optimized away, apparently with no harm.') .
                  nl ('    // Make sure that the parent type has been created.') .
@@ -421,7 +421,7 @@ sub _output_p_cc ($$$$)
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($dynamic_gtype_registration_var, $conditional);
   $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
-  $code_string = nl ('void ' . $full_cpp_class_type . '::class_init_function(void* g_class, void* class_data)') .
+  $code_string = nl ('void ' . $cpp_class_type . '::class_init_function(void* g_class, void* class_data)') .
                  nl ('{') .
                  nl ('  BaseClassType* const klass = static_cast< BaseClassType* >(g_class);') .
                  nl ('  CppClassParent::class_init_function(klass, class_data);') .
@@ -459,7 +459,7 @@ sub _output_p_cc ($$$$)
     $section_manager->append_string (nl);
   }
 
-  $code_string = nl ('Glib::ObjectBase* ' . $full_cpp_class_type . '::wrap_new(GObject* object)') .
+  $code_string = nl ('Glib::ObjectBase* ' . $cpp_class_type . '::wrap_new(GObject* object)') .
                  nl ('{') .
                  nl ('  return new ' . $full_cpp_type . '(static_cast< ' . $c_type . '* >(object));') .
                  nl ('}') .
