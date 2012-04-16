@@ -868,7 +868,7 @@ sub write_docs ($)
 
     if (defined $parent_string)
     {
-      $refsect += nl ($parent_string) .
+      $refsect .= nl ($parent_string) .
                   nl (join ((nl ','), @parent_links) . '.');
     }
 
@@ -884,7 +884,7 @@ sub write_docs ($)
 
     if (@{$kids})
     {
-      $refsect += nl ('      Possible children:') .
+      $refsect .= nl ('      Possible children:') .
                   nl (join ((nl ','), @kid_links) . '.');
     }
 
@@ -915,16 +915,16 @@ sub write_docs ($)
 
     if (@mandatory_atts)
     {
-      $refsect += nl ('      Mandatory attributes (mandatory value when such exists):') .
+      $refsect .= nl ('      Mandatory attributes (mandatory value when such exists):') .
                   nl (join ((nl ','), @mandatory_atts) . '.');
     }
     if (@optional_atts)
     {
-      $refsect += nl ('      Optional attributes (default value when attribute is not specified):') .
+      $refsect .= nl ('      Optional attributes (default value when attribute is not specified):') .
                   nl (join ((nl ','), @optional_atts) . '.');
     }
 
-    $refsect += nl ('      <example>') .
+    $refsect .= nl ('      <example>') .
                 nl ('        <title>A GIR fragment showing an namespace node</title>') .
                 nl ('        <programlisting><![CDATA[') .
                 nl ('        TODO]]></programlisting>') .
