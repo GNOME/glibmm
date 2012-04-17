@@ -33,7 +33,7 @@ sub output ($$$)
   my ($wrap_parser, $c_type, $cpp_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
-  my $cc_end_section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_END;
+  my $cc_end_section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
   my $cc_namespace_section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_NAMESPACE;
   my $code_string = nl ('public:') .
                     nl (Common::Output::Shared::doxy_skip_begin) .

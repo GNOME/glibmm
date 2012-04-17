@@ -92,7 +92,7 @@ sub _output_cc ($$$$$$)
   my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
   my $code_string = nl ($full_cpp_type . '::' . $cpp_type . '()') .
                     nl (':');
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_END;
+  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
 
   if (defined $new_func and $new_func ne '' and $new_func ne 'NONE')
   {

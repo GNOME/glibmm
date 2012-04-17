@@ -154,7 +154,7 @@ sub _output_p_h ($$$$$)
                     nl (Common::Output::Shared::doxy_skip_begin) .
                     nl ('  typedef ' . $full_cpp_type . ' CppObjectType;') .
                     nl ('  typedef ' . $c_type . ' BaseObjectType;');
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_H_CONTENTS;
+  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_H_GENERATED;
 
   $section_manager->push_section ($section);
   $section_manager->append_string ($code_string);
@@ -233,7 +233,7 @@ sub _output_cc ($$$$$$)
                     nl ();
   my $no_wrap_function_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::NO_WRAP_FUNCTION;
   my $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_END;
+  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
 
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
   $section_manager->push_section ($section);

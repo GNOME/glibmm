@@ -163,7 +163,7 @@ sub _output_p_h ($$$$)
                     nl ('  // Callbacks (default signal handlers):') .
                     nl ('  // These will call the *_impl member methods, which will then call the existing default signal callbacks, if any.') .
                     nl ('  // You could prevent the original default signal handlers being called by overriding the *_impl method.');
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_H_CONTENTS;
+  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_H_GENERATED;
 
   $section_manager->push_section ($section);
   $section_manager->append_string ($code_string);
@@ -191,7 +191,7 @@ sub _output_cc ($$$$$$)
   my $conditional = Common::Output::Shared::generate_conditional $wrap_parser;
   my $no_wrap_function_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::NO_WRAP_FUNCTION;
   my $complete_cpp_type = Common::Output::Shared::get_complete_cpp_type $wrap_parser;
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_END;
+  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
   my $code_string = nl ('namespace Glib') .
                     nl ('{') .
                     nl () .

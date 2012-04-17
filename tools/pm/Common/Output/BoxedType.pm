@@ -148,7 +148,7 @@ sub _output_cc ($$$$$$$)
                     nl () .
                     nl ('} // namespace Glib') .
                     nl ();
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_END;
+  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
 
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
   $section_manager->push_section ($section);

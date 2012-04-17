@@ -94,7 +94,7 @@ sub _output_cc ($$$$$)
   my ($wrap_parser, $c_type, $new_func, $ref_func, $unref_func) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_END;
+  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
   my $code_string = nl ('/* Why reinterpret_cast< ' . $full_cpp_type . '* >(gobject) is needed:') .
                     nl (' *') .
                     nl (' * A ' . $full_cpp_type . ' instance is in fact always a ' . $c_type . ' instance.') .

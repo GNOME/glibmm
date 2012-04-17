@@ -281,7 +281,7 @@ sub output_enum_gtype_func_cc ($$$)
                       nl () .
                       nl ('} // namespace Glib') .
                       nl ();
-    my $section = get_section $wrap_parser, Common::Sections::CC_END;
+    my $section = get_section $wrap_parser, Common::Sections::CC_GENERATED;
 
     $section_manager->append_string_to_section ($code_string, $section);
   }
