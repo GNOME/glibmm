@@ -126,7 +126,7 @@ std::vector<std::string> get_system_data_dirs()
   //TODO: Use a utility function:
   std::vector<std::string> result;
   const char* const * cresult = g_get_system_data_dirs();
-  if(cresult)
+  if(!cresult)
     return result;
 
   for(const gchar* const * iter = cresult; *iter != 0; ++iter)
@@ -143,7 +143,7 @@ std::vector<std::string> get_system_config_dirs()
   //TODO: Use a utility function:
   std::vector<std::string> result;
   const char* const * cresult = g_get_system_config_dirs();
-  if(cresult)
+  if(!cresult)
     return result;
 
   for(const gchar* const * iter = cresult; *iter != 0; ++iter)
