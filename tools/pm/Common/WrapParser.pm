@@ -2575,7 +2575,7 @@ sub new ($$$$$$$)
     'tokens' => [],
     'parsing_stage' => STAGE_INVALID,
     'main_section' => Common::Sections::DEV_NULL->[0],
-    'section_manager' => Common::SectionManager->new,
+    'section_manager' => Common::SectionManager->new ($base, $mm_module),
     'stage_section_tuples' =>
     {
       STAGE_HG() => [Common::Sections::H, 'tokens_hg', 'hg'],
