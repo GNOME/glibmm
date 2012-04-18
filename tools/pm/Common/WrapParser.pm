@@ -2487,6 +2487,15 @@ sub _on_module ($)
   $self->{'module'} = $str;
 }
 
+sub _on_ctor_default ($)
+{
+  my ($self) = @_;
+  $self->_extract_bracketed_text;
+
+# TODO: get default constructor from gir.
+  Common::Output::Ctor::ctor_default $self;
+}
+
 sub _on_pinclude ($)
 {
   my ($self) = @_;
@@ -2642,6 +2651,7 @@ sub new ($$$$$$$)
     '_INSERT_SECTION' => [$self, \&_on_insert_section],
     'class' => [$self, \&_on_class_keyword],
     '_MODULE' => [$self, \&_on_module],
+    '_CTOR_DEFAULT' => [$self, \&_on_ctor_default],
     '_PINCLUDE' => [$self, \&_on_pinclude]
   };
 
