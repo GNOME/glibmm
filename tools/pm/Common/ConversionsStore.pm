@@ -286,7 +286,7 @@ sub add_from_file ($$)
           foreach my $line (@lines)
           {
             ++$line_num;
-            $line =~ s/\s*#.*//;
+            $line =~ s/^\s*#.*//;
             $line = Common::Util::string_trim ($line);
             next unless $line;
             if ($expect_brace)
@@ -300,7 +300,7 @@ sub add_from_file ($$)
             }
             elsif (defined $from and defined $to)
             {
-              if ($line =~ /\s*(\w+)\s*:\s*(.*)$/)
+              if ($line =~ /^\s*(\w+)\s*:\s*(.*)$/)
               {
                 my $transfer_str = $1;
                 my $transfer = $2;
