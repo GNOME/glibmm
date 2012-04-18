@@ -103,18 +103,32 @@ sub _output_cc ($$$$$$$$$$$$$$$$)
   else
   {
     my $this_param = '';
+    my @params = ();
 
     if ($const)
     {
-      $this_param = 'const_cast< ' . $c_type . '* >(gobj()), ';
+      $this_param = 'const_cast< ' . $c_type . '* >(gobj())';
     }
     elsif (not $static)
     {
-      $this_param = 'gobj(), ';
+      $this_param = 'gobj()';
     }
 
+    push @params, $this_param;
+
     my $conversions_store = $wrap_parser->get_conversions_store;
-    my $c_param_list_str = $this_param . (Common::Output::Shared::convzipstr $wrap_parser, $cpp_param_types, $c_param_types, $c_param_transfers, $cpp_param_names) . ($errthrow ? ', &gerror' : '');
+    my $convs_str = Common::Output::Shared::convzipstr $wrap_parser, $cpp_param_types, $c_param_types, $c_param_transfers, $cpp_param_names;
+
+    if ($convs_str)
+    {
+      push @params, $convs_str;
+    }
+    if ($errthrow)
+    {
+      push @params, '&gerror';
+    }
+
+    my $c_param_list_str = join ', ', @params;
     my $c_func_invocation = $c_func_name . '(' . $c_param_list_str . ')';
     my $ret_convert = '';
 
@@ -152,7 +166,7 @@ sub _output_cc ($$$$$$$$$$$$$$$$)
     }
     else
     {
-      if ($ret_void)
+      unless ($ret_void)
       {
         $code_string .= nl ('  return ' . $ret_convert . ';');
       }

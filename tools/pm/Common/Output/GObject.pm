@@ -84,7 +84,7 @@ sub _output_h_in_class ($$$$$$)
   my $base_member = lc ($cpp_class_type) . '_';
 
   $code_string = nl ('  friend class ' . $cpp_class_type . ';') .
-                 nl ('  static CppClassType ' . $base_member . '_;') .
+                 nl ('  static CppClassType ' . $base_member . ';') .
                  nl () .
                  nl ('private:') .
                  nl ('  // noncopyable') .
@@ -109,7 +109,7 @@ sub _output_h_in_class ($$$$$$)
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($variable, $conditional);
 
-  my $copy_proto = 'no';
+  my $copy_proto = 'yes';
   my $reinterpret = 1;
   my $definitions = 1;
 
@@ -220,12 +220,34 @@ sub _output_cc ($$$$$$)
   my $section_manager = $wrap_parser->get_section_manager;
   my $complete_cpp_type = Common::Output::Shared::get_complete_cpp_type $wrap_parser;
   my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
+
+  {
+    my $mm_module = $wrap_parser->get_mm_module;
+    my $base = $wrap_parser->get_base;
+    my $header_include = join '', $mm_module, '/', $base. '.h';
+    my $private_include = join '', $mm_module, '/private/', $base, '_p.h';
+    my $generated_headers_section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED_INCLUDES;
+
+    unless (Common::Output::Shared::already_included $wrap_parser, $header_include)
+    {
+      my $code_string = nl '#include <', $header_include, '>';
+
+      $section_manager->append_string_to_section ($code_string, $generated_headers_section);
+    }
+    unless (Common::Output::Shared::already_included $wrap_parser, $private_include)
+    {
+      my $code_string = nl '#include <', $private_include, '>';
+
+      $section_manager->append_string_to_section ($code_string, $generated_headers_section);
+    }
+  }
+
   my $code_string = nl ('namespace Glib') .
                     nl ('{') .
                     nl () .
                     nl ('Glib::RefPtr< ' . $complete_cpp_type . ' > wrap(' . $c_type . '* object, bool take_copy)') .
                     nl ('{') .
-                    nl ('  return Glib::RefPtr< ' . $complete_cpp_type . ' >(dynamic_cast< ' . $complete_cpp_type . ' >(Glib::wrap_auto (static_cast< GObject* >(object), take_copy)));') .
+                    nl ('  return Glib::RefPtr< ' . $complete_cpp_type . ' >(dynamic_cast< ' . $complete_cpp_type . '* >(Glib::wrap_auto (reinterpret_cast< GObject* >(object), take_copy)));') .
                     nl ('  // We use dynamic_cast<> in case of multiple inheritance.') .
                     nl ('}') .
                     nl () .
@@ -264,7 +286,7 @@ sub _output_cc ($$$$$$)
                  nl () .
                  nl ($full_cpp_type . '::' . $cpp_type . '(' . $c_type . '* castitem)') .
                  nl (':') .
-                 nl ('  ' . $cpp_parent_type . '(static_cast< ' . $c_parent_type . '* >(castitem))') .
+                 nl ('  ' . $cpp_parent_type . '(reinterpret_cast< ' . $c_parent_type . '* >(castitem))') .
                  nl ('{}') .
                  nl ();
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
@@ -289,14 +311,14 @@ sub _output_cc ($$$$$$)
                  nl () .
                  nl ('GType ' . $full_cpp_type . '::get_type()') .
                  nl ('{') .
-                 nl ('  return ' . $base_member . '_.init().get_type();') .
+                 nl ('  return ' . $base_member . '.init().get_type();') .
                  nl ('}') .
                  nl ();
   $section_manager->append_string ($code_string);
   $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
   $code_string = nl ('GType ' . $full_cpp_type . '::get_type(GTypeModule* module)') .
                  nl ('{') .
-                 nl ('  return ' . $base_member . '_.init(module).get_type();') .
+                 nl ('  return ' . $base_member . '.init(module).get_type();') .
                  nl ('}') .
                  nl ();
 
@@ -461,7 +483,7 @@ sub _output_p_cc ($$$$)
 
   $code_string = nl ('Glib::ObjectBase* ' . $cpp_class_type . '::wrap_new(GObject* object)') .
                  nl ('{') .
-                 nl ('  return new ' . $full_cpp_type . '(static_cast< ' . $c_type . '* >(object));') .
+                 nl ('  return new ' . $full_cpp_type . '(reinterpret_cast< ' . $c_type . '* >(object));') .
                  nl ('}') .
                  nl ();
   $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
@@ -471,7 +493,6 @@ sub _output_p_cc ($$$$)
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($custom_wrap_new_var, $conditional);
-  $section_manager->append_string (Common::Output::Shared::close_namespaces $wrap_parser);
   $section_manager->pop_entry;
 }
 

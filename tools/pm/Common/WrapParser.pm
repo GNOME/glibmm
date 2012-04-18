@@ -2595,8 +2595,8 @@ sub new ($$$$$$$)
     'section_manager' => Common::SectionManager->new ($base, $mm_module),
     'stage_section_tuples' =>
     {
-      STAGE_HG() => [Common::Sections::H, 'tokens_hg', 'hg'],
-      STAGE_CCG() => [Common::Sections::CC, 'tokens_ccg', 'ccg'],
+      STAGE_HG() => [Common::Sections::H_CONTENTS, 'tokens_hg', 'hg'],
+      STAGE_CCG() => [Common::Sections::CC_CONTENTS, 'tokens_ccg', 'ccg'],
       STAGE_INVALID() => [Common::Sections::DEV_NULL, 'tokens_null', 'BAD']
     },
     'type_info_store' => $type_info_store,

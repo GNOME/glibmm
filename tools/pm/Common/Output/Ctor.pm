@@ -97,7 +97,7 @@ sub wrap_ctor ($$$$$$)
   my $base_member = (lc $cpp_class_type) . '_';
   my $conditional = initially_unowned_sink $wrap_parser;
   my $conversions_store = $wrap_parser->get_conversions_store;
-  my $ctor_params_str = join ', ', '', (map { join '', '"', $c_prop_names->[$_], '"', $conversions_store->get_conversion ($cpp_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cpp_param_names->[$_]) } 0 .. (@{$cpp_param_types} - 1)), 'static_cast<char*>(0)';
+  my $ctor_params_str = join ', ', '', (map { join '', '"', $c_prop_names->[$_], '", ', ($conversions_store->get_conversion ($cpp_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cpp_param_names->[$_])) } 0 .. (@{$cpp_param_types} - 1)), 'static_cast<char*>(0)';
 
   $section_manager->append_string_to_section ($code_string, $main_section);
   $code_string = (nl $full_cpp_type, '::', $cpp_type, '(', $cpp_params_str, ')') .
@@ -126,7 +126,7 @@ sub wrap_create ($$$)
   my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
   my $cpp_params_str = Common::Output::Shared::paramzipstr $cpp_param_types, $cpp_param_names;
   my $cpp_names_str = join ', ', @{$cpp_param_names};
-  my $code_string = (nl 'static Glib::RefPtr< ', $cpp_type, ' > create(', $cpp_params_str, ')');
+  my $code_string = (nl 'static Glib::RefPtr< ', $cpp_type, ' > create(', $cpp_params_str, ');');
 
   $section_manager->append_string_to_section ($code_string, $main_section);
   $code_string = (nl 'Glib::RefPtr< ', $full_cpp_type, ' > ', $full_cpp_type, '::create(', $cpp_params_str, ')') .
