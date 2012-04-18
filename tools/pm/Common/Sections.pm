@@ -29,6 +29,8 @@ use Common::Sections::Section;
 use Common::Sections::Conditional;
 use Common::Sections::Entries;
 
+# TODO: sort those sections in some sensible manner.
+
 use constant
 {
   'H' => ['SECTION_H', Common::Constants::FILE ()], # main header section
@@ -67,7 +69,8 @@ use constant
   'CC_SIGNAL_PROXIES' => ['SECTION_CC_SIGNAL_PROXIES', Common::Constants::CLASS ()],
   'H_PROPERTY_PROXIES' => ['SECTION_H_PROPERTY_PROXIES', Common::Constants::CLASS ()],
   'CC_PROPERTY_PROXIES' => ['SECTION_CC_PROPERTY_PROXIES', Common::Constants::CLASS ()],
-  'CC_INITIALIZE_EXTRA' => ['SECTION_CC_INITIALIZE_EXTRA', Common::Constants::CLASS ()] # TODO: check if needed.
+  'CC_INITIALIZE_EXTRA' => ['SECTION_CC_INITIALIZE_EXTRA', Common::Constants::CLASS ()], # TODO: check if needed.
+  'P_H_INCLUDES' => ['SECTION_P_H_INCLUDES', Common::Constants::FILE ()]
 };
 
 1; # indicate proper module load.

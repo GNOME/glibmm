@@ -153,6 +153,8 @@ sub _prepare_p_h_section ($)
 
   $self->push_section (Common::Sections::P_H->[0]);
   $self->append_string (join "\n", @code);
+  $self->append_section (Common::Sections::P_H_INCLUDES->[0]);
+  $self->append_string ("\n");
   $self->append_section (Common::Sections::P_H_GENERATED->[0]);
   @code =
   (

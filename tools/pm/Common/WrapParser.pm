@@ -2487,6 +2487,14 @@ sub _on_module ($)
   $self->{'module'} = $str;
 }
 
+sub _on_pinclude ($)
+{
+  my ($self) = @_;
+  my $str = Common::Util::string_trim $self->_extract_bracketed_text;
+
+  Common::Output::Misc::p_include $self, $str;
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -2634,6 +2642,7 @@ sub new ($$$$$$$)
     '_INSERT_SECTION' => [$self, \&_on_insert_section],
     'class' => [$self, \&_on_class_keyword],
     '_MODULE' => [$self, \&_on_module],
+    '_PINCLUDE' => [$self, \&_on_pinclude]
   };
 
   return $self;

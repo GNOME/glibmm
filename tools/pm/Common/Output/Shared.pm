@@ -622,4 +622,29 @@ sub deprecate_end ($)
 
 }
 
+sub generate_include_variable ($)
+{
+  my ($include) = @_;
+  my $variable = $include;
+  $variable =~ s#[/.-]#_#g;
+
+  return join '_', 'FLAG', (uc $variable), 'BOOL_VARIABLE';
+}
+
+sub already_included ($$)
+{
+  my ($wrap_parser, $include) = @_;
+  my $conditional = generate_conditional $wrap_parser;
+  my $variable = generate_include_variable $include;
+  my $section_manager = $wrap_parser->get_section_manager;
+  my $value = $section_manager->get_variable ($variable);
+
+  unless ($value)
+  {
+    $section_manager->set_variable ($variable, 1);
+    return 0;
+  }
+  return 1;
+}
+
 1; # indicate proper module load.

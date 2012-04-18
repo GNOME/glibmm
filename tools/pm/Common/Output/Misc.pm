@@ -1,5 +1,5 @@
 # -*- mode: perl; perl-indent-level: 2; indent-tabs-mode: nil -*-
-# gmmproc - Common::Output module
+# gmmproc - Common::Output::Misc module
 #
 # Copyright 2012 glibmm development team
 #
@@ -18,25 +18,28 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
 
-package Common::Output;
+package Common::Output::Misc;
 
 use strict;
 use warnings;
 
-use Common::Output::BoxedTypeStatic;
-use Common::Output::BoxedType;
-use Common::Output::Ctor;
-use Common::Output::Enum;
-use Common::Output::Generic;
-use Common::Output::GError;
-use Common::Output::GObject;
-use Common::Output::GtkObject;
-use Common::Output::Interface;
-use Common::Output::Method;
-use Common::Output::Misc;
-use Common::Output::OpaqueCopyable;
-use Common::Output::OpaqueRefcounted;
-use Common::Output::Property;
-use Common::Output::VFunc;
+sub nl
+{
+  return Common::Output::Shared::nl @_;
+}
+
+sub p_include ($$)
+{
+  my ($wrap_parser, $include) = @_;
+
+  unless (Common::Output::Shared::already_included $wrap_parser, $include)
+  {
+    my $section_manager = $wrap_parser->get_section_manager;
+    my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_H_INCLUDES;
+    my $code_string = (nl '#include <', $include, '>');
+
+    $section_manager->append_string_to_section ($code_string, $section);
+  }
+}
 
 1; # indicate proper module load.
