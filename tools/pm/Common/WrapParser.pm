@@ -676,6 +676,36 @@ sub _on_ignore_signal ($)
 #  }
 }
 
+# TODO: move it elsewhere, remove it later.
+sub _maybe_warn_about_refreturn ($$$)
+{
+  my ($self, $ret_transfer, $refreturn) = @_;
+
+  if ($ret_transfer == Common::ConversionsStore::TRANSFER_FULL and $refreturn)
+  {
+    $self->fixed_warning ('refreturn given but annotation says that transfer is already full - which is wrong? (refreturn is ignored anyway.)');
+  }
+  elsif ($ret_transfer == Common::ConversionsStore::TRANSFER_NONE and not $refreturn)
+  {
+    $self->fixed_warning ('There is no refreturn, but annotation says that transfer is none - which is wrong? (refreturn would be ignored anyway.)');
+  }
+}
+
+# TODO: move it elsewhere, remove it later.
+sub _maybe_warn_about_errthrow ($$$)
+{
+  my ($self, $throws, $errthrow) = @_;
+
+  if (not $throws and $errthrow)
+  {
+    $self->fixed_warning ('errthrow given but annotation says that no error here is thrown - which is wrong? (errthrow is ignored anyway.)');
+  }
+  elsif ($throws and not $errthrow)
+  {
+    $self->fixed_warning ('There is no errthrow but annotation says that an error can be thrown here - which is wrong? (errthrow would be ignored anyway.)');
+  }
+}
+
 sub _on_wrap_method ($)
 {
   my ($self) = @_;
@@ -762,22 +792,8 @@ sub _on_wrap_method ($)
 
 # TODO: remove the ifs below after possible bugs in
 # TODO continued: wrappers/annotations are fixed.
-  if ($ret_transfer == Common::ConversionsStore::TRANSFER_FULL and $refreturn)
-  {
-    $self->fixed_warning ('refreturn given but annotation says that transfer is already full - which is wrong? (refreturn is ignored anyway.)');
-  }
-  elsif ($ret_transfer == Common::ConversionsStore::TRANSFER_NONE and not $refreturn)
-  {
-    $self->fixed_warning ('There is no refreturn, but annotation says that transfer is none - which is wrong? (refreturn would be ignored anyway.)');
-  }
-  if (not $throws and $errthrow)
-  {
-    $self->fixed_warning ('errthrow given but annotation says that no error here is thrown - which is wrong? (errthrow is ignored anyway.)');
-  }
-  elsif ($throws and not $errthrow)
-  {
-    $self->fixed_warning ('There is no errthrow but annotation says that an error can be thrown here - which is wrong? (errthrow would be ignored anyway.)');
-  }
+  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn);
+  $self->_maybe_warn_about_errthrow ($throws, $errthrow);
 
   Common::Output::Method::output ($self,
                                   $cxx_function->get_static,
@@ -927,14 +943,7 @@ sub _on_wrap_signal ($)
 
 # TODO: remove the ifs below after possible bugs in
 # TODO continued: wrappers/annotations are fixed.
-  if ($ret_transfer == Common::ConversionsStore::TRANSFER_FULL and $refreturn)
-  {
-    $self->fixed_warning ('refreturn given but annotation says that transfer is already full - which is wrong? (refreturn is ignored anyway.)');
-  }
-  elsif ($ret_transfer == Common::ConversionsStore::TRANSFER_NONE and not $refreturn)
-  {
-    $self->fixed_warning ('There is no refreturn, but annotation says that transfer is none - which is wrong? (refreturn would be ignored anyway.)');
-  }
+  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn);
 
 # TODO: Add custom_signal_handler.
   Common::Output::Signal::output $self,
@@ -1081,22 +1090,8 @@ sub _on_wrap_vfunc ($)
 
 # TODO: remove the ifs below after possible bugs in
 # TODO continued: wrappers/annotations are fixed.
-  if ($ret_transfer == Common::ConversionsStore::TRANSFER_FULL and $refreturn)
-  {
-    $self->fixed_warning ('refreturn given but annotation says that transfer is already full - which is wrong? (refreturn is ignored anyway.)');
-  }
-  elsif ($ret_transfer == Common::ConversionsStore::TRANSFER_NONE and not $refreturn)
-  {
-    $self->fixed_warning ('There is no refreturn, but annotation says that transfer is none - which is wrong? (refreturn would be ignored anyway.)');
-  }
-  if (not $throws and $errthrow)
-  {
-    $self->fixed_warning ('errthrow given but annotation says that no error here is thrown - which is wrong? (errthrow is ignored anyway.)');
-  }
-  elsif ($throws and not $errthrow)
-  {
-    $self->fixed_warning ('There is no errthrow but annotation says that an error can be thrown here - which is wrong? (errthrow would be ignored anyway.)');
-  }
+  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn);
+  $self->_maybe_warn_about_errthrow ($throws, $errthrow);
 
   Common::Output::VFunc::output $self,
                                 $ifdef,
