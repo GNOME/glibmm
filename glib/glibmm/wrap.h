@@ -116,6 +116,14 @@ typename T::BaseObjectType* unwrap(T* ptr)
   return (ptr) ? ptr->gobj() : 0;
 }
 
+/** Get the underlying C instance from the C++ instance.
+ */
+template <class T> inline
+typename T::BaseObjectType* unwrap(T& ref)
+{
+  return ref.gobj();
+}
+
 /** Get the underlying C instance from the C++ instance.  This is just
  * like calling gobj(), but it does its own check for a NULL pointer.
  */
@@ -123,6 +131,14 @@ template <class T> inline
 const typename T::BaseObjectType* unwrap(const T* ptr)
 {
   return (ptr) ? ptr->gobj() : 0;
+}
+
+/** Get the underlying C instance from the C++ instance.
+ */
+template <class T> inline
+const typename T::BaseObjectType* unwrap(const T& ref)
+{
+  return ref.gobj();
 }
 
 /** Get the underlying C instance from the C++ instance.  This is just
