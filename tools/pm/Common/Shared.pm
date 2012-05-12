@@ -27,10 +27,10 @@ use feature ':5.10';
 use constant
 {
   'GEN_NONE' => 0,
-  'GEN_NORMAL' => (1 >> 0),
-  'GEN_REF' => (1 >> 1),
-  'GEN_PTR' => (1 >> 2),
-  'GEN_CONST' => (1 >> 3)
+  'GEN_NORMAL' => (1 << 0),
+  'GEN_REF' => (1 << 1),
+  'GEN_PTR' => (1 << 2),
+  'GEN_CONST' => (1 << 3)
 };
 
 use Common::Util;
