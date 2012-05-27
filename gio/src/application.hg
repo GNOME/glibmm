@@ -90,11 +90,23 @@ class Application : public Glib::Object, public ActionGroup, public ActionMap
   _IMPLEMENTS_INTERFACE(ActionMap)
 
 protected:
-  explicit Application(const Glib::ustring& application_id, ApplicationFlags flags = APPLICATION_FLAGS_NONE);
+  /** Constructs an application instance.
+   * If no application ID is given then some features (most notably application uniqueness) will be disabled.
+   *
+   * @aparam application_id The application ID.
+   * @param flags The application flags.
+   */
+  explicit Application(const Glib::ustring& application_id = Glib::ustring(), ApplicationFlags flags = APPLICATION_FLAGS_NONE);
   _IGNORE(g_application_new)
 
 public:
-  _WRAP_CREATE(const Glib::ustring& application_id, ApplicationFlags flags = APPLICATION_FLAGS_NONE)
+  /** Creates an application instance.
+   * If no application ID is given then some features (most notably application uniqueness) will be disabled.
+   *
+   * @aparam application_id The application ID.
+   * @param flags The application flags.
+   */
+  _WRAP_CREATE(const Glib::ustring& application_id = Glib::ustring(), ApplicationFlags flags = APPLICATION_FLAGS_NONE)
 
   _WRAP_METHOD(static bool id_is_valid(const Glib::ustring& application_id), g_application_id_is_valid)
 
