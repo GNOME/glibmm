@@ -286,10 +286,6 @@ StaticRecMutex::operator RecMutex&()
 RecMutex::RecMutex()
 {
   g_static_rec_mutex_init(&gobject_);
-
-  // GLib doesn't have GRecMutex, only GStaticRecMutex.  Force initialization
-  // of the mutex now, to mimic the behaviour of a (hypothetical) GRecMutex.
-  g_static_mutex_get_mutex(&gobject_.mutex);
 }
 
 RecMutex::~RecMutex()

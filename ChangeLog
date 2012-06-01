@@ -1,3 +1,16 @@
+2012-06-08  Michał Wróbel  <michal.wrobel@flytronic.pl>
+
+	Thread::RecMutex: Don't initialize this as a GStaticMutex.
+
+	The previous code (removed here) depended on an implementation
+	detail of GStaticRecMutex, which was changed in this glib commit:
+	http://git.gnome.org/browse/glib/commit/?id=2b281e40f32b7916d856dcc95e6f8fe625fcff03
+
+	This change avoids a deadlock with that version of glib.
+	Note that Thread::* is deprecated anyway, which is lucky because we do not
+	know for sure that this fix is enough.
+	Bug #677291
+
 2012-06-04  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
 
 	Glib::add_exception_handler(): Fix misplaced endif.
