@@ -83,6 +83,7 @@ sub _read_all_bases ($)
 
     unless (defined $fd)
     {
+# TODO: do proper logging.
       print 'Could not open file `' . $hg . '\' for reading.' . "\n";
       exit 1;
     }
@@ -265,6 +266,7 @@ sub add_base ($$)
 
   if (exists $bases->{$base})
   {
+# TODO: is proper logging needed at this stage?
     print STDERR 'Base `' . $base . ' was already added.' . "\n";
     return;
   }

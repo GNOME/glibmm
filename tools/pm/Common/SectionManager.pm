@@ -247,6 +247,7 @@ sub _append_stuff_to_entries ($$$$$)
     }
     default
     {
+# TODO: do proper logging.
       print STDERR 'Wrong type of entry.' . "\n";
       exit 1;
     }
@@ -459,6 +460,7 @@ sub write_main_section_to_file ($$$)
 
   unless (exists $main_sections->{$section_name})
   {
+# TODO: do proper logging.
     print STDERR 'No such main section: `' . $section_name . '\'.' . "\n";
     exit 1;
   }
@@ -471,6 +473,7 @@ sub write_main_section_to_file ($$$)
 
   unless (defined $fd)
   {
+# TODO: do proper logging.
     print STDERR 'Could not open file `' . $file_name . '\' for writing.' . "\n";
     exit 1;
   }
@@ -513,6 +516,7 @@ sub write_main_section_to_file ($$$)
       }
       default
       {
+# TODO: do proper logging.
         print STDERR 'Unknown type of entry in section.' . "\n";
         exit 1;
       }
