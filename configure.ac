@@ -42,6 +42,7 @@ MM_CONFIG_DOCTOOL_DIR([docs])
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 AC_SUBST([LIBGLIBMM_SO_VERSION], [4:0:3])
 
+AC_PROG_CC
 AC_PROG_CXX
 AC_DISABLE_STATIC
 LT_INIT([win32-dll])
@@ -62,12 +63,14 @@ AS_IF([test "x$enable_static" = xyes],
 
 glibreq='2.0 >= 2.29.8'
 
+GM_MODULES="glib-$glibreq gobject-$glibreq"
 GLIBMM_MODULES="sigc++-2.0 >= 2.0.10 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
 GIOMM_MODULES="$GLIBMM_MODULES gio-$glibreq"
 test "x$glibmm_host_windows" = xyes || GIOMM_MODULES="$GIOMM_MODULES gio-unix-$glibreq"
 
 PKG_CHECK_MODULES([GLIBMM], [$GLIBMM_MODULES])
 PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
+PKG_CHECK_MODULES([GM],     [$GM_MODULES])
 
 MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
 MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
@@ -131,29 +134,37 @@ AC_DEFINE([GLIBMM_PROPERTIES_ENABLED],[1], [This is always set. This is only for
 AC_DEFINE([GLIBMM_VFUNCS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
 AC_DEFINE([GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
 
+GOBJECT_INTROSPECTION_CHECK([0.10.1])
+
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
                  tools/gmmproc
-                 tools/generate_wrap_init.pl
                  tools/pm/Gir/Config.pm
-                 glib/${GLIBMM_MODULE_NAME}.pc:glib/glibmm.pc.in
-                 glib/${GLIBMM_MODULE_NAME}-uninstalled.pc:glib/glibmm-uninstalled.pc.in
-                 glib/src/Makefile
-                 glib/glibmm/Makefile
-                 gio/${GIOMM_MODULE_NAME}.pc:gio/giomm.pc.in
-                 gio/${GIOMM_MODULE_NAME}-uninstalled.pc:gio/giomm-uninstalled.pc.in
-                 gio/src/Makefile
-                 gio/giomm/Makefile
-                 tests/Makefile
-                 examples/Makefile
-                 docs/Makefile
-                 docs/reference/Doxyfile
-                 MSVC_Net2005/glibmm/glibmm.rc
-                 MSVC_Net2005/giomm/giomm.rc
-                 MSVC_Net2008/glibmm/glibmm.rc
-                 MSVC_Net2008/giomm/giomm.rc
-                 MSVC_Net2010/glibmm/glibmm.rc
-                 MSVC_Net2010/giomm/giomm.rc])
+                 tools/pm/tests/Gir/Config.pm])
+
+#AC_CONFIG_FILES([Makefile
+#                 tools/Makefile
+#                 tools/gmmproc
+#                 tools/generate_wrap_init.pl
+#                 tools/pm/Gir/Config.pm
+#                 glib/${GLIBMM_MODULE_NAME}.pc:glib/glibmm.pc.in
+#                 glib/${GLIBMM_MODULE_NAME}-uninstalled.pc:glib/glibmm-uninstalled.pc.in
+#                 glib/src/Makefile
+#                 glib/glibmm/Makefile
+#                 gio/${GIOMM_MODULE_NAME}.pc:gio/giomm.pc.in
+#                 gio/${GIOMM_MODULE_NAME}-uninstalled.pc:gio/giomm-uninstalled.pc.in
+#                 gio/src/Makefile
+#                 gio/giomm/Makefile
+#                 tests/Makefile
+#                 examples/Makefile
+#                 docs/Makefile
+#                 docs/reference/Doxyfile
+#                 MSVC_Net2005/glibmm/glibmm.rc
+#                 MSVC_Net2005/giomm/giomm.rc
+#                 MSVC_Net2008/glibmm/glibmm.rc
+#                 MSVC_Net2008/giomm/giomm.rc
+#                 MSVC_Net2010/glibmm/glibmm.rc
+#                 MSVC_Net2010/giomm/giomm.rc])
 
 # Copy the generated configuration headers into the MSVC project directories.
 AC_CONFIG_COMMANDS([MSVC_Net2005/glibmm/glibmmconfig.h],

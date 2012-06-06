@@ -1,66 +1,86 @@
-## Copyright (c) 2009  Openismus GmbH  <http://www.openismus.com/>
-##
-## This file is part of glibmm.
-##
-## glibmm is free software: you can redistribute it and/or modify it
-## under the terms of the GNU Lesser General Public License as published
-## by the Free Software Foundation, either version 2.1 of the License,
-## or (at your option) any later version.
-##
-## glibmm is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-## See the GNU Lesser General Public License for more details.
-##
-## You should have received a copy of the GNU Lesser General Public License
-## along with this library.  If not, see <http://www.gnu.org/licenses/>.
-
 AUTOMAKE_OPTIONS = subdir-objects
 
-include $(srcdir)/m4/filelist.am
-include $(srcdir)/pm/filelist.am
+-include $(INTROSPECTION_MAKEFILE)
+INTROSPECTION_SCANNER_ARGS = \
+  --warn-all
+INTROSPECTION_COMPILER_ARGS = \
+  --includedir=$(srcdir)
 
-# TODO: All these Perl scripts and M4 files are architecture-independent
-# and should probably go somewhere below $(pkgdatadir) instead.
-gmmproc_bindir = $(libdir)/$(GLIBMM_MODULE_NAME)/proc
-gmmproc_m4dir  = $(gmmproc_bindir)/m4
-gmmproc_pmdir  = $(gmmproc_bindir)/pm
+c_lib = \
+  pm/tests/libgm/gm/libgm.la
 
-gmmproc_bin_SCRIPTS  = gmmproc generate_wrap_init.pl
-dist_gmmproc_m4_DATA = $(files_codegen_m4:%=m4/%)
-dist_gmmproc_pm_DATA = $(files_codegen_pm:%=pm/%)
+c_files = \
+  pm/tests/libgm/gm/gm-obj.c \
+  pm/tests/libgm/gm/gm-obj.h \
+  pm/tests/libgm/gm/gm-other.c \
+  pm/tests/libgm/gm/gm-other.h
 
-dist_noinst_DATA    = README TODO
-dist_noinst_SCRIPTS = enum.pl
+cxx_lib = \
+  pm/tests/libgmmm/gm/gmmm/libgmmm.la
 
-noinst_PROGRAMS = extra_defs_gen/generate_defs_glib extra_defs_gen/generate_defs_gio
-lib_LTLIBRARIES = extra_defs_gen/libglibmm_generate_extra_defs-2.4.la
+cxx_files = \
+  pm/tests/libgmmm/gm/gmmm/obj.cc \
+  pm/tests/libgmmm/gm/gmmm/obj.h \
+  pm/tests/libgmmm/gm/gmmm/other.cc \
+  pm/tests/libgmmm/gm/gmmm/other.h
 
-extradefs_includedir      = $(includedir)/$(GLIBMM_MODULE_NAME)/glibmm_generate_extra_defs
-extradefs_include_HEADERS = extra_defs_gen/generate_extra_defs.h
+cxx_templates = \
+  pm/tests/libgmmm/gm/src/obj.ccg \
+  pm/tests/libgmmm/gm/src/obj.hg \
+  pm/tests/libgmmm/gm/src/other.ccg \
+  pm/tests/libgmmm/gm/src/other.hg
 
-extradefs_ldflags = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
+cxx_gm_templates = \
+  obj \
+  other
 
-extra_defs_gen_libglibmm_generate_extra_defs_2_4_la_SOURCES = extra_defs_gen/generate_extra_defs.cc
-extra_defs_gen_libglibmm_generate_extra_defs_2_4_la_LDFLAGS = $(extradefs_ldflags)
-extra_defs_gen_libglibmm_generate_extra_defs_2_4_la_LIBADD  = $(GLIBMM_LIBS)
+gir_file = pm/tests/libgm/gm/Gm-1.0.gir
+proc_stamp_file = pm/tests/libgmmm/proc/.proc-stamp
 
-extra_defs_gen_generate_defs_glib_SOURCES = extra_defs_gen/generate_defs_glib.cc
-extra_defs_gen_generate_defs_glib_LDADD   = $(GLIBMM_LIBS) $(lib_LTLIBRARIES)
+noinst_LTLIBRARIES = $(c_lib) $(cxx_lib)
 
-extra_defs_gen_generate_defs_gio_SOURCES = extra_defs_gen/generate_defs_gio.cc
-extra_defs_gen_generate_defs_gio_LDADD   = $(GIOMM_LIBS) $(lib_LTLIBRARIES)
+pm_tests_libgm_gm_libgm_la_SOURCES = \
+  $(c_files)
+pm_tests_libgm_gm_libgm_la_LIBADD = \
+  $(GM_LIBS)
+pm_tests_libgm_gm_libgm_la_CPPFLAGS = \
+  $(GM_CFLAGS)
+pm_tests_libgm_gm_libgm_la_CFLAGS = \
+  $(GLIBMM_WXXFLAGS)
 
-AM_CPPFLAGS = -I$(top_builddir) $(GTHREAD_CFLAGS) $(GIOMM_CFLAGS)
-AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
+$(gir_file): $(INTROSPECTION_SCANNER) $(c_lib)
+pm_tests_libgm_gm_Gm_1_0_gir_SCANNERFLAGS =
+pm_tests_libgm_gm_Gm_1_0_gir_INCLUDES = \
+  GObject-2.0
+pm_tests_libgm_gm_Gm_1_0_gir_CFLAGS = \
+  -I$(srcdir)
+pm_tests_libgm_gm_Gm_1_0_gir_LIBS = \
+  $(c_lib)
+pm_tests_libgm_gm_Gm_1_0_gir_FILES = \
+  $(c_files)
+pm_tests_libgm_gm_Gm_1_0_gir_EXPORT_PACKAGES = \
+  gm-1.0
+INTROSPECTION_GIRS = $(gir_file)
 
-EXTRA_DIST = defs_gen/definitions.py \
-  defs_gen/defsparser.py \
-  defs_gen/h2def.py \
-  defs_gen/scmexpr.py \
-  defs_gen/docextract.py \
-  defs_gen/docextract_to_xml.py
+pm_tests_libgmmm_gm_gmmm_libgmmm_la_SOURCES = \
+  $(cxx_files)
+pm_tests_libgmmm_gm_gmmm_libgmmm_la_CPPFLAGS = \
+  -I$(srcdir)/pm/tests/libgm \
+  -I$(builddir)/pm/tests/libgmmm/gm \
+  `pkg-config --cflags glibmm-2.4`
+pm_tests_libgmmm_gm_gmmm_libgmmm_la_CXXFLAGS = \
+  $(GLIBMM_WXXFLAGS)
 
-# Instruct GNU make to delete the targets of a rule after it failed, in
-# order to avoid the complication of handling that situation manually.
-.DELETE_ON_ERROR:
+$(cxx_files): $(proc_stamp_file)
+
+inc1 = @abs_top_srcdir@/tools/pm/tests
+inc2 = @abs_top_srcdir@/tools/pm
+source = @abs_top_srcdir@/tools/pm/tests/libgmmm/gm/src
+dest = @abs_top_builddir@/tools/pm/tests/libgmmm/gm/gmmm
+gmminc = @abs_top_srcdir@/tools/pm/tests/libgmmm/proc
+
+$(proc_stamp_file): $(gir_file) $(cxx_templates) gmmproc
+	perl -I$(inc1) -I$(inc2) ./gmmproc --source $(source) --destination $(dest) --gir Gm-1.0.gir --mm-module gmmm --include $(gmminc) $(cxx_gm_templates)
+	touch $(proc_stamp_file)
+
+CLEANFILES = $(cxx_files) $(gir_file) $(proc_stamp_file)
