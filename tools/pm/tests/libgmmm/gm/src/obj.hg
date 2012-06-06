@@ -1,0 +1,81 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2012 Krzesimir Nowak <qdlacz@gmail.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+#include <gmmm/other.h>
+
+_MODULE(Gm)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gm
+{
+
+class Obj : public Glib::Object
+{
+  _CLASS_GOBJECT(Obj, GmObj)
+  _CTOR_DEFAULT()
+  _WRAP_CTOR(Obj(const Glib::RefPtr<Other>& other, const Glib::ustring& string, int number), gm_obj_new_bogus_names)
+  _WRAP_CTOR(Obj(int number, const Glib::ustring& string, const Glib::RefPtr<Other>& other), gm_obj_new_valid_names)
+
+public:
+  _WRAP_CREATE()
+  _WRAP_CREATE(const Glib::RefPtr<Other>& other, const Glib::ustring& string, int number)
+  _WRAP_CREATE(int number, const Glib::ustring& string, const Glib::RefPtr<Other> &other)
+
+
+  _WRAP_METHOD(int get_number() const, gm_obj_get_number)
+  _WRAP_METHOD(void set_number(int number), gm_obj_set_number)
+
+
+  _WRAP_METHOD(Glib::RefPtr<Other> get_other_t_f(), gm_obj_get_other_t_f)
+  _WRAP_METHOD(Glib::RefPtr<const Other> get_other_t_f() const, gm_obj_get_other_t_f, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Other> get_other_t_n(), gm_obj_get_other_t_n)
+  _WRAP_METHOD(Glib::RefPtr<const Other> get_other_t_n() const, gm_obj_get_other_t_n, constversion)
+  _WRAP_METHOD(void set_other_t_f(const Glib::RefPtr<Other>& other), gm_obj_set_other_t_f)
+  _WRAP_METHOD(void set_other_t_n(const Glib::RefPtr<Other>& other), gm_obj_set_other_t_n)
+
+
+  _WRAP_METHOD(std::vector<Glib::RefPtr<Other> > get_others_t_c(), gm_obj_get_others_t_c)
+  _WRAP_METHOD(std::vector<Glib::RefPtr<const Other> > get_others_t_c() const, gm_obj_get_others_t_c)
+  _WRAP_METHOD(std::vector<Glib::RefPtr<Other> > get_others_t_f(), gm_obj_get_others_t_f)
+  _WRAP_METHOD(std::vector<Glib::RefPtr<const Other> > get_others_t_f() const, gm_obj_get_others_t_f)
+  _WRAP_METHOD(std::vector<Glib::RefPtr<Other> > get_others_t_n(), gm_obj_get_others_t_n)
+  _WRAP_METHOD(std::vector<Glib::RefPtr<const Other> > get_others_t_n() const, gm_obj_get_others_t_n)
+  // Full transfer of container in parameter is not directly supported
+  // by neither ContainerHandles nor vectorutils
+  _IGNORE(gm_obj_set_others_t_f)
+  //_WRAP_METHOD(void set_others_t_f(const std::vector<Glib::RefPtr<Other> >& others), gm_obj_set_others_t_f)
+  _WRAP_METHOD(void set_others_t_n(const std::vector<Glib::RefPtr<Other> >& others), gm_obj_set_others_t_n)
+
+
+  _WRAP_METHOD(Glib::ustring get_string_t_f() const, gm_obj_get_string_t_f)
+  _WRAP_METHOD(Glib::ustring get_string_t_n() const, gm_obj_get_string_t_n)
+  _WRAP_METHOD(void set_string_t_f(const Glib::ustring& string), gm_obj_set_string_t_f)
+  _WRAP_METHOD(void set_string_t_n(const Glib::ustring& string), gm_obj_set_string_t_n)
+
+
+
+
+  _WRAP_PROPERTY("number", int)
+  _WRAP_PROPERTY("string", Glib::ustring)
+  _WRAP_PROPERTY("other", Glib::RefPtr<Other>)
+};
+
+} // namespace Gm
