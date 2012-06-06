@@ -2867,8 +2867,6 @@ sub parse ($)
 
       if (exists $handlers->{$token})
       {
-        print 'Currently parsing: ' . $token . "\n";
-
         my $pair = $handlers->{$token};
         my $object = $pair->[0];
         my $handler = $pair->[1];

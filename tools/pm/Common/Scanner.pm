@@ -120,8 +120,7 @@ sub _switch_to_stage ($$)
   else
   {
 # TODO: throw an internal error
-    print STDERR 'Internal error in Scanner - unknown stage: ' . $stage . "\n";
-    exit 1;
+    die 'Internal error in Scanner - unknown stage: ' . $stage . "\n";
   }
 }
 
@@ -173,11 +172,11 @@ sub _make_full_type ($$)
 
   if (defined $cpp_type)
   {
-    return join '::', reverse @{$namespaces}, reverse @{$classes}, $cpp_type;
+    return join '::', reverse (@{$namespaces}), reverse (@{$classes}), $cpp_type;
   }
   else
   {
-    return join '::', reverse @{$namespaces}, reverse @{$classes};
+    return join '::', reverse (@{$namespaces}), (reverse @{$classes});
   }
 }
 
@@ -444,7 +443,7 @@ sub _on_class_opaque_refcounted ($)
   }
 }
 
-sub _on_namespace ($)
+sub _on_namespace_keyword ($)
 {
   my ($self) = @_;
   my $tokens = $self->_get_tokens;
@@ -472,22 +471,24 @@ sub _on_namespace ($)
         $in_m_comment = 0;
       }
     }
-    elsif ($token =~ m'^//[/!]?$')
+    elsif ($token =~ m#^//[/!]?$#)
     {
       $in_s_comment = 1;
     }
-    elsif ($token =~ m'^/*[*!]?$')
+    elsif ($token =~ m#^/\*[*!]?$#)
     {
       $in_m_comment = 1;
     }
     elsif ($token eq '{')
     {
+
       my $namespaces = $self->_get_namespaces;
       my $namespace_levels = $self->_get_namespace_levels;
 
-      $name = Util::string_trim ($name);
+      $name = Common::Util::string_trim ($name);
       push @{$namespaces}, $name;
       push @{$namespace_levels}, $self->_get_level + 1;
+
       return;
     }
     elsif ($token eq ';')
@@ -501,7 +502,7 @@ sub _on_namespace ($)
   }
 }
 
-sub _on_class ($)
+sub _on_class_keyword ($)
 {
   my ($self) = @_;
   my $tokens = $self->_get_tokens;
@@ -617,8 +618,8 @@ sub new ($$$)
     '_CLASS_INTERFACE' => [$self, \&_on_class_interface],
     '_CLASS_OPAQUE_COPYABLE' => [$self, \&_on_class_opaque_copyable],
     '_CLASS_OPAQUE_REFCOUNTED' => [$self, \&_on_class_opaque_refcounted],
-    'namespace' => [$self, \&_on_namespace],
-    'class' => [$self, \&_on_class]
+    'namespace' => [$self, \&_on_namespace_keyword],
+    'class' => [$self, \&_on_class_keyword]
   };
 
   return $self;
