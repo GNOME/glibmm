@@ -592,7 +592,7 @@ sub get_parent_from_object ($$)
 sub convzipstr ($$$$$)
 {
   my ($wrap_parser, $from_types, $to_types, $transfers, $from_names) = @_;
-  my $conversions_store = $wrap_parser->get_conversions_store;
+  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $from_types_count = @{$from_types};
   my $to_types_count = @{$to_types};
   my $transfers_count = @{$transfers};
@@ -600,7 +600,7 @@ sub convzipstr ($$$$$)
 
 # TODO: throw runtime error or internal error or whatever.
   die if $from_types_count != $to_types_count or $to_types_count != $transfers_count or $transfers_count != $from_names_count;
-  return join ', ', map { $conversions_store->get_conversion ($from_types->[$_], $to_types->[$_], $transfers->[$_], $from_names->[$_]) } 0 .. $from_types_count - 1;
+  return join ', ', map { $type_info_local->get_conversion ($from_types->[$_], $to_types->[$_], $transfers->[$_], $from_names->[$_]) } 0 .. $from_types_count - 1;
 }
 
 sub deprecate_start ($)

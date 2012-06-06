@@ -32,7 +32,7 @@ use Common::Util;
 use Common::SectionManager;
 use Common::Shared;
 use Common::Output;
-use Common::ConversionsStore;
+use Common::TypeInfo::Local;
 use constant
 {
   'STAGE_HG' => 0,
@@ -681,11 +681,11 @@ sub _maybe_warn_about_refreturn ($$$)
 {
   my ($self, $ret_transfer, $refreturn) = @_;
 
-  if ($ret_transfer == Common::ConversionsStore::TRANSFER_FULL and $refreturn)
+  if ($ret_transfer == Common::TypeInfo::Common::TRANSFER_FULL and $refreturn)
   {
     $self->fixed_warning ('refreturn given but annotation says that transfer is already full - which is wrong? (refreturn is ignored anyway.)');
   }
-  elsif ($ret_transfer == Common::ConversionsStore::TRANSFER_NONE and not $refreturn)
+  elsif ($ret_transfer == Common::TypeInfo::Common::TRANSFER_NONE and not $refreturn)
   {
     $self->fixed_warning ('There is no refreturn, but annotation says that transfer is none - which is wrong? (refreturn would be ignored anyway.)');
   }
@@ -786,7 +786,7 @@ sub _on_wrap_method ($)
     }
   }
 
-  my $c_function = Common::CFunctionInfo->new_from_gir ($gir_func);
+  my $c_function = Common::CFunctionInfo->new_from_gir ($gir_func, $self);
   my $ret_transfer = $c_function->get_return_transfer;
   my $throws = $c_function->get_throws;
 
@@ -938,7 +938,7 @@ sub _on_wrap_signal ($)
     $self->fixed_error ('No such signal: ' . $c_signal_str);
   }
 
-  my $c_signal = Common::SignalInfo->new_from_gir ($gir_signal);
+  my $c_signal = Common::SignalInfo->new_from_gir ($gir_signal, $self);
   my $ret_transfer = $c_signal->get_return_transfer;
 
 # TODO: remove the ifs below after possible bugs in
@@ -1084,7 +1084,7 @@ sub _on_wrap_vfunc ($)
     $self->fixed_error ('No such virtual method: ' . $c_vfunc_name);
   }
 
-  my $c_vfunc = Common::CFunctionInfo->new_from_gir ($gir_vfunc);
+  my $c_vfunc = Common::CFunctionInfo->new_from_gir ($gir_vfunc, $self);
   my $ret_transfer = $c_vfunc->get_return_transfer;
   my $throws = $c_vfunc->get_throws;
 
@@ -1142,7 +1142,7 @@ sub _on_wrap_ctor ($)
     $self->fixed_error ('No such constructor: ' . $c_constructor_name);
   }
 
-  my $c_constructor = Common::CFunctionInfo->new_from_gir ($gir_constructor);
+  my $c_constructor = Common::CFunctionInfo->new_from_gir ($gir_constructor, $self);
   my $c_param_names = $c_constructor->get_param_names;
   my $cxx_param_names = $cxx_function->get_param_names;
   my $c_params_count = @{$c_param_names};
@@ -1554,10 +1554,11 @@ sub _on_class_g_object ($)
     }
   }
 
-  my $type_info_store = $self->get_type_info_store;
+  my $type_info_local = $self->get_type_info_local;
 # TODO: write an info about adding mapping when returned value
 # TODO continued: is undefined.
-  my $cpp_parent_type = $type_info_store->c_to_cpp ($c_parent_type);
+  my $cxx_parent_type = $type_info_local->c_to_cxx ($c_parent_type);
+
 
   $self->_push_gir_class ($gir_class);
   $self->_push_c_class ($c_type);
@@ -1569,7 +1570,7 @@ sub _on_class_g_object ($)
                                   $c_parent_class_type,
                                   $get_type_func,
                                   $cpp_type,
-                                  $cpp_parent_type;
+                                  $cxx_parent_type;
 }
 
 # TODO: set current gir_class.
@@ -1949,8 +1950,8 @@ sub _on_class_interface ($)
     }
   }
 
-  my $type_info_store = $self->get_type_info_store;
-  my $cpp_parent_name = $type_info_store->c_to_cpp ($c_parent_name);
+  my $type_info_local = $self->get_type_info_local;
+  my $cxx_parent_type = $type_info_local->c_to_cxx ($c_parent_name);
 
   $self->_push_gir_class ($gir_class);
 
@@ -1959,7 +1960,7 @@ sub _on_class_interface ($)
                                     $c_class_name,
                                     $c_parent_name,
                                     $cpp_name,
-                                    $cpp_parent_name,
+                                    $cxx_parent_type,
                                     $get_type_func;
 }
 
@@ -2565,9 +2566,9 @@ sub get_repositories ($)
 }
 
 # public
-sub new ($$$$$$$)
+sub new ($$$$$$)
 {
-  my ($type, $tokens_hg, $tokens_ccg, $type_info_store, $repositories, $conversions_store, $mm_module, $base) = @_;
+  my ($type, $tokens_hg, $tokens_ccg, $type_info_global, $repositories, $mm_module, $base) = @_;
   my $class = (ref $type or $type or 'Common::WrapParser');
   my $self =
   {
@@ -2594,9 +2595,8 @@ sub new ($$$$$$$)
       STAGE_CCG() => [Common::Sections::CC_CONTENTS, 'tokens_ccg', 'ccg'],
       STAGE_INVALID() => [Common::Sections::DEV_NULL, 'tokens_null', 'BAD']
     },
-    'type_info_store' => $type_info_store,
+    'type_info_local' => Common::TypeInfo::Local->new ($type_info_global),
     'counter' => 0,
-    'conversions_store' => Common::ConversionsStore->new_local ($conversions_store),
     'gir_stack' => [],
     'c_stack' => [],
     'mm_module' => $mm_module,
@@ -2658,6 +2658,13 @@ sub get_type_info_store ($)
   my ($self) = @_;
 
   return $self->{'type_info_store'};
+}
+
+sub get_type_info_local ($)
+{
+  my ($self) = @_;
+
+  return $self->{'type_info_local'};
 }
 
 sub get_number ($)

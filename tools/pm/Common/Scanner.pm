@@ -181,12 +181,12 @@ sub _make_full_type ($$)
   }
 }
 
-sub _append ($$$)
+sub _append ($$$$)
 {
-  my ($self, $c_stuff, $cpp_stuff) = @_;
-  my $pairs = $self->get_pairs;
+  my ($self, $c_stuff, $cxx_stuff, $macro_type) = @_;
+  my $tuples = $self->get_tuples;
 
-  push @{$pairs}, [$c_stuff, $cpp_stuff];
+  push @{$tuples}, [$c_stuff, $cxx_stuff, $macro_type];
 }
 
 sub _get_params ($)
@@ -208,7 +208,7 @@ sub _on_wrap_func_generic ($$)
   my $cpp_function = Common::Shared::parse_function_declaration ($args->[0])->[2];
   my $c_function = $args->[1];
 
-  $self->_append ($c_function, $self->_make_full_type ($cpp_function));
+  $self->_append ($c_function, $self->_make_full_type ($cpp_function), 'FUNC');
 }
 
 sub _on_wrap_enum_generic ($$)
@@ -217,19 +217,21 @@ sub _on_wrap_enum_generic ($$)
   my $cpp_enum = $args->[0];
   my $c_enum = $args->[1];
 
-  $self->_append ($c_enum, $self->_make_full_type ($cpp_enum));
+  $self->_append ($c_enum, $self->_make_full_type ($cpp_enum), 'ENUM');
 }
 
-sub _on_wrap_class_generic ($$)
+sub _on_wrap_class_generic ($$$)
 {
-  my ($self, $args) = @_;
+  my ($self, $args, $macro_type) = @_;
   my $classes = $self->_get_classes;
   my $cpp_class = $args->[0];
   my $c_class = $args->[1];
 
   if (@{$classes} > 0 and $classes->[-1] eq $cpp_class)
   {
-    $self->_append ($c_class, $self->_make_full_type (undef));
+    my $cxx_full_type = $self->_make_full_type (undef);
+
+    $self->_append ($c_class, $self->_make_full_type (undef), $macro_type);
   }
 }
 
@@ -614,7 +616,6 @@ sub _on_wrap_enum ($)
   if (defined $args)
   {
     $self->_on_wrap_enum_generic ($args);
-    $self->_on_convert_enum ($args);
   }
 }
 
@@ -626,7 +627,6 @@ sub _on_wrap_gerror ($)
   if (defined $args)
   {
     $self->_on_wrap_enum_generic ($args);
-    $self->_on_convert_enum ($args);
   }
 }
 
@@ -637,8 +637,8 @@ sub _on_class_generic ($)
 
   if (defined $args)
   {
-    $self->_on_wrap_class_generic ($args);
     # no conversion generation possible - it have to be provided manually.
+    $self->_on_wrap_class_generic ($args, 'MANUAL');
   }
 }
 
@@ -649,8 +649,7 @@ sub _on_class_g_object ($)
 
   if (defined $args)
   {
-    $self->_on_wrap_class_generic ($args);
-    $self->_on_convert_reffed_class ($args);
+    $self->_on_wrap_class_generic ($args, 'REFFED');
   }
 }
 
@@ -661,8 +660,7 @@ sub _on_class_gtk_object ($)
 
   if (defined $args)
   {
-    $self->_on_wrap_class_generic ($args);
-    $self->_on_convert_class ($args); # Glib::wrap and Glib::unwrap
+    $self->_on_wrap_class_generic ($args, 'NORMAL');
   }
 }
 
@@ -673,8 +671,7 @@ sub _on_class_boxed_type ($)
 
   if (defined $args)
   {
-    $self->_on_wrap_class_generic ($args);
-    $self->_on_convert_class ($args); # Glib::wrap and Glib::unwrap
+    $self->_on_wrap_class_generic ($args, 'NORMAL');
   }
 }
 
@@ -685,8 +682,7 @@ sub _on_class_boxed_type_static ($)
 
   if (defined $args)
   {
-    $self->_on_wrap_class_generic ($args);
-    $self->_on_convert_class ($args); # Glib::wrap and Glib::unwrap
+    $self->_on_wrap_class_generic ($args, 'NORMAL');
   }
 }
 
@@ -697,8 +693,8 @@ sub _on_class_interface ($)
 
   if (defined $args)
   {
-    $self->_on_wrap_class_generic ($args);
 # TODO: which convert? reffed or not? probably both. probably manual.
+    $self->_on_wrap_class_generic ($args, 'MANUAL');
   }
 }
 
@@ -709,8 +705,7 @@ sub _on_class_opaque_copyable ($)
 
   if (defined $args)
   {
-    $self->_on_wrap_class_generic ($args);
-    $self->_on_convert_class ($args); # Glib::wrap and Glib::unwrap
+    $self->_on_wrap_class_generic ($args, 'NORMAL');
   }
 }
 
@@ -721,8 +716,7 @@ sub _on_class_opaque_refcounted ($)
 
   if (defined $args)
   {
-    $self->_on_wrap_class_generic ($args);
-    $self->_on_convert_reffed_class ($args);
+    $self->_on_wrap_class_generic ($args, 'REFFED');
   }
 }
 
@@ -858,8 +852,7 @@ sub new ($$$)
   my $self =
   {
     'tokens' => undef,
-    'pairs' => [],
-    'conversions' => [],
+    'tuples' => [],
     'stages' =>
     {
       STAGE_HG () => \@tokens_hg_copy,
@@ -942,11 +935,11 @@ sub scan ($)
   }
 }
 
-sub get_pairs ($)
+sub get_tuples ($)
 {
   my ($self) = @_;
 
-  return $self->{'pairs'};
+  return $self->{'tuples'};
 }
 
 sub get_conversions ($)

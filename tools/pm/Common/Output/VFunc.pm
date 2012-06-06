@@ -76,7 +76,7 @@ sub _output_cc ($$$$$$$$$$$$$)
   my $cpp_to_c_params_str = (Common::Output::Shared::convzipstr $wrap_parser, $cpp_param_types, $c_param_types, $c_param_transfers, $cpp_param_names) . ($errthrow ? ', &temp_error' : '');
   my $c_func_invocation = join '', '(*base->', $c_vfunc_name, ')(', $gobj, ', ', $cpp_to_c_params_str . ')';
   my $last_return = '';
-  my $conversions_store = $wrap_parser->get_conversions_store;
+  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $error_init_string = (nl '    GError* temp_error(0);');
   my $errthrow_string = (nl '    if (temp_error)') .
                         (nl '    {') .
@@ -112,11 +112,11 @@ sub _output_cc ($$$$$$$$$$$$$)
                       (nl) .
                       $errthrow_string .
                       (nl);
-      $conv = $conversions_store->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, 'temp_retval');
+      $conv = $type_info_local->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, 'temp_retval');
     }
     else
     {
-      $conv = $conversions_store->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, $c_func_invocation);
+      $conv = $type_info_local->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, $c_func_invocation);
     }
     $code_string .= nl ('    return ' . $conv . ';');
     $last_return = (nl) .
@@ -147,7 +147,7 @@ sub _output_p_cc ($$$$$$$$$$$$)
 
   my $c_params_str = (Common::Output::Shared::paramzipstr $c_param_types, $c_param_names) . ($errthrow ? ', GError** gerror' : '');
   my $ret_void = ($c_return_type eq 'void');
-  my $conversions_store = $wrap_parser->get_conversions_store;
+  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $convs_str = Common::Output::Shared::convzipstr $wrap_parser, $c_param_types, $cpp_param_types, $c_param_transfers, $c_param_names;
   my $vfunc_call = 'obj->' . $cpp_vfunc_name . '(' . $convs_str . ')';
   my $c_callback_call = '(*base->' . $c_vfunc_name . '(self, ' . (join ', ', @{$c_param_names}) . ($errthrow ? ', gerror' : '') . ')';
@@ -156,7 +156,7 @@ sub _output_p_cc ($$$$$$$$$$$$)
 
   unless ($ret_void)
   {
-    $vfunc_call = 'return ' . $conversions_store->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $vfunc_call);
+    $vfunc_call = 'return ' . $type_info_local->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $vfunc_call);
     $c_callback_call = 'return ' . $c_callback_call;
     $after_catch_return = (nl) .
                           (nl '      typedef ', $c_return_type, ' RType;') .

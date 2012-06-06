@@ -29,8 +29,7 @@ sub new ($)
   my $class = (ref $type or $type or 'Common::TokensStore');
   my $self =
   {
-    'pairs' => [],
-    'conversions' => [],
+    'tuples' => [],
     'section_manager' => undef,
     'tokens_hg' => undef,
     'tokens_ccg' => undef
@@ -39,32 +38,18 @@ sub new ($)
   return bless $self, $class;
 }
 
-sub set_pairs ($$)
+sub set_tuples ($$)
 {
-  my ($self, $pairs) = @_;
+  my ($self, $tuples) = @_;
 
-  $self->{'pairs'} = $pairs;
+  $self->{'tuples'} = $tuples;
 }
 
-sub get_pairs ($)
+sub get_tuples ($)
 {
   my ($self) = @_;
 
-  return $self->{'pairs'};
-}
-
-sub set_conversions ($$)
-{
-  my ($self, $conversions) = @_;
-
-  $self->{'conversions'} = $conversions;
-}
-
-sub get_conversions ($)
-{
-  my ($self) = @_;
-
-  return $self->{'conversions'};
+  return $self->{'tuples'};
 }
 
 sub set_section_manager ($$)

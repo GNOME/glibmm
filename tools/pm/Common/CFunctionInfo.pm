@@ -32,11 +32,11 @@ sub _get_name_from_gir ($$)
   return $gir_function->get_a_c_identifier;
 }
 
-sub new_from_gir ($$)
+sub new_from_gir ($$$)
 {
-  my ($type, $gir_function) = @_;
+  my ($type, $gir_function, $wrap_parser) = @_;
   my $class = (ref $type or $type or 'Common::CFunctionInfo');
-  my $self = $class->SUPER::new_from_gir ($gir_function);
+  my $self = $class->SUPER::new_from_gir ($gir_function, $wrap_parser);
   my $throws = $gir_function->get_a_throws;
 
   $self->{'throws'} = $throws;

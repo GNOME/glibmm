@@ -96,8 +96,8 @@ sub wrap_ctor ($$$$$$)
   my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
   my $base_member = (lc $cpp_class_type) . '_';
   my $conditional = initially_unowned_sink $wrap_parser;
-  my $conversions_store = $wrap_parser->get_conversions_store;
-  my $ctor_params_str = join ', ', '', (map { join '', '"', $c_prop_names->[$_], '", ', ($conversions_store->get_conversion ($cpp_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cpp_param_names->[$_])) } 0 .. (@{$cpp_param_types} - 1)), 'static_cast<char*>(0)';
+  my $type_info_local = $wrap_parser->get_type_info_local ();
+  my $ctor_params_str = join ', ', '', (map { join '', '"', $c_prop_names->[$_], '", ', ($type_info_local->get_conversion ($cpp_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cpp_param_names->[$_])) } 0 .. (@{$cpp_param_types} - 1)), 'static_cast<char*>(0)';
 
   $section_manager->append_string_to_section ($code_string, $main_section);
   $code_string = (nl $full_cpp_type, '::', $cpp_type, '(', $cpp_params_str, ')') .

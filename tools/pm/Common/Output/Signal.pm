@@ -85,7 +85,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
   my $proxy_info = $signal_prefix . '_signal_' . $cpp_signal_name . '_info';
   my $ret_void = ($c_return_type eq 'void');
   my $cpp_param_types_str = join ', ', @cpp_param_types;
-  my $conversions_store = $wrap_parser->get_conversions_store;
+  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $code_string = Common::Output::Shared::ifdef $ifdef;
 
   if ($ret_void and not @{$c_param_types} and $cpp_return_type eq 'void' and not @{$cpp_param_types})
@@ -122,12 +122,12 @@ sub _output_cc ($$$$$$$$$$$$$$)
 
       unless ($ret_void)
       {
-        if ($c_return_transfer == Common::ConversionsStore and $c_return_type =~ /\*$/)
+        if ($c_return_transfer == Common::TypeInfo::Common::TRANSFER_NONE and $c_return_type =~ /\*$/)
         {
 # TODO: print a warning - pointers returned from signals ought to have ownership transferred fully.
 # TODO continued: need warning or error with fixed line number for this.
         }
-        my $conv = $conversions_store->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $return_string);
+        my $conv = $type_info_local->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $return_string);
 
         $return_string = 'return ' . $conv;
         $last_return = nl () .
@@ -237,7 +237,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
     }
     else
     {
-      my $conv = $conversions_store->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, $c_func_invocation);
+      my $conv = $type_info_local->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, $c_func_invocation);
 
       $code_string .= nl ('    return ' . $conv . ';');
       $last_return = nl () .
@@ -273,7 +273,7 @@ sub _output_p_cc ($$$$$$$$$$$$$)
 
     my $c_params_str = Common::Output::Shared::zupstr $c_param_types, $c_param_names, ' ', ', ';
     my $ret_void = ($c_return_type eq 'void');
-    my $conversions_store = $wrap_parser->get_conversions_store;
+    my $type_info_local = $wrap_parser->get_type_info_local ();
     my $convs_str = Common::Output::Shared::convzipstr $c_param_types, $cpp_param_types, $c_param_transfers, $c_param_names;
     my $vfunc_call = 'obj->on_' . $cpp_signal_name . '(' . $convs_str . ')';
     my $c_callback_call = '(*base->' . $c_signal_name . '(self, ' . (join ', ', @{$c_param_names}) . ')';
@@ -281,7 +281,7 @@ sub _output_p_cc ($$$$$$$$$$$$$)
 
     unless ($ret_void)
     {
-      $vfunc_call = 'return ' . $conversions_store->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $vfunc_call);
+      $vfunc_call = 'return ' . $type_info_local->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $vfunc_call);
       $c_callback_call = 'return ' . $c_callback_call;
       $last_return = nl () .
                      nl ('  typedef ' . $c_return_type . ' RType;') .

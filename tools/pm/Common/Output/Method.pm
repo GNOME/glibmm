@@ -116,7 +116,7 @@ sub _output_cc ($$$$$$$$$$$$$$$$)
 
     push @params, $this_param;
 
-    my $conversions_store = $wrap_parser->get_conversions_store;
+    my $type_info_local = $wrap_parser->get_type_info_local ();
     my $convs_str = Common::Output::Shared::convzipstr $wrap_parser, $cpp_param_types, $c_param_types, $c_param_transfers, $cpp_param_names;
 
     if ($convs_str)
@@ -134,7 +134,7 @@ sub _output_cc ($$$$$$$$$$$$$$$$)
 
     unless ($ret_void)
     {
-      $ret_convert = $conversions_store->get_conversion ($c_ret_type, $cpp_ret_type, $ret_transfer, $c_func_invocation);
+      $ret_convert = $type_info_local->get_conversion ($c_ret_type, $cpp_ret_type, $ret_transfer, $c_func_invocation);
     }
 
     if ($errthrow)

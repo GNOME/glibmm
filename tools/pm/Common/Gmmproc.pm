@@ -29,7 +29,7 @@ use Common::Scanner;
 use Common::Sections;
 use Common::SectionManager;
 use Common::TokensStore;
-use Common::TypeInfoStore;
+use Common::TypeInfo::Global;
 use Common::WrapParser;
 use Common::Variables;
 
@@ -61,11 +61,9 @@ sub _tokenize_contents_ ($)
 sub _prepare ($)
 {
   my ($self) = @_;
-  my $conversions_store = $self->get_conversions_store;
-  my $type_info_store = $self->get_type_info_store;
+  my $type_info_global = $self->get_type_info_global;
 
-  $conversions_store->add_from_file ('conversions');
-  $type_info_store->add_from_file ('mappings');
+  $type_info_global->add_infos_from_file ('type_infos');
 }
 
 sub _read_all_bases ($)
@@ -124,31 +122,23 @@ sub _scan_all_bases ($)
     my $scanner = Common::Scanner->new ($tokens_hg, $tokens_ccg);
 
     $scanner->scan;
-    $tokens_store->set_pairs ($scanner->get_pairs);
-    $tokens_store->set_conversions ($scanner->get_conversions);
+    $tokens_store->set_tuples ($scanner->get_tuples);
   }
 
-  my $type_info_store = $self->get_type_info_store;
-  my $conversions_store = $self->get_conversions_store;
+  my $type_info_global = $self->get_type_info_global;
 
   foreach my $base (@bases_keys)
   {
     my $tokens_store = $bases->{$base};
-    my $pairs = $tokens_store->get_pairs;
+    my $tuples = $tokens_store->get_tuples;
 
-    foreach my $pair (@{$pairs})
+    foreach my $tuple (@{$tuples})
     {
-      my $c_stuff = $pair->[0];
-      my $cpp_stuff = $pair->[1];
+      my $c_stuff = $tuple->[0];
+      my $cxx_stuff = $tuple->[1];
+      my $macro_type = $tuple->[2];
 
-      $type_info_store->add_new ($c_stuff, $cpp_stuff);
-    }
-
-    my $conversions = $tokens_store->get_conversions;
-
-    foreach my $conversion (@{$conversions})
-    {
-      $conversions_store->add_new_generated (@{$conversion});
+      $type_info_global->add_generated_info ($c_stuff, $cxx_stuff, $macro_type);
     }
   }
 }
@@ -157,9 +147,8 @@ sub _parse_all_bases ($)
 {
   my ($self) = @_;
   my $bases = $self->get_bases;
-  my $type_info_store = $self->get_type_info_store;
+  my $type_info_global = $self->get_type_info_global ();
   my $repositories = $self->get_repositories;
-  my $conversions_store = $self->get_conversions_store;
   my $mm_module = $self->get_mm_module;
 
   # parallelize
@@ -170,9 +159,8 @@ sub _parse_all_bases ($)
     my $tokens_ccg = $tokens_store->get_ccg_tokens;
     my $wrap_parser = Common::WrapParser->new ($tokens_hg,
                                                $tokens_ccg,
-                                               $type_info_store,
+                                               $type_info_global,
                                                $repositories,
-                                               $conversions_store,
                                                $mm_module,
                                                $base);
 
@@ -205,11 +193,9 @@ sub _generate_all_bases ($)
 sub _finish ($)
 {
   my ($self) = @_;
-  my $conversions_store = $self->get_conversions_store;
-  my $type_info_store = $self->get_type_info_store;
+  my $type_info_global = $self->get_type_info_global ();
 
-  $conversions_store->write_to_file ('conversions');
-  $type_info_store->write_to_file ('mappings');
+  $type_info_global->write_generated_infos_to_file ();
 }
 
 sub new ($$$$)
@@ -222,8 +208,7 @@ sub new ($$$$)
     'bases' => {},
     'source_dir' => '.',
     'destination_dir' => '.',
-    'type_info_store' => Common::TypeInfoStore->new ($mm_module, $include_paths),
-    'conversions_store' => Common::ConversionsStore->new_global ($mm_module, $include_paths),
+    'type_info_global' => Common::TypeInfo::Global->new ($mm_module, $include_paths),
     'mm_module' => $mm_module,
     'include_paths' => $include_paths
   };
@@ -301,18 +286,11 @@ sub get_repositories ($)
   return $self->{'repositories'};
 }
 
-sub get_type_info_store ($)
+sub get_type_info_global ($)
 {
   my ($self) = @_;
 
-  return $self->{'type_info_store'};
-}
-
-sub get_conversions_store ($)
-{
-  my ($self) = @_;
-
-  return $self->{'conversions_store'};
+  return $self->{'type_info_global'};
 }
 
 sub get_mm_module ($)
