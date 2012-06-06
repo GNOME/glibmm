@@ -2653,13 +2653,6 @@ sub new ($$$$$$)
   return $self;
 }
 
-sub get_type_info_store ($)
-{
-  my ($self) = @_;
-
-  return $self->{'type_info_store'};
-}
-
 sub get_type_info_local ($)
 {
   my ($self) = @_;
@@ -2675,13 +2668,6 @@ sub get_number ($)
 
   ++$self->{$c};
   return $number;
-}
-
-sub get_conversions_store ($)
-{
-  my ($self) = @_;
-
-  return $self->{'conversions_store'};
 }
 
 sub generate_first_class_number ($)
