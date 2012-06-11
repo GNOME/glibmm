@@ -256,10 +256,12 @@ sub _type_fixup ($)
 {
   my ($type) = @_;
 
+  # 'int * &' -> 'int*&'
   while ($type =~ /\s+[&*]+/)
   {
-    $type =~ s/\s+([*&]+)/$1 /g;
+    $type =~ s/\s+([&*]+)/$1 /g;
   }
+  # vector<int> -> vector< int >
   while ($type =~ /<\S/)
   {
     $type =~ s/<(\S)/< $1/g;
@@ -267,6 +269,25 @@ sub _type_fixup ($)
   while ($type =~ /\S>/)
   {
     $type =~ s/(\S)>/$1 >/g;
+  }
+  # std::vector < int >& -> std::vector< int >&
+  while ($type =~ /\w\s+</)
+  {
+    $type =~ s/(\w)\s+</$1</g;
+  }
+  # std :: vector -> std::vector
+  while ($type =~ /\w\s+::/)
+  {
+    $type =~ s/(\w)\s+::/$1::/g;
+  }
+  while ($type =~ /::\s+/)
+  {
+    $type =~ s/::\s+/::/g;
+  }
+  # a< b,c,d > -> a< b, c, d >
+  while ($type =~ /,\S/)
+  {
+    $type =~ s/,(\S)/, $1/g;
   }
   $type = Common::Util::string_simplify $type;
 }
