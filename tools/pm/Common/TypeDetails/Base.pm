@@ -48,16 +48,7 @@ sub _tokenize ($$)
 {
   my ($self, $match) = @_;
   my $split_values = $self->_get_split_values ();
-  my @preliminary_tokens = split (/([$split_values])/, $match);
-  my @final_tokens = ();
-
-  foreach my $token (@preliminary_tokens)
-  {
-    if (defined $token and $token ne '')
-    {
-      unshift (@final_tokens, $token);
-    }
-  }
+  my @final_tokens = reverse (Common::Shared::cleanup_tokens (split (/([$split_values])/, $match)));
 
   return \@final_tokens;
 }

@@ -22,7 +22,6 @@ package Common::TypeInfo::Global;
 
 use strict;
 use warnings;
-#use feature ':5.10';
 use v5.10;
 
 use constant
@@ -131,195 +130,12 @@ sub _get_cxx_container_types ($)
   return $self->{'cxx_container_types'};
 }
 
-#sub _do_c_cxx_container_check ($$$)
-#{
-#  my ($self, $c_value, $cxx_value) = @_;
-#  my $cxx_value_iter = $cxx_value;
-#  my $cxx_base = undef;
-#  my $c_base = $c_value->get_base ();
-#
-#  until (defined $cxx_base)
-#  {
-#    my $templates = $cxx_value_iter->get_templates ();
-#
-#    if (@{$templates} == 1)
-#    {
-#      if ($templates->[0]->match_sigil ('', Common::TypeDetails::Base::NONE))
-#      {
-#        $cxx_value_iter = $templates->[0];
-#      }
-#      else
-#      {
-#        return 0;
-#      }
-#    }
-#    elsif (@{$templates} == 0)
-#    {
-#      $cxx_base = $cxx_value_iter->get_base ();
-#    }
-#  }
-#
-#  my $cxx_test = $self->c_to_cxx ($c_base);
-#
-#  if (defined $cxx_test)
-#  {
-#    my $sub_types = Common::Shared::split_cpp_type_to_sub_types $cxx_test;
-#
-## TODO: think if there are cases that need checking
-## TODO continued: correspondence in another direction.
-#    foreach my $sub_type (@{$sub_types})
-#    {
-#      if ($sub_type eq $cxx_base)
-#      {
-#        return 1;
-#      }
-#    }
-#  }
-#
-#  return 0;
-#}
-
 sub _get_cxx_pointer_types ($)
 {
   my ($self) = @_;
 
   return $self->{'cxx_pointer_types'};
 }
-
-#sub check_conversion_type ($$$)
-#{
-#  my ($self, $from_details, $to_details) = @_;
-#  my $c_container_types = $self->_get_c_container_types ();
-#  my $cxx_container_types = $self->_get_cxx_container_types ();
-#  my $conversion_type = SINGLE;
-#  my $from_value = $from_details->get_value_details ();
-#  my $to_value = $to_details->get_value_details ();
-#  my $from_base = $from_value->get_base ();
-#  my $to_base = $to_value->get_base ();
-#  my @tuples =
-#  (
-#    [$from_details, $to_details, CXX_C_CONTAINER, CXX_C_CONTAINER_CHECK, $from_base, $to_base],
-#    [$to_details, $from_details, C_CXX_CONTAINER, C_CXX_CONTAINER_CHECK, $to_base, $from_base]
-#  );
-#
-#  foreach my $tuple (@tuples)
-#  {
-#    my ($first_details, $second_details, $current_type, $current_check_type, $first_base, $second_base) = @{$tuple};
-#    my $first_cxx_container = exists $cxx_container_types->{$first_base};
-#    my $second_c_container = exists $c_container_types->{$second_base};
-#
-#    if ($first_cxx_container)
-#    {
-#      print "$first_base is a C++ container\n";
-#
-#      if ($second_c_container)
-#      {
-#        print "$second_base is a C container\n";
-#        $conversion_type = $current_type;
-#      }
-#      elsif ($second_details->match_sigil (['*', '**'], Common::TypeDetails::Base::NONE))
-#      {
-#        $conversion_type = $current_check_type;
-#      }
-#      else
-#      {
-#        $conversion_type = UNKNOWN;
-#      }
-#
-#      last;
-#    }
-#    elsif ($second_c_container)
-#    {
-## TODO: should we treat Gtk::Widget** as container type? I
-## TODO continued: guess not, just use vector.
-#      $conversion_type = UNKNOWN;
-#      last;
-#    }
-#  }
-#
-#  given ($conversion_type)
-#  {
-#    when (C_CXX_CONTAINER_CHECK)
-#    {
-#      if ($self->_do_c_cxx_container_check ($from_value, $to_value))
-#      {
-#        $conversion_type = C_CXX_CONTAINER;
-#      }
-#      else
-#      {
-#        $conversion_type = UNKNOWN;
-#      }
-#    }
-#    when (CXX_C_CONTAINER_CHECK)
-#    {
-#      if ($self->_do_c_cxx_container_check ($to_value, $from_value))
-#      {
-#        $conversion_type = CXX_C_CONTAINER;
-#      }
-#      else
-#      {
-#        $conversion_type = UNKNOWN;
-#      }
-#    }
-#    when (SINGLE)
-#    {
-#      my $selected_from_base = undef;
-#      my $selected_to_base = undef;
-#      my $cxx_pointer_types = $self->_get_cxx_pointer_types ();
-#
-#      if (exists ($cxx_pointer_types->{$from_base}))
-#      {
-#        $selected_from_base = $from_value->get_templates ()->[0]->get_value_details ()->get_base ();
-#        $selected_to_base = $to_base;
-#      }
-#      elsif (exists ($cxx_pointer_types->{$to_base}))
-#      {
-#        $selected_from_base = $from_base;
-#        $selected_to_base = $to_value->get_templates ()->[0]->get_value_details ()->get_base ();
-#      }
-#      else
-#      {
-#        $selected_from_base = $from_base;
-#        $selected_to_base = $to_base;
-#      }
-#
-#      my @another_tuples =
-#      (
-#        [$selected_from_base, $selected_to_base, C_CXX],
-#        [$selected_to_base, $selected_from_base, CXX_C]
-#      );
-#
-#      foreach my $tuple (@another_tuples)
-#      {
-#        my ($first_base, $second_base, $current_type) = @{$tuple};
-#        my $cxx_test = $self->c_to_cxx ($first_base);
-#
-#        if (defined $cxx_test)
-#        {
-#          my $sub_types = Common::Shared::split_cpp_type_to_sub_types $cxx_test;
-#
-## TODO: think if there are cases that need checking
-## TODO continued: correspondence in another direction.
-#          foreach my $sub_type (@{$sub_types})
-#          {
-#            if ($sub_type eq $second_base)
-#            {
-#              $conversion_type = $current_type;
-#              last;
-#            }
-#          }
-#        }
-#      }
-#
-#      if ($conversion_type == SINGLE)
-#      {
-#        $conversion_type = UNKNOWN;
-#      }
-#    }
-#  }
-#
-#  return $conversion_type;
-#}
 
 sub _get_generated_type_infos_basename ($)
 {
@@ -575,7 +391,7 @@ sub _add_info_to_general_conversions ($$$$$$$)
   }
 
   my $conversions = $self->_get_general_conversions ($which);
-  my $cxx_sub_types = Common::Shared::split_cpp_type_to_sub_types $cxx_stuff;
+  my $cxx_sub_types = Common::Shared::split_cxx_type_to_sub_types $cxx_stuff;
   my $from_c_conversions = $conversions->{'c'};
 
   if (exists $from_c_conversions->{$c_stuff})
@@ -762,23 +578,6 @@ sub _get_unambiguous_tuples ($)
   return \@tuples;
 }
 
-#sub _get_stuff_from ($$$)
-#{
-#  my ($self, $stuff, $mapping_getter) = @_;
-#
-#  foreach my $which (_desired_order ())
-#  {
-#    my $mapping = $self->$mapping_getter ($which);
-#
-#    if (exists $mapping->{$stuff})
-#    {
-#      return $mapping->{$stuff};
-#    }
-#  }
-#
-#  return undef;
-#}
-
 sub _get_mm_module ($)
 {
   my ($self) = @_;
@@ -799,45 +598,6 @@ sub _get_read_files ($)
 
   return $self->{'read_files'};
 }
-
-#sub _get_common ($$$)
-#{
-#  my ($self, $which, $what) = @_;
-#  my $name = '';
-#
-#  given ($which)
-#  {
-#    when (FROM_FILES)
-#    {
-#      $name = 'from_files';
-#    }
-#    when (GENERATED)
-#    {
-#      $name = 'generated';
-#    }
-#    default
-#    {
-## TODO: throw internal error.
-#      die;
-#    }
-#  }
-#
-#  return $self->{$name}{$what};
-#}
-
-#sub _get_c_to_cxx ($$)
-#{
-#  my ($self, $which) = @_;
-#
-#  return $self->_get_common ($which, 'c_to_cxx');
-#}
-
-#sub _get_cxx_to_c ($$)
-#{
-#  my ($self, $which) = @_;
-#
-#  return $self->_get_common ($which, 'cxx_to_c');
-#}
 
 sub _get_conversions ($$)
 {
@@ -922,8 +682,6 @@ sub new ($$$)
   };
   my $self =
   {
-#    'generated' => $generated,
-#    'from_files' => $from_files,
     'mm_module' => $mm_module,
     'include_paths' => $include_paths,
     'read_files' => {},
@@ -931,8 +689,8 @@ sub new ($$$)
     'cxx_container_types' => $cxx_container_types,
     'cxx_pointer_types' => $cxx_pointer_types
   };
-  map { $self->{ _which_to_string ($_)} = _create_hierarchy (); } (_desired_order ());
 
+  map { $self->{ _which_to_string ($_)} = _create_hierarchy (); } (_desired_order ());
   $self = bless ($self, $class);
 
   my $convertors =

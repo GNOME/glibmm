@@ -24,15 +24,6 @@ use strict;
 use warnings;
 use feature ':5.10';
 
-use constant
-{
-  'GEN_NONE' => 0,
-  'GEN_NORMAL' => (1 << 0),
-  'GEN_REF' => (1 << 1),
-  'GEN_PTR' => (1 << 2),
-  'GEN_CONST' => (1 << 3)
-};
-
 use Common::Util;
 
 sub extract_token ($)
@@ -44,9 +35,6 @@ sub extract_token ($)
   {
     my $token = shift @{$tokens};
 
-    # skip empty tokens
-    next if (not defined $token or $token eq '');
-
     if ($token =~ /\n/)
     {
       ++$line_change;
@@ -55,7 +43,12 @@ sub extract_token ($)
     return [$token, $line_change];
   }
 
-  return ['', $line_change];
+  return [undef, $line_change];
+}
+
+sub cleanup_tokens
+{
+  return grep { defined and $_ ne '' } @_;
 }
 
 sub extract_bracketed_text ($)
@@ -76,6 +69,10 @@ sub extract_bracketed_text ($)
     last if ($token eq '(');
   }
 
+  my $escape = 0;
+  my $sq = 0;
+  my $dq = 0;
+
   # Concatenate until the corresponding ")":
   while (@{$tokens})
   {
@@ -84,38 +81,12 @@ sub extract_bracketed_text ($)
     my $add_to_line = $result->[1];
 
     $line_change += $add_to_line;
-    ++$level if ($token eq '(');
-    --$level if ($token eq ')');
-
-    return [$str, $line_change] unless $level;
-    $str .= $token;
-  }
-
-  return undef;
-}
-
-sub string_split_commas ($)
-{
-  my ($in) = @_;
-  my @out = ();
-  my $level = 0;
-  my $str = '';
-  my @tokens = split(/([,()"'\\])/, $in);
-  my $sq = 0;
-  my $dq = 0;
-  my $escape = 0;
-
-  while (@tokens)
-  {
-    my $token = shift @tokens;
-
-    next if ($token eq '');
-
     if ($escape)
     {
       # do nothing
+      $escape = 0;
     }
-    if ($sq)
+    elsif ($sq)
     {
       if ($token eq '\'')
       {
@@ -141,25 +112,88 @@ sub string_split_commas ($)
     {
       $dq = 1;
     }
-    elsif ($token eq '(')
+    else
     {
-      ++$level;
-    }
-    elsif ($token eq ')')
-    {
-      --$level;
-    }
-    elsif ($token eq ',' and not $level)
-    {
-      push @out, Common::Util::string_trim $str;
-      $str = '';
-      next;
+      ++$level if ($token eq '(');
+      --$level if ($token eq ')');
     }
 
+    return [$str, $line_change] unless $level;
     $str .= $token;
   }
 
-  push @out, Common::Util::string_trim $str;
+  return undef;
+}
+
+sub string_split_commas ($)
+{
+  my ($in) = @_;
+  my @out = ();
+  my @tokens = cleanup_tokens (split (/([,()"'\\])/, $in));
+
+  if (@tokens)
+  {
+    my $level = 0;
+    my $str = '';
+    my $sq = 0;
+    my $dq = 0;
+    my $escape = 0;
+
+    while (@tokens)
+    {
+      my $token = shift @tokens;
+
+      if ($escape)
+      {
+        # do nothing
+        $escape = 0;
+      }
+      elsif ($sq)
+      {
+        if ($token eq '\'')
+        {
+          $sq = 0;
+        }
+      }
+      elsif ($dq)
+      {
+        if ($token eq '"')
+        {
+          $dq = 0;
+        }
+      }
+      elsif ($token eq '\\')
+      {
+        $escape = 1;
+      }
+      elsif ($token eq '\'')
+      {
+        $sq = 1;
+      }
+      elsif ($token eq '"')
+      {
+        $dq = 1;
+      }
+      elsif ($token eq '(')
+      {
+        ++$level;
+      }
+      elsif ($token eq ')')
+      {
+        --$level;
+      }
+      elsif ($token eq ',' and not $level)
+      {
+        push @out, Common::Util::string_trim $str;
+        $str = '';
+        next;
+      }
+
+      $str .= $token;
+    }
+
+    push (@out, Common::Util::string_trim $str);
+  }
   return @out;
 }
 
@@ -167,88 +201,92 @@ sub string_split_func_params ($)
 {
   my ($in) = @_;
   my @out = ();
-  my $level = 0;
-  my $str = '';
-  my @tokens = split (/([,()"'\\<>{}])/, $in);
-  my $sq = 0;
-  my $dq = 0;
-  my $escape = 0;
-  my @close_stack = ();
-  my %closes = ('(' => ')', '<' => '>', '{' => '}');
+  my @tokens = cleanup_tokens (split(/([,()"'\\<>{}])/, $in));
 
-  while (@tokens)
+  if (@tokens)
   {
-    my $token = shift @tokens;
+    my $level = 0;
+    my $str = '';
+    my $sq = 0;
+    my $dq = 0;
+    my $escape = 0;
+    my @close_stack = ();
+    my %pairs = ('(' => ')', '<' => '>', '{' => '}');
+    my @opens = keys (%pairs);
+    my @closes = values (%pairs);
 
-    next if ($token eq '');
-
-    if ($sq)
+    while (@tokens)
     {
-      if ($escape)
+      my $token = shift @tokens;
+
+      if ($sq)
       {
-        $escape = 0;
+        if ($escape)
+        {
+          $escape = 0;
+        }
+        elsif ($token eq '\'')
+        {
+          $sq = 0;
+        }
+        elsif ($token eq '\\')
+        {
+          $escape = 1;
+        }
+      }
+      elsif ($dq)
+      {
+        if ($escape)
+        {
+          $escape = 0;
+        }
+        elsif ($token eq '"')
+        {
+          $dq = 0;
+        }
+        elsif ($token eq '\\')
+        {
+          $escape = 1;
+        }
       }
       elsif ($token eq '\'')
       {
-        $sq = 0;
-      }
-      elsif ($token eq '\\')
-      {
-        $escape = 1;
-      }
-    }
-    elsif ($dq)
-    {
-      if ($escape)
-      {
-        $escape = 0;
+        $sq = 1;
       }
       elsif ($token eq '"')
       {
-        $dq = 0;
+        $dq = 1;
       }
-      elsif ($token eq '\\')
+      elsif ($token ~~ @opens)
       {
-        $escape = 1;
+        ++$level;
+        push @close_stack, $pairs{$token};
       }
-    }
-    elsif ($token eq '\'')
-    {
-      $sq = 1;
-    }
-    elsif ($token eq '"')
-    {
-      $dq = 1;
-    }
-    elsif ($token eq '(' or $token eq '<' or $token eq '{')
-    {
-      ++$level;
-      push @close_stack, $closes{$token};
-    }
-    elsif ($token eq ')' or $token eq '>' or $token eq '}')
-    {
-      my $expected = pop @close_stack;
+      elsif ($token ~~ @closes)
+      {
+        my $expected = pop @close_stack;
 
-      if ($expected eq $token)
-      {
-        --$level;
+        if ($expected eq $token)
+        {
+          --$level;
+        }
+        else
+        {
+          return [];
+        }
       }
-      else
+      elsif ($token eq ',' and not $level)
       {
-        return [];
+        push @out, Common::Util::string_trim ($str);
+        $str = '';
+        next;
       }
-    }
-    elsif ($token eq ',' and not $level)
-    {
-      push @out, $str;
-      $str = '';
-      next;
+
+      $str .= $token;
     }
 
-    $str .= $token;
+    push @out, Common::Util::string_trim ($str);
   }
-
-  push @out, $str;
   return \@out;
 }
 
@@ -375,18 +413,14 @@ sub parse_function_declaration ($)
 
   $line = Common::Util::string_simplify ($line);
 
-  my @tokens = split /([\s(),"'\\])/, $line;
+  my @tokens = cleanup_tokens (split (/([\s(),"'\\]|\w+)/, $line));
 
   # get before
   while (@tokens)
   {
-    my $token = shift @tokens;
+    my $token = Common::Util::string_trim (shift (@tokens));
 
-    next unless ($token);
-
-    $token = Common::Util::string_trim ($token);
-
-    next unless ($token);
+    next if ($token eq '');
 
     if ($token eq 'static')
     {
@@ -408,8 +442,11 @@ sub parse_function_declaration ($)
   {
     my $token = shift @tokens;
 
-    next unless ($token);
-    last if ($token eq ')');
+    if ($token eq ')')
+    {
+      unshift (@tokens, $token);
+      last;
+    }
     push @after_parts, $token;
   }
 
@@ -421,26 +458,45 @@ sub parse_function_declaration ($)
   }
   @after_parts = undef;
 
+  while (@tokens)
+  {
+    my $token = Common::Util::string_trim (shift (@tokens));
+
+    if ($token ne '')
+    {
+      unshift (@tokens, $token);
+      last;
+    }
+  }
+
   #get params
-  my @params_parts = (')');
-  my $level = 1;
+  my @params_parts = ();
+  my $level = 0;
   my $maybe_dq_change = 0;
   my $dq = 0;
   my $maybe_sq_change = 0;
   my $sq = 0;
+  my $no_push = 0;
 
   while (@tokens)
   {
     my $token = shift @tokens;
 
-    next unless ($token);
-    push @params_parts, $token;
+    if ($no_push)
+    {
+      $no_push = 0;
+    }
+    else
+    {
+      push @params_parts, $token;
+    }
     if ($maybe_dq_change)
     {
       $maybe_dq_change = 0;
       if ($token ne '\\')
       {
         $dq = 0;
+        $no_push = 1;
         unshift @tokens, $token;
       }
     }
@@ -457,6 +513,7 @@ sub parse_function_declaration ($)
       if ($token ne '\\')
       {
         $sq = 0;
+        $no_push = 1;
         unshift @tokens, $token;
       }
     }
@@ -489,66 +546,43 @@ sub parse_function_declaration ($)
     }
   }
 
-  # TODO: this is probably not what we want for string default values.
-  # TODO continued: not sure if we should care about that.
-  # TODO continued: if string parameter's default value holds several consecutive whitespaces
-  # TODO continued: then those ones are going to be changed into single space.
-  my $params = Common::Util::string_trim (join '', reverse @params_parts);
+  my $params = Common::Util::string_trim (join ('', reverse @params_parts));
 
   @params_parts = undef;
   # get rid of whitespaces
   while (@tokens)
   {
-    my $token = shift @tokens;
+    my $token = Common::Util::string_trim (shift (@tokens));
 
-    next unless ($token);
-
-    $token = Common::Util::string_trim ($token);
-
-    next unless ($token);
+    next if ($token eq '');
 
     unshift @tokens, $token;
     last;
   }
 
   my @name_parts = ();
-  my $try_operator = 0;
+  my $try_operator = join ('', reverse (@tokens)) =~ /\boperator\b/;
 
-# TODO: this part needs testing
-  while (@tokens)
+  if ($try_operator)
   {
-    my $token = shift @tokens;
-
-    next unless ($token);
-
-    my $trimmed_token = Common::Util::string_trim ($token);
-
-    if ($try_operator)
+    while (@tokens)
     {
-      if ($trimmed_token)
-      {
-        if ($trimmed_token eq 'operator')
-        {
-          push @name_parts, $trimmed_token . ' ';
-        }
-        else
-        {
-          unshift @tokens, $token . ' ';
-        }
-        last;
-      }
+      my $token = shift (@tokens);
+
+      push (@name_parts, $token);
+
+      last if ($token =~ '\boperator\b');
     }
-    elsif ($trimmed_token)
+  }
+  else
+  {
+    if (@tokens)
     {
-      push @name_parts, $trimmed_token;
-    }
-    else
-    {
-      $try_operator = 1;
+      push (@name_parts, shift (@tokens));
     }
   }
 
-  my $name = Common::Util::string_simplify (join '', reverse @name_parts);
+  my $name = Common::Util::string_simplify (join ('', reverse (@name_parts)));
   my $ret_type = Common::Util::string_simplify (join '', reverse @tokens);
 
   $ret_type = _type_fixup $ret_type;
@@ -556,72 +590,20 @@ sub parse_function_declaration ($)
   return [$before, $ret_type, $name, $params, $after];
 }
 
-sub split_cpp_type_to_sub_types ($)
+sub split_cxx_type_to_sub_types ($)
 {
-  my ($cpp_type) = @_;
-  my @cpp_parts = split '::', $cpp_type;
-  my @cpp_sub_types = ();
+  my ($cxx_type) = @_;
+  my @cxx_parts = split '::', $cxx_type;
+  my @cxx_sub_types = ();
 
-  for (my $iter = 0; $iter < @cpp_parts; ++$iter)
+  for (my $iter = 0; $iter < @cxx_parts; ++$iter)
   {
-    my $cpp_sub_type = join '::', @cpp_parts[$iter .. $#cpp_parts];
+    my $cxx_sub_type = join '::', @cxx_parts[$iter .. $#cxx_parts];
 
-    push @cpp_sub_types, $cpp_sub_type;
+    push @cxx_sub_types, $cxx_sub_type;
   }
 
-  return \@cpp_sub_types;
-}
-
-# prototype needed, because it is recursively called.
-sub gen_cpp_types ($$);
-
-sub gen_cpp_types ($$)
-{
-  my ($all_cpp_types, $flags) = @_;
-
-  if (@{$all_cpp_types} > 0 and $flags != GEN_NONE)
-  {
-    my $outermost_type = $all_cpp_types->[0];
-    my $sub_types = split_cpp_type_to_sub_types ($outermost_type);
-    my @gen_types = ();
-
-    if (@{$all_cpp_types} > 1)
-    {
-      my @further_types = @{$all_cpp_types}[1 .. $#{$all_cpp_types}];
-      my $child_sub_types = gen_cpp_types (\@further_types, $flags);
-
-      @further_types = ();
-      foreach my $sub_type (@{$sub_types})
-      {
-        push @gen_types, map { $sub_type . '< ' . $_ . ' >'} @{$child_sub_types};
-      }
-    }
-    else
-    {
-      push @gen_types, @{$sub_types};
-    }
-
-    my @ret_types = ();
-
-    if ($flags & GEN_NORMAL == GEN_NORMAL)
-    {
-      push @ret_types, @gen_types;
-    }
-    if ($flags & GEN_REF == GEN_REF)
-    {
-      push @ret_types, map { $_ . '&' } @gen_types;
-    }
-    if ($flags & GEN_PTR == GEN_PTR)
-    {
-      push @ret_types, map { $_ . '*' } @gen_types;
-    }
-    if ($flags & GEN_CONST == GEN_CONST)
-    {
-      push @ret_types, map { 'const ' . $_ } @ret_types;
-    }
-    return \@ret_types;
-  }
-  return [];
+  return \@cxx_sub_types;
 }
 
 sub get_args ($$)
@@ -652,7 +634,6 @@ sub get_args ($$)
 # TODO: programming error - throw an exception
       die;
     }
-
   }
 
   my $errors = [];
@@ -660,7 +641,7 @@ sub get_args ($$)
 
   foreach my $arg (@{$args})
   {
-    my ($param, $possible_value) = split /[\s]+/, $arg, 2;
+    my ($param, $possible_value) = split /\s+/, $arg, 2;
 
     unless ($param =~ /^[\w-]+$/)
     {

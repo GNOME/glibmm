@@ -49,7 +49,7 @@ sub disassemble_type ($)
   unless ($parameter_ref)
   {
     # string was passed
-    my @temp_parts = reverse split /(\w+|[()*&<>,`']|::)/, $cxx_type_or_array_ref;
+    my @temp_parts = reverse (Common::Shared::cleanup_tokens (split (/(\w+|[()*&<>,`']|::)/, $cxx_type_or_array_ref)));
 
     $parts = \@temp_parts;
   }

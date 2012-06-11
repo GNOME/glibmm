@@ -22,6 +22,7 @@ package Common::WrapParser;
 
 use strict;
 use warnings;
+use v5.10;
 
 use IO::File;
 
@@ -2315,8 +2316,6 @@ sub _on_namespace_keyword ($)
   # declaration this is.
   foreach my $token (@{$tokens})
   {
-    next if (not defined $token or $token eq '');
-
     if ($in_s_comment)
     {
       if ($token eq "\n")
