@@ -560,12 +560,26 @@ sub endif ($)
 
 sub paramzipstr ($$)
 {
-  my ($array1, $array2) = @_;
-  my $count = @{$array1};
+  my ($types, $names) = @_;
+  my $count = @{$types};
 
 # TODO: throw runtime error or internal error or whatever.
-  die if $count != scalar(@{$array2});
-  return join ', ', map { join ' ', $array1->[$_], $array2->[$_] } 0 .. $count - 1;
+  die if ($count != scalar (@{$names}));
+
+  my @params = ();
+
+  foreach my $index (0 .. $count - 1)
+  {
+    my $type = $types->[$index];
+    my $name = $names->[$index];
+
+    if (defined ($type))
+    {
+      push (@params, join (' ', $type, $name));
+    }
+  }
+
+  return join (', ', @params);
 }
 
 sub get_parent_from_object ($$)
@@ -600,7 +614,28 @@ sub convzipstr ($$$$$)
 
 # TODO: throw runtime error or internal error or whatever.
   die if $from_types_count != $to_types_count or $to_types_count != $transfers_count or $transfers_count != $from_names_count;
-  return join ', ', map { $type_info_local->get_conversion ($from_types->[$_], $to_types->[$_], $transfers->[$_], $from_names->[$_]) } 0 .. $from_types_count - 1;
+
+  my @conversions = ();
+
+  foreach my $index (0 .. $from_types_count - 1)
+  {
+    if (defined ($from_types->[$index]))
+    {
+      push (@conversions,
+            $type_info_local->get_conversion ($from_types->[$index],
+                                              $to_types->[$index],
+                                              $transfers->[$index],
+                                              $from_names->[$index]));
+    }
+    else
+    {
+# TODO: consider using C++11 nullptr
+      push (@conversions,
+            join ('', 'static_cast< ', $to_types->[$index], ' >(0)'));
+    }
+  }
+
+  return join (', ', @conversions);
 }
 
 sub deprecate_start ($)
@@ -645,6 +680,67 @@ sub already_included ($$)
     return 0;
   }
   return 1;
+}
+
+sub get_types_permutations;
+
+sub get_types_permutations
+{
+  my ($param_types, $param_nullables, $index) = @_;
+
+  unless (defined ($index))
+  {
+    $index = 0;
+  }
+
+  my $count = @{$param_types};
+
+  unless ($count)
+  {
+    return [[]];
+  }
+
+  if ($index == $count - 1)
+  {
+    my $permutations = [[$param_types->[$index]]];
+
+    if ($param_nullables->[$index])
+    {
+      push (@{$permutations}, [undef]);
+    }
+
+    return $permutations;
+  }
+
+  my $tail_permutations = get_types_permutations ($param_types, $param_nullables, $index + 1);
+
+  if ($param_nullables->[$index])
+  {
+    my $permutations = [];
+
+    foreach my $tail_permutation (@{$tail_permutations})
+    {
+      push (@{$permutations}, [$param_types->[$index],
+                               @{$tail_permutation}]);
+    }
+
+    foreach my $tail_permutation (@{$tail_permutations})
+    {
+      push (@{$permutations}, [undef,
+                               @{$tail_permutation}]);
+    }
+
+    return $permutations;
+  }
+  else
+  {
+    foreach my $tail_permutation (@{$tail_permutations})
+    {
+      unshift (@{$tail_permutation}, $param_types->[$index]);
+    }
+
+    return $tail_permutations;
+  }
 }
 
 1; # indicate proper module load.

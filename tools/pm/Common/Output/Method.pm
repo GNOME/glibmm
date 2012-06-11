@@ -191,12 +191,16 @@ sub _output_cc ($$$$$$$$$$$$$$$$)
   $section_manager->append_string_to_section ($code_string, $section);
 }
 
-sub output ($$$$$$$$$$$$$$$$)
+sub output ($$$$$$$$$$$$$$$$$)
 {
-  my ($wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $cpp_param_types, $cpp_param_names, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow) = @_;
+  my ($wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $cpp_param_types, $cpp_param_names, $cxx_param_nullables, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow) = @_;
+  my $permutations = Common::Output::Shared::get_types_permutations ($cpp_param_types, $cxx_param_nullables);
 
-  _output_h $wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $cpp_param_types, $cpp_param_names, $const;
-  _output_cc $wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $cpp_param_types, $cpp_param_names, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow;
+  foreach my $permutation (@{$permutations})
+  {
+    _output_h $wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $permutation, $cpp_param_names, $const;
+    _output_cc $wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $permutation, $cpp_param_names, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow;
+  }
 }
 
 1; # indicate proper module load.

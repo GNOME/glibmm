@@ -169,12 +169,12 @@ sub string_split_func_params ($)
   my @out = ();
   my $level = 0;
   my $str = '';
-  my @tokens = split(/([,()"'\\<>])/, $in);
+  my @tokens = split (/([,()"'\\<>{}])/, $in);
   my $sq = 0;
   my $dq = 0;
   my $escape = 0;
   my @close_stack = ();
-  my %closes = ('(' => ')', '<' => '>');
+  my %closes = ('(' => ')', '<' => '>', '{' => '}');
 
   while (@tokens)
   {
@@ -220,12 +220,12 @@ sub string_split_func_params ($)
     {
       $dq = 1;
     }
-    elsif ($token eq '(' or $token eq '<')
+    elsif ($token eq '(' or $token eq '<' or $token eq '{')
     {
       ++$level;
       push @close_stack, $closes{$token};
     }
-    elsif ($token eq ')' or $token eq '>')
+    elsif ($token eq ')' or $token eq '>' or $token eq '}')
     {
       my $expected = pop @close_stack;
 
@@ -292,27 +292,46 @@ sub parse_params ($)
   {
     my @subparts = split ('=', $part);
     my $value = undef;
-    my $rest = Common::Util::string_trim $subparts[0];
-    my $name = undef;
-    my $type = undef;
+    my $rest = Common::Util::string_trim (shift (@subparts));
 
-    if (@subparts > 1)
+    if (@subparts)
     {
-      $value = join '', $subparts[1 .. @subparts - 1];
+      $value = Common::Util::string_trim (join ('', @subparts));
     }
-    if ($rest =~ /^(.+\W)(\w+)$/)
+    if ($rest =~ /^(.+?)(\w+)(?:{([^}]+)})?$/)
     {
-      $type = $1;
-      $name = $2;
+      my $type = $1;
+      my $name = $2;
+      my $param = $3;
+      my $nullable = 0;
+      my $out = 0;
 
+      given ($param)
+      {
+        when ('?')
+        {
+          $nullable = 1;
+        }
+        when (['OUT', 'RET'])
+        {
+          $out = 1;
+        }
+      }
       $type = _type_fixup $type;
+
+      push (@params,
+            {
+              'type' => $type,
+              'name' => $name,
+              'value' => $value,
+              'nullable' => $nullable,
+              'out' => $out
+            });
     }
     else
     {
       return [];
     }
-
-    push @params, {'type' => $type, 'name' => $name, 'value' => $value};
   }
   return \@params;
 }

@@ -36,12 +36,18 @@ sub new_from_string ($$)
   my $params = Common::Shared::parse_params $cxx_parts->[3];
   my $param_types = [];
   my $param_names = [];
+  my $param_values = [];
+  my $param_nullables = [];
+  my $param_outs = [];
   my $const = ($cxx_parts->[4] =~ /\bconst\b/);
 
   foreach my $desc (@{$params})
   {
     push @{$param_types}, $desc->{'type'};
     push @{$param_names}, $desc->{'name'};
+    push @{$param_values}, $desc->{'value'};
+    push (@{$param_nullables}, $desc->{'nullable'});
+    push (@{$param_outs}, $desc->{'out'});
   }
 
   $params = undef;
@@ -53,6 +59,9 @@ sub new_from_string ($$)
     'name' => $name,
     'param_types' => $param_types,
     'param_names' => $param_names,
+    'param_values' => $param_values,
+    'param_nullables' => $param_nullables,
+    'param_outs' => $param_outs,
     'const' => $const
   };
 
@@ -92,6 +101,27 @@ sub get_param_names ($)
   my ($self) = @_;
 
   return $self->{'param_names'};
+}
+
+sub get_param_values ($)
+{
+  my ($self) = @_;
+
+  return $self->{'param_values'};
+}
+
+sub get_param_nullables ($)
+{
+  my ($self) = @_;
+
+  return $self->{'param_nullables'};
+}
+
+sub get_param_outs ($)
+{
+  my ($self) = @_;
+
+  return $self->{'param_outs'};
 }
 
 sub get_const ($)
