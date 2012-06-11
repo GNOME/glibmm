@@ -140,6 +140,10 @@ gm_obj_get_other_t_f (GmObj* obj);
 GmOther*
 gm_obj_get_other_t_n (GmObj* obj);
 
+void
+gm_obj_set_string_allow_none (GmObj* obj,
+                              const gchar* str);
+
 G_END_DECLS
 
 #endif /* GLIBMM_TEST_GM_OBJ_H */

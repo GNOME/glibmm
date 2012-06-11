@@ -802,3 +802,17 @@ gm_obj_get_other_t_n (GmObj* obj)
 
   return obj->priv->other;
 }
+
+/**
+ * gm_obj_set_string_allow_none:
+ * @obj: A #GmObj.
+ * @str: (transfer none) (allow-none): A string or %NULL.
+ *
+ * Does nothing actually.
+ */
+void
+gm_obj_set_string_allow_none (GmObj* obj,
+                              const gchar* str)
+{
+  g_return_if_fail (GM_IS_OBJ (obj));
+}
