@@ -1114,6 +1114,19 @@
   )
 )
 
+(define-enum RecordType
+  (in-module "GResolver")
+  (c-name "GResolverRecordType")
+  (gtype-id "G_TYPE_RESOLVER_RECORD_TYPE")
+  (values
+    '("srv" "G_RESOLVER_RECORD_SRV")
+    '("mx" "G_RESOLVER_RECORD_MX")
+    '("txt" "G_RESOLVER_RECORD_TXT")
+    '("soa" "G_RESOLVER_RECORD_SOA")
+    '("ns" "G_RESOLVER_RECORD_NS")
+  )
+)
+
 (define-enum Error
   (in-module "GResource")
   (c-name "GResourceError")
@@ -1606,6 +1619,15 @@
   )
 )
 
+(define-enum DBusFlags
+  (in-module "GTest")
+  (c-name "GTestDBusFlags")
+  (gtype-id "G_TYPE_TEST_DBUS_FLAGS")
+  (values
+    '("none" "G_TEST_DBUS_NONE")
+  )
+)
+
 (define-flags BindFlags
   (in-module "GSettings")
   (c-name "GSettingsBindFlags")
@@ -2057,6 +2079,12 @@
   )
 )
 
+(define-method get_supported_types
+  (of-object "GAppInfo")
+  (c-name "g_app_info_get_supported_types")
+  (return-type "const-char**")
+)
+
 (define-method can_delete
   (of-object "GAppInfo")
   (c-name "g_app_info_can_delete")
@@ -2334,6 +2362,18 @@
   (parameters
     '("const-gchar*" "application_id")
   )
+)
+
+(define-method get_dbus_connection
+  (of-object "GApplication")
+  (c-name "g_application_get_dbus_connection")
+  (return-type "GDBusConnection*")
+)
+
+(define-method get_dbus_object_path
+  (of-object "GApplication")
+  (c-name "g_application_get_dbus_object_path")
+  (return-type "const-gchar*")
 )
 
 (define-method get_inactivity_timeout
@@ -3628,6 +3668,15 @@
   )
 )
 
+(define-method allow_mechanism
+  (of-object "GDBusAuthObserver")
+  (c-name "g_dbus_auth_observer_allow_mechanism")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "mechanism")
+  )
+)
+
 
 
 ;; From gdbusconnection.h
@@ -3771,6 +3820,12 @@
   (of-object "GDBusConnection")
   (c-name "g_dbus_connection_get_peer_credentials")
   (return-type "GCredentials*")
+)
+
+(define-method get_last_serial
+  (of-object "GDBusConnection")
+  (c-name "g_dbus_connection_get_last_serial")
+  (return-type "guint32")
 )
 
 (define-method get_exit_on_close
@@ -4110,6 +4165,14 @@
     '("guint" "filter_id")
   )
 )
+
+
+
+;; From gdbus-daemon-generated.h
+
+
+
+;; From gdbusdaemon.h
 
 
 
@@ -6046,6 +6109,12 @@
   (parameters
     '("const-gchar*" "desktop_env")
   )
+)
+
+(define-method get_startup_wm_class
+  (of-object "GDesktopAppInfo")
+  (c-name "g_desktop_app_info_get_startup_wm_class")
+  (return-type "const-char*")
 )
 
 (define-function g_desktop_app_info_new
@@ -9101,6 +9170,17 @@
   )
 )
 
+(define-method read_bytes
+  (of-object "GInputStream")
+  (c-name "g_input_stream_read_bytes")
+  (return-type "GBytes*")
+  (parameters
+    '("gsize" "count")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
 (define-method skip
   (of-object "GInputStream")
   (c-name "g_input_stream_skip")
@@ -9140,6 +9220,29 @@
   (of-object "GInputStream")
   (c-name "g_input_stream_read_finish")
   (return-type "gssize")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method read_bytes_async
+  (of-object "GInputStream")
+  (c-name "g_input_stream_read_bytes_async")
+  (return-type "none")
+  (parameters
+    '("gsize" "count")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_bytes_finish
+  (of-object "GInputStream")
+  (c-name "g_input_stream_read_bytes_finish")
+  (return-type "GBytes*")
   (parameters
     '("GAsyncResult*" "result")
     '("GError**" "error")
@@ -9361,6 +9464,11 @@
   (return-type "GType")
 )
 
+(define-function g_resolver_record_type_get_type
+  (c-name "g_resolver_record_type_get_type")
+  (return-type "GType")
+)
+
 (define-function g_resource_error_get_type
   (c-name "g_resource_error_get_type")
   (return-type "GType")
@@ -9558,6 +9666,11 @@
 
 (define-function g_socket_client_event_get_type
   (c-name "g_socket_client_event_get_type")
+  (return-type "GType")
+)
+
+(define-function g_test_dbus_flags_get_type
+  (c-name "g_test_dbus_flags_get_type")
   (return-type "GType")
 )
 
@@ -10038,6 +10151,14 @@
   )
 )
 
+(define-function g_memory_input_stream_new_from_bytes
+  (c-name "g_memory_input_stream_new_from_bytes")
+  (return-type "GInputStream*")
+  (parameters
+    '("GBytes*" "bytes")
+  )
+)
+
 (define-method add_data
   (of-object "GMemoryInputStream")
   (c-name "g_memory_input_stream_add_data")
@@ -10046,6 +10167,15 @@
     '("const-void*" "data")
     '("gssize" "len")
     '("GDestroyNotify" "destroy")
+  )
+)
+
+(define-method add_bytes
+  (of-object "GMemoryInputStream")
+  (c-name "g_memory_input_stream_add_bytes")
+  (return-type "none")
+  (parameters
+    '("GBytes*" "bytes")
   )
 )
 
@@ -10092,6 +10222,12 @@
   (of-object "GMemoryOutputStream")
   (c-name "g_memory_output_stream_steal_data")
   (return-type "gpointer")
+)
+
+(define-method steal_as_bytes
+  (of-object "GMemoryOutputStream")
+  (c-name "g_memory_output_stream_steal_as_bytes")
+  (return-type "GBytes*")
 )
 
 
@@ -11141,6 +11277,17 @@
   )
 )
 
+(define-method write_bytes
+  (of-object "GOutputStream")
+  (c-name "g_output_stream_write_bytes")
+  (return-type "gssize")
+  (parameters
+    '("GBytes*" "bytes")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
 (define-method splice
   (of-object "GOutputStream")
   (c-name "g_output_stream_splice")
@@ -11190,6 +11337,29 @@
 (define-method write_finish
   (of-object "GOutputStream")
   (c-name "g_output_stream_write_finish")
+  (return-type "gssize")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method write_bytes_async
+  (of-object "GOutputStream")
+  (c-name "g_output_stream_write_bytes_async")
+  (return-type "none")
+  (parameters
+    '("GBytes*" "bytes")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method write_bytes_finish
+  (of-object "GOutputStream")
+  (c-name "g_output_stream_write_bytes_finish")
   (return-type "gssize")
   (parameters
     '("GAsyncResult*" "result")
@@ -11434,18 +11604,9 @@
   (return-type "gssize")
   (parameters
     '("void*" "buffer")
-    '("gsize" "size")
+    '("gsize" "count")
     '("GCancellable*" "cancellable")
     '("GError**" "error")
-  )
-)
-
-(define-function g_pollable_source_new
-  (c-name "g_pollable_source_new")
-  (is-constructor-of "GPollableSource")
-  (return-type "GSource*")
-  (parameters
-    '("GObject*" "pollable_stream")
   )
 )
 
@@ -11485,7 +11646,70 @@
   (return-type "gssize")
   (parameters
     '("const-void*" "buffer")
-    '("gsize" "size")
+    '("gsize" "count")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gpollableutils.h
+
+(define-function g_pollable_source_new
+  (c-name "g_pollable_source_new")
+  (is-constructor-of "GPollableSource")
+  (return-type "GSource*")
+  (parameters
+    '("GObject*" "pollable_stream")
+  )
+)
+
+(define-function g_pollable_source_new_full
+  (c-name "g_pollable_source_new_full")
+  (return-type "GSource*")
+  (parameters
+    '("gpointer" "pollable_stream")
+    '("GSource*" "child_source")
+    '("GCancellable*" "cancellable")
+  )
+)
+
+(define-function g_pollable_stream_read
+  (c-name "g_pollable_stream_read")
+  (return-type "gssize")
+  (parameters
+    '("GInputStream*" "stream")
+    '("void*" "buffer")
+    '("gsize" "count")
+    '("gboolean" "blocking")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_pollable_stream_write
+  (c-name "g_pollable_stream_write")
+  (return-type "gssize")
+  (parameters
+    '("GOutputStream*" "stream")
+    '("const-void*" "buffer")
+    '("gsize" "count")
+    '("gboolean" "blocking")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_pollable_stream_write_all
+  (c-name "g_pollable_stream_write_all")
+  (return-type "gboolean")
+  (parameters
+    '("GOutputStream*" "stream")
+    '("const-void*" "buffer")
+    '("gsize" "count")
+    '("gboolean" "blocking")
+    '("gsize*" "bytes_written")
     '("GCancellable*" "cancellable")
     '("GError**" "error")
   )
@@ -11534,6 +11758,12 @@
   (return-type "const-gchar*")
 )
 
+(define-method get_destination_protocol
+  (of-object "GProxyAddress")
+  (c-name "g_proxy_address_get_destination_protocol")
+  (return-type "const-gchar*")
+)
+
 (define-method get_destination_hostname
   (of-object "GProxyAddress")
   (c-name "g_proxy_address_get_destination_hostname")
@@ -11555,6 +11785,12 @@
 (define-method get_password
   (of-object "GProxyAddress")
   (c-name "g_proxy_address_get_password")
+  (return-type "const-gchar*")
+)
+
+(define-method get_uri
+  (of-object "GProxyAddress")
+  (c-name "g_proxy_address_get_uri")
   (return-type "const-gchar*")
 )
 
@@ -11828,6 +12064,41 @@
 (define-method lookup_service_finish
   (of-object "GResolver")
   (c-name "g_resolver_lookup_service_finish")
+  (return-type "GList*")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method lookup_records
+  (of-object "GResolver")
+  (c-name "g_resolver_lookup_records")
+  (return-type "GList*")
+  (parameters
+    '("const-gchar*" "rrname")
+    '("GResolverRecordType" "record_type")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method lookup_records_async
+  (of-object "GResolver")
+  (c-name "g_resolver_lookup_records_async")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "rrname")
+    '("GResolverRecordType" "record_type")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method lookup_records_finish
+  (of-object "GResolver")
+  (c-name "g_resolver_lookup_records_finish")
   (return-type "GList*")
   (parameters
     '("GAsyncResult*" "result")
@@ -12875,6 +13146,15 @@
   (of-object "GSimpleAsyncResult")
   (c-name "g_simple_async_result_get_op_res_gboolean")
   (return-type "gboolean")
+)
+
+(define-method set_check_cancellable
+  (of-object "GSimpleAsyncResult")
+  (c-name "g_simple_async_result_set_check_cancellable")
+  (return-type "none")
+  (parameters
+    '("GCancellable*" "check_cancellable")
+  )
 )
 
 (define-method get_source_tag
@@ -14336,6 +14616,68 @@
   (of-object "GTcpWrapperConnection")
   (c-name "g_tcp_wrapper_connection_get_base_io_stream")
   (return-type "GIOStream*")
+)
+
+
+
+;; From gtestdbus.h
+
+(define-function g_test_dbus_get_type
+  (c-name "g_test_dbus_get_type")
+  (return-type "GType")
+)
+
+(define-function g_test_dbus_new
+  (c-name "g_test_dbus_new")
+  (is-constructor-of "GTestDbus")
+  (return-type "GTestDBus*")
+  (parameters
+    '("GTestDBusFlags" "flags")
+  )
+)
+
+(define-method get_flags
+  (of-object "GTestDBus")
+  (c-name "g_test_dbus_get_flags")
+  (return-type "GTestDBusFlags")
+)
+
+(define-method get_bus_address
+  (of-object "GTestDBus")
+  (c-name "g_test_dbus_get_bus_address")
+  (return-type "const-gchar*")
+)
+
+(define-method add_service_dir
+  (of-object "GTestDBus")
+  (c-name "g_test_dbus_add_service_dir")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "path")
+  )
+)
+
+(define-method up
+  (of-object "GTestDBus")
+  (c-name "g_test_dbus_up")
+  (return-type "none")
+)
+
+(define-method stop
+  (of-object "GTestDBus")
+  (c-name "g_test_dbus_stop")
+  (return-type "none")
+)
+
+(define-method down
+  (of-object "GTestDBus")
+  (c-name "g_test_dbus_down")
+  (return-type "none")
+)
+
+(define-function g_test_dbus_unset
+  (c-name "g_test_dbus_unset")
+  (return-type "none")
 )
 
 
