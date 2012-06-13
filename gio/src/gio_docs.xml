@@ -1593,6 +1593,28 @@ cancellable signal should not do something that can block.
 <return></return>
 </signal>
 
+<signal name="GDBusAuthObserver::allow-mechanism">
+<description>
+Emitted to check if @mechanism is allowed to be used.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="observer">
+<parameter_description> The #GDBusAuthObserver emitting the signal.
+</parameter_description>
+</parameter>
+<parameter name="mechanism">
+<parameter_description> The name of the mechanism, e.g. &lt;literal&gt;DBUS_COOKIE_SHA1&lt;/literal&gt;.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @mechanism can be used to authenticate the other peer, %FALSE if not.
+
+</return>
+</signal>
+
 <signal name="GDBusAuthObserver::authorize-authenticated-peer">
 <description>
 Emitted to check if a peer that is successfully authenticated
@@ -2146,7 +2168,7 @@ Since: 2.22
 Emitted when @file has been changed.
 
 If using #G_FILE_MONITOR_SEND_MOVED flag and @event_type is
-#G_FILE_MONITOR_SEND_MOVED, @file will be set to a #GFile containing the
+#G_FILE_MONITOR_EVENT_MOVED, @file will be set to a #GFile containing the
 old path, and @other_file will be set to a #GFile containing the new path.
 
 In all the other cases, @other_file will be set to #NULL.
@@ -17190,6 +17212,12 @@ content types from a given @appinfo, %FALSE if not.
 <description>
 Creates a new #GAppInfo from the given information.
 
+Note that for @commandline, the quoting rules of the Exec key of the
+&lt;ulink url=&quot;http://freedesktop.org/Standards/desktop-entry-spec&quot;&gt;freedesktop.org Desktop
+Entry Specification&lt;/ulink&gt; are applied. For example, if the @commandline contains
+percent-encoded URIs, the percent-character must be doubled in order to prevent it from
+being swallowed by Exec key unquoting. See the specification for exact quoting rules.
+
 
 </description>
 <parameters>
@@ -17524,6 +17552,30 @@ Since: 2.28
 </parameters>
 <return> #GList of #GAppInfos
 for given @content_type or %NULL on error.
+
+</return>
+</function>
+
+<function name="g_app_info_get_supported_types">
+<description>
+Retrieves the list of content types that @app_info claims to support.
+If this information is not provided by the environment, this function
+will return %NULL.
+This function does not take in consideration associations added with
+g_app_info_add_supports_type(), but only those exported directly by
+the application.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GAppInfo that can handle files
+</parameter_description>
+</parameter>
+</parameters>
+<return>
+a list of content types.
 
 </return>
 </function>
@@ -18290,6 +18342,67 @@ Since: 2.28
 </return>
 </function>
 
+<function name="g_application_get_dbus_connection">
+<description>
+Gets the #GDBusConnection being used by the application, or %NULL.
+
+If #GApplication is using its D-Bus backend then this function will
+return the #GDBusConnection being used for uniqueness and
+communication with the desktop environment and other instances of the
+application.
+
+If #GApplication is not using D-Bus then this function will return
+%NULL.  This includes the situation where the D-Bus backend would
+normally be in use but we were unable to connect to the bus.
+
+This function must not be called before the application has been
+registered.  See g_application_get_is_registered().
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GApplication
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GDBusConnection, or %NULL
+
+</return>
+</function>
+
+<function name="g_application_get_dbus_object_path">
+<description>
+Gets the D-Bus object path being used by the application, or %NULL.
+
+If #GApplication is using its D-Bus backend then this function will
+return the D-Bus object path that #GApplication is using.  If the
+application is the primary instance then there is an object published
+at this path.  If the application is not the primary instance then
+the result of this function is undefined.
+
+If #GApplication is not using D-Bus then this function will return
+%NULL.  This includes the situation where the D-Bus backend would
+normally be in use but we were unable to connect to the bus.
+
+This function must not be called before the application has been
+registered.  See g_application_get_is_registered().
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GApplication
+</parameter_description>
+</parameter>
+</parameters>
+<return> the object path, or %NULL
+
+</return>
+</function>
+
 <function name="g_application_get_default">
 <description>
 Returns the default #GApplication instance for this process.
@@ -18454,7 +18567,11 @@ Creates a new #GApplication instance.
 
 This function calls g_type_init() for you.
 
-The application id must be valid.  See g_application_id_is_valid().
+If non-%NULL, the application id must be valid.  See
+g_application_id_is_valid().
+
+If no application ID is given then some features of #GApplication
+(most notably application uniqueness) will be disabled.
 
 
 </description>
@@ -18547,6 +18664,9 @@ primary instance.  This is implemented by attempting to acquire the
 application identifier as a unique bus name on the session bus using
 GDBus.
 
+If there is no application ID or if %G_APPLICATION_NON_UNIQUE was
+given, then this process will always become the primary instance.
+
 Due to the internal architecture of GDBus, method calls can be
 dispatched at any time (even if a main loop is not running).  For
 this reason, you must ensure that any object paths that you wish to
@@ -18556,7 +18676,8 @@ If the application has already been registered then %TRUE is
 returned with no work performed.
 
 The #GApplication::startup signal is emitted if registration succeeds
-and @application is the primary instance.
+and @application is the primary instance (including the non-unique
+case).
 
 In the event of an error (such as @cancellable being cancelled, or a
 failure to connect to the session bus), %FALSE is returned and @error
@@ -18732,7 +18853,8 @@ Sets the unique identifier for @application.
 The application id can only be modified if @application has not yet
 been registered.
 
-The application id must be valid.  See g_application_id_is_valid().
+If non-%NULL, the application id must be valid.  See
+g_application_id_is_valid().
 
 Since: 2.28
 
@@ -22435,6 +22557,28 @@ Since: 2.26
 <return></return>
 </function>
 
+<function name="g_dbus_auth_observer_allow_mechanism">
+<description>
+Emits the #GDBusAuthObserver::allow-mechanism signal on @observer.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="observer">
+<parameter_description> A #GDBusAuthObserver.
+</parameter_description>
+</parameter>
+<parameter name="mechanism">
+<parameter_description> The name of the mechanism, e.g. &lt;literal&gt;DBUS_COOKIE_SHA1&lt;/literal&gt;.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @mechanism can be used to authenticate the other peer, %FALSE if not.
+
+</return>
+</function>
+
 <function name="g_dbus_auth_observer_authorize_authenticated_peer">
 <description>
 Emits the #GDBusAuthObserver::authorize-authenticated-peer signal on @observer.
@@ -23327,6 +23471,29 @@ Since: 2.26
 </parameters>
 <return> The GUID. Do not free this string, it is owned by
 @connection.
+
+</return>
+</function>
+
+<function name="g_dbus_connection_get_last_serial">
+<description>
+Retrieves the last serial number assigned to a #GDBusMessage on
+the current thread. This includes messages sent via both low-level
+API such as g_dbus_connection_send_message() as well as
+high-level API such as g_dbus_connection_emit_signal(),
+g_dbus_connection_call() or g_dbus_proxy_call().
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the last used serial or zero when no message has been sent
+within the current thread.
 
 </return>
 </function>
@@ -29218,6 +29385,27 @@ Since: 2.30
 <return> %TRUE if the @info should be shown in @desktop_env according to the
 &lt;literal&gt;OnlyShowIn&lt;/literal&gt; and &lt;literal&gt;NotShowIn&lt;/literal&gt; keys, %FALSE
 otherwise.
+
+</return>
+</function>
+
+<function name="g_desktop_app_info_get_startup_wm_class">
+<description>
+Retrieves the StartupWMClass field from @app_info. This represents the
+WM_CLASS property of the main window of the application, if launched through
+@app_info.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="app_info">
+<parameter_description> a #GDesktopAppInfo that supports startup notify
+</parameter_description>
+</parameter>
+</parameters>
+<return> the startup WM class, or %NULL if none is set
+in the desktop file.
 
 </return>
 </function>
@@ -37693,7 +37881,7 @@ operation will finish as much as possible. A stream that failed to
 close will still return %G_IO_ERROR_CLOSED for all operations. Still, it
 is important to check and report the error to the user.
 
-If @cancellable is not NULL, then the operation can be cancelled by
+If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 Cancelling a close will still leave the stream closed, but some streams
@@ -37829,9 +38017,9 @@ It is not an error if this is not the same as the requested size, as it
 can happen e.g. near the end of a file. Zero is returned on end of file
 (or if @count is zero),  but never otherwise.
 
-If @cancellable is not NULL, then the operation can be cancelled by
+If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error G_IO_ERROR_CANCELLED will be returned. If an
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. If an
 operation was partially finished when the operation was cancelled the
 partial result will be returned, without an error.
 
@@ -37861,7 +38049,7 @@ On error -1 is returned and @error is set accordingly.
 </parameter_description>
 </parameter>
 </parameters>
-<return> Number of bytes read, or -1 on error
+<return> Number of bytes read, or -1 on error, or 0 on end of file.
 </return>
 </function>
 
@@ -37974,6 +38162,136 @@ of the request.
 <return></return>
 </function>
 
+<function name="g_input_stream_read_bytes">
+<description>
+Like g_input_stream_read(), this tries to read @count bytes from
+the stream in a blocking fashion. However, rather than reading into
+a user-supplied buffer, this will create a new #GBytes containing
+the data that was read. This may be easier to use from language
+bindings.
+
+If count is zero, returns a zero-length #GBytes and does nothing. A
+value of @count larger than %G_MAXSSIZE will cause a
+%G_IO_ERROR_INVALID_ARGUMENT error.
+
+On success, a new #GBytes is returned. It is not an error if the
+size of this object is not the same as the requested size, as it
+can happen e.g. near the end of a file. A zero-length #GBytes is
+returned on end of file (or if @count is zero), but never
+otherwise.
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. If an
+operation was partially finished when the operation was cancelled the
+partial result will be returned, without an error.
+
+On error %NULL is returned and @error is set accordingly.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GInputStream.
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> maximum number of bytes that will be read from the stream. Common
+values include 4096 and 8192.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store the error occurring, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GBytes, or %NULL on error
+</return>
+</function>
+
+<function name="g_input_stream_read_bytes_async">
+<description>
+Request an asynchronous read of @count bytes from the stream into a
+new #GBytes. When the operation is finished @callback will be
+called. You can then call g_input_stream_read_bytes_finish() to get the
+result of the operation.
+
+During an async request no other sync and async calls are allowed
+on @stream, and will result in %G_IO_ERROR_PENDING errors.
+
+A value of @count larger than %G_MAXSSIZE will cause a
+%G_IO_ERROR_INVALID_ARGUMENT error.
+
+On success, the new #GBytes will be passed to the callback. It is
+not an error if this is smaller than the requested size, as it can
+happen e.g. near the end of a file, but generally we try to read as
+many bytes as requested. Zero is returned on end of file (or if
+@count is zero), but never otherwise.
+
+Any outstanding I/O request with higher priority (lower numerical
+value) will be executed before an outstanding request with lower
+priority. Default priority is %G_PRIORITY_DEFAULT.
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> A #GInputStream.
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of bytes that will be read from the stream
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_input_stream_read_bytes_finish">
+<description>
+Finishes an asynchronous stream read-into-#GBytes operation.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GInputStream.
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occurring, or %NULL to
+ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly-allocated #GBytes, or %NULL on error
+</return>
+</function>
+
 <function name="g_input_stream_read_finish">
 <description>
 Finishes an asynchronous stream read operation. 
@@ -37995,7 +38313,7 @@ ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> number of bytes read in, or -1 on error.
+<return> number of bytes read in, or -1 on error, or 0 on end of file.
 </return>
 </function>
 
@@ -39198,6 +39516,26 @@ Returns a new #GVfs handle for a local vfs.
 </return>
 </function>
 
+<function name="g_memory_input_stream_add_bytes">
+<description>
+Appends @bytes to data that can be read from the input stream.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GMemoryInputStream
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> input data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_memory_input_stream_add_data">
 <description>
 Appends @data to data that can be read from the input stream
@@ -39233,6 +39571,23 @@ Creates a new empty #GMemoryInputStream.
 <parameters>
 </parameters>
 <return> a new #GInputStream
+</return>
+</function>
+
+<function name="g_memory_input_stream_new_from_bytes">
+<description>
+Creates a new #GMemoryInputStream with data from the given @bytes.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="bytes">
+<parameter_description> a #GBytes
+</parameter_description>
+</parameter>
+</parameters>
+<return> new #GInputStream read from @bytes
 </return>
 </function>
 
@@ -39372,6 +39727,25 @@ finalized, or %NULL
 </return>
 </function>
 
+<function name="g_memory_output_stream_steal_as_bytes">
+<description>
+Returns data from the @ostream as a #GBytes. @ostream must be
+closed before calling this function.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="ostream">
+<parameter_description> a #GMemoryOutputStream
+</parameter_description>
+</parameter>
+</parameters>
+<return> the stream's data
+
+</return>
+</function>
+
 <function name="g_memory_output_stream_steal_data">
 <description>
 Gets any loaded data from the @ostream. Ownership of the data
@@ -39416,7 +39790,7 @@ Since: 2.28
 <function name="g_menu_append">
 <description>
 Convenience function for appending a normal menu item to the end of
-@menu.  Combine g_menu_new() and g_menu_insert_item() for a more
+@menu.  Combine g_menu_item_new() and g_menu_insert_item() for a more
 flexible alternative.
 
 Since: 2.32
@@ -39647,7 +40021,7 @@ Since: 2.32
 <function name="g_menu_insert">
 <description>
 Convenience function for inserting a normal menu item into @menu.
-Combine g_menu_new() and g_menu_insert_item() for a more flexible
+Combine g_menu_item_new() and g_menu_insert_item() for a more flexible
 alternative.
 
 Since: 2.32
@@ -40616,7 +40990,7 @@ Since: 2.32
 <function name="g_menu_prepend">
 <description>
 Convenience function for prepending a normal menu item to the start
-of @menu.  Combine g_menu_new() and g_menu_insert_item() for a more
+of @menu.  Combine g_menu_item_new() and g_menu_insert_item() for a more
 flexible alternative.
 
 Since: 2.32
@@ -42224,7 +42598,7 @@ close will still return %G_IO_ERROR_CLOSED for all operations. Still, it
 is important to check and report the error to the user, otherwise
 there might be a loss of data as all data might not be written.
 
-If @cancellable is not NULL, then the operation can be cancelled by
+If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 Cancelling a close will still leave the stream closed, but there some streams
@@ -42609,7 +42983,7 @@ storage in the stream. All writes block until at least one byte
 is written or an error occurs; 0 is never returned (unless
 @count is 0).
 
-If @cancellable is not NULL, then the operation can be cancelled by
+If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. If an
 operation was partially finished when the operation was cancelled the
@@ -42658,7 +43032,7 @@ write as many bytes as requested, only stopping on an error.
 On a successful write of @count bytes, %TRUE is returned, and @bytes_written
 is set to @count.
 
-If there is an error during the operation FALSE is returned and @error
+If there is an error during the operation %FALSE is returned and @error
 is set to indicate the error status, @bytes_written is updated to contain
 the number of bytes written into the stream before the error occurred.
 
@@ -42760,6 +43134,137 @@ g_output_stream_write().
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_output_stream_write_bytes">
+<description>
+Tries to write the data from @bytes into the stream. Will block
+during the operation.
+
+If @bytes is 0-length, returns 0 and does nothing. A #GBytes larger
+than %G_MAXSSIZE will cause a %G_IO_ERROR_INVALID_ARGUMENT error.
+
+On success, the number of bytes written to the stream is returned.
+It is not an error if this is not the same as the requested size, as it
+can happen e.g. on a partial I/O error, or if there is not enough
+storage in the stream. All writes block until at least one byte
+is written or an error occurs; 0 is never returned (unless
+the size of @bytes is 0).
+
+If @cancellable is not %NULL, then the operation can be cancelled by
+triggering the cancellable object from another thread. If the operation
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. If an
+operation was partially finished when the operation was cancelled the
+partial result will be returned, without an error.
+
+On error -1 is returned and @error is set accordingly.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> the #GBytes to write
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional cancellable object
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store the error occurring, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> Number of bytes written, or -1 on error
+</return>
+</function>
+
+<function name="g_output_stream_write_bytes_async">
+<description>
+Request an asynchronous write of the data in @bytes to the stream.
+When the operation is finished @callback will be called. You can
+then call g_output_stream_write_bytes_finish() to get the result of
+the operation.
+
+During an async request no other sync and async calls are allowed,
+and will result in %G_IO_ERROR_PENDING errors.
+
+A #GBytes larger than %G_MAXSSIZE will cause a
+%G_IO_ERROR_INVALID_ARGUMENT error.
+
+On success, the number of bytes written will be passed to the
+@callback. It is not an error if this is not the same as the
+requested size, as it can happen e.g. on a partial I/O error,
+but generally we try to write as many bytes as requested.
+
+You are guaranteed that this method will never fail with
+%G_IO_ERROR_WOULD_BLOCK - if @stream can't accept more data, the
+method will just wait until this changes.
+
+Any outstanding I/O request with higher priority (lower numerical
+value) will be executed before an outstanding request with lower
+priority. Default priority is %G_PRIORITY_DEFAULT.
+
+For the synchronous, blocking version of this function, see
+g_output_stream_write_bytes().
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> A #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> The bytes to write
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the io priority of the request.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_output_stream_write_bytes_finish">
+<description>
+Finishes a stream write-from-#GBytes operation.
+
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occurring, or %NULL to
+ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #gssize containing the number of bytes written to the stream.
+</return>
 </function>
 
 <function name="g_output_stream_write_finish">
@@ -43180,7 +43685,7 @@ next attempt to read will return the error.
 
 <function name="g_pollable_input_stream_read_nonblocking">
 <description>
-Attempts to read up to @size bytes from @stream into @buffer, as
+Attempts to read up to @count bytes from @stream into @buffer, as
 with g_input_stream_read(). If @stream is not currently readable,
 this will immediately return %G_IO_ERROR_WOULD_BLOCK, and you can
 use g_pollable_input_stream_create_source() to create a #GSource
@@ -43201,11 +43706,11 @@ Virtual: read_nonblocking
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to read data into (which should be at least @size
+<parameter_description> a buffer to read data into (which should be at least @count
 bytes long).
 </parameter_description>
 </parameter>
-<parameter name="size">
+<parameter name="count">
 <parameter_description> the number of bytes you want to read
 </parameter_description>
 </parameter>
@@ -43306,7 +43811,7 @@ next attempt to write will return the error.
 
 <function name="g_pollable_output_stream_write_nonblocking">
 <description>
-Attempts to write up to @size bytes from @buffer to @stream, as
+Attempts to write up to @count bytes from @buffer to @stream, as
 with g_output_stream_write(). If @stream is not currently writable,
 this will immediately return %G_IO_ERROR_WOULD_BLOCK, and you can
 use g_pollable_output_stream_create_source() to create a #GSource
@@ -43331,7 +43836,7 @@ Virtual: write_nonblocking
 data from
 </parameter_description>
 </parameter>
-<parameter name="size">
+<parameter name="count">
 <parameter_description> the number of bytes you want to write
 </parameter_description>
 </parameter>
@@ -43371,9 +43876,196 @@ Since: 2.28
 </return>
 </function>
 
+<function name="g_pollable_source_new_full">
+<description>
+Utility method for #GPollableInputStream and #GPollableOutputStream
+implementations. Creates a new #GSource, as with
+g_pollable_source_new(), but also attaching @child_source (with a
+dummy callback), and @cancellable, if they are non-%NULL.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="pollable_stream">
+<parameter_description> the stream associated with the
+new source
+</parameter_description>
+</parameter>
+<parameter name="child_source">
+<parameter_description> optional child source to attach
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable to attach
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GSource.
+
+</return>
+</function>
+
+<function name="g_pollable_stream_read">
+<description>
+Tries to read from @stream, as with g_input_stream_read() (if
+@blocking is %TRUE) or g_pollable_input_stream_read_nonblocking()
+(if @blocking is %FALSE). This can be used to more easily share
+code between blocking and non-blocking implementations of a method.
+
+If @blocking is %FALSE, then @stream must be a
+#GPollableInputStream for which g_pollable_input_stream_can_poll()
+returns %TRUE, or else the behavior is undefined. If @blocking is
+%TRUE, then @stream does not need to be a #GPollableInputStream.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GInputStream
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a buffer to read data into
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of bytes to read
+</parameter_description>
+</parameter>
+<parameter name="blocking">
+<parameter_description> whether to do blocking I/O
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store the error occurring, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of bytes read, or -1 on error.
+
+</return>
+</function>
+
+<function name="g_pollable_stream_write">
+<description>
+Tries to write to @stream, as with g_output_stream_write() (if
+@blocking is %TRUE) or g_pollable_output_stream_write_nonblocking()
+(if @blocking is %FALSE). This can be used to more easily share
+code between blocking and non-blocking implementations of a method.
+
+If @blocking is %FALSE, then @stream must be a
+#GPollableOutputStream for which
+g_pollable_output_stream_can_poll() returns %TRUE or else the
+behavior is undefined. If @blocking is %TRUE, then @stream does not
+need to be a #GPollableOutputStream.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> the buffer
+containing the data to write.
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of bytes to write
+</parameter_description>
+</parameter>
+<parameter name="blocking">
+<parameter_description> whether to do blocking I/O
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store the error occurring, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of bytes written, or -1 on error.
+
+</return>
+</function>
+
+<function name="g_pollable_stream_write_all">
+<description>
+Tries to write @count bytes to @stream, as with
+g_output_stream_write_all(), but using g_pollable_stream_write()
+rather than g_output_stream_write().
+
+On a successful write of @count bytes, %TRUE is returned, and
+@bytes_written is set to @count.
+
+If there is an error during the operation (including
+%G_IO_ERROR_WOULD_BLOCK in the non-blocking case), %FALSE is
+returned and @error is set to indicate the error status,
+@bytes_written is updated to contain the number of bytes written
+into the stream before the error occurred.
+
+As with g_pollable_stream_write(), if @blocking is %FALSE, then
+@stream must be a #GPollableOutputStream for which
+g_pollable_output_stream_can_poll() returns %TRUE or else the
+behavior is undefined. If @blocking is %TRUE, then @stream does not
+need to be a #GPollableOutputStream.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream.
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> the buffer
+containing the data to write.
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of bytes to write
+</parameter_description>
+</parameter>
+<parameter name="blocking">
+<parameter_description> whether to do blocking I/O
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> location to store the number of bytes that was 
+written to the stream
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> location to store the error occurring, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if there was an error
+
+</return>
+</function>
+
 <function name="g_proxy_address_get_destination_hostname">
 <description>
-Gets @proxy's destination hostname.
+Gets @proxy's destination hostname; that is, the name of the host
+that will be connected to via the proxy, not the name of the proxy
+itself.
 
 Since: 2.26
 
@@ -43391,7 +44083,9 @@ Since: 2.26
 
 <function name="g_proxy_address_get_destination_port">
 <description>
-Gets @proxy's destination port.
+Gets @proxy's destination port; that is, the port on the
+destination host that will be connected to via the proxy, not the
+port number of the proxy itself.
 
 Since: 2.26
 
@@ -43403,6 +44097,25 @@ Since: 2.26
 </parameter>
 </parameters>
 <return> the @proxy's destination port
+
+</return>
+</function>
+
+<function name="g_proxy_address_get_destination_protocol">
+<description>
+Gets the protocol that is being spoken to the destination
+server; eg, &quot;http&quot; or &quot;ftp&quot;.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> a #GProxyAddress
+</parameter_description>
+</parameter>
+</parameters>
+<return> the @proxy's destination protocol
 
 </return>
 </function>
@@ -43427,7 +44140,7 @@ Since: 2.26
 
 <function name="g_proxy_address_get_protocol">
 <description>
-Gets @proxy's protocol.
+Gets @proxy's protocol. eg, &quot;socks&quot; or &quot;http&quot;
 
 Since: 2.26
 
@@ -43439,6 +44152,24 @@ Since: 2.26
 </parameter>
 </parameters>
 <return> the @proxy's protocol
+
+</return>
+</function>
+
+<function name="g_proxy_address_get_uri">
+<description>
+Gets the proxy URI that @proxy was constructed from.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> a #GProxyAddress
+</parameter_description>
+</parameter>
+</parameters>
+<return> the @proxy's URI, or %NULL if unknown
 
 </return>
 </function>
@@ -43465,6 +44196,10 @@ Since: 2.26
 <description>
 Creates a new #GProxyAddress for @inetaddr with @protocol that should
 tunnel through @dest_hostname and @dest_port.
+
+(Note that this method doesn't set the #GProxyAddress:uri or
+#GProxyAddress:destination-protocol fields; use g_object_new()
+directly if you want to set those.)
 
 Since: 2.26
 
@@ -44162,6 +44897,124 @@ for more details.
 </return>
 </function>
 
+<function name="g_resolver_lookup_records">
+<description>
+Synchronously performs a DNS record lookup for the given @rrname and returns
+a list of records as #GVariant tuples. See #GResolverRecordType for
+information on what the records contain for each @record_type.
+
+If the DNS resolution fails, @error (if non-%NULL) will be set to
+a value from #GResolverError.
+
+If @cancellable is non-%NULL, it can be used to cancel the
+operation, in which case @error (if non-%NULL) will be set to
+%G_IO_ERROR_CANCELLED.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GResolver
+</parameter_description>
+</parameter>
+<parameter name="rrname">
+<parameter_description> the DNS name to lookup the record for
+</parameter_description>
+</parameter>
+<parameter name="record_type">
+<parameter_description> the type of DNS record to lookup
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GList of #GVariant,
+or %NULL on error. You must free each of the records and the list when you are
+done with it. (You can use g_list_free_full() with g_variant_unref() to do this.)
+
+</return>
+</function>
+
+<function name="g_resolver_lookup_records_async">
+<description>
+Begins asynchronously performing a DNS lookup for the given
+@rrname, and eventually calls @callback, which must call
+g_resolver_lookup_records_finish() to get the final result. See
+g_resolver_lookup_records() for more details.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GResolver
+</parameter_description>
+</parameter>
+<parameter name="rrname">
+<parameter_description> the DNS name to lookup the record for
+</parameter_description>
+</parameter>
+<parameter name="record_type">
+<parameter_description> the type of DNS record to lookup
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call after resolution completes
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data for @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_resolver_lookup_records_finish">
+<description>
+Retrieves the result of a previous call to
+g_resolver_lookup_records_async(). Returns a list of records as #GVariant
+tuples. See #GResolverRecordType for information on what the records contain.
+
+If the DNS resolution failed, @error (if non-%NULL) will be set to
+a value from #GResolverError. If the operation was cancelled,
+@error will be set to %G_IO_ERROR_CANCELLED.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GResolver
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> the result passed to your #GAsyncReadyCallback
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GList of #GVariant,
+or %NULL on error. You must free each of the records and the list when you are
+done with it. (You can use g_list_free_full() with g_variant_unref() to do this.)
+
+</return>
+</function>
+
 <function name="g_resolver_lookup_service">
 <description>
 Synchronously performs a DNS SRV lookup for the given @service and
@@ -44336,19 +45189,19 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource.
+<parameter_description> A #GResource
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A pathname inside the resource.
+<parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags.
+<parameter_description> A #GResourceLookupFlags
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -44366,7 +45219,7 @@ Since: 2.32
 </description>
 <parameters>
 </parameters>
-<return> a #GQuark.
+<return> a #GQuark
 
 </return>
 </function>
@@ -44383,15 +45236,15 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource.
+<parameter_description> A #GResource
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A pathname inside the resource.
+<parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags.
+<parameter_description> A #GResourceLookupFlags
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -44405,11 +45258,11 @@ or %NULL if the length is not needed
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the file was found. %FALSE if there were errors.
+<return> %TRUE if the file was found. %FALSE if there were errors
 
 </return>
 </function>
@@ -44427,15 +45280,15 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> the path of a filename to load, in the GLib filename encoding.
+<parameter_description> the path of a filename to load, in the GLib filename encoding
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GResource, or %NULL on error.
+<return> a new #GResource, or %NULL on error
 
 </return>
 </function>
@@ -44462,24 +45315,24 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource.
+<parameter_description> A #GResource
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A pathname inside the resource.
+<parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags.
+<parameter_description> A #GResourceLookupFlags
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
 <return> #GBytes or %NULL on error.
-Free the returned object with g_bytes_unref().
+Free the returned object with g_bytes_unref()
 
 </return>
 </function>
@@ -44498,15 +45351,15 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="data">
-<parameter_description> A #GBytes.
+<parameter_description> A #GBytes
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GResource, or %NULL on error.
+<return> a new #GResource, or %NULL on error
 
 </return>
 </function>
@@ -44523,24 +45376,24 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource.
+<parameter_description> A #GResource
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> A pathname inside the resource.
+<parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags.
+<parameter_description> A #GResourceLookupFlags
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
 <return> #GInputStream or %NULL on error.
-Free the returned object with g_object_unref().
+Free the returned object with g_object_unref()
 
 </return>
 </function>
@@ -44555,11 +45408,11 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource.
+<parameter_description> A #GResource
 </parameter_description>
 </parameter>
 </parameters>
-<return> The passed in #GResource.
+<return> The passed in #GResource
 
 </return>
 </function>
@@ -44576,7 +45429,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource.
+<parameter_description> A #GResource
 </parameter_description>
 </parameter>
 </parameters>
@@ -44597,15 +45450,15 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A pathname inside the resource.
+<parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags.
+<parameter_description> A #GResourceLookupFlags
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -44626,11 +45479,11 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A pathname inside the resource.
+<parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags.
+<parameter_description> A #GResourceLookupFlags
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -44644,11 +45497,11 @@ or %NULL if the length is not needed
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the file was found. %FALSE if there were errors.
+<return> %TRUE if the file was found. %FALSE if there were errors
 
 </return>
 </function>
@@ -44675,20 +45528,20 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A pathname inside the resource.
+<parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags.
+<parameter_description> A #GResourceLookupFlags
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
 <return> #GBytes or %NULL on error.
-Free the returned object with g_bytes_unref().
+Free the returned object with g_bytes_unref()
 
 </return>
 </function>
@@ -44706,20 +45559,20 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> A pathname inside the resource.
+<parameter_description> A pathname inside the resource
 </parameter_description>
 </parameter>
 <parameter name="lookup_flags">
-<parameter_description> A #GResourceLookupFlags.
+<parameter_description> A #GResourceLookupFlags
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for a #GError, or %NULL.
+<parameter_description> return location for a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
 <return> #GInputStream or %NULL on error.
-Free the returned object with g_object_unref().
+Free the returned object with g_object_unref()
 
 </return>
 </function>
@@ -44735,7 +45588,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource.
+<parameter_description> A #GResource
 </parameter_description>
 </parameter>
 </parameters>
@@ -44751,7 +45604,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="resource">
-<parameter_description> A #GResource.
+<parameter_description> A #GResource
 </parameter_description>
 </parameter>
 </parameters>
@@ -51547,18 +52400,18 @@ Since: 2.22
 
 <function name="g_static_resource_fini">
 <description>
-Finalized a GResource initialized by g_static_resource_init ().
+Finalized a GResource initialized by g_static_resource_init().
 
 This is normally used by code generated by
-&lt;link linkend=&quot;glib-compile-resources&quot;&gt;glib-compile-resources&lt;/link&gt; and is
-not typically used by other code.
+&lt;link linkend=&quot;glib-compile-resources&quot;&gt;glib-compile-resources&lt;/link&gt;
+and is not typically used by other code.
 
 Since: 2.32
 
 </description>
 <parameters>
 <parameter name="static_resource">
-<parameter_description> pointer to a static #GStaticResource.
+<parameter_description> pointer to a static #GStaticResource
 </parameter_description>
 </parameter>
 </parameters>
@@ -51567,22 +52420,22 @@ Since: 2.32
 
 <function name="g_static_resource_get_resource">
 <description>
-Gets the GResource that was registred by a call to g_static_resource_init ().
+Gets the GResource that was registred by a call to g_static_resource_init().
 
 This is normally used by code generated by
-&lt;link linkend=&quot;glib-compile-resources&quot;&gt;glib-compile-resources&lt;/link&gt; and is
-not typically used by other code.
+&lt;link linkend=&quot;glib-compile-resources&quot;&gt;glib-compile-resources&lt;/link&gt;
+and is not typically used by other code.
 
 Since: 2.32
 
 </description>
 <parameters>
 <parameter name="static_resource">
-<parameter_description> pointer to a static #GStaticResource.
+<parameter_description> pointer to a static #GStaticResource
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GResource.
+<return> a #GResource
 
 </return>
 </function>
@@ -51593,15 +52446,15 @@ Initializes a GResource from static data using a
 GStaticResource.
 
 This is normally used by code generated by
-&lt;link linkend=&quot;glib-compile-resources&quot;&gt;glib-compile-resources&lt;/link&gt; and is
-not typically used by other code.
+&lt;link linkend=&quot;glib-compile-resources&quot;&gt;glib-compile-resources&lt;/link&gt;
+and is not typically used by other code.
 
 Since: 2.32
 
 </description>
 <parameters>
 <parameter name="static_resource">
-<parameter_description> pointer to a static #GStaticResource.
+<parameter_description> pointer to a static #GStaticResource
 </parameter_description>
 </parameter>
 </parameters>
@@ -51691,6 +52544,146 @@ Since: 2.28
 <return> the new #GSocketConnection.
 
 </return>
+</function>
+
+<function name="g_test_dbus_add_service_dir">
+<description>
+Add a path where dbus-daemon will lookup for .services files. This can't be
+called after g_test_dbus_up().
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GTestDBus
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> path to a directory containing .service files
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_test_dbus_down">
+<description>
+Stop the session bus started by g_test_dbus_up().
+
+This will wait for the singleton returned by g_bus_get() or g_bus_get_sync()
+is destroyed. This is done to ensure that the next unit test won't get a
+leaked singleton from this test.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GTestDBus
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_test_dbus_get_bus_address">
+<description>
+Get the address on which dbus-daemon is running. if g_test_dbus_up() has not
+been called yet, %NULL is returned. This can be used with
+g_dbus_connection_new_for_address()
+
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GTestDBus
+</parameter_description>
+</parameter>
+</parameters>
+<return> the address of the bus, or %NULL.
+</return>
+</function>
+
+<function name="g_test_dbus_get_flags">
+<description>
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GTestDBus
+</parameter_description>
+</parameter>
+</parameters>
+<return> the value of #GTestDBus:flags property
+</return>
+</function>
+
+<function name="g_test_dbus_new">
+<description>
+Create a new #GTestDBus object.
+
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> a #GTestDBusFlags
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GTestDBus.
+</return>
+</function>
+
+<function name="g_test_dbus_stop">
+<description>
+Stop the session bus started by g_test_dbus_up().
+
+Unlike g_test_dbus_down(), this won't verify the #GDBusConnection
+singleton returned by g_bus_get() or g_bus_get_sync() is destroyed. Unit
+tests wanting to verify behaviour after the session bus has been stopped
+can use this function but should still call g_test_dbus_down() when done.
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GTestDBus
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_test_dbus_unset">
+<description>
+Unset DISPLAY and DBUS_SESSION_BUS_ADDRESS env variables to ensure the test
+won't use user's session bus.
+
+This is useful for unit tests that want to verify behaviour when no session
+bus is running. It is not necessary to call this if unit test already calls
+g_test_dbus_up() before acquiring the session bus.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_test_dbus_up">
+<description>
+Start a dbus-daemon instance and set DBUS_SESSION_BUS_ADDRESS. After this
+call, it is safe for unit tests to start sending messages on the session bug.
+
+If this function is called from setup callback of g_test_add(),
+g_test_dbus_down() must be called in its teardown callback.
+
+If this function is called from unit test's main(), then g_test_dbus_down()
+must be called after g_test_run().
+
+</description>
+<parameters>
+<parameter name="self">
+<parameter_description> a #GTestDBus
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_themed_icon_append_name">
@@ -55382,7 +56375,7 @@ Gets the default #GVfs for the system.
 </description>
 <parameters>
 </parameters>
-<return> a #GVfs. 
+<return> a #GVfs.
 </return>
 </function>
 
@@ -55402,7 +56395,7 @@ Gets a #GFile for @path.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile. 
+<return> a #GFile.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -55412,7 +56405,7 @@ Free the returned object with g_object_unref().
 Gets a #GFile for @uri.
 
 This operation never fails, but the returned object
-might not support any I/O operation if the URI 
+might not support any I/O operation if the URI
 is malformed or if the URI scheme is not supported.
 
 
@@ -55423,11 +56416,11 @@ is malformed or if the URI scheme is not supported.
 </parameter_description>
 </parameter>
 <parameter name="uri">
-<parameter_description> a string containing a URI 
+<parameter_description> a string containing a URI
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile. 
+<return> a #GFile.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -55457,7 +56450,7 @@ Gets a list of URI schemes supported by @vfs.
 </parameter>
 </parameters>
 <return> a %NULL-terminated array of strings.
-The returned array belongs to GIO and must 
+The returned array belongs to GIO and must
 not be freed or modified.
 </return>
 </function>
@@ -55474,14 +56467,15 @@ Checks if the VFS is active.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if construction of the @vfs was successful and it is now active.
+<return> %TRUE if construction of the @vfs was successful
+and it is now active.
 </return>
 </function>
 
 <function name="g_vfs_parse_name">
 <description>
-This operation never fails, but the returned object might 
-not support any I/O operations if the @parse_name cannot 
+This operation never fails, but the returned object might
+not support any I/O operations if the @parse_name cannot
 be parsed by the #GVfs module.
 
 

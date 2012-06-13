@@ -1747,7 +1747,7 @@ You do not need to hold the lock to call this function.
 <description>
 Increases the reference count of the asynchronous @queue by 1.
 
-@Deprecated: Since 2.8, reference counting is done atomically
+Deprecated: 2.8: Reference counting is done atomically.
 so g_async_queue_ref() can be used regardless of the @queue's
 lock.
 
@@ -2030,7 +2030,7 @@ and releases the lock. This function must be called while holding
 the @queue's lock. If the reference count went to 0, the @queue
 will be destroyed and the memory allocated will be freed.
 
-@Deprecated: Since 2.8, reference counting is done atomically
+Deprecated: 2.8: Reference counting is done atomically.
 so g_async_queue_unref() can be used regardless of the @queue's
 lock.
 
@@ -6530,7 +6530,7 @@ Windows a handle for a process (which doesn't have to be a child).
 </parameter_description>
 </parameter>
 <parameter name="notify">
-<parameter_description>   function to call when the idle is removed, or %NULL
+<parameter_description> function to call when the idle is removed, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -6644,6 +6644,38 @@ Since: 2.28
 <parameters>
 <parameter name="object_ptr">
 <parameter_description> a pointer to a #GObject reference
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_clear_pointer">
+<description>
+Clears a reference to a variable.
+
+@pp must not be %NULL.
+
+If the reference is %NULL then this function does nothing.
+Otherwise, the variable is destroyed using @destroy and the
+pointer is set to %NULL.
+
+This function is threadsafe and modifies the pointer atomically,
+using memory barriers where needed.
+
+A macro is also included that allows this function to be used without
+pointer casts.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="pp">
+<parameter_description> a pointer to a variable, struct member etc. holding a pointer
+</parameter_description>
+</parameter>
+<parameter name="destroy">
+<parameter_description> a function to which a gpointer can be passed, to destroy *@pp
 </parameter_description>
 </parameter>
 </parameters>
@@ -10498,7 +10530,7 @@ the local time zone.
 This call is equivalent to calling g_date_time_new() with the time
 zone returned by g_time_zone_new_local().
 
-Since: 2.26.
+Since: 2.26
 
 </description>
 <parameters>
@@ -10602,7 +10634,7 @@ UTC.
 This call is equivalent to calling g_date_time_new() with the time
 zone returned by g_time_zone_new_utc().
 
-Since: 2.26.
+Since: 2.26
 
 </description>
 <parameters>
@@ -11554,7 +11586,8 @@ Since: 2.32
 <parameters>
 <parameter name="envp">
 <parameter_description> an environment
-list (eg, as returned from g_get_environ())
+list (eg, as returned from g_get_environ()), or %NULL
+for an empty environment list
 </parameter_description>
 </parameter>
 <parameter name="variable">
@@ -11586,7 +11619,8 @@ Since: 2.32
 <parameters>
 <parameter name="envp">
 <parameter_description> an environment
-list that can be freed using g_strfreev() (e.g., as returned from g_get_environ())
+list that can be freed using g_strfreev() (e.g., as returned from g_get_environ()), or %NULL
+for an empty environment list
 </parameter_description>
 </parameter>
 <parameter name="variable">
@@ -11619,7 +11653,8 @@ Since: 2.32
 <parameters>
 <parameter name="envp">
 <parameter_description> an environment
-list that can be freed using g_strfreev() (e.g., as returned from g_get_environ())
+list that can be freed using g_strfreev() (e.g., as returned from g_get_environ()), 
+or %NULL for an empty environment list
 </parameter_description>
 </parameter>
 <parameter name="variable">
@@ -14967,7 +15002,7 @@ range between #G_PRIORITY_DEFAULT_IDLE and #G_PRIORITY_HIGH_IDLE.
 </parameter_description>
 </parameter>
 <parameter name="notify">
-<parameter_description>   function to call when the idle is removed, or %NULL
+<parameter_description> function to call when the idle is removed, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -21079,10 +21114,6 @@ previously installed the #glib_mem_profiler_table with g_mem_set_vtable().
 
 </description>
 <parameters>
-<parameter name="void">
-<parameter_description>
-</parameter_description>
-</parameter>
 </parameters>
 <return></return>
 </function>
@@ -22872,7 +22903,9 @@ Since: 2.10
 Increases the freeze count on @object. If the freeze count is
 non-zero, the emission of &quot;notify&quot; signals on @object is
 stopped. The signals are queued until the freeze count is decreased
-to zero.
+to zero. Duplicate notifications are squashed so that at most one
+#GObject::notify signal is emitted for each property modified while the
+object is frozen.
 
 This is necessary for accessors that modify multiple properties to prevent
 premature notification while the object is still being modified.
@@ -23681,7 +23714,10 @@ g_object_set_qdata_full().
 <description>
 Reverts the effect of a previous call to
 g_object_freeze_notify(). The freeze count is decreased on @object
-and when it reaches zero, all queued &quot;notify&quot; signals are emitted.
+and when it reaches zero, queued &quot;notify&quot; signals are emitted.
+
+Duplicate notifications for each property are squashed so that at most one
+#GObject::notify signal is emitted for each property.
 
 It is an error to call this function when the freeze count is zero.
 
@@ -35115,8 +35151,15 @@ specified by the only argument that must be provided, @argv. @argv
 should be a %NULL-terminated array of strings, to be passed as the
 argument vector for the child. The first string in @argv is of
 course the name of the program to execute. By default, the name of
-the program must be a full path; the &lt;envar&gt;PATH&lt;/envar&gt; shell variable 
-will only be searched if you pass the %G_SPAWN_SEARCH_PATH flag.
+the program must be a full path. If @flags contains the 
+%G_SPAWN_SEARCH_PATH flag, the &lt;envar&gt;PATH&lt;/envar&gt; environment variable 
+is used to search for the executable. If @flags contains the
+%G_SPAWN_SEARCH_PATH_FROM_ENVP flag, the &lt;envar&gt;PATH&lt;/envar&gt; variable from 
+@envp is used to search for the executable.
+If both the %G_SPAWN_SEARCH_PATH and %G_SPAWN_SEARCH_PATH_FROM_ENVP
+flags are set, the &lt;envar&gt;PATH&lt;/envar&gt; variable from @envp takes precedence 
+over the environment variable.
+
 If the program name is not a full path and %G_SPAWN_SEARCH_PATH flag is not
 used, then the program will be run from the current directory (or
 @working_directory, if specified); this might be unexpected or even
@@ -35182,7 +35225,11 @@ descriptors will be inherited by the child; otherwise all
 descriptors except stdin/stdout/stderr will be closed before
 calling exec() in the child. %G_SPAWN_SEARCH_PATH 
 means that &lt;literal&gt;argv[0]&lt;/literal&gt; need not be an absolute path, it
-will be looked for in the user's &lt;envar&gt;PATH&lt;/envar&gt;. 
+will be looked for in the &lt;envar&gt;PATH&lt;/envar&gt; environment variable.
+%G_SPAWN_SEARCH_PATH_FROM_ENVP means need not be an absolute path, it
+will be looked for in the &lt;envar&gt;PATH&lt;/envar&gt; variable from @envp. If
+both %G_SPAWN_SEARCH_PATH and %G_SPAWN_SEARCH_PATH_FROM_ENVP are used,
+the value from @envp takes precedence over the environment.
 %G_SPAWN_STDOUT_TO_DEV_NULL means that the child's standard output will 
 be discarded, instead of going to the same location as the parent's 
 standard output. If you use this flag, @standard_output must be %NULL.
@@ -38153,7 +38200,7 @@ Since: 2.16
 </description>
 <parameters>
 <parameter name="testpath">
-<parameter_description>   Slash-separated test case path name for the test.
+<parameter_description>   /-separated test case path name for the test.
 </parameter_description>
 </parameter>
 <parameter name="test_data">
@@ -38180,7 +38227,7 @@ Since: 2.16
 </description>
 <parameters>
 <parameter name="testpath">
-<parameter_description>   Slash-separated test case path name for the test.
+<parameter_description>   /-separated test case path name for the test.
 </parameter_description>
 </parameter>
 <parameter name="test_func">
@@ -40041,7 +40088,7 @@ this function returns the same value, without modifying @time_.
 
 This function may, however, modify @time_ in order to deal with
 non-existent times.  If the non-existent local @time_ of 02:30 were
-requested on March 13th 2010 in Toronto then this function would
+requested on March 14th 2010 in Toronto then this function would
 adjust @time_ to be 03:00 and return the interval containing the
 adjusted time.
 
@@ -40405,7 +40452,7 @@ the range between #G_PRIORITY_DEFAULT and #G_PRIORITY_HIGH.
 </parameter_description>
 </parameter>
 <parameter name="notify">
-<parameter_description>   function to call when the timeout is removed, or %NULL
+<parameter_description> function to call when the timeout is removed, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -40512,7 +40559,7 @@ the range between #G_PRIORITY_DEFAULT and #G_PRIORITY_HIGH.
 </parameter_description>
 </parameter>
 <parameter name="notify">
-<parameter_description>   function to call when the timeout is removed, or %NULL
+<parameter_description> function to call when the timeout is removed, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -41505,7 +41552,7 @@ macro.
 </parameter_description>
 </parameter>
 </parameters>
-<return>  #TRUE if @instance is valid, #FALSE otherwise.
+<return> %TRUE if @instance is valid, %FALSE otherwise.
 </return>
 </function>
 
@@ -41854,6 +41901,33 @@ includes the type itself, so that e.g. a fundamental type has depth 1.
 </parameters>
 <return> The depth of @type.
 </return>
+</function>
+
+<function name="g_type_ensure">
+<description>
+Ensures that the indicated @type has been registered with the
+type system, and its _class_init() method has been run.
+
+In theory, simply calling the type's _get_type() method (or using
+the corresponding macro) is supposed take care of this. However,
+_get_type() methods are often marked %G_GNUC_CONST for performance
+reasons, even though this is technically incorrect (since
+%G_GNUC_CONST requires that the function not have side effects,
+which _get_type() methods do on the first call). As a result, if
+you write a bare call to a _get_type() macro, it may get optimized
+out by the compiler. Using g_type_ensure() guarantees that the
+type's _get_type() method is called.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> a #GType.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_type_free_instance">
@@ -46900,8 +46974,8 @@ the length (not including the nul terminator)
 </parameter_description>
 </parameter>
 </parameters>
-<return> (transfer full) (array zero-terminated=1 length=length)
-(element-type guint8): a newly allocated string
+<return>
+a newly allocated string
 
 </return>
 </function>
@@ -47065,6 +47139,11 @@ linkend='gvariant-format-strings'&gt;GVariant Format Strings&lt;/link&gt;.
 Please note that the syntax of the format string is very likely to be
 extended in the future.
 
+@format_string determines the C types that are used for unpacking
+the values and also determines if the values are copied or borrowed,
+see the section on
+&lt;link linkend='gvariant-format-strings-pointers'&gt;GVariant Format Strings&lt;/link&gt;.
+
 Since: 2.24
 
 </description>
@@ -47197,6 +47276,11 @@ Reads a child item out of a container #GVariant instance and
 deconstructs it according to @format_string.  This call is
 essentially a combination of g_variant_get_child_value() and
 g_variant_get().
+
+@format_string determines the C types that are used for unpacking
+the values and also determines if the values are copied or borrowed,
+see the section on
+&lt;link linkend='gvariant-format-strings-pointers'&gt;GVariant Format Strings&lt;/link&gt;.
 
 Since: 2.24
 
@@ -47784,6 +47868,11 @@ These two generalisations allow mixing of multiple calls to
 g_variant_new_va() and g_variant_get_va() within a single actual
 varargs call by the user.
 
+@format_string determines the C types that are used for unpacking
+the values and also determines if the values are copied or borrowed,
+see the section on
+&lt;link linkend='gvariant-format-strings-pointers'&gt;GVariant Format Strings&lt;/link&gt;.
+
 Since: 2.24
 
 </description>
@@ -48131,6 +48220,11 @@ types, g_variant_iter_next() is definitely preferred.  For string
 types, use the '&amp;' prefix to avoid allocating any memory at all (and
 thereby avoiding the need to free anything as well).
 
+@format_string determines the C types that are used for unpacking
+the values and also determines if the values are copied or borrowed,
+see the section on
+&lt;link linkend='gvariant-format-strings-pointers'&gt;GVariant Format Strings&lt;/link&gt;.
+
 Since: 2.24
 
 </description>
@@ -48244,6 +48338,11 @@ g_free (key);
 For a solution that is likely to be more convenient to C programmers
 when dealing with loops, see g_variant_iter_loop().
 
+@format_string determines the C types that are used for unpacking
+the values and also determines if the values are copied or borrowed,
+see the section on
+&lt;link linkend='gvariant-format-strings-pointers'&gt;GVariant Format Strings&lt;/link&gt;.
+
 Since: 2.24
 
 </description>
@@ -48321,7 +48420,10 @@ g_variant_get().  In the case that %NULL would have been returned,
 this function returns %FALSE.  Otherwise, it unpacks the returned
 value and returns %TRUE.
 
-See g_variant_get() for information about @format_string.
+@format_string determines the C types that are used for unpacking
+the values and also determines if the values are copied or borrowed,
+see the section on
+&lt;link linkend='gvariant-format-strings-pointers'&gt;GVariant Format Strings&lt;/link&gt;.
 
 Since: 2.28
 
