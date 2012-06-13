@@ -67,6 +67,7 @@ sub extract_bracketed_text ($)
 
     $line_change += $add_to_line;
     last if ($token eq '(');
+    return undef if (not $line_change and $token != /^\s+$/);
   }
 
   my $escape = 0;
@@ -374,6 +375,14 @@ sub parse_params ($)
         when (['OUT', 'RET'])
         {
           $out = 1;
+        }
+        when (undef)
+        {
+          # That's fine - no {foo} was used at all.
+        }
+        default
+        {
+          die '|' . $param . '|';
         }
       }
       $type = _type_fixup $type;

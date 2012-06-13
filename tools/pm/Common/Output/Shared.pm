@@ -558,23 +558,29 @@ sub endif ($)
   return '';
 }
 
-sub paramzipstr ($$)
+sub paramzipstr
 {
-  my ($types, $names) = @_;
+  my ($types, $names, $values) = @_;
   my $count = @{$types};
 
 # TODO: throw runtime error or internal error or whatever.
   die if ($count != scalar (@{$names}));
+  unless (defined ($values))
+  {
+    $values = [];
+  }
 
   my @params = ();
 
   foreach my $index (0 .. $count - 1)
   {
     my $type = $types->[$index];
-    my $name = $names->[$index];
 
     if (defined ($type))
     {
+      my $value = $values->[$index];
+      my $name = $names->[$index] . (defined ($value) ? (' = ' . $value) : '');
+
       push (@params, join (' ', $type, $name));
     }
   }

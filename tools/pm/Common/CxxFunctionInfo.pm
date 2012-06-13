@@ -38,8 +38,9 @@ sub new_from_string ($$)
   my $param_names = [];
   my $param_values = [];
   my $param_nullables = [];
-  my $param_outs = [];
+  my $param_out_index = -1;
   my $const = ($cxx_parts->[4] =~ /\bconst\b/);
+  my $index = 0;
 
   foreach my $desc (@{$params})
   {
@@ -47,7 +48,13 @@ sub new_from_string ($$)
     push @{$param_names}, $desc->{'name'};
     push @{$param_values}, $desc->{'value'};
     push (@{$param_nullables}, $desc->{'nullable'});
-    push (@{$param_outs}, $desc->{'out'});
+
+    if ($desc->{'out'})
+    {
+      die if ($param_out_index > -1);
+      $param_out_index = $index;
+    }
+    ++$index;
   }
 
   $params = undef;
@@ -61,7 +68,7 @@ sub new_from_string ($$)
     'param_names' => $param_names,
     'param_values' => $param_values,
     'param_nullables' => $param_nullables,
-    'param_outs' => $param_outs,
+    'param_out_index' => $param_out_index,
     'const' => $const
   };
 
@@ -117,11 +124,11 @@ sub get_param_nullables ($)
   return $self->{'param_nullables'};
 }
 
-sub get_param_outs ($)
+sub get_param_out_index ($)
 {
   my ($self) = @_;
 
-  return $self->{'param_outs'};
+  return $self->{'param_out_index'};
 }
 
 sub get_const ($)
