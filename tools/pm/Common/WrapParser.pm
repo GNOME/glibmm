@@ -1156,12 +1156,13 @@ sub _on_wrap_ctor ($)
 
   my @c_prop_names = map { $self->_get_prop_name ($gir_class, $c_param_names->[$_], $cxx_param_names->[$_]) } 0 .. ($c_params_count - 1);
 
-  Common::Output::Ctor::wrap_ctor $self,
-                                  $c_constructor->get_param_types,
-                                  $c_constructor->get_param_transfers,
-                                  \@c_prop_names,
-                                  $cxx_function->get_param_types,
-                                  $cxx_function->get_param_names;
+  Common::Output::Ctor::wrap_ctor ($self,
+                                   $c_constructor->get_param_types,
+                                   $c_constructor->get_param_transfers,
+                                   \@c_prop_names,
+                                   $cxx_function->get_param_types,
+                                   $cxx_function->get_param_names,
+                                   $cxx_function->get_param_values);
 }
 
 sub _on_wrap_create ($)
@@ -1170,14 +1171,19 @@ sub _on_wrap_create ($)
   my $params = Common::Shared::parse_params $self->_extract_bracketed_text;
   my $types = [];
   my $names = [];
+  my $values = [];
 
   foreach my $param (@{$params})
   {
     push @{$types}, $param->{'type'};
     push @{$names}, $param->{'name'};
+    push (@{$values}, $param->{'value'});
   }
 
-  Common::Output::Ctor::wrap_create $self, $types, $names;
+  Common::Output::Ctor::wrap_create ($self,
+                                     $types,
+                                     $names,
+                                     $values);
 }
 
 sub _on_wrap_enum ($)
