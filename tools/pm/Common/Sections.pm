@@ -49,11 +49,11 @@ use constant
   'CC_NAMESPACE' => ['SECTION_CC_NAMESPACE', Common::Constants::NAMESPACE ()],
   'P_CC_IMPLEMENTS_INTERFACES' => ['SECTION_P_CC_IMPLEMENTS_INTERFACES', Common::Constants::CLASS ()],
   'H_VFUNCS' => ['SECTION_H_VFUNCS', Common::Constants::CLASS ()],
-  'H_VFUNCS_CPP_WRAPPER' => ['SECTION_H_VFUNCS_CPP_WRAPPER', Common::Constants::CLASS ()], # TODO: probably not needed.
+  'H_VFUNCS_CXX_WRAPPER' => ['SECTION_H_VFUNCS_CXX_WRAPPER', Common::Constants::CLASS ()], # TODO: probably not needed.
   'H_DEFAULT_SIGNAL_HANDLERS' => ['SECTION_H_DEFAULT_SIGNAL_HANDLERS', Common::Constants::CLASS ()],
   'CC_DEFAULT_SIGNAL_HANDLERS' => ['SECTION_CC_DEFAULT_SIGNAL_HANDLERS', Common::Constants::CLASS ()],
   'CC_VFUNCS' => ['SECTION_CC_VFUNCS', Common::Constants::CLASS ()],
-  'CC_VFUNCS_CPP_WRAPPER' => ['SECTION_CC_VFUNCS_CPP_WRAPPER', Common::Constants::CLASS ()], # TODO: probably not needed
+  'CC_VFUNCS_CXX_WRAPPER' => ['SECTION_CC_VFUNCS_CXX_WRAPPER', Common::Constants::CLASS ()], # TODO: probably not needed
   'P_H_DEFAULT_SIGNAL_HANDLERS' => ['SECTION_P_H_DEFAULT_SIGNAL_HANDLERS', Common::Constants::CLASS ()],
   'P_H_VFUNCS' => ['SECTION_P_H_VFUNCS', Common::Constants::CLASS ()],
   'P_CC_DEFAULT_SIGNAL_HANDLERS' => ['SECTION_P_CC_DEFAULT_SIGNAL_HANDLERS', Common::Constants::CLASS ()],

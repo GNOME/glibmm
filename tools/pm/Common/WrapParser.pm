@@ -526,7 +526,7 @@ sub _on_string_literal ($)
   $self->_on_string_with_delimiters ('"', '"', 'string');
 }
 
-sub _on_comment_cpp ($)
+sub _on_comment_cxx ($)
 {
   my ($self) = @_;
 
@@ -978,7 +978,7 @@ sub _on_wrap_property ($)
   }
 
   my $prop_c_name = shift @args;
-  my $prop_cpp_type = shift @args;
+  my $prop_cxx_type = shift @args;
 
   # Catch useless parameters.
   $self->_handle_get_args_results (Common::Shared::get_args \@args, {});
@@ -991,7 +991,7 @@ sub _on_wrap_property ($)
   $prop_c_name =~ s/_/-/g;
   $prop_c_name =~ s/"//g;
 
-  my $prop_cpp_name = $prop_c_name;
+  my $prop_cxx_name = $prop_c_name;
 
   $prop_c_name =~ s/-/_/g;
 
@@ -1026,8 +1026,8 @@ sub _on_wrap_property ($)
                                    $construct_only,
                                    $readable,
                                    $writable,
-                                   $prop_cpp_type,
-                                   $prop_cpp_name,
+                                   $prop_cxx_type,
+                                   $prop_cxx_name,
                                    $prop_c_name;
 }
 
@@ -1200,7 +1200,7 @@ sub _on_wrap_enum ($)
     $self->fixed_error ('Too few parameters.');
   }
 
-  my $cpp_type = Common::Util::string_trim(shift @args);
+  my $cxx_type = Common::Util::string_trim(shift @args);
   my $c_type = Common::Util::string_trim(shift @args);
   my @sed = ();
   my $setup =
@@ -1242,7 +1242,7 @@ sub _on_wrap_enum ($)
   my $gir_gtype = $enum->get_a_glib_get_type;
   my $members = _extract_members $enum, \@substs;
 
-  Common::Output::Enum::output ($self, $cpp_type, $members, $flags, $gir_gtype);
+  Common::Output::Enum::output ($self, $cxx_type, $members, $flags, $gir_gtype);
 }
 
 sub _on_wrap_gerror ($)
@@ -1259,7 +1259,7 @@ sub _on_wrap_gerror ($)
     $self->fixed_error ('Too few parameters.');
   }
 
-  my $cpp_type = Common::Util::string_trim (shift @args);
+  my $cxx_type = Common::Util::string_trim (shift @args);
   my $c_type = Common::Util::string_trim (shift @args);
   my $enum = $namespace->get_g_enumeration_by_name ($c_type);
 
@@ -1307,7 +1307,7 @@ sub _on_wrap_gerror ($)
   my $gir_domain = $enum->get_a_glib_error_domain;
   my $members = _extract_members $enum, \@substs;
 
-  Common::Output::GError::output $self, $cpp_type, $members, $gir_domain, $gir_gtype;
+  Common::Output::GError::output $self, $cxx_type, $members, $gir_domain, $gir_gtype;
 }
 
 sub _on_implements_interface ($)
@@ -1342,7 +1342,7 @@ sub _on_class_generic ($)
     $self->fixed_error ('Too few parameters.');
   }
 
-  my $cpp_type = shift @args;
+  my $cxx_type = shift @args;
   my $c_type = shift @args;
 
   # Catch useless parameters.
@@ -1374,7 +1374,7 @@ sub _on_class_generic ($)
 
   $self->push_gir_record ($gir_record);
 
-  Common::Output::Generic::output ($self, $c_type, $cpp_type);
+  Common::Output::Generic::output ($self, $c_type, $cxx_type);
 }
 
 sub _on_class_g_object ($)
@@ -1403,7 +1403,7 @@ sub _on_class_g_object ($)
     $self->fixed_error ('No such namespace: ' . $module);
   }
 
-  my $cpp_type = shift @args;
+  my $cxx_type = shift @args;
   my $c_type = shift @args;
   my $gir_class = $namespace->get_g_class_by_name ($c_type);
 
@@ -1579,7 +1579,7 @@ sub _on_class_g_object ($)
                                   $c_parent_type,
                                   $c_parent_class_type,
                                   $get_type_func,
-                                  $cpp_type,
+                                  $cxx_type,
                                   $cxx_parent_type;
 }
 
@@ -1615,7 +1615,7 @@ sub _on_class_boxed_type ($)
     $self->fixed_error ('No such namespace: ' . $module);
   }
 
-  my ($cpp_type, $c_type, $new_func, $copy_func, $free_func) = @args;
+  my ($cxx_type, $c_type, $new_func, $copy_func, $free_func) = @args;
   my $gir_record = $namespace->get_g_record_by_name ($c_type);
 
   unless (defined $gir_record)
@@ -1754,7 +1754,7 @@ sub _on_class_boxed_type ($)
 
   Common::Output::BoxedType::output $self,
                                     $c_type,
-                                    $cpp_type,
+                                    $cxx_type,
                                     $get_type_func,
                                     $new_func,
                                     $copy_func,
@@ -1787,7 +1787,7 @@ sub _on_class_boxed_type_static ($)
     $self->fixed_error ('No such namespace: ' . $module);
   }
 
-  my ($cpp_type, $c_type) = @args;
+  my ($cxx_type, $c_type) = @args;
   my $gir_record = $namespace->get_g_record_by_name ($c_type);
 
   unless (defined $gir_record)
@@ -1806,7 +1806,7 @@ sub _on_class_boxed_type_static ($)
 
   Common::Output::BoxedTypeStatic::output $self,
                                           $c_type,
-                                          $cpp_type,
+                                          $cxx_type,
                                           $get_type_func;
 }
 
@@ -1836,19 +1836,19 @@ sub _on_class_interface ($)
     $self->fixed_error ('No such namespace: ' . $module);
   }
 
-  my ($cpp_name, $c_name) = @args;
-  my $gir_class = $namespace->get_g_class_by_name ($c_name);
+  my ($cxx_type, $c_type) = @args;
+  my $gir_class = $namespace->get_g_class_by_name ($c_type);
 
   unless (defined $gir_class)
   {
-    $self->fixed_error ('No such class: ' . $c_name);
+    $self->fixed_error ('No such class: ' . $c_type);
   }
 
   my $get_type_func = $gir_class->get_a_glib_get_type;
 
   unless (defined $get_type_func)
   {
-    $self->fixed_error ('Class `' . $c_name . '\' has no get type function.');
+    $self->fixed_error ('Class `' . $c_type . '\' has no get type function.');
   }
 
   my $prerequisite_count = $gir_class->get_g_prerequisite_count;
@@ -1878,35 +1878,35 @@ sub _on_class_interface ($)
 
   unless (defined $gir_type_struct)
   {
-    $self->fixed_error ('Class `' . $c_name . '\' has no Iface struct.');
+    $self->fixed_error ('Class `' . $c_type . '\' has no Iface struct.');
   }
 
   my @gir_prefixes = $namespace->get_a_c_identifier_prefixes;
-  my $c_class_name = undef;
+  my $c_class_type = undef;
 
   foreach my $gir_prefix (@gir_prefixes)
   {
-    my $temp_name = $gir_prefix . $gir_type_struct;
+    my $temp_type = $gir_prefix . $gir_type_struct;
 
-    if (defined $namespace->get_g_record_by_name ($temp_name))
+    if (defined $namespace->get_g_record_by_name ($temp_type))
     {
-      $c_class_name = $temp_name;
+      $c_class_type = $temp_type;
       last;
     }
   }
 
-  unless (defined $c_class_name)
+  unless (defined $c_class_type)
   {
     $self->fixed_error ('Could not find any type struct (' . $gir_type_struct . ').');
   }
 
-  my $c_parent_name = undef;
+  my $c_parent_type = undef;
 
   # if parent is for example Gtk.Widget
   if ($gir_parent =~ /^([^.]+)\.(.*)/)
   {
     my $gir_parent_module = $1;
-    my $gir_parent_name = $2;
+    my $gir_parent_type = $2;
     my $parent_repository = $repositories=>get_repository ($gir_parent_module);
 
     unless (defined $parent_repository)
@@ -1925,51 +1925,51 @@ sub _on_class_interface ($)
 
     foreach my $gir_parent_prefix (@gir_parent_prefixes)
     {
-      my $temp_parent_name = $gir_parent_prefix . $gir_parent_name;
-      my $gir_parent_class = $parent_namespace->get_g_class_by_name ($temp_parent_name);
+      my $temp_parent_type = $gir_parent_prefix . $gir_parent_type;
+      my $gir_parent_class = $parent_namespace->get_g_class_by_name ($temp_parent_type);
 
       if (defined $gir_parent_class)
       {
-        $c_parent_name = $temp_parent_name;
+        $c_parent_type = $temp_parent_type;
         last;
       }
     }
 
-    unless (defined $c_parent_name)
+    unless (defined $c_parent_type)
     {
-      $self->fixed_error ('No such parent class in namespace: `' . $c_parent_name . '\.');
+      $self->fixed_error ('No such parent class in namespace: `' . $c_parent_type . '\.');
     }
   }
   else
   {
     for my $gir_prefix (@gir_prefixes)
     {
-      my $temp_parent_name = $gir_prefix . $gir_parent;
-      my $gir_parent_class = $namespace->get_g_class_by_name ($temp_parent_name);
+      my $temp_parent_type = $gir_prefix . $gir_parent;
+      my $gir_parent_class = $namespace->get_g_class_by_name ($temp_parent_type);
 
       if (defined $gir_parent_class)
       {
-        $c_parent_name = $temp_parent_name;
+        $c_parent_type = $temp_parent_type;
         last;
       }
     }
 
-    unless (defined $c_parent_name)
+    unless (defined $c_parent_type)
     {
-      $self->fixed_error ('No such parent class in namespace: `' . $c_parent_name . '\.');
+      $self->fixed_error ('No such parent class in namespace: `' . $c_parent_type . '\.');
     }
   }
 
   my $type_info_local = $self->get_type_info_local;
-  my $cxx_parent_type = $type_info_local->c_to_cxx ($c_parent_name);
+  my $cxx_parent_type = $type_info_local->c_to_cxx ($c_parent_type);
 
   $self->_push_gir_class ($gir_class);
 
   Common::Output::Interface::output $self,
-                                    $c_name,
-                                    $c_class_name,
-                                    $c_parent_name,
-                                    $cpp_name,
+                                    $c_type,
+                                    $c_class_type,
+                                    $c_parent_type,
+                                    $cxx_type,
                                     $cxx_parent_type,
                                     $get_type_func;
 }
@@ -2002,7 +2002,7 @@ sub _on_class_opaque_copyable ($)
     $self->fixed_error ('No such namespace: ' . $module);
   }
 
-  my ($cpp_type, $c_type, $new_func, $copy_func, $free_func) = @args;
+  my ($cxx_type, $c_type, $new_func, $copy_func, $free_func) = @args;
   my $gir_record = $namespace->get_g_record_by_name ($c_type);
 
   unless (defined $gir_record)
@@ -2134,7 +2134,7 @@ sub _on_class_opaque_copyable ($)
 
   Common::Output::OpaqueCopyable::output $self,
                                          $c_type,
-                                         $cpp_type,
+                                         $cxx_type,
                                          $new_func,
                                          $copy_func,
                                          $free_func;
@@ -2168,7 +2168,7 @@ sub _on_class_opaque_refcounted ($)
     $self->fixed_error ('No such namespace: ' . $module);
   }
 
-  my ($cpp_type, $c_type, $new_func, $copy_func, $free_func) = @args;
+  my ($cxx_type, $c_type, $new_func, $copy_func, $free_func) = @args;
   my $gir_record = $namespace->get_g_record_by_name ($c_type);
 
   unless (defined $gir_record)
@@ -2300,7 +2300,7 @@ sub _on_class_opaque_refcounted ($)
 
   Common::Output::OpaqueRefcounted::output $self,
                                            $c_type,
-                                           $cpp_type,
+                                           $cxx_type,
                                            $new_func,
                                            $copy_func,
                                            $free_func;
@@ -2620,7 +2620,7 @@ sub new ($$$$$$)
 #    '`' => [$self, \&_on_backtick], # probably won't be needed anymore
 #    '\'' => [$self, \&_on_apostrophe], # probably won't be needed anymore
     '"' => [$self, \&_on_string_literal],
-    '//' => [$self, \&_on_comment_cpp],
+    '//' => [$self, \&_on_comment_cxx],
     '///' => [$self, \&_on_comment_doxygen_single],
     '//!' => [$self, \&_on_comment_doxygen_single],
     '/*' => [$self, \&_on_comment_c],

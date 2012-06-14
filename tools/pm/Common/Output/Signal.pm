@@ -30,12 +30,12 @@ sub nl
 
 sub _output_h ($$$$$$)
 {
-  my ($wrap_parser, $ifdef, $cpp_return_type, $cpp_signal_name, $cpp_param_types, $default_signal_handler_enabled) = @_;
+  my ($wrap_parser, $ifdef, $cxx_return_type, $cxx_signal_name, $cxx_param_types, $default_signal_handler_enabled) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
-  my $cpp_param_types_str = join ', ', @{$cpp_param_types};
+  my $cxx_param_types_str = join ', ', @{$cxx_param_types};
   my $code_string = (Common::Output::Shared::ifdef $ifdef) .
-                    nl ('  Glib::SignalProxy' . (scalar @{$cpp_param_types}) . '< ' . $cpp_return_type . ', ' . $cpp_param_types_str . ' > signal_' . $cpp_signal_name . '();') .
+                    nl ('  Glib::SignalProxy' . (scalar @{$cxx_param_types}) . '< ' . $cxx_return_type . ', ' . $cxx_param_types_str . ' > signal_' . $cxx_signal_name . '();') .
                     nl () .
                     Common::Output::Shared::endif $ifdef;
 
@@ -44,7 +44,7 @@ sub _output_h ($$$$$$)
   if ($default_signal_handler_enabled)
   {
     $code_string = (Common::Output::Shared::ifdef $ifdef) .
-                   nl ('  virtual ' . $cpp_return_type . ' on_' . $cpp_signal_name . '(' . $cpp_param_types_str . ');') .
+                   nl ('  virtual ' . $cxx_return_type . ' on_' . $cxx_signal_name . '(' . $cxx_param_types_str . ');') .
                    nl () .
                    Common::Output::Shared::endif $ifdef;
 
@@ -74,21 +74,21 @@ sub _output_p_h ($$$$$$$)
 
 sub _output_cc ($$$$$$$$$$$$$$)
 {
-  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_signal_string, $c_param_types, $c_param_names, $c_param_transfers, $cpp_return_type, $cpp_signal_name, $cpp_param_types, $custom_c_callback, $default_signal_handler_enabled) = @_;
+  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_signal_string, $c_param_types, $c_param_names, $c_param_transfers, $cxx_return_type, $cxx_signal_name, $cxx_param_types, $custom_c_callback, $default_signal_handler_enabled) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $signal_prefix = $full_cpp_type;
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $signal_prefix = $full_cxx_type;
   my $c_type = Common::Output::Shared::get_c_type $wrap_parser;
 
   $signal_prefix =~ s/::/_/g;
 
-  my $proxy_info = $signal_prefix . '_signal_' . $cpp_signal_name . '_info';
+  my $proxy_info = $signal_prefix . '_signal_' . $cxx_signal_name . '_info';
   my $ret_void = ($c_return_type eq 'void');
-  my $cpp_param_types_str = join ', ', @cpp_param_types;
+  my $cxx_param_types_str = join ', ', @cxx_param_types;
   my $type_info_local = $wrap_parser->get_type_info_local ();
   my $code_string = Common::Output::Shared::ifdef $ifdef;
 
-  if ($ret_void and not @{$c_param_types} and $cpp_return_type eq 'void' and not @{$cpp_param_types})
+  if ($ret_void and not @{$c_param_types} and $cxx_return_type eq 'void' and not @{$cxx_param_types})
   {
     $code_string .= nl ('// Use predefined callback for SignalProxy0<void> to reduce code size.') .
                     nl ('const Glib::SignalProxyInfo ' . $proxy_info . ' =') .
@@ -101,7 +101,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
   }
   else
   {
-    my $signal_callback = $signal_prefix . '_signal_' . $cpp_signal_name . '_callback';
+    my $signal_callback = $signal_prefix . '_signal_' . $cxx_signal_name . '_callback';
     my $signal_notify = undef;
 
     if ($ret_void)
@@ -110,13 +110,13 @@ sub _output_cc ($$$$$$$$$$$$$$)
     }
     else
     {
-      $signal_notify = $signal_prefix . '_signal_' . $cpp_signal_name . '_notify_callback';
+      $signal_notify = $signal_prefix . '_signal_' . $cxx_signal_name . '_notify_callback';
     }
     unless ($custom_c_callback)
     {
-      my $callback_cpp_params_str = Common::Output::Shared::convzipstr $wrap_parser, $c_param_types, $cpp_param_types, $c_param_transfers, $c_param_names;
+      my $callback_cxx_params_str = Common::Output::Shared::convzipstr $wrap_parser, $c_param_types, $cxx_param_types, $c_param_transfers, $c_param_names;
       my $c_params_str = Common::Output::Shared::paramzipstr $c_param_types, $c_param_names;
-      my $partial_return_string = '(*static_cast<SlotType*>(slot))(' . $callback_cpp_params_str . ')';
+      my $partial_return_string = '(*static_cast<SlotType*>(slot))(' . $callback_cxx_params_str . ')';
       my $return_string = $partial_return_string;
       my $last_return = '';
 
@@ -127,7 +127,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
 # TODO: print a warning - pointers returned from signals ought to have ownership transferred fully.
 # TODO continued: need warning or error with fixed line number for this.
         }
-        my $conv = $type_info_local->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $return_string);
+        my $conv = $type_info_local->get_conversion ($cxx_return_type, $c_return_type, $c_return_transfer, $return_string);
 
         $return_string = 'return ' . $conv;
         $last_return = nl () .
@@ -137,7 +137,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
       $code_string .= nl ($c_return_type . ' ' . $signal_callback . '(' . $c_type . '* self, ' . $c_params_str . ', gpointer data)') .
                       nl ('{') .
                       nl ('  using namespace ' . (Common::Output::Shared::get_full_namespace $wrap_parser) . ';') .
-                      nl ('  typedef sigc::slot< ' . $cpp_return_type . ', ' . $cpp_param_types_str . ' > SlotType;') .
+                      nl ('  typedef sigc::slot< ' . $cxx_return_type . ', ' . $cxx_param_types_str . ' > SlotType;') .
                       nl () .
                       nl ('  // Do not try to call a signal on a disassociated wrapper.') .
                       nl ('  if (Glib::ObjectBase::_get_current_wrapper(static_cast<GObject*>(self)))') .
@@ -163,7 +163,7 @@ sub _output_cc ($$$$$$$$$$$$$$)
         $code_string .= nl ($c_return_type . ' ' . $signal_notify . '(' . $c_type . '* self, ' . $c_params_str . ', gpointer data)') .
                         nl ('{') .
                         nl ('  using namespace ' . (Common::Output::Shared::get_full_namespace $wrap_parser) . ';') .
-                        nl ('  typedef sigc::slot< void, ' . $cpp_param_types_str . ' > SlotType;') .
+                        nl ('  typedef sigc::slot< void, ' . $cxx_param_types_str . ' > SlotType;') .
                         nl () .
                         nl ('  // Do not try to call a signal on disassociated wrapper.') .
                         nl ('  if (Glib::ObjectBase::_get_current_wrapper(static_cast<GObject*>(self)))') .
@@ -202,10 +202,10 @@ sub _output_cc ($$$$$$$$$$$$$$)
 
   $section_manager->append_string_to_section ($code_string, $section);
 
-  my $signal_proxy_type = 'Glib::SignalProxy' . (scalar @{$cpp_param_types}) . '< ' . $cpp_return_type . ', ' . $cpp_param_types_str . ' >';
+  my $signal_proxy_type = 'Glib::SignalProxy' . (scalar @{$cxx_param_types}) . '< ' . $cxx_return_type . ', ' . $cxx_param_types_str . ' >';
 
   $code_string = (Common::Output::Shared::ifdef $ifdef) .
-                 nl ($signal_proxy_type . ' ' . $full_cpp_type . '::signal_' . $cpp_signal_name . '()') .
+                 nl ($signal_proxy_type . ' ' . $full_cxx_type . '::signal_' . $cxx_signal_name . '()') .
                  nl ('{') .
                  nl ('  ' . $signal_proxy_type . '(this, &' . $proxy_info . ');') .
                  nl ('}') .
@@ -219,12 +219,12 @@ sub _output_cc ($$$$$$$$$$$$$$)
     $code_string = Common::Output::Shared::ifdef $ifdef;
 
     my $parent_from_object = Common::Output::Shared::get_parent_from_object $wrap_parser, 'gobject_';
-    my $cpp_params_str = Common::Output::paramzipstr $cpp_param_types, $cpp_param_names;
-    my $cpp_to_c_params_str = Common::Output::Shared::convzipstr $cpp_param_types, $c_param_types, $c_param_transfers, $cpp_param_names;
-    my $c_func_invocation = '(*base->' . $c_signal_name . ')(gobj(), ' . $cpp_to_c_params_str . ')';
+    my $cxx_params_str = Common::Output::paramzipstr $cxx_param_types, $cxx_param_names;
+    my $cxx_to_c_params_str = Common::Output::Shared::convzipstr $cxx_param_types, $c_param_types, $c_param_transfers, $cxx_param_names;
+    my $c_func_invocation = '(*base->' . $c_signal_name . ')(gobj(), ' . $cxx_to_c_params_str . ')';
     my $last_return = '';
 
-    $code_string .= nl ($cpp_return_type . ' ' . $full_cpp_type . '::on_' . $cpp_signal_name . '(' . $cpp_params_str . ')') .
+    $code_string .= nl ($cxx_return_type . ' ' . $full_cxx_type . '::on_' . $cxx_signal_name . '(' . $cxx_params_str . ')') .
                     nl ('{') .
                     nl ('  BaseClassType* const base(static_cast<BaseClassType*>(' . $parent_from_object . '));') .
                     nl () .
@@ -237,11 +237,11 @@ sub _output_cc ($$$$$$$$$$$$$$)
     }
     else
     {
-      my $conv = $type_info_local->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, $c_func_invocation);
+      my $conv = $type_info_local->get_conversion ($c_return_type, $cxx_return_type, $c_return_transfer, $c_func_invocation);
 
       $code_string .= nl ('    return ' . $conv . ';');
       $last_return = nl () .
-                     nl ('  typedef ' . $cpp_return_type . ' RType;') .
+                     nl ('  typedef ' . $cxx_return_type . ' RType;') .
                      nl ('  return RType();');
 
     }
@@ -257,12 +257,12 @@ sub _output_cc ($$$$$$$$$$$$$$)
 
 sub _output_p_cc ($$$$$$$$$$$$$)
 {
-  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_param_types, $c_param_names, $c_param_transfers, $cpp_return_type, $cpp_signal_name, $cpp_param_types, $default_signal_handler_enabled) = @_;
+  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_param_types, $c_param_names, $c_param_transfers, $cxx_return_type, $cxx_signal_name, $cxx_param_types, $default_signal_handler_enabled) = @_;
 
   if ($default_signal_handler_enabled)
   {
     my $section_manager = $wrap_parser->get_section_manager;
-    my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
+    my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
     my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_CC_INIT_DEFAULT_SIGNAL_HANDLERS;
     my $code_string = (Common::Output::Shared::ifdef $ifdef) .
                       nl ('  klass->' . $c_signal_name . ' = &' . $c_signal_name . '_callback;') .
@@ -274,14 +274,14 @@ sub _output_p_cc ($$$$$$$$$$$$$)
     my $c_params_str = Common::Output::Shared::zupstr $c_param_types, $c_param_names, ' ', ', ';
     my $ret_void = ($c_return_type eq 'void');
     my $type_info_local = $wrap_parser->get_type_info_local ();
-    my $convs_str = Common::Output::Shared::convzipstr $c_param_types, $cpp_param_types, $c_param_transfers, $c_param_names;
-    my $vfunc_call = 'obj->on_' . $cpp_signal_name . '(' . $convs_str . ')';
+    my $convs_str = Common::Output::Shared::convzipstr $c_param_types, $cxx_param_types, $c_param_transfers, $c_param_names;
+    my $vfunc_call = 'obj->on_' . $cxx_signal_name . '(' . $convs_str . ')';
     my $c_callback_call = '(*base->' . $c_signal_name . '(self, ' . (join ', ', @{$c_param_names}) . ')';
     my $last_return = '';
 
     unless ($ret_void)
     {
-      $vfunc_call = 'return ' . $type_info_local->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $vfunc_call);
+      $vfunc_call = 'return ' . $type_info_local->get_conversion ($cxx_return_type, $c_return_type, $c_return_transfer, $vfunc_call);
       $c_callback_call = 'return ' . $c_callback_call;
       $last_return = nl () .
                      nl ('  typedef ' . $c_return_type . ' RType;') .
@@ -297,7 +297,7 @@ sub _output_p_cc ($$$$$$$$$$$$$)
     my $c_type = Common::Output::Shared::get_c_type $wrap_parser;
 
     $code_string = (Common::Output::Shared::ifdef $ifdef) .
-                   nl ($c_return_type . ' ' . $cpp_class_type . '::' . $c_signal_name . '_callback(' . $c_type . '* self, ' . $c_params_str . ')') .
+                   nl ($c_return_type . ' ' . $cxx_class_type . '::' . $c_signal_name . '_callback(' . $c_type . '* self, ' . $c_params_str . ')') .
                    nl ('{') .
                    nl ('  // First, do a simple cast to ObjectBase. We will have to do a dynamic cast') .
                    nl ('  // eventually, but it is not necessary to check whether we need to call') .
@@ -348,12 +348,12 @@ sub _output_p_cc ($$$$$$$$$$$$$)
 # TODO: Add custom_signal_handler.
 sub output ($$$$$$$$$$$$$$$$)
 {
-  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_signal_string, $c_param_types, $c_param_names, $c_param_transfers, $cpp_return_type, $cpp_signal_name, $cpp_param_types, $cpp_param_names, $custom_c_callback, $default_signal_handler_enabled) = @_;
+  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_signal_string, $c_param_types, $c_param_names, $c_param_transfers, $cxx_return_type, $cxx_signal_name, $cxx_param_types, $cxx_param_names, $custom_c_callback, $default_signal_handler_enabled) = @_;
 
-  _output_h $wrap_parser, $ifdef, $cpp_return_type, $cpp_signal_name, $cpp_param_types, $default_signal_handler_enabled;
+  _output_h $wrap_parser, $ifdef, $cxx_return_type, $cxx_signal_name, $cxx_param_types, $default_signal_handler_enabled;
   _output_p_h $wrap_parser, $ifdef, $c_return_type, $c_signal_name, $c_param_types, $c_param_names, $default_signal_handler_enabled;
-  _output_cc $wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_signal_string, $c_param_types, $c_param_names, $c_param_transfers, $cpp_return_type, $cpp_signal_name, $cpp_param_types, $custom_c_callback, $default_signal_handler_enabled;
-  _output_p_cc $wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_param_types, $c_param_names, $c_param_transfers, $cpp_return_type, $cpp_signal_name, $cpp_param_types, $default_signal_handler_enabled;
+  _output_cc $wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_signal_string, $c_param_types, $c_param_names, $c_param_transfers, $cxx_return_type, $cxx_signal_name, $cxx_param_types, $custom_c_callback, $default_signal_handler_enabled;
+  _output_p_cc $wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_signal_name, $c_param_types, $c_param_names, $c_param_transfers, $cxx_return_type, $cxx_signal_name, $cxx_param_types, $default_signal_handler_enabled;
 }
 
 1; # indicate proper module load.

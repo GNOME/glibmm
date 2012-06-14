@@ -32,7 +32,7 @@ sub _output_h_before_namespace ($$$)
 {
   my ($wrap_parser, $c_type, $c_class_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
-  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
+  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
   my $subconditional = Common::Output::Shared::struct_prototype $wrap_parser, $c_type, $c_class_type;
   my $variable = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::NO_WRAP_FUNCTION;
   my $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
@@ -43,7 +43,7 @@ sub _output_h_before_namespace ($$$)
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($variable, $conditional);
   my $code_string = Common::Output::Shared::open_namespaces ($wrap_parser) .
-                    nl ('class ' . $cpp_class_type . ';') .
+                    nl ('class ' . $cxx_class_type . ';') .
                     Common::Output::Shared::close_namespaces ($wrap_parser) .
                     nl ();
   $section_manager->append_string ($code_string);
@@ -52,16 +52,16 @@ sub _output_h_before_namespace ($$$)
 
 sub _output_h_in_class ($$$$$$)
 {
-  my ($wrap_parser, $c_type, $c_parent_type, $c_class_type, $cpp_type, $cpp_parent_type) = @_;
+  my ($wrap_parser, $c_type, $c_parent_type, $c_class_type, $cxx_type, $cxx_parent_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
-  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
+  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
   my $code_string = nl (Common::Output::Shared::doxy_skip_begin) .
                     nl () .
                     nl ('public:') .
-                    nl ('  typedef ' . $cpp_type . ' CppObjectType;') .
-                    nl ('  typedef ' . $cpp_class_type . ' CppClassType;') .
-                    nl ('  typedef ' . $cpp_parent_type . ' CppParentType;') .
+                    nl ('  typedef ' . $cxx_type . ' CppObjectType;') .
+                    nl ('  typedef ' . $cxx_class_type . ' CppClassType;') .
+                    nl ('  typedef ' . $cxx_parent_type . ' CppParentType;') .
                     nl ('  typedef ' . $c_type . ' BaseObjectType;') .
                     nl ('  typedef ' . $c_class_type . ' BaseClassType;') .
                     nl ('  typedef ' . $c_parent_type . ' BaseParentType;') .
@@ -81,23 +81,23 @@ sub _output_h_in_class ($$$$$$)
   $section_manager->set_variable_for_conditional ($variable, $conditional);
 
   my $virtual_dtor = 1;
-  my $base_member = lc ($cpp_class_type) . '_';
+  my $base_member = lc ($cxx_class_type) . '_';
 
-  $code_string = nl ('  friend class ' . $cpp_class_type . ';') .
+  $code_string = nl ('  friend class ' . $cxx_class_type . ';') .
                  nl ('  static CppClassType ' . $base_member . ';') .
                  nl () .
                  nl ('private:') .
                  nl ('  // noncopyable') .
-                 nl (Common::Output::Shared::copy_protos_str $cpp_type) .
+                 nl (Common::Output::Shared::copy_protos_str $cxx_type) .
                  nl () .
                  nl ('protected:') .
-                 nl ('  explicit ' . $cpp_type . '(const Glib::ConstructParams& construct_params);') .
-                 nl ('  explicit ' . $cpp_type . '(' . $c_type . '* castitem);') .
+                 nl ('  explicit ' . $cxx_type . '(const Glib::ConstructParams& construct_params);') .
+                 nl ('  explicit ' . $cxx_type . '(' . $c_type . '* castitem);') .
                  nl () .
                  nl (Common::Output::Shared::doxy_skip_end) .
                  nl () .
                  nl ('public:') .
-                 nl (Common::Output::Shared::dtor_proto_str $cpp_type, $virtual_dtor) .
+                 nl (Common::Output::Shared::dtor_proto_str $cxx_type, $virtual_dtor) .
                  nl () .
                  nl (Common::Output::Shared::doxy_skip_begin) .
                  nl ('  static GType get_type() G_GNUC_CONST;');
@@ -139,20 +139,20 @@ sub _output_h_after_namespace ($$)
 
 sub _output_p_h ($$$$$)
 {
-  my ($wrap_parser, $c_type, $c_class_type, $c_parent_class_type, $cpp_parent_type) = @_;
-  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $cpp_parent_class_type = $cpp_parent_type . '::CppClassType';
+  my ($wrap_parser, $c_type, $c_class_type, $c_parent_class_type, $cxx_parent_type) = @_;
+  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $cxx_parent_class_type = $cxx_parent_type . '::CppClassType';
   my $section_manager = $wrap_parser->get_section_manager;
   my $code_string = nl ('#include <glibmm/class.h>') .
                     nl () .
                     Common::Output::Shared::open_namespaces ($wrap_parser) .
                     nl () .
-                    nl ('class ' . $cpp_class_type . ' : public Glib::Class') .
+                    nl ('class ' . $cxx_class_type . ' : public Glib::Class') .
                     nl ('{') .
                     nl ('public:') .
                     nl (Common::Output::Shared::doxy_skip_begin) .
-                    nl ('  typedef ' . $full_cpp_type . ' CppObjectType;') .
+                    nl ('  typedef ' . $full_cxx_type . ' CppObjectType;') .
                     nl ('  typedef ' . $c_type . ' BaseObjectType;');
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_H_GENERATED;
 
@@ -162,16 +162,16 @@ sub _output_p_h ($$$$$)
   my $do_not_derive_gtype_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::DO_NOT_DERIVE_GTYPE;
   my $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
 
-  $code_string = nl ('  typedef ' . $cpp_parent_class_type . ' CppClassParent;');
+  $code_string = nl ('  typedef ' . $cxx_parent_class_type . ' CppClassParent;');
   $section_manager->append_string_to_conditional ($code_string, $conditional, 1);
   $code_string = nl ('  typedef ' . $c_class_type . ' BaseClassType;') .
-                 nl ('  typedef ' . $cpp_parent_class_type . ' CppClassParent;') .
+                 nl ('  typedef ' . $cxx_parent_class_type . ' CppClassParent;') .
                  nl ('  typedef ' . $c_parent_class_type . ' BaseClassParent;');
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($do_not_derive_gtype_var, $conditional);
   $code_string = nl () .
-                 nl ('  friend class ' . $full_cpp_type . ';') .
+                 nl ('  friend class ' . $full_cxx_type . ';') .
                  nl (Common::Output::Shared::doxy_skip_end) .
                  nl () .
                  nl ('  const Glib::Class& init();') .
@@ -216,10 +216,10 @@ sub _output_p_h ($$$$$)
 
 sub _output_cc ($$$$$$)
 {
-  my ($wrap_parser, $c_type, $c_parent_type, $get_type_func, $cpp_type, $cpp_parent_type) = @_;
+  my ($wrap_parser, $c_type, $c_parent_type, $get_type_func, $cxx_type, $cxx_parent_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
-  my $complete_cpp_type = Common::Output::Shared::get_complete_cpp_type $wrap_parser;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
+  my $complete_cxx_type = Common::Output::Shared::get_complete_cxx_type $wrap_parser;
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
 
   {
     my $mm_module = $wrap_parser->get_mm_module;
@@ -245,9 +245,9 @@ sub _output_cc ($$$$$$)
   my $code_string = nl ('namespace Glib') .
                     nl ('{') .
                     nl () .
-                    nl ('Glib::RefPtr< ' . $complete_cpp_type . ' > wrap(' . $c_type . '* object, bool take_copy)') .
+                    nl ('Glib::RefPtr< ' . $complete_cxx_type . ' > wrap(' . $c_type . '* object, bool take_copy)') .
                     nl ('{') .
-                    nl ('  return Glib::RefPtr< ' . $complete_cpp_type . ' >(dynamic_cast< ' . $complete_cpp_type . '* >(Glib::wrap_auto (reinterpret_cast< GObject* >(object), take_copy)));') .
+                    nl ('  return Glib::RefPtr< ' . $complete_cxx_type . ' >(dynamic_cast< ' . $complete_cxx_type . '* >(Glib::wrap_auto (reinterpret_cast< GObject* >(object), take_copy)));') .
                     nl ('  // We use dynamic_cast<> in case of multiple inheritance.') .
                     nl ('}') .
                     nl () .
@@ -262,7 +262,7 @@ sub _output_cc ($$$$$$)
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($no_wrap_function_var, $conditional);
   $code_string = Common::Output::Shared::open_namespaces ($wrap_parser) .
-                 nl ($c_type . '* ' . $full_cpp_type . '::gobj_copy()') .
+                 nl ($c_type . '* ' . $full_cxx_type . '::gobj_copy()') .
                  nl ('{') .
                  nl ('  reference();') .
                  nl ('  return gobj();') .
@@ -273,9 +273,9 @@ sub _output_cc ($$$$$$)
 
   my $custom_ctor_cast_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::CUSTOM_CTOR_CAST;
 
-  $code_string = nl ($full_cpp_type . '::' . $cpp_type . '(const Glib::ConstructParams& construct_params)') .
+  $code_string = nl ($full_cxx_type . '::' . $cxx_type . '(const Glib::ConstructParams& construct_params)') .
                  nl (':') .
-                 nl ('  ' . $cpp_parent_type . '(construct_params)') .
+                 nl ('  ' . $cxx_parent_type . '(construct_params)') .
                  nl ('{');
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
 
@@ -284,9 +284,9 @@ sub _output_cc ($$$$$$)
   $section_manager->append_conditional_to_conditional ($subconditional, $conditional, 0);
   $code_string = nl ('}') .
                  nl () .
-                 nl ($full_cpp_type . '::' . $cpp_type . '(' . $c_type . '* castitem)') .
+                 nl ($full_cxx_type . '::' . $cxx_type . '(' . $c_type . '* castitem)') .
                  nl (':') .
-                 nl ('  ' . $cpp_parent_type . '(reinterpret_cast< ' . $c_parent_type . '* >(castitem))') .
+                 nl ('  ' . $cxx_parent_type . '(reinterpret_cast< ' . $c_parent_type . '* >(castitem))') .
                  nl ('{}') .
                  nl ();
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
@@ -295,28 +295,28 @@ sub _output_cc ($$$$$$)
   $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
 
   my $custom_dtor_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::CUSTOM_DTOR;
-  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
+  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
 
-  $code_string = nl ($full_cpp_type . '::~' . $cpp_type . '()') .
+  $code_string = nl ($full_cxx_type . '::~' . $cxx_type . '()') .
                  nl ('{}') .
                  nl ();
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($custom_dtor_var, $conditional);
 
-  my $base_member = lc ($cpp_class_type) . '_';
+  my $base_member = lc ($cxx_class_type) . '_';
 
 # TODO: move to Shared?
-  $code_string = nl ($full_cpp_type . '::CppClassType ' . $full_cpp_type . '::' . $base_member . '; // Initialize static member') .
+  $code_string = nl ($full_cxx_type . '::CppClassType ' . $full_cxx_type . '::' . $base_member . '; // Initialize static member') .
                  nl () .
-                 nl ('GType ' . $full_cpp_type . '::get_type()') .
+                 nl ('GType ' . $full_cxx_type . '::get_type()') .
                  nl ('{') .
                  nl ('  return ' . $base_member . '.init().get_type();') .
                  nl ('}') .
                  nl ();
   $section_manager->append_string ($code_string);
   $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
-  $code_string = nl ('GType ' . $full_cpp_type . '::get_type(GTypeModule* module)') .
+  $code_string = nl ('GType ' . $full_cxx_type . '::get_type(GTypeModule* module)') .
                  nl ('{') .
                  nl ('  return ' . $base_member . '.init(module).get_type();') .
                  nl ('}') .
@@ -327,7 +327,7 @@ sub _output_cc ($$$$$$)
   $section_manager->append_string_to_conditional ($code_string, $conditional, 1);
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($dynamic_gtype_registration_var, $conditional);
-  $code_string = nl ('GType ' . $full_cpp_type . '::get_base_type()') .
+  $code_string = nl ('GType ' . $full_cxx_type . '::get_base_type()') .
                  nl ('{') .
                  nl ('  return ' . $get_type_func . '();') .
                  nl ('}') .
@@ -341,7 +341,7 @@ sub _output_cc ($$$$$$)
     (Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_PROPERTY_PROXIES),
     (Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_DEFAULT_SIGNAL_HANDLERS),
     (Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_VFUNCS),
-    (Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_VFUNCS_CPP_WRAPPER),
+    (Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_VFUNCS_CXX_WRAPPER),
     (Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_CC_NAMESPACE)
   );
 
@@ -358,9 +358,9 @@ sub _output_p_cc ($$$$)
 {
   my ($wrap_parser, $c_type, $c_type_class, $get_type_func) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
-  my $code_string = nl ('const Glib::Class& ' . $cpp_class_type . '::init()') .
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
+  my $code_string = nl ('const Glib::Class& ' . $cxx_class_type . '::init()') .
                     nl ('{') .
                     nl ('  if (!gtype_) // create the GType if necessary') .
                     nl ('  {');
@@ -375,7 +375,7 @@ sub _output_p_cc ($$$$)
   $code_string = nl ('    gtype_ = CppClassParent::CppObjectType::get_type();');
   $section_manager->append_string_to_conditional ($code_string, $conditional, 1);
   $code_string = nl ('    // Glib::Class has to know the class init function to clone custom types.') .
-                 nl ('    class_init_func_ = &' . $cpp_class_type . '::class_init_function;') .
+                 nl ('    class_init_func_ = &' . $cxx_class_type . '::class_init_function;') .
                  nl () .
                  nl ('    // This is actually just optimized away, apparently with no harm.') .
                  nl ('    // Make sure that the parent type has been created.') .
@@ -403,7 +403,7 @@ sub _output_p_cc ($$$$)
 
   my $dynamic_gtype_registration_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::DYNAMIC_GTYPE_REGISTRATION;
 
-  $code_string = nl ('const Glib::Class& ' . $cpp_class_type . '::init(GTypeModule* module)') .
+  $code_string = nl ('const Glib::Class& ' . $cxx_class_type . '::init(GTypeModule* module)') .
                  nl ('{') .
                  nl ('  if (!gtype_) // create the GType if necessary') .
                  nl ('  {');
@@ -416,7 +416,7 @@ sub _output_p_cc ($$$$)
                  nl ('    gtype_ = CppClassParent::CppObjectType::get_type();');
   $section_manager->append_string_to_conditional ($code_string, $subconditional, 1);
   $code_string = nl ('    // Glib::Class has to know the class init function to clone custom types.') .
-                 nl ('    class_init_func_ = &' . $cpp_class_type . '::class_init_function;') .
+                 nl ('    class_init_func_ = &' . $cxx_class_type . '::class_init_function;') .
                  nl () .
                  nl ('    // This is actually just optimized away, apparently with no harm.') .
                  nl ('    // Make sure that the parent type has been created.') .
@@ -443,7 +443,7 @@ sub _output_p_cc ($$$$)
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($dynamic_gtype_registration_var, $conditional);
   $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
-  $code_string = nl ('void ' . $cpp_class_type . '::class_init_function(void* g_class, void* class_data)') .
+  $code_string = nl ('void ' . $cxx_class_type . '::class_init_function(void* g_class, void* class_data)') .
                  nl ('{') .
                  nl ('  BaseClassType* const klass = static_cast< BaseClassType* >(g_class);') .
                  nl ('  CppClassParent::class_init_function(klass, class_data);') .
@@ -481,9 +481,9 @@ sub _output_p_cc ($$$$)
     $section_manager->append_string (nl);
   }
 
-  $code_string = nl ('Glib::ObjectBase* ' . $cpp_class_type . '::wrap_new(GObject* object)') .
+  $code_string = nl ('Glib::ObjectBase* ' . $cxx_class_type . '::wrap_new(GObject* object)') .
                  nl ('{') .
-                 nl ('  return new ' . $full_cpp_type . '(reinterpret_cast< ' . $c_type . '* >(object));') .
+                 nl ('  return new ' . $full_cxx_type . '(reinterpret_cast< ' . $c_type . '* >(object));') .
                  nl ('}') .
                  nl ();
   $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
@@ -498,13 +498,13 @@ sub _output_p_cc ($$$$)
 
 sub output ($$$$$$$$)
 {
-  my ($wrap_parser, $c_type, $c_class_type, $c_parent_type, $c_parent_class_type, $get_type_func, $cpp_type, $cpp_parent_type) = @_;
+  my ($wrap_parser, $c_type, $c_class_type, $c_parent_type, $c_parent_class_type, $get_type_func, $cxx_type, $cxx_parent_type) = @_;
 
   _output_h_before_namespace $wrap_parser, $c_type, $c_class_type;
-  _output_h_in_class $wrap_parser, $c_type, $c_parent_type, $c_class_type, $cpp_type, $cpp_parent_type;
+  _output_h_in_class $wrap_parser, $c_type, $c_parent_type, $c_class_type, $cxx_type, $cxx_parent_type;
   _output_h_after_namespace $wrap_parser, $c_type;
-  _output_p_h $wrap_parser, $c_type, $c_class_type, $c_parent_class_type, $cpp_parent_type;
-  _output_cc $wrap_parser, $c_type, $c_parent_type, $get_type_func, $cpp_type, $cpp_parent_type;
+  _output_p_h $wrap_parser, $c_type, $c_class_type, $c_parent_class_type, $cxx_parent_type;
+  _output_cc $wrap_parser, $c_type, $c_parent_type, $get_type_func, $cxx_type, $cxx_parent_type;
   _output_p_cc $wrap_parser, $c_type, $c_class_type, $get_type_func;
 }
 

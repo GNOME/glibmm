@@ -48,25 +48,25 @@ sub initially_unowned_sink ($)
 sub ctor_default ($)
 {
   my ($wrap_parser) = @_;
-  my $cpp_type = Common::Output::Shared::get_cpp_type $wrap_parser;
+  my $cxx_type = Common::Output::Shared::get_cxx_type $wrap_parser;
 
-  unless (defined $cpp_type)
+  unless (defined $cxx_type)
   {
 # TODO: warn.
     return;
   }
 
-  my $code_string = nl $cpp_type, '();';
+  my $code_string = nl $cxx_type, '();';
   my $main_section = $wrap_parser->get_main_section;
   my $section_manager = $wrap_parser->get_section_manager;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
-  my $base_member = (lc $cpp_class_type) . '_';
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
+  my $base_member = (lc $cxx_class_type) . '_';
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_NAMESPACE;
   my $conditional = initially_unowned_sink $wrap_parser;
 
   $section_manager->append_string_to_section ($code_string, $main_section);
-  $code_string = (nl $full_cpp_type, '::', $cpp_type, '()') .
+  $code_string = (nl $full_cxx_type, '::', $cxx_type, '()') .
                  (nl ':') .
                  (nl '  // Mark this class as non-derived to allow C++ vfuncs to be skipped.') .
                  (nl '  Glib::ObjectBase(0),') .
@@ -84,24 +84,24 @@ sub ctor_default ($)
 
 sub wrap_ctor ($$$$$$$)
 {
-  my ($wrap_parser, $c_param_types, $c_param_transfers, $c_prop_names, $cpp_param_types, $cpp_param_names, $cxx_param_values) = @_;
+  my ($wrap_parser, $c_param_types, $c_param_transfers, $c_prop_names, $cxx_param_types, $cxx_param_names, $cxx_param_values) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
-  my $cpp_type = Common::Output::Shared::get_cpp_type $wrap_parser;
-  my $cpp_params_str_h = Common::Output::Shared::paramzipstr ($cpp_param_types, $cpp_param_names, $cxx_param_values);
-  my $cxx_params_str_cc = Common::Output::Shared::paramzipstr ($cpp_param_types, $cpp_param_names);
-  my $code_string = (nl 'explicit ', $cpp_type, '(', $cpp_params_str_h, ');') .
+  my $cxx_type = Common::Output::Shared::get_cxx_type $wrap_parser;
+  my $cxx_params_str_h = Common::Output::Shared::paramzipstr ($cxx_param_types, $cxx_param_names, $cxx_param_values);
+  my $cxx_params_str_cc = Common::Output::Shared::paramzipstr ($cxx_param_types, $cxx_param_names);
+  my $code_string = (nl 'explicit ', $cxx_type, '(', $cxx_params_str_h, ');') .
                     (nl);
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_NAMESPACE;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
-  my $base_member = (lc $cpp_class_type) . '_';
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
+  my $base_member = (lc $cxx_class_type) . '_';
   my $conditional = initially_unowned_sink $wrap_parser;
   my $type_info_local = $wrap_parser->get_type_info_local ();
-  my $ctor_params_str = join ', ', '', (map { join '', '"', $c_prop_names->[$_], '", ', ($type_info_local->get_conversion ($cpp_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cpp_param_names->[$_])) } 0 .. (@{$cpp_param_types} - 1)), 'static_cast<char*>(0)';
+  my $ctor_params_str = join ', ', '', (map { join '', '"', $c_prop_names->[$_], '", ', ($type_info_local->get_conversion ($cxx_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cxx_param_names->[$_])) } 0 .. (@{$cxx_param_types} - 1)), 'static_cast<char*>(0)';
 
   $section_manager->append_string_to_section ($code_string, $main_section);
-  $code_string = (nl $full_cpp_type, '::', $cpp_type, '(', $cxx_params_str_cc, ')') .
+  $code_string = (nl $full_cxx_type, '::', $cxx_type, '(', $cxx_params_str_cc, ')') .
                  (nl ':') .
                  (nl '  // Mark this class as non-derived to allow C++ vfuncs to be skipped.') .
                  (nl '  Glib::ObjectBase(0),') .
@@ -119,21 +119,21 @@ sub wrap_ctor ($$$$$$$)
 
 sub wrap_create ($$$$)
 {
-  my ($wrap_parser, $cpp_param_types, $cpp_param_names, $cxx_param_values) = @_;
+  my ($wrap_parser, $cxx_param_types, $cxx_param_names, $cxx_param_values) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_NAMESPACE;
-  my $cpp_type = Common::Output::Shared::get_cpp_type $wrap_parser;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $cpp_params_str_h = Common::Output::Shared::paramzipstr ($cpp_param_types, $cpp_param_names, $cxx_param_values);
-  my $cxx_params_str_cc = Common::Output::Shared::paramzipstr ($cpp_param_types, $cpp_param_names);
-  my $cpp_names_str = join ', ', @{$cpp_param_names};
-  my $code_string = (nl 'static Glib::RefPtr< ', $cpp_type, ' > create(', $cpp_params_str_h, ');');
+  my $cxx_type = Common::Output::Shared::get_cxx_type $wrap_parser;
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $cxx_params_str_h = Common::Output::Shared::paramzipstr ($cxx_param_types, $cxx_param_names, $cxx_param_values);
+  my $cxx_params_str_cc = Common::Output::Shared::paramzipstr ($cxx_param_types, $cxx_param_names);
+  my $cxx_names_str = join ', ', @{$cxx_param_names};
+  my $code_string = (nl 'static Glib::RefPtr< ', $cxx_type, ' > create(', $cxx_params_str_h, ');');
 
   $section_manager->append_string_to_section ($code_string, $main_section);
-  $code_string = (nl 'Glib::RefPtr< ', $full_cpp_type, ' > ', $full_cpp_type, '::create(', $cxx_params_str_cc, ')') .
+  $code_string = (nl 'Glib::RefPtr< ', $full_cxx_type, ' > ', $full_cxx_type, '::create(', $cxx_params_str_cc, ')') .
                  (nl '{') .
-                 (nl '  return Glib::RefPtr< ', $cpp_type, ' >(new ', $cpp_type, '(', $cpp_names_str, '));') .
+                 (nl '  return Glib::RefPtr< ', $cxx_type, ' >(new ', $cxx_type, '(', $cxx_names_str, '));') .
                  (nl '}') .
                  (nl);
   $section_manager->append_string_to_section ($code_string, $section);

@@ -30,23 +30,23 @@ sub nl
 
 sub _output_h ($$$$$$$$)
 {
-  my ($wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $cpp_param_types, $cpp_param_names, $cxx_param_values, $const) = @_;
+  my ($wrap_parser, $static, $cxx_ret_type, $cxx_func_name, $cxx_param_types, $cxx_param_names, $cxx_param_values, $const) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
   my $code_string = '';
 
-  die if (scalar (@{$cpp_param_types}) != scalar(@{$cpp_param_names}));
+  die if (scalar (@{$cxx_param_types}) != scalar(@{$cxx_param_names}));
   die if ($static and $const);
 
   if ($static)
   {
     $code_string .= 'static ';
   }
-  $code_string .= $cpp_ret_type . ' ' . $cpp_func_name;
+  $code_string .= $cxx_ret_type . ' ' . $cxx_func_name;
 
-  my $cpp_params_str = Common::Output::Shared::paramzipstr $cpp_param_types, $cpp_param_names, $cxx_param_values;
+  my $cxx_params_str = Common::Output::Shared::paramzipstr $cxx_param_types, $cxx_param_names, $cxx_param_values;
 
-  $code_string .= '(' . $cpp_params_str . ')';
+  $code_string .= '(' . $cxx_params_str . ')';
   if ($const)
   {
     $code_string .= ' const';
@@ -57,21 +57,21 @@ sub _output_h ($$$$$$$$)
 
 sub _output_cc ($$$$$$$$$$$$$$$$$)
 {
-  my ($wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $cpp_param_types, $cpp_param_names, $cxx_param_out_index, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow) = @_;
+  my ($wrap_parser, $static, $cxx_ret_type, $cxx_func_name, $cxx_param_types, $cxx_param_names, $cxx_param_out_index, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $code_string = '';
-  my $ret_void = ($cpp_ret_type eq 'void');
+  my $ret_void = ($cxx_ret_type eq 'void');
 
 # TODO: replace with exception throwing
   # if dies then it is internal error. should not happen here.
   die if ($static and ($const or $constversion));
-  die if (scalar (@{$cpp_param_types}) != scalar(@{$cpp_param_names}));
+  die if (scalar (@{$cxx_param_types}) != scalar(@{$cxx_param_names}));
   if ($cxx_param_out_index < 0) {
-    die if (scalar (@{$c_param_types}) != scalar(@{$cpp_param_types}));
+    die if (scalar (@{$c_param_types}) != scalar(@{$cxx_param_types}));
   }
   else
   {
-    die if (scalar (@{$c_param_types}) + 1 != scalar(@{$cpp_param_types}));
+    die if (scalar (@{$c_param_types}) + 1 != scalar(@{$cxx_param_types}));
   }
 
   if ($deprecated)
@@ -87,14 +87,14 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
     $code_string .= nl ('// static');
   }
 
-  my $cpp_params_str = Common::Output::Shared::paramzipstr $cpp_param_types, $cpp_param_names;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
+  my $cxx_params_str = Common::Output::Shared::paramzipstr $cxx_param_types, $cxx_param_names;
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
   my $c_type = Common::Output::Shared::get_c_type $wrap_parser;
 
-  $code_string .= nl ($cpp_ret_type . ' ' . $full_cpp_type . '::' . $cpp_func_name . '(' . $cpp_params_str . ')' . ($const ? ' const' : '')) .
+  $code_string .= nl ($cxx_ret_type . ' ' . $full_cxx_type . '::' . $cxx_func_name . '(' . $cxx_params_str . ')' . ($const ? ' const' : '')) .
                   nl ('{');
 
-  my $names_only = join ', ', @{$cpp_param_names};
+  my $names_only = join ', ', @{$cxx_param_names};
 
   if ($constversion)
   {
@@ -104,7 +104,7 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
     {
       $ret = 'return ';
     }
-    $code_string .= nl ('  ' . $ret . 'const_cast< ' . $full_cpp_type . '* >(this)->' . $cpp_func_name . '(' . $names_only . ');');
+    $code_string .= nl ('  ' . $ret . 'const_cast< ' . $full_cxx_type . '* >(this)->' . $cxx_func_name . '(' . $names_only . ');');
   }
   else
   {
@@ -128,14 +128,14 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
 
     if ($cxx_param_out_index < 0)
     {
-      $prepped_cxx_param_types = $cpp_param_types;
-      $prepped_cxx_param_names = $cpp_param_names;
+      $prepped_cxx_param_types = $cxx_param_types;
+      $prepped_cxx_param_names = $cxx_param_names;
     }
     else
     {
       # copy arrays
-      $prepped_cxx_param_types = [@{$cpp_param_types}];
-      $prepped_cxx_param_names = [@{$cpp_param_names}];
+      $prepped_cxx_param_types = [@{$cxx_param_types}];
+      $prepped_cxx_param_names = [@{$cxx_param_names}];
 
       splice (@{$prepped_cxx_param_types}, $cxx_param_out_index, 1);
       splice (@{$prepped_cxx_param_names}, $cxx_param_out_index, 1);
@@ -159,11 +159,11 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
 
     unless ($ret_void)
     {
-      $ret_convert = $type_info_local->get_conversion ($c_ret_type, $cpp_ret_type, $ret_transfer, $c_func_invocation);
+      $ret_convert = $type_info_local->get_conversion ($c_ret_type, $cxx_ret_type, $ret_transfer, $c_func_invocation);
     }
     elsif ($cxx_param_out_index > -1)
     {
-      $ret_convert = $type_info_local->get_conversion ($c_ret_type, $cpp_param_types->[$cxx_param_out_index], $ret_transfer, $c_func_invocation);
+      $ret_convert = $type_info_local->get_conversion ($c_ret_type, $cxx_param_types->[$cxx_param_out_index], $ret_transfer, $c_func_invocation);
     }
 
     if ($errthrow)
@@ -172,11 +172,11 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
 
       unless ($ret_void)
       {
-        $code_string .= nl ('  ' . $cpp_ret_type . ' retvalue(' . $ret_convert . ');');
+        $code_string .= nl ('  ' . $cxx_ret_type . ' retvalue(' . $ret_convert . ');');
       }
       elsif ($cxx_param_out_index > -1)
       {
-        $code_string .= nl ('  ' . $cpp_param_names->[$cxx_param_out_index] . ' = (' . $ret_convert . ');');
+        $code_string .= nl ('  ' . $cxx_param_names->[$cxx_param_out_index] . ' = (' . $ret_convert . ');');
       }
       else
       {
@@ -205,7 +205,7 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
       }
       elsif ($cxx_param_out_index > -1)
       {
-        $code_string .= nl ('  ' . $cpp_param_names->[$cxx_param_out_index] . ' = (' . $ret_convert . ');');
+        $code_string .= nl ('  ' . $cxx_param_names->[$cxx_param_out_index] . ' = (' . $ret_convert . ');');
       }
       else
       {
@@ -230,13 +230,13 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
 
 sub output ($$$$$$$$$$$$$$$$$$$)
 {
-  my ($wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $cpp_param_types, $cpp_param_names, $cxx_param_values, $cxx_param_nullables, $cxx_param_out_index, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow) = @_;
-  my $permutations = Common::Output::Shared::get_types_permutations ($cpp_param_types, $cxx_param_nullables);
+  my ($wrap_parser, $static, $cxx_ret_type, $cxx_func_name, $cxx_param_types, $cxx_param_names, $cxx_param_values, $cxx_param_nullables, $cxx_param_out_index, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow) = @_;
+  my $permutations = Common::Output::Shared::get_types_permutations ($cxx_param_types, $cxx_param_nullables);
 
   foreach my $permutation (@{$permutations})
   {
-    _output_h $wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $permutation, $cpp_param_names, $cxx_param_values, $const;
-    _output_cc $wrap_parser, $static, $cpp_ret_type, $cpp_func_name, $permutation, $cpp_param_names, $cxx_param_out_index, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow;
+    _output_h $wrap_parser, $static, $cxx_ret_type, $cxx_func_name, $permutation, $cxx_param_names, $cxx_param_values, $const;
+    _output_cc $wrap_parser, $static, $cxx_ret_type, $cxx_func_name, $permutation, $cxx_param_names, $cxx_param_out_index, $const, $constversion, $deprecated, $ifdef, $c_ret_type, $ret_transfer, $c_func_name, $c_param_types, $c_param_transfers, $errthrow;
   }
 }
 

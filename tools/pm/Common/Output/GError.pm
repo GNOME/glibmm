@@ -30,7 +30,7 @@ sub nl
 
 sub _output_gerror ($$$)
 {
-  my ($wrap_parser, $cpp_type, $members) = @_;
+  my ($wrap_parser, $cxx_type, $members) = @_;
   my $string_members = Common::Output::Shared::convert_members_to_strings ($members);
   my $section_manager = $wrap_parser->get_section_manager;
   my $namespaces = $wrap_parser->get_namespaces;
@@ -41,7 +41,7 @@ sub _output_gerror ($$$)
     $wrap_init = '::' . $namespaces->[0] . '::' . $wrap_init;
   }
 
-  my $code_string = nl ('class ' . $cpp_type . ' : public Glib::Error') .
+  my $code_string = nl ('class ' . $cxx_type . ' : public Glib::Error') .
                     nl ('{') .
                     nl ('public:') .
                     nl ('  enum Code') .
@@ -49,8 +49,8 @@ sub _output_gerror ($$$)
                     nl (join nl (','), @{$string_members}) .
                     nl ('  };') .
                     nl () .
-                    nl ('  ' . $cpp_type . '(Code error_code, const Glib::ustring& error_message);') .
-                    nl ('  explicit ' . $cpp_type . '(GError* gobject);') .
+                    nl ('  ' . $cxx_type . '(Code error_code, const Glib::ustring& error_message);') .
+                    nl ('  explicit ' . $cxx_type . '(GError* gobject);') .
                     nl ('  Code code() const;') .
                     nl () .
                     nl (Common::Output::Shared::doxy_skip_begin) .
@@ -68,37 +68,37 @@ sub _output_gerror ($$$)
 
 sub _output_gerror_gtype_h ($$$)
 {
-  my ($wrap_parser, $cpp_type, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $get_type_func) = @_;
 
-  Common::Output::Shared::output_enum_gtype_func_h $wrap_parser, $cpp_type, Common::Output::Shared::ENUM_TYPE, $get_type_func;
+  Common::Output::Shared::output_enum_gtype_func_h $wrap_parser, $cxx_type, Common::Output::Shared::ENUM_TYPE, $get_type_func;
 }
 
 sub _output_gerror_impl ($$$)
 {
-  my ($wrap_parser, $cpp_type, $domain) = @_;
-  my $container_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $full_cpp_type = join '::', $container_cpp_type, $cpp_type;
+  my ($wrap_parser, $cxx_type, $domain) = @_;
+  my $container_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $full_cxx_type = join '::', $container_cxx_type, $cxx_type;
   my $section_manager->get_section_manager;
   my $code_string = nl (Common::Output::Shared::open_namespaces $wrap_parser) .
-                    nl ($full_cpp_type . '::' . $cpp_type . '(' . $full_cpp_type . '::Code error_code, const Glib::ustring& error_message)') .
+                    nl ($full_cxx_type . '::' . $cxx_type . '(' . $full_cxx_type . '::Code error_code, const Glib::ustring& error_message)') .
                     nl (':') .
                     nl ('  Glib::Error(g_quark_from_static_string ("' . $domain . '"), error_code, error_message)') .
                     nl ('{}') .
                     nl () .
-                    nl ($full_cpp_type . '::' . $cpp_type . '(GError* gobject)') .
+                    nl ($full_cxx_type . '::' . $cxx_type . '(GError* gobject)') .
                     nl (':') .
                     nl ('  Glib::Error(gobject)') .
                     nl ('{}') .
                     nl () .
-                    nl ($full_cpp_type . '::Code ' . $full_cpp_type . '::code() const') .
+                    nl ($full_cxx_type . '::Code ' . $full_cxx_type . '::code() const') .
                     nl ('{') .
                     nl ('  return static_cast<Code>(Glib::Error::code());') .
                     nl ('}') .
                     nl () .
                     nl ('// static') .
-                    nl ('void ' . $full_cpp_type . '::throw_func(GError* gobject)') .
+                    nl ('void ' . $full_cxx_type . '::throw_func(GError* gobject)') .
                     nl ('{') .
-                    nl ('  throw ' . $full_cpp_type . '(gobject);') .
+                    nl ('  throw ' . $full_cxx_type . '(gobject);') .
                     nl ('}') .
                     nl () .
                     Common::Output::Shared::close_namespaces $wrap_parser;
@@ -109,19 +109,19 @@ sub _output_gerror_impl ($$$)
 
 sub _output_gerror_gtype_cc ($$$)
 {
-  my ($wrap_parser, $cpp_type, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $get_type_func) = @_;
 
-  Common::Output::Shared::output_enum_gtype_func_cc ($wrap_parser, $cpp_type, $get_type_func);
+  Common::Output::Shared::output_enum_gtype_func_cc ($wrap_parser, $cxx_type, $get_type_func);
 }
 
 sub output ($$$$$)
 {
-  my ($wrap_parser, $cpp_type, $members, $domain, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $members, $domain, $get_type_func) = @_;
 
-  _output_gerror $wrap_parser, $cpp_type, $members;
-  _output_gerror_gtype_h $wrap_parser, $cpp_type, $get_type_func;
-  _output_gerror_impl $wrap_parser, $cpp_type, $domain;
-  _output_gerror_gtype_cc $wrap_parser, $cpp_type, $get_type_func;
+  _output_gerror $wrap_parser, $cxx_type, $members;
+  _output_gerror_gtype_h $wrap_parser, $cxx_type, $get_type_func;
+  _output_gerror_impl $wrap_parser, $cxx_type, $domain;
+  _output_gerror_gtype_cc $wrap_parser, $cxx_type, $get_type_func;
 }
 
 1; # indicate proper module load.

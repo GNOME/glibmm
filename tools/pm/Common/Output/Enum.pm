@@ -30,11 +30,11 @@ sub nl
 
 sub _output_enum ($$$)
 {
-  my ($wrap_parser, $cpp_type, $members) = @_;
+  my ($wrap_parser, $cxx_type, $members) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
   my $string_members = Common::Output::Shared::convert_members_to_strings $members;
-  my $code_string = nl ('enum ' . $cpp_type) .
+  my $code_string = nl ('enum ' . $cxx_type) .
                     nl ('{') .
                     nl (join ((nl ','), @{$string_members})) .
                     nl ('};') .
@@ -45,36 +45,36 @@ sub _output_enum ($$$)
 
 sub _output_flag_ops ($$$)
 {
-  my ($wrap_parser, $cpp_type, $flags) = @_;
+  my ($wrap_parser, $cxx_type, $flags) = @_;
 
   if ($flags)
   {
     my $section_manager = $wrap_parser->get_section_manager;
-    my $container_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-    my $full_cpp_type = join '::', $container_cpp_type, $cpp_type;
-    my $code_string .= nl ('inline ' . $full_cpp_type . ' operator|(' . $full_cpp_type . ' lhs, ' . $full_cpp_type . ' rhs)') .
-                       nl ('  { return static_cast<' . $full_cpp_type . '>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs)); }') .
+    my $container_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+    my $full_cxx_type = join '::', $container_cxx_type, $cxx_type;
+    my $code_string .= nl ('inline ' . $full_cxx_type . ' operator|(' . $full_cxx_type . ' lhs, ' . $full_cxx_type . ' rhs)') .
+                       nl ('  { return static_cast<' . $full_cxx_type . '>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs)); }') .
                        nl () .
-                       nl ('inline ' . $full_cpp_type . ' operator&(' . $full_cpp_type . ' lhs, ' . $full_cpp_type . ' rhs)') .
-                       nl ('  { return static_cast<' . $full_cpp_type . '>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs)); }') .
+                       nl ('inline ' . $full_cxx_type . ' operator&(' . $full_cxx_type . ' lhs, ' . $full_cxx_type . ' rhs)') .
+                       nl ('  { return static_cast<' . $full_cxx_type . '>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs)); }') .
                        nl () .
-                       nl ('inline ' . $full_cpp_type . ' operator^(' . $full_cpp_type . ' lhs, ' . $full_cpp_type . ' rhs)') .
-                       nl ('{ return static_cast<' . $full_cpp_type . '>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs)); }') .
+                       nl ('inline ' . $full_cxx_type . ' operator^(' . $full_cxx_type . ' lhs, ' . $full_cxx_type . ' rhs)') .
+                       nl ('{ return static_cast<' . $full_cxx_type . '>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs)); }') .
                        nl () .
-                       nl ('inline ' . $full_cpp_type . ' operator~(' . $full_cpp_type . ' flags)') .
-                       nl ('  { return static_cast<' . $full_cpp_type . '>(~static_cast<unsigned>(flags)); }') .
+                       nl ('inline ' . $full_cxx_type . ' operator~(' . $full_cxx_type . ' flags)') .
+                       nl ('  { return static_cast<' . $full_cxx_type . '>(~static_cast<unsigned>(flags)); }') .
                        nl () .
-                       nl ('inline ' . $full_cpp_type . '& operator|=(' . $full_cpp_type . '& lhs, ' . $full_cpp_type . ' rhs)') .
-                       nl ('  { return (lhs = static_cast<' . $full_cpp_type . '>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs))); }') .
+                       nl ('inline ' . $full_cxx_type . '& operator|=(' . $full_cxx_type . '& lhs, ' . $full_cxx_type . ' rhs)') .
+                       nl ('  { return (lhs = static_cast<' . $full_cxx_type . '>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs))); }') .
                        nl () .
-                       nl ('inline ' . $full_cpp_type . '& operator&=(' . $full_cpp_type . '& lhs, ' . $full_cpp_type . ' rhs)') .
-                       nl ('  { return (lhs = static_cast<' . $full_cpp_type . '>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs))); }') .
+                       nl ('inline ' . $full_cxx_type . '& operator&=(' . $full_cxx_type . '& lhs, ' . $full_cxx_type . ' rhs)') .
+                       nl ('  { return (lhs = static_cast<' . $full_cxx_type . '>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs))); }') .
                        nl () .
-                       nl ('inline ' . $full_cpp_type . '& operator^=(' . $full_cpp_type . '& lhs, ' . $full_cpp_type . ' rhs)') .
-                       nl ('  { return (lhs = static_cast<' . $full_cpp_type . '>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs))); }') .
+                       nl ('inline ' . $full_cxx_type . '& operator^=(' . $full_cxx_type . '& lhs, ' . $full_cxx_type . ' rhs)') .
+                       nl ('  { return (lhs = static_cast<' . $full_cxx_type . '>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs))); }') .
                        nl ();
 
-    if ($container_cpp_type)
+    if ($container_cxx_type)
     {
       my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::H_AFTER_FIRST_CLASS;
 
@@ -89,7 +89,7 @@ sub _output_flag_ops ($$$)
 
 sub _output_gtype_func_h ($$$$)
 {
-  my ($wrap_parser, $cpp_type, $flags, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $flags, $get_type_func) = @_;
   my $type = undef;
 
   if ($flags)
@@ -101,24 +101,24 @@ sub _output_gtype_func_h ($$$$)
     $type = Common::Output::Shared::ENUM_TYPE;
   }
 
-  Common::Output::Shared::output_enum_gtype_func_h $wrap_parser, $cpp_type, $type, $get_type_func;
+  Common::Output::Shared::output_enum_gtype_func_h $wrap_parser, $cxx_type, $type, $get_type_func;
 }
 
 sub _output_gtype_func_cc ($$$)
 {
-  my ($wrap_parser, $cpp_type, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $get_type_func) = @_;
 
-  Common::Output::Shared::output_enum_gtype_func_cc $wrap_parser, $cpp_type, $get_type_func;
+  Common::Output::Shared::output_enum_gtype_func_cc $wrap_parser, $cxx_type, $get_type_func;
 }
 
 sub output ($$$$$)
 {
-  my ($wrap_parser, $cpp_type, $members, $flags, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $members, $flags, $get_type_func) = @_;
 
-  _output_enum $wrap_parser, $cpp_type, $members;
-  _output_flag_ops $wrap_parser, $cpp_type, $flags;
-  _output_gtype_func_h $wrap_parser, $cpp_type, $flags, $get_type_func;
-  _output_gtype_func_cc $wrap_parser, $cpp_type, $get_type_func;
+  _output_enum $wrap_parser, $cxx_type, $members;
+  _output_flag_ops $wrap_parser, $cxx_type, $flags;
+  _output_gtype_func_h $wrap_parser, $cxx_type, $flags, $get_type_func;
+  _output_gtype_func_cc $wrap_parser, $cxx_type, $get_type_func;
 }
 
 1; # indicate proper module load.

@@ -30,11 +30,11 @@ sub nl
 
 sub _output_h_in_class ($$$)
 {
-  my ($wrap_parser, $c_type, $cpp_type) = @_;
+  my ($wrap_parser, $c_type, $cxx_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $code_string = nl ('public:') .
                     nl (Common::Output::Shared::doxy_skip_begin) .
-                    nl ('  typedef ' . $cpp_type . ' CppObjectType;') .
+                    nl ('  typedef ' . $cxx_type . ' CppObjectType;') .
                     nl ('  typedef ' . $c_type . ' BaseObjectType;') .
                     nl (Common::Output::Shared::doxy_skip_end) .
                     nl ();
@@ -43,7 +43,7 @@ sub _output_h_in_class ($$$)
   $section_manager->push_section ($main_section);
   $section_manager->append_string ($code_string);
 
-  my $conditional = Common::Output::Shared::default_ctor_proto $wrap_parser, $cpp_type;
+  my $conditional = Common::Output::Shared::default_ctor_proto $wrap_parser, $cxx_type;
 
   $section_manager->append_conditional ($conditional);
 
@@ -53,11 +53,11 @@ sub _output_h_in_class ($$$)
   my $virtual_dtor = 0;
 
   $code_string = nl ('  // Use make_a_copy = true when getting it directly from a struct.') .
-                 nl ('  explicit ' . $cpp_type . '(' . $c_type . '* castitem, bool make_a_copy = false);') .
+                 nl ('  explicit ' . $cxx_type . '(' . $c_type . '* castitem, bool make_a_copy = false);') .
                  nl () .
-                 nl (Common::Output::Shared::copy_protos_str $cpp_type) .
+                 nl (Common::Output::Shared::copy_protos_str $cxx_type) .
                  nl () .
-                 nl (Common::Output::Shared::dtor_proto_str $cpp_type, $virtual_dtor) .
+                 nl (Common::Output::Shared::dtor_proto_str $cxx_type, $virtual_dtor) .
                  nl () .
                  nl (Common::Output::Shared::gobj_protos_str $c_type, $copy_proto, $reinterpret, $definitions) .
                  nl () .
@@ -85,12 +85,12 @@ sub _output_h_after_first_namespace ($$)
 
 sub _output_cc ($$$$$$)
 {
-  my ($wrap_parser, $c_type, $cpp_type, $new_func, $copy_func, $free_func) = @_;
+  my ($wrap_parser, $c_type, $cxx_type, $new_func, $copy_func, $free_func) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $custom_default_ctor_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::CUSTOM_DEFAULT_CTOR;
   my $conditional = Common::Output::Shared::generate_conditional $wrap_parser;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $code_string = nl ($full_cpp_type . '::' . $cpp_type . '()') .
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $code_string = nl ($full_cxx_type . '::' . $cxx_type . '()') .
                     nl (':');
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
 
@@ -108,12 +108,12 @@ sub _output_cc ($$$$$$)
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($custom_default_ctor_var, $conditional);
 # TODO: we probably have to assume that copy func must be provided.
-  $code_string = nl ($full_cpp_type . '::' . $cpp_type . '(const ' . $cpp_type . '& src)') .
+  $code_string = nl ($full_cxx_type . '::' . $cxx_type . '(const ' . $cxx_type . '& src)') .
                  nl (':') .
                  nl ('  gobject_((src.gobject_) ? ' . $copy_func . '(src.gobject_) : 0)') .
                  nl ('{}') .
                  nl () .
-                 nl ($full_cpp_type . '::' . $cpp_type . '(' . $c_type . '* castitem, bool make_a_copy /* = false */)') .
+                 nl ($full_cxx_type . '::' . $cxx_type . '(' . $c_type . '* castitem, bool make_a_copy /* = false */)') .
                  nl ('{') .
                  nl ('  if (!make_a_copy)') .
                  nl ('  {') .
@@ -137,7 +137,7 @@ sub _output_cc ($$$$$$)
                  nl ();
   if (defined $copy_func and $copy_func ne '' and $copy_func ne 'NONE')
   {
-    $code_string .= nl ($full_cpp_type . '& ' . $full_cpp_type . '::operator=(const ' . $full_cpp_type . '& src)') .
+    $code_string .= nl ($full_cxx_type . '& ' . $full_cxx_type . '::operator=(const ' . $full_cxx_type . '& src)') .
                     nl ('{') .
                     nl ('  ' . $c_type . '* const new_gobject = (src.gobject_) ? ' . $copy_func . '(src.gobject_) : 0;') .
                     nl () .
@@ -152,7 +152,7 @@ sub _output_cc ($$$$$$)
                     nl ('}') .
                     nl ();
   }
-  $code_string .= nl ($full_cpp_type . '::~' . $cpp_type . '()') .
+  $code_string .= nl ($full_cxx_type . '::~' . $cxx_type . '()') .
                   nl ('{') .
                   nl ('  if (gobject_)') .
                   nl ('  {') .
@@ -160,7 +160,7 @@ sub _output_cc ($$$$$$)
                   nl ('  }') .
                   nl ('}') .
                   nl () .
-                  nl ($c_type . '* ' . $full_cpp_type . '::gobj_copy() const') .
+                  nl ($c_type . '* ' . $full_cxx_type . '::gobj_copy() const') .
                   nl ('{') .
                   nl ('  return ' . $copy_func . '(gobject_);') .
                   nl ('}') .
@@ -178,11 +178,11 @@ sub _output_cc ($$$$$$)
 
 sub output ($$$$$$)
 {
-  my ($wrap_parser, $c_type, $cpp_type, $new_func, $copy_func, $free_func) = @_;
+  my ($wrap_parser, $c_type, $cxx_type, $new_func, $copy_func, $free_func) = @_;
 
-  _output_h_in_class $wrap_parser, $c_type, $cpp_type;
+  _output_h_in_class $wrap_parser, $c_type, $cxx_type;
   _output_h_after_first_namespace $wrap_parser, $c_type;
-  _output_cc $wrap_parser, $c_type, $cpp_type, $new_func, $copy_func, $free_func;
+  _output_cc $wrap_parser, $c_type, $cxx_type, $new_func, $copy_func, $free_func;
 }
 
 1; # indicate proper module load.

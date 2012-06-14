@@ -166,13 +166,13 @@ sub _extract_bracketed_text ($)
 
 sub _make_full_type ($$)
 {
-  my ($self, $cpp_type) = @_;
+  my ($self, $cxx_type) = @_;
   my $namespaces = $self->_get_namespaces;
   my $classes = $self->_get_classes;
 
-  if (defined $cpp_type)
+  if (defined $cxx_type)
   {
-    return join '::', reverse (@{$namespaces}), reverse (@{$classes}), $cpp_type;
+    return join '::', reverse (@{$namespaces}), reverse (@{$classes}), $cxx_type;
   }
   else
   {
@@ -204,29 +204,29 @@ sub _get_params ($)
 sub _on_wrap_func_generic ($$)
 {
   my ($self, $args) = @_;
-  my $cpp_function = Common::Shared::parse_function_declaration ($args->[0])->[2];
+  my $cxx_function = Common::Shared::parse_function_declaration ($args->[0])->[2];
   my $c_function = $args->[1];
 
-  $self->_append ($c_function, $self->_make_full_type ($cpp_function), 'FUNC');
+  $self->_append ($c_function, $self->_make_full_type ($cxx_function), 'FUNC');
 }
 
 sub _on_wrap_enum_generic ($$)
 {
   my ($self, $args) = @_;
-  my $cpp_enum = $args->[0];
+  my $cxx_enum = $args->[0];
   my $c_enum = $args->[1];
 
-  $self->_append ($c_enum, $self->_make_full_type ($cpp_enum), 'ENUM');
+  $self->_append ($c_enum, $self->_make_full_type ($cxx_enum), 'ENUM');
 }
 
 sub _on_wrap_class_generic ($$$)
 {
   my ($self, $args, $macro_type) = @_;
   my $classes = $self->_get_classes;
-  my $cpp_class = $args->[0];
+  my $cxx_class = $args->[0];
   my $c_class = $args->[1];
 
-  if (@{$classes} > 0 and $classes->[-1] eq $cpp_class)
+  if (@{$classes} > 0 and $classes->[-1] eq $cxx_class)
   {
     my $cxx_full_type = $self->_make_full_type (undef);
 
@@ -274,7 +274,7 @@ sub _on_string_literal ($)
   $self->_on_string_with_end ('"');
 }
 
-sub _on_comment_cpp ($)
+sub _on_comment_cxx ($)
 {
   my ($self) = @_;
 
@@ -598,9 +598,9 @@ sub new ($$$)
     '{' => [$self, \&_on_open_brace],
     '}' => [$self, \&_on_close_brace],
     '"' => [$self, \&_on_string_literal],
-    '//' => [$self, \&_on_comment_cpp],
-    '///' => [$self, \&_on_comment_cpp],
-    '//!' => [$self, \&_on_comment_cpp],
+    '//' => [$self, \&_on_comment_cxx],
+    '///' => [$self, \&_on_comment_cxx],
+    '//!' => [$self, \&_on_comment_cxx],
     '/*' => [$self, \&_on_comment_c],
     '/**' => [$self, \&_on_comment_doxygen],
     '/*!' => [$self, \&_on_comment_doxygen],

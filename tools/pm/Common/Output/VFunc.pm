@@ -30,12 +30,12 @@ sub nl
 
 sub _output_h ($$$$$$$)
 {
-  my ($wrap_parser, $ifdef, $cpp_return_type, $cpp_vfunc_name, $cpp_param_types, $cpp_param_names, $const) = @_;
+  my ($wrap_parser, $ifdef, $cxx_return_type, $cxx_vfunc_name, $cxx_param_types, $cxx_param_names, $const) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
-  my $cpp_params_str = Common::Output::Shared::paramzipstr $cpp_param_types, $cpp_param_names;
+  my $cxx_params_str = Common::Output::Shared::paramzipstr $cxx_param_types, $cxx_param_names;
   my $code_string = (Common::Output::Shared::ifdef $ifdef) .
-                    (nl 'virtual ', $cpp_return_type, ' ', $cpp_vfunc_name, '(', $cpp_params_str, ($const ? ') const;' : ');')) .
+                    (nl 'virtual ', $cxx_return_type, ' ', $cxx_vfunc_name, '(', $cxx_params_str, ($const ? ') const;' : ');')) .
                     (nl) .
                     Common::Output::Shared::endif $ifdef;
 
@@ -58,23 +58,23 @@ sub _output_p_h ($$$$$$$)
 
 sub _output_cc ($$$$$$$$$$$$$)
 {
-  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_transfers, $cpp_return_type, $cpp_vfunc_name, $cpp_param_types, $cpp_param_names, $const, $errthrow) = @_;
+  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_transfers, $cxx_return_type, $cxx_vfunc_name, $cxx_param_types, $cxx_param_names, $const, $errthrow) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
   my $parent_from_object = Common::Output::Shared::get_parent_from_object $wrap_parser, 'gobject_';
-  my $cpp_params_str = Common::Output::Shared::paramzipstr $cpp_param_types, $cpp_param_names;
+  my $cxx_params_str = Common::Output::Shared::paramzipstr $cxx_param_types, $cxx_param_names;
   my $code_string = (Common::Output::Shared::ifdef $ifdef) .
-                    (nl $cpp_return_type, ' ', $full_cpp_type, '::', $cpp_vfunc_name, '(', $cpp_params_str, ($const ? ') const' : ')')) .
+                    (nl $cxx_return_type, ' ', $full_cxx_type, '::', $cxx_vfunc_name, '(', $cxx_params_str, ($const ? ') const' : ')')) .
                     (nl '{') .
                     (nl '  BaseClassType* const base(static_cast<BaseClassType*>(' . $parent_from_object . '));') .
                     (nl) .
                     (nl '  if (base && base->' . $c_vfunc_name . ')') .
                     (nl '  {');
-  my $ret_void = ($cpp_return_type eq 'void');
+  my $ret_void = ($cxx_return_type eq 'void');
   my $c_type = Common::Output::Shared::get_c_type $wrap_parser;
   my $gobj = ($const ? 'const_cast< ' . $c_type . ' >(gobj())' : 'gobj()');
-  my $cpp_to_c_params_str = (Common::Output::Shared::convzipstr $wrap_parser, $cpp_param_types, $c_param_types, $c_param_transfers, $cpp_param_names) . ($errthrow ? ', &temp_error' : '');
-  my $c_func_invocation = join '', '(*base->', $c_vfunc_name, ')(', $gobj, ', ', $cpp_to_c_params_str . ')';
+  my $cxx_to_c_params_str = (Common::Output::Shared::convzipstr $wrap_parser, $cxx_param_types, $c_param_types, $c_param_transfers, $cxx_param_names) . ($errthrow ? ', &temp_error' : '');
+  my $c_func_invocation = join '', '(*base->', $c_vfunc_name, ')(', $gobj, ', ', $cxx_to_c_params_str . ')';
   my $last_return = '';
   my $type_info_local = $wrap_parser->get_type_info_local ();
   my $error_init_string = (nl '    GError* temp_error(0);');
@@ -112,15 +112,15 @@ sub _output_cc ($$$$$$$$$$$$$)
                       (nl) .
                       $errthrow_string .
                       (nl);
-      $conv = $type_info_local->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, 'temp_retval');
+      $conv = $type_info_local->get_conversion ($c_return_type, $cxx_return_type, $c_return_transfer, 'temp_retval');
     }
     else
     {
-      $conv = $type_info_local->get_conversion ($c_return_type, $cpp_return_type, $c_return_transfer, $c_func_invocation);
+      $conv = $type_info_local->get_conversion ($c_return_type, $cxx_return_type, $c_return_transfer, $c_func_invocation);
     }
     $code_string .= nl ('    return ' . $conv . ';');
     $last_return = (nl) .
-                   (nl '  typedef ' . $cpp_return_type . ' RType;') .
+                   (nl '  typedef ' . $cxx_return_type . ' RType;') .
                    (nl '  return RType();');
   }
   $code_string .= (nl '  }') .
@@ -134,9 +134,9 @@ sub _output_cc ($$$$$$$$$$$$$)
 
 sub _output_p_cc ($$$$$$$$$$$$)
 {
-  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_names, $c_param_transfers, $cpp_return_type, $cpp_vfunc_name, $cpp_param_types, $errthrow) = @_;
+  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_names, $c_param_transfers, $cxx_return_type, $cxx_vfunc_name, $cxx_param_types, $errthrow) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
-  my $cpp_class_type = Common::Output::Shared::get_cpp_class_type $wrap_parser;
+  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::P_CC_INIT_VFUNCS;
   my $code_string = (Common::Output::Shared::ifdef $ifdef) .
                     (nl '  klass->' . $c_vfunc_name . ' = &' . $c_vfunc_name . '_vfunc_callback;') .
@@ -148,15 +148,15 @@ sub _output_p_cc ($$$$$$$$$$$$)
   my $c_params_str = (Common::Output::Shared::paramzipstr $c_param_types, $c_param_names) . ($errthrow ? ', GError** gerror' : '');
   my $ret_void = ($c_return_type eq 'void');
   my $type_info_local = $wrap_parser->get_type_info_local ();
-  my $convs_str = Common::Output::Shared::convzipstr $wrap_parser, $c_param_types, $cpp_param_types, $c_param_transfers, $c_param_names;
-  my $vfunc_call = 'obj->' . $cpp_vfunc_name . '(' . $convs_str . ')';
+  my $convs_str = Common::Output::Shared::convzipstr $wrap_parser, $c_param_types, $cxx_param_types, $c_param_transfers, $c_param_names;
+  my $vfunc_call = 'obj->' . $cxx_vfunc_name . '(' . $convs_str . ')';
   my $c_callback_call = '(*base->' . $c_vfunc_name . '(self, ' . (join ', ', @{$c_param_names}) . ($errthrow ? ', gerror' : '') . ')';
   my $last_return = '';
   my $after_catch_return = '';
 
   unless ($ret_void)
   {
-    $vfunc_call = 'return ' . $type_info_local->get_conversion ($cpp_return_type, $c_return_type, $c_return_transfer, $vfunc_call);
+    $vfunc_call = 'return ' . $type_info_local->get_conversion ($cxx_return_type, $c_return_type, $c_return_transfer, $vfunc_call);
     $c_callback_call = 'return ' . $c_callback_call;
     $after_catch_return = (nl) .
                           (nl '      typedef ', $c_return_type, ' RType;') .
@@ -177,7 +177,7 @@ sub _output_p_cc ($$$$$$$$$$$$)
   my $c_type = Common::Output::Shared::get_c_type $wrap_parser;
 
   $code_string = (Common::Output::Shared::ifdef $ifdef) .
-                 (nl $c_return_type, ' ', $cpp_class_type . '::' . $c_vfunc_name . '_vfunc_callback(', $c_type, '* self, ', $c_params_str, ')') .
+                 (nl $c_return_type, ' ', $cxx_class_type . '::' . $c_vfunc_name . '_vfunc_callback(', $c_type, '* self, ', $c_params_str, ')') .
                  (nl '{') .
                  (nl '  // First, do a simple cast to ObjectBase. We will have to do a dynamic cast') .
                  (nl '  // eventually, but it is not necessary to check whether we need to call') .
@@ -236,19 +236,19 @@ sub _output_p_cc ($$$$$$$$$$$$)
 
 sub output ($$$$$$$$$$$$$$$$)
 {
-  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_names, $c_param_transfers, $cpp_return_type, $cpp_vfunc_name, $cpp_param_types, $cpp_param_names, $const, $custom_vfunc, $custom_vfunc_callback, $errthrow) = @_;
+  my ($wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_names, $c_param_transfers, $cxx_return_type, $cxx_vfunc_name, $cxx_param_types, $cxx_param_names, $const, $custom_vfunc, $custom_vfunc_callback, $errthrow) = @_;
 
-  _output_h $wrap_parser, $ifdef, $cpp_return_type, $cpp_vfunc_name, $cpp_param_types, $cpp_param_names, $const;
+  _output_h $wrap_parser, $ifdef, $cxx_return_type, $cxx_vfunc_name, $cxx_param_types, $cxx_param_names, $const;
   _output_p_h $wrap_parser, $ifdef, $c_return_type, $c_vfunc_name, $c_param_types, $c_param_names, $errthrow;
 
   unless ($custom_vfunc)
   {
-    _output_cc $wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_transfers, $cpp_return_type, $cpp_vfunc_name, $cpp_param_types, $cpp_param_names, $const, $errthrow;
+    _output_cc $wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_transfers, $cxx_return_type, $cxx_vfunc_name, $cxx_param_types, $cxx_param_names, $const, $errthrow;
   }
 
   unless ($custom_vfunc_callback)
   {
-    _output_p_cc $wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_names, $c_param_transfers, $cpp_return_type, $cpp_vfunc_name, $cpp_param_types, $errthrow;
+    _output_p_cc $wrap_parser, $ifdef, $c_return_type, $c_return_transfer, $c_vfunc_name, $c_param_types, $c_param_names, $c_param_transfers, $cxx_return_type, $cxx_vfunc_name, $cxx_param_types, $errthrow;
   }
 }
 

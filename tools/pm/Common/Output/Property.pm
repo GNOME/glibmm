@@ -30,29 +30,29 @@ sub nl
 
 sub _output_h ($$$$)
 {
-  my ($wrap_parser, $proxy_suffix, $prop_cpp_type, $prop_cpp_name) = @_;
+  my ($wrap_parser, $proxy_suffix, $prop_cxx_type, $prop_cxx_name) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
-  my $proxy_type = 'Glib::PropertyProxy' . $proxy_suffix . '< ' . $prop_cpp_type . ' >';
+  my $proxy_type = 'Glib::PropertyProxy' . $proxy_suffix . '< ' . $prop_cxx_type . ' >';
   my $method_suffix = ($proxy_suffix eq '_ReadOnly' ? ' const' : '');
   my $code_string = (nl '  /** You rarely need to use properties because there are get_and _set_ methods for almost all of them.') .
                     (nl '   * @return A PropertyProxy that allows you to get or set the property of the value, or receive notification when') .
                     (nl '   * the value of the property changes.') .
                     (nl '   */') .
-                    (nl '  ' . $proxy_type . ' property_' . $prop_cpp_name . '()' . $method_suffix . ';');
+                    (nl '  ' . $proxy_type . ' property_' . $prop_cxx_name . '()' . $method_suffix . ';');
 
   $section_manager->append_string_to_section ($code_string, $main_section);
 }
 
 sub _output_cc ($$$$$)
 {
-  my ($wrap_parser, $proxy_suffix, $prop_cpp_type, $prop_cpp_name, $prop_c_name) = @_;
+  my ($wrap_parser, $proxy_suffix, $prop_cxx_type, $prop_cxx_name, $prop_c_name) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_PROPERTY_PROXIES;
-  my $proxy_type = 'Glib::PropertyProxy' . $proxy_suffix . '< ' . $prop_cpp_type . ' >';
+  my $proxy_type = 'Glib::PropertyProxy' . $proxy_suffix . '< ' . $prop_cxx_type . ' >';
   my $method_suffix = ($proxy_suffix eq '_ReadOnly' ? ' const' : '');
-  my $full_cpp_type = Common::Output::Shared::get_full_cpp_type $wrap_parser;
-  my $code_string = (nl $proxy_type . ' ' . $full_cpp_type . '::property_' . $prop_cpp_name . '()' . $method_suffix) .
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
+  my $code_string = (nl $proxy_type . ' ' . $full_cxx_type . '::property_' . $prop_cxx_name . '()' . $method_suffix) .
                     (nl '{') .
                     (nl '  return ' . $proxy_type . '(this, "' . $prop_c_name . '");') .
                     (nl '}') .
@@ -63,7 +63,7 @@ sub _output_cc ($$$$$)
 
 sub output ($$$$$$$)
 {
-  my ($wrap_parser, $construct_only, $readable, $writable, $prop_cpp_type, $prop_cpp_name, $prop_c_name) = @_;
+  my ($wrap_parser, $construct_only, $readable, $writable, $prop_cxx_type, $prop_cxx_name, $prop_c_name) = @_;
   my $read_only = 0;
   my $write_only = 0;
 
@@ -82,15 +82,15 @@ sub output ($$$$$$$)
 
   my $proxy_suffix = ($read_only ? '_ReadOnly' : ($write_only ? '_WriteOnly' : ''));
 
-  _output_h $wrap_parser, $proxy_suffix, $prop_cpp_type, $prop_cpp_name;
-  _output_cc $wrap_parser, $proxy_suffix, $prop_cpp_type, $prop_cpp_name, $prop_c_name;
+  _output_h $wrap_parser, $proxy_suffix, $prop_cxx_type, $prop_cxx_name;
+  _output_cc $wrap_parser, $proxy_suffix, $prop_cxx_type, $prop_cxx_name, $prop_c_name;
 
   if (not $read_only and $readable)
   {
     $proxy_suffix = '_ReadOnly';
 
-    _output_h $wrap_parser, $proxy_suffix, $prop_cpp_type, $prop_cpp_name;
-    _output_cc $wrap_parser, $proxy_suffix, $prop_cpp_type, $prop_cpp_name, $prop_c_name;
+    _output_h $wrap_parser, $proxy_suffix, $prop_cxx_type, $prop_cxx_name;
+    _output_cc $wrap_parser, $proxy_suffix, $prop_cxx_type, $prop_cxx_name, $prop_c_name;
   }
 }
 

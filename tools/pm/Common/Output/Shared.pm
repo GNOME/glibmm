@@ -110,7 +110,7 @@ sub get_c_type ($)
 }
 
 # returns Terminal
-sub get_cpp_type ($)
+sub get_cxx_type ($)
 {
   my ($wrap_parser) = @_;
   my $classes = $wrap_parser->get_classes;
@@ -124,13 +124,13 @@ sub get_cpp_type ($)
 
 # returns Terminal, the difference is that it can also return Foo::Bar if Bar is
 # a class inside a Foo class
-sub get_full_cpp_type ($)
+sub get_full_cxx_type ($)
 {
   my ($wrap_parser) = @_;
   my $classes = $wrap_parser->get_classes;
-  my $full_cpp_class = join '::', @{$classes};
+  my $full_cxx_class = join '::', @{$classes};
 
-  return $full_cpp_class;
+  return $full_cxx_class;
 }
 
 # returns Gnome::Vte
@@ -144,35 +144,35 @@ sub get_full_namespace ($)
 }
 
 # returns Gnome::Vte::Terminal
-sub get_complete_cpp_type ($)
+sub get_complete_cxx_type ($)
 {
   my ($wrap_parser) = @_;
   my $namespaces = get_full_namespace $wrap_parser;
-  my $classes = get_full_cpp_type $wrap_parser;
+  my $classes = get_full_cxx_type $wrap_parser;
 
   return join '::', $namespaces, $classes;
 }
 
 # returns Terminal_Class for Gnome::Vte::Terminal.
 # returns Terminal_Foo_Class for Gnome::Vte::Terminal::Foo.
-sub get_cpp_class_type ($)
+sub get_cxx_class_type ($)
 {
   my ($wrap_parser) = @_;
-  my $full_cpp_type = get_full_cpp_type $wrap_parser;
+  my $full_cxx_type = get_full_cxx_type $wrap_parser;
 
-  $full_cpp_type =~ s/::/_/g;
-  return $full_cpp_type . '_Class';
+  $full_cxx_type =~ s/::/_/g;
+  return $full_cxx_type . '_Class';
 }
 
 # returns Gnome::Vte::Terminal_Class for Gnome::Vte::Terminal.
 # returns Gnome::Vte::Terminal_Foo_Class for Gnome::Vte::Terminal::Foo.
-sub get_complete_cpp_class_type ($)
+sub get_complete_cxx_class_type ($)
 {
   my ($wrap_parser) = @_;
   my $full_namespace = get_full_namespace $wrap_parser;
-  my $cpp_class_type = get_cpp_class_type $wrap_parser;
+  my $cxx_class_type = get_cxx_class_type $wrap_parser;
 
-  return join '::', $full_namespace, $cpp_class_type;
+  return join '::', $full_namespace, $cxx_class_type;
 }
 
 # TODO: implement beautifying if I am really bored.
@@ -196,14 +196,14 @@ sub get_variable ($$);
 
 sub output_enum_gtype_func_h ($$$$)
 {
-  my ($wrap_parser, $cpp_type, $type, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $type, $get_type_func) = @_;
 
   if (defined $get_type_func)
   {
     my $namespaces = $wrap_parser->get_namespaces;
     my $main_section = $wrap_parser->get_main_section;
     my $classes = $wrap_parser->get_classes;
-    my $full_cpp_type = join '::', (get_full_cpp_type $wrap_parser), $cpp_type;
+    my $full_cxx_type = join '::', (get_full_cxx_type $wrap_parser), $cxx_type;
     my $close = 1;
     my $value_base = 'Glib::Value_' . $type;
     my $code_string = '';
@@ -228,7 +228,7 @@ sub output_enum_gtype_func_h ($$$$)
     }
 
     $code_string .= nl ('template <>') .
-                    nl ('class Value< ' . $full_cpp_type . ' > : public ' . $value_base . '< ' . $full_cpp_type . ' >') .
+                    nl ('class Value< ' . $full_cxx_type . ' > : public ' . $value_base . '< ' . $full_cxx_type . ' >') .
                     nl ('{') .
                     nl ('public:') .
                     nl ('  static GType value_type() G_GNUC_CONST;') .
@@ -263,18 +263,18 @@ sub output_enum_gtype_func_h ($$$$)
 
 sub output_enum_gtype_func_cc ($$$)
 {
-  my ($wrap_parser, $cpp_type, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $get_type_func) = @_;
 
   if (defined $get_type_func)
   {
-    my $container_cpp_type = get_full_cpp_type $wrap_parser;
-    my $full_cpp_type = join '::', $container_cpp_type, $cpp_type;
+    my $container_cxx_type = get_full_cxx_type $wrap_parser;
+    my $full_cxx_type = join '::', $container_cxx_type, $cxx_type;
     my $section_manager = $wrap_parser->get_section_manager;
     my $code_string = nl ('namespace Glib') .
                       nl ('{') .
                       nl () .
                       nl ('// static') .
-                      nl ('GType Glib::Value< ' . $full_cpp_type . ' >::value_type()') .
+                      nl ('GType Glib::Value< ' . $full_cxx_type . ' >::value_type()') .
                       nl ('{') .
                       nl ('  return ' . $get_type_func . '();') .
                       nl ('}') .
@@ -297,11 +297,11 @@ sub generate_conditional ($)
 
 sub struct_prototype ($$$)
 {
-  my ($wrap_parser, $c_name, $c_class_name) = @_;
+  my ($wrap_parser, $c_type, $c_class_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $code_string = nl (doxy_skip_begin) .
-                    nl ('typedef struct _' . $c_name . ' ' . $c_name . ';') .
-                    nl ('typedef struct _' . $c_class_name . ' ' . $c_class_name . ';') .
+                    nl ('typedef struct _' . $c_type . ' ' . $c_type . ';') .
+                    nl ('typedef struct _' . $c_class_type . ' ' . $c_class_type . ';') .
                     nl (doxy_skip_end) .
                     nl ();
   my $variable = get_variable $wrap_parser, Common::Variables::STRUCT_NOT_HIDDEN;
@@ -315,27 +315,27 @@ sub struct_prototype ($$$)
 
 sub wrap_proto ($$$$$$)
 {
-  my ($wrap_parser, $c_name, $result_type, $take_copy, $open, $const) = @_;
+  my ($wrap_parser, $c_type, $result_type, $take_copy, $open, $const) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $result = undef;
-  my $complete_cpp_type = get_complete_cpp_type $wrap_parser;
+  my $complete_cxx_type = get_complete_cxx_type $wrap_parser;
 
 # TODO: make result type constant
   if ($result_type eq 'refptr')
   {
-    $result = 'Glib::RefPtr< ' . $complete_cpp_type . ' >';
+    $result = 'Glib::RefPtr< ' . $complete_cxx_type . ' >';
   }
   elsif ($result_type eq 'ref')
   {
-    $result = $complete_cpp_type . '&';
+    $result = $complete_cxx_type . '&';
   }
   elsif ($result_type eq 'ptr')
   {
-    $result = $complete_cpp_type . '*';
+    $result = $complete_cxx_type . '*';
   }
   elsif ($result_type eq 'plain')
   {
-    $result = $complete_cpp_type;
+    $result = $complete_cxx_type;
   }
   else
   {
@@ -347,7 +347,7 @@ sub wrap_proto ($$$$$$)
     $result = 'const ' . $result;
   }
 
-  my $params = ($const ? 'const ' : '') . $c_name . '* object';
+  my $params = ($const ? 'const ' : '') . $c_type . '* object';
   my $params_doc = ' * @param object The C instance.';
 
   if ($take_copy ne 'N/A')
@@ -386,7 +386,7 @@ sub wrap_proto ($$$$$$)
                   nl ($params_doc) .
                   nl (' * @result A C++ instance that wraps this C instance') .
                   nl (' *') .
-                  nl (' * @relates ' . $complete_cpp_type) .
+                  nl (' * @relates ' . $complete_cxx_type) .
                   nl (' */') .
                   nl ($result . ' wrap(' . $params . ');') .
                   nl ();
@@ -404,11 +404,11 @@ sub wrap_proto ($$$$$$)
 
 sub default_ctor_proto ($$)
 {
-  my ($wrap_parser, $cpp_name) = @_;
+  my ($wrap_parser, $cxx_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $variable = get_variable $wrap_parser, Common::Variables::CUSTOM_DEFAULT_CTOR;
   my $conditional = generate_conditional $wrap_parser;
-  my $code_string = nl ('  ' . $cpp_name . '();');
+  my $code_string = nl ('  ' . $cxx_type . '();');
 
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
   $section_manager->set_variable_for_conditional ($variable, $conditional);
@@ -419,37 +419,37 @@ sub default_ctor_proto ($$)
 # wrap output of this function with nl();
 sub copy_protos_str ($)
 {
-  my ($cpp_name) = @_;
-  my $code_string = nl ('  ' . $cpp_name . '(const ' . $cpp_name . '& src);') .
-                    '  ' . $cpp_name . '& operator=(const ' . $cpp_name . '& src);';
+  my ($cxx_type) = @_;
+  my $code_string = nl ('  ' . $cxx_type . '(const ' . $cxx_type . '& src);') .
+                    '  ' . $cxx_type . '& operator=(const ' . $cxx_type . '& src);';
 
   return $code_string;
 }
 
 sub dtor_proto_str ($$)
 {
-  my ($cpp_name, $virtual_dtor) = @_;
-  my $code_string = '  ' . ($virtual_dtor ? 'virtual ' : '') . '~' . $cpp_name . '();';
+  my ($cxx_type, $virtual_dtor) = @_;
+  my $code_string = '  ' . ($virtual_dtor ? 'virtual ' : '') . '~' . $cxx_type . '();';
 
   return $code_string;
 }
 
 sub gobj_protos_str ($$$$)
 {
-  my ($c_name, $copy_proto, $reinterpret, $definitions) = @_;
-  my $gobj = ($reinterpret ? 'reinterpret_cast< ' . $c_name . '* >(gobject_)' : 'gobject_');
+  my ($c_type, $copy_proto, $reinterpret, $definitions) = @_;
+  my $gobj = ($reinterpret ? 'reinterpret_cast< ' . $c_type . '* >(gobject_)' : 'gobject_');
   my $code_string = nl ('  /// Provides access to the underlying C instance.') .
-                    nl ('  ' . $c_name . '* gobj()' . ($definitions ? ' { return ' . $gobj . '; }' : ';')) .
+                    nl ('  ' . $c_type . '* gobj()' . ($definitions ? ' { return ' . $gobj . '; }' : ';')) .
                     nl () .
                     nl ('  /// Provides access to the underlying C instance.') .
-                    '  const ' . $c_name . '* gobj() const' . ($definitions ? ' { return ' . $gobj . '; }' : ';');
+                    '  const ' . $c_type . '* gobj() const' . ($definitions ? ' { return ' . $gobj . '; }' : ';');
 
   if ($copy_proto ne 'no')
   {
     $code_string = nl ($code_string) .
                    nl () .
                    nl ('  /// Provides access to the underlying C instance. The caller is responsible for freeing it. Use when directly setting fields in structs.') .
-                   '  ' . $c_name . '* gobj_copy()';
+                   '  ' . $c_type . '* gobj_copy()';
     if ($copy_proto eq 'const')
     {
       $code_string .= ' const';
@@ -472,7 +472,7 @@ sub _get_prefixed_name ($$$)
   {
     when (Common::Constants::CLASS)
     {
-      my $complete_type = get_complete_cpp_type $wrap_parser;
+      my $complete_type = get_complete_cxx_type $wrap_parser;
 
       $complete_type =~ s/::/_/g;
       $prefixed_name = join '_', $complete_type, $name;
@@ -611,15 +611,15 @@ sub get_parent_from_object ($$)
 
 sub convzipstr ($$$$$)
 {
-  my ($wrap_parser, $from_types, $to_types, $transfers, $from_names) = @_;
+  my ($wrap_parser, $from_types, $to_types, $transfers, $substs) = @_;
   my $type_info_local = $wrap_parser->get_type_info_local ();
   my $from_types_count = @{$from_types};
   my $to_types_count = @{$to_types};
   my $transfers_count = @{$transfers};
-  my $from_names_count = @{$from_names};
+  my $substs_count = @{$substs};
 
 # TODO: throw runtime error or internal error or whatever.
-  die if $from_types_count != $to_types_count or $to_types_count != $transfers_count or $transfers_count != $from_names_count;
+  die if $from_types_count != $to_types_count or $to_types_count != $transfers_count or $transfers_count != $substs_count;
 
   my @conversions = ();
 
@@ -631,7 +631,7 @@ sub convzipstr ($$$$$)
             $type_info_local->get_conversion ($from_types->[$index],
                                               $to_types->[$index],
                                               $transfers->[$index],
-                                              $from_names->[$index]));
+                                              $substs->[$index]));
     }
     else
     {
