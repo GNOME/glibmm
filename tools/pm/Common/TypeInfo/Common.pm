@@ -97,11 +97,8 @@ sub add_specific_conversion ($$$$$$)
 
   my $from_conversions = $conversions->{$from};
 
-  unless (exists $from_conversions->{$to})
-  {
-    $from_conversions->{$to} = [$transfer_none, $transfer_container, $transfer_full];
-  }
-# TODO: what should be done with duplicates?
+# TODO: should we warn about overwriting previous conversion if it existed?
+  $from_conversions->{$to} = [$transfer_none, $transfer_container, $transfer_full];
 }
 
 sub get_specific_conversion ($$$$$)
