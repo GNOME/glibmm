@@ -912,8 +912,8 @@ sub add_infos_from_file ($$)
             }
             elsif ($line =~ /^(.+?)\s*=>\s*(.+):$/)
             {
-              $from = $1;
-              $to = $2;
+              $from = Common::Shared::_type_fixup ($1);
+              $to = Common::Shared::_type_fixup ($2);
               $expect_brace = 1;
             }
             elsif ($line =~ /^(.+?)\s*<=>\s*(.+?)\s*##\s*(.+?)$/)
