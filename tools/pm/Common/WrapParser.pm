@@ -2508,6 +2508,81 @@ sub _on_pinclude ($)
   Common::Output::Misc::p_include $self, $str;
 }
 
+sub _on_push_named_conv ($)
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args < 6)
+  {
+    $self->fixed_error ('Expected 6 parameters - conversion name, from type, to type, conversion for transfer none, conversion for transfer container and conversion for transfer full');
+  }
+  if (@args > 6)
+  {
+    $self->fixed_warning ('Superfluous parameter will be ignored.');
+  }
+
+  my $conv_name = shift (@args);
+  my $type_info_local = $self->get_type_info_local ();
+
+  if ($type_info_local->named_conversion_exists ($conv_name))
+  {
+    $self->fixed_error ('Conversion `' . $conv_name . '\' already exists.');
+  }
+
+  my ($from_type, $to_type, $transfer_none, $transfer_container, $transfer_full) = @args;
+  my $any_conv_exists = 0;
+
+  foreach my $transfer ($transfer_none, $transfer_container, $transfer_full)
+  {
+    if ($transfer eq 'NONE')
+    {
+      $transfer = undef;
+    }
+    else
+    {
+      $any_conv_exists = 1;
+    }
+  }
+
+  unless ($any_conv_exists)
+  {
+    $self->fixed_error ('At least one conversion has to be not NONE.');
+  }
+
+  $type_info_local->push_named_conversion ($conv_name,
+                                           Common::Shared::_type_fixup ($from_type),
+                                           Common::Shared::_type_fixup ($to_type),
+                                           $transfer_none,
+                                           $transfer_container,
+                                           $transfer_full);
+}
+
+sub _on_pop_named_conv ($)
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args < 1)
+  {
+    $self->fixed_error ('Expected one parameter being name of conversion to be popped.');
+  }
+  if (@args > 1)
+  {
+    $self->fixed_warning ('Superfluous parameters will be ignored.');
+  }
+
+  my $conv_name = shift (@args);
+  my $type_info_local = $self->get_type_info_local ();
+
+  unless ($type_info_local->named_conversion_exists ($conv_name))
+  {
+    $self->fixed_error ('Conversion `' . $conv_name . '\' does not exist.');
+  }
+
+  $type_info_local->pop_named_conversion ($conv_name);
+}
+
 sub _on_add_conversion ($)
 {
   my ($self) = @_;
@@ -2700,6 +2775,8 @@ sub new ($$$$$$)
     '_MODULE' => [$self, \&_on_module],
     '_CTOR_DEFAULT' => [$self, \&_on_ctor_default],
     '_PINCLUDE' => [$self, \&_on_pinclude],
+    '_PUSH_NAMED_CONV' => [$self, \&_on_push_named_conv],
+    '_POP_NAMED_CONV' => [$self, \&_on_pop_named_conv],
     '_ADD_CONVERSION' => [$self, \&_on_add_conversion]
   };
 
