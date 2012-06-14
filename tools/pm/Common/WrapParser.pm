@@ -2508,6 +2508,49 @@ sub _on_pinclude ($)
   Common::Output::Misc::p_include $self, $str;
 }
 
+sub _on_add_conversion ($)
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args < 5)
+  {
+    $self->fixed_error ('Expected 5 parameters - from type, to type, conversion for transfer none, conversion for transfer container and conversion for transfer full');
+  }
+  if (@args > 5)
+  {
+    $self->fixed_warning ('Superfluous parameter will be ignored.');
+  }
+
+  my $conv_name = shift (@args);
+  my $type_info_local = $self->get_type_info_local ();
+  my ($from_type, $to_type, $transfer_none, $transfer_container, $transfer_full) = @args;
+  my $any_conv_exists = 0;
+
+  foreach my $transfer ($transfer_none, $transfer_container, $transfer_full)
+  {
+    if ($transfer eq 'NONE')
+    {
+      $transfer = undef;
+    }
+    else
+    {
+      $any_conv_exists = 1;
+    }
+  }
+
+  unless ($any_conv_exists)
+  {
+    $self->fixed_error ('At least one conversion has to be not NONE.');
+  }
+
+  $type_info_local->add_conversion (Common::Shared::_type_fixup ($from_type),
+                                    Common::Shared::_type_fixup ($to_type),
+                                    $transfer_none,
+                                    $transfer_container,
+                                    $transfer_full);
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -2615,6 +2658,7 @@ sub new ($$$$$$)
   $self = bless $self, $class;
   $self->{'handlers'} =
   {
+# TODO: change those to 'sub { $self->method; }'
     '{' => [$self, \&_on_open_brace],
     '}' => [$self, \&_on_close_brace],
 #    '`' => [$self, \&_on_backtick], # probably won't be needed anymore
@@ -2655,7 +2699,8 @@ sub new ($$$$$$)
     'class' => [$self, \&_on_class_keyword],
     '_MODULE' => [$self, \&_on_module],
     '_CTOR_DEFAULT' => [$self, \&_on_ctor_default],
-    '_PINCLUDE' => [$self, \&_on_pinclude]
+    '_PINCLUDE' => [$self, \&_on_pinclude],
+    '_ADD_CONVERSION' => [$self, \&_on_add_conversion]
   };
 
   return $self;
