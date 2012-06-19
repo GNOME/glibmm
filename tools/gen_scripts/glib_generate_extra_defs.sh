@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Note that JHBUILD_SOURCES should be defined to contain the path to the root
-# of the jhbuild sources.  The script assumes that it resides in the
+# This script assumes that it resides in the
 # tools/gen_scripts directory and the defs files will be placed in glib/src.
 
 ROOT_DIR="$(dirname "$0")/../.."
