@@ -678,9 +678,11 @@ sub _on_ignore_signal ($)
 }
 
 # TODO: move it elsewhere, remove it later.
-sub _maybe_warn_about_refreturn ($$$)
+sub _maybe_warn_about_refreturn ($$$$)
 {
-  my ($self, $ret_transfer, $refreturn) = @_;
+  my ($self, $ret_transfer, $refreturn, $cxx_type) = @_;
+
+  return if ($cxx_type !~ /^(const\s+)?(?:Glib::)?RefPtr/);
 
   if ($ret_transfer == Common::TypeInfo::Common::TRANSFER_FULL and $refreturn)
   {
@@ -793,7 +795,7 @@ sub _on_wrap_method ($)
 
 # TODO: remove the ifs below after possible bugs in
 # TODO continued: wrappers/annotations are fixed.
-  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn);
+  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn, $cxx_function->get_return_type ());
   $self->_maybe_warn_about_errthrow ($throws, $errthrow);
 
   Common::Output::Method::output ($self,
@@ -947,7 +949,7 @@ sub _on_wrap_signal ($)
 
 # TODO: remove the ifs below after possible bugs in
 # TODO continued: wrappers/annotations are fixed.
-  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn);
+  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn, $cxx_function->get_return_type ());
 
 # TODO: Add custom_signal_handler.
   Common::Output::Signal::output $self,
@@ -1094,7 +1096,7 @@ sub _on_wrap_vfunc ($)
 
 # TODO: remove the ifs below after possible bugs in
 # TODO continued: wrappers/annotations are fixed.
-  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn);
+  $self->_maybe_warn_about_refreturn ($ret_transfer, $refreturn, $cxx_function->get_return_type ());
   $self->_maybe_warn_about_errthrow ($throws, $errthrow);
 
   Common::Output::VFunc::output $self,
