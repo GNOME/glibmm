@@ -18,11 +18,18 @@ c_files = \
 cxx_lib = \
   pm/tests/libgmmm/gm/gmmm/libgmmm.la
 
-cxx_files = \
+gen_cxx_files = \
   pm/tests/libgmmm/gm/gmmm/obj.cc \
   pm/tests/libgmmm/gm/gmmm/obj.h \
   pm/tests/libgmmm/gm/gmmm/other.cc \
-  pm/tests/libgmmm/gm/gmmm/other.h
+  pm/tests/libgmmm/gm/gmmm/other.h \
+  pm/tests/libgmmm/gm/gmmm/wrap_init.cc
+
+cxx_files = \
+  $(gen_cxx_files) \
+  pm/tests/libgmmm/gm/gmmm/init.cc \
+  pm/tests/libgmmm/gm/gmmm/init.h \
+  pm/tests/libgmmm/gm/gmmm/wrap_init.h
 
 cxx_templates = \
   pm/tests/libgmmm/gm/src/obj.ccg \
@@ -49,7 +56,10 @@ pm_tests_libgm_gm_libgm_la_CFLAGS = \
   $(GLIBMM_WXXFLAGS)
 
 $(gir_file): $(INTROSPECTION_SCANNER) $(c_lib)
-pm_tests_libgm_gm_Gm_1_0_gir_SCANNERFLAGS =
+pm_tests_libgm_gm_Gm_1_0_gir_SCANNERFLAGS = \
+  -I$(top_srcdir) \
+  --c-include=gm/gm.h \
+  --warn-all
 pm_tests_libgm_gm_Gm_1_0_gir_INCLUDES = \
   GObject-2.0
 pm_tests_libgm_gm_Gm_1_0_gir_CFLAGS = \
@@ -71,7 +81,7 @@ pm_tests_libgmmm_gm_gmmm_libgmmm_la_CPPFLAGS = \
 pm_tests_libgmmm_gm_gmmm_libgmmm_la_CXXFLAGS = \
   $(GLIBMM_WXXFLAGS)
 
-$(cxx_files): $(proc_stamp_file)
+$(gen_cxx_files): $(proc_stamp_file)
 
 inc1 = @abs_top_srcdir@/tools/pm/tests
 inc2 = @abs_top_srcdir@/tools/pm
@@ -80,7 +90,7 @@ dest = @abs_top_builddir@/tools/pm/tests/libgmmm/gm/gmmm
 gmminc = @abs_top_srcdir@/tools/pm/tests/libgmmm/proc
 
 $(proc_stamp_file): $(gir_file) $(cxx_templates) gmmproc
-	perl -I$(inc1) -I$(inc2) ./gmmproc --source $(source) --destination $(dest) --gir Gm-1.0.gir --mm-module gmmm --include $(gmminc) $(cxx_gm_templates)
+	perl -I$(inc1) -I$(inc2) ./gmmproc --source $(source) --destination $(dest) --gir Gm-1.0.gir --mm-module gmmm --include $(gmminc) --wrap-init-namespace Gm $(cxx_gm_templates)
 	touch $(proc_stamp_file)
 
-CLEANFILES = $(cxx_files) $(gir_file) $(proc_stamp_file)
+CLEANFILES = $(gen_cxx_files) $(gir_file) $(proc_stamp_file)
