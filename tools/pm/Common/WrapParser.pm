@@ -34,6 +34,7 @@ use Common::SectionManager;
 use Common::Shared;
 use Common::Output;
 use Common::TypeInfo::Local;
+use Common::WrapInit;
 use constant
 {
   'STAGE_HG' => 0,
@@ -473,6 +474,14 @@ sub _on_open_brace ($)
   $section_manager->append_string_to_section ('{', $main_section);
 }
 
+sub add_wrap_init_entry
+{
+  my ($self, $entry) = @_;
+  my $wrap_init_entries = $self->get_wrap_init_entries ();
+
+  push (@{$wrap_init_entries}, $entry);
+}
+
 sub _on_close_brace ($)
 {
   my ($self) = @_;
@@ -495,6 +504,30 @@ sub _on_close_brace ($)
 
       $self->_on_ending_brace;
       $section_manager->append_section_to_section ($section, $main_section);
+    }
+
+    my $temp_wrap_init_stack = $self->_get_temp_wrap_init_stack ();
+
+    # check if we are closing the class brace which had temporary wrap init
+    if (@{$temp_wrap_init_stack})
+    {
+      my $temp_wrap_init = $temp_wrap_init_stack->[-1];
+      my $wrap_init_level = $temp_wrap_init->[0];
+
+      if ($wrap_init_level == $level)
+      {
+        shift (@{$temp_wrap_init});
+        pop (@{$temp_wrap_init_stack});
+
+        my $wrap_init_entry = Common::WrapInit::GObject->new (@{$temp_wrap_init});
+
+        $self->add_wrap_init_entry ($wrap_init_entry);
+      }
+      elsif ($wrap_init_level > $level)
+      {
+# TODO: internal error I guess. This wrap init should already be popped.
+        die;
+      }
     }
 
     pop @{$class_levels};
@@ -1247,6 +1280,24 @@ sub _on_wrap_enum ($)
   Common::Output::Enum::output ($self, $cxx_type, $members, $flags, $gir_gtype);
 }
 
+# TODO: move it outside handlers section
+sub _get_c_includes ($)
+{
+  my ($repository) = @_;
+  my $c_includes_count = $repository->get_g_c_include_count ();
+  my $c_includes = [];
+
+  foreach my $index (0 .. ($c_includes_count - 1))
+  {
+    my $gir_c_include = $repository->get_g_c_include_by_index ($index);
+    my $include = join ('', '<', $gir_c_include->get_a_name (), '>');
+
+    push (@{$c_includes}, $include);
+  }
+
+  return $c_includes;
+}
+
 sub _on_wrap_gerror ($)
 {
   my ($self) = @_;
@@ -1310,6 +1361,23 @@ sub _on_wrap_gerror ($)
   my $members = _extract_members $enum, \@substs;
 
   Common::Output::GError::output $self, $cxx_type, $members, $gir_domain, $gir_gtype;
+
+  my $c_includes = _get_c_includes ($repository);
+  my $cxx_includes = [join ('', '"', $self->get_base (), '.h"')];
+# TODO: Add deprecated option to _WRAP_GERROR
+  my $deprecated = 0;
+# TODO: Add "not for windows" option to _WRAP_GERROR
+  my $not_for_windows = 0;
+  my $complete_cxx_type = Common::Output::Shared::get_complete_cxx_type ($self);
+  my $wrap_init_entry = Common::WrapInit::GError->new ($c_includes,
+                                                       $cxx_includes,
+                                                       $deprecated,
+                                                       $not_for_windows,
+                                                       $self->get_mm_module (),
+                                                       $gir_domain,
+                                                       $complete_cxx_type);
+
+  $self->add_wrap_init_entry ($wrap_init_entry);
 }
 
 sub _on_implements_interface ($)
@@ -1377,6 +1445,40 @@ sub _on_class_generic ($)
   $self->push_gir_record ($gir_record);
 
   Common::Output::Generic::output ($self, $c_type, $cxx_type);
+}
+
+sub _get_temp_wrap_init_stack
+{
+  my ($self) = @_;
+
+  return $self->{'temp_wrap_init_stack'};
+}
+
+sub push_temp_wrap_init
+{
+  my ($self, $repository, $get_type_func) = @_;
+  my $level = $self->get_level ();
+  my $c_includes = _get_c_includes ($repository);
+  my $cxx_includes = [join ('', '"', $self->get_base (), '.h"'), join ('', '"private/', $self->get_base (), '_p.h"')];
+  my $deprecated = 0;
+  my $not_for_windows = 0;
+  my $mm_module = $self->get_mm_module ();
+  my $complete_cxx_class_type = Common::Output::Shared::get_complete_cxx_class_type ($self);
+  my $complete_cxx_type = Common::Output::Shared::get_complete_cxx_type ($self);
+  my $temp_wrap_init_stack = $self->_get_temp_wrap_init_stack ();
+
+  push (@{$temp_wrap_init_stack},
+        [
+          $level,
+          $c_includes,
+          $cxx_includes,
+          $deprecated,
+          $not_for_windows,
+          $mm_module,
+          $get_type_func,
+          $complete_cxx_class_type,
+          $complete_cxx_type
+        ]);
 }
 
 sub _on_class_g_object ($)
@@ -1583,6 +1685,8 @@ sub _on_class_g_object ($)
                                   $get_type_func,
                                   $cxx_type,
                                   $cxx_parent_type;
+
+  $self->push_temp_wrap_init ($repository, $get_type_func);
 }
 
 # TODO: set current gir_class.
@@ -1974,6 +2078,7 @@ sub _on_class_interface ($)
                                     $cxx_type,
                                     $cxx_parent_type,
                                     $get_type_func;
+  $self->push_temp_wrap_init ($repository, $get_type_func);
 }
 
 # TODO: some of the code here duplicates the code in next
@@ -2628,6 +2733,41 @@ sub _on_add_conversion ($)
                                     $transfer_full);
 }
 
+# TODO: this should put some ifdefs around either class or file
+sub _on_is_deprecated
+{
+  my ($self) = @_;
+  my $temp_wrap_init_stack = $self->_get_temp_wrap_init_stack ();
+
+  if (@{$temp_wrap_init_stack})
+  {
+    my $temp_wrap_init = $temp_wrap_init_stack->[-1];
+    my $level = $self->get_level ();
+
+    if ($temp_wrap_init->[0] == $level)
+    {
+      $temp_wrap_init->[3] = 1;
+    }
+  }
+}
+
+sub _on_gtkmmproc_win32_no_wrap
+{
+  my ($self) = @_;
+  my $temp_wrap_init_stack = $self->_get_temp_wrap_init_stack ();
+
+  if (@{$temp_wrap_init_stack})
+  {
+    my $temp_wrap_init = $temp_wrap_init_stack->[-1];
+    my $level = $self->get_level ();
+
+    if ($temp_wrap_init->[0] == $level)
+    {
+      $temp_wrap_init->[4] = 1;
+    }
+  }
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -2729,7 +2869,9 @@ sub new ($$$$$$)
     'c_stack' => [],
     'mm_module' => $mm_module,
     'base' => $base,
-    'filename' => undef
+    'filename' => undef,
+    'wrap_init_entries' => [],
+    'temp_wrap_init_stack' => []
   };
 
   $self = bless $self, $class;
@@ -2779,10 +2921,19 @@ sub new ($$$$$$)
     '_PINCLUDE' => [$self, \&_on_pinclude],
     '_PUSH_NAMED_CONV' => [$self, \&_on_push_named_conv],
     '_POP_NAMED_CONV' => [$self, \&_on_pop_named_conv],
-    '_ADD_CONVERSION' => [$self, \&_on_add_conversion]
+    '_ADD_CONVERSION' => [$self, \&_on_add_conversion],
+    '_IS_DEPRECATED' => [$self, \&_on_is_deprecated],
+    '_GTKMMPROC_WIN32_NO_WRAP' => [$self, \&_on_gtkmmproc_win32_no_wrap]
   };
 
   return $self;
+}
+
+sub get_wrap_init_entries
+{
+  my ($self) = @_;
+
+  return $self->{'wrap_init_entries'};
 }
 
 sub get_type_info_local ($)

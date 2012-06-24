@@ -32,7 +32,8 @@ sub new ($)
     'tuples' => [],
     'section_manager' => undef,
     'tokens_hg' => undef,
-    'tokens_ccg' => undef
+    'tokens_ccg' => undef,
+    'wrap_init_entries' => undef
   };
 
   return bless $self, $class;
@@ -92,6 +93,20 @@ sub get_ccg_tokens ($)
   my ($self) = @_;
 
   return $self->{'tokens_ccg'};
+}
+
+sub set_wrap_init_entries
+{
+  my ($self, $wrap_init_entries) = @_;
+
+  $self->{'wrap_init_entries'} = $wrap_init_entries;
+}
+
+sub get_wrap_init_entries
+{
+  my ($self) = @_;
+
+  return $self->{'wrap_init_entries'};
 }
 
 1; # indicate proper module load.
