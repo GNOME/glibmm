@@ -595,31 +595,31 @@ sub new ($$$)
 
   $self->{'handlers'} =
   {
-    '{' => [$self, \&_on_open_brace],
-    '}' => [$self, \&_on_close_brace],
-    '"' => [$self, \&_on_string_literal],
-    '//' => [$self, \&_on_comment_cxx],
-    '///' => [$self, \&_on_comment_cxx],
-    '//!' => [$self, \&_on_comment_cxx],
-    '/*' => [$self, \&_on_comment_c],
-    '/**' => [$self, \&_on_comment_doxygen],
-    '/*!' => [$self, \&_on_comment_doxygen],
-    '#m4begin' => [$self, \&_on_m4_section],
-    '#m4' => [$self, \&_on_m4_line],
-    '_WRAP_METHOD' => [$self, \&_on_wrap_method],
-    '_WRAP_CTOR' => [$self, \&_on_wrap_ctor],
-    '_WRAP_ENUM' => [$self, \&_on_wrap_enum],
-    '_WRAP_GERROR' => [$self, \&_on_wrap_gerror],
-    '_CLASS_GENERIC' => [$self, \&_on_class_generic],
-    '_CLASS_GOBJECT' => [$self, \&_on_class_g_object],
-    '_CLASS_GTKOBJECT' => [$self, \&_on_class_gtk_object],
-    '_CLASS_BOXEDTYPE' => [$self, \&_on_class_boxed_type],
-    '_CLASS_BOXEDTYPE_STATIC' => [$self, \&_on_class_boxed_type_static],
-    '_CLASS_INTERFACE' => [$self, \&_on_class_interface],
-    '_CLASS_OPAQUE_COPYABLE' => [$self, \&_on_class_opaque_copyable],
-    '_CLASS_OPAQUE_REFCOUNTED' => [$self, \&_on_class_opaque_refcounted],
-    'namespace' => [$self, \&_on_namespace_keyword],
-    'class' => [$self, \&_on_class_keyword]
+    '{' => sub { $self->_on_open_brace (@_); },
+    '}' => sub { $self->_on_close_brace (@_); },
+    '"' => sub { $self->_on_string_literal (@_); },
+    '//' => sub { $self->_on_comment_cxx (@_); },
+    '///' => sub { $self->_on_comment_cxx (@_); },
+    '//!' => sub { $self->_on_comment_cxx (@_); },
+    '/*' => sub { $self->_on_comment_c (@_); },
+    '/**' => sub { $self->_on_comment_doxygen (@_); },
+    '/*!' => sub { $self->_on_comment_doxygen (@_); },
+    '#m4begin' => sub { $self->_on_m4_section (@_); },
+    '#m4' => sub { $self->_on_m4_line (@_); },
+    '_WRAP_METHOD' => sub { $self->_on_wrap_method (@_); },
+    '_WRAP_CTOR' => sub { $self->_on_wrap_ctor (@_); },
+    '_WRAP_ENUM' => sub { $self->_on_wrap_enum (@_); },
+    '_WRAP_GERROR' => sub { $self->_on_wrap_gerror (@_); },
+    '_CLASS_GENERIC' => sub { $self->_on_class_generic (@_); },
+    '_CLASS_GOBJECT' => sub { $self->_on_class_g_object (@_); },
+    '_CLASS_GTKOBJECT' => sub { $self->_on_class_gtk_object (@_); },
+    '_CLASS_BOXEDTYPE' => sub { $self->_on_class_boxed_type (@_); },
+    '_CLASS_BOXEDTYPE_STATIC' => sub { $self->_on_class_boxed_type_static (@_); },
+    '_CLASS_INTERFACE' => sub { $self->_on_class_interface (@_); },
+    '_CLASS_OPAQUE_COPYABLE' => sub { $self->_on_class_opaque_copyable (@_); },
+    '_CLASS_OPAQUE_REFCOUNTED' => sub { $self->_on_class_opaque_refcounted (@_); },
+    'namespace' => sub { $self->_on_namespace_keyword (@_); },
+    'class' => sub { $self->_on_class_keyword (@_); }
   };
 
   return $self;
@@ -643,18 +643,9 @@ sub scan ($)
 
       if (exists $handlers->{$token})
       {
-        my $pair = $handlers->{$token};
-        my $object = $pair->[0];
-        my $handler = $pair->[1];
+        my $handler = $handlers->{$token};
 
-        if (defined $object)
-        {
-          $object->$handler;
-        }
-        else
-        {
-          &{$handler};
-        }
+        &{$handler};
       }
     }
   }

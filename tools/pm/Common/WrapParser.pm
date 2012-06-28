@@ -2878,52 +2878,52 @@ sub new ($$$$$$)
   $self->{'handlers'} =
   {
 # TODO: change those to 'sub { $self->method; }'
-    '{' => [$self, \&_on_open_brace],
-    '}' => [$self, \&_on_close_brace],
-#    '`' => [$self, \&_on_backtick], # probably won't be needed anymore
-#    '\'' => [$self, \&_on_apostrophe], # probably won't be needed anymore
-    '"' => [$self, \&_on_string_literal],
-    '//' => [$self, \&_on_comment_cxx],
-    '///' => [$self, \&_on_comment_doxygen_single],
-    '//!' => [$self, \&_on_comment_doxygen_single],
-    '/*' => [$self, \&_on_comment_c],
-    '/**' => [$self, \&_on_comment_doxygen],
-    '/*!' => [$self, \&_on_comment_doxygen],
-    '#m4begin' => [$self, \&_on_m4_section], # probably won't be needed anymore
-    '#m4' => [$self, \&_on_m4_line], # probably won't be needed anymore
-    '_DEFS' => [$self, \&_on_defs], # probably won't be needed anymore
-    '_IGNORE' => [$self, \&_on_ignore],
-    '_IGNORE_SIGNAL' => [$self, \&_on_ignore_signal],
-    '_WRAP_METHOD' => [$self, \&_on_wrap_method],
-    '_WRAP_METHOD_DOCS_ONLY' => [$self, \&_on_wrap_method_docs_only],
-#    '_WRAP_CORBA_METHOD'=> [$self, \&_on_wrap_corba_method],
-    '_WRAP_SIGNAL' => [$self, \&_on_wrap_signal],
-    '_WRAP_PROPERTY' => [$self, \&_on_wrap_property],
-    '_WRAP_VFUNC' => [$self, \&_on_wrap_vfunc],
-    '_WRAP_CTOR' => [$self, \&_on_wrap_ctor],
-    '_WRAP_CREATE' => [$self, \&_on_wrap_create],
-    '_WRAP_ENUM' => [$self, \&_on_wrap_enum],
-    '_WRAP_GERROR' => [$self, \&_on_wrap_gerror],
-    '_IMPLEMENTS_INTERFACE' => [$self, \&_on_implements_interface],
-    '_CLASS_GENERIC' => [$self, \&_on_class_generic],
-    '_CLASS_GOBJECT' => [$self, \&_on_class_g_object],
-    '_CLASS_GTKOBJECT' => [$self, \&_on_class_gtk_object],
-    '_CLASS_BOXEDTYPE' => [$self, \&_on_class_boxed_type],
-    '_CLASS_BOXEDTYPE_STATIC' => [$self, \&_on_class_boxed_type_static],
-    '_CLASS_INTERFACE' => [$self, \&_on_class_interface],
-    '_CLASS_OPAQUE_COPYABLE' => [$self, \&_on_class_opaque_copyable],
-    '_CLASS_OPAQUE_REFCOUNTED' => [$self, \&_on_class_opaque_refcounted],
-    'namespace' => [$self, \&_on_namespace_keyword],
-    '_INSERT_SECTION' => [$self, \&_on_insert_section],
-    'class' => [$self, \&_on_class_keyword],
-    '_MODULE' => [$self, \&_on_module],
-    '_CTOR_DEFAULT' => [$self, \&_on_ctor_default],
-    '_PINCLUDE' => [$self, \&_on_pinclude],
-    '_PUSH_NAMED_CONV' => [$self, \&_on_push_named_conv],
-    '_POP_NAMED_CONV' => [$self, \&_on_pop_named_conv],
-    '_ADD_CONVERSION' => [$self, \&_on_add_conversion],
-    '_IS_DEPRECATED' => [$self, \&_on_is_deprecated],
-    '_GTKMMPROC_WIN32_NO_WRAP' => [$self, \&_on_gtkmmproc_win32_no_wrap]
+    '{' => sub { $self->_on_open_brace (@_); },
+    '}' => sub { $self->_on_close_brace (@_); },
+#    '`' => sub { $self->_on_backtick (@_); }, # probably won't be needed anymore
+#    '\'' => sub { $self->_on_apostrophe (@_); }, # probably won't be needed anymore
+    '"' => sub { $self->_on_string_literal (@_); },
+    '//' => sub { $self->_on_comment_cxx (@_); },
+    '///' => sub { $self->_on_comment_doxygen_single (@_); },
+    '//!' => sub { $self->_on_comment_doxygen_single (@_); },
+    '/*' => sub { $self->_on_comment_c (@_); },
+    '/**' => sub { $self->_on_comment_doxygen (@_); },
+    '/*!' => sub { $self->_on_comment_doxygen (@_); },
+    '#m4begin' => sub { $self->_on_m4_section (@_); }, # probably won't be needed anymore
+    '#m4' => sub { $self->_on_m4_line (@_); }, # probably won't be needed anymore
+    '_DEFS' => sub { $self->_on_defs (@_); }, # probably won't be needed anymore
+    '_IGNORE' => sub { $self->_on_ignore (@_); },
+    '_IGNORE_SIGNAL' => sub { $self->_on_ignore_signal (@_); },
+    '_WRAP_METHOD' => sub { $self->_on_wrap_method (@_); },
+    '_WRAP_METHOD_DOCS_ONLY' => sub { $self->_on_wrap_method_docs_only (@_); },
+#    '_WRAP_CORBA_METHOD'=> sub { $self->_on_wrap_corba_method (@_); },
+    '_WRAP_SIGNAL' => sub { $self->_on_wrap_signal (@_); },
+    '_WRAP_PROPERTY' => sub { $self->_on_wrap_property (@_); },
+    '_WRAP_VFUNC' => sub { $self->_on_wrap_vfunc (@_); },
+    '_WRAP_CTOR' => sub { $self->_on_wrap_ctor (@_); },
+    '_WRAP_CREATE' => sub { $self->_on_wrap_create (@_); },
+    '_WRAP_ENUM' => sub { $self->_on_wrap_enum (@_); },
+    '_WRAP_GERROR' => sub { $self->_on_wrap_gerror (@_); },
+    '_IMPLEMENTS_INTERFACE' => sub { $self->_on_implements_interface (@_); },
+    '_CLASS_GENERIC' => sub { $self->_on_class_generic (@_); },
+    '_CLASS_GOBJECT' => sub { $self->_on_class_g_object (@_); },
+    '_CLASS_GTKOBJECT' => sub { $self->_on_class_gtk_object (@_); },
+    '_CLASS_BOXEDTYPE' => sub { $self->_on_class_boxed_type (@_); },
+    '_CLASS_BOXEDTYPE_STATIC' => sub { $self->_on_class_boxed_type_static (@_); },
+    '_CLASS_INTERFACE' => sub { $self->_on_class_interface (@_); },
+    '_CLASS_OPAQUE_COPYABLE' => sub { $self->_on_class_opaque_copyable (@_); },
+    '_CLASS_OPAQUE_REFCOUNTED' => sub { $self->_on_class_opaque_refcounted (@_); },
+    'namespace' => sub { $self->_on_namespace_keyword (@_); },
+    '_INSERT_SECTION' => sub { $self->_on_insert_section (@_); },
+    'class' => sub { $self->_on_class_keyword (@_); },
+    '_MODULE' => sub { $self->_on_module (@_); },
+    '_CTOR_DEFAULT' => sub { $self->_on_ctor_default (@_); },
+    '_PINCLUDE' => sub { $self->_on_pinclude (@_); },
+    '_PUSH_NAMED_CONV' => sub { $self->_on_push_named_conv (@_); },
+    '_POP_NAMED_CONV' => sub { $self->_on_pop_named_conv (@_); },
+    '_ADD_CONVERSION' => sub { $self->_on_add_conversion (@_); },
+    '_IS_DEPRECATED' => sub { $self->_on_is_deprecated (@_); },
+    '_GTKMMPROC_WIN32_NO_WRAP' => sub { $self->_on_gtkmmproc_win32_no_wrap (@_); },
   };
 
   return $self;
@@ -3150,21 +3150,13 @@ sub parse ($)
 
       if (exists $handlers->{$token})
       {
-        my $pair = $handlers->{$token};
-        my $object = $pair->[0];
-        my $handler = $pair->[1];
+        my $handler = $handlers->{$token};
 
         $self->_set_current_macro ($token);
         $self->_set_fixed_line_num;
 
-        if (defined $object)
-        {
-          $object->$handler;
-        }
-        else
-        {
-          &{$handler};
-        }
+        # handler call
+        &{$handler};
       }
       else
       {
