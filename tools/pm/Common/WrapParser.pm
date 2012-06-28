@@ -2863,6 +2863,32 @@ sub _on_config_include
                                               $section);
 }
 
+# TODO: move it to Ctor.pm
+sub _on_construct
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+  my $section = $self->get_main_section ();
+  my $section_manager = $self->get_section_manager ();
+  my $params = '';
+
+  if (@args)
+  {
+    my $param_str = join (', ', @args);
+
+    $params = join ('', ', ', $param_str, ', static_cast<char*>(0)');
+  }
+
+  my @lines =
+  (
+    '// Mark this class as non-derived to allow C++ vfuncs to be skipped.',
+    'Glib::ObjectBase(0),',
+    join ('', 'CppParentType(Glib::ConstructParams(get_static_cpp_class_type_instance().init()', $params, ')')
+  );
+
+  $section_manager->append_string_to_section (join ("\n", @lines), $section);
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3026,6 +3052,7 @@ sub new ($$$$$$)
 # TODO: this should be an example of plugin handler.
     '_UNICHAR_FUNC_BOOL' => sub { $self->_on_unichar_func_bool (@_); },
     '_CONFIGINCLUDE' => sub { $self->_on_config_include (@_); },
+    '_CONSTRUCT' => sub { $self->_on_construct (@_); },
   };
 
   return $self;

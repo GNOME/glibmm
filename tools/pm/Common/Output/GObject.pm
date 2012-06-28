@@ -85,6 +85,7 @@ sub _output_h_in_class ($$$$$$)
 
   $code_string = nl ('  friend class ' . $cxx_class_type . ';') .
                  nl ('  static CppClassType ' . $base_member . ';') .
+                 nl ('  static CppClassType& get_static_cpp_class_type_instance() { return ' . $base_member . '; }') .
                  nl () .
                  nl ('private:') .
                  nl ('  // noncopyable') .

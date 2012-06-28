@@ -60,8 +60,6 @@ sub ctor_default ($)
   my $main_section = $wrap_parser->get_main_section;
   my $section_manager = $wrap_parser->get_section_manager;
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
-  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
-  my $base_member = (lc $cxx_class_type) . '_';
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_NAMESPACE;
   my $conditional = initially_unowned_sink $wrap_parser;
 
@@ -70,7 +68,7 @@ sub ctor_default ($)
                  (nl ':') .
                  (nl '  // Mark this class as non-derived to allow C++ vfuncs to be skipped.') .
                  (nl '  Glib::ObjectBase(0),') .
-                 (nl '  CppParentType(Glib::ConstructParams(', $base_member, '.init()))') .
+                 (nl '  CppParentType(Glib::ConstructParams(get_static_cpp_class_type_instance().init()))') .
                  (nl '{');
 # TODO: There is SECTION_CC_INITIALIZE_CLASS_EXTRA imported. Check if it is needed.
   $section_manager->push_section ($section);
@@ -94,8 +92,6 @@ sub wrap_ctor ($$$$$$$)
                     (nl);
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_NAMESPACE;
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
-  my $cxx_class_type = Common::Output::Shared::get_cxx_class_type $wrap_parser;
-  my $base_member = (lc $cxx_class_type) . '_';
   my $conditional = initially_unowned_sink $wrap_parser;
   my $type_info_local = $wrap_parser->get_type_info_local ();
   my $ctor_params_str = join ', ', '', (map { join '', '"', $c_prop_names->[$_], '", ', ($type_info_local->get_conversion ($cxx_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cxx_param_names->[$_])) } 0 .. (@{$cxx_param_types} - 1)), 'static_cast<char*>(0)';
@@ -105,7 +101,7 @@ sub wrap_ctor ($$$$$$$)
                  (nl ':') .
                  (nl '  // Mark this class as non-derived to allow C++ vfuncs to be skipped.') .
                  (nl '  Glib::ObjectBase(0),') .
-                 (nl '  CppParentType(Glib::ConstructParams(', $base_member, '.init()', $ctor_params_str, '))') .
+                 (nl '  CppParentType(Glib::ConstructParams(get_static_cpp_class_type_instance().init()', $ctor_params_str, '))') .
                  (nl '{');
 # TODO: There is SECTION_CC_INITIALIZE_CLASS_EXTRA imported. Check if it is needed.
   $section_manager->push_section ($section);
