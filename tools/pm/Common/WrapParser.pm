@@ -2889,6 +2889,29 @@ sub _on_construct
   $section_manager->append_string_to_section (join ("\n", @lines), $section);
 }
 
+sub _on_custom_default_ctor
+{
+  my ($self) = @_;
+  my $variable = Common::Output::Shared::get_variable ($self, Common::Variables::CUSTOM_DEFAULT_CTOR);
+  my $section_manager = $self->get_section_manager ();
+
+  $section_manager->set_variable ($variable, 1);
+}
+
+sub _deprecate_ifdef_start
+{
+  my ($self) = @_;
+
+  Common::Output::Shared::deprecate_start ($self);
+}
+
+sub _deprecate_ifdef_end
+{
+  my ($self) = @_;
+
+  Common::Output::Shared::deprecate_end ($self);
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3053,6 +3076,9 @@ sub new ($$$$$$)
     '_UNICHAR_FUNC_BOOL' => sub { $self->_on_unichar_func_bool (@_); },
     '_CONFIGINCLUDE' => sub { $self->_on_config_include (@_); },
     '_CONSTRUCT' => sub { $self->_on_construct (@_); },
+    '_CUSTOM_DEFAULT_CTOR' => sub { $self->_on_custom_default_ctor (@_); },
+    '_DEPRECATE_IFDEF_START' => sub { $self->_on_deprecate_ifdef_start (@_); },
+    '_DEPRECATE_IFDEF_END' => sub { $self->_on_deprecate_ifdef_end (@_); },
   };
 
   return $self;
