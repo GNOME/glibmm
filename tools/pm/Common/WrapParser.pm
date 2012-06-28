@@ -3006,6 +3006,14 @@ sub _on_member_get_ref_ptr
   Common::Output::Member::output_get_ref_ptr ($self, @args);
 }
 
+sub _on_gmmproc_extra_namespace
+{
+  my ($self) = @_;
+
+  $self->fixed_warning ('This macro is obsolete, just remove it.');
+  $self->_extract_bracketed_text ();
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3181,6 +3189,7 @@ sub new ($$$$$$)
     '_MEMBER_GET_PTR' => sub { $self->_on_member_get_ptr (@_); },
     '_MEMBER_GET_GOBJECT' => sub { $self->_on_member_get_gobject (@_); },
     '_MEMBER_GET_REF_PTR' => sub { $self->_on_member_get_ref_ptr (@_); },
+    '_GMMPROC_EXTRA_NAMESPACE' => { $self->_on_gmmproc_extra_namespace (@_); }
   };
 
   return $self;
