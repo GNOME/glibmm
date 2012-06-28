@@ -2843,6 +2843,26 @@ sub _on_unichar_func_bool
                                               $main_section);
 }
 
+# TODO: move it to Misc.pm
+sub _on_config_include
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 1)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  my $include_file = shift (@args);
+  my $section_manager = $self->get_section_manager ();
+  my $section = Common::Output::Shared::get_section ($self, Common::Sections::SECTION_HEADER_BEGIN);
+  my $code_string = nl (join ('', '#include <', $include_file, '>'));
+
+  $section_manager->append_string_to_section ($code_string,
+                                              $section);
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3005,6 +3025,7 @@ sub new ($$$$$$)
     '_UNICHAR_FUNC' => sub { $self->_on_unichar_func (@_); },
 # TODO: this should be an example of plugin handler.
     '_UNICHAR_FUNC_BOOL' => sub { $self->_on_unichar_func_bool (@_); },
+    '_CONFIGINCLUDE' => sub { $self->_on_config_include (@_); },
   };
 
   return $self;
