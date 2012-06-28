@@ -2768,6 +2768,81 @@ sub _on_gtkmmproc_win32_no_wrap
   }
 }
 
+sub _on_ascii_func
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 2)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  my $return_type = shift (@args);
+  my $func_name = shift (@args);
+  my $section_manager = $self->get_section_manager ();
+  my @lines =
+  (
+    join ('', 'inline ', $return_type, ' ', $func_name, '(char c)'),
+    join ('', '  { return g_ascii_', $func_name, '(c); }'),
+    ''
+  );
+  my $main_section = $self->get_main_section ();
+
+  $section_manager->append_string_to_section (join ("\n", @lines),
+                                              $main_section);
+}
+
+sub _on_unichar_func
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 2)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  my $return_type = shift (@args);
+  my $func_name = shift (@args);
+  my $section_manager = $self->get_section_manager ();
+  my @lines =
+  (
+    join ('', 'inline ', $return_type, ' ', $func_name, '(gunichar uc)'),
+    join ('', '  { return g_unichar_', $func_name, '(uc); }'),
+    ''
+  );
+  my $main_section = $self->get_main_section ();
+
+  $section_manager->append_string_to_section (join ("\n", @lines),
+                                              $main_section);
+}
+
+sub _on_unichar_func_bool
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 2)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  my $return_type = shift (@args);
+  my $func_name = shift (@args);
+  my $section_manager = $self->get_section_manager ();
+  my @lines =
+  (
+    join ('', 'inline ', $return_type, ' ', $func_name, '(gunichar uc)'),
+    join ('', '  { return (g_unichar_', $func_name, '(uc) != 0); }'),
+    ''
+  );
+  my $main_section = $self->get_main_section ();
+
+  $section_manager->append_string_to_section (join ("\n", @lines),
+                                              $main_section);
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -2924,6 +2999,12 @@ sub new ($$$$$$)
     '_ADD_CONVERSION' => sub { $self->_on_add_conversion (@_); },
     '_IS_DEPRECATED' => sub { $self->_on_is_deprecated (@_); },
     '_GTKMMPROC_WIN32_NO_WRAP' => sub { $self->_on_gtkmmproc_win32_no_wrap (@_); },
+# TODO: this should be an example of plugin handler.
+    '_ASCII_FUNC' => sub { $self->_on_ascii_func (@_); },
+# TODO: this should be an example of plugin handler.
+    '_UNICHAR_FUNC' => sub { $self->_on_unichar_func (@_); },
+# TODO: this should be an example of plugin handler.
+    '_UNICHAR_FUNC_BOOL' => sub { $self->_on_unichar_func_bool (@_); },
   };
 
   return $self;
