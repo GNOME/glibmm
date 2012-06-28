@@ -32,6 +32,7 @@ use Common::Output::GError;
 use Common::Output::GObject;
 use Common::Output::GtkObject;
 use Common::Output::Interface;
+use Common::Output::Member;
 use Common::Output::Method;
 use Common::Output::Misc;
 use Common::Output::OpaqueCopyable;

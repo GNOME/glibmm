@@ -2912,6 +2912,100 @@ sub _deprecate_ifdef_end
   Common::Output::Shared::deprecate_end ($self);
 }
 
+sub _on_member_set
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 4)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  Common::Output::Member::output_set ($self, @args);
+}
+
+sub _on_member_set_ptr
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 4)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  Common::Output::Member::output_set_ptr ($self, @args);
+}
+
+sub _on_member_set_gobject
+{
+  my ($self) = @_;
+
+  $self->fixed_warning ('This macro is deprecated, please use _MEMBER_SET_REF_PTR');
+  $self->on_member_set_ref_ptr ();
+}
+
+sub _on_member_set_ref_ptr
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 4)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  Common::Output::Member::output_set_ref_ptr ($self, @args);
+}
+
+sub _on_member_get
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 4)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  Common::Output::Member::output_get ($self, @args);
+}
+
+sub _on_member_get_ptr
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 4)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  Common::Output::Member::output_get_ptr ($self, @args);
+}
+
+sub _on_member_get_gobject
+{
+  my ($self) = @_;
+
+  $self->fixed_warning ('This macro is deprecated, please use _MEMBER_GET_REF_PTR');
+  $self->_on_member_get_ref_ptr ();
+}
+
+sub _on_member_get_ref_ptr
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 4)
+  {
+    $self->fixed_error ('Wrong number of parameters');
+  }
+
+  Common::Output::Member::output_get_ref_ptr ($self, @args);
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3079,6 +3173,14 @@ sub new ($$$$$$)
     '_CUSTOM_DEFAULT_CTOR' => sub { $self->_on_custom_default_ctor (@_); },
     '_DEPRECATE_IFDEF_START' => sub { $self->_on_deprecate_ifdef_start (@_); },
     '_DEPRECATE_IFDEF_END' => sub { $self->_on_deprecate_ifdef_end (@_); },
+    '_MEMBER_SET' => sub { $self->_on_member_set (@_); },
+    '_MEMBER_SET_PTR' => sub { $self->_on_member_set_ptr (@_); },
+    '_MEMBER_SET_GOBJECT' => sub { $self->_on_member_set_gobject (@_); },
+    '_MEMBER_SET_REF_PTR' => sub { $self->_on_member_set_ref_ptr (@_); },
+    '_MEMBER_GET' => sub { $self->_on_member_get (@_); },
+    '_MEMBER_GET_PTR' => sub { $self->_on_member_get_ptr (@_); },
+    '_MEMBER_GET_GOBJECT' => sub { $self->_on_member_get_gobject (@_); },
+    '_MEMBER_GET_REF_PTR' => sub { $self->_on_member_get_ref_ptr (@_); },
   };
 
   return $self;
