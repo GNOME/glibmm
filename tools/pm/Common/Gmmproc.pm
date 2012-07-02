@@ -393,16 +393,16 @@ sub get_destination_dir ($)
 
 sub set_include_paths ($$)
 {
-  my ($self, $includes) = @_;
+  my ($self, $include_paths) = @_;
 
-  $self->{'includes'} = $includes;
+  $self->{'include_paths'} = $include_paths;
 }
 
 sub get_include_paths ($)
 {
   my ($self) = @_;
 
-  return $self->{'includes'};
+  return $self->{'include_paths'};
 }
 
 sub add_base ($$)
