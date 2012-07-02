@@ -11,8 +11,16 @@ my $parent_dir = ""; # e.g. gtkmm
 my $debug = 0;
 my %objects = ();    # Hashmap of arrays of objects (classes) in each file
 my %exceptions = (); # Hashmap of arrays of exception classes in each file
-my %win32_nowrap = ();
+my %conditional_compilation = ();
 my %deprecated = ();
+my %extra_includes = ();
+
+# The keys in all hashes except %extra_includes are names of header files (xyz.h),
+# corresponding to the read .hg files.
+#
+# The keys in %extra_includes are names of header files to include without reading.
+# %extra_includes is a hash rather than a list because we don't want duplicates.
+# Its values are not used. In C++ it would have been a std::set.
 
 # $objects{$filename_header} is a reference to an array. That array contains
 # references to arrays with two or more elements, ($cppname, $basename, @extra_namespace),
@@ -29,17 +37,16 @@ sub print_with_guards
     print "#ifndef " . uc($parent_dir) ."_DISABLE_DEPRECATED\n"
   }
 
-  #On Win32, these files are not compiled:
-  if ($win32_nowrap{$file})
+  if ($conditional_compilation{$file})
   {
-    print "#ifndef G_OS_WIN32\n"
+    print "#$conditional_compilation{$file}\n"
   }
 
   print "$message";
 
-  if ($win32_nowrap{$file})
+  if ($conditional_compilation{$file})
   {
-    print "#endif //G_OS_WIN32\n"
+    print "#endif // $conditional_compilation{$file}\n"
   }
 
   if ($deprecated{$file})
@@ -94,7 +101,7 @@ while ($ARGV[0])
   # Store header filename, so we can #include it later:
   my $filename_header = $filename;
   $filename_header =~ s#.*/([^/]+)\.hg#$1.h#;
-  $win32_nowrap{$filename_header} = 0;
+  $conditional_compilation{$filename_header} = "";
   $deprecated{$filename_header} = 0;
 
   # Keep track of sub-namespaces, if any.
@@ -150,9 +157,27 @@ while ($ARGV[0])
         push(@{$exceptions{$filename_header}}, \@names);
       }
     }
+    elsif (/\b_INCLUDE_IN_WRAP_INIT\((.+)\)/)
+    {
+      $extra_includes{$1} = 1;
+    }
     elsif (/\b_GTKMMPROC_WIN32_NO_WRAP\b/)
     {
-      $win32_nowrap{$filename_header} = 1; # This file will not be compiled on Win32
+      # This file will not be compiled on Win32.
+      # No extra include is required. If G_OS_WIN32 is defined, it's defined in
+      # a file included indirectly by glibmm.h.
+      $conditional_compilation{$filename_header} = "ifndef G_OS_WIN32";
+    }
+    elsif (/\b_GMMPROC_WRAP_CONDITIONALLY\((.+)\)/)
+    {
+      # The compilation of this file will be controlled by a preprocessor directive.
+
+      # Allow m4 quotes in the parameter. There may be cases where the m4 processor
+      # would misunderstand a parameter without quotes.
+      my $par = $1;
+      $par =~ s/^\s*`*\s*//; # Remove m4 quotes and leading and trailing white space.
+      $par =~ s/\s*'*\s*$//;
+      $conditional_compilation{$filename_header} = $par;
     }
     elsif (/\b_IS_DEPRECATED\b/)
     {
@@ -180,9 +205,14 @@ print << "EOF";
 #include <${parent_dir}/wrap_init.h>
 #include <glibmm/error.h>
 #include <glibmm/object.h>
-
-// #include the widget headers so that we can call the get_type() static methods:
 EOF
+
+foreach my $filename_header (sort keys %extra_includes)
+{
+  print "#include <$filename_header>\n";
+}
+
+print "\n// #include the widget headers so that we can call the get_type() static methods:\n";
 
 # keys %deprecated contains all filenames, not just the names of deprecated files.
 foreach my $filename_header (sort keys %deprecated)

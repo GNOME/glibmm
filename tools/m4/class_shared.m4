@@ -282,10 +282,32 @@ dnl Just process it to remove it from the generated file.
 dnl generate_wrap_init.pl will look for this in the original .hg file.
 dnl
 define(`_GTKMMPROC_WIN32_NO_WRAP', dnl
-`//This is not available in on Win32.
-//This source file will not be compiled,
-//and the class will not be registered in wrap_init.h or wrap_init.cc
+`//This is not available on Win32.
+//This source file will not be compiled on Win32,
+//and no class defined in it will be registered by wrap_init`'().
 ')dnl
+
+dnl _GMMPROC_WRAP_CONDITIONALLY(preprocessor_if/ifdef/ifndef_directive_without_#)
+dnl Just process it to remove it from the generated file.
+dnl generate_wrap_init.pl will look for this in the original .hg file.
+dnl
+dnl Example calls:
+dnl _GMMPROC_WRAP_CONDITIONALLY(ifndef G_OS_WIN32) # Same as _GTKMMPROC_WIN32_NO_WRAP
+dnl _GMMPROC_WRAP_CONDITIONALLY(ifdef GDK_WINDOWING_X11)
+dnl _GMMPROC_WRAP_CONDITIONALLY(`if defined(GDK_WINDOWING_X11) || defined(GDK_WINDOWING_QUARTZ)')
+dnl
+define(`_GMMPROC_WRAP_CONDITIONALLY', dnl
+`//This is available only #$1.
+//Otherwise this source file will not be compiled,
+//and no class defined in it will be registered by wrap_init`'().
+')dnl
+
+dnl _INCLUDE_IN_WRAP_INIT(file)
+dnl Usually used in combination with _GMMPROC_WRAP_CONDITIONALLY.
+dnl It does not generate any code in the .h and .cc files.
+dnl generate_wrap_init.pl will look for this in the original .hg file.
+dnl
+define(`_INCLUDE_IN_WRAP_INIT',`')dnl
 
 dnl _IS_DEPRECATED
 dnl ifdef-out the whole .h and .cc files.
