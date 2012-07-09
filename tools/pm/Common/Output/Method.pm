@@ -122,7 +122,6 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
 
     push @params, $this_param;
 
-    my $type_info_local = $wrap_parser->get_type_info_local ();
     my $prepped_cxx_param_types = [];
     my $prepped_cxx_param_names = [];
 
@@ -159,11 +158,11 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
 
     unless ($ret_void)
     {
-      $ret_convert = $type_info_local->get_conversion ($c_ret_type, $cxx_ret_type, $ret_transfer, $c_func_invocation);
+      $ret_convert = Common::Output::Shared::convert_or_die ($wrap_parser, $c_ret_type, $cxx_ret_type, $ret_transfer, $c_func_invocation);
     }
     elsif ($cxx_param_out_index > -1)
     {
-      $ret_convert = $type_info_local->get_conversion ($c_ret_type, $cxx_param_types->[$cxx_param_out_index], $ret_transfer, $c_func_invocation);
+      $ret_convert = Common::Output::Shared::convert_or_die ($wrap_parser, $c_ret_type, $cxx_param_types->[$cxx_param_out_index], $ret_transfer, $c_func_invocation);
     }
 
     if ($errthrow)

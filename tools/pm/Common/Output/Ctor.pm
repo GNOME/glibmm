@@ -93,8 +93,13 @@ sub wrap_ctor ($$$$$$$)
   my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_NAMESPACE;
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
   my $conditional = initially_unowned_sink $wrap_parser;
-  my $type_info_local = $wrap_parser->get_type_info_local ();
-  my $ctor_params_str = join ', ', '', (map { join '', '"', $c_prop_names->[$_], '", ', ($type_info_local->get_conversion ($cxx_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cxx_param_names->[$_])) } 0 .. (@{$cxx_param_types} - 1)), 'static_cast<char*>(0)';
+  my $ctor_params_str = '';
+
+  if (@{$c_prop_names} > 0)
+  {
+# TODO: consider using C++11 nullptr
+    $ctor_params_str = join (', ', '', (map { join ('', '"', $c_prop_names->[$_], '", ', Common::Output::Shared::convert_or_die ($wrap_parser, $cxx_param_types->[$_], $c_param_types->[$_], $c_param_transfers->[$_], $cxx_param_names->[$_])); } 0 .. (@{$cxx_param_types} - 1)), 'static_cast<char*>(0)');
+  }
 
   $section_manager->append_string_to_section ($code_string, $main_section);
   $code_string = (nl $full_cxx_type, '::', $cxx_type, '(', $cxx_params_str_cc, ')') .

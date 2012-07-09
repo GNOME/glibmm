@@ -609,10 +609,26 @@ sub get_parent_from_object ($$)
   return $code_string;
 }
 
+sub convert_or_die
+{
+  my ($wrap_parser, $from, $to, $transfer, $subst) = @_;
+  my $type_info_local = $wrap_parser->get_type_info_local ();
+  my $conversion = $type_info_local->get_conversion ($from,
+                                                     $to,
+                                                     $transfer,
+                                                     $subst);
+
+  unless (defined ($conversion))
+  {
+    my $message = join ('', 'Could not find conversion from `', $from, '\' to `', $to, '\' with transfer `', Common::TypeInfo::Common::transfer_to_string ($transfer), '\' for substitution `', $subst, '\'');
+
+    $wrap_parser->fixed_error ($message);
+  }
+}
+
 sub convzipstr ($$$$$)
 {
   my ($wrap_parser, $from_types, $to_types, $transfers, $substs) = @_;
-  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $from_types_count = @{$from_types};
   my $to_types_count = @{$to_types};
   my $transfers_count = @{$transfers};
@@ -628,10 +644,11 @@ sub convzipstr ($$$$$)
     if (defined ($from_types->[$index]))
     {
       push (@conversions,
-            $type_info_local->get_conversion ($from_types->[$index],
-                                              $to_types->[$index],
-                                              $transfers->[$index],
-                                              $substs->[$index]));
+            convert_or_die ($wrap_parser,
+                            $from_types->[$index],
+                            $to_types->[$index],
+                            $transfers->[$index],
+                            $substs->[$index]));
     }
     else
     {

@@ -34,11 +34,10 @@ sub output_get
   my $section_manager = $wrap_parser->get_section_manager ();
   my $main_section = $wrap_parser->get_main_section ();
   my $cc_section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::CC_NAMESPACE);
-  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $main_code_string = '';
   my $cc_code_string = '';
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
-  my $conversion = $type_info_local->get_conversion ($c_type, $cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
+  my $conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $c_type, $cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
 
   if ($deprecated)
   {
@@ -69,12 +68,11 @@ sub output_get_ptr
   my $section_manager = $wrap_parser->get_section_manager ();
   my $main_section = $wrap_parser->get_main_section ();
   my $cc_section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::CC_NAMESPACE);
-  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $main_code_string = '';
   my $cc_code_string = '';
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
-  my $conversion = $type_info_local->get_conversion ($c_type, $cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
-  my $const_conversion = $type_info_local->get_conversion ($c_type, 'const ' . $cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
+  my $conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $c_type, $cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
+  my $const_conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $c_type, 'const ' . $cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
 
   if ($deprecated)
   {
@@ -111,14 +109,13 @@ sub output_get_ref_ptr
   my $section_manager = $wrap_parser->get_section_manager ();
   my $main_section = $wrap_parser->get_main_section ();
   my $cc_section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::CC_NAMESPACE);
-  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $main_code_string = '';
   my $cc_code_string = '';
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
   my $reffed_cxx_type = 'Glib::RefPtr< ' . $cxx_type . '>';
   my $reffed_const_cxx_type = 'Glib::RefPtr< const ' . $cxx_type . '>';
-  my $conversion = $type_info_local->get_conversion ($c_type, $reffed_cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
-  my $const_conversion = $type_info_local->get_conversion ($c_type, $reffed_const_cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
+  my $conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $c_type, $reffed_cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
+  my $const_conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $c_type, $reffed_const_cxx_type, Common::TypeInfo::Common::TRANSFER_NONE, 'gobj()->' . $c_name);
 
   if ($deprecated)
   {
@@ -155,11 +152,10 @@ sub output_set
   my $section_manager = $wrap_parser->get_section_manager ();
   my $main_section = $wrap_parser->get_main_section ();
   my $cc_section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::CC_NAMESPACE);
-  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $main_code_string = '';
   my $cc_code_string = '';
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
-  my $conversion = $type_info_local->get_conversion ($cxx_type, $c_type, Common::TypeInfo::Common::TRANSFER_NONE, 'value');
+  my $conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $cxx_type, $c_type, Common::TypeInfo::Common::TRANSFER_NONE, 'value');
 
   if ($deprecated)
   {
@@ -190,11 +186,10 @@ sub output_set_ptr
   my $section_manager = $wrap_parser->get_section_manager ();
   my $main_section = $wrap_parser->get_main_section ();
   my $cc_section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::CC_NAMESPACE);
-  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $main_code_string = '';
   my $cc_code_string = '';
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
-  my $conversion = $type_info_local->get_conversion ($cxx_type, $c_type, Common::TypeInfo::Common::TRANSFER_NONE, 'value');
+  my $conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $cxx_type, $c_type, Common::TypeInfo::Common::TRANSFER_NONE, 'value');
 
   if ($deprecated)
   {
@@ -225,13 +220,12 @@ sub output_set_ref_ptr
   my $section_manager = $wrap_parser->get_section_manager ();
   my $main_section = $wrap_parser->get_main_section ();
   my $cc_section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::CC_NAMESPACE);
-  my $type_info_local = $wrap_parser->get_type_info_local ();
   my $main_code_string = '';
   my $cc_code_string = '';
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
   my $ref_cxx_type = join ('', 'Glib::RefPtr< ', $cxx_type, ' >');
-  my $conversion = $type_info_local->get_conversion ($ref_cxx_type, $c_type, Common::TypeInfo::Common::TRANSFER_NONE, 'value');
-  my $old_conversion = $type_info_local->get_conversion ($c_type, $ref_cxx_type, Common::TypeInfo::TRANSFER_FULL, 'gobj->' . $c_name);
+  my $conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $ref_cxx_type, $c_type, Common::TypeInfo::Common::TRANSFER_NONE, 'value');
+  my $old_conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $c_type, $ref_cxx_type, Common::TypeInfo::Common::TRANSFER_FULL, 'gobj->' . $c_name);
 
   if ($deprecated)
   {

@@ -801,8 +801,6 @@ sub get_conversion ($$$$$)
     }
   }
 
-# TODO: throw proper exception
-  die join '', 'Could not find any conversion from `', $from, '\' to `', $to, '\' with transfer `', (Common::TypeInfo::Common::transfer_to_string $transfer), '\'';
   return undef;
 }
 
