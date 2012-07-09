@@ -443,6 +443,20 @@ sub _on_class_opaque_refcounted ($)
   }
 }
 
+sub _on_module
+{
+  my ($self) = @_;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
+
+  if (@args != 1)
+  {
+# TODO: warning.
+    return;
+  }
+
+  $self->{'modules'}{$args[0] . '.gir'} = undef;
+}
+
 sub _on_namespace_keyword ($)
 {
   my ($self) = @_;
@@ -588,7 +602,8 @@ sub new ($$$)
     'namespaces' => [],
     'class_levels' => [],
     'classes' => [],
-    'level' => 0
+    'level' => 0,
+    'modules' => {}
   };
 
   $self = bless $self, $class;
@@ -618,6 +633,7 @@ sub new ($$$)
     '_CLASS_INTERFACE' => sub { $self->_on_class_interface (@_); },
     '_CLASS_OPAQUE_COPYABLE' => sub { $self->_on_class_opaque_copyable (@_); },
     '_CLASS_OPAQUE_REFCOUNTED' => sub { $self->_on_class_opaque_refcounted (@_); },
+    '_MODULE' => sub { $self->_on_module (@_); },
     'namespace' => sub { $self->_on_namespace_keyword (@_); },
     'class' => sub { $self->_on_class_keyword (@_); }
   };
@@ -656,6 +672,14 @@ sub get_tuples ($)
   my ($self) = @_;
 
   return $self->{'tuples'};
+}
+
+sub get_modules ($)
+{
+  my ($self) = @_;
+  my @modules = keys (%{$self->{'modules'}});
+
+  return \@modules;
 }
 
 1; # indicate proper module load.

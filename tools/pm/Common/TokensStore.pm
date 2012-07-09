@@ -33,7 +33,8 @@ sub new ($)
     'section_manager' => undef,
     'tokens_hg' => undef,
     'tokens_ccg' => undef,
-    'wrap_init_entries' => undef
+    'wrap_init_entries' => undef,
+    'modules' => undef
   };
 
   return bless $self, $class;
@@ -107,6 +108,20 @@ sub get_wrap_init_entries
   my ($self) = @_;
 
   return $self->{'wrap_init_entries'};
+}
+
+sub set_modules
+{
+  my ($self, $modules) = @_;
+
+  $self->{'modules'} = $modules;
+}
+
+sub get_modules
+{
+  my ($self) = @_;
+
+  return $self->{'modules'};
 }
 
 1; # indicate proper module load.

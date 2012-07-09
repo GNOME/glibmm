@@ -278,7 +278,7 @@ sub parse_file ($$)
     unless (defined $real_filename)
     {
 # TODO: throw a runtime error.
-      my $message = join '', 'Could not find ', $filename, ' in followin paths:', "\n", (join "\n", @{$girdirs}), "\n";
+      my $message = join '', 'Could not find ', $filename, ' in following paths:', "\n", (join "\n", @{$girdirs}), "\n";
       die $message; # with horrible death!
     }
 

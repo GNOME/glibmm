@@ -785,6 +785,7 @@ sub _on_wrap_method ($)
 # TODO continued: namespace is not needed.
   my $repositories = $self->get_repositories;
   my $module = $self->get_module;
+  my $module_namespace = (split (/-/, $module))[0];
   my $repository = $repositories->get_repository ($module);
 
   unless (defined $repository)
@@ -792,7 +793,7 @@ sub _on_wrap_method ($)
     $self->fixed_error ('No such repository: ' . $module);
   }
 
-  my $gir_namespace = $repository->get_g_namespace_by_name ($module);
+  my $gir_namespace = $repository->get_g_namespace_by_name ($module_namespace);
 
   unless (defined $gir_namespace)
   {
@@ -1226,8 +1227,9 @@ sub _on_wrap_enum ($)
   my ($self) = @_;
   my $repositories = $self->get_repositories;
   my $module = $self->get_module;
+  my $module_namespace = (split (/-/, $module))[0];
   my $repository = $repositories->get_repository ($module);
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
   my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text);
 
   if (@args < 2)
@@ -1303,8 +1305,9 @@ sub _on_wrap_gerror ($)
   my ($self) = @_;
   my $repositories = $self->get_repositories;
   my $module = $self->get_module;
+  my $module_namespace = (split (/-/, $module))[0];
   my $repository = $repositories->get_repository ($module);
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
   my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text);
 
   if (@args < 2)
@@ -1427,7 +1430,8 @@ sub _on_class_generic ($)
     $self->fixed_error ('No such repository: ' . $module);
   }
 
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $module_namespace = (split (/-/, $module))[0];
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
 
   unless (defined $namespace)
   {
@@ -1500,7 +1504,8 @@ sub _on_class_g_object ($)
     $self->fixed_error ('No such repository: ' . $module);
   }
 
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $module_namespace = (split (/-/, $module))[0];
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
 
   unless (defined $namespace)
   {
@@ -1714,7 +1719,8 @@ sub _on_class_boxed_type ($)
     $self->fixed_error ('No such repository: ' . $module);
   }
 
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $module_namespace = (split (/-/, $module))[0];
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
 
   unless (defined $namespace)
   {
@@ -1886,7 +1892,8 @@ sub _on_class_boxed_type_static ($)
     $self->fixed_error ('No such repository: ' . $module);
   }
 
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $module_namespace = (split (/-/, $module))[0];
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
 
   unless (defined $namespace)
   {
@@ -1935,7 +1942,8 @@ sub _on_class_interface ($)
     $self->fixed_error ('No such repository: ' . $module);
   }
 
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $module_namespace = (split (/-/, $module))[0];
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
 
   unless (defined $namespace)
   {
@@ -2102,7 +2110,8 @@ sub _on_class_opaque_copyable ($)
     $self->fixed_error ('No such repository: ' . $module);
   }
 
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $module_namespace = (split (/-/, $module))[0];
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
 
   unless (defined $namespace)
   {
@@ -2268,7 +2277,8 @@ sub _on_class_opaque_refcounted ($)
     $self->fixed_error ('No such repository: ' . $module);
   }
 
-  my $namespace = $repository->get_g_namespace_by_name ($module);
+  my $module_namespace = (split (/-/, $module))[0];
+  my $namespace = $repository->get_g_namespace_by_name ($module_namespace);
 
   unless (defined $namespace)
   {
@@ -2590,7 +2600,7 @@ sub _on_class_keyword ($)
   $self->fixed_error ('Hit eof while processing `class\'.');
 }
 
-sub _on_module ($)
+sub _on_module
 {
   my ($self) = @_;
   my $str = Common::Util::string_trim $self->_extract_bracketed_text;

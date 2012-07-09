@@ -30,12 +30,11 @@
 
 use strict;
 use warnings;
+use v5.12;
 use IO::File;
 use Getopt::Long qw(:config permute);
 
-require Gir::Parser;
-require Gir::Repositories;
-require Common::Gmmproc;
+use Common::Gmmproc;
 
 # prototypes
 sub print_usage ();
@@ -113,30 +112,25 @@ sub main ()
   my $source_dir = undef;
   my $destination_dir = undef;
   my $unwrapped = 0;
-  my $gir_basename = undef;
   my $templates = [];
   my $include_paths = [];
   my $debug = (exists $ENV{'GMMPROC_DEBUG'}) ? $ENV{'GMMPROC_DEBUG'} : 0;
   my $mm_module = undef;
   my $wrap_init_namespace = undef;
-  my $opt_parse_result = GetOptions
-  (
-    'help|h' => \&print_help,
-    'source|s=s' => \$source_dir,
-    'destination|d=s' => \$destination_dir,
-    'list|l=s' => sub { process_list_file ($templates, shift, shift) },
-    'unwrapped|u' => \$unwrapped,
-    'gir|r=s' => \$gir_basename,
-    'include|i=s@' => \$include_paths,
-    'debug|g' => \$debug,
-    'mm-module|m=s' => \$mm_module,
-    'wrap-init-namespace|w=s' => \$wrap_init_namespace,
-    '<>' => sub { add_file_to_list ($templates, shift); }
-  );
+  my $opt_parse_result = GetOptions ('help|h' => \&print_help,
+                                     'source|s=s' => \$source_dir,
+                                     'destination|d=s' => \$destination_dir,
+                                     'list|l=s' => sub { process_list_file ($templates, shift, shift) },
+                                     'unwrapped|u' => \$unwrapped,
+                                     'include|i=s@' => \$include_paths,
+                                     'debug|g' => \$debug,
+                                     'mm-module|m=s' => \$mm_module,
+                                     'wrap-init-namespace|w=s' => \$wrap_init_namespace,
+                                     '<>' => sub { push (@{$templates}, $_[0]); });
 
 # TODO: print what is wrong.
   if (not $opt_parse_result or not $source_dir or not $destination_dir or
-      not $mm_module or @{$templates} < 1 or not $gir_basename or
+      not $mm_module or @{$templates} < 1 or
       @{$include_paths} < 1 or not $wrap_init_namespace)
   {
     print_usage;
@@ -145,23 +139,14 @@ sub main ()
 
   eval
   {
-    my $gir_parser = Gir::Parser->new;
+    my $gmmproc = Common::Gmmproc->new ($mm_module,
+                                        $include_paths,
+                                        $wrap_init_namespace,
+                                        $source_dir,
+                                        $destination_dir,
+                                        $templates);
 
-    $gir_parser->parse_file ($gir_basename);
-
-    my $repositories = $gir_parser->get_repositories;
-    my $gmmproc = Common::Gmmproc->new ($repositories, $mm_module, $include_paths, $wrap_init_namespace);
-
-# TODO: move it to constructor.
-    $gmmproc->set_source_dir ($source_dir);
-    $gmmproc->set_destination_dir ($destination_dir);
-
-    for my $template (@{$templates})
-    {
-      $gmmproc->add_base ($template);
-    }
-
-    $gmmproc->parse_and_generate;
+    $gmmproc->parse_and_generate ();
 
 # TODO: info about unwrapped information should be written to a logfile.
     if ($unwrapped)
@@ -205,12 +190,4 @@ sub process_list_file ($$$)
       push @{$templates}, $line;
     }
   }
-}
-
-sub add_file_to_list ($$)
-{
-  my $templates = shift;
-  my $file = shift;
-
-  push @{$templates}, $file;
 }

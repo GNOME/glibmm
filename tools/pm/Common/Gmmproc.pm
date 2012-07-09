@@ -33,9 +33,10 @@ use Common::TypeInfo::Global;
 use Common::WrapParser;
 use Common::Variables;
 
+use Gir::Parser;
 use Gir::Repositories;
 
-sub _tokenize_contents_ ($)
+sub _tokenize_contents_
 {
   my ($contents) = @_;
   # Break the file into tokens.  Token is:
@@ -56,19 +57,75 @@ sub _tokenize_contents_ ($)
   return \@tokens;
 }
 
-sub _prepare ($)
+sub _get_source_dir
 {
   my ($self) = @_;
-  my $type_info_global = $self->get_type_info_global;
+
+  return $self->{'source_dir'};
+}
+
+sub _get_destination_dir
+{
+  my ($self) = @_;
+
+  return $self->{'destination_dir'};
+}
+
+sub _get_bases
+{
+  my ($self) = @_;
+
+  return $self->{'bases'};
+}
+
+sub _get_repositories
+{
+  my ($self) = @_;
+
+  return $self->{'repositories'};
+}
+
+sub _set_repositories
+{
+  my ($self, $repositories) = @_;
+
+  $self->{'repositories'} = $repositories;
+}
+
+sub _get_type_info_global
+{
+  my ($self) = @_;
+
+  return $self->{'type_info_global'};
+}
+
+sub _get_mm_module
+{
+  my ($self) = @_;
+
+  return $self->{'mm_module'};
+}
+
+sub _get_wrap_init_namespace
+{
+  my ($self) = @_;
+
+  return $self->{'wrap_init_namespace'};
+}
+
+sub _prepare
+{
+  my ($self) = @_;
+  my $type_info_global = $self->_get_type_info_global ();
 
   $type_info_global->add_infos_from_file ('type_infos');
 }
 
-sub _read_all_bases ($)
+sub _read_all_bases
 {
   my ($self) = @_;
-  my $source_dir = $self->get_source_dir;
-  my $bases = $self->get_bases;
+  my $source_dir = $self->_get_source_dir ();
+  my $bases = $self->_get_bases ();
 
   # parallelize
   foreach my $base (sort keys %{$bases})
@@ -106,10 +163,10 @@ sub _read_all_bases ($)
   }
 }
 
-sub _scan_all_bases ($)
+sub _scan_all_bases
 {
   my ($self) = @_;
-  my $bases = $self->get_bases;
+  my $bases = $self->_get_bases;
   my @bases_keys = sort keys %{$bases};
 
   # parallelize
@@ -122,33 +179,36 @@ sub _scan_all_bases ($)
 
     $scanner->scan;
     $tokens_store->set_tuples ($scanner->get_tuples);
+    $tokens_store->set_modules ($scanner->get_modules);
   }
 
-  my $type_info_global = $self->get_type_info_global;
+  my $type_info_global = $self->_get_type_info_global;
+  my %gir_modules = ();
 
   foreach my $base (@bases_keys)
   {
     my $tokens_store = $bases->{$base};
-    my $tuples = $tokens_store->get_tuples;
+    my $tuples = $tokens_store->get_tuples ();
+    my $modules = $tokens_store->get_modules ();
 
-    foreach my $tuple (@{$tuples})
-    {
-      my $c_stuff = $tuple->[0];
-      my $cxx_stuff = $tuple->[1];
-      my $macro_type = $tuple->[2];
-
-      $type_info_global->add_generated_info ($c_stuff, $cxx_stuff, $macro_type);
-    }
+    map { $type_info_global->add_generated_info (@{$_}); } @{$tuples};
+    map { $gir_modules{$_} = undef; } @{$modules};
   }
+
+  my $gir_parser = Gir::Parser->new ();
+
+  map { $gir_parser->parse_file ($_); } keys (%gir_modules);
+
+  $self->_set_repositories ($gir_parser->get_repositories ());
 }
 
-sub _parse_all_bases ($)
+sub _parse_all_bases
 {
   my ($self) = @_;
-  my $bases = $self->get_bases;
-  my $type_info_global = $self->get_type_info_global ();
-  my $repositories = $self->get_repositories;
-  my $mm_module = $self->get_mm_module;
+  my $bases = $self->_get_bases;
+  my $type_info_global = $self->_get_type_info_global ();
+  my $repositories = $self->_get_repositories;
+  my $mm_module = $self->_get_mm_module;
 
   # parallelize
   foreach my $base (sort keys %{$bases})
@@ -172,7 +232,7 @@ sub _parse_all_bases ($)
 sub _generate_wrap_init
 {
   my ($self) = @_;
-  my $bases = $self->get_bases ();
+  my $bases = $self->_get_bases ();
   my %total_c_includes = ();
   my %total_cxx_includes = ();
   my %total_entries = ();
@@ -230,9 +290,9 @@ sub _generate_wrap_init
     }
   }
 
-  my $destination_dir = $self->get_destination_dir ();
+  my $destination_dir = $self->_get_destination_dir ();
   my $wrap_init_cc = IO::File->new ($destination_dir . '/wrap_init.cc', 'w');
-  my $mm_module = $self->get_mm_module ();
+  my $mm_module = $self->_get_mm_module ();
   my $deprecation_guard = uc ($mm_module) . '_DISABLE_DEPRECATED';
 
   die unless (defined ($wrap_init_cc));
@@ -277,7 +337,7 @@ sub _generate_wrap_init
     $wrap_init_cc->say ();
   }
 
-  my @namespaces = split (/::/, $self->get_wrap_init_namespace ());
+  my @namespaces = split (/::/, $self->_get_wrap_init_namespace ());
 
   foreach my $namespace (@namespaces)
   {
@@ -313,11 +373,11 @@ sub _generate_wrap_init
   $wrap_init_cc->close();
 }
 
-sub _generate_all_bases ($)
+sub _generate_all_bases
 {
   my ($self) = @_;
-  my $bases = $self->get_bases;
-  my $destination_dir = $self->get_destination_dir;
+  my $bases = $self->_get_bases;
+  my $destination_dir = $self->_get_destination_dir;
 
   # parallelize
   foreach my $base (sort keys %{$bases})
@@ -336,126 +396,34 @@ sub _generate_all_bases ($)
   $self->_generate_wrap_init ();
 }
 
-sub _finish ($)
+sub _finish
 {
   my ($self) = @_;
-  my $type_info_global = $self->get_type_info_global ();
+  my $type_info_global = $self->_get_type_info_global ();
 
   $type_info_global->write_generated_infos_to_file ();
 }
 
 sub new
 {
-  my ($type, $repositories, $mm_module, $include_paths, $wrap_init_namespace) = @_;
+  my ($type, $mm_module, $include_paths, $wrap_init_namespace, $source_dir, $destination_dir, $templates) = @_;
   my $class = (ref $type or $type or 'Common::Gmmproc');
+  my %bases = map { $_ => Common::TokensStore->new() } @{$templates};
   my $self =
   {
-    'repositories' => $repositories,
-    'bases' => {},
-    'source_dir' => '.',
-    'destination_dir' => '.',
+    'repositories' => undef,
+    'bases' => \%bases,
+    'source_dir' => $source_dir,
+    'destination_dir' => $destination_dir,
     'type_info_global' => Common::TypeInfo::Global->new ($mm_module, $include_paths),
     'mm_module' => $mm_module,
-    'include_paths' => $include_paths,
     'wrap_init_namespace' => $wrap_init_namespace
   };
 
   return bless $self, $class;
 }
 
-sub set_source_dir ($$)
-{
-  my ($self, $source_dir) = @_;
-
-  $self->{'source_dir'} = $source_dir;
-}
-
-sub get_source_dir ($)
-{
-  my ($self) = @_;
-
-  return $self->{'source_dir'};
-}
-
-sub set_destination_dir ($$)
-{
-  my ($self, $destination_dir) = @_;
-
-  $self->{'destination_dir'} = $destination_dir;
-}
-
-sub get_destination_dir ($)
-{
-  my ($self) = @_;
-
-  return $self->{'destination_dir'};
-}
-
-sub set_include_paths ($$)
-{
-  my ($self, $include_paths) = @_;
-
-  $self->{'include_paths'} = $include_paths;
-}
-
-sub get_include_paths ($)
-{
-  my ($self) = @_;
-
-  return $self->{'include_paths'};
-}
-
-sub add_base ($$)
-{
-  my ($self, $base) = @_;
-  my $bases = $self->get_bases;
-
-  if (exists $bases->{$base})
-  {
-# TODO: is proper logging needed at this stage?
-    print STDERR 'Base `' . $base . ' was already added.' . "\n";
-    return;
-  }
-
-  $bases->{$base} = Common::TokensStore->new;
-}
-
-sub get_bases ($)
-{
-  my ($self) = @_;
-
-  return $self->{'bases'};
-}
-
-sub get_repositories ($)
-{
-  my ($self) = @_;
-
-  return $self->{'repositories'};
-}
-
-sub get_type_info_global ($)
-{
-  my ($self) = @_;
-
-  return $self->{'type_info_global'};
-}
-
-sub get_mm_module ($)
-{
-  my ($self) = @_;
-
-  return $self->{'mm_module'};
-}
-
-sub get_wrap_init_namespace
-{
-  my ($self) = @_;
-
-  return $self->{'wrap_init_namespace'};
-}
-
-sub parse_and_generate ($)
+sub parse_and_generate
 {
   my ($self) = @_;
 

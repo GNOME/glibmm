@@ -1,5 +1,5 @@
 # -*- mode: perl; perl-indent-level: 2; indent-tabs-mode: nil -*-
-## Copyright 2011 Krzesimir Nowak
+## Copyright 2011, 2012 Krzesimir Nowak
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ sub add_repository ($$)
   my ($self, $repository) = @_;
   my $repositories = $self->{'repositories'};
   my $namespace = $repository->get_g_namespace_by_index (0);
-  my $name = $namespace->get_a_name ();
+  my $name = join ('-', $namespace->get_a_name (), $namespace->get_a_version ());
 
   if (exists $repositories->{$name})
   {
