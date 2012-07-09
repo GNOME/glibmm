@@ -127,7 +127,7 @@ sub equal ($$$)
     my $self_contained_type = $self->_get_contained_type;
     my $other_contained_type = $self->_get_contained_type;
 
-    return $self_contained_type->equal ($other_contained_type);
+    return $self_contained_type->equal ($other_contained_type, $flags);
   }
 
   return 1;

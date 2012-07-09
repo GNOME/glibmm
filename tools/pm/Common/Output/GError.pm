@@ -78,7 +78,7 @@ sub _output_gerror_impl ($$$)
   my ($wrap_parser, $cxx_type, $domain) = @_;
   my $container_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
   my $full_cxx_type = join '::', $container_cxx_type, $cxx_type;
-  my $section_manager->get_section_manager;
+  my $section_manager = $wrap_parser->get_section_manager;
   my $code_string = nl (Common::Output::Shared::open_namespaces $wrap_parser) .
                     nl ($full_cxx_type . '::' . $cxx_type . '(' . $full_cxx_type . '::Code error_code, const Glib::ustring& error_message)') .
                     nl (':') .

@@ -1253,9 +1253,9 @@ sub _on_wrap_enum ($)
 
   for my $subst (@sed)
   {
-    if ($subst =~ /^\s*s#([^#]+)#([^#]*)#\s*$/)
+    if ($subst =~ /^\s*s#([^#]*)#([^#]*)#\s*$/)
     {
-      push @substs, $subst;
+      push (@substs, [$1, $2]);
     }
     else
     {
@@ -2866,7 +2866,7 @@ sub _on_config_include
 
   my $include_file = shift (@args);
   my $section_manager = $self->get_section_manager ();
-  my $section = Common::Output::Shared::get_section ($self, Common::Sections::SECTION_HEADER_BEGIN);
+  my $section = Common::Output::Shared::get_section ($self, Common::Sections::H_BEGIN);
   my $code_string = nl (join ('', '#include <', $include_file, '>'));
 
   $section_manager->append_string_to_section ($code_string,
@@ -2908,14 +2908,14 @@ sub _on_custom_default_ctor
   $section_manager->set_variable ($variable, 1);
 }
 
-sub _deprecate_ifdef_start
+sub _on_deprecate_ifdef_start
 {
   my ($self) = @_;
 
   Common::Output::Shared::deprecate_start ($self);
 }
 
-sub _deprecate_ifdef_end
+sub _on_deprecate_ifdef_end
 {
   my ($self) = @_;
 
@@ -3199,7 +3199,7 @@ sub new ($$$$$$)
     '_MEMBER_GET_PTR' => sub { $self->_on_member_get_ptr (@_); },
     '_MEMBER_GET_GOBJECT' => sub { $self->_on_member_get_gobject (@_); },
     '_MEMBER_GET_REF_PTR' => sub { $self->_on_member_get_ref_ptr (@_); },
-    '_GMMPROC_EXTRA_NAMESPACE' => { $self->_on_gmmproc_extra_namespace (@_); }
+    '_GMMPROC_EXTRA_NAMESPACE' => sub { $self->_on_gmmproc_extra_namespace (@_); }
   };
 
   return $self;
