@@ -808,17 +808,18 @@ sub _on_wrap_method ($)
 
     unless (defined $gir_func)
     {
-# TODO: Check if we have any function outside C class wrapped
-# TODO continued: in C++ class.
       $gir_func = $gir_namespace->get_g_function_by_name ($c_function_name);
 
-      unless (defined $gir_func)
+      # Check if we are wrapping a C constructor with
+      # _WRAP_METHOD. Sensible only for static methods.
+      if (not defined ($gir_func) and $cxx_function->get_static ())
+      {
+        $gir_func = $gir_entity->get_g_constructor_by_name ($c_function_name);
+      }
+
+      unless (defined ($gir_func))
       {
         $self->fixed_error ('No such method: ' . $c_function_name);
-      }
-      else
-      {
-        $self->fixed_warning ('Found a function, but it is outside class.');
       }
     }
   }
