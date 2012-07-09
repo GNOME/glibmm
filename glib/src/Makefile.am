@@ -16,17 +16,19 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
 # Override code generator commands to use the uninstalled tools.
-gmmproc = $(PERL) -I$(top_srcdir)/tools/pm -- $(top_builddir)/tools/gmmproc
-gen_wrap_init = $(PERL) -- $(top_builddir)/tools/generate_wrap_init.pl
-
-binding_name    = glibmm
-wrap_init_flags = --namespace=Glib --parent_dir=glibmm
-codegen_srcdir  = $(top_srcdir)/tools
-
+include $(top_srcdir)/tools/pm/filelist.am
 include $(srcdir)/filelist.am
-include $(top_srcdir)/tools/m4/filelist.am
+include $(top_srcdir)/tools/proc/filelist.am
 
-files_defs = $(glibmm_files_defs)
+codegen_proc_srcdir  = $(top_srcdir)/tools/proc
+gmmproc_script = $(top_builddir)/tools/gmmproc
+gmmproc_perl_includes = -I$(top_srcdir)/tools/pm
+gmmproc_extra_dependencies = $(gmmproc_pm_modules) $(gmmproc_script)
+
+binding_name = glibmm
+wrap_init_namespace = Glib
+gir_basename = GLib-2.0.gir
+
 files_ccg  = $(glibmm_files_ccg)
 files_hg   = $(glibmm_files_hg)
 

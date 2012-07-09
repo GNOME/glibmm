@@ -19,7 +19,8 @@ ACLOCAL_AMFLAGS	= -I build ${ACLOCAL_FLAGS}
 DISTCHECK_CONFIGURE_FLAGS = --enable-warnings=fatal
 
 if MAINTAINER_MODE
-src_subdirs = glib/src gio/src
+src_subdirs = glib/src
+#src_subdirs += gio/src
 else
 src_subdirs =
 endif
@@ -28,20 +29,26 @@ doc_subdirs = docs
 else
 doc_subdirs =
 endif
-SUBDIRS = tools $(src_subdirs) glib/glibmm gio/giomm tests examples $(doc_subdirs)
+SUBDIRS =
+#SUBDIRS += tools
+SUBDIRS += $(src_subdirs) glib/glibmm
+#SUBDIRS += gio/giomm
+SUBDIRS += tests examples $(doc_subdirs)
 
 glibmm_includedir = $(includedir)/$(GLIBMM_MODULE_NAME)
 glibmm_include_HEADERS = glib/glibmm.h
 glibmm_libincludedir = $(libdir)/$(GLIBMM_MODULE_NAME)/include
 nodist_glibmm_libinclude_HEADERS = glib/glibmmconfig.h
 
-giomm_includedir = $(includedir)/$(GIOMM_MODULE_NAME)
-giomm_include_HEADERS = gio/giomm.h
-giomm_libincludedir = $(libdir)/$(GIOMM_MODULE_NAME)/include
-nodist_giomm_libinclude_HEADERS = gio/giommconfig.h
+#giomm_includedir = $(includedir)/$(GIOMM_MODULE_NAME)
+#giomm_include_HEADERS = gio/giomm.h
+#giomm_libincludedir = $(libdir)/$(GIOMM_MODULE_NAME)/include
+#nodist_giomm_libinclude_HEADERS = gio/giommconfig.h
 
 pkgconfigdir = $(libdir)/pkgconfig
-nodist_pkgconfig_DATA = glib/$(GLIBMM_MODULE_NAME).pc gio/$(GIOMM_MODULE_NAME).pc
+nodist_pkgconfig_DATA = glib/$(GLIBMM_MODULE_NAME).pc
+#nodist_pkgconfig_DATA += gio/$(GIOMM_MODULE_NAME).pc
+
 
 include $(srcdir)/MSVC_Net2005/filelist.am
 include $(srcdir)/MSVC_Net2008/filelist.am

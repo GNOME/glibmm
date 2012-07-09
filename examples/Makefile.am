@@ -20,36 +20,39 @@ AUTOMAKE_OPTIONS = subdir-objects
 check_PROGRAMS =			\
 	child_watch/child_watch		\
 	compose/example			\
-	dbus/session_bus_service \
-	dbus/server_without_bus			\
-	dbus/client_bus_listnames \
 	iochannel_stream/example	\
 	keyfile/example			\
 	markup/parser			\
-	network/resolver		\
-	network/socket-client		\
-	network/socket-server		\
 	options/example			\
 	properties/example		\
 	regex/example			\
-	settings/settings		\
 	thread/dispatcher		\
 	thread/dispatcher2		\
 	thread/thread			\
 	thread/threadpool
 
+#check_PROGRAMS += \
+#	dbus/session_bus_service \
+#	dbus/server_without_bus			\
+#	dbus/client_bus_listnames \
+#	network/resolver		\
+#	network/socket-client		\
+#	network/socket-server		\
+#	settings/settings
+
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
-giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
+#giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
 local_cppflags  = -I$(top_builddir) $(glibmm_includes) $(giomm_includes)
 
 AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS)
-AM_CXXFLAGS = $(GIOMM_CFLAGS) $(GLIBMM_WXXFLAGS)
+AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
+#AM_CXXFLAGS += $(GIOMM_CFLAGS)
 
 local_libglibmm = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
-local_libgiomm  = $(top_builddir)/gio/giomm/libgiomm-$(GIOMM_API_VERSION).la
+#local_libgiomm  = $(top_builddir)/gio/giomm/libgiomm-$(GIOMM_API_VERSION).la
 
 LDADD        = $(GLIBMM_LIBS) $(local_libglibmm)
-giomm_ldadd  = $(GIOMM_LIBS) $(local_libglibmm) $(local_libgiomm)
+#giomm_ldadd  = $(GIOMM_LIBS) $(local_libglibmm) $(local_libgiomm)
 thread_ldadd = $(GTHREAD_LIBS) $(GLIBMM_LIBS) $(local_libglibmm)
 
 child_watch_child_watch_SOURCES  = child_watch/main.cc
@@ -76,27 +79,27 @@ thread_threadpool_SOURCES  = thread/threadpool.cc
 thread_threadpool_LDADD    = $(thread_ldadd)
 
 # giomm examples
-dbus_session_bus_service_SOURCES = dbus/session_bus_service.cc
-dbus_session_bus_service_LDADD   = $(giomm_ldadd)
-dbus_server_without_bus_SOURCES = dbus/server_without_bus.cc
-dbus_server_without_bus_LDADD   = $(giomm_ldadd)
-dbus_client_bus_listnames_SOURCES = dbus/client_bus_listnames.cc
-dbus_client_bus_listnames_LDADD   = $(giomm_ldadd)
+#dbus_session_bus_service_SOURCES = dbus/session_bus_service.cc
+#dbus_session_bus_service_LDADD   = $(giomm_ldadd)
+#dbus_server_without_bus_SOURCES = dbus/server_without_bus.cc
+#dbus_server_without_bus_LDADD   = $(giomm_ldadd)
+#dbus_client_bus_listnames_SOURCES = dbus/client_bus_listnames.cc
+#dbus_client_bus_listnames_LDADD   = $(giomm_ldadd)
 
-network_resolver_SOURCES   = network/resolver.cc
-network_resolver_LDADD     = $(giomm_ldadd)
-network_socket_client_SOURCES = network/socket-client.cc
-network_socket_client_LDADD   = $(giomm_ldadd)
-network_socket_server_SOURCES = network/socket-server.cc
-network_socket_server_LDADD   = $(giomm_ldadd)
+#network_resolver_SOURCES   = network/resolver.cc
+#network_resolver_LDADD     = $(giomm_ldadd)
+#network_socket_client_SOURCES = network/socket-client.cc
+#network_socket_client_LDADD   = $(giomm_ldadd)
+#network_socket_server_SOURCES = network/socket-server.cc
+#network_socket_server_LDADD   = $(giomm_ldadd)
 
-settings_settings_SOURCES = settings/settings.cc
-settings_settings_LDADD   = $(giomm_ldadd)
+#settings_settings_SOURCES = settings/settings.cc
+#settings_settings_LDADD   = $(giomm_ldadd)
 
-dist_noinst_DATA = settings/org.gtkmm.demo.gschema.xml
-CLEANFILES = settings/gschemas.compiled
+#dist_noinst_DATA = settings/org.gtkmm.demo.gschema.xml
+#CLEANFILES = settings/gschemas.compiled
 
-settings/gschemas.compiled: $(srcdir)/settings/org.gtkmm.demo.gschema.xml
-	$(AM_V_GEN)$(GLIB_COMPILE_SCHEMAS) --targetdir=settings $(srcdir)/settings
+#settings/gschemas.compiled: $(srcdir)/settings/org.gtkmm.demo.gschema.xml
+#	$(AM_V_GEN)$(GLIB_COMPILE_SCHEMAS) --targetdir=settings $(srcdir)/settings
 
-all-local: settings/gschemas.compiled
+#all-local: settings/gschemas.compiled
