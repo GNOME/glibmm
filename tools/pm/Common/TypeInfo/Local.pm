@@ -90,6 +90,24 @@ sub _get_named_conversion ($$$$$)
   return undef;
 }
 
+sub _get_identity_conversion
+{
+  my ($self, $from, $to, $transfer, $subst) = @_;
+
+  if ($transfer == Common::TypeInfo::Common::TRANSFER_NONE)
+  {
+    my $from_details = Common::TypeDetails::disassemble_type ($from);
+    my $to_details = Common::TypeDetails::disassemble_type ($to);
+
+    if ($from_details->equal ($to_details, Common::TypeDetails::Base::RECURSIVE))
+    {
+      return $subst;
+    }
+  }
+
+  return undef;
+}
+
 sub new ($$)
 {
   my ($type, $global) = @_;
@@ -239,24 +257,25 @@ sub pop_named_conversion ($$)
 sub get_conversion ($$$$$)
 {
   my ($self, $from, $to, $transfer, $subst) = @_;
-  my $conversion = $self->_get_named_conversion ($from, $to, $transfer, $subst);
+  my @conversion_subs =
+  (
+    sub { return $self->_get_identity_conversion ($from, $to, $transfer, $subst); },
+    sub { return $self->_get_named_conversion ($from, $to, $transfer, $subst); },
+    sub { my $conversions = $self->_get_conversions (); return Common::TypeInfo::Common::get_specific_conversion ($conversions, $from, $to, $transfer, $subst); },
+    sub { my $global = $self->_get_global (); return $global->get_conversion ($from, $to, $transfer, $subst); }
+  );
 
-  unless (defined ($conversion))
+  foreach my $conversion_sub (@conversion_subs)
   {
-    my $conversions = $self->_get_conversions;
+    my $conversion = &{$conversion_sub} ();
 
-    $conversion = Common::TypeInfo::Common::get_specific_conversion $conversions, $from, $to, $transfer, $subst;
-
-    unless (defined $conversion)
+    if (defined ($conversion))
     {
-      my $global = $self->_get_global;
-
-      # this will throw an exception when nothing is found.
-      $conversion = $global->get_conversion ($from, $to, $transfer, $subst);
+      return $conversion;
     }
   }
 
-  return $conversion;
+  return undef;
 }
 
 sub c_to_cxx ($$)
