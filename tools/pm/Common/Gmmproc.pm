@@ -1,7 +1,7 @@
 # -*- mode: perl; perl-indent-level: 2; indent-tabs-mode: nil -*-
 # gmmproc - Common::Gmmproc module
 #
-# Copyright 2012 glibmm development team
+# Copyright 2012 Krzesimir Nowak <qdlacz@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
