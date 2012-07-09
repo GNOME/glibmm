@@ -3104,8 +3104,8 @@ sub new ($$$$$$)
   my $self =
   {
 # TODO: check if all those fields are really needed.
-    'line_num' => 0,
-    'fixed_line_num' => 0,
+    'line_num' => 1,
+    'fixed_line_num' => 1,
     'level' => 0,
     'classes' => [],
     'class_levels' => [],
@@ -3439,7 +3439,7 @@ sub parse ($)
         $self->_set_fixed_line_num;
 
         # handler call
-        &{$handler};
+        &{$handler} ();
       }
       else
       {
@@ -3447,7 +3447,7 @@ sub parse ($)
         # no handler found - just paste the token to main section
         $section_manager->append_string_to_section ($token, $main_section);
 # TODO: remove it later.
-        if ($token =~ /^[A-Z_]+$/)
+        if ($token =~ /^[A-Z_]{2,}$/)
         {
           print STDERR $token . ": Possible not implemented token!\n";
         }
