@@ -1446,7 +1446,8 @@ sub _on_class_generic ($)
 # TODO: should we check also other things? like Union or Glib::Boxed?
   }
 
-  $self->push_gir_record ($gir_record);
+  $self->_push_gir_record ($gir_record);
+  $self->_push_c_class ($c_type);
 
   Common::Output::Generic::output ($self, $c_type, $cxx_type);
 }
@@ -1862,7 +1863,8 @@ sub _on_class_boxed_type ($)
     $self->fixed_error ('Free/unref function can not be NONE.');
   }
 
-  $self->push_gir_record ($gir_record);
+  $self->_push_gir_record ($gir_record);
+  $self->_push_c_class ($c_type);
 
   Common::Output::BoxedType::output $self,
                                     $c_type,
@@ -1915,7 +1917,8 @@ sub _on_class_boxed_type_static ($)
     $self->fixed_error ('Record `' . $c_type . '\' has no get type function.');
   }
 
-  $self->push_gir_record ($gir_record);
+  $self->_push_gir_record ($gir_record);
+  $self->_push_c_class ($c_type);
 
   Common::Output::BoxedTypeStatic::output $self,
                                           $c_type,
@@ -2078,6 +2081,7 @@ sub _on_class_interface ($)
   my $cxx_parent_type = $type_info_local->c_to_cxx ($c_parent_type);
 
   $self->_push_gir_class ($gir_class);
+  $self->_push_c_class ($c_type);
 
   Common::Output::Interface::output $self,
                                     $c_type,
@@ -2246,7 +2250,8 @@ sub _on_class_opaque_copyable ($)
     $self->fixed_error ('Free/unref function can not be NONE.');
   }
 
-  $self->push_gir_record ($gir_record);
+  $self->_push_gir_record ($gir_record);
+  $self->_push_c_class ($c_type);
 
   Common::Output::OpaqueCopyable::output $self,
                                          $c_type,
@@ -2413,7 +2418,8 @@ sub _on_class_opaque_refcounted ($)
     $self->fixed_error ('Free/unref function can not be NONE.');
   }
 
-  $self->push_gir_record ($gir_record);
+  $self->_push_gir_record ($gir_record);
+  $self->_push_c_class ($c_type);
 
   Common::Output::OpaqueRefcounted::output $self,
                                            $c_type,
