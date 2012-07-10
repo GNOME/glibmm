@@ -122,6 +122,10 @@ dnl OptionGroup
 _CONVERSION(`OptionGroup&',`GOptionGroup*',`($3).gobj()')
 #_CONVERSION(`GOptionGroup*',`OptionGroup',`Glib::wrap(($3), true /* take_copy */)')
 
+dnl Bytes
+_CONVERSION(`GBytes*',`Glib::RefPtr<Glib::Bytes>',`Glib::wrap($3)')
+_CONVERSION(`GBytes*',`Glib::RefPtr<const Glib::Bytes>',`Glib::wrap($3)')
+
 dnl Regex
 _CONVERSION(`GRegex*',`Glib::RefPtr<Regex>',`Glib::wrap($3)')
 _CONVERSION(`GRegex*',`Glib::RefPtr<const Regex>',`Glib::wrap($3)')
@@ -147,5 +151,5 @@ _CONVERSION(`const Glib::VariantType&',`const GVariantType*',`($3).gobj()')
 _CONVERSION(`const GVariantType*',`VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
 _CONVERSION(`GVariantType*',`VariantType',`Glib::wrap(($3), true)')
 
-dnl Misillaneous
+dnl Miscellaneous
 _CONVERSION(`gint64&',`gint64*',`&($3)')

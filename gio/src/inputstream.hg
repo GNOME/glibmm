@@ -19,6 +19,7 @@
 
 #include <glibmm/object.h>
 #include <glibmm/priorities.h>
+#include <glibmm/bytes.h>
 
 #include <giomm/asyncresult.h>
 #include <giomm/cancellable.h>
@@ -97,6 +98,25 @@ public:
 
   //TODO: bool read_all(std::string& buffer, gsize count, gsize& bytes_read, const Glib::RefPtr<Cancellable>& cancellable);
   //TODO: bool read_all(std::string& buffer, gsize count, gsize& bytes_read)
+
+
+  _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> read_bytes(gsize count, const Glib::RefPtr<Cancellable>& cancellable), g_input_stream_read_bytes, errthrow)
+
+  //TODO: Documentation.
+  /**
+   * @newin{2,34}
+   */
+  void read_bytes_async(gsize count, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  /**
+   * @newin{2,34}
+   */
+  void read_bytes_async(gsize count, const SlotAsyncReady& slot, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_input_stream_read_bytes_async)
+
+  _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> read_bytes_finish(const Glib::RefPtr<AsyncResult>& result), g_input_stream_read_bytes_finish, errthrow)
+
+
 
   _WRAP_METHOD(gssize skip(gsize count, const Glib::RefPtr<Cancellable>& cancellable),
                g_input_stream_skip,
