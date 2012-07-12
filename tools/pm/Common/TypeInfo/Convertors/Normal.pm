@@ -22,10 +22,38 @@ package Common::TypeInfo::Convertors::Normal;
 
 use strict;
 use warnings;
+use v5.12;
 
-sub convert ($$$$$$)
+sub convert
 {
-# TODO: Implement it.
+  my ($tiglobal, $from_details, $to_details, $transfer, $subst, $conversion_type) = @_;
+
+  given ($conversion_type)
+  {
+    when (Common::TypeInfo::Global::C_CXX ())
+    {
+      if ($from_details->match_sigil (['*']) and $to_details->match_sigil (['']))
+      {
+          return join ('', 'Glib::wrap(', $subst, ', ', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? 'true' : 'false'), ')');
+      }
+    }
+    when (Common::TypeInfo::Global::CXX_C ())
+    {
+      if ($from_details->match_sigil (['&']) and $to_details->match_sigil (['*']))
+      {
+        return join ('', 'Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '' : '_copy'), '(', $subst, ')');
+      }
+    }
+    when (Common::TypeInfo::Global::C_CXX_CONTAINER ())
+    {
+
+    }
+    when (Common::TypeInfo::Global::CXX_C_CONTAINER ())
+    {
+
+    }
+  }
+
   return undef;
 }
 
