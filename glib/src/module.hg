@@ -99,12 +99,14 @@ public:
    */
   _WRAP_METHOD(static std::string get_last_error(), g_module_error)
 
+  _PUSH_NAMED_CONV(void_to_gpointer, void*&, gpointer*, &(##ARG##), NONE, NONE)
   /** Gets a symbol pointer from the module.
    * @param symbol_name The name of the symbol to lookup
    * @param symbol A pointer to set to the symbol
    * @returns True if the symbol was found, false otherwise.
    */
   _WRAP_METHOD(bool get_symbol(const std::string& symbol_name, void*& symbol) const, g_module_symbol)
+  _POP_NAMED_CONV(void_to_gpointer)
 
   /** Get the name of the module.
    * @returns The name of the module

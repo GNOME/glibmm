@@ -112,7 +112,9 @@ public:
 //The C parameters are actually const, but gmmproc doesn't understand that,
 //so we add a m4 conversion to satisfy it:
 #m4 _CONVERSION(`const VariantType&',`GVariantType*',`($3).gobj()')
+  // FIXME: That need fixing in gir - g_variant_type_new_array is treated there as a method instead of constructor, so first parameter is not stored at all.
   _WRAP_METHOD(static VariantType create_array(const VariantType& element), g_variant_type_new_array)
+  // FIXME: That need fixing in gir - g_variant_type_new_maybe is treated there as a method instead of constructor, so first parameter is not stored at all.
   _WRAP_METHOD(static VariantType create_maybe(const VariantType& element), g_variant_type_new_maybe)
 
   //TODO: Use a single list parameter:
@@ -136,7 +138,9 @@ public:
 
   #m4 _CONVERSION(`const VariantType&',`gconstpointer',`const_cast<GVariantType*>(($3).gobj())')
   _WRAP_METHOD(guint hash() const, g_variant_type_hash)
+  _PUSH_NAMED_CONV(varianttype_to_gconstpointer, const VariantType&, gconstpointer, static_cast<gconstpointer>(Glib::unwrap(##ARG##)), NONE, static_cast<gconstpointer>(Glib::unwrap_copy(##ARG##)))
   _WRAP_METHOD(bool equal(const VariantType& other) const, g_variant_type_equal)
+  _POP_NAMED_CONV(varianttype_to_gconstpointer)
 
   _WRAP_METHOD(bool is_subtype_of(const VariantType& supertype) const, g_variant_type_is_subtype_of)
 
