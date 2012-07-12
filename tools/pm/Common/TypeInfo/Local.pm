@@ -93,32 +93,28 @@ sub _get_named_conversion ($$$$$)
 sub _get_identity_conversion
 {
   my ($self, $from, $to, $transfer, $subst) = @_;
+  my $from_details = Common::TypeDetails::disassemble_type ($from);
+  my $to_details = Common::TypeDetails::disassemble_type ($to);
 
-  if ($transfer == Common::TypeInfo::Common::TRANSFER_NONE)
+  if ($from_details->equal ($to_details, Common::TypeDetails::Base::RECURSIVE))
   {
-    my $from_details = Common::TypeDetails::disassemble_type ($from);
-    my $to_details = Common::TypeDetails::disassemble_type ($to);
+    return $subst;
+  }
+  else
+  {
+    my $from_value = $from_details->get_value_details ();
+    my $to_value = $to_details->get_value_details ();
 
-    if ($from_details->equal ($to_details, Common::TypeDetails::Base::RECURSIVE))
+    if ($from_value->get_base () eq $to_value->get_base ())
     {
-      return $subst;
-    }
-    else
-    {
-      my $from_value = $from_details->get_value_details ();
-      my $to_value = $to_details->get_value_details ();
-
-      if ($from_value->get_base () eq $to_value->get_base ())
+      foreach my $sigil_pair ([['&'], ['*']], [['*&'], ['**']], [['**&'], ['***']])
       {
-        foreach my $sigil_pair ([['&'], ['*']], [['*&'], ['**']], [['**&'], ['***']])
-        {
-          my $from_sigil = $sigil_pair->[0];
-          my $to_sigil = $sigil_pair->[1];
+        my $from_sigil = $sigil_pair->[0];
+        my $to_sigil = $sigil_pair->[1];
 
-          if ($from_details->match_sigil ($from_sigil) and $to_details->match_sigil ($to_sigil))
-          {
-            return '&' . $subst;
-          }
+        if ($from_details->match_sigil ($from_sigil) and $to_details->match_sigil ($to_sigil))
+        {
+          return '&' . $subst;
         }
       }
     }
