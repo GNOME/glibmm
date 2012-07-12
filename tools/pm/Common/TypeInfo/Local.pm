@@ -103,6 +103,25 @@ sub _get_identity_conversion
     {
       return $subst;
     }
+    else
+    {
+      my $from_value = $from_details->get_value_details ();
+      my $to_value = $to_details->get_value_details ();
+
+      if ($from_value->get_base () eq $to_value->get_base ())
+      {
+        foreach my $sigil_pair ([['&'], ['*']], [['*&'], ['**']], [['**&'], ['***']])
+        {
+          my $from_sigil = $sigil_pair->[0];
+          my $to_sigil = $sigil_pair->[1];
+
+          if ($from_details->match_sigil ($from_sigil) and $to_details->match_sigil ($to_sigil))
+          {
+            return '&' . $subst;
+          }
+        }
+      }
+    }
   }
 
   return undef;
