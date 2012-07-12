@@ -36,9 +36,18 @@ sub convert ($$$$$$)
       {
         return $subst;
       }
-      if ($from_details->equal ($to_details, Common::TypeDetails::Base::ACCESS_MODIFIERS) and $from_details->match_sigil(['&']) and $to_details->match_sigil (['*']))
+      if ($from_details->equal ($to_details, Common::TypeDetails::Base::ACCESS_MODIFIERS))
       {
-        return join '', '&(', $subst, ')';
+        foreach my $sigil_pair ([['&'], ['*']], [['*&'], ['**']], [['**&'], ['***']])
+        {
+          my $from_sigil = $sigil_pair->[0];
+          my $to_sigil = $sigil_pair->[1];
+
+          if ($from_details->match_sigil ($from_sigil) and $to_details->match_sigil ($to_sigil))
+          {
+            return '&' . $subst;
+          }
+        }
       }
     }
     when (Common::TypeInfo::Global::C_CXX)
