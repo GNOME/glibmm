@@ -612,6 +612,14 @@ sub get_parent_from_object ($$)
 sub convert_or_die
 {
   my ($wrap_parser, $from, $to, $transfer, $subst) = @_;
+  my @good_range = Common::TypeInfo::Common::transfer_good_range ();
+
+  unless ($transfer ~~ @good_range)
+  {
+    my $message = join ('', 'Got invalid transfer for conversion from `', $from, '\' to `', $to, '\' for substitution `', $subst, '\'');
+    $wrap_parser->fixed_error ($message);
+  }
+
   my $type_info_local = $wrap_parser->get_type_info_local ();
   my $conversion = $type_info_local->get_conversion ($from,
                                                      $to,
