@@ -124,19 +124,22 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
     my $this_param = '';
     my @params = ();
 
-    if ($const)
+    unless ($static)
     {
-      $this_param = 'const_cast< ' . $c_type . '* >(gobj())';
-    }
-    elsif (not $static)
-    {
-      $this_param = 'gobj()';
+      if ($const)
+      {
+        $this_param = 'const_cast< ' . $c_type . '* >(gobj())';
+      }
+      else
+      {
+        $this_param = 'gobj()';
+      }
+
+      push @params, $this_param;
     }
 
-    push @params, $this_param;
-
-    my $prepped_cxx_param_types = [];
-    my $prepped_cxx_param_names = [];
+    my $prepped_cxx_param_types = undef;
+    my $prepped_cxx_param_names = undef;
 
     if ($cxx_param_out_index < 0)
     {
