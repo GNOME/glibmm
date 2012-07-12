@@ -635,7 +635,19 @@ sub convzipstr ($$$$$)
   my $substs_count = @{$substs};
 
 # TODO: throw runtime error or internal error or whatever.
-  die if $from_types_count != $to_types_count or $to_types_count != $transfers_count or $transfers_count != $substs_count;
+  #die if $from_types_count != $to_types_count or $to_types_count != $transfers_count or $transfers_count != $substs_count;
+  if ($from_types_count != $to_types_count)
+  {
+    $wrap_parser->fixed_error ('From types count should be equal to to types count.');
+  }
+  if ($to_types_count != $transfers_count)
+  {
+    $wrap_parser->fixed_error ('To types count should be equal to transfers count.');
+  }
+  if ($transfers_count != $substs_count)
+  {
+    $wrap_parser->fixed_error ('Transfers count should be equal to substs count.');
+  }
 
   my @conversions = ();
 

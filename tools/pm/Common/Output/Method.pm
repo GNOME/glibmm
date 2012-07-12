@@ -64,14 +64,27 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
 
 # TODO: replace with exception throwing
   # if dies then it is internal error. should not happen here.
-  die if ($static and ($const or $constversion));
-  die if (scalar (@{$cxx_param_types}) != scalar(@{$cxx_param_names}));
-  if ($cxx_param_out_index < 0) {
-    die if (scalar (@{$c_param_types}) != scalar(@{$cxx_param_types}));
+  if ($static and ($const or $constversion))
+  {
+    $wrap_parser->fixed_error ('static and const does not mix.');
+  }
+  if (scalar (@{$cxx_param_types}) != scalar(@{$cxx_param_names}))
+  {
+    $wrap_parser->fixed_error ('param types count should be equal to param names count');
+  }
+  if ($cxx_param_out_index < 0)
+  {
+    if (scalar (@{$c_param_types}) != scalar(@{$cxx_param_types}))
+    {
+      $wrap_parser->fixed_error ('C param types count should be equal to C++ param count');
+    }
   }
   else
   {
-    die if (scalar (@{$c_param_types}) + 1 != scalar(@{$cxx_param_types}));
+    if (scalar (@{$c_param_types}) + 1 != scalar(@{$cxx_param_types}))
+    {
+      $wrap_parser->fixed_error ('C param types count should be greater by one from C++ param_types (there is an output parameter.');
+    }
   }
 
   if ($deprecated)
