@@ -191,6 +191,7 @@ sub _scan_all_bases
     my $tuples = $tokens_store->get_tuples ();
     my $modules = $tokens_store->get_modules ();
 
+    # TODO: FUNC and MANUAL types should not be added.
     map { $type_info_global->add_generated_info (@{$_}); } @{$tuples};
     map { $gir_modules{$_} = undef; } @{$modules};
   }

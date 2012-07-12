@@ -725,7 +725,8 @@ sub register_convertor ($$$)
 sub add_generated_info ($$$$)
 {
   my ($self, $c_stuff, $cxx_stuff, $type) = @_;
-  my $apply_conversion = 1;
+# TODO: Probably get rid of MANUAL and FUNC convertors. They are pointless anyway.
+  my $apply_conversion = (($type eq 'MANUAL' or $type eq 'FUNC') ? 0 : 1);
   my $apply_mapping = 1;
 
   $self->_add_info_to_general_conversions ($c_stuff, $cxx_stuff, $type, GENERATED, $apply_conversion, $apply_mapping);
