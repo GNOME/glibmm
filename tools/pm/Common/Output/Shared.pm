@@ -624,6 +624,8 @@ sub convert_or_die
 
     $wrap_parser->fixed_error ($message);
   }
+
+  return $conversion;
 }
 
 sub convzipstr ($$$$$)

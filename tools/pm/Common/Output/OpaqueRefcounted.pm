@@ -175,7 +175,7 @@ sub _output_cc ($$$$$)
                   nl ();
   $section_manager->append_string_to_section ($code_string, $section);
   $code_string = nl () .
-                 Common::Output::close_namespaces $wrap_parser;
+                 Common::Output::Shared::close_namespaces $wrap_parser;
   $section_manager->append_string_to_section ($code_string, $section);
 }
 

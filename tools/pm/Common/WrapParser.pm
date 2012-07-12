@@ -1345,9 +1345,9 @@ sub _on_wrap_gerror ($)
 
   for my $subst (@sed)
   {
-    if ($subst =~ /^\s*s#([^#]+)#([^#]*)#\s*$/)
+    if ($subst =~ /^\s*s#([^#]*)#([^#]*)#\s*$/)
     {
-      push @substs, $subst;
+      push (@substs, [$1, $2]);
     }
     else
     {
