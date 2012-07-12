@@ -801,10 +801,12 @@ sub _on_wrap_method ($)
   }
 
   my $gir_func = $gir_entity->get_g_method_by_name ($c_function_name);
+  my $is_a_function = 0;
 
   unless (defined $gir_func)
   {
     $gir_func = $gir_entity->get_g_function_by_name ($c_function_name);
+    $is_a_function = 1;
 
     unless (defined $gir_func)
     {
@@ -825,6 +827,30 @@ sub _on_wrap_method ($)
   }
 
   my $c_function = Common::CFunctionInfo->new_from_gir ($gir_func, $self);
+  my $c_param_types = $c_function->get_param_types ();
+  my $c_param_transfers = $c_function->get_param_transfers ();
+
+  # Workaround for wrapping gir <function> as a method - gir omits
+  # "this" parameter in <method>, but not in <function> - we have to
+  # get rid of it ourselves.
+  # TODO: Should we check the deleted parameter?
+  if (not $cxx_function->get_static () and $is_a_function)
+  {
+    shift (@{$c_param_types});
+    shift (@{$c_param_transfers});
+  }
+  # TODO: Fix it in gobject-introspection. Workaround for wrapping gir
+  # <method> which should be <constructor>. This happens where
+  # constructor takes an instance of the type it instatiates. That one
+  # needs fixing in gir files, not here.
+  if ($cxx_function->get_static () and not $is_a_function)
+  {
+    my $guessed_c_type = join ('', 'const ', $gir_entity->get_a_c_type (), '*');
+
+    unshift (@{$c_param_types}, $guessed_c_type);
+    unshift (@{$c_param_transfers}, Common::TypeInfo::Common::TRANSFER_NONE);
+  }
+
   my $ret_transfer = $c_function->get_return_transfer;
   my $throws = $c_function->get_throws;
 
@@ -849,8 +875,8 @@ sub _on_wrap_method ($)
                                   $c_function->get_return_type,
                                   $ret_transfer,
                                   $c_function->get_name,
-                                  $c_function->get_param_types,
-                                  $c_function->get_param_transfers,
+                                  $c_param_types,
+                                  $c_param_transfers,
                                   $throws);
 }
 
