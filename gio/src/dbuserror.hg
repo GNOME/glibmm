@@ -17,29 +17,18 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/error.h>
+
 _DEFS(giomm,gio)
-_PINCLUDE(glibmm/private/interface_p.h)
 
 namespace Gio
 {
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-//Our custom friend declaration (see below) needs this pre-declaration.
-void wrap_init();
-#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 namespace DBus
 {
 
 //The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the DBus sub-namespace
 _GMMPROC_EXTRA_NAMESPACE(DBus)
-
-
-#m4 _PUSH(SECTION_H_GERROR_PRIVATE)
-  //This extra line is only necessary because this class is in a sub-namespace, but we want 
-  //it to be used in the wrap_init() of the main namespace. It's an awkward hack.
-  friend void Gio::wrap_init(); // uses throw_func()
-#m4 _POP()
 
 _WRAP_GERROR(Error, GDBusError, G_DBUS_ERROR, NO_GTYPE)
 

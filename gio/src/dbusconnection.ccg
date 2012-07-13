@@ -18,10 +18,14 @@
  */
 
 #include <gio/gio.h>
+#include <glibmm/exceptionhandler.h>
+#include <giomm/actiongroup.h>
 #include <giomm/dbusauthobserver.h>
 #include <giomm/dbusintrospection.h>
 #include <giomm/dbusmethodinvocation.h>
 #include <giomm/dbuserror.h>
+#include <giomm/menumodel.h>
+#include <giomm/unixfdlist.h>
 #include "slot_async.h"
 
 namespace
@@ -657,7 +661,7 @@ void Connection::call(
   const Glib::RefPtr<Cancellable>&      cancellable,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
-  CallFlags                         flags,
+  CallFlags                             flags,
   const Glib::VariantType&              reply_type
 )
 {
@@ -682,7 +686,7 @@ void Connection::call(
   const SlotAsyncReady&                 slot,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
-  CallFlags                         flags,
+  CallFlags                             flags,
   const Glib::VariantType&              reply_type
 )
 {
@@ -706,7 +710,7 @@ Glib::VariantContainerBase Connection::call_sync(
   const Glib::RefPtr<Cancellable>&      cancellable,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
-  CallFlags                         flags,
+  CallFlags                             flags,
   const Glib::VariantType&              reply_type
 )
 {
@@ -733,7 +737,7 @@ Glib::VariantContainerBase Connection::call_sync(
   const Glib::VariantContainerBase&     parameters,
   const Glib::ustring&                  bus_name,
   int                                   timeout_msec,
-  CallFlags                         flags,
+  CallFlags                             flags,
   const Glib::VariantType&              reply_type
 )
 {
@@ -750,6 +754,65 @@ Glib::VariantContainerBase Connection::call_sync(
 
   return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
 }
+
+//TODO: Re-add the following two methods when the call_finish() method with a
+//UnixFDList exists.
+#if 0
+#ifdef G_OS_LINUX
+// With a UnixFDList.
+void Connection::call(
+  const Glib::ustring&                object_path,
+  const Glib::ustring&                interface_name,
+  const Glib::ustring&                method_name,
+  const Glib::VariantContainerBase&   parameters,
+  const SlotAsyncReady&               slot,
+  const Glib::RefPtr<Cancellable>&    cancellable,
+  const Glib::RefPtr<UnixFDList>&     fd_list,
+  const Glib::ustring&                bus_name,
+  int                                 timeout_msec,
+  CallFlags                           flags,
+  const Glib::VariantType&            reply_type
+)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_call_with_uinx_fd_list(gobj(), bus_name.c_str(),
+    object_path.c_str(), interface_name.c_str(), method_name.c_str(),
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
+    static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(fd_list),
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+}
+
+// Non-cancellable version (with a UnixFDList).
+void Connection::call(
+  const Glib::ustring&                object_path,
+  const Glib::ustring&                interface_name,
+  const Glib::ustring&                method_name,
+  const Glib::VariantContainerBase&   parameters,
+  const SlotAsyncReady&               slot,
+  const Glib::RefPtr<UnixFDList>&     fd_list,
+  const Glib::ustring&                bus_name,
+  int                                 timeout_msec,
+  CallFlags                           flags,
+  const Glib::VariantType&            reply_type
+)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_call_with_unix_fd_list(gobj(), bus_name.c_str(),
+    object_path.c_str(), interface_name.c_str(), method_name.c_str(),
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
+    static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(fd_list),
+    0, &SignalProxy_async_callback, slot_copy);
+}
+#endif // G_OS_LINUX
+#endif // 0
 
 void Connection::emit_signal(
   const Glib::ustring&                object_path,

@@ -21,7 +21,6 @@
 #include <glibmm/exceptionhandler.h>
 #include <glib.h>
 
-
 namespace
 {
 
@@ -59,31 +58,38 @@ static void* call_thread_entry_slot(void* data)
 namespace Glib
 {
 
-// internal
+// This was always meant as an internal method. It is no longer called,
+// and no longer needs to be called. We are keeping it just to avoid 
+// breaking ABI, though hopefully nobody is using it anyway.
+// TODO: Remove this when we can break ABI.
 void thread_init_impl()
 {
   // Make sure the exception map is initialized before creating any thread.
   Glib::Error::register_init();
 }
 
-
 /**** Glib::Thread *********************************************************/
 
 // static
-Thread* Thread::create(const sigc::slot<void>& slot, bool joinable)
+Thread* Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
 {
   // Make a copy of slot on the heap
   sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
 
   GError* error = 0;
 
-  GThread *const thread = g_thread_create(
-      &call_thread_entry_slot, slot_copy, joinable, &error);
+  GThread *const thread = g_thread_try_new(NULL,
+      &call_thread_entry_slot, slot_copy, &error);
 
   if(error)
   {
     delete slot_copy;
-    Glib::Error::throw_exception(error);
+    // Glib::Error::throw_exception() will probably wrap G_THREAD_ERROR in a
+    // Glib::Threads::ThreadError instance, but we want a Glib::ThreadError.
+    if (error->domain == G_THREAD_ERROR)
+      throw Glib::ThreadError(error);
+    else
+      Glib::Error::throw_exception(error);
   }
 
   return reinterpret_cast<Thread*>(thread);
@@ -105,7 +111,12 @@ Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
   if(error)
   {
     delete slot_copy;
-    Glib::Error::throw_exception(error);
+    // Glib::Error::throw_exception() will probably wrap G_THREAD_ERROR in a
+    // Glib::Threads::ThreadError instance, but we want a Glib::ThreadError.
+    if (error->domain == G_THREAD_ERROR)
+      throw Glib::ThreadError(error);
+    else
+      Glib::Error::throw_exception(error);
   }
 
   return reinterpret_cast<Thread*>(thread);
@@ -117,14 +128,14 @@ Thread* Thread::self()
   return reinterpret_cast<Thread*>(g_thread_self());
 }
 
-bool Thread::joinable() const
-{
-  return gobject_.joinable;
-}
-
 void Thread::join()
 {
   g_thread_join(&gobject_);
+}
+
+bool Thread::joinable() const
+{
+  return true; //An appropriate result now that this is deprecated because all threads are now joinable.
 }
 
 void Thread::set_priority(ThreadPriority priority)
@@ -134,14 +145,32 @@ void Thread::set_priority(ThreadPriority priority)
 
 ThreadPriority Thread::get_priority() const
 {
-  return (ThreadPriority) gobject_.priority;
+  return THREAD_PRIORITY_NORMAL; //An appropriate result now that this is deprecated because the priority concept has been removed.
 }
+
+void thread_init(GThreadFunctions* /* vtable */)
+{
+  //g_thread_init() is deprecated and now does nothing,
+  //so we do not even call it. That avoids a need to link to gthread-2.0, 
+  //which contains the empty g_thread_init() implementation.
+  //g_thread_init(vtable);
+  
+  Glib::thread_init_impl();
+}
+
+bool thread_supported()
+{
+  //MSVC++ needs the != 0 to avoid an int -> bool cast warning.
+  return (g_thread_supported() != 0);
+}
+
 
 // static
 void Thread::yield()
 {
   g_thread_yield();
 }
+
 
 Thread* wrap(GThread* gobject)
 {
@@ -195,7 +224,7 @@ StaticMutex::operator Mutex&()
 
 Mutex::Mutex()
 :
-  gobject_ (g_mutex_new())
+  gobject_ (g_mutex_new()) //TODO: Use a statically-allocated GMutext instead, with g_mutex_init().
 {}
 
 Mutex::~Mutex()
@@ -257,10 +286,6 @@ StaticRecMutex::operator RecMutex&()
 RecMutex::RecMutex()
 {
   g_static_rec_mutex_init(&gobject_);
-
-  // GLib doesn't have GRecMutex, only GStaticRecMutex.  Force initialization
-  // of the mutex now, to mimic the behaviour of a (hypothetical) GRecMutex.
-  g_static_mutex_get_mutex(&gobject_.mutex);
 }
 
 RecMutex::~RecMutex()
@@ -360,6 +385,18 @@ void Cond::wait(Mutex& mutex)
 bool Cond::timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time)
 {
   return g_cond_timed_wait(gobject_, mutex.gobj(), const_cast<Glib::TimeVal*>(&abs_time));
+}
+
+void* StaticPrivate_get_helper(GStaticPrivate *private_key) {
+  return g_static_private_get(private_key);
+}
+
+void StaticPrivate_set_helper(GStaticPrivate *private_key, gpointer data, GDestroyNotify notify) {
+  return g_static_private_set(private_key, data, notify);
+}
+
+GPrivate* GPrivate_new_helper(GDestroyNotify notify) {
+  return g_private_new(notify);
 }
 
 

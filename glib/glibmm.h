@@ -81,6 +81,13 @@
 
 #include <glibmmconfig.h>
 //#include <glibmm/i18n.h> //This must be included by the application, after system headers such as <iostream>.
+
+//Include this first because we need it to be the first thing to include <glib.h>, 
+//so we can do an undef trick to still use deprecated API in the header: 
+#include <glibmm/thread.h>
+
+#include <glibmm/threads.h>
+
 #include <glibmm/arrayhandle.h>
 #include <glibmm/balancedtree.h>
 #include <glibmm/checksum.h>
@@ -122,7 +129,6 @@
 #include <glibmm/slisthandle.h>
 #include <glibmm/spawn.h>
 #include <glibmm/stringutils.h>
-#include <glibmm/thread.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/timer.h>
 #include <glibmm/timeval.h>

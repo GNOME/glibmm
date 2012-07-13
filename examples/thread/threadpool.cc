@@ -1,7 +1,7 @@
 
 #include <iostream>
+#include <glibmm/threads.h>
 #include <glibmm/random.h>
-#include <glibmm/thread.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/timer.h>
 
@@ -9,7 +9,7 @@
 namespace
 {
 
-Glib::StaticMutex mutex = GLIBMM_STATIC_MUTEX_INIT;
+Glib::Threads::Mutex mutex;
 
 void print_char(char c)
 {
@@ -18,7 +18,7 @@ void print_char(char c)
   for(int i = 0; i < 100; ++i)
   {
     {
-      Glib::Mutex::Lock lock (mutex);
+      Glib::Threads::Mutex::Lock lock (mutex);
       std::cout << c;
       std::cout.flush();
     }
@@ -31,8 +31,6 @@ void print_char(char c)
 
 int main(int, char**)
 {
-  Glib::thread_init();
-
   Glib::ThreadPool pool (10);
 
   for(char c = 'a'; c <= 'z'; ++c)

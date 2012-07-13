@@ -60,6 +60,10 @@ divert[]dnl
 // -*- c++ -*-
 // This is a generated file, do not edit.  Generated from __file__
 
+/* So we can use deprecated functions in our deprecated methods */
+#undef G_DISABLE_DEPRECATED
+#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
+
 #include <glibmm/value.h>
 
 namespace Glib

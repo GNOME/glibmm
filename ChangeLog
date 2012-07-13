@@ -1,3 +1,1402 @@
+2012-07-10  Krzesimir Nowak  <qdlacz@gmail.com>
+
+	Glib::Checksum: Fix a typo.
+
+	* glib/src/checksum.hg: Should be *_SHOULD_*, not *_SHOUD_*.
+
+2.33.3:
+
+2012-07-10  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio::InetSocketAddress: Added get_flowinfo() and get_scope_id()
+
+	* gio/src/inetsocketaddress.hg: And add the properties.
+
+2012-07-10  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio::OutputStream: Add write_bytes().
+
+	* tools/m4/convert_glib.m4:
+	* gio/src/outputstream.[hg|ccg]: Add write_bytes(), write_bytes_async(),
+	and write_bytes_finish().
+
+2012-07-10  Murray Cumming  <murrayc@murrayc.com>
+
+	Added Glib::Bytes and Gio::InputStream::read_bytes().
+
+	* glib/src/bytes.[hg|ccg]:
+	* glib/src/filelist.am:
+	* tools/m4/convert_glib.m4: Added a simple GBytes wrapper.
+	* gio/src/inputstream.[hg|ccg]: Added read_bytes(), read_bytes_async() 
+	and read_bytes_finish() using the new Glib::Bytes type.
+
+2012-07-10  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio::DBus::Connection: Add get_last_serial().
+
+	* gio/src/dbusconnection.hg: Wrap g_dbus_connection_get_last_serial().
+
+2012-07-02  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	generate_wrap_init.pl: Add _INCLUDE_IN_WRAP_INIT, _GMMPROC_WRAP_CONDITIONALLY.
+
+	* tools/generate_wrap_init.pl.in: Handle _INCLUDE_IN_WRAP_INIT and
+	_GMMPROC_WRAP_CONDITIONALLY.
+	* tools/m4/class_shared.m4: Add _INCLUDE_IN_WRAP_INIT and
+	_GMMPROC_WRAP_CONDITIONALLY. Bug #678883.
+
+2012-07-01  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Update .gitignore.
+
+	* .gitignore: Add /glib/glibmm/threads.[h|cc]. Update /examples/dbus/*.
+
+2.33.2:
+
+2012-06-19  Murray Cumming  <murrayc@murrayc.com>
+
+	gio_signals.defs: Regenerate.
+
+	* gio/src/gio_signals.defs: Regenerate with gen_scripts.
+
+2012-06-19  Murray Cumming  <murrayc@murrayc.com>
+
+	gen_scripts: Correct some comments/documentation.
+
+	* tools/gen_scripts/gio_generate_extra_defs.sh:
+	* tools/gen_scripts/glib_generate_extra_defs.sh:
+	These do not need JHBUILD_SOURCES to be defined.
+
+2012-06-13  Murray Cumming  <murrayc@murrayc.com>
+
+	Updated the *docs.xml files.
+
+	* gio/src/gio_docs.xml:
+	* glib/src/glib_docs.xml: Used the gen_scripts.
+
+2012-06-13  Murray Cumming  <murrayc@murrayc.com>
+
+	Updated the methods .defs.
+
+	* gio/src/gio_methods.defs:
+	* glib/src/glib_functions.defs:
+	* glib/src/gobject_functions.defs: Used the gen_scripts.
+
+2012-06-13  Murray Cumming  <murrayc@murrayc.com>
+
+	Updated the enums .defs.
+
+	* gio/src/gio_enums.defs:
+	* glib/src/glib_enums.defs: Used the gen_scripts.
+
+2012-06-13  Murray Cumming  <murrayc@murrayc.com>
+
+	Simplify the gen_scripts slightly.
+
+	* tools/gen_scripts/gio_generate_docs.sh:
+	* tools/gen_scripts/gio_generate_enums.sh:
+	* tools/gen_scripts/gio_generate_methods.sh:
+	* tools/gen_scripts/glib_generate_docs.sh:
+	* tools/gen_scripts/glib_generate_enums.sh:
+	* tools/gen_scripts/glib_generate_methods.sh:
+	Do not require changes to PATH.
+
+2.33.1 (unstable):
+
+2012-06-08  Michał Wróbel  <michal.wrobel@flytronic.pl>
+
+	Thread::RecMutex: Don't initialize this as a GStaticMutex.
+
+	The previous code (removed here) depended on an implementation
+	detail of GStaticRecMutex, which was changed in this glib commit:
+	http://git.gnome.org/browse/glib/commit/?id=2b281e40f32b7916d856dcc95e6f8fe625fcff03
+
+	This change avoids a deadlock with that version of glib.
+	Note that Thread::* is deprecated anyway, which is lucky because we do not
+	know for sure that this fix is enough.
+	Bug #677291
+
+2012-06-04  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Glib::add_exception_handler(): Fix misplaced endif.
+
+	* glib/glibmm/exceptionhandler.h: Fix a misplaced endif, which has made
+	Doxygen exclude add_exception_handler() from the documentation.
+
+2012-05-28  Murray Cumming  <murrayc@murrayc.com>
+
+	Application: Pass 0 (NULL) rather than "" to GApplication.
+
+	* gio/src/application.ccg: It is annoying that GApplication (and other 
+	C code) distinguishes, of course.
+
+2012-05-27  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio::Application: Allow the application ID to be empty.
+
+	* configure.ac: Depend on the latest unstable glib release (2.33.1).
+	* gio/src/application.hg: constructor, create(): Add a default 
+	(empty string) parameter for the application ID, because this may
+	now be empty if you do not need the full GApplication functionality.
+
+2012-04-21  Kalev Lember  <kalevlember@gmail.com>
+
+	Gio: Start wrapping GResource.
+
+	* gio/src/resource.[hg|ccg]: Add Gio::ResourceError so that the
+	resource handling functions in gtkmm could use it. The rest of the
+	GResource API is unwrapped.
+	* gio/src/filelist.am: List new resource.hg file.
+	Bug #674545.
+
+2012-04-17  Krzesimir Nowak  <qdlacz@gmail.com>
+
+	Miscutils: Fix typos.
+
+	* glib/glibmm/miscutils.cc: Return early from get_system_data_dirs()
+	and get_system_config_dirs() when C function returns NULL.
+
+2.32.0:
+
+2012-04-05  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	gmmproc: Add macro _CUSTOM_CTOR_CAST in _CLASS_BOXEDTYPE.
+
+	* tools/m4/class_boxedtype.m4: Add macro _CUSTOM_CTOR_CAST.
+	Bug #511136, comment 20.
+
+2012-04-10  Chun-wei Fan  <fanc999@src.gnome.org>
+
+	Update Visual Studio projects
+
+	* Fix Visual C++ projects for glibmm and giomm as numerous
+	sources have been added for the addition of APIs so that
+	these libraries can be properly built
+
+2012-04-04  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+ 
+	Glib::Dispatcher: Don't send messages to a deleted Dispatcher.
+
+	* glib/glibmm/dispatcher.h: Add missing usage rules.
+	* glib/glibmm/dispatcher.cc: Avoid delivering messages to deleted Dispatchers.
+	Don't block message delivery while a second main loop is running.
+	Bug #651942.
+
+2012-04-04  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Make SignalTimeout,SignalIdle::connect_once() more thread safe.
+
+	* glib/glibmm/main.cc: Call SourceConnectionNode::install() before
+	g_source_attach(). Suggested by Chris Vine. Bug #396963 comments 15-18.
+
+2012-04-03  Murray Cumming  <murrayc@murrayc.com>
+
+	Some improvements to the documentation in the previous commit.
+
+	* glib/glibmm/property.h:
+
+2012-04-03  Mark Vender  <markv743@yahoo.co.uk>
+
+	Document Glib::Property and Glib::PropertyBase
+
+	* glib/glibmm/property.h:
+	Bug #673291
+
+2012-04-03  Murray Cumming  <murrayc@murrayc.com>
+
+	Slight rewrite of the documenation in the previous commit.
+
+	* tools/m4/class_interface.m4:
+
+2012-04-03  Mark Vender  <markv743@yahoo.co.uk>
+
+	gmmproc: Generate the documentation of default constructors of interface classes.
+
+	Bug #673213
+
+2012-04-03  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Make SignalTimeout,SignalIdle::connect_once() more thread safe.
+
+	* glib/glibmm/main.cc: Don't create a sigc::connection in the connect_once()
+	methods. Bug #396963.
+
+2012-03-30  Murray Cumming  <murrayc@murrayc.com>
+
+	Regenerate .defs files.
+
+	* gio/src/gio_docs.xml:
+	* gio/src/gio_enums.defs:
+	* gio/src/gio_signals.defs:
+	* glib/src/glib_docs.xml:
+	* glib/src/glib_enums.defs:
+	* glib/src/glib_functions.defs:
+	* glib/src/gobject_functions.defs: Regenereated using
+	the scripts.
+
+2.31.22:
+
+2012-03-26  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	gmmproc: _WRAP_SIGNAL(): Mark deprecated signals in the _p.h and .cc files.
+
+	* tools/pm/WrapParser.pm: output_wrap_signal(): Pass $deprecated to
+	output_wrap_default_signal_handler_[h|cc]().
+	* tools/pm/Output.pm: output_wrap_default_signal_handler_[h|cc]():
+	Take a 'deprecated' bool parameter and pass it to _SIGNAL_P[H|CC]().
+	* tools/m4/signal.m4: _SIGNAL_PROXY(): Add deprecation info to the .cc file.
+	_SIGNAL_PH(), _SIGNAL_PCC(): Take a 'deprecated' bool parameter.
+
+2012-03-26  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	gmmproc: _WRAP_PROPERTY(): Fix mixed-up deprecation and documentation.
+
+	* tools/pm/Output.pm: Add $deprecated in the first call to _PROPERTY_PROXY().
+	* tools/m4/property.m4: Correct comments in .cc files by swapping #endif's
+	in _PROPERTY_PROXY().
+
+2012-03-25  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio: Move AppLaunchContext into its own header file.
+
+	* gio/src/appinfo.[hg|ccg]: Move the AppLaunchContext class into:
+	* gio/src/applaunchcontext.[hg|ccg]:
+	This helps gmmproc, for instance when deriving from it for 
+	Gdk::AppLaunchContext.
+
+2012-03-25  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Action, DBusObject: Ensure vfunc callbacks return valid memory.
+
+	* gio/src/action.hg (get_name_vfunc_callback):
+	* gio/src/dbusobject.hg (get_object_path_vfunc_callback):
+	(get_interfaces_vfunc_callback): Ensure that the return values of the
+	virtual functions of these callbacks are properly copied by correcting
+	the appropriate conversions so that the callbacks don't return empty
+	memory.
+
+2012-03-23  Murray Cumming  <murrayc@murrayc.com>
+
+	ActionGroup: list_actions_vfunc(): Do not return freed memory.
+
+	* gio/src/actiongroup.hg: list_actions vfunc: Correct the conversion,
+	doing a deep copy of the array of strings.
+
+2012-03-23  Murray Cumming  <murrayc@murrayc.com>
+
+	gmmproc: _WRAP_SIGNAL(): Allow signals to be deprecated.
+
+	* tools/pm/WrapParser.pm: on_wrap_signal(): Parse an optional
+    	deprecated "the explanation" parameter.
+	* tools/pm/Output.pm: output_wrap_signal_decl(): Take a deprecated bool
+    	and deprecated_docs, passing them to the m4 macro.
+	* tools/m4/signal.m4: _SIGNAL_PROXY(): Take a deprecated bool parameter
+	and use it to ifdef-out the signal declaration.
+	However, we cannot put the ifdef around the default signal handler, 
+	because that would break ABI.
+
+2012-03-22  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio: MenuItem: set_action_and_target(): Add one without the variant.
+
+	* gio/src/menuitem.[hg|ccg]: set_action_and_target(): Rename to 
+	set_action() and add a set_action() with just the action name,
+	because the GVariant* is optional.
+
+2012-03-22  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio: SimpleAction: Add a parameter that takes no VariantType.
+
+	* gio/src/simpleaction.[hg|ccg]: The GVariantType* is optional.
+
+2012-03-22  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio: Menu, MenuItem: Add default parameter values.
+
+	* gio/src/menu.hg:
+	* gio/src/menuitem.hg: Let the detailed_description parameters be 
+	empty.
+
+2012-03-22  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio: Add Menu and MenuItem.
+
+	* tools/extra_defs_gen/generate_defs_gio.cc: Mention the new GTypes here,
+	though they do not seem to have any properties or signals.
+
+	* gio/src/filelist.am:
+	* gio/src/menu.[hg|ccg]:
+	* gio/src/menuitem.[hg|ccg]: Add these classes, as a way to create
+	the Gio::MenuModel for Gtk::Application::set_app_menu() and set_menubar().
+	* tools/m4/convert_gio.m4: Add MenuItem conversion.
+	* gio/giomm.h: Mention the new headers here.
+
+2012-03-22  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Dispatcher examples: Use Glib::signal_idle().connect_once().
+
+	* examples/thread/dispatcher.cc: Use Glib::signal_idle().connect_once().
+	* examples/thread/dispatcher2.cc: Use Glib::signal_idle().connect_once().
+	Rename class Dispatcher to ThreadDispatcher. Bug #396963
+
+2012-03-15  Murray Cumming  <murrayc@murrayc.com>
+
+	Fix some warnings found by clang++.
+
+	* glib/glibmm/class.cc: registered_derived_type(): Use (void*)0 instead
+	of NULL to avoid a missing sentintel warning.
+
+2012-03-16  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::DBus::Object: Add the signals of the interface.
+
+	* gio/src/dbusobject.hg: Add the signal_interface_[added|removed]()
+	signals of the interface.
+	* tools/extra_defs_gen/generate_defs_gio.cc: Add the GDBusObject GType
+	to the signal and properties generation utility.
+	* gio/src/gio_signals.defs: Regenerate the defs file to get the
+	signals of the interface.
+	* tools/m4/convert_gio.m4: Add a necessary conversion for wrapping the
+	signals.
+
+	* gio/src/dbusinterface.hg: Whitespace corrections.
+
+2012-03-15  José Alburquerque  <jaalburquerque@gmail.com>
+
+	DateTime: Correct the declaration of the TimeVal struct.
+
+	* glib/src/datetime.hg: It was declared as a class but is in fact a
+	struct.  I also built the jhbuild c++ sources (as gtkmm was) using
+	clang++ out of curiosity which discovered this.
+
+2012-03-14  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::DBus: Add the Interface and Object interfaces.
+
+	* gio/src/dbusinterface.{ccg,hg}:
+	* gio/src/dbusobject.{ccg,hg}:
+	* gio/src/filelist.am: Add the new sources and include them in the
+	list of files to be built.
+	* gio/src/gio_vfuncs.defs: Add the virtual function definitions for
+	the new interfaces.
+	* tools/m4/convert_gio.m4: Add conversions for the new interfaces.
+
+2012-03-12  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Glib::Threads::Private, Glib::Dispatcher: Delete Glib::DispatchNotifier.
+
+	* glib/src/thread.hg: Add missing @deprecated.
+	* glib/src/threads.hg: Add Private::replace(). Add documentation to Private.
+	* glib/glibmm/dispatcher.cc: Use Private::replace() instead of set().
+	Bug #671587.
+
+2.31.20:
+
+2012-03-03  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio::Application: Add quit(). 
+
+	* gio/src/application.hg: Wrap g_application_quit().
+
+2012-03-02  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Signal*: Better description of the connect*() methods.
+
+	* glib/glibmm/main.h: Mention that returning false from a bool-returning
+	handler disconnects the handler. Other minor changes of the descriptions.
+	Bug #669906.
+
+2012-03-02  Murray Cumming  <murrayc@murrayc.com>
+
+	h2defs.py: Ignore the new GDK_AVAILABLE_IN_* macros.
+
+	* tools/defs_gen/h2def.py: Strip these macros so we can actually
+	parse the latest headers.
+
+2012-03-01  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: Allow destructors to be documented.
+
+	* tools/m4/base.m4 (SECTION_DTOR_DOCUMENTATION): Add a new section in
+	which to store a destructor's documentation.
+	* tools/m4/class_shared.m4 (_DOCUMENT_DTOR): Add a new macro which
+	takes text and places it in a Doxygen comment block sending the
+	comment block to the new section above.  The text can be multiline.
+	The macro assumes that any lines below the first, if any, have at
+	least one space preceding them.  If the text is a single line, it can
+	be double quoted (the double quotes are removed).  
+	* tools/m4/class_boxedtype.m4:
+	* tools/m4/class_gobject.m4:
+	* tools/m4/class_interface.m4:
+	* tools/m4/class_opaque_copyable.m4: Modify these so that any Doxygen
+	comment block sent to the new section above is inserted in the
+	generated declaration of the destructor.
+
+	Bug #668918.
+
+2012-02-29  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Generation Scripts: Don't assume the root directory is glibmm.
+
+	* tools/gen_scripts/gio_generate_docs.sh:
+	* tools/gen_scripts/gio_generate_enums.sh:
+	* tools/gen_scripts/gio_generate_extra_defs.sh:
+	* tools/gen_scripts/gio_generate_methods.sh:
+	* tools/gen_scripts/glib_generate_docs.sh:
+	* tools/gen_scripts/glib_generate_enums.sh:
+	* tools/gen_scripts/glib_generate_extra_defs.sh:
+	* tools/gen_scripts/glib_generate_methods.sh: Modify them so that they
+	assume that they reside in the tools/gen_scripts directory and find
+	the root of glibmm based on that instead of assuming that the name of
+	the root directory is glibmm.
+
+	* gio/src/gio_enums.defs.patch: Add this patch file to streamline the
+	enum generation so that keeping the custom Gio::HOST_WAS_NOT_FOUND
+	enum value is easier.
+
+2012-02-29  Murray Cumming  <murrayc@murrayc.com>
+
+	Add back our custom Gio::HOST_WAS_NOT_FOUND enum value. 
+
+	* gio/src/gio_enums.defs: This is easy to lose, but we always
+	notice during make check.
+
+2012-02-28  José Alburquerque  <jaalburquerque@gmail.com>
+
+	tools: Add XML docs and defs generation scripts.
+
+	* tools/gen_scripts/gio_generate_docs.sh:
+	* tools/gen_scripts/gio_generate_enums.sh:
+	* tools/gen_scripts/gio_generate_extra_defs.sh:
+	* tools/gen_scripts/gio_generate_methods.sh:
+	* tools/gen_scripts/glib_generate_docs.sh:
+	* tools/gen_scripts/glib_generate_enums.sh:
+	* tools/gen_scripts/glib_generate_extra_defs.sh:
+	* tools/gen_scripts/glib_generate_methods.sh: Add these scripts to
+	generate the XML docs and defs files for glibmm and giomm.  A
+	'JHBUILD_SOURCES' variable pointing to the jhbuild root source
+	directory needs to be defined and the various tools (like h2def.py,
+	enum.pl, etc.) need to be in the command path for these scripts to run
+	successfully.  They generate the appropriate files, patch them if
+	necessary, and place them in the correct place.  All that's needed is
+	to run the scripts.
+
+	* gio/src/gio_docs.xml:
+	* gio/src/gio_enums.defs:
+	* gio/src/gio_methods.defs:
+	* gio/src/gio_signals.defs:
+	* glib/src/glib_docs.xml:
+	* glib/src/glib_enums.defs:
+	* glib/src/glib_functions.defs:
+	* glib/src/gmodule_functions.defs:
+	* glib/src/gobject_enums.defs:
+	* glib/src/gobject_functions.defs: Regenerate all the XML and defs
+	files to ensure that the scripts work.
+
+	* glib/src/glib_enums.defs.patch: Add this patch file so that it isn't
+	necessary to manually edit the defs file.
+	* gio/src/gio_signals.defs.patch:
+	* glib/src/glib_functions.defs.patch: Update these patch files so the
+	defs files patch successfully.
+
+	Bug #668918.
+
+2012-02-28  José Alburquerque  <jaalburquerque@gmail.com>
+
+	docextract_to_xml.py: Generate signal docs by default.
+
+	* tools/defs_gen/docextract_to_xml.py: Change the --with-signals
+	option to --no-signals and assume that signal documentation should be
+	generated by default.  The --no-signals option requests that the docs
+	not be generated.
+
+	Bug #668918.
+
+2012-02-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	DBus::Error, DBus::Proxy: Fix interaction with generate_wrap_init.pl.
+
+	* gio/src/dbuserror.hg: Remove now unnecessary declaration of friend
+	Gio::wrap_init().
+	* gio/src/dbusproxy.hg: Add _GMMPROC_EXTRA_NAMESPACE(DBus). Bug #640029.
+
+2012-02-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Fix exceptions thrown by Thread::create() and Threads::Thread::create.
+
+	* glib/src/thread.ccg: create(): Call g_thread_try_new() instead of
+	g_thread_new(). Throw a Glib::ThreadError when appropriate, instead of calling
+	Glib::Error::throw_exception(), which would throw Glib::Threads::ThreadError.
+	* glib/src/threads.ccg:create(): Call g_thread_try_new() instead of
+	g_thread_new(). Remove parameter 'joinable'.
+	* glib/src/threads.hg: Remove parameter 'joinable'. Remove comments about
+	non-joinable threads and thread priorities.
+	* examples/network/resolver.cc:
+	* examples/network/socket-client.cc:
+	* examples/network/socket-server.cc:
+	* examples/thread/dispatcher.cc:
+	* examples/thread/dispatcher2.cc:
+	* examples/thread/thread.cc: Remove parameter 'joinable' in calls to
+	Glib::Threads::Thread::create(). Bug #640029.
+
+2012-02-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Fix the build with --disable-deprecated-api.
+
+	* glib/glibmm/main.cc: Call get_time() instead of the deprecated
+	get_current_time(), when GLIBMM_DISABLE_DEPRECATED is defined.
+	* glib/src/thread.[hg|ccg]: Use _IS_DEPRECATED instead of
+	_DEPRECATE_IFDEF_{START|END}. _DEPRECATE_IFDEF_{START|END} does not include
+	code generated by gmmproc within #ifndef/#endif.
+	* glib/src/threads.ccg: Change catch(Glib::Thread::Exit&) to
+	catch(Glib::Threads::Thread::Exit&).
+	* glib/src/threads.hg: Add _GMMPROC_EXTRA_NAMESPACE(Threads).
+	* glib/src/valuearray.hg:
+	* gio/src/application.hg: #undef G_DISABLE_DEPRECATED in the .cc file.
+	* tools/m4/class_shared.m4: Define _IS_DEPRECATED. Bug #640029.
+
+2012-02-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	generate_wrap_init.pl: Improve reg. of exception classes in sub-namespaces.
+
+	* tools/generate_wrap_init.pl.in: When there are exception classes in sub-
+	namespaces, create extra wrap_init() functions in those namespaces, and
+	register the exception classes from there. wrap_init() is a friend that makes
+	a pointer to the private throw_func(), and that's easier if wrap_init() is
+	declared in the same namespace as the exception class. Bug #640029.
+
+2012-02-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	generate_wrap_init.pl: Improve it for deprecated files and sub-namespaces.
+
+	* tools/generate_wrap_init.pl.in: Note that _IS_DEPRECATED deprecates a
+	whole file. Keep track of sub-namespaces for _CLASS_GOBJECT and
+	_CLASS_GTKOBJECT (not just for _WRAP_GERROR). Ignore macros in comments.
+	Bug #640029.
+
+2.31.18.1:
+
+2012-02-26  José Alburquerque  <jaalburquerque@gmail.com>
+
+	h2def.py: Handle types such as 'const gchar* const *' for functions.
+
+	* tools/defs_gen/h2def.py (clean_func): Make deprecated handling more
+	general so that macros such as GDK_DEPRECATED and GDK_DEPRECATED_FOR()
+	are also stripped.  Also replace '* const' with '*-const' in the
+	constants processing section so that types such as 'const gchar*
+	const*' (which are now used in the declaration of functions such as
+	gtk_about_dialog_get_authors()) are correctly processed.
+
+2012-02-26  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::DBus::[ActionGroup|MenuModel]: Have get() and not create() methods.
+
+	* gio/src/dbusactiongroup.hg:
+	* gio/src/dbusmenumodel.hg: Have get() methods to get instances of
+	theses classes and not create() methods as is done in
+	Gio::Application.
+
+	Bug #637445.
+
+2012-02-24  Murray Cumming  <murrayc@murrayc.com>
+
+	gmmproc: _WRAP_PROPERTY(): Allow properties to be deprecated.
+
+	* tools/m4/property.m4: get_docs(): Take optional documentation_docs
+	too, like DocsParser::lookup_documentation().
+	* tools/pm/Output.pm: output_wrap_property(): Take a deprecated bool
+	and deprecated_docs, adding the ifdef if necessary and passing 
+	it to the _PROPERTY_PROXY() m4 macro, with the amended documentation.
+	* tools/pm/Property.pm: _PROPERTY_PROXY(): Take a deprecated bool
+	parameter and add the ifndef if necessary.
+	* tools/pm/WrapParser.pm: on_wrap_property(): Parse an optional
+	deprecated "the explanation" parameter.
+
+2012-02-24  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::Application, Gio::DBus::AuthObserver: Typos.
+
+	* gio/src/application.hg:
+	* gio/src/dbusauthobserver.hg:
+
+2012-02-24  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::Application: Add missing virtual functions and methods.
+
+	* gio/src/application.{ccg,hg}: Add the rest of the virtual functions
+	-- all except the one with a GVariantBuilder parameter because that
+	type is not wrapped yet.  Also add the [set|get]_default() methods
+	wrapping the respective C functions.
+	* gio/src/gio_vfuncs.defs: Add the rest of GApplication's virtual
+	function definitions so they can be wrapped.
+	* tools/m4/convert_gio.m4: Add GApplication conversions.
+
+2012-02-24  José Alburquerque  <jaalburquerque@gmail.com>
+
+	giomm: Add class docs to recently added Application related classes.
+
+	* gio/src/actionmap.hg:
+	* gio/src/dbusactiongroup.hg:
+	* gio/src/dbusmenumodel.hg:
+	* gio/src/menuattributeiter.hg:
+	* gio/src/menulinkiter.hg:
+	* gio/src/remoteactiongroup.hg:
+
+2012-02-24  José Alburquerque  <jaalburquerque@gmail.com>
+
+	MenuModel: Add the attribute and link constants.
+
+	* gio/src/dbusmenumodel.hg:
+	* gio/src/menumodel.ccg: Add the class documentation.  Also add the
+	attribute and link constants from the C API in enums and re-wrap the
+	existing methods to use the enums (this was adapted from gstreamermm).
+
+2012-02-23  José Alburquerque  <jaalburquerque@gmail.com>
+
+	giomm: Add the DBus::MenuModel class.
+
+	* gio/src/dbusmenumodel.{ccg,hg}: Add the sources wrapping a single
+	create() method.
+	* gio/src/filelist.am: Add the sources to the list of files to be
+	built.
+
+2012-02-23  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::DBus::Connection: Add the MenuModel export/unexport methods.
+
+	* gio/src/dbusconnection.{ccg,hg}: Add the two new methods, wrapping
+	the two functions in the GMenuModel exporter API:
+	http://developer.gnome.org/gio/2.31/gio-GMenuModel-exporter.html
+	* tools/m4/convert_gio.m4: Add necessary conversions.
+
+2012-02-22  José Alburquerque  <jaalburquerque@gmail.com>
+
+	giomm: MenuModel, MenuAttributeIter: Correct typos.
+
+	* gio/src/menuattributeiter.hg (get_next): Remove extra (unneeded)
+	parameter to the _WRAP_METHOD_DOCS_ONLY macro.
+	* gio/src/menumodel.ccg: Whitespace.
+
+2012-02-22  José Alburquerque  <jaalburquerque@gmail.com>
+
+	giomm: Add the MenuModel and Menu[Attribute|Link]Iter classes.
+
+	* gio/src/menuattributeiter.{ccg,hg}:
+	* gio/src/menulinkiter.{ccg,hg}:
+	* gio/src/menumodel.{ccg,hg}:
+	* gio/src/filelist.am: Add the sources for the classes and include
+	them in the list of source files to build.
+	* tools/m4/convert_gio.m4:
+	* tools/m4/convert_glib.m4: Add the necessary conversions.
+
+2012-02-22  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::Application: Derive from the ActionGroup interface.
+
+	* gio/src/application.hg: As is done in the C API.
+
+2.31.18:
+
+2012-02-20  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::DBus::Connection: Add the ActionGroup export/unexport methods.
+
+	* gio/src/dbusconnection.{ccg,hg}: Add the two new methods, wrapping
+	the two functions in the new GActionGroup exporter API:
+	http://developer.gnome.org/gio/2.31/gio-GActionGroup-exporter.html
+
+2012-02-20  José Alburquerque  <jaalburquerque@gmail.com>
+
+	giomm: Add the DBus::ActionGroup class.
+
+	* gio/src/dbusactiongroup.{ccg,hg}: Add the sources, wrapping the
+	create() method.
+	* gio/src/filelist.am: Include the sources in the build.
+
+2012-02-20  José Alburquerque  <jaalburquerque@gmail.com>
+
+	giomm: Add the RemoteActionGroup interface.
+
+	* gio/src/remoteactiongroup.{ccg,hg}:
+	* gio/src/filelist.am: Add the sources, wrapping the methods and
+	virtual functions, and include them in the list of files to be built.
+	* gio/src/gio_vfuncs.defs: Add the GRemoteActionGroup virtual
+	functions.
+
+	* gio/src/applicationcommandline.hg: Add the class documentation
+	block.
+
+2012-02-16  José Alburquerque  <jaalburquerque@gmail.com>
+
+	h2def.py: Handle deprecated functions.
+
+	* tools/defs_gen/h2def.py: The g_application_set_action_group() and
+	the g_volume_monitor_adopt_orphan_mount() functions are wrapped but
+	not generated because they have been deprecated in their header files
+	by using a GLIB_DEPRECATED macro before the function declaration.
+	Modify this tool to strip the macro so the functions are recognized.
+	* gio/src/gio_methods.defs: Regenerate so the missing method
+	definitions are included.
+
+2012-02-15  José Alburquerque  <jaalburquerque@gmail.com>
+
+	giomm: Add the ActionMap interface.
+
+	* gio/src/actionmap.{ccg,hg}:
+	* gio/src/filelist.am: Add the new sources.
+
+	* gio/src/gio_methods.defs: Regenerate to get the new ActionMap
+	methods.
+	* gio/src/gio_vfuncs.defs: Add the ActionMap virtual functions.
+
+	* gio/src/application.hg:
+	* gio/src/simpleactiongroup.hg: These classes implement the new
+	interface.
+
+	* gio/src/gio_extra_objects.defs: Add new objects so that there are no
+	missing define-object warnings from gmmproc.
+
+2012-02-15  José Alburquerque  <jaalburquerque@gmail.com>
+
+	reviewed by: <delete if not using a buddy>
+
+	* gio/src/actionmap.ccg:
+	* gio/src/actionmap.hg:
+
+2012-02-14  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: docs: Remove possible parens in gtk-doc signal references.
+
+	* tools/pm/DocsParser.pm: Discard possible parenthesis following a
+	gtk-doc signal reference.  This avoids a double set of parenthesis
+	appearing in the documentation.
+
+	Bug #668918.
+
+2012-02-14  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::DBus::Proxy: Add a TODO.
+
+	* gio/src/dbusproxy.hg: Add a TODO.
+	* gio/src/filemonitor.hg: Typo.
+	* tools/pm/DocsParser.pm (convert_tags_to_doxygen): Allow <listitem>
+	tags to not be on a line by themselves also (as was done with the
+	<itemizedlist> tag.
+
+2012-02-14  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Remove unnecessary signal docs.
+
+	* gio/src/dbusserver.hg:
+	* gio/src/drive.hg: Remove signal docs from .hg files that is now
+	automatically included by gmmproc.
+
+2012-02-14  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Regenerate XML docs for glibmm and giomm.
+
+	* gio/src/gio_docs.xml:
+	* glib/src/glib_docs.xml: Regenerate these, now including the signal
+	docs so that gmmproc can include their docs in the source generation
+	process.
+
+2.31.16.1:
+
+2012-02-13  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: docs: Convert signal and property names correctly.
+
+	* tools/pm/DocsParser.pm (substitute_identifiers): Search for gtk-doc
+	property and signal references and convert them to appropriate C++
+	names so that they are referenced correctly in the documentation.
+
+	Bug #668918.
+
+2012-02-08  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: DocsParser.pm (convert_tags_to_doxygen): Correct typo.
+
+	* tools/pm/DocsParser.pm (convert_tags_to_doxygen): Make the newline
+	following the <itemizedlist> tags optional when converting them to
+	Doxygen format (in case the tags are not necessarily on a line by
+	themselves).
+
+2012-02-08  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: Translate the <itemizedlist> tags in docs correctly.
+
+	* tools/pm/DocsParser.pm (lookup_documentation): Typo.
+	(convert_tags_to_doxygen): Add substitutions to convert gtk-doc
+	<itemizedlist> tags to Doxygen format.  For example, see
+	Gtk::ToolItem's "create-menu-proxy" and "toolbar-reconfigured"
+	signal docs.
+
+2012-02-07  José Alburquerque  <jaalburquerque@gmail.com>
+
+	docextract_to_xml.py: Add some HTML entity conversions.
+
+	* tools/defs_gen/docextract_to_xml.py: Add some HTML entity
+	conversions that produce errors when processed by gmmproc.
+
+2012-02-07  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: Method generation: Fix indentation of void methods.
+
+	* tools/m4/method.m4: Make sure that the generated line in methods
+	returning void is indented properly (by two spaces).  Before, there
+	was no indentation (see for example the Entry::set_inner_border()
+	method).
+
+2012-02-03  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: Add documentation to wrapped signals.
+
+	* tools/m4/signal.m4: Add docs to the on_*() default handlers
+	referring the users to the signal_*() docs.
+	* tools/pm/DocsParser.pm (parse_on_start):
+	(parse_on_end): Allow the <signal></signal> tags from the generated
+	XML docs to be processed in a similar way as the <function></function>
+	tags are processed.  The docs of the signals are stored as
+	"Class::a_signal_name" in the hash.
+	(append_parameter_docs): Skip the first parameter for signals also
+	because the first parameter of signals is the object for which the
+	signal is triggered.
+	(lookup_documentation): Generalize the no docs warning to include
+	signals also.
+	* tools/pm/Function.pm (get_refdoc_comment): Modify the subroutine to
+	accept the docs of the signal (that the DocsParser stores) and include
+	the prototype of the slot in the docs.
+	* tools/pm/Output.pm (output_wrap_sig_decl): Modify the subroutine to
+	look up the documentation of the signal which it then passes to
+	get_refdoc_comment() so that the documentation of the signal from the
+	generated XML is included in the declaration of the signal.
+
+	Bug #668918 (Mark)
+
+2.31.16:
+
+2012-01-30  TS  <t.sailer@alumni.ethz.ch>
+
+	Dispatcher: Fix the build on win32.
+
+	* glib/glibmm/dispatcher.cc: Mention the new Threads:: namespace in the
+	ifdefed win32 code.
+
+2011-12-08  Haikel Guemar  <karlthered@gmail.com>
+
+	thread.h: Move calls to deprecated glib functions into thread.cc.
+
+	* glib/src/thread.[hg|ccg]: Move calls to deprecated glib functions 
+	from thread.h into new public helper functions, so they are only
+	used in our .cc file. This avoids warnings in application compiles 
+	just because they happen to include this header.
+
+2.31.2:
+
+2011-11-24  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Make class Glib::Threads::Private buildable with --enable-warnings=fatal.
+
+	* glib/src/threads.hg: G_PRIVATE_INIT(destructor_func) is used only in an
+	initialization.
+
+2011-11-23  Murray Cumming  <murrayc@murrayc.com>
+
+	Add Glib::Threads::* in threads.h, deprecating everything in thread.h
+
+	* glib/src/filelist.am:
+	* glib/src/thread.[hg|ccg]: Deprecate the whole file, adding 
+	deprecation doxygen comments to all API.
+	* glib/src/threads.[hg|ccg]: A new Threads namespace containing
+	equivalents for everything in thread.h, implemented using 
+	only non-deprecated glib API. This was necessary because we had
+	to break the ABI to do this.
+	* glib/glibmm.h: Include threads.h
+
+	* glib/glibmm/main.[h|cc]: Added a wait() method overload that 
+	takes the new types, deprecating the existing wait() method.
+
+	* examples/network/resolver.cc:
+	* examples/network/socket-client.cc:
+	* examples/network/socket-server.cc:
+	* examples/thread/dispatcher.cc:
+	* examples/thread/dispatcher2.cc:
+	* examples/thread/thread.cc:
+	* examples/thread/threadpool.cc:
+	* glib/glibmm/dispatcher.cc:
+	* glib/glibmm/exceptionhandler.cc:
+	* glib/glibmm/threadpool.[h|cc]: Use the new Glib::Threads::* types
+	instead of thread.h.
+
+2011-11-23  Murray Cumming  <murrayc@murrayc.com>
+
+	Avoid a deprecation warning in implelementation of deprecated API.
+
+	* glib/glibmm/main.cc: Define GLIB_DISABLE_DEPRECATION_WARNINGS
+	to avoid a warning about g_source_get_current_time(), 
+	which we must use in our own deprecated code.
+
+2011-11-23  Murray Cumming  <murrayc@murrayc.com>
+
+	class.cc: Avoid compiler warnings when using -std=c++0x with g++.
+
+	* glib/glibmm/class.cc: Add casts because GTypeQuery::class_size 
+	and instance_size are guint but GTypeInfo::class_size and 
+	instance_size are guint16.
+
+2011-11-18  Murray Cumming  <murrayc@murrayc.com>
+
+	Require glibmm 2.2.10 so that make check works.
+
+	* configure.ac: Bug #663686 (Michael Biebl)
+
+2011-11-16  Hub Figuière  <hub@figuiere.net>
+
+	Ensure template parameter has a space before to avoid trigraphs.
+	(Gtkmm bug #663303)
+
+	* tools/m4/property.m4: Ensure template parameter has a space
+	before to avoid trigraphs.
+
+2011-10-26  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	giomm: Add some unwrapped methods and properties.
+
+	* gio/src/drive.hg: Add get_sort_key().
+	* gio/src/emblemedicon.hg: Add clear_emblems().
+	* gio/src/fileicon.hg: Add the "file" property.
+	* gio/src/inetaddress.hg: Add address_equal().
+	* gio/src/mount.hg: Add get_sort_key().
+	* gio/src/socket.hg: Add the "timeout" property.
+	* gio/src/socketaddress.hg: Add the "family" property.
+	* tools/m4/convert_gio.m4: Add a necessary conversion.
+
+2011-10-26  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: Example Removal: Also remove code in </programlisting> tags.
+
+	* tools/pm/DocsParser.pm (lookup_documentation): Also remove code in
+	<programlisting>...</programlisting> tags.
+
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
+	Avoid use of deprecated API in tests and examples.
+
+	* tests/Makefile.am:
+	* examples/Makefile.am: Disable deprecated API.
+	* examples/network/socket-client.cc:
+	* examples/network/socket-server.cc:
+	* examples/thread/dispatcher.cc:
+	* examples/thread/dispatcher2.cc:
+	* examples/thread/thread.cc: Remove calls to Glib::thread_init(), instead 
+	calling Glib::init() where that side-effect was also intended.
+
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
+	threadpool example: Use Mutex instead of StaticMutex.
+
+	* examples/thread/threadpool.cc: The advantage of StaticMutex was that
+	it would silently do nothing if threads were not initialized. That
+	was never a useful distinction in this example anyway.
+	Also remove the deprecated thread_init() call.
+	* glib/src/thread.ccg: Mutex: Add a TODO about not using the deprecated
+	API.
+
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
+	Fix the deprecation ifdefs.
+  
+	* glib/src/thread.hg: Move the deprecation ifdefs to avoid affecting 
+	non-deprecated API.
+
+2.31.0.1:
+
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
+	Avoid an unused-parameter compiler warning.
+
+	* glib/src/thread.ccg: thread_init(): Comment out the vtable parameter.
+
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
+	thread.h: Allow use of this without causing deprecation compiler warnings.
+
+	* glib/src/thread.hg: undef and then redefine G_DISABLE_DEPRECATED, and
+	define GLIB_DISABLE_DEPRECATION_WARNINGS, if G_DISABLE_DEPRECATED is 
+	defined, so we can use the deprecated API in this header (though only in 
+	our own deprecated API).
+	 
+	* tools/generate_wrap_init.pl.in: Include glibmm.h instead of glib.h so 
+	we can include thread.h first (via glibmm.h) instead of only later.
+	This seems more logical than explicitly including thread.h in all 
+	(even non-glibmm) generated wrap_init.cc files.
+	
+  * tools/m4/base.m4:
+	* glib/glibmm.h:
+	* glib/glibmm/dispatcher.cc:
+	* glib/glibmm/exceptionhandler.cc:
+	* glib/glibmm/main.cc:
+	* examples/thread/thread.cc:
+	* examples/thread/threadpool.cc: Adjust the includes to include thread.h 
+	first.
+
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
+	Move IOCondition from main.h to iochannel.h and autogenerate it.
+
+	* glib/src/iochannel.hg: Use _WRAP_ENUM() for IOCondition instead of 
+	hand-coding it in 
+	* glib/glibmm/main.h: 
+	though this requires some manual editing of 
+	* glib/src/glib_enums.defs: due to the weird defines that GioChannel uses for
+	its values. See the comment.
+	* glib/glibmm/streamiochannel.cc: Adjust the includes.
+	This avoids the need to include glib.h from main.h.
+	
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
+	Avoid some deprecation compiler warnings. 
+
+	* gio/src/file.hg:
+	* gio/src/volumemonitor.hg:
+	* glib/src/date.hg: Add GLIB_DISABLE_DEPRECATION_WARNINGS to 
+	SECTION_CC_PRE_INCLUDES to avoid compiler warnings with the new glib 
+	deprecation system.
+	* glib/src/value_basictypes.cc.m4: undef them here too, because 
+	g_value_set_char() and g_value_get_char() are deprecated. 
+
+2011-10-26  Murray Cumming  <murrayc@murrayc.com>
+
+	Thread: Move deprecated parts together.
+
+	* glib/src/thread.hg: This simplifies things a bit.
+
+2011-10-25  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: Don't include C code examples found in the XML docs.
+
+	* tools/pm/DocsParser.pm (lookup_documentation): Remove the C example
+	code from the attained documentation of the specified function.  Print
+	a warning that the example code has been removed if that is the
+	case.  Include the function name in the warning so that it is known
+	where the examples are in case it is convenient to translate them.
+	(convert_tags_to_doxygen): No longer convert tags and symbols that
+	signal example code to Doxygen format since they are removed with the
+	example code.
+
+	Bug #650544
+
+2011-10-25  Murray Cumming  <murrayc@murrayc.com>
+
+	giomm/wrap_init.h: Remove the glibmm.h include from here too.
+
+	* gio/giomm/wrap_init.[h|cc]: Move the #include into the .cc file.
+	* gio/giomm.h: Add an #include glibmm.h here instead.
+	
+2011-10-25  Murray Cumming  <murrayc@murrayc.com>
+
+	gmmproc: Include <glibmm.h> in .cc files for convenience.
+	
+	* tools/m4/base.m4: Add an include <glibmm.h> line to the .cc files.
+	* glib/src/optioncontext.ccg: Rename a namespace to avoid a clash.
+	
+	It is more useful to keep the general glibmm.h include out of headers.
+
+2011-10-24  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: Don't include <glibmm.h> by default in generated files.
+
+	* tools/m4/base.m4: Include <glibmm/ustring.h> and <sigc++/sigc++.h>
+	by default in header files of generated files in modules other than
+	glibmm.  This should make compilation faster for those modules.
+
+	* gio/src/*.{h,cc}g:
+	* gio/giomm/slot_async.cc: Adjust includes according to the above
+	change.
+
+	Bug #662597
+
+2.31.0:
+
+2011-10-25  Murray Cumming  <murrayc@murrayc.com>
+
+	Regenerated more defs.
+
+	* gio/src/gio_enums.defs: Regenerated with enums.pl.
+	* gio/src/gio_methods.defs: Regenerated with h2defs.py.
+	* glib/src/glib_functions.defs:
+	* glib/src/gobject_functions.defs: Regenereated with h2defs.py
+	* glib/src/glib_deprecated_functions.defs: Added this file.
+	* glib/src/glib.defs: Mention the new file.
+
+2011-10-25  Murray Cumming  <murrayc@murrayc.com>
+
+	Do not use gthread-2.0.
+
+	* configure.ac: Do not use gthread-2.0 at all, because it only contains 
+	empty functions so it is better to just not call them.
+	Require the latest glib version, to avoid people using this version of 
+	glibmm with a version of glib that would need g_thread_init().
+	* glib/src/thread.ccg: thread_init(): Do not call g_thread_init() because 
+	it now does nothing and would require linking to gthread-2.0.
+
+2011-10-25  Murray Cumming  <murrayc@murrayc.com>
+
+	Fix the make check build by always linking to gthread-2.0.
+
+	* configure.ac: Always use gthread-2.0 because there is now no advantage to
+	not doing that, because threading is now always enabled in glib.
+	Remove the separate GTHREAD* variables.
+	* glib/glibmm/Makefile.am:
+	* gio/giomm/Makefile.am:
+	* tests/Makefile.am:
+	* tools/Makefile.am:
+	* examples/Makefile.am: Remove use of the GTHREAD* variables..
+	* examples/network/resolver.cc: Remove the non-threading option and code that
+	uses it.
+
+2011-10-25  Murray Cumming  <murrayc@murrayc.com>
+
+	Regenerate enums defs.
+
+  * glib/src/glib_enums.defs, gobject_enums.defs: Regenerated with enums.pl.
+	* glib/src/glib_deprecated_enums.defs: Added this file.
+	* glib/src/filelist.am: Mention the new file.
+	* glib/src/glib.defs: Mention the new file and actually mention 
+	gobject_enums.defs.
+
+2011-10-23  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::DBus::Connection: Temporarily remove newly added call() methods.
+
+	* gio/src/dbusconnection.{ccg,hg}: Remove the newly added call()
+	methods with a UnixFDList parameter until the call_finish() method
+	with a UnixFDList parameter is added also.
+
+	* gio/src/credentials.hg:
+	* gio/src/dbusmessage.ccg:
+	* gio/src/dbusmessage.hg: Typos.
+
+2011-10-21  Murray Cumming  <murrayc@murrayc.com>
+
+	Thread: Use g_thread_new() instead of g_thread_create().
+
+	* glib/src/thread.[hg|ccg]: create(): Replace use of (deprecated) 
+  g_thread_create() with g_thread_new(), ignoring the joinable parameter.
+  create(lots of parameters): Deprecate this, because the parameters are 
+  ignored by g_thread_create_full() now.
+
+2011-10-21  Murray Cumming  <murrayc@murrayc.com>
+
+	Deprecated thread_init(), Thread::joinable(), *_priotity(), etc.
+
+	* glib/src/thread.[hg|ccg]: Deprecate thread_init(), thread_supported,
+	Thread::joinable(), Thread::set_priority(), Thread::get_priority() and 
+	ThreadPriority.
+	
+2011-10-16  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: Remove M4 warnings due to commas in return types.
+
+	* tools/m4/convert_base.m4 (__HASH2): Appropriately quote the
+	pushdef() arguments and the m4_ifelse() arguments due to some warnings
+	generated because of the newly wrapped method in the
+	ApplicationCommandLine class (get_platform_data()) which has a comma
+	in the return type.  The wrapping was successful even with the warning
+	but the return type was still being split when passed to this macro.
+	Document what the macro does.
+	(_CONVERT): Typos.
+	(_CONVERSION):
+	(_INITIALIZATION): Document what parameters are allowed for these
+	macros.
+
+2011-10-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::DBus::Connection: Correct UnixFDList class forward declaration.
+
+	* gio/src/dbusconnection.hg: Place the class declaration in the Gio
+	namespace and not in the Gio::DBus namespace which is incorrect to fix
+	the build.  There was a '-Werror' option in the CXXFLAGS variable of
+	my ~/.jhbuildrc file which was causing deprecation warnings to break
+	the build so I did not verify the previous to last commit, sorry.
+
+2011-10-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Date: set_time(): Use g_date_set_time_t() instead of g_date_set_time().
+
+	* glib/src/date.ccg: The latter function is deprecated.  This fixes
+	the build with the master branch of glib with deprecations disabled
+	though there's one small error related to the Threads discussion on
+	the mailing list that will still have to be looked at.
+
+2011-10-13  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	DBusMethodInvocation: Add UnixFDList return_value() method overload.
+
+	* gio/src/dbusmethodinvocation.hg: Add the method overload.
+	* gio/src/dbusmessage.hg: Add an _IGNORE.
+
+2011-10-13  Murray Cumming  <murrayc@murrayc.com>
+
+	Do not include glib/gvarianttype.h.
+
+	* glib/src/thread.hg: Include glib.h instead. The recent glib version
+	has a pragma that complains about this.
+
+2011-10-12  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Gio::DBus::Connection: Add UnixFDList call() method overloads.
+
+	* gio/src/dbusconnection.{ccg,hg}: Add cancellable and
+	non-cancellable UnixFDList call() methods.  The TODO's are for when
+	gmmproc can possibly handle setting C++ parameters from C output
+	parameters properly which may be possible with a few changes.
+
+2011-10-12  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	VariantContainerBase: Add create_maybe().
+
+	* glib/src/variant.{ccg,hg}: Add a create_maybe() method because it
+	was discussed on the mailing list.  Clearly the variant classes are
+	not intended for general use.  However, this method is added just
+	so that the API is more complete.
+
+2011-10-11  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	DataInputStream: Add read_line_utf8() and read_line_finish_utf8().
+
+	* gio/src/datainputstream.hg: Add the two methods and their overloads
+	using the new gmmproc parameter reordering, optional parameter
+	signaling and output parameter signaling functionality.  It's not
+	difficult to write the _INITIALIZATION and _WRAP_METHOD macros but
+	they may not be readily understandable.  I think they are, but I could
+	be wrong.
+
+2011-10-11  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: _WRAP_METHOD: Use {OUT} instead of {RET} for output params.
+
+	* tools/pm/Output.pm: Use {OUT} instead of {RET} to signify that a
+	parameter is an output parameter because it is probably more
+	intuitive.
+	* tools/m4/convert_base.m4 (_INITIALIZE): Don't quote the C return
+	because otherwise the macros in it aren't expanded when the macro is
+	used.  This could be because of the recent M4 changes in the previous
+	to the last commit.
+
+2011-10-11  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	ApplicationCommandLine: Add the get_platform_data() method.
+
+	* gio/src/applicationcommandline.hg:
+
+2011-10-10  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: _WRAP_METHOD: Allow return types to have commas.
+
+	* tools/pm/WrapParser.pm (string_split_commas): Modify so that when
+	splitting by commas, '<' and '>' are taken into account by levels as
+	is done with '(' and ')'.  This so that if a return type in a
+	_WRAP_METHOD has a comma (which is possible, e.g. with std::map<>) the
+	return type is not split incorrectly.
+	(read_file): Modified so that '<' and '>' are tokens by which to
+	split.
+	* tools/pm/Output.pm (output_wrap_meth): Add `' around the return type
+	when calling the _METHOD() and _STATIC_METHOD() M4 macros so that
+	commas don't split the return type into more than one argument.
+	* tools/m4/method.m4: Do the same (for the return type) in _METHOD()
+	and _STATIC_METHOD() when calling the _CONVERT() macro for the same
+	reason as above.
+	
+	Bug #661401
+
+2011-10-10  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	SimpleAction: Wrap the signals and properties.
+
+	* gio/src/simpleaction.hg: Wrap the signals using the
+	no_default_handler option because there are no signal members exposed
+	in the GSimpleActionClass struct (in fact, there is no
+	GSimpleActionClass struct).  Also wrap the properties.
+
+2011-10-10  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Application, {,Simple}Action{,Group}: Update @newins{}'s.
+
+	* gio/src/action.hg:
+	* gio/src/application.hg:
+	* gio/src/simpleaction.hg:
+	* gio/src/simpleactiongroup.hg:
+
+	* gio/src/applicationcommandline.hg: Add bug URL to a TODO.
+
+2011-10-10  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	ApplicationCommandLine: Update a TODO.
+
+	* gio/src/applicationcommandline.hg:
+
+2011-10-09  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	Re-add Application and related class so they can be finished.
+
+	* gio/giomm.h:
+	* gio/src/action.ccg:
+	* gio/src/action.hg:
+	* gio/src/actiongroup.ccg:
+	* gio/src/actiongroup.hg:
+	* gio/src/application.ccg:
+	* gio/src/application.hg:
+	* gio/src/applicationcommandline.ccg:
+	* gio/src/applicationcommandline.hg:
+	* gio/src/filelist.am:
+	* gio/src/simpleaction.ccg:
+	* gio/src/simpleaction.hg:
+	* gio/src/simpleactiongroup.ccg:
+	* gio/src/simpleactiongroup.hg:
+
+2011-09-27  Krzesimir Nowak  <qdlacz@gmail.com>
+
+	Fix h2def.py not parsing function starting with G_GNUC_* macros.
+
+	* tools/defs_gen/h2def.py: Strip some G_GNUC_* macros that are known
+	to be placed before return type of function prototype.
+	Fixes bug #660225.
+
+2.30.0
+
+2011-09-27  Murray Cumming  <murrayc@murrayc.com>
+
+	Gio::DBus::Server: Add constructors.
+
+	* gio/src/dbusserver.[hg|ccg]: Uncomment the constructors now that bug #639478
+	has been fixed, though nobody has tried to use this yet.
+
+2011-09-27  Murray Cumming  <murrayc@murrayc.com>
+
+	Regenerated .defs files.
+
+	* glib/src/glib_functions.defs:
+	* glib/src/gobject_functions.defs:
+	* glib/src/gmodule_functions.defs:
+	* gio/src/gio_functions.defs: Regenerated with h2defs.py, though see 
+	bug #660225 .
+	* glib/src/datetime.hg: Added an m4 conversion that is now necessary.
+
+2011-09-26  Murray Cumming  <murrayc@murrayc.com>
+
+	Remove Application and friends, because they are still not ready.
+
+	* gio/src/action.[hg|ccg]:
+	* gio/src/actiongroup..[hg|ccg]:
+	* gio/src/application.[hg|ccg]:
+	* gio/src/applicationcommandline..[hg|ccg]:
+	* gio/src/simpleaction..[hg|ccg]:
+	* gio/src/simpleactiongroup.[hg|ccg]: Removed.
+	* gio/src/filelist.am:
+	* goi/giomm.h: Do not mention them.
+	See bug #637445#c29
+
 2011-09-22  José Alburquerque  <jaalburqu@svn.gnome.org>
 
 	Action, ActionGroup: Wrap virtual functions.

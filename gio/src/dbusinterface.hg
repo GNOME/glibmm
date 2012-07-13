@@ -1,0 +1,76 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2012 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/interface.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gio/gio.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GDBusInterfaceIface GDBusInterfaceIface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+namespace DBus
+{
+
+class InterfaceInfo;
+class Object;
+
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+//TODO: Have Proxy derive from this interface when there is an ABI break.
+
+/** Interface - Base type for D-Bus interfaces.
+ * The Interface type is the base type for D-Bus interfaces both on the service
+ * side (see InterfaceSkeleton) and client side (see Proxy).
+ * @newin{2,34}
+ */
+
+class Interface : public Glib::Interface
+{
+  _CLASS_INTERFACE(Interface, GDBusInterface, G_DBUS_INTERFACE, GDBusInterfaceIface)
+
+public:
+  _WRAP_METHOD(Glib::RefPtr<InterfaceInfo> get_info(), g_dbus_interface_get_info)
+  _WRAP_METHOD(Glib::RefPtr<const InterfaceInfo> get_info() const, g_dbus_interface_get_info, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<Gio::DBus::Object> get_object(), g_dbus_interface_get_object)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::DBus::Object> get_object() const, g_dbus_interface_get_object, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<Gio::DBus::Object> dup_object(), g_dbus_interface_dup_object)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::DBus::Object> dup_object() const, g_dbus_interface_dup_object, constversion)
+
+  _WRAP_METHOD(void set_object(const Glib::RefPtr<Gio::DBus::Object>& object), g_dbus_interface_set_object)
+
+  _WRAP_VFUNC(Glib::RefPtr<InterfaceInfo> get_info() const, "get_info")
+  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Object> get_object() const, "get_object")
+
+#m4 _CONVERSION(`GDBusObject*',`const Glib::RefPtr<Gio::DBus::Object>&',`Glib::wrap($3, true)')
+  _WRAP_VFUNC(void set_object(const Glib::RefPtr<Gio::DBus::Object>& object), "set_object")
+
+  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Object> dup_object() const, "dup_object")
+};
+
+} // namespace DBus
+
+} // namespace Gio

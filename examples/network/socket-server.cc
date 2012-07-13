@@ -111,8 +111,6 @@ main (int argc,
     GOptionContext *context;
     Glib::RefPtr<Gio::Cancellable> cancellable;
 
-    Glib::thread_init (NULL);
-
     Gio::init ();
 
     context = g_option_context_new (" - Test GSocket server stuff");
@@ -126,7 +124,7 @@ main (int argc,
     if (cancel_timeout)
     {
         cancellable = Gio::Cancellable::create ();
-        Glib::Thread::create (sigc::bind (sigc::ptr_fun (cancel_thread), cancellable), false);
+        Glib::Threads::Thread::create (sigc::bind (sigc::ptr_fun (cancel_thread), cancellable));
     }
 
     loop = Glib::MainLoop::create ();

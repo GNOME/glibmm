@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([glibmm], [2.29.13],
+AC_INIT([glibmm], [2.33.3],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=glibmm],
         [glibmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -61,10 +61,10 @@ AS_IF([test "x$enable_static" = xyes],
   AC_DEFINE([GIOMM_STATIC_LIB],  [1], [Define if giomm is built as a static library])
 ])
 
-glibreq='2.0 >= 2.29.8'
+glibreq='2.0 >= 2.33.3'
 
 GM_MODULES="glib-$glibreq gobject-$glibreq"
-GLIBMM_MODULES="sigc++-2.0 >= 2.0.10 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
+GLIBMM_MODULES="sigc++-2.0 >= 2.2.10 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
 GIOMM_MODULES="$GLIBMM_MODULES gio-$glibreq"
 test "x$glibmm_host_windows" = xyes || GIOMM_MODULES="$GIOMM_MODULES gio-unix-$glibreq"
 
@@ -72,8 +72,6 @@ PKG_CHECK_MODULES([GLIBMM], [$GLIBMM_MODULES])
 PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
 PKG_CHECK_MODULES([GM],     [$GM_MODULES])
 
-MM_PKG_CONFIG_SUBST([GTHREAD_CFLAGS], [--cflags-only-other gthread-2.0])
-MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs gthread-2.0])
 MM_PKG_CONFIG_SUBST([GIRDIR], [--variable=girdir gobject-introspection-1.0])
 
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
@@ -152,13 +150,13 @@ AC_CONFIG_FILES([Makefile
 AC_CONFIG_FILES([tests/Makefile
                  examples/Makefile
                  docs/Makefile
-                 docs/reference/Doxyfile])
+                 docs/reference/Doxyfile
                  MSVC_Net2005/glibmm/glibmm.rc
                  MSVC_Net2008/glibmm/glibmm.rc
-                 MSVC_Net2010/glibmm/glibmm.rc
-#C_CONFIG_FILES([MSVC_Net2005/giomm/giomm.rc
-#                MSVC_Net2008/giomm/giomm.rc
-#                MSVC_Net2010/giomm/giomm.rc])
+                 MSVC_Net2010/glibmm/glibmm.rc])
+#AC_CONFIG_FILES([MSVC_Net2005/giomm/giomm.rc
+#                 MSVC_Net2008/giomm/giomm.rc
+#                 MSVC_Net2010/giomm/giomm.rc])
 
 # Copy the generated configuration headers into the MSVC project directories.
 AC_CONFIG_COMMANDS([MSVC_Net2005/glibmm/glibmmconfig.h],
@@ -167,10 +165,10 @@ AC_CONFIG_COMMANDS([MSVC_Net2008/glibmm/glibmmconfig.h],
                    [cp -f glib/glibmmconfig.h MSVC_Net2008/glibmm/glibmmconfig.h])
 AC_CONFIG_COMMANDS([MSVC_Net2010/glibmm/glibmmconfig.h],
                    [cp -f glib/glibmmconfig.h MSVC_Net2010/glibmm/glibmmconfig.h])
-#C_CONFIG_COMMANDS([MSVC_Net2005/giomm/giommconfig.h],
-#                  [cp -f gio/giommconfig.h MSVC_Net2005/giomm/giommconfig.h])
-#C_CONFIG_COMMANDS([MSVC_Net2008/giomm/giommconfig.h],
-#                  [cp -f gio/giommconfig.h MSVC_Net2008/giomm/giommconfig.h])
-#C_CONFIG_COMMANDS([MSVC_Net2010/giomm/giommconfig.h],
-#                  [cp -f gio/giommconfig.h MSVC_Net2010/giomm/giommconfig.h])
+#AC_CONFIG_COMMANDS([MSVC_Net2005/giomm/giommconfig.h],
+#                   [cp -f gio/giommconfig.h MSVC_Net2005/giomm/giommconfig.h])
+#AC_CONFIG_COMMANDS([MSVC_Net2008/giomm/giommconfig.h],
+#                   [cp -f gio/giommconfig.h MSVC_Net2008/giomm/giommconfig.h])
+#AC_CONFIG_COMMANDS([MSVC_Net2010/giomm/giommconfig.h],
+#                   [cp -f gio/giommconfig.h MSVC_Net2010/giomm/giommconfig.h])
 AC_OUTPUT

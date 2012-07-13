@@ -46,15 +46,23 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
   GTypeQuery base_query = { 0, 0, 0, 0, };
   g_type_query(base_type, &base_query);
 
+  //GTypeQuery::class_size is guint but GTypeInfo::class_size is guint16.
+  const guint16 class_size =
+   (guint16)base_query.class_size;
+
+  //GTypeQuery::instance_size is guint but GTypeInfo::instance_size is guint16.
+  const guint16 instance_size =
+   (guint16)base_query.instance_size;
+ 
   const GTypeInfo derived_info =
   {
-    base_query.class_size,
+    class_size,
     0, // base_init
     0, // base_finalize
     class_init_func_,
     0, // class_finalize
     0, // class_data
-    base_query.instance_size,
+    instance_size,
     0, // n_preallocs
     0, // instance_init
     0, // value_table
@@ -66,7 +74,7 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
     return;
   }
 
-  gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, NULL);
+  gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, (void*)0);
   
   if(module)
     gtype_ = g_type_module_register_type(module, base_type, derived_name, &derived_info, GTypeFlags(0));
@@ -94,15 +102,23 @@ GType Class::clone_custom_type(const char* custom_type_name) const
     GTypeQuery base_query = { 0, 0, 0, 0, };
     g_type_query(base_type, &base_query);
 
+    //GTypeQuery::class_size is guint but GTypeInfo::class_size is guint16.
+    const guint16 class_size =
+      (guint16)base_query.class_size;
+
+    //GTypeQuery::instance_size is guint but GTypeInfo::instance_size is guint16.
+    const guint16 instance_size =
+      (guint16)base_query.instance_size;
+
     const GTypeInfo derived_info =
     {
-      base_query.class_size,
+      class_size,
       0, // base_init
       0, // base_finalize
       &Class::custom_class_init_function,
       0, // class_finalize
       this, // class_data
-      base_query.instance_size,
+      instance_size,
       0, // n_preallocs
       0, // instance_init
       0, // value_table

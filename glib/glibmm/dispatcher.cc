@@ -18,15 +18,16 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/threads.h>
 #include <glibmm/dispatcher.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/main.h>
-#include <glibmm/thread.h>
 
 #include <cerrno>
 #include <fcntl.h>
 #include <glib.h>
+#include <set>
 
 #ifdef G_OS_WIN32
 # include <windows.h>
@@ -126,8 +127,10 @@ class DispatchNotifier : public sigc::trackable
 public:
   ~DispatchNotifier();
 
-  static DispatchNotifier* reference_instance(const Glib::RefPtr<MainContext>& context);
-  static void unreference_instance(DispatchNotifier* notifier);
+  static DispatchNotifier* reference_instance(
+    const Glib::RefPtr<MainContext>& context, const Dispatcher* dispatcher);
+  static void unreference_instance(
+    DispatchNotifier* notifier, const Dispatcher* dispatcher);
 
   void send_notification(Dispatcher* dispatcher);
 
@@ -137,12 +140,14 @@ protected:
   explicit DispatchNotifier(const Glib::RefPtr<MainContext>& context);
 
 private:
-  static Glib::StaticPrivate<DispatchNotifier> thread_specific_instance_;
+  static Glib::Threads::Private<DispatchNotifier> thread_specific_instance_;
+
+  std::set<const Dispatcher*>   deleted_dispatchers_;
 
   long                          ref_count_;
   Glib::RefPtr<MainContext>     context_;
 #ifdef G_OS_WIN32
-  Glib::Mutex                   mutex_;
+  Glib::Threads::Mutex          mutex_;
   std::list<DispatchNotifyData> notify_queue_;
   HANDLE                        fd_receiver_;
 #else
@@ -152,6 +157,7 @@ private:
 
   void create_pipe();
   bool pipe_io_handler(Glib::IOCondition condition);
+  bool pipe_is_empty();
 
   // noncopyable
   DispatchNotifier(const DispatchNotifier&);
@@ -161,11 +167,11 @@ private:
 /**** Glib::DispatchNotifier ***********************************************/
 
 // static
-Glib::StaticPrivate<DispatchNotifier>
-DispatchNotifier::thread_specific_instance_ = GLIBMM_STATIC_PRIVATE_INIT;
+Glib::Threads::Private<DispatchNotifier> DispatchNotifier::thread_specific_instance_;
 
 DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
 :
+  deleted_dispatchers_(),
   ref_count_    (0),
   context_      (context),
 #ifdef G_OS_WIN32
@@ -186,8 +192,20 @@ DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
 #else
     const int fd = fd_receiver_;
 #endif
-    context_->signal_io().connect(sigc::mem_fun(*this, &DispatchNotifier::pipe_io_handler),
-                                  fd, Glib::IO_IN);
+    // The following code is equivalent to
+    // context_->signal_io().connect(
+    //   sigc::mem_fun(*this, &DispatchNotifier::pipe_io_handler), fd, Glib::IO_IN);
+    // except for source->set_can_recurse(true).
+
+    const Glib::RefPtr<IOSource> source = IOSource::create(fd, Glib::IO_IN);
+
+    // If the signal emission in pipe_io_handler() starts a new main loop,
+    // the event source shall not be blocked while that loop runs. (E.g. while
+    // a connected slot function shows a modal dialog box.)
+    source->set_can_recurse(true);
+
+    source->connect(sigc::mem_fun(*this, &DispatchNotifier::pipe_io_handler));
+    g_source_attach(source->gobj(), context_->gobj());
   }
   catch(...)
   {
@@ -249,19 +267,31 @@ void DispatchNotifier::create_pipe()
 }
 
 // static
-DispatchNotifier* DispatchNotifier::reference_instance(const Glib::RefPtr<MainContext>& context)
+DispatchNotifier* DispatchNotifier::reference_instance
+  (const Glib::RefPtr<MainContext>& context, const Dispatcher* dispatcher)
 {
   DispatchNotifier* instance = thread_specific_instance_.get();
 
   if(!instance)
   {
     instance = new DispatchNotifier(context);
-    thread_specific_instance_.set(instance);
+    thread_specific_instance_.replace(instance);
   }
   else
   {
     // Prevent massive mess-up.
     g_return_val_if_fail(instance->context_ == context, 0);
+
+    // In the possible but unlikely case that a new dispatcher gets the same
+    // address as a newly deleted one, if the pipe still contains messages to
+    // the deleted dispatcher, those messages will be delivered to the new one.
+    // Not ideal, but perhaps the best that can be done without breaking ABI.
+    // The alternative would be to remove the following erase(), and risk not
+    // delivering messages sent to the new dispatcher.
+    //TODO: When we can break ABI, a better solution without this drawback can
+    // be implemented. See https://bugzilla.gnome.org/show_bug.cgi?id=651942
+    // especially comment 16.
+    instance->deleted_dispatchers_.erase(dispatcher);
   }
 
   ++instance->ref_count_; // initially 0
@@ -270,19 +300,28 @@ DispatchNotifier* DispatchNotifier::reference_instance(const Glib::RefPtr<MainCo
 }
 
 // static
-void DispatchNotifier::unreference_instance(DispatchNotifier* notifier)
+void DispatchNotifier::unreference_instance(
+  DispatchNotifier* notifier, const Dispatcher* dispatcher)
 {
-  DispatchNotifier *const instance = thread_specific_instance_.get();
+  DispatchNotifier* const instance = thread_specific_instance_.get();
 
   // Yes, the notifier argument is only used to check for sanity.
   g_return_if_fail(instance == notifier);
+
+  if (instance->pipe_is_empty())
+    // No messages in the pipe. No need to keep track of deleted dispatchers.
+    instance->deleted_dispatchers_.clear();
+  else
+    // There are messages in the pipe, possibly to the deleted dispatcher.
+    // Keep its address, so pipe_io_handler() can avoid delivering messages to it.
+    instance->deleted_dispatchers_.insert(dispatcher);
 
   if(--instance->ref_count_ <= 0)
   {
     g_return_if_fail(instance->ref_count_ == 0); // could be < 0 if messed up
 
     // This causes deletion of the notifier object.
-    thread_specific_instance_.set(0);
+    thread_specific_instance_.replace(0);
   }
 }
 
@@ -290,7 +329,7 @@ void DispatchNotifier::send_notification(Dispatcher* dispatcher)
 {
 #ifdef G_OS_WIN32
   {
-    const Mutex::Lock lock (mutex_);
+    const Threads::Mutex::Lock lock (mutex_);
 
     const bool was_empty = notify_queue_.empty();
     notify_queue_.push_back(DispatchNotifyData(dispatcher, this));
@@ -332,13 +371,25 @@ void DispatchNotifier::send_notification(Dispatcher* dispatcher)
 #endif /* !G_OS_WIN32 */
 }
 
+bool DispatchNotifier::pipe_is_empty()
+{
+#ifdef G_OS_WIN32
+  return notify_queue_.empty();
+#else
+  PollFD poll_fd(fd_receiver_, Glib::IO_IN);
+  // GPollFD*, number of file descriptors to poll, timeout (ms)
+  g_poll(poll_fd.gobj(), 1, 0);
+  return (poll_fd.get_revents() & Glib::IO_IN) == 0;
+#endif
+}
+
 bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
 {
   DispatchNotifyData data;
 
 #ifdef G_OS_WIN32
   {
-    const Mutex::Lock lock (mutex_);
+    const Threads::Mutex::Lock lock (mutex_);
 
     // Should never be empty at this point, but let's allow for bogus
     // notifications with no data available anyway; just to be safe.
@@ -386,6 +437,21 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
 
   g_return_val_if_fail(data.notifier == this, true);
 
+  // Drop the received message, if it is addressed to a deleted dispatcher.
+  const bool drop_message =
+    (deleted_dispatchers_.find(data.dispatcher) != deleted_dispatchers_.end());
+
+  // If the pipe is empty, there can be no messages to deleted dispatchers.
+  // No reason to keep track of them any more.
+  if (!deleted_dispatchers_.empty() && pipe_is_empty())
+    deleted_dispatchers_.clear();
+
+  if (drop_message)
+  {
+    g_warning("Dropped dispatcher message as the dispatcher no longer exists");
+    return true;
+  }
+
   // Actually, we wouldn't need the try/catch block because the Glib::Source
   // C callback already does it for us.  However, we do it anyway because the
   // default return value is 'false', which is not what we want.
@@ -406,18 +472,18 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
 Dispatcher::Dispatcher()
 :
   signal_   (),
-  notifier_ (DispatchNotifier::reference_instance(MainContext::get_default()))
+  notifier_ (DispatchNotifier::reference_instance(MainContext::get_default(), this))
 {}
 
 Dispatcher::Dispatcher(const Glib::RefPtr<MainContext>& context)
 :
   signal_   (),
-  notifier_ (DispatchNotifier::reference_instance(context))
+  notifier_ (DispatchNotifier::reference_instance(context, this))
 {}
 
 Dispatcher::~Dispatcher()
 {
-  DispatchNotifier::unreference_instance(notifier_);
+  DispatchNotifier::unreference_instance(notifier_, this);
 }
 
 void Dispatcher::emit()

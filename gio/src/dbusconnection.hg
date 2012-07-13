@@ -36,6 +36,11 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
+class ActionGroup;
+class MenuModel;
+class UnixFDList;
+
+
 namespace DBus
 {
 
@@ -47,7 +52,6 @@ _WRAP_ENUM(SignalFlags, GDBusSignalFlags, s#^DBUS_##, NO_GTYPE)
 _WRAP_ENUM(SubtreeFlags, GDBusSubtreeFlags, s#^DBUS_##, NO_GTYPE)
 
 _GMMPROC_EXTRA_NAMESPACE(DBus)
-
 
 /** @defgroup DBus D-Bus API
  *
@@ -618,6 +622,8 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Credentials> get_peer_credentials(), g_dbus_connection_get_peer_credentials, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Credentials> get_peer_credentials() const, g_dbus_connection_get_peer_credentials, refreturn, constversion)
 
+  _WRAP_METHOD(guint32 get_last_serial() const, g_dbus_connection_get_last_serial)
+
   /** Asynchronously invokes the @a method_name method on the @a
    * interface_name D-Bus interface on the remote object at @a object_path
    * owned by @a bus_name.
@@ -663,7 +669,7 @@ public:
     const Glib::RefPtr<Cancellable>&    cancellable,
     const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    CallFlags                       flags = Gio::DBus::CALL_FLAGS_NONE,
+    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
   _IGNORE(g_dbus_connection_call)
@@ -677,7 +683,7 @@ public:
     const SlotAsyncReady&               slot,
     const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    CallFlags                       flags = Gio::DBus::CALL_FLAGS_NONE,
+    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
 
@@ -732,7 +738,7 @@ public:
     const Glib::RefPtr<Cancellable>&    cancellable,
     const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    CallFlags                       flags = Gio::DBus::CALL_FLAGS_NONE,
+    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
   _IGNORE(g_dbus_connection_call_sync)
@@ -745,9 +751,91 @@ public:
     const Glib::VariantContainerBase&   parameters,
     const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    CallFlags                       flags = Gio::DBus::CALL_FLAGS_NONE,
+    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
+
+// TODO: Re-add the following two methods when the call_finish() method with a
+// UnixFDList is wrapped.
+#if 0
+#ifdef G_OS_LINUX
+  /** Like call() but also takes a GUnixFDList object.
+   * This method is only available on UNIX.
+   *
+   * @param object_path Path of remote object.
+   * @param interface_name D-Bus interface to invoke method on.
+   * @param method_name The name of the method to invoke.
+   * @param parameters A Glib::VariantContainerBase tuple with parameters for the
+   * method or <tt>0</tt> if not passing parameters.
+   * @param slot A SlotAsyncReady to call when the request is satisfied.
+   * @param cancellable A Cancellable.
+   * @param fd_list A UnixFDList.
+   * @param bus_name A unique or well-known bus name or <tt>0</tt> if the
+   * connection is not a message bus connection.
+   * @param timeout_msec The timeout in milliseconds, -1 to use the default
+   * timeout or G_MAXINT for no timeout.
+   * @param flags Flags from the Gio::DBus::CallFlags enumeration.
+   * @param reply_type The expected type of the reply, or <tt>0</tt>.
+   * @newin{2,32}
+   */
+  void call(
+    const Glib::ustring&                object_path,
+    const Glib::ustring&                interface_name,
+    const Glib::ustring&                method_name,
+    const Glib::VariantContainerBase&   parameters,
+    const SlotAsyncReady&               slot,
+    const Glib::RefPtr<Cancellable>&    cancellable,
+    const Glib::RefPtr<UnixFDList>&     fd_list,
+    const Glib::ustring&                bus_name = Glib::ustring(),
+    int                                 timeout_msec = -1,
+    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
+    const Glib::VariantType&            reply_type = Glib::VariantType()
+  );
+  _IGNORE(g_dbus_connection_call_with_uinx_fd_list)
+
+  /// A non-cancellable version of call() (with a UnixFDList).
+  void call(
+    const Glib::ustring&                object_path,
+    const Glib::ustring&                interface_name,
+    const Glib::ustring&                method_name,
+    const Glib::VariantContainerBase&   parameters,
+    const SlotAsyncReady&               slot,
+    const Glib::RefPtr<UnixFDList>&     fd_list,
+    const Glib::ustring&                bus_name = Glib::ustring(),
+    int                                 timeout_msec = -1,
+    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
+    const Glib::VariantType&            reply_type = Glib::VariantType()
+  );
+#endif // G_OS_LINUX
+#endif // 0
+
+  ///** Finishes an operation started with call() (with a UnixFDList).
+   //* @param res A AsyncResult obtained from the SlotAsyncReady passed to
+   //* call().
+   //* @result A Variant tuple with return values.
+   //* @throw Glib::Error.
+   //* @newin{2,32}
+   //*/
+  //TODO: _WRAP_METHOD(Glib::VariantContainerBase call_with_unix_fd_finish(const Glib::RefPtr<AsyncResult>& res{.}, Glib::RefPtr<UnixFDList>& out_fd_list{.?}), g_dbus_connection_call_with_unix_fd_list_finish, errthrow)
+
+  /* TODO:
+  _WRAP_METHOD(
+    Glib::VariantContainerBase call_sync(
+      const Glib::ustring&                object_path{.},
+      const Glib::ustring&                interface_name{.},
+      const Glib::ustring&                method_name{.},
+      const Glib::VariantContainerBase&   parameters{.},
+      const Glib::RefPtr<Cancellable>&    cancellable{.?},
+      const Glib::RefPtr<UnixFDList>&     fd_list{.},
+      Glib::RefPtr<UnixFDList>&           out_fd_list{.},
+      const Glib::ustring&                bus_name{.} = Glib::ustring(),
+      int                                 timeout_msec{.} = -1,
+      CallFlags                           flags{.} = Gio::DBus::CALL_FLAGS_NONE,
+      const Glib::VariantType&            reply_type{.} = Glib::VariantType()
+    ),
+    g_dbus_connection_call_with_unix_fd_list_sync, errthrow
+  )
+  */
 
   /** Emits a signal.
    *
@@ -955,6 +1043,12 @@ public:
   _IGNORE(g_dbus_connection_register_subtree)
 
   _WRAP_METHOD(bool unregister_subtree(guint registration_id), g_dbus_connection_unregister_subtree)
+
+  _WRAP_METHOD(guint export_action_group(const Glib::ustring& object_path, const Glib::RefPtr<ActionGroup>& action_group), g_dbus_connection_export_action_group, errthrow)
+  _WRAP_METHOD(void unexport_action_group(guint export_id), g_dbus_connection_unexport_action_group)
+
+  _WRAP_METHOD(guint export_menu_model(const Glib::ustring& object_path, const Glib::RefPtr<MenuModel>& menu), g_dbus_connection_export_menu_model, errthrow)
+  _WRAP_METHOD(void unexport_menu_model(guint export_id), g_dbus_connection_unexport_menu_model)
 
   //_WRAP_PROPERTY("address", std::string) // write-only construct-only
   //_WRAP_PROPERTY("authentication-observer", Glib::RefPtr<AuthObserver>) // write-only construct-only

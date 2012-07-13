@@ -23,72 +23,28 @@
 #include <glibmm/refptr.h>
 #include <glibmm/timeval.h>
 #include <glibmm/priorities.h>
+#include <glibmm/iochannel.h>
 #include <sigc++/sigc++.h>
-#include <glib.h>
 #include <vector>
 
 namespace Glib
 {
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 class Cond;
 class Mutex;
-class IOChannel;
+#endif //GLIBMM_DISABLE_DEPRECATED
+
+namespace Threads
+{
+  class Cond;
+  class Mutex;
+}
 
 /** @defgroup MainLoop The Main Event Loop
  * Manages all available sources of events.
  * @{
  */
-
-/** A bitwise combination representing an I/O condition to watch for on an
- * event source.
- * The flags correspond to those used by the <tt>%poll()</tt> system call
- * on UNIX (see <tt>man 2 poll</tt>).  To test for individual flags, do
- * something like this:
- * @code
- * if((condition & Glib::IO_OUT) != 0)
- *   do_some_output();
- * @endcode
- * @par Bitwise operators:
- * <tt>IOCondition operator|(IOCondition, IOCondition)</tt><br>
- * <tt>IOCondition operator&(IOCondition, IOCondition)</tt><br>
- * <tt>IOCondition operator^(IOCondition, IOCondition)</tt><br>
- * <tt>IOCondition operator~(IOCondition)</tt><br>
- * <tt>IOCondition& operator|=(IOCondition&, IOCondition)</tt><br>
- * <tt>IOCondition& operator&=(IOCondition&, IOCondition)</tt><br>
- * <tt>IOCondition& operator^=(IOCondition&, IOCondition)</tt><br>
- */
-enum IOCondition
-{
-  IO_IN   = G_IO_IN,  /*!< @hideinitializer There is data to read. */
-  IO_OUT  = G_IO_OUT, /*!< @hideinitializer Data can be written (without blocking). */
-  IO_PRI  = G_IO_PRI, /*!< @hideinitializer There is urgent data to read. */
-  IO_ERR  = G_IO_ERR, /*!< @hideinitializer %Error condition. */
-  IO_HUP  = G_IO_HUP, /*!< @hideinitializer Hung up (the connection has been broken,
-                                            usually for pipes and sockets). */
-  IO_NVAL = G_IO_NVAL /*!< @hideinitializer Invalid request. The file descriptor is not open. */
-};
-
-inline IOCondition operator|(IOCondition lhs, IOCondition rhs)
-  { return static_cast<IOCondition>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs)); }
-
-inline IOCondition operator&(IOCondition lhs, IOCondition rhs)
-  { return static_cast<IOCondition>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs)); }
-
-inline IOCondition operator^(IOCondition lhs, IOCondition rhs)
-  { return static_cast<IOCondition>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs)); }
-
-inline IOCondition operator~(IOCondition flags)
-  { return static_cast<IOCondition>(~static_cast<unsigned>(flags)); }
-
-inline IOCondition& operator|=(IOCondition& lhs, IOCondition rhs)
-  { return (lhs = static_cast<IOCondition>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs))); }
-
-inline IOCondition& operator&=(IOCondition& lhs, IOCondition rhs)
-  { return (lhs = static_cast<IOCondition>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs))); }
-
-inline IOCondition& operator^=(IOCondition& lhs, IOCondition rhs)
-  { return (lhs = static_cast<IOCondition>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs))); }
-
 
 class PollFD
 {
@@ -135,15 +91,18 @@ public:
    * optimizations and more efficient system power usage.
    *
    * @code
+   * bool timeout_handler() { ... }
    * Glib::signal_timeout().connect(sigc::ptr_fun(&timeout_handler), 1000);
    * @endcode
    * is equivalent to:
    * @code
+   * bool timeout_handler() { ... }
    * const Glib::RefPtr<Glib::TimeoutSource> timeout_source = Glib::TimeoutSource::create(1000);
    * timeout_source->connect(sigc::ptr_fun(&timeout_handler));
    * timeout_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when @a interval has elapsed.
+   * If <tt>timeout_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param interval The timeout in milliseconds.
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
@@ -151,11 +110,11 @@ public:
   sigc::connection connect(const sigc::slot<bool>& slot, unsigned int interval,
                            int priority = PRIORITY_DEFAULT);
 
- /** Connects an timeout handler that runs only once.
+ /** Connects a timeout handler that runs only once.
   * This method takes a function pointer to a function with a void return
   * and no parameters. After running once it is not called again.
   *
-  * @see connect
+  * @see connect()
   * @param slot A slot to call when @a interval has elapsed. For example:
   * @code
   * void on_timeout_once()
@@ -178,15 +137,18 @@ public:
    * Subsequent timer iterations will generally run at the specified interval.
    *
    * @code
-   * Glib::signal_timeout().connect(sigc::ptr_fun(&timeout_handler), 1000);
+   * bool timeout_handler() { ... }
+   * Glib::signal_timeout().connect_seconds(sigc::ptr_fun(&timeout_handler), 5);
    * @endcode
    * is equivalent to:
    * @code
-   * const Glib::RefPtr<Glib::TimeoutSource> timeout_source = Glib::TimeoutSource::create(1000);
-   * timeout_source->connectseconds(sigc::ptr_fun(&timeout_handler));
+   * bool timeout_handler() { ... }
+   * const Glib::RefPtr<Glib::TimeoutSource> timeout_source = Glib::TimeoutSource::create(5000);
+   * timeout_source->connect(sigc::ptr_fun(&timeout_handler));
    * timeout_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when @a interval has elapsed.
+   * If <tt>timeout_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param interval The timeout in seconds.
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
@@ -196,18 +158,18 @@ public:
   sigc::connection connect_seconds(const sigc::slot<bool>& slot, unsigned int interval,
                            int priority = PRIORITY_DEFAULT);
 
- /** Connects an timeout handler that runs only once with whole second
+ /** Connects a timeout handler that runs only once with whole second
   *  granularity.
   *
   * This method takes a function pointer to a function with a void return
   * and no parameters. After running once it is not called again.
   *
-  * @see connect_seconds
+  * @see connect_seconds()
   * @param slot A slot to call when @a interval has elapsed. For example:
   * @code
   * void on_timeout_once()
   * @endcode
-  * @param interval The timeout in milliseconds.
+  * @param interval The timeout in seconds.
   * @param priority The priority of the new event source.
   */
   void connect_seconds_once(const sigc::slot<void>& slot, unsigned int interval,
@@ -230,15 +192,18 @@ public:
 
   /** Connects an idle handler.
    * @code
+   * bool idle_handler() { ... }
    * Glib::signal_idle().connect(sigc::ptr_fun(&idle_handler));
    * @endcode
    * is equivalent to:
    * @code
+   * bool idle_handler() { ... }
    * const Glib::RefPtr<Glib::IdleSource> idle_source = Glib::IdleSource::create();
    * idle_source->connect(sigc::ptr_fun(&idle_handler));
    * idle_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when the main loop is idle.
+   * If <tt>idle_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
@@ -247,6 +212,13 @@ public:
  /** Connects an idle handler that runs only once.
   * This method takes a function pointer to a function with a void return
   * and no parameters. After running once it is not called again.
+  *
+  * @see connect()
+  * @param slot A slot to call when the main loop is idle. For example:
+  * @code
+  * void on_idle_once()
+  * @endcode
+  * @param priority The priority of the new event source.
   */
   void connect_once(const sigc::slot<void>& slot, int priority = PRIORITY_DEFAULT_IDLE);
 
@@ -265,19 +237,21 @@ public:
   explicit inline SignalIO(GMainContext* context);
 #endif
 
-  /** Connects an I/O handler.
+  /** Connects an I/O handler that watches a file descriptor.
    * @code
+   * bool io_handler(Glib::IOCondition io_condition) { ... }
    * Glib::signal_io().connect(sigc::ptr_fun(&io_handler), fd, Glib::IO_IN | Glib::IO_HUP);
    * @endcode
    * is equivalent to:
    * @code
+   * bool io_handler(Glib::IOCondition io_condition) { ... }
    * const Glib::RefPtr<Glib::IOSource> io_source = Glib::IOSource::create(fd, Glib::IO_IN | Glib::IO_HUP);
    * io_source->connect(sigc::ptr_fun(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when polling @a fd results in an event that matches @a condition.
    * The event will be passed as a parameter to @a slot.
-   * If @a io_handler returns <tt>false</tt> the signal is disconnected.
+   * If <tt>io_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param fd The file descriptor (or a @c HANDLE on Win32 systems) to watch.
    * @param condition The conditions to watch for.
    * @param priority The priority of the new event source.
@@ -286,19 +260,21 @@ public:
   sigc::connection connect(const sigc::slot<bool,IOCondition>& slot, int fd,
                            IOCondition condition, int priority = PRIORITY_DEFAULT);
 
-  /** Connects an I/O channel.
+  /** Connects an I/O handler that watches an I/O channel.
    * @code
+   * bool io_handler(Glib::IOCondition io_condition) { ... }
    * Glib::signal_io().connect(sigc::ptr_fun(&io_handler), channel, Glib::IO_IN | Glib::IO_HUP);
    * @endcode
    * is equivalent to:
    * @code
+   * bool io_handler(Glib::IOCondition io_condition) { ... }
    * const Glib::RefPtr<Glib::IOSource> io_source = Glib::IOSource::create(channel, Glib::IO_IN | Glib::IO_HUP);
    * io_source->connect(sigc::ptr_fun(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode
    * @param slot A slot to call when polling @a channel results in an event that matches @a condition.
    * The event will be passed as a parameter to @a slot.
-   * If @a io_handler returns <tt>false</tt> the signal is disconnected.
+   * If <tt>io_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param channel The IOChannel object to watch.
    * @param condition The conditions to watch for.
    * @param priority The priority of the new event source.
@@ -322,10 +298,11 @@ public:
 #endif
   /** Connects a child watch handler.
    * @code
+   * void child_watch_handler(GPid pid, int child_status) { ... }
    * Glib::signal_child_watch().connect(sigc::ptr_fun(&child_watch_handler), pid);
    * @endcode
-   * @param slot A slot to call when child @a pid exited.
-   * @param pid The child to watch for.
+   * @param slot A slot to call when child process @a pid exited.
+   * @param pid The child process to watch for.
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
@@ -405,6 +382,18 @@ public:
    */
   bool acquire();
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
+  /** Tries to become the owner of the specified context, as with acquire(). But if another thread is the owner,
+   * atomically drop mutex and wait on cond until that owner releases ownership or until cond is signaled, then try
+   * again (once) to become the owner.
+   * @param cond A condition variable.
+   * @param mutex A mutex, currently held.
+   * @return true if the operation succeeded, and this thread is now the owner of context.
+   *
+   * @deprecated Use wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex) instead.
+   */
+  bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
+#endif //GLIBMM_DISABLE_DEPRECATED
 
   /** Tries to become the owner of the specified context, as with acquire(). But if another thread is the owner,
    * atomically drop mutex and wait on cond until that owner releases ownership or until cond is signaled, then try
@@ -413,7 +402,7 @@ public:
    * @param mutex A mutex, currently held.
    * @return true if the operation succeeded, and this thread is now the owner of context.
    */
-  bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
+  bool wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex);
 
   /** Releases ownership of a context previously acquired by this thread with acquire(). If the context was acquired
    * multiple times, the only release ownership when release() is called as many times as it was acquired.

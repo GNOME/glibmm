@@ -213,6 +213,39 @@ bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written)
   return retvalue;
 }
 
+
+void
+OutputStream::write_bytes_async(const Glib::RefPtr<const Glib::Bytes>& bytes, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_output_stream_write_bytes_async(gobj(),
+                            const_cast<GBytes*>(Glib::unwrap(bytes)),
+                            io_priority,
+                            Glib::unwrap(cancellable),
+                            &SignalProxy_async_callback,
+                            slot_copy);
+}
+
+void
+OutputStream::write_bytes_async(const Glib::RefPtr<const Glib::Bytes>& bytes, const SlotAsyncReady& slot, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_output_stream_write_bytes_async(gobj(),
+                            const_cast<GBytes*>(Glib::unwrap(bytes)),
+                            io_priority,
+                            0,
+                            &SignalProxy_async_callback,
+                            slot_copy);
+}
+
 gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, const Glib::RefPtr<Cancellable>& cancellable, OutputStreamSpliceFlags flags)
 {
   GError* gerror = 0;

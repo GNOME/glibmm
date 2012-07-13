@@ -44,8 +44,8 @@ private:
 
   // Note that the thread does not write to the member data at all.  It only
   // reads signal_increment_, which is only written to before the thread is
-  // lauched.  Therefore, no locking is required.
-  Glib::Thread*       thread_;
+  // launched.  Therefore, no locking is required.
+  Glib::Threads::Thread*       thread_;
   int                 id_;
   unsigned int        progress_;
   Glib::Dispatcher    signal_increment_;
@@ -102,7 +102,7 @@ int ThreadProgress::id() const
 void ThreadProgress::launch()
 {
   // Create a joinable thread.
-  thread_ = Glib::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function), true);
+  thread_ = Glib::Threads::Thread::create(sigc::mem_fun(*this, &ThreadProgress::thread_function));
 }
 
 void ThreadProgress::join()
@@ -148,9 +148,6 @@ Application::Application()
   main_loop_        (Glib::MainLoop::create()),
   progress_threads_ (5)
 {
-  // Note that unless you're targetting an embedded platform, you can assume
-  // exceptions to be enabled.  The #ifdef is only here to make the example
-  // compile in either case; you may ignore it otherwise.
   try
   {
     for (std::vector<ThreadProgress*>::size_type i = 0; i < progress_threads_.size(); ++i)
@@ -181,8 +178,7 @@ Application::~Application()
 void Application::run()
 {
   // Install a one-shot idle handler to launch the threads.
-  Glib::signal_idle().connect(
-      sigc::bind_return(sigc::mem_fun(*this, &Application::launch_threads), false));
+  Glib::signal_idle().connect_once(sigc::mem_fun(*this, &Application::launch_threads));
 
   main_loop_->run();
 }
@@ -213,7 +209,7 @@ void Application::on_progress_finished(ThreadProgress* thread_progress)
 
 int main(int, char**)
 {
-  Glib::thread_init();
+  Glib::init();
 
   Application application;
   application.run();

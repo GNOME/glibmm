@@ -1,0 +1,50 @@
+/* Copyright (C) 2012 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+class MenuModel;
+
+/** MenuLinkIter - A menu link iterator.
+ * @newin{2,32}
+ */
+class MenuLinkIter : public Glib::Object
+{
+  _CLASS_GOBJECT(MenuLinkIter, GMenuLinkIter, G_MENU_LINK_ITER, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+  _WRAP_METHOD(Glib::ustring get_name() const, g_menu_link_iter_get_name)
+
+  _WRAP_METHOD_DOCS_ONLY(g_menu_link_iter_get_next)
+  bool get_next(Glib::ustring& out_link, Glib::RefPtr<MenuModel>& value);
+
+  _WRAP_METHOD(Glib::RefPtr<MenuModel> get_value(), g_menu_link_iter_get_value)
+  _WRAP_METHOD(Glib::RefPtr<const MenuModel> get_value() const, g_menu_link_iter_get_value, constversion)
+
+  _WRAP_METHOD(bool next(), g_menu_link_iter_next)
+};
+
+} // namespace Gio

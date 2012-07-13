@@ -1,0 +1,79 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2012 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/interface.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gio/gio.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GDBusObjectIface GDBusObjectIface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+namespace DBus
+{
+
+class Interface;
+
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+/** Object - Base type for D-Bus objects.
+ * The Object type is the base type for D-Bus objects on both the service side
+ * (see ObjectSkeleton) and the client side (see ObjectProxy). It is
+ * essentially just a container of interfaces.
+ * @newin{2,34}
+ */
+
+class Object : public Glib::Interface
+{
+  _CLASS_INTERFACE(Object, GDBusObject, G_DBUS_OBJECT, GDBusObjectIface)
+
+public:
+  _WRAP_METHOD(Glib::ustring get_object_path() const, g_dbus_object_get_object_path)
+
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<Gio::DBus::Interface> >',`Glib::ListHandler< Glib::RefPtr<Gio::DBus::Interface> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<Gio::DBus::Interface> > get_interfaces(), g_dbus_object_get_interfaces)
+
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<const Gio::DBus::Interface> >',`Glib::ListHandler< Glib::RefPtr<const Gio::DBus::Interface> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const Gio::DBus::Interface> > get_interfaces() const, g_dbus_object_get_interfaces)
+
+  _WRAP_METHOD(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name), g_dbus_object_get_interface)
+  _WRAP_METHOD(Glib::RefPtr<const Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name) const, g_dbus_object_get_interface, constversion)
+
+#m4 _CONVERSION(`GDBusInterface*',`const Glib::RefPtr<Gio::DBus::Interface>&',`Glib::wrap($3, true)')
+
+  _WRAP_SIGNAL(void interface_added(const Glib::RefPtr<Gio::DBus::Interface>& interface), "interface_added")
+  _WRAP_SIGNAL(void interface_removed(const Glib::RefPtr<Gio::DBus::Interface>& interface), "interface_removed")
+
+#m4 _CONVERSION(`Glib::ustring',`const gchar*',`g_strdup($3.c_str())')
+  _WRAP_VFUNC(Glib::ustring get_object_path() const, "get_object_path")
+
+#m4 _CONVERSION(`std::vector< Glib::RefPtr<Gio::DBus::Interface> >',`GList*',`g_list_copy(Glib::ListHandler< Glib::RefPtr<Gio::DBus::Interface> >::vector_to_list($3).data())')
+  _WRAP_VFUNC(std::vector< Glib::RefPtr<Gio::DBus::Interface> > get_interfaces() const, "get_interfaces")
+
+  _WRAP_VFUNC(Glib::RefPtr<Gio::DBus::Interface> get_interface(const Glib::ustring& interface_name) const, "get_interface")
+};
+
+} // namespace DBus
+
+} // namespace Gio

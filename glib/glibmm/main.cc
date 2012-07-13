@@ -19,15 +19,32 @@
  */
 
 #undef G_DISABLE_DEPRECATED //So we can use newly-deprecated API, to preserve our API.
+#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
+
+#include <glibmm/threads.h>
+
+#ifndef GLIBMM_DISABLE_DEPRECATED
+#include <glibmm/thread.h>
+#endif //GLIBMM_DISABLE_DEPRECATED
+
 #include <glibmm/main.h>
 #include <glibmm/exceptionhandler.h>
-#include <glibmm/thread.h>
 #include <glibmm/wrap.h>
 #include <glibmm/iochannel.h>
 #include <algorithm>
 
 namespace
 {
+#ifdef GLIBMM_DISABLE_DEPRECATED
+void time64_to_time_val(gint64 time64, Glib::TimeVal& time_val)
+{
+  // This function is not guaranteed to convert correctly if time64 is negative.
+  const long seconds = static_cast<long>(time64 / G_GINT64_CONSTANT(1000000));
+  const long microseconds = static_cast<long>(time64 -
+                            static_cast<gint64>(seconds) * G_GINT64_CONSTANT(1000000));
+  time_val = Glib::TimeVal(seconds, microseconds);
+}
+#endif //GLIBMM_DISABLE_DEPRECATED
 
 class SourceConnectionNode
 {
@@ -67,7 +84,7 @@ void* SourceConnectionNode::notify(void* data)
     g_source_destroy(s);
 
     // Destroying the object triggers execution of destroy_notify_handler(),
-    // eiter immediately or later, so we leave that to do the deletion.
+    // either immediately or later, so we leave that to do the deletion.
   }
 
   return 0;
@@ -197,6 +214,26 @@ static gboolean glibmm_source_callback(void* data)
   return 0;
 }
 
+/* Only used by SignalTimeout::connect_once() and SignalIdle::connect_once().
+ * These don't use Glib::Source, to avoid the unnecessary overhead
+ * of a completely unused wrapper object.
+ */
+static gboolean glibmm_source_callback_once(void* data)
+{
+  SourceConnectionNode* const conn_data = static_cast<SourceConnectionNode*>(data);
+
+  try
+  {
+    // Recreate the specific slot from the generic slot node.
+    (*static_cast<sigc::slot<void>*>(conn_data->get_slot()))();
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return 0; // Destroy the event source after one call
+}
+
 static gboolean glibmm_iosource_callback(GIOChannel*, GIOCondition condition, void* data)
 {
   SourceCallbackData *const callback_data = static_cast<SourceCallbackData*>(data);
@@ -232,6 +269,23 @@ static gboolean glibmm_child_watch_callback(GPid pid, gint child_status, void* d
     Glib::exception_handlers_invoke();
   }
   return 0;
+}
+
+static void glibmm_signal_connect_once(const sigc::slot<void>& slot, int priority,
+                                       GSource* source, GMainContext* context)
+{
+  SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
+
+  if (priority != G_PRIORITY_DEFAULT)
+    g_source_set_priority(source, priority);
+
+  g_source_set_callback(
+    source, &glibmm_source_callback_once, conn_node,
+    &SourceConnectionNode::destroy_notify_callback);
+
+  conn_node->install(source);
+  g_source_attach(source, context);
+  g_source_unref(source);
 }
 
 } // anonymous namespace
@@ -298,7 +352,8 @@ sigc::connection SignalTimeout::connect(const sigc::slot<bool>& slot,
 void SignalTimeout::connect_once(const sigc::slot<void>& slot,
                                  unsigned int interval, int priority)
 {
-    connect(sigc::bind_return(slot, false), interval, priority);
+  GSource* const source = g_timeout_source_new(interval);
+  glibmm_signal_connect_once(slot, priority, source, context_);
 }
 
 /* Note that this is our equivalent of g_timeout_add_seconds(). */
@@ -327,7 +382,8 @@ sigc::connection SignalTimeout::connect_seconds(const sigc::slot<bool>& slot,
 void SignalTimeout::connect_seconds_once(const sigc::slot<void>& slot,
                                          unsigned int interval, int priority)
 {
-    connect_seconds(sigc::bind_return(slot, false), interval, priority);
+  GSource* const source = g_timeout_source_new_seconds(interval);
+  glibmm_signal_connect_once(slot, priority, source, context_);
 }
 
 SignalTimeout signal_timeout()
@@ -367,7 +423,8 @@ sigc::connection SignalIdle::connect(const sigc::slot<bool>& slot, int priority)
 
 void SignalIdle::connect_once(const sigc::slot<void>& slot, int priority)
 {
-    connect(sigc::bind_return(slot, false), priority);
+  GSource* const source = g_idle_source_new();
+  glibmm_signal_connect_once(slot, priority, source, context_);
 }
 
 SignalIdle signal_idle()
@@ -489,7 +546,14 @@ bool MainContext::acquire()
   return g_main_context_acquire(gobj());
 }
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 bool MainContext::wait(Glib::Cond& cond, Glib::Mutex& mutex)
+{
+  return g_main_context_wait(gobj(), cond.gobj(), mutex.gobj());
+}
+#endif //GLIBMM_DISABLE_DEPRECATED
+
+bool MainContext::wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex)
 {
   return g_main_context_wait(gobj(), cond.gobj(), mutex.gobj());
 }
@@ -771,7 +835,7 @@ Source::Source()
 {
   g_source_set_callback(
       gobject_, &glibmm_dummy_source_callback,
-      new SourceCallbackData(this), // our persistant callback data object
+      new SourceCallbackData(this), // our persistent callback data object
       &SourceCallbackData::destroy_notify_callback);
 }
 
@@ -781,7 +845,7 @@ Source::Source(GSource* cast_item, GSourceFunc callback_func)
 {
   g_source_set_callback(
       gobject_, callback_func,
-      new SourceCallbackData(this), // our persistant callback data object
+      new SourceCallbackData(this), // our persistent callback data object
       &SourceCallbackData::destroy_notify_callback);
 }
 
@@ -941,7 +1005,11 @@ TimeoutSource::~TimeoutSource()
 bool TimeoutSource::prepare(int& timeout)
 {
   Glib::TimeVal current_time;
+#ifndef GLIBMM_DISABLE_DEPRECATED
   get_current_time(current_time);
+#else
+  time64_to_time_val(get_time(), current_time);
+#endif //GLIBMM_DISABLE_DEPRECATED
 
   Glib::TimeVal remaining = expiration_;
   remaining.subtract(current_time);
@@ -978,7 +1046,11 @@ bool TimeoutSource::prepare(int& timeout)
 bool TimeoutSource::check()
 {
   Glib::TimeVal current_time;
+#ifndef GLIBMM_DISABLE_DEPRECATED
   get_current_time(current_time);
+#else
+  time64_to_time_val(get_time(), current_time);
+#endif //GLIBMM_DISABLE_DEPRECATED
 
   return (expiration_ <= current_time);
 }
@@ -989,7 +1061,11 @@ bool TimeoutSource::dispatch(sigc::slot_base* slot)
 
   if(again)
   {
+#ifndef GLIBMM_DISABLE_DEPRECATED
     get_current_time(expiration_);
+#else
+    time64_to_time_val(get_time(), expiration_);
+#endif //GLIBMM_DISABLE_DEPRECATED
     expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
   }
 

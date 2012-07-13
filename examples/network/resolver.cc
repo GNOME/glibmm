@@ -48,9 +48,7 @@ usage (void)
     std::cerr
         << "Usage: resolver [-t] [-s] [hostname | IP | service/protocol/domain ] ...\n"
         << "       resolver [-t] [-s] -c [hostname | IP | service/protocol/domain ]\n"
-        << "       Use -t to enable threading.\n"
         << "       Use -s to do synchronous lookups.\n"
-        << "       Both together will result in simultaneous lookups in multiple threads\n"
         << "       Use -c (and only a single resolvable argument) to test GSocketConnectable.\n";
     exit (1);
 }
@@ -214,18 +212,10 @@ start_threaded_lookups (char **argv, int argc)
     int i;
 
     for (i = 0; i < argc; i++)
-        Glib::Thread::create (sigc::bind (sigc::ptr_fun (lookup_thread),
-                                          argv[i]),
-                              false);
-}
-
-static void
-start_sync_lookups (char **argv, int argc)
-{
-    int i;
-
-    for (i = 0; i < argc; i++)
-        lookup_one_sync (argv[i]);
+    {
+        Glib::Threads::Thread::create (sigc::bind (sigc::ptr_fun (lookup_thread),
+                                          argv[i]));
+    }
 }
 
 static void
@@ -462,24 +452,17 @@ async_cancel (Glib::IOCondition /*cond*/, Glib::RefPtr<Gio::Cancellable> cancell
 int
 main (int argc, char **argv)
 {
-    bool threaded = false, synchronous = false;
+    bool synchronous = false;
     bool use_connectable = false;
 #ifdef G_OS_UNIX
     Glib::RefPtr<Glib::IOChannel> chan;
     sigc::connection watch_conn;
 #endif
 
-    /* We can't use Glib::OptionContext because we use the arguments to
-     * decide whether or not to call g_thread_init().
-     */
+    // TODO: Use Glib::OptionContext.
     while (argc >= 2 && argv[1][0] == '-')
     {
-        if (!strcmp (argv[1], "-t"))
-        {
-            Glib::thread_init ();
-            threaded = true;
-        }
-        else if (!strcmp (argv[1], "-s"))
+        if (!strcmp (argv[1], "-s"))
             synchronous = true;
         else if (!strcmp (argv[1], "-c"))
             use_connectable = true;
@@ -489,6 +472,7 @@ main (int argc, char **argv)
         argv++;
         argc--;
     }
+
     Gio::init ();
 
     if (argc < 2 || (argc > 2 && use_connectable))
@@ -524,10 +508,8 @@ main (int argc, char **argv)
         do_connectable (argv[1], synchronous);
     else
     {
-        if (threaded && synchronous)
+        if (synchronous)
             start_threaded_lookups (argv + 1, argc - 1);
-        else if (synchronous)
-            start_sync_lookups (argv + 1, argc - 1);
         else
             start_async_lookups (argv + 1, argc - 1);
     }

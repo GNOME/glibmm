@@ -20,6 +20,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm.h>
+
+#include <giomm/action.h>
 #include <giomm/actiongroup.h>
 #include <giomm/appinfo.h>
 #include <giomm/application.h>
@@ -37,6 +40,7 @@
 #include <giomm/dbuserror.h>
 #include <giomm/dbuserrorutils.h>
 #include <giomm/dbusintrospection.h>
+#include <giomm/dbusmenumodel.h>
 #include <giomm/dbusmessage.h>
 #include <giomm/dbusmethodinvocation.h>
 #include <giomm/dbusownname.h>
@@ -73,6 +77,9 @@
 #include <giomm/inputstream.h>
 #include <giomm/iostream.h>
 #include <giomm/loadableicon.h>
+#include <giomm/menu.h>
+#include <giomm/menuitem.h>
+#include <giomm/menumodel.h>
 #include <giomm/memoryinputstream.h>
 #include <giomm/memoryoutputstream.h>
 #include <giomm/mount.h>
@@ -85,6 +92,8 @@
 #include <giomm/resolver.h>
 #include <giomm/seekable.h>
 #include <giomm/settings.h>
+#include <giomm/simpleaction.h>
+#include <giomm/simpleactiongroup.h>
 #include <giomm/socket.h>
 #include <giomm/socketaddress.h>
 #include <giomm/socketaddressenumerator.h>

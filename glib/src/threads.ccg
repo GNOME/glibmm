@@ -1,0 +1,245 @@
+// -*- c++ -*-
+/* $Id: thread.ccg,v 1.9 2006/05/12 08:08:44 murrayc Exp $ */
+
+/* Copyright (C) 2002 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/exceptionhandler.h>
+#include <glib.h>
+
+
+namespace
+{
+
+extern "C"
+{
+
+static void* call_thread_entry_slot(void* data)
+{
+  sigc::slot_base *const slot = reinterpret_cast<sigc::slot_base*>(data);
+
+  try
+  {
+    // Recreate the specific slot, and drop the reference obtained by create().
+    (*static_cast<sigc::slot<void>*>(slot))();
+  }
+  catch(Glib::Threads::Thread::Exit&)
+  {
+    // Just exit from the thread.  The Threads::Thread::Exit exception
+    // is our sane C++ replacement of g_thread_exit().
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  delete slot;
+  return 0;
+}
+
+} //extern "C"
+
+} // anonymous namespace
+
+
+namespace Glib
+{
+
+namespace Threads
+{
+
+/**** Glib::Thread *********************************************************/
+
+// static
+Thread* Thread::create(const sigc::slot<void>& slot)
+{
+  // Make a copy of slot on the heap
+  sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
+
+  GError* error = 0;
+
+  GThread *const thread = g_thread_try_new(NULL,
+      &call_thread_entry_slot, slot_copy, &error);
+
+  if(error)
+  {
+    delete slot_copy;
+    Glib::Error::throw_exception(error);
+  }
+
+  return reinterpret_cast<Thread*>(thread);
+}
+
+// static
+Thread* Thread::self()
+{
+  return reinterpret_cast<Thread*>(g_thread_self());
+}
+
+void Thread::join()
+{
+  g_thread_join(&gobject_);
+}
+
+// static
+void Thread::yield()
+{
+  g_thread_yield();
+}
+
+
+Thread* wrap(GThread* gobject)
+{
+  return reinterpret_cast<Thread*>(gobject);
+}
+
+
+/**** Glib::Mutex **********************************************************/
+
+Mutex::Mutex()
+{
+  g_mutex_init(&gobject_);
+}
+
+Mutex::~Mutex()
+{
+  g_mutex_clear(&gobject_);
+}
+
+void Mutex::lock()
+{
+  g_mutex_lock(&gobject_);
+}
+
+bool Mutex::trylock()
+{
+  return g_mutex_trylock(&gobject_);
+}
+
+void Mutex::unlock()
+{
+  g_mutex_unlock(&gobject_);
+}
+
+/**** Glib::RecMutex *******************************************************/
+
+RecMutex::RecMutex()
+{
+  g_rec_mutex_init(&gobject_);
+}
+
+RecMutex::~RecMutex()
+{
+  g_rec_mutex_clear(&gobject_);
+}
+
+void RecMutex::lock()
+{
+  g_rec_mutex_lock(&gobject_);
+}
+
+bool RecMutex::trylock()
+{
+  return g_rec_mutex_trylock(&gobject_);
+}
+
+void RecMutex::unlock()
+{
+  g_rec_mutex_unlock(&gobject_);
+}
+
+/**** Glib::RWLock ***************************************************/
+
+void RWLock::reader_lock()
+{
+  g_rw_lock_reader_lock(&gobject_);
+}
+
+bool RWLock::reader_trylock()
+{
+  return g_rw_lock_reader_trylock(&gobject_);
+}
+
+void RWLock::reader_unlock()
+{
+  g_rw_lock_reader_unlock(&gobject_);
+}
+
+void RWLock::writer_lock()
+{
+  g_rw_lock_writer_lock(&gobject_);
+}
+
+bool RWLock::writer_trylock()
+{
+  return g_rw_lock_writer_trylock(&gobject_);
+}
+
+void RWLock::writer_unlock()
+{
+  g_rw_lock_writer_unlock(&gobject_);
+}
+
+/**** Glib::RWLock *********************************************************/
+
+RWLock::RWLock()
+{
+  g_rw_lock_init(&gobject_);
+}
+
+RWLock::~RWLock()
+{
+  g_rw_lock_clear(&gobject_);
+}
+
+
+/**** Glib::Cond ***********************************************************/
+
+Cond::Cond()
+{
+  g_cond_init(&gobject_);
+}
+
+Cond::~Cond()
+{
+  g_cond_clear(&gobject_);
+}
+
+void Cond::signal()
+{
+  g_cond_signal(&gobject_);
+}
+
+void Cond::broadcast()
+{
+  g_cond_broadcast(&gobject_);
+}
+
+void Cond::wait(Mutex& mutex)
+{
+  g_cond_wait(&gobject_, mutex.gobj());
+}
+
+bool Cond::wait_until(Mutex& mutex, gint64 end_time)
+{
+  return g_cond_wait_until(&gobject_, mutex.gobj(), end_time);
+}
+
+} // namespace Threads
+
+} // namespace Glib
+

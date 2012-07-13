@@ -58,28 +58,25 @@ class Server : public Glib::Object, public Initable
 
 protected:
 
-//TODO: Uncomment when this bug is resolved: https://bugzilla.gnome.org/show_bug.cgi?id=639478
-/*
-  DBusServer(const std::string& address,
+  Server(const std::string& address,
     const std::string& guid,
     const Glib::RefPtr<AuthObserver>& observer,
     const Glib::RefPtr<Cancellable>& cancellable,
     ServerFlags flags);
 
-  DBusServer(const std::string& address,
+  Server(const std::string& address,
     const std::string& guid,
     const Glib::RefPtr<Cancellable>& cancellable,
     ServerFlags flags);
 
-  DBusServer(const std::string& address,
+  Server(const std::string& address,
     const std::string& guid,
     const Glib::RefPtr<AuthObserver>& observer,
     ServerFlags flags);
 
-  DBusServer(const std::string& address,
+  Server(const std::string& address,
     const std::string& guid,
     ServerFlags flags);
-*/
 
 public:
 
@@ -124,27 +121,6 @@ public:
   _WRAP_PROPERTY("guid", std::string)
 
 #m4 _CONVERSION(`GDBusConnection*', `const Glib::RefPtr<Connection>&', `Glib::wrap($3, true)')
-  /** Emitted when a new authenticated connection has been made. Use
-   * Gio::DBus::Connection::get_peer_credentials() to figure out what identity
-   * (if any), was authenticated.
-   *
-   * If you want to accept the connection, keep a global reference to the
-   * connection (by keeping it in a global RefPtr<>) and return <tt>true</tt>.
-   * When you are done with the connection call Gio::DBus::Connection::close().
-   * Note that the other peer may disconnect at any time - a typical thing to
-   * do when accepting a connection is to listen to the
-   * Gio::DBus::Connection::signal_closed() signal.
-   *
-   * If property_flags() contains Gio::DBus::SERVER_FLAGS_RUN_IN_THREAD then
-   * the signal is emitted in a new thread dedicated to the connection.
-   * Otherwise the signal is emitted in the thread-default main loop of the
-   * thread that server was constructed in.
-   *
-   * You are guaranteed that signal handlers for this signal runs before
-   * incoming messages on the connection are processed. This means that it's
-   * suitable to call Gio::DBus::Connection::register_object() or similar from
-   * the signal handler.
-   */
   _WRAP_SIGNAL(bool new_connection(const Glib::RefPtr<Connection>& connection), "new-connection", no_default_handler)
 };
 

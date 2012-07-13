@@ -1,0 +1,53 @@
+/* Copyright (C) 2012 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <giomm/menumodel.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(giomm/private/menumodel_p.h)
+
+namespace Gio
+{
+
+namespace DBus
+{
+
+class Connection;
+
+_GMMPROC_EXTRA_NAMESPACE(DBus)
+
+/** MenuModel - A D-Bus Gio::MenuModel implementation.
+ * MenuModel is an implementation of Gio::MenuModel that can be used as a proxy
+ * for a menu model that is exported over D-Bus with
+ * Gio::DBus::Connection::export_menu_model().
+ * @newin{2,32}
+ */
+class MenuModel : public ::Gio::MenuModel
+{
+  _CLASS_GOBJECT(MenuModel, GDBusMenuModel, G_DBUS_MENU_MODEL, ::Gio::MenuModel, GMenuModel)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+#m4 _CONVERSION(`GDBusMenuModel*',`Glib::RefPtr<MenuModel>',`Glib::wrap($3)')
+  _WRAP_METHOD(static Glib::RefPtr<MenuModel> get(const Glib::RefPtr<Connection>& connection, const Glib::ustring& bus_name, const Glib::ustring& object_path), g_dbus_menu_model_get)
+};
+
+} // namespace DBus
+
+} // namespace Gio

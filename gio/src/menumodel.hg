@@ -1,0 +1,157 @@
+/* Copyright (C) 2012 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+enum MenuAttribute
+{
+  /// The "action" menu attribute.
+  MENU_ATTRIBUTE_ACTION,
+
+  /// The "label" menu attribute.
+  MENU_ATTRIBUTE_LABEL,
+
+  /// The "target" menu attribute.
+  MENU_ATTRIBUTE_TARGET
+};
+
+enum MenuLink
+{
+  /// The "section" menu link.
+  MENU_LINK_SECTION,
+
+  /// The "submenu" menu link.
+  MENU_LINK_SUBMENU
+};
+
+class MenuAttributeIter;
+class MenuLinkIter;
+
+/** MenuModel - An abstract class representing the contents of a menu.
+ * MenuModel represents the contents of a menu -- an ordered list of menu
+ * items. The items are associated with actions, which can be activated through
+ * them. Items can be grouped in sections, and may have submenus associated
+ * with them. Both items and sections usually have some representation data,
+ * such as labels or icons. The type of the associated action (ie whether it is
+ * stateful, and what kind of state it has) can influence the representation of
+ * the item.
+ *
+ * The conceptual model of menus in MenuModel is hierarchical: sections and
+ * submenus are again represented by MenuModels. Menus themselves do not define
+ * their own roles. Rather, the role of a particular MenuModel is defined by
+ * the item that references it (or, in the case of the 'root' menu, is defined
+ * by the context in which it is used).
+ *
+ * The motivation for this abstract model of application controls is that
+ * modern user interfaces tend to make these controls available outside the
+ * application. Examples include global menus, jumplists, dash boards, etc. To
+ * support such uses, it is necessary to 'export' information about actions and
+ * their representation in menus, which is exactly what
+ * Gio::DBus::Connection::export_action_group() and the
+ * Gio::DBus::Connection::export_menu_model() do for ActionGroup and MenuModel.
+ * The client-side counterparts to make use of the exported information are
+ * Gio::DBus::ActionGroup and Gio::DBus::MenuModel.
+ *
+ * The API of MenuModel is very generic, with iterators for the attributes and
+ * links of an item, see iterate_item_attributes() and iterate_item_links().
+ * The 'standard' attributes and link types have predefined names:
+ * Gio::MENU_ATTRIBUTE_LABEL, Gio::MENU_ATTRIBUTE_ACTION,
+ * Gio::MENU_ATTRIBUTE_TARGET, Gio::MENU_LINK_SECTION and
+ * Gio::MENU_LINK_SUBMENU.
+ *
+ * Items in a MenuModel represent active controls if they refer to an action
+ * that can get activated when the user interacts with the menu item. The
+ * reference to the action is encoded by the string id in the
+ * Gio::MENU_ATTRIBUTE_ACTION attribute. An action id uniquely identifies an
+ * action in an action group. Which action group(s) provide actions depends on
+ * the context in which the menu model is used. E.g. when the model is exported
+ * as the application menu of a Gtk::Application, actions can be
+ * application-wide or window-specific (and thus come from two different action
+ * groups). By convention, the application-wide actions have names that start
+ * with "app.", while the names of window-specific actions start with "win.".
+ *
+ * While a wide variety of stateful actions is possible, the following is the
+ * minimum that is expected to be supported by all users of exported menu
+ * information:
+ *
+ * - an action with no parameter type and no state
+ * - an action with no parameter type and boolean state
+ * - an action with string parameter type and string state
+ *
+ * <b>Stateless.</b>  A stateless action typically corresponds to an ordinary
+ * menu item. Selecting such a menu item will activate the action (with no
+ * parameter).
+ *
+ * <b>Boolean State.</b>  An action with a boolean state will most typically be
+ * used with a "toggle" or "switch" menu item. The state can be set directly,
+ * but activating the action (with no parameter) results in the state being
+ * toggled. Selecting a toggle menu item will activate the action. The menu
+ * item should be rendered as "checked" when the state is true.
+ *
+ * <b>String Parameter and State.</b>  Actions with string parameters and state
+ * will most typically be used to represent an enumerated choice over the items
+ * available for a group of radio menu items. Activating the action with a
+ * string parameter is equivalent to setting that parameter as the state. Radio
+ * menu items, in addition to being associated with the action, will have a
+ * target value. Selecting that menu item will result in activation of the
+ * action with the target value as the parameter. The menu item should be
+ * rendered as "selected" when the state of the action is equal to the target
+ * value of the menu item.
+ *
+ * See the C API docs for a graphical example.
+ * @newin{2,32}
+ */
+class MenuModel : public Glib::Object
+{
+  _CLASS_GOBJECT(MenuModel, GMenuModel, G_MENU_MODEL, Glib::Object, GObject)
+
+protected:
+  _CTOR_DEFAULT
+
+public:
+#m4begin
+dnl See the .ccg implementation for how this conversion works.
+  _CONVERSION(`MenuAttribute',`const gchar*',`giomm_get_menu_attribute($3)')
+#m4end
+  _WRAP_METHOD(Glib::VariantBase get_item_attribute(int item_index, MenuAttribute attribute, const Glib::VariantType& expected_type), g_menu_model_get_item_attribute_value)
+  _WRAP_METHOD(const Glib::VariantBase get_item_attribute(int item_index, MenuAttribute attribute, const Glib::VariantType& expected_type) const, g_menu_model_get_item_attribute_value, constversion)
+
+  //TODO?: _WRAP_METHOD(bool get_item_attribute(int item_index, MenuAttribute attribute, const Glib::ustring& format_string, ...), g_menu_model_get_item_attribute)
+
+#m4begin
+dnl See the .ccg implementation for how this conversion works.
+  _CONVERSION(`MenuLink',`const gchar*',`giomm_get_menu_link($3)')
+#m4end
+  _WRAP_METHOD(Glib::RefPtr<MenuModel> get_item_link(int item_index, MenuLink link), g_menu_model_get_item_link)
+  _WRAP_METHOD(Glib::RefPtr<const MenuModel> get_item_link(int item_index, MenuLink link) const, g_menu_model_get_item_link, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<MenuAttributeIter> iterate_item_attributes(int item_index), g_menu_model_iterate_item_attributes)
+  _WRAP_METHOD(Glib::RefPtr<const MenuAttributeIter> iterate_item_attributes(int item_index) const, g_menu_model_iterate_item_attributes, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<MenuLinkIter> iterate_item_links(int item_index), g_menu_model_iterate_item_links)
+  _WRAP_METHOD(Glib::RefPtr<const MenuLinkIter> iterate_item_links(int item_index) const, g_menu_model_iterate_item_links, constversion)
+
+  _WRAP_METHOD(void items_changed(int position, int removed, int added), g_menu_model_items_changed)
+};
+
+} // namespace Gio

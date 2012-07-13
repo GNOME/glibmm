@@ -32,9 +32,9 @@ check_PROGRAMS =			\
 	thread/threadpool
 
 #check_PROGRAMS += \
-#	dbus/session_bus_service \
-#	dbus/server_without_bus			\
-#	dbus/client_bus_listnames \
+#	dbus/session_bus_service	\
+#	dbus/server_without_bus		\
+#	dbus/client_bus_listnames	\
 #	network/resolver		\
 #	network/socket-client		\
 #	network/socket-server		\
@@ -44,8 +44,8 @@ glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 #giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
 local_cppflags  = -I$(top_builddir) $(glibmm_includes) $(giomm_includes)
 
-AM_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS)
-AM_CXXFLAGS = $(GLIBMM_WXXFLAGS)
+AM_CPPFLAGS = $(local_cppflags)
+AM_CXXFLAGS = $(GLIBMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED
 #AM_CXXFLAGS += $(GIOMM_CFLAGS)
 
 local_libglibmm = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
@@ -53,7 +53,7 @@ local_libglibmm = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
 
 LDADD        = $(GLIBMM_LIBS) $(local_libglibmm)
 #giomm_ldadd  = $(GIOMM_LIBS) $(local_libglibmm) $(local_libgiomm)
-thread_ldadd = $(GTHREAD_LIBS) $(GLIBMM_LIBS) $(local_libglibmm)
+thread_ldadd = $(GLIBMM_LIBS) $(local_libglibmm)
 
 child_watch_child_watch_SOURCES  = child_watch/main.cc
 iochannel_stream_example_SOURCES =	\

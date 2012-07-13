@@ -1,4 +1,295 @@
-2.29.13:
+2.33.3 (unstable):
+
+Glib:
+* Added the Bytes class, wrapping GBytes.
+  (Murray Cumming)
+
+Gio:
+* InetSocketAddress: Added get_flowinfo() and get_scope_id()
+* OutputStream: Added write_bytes(), write_bytes_async() and write_bytes_finish().
+* InputStream: Added read_bytes(), read_bytes_async() and read_bytes_finish().
+  (Murray Cumming)
+
+Gio::DBus:
+* Connection: Added get_last_serial().
+  (Murray Cumming)
+
+gmmproc:
+* Add _INCLUDE_IN_WRAP_INIT, _GMMPROC_WRAP_CONDITIONALLY.
+  (Kjell Ahlstedt) Bug #678883.
+
+2.33.2 (unstable):
+
+* Added some enum values and documentation.
+  (Murray Cumming)
+
+2.33.1 (unstable):
+
+Gio:
+* Application:
+  - Allow the application ID to be empty.
+  - Pass 0 (NULL) rather than "" to GApplication.
+  (Murray Cumming)
+* Add Resource
+  Bug #674545 (Kalev Lember)
+
+Glib:
+* Miscutils: get_system_data_dirs(), get_system_config_dirs():
+  Return early when the C function returns NULL.
+  (Krzesimir Nowak)
+* Thread::RecMutex: Don't initialize this as a GStaticMutex.
+  (Deprecated anyway)
+  (Michał Wróbel) Bug #677291
+* Documentation: Don't hide add_exception_handler() documentation.
+  (Kjell Ahlstedt)
+
+2.32.0 (stable):
+
+Glib:
+* Dispatcher: Don't send messages to a deleted Dispatcher.
+  (Kjell Ahlstedt) Bug #651942
+* Make SignalTimeout/SignalIdle::connect_once() more thread safe.
+  (Kjell Ahlstedt) Suggested by Chris Vine. Bug #396963
+* Document Glib::Property and Glib::PropertyBase.
+  (Mark Vender) Bug #673291
+
+gmmproc:
+* Add macro _CUSTOM_CTOR_CAST in _CLASS_BOXEDTYPE.
+  (Kjell Ahlstedt) Bug #511136, comment 20.
+* Generate the documentation of default constructors of interface classes.
+  (Mark Vender) Bug #673213
+
+Build:
+* Update Visual Studio projects.
+  (Chun-wei Fan)
+
+
+2.31.22 (unstable):
+
+Glib:
+* Threads, Dispatcher: Delete DispatchNotifier.
+  (Kjell Ahlstedt) Bug #671587.
+
+Gio:
+* Action: Ensure vfunc callbacks return valid memory.
+  (José Alburquerque)
+* ActionGroup: list_actions_vfunc(): Do not return freed memory.
+  (Murray Cumming)
+* Move AppLaunchContext into its own header file.
+  (Murray Cumming)
+* Add Menu and MenuItem.
+* SimpleAction: Constructor: Add a parameter that takes no VariantType.
+  (Murray Cumming)
+
+Gio::DBus:
+* Object: Ensure vfunc callbacks return valid memory.
+  (José Alburquerque)
+* Add the Interface and Object interfaces.
+  (José Alburquerque)
+
+gmmproc:
+* _WRAP_SIGNAL() can now take an optional deprecated parameter,
+  like _WRAP_METHOD() and _WRAP_PROPERTY().
+  (Murray Cumming, Kjell Ahlstedt)
+* _WRAP_PROPERTY(): Correct the ifdefs in generated code when
+  using the optional deprecated parameter.
+  (Kjell Ahlstedt)
+
+Other:
+* Dispatcher examples: Use Glib::signal_idle().connect_once().
+  (Kjell Ahlstedt) Bug #396963
+* Some fixes for minor clang++ warnings.
+  (José Alburquerque, Murray Cumming)
+
+
+2.31.20:
+
+Glib:
+* Fix exceptions thrown by Thread::create() and Threads::Thread::create.
+  (Kjell Ahlstedt) Bug #640029 (Michael Edwards)
+* Fix the build with --disable-deprecated-api.
+  (Kjell Ahlstedt) Bug #640029 (Michael Edwards)
+
+Gio::
+* Application: Add quit(). 
+  (Murray Cumming)
+
+Gio::DBus:
+* DBus::Error, DBus::Proxy: Fix interaction with generate_wrap_init.pl.
+  (Kjell Ahlstedt) Bug #640029 (Michael Edwards)
+
+* Documentation: Signal*: Better description of the connect*() methods.
+  (Kjell Ahlstedt) Bug #669906 (Mark Vender)
+
+gmmproc and tools:
+* gmmproc: Allow destructors to be documented.
+  (José Alburquerque) Bug #668918 (Mark Vender)
+* docextract_to_xml.py: Generate signal documentation too.
+  (José Alburquerque) Bug #668918 (Mark Vender)
+* Add some scripts to regenerate the .defs files.
+  (José Alburquerque)
+* generate_wrap_init.pl:
+  - Improve reg. of exception classes in sub-namespaces and
+  improve it for deprecated files and sub-namespaces.
+  (Kjell Ahlstedt) Bug #640029 (Michael Edwards)
+* h2defs.py: Ignore the new GDK_AVAILABLE_IN_* macros.
+  (Murray Cumming)
+
+2.31.18.1:
+
+gmmproc:
+* h2def.py: Handle types such as 'const gchar* const *' for functions.
+  (José Alburquerque)
+* _WRAP_PROPERTY(): Allow properties to be deprecated.
+  (Murray Cumming)
+
+Gio:
+* Application: Derive from the ActionGroup interface.
+* Application: Add missing virtual functions and get/set_default() methods.
+* Add MenuModel, MenuAttribute, MenuLink and MenuIter.
+
+Gio::DBus:
+* ActionGroup, MenuModel: Have get() methods instead of create() methods.
+  (José Alburquerque) Bug #637445.
+* Add DBus::MenuModel.
+* Connection: Add the MenuModel export/unexport methods.
+* Add class documentation.
+
+
+2.31.18: (unstable):
+
+Gio:
+* Add the ActionMap interface.
+  (José Alburquerque)
+
+Gio::Dbus:
+* Add the ActionGroup classe.
+* Connection: Add the ActionGroup export/unexport methods.
+  (José Alburquerque)
+
+Glib:
+* Add the RemoteActionGroup classes.
+  (José Alburquerque)
+
+gmmproc:
+* h2def.py: Handle deprecated functions.
+* docs: Remove possible parens in gtk-doc signal references. Bug #668918.
+  (José Alburquerque)
+
+
+2.31.16.1: (unstable):
+
+* gmmproc (docs):
+  - Add documentation to wrapped signals.
+  	Bug #668918 (Mark)
+  - Convert signal and property names correctly.
+  	Bug #668918 (Mark)
+  - Add some HTML entity conversions.
+  - Translate the <itemizedlist> tags in docs correctly.
+	(José Alburquerque)
+
+2.31.16: (unstable):
+
+Build:
+* Dispatcher: Fix the build on win32.
+	(TS)
+* thread.h: Move calls to deprecated glib functions into thread.cc.
+	(Haikel Guemar)
+
+2.31.2: (unstable):
+
+glibmm:
+* Add Glib::Threads::* in threads.h, deprecating everything in thread.h.
+  This was necessary because we had to break the ABI to avoid using 
+  API that is now deprecated in glib.
+* Avoid compiler warnings when using -std=c++0x with g++.
+  (Murray Cumming, Kjell Ahlsted)
+
+giomm:
+* drive: Add get_sort_key().
+* EmblemedIcon: Add clear_emblems().
+* FileIconL Add the "file" property.
+* InetAddress: Add address_equal().
+* Mount: Add get_sort_key().
+* Socket: Add the "timeout" property.
+* SocketAddress: Add the "family" property.
+  (José Alburquerque)
+
+gmmproc:
+* C example code removal: Also remove code in </programlisting> tags.
+ (José Alburquerque)
+* Ensure template parameter has a space before to avoid trigraphs.
+  (Hub Figuière) Bug #663303
+
+Examples:
+* Avoid use of the now-deprecated API.
+ (Murray Cummign)
+
+2.31.0.2: (unstable)
+
+* gthread.h: Move the deprecation ifdefs to avoid affecting non-deprecated API.
+
+2.31.0.1: (unstable)
+
+* Avoid deprecation compiler warnings in glibmm and projects using glibmm.
+  However, you will need to include either <glibmm.h> or <glibmm/thread.h>
+  before other glibmm includes.
+  (Murray Cumming)
+* Move IOCondition from main.h to iochannel.h.
+  (Murray Cumming)
+* Don't include <glibmm.h> via init.h or wrap_init.h.
+  (Murray Cumming)
+* gmmproc:
+  - Don't include C code examples found in the XML docs. Bug #650544
+  - Don't include <glibmm.h> by default in generated files. Bug #662597
+  (José Alburquerque)
+	
+2.31.0: (unstable)
+
+Glib:
+* Date: set_time(): Use g_date_set_time_t() instead of g_date_set_time().
+  (José Alburquerque) 
+* Thread: Deprecated thread_init(), Thread::joinable(), *_priority(), etc.
+  (Murray Cumming)
+* (Threads are always enabled in glib now, and thread_init() does nothing.)
+* VariantContainerBase: Add create_maybe().
+  (José Alburquerque) 
+
+Gio:
+* DataInputStream: Add read_line_utf8() and read_line_finish_utf8().
+  (José Alburquerque)
+* DBus::MethodInvocation: Add UnixFDList return_value() method overload.
+  (José Alburquerque)
+* Re-add Application and related class so they can be finished.
+  (José Alburquerque)
+* ApplicationCommandLine: Add the get_platform_data() method.
+  (José Alburquerque)
+* SimpleAction: Wrap the signals and properties.
+  (José Alburquerque)
+
+* gmmproc:
+  - Fix h2def.py not parsing function starting with G_GNUC_* macros.
+  (Krzesimir Nowak) Bug #660225.
+  - _WRAP_METHOD: Allow return types to have commas.
+  (José Alburquerque) Bug #661401
+  - _WRAP_METHOD: Use {OUT} instead of {RET} for output params.
+  (José Alburquerque)
+  - Remove M4 warnings due to commas in return types.
+  (José Alburquerque)
+
+2.30.0: (stable)
+
+giomm:
+* DBus::Server: Add constructors.
+* Remove Application and friends, because they are still not ready.
+  See bug ##637445#c29
+  (Murray Cumming)
+
+Documentation:
+* gmmproc: DocParser: Correct the removal of link tags.
+  (José Alburquerque)
+	
+2.29.13: (unstable)
 
 giomm:
 * Variant< std::vector<std::string> >: Ensure correct creation.
@@ -8,7 +299,7 @@ gmmproc
   on other _WRAP_METHOD() calls in the same .hg file.
   (Kjell Ahlstedt) Bug #657751,
 	
-2.29.12:
+2.29.12: (unstable)
 
 2011-08-03  Murray Cumming  <murrayc@murrayc.com>
 
@@ -25,7 +316,7 @@ configure: Require the latest libsigc++ because our tests require it.
 	(Murray Cumming)
 
 	
-2.29.11:
+2.29.11: (unstable)
 
 * Gio::AppInfo:
   - launch(): Use a vector instead of a ListHandle and assume that it contains 
@@ -44,13 +335,13 @@ configure: Require the latest libsigc++ because our tests require it.
   are defined in one file.
   (José Alburquerque)
 
-2.29.10:
+2.29.10: (unstable)
 
 * Gio:
 - Added DateTime, TimeZone, TimeZoneMonitor.
   (José Alburquerque)
 
-2.28.2:
+2.28.2: (stable)
 
 * gmmproc:
   - _WRAP_METHOD: Add optional parameter functionality.
@@ -479,7 +770,7 @@ Gio:
 	* Added connect_to_uri(), connect_to_uri_async()
 	and connect_to_uri_finish().
 	(Murray Cumming)
-* SocketConnectable: socketconnectable.hg: Added proxy_enumerate() and a
+* SocketConnectable: socketconnectable Added proxy_enumerate() and a
 	const enumerate().
 * Added UnixSocketAddress
 * UnixCredentialMessage, UnixFDMessage: Wrap properties properly.

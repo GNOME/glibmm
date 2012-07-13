@@ -32,6 +32,8 @@ namespace Gio
 
 namespace DBus
 {
+//The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the DBus sub-namespace
+_GMMPROC_EXTRA_NAMESPACE(DBus)
 
 _WRAP_ENUM(ProxyFlags, GDBusProxyFlags, s#^DBUS_##, NO_GTYPE)
 
@@ -331,6 +333,9 @@ public:
  _WRAP_PROPERTY("g-object-path", Glib::ustring)
 
   typedef std::map<Glib::ustring, Glib::VariantBase> MapChangedProperties;
+
+  // TODO: Should the signal names match the C API names (ie. the C API names
+  // are g_signal_name while these are just signal_name).
 
   // The DBus API ensures that the variant changed_properties is of type "DICT<STRING,VARIANT>"
   #m4 _CONVERSION(`GVariant*', `const MapChangedProperties&', `Glib::Variant<MapChangedProperties>($3, true).get()')

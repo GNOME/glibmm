@@ -17,6 +17,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+#undef G_DISABLE_DEPRECATED
+#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
+#m4 _POP()
+
+#include <giomm/actiongroup.h>
+#include <giomm/actionmap.h>
 #include <giomm/applicationcommandline.h>
 #include <giomm/file.h>
 #include <glibmm/object.h>
@@ -29,8 +36,6 @@ namespace Gio
 {
 
 _WRAP_ENUM(ApplicationFlags, GApplicationFlags, NO_GTYPE)
-
-class ActionGroup;
 
 /** Application - Core application class.
  * An Application is the foundation of an application, unique for a given
@@ -76,18 +81,32 @@ class ActionGroup;
  *
  * See the C API docs for an example.
  *
- * @newin{2,28}
+ * @newin{2,32}
  */
-class Application : public Glib::Object
+class Application : public Glib::Object, public ActionGroup, public ActionMap
 {
   _CLASS_GOBJECT(Application, GApplication, G_APPLICATION, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(ActionGroup)
+  _IMPLEMENTS_INTERFACE(ActionMap)
 
 protected:
-  explicit Application(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE);
+  /** Constructs an application instance.
+   * If no application ID is given then some features (most notably application uniqueness) will be disabled.
+   *
+   * @aparam application_id The application ID.
+   * @param flags The application flags.
+   */
+  explicit Application(const Glib::ustring& application_id = Glib::ustring(), ApplicationFlags flags = APPLICATION_FLAGS_NONE);
   _IGNORE(g_application_new)
 
 public:
-  _WRAP_CREATE(const Glib::ustring& application_id, ApplicationFlags flags=APPLICATION_FLAGS_NONE)
+  /** Creates an application instance.
+   * If no application ID is given then some features (most notably application uniqueness) will be disabled.
+   *
+   * @aparam application_id The application ID.
+   * @param flags The application flags.
+   */
+  _WRAP_CREATE(const Glib::ustring& application_id = Glib::ustring(), ApplicationFlags flags = APPLICATION_FLAGS_NONE)
 
   _WRAP_METHOD(static bool id_is_valid(const Glib::ustring& application_id), g_application_id_is_valid)
 
@@ -132,7 +151,7 @@ public:
    * @param files The files to open. This must be non-empty.
    * @param hint A hint.
    *
-   * @newin{2,28}
+   * @newin{2,32}
    */
   void open(const type_vec_files& files, const Glib::ustring& hint = Glib::ustring());
   _IGNORE(g_application_open)
@@ -152,12 +171,20 @@ public:
    * @param file The file to open. This must be non-empty.
    * @param hint A hint.
    *
-   * @newin{2,28}
+   * @newin{2,32}
    */
   void open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring& hint = Glib::ustring());
 
   _WRAP_METHOD(int run(int argc, char** argv), g_application_run)
-  //TODO: g_application_run_with_arguments)
+
+  _WRAP_METHOD(void quit(), g_application_quit)
+
+  _WRAP_METHOD(static void set_default(const Glib::RefPtr<Application>& application), g_application_set_default)
+
+  /// Unsets any existing default application.
+  static void unset_default();
+
+  _WRAP_METHOD(static Glib::RefPtr<Application> get_default(), g_application_get_default)
 
   _WRAP_PROPERTY("action-group", Glib::RefPtr<ActionGroup>)
   _WRAP_PROPERTY("application-id", Glib::ustring)
@@ -175,6 +202,7 @@ public:
   //We wrap the open signal without _WRAP_SIGNAL(), because we need to change its parameters.
   //See bug https://bugzilla.gnome.org/show_bug.cgi?id=637457
   Glib::SignalProxy2< void,  const type_vec_files&, const Glib::ustring& > signal_open();
+  _IGNORE_SIGNAL(open)
 
 #m4 _CONVERSION(`GApplicationCommandLine*', `const Glib::RefPtr<ApplicationCommandLine>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(int command_line(const Glib::RefPtr<ApplicationCommandLine>& command_line), "command-line")
@@ -194,16 +222,16 @@ protected:
 #m4 _CONVERSION(`gchar***', `char**&',`*($3)')
   _WRAP_VFUNC(bool local_command_line(char**& arguments, int& exit_status), local_command_line)
   
-/* TODO:
-  void                      (* before_emit)         (GApplication              *application,
-                                                     GVariant                  *platform_data);
-  void                      (* after_emit)          (GApplication              *application,
-                                                     GVariant                  *platform_data);
-  void                      (* add_platform_data)   (GApplication              *application,
-                                                     GVariantBuilder           *builder);
-  void                      (* quit_mainloop)       (GApplication              *application);
-  void                      (* run_mainloop)        (GApplication              *application);
-*/
+#m4 _CONVERSION(`GVariant*',`const Glib::VariantBase&',`Glib::wrap($3,true)')
+
+  _WRAP_VFUNC(void before_emit(const Glib::VariantBase& platform_data), "before_emit")
+  _WRAP_VFUNC(void after_emit(const Glib::VariantBase& platform_data), "after_emit")
+
+  //TODO: File a bug about GVariantBuilder not being registered with the GType system first:
+  //_WRAP_VFUNC(void add_platform_data(Glib::VariantBuilder* builder), "add_platform_data")
+
+  _WRAP_VFUNC(void quit_mainloop(), "quit_mainloop")
+  _WRAP_VFUNC(void run_mainloop(), "run_mainloop")
 
 
 private:

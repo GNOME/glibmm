@@ -34,5 +34,5 @@ local_cppflags = $(binding_includes) $(binding_cppflags) -DGLIBMM_BUILD=1
 libglibmm_@GLIBMM_API_VERSION@_la_SOURCES = $(binding_sources)
 libglibmm_@GLIBMM_API_VERSION@_la_LDFLAGS = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
 libglibmm_@GLIBMM_API_VERSION@_la_LIBADD  = $(GLIBMM_LIBS)
-libglibmm_@GLIBMM_API_VERSION@_la_CPPFLAGS = $(local_cppflags) $(GTHREAD_CFLAGS) $(GLIBMM_CFLAGS)
+libglibmm_@GLIBMM_API_VERSION@_la_CPPFLAGS = $(local_cppflags) $(GLIBMM_CFLAGS)
 libglibmm_@GLIBMM_API_VERSION@_la_CXXFLAGS = $(GLIBMM_WXXFLAGS)
