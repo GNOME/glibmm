@@ -150,13 +150,13 @@ sub _read_all_bases
     $fd = IO::File->new ($ccg, 'r');
     if (defined $fd)
     {
-      my $str = join '',
+      my $str = join "\n",
                      '_INSERT_SECTION(SECTION_CCG_BEGIN)',
-                     "\n",
+                     '',
                      $fd->getlines,
-                     "\n",
+                     '',
                      '_INSERT_SECTION(SECTION_CCG_END)',
-                     "\n";
+                     '';
       $tokens_store->set_ccg_tokens (_tokenize_contents_ ($str));
       $fd->close;
     }
@@ -234,6 +234,7 @@ sub _generate_wrap_init
 {
   my ($self) = @_;
   my $bases = $self->_get_bases ();
+  my %total_extra_includes = ();
   my %total_c_includes = ();
   my %total_cxx_includes = ();
   my %total_entries = ();
@@ -246,9 +247,10 @@ sub _generate_wrap_init
     foreach my $entry (@{$wrap_init_entries})
     {
       my $deprecated = $entry->get_deprecated ();
-      my $not_for_windows = $entry->get_not_for_windows ();
+      my $cpp_condition = $entry->get_cpp_condition ();
       my $c_includes = $entry->get_c_includes ();
       my $cxx_includes = $entry->get_cxx_includes ();
+      my $extra_includes = $entry->get_extra_includes ();
       my $ref = ref ($entry);
 
       if (exists ($total_entries{$ref}))
@@ -258,6 +260,11 @@ sub _generate_wrap_init
       else
       {
         $total_entries{$ref} = [$entry];
+      }
+
+      foreach my $extra_include (@{$extra_includes})
+      {
+        $total_extra_includes{$extra_include} = undef;
       }
 
       foreach my $pair ([$c_includes, \%total_c_includes], [$cxx_includes, \%total_cxx_includes])
@@ -271,7 +278,7 @@ sub _generate_wrap_init
           {
             my $include_entry = $total->{$include};
 
-            foreach my $another_pair ([0, $deprecated], [1, $not_for_windows])
+            foreach my $another_pair ([0, $deprecated], [1, $cpp_condition])
             {
               my $index = $another_pair->[0];
               my $trait = $another_pair->[1];
@@ -284,7 +291,7 @@ sub _generate_wrap_init
           }
           else
           {
-            $total->{$include} = [$deprecated, $not_for_windows];
+            $total->{$include} = [$deprecated, $cpp_condition];
           }
         }
       }
@@ -305,44 +312,62 @@ sub _generate_wrap_init
   $wrap_init_cc->say ('#include <glibmm/object.h>');
   $wrap_init_cc->say ();
 
-  foreach my $pair (['C includes', \%total_c_includes], ['C++ includes', \%total_cxx_includes])
+  my @extra_includes = keys (%total_extra_includes);
+
+  if (@extra_includes > 0)
   {
-    my $comment = '// ' . $pair->[0];
-    my $includes = $pair->[1];
+    $wrap_init_cc->say ('// extra includes');
 
-    $wrap_init_cc->say ($comment);
-    foreach my $include (sort (keys (%{$includes})))
+    foreach my $extra_include (sort (@extra_includes))
     {
-      my $traits = $includes->{$include};
-      my $deprecated = $traits->[0];
-      my $not_for_windows = $traits->[1];
-
-      if ($deprecated)
-      {
-        $wrap_init_cc->say ('#ifndef ' . $deprecation_guard);
-      }
-      if ($not_for_windows)
-      {
-        $wrap_init_cc->say ('#ifndef G_OS_WIN32');
-      }
-      $wrap_init_cc->say ('#include ' . $include);
-      if ($not_for_windows)
-      {
-        $wrap_init_cc->say ('#endif // G_OS_WIN32');
-      }
-      if ($deprecated)
-      {
-        $wrap_init_cc->say ('#endif // ' . $deprecation_guard);
-      }
+      $wrap_init_cc->say ('#include <' . $extra_include . '>');
     }
     $wrap_init_cc->say ();
+  }
+
+  foreach my $pair (['C includes', \%total_c_includes], ['C++ includes', \%total_cxx_includes])
+  {
+    my $total_includes = $pair->[1];
+    my @includes = keys (%{$total_includes});
+
+    if (@includes > 0)
+    {
+      my $comment = '// ' . $pair->[0];
+
+      $wrap_init_cc->say ($comment);
+      foreach my $include (sort (@includes))
+      {
+        my $traits = $total_includes->{$include};
+        my $deprecated = $traits->[0];
+        my $cpp_condition = $traits->[1];
+
+        if ($deprecated)
+        {
+          $wrap_init_cc->say ('#ifndef ' . $deprecation_guard);
+        }
+        if (defined $cpp_condition and $cpp_condition ne '')
+        {
+          $wrap_init_cc->say ('#' . $cpp_condition);
+        }
+        $wrap_init_cc->say ('#include ' . $include);
+        if (defined $cpp_condition and $cpp_condition ne '')
+        {
+          $wrap_init_cc->say ('#endif // ' . $cpp_condition);
+        }
+        if ($deprecated)
+        {
+          $wrap_init_cc->say ('#endif // ' . $deprecation_guard);
+        }
+      }
+      $wrap_init_cc->say ();
+    }
   }
 
   my @namespaces = split (/::/, $self->_get_wrap_init_namespace ());
 
   foreach my $namespace (@namespaces)
   {
-    $wrap_init_cc->say (join ('', 'namespace ', $namespace));
+    $wrap_init_cc->say ('namespace ' . $namespace);
     $wrap_init_cc->say ('{');
     $wrap_init_cc->say ();
   }
@@ -353,9 +378,9 @@ sub _generate_wrap_init
   foreach my $entry_type (sort (keys (%total_entries)))
   {
     my $entries = $total_entries{$entry_type};
-    my $comment = join ('', '  // ', (split (/::/, $entry_type))[-1]);
+    my $entry_type_comment = (split (/::/, $entry_type))[-1];
 
-    $wrap_init_cc->say ($comment);
+    $wrap_init_cc->say ('  // ' . $entry_type_comment);
     foreach my $entry (@{$entries})
     {
       $wrap_init_cc->say ($entry->get_main_line ());
@@ -367,7 +392,7 @@ sub _generate_wrap_init
 
   foreach my $namespace (reverse (@namespaces))
   {
-    $wrap_init_cc->say (join ('', '} // namespace ', $namespace));
+    $wrap_init_cc->say ('} // namespace ' . $namespace);
     $wrap_init_cc->say ();
   }
   $wrap_init_cc->say ('// end of generated file');

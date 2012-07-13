@@ -34,8 +34,7 @@ sub _get_line
   my @lines =
   (
     join ('', '  Glib::wrap_register(', $get_type_func, '(), &::', $cxx_class_type, '::wrap_new);'),
-# TODO: use the g_ensure_registered or something from GLib.
-    join ('', '  ', $cxx_type, '::get_type();')
+    join ('', '  g_type_ensure(', $cxx_type, '::get_type());')
   );
 
   return join ("\n", @lines);
@@ -43,9 +42,9 @@ sub _get_line
 
 sub new
 {
-  my ($type, $c_includes, $cxx_includes, $deprecated, $not_for_windows, $mm_module, $get_type_func, $cxx_class_type, $cxx_type) = @_;
+  my ($type, $extra_includes, $c_includes, $cxx_includes, $deprecated, $cpp_condition, $mm_module, $get_type_func, $cxx_class_type, $cxx_type) = @_;
   my $class = (ref $type or $type or 'Common::WrapInit::GObject');
-  my $self = $class->SUPER::new ($c_includes, $cxx_includes, $deprecated, $not_for_windows, $mm_module);
+  my $self = $class->SUPER::new ($extra_includes, $c_includes, $cxx_includes, $deprecated, $cpp_condition, $mm_module);
 
   $self->{'get_type_func'} = $get_type_func;
   $self->{'cxx_class_type'} = $cxx_class_type;

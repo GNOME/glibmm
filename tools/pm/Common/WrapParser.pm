@@ -37,12 +37,18 @@ use Common::TypeInfo::Local;
 use Common::WrapInit;
 use constant
 {
+  # stages
   'STAGE_HG' => 0,
   'STAGE_CCG' => 1,
   'STAGE_INVALID' => 2,
+  # gir entry
   'GIR_RECORD' => 0,
   'GIR_CLASS' => 1,
-  'GIR_ANY' => 2
+  'GIR_ANY' => 2,
+  # temp wrap init
+  'TEMP_WRAP_INIT_EXTRA_INCLUDES' => 1,
+  'TEMP_WRAP_INIT_DEPRECATED' => 4,
+  'TEMP_WRAP_INIT_CPP_CONDITION' => 5
 };
 
 ###
@@ -1396,13 +1402,16 @@ sub _on_wrap_gerror ($)
   my $cxx_includes = [join ('', '"', $self->get_base (), '.h"')];
 # TODO: Add deprecated option to _WRAP_GERROR
   my $deprecated = 0;
-# TODO: Add "not for windows" option to _WRAP_GERROR
-  my $not_for_windows = 0;
+# TODO: Add "C preprocessor condition" option to _WRAP_GERROR
+  my $cpp_condition = 0;
+# TODO: Add "Extra include" option to _WRAP_GERROR
+  my $extra_includes = [];
   my $complete_cxx_type = Common::Output::Shared::get_complete_cxx_type ($self);
-  my $wrap_init_entry = Common::WrapInit::GError->new ($c_includes,
+  my $wrap_init_entry = Common::WrapInit::GError->new ($extra_includes,
+                                                       $c_includes,
                                                        $cxx_includes,
                                                        $deprecated,
-                                                       $not_for_windows,
+                                                       $cpp_condition,
                                                        $self->get_mm_module (),
                                                        $gir_domain,
                                                        $complete_cxx_type);
@@ -1502,6 +1511,7 @@ sub push_temp_wrap_init
   push (@{$temp_wrap_init_stack},
         [
           $level,
+          [],
           $c_includes,
           $cxx_includes,
           $deprecated,
@@ -2789,14 +2799,15 @@ sub _on_is_deprecated
 
     if ($temp_wrap_init->[0] == $level)
     {
-      $temp_wrap_init->[3] = 1;
+      $temp_wrap_init->[TEMP_WRAP_INIT_DEPRECATED] = 1;
     }
   }
 }
 
-sub _on_gtkmmproc_win32_no_wrap
+# TODO: move it elsewhere in the file.
+sub _add_wrap_init_condition
 {
-  my ($self) = @_;
+  my ($self, $cpp_condition) = @_;
   my $temp_wrap_init_stack = $self->_get_temp_wrap_init_stack ();
 
   if (@{$temp_wrap_init_stack})
@@ -2806,9 +2817,17 @@ sub _on_gtkmmproc_win32_no_wrap
 
     if ($temp_wrap_init->[0] == $level)
     {
-      $temp_wrap_init->[4] = 1;
+      $temp_wrap_init->[TEMP_WRAP_INIT_CPP_CONDITION] = $cpp_condition;
     }
   }
+}
+
+sub _on_gtkmmproc_win32_no_wrap
+{
+  my ($self) = @_;
+
+  $self->fixed_warning ('Deprecated. Use _GMMPROC_WRAP_CONDITIONALLY instead.');
+  $self->_add_wrap_init_condition ('ifndef G_OS_WIN32');
 }
 
 sub _on_ascii_func
@@ -3057,6 +3076,42 @@ sub _on_gmmproc_extra_namespace
   $self->_extract_bracketed_text ();
 }
 
+sub _on_gmmproc_wrap_conditionally
+{
+  my ($self) = @_;
+  my $cpp_condition = Common::Util::string_trim ($self->_extract_bracketed_text());
+
+  if ($cpp_condition =~ /^#/)
+  {
+    $cpp_condition =~ s/^#//;
+  }
+
+  if ($cpp_condition !~ /^(?:(?:ifndef)|(?:ifdef)|(?:if))/)
+  {
+    $self->fixed_error ('Expected C preprocessor conditional (if, ifdef, ifndef))');
+  }
+
+  $self->_add_wrap_init_condition ($cpp_condition);
+}
+
+sub _on_include_in_wrap_init
+{
+  my ($self) = @_;
+  my $temp_wrap_init_stack = $self->_get_temp_wrap_init_stack ();
+  my $extra_include = Common::Util::string_trim ($self->_extract_bracketed_text());
+
+  if (@{$temp_wrap_init_stack})
+  {
+    my $temp_wrap_init = $temp_wrap_init_stack->[-1];
+    my $level = $self->get_level ();
+
+    if ($temp_wrap_init->[0] == $level)
+    {
+      push (@{$temp_wrap_init->[TEMP_WRAP_INIT_EXTRA_INCLUDES]}, $extra_include);
+    }
+  }
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3232,7 +3287,9 @@ sub new ($$$$$$)
     '_MEMBER_GET_PTR' => sub { $self->_on_member_get_ptr (@_); },
     '_MEMBER_GET_GOBJECT' => sub { $self->_on_member_get_gobject (@_); },
     '_MEMBER_GET_REF_PTR' => sub { $self->_on_member_get_ref_ptr (@_); },
-    '_GMMPROC_EXTRA_NAMESPACE' => sub { $self->_on_gmmproc_extra_namespace (@_); }
+    '_GMMPROC_EXTRA_NAMESPACE' => sub { $self->_on_gmmproc_extra_namespace (@_); },
+    '_GMMPROC_WRAP_CONDITIONALLY' => sub { $self->_on_gmmproc_wrap_conditionally (@_); },
+    '_INCLUDE_IN_WRAP_INIT' => sub { $self->_on_include_in_wrap_init (@_); }
   };
 
   return $self;

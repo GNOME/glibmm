@@ -31,18 +31,26 @@ sub _get_line
 
 sub new
 {
-  my ($type, $c_includes, $cxx_includes, $deprecated, $not_for_windows, $mm_module) = @_;
-  my $class = (ref $type or $type or 'Common::WrapInit::Base');
+  my ($type, $extra_includes, $c_includes, $cxx_includes, $deprecated, $cpp_condition, $mm_module) = @_;
+  my $class = (ref ($type) or $type or 'Common::WrapInit::Base');
   my $self =
   {
+    'extra_includes' => $extra_includes,
     'c_includes' => $c_includes,
     'cxx_includes' => $cxx_includes,
     'deprecated' => $deprecated,
-    'not_for_windows' => $not_for_windows,
+    'cpp_condition' => $cpp_condition,
     'mm_module' => $mm_module
   };
 
-  return bless $self, $class;
+  return bless ($self, $class);
+}
+
+sub get_extra_includes
+{
+  my ($self) = @_;
+
+  return $self->{'extra_includes'};
 }
 
 sub get_c_includes
@@ -66,18 +74,18 @@ sub get_deprecated
   return $self->{'deprecated'};
 }
 
-sub get_not_for_windows
+sub get_cpp_condition
 {
   my ($self) = @_;
 
-  return $self->{'not_for_windows'};
+  return $self->{'cpp_condition'};
 }
 
 sub get_main_line
 {
   my ($self) = @_;
   my $deprecated = $self->get_deprecated ();
-  my $not_for_windows = $self->get_not_for_windows ();
+  my $cpp_condition = $self->get_cpp_condition ();
   my $mm_module = $self->{'mm_module'};
   my $deprecation_macro = join ('', uc ($mm_module), '_DISABLE_DEPRECATED');
   my @lines = ();
@@ -85,20 +93,20 @@ sub get_main_line
 
   if ($deprecated)
   {
-    push (@lines, join ('', '#ifndef ', $deprecation_macro, "\n"));
+    push (@lines, '#ifndef ' . $deprecation_macro);
   }
-  if ($not_for_windows)
+  if (defined $cpp_condition and $cpp_condition ne '')
   {
-    push (@lines, '#ifndef G_OS_WIN32');
+    push (@lines, '#' . $cpp_condition);
   }
   push (@lines, $self->_get_line ());
-  if ($not_for_windows)
+  if (defined $cpp_condition and $cpp_condition ne '')
   {
-    push (@lines, '#endif // G_OS_WIN32');
+    push (@lines, '#endif // ' . $cpp_condition);
   }
   if ($deprecated)
   {
-    push (@lines, join ('', '#endif // ', $deprecation_macro));
+    push (@lines, '#endif // ' . $deprecation_macro);
   }
 
   return join ("\n", @lines);
