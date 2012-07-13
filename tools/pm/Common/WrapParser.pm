@@ -2919,7 +2919,7 @@ sub _on_config_include
   my $include_file = shift (@args);
   my $section_manager = $self->get_section_manager ();
   my $section = Common::Output::Shared::get_section ($self, Common::Sections::H_BEGIN);
-  my $code_string = nl (join ('', '#include <', $include_file, '>'));
+  my $code_string = Common::Output::Shared::nl (join ('', '#include <', $include_file, '>'));
 
   $section_manager->append_string_to_section ($code_string,
                                               $section);
