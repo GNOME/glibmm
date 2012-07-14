@@ -765,6 +765,7 @@ sub _on_wrap_method ($)
   my $constversion = 0;
   my $errthrow = 0;
   my $ifdef = undef;
+  my $silence_gir_quirk = 0;
   my $setup =
   {
     'b(deprecated)' => \$deprecated,
@@ -773,7 +774,8 @@ sub _on_wrap_method ($)
     'ob(refreturn)' => \$refreturn,
     'b(constversion)' => \$constversion,
     'ob(errthrow)' => \$errthrow,
-    's(ifdef)' => \$ifdef
+    's(ifdef)' => \$ifdef,
+    'b(silence_gir_quirk)' => \$silence_gir_quirk
   };
 
   $self->_handle_get_args_results (Common::Shared::get_args \@args, $setup);
@@ -845,18 +847,40 @@ sub _on_wrap_method ($)
     shift (@{$c_param_types});
     shift (@{$c_param_transfers});
   }
-  # TODO: Fix it in gobject-introspection. Workaround for wrapping gir
-  # <method> which should be <constructor>. This happens where
-  # constructor takes an instance of the type it instatiates. That one
-  # needs fixing in gir files, not here.
+
   if ($cxx_function->get_static () and not $is_a_function)
   {
-    my $guessed_c_type = join ('', 'const ', $gir_entity->get_a_c_type (), '*');
-    my $message = 'This is marked as <method> instead of <constructor>. Please fix it in C library by adding (constructor) annotation after constructor_name (here: "' . $c_function->get_name () . ': (constructor)"). For now working it around by prepending "' $guessed_c_type . '" parameter type.';
+    if (index ($c_function_name, '_new') >= 0)
+    {
+      # Workaround for wrapping gir <method> which should be
+      # <constructor>. This happens where constructor takes an instance
+      # of the type it instatiates. That one needs fixing in gir files,
+      # not here.
+      my $guessed_c_type = join ('', 'const ', $gir_entity->get_a_c_type (), '*');
+      my $message = 'This is marked as <method> instead of <constructor>. Please fix it in C library by adding (constructor) annotation after constructor_name (here: "' . $c_function_name . ': (constructor)"). For now working it around by prepending "' . $guessed_c_type . '" parameter type.';
 
-    $self->fixed_warning ($message);
-    unshift (@{$c_param_types}, $guessed_c_type);
-    unshift (@{$c_param_transfers}, Common::TypeInfo::Common::TRANSFER_NONE);
+      $self->fixed_warning ($message);
+      unshift (@{$c_param_types}, $guessed_c_type);
+      unshift (@{$c_param_transfers}, Common::TypeInfo::Common::TRANSFER_NONE);
+    }
+    else
+    {
+      # Workaround for rare cases of functions like
+      # g_bytes_hash(gconstpointer bytes) which are treated by
+      # gobject-introspection as methods instead of functions. I do
+      # not know whether this should be fixed in gobject-introspection
+      # and whether we can just assume that prepended C parameter is
+      # going to be the same as first C++ parameter. Probably not.
+      # Wrapping this function manually is the safest bet.
+      unless ($silence_gir_quirk)
+      {
+        my $message = 'This is marked as <method> in GIR, but is wrapped as static method. You probably know what you are doing, so I am assuming that you are not wrapping a constructor and that the first parameter of C function is of the same type as the one of C++ static method. If this is right then add "silence_gir_quirk" option to this macro. Otherwise try either filing a bug to appriopriate product (be it C library or gmmproc) or wrapping this method manually.';
+
+        $self->fixed_warning ($message);
+      }
+      unshift (@{$c_param_types}, $cxx_function->get_param_types ()->[0]);
+      unshift (@{$c_param_transfers}, Common::TypeInfo::Common::TRANSFER_NONE);
+    }
   }
 
   my $ret_transfer = $c_function->get_return_transfer;
