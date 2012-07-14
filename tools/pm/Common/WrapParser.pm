@@ -852,7 +852,9 @@ sub _on_wrap_method ($)
   if ($cxx_function->get_static () and not $is_a_function)
   {
     my $guessed_c_type = join ('', 'const ', $gir_entity->get_a_c_type (), '*');
+    my $message = 'This is marked as <method> instead of <constructor>. Please fix it in C library by adding (constructor) annotation after constructor_name (here: "' . $c_function->get_name () . ': (constructor)"). For now working it around by prepending "' $guessed_c_type . '" parameter type.';
 
+    $self->fixed_warning ($message);
     unshift (@{$c_param_types}, $guessed_c_type);
     unshift (@{$c_param_transfers}, Common::TypeInfo::Common::TRANSFER_NONE);
   }

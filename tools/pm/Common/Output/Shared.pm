@@ -616,7 +616,7 @@ sub convert_or_die
 
   unless ($transfer ~~ @good_range)
   {
-    my $message = join ('', 'Got invalid transfer for conversion from `', $from, '\' to `', $to, '\' for substitution `', $subst, '\'');
+    my $message = join ('', 'Got invalid transfer for conversion from `', $from, '\' to `', $to, '\' for substitution `', $subst, '\'. Please fix it in C library by adding correct transfer annotation.');
     $wrap_parser->fixed_error ($message);
   }
 
