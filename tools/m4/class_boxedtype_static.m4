@@ -141,9 +141,11 @@ public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   typedef __CPPNAME__ CppObjectType;
   typedef __CNAME__ BaseObjectType;
-
-  static GType get_type() G_GNUC_CONST;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+  /** Get the GType for this class, for use with the underlying GObject type system.
+   */
+  static GType get_type() G_GNUC_CONST;
 
 ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',,`dnl else
   __CPPNAME__`'();
