@@ -20,8 +20,6 @@
 
 _MODULE(GLib-2.0)
 
-_DEFS(glibmm,glib)
-
 #include <glibmmconfig.h>
 #include <glib.h> //For the GIOChannel enum values.
 #include <glibmm/error.h>
@@ -40,9 +38,9 @@ namespace Glib
 class Source;
 class IOSource;
 
-_WRAP_ENUM(SeekType, GSeekType, NO_GTYPE, sed s#^SEEK_#SEEK_TYPE_#)
-_WRAP_ENUM(IOStatus, GIOStatus, NO_GTYPE)
-_WRAP_ENUM(IOFlags, GIOFlags, NO_GTYPE)
+_WRAP_ENUM(SeekType, GSeekType, sed s#^SEEK_#SEEK_TYPE_#)
+_WRAP_ENUM(IOStatus, GIOStatus)
+_WRAP_ENUM(IOFlags, GIOFlags)
 
 
 /** A bitwise combination representing an I/O condition to watch for on an
@@ -55,11 +53,11 @@ _WRAP_ENUM(IOFlags, GIOFlags, NO_GTYPE)
  *   do_some_output();
  * @endcode
  */
-_WRAP_ENUM(IOCondition, GIOCondition, NO_GTYPE)
+_WRAP_ENUM(IOCondition, GIOCondition)
 
 /** Exception class for IOChannel errors.
  */
-_WRAP_GERROR(IOChannelError, GIOChannelError, G_IO_CHANNEL_ERROR, NO_GTYPE,
+_WRAP_GERROR(IOChannelError, GIOChannelError,
     sed s#^INVAL$#INVALID_ARGUMENT#,
     sed s#^ISDIR$#IS_DIRECTORY#,
     sed s#^PIPE$#BROKEN_PIPE#,
@@ -175,7 +173,7 @@ public:
    * @throw Glib::IOChannelError
    * @throw Glib::ConvertError
    */
-  _WRAP_METHOD(IOStatus read(gunichar& thechar), g_io_channel_read_unichar, errthrow)
+  _WRAP_METHOD(IOStatus read(gunichar& thechar), g_io_channel_read_unichar)
 
   /** Read a character sequence into memory.
    * @param buf A buffer to read data into.
@@ -190,7 +188,7 @@ public:
    * @throw Glib::ConvertError
    */
   _WRAP_METHOD(IOStatus read(char* buf, gsize count, gsize& bytes_read),
-               g_io_channel_read_chars, errthrow)
+               g_io_channel_read_chars)
 
   /** Read a maximum of @a count bytes into @a str.
    * @param count The maximum number of bytes to read.
@@ -242,7 +240,7 @@ public:
    * @throw Glib::ConvertError
    */
   _WRAP_METHOD(IOStatus write(const char* buf, gssize count, gsize& bytes_written),
-               g_io_channel_write_chars, errthrow)
+               g_io_channel_write_chars)
 
   /** Write a single UCS-4 character to the I/O channel.
    * @param unichar The character to write.
@@ -250,7 +248,7 @@ public:
    * @throw Glib::IOChannelError
    * @throw Glib::ConvertError
    */
-  _WRAP_METHOD(IOStatus write(gunichar unichar), g_io_channel_write_unichar, errthrow)
+  _WRAP_METHOD(IOStatus write(gunichar unichar), g_io_channel_write_unichar)
 
   /** Seek the I/O channel to a specific position.
    * @param offset The offset in bytes from the position specified by @a type.
@@ -262,14 +260,14 @@ public:
    * @throw Glib::ConvertError
    */
   _WRAP_METHOD(IOStatus seek(gint64 offset, SeekType type = SEEK_TYPE_SET),
-               g_io_channel_seek_position, errthrow)
+               g_io_channel_seek_position)
 
   /** Flush the buffers of the I/O channel.
    * @return The status of the operation.
    * @throw Glib::IOChannelError
    * @throw Glib::ConvertError
    */
-  _WRAP_METHOD(IOStatus flush(), g_io_channel_flush, errthrow)
+  _WRAP_METHOD(IOStatus flush(), g_io_channel_flush)
 
   /** Close the I/O channel.
    * Any pending data to be written will be flushed if @a flush is <tt>true</tt>.
@@ -279,7 +277,7 @@ public:
    * @return The status of the operation.
    * @throw Glib::IOChannelError
    */
-  _WRAP_METHOD(IOStatus close(bool flush = true), g_io_channel_shutdown, errthrow)
+  _WRAP_METHOD(IOStatus close(bool flush = true), g_io_channel_shutdown)
 
   /** Get the IOChannel internal buffer size.
    * @return The buffer size.
@@ -309,7 +307,7 @@ public:
    * @return The operation result code.
    * @throw Glib::IOChannelError
    */
-  _WRAP_METHOD(IOStatus set_flags(IOFlags flags), g_io_channel_set_flags, errthrow)
+  _WRAP_METHOD(IOStatus set_flags(IOFlags flags), g_io_channel_set_flags)
 
   /** Set the buffering status of the I/O channel.
    * The buffering state can only be set if the channel's encoding is

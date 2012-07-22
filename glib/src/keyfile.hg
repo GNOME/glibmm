@@ -17,8 +17,6 @@
 
 _MODULE(GLib-2.0)
 
-_DEFS(glibmm,glib)
-
 #include <glibmmconfig.h>
 #include <glibmm/ustring.h>
 #include <glibmm/arrayhandle.h>
@@ -33,11 +31,11 @@ extern "C" { typedef struct _GKeyFile GKeyFile; }
 namespace Glib
 {
 
-  _WRAP_ENUM(KeyFileFlags, GKeyFileFlags, NO_GTYPE)
+  _WRAP_ENUM(KeyFileFlags, GKeyFileFlags)
 
 /** Exception class for KeyFile errors.
  */
-_WRAP_GERROR(KeyFileError, GKeyFileError, G_KEY_FILE_ERROR, NO_GTYPE)
+_WRAP_GERROR(KeyFileError, GKeyFileError)
 
 /** This class lets you parse, edit or create files containing groups of key-value pairs, which we call key files 
  * for lack of a better name. Several freedesktop.org specifications use key files now, e.g the Desktop Entry 
@@ -124,7 +122,7 @@ public:
   KeyFile(GKeyFile* castitem, bool takes_ownership = false);
 
 public:
-  _WRAP_METHOD(bool load_from_file(const std::string& filename, KeyFileFlags flags = Glib::KEY_FILE_NONE), g_key_file_load_from_file, errthrow)
+  _WRAP_METHOD(bool load_from_file(const std::string& filename, KeyFileFlags flags = Glib::KEY_FILE_NONE), g_key_file_load_from_file)
 
   /** Loads a KeyFile from memory
    * @param data The data to use as a KeyFile
@@ -135,10 +133,8 @@ public:
   bool load_from_data(const Glib::ustring& data, KeyFileFlags flags = Glib::KEY_FILE_NONE);
   _IGNORE(g_key_file_load_from_data)
 
-#m4 _CONVERSION(`const Glib::ArrayHandle<std::string>&', `const gchar**', `const_cast<const gchar**>($3.data())')
-#m4 _CONVERSION(`Glib::ArrayHandle<std::string>&', `gchar**', `const_cast<gchar**>($3.data())')
   // TODO: This is wrong - full_path should be a std::string& (an out param).
-  //_WRAP_METHOD(bool load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, Glib::ArrayHandle<std::string>& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE), g_key_file_load_from_dirs, errthrow)
+  //_WRAP_METHOD(bool load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, Glib::ArrayHandle<std::string>& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE), g_key_file_load_from_dirs)
   // This has to be wrapped by hand.
   //_WRAP_METHOD(bool load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, std::string& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE, g_key_file_load_from_dirs)
 
@@ -180,10 +176,10 @@ public:
   _IGNORE(g_key_file_get_keys)
 
   _WRAP_METHOD(bool has_group(const Glib::ustring& group_name) const, g_key_file_has_group)
-  _WRAP_METHOD(bool has_key(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_has_key, errthrow)
+  _WRAP_METHOD(bool has_key(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_has_key)
 	
-  _WRAP_METHOD(Glib::ustring get_value(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_value, errthrow)
-  _WRAP_METHOD(Glib::ustring get_string(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_string, errthrow)
+  _WRAP_METHOD(Glib::ustring get_value(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_value)
+  _WRAP_METHOD(Glib::ustring get_string(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_string)
 
   /** Gets the value associated with @a key under @a group_name translated
    * into the current locale.
@@ -193,7 +189,7 @@ public:
   Glib::ustring get_locale_string(const Glib::ustring& group_name, const Glib::ustring& key) const;
   _IGNORE(g_key_file_get_locale_string)
 
-  _WRAP_METHOD(Glib::ustring get_locale_string(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale) const, g_key_file_get_locale_string, errthrow)
+  _WRAP_METHOD(Glib::ustring get_locale_string(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale) const, g_key_file_get_locale_string)
 
   /** Gets the value in the first group, under @a key, interpreting it as
    * a boolean.
@@ -204,7 +200,7 @@ public:
    */
   bool get_boolean(const Glib::ustring& key) const;
 
-  _WRAP_METHOD(bool get_boolean(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_boolean, errthrow)
+  _WRAP_METHOD(bool get_boolean(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_boolean)
 
   /** Gets the value in the first group, under @a key, interpreting it as
    * an integer.
@@ -215,7 +211,7 @@ public:
    */
   int get_integer(const Glib::ustring& key) const;
 
-  _WRAP_METHOD(int get_integer(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_integer, errthrow)
+  _WRAP_METHOD(int get_integer(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_integer)
 
   /** Gets the value in the first group, under @a key, interpreting it as
    * a signed 64-bit integer. This is similar to get_integer() but can return
@@ -228,7 +224,7 @@ public:
    */
   gint64 get_int64(const Glib::ustring& key) const;
 
-  _WRAP_METHOD(gint64 get_int64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_int64, errthrow)
+  _WRAP_METHOD(gint64 get_int64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_int64)
 
   /** Gets the value in the first group, under @a key, interpreting it as
    * an unsigned 64-bit integer. This is similar to get_integer() but can
@@ -241,7 +237,7 @@ public:
    */
   guint64 get_uint64(const Glib::ustring& key) const;
 
-  _WRAP_METHOD(guint64 get_uint64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_uint64, errthrow)
+  _WRAP_METHOD(guint64 get_uint64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_uint64)
 
   /** Gets the value in the first group, under @a key, interpreting it as
    * a double.
@@ -253,7 +249,7 @@ public:
    */
   double get_double(const Glib::ustring& key) const;
 
-  _WRAP_METHOD(double get_double(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_double, errthrow)
+  _WRAP_METHOD(double get_double(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_double)
 
   _WRAP_METHOD(void set_double(const Glib::ustring& group_name, const Glib::ustring& key, double value), g_key_file_set_double)
 
@@ -335,7 +331,7 @@ public:
    */
   Glib::ustring get_comment(const Glib::ustring& group_name) const;
 
-  _WRAP_METHOD(Glib::ustring get_comment(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_comment, errthrow)
+  _WRAP_METHOD(Glib::ustring get_comment(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_comment)
 	
   _WRAP_METHOD(void set_list_separator(gchar separator), g_key_file_set_list_separator)
   _WRAP_METHOD(void set_value(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& value), g_key_file_set_value)
@@ -410,11 +406,11 @@ public:
    */
   void set_comment(const Glib::ustring& group_name, const Glib::ustring& comment);
 
-  _WRAP_METHOD(void set_comment(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& comment), g_key_file_set_comment, errthrow)
+  _WRAP_METHOD(void set_comment(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& comment), g_key_file_set_comment)
 
-  _WRAP_METHOD(void remove_comment(const Glib::ustring& group_name, const Glib::ustring& key), g_key_file_remove_comment, errthrow)
-  _WRAP_METHOD(void remove_key(const Glib::ustring& group_name, const Glib::ustring& key), g_key_file_remove_key, errthrow)
-  _WRAP_METHOD(void remove_group(const Glib::ustring& group_name), g_key_file_remove_group, errthrow)
+  _WRAP_METHOD(void remove_comment(const Glib::ustring& group_name, const Glib::ustring& key), g_key_file_remove_comment)
+  _WRAP_METHOD(void remove_key(const Glib::ustring& group_name, const Glib::ustring& key), g_key_file_remove_key)
+  _WRAP_METHOD(void remove_group(const Glib::ustring& group_name), g_key_file_remove_group)
 
   GKeyFile*       gobj()       { return gobject_; }
   const GKeyFile* gobj() const { return gobject_; }

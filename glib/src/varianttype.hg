@@ -17,8 +17,6 @@
 
 _MODULE(GLib-2.0)
 
-_DEFS(glibmm,glib)
-
 #include <glibmmconfig.h>
 #include <glib-object.h> //For gsize
 #include <string>
@@ -109,9 +107,6 @@ public:
   VariantType& operator=(const GVariantType* castitem);
 
 
-//The C parameters are actually const, but gmmproc doesn't understand that,
-//so we add a m4 conversion to satisfy it:
-#m4 _CONVERSION(`const VariantType&',`GVariantType*',`($3).gobj()')
   // FIXME: That need fixing in gir - g_variant_type_new_array is treated there as a method instead of constructor, so first parameter is not stored at all.
   _WRAP_METHOD(static VariantType create_array(const VariantType& element), g_variant_type_new_array)
   // FIXME: That need fixing in gir - g_variant_type_new_maybe is treated there as a method instead of constructor, so first parameter is not stored at all.
@@ -136,7 +131,6 @@ public:
   _WRAP_METHOD(bool is_dict_entry() const, g_variant_type_is_dict_entry)
   _WRAP_METHOD(bool is_variant() const, g_variant_type_is_variant)
 
-  #m4 _CONVERSION(`const VariantType&',`gconstpointer',`const_cast<GVariantType*>(($3).gobj())')
   _WRAP_METHOD(guint hash() const, g_variant_type_hash)
   _PUSH_NAMED_CONV(varianttype_to_gconstpointer, const VariantType&, gconstpointer, static_cast<gconstpointer>(Glib::unwrap(##ARG##)), NONE, static_cast<gconstpointer>(Glib::unwrap_copy(##ARG##)))
   _WRAP_METHOD(bool equal(const VariantType& other) const, g_variant_type_equal)

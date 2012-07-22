@@ -19,8 +19,6 @@
 
 _MODULE(GLib-2.0)
 
-_DEFS(glibmm,glib)
-
 #include <glibmm/optionentry.h>
 #include <glibmm/optiongroup.h>
 #include <glibmm/error.h>
@@ -36,7 +34,7 @@ namespace Glib
 
 /** Exception class for options.
  */
-_WRAP_GERROR(OptionError, GOptionError, G_OPTION_ERROR, NO_GTYPE)
+_WRAP_GERROR(OptionError, GOptionError)
 
 /** An OptionContext defines which options are accepted by the commandline option parser.
  */
@@ -61,8 +59,7 @@ public:
   _WRAP_METHOD(void set_ignore_unknown_options(bool ignore_unknown = true), g_option_context_set_ignore_unknown_options)
   _WRAP_METHOD(bool get_ignore_unknown_options() const, g_option_context_get_ignore_unknown_options)
 
-#m4 _CONVERSION(`char**&',`gchar***',`&($3)')
-  _WRAP_METHOD(bool parse(int& argc, char**& argv), g_option_context_parse, errthrow)
+  _WRAP_METHOD(bool parse(int& argc, char**& argv), g_option_context_parse)
 
   //g_option_context_add_main_entries(), just creates a group internally, adds them to it, and does a set_main_group()
   //- a group without callbacks seems to do some simple default parsing.
@@ -90,7 +87,6 @@ public:
   //const OptionGroup& get_main_group() const;
   _IGNORE(g_option_context_get_main_group)
 
-  #m4 _CONVERSION(`const OptionGroup&',`GOptionGroup*',`const_cast<GOptionGroup*>(($3).gobj())')
   _WRAP_METHOD(Glib::ustring get_help(bool main_help, const OptionGroup& group) const, g_option_context_get_help)
  
   /** Returns a formatted, translated help text for the given context. 

@@ -17,8 +17,6 @@
 
 _MODULE(GLib-2.0)
 
-_DEFS(glibmm,glib)
-
 #include <glibmmconfig.h>
 #include <glibmm/varianttype.h>
 #include <glibmm/variantiter.h>
@@ -112,7 +110,6 @@ public:
   _WRAP_METHOD(Glib::ustring print(bool type_annotate = false) const, g_variant_print)
   _IGNORE(g_variant_print_string)
 
-  #m4 _CONVERSION(`const VariantBase&',`gconstpointer',`const_cast<GVariant*>(($3).gobj())')
   _WRAP_METHOD(guint hash() const, g_variant_hash)
   _PUSH_NAMED_CONV(variantbase_to_gconstpointer, const VariantBase&, gconstpointer, static_cast<gconstpointer>(Glib::unwrap(##ARG##)), NONE, static_cast<gconstpointer>(Glib::unwrap_copy(##ARG##)))
   _WRAP_METHOD(bool equal(const VariantBase& other) const, g_variant_equal)
@@ -309,8 +306,6 @@ public:
    */
   void get_child(VariantBase& child, gsize index = 0) const;
   _IGNORE(g_variant_get_child, g_variant_get_child_value)
-
-#m4 _CONVERSION(`GVariant*',`VariantBase',`Glib::wrap($3, true)')
 
   _WRAP_METHOD(VariantBase get_child(gsize index = 0), g_variant_get_child_value)
 

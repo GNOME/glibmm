@@ -17,8 +17,6 @@
 
 _MODULE(GLib-2.0)
 
-_DEFS(glibmm,glib)
-
 #include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
@@ -33,12 +31,12 @@ typedef struct _GRegex GRegex;
 namespace Glib
 {
 
-_WRAP_ENUM(RegexCompileFlags, GRegexCompileFlags, NO_GTYPE)
-_WRAP_ENUM(RegexMatchFlags, GRegexMatchFlags, NO_GTYPE)
+_WRAP_ENUM(RegexCompileFlags, GRegexCompileFlags)
+_WRAP_ENUM(RegexMatchFlags, GRegexMatchFlags)
 
 /** Exception class for Regex
  */
-_WRAP_GERROR(RegexError, GRegexError, G_REGEX_ERROR, NO_GTYPE)
+_WRAP_GERROR(RegexError, GRegexError)
 
 
 class MatchInfo;
@@ -167,7 +165,7 @@ public:
     RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)
   );
 
-  _WRAP_METHOD_DOCS_ONLY(g_regex_match_all_full, errthrow)
+  _WRAP_METHOD_DOCS_ONLY(g_regex_match_all_full)
   /// @throw Glib::Error.
   bool match_all(
     const Glib::ustring& string,
@@ -187,23 +185,21 @@ public:
    */
   bool match_all(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options);
 
-#m4 _CONVERSION(`gchar**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
-
   _WRAP_METHOD(static Glib::StringArrayHandle split_simple(const Glib::ustring& pattern, const Glib::ustring& string, RegexCompileFlags compile_options = static_cast<RegexCompileFlags>(0), RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_split_simple)
   _WRAP_METHOD(Glib::StringArrayHandle split(const Glib::ustring& string, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_split)
 
-  _WRAP_METHOD(Glib::StringArrayHandle split(const gchar* string, gssize string_len, int start_position, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0), int max_tokens = 0) const, g_regex_split_full, errthrow)
+  _WRAP_METHOD(Glib::StringArrayHandle split(const gchar* string, gssize string_len, int start_position, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0), int max_tokens = 0) const, g_regex_split_full)
 
   Glib::StringArrayHandle split(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, int max_tokens) const;
 
-  _WRAP_METHOD(Glib::ustring replace(const gchar* string, gssize string_len, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_replace, errthrow)
+  _WRAP_METHOD(Glib::ustring replace(const gchar* string, gssize string_len, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_replace)
   Glib::ustring replace(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options);
 
-  _WRAP_METHOD(Glib::ustring replace_literal(const gchar *string, gssize string_len, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_replace_literal, errthrow)
+  _WRAP_METHOD(Glib::ustring replace_literal(const gchar *string, gssize string_len, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options = static_cast<RegexMatchFlags>(0)), g_regex_replace_literal)
   Glib::ustring replace_literal(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options);
 
-  _WRAP_METHOD(Glib::ustring replace_eval(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options, GRegexEvalCallback eval,  gpointer user_data), g_regex_replace_eval, errthrow)
-  _WRAP_METHOD(static bool check_replacement(const Glib::ustring& replacement, gboolean* has_references), g_regex_check_replacement, errthrow)
+  _WRAP_METHOD(Glib::ustring replace_eval(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options, GRegexEvalCallback eval,  gpointer user_data), g_regex_replace_eval)
+  _WRAP_METHOD(static bool check_replacement(const Glib::ustring& replacement, gboolean* has_references), g_regex_check_replacement)
 };
 
 //TODO: Add C++ iterator like functionality for this class.
@@ -252,12 +248,12 @@ public:
   _WRAP_METHOD(Glib::ustring get_string() const, g_match_info_get_string)
   _WRAP_METHOD(bool matches() const, g_match_info_matches)
 
-  _WRAP_METHOD(bool next(), g_match_info_next, errthrow)
+  _WRAP_METHOD(bool next(), g_match_info_next)
 
   _WRAP_METHOD(int get_match_count() const, g_match_info_get_match_count)
   _WRAP_METHOD(bool is_partial_match() const, g_match_info_is_partial_match)
 
-  _WRAP_METHOD(Glib::ustring expand_references(const Glib::ustring& string_to_expand), g_match_info_expand_references, errthrow)
+  _WRAP_METHOD(Glib::ustring expand_references(const Glib::ustring& string_to_expand), g_match_info_expand_references)
 
   _WRAP_METHOD(Glib::ustring fetch(int match_num), g_match_info_fetch)
 

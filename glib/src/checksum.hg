@@ -19,8 +19,6 @@
 
 _MODULE(GLib-2.0)
 
-_DEFS(glibmm,glib)
-
 #include <glib.h>
 #include <string>
 
@@ -61,9 +59,7 @@ public:
    *
    * @newin{2,16}
    */
-  _WRAP_ENUM(ChecksumType, GChecksumType, NO_GTYPE)
-
-#m4 _CONVERSION(`ChecksumType', `GChecksumType', `(($2)$3)')
+  _WRAP_ENUM(ChecksumType, GChecksumType)
 
   /** Creates a new Checksum, using the checksum algorithm @a checksum_type. 
    * If the checksum_type is not known, then operator bool() will return false.
@@ -80,8 +76,9 @@ public:
   _WRAP_METHOD(void reset(), g_checksum_reset)
   
   //TODO: length should really be gssize, not gsize, when we can break ABI:
-#m4 _CONVERSION(`gsize',`gssize',`(gssize)($3)')
+  _PUSH_NAMED_CONV(gsize_to_gssize, gsize, gssize, static_cast<gssize>(##ARG##), NONE, NONE)
   _WRAP_METHOD(void update(const guchar* data, gsize length), g_checksum_update)
+  _POP_NAMED_CONV(gsize_to_gssize)
 
   /** Feeds data into an existing Checksum.
    * The checksum must still be open, that is get_string() or get_digest() must not have been called on the checksum.
