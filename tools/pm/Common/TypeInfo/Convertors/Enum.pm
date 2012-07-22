@@ -30,11 +30,7 @@ sub convert ($$$$$$)
 
   given ($conversion_type)
   {
-    when (Common::TypeInfo::Global::C_CXX)
-    {
-      continue;
-    }
-    when (Common::TypeInfo::Global::CXX_C)
+    when ([Common::TypeInfo::Global::C_CXX, Common::TypeInfo::Global::CXX_C])
     {
       if ($from_details->match_sigil (['']) and $to_details->match_sigil (['']))
       {
