@@ -3163,6 +3163,82 @@ sub _on_pop_section
   $self->_pop_main_section ();
 }
 
+sub _on_template_keyword
+{
+  my ($self) = @_;
+  my $tokens = $self->get_tokens ();
+  my $section_manager = $self->get_section_manager ();
+  my $main_section = $self->get_main_section ();
+  my $done = 0;
+  my $in_s_comment = 0;
+  my $in_m_comment = 0;
+  my $template_level = 0;
+  my @template_tokens = ('template');
+
+  # extract all tokens with template angles (<...>), so we won't parse
+  # class keyword in template context as in 'template<class T>'.
+  while (@{$tokens})
+  {
+    my $token = $self->_extract_token ();
+
+    if ($in_s_comment)
+    {
+      if ($token eq "\n")
+      {
+        $in_s_comment = 0;
+      }
+    }
+    elsif ($in_m_comment)
+    {
+      if ($token eq '*/')
+      {
+        $in_m_comment = 0;
+      }
+    }
+    elsif ($token eq '//' or $token eq '///' or $token eq '//!')
+    {
+      $in_s_comment = 1;
+    }
+    elsif ($token eq '/*' or $token eq '/**' or $token eq '/*!')
+    {
+      $in_m_comment = 1;
+    }
+    elsif ($token eq '<')
+    {
+      ++$template_level;;
+    }
+    elsif ($token eq '>')
+    {
+      unless ($template_level)
+      {
+        $self->fixed_error ('Expected \'<\' after template keyword, not \'>\'.');
+      }
+      --$template_level;
+      unless ($template_level)
+      {
+        $done = 1;
+      }
+    }
+    elsif ($token !~ /^\s+$/)
+    {
+      unless ($template_level)
+      {
+        $self->fixed_error ('Expected \'<\' after template keyword, not \'' . $token . '\'.');
+      }
+    }
+
+    push (@template_tokens, $token);
+
+    if ($done)
+    {
+      $section_manager->append_string_to_section (join ('', @template_tokens),
+                                                  $main_section);
+      return;
+    }
+  }
+  $self->fixed_error ('Hit eof while processing `template\'.');
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3342,7 +3418,8 @@ sub new ($$$$$$)
     '_GMMPROC_WRAP_CONDITIONALLY' => sub { $self->_on_gmmproc_wrap_conditionally (@_); },
     '_INCLUDE_IN_WRAP_INIT' => sub { $self->_on_include_in_wrap_init (@_); },
     '_PUSH_SECTION' => sub { $self->_on_push_section (@_); },
-    '_POP_SECTION' => sub { $self->_on_pop_section (@_); }
+    '_POP_SECTION' => sub { $self->_on_pop_section (@_); },
+    'template' => sub { $self->_on_template_keyword (@_); }
   };
 
   return $self;

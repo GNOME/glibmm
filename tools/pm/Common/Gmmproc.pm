@@ -49,10 +49,10 @@ sub _tokenize_contents_
   # - //!
   # - //
   # - any char proceeded by \
-  # - symbols ;{}"`'():
+  # - symbols ;{}"`'()<>:
   # - newline
-  my @tokens = Common::Shared::cleanup_tokens (split(/([#A-Za-z0-9_]+)|(\/\*[*!]?)|(\*\/)|(\/\/[\/!]?)|(\\.)|([:;{}"'`()])|(\n)/,
-                     $contents));
+  my @tokens = Common::Shared::cleanup_tokens (split(/([#A-Za-z0-9_]+)|(\/\*[*!]?)|(\*\/)|(\/\/[\/!]?)|(\\.)|([:;{}"'`()<>])|(\n)/,
+                                                     $contents));
 
   return \@tokens;
 }

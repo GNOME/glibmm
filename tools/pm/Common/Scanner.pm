@@ -582,6 +582,62 @@ sub _on_class_keyword ($)
   }
 }
 
+sub _on_template_keyword
+{
+  my ($self) = @_;
+  my $tokens = $self->_get_tokens ();
+  my $in_s_comment = 0;
+  my $in_m_comment = 0;
+  my $template_level = 0;
+
+  # extract all tokens with template angles (<...>), so we won't parse
+  # class keyword in template context as in 'template<class T>'.
+  while (@{$tokens})
+  {
+    my $token = $self->_extract_token ();
+
+    if ($in_s_comment)
+    {
+      if ($token eq "\n")
+      {
+        $in_s_comment = 0;
+      }
+    }
+    elsif ($in_m_comment)
+    {
+      if ($token eq '*/')
+      {
+        $in_m_comment = 0;
+      }
+    }
+    elsif ($token eq '//' or $token eq '///' or $token eq '//!')
+    {
+      $in_s_comment = 1;
+    }
+    elsif ($token eq '/*' or $token eq '/**' or $token eq '/*!')
+    {
+      $in_m_comment = 1;
+    }
+    elsif ($token eq '<')
+    {
+      ++$template_level;;
+    }
+    elsif ($token eq '>')
+    {
+      unless ($template_level)
+      {
+        $self->fixed_error ('Expected \'<\' after template keyword, not \'>\'.');
+      }
+      --$template_level;
+      unless ($template_level)
+      {
+        return;
+      }
+    }
+  }
+  return;
+}
+
 sub new ($$$)
 {
   my ($type, $tokens_hg, $tokens_ccg) = @_;
@@ -635,7 +691,8 @@ sub new ($$$)
     '_CLASS_OPAQUE_REFCOUNTED' => sub { $self->_on_class_opaque_refcounted (@_); },
     '_MODULE' => sub { $self->_on_module (@_); },
     'namespace' => sub { $self->_on_namespace_keyword (@_); },
-    'class' => sub { $self->_on_class_keyword (@_); }
+    'class' => sub { $self->_on_class_keyword (@_); },
+    'template' => sub { $self->_on_template_keyword (@_); }
   };
 
   return $self;
