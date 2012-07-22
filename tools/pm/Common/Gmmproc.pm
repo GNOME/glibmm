@@ -153,7 +153,7 @@ sub _read_all_bases
       my $str = join "\n",
                      '_INSERT_SECTION(SECTION_CCG_BEGIN)',
                      '',
-                     $fd->getlines,
+                     join ('', $fd->getlines ()),
                      '',
                      '_INSERT_SECTION(SECTION_CCG_END)',
                      '';
