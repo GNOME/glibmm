@@ -23,6 +23,23 @@
 namespace Glib
 {
 
+VariantBase::VariantBase(GVariant* castitem, bool make_a_copy /* = false */)
+{
+  if (castitem)
+  {
+    if (g_variant_is_floating(castitem))
+    {
+      g_variant_ref_sink (castitem);
+    }
+    if (make_a_copy)
+    {
+      g_variant_ref (castitem);
+    }
+  }
+
+  gobject_ = castitem;
+}
+
 void VariantBase::get_normal_form(VariantBase& result) const
 {
   GVariant* const g_value =
