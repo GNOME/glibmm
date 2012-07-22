@@ -86,13 +86,33 @@ sub _output_h_after_first_namespace ($$)
 sub _output_cc ($$$$$$)
 {
   my ($wrap_parser, $c_type, $cxx_type, $new_func, $copy_func, $free_func) = @_;
-  my $section_manager = $wrap_parser->get_section_manager;
-  my $custom_default_ctor_var = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::CUSTOM_DEFAULT_CTOR;
-  my $conditional = Common::Output::Shared::generate_conditional $wrap_parser;
-  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
-  my $code_string = nl ($full_cxx_type . '::' . $cxx_type . '()') .
-                    nl (':');
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
+  my $section_manager = $wrap_parser->get_section_manager ();
+  my $custom_default_ctor_var = Common::Output::Shared::get_variable ($wrap_parser, Common::Variables::CUSTOM_DEFAULT_CTOR);
+  my $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
+  my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
+  my $complete_cxx_type = Common::Output::Shared::get_complete_cxx_type ($wrap_parser);
+  my $code_string = nl ('namespace Glib') .
+                    nl ('{') .
+                    nl () .
+                    nl ($complete_cxx_type . ' wrap(' . $c_type . '* object, bool take_copy /* = false */)') .
+                    nl ('{') .
+                    nl ('  return ', $complete_cxx_type, '(object, take_copy);') .
+                    nl ('}') .
+                    nl () .
+                    nl ('} // namespace Glib') .
+                    nl ();
+  my $no_wrap_function_var = Common::Output::Shared::get_variable ($wrap_parser, Common::Variables::NO_WRAP_FUNCTION);
+  my $section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::CC_GENERATED);
+
+  $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
+  $section_manager->push_section ($section);
+  $section_manager->append_conditional ($conditional);
+  $section_manager->set_variable_for_conditional ($no_wrap_function_var, $conditional);
+
+  $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
+  $code_string = Common::Output::Shared::open_namespaces ($wrap_parser) .
+                 nl ($full_cxx_type . '::' . $cxx_type . '()') .
+                 nl (':');
 
   if (defined $new_func and $new_func ne '' and $new_func ne 'NONE')
   {
@@ -102,9 +122,9 @@ sub _output_cc ($$$$$$)
   {
     $code_string .= nl ('  gobject_(0) // Allows creation of invalid wrapper, e.g. for output arguments to methods.');
   }
-  $code_string .= nl ();
+  $code_string .= nl ('{}') .
+                  nl ();
   $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
-  $section_manager->push_section ($section);
   $section_manager->append_conditional ($conditional);
   $section_manager->set_variable_for_conditional ($custom_default_ctor_var, $conditional);
 # TODO: we probably have to assume that copy func must be provided.
@@ -148,7 +168,7 @@ sub _output_cc ($$$$$$)
                     nl () .
                     nl ('  gobject_ = new_gobject;') .
                     nl () .
-                    nl ('  return *this') .
+                    nl ('  return *this;') .
                     nl ('}') .
                     nl ();
   }
