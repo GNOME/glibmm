@@ -21,6 +21,13 @@ define(`__BOOL_CUSTOM_DEFAULT_CTOR__',`$1')
 _POP()
 ')
 
+define(`_CUSTOM_CTOR_CAST',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_CUSTOM_CTOR_CAST__',`$1')
+_POP()
+')
+
 _POP()
 _SECTION(SECTION_CLASS2)
 ') dnl End of _CLASS_OPAQUE_COPYABLE.
@@ -91,6 +98,7 @@ __CPPNAME__::__CPPNAME__`'(const __CPPNAME__& src)
   gobject_ ((src.gobject_) ? __OPAQUE_FUNC_COPY`'(src.gobject_) : 0)
 {}
 
+ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
 __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem, bool make_a_copy /* = false */)
 {
   if(!make_a_copy)
@@ -108,6 +116,7 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem, bool make_a_copy /* = false */)
       gobject_ = 0;
   }
 }
+')
 
 ifelse(__OPAQUE_FUNC_COPY,NONE,`dnl
 ',`dnl else
