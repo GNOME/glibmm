@@ -36,13 +36,13 @@ sub _get_line
 
 sub new
 {
-  my ($type, $extra_includes, $c_includes, $cxx_includes, $deprecated, $not_for_windows, $mm_module, $cxx_type, $error_domain) = @_;
+  my ($type, $extra_includes, $c_includes, $cxx_includes, $deprecated, $cpp_condition, $mm_module, $cxx_type, $error_domain) = @_;
   my $class = (ref $type or $type or 'Common::WrapInit::GError');
-  my $self = $class->SUPER::new ($extra_includes, $c_includes, $cxx_includes, $deprecated, $not_for_windows, $mm_module);
+  my $self = $class->SUPER::new ($extra_includes, $c_includes, $cxx_includes, $deprecated, $cpp_condition, $mm_module);
 
   $self->{'cxx_type'} = $cxx_type;
   $self->{'error_domain'} = $error_domain;
-  return bless $self, $class;
+  return bless ($self, $class);
 }
 
 1; # indicate proper module load.

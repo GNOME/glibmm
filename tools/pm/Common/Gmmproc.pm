@@ -280,14 +280,15 @@ sub _generate_wrap_init
           {
             my $include_entry = $total->{$include};
 
-            foreach my $another_pair ([0, $deprecated], [1, $cpp_condition])
+            foreach my $another_tuple ([0, $deprecated, 0], [1, $cpp_condition, undef])
             {
-              my $index = $another_pair->[0];
-              my $trait = $another_pair->[1];
+              my $index = $another_tuple->[0];
+              my $trait = $another_tuple->[1];
+              my $default_value = $another_tuple->[2];
 
               if ($include_entry->[$index] and not $trait)
               {
-                $include_entry->[$index] = 0;
+                $include_entry->[$index] = $default_value;
               }
             }
           }

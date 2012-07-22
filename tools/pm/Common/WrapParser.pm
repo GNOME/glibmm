@@ -1471,7 +1471,7 @@ sub _on_wrap_gerror ($)
 # TODO: Add deprecated option to _WRAP_GERROR
   my $deprecated = 0;
 # TODO: Add "C preprocessor condition" option to _WRAP_GERROR
-  my $cpp_condition = 0;
+  my $cpp_condition = undef;
 # TODO: Add "Extra include" option to _WRAP_GERROR
   my $extra_includes = [];
   my $complete_cxx_type = Common::Output::Shared::get_complete_cxx_type ($self);
@@ -1481,8 +1481,8 @@ sub _on_wrap_gerror ($)
                                                        $deprecated,
                                                        $cpp_condition,
                                                        $self->get_mm_module (),
-                                                       $gir_domain,
-                                                       $complete_cxx_type);
+                                                       $complete_cxx_type,
+                                                       $gir_domain);
 
   $self->add_wrap_init_entry ($wrap_init_entry);
 }
