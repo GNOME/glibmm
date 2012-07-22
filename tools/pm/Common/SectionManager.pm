@@ -89,6 +89,7 @@ sub _prepare_h_section ($)
     );
     $self->append_string (join "\n", @code);
   }
+  $self->append_section (Common::Sections::H_INCLUDES->[0]);
   $self->append_section (Common::Sections::H_CONTENTS->[0]);
   @code =
   (
@@ -100,19 +101,24 @@ sub _prepare_h_section ($)
   $self->pop_entry;
 }
 
-sub _prepare_cc_section ($)
+sub _prepare_cc_section
 {
   my ($self) = @_;
+  my $base = $self->_get_base ();
+  my $mm_module = $self->_get_mm_module ();
   my @code =
   (
-    _get_header,
+    '#include <glibmm.h>',
+    '',
+    '#include <' . $mm_module . '/' . $base . '.h>',
+    '#include <' . $mm_module . '/private/' . $base . '_p.h>',
     ''
   );
 
   $self->push_section (Common::Sections::CC->[0]);
-  $self->append_string (join "\n", @code);
+  $self->append_string (_get_header ());
   $self->append_section (Common::Sections::CC_PRE_INCLUDES->[0]);
-  $self->append_string ("\n");
+  $self->append_string (join ("\n", @code));
   $self->append_section (Common::Sections::CC_GENERATED_INCLUDES->[0]);
   $self->append_string ("\n");
   $self->append_section (Common::Sections::CC_INCLUDES->[0]);
