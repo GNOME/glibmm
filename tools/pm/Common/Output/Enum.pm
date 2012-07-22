@@ -50,8 +50,14 @@ sub _output_flag_ops
   if ($flags)
   {
     my $section_manager = $wrap_parser->get_section_manager;
-    my $container_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
-    my $full_cxx_type = join '::', $container_cxx_type, $cxx_type;
+    my $container_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
+    my $full_cxx_type = $cxx_type;
+
+    if ($container_cxx_type)
+    {
+      $full_cxx_type = $container_cxx_type . '::' . $full_cxx_type;
+    }
+
     my $code_string .= nl ('inline ' . $full_cxx_type . ' operator|(' . $full_cxx_type . ' lhs, ' . $full_cxx_type . ' rhs)') .
                        nl ('  { return static_cast<' . $full_cxx_type . '>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs)); }') .
                        nl () .

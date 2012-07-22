@@ -1475,6 +1475,15 @@ sub _on_wrap_gerror ($)
 # TODO: Add "Extra include" option to _WRAP_GERROR
   my $extra_includes = [];
   my $complete_cxx_type = Common::Output::Shared::get_complete_cxx_type ($self);
+
+  if ($complete_cxx_type)
+  {
+    $complete_cxx_type .= '::' . $cxx_type;
+  }
+  else
+  {
+    $complete_cxx_type = $cxx_type;
+  }
   my $wrap_init_entry = Common::WrapInit::GError->new ($extra_includes,
                                                        $c_includes,
                                                        $cxx_includes,

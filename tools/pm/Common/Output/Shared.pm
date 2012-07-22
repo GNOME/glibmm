@@ -149,8 +149,17 @@ sub get_complete_cxx_type ($)
   my ($wrap_parser) = @_;
   my $namespaces = get_full_namespace $wrap_parser;
   my $classes = get_full_cxx_type $wrap_parser;
+  my @type = ();
 
-  return join '::', $namespaces, $classes;
+  if ($namespaces)
+  {
+    push (@type, $namespaces);
+  }
+  if ($classes)
+  {
+    push (@type, $classes);
+  }
+  return join ('::', @type);
 }
 
 # returns Terminal_Class for Gnome::Vte::Terminal.
@@ -169,10 +178,20 @@ sub get_cxx_class_type ($)
 sub get_complete_cxx_class_type ($)
 {
   my ($wrap_parser) = @_;
-  my $full_namespace = get_full_namespace $wrap_parser;
-  my $cxx_class_type = get_cxx_class_type $wrap_parser;
+  my $full_namespace = get_full_namespace ($wrap_parser);
+  my $cxx_class_type = get_cxx_class_type ($wrap_parser);
+  my @type = ();
 
-  return join '::', $full_namespace, $cxx_class_type;
+  if ($full_namespace)
+  {
+    push (@type, $full_namespace);
+  }
+  if ($cxx_class_type)
+  {
+    push (@type, $cxx_class_type);
+  }
+
+  return join ('::', @type);
 }
 
 # TODO: implement beautifying if I am really bored.
@@ -200,21 +219,30 @@ sub output_enum_gtype_func_h ($$$$)
 
   if (defined $get_type_func)
   {
-    my $namespaces = $wrap_parser->get_namespaces;
-    my $main_section = $wrap_parser->get_main_section;
-    my $classes = $wrap_parser->get_classes;
-    my $full_cxx_type = join '::', (get_full_cxx_type $wrap_parser), $cxx_type;
-    my $close = 1;
+    my $namespaces = $wrap_parser->get_namespaces ();
+    my $main_section = $wrap_parser->get_main_section ();
+    my $container_type = get_full_cxx_type ($wrap_parser);
+    my $full_cxx_type = $cxx_type;
+    my $h_includes_section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::H_INCLUDES);
+    my $section_manager = $wrap_parser->get_section_manager ();
+
+    $section_manager->append_string_to_section (nl ('#include <glibmm/value.h>'),
+                                                $h_includes_section);
+    if ($container_type)
+    {
+      $full_cxx_type = $container_type . '::' . $full_cxx_type;
+    }
+
+    my $glib_namespace = 0;
     my $value_base = 'Glib::Value_' . $type;
     my $code_string = '';
-    my $section_manager = $wrap_parser->get_section_manager;
 
     if (@{$namespaces} == 1 and $namespaces->[0] eq 'Glib')
     {
-      $close = 0;
+      $glib_namespace = 1;
     }
 
-    if ($close)
+    unless ($glib_namespace)
     {
       $code_string .= close_namespaces ($wrap_parser) .
                       nl (doxy_skip_begin) .
@@ -235,7 +263,7 @@ sub output_enum_gtype_func_h ($$$$)
                     nl ('};') .
                     nl ();
 
-    if ($close)
+    unless ($glib_namespace)
     {
       $code_string .= nl ('} // namespace Glib') .
                       nl (doxy_skip_end) .
@@ -248,7 +276,7 @@ sub output_enum_gtype_func_h ($$$$)
                       nl ();
     }
 
-    if (@{$classes} > 0)
+    if ($container_type)
     {
       my $section = get_section $wrap_parser, Common::Sections::H_AFTER_FIRST_CLASS;
 
@@ -268,7 +296,13 @@ sub output_enum_gtype_func_cc ($$$)
   if (defined $get_type_func)
   {
     my $container_cxx_type = get_full_cxx_type $wrap_parser;
-    my $full_cxx_type = join '::', $container_cxx_type, $cxx_type;
+    my $full_cxx_type = $cxx_type;
+
+    if ($container_cxx_type)
+    {
+      $full_cxx_type = $container_cxx_type . '::' . $full_cxx_type;
+    }
+
     my $section_manager = $wrap_parser->get_section_manager;
     my $code_string = nl ('namespace Glib') .
                       nl ('{') .
