@@ -68,9 +68,18 @@ sub _output_h_in_class
   my $virtual_dtor = 0;
 
   $section_manager->append_conditional ($conditional);
+  $section_manager->append_string (nl ());
+
+  my $variable = Common::Output::Shared::get_variable ($wrap_parser, Common::Variables::CUSTOM_CTOR_CAST);
+
+  $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
+  $code_string = nl ('explicit ' . $cxx_type . '(' . $c_type . '* gobject, bool make_a_copy = true);') .
+                 nl ();
+  $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
+  $section_manager->append_conditional ($conditional);
+  $section_manager->set_variable_for_conditional ($variable, $conditional);
+
   $code_string = nl () .
-                 nl ('explicit ' . $cxx_type . '(' . $c_type . '* gobject, bool make_a_copy = true);') .
-                 nl () .
                  nl (Common::Output::Shared::copy_protos_str $cxx_type) .
                  nl () .
                  nl (Common::Output::Shared::dtor_proto_str $cxx_type, $virtual_dtor) .
@@ -181,16 +190,23 @@ sub _output_cc
                  nl (':') .
                  nl ('  gobject_ ((other.gobject_) ? ' . $copy_func . '(other.gobject_) : 0)') .
                  nl ('{}') .
-                 nl () .
-                 nl ($cxx_type . '::' . $cxx_type . '(' . $c_type . '* gobject, bool make_a_copy)') .
+                 nl ();
+  $section_manager->append_string ($code_string);
+  $code_string = nl ($cxx_type . '::' . $cxx_type . '(' . $c_type . '* gobject, bool make_a_copy)') .
                  nl (':') .
                  nl ('// For BoxedType wrappers, make_a_copy is true by default. The static') .
-                 nl ('// BoxedTyoe wrappers always take a copy, thus make_a_copy = true') .
+                 nl ('// BoxedType wrappers always take a copy, thus make_a_copy = true') .
                  nl ('// ensures identical behaviour if the default argument is used.') .
                  nl ('  gobject_ ((make_a_copy && gobject) ? ' . $copy_func . '(gobject) : gobject)') .
                  nl ('{}') .
-                 nl () .
-                 nl ($cxx_type . '& ' . $cxx_type . '::operator=(const ' . $cxx_type . '& other)') .
+                 nl ();
+
+  $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
+  $variable = Common::Output::Shared::get_variable ($wrap_parser, Common::Variables::CUSTOM_CTOR_CAST);
+  $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
+  $section_manager->append_conditional ($conditional);
+  $section_manager->set_variable_for_conditional ($variable, $conditional);
+  $code_string = nl ($cxx_type . '& ' . $cxx_type . '::operator=(const ' . $cxx_type . '& other)') .
                  nl ('{') .
                  nl ('  ' . $cxx_type . ' temp (other);') .
                  nl ('  swap(temp);') .

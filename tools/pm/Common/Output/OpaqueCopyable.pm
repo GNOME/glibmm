@@ -38,7 +38,7 @@ sub _output_h_in_class ($$$)
                     nl ('  typedef ' . $c_type . ' BaseObjectType;') .
                     nl (Common::Output::Shared::doxy_skip_end) .
                     nl ();
-  my $main_section = $wrap_parser->get_main_section;
+  my $main_section = $wrap_parser->get_main_section ();
 
   $section_manager->push_section ($main_section);
   $section_manager->append_string ($code_string);
@@ -46,16 +46,23 @@ sub _output_h_in_class ($$$)
   my $conditional = Common::Output::Shared::default_ctor_proto $wrap_parser, $cxx_type;
 
   $section_manager->append_conditional ($conditional);
+  $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
+
+  my $variable = Common::Output::Shared::get_variable ($wrap_parser, Common::Variables::CUSTOM_CTOR_CAST);
+
+  $code_string = nl ('  // Use make_a_copy = true when getting it directly from a struct.') .
+                 nl ('  explicit ' . $cxx_type . '(' . $c_type . '* castitem, bool make_a_copy = false);') .
+                 nl ();
+  $section_manager->append_string_to_conditional ($code_string, $conditional, 0);
+  $section_manager->append_conditional ($conditional);
+  $section_manager->set_variable_for_conditional ($variable, $conditional);
 
   my $copy_proto = 'const';
   my $reinterpret = 0;
   my $definitions = 1;
   my $virtual_dtor = 0;
 
-  $code_string = nl ('  // Use make_a_copy = true when getting it directly from a struct.') .
-                 nl ('  explicit ' . $cxx_type . '(' . $c_type . '* castitem, bool make_a_copy = false);') .
-                 nl () .
-                 nl (Common::Output::Shared::copy_protos_str $cxx_type) .
+  $code_string = nl (Common::Output::Shared::copy_protos_str $cxx_type) .
                  nl () .
                  nl (Common::Output::Shared::dtor_proto_str $cxx_type, $virtual_dtor) .
                  nl () .
@@ -88,6 +95,7 @@ sub _output_cc ($$$$$$)
   my ($wrap_parser, $c_type, $cxx_type, $new_func, $copy_func, $free_func) = @_;
   my $section_manager = $wrap_parser->get_section_manager ();
   my $custom_default_ctor_var = Common::Output::Shared::get_variable ($wrap_parser, Common::Variables::CUSTOM_DEFAULT_CTOR);
+  my $custom_ctor_cast_var = Common::Output::Shared::get_variable ($wrap_parser, Common::Variables::CUSTOM_CTOR_CAST);
   my $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
   my $complete_cxx_type = Common::Output::Shared::get_complete_cxx_type ($wrap_parser);
@@ -110,8 +118,8 @@ sub _output_cc ($$$$$$)
   $section_manager->set_variable_for_conditional ($no_wrap_function_var, $conditional);
 
   $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
-  $code_string = Common::Output::Shared::open_namespaces ($wrap_parser) .
-                 nl ($full_cxx_type . '::' . $cxx_type . '()') .
+  $section_manager->append_string (Common::Output::Shared::open_namespaces ($wrap_parser));
+  $code_string = nl ($full_cxx_type . '::' . $cxx_type . '()') .
                  nl (':');
 
   if (defined $new_func and $new_func ne '' and $new_func ne 'NONE')
@@ -132,8 +140,10 @@ sub _output_cc ($$$$$$)
                  nl (':') .
                  nl ('  gobject_((src.gobject_) ? ' . $copy_func . '(src.gobject_) : 0)') .
                  nl ('{}') .
-                 nl () .
-                 nl ($full_cxx_type . '::' . $cxx_type . '(' . $c_type . '* castitem, bool make_a_copy /* = false */)') .
+                 nl ();
+  $section_manager->append_string ($code_string);
+  $conditional = Common::Output::Shared::generate_conditional ($wrap_parser);
+  $code_string = nl ($full_cxx_type . '::' . $cxx_type . '(' . $c_type . '* castitem, bool make_a_copy /* = false */)') .
                  nl ('{') .
                  nl ('  if (!make_a_copy)') .
                  nl ('  {') .
@@ -143,7 +153,7 @@ sub _output_cc ($$$$$$)
                  nl ('  else') .
                  nl ('  {') .
                  nl ('    // We are probably getting it via direct access to a struct,') .
-                 nl ('    // so we can not just take ut - we have to take a copy if it.') .
+                 nl ('    // so we can not just take it - we have to take a copy if it.') .
                  nl ('    if (castitem)') .
                  nl ('    {') .
                  nl ('      gobject_ = ' . $copy_func . '(castitem);') .
@@ -155,6 +165,11 @@ sub _output_cc ($$$$$$)
                  nl ('  }') .
                  nl ('}') .
                  nl ();
+  $section_manager->append_string_to_conditional ($code_string, $conditional);
+  $section_manager->append_conditional ($conditional);
+  $section_manager->set_variable_for_conditional ($custom_ctor_cast_var, $conditional);
+  $code_string = '';
+
   if (defined $copy_func and $copy_func ne '' and $copy_func ne 'NONE')
   {
     $code_string .= nl ($full_cxx_type . '& ' . $full_cxx_type . '::operator=(const ' . $full_cxx_type . '& src)') .

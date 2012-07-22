@@ -3306,6 +3306,15 @@ sub _on_template_keyword
   $self->fixed_error ('Hit eof while processing `template\'.');
 }
 
+sub _on_custom_ctor_cast
+{
+  my ($self) = @_;
+  my $variable = Common::Output::Shared::get_variable ($self, Common::Variables::CUSTOM_CTOR_CAST);
+  my $section_manager = $self->get_section_manager ();
+
+  $section_manager->set_variable ($variable, 1);
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3488,7 +3497,8 @@ sub new
     '_INCLUDE_IN_WRAP_INIT' => sub { $self->_on_include_in_wrap_init (@_); },
     '_PUSH_SECTION' => sub { $self->_on_push_section (@_); },
     '_POP_SECTION' => sub { $self->_on_pop_section (@_); },
-    'template' => sub { $self->_on_template_keyword (@_); }
+    'template' => sub { $self->_on_template_keyword (@_); },
+    '_CUSTOM_CTOR_CAST' => sub { $self->_on_custom_ctor_cast (@_); }
   };
 
   return $self;
