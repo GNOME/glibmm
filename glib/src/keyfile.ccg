@@ -74,6 +74,33 @@ bool KeyFile::load_from_data_dirs(const std::string& file, std::string& full_pat
   return (result != 0);
 }
 
+bool KeyFile::load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, std::string& full_path, KeyFileFlags flags)
+{
+  GError* gerror = 0;
+  char* full_path_c = 0;
+
+  const gboolean result = g_key_file_load_from_dirs(
+      gobj(), file.c_str(), const_cast<const gchar**>(search_dirs.data()),
+      &full_path_c, static_cast<GKeyFileFlags>(unsigned(flags)),
+      &gerror);
+
+  if(gerror)
+  {
+    if (full_path_c)
+    {
+      g_free(full_path_c);
+    }
+    Glib::Error::throw_exception(gerror);
+  }
+
+  if(full_path_c)
+    full_path = Glib::ScopedPtr<char>(full_path_c).get();
+  else
+    full_path.erase();
+
+  return (result != 0);
+}
+
 Glib::ustring KeyFile::to_data()
 {
   GError* gerror = 0;
