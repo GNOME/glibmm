@@ -181,7 +181,7 @@ IOFlags StreamIOChannel::get_flags_vfunc()
   if(stream_in_)
     flags |= IO_FLAG_IS_READABLE;
   if(stream_out_)
-    flags |= IO_FLAG_IS_WRITEABLE;
+    flags |= IO_FLAG_IS_WRITABLE;
 
   return flags;
 }
