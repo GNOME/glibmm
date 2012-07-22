@@ -3138,6 +3138,31 @@ sub _on_include_in_wrap_init
   }
 }
 
+sub _on_push_section
+{
+  my ($self) = @_;
+  my $section_name = Common::Util::string_trim ($self->_extract_bracketed_text());
+  my $traits = Common::Sections::get_section_traits_from_string ($section_name);
+
+  if (defined ($traits))
+  {
+    my $full_section_name = Common::Output::Shared::get_section ($self, $traits);
+
+    $self->_push_main_section ($full_section_name);
+  }
+  else
+  {
+    $self->fixed_error ('Unknown section: ' . $section_name);
+  }
+}
+
+sub _on_pop_section
+{
+  my ($self) = @_;
+
+  $self->_pop_main_section ();
+}
+
 ###
 ### HANDLERS ABOVE
 ###
@@ -3225,7 +3250,7 @@ sub new ($$$$$$)
     'tokens_null' => [],
     'tokens' => [],
     'parsing_stage' => STAGE_INVALID,
-    'main_section' => Common::Sections::DEV_NULL->[0],
+    'main_sections_stack' => [Common::Sections::DEV_NULL->[0]],
     'section_manager' => Common::SectionManager->new ($base, $mm_module),
     'stage_section_tuples' =>
     {
@@ -3315,7 +3340,9 @@ sub new ($$$$$$)
     '_MEMBER_GET_REF_PTR' => sub { $self->_on_member_get_ref_ptr (@_); },
     '_GMMPROC_EXTRA_NAMESPACE' => sub { $self->_on_gmmproc_extra_namespace (@_); },
     '_GMMPROC_WRAP_CONDITIONALLY' => sub { $self->_on_gmmproc_wrap_conditionally (@_); },
-    '_INCLUDE_IN_WRAP_INIT' => sub { $self->_on_include_in_wrap_init (@_); }
+    '_INCLUDE_IN_WRAP_INIT' => sub { $self->_on_include_in_wrap_init (@_); },
+    '_PUSH_SECTION' => sub { $self->_on_push_section (@_); },
+    '_POP_SECTION' => sub { $self->_on_pop_section (@_); }
   };
 
   return $self;
@@ -3410,19 +3437,50 @@ sub get_section_manager ($)
   return $self->{'section_manager'};
 }
 
+sub _get_main_sections_stack
+{
+  my ($self) = @_;
+
+  return $self->{'main_sections_stack'};
+}
+
 # public
 sub get_main_section ($)
 {
   my ($self) = @_;
+  my $main_sections_stack = $self->_get_main_sections_stack ();
 
-  return $self->{'main_section'};
+  if (@{$main_sections_stack})
+  {
+    return $main_sections_stack->[-1];
+  }
+  return Common::Sections::DEV_NULL->[0];
 }
 
 sub set_main_section ($$)
 {
   my ($self, $main_section) = @_;
 
-  $self->{'main_section'} = $main_section;
+  $self->{'main_sections_stack'} = [$main_section];
+}
+
+sub _push_main_section
+{
+  my ($self, $main_section) = @_;
+  my $main_sections_stack = $self->_get_main_sections_stack ();
+
+  push (@{$main_sections_stack}, $main_section);
+}
+
+sub _pop_main_section
+{
+  my ($self) = @_;
+  my $main_sections_stack = $self->_get_main_sections_stack ();
+
+  if (@{$main_sections_stack})
+  {
+    pop (@{$main_sections_stack});
+  }
 }
 
 sub set_parsing_stage ($$)

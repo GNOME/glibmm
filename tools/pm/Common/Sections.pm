@@ -73,4 +73,22 @@ use constant
   'P_H_INCLUDES' => ['SECTION_P_H_INCLUDES', Common::Constants::FILE ()]
 };
 
+sub get_section_traits_from_string
+{
+  use constant 1.01;              # don't omit this!
+
+  my ($short_section_name) = @_;
+  my $full_name = 'Common::Sections::' . $short_section_name;
+
+  if (exists ($constant::declared{$full_name}))
+  {
+    no strict 'refs';
+
+    my $traits = &{$full_name} ();
+
+    return $traits;
+  }
+  return undef;
+}
+
 1; # indicate proper module load.
