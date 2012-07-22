@@ -699,6 +699,19 @@ sub _on_m4_line ($)
   $self->fixed_error ('Hit eof when looking for newline');
 }
 
+sub _on_dnl
+{
+  my ($self) = @_;
+  my $tokens = $self->get_tokens;
+
+  while (@{$tokens})
+  {
+    return if ($self->_extract_token eq "\n");
+  }
+
+  $self->fixed_error ('Hit eof when looking for newline');
+}
+
 sub _on_defs ($)
 {
   my ($self) = @_;
@@ -3414,6 +3427,7 @@ sub new
     '/*!' => sub { $self->_on_comment_doxygen (@_); },
     '#m4begin' => sub { $self->_on_m4_section (@_); }, # probably won't be needed anymore
     '#m4' => sub { $self->_on_m4_line (@_); }, # probably won't be needed anymore
+    'dnl' => sub { $self->_on_dnl (@_); },
     '_DEFS' => sub { $self->_on_defs (@_); }, # probably won't be needed anymore
     '_IGNORE' => sub { $self->_on_ignore (@_); },
     '_IGNORE_SIGNAL' => sub { $self->_on_ignore_signal (@_); },
