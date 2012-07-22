@@ -51,8 +51,8 @@ sub _output_h_in_class ($$$)
   my $main_section = $wrap_parser->get_main_section;
   my $code_string = nl ('public:') .
                     nl (Common::Output::Shared::doxy_skip_begin) .
-                    nl ('  typedef ' . $cxx_type . 'CppObjectType;') .
-                    nl ('  typedef ' . $c_type . 'BaseObjectType;') .
+                    nl ('  typedef ' . $cxx_type . ' CppObjectType;') .
+                    nl ('  typedef ' . $c_type . ' BaseObjectType;') .
                     nl () .
                     nl (  'static GType get_type() G_GNUC_CONST;') .
                     nl (Common::Output::Shared::doxy_skip_end) .
@@ -130,11 +130,10 @@ sub _output_h_after_first_namespace ($$$)
   $section_manager->pop_entry;
 }
 
-sub _output_cc ($$$$$$$)
+sub _output_cc
 {
   my ($wrap_parser, $c_type, $cxx_type, $get_type_func, $new_func, $copy_func, $free_func) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
-  my $prefix = Common::Output::Shared::get_var_prefix $wrap_parser;
   my $variable = Common::Output::Shared::get_variable $wrap_parser, Common::Variables::NO_WRAP_FUNCTION;
   my $conditional = Common::Output::Shared::generate_conditional $wrap_parser;
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
@@ -166,7 +165,7 @@ sub _output_cc ($$$$$$$)
   $conditional = Common::Output::Shared::generate_conditional $wrap_parser;
   $code_string = nl($cxx_type . '::' . $cxx_type . '()') .
                  nl(':');
-  if (defined $new_func and $new_func != '' and $new_func != 'NONE')
+  if (defined $new_func and $new_func ne '' and $new_func ne 'NONE')
   {
     $code_string .= nl ('gobject_ (' . $new_func . '())');
   }
