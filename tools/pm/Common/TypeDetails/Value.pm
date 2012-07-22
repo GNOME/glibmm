@@ -225,8 +225,8 @@ sub equal ($$$)
 
     if (($flags & Common::TypeDetails::Base::RECURSIVE) == Common::TypeDetails::Base::RECURSIVE)
     {
-      my $self_template = $self->_get_template;
-      my $other_template = $other->_get_template;
+      my $self_template = $self->get_templates ();
+      my $other_template = $other->get_templates ();
       my $self_template_count = @{$self_template};
       my $other_template_count = @{$other_template};
 

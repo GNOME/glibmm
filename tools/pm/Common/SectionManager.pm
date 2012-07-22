@@ -38,7 +38,7 @@ use constant
 
 # TODO: get wrapparser?
 
-sub _get_header ()
+sub _get_header
 {
   my @code =
   (
@@ -50,7 +50,7 @@ sub _get_header ()
   return join "\n", @code;
 }
 
-sub _get_header_guard ($$)
+sub _get_header_guard
 {
   my ($self, $suffix) = @_;
   my $base = $self->_get_base;
@@ -62,7 +62,7 @@ sub _get_header_guard ($$)
   return join '_', '', (uc $mm_module), (uc $base), $suffix, '';
 }
 
-sub _prepare_h_section ($)
+sub _prepare_h_section
 {
   my ($self) = @_;
   my $header_guard = $self->_get_header_guard ('H');

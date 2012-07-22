@@ -139,8 +139,8 @@ sub get_cxx_type ($)
 sub get_full_cxx_type ($)
 {
   my ($wrap_parser) = @_;
-  my $classes = $wrap_parser->get_classes;
-  my $full_cxx_class = join '::', @{$classes};
+  my $classes = $wrap_parser->get_classes ();
+  my $full_cxx_class = join ('::', @{$classes});
 
   return $full_cxx_class;
 }
@@ -149,8 +149,8 @@ sub get_full_cxx_type ($)
 sub get_full_namespace ($)
 {
   my ($wrap_parser) = @_;
-  my $namespaces = $wrap_parser->get_namespaces;
-  my $full_namespace = join '::', @{$namespaces};
+  my $namespaces = $wrap_parser->get_namespaces ();
+  my $full_namespace = join ('::', @{$namespaces});
 
   return $full_namespace;
 }
@@ -179,7 +179,7 @@ sub get_complete_cxx_type ($)
 sub get_cxx_class_type ($)
 {
   my ($wrap_parser) = @_;
-  my $full_cxx_type = get_full_cxx_type $wrap_parser;
+  my $full_cxx_type = get_full_cxx_type ($wrap_parser);
 
   $full_cxx_type =~ s/::/_/g;
   return $full_cxx_type . '_Class';

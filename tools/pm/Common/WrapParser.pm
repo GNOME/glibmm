@@ -922,8 +922,8 @@ sub _on_wrap_method ($)
     }
   }
 
-  my $ret_transfer = $c_function->get_return_transfer;
-  my $throws = $c_function->get_throws;
+  my $ret_transfer = $c_function->get_return_transfer  ();
+  my $throws = $c_function->get_throws ();
 
 # TODO: remove the ifs below after possible bugs in
 # TODO continued: wrappers/annotations are fixed.
@@ -945,7 +945,7 @@ sub _on_wrap_method ($)
                                   $ifdef,
                                   $c_function->get_return_type,
                                   $ret_transfer,
-                                  $c_function->get_name,
+                                  $c_function->get_name (),
                                   $c_param_types,
                                   $c_param_transfers,
                                   $throws);
@@ -1834,7 +1834,7 @@ sub _on_class_gtk_object ($)
 sub _on_class_boxed_type ($)
 {
   my ($self) = @_;
-  my @args = Common::Shared::string_split_commas $self->_extract_bracketed_text;
+  my @args = Common::Shared::string_split_commas ($self->_extract_bracketed_text ());
 
   if (@args > 5)
   {
@@ -1996,13 +1996,13 @@ sub _on_class_boxed_type ($)
   $self->_push_gir_record ($gir_record);
   $self->_push_c_class ($c_type);
 
-  Common::Output::BoxedType::output $self,
-                                    $c_type,
-                                    $cxx_type,
-                                    $get_type_func,
-                                    $new_func,
-                                    $copy_func,
-                                    $free_func;
+  Common::Output::BoxedType::output ($self,
+                                     $c_type,
+                                     $cxx_type,
+                                     $get_type_func,
+                                     $new_func,
+                                     $copy_func,
+                                     $free_func);
 }
 
 sub _on_class_boxed_type_static ($)
@@ -2690,9 +2690,9 @@ sub _on_class_keyword ($)
     }
     elsif ($token eq '{')
     {
-      my $level = $self->get_level;
-      my $classes = $self->get_classes;
-      my $class_levels = $self->get_class_levels;
+      my $level = $self->get_level ();
+      my $classes = $self->get_classes ();
+      my $class_levels = $self->get_class_levels ();
 
 # TODO: rather use type fixup
       $name =~ s/\s+//g;
@@ -2701,9 +2701,10 @@ sub _on_class_keyword ($)
 
       if (@{$classes} == 1)
       {
-        $self->generate_first_class_number;
+        $self->generate_first_class_number ();
 
-        my $section = Common::Output::Shared::get_section $self, Common::Sections::H_BEFORE_FIRST_CLASS;
+        my $section = Common::Output::Shared::get_section ($self,
+                                                           Common::Sections::H_BEFORE_FIRST_CLASS);
 
         $section_manager->append_section_to_section ($section, $main_section);
       }

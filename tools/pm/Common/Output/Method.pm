@@ -155,7 +155,8 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
       splice (@{$prepped_cxx_param_types}, $cxx_param_out_index, 1);
       splice (@{$prepped_cxx_param_names}, $cxx_param_out_index, 1);
     }
-    my $convs_str = Common::Output::Shared::convzipstr $wrap_parser, $prepped_cxx_param_types, $c_param_types, $c_param_transfers, $prepped_cxx_param_names;
+
+    my $convs_str = Common::Output::Shared::convzipstr ($wrap_parser, $prepped_cxx_param_types, $c_param_types, $c_param_transfers, $prepped_cxx_param_names);
 
     $prepped_cxx_param_types = undef;
     $prepped_cxx_param_names = undef;

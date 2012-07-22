@@ -82,7 +82,7 @@ sub _output_flag_ops
 
     if ($container_cxx_type)
     {
-      my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::H_AFTER_FIRST_CLASS;
+      my $section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::H_AFTER_FIRST_CLASS);
 
       $section_manager->append_string_to_section ($code_string, $section);
     }

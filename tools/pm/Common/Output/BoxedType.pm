@@ -28,7 +28,7 @@ sub nl
   return Common::Output::Shared::nl @_;
 }
 
-sub _output_h_before_first_namespace ($$$)
+sub _output_h_before_first_namespace
 {
   my ($wrap_parser, $c_type, $cxx_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
@@ -44,7 +44,7 @@ sub _output_h_before_first_namespace ($$$)
   $section_manager->set_variable_for_conditional ($variable, $conditional);
 }
 
-sub _output_h_in_class ($$$)
+sub _output_h_in_class
 {
   my ($wrap_parser, $c_type, $cxx_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
@@ -87,7 +87,7 @@ sub _output_h_in_class ($$$)
   $section_manager->pop_entry;
 }
 
-sub _output_h_after_first_namespace ($$$)
+sub _output_h_after_first_namespace
 {
   my ($wrap_parser, $c_type, $cxx_type) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
@@ -223,14 +223,14 @@ sub _output_cc
   $section_manager->pop_entry;
 }
 
-sub output ($)
+sub output
 {
   my ($wrap_parser, $c_type, $cxx_type, $get_type_func, $new_func, $copy_func, $free_func) = @_;
 
-  _output_h_before_first_namespace $wrap_parser, $c_type, $cxx_type;
-  _output_h_in_class $wrap_parser, $c_type, $cxx_type;
-  _output_h_after_first_namespace $wrap_parser, $c_type, $cxx_type;
-  _output_cc $wrap_parser, $c_type, $cxx_type, $get_type_func, $new_func, $copy_func, $free_func;
+  _output_h_before_first_namespace ($wrap_parser, $c_type, $cxx_type);
+  _output_h_in_class ($wrap_parser, $c_type, $cxx_type);
+  _output_h_after_first_namespace ($wrap_parser, $c_type, $cxx_type);
+  _output_cc ($wrap_parser, $c_type, $cxx_type, $get_type_func, $new_func, $copy_func, $free_func);
 }
 
 1; # indicate proper module load.

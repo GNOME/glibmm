@@ -116,8 +116,8 @@ sub _output_gerror_impl
                     nl ('  throw ' . $full_cxx_type . '(gobject);') .
                     nl ('}') .
                     nl () .
-                    Common::Output::Shared::close_namespaces $wrap_parser;
-  my $section = Common::Output::Shared::get_section $wrap_parser, Common::Sections::CC_GENERATED;
+                    Common::Output::Shared::close_namespaces ($wrap_parser);
+  my $section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::CC_GENERATED);
 
   $section_manager->append_string_to_section ($code_string, $section);
 }
