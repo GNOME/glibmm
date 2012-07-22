@@ -166,7 +166,7 @@ sub output_set
   $main_code_string .= nl (join ('', 'void set_', $cxx_name, '(const ', $cxx_type, '& value);'));
   $cc_code_string .= nl (join ('', 'void ', $full_cxx_type, '::set_', $cxx_name, '(const ', $cxx_type, '& value)')) .
                      nl ('{') .
-                     nl (join ('', '  gobj->', $c_name, ' = ', $conversion, ';')) .
+                     nl (join ('', '  gobj()->', $c_name, ' = ', $conversion, ';')) .
                      nl ('}') .
                      nl ();
 
@@ -200,7 +200,7 @@ sub output_set_ptr
   $main_code_string .= nl (join ('', 'void set_', $cxx_name, '(const ', $cxx_type, ' value);'));
   $cc_code_string .= nl (join ('', 'void ', $full_cxx_type, '::set_', $cxx_name, '(const ', $cxx_type, ' value)')) .
                      nl ('{') .
-                     nl (join ('', '  gobj->', $c_name, ' = ', $conversion, ';')) .
+                     nl (join ('', '  gobj()->', $c_name, ' = ', $conversion, ';')) .
                      nl ('}') .
                      nl ();
 
@@ -225,7 +225,7 @@ sub output_set_ref_ptr
   my $full_cxx_type = Common::Output::Shared::get_full_cxx_type ($wrap_parser);
   my $ref_cxx_type = join ('', 'Glib::RefPtr< ', $cxx_type, ' >');
   my $conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $ref_cxx_type, $c_type, Common::TypeInfo::Common::TRANSFER_NONE, 'value');
-  my $old_conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $c_type, $ref_cxx_type, Common::TypeInfo::Common::TRANSFER_FULL, 'gobj->' . $c_name);
+  my $old_conversion = Common::Output::Shared::convert_or_die ($wrap_parser, $c_type, $ref_cxx_type, Common::TypeInfo::Common::TRANSFER_FULL, 'gobj()->' . $c_name);
 
   if ($deprecated)
   {
@@ -239,7 +239,7 @@ sub output_set_ref_ptr
                      nl ('  // Take possession of the old value, unrefing it in the destructor.') .
                      nl (join ('', '  ', $ref_cxx_type, ' old_value(', $old_conversion, ');')) .
                      nl () .
-                     nl (join ('', '  gobj->', $c_name, ' = ', $conversion, ';')) .
+                     nl (join ('', '  gobj()->', $c_name, ' = ', $conversion, ';')) .
                      nl ('}') .
                      nl ();
 
