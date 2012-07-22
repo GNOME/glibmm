@@ -22,11 +22,6 @@
 #define GLIB_DISABLE_DEPRECATION_WARNINGS 1
 
 #include <glibmm/threads.h>
-
-#ifndef GLIBMM_DISABLE_DEPRECATED
-#include <glibmm/thread.h>
-#endif //GLIBMM_DISABLE_DEPRECATED
-
 #include <glibmm/main.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/wrap.h>
@@ -545,13 +540,6 @@ bool MainContext::acquire()
 {
   return g_main_context_acquire(gobj());
 }
-
-#ifndef GLIBMM_DISABLE_DEPRECATED
-bool MainContext::wait(Glib::Cond& cond, Glib::Mutex& mutex)
-{
-  return g_main_context_wait(gobj(), cond.gobj(), mutex.gobj());
-}
-#endif //GLIBMM_DISABLE_DEPRECATED
 
 bool MainContext::wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex)
 {

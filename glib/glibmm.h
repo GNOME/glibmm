@@ -84,7 +84,7 @@
 
 //Include this first because we need it to be the first thing to include <glib.h>, 
 //so we can do an undef trick to still use deprecated API in the header: 
-#include <glibmm/thread.h>
+//#include <glibmm/thread.h>
 
 #include <glibmm/threads.h>
 
