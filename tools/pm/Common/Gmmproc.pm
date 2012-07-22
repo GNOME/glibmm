@@ -210,6 +210,7 @@ sub _parse_all_bases
   my $type_info_global = $self->_get_type_info_global ();
   my $repositories = $self->_get_repositories;
   my $mm_module = $self->_get_mm_module;
+  my $wrap_init_namespace = $self->_get_wrap_init_namespace ();
 
   # parallelize
   foreach my $base (sort keys %{$bases})
@@ -222,7 +223,8 @@ sub _parse_all_bases
                                                $type_info_global,
                                                $repositories,
                                                $mm_module,
-                                               $base);
+                                               $base,
+                                               $wrap_init_namespace);
 
     $wrap_parser->parse;
     $tokens_store->set_section_manager ($wrap_parser->get_section_manager);

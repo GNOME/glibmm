@@ -33,12 +33,21 @@ sub _output_gerror
   my ($wrap_parser, $cxx_type, $members, $new_style) = @_;
   my $string_members = Common::Output::Shared::convert_members_to_strings ($members);
   my $section_manager = $wrap_parser->get_section_manager;
-  my $namespaces = $wrap_parser->get_namespaces;
+  my $wrap_init_namespace = $wrap_parser->get_wrap_init_namespace ();
   my $wrap_init = 'wrap_init()';
+  my $h_includes_section = Common::Output::Shared::get_section ($wrap_parser, Common::Sections::H_INCLUDES);
+  my $mm_module = $wrap_parser->get_mm_module ();
 
-  if (@{$namespaces})
+  $section_manager->append_string_to_section (nl ('#include <', $mm_module, '/wrap_init.h>'),
+                                              $h_includes_section);
+
+  if (defined ($wrap_init_namespace) and $wrap_init_namespace ne '')
   {
-    $wrap_init = '::' . $namespaces->[0] . '::' . $wrap_init;
+    $wrap_init = $wrap_init_namespace . '::' . $wrap_init;
+    if (index ($wrap_init_namespace, '::') != 0)
+    {
+      $wrap_init = '::' . $wrap_init;
+    }
   }
 
   my $code_string = nl ('class ' . $cxx_type . ' : public Glib::Error') .

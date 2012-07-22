@@ -3347,9 +3347,9 @@ sub get_repositories ($)
 }
 
 # public
-sub new ($$$$$$)
+sub new
 {
-  my ($type, $tokens_hg, $tokens_ccg, $type_info_global, $repositories, $mm_module, $base) = @_;
+  my ($type, $tokens_hg, $tokens_ccg, $type_info_global, $repositories, $mm_module, $base, $wrap_init_namespace) = @_;
   my $class = (ref $type or $type or 'Common::WrapParser');
   my $self =
   {
@@ -3384,7 +3384,8 @@ sub new ($$$$$$)
     'base' => $base,
     'filename' => undef,
     'wrap_init_entries' => [],
-    'temp_wrap_init_stack' => []
+    'temp_wrap_init_stack' => [],
+    'wrap_init_namespace' => $wrap_init_namespace
   };
 
   $self = bless $self, $class;
@@ -3465,6 +3466,13 @@ sub new ($$$$$$)
   };
 
   return $self;
+}
+
+sub get_wrap_init_namespace
+{
+  my ($self) = @_;
+
+  return $self->{'wrap_init_namespace'};
 }
 
 sub get_wrap_init_entries
