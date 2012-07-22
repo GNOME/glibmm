@@ -48,7 +48,7 @@ glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 local_cppflags  = -I$(top_builddir) $(glibmm_includes)
 #local_cppflags += $(giomm_includes)
 
-AM_CPPFLAGS = $(local_cppflags)
+AM_CPPFLAGS = $(local_cppflags) $(GLIBMM_CFLAGS)
 #AM_CPPFLAGS += $(GIOMM_CFLAGS)
 AM_CXXFLAGS = $(GLIBMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED
 
