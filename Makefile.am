@@ -31,9 +31,10 @@ doc_subdirs =
 endif
 SUBDIRS =
 #SUBDIRS += tools
-SUBDIRS += $(src_subdirs)
-#SUBDIRS += glib/glibmm gio/giomm
-#SUBDIRS += tests examples $(doc_subdirs)
+SUBDIRS += $(src_subdirs) glib/glibmm
+#SUBDIRS += gio/giomm
+SUBDIRS += tests examples
+#SUBDIRS += $(doc_subdirs)
 
 glibmm_includedir = $(includedir)/$(GLIBMM_MODULE_NAME)
 glibmm_include_HEADERS = glib/glibmm.h
