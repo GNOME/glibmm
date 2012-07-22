@@ -160,6 +160,15 @@ const typename T::BaseObjectType* unwrap(const Glib::RefPtr<const T>& ptr)
 }
 
 /** Get the underlying C instance from the C++ instance and acquire a
+ * reference.
+ */
+template <class T> inline
+typename T::BaseObjectType* unwrap_copy(const T& ref)
+{
+  return ref.gobj_copy();
+}
+
+/** Get the underlying C instance from the C++ instance and acquire a
  * reference.  This is just like calling gobj_copy(), but it does its own
  * check for a NULL pointer.
  */
