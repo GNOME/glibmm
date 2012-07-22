@@ -98,7 +98,7 @@ sub _get_identity_conversion
   my $from_details = Common::TypeDetails::disassemble_type ($from);
   my $to_details = Common::TypeDetails::disassemble_type ($to);
 
-  if ($from_details->equal ($to_details, Common::TypeDetails::Base::RECURSIVE))
+  if ($from_details->equal ($to_details, Common::TypeDetails::Base::COMPLETE))
   {
     return $subst;
   }

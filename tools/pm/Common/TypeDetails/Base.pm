@@ -27,9 +27,10 @@ use constant
 {
   NONE => 0,
   BASE => 1 << 0,
-  ACCESS_MODIFIERS => (1 << 1),
+  ACCESS_MODIFIERS => 1 << 1,
   STRUCTURE => 1 << 2,
-  RECURSIVE => 1 << 2 | 1 << 3 # recursive check forces structure equality
+  RECURSIVE => 1 << 2 | 1 << 3, # recursive check forces structure equality
+  COMPLETE => 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3
 };
 
 sub _get_split_values ($)
