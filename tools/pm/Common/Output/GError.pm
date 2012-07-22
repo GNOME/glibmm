@@ -28,9 +28,9 @@ sub nl
   return Common::Output::Shared::nl @_;
 }
 
-sub _output_gerror ($$$)
+sub _output_gerror
 {
-  my ($wrap_parser, $cxx_type, $members) = @_;
+  my ($wrap_parser, $cxx_type, $members, $new_style) = @_;
   my $string_members = Common::Output::Shared::convert_members_to_strings ($members);
   my $section_manager = $wrap_parser->get_section_manager;
   my $namespaces = $wrap_parser->get_namespaces;
@@ -44,7 +44,7 @@ sub _output_gerror ($$$)
   my $code_string = nl ('class ' . $cxx_type . ' : public Glib::Error') .
                     nl ('{') .
                     nl ('public:') .
-                    nl ('  enum Code') .
+                    nl ('  enum ' . ($new_style ? 'class ' : '') . 'Code') .
                     nl ('  {') .
                     nl (join nl (','), @{$string_members}) .
                     nl ('  };') .
@@ -66,14 +66,14 @@ sub _output_gerror ($$$)
   $section_manager->append_string_to_section ($code_string, $wrap_parser->get_main_section);
 }
 
-sub _output_gerror_gtype_h ($$$)
+sub _output_gerror_gtype_h
 {
   my ($wrap_parser, $cxx_type, $get_type_func) = @_;
 
   Common::Output::Shared::output_enum_gtype_func_h $wrap_parser, $cxx_type, Common::Output::Shared::ENUM_TYPE, $get_type_func;
 }
 
-sub _output_gerror_impl ($$$)
+sub _output_gerror_impl
 {
   my ($wrap_parser, $cxx_type, $domain) = @_;
   my $container_cxx_type = Common::Output::Shared::get_full_cxx_type $wrap_parser;
@@ -107,21 +107,21 @@ sub _output_gerror_impl ($$$)
   $section_manager->append_string_to_section ($code_string, $section);
 }
 
-sub _output_gerror_gtype_cc ($$$)
+sub _output_gerror_gtype_cc
 {
   my ($wrap_parser, $cxx_type, $get_type_func) = @_;
 
   Common::Output::Shared::output_enum_gtype_func_cc ($wrap_parser, $cxx_type, $get_type_func);
 }
 
-sub output ($$$$$)
+sub output
 {
-  my ($wrap_parser, $cxx_type, $members, $domain, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $members, $domain, $get_type_func, $new_style) = @_;
 
-  _output_gerror $wrap_parser, $cxx_type, $members;
-  _output_gerror_gtype_h $wrap_parser, $cxx_type, $get_type_func;
-  _output_gerror_impl $wrap_parser, $cxx_type, $domain;
-  _output_gerror_gtype_cc $wrap_parser, $cxx_type, $get_type_func;
+  _output_gerror ($wrap_parser, $cxx_type, $members, $new_style);
+  _output_gerror_gtype_h ($wrap_parser, $cxx_type, $get_type_func);
+  _output_gerror_impl ($wrap_parser, $cxx_type, $domain);
+  _output_gerror_gtype_cc ($wrap_parser, $cxx_type, $get_type_func);
 }
 
 1; # indicate proper module load.

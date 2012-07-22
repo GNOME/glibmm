@@ -28,13 +28,13 @@ sub nl
   return Common::Output::Shared::nl @_;
 }
 
-sub _output_enum ($$$)
+sub _output_enum
 {
-  my ($wrap_parser, $cxx_type, $members) = @_;
+  my ($wrap_parser, $cxx_type, $members, $new_style) = @_;
   my $section_manager = $wrap_parser->get_section_manager;
   my $main_section = $wrap_parser->get_main_section;
   my $string_members = Common::Output::Shared::convert_members_to_strings $members;
-  my $code_string = nl ('enum ' . $cxx_type) .
+  my $code_string = nl ('enum ' . ($new_style ? 'class ' : '') . $cxx_type) .
                     nl ('{') .
                     nl (join ((nl ','), @{$string_members})) .
                     nl ('};') .
@@ -43,7 +43,7 @@ sub _output_enum ($$$)
   $section_manager->append_string_to_section ($code_string, $main_section);
 }
 
-sub _output_flag_ops ($$$)
+sub _output_flag_ops
 {
   my ($wrap_parser, $cxx_type, $flags) = @_;
 
@@ -87,7 +87,7 @@ sub _output_flag_ops ($$$)
   }
 }
 
-sub _output_gtype_func_h ($$$$)
+sub _output_gtype_func_h
 {
   my ($wrap_parser, $cxx_type, $flags, $get_type_func) = @_;
   my $type = undef;
@@ -104,21 +104,21 @@ sub _output_gtype_func_h ($$$$)
   Common::Output::Shared::output_enum_gtype_func_h $wrap_parser, $cxx_type, $type, $get_type_func;
 }
 
-sub _output_gtype_func_cc ($$$)
+sub _output_gtype_func_cc
 {
   my ($wrap_parser, $cxx_type, $get_type_func) = @_;
 
   Common::Output::Shared::output_enum_gtype_func_cc $wrap_parser, $cxx_type, $get_type_func;
 }
 
-sub output ($$$$$)
+sub output
 {
-  my ($wrap_parser, $cxx_type, $members, $flags, $get_type_func) = @_;
+  my ($wrap_parser, $cxx_type, $members, $flags, $get_type_func, $new_style) = @_;
 
-  _output_enum $wrap_parser, $cxx_type, $members;
-  _output_flag_ops $wrap_parser, $cxx_type, $flags;
-  _output_gtype_func_h $wrap_parser, $cxx_type, $flags, $get_type_func;
-  _output_gtype_func_cc $wrap_parser, $cxx_type, $get_type_func;
+  _output_enum ($wrap_parser, $cxx_type, $members, $new_style);
+  _output_flag_ops ($wrap_parser, $cxx_type, $flags);
+  _output_gtype_func_h ($wrap_parser, $cxx_type, $flags, $get_type_func);
+  _output_gtype_func_cc ($wrap_parser, $cxx_type, $get_type_func);
 }
 
 1; # indicate proper module load.

@@ -228,17 +228,40 @@ sub _extract_bracketed_text ($)
   $self->fixed_error ('Hit eof when extracting bracketed text.');
 }
 
-sub _extract_members ($$)
+sub _extract_members
 {
-  my ($object, $substs) = @_;
+  my ($object, $substs, $new_style, $identifier_prefixes) = @_;
   my $member_count = $object->get_g_member_count;
   my @all_members = ();
 
   for (my $iter = 0; $iter < $member_count; ++$iter)
   {
     my $member = $object->get_g_member_by_index ($iter);
-    my $name = uc $member->get_a_name;
-    my $value = $member->get_a_value;
+    my $name = undef;
+
+    if ($new_style)
+    {
+      $name = uc ($member->get_a_name ());
+    }
+    else
+    {
+      # For old style enums we have to use full names without global
+      # prefix. Otherwise we can get some conflicts like for SURROGATE
+      # that is in both UnicodeType and UnicodeBreakType.
+      foreach my $prefix (@{$identifier_prefixes})
+      {
+        my $to_remove = $prefix . '_';
+
+        $name = $member->get_a_c_identifier ();
+        if ($name =~ /^$to_remove/)
+        {
+          $name =~ s/^$to_remove//;
+          last;
+        }
+      }
+    }
+
+    my $value = $member->get_a_value ();
 
     foreach my $pair (@{$substs})
     {
@@ -1299,11 +1322,13 @@ sub _on_wrap_enum ($)
   my $cxx_type = Common::Util::string_trim(shift @args);
   my $c_type = Common::Util::string_trim(shift @args);
   my @sed = ();
+  my $new_style = 0;
   my $setup =
   {
     'ob(NO_GTYPE)' => undef,
     'a(sed)' => \@sed,
     'os(get_type_func)' => undef,
+    'b(new_style)' => \$new_style
   };
 
   $self->_handle_get_args_results (Common::Shared::get_args \@args, $setup);
@@ -1335,10 +1360,16 @@ sub _on_wrap_enum ($)
     }
   }
 
+  my @identifier_prefixes = split (',', $namespace->get_a_c_identifier_prefixes ());
   my $gir_gtype = $enum->get_a_glib_get_type;
-  my $members = _extract_members $enum, \@substs;
+  my $members = _extract_members ($enum, \@substs, $new_style, \@identifier_prefixes);
 
-  Common::Output::Enum::output ($self, $cxx_type, $members, $flags, $gir_gtype);
+  Common::Output::Enum::output ($self,
+                                $cxx_type,
+                                $members,
+                                $flags,
+                                $gir_gtype,
+                                $new_style);
 }
 
 # TODO: move it outside handlers section
@@ -1377,6 +1408,7 @@ sub _on_wrap_gerror ($)
   my $cxx_type = Common::Util::string_trim (shift @args);
   my $c_type = Common::Util::string_trim (shift @args);
   my $enum = $namespace->get_g_enumeration_by_name ($c_type);
+  my @identifier_prefixes = split (',', $namespace->get_a_c_identifier_prefixes ());
 
   if (@args)
   {
@@ -1390,11 +1422,13 @@ sub _on_wrap_gerror ($)
   }
 
   my @sed = ();
+  my $new_style = 0;
   my $setup =
   {
     'ob(NO_GTYPE)' => undef,
     'a(sed)' => \@sed,
     'os(get_type_func)' => undef,
+    'b(new_style)' => \$new_style
   };
 
   $self->_handle_get_args_results (Common::Shared::get_args \@args, $setup);
@@ -1420,9 +1454,17 @@ sub _on_wrap_gerror ($)
 
   my $gir_gtype = $enum->get_a_glib_get_type;
   my $gir_domain = $enum->get_a_glib_error_domain;
-  my $members = _extract_members $enum, \@substs;
+  #my $members = _extract_members ($enum, \@substs, $new_style, \@identifier_prefixes);
+  # We are passing true for "new style" members - we are not afraid of name collisions
+  # in GError code enums. Also, it seems that the same was done in old gmmproc.
+  my $members = _extract_members ($enum, \@substs, 1, \@identifier_prefixes);
 
-  Common::Output::GError::output $self, $cxx_type, $members, $gir_domain, $gir_gtype;
+  Common::Output::GError::output ($self,
+                                  $cxx_type,
+                                  $members,
+                                  $gir_domain,
+                                  $gir_gtype,
+                                  $new_style);
 
   my $c_includes = _get_c_includes ($repository);
   my $cxx_includes = [join ('', '"', $self->get_base (), '.h"')];
