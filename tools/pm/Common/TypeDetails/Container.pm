@@ -107,7 +107,7 @@ sub get_string ($)
 {
   my ($self) = @_;
   my $contained_type = $self->_get_contained_type ();
-  my $sigil = self->_get_sigil ();
+  my $sigil = $self->_get_sigil ();
   my $basic_string = $self->get_basic_string ();
 
   return ($contained_type->get_string () . $sigil . ($basic_string ? ' ' . $basic_string : ''));

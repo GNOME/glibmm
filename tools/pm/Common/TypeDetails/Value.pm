@@ -215,8 +215,8 @@ sub equal ($$$)
 
   if (($flags & Common::TypeDetails::Base::BASE) == Common::TypeDetails::Base::BASE)
   {
-    my $self_base = $self->_get_base;
-    my $other_base = $self->_get_base;
+    my $self_base = $self->get_base ();
+    my $other_base = $other->get_base ();
 
     if ($self_base ne $other_base)
     {
