@@ -48,10 +48,9 @@ sub doxy_skip_end ()
   return '#endif // DOXYGEN_SHOULD_SKIP_THIS';
 }
 
-sub open_namespaces ($)
+sub open_some_namespaces
 {
-  my ($wrap_parser) = @_;
-  my $namespaces = $wrap_parser->get_namespaces;
+  my ($namespaces) = @_;
   my $code_string = '';
 
   foreach my $opened_name (@{$namespaces})
@@ -63,10 +62,16 @@ sub open_namespaces ($)
   return $code_string;
 }
 
-sub close_namespaces ($)
+sub open_namespaces
 {
   my ($wrap_parser) = @_;
-  my $namespaces = $wrap_parser->get_namespaces;
+
+  return open_some_namespaces ($wrap_parser->get_namespaces ());
+}
+
+sub close_some_namespaces
+{
+  my ($namespaces) = @_;
   my $code_string = '';
 
   foreach my $closed_name (reverse @{$namespaces})
@@ -75,6 +80,13 @@ sub close_namespaces ($)
                     nl ();
   }
   return $code_string;
+}
+
+sub close_namespaces
+{
+  my ($wrap_parser, $namespaces) = @_;
+
+  return close_some_namespaces ($wrap_parser->get_namespaces ());
 }
 
 sub get_first_class ($)
@@ -210,6 +222,7 @@ sub convert_members_to_strings ($)
   return \@strings;
 }
 
+# TODO: reorder the functions, so we don't have to declare them first.
 sub get_section ($$);
 sub get_variable ($$);
 
@@ -678,8 +691,7 @@ sub convzipstr ($$$$$)
   my $transfers_count = @{$transfers};
   my $substs_count = @{$substs};
 
-# TODO: throw runtime error or internal error or whatever.
-  #die if $from_types_count != $to_types_count or $to_types_count != $transfers_count or $transfers_count != $substs_count;
+# TODO: internal error.
   if ($from_types_count != $to_types_count)
   {
     $wrap_parser->fixed_error ('From types count should be equal to to types count.');

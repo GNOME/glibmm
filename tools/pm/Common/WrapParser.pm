@@ -773,6 +773,10 @@ sub _maybe_warn_about_refreturn ($$$$)
 sub _maybe_warn_about_errthrow ($$$)
 {
   my ($self, $throws, $errthrow) = @_;
+  my $module = $self->{'module'};
+  my @silent_modules = ('GLib-2.0', 'GModule-2.0');
+
+  return if ($module ~~ @silent_modules);
 
   if (not $throws and $errthrow)
   {
@@ -883,8 +887,7 @@ sub _on_wrap_method ($)
     shift (@{$c_param_types});
     shift (@{$c_param_transfers});
   }
-
-  if ($cxx_function->get_static () and not $is_a_function)
+  elsif ($cxx_function->get_static () and not $is_a_function)
   {
     if (index ($c_function_name, '_new') >= 0)
     {
@@ -1427,7 +1430,7 @@ sub _on_wrap_gerror ($)
   {
     my $arg = $args[0];
 
-    if ($arg ne 'NO_GTYPE' and $arg !~ /^\s*s#[^#]+#[^#]*#\s*$/ and $arg !~ /^\s*get_type_func=.*$/)
+    if ($arg ne 'NO_GTYPE' and $arg !~ /^\s*s#[^#]*#[^#]*#\s*$/ and $arg !~ /^\s*get_type_func=.*$/ and $arg !~ '^sed')
     {
       $self->fixed_warning ('Domain parameter is deprecated.');
       shift @args;
@@ -2663,8 +2666,6 @@ sub _on_class_keyword ($)
   # declaration this is.
   foreach my $token (@{$tokens})
   {
-    next if (not defined $token or $token eq '');
-
     if ($in_s_comment)
     {
       if ($token eq "\n")
@@ -2693,6 +2694,7 @@ sub _on_class_keyword ($)
       my $classes = $self->get_classes;
       my $class_levels = $self->get_class_levels;
 
+# TODO: rather use type fixup
       $name =~ s/\s+//g;
       push @{$classes}, $name;
       push @{$class_levels}, $level + 1;
@@ -2716,7 +2718,7 @@ sub _on_class_keyword ($)
     {
       $colon_met = 1;
     }
-    elsif ($token !~ /\s/)
+    elsif ($token !~ /^\s+$/)
     {
       unless ($colon_met)
       {

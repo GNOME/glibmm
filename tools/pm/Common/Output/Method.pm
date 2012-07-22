@@ -209,7 +209,7 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
       unless ($ret_void)
       {
         $code_string .= nl () .
-                        nl ('return retvalue;');
+                        nl ('  return retvalue;');
       }
     }
     else
@@ -228,7 +228,8 @@ sub _output_cc ($$$$$$$$$$$$$$$$$)
       }
     }
   }
-  $code_string .= nl ('}');
+  $code_string .= nl ('}') .
+                  nl ();
   if ($ifdef)
   {
     $code_string .= nl ('#endif // ' . $ifdef);
