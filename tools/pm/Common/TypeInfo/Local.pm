@@ -83,8 +83,10 @@ sub _get_named_conversion ($$$$$)
     {
       my $to_section = $to_conversions->{$to};
       my $name = $to_section->{'names_stack'}[-1];
+      my $template = $to_section->{'transfers'}{$name}[$transfer];
 
-      return $to_section->{'transfers'}{$name}[$transfer];
+      $template =~ s/##ARG##/$subst/g;
+      return $template;
     }
   }
   return undef;
