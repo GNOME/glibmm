@@ -32,16 +32,34 @@ sub convert
   {
     when (Common::TypeInfo::Global::C_CXX ())
     {
+      if ($from_details->match_sigil (['c*'], Common::TypeDetails::Base::ACCESS_MODIFIERS))
+      {
+        if ($to_details->match_sigil ([''], Common::TypeDetails::Base::ACCESS_MODIFIERS))
+        {
+          my $base = $from_details->get_value_details ()->get_base ();
+
+          return 'Glib::wrap(const_cast< ' . $base . '* >(' . $subst . '), ' . (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? 'false' : 'true') . ')';
+        }
+      }
+
       if ($from_details->match_sigil (['*']) and $to_details->match_sigil (['']))
       {
-          return join ('', 'Glib::wrap(', $subst, ', ', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? 'true' : 'false'), ')');
+          return join ('', 'Glib::wrap(', $subst, ', ', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? 'false' : 'true'), ')');
       }
     }
     when (Common::TypeInfo::Global::CXX_C ())
     {
+      if ($from_details->match_sigil (['c&'], Common::TypeDetails::Base::ACCESS_MODIFIERS))
+      {
+        if ($to_details->match_sigil (['*'], Common::TypeDetails::Base::ACCESS_MODIFIERS))
+        {
+          return 'const_cast< ' . $to_details->get_string () . ' >(Glib::unwrap' . (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '_copy' : '') . '(' . $subst . '))';
+        }
+      }
+
       if ($from_details->match_sigil (['&']) and $to_details->match_sigil (['*']))
       {
-        return join ('', 'Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '' : '_copy'), '(', $subst, ')');
+        return join ('', 'Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '_copy' : ''), '(', $subst, ')');
       }
     }
     when (Common::TypeInfo::Global::C_CXX_CONTAINER ())

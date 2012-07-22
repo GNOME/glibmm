@@ -40,7 +40,7 @@ sub convert ($$$$$$)
       {
         if ($from_details->match_sigil (['*'], Common::TypeDetails::Base::ACCESS_MODIFIERS) and $to_details->match_sigil (['<>&', '<>', '<c>&', '<c>'], Common::TypeDetails::Base::ACCESS_MODIFIERS))
         {
-          return join ('', 'Glib::wrap(', $subst, ', ', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? 'true' : 'false'), ')');
+          return join ('', 'Glib::wrap(', $subst, ', ', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? 'false' : 'true'), ')');
         }
       }
     }
@@ -56,20 +56,20 @@ sub convert ($$$$$$)
         {
           if ($to_details->match_sigil (['*c']))
           {
-            return join ('', 'Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '' : '_copy'), '(', $subst, ')');
+            return join ('', 'Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '_copy' : ''), '(', $subst, ')');
           }
           elsif ($to_details->match_sigil (['*'], Common::TypeDetails::Base::ACCESS_MODIFIERS))
           {
             my $c_value_details = $to_details->get_value_details ();
             my $c_base = $c_value_details->get_base ();
 
-            return join ('', 'const_cast< ', $c_base, ' >(Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '' : '_copy'), '(', $subst, '))');
+            return join ('', 'const_cast< ', $c_base, ' >(Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '_copy' : ''), '(', $subst, '))');
           }
         }
 
         if ($from_details->match_sigil (['<>&', '<>', '<>c&', '<>c'], Common::TypeDetails::Base::ACCESS_MODIFIERS) and $to_details->match_sigil (['*', 'c*'], Common::TypeDetails::Base::ACCESS_MODIFIERS))
         {
-          return join ('', 'Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '' : '_copy'), '(', $subst, ')');
+          return join ('', 'Glib::unwrap', (($transfer > Common::TypeInfo::Common::TRANSFER_NONE) ? '_copy' : ''), '(', $subst, ')');
         }
       }
     }
