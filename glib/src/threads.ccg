@@ -135,6 +135,11 @@ void Mutex::unlock()
   g_mutex_unlock(&gobject_);
 }
 
+Mutex* wrap(GMutex* gobject)
+{
+  return reinterpret_cast<Mutex*>(gobject);
+}
+
 /**** Glib::RecMutex *******************************************************/
 
 RecMutex::RecMutex()
@@ -160,6 +165,11 @@ bool RecMutex::trylock()
 void RecMutex::unlock()
 {
   g_rec_mutex_unlock(&gobject_);
+}
+
+RecMutex* wrap(GRecMutex* gobject)
+{
+  return reinterpret_cast<RecMutex*>(gobject);
 }
 
 /**** Glib::RWLock ***************************************************/

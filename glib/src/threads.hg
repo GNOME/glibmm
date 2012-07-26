@@ -222,7 +222,19 @@ private:
   Mutex::Lock& operator=(const Mutex::Lock&);
 };
 
-//TODO: Docuemenation
+/** A C++ wrapper for the C object.
+ * Do not use operator delete on the returned pointer. If the caller owns the
+ * GMutex object, the caller must destroy it in the same way as if this function
+ * had not been called.
+ *
+ * @param gobject The C instance.
+ * @result The GMutex* cast to a Glib::Threads::Mutex*.
+ *
+ * @relates Glib::Threads::Mutex
+ */
+Mutex* wrap(GMutex* gobject);
+
+//TODO: Documentation
 class RecMutex
 {
 public:
@@ -272,6 +284,17 @@ private:
   RecMutex::Lock& operator=(const RecMutex::Lock&);
 };
 
+/** A C++ wrapper for the C object.
+ * Do not use operator delete on the returned pointer. If the caller owns the
+ * GRecMutex object, the caller must destroy it in the same way as if this function
+ * had not been called.
+ *
+ * @param gobject The C instance.
+ * @result The GRecMutex* cast to a Glib::Threads::RecMutex*.
+ *
+ * @relates Glib::Threads::RecMutex
+ */
+RecMutex* wrap(GRecMutex* gobject);
 
 //TODO: Documentation
 class RWLock
