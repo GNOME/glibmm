@@ -8,6 +8,7 @@
 std::stringstream debug;
 std::ostream& ostr = debug;
 
+static void test_variant_floating();
 static void test_dynamic_cast();
 
 int main(int, char**)
@@ -119,6 +120,7 @@ int main(int, char**)
       " in the variant are: " << value << '.' << std::endl;
   }
 
+  test_variant_floating();
   test_dynamic_cast();
 
   return EXIT_SUCCESS;
@@ -302,4 +304,75 @@ static void test_dynamic_cast()
 
   test_dynamic_cast_ustring_types();
   test_dynamic_cast_string_types();
+}
+
+static GLogLevelFlags
+get_log_flags()
+{
+  return static_cast<GLogLevelFlags>(static_cast<unsigned>(G_LOG_LEVEL_CRITICAL) | static_cast<unsigned>(G_LOG_LEVEL_WARNING));
+}
+
+struct WarnCatcher
+{
+  WarnCatcher(const std::string& domain)
+    : m_domain(domain)
+    , m_old_flags(g_log_set_fatal_mask(m_domain.c_str(), get_log_flags()))
+  {}
+
+  ~WarnCatcher()
+  {
+    g_log_set_fatal_mask(m_domain.c_str(), m_old_flags);
+  }
+
+  std::string m_domain;
+  GLogLevelFlags m_old_flags;
+};
+
+static void test_variant_floating()
+{
+  WarnCatcher warn_catcher("GLib");
+
+  {
+    GVariant* cv = g_variant_new("i", 42);
+    Glib::VariantBase cxxv = Glib::wrap(cv, false);
+
+    g_assert(!cxxv.is_floating());
+  }
+
+  {
+    GVariant* cv = g_variant_new("i", 42);
+    Glib::VariantBase cxxv = Glib::wrap(cv, true);
+
+    g_assert(!cxxv.is_floating());
+
+    g_variant_unref(cv);
+  }
+
+  {
+    GVariant* cv = g_variant_new("i", 42);
+
+    if (g_variant_is_floating(cv))
+    {
+      g_variant_ref_sink(cv);
+    }
+
+    Glib::VariantBase cxxv = Glib::wrap(cv, false);
+
+    g_assert(!cxxv.is_floating());
+  }
+
+  {
+    GVariant* cv = g_variant_new("i", 42);
+
+    if (g_variant_is_floating(cv))
+    {
+      g_variant_ref_sink(cv);
+    }
+
+    Glib::VariantBase cxxv = Glib::wrap(cv, true);
+
+    g_assert(!cxxv.is_floating());
+
+    g_variant_unref(cv);
+  }
 }
