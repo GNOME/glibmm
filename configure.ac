@@ -60,7 +60,7 @@ AS_IF([test "x$enable_static" = xyes],
   AC_DEFINE([GIOMM_STATIC_LIB],  [1], [Define if giomm is built as a static library])
 ])
 
-glibreq='2.0 >= 2.33.3'
+glibreq='2.0 >= 2.33.4'
 
 GLIBMM_MODULES="sigc++-2.0 >= 2.2.10 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
 GIOMM_MODULES="$GLIBMM_MODULES gio-$glibreq"
