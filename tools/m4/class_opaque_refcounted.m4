@@ -169,7 +169,7 @@ ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
 protected:
   // Do not derive this.  __NAMESPACE__::__CPPNAME__ can neither be constructed nor deleted.
   __CPPNAME__`'();
-  void operator delete(void*, size_t);
+  void operator delete(void*, std::size_t);
 
 private:
   // noncopyable
