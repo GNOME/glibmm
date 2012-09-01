@@ -2433,6 +2433,52 @@ blocking the operation.
 <return></return>
 </signal>
 
+<signal name="GMountOperation::show-unmount-progress">
+<description>
+Emitted when an unmount operation has been busy for more than some time
+(typically 1.5 seconds).
+
+When unmounting or ejecting a volume, the kernel might need to flush
+pending data in its buffers to the volume stable storage, and this operation
+can take a considerable amount of time. This signal may be emitted several
+times as long as the unmount operation is outstanding, and then one
+last time when the operation is completed, with @bytes_left set to zero.
+
+Implementations of GMountOperation should handle this signal by
+showing an UI notification, and then dismiss it, or show another notification
+of completion, when @bytes_left reaches zero.
+
+If the message contains a line break, the first line should be
+presented as a heading. For example, it may be used as the
+primary text in a #GtkMessageDialog.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="op">
+<parameter_description> a #GMountOperation:
+</parameter_description>
+</parameter>
+<parameter name="message">
+<parameter_description> string containing a mesage to display to the user
+</parameter_description>
+</parameter>
+<parameter name="time_left">
+<parameter_description> the estimated time left before the operation completes,
+in microseconds, or -1
+</parameter_description>
+</parameter>
+<parameter name="bytes_left">
+<parameter_description> the amount of bytes to be written before the operation
+completes (or -1 if such amount is not known), or zero if the operation
+is completed
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GNetworkMonitor::network-changed">
 <description>
 Emitted when the network configuration changes. If @available is
@@ -13455,6 +13501,295 @@ Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-i
 </return>
 </function>
 
+<function name="foo_igen_naming_get_type_">
+<description>
+Gets the value of the &lt;link linkend=&quot;gdbus-property-Naming.Type&quot;&gt;&quot;Type&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is both readable and writable, it is meaningful to use this function on both the client- and service-side.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #FooiGenNaming.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value.
+</return>
+</function>
+
+<function name="foo_igen_naming_interface_info">
+<description>
+Gets a machine-readable description of the &lt;link linkend=&quot;gdbus-interface-Naming.top_of_page&quot;&gt;Naming&lt;/link&gt; D-Bus interface.
+
+
+</description>
+<parameters>
+</parameters>
+<return> A #GDBusInterfaceInfo. Do not free.
+</return>
+</function>
+
+<function name="foo_igen_naming_override_properties">
+<description>
+Overrides all #GObject properties in the #FooiGenNaming interface for a concrete class.
+The properties are overridden in the order they are defined.
+
+
+</description>
+<parameters>
+<parameter name="klass">
+<parameter_description> The class structure for a #GObject&lt;!-- --&gt;-derived class.
+</parameter_description>
+</parameter>
+<parameter name="property_id_begin">
+<parameter_description> The property id to assign to the first overridden property.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The last property id.
+</return>
+</function>
+
+<function name="foo_igen_naming_proxy_new">
+<description>
+Asynchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-Naming.top_of_page&quot;&gt;Naming&lt;/link&gt;. See g_dbus_proxy_new() for more details.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call foo_igen_naming_proxy_new_finish() to get the result of the operation.
+
+See foo_igen_naming_proxy_new_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="foo_igen_naming_proxy_new_finish">
+<description>
+Finishes an operation started with foo_igen_naming_proxy_new().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to foo_igen_naming_proxy_new().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="foo_igen_naming_proxy_new_for_bus">
+<description>
+Like foo_igen_naming_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call foo_igen_naming_proxy_new_for_bus_finish() to get the result of the operation.
+
+See foo_igen_naming_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="foo_igen_naming_proxy_new_for_bus_finish">
+<description>
+Finishes an operation started with foo_igen_naming_proxy_new_for_bus().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to foo_igen_naming_proxy_new_for_bus().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="foo_igen_naming_proxy_new_for_bus_sync">
+<description>
+Like foo_igen_naming_proxy_new_sync() but takes a #GBusType instead of a #GDBusConnection.
+
+The calling thread is blocked until a reply is received.
+
+See foo_igen_naming_proxy_new_for_bus() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="foo_igen_naming_proxy_new_sync">
+<description>
+Synchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-Naming.top_of_page&quot;&gt;Naming&lt;/link&gt;. See g_dbus_proxy_new_sync() for more details.
+
+The calling thread is blocked until a reply is received.
+
+See foo_igen_naming_proxy_new() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="foo_igen_naming_set_type_">
+<description>
+Sets the &lt;link linkend=&quot;gdbus-property-Naming.Type&quot;&gt;&quot;Type&quot;&lt;/link&gt; D-Bus property to @value.
+
+Since this D-Bus property is both readable and writable, it is meaningful to use this function on both the client- and service-side.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #FooiGenNaming.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The value to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="foo_igen_naming_skeleton_new">
+<description>
+Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-Naming.top_of_page&quot;&gt;Naming&lt;/link&gt;.
+
+
+</description>
+<parameters>
+</parameters>
+<return> The skeleton object.
+</return>
+</function>
+
 <function name="foo_igen_object_get_authorize">
 <description>
 Gets the #FooiGenAuthorize instance for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-project-Authorize.top_of_page&quot;&gt;org.project.Authorize&lt;/link&gt; on @object, if any.
@@ -13648,6 +13983,22 @@ Gets the #FooiGenMethodThreads instance for the D-Bus interface &lt;link linkend
 </parameter>
 </parameters>
 <return> A #FooiGenMethodThreads that must be freed with g_object_unref() or %NULL if @object does not implement the interface.
+</return>
+</function>
+
+<function name="foo_igen_object_get_naming">
+<description>
+Gets the #FooiGenNaming instance for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-Naming.top_of_page&quot;&gt;Naming&lt;/link&gt; on @object, if any.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #FooiGenObject.
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #FooiGenNaming that must be freed with g_object_unref() or %NULL if @object does not implement the interface.
 </return>
 </function>
 
@@ -14171,6 +14522,24 @@ Like foo_igen_object_get_method_threads() but doesn't increase the reference cou
 </return>
 </function>
 
+<function name="foo_igen_object_peek_naming">
+<description>
+Like foo_igen_object_get_naming() but doesn't increase the reference count on the returned object.
+
+&lt;warning&gt;It is not safe to use the returned object if you are on another thread than the one where the #GDBusObjectManagerClient or #GDBusObjectManagerServer for @object is running.&lt;/warning&gt;
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #FooiGenObject.
+</parameter_description>
+</parameter>
+</parameters>
+<return> A #FooiGenNaming or %NULL if @object does not implement the interface. Do not free the returned object, it is owned by @object.
+</return>
+</function>
+
 <function name="foo_igen_object_peek_oldie_interface">
 <description>
 Like foo_igen_object_get_oldie_interface() but doesn't increase the reference count on the returned object.
@@ -14495,6 +14864,24 @@ Sets the #FooiGenMethodThreads instance for the D-Bus interface &lt;link linkend
 </parameter>
 <parameter name="interface_">
 <parameter_description> A #FooiGenMethodThreads or %NULL to clear the interface.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="foo_igen_object_skeleton_set_naming">
+<description>
+Sets the #FooiGenNaming instance for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-Naming.top_of_page&quot;&gt;Naming&lt;/link&gt; on @object.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #FooiGenObjectSkeleton.
+</parameter_description>
+</parameter>
+<parameter name="interface_">
+<parameter_description> A #FooiGenNaming or %NULL to clear the interface.
 </parameter_description>
 </parameter>
 </parameters>
@@ -19242,6 +19629,63 @@ Gets the user data from a #GAsyncResult.
 </parameter>
 </parameters>
 <return> the user data for @res.
+</return>
+</function>
+
+<function name="g_async_result_is_tagged">
+<description>
+Checks if @result has the given @source_tag (generally a function
+pointer indicating the function @result was created by).
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="source_tag">
+<parameter_description> an application-defined tag
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @result has the indicated @source_tag, %FALSE if
+not.
+
+</return>
+</function>
+
+<function name="g_async_result_legacy_propagate_error">
+<description>
+If @result is a #GSimpleAsyncResult, this is equivalent to
+g_simple_async_result_propagate_error(). Otherwise it returns
+%FALSE.
+
+This can be used for legacy error handling in async
+&lt;literal&gt;_finish ()&lt;/literal&gt; wrapper functions that traditionally
+handled #GSimpleAsyncResult error returns themselves rather than
+calling into the virtual method. This should not be used in new
+code; #GAsyncResult errors that are set by virtual methods should
+also be extracted by virtual methods, to enable subclasses to chain
+up correctly.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="dest">
+<parameter_description> a location to propagate the error to.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @error is has been filled in with an error from
+@res, %FALSE if not.
+
 </return>
 </function>
 
@@ -26283,32 +26727,32 @@ The contents of the description has no ABI guarantees, the contents
 and formatting is subject to change at any time. Typical output
 looks something like this:
 &lt;programlisting&gt;
-Type:    method-call
-Flags:   none
-Version: 0
-Serial:  4
-Headers:
+Type&colon;    method-call
+Flags&colon;   none
+Version&colon; 0
+Serial&colon;  4
+Headers&colon;
 path -&gt; objectpath '/org/gtk/GDBus/TestObject'
 interface -&gt; 'org.gtk.GDBus.TestInterface'
 member -&gt; 'GimmeStdout'
 destination -&gt; ':1.146'
-Body: ()
+Body&colon; ()
 UNIX File Descriptors:
 (none)
 &lt;/programlisting&gt;
 or
 &lt;programlisting&gt;
-Type:    method-return
-Flags:   no-reply-expected
-Version: 0
-Serial:  477
-Headers:
+Type&colon;    method-return
+Flags&colon;   no-reply-expected
+Version&colon; 0
+Serial&colon;  477
+Headers&colon;
 reply-serial -&gt; uint32 4
 destination -&gt; ':1.159'
 sender -&gt; ':1.146'
 num-unix-fds -&gt; uint32 1
-Body: ()
-UNIX File Descriptors:
+Body&colon; ()
+UNIX File Descriptors&colon;
 fd 12: dev=0:10,mode=020620,ino=5,uid=500,gid=5,rdev=136:2,size=0,atime=1273085037,mtime=1273085851,ctime=1272982635
 &lt;/programlisting&gt;
 
@@ -27223,6 +27667,9 @@ Since: 2.26
 <description>
 Parses @xml_data and returns a #GDBusNodeInfo representing the data.
 
+The introspection XML must contain exactly one top-level
+&lt;tag class=&quot;starttag&quot;&gt;node&lt;/tag&gt; element.
+
 Note that this routine is using a
 &lt;link linkend=&quot;glib-Simple-XML-Subset-Parser.description&quot;&gt;GMarkup&lt;/link&gt;-based
 parser that only accepts a subset of valid XML documents.
@@ -27863,6 +28310,28 @@ Since: 2.30
 <return> A #GDBusConnection object or %NULL if
 @manager isn't exported on a connection. The returned object should
 be freed with g_object_unref().
+
+</return>
+</function>
+
+<function name="g_dbus_object_manager_server_is_exported">
+<description>
+Returns whether @object is currently exported on @manager.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="manager">
+<parameter_description> A #GDBusObjectManagerServer.
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> An object.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @object is exported
 
 </return>
 </function>
@@ -30373,37 +30842,38 @@ Since: 2.18
 
 <function name="g_file_append_to">
 <description>
-Gets an output stream for appending data to the file. If
-the file doesn't already exist it is created.
+Gets an output stream for appending data to the file.
+If the file doesn't already exist it is created.
 
 By default files created are generally readable by everyone,
 but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
 will be made readable only to the current user, to the level that
 is supported on the target filesystem.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+If @cancellable is not %NULL, then the operation can be cancelled
+by triggering the cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+returned.
 
-Some file systems don't allow all file names, and may
-return an %G_IO_ERROR_INVALID_FILENAME error.
-If the file is a directory the %G_IO_ERROR_IS_DIRECTORY error will be
-returned. Other errors are possible too, and depend on what kind of
-filesystem the file is on.
+Some file systems don't allow all file names, and may return an
+%G_IO_ERROR_INVALID_FILENAME error. If the file is a directory the
+%G_IO_ERROR_IS_DIRECTORY error will be returned. Other errors are
+possible too, and depend on what kind of filesystem the file is on.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -30423,30 +30893,33 @@ Asynchronously opens @file for appending.
 For more details, see g_file_append_to() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_append_to_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_append_to_finish() to get the result
+of the operation.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request. 
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -30459,14 +30932,14 @@ of the request.
 
 <function name="g_file_append_to_finish">
 <description>
-Finishes an asynchronous file append operation started with 
-g_file_append_to_async(). 
+Finishes an asynchronous file append operation started with
+g_file_append_to_async().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
@@ -30478,7 +30951,8 @@ g_file_append_to_async().
 </parameter_description>
 </parameter>
 </parameters>
-<return> a valid #GFileOutputStream or %NULL on error.
+<return> a valid #GFileOutputStream
+or %NULL on error.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -30813,25 +31287,25 @@ If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-If @progress_callback is not %NULL, then the operation can be monitored by
-setting this to a #GFileProgressCallback function. @progress_callback_data
-will be passed to this function. It is guaranteed that this callback will
-be called after all data has been transferred with the total number of bytes
-copied during the operation.
+If @progress_callback is not %NULL, then the operation can be monitored
+by setting this to a #GFileProgressCallback function.
+@progress_callback_data will be passed to this function. It is guaranteed
+that this callback will be called after all data has been transferred with
+the total number of bytes copied during the operation.
 
-If the @source file does not exist then the G_IO_ERROR_NOT_FOUND
-error is returned, independent on the status of the @destination.
+If the @source file does not exist, then the %G_IO_ERROR_NOT_FOUND error
+is returned, independent on the status of the @destination.
 
-If #G_FILE_COPY_OVERWRITE is not specified and the target exists, then the
-error G_IO_ERROR_EXISTS is returned.
+If #G_FILE_COPY_OVERWRITE is not specified and the target exists, then
+the error %G_IO_ERROR_EXISTS is returned.
 
-If trying to overwrite a file over a directory the G_IO_ERROR_IS_DIRECTORY
+If trying to overwrite a file over a directory, the %G_IO_ERROR_IS_DIRECTORY
 error is returned. If trying to overwrite a directory with a directory the
-G_IO_ERROR_WOULD_MERGE error is returned.
+%G_IO_ERROR_WOULD_MERGE error is returned.
 
 If the source is a directory and the target does not exist, or
 #G_FILE_COPY_OVERWRITE is specified and the target is a file, then the
-G_IO_ERROR_WOULD_RECURSE error is returned.
+%G_IO_ERROR_WOULD_RECURSE error is returned.
 
 If you are interested in copying the #GFile object itself (not the on-disk
 file), see g_file_dup().
@@ -30840,7 +31314,7 @@ file), see g_file_dup().
 </description>
 <parameters>
 <parameter name="source">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="destination">
@@ -30852,7 +31326,8 @@ file), see g_file_dup().
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="progress_callback">
@@ -30888,7 +31363,7 @@ g_file_copy_finish() to get the result of the operation.
 </description>
 <parameters>
 <parameter name="source">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="destination">
@@ -30905,7 +31380,8 @@ of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="progress_callback">
@@ -30931,7 +31407,7 @@ information, or %NULL if progress information is not needed
 
 <function name="g_file_copy_attributes">
 <description>
-Copies the file attributes from @source to @destination. 
+Copies the file attributes from @source to @destination.
 
 Normally only a subset of the file attributes are copied,
 those that are copies in a normal file copy operation
@@ -30944,44 +31420,45 @@ is useful when implementing move by copy + delete source.
 </description>
 <parameters>
 <parameter name="source">
-<parameter_description> a #GFile with attributes.
+<parameter_description> a #GFile with attributes
 </parameter_description>
 </parameter>
 <parameter name="destination">
-<parameter_description> a #GFile to copy attributes to.
+<parameter_description> a #GFile to copy attributes to
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCopyFlags.
+<parameter_description> a set of #GFileCopyFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, %NULL to ignore.
+<parameter_description> a #GError, %NULL to ignore
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the attributes were copied successfully, %FALSE otherwise.
+<return> %TRUE if the attributes were copied successfully,
+%FALSE otherwise.
 </return>
 </function>
 
 <function name="g_file_copy_finish">
 <description>
-Finishes copying the file started with 
-g_file_copy_async().
+Finishes copying the file started with g_file_copy_async().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -31000,34 +31477,35 @@ The file must not already exist.
 
 By default files created are generally readable by everyone,
 but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
-will be made readable only to the current user, to the level that
-is supported on the target filesystem.
+will be made readable only to the current user, to the level
+that is supported on the target filesystem.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+If @cancellable is not %NULL, then the operation can be cancelled
+by triggering the cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+returned.
 
-If a file or directory with this name already exists the G_IO_ERROR_EXISTS
-error will be returned.
-Some file systems don't allow all file names, and may
-return an G_IO_ERROR_INVALID_FILENAME error, and if the name
-is to long G_IO_ERROR_FILENAME_TOO_LONG will be returned.
-Other errors are possible too, and depend on what kind of
-filesystem the file is on.
+If a file or directory with this name already exists the
+%G_IO_ERROR_EXISTS error will be returned. Some file systems don't
+allow all file names, and may return an %G_IO_ERROR_INVALID_FILENAME
+error, and if the name is to long %G_IO_ERROR_FILENAME_TOO_LONG will
+be returned. Other errors are possible too, and depend on what kind
+of filesystem the file is on.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -31035,44 +31513,47 @@ filesystem the file is on.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileOutputStream for the newly created file, or 
-%NULL on error.
+<return> a #GFileOutputStream for the newly created
+file, or %NULL on error.
 Free the returned object with g_object_unref().
 </return>
 </function>
 
 <function name="g_file_create_async">
 <description>
-Asynchronously creates a new file and returns an output stream for writing to it.
-The file must not already exist.
+Asynchronously creates a new file and returns an output stream
+for writing to it. The file must not already exist.
 
 For more details, see g_file_create() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_create_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_create_finish() to get the result
+of the operation.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request.
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31085,18 +31566,18 @@ of the request.
 
 <function name="g_file_create_finish">
 <description>
-Finishes an asynchronous file create operation started with 
-g_file_create_async(). 
+Finishes an asynchronous file create operation started with
+g_file_create_async().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -31111,27 +31592,29 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_create_readwrite">
 <description>
-Creates a new file and returns a stream for reading and writing to it.
-The file must not already exist.
+Creates a new file and returns a stream for reading and
+writing to it. The file must not already exist.
 
 By default files created are generally readable by everyone,
 but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
-will be made readable only to the current user, to the level that
-is supported on the target filesystem.
+will be made readable only to the current user, to the level
+that is supported on the target filesystem.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
+If @cancellable is not %NULL, then the operation can be cancelled
+by triggering the cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+returned.
 
-If a file or directory with this name already exists the %G_IO_ERROR_EXISTS
-error will be returned. Some file systems don't allow all file names,
-and may return an %G_IO_ERROR_INVALID_FILENAME error, and if the name
-is too long, %G_IO_ERROR_FILENAME_TOO_LONG will be returned. Other errors
-are possible too, and depend on what kind of filesystem the file is on.
+If a file or directory with this name already exists, the
+%G_IO_ERROR_EXISTS error will be returned. Some file systems don't
+allow all file names, and may return an %G_IO_ERROR_INVALID_FILENAME
+error, and if the name is too long, %G_IO_ERROR_FILENAME_TOO_LONG
+will be returned. Other errors are possible too, and depend on what
+kind of filesystem the file is on.
 
-Note that in many non-local file cases read and write streams are not
-supported, so make sure you really need to do read and write streaming,
-rather than just opening for reading or writing.
+Note that in many non-local file cases read and write streams are
+not supported, so make sure you really need to do read and write
+streaming, rather than just opening for reading or writing.
 
 Since: 2.22
 
@@ -31146,7 +31629,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -31154,7 +31638,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileIOStream for the newly created file, or %NULL on error.
+<return> a #GFileIOStream for the newly created
+file, or %NULL on error.
 Free the returned object with g_object_unref().
 
 </return>
@@ -31162,14 +31647,15 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_create_readwrite_async">
 <description>
-Asynchronously creates a new file and returns a stream for reading and
-writing to it. The file must not already exist.
+Asynchronously creates a new file and returns a stream
+for reading and writing to it. The file must not already exist.
 
 For more details, see g_file_create_readwrite() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then
-call g_file_create_readwrite_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_create_readwrite_finish() to get
+the result of the operation.
 
 Since: 2.22
 
@@ -31189,11 +31675,13 @@ of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31234,32 +31722,96 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_delete">
 <description>
-Deletes a file. If the @file is a directory, it will only be deleted if it 
-is empty.
+Deletes a file. If the @file is a directory, it will only be
+deleted if it is empty. This has the same semantics as g_unlink().
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 Virtual: delete_file
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, or %NULL 
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
 <return> %TRUE if the file was deleted. %FALSE otherwise.
 </return>
+</function>
+
+<function name="g_file_delete_async">
+<description>
+Asynchronously delete a file. If the @file is a directory, it will
+only be deleted if it is empty.  This has the same semantics as
+g_unlink().
+
+Virtual: delete_file_async
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_delete_finish">
+<description>
+Finishes deleting a file started with g_file_delete_async().
+
+Virtual: delete_file_finish
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_file_descriptor_based_get_fd">
@@ -31282,41 +31834,42 @@ Since: 2.24
 
 <function name="g_file_dup">
 <description>
-Duplicates a #GFile handle. This operation does not duplicate 
-the actual file or directory represented by the #GFile; see 
-g_file_copy() if attempting to copy a file. 
+Duplicates a #GFile handle. This operation does not duplicate
+the actual file or directory represented by the #GFile; see
+g_file_copy() if attempting to copy a file.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new #GFile that is a duplicate of the given #GFile. 
+<return> a new #GFile that is a duplicate
+of the given #GFile.
 </return>
 </function>
 
 <function name="g_file_eject_mountable">
 <description>
-Starts an asynchronous eject on a mountable.  
+Starts an asynchronous eject on a mountable.
 When this operation has completed, @callback will be called with
-@user_user data, and the operation can be finalized with 
+@user_user data, and the operation can be finalized with
 g_file_eject_mountable_finish().
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 Deprecated: 2.22: Use g_file_eject_mountable_with_operation() instead.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -31324,11 +31877,13 @@ Deprecated: 2.22: Use g_file_eject_mountable_with_operation() instead.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31341,19 +31896,20 @@ Deprecated: 2.22: Use g_file_eject_mountable_with_operation() instead.
 
 <function name="g_file_eject_mountable_finish">
 <description>
-Finishes an asynchronous eject operation started by 
+Finishes an asynchronous eject operation started by
 g_file_eject_mountable().
 
-Deprecated: 2.22: Use g_file_eject_mountable_with_operation_finish() instead.
+Deprecated: 2.22: Use g_file_eject_mountable_with_operation_finish()
+instead.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -31361,8 +31917,8 @@ Deprecated: 2.22: Use g_file_eject_mountable_with_operation_finish() instead.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @file was ejected successfully. %FALSE 
-otherwise.
+<return> %TRUE if the @file was ejected successfully.
+%FALSE otherwise.
 
 </return>
 </function>
@@ -31383,7 +31939,7 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -31391,15 +31947,18 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="mount_operation">
-<parameter_description> a #GMountOperation, or %NULL to avoid user interaction.
+<parameter_description> a #GMountOperation,
+or %NULL to avoid user interaction
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31420,11 +31979,11 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -31432,96 +31991,103 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @file was ejected successfully. %FALSE
-otherwise.
+<return> %TRUE if the @file was ejected successfully.
+%FALSE otherwise.
 
 </return>
 </function>
 
 <function name="g_file_enumerate_children">
 <description>
-Gets the requested information about the files in a directory. The result
-is a #GFileEnumerator object that will give out #GFileInfo objects for
-all the files in the directory.
+Gets the requested information about the files in a directory.
+The result is a #GFileEnumerator object that will give out
+#GFileInfo objects for all the files in the directory.
 
-The @attributes value is a string that specifies the file attributes that
-should be gathered. It is not an error if it's not possible to read a particular
-requested attribute from a file - it just won't be set. @attributes should
-be a comma-separated list of attributes or attribute wildcards. The wildcard &quot;*&quot;
-means all attributes, and a wildcard like &quot;standard::*&quot; means all attributes in the standard
-namespace. An example attribute query be &quot;standard::*,owner::user&quot;.
-The standard attributes are available as defines, like #G_FILE_ATTRIBUTE_STANDARD_NAME.
+The @attributes value is a string that specifies the file
+attributes that should be gathered. It is not an error if
+it's not possible to read a particular requested attribute
+from a file - it just won't be set. @attributes should
+be a comma-separated list of attributes or attribute wildcards.
+The wildcard &quot;*&quot; means all attributes, and a wildcard like
+&quot;standard::*&quot; means all attributes in the standard namespace.
+An example attribute query be &quot;standard::*,owner::user&quot;.
+The standard attributes are available as defines, like
+#G_FILE_ATTRIBUTE_STANDARD_NAME.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+If @cancellable is not %NULL, then the operation can be cancelled
+by triggering the cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+returned.
 
-If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
-If the file is not a directory, the G_FILE_ERROR_NOTDIR error will be returned.
-Other errors are possible too.
+If the file does not exist, the %G_IO_ERROR_NOT_FOUND error will
+be returned. If the file is not a directory, the %G_FILE_ERROR_NOTDIR
+error will be returned. Other errors are possible too.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attributes">
-<parameter_description> an attribute query string.
+<parameter_description> an attribute query string
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileQueryInfoFlags.
+<parameter_description> a set of #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> #GError for error reporting.
+<parameter_description> #GError for error reporting
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GFileEnumerator if successful, %NULL on error. 
-Free the returned object with g_object_unref().
+<return> A #GFileEnumerator if successful,
+%NULL on error. Free the returned object with g_object_unref().
 </return>
 </function>
 
 <function name="g_file_enumerate_children_async">
 <description>
-Asynchronously gets the requested information about the files in a directory. The result
-is a #GFileEnumerator object that will give out #GFileInfo objects for
-all the files in the directory.
+Asynchronously gets the requested information about the files
+in a directory. The result is a #GFileEnumerator object that will
+give out #GFileInfo objects for all the files in the directory.
 
 For more details, see g_file_enumerate_children() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_enumerate_children_finish() to get the result of the operation.
+When the operation is finished, @callback will be called. You can
+then call g_file_enumerate_children_finish() to get the result of
+the operation.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attributes">
-<parameter_description> an attribute query string.
+<parameter_description> an attribute query string
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileQueryInfoFlags.
+<parameter_description> a set of #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request.
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -31546,19 +32112,20 @@ See g_file_enumerate_children_async().
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileEnumerator or %NULL if an error occurred.
+<return> a #GFileEnumerator or %NULL
+if an error occurred.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -31841,22 +32408,23 @@ Sets the file enumerator as having pending operations.
 
 <function name="g_file_equal">
 <description>
-Checks equality of two given #GFile&lt;!-- --&gt;s. Note that two
-#GFile&lt;!-- --&gt;s that differ can still refer to the same
+Checks equality of two given #GFiles.
+
+Note that two #GFiles that differ can still refer to the same
 file on the filesystem due to various forms of filename
 aliasing.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file1">
-<parameter_description> the first #GFile.
+<parameter_description> the first #GFile
 </parameter_description>
 </parameter>
 <parameter name="file2">
-<parameter_description> the second #GFile.
+<parameter_description> the second #GFile
 </parameter_description>
 </parameter>
 </parameters>
@@ -31867,33 +32435,35 @@ This call does no blocking i/o.
 
 <function name="g_file_find_enclosing_mount">
 <description>
-Gets a #GMount for the #GFile. 
+Gets a #GMount for the #GFile.
 
-If the #GFileIface for @file does not have a mount (e.g. possibly a 
-remote share), @error will be set to %G_IO_ERROR_NOT_FOUND and %NULL
-will be returned.
+If the #GFileIface for @file does not have a mount (e.g.
+possibly a remote share), @error will be set to %G_IO_ERROR_NOT_FOUND
+and %NULL will be returned.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError. 
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GMount where the @file is located or %NULL on error.
+<return> a #GMount where the @file is located
+or %NULL on error.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -31905,8 +32475,9 @@ Asynchronously gets the mount for the file.
 For more details, see g_file_find_enclosing_mount() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_find_enclosing_mount_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_find_enclosing_mount_finish() to
+get the result of the operation.
 
 </description>
 <parameters>
@@ -31915,16 +32486,18 @@ g_file_find_enclosing_mount_finish() to get the result of the operation.
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request.
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -31937,7 +32510,7 @@ of the request.
 
 <function name="g_file_find_enclosing_mount_finish">
 <description>
-Finishes an asynchronous find mount request. 
+Finishes an asynchronous find mount request.
 See g_file_find_enclosing_mount_async().
 
 
@@ -31969,24 +32542,24 @@ If called for the top level of a system (such as the filesystem root
 or a uri like sftp://host/) it will return a single directory separator
 (and on Windows, possibly a drive letter).
 
-The base name is a byte string (*not* UTF-8). It has no defined encoding
+The base name is a byte string (not UTF-8). It has no defined encoding
 or rules other than it may not contain zero bytes.  If you want to use
 filenames in a user interface you should use the display name that you
 can get by requesting the %G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME
 attribute with g_file_query_info().
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> string containing the #GFile's base name, or %NULL 
-if given #GFile is invalid. The returned string should be 
+<return> string containing the #GFile's base name, or %NULL
+if given #GFile is invalid. The returned string should be
 freed with g_free() when no longer needed.
 </return>
 </function>
@@ -31999,17 +32572,17 @@ Note that the file with that specific name might not exist, but
 you can still have a #GFile that points to it. You can use this
 for instance to create that file.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="name">
-<parameter_description> string containing the child's basename.
+<parameter_description> string containing the child's basename
 </parameter_description>
 </parameter>
 </parameters>
@@ -32020,55 +32593,56 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_get_child_for_display_name">
 <description>
-Gets the child of @file for a given @display_name (i.e. a UTF8
-version of the name). If this function fails, it returns %NULL and @error will be 
-set. This is very useful when constructing a GFile for a new file
-and the user entered the filename in the user interface, for instance
-when you select a directory and type a filename in the file selector.
+Gets the child of @file for a given @display_name (i.e. a UTF-8
+version of the name). If this function fails, it returns %NULL
+and @error will be set. This is very useful when constructing a
+#GFile for a new file and the user entered the filename in the
+user interface, for instance when you select a directory and
+type a filename in the file selector.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="display_name">
-<parameter_description> string to a possible child.
+<parameter_description> string to a possible child
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> #GError.
+<parameter_description> return location for an error
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile to the specified child, or 
-%NULL if the display name couldn't be converted.  
+<return> a #GFile to the specified child, or
+%NULL if the display name couldn't be converted.
 Free the returned object with g_object_unref().
 </return>
 </function>
 
 <function name="g_file_get_parent">
 <description>
-Gets the parent directory for the @file. 
-If the @file represents the root directory of the 
+Gets the parent directory for the @file.
+If the @file represents the root directory of the
 file system, then %NULL will be returned.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile structure to the parent of the given
-#GFile or %NULL if there is no parent. 
-Free the returned object with g_object_unref().
+<return> a #GFile structure to the
+parent of the given #GFile or %NULL if there is
+no parent. Free the returned object with g_object_unref().
 </return>
 </function>
 
@@ -32084,65 +32658,67 @@ full-pathname kind of string in a user interface,
 like in a location entry.
 
 For local files with names that can safely be converted
-to UTF8 the pathname is used, otherwise the IRI is used
-(a form of URI that allows UTF8 characters unescaped).
+to UTF-8 the pathname is used, otherwise the IRI is used
+(a form of URI that allows UTF-8 characters unescaped).
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the #GFile's parse name. The returned 
-string should be freed with g_free() when no longer needed.
+<return> a string containing the #GFile's parse name.
+The returned string should be freed with g_free()
+when no longer needed.
 </return>
 </function>
 
 <function name="g_file_get_path">
 <description>
-Gets the local pathname for #GFile, if one exists. 
+Gets the local pathname for #GFile, if one exists.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> string containing the #GFile's path, or %NULL if 
-no such path exists. The returned string should be 
+<return> string containing the #GFile's path, or %NULL if
+no such path exists. The returned string should be
 freed with g_free() when no longer needed.
 </return>
 </function>
 
 <function name="g_file_get_relative_path">
 <description>
-Gets the path for @descendant relative to @parent. 
+Gets the path for @descendant relative to @parent.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="parent">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="descendant">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> string with the relative path from @descendant 
-to @parent, or %NULL if @descendant doesn't have @parent as prefix. 
-The returned string should be freed with g_free() when no longer needed.
+<return> string with the relative path from @descendant
+to @parent, or %NULL if @descendant doesn't have @parent
+as prefix. The returned string should be freed with g_free()
+when no longer needed.
 </return>
 </function>
 
@@ -32150,18 +32726,19 @@ The returned string should be freed with g_free() when no longer needed.
 <description>
 Gets the URI for the @file.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
 <return> a string containing the #GFile's URI.
-The returned string should be freed with g_free() when no longer needed.
+The returned string should be freed with g_free()
+when no longer needed.
 </return>
 </function>
 
@@ -32170,22 +32747,22 @@ The returned string should be freed with g_free() when no longer needed.
 Gets the URI scheme for a #GFile.
 RFC 3986 decodes the scheme as:
 &lt;programlisting&gt;
-URI = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ] 
+URI = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
 &lt;/programlisting&gt;
-Common schemes include &quot;file&quot;, &quot;http&quot;, &quot;ftp&quot;, etc. 
+Common schemes include &quot;file&quot;, &quot;http&quot;, &quot;ftp&quot;, etc.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the URI scheme for the given 
-#GFile. The returned string should be freed with g_free() 
+<return> a string containing the URI scheme for the given
+#GFile. The returned string should be freed with g_free()
 when no longer needed.
 </return>
 </function>
@@ -32219,14 +32796,16 @@ case that @parent is %NULL).
 
 <function name="g_file_has_prefix">
 <description>
-Checks whether @file has the prefix specified by @prefix. In other word, 
-if the names of initial elements of @file&lt;!-- --&gt;s pathname match @prefix.
-Only full pathname elements are matched, so a path like /foo is not
-considered a prefix of /foobar, only of /foo/bar.
+Checks whether @file has the prefix specified by @prefix.
 
-This call does no i/o, as it works purely on names. As such it can 
-sometimes return %FALSE even if @file is inside a @prefix (from a 
-filesystem point of view), because the prefix of @file is an alias 
+In other words, if the names of initial elements of @file's
+pathname match @prefix. Only full pathname elements are matched,
+so a path like /foo is not considered a prefix of /foobar, only
+of /foo/bar.
+
+This call does no I/O, as it works purely on names. As such it can
+sometimes return %FALSE even if @file is inside a @prefix (from a
+filesystem point of view), because the prefix of @file is an alias
 of @prefix.
 
 Virtual: prefix_matches
@@ -32234,15 +32813,15 @@ Virtual: prefix_matches
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="prefix">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return>  %TRUE if the @files's parent, grandparent, etc is @prefix. 
+<return>  %TRUE if the @files's parent, grandparent, etc is @prefix,
 %FALSE otherwise.
 </return>
 </function>
@@ -32251,17 +32830,17 @@ Virtual: prefix_matches
 <description>
 Checks to see if a #GFile has a given URI scheme.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="uri_scheme">
-<parameter_description> a string containing a URI scheme.
+<parameter_description> a string containing a URI scheme
 </parameter_description>
 </parameter>
 </parameters>
@@ -32275,20 +32854,20 @@ not supported, or #GFile is invalid.
 <description>
 Creates a hash value for a #GFile.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 Virtual: hash
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> #gconstpointer to a #GFile.
+<parameter_description> #gconstpointer to a #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> 0 if @file is not a valid #GFile, otherwise an 
-integer that can be used as hash value for the #GFile. 
-This function is intended for easily hashing a #GFile to 
+<return> 0 if @file is not a valid #GFile, otherwise an
+integer that can be used as hash value for the #GFile.
+This function is intended for easily hashing a #GFile to
 add to a #GHashTable or similar data structure.
 </return>
 </function>
@@ -33776,49 +34355,48 @@ A native file s one expressed in the platform-native filename format,
 e.g. &quot;C:\Windows&quot; or &quot;/usr/bin/&quot;. This does not mean the file is local,
 as it might be on a locally mounted remote filesystem.
 
-On some systems non-native files may be available using
-the native filesystem via a userspace filesystem (FUSE), in
-these cases this call will return %FALSE, but g_file_get_path()
-will still return a native path.
+On some systems non-native files may be available using the native
+filesystem via a userspace filesystem (FUSE), in these cases this call
+will return %FALSE, but g_file_get_path() will still return a native path.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if file is native. 
+<return> %TRUE if @file is native
 </return>
 </function>
 
 <function name="g_file_load_contents">
 <description>
-Loads the content of the file into memory. The data is always 
+Loads the content of the file into memory. The data is always
 zero-terminated, but this is not included in the resultant @length.
 The returned @content should be freed with g_free() when no longer
 needed.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object, %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="contents">
-<parameter_description> a location to place the contents of the file.
+<parameter_description> a location to place the contents of the file
 </parameter_description>
 </parameter>
 <parameter name="length">
@@ -33848,23 +34426,23 @@ Starts an asynchronous load of the @file's contents.
 For more details, see g_file_load_contents() which is
 the synchronous version of this call.
 
-When the load operation has completed, @callback will be called 
-with @user data. To finish the operation, call 
-g_file_load_contents_finish() with the #GAsyncResult returned by 
+When the load operation has completed, @callback will be called
+with @user data. To finish the operation, call
+g_file_load_contents_finish() with the #GAsyncResult returned by
 the @callback.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object, %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -33881,25 +34459,25 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 <function name="g_file_load_contents_finish">
 <description>
-Finishes an asynchronous load of the @file's contents. 
-The contents are placed in @contents, and @length is set to the 
+Finishes an asynchronous load of the @file's contents.
+The contents are placed in @contents, and @length is set to the
 size of the @contents string. The @content should be freed with
-g_free() when no longer needed. If @etag_out is present, it will be 
+g_free() when no longer needed. If @etag_out is present, it will be
 set to the new entity tag for the @file.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="contents">
-<parameter_description> a location to place the contents of the file.
+<parameter_description> a location to place the contents of the file
 </parameter_description>
 </parameter>
 <parameter name="length">
@@ -33917,37 +34495,38 @@ or %NULL if the entity tag is not needed
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the load was successful. If %FALSE and @error is 
-present, it will be set appropriately. 
+<return> %TRUE if the load was successful. If %FALSE and @error is
+present, it will be set appropriately.
 </return>
 </function>
 
 <function name="g_file_load_partial_contents_async">
 <description>
-Reads the partial contents of a file. A #GFileReadMoreCallback should be 
-used to stop reading from the file when appropriate, else this function
-will behave exactly as g_file_load_contents_async(). This operation 
-can be finished by g_file_load_partial_contents_finish().
+Reads the partial contents of a file. A #GFileReadMoreCallback should
+be used to stop reading from the file when appropriate, else this
+function will behave exactly as g_file_load_contents_async(). This
+operation can be finished by g_file_load_partial_contents_finish().
 
-Users of this function should be aware that @user_data is passed to 
+Users of this function should be aware that @user_data is passed to
 both the @read_more_callback and the @callback.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object, %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="read_more_callback">
-<parameter_description> a #GFileReadMoreCallback to receive partial data and to specify whether further data should be read.
+<parameter_description> a #GFileReadMoreCallback to receive partial data
+and to specify whether further data should be read
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -33955,7 +34534,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> the data to pass to the callback functions.
+<parameter_description> the data to pass to the callback functions
 </parameter_description>
 </parameter>
 </parameters>
@@ -33965,7 +34544,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 <function name="g_file_load_partial_contents_finish">
 <description>
 Finishes an asynchronous partial load operation that was started
-with g_file_load_partial_contents_async(). The data is always 
+with g_file_load_partial_contents_async(). The data is always
 zero-terminated, but this is not included in the resultant @length.
 The returned @content should be freed with g_free() when no longer
 needed.
@@ -33974,15 +34553,15 @@ needed.
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="contents">
-<parameter_description> a location to place the contents of the file.
+<parameter_description> a location to place the contents of the file
 </parameter_description>
 </parameter>
 <parameter name="length">
@@ -34000,19 +34579,19 @@ or %NULL if the entity tag is not needed
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the load was successful. If %FALSE and @error is 
-present, it will be set appropriately. 
+<return> %TRUE if the load was successful. If %FALSE and @error is
+present, it will be set appropriately.
 </return>
 </function>
 
 <function name="g_file_make_directory">
 <description>
-Creates a directory. Note that this will only create a child directory of
-the immediate parent directory of the path or URI given by the #GFile. To 
-recursively create directories, see g_file_make_directory_with_parents().
-This function will fail if the parent directory does not exist, setting 
-@error to %G_IO_ERROR_NOT_FOUND. If the file system doesn't support creating
-directories, this function will fail, setting @error to 
+Creates a directory. Note that this will only create a child directory
+of the immediate parent directory of the path or URI given by the #GFile.
+To recursively create directories, see g_file_make_directory_with_parents().
+This function will fail if the parent directory does not exist, setting
+@error to %G_IO_ERROR_NOT_FOUND. If the file system doesn't support
+creating directories, this function will fail, setting @error to
 %G_IO_ERROR_NOT_SUPPORTED.
 
 For a local #GFile the newly created directory will have the default
@@ -34020,21 +34599,22 @@ For a local #GFile the newly created directory will have the default
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, or %NULL 
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -34044,33 +34624,35 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 <function name="g_file_make_directory_with_parents">
 <description>
-Creates a directory and any parent directories that may not exist similar to
-'mkdir -p'. If the file system does not support creating directories, this
-function will fail, setting @error to %G_IO_ERROR_NOT_SUPPORTED. If the
-directory itself already exists, this function will fail setting @error
-to %G_IO_ERROR_EXISTS, unlike the similar g_mkdir_with_parents().
+Creates a directory and any parent directories that may not
+exist similar to 'mkdir -p'. If the file system does not support
+creating directories, this function will fail, setting @error to
+%G_IO_ERROR_NOT_SUPPORTED. If the directory itself already exists,
+this function will fail setting @error to %G_IO_ERROR_EXISTS, unlike
+the similar g_mkdir_with_parents().
 
 For a local #GFile the newly created directories will have the default
 (current) ownership and permissions of the current process.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 Since: 2.18
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, or %NULL 
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -34101,11 +34683,12 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
@@ -34115,12 +34698,12 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 <function name="g_file_monitor">
 <description>
-Obtains a file or directory monitor for the given file, depending
-on the type of the file.
+Obtains a file or directory monitor for the given file,
+depending on the type of the file.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 Since: 2.18
 
@@ -34135,7 +34718,8 @@ Since: 2.18
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -34143,7 +34727,8 @@ Since: 2.18
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileMonitor for the given @file, or %NULL on error.
+<return> a #GFileMonitor for the given @file,
+or %NULL on error.
 Free the returned object with g_object_unref().
 
 </return>
@@ -34172,30 +34757,32 @@ This may fail if directory monitoring is not supported.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 Virtual: monitor_dir
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileMonitorFlags.
+<parameter_description> a set of #GFileMonitorFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, or %NULL.
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileMonitor for the given @file, or %NULL on error.
+<return> a #GFileMonitor for the given @file,
+or %NULL on error.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -34239,29 +34826,31 @@ mechanism exists, then regular polling of the file is used.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileMonitorFlags.
+<parameter_description> a set of #GFileMonitorFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, or %NULL.
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileMonitor for the given @file, or %NULL on error.
+<return> a #GFileMonitor for the given @file,
+or %NULL on error.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -34304,20 +34893,21 @@ to poll for changes
 
 <function name="g_file_mount_enclosing_volume">
 <description>
-Starts a @mount_operation, mounting the volume that contains the file @location. 
+Starts a @mount_operation, mounting the volume that contains
+the file @location.
 
 When this operation has completed, @callback will be called with
-@user_user data, and the operation can be finalized with 
+@user_user data, and the operation can be finalized with
 g_file_mount_enclosing_volume_finish().
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 </description>
 <parameters>
 <parameter name="location">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -34325,15 +34915,18 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="mount_operation">
-<parameter_description> a #GMountOperation or %NULL to avoid user interaction.
+<parameter_description> a #GMountOperation
+or %NULL to avoid user interaction
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -34352,11 +34945,11 @@ Finishes a mount operation started by g_file_mount_enclosing_volume().
 </description>
 <parameters>
 <parameter name="location">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -34364,8 +34957,8 @@ Finishes a mount operation started by g_file_mount_enclosing_volume().
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if successful. If an error
-has occurred, this function will return %FALSE and set @error
+<return> %TRUE if successful. If an error has occurred,
+this function will return %FALSE and set @error
 appropriately if present.
 </return>
 </function>
@@ -34373,20 +34966,21 @@ appropriately if present.
 <function name="g_file_mount_mountable">
 <description>
 Mounts a file of type G_FILE_TYPE_MOUNTABLE.
-Using @mount_operation, you can request callbacks when, for instance, 
+Using @mount_operation, you can request callbacks when, for instance,
 passwords are needed during authentication.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_mount_mountable_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_mount_mountable_finish() to get
+the result of the operation.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -34394,15 +34988,18 @@ g_file_mount_mountable_finish() to get the result of the operation.
 </parameter_description>
 </parameter>
 <parameter name="mount_operation">
-<parameter_description> a #GMountOperation, or %NULL to avoid user interaction.
+<parameter_description> a #GMountOperation,
+or %NULL to avoid user interaction
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -34417,18 +35014,18 @@ g_file_mount_mountable_finish() to get the result of the operation.
 <description>
 Finishes a mount operation. See g_file_mount_mountable() for details.
 
-Finish an asynchronous mount operation that was started 
+Finish an asynchronous mount operation that was started
 with g_file_mount_mountable().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -34443,10 +35040,11 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_move">
 <description>
-Tries to move the file or directory @source to the location specified by @destination.
-If native move operations are supported then this is used, otherwise a copy + delete
-fallback is used. The native implementation may support moving directories (for instance
-on moves inside the same filesystem), but the fallback code does not.
+Tries to move the file or directory @source to the location specified
+by @destination. If native move operations are supported then this is
+used, otherwise a copy + delete fallback is used. The native
+implementation may support moving directories (for instance on moves
+inside the same filesystem), but the fallback code does not.
 
 If the flag #G_FILE_COPY_OVERWRITE is specified an already
 existing @destination file is overwritten.
@@ -34457,53 +35055,57 @@ will be copied as symlinks, otherwise the target of the
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-If @progress_callback is not %NULL, then the operation can be monitored by
-setting this to a #GFileProgressCallback function. @progress_callback_data
-will be passed to this function. It is guaranteed that this callback will
-be called after all data has been transferred with the total number of bytes
-copied during the operation.
+If @progress_callback is not %NULL, then the operation can be monitored
+by setting this to a #GFileProgressCallback function.
+@progress_callback_data will be passed to this function. It is
+guaranteed that this callback will be called after all data has been
+transferred with the total number of bytes copied during the operation.
 
-If the @source file does not exist then the G_IO_ERROR_NOT_FOUND
+If the @source file does not exist, then the %G_IO_ERROR_NOT_FOUND
 error is returned, independent on the status of the @destination.
 
-If #G_FILE_COPY_OVERWRITE is not specified and the target exists, then the
-error G_IO_ERROR_EXISTS is returned.
+If #G_FILE_COPY_OVERWRITE is not specified and the target exists,
+then the error %G_IO_ERROR_EXISTS is returned.
 
-If trying to overwrite a file over a directory the G_IO_ERROR_IS_DIRECTORY
+If trying to overwrite a file over a directory, the %G_IO_ERROR_IS_DIRECTORY
 error is returned. If trying to overwrite a directory with a directory the
-G_IO_ERROR_WOULD_MERGE error is returned.
+%G_IO_ERROR_WOULD_MERGE error is returned.
 
-If the source is a directory and the target does not exist, or #G_FILE_COPY_OVERWRITE is
-specified and the target is a file, then the G_IO_ERROR_WOULD_RECURSE error
-may be returned (if the native move operation isn't available).
+If the source is a directory and the target does not exist, or
+#G_FILE_COPY_OVERWRITE is specified and the target is a file, then
+the %G_IO_ERROR_WOULD_RECURSE error may be returned (if the native
+move operation isn't available).
 
 
 </description>
 <parameters>
 <parameter name="source">
-<parameter_description> #GFile pointing to the source location.
+<parameter_description> #GFile pointing to the source location
 </parameter_description>
 </parameter>
 <parameter name="destination">
-<parameter_description> #GFile pointing to the destination location.
+<parameter_description> #GFile pointing to the destination location
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> set of #GFileCopyFlags.
+<parameter_description> set of #GFileCopyFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="progress_callback">
-<parameter_description> #GFileProgressCallback function for updates.
+<parameter_description> #GFileProgressCallback
+function for updates
 </parameter_description>
 </parameter>
 <parameter name="progress_callback_data">
-<parameter_description> gpointer to user data for the callback function.
+<parameter_description> gpointer to user data for
+the callback function
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -34517,17 +35119,17 @@ may be returned (if the native move operation isn't available).
 
 <function name="g_file_new_for_commandline_arg">
 <description>
-Creates a #GFile with the given argument from the command line. The value of
-@arg can be either a URI, an absolute path or a relative path resolved
-relative to the current working directory.
-This operation never fails, but the returned object might not support any
-I/O operation if @arg points to a malformed path.
+Creates a #GFile with the given argument from the command line.
+The value of @arg can be either a URI, an absolute path or a
+relative path resolved relative to the current working directory.
+This operation never fails, but the returned object might not
+support any I/O operation if @arg points to a malformed path.
 
 
 </description>
 <parameters>
 <parameter name="arg">
-<parameter_description> a command line string.
+<parameter_description> a command line string
 </parameter_description>
 </parameter>
 </parameters>
@@ -34546,8 +35148,8 @@ operation if @path is malformed.
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> a string containing a relative or absolute path. The string
-must be encoded in the glib filename encoding.
+<parameter_description> a string containing a relative or absolute path.
+The string must be encoded in the glib filename encoding.
 </parameter_description>
 </parameter>
 </parameters>
@@ -34558,16 +35160,16 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_new_for_uri">
 <description>
-Constructs a #GFile for a given URI. This operation never 
-fails, but the returned object might not support any I/O 
-operation if @uri is malformed or if the uri type is 
+Constructs a #GFile for a given URI. This operation never
+fails, but the returned object might not support any I/O
+operation if @uri is malformed or if the uri type is
 not supported.
 
 
 </description>
 <parameters>
 <parameter name="uri">
-<parameter_description> a UTF8 string containing a URI.
+<parameter_description> a UTF-8 string containing a URI
 </parameter_description>
 </parameter>
 </parameters>
@@ -34595,11 +35197,11 @@ Since: 2.32
 <parameters>
 <parameter name="tmpl">
 <parameter_description> Template for the file
-name, as in g_file_open_tmp(), or %NULL for a default template.
+name, as in g_file_open_tmp(), or %NULL for a default template
 </parameter_description>
 </parameter>
 <parameter name="iostream">
-<parameter_description> on return, a #GFileIOStream for the created file.
+<parameter_description> on return, a #GFileIOStream for the created file
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -34616,18 +35218,21 @@ Free the returned object with g_object_unref().
 <function name="g_file_open_readwrite">
 <description>
 Opens an existing file for reading and writing. The result is
-a #GFileIOStream that can be used to read and write the contents of the file.
+a #GFileIOStream that can be used to read and write the contents
+of the file.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
+If @cancellable is not %NULL, then the operation can be cancelled
+by triggering the cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+returned.
 
-If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
-If the file is a directory, the G_IO_ERROR_IS_DIRECTORY error will be returned.
-Other errors are possible too, and depend on what kind of filesystem the file is on.
-Note that in many non-local file cases read and write streams are not supported,
-so make sure you really need to do read and write streaming, rather than
-just opening for reading or writing.
+If the file does not exist, the %G_IO_ERROR_NOT_FOUND error will
+be returned. If the file is a directory, the %G_IO_ERROR_IS_DIRECTORY
+error will be returned. Other errors are possible too, and depend on
+what kind of filesystem the file is on. Note that in many non-local
+file cases read and write streams are not supported, so make sure you
+really need to do read and write streaming, rather than just opening
+for reading or writing.
 
 Since: 2.22
 
@@ -34659,28 +35264,31 @@ Asynchronously opens @file for reading and writing.
 For more details, see g_file_open_readwrite() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_open_readwrite_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_open_readwrite_finish() to get
+the result of the operation.
 
 Since: 2.22
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
 <parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
-of the request.
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -34701,11 +35309,11 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -34849,15 +35457,16 @@ by g_file_output_stream_query_info_async().
 
 <function name="g_file_parse_name">
 <description>
-Constructs a #GFile with the given @parse_name (i.e. something given by g_file_get_parse_name()).
-This operation never fails, but the returned object might not support any I/O
-operation if the @parse_name cannot be parsed.
+Constructs a #GFile with the given @parse_name (i.e. something
+given by g_file_get_parse_name()). This operation never fails,
+but the returned object might not support any I/O operation if
+the @parse_name cannot be parsed.
 
 
 </description>
 <parameters>
 <parameter name="parse_name">
-<parameter_description> a file name or path to be parsed.
+<parameter_description> a file name or path to be parsed
 </parameter_description>
 </parameter>
 </parameters>
@@ -34867,29 +35476,31 @@ operation if the @parse_name cannot be parsed.
 
 <function name="g_file_poll_mountable">
 <description>
-Polls a file of type G_FILE_TYPE_MOUNTABLE.
+Polls a file of type #G_FILE_TYPE_MOUNTABLE.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_mount_mountable_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_mount_mountable_finish() to get
+the result of the operation.
 
 Since: 2.22
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object, %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -34912,11 +35523,11 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -34937,17 +35548,17 @@ application to handle the file specified by @file.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> a #GFile to open.
+<parameter_description> a #GFile to open
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object, %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -34955,7 +35566,8 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GAppInfo if the handle was found, %NULL if there were errors.
+<return> a #GAppInfo if the handle was found,
+%NULL if there were errors.
 When you are done with it, release it with g_object_unref()
 </return>
 </function>
@@ -34971,33 +35583,35 @@ file might have been created or removed in between the operations. The
 general approach to handling that is to not check, but just do the
 operation and handle the errors as they come.
 
-As an example of race-free checking, take the case of reading a file, and
-if it doesn't exist, creating it. There are two racy versions: read it, and
-on error create it; and: check if it exists, if not create it. These
-can both result in two processes creating the file (with perhaps a partially
-written file as the result). The correct approach is to always try to create
-the file with g_file_create() which will either atomically create the file
-or fail with a G_IO_ERROR_EXISTS error.
+As an example of race-free checking, take the case of reading a file,
+and if it doesn't exist, creating it. There are two racy versions: read
+it, and on error create it; and: check if it exists, if not create it.
+These can both result in two processes creating the file (with perhaps
+a partially written file as the result). The correct approach is to
+always try to create the file with g_file_create() which will either
+atomically create the file or fail with a %G_IO_ERROR_EXISTS error.
 
-However, in many cases an existence check is useful in a user
-interface, for instance to make a menu item sensitive/insensitive, so that
-you don't have to fool users that something is possible and then just show
-and error dialog. If you do this, you should make sure to also handle the
-errors that can happen due to races when you execute the operation.
+However, in many cases an existence check is useful in a user interface,
+for instance to make a menu item sensitive/insensitive, so that you don't
+have to fool users that something is possible and then just show an error
+dialog. If you do this, you should make sure to also handle the errors
+that can happen due to races when you execute the operation.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the file exists (and can be detected without error), %FALSE otherwise (or if cancelled).
+<return> %TRUE if the file exists (and can be detected without error),
+%FALSE otherwise (or if cancelled).
 </return>
 </function>
 
@@ -35006,28 +35620,29 @@ errors that can happen due to races when you execute the operation.
 Utility function to inspect the #GFileType of a file. This is
 implemented using g_file_query_info() and as such does blocking I/O.
 
-The primary use case of this method is to check if a file is a regular file,
-directory, or symlink.
+The primary use case of this method is to check if a file is
+a regular file, directory, or symlink.
 
 Since: 2.18
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileQueryInfoFlags passed to g_file_query_info().
+<parameter_description> a set of #GFileQueryInfoFlags passed to g_file_query_info()
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 </parameters>
-<return> The #GFileType of the file and #G_FILE_TYPE_UNKNOWN if the file
-does not exist
+<return> The #GFileType of the file and #G_FILE_TYPE_UNKNOWN
+if the file does not exist
 
 </return>
 </function>
@@ -35039,40 +35654,45 @@ about the filesystem the @file is on, rather than the file itself.
 For instance the amount of space available and the type of
 the filesystem.
 
-The @attributes value is a string that specifies the file attributes that
-should be gathered. It is not an error if it's not possible to read a particular
-requested attribute from a file - it just won't be set. @attributes should
-be a comma-separated list of attributes or attribute wildcards. The wildcard &quot;*&quot;
-means all attributes, and a wildcard like &quot;filesystem::*&quot; means all attributes in the
-filesystem namespace. The standard namespace for filesystem attributes is &quot;filesystem&quot;.
-Common attributes of interest are #G_FILE_ATTRIBUTE_FILESYSTEM_SIZE
-(the total size of the filesystem in bytes), #G_FILE_ATTRIBUTE_FILESYSTEM_FREE (number of
-bytes available), and #G_FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
+The @attributes value is a string that specifies the attributes
+that should be gathered. It is not an error if it's not possible
+to read a particular requested attribute from a file - it just
+won't be set. @attributes should be a comma-separated list of
+attributes or attribute wildcards. The wildcard &quot;*&quot; means all
+attributes, and a wildcard like &quot;filesystem::*&quot; means all attributes
+in the filesystem namespace. The standard namespace for filesystem
+attributes is &quot;filesystem&quot;. Common attributes of interest are
+#G_FILE_ATTRIBUTE_FILESYSTEM_SIZE (the total size of the filesystem
+in bytes), #G_FILE_ATTRIBUTE_FILESYSTEM_FREE (number of bytes available),
+and #G_FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+If @cancellable is not %NULL, then the operation can be cancelled
+by triggering the cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+returned.
 
-If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
-Other errors are possible too, and depend on what kind of filesystem the file is on.
+If the file does not exist, the %G_IO_ERROR_NOT_FOUND error will
+be returned. Other errors are possible too, and depend on what
+kind of filesystem the file is on.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attributes">
-<parameter_description>  an attribute query string.
+<parameter_description>  an attribute query string
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError. 
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
@@ -35098,24 +35718,26 @@ operation.
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attributes">
-<parameter_description> an attribute query string.
+<parameter_description> an attribute query string
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request.
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -35128,124 +35750,133 @@ of the request.
 
 <function name="g_file_query_filesystem_info_finish">
 <description>
-Finishes an asynchronous filesystem info query.  See
-g_file_query_filesystem_info_async().
+Finishes an asynchronous filesystem info query.
+See g_file_query_filesystem_info_async().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError. 
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GFileInfo for given @file or %NULL on error.
+<return> #GFileInfo for given @file
+or %NULL on error.
 Free the returned object with g_object_unref().
 </return>
 </function>
 
 <function name="g_file_query_info">
 <description>
-Gets the requested information about specified @file. The result
-is a #GFileInfo object that contains key-value attributes (such as 
-the type or size of the file).
+Gets the requested information about specified @file.
+The result is a #GFileInfo object that contains key-value
+attributes (such as the type or size of the file).
 
-The @attributes value is a string that specifies the file attributes that
-should be gathered. It is not an error if it's not possible to read a particular
-requested attribute from a file - it just won't be set. @attributes should
-be a comma-separated list of attributes or attribute wildcards. The wildcard &quot;*&quot;
-means all attributes, and a wildcard like &quot;standard::*&quot; means all attributes in the standard
-namespace. An example attribute query be &quot;standard::*,owner::user&quot;.
-The standard attributes are available as defines, like #G_FILE_ATTRIBUTE_STANDARD_NAME.
+The @attributes value is a string that specifies the file
+attributes that should be gathered. It is not an error if
+it's not possible to read a particular requested attribute
+from a file - it just won't be set. @attributes should be a
+comma-separated list of attributes or attribute wildcards.
+The wildcard &quot;*&quot; means all attributes, and a wildcard like
+&quot;standard::*&quot; means all attributes in the standard namespace.
+An example attribute query be &quot;standard::*,owner::user&quot;.
+The standard attributes are available as defines, like
+#G_FILE_ATTRIBUTE_STANDARD_NAME.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+If @cancellable is not %NULL, then the operation can be cancelled
+by triggering the cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+returned.
 
 For symlinks, normally the information about the target of the
-symlink is returned, rather than information about the symlink itself.
-However if you pass #G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS in @flags the
-information about the symlink itself will be returned. Also, for symlinks
-that point to non-existing files the information about the symlink itself
-will be returned.
+symlink is returned, rather than information about the symlink
+itself. However if you pass #G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS
+in @flags the information about the symlink itself will be returned.
+Also, for symlinks that point to non-existing files the information
+about the symlink itself will be returned.
 
-If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
-Other errors are possible too, and depend on what kind of filesystem the file is on.
+If the file does not exist, the %G_IO_ERROR_NOT_FOUND error will be
+returned. Other errors are possible too, and depend on what kind of
+filesystem the file is on.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attributes">
-<parameter_description> an attribute query string.
+<parameter_description> an attribute query string
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileQueryInfoFlags.
+<parameter_description> a set of #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileInfo for the given @file, or %NULL on error.
-Free the returned object with g_object_unref().
+<return> a #GFileInfo for the given @file, or %NULL
+on error. Free the returned object with g_object_unref().
 </return>
 </function>
 
 <function name="g_file_query_info_async">
 <description>
-Asynchronously gets the requested information about specified @file. The result
-is a #GFileInfo object that contains key-value attributes (such as type or size
-for the file).
+Asynchronously gets the requested information about specified @file.
+The result is a #GFileInfo object that contains key-value attributes
+(such as type or size for the file).
 
-For more details, see g_file_query_info() which is
-the synchronous version of this call.
+For more details, see g_file_query_info() which is the synchronous
+version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_query_info_finish() to get the result of the operation.
+When the operation is finished, @callback will be called. You can
+then call g_file_query_info_finish() to get the result of the operation.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attributes">
-<parameter_description> an attribute query string.
+<parameter_description> an attribute query string
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileQueryInfoFlags.
+<parameter_description> a set of #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request.
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call when the
+request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -35258,27 +35889,28 @@ of the request.
 
 <function name="g_file_query_info_finish">
 <description>
-Finishes an asynchronous file info query. 
+Finishes an asynchronous file info query.
 See g_file_query_info_async().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError. 
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GFileInfo for given @file or %NULL on error.
-Free the returned object with g_object_unref().
+<return> #GFileInfo for given @file
+or %NULL on error. Free the returned object with
+g_object_unref().
 </return>
 </function>
 
@@ -35290,11 +35922,12 @@ Obtain the list of settable attributes for the file.
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35303,29 +35936,31 @@ Obtain the list of settable attributes for the file.
 </parameter>
 </parameters>
 <return> a #GFileAttributeInfoList describing the settable attributes.
-When you are done with it, release it with g_file_attribute_info_list_unref()
+When you are done with it, release it with
+g_file_attribute_info_list_unref()
 </return>
 </function>
 
 <function name="g_file_query_writable_namespaces">
 <description>
-Obtain the list of attribute namespaces where new attributes 
+Obtain the list of attribute namespaces where new attributes
 can be created by a user. An example of this is extended
 attributes (in the &quot;xattr&quot; namespace).
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35334,7 +35969,8 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter>
 </parameters>
 <return> a #GFileAttributeInfoList describing the writable namespaces.
-When you are done with it, release it with g_file_attribute_info_list_unref()
+When you are done with it, release it with
+g_file_attribute_info_list_unref()
 </return>
 </function>
 
@@ -35345,18 +35981,19 @@ can be used to read the contents of the file.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-If the file does not exist, the G_IO_ERROR_NOT_FOUND error will be returned.
-If the file is a directory, the G_IO_ERROR_IS_DIRECTORY error will be returned.
-Other errors are possible too, and depend on what kind of filesystem the file is on.
+If the file does not exist, the %G_IO_ERROR_NOT_FOUND error will be
+returned. If the file is a directory, the %G_IO_ERROR_IS_DIRECTORY
+error will be returned. Other errors are possible too, and depend
+on what kind of filesystem the file is on.
 
 Virtual: read_fn
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> #GFile to read.
+<parameter_description> #GFile to read
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
@@ -35380,8 +36017,9 @@ Asynchronously opens @file for reading.
 For more details, see g_file_read() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_read_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_read_finish() to get the result
+of the operation.
 
 </description>
 <parameters>
@@ -35391,15 +36029,17 @@ g_file_read_finish() to get the result of the operation.
 </parameter>
 <parameter name="io_priority">
 <parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
-of the request.
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -35412,18 +36052,18 @@ of the request.
 
 <function name="g_file_read_finish">
 <description>
-Finishes an asynchronous file read operation started with 
-g_file_read_async(). 
+Finishes an asynchronous file read operation started with
+g_file_read_async().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35453,55 +36093,56 @@ but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
 will be made readable only to the current user, to the level that
 is supported on the target filesystem.
 
-If @cancellable is not %NULL, then the operation can be cancelled by
-triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+If @cancellable is not %NULL, then the operation can be cancelled
+by triggering the cancellable object from another thread. If the
+operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
+returned.
 
-If you pass in a non-#NULL @etag value, then this value is
+If you pass in a non-%NULL @etag value, then this value is
 compared to the current entity tag of the file, and if they differ
-an G_IO_ERROR_WRONG_ETAG error is returned. This generally means
+an %G_IO_ERROR_WRONG_ETAG error is returned. This generally means
 that the file has been changed since you last read it. You can get
 the new etag from g_file_output_stream_get_etag() after you've
 finished writing and closed the #GFileOutputStream. When you load
 a new file you can use g_file_input_stream_query_info() to get
 the etag of the file.
 
-If @make_backup is %TRUE, this function will attempt to make a backup
-of the current file before overwriting it. If this fails a G_IO_ERROR_CANT_CREATE_BACKUP
-error will be returned. If you want to replace anyway, try again with
-@make_backup set to %FALSE.
+If @make_backup is %TRUE, this function will attempt to make a
+backup of the current file before overwriting it. If this fails
+a %G_IO_ERROR_CANT_CREATE_BACKUP error will be returned. If you
+want to replace anyway, try again with @make_backup set to %FALSE.
 
-If the file is a directory the G_IO_ERROR_IS_DIRECTORY error will be returned,
-and if the file is some other form of non-regular file then a
-G_IO_ERROR_NOT_REGULAR_FILE error will be returned.
-Some file systems don't allow all file names, and may
-return an G_IO_ERROR_INVALID_FILENAME error, and if the name
-is to long G_IO_ERROR_FILENAME_TOO_LONG will be returned.
-Other errors are possible too, and depend on what kind of
-filesystem the file is on.
+If the file is a directory the %G_IO_ERROR_IS_DIRECTORY error will
+be returned, and if the file is some other form of non-regular file
+then a %G_IO_ERROR_NOT_REGULAR_FILE error will be returned. Some
+file systems don't allow all file names, and may return an
+%G_IO_ERROR_INVALID_FILENAME error, and if the name is to long
+%G_IO_ERROR_FILENAME_TOO_LONG will be returned. Other errors are
+possible too, and depend on what kind of filesystem the file is on.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="etag">
-<parameter_description> an optional &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; for the 
-current #GFile, or #NULL to ignore.
+<parameter_description> an optional &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt;
+for the current #GFile, or #NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="make_backup">
-<parameter_description> %TRUE if a backup should be created.
+<parameter_description> %TRUE if a backup should be created
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35509,52 +36150,55 @@ current #GFile, or #NULL to ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFileOutputStream or %NULL on error. 
+<return> a #GFileOutputStream or %NULL on error.
 Free the returned object with g_object_unref().
 </return>
 </function>
 
 <function name="g_file_replace_async">
 <description>
-Asynchronously overwrites the file, replacing the contents, possibly
-creating a backup copy of the file first.
+Asynchronously overwrites the file, replacing the contents,
+possibly creating a backup copy of the file first.
 
 For more details, see g_file_replace() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_replace_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_replace_finish() to get the result
+of the operation.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="etag">
-<parameter_description> an &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; for the 
-current #GFile, or NULL to ignore.
+<parameter_description> an &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt;
+for the current #GFile, or NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="make_backup">
-<parameter_description> %TRUE if a backup should be created.
+<parameter_description> %TRUE if a backup should be created
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request.
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -35568,55 +36212,56 @@ of the request.
 <function name="g_file_replace_contents">
 <description>
 Replaces the contents of @file with @contents of @length bytes.
- 
-If @etag is specified (not %NULL) any existing file must have that etag, or
-the error %G_IO_ERROR_WRONG_ETAG will be returned.
 
-If @make_backup is %TRUE, this function will attempt to make a backup of @file.
+If @etag is specified (not %NULL), any existing file must have that etag,
+or the error %G_IO_ERROR_WRONG_ETAG will be returned.
+
+If @make_backup is %TRUE, this function will attempt to make a backup
+of @file.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-The returned @new_etag can be used to verify that the file hasn't changed the
-next time it is saved over.
+The returned @new_etag can be used to verify that the file hasn't
+changed the next time it is saved over.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="contents">
-<parameter_description> a string containing the new contents for @file.
+<parameter_description> a string containing the new contents for @file
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> the length of @contents in bytes.
+<parameter_description> the length of @contents in bytes
 </parameter_description>
 </parameter>
 <parameter name="etag">
-<parameter_description> the old &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; 
+<parameter_description> the old &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt;
 for the document, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="make_backup">
-<parameter_description> %TRUE if a backup should be created.
+<parameter_description> %TRUE if a backup should be created
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="new_etag">
 <parameter_description> a location to a new &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt;
-for the document. This should be freed with g_free() when no longer 
+for the document. This should be freed with g_free() when no longer
 needed, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object, %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35624,41 +36269,40 @@ needed, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if successful. If an error
-has occurred, this function will return %FALSE and set @error
-appropriately if present.
+<return> %TRUE if successful. If an error has occurred, this function
+will return %FALSE and set @error appropriately if present.
 </return>
 </function>
 
 <function name="g_file_replace_contents_async">
 <description>
-Starts an asynchronous replacement of @file with the given 
-@contents of @length bytes. @etag will replace the document's 
+Starts an asynchronous replacement of @file with the given
+@contents of @length bytes. @etag will replace the document's
 current entity tag.
 
 When this operation has completed, @callback will be called with
-@user_user data, and the operation can be finalized with 
+@user_user data, and the operation can be finalized with
 g_file_replace_contents_finish().
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-If @make_backup is %TRUE, this function will attempt to 
+If @make_backup is %TRUE, this function will attempt to
 make a backup of @file.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="contents">
-<parameter_description> string of contents to replace the file with.
+<parameter_description> string of contents to replace the file with
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> the length of @contents in bytes.
+<parameter_description> the length of @contents in bytes
 </parameter_description>
 </parameter>
 <parameter name="etag">
@@ -35666,15 +36310,15 @@ make a backup of @file.
 </parameter_description>
 </parameter>
 <parameter name="make_backup">
-<parameter_description> %TRUE if a backup should be created.
+<parameter_description> %TRUE if a backup should be created
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object, %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -35692,28 +36336,28 @@ make a backup of @file.
 <function name="g_file_replace_contents_finish">
 <description>
 Finishes an asynchronous replace of the given @file. See
-g_file_replace_contents_async(). Sets @new_etag to the new entity 
+g_file_replace_contents_async(). Sets @new_etag to the new entity
 tag for the document, if present.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="new_etag">
-<parameter_description> a location of a new &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; 
-for the document. This should be freed with g_free() when it is no 
+<parameter_description> a location of a new &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt;
+for the document. This should be freed with g_free() when it is no
 longer needed, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, or %NULL 
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -35723,18 +36367,18 @@ longer needed, or %NULL
 
 <function name="g_file_replace_finish">
 <description>
-Finishes an asynchronous file replace operation started with 
-g_file_replace_async(). 
+Finishes an asynchronous file replace operation started with
+g_file_replace_async().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35753,8 +36397,8 @@ Returns an output stream for overwriting the file in readwrite mode,
 possibly creating a backup copy of the file first. If the file doesn't
 exist, it will be created.
 
-For details about the behaviour, see g_file_replace() which does the same
-thing but returns an output stream only.
+For details about the behaviour, see g_file_replace() which does the
+same thing but returns an output stream only.
 
 Note that in many non-local file cases read and write streams are not
 supported, so make sure you really need to do read and write streaming,
@@ -35769,8 +36413,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="etag">
-<parameter_description> an optional &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; for the
-current #GFile, or #NULL to ignore
+<parameter_description> an optional &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt;
+for the current #GFile, or #NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="make_backup">
@@ -35782,7 +36426,8 @@ current #GFile, or #NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35798,47 +36443,51 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_replace_readwrite_async">
 <description>
-Asynchronously overwrites the file in read-write mode, replacing the
-contents, possibly creating a backup copy of the file first.
+Asynchronously overwrites the file in read-write mode,
+replacing the contents, possibly creating a backup copy
+of the file first.
 
 For more details, see g_file_replace_readwrite() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then
-call g_file_replace_readwrite_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_replace_readwrite_finish() to get
+the result of the operation.
 
 Since: 2.22
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="etag">
-<parameter_description> an &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt; for the
-current #GFile, or NULL to ignore.
+<parameter_description> an &lt;link linkend=&quot;gfile-etag&quot;&gt;entity tag&lt;/link&gt;
+for the current #GFile, or NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="make_backup">
-<parameter_description> %TRUE if a backup should be created.
+<parameter_description> %TRUE if a backup should be created
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileCreateFlags.
+<parameter_description> a set of #GFileCreateFlags
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
 <parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
-of the request.
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -35859,11 +36508,11 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35881,22 +36530,22 @@ Free the returned object with g_object_unref().
 <description>
 Resolves a relative path for @file to an absolute path.
 
-This call does no blocking i/o.
+This call does no blocking I/O.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="relative_path">
-<parameter_description> a given relative path string.
+<parameter_description> a given relative path string
 </parameter_description>
 </parameter>
 </parameters>
-<return> #GFile to the resolved path. %NULL if @relative_path 
-is %NULL or if @file is invalid.
+<return> #GFile to the resolved path.
+%NULL if @relative_path is %NULL or if @file is invalid.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -35910,17 +36559,17 @@ Some attributes can be unset by setting @attribute to
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attribute">
-<parameter_description> a string containing the attribute's name.
+<parameter_description> a string containing the attribute's name
 </parameter_description>
 </parameter>
 <parameter name="type">
@@ -35928,15 +36577,17 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="value_p">
-<parameter_description> a pointer to the value (or the pointer itself if the type is a pointer type)
+<parameter_description> a pointer to the value (or the pointer
+itself if the type is a pointer type)
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a set of #GFileQueryInfoFlags.
+<parameter_description> a set of #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35950,35 +36601,36 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 <function name="g_file_set_attribute_byte_string">
 <description>
-Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_BYTE_STRING to @value. 
-If @attribute is of a different type, this operation will fail, 
-returning %FALSE. 
+Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_BYTE_STRING to @value.
+If @attribute is of a different type, this operation will fail,
+returning %FALSE.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attribute">
-<parameter_description> a string containing the attribute's name.
+<parameter_description> a string containing the attribute's name
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a string containing the attribute's new value.
+<parameter_description> a string containing the attribute's new value
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a #GFileQueryInfoFlags.
+<parameter_description> a #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -35986,41 +36638,42 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @attribute was successfully set to @value 
+<return> %TRUE if the @attribute was successfully set to @value
 in the @file, %FALSE otherwise.
 </return>
 </function>
 
 <function name="g_file_set_attribute_int32">
 <description>
-Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_INT32 to @value. 
+Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_INT32 to @value.
 If @attribute is of a different type, this operation will fail.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attribute">
-<parameter_description> a string containing the attribute's name.
+<parameter_description> a string containing the attribute's name
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a #gint32 containing the attribute's new value.
+<parameter_description> a #gint32 containing the attribute's new value
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a #GFileQueryInfoFlags.
+<parameter_description> a #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36028,41 +36681,42 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @attribute was successfully set to @value 
-in the @file, %FALSE otherwise. 
+<return> %TRUE if the @attribute was successfully set to @value
+in the @file, %FALSE otherwise.
 </return>
 </function>
 
 <function name="g_file_set_attribute_int64">
 <description>
-Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_INT64 to @value. 
+Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_INT64 to @value.
 If @attribute is of a different type, this operation will fail.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attribute">
-<parameter_description> a string containing the attribute's name.
+<parameter_description> a string containing the attribute's name
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a #guint64 containing the attribute's new value.
+<parameter_description> a #guint64 containing the attribute's new value
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a #GFileQueryInfoFlags.
+<parameter_description> a #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36076,34 +36730,35 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 <function name="g_file_set_attribute_string">
 <description>
-Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_STRING to @value. 
+Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_STRING to @value.
 If @attribute is of a different type, this operation will fail.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attribute">
-<parameter_description> a string containing the attribute's name.
+<parameter_description> a string containing the attribute's name
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a string containing the attribute's value.
+<parameter_description> a string containing the attribute's value
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> #GFileQueryInfoFlags.
+<parameter_description> #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36117,34 +36772,35 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 <function name="g_file_set_attribute_uint32">
 <description>
-Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_UINT32 to @value. 
+Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_UINT32 to @value.
 If @attribute is of a different type, this operation will fail.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attribute">
-<parameter_description> a string containing the attribute's name.
+<parameter_description> a string containing the attribute's name
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a #guint32 containing the attribute's new value.
+<parameter_description> a #guint32 containing the attribute's new value
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a #GFileQueryInfoFlags.
+<parameter_description> a #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36152,41 +36808,42 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @attribute was successfully set to @value 
+<return> %TRUE if the @attribute was successfully set to @value
 in the @file, %FALSE otherwise.
 </return>
 </function>
 
 <function name="g_file_set_attribute_uint64">
 <description>
-Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_UINT64 to @value. 
+Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_UINT64 to @value.
 If @attribute is of a different type, this operation will fail.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile. 
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="attribute">
-<parameter_description> a string containing the attribute's name.
+<parameter_description> a string containing the attribute's name
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a #guint64 containing the attribute's new value.
+<parameter_description> a #guint64 containing the attribute's new value
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a #GFileQueryInfoFlags.
+<parameter_description> a #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36194,7 +36851,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the @attribute was successfully set to @value 
+<return> %TRUE if the @attribute was successfully set to @value
 in the @file, %FALSE otherwise.
 </return>
 </function>
@@ -36203,41 +36860,43 @@ in the @file, %FALSE otherwise.
 <description>
 Asynchronously sets the attributes of @file with @info.
 
-For more details, see g_file_set_attributes_from_info() which is
-the synchronous version of this call.
+For more details, see g_file_set_attributes_from_info(),
+which is the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_set_attributes_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_set_attributes_finish() to get
+the result of the operation.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="info">
-<parameter_description> a #GFileInfo.
+<parameter_description> a #GFileInfo
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a #GFileQueryInfoFlags.
+<parameter_description> a #GFileQueryInfoFlags
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request. 
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback. 
+<parameter_description> a #GAsyncReadyCallback
 </parameter_description>
 </parameter>
 <parameter name="user_data">
-<parameter_description> a #gpointer.
+<parameter_description> a #gpointer
 </parameter_description>
 </parameter>
 </parameters>
@@ -36252,15 +36911,15 @@ Finishes setting an attribute started in g_file_set_attributes_async().
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="info">
-<parameter_description> a #GFileInfo.
+<parameter_description> a #GFileInfo
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36274,28 +36933,28 @@ Finishes setting an attribute started in g_file_set_attributes_async().
 
 <function name="g_file_set_attributes_from_info">
 <description>
-Tries to set all attributes in the #GFileInfo on the target values, 
-not stopping on the first error.
+Tries to set all attributes in the #GFileInfo on the target
+values, not stopping on the first error.
 
-If there is any error during this operation then @error will be set to
-the first error. Error on particular fields are flagged by setting 
-the &quot;status&quot; field in the attribute value to 
-%G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can also detect
-further errors.
+If there is any error during this operation then @error will
+be set to the first error. Error on particular fields are flagged
+by setting the &quot;status&quot; field in the attribute value to
+%G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can
+also detect further errors.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="info">
-<parameter_description> a #GFileInfo.
+<parameter_description> a #GFileInfo
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -36303,11 +36962,12 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError, or %NULL 
+<parameter_description> a #GError, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -36319,32 +36979,34 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 <description>
 Renames @file to the specified display name.
 
-The display name is converted from UTF8 to the correct encoding for the target
-filesystem if possible and the @file is renamed to this.
+The display name is converted from UTF-8 to the correct encoding
+for the target filesystem if possible and the @file is renamed to this.
 
-If you want to implement a rename operation in the user interface the edit name
-(#G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME) should be used as the initial value in the rename
-widget, and then the result after editing should be passed to g_file_set_display_name().
+If you want to implement a rename operation in the user interface the
+edit name (#G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME) should be used as the
+initial value in the rename widget, and then the result after editing
+should be passed to g_file_set_display_name().
 
 On success the resulting converted filename is returned.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="display_name">
-<parameter_description> a string.
+<parameter_description> a string
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36352,8 +37014,8 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GFile specifying what @file was renamed to, or %NULL 
-if there was an error.
+<return> a #GFile specifying what @file was renamed to,
+or %NULL if there was an error.
 Free the returned object with g_object_unref().
 </return>
 </function>
@@ -36365,30 +37027,33 @@ Asynchronously sets the display name for a given #GFile.
 For more details, see g_file_set_display_name() which is
 the synchronous version of this call.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_set_display_name_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_set_display_name_finish() to get
+the result of the operation.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="display_name">
-<parameter_description> a string.
+<parameter_description> a string
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt; 
-of the request. 
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -36401,18 +37066,18 @@ of the request.
 
 <function name="g_file_set_display_name_finish">
 <description>
-Finishes setting a display name started with 
+Finishes setting a display name started with
 g_file_set_display_name_async().
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="res">
-<parameter_description> a #GAsyncResult. 
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36427,7 +37092,7 @@ Free the returned object with g_object_unref().
 
 <function name="g_file_start_mountable">
 <description>
-Starts a file of type G_FILE_TYPE_MOUNTABLE.
+Starts a file of type #G_FILE_TYPE_MOUNTABLE.
 Using @start_operation, you can request callbacks when, for instance,
 passwords are needed during authentication.
 
@@ -36435,15 +37100,16 @@ If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_mount_mountable_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_mount_mountable_finish() to get
+the result of the operation.
 
 Since: 2.22
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -36451,15 +37117,15 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="start_operation">
-<parameter_description> a #GMountOperation, or %NULL to avoid user interaction.
+<parameter_description> a #GMountOperation, or %NULL to avoid user interaction
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object, %NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -36482,11 +37148,11 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36502,21 +37168,22 @@ otherwise.
 
 <function name="g_file_stop_mountable">
 <description>
-Stops a file of type G_FILE_TYPE_MOUNTABLE.
+Stops a file of type #G_FILE_TYPE_MOUNTABLE.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_stop_mountable_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_stop_mountable_finish() to get
+the result of the operation.
 
 Since: 2.22
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -36524,15 +37191,18 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="mount_operation">
-<parameter_description> a #GMountOperation, or %NULL to avoid user interaction.
+<parameter_description> a #GMountOperation,
+or %NULL to avoid user interaction.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -36555,11 +37225,11 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36567,8 +37237,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the operation finished successfully. %FALSE
-otherwise.
+<return> %TRUE if the operation finished successfully.
+%FALSE otherwise.
 
 </return>
 </function>
@@ -36586,7 +37256,7 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> a #GFile.
+<parameter_description> a #GFile
 </parameter_description>
 </parameter>
 </parameters>
@@ -36602,20 +37272,20 @@ deleting it, but the user can recover it before emptying the trashcan.
 Not all file systems support trashing, so this call can return the
 %G_IO_ERROR_NOT_SUPPORTED error.
 
-
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
-was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> #GFile to send to trash.
+<parameter_description> #GFile to send to trash
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36635,15 +37305,16 @@ If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_unmount_mountable_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_unmount_mountable_finish() to get
+the result of the operation.
 
 Deprecated: 2.22: Use g_file_unmount_mountable_with_operation() instead.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -36651,11 +37322,13 @@ Deprecated: 2.22: Use g_file_unmount_mountable_with_operation() instead.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -36670,19 +37343,20 @@ Deprecated: 2.22: Use g_file_unmount_mountable_with_operation() instead.
 <description>
 Finishes an unmount operation, see g_file_unmount_mountable() for details.
 
-Finish an asynchronous unmount operation that was started 
+Finish an asynchronous unmount operation that was started
 with g_file_unmount_mountable().
 
-Deprecated: 2.22: Use g_file_unmount_mountable_with_operation_finish() instead.
+Deprecated: 2.22: Use g_file_unmount_mountable_with_operation_finish()
+instead.
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36690,29 +37364,30 @@ Deprecated: 2.22: Use g_file_unmount_mountable_with_operation_finish() instead.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the operation finished successfully. %FALSE
-otherwise.
+<return> %TRUE if the operation finished successfully.
+%FALSE otherwise.
 
 </return>
 </function>
 
 <function name="g_file_unmount_mountable_with_operation">
 <description>
-Unmounts a file of type G_FILE_TYPE_MOUNTABLE.
+Unmounts a file of type #G_FILE_TYPE_MOUNTABLE.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
-When the operation is finished, @callback will be called. You can then call
-g_file_unmount_mountable_finish() to get the result of the operation.
+When the operation is finished, @callback will be called.
+You can then call g_file_unmount_mountable_finish() to get
+the result of the operation.
 
 Since: 2.22
 
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -36720,15 +37395,18 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="mount_operation">
-<parameter_description> a #GMountOperation, or %NULL to avoid user interaction.
+<parameter_description> a #GMountOperation,
+or %NULL to avoid user interaction
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore.
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied, or %NULL.
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -36741,7 +37419,8 @@ Since: 2.22
 
 <function name="g_file_unmount_mountable_with_operation_finish">
 <description>
-Finishes an unmount operation, see g_file_unmount_mountable_with_operation() for details.
+Finishes an unmount operation,
+see g_file_unmount_mountable_with_operation() for details.
 
 Finish an asynchronous unmount operation that was started
 with g_file_unmount_mountable_with_operation().
@@ -36751,11 +37430,11 @@ Since: 2.22
 </description>
 <parameters>
 <parameter name="file">
-<parameter_description> input #GFile.
+<parameter_description> input #GFile
 </parameter_description>
 </parameter>
 <parameter name="result">
-<parameter_description> a #GAsyncResult.
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -36763,8 +37442,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if the operation finished successfully. %FALSE
-otherwise.
+<return> %TRUE if the operation finished successfully.
+%FALSE otherwise.
 
 </return>
 </function>
@@ -40148,6 +40827,97 @@ Since: 2.32
 <return></return>
 </function>
 
+<function name="g_menu_item_get_attribute">
+<description>
+Queries the named @attribute on @menu_item.
+
+If the attribute exists and matches the #GVariantType corresponding
+to @format_string then @format_string is used to deconstruct the
+value into the positional parameters and %TRUE is returned.
+
+If the attribute does not exist, or it does exist but has the wrong
+type, then the positional parameters are ignored and %FALSE is
+returned.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="menu_item">
+<parameter_description> a #GMenuItem
+</parameter_description>
+</parameter>
+<parameter name="attribute">
+<parameter_description> the attribute name to query
+</parameter_description>
+</parameter>
+<parameter name="format_string">
+<parameter_description> a #GVariant format string
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> positional parameters, as per @format_string
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the named attribute was found with the expected
+type
+
+</return>
+</function>
+
+<function name="g_menu_item_get_attribute_value">
+<description>
+Queries the named @attribute on @menu_item.
+
+If @expected_type is specified and the attribute does not have this
+type, %NULL is returned.  %NULL is also returned if the attribute
+simply does not exist.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="menu_item">
+<parameter_description> a #GMenuItem
+</parameter_description>
+</parameter>
+<parameter name="attribute">
+<parameter_description> the attribute name to query
+</parameter_description>
+</parameter>
+<parameter name="expected_type">
+<parameter_description> the expected type of the attribute
+</parameter_description>
+</parameter>
+</parameters>
+<return> the attribute value, or %NULL
+
+</return>
+</function>
+
+<function name="g_menu_item_get_link">
+<description>
+Queries the named @link on @menu_item.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="menu_item">
+<parameter_description> a #GMenuItem
+</parameter_description>
+</parameter>
+<parameter name="link">
+<parameter_description> the link name to query
+</parameter_description>
+</parameter>
+</parameters>
+<return> the link, or %NULL
+
+</return>
+</function>
+
 <function name="g_menu_item_new">
 <description>
 Creates a new #GMenuItem.
@@ -40173,6 +40943,32 @@ Since: 2.32
 </parameter>
 </parameters>
 <return> a new #GMenuItem
+
+</return>
+</function>
+
+<function name="g_menu_item_new_from_model">
+<description>
+Creates a #GMenuItem as an exact copy of an existing menu item in a
+#GMenuModel.
+
+@item_index must be valid (ie: be sure to call
+g_menu_model_get_n_items() first).
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="model">
+<parameter_description> a #GMenuModel
+</parameter_description>
+</parameter>
+<parameter name="item_index">
+<parameter_description> the index of an item in @model
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GMenuItem.
 
 </return>
 </function>
@@ -40736,6 +41532,12 @@ value into the positional parameters and %TRUE is returned.
 If the attribute does not exist, or it does exist but has the wrong
 type, then the positional parameters are ignored and %FALSE is
 returned.
+
+This function is a mix of g_menu_model_get_item_attribute_value() and
+g_variant_get(), followed by a g_variant_unref().  As such,
+@format_string must make a complete copy of the data (since the
+#GVariant may go away after the call to g_variant_unref()).  In
+particular, no '&amp;' characters are allowed in @format_string.
 
 Since: 2.32
 
@@ -44218,7 +45020,7 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="dest_hostname">
-<parameter_description> The destination hostname the the proxy should tunnel to.
+<parameter_description> The destination hostname the proxy should tunnel to.
 </parameter_description>
 </parameter>
 <parameter name="dest_port">
@@ -45439,7 +46241,7 @@ Since: 2.32
 <function name="g_resources_enumerate_children">
 <description>
 Returns all the names of children at the specified @path in the set of
-globally registred resources.
+globally registered resources.
 The return result is a %NULL terminated list of strings which should
 be released with g_strfreev().
 
@@ -45470,7 +46272,7 @@ Since: 2.32
 <function name="g_resources_get_info">
 <description>
 Looks for a file at the specified @path in the set of
-globally registred resources and if found returns information about it.
+globally registered resources and if found returns information about it.
 
 @lookup_flags controls the behaviour of the lookup.
 
@@ -45509,7 +46311,7 @@ or %NULL if the length is not needed
 <function name="g_resources_lookup_data">
 <description>
 Looks for a file at the specified @path in the set of
-globally registred resources and returns a #GBytes that
+globally registered resources and returns a #GBytes that
 lets you directly access the data in memory.
 
 The data is always followed by a zero byte, so you
@@ -45549,7 +46351,7 @@ Free the returned object with g_bytes_unref()
 <function name="g_resources_open_stream">
 <description>
 Looks for a file at the specified @path in the set of
-globally registred resources and returns a #GInputStream
+globally registered resources and returns a #GInputStream
 that lets you read the data.
 
 @lookup_flags controls the behaviour of the lookup.
@@ -47191,7 +47993,7 @@ First, if g_settings_schema_source_lookup() is called with the
 source, the lookup will recurse to the parent.
 
 Second, any references to other schemas specified within this
-source (ie: &lt;literal&gt;child&lt;/literal&gt; or &lt;literal&gt;extents&lt;/literal&gt;)
+source (ie: &lt;literal&gt;child&lt;/literal&gt; or &lt;literal&gt;extends&lt;/literal&gt;)
 references may be resolved from the @parent.
 
 For this second reason, except in very unusual situations, the
@@ -50521,7 +51323,7 @@ Since: 2.22
 <function name="g_socket_get_fd">
 <description>
 Returns the underlying OS socket object. On unix this
-is a socket file descriptor, and on windows this is
+is a socket file descriptor, and on Windows this is
 a Winsock2 SOCKET handle. This may be useful for
 doing platform specific or otherwise unusual operations
 on the socket.
@@ -52420,7 +53222,7 @@ Since: 2.32
 
 <function name="g_static_resource_get_resource">
 <description>
-Gets the GResource that was registred by a call to g_static_resource_init().
+Gets the GResource that was registered by a call to g_static_resource_init().
 
 This is normally used by code generated by
 &lt;link linkend=&quot;glib-compile-resources&quot;&gt;glib-compile-resources&lt;/link&gt;
@@ -52980,6 +53782,32 @@ Since: 2.28
 <return> The certificate of @cert's issuer,
 or %NULL if @cert is self-signed or signed with an unknown
 certificate.
+
+</return>
+</function>
+
+<function name="g_tls_certificate_is_same">
+<description>
+Check if two #GTlsCertificate objects represent the same certificate.
+The raw DER byte data of the two certificates are checked for equality.
+This has the effect that two certificates may compare equal even if
+their #GTlsCertificate:issuer, #GTlsCertificate:private-key, or
+#GTlsCertificate:private-key-pem properties differ.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="cert_one">
+<parameter_description> first certificate to compare
+</parameter_description>
+</parameter>
+<parameter name="cert_two">
+<parameter_description> second certificate to compare
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the same or not
 
 </return>
 </function>
@@ -56177,7 +57005,7 @@ Since: 2.20
 
 <function name="g_unix_socket_address_abstract_names_supported">
 <description>
-Checks if abstract unix domain socket names are supported.
+Checks if abstract UNIX domain socket names are supported.
 
 Since: 2.22
 

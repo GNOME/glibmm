@@ -438,6 +438,21 @@
     '("define-repetion" "G_REGEX_ERROR_DEFINE_REPETION")
     '("inconsistent-newline-options" "G_REGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS")
     '("missing-back-reference" "G_REGEX_ERROR_MISSING_BACK_REFERENCE")
+    '("invalid-relative-reference" "G_REGEX_ERROR_INVALID_RELATIVE_REFERENCE")
+    '("backtracking-control-verb-argument-forbidden" "G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN")
+    '("unknown-backtracking-control-verb" "G_REGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB")
+    '("number-too-big" "G_REGEX_ERROR_NUMBER_TOO_BIG")
+    '("missing-subpattern-name" "G_REGEX_ERROR_MISSING_SUBPATTERN_NAME")
+    '("missing-digit" "G_REGEX_ERROR_MISSING_DIGIT")
+    '("invalid-data-character" "G_REGEX_ERROR_INVALID_DATA_CHARACTER")
+    '("extra-subpattern-name" "G_REGEX_ERROR_EXTRA_SUBPATTERN_NAME")
+    '("backtracking-control-verb-argument-required" "G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED")
+    '("invalid-control-char" "G_REGEX_ERROR_INVALID_CONTROL_CHAR")
+    '("missing-name" "G_REGEX_ERROR_MISSING_NAME")
+    '("not-supported-in-class" "G_REGEX_ERROR_NOT_SUPPORTED_IN_CLASS")
+    '("too-many-forward-references" "G_REGEX_ERROR_TOO_MANY_FORWARD_REFERENCES")
+    '("name-too-long" "G_REGEX_ERROR_NAME_TOO_LONG")
+    '("character-value-too-large" "G_REGEX_ERROR_CHARACTER_VALUE_TOO_LARGE")
   )
 )
 
@@ -456,10 +471,14 @@
     '("raw" "G_REGEX_RAW")
     '("no-auto-capture" "G_REGEX_NO_AUTO_CAPTURE")
     '("optimize" "G_REGEX_OPTIMIZE")
+    '("firstline" "G_REGEX_FIRSTLINE")
     '("dupnames" "G_REGEX_DUPNAMES")
     '("newline-cr" "G_REGEX_NEWLINE_CR")
     '("newline-lf" "G_REGEX_NEWLINE_LF")
     '("newline-crlf" "G_REGEX_NEWLINE_CRLF")
+    '("newline-anycrlf" "G_REGEX_NEWLINE_ANYCRLF")
+    '("bsr-anycrlf" "G_REGEX_BSR_ANYCRLF")
+    '("javascript-compat" "G_REGEX_JAVASCRIPT_COMPAT")
   )
 )
 
@@ -477,6 +496,12 @@
     '("newline-lf" "G_REGEX_MATCH_NEWLINE_LF")
     '("newline-crlf" "G_REGEX_MATCH_NEWLINE_CRLF")
     '("newline-any" "G_REGEX_MATCH_NEWLINE_ANY")
+    '("newline-anycrlf" "G_REGEX_MATCH_NEWLINE_ANYCRLF")
+    '("bsr-anycrlf" "G_REGEX_MATCH_BSR_ANYCRLF")
+    '("bsr-any" "G_REGEX_MATCH_BSR_ANY")
+    '("partial-soft" "G_REGEX_MATCH_PARTIAL_SOFT")
+    '("partial-hard" "G_REGEX_MATCH_PARTIAL_HARD")
+    '("notempty-atstart" "G_REGEX_MATCH_NOTEMPTY_ATSTART")
   )
 )
 
@@ -2540,6 +2565,15 @@
     '("GChecksumType" "checksum_type")
     '("const-gchar*" "str")
     '("gssize" "length")
+  )
+)
+
+(define-function g_compute_checksum_for_bytes
+  (c-name "g_compute_checksum_for_bytes")
+  (return-type "gchar*")
+  (parameters
+    '("GChecksumType" "checksum_type")
+    '("GBytes*" "data")
   )
 )
 
@@ -5744,6 +5778,10 @@
 
 
 
+;; From glib_probes.h
+
+
+
 ;; From glib_trace.h
 
 
@@ -5950,6 +5988,16 @@
   (of-object "GList")
   (c-name "g_list_copy")
   (return-type "GList*")
+)
+
+(define-method copy_deep
+  (of-object "GList")
+  (c-name "g_list_copy_deep")
+  (return-type "GList*")
+  (parameters
+    '("GCopyFunc" "func")
+    '("gpointer" "user_data")
+  )
 )
 
 (define-method nth
@@ -6741,6 +6789,12 @@
   (of-object "GMappedFile")
   (c-name "g_mapped_file_get_contents")
   (return-type "gchar*")
+)
+
+(define-method get_bytes
+  (of-object "GMappedFile")
+  (c-name "g_mapped_file_get_bytes")
+  (return-type "GBytes*")
 )
 
 (define-method ref
@@ -8364,6 +8418,12 @@
   (return-type "gint")
 )
 
+(define-method get_has_cr_or_lf
+  (of-object "GRegex")
+  (c-name "g_regex_get_has_cr_or_lf")
+  (return-type "gboolean")
+)
+
 (define-method get_string_number
   (of-object "GRegex")
   (c-name "g_regex_get_string_number")
@@ -9432,6 +9492,16 @@
   (return-type "GSList*")
 )
 
+(define-method copy_deep
+  (of-object "GSList")
+  (c-name "g_slist_copy_deep")
+  (return-type "GSList*")
+  (parameters
+    '("GCopyFunc" "func")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method nth
   (of-object "GSList")
   (c-name "g_slist_nth")
@@ -9537,6 +9607,11 @@
   (return-type "GQuark")
 )
 
+(define-function g_spawn_exit_error_quark
+  (c-name "g_spawn_exit_error_quark")
+  (return-type "GQuark")
+)
+
 (define-function g_spawn_async
   (c-name "g_spawn_async")
   (return-type "gboolean")
@@ -9604,6 +9679,15 @@
   (return-type "gboolean")
   (parameters
     '("const-gchar*" "command_line")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_spawn_check_exit_status
+  (c-name "g_spawn_check_exit_status")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "exit_status")
     '("GError**" "error")
   )
 )
@@ -10314,6 +10398,12 @@
   )
 )
 
+(define-method free_to_bytes
+  (of-object "GString")
+  (c-name "g_string_free_to_bytes")
+  (return-type "GBytes*")
+)
+
 (define-method equal
   (of-object "GString")
   (c-name "g_string_equal")
@@ -10638,6 +10728,17 @@
   )
 )
 
+(define-function g_test_add_data_func_full
+  (c-name "g_test_add_data_func_full")
+  (return-type "none")
+  (parameters
+    '("const-char*" "testpath")
+    '("gpointer" "test_data")
+    '("GTestDataFunc" "test_func")
+    '("GDestroyNotify" "data_free_func")
+  )
+)
+
 (define-function g_test_fail
   (c-name "g_test_fail")
   (return-type "none")
@@ -10941,6 +11042,27 @@
   (parameters
     '("GTestLogFatalFunc" "log_func")
     '("gpointer" "user_data")
+  )
+)
+
+(define-function g_test_expect_message
+  (c-name "g_test_expect_message")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "log_domain")
+    '("GLogLevelFlags" "log_level")
+    '("const-gchar*" "pattern")
+  )
+)
+
+(define-function g_test_assert_expected_messages_internal
+  (c-name "g_test_assert_expected_messages_internal")
+  (return-type "none")
+  (parameters
+    '("const-char*" "domain")
+    '("const-char*" "file")
+    '("int" "line")
+    '("const-char*" "func")
   )
 )
 
@@ -13265,6 +13387,16 @@
     '("const-gchar*" "format_string")
     '("const-gchar**" "endptr")
     '("va_list*" "app")
+  )
+)
+
+(define-method check_format_string
+  (of-object "GVariant")
+  (c-name "g_variant_check_format_string")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "format_string")
+    '("gboolean" "copy_only")
   )
 )
 

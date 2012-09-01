@@ -2605,6 +2605,24 @@
   (return-type "GObject*")
 )
 
+(define-method legacy_propagate_error
+  (of-object "GAsyncResult")
+  (c-name "g_async_result_legacy_propagate_error")
+  (return-type "gboolean")
+  (parameters
+    '("GError**" "error")
+  )
+)
+
+(define-method is_tagged
+  (of-object "GAsyncResult")
+  (c-name "g_async_result_is_tagged")
+  (return-type "gboolean")
+  (parameters
+    '("gpointer" "source_tag")
+  )
+)
+
 
 
 ;; From gbufferedinputstream.h
@@ -5558,6 +5576,15 @@
   )
 )
 
+(define-method is_exported
+  (of-object "GDBusObjectManagerServer")
+  (c-name "g_dbus_object_manager_server_is_exported")
+  (return-type "gboolean")
+  (parameters
+    '("GDBusObjectSkeleton*" "object")
+  )
+)
+
 (define-method unexport
   (of-object "GDBusObjectManagerServer")
   (c-name "g_dbus_object_manager_server_unexport")
@@ -7279,6 +7306,28 @@
   (return-type "gboolean")
   (parameters
     '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method delete_async
+  (of-object "GFile")
+  (c-name "g_file_delete_async")
+  (return-type "none")
+  (parameters
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method delete_finish
+  (of-object "GFile")
+  (c-name "g_file_delete_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
     '("GError**" "error")
   )
 )
@@ -10420,6 +10469,15 @@
   )
 )
 
+(define-function g_menu_item_new_from_model
+  (c-name "g_menu_item_new_from_model")
+  (return-type "GMenuItem*")
+  (parameters
+    '("GMenuModel*" "model")
+    '("gint" "item_index")
+  )
+)
+
 (define-function g_menu_item_new_submenu
   (c-name "g_menu_item_new_submenu")
   (return-type "GMenuItem*")
@@ -10435,6 +10493,36 @@
   (parameters
     '("const-gchar*" "label")
     '("GMenuModel*" "section")
+  )
+)
+
+(define-method get_attribute_value
+  (of-object "GMenuItem")
+  (c-name "g_menu_item_get_attribute_value")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "attribute")
+    '("const-GVariantType*" "expected_value")
+  )
+)
+
+(define-method get_attribute
+  (of-object "GMenuItem")
+  (c-name "g_menu_item_get_attribute")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "attribute")
+    '("const-gchar*" "format_string")
+  )
+  (varargs #t)
+)
+
+(define-method get_link
+  (of-object "GMenuItem")
+  (c-name "g_menu_item_get_link")
+  (return-type "GMenuModel*")
+  (parameters
+    '("const-gchar*" "link")
   )
 )
 
@@ -14876,6 +14964,15 @@
   (parameters
     '("GSocketConnectable*" "identity")
     '("GTlsCertificate*" "trusted_ca")
+  )
+)
+
+(define-method is_same
+  (of-object "GTlsCertificate")
+  (c-name "g_tls_certificate_is_same")
+  (return-type "gboolean")
+  (parameters
+    '("GTlsCertificate*" "cert_two")
   )
 )
 

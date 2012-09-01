@@ -6495,10 +6495,14 @@ If you obtain @pid from g_spawn_async() or g_spawn_async_with_pipes()
 you will need to pass #G_SPAWN_DO_NOT_REAP_CHILD as flag to 
 the spawn function for the child watching to work.
 
-Note that on platforms where #GPid must be explicitly closed
-(see g_spawn_close_pid()) @pid must not be closed while the
-source is still active. Typically, you will want to call
-g_spawn_close_pid() in the callback function for the source.
+In many programs, you will want to call g_spawn_check_exit_status()
+in the callback to determine whether or not the child exited
+successfully.
+
+Also, note that on platforms where #GPid must be explicitly closed
+(see g_spawn_close_pid()) @pid must not be closed while the source
+is still active.  Typically, you should invoke g_spawn_close_pid()
+in the callback function for the source.
 
 GLib supports only a single callback per process id.
 
@@ -7126,7 +7130,9 @@ Deprecated: 2.26: Rarely used API
 
 <function name="g_completion_clear_items">
 <description>
-Removes all items from the #GCompletion.
+Removes all items from the #GCompletion. The items are not freed, so if the
+memory was dynamically allocated, it should be freed after calling this
+function.
 
 Deprecated: 2.26: Rarely used API
 
@@ -7166,8 +7172,8 @@ when no longer needed.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the list of items whose strings begin with @prefix. This
-should not be changed.
+<return> the list of items whose strings begin with
+@prefix. This should not be changed.
 </return>
 </function>
 
@@ -7211,7 +7217,9 @@ not be changed.
 
 <function name="g_completion_free">
 <description>
-Frees all memory used by the #GCompletion.
+Frees all memory used by the #GCompletion. The items are not freed, so if
+the memory was dynamically allocated, it should be freed after calling this
+function.
 
 Deprecated: 2.26: Rarely used API
 
@@ -7244,7 +7252,9 @@ be used as the #GCompletion items.
 
 <function name="g_completion_remove_items">
 <description>
-Removes items from a #GCompletion.
+Removes items from a #GCompletion. The items are not freed, so if the memory
+was dynamically allocated, free @items with g_list_free_full() after calling
+this function.
 
 Deprecated: 2.26: Rarely used API
 
@@ -7281,6 +7291,33 @@ Deprecated: 2.26: Rarely used API
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_compute_checksum_for_bytes">
+<description>
+Computes the checksum for a binary @data. This is a
+convenience wrapper for g_checksum_new(), g_checksum_get_string()
+and g_checksum_free().
+
+The hexadecimal string returned will be in lower case.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="checksum_type">
+<parameter_description> a #GChecksumType
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> binary blob to compute the digest of
+</parameter_description>
+</parameter>
+</parameters>
+<return> the digest of the binary data as a string in hexadecimal.
+The returned string should be freed with g_free() when done using it.
+
+</return>
 </function>
 
 <function name="g_compute_checksum_for_data">
@@ -7466,7 +7503,7 @@ Destroys a #GCond that has been created with g_cond_new().
 Calling g_cond_free() for a #GCond on which threads are
 blocking leads to undefined behaviour.
 
-Deprecated:3.32:GCond can now be statically allocated, or embedded
+Deprecated: 2.32: GCond can now be statically allocated, or embedded
 in structures and initialised with g_cond_init().
 
 </description>
@@ -7509,7 +7546,7 @@ Since: 2.32
 <description>
 Allocates and initializes a new #GCond.
 
-Deprecated:3.32:GCond can now be statically allocated, or embedded
+Deprecated: 2.32: GCond can now be statically allocated, or embedded
 in structures and initialised with g_cond_init().
 
 </description>
@@ -11169,7 +11206,11 @@ when you are finished with it.
 Retrieves the name of another entry in the directory, or %NULL.
 The order of entries returned from this function is not defined,
 and may vary by file system or other operating-system dependent
-factors. 
+factors.
+
+%NULL may also be returned in case of errors. On Unix, you can
+check &lt;literal&gt;errno&lt;/literal&gt; to find out if %NULL was returned
+because of an error.
 
 On Unix, the '.' and '..' entries are omitted, and the returned
 name is in the on-disk encoding.
@@ -11185,7 +11226,7 @@ filenames, the returned name is in UTF-8.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The entry's name or %NULL if there are no 
+<return> The entry's name or %NULL if there are no
 more entries. The return value is owned by GLib and
 must not be modified or freed.
 </return>
@@ -12326,7 +12367,7 @@ full name including the type suffix.
 </parameter_description>
 </parameter>
 </parameters>
-<return> absolute path, or %NULL
+<return> a newly-allocated string with the absolute path, or %NULL
 </return>
 </function>
 
@@ -15144,10 +15185,10 @@ if your hash table's keys are of the form
 
 <function name="g_intern_static_string">
 <description>
-Returns a canonical representation for @string. Interned strings can
-be compared for equality by comparing the pointers, instead of using strcmp().
-g_intern_static_string() does not copy the string, therefore @string must
-not be freed or modified. 
+Returns a canonical representation for @string. Interned strings
+can be compared for equality by comparing the pointers, instead of
+using strcmp(). g_intern_static_string() does not copy the string,
+therefore @string must not be freed or modified.
 
 Since: 2.10
 
@@ -15165,8 +15206,9 @@ Since: 2.10
 
 <function name="g_intern_string">
 <description>
-Returns a canonical representation for @string. Interned strings can
-be compared for equality by comparing the pointers, instead of using strcmp().
+Returns a canonical representation for @string. Interned strings
+can be compared for equality by comparing the pointers, instead of
+using strcmp().
 
 Since: 2.10
 
@@ -17855,7 +17897,8 @@ Copies a #GList.
 &lt;note&gt;&lt;para&gt;
 Note that this is a &quot;shallow&quot; copy. If the list elements 
 consist of pointers to data, the pointers are copied but 
-the actual data is not.
+the actual data is not. See g_list_copy_deep() if you need
+to copy the data as well.
 &lt;/para&gt;&lt;/note&gt;
 
 
@@ -17867,6 +17910,49 @@ the actual data is not.
 </parameter>
 </parameters>
 <return> a copy of @list
+</return>
+</function>
+
+<function name="g_list_copy_deep">
+<description>
+Makes a full (deep) copy of a #GList.
+
+In contrast with g_list_copy(), this function uses @func to make a copy of
+each list element, in addition to copying the list container itself.
+
+@func, as a #GCopyFunc, takes two arguments, the data to be copied and a user
+pointer. It's safe to pass #NULL as user_data, if the copy function takes only
+one argument.
+
+For instance, if @list holds a list of GObjects, you can do:
+|[
+another_list = g_list_copy_deep (list, (GCopyFunc) g_object_ref, NULL);
+]|
+
+And, to entirely free the new list, you could do:
+|[
+g_list_free_full (another_list, g_object_unref);
+]|
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GList
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a copy function used to copy every element in the list
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the copy function @func, or #NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a full copy of @list, use #g_list_free_full to free it
+
 </return>
 </function>
 
@@ -19244,13 +19330,13 @@ Runs a single iteration for the given main loop. This involves
 checking to see if any event sources are ready to be processed,
 then if no events sources are ready and @may_block is %TRUE, waiting
 for a source to become ready, then dispatching the highest priority
-events sources that are ready. Otherwise, if @may_block is %FALSE 
-sources are not waited to become ready, only those highest priority 
-events sources will be dispatched (if any), that are ready at this 
+events sources that are ready. Otherwise, if @may_block is %FALSE
+sources are not waited to become ready, only those highest priority
+events sources will be dispatched (if any), that are ready at this
 given moment without further waiting.
 
-Note that even when @may_block is %TRUE, it is still possible for 
-g_main_context_iteration() to return %FALSE, since the the wait may 
+Note that even when @may_block is %TRUE, it is still possible for
+g_main_context_iteration() to return %FALSE, since the wait may
 be interrupted for other reasons than an event source becoming ready.
 
 
@@ -19919,6 +20005,27 @@ Deprecated:2.22: Use g_mapped_file_unref() instead.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_mapped_file_get_bytes">
+<description>
+Creates a new #GBytes which references the data mapped from @file.
+The mapped contents of the file must not be modified after creating this
+bytes object, because a #GBytes should be immutable.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GMappedFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly allocated #GBytes referencing data
+from @file
+
+</return>
 </function>
 
 <function name="g_mapped_file_get_contents">
@@ -20737,9 +20844,9 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a %NULL-terminated array of gchar * pointers.
-It must be freed using g_strfreev(). If the previous match failed
-%NULL is returned
+<return> a %NULL-terminated array of gchar *
+pointers.  It must be freed using g_strfreev(). If the previous
+match failed %NULL is returned
 
 </return>
 </function>
@@ -20956,13 +21063,21 @@ check that what has been typed so far is potentially valid, it is
 able to raise an error as soon as a mistake is made.
 
 GRegex supports the concept of partial matching by means of the
-#G_REGEX_MATCH_PARTIAL flag. When this is set the return code for
+#G_REGEX_MATCH_PARTIAL_SOFT and #G_REGEX_MATCH_PARTIAL_HARD flags.
+When they are used, the return code for
 g_regex_match() or g_regex_match_full() is, as usual, %TRUE
 for a complete match, %FALSE otherwise. But, when these functions
 return %FALSE, you can check if the match was partial calling
 g_match_info_is_partial_match().
 
-When using partial matching you cannot use g_match_info_fetch*().
+The difference between #G_REGEX_MATCH_PARTIAL_SOFT and 
+#G_REGEX_MATCH_PARTIAL_HARD is that when a partial match is encountered
+with #G_REGEX_MATCH_PARTIAL_SOFT, matching continues to search for a
+possible complete match, while with #G_REGEX_MATCH_PARTIAL_HARD matching
+stops at the partial match.
+When both #G_REGEX_MATCH_PARTIAL_SOFT and #G_REGEX_MATCH_PARTIAL_HARD
+are set, the latter takes precedence.
+See &lt;ulink&gt;man:pcrepartial&lt;/ulink&gt; for more information on partial matching.
 
 Because of the way certain internal optimizations are implemented
 the partial matching algorithm cannot be used with all patterns.
@@ -20971,7 +21086,8 @@ meta-sequences such as &quot;\d+&quot; are not permitted if the maximum number
 of occurrences is greater than one. Optional items such as &quot;\d?&quot;
 (where the maximum is one) are permitted. Quantifiers with any values
 are permitted after parentheses, so the invalid examples above can be
-coded thus &quot;(a){2,4}&quot; and &quot;(\d)+&quot;. If #G_REGEX_MATCH_PARTIAL is set
+coded thus &quot;(a){2,4}&quot; and &quot;(\d)+&quot;. If #G_REGEX_MATCH_PARTIAL or 
+#G_REGEX_MATCH_PARTIAL_HARD is set
 for a pattern that does not conform to the restrictions, matching
 functions return an error.
 
@@ -21451,7 +21567,7 @@ Gets a string describing the last module error.
 </return>
 </function>
 
-<function name="g_module_name">
+<function name="g_module_make_resident">
 <description>
 Ensures that a module will never be unloaded.
 Any future g_module_close() calls on the module will be ignored.
@@ -21464,6 +21580,24 @@ Any future g_module_close() calls on the module will be ignored.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_module_name">
+<description>
+Returns the filename that the module was opened with.
+
+If @module refers to the application itself, &quot;main&quot; is returned.
+
+
+</description>
+<parameters>
+<parameter name="module">
+<parameter_description> a #GModule
+</parameter_description>
+</parameter>
+</parameters>
+<return> the filename of the module
+</return>
 </function>
 
 <function name="g_module_open">
@@ -21565,7 +21699,7 @@ Destroys a @mutex that has been created with g_mutex_new().
 Calling g_mutex_free() on a locked mutex may result
 in undefined behaviour.
 
-Deprecated:3.32:GMutex can now be statically allocated, or embedded
+Deprecated: 2.32: GMutex can now be statically allocated, or embedded
 in structures and initialised with g_mutex_init().
 
 </description>
@@ -21585,7 +21719,7 @@ Initializes a #GMutex so that it can be used.
 This function is useful to initialize a mutex that has been
 allocated on the stack, or as part of a larger structure.
 It is not necessary to initialize a mutex that has been
-created that has been statically allocated.
+statically allocated.
 
 |[
 typedef struct {
@@ -21642,7 +21776,7 @@ already been locked by the same thread results in undefined behaviour
 <description>
 Allocates and initializes a new #GMutex.
 
-Deprecated:3.32:GMutex can now be statically allocated, or embedded
+Deprecated: 2.32: GMutex can now be statically allocated, or embedded
 in structures and initialised with g_mutex_init().
 
 </description>
@@ -27333,6 +27467,7 @@ statically allocated memory in dynamically loaded modules, if you
 expect to ever unload the module again (e.g. do not use this
 function in GTK+ theme engines).
 
+
 </description>
 <parameters>
 <parameter name="string">
@@ -27351,6 +27486,7 @@ Gets the #GQuark identifying the given string. If the string does
 not currently have an associated #GQuark, a new #GQuark is created,
 using a copy of the string.
 
+
 </description>
 <parameters>
 <parameter name="string">
@@ -27367,6 +27503,7 @@ using a copy of the string.
 <description>
 Gets the string associated with the given #GQuark.
 
+
 </description>
 <parameters>
 <parameter name="quark">
@@ -27374,7 +27511,7 @@ Gets the string associated with the given #GQuark.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the string associated with the #GQuark.
+<return> the string associated with the #GQuark
 </return>
 </function>
 
@@ -28861,6 +28998,24 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_regex_get_has_cr_or_lf">
+<description>
+Checks whether the pattern contains explicit CR or LF references.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="regex">
+<parameter_description> a #GRegex structure
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the pattern contains explicit CR or LF references
+
+</return>
+</function>
+
 <function name="g_regex_get_match_flags">
 <description>
 Returns the match options that @regex was created with.
@@ -29574,7 +29729,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a %NULL-terminated gchar ** array. Free it using g_strfreev()
+<return> a %NULL-terminated gchar ** array. Free
+it using g_strfreev()
 
 </return>
 </function>
@@ -29637,7 +29793,8 @@ If this is less than 1, the string is split completely
 </parameter_description>
 </parameter>
 </parameters>
-<return> a %NULL-terminated gchar ** array. Free it using g_strfreev()
+<return> a %NULL-terminated gchar ** array. Free
+it using g_strfreev()
 
 </return>
 </function>
@@ -29693,7 +29850,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a %NULL-terminated array of strings. Free it using g_strfreev()
+<return> a %NULL-terminated array of strings. Free
+it using g_strfreev()
 
 </return>
 </function>
@@ -33723,7 +33881,8 @@ Copies a #GSList.
 &lt;note&gt;&lt;para&gt;
 Note that this is a &quot;shallow&quot; copy. If the list elements
 consist of pointers to data, the pointers are copied but
-the actual data isn't.
+the actual data isn't. See g_slist_copy_deep() if you need
+to copy the data as well.
 &lt;/para&gt;&lt;/note&gt;
 
 
@@ -33738,11 +33897,60 @@ the actual data isn't.
 </return>
 </function>
 
+<function name="g_slist_copy_deep">
+<description>
+Makes a full (deep) copy of a #GSList.
+
+In contrast with g_slist_copy(), this function uses @func to make a copy of
+each list element, in addition to copying the list container itself.
+
+@func, as a #GCopyFunc, takes two arguments, the data to be copied and a user
+pointer. It's safe to pass #NULL as user_data, if the copy function takes only
+one argument.
+
+For instance, if @list holds a list of GObjects, you can do:
+|[
+another_list = g_slist_copy_deep (list, (GCopyFunc) g_object_ref, NULL);
+]|
+
+And, to entirely free the new list, you could do:
+|[
+g_slist_free_full (another_list, g_object_unref);
+]|
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GSList
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description> a copy function used to copy every element in the list
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to the copy function @func, or #NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a full copy of @list, use #g_slist_free_full to free it
+
+</return>
+</function>
+
 <function name="g_slist_delete_link">
 <description>
 Removes the node link_ from the list and frees it.
 Compare this to g_slist_remove_link() which removes the node
 without freeing it.
+
+&lt;note&gt;Removing arbitrary nodes from a singly-linked list
+requires time that is proportional to the length of the list
+(ie. O(n)). If you find yourself using g_slist_delete_link()
+frequently, you should consider a different data structure, such
+as the doubly-linked #GList.&lt;/note&gt;
 
 
 </description>
@@ -34241,6 +34449,12 @@ freeing the element. The removed element's next
 link is set to %NULL, so that it becomes a
 self-contained list with one element.
 
+&lt;note&gt;Removing arbitrary nodes from a singly-linked list
+requires time that is proportional to the length of the list
+(ie. O(n)). If you find yourself using g_slist_remove_link()
+frequently, you should consider a different data structure, such
+as the doubly-linked #GList.&lt;/note&gt;
+
 
 </description>
 <parameters>
@@ -34482,7 +34696,13 @@ see g_source_set_can_recurse().
 <function name="g_source_get_context">
 <description>
 Gets the #GMainContext with which the source is associated.
-Calling this function on a destroyed source is an error.
+
+You can call this on a source that has been destroyed, provided
+that the #GMainContext it was attached to still exists (in which
+case it will return that #GMainContext). In particular, you can
+always call this function on the source returned from
+g_main_current_source(). But calling this function on a source
+whose #GMainContext has been destroyed is an error.
 
 
 </description>
@@ -35360,6 +35580,65 @@ the spawned program opens its windows on the right screen.
 </return>
 </function>
 
+<function name="g_spawn_check_exit_status">
+<description>
+Set @error if @exit_status indicates the child exited abnormally
+(e.g. with a nonzero exit code, or via a fatal signal).
+
+The g_spawn_sync() and g_child_watch_add() family of APIs return an
+exit status for subprocesses encoded in a platform-specific way.
+On Unix, this is guaranteed to be in the same format
+&lt;literal&gt;waitpid(2)&lt;/literal&gt; returns, and on Windows it is
+guaranteed to be the result of
+&lt;literal&gt;GetExitCodeProcess()&lt;/literal&gt;.  Prior to the introduction
+of this function in GLib 2.34, interpreting @exit_status required
+use of platform-specific APIs, which is problematic for software
+using GLib as a cross-platform layer.
+
+Additionally, many programs simply want to determine whether or not
+the child exited successfully, and either propagate a #GError or
+print a message to standard error.  In that common case, this
+function can be used.  Note that the error message in @error will
+contain human-readable information about the exit status.
+
+The &lt;literal&gt;domain&lt;/literal&gt; and &lt;literal&gt;code&lt;/literal&gt; of @error
+have special semantics in the case where the process has an &quot;exit
+code&quot;, as opposed to being killed by a signal.  On Unix, this
+happens if &lt;literal&gt;WIFEXITED&lt;/literal&gt; would be true of
+@exit_status.  On Windows, it is always the case.
+
+The special semantics are that the actual exit code will be the
+code set in @error, and the domain will be %G_SPAWN_EXIT_ERROR.
+This allows you to differentiate between different exit codes.
+
+If the process was terminated by some means other than an exit
+status, the domain will be %G_SPAWN_ERROR, and the code will be
+%G_SPAWN_ERROR_FAILED.
+
+This function just offers convenience; you can of course also check
+the available platform via a macro such as %G_OS_UNIX, and use
+&lt;literal&gt;WIFEXITED()&lt;/literal&gt; and &lt;literal&gt;WEXITSTATUS()&lt;/literal&gt;
+on @exit_status directly.  Do not attempt to scan or parse the
+error message string; it may be translated and/or change in future
+versions of GLib.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="exit_status">
+<parameter_description> An exit code as returned from g_spawn_sync()
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if child exited successfully, %FALSE otherwise (and @error will be set)
+</return>
+</function>
+
 <function name="g_spawn_close_pid">
 <description>
 On some platforms, notably Windows, the #GPid type represents a resource
@@ -35416,9 +35695,9 @@ implications, so consider using g_spawn_sync() directly if
 appropriate. Possible errors are those from g_spawn_sync() and those
 from g_shell_parse_argv().
 
-If @exit_status is non-%NULL, the exit status of the child is stored there as
-it would be returned by waitpid(); standard UNIX macros such as WIFEXITED()
-and WEXITSTATUS() must be used to evaluate the exit status.
+If @exit_status is non-%NULL, the platform-specific exit status of
+the child is stored there; see the documentation of
+g_spawn_check_exit_status() for how to use and interpret this.
 
 On Windows, please note the implications of g_shell_parse_argv()
 parsing @command_line. Parsing is done according to Unix shell rules, not 
@@ -35465,13 +35744,15 @@ All output from the child is stored in @standard_output and @standard_error,
 if those parameters are non-%NULL. Note that you must set the  
 %G_SPAWN_STDOUT_TO_DEV_NULL and %G_SPAWN_STDERR_TO_DEV_NULL flags when
 passing %NULL for @standard_output and @standard_error.
-If @exit_status is non-%NULL, the exit status of the child is stored
-there as it would be returned by waitpid(); standard UNIX macros such 
-as WIFEXITED() and WEXITSTATUS() must be used to evaluate the exit status.
-Note that this function call waitpid() even if @exit_status is %NULL, and
-does not accept the %G_SPAWN_DO_NOT_REAP_CHILD flag.
-If an error occurs, no data is returned in @standard_output, 
-@standard_error, or @exit_status. 
+
+If @exit_status is non-%NULL, the platform-specific exit status of
+the child is stored there; see the doucumentation of
+g_spawn_check_exit_status() for how to use and interpret this.
+Note that it is invalid to pass %G_SPAWN_DO_NOT_REAP_CHILD in
+@flags.
+
+If an error occurs, no data is returned in @standard_output,
+@standard_error, or @exit_status.
 
 This function calls g_spawn_async_with_pipes() internally; see that
 function for full details on the other parameters and details on
@@ -37104,6 +37385,30 @@ free it after use with g_free().
 </return>
 </function>
 
+<function name="g_string_free_to_bytes">
+<description>
+Transfers ownership of the contents of @string to a newly allocated
+#GBytes.  The #GString structure itself is deallocated, and it is
+therefore invalid to use @string after invoking this function.
+
+Note that while #GString ensures that its buffer always has a
+trailing nul character (not reflected in its &quot;len&quot;), the returned
+#GBytes does not include this extra nul; i.e. it has length exactly
+equal to the &quot;len&quot; member.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> a #GString
+</parameter_description>
+</parameter>
+</parameters>
+<return> A newly allocated #GBytes containing contents of @string; @string itself is freed
+</return>
+</function>
+
 <function name="g_string_hash">
 <description>
 Creates a hash code for @str; for use with #GHashTable.
@@ -38215,6 +38520,35 @@ Since: 2.16
 <return></return>
 </function>
 
+<function name="g_test_add_data_func_full">
+<description>
+Create a new test case, as with g_test_add_data_func(), but freeing
+@test_data after the test run is complete.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="testpath">
+<parameter_description> /-separated test case path name for the test.
+</parameter_description>
+</parameter>
+<parameter name="test_data">
+<parameter_description> Test data argument for the test function.
+</parameter_description>
+</parameter>
+<parameter name="test_func">
+<parameter_description> The test function to invoke for this test.
+</parameter_description>
+</parameter>
+<parameter name="data_free_func">
+<parameter_description> #GDestroyNotify for @test_data.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_test_add_func">
 <description>
 Create a new test case, similar to g_test_create_case(). However
@@ -38234,6 +38568,19 @@ Since: 2.16
 <parameter_description>  The test function to invoke for this test.
 </parameter_description>
 </parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_test_assert_expected_messages">
+<description>
+Asserts that all messages previously indicated via
+g_test_expect_message() have been seen and suppressed.
+
+Since: 2.34
+
+</description>
+<parameters>
 </parameters>
 <return></return>
 </function>
@@ -38352,6 +38699,58 @@ Since: 2.16
 </return>
 </function>
 
+<function name="g_test_expect_message">
+<description>
+Indicates that a message with the given @log_domain and @log_level,
+with text matching @pattern, is expected to be logged. When this
+message is logged, it will not be printed, and the test case will
+not abort.
+
+Use g_test_assert_expected_messages() to assert that all
+previously-expected messages have been seen and suppressed.
+
+You can call this multiple times in a row, if multiple messages are
+expected as a result of a single call. (The messages must appear in
+the same order as the calls to g_test_expect_message().)
+
+For example:
+
+|[
+/ * g_main_context_push_thread_default() should fail if the
+* context is already owned by another thread.
+* /
+g_test_expect_message (G_LOG_DOMAIN,
+G_LOG_LEVEL_CRITICIAL,
+&quot;assertion.*acquired_context.*failed&quot;);
+g_main_context_push_thread_default (bad_context);
+g_test_assert_expected_messages ();
+]|
+
+Note that you cannot use this to test g_error() messages, since
+g_error() intentionally never returns even if the program doesn't
+abort; use g_test_trap_fork() in this case.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="log_domain">
+<parameter_description> the log domain of the message
+</parameter_description>
+</parameter>
+<parameter name="log_level">
+<parameter_description> the log level of the message
+</parameter_description>
+</parameter>
+<parameter name="pattern">
+<parameter_description> a glob-style
+&lt;link linkend=&quot;glib-Glob-style-pattern-matching&quot;&gt;pattern&lt;/link&gt;
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_test_fail">
 <description>
 Indicates that a test failed. This function can be called
@@ -38400,57 +38799,57 @@ So far, the following arguments are understood:
 &lt;varlistentry&gt;
 &lt;term&gt;&lt;option&gt;-l&lt;/option&gt;&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-list test cases available in a test executable.
+List test cases available in a test executable.
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;&lt;option&gt;--seed=&lt;replaceable&gt;RANDOMSEED&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-provide a random seed to reproduce test runs using random numbers.
+Provide a random seed to reproduce test runs using random numbers.
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;&lt;option&gt;--verbose&lt;/option&gt;&lt;/term&gt;
-&lt;listitem&gt;&lt;para&gt;run tests verbosely.&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Run tests verbosely.&lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;&lt;option&gt;-q&lt;/option&gt;, &lt;option&gt;--quiet&lt;/option&gt;&lt;/term&gt;
-&lt;listitem&gt;&lt;para&gt;run tests quietly.&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Run tests quietly.&lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;&lt;option&gt;-p &lt;replaceable&gt;TESTPATH&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-execute all tests matching &lt;replaceable&gt;TESTPATH&lt;/replaceable&gt;.
+Execute all tests matching &lt;replaceable&gt;TESTPATH&lt;/replaceable&gt;.
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;&lt;option&gt;-m {perf|slow|thorough|quick|undefined|no-undefined}&lt;/option&gt;&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-execute tests according to these test modes:
+Execute tests according to these test modes:
 &lt;variablelist&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;perf&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-performance tests, may take long and report results.
+Performance tests, may take long and report results.
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;slow, thorough&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-slow and thorough tests, may take quite long and 
+Slow and thorough tests, may take quite long and
 maximize coverage.
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;quick&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-quick tests, should run really quickly and give good coverage.
+Quick tests, should run really quickly and give good coverage.
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;undefined&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-tests for undefined behaviour, may provoke programming errors
+Tests for undefined behaviour, may provoke programming errors
 under g_test_trap_fork() to check that appropriate assertions
 or warnings are given
 &lt;/para&gt;&lt;/listitem&gt;
@@ -38458,7 +38857,7 @@ or warnings are given
 &lt;varlistentry&gt;
 &lt;term&gt;no-undefined&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
-avoid tests for undefined behaviour
+Avoid tests for undefined behaviour
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;/variablelist&gt;
@@ -38466,19 +38865,7 @@ avoid tests for undefined behaviour
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
 &lt;term&gt;&lt;option&gt;--debug-log&lt;/option&gt;&lt;/term&gt;
-&lt;listitem&gt;&lt;para&gt;debug test logging output.&lt;/para&gt;&lt;/listitem&gt;
-&lt;/varlistentry&gt;
-&lt;varlistentry&gt;
-&lt;term&gt;&lt;option&gt;-k&lt;/option&gt;, &lt;option&gt;--keep-going&lt;/option&gt;&lt;/term&gt;
-&lt;listitem&gt;&lt;para&gt;gtester-specific argument.&lt;/para&gt;&lt;/listitem&gt;
-&lt;/varlistentry&gt;
-&lt;varlistentry&gt;
-&lt;term&gt;&lt;option&gt;--GTestLogFD &lt;replaceable&gt;N&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
-&lt;listitem&gt;&lt;para&gt;gtester-specific argument.&lt;/para&gt;&lt;/listitem&gt;
-&lt;/varlistentry&gt;
-&lt;varlistentry&gt;
-&lt;term&gt;&lt;option&gt;--GTestSkipCount &lt;replaceable&gt;N&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
-&lt;listitem&gt;&lt;para&gt;gtester-specific argument.&lt;/para&gt;&lt;/listitem&gt;
+&lt;listitem&gt;&lt;para&gt;Debug test logging output.&lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;/variablelist&gt;
 
@@ -39706,8 +40093,7 @@ except this is done on a per thread basis.
 
 By setting @interval to 0, idle threads will not be stopped.
 
-This function makes use of g_async_queue_timed_pop () using
-@interval.
+The default value is 15000 (15 seconds).
 
 Since: 2.10
 
@@ -39771,6 +40157,8 @@ or -1 for unlimited
 Sets the maximal number of unused threads to @max_threads.
 If @max_threads is -1, no limit is imposed on the number
 of unused threads.
+
+The default value is 2.
 
 </description>
 <parameters>
@@ -44029,9 +44417,9 @@ Since: 2.6
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated %NULL-terminated list of
-strings holding the individual URIs. The array should
-be freed with g_strfreev().
+<return> a newly allocated %NULL-terminated list
+of strings holding the individual URIs. The array should be freed
+with g_strfreev().
 
 </return>
 </function>
@@ -46889,6 +47277,45 @@ Since: 2.24
 </parameter>
 </parameters>
 <return> the byteswapped form of @value
+
+</return>
+</function>
+
+<function name="g_variant_check_format_string">
+<description>
+Checks if calling g_variant_get() with @format_string on @value would
+be valid from a type-compatibility standpoint.  @format_string is
+assumed to be a valid format string (from a syntactic standpoint).
+
+If @copy_only is %TRUE then this function additionally checks that it
+would be safe to call g_variant_unref() on @value immediately after
+the call to g_variant_get() without invalidating the result.  This is
+only possible if deep copies are made (ie: there are no pointers to
+the data inside of the soon-to-be-freed #GVariant instance).  If this
+check fails then a g_critical() is printed and %FALSE is returned.
+
+This function is meant to be used by functions that wish to provide
+varargs accessors to #GVariant values of uncertain values (eg:
+g_variant_lookup() or g_menu_model_get_item_attribute()).
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a #GVariant
+</parameter_description>
+</parameter>
+<parameter name="format_string">
+<parameter_description> a valid #GVariant format string
+</parameter_description>
+</parameter>
+<parameter name="copy_only">
+<parameter_description> %TRUE to ensure the format string makes deep copies
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @format_string is safe to use
 
 </return>
 </function>

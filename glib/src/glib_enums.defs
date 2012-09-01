@@ -764,7 +764,22 @@
 ;;   G_REGEX_ERROR_TOO_MANY_BRANCHES_IN_DEFINE = 154,
 ;;   G_REGEX_ERROR_DEFINE_REPETION = 155,
 ;;   G_REGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS = 156,
-;;   G_REGEX_ERROR_MISSING_BACK_REFERENCE = 157
+;;   G_REGEX_ERROR_MISSING_BACK_REFERENCE = 157,
+;;   G_REGEX_ERROR_INVALID_RELATIVE_REFERENCE = 158,
+;;   G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN = 159,
+;;   G_REGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB  = 160,
+;;   G_REGEX_ERROR_NUMBER_TOO_BIG = 161,
+;;   G_REGEX_ERROR_MISSING_SUBPATTERN_NAME = 162,
+;;   G_REGEX_ERROR_MISSING_DIGIT = 163,
+;;   G_REGEX_ERROR_INVALID_DATA_CHARACTER = 164,
+;;   G_REGEX_ERROR_EXTRA_SUBPATTERN_NAME = 165,
+;;   G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED = 166,
+;;   G_REGEX_ERROR_INVALID_CONTROL_CHAR = 168,
+;;   G_REGEX_ERROR_MISSING_NAME = 169,
+;;   G_REGEX_ERROR_NOT_SUPPORTED_IN_CLASS = 171,
+;;   G_REGEX_ERROR_TOO_MANY_FORWARD_REFERENCES = 172,
+;;   G_REGEX_ERROR_NAME_TOO_LONG = 175,
+;;   G_REGEX_ERROR_CHARACTER_VALUE_TOO_LARGE = 176
 ;; } GRegexError;
 
 (define-enum-extended RegexError
@@ -813,6 +828,21 @@
     '("define-repetion" "G_REGEX_ERROR_DEFINE_REPETION" "155")
     '("inconsistent-newline-options" "G_REGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS" "156")
     '("missing-back-reference" "G_REGEX_ERROR_MISSING_BACK_REFERENCE" "157")
+    '("invalid-relative-reference" "G_REGEX_ERROR_INVALID_RELATIVE_REFERENCE" "158")
+    '("backtracking-control-verb-argument-forbidden" "G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN" "159")
+    '("unknown-backtracking-control-verb" "G_REGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB" "160")
+    '("number-too-big" "G_REGEX_ERROR_NUMBER_TOO_BIG" "161")
+    '("missing-subpattern-name" "G_REGEX_ERROR_MISSING_SUBPATTERN_NAME" "162")
+    '("missing-digit" "G_REGEX_ERROR_MISSING_DIGIT" "163")
+    '("invalid-data-character" "G_REGEX_ERROR_INVALID_DATA_CHARACTER" "164")
+    '("extra-subpattern-name" "G_REGEX_ERROR_EXTRA_SUBPATTERN_NAME" "165")
+    '("backtracking-control-verb-argument-required" "G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED" "166")
+    '("invalid-control-char" "G_REGEX_ERROR_INVALID_CONTROL_CHAR" "168")
+    '("missing-name" "G_REGEX_ERROR_MISSING_NAME" "169")
+    '("not-supported-in-class" "G_REGEX_ERROR_NOT_SUPPORTED_IN_CLASS" "171")
+    '("too-many-forward-references" "G_REGEX_ERROR_TOO_MANY_FORWARD_REFERENCES" "172")
+    '("name-too-long" "G_REGEX_ERROR_NAME_TOO_LONG" "175")
+    '("character-value-too-large" "G_REGEX_ERROR_CHARACTER_VALUE_TOO_LARGE" "176")
   )
 )
 
@@ -829,10 +859,14 @@
 ;;   G_REGEX_RAW               = 1 << 11,
 ;;   G_REGEX_NO_AUTO_CAPTURE   = 1 << 12,
 ;;   G_REGEX_OPTIMIZE          = 1 << 13,
+;;   G_REGEX_FIRSTLINE         = 1 << 18,
 ;;   G_REGEX_DUPNAMES          = 1 << 19,
 ;;   G_REGEX_NEWLINE_CR        = 1 << 20,
 ;;   G_REGEX_NEWLINE_LF        = 1 << 21,
-;;   G_REGEX_NEWLINE_CRLF      = G_REGEX_NEWLINE_CR | G_REGEX_NEWLINE_LF
+;;   G_REGEX_NEWLINE_CRLF      = G_REGEX_NEWLINE_CR | G_REGEX_NEWLINE_LF,
+;;   G_REGEX_NEWLINE_ANYCRLF   = G_REGEX_NEWLINE_CR | 1 << 22,
+;;   G_REGEX_BSR_ANYCRLF       = 1 << 23,
+;;   G_REGEX_JAVASCRIPT_COMPAT = 1 << 25
 ;; } GRegexCompileFlags;
 
 (define-flags-extended RegexCompileFlags
@@ -849,25 +883,35 @@
     '("raw" "G_REGEX_RAW" "1 << 11")
     '("no-auto-capture" "G_REGEX_NO_AUTO_CAPTURE" "1 << 12")
     '("optimize" "G_REGEX_OPTIMIZE" "1 << 13")
+    '("firstline" "G_REGEX_FIRSTLINE" "1 << 18")
     '("dupnames" "G_REGEX_DUPNAMES" "1 << 19")
     '("newline-cr" "G_REGEX_NEWLINE_CR" "1 << 20")
     '("newline-lf" "G_REGEX_NEWLINE_LF" "1 << 21")
     '("newline-crlf" "G_REGEX_NEWLINE_CRLF" "0x300000")
+    '("newline-anycrlf" "G_REGEX_NEWLINE_ANYCRLF" "1048576 | 1 << 22")
+    '("bsr-anycrlf" "G_REGEX_BSR_ANYCRLF" "1 << 23")
+    '("javascript-compat" "G_REGEX_JAVASCRIPT_COMPAT" "1 << 25")
   )
 )
 
 ;; Original typedef:
 ;; typedef enum
 ;; {
-;;   G_REGEX_MATCH_ANCHORED      = 1 << 4,
-;;   G_REGEX_MATCH_NOTBOL        = 1 << 7,
-;;   G_REGEX_MATCH_NOTEOL        = 1 << 8,
-;;   G_REGEX_MATCH_NOTEMPTY      = 1 << 10,
-;;   G_REGEX_MATCH_PARTIAL       = 1 << 15,
-;;   G_REGEX_MATCH_NEWLINE_CR    = 1 << 20,
-;;   G_REGEX_MATCH_NEWLINE_LF    = 1 << 21,
-;;   G_REGEX_MATCH_NEWLINE_CRLF  = G_REGEX_MATCH_NEWLINE_CR | G_REGEX_MATCH_NEWLINE_LF,
-;;   G_REGEX_MATCH_NEWLINE_ANY   = 1 << 22
+;;   G_REGEX_MATCH_ANCHORED         = 1 << 4,
+;;   G_REGEX_MATCH_NOTBOL           = 1 << 7,
+;;   G_REGEX_MATCH_NOTEOL           = 1 << 8,
+;;   G_REGEX_MATCH_NOTEMPTY         = 1 << 10,
+;;   G_REGEX_MATCH_PARTIAL          = 1 << 15,
+;;   G_REGEX_MATCH_NEWLINE_CR       = 1 << 20,
+;;   G_REGEX_MATCH_NEWLINE_LF       = 1 << 21,
+;;   G_REGEX_MATCH_NEWLINE_CRLF     = G_REGEX_MATCH_NEWLINE_CR | G_REGEX_MATCH_NEWLINE_LF,
+;;   G_REGEX_MATCH_NEWLINE_ANY      = 1 << 22,
+;;   G_REGEX_MATCH_NEWLINE_ANYCRLF  = G_REGEX_MATCH_NEWLINE_CR | G_REGEX_MATCH_NEWLINE_ANY,
+;;   G_REGEX_MATCH_BSR_ANYCRLF      = 1 << 23,
+;;   G_REGEX_MATCH_BSR_ANY          = 1 << 24,
+;;   G_REGEX_MATCH_PARTIAL_SOFT     = G_REGEX_MATCH_PARTIAL,
+;;   G_REGEX_MATCH_PARTIAL_HARD     = 1 << 27,
+;;   G_REGEX_MATCH_NOTEMPTY_ATSTART = 1 << 28
 ;; } GRegexMatchFlags;
 
 (define-flags-extended RegexMatchFlags
@@ -883,6 +927,12 @@
     '("newline-lf" "G_REGEX_MATCH_NEWLINE_LF" "1 << 21")
     '("newline-crlf" "G_REGEX_MATCH_NEWLINE_CRLF" "0x300000")
     '("newline-any" "G_REGEX_MATCH_NEWLINE_ANY" "1 << 22")
+    '("newline-anycrlf" "G_REGEX_MATCH_NEWLINE_ANYCRLF" "0x500000")
+    '("bsr-anycrlf" "G_REGEX_MATCH_BSR_ANYCRLF" "1 << 23")
+    '("bsr-any" "G_REGEX_MATCH_BSR_ANY" "1 << 24")
+    '("partial-soft" "G_REGEX_MATCH_PARTIAL_SOFT" "0x8000")
+    '("partial-hard" "G_REGEX_MATCH_PARTIAL_HARD" "1 << 27")
+    '("notempty-atstart" "G_REGEX_MATCH_NOTEMPTY_ATSTART" "1 << 28")
   )
 )
 
