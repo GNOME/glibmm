@@ -25,6 +25,7 @@
 
 #include <glibmm/interface.h>
 #include <glibmm/listhandle.h>
+#include <glibmm/arrayhandle.h>
 #include <glibmm/object.h>
 //#include <giomm/file.h>
 #include <giomm/icon.h>
@@ -67,6 +68,7 @@ public:
 
   _WRAP_METHOD(std::string get_id() const, g_app_info_get_id)
   _WRAP_METHOD(std::string get_name() const, g_app_info_get_name)
+  _WRAP_METHOD(std::string get_display_name() const, g_app_info_get_display_name)
   _WRAP_METHOD(std::string get_description() const, g_app_info_get_description)
   _WRAP_METHOD(std::string get_executable() const, g_app_info_get_executable)
   _WRAP_METHOD(std::string get_commandline() const, g_app_info_get_commandline)
@@ -196,8 +198,15 @@ public:
   _WRAP_METHOD(bool remove_supports_type(const std::string& content_type),
                g_app_info_remove_supports_type,
                errthrow)
+
+#m4 _CONVERSION(`const char**', `Glib::StringArrayHandle', `Glib::StringArrayHandle($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(Glib::StringArrayHandle get_supported_types() const, g_app_info_get_supported_types)
+
+  _WRAP_METHOD(bool set_as_last_used_for_type(const std::string& content_type), g_app_info_set_as_last_used_for_type, errthrow)
+
 #m4 _CONVERSION(`GList*',`Glib::ListHandle<Glib::RefPtr<AppInfo> >',`Glib::ListHandle<Glib::RefPtr<AppInfo> >($3, Glib::OWNERSHIP_SHALLOW)')
   _WRAP_METHOD(static Glib::ListHandle<Glib::RefPtr<AppInfo> > get_all(), g_app_info_get_all)
+
   _WRAP_METHOD(static Glib::ListHandle<Glib::RefPtr<AppInfo> > get_all_for_type(const std::string& content_type), g_app_info_get_all_for_type)
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type, bool must_support_uris = true), g_app_info_get_default_for_type)
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme), g_app_info_get_default_for_uri_scheme)
