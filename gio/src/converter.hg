@@ -1,0 +1,59 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2012 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/interface.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gio/gio.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GConverterIface GConverterIface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+_WRAP_ENUM(ConverterResult, GConverterResult)
+_WRAP_ENUM(ConverterFlags, GConverterFlags)
+
+/** Converter - Data conversion interface.
+ * Converter is implemented by objects that convert binary data in various
+ * ways. The conversion can be stateful and may fail at any place.
+ *
+ * Some example conversions are: character set conversion, compression,
+ * decompression and regular expression replace. 
+ *
+ * @newin{2,34}
+ */
+class Converter : public Glib::Interface
+{
+  _CLASS_INTERFACE(Converter, GConverter, G_CONVERTER, GConverterIface)
+
+public:
+  _WRAP_METHOD(ConverterResult convert(const void* inbuf, gsize inbuf_size, void* outbuf, gsize outbuf_size, ConverterFlags flags, gsize& bytes_read, gsize& bytes_written), g_converter_convert, errthrow)
+  _WRAP_METHOD(void reset(), g_converter_reset)
+
+#m4 _CONVERSION(`gsize*',`gsize&',`*($3)')
+  _WRAP_VFUNC(ConverterResult convert(const void* inbuf, gsize inbuf_size, void* outbuf, gsize outbuf_size, ConverterFlags flags, gsize& bytes_read, gsize& bytes_written, GError** error), "convert")
+
+  _WRAP_VFUNC(void reset(), "reset")
+};
+
+} // namespace Gio
