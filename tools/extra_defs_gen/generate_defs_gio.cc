@@ -44,6 +44,7 @@ int main(int, char**)
             << get_defs(G_TYPE_CANCELLABLE)
             << get_defs(G_TYPE_BUFFERED_INPUT_STREAM)
             << get_defs(G_TYPE_BUFFERED_OUTPUT_STREAM)
+            << get_defs(G_TYPE_CHARSET_CONVERTER)
             << get_defs(G_TYPE_DATA_INPUT_STREAM)
             << get_defs(G_TYPE_DATA_OUTPUT_STREAM)
             << get_defs(G_TYPE_DRIVE)
@@ -93,6 +94,7 @@ int main(int, char**)
 
             << get_defs(G_TYPE_VOLUME_MONITOR)
             << get_defs(G_TYPE_ZLIB_COMPRESSOR)
+            << get_defs(G_TYPE_ZLIB_DECOMPRESSOR)
 
             // network IO classes
             << get_defs(G_TYPE_INET_ADDRESS)

@@ -17,6 +17,7 @@
 
 #include <glibmm/object.h>
 #include <giomm/converter.h>
+#include <giomm/zlibcompressor.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -24,35 +25,30 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-_WRAP_ENUM(ZlibCompressorFormat,  GZlibCompressorFormat)
-
 class FileInfo;
 
-/** ZlibCompressor - Zlib compressor.
- * ZlibCompressor is an implementation of Converter that compresses data using
- * zlib.
+/** ZlibDecompressor - Zlib decompressor.
+ * ZlibDecompressor is an implementation of Converter that decompresses data
+ * compressed with zlib.
  * @newin{2,34}
  */
-class ZlibCompressor : public Glib::Object, public Converter
+class ZlibDecompressor : public Glib::Object, public Converter
 {
-  _CLASS_GOBJECT(ZlibCompressor, GZlibCompressor, G_ZLIB_COMPRESSOR, Glib::Object, GObject)
+  _CLASS_GOBJECT(ZlibDecompressor, GZlibDecompressor, G_ZLIB_DECOMPRESSOR, Glib::Object, GObject)
   _IMPLEMENTS_INTERFACE(Converter)
 
 protected:
-  _WRAP_CTOR(ZlibCompressor(ZlibCompressorFormat format, int level), g_zlib_compressor_new)
+  _WRAP_CTOR(ZlibDecompressor(ZlibCompressorFormat format), g_zlib_decompressor_new)
 
 public:
-  _WRAP_METHOD_DOCS_ONLY(g_zlib_compressor_new)
-  _WRAP_CREATE(ZlibCompressorFormat format, int level)
+  _WRAP_METHOD_DOCS_ONLY(g_zlib_decompressor_new)
+  _WRAP_CREATE(ZlibCompressorFormat format)
 
-  _WRAP_METHOD(Glib::RefPtr<FileInfo> get_file_info(), g_zlib_compressor_get_file_info)
-  _WRAP_METHOD(Glib::RefPtr<const FileInfo> get_file_info() const, g_zlib_compressor_get_file_info, constversion)
-
-  _WRAP_METHOD(void set_file_info(const Glib::RefPtr<FileInfo>& file_info), g_zlib_compressor_set_file_info)
+  _WRAP_METHOD(Glib::RefPtr<FileInfo> get_file_info(), g_zlib_decompressor_get_file_info)
+  _WRAP_METHOD(Glib::RefPtr<const FileInfo> get_file_info() const, g_zlib_decompressor_get_file_info, constversion)
 
   _WRAP_PROPERTY("file-info", Glib::RefPtr<FileInfo>)
   _WRAP_PROPERTY("format", ZlibCompressorFormat)
-  _WRAP_PROPERTY("level", int)
 };
 
 } // namespace Gio
