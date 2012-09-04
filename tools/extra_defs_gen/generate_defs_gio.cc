@@ -92,6 +92,7 @@ int main(int, char**)
             << get_defs(G_TYPE_VOLUME)
 
             << get_defs(G_TYPE_VOLUME_MONITOR)
+            << get_defs(G_TYPE_ZLIB_COMPRESSOR)
 
             // network IO classes
             << get_defs(G_TYPE_INET_ADDRESS)

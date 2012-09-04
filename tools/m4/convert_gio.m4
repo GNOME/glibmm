@@ -37,6 +37,7 @@ _CONV_ENUM(G,SocketMsgFlags)
 _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketType)
 _CONV_ENUM(G,UnixSocketAddressType)
+_CONV_ENUM(G,ZlibCompressorFormat)
 
 # Action
 _CONVERSION(`GAction*',`Glib::RefPtr<Action>',`Glib::wrap($3)')
