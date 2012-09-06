@@ -89,6 +89,16 @@ Glib::ustring content_type_get_mime_type(const Glib::ustring& type);
 Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
 
 /**
+ * Gets the symbolic icon for a content type.
+ *
+ * @param type A content type string.
+ * @return Icon corresponding to the content type.
+ *
+ * @newin{2,34}
+ */
+Glib::RefPtr<Icon> content_type_get_symbolic_icon(const Glib::ustring& type);
+
+/**
  * Checks if a content type can be executable. Note that for instance
  * things like text files can be executables (i.e. scripts and batch files).
  *
