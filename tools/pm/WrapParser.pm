@@ -1201,6 +1201,7 @@ sub on_wrap_vfunc($)
   my $custom_vfunc = 0;
   my $custom_vfunc_callback = 0;
   my $ifdef = "";
+  my $errthrow = 0;
 
   while($#args >= 2) # If optional arguments are there.
   {
@@ -1223,6 +1224,10 @@ sub on_wrap_vfunc($)
     {
       $custom_vfunc_callback = 1;
     }
+    elsif($argRef eq "errthrow")
+    {
+      $errthrow = 1;
+    }
     elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
     	$ifdef = $1;
@@ -1231,7 +1236,7 @@ sub on_wrap_vfunc($)
 
   $self->output_wrap_vfunc($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                            $refreturn, $refreturn_ctype, $custom_vfunc,
-                           $custom_vfunc_callback, $ifdef);
+                           $custom_vfunc_callback, $ifdef, $errthrow);
 }
 
 sub on_wrap_enum($)
@@ -1400,11 +1405,11 @@ sub output_wrap_signal($$$$$$$$$$$)
 }
 
 # void output_wrap($CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
-#                  $custom_vfunc, $custom_vfunc_callback, $ifdef)
-sub output_wrap_vfunc($$$$$$$$)
+#                  $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow)
+sub output_wrap_vfunc($$$$$$$$$)
 {
   my ($self, $CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
-      $custom_vfunc, $custom_vfunc_callback, $ifdef) = @_;
+      $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, '_WRAP_VFUNC'));
@@ -1438,6 +1443,7 @@ sub output_wrap_vfunc($$$$$$$$)
   $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" suffix, and a separate easily-named invoker method.
 
   $$objCVfunc{rettype_needs_ref} = $refreturn_ctype;
+  $$objCVfunc{throw_any_errors} = 1 if($errthrow);
 
   $objOutputter->output_wrap_vfunc_h($filename, $line_num, $objCppVfunc, $objCVfunc, $ifdef);
   $objOutputter->output_wrap_vfunc_cc($filename, $line_num, $objCppVfunc, $objCVfunc,

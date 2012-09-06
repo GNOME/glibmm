@@ -140,12 +140,18 @@ sub output_wrap_vfunc_h($$$$$$)
 }
 
 # _VFUNC_CC(signame,gtkname,rettype,crettype,`<cppargs>',`<cargs>')
-sub output_wrap_vfunc_cc($$$$$$$)
+sub output_wrap_vfunc_cc($$$$$$$$)
 {
   my ($self, $filename, $line_num, $objCppfunc, $objCFunc,
       $custom_vfunc, $custom_vfunc_callback, $ifdef) = @_;
 
   my $cname = $$objCFunc{name};
+  
+  my $errthrow = "";
+  if($$objCFunc{throw_any_errors})
+  {
+    $errthrow = "errthrow"
+  }
 
   # e.g. Gtk::Button::draw_indicator:
 
@@ -156,16 +162,17 @@ sub output_wrap_vfunc_cc($$$$$$$)
     my $refreturn = "";
     $refreturn = "refreturn" if($$objCppfunc{rettype_needs_ref});
 
-    my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
+    my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
       $$objCFunc{rettype},
       $objCppfunc->args_types_and_names(),
-      convert_args_cpp_to_c($objCppfunc, $objCFunc, 0, $line_num), #$objCppfunc->args_names_only(),
+      convert_args_cpp_to_c($objCppfunc, $objCFunc, 0, $line_num, $errthrow), #$objCppfunc->args_names_only(),
       $objCppfunc->get_is_const(),
       $refreturn,
-      $ifdef);
+      $ifdef,
+      $errthrow);
 
     $self->append($str);
   }
@@ -177,7 +184,7 @@ sub output_wrap_vfunc_cc($$$$$$$)
     my $refreturn_ctype = "";
     $refreturn_ctype = "refreturn_ctype" if($$objCFunc{rettype_needs_ref});
 
-    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s)dnl\n",
+    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -187,7 +194,8 @@ sub output_wrap_vfunc_cc($$$$$$$)
       convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num),
       ${$objCFunc->get_param_names()}[0],
       $refreturn_ctype,
-      $ifdef);
+      $ifdef,
+      $errthrow);
 
     $self->append($str);
   }
@@ -964,6 +972,10 @@ sub convert_args_c_to_cpp($$$)
   my @result;
 
   my $num_c_args = scalar(@{$c_param_types});
+  
+  # If the the function has been marked as a function that throws errors (Glib::Error)
+  # don't count the last GError** argument.
+  $num_c_args-- if($$objCDefsFunc{throw_any_errors});
 
   my $num_cpp_args = scalar(@{$cpp_param_types});
 

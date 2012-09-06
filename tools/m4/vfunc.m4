@@ -18,10 +18,10 @@ ifelse(`$4',,,`#endif // $4
 _POP()')
 
 
-dnl               $1      $2       $3        $4
+dnl              $1      $2       $3        $4
 dnl _VFUNC_PCC(cppname,gtkname,cpprettype,crettype,
-dnl                        $5                $6          $7            $8        $9					$10
-dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef)
+dnl                         $5               $6           $7            $8         $9           $10      $11
+dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef, errthrow)
 dnl
 dnl Note: _get_current_wrapper_inline() could be used throughout for performance instead of _get_current_wrapper(),
 dnl and is_derived_() instead of is_derived_(),
@@ -86,7 +86,15 @@ dnl  g_assert(base != 0);
 
   // Call the original underlying C function:
   if(base && base->$2)
-    ifelse($4,void,,`return ')(*base->$2)`'($6);
+  {
+    ifelse($4,void,,`$4 result = ')(*base->$2)`'($6);
+ifelse($11,errthrow,`dnl
+    if(*error)
+      ::Glib::Error::throw_exception(*error);
+')dnl
+ifelse($4,void,,`    return result;
+')dnl
+  }
 
 ifelse($4,void,,`dnl
 
@@ -98,8 +106,8 @@ ifelse(`$10',,,`#endif // $10
 ')dnl
 _POP()')
 
-#                $1        $2        $3           $4          $5            $6         $7          $8			$9
-# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn, $ifdef)
+#               $1        $2          $3         $4          $5             $6          $7        $8        $9        $10
+# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn, $ifdef, $errthrow)
 #
 define(`_VFUNC_CC',`dnl
 _PUSH(SECTION_CC_VFUNCS)
@@ -116,14 +124,25 @@ ifdef(`__BOOL_IS_INTERFACE__',`dnl
 dnl  g_assert(base != 0);
 
   if(base && base->$2)
+  {
+ifelse($10,errthrow,`dnl
+    GError* gerror = 0;
+')dnl
 ifelse($3,void,`dnl
     (*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6));
+  }
 ',`dnl
 ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requested.
-    return Glib::wrap((*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6)), true);
+    $3 result(Glib::wrap((*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6)), true));
 ',`dnl
-    return _CONVERT($4,$3,`(*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6))');
+    $3 result(_CONVERT($4,$3,`(*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6))'));
 ')dnl
+ifelse($10,errthrow,`dnl
+    if(gerror)
+      ::Glib::Error::throw_exception(gerror);
+')dnl
+    return result;
+  }
 
   typedef $3 RType;
   return RType`'();

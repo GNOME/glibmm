@@ -1,3 +1,33 @@
+2012-09-05  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: _WRAP_VFUNC: Handle virtual functions that throw GErrors.
+
+	* tools/pm/WrapParser.pm (on_wrap_vfunc): Modified so that _WRAP_VFUNC
+	recognizes an optional "errthrow" parameter as is done in
+	_WRAP_METHOD.
+	(output_wrap_vfunc): Modified to tag the located virtual function
+	definition as one that will be wrapped by a C++ method that throws the
+	final C GError parameter.
+	* tools/pm/Output.pm (output_wrap_vfunc_cc): Modified to pass an
+	optional "errthrow" string to _VFUNC_CC and _VFUNC_PCC so that they
+	can include the proper code for the getting and throwing of the
+	GError.  Also modified to pass the "errthrow" string to the
+	convert_args_cpp_to_c() so that it process the C++ method as one
+	throwing a Glib::Error.
+	(convert_args_c_to_cpp): Modified to ignore the final GError if the
+	C function has been marked as one that will be wrapped by a C++ method
+	throwing the final C GError parameter.
+
+	* tools/m4/vfunc.m4 (_VFUNC_PCC): Modified to recognize a final
+	"errthrow" string parameter in which case code is inserted to declare
+	a local parameter in which to store the C GError and then throw
+	it as a Glib::Error if an error was received when the underlying C
+	function is called in the virtual function callback.
+	(_VFUNC_CC): Also modified to recognize a final "errthrow" string
+	parameter inserting code to store and then throw a possibly obtained
+	GError as a Glib::Error in the C++ virtual function when calling the
+	underlying C virtual function.
+
 2012-09-04  José Alburquerque  <jaalburquerque@gmail.com>
 
 	giomm: Add the ZlibDecompressor and the CharsetConverter classes.
