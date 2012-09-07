@@ -132,7 +132,7 @@ _CONVERSION(`GRegex*',`Glib::RefPtr<Regex>',`Glib::wrap($3)')
 _CONVERSION(`GRegex*',`Glib::RefPtr<const Regex>',`Glib::wrap($3)')
 
 #Source
-_CONVERSION(`GSource*',`Glib::RefPtr<Glib::IOSource>',`Glib::wrap($3)')
+_CONVERSION(`GSource*',`Glib::RefPtr<Glib::Source>',`Glib::wrap($3)')
 
 dnl TimeVal
 _CONVERSION(`const TimeVal&',`const GTimeVal*',`&($3)')
