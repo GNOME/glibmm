@@ -50,9 +50,10 @@ Glib::ustring content_type_get_mime_type(const Glib::ustring& type)
 
 Glib::RefPtr<Gio::Icon> content_type_get_icon(const Glib::ustring& type)
 {
-  //TODO: Does g_content_type_get_icon() return a reference?
-  //It currently has no implementation so it's hard to know. murrayc.
-  return Glib::wrap(g_content_type_get_icon(type.c_str()));
+ Glib::RefPtr<Icon> retvalue = Glib::wrap(g_content_type_get_icon(type.c_str()));
+  if(retvalue)
+    retvalue->reference(); //The function does not do a ref for us.
+  return retvalue;
 }
 
 bool content_type_can_be_executable(const Glib::ustring& type)
