@@ -24,6 +24,7 @@
 #include <giomm/socketconnectable.h>
 #include <giomm/socketaddress.h>
 #include <giomm/enums.h>
+#include <giomm/inetaddress.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -149,6 +150,9 @@ public:
   // TODO: wrap g_socket_send_message -- figure out this GOutputVector thing
   _WRAP_METHOD(void close(), g_socket_close, errthrow)
   _WRAP_METHOD(bool is_closed(), g_socket_is_closed)
+
+  _WRAP_METHOD(Glib::RefPtr<Glib::IOSource> create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_create_source)
+
   _WRAP_METHOD(void shutdown(bool shutdown_read, bool shutdown_write), g_socket_shutdown, errthrow)
   _WRAP_METHOD(bool is_connected(), g_socket_is_connected)
 
@@ -157,10 +161,17 @@ public:
   // constructor that takes a GSource*
 //#m4 _CONVERSION(`GSource*',`Glib::RefPtr<Glib::Source>',`Glib::RefPtr<Glib::Source>(new ::Glib::Source($3))')
   //_WRAP_METHOD(Glib::RefPtr<Glib::Source> create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable), g_socket_create_source)
+
+  _WRAP_METHOD(gssize get_available_bytes() const,  g_socket_get_available_bytes)
+
   _WRAP_METHOD(Glib::IOCondition condition_check(Glib::IOCondition condition), g_socket_condition_check)
 
   _WRAP_METHOD(void condition_wait(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable), g_socket_condition_wait, errthrow)
+
+  //TODO: Documentation.
   void condition_wait(Glib::IOCondition condition);
+
+  _WRAP_METHOD(void condition_timed_wait(Glib::IOCondition condition, gint64 timeout, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_condition_timed_wait, errthrow)
 
   _WRAP_METHOD(void set_listen_backlog(int backlog), g_socket_set_listen_backlog)
   _WRAP_METHOD(int get_listen_backlog() const, g_socket_get_listen_backlog)
@@ -187,7 +198,22 @@ public:
 
   _WRAP_METHOD_DOCS_ONLY(g_socket_send_with_blocking)
   gssize send_with_blocking(gchar* buffer, gsize size, bool blocking, const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
-    
+
+  _WRAP_METHOD(guint get_ttl() const, g_socket_get_ttl)
+  _WRAP_METHOD(void set_ttl(guint ttl), g_socket_set_ttl)
+
+  _WRAP_METHOD(bool get_broadcast() const, g_socket_get_broadcast )
+  _WRAP_METHOD(void set_broadcast(bool broadcast), g_socket_set_broadcast)
+
+  _WRAP_METHOD(bool get_multicast_loopback() const, g_socket_get_multicast_loopback)
+  _WRAP_METHOD(void set_multicast_loopback(bool loopback), g_socket_set_multicast_loopback)
+  _WRAP_METHOD(guint get_multicast_ttl() const, g_socket_get_multicast_ttl)
+  _WRAP_METHOD(void set_multicast_ttl(guint ttl), g_socket_set_multicast_ttl)
+
+  _WRAP_METHOD(bool join_multicast_group(const Glib::RefPtr<InetAddress>& group, bool source_specific, const std::string& iface{?}), g_socket_join_multicast_group, errthrow)
+  _WRAP_METHOD(bool leave_multicast_group(const Glib::RefPtr<InetAddress>& ggroup, bool source_specific, const std::string& iface{?}), g_socket_leave_multicast_group, errthrow)
+
+ 
   _WRAP_PROPERTY("blocking", bool)
   _WRAP_PROPERTY("family", SocketFamily)
   _WRAP_PROPERTY("fd", int)
@@ -197,7 +223,11 @@ public:
   _WRAP_PROPERTY("remote-address", Glib::RefPtr<SocketAddress>)
   _WRAP_PROPERTY("timeout", guint)
   _WRAP_PROPERTY("protocol", SocketProtocol)
+  _WRAP_PROPERTY("broadcast", bool)
   _WRAP_PROPERTY("type", SocketType)
+  _WRAP_PROPERTY("ttl", guint)
+  _WRAP_PROPERTY("multicast-loopback", bool)
+  _WRAP_PROPERTY("multicast-ttl", guint)
 };
 
 } // namespace Gio
