@@ -33,7 +33,7 @@ namespace Container_Helpers
 /* Count the number of elements in a 0-terminated sequence.
  */
 template <class T> inline
-size_t compute_array_size(const T* array)
+std::size_t compute_array_size(const T* array)
 {
   const T* pend = array;
 
@@ -47,7 +47,7 @@ size_t compute_array_size(const T* array)
  * specifies the number of elements in the input sequence.
  */
 template <class For, class Tr>
-typename Tr::CType* create_array(For pbegin, size_t size, Tr)
+typename Tr::CType* create_array(For pbegin, std::size_t size, Tr)
 {
   typedef typename Tr::CType CType;
 
@@ -66,7 +66,7 @@ typename Tr::CType* create_array(For pbegin, size_t size, Tr)
 }
 
 template <class For>
-gboolean* create_bool_array(For pbegin, size_t size)
+gboolean* create_bool_array(For pbegin, std::size_t size)
 {
   gboolean *const array(static_cast<gboolean*>(g_malloc((size + 1) * sizeof(gboolean))));
   gboolean *const array_end(array + size);
@@ -89,10 +89,10 @@ struct ArraySourceTraits
 {
   typedef typename Tr::CType CType;
 
-  static size_t get_size(const Cont& cont)
+  static std::size_t get_size(const Cont& cont)
     { return cont.size(); }
 
-  static const CType* get_data(const Cont& cont, size_t size)
+  static const CType* get_data(const Cont& cont, std::size_t size)
     { return Glib::Container_Helpers::create_array(cont.begin(), size, Tr()); }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_SHALLOW;
@@ -104,10 +104,10 @@ struct BoolArraySourceTraits
 {
   typedef gboolean CType;
 
-  static size_t get_size(const Cont& cont)
+  static std::size_t get_size(const Cont& cont)
     { return cont.size(); }
 
-  static const CType* get_data(const Cont& cont, size_t size)
+  static const CType* get_data(const Cont& cont, std::size_t size)
     { return Glib::Container_Helpers::create_bool_array(cont.begin(), size); }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_SHALLOW;
@@ -120,10 +120,10 @@ struct ArraySourceTraits<Tr,Cont*>
 {
   typedef typename Tr::CType CType;
 
-  static size_t get_size(const CType* array)
+  static std::size_t get_size(const CType* array)
     { return (array) ? Glib::Container_Helpers::compute_array_size(array) : 0; }
 
-  static const CType* get_data(const CType* array, size_t)
+  static const CType* get_data(const CType* array, std::size_t)
     { return array; }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_NONE;
@@ -138,21 +138,21 @@ struct ArraySourceTraits<Tr,const Cont*> : ArraySourceTraits<Tr,Cont*>
  * For consistency, the array must be 0-terminated, even though the array
  * size is known at compile time.
  */
-template <class Tr, class Cont, size_t N>
+template <class Tr, class Cont, std::size_t N>
 struct ArraySourceTraits<Tr,Cont[N]>
 {
   typedef typename Tr::CType CType;
 
-  static size_t get_size(const CType*)
+  static std::size_t get_size(const CType*)
     { return (N - 1); }
 
-  static const CType* get_data(const CType* array, size_t)
+  static const CType* get_data(const CType* array, std::size_t)
     { return array; }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_NONE;
 };
 
-template <class Tr, class Cont, size_t N>
+template <class Tr, class Cont, std::size_t N>
 struct ArraySourceTraits<Tr,const Cont[N]> : ArraySourceTraits<Tr,Cont[N]>
 {};
 
@@ -171,7 +171,7 @@ public:
 
   typedef std::random_access_iterator_tag   iterator_category;
   typedef CppType                           value_type;
-  typedef ptrdiff_t                         difference_type;
+  typedef std::ptrdiff_t                    difference_type;
   typedef value_type                        reference;
   typedef void                              pointer;
 
@@ -227,8 +227,8 @@ public:
   typedef typename Tr::CType    CType;
 
   typedef CppType               value_type;
-  typedef size_t                size_type;
-  typedef ptrdiff_t             difference_type;
+  typedef std::size_t           size_type;
+  typedef std::ptrdiff_t        difference_type;
 
   typedef Glib::Container_Helpers::ArrayHandleIterator<Tr>   const_iterator;
   typedef Glib::Container_Helpers::ArrayHandleIterator<Tr>   iterator;
@@ -237,7 +237,7 @@ public:
     ArrayHandle(const Cont& container);
 
   // Take over ownership of an array created by GTK+ functions.
-  inline ArrayHandle(const CType* array, size_t array_size, Glib::OwnershipType ownership);
+  inline ArrayHandle(const CType* array, std::size_t array_size, Glib::OwnershipType ownership);
   inline ArrayHandle(const CType* array, Glib::OwnershipType ownership);
 
   // Copying clears the ownership flag of the source handle.
@@ -259,11 +259,11 @@ public:
     void copy(Out pdest) const;
 
   inline const CType* data()  const;
-  inline size_t       size()  const;
+  inline std::size_t  size()  const;
   inline bool         empty() const;
 
 private:
-  size_t                      size_;
+  std::size_t                 size_;
   const CType*                parray_;
   mutable Glib::OwnershipType ownership_;
 
@@ -282,8 +282,8 @@ public:
   typedef Tr::CType    CType;
 
   typedef CppType               value_type;
-  typedef size_t                size_type;
-  typedef ptrdiff_t             difference_type;
+  typedef std::size_t           size_type;
+  typedef std::ptrdiff_t        difference_type;
 
   typedef Glib::Container_Helpers::ArrayHandleIterator<Tr>   const_iterator;
   typedef Glib::Container_Helpers::ArrayHandleIterator<Tr>   iterator;
@@ -292,7 +292,7 @@ public:
     ArrayHandle(const Cont& container);
 
   // Take over ownership of an array created by GTK+ functions.
-  inline ArrayHandle(const CType* array, size_t array_size, Glib::OwnershipType ownership);
+  inline ArrayHandle(const CType* array, std::size_t array_size, Glib::OwnershipType ownership);
   inline ArrayHandle(const CType* array, Glib::OwnershipType ownership);
 
   // Copying clears the ownership flag of the source handle.
@@ -347,11 +347,11 @@ public:
     void copy(Out pdest) const;
 
   inline const CType* data()  const;
-  inline size_t       size()  const;
+  inline std::size_t  size()  const;
   inline bool         empty() const;
 
 private:
-  size_t                      size_;
+  std::size_t                 size_;
   const CType*                parray_;
   mutable Glib::OwnershipType ownership_;
 
@@ -517,7 +517,7 @@ ArrayHandle<T,Tr>::ArrayHandle(const Cont& container)
 {}
 
 template <class T, class Tr> inline
-ArrayHandle<T,Tr>::ArrayHandle(const typename ArrayHandle<T,Tr>::CType* array, size_t array_size,
+ArrayHandle<T,Tr>::ArrayHandle(const typename ArrayHandle<T,Tr>::CType* array, std::size_t array_size,
                                Glib::OwnershipType ownership)
 :
   size_      ((array) ? array_size : 0),
@@ -644,7 +644,7 @@ const typename ArrayHandle<T,Tr>::CType* ArrayHandle<T,Tr>::data() const
 }
 
 template <class T, class Tr> inline
-size_t ArrayHandle<T,Tr>::size() const
+std::size_t ArrayHandle<T,Tr>::size() const
 {
   return size_;
 }
@@ -668,7 +668,7 @@ ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::ArrayHandle(const Cont& 
 {}
 
 inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::ArrayHandle(const gboolean* array, size_t array_size,
+ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::ArrayHandle(const gboolean* array, std::size_t array_size,
                                                                     Glib::OwnershipType ownership)
 :
   size_      ((array) ? array_size : 0),
@@ -734,7 +734,7 @@ const gboolean* ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::data() c
 }
 
 inline
-size_t ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::size() const
+std::size_t ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::size() const
 {
   return size_;
 }

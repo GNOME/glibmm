@@ -26,6 +26,7 @@
 #include <glibmm/iochannel.h>
 #include <sigc++/sigc++.h>
 #include <vector>
+#include <cstddef>
 
 namespace Glib
 {
@@ -493,7 +494,7 @@ public:
 private:
   // Glib::MainContext can neither be constructed nor deleted.
   MainContext();
-  void operator delete(void*, size_t);
+  void operator delete(void*, std::size_t);
 
   // noncopyable
   MainContext(const MainContext& other);
@@ -553,7 +554,7 @@ public:
 private:
   // Glib::MainLoop can neither be constructed nor deleted.
   MainLoop();
-  void operator delete(void*, size_t);
+  void operator delete(void*, std::size_t);
 
   MainLoop(const MainLoop&);
   MainLoop& operator=(const MainLoop&);

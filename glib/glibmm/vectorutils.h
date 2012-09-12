@@ -21,6 +21,7 @@
 #include <vector>
 #include <glibmmconfig.h>
 #include <glibmm/containerhandle_shared.h>
+#include <cstddef>
 
 /* There are three types of functions:
  * 1. Returning a container.
@@ -68,7 +69,7 @@ namespace Container_Helpers
 /* Count the number of elements in a 0-terminated sequence.
  */
 template <class T> inline
-size_t compute_array_size2(const T* array)
+std::size_t compute_array_size2(const T* array)
 {
   if(array)
   {
@@ -88,7 +89,7 @@ size_t compute_array_size2(const T* array)
  * specifies the number of elements in the input sequence.
  */
 template <class Tr>
-typename Tr::CType* create_array(typename std::vector<typename Tr::CppType>::const_iterator pbegin, size_t size)
+typename Tr::CType* create_array(typename std::vector<typename Tr::CppType>::const_iterator pbegin, std::size_t size)
 {
   typedef typename Tr::CType CType;
 
@@ -110,7 +111,7 @@ typename Tr::CType* create_array(typename std::vector<typename Tr::CppType>::con
  * which does not conform to being an STL container.
  */
 gboolean* create_bool_array(std::vector<bool>::const_iterator pbegin,
-                             size_t size);
+                            std::size_t size);
 
 /* Create and fill a GList as efficient as possible.
  * This requires bidirectional iterators.
@@ -162,7 +163,7 @@ public:
 
   typedef std::random_access_iterator_tag   iterator_category;
   typedef CppType                           value_type;
-  typedef ptrdiff_t                         difference_type;
+  typedef std::ptrdiff_t                    difference_type;
   typedef value_type                        reference;
   typedef void                              pointer;
 
@@ -203,7 +204,7 @@ public:
 
   typedef std::forward_iterator_tag   iterator_category;
   typedef CppType                     value_type;
-  typedef ptrdiff_t                   difference_type;
+  typedef std::ptrdiff_t              difference_type;
   typedef value_type                  reference;
   typedef void                        pointer;
 
@@ -229,7 +230,7 @@ public:
 
   typedef std::forward_iterator_tag   iterator_category;
   typedef CppType                     value_type;
-  typedef ptrdiff_t                   difference_type;
+  typedef std::ptrdiff_t              difference_type;
   typedef value_type                  reference;
   typedef void                        pointer;
 
@@ -287,7 +288,7 @@ public:
    * @param array_size - length of @a array.
    * @param ownership - ownership definition.
    */
-  explicit inline ArrayKeeper(const CType* array, size_t array_size, Glib::OwnershipType ownership);
+  explicit inline ArrayKeeper(const CType* array, std::size_t array_size, Glib::OwnershipType ownership);
   inline ArrayKeeper(const ArrayKeeper& keeper);
   ~ArrayKeeper();
 
@@ -301,7 +302,7 @@ public:
 
 private:
   CType* array_;
-  size_t array_size_;
+  std::size_t array_size_;
   mutable Glib::OwnershipType ownership_;
 };
 
@@ -466,7 +467,7 @@ public:
   typedef typename Glib::Container_Helpers::ArrayIterator<Tr> ArrayIteratorType;
 
 // maybe think about using C++0x move constructors?
-  static VectorType array_to_vector(const CType* array, size_t array_size, Glib::OwnershipType ownership);
+  static VectorType array_to_vector(const CType* array, std::size_t array_size, Glib::OwnershipType ownership);
   static VectorType array_to_vector(const CType* array, Glib::OwnershipType ownership);
   static ArrayKeeperType vector_to_array(const VectorType& vector);
 };
@@ -482,7 +483,7 @@ public:
   typedef Glib::Container_Helpers::ArrayIterator<Glib::Container_Helpers::TypeTraits<bool> > ArrayIteratorType;
 
 // maybe think about using C++0x move constructors?
-  static VectorType array_to_vector(const CType* array, size_t array_size, Glib::OwnershipType ownership);
+  static VectorType array_to_vector(const CType* array, std::size_t array_size, Glib::OwnershipType ownership);
   static VectorType array_to_vector(const CType* array, Glib::OwnershipType ownership);
   static ArrayKeeperType vector_to_array(const VectorType& vector);
 };
@@ -768,7 +769,7 @@ bool SListIterator<Tr>::operator!=(const SListIterator<Tr>& rhs) const
 /**** Glib::Container_Helpers::ArrayKeeper<> ************************/
 
 template <typename Tr>
-inline ArrayKeeper<Tr>::ArrayKeeper(const CType* array, size_t array_size, Glib::OwnershipType ownership)
+inline ArrayKeeper<Tr>::ArrayKeeper(const CType* array, std::size_t array_size, Glib::OwnershipType ownership)
 :
   array_(const_cast<CType*>(array)),
   array_size_(array_size),
@@ -901,7 +902,7 @@ inline GSList* GSListKeeper<Tr>::data() const
 
 template <typename T, class Tr>
 typename ArrayHandler<T, Tr>::VectorType
-ArrayHandler<T, Tr>::array_to_vector(const CType* array, size_t array_size, Glib::OwnershipType ownership)
+ArrayHandler<T, Tr>::array_to_vector(const CType* array, std::size_t array_size, Glib::OwnershipType ownership)
 {
   if (array)
   {

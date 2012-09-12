@@ -101,7 +101,7 @@ struct SListSourceTraits<Tr,const Cont*> : SListSourceTraits<Tr,Cont*>
  * to the first element.  For consistency, the array must be 0-terminated,
  * even though the array size is known at compile time.
  */
-template <class Tr, class Cont, size_t N>
+template <class Tr, class Cont, std::size_t N>
 struct SListSourceTraits<Tr,Cont[N]>
 {
   static GSList* get_data(const Cont* array)
@@ -110,7 +110,7 @@ struct SListSourceTraits<Tr,Cont[N]>
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_SHALLOW;
 };
 
-template <class Tr, class Cont, size_t N>
+template <class Tr, class Cont, std::size_t N>
 struct SListSourceTraits<Tr,const Cont[N]> : SListSourceTraits<Tr,Cont[N]>
 {};
 
@@ -129,7 +129,7 @@ public:
 
   typedef std::forward_iterator_tag   iterator_category;
   typedef CppType                     value_type;
-  typedef ptrdiff_t                   difference_type;
+  typedef std::ptrdiff_t              difference_type;
   typedef value_type                  reference;
   typedef void                        pointer;
 
@@ -166,8 +166,8 @@ public:
   typedef typename Tr::CType    CType;
 
   typedef CppType               value_type;
-  typedef size_t                size_type;
-  typedef ptrdiff_t             difference_type;
+  typedef std::size_t           size_type;
+  typedef std::ptrdiff_t        difference_type;
 
   typedef Glib::Container_Helpers::SListHandleIterator<Tr>   const_iterator;
   typedef Glib::Container_Helpers::SListHandleIterator<Tr>   iterator;
@@ -196,7 +196,7 @@ public:
     void copy(Out pdest) const;
 
   inline GSList* data()  const;
-  inline size_t  size()  const;
+  inline std::size_t size()  const;
   inline bool    empty() const;
 
 private:
@@ -387,7 +387,7 @@ GSList* SListHandle<T,Tr>::data() const
 }
 
 template <class T, class Tr> inline
-size_t SListHandle<T,Tr>::size() const
+std::size_t SListHandle<T,Tr>::size() const
 {
   return g_slist_length(pslist_);
 }

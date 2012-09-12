@@ -54,8 +54,8 @@ public:
 
   typedef T_CppElement element_type;
 
-  typedef size_t difference_type;
-  typedef size_t size_type;
+  typedef std::size_t difference_type; //TODO Why not std::ptrdiff_t?
+  typedef std::size_t size_type;
 
   //These are implemented differently for each Helper List.
   virtual iterator erase(iterator) = 0;

@@ -25,6 +25,7 @@
 #include <glibmm/sarray.h> /* for backward compatibility */
 #include <glib.h>
 #include <iterator>
+#include <cstddef>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -58,8 +59,8 @@ class List_Iterator : public List_Iterator_Base<T>
 {
 public:
   typedef std::bidirectional_iterator_tag iterator_category;
-  typedef size_t size_type;
-  typedef ptrdiff_t difference_type;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
   
   typedef typename List_Iterator_Base<T>::pointer pointer;
   typedef typename List_Iterator_Base<T>::reference reference;
@@ -131,8 +132,8 @@ class SList_Iterator : public List_Iterator_Base<T>
 {
 public:
   typedef std::forward_iterator_tag iterator_category;
-  typedef size_t size_type;
-  typedef ptrdiff_t difference_type;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
 
   typedef typename List_Iterator_Base<T>::pointer pointer;
   typedef typename List_Iterator_Base<T>::reference reference;
@@ -185,8 +186,8 @@ class List_Cpp_Iterator : public List_Iterator_Base<T_IFace>
 {
 public:
   typedef std::bidirectional_iterator_tag iterator_category;
-  typedef size_t size_type;
-  typedef ptrdiff_t difference_type;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
 
   typedef typename List_Iterator_Base<T_IFace>::pointer pointer;
   typedef typename List_Iterator_Base<T_IFace>::reference reference;

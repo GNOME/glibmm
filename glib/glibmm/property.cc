@@ -82,7 +82,7 @@ static unsigned int property_to_id(Glib::ObjectBase& object, Glib::PropertyBase&
   void *const base_ptr = dynamic_cast<void*>(&object);
   void *const prop_ptr = &property;
 
-  const ptrdiff_t offset = static_cast<guint8*>(prop_ptr) - static_cast<guint8*>(base_ptr);
+  const std::ptrdiff_t offset = static_cast<guint8*>(prop_ptr) - static_cast<guint8*>(base_ptr);
 
   g_return_val_if_fail(offset > 0 && offset < G_MAXINT, 0);
 

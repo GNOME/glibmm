@@ -74,7 +74,7 @@ public:
 
   Iterator begin() const { return pbegin_; }
   Iterator end()   const { return pend_;   }
-  size_t   size()  const { return std::distance(pbegin_, pend_); }
+  std::size_t size()  const { return std::distance(pbegin_, pend_); }
 };
 
 /** Helper function to create a Glib::Sequence<> object, which

@@ -132,8 +132,8 @@ static std::vector<Glib::ustring>
 split_service_parts (const Glib::ustring& arg)
 {
     std::vector<Glib::ustring> parts;
-    size_t delim1 = 0;
-    size_t delim2 = 0;
+    std::size_t delim1 = 0;
+    std::size_t delim2 = 0;
     delim1 = arg.find ('/', 0);
     if (delim1 == std::string::npos)
         return parts;
@@ -402,7 +402,7 @@ do_connectable (const std::string& arg, gboolean synchronous)
         std::string host, port_str;
         guint16 port;
 
-        size_t pos = arg.find (':');
+        std::size_t pos = arg.find (':');
         if (pos != std::string::npos)
         {
             host = arg.substr (0, pos);

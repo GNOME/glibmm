@@ -23,7 +23,7 @@ namespace Glib
 namespace Container_Helpers
 {
 
-gboolean* create_bool_array(std::vector<bool>::const_iterator pbegin, size_t size)
+gboolean* create_bool_array(std::vector<bool>::const_iterator pbegin, std::size_t size)
 {
   gboolean *const array(static_cast<gboolean*>(g_malloc((size + 1) * sizeof(gboolean))));
   gboolean *const array_end(array + size);
@@ -43,7 +43,7 @@ gboolean* create_bool_array(std::vector<bool>::const_iterator pbegin, size_t siz
 /**** Glib::ArrayHandler<bool> ************************/
 
 ArrayHandler<bool, Glib::Container_Helpers::TypeTraits<bool> >::VectorType
-ArrayHandler<bool, Glib::Container_Helpers::TypeTraits<bool> >::array_to_vector(const CType* array, size_t array_size, Glib::OwnershipType ownership)
+ArrayHandler<bool, Glib::Container_Helpers::TypeTraits<bool> >::array_to_vector(const CType* array, std::size_t array_size, Glib::OwnershipType ownership)
 {
   if(array)
   {

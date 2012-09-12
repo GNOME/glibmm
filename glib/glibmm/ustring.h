@@ -30,7 +30,7 @@
 #include <sstream>
 #include <string>
 #ifndef GLIBMM_HAVE_STD_ITERATOR_TRAITS
-#include <cstddef> /* for ptrdiff_t */
+#include <cstddef> /* for std::ptrdiff_t */
 #endif
 
 namespace Glib
@@ -54,7 +54,7 @@ struct IteratorTraits<T*>
 {
   typedef std::random_access_iterator_tag iterator_category;
   typedef T                               value_type;
-  typedef ptrdiff_t                       difference_type;
+  typedef std::ptrdiff_t                  difference_type;
   typedef T*                              pointer;
   typedef T&                              reference;
 };
@@ -64,7 +64,7 @@ struct IteratorTraits<const T*>
 {
   typedef std::random_access_iterator_tag iterator_category;
   typedef T                               value_type;
-  typedef ptrdiff_t                       difference_type;
+  typedef std::ptrdiff_t                  difference_type;
   typedef const T*                        pointer;
   typedef const T&                        reference;
 };
