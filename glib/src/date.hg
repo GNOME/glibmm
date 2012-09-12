@@ -28,6 +28,7 @@ _DEFS(glibmm,glib)
 #include <glibmmconfig.h>
 #include <glibmm/ustring.h>
 #include <glib.h>
+#include <ctime>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" { struct tm; }
@@ -119,14 +120,14 @@ public:
 
   _DEPRECATE_IFDEF_START
 
-  //Avoid a build problem in the case that time_t is equivalent to guint32 (GTime is also guint32)
+  //Avoid a build problem in the case that std::time_t is equivalent to gint32 (GTime is also gint32)
   //That would make the set_time() method overload impossible.
   #ifdef GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32
-  /** Sets the value of a date from a GTime (time_t) value.
+  /** Sets the value of a date from a GTime value.
    *
    * @param time GTime value to set.
    *
-   * @deprecated Please use set_time(time_t) or set_time(const GTimeVal&).
+   * @deprecated Please use set_time(std::time_t) or set_time(const GTimeVal&).
    */
   void set_time(GTime time);
   #endif //GLIBMM_HAVE_C_STD_TIME_T_IS_NOT_INT32
@@ -134,15 +135,15 @@ public:
   _DEPRECATE_IFDEF_END
 
 
-  /** Sets the value of a date from a <type>time_t</type> value.
+  /** Sets the value of a date from a <type>std::time_t</type> value.
    *
-   * @param timet time_t value to set
+   * @param timet std::time_t value to set
    *
    * @see set_time_current()
    *
    * Since: 2.10
    */
-  void set_time(time_t timet);
+  void set_time(std::time_t timet);
 
   /** Sets the value of a date from a GTimeVal value.  Note that the
    * tv_usec member is ignored, because Glib::Date can't make use of the
