@@ -771,7 +771,21 @@ public:
 
   _WRAP_METHOD(bool query_exists(const Glib::RefPtr<Cancellable>& cancellable{?}) const, g_file_query_exists)
 
-  _WRAP_METHOD(FileType query_file_type(FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable{?}) const, g_file_query_file_type)
+  //We cannot use the {?} format here because we want a default value for flags, but gmmproc then generates a method with a default value for flags when it is not the last parameter.
+  _WRAP_METHOD(FileType query_file_type(FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable) const, g_file_query_file_type)
+
+  /** Utility function to inspect the #GFileType of a file. This is
+   * implemented using query_info() and as such does blocking I/O.
+   *
+   * The primary use case of this method is to check if a file is a regular file,
+   * directory, or symlink.
+   *
+   * @param flags: a set of FileQueryInfoFlags passed to query_info().
+   * @results The FileType of the file, or FILE_TYPE_UNKNOWN if the file does not exist.
+   *
+   * @newin{2,18}
+   */
+   FileType query_file_type(FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE) const;
 
   /** Asynchronously gets the requested information about specified file. The result is a FileInfo object that contains key-value attributes (such as type or size for the file).
    *

@@ -383,6 +383,11 @@ File::replace_readwrite_async(const SlotAsyncReady& slot, const std::string& eta
                        slot_copy);
 }
 
+FileType File::query_file_type(FileQueryInfoFlags flags) const
+{
+  return (FileType)g_file_query_file_type(const_cast<GFile*>(gobj()), (GFileQueryInfoFlags)flags, 0);
+}
+
 Glib::RefPtr<FileInfo> File::query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags) const
 {
   GError* gerror = 0;
