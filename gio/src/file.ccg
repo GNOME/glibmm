@@ -403,16 +403,6 @@ Glib::RefPtr<FileInfo> File::query_info(const std::string& attributes, FileQuery
   return retvalue;
 }
 
-bool File::query_exists() const
-{
-  return g_file_query_exists(const_cast<GFile*>(gobj()), 0);
-}
-
-FileType File::query_file_type(FileQueryInfoFlags flags) const
-{
-  return (FileType)g_file_query_file_type(const_cast<GFile*>(gobj()), (GFileQueryInfoFlags)flags, 0);
-}
-
 void
 File::query_info_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags, int io_priority) const
 {
@@ -552,17 +542,6 @@ File::enumerate_children_async(const SlotAsyncReady& slot, const std::string& at
                                   0,
                                   &SignalProxy_async_callback,
                                   slot_copy);
-}
-
-Glib::RefPtr<File> File::set_display_name(const Glib::ustring& display_name)
-{
-  GError* gerror = 0;
-  Glib::RefPtr<File> retvalue = Glib::wrap(g_file_set_display_name(gobj(), display_name.c_str(), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
 }
 
 void
@@ -896,71 +875,6 @@ File::set_attributes_finish(const Glib::RefPtr<AsyncResult>& result,
   return res;
 }
 
-bool File::set_attribute_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags)
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_string(gobj(), attribute.c_str(), value.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-bool File::set_attribute_byte_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags)
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_byte_string(gobj(), attribute.c_str(), value.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-bool File::set_attribute_uint32(const std::string& attribute, guint32 value, FileQueryInfoFlags flags)
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_uint32(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-bool File::set_attribute_int32(const std::string& attribute, gint32 value, FileQueryInfoFlags flags)
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_int32(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-bool File::set_attribute_uint64(const std::string& attribute, guint64 value, FileQueryInfoFlags flags)
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_uint64(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-bool File::set_attribute_int64(const std::string& attribute, gint64 value, FileQueryInfoFlags flags)
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_set_attribute_int64(gobj(), attribute.c_str(), value, ((GFileQueryInfoFlags)(flags)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
 
 void File::mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags)
 {
@@ -1678,16 +1592,6 @@ void File::poll_mountable(const SlotAsyncReady& slot)
     slot_copy);
 }
 
-Glib::RefPtr<FileInputStream> File::read()
-{
-  GError* gerror = 0;
-  Glib::RefPtr<FileInputStream> retvalue = Glib::wrap(g_file_read(gobj(), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
 void File::find_enclosing_mount_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
@@ -1812,77 +1716,6 @@ Glib::RefPtr<FileIOStream> File::create_file_readwrite(FileCreateFlags flags)
   return retvalue;
 }
 
-bool File::remove()
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_delete(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-bool File::trash()
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_trash(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-bool File::make_directory()
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_make_directory(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-bool File::make_directory_with_parents()
-{
-  GError* gerror = 0;
-  const bool retvalue = g_file_make_directory_with_parents(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-bool File::make_symbolic_link(const std::string& symlink_value)
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_make_symbolic_link(gobj(), symlink_value.c_str(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-Glib::RefPtr<FileAttributeInfoList> File::query_settable_attributes()
-{
-  GError* gerror = 0;
-  Glib::RefPtr<FileAttributeInfoList> retvalue = Glib::wrap(g_file_query_settable_attributes(gobj(), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-Glib::RefPtr<FileAttributeInfoList> File::query_writable_namespaces()
-{
-  GError* gerror = 0;
-  Glib::RefPtr<FileAttributeInfoList> retvalue = Glib::wrap(g_file_query_writable_namespaces(gobj(), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-
 Glib::RefPtr<FileOutputStream> File::append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
 {
   GError* gerror = 0;
@@ -1897,26 +1730,6 @@ Glib::RefPtr<FileOutputStream> File::append_to(FileCreateFlags flags)
 {
   GError* gerror = 0;
   Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-Glib::RefPtr<Mount> File::find_enclosing_mount()
-{
-  GError* gerror = 0;
-  Glib::RefPtr<Mount> retvalue = Glib::wrap(g_file_find_enclosing_mount(gobj(), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-Glib::RefPtr<AppInfo> File::query_default_handler()
-{
-  GError* gerror = 0;
-  Glib::RefPtr<AppInfo> retvalue = Glib::wrap(g_file_query_default_handler(gobj(), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 

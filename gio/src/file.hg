@@ -187,19 +187,9 @@ public:
   _WRAP_METHOD(std::string get_uri_scheme() const, g_file_get_uri_scheme)
 
   //TODO: We don't have both const and unconst versions because a FileInputStream can't really change the File.
-  _WRAP_METHOD(Glib::RefPtr<FileInputStream> read(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(Glib::RefPtr<FileInputStream> read(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_read,
                refreturn, errthrow)
-
-  /** Opens a file for reading. The result is a FileInputStream that
-   * can be used to read the contents of the file.
-   * 
-   * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
-   * If the file is a directory, a Gio::Error with IS_DIRECTORY will be thrown.
-   * Other errors are possible too, and depend on what kind of filesystem the file is on.
-   * @return FileInputStream or an empty RefPtr on error.
-   */
-  Glib::RefPtr<FileInputStream> read();
 
   /** Asynchronously opens the file for reading.
    * For more details, see read() which is the synchronous version of this call.
@@ -581,7 +571,7 @@ public:
                refreturn, errthrow)
 
 
-  _WRAP_METHOD(Glib::RefPtr<FileIOStream> open_readwrite(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(Glib::RefPtr<FileIOStream> open_readwrite(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_open_readwrite,
                refreturn, errthrow)
 
@@ -779,50 +769,9 @@ public:
 
   _IGNORE(g_file_query_info)
 
-  _WRAP_METHOD(bool query_exists(const Glib::RefPtr<Cancellable>& cancellable) const, g_file_query_exists)
+  _WRAP_METHOD(bool query_exists(const Glib::RefPtr<Cancellable>& cancellable{?}) const, g_file_query_exists)
 
-  /** Utility function to check if a particular file exists. This is
-   * implemented using query_info() and as such does blocking I/O.
-   *
-   * Note that in many cases it is racy to first check for file existance
-   * and then execute something based on the outcome of that, because the
-   * file might have been created or removed inbetween the operations. The
-   * general approach to handling that is to not check, but just do the
-   * operation and handle the errors as they come.
-   *
-   * As an example of race-free checking, take the case of reading a file, and
-   * if it doesn't exist, creating it. There are two racy versions: read it, and
-   * on error create it; and: check if it exists, if not create it. These
-   * can both result in two processes creating the file (with perhaps a partially
-   * written file as the result). The correct approach is to always try to create
-   * the file with g_file_create() which will either atomically create the file
-   * or throw a Gio::Error with EXISTS.
-   *
-   * However, in many cases an existance check is useful in a user
-   * interface, for instance to make a menu item sensitive/insensitive, so that
-   * you don't have to fool users that something is possible and then just show
-   * and error dialog. If you do this, you should make sure to also handle the
-   * errors that can happen due to races when you execute the operation.
-   * 
-   * @result true if the file exists (and can be detected without error), false otherwise (or if cancelled).
-   */
-  bool query_exists() const;
-
-
-  _WRAP_METHOD(FileType query_file_type(FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable) const, g_file_query_file_type)
-
-  /** Utility function to inspect the #GFileType of a file. This is
-   * implemented using query_info() and as such does blocking I/O.
-   *
-   * The primary use case of this method is to check if a file is a regular file,
-   * directory, or symlink.
-   * 
-   * @param flags: a set of FileQueryInfoFlags passed to query_info().
-   * @results The FileType of the file, or FILE_TYPE_UNKNOWN if the file does not exist.
-   *
-   * @newin{2,18}
-   */
-   FileType query_file_type(FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE) const;
+  _WRAP_METHOD(FileType query_file_type(FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable{?}) const, g_file_query_file_type)
 
   /** Asynchronously gets the requested information about specified file. The result is a FileInfo object that contains key-value attributes (such as type or size for the file).
    *
@@ -906,7 +855,7 @@ public:
   Glib::RefPtr<FileInfo> query_filesystem_info(const std::string& attributes = "*");
   _IGNORE(g_file_query_filesystem_info)
 
-  _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount(const Glib::RefPtr<Cancellable>& cancellable), 
+  _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount(const Glib::RefPtr<Cancellable>& cancellable{?}), 
                g_file_find_enclosing_mount, retreturn, errthrow)
 
 
@@ -946,19 +895,6 @@ public:
   _WRAP_METHOD(Glib::RefPtr<FileInfo> query_filesystem_info_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_query_filesystem_info_finish,
                refreturn, errthrow)
-
-
-  /** Gets a Mount for the File. 
-   * 
-   * If the FileIface for the file does not have a mount (e.g. possibly a 
-   * remote share), an Gio::Error wtih NOT_FOUND will be thrown and an empty RefPtr 
-   * will be returned.
-   *
-   * @param cancellable Cancellable object.
-   * @return A Mount where the file is located.
-   */
-  Glib::RefPtr<Mount> find_enclosing_mount();
-
 
   /** Asynchronously gets the mount for the file.
    *
@@ -1075,29 +1011,9 @@ public:
                g_file_enumerate_children_finish,
                errthrow)
 
-  _WRAP_METHOD(Glib::RefPtr<File> set_display_name(const Glib::ustring& display_name, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(Glib::RefPtr<File> set_display_name(const Glib::ustring& display_name, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_set_display_name,
                refreturn, errthrow)
-
-  /** Renames the file to the specified display name.
-   * 
-   * The display name is converted from UTF8 to the correct encoding for the target
-   * filesystem if possible and the file is renamed to this.
-   * 
-   * If you want to implement a rename operation in the user interface the edit name
-   * (G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME) should be used as the initial value in the rename
-   * widget, and then the result after editing should be passed to set_display_name().
-   * 
-   * On success the resulting converted filename is returned.
-   * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
-   * was cancelled, a Gio::Error with CANCELLED will be thrown.
-   *
-   * @param display_name A string.
-   * @return A Glib::File specifying what the file was renamed to, or an empty RefPtr if there was an error.
-   */
-  Glib::RefPtr<File> set_display_name(const Glib::ustring& display_name);
-
 
   /** Asynchronously sets the display name for a given Gio::File. For the synchronous version of this function, see set_display_name().
    * When the operation is finished, @a slot will be called. You can then call set_display_name_finish() to get the result of the operation.
@@ -1131,29 +1047,13 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @return <tt>true</tt> if the file was deleted. <tt>false</tt> otherwise.
    */
-   _WRAP_METHOD(bool remove(const Glib::RefPtr<Cancellable>& cancellable),
+   _WRAP_METHOD(bool remove(const Glib::RefPtr<Cancellable>& cancellable{?}),
                 g_file_delete,
                 errthrow)
 
-  /** Deletes a file.
-   * If the file is a directory, it will only be deleted if it is empty.
-   * 
-   * @return <tt>true</tt> if the file was deleted. <tt>false</tt> otherwise.
-   */
-  bool remove();
-
-  _WRAP_METHOD(bool trash(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool trash(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_trash,
                errthrow)
-
-  /** Sends the file to the "Trashcan", if possible. This is similar to
-   * deleting it, but the user can recover it before emptying the trashcan.
-   * Not all filesystems support trashing, so this call can throw a Gio::Error
-   * with NOT_SUPPORTED.
-   *
-   * @return <tt>true</tt> on successful trash, <tt>false</tt> otherwise.
-   */
-  bool trash();
 
 
   /** A signal handler would be, for instance:
@@ -1322,67 +1222,21 @@ public:
                g_file_make_directory,
                errthrow)
 
-  /** Creates a directory. 
-   * Note that this will only create a child directory of the immediate parent 
-   * directory of the path or URI given by the File. To recursively create 
-   * directories, see make_directory_with_parents(). This function will fail if 
-   * the parent directory does not exist, throwing an exception with 
-   * IO_ERROR_NOT_FOUND. If the file system doesn't support creating directories, 
-   * this function will fail, throwing an exception with IO_ERROR_NOT_SUPPORTED. 
-   * 
-   * @return <tt>true</tt> on successful creation, <tt>false</tt> otherwise.
-   */
-  bool make_directory();
-
-
-  _WRAP_METHOD(bool make_directory_with_parents(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool make_directory_with_parents(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_make_directory_with_parents,
                errthrow)
 
-  /** Creates a directory and any parent directories that may not exist, similar to 'mkdir -p'. 
-   * If the file system does not support creating directories, this function will fail, 
-   * throwing an exception with IO_ERROR_NOT_SUPPORTED.
-   * 
-   * @return <tt>true</tt> on successful creation, <tt>false</tt> otherwise.
-   *
-   * @newin{2,18}
-   */
-  bool make_directory_with_parents();
-
-  _WRAP_METHOD(bool make_symbolic_link(const std::string& symlink_value, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool make_symbolic_link(const std::string& symlink_value, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_make_symbolic_link,
                errthrow)
 
-  /** Creates a symbolic link.
-   * 
-   * @param symlink_value A string with the value of the new symlink.
-   * @return <tt>true</tt> on the creation of a new symlink, <tt>false</tt> otherwise.
-   */
-  bool make_symbolic_link(const std::string& symlink_value);
-
-  _WRAP_METHOD(Glib::RefPtr<FileAttributeInfoList> query_settable_attributes(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(Glib::RefPtr<FileAttributeInfoList> query_settable_attributes(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_query_settable_attributes,
                errthrow)
 
-  /** Obtain the list of settable attributes for the file.
-   * 
-   * Returns: a FileAttributeInfoList describing the settable attributes.
-   * @return A FileAttributeInfoList describing the settable attributes.
-   */
-  Glib::RefPtr<FileAttributeInfoList> query_settable_attributes();
-
-  _WRAP_METHOD(Glib::RefPtr<FileAttributeInfoList> query_writable_namespaces(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(Glib::RefPtr<FileAttributeInfoList> query_writable_namespaces(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_query_writable_namespaces,
                errthrow)
-
-  /** Obtain the list of attribute namespaces where new attributes 
-   * can be created by a user. An example of this is extended
-   * attributes (in the "xattr" namespace).
-   * 
-   * @return A FileAttributeInfoList describing the writable namespaces.
-   */
-  Glib::RefPtr<FileAttributeInfoList> query_writable_namespaces();
-
 
   /* This seems to be very generic (see the gpointer parameter),
      in a C kind of way. Hopefully we don't need it. murrayc
@@ -1463,94 +1317,29 @@ public:
 
   bool set_attributes_finish(const Glib::RefPtr<AsyncResult>& result, const Glib::RefPtr<FileInfo>& info);
 
-  _WRAP_METHOD(bool set_attribute_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool set_attribute_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_set_attribute_string,
                errthrow)
 
-  /** Sets @a attribute of type FILE_ATTRIBUTE_TYPE_STRING to @a value. 
-   * If @a attribute is of a different type, this operation will fail.
-   * 
-   * @param attribute A string containing the attribute's name.
-   * @param value A string containing the attribute's value.
-   * @param flags FileQueryInfoFlags.
-   * @return <tt>true</tt> if the @a attribute was successfully set, <tt>false</tt> otherwise.
-   */
-  bool set_attribute_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags);
-
-  _WRAP_METHOD(bool set_attribute_byte_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool set_attribute_byte_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_set_attribute_byte_string,
                errthrow)
 
-  /** Sets @a attribute of type FILE_ATTRIBUTE_TYPE_BYTE_STRING to @a value. 
-   * If @a attribute is of a different type, this operation will fail, 
-   * returning <tt>false</tt>. 
-   * 
-   * @param attribute A string containing the attribute's name.
-   * @param value A string containing the attribute's new value.
-   * @param flags A FileQueryInfoFlags.
-   * @return <tt>true</tt> if the @a attribute was successfully set to @a value 
-   * in the @a file, <tt>false</tt> otherwise.
-   */
-  bool set_attribute_byte_string(const std::string& attribute, const std::string& value, FileQueryInfoFlags flags);
-
-  _WRAP_METHOD(bool set_attribute_uint32(const std::string& attribute, guint32 value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool set_attribute_uint32(const std::string& attribute, guint32 value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_set_attribute_uint32,
                errthrow)
 
-  /** Sets @a attribute of type FILE_ATTRIBUTE_TYPE_UINT32 to @a value. 
-   * If @a attribute is of a different type, this operation will fail.
-   * 
-   * @param attribute A string containing the attribute's name.
-   * @param value A #guint32 containing the attribute's new value.
-   * @param flags A FileQueryInfoFlags.
-   * @return <tt>true</tt> if the @a attribute was successfully set to @a value 
-   * in the @a file, <tt>false</tt> otherwise.
-   */
-  bool set_attribute_uint32(const std::string& attribute, guint32 value, FileQueryInfoFlags flags);
-
-  _WRAP_METHOD(bool set_attribute_int32(const std::string& attribute, gint32 value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool set_attribute_int32(const std::string& attribute, gint32 value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_set_attribute_int32,
                errthrow)
 
-  /** Sets @a attribute of type FILE_ATTRIBUTE_TYPE_INT32 to @a value. 
-   * If @a attribute is of a different type, this operation will fail.
-   * 
-   * @param attribute A string containing the attribute's name.
-   * @param value A #gint32 containing the attribute's new value.
-   * @param flags A FileQueryInfoFlags.
-   * @return <tt>true</tt> if the @a attribute was successfully set to @a value 
-   * in the @a file, <tt>false</tt> otherwise.
-   */
-  bool set_attribute_int32(const std::string& attribute, gint32 value, FileQueryInfoFlags flags);
-
-  _WRAP_METHOD(bool set_attribute_uint64(const std::string& attribute, guint64 value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool set_attribute_uint64(const std::string& attribute, guint64 value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_set_attribute_uint64,
                errthrow)
 
-  /** Sets @a attribute of type FILE_ATTRIBUTE_TYPE_UINT64 to @a value. 
-   * If @a attribute is of a different type, this operation will fail.
-   * 
-   * @param attribute A string containing the attribute's name.
-   * @param value A #guint64 containing the attribute's new value.
-   * @param flags A FileQueryInfoFlags.
-   * @return <tt>true</tt> if the @a attribute was successfully set to @a value 
-   * in the @a file, <tt>false</tt> otherwise.
-   */
-  bool set_attribute_uint64(const std::string& attribute, guint64 value, FileQueryInfoFlags flags);
-
-  _WRAP_METHOD(bool set_attribute_int64(const std::string& attribute, gint64 value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool set_attribute_int64(const std::string& attribute, gint64 value, FileQueryInfoFlags flags, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_set_attribute_int64,
                errthrow)
-
-  /** Sets @a attribute of type FILE_ATTRIBUTE_TYPE_INT64 to @a value. 
-   * If @a attribute is of a different type, this operation will fail.
-   * 
-   * @param attribute A string containing the attribute's name.
-   * @param value A #guint64 containing the attribute's new value.
-   * @param flags A FileQueryInfoFlags.
-   * @return <tt>true</tt> if the @a attribute was successfully set, <tt>false</tt> otherwise.
-   */
-  bool set_attribute_int64(const std::string& attribute, gint64 value, FileQueryInfoFlags flags);
 
   /** Starts a @a mount_operation, mounting the volume that contains the file. 
    * 
@@ -2015,16 +1804,9 @@ public:
   _WRAP_METHOD(bool poll_mountable_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_poll_mountable_finish, errthrow)
 
-  _WRAP_METHOD(Glib::RefPtr<AppInfo> query_default_handler(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(Glib::RefPtr<AppInfo> query_default_handler(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_query_default_handler,
                errthrow)
-
-/** Returns the AppInfo that is registered as the default
- * application to handle the file specified by the file.
- *
- * @result A AppInfo if the handle was found, or an empty RefPtr if there were errors.
- **/
-  Glib::RefPtr<AppInfo> query_default_handler();
 
   //TODO: Something better than char*& for contents?
   /** Loads the content of the file into memory, returning the size of the data. 
