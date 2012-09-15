@@ -120,19 +120,16 @@ public:
   //TODO: Write custom documetation, mentioning, for instance, the exception, instead of a bool return.
   _WRAP_METHOD(void bind(const Glib::RefPtr<SocketAddress>& address, bool allow_reuse), g_socket_bind, errthrow)
   _WRAP_METHOD(void listen(), g_socket_listen, errthrow)
-  _WRAP_METHOD(Glib::RefPtr<Socket> accept(const Glib::RefPtr<Cancellable>& cancellable), g_socket_accept, errthrow)
-  Glib::RefPtr<Socket> accept();
+  _WRAP_METHOD(Glib::RefPtr<Socket> accept(const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_accept, errthrow)
 
   //TODO: Write custom documetation, mentioning, for instance, the exception, instead of a bool return.
-  _WRAP_METHOD(void connect(const Glib::RefPtr<SocketAddress>& address, const Glib::RefPtr<Cancellable>& cancellable), g_socket_connect, errthrow)
-  void connect(const Glib::RefPtr<SocketAddress>& address);
+  _WRAP_METHOD(void connect(const Glib::RefPtr<SocketAddress>& address, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_connect, errthrow)
 
   // FIXME: it doesn't really seem like this is a proper use of exceptions...
   _WRAP_METHOD(void check_connect_result(), g_socket_check_connect_result, errthrow)
 
   // TODO: std::string overload?
-  _WRAP_METHOD(gssize receive(char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable), g_socket_receive, errthrow)
-  gssize receive(char* buffer, gsize size);
+  _WRAP_METHOD(gssize receive(char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_receive, errthrow)
 
   _IGNORE(g_socket_receive_from)
   gssize receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable);
@@ -140,12 +137,10 @@ public:
   // TODO: wrap g_socket_receive_message -- figure out this GInputVector thing
   // TODO: std::string overload?
 
-  _WRAP_METHOD(gssize send(const gchar* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable), g_socket_send, errthrow)
-  gssize send(const gchar* buffer, gsize size);
+  _WRAP_METHOD(gssize send(const gchar* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_send, errthrow)
 
   // TODO: std::string overload?
-  _WRAP_METHOD(gssize send_to(const Glib::RefPtr<SocketAddress>& address, const char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable), g_socket_send_to, errthrow)
-  gssize send_to(const Glib::RefPtr<SocketAddress>& address, const char* buffer, gsize size);
+  _WRAP_METHOD(gssize send_to(const Glib::RefPtr<SocketAddress>& address, const char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_send_to, errthrow)
 
   // TODO: wrap g_socket_send_message -- figure out this GOutputVector thing
   _WRAP_METHOD(void close(), g_socket_close, errthrow)
@@ -160,16 +155,13 @@ public:
   // This won't work because Glib::Source is abstract, and Glib::IOSource has no
   // constructor that takes a GSource*
 //#m4 _CONVERSION(`GSource*',`Glib::RefPtr<Glib::Source>',`Glib::RefPtr<Glib::Source>(new ::Glib::Source($3))')
-  //_WRAP_METHOD(Glib::RefPtr<Glib::Source> create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable), g_socket_create_source)
+  //_WRAP_METHOD(Glib::RefPtr<Glib::Source> create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_create_source)
 
   _WRAP_METHOD(gssize get_available_bytes() const,  g_socket_get_available_bytes)
 
   _WRAP_METHOD(Glib::IOCondition condition_check(Glib::IOCondition condition), g_socket_condition_check)
 
-  _WRAP_METHOD(void condition_wait(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable), g_socket_condition_wait, errthrow)
-
-  //TODO: Documentation.
-  void condition_wait(Glib::IOCondition condition);
+  _WRAP_METHOD(void condition_wait(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_condition_wait, errthrow)
 
   _WRAP_METHOD(void condition_timed_wait(Glib::IOCondition condition, gint64 timeout, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_condition_timed_wait, errthrow)
 

@@ -91,24 +91,4 @@ FileEnumerator::close_async(int io_priority,
                                 slot_copy);
 }
 
-Glib::RefPtr<FileInfo> FileEnumerator::next_file()
-{
-  GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_enumerator_next_file(gobj(), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-bool FileEnumerator::close()
-{
-  GError* gerror = 0;
-  bool retvalue = g_file_enumerator_close(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
 } // namespace Gio

@@ -34,39 +34,6 @@ void Resolver::set_default(const Glib::RefPtr<Resolver>& resolver)
     g_resolver_set_default(Glib::unwrap(resolver));
 }
 
-Glib::ListHandle< Glib::RefPtr<InetAddress> > Resolver::lookup_by_name(const Glib::ustring& hostname)
-{
-  GError* gerror = 0;
-  Glib::ListHandle< Glib::RefPtr<InetAddress> > retvalue = Glib::ListHandle< Glib::RefPtr<InetAddress> >(g_resolver_lookup_by_name(gobj(), hostname.c_str(), 0, &(gerror)), Glib::OWNERSHIP_DEEP);
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-Glib::ustring Resolver::lookup_by_address(const Glib::RefPtr<InetAddress>& address)
-{
-  GError* gerror = 0;
-  Glib::ustring retvalue = Glib::convert_return_gchar_ptr_to_ustring(g_resolver_lookup_by_address(gobj(), const_cast<GInetAddress*>(Glib::unwrap(address)), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-ListHandle_SrvTarget Resolver::lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain)
-{
-  GError* gerror = 0;
-  ListHandle_SrvTarget retvalue = ListHandle_SrvTarget(g_resolver_lookup_service(gobj(), service.c_str(), protocol.c_str(), domain.c_str(), 0, &(gerror)), Glib::OWNERSHIP_DEEP);
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
 void
 Resolver::lookup_by_name_async(const Glib::ustring& hostname,
                                const SlotAsyncReady& slot,

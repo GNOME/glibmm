@@ -492,20 +492,6 @@ void Connection::get(BusType bus_type, const SlotAsyncReady& slot)
     slot_copy);
 }
 
-//static
-Glib::RefPtr<Connection> Connection::get_sync(BusType bus_type)
-{
-  GError* gerror = 0;
-
-  GDBusConnection* result = g_bus_get_sync(static_cast<GBusType>(bus_type),
-    0, & gerror);
-
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return Glib::wrap(result);
-}
-
 void Connection::close()
 {
   g_dbus_connection_close(gobj(), 0, 0, 0);
@@ -531,14 +517,6 @@ void Connection::close(const SlotAsyncReady& slot)
                     slot_copy);
 }
 
-void Connection::close_sync()
-{
-  GError* gerror = 0;
-  g_dbus_connection_close_sync(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-}
-
 void Connection::flush()
 {
   g_dbus_connection_flush(gobj(), 0, 0, 0);
@@ -562,14 +540,6 @@ void Connection::flush(const SlotAsyncReady& slot)
                     0,
                     &SignalProxy_async_callback,
                     slot_copy);
-}
-
-void Connection::flush_sync()
-{
-  GError* gerror = 0;
-  g_dbus_connection_flush_sync(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
 }
 
 bool Connection::send_message(const Glib::RefPtr<Message>& message,

@@ -53,63 +53,6 @@ Glib::RefPtr<Socket> Socket::create_from_fd(int fd, const Glib::RefPtr<Cancellab
   return Glib::RefPtr<Socket>(new Socket(fd, cancellable));
 }
 
-
-void Socket::connect(const Glib::RefPtr<SocketAddress>& address)
-{
-  GError* gerror = 0;
-  g_socket_connect(gobj(), const_cast<GSocketAddress*>(Glib::unwrap(address)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-}
-
-Glib::RefPtr<Socket> Socket::accept()
-{
-  GError* gerror = 0;
-  Glib::RefPtr<Socket> retvalue = Glib::wrap(g_socket_accept(gobj(), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-gssize Socket::receive(char* buffer, gsize size)
-{
-  GError* gerror = 0;
-  gssize retvalue = g_socket_receive(gobj(), buffer, size, 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-gssize Socket::send(const gchar* buffer, gsize size)
-{
-  GError* gerror = 0;
-  gssize retvalue = g_socket_send(gobj(), buffer, size, 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-gssize Socket::send_to(const Glib::RefPtr<SocketAddress>& address, const char* buffer, gsize size)
-{
-  GError* gerror = 0;
-  gssize retvalue = g_socket_send_to(gobj(), const_cast<GSocketAddress*>(Glib::unwrap(address)), buffer, size, 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-void Socket::condition_wait(Glib::IOCondition condition)
-{
-  GError* gerror = 0;
-  g_socket_condition_wait(gobj(), ((GIOCondition)(condition)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-}
-
 gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = 0;

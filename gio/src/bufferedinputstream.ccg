@@ -28,16 +28,6 @@ Glib::RefPtr<BufferedInputStream> BufferedInputStream::create_sized(const Glib::
   return Glib::RefPtr<Gio::BufferedInputStream>(new BufferedInputStream(base_stream, buffer_size));
 }
 
-gssize BufferedInputStream::fill(gssize count)
-{
-  GError* gerror = 0;
-  const gssize retvalue = g_buffered_input_stream_fill(const_cast<GBufferedInputStream*>(gobj()), count, 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
 void BufferedInputStream::fill_async(const SlotAsyncReady& slot,
                                      gssize count,
                                      const Glib::RefPtr<Cancellable>& cancellable,
@@ -72,17 +62,5 @@ void BufferedInputStream::fill_async(const SlotAsyncReady& slot,
             &SignalProxy_async_callback,
             slot_copy);
 }
-
-int BufferedInputStream::read_byte()
-{
-  GError* gerror = 0;
-  const int retvalue = g_buffered_input_stream_read_byte(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
 
 }   // namespace Gio

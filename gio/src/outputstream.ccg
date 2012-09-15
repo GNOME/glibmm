@@ -152,17 +152,6 @@ OutputStream::close_async(const SlotAsyncReady& slot, int io_priority)
                               slot_copy);
 }
 
-
-gssize OutputStream::write(const void* buffer, gsize count)
-{
-  GError* gerror = 0;
-  gssize retvalue = g_output_stream_write(gobj(), buffer, count, 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
 gssize OutputStream::write(const std::string& buffer, const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = 0;
@@ -177,16 +166,6 @@ gssize OutputStream::write(const std::string& buffer)
 {
   GError* gerror = 0;
   gssize retvalue = g_output_stream_write(gobj(), buffer.data(), buffer.size(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-bool OutputStream::write_all(const void* buffer, gsize count, gsize& bytes_written)
-{
-  GError* gerror = 0;
-  bool retvalue = g_output_stream_write_all(gobj(), buffer, count, &(bytes_written), 0, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -260,26 +239,6 @@ gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, OutputStrea
 {
   GError* gerror = 0;
   gssize retvalue = g_output_stream_splice(gobj(), Glib::unwrap(source), ((GOutputStreamSpliceFlags)(flags)), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-bool OutputStream::flush()
-{
-  GError* gerror = 0;
-  bool retvalue = g_output_stream_flush(gobj(), 0, &(gerror));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-bool OutputStream::close()
-{
-  GError* gerror = 0;
-  bool retvalue = g_output_stream_close(gobj(), 0, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 

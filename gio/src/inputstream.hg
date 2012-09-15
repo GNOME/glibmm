@@ -43,27 +43,9 @@ class InputStream : public Glib::Object
   _CLASS_GOBJECT(InputStream, GInputStream, G_INPUT_STREAM, Glib::Object, GObject)
 
 public:
-  _WRAP_METHOD(gssize read(void* buffer, gsize count, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(gssize read(void* buffer, gsize count, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_input_stream_read,
                errthrow)
-
-  /** Tries to read @a count bytes from the stream into the buffer starting at
-   *  @a buffer. Will block during this read.
-   * 
-   * If count is zero returns zero and does nothing. A value of @a count 
-   * larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
-   * 
-   * On success, the number of bytes read into the buffer is returned.
-   * It is not an error if this is not the same as the requested size, as it
-   * can happen e.g. near the end of a file. Zero is returned on end of file
-   * (or if @a count is zero), but never otherwise.
-   * 
-   * On error -1 is returned.
-   * @param buffer A buffer to read data into (which should be at least count bytes long).
-   * @param count The number of bytes that will be read from the stream.
-   * @return Number of bytes read, or -1 on error.
-   */
-  gssize read(void* buffer, gsize count);
 
   //TODO: for glibmm 2.17/18, we should decide whether to provide a read()
   // function as below, which would presumably read until EOL, or one with
@@ -72,29 +54,9 @@ public:
   //TODO: gssize read(std::string& buffer, const Glib::RefPtr<Cancellable>& cancellable);
   //TODO: gssize read(std::string& buffer);
 
-  _WRAP_METHOD(bool read_all(void* buffer, gsize count, gsize& bytes_read, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool read_all(void* buffer, gsize count, gsize& bytes_read, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_input_stream_read_all,
                errthrow)
-
-  /** Tries to read @a count bytes from the stream into the buffer starting at
-   *  @a buffer. Will block during this read.
-   * 
-   * This function is similar to read(), except it tries to
-   * read as many bytes as requested, only stopping on an error or end of stream.
-   * 
-   * On a successful read of @a count bytes, or if we reached the end of the
-   * stream, <tt>true</tt> is returned, and @a bytes_read is set to the number of bytes
-   * read into @a buffer .
-   * 
-   * If there is an error during the operation <tt>false</tt> is returned and a Gio::Error 
-   * is thrown to indicate the error status, @a bytes_read is updated to contain
-   * the number of bytes read into @a buffer before the error occured.
-   * @param buffer A buffer to read data into (which should be at least count bytes long).
-   * @param count The number of bytes that will be read from the stream.
-   * @param bytes_read Location to store the number of bytes that was read from the stream.
-   * @return <tt>true</tt> on success, <tt>false</tt> if there was an error.
-   */  
-  bool read_all(void* buffer, gsize count, gsize& bytes_read);
 
   //TODO: bool read_all(std::string& buffer, gsize count, gsize& bytes_read, const Glib::RefPtr<Cancellable>& cancellable);
   //TODO: bool read_all(std::string& buffer, gsize count, gsize& bytes_read)
@@ -118,49 +80,14 @@ public:
 
 
 
-  _WRAP_METHOD(gssize skip(gsize count, const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(gssize skip(gsize count, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_input_stream_skip,
                errthrow)
 
-  /** Tries to skip @a count bytes from the stream. Will block during the operation.
-   * 
-   * This is identical to read(), from a behaviour standpoint,
-   * but the bytes that are skipped are not returned to the user. Some
-   * streams have an implementation that is more efficient than reading the data.
-   * 
-   * This function is optional for inherited classes, as the default implementation
-   * emulates it using read.
-   * 
-   * @param count The number of bytes that will be skipped from the stream.
-   * @return Number of bytes skipped, or -1 on error.
-   */
-  gssize skip(gsize count);
-
-  _WRAP_METHOD(bool close(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool close(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_input_stream_close,
                errthrow)
 
-  /** Closes the stream, releasing resources related to it.
-   * 
-   * Once the stream is closed, all other operations will throw a Gio::Error with CLOSED.
-   * Closing a stream multiple times will not return an error.
-   * 
-   * Streams will be automatically closed when the last reference
-   * is dropped, but you might want to call this make sure resources
-   * are released as early as possible.
-   * 
-   * Some streams might keep the backing store of the stream (e.g. a file descriptor)
-   * open after the stream is closed. See the documentation for the individual
-   * stream for details.
-   * 
-   * On failure the first error that happened will be reported, but the close
-   * operation will finish as much as possible. A stream that failed to
-   * close will still throw a Gio::Error with CLOSED for all operations. Still, it
-   * is important to check and report the error to the user.
-   * 
-   * @return <tt>true</tt> on success, <tt>false</tt> on failure.
-   */
-  bool close();
 
   /** Request an asynchronous read of @a count bytes from the stream into the buffer
    * starting at @a buffer. When the operation is finished @a slot will be called. 

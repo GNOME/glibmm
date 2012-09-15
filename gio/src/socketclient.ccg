@@ -131,46 +131,6 @@ SocketClient::connect_to_service_async(const Glib::ustring& domain,
                                             slot_copy);
 }
 
-Glib::RefPtr<SocketConnection> SocketClient::connect(const Glib::RefPtr<SocketConnectable>& connectable)
-{
-  GError* gerror = 0;
-  Glib::RefPtr<SocketConnection> retvalue = Glib::wrap(g_socket_client_connect(gobj(), const_cast<GSocketConnectable*>(Glib::unwrap(connectable)), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-Glib::RefPtr<SocketConnection> SocketClient::connect_to_host(const Glib::ustring& host_and_port, guint16 default_port)
-{
-  GError* gerror = 0;
-  Glib::RefPtr<SocketConnection> retvalue = Glib::wrap(g_socket_client_connect_to_host(gobj(), host_and_port.c_str(), default_port, 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-Glib::RefPtr<SocketConnection> SocketClient::connect_to_service(const Glib::ustring& domain, const Glib::ustring& service)
-{
-  GError* gerror = 0;
-  Glib::RefPtr<SocketConnection> retvalue = Glib::wrap(g_socket_client_connect_to_service(gobj(), domain.c_str(), service.c_str(), 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
-Glib::RefPtr<SocketConnection> SocketClient::connect_to_uri(const Glib::ustring& uri, guint16 default_port)
-{
-  GError* gerror = 0;
-  Glib::RefPtr<SocketConnection> retvalue = Glib::wrap(g_socket_client_connect_to_uri(gobj(), uri.c_str(), default_port, 0, &(gerror)));
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-}
-
 void
 SocketClient::connect_to_uri_async(const Glib::ustring& uri, guint16 default_port,
                                        const Glib::RefPtr<Cancellable>& cancellable,

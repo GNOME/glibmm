@@ -54,28 +54,13 @@ class FileEnumerator : public Glib::Object
   _CLASS_GOBJECT(FileEnumerator, GFileEnumerator, G_FILE_ENUMERATOR, Glib::Object, GObject)
 
 public:
-  _WRAP_METHOD(Glib::RefPtr<FileInfo> next_file(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(Glib::RefPtr<FileInfo> next_file(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_enumerator_next_file,
                errthrow)
 
-  /** 
-   * @return A FileInfo or an empty RefPtr on error or end of enumerator.
-   */
-  Glib::RefPtr<FileInfo> next_file();
-
-  _WRAP_METHOD(bool close(const Glib::RefPtr<Cancellable>& cancellable),
+  _WRAP_METHOD(bool close(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_enumerator_close,
                errthrow)
-
-  /** Releases all resources used by this enumerator, making the
-   * enumerator throw a Gio::Error with CLOSED on all calls.
-   * 
-   * This will be automatically called when the last reference
-   * is dropped, but you might want to call this method to make sure resources
-   * are released as early as possible.
-   * @return #<tt>true</tt> on success or an empty RefPtr on error.
-   */
-  bool close();
 
 
   /** Request information for a number of files from the enumerator asynchronously. 

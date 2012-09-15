@@ -68,51 +68,13 @@ public:
   _WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_local_address() const, g_socket_client_get_local_address, constversion)
   _WRAP_METHOD(void set_local_address(const Glib::RefPtr<SocketAddress>& address), g_socket_client_set_local_address)
 
-  _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect, errthrow)
-Glib::RefPtr<SocketConnection> connect(const Glib::RefPtr<SocketConnectable>& connectable);
+  _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_client_connect, errthrow)
 
-  _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_host(const Glib::ustring& host_and_port, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect_to_host, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_host(const Glib::ustring& host_and_port, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_client_connect_to_host, errthrow)
 
-  /** This is a helper function for connect().
-   * This attempts to create a TCP connection to the named host.
-   *
-   * @a host_and_port may be in any of a number of recognised formats; an IPv6 address, an IPv4 address, or a domain name (in which case a DNS lookup is performed). Quoting with [] is supported for all address types. A port override may be specified in the usual way with a colon. Ports may be given as decimal numbers or symbolic names (in which case an /etc/services lookup is performed).
-   *
-   * If no port override is given in @a host_and_port then default_port will be used as the port number to connect to.
-   * 
-   * In general, @a host_and_port is expected to be provided by the user (allowing them to give the hostname, and a port overide if necessary) and default_port is expected to be provided by the application.
-   *
-   * In the case that an IP address is given, a single connection attempt is made. In the case that a name is given, multiple connection attempts may be made, in turn and according to the number of address records in DNS, until a connection succeeds.
-   *
-   * Upon a successful connection, a new SocketConnection is constructed and returned. 
-   *
-   * In the event of any failure (DNS error, service not found, no hosts connectable) an exception is thrown.
-   *
-   * @param host_and_port The name and optionally port of the host to connect to.
-   * @param default_port The default port to connect to.
-   */
-  Glib::RefPtr<SocketConnection> connect_to_host(const Glib::ustring& host_and_port, guint16 default_port);
+  _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, const Glib::ustring& service, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_client_connect_to_service, errthrow)
 
-  _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, const Glib::ustring& service, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect_to_service, errthrow)
-Glib::RefPtr<SocketConnection> connect_to_service(const Glib::ustring& domain, const Glib::ustring& service);
-
-  _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_uri(const Glib::ustring& uri, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable), g_socket_client_connect_to_uri, errthrow)
-
-  /** This is a helper function for connect().
-   * This attempts to create a TCP connection with a network URI.
-   *
-   * @a uri may be any valid URI containing an "authority" (hostname/port) component. If a port is not specified in the URI, default_port will be used. TLS will be negotiated if "tls" is true. (GSocketClient does not know to automatically assume TLS for certain URI schemes.)
-   *
-   * Using this rather than connect() or connect_to_host() allows SocketClient to determine when to use application-specific proxy protocols.
-   *
-   * Upon a successful connection, a new SocketConnection is constructed and returned.
-   *
-   * In the event of any failure (DNS error, service not found, no hosts connectable) an exception is thrown.
-   *
-   * @param uri A network URI
-   * @param default_port The default port to connect to.
-   */
-  Glib::RefPtr<SocketConnection> connect_to_uri(const Glib::ustring& uri, guint16 default_port);
+  _WRAP_METHOD(Glib::RefPtr<SocketConnection> connect_to_uri(const Glib::ustring& uri, guint16 default_port, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_client_connect_to_uri, errthrow)
 
   _WRAP_METHOD_DOCS_ONLY(g_socket_client_connect_async)
   void connect_async(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot);
