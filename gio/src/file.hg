@@ -1065,6 +1065,35 @@ public:
                 g_file_delete,
                 errthrow)
 
+   /** Asynchronously delete a file.
+    * If the @file is a directory, it will
+    * only be deleted if it is empty.  This has the same semantics as
+    * g_unlink().
+    *
+    * @param slot_ready A SlotAsyncReady to call when the request is satisfied
+    * @param cancellable A Cancellable object which can be used to cancel the operation
+    * @param io_priority The I/O priority of the request
+    * @newin{2,34}
+    */
+  void remove_async(const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
+
+   /** Asynchronously delete a file.
+    * If the @file is a directory, it will
+    * only be deleted if it is empty.  This has the same semantics as
+    * g_unlink().
+    *
+    * @param slot_ready A SlotAsyncReady to call when the request is satisfied
+    * @param io_priority The I/O priority of the request
+    * @newin{2,34}
+    */
+  void remove_async(const SlotAsyncReady& slot_ready, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_file_delete_async)
+
+  _WRAP_METHOD(bool remove_finish(const Glib::RefPtr<AsyncResult>& result),
+               g_file_delete_finish,
+               errthrow)
+
+
   _WRAP_METHOD(bool trash(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_trash,
                errthrow)
