@@ -732,12 +732,15 @@ public:
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
 
-// TODO: Re-add the following two methods when the call_finish() method with a
-// UnixFDList is wrapped.
-#if 0
 #ifdef G_OS_LINUX
   /** Like call() but also takes a GUnixFDList object.
    * This method is only available on UNIX.
+   *
+   * This is an asynchronous method. When the operation is finished, callback
+   * will be invoked in the thread-default main loop of the thread you are
+   * calling this method from. You can then call call_with_unix_fd_finish() to get the
+   * result of the operation.  See call_sync() for the synchronous version of
+   * this function.
    *
    * @param object_path Path of remote object.
    * @param interface_name D-Bus interface to invoke method on.
@@ -753,7 +756,7 @@ public:
    * timeout or G_MAXINT for no timeout.
    * @param flags Flags from the Gio::DBus::CallFlags enumeration.
    * @param reply_type The expected type of the reply, or <tt>0</tt>.
-   * @newin{2,32}
+   * @newin{2,34}
    */
   void call(
     const Glib::ustring&                object_path,
@@ -768,9 +771,11 @@ public:
     CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
-  _IGNORE(g_dbus_connection_call_with_uinx_fd_list)
+  _IGNORE(g_dbus_connection_call_with_unix_fd_list)
 
-  /// A non-cancellable version of call() (with a UnixFDList).
+  /** A non-cancellable version of call() (with a UnixFDList).
+   * @newin{2,34}
+   */
   void call(
     const Glib::ustring&                object_path,
     const Glib::ustring&                interface_name,
@@ -784,18 +789,27 @@ public:
     const Glib::VariantType&            reply_type = Glib::VariantType()
   );
 #endif // G_OS_LINUX
-#endif // 0
 
-  ///** Finishes an operation started with call() (with a UnixFDList).
-   //* @param res A AsyncResult obtained from the SlotAsyncReady passed to
-   //* call().
-   //* @result A Variant tuple with return values.
-   //* @throw Glib::Error.
-   //* @newin{2,32}
-   //*/
-  //TODO: _WRAP_METHOD(Glib::VariantContainerBase call_with_unix_fd_finish(const Glib::RefPtr<AsyncResult>& res{.}, Glib::RefPtr<UnixFDList>& out_fd_list{.?}), g_dbus_connection_call_with_unix_fd_list_finish, errthrow)
 
-  /* TODO:
+  //We do not use _WRAP_METHOD() because it cannot (yet) handle the out_fd_list output parameter:
+  //_WRAP_METHOD(Glib::VariantContainerBase call_with_unix_fd_finish(const Glib::RefPtr<AsyncResult>& res{.}, Glib::RefPtr<UnixFDList>& out_fd_list{.?}), g_dbus_connection_call_with_unix_fd_list_finish, errthrow)
+
+  /** Finishes an operation started with call() (with a UnixFDList).
+   * @param res A AsyncResult obtained from the SlotAsyncReady passed to
+   * call().
+   * @result A Variant tuple with return values.
+   * @throw Glib::Error.
+   * @newin{2,32}
+   */
+  Glib::VariantContainerBase call_with_unix_fd_finish(const Glib::RefPtr<AsyncResult>& res, Glib::RefPtr<UnixFDList>& out_fd_list);
+
+  /// A call_with_unix_fd_finish() convenience overload.
+  Glib::VariantContainerBase call_with_unix_fd_finish(const Glib::RefPtr<AsyncResult>& res);
+  _IGNORE(g_dbus_connection_call_with_unix_fd_list_finish)
+
+
+  //We do not use _WRAP_METHOD() because it cannot (yet) handle the out_fd_list output parameter:
+  /*
   _WRAP_METHOD(
     Glib::VariantContainerBase call_sync(
       const Glib::ustring&                object_path{.},
@@ -813,6 +827,36 @@ public:
     g_dbus_connection_call_with_unix_fd_list_sync, errthrow
   )
   */
+
+  /** Like call_sync() but also takes and returns UnixFDList objects.
+   * 
+   * This method is only available on UNIX.
+   * 
+   * @newin{2,34}
+   * @param bus_name A unique or well-known bus name.
+   * @param object_path Path of remote object.
+   * @param interface_name D-Bus interface to invoke method on.
+   * @param method_name The name of the method to invoke.
+   * @param parameters A Variant tuple with parameters for the method
+   * or <tt>0</tt> if not passing parameters.
+   * @param reply_type The expected type of the reply, or <tt>0</tt>.
+   * @param flags Flags from the DBusCallFlags enumeration.
+   * @param timeout_msec The timeout in milliseconds, -1 to use the default
+   * timeout or MAXINT for no timeout.
+   * @param fd_list A UnixFDList or <tt>0</tt>.
+   * @param out_fd_list Return location for a UnixFDList or <tt>0</tt>.
+   * @param cancellable A Cancellable or <tt>0</tt>.
+   * @return <tt>0</tt> if @a error is set. Otherwise a Variant tuple with
+   * return values. Free with Glib::variant_unref().
+   */
+  Glib::VariantContainerBase call_sync(const Glib::ustring& object_path, const Glib::ustring& interface_name, const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<UnixFDList>& fd_list, Glib::RefPtr<UnixFDList>& out_fd_list, const Glib::ustring& bus_name = Glib::ustring(), int timeout_msec = -1, CallFlags flags = Gio::DBus::CALL_FLAGS_NONE, const Glib::VariantType& reply_type = Glib::VariantType());
+
+  /** A call_sync() convenience overload.
+   * @newin{2,34}
+   */
+  Glib::VariantContainerBase call_sync(const Glib::ustring& object_path, const Glib::ustring& interface_name, const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters, const Glib::RefPtr<UnixFDList>& fd_list, Glib::RefPtr<UnixFDList>& out_fd_list, const Glib::ustring& bus_name = Glib::ustring(), int timeout_msec = -1, CallFlags flags = Gio::DBus::CALL_FLAGS_NONE, const Glib::VariantType& reply_type = Glib::VariantType());
+  _IGNORE(g_dbus_connection_call_with_unix_fd_list_sync)
+
 
   /** Emits a signal.
    *
