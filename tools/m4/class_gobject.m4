@@ -68,6 +68,16 @@ dnl define(`__BOOL_NO_WRAP_FUNCTION__',`$1')
 dnl _POP()
 dnl ')
 
+dnl In case a class needs to write its own implementation of its Glib::wrap()
+dnl function.  The function will be declared in the header, but the body is not
+dnl generated.
+define(`_CUSTOM_WRAP_FUNCTION',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_CUSTOM_WRAP_FUNCTION__',`$1')
+_POP()
+')
+
 dnl Some gobjects actually derive from GInitiallyUnowned, which does some odd reference-counting that is useful to C coders.
 dnl We don't want to expose that base class in our API, 
 dnl but we do want to reverse what it does:
@@ -139,6 +149,8 @@ __NAMESPACE_END__
 
 _SECTION(SECTION_SRC_GENERATED)
 
+ifdef(`__BOOL_CUSTOM_WRAP_FUNCTION__',`dnl
+',`dnl else
 ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl else
 namespace Glib
@@ -151,6 +163,7 @@ Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__REAL_CNAME__`'* object, bool tak
 }
 
 } /* namespace Glib */
+')dnl endif
 ')dnl endif
 
 
@@ -275,4 +288,3 @@ public:
 _H_VFUNCS_AND_SIGNALS()
 
 ')
-

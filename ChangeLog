@@ -1,5 +1,20 @@
 2012-09-14  José Alburquerque  <jaalburquerque@gmail.com>
 
+	_CLASS_GOBJECT: Allow classes to have custom wrap() functions.
+
+	* tools/m4/class_gobject.m4 (_CUSTOM_WRAP_FUNCTION): Add this new
+	macro which can be used in _CLASS_GOBJECT classes so that if they want
+	they can write their own implementation of their Glib::wrap()
+	function.  This is useful for modules such as gstreamermm that want to
+	keep certain classes (like the plug-ins) from being registered on
+	startup but then do a one time registration of the wrap_new() function
+	in the Glib::wrap() function before calling Glib::wrap_auto() which
+	can then find the wrap_new() function if necessary.
+
+	Bug #684006.
+
+2012-09-14  José Alburquerque  <jaalburquerque@gmail.com>
+
 	generate_wrap_init.pl: Allow classes in files to not be registered.
 
 	* tools/m4/class_shared.m4: Add a new _NO_WRAP_INIT_REGISTRATION macro
