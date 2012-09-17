@@ -15,6 +15,12 @@ my %conditional_compilation = ();
 my %deprecated = ();
 my %extra_includes = ();
 
+# Hashmap telling if the registration of the classes in a file should not be
+# included in the wrap_init() function.  (This is useful for modules such as
+# gstreamermm that want to exclude plug-in types from being registered in their
+# wrap_init() function.)
+my %exclude_from_wrap_init = ();
+
 # The keys in all hashes except %extra_includes are names of header files (xyz.h),
 # corresponding to the read .hg files.
 #
@@ -183,6 +189,10 @@ while ($ARGV[0])
     {
       $deprecated{$filename_header} = 1; # This file is deprecated
     }
+    elsif (/\b_NO_WRAP_INIT_REGISTRATION\b/)
+    {
+      $exclude_from_wrap_init{$filename_header} = 1;
+    } 
   }
 
   shift @ARGV;
@@ -217,6 +227,7 @@ print "\n// #include the widget headers so that we can call the get_type() stati
 # keys %deprecated contains all filenames, not just the names of deprecated files.
 foreach my $filename_header (sort keys %deprecated)
 {
+  next if($exclude_from_wrap_init{$filename_header});
   print_with_guards($filename_header, "#include \"$filename_header\"\n");
 }
 
@@ -228,6 +239,8 @@ print "//Declarations of the *_get_type() functions:\n\n";
 
 foreach my $filename_header (sort keys %objects)
 {
+  next if($exclude_from_wrap_init{$filename_header});
+
   my @objects_in_file = @{$objects{$filename_header}};
   my $message = "";
   foreach my $i (@objects_in_file)
@@ -271,6 +284,8 @@ print "\n//Declarations of the *_Class::wrap_new() methods, instead of including
 
 foreach my $filename_header (sort keys %objects)
 {
+  next if($exclude_from_wrap_init{$filename_header});
+
   my @objects_in_file = @{$objects{$filename_header}};
   my $message = "";
   foreach my $i (@objects_in_file)
@@ -394,6 +409,8 @@ print "  // Map gtypes to gtkmm wrapper-creation functions:\n";
 
 foreach my $filename_header (sort keys %objects)
 {
+  next if($exclude_from_wrap_init{$filename_header});
+
   my @objects_in_file = @{$objects{$filename_header}};
   my $message = "";
   foreach my $i (@objects_in_file)
@@ -411,6 +428,8 @@ print "  // Register the gtkmm gtypes:\n";
 
 foreach my $filename_header (sort keys %objects)
 {
+  next if($exclude_from_wrap_init{$filename_header});
+
   my @objects_in_file = @{$objects{$filename_header}};
   my $message = "";
   foreach my $i (@objects_in_file)
@@ -430,4 +449,3 @@ $namespace_whole_close
 EOF
 
 exit 0;
-

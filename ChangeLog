@@ -1,3 +1,22 @@
+2012-09-14  José Alburquerque  <jaalburquerque@gmail.com>
+
+	generate_wrap_init.pl: Allow classes in files to not be registered.
+
+	* tools/m4/class_shared.m4: Add a new _NO_WRAP_INIT_REGISTRATION macro
+	used in the generate_wrap_init.pl script to recognize a file whose
+	classes should not be registered by wrap_init().
+	* tools/generate_wrap_init.pl.in (exclude_from_wrap_init): Include a
+	hash map to determine if the classes in a file should not be
+	registered with the wrapping system by the wrap_init() function.
+	(main): Modified to see if the new _NO_WRAP_INIT_REGISTRATION macro is
+	used in a file and store a true/false value in the hash map for the
+	specified file.  Also, modified to not include the includes, the
+	*_get_type() function declarations, the wrap_new() function
+	declarations and the *::get_type() invocations of the classes in the
+	file marked for no registration.
+
+	Bug #684006.
+
 2012-09-16  Murray Cumming  <murrayc@murrayc.com>
 
 	File: Add remove_async() and remove_finish().

@@ -319,3 +319,10 @@ define(`__BOOL_DEPRECATED__',`$1')
 _POP()
 ')
 
+dnl _NO_WRAP_INIT_REGISTRATION
+dnl Used to tag the classes in a file as one not be registered by the
+dnl wrap_init() function (all the classes in the file will not be registered).
+dnl This macro does not generate any code in the .h and .cc files.
+dnl generate_wrap_init.pl will look for this in the original .hg file.
+dnl
+define(`_NO_WRAP_INIT_REGISTRATION',`')dnl
