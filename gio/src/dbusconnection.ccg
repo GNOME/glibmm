@@ -725,6 +725,9 @@ Glib::VariantContainerBase Connection::call_sync(
   return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
 }
 
+//TODO: Re-add the following two methods when the call_finish() method with a
+//UnixFDList exists.
+#if 0
 #ifdef G_OS_LINUX
 // With a UnixFDList.
 void Connection::call(
@@ -738,7 +741,8 @@ void Connection::call(
   const Glib::ustring&                bus_name,
   int                                 timeout_msec,
   CallFlags                           flags,
-  const Glib::VariantType&            reply_type)
+  const Glib::VariantType&            reply_type
+)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -763,7 +767,8 @@ void Connection::call(
   const Glib::ustring&                bus_name,
   int                                 timeout_msec,
   CallFlags                           flags,
-  const Glib::VariantType&            reply_type)
+  const Glib::VariantType&            reply_type
+)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -777,6 +782,7 @@ void Connection::call(
     0, &SignalProxy_async_callback, slot_copy);
 }
 #endif // G_OS_LINUX
+#endif // 0
 
 void Connection::emit_signal(
   const Glib::ustring&                object_path,
@@ -876,66 +882,6 @@ guint Connection::register_subtree(const Glib::ustring& object_path,
     ::Glib::Error::throw_exception(gerror);
 
   return result;
-}
-
-
-Glib::VariantContainerBase Connection::call_sync(const Glib::ustring& object_path, const Glib::ustring& interface_name, const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<UnixFDList>& fd_list, Glib::RefPtr<UnixFDList>& out_fd_list, const Glib::ustring& bus_name, int timeout_msec, CallFlags flags, const Glib::VariantType& reply_type)
-{
-  GError* gerror = 0;
-  GUnixFDList* cunixfdlist = 0;
-  Glib::VariantContainerBase retvalue = Glib::VariantContainerBase(g_dbus_connection_call_with_unix_fd_list_sync(gobj(), bus_name.c_str(), object_path.c_str(), interface_name.c_str(), method_name.c_str(), const_cast<GVariant*>((parameters).gobj()), (reply_type).gobj(), ((GDBusCallFlags)(flags)), timeout_msec, Glib::unwrap(fd_list), &cunixfdlist, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)), false);
-
-  if(cunixfdlist)
-     out_fd_list = Glib::wrap(cunixfdlist);
-
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-Glib::VariantContainerBase Connection::call_sync(const Glib::ustring& object_path, const Glib::ustring& interface_name, const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters, const Glib::RefPtr<UnixFDList>& fd_list, Glib::RefPtr<UnixFDList>& out_fd_list, const Glib::ustring& bus_name, int timeout_msec, CallFlags flags, const Glib::VariantType& reply_type)
-{
-  GError* gerror = 0;
-  GUnixFDList* cunixfdlist = 0;
-  Glib::VariantContainerBase retvalue = Glib::VariantContainerBase(g_dbus_connection_call_with_unix_fd_list_sync(gobj(), bus_name.c_str(), object_path.c_str(), interface_name.c_str(), method_name.c_str(), const_cast<GVariant*>((parameters).gobj()), (reply_type).gobj(), ((GDBusCallFlags)(flags)), timeout_msec, Glib::unwrap(fd_list), &cunixfdlist, 0, &(gerror)), false);
-
-  if(cunixfdlist)
-     out_fd_list = Glib::wrap(cunixfdlist);
-
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
-
-}
-
-Glib::VariantContainerBase Connection::call_with_unix_fd_finish(const Glib::RefPtr<AsyncResult>& res, Glib::RefPtr<UnixFDList>& out_fd_list)
-{
-  GError* gerror = 0;
-  GUnixFDList* cunixfdlist = 0;
-  Glib::VariantContainerBase retvalue = Glib::VariantContainerBase(g_dbus_connection_call_with_unix_fd_list_finish(gobj(), &cunixfdlist, Glib::unwrap(res), &(gerror)), false);
-
-  if(cunixfdlist)
-     out_fd_list = Glib::wrap(cunixfdlist);
-
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-
-  return retvalue;
-}
-
-Glib::VariantContainerBase Connection::call_with_unix_fd_finish(const Glib::RefPtr<AsyncResult>& res)
-{
-  GError* gerror = 0;
-  Glib::VariantContainerBase retvalue = Glib::VariantContainerBase(g_dbus_connection_call_with_unix_fd_list_finish(gobj(), 0, Glib::unwrap(res), &(gerror)), false);
-
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
 }
 
 } //namespace DBus
