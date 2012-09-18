@@ -681,16 +681,25 @@ sub string_split_commas($)
 
   my @out;
   my $level = 0;
+  my $in_braces = 0;
   my $str = "";
-  my @in = split(/([,()<>])/, $in);
+  my @in = split(/([,()<>{}])/, $in);
 
   while ($#in > -1)
     {
       my $t = shift @in;
 
       next if ($t eq "");
+
+      $in_braces++ if ($t eq "{");
+      $in_braces-- if ($t eq "}");
+
       $level++ if ($t eq "(" or $t eq "<");
-      $level-- if ($t eq ")" or $t eq ">");
+
+      # In the case of a '>' decrease the level if it is not in a {...}
+      # because if it is found in a {...} it is most likely indicating that
+      # a parameter in a method declaration is an output param. 
+      $level-- if ($t eq ")" or ($t eq ">" && !$in_braces));
 
       # skip , inside functions  Ie.  void (*)(int,int)
       if ( ($t eq ",") && !$level) 

@@ -65,7 +65,8 @@ m4_m4exit(1)
 #  Functions for populating initialization tables.
 #
 define(`_INITIALIZATION',`
-m4_ifelse(`$3',,,`define(IN`'__HASH2(`$1',`$2'),`$3')')
+m4_ifelse(`$3',,,`define(IN`'__HASH2(`$1',`$2'),m4_patsubst(`$3',`; +',`;
+  '))')
 ')
 
 define(`_EQUAL',`define(EV`'__HASH(`$1'),`$2')')

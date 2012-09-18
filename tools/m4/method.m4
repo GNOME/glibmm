@@ -8,96 +8,142 @@ dnl
 
 
 dnl
-dnl method 
-dnl           $1      $2     $3         $4       $5     $6    $7     $8        $9        $10         $11       $12         $13                $14        $15             $16
-dnl  _METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,const,refreturn,errthrow,deprecated,constversion,ifdef,arglist_without_types,out_param,out_param_cpptype,wrap_line)
+dnl method
+dnl           $1       $2     $3         $4       $5        $6        $7         $8          $9     $10       $11       $12         $13       $14         $15               $16        $17             $18
+dnl  _METHOD(cppname,cname,cpprettype,crettype,arglist,cdeclarations,cargs,cinitializations,const,refreturn,errthrow,deprecated,constversion,ifdef,arglist_without_types,out_param,out_param_cpptype,wrap_line)
 define(`_METHOD',`dnl
 _PUSH(SECTION_CC)
-ifelse(`$10',,,`_DEPRECATE_IFDEF_START
+ifelse(`$12',,,`_DEPRECATE_IFDEF_START
 ')dnl
-ifelse(`$13',,,`#ifdef $13'
+ifelse(`$15',,,`#ifdef $15'
 )dnl
-$3 __CPPNAME__::$1`'($5)ifelse(`$7',1,` const')
+$3 __CPPNAME__::$1`'($5)ifelse(`$9',1,` const')
 {
-ifelse(`$11',,dnl
-`ifelse(`$8'`$9',,dnl If it is not errthrow or refreturn
-`ifelse(`$14',,dnl If no output parameter is specified
-`ifelse(`$3',void,dnl If it returns voids:
-`  $2(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6);' dnl It it returns non-void:
-,`  return _CONVERT($4,`$3',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');'dnl
-)'dnl End if it returns voids.
-dnl An output parameter is specified:
-,`  _INITIALIZE($15,$4,`$14',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)',$16);'dnl
-)',dnl End if an output parameter is specified.
+ifelse(`$13',,dnl
+`ifelse(`$10'`$11',,dnl If it is not errthrow or refreturn
+dnl Insert the declarations for C output parameters
+`ifelse(`$6',,,`$6
+')`'dnl
+ifelse(`$16',,dnl If no C++ output parameter is specified
+`ifelse(`$3',void,dnl If the C function returns voids:
+`  $2(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7);dnl
+dnl Insert the initializations for the C output parameters
+ifelse(`$8',,,`$8
+')dnl
+'dnl If the C function returns non-void:
+,dnl Insert the declarations for C output parameters
+dnl Store the return if there are C output parameters.
+`ifelse(`$6',,`  return ',`  `$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');dnl
+dnl Insert the initializations for the C output parameters
+ifelse(`$8',,,`$8
+')dnl
+dnl return the value
+ifelse(`$6',,,`  return retvalue;
+')dnl
+')'dnl End if it returns voids.
+dnl A C++ output parameter is specified:
+,`  _INITIALIZE($17,$4,`$16',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)',$18);
+dnl
+dnl Insert the initializations for the C output parameters
+ifelse(`$8',,,`$8
+')dnl
+')',dnl End if a C++ output parameter is specified.
 dnl If is errthrow or refreturn
-`ifelse(`$9',,,`  GError* gerror = 0;')
-ifelse(`$14',,dnl If no output parameter is specified:
-`  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)');'dnl
-dnl An output parameter is specified:
-,`  _INITIALIZE($15,$4,`$14',`$2`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$6',,,`, ')$6)',$16);'dnl
+`ifelse(`$11',,,`  GError* gerror = 0;
+')dnl
+dnl Insert the declarations for C output parameters
+ifelse(`$6',,,`$6
+')`'dnl
+ifelse(`$16',,dnl If no C++ output parameter is specified:
+`  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');dnl
+'dnl
+,dnl A C++ output parameter is specified:
+`  _INITIALIZE($17,$4,`$16',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)',$18);
+'dnl
 )dnl
-ifelse(`$9',,,`
+ifelse(`$11',,,`
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-')
-ifelse(`$8',,,`dnl
-  if(ifelse(`$14',,`retvalue',$14))
-    ifelse(`$14',,`retvalue',$14)->reference(); //The function does not do a ref for us.
 ')dnl
-ifelse(`$3',void,,`  return retvalue;')
+ifelse(`$10',,,`
+  if(ifelse(`$16',,`retvalue',$16))
+    ifelse(`$16',,`retvalue',$16)->reference(); //The function does not do a ref for us.
+')dnl
+dnl Insert the initializations for the C output parameters
+ifelse(`$8',,,`$8
+')`'dnl
+ifelse(`$3',void,,`  return retvalue;')dnl
 ')dnl End errthrow/refreturn
-',`  return const_cast<__CPPNAME__*>(this)->$1($12);')
+',`  return const_cast<__CPPNAME__*>(this)->$1($14);')
 }
 
-ifelse(`$13',,,`
-#endif // $13
+ifelse(`$15',,,`
+#endif // $15
 ')dnl
-ifelse(`$10',,,`_DEPRECATE_IFDEF_END
+ifelse(`$12',,,`_DEPRECATE_IFDEF_END
 ')dnl
 _POP()')
 
 dnl
 dnl static method
-dnl                  $1       $2     $3         $4      $5     $6      $7      $8         $9       $10     $11        $12           $13
-dnl  _STATIC_METHOD(cppname,cname,cpprettype,crettype,arglist,cargs,refreturn,errthrow,deprecated,ifdef,out_param,out_param_type,wrap_line)
+dnl                  $1       $2     $3         $4      $5        $6         $7         $8            $9      $10         $11       $12     $13        $14          $15
+dnl  _STATIC_METHOD(cppname,cname,cpprettype,crettype,arglist,cdeclarations,cargs,cinitializations,refreturn,errthrow,deprecated,ifdef,out_param,out_param_type,wrap_line)
 define(`_STATIC_METHOD',`dnl
 _PUSH(SECTION_CC)
-ifelse(`$9',,,`_DEPRECATE_IFDEF_START
+ifelse(`$11',,,`_DEPRECATE_IFDEF_START
 ')dnl
-ifelse(`$10',,,`#ifdef $10'
+ifelse(`$12',,,`#ifdef $12'
 )dnl
 $3 __CPPNAME__::$1($5)
 {
-ifelse(`$7'`$8',,dnl
-`ifelse(`$11',,dnl If no output parameter is specified
-`ifelse(`$3',void,,`  return ')_CONVERT($4,`$3',`$2`'($6)');
-'dnl
-dnl An output parameter is specified:
-,`  _INITIALIZE($12,$4,`$11',`$2`'($6)',$13);'
-)',dnl End if an output parameter is specified.
-`ifelse(`$8',,,`  GError* gerror = 0;')
-ifelse(`$11',,dnl If no output parameter is specified:
-  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'($6)');
-dnl An output parameter is specified:
-,`  _INITIALIZE($12,$4,`$11',`$2`'($6)',$13);'dnl
+ifelse(`$9'`$10',,dnl
+dnl Insert declarations for C the output parameters
+ifelse(`$6',,,`$6
+')`'dnl
+`ifelse(`$13',,
+dnl If no C++ output parameter is specified.
+`  ifelse(`$3',void,,dnl
+dnl Returns non-void:
+dnl Store the return if there are C output parameters
+ifelse(`$6',,`return ',``$3' retval = '))_CONVERT($4,`$3',`$2`'($7)');'dnl
+dnl A C++ output parameter is specified so initialize it from C return
+,`  _INITIALIZE($14,$4,`$13',`$2`'($7)',$15);'dnl
+)
+dnl Insert the initializations for the C output parameters if there are any
+ifelse(`$8',,,`$8
+')`'dnl
+dnl Return the value if it was stored and if the method returns something
+ifelse(`$3',void,,`ifelse(`$6',,,`  return retval;
+')')dnl
+',dnl End if a C++ output parameter is specified.
+`ifelse(`$10',,,`  GError* gerror = 0;')
+dnl Insert the declarations for the C output parameters
+ifelse(`$6',,,`$6
+')`'dnl
+ifelse(`$13',,dnl If no C++ output parameter is specified:
+  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'($7)');dnl
+dnl A C++ output parameter is specified:
+,`  _INITIALIZE($14,$4,`$13',`$2`'($7)',$15);'dnl
 )dnl
-ifelse(`$8',,,`
+ifelse(`$10',,,`
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
-')
-ifelse(`$7',,,`dnl
-  if(ifelse(`$11',,`retvalue',$11))
-    ifelse(`$11',,`retvalue',$11)->reference(); //The function does not do a ref for us
 ')dnl
-ifelse(`$3',void,,`  return retvalue;')
+dnl Insert the initializations for the C output parameters.
+ifelse(`$8',,,`$8
+')`'dnl
+ifelse(`$9',,,`
+  if(ifelse(`$13',,`retvalue',$13))
+    ifelse(`$13',,`retvalue',$13)->reference(); //The function does not do a ref for us
+')dnl
+ifelse(`$3',void,,`  return retvalue;
+')dnl
 ')dnl
 }
 
-ifelse(`$10',,,`
-#endif // $10
+ifelse(`$12',,,`
+#endif // $12
 ')dnl
-ifelse(`$9',,,`_DEPRECATE_IFDEF_END
+ifelse(`$11',,,`_DEPRECATE_IFDEF_END
 ')
 _POP()')
-
-

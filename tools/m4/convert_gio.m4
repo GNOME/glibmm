@@ -261,6 +261,7 @@ _CONVERSION(`const Glib::VariantContainerBase&',`GVariant*',`const_cast<GVariant
 
 #VariantType
 _CONVERSION(`const GVariantType*',`Glib::VariantType',`Glib::wrap(const_cast<GVariantType*>($3), false)')
+_CONVERSION(`const Glib::VariantType&',`const GVariantType*',`$3.gobj()')
 
 #Volume
 _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')

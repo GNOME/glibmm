@@ -5,6 +5,11 @@ use warnings;
 use Util;
 use FunctionBase;
 
+# These are flags that indicate whether parameters are optional or output
+# parameters.
+use constant FLAG_PARAM_OPTIONAL => 1;
+use constant FLAG_PARAM_OUTPUT => 2;
+
 BEGIN {
      use Exporter   ();
      our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
@@ -16,7 +21,7 @@ BEGIN {
      %EXPORT_TAGS = ( );
      # your exported package globals go here,
      # as well as any optionally exported functions
-     @EXPORT_OK   = qw($Var1 %Hashit &func3);
+     @EXPORT_OK   = qw($Var1 %Hashit &func3 FLAG_PARAM_OPTIONAL FLAG_PARAM_OUTPUT);
      }
 our @EXPORT_OK;
 
@@ -35,7 +40,7 @@ our @EXPORT_OK;
 #       string array param_type;
 #       string array param_name;
 #       string array param_default_value;
-#       bool array param_optional;
+#       int array param_flags; (stores flags form params: 1 => optional, 2 => output)
 #       hash param_mappings; (maps C param names (if specified) to the C++ index)
 #       string array possible_args_list; (a list of space separated indexes)
 #       string in_module; e.g. Gtk
@@ -75,7 +80,7 @@ sub new($$)
   $$self{param_types} = [];
   $$self{param_names} = [];
   $$self{param_default_values} = [];
-  $$self{param_optional} = [];
+  $$self{param_flags} = [];
   $$self{param_mappings} = {};
   $$self{possible_args_list} = [];
   $$self{in_module} = "";
@@ -136,7 +141,7 @@ sub new_ctor($$)
   $$self{param_types} = [];
   $$self{param_names} = [];
   $$self{param_default_values} = [];
-  $$self{param_optional} = [];
+  $$self{param_flags} = [];
   $$self{param_mappings} = {};
   $$self{possible_args_list} = [];
   $$self{in_module} = "";
@@ -186,13 +191,13 @@ sub parse_param($$)
   my $value = "";
   my $id = 0;
   my $has_value = 0;
-  my $is_optional = 0;
+  my $flags = 0;
   my $curr_param = 0;
 
   my $param_types = $$self{param_types};
   my $param_names = $$self{param_names};
   my $param_default_values = $$self{param_default_values};
-  my $param_optional = $$self{param_optional};
+  my $param_flags = $$self{param_flags};
   my $param_mappings = $$self{param_mappings};
 
   # Mappings from a C name to this C++ param defaults to empty (no mapping).
@@ -206,7 +211,7 @@ sub parse_param($$)
   # parse through argument list
   my @str = ();
   my $par = 0;
-  foreach (split(/(const )|([,=&*()])|(<[^,]*>)|(\s+)/, $line)) #special characters OR <something> OR whitespace.
+  foreach (split(/(const )|([,=&*()])|(<[^,{}]*>)|(\s+)/, $line)) #special characters OR <something> OR whitespace.
   {
     next if ( !defined($_) or $_ eq "" );
 
@@ -222,7 +227,7 @@ sub parse_param($$)
        $par--; #Decrement the number of parameters.
        next;
     }
-    elsif ( $par || /^(const )|(<[^,]*>)|([*&])|(\s+)/ ) #TODO: What's happening here?
+    elsif ( $par || /^(const )|(<[^,{}]*>)|([*&])|(\s+)/ ) #TODO: What's happening here?
     {
       push(@str, $_); #This looks like part of the type, so we store it.
       next;
@@ -252,21 +257,24 @@ sub parse_param($$)
 
       $type = string_trim($type);
 
-      # Determine if the param is optional or if a C param name should be
-      # mapped to the current C++ index (if name ends with {c_name?}). (A
-      # '.' for the name means use the C++ as the C name).
-      if ($name =~ /\{\s*(\w*|\.)\s*(\??)\s*\}$/)
+      # Determine if the param is optional, an output param or if a C param
+      # name should be mapped to the current C++ index (if name ends with
+      # {c_name>>?}). (A '.' for the name means use the C++ as the C name).
+      # '@' - Means that it is an output parameter.
+      # '?' - Means that it is an optional parameter.
+      if ($name =~ /\{\s*(\w+|\.)?\s*(>>)?\s*(\??)\s*\}$/)
       {
-        $is_optional = 1 if($2);
+        $flags = FLAG_PARAM_OPTIONAL if($3);
+        $flags |= FLAG_PARAM_OUTPUT if($2);
         $mapping = $1 if($1);
-        $name =~ s/\{\s*(\w|\.)*\??\s*\}$//;
+        $name =~ s/\{\s*(\w+|\.)?\s*(>>)?\s*\??\s*\}$//;
         $mapping = $name if($mapping eq ".");
       }
 
       push(@$param_types, $type);
       push(@$param_names, $name);
       push(@$param_default_values, $value);
-      push(@$param_optional, $is_optional);
+      push(@$param_flags, $flags);
 
       # Map from the c_name to the C++ index (no map if no name given).
       $$param_mappings{$mapping} = $curr_param if($mapping);
@@ -277,7 +285,7 @@ sub parse_param($$)
       $value = "";
       $has_value = 0;
       $name = "";
-      $is_optional = 0;
+      $flags = 0;
       $curr_param++;
 
       # Mappings from a C name to this C++ param defaults to empty (no mapping).
@@ -323,22 +331,23 @@ sub parse_param($$)
   }
 
   $type = string_trim($type);
-
-  # Determine if the param is optional or if a C param name should be
-  # mapped to the current C++ index (if name ends with {c_name?}). (A
-  # '.' for the name means use the C++ as the C name).
-  if ($name =~ /\{\s*(\w*|\.)\s*(\??)\s*\}$/)
+  
+  # Determine if the param is optional, an output param or if a C param
+  # name should be mapped to the current C++ index (if name ends with
+  # {c_name>>?}). (A '.' for the name means use the C++ as the C name).
+  if ($name =~ /\{\s*(\w+|\.)?\s*(>>)?\s*(\??)\s*\}$/)
   {
-    $is_optional = 1 if($2);
+    $flags = FLAG_PARAM_OPTIONAL if($3);
+    $flags |= FLAG_PARAM_OUTPUT if($2);
     $mapping = $1 if($1);
-    $name =~ s/\{\s*(\w*|\.)\??\s*\}$//;
+    $name =~ s/\{\s*(\w+|\.)?\s*(>>)?\??\s*\}$//;
     $mapping = $name if($mapping eq ".");
   }
 
   push(@$param_types, $type);
   push(@$param_names, $name);
   push(@$param_default_values, $value);
-  push(@$param_optional, $is_optional);
+  push(@$param_flags, $flags);
 
   # Map from the c_name to the C++ index (no map if no name given).
   $$param_mappings{$mapping} = $curr_param if($mapping);
@@ -434,7 +443,7 @@ sub possible_args_list($$)
 
   my $param_names = $$self{param_names};
   my $param_types = $$self{param_types};
-  my $param_optional = $$self{param_optional};
+  my $param_flags = $$self{param_flags};
 
   my @result = ();
 
@@ -455,7 +464,7 @@ sub possible_args_list($$)
   	push(@result, "$i");
   	# And if it's optional also add an empty string to represent that it is
   	# not added.
-  	push(@result, "") if ($$param_optional[$i]);
+  	push(@result, "") if ($$param_flags[$i] & FLAG_PARAM_OPTIONAL);
   	return @result;
   }
 
@@ -477,7 +486,7 @@ sub possible_args_list($$)
 
   # If this parameter is optional, append the remaining possibilities without
   # this param's type and name.
-  if($$param_optional[$i])
+  if($$param_flags[$i] & FLAG_PARAM_OPTIONAL)
   {
     foreach my $possibility (@remaining)
     {

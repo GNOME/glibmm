@@ -1,3 +1,65 @@
+2012-09-18  José Alburquerque  <jaalburqu@svn.gnome.org>
+
+	gmmproc: _WRAP_METHOD: Allow setting parameters from C output params.
+
+	* tools/m4/convert_base.m4 (_INITIALIZATION): Insert newlines between
+	a possible series of statements that has been specified as an
+	initialization.  For example, the declaration, assignment and the
+	g_free() call would each be on a seperate line in the following (from
+	datainputstream.hg):
+
+	_INITIALIZATION(`std::string&',`return-char*',`char* tmp = $4; $3 = tmp; g_free(tmp)')
+
+	* tools/pm/Function.pm (FLAG_PARAM_OPTIONAL):
+	(FLAG_PARAM_OUTPUT): Added new constant flags representing if a
+	parameter is optional or if it is an output parameter.
+	(EXPORT_OK): Exported the above flags so they can be used in other
+	modules.
+	(param_optional): Renamed to param_flags.  Redesigned it to store a
+	possible combination of both flags above and not just if a parameter
+	is optional.
+	(parse_param): Modified the subroutine to look for an '>>' in a
+	possible '{.*}' following the current parameter name which would
+	signal that the parameter is an output parameter.  The syntax for
+	signaling if a parameter is optional, is an output parameter or should
+	be mapped to a specific C parameter would be:
+
+	cpp_param_name{c_param_name>>?}
+
+	c_param_name means that the C++ parameter should be mapped to the C
+	parameter no matter the parameter order of either.  The '>>' means
+	that the parameter should be set from the C parameter because the C
+	parameter is an output parameter.   Finally, the '?' means that the
+	parameter is optional thus overloads should be generated without that
+	paramter.  All three components within the {} are optional.  A '.' may
+	be used instead of the c parameter name if the C++ parameter name is
+	the same as the C parameter name.
+
+	(possible_args_list): Modified to use the param_flags variable.
+
+	* tools/pm/Output.pm (output_wrap_vfunc_h): Modified to receive the
+	new return type from convert_args_cpp_to_c() (see below).
+	(output_wrap_meth): Modified to receive the new return from
+	convert_args_cpp_to_c (see below) and pass them to the _METHOD() and
+	_STATIC_METHOD() macros.
+	(convert_args_cpp_to_c): Modified to generate a
+	list of C declarations for any possible C output parameters and to
+	generate a list of _INITIALIZE() macros to initialize the C++
+	parameters from the C output parameters.  The function returns an array
+	of three strings (the convert macros, the possible C declarations and
+	the _INITIALIZE() macros in that order).
+
+	* tools/pm/WrapParser.pm (string_split_commas): Modified the
+	subroutine to ignore '>>' if they are in '{}' (so that the '>>' can
+	signal that a parameter should be set from a C output parameter.
+
+	* tools/m4/method.m4 (_METHOD, _STATIC_METHOD): Rewrote to accept
+	C declarations of possible C output parameters and _INITIALIZE macros
+	which would initialize the appropriate C++ parameters from the output
+	variables and insert them appropriately in the generated code.
+
+	Bug #662371.
+
 2012-09-18  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
 
 	Improve the use of _IGNORE. Don't use gio_others.defs.
