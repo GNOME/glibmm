@@ -870,7 +870,7 @@ sub on_wrap_method($)
     return;
   }
 
-  #Parse the method decaration and build an object that holds the details:
+  #Parse the method declaration and build an object that holds the details:
   $objCppfunc = &Function::new($argCppMethodDecl, $self);
 
   # handle second argument:
@@ -884,7 +884,11 @@ sub on_wrap_method($)
   if ($argCFunctionName =~ m/^\S+$/s)
   {
     #c-name. e.g. gtk_clist_set_column_title
-    $objCfunc = GtkDefs::lookup_function($argCFunctionName);
+    if ($$objCppfunc{static}) {
+      $objCfunc = GtkDefs::lookup_method_set_weak_mark($argCFunctionName);
+    } else {
+      $objCfunc = GtkDefs::lookup_method($argCFunctionName);
+    }
 
     if(!$objCfunc) #If the lookup failed:
     {
@@ -977,7 +981,7 @@ sub on_wrap_method_docs_only($)
   if ($argCFunctionName =~ m/^\S+$/s)
   {
     #c-name. e.g. gtk_clist_set_column_title
-    $objCfunc = GtkDefs::lookup_function($argCFunctionName);
+    $objCfunc = GtkDefs::lookup_method_set_weak_mark($argCFunctionName);
 
     if(!$objCfunc) #If the lookup failed:
     {
@@ -1049,7 +1053,8 @@ sub on_wrap_ctor($)
   #Get the C function's details:
   if ($argCFunctionName =~ m/^\S+$/s)
   {
-    $objCfunc = GtkDefs::lookup_function($argCFunctionName); #c-name. e.g. gtk_clist_set_column_title
+    #c-name. e.g. gtk_button_new
+    $objCfunc = GtkDefs::lookup_method_set_weak_mark($argCFunctionName);
     if(!$objCfunc) #If the lookup failed:
     {
       $objOutputter->output_wrap_failed($argCFunctionName, "ctor defs lookup failed (2)");

@@ -1,3 +1,18 @@
+2012-09-18  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	gmmproc: Improve the search for unwrapped methods.
+
+	* tools/pm/GtkDefs.pm: lookup_method_set_weak_mark(): New function.
+	get_unwrapped(): Correct the search when methods from more than one class
+	have been wrapped.
+	GtkDefs::Function::new(): Take into account that a method (g_iconv) may be
+	nameless. After this change the patch of g_iconv in glib_functions.defs.patch
+	is probably unnecessary but harmless.
+	* tools/pm/WrapParser.pm: on_wrap_method_docs_only(), on_wrap_ctor():
+	Call GtkDefs::lookup_method_set_weak_mark().
+	on_wrap_method(): Call GtkDefs::lookup_method_set_weak_mark() if the method
+	is static.
+
 2012-09-14  José Alburquerque  <jaalburquerque@gmail.com>
 
 	_CLASS_GOBJECT: Allow classes to have custom wrap() functions.

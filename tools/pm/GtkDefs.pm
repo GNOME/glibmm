@@ -34,9 +34,12 @@ use FunctionBase;
 #    @ get_methods()
 #    @ get_signals()
 #    @ get_properties()
+#    @ get_unwrapped()
 #
 #    $ lookup_enum(c_type)
 #    $ lookup_object(c_name)
+#    $ lookup_method_dont_mark(c_name)
+#    $ lookup_method_set_weak_mark(c_name)
 #    $ lookup_method(c_name)
 #    $ lookup_function(c_name)
 #    $ lookup_property(object, c_name)
@@ -369,19 +372,19 @@ sub get_marked
 }
 
 # This searches for items wrapped by this file and then tries to locate
-# other functions/signal/properties which may have been left unmarked.
+# other methods/signals/properties which may have been left unmarked.
 sub get_unwrapped
 {
-  # find methods which were used in for a _WRAP
+  # find methods which were used in a _WRAP or _IGNORE.
   my @targets;
   push @targets,grep {$$_{entity_type} eq "method" && $$_{mark}==1} values %GtkDefs::methods;
   push @targets,grep {$$_{mark}==1} values %GtkDefs::signals;
   push @targets,grep {$$_{mark}==1} values %GtkDefs::properties;
 
   # find the classes which used them.
-  my @classes = join(" ", unique(map { $$_{class} } @targets));
+  my @classes = unique(map { $$_{class} } @targets);
 
-  # find methods which are in those classes which didn't get marked.
+  # find methods/signals/properties which are in those classes which didn't get marked.
   my @unwrapped;
   my $class;
   foreach $class (@classes)
@@ -485,7 +488,7 @@ sub lookup_method_dont_mark($)
 
 sub lookup_method($)
 {
-  my $obj = lookup_method_dont_mark($_);
+  my $obj = lookup_method_dont_mark($_[0]);
 
   $$obj{mark} = 1 if($obj);
   return $obj;
@@ -494,6 +497,26 @@ sub lookup_method($)
 sub lookup_function($)
 {
   return lookup_method($_[0]);
+}
+
+sub lookup_method_set_weak_mark($)
+{
+  my $obj = lookup_method_dont_mark($_[0]);
+
+  # A constructor or a static method may be listed in the .defs file as a method
+  # of another class, if its first parameter is a pointer to a class instance.
+  # Examples:
+  #   GVariantIter* g_variant_iter_new(GVariant* value)
+  #   GtkWidget* gtk_application_window_new(GtkApplication* application)
+  #   GSocketConnection* g_socket_connection_factory_create_connection(GSocket* socket)
+  #
+  # The use of gtk_application_window_new() in Gtk::ApplicationWindow shall
+  # not cause get_unwrapped() to list all methods, signals and properties of
+  # GtkApplication as unwrapped in applicationwindow.hg.
+  # Therefore mark=2 instead of mark=1.
+
+  $$obj{mark} = 2 if ($obj && $$obj{mark} == 0);
+  return $obj;
 }
 
 sub lookup_signal($$)
@@ -520,21 +543,19 @@ package GtkDefs::Function;
 BEGIN { @GtkDefs::Function::ISA=qw(FunctionBase); }
 
 #  class Function : FunctionBase
-#
 #    {
-#       string name; e.g. gtk_accelerator_valid
-#       string c_name;
-#       string class e.g. GtkButton 
+#       string name;   e.g. function: gtk_accelerator_valid, method: clicked
+#       string c_name; e.g. gtk_accelerator_valid, gtk_button_clicked
+#       string class;  e.g. GtkButton
 #
 #       string rettype;
 #       string array param_types;
 #       string array param_names;
 #
-#       string entity_type. e.g. method or signal
+#       string entity_type; e.g. method or function
 #
 #       bool varargs;
 #       bool mark;
-#
 #    }
 
 # "new" can't have prototype
@@ -545,9 +566,13 @@ sub new
   my $self = {};
   bless $self;
 
+  #Remove first and last braces:
   $def =~ s/^\(//;
   $def =~ s/\)$//;
-  $def =~ s/^\s*define-(\S+)\s+(\S+)\s*//;
+
+  #In rare cases a method can be nameless (g_iconv).
+  #Don't interpret the following "(of-object" as the method's name.
+  $def =~ s/^\s*define-([^\s\(]+)\s*([^\s\(]*)\s*//;
   $$self{entity_type} = $1;
   $$self{name} = $2;
   $$self{name} =~ s/-/_/g; # change - to _
