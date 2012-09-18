@@ -33,9 +33,12 @@ class VariantBase;
 class VariantIter
 {
   _CLASS_OPAQUE_COPYABLE(VariantIter, GVariantIter, NONE, g_variant_iter_copy, g_variant_iter_free)
+  _IGNORE(g_variant_iter_copy, g_variant_iter_free)
 public:
   explicit VariantIter(const VariantBase& variant);
-  _IGNORE(g_variant_iter_new)
+  dnl // Don't _IGNORE(g_variant_iter_new). It's listed in glib_functions.defs as
+  dnl // a method of GVariant. Ignoring it would make gmmproc think that this
+  dnl // file wraps GVariant, and it would list all GVariant methods as unwrapped.
 
   _WRAP_METHOD(gsize get_n_children() const, g_variant_iter_n_children)
 
