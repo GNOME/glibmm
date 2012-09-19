@@ -118,6 +118,13 @@ sub output_wrap_vfunc_h($$$$$$)
 #   );
 #  $self->append($str);
 
+  # Prepend a Doxygen @throws directive to the declaration if the virtual
+  # function throws an error.
+  if($$objCDefsFunc{throw_any_errors})
+  {
+    $self->append('/// @throws Glib::Error.' . "\n");
+  }
+
   my $cppVfuncDecl = "virtual " . $$objCppfunc{rettype} . " " . $$objCppfunc{name} . "(" . $objCppfunc->args_types_and_names() . ")";
   if($objCppfunc->get_is_const())
   {
