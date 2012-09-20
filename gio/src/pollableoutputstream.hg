@@ -1,0 +1,62 @@
+// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+
+/* Copyright (C) 2012 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/interface.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gio/gio.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GPollableOutputStreamInterface GPollableOutputStreamInterface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+namespace Gio
+{
+
+class Cancellable;
+
+/** PollableOutputStream - Interface for pollable output streams.
+ * PollableOutputStream is implemented by OutputStreams that can be polled for
+ * readiness to write. This can be used when interfacing with a non-GIO API
+ * that expects UNIX-file-descriptor-style asynchronous I/O rather than
+ * GIO-style.
+ * @newin{2,34}
+ */
+class PollableOutputStream : public Glib::Interface
+{
+  _CLASS_INTERFACE(PollableOutputStream, GPollableOutputStream, G_POLLABLE_OUTPUT_STREAM, GPollableOutputStreamInterface)
+
+public:
+  _WRAP_METHOD(bool can_poll() const, g_pollable_output_stream_can_poll)
+  _WRAP_METHOD(bool is_writable() const, g_pollable_output_stream_is_writable)
+
+  //TODO: _WRAP_METHOD(Glib::RefPtr<Source> create_source(const Glib::RefPtr<Cancellable>& cancellable), g_pollable_output_stream_create_source)
+
+  _WRAP_METHOD(gssize write_nonblocking(const void* buffer, gsize count, const Glib::RefPtr<Cancellable>& cancellable{?}), g_pollable_output_stream_write_nonblocking, errthrow)
+
+  _WRAP_VFUNC(bool can_poll() const, "can_poll")
+  _WRAP_VFUNC(bool is_writable() const, "is_writable")
+
+  //TODO:_WRAP_VFUNC(Glib::RefPtr<Source> create_source(const Glib::RefPtr<Cancellable>& cancellable), "create_source")
+
+  _WRAP_VFUNC(gssize write_nonblocking(const void* buffer, gsize count), "write_nonblocking", errthrow)
+};
+
+} // namespace Gio
