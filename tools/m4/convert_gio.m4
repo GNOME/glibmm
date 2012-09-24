@@ -75,6 +75,10 @@ _CONVERSION(`const Glib::RefPtr<Gio::Cancellable>&',`GCancellable*',__CONVERT_CO
 _CONVERSION(`GCancellable*', `Glib::RefPtr<Cancellable>', `Glib::wrap($3)')
 _CONVERSION(`GCancellable*', `const Glib::RefPtr<Cancellable>&', `Glib::wrap($3)')
 
+# Converter
+_CONVERSION(`const Glib::RefPtr<Converter>&',`GConverter*',`Glib::unwrap($3)')
+_CONVERSION(`GConverter*',`Glib::RefPtr<Converter>',`Glib::wrap($3)')
+
 # Credentials
 _CONVERSION(`const Glib::RefPtr<Credentials>&',`GCredentials*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Credentials))
 _CONVERSION(`const Glib::RefPtr<const Credentials>&',`GCredentials*',__CONVERT_CONST_REFPTR_TO_P_SUN(Gio::Credentials))
