@@ -19634,14 +19634,14 @@ Gets the user data from a #GAsyncResult.
 
 <function name="g_async_result_is_tagged">
 <description>
-Checks if @result has the given @source_tag (generally a function
-pointer indicating the function @result was created by).
+Checks if @res has the given @source_tag (generally a function
+pointer indicating the function @res was created by).
 
 Since: 2.34
 
 </description>
 <parameters>
-<parameter name="result">
+<parameter name="res">
 <parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
@@ -19650,7 +19650,7 @@ Since: 2.34
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @result has the indicated @source_tag, %FALSE if
+<return> %TRUE if @res has the indicated @source_tag, %FALSE if
 not.
 
 </return>
@@ -19658,7 +19658,7 @@ not.
 
 <function name="g_async_result_legacy_propagate_error">
 <description>
-If @result is a #GSimpleAsyncResult, this is equivalent to
+If @res is a #GSimpleAsyncResult, this is equivalent to
 g_simple_async_result_propagate_error(). Otherwise it returns
 %FALSE.
 
@@ -19674,11 +19674,11 @@ Since: 2.34
 
 </description>
 <parameters>
-<parameter name="result">
+<parameter name="res">
 <parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
-<parameter name="dest">
+<parameter name="error">
 <parameter_description> a location to propagate the error to.
 </parameter_description>
 </parameter>
@@ -21139,6 +21139,28 @@ Gets the human readable description of the content type.
 </parameters>
 <return> a short description of the content type @type. Free the
 returned string with g_free()
+</return>
+</function>
+
+<function name="g_content_type_get_generic_icon_name">
+<description>
+Gets the generic icon name for a content type.
+
+See the &lt;ulink url=&quot;http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec&quot;&gt;shared-mime-info&lt;/ulink&gt;
+specification for more on the generic icon name.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> a content type string
+</parameter_description>
+</parameter>
+</parameters>
+<return> the registered generic icon name for the given @type,
+or %NULL if unknown. Free with g_free()
+
 </return>
 </function>
 
@@ -23314,7 +23336,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="bus_name">
-<parameter_description> A unique or well-known bus name.
+<parameter_description> A unique or well-known bus name or %NULL if
+@connection is not a message bus connection.
 </parameter_description>
 </parameter>
 <parameter name="object_path">
@@ -23479,7 +23502,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 <parameter name="bus_name">
-<parameter_description> A unique or well-known bus name.
+<parameter_description> A unique or well-known bus name or %NULL if
+@connection is not a message bus connection.
 </parameter_description>
 </parameter>
 <parameter name="object_path">
@@ -26746,32 +26770,32 @@ The contents of the description has no ABI guarantees, the contents
 and formatting is subject to change at any time. Typical output
 looks something like this:
 &lt;programlisting&gt;
-Type:    method-call
-Flags:   none
-Version: 0
-Serial:  4
-Headers:
+Type&colon;    method-call
+Flags&colon;   none
+Version&colon; 0
+Serial&colon;  4
+Headers&colon;
 path -&gt; objectpath '/org/gtk/GDBus/TestObject'
 interface -&gt; 'org.gtk.GDBus.TestInterface'
 member -&gt; 'GimmeStdout'
 destination -&gt; ':1.146'
-Body: ()
+Body&colon; ()
 UNIX File Descriptors:
 (none)
 &lt;/programlisting&gt;
 or
 &lt;programlisting&gt;
-Type:    method-return
-Flags:   no-reply-expected
-Version: 0
-Serial:  477
-Headers:
+Type&colon;    method-return
+Flags&colon;   no-reply-expected
+Version&colon; 0
+Serial&colon;  477
+Headers&colon;
 reply-serial -&gt; uint32 4
 destination -&gt; ':1.159'
 sender -&gt; ':1.146'
 num-unix-fds -&gt; uint32 1
-Body: ()
-UNIX File Descriptors:
+Body&colon; ()
+UNIX File Descriptors&colon;
 fd 12: dev=0:10,mode=020620,ino=5,uid=500,gid=5,rdev=136:2,size=0,atime=1273085037,mtime=1273085851,ctime=1272982635
 &lt;/programlisting&gt;
 
@@ -29879,15 +29903,15 @@ otherwise.
 
 <function name="g_desktop_app_info_get_startup_wm_class">
 <description>
-Retrieves the StartupWMClass field from @app_info. This represents the
-WM_CLASS property of the main window of the application, if launched through
-@app_info.
+Retrieves the StartupWMClass field from @info. This represents the
+WM_CLASS property of the main window of the application, if launched
+through @info.
 
 Since: 2.34
 
 </description>
 <parameters>
-<parameter name="app_info">
+<parameter name="info">
 <parameter_description> a #GDesktopAppInfo that supports startup notify
 </parameter_description>
 </parameter>
@@ -31840,7 +31864,7 @@ Since: 2.34
 <parameter_description> input #GFile
 </parameter_description>
 </parameter>
-<parameter name="res">
+<parameter name="result">
 <parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
@@ -53502,6 +53526,8 @@ g_dbus_connection_new_for_address()
 
 <function name="g_test_dbus_get_flags">
 <description>
+Gets the flags of the #GTestDBus object.
+
 
 </description>
 <parameters>
@@ -56681,7 +56707,7 @@ Guesses whether a Unix mount should be displayed in the UI.
 
 <function name="g_unix_mount_guess_symbolic_icon">
 <description>
-Guesses the symbolic icon of a Unix mount. 
+Guesses the symbolic icon of a Unix mount.
 
 Since: 2.34
 
@@ -56925,6 +56951,10 @@ Since: 2.34
 
 </description>
 <parameters>
+<parameter name="mount_point">
+<parameter_description> a #GUnixMountPoint
+</parameter_description>
+</parameter>
 </parameters>
 <return> a #GIcon
 
