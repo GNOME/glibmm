@@ -26,14 +26,13 @@ dnl Insert the declarations for C output parameters
 ')`'dnl
 ifelse(`$16',,dnl If no C++ output parameter is specified
 `ifelse(`$3',void,dnl If the C function returns voids:
-`  $2(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7);dnl
+`  $2(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7);
 dnl Insert the initializations for the C output parameters
 ifelse(`$8',,,`$8
 ')dnl
-'dnl If the C function returns non-void:
-,dnl Insert the declarations for C output parameters
+',dnl If the C function returns non-void:
 dnl Store the return if there are C output parameters.
-`ifelse(`$6',,`  return ',`  `$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');dnl
+`ifelse(`$6',,`  return ',`  `$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');
 dnl Insert the initializations for the C output parameters
 ifelse(`$8',,,`$8
 ')dnl
@@ -55,26 +54,28 @@ dnl Insert the declarations for C output parameters
 ifelse(`$6',,,`$6
 ')`'dnl
 ifelse(`$16',,dnl If no C++ output parameter is specified:
-`  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');dnl
+`  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');
 'dnl
 ,dnl A C++ output parameter is specified:
 `  _INITIALIZE($17,$4,`$16',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)',$18);
 'dnl
 )dnl
-ifelse(`$11',,,`
+ifelse(`$11',,,`dnl
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 ')dnl
-ifelse(`$10',,,`
+ifelse(`$10',,,`dnl
   if(ifelse(`$16',,`retvalue',$16))
     ifelse(`$16',,`retvalue',$16)->reference(); //The function does not do a ref for us.
 ')dnl
 dnl Insert the initializations for the C output parameters
 ifelse(`$8',,,`$8
 ')`'dnl
-ifelse(`$3',void,,`  return retvalue;')dnl
+ifelse(`$3',void,,`  return retvalue;
+')dnl
 ')dnl End errthrow/refreturn
-',`  return const_cast<__CPPNAME__*>(this)->$1($14);')
+',`  return const_cast<__CPPNAME__*>(this)->$1($14);
+')dnl
 }
 
 ifelse(`$15',,,`

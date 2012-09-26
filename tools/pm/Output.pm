@@ -974,8 +974,20 @@ sub convert_args_cpp_to_c($$$$$)
       # Remove a possible final '*' from the output parameter type because it
       # will be passed by C reference (&name).
       $cOutputParamType =~ s/\*$//;
+ 
+      # Only initialize pointers to zero.  Otherwise, use the default
+      # constructor of the type.
+      my $initialization = "";
+      if($cOutputParamType =~ /\*$/)
+      {
+        $initialization = " = 0"; 
+      }
+      else
+      {
+        $initialization = " = $cOutputParamType()"; 
+      }
 
-      push(@declarations, "  $cOutputParamType $cOutputParamName = 0;");
+      push(@declarations, "  $cOutputParamType $cOutputParamName$initialization;");
 
       push(@conversions, "&" . $cOutputParamName);
 
