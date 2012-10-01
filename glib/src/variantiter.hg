@@ -22,6 +22,7 @@ namespace Glib
 {
 
 class VariantBase;
+class VariantContainerBase;
 
 //This can't be like a real iterator (like Gtk::TextIter),
 //because g_iter_value_get_next_value() both gets a value and changes the iterator.
@@ -35,7 +36,11 @@ class VariantIter
   _CLASS_OPAQUE_COPYABLE(VariantIter, GVariantIter, NONE, g_variant_iter_copy, g_variant_iter_free)
   _IGNORE(g_variant_iter_copy, g_variant_iter_free)
 public:
+  //TODO: The variant parameter should be a VariantContainerBase.
   explicit VariantIter(const VariantBase& variant);
+
+  _WRAP_METHOD(gsize init(const VariantContainerBase& value), g_variant_iter_init)
+
   dnl // Don't _IGNORE(g_variant_iter_new). It's listed in glib_functions.defs as
   dnl // a method of GVariant. Ignoring it would make gmmproc think that this
   dnl // file wraps GVariant, and it would list all GVariant methods as unwrapped.
@@ -43,7 +48,7 @@ public:
   _WRAP_METHOD(gsize get_n_children() const, g_variant_iter_n_children)
 
   bool next_value(VariantBase& value);
-  _IGNORE(g_variant_iter_next_value)
+  _IGNORE(g_variant_iter_next_value, g_variant_iter_next)
 
 };
 
