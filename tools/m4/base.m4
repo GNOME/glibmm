@@ -59,6 +59,12 @@ dnl
 m4_include(convert.m4)
 
 dnl
+dnl  Initialization macros
+dnl
+
+m4_include(initialize.m4)
+
+dnl
 dnl ----------------------- Utility Macros -------------------------
 dnl 
 

@@ -868,9 +868,9 @@ sub convert_args_cpp_to_c($$$$$)
   my $c_param_types = $$objCDefsFunc{param_types};
   my $c_param_names = $$objCDefsFunc{param_names};
 
-  my @conversions;
-  my @declarations;
-  my @initializations;
+  my @conversions = ();
+  my @declarations = ();
+  my @initializations = ();
 
   my $num_c_args_expected = scalar(@{$c_param_types});
   if( !($static) ) { $num_c_args_expected--; } #The cpp method will need an Object* paramater at the start.
@@ -991,7 +991,7 @@ sub convert_args_cpp_to_c($$$$$)
 
       push(@conversions, "&" . $cOutputParamName);
 
-      push(@initializations, sprintf("  _INITIALIZE(\`%s\',%s,%s,%s,%s);",
+      push(@initializations, sprintf("_INITIALIZE(\`%s\',%s,%s,%s,%s);",
                     $cppParamType,
                     $cOutputParamType,
                     $cppParamName,
@@ -1016,7 +1016,7 @@ sub convert_args_cpp_to_c($$$$$)
     }
   }
 
-  return ( join(", ", @conversions), join("\n  ", @declarations),
+  return ( join(", ", @conversions), join("\n", @declarations),
     join("\n  ", @initializations) );
 }
 
