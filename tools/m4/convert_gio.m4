@@ -20,6 +20,7 @@ _CONV_ENUM(G,DriveStartFlags)
 _CONV_ENUM(G,DriveStartStopType)
 _CONV_ENUM(G,EmblemOrigin)
 _CONV_ENUM(G,FileAttributeInfoFlags)
+_CONV_ENUM(G,FileAttributeStatus)
 _CONV_ENUM(G,FileAttributeType)
 _CONV_ENUM(G,FileCopyFlags)
 _CONV_ENUM(G,FileCreateFlags)
@@ -138,6 +139,10 @@ _CONVERSION(`GFile*',`Glib::RefPtr<const File>',`Glib::wrap($3)')
 _CONVERSION(`GFileAttributeValue*',`FileAttributeValue',`Glib::wrap($3)')
 _CONVERSION(`const FileAttributeValue&',`const GFileAttributeValue*',`$3.gobj()')
 _CONVERSION(`GFileAttributeInfoList*',`Glib::RefPtr<FileAttributeInfoList>',`Glib::wrap($3)')
+
+# FileAttributeMatcher
+_CONVERSION(`GFileAttributeMatcher*',`Glib::RefPtr<FileAttributeMatcher>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const FileAttributeMatcher>&',`GFileAttributeMatcher*',`const_cast<GFileAttributeMatcher*>(Glib::unwrap($3))')
 
 #FileEnumerator
 _CONVERSION(`GFileEnumerator*',`Glib::RefPtr<FileEnumerator>',`Glib::wrap($3)')

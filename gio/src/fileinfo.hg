@@ -63,10 +63,13 @@ public:
    */
   static Glib::RefPtr<FileAttributeMatcher> create(const std::string& attributes = "*");
 
+  _WRAP_METHOD(Glib::RefPtr<FileAttributeMatcher> create_difference(const Glib::RefPtr<const FileAttributeMatcher>& subtract) const, g_file_attribute_matcher_subtract)
+
   _WRAP_METHOD(bool matches(const std::string& full_name) const, g_file_attribute_matcher_matches)
   _WRAP_METHOD(bool matches_only(const std::string& full_name) const, g_file_attribute_matcher_matches_only)
   _WRAP_METHOD(bool enumerate_namespace(const std::string& ns), g_file_attribute_matcher_enumerate_namespace)
   _WRAP_METHOD(std::string enumerate_next(), g_file_attribute_matcher_enumerate_next)
+  _WRAP_METHOD(std::string to_string() const, g_file_attribute_matcher_to_string)
 };
 
 /** FileInfo implements methods for getting information that all files should contain, and allows for manipulation of extended attributes.
@@ -92,6 +95,8 @@ public:
   _WRAP_METHOD(bool has_attribute(const std::string& attribute) const,
                g_file_info_has_attribute)
 
+  _WRAP_METHOD(bool has_namespace(const std::string& name_space) const, g_file_info_has_namespace)
+
   #m4 _CONVERSION(`char**',`Glib::StringArrayHandle',`Glib::StringArrayHandle($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(Glib::StringArrayHandle list_attributes(const std::string& name_space) const,
                g_file_info_list_attributes)
@@ -101,9 +106,14 @@ public:
   _WRAP_METHOD(void remove_attribute(const std::string& attribute),
                g_file_info_remove_attribute)
 
+  _WRAP_METHOD(FileAttributeStatus get_attribute_status(const std::string& attribute) const, g_file_info_get_attribute_status)
+
   //TODO: This should return a ustring instead: https://bugzilla.gnome.org/show_bug.cgi?id=615950#c7
   _WRAP_METHOD(std::string get_attribute_string(const std::string& attribute) const,
                g_file_info_get_attribute_string)
+
+#m4 _CONVERSION(`char**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(std::vector<Glib::ustring> get_attribute_strings(const std::string& attribute) const, g_file_info_get_attribute_stringv)
 
   _WRAP_METHOD(Glib::ustring get_attribute_as_string(const std::string& attribute) const,
                g_file_info_get_attribute_as_string)
@@ -122,9 +132,14 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Glib::Object> get_attribute_object(const std::string& attribute) const,
                g_file_info_get_attribute_object)
 
+  _WRAP_METHOD(bool set_attribute_status(const std::string& attribute, FileAttributeStatus status), g_file_info_set_attribute_status)
+
   //TODO: This should take a ustring value instead: https://bugzilla.gnome.org/show_bug.cgi?id=615950#c7
   _WRAP_METHOD(void set_attribute_string(const std::string& attribute, const std::string& value),
                g_file_info_set_attribute_string)
+
+#m4 _CONVERSION(`std::vector<Glib::ustring>&',`char**',`const_cast<char**>(Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data())')
+  _WRAP_METHOD(void set_attribute_strings(const std::string& attribute, std::vector<Glib::ustring>& attr_value), g_file_info_set_attribute_stringv)
 
   _WRAP_METHOD(void set_attribute_byte_string(const std::string& attribute, const std::string& value),
                g_file_info_set_attribute_byte_string)
@@ -168,6 +183,7 @@ public:
   _WRAP_METHOD(goffset get_size() const, g_file_info_get_size)
 
   Glib::TimeVal modification_time() const;
+  _IGNORE(g_file_info_get_modification_time)
 
   _WRAP_METHOD(std::string get_symlink_target() const, g_file_info_get_symlink_target)
 
