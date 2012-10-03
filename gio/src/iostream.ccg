@@ -55,5 +55,33 @@ IOStream::close_async(const SlotAsyncReady& slot, int io_priority)
                           slot_copy);
 }
 
+void
+IOStream::splice_async(const Glib::RefPtr<IOStream>& stream2,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable,
+  IOStreamSpliceFlags flags, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_io_stream_splice_async(gobj(), Glib::unwrap(stream2),
+    static_cast<GIOStreamSpliceFlags>(flags), io_priority,
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+}
+
+void
+IOStream::splice_async(const Glib::RefPtr<IOStream>& stream2,
+  const SlotAsyncReady& slot, IOStreamSpliceFlags flags, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_io_stream_splice_async(gobj(), Glib::unwrap(stream2),
+    static_cast<GIOStreamSpliceFlags>(flags), io_priority, 0,
+    &SignalProxy_async_callback, slot_copy);
+}
 
 } // namespace Gio
