@@ -35,19 +35,20 @@ class MenuItem : public Glib::Object
 protected:
   _WRAP_CTOR(MenuItem(const Glib::ustring& label = Glib::ustring(), const Glib::ustring& detailed_action = Glib::ustring()), g_menu_item_new)
 
-  //TODO: label can be empty, so reorder these parameters?
-  _WRAP_CTOR(MenuItem(const Glib::ustring& label, const Glib::RefPtr<MenuModel>& submenu), g_menu_item_new_submenu)
+  _WRAP_CTOR(MenuItem(const Glib::ustring& label{?}, const Glib::RefPtr<MenuModel>& submenu), g_menu_item_new_submenu)
 
 public:
   _WRAP_CREATE(const Glib::ustring& label, const Glib::ustring& detailed_action)
 
-  _WRAP_CREATE(const Glib::ustring& label, const Glib::RefPtr<MenuModel>& submenu)
+  _WRAP_CREATE(const Glib::ustring& label{?}, const Glib::RefPtr<MenuModel>& submenu)
 
             
 
 //TODO: GMenuItem * g_menu_item_new_section                 (const Glib::ustring& label,
 //                                                     const Glib::RefPtr<MenuModel>& section);
 
+  //TODO: Maybe this method should just be called set_attribute?  That would
+  //probably require an API/ABI break.
   _WRAP_METHOD(void set_attribute_value(const Glib::ustring& attribute, const Glib::VariantBase& value), g_menu_item_set_attribute_value)
   _IGNORE(g_menu_item_set_attribute)
 
@@ -58,6 +59,15 @@ public:
   _WRAP_METHOD(void set_label(const Glib::ustring& label), g_menu_item_set_label)
   _WRAP_METHOD(void set_submenu(const Glib::RefPtr<MenuModel>& submenu), g_menu_item_set_submenu)
   _WRAP_METHOD(void set_section(const Glib::RefPtr<MenuModel>& section), g_menu_item_set_section)
+
+  //TODO: Maybe these methods should just be called get_attribute() (they are
+  //called get_attribute_value() for consistency with the already existing
+  //set_attribute_value() method above.
+  _WRAP_METHOD(Glib::VariantBase get_attribute_value(const Glib::ustring& attribute, const Glib::VariantType& expected_type{?}), g_menu_item_get_attribute_value)
+  _WRAP_METHOD(const Glib::VariantBase get_attribute_value(const Glib::ustring& attribute, const Glib::VariantType& expected_type{?}) const, g_menu_item_get_attribute_value, constversion)
+
+  // Ignore varargs function.
+  _IGNORE(g_menu_item_get_attribute)
  
   //TODO: Documentation:
   void set_action_and_target(const Glib::ustring& action);
