@@ -404,6 +404,7 @@ sub convert_tags_to_doxygen($)
     s"<listitem>(.*?)(\n?)</listitem>(\n?)"- $1\n"sg;
 
     # Use our Doxygen @newin alias:
+    s/\bSince:\s*(\d+)\.(\d+)\.(\d+)\b/\@newin{$1,$2,$3}/g;
     s/\bSince:\s*(\d+)\.(\d+)\b/\@newin{$1,$2}/g;
 
     s"\b->\b"->"g;
