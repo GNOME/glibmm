@@ -234,7 +234,12 @@ private:
  */
 Mutex* wrap(GMutex* gobject);
 
-//TODO: Documentation
+/** This represents a recursive mutex.
+ * It is similar to a Mutex with the difference
+ * that it is possible to lock a RecMutex multiple times in the same
+ * thread without deadlock. When doing so, care has to be taken to
+ * unlock the recursive mutex as often as it has been locked.
+ */
 class RecMutex
 {
 public:
@@ -296,7 +301,17 @@ private:
  */
 RecMutex* wrap(GRecMutex* gobject);
 
-//TODO: Documentation
+/** This represents a reader-writer lock.
+ * It is similar to a Mutex in that it allows
+ * multiple threads to coordinate access to a shared resource.
+ *
+ * The difference to a mutex is that a reader-writer lock discriminates
+ * between read-only ('reader') and full ('writer') access. While only
+ * one thread at a time is allowed write access (by holding the 'writer'
+ * lock via writer_lock()), multiple threads can gain
+ * simultaneous read-only access (by holding the 'reader' lock via
+ * reader_lock()).
+ */
 class RWLock
 {
 public:

@@ -64,13 +64,60 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<Glib::Bytes> read_bytes(gsize count, const Glib::RefPtr<Cancellable>& cancellable), g_input_stream_read_bytes, errthrow)
 
-  //TODO: Documentation.
-  /**
+  //TODO: Why not use _WRAP_METHOD() for this?
+  /** Request an asynchronous read of @a count bytes from the stream into a
+   * new Glib::Bytes. When the operation is finished @a slot will be called. 
+   * You can then call read_bytes_finish() to get the result of the 
+   * operation.
+   *
+   * During an async request no other sync and async calls are allowed, and will
+   * result in Gio::Error with PENDING being thrown. 
+   *
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
+   *
+   * On success, the new Glib::Bytes will be passed to the callback. It is
+   * not an error if this is smaller than the requested size, as it can
+   * happen e.g. near the end of a file, but generally we try to read as
+   * many bytes as requested. Zero is returned on end of file (or if
+   * @a count is zero), but never otherwise.
+   *
+   * Any outstanding I/O request with higher priority (lower numerical
+   * value) will be executed before an outstanding request with lower
+   * priority. The default priority is PRIORITY_DEFAULT.
+   *
+   * @param count The number of bytes that will be read from the stream.
+   * @param slot Callback to call when the request is satisfied.
+   * @param cancellable A Cancellable object.
+   * @param io_priority The I/O priority of the request.
+   *
    * @newin{2,34}
    */
   void read_bytes_async(gsize count, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
 
-  /**
+  /** Request an asynchronous read of @a count bytes from the stream into a
+   * new Glib::Bytes. When the operation is finished @a slot will be called. 
+   * You can then call read_bytes_finish() to get the result of the 
+   * operation.
+   *
+   * During an async request no other sync and async calls are allowed, and will
+   * result in Gio::Error with PENDING being thrown. 
+   *
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
+   *
+   * On success, the new Glib::Bytes will be passed to the callback. It is
+   * not an error if this is smaller than the requested size, as it can
+   * happen e.g. near the end of a file, but generally we try to read as
+   * many bytes as requested. Zero is returned on end of file (or if
+   * @a count is zero), but never otherwise.
+   *
+   * Any outstanding I/O request with higher priority (lower numerical
+   * value) will be executed before an outstanding request with lower
+   * priority. The default priority is PRIORITY_DEFAULT.
+   *
+   * @param count The number of bytes that will be read from the stream.
+   * @param slot Callback to call when the request is satisfied.h
+   * @param io_priority The I/O priority of the request.
+   *
    * @newin{2,34}
    */
   void read_bytes_async(gsize count, const SlotAsyncReady& slot, int io_priority = Glib::PRIORITY_DEFAULT);
@@ -117,7 +164,7 @@ public:
    * @param count The number of bytes that will be read from the stream.
    * @param slot Callback to call when the request is satisfied.
    * @param cancellable A Cancellable object.
-   * @param io_priority The I/O priority of the request. 
+   * @param io_priority The I/O priority of the request.
    */
   void read_async(void* buffer, gsize count, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
 

@@ -128,13 +128,71 @@ public:
 
   _WRAP_METHOD(gssize write_bytes(const Glib::RefPtr<const Glib::Bytes>& bytes, const Glib::RefPtr<Cancellable>& cancellable{?}), g_output_stream_write_bytes, errthrow)
 
-  //TODO: Documentation.
-  /**
+  /** Request an asynchronous write of the data in @a bytes to the stream.
+   * When the operation is finished @a slot will be called. You can
+   * then call write_bytes_finish() to get the result of
+   * the operation.
+   *
+   * During an async request no other sync and async calls are allowed, 
+   * and will result in Gio::Error with PENDING being thrown. 
+   *
+   * A Glib:Bytes larger than MAXSSIZE will cause a Gio::Error with  
+   * INVALID_ARGUMENT to be thrown.
+   * 
+   * On success, the number of bytes written will be passed to the
+   * callback @a slot. It is not an error if this is not the same as the
+   * requested size, as it can happen e.g. on a partial I/O error,
+   * but generally we try to write as many bytes as requested.
+   *
+   * You are guaranteed that this method will never fail with
+   * IO_ERROR_WOULD_BLOCK - if the stream can't accept more data, the
+   * method will just wait until this changes.
+   *
+   * Any outstanding I/O request with higher priority (lower numerical 
+   * value) will be executed before an outstanding request with lower 
+   * priority. Default priority is Glib::PRIORITY_DEFAULT.
+   * 
+   * For the synchronous, blocking version of this function, see write_bytes().
+   *
+   * @param bytes The bytes to 
+   * @param slot Callback slot to call when the request is satisfied.
+   * @param cancellable Cancellable object.
+   * @param io_priority The io priority of the request.
+   *
    * @newin{2,34}
    */
   void write_bytes_async(const Glib::RefPtr<const Glib::Bytes>& bytes, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
 
-  /**
+  /** Request an asynchronous write of the data in @a bytes to the stream.
+   * When the operation is finished @a slot will be called. You can
+   * then call write_bytes_finish() to get the result of
+   * the operation.
+   *
+   * During an async request no other sync and async calls are allowed, 
+   * and will result in Gio::Error with PENDING being thrown. 
+   *
+   * A Glib:Bytes larger than MAXSSIZE will cause a Gio::Error with  
+   * INVALID_ARGUMENT to be thrown.
+   * 
+   * On success, the number of bytes written will be passed to the
+   * callback @a slot. It is not an error if this is not the same as the
+   * requested size, as it can happen e.g. on a partial I/O error,
+   * but generally we try to write as many bytes as requested.
+   *
+   * You are guaranteed that this method will never fail with
+   * IO_ERROR_WOULD_BLOCK - if the stream can't accept more data, the
+   * method will just wait until this changes.
+   *
+   * Any outstanding I/O request with higher priority (lower numerical 
+   * value) will be executed before an outstanding request with lower 
+   * priority. Default priority is Glib::PRIORITY_DEFAULT.
+   * 
+   * For the synchronous, blocking version of this function, see write_bytes().
+   *
+   * @param bytes The bytes to 
+   * @param slot Callback slot to call when the request is satisfied.
+   * @param io_priority The io priority of the request.
+   *
    * @newin{2,34}
    */
   void write_bytes_async(const Glib::RefPtr<const Glib::Bytes>& bytes, const SlotAsyncReady& slot, int io_priority = Glib::PRIORITY_DEFAULT);
@@ -179,7 +237,7 @@ public:
    * and will result in Gio::Error with PENDING being thrown. 
    *
    * A value of @a count larger than MAXSSIZE will cause a Gio::Error with  
-   * NVALID_ARGUMENT to be thrown.
+   * INVALID_ARGUMENT to be thrown.
    *
    * On success, the number of bytes written will be passed to the
    * callback @a slot. It is not an error if this is not the same as the 
