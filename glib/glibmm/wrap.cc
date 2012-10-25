@@ -48,7 +48,8 @@ namespace Glib
 
 void wrap_register_init()
 {
-  g_type_init();
+  // g_type_init() is deprecated as of 2.36.
+  // g_type_init();
 
   if(!Glib::quark_)
   {

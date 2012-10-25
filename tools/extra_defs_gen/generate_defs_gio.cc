@@ -35,7 +35,8 @@
 
 int main(int, char**)
 {
-  g_type_init ();
+  // g_type_init() is deprecated as of 2.36.
+  // g_type_init();
 
   std::cout << get_defs(G_TYPE_ASYNC_RESULT)
             << get_defs(G_TYPE_ACTION)

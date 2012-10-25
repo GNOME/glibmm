@@ -256,6 +256,3 @@ std::string get_defs(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
 
   return strDefs;
 }
-
-
-
