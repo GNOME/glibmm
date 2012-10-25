@@ -56,7 +56,7 @@ Glib::RefPtr<Gio::Icon> content_type_get_icon(const Glib::ustring& type)
   return retvalue;
 }
 
-Glib::RefPtr<Gio::Icon> content_type_get_symbloic_icon(const Glib::ustring& type)
+Glib::RefPtr<Gio::Icon> content_type_get_symbolic_icon(const Glib::ustring& type)
 {
   Glib::RefPtr<Icon> retvalue = Glib::wrap(g_content_type_get_symbolic_icon(type.c_str()));
   if(retvalue)
