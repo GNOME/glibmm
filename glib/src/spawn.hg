@@ -44,7 +44,7 @@ _WRAP_GERROR(SpawnError, GSpawnError, G_SPAWN_ERROR, NO_GTYPE, s#^2BIG$#TOOBIG#)
  * specified by the only argument that must be provided, @a argv.
  * The first string in @a argv is of
  * course the name of the program to execute. By default, the name of
- * the program must be a full path; the PATH shell variable 
+ * the program must be a full path; the PATH shell variable
  * will only be searched if you pass the SPAWN_SEARCH_PATH flag.
  *
  * On Windows, note that all the string or string vector arguments to
@@ -87,25 +87,25 @@ _WRAP_GERROR(SpawnError, GSpawnError, G_SPAWN_ERROR, NO_GTYPE, s#^2BIG$#TOOBIG#)
  * the child's environment.
  *
  * @a flags should be the bitwise OR of any flags you want to affect the
- * function's behaviour. The SPAWN_DO_NOT_REAP_CHILD flags means that 
+ * function's behaviour. The SPAWN_DO_NOT_REAP_CHILD flags means that
  * the child will not automatically be reaped; you must use a
- * ChildWatch source to be notified about the death of the child 
+ * ChildWatch source to be notified about the death of the child
  * process. Eventually you must call spawn_close_pid() on the
  * @a child_pid, in order to free resources which may be associated
  * with the child process. (On Unix, using a ChildWatch source is
- * equivalent to calling waitpid() or handling the SIGCHLD signal 
+ * equivalent to calling waitpid() or handling the SIGCHLD signal
  * manually. On Windows, calling spawn_close_pid() is equivalent
- * to calling CloseHandle() on the process handle returned in 
+ * to calling CloseHandle() on the process handle returned in
  * @a child_pid).
  *
  * PAWN_LEAVE_DESCRIPTORS_OPEN means that the parent's open file
  * descriptors will be inherited by the child; otherwise all
  * descriptors except stdin/stdout/stderr will be closed before
- * calling exec() in the child. SPAWN_SEARCH_PATH 
+ * calling exec() in the child. SPAWN_SEARCH_PATH
  * means that argv[0] need not be an absolute path, it
- * will be looked for in the user's PATH. 
- * SPAWN_STDOUT_TO_DEV_NULL means that the child's standard output will 
- * be discarded, instead of going to the same location as the parent's 
+ * will be looked for in the user's PATH.
+ * SPAWN_STDOUT_TO_DEV_NULL means that the child's standard output will
+ * be discarded, instead of going to the same location as the parent's
  * standard output. If you use this flag, @a standard_output must be NULL.
  * SPAWN_STDERR_TO_DEV_NULL means that the child's standard error
  * will be discarded, instead of going to the same location as the parent's
@@ -141,7 +141,7 @@ _WRAP_GERROR(SpawnError, GSpawnError, G_SPAWN_ERROR, NO_GTYPE, s#^2BIG$#TOOBIG#)
  * SPAWN_DO_NOT_REAP_CHILD flag. You can then access the child
  * process using the Win32 API, for example wait for its termination
  * with the WaitFor*() functions, or examine its
- * exit code with GetExitCodeProcess(). You should close the handle 
+ * exit code with GetExitCodeProcess(). You should close the handle
  * with CloseHandle() or spawn_close_pid() when you no longer need it.
  *
  * If non-NULL, the @a standard_input, @a standard_output, @a standard_error
@@ -151,24 +151,24 @@ _WRAP_GERROR(SpawnError, GSpawnError, G_SPAWN_ERROR, NO_GTYPE, s#^2BIG$#TOOBIG#)
  * when they are no longer in use. If these parameters are NULL, the corresponding
  * pipe won't be created.
  *
- * If @a standard_input is NULL, the child's standard input is attached to 
+ * If @a standard_input is NULL, the child's standard input is attached to
  * /dev/null unless SPAWN_CHILD_INHERITS_STDIN is set.
  *
- * If @a standard_error is NULL, the child's standard error goes to the same 
- * location as the parent's standard error unless SPAWN_STDERR_TO_DEV_NULL 
+ * If @a standard_error is NULL, the child's standard error goes to the same
+ * location as the parent's standard error unless SPAWN_STDERR_TO_DEV_NULL
  * is set.
  *
- * If @a standard_output is NULL, the child's standard output goes to the same 
- * location as the parent's standard output unless SPAWN_STDOUT_TO_DEV_NULL 
+ * If @a standard_output is NULL, the child's standard output goes to the same
+ * location as the parent's standard output unless SPAWN_STDOUT_TO_DEV_NULL
  * is set.
  *
  * If @a child_pid is not NULL and an error does not occur then the returned
  * pid must be closed using spawn_close_pid().
  *
  * @note
- * If you are writing a gtkmm application, and the program you 
+ * If you are writing a gtkmm application, and the program you
  * are spawning is a graphical application, too, then you may
- * want to use spawn_on_screen_with_pipes() instead to ensure that 
+ * want to use spawn_on_screen_with_pipes() instead to ensure that
  * the spawned program opens its windows on the right screen.
  *
  * @param working_directory Child's current working directory, or an empty string to inherit the parent's, in the GLib file name encoding.
@@ -225,11 +225,11 @@ void spawn_async_with_pipes(const std::string& working_directory,
 
 /** See pawn_async_with_pipes() for a full description. This function
  * simply calls the spawn_async_with_pipes() without any pipes.
- * 
+ *
  * @note
- * If you are writing a GTK+ application, and the program you 
+ * If you are writing a GTK+ application, and the program you
  * are spawning is a graphical application, too, then you may
- * want to use gdk_spawn_on_screen() instead to ensure that 
+ * want to use gdk_spawn_on_screen() instead to ensure that
  * the spawned program opens its windows on the right screen.
  *
  * @param working_directory Child's current working directory, or an empty string to inherit parent's.
@@ -273,21 +273,21 @@ void spawn_async(const std::string& working_directory,
 
 /** Executes a child synchronously (waits for the child to exit before returning).
  * All output from the child is stored in @a standard_output and @a standard_error,
- * if those parameters are non-NULL. Note that you must set the  
+ * if those parameters are non-NULL. Note that you must set the
  * SPAWN_STDOUT_TO_DEV_NULL and SPAWN_STDERR_TO_DEV_NULL flags when
  * passing NULL for @a standard_output and @a standard_error.
  * If @a exit_status is non-NULL, the exit status of the child is stored
- * there as it would be returned by waitpid(); standard UNIX macros such 
+ * there as it would be returned by waitpid(); standard UNIX macros such
  * as WIFEXITED() and WEXITSTATUS() must be used to evaluate the exit status.
  * Note that this function calls waitpid() even if @a exit_status is NULL, and
  * does not accept the SPAWN_DO_NOT_REAP_CHILD flag.
- * If an error occurs, no data is returned in @a standard_output, 
- * @a standard_error, or @a exit_status. 
+ * If an error occurs, no data is returned in @a standard_output,
+ * @a standard_error, or @a exit_status.
  *
  * This function calls spawn_async_with_pipes() internally; see that
  * function for full details on the other parameters and details on
  * how these functions work on Windows.
- * 
+ *
  * @param working_directory Child's current working directory, or an empty string to inherit the parent's, in the GLib file name encoding.
  * @param argv Child's argument vector.
  * @param envp Child's environment.
@@ -313,7 +313,7 @@ void spawn_sync(const std::string& working_directory,
                 int* exit_status = 0);
 
 /** Like the main spawn_sync() method, but inheriting the parent's environment.
- * 
+ *
  * @param working_directory Child's current working directory, or an empty string to inherit the parent's, in the GLib file name encoding.
  * @param argv Child's argument vector.
  * @param flags Flags from SpawnFlags
@@ -341,8 +341,8 @@ void spawn_sync(const std::string& working_directory,
  * command line in the background. Unlike spawn_async(), the
  * SPAWN_SEARCH_PATH flag is enabled, other flags are not. Note
  * that SPAWN_SEARCH_PATH can have security implications, so
- * consider using spawn_async() directly if appropriate. 
- * 
+ * consider using spawn_async() directly if appropriate.
+ *
  * The same concerns on Windows apply as for spawn_command_line_sync().
  *
  * @param command_line A command line.
@@ -366,9 +366,9 @@ void spawn_command_line_async(const std::string& command_line);
  * If @a exit_status is non-NULL, the exit status of the child is stored there as
  * it would be returned by waitpid(); standard UNIX macros such as WIFEXITED()
  * and WEXITSTATUS() must be used to evaluate the exit status.
- * 
+ *
  * On Windows, please note the implications of shell_parse_argv()
- * parsing @a command_line. Parsing is done according to Unix shell rules, not 
+ * parsing @a command_line. Parsing is done according to Unix shell rules, not
  * Windows command interpreter rules.
  * Space is a separator, and backslashes are
  * special. Thus you cannot simply pass a @a command_line containing
@@ -377,7 +377,7 @@ void spawn_command_line_async(const std::string& command_line);
  * separator. You need to enclose such paths with single quotes, like
  * "'c:\\program files\\app\\app.exe' 'e:\\folder\\argument.txt'".
  *
- * @param command_line A command line. 
+ * @param command_line A command line.
  * @param standard_output Return location for child output.
  * @param standard_error Return location for child errors.
  * @param exit_status Return location for child exit status, as returned by waitpid().
@@ -400,7 +400,7 @@ void spawn_command_line_sync(const std::string& command_line,
  *
  * @param pid The process identifier to close.
  */
-void spawn_close_pid(Pid pid);                             
+void spawn_close_pid(Pid pid);
 
 /** @} group Spawn */
 

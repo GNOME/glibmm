@@ -58,29 +58,29 @@ _WRAP_ENUM(FileMonitorFlags, GFileMonitorFlags, NO_GTYPE)
 
 
 /** File and directory handling.
- * Gio::File is a high level abstraction for manipulating files on a virtual file system. Gio::Files are lightweight, immutable objects that do no 
- * I/O upon creation. It is necessary to understand that a Gio::File object does not represent a file, merely a handle to a file. All file I/O is 
+ * Gio::File is a high level abstraction for manipulating files on a virtual file system. Gio::Files are lightweight, immutable objects that do no
+ * I/O upon creation. It is necessary to understand that a Gio::File object does not represent a file, merely a handle to a file. All file I/O is
  * implemented as streaming operations (see Gio::InputStream and Gio::OutputStream).
  *
  * A GioFile can be constructed from a path, URI, or a command line argument.
  *
- * You can move through the filesystem with Gio::File handles with get_parent() to get a handle to the parent directory, 
+ * You can move through the filesystem with Gio::File handles with get_parent() to get a handle to the parent directory,
  * get_child() to get a handle to a child within a directory, and resolve_relative_path() to resolve a relative path between two Gio::Files.
  *
- * Many Gio::File operations have both synchronous and asynchronous versions to suit your application. Asynchronous versions of synchronous 
- * functions simply have _async() appended to their function names. The asynchronous I/O functions call a SlotAsyncReady callback slot which is 
+ * Many Gio::File operations have both synchronous and asynchronous versions to suit your application. Asynchronous versions of synchronous
+ * functions simply have _async() appended to their function names. The asynchronous I/O functions call a SlotAsyncReady callback slot which is
  * then used to finalize the operation, producing a AsyncResult which is then passed to the function's matching _finish() operation.
  *
- * Some Gio::File operations do not have synchronous analogs, as they may take a very long time to finish, and blocking may leave an application 
- * unusable. Notable cases include: mount_mountable() to mount a mountable file, unmount_mountable() to unmount a mountable file, 
+ * Some Gio::File operations do not have synchronous analogs, as they may take a very long time to finish, and blocking may leave an application
+ * unusable. Notable cases include: mount_mountable() to mount a mountable file, unmount_mountable() to unmount a mountable file,
  * and eject_mountable() to eject a mountable file.
- * 
- * One notable feature of Gio::Files are entity tags, or "etags" for short. Entity tags are somewhat like a more abstract version of the 
- * traditional mtime, and can be used to quickly determine if the file has been modified from the version on the file system. 
+ *
+ * One notable feature of Gio::Files are entity tags, or "etags" for short. Entity tags are somewhat like a more abstract version of the
+ * traditional mtime, and can be used to quickly determine if the file has been modified from the version on the file system.
  * See the HTTP 1.1 specification for HTTP Etag headers, which are a very similar concept.
  *
  * @newin{2,16}
- */ 
+ */
 class File : public Glib::Interface
 {
   _CLASS_INTERFACE(File, GFile, G_FILE, GFileIface)
@@ -116,8 +116,8 @@ public:
   static Glib::RefPtr<File> create_for_uri(const std::string& uri);
   _IGNORE(g_file_new_for_uri)
 
-  /** Constructs a File for a given argument from the command line. 
-   * The value of @a arg can be either a URI, an absolute path or a relative path resolved relative to the current working directory. 
+  /** Constructs a File for a given argument from the command line.
+   * The value of @a arg can be either a URI, an absolute path or a relative path resolved relative to the current working directory.
    * This operation never fails, but the returned object might not support any I/O operation if arg points to a malformed path.
    *
    * @param arg A string containing a relative or absolute path.
@@ -148,7 +148,7 @@ public:
   _WRAP_METHOD(std::string get_uri() const, g_file_get_uri)
   _WRAP_METHOD(Glib::ustring get_parse_name() const, g_file_get_parse_name)
 
-  //Note that these return a reference (usually new instances, 
+  //Note that these return a reference (usually new instances,
   //so we don't need to use refreturn.
 
   //TODO: Do we need const and unconst versions of these get_*() methods,
@@ -218,16 +218,16 @@ public:
 
   /** Gets an output stream for appending data to the file. If
    * the file doesn't already exist it is created.
-   * 
+   *
    * By default files created are generally readable by everyone,
    * but if you pass FILE_CREATE_PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
-   * 
+   *
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
-   * 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
+   *
    * Some filesystems don't allow all filenames, and may
    * throw a Gio::Error with INVALID_FILENAME.
    * If the file is a directory a Gio::Error with IS_DIRECTORY will be
@@ -241,15 +241,15 @@ public:
 
   /** Gets an output stream for appending data to the file. If
    * the file doesn't already exist it is created.
-   * 
+   *
    * By default files created are generally readable by everyone,
    * but if you pass FILE_CREATE_PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
-   * 
+   *
    * Some filesystems don't allow all filenames, and may
    * throw a Gio::Error with INVALID_FILENAME.
-   * If the file is a directory a Gio::Error with IS_DIRECTORY will be 
+   * If the file is a directory a Gio::Error with IS_DIRECTORY will be
    * thrown. Other errors are possible too, and depend on what kind of
    * filesystem the file is on.
    * @param flags A set of FileCreateFlags.
@@ -258,21 +258,21 @@ public:
   Glib::RefPtr<FileOutputStream> append_to(FileCreateFlags flags = FILE_CREATE_NONE);
   _IGNORE(g_file_append_to)
 
-  //We renamed this to create_file from (g_file_create() and g_file_create_readwrite), to avoid confusion with static create() methods, 
+  //We renamed this to create_file from (g_file_create() and g_file_create_readwrite), to avoid confusion with static create() methods,
   //but I would still like to choose a different word, but can't think of a good one. murrayc.
 
   /** Creates a new file and returns an output stream for writing to it.
    * The file must not already exist.
-   * 
+   *
    * By default files created are generally readable by everyone,
    * but if you pass FILE_CREATE_PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
-   * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread.
    * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
-   * 
-   * If a file with this name already exists a Gio::Error with EXISTS 
+   *
+   * If a file with this name already exists a Gio::Error with EXISTS
    * will be thrown. If the file is a directory a Gio::Error with IS_DIRECTORY
    * will be thrown.
    *
@@ -290,13 +290,13 @@ public:
 
   /** Creates a new file and returns an output stream for writing to it.
    * The file must not already exist.
-   * 
+   *
    * By default files created are generally readable by everyone,
    * but if you pass FILE_CREATE_PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
-   * 
-   * If a file with this name already exists a Gio::Error with EXISTS 
+   *
+   * If a file with this name already exists a Gio::Error with EXISTS
    * will be thrown. If the file is a directory a Gio::Error with IS_DIRECTORY
    * will be thrown.
    *
@@ -314,16 +314,16 @@ public:
 
   /** Creates a new file and returns a stream for reading and writing to it.
    * The file must not already exist.
-   * 
+   *
    * By default files created are generally readable by everyone,
    * but if you pass FILE_CREATE_PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
-   * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread.
    * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
-   * 
-   * If a file with this name already exists a Gio::Error with EXISTS 
+   *
+   * If a file with this name already exists a Gio::Error with EXISTS
    * will be thrown. If the file is a directory a Gio::Error with IS_DIRECTORY
    * will be thrown.
    *
@@ -345,13 +345,13 @@ public:
 
   /** Creates a new file and returns a stream for reading and writing to it.
    * The file must not already exist.
-   * 
+   *
    * By default files created are generally readable by everyone,
    * but if you pass FILE_CREATE_PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
-   * 
-   * If a file with this name already exists a Gio::Error with EXISTS 
+   *
+   * If a file with this name already exists a Gio::Error with EXISTS
    * will be thrown. If the file is a directory a Gio::Error with IS_DIRECTORY
    * will be thrown.
    *
@@ -374,33 +374,33 @@ public:
 
 
   /** Returns an output stream for overwriting the file, possibly creating a backup copy of the file first.
-   * This will try to replace the file in the safest way possible so that any errors during the writing will 
-   * not affect an already existing copy of the file. For instance, for local files it may write to a 
+   * This will try to replace the file in the safest way possible so that any errors during the writing will
+   * not affect an already existing copy of the file. For instance, for local files it may write to a
    * temporary file and then atomically rename over the destination when the stream is closed.
    *
-   * By default files created are generally readable by everyone, but if you pass FILE_CREATE_PRIVATE in 
-   * @a flags the file will be made readable only to the current user, to the level that is supported on the 
+   * By default files created are generally readable by everyone, but if you pass FILE_CREATE_PRIVATE in
+   * @a flags the file will be made readable only to the current user, to the level that is supported on the
    * target filesystem.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * The operation can be cancelled by triggering the cancellable object from another thread.
    * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
-   * If you pass in an etag value, then this value is compared to the current entity tag of the file, 
-   * and if they differ a Gio::Error with WRONG_ETAG will be thrown. This generally means that the file has 
-   * been changed since you last read it. You can get the new etag from FileOutputStream::get_etag() 
-   * after you've finished writing and closed the FileOutputStream. When you load a new file you can 
+   * If you pass in an etag value, then this value is compared to the current entity tag of the file,
+   * and if they differ a Gio::Error with WRONG_ETAG will be thrown. This generally means that the file has
+   * been changed since you last read it. You can get the new etag from FileOutputStream::get_etag()
+   * after you've finished writing and closed the FileOutputStream. When you load a new file you can
    * use FileInputStream::query_info() to get the etag of the file.
    *
-   * If @a make_backup is true, this function will attempt to make a backup of the current file before 
-   * overwriting it. If this fails aa Gio::Error with CANT_CREATE_BACKUP will be thrown. If you want to replace 
+   * If @a make_backup is true, this function will attempt to make a backup of the current file before
+   * overwriting it. If this fails aa Gio::Error with CANT_CREATE_BACKUP will be thrown. If you want to replace
    * anyway, try again with @a make_backup set to false.
    *
-   * If the file is a directory a Gio::Error with IS_DIRECTORY will be thrown, and if the file is some 
-   * other form of non-regular file then aa Gio::Error with NOT_REGULAR_FILE will be thrown. Some file 
-   * systems don't allow all file names, and may throw a Gio::Error with INVALID_FILENAME, and if the 
-   * name is to longa Gio::Error with FILENAME_TOO_LONG will be thrown. Other errors are possible too, and 
+   * If the file is a directory a Gio::Error with IS_DIRECTORY will be thrown, and if the file is some
+   * other form of non-regular file then aa Gio::Error with NOT_REGULAR_FILE will be thrown. Some file
+   * systems don't allow all file names, and may throw a Gio::Error with INVALID_FILENAME, and if the
+   * name is to longa Gio::Error with FILENAME_TOO_LONG will be thrown. Other errors are possible too, and
    * depend on what kind of filesystem the file is on.
-   * 
+   *
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -410,30 +410,30 @@ public:
 
 
   /** Returns an output stream for overwriting the file, possibly creating a backup copy of the file first.
-   * This will try to replace the file in the safest way possible so that any errors during the writing will 
-   * not affect an already existing copy of the file. For instance, for local files it may write to a 
+   * This will try to replace the file in the safest way possible so that any errors during the writing will
+   * not affect an already existing copy of the file. For instance, for local files it may write to a
    * temporary file and then atomically rename over the destination when the stream is closed.
    *
-   * By default files created are generally readable by everyone, but if you pass FILE_CREATE_PRIVATE in 
-   * @a flags the file will be made readable only to the current user, to the level that is supported on the 
+   * By default files created are generally readable by everyone, but if you pass FILE_CREATE_PRIVATE in
+   * @a flags the file will be made readable only to the current user, to the level that is supported on the
    * target filesystem.
    *
-   * If you pass in an etag value, then this value is compared to the current entity tag of the file, 
-   * and if they differ a Gio::Error with WRONG_ETAG will be thrown. This generally means that the file has 
-   * been changed since you last read it. You can get the new etag from FileOutputStream::get_etag() 
-   * after you've finished writing and closed the FileOutputStream. When you load a new file you can 
+   * If you pass in an etag value, then this value is compared to the current entity tag of the file,
+   * and if they differ a Gio::Error with WRONG_ETAG will be thrown. This generally means that the file has
+   * been changed since you last read it. You can get the new etag from FileOutputStream::get_etag()
+   * after you've finished writing and closed the FileOutputStream. When you load a new file you can
    * use FileInputStream::query_info() to get the etag of the file.
    *
-   * If @a make_backup is true, this function will attempt to make a backup of the current file before 
-   * overwriting it. If this fails aa Gio::Error with CANT_CREATE_BACKUP will be thrown. If you want to replace 
+   * If @a make_backup is true, this function will attempt to make a backup of the current file before
+   * overwriting it. If this fails aa Gio::Error with CANT_CREATE_BACKUP will be thrown. If you want to replace
    * anyway, try again with @a make_backup set to false.
    *
-   * If the file is a directory a Gio::Error with IS_DIRECTORY will be thrown, and if the file is some 
-   * other form of non-regular file then aa Gio::Error with NOT_REGULAR_FILE will be thrown. Some file 
-   * systems don't allow all file names, and may throw a Gio::Error with INVALID_FILENAME, and if the 
-   * name is to longa Gio::Error with FILENAME_TOO_LONG will be thrown. Other errors are possible too, and 
+   * If the file is a directory a Gio::Error with IS_DIRECTORY will be thrown, and if the file is some
+   * other form of non-regular file then aa Gio::Error with NOT_REGULAR_FILE will be thrown. Some file
+   * systems don't allow all file names, and may throw a Gio::Error with INVALID_FILENAME, and if the
+   * name is to longa Gio::Error with FILENAME_TOO_LONG will be thrown. Other errors are possible too, and
    * depend on what kind of filesystem the file is on.
-   * 
+   *
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -446,7 +446,7 @@ public:
 
   /** Asynchronously opens the file for appending.
    * For more details, see append_to() which is the synchronous version of this call.
-   * 
+   *
    * When the operation is finished, @a slot will be called. You can then call append_to_finish() to get the result of the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
@@ -457,7 +457,7 @@ public:
 
   /** Asynchronously opens the file for appending.
    * For more details, see append_to() which is the synchronous version of this call.
-   * 
+   *
    * When the operation is finished, @a slot will be called. You can then call append_to_finish() to get the result of the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param flags a set of FileCreateFlags.
@@ -471,14 +471,14 @@ public:
                refreturn, errthrow)
 
 
-  //We renamed this to create_file_async from (g_file_create_async() and g_file_create_readwrite_async), to avoid confusion with static create() methods, 
+  //We renamed this to create_file_async from (g_file_create_async() and g_file_create_readwrite_async), to avoid confusion with static create() methods,
   //but I would still like to choose a different word, but can't think of a good one. murrayc. See also create_file().
 
   /** Asynchronously creates a new file and returns an output stream for writing to it. The file must not already exist.
    * For more details, see create_file() which is the synchronous version of this call.
    *
    * When the operation is finished, @a slot will be called. You can then call create_file_finish() to get the result of the operation.
-   * 
+   *
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param flags a set of FileCreateFlags.
@@ -490,7 +490,7 @@ public:
    * For more details, see create_file() which is the synchronous version of this call.
    *
    * When the operation is finished, @a slot will be called. You can then call create_file_finish() to get the result of the operation.
-   * 
+   *
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param flags a set of FileCreateFlags.
    * @param io_priority The I/O priority of the request.
@@ -509,7 +509,7 @@ public:
    * For more details, see create_file_readwrite() which is the synchronous version of this call.
    *
    * When the operation is finished, @a slot will be called. You can then call create_file_readwrite_finish() to get the result of the operation.
-   * 
+   *
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param flags a set of FileCreateFlags.
@@ -525,7 +525,7 @@ public:
    * For more details, see create_file_readwrite() which is the synchronous version of this call.
    *
    * When the operation is finished, @a slot will be called. You can then call create_file_readwrite_finish() to get the result of the operation.
-   * 
+   *
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param flags a set of FileCreateFlags.
    * @param io_priority The I/O priority of the request.
@@ -623,15 +623,15 @@ public:
 
 
   /** Returns an output stream for overwriting the file in readwrite mode, possibly creating a backup copy of the file first.
-   * 
+   *
    * If the file doesn't exist, it will be created.
    *
    * For details about the behaviour, see replace() which does the same thing but returns an output stream only.
    *
-   * Note that in many non-local file cases read and write streams are not supported, 
+   * Note that in many non-local file cases read and write streams are not supported,
    * so make sure you really need to do read and write streaming,
    * rather than just opening for reading or writing.
-   * 
+   *
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -643,15 +643,15 @@ public:
 
 
   /** Returns an output stream for overwriting the file in readwrite mode, possibly creating a backup copy of the file first.
-   * 
+   *
    * If the file doesn't exist, it will be created.
    *
    * For details about the behaviour, see replace() which does the same thing but returns an output stream only.
    *
-   * Note that in many non-local file cases read and write streams are not supported, 
+   * Note that in many non-local file cases read and write streams are not supported,
    * so make sure you really need to do read and write streaming,
    * rather than just opening for reading or writing.
-   * 
+   *
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -717,10 +717,10 @@ public:
    * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
    * namespace. An example attribute query be "standard::*,owner::user".
    * The standard attributes are available as defines, like #G_FILE_ATTRIBUTE_STANDARD_NAME.
-   * 
+   *
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * For symlinks, normally the information about the target of the
    * symlink is returned, rather than information about the symlink itself.
@@ -822,7 +822,7 @@ public:
    * about the filesystem the file is on, rather than the file itself.
    * For instance the amount of space availible and the type of
    * the filesystem.
-   * 
+   *
    * The @a attribute  value is a string that specifies the file attributes that
    * should be gathered. It is not an error if its not possible to read a particular
    * requested attribute from a file, it just won't be set. @a attribute  should
@@ -832,11 +832,11 @@ public:
    * Common attributes of interest are FILE_ATTRIBUTE_FILESYSTEM_SIZE
    * (the total size of the filesystem in bytes), FILE_ATTRIBUTE_FILESYSTEM_FREE (number of
    * bytes availible), and FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
-   * 
+   *
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
-   * 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
+   *
    * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
    * Other errors are possible too, and depend on what kind of filesystem the file is on.
    * @param cancellable A Cancellable object.
@@ -849,7 +849,7 @@ public:
    * about the filesystem the file is on, rather than the file itself.
    * For instance the amount of space availible and the type of
    * the filesystem.
-   * 
+   *
    * The @a attribute  value is a string that specifies the file attributes that
    * should be gathered. It is not an error if its not possible to read a particular
    * requested attribute from a file, it just won't be set. @a attribute  should
@@ -859,8 +859,8 @@ public:
    * Common attributes of interest are FILE_ATTRIBUTE_FILESYSTEM_SIZE
    * (the total size of the filesystem in bytes), FILE_ATTRIBUTE_FILESYSTEM_FREE (number of
    * bytes availible), and FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
-   * 
-   * 
+   *
+   *
    * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
    * Other errors are possible too, and depend on what kind of filesystem the file is on.
    * @param attributes An attribute query string.
@@ -869,7 +869,7 @@ public:
   Glib::RefPtr<FileInfo> query_filesystem_info(const std::string& attributes = "*");
   _IGNORE(g_file_query_filesystem_info)
 
-  _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount(const Glib::RefPtr<Cancellable>& cancellable{?}), 
+  _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount(const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_file_find_enclosing_mount, retreturn, errthrow)
 
 
@@ -877,7 +877,7 @@ public:
    * that the file is on. The result is a FileInfo object
    * that contains key-value attributes (such as type or size for the
    * file).
-   * 
+   *
    * For more details, see query_filesystem_info() which is the synchronous version of this call.
    *
    * When the operation is finished, @a slot will be called. You can then call query_filesystem_info_finish() to get the result of the operation.
@@ -893,7 +893,7 @@ public:
    * that the file is on. The result is a FileInfo object
    * that contains key-value attributes (such as type or size for the
    * file).
-   * 
+   *
    * For more details, see query_filesystem_info() which is the synchronous version of this call.
    *
    * When the operation is finished, @a slot will be called. You can then call query_filesystem_info_finish() to get the result of the operation.
@@ -938,14 +938,14 @@ public:
   void find_enclosing_mount_async(const SlotAsyncReady& slot, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_find_enclosing_mount_async)
 
-  _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount_finish(const Glib::RefPtr<AsyncResult>& result), 
+  _WRAP_METHOD(Glib::RefPtr<Mount> find_enclosing_mount_finish(const Glib::RefPtr<AsyncResult>& result),
                g_file_find_enclosing_mount_finish, refreturn, errthrow)
 
 
   /** Gets the requested information about the files in a directory. The result
    * is a FileEnumerator object that will give out FileInfo objects for
    * all the files in the directory.
-   * 
+   *
    * The @a attribute  value is a string that specifies the file attributes that
    * should be gathered. It is not an error if its not possible to read a particular
    * requested attribute from a file, it just won't be set. @a attribute  should
@@ -953,11 +953,11 @@ public:
    * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
    * namespace. An example attribute query be "standard::*,owner::user".
    * The standard attributes are availible as defines, like FILE_ATTRIBUTE_STANDARD_NAME.
-   * 
+   *
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
-   * 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
+   *
    * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
    * If the file is not a directory, a Glib::FileError with NOTDIR will be thrown.
    * Other errors are possible too.
@@ -973,7 +973,7 @@ public:
   /** Gets the requested information about the files in a directory. The result
    * is a FileEnumerator object that will give out FileInfo objects for
    * all the files in the directory.
-   * 
+   *
    * The @a attribute  value is a string that specifies the file attributes that
    * should be gathered. It is not an error if its not possible to read a particular
    * requested attribute from a file, it just won't be set. @a attribute  should
@@ -981,7 +981,7 @@ public:
    * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
    * namespace. An example attribute query be "standard::*,owner::user".
    * The standard attributes are availible as defines, like FILE_ATTRIBUTE_STANDARD_NAME.
-   * 
+   *
    * If the file does not exist, a Gio::Error with NOT_FOUND will be thrown.
    * If the file is not a directory, a Glib::FileError with NOTDIR will be thrown.
    * Other errors are possible too.
@@ -1053,9 +1053,9 @@ public:
                g_file_set_display_name_finish,
                errthrow)
 
-  /** Deletes a file. 
+  /** Deletes a file.
    * If the file is a directory, it will only be deleted if it is empty.
-   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * The operation can be cancelled by triggering the cancellable object from another thread.
    * If the operation was cancelled, a Glib::FileError with ERROR_CANCELLED will be thrown.
    *
    * @param cancellable A Cancellable object which can be used to cancel the operation.
@@ -1116,10 +1116,10 @@ public:
    *
    * If FILE_COPY_OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    *
-   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown. 
+   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown.
    * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    *
-   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, 
+   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file,
    * then a Gio::Error with WOULD_RECURSE will be thrown.
    *
    * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
@@ -1136,10 +1136,10 @@ public:
    *
    * If FILE_COPY_OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    *
-   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown. 
+   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown.
    * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    *
-   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, 
+   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file,
    * then a Gio::Error with WOULD_RECURSE will be thrown.
    *
    * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
@@ -1154,10 +1154,10 @@ public:
    *
    * If FILE_COPY_OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    *
-   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown. 
+   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown.
    * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    *
-   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, 
+   * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file,
    * then a Gio::Error with WOULD_RECURSE will be thrown.
    *
    * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
@@ -1234,24 +1234,24 @@ public:
                g_file_copy_finish,
                errthrow)
 
-  /** Tries to move the file or directory source to the location specified by destination. If native move operations are supported then this is 
-   * used, otherwise a copy and delete fallback is used. The native implementation may support moving directories (for instance on moves inside 
+  /** Tries to move the file or directory source to the location specified by destination. If native move operations are supported then this is
+   * used, otherwise a copy and delete fallback is used. The native implementation may support moving directories (for instance on moves inside
    * the same filesystem), but the fallback code does not.
    *
    * If the flag FILE_COPY_OVERWRITE is specified an already existing destination file is overwritten.
-   * 
+   *
    * If the flag FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
-   * 
+   *
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * The operation can be monitored via the @a slot callback.
    * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
-   * 
+   *
    * If G_FILE_COPY_OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
-   * 
-   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown. 
+   *
+   * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown.
    * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
-   * 
+   *
    * If the source is a directory and the target does not exist, or FILE_COPY_OVERWRITE is specified and the target is a file, then a Gio::Error with WOULD_RECURSE may be thrown (if the native move operation isn't available).
    */
   bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE);
@@ -1292,16 +1292,16 @@ public:
 							   GError                    **error);
    */
 
-  /** Tries to set all attributes in the FileInfo on the target values, 
+  /** Tries to set all attributes in the FileInfo on the target values,
    * not stopping on the first error.
-   * 
+   *
    * If there is any error during this operation then a Gio::Error will be thrown.
-   * Error on particular fields are flagged by setting 
-   * the "status" field in the attribute value to 
+   * Error on particular fields are flagged by setting
+   * the "status" field in the attribute value to
    * FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can also detect
    * further errors.
-   * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,  
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * @param info A FileInfo.
@@ -1311,16 +1311,16 @@ public:
    */
   bool set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, const Glib::RefPtr<Cancellable>& cancellable, FileQueryInfoFlags flags = FILE_QUERY_INFO_NONE);
 
-  /** Tries to set all attributes in the FileInfo on the target values, 
+  /** Tries to set all attributes in the FileInfo on the target values,
    * not stopping on the first error.
-   * 
+   *
    * If there is any error during this operation then a Gio::Error will be thrown.
-   * Error on particular fields are flagged by setting 
-   * the "status" field in the attribute value to 
+   * Error on particular fields are flagged by setting
+   * the "status" field in the attribute value to
    * FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can also detect
    * further errors.
-   * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * @param info A FileInfo.
@@ -1384,12 +1384,12 @@ public:
                g_file_set_attribute_int64,
                errthrow)
 
-  /** Starts a @a mount_operation, mounting the volume that contains the file. 
-   * 
-   * When this operation has completed, @a slot will be called with, 
+  /** Starts a @a mount_operation, mounting the volume that contains the file.
+   *
+   * When this operation has completed, @a slot will be called with,
    * and the operation can be finalized with mount_enclosing_volume_finish().
-   * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * @param mount_operation A MountOperation.
@@ -1398,9 +1398,9 @@ public:
    */
   void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
-  /** Starts a @a mount_operation, mounting the volume that contains the file. 
-   * 
-   * When this operation has completed, @a slot will be called with, 
+  /** Starts a @a mount_operation, mounting the volume that contains the file.
+   *
+   * When this operation has completed, @a slot will be called with,
    * and the operation can be finalized with mount_enclosing_volume_finish().
    *
    * @param mount_operation A MountOperation.
@@ -1408,9 +1408,9 @@ public:
    */
   void mount_enclosing_volume(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
-  /** Starts a @a mount_operation, mounting the volume that contains the file. 
-   * 
-   * When this operation has completed, @a slot will be called with, 
+  /** Starts a @a mount_operation, mounting the volume that contains the file.
+   *
+   * When this operation has completed, @a slot will be called with,
    * and the operation can be finalized with mount_enclosing_volume_finish().
    *
    * @param slot A callback slot which will be called when the request is satisfied.
@@ -1418,7 +1418,7 @@ public:
   void mount_enclosing_volume(const SlotAsyncReady& slot, MountMountFlags flags = MOUNT_MOUNT_NONE);
   _IGNORE(g_file_mount_enclosing_volume)
 
-  /** Starts a @a mount_operation, mounting the volume that contains the file. 
+  /** Starts a @a mount_operation, mounting the volume that contains the file.
    *
    */
   void mount_enclosing_volume(MountMountFlags flags = MOUNT_MOUNT_NONE);
@@ -1428,10 +1428,10 @@ public:
                g_file_mount_enclosing_volume_finish,
                errthrow)
 
-  /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance, 
+  /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance,
    * passwords are needed during authentication.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
@@ -1442,7 +1442,7 @@ public:
    */
   void mount_mountable(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
-  /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance, 
+  /** Mounts a file of type FILE_TYPE_MOUNTABLE. Using @a mount_operation, you can request callbacks when, for instance,
    * passwords are needed during authentication.
    *
    * When the operation is finished, @a slot will be called. You can then call mount_mountable_finish() to get the result of the operation.
@@ -1471,7 +1471,7 @@ public:
 
   /** Unmounts a file of type FILE_TYPE_MOUNTABLE.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call unmount_mountable_finish() to get the result of the operation.
@@ -1499,7 +1499,7 @@ public:
 
   /** Unmounts a file of type FILE_TYPE_MOUNTABLE.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call unmount_mountable_finish() to get the result of the operation.
@@ -1542,7 +1542,7 @@ public:
 
   /** Starts an asynchronous eject on a mountable.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call eject_mountable_finish() to get the result of the operation.
@@ -1570,7 +1570,7 @@ public:
 
   /** Starts an asynchronous eject on a mountable.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call eject_mountable_finish() to get the result of the operation.
@@ -1612,7 +1612,7 @@ public:
                errthrow)
 
 
-  /** Copies the file attributes from @a source to @a destination. 
+  /** Copies the file attributes from @a source to @a destination.
    *
    * Normally only a subset of the file attributes are copied,
    * those that are copies in a normal file copy operation
@@ -1627,7 +1627,7 @@ public:
    */
   bool copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FILE_COPY_NONE);
 
-  /** Copies the file attributes from @a source to @a destination. 
+  /** Copies the file attributes from @a source to @a destination.
    *
    * Normally only a subset of the file attributes are copied,
    * those that are copies in a normal file copy operation
@@ -1641,10 +1641,10 @@ public:
    */
   bool copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FILE_COPY_NONE);
   _IGNORE(g_file_copy_attributes)
- 
+
   /** Obtains a directory monitor for the given file.
    * This may fail if directory monitoring is not supported.
-   * 
+   *
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
    * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
@@ -1656,7 +1656,7 @@ public:
 
   /** Obtains a directory monitor for the given file.
    * This may fail if directory monitoring is not supported.
-   * 
+   *
    * @param flags A set of FileMonitorFlags.
    * @return A FileMonitor for the file.
    */
@@ -1665,7 +1665,7 @@ public:
 
   /** Obtains a file monitor for the given file. If no file notification
    * mechanism exists, then regular polling of the file is used.
-   * 
+   *
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
    * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
@@ -1677,7 +1677,7 @@ public:
 
   /** Obtains a file monitor for the given file. If no file notification
    * mechanism exists, then regular polling of the file is used.
-   * 
+   *
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
    * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
@@ -1691,7 +1691,7 @@ public:
 
   /** Obtains a file monitor for the given file. If no file notification
    * mechanism exists, then regular polling of the file is used.
-   * 
+   *
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
    * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
@@ -1705,7 +1705,7 @@ public:
 
   /** Obtains a file monitor for the given file. If no file notification
    * mechanism exists, then regular polling of the file is used.
-   * 
+   *
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation
    * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
@@ -1724,12 +1724,12 @@ public:
   * Using @a start_operation, you can request callbacks when, for instance,
   * passwords are needed during authentication.
   *
-  * When this operation has completed, @a slot will be called 
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with start_mountable_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
   *
   * @param slot: A callback to call when the request is satisfied.
   * @param cancellable A Cancellable object.
@@ -1743,12 +1743,12 @@ public:
   * Using @a start_operation, you can request callbacks when, for instance,
   * passwords are needed during authentication.
   *
-  * When this operation has completed, @a slot will be called 
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with start_mountable_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
   *
   * @param slot: A callback to call when the request is satisfied.
   * @param cancellable A Cancellable object.
@@ -1767,12 +1767,12 @@ public:
   * Using @a start_operation, you can request callbacks when, for instance,
   * passwords are needed during authentication.
   *
-  * When this operation has completed, @a slot will be called 
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with stop_mountable_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
   *
   * @param slot: A callback to call when the request is satisfied.
   * @param cancellable A Cancellable object.
@@ -1787,12 +1787,12 @@ public:
   * Using @a start_operation, you can request callbacks when, for instance,
   * passwords are needed during authentication.
   *
-  * When this operation has completed, @a slot will be called 
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with stop_mountable_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
   *
   * @param slot: A callback to call when the request is satisfied.
   * @param start_operation A Cancellable object.
@@ -1811,12 +1811,12 @@ public:
   * Using @a start_operation, you can request callbacks when, for instance,
   * passwords are needed during authentication.
   *
-  * When this operation has completed, @a slot will be called 
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with stop_mountable_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
   *
   * @param slot: A callback to call when the request is satisfied.
   * @param cancellable A Cancellable object.
@@ -1830,12 +1830,12 @@ public:
   * Using @a start_operation, you can request callbacks when, for instance,
   * passwords are needed during authentication.
   *
-  * When this operation has completed, @a slot will be called 
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with stop_mountable_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
   *
   * @param slot: A callback to call when the request is satisfied.
   *
@@ -1852,46 +1852,46 @@ public:
                errthrow)
 
   //TODO: Something better than char*& for contents?
-  /** Loads the content of the file into memory, returning the size of the data. 
+  /** Loads the content of the file into memory, returning the size of the data.
    * The data is always zero terminated, but this is not included in the resultant @a length.
-   * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread.
    * If the operation was cancelled, a Gio::Error exception with CANCELLED will be returned.
    *
    * @param cancellable A cancellable object.
-   * @param contents A location to place the contents of the file. 
+   * @param contents A location to place the contents of the file.
    * @param length A location to place the length of the contents of the file.
    * @param etag_out A location to place the current entity tag for the file.
    */
   bool load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length, std::string& etag_out);
 
-  /** Loads the content of the file into memory, returning the size of the data. 
+  /** Loads the content of the file into memory, returning the size of the data.
    * The data is always zero terminated, but this is not included in the resultant @a length.
-   * 
-   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   *
+   * The operation can be cancelled by triggering the cancellable object from another thread.
    * If the operation was cancelled, a Gio::Error exception with CANCELLED will be returned.
    *
    * @param cancellable A cancellable object.
-   * @param contents A location to place the contents of the file. 
+   * @param contents A location to place the contents of the file.
    * @param length A location to place the length of the contents of the file.
    * @newin{2,22}
    */
   bool load_contents(const Glib::RefPtr<Cancellable>& cancellable, char*& contents, gsize& length);
 
   //TODO: Something better than char*& for contents?
-  /** Loads the content of the file into memory, returning the size of the data. 
+  /** Loads the content of the file into memory, returning the size of the data.
    * The data is always zero terminated, but this is not included in the resultant @a length.
    *
-   * @param contents A location to place the contents of the file. 
+   * @param contents A location to place the contents of the file.
    * @param length A location to place the length of the contents of the file.
    * @param etag_out A location to place the current entity tag for the file.
    */
   bool load_contents(char*& contents, gsize& length, std::string& etag_out);
 
-  /** Loads the content of the file into memory, returning the size of the data. 
+  /** Loads the content of the file into memory, returning the size of the data.
    * The data is always zero terminated, but this is not included in the resultant @a length.
    *
-   * @param contents A location to place the contents of the file. 
+   * @param contents A location to place the contents of the file.
    * @param length A location to place the length of the contents of the file.
    * @newin{2,22}
    */
@@ -1901,10 +1901,10 @@ public:
   /** Starts an asynchronous load of the file's contents.
    * For more details, see load_contents() which is the synchronous version of this call.
    *
-   * When the load operation has completed, the @a slot will be called. To finish the operation, 
+   * When the load operation has completed, the @a slot will be called. To finish the operation,
    * call load_contents_finish() with the AsyncResult provided to the @a slot.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * The operation can be cancelled by triggering the cancellable object from another thread.
    * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * @param slot A callback slot which will be called when the request is satisfied.
@@ -1915,7 +1915,7 @@ public:
   /** Starts an asynchronous load of the file's contents.
    * For more details, see load_contents() which is the synchronous version of this call.
    *
-   * When the load operation has completed, the @a slot will be called. To finish the operation, 
+   * When the load operation has completed, the @a slot will be called. To finish the operation,
    * call load_contents_finish() with the AsyncResult provided to the @a slot.
    *
    * @param slot A callback slot which will be called when the request is satisfied.
@@ -1923,27 +1923,27 @@ public:
   void load_contents_async(const SlotAsyncReady& slot);
   _IGNORE(g_file_load_contents_async)
 
-  /** Finishes an asynchronous load of the @a file's contents. 
-   * The contents are placed in @a contents, and @a length is set to the 
-   * size of the @a contents string. If @a etag_out is present, it will be 
+  /** Finishes an asynchronous load of the @a file's contents.
+   * The contents are placed in @a contents, and @a length is set to the
+   * size of the @a contents string. If @a etag_out is present, it will be
    * set to the new entity tag for the @a file.
    * @param res A AsyncResult.
    * @param contents A location to place the contents of the file.
    * @param length A location to place the length of the contents of the file.
    * @param etag_out A location to place the current entity tag for the file.
-   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is 
+   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is
    * present, it will be set appropriately.
    */
   bool load_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out);
 
-  /** Finishes an asynchronous load of the @a file's contents. 
-   * The contents are placed in @a contents, and @a length is set to the 
-   * size of the @a contents string. If @a etag_out is present, it will be 
+  /** Finishes an asynchronous load of the @a file's contents.
+   * The contents are placed in @a contents, and @a length is set to the
+   * size of the @a contents string. If @a etag_out is present, it will be
    * set to the new entity tag for the @a file.
    * @param res A AsyncResult.
    * @param contents A location to place the contents of the file.
    * @param length A location to place the length of the contents of the file.
-   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is 
+   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is
    * present, it will be set appropriately.
    * @newin{2,22}
    */
@@ -1956,13 +1956,13 @@ public:
    */
   typedef sigc::slot<bool, const char*, goffset> SlotReadMore;
 
-  //Note that slot_read_more can be NULL but that would not be a useful method overload, because the documentation says that it would 
+  //Note that slot_read_more can be NULL but that would not be a useful method overload, because the documentation says that it would
   //then be equivalent to load_contents_async.
 
   /** Reads the partial contents of a file.
    * The @a slot_read_more callback slot should be used to stop reading from the file when appropriate. This operation can be finished by load_partial_contents_finish().
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call load_partial_contents_finish() to get the result of the operation.
@@ -1976,7 +1976,7 @@ public:
   /** Reads the partial contents of a file.
    * The @a slot_read_more callback slot should be used to stop reading from the file when appropriate. This operation can be finished by load_partial_contents_finish().
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, 
+   * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled,
    * a Gio::Error with CANCELLED will be thrown.
    *
    * When the operation is finished, @a slot will be called. You can then call load_partial_contents_finish() to get the result of the operation.
@@ -1994,7 +1994,7 @@ public:
    * @param contents A location to place the contents of the file.
    * @param length A location to place the length of the contents of the file.
    * @param etag_out A location to place the current entity tag for the file.
-   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is 
+   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is
    * present, it will be set appropriately.
    */
   bool load_partial_contents_finish(const Glib::RefPtr<AsyncResult>& result, char*& contents, gsize& length, std::string& etag_out);
@@ -2004,7 +2004,7 @@ public:
    * @param res A AsyncResult.
    * @param contents A location to place the contents of the file.
    * @param length A location to place the length of the contents of the file.
-   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is 
+   * @return <tt>true</tt> if the load was successful. If <tt>false</tt> and @a error is
    * present, it will be set appropriately.
    * @newin{2,22}
    */
@@ -2012,21 +2012,21 @@ public:
   _IGNORE(g_file_load_partial_contents_finish)
 
   /** Replaces the contents of the file with @a contents of @a length bytes.
-   *  
+   *
    * If @a etag is specified (not an empty string) any existing file must have that etag, or
    * a Gio::Error with WRONG_ETAG will be thrown.
-   * 
+   *
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
-   * 
+   *
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
-   * 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
+   *
    * The returned @a new_etag  can be used to verify that the file hasn't changed the
    * next time it is saved over.
    * @param contents A string containing the new contents for the file.
    * @param length The length of @a contents in bytes.
-   * @param etag The old entity tag 
+   * @param etag The old entity tag
    * for the document.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -2037,17 +2037,17 @@ public:
   void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
 
   /** Replaces the contents of the file with @a contents of @a length bytes.
-   *  
+   *
    * If @a etag is specified (not an empty string) any existing file must have that etag, or
    * a Gio::Error with WRONG_ETAG will be thrown.
-   * 
+   *
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
-   * 
+   *
    * The returned @a new_etag  can be used to verify that the file hasn't changed the
    * next time it is saved over.
    * @param contents A string containing the new contents for the file.
    * @param length The length of @a contents in bytes.
-   * @param etag The old entity tag 
+   * @param etag The old entity tag
    * for the document.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -2057,20 +2057,20 @@ public:
   void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
 
   /** Replaces the contents of the file with @a contents.
-   *  
+   *
    * If @a etag is specified (not an empty string) any existing file must have that etag, or
    * a Gio::Error with WRONG_ETAG will be thrown.
-   * 
+   *
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
-   * 
+   *
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
-   * was cancelled, a Gio::Error with CANCELLED will be thrown. 
-   * 
+   * was cancelled, a Gio::Error with CANCELLED will be thrown.
+   *
    * The returned @a new_etag  can be used to verify that the file hasn't changed the
    * next time it is saved over.
    * @param contents A string containing the new contents for the file.
-   * @param etag The old entity tag 
+   * @param etag The old entity tag
    * for the document.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -2081,16 +2081,16 @@ public:
   void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
 
   /** Replaces the contents of the file with @a contents.
-   *  
+   *
    * If @a etag is specified (not an empty string) any existing file must have that etag, or
    * a Gio::Error with WRONG_ETAG will be thrown.
-   * 
+   *
    * If @a make_backup is <tt>true</tt>, this function will attempt to make a backup of the file.
-   * 
+   *
    * The returned @a new_etag  can be used to verify that the file hasn't changed the
    * next time it is saved over.
    * @param contents A string containing the new contents for the file.
-   * @param etag The old entity tag 
+   * @param etag The old entity tag
    * for the document.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -2104,18 +2104,18 @@ public:
   //TODO: Add replace_contents() without the etags?
 
 
- /** Starts an asynchronous replacement of the file with the given 
-  * @a contents of @a length bytes. @a etag will replace the document's 
+ /** Starts an asynchronous replacement of the file with the given
+  * @a contents of @a length bytes. @a etag will replace the document's
   * current entity tag.
-  * 
-  * When this operation has completed, @a slot will be called 
+  *
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with replace_contents_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
-  * 
-  * If @a make_backup is true, this function will attempt to 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
+  *
+  * If @a make_backup is true, this function will attempt to
   * make a backup of the file.
   *
   * @param slot: A callback to call when the request is satisfied.
@@ -2128,14 +2128,14 @@ public:
   */
   void replace_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const char* contents, gsize length, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
 
- /** Starts an asynchronous replacement of the file with the given 
-  * @a contents of @a length bytes. @a etag will replace the document's 
+ /** Starts an asynchronous replacement of the file with the given
+  * @a contents of @a length bytes. @a etag will replace the document's
   * current entity tag.
-  * 
-  * When this operation has completed, @a slot will be called 
+  *
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with replace_contents_finish().
-  * 
-  * If @a make_backup is true, this function will attempt to 
+  *
+  * If @a make_backup is true, this function will attempt to
   * make a backup of the file.
   *
   * @param slot: A callback to call when the request is satisfied.
@@ -2147,18 +2147,18 @@ public:
   */
   void replace_contents_async(const SlotAsyncReady& slot, const char* contents, gsize length, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
 
- /** Starts an asynchronous replacement of the file with the given 
-  * @a contents of @a length bytes. @a etag will replace the document's 
+ /** Starts an asynchronous replacement of the file with the given
+  * @a contents of @a length bytes. @a etag will replace the document's
   * current entity tag.
-  * 
-  * When this operation has completed, @a slot will be called 
+  *
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with replace_contents_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
-  * 
-  * If @a make_backup is true, this function will attempt to 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
+  *
+  * If @a make_backup is true, this function will attempt to
   * make a backup of the file.
   *
   * @param slot: A callback to call when the request is satisfied.
@@ -2170,18 +2170,18 @@ public:
   */
   void replace_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
 
- /** Starts an asynchronous replacement of the file with the given 
-  * @a contents. @a etag will replace the document's 
+ /** Starts an asynchronous replacement of the file with the given
+  * @a contents. @a etag will replace the document's
   * current entity tag.
-  * 
-  * When this operation has completed, @a slot will be called 
+  *
+  * When this operation has completed, @a slot will be called
   * and the operation can be finalized with replace_contents_finish().
-  * 
+  *
   * The operation can be cancelled by
   * triggering the cancellable object from another thread. If the operation
-  * was cancelled, a Gio::Error with CANCELLED will be thrown. 
-  * 
-  * If @a make_backup is true, this function will attempt to 
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
+  *
+  * If @a make_backup is true, this function will attempt to
   * make a backup of the file.
   *
   * @param slot: A callback to call when the request is satisfied.
@@ -2195,16 +2195,16 @@ public:
   _IGNORE(g_file_replace_contents_async)
 
   /** Finishes an asynchronous replace of the given file . See
-   * replace_contents_async(). Sets @a new_etag to the new entity 
+   * replace_contents_async(). Sets @a new_etag to the new entity
    * tag for the document.
    * @param result A AsyncResult.
-   * @param new_etag A location of a new entity tag 
+   * @param new_etag A location of a new entity tag
    * for the document.
    */
   void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& etag);
 
   /** Finishes an asynchronous replace of the given file . See
-   * replace_contents_async(). Sets @a new_etag to the new entity 
+   * replace_contents_async(). Sets @a new_etag to the new entity
    * tag for the document.
    * @param result A AsyncResult.
    * for the document.
@@ -2259,11 +2259,11 @@ Glib::RefPtr<Gio::File> wrap(GFile* object, bool take_copy);
 namespace Container_Helpers
 {
 
-/** This specialization of TypeTraits exists 
- * because the default use of Glib::wrap(GObject*), 
+/** This specialization of TypeTraits exists
+ * because the default use of Glib::wrap(GObject*),
  * instead of a specific Glib::wrap(GSomeInterface*),
  * would not return a wrapper for an interface.
- */ 
+ */
 template <>
 struct TypeTraits< Glib::RefPtr<Gio::File> >
 {
@@ -2276,7 +2276,7 @@ struct TypeTraits< Glib::RefPtr<Gio::File> >
 
   static CppType to_cpp_type    (const CType& item)
   {
-    //Use a specific Glib::wrap() function, 
+    //Use a specific Glib::wrap() function,
     //because CType has the specific type (not just GObject):
     return Glib::wrap(item, true /* take_copy */);
   }

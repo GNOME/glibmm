@@ -28,11 +28,11 @@
 namespace Glib
 {
 
-/** Quarks are unique IDs in Glib for strings for use in 
+/** Quarks are unique IDs in Glib for strings for use in
  * hash table lookups.  Each Quark is unique but may change
  * between runs.
  *
- * QueryQuark is a converter class for looking up but not 
+ * QueryQuark is a converter class for looking up but not
  * allocating an ID.  An id means the quark lookup failed.
  *
  * Quark is used for actions for which the id should live on

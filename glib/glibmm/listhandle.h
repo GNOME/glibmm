@@ -150,10 +150,10 @@ private:
 
 //TODO: Remove this when we can break glibmm API.
 /** This is an intermediate type. When a method takes this, or returns this, you
- * should use a standard C++ container of your choice, such as std::list or 
+ * should use a standard C++ container of your choice, such as std::list or
  * std::vector.
  *
- * However, this is not used in new API. We now prefer to just use std::vector, 
+ * However, this is not used in new API. We now prefer to just use std::vector,
  * which is less flexibile, but makes the API clearer.
  *
  * @ingroup ContHandles

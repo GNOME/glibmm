@@ -30,11 +30,11 @@ _DEFS(glibmm,glib)
 namespace Glib
 {
 
-//Hand-written, instead of using _WRAP_ENUM, 
+//Hand-written, instead of using _WRAP_ENUM,
 //because the C enum values don't have a prefix.
 
 /** Specifies the type of traveral performed by methods such as NodeTree::_traverse() and NodeTree::find().
- * 
+ *
  * @ingroup glibmmEnums
  */
 enum TraverseType
@@ -47,24 +47,24 @@ enum TraverseType
 
 /** N-ary Trees - trees of data with any number of branches
  * The NodeTree class and its associated functions provide an N-ary tree data structure, in which nodes in the tree can contain arbitrary data.
- * 
+ *
  * To insert a node into a tree use insert(), insert_before(), append() or prepend().
- * 
+ *
  * To create a new node and insert it into a tree use insert_data(), insert_data_before(), append_data() and prepend_data().
- * 
+ *
  * To reverse the children of a node use reverse_children().
- * 
+ *
  * To find a node use root(), find(), find_child(), index_of(), child_index(), first_child(), last_child(), nth_child(), first_sibling(), prev_sibling(), next_sibling() or last_sibling().
- * 
+ *
  * To get information about a node or tree use is_leaf(), is_root(), depth(), node_count(), child_count(), is_ancestor() or max_height().
- * 
+ *
  * To traverse a tree, calling a function for each node visited in the traversal, use traverse() or foreach().
- * 
+ *
  * To remove a node or subtree from a tree use unlink().
  *
  * @newin{2,18}
  */
-template <typename T> 
+template <typename T>
 class NodeTree
 {
   _CLASS_GENERIC(NodeTree, GNode)
@@ -136,7 +136,7 @@ public:
 
   /** Inserts a NodeTree beneath the parent at the given position.
    *
-   * @param position the position to place node at, with respect to its siblings 
+   * @param position the position to place node at, with respect to its siblings
    * If position is -1, node is inserted as the last child of parent
    * @param node the NodeTree to insert
    * @return the inserted NodeTree
@@ -201,7 +201,7 @@ public:
 
   /** Inserts a new NodeTree at the given position.
    *
-   * @param position the position to place the new NodeTree at. 
+   * @param position the position to place the new NodeTree at.
    * If position is -1, the new NodeTree is inserted as the last child of parent
    * @param data the data for the new NodeTree
    * @return the new NodeTree
@@ -216,7 +216,7 @@ public:
 
   /** Inserts a new NodeTree before the given sibling.
    *
-   * @param sibling the sibling NodeTree to place node before. 
+   * @param sibling the sibling NodeTree to place node before.
    * @param data the data for the new NodeTree
    * @return the new NodeTree
    */
@@ -292,13 +292,13 @@ public:
   };
 
   /** Traverses a tree starting at the current node.
-   * It calls the given function for each node visited. 
+   * It calls the given function for each node visited.
    * The traversal can be halted at any point by returning true from @a func.
    *
    * @param order The order in which nodes are visited.
    * @param flags Which types of children are to be visited.
-   * @param max_depth The maximum depth of the traversal. 
-   * Nodes below this depth will not be visited. 
+   * @param max_depth The maximum depth of the traversal.
+   * Nodes below this depth will not be visited.
    * If max_depth is -1 all nodes in the tree are visited.
    * If max_depth is 1, only the root is visited.
    * If max_depth is 2, the root and its children are visited. And so on.
@@ -339,7 +339,7 @@ public:
     type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
 
     g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach_compare_child, reinterpret_cast<gpointer>(&bound_slot));
-    
+
     return wrap(child);
   }
 
@@ -411,7 +411,7 @@ public:
   }
   _IGNORE(g_node_child_index)
 
-  /** Gets the position with respect to its siblings. 
+  /** Gets the position with respect to its siblings.
    * child must be a child of node.
    * The first child is numbered 0, the second 1, and so on.
    *
@@ -426,7 +426,7 @@ public:
 
   /** Gets the first child.
    *
-   * @return The first child, or 0 if the node has no children. 
+   * @return The first child, or 0 if the node has no children.
    */
   NodeTree<T>* first_child()
   {
@@ -435,7 +435,7 @@ public:
 
   /** Gets the first child.
    *
-   * @return The first child, or 0 if the node has no children. 
+   * @return The first child, or 0 if the node has no children.
    */
   const NodeTree<T>* first_child() const
   {
@@ -466,7 +466,7 @@ public:
    *
    * @return The nth child, or 0 if n is too large.
    */
-  NodeTree<T>* nth_child(int n) 
+  NodeTree<T>* nth_child(int n)
   {
     return wrap(g_node_nth_child(gobj(), n));
   }
@@ -480,7 +480,7 @@ public:
     return const_cast<NodeTree<T>*>(this)->nth_child(n);
   }
   _IGNORE(g_node_nth_child)
-  
+
   /** Gets the first sibling
    * @return The first sibling, or 0 if the node has no siblings.
    */

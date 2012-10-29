@@ -52,7 +52,7 @@ void* SignalProxyConnectionNode::notify(void* data)
   {
     GObject* o = conn->object_;
     conn->object_ = 0;
-  
+
     if(g_signal_handler_is_connected(o, conn->connection_id_)) //We check first, because during destruction, GTK+ sometimes seems to disconnect them for us, before we expect it to.  See bug #87912
     {
       // Disconnecting triggers execution of destroy_notify_handler(), eiter immediately or later:
@@ -60,11 +60,11 @@ void* SignalProxyConnectionNode::notify(void* data)
       //   In that case, destroy_notify_handler() will be called after this whole function has returned.
       // Anyway. destroy_notify_handler() will always be called, so we leave that to do the deletion.
 
-      
+
       //Forget the connection:
       gulong connection_id = conn->connection_id_;
       conn->connection_id_ = 0;
-      
+
       g_signal_handler_disconnect(o, connection_id);
     }
   }
@@ -77,7 +77,7 @@ void SignalProxyConnectionNode::destroy_notify_handler(gpointer data, GClosure*)
 {
   //glib calls this when it has finished with a glib signal connection,
   //either when the emitting object dies, or when the connection has been disconnected.
-  
+
   // notification from gtk+.
   SignalProxyConnectionNode* conn = static_cast<SignalProxyConnectionNode*>(data);
 

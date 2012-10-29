@@ -43,11 +43,11 @@ struct TimeVal : public GTimeVal
   inline TimeVal& operator=(const GTimeVal& gtimeval);
 
   /** Assigns the current time to the TimeVal instance.
-   * Equivalent to the UNIX gettimeofday() function, but is portable and 
-   * works also on Win32. 
+   * Equivalent to the UNIX gettimeofday() function, but is portable and
+   * works also on Win32.
    */
   void assign_current_time();
-  
+
   /** Converts a string containing an ISO 8601 encoded date and time
    * to a Glib::TimeVal and puts it in TimeVal instance.
    * @param iso_date ISO 8601 encoded string.
@@ -178,17 +178,17 @@ TimeVal operator+(const TimeVal& lhs, const TimeVal& rhs)
 { return TimeVal(lhs) += rhs; }
 
 /** @relates Glib::TimeVal */
-inline 
+inline
 TimeVal operator+(const TimeVal& lhs, long seconds)
 { return TimeVal(lhs) += seconds; }
 
 /** @relates Glib::TimeVal */
-inline 
+inline
 TimeVal operator-(const TimeVal& lhs, const TimeVal& rhs)
 { return TimeVal(lhs) -= rhs; }
 
 /** @relates Glib::TimeVal */
-inline 
+inline
 TimeVal operator-(const TimeVal& lhs, long seconds)
 { return TimeVal(lhs) -= seconds; }
 

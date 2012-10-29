@@ -28,11 +28,11 @@ namespace Glib
 {
 
 /** Computes the checksum for data.
- * This is a generic API for computing checksums (or "digests") for a sequence of arbitrary bytes, 
+ * This is a generic API for computing checksums (or "digests") for a sequence of arbitrary bytes,
  * using various hashing algorithms like MD5, SHA-1 and SHA-256. Checksums are commonly used in various environments and specifications.
  *
- * glibmm supports incremental checksums by calling update() as long as there's data available and then using get_string() 
- * or get_digest() to compute the checksum and return it either as a string in hexadecimal form, or as a raw sequence of bytes. 
+ * glibmm supports incremental checksums by calling update() as long as there's data available and then using get_string()
+ * or get_digest() to compute the checksum and return it either as a string in hexadecimal form, or as a raw sequence of bytes.
  * To compute the checksum for binary blobs and NULL-terminated strings in one go, use the static compute_checksum() convenience functions().
  *
  * @newin{2,16}
@@ -52,8 +52,8 @@ public:
    * The hashing algorithm to be used by Checksum when performing the
    * digest of some data.
    *
-   * Note that the ChecksumType enumeration may be extended at a later 
-   * date to include new hashing algorithm types. 
+   * Note that the ChecksumType enumeration may be extended at a later
+   * date to include new hashing algorithm types.
    *
    * @newin{2,16}
    */
@@ -61,7 +61,7 @@ public:
 
 #m4 _CONVERSION(`ChecksumType', `GChecksumType', `(($2)$3)')
 
-  /** Creates a new Checksum, using the checksum algorithm @a checksum_type. 
+  /** Creates a new Checksum, using the checksum algorithm @a checksum_type.
    * If the checksum_type is not known, then operator bool() will return false.
    *
    * @param type checksum type, one of defined above.
@@ -74,14 +74,14 @@ public:
   operator bool() const;
 
   _WRAP_METHOD(void reset(), g_checksum_reset)
-  
+
   //TODO: length should really be gssize, not gsize, when we can break ABI:
 #m4 _CONVERSION(`gsize',`gssize',`(gssize)($3)')
   _WRAP_METHOD(void update(const guchar* data, gsize length), g_checksum_update)
 
   /** Feeds data into an existing Checksum.
    * The checksum must still be open, that is get_string() or get_digest() must not have been called on the checksum.
-   * 
+   *
    * @param data Buffer used to compute the checksum
    */
   void update(const std::string& data);
@@ -90,11 +90,11 @@ public:
 
   _WRAP_METHOD(std::string get_string() const, g_checksum_get_string)
 
- 
+
   _WRAP_METHOD(static std::string compute_checksum(ChecksumType type, const guchar* data, gsize length), g_compute_checksum_for_data)
 
   /** Computes the checksum of a string.
-   * 
+   *
    * @param checksum_type A ChecksumType
    * @param str The string to compute the checksum of.
    * @result The checksum as a hexadecimal string.

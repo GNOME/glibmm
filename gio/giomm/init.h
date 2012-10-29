@@ -5,7 +5,7 @@
 #include "wrap_init.h"
 
 /* init.h
- * 
+ *
  * Copyright (C) 2007 The gtkmm development team
  *
  * This library is free software; you can redistribute it and/or

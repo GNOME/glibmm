@@ -28,10 +28,10 @@ OptionEntry::OptionEntry()
 
 OptionEntry::~OptionEntry()
 {
-  g_free(const_cast<char*>(gobject_->long_name));  
+  g_free(const_cast<char*>(gobject_->long_name));
   g_free(const_cast<char*>(gobject_->description));
   g_free(const_cast<char*>(gobject_->arg_description));
-  g_free(gobject_);  
+  g_free(gobject_);
 }
 
 OptionEntry::OptionEntry(const OptionEntry& src)
@@ -57,7 +57,7 @@ OptionEntry& OptionEntry::operator=(const OptionEntry& src)
     gobject_->arg_data = src.gobject_->arg_data; //Shared, because it's not owned by any instance of this class anyway.
 
     if(gobject_->description)
-      g_free(const_cast<char*>(gobject_->description));    
+      g_free(const_cast<char*>(gobject_->description));
 
     gobject_->description = g_strdup(src.gobject_->description);
 
@@ -78,9 +78,9 @@ void OptionEntry::set_long_name(const Glib::ustring& value)
     gobject_->long_name = 0;
   }
 
-  //Note that we do not use NULL for an empty string, 
+  //Note that we do not use NULL for an empty string,
   //because G_OPTION_REMAINING is actually a "", so it actually has a distinct meaning:
-  //TODO: Wrap G_OPTION_REMAINING in C++ somehow, maybe as an explicit set_long_name(void) or set_is_remaining()? murrayc. 
+  //TODO: Wrap G_OPTION_REMAINING in C++ somehow, maybe as an explicit set_long_name(void) or set_is_remaining()? murrayc.
   gobj()->long_name = (value).c_str() ? g_strdup((value).c_str()) : 0;
 }
 
@@ -105,7 +105,7 @@ void OptionEntry::set_arg_description(const Glib::ustring& value)
 
   gobj()->arg_description = (value).empty() ? 0 : g_strdup((value).c_str());
 }
- 
+
 
 } // namespace Glib
 

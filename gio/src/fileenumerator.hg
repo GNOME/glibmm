@@ -37,14 +37,14 @@ class File;
 //TODO: Consider wrapping this like a std::iterator (or at least renaming it), though the asyncness probably makes that unsuitable.
 
 /** Enumerated Files Routines.
- * FileEnumerator allows you to operate on a set of Gio::Files, returning a Gio::FileInfo instance for each file enumerated 
+ * FileEnumerator allows you to operate on a set of Gio::Files, returning a Gio::FileInfo instance for each file enumerated
  * (e.g. Gio::File::enumerate_children() will return a FileEnumerator for each of the children within a directory).
  *
- * To get the next file's information from a Gio::FileEnumerator, use next_file() or its asynchronous version, next_file_async(). 
- * Note that the asynchronous version will return a list of Gio::FileInfos, whereas the synchronous version will only return the next 
+ * To get the next file's information from a Gio::FileEnumerator, use next_file() or its asynchronous version, next_file_async().
+ * Note that the asynchronous version will return a list of Gio::FileInfos, whereas the synchronous version will only return the next
  * file in the enumerator.
  *
- * To close a Gio::FileEnumerator, use FileEnumerator::close(), or its asynchronous version, close_async(). Once a FileEnumerator is closed, 
+ * To close a Gio::FileEnumerator, use FileEnumerator::close(), or its asynchronous version, close_async(). Once a FileEnumerator is closed,
  * no further actions may be performed on it.
  *
  * @newin{2,16}
@@ -63,16 +63,16 @@ public:
                errthrow)
 
 
-  /** Request information for a number of files from the enumerator asynchronously. 
+  /** Request information for a number of files from the enumerator asynchronously.
    * When all I/O for the operation is finished the callback slot will be called with the requested information.
    *
-   * The callback could be called with less than num_files files in case of error or at the end of the enumerator. 
-   * In case of a partial error the callback will be called with any succeeding items and no error, and on the next request the error will be reported. 
+   * The callback could be called with less than num_files files in case of error or at the end of the enumerator.
+   * In case of a partial error the callback will be called with any succeeding items and no error, and on the next request the error will be reported.
    * If a request is cancelled the callback will be called with ERROR_CANCELLED.
    *
    * During an async request no other sync and async calls are allowed, and will result in ERROR_PENDING errors.
    *
-   * Any outstanding I/O request with higher priority (lower numerical value) will be executed before an outstanding request with lower priority. 
+   * Any outstanding I/O request with higher priority (lower numerical value) will be executed before an outstanding request with lower priority.
    * The default priority is PRIORITY_DEFAULT.
    * @param slot A callback to call when the request is satisfied.
    * @param cancellable An cancellable object which can be used to cancel the request.
@@ -81,16 +81,16 @@ public:
    */
   void next_files_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int num_files = 1, int io_priority = Glib::PRIORITY_DEFAULT);
 
-  /** Request information for a number of files from the enumerator asynchronously. 
+  /** Request information for a number of files from the enumerator asynchronously.
    * When all I/O for the operation is finished the callback slot will be called with the requested information.
    *
-   * The callback could be called with less than num_files files in case of error or at the end of the enumerator. 
-   * In case of a partial error the callback will be called with any succeeding items and no error, and on the next request the error will be reported. 
+   * The callback could be called with less than num_files files in case of error or at the end of the enumerator.
+   * In case of a partial error the callback will be called with any succeeding items and no error, and on the next request the error will be reported.
    * If a request is cancelled the callback will be called with ERROR_CANCELLED.
    *
    * During an async request no other sync and async calls are allowed, and will result in ERROR_PENDING errors.
    *
-   * Any outstanding I/O request with higher priority (lower numerical value) will be executed before an outstanding request with lower priority. 
+   * Any outstanding I/O request with higher priority (lower numerical value) will be executed before an outstanding request with lower priority.
    * The default priority is PRIORITY_DEFAULT.
    * @param slot A callback to call when the request is satisfied.
    * @param num_files The number of file info objects to request.
@@ -110,7 +110,7 @@ public:
    *
    * See close(), which is the synchronous version of this function.
    *
-   * The operation can be cancelled by triggering the cancellable object from another thread. 
+   * The operation can be cancelled by triggering the cancellable object from another thread.
    * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown by close_finish().
    *
    * @param io_priority The I/O priority of the request.

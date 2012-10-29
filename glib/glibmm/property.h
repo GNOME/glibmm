@@ -49,9 +49,9 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 /** This is the base class for Glib::Object properties.
- * 
+ *
  * This class manages the generic parts of the object properties.
- * Derived (templated) classes handle the specific value types. 
+ * Derived (templated) classes handle the specific value types.
  */
 class PropertyBase
 {
@@ -60,7 +60,7 @@ public:
   /** Returns the name of the property.
    */
   Glib::ustring get_name() const;
-  
+
   /** Notifies the object containing the property that the property has changed.
    * This emits the "notify" signal, passing the property name.
    */
@@ -72,7 +72,7 @@ protected:
   GParamSpec*     param_spec_;
 
   /** This constructs a property of type @a value_type for the @a object.
-   * The property is not registered in the GObject object system 
+   * The property is not registered in the GObject object system
    * until install_property() has been called. Derived classes do this in
    * their constructors.
    *
@@ -86,7 +86,7 @@ protected:
    * Checks if the property has already been installed.
    */
   bool lookup_property(const Glib::ustring& name);
-  
+
   /**
    * Installs the property specified by the given @a param_spec.
    */
@@ -114,7 +114,7 @@ private:
 };
 
 /** A Glib::Object property.
- * 
+ *
  * This class wraps a GObject property, providing a C++ API to the GObject property
  * system, for use with classes derived from Glib::Object or Glib::Interface.
  *
@@ -125,15 +125,15 @@ private:
  *  * A short description.
  *  * The default value and the minimum and maximum bounds (depending on the type of the property).
  *  * Flags, defining, among other things, whether the property can be read or written.
- * 
+ *
  * This Property class currently supports only the name and default value. The
  * minimum and maximum bounds are set to the full range of the value. The nick
  * and the explanation are set to empty. The flags are set to indicate that the
  * property can be both read from and written to.
- * 
- * The class information must be installed into the GObject system once per 
+ *
+ * The class information must be installed into the GObject system once per
  * property, but this is handled automatically.
- * 
+ *
  * A property can be used only as direct data member of a type, inheriting from
  * Glib::Object. A reference to the object must be passed to the constructor of
  * the property.
@@ -149,7 +149,7 @@ public:
    * For each instance of the object, the same property must be constructed with the same name
    */
   Property(Glib::Object& object, const Glib::ustring& name);
-  
+
   /** Constructs a property of the @a object with the specified @a name and @a default_value.
    * For  each instance of the object, the same property must be constructed with the same name.
    */
@@ -159,7 +159,7 @@ public:
    * The object containing the property will be notified about the change.
    */
   inline void set_value(const PropertyType& data);
-  
+
   /** Returns the value of the property.
    */
   inline PropertyType get_value() const;
@@ -168,7 +168,7 @@ public:
    * The object containing the property will be notified about the change.
    */
   inline Property<T>& operator=(const PropertyType& data);
-  
+
   /** Returns the value of the property.
    */
   inline operator PropertyType() const;

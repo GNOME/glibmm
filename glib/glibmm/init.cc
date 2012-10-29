@@ -27,7 +27,7 @@ namespace Glib
 void init()
 {
   Glib::wrap_register_init();
-  Glib::Error::register_init(); //also calls Glib::wrap_init();  
+  Glib::Error::register_init(); //also calls Glib::wrap_init();
 }
 
 } // namespace Glib

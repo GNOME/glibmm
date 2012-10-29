@@ -130,7 +130,7 @@ Glib::ustring content_type_from_mime_type(const Glib::ustring& mime_type);
  * given data.
  */
 Glib::ustring content_type_guess(const std::string& filename,
-                                 const guchar* data, gsize data_size, 
+                                 const guchar* data, gsize data_size,
                                  bool& result_uncertain);
 
 /**
@@ -144,7 +144,7 @@ Glib::ustring content_type_guess(const std::string& filename,
  * given data.
  */
 Glib::ustring content_type_guess(const std::string& filename,
-                                 const std::string& data, 
+                                 const std::string& data,
                                  bool& result_uncertain);
 
 /** Tries to guess the type of the tree with root @a root, by
@@ -152,7 +152,7 @@ Glib::ustring content_type_guess(const std::string& filename,
  * of content types, with the best guess coming first.
  *
  * The types returned all have the form x-content/foo, e.g.
- * x-content/audio-cdda (for audio CDs) or x-content/image-dcf 
+ * x-content/audio-cdda (for audio CDs) or x-content/image-dcf
  * (for a camera memory card). See the <ulink url="http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec">shared-mime-info</ulink>
  * specification for more on x-content types.
  *
