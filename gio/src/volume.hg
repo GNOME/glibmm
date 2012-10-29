@@ -40,15 +40,15 @@ class File;
 class Drive;
 
 /** The Volume interface represents user-visible objects that can be mounted.
- * 
- * Mounting a Volume instance is an asynchronous operation. For more information about asynchronous operations, see AsyncReady and SimpleAsyncReady. To 
+ *
+ * Mounting a Volume instance is an asynchronous operation. For more information about asynchronous operations, see AsyncReady and SimpleAsyncReady. To
  * mount a GVolume, first call mount(), optionally providing a MountOperation object and a SlotAsyncReady callback.
- * 
- * Typically, you will not want to provide a MountOperation if automounting all volumes when a desktop session starts since it's not desirable to 
+ *
+ * Typically, you will not want to provide a MountOperation if automounting all volumes when a desktop session starts since it's not desirable to
  * put up a lot of dialogs asking for credentials.
- * 
- * The callback will be fired when the operation has resolved (either with success or failure), and a AsyncReady structure will be passed to the callback. 
- * That callback should then call g_volume_mount_finish() with the GVolume instance and the GAsyncReady data to see if the operation was completed 
+ *
+ * The callback will be fired when the operation has resolved (either with success or failure), and a AsyncReady structure will be passed to the callback.
+ * That callback should then call g_volume_mount_finish() with the GVolume instance and the GAsyncReady data to see if the operation was completed
  * successfully. If an error is present when finish() is called, then it will be filled with any error information.
  *
  * @newin{2,16}
@@ -110,7 +110,7 @@ public:
   void mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags = MOUNT_MOUNT_NONE);
 
   /** Mounts a volume.
-   * 
+   *
    * @param mount_operation A mount operation.
    */
   void mount(const Glib::RefPtr<MountOperation>& mount_operation, MountMountFlags flags = MOUNT_MOUNT_NONE);
@@ -166,11 +166,11 @@ public:
 
   //_WRAP_VFUNC(bool can_mount(), can_mount)
   //_WRAP_VFUNC(bool can_eject(), can_eject)
-  //_WRAP_VFUNC(void mount_fn(GMountMountFlags flags, GMountOperation* mount_operation, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), mount_fn) //TODO: Rename to mount()?       
+  //_WRAP_VFUNC(void mount_fn(GMountMountFlags flags, GMountOperation* mount_operation, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), mount_fn) //TODO: Rename to mount()?
   //_WRAP_VFUNC(bool mount_finish(GAsyncResult* result, GError** error), mount_finish)
   //_WRAP_VFUNC(void eject(GMountUnmountFlags flags, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data), eject)
   //_WRAP_VFUNC(bool eject_finish(GAsyncResult* result, GError** error), eject_finish)
-  
+
   //_WRAP_VFUNC(std::string get_identifier(const std::string& kind), get_identifier)
 
   //TODO: Use an ArrayHandle.
@@ -190,11 +190,11 @@ Glib::RefPtr<Gio::Volume> wrap(GVolume* object, bool take_copy);
 namespace Container_Helpers
 {
 
-/** This specialization of TypeTraits exists 
- * because the default use of Glib::wrap(GObject*), 
+/** This specialization of TypeTraits exists
+ * because the default use of Glib::wrap(GObject*),
  * instead of a specific Glib::wrap(GSomeInterface*),
  * would not return a wrapper for an interface.
- */ 
+ */
 template <>
 struct TypeTraits< Glib::RefPtr<Gio::Volume> >
 {
@@ -207,7 +207,7 @@ struct TypeTraits< Glib::RefPtr<Gio::Volume> >
 
   static CppType to_cpp_type    (const CType& item)
   {
-    //Use a specific Glib::wrap() function, 
+    //Use a specific Glib::wrap() function,
     //because CType has the specific type (not just GObject):
     return Glib::wrap(item, true /* take_copy */);
   }

@@ -39,9 +39,9 @@ namespace Glib
  *
  * You may also receive notification when a property's value changes, by connecting to signal_changed().
  *
- * You may register new properties for your class (actually for the underlying GType) 
+ * You may register new properties for your class (actually for the underlying GType)
  * simply by adding a PropertyProxy instance as a class member.
- * However, your constructor must call the Glib::ObjectBase constructor with a new GType name, 
+ * However, your constructor must call the Glib::ObjectBase constructor with a new GType name,
  * in order to register a new GType.
  */
 template <class T>
@@ -149,7 +149,7 @@ T PropertyProxy<T>::get_value() const
   return value.get();
 }
 
-//We previously just static_cast<> PropertyProxy_WriteOnly<> to PropertyProxy<> to call its set_value(), 
+//We previously just static_cast<> PropertyProxy_WriteOnly<> to PropertyProxy<> to call its set_value(),
 //to avoid code duplication.
 //But the AIX compiler does not like that hack.
 template <class T>
@@ -162,7 +162,7 @@ void PropertyProxy_WriteOnly<T>::set_value(const T& data)
   set_property_(value);
 }
 
-//We previously just static_cast<> PropertyProxy_WriteOnly<> to PropertyProxy<> to call its set_value(), 
+//We previously just static_cast<> PropertyProxy_WriteOnly<> to PropertyProxy<> to call its set_value(),
 //to avoid code duplication.
 //But the AIX compiler does not like that hack.
 template <class T>

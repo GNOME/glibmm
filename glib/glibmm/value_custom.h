@@ -88,7 +88,7 @@ private:
   inline CppType get_(void*) const;
 };
 
-  
+
 /** Generic value implementation for custom types.
  * @ingroup glibmmValue
  * Any type to be used with this template must implement:

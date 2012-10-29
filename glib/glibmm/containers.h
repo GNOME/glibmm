@@ -61,7 +61,7 @@ public:
   typedef std::bidirectional_iterator_tag iterator_category;
   typedef std::size_t size_type;
   typedef std::ptrdiff_t difference_type;
-  
+
   typedef typename List_Iterator_Base<T>::pointer pointer;
   typedef typename List_Iterator_Base<T>::reference reference;
 

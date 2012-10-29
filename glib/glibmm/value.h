@@ -108,7 +108,7 @@ public:
 
 protected:
   void  set_boxed(const void* data);
-  void* get_boxed() const; // doesn't copy  
+  void* get_boxed() const; // doesn't copy
 };
 
 
@@ -235,7 +235,7 @@ public:
   CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
 
-//The SUN Forte Compiler has a problem with this: 
+//The SUN Forte Compiler has a problem with this:
 #ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for RefPtr<> to const Glib::Object.

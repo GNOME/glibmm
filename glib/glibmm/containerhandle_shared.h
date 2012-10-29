@@ -42,10 +42,10 @@ namespace Glib
 /**
  * @ingroup ContHandles
  */
- 
+
 //! Ownership of the container
-/*! Defines how and if the container will release the list and 
- * its elemens when it is destroyed 
+/*! Defines how and if the container will release the list and
+ * its elemens when it is destroyed
  */
 enum OwnershipType
 {
@@ -145,7 +145,7 @@ struct TypeTraits<T*>
     GObject* cobj = (GObject*)ptr;
     return dynamic_cast<CppType>(Glib::wrap_auto(cobj, false /* take_copy */));
   }
-  
+
   static void    release_c_type (CType   ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
@@ -154,7 +154,7 @@ struct TypeTraits<T*>
 };
 
 //This confuse the SUN Forte compiler, so we ifdef it out:
-#ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS 
+#ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for pointers to const GtkObject instances.
  * @ingroup ContHelpers
@@ -177,7 +177,7 @@ struct TypeTraits<const T*>
      GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
      return dynamic_cast<CppType>(Glib::wrap_auto(cobj, false /* take_copy */));
   }
-  
+
   static void    release_c_type (CType   ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
@@ -211,7 +211,7 @@ struct TypeTraits< Glib::RefPtr<T> >
     return Glib::RefPtr<T>( dynamic_cast<T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
     //We use dynamic_cast<> in case of multiple inheritance.
   }
-  
+
   static void    release_c_type (CType          ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
@@ -247,7 +247,7 @@ struct TypeTraits< Glib::RefPtr<const T> >
     return Glib::RefPtr<const T>( dynamic_cast<const T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
     //We use dynamic_cast<> in case of multiple inheritance.
   }
-  
+
   static void    release_c_type (CType          ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);

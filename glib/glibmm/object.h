@@ -189,7 +189,7 @@ struct TypeTraits< Glib::RefPtr<T> >
     return Glib::RefPtr<T>( dynamic_cast<T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
     //We use dynamic_cast<> in case of multiple inheritance.
   }
-  
+
   static void release_c_type(CType ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
@@ -225,7 +225,7 @@ struct TypeTraits< Glib::RefPtr<const T> >
     return Glib::RefPtr<const T>( dynamic_cast<const T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
     //We use dynamic_cast<> in case of multiple inheritance.
   }
-  
+
   static void release_c_type (CType ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(0, ptr);
@@ -261,7 +261,7 @@ public:
   CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
 
-//The SUN Forte Compiler has a problem with this: 
+//The SUN Forte Compiler has a problem with this:
 #  ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for RefPtr<> to const Glib::Object.

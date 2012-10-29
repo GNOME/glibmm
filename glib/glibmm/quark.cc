@@ -25,7 +25,7 @@ namespace Glib
 {
 
 QueryQuark::QueryQuark(const GQuark& q)
-  : quark_(q) 
+  : quark_(q)
 {}
 
 QueryQuark::QueryQuark(const ustring& s)

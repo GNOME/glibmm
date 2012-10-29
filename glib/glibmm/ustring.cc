@@ -219,7 +219,7 @@ namespace Glib
 {
 
 #ifndef GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
-// Initialize static member here, 
+// Initialize static member here,
 // because the compiler did not allow us do it inline.
 const ustring::size_type ustring::npos = std::string::npos;
 #endif

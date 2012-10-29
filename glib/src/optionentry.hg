@@ -27,18 +27,18 @@ extern "C" { typedef struct _GOptionEntry GOptionEntry; }
 namespace Glib
 {
 
-/** An OptionEntry defines a single option. To have an effect, it must be added to an OptionGroup with 
+/** An OptionEntry defines a single option. To have an effect, it must be added to an OptionGroup with
  * OptionGroup::add_entry().
- * 
- * The long name of an option can be used to specify it in a commandline as --long_name. 
- * Every option must have a long name. To resolve conflicts if multiple option groups contain the same long name, it is also 
+ *
+ * The long name of an option can be used to specify it in a commandline as --long_name.
+ * Every option must have a long name. To resolve conflicts if multiple option groups contain the same long name, it is also
  * possible to specify the option as --groupname-long_name.
  *
  * If an option has a short name, it can be specified as -short_name in a commandline.
  *
  * The description for the option is shown in the --help  output.
  *
- * The arg_descripton is the placeholder to use for the extra argument parsed by the option in --help  output. 
+ * The arg_descripton is the placeholder to use for the extra argument parsed by the option in --help  output.
  */
 class OptionEntry
 {
@@ -60,36 +60,36 @@ public:
   OptionEntry();
   OptionEntry(const OptionEntry& src);
   virtual ~OptionEntry();
-  
+
   OptionEntry& operator=(const OptionEntry& src);
 
   //#m4 _CONVERSION(`Glib::ustring',`const gchar*',`($3).empty() ? NULL : g_strdup(($3).c_str())')
-  
+
   _MEMBER_GET(long_name, long_name, Glib::ustring, const char*)
 
   void set_long_name(const Glib::ustring& value);
-  
+
   _MEMBER_GET(short_name, short_name, gchar, gchar)
   _MEMBER_SET(short_name, short_name, gchar, gchar)
-  
+
   _MEMBER_GET(flags, flags, int, int)
   /** Set one or more OptionEntry::Flags.
    * Do not set FLAG_FILENAME. Character encoding is chosen when the OptionEntry
    * is added to an OptionGroup.
    */
   _MEMBER_SET(flags, flags, int, int)
-  
+
   _MEMBER_GET(description, description, Glib::ustring, const char*)
 
   void set_description(const Glib::ustring& value);
-  
+
   _MEMBER_GET(arg_description, arg_description, Glib::ustring, const char*)
 
   void set_arg_description(const Glib::ustring& value);
-  
+
   GOptionEntry*       gobj()       { return gobject_; }
   const GOptionEntry* gobj() const { return gobject_; }
-  
+
 protected:
 
   GOptionEntry* gobject_;

@@ -30,7 +30,7 @@ void TimeVal::assign_current_time()
 {
   g_get_current_time(this);
 }
- 
+
 bool TimeVal::assign_from_iso8601(const Glib::ustring& iso_date)
 {
   return g_time_val_from_iso8601(iso_date.c_str(), this);
@@ -108,7 +108,7 @@ void TimeVal::subtract_milliseconds(long milliseconds)
 }
 
 void TimeVal::add_microseconds(long microseconds)
-{ 
+{
   g_time_val_add(this, microseconds);
 }
 

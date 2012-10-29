@@ -73,8 +73,8 @@ TInterface* wrap_auto_interface(GObject* object, bool take_copy = false)
     pCppObject = wrap_create_new_wrapper_for_interface(object, TInterface::get_base_type());
   }
 
-  //If no exact wrapper was created, 
-  //create an instance of the interface, 
+  //If no exact wrapper was created,
+  //create an instance of the interface,
   //so we at least get the expected type:
   TInterface* result = 0;
   if(pCppObject)

@@ -33,7 +33,7 @@ _IS_DEPRECATED // This whole file is deprecated.
 //Stop the deprecation ifdef guards around the API declarations:
 #undef G_DISABLE_DEPRECATED
 
-//Stop the compiler warnings about using the deprecated API; 
+//Stop the compiler warnings about using the deprecated API;
 #define GLIB_DISABLE_DEPRECATION_WARNINGS 1
 
 #define GLIBMM_G_DISABLE_DEPRECATED_UNDEFED 1
@@ -71,7 +71,7 @@ enum { THREAD_PRIORITY_NORMAL = GLIBMM_MACRO_DEFINITION_THREAD_PRIORITY_NORMAL }
  * @relates Glib::StaticRecMutex
  * @hideinitializer
  *
- * @deprecated Glib::StaticRecMutex is deprecated in favour of Glib::Threads::RecMutex, which can be used statically. 
+ * @deprecated Glib::StaticRecMutex is deprecated in favour of Glib::Threads::RecMutex, which can be used statically.
  */
 #define GLIBMM_STATIC_REC_MUTEX_INIT { G_STATIC_REC_MUTEX_INIT }
 
@@ -79,7 +79,7 @@ enum { THREAD_PRIORITY_NORMAL = GLIBMM_MACRO_DEFINITION_THREAD_PRIORITY_NORMAL }
  * @relates Glib::StaticRWLock
  * @hideinitializer
  *
- * @deprecated Glib::StaticRWLock is deprecated in favour of Glib::Threads::RWLock, which can be used statically. 
+ * @deprecated Glib::StaticRWLock is deprecated in favour of Glib::Threads::RWLock, which can be used statically.
  */
 #define GLIBMM_STATIC_RW_LOCK_INIT { G_STATIC_RW_LOCK_INIT }
 
@@ -87,7 +87,7 @@ enum { THREAD_PRIORITY_NORMAL = GLIBMM_MACRO_DEFINITION_THREAD_PRIORITY_NORMAL }
  * @relates Glib::StaticPrivate
  * @hideinitializer
  *
- * @deprecated Glib::StaticPrivate is deprecated in favour of Glib::Threads::Private, which can be used statically. 
+ * @deprecated Glib::StaticPrivate is deprecated in favour of Glib::Threads::Private, which can be used statically.
  */
 #define GLIBMM_STATIC_PRIVATE_INIT { G_STATIC_PRIVATE_INIT }
 
@@ -247,7 +247,7 @@ public:
    * @return The new Thread* on success.
    * @throw Glib::ThreadError
    *
-   * @deprecated Use the simpler create() method instead, because all Threads 
+   * @deprecated Use the simpler create() method instead, because all Threads
    * are now joinable, and bounds and priority parameters now have no effect.
    */
   static Thread* create(const sigc::slot<void>& slot, unsigned long stack_size,
@@ -259,7 +259,7 @@ public:
    * @deprecated All threads are now joinable.
    */
   bool joinable() const;
-  
+
   /** Changes the priority of the thread to @a priority.
    * @note It is not guaranteed, that threads with different priorities really
    * behave accordingly.  On some systems (e.g. Linux) only @c root can
@@ -336,7 +336,7 @@ struct StaticMutex;
  * conversion to Mutex&, thus you can safely use Mutex::Lock with a
  * StaticMutex.
  *
- * @deprecated Use Glib::Threads::Mutex instead, which can be used statically. 
+ * @deprecated Use Glib::Threads::Mutex instead, which can be used statically.
  */
 struct StaticMutex
 {
@@ -358,7 +358,7 @@ struct StaticMutex
  * @relates Glib::StaticMutex
  * @hideinitializer
  *
- * @deprecated  Glib::StaticMutex is deprecated in favour of Glib::Threads::Mutex, which can be used statically. 
+ * @deprecated  Glib::StaticMutex is deprecated in favour of Glib::Threads::Mutex, which can be used statically.
  */
 #define GLIBMM_STATIC_MUTEX_INIT { G_STATIC_MUTEX_INIT }
 
@@ -630,9 +630,9 @@ private:
   RWLock::WriterLock& operator=(const RWLock::WriterLock&);
 };
 
-/** An opaque data structure to represent a condition. 
- * A @a Cond is an object that threads can block on, if they find a certain 
- * condition to be false. If other threads change the state of this condition 
+/** An opaque data structure to represent a condition.
+ * A @a Cond is an object that threads can block on, if they find a certain
+ * condition to be false. If other threads change the state of this condition
  * they can signal the @a Cond, such that the waiting thread is woken up.
  * @par Usage example:
  * @code
@@ -670,15 +670,15 @@ public:
   Cond();
   ~Cond();
 
-  /** If threads are waiting for this @a Cond, exactly one of them is woken up. 
-   * It is good practice to hold the same lock as the waiting thread, while calling 
+  /** If threads are waiting for this @a Cond, exactly one of them is woken up.
+   * It is good practice to hold the same lock as the waiting thread, while calling
    * this method, though not required.
    *
    */
   void signal();
 
   /** If threads are waiting for this @a Cond, all of them are woken up.
-   * It is good practice to hold the same lock as the waiting thread, while calling 
+   * It is good practice to hold the same lock as the waiting thread, while calling
    * this method, though not required.
    */
   void broadcast();
@@ -687,12 +687,12 @@ public:
    * The mutex is unlocked before falling asleep and locked again before resuming.
    *
    * @param mutex a @a Mutex that is currently locked.
-   * 
+   *
    * @note It is important to use the @a wait() and @a timed_wait() methods
-   * only inside a loop, which checks for the condition to be true as it is not 
-   * guaranteed that the waiting thread will find it fulfilled, even if the signaling 
-   * thread left the condition in that state. This is because another thread can have 
-   * altered the condition, before the waiting thread got the chance to be woken up, 
+   * only inside a loop, which checks for the condition to be true as it is not
+   * guaranteed that the waiting thread will find it fulfilled, even if the signaling
+   * thread left the condition in that state. This is because another thread can have
+   * altered the condition, before the waiting thread got the chance to be woken up,
    * even if the condition itself is protected by a @a Mutex.
    */
   void wait(Mutex& mutex);
@@ -702,12 +702,12 @@ public:
    *
    * @param mutex a @a Mutex that is currently locked.
    * @param abs_time a max time to wait.
-   * 
+   *
    * @note It is important to use the @a wait() and @a timed_wait() methods
-   * only inside a loop, which checks for the condition to be true as it is not 
-   * guaranteed that the waiting thread will find it fulfilled, even if the signaling 
-   * thread left the condition in that state. This is because another thread can have 
-   * altered the condition, before the waiting thread got the chance to be woken up, 
+   * only inside a loop, which checks for the condition to be true as it is not
+   * guaranteed that the waiting thread will find it fulfilled, even if the signaling
+   * thread left the condition in that state. This is because another thread can have
+   * altered the condition, before the waiting thread got the chance to be woken up,
    * even if the condition itself is protected by a @a Mutex.
    */
   bool timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time);

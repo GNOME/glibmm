@@ -25,7 +25,7 @@
 namespace
 {
 
-static void Application_signal_open_callback(GApplication* self, GFile** files, 
+static void Application_signal_open_callback(GApplication* self, GFile** files,
   gint n_files, const gchar* hint, void* data)
 {
   typedef sigc::slot< void, const Gio::Application::type_vec_files&, const Glib::ustring& > SlotType;
@@ -35,7 +35,7 @@ static void Application_signal_open_callback(GApplication* self, GFile** files,
   {
     vec_files[i] = Glib::wrap(files[i], true);
   }
-  
+
   const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
 
   // Do not try to call a signal on a disassociated wrapper.
@@ -68,7 +68,7 @@ static void Application_signal_open_notify_callback(GApplication* self, GFile** 
   {
     vec_files[i] = Glib::wrap(files[i], true);
   }
-  
+
   const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
 
   // Do not try to call a signal on a disassociated wrapper.
@@ -118,7 +118,7 @@ Application::Application(const Glib::ustring& application_id, ApplicationFlags f
   Glib::ObjectBase(0),
   Glib::Object(Glib::ConstructParams(custom_class_init(), "application_id", (application_id.empty() ? 0 : application_id.c_str()), "flags", ((GApplicationFlags)(flags)), static_cast<char*>(0)))
 {
-  
+
 }
 
 //static
@@ -127,7 +127,7 @@ void Application::unset_default()
   g_application_set_default(0);
 }
 
-void Application_Class::open_callback(GApplication* self, GFile** files, 
+void Application_Class::open_callback(GApplication* self, GFile** files,
   gint n_files, const gchar *hint)
 {
   Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
@@ -151,9 +151,9 @@ void Application_Class::open_callback(GApplication* self, GFile** files,
         for (int i = 0; i < n_files; i++) {
           vec_files[i] = Glib::wrap(files[i], true);
         }
-        
+
         const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
-  
+
         obj->on_open(vec_files, hint_str);
         return;
       }
@@ -163,7 +163,7 @@ void Application_Class::open_callback(GApplication* self, GFile** files,
       }
     }
   }
-  
+
   BaseClassType *const base = static_cast<BaseClassType*>(
     g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
     );
@@ -185,7 +185,7 @@ void Gio::Application::on_open(const Application::type_vec_files& files, const G
   );
 
   if(base && base->open) {
-    (*base->open)(gobj(), 
+    (*base->open)(gobj(),
       Glib::ArrayHandler<type_vec_files::value_type>::vector_to_array(files).data(),
       files.size(),
       hint.c_str());
@@ -194,7 +194,7 @@ void Gio::Application::on_open(const Application::type_vec_files& files, const G
 
 void Application::open(const type_vec_files& files, const Glib::ustring& hint)
 {
-  g_application_open(gobj(), 
+  g_application_open(gobj(),
     Glib::ArrayHandler<type_vec_files::value_type>::vector_to_array(files).data(),
     files.size(),
     hint.c_str());

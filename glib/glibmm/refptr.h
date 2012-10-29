@@ -55,7 +55,7 @@ public:
    * Afterwards it will be null and use of -> will cause a segmentation fault.
    */
   inline RefPtr();
-  
+
   /// Destructor - decrements reference count.
   inline ~RefPtr();
 
@@ -94,7 +94,7 @@ public:
 
   /// Tests whether the RefPtr<> point to the same underlying instance.
   inline bool operator==(const RefPtr<T_CppObject>& src) const;
-  
+
   /// See operator==().
   inline bool operator!=(const RefPtr<T_CppObject>& src) const;
 
@@ -137,7 +137,7 @@ public:
 
   /** Static cast to derived class.
    *
-   * Like the dynamic cast; the notation is 
+   * Like the dynamic cast; the notation is
    * @code
    *   ptr_derived = RefPtr<Derived>::cast_static(ptr_base);
    * @endcode
@@ -155,7 +155,7 @@ public:
   template <class T_CastFrom>
   static inline RefPtr<T_CppObject> cast_const(const RefPtr<T_CastFrom>& src);
 
-  //TODO: Maybe remove these if we replace operator bool() with operator const void* after 
+  //TODO: Maybe remove these if we replace operator bool() with operator const void* after
   //an API/ABI break, as suggested by Daniel Elstner? murrayc.
   //See bug https://bugzilla.gnome.org/show_bug.cgi?id=626858
 

@@ -131,7 +131,7 @@ static gboolean gtype_wraps_interface(GType implementer_type, GType interface_ty
   {
     found = (ifaces[n_ifaces] == interface_type);
   }
-      
+
   g_free (ifaces);
 
   return found;
@@ -155,7 +155,7 @@ Glib::ObjectBase* wrap_create_new_wrapper_for_interface(GObject* object, GType i
   {
     // Look up the wrap table index stored in the type's static data.
     // If a wrap_new() has been registered for the type then call it.
-    // But only if the type implements the interface, 
+    // But only if the type implements the interface,
     // so that the C++ instance is likely to inherit from the appropriate class too.
     //
     const gpointer idx = g_type_get_qdata(type, Glib::quark_);

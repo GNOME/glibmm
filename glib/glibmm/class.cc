@@ -53,7 +53,7 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
   //GTypeQuery::instance_size is guint but GTypeInfo::instance_size is guint16.
   const guint16 instance_size =
    (guint16)base_query.instance_size;
- 
+
   const GTypeInfo derived_info =
   {
     class_size,
@@ -75,7 +75,7 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
   }
 
   gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, (void*)0);
-  
+
   if(module)
     gtype_ = g_type_module_register_type(module, base_type, derived_name, &derived_info, GTypeFlags(0));
   else

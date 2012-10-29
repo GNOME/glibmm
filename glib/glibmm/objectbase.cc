@@ -271,7 +271,7 @@ sigc::connection ObjectBase::connect_property_changed_with_return(const Glib::us
   // which will contain a switch/case statement which will examine the property name.
   const Glib::ustring notify_signal_name = "notify::" + property_name;
   pConnectionNode->connection_id_ = g_signal_connect_data(gobj(),
-         notify_signal_name.c_str(), (GCallback)(&PropertyProxyConnectionNode::callback), pConnectionNode, 
+         notify_signal_name.c_str(), (GCallback)(&PropertyProxyConnectionNode::callback), pConnectionNode,
          &PropertyProxyConnectionNode::destroy_notify_handler,
          G_CONNECT_AFTER);
 
