@@ -19,6 +19,7 @@
 
 #include <gio/gio.h>
 #include <glibmm/error.h>
+#include <glibmm/variant.h>
 #include "slot_async.h"
 
 namespace Gio
@@ -121,6 +122,37 @@ Resolver::lookup_service_async(const Glib::ustring& service,
                                    0,
                                    &SignalProxy_async_callback,
                                    slot_copy);
+}
+
+void
+Resolver::lookup_records_async(const Glib::ustring& rrname,
+                               ResolverRecordType record_type,
+                               const SlotAsyncReady& slot,
+                               const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_records_async(gobj(),
+                                  (rrname.empty() ? 0 : rrname.c_str()),
+                                  static_cast<GResolverRecordType>(record_type),
+                                  Glib::unwrap(cancellable),
+                                  &SignalProxy_async_callback,
+                                  slot_copy);
+}
+
+void
+Resolver::lookup_records_async(const Glib::ustring& rrname,
+                               ResolverRecordType record_type,
+                               const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_records_async(gobj(),
+                                  (rrname.empty() ? 0 : rrname.c_str()),
+                                  static_cast<GResolverRecordType>(record_type),
+                                  0,
+                                  &SignalProxy_async_callback,
+                                  slot_copy);
 }
 
 std::string
