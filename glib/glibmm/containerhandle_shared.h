@@ -22,6 +22,7 @@
 #include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
+#include <glibmm/variant.h>
 #include <glibmm/wrap.h>
 #include <glibmm/debug.h>
 #include <glib-object.h>
@@ -322,6 +323,51 @@ struct TypeTraits<bool>
   static CppType to_cpp_type    (CType   item) { return (item != 0); }
   static void    release_c_type (CType) {}
 };
+
+/** Specialization for Glib::VariantBase.
+ * @ingroup ContHelpers
+ */
+template <>
+struct TypeTraits<Glib::VariantBase>
+{
+  typedef Glib::VariantBase     CppType;
+  typedef GVariant *            CType;
+  typedef GVariant *            CTypeNonConst;
+
+  static CType to_c_type (const Glib::VariantBase& v)
+    { return const_cast<CTypeNonConst>(v.gobj()); }
+
+  static CType to_c_type (CType v) { return v; }
+
+  static CppType to_cpp_type(CType v)
+    { return Glib::VariantBase(v, true); }
+
+  static void release_c_type(CType v)
+    { g_variant_unref(const_cast<CTypeNonConst>(v)); }
+};
+
+/** Specialization for Glib::VariantContainerBase.
+ * @ingroup ContHelpers
+ */
+template <>
+struct TypeTraits<Glib::VariantContainerBase>
+{
+  typedef Glib::VariantContainerBase    CppType;
+  typedef GVariant *                    CType;
+  typedef GVariant *                    CTypeNonConst;
+
+  static CType to_c_type (const Glib::VariantContainerBase& v)
+    { return const_cast<CTypeNonConst>(v.gobj()); }
+
+  static CType to_c_type (CType v) { return v; }
+
+  static CppType to_cpp_type(CType v)
+    { return Glib::VariantContainerBase(v, true); }
+
+  static void release_c_type(CType v)
+    { g_variant_unref(const_cast<CTypeNonConst>(v)); }
+};
+
 
 #ifndef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
 
