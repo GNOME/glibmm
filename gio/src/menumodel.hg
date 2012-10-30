@@ -136,6 +136,10 @@ dnl See the .ccg implementation for how this conversion works.
   //It makes no sense to return const by value.
   _CONVERSION(`MenuAttribute',`const gchar*',`giomm_get_menu_attribute($3)')
 #m4end
+
+  //TODO: Add a get_item_attribute() templated method to get values directly
+  //instead of returning a Glib::VariantBase?
+
   _WRAP_METHOD(Glib::VariantBase get_item_attribute(int item_index, MenuAttribute attribute, const Glib::VariantType& expected_type), g_menu_model_get_item_attribute_value)
   _WRAP_METHOD(const Glib::VariantBase get_item_attribute(int item_index, MenuAttribute attribute, const Glib::VariantType& expected_type) const, g_menu_model_get_item_attribute_value, constversion)
 
@@ -159,6 +163,9 @@ dnl See the .ccg implementation for how this conversion works.
   _WRAP_METHOD(Glib::RefPtr<const MenuLinkIter> iterate_item_links(int item_index) const, g_menu_model_iterate_item_links, constversion)
 
   _WRAP_METHOD(void items_changed(int position, int removed, int added), g_menu_model_items_changed)
+
+  //TODO: The "items-changed" signal cannot be wrapped because it is not
+  //included in the *Class declaration of GMenuModel.
 };
 
 } // namespace Gio
