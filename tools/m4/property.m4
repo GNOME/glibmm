@@ -8,7 +8,7 @@ dnl
 
 dnl                  $1         $2            $3          $4           $5        $6
 dnl _PROPERTY_PROXY(name, name_underscored, cpp_type, proxy_suffix, deprecated, docs)
-dnl proxy_suffix could be "_WriteOnly" or "_ReadOnly"
+dnl proxy_suffix could be "", "_WriteOnly" or "_ReadOnly"
 dnl The method will be const if the propertyproxy is _ReadOnly.
 dnl
 define(`_PROPERTY_PROXY',`dnl
@@ -21,8 +21,9 @@ Glib::PropertyProxy$4< _QUOTE($3) >'dnl
 /** $6
    *
    * You rarely need to use properties because there are get_ and set_ methods for almost all of them.
-   * @return A PropertyProxy that allows you to get or set the property of the value, or receive notification when
-   * the value of the property changes.
+   * @return A PropertyProxy$4 that allows you to dnl
+ifelse($4,_ReadOnly,get,`ifelse($4,_WriteOnly,set,get or set)') the value of the property,
+   * or receive notification when the value of the property changes.
    */
   __PROXY_TYPE__ property_$2`'() ifelse($4,_ReadOnly, const,);
 #endif //#GLIBMM_PROPERTIES_ENABLED
