@@ -18,7 +18,36 @@
  */
 
 #include <gio/gio.h>
+#include "slot_async.h"
 
 namespace Gio
 {
+
+void
+SocketConnection::connect_async(const Glib::RefPtr<SocketAddress>& address,
+                                const SlotAsyncReady& slot,
+                                const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_connection_connect_async(gobj(),
+                                    Glib::unwrap(address),
+                                    Glib::unwrap(cancellable),
+                                    &SignalProxy_async_callback,
+                                    slot_copy);
+}
+
+void
+SocketConnection::connect_async(const Glib::RefPtr<SocketAddress>& address,
+                                const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_socket_connection_connect_async(gobj(),
+                                    Glib::unwrap(address),
+                                    0,
+                                    &SignalProxy_async_callback,
+                                    slot_copy);
+}
+
 } // namespace Gio

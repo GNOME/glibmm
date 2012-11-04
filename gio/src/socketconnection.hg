@@ -54,20 +54,45 @@ class SocketConnection : public Gio::IOStream
     _CLASS_GOBJECT(SocketConnection, GSocketConnection, G_SOCKET_CONNECTION, Gio::IOStream, GIOStream)
 
 public:
-_WRAP_METHOD(Glib::RefPtr<Socket> get_socket(), g_socket_connection_get_socket, refreturn)
-_WRAP_METHOD(Glib::RefPtr<const Socket> get_socket() const, g_socket_connection_get_socket, constversion, refreturn)
-_WRAP_METHOD(Glib::RefPtr<SocketAddress> get_local_address(), g_socket_connection_get_local_address, errthrow)
-_WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_local_address() const, g_socket_connection_get_local_address, constversion, errthrow)
-_WRAP_METHOD(Glib::RefPtr<SocketAddress> get_remote_address(), g_socket_connection_get_remote_address, errthrow)
-_WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_remote_address() const, g_socket_connection_get_remote_address, constversion, errthrow)
+  _WRAP_METHOD(bool connect(const Glib::RefPtr<SocketAddress>& address, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_connection_connect, errthrow)
 
-// Not sure that registering new GTypes with the factory is useful for the C++ binding
-//_WRAP_METHOD(void factory_register_type(GType g_type, GSocketFamily family, GSocketType type, gint protocol);
-//_WRAP_METHOD(GType factory_lookup_type(GSocketFamily family, GSocketType type, gint protocol_id);
+  /**  Asynchronously connect this connection to the specified remote address.
+   * This clears the "blocking" flag on this connection's underlying socket if
+   * it is currently set.
+   *
+   * Use connect_finish() to retrieve the result.
+   *
+   * @param address A SocketAddress specifying the remote address.
+   * @param slot A SlotAsyncReady slot.
+   * @param cancellable A Cancellable.
+   * @newin{2,36}
+   */
+  void connect_async(const Glib::RefPtr<SocketAddress>& address,
+    const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
+  _IGNORE(g_socket_connection_connect_async)
 
-_WRAP_METHOD(static Glib::RefPtr<SocketConnection> create(const Glib::RefPtr<Socket>& socket), g_socket_connection_factory_create_connection)
+  /// A Non-cancellable version of connect_async().
+  void connect_async(const Glib::RefPtr<SocketAddress>& address,
+    const SlotAsyncReady& slot);
 
-_WRAP_PROPERTY("socket", Glib::RefPtr<Socket>)
+  _WRAP_METHOD(bool connect_finish(const Glib::RefPtr<AsyncResult>& result), g_socket_connection_connect_finish, errthrow)
+
+  _WRAP_METHOD(bool is_connected() const, g_socket_connection_is_connected)
+
+  _WRAP_METHOD(Glib::RefPtr<Socket> get_socket(), g_socket_connection_get_socket, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Socket> get_socket() const, g_socket_connection_get_socket, constversion, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_local_address(), g_socket_connection_get_local_address, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_local_address() const, g_socket_connection_get_local_address, constversion, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_remote_address(), g_socket_connection_get_remote_address, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<const SocketAddress> get_remote_address() const, g_socket_connection_get_remote_address, constversion, errthrow)
+
+  // Not sure that registering new GTypes with the factory is useful for the C++ binding
+  //_WRAP_METHOD(void factory_register_type(GType g_type, GSocketFamily family, GSocketType type, gint protocol);
+  //_WRAP_METHOD(GType factory_lookup_type(GSocketFamily family, GSocketType type, gint protocol_id);
+
+  _WRAP_METHOD(static Glib::RefPtr<SocketConnection> create(const Glib::RefPtr<Socket>& socket), g_socket_connection_factory_create_connection)
+
+  _WRAP_PROPERTY("socket", Glib::RefPtr<Socket>)
 };
 
 } // namespace Gio
