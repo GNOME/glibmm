@@ -49,7 +49,49 @@ public:
 
     _WRAP_METHOD(Glib::RefPtr<Credentials> receive_credentials(const Glib::RefPtr<Cancellable>& cancellable{?}), g_unix_connection_receive_credentials, errthrow)
     _WRAP_METHOD(Glib::RefPtr<const Credentials> receive_credentials(const Glib::RefPtr<Cancellable>& cancellable{?}) const, g_unix_connection_receive_credentials, errthrow, constversion)
+
+  /**  Asynchronously receive credentials.
+   * For more details, see receive_credentials() which is the synchronous
+   * version of this call.
+   *
+   * When the operation is finished, @a slot will be called. You can then call
+   * receive_credentials_finish() to get the result of the operation.
+   *
+   * @param slot A SlotAsyncReady to call when the request is satisfied. 
+   * @param cancellable A Cancellable object.
+   * @newin{2,36}
+   */
+  void receive_credentials_async(const SlotAsyncReady& slot,
+    const Glib::RefPtr<Cancellable>& cancellable);
+  _IGNORE(g_unix_connection_receive_credentials_async)
+
+  /// A non-cancellable version of receive_credentials_async().
+  void receive_credentials_async(const SlotAsyncReady& slot);
+
+  _WRAP_METHOD(Glib::RefPtr<Credentials> receive_credentials_finish(const Glib::RefPtr<AsyncResult>& result), g_unix_connection_receive_credentials_finish, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<const Credentials> receive_credentials_finish(const Glib::RefPtr<AsyncResult>& result) const, g_unix_connection_receive_credentials_finish, errthrow, constversion)
+
     _WRAP_METHOD(bool send_credentials(const Glib::RefPtr<Cancellable>& cancellable{?}), g_unix_connection_send_credentials, errthrow)
+
+  /**  Asynchronously send credentials.
+   * For more details, see send_credentials() which is the synchronous version
+   * of this call.
+   *
+   * When the operation is finished, @a slot will be called. You can then call
+   * send_credentials_finish() to get the result of the operation.
+   *
+   * @param slot A SlotAsyncReady to call when the request is satisfied. 
+   * @param cancellable A Cancellable object.  
+   * @newin{2,36}
+   */
+  void send_credentials_async(const SlotAsyncReady& slot,
+    const Glib::RefPtr<Cancellable>& cancellable);
+  _IGNORE(g_unix_connection_send_credentials_async)
+
+  /// A non-cancellable version of send_credentials_async().
+  void send_credentials_async(const SlotAsyncReady& slot);
+
+  _WRAP_METHOD(bool send_credentials_finish(const Glib::RefPtr<AsyncResult>& result), g_unix_connection_send_credentials_finish, errthrow)
 };
 
 } // namespace Gio

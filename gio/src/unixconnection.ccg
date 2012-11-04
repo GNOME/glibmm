@@ -19,7 +19,54 @@
 
 #include <gio/gio.h>
 #include <gio/gunixconnection.h>
+#include "slot_async.h"
 
 namespace Gio
 {
+
+void UnixConnection::receive_credentials_async(const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_unix_connection_receive_credentials_async(gobj(),
+                                              Glib::unwrap(cancellable),
+                                              &SignalProxy_async_callback,
+                                              slot_copy);
+}
+
+void UnixConnection::receive_credentials_async(const SlotAsyncReady& slot)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_unix_connection_receive_credentials_async(gobj(),
+                                              0,
+                                              &SignalProxy_async_callback,
+                                              slot_copy);
+}
+
+void
+UnixConnection::send_credentials_async(const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_unix_connection_send_credentials_async(gobj(),
+                                           Glib::unwrap(cancellable),
+                                           &SignalProxy_async_callback,
+                                           slot_copy);
+}
+
+void
+UnixConnection::send_credentials_async(const SlotAsyncReady& slot)
+
+{
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_unix_connection_send_credentials_async(gobj(),
+                                           0,
+                                           &SignalProxy_async_callback,
+                                           slot_copy);
+}
+
 } // namespace Gio
