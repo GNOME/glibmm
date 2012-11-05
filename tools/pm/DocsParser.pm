@@ -112,11 +112,12 @@ sub parse_on_start($$%)
 
   $tag = lc($tag);
 
-  if($tag eq "function" or $tag eq "signal")
+  if($tag eq "function" or $tag eq "signal" or $tag eq "enum")
   {
     if(defined $DocsParser::objCurrentFunction)
     {
-      $objParser->xpcroak("\nClose a function tag before you open another one.");
+      $objParser->xpcroak(
+        "\nClose a function, signal or enum tag before you open another one.");
     }
 
     my $functionName = $attr{name};
@@ -194,7 +195,7 @@ sub parse_on_end($$)
 
   $tag = lc($tag);
 
-  if($tag eq "function" or $tag eq "signal")
+  if($tag eq "function" or $tag eq "signal" or $tag eq "enum")
   {
     # Store the Function structure in the array:
     my $functionName = $$DocsParser::objCurrentFunction{name};
@@ -233,6 +234,77 @@ sub parse_on_cdata($$)
 }
 
 
+# $text lookup_enum_description($enum_name)
+# Looks up the description of enum and returns it after converting it from
+# C to C++ format.
+sub lookup_enum_description($)
+{
+  my ($enum_name) = @_;
+
+  my $objFunction = $DocsParser::hasharrayFunctions{$enum_name};
+  if(!$objFunction)
+  {
+    #print "DocsParser.pm: Warning: enum not found: $enum_name\n";
+    return ""
+  }
+
+  my $text = $$objFunction{description};
+
+  if(length($text) eq 0)
+  {
+    print "DocsParser.pm: Warning: No C docs for: \"$enum_name\"\n";
+    return "";
+  }
+
+  DocsParser::convert_docs_to_cpp($objFunction, \$text);
+  DocsParser::add_m4_quotes(\$text);
+
+  # Escape the space after "i.e." or "e.g." in the brief description.
+  $text =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
+
+  remove_example_code($enum_name, \$text);
+
+  return $text;
+}
+
+# $strCommentBlock lookup_enum_value_documentation($enum_name, $c_val_name)
+# Returns a Doxygen comment block for the enum value.
+sub lookup_enum_value_documentation($$)
+{
+  my ($enum_name, $c_val_name) = @_;
+  
+  # Assume that there is no description.
+  my $desc = "";
+
+  my $obj_function = $DocsParser::hasharrayFunctions{$enum_name};
+  
+  if($obj_function)
+  {
+    my $param_descriptions = \$$obj_function{param_descriptions};
+    $desc = $$param_descriptions->{$c_val_name};
+  }
+ 
+  if(!$desc or length($desc) eq 0)
+  {
+    return "";
+  }
+  
+  DocsParser::convert_docs_to_cpp($obj_function, \$desc);
+  DocsParser::add_m4_quotes(\$desc);
+
+  # Escape the space after "i.e." or "e.g." in the brief description.
+  $desc =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
+
+  remove_example_code($enum_name, \$desc);
+
+  # Convert to Doxygen-style comment.
+  $desc =~ s/\n/\n${DocsParser::commentMiddleStart}/g;
+  $desc =  $DocsParser::commentStart . $desc;
+  $desc .= "\n${DocsParser::commentEnd}\n";
+
+  return $desc;
+}
+
 # $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs)
 sub lookup_documentation($$)
 {
@@ -266,16 +338,8 @@ sub lookup_documentation($$)
 
   # Escape the space after "i.e." or "e.g." in the brief description.
   $text =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
-
-  # Remove C example code.
-  my $example_removals =
-    ($text =~ s"<informalexample>.*?</informalexample>"[C example ellipted]"sg);
-  $example_removals +=
-    ($text =~ s"<programlisting>.*?</programlisting>"\n[C example ellipted]"sg);
-  $example_removals += ($text =~ s"\|\[.*?]\|"\n[C example ellipted]"sg);
-
-  print STDERR "gmmproc: $functionName(): Example code discarded.\n"
-    if ($example_removals);
+  
+  remove_example_code($functionName, \$text);
 
   # Convert to Doxygen-style comment.
   $text =~ s/\n/\n${DocsParser::commentMiddleStart}/g;
@@ -283,6 +347,23 @@ sub lookup_documentation($$)
   $text .= "\n${DocsParser::commentEnd}\n";
 
   return $text;
+}
+
+# void remove_example_code($obj_name, \$text)
+# Removes example code from the text of docs (passed by reference).
+sub remove_example_code($$)
+{
+  my ($obj_name, $text) = @_;
+
+  # Remove C example code.
+  my $example_removals =
+    ($$text =~ s"<informalexample>.*?</informalexample>"[C example ellipted]"sg);
+  $example_removals +=
+    ($$text =~ s"<programlisting>.*?</programlisting>"\n[C example ellipted]"sg);
+  $example_removals += ($$text =~ s"\|\[.*?]\|"\n[C example ellipted]"sg);
+
+  print STDERR "gmmproc: $obj_name: Example code discarded.\n"
+    if ($example_removals);
 }
 
 sub add_m4_quotes($)

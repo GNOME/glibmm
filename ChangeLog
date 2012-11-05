@@ -1,3 +1,56 @@
+2012-11-04  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: Make enum documentation possible.
+
+	* tools/defs_gen/docextract.py (enum_name_pattern): Add a new regular
+	expression that recognizes gtk-doc enum comment blocks (though
+	imperfectly because it also catches things such as structure comment
+	blocks).
+	(identifier_patterns): Append the new enum_name_pattern to the list of
+	patterns used to test each gtk-doc block's identifier to see what type
+	of block it is.
+	(parse_file): Do not add a particular gtk-doc block if it has been
+	marked as a block initially thought to be an enum comment block but
+	later found not to be so.
+	(skip_to_identifier): Mark the current comment block as an enum type
+	if the enum_name_pattern matches the identifier.
+	(process_params): Mark the current block as invalid if the block was
+	recognized as an enum type but no parameters are found or if any of
+	the parameter names are not all caps.
+	(parse_dir): Include .h files for processing because gtk-doc enum
+	comment blocks are included in those files.
+	* tools/defs_gen/docextract_to_xml.py: Add an option to not print out
+	enum docs.  Assume that enum docs should be printed out by default.
+	* tools/pm/DocsParser.pm (parse_on_start):
+	(parse_on_end): Add logic to correctly parse an <enum> tag (which is
+	just like the already existing <function> and <signal> tags.  The only
+	difference is in the name of the tags.  The function name syntax is
+	the same as a C function name, the signal name has the form
+	'CStructName::signal-name' while the enum name has the form
+	'CEnumName')
+	(lookup_enum_description): Add this subroutine that gets the
+	the description of the specified enum.
+	(lookup_enum_value_documentation): Add this subroutine that gets the
+	description of an enum value as a Doxygen block.
+	(lookup_documentation): Use the new remove_example_code subroutine
+	described below.
+	(remove_example_code): Add this subroutine that removes example code
+	from the specified text so that it can be used in other places.
+	* tools/pm/Enum.pm (c_prefix): Add a new field to the class storing
+	the enum's C prefix.  This field is used when looking up an enum's
+	value documentation.
+	(parse_values): Modified to store the C prefix of the enum.
+	(build_element_list): Modified to lookup the documentation of the
+	values of the enum and insert the Doxygen block just before each
+	value.  This allows Doxygen to document each value of the enum.
+	* tools/pm/Output.pm (output_wrap_enum): Modified to lookup
+	the description of the enum previously parsed by the DocParser and
+	merge it with an already passed in comment for the enum which is then
+	passed as before to the _ENUM macro.
+	* tools/m4/enum.m4: Whitespace correction.
+
+	Bug #544694.
+
 2012-11-04  Murray Cumming  <murrayc@murrayc.com>
 
         MountOperation: Correct an ABI break.

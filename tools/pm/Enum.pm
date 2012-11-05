@@ -2,6 +2,7 @@ package Enum;
 
 use strict;
 use warnings;
+use DocsParser;
 
 BEGIN {
      use Exporter   ();
@@ -27,6 +28,7 @@ our @EXPORT_OK;
 #
 #       string array elem_names;
 #       string array elem_values;
+#       string c_prefix;
 #
 #       bool mark;
 #    }
@@ -143,6 +145,7 @@ sub new
 
   $$self{mark}  = 0;
   $$self{flags} = 0;
+  $$self{c_prefix} = "";
 
   $$self{elem_names}  = [];
   $$self{elem_values} = [];
@@ -215,6 +218,9 @@ sub parse_values($$)
   {
     # cut off the module prefix, e.g. GTK_
     s/^$common_prefix// foreach (@$elem_names);
+    
+    # Save the common prefix.
+    $$self{c_prefix}  = $common_prefix;
   }
 
   $$self{elem_names}  = $elem_names;
@@ -316,7 +322,23 @@ sub build_element_list($$$$)
       $name  =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
       $value =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
     }
+   
+    my $docs  =
+      DocsParser::lookup_enum_value_documentation("$$self{c_type}",
+        "$$self{c_prefix}$name");
 
+    if($docs ne "")
+    {
+      # Make sure the docs is indented the right number of spaces.
+      # (First remove initial spaces in first line and then the rest
+      # and then indent the lines).
+      $docs =~ s/^\s+//;
+      $docs =~ s/\n\s+/\n/g;
+      $docs =~ s/\n(\s*\*)/\n${indent} $1/g;
+      $docs = "${indent}${docs}";
+    }
+
+    $elements .= $docs;
     $elements .= "${indent}${name}";
     $elements .= " = ${value}" if($value ne "");
     $elements .= ",\n" if($i < $num_elements - 1);

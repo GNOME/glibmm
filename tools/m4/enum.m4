@@ -1,4 +1,3 @@
-
 dnl
 dnl _ENUM(cpp_type, c_type, value_suffix, `element_list', `flags', `optional_refdoc_comment', 'get_type_function_name')
 dnl
@@ -20,7 +19,7 @@ m4_define(`__DOCGROUP_'__MODULE_CANONICAL__`_ENUMS__')dnl
 ')dnl endif
 dnl
 dnl
-/**$6
+/** $6
  * @ingroup __MODULE_CANONICAL__`'Enums
 m4_ifelse($3,Flags,`dnl
  * @par Bitwise operators:
@@ -98,4 +97,3 @@ GType Glib::Value<__NAMESPACE__::__ENUM_CPPNAME__>::value_type()
 _POP()
 ')dnl endif !NO_GTYPE
 ')dnl enddef _ENUM
-

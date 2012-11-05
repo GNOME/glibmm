@@ -601,6 +601,18 @@ sub output_wrap_enum($$$$$$$)
 
   my $value_suffix = "Enum";
   $value_suffix = "Flags" if($$objEnum{flags});
+  
+  # Get the existing enum description from the parsed docs.
+  my $description = DocsParser::lookup_enum_description("$c_type");
+
+  # Prepend the Doxygen marker ' * ' to all but the first line.
+  $description =~ s/\n/\n * /g;
+ 
+  # Make sure indentation of passed in comment is correct.
+  $comment =~ s/\n\s*\*/\n */g;
+ 
+  # Merge the passed in comment to the existing enum documentation.
+  $comment = $comment . "\n * " . $description;
 
   my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\')dnl\n",
     $cpp_type,
