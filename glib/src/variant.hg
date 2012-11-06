@@ -718,6 +718,14 @@ public:
   static Variant< std::vector<std::string> >
     create(const std::vector<std::string>& data);
 
+  /** Creates a new Variant from an array of D-Bus object paths.
+   * @param data The array to use for creation.
+   * @return The new Variant.
+   * @newin{2,36}
+   */
+  static Variant< std::vector<std::string> >
+    create_from_object_paths(const std::vector<std::string>& paths);
+
   /** Gets a specific element of the string array.  It is an error if @a index
    * is greater than the number of child items in the container.  See
    * VariantContainerBase::get_n_children().
@@ -737,6 +745,10 @@ public:
    */
   std::vector<std::string> get() const;
   _IGNORE(g_variant_get_bytestring_array, g_variant_dup_bytestring_array)
+
+  // Object paths are merely strings so it is possible to get them already with
+  // the existing get() methods in this class.
+  _IGNORE(g_variant_get_objv, g_variant_dup_objv)
 
   /** Gets a VariantIter of the Variant.
    * @return the VaraintIter.

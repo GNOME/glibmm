@@ -486,10 +486,39 @@ Variant<type_vec_string>::create(const type_vec_string& data)
   // Terminate the string array.
   str_array[data.size()] = NULL;
 
-  // Create the variant using the builder.
+  // Create the variant using g_variant_new_bytestring_array() (passing the
+  // newly constructed array.
   Variant<type_vec_string> result =
     Variant<type_vec_string>(g_variant_new_bytestring_array(str_array,
       data.size()));
+
+  g_strfreev(str_array);
+
+  // Remove the floating reference (since it is newly created).
+  g_variant_ref_sink(result.gobj());
+
+  return result;
+}
+
+Variant<type_vec_string>
+Variant<type_vec_string>::create_from_object_paths(const type_vec_string& data)
+{
+  // Create a string array to add the strings of the vector to.
+  char** str_array = g_new(char*, data.size() + 1);
+
+  // Add the elements of the vector into the string array.
+  for(type_vec_string::size_type i = 0; i < data.size(); i++)
+  {
+    str_array[i] = g_strdup(data[i].c_str());
+  }
+
+  // Terminate the string array.
+  str_array[data.size()] = NULL;
+
+  // Create the variant using g_variant_new_objv() (passing the
+  // newly constructed array.
+  Variant<type_vec_string> result =
+    Variant<type_vec_string>(g_variant_new_objv(str_array, data.size()));
 
   g_strfreev(str_array);
 
