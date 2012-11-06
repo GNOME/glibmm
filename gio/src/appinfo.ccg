@@ -44,15 +44,9 @@ AppInfo::create_from_commandline(const std::string& commandline,
   return Glib::wrap(capp_info);
 }
 
-bool AppInfo::launch_default_for_uri(const std::string& uri)
+Glib::RefPtr<AppInfo> AppInfo::create_duplicate() const
 {
-  GError* gerror = 0;
-  const bool retvalue = g_app_info_launch_default_for_uri(uri.c_str(), 0, &(gerror));
-
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-
-  return retvalue;
+   return Glib::wrap(g_app_info_dup(const_cast<GAppInfo*>(gobj())));
 }
 
 bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& launch_context)

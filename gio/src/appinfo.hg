@@ -60,8 +60,12 @@ public:
                                                        const std::string& application_name,
                                                        AppInfoCreateFlags flags);
 
-  //_IGNORE(g_app_info_dup)
-  _IGNORE(g_app_info_equal)
+  /**  Creates a duplicate of a this AppInfo.
+   * @return A duplicate of this AppInfo.
+   * @newin{2,36}
+   */
+  Glib::RefPtr<AppInfo> create_duplicate() const;
+  _IGNORE(g_app_info_dup)
 
   // Note that the implementation of equal() is virtual via equal_vfunc().
   _WRAP_METHOD(bool equal(const Glib::RefPtr<AppInfo>& other) const, g_app_info_equal)
@@ -211,9 +215,7 @@ public:
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type, bool must_support_uris = true), g_app_info_get_default_for_type)
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme), g_app_info_get_default_for_uri_scheme)
   _WRAP_METHOD(static void reset_type_associations(const std::string& content_type), g_app_info_reset_type_associations)
-  _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context), g_app_info_launch_default_for_uri, errthrow)
-  // same as above but without optional AppLaunchContext
-  static bool launch_default_for_uri(const std::string& uri);
+  _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context{?}), g_app_info_launch_default_for_uri, errthrow)
 
 protected:
   //_WRAP_VFUNC(Glib::RefPtr<AppInfo> dup(), "dup")
@@ -238,4 +240,3 @@ protected:
 };
 
 } // namespace Gio
-
