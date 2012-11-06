@@ -154,7 +154,7 @@ sub output_wrap_vfunc_cc($$$$$$$$)
       $custom_vfunc, $custom_vfunc_callback, $ifdef) = @_;
 
   my $cname = $$objCFunc{name};
-  
+
   my $errthrow = "";
   if($$objCFunc{throw_any_errors})
   {
@@ -601,16 +601,16 @@ sub output_wrap_enum($$$$$$$)
 
   my $value_suffix = "Enum";
   $value_suffix = "Flags" if($$objEnum{flags});
-  
+
   # Get the existing enum description from the parsed docs.
   my $description = DocsParser::lookup_enum_description("$c_type");
 
   # Prepend the Doxygen marker ' * ' to all but the first line.
   $description =~ s/\n/\n * /g;
- 
+
   # Make sure indentation of passed in comment is correct.
   $comment =~ s/\n\s*\*/\n */g;
- 
+
   # Merge the passed in comment to the existing enum documentation.
   $comment = $comment . "\n * " . $description;
 
@@ -718,7 +718,7 @@ sub output_wrap_property($$$$$$$$)
     {
       $self->append("\n_DEPRECATE_IFDEF_START\n");
     }
-    
+
     my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s,`%s')dnl\n",
       $name,
       $name_underscored,
@@ -744,7 +744,7 @@ sub output_wrap_property($$$$$$$$)
       );
       $self->append($str);
     }
-    
+
     if($deprecated ne "")
     {
       $self->append("\n_DEPRECATE_IFDEF_END");
@@ -986,7 +986,7 @@ sub convert_args_cpp_to_c($$$$$)
       # Remove a possible final '*' from the output parameter type because it
       # will be passed by C reference (&name).
       $cOutputParamType =~ s/\*$//;
- 
+
       # Only initialize pointers to zero.  Otherwise, use the default
       # constructor of the type.
       my $initialization = "";
@@ -1046,7 +1046,7 @@ sub convert_args_c_to_cpp($$$)
   my @result;
 
   my $num_c_args = scalar(@{$c_param_types});
-  
+
   # If the the function has been marked as a function that throws errors (Glib::Error)
   # don't count the last GError** argument.
   $num_c_args-- if($$objCDefsFunc{throw_any_errors});

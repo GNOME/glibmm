@@ -272,23 +272,23 @@ sub lookup_enum_description($)
 sub lookup_enum_value_documentation($$)
 {
   my ($enum_name, $c_val_name) = @_;
-  
+
   # Assume that there is no description.
   my $desc = "";
 
   my $obj_function = $DocsParser::hasharrayFunctions{$enum_name};
-  
+
   if($obj_function)
   {
     my $param_descriptions = \$$obj_function{param_descriptions};
     $desc = $$param_descriptions->{$c_val_name};
   }
- 
+
   if(!$desc or length($desc) eq 0)
   {
     return "";
   }
-  
+
   DocsParser::convert_docs_to_cpp($obj_function, \$desc);
   DocsParser::add_m4_quotes(\$desc);
 
@@ -338,7 +338,7 @@ sub lookup_documentation($$)
 
   # Escape the space after "i.e." or "e.g." in the brief description.
   $text =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
-  
+
   remove_example_code($functionName, \$text);
 
   # Convert to Doxygen-style comment.

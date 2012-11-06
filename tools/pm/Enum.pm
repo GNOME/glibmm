@@ -218,7 +218,7 @@ sub parse_values($$)
   {
     # cut off the module prefix, e.g. GTK_
     s/^$common_prefix// foreach (@$elem_names);
-    
+
     # Save the common prefix.
     $$self{c_prefix}  = $common_prefix;
   }
@@ -322,7 +322,7 @@ sub build_element_list($$$$)
       $name  =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
       $value =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
     }
-   
+
     my $docs  =
       DocsParser::lookup_enum_value_documentation("$$self{c_type}",
         "$$self{c_prefix}$name");
