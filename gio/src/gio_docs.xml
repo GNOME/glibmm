@@ -1431,6 +1431,31 @@ Since: 2.28
 <return></return>
 </signal>
 
+<enum name="GAppInfoCreateFlags">
+<description>
+Flags used when creating a #GAppInfo.
+
+</description>
+<parameters>
+<parameter name="G_APP_INFO_CREATE_NONE">
+<parameter_description> No flags.
+</parameter_description>
+</parameter>
+<parameter name="G_APP_INFO_CREATE_NEEDS_TERMINAL">
+<parameter_description> Application opens in a terminal window.
+</parameter_description>
+</parameter>
+<parameter name="G_APP_INFO_CREATE_SUPPORTS_URIS">
+<parameter_description> Application supports URI arguments.
+</parameter_description>
+</parameter>
+<parameter name="G_APP_INFO_CREATE_SUPPORTS_STARTUP_NOTIFICATION">
+<parameter_description> Application supports startup notification. Since 2.26
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GApplication::activate">
 <description>
 The ::activate signal is emitted on the primary instance when an
@@ -1527,6 +1552,169 @@ after registration. See g_application_register().
 <return></return>
 </signal>
 
+<enum name="GApplicationFlags">
+<description>
+Flags used to define the behaviour of a #GApplication.
+
+Since: 2.28
+
+</description>
+<parameters>
+<parameter name="G_APPLICATION_FLAGS_NONE">
+<parameter_description> Default
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_IS_SERVICE">
+<parameter_description> Run as a service. In this mode, registration
+fails if the service is already running, and the application will
+stay around for a while when the use count falls to zero.
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_IS_LAUNCHER">
+<parameter_description> Don't try to become the primary instance.
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_HANDLES_OPEN">
+<parameter_description> This application handles opening files (in
+the primary instance). Note that this flag only affects the default
+implementation of local_command_line(), and has no effect if
+%G_APPLICATION_HANDLES_COMMAND_LINE is given.
+See g_application_run() for details.
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_HANDLES_COMMAND_LINE">
+<parameter_description> This application handles command line
+arguments (in the primary instance). Note that this flag only affect
+the default implementation of local_command_line().
+See g_application_run() for details.
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_SEND_ENVIRONMENT">
+<parameter_description> Send the environment of the
+launching process to the primary instance. Set this flag if your
+application is expected to behave differently depending on certain
+environment variables. For instance, an editor might be expected
+to use the &lt;envar&gt;GIT_COMMITTER_NAME&lt;/envar&gt; environment variable
+when editing a git commit message. The environment is available
+to the #GApplication::command-line signal handler, via
+g_application_command_line_getenv().
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_NON_UNIQUE">
+<parameter_description> Make no attempts to do any of the typical
+single-instance application negotiation, even if the application
+ID is given.  The application neither attempts to become the
+owner of the application ID nor does it check if an existing
+owner already exists.  Everything occurs in the local process.
+Since: 2.30.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GAskPasswordFlags">
+<description>
+#GAskPasswordFlags are used to request specific information from the
+user, or to notify the user of their choices in an authentication
+situation.
+
+</description>
+<parameters>
+<parameter name="G_ASK_PASSWORD_NEED_PASSWORD">
+<parameter_description> operation requires a password.
+</parameter_description>
+</parameter>
+<parameter name="G_ASK_PASSWORD_NEED_USERNAME">
+<parameter_description> operation requires a username.
+</parameter_description>
+</parameter>
+<parameter name="G_ASK_PASSWORD_NEED_DOMAIN">
+<parameter_description> operation requires a domain.
+</parameter_description>
+</parameter>
+<parameter name="G_ASK_PASSWORD_SAVING_SUPPORTED">
+<parameter_description> operation supports saving settings.
+</parameter_description>
+</parameter>
+<parameter name="G_ASK_PASSWORD_ANONYMOUS_SUPPORTED">
+<parameter_description> operation supports anonymous users.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GBusNameOwnerFlags">
+<description>
+Flags used in g_bus_own_name().
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_BUS_NAME_OWNER_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT">
+<parameter_description> Allow another message bus connection to claim the name.
+</parameter_description>
+</parameter>
+<parameter name="G_BUS_NAME_OWNER_FLAGS_REPLACE">
+<parameter_description> If another message bus connection owns the name and have
+specified #G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT, then take the name from the other connection.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GBusNameWatcherFlags">
+<description>
+Flags used in g_bus_watch_name().
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_BUS_NAME_WATCHER_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_BUS_NAME_WATCHER_FLAGS_AUTO_START">
+<parameter_description> If no-one owns the name when
+beginning to watch the name, ask the bus to launch an owner for the
+name.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GBusType">
+<description>
+An enumeration for well-known message buses.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_BUS_TYPE_STARTER">
+<parameter_description> An alias for the message bus that activated the process, if any.
+</parameter_description>
+</parameter>
+<parameter name="G_BUS_TYPE_NONE">
+<parameter_description> Not a message bus.
+</parameter_description>
+</parameter>
+<parameter name="G_BUS_TYPE_SYSTEM">
+<parameter_description> The system-wide message bus.
+</parameter_description>
+</parameter>
+<parameter name="G_BUS_TYPE_SESSION">
+<parameter_description> The login session message bus.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GCancellable::cancelled">
 <description>
 Emitted when the operation has been cancelled.
@@ -1593,6 +1781,83 @@ cancellable signal should not do something that can block.
 <return></return>
 </signal>
 
+<enum name="GConverterFlags">
+<description>
+Flags used when calling a g_converter_convert().
+
+Since: 2.24
+
+</description>
+<parameters>
+<parameter name="G_CONVERTER_NO_FLAGS">
+<parameter_description> No flags.
+</parameter_description>
+</parameter>
+<parameter name="G_CONVERTER_INPUT_AT_END">
+<parameter_description> At end of input data
+</parameter_description>
+</parameter>
+<parameter name="G_CONVERTER_FLUSH">
+<parameter_description> Flush data
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GConverterResult">
+<description>
+Results returned from g_converter_convert().
+
+Since: 2.24
+
+</description>
+<parameters>
+<parameter name="G_CONVERTER_ERROR">
+<parameter_description> There was an error during conversion.
+</parameter_description>
+</parameter>
+<parameter name="G_CONVERTER_CONVERTED">
+<parameter_description> Some data was consumed or produced
+</parameter_description>
+</parameter>
+<parameter name="G_CONVERTER_FINISHED">
+<parameter_description> The conversion is finished
+</parameter_description>
+</parameter>
+<parameter name="G_CONVERTER_FLUSHED">
+<parameter_description> Flushing is finished
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GCredentialsType">
+<description>
+Enumeration describing different kinds of native credential types.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_CREDENTIALS_TYPE_INVALID">
+<parameter_description> Indicates an invalid native credential type.
+</parameter_description>
+</parameter>
+<parameter name="G_CREDENTIALS_TYPE_LINUX_UCRED">
+<parameter_description> The native credentials type is a &lt;type&gt;struct ucred&lt;/type&gt;.
+</parameter_description>
+</parameter>
+<parameter name="G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED">
+<parameter_description> The native credentials type is a &lt;type&gt;struct cmsgcred&lt;/type&gt;.
+</parameter_description>
+</parameter>
+<parameter name="G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED">
+<parameter_description> The native credentials type is a &lt;type&gt;struct sockpeercred&lt;/type&gt;. Added in 2.30.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GDBusAuthObserver::allow-mechanism">
 <description>
 Emitted to check if @mechanism is allowed to be used.
@@ -1642,6 +1907,47 @@ Since: 2.26
 </return>
 </signal>
 
+<enum name="GDBusCallFlags">
+<description>
+Flags used in g_dbus_connection_call() and similar APIs.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_CALL_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CALL_FLAGS_NO_AUTO_START">
+<parameter_description> The bus must not launch
+an owner for the destination name in response to this method
+invocation.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusCapabilityFlags">
+<description>
+Capabilities negotiated with the remote peer.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_CAPABILITY_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING">
+<parameter_description> The connection
+supports exchanging UNIX file descriptors with the remote peer.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GDBusConnection::closed">
 <description>
 Emitted when the connection is closed.
@@ -1687,6 +1993,271 @@ remote peer closed its end of the connection.
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GDBusConnectionFlags">
+<description>
+Flags used when creating a new #GDBusConnection.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_CONNECTION_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT">
+<parameter_description> Perform authentication against server.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER">
+<parameter_description> Perform authentication against client.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS">
+<parameter_description> When
+authenticating as a server, allow the anonymous authentication
+method.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION">
+<parameter_description> Pass this flag if connecting to a peer that is a
+message bus. This means that the Hello() method will be invoked as part of the connection setup.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING">
+<parameter_description> If set, processing of D-Bus messages is
+delayed until g_dbus_connection_start_message_processing() is called.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusError">
+<description>
+Error codes for the %G_DBUS_ERROR error domain.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_ERROR_FAILED">
+<parameter_description>
+A generic error; &quot;something went wrong&quot; - see the error message for
+more.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_NO_MEMORY">
+<parameter_description>
+There was not enough memory to complete an operation.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SERVICE_UNKNOWN">
+<parameter_description>
+The bus doesn't know how to launch a service to supply the bus name
+you wanted.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_NAME_HAS_NO_OWNER">
+<parameter_description>
+The bus name you referenced doesn't exist (i.e. no application owns
+it).
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_NO_REPLY">
+<parameter_description>
+No reply to a message expecting one, usually means a timeout occurred.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_IO_ERROR">
+<parameter_description>
+Something went wrong reading or writing to a socket, for example.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_BAD_ADDRESS">
+<parameter_description>
+A D-Bus bus address was malformed.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_NOT_SUPPORTED">
+<parameter_description>
+Requested operation isn't supported (like ENOSYS on UNIX).
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_LIMITS_EXCEEDED">
+<parameter_description>
+Some limited resource is exhausted.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_ACCESS_DENIED">
+<parameter_description>
+Security restrictions don't allow doing what you're trying to do.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_AUTH_FAILED">
+<parameter_description>
+Authentication didn't work.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_NO_SERVER">
+<parameter_description>
+Unable to connect to server (probably caused by ECONNREFUSED on a
+socket).
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_TIMEOUT">
+<parameter_description>
+Certain timeout errors, possibly ETIMEDOUT on a socket.  Note that
+%G_DBUS_ERROR_NO_REPLY is used for message reply timeouts. Warning:
+this is confusingly-named given that %G_DBUS_ERROR_TIMED_OUT also
+exists. We can't fix it for compatibility reasons so just be
+careful.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_NO_NETWORK">
+<parameter_description>
+No network access (probably ENETUNREACH on a socket).
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_ADDRESS_IN_USE">
+<parameter_description>
+Can't bind a socket since its address is in use (i.e. EADDRINUSE).
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_DISCONNECTED">
+<parameter_description>
+The connection is disconnected and you're trying to use it.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_INVALID_ARGS">
+<parameter_description>
+Invalid arguments passed to a method call.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_FILE_NOT_FOUND">
+<parameter_description>
+Missing file.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_FILE_EXISTS">
+<parameter_description>
+Existing file and the operation you're using does not silently overwrite.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_UNKNOWN_METHOD">
+<parameter_description>
+Method name you invoked isn't known by the object you invoked it on.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_TIMED_OUT">
+<parameter_description>
+Certain timeout errors, e.g. while starting a service. Warning: this is
+confusingly-named given that %G_DBUS_ERROR_TIMEOUT also exists. We
+can't fix it for compatibility reasons so just be careful.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_MATCH_RULE_NOT_FOUND">
+<parameter_description>
+Tried to remove or modify a match rule that didn't exist.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_MATCH_RULE_INVALID">
+<parameter_description>
+The match rule isn't syntactically valid.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_EXEC_FAILED">
+<parameter_description>
+While starting a new process, the exec() call failed.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_FORK_FAILED">
+<parameter_description>
+While starting a new process, the fork() call failed.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_CHILD_EXITED">
+<parameter_description>
+While starting a new process, the child exited with a status code.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_CHILD_SIGNALED">
+<parameter_description>
+While starting a new process, the child exited on a signal.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_FAILED">
+<parameter_description>
+While starting a new process, something went wrong.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_SETUP_FAILED">
+<parameter_description>
+We failed to setup the environment correctly.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_CONFIG_INVALID">
+<parameter_description>
+We failed to setup the config parser correctly.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_SERVICE_INVALID">
+<parameter_description>
+Bus name was not valid.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_SERVICE_NOT_FOUND">
+<parameter_description>
+Service file not found in system-services directory.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_PERMISSIONS_INVALID">
+<parameter_description>
+Permissions are incorrect on the setuid helper.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_FILE_INVALID">
+<parameter_description>
+Service file invalid (Name, User or Exec missing).
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SPAWN_NO_MEMORY">
+<parameter_description>
+Tried to get a UNIX process ID and it wasn't available.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_UNIX_PROCESS_ID_UNKNOWN">
+<parameter_description>
+Tried to get a UNIX process ID and it wasn't available.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_INVALID_SIGNATURE">
+<parameter_description>
+A type signature is not valid.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_INVALID_FILE_CONTENT">
+<parameter_description>
+A file contains invalid syntax or is otherwise broken.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_SELINUX_SECURITY_CONTEXT_UNKNOWN">
+<parameter_description>
+Asked for SELinux security context and it wasn't available.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_ADT_AUDIT_DATA_UNKNOWN">
+<parameter_description>
+Asked for ADT audit data and it wasn't available.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_OBJECT_PATH_IN_USE">
+<parameter_description>
+There's already an object with the requested object path.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GDBusInterfaceSkeleton::g-authorize-method">
 <description>
@@ -1741,6 +2312,153 @@ Since: 2.30
 
 </return>
 </signal>
+
+<enum name="GDBusInterfaceSkeletonFlags">
+<description>
+Flags describing the behavior of a #GDBusInterfaceSkeleton instance.
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="G_DBUS_INTERFACE_SKELETON_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD">
+<parameter_description> Each method invocation is handled in
+a thread dedicated to the invocation. This means that the method implementation can use blocking IO
+without blocking any other part of the process. It also means that the method implementation must
+use locking to access data structures used by other threads.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusMessageByteOrder">
+<description>
+Enumeration used to describe the byte order of a D-Bus message.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN">
+<parameter_description> The byte order is big endian.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_BYTE_ORDER_LITTLE_ENDIAN">
+<parameter_description> The byte order is little endian.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusMessageFlags">
+<description>
+Message flags used in #GDBusMessage.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_MESSAGE_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED">
+<parameter_description> A reply is not expected.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_FLAGS_NO_AUTO_START">
+<parameter_description> The bus must not launch an
+owner for the destination name in response to this message.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusMessageHeaderField">
+<description>
+Header fields used in #GDBusMessage.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_INVALID">
+<parameter_description> Not a valid header field.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_PATH">
+<parameter_description> The object path.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE">
+<parameter_description> The interface name.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_MEMBER">
+<parameter_description> The method or signal name.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME">
+<parameter_description> The name of the error that occurred.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL">
+<parameter_description> The serial number the message is a reply to.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION">
+<parameter_description> The name the message is intended for.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_SENDER">
+<parameter_description> Unique name of the sender of the message (filled in by the bus).
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE">
+<parameter_description> The signature of the message body.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS">
+<parameter_description> The number of UNIX file descriptors that accompany the message.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusMessageType">
+<description>
+Message types used in #GDBusMessage.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_MESSAGE_TYPE_INVALID">
+<parameter_description> Message is of invalid type.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_TYPE_METHOD_CALL">
+<parameter_description> Method call.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_TYPE_METHOD_RETURN">
+<parameter_description> Method reply.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_TYPE_ERROR">
+<parameter_description> Error reply.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_TYPE_SIGNAL">
+<parameter_description> Signal emission.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GDBusObject::interface-added">
 <description>
@@ -1961,6 +2679,28 @@ Since: 2.30
 <return></return>
 </signal>
 
+<enum name="GDBusObjectManagerClientFlags">
+<description>
+Flags used when constructing a #GDBusObjectManagerClient.
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START">
+<parameter_description> If not set and the
+manager is for a well-known name, then request the bus to launch
+an owner for the name if no-one owns the name. This flag can only
+be used in managers for well-known names.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GDBusObjectSkeleton::authorize-method">
 <description>
 Emitted when a method is invoked by a remote caller and used to
@@ -1993,6 +2733,29 @@ Since: 2.30
 
 </return>
 </signal>
+
+<enum name="GDBusPropertyInfoFlags">
+<description>
+Flags describing the access control of a D-Bus property.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_PROPERTY_INFO_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_PROPERTY_INFO_FLAGS_READABLE">
+<parameter_description> Property is readable.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE">
+<parameter_description> Property is writable.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GDBusProxy::g-properties-changed">
 <description>
@@ -2057,6 +2820,60 @@ Since: 2.26
 <return></return>
 </signal>
 
+<enum name="GDBusProxyFlags">
+<description>
+Flags used when constructing an instance of a #GDBusProxy derived class.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_PROXY_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES">
+<parameter_description> Don't load properties.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS">
+<parameter_description> Don't connect to signals on the remote object.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START">
+<parameter_description> If not set and the proxy if for a well-known name,
+then request the bus to launch an owner for the name if no-one owns the name. This flag can
+only be used in proxies for well-known names.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES">
+<parameter_description> If set, the property value for any &lt;emphasis&gt;invalidated property&lt;/emphasis&gt; will be (asynchronously) retrieved upon receiving the &lt;ulink url=&quot;http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties&quot;&gt;PropertiesChanged&lt;/ulink&gt; D-Bus signal and the property will not cause emission of the #GDBusProxy::g-properties-changed signal. When the value is received the #GDBusProxy::g-properties-changed signal is emitted for the property along with the retrieved value. Since 2.32.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusSendMessageFlags">
+<description>
+Flags used when sending #GDBusMessage&lt;!-- --&gt;s on a #GDBusConnection.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_SEND_MESSAGE_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL">
+<parameter_description> Do not automatically
+assign a serial number from the #GDBusConnection object when
+sending a message.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GDBusServer::new-connection">
 <description>
 Emitted when a new authenticated connection has been made. Use
@@ -2099,6 +2916,122 @@ run.
 
 </return>
 </signal>
+
+<enum name="GDBusServerFlags">
+<description>
+Flags used when creating a #GDBusServer.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_SERVER_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_SERVER_FLAGS_RUN_IN_THREAD">
+<parameter_description> All #GDBusServer::new-connection
+signals will run in separated dedicated threads (see signal for
+details).
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS">
+<parameter_description> Allow the anonymous
+authentication method.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusSignalFlags">
+<description>
+Flags used when subscribing to signals via g_dbus_connection_signal_subscribe().
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_SIGNAL_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE">
+<parameter_description> Don't actually send the AddMatch
+D-Bus call for this signal subscription.  This gives you more control
+over which match rules you add (but you must add them manually).
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDBusSubtreeFlags">
+<description>
+Flags passed to g_dbus_connection_register_subtree().
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_DBUS_SUBTREE_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES">
+<parameter_description> Method calls to objects not in the enumerated range
+will still be dispatched. This is useful if you want
+to dynamically spawn objects in the subtree.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDataStreamByteOrder">
+<description>
+#GDataStreamByteOrder is used to ensure proper endianness of streaming data sources
+across various machine architectures.
+
+
+</description>
+<parameters>
+<parameter name="G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN">
+<parameter_description> Selects Big Endian byte order.
+</parameter_description>
+</parameter>
+<parameter name="G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN">
+<parameter_description> Selects Little Endian byte order.
+</parameter_description>
+</parameter>
+<parameter name="G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN">
+<parameter_description> Selects endianness based on host machine's architecture.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDataStreamNewlineType">
+<description>
+#GDataStreamNewlineType is used when checking for or setting the line endings for a given file.
+
+</description>
+<parameters>
+<parameter name="G_DATA_STREAM_NEWLINE_TYPE_LF">
+<parameter_description> Selects &quot;LF&quot; line endings, common on most modern UNIX platforms.
+</parameter_description>
+</parameter>
+<parameter name="G_DATA_STREAM_NEWLINE_TYPE_CR">
+<parameter_description> Selects &quot;CR&quot; line endings.
+</parameter_description>
+</parameter>
+<parameter name="G_DATA_STREAM_NEWLINE_TYPE_CR_LF">
+<parameter_description> Selects &quot;CR, LF&quot; line ending, common on Microsoft Windows.
+</parameter_description>
+</parameter>
+<parameter name="G_DATA_STREAM_NEWLINE_TYPE_ANY">
+<parameter_description> Automatically try to handle any line ending type.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GDrive::changed">
 <description>
@@ -2163,6 +3096,245 @@ Since: 2.22
 <return></return>
 </signal>
 
+<enum name="GDriveStartFlags">
+<description>
+Flags used when starting a drive.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="G_DRIVE_START_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GDriveStartStopType">
+<description>
+Enumeration describing how a drive can be started/stopped.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="G_DRIVE_START_STOP_TYPE_UNKNOWN">
+<parameter_description> Unknown or drive doesn't support
+start/stop.
+</parameter_description>
+</parameter>
+<parameter name="G_DRIVE_START_STOP_TYPE_SHUTDOWN">
+<parameter_description> The stop method will physically
+shut down the drive and e.g. power down the port the drive is
+attached to.
+</parameter_description>
+</parameter>
+<parameter name="G_DRIVE_START_STOP_TYPE_NETWORK">
+<parameter_description> The start/stop methods are used
+for connecting/disconnect to the drive over the network.
+</parameter_description>
+</parameter>
+<parameter name="G_DRIVE_START_STOP_TYPE_MULTIDISK">
+<parameter_description> The start/stop methods will
+assemble/disassemble a virtual drive from several physical
+drives.
+</parameter_description>
+</parameter>
+<parameter name="G_DRIVE_START_STOP_TYPE_PASSWORD">
+<parameter_description> The start/stop methods will
+unlock/lock the disk (for example using the ATA &lt;quote&gt;SECURITY
+UNLOCK DEVICE&lt;/quote&gt; command)
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GEmblemOrigin">
+<description>
+GEmblemOrigin is used to add information about the origin of the emblem
+to #GEmblem.
+
+Since: 2.18
+
+</description>
+<parameters>
+<parameter name="G_EMBLEM_ORIGIN_UNKNOWN">
+<parameter_description> Emblem of unknown origin
+</parameter_description>
+</parameter>
+<parameter name="G_EMBLEM_ORIGIN_DEVICE">
+<parameter_description> Emblem adds device-specific information
+</parameter_description>
+</parameter>
+<parameter name="G_EMBLEM_ORIGIN_LIVEMETADATA">
+<parameter_description> Emblem depicts live metadata, such as &quot;readonly&quot;
+</parameter_description>
+</parameter>
+<parameter name="G_EMBLEM_ORIGIN_TAG">
+<parameter_description> Emblem comes from a user-defined tag, e.g. set by nautilus (in the future)
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GFileAttributeInfoFlags">
+<description>
+Flags specifying the behaviour of an attribute.
+
+</description>
+<parameters>
+<parameter name="G_FILE_ATTRIBUTE_INFO_NONE">
+<parameter_description> no flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE">
+<parameter_description> copy the attribute values when the file is copied.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED">
+<parameter_description> copy the attribute values when the file is moved.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GFileAttributeStatus">
+<description>
+Used by g_file_set_attributes_from_info() when setting file attributes.
+
+</description>
+<parameters>
+<parameter name="G_FILE_ATTRIBUTE_STATUS_UNSET">
+<parameter_description> Attribute value is unset (empty).
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_STATUS_SET">
+<parameter_description> Attribute value is set.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING">
+<parameter_description> Indicates an error in setting the value.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GFileAttributeType">
+<description>
+The data types for file attributes.
+
+</description>
+<parameters>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_INVALID">
+<parameter_description> indicates an invalid or uninitalized type.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_STRING">
+<parameter_description> a null terminated UTF8 string.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_BYTE_STRING">
+<parameter_description> a zero terminated string of non-zero bytes.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_BOOLEAN">
+<parameter_description> a boolean value.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_UINT32">
+<parameter_description> an unsigned 4-byte/32-bit integer.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_INT32">
+<parameter_description> a signed 4-byte/32-bit integer.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_UINT64">
+<parameter_description> an unsigned 8-byte/64-bit integer.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_INT64">
+<parameter_description> a signed 8-byte/64-bit integer.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_OBJECT">
+<parameter_description> a #GObject.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_ATTRIBUTE_TYPE_STRINGV">
+<parameter_description> a %NULL terminated char **. Since 2.22
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GFileCopyFlags">
+<description>
+Flags used when copying or moving files.
+
+</description>
+<parameters>
+<parameter name="G_FILE_COPY_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_COPY_OVERWRITE">
+<parameter_description> Overwrite any existing files
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_COPY_BACKUP">
+<parameter_description> Make a backup of any existing files.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_COPY_NOFOLLOW_SYMLINKS">
+<parameter_description> Don't follow symlinks.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_COPY_ALL_METADATA">
+<parameter_description> Copy all file metadata instead of just default set used for copy (see #GFileInfo).
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_COPY_NO_FALLBACK_FOR_MOVE">
+<parameter_description> Don't use copy and delete fallback if native move not supported.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_COPY_TARGET_DEFAULT_PERMS">
+<parameter_description> Leaves target file with default perms, instead of setting the source file perms.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GFileCreateFlags">
+<description>
+Flags used when an operation may create a file.
+
+</description>
+<parameters>
+<parameter name="G_FILE_CREATE_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_CREATE_PRIVATE">
+<parameter_description> Create a file that can only be
+accessed by the current user.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_CREATE_REPLACE_DESTINATION">
+<parameter_description> Replace the destination
+as if it didn't exist before. Don't try to keep any old
+permissions, replace instead of following links. This
+is generally useful if you're doing a &quot;copy over&quot;
+rather than a &quot;save new version of&quot; replace operation.
+You can think of it as &quot;unlink destination&quot; before
+writing to it, although the implementation may not
+be exactly like that. Since 2.20
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GFileMonitor::changed">
 <description>
 Emitted when @file has been changed.
@@ -2195,6 +3367,128 @@ In all the other cases, @other_file will be set to #NULL.
 <return></return>
 </signal>
 
+<enum name="GFileMonitorEvent">
+<description>
+Specifies what type of event a monitor event is.
+
+</description>
+<parameters>
+<parameter name="G_FILE_MONITOR_EVENT_CHANGED">
+<parameter_description> a file changed.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT">
+<parameter_description> a hint that this was probably the last change in a set of changes.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_EVENT_DELETED">
+<parameter_description> a file was deleted.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_EVENT_CREATED">
+<parameter_description> a file was created.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED">
+<parameter_description> a file attribute was changed.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_EVENT_PRE_UNMOUNT">
+<parameter_description> the file location will soon be unmounted.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_EVENT_UNMOUNTED">
+<parameter_description> the file location was unmounted.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_EVENT_MOVED">
+<parameter_description> the file was moved.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GFileMonitorFlags">
+<description>
+Flags used to set what a #GFileMonitor will watch for.
+
+</description>
+<parameters>
+<parameter name="G_FILE_MONITOR_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_WATCH_MOUNTS">
+<parameter_description> Watch for mount events.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_MONITOR_SEND_MOVED">
+<parameter_description> Pair DELETED and CREATED events caused
+by file renames (moves) and send a single G_FILE_MONITOR_EVENT_MOVED
+event instead (NB: not supported on all backends; the default
+behaviour -without specifying this flag- is to send single DELETED
+and CREATED events).
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GFileQueryInfoFlags">
+<description>
+Flags used when querying a #GFileInfo.
+
+</description>
+<parameters>
+<parameter name="G_FILE_QUERY_INFO_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS">
+<parameter_description> Don't follow symlinks.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GFileType">
+<description>
+Indicates the file's on-disk type.
+
+</description>
+<parameters>
+<parameter name="G_FILE_TYPE_UNKNOWN">
+<parameter_description> File's type is unknown.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_TYPE_REGULAR">
+<parameter_description> File handle represents a regular file.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_TYPE_DIRECTORY">
+<parameter_description> File handle represents a directory.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_TYPE_SYMBOLIC_LINK">
+<parameter_description> File handle represents a symbolic link
+(Unix systems).
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_TYPE_SPECIAL">
+<parameter_description> File is a &quot;special&quot; file, such as a socket, fifo,
+block device, or character device.
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_TYPE_SHORTCUT">
+<parameter_description> File is a shortcut (Windows systems).
+</parameter_description>
+</parameter>
+<parameter name="G_FILE_TYPE_MOUNTABLE">
+<parameter_description> File is a mountable location.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GFilenameCompleter::got-completion-data">
 <description>
 Emitted when the file name completion information comes available.
@@ -2204,6 +3498,274 @@ Emitted when the file name completion information comes available.
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GFilesystemPreviewType">
+<description>
+Indicates a hint from the file system whether files should be
+previewed in a file manager. Returned as the value of the key
+#G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW.
+
+</description>
+<parameters>
+<parameter name="G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS">
+<parameter_description> Only preview files if user has explicitly requested it.
+</parameter_description>
+</parameter>
+<parameter name="G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL">
+<parameter_description> Preview files if user has requested preview of &quot;local&quot; files.
+</parameter_description>
+</parameter>
+<parameter name="G_FILESYSTEM_PREVIEW_TYPE_NEVER">
+<parameter_description> Never preview files.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GIOErrorEnum">
+<description>
+Error codes returned by GIO functions.
+
+
+</description>
+<parameters>
+<parameter name="G_IO_ERROR_FAILED">
+<parameter_description> Generic error condition for when any operation fails.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_FOUND">
+<parameter_description> File not found.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_EXISTS">
+<parameter_description> File already exists.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_IS_DIRECTORY">
+<parameter_description> File is a directory.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_DIRECTORY">
+<parameter_description> File is not a directory.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_EMPTY">
+<parameter_description> File is a directory that isn't empty.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_REGULAR_FILE">
+<parameter_description> File is not a regular file.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_SYMBOLIC_LINK">
+<parameter_description> File is not a symbolic link.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_MOUNTABLE_FILE">
+<parameter_description> File cannot be mounted.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_FILENAME_TOO_LONG">
+<parameter_description> Filename is too many characters.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_INVALID_FILENAME">
+<parameter_description> Filename is invalid or contains invalid characters.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_TOO_MANY_LINKS">
+<parameter_description> File contains too many symbolic links.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NO_SPACE">
+<parameter_description> No space left on drive.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_INVALID_ARGUMENT">
+<parameter_description> Invalid argument.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_PERMISSION_DENIED">
+<parameter_description> Permission denied.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_SUPPORTED">
+<parameter_description> Operation not supported for the current backend.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_MOUNTED">
+<parameter_description> File isn't mounted.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_ALREADY_MOUNTED">
+<parameter_description> File is already mounted.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_CLOSED">
+<parameter_description> File was closed.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_CANCELLED">
+<parameter_description> Operation was cancelled. See #GCancellable.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_PENDING">
+<parameter_description> Operations are still pending.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_READ_ONLY">
+<parameter_description> File is read only.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_CANT_CREATE_BACKUP">
+<parameter_description> Backup couldn't be created.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_WRONG_ETAG">
+<parameter_description> File's Entity Tag was incorrect.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_TIMED_OUT">
+<parameter_description> Operation timed out.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_WOULD_RECURSE">
+<parameter_description> Operation would be recursive.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_BUSY">
+<parameter_description> File is busy.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_WOULD_BLOCK">
+<parameter_description> Operation would block.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_HOST_NOT_FOUND">
+<parameter_description> Host couldn't be found (remote operations).
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_WOULD_MERGE">
+<parameter_description> Operation would merge files.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_FAILED_HANDLED">
+<parameter_description> Operation failed and a helper program has
+already interacted with the user. Do not display any error dialog.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_TOO_MANY_OPEN_FILES">
+<parameter_description> The current process has too many files
+open and can't open any more. Duplicate descriptors do count toward
+this limit. Since 2.20
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_INITIALIZED">
+<parameter_description> The object has not been initialized. Since 2.22
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_ADDRESS_IN_USE">
+<parameter_description> The requested address is already in use. Since 2.22
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_PARTIAL_INPUT">
+<parameter_description> Need more input to finish operation. Since 2.24
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_INVALID_DATA">
+<parameter_description> There input data was invalid. Since 2.24
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_DBUS_ERROR">
+<parameter_description> A remote object generated an error that
+doesn't correspond to a locally registered #GError error
+domain. Use g_dbus_error_get_remote_error() to extract the D-Bus
+error name and g_dbus_error_strip_remote_error() to fix up the
+message so it matches what was received on the wire. Since 2.26.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_HOST_UNREACHABLE">
+<parameter_description> Host unreachable. Since 2.26
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NETWORK_UNREACHABLE">
+<parameter_description> Network unreachable. Since 2.26
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_CONNECTION_REFUSED">
+<parameter_description> Connection refused. Since 2.26
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_PROXY_FAILED">
+<parameter_description> Connection to proxy server failed. Since 2.26
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_PROXY_AUTH_FAILED">
+<parameter_description> Proxy authentication failed. Since 2.26
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_PROXY_NEED_AUTH">
+<parameter_description> Proxy server needs authentication. Since 2.26
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_PROXY_NOT_ALLOWED">
+<parameter_description> Proxy connection is not allowed by ruleset.
+Since 2.26
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GIOModuleScopeFlags">
+<description>
+Flags for use with g_io_module_scope_new().
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="G_IO_MODULE_SCOPE_NONE">
+<parameter_description> No module scan flags
+</parameter_description>
+</parameter>
+<parameter name="G_IO_MODULE_SCOPE_BLOCK_DUPLICATES">
+<parameter_description> When using this scope to load or
+scan modules, automatically block a modules which has the same base
+basename as previously loaded module.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GIOStreamSpliceFlags">
+<description>
+GIOStreamSpliceFlags determine how streams should be spliced.
+
+Since: 2.28
+
+</description>
+<parameters>
+<parameter name="G_IO_STREAM_SPLICE_NONE">
+<parameter_description> Do not close either stream.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_STREAM_SPLICE_CLOSE_STREAM1">
+<parameter_description> Close the first stream after
+the splice.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_STREAM_SPLICE_CLOSE_STREAM2">
+<parameter_description> Close the second stream after
+the splice.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_STREAM_SPLICE_WAIT_FOR_BOTH">
+<parameter_description> Wait for both splice operations to finish
+before calling the callback.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GMenuModel::items-changed">
 <description>
@@ -2297,6 +3859,19 @@ finalized.
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GMountMountFlags">
+<description>
+Flags used when mounting a mount.
+
+</description>
+<parameters>
+<parameter name="G_MOUNT_MOUNT_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GMountOperation::aborted">
 <description>
@@ -2479,6 +4054,49 @@ is completed
 <return></return>
 </signal>
 
+<enum name="GMountOperationResult">
+<description>
+#GMountOperationResult is returned as a result when a request for
+information is send by the mounting operation.
+
+</description>
+<parameters>
+<parameter name="G_MOUNT_OPERATION_HANDLED">
+<parameter_description> The request was fulfilled and the
+user specified data is now available
+</parameter_description>
+</parameter>
+<parameter name="G_MOUNT_OPERATION_ABORTED">
+<parameter_description> The user requested the mount operation
+to be aborted
+</parameter_description>
+</parameter>
+<parameter name="G_MOUNT_OPERATION_UNHANDLED">
+<parameter_description> The request was unhandled (i.e. not
+implemented)
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GMountUnmountFlags">
+<description>
+Flags used when an unmounting a mount.
+
+</description>
+<parameters>
+<parameter name="G_MOUNT_UNMOUNT_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_MOUNT_UNMOUNT_FORCE">
+<parameter_description> Unmount even if there are outstanding
+file operations on the mount.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GNetworkMonitor::network-changed">
 <description>
 Emitted when the network configuration changes. If @available is
@@ -2503,6 +4121,53 @@ Since: 2.32
 <return></return>
 </signal>
 
+<enum name="GOutputStreamSpliceFlags">
+<description>
+GOutputStreamSpliceFlags determine how streams should be spliced.
+
+</description>
+<parameters>
+<parameter name="G_OUTPUT_STREAM_SPLICE_NONE">
+<parameter_description> Do not close either stream.
+</parameter_description>
+</parameter>
+<parameter name="G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE">
+<parameter_description> Close the source stream after
+the splice.
+</parameter_description>
+</parameter>
+<parameter name="G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET">
+<parameter_description> Close the target stream after
+the splice.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GPasswordSave">
+<description>
+#GPasswordSave is used to indicate the lifespan of a saved password.
+
+#Gvfs stores passwords in the Gnome keyring when this flag allows it
+to, and later retrieves it again from there.
+
+</description>
+<parameters>
+<parameter name="G_PASSWORD_SAVE_NEVER">
+<parameter_description> never save a password.
+</parameter_description>
+</parameter>
+<parameter name="G_PASSWORD_SAVE_FOR_SESSION">
+<parameter_description> save a password for the session.
+</parameter_description>
+</parameter>
+<parameter name="G_PASSWORD_SAVE_PERMANENTLY">
+<parameter_description> save a password permanently.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GResolver::reload">
 <description>
 Emitted when the resolver notices that the system resolver
@@ -2517,6 +4182,141 @@ configuration has changed.
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GResolverError">
+<description>
+An error code used with %G_RESOLVER_ERROR in a #GError returned
+from a #GResolver routine.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="G_RESOLVER_ERROR_NOT_FOUND">
+<parameter_description> the requested name/address/service was not
+found
+</parameter_description>
+</parameter>
+<parameter name="G_RESOLVER_ERROR_TEMPORARY_FAILURE">
+<parameter_description> the requested information could not
+be looked up due to a network error or similar problem
+</parameter_description>
+</parameter>
+<parameter name="G_RESOLVER_ERROR_INTERNAL">
+<parameter_description> unknown error
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GResolverRecordType">
+<description>
+The type of record that g_resolver_lookup_records() or
+g_resolver_lookup_records_async() should retrieve. The records are returned
+as lists of #GVariant tuples. Each record type has different values in
+the variant tuples returned.
+
+%G_RESOLVER_RECORD_SRV records are returned as variants with the signature
+'(qqqs)', containing a guint16 with the priority, a guint16 with the
+weight, a guint16 with the port, and a string of the hostname.
+
+%G_RESOLVER_RECORD_MX records are returned as variants with the signature
+'(qs)', representing a guint16 with the preference, and a string containing
+the mail exchanger hostname.
+
+%G_RESOLVER_RECORD_TXT records are returned as variants with the signature
+'(as)', representing an array of the strings in the text record.
+
+%G_RESOLVER_RECORD_SOA records are returned as variants with the signature
+'(ssuuuuu)', representing a string containing the primary name server, a
+string containing the administrator, the serial as a guint32, the refresh
+interval as guint32, the retry interval as a guint32, the expire timeout
+as a guint32, and the ttl as a guint32.
+
+%G_RESOLVER_RECORD_NS records are returned as variants with the signature
+'(s)', representing a string of the hostname of the name server.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="G_RESOLVER_RECORD_SRV">
+<parameter_description> lookup DNS SRV records for a domain
+</parameter_description>
+</parameter>
+<parameter name="G_RESOLVER_RECORD_MX">
+<parameter_description> lookup DNS MX records for a domain
+</parameter_description>
+</parameter>
+<parameter name="G_RESOLVER_RECORD_TXT">
+<parameter_description> lookup DNS TXT records for a name
+</parameter_description>
+</parameter>
+<parameter name="G_RESOLVER_RECORD_SOA">
+<parameter_description> lookup DNS SOA records for a zone
+</parameter_description>
+</parameter>
+<parameter name="G_RESOLVER_RECORD_NS">
+<parameter_description> lookup DNS NS records for a domain
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GResourceError">
+<description>
+An error code used with %G_RESOURCE_ERROR in a #GError returned
+from a #GResource routine.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="G_RESOURCE_ERROR_NOT_FOUND">
+<parameter_description> no file was found at the requested path
+</parameter_description>
+</parameter>
+<parameter name="G_RESOURCE_ERROR_INTERNAL">
+<parameter_description> unknown error
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GResourceFlags">
+<description>
+GResourceFlags give information about a particular file inside a resource
+bundle.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="G_RESOURCE_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+<parameter name="G_RESOURCE_FLAGS_COMPRESSED">
+<parameter_description> The file is compressed.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GResourceLookupFlags">
+<description>
+GResourceLookupFlags determine how resource path lookups are handled.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="G_RESOURCE_LOOKUP_FLAGS_NONE">
+<parameter_description> No flags set.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GSettings::change-event">
 <description>
@@ -2643,6 +4443,46 @@ callbacks when the writability of &quot;x&quot; changes.
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GSettingsBindFlags">
+<description>
+Flags used when creating a binding. These flags determine in which
+direction the binding works. The default is to synchronize in both
+directions.
+
+</description>
+<parameters>
+<parameter name="G_SETTINGS_BIND_DEFAULT">
+<parameter_description> Equivalent to &lt;literal&gt;G_SETTINGS_BIND_GET|G_SETTINGS_BIND_SET&lt;/literal&gt;
+</parameter_description>
+</parameter>
+<parameter name="G_SETTINGS_BIND_GET">
+<parameter_description> Update the #GObject property when the setting changes.
+It is an error to use this flag if the property is not writable.
+</parameter_description>
+</parameter>
+<parameter name="G_SETTINGS_BIND_SET">
+<parameter_description> Update the setting when the #GObject property changes.
+It is an error to use this flag if the property is not readable.
+</parameter_description>
+</parameter>
+<parameter name="G_SETTINGS_BIND_NO_SENSITIVITY">
+<parameter_description> Do not try to bind a &quot;sensitivity&quot; property to the writability of the setting
+</parameter_description>
+</parameter>
+<parameter name="G_SETTINGS_BIND_GET_NO_CHANGES">
+<parameter_description> When set in addition to #G_SETTINGS_BIND_GET, set the #GObject property
+value initially from the setting, but do not listen for changes of the setting
+</parameter_description>
+</parameter>
+<parameter name="G_SETTINGS_BIND_INVERT_BOOLEAN">
+<parameter_description> When passed to g_settings_bind(), uses a pair of mapping functions that invert
+the boolean value when mapping between the setting and the property.  The setting and property must both
+be booleans.  You cannot pass this flag to g_settings_bind_with_mapping().
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GSimpleAction::activate">
 <description>
@@ -2834,6 +4674,162 @@ Since: 2.32
 <return></return>
 </signal>
 
+<enum name="GSocketClientEvent">
+<description>
+Describes an event occurring on a #GSocketClient. See the
+#GSocketClient::event signal for more details.
+
+Additional values may be added to this type in the future.
+
+Since: 2.32
+
+</description>
+<parameters>
+<parameter name="G_SOCKET_CLIENT_RESOLVING">
+<parameter_description> The client is doing a DNS lookup.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_CLIENT_RESOLVED">
+<parameter_description> The client has completed a DNS lookup.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_CLIENT_CONNECTING">
+<parameter_description> The client is connecting to a remote
+host (either a proxy or the destination server).
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_CLIENT_CONNECTED">
+<parameter_description> The client has connected to a remote
+host.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_CLIENT_PROXY_NEGOTIATING">
+<parameter_description> The client is negotiating
+with a proxy to connect to the destination server.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_CLIENT_PROXY_NEGOTIATED">
+<parameter_description> The client has negotiated
+with the proxy server.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_CLIENT_TLS_HANDSHAKING">
+<parameter_description> The client is performing a
+TLS handshake.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_CLIENT_TLS_HANDSHAKED">
+<parameter_description> The client has performed a
+TLS handshake.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_CLIENT_COMPLETE">
+<parameter_description> The client is done with a particular
+#GSocketConnectable.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GSocketFamily">
+<description>
+The protocol family of a #GSocketAddress. (These values are
+identical to the system defines %AF_INET, %AF_INET6 and %AF_UNIX,
+if available.)
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="G_SOCKET_FAMILY_INVALID">
+<parameter_description> no address family
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_FAMILY_IPV4">
+<parameter_description> the IPv4 family
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_FAMILY_IPV6">
+<parameter_description> the IPv6 family
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_FAMILY_UNIX">
+<parameter_description> the UNIX domain family
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GSocketMsgFlags">
+<description>
+Flags used in g_socket_receive_message() and g_socket_send_message().
+The flags listed in the enum are some commonly available flags, but the
+values used for them are the same as on the platform, and any other flags
+are passed in/out as is. So to use a platform specific flag, just include
+the right system header and pass in the flag.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="G_SOCKET_MSG_NONE">
+<parameter_description> No flags.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_MSG_OOB">
+<parameter_description> Request to send/receive out of band data.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_MSG_PEEK">
+<parameter_description> Read data from the socket without removing it from
+the queue.
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_MSG_DONTROUTE">
+<parameter_description> Don't use a gateway to send out the packet,
+only send to hosts on directly connected networks.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GSocketProtocol">
+<description>
+A protocol identifier is specified when creating a #GSocket, which is a
+family/type specific identifier, where 0 means the default protocol for
+the particular family/type.
+
+This enum contains a set of commonly available and used protocols. You
+can also pass any other identifiers handled by the platform in order to
+use protocols not listed here.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="G_SOCKET_PROTOCOL_UNKNOWN">
+<parameter_description> The protocol type is unknown
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_PROTOCOL_DEFAULT">
+<parameter_description> The default protocol for the family/type
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_PROTOCOL_TCP">
+<parameter_description> TCP over IP
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_PROTOCOL_UDP">
+<parameter_description> UDP over IP
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_PROTOCOL_SCTP">
+<parameter_description> SCTP over IP
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GSocketService::incoming">
 <description>
 The ::incoming signal is emitted when a new incoming connection
@@ -2867,6 +4863,51 @@ g_socket_listener_add_address()
 </return>
 </signal>
 
+<enum name="GSocketType">
+<description>
+Flags used when creating a #GSocket. Some protocols may not implement
+all the socket types.
+
+Since: 2.22
+
+</description>
+<parameters>
+<parameter name="G_SOCKET_TYPE_INVALID">
+<parameter_description> Type unknown or wrong
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_TYPE_STREAM">
+<parameter_description> Reliable connection-based byte streams (e.g. TCP).
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_TYPE_DATAGRAM">
+<parameter_description> Connectionless, unreliable datagram passing.
+(e.g. UDP)
+</parameter_description>
+</parameter>
+<parameter name="G_SOCKET_TYPE_SEQPACKET">
+<parameter_description> Reliable connection-based passing of datagrams
+of fixed maximum length (e.g. SCTP).
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTestDBusFlags">
+<description>
+Flags to define future #GTestDBus behaviour.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="G_TEST_DBUS_NONE">
+<parameter_description> No flags.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GThreadedSocketService::run">
 <description>
 The ::run signal is emitted in a worker thread in response to an
@@ -2893,6 +4934,83 @@ not return until the connection is closed.
 <return> %TRUE to stop further signal handlers from being called
 </return>
 </signal>
+
+<enum name="GTlsAuthenticationMode">
+<description>
+The client authentication mode for a #GTlsServerConnection.
+
+Since: 2.28
+
+</description>
+<parameters>
+<parameter name="G_TLS_AUTHENTICATION_NONE">
+<parameter_description> client authentication not required
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_AUTHENTICATION_REQUESTED">
+<parameter_description> client authentication is requested
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_AUTHENTICATION_REQUIRED">
+<parameter_description> client authentication is required
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTlsCertificateFlags">
+<description>
+A set of flags describing TLS certification validation. This can be
+used to set which validation steps to perform (eg, with
+g_tls_client_connection_set_validation_flags()), or to describe why
+a particular certificate was rejected (eg, in
+#GTlsConnection::accept-certificate).
+
+Since: 2.28
+
+</description>
+<parameters>
+<parameter name="G_TLS_CERTIFICATE_UNKNOWN_CA">
+<parameter_description> The signing certificate authority is
+not known.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CERTIFICATE_BAD_IDENTITY">
+<parameter_description> The certificate does not match the
+expected identity of the site that it was retrieved from.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CERTIFICATE_NOT_ACTIVATED">
+<parameter_description> The certificate's activation time
+is still in the future
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CERTIFICATE_EXPIRED">
+<parameter_description> The certificate has expired
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CERTIFICATE_REVOKED">
+<parameter_description> The certificate has been revoked
+according to the #GTlsConnection's certificate revocation list.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CERTIFICATE_INSECURE">
+<parameter_description> The certificate's algorithm is
+considered insecure.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CERTIFICATE_GENERIC_ERROR">
+<parameter_description> Some other error occurred validating
+the certificate
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_CERTIFICATE_VALIDATE_ALL">
+<parameter_description> the combination of all of the above
+flags
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GTlsConnection::accept-certificate">
 <description>
@@ -2955,6 +5073,169 @@ no one else overrides it.
 </return>
 </signal>
 
+<enum name="GTlsDatabaseLookupFlags">
+<description>
+Flags for g_tls_database_lookup_certificate_handle(),
+g_tls_database_lookup_certificate_issuer(),
+and g_tls_database_lookup_certificates_issued_by().
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="G_TLS_DATABASE_LOOKUP_NONE">
+<parameter_description> No lookup flags
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_DATABASE_LOOKUP_KEYPAIR">
+<parameter_description> Restrict lookup to certificates that have
+a private key.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTlsDatabaseVerifyFlags">
+<description>
+Flags for g_tls_database_verify_chain().
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="G_TLS_DATABASE_VERIFY_NONE">
+<parameter_description> No verification flags
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTlsError">
+<description>
+An error code used with %G_TLS_ERROR in a #GError returned from a
+TLS-related routine.
+
+Since: 2.28
+
+</description>
+<parameters>
+<parameter name="G_TLS_ERROR_UNAVAILABLE">
+<parameter_description> No TLS provider is available
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_ERROR_MISC">
+<parameter_description> Miscellaneous TLS error
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_ERROR_BAD_CERTIFICATE">
+<parameter_description> A certificate could not be parsed
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_ERROR_NOT_TLS">
+<parameter_description> The TLS handshake failed because the
+peer does not seem to be a TLS server.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_ERROR_HANDSHAKE">
+<parameter_description> The TLS handshake failed because the
+peer's certificate was not acceptable.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_ERROR_CERTIFICATE_REQUIRED">
+<parameter_description> The TLS handshake failed because
+the server requested a client-side certificate, but none was
+provided. See g_tls_connection_set_certificate().
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_ERROR_EOF">
+<parameter_description> The TLS connection was closed without proper
+notice, which may indicate an attack. See
+g_tls_connection_set_require_close_notify().
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTlsInteractionResult">
+<description>
+#GTlsInteractionResult is returned by various functions in #GTlsInteraction
+when finishing an interaction request.
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="G_TLS_INTERACTION_UNHANDLED">
+<parameter_description> The interaction was unhandled (i.e. not
+implemented).
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_INTERACTION_HANDLED">
+<parameter_description> The interaction completed, and resulting data
+is available.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_INTERACTION_FAILED">
+<parameter_description> The interaction has failed, or was cancelled.
+and the operation should be aborted.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTlsPasswordFlags">
+<description>
+Various flags for the password.
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="G_TLS_PASSWORD_NONE">
+<parameter_description> No flags
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PASSWORD_RETRY">
+<parameter_description> The password was wrong, and the user should retry.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PASSWORD_MANY_TRIES">
+<parameter_description> Hint to the user that the password has been
+wrong many times, and the user may not have many chances left.
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_PASSWORD_FINAL_TRY">
+<parameter_description> Hint to the user that this is the last try to get
+this password right.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTlsRehandshakeMode">
+<description>
+When to allow rehandshaking. See
+g_tls_connection_set_rehandshake_mode().
+
+Since: 2.28
+
+</description>
+<parameters>
+<parameter name="G_TLS_REHANDSHAKE_NEVER">
+<parameter_description> Never allow rehandshaking
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_REHANDSHAKE_SAFELY">
+<parameter_description> Allow safe rehandshaking only
+</parameter_description>
+</parameter>
+<parameter name="G_TLS_REHANDSHAKE_UNSAFELY">
+<parameter_description> Allow unsafe rehandshaking
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <signal name="GUnixMountMonitor::mountpoints-changed">
 <description>
 Emitted when the unix mount points have changed.
@@ -2982,6 +5263,51 @@ Emitted when the unix mounts have changed.
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GUnixSocketAddressType">
+<description>
+The type of name used by a #GUnixSocketAddress.
+%G_UNIX_SOCKET_ADDRESS_PATH indicates a traditional unix domain
+socket bound to a filesystem path. %G_UNIX_SOCKET_ADDRESS_ANONYMOUS
+indicates a socket not bound to any name (eg, a client-side socket,
+or a socket created with socketpair()).
+
+For abstract sockets, there are two incompatible ways of naming
+them; the man pages suggest using the entire &lt;literal&gt;struct
+sockaddr_un&lt;/literal&gt; as the name, padding the unused parts of the
+%sun_path field with zeroes; this corresponds to
+%G_UNIX_SOCKET_ADDRESS_ABSTRACT_PADDED. However, many programs
+instead just use a portion of %sun_path, and pass an appropriate
+smaller length to bind() or connect(). This is
+%G_UNIX_SOCKET_ADDRESS_ABSTRACT.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="G_UNIX_SOCKET_ADDRESS_INVALID">
+<parameter_description> invalid
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_SOCKET_ADDRESS_ANONYMOUS">
+<parameter_description> anonymous
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_SOCKET_ADDRESS_PATH">
+<parameter_description> a filesystem path
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_SOCKET_ADDRESS_ABSTRACT">
+<parameter_description> an abstract name
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_SOCKET_ADDRESS_ABSTRACT_PADDED">
+<parameter_description> an abstract name, 0-padded
+to the full length of a unix socket name
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <signal name="GVolume::changed">
 <description>
@@ -3225,6 +5551,30 @@ Emitted when a mountable volume is removed from the system.
 <return></return>
 </signal>
 
+<enum name="GZlibCompressorFormat">
+<description>
+Used to select the type of data format to use for #GZlibDecompressor
+and #GZlibCompressor.
+
+Since: 2.24
+
+</description>
+<parameters>
+<parameter name="G_ZLIB_COMPRESSOR_FORMAT_ZLIB">
+<parameter_description> deflate compression with zlib header
+</parameter_description>
+</parameter>
+<parameter name="G_ZLIB_COMPRESSOR_FORMAT_GZIP">
+<parameter_description> gzip file format
+</parameter_description>
+</parameter>
+<parameter name="G_ZLIB_COMPRESSOR_FORMAT_RAW">
+<parameter_description> deflate compression with no header
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <function name="example_animal_call_poke">
 <description>
 Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-gtk-GDBus-Example-ObjectManager-Animal.Poke&quot;&gt;Poke()&lt;/link&gt; D-Bus method on @proxy.
@@ -3349,6 +5699,46 @@ Since: 2.30
 <return></return>
 </function>
 
+<function name="example_animal_dup_bar">
+<description>
+Gets a copy of the &lt;link linkend=&quot;gdbus-property-org-gtk-GDBus-Example-ObjectManager-Animal.Bar&quot;&gt;&quot;Bar&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #ExampleAnimal.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value or %NULL if the property is not set. The returned value should be freed with g_free().
+
+</return>
+</function>
+
+<function name="example_animal_dup_foo">
+<description>
+Gets a copy of the &lt;link linkend=&quot;gdbus-property-org-gtk-GDBus-Example-ObjectManager-Animal.Foo&quot;&gt;&quot;Foo&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #ExampleAnimal.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value or %NULL if the property is not set. The returned value should be freed with g_free().
+
+</return>
+</function>
+
 <function name="example_animal_dup_mood">
 <description>
 Gets a copy of the &lt;link linkend=&quot;gdbus-property-org-gtk-GDBus-Example-ObjectManager-Animal.Mood&quot;&gt;&quot;Mood&quot;&lt;/link&gt; D-Bus property.
@@ -3387,6 +5777,50 @@ Since: 2.30
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="example_animal_get_bar">
+<description>
+Gets the value of the &lt;link linkend=&quot;gdbus-property-org-gtk-GDBus-Example-ObjectManager-Animal.Bar&quot;&gt;&quot;Bar&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+&lt;warning&gt;The returned value is only valid until the property changes so on the client-side it is only safe to use this function on the thread where @object was constructed. Use example_animal_dup_bar() if on another thread.&lt;/warning&gt;
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #ExampleAnimal.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value or %NULL if the property is not set. Do not free the returned value, it belongs to @object.
+
+</return>
+</function>
+
+<function name="example_animal_get_foo">
+<description>
+Gets the value of the &lt;link linkend=&quot;gdbus-property-org-gtk-GDBus-Example-ObjectManager-Animal.Foo&quot;&gt;&quot;Foo&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+&lt;warning&gt;The returned value is only valid until the property changes so on the client-side it is only safe to use this function on the thread where @object was constructed. Use example_animal_dup_foo() if on another thread.&lt;/warning&gt;
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #ExampleAnimal.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value or %NULL if the property is not set. Do not free the returned value, it belongs to @object.
+
+</return>
 </function>
 
 <function name="example_animal_get_mood">
@@ -3664,6 +6098,50 @@ Since: 2.30
 <return> The constructed proxy object or %NULL if @error is set.
 
 </return>
+</function>
+
+<function name="example_animal_set_bar">
+<description>
+Sets the &lt;link linkend=&quot;gdbus-property-org-gtk-GDBus-Example-ObjectManager-Animal.Bar&quot;&gt;&quot;Bar&quot;&lt;/link&gt; D-Bus property to @value.
+
+Since this D-Bus property is not writable, it is only meaningful to use this function on the service-side.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #ExampleAnimal.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The value to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="example_animal_set_foo">
+<description>
+Sets the &lt;link linkend=&quot;gdbus-property-org-gtk-GDBus-Example-ObjectManager-Animal.Foo&quot;&gt;&quot;Foo&quot;&lt;/link&gt; D-Bus property to @value.
+
+Since this D-Bus property is not writable, it is only meaningful to use this function on the service-side.
+
+Since: 2.30
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #ExampleAnimal.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The value to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="example_animal_set_mood">
@@ -9670,13 +12148,11 @@ Since: 2.0
 <description>
 Gets a machine-readable description of the &lt;link linkend=&quot;gdbus-interface-ChangingInterfaceV10.top_of_page&quot;&gt;ChangingInterfaceV10&lt;/link&gt; D-Bus interface.
 
-Since: 10.0
 
 </description>
 <parameters>
 </parameters>
 <return> A #GDBusInterfaceInfo. Do not free.
-
 </return>
 </function>
 
@@ -9685,7 +12161,6 @@ Since: 10.0
 Overrides all #GObject properties in the #FooiGenChangingInterfaceV10 interface for a concrete class.
 The properties are overridden in the order they are defined.
 
-Since: 10.0
 
 </description>
 <parameters>
@@ -9699,7 +12174,6 @@ Since: 10.0
 </parameter>
 </parameters>
 <return> The last property id.
-
 </return>
 </function>
 
@@ -9711,8 +12185,6 @@ When the operation is finished, @callback will be invoked in the &lt;link linken
 You can then call foo_igen_changing_interface_v10_proxy_new_finish() to get the result of the operation.
 
 See foo_igen_changing_interface_v10_proxy_new_sync() for the synchronous, blocking version of this constructor.
-
-Since: 10.0
 
 </description>
 <parameters>
@@ -9752,7 +12224,6 @@ Since: 10.0
 <description>
 Finishes an operation started with foo_igen_changing_interface_v10_proxy_new().
 
-Since: 10.0
 
 </description>
 <parameters>
@@ -9766,7 +12237,6 @@ Since: 10.0
 </parameter>
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
-
 </return>
 </function>
 
@@ -9778,8 +12248,6 @@ When the operation is finished, @callback will be invoked in the &lt;link linken
 You can then call foo_igen_changing_interface_v10_proxy_new_for_bus_finish() to get the result of the operation.
 
 See foo_igen_changing_interface_v10_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.
-
-Since: 10.0
 
 </description>
 <parameters>
@@ -9819,7 +12287,6 @@ Since: 10.0
 <description>
 Finishes an operation started with foo_igen_changing_interface_v10_proxy_new_for_bus().
 
-Since: 10.0
 
 </description>
 <parameters>
@@ -9833,7 +12300,6 @@ Since: 10.0
 </parameter>
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
-
 </return>
 </function>
 
@@ -9845,7 +12311,6 @@ The calling thread is blocked until a reply is received.
 
 See foo_igen_changing_interface_v10_proxy_new_for_bus() for the asynchronous version of this constructor.
 
-Since: 10.0
 
 </description>
 <parameters>
@@ -9875,7 +12340,6 @@ Since: 10.0
 </parameter>
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
-
 </return>
 </function>
 
@@ -9887,7 +12351,6 @@ The calling thread is blocked until a reply is received.
 
 See foo_igen_changing_interface_v10_proxy_new() for the asynchronous version of this constructor.
 
-Since: 10.0
 
 </description>
 <parameters>
@@ -9917,7 +12380,6 @@ Since: 10.0
 </parameter>
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
-
 </return>
 </function>
 
@@ -9925,13 +12387,11 @@ Since: 10.0
 <description>
 Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-ChangingInterfaceV10.top_of_page&quot;&gt;ChangingInterfaceV10&lt;/link&gt;.
 
-Since: 10.0
 
 </description>
 <parameters>
 </parameters>
 <return> The skeleton object.
-
 </return>
 </function>
 
@@ -10998,13 +13458,11 @@ Since: 2.0
 <description>
 Gets a machine-readable description of the &lt;link linkend=&quot;gdbus-interface-ChangingInterfaceV2.top_of_page&quot;&gt;ChangingInterfaceV2&lt;/link&gt; D-Bus interface.
 
-Since: 2.0
 
 </description>
 <parameters>
 </parameters>
 <return> A #GDBusInterfaceInfo. Do not free.
-
 </return>
 </function>
 
@@ -11013,7 +13471,6 @@ Since: 2.0
 Overrides all #GObject properties in the #FooiGenChangingInterfaceV2 interface for a concrete class.
 The properties are overridden in the order they are defined.
 
-Since: 2.0
 
 </description>
 <parameters>
@@ -11027,7 +13484,6 @@ Since: 2.0
 </parameter>
 </parameters>
 <return> The last property id.
-
 </return>
 </function>
 
@@ -11039,8 +13495,6 @@ When the operation is finished, @callback will be invoked in the &lt;link linken
 You can then call foo_igen_changing_interface_v2_proxy_new_finish() to get the result of the operation.
 
 See foo_igen_changing_interface_v2_proxy_new_sync() for the synchronous, blocking version of this constructor.
-
-Since: 2.0
 
 </description>
 <parameters>
@@ -11080,7 +13534,6 @@ Since: 2.0
 <description>
 Finishes an operation started with foo_igen_changing_interface_v2_proxy_new().
 
-Since: 2.0
 
 </description>
 <parameters>
@@ -11094,7 +13547,6 @@ Since: 2.0
 </parameter>
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
-
 </return>
 </function>
 
@@ -11106,8 +13558,6 @@ When the operation is finished, @callback will be invoked in the &lt;link linken
 You can then call foo_igen_changing_interface_v2_proxy_new_for_bus_finish() to get the result of the operation.
 
 See foo_igen_changing_interface_v2_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.
-
-Since: 2.0
 
 </description>
 <parameters>
@@ -11147,7 +13597,6 @@ Since: 2.0
 <description>
 Finishes an operation started with foo_igen_changing_interface_v2_proxy_new_for_bus().
 
-Since: 2.0
 
 </description>
 <parameters>
@@ -11161,7 +13610,6 @@ Since: 2.0
 </parameter>
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
-
 </return>
 </function>
 
@@ -11173,7 +13621,6 @@ The calling thread is blocked until a reply is received.
 
 See foo_igen_changing_interface_v2_proxy_new_for_bus() for the asynchronous version of this constructor.
 
-Since: 2.0
 
 </description>
 <parameters>
@@ -11203,7 +13650,6 @@ Since: 2.0
 </parameter>
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
-
 </return>
 </function>
 
@@ -11215,7 +13661,6 @@ The calling thread is blocked until a reply is received.
 
 See foo_igen_changing_interface_v2_proxy_new() for the asynchronous version of this constructor.
 
-Since: 2.0
 
 </description>
 <parameters>
@@ -11245,7 +13690,6 @@ Since: 2.0
 </parameter>
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
-
 </return>
 </function>
 
@@ -11253,13 +13697,11 @@ Since: 2.0
 <description>
 Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-ChangingInterfaceV2.top_of_page&quot;&gt;ChangingInterfaceV2&lt;/link&gt;.
 
-Since: 2.0
 
 </description>
 <parameters>
 </parameters>
 <return> The skeleton object.
-
 </return>
 </function>
 
@@ -13890,7 +16332,6 @@ Gets the #FooiGenChangingInterfaceV1 instance for the D-Bus interface &lt;link l
 <description>
 Gets the #FooiGenChangingInterfaceV10 instance for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-ChangingInterfaceV10.top_of_page&quot;&gt;ChangingInterfaceV10&lt;/link&gt; on @object, if any.
 
-Since: 10.0
 
 </description>
 <parameters>
@@ -13900,7 +16341,6 @@ Since: 10.0
 </parameter>
 </parameters>
 <return> A #FooiGenChangingInterfaceV10 that must be freed with g_object_unref() or %NULL if @object does not implement the interface.
-
 </return>
 </function>
 
@@ -13908,7 +16348,6 @@ Since: 10.0
 <description>
 Gets the #FooiGenChangingInterfaceV2 instance for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-ChangingInterfaceV2.top_of_page&quot;&gt;ChangingInterfaceV2&lt;/link&gt; on @object, if any.
 
-Since: 2.0
 
 </description>
 <parameters>
@@ -13918,7 +16357,6 @@ Since: 2.0
 </parameter>
 </parameters>
 <return> A #FooiGenChangingInterfaceV2 that must be freed with g_object_unref() or %NULL if @object does not implement the interface.
-
 </return>
 </function>
 
@@ -14416,7 +16854,6 @@ Like foo_igen_object_get_changing_interface_v10() but doesn't increase the refer
 
 &lt;warning&gt;It is not safe to use the returned object if you are on another thread than the one where the #GDBusObjectManagerClient or #GDBusObjectManagerServer for @object is running.&lt;/warning&gt;
 
-Since: 10.0
 
 </description>
 <parameters>
@@ -14426,7 +16863,6 @@ Since: 10.0
 </parameter>
 </parameters>
 <return> A #FooiGenChangingInterfaceV10 or %NULL if @object does not implement the interface. Do not free the returned object, it is owned by @object.
-
 </return>
 </function>
 
@@ -14436,7 +16872,6 @@ Like foo_igen_object_get_changing_interface_v2() but doesn't increase the refere
 
 &lt;warning&gt;It is not safe to use the returned object if you are on another thread than the one where the #GDBusObjectManagerClient or #GDBusObjectManagerServer for @object is running.&lt;/warning&gt;
 
-Since: 2.0
 
 </description>
 <parameters>
@@ -14446,7 +16881,6 @@ Since: 2.0
 </parameter>
 </parameters>
 <return> A #FooiGenChangingInterfaceV2 or %NULL if @object does not implement the interface. Do not free the returned object, it is owned by @object.
-
 </return>
 </function>
 
@@ -14762,8 +17196,6 @@ Sets the #FooiGenChangingInterfaceV1 instance for the D-Bus interface &lt;link l
 <description>
 Sets the #FooiGenChangingInterfaceV10 instance for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-ChangingInterfaceV10.top_of_page&quot;&gt;ChangingInterfaceV10&lt;/link&gt; on @object.
 
-Since: 10.0
-
 </description>
 <parameters>
 <parameter name="object">
@@ -14781,8 +17213,6 @@ Since: 10.0
 <function name="foo_igen_object_skeleton_set_changing_interface_v2">
 <description>
 Sets the #FooiGenChangingInterfaceV2 instance for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-ChangingInterfaceV2.top_of_page&quot;&gt;ChangingInterfaceV2&lt;/link&gt; on @object.
-
-Since: 2.0
 
 </description>
 <parameters>
@@ -39501,6 +41931,22 @@ associated with @extension.
 </return>
 </function>
 
+<function name="g_io_module_load">
+<description>
+Required API for GIO modules to implement.
+This function is ran after the module has been loaded into GIO,
+to initialize the module.
+
+</description>
+<parameters>
+<parameter name="module">
+<parameter_description> a #GIOModule.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_io_module_new">
 <description>
 Creates a new GIOModule that will load the specific
@@ -39516,6 +41962,43 @@ shared library when in use.
 </parameters>
 <return> a #GIOModule from given @filename, 
 or %NULL on error.
+</return>
+</function>
+
+<function name="g_io_module_query">
+<description>
+Optional API for GIO modules to implement.
+
+Should return a list of all the extension points that may be
+implemented in this module.
+
+This method will not be called in normal use, however it may be
+called when probing existing modules and recording which extension
+points that this model is used for. This means we won't have to
+load and initialze this module unless its needed.
+
+If this function is not implemented by the module the module will
+always be loaded, initialized and then unloaded on application startup
+so that it can register its extension points during init.
+
+Note that a module need not actually implement all the extension points
+that g_io_module_query returns, since the exact list of extension may
+depend on runtime issues. However all extension points actually implemented
+must be returned by g_io_module_query() (if defined).
+
+When installing a module that implements g_io_module_query you must
+run gio-querymodules in order to build the cache files required for
+lazy loading.
+
+Since: 2.24
+
+</description>
+<parameters>
+</parameters>
+<return> A %NULL-terminated array of strings, listing the supported
+extension points of the module. The array must be suitable for
+freeing with g_strfreev().
+
 </return>
 </function>
 
@@ -39578,6 +42061,22 @@ Since: 2.30
 <return> the new module scope
 
 </return>
+</function>
+
+<function name="g_io_module_unload">
+<description>
+Required API for GIO modules to implement.
+This function is ran when the module is being unloaded from GIO,
+to finalize the module.
+
+</description>
+<parameters>
+<parameter name="module">
+<parameter_description> a #GIOModule.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_io_modules_load_all_in_directory">
