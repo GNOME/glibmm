@@ -869,9 +869,6 @@ Variant< std::pair<K, V> >::create(const std::pair<K, V>& data)
   Variant< std::pair<K, V> > result = Variant< std::pair<K, V> >(
     g_variant_new_dict_entry(key.gobj(), value.gobj()));
 
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
-
   return result;
 }
 
@@ -928,9 +925,6 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
   Variant< std::vector<T> > result =
     Variant< std::vector<T> >(g_variant_new(
       reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
 
   return result;
 }
@@ -1020,9 +1014,6 @@ Variant< std::map<K, V> >::create(const std::map<K, V>& data)
   // Create the variant using the builder.
   Variant< std::map<K, V> > result = Variant< std::map<K, V> >(g_variant_new(
     reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
 
   return result;
 }
