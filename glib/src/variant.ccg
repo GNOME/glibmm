@@ -112,11 +112,7 @@ VariantContainerBase::create_tuple(const std::vector<VariantBase>& children)
 
   VariantContainerBase result = VariantContainerBase(g_variant_new_tuple(
     var_array, children.size()));
-
-  g_variant_ref_sink(result.gobj());
-
   delete[] var_array;
-
   return result;
 }
 
@@ -136,12 +132,7 @@ VariantContainerBase::create_maybe(const VariantType& child_type,
 {
   GVariant* g_variant = g_variant_new_maybe(child_type.gobj(),
     const_cast<GVariant*>(child.gobj()));
-
   VariantContainerBase result = VariantContainerBase(g_variant);
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
-
   return result;
 }
 
@@ -221,10 +212,6 @@ const VariantType& Variant<VariantBase>::variant_type()
 Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
 {
   Variant<VariantBase> result = Variant<VariantBase>(g_variant_new_variant(const_cast<GVariant*>(data.gobj())));
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
-
   return result;
 }
 
@@ -256,10 +243,6 @@ Variant<Glib::ustring>::create(const Glib::ustring& data)
 {
   Variant<Glib::ustring> result =
     Variant<Glib::ustring>(g_variant_new_string(data.c_str()));
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
-
   return result;
 }
 
@@ -314,10 +297,6 @@ Variant<std::string>::create(const std::string& data)
 {
   Variant<std::string> result =
     Variant<std::string>(g_variant_new_bytestring(data.c_str()));
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
-
   return result;
 }
 
@@ -402,9 +381,6 @@ Variant<type_vec_ustring>::create(const type_vec_ustring& data)
   Variant<type_vec_ustring> result =
     Variant<type_vec_ustring>(g_variant_new(
       array_variant_type.get_string().c_str(), builder));
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
 
   return result;
 }
@@ -493,10 +469,6 @@ Variant<type_vec_string>::create(const type_vec_string& data)
       data.size()));
 
   g_strfreev(str_array);
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
-
   return result;
 }
 
@@ -521,10 +493,6 @@ Variant<type_vec_string>::create_from_object_paths(const type_vec_string& data)
     Variant<type_vec_string>(g_variant_new_objv(str_array, data.size()));
 
   g_strfreev(str_array);
-
-  // Remove the floating reference (since it is newly created).
-  g_variant_ref_sink(result.gobj());
-
   return result;
 }
 
