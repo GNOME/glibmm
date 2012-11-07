@@ -17,7 +17,7 @@ def usage():
     sys.stderr.write('usage: docextract_to_xml.py ' +
         '[-s /src/dir | --source-dir=/src/dir] ' +
         '[-a | --with-annotations] [-p | --with-properties] ' +
-        '[-i | --no-signals ] [-n | --no-since]\n')
+        '[-n | --no-since] [-i | --no-signals ] [-e | --no-enums ]\n')
     sys.exit(1)
 
 # Translates special texts to &... HTML acceptable format.  Also replace
@@ -61,10 +61,10 @@ def print_annotations(annotations):
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:s:o:apin",
+        opts, args = getopt.getopt(sys.argv[1:], "d:s:o:apnie",
                                    ["source-dir=", "with-annotations",
-                                     "with-properties", "no-signals",
-                                     "no-since"])
+                                     "with-properties", "no-since",
+                                     "no-signals", "no-enums"])
     except getopt.error, e:
         sys.stderr.write('docextract_to_xml.py: %s\n' % e)
         usage()
@@ -72,6 +72,7 @@ if __name__ == '__main__':
     with_annotations = False
     with_signals = True
     with_properties = False
+    with_enums = True
     for opt, arg in opts:
         if opt in ('-s', '--source-dir'):
             source_dirs.append(arg)
@@ -79,10 +80,12 @@ if __name__ == '__main__':
             with_annotations = True
         if opt in ('-p', '--with-properties'):
             with_properties = True
-        if opt in ('-i', '--no-signals'):
-            with_signals = False
         if opt in ('-n', '--no-since'):
             docextract.no_since = True
+        if opt in ('-i', '--no-signals'):
+            with_signals = False
+        if opt in ('-e', '--no-enums'):
+            with_enums = False
     if len(args) != 0:
         usage()
 
@@ -106,6 +109,9 @@ if __name__ == '__main__':
             # Likewise for properties.
             elif block_type == 'property' and not with_properties:
                 continue
+            # Likewise for enums.
+            elif block_type == 'enum' and not with_enums:
+                continue
 
             print "<" + block_type + " name=\"" + escape_text(name) + "\">"
 
@@ -127,15 +133,17 @@ if __name__ == '__main__':
 
                 print "</parameters>"
 
-                # Show the return-type (also if not dealing with a property):
-                if with_annotations:
-                    print "<return>"
-                    print "<return_description>" + escape_text(value.ret[0]) + \
-                            "</return_description>"
-                    print_annotations(value.ret[1])
-                    print "</return>"
-                else:
-                    print "<return>" + escape_text(value.ret[0]) + "</return>"
+            if block_type != 'property' and block_type != 'enum':
+              # Show the return-type (also if not dealing with a property or
+              # enum):
+              if with_annotations:
+                  print "<return>"
+                  print "<return_description>" + escape_text(value.ret[0]) + \
+                          "</return_description>"
+                  print_annotations(value.ret[1])
+                  print "</return>"
+              else:
+                  print "<return>" + escape_text(value.ret[0]) + "</return>"
 
             if with_annotations:
                 print_annotations(value.get_annotations())

@@ -331,7 +331,7 @@ sub parse_param($$)
   }
 
   $type = string_trim($type);
-  
+
   # Determine if the param is optional, an output param or if a C param
   # name should be mapped to the current C++ index (if name ends with
   # {c_name>>?}). (A '.' for the name means use the C++ as the C name).

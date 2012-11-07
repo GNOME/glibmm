@@ -1319,14 +1319,14 @@ sub on_wrap_property($)
 
   my $filename = $$self{filename};
   my $line_num = $$self{line_num};
-  
+
   #TODO: Reduce duplication with on_wrap_method():
   my $argDeprecated = "";
   my $deprecation_docs = "";
   while($#args >= 2) # If the optional arguments are there.
   {
     my $argRef = string_trim(pop @args);
-    
+
     if($argRef =~ /^deprecated(.*)/) #If deprecated is at the start.
     {
       $argDeprecated = "deprecated";
@@ -1337,7 +1337,7 @@ sub on_wrap_property($)
       }
     }
   }
-    
+
 
   $objOutputter->output_wrap_property($filename, $line_num, $argPropertyName, $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs);
 }

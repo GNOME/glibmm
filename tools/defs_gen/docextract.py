@@ -17,7 +17,8 @@ __all__ = ['extract']
 class GtkDoc:
     def __init__(self):
         self.name = None
-        self.block_type = '' # The block type ('function', 'signal', 'property')
+        # The block type ('function', 'signal', property', 'enum')
+        self.block_type = ''
         self.params = []
         self.annotations = []
         self.description = ''
@@ -63,6 +64,7 @@ comment_empty_line_pattern = re.compile(r'^\s*\**\s*$')
 function_name_pattern = re.compile(r'^([a-z]\w*)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
 signal_name_pattern = re.compile(r'^([A-Z]\w+::[a-z0-9-]+)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
 property_name_pattern = re.compile(r'^([A-Z]\w+:[a-z0-9-]+)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
+enum_name_pattern = re.compile(r'^([A-Z]\w+)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
 return_pattern = re.compile(r'^@?(returns:|return\s+value:)(.*\n?)$', re.IGNORECASE)
 deprecated_pattern = re.compile(r'^(deprecated\s*:\s*.*\n?)$', re.IGNORECASE)
 rename_to_pattern = re.compile(r'^(rename\s+to)\s*:\s*(.*\n?)$', re.IGNORECASE)
@@ -77,7 +79,7 @@ annotation_lead_pattern = re.compile(r'^\s*\(\s*(.*?)\s*\)\s*')
 # are grouped in a list for easy determination of block identifiers (in
 # skip_to_identifier).  The function_name_pattern should be tested for last
 # because it always matches signal and property identifiers.
-identifier_patterns = [ signal_name_pattern, property_name_pattern, function_name_pattern ]
+identifier_patterns = [ signal_name_pattern, property_name_pattern, enum_name_pattern, function_name_pattern ]
 
 # This pattern is to match return sections that forget to have a colon (':')
 # after the initial 'Return' phrase.  It is not included by default in the list
@@ -106,8 +108,14 @@ def parse_file(fp, doc_dict):
             line = process_params(fp, line, cur_doc)
             line = process_description(fp, line, cur_doc)
             line = process_final_sections(fp, line, cur_doc)
-            # Add the current doc block to the dictionary of doc blocks.
-            doc_dict[cur_doc.name] = cur_doc
+
+            # Add the current doc block to the dictionary of doc blocks.  If
+            # this block was initially recognized as an 'enum' block in
+            # skip_to_identifier(), the process_params() function will mark the
+            # block as invalid if enum members are not all caps.  In that case
+            # do not add the block.
+            if cur_doc.get_type() != 'invalid':
+                doc_dict[cur_doc.name] = cur_doc
 
 # Given a list of annotations as string of the form 
 # '(annotation1) (annotation2) ...' return a list of annotations of the form
@@ -153,9 +161,9 @@ def skip_to_nonblank(fp, line):
 # Given the first line of a comment block (the '/**'), see if the next
 # non-blank line is the identifier of the comment block.  Stop processing if
 # the end of the block or eof is reached.  Store the identifier (if there is
-# one) and its type ('function', 'signal' or 'property') in the given GtkDoc.
-# Return the line where the identifier is found or the line that stops the
-# processing (if eof or the end of the comment block is found first).
+# one) and its type ('function', 'signal' or 'property', 'enum') in the given
+# GtkDoc.  Return the line where the identifier is found or the line that stops
+# the processing (if eof or the end of the comment block is found first).
 def skip_to_identifier(fp, line, cur_doc):
     # Skip the initial comment block line ('/**') if not eof.
     if line: line = fp.readline()
@@ -182,6 +190,8 @@ def skip_to_identifier(fp, line, cur_doc):
                     cur_doc.set_type('signal')
                 elif pattern == property_name_pattern:
                     cur_doc.set_type('property')
+                elif pattern == enum_name_pattern:
+                    cur_doc.set_type('enum')
                 elif pattern == function_name_pattern:
                     cur_doc.set_type('function')
                 return line
@@ -198,6 +208,10 @@ def process_params(fp, line, cur_doc):
     if line: line = fp.readline()
     line = skip_to_nonblank(fp, line)
     if not line or comment_end_pattern.match(line):
+        # If there are no parameters and this block has been recognized as an
+        # enum block, then mark it as invalid.
+        if cur_doc.get_type() == 'enum':
+            cur_doc.set_type('invalid')
         return line
 
     # Remove initial ' * ' in first non-empty comment block line.
@@ -207,8 +221,19 @@ def process_params(fp, line, cur_doc):
     # param section is not reached (which could be triggered by anything that
     # doesn't match a '@param:..." line, even the end of the comment block).
     match = param_pattern.match(line)
+
+    # Mark the cur_doc type as invalid if no parameters are found.
+    if not match and cur_doc.get_type() == 'enum':
+        cur_doc.set_type('invalid')
+
     while line and match:
+        name = match.group(1)
         description = match.group(2)
+
+        # Set the cur_doc type as 'invalid' if the enum member names are not
+        # all caps.
+        if not name.isupper() and cur_doc.get_type() == 'enum':
+            cur_doc.set_type('invalid')
 
         # First extract the annotations from the description and save them.
         annotations = []
@@ -224,12 +249,12 @@ def process_params(fp, line, cur_doc):
         # See if the return has been included as part of the parameter
         # section and make sure that lines are added to the GtkDoc return if
         # so.
-        if match.group(1).lower() == "returns":
+        if name.lower() == "returns":
             cur_doc.add_return(description, annotations)
             append_func = cur_doc.append_to_return
         # If not, just add it as a regular parameter.
         else:
-            cur_doc.add_param(match.group(1), description, annotations)
+            cur_doc.add_param(name, description, annotations)
 
         # Now read lines and append them until next parameter, beginning of
         # description (an empty line), the end of the comment block or eof.
@@ -403,7 +428,7 @@ def parse_dir(dir, doc_dict):
         path = os.path.join(dir, file)
         if os.path.isdir(path):
             parse_dir(path, doc_dict)
-        if len(file) > 2 and file[-2:] == '.c':
+        if len(file) > 2 and (file[-2:] == '.c' or file[-2:] == '.h'):
             sys.stderr.write("Processing " + path + '\n')
             parse_file(open(path, 'r'), doc_dict)
 
