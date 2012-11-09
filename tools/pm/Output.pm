@@ -470,12 +470,18 @@ sub output_wrap_ctor($$$$$)
     #TODO: Add explicit.
     $self->append("  explicit " . $objCppfunc->get_declaration($arg_list) . "\n");
 
+    my $errthrow = "";
+    if($$objCDefsFunc{throw_any_errors})
+    {
+      $errthrow = "errthrow";
+    }
+
     #Implementation:
     my $str = sprintf("_CTOR_IMPL(%s,%s,\`%s\',\`%s\')dnl\n",
       $$objCppfunc{name},
       $$objCDefsFunc{c_name},
       $objCppfunc->args_types_and_names($arg_list),
-      get_ctor_properties($objCppfunc, $objCDefsFunc, $line_num, $arg_list)
+      get_ctor_properties($objCppfunc, $objCDefsFunc, $line_num, $errthrow, $arg_list)
     );
 
     $self->append($str);
@@ -1099,15 +1105,21 @@ sub convert_args_c_to_cpp($$$)
 }
 
 
-# generates the XXX in g_object_new(get_type(), XXX): A list of property names and values.
-# Uses the cpp arg name as the property name.
-# The optional index specifies which arg list out of the possible combination
-# of arguments based on whether any arguments are optional. index = 0 ==> all
-# the arguments.
-# $string get_ctor_properties($objCppfunc, $objCDefsFunc, $wrap_line_number, $index = 0)
-sub get_ctor_properties($$$$$)
+# generates the XXX in g_object_new(get_type(), XXX): A list of property names
+# and values.  Uses the cpp arg name as the property name.
+#
+# - The optional index specifies which arg list out of the possible combination
+#   of arguments based on whether any arguments are optional. index = 0 ==> all
+#   the arguments.
+#
+# - The errthrow parameter tells if the C new function has a final GError**
+#   parameter.  That parameter is ignored since it will not form part of the
+#   property list.
+#
+# $string get_ctor_properties($objCppfunc, $objCDefsFunc, $wrap_line_number, $errthrow, $index = 0)
+sub get_ctor_properties($$$$$$)
 {
-  my ($objCppfunc, $objCDefsFunc, $wrap_line_number, $index) = @_;
+  my ($objCppfunc, $objCDefsFunc, $wrap_line_number, $errthrow, $index) = @_;
 
   $index = 0 unless defined $index;
 
@@ -1121,6 +1133,9 @@ sub get_ctor_properties($$$$$)
   my @result;
 
   my $num_args = scalar(@{$c_param_types});
+
+  # If the C function has a final GError** parameter, ignore it.
+  $num_args-- if ($errthrow eq "errthrow");
 
   my $num_cpp_args = scalar(@{$cpp_param_types});
   if ( $num_cpp_args != $num_args )

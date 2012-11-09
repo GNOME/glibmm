@@ -1071,6 +1071,22 @@ sub on_wrap_ctor($)
     }
   }
 
+    # Handle options (presently only "errthrow" is recognized).
+  $$objCfunc{throw_any_errors} = 0;
+  while($#args >= 2)
+  {
+    my $argRef = string_trim(pop @args);
+    if($argRef eq "errthrow")
+    {
+      $$objCfunc{throw_any_errors} = 1;
+    }
+    else
+    {
+      print STDERR "$filename:$line_num:_WRAP_CTOR: Invalid option '$argRef'.\n";
+      return;
+    }
+  }
+
   $objOutputter->output_wrap_ctor($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl);
 }
 
