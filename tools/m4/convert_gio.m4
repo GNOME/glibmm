@@ -39,6 +39,7 @@ _CONV_ENUM(G,SocketFamily)
 _CONV_ENUM(G,SocketMsgFlags)
 _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketType)
+_CONV_ENUM(G, TlsCertificateFlags)
 _CONV_ENUM(G,UnixSocketAddressType)
 _CONV_ENUM(G,ZlibCompressorFormat)
 
@@ -249,6 +250,7 @@ _CONVERSION(`GSocketAddressEnumerator*',`Glib::RefPtr<SocketAddressEnumerator>',
 
 #SocketConnectable
 _CONVERSION(`const Glib::RefPtr<SocketConnectable>&',`GSocketConnectable*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const SocketConnectable>&', `GSocketConnectable*', `const_cast<GSocketConnectable*>(Glib::unwrap($3))')
 
 #SocketConnection
 _CONVERSION(`GSocketConnection*',`Glib::RefPtr<SocketConnection>',`Glib::wrap($3)')
@@ -259,6 +261,10 @@ _CONVERSION(`GSocketControlMessage*',`Glib::RefPtr<SocketControlMessage>',`Glib:
 
 #TimeZoneMonitor
 _CONVERSION(`GTimeZoneMonitor*',`Glib::RefPtr<TimeZoneMonitor>',`Glib::wrap($3)')
+
+#TlsCertificate
+_CONVERSION(`GTlsCertificate*', `Glib::RefPtr<TlsCertificate>', `Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<const TlsCertificate>&', `GTlsCertificate*', `const_cast<GTlsCertificate*>(Glib::unwrap($3))')
 
 #UnixFDList
 _CONVERSION(`GUnixFDList*',`Glib::RefPtr<UnixFDList>',`Glib::wrap($3)')

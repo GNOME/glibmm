@@ -114,6 +114,7 @@ int main(int, char**)
             << get_defs(G_TYPE_SOCKET_CLIENT)
             << get_defs(G_TYPE_SOCKET_CONNECTION)
             << get_defs(G_TYPE_TCP_CONNECTION)
+            << get_defs(G_TYPE_TLS_CERTIFICATE)
 #ifndef G_OS_WIN32
             << get_defs(G_TYPE_UNIX_CONNECTION)
 #endif
