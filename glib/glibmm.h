@@ -90,6 +90,7 @@
 
 #include <glibmm/arrayhandle.h>
 #include <glibmm/balancedtree.h>
+#include <glibmm/base64.h>
 #include <glibmm/bytearray.h>
 #include <glibmm/bytes.h>
 #include <glibmm/checksum.h>

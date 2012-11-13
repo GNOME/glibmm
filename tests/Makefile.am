@@ -24,6 +24,7 @@ check_PROGRAMS =				\
 	giomm_asyncresult_sourceobject/test	\
 	giomm_tls_client/test			\
 	glibmm_btree/test			\
+	glibmm_base64/test			\
 	glibmm_date/test			\
 	glibmm_buildfilename/test		\
 	glibmm_interface_implementation/test	\
@@ -71,6 +72,7 @@ giomm_asyncresult_sourceobject_test_LDADD    = $(giomm_ldadd)
 giomm_tls_client_test_SOURCES                = giomm_tls_client/main.cc
 giomm_tls_client_test_LDADD                  = $(giomm_ldadd)
 
+glibmm_base64_test_SOURCES               = glibmm_base64/main.cc
 glibmm_btree_test_SOURCES                = glibmm_btree/main.cc
 glibmm_buildfilename_test_SOURCES        = glibmm_buildfilename/main.cc
 glibmm_date_test_SOURCES                 = glibmm_date/main.cc
