@@ -22,13 +22,13 @@
 
 #include <glibmm.h>
 
-#include <giomm/actiongroup.h>
 #include <giomm/action.h>
+#include <giomm/actiongroup.h>
 #include <giomm/actionmap.h>
 #include <giomm/appinfo.h>
 #include <giomm/applaunchcontext.h>
-#include <giomm/applicationcommandline.h>
 #include <giomm/application.h>
+#include <giomm/applicationcommandline.h>
 #include <giomm/asyncinitable.h>
 #include <giomm/asyncresult.h>
 #include <giomm/bufferedinputstream.h>
@@ -65,14 +65,14 @@
 # include <giomm/desktopappinfo.h>
 #endif
 #include <giomm/drive.h>
-#include <giomm/emblemedicon.h>
 #include <giomm/emblem.h>
+#include <giomm/emblemedicon.h>
 #include <giomm/enums.h>
 #include <giomm/error.h>
+#include <giomm/file.h>
 #include <giomm/fileattributeinfo.h>
 #include <giomm/fileattributeinfolist.h>
 #include <giomm/fileenumerator.h>
-#include <giomm/file.h>
 #include <giomm/fileicon.h>
 #include <giomm/fileinfo.h>
 #include <giomm/fileinputstream.h>
@@ -85,15 +85,15 @@
 #include <giomm/icon.h>
 #include <giomm/inetaddress.h>
 #include <giomm/inetsocketaddress.h>
-#include <giomm/initable.h>
 #include <giomm/init.h>
+#include <giomm/initable.h>
 #include <giomm/inputstream.h>
 #include <giomm/iostream.h>
 #include <giomm/loadableicon.h>
 #include <giomm/memoryinputstream.h>
 #include <giomm/memoryoutputstream.h>
-#include <giomm/menuattributeiter.h>
 #include <giomm/menu.h>
+#include <giomm/menuattributeiter.h>
 #include <giomm/menuitem.h>
 #include <giomm/menulinkiter.h>
 #include <giomm/menumodel.h>
@@ -104,22 +104,23 @@
 #include <giomm/outputstream.h>
 #include <giomm/pollableinputstream.h>
 #include <giomm/pollableoutputstream.h>
-#include <giomm/proxyaddress.h>
 #include <giomm/proxy.h>
+#include <giomm/proxyaddress.h>
 #include <giomm/proxyresolver.h>
 #include <giomm/remoteactiongroup.h>
 #include <giomm/resolver.h>
 #include <giomm/resource.h>
 #include <giomm/seekable.h>
 #include <giomm/settings.h>
+#include <giomm/simpleaction.h>
 #include <giomm/simpleactiongroup.h>
-#include <giomm/socketaddressenumerator.h>
+#include <giomm/socket.h>
 #include <giomm/socketaddress.h>
+#include <giomm/socketaddressenumerator.h>
 #include <giomm/socketclient.h>
 #include <giomm/socketconnectable.h>
 #include <giomm/socketconnection.h>
 #include <giomm/socketcontrolmessage.h>
-#include <giomm/socket.h>
 #include <giomm/socketlistener.h>
 #include <giomm/socketservice.h>
 #include <giomm/srvtarget.h>
