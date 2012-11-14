@@ -1781,6 +1781,8 @@
   (construct-only #f)
 )
 
+;; From GTlsBackend
+
 ;; From GTlsCertificate
 
 (define-property certificate
@@ -1826,6 +1828,192 @@
   (readable #t)
   (writable #t)
   (construct-only #t)
+)
+
+;; From GTlsClientConnection
+
+(define-property accepted-cas
+  (of-object "GTlsClientConnection")
+  (prop-type "GParamPointer")
+  (docs "Distinguished names of the CAs the server accepts certificates from")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property server-identity
+  (of-object "GTlsClientConnection")
+  (prop-type "GParamObject")
+  (docs "GSocketConnectable identifying the server")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property use-ssl3
+  (of-object "GTlsClientConnection")
+  (prop-type "GParamBoolean")
+  (docs "Use SSL 3.0 rather than trying to use TLS 1.x")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property validation-flags
+  (of-object "GTlsClientConnection")
+  (prop-type "GParamFlags")
+  (docs "What certificate validation to perform")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GTlsConnection
+
+(define-signal accept-certificate
+  (of-object "GTlsConnection")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("GTlsCertificate*" "p0")
+    '("GTlsCertificateFlags" "p1")
+  )
+)
+
+(define-property base-io-stream
+  (of-object "GTlsConnection")
+  (prop-type "GParamObject")
+  (docs "The GIOStream that the connection wraps")
+  (readable #t)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property require-close-notify
+  (of-object "GTlsConnection")
+  (prop-type "GParamBoolean")
+  (docs "Whether to require proper TLS close notification")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property rehandshake-mode
+  (of-object "GTlsConnection")
+  (prop-type "GParamEnum")
+  (docs "When to allow rehandshaking")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property use-system-certdb
+  (of-object "GTlsConnection")
+  (prop-type "GParamBoolean")
+  (docs "Whether to verify peer certificates against the system certificate database")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property database
+  (of-object "GTlsConnection")
+  (prop-type "GParamObject")
+  (docs "Certificate database to use for looking up or verifying certificates")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property interaction
+  (of-object "GTlsConnection")
+  (prop-type "GParamObject")
+  (docs "Optional object for user interaction")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property certificate
+  (of-object "GTlsConnection")
+  (prop-type "GParamObject")
+  (docs "The connection's certificate")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property peer-certificate
+  (of-object "GTlsConnection")
+  (prop-type "GParamObject")
+  (docs "The connection's peer's certificate")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+(define-property peer-certificate-errors
+  (of-object "GTlsConnection")
+  (prop-type "GParamFlags")
+  (docs "Errors found with the peer's certificate")
+  (readable #t)
+  (writable #f)
+  (construct-only #f)
+)
+
+;; From GTlsDatabase
+
+;; From GTlsFileDatabase
+
+(define-property anchors
+  (of-object "GTlsFileDatabase")
+  (prop-type "GParamString")
+  (docs "The certificate authority anchor file")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GTlsInteraction
+
+;; From GTlsPassword
+
+(define-property flags
+  (of-object "GTlsPassword")
+  (prop-type "GParamFlags")
+  (docs "Flags about the password")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property description
+  (of-object "GTlsPassword")
+  (prop-type "GParamString")
+  (docs "Description of what the password is for")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+(define-property warning
+  (of-object "GTlsPassword")
+  (prop-type "GParamString")
+  (docs "Warning about the password")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
+)
+
+;; From GTlsServerConnection
+
+(define-property authentication-mode
+  (of-object "GTlsServerConnection")
+  (prop-type "GParamEnum")
+  (docs "The client authentication mode")
+  (readable #t)
+  (writable #t)
+  (construct-only #f)
 )
 
 ;; From GUnixConnection
