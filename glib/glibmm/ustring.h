@@ -165,14 +165,14 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  * @par
  * The stream I/O operators, that is operator<<() and operator>>(), perform
  * implicit charset conversion to/from the current locale.  If that's not
- * what you intented (e.g. when writing to a configuration file that should
+ * what you intended (e.g. when writing to a configuration file that should
  * always be UTF-8 encoded) use ustring::raw() to override this behaviour.
  * @par
  * If you're using std::ostringstream to build strings for display in the
  * user interface, you must convert the result back to UTF-8 as shown below:
  * @code
+ * std::locale::global(std::locale("")); // set the global locale to the user's preferred locale
  * std::ostringstream output;
- * output.imbue(std::locale("")); // use the user's locale for this stream
  * output << percentage << " % done";
  * label->set_text(Glib::locale_to_utf8(output.str()));
  * @endcode
