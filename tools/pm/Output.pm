@@ -390,7 +390,10 @@ sub output_wrap_meth($$$$$$$)
         convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 1, $line_num,
         $errthrow, $arg_list); #1 means it's static, so it has 'object'.
 
-      $str = sprintf("_STATIC_METHOD(%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
+      my $no_slot_copy = "";
+      $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
+
+      $str = sprintf("_STATIC_METHOD(%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,`%s',`%s',`%s',%s)dnl\n",
         $$objCppfunc{name},
         $$objCDefsFunc{c_name},
         $$objCppfunc{rettype},
@@ -405,6 +408,9 @@ sub output_wrap_meth($$$$$$$)
         $ifdef,
         $output_var_name,
         $output_var_type,
+        $$objCppfunc{slot_type},
+        $$objCppfunc{slot_name},
+        $no_slot_copy,
         $line_num
         );
     } else {
@@ -412,7 +418,10 @@ sub output_wrap_meth($$$$$$$)
         convert_args_cpp_to_c($objCppfunc, $objCDefsFunc, 0, $line_num,
         $errthrow, $arg_list);
 
-      $str = sprintf("_METHOD(%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s,%s,%s,%s)dnl\n",
+      my $no_slot_copy = "";
+      $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
+
+      $str = sprintf("_METHOD(%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s,%s,%s,`%s',`%s',`%s',%s)dnl\n",
         $$objCppfunc{name},
         $$objCDefsFunc{c_name},
         $$objCppfunc{rettype},
@@ -430,6 +439,9 @@ sub output_wrap_meth($$$$$$$)
         $ifdef,
         $output_var_name,
         $output_var_type,
+        $$objCppfunc{slot_type},
+        $$objCppfunc{slot_name},
+        $no_slot_copy,
         $line_num
         );
     }
@@ -926,6 +938,11 @@ sub convert_args_cpp_to_c($$$$$)
     $$cpp_param_mappings{@$c_param_names[$num_c_args_expected]} = $cpp_index;
   }
 
+  # If the method has a slot temporarily decrement the C arg count when
+  # comparing the C++ and C argument count because the C function would
+  # have a final 'gpointer data' parameter.
+  $num_c_args_expected-- if ($$objCppfunc{slot_name});
+
   if ( $num_cpp_args != $num_c_args_expected )
   {
     Output::error( "convert_args_cpp_to_c(): Incorrect number of arguments. (%d != %d)\n",
@@ -936,6 +953,9 @@ sub convert_args_cpp_to_c($$$$$)
 
     return ("", "", "");
   }
+
+  # Reincrement the expected C argument count if there is a slot.
+  $num_c_args_expected++ if ($$objCppfunc{slot_name});
 
   # If there is an output parameter it must be processed so re-increment (now)
   # the number of C++ arguments.
@@ -1018,6 +1038,29 @@ sub convert_args_cpp_to_c($$$$$)
       next;
     }
 
+    # If dealing with a slot.
+    if ($$objCppfunc{slot_name} eq $cppParamName)
+    {
+      if ($$objCppfunc{slot_callback})
+      {
+        # The conversion for the slot is the address of the callback.
+        push(@conversions, "&" . $$objCppfunc{slot_callback});
+      }
+      else
+      {
+        Output::error(
+          "convert_args_cpp_to_c(): Missing a slot callback.  " .
+          "Specify it with the 'slot_callback' option.\n",);
+      }
+
+      # Get the slot type without the const and the & and store it so
+      # it can be passed to the m4 _*METHOD macros.
+      $cppParamType =~ /^const\s+(.*)&/;
+      $$objCppfunc{slot_type} = $1;
+
+      next;
+    }
+
     if ($cppParamType ne $cParamType) #If a type conversion is needed.
     {
 
@@ -1033,6 +1076,11 @@ sub convert_args_cpp_to_c($$$$$)
       push(@conversions, $cppParamName);
     }
   }
+
+  # Append the final slot copy parameter to the C function if the
+  # method has a slot.  The parameter name is consistent with the name
+  # in the _*METHOD() m4 macros.
+  push(@conversions, "slot_copy") if ($$objCppfunc{slot_name});
 
   return ( join(", ", @conversions), join("\n", @declarations),
     join("\n  ", @initializations) );

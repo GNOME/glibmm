@@ -9,8 +9,8 @@ dnl
 
 dnl
 dnl method
-dnl           $1       $2     $3         $4       $5        $6        $7         $8          $9     $10       $11       $12         $13       $14         $15               $16        $17             $18
-dnl  _METHOD(cppname,cname,cpprettype,crettype,arglist,cdeclarations,cargs,cinitializations,const,refreturn,errthrow,deprecated,constversion,ifdef,arglist_without_types,out_param,out_param_cpptype,wrap_line)
+dnl           $1       $2     $3         $4       $5        $6        $7         $8          $9     $10       $11       $12         $13       $14         $15               $16        $17              $18        $19        $20         $21
+dnl  _METHOD(cppname,cname,cpprettype,crettype,arglist,cdeclarations,cargs,cinitializations,const,refreturn,errthrow,deprecated,constversion,ifdef,arglist_without_types,out_param,out_param_cpptype,slot_type,slot_name,no_slot_copy,wrap_line)
 define(`_METHOD',`dnl
 _PUSH(SECTION_CC)
 ifelse(`$12',,,`_DEPRECATE_IFDEF_START
@@ -21,8 +21,19 @@ $3 __CPPNAME__::$1`'($5)ifelse(`$9',1,` const')
 {
 ifelse(`$13',,dnl
 `ifelse(`$10'`$11',,dnl If it is not errthrow or refreturn
+dnl If a slot type has been specified insert a slot copy declaration.
+`ifelse(`$18',,,dnl
+dnl See if the slot should or should not be copied
+`ifelse(`$20',,dnl
+`  // Create a copy of the slot.
+  $18* slot_copy = new $18($19); ',dnl
+dnl
+`  // Use the original slot (not a copy).
+  $18* slot_copy = const_cast<$18*>(&$19);')
+
+')`'dnl
 dnl Insert the declarations for C output parameters
-`ifelse(`$6',,,`$6
+ifelse(`$6',,,`$6
 ')`'dnl
 ifelse(`$16',,dnl If no C++ output parameter is specified
 `ifelse(`$3',void,dnl If the C function returns voids:
@@ -41,7 +52,7 @@ ifelse(`$6',,,`  return retvalue;
 ')dnl
 ')'dnl End if it returns voids.
 dnl A C++ output parameter is specified:
-,`  _INITIALIZE($17,$4,`$16',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)',$18);
+,`  _INITIALIZE($17,$4,`$16',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)',$21);
 dnl
 dnl Insert the initializations for the C output parameters
 ifelse(`$8',,,`$8
@@ -50,6 +61,17 @@ ifelse(`$8',,,`$8
 dnl If is errthrow or refreturn
 `ifelse(`$11',,,`  GError* gerror = 0;
 ')dnl
+dnl If a slot type has been specified insert a slot copy declaration.
+ifelse(`$18',,,dnl
+dnl See if the slot should or should not be copied
+`ifelse(`$20',,dnl
+`  // Create a copy of the slot.
+  $18* slot_copy = new $18($19); ',dnl
+dnl
+`  // Use the original slot (not a copy).
+  $18* slot_copy = const_cast<$18*>(&$19);')
+
+')`'dnl
 dnl Insert the declarations for C output parameters
 ifelse(`$6',,,`$6
 ')`'dnl
@@ -57,7 +79,7 @@ ifelse(`$16',,dnl If no C++ output parameter is specified:
 `  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');
 'dnl
 ,dnl A C++ output parameter is specified:
-`  _INITIALIZE($17,$4,`$16',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)',$18);
+`  _INITIALIZE($17,$4,`$16',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)',$21);
 'dnl
 )dnl
 ifelse(`$11',,,`dnl
@@ -87,8 +109,8 @@ _POP()')
 
 dnl
 dnl static method
-dnl                  $1       $2     $3         $4      $5        $6         $7         $8            $9      $10         $11       $12     $13        $14          $15
-dnl  _STATIC_METHOD(cppname,cname,cpprettype,crettype,arglist,cdeclarations,cargs,cinitializations,refreturn,errthrow,deprecated,ifdef,out_param,out_param_type,wrap_line)
+dnl                  $1       $2     $3         $4      $5        $6         $7         $8            $9      $10         $11       $12     $13        $14         $15      $16          $17       $18
+dnl  _STATIC_METHOD(cppname,cname,cpprettype,crettype,arglist,cdeclarations,cargs,cinitializations,refreturn,errthrow,deprecated,ifdef,out_param,out_param_type,slot_type,slot_name,no_slot_copy,wrap_line)
 define(`_STATIC_METHOD',`dnl
 _PUSH(SECTION_CC)
 ifelse(`$11',,,`_DEPRECATE_IFDEF_START
@@ -98,6 +120,17 @@ ifelse(`$12',,,`#ifdef $12'
 $3 __CPPNAME__::$1($5)
 {
 ifelse(`$9'`$10',,dnl
+dnl If a slot type has been specified insert a slot copy declaration.
+ifelse(`$15',,,dnl
+dnl See if the slot should or should not be copied
+`ifelse(`$17',,dnl
+`  // Create a copy of the slot.
+  $15* slot_copy = new $15($16); ',dnl
+dnl
+`  // Use the original slot (not a copy).
+  $15* slot_copy = const_cast<$15*>(&$16);')
+
+')`'dnl
 dnl Insert declarations for C the output parameters
 ifelse(`$6',,,`$6
 ')`'dnl
@@ -108,7 +141,7 @@ dnl Returns non-void:
 dnl Store the return if there are C output parameters
 ifelse(`$6',,`return ',``$3' retval = '))_CONVERT($4,`$3',`$2`'($7)');'dnl
 dnl A C++ output parameter is specified so initialize it from C return
-,`  _INITIALIZE($14,$4,`$13',`$2`'($7)',$15);'dnl
+,`  _INITIALIZE($14,$4,`$13',`$2`'($7)',$18);'dnl
 )
 dnl Insert the initializations for the C output parameters if there are any
 ifelse(`$8',,,`$8
@@ -118,13 +151,24 @@ ifelse(`$3',void,,`ifelse(`$6',,,`  return retval;
 ')')dnl
 ',dnl End if a C++ output parameter is specified.
 `ifelse(`$10',,,`  GError* gerror = 0;')
+dnl If a slot type has been specified insert a slot copy declaration.
+ifelse(`$15',,,dnl
+dnl See if the slot should or should not be copied
+`ifelse(`$17',,dnl
+`  // Create a copy of the slot.
+  $15* slot_copy = new $15($16); ',dnl
+dnl
+`  // Use the original slot (not a copy).
+  $15* slot_copy = const_cast<$15*>(&$16);')
+
+')`'dnl
 dnl Insert the declarations for the C output parameters
 ifelse(`$6',,,`$6
 ')`'dnl
 ifelse(`$13',,dnl If no C++ output parameter is specified:
   ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'($7)');dnl
 dnl A C++ output parameter is specified:
-,`  _INITIALIZE($14,$4,`$13',`$2`'($7)',$15);'dnl
+,`  _INITIALIZE($14,$4,`$13',`$2`'($7)',$18);'dnl
 )dnl
 ifelse(`$10',,,`
   if(gerror)

@@ -942,6 +942,25 @@ sub on_wrap_method($)
     {
     	$ifdef = $1;
     }
+    # The "slot_name" option tells gmmproc the name of the parameter
+    # that is a slot in the method if there is one.
+    elsif($argRef =~ /^slot_name\s+(\w+)/)
+    {
+      $$objCppfunc{slot_name} = $1;
+    }
+    # The "slot_callback" option tells gmmproc the name of the
+    # callback function that should be passed to the C function if the
+    # method has a slot.
+    elsif($argRef =~ /^slot_callback\s+(\w+)/)
+    {
+      $$objCppfunc{slot_callback} = $1;
+    }
+    # The "no_slot_copy" options tells gmmproc to pass the actual slot
+    # and not a copy of it to the C function in the data parameter.
+    if($argRef eq "no_slot_copy")
+    {
+      $$objCppfunc{no_slot_copy} = 1;
+    }
   }
 
   if ($commentblock ne '')

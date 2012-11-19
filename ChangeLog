@@ -1,3 +1,39 @@
+2012-11-18  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: _WRAP_METHOD: Support wrapping methods with slots.
+
+	* tools/pm/WrapParser.pm (on_wrap_method): Add code to parse the
+	additional 'slot_name', 'slot_callback' and 'no_slot_copy' options.
+	- The 'slot_name' options specifies the name of the slot parameter in
+	  the C++ method declaration.
+	- The 'slot_callback' option specifies the name of the callback to
+	  pass to the C function.
+	- The 'no_slot_copy' option specifies that the actual slot should be
+	  passed to the C function in the data parameter and not a copy.  By
+	  default, a copy is used.
+	* tools/pm/Output.pm (output_wrap_meth): Pass the new slot options
+	along to the *METHOD() m4 macros.
+	(convert_args_cpp_to_c):
+	- If there is a slot parameter, ignore the final user_data parameter
+	  in the C function when comparing the argument count in the C++
+	  method and the C function.
+	- Convert a possible slot parameter to the address of the specified
+	  slot callback (with the 'slot_callback' option).  Report an error if
+	  no callback has been specified.
+	- Pass a 'slot_copy' variable as the final user data parameter to the
+	  C function.  The variable is declared by the _*METHOD() m4 macros.
+	* tools/m4/method.m4 (_METHOD):
+	(_STATIC_METHOD):
+	- Accept the new 'slot_type', 'slot_name' and 'no_slot_copy' options
+	  which specify the C++ slot type (without the const and the &), the
+	  C++ slot parameter name and whether to create a copy of the slot or
+	  not respectively.
+	- Insert code to declare a 'slot_copy' variable that is either a copy
+	  of the slot or a pointer to the actual C++ slot based on the
+	  'no_slot_copy' option.
+
+	Bug #688587.
+
 2012-11-15  José Alburquerque  <jaalburquerque@gmail.com>
 
 	giomm.h: Include the tlspassword.h header file.
