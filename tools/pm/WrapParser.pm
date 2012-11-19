@@ -969,7 +969,8 @@ sub on_wrap_method($)
   }
   else
   {
-    $commentblock = DocsParser::lookup_documentation($argCFunctionName, $deprecation_docs);
+    $commentblock = DocsParser::lookup_documentation($argCFunctionName,
+      $deprecation_docs, $objCppfunc);
   }
 
   $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock, $ifdef);

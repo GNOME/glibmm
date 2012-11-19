@@ -305,10 +305,13 @@ sub lookup_enum_value_documentation($$)
   return $desc;
 }
 
-# $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs)
-sub lookup_documentation($$)
+# $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs, $objCppfunc)
+# The final objCppfunc parameter is optional.  If passed, it is used to
+# decide if the final C parameter should be omitted if the C++ method
+# has a slot parameter.
+sub lookup_documentation($$;$)
 {
-  my ($functionName, $deprecation_docs) = @_;
+  my ($functionName, $deprecation_docs, $objCppfunc) = @_;
 
   my $objFunction = $DocsParser::hasharrayFunctions{$functionName};
   if(!$objFunction)
@@ -332,7 +335,7 @@ sub lookup_documentation($$)
     $text .= "\n\@deprecated $deprecation_docs";
   }
 
-  DocsParser::append_parameter_docs($objFunction, \$text);
+  DocsParser::append_parameter_docs($objFunction, \$text, $objCppfunc);
   DocsParser::append_return_docs($objFunction, \$text);
   DocsParser::add_m4_quotes(\$text);
 
@@ -381,9 +384,12 @@ sub add_m4_quotes($)
   $$text = "`" . $$text . "'";
 }
 
-sub append_parameter_docs($$)
+# The final objCppfunc is optional.  If passed, it is used to determine
+# if the final C parameter should be omitted if the C++ method has a
+# slot parameter.
+sub append_parameter_docs($$;$)
 {
-  my ($obj_function, $text) = @_;
+  my ($obj_function, $text, $objCppfunc) = @_;
 
   my @param_names = @{$$obj_function{param_names}};
   my $param_descriptions = \$$obj_function{param_descriptions};
@@ -398,11 +404,23 @@ sub append_parameter_docs($$)
   # Also skip first param if this is a signal.
   shift(@param_names) if ($$obj_function{name} =~ /\w+::/);
 
+  # Skip the last param if there is a slot because it would be a
+  # gpointer user_data parameter.
+  pop(@param_names) if (defined($objCppfunc) && $$objCppfunc{slot_name});
+
   foreach my $param (@param_names)
   {
     if ($param ne "error" ) #We wrap GErrors as exceptions, so ignore these.
     {
       my $desc = $$param_descriptions->{$param};
+
+      # Deal with callback parameters converting the docs to a slot
+      # compatible format.
+      if ($param eq "callback")
+      {
+        $param = "slot";
+        $$text =~ s/\@a callback/\@a slot/g;
+      }
 
       $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
       DocsParser::convert_docs_to_cpp($obj_function, \$desc);
@@ -543,6 +561,9 @@ sub substitute_identifiers($$)
     s/\bHas::/HAS_/g;
     s/\bNo::/NO_/g;
     s/\bG:://g; #Rename G::Something to Something. Doesn't seem to work. murrayc.
+
+    # Substitute callback types to slot types.
+    s/(\b\w+)Callback/Slot$1/g;
 
     # Replace C function names with C++ counterparts.
     s/\b([a-z]+_[a-z][a-z\d_]+) ?\(\)/&DocsParser::substitute_function($doc_func, $1)/eg;

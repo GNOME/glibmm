@@ -1,5 +1,27 @@
 2012-11-18  José Alburquerque  <jaalburquerque@gmail.com>
 
+	gmmproc: Documentation: Adjust if the method has a slot param.
+
+	* tools/pm/WrapParser.pm (on_wrap_method): Pass the objCppfunc object
+	to the DocParser::lookup_documentation() subroutine so that it can
+	decide if the final parameter of the C function should be excluded
+	from the docs.  The final parameter (which would be a gpointer
+	user_data parameter) would be omitted if the C++ method has a slot
+	parameter.
+	* tools/pm/DocsParser.pm (lookup_documentation): Pass the objCppfunc
+	on to the append_parameter_docs() subroutine which does what's
+	described above.
+	(append_parameter_documentation): Decide whether to skip the final C
+	parameter as described above.  Also rename 'callback' parameters to
+	'slot' and use '@a slot' instead of '@a callback' in the main
+	description.
+	(substitute_identifiers): Replace C *Callback types to C++ Slot*
+	types.
+
+	Bug #688587.
+
+2012-11-18  José Alburquerque  <jaalburquerque@gmail.com>
+
 	gmmproc: _WRAP_METHOD: Support wrapping methods with slots.
 
 	* tools/pm/WrapParser.pm (on_wrap_method): Add code to parse the
