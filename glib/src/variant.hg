@@ -97,7 +97,11 @@ public:
    */
   void init(const GVariant* cobject, bool take_a_reference = false);
 
+// It's necessary to take an extra reference of the 'const GVariantType*'
+// returned by g_variant_get_type() because it doesn't do that already.
+#m4 _CONVERSION(`const GVariantType*',`VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
   _WRAP_METHOD(VariantType get_type() const, g_variant_get_type)
+
   _WRAP_METHOD(std::string get_type_string() const, g_variant_get_type_string)
   _WRAP_METHOD(bool is_floating() const, g_variant_is_floating)
   _WRAP_METHOD(bool is_of_type(const VariantType& type) const, g_variant_is_of_type)
