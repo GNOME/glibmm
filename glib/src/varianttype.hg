@@ -140,6 +140,9 @@ public:
 
   _WRAP_METHOD(bool is_subtype_of(const VariantType& supertype) const, g_variant_type_is_subtype_of)
 
+// It's necessary to take an extra reference of the 'const GVariantType*'
+// returned by g_variant_type_element() because it doesn't do that already.
+#m4 _CONVERSION(`const GVariantType*',`VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
   _WRAP_METHOD(VariantType element() const, g_variant_type_element)
   _WRAP_METHOD(VariantType first() const, g_variant_type_first)
   _WRAP_METHOD(VariantType next () const, g_variant_type_next)
