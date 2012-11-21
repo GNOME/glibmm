@@ -20,6 +20,7 @@ _DEFS(glibmm,glib)
 #include <glibmmconfig.h>
 #include <glib-object.h> //For gsize
 #include <string>
+#include <vector>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GVariantType GVariantType;
@@ -113,8 +114,15 @@ public:
   _WRAP_METHOD(static VariantType create_array(const VariantType& element), g_variant_type_new_array)
   _WRAP_METHOD(static VariantType create_maybe(const VariantType& element), g_variant_type_new_maybe)
 
-  //TODO: Use a single list parameter:
-  //_WRAP_METHOD(static VariantType create_tuple(const GVariantType * const *items, gint length), g_variant_type_new_tuple)
+  /** Constructs a new tuple type, from @a items.
+    *
+    * @param items A vector of VariantTypes, one for each item.
+    * @return A new tuple VariantType.
+    *
+    * @newin{2,36}
+    */
+  static VariantType create_tuple(const std::vector<VariantType>& items);
+  _IGNORE(g_variant_type_new_tuple)
 
   _WRAP_METHOD(static VariantType create_dict_entry(const VariantType& key, const VariantType& value), g_variant_type_new_dict_entry)
 
