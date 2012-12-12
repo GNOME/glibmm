@@ -62,15 +62,20 @@ namespace Threads
 /**** Glib::Thread *********************************************************/
 
 // static
-Thread* Thread::create(const sigc::slot<void>& slot)
+Thread* Thread::create(const sigc::slot<void>& slot, const std::string& name)
 {
   // Make a copy of slot on the heap
   sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
 
   GError* error = 0;
+  GThread* thread;
 
-  GThread *const thread = g_thread_try_new(NULL,
-      &call_thread_entry_slot, slot_copy, &error);
+  if (name.size() > 0)
+    thread = g_thread_try_new(name.c_str(), &call_thread_entry_slot,
+        slot_copy, &error);
+  else
+    thread = g_thread_try_new(NULL, &call_thread_entry_slot,
+        slot_copy, &error);
 
   if(error)
   {
@@ -79,6 +84,12 @@ Thread* Thread::create(const sigc::slot<void>& slot)
   }
 
   return reinterpret_cast<Thread*>(thread);
+}
+
+// static
+Thread* Thread::create(const sigc::slot<void>& slot)
+{
+  return create(slot, std::string());
 }
 
 // static

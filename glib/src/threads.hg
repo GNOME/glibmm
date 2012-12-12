@@ -89,6 +89,32 @@ public:
    */
   static Thread* create(const sigc::slot<void>& slot);
 
+  // TODO: At next ABI break, remove the single parameter create
+  //       method and default name to std::string()
+
+  /** Creates a new named thread.
+   * You can wait for this thread's termination by calling join().
+   *
+   * The new thread executes the function or method @a slot points to.  You can
+   * pass additional arguments using sigc::bind().  If the thread was created
+   * successfully, it is returned, otherwise a Threads::ThreadError exception is thrown.
+   *
+   * Because sigc::trackable is not thread safe, if the slot represents a
+   * non-static class method (that is, it is created by sigc::mem_fun()), the
+   * class concerned should not derive from sigc::trackable.
+   *
+   * The @a name can be useful for discriminating threads in a debugger.
+   * Some systems restrict the length of @a name to 16 bytes.
+   *
+   * @param slot A slot to execute in the new thread.
+   * @param name A name for the new thread.
+   * @return The new Thread* on success.
+   * @throw Glib::Threads::ThreadError
+   *
+   * @newin{2,36}
+   */
+  static Thread* create(const sigc::slot<void>& slot, const std::string& name);
+
   /** Returns the Thread* corresponding to the calling thread.
    * @return The current thread.
    */
