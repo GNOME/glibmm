@@ -87,6 +87,23 @@ class VariantBase
     g_variant_get, g_variant_get_va)
 public:
 
+  /** This typedef is just to make it more obvious that
+   * our operator const void* should be used like operator bool().
+   */
+  typedef const void* BoolExpr;
+
+  /** Test whether the Variant has an underlying instance.
+   *
+   * Mimics usage of pointers:
+   * @code
+   *   if (variant)
+   *     do_something();
+   * @endcode
+   *
+   * @newin{2,36}
+   */
+   operator BoolExpr() const;
+
   /** Replace the underlying GVariant.
    * This is for use by methods that take a VariantBase& as an output
    * parameter.
@@ -175,6 +192,26 @@ public:
    template<class V_CastTo>
    static V_CastTo cast_dynamic(const VariantBase& v) throw(std::bad_cast);
 
+private:
+  /** Relational operators are deleted to prevent invalid conversion
+   * to const void*.
+   */
+  bool operator<(const VariantBase& src) const;
+
+  /// See operator<().
+  bool operator<=(const VariantBase& src) const;
+
+  /// See operator<().
+  bool operator>(const VariantBase& src) const;
+
+  /// See operator<().
+  bool operator>=(const VariantBase& src) const;
+
+  /// See operator<().
+  bool operator==(const VariantBase& src) const;
+
+  /// See operator<().
+  bool operator!=(const VariantBase& src) const;
 };
 
 template<class V_CastTo>
