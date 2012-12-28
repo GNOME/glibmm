@@ -391,7 +391,17 @@ sub output_wrap_meth($$$$$$$)
         $errthrow, $arg_list); #1 means it's static, so it has 'object'.
 
       my $no_slot_copy = "";
-      $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
+      my $slot_type = "";
+      my $slot_name = "";
+
+      # A slot may be optional so if it is signaled by
+      # convert_args_cpp_to_c() to not be included, then don't.
+      if ($$objCppfunc{include_slot})
+      {
+        $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
+        $slot_type = $$objCppfunc{slot_type};
+        $slot_name = $$objCppfunc{slot_name};
+      }
 
       $str = sprintf("_STATIC_METHOD(%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,`%s',`%s',`%s',%s)dnl\n",
         $$objCppfunc{name},
@@ -408,8 +418,8 @@ sub output_wrap_meth($$$$$$$)
         $ifdef,
         $output_var_name,
         $output_var_type,
-        $$objCppfunc{slot_type},
-        $$objCppfunc{slot_name},
+        $slot_type,
+        $slot_name,
         $no_slot_copy,
         $line_num
         );
@@ -419,7 +429,17 @@ sub output_wrap_meth($$$$$$$)
         $errthrow, $arg_list);
 
       my $no_slot_copy = "";
-      $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
+      my $slot_type = "";
+      my $slot_name = "";
+
+      # A slot may be optional so if it is signaled by
+      # convert_args_cpp_to_c() to not be included, then don't.
+      if ($$objCppfunc{include_slot})
+      {
+        $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
+        $slot_type = $$objCppfunc{slot_type};
+        $slot_name = $$objCppfunc{slot_name};
+      }
 
       $str = sprintf("_METHOD(%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s,%s,%s,`%s',`%s',`%s',%s)dnl\n",
         $$objCppfunc{name},
@@ -439,8 +459,8 @@ sub output_wrap_meth($$$$$$$)
         $ifdef,
         $output_var_name,
         $output_var_type,
-        $$objCppfunc{slot_type},
-        $$objCppfunc{slot_name},
+        $slot_type,
+        $slot_name,
         $no_slot_copy,
         $line_num
         );
@@ -969,6 +989,10 @@ sub convert_args_cpp_to_c($$$$$)
   my $cpp_param_max = $num_cpp_args;
   # if( !($static) ) { $cpp_param_max++; }
 
+  # Tells if slot code should be included or not based on if a slot
+  # parameter is optional.
+  $$objCppfunc{include_slot} = 0;
+
   for ($i = 0; $i < $cpp_param_max; $i++)
   {
     # Skip the output parameter because it is handled in output_wrap_meth().
@@ -1058,6 +1082,9 @@ sub convert_args_cpp_to_c($$$$$)
       $cppParamType =~ /^const\s+(.*)&/;
       $$objCppfunc{slot_type} = $1;
 
+      # Signal that the slot code should be included.
+      $$objCppfunc{include_slot} = 1;
+
       next;
     }
 
@@ -1080,7 +1107,17 @@ sub convert_args_cpp_to_c($$$$$)
   # Append the final slot copy parameter to the C function if the
   # method has a slot.  The parameter name is consistent with the name
   # in the _*METHOD() m4 macros.
-  push(@conversions, "slot_copy") if ($$objCppfunc{slot_name});
+  if ($$objCppfunc{slot_name})
+  {
+    if ($$objCppfunc{include_slot})
+    {
+      push(@conversions, "slot_copy")
+    }
+    else
+    {
+      push(@conversions, "0")
+    }
+  }
 
   return ( join(", ", @conversions), join("\n", @declarations),
     join("\n  ", @initializations) );
