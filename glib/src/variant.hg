@@ -439,6 +439,50 @@ public:
   _WRAP_METHOD(VariantBase get() const, g_variant_get_variant)
 };
 
+/** Specialization of Variant containing a Variant<T>.
+ * @newin{2,36}
+ * @ingroup Variant
+ */
+template<class T>
+class Variant< Variant<T> > : public VariantContainerBase
+{
+public:
+  typedef GVariant*                     CType;
+  typedef Variant<T>                    CppType;
+  typedef Variant<CppType>              CppContainerType;
+
+  /// Default constructor.
+  Variant< Variant<T> >();
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
+   * @newin{2,36}
+   */
+  explicit Variant< Variant<T> >(GVariant* castitem, bool take_a_reference = false);
+
+  /** Gets the VariantType.
+   * @return The VariantType.
+   * @newin{2,36}
+   */
+  static const VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Variant< Variant<T> >.
+   * @param data The value of the new Variant.
+   * @return The new Variant.
+   * @newin{2,36}
+   */
+  static Variant< Variant<T> > create(const Variant<T>& data);
+
+  /** Gets the contents of the Variant.
+   * @return The contents of the Variant.
+   * @newin{2,36}
+   */
+  Variant<T> get() const;
+};
+
 /** Specialization of Variant containing a Glib::ustring, for variants of type
  * string, bytestring, object path, or signature.
  * @newin{2,28}
@@ -899,6 +943,42 @@ _IGNORE(
 namespace Glib
 {
 
+/*--------------------Variant< Variant<T> >---------------------*/
+
+template<class T>
+Variant< Variant<T> >::Variant()
+: VariantContainerBase()
+{
+}
+
+template<class T>
+Variant< Variant<T> >::Variant(GVariant* castitem, bool take_a_reference)
+: VariantContainerBase(castitem, take_a_reference)
+{
+}
+
+// static
+template<class T>
+const VariantType& Variant< Variant<T> >::variant_type()
+{
+  return VARIANT_TYPE_VARIANT;
+}
+
+template<class T>
+Variant< Variant<T> > Variant< Variant<T> >::create(const Variant<T>& data)
+{
+  Variant< Variant<T> > result = Variant< Variant<T> >(
+    g_variant_new_variant(const_cast<GVariant*>(data.gobj())));
+  return result;
+}
+
+template<class T>
+Variant<T> Variant< Variant<T> >::get() const
+{
+  GVariant* const gvariant = g_variant_get_variant(gobject_);
+  return Variant<T>(gvariant, true);
+}
+
 /*--------------------Variant< std::pair<K, V> >---------------------*/
 
 // static
@@ -970,8 +1050,8 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
   for(typename std::vector<T>::const_iterator iter = data.begin();
    iter < data.end(); iter++)
   {
-    g_variant_builder_add(builder,
-      reinterpret_cast<gchar*>(element_variant_type.gobj()), *iter);
+    Glib::Variant<T> variant = Glib::Variant<T>::create(*iter);
+    g_variant_builder_add_value(builder, variant.gobj());
   }
 
   // Create the variant using the builder.
@@ -985,29 +1065,37 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
 template<class T>
 T Variant< std::vector<T> >::get_child(gsize index) const
 {
-  gsize n_elements = 0;
-
-  const T* array = reinterpret_cast<const T*>(
-    g_variant_get_fixed_array(const_cast<GVariant*>(gobj()), &n_elements,
-    sizeof(T)));
-
-  if(index >= n_elements)
+  if(index >= g_variant_n_children(const_cast<GVariant*>(gobj())))
     throw std::out_of_range(
-      "Variant< std::vector<T> >::get(): Index out of bounds.");
+      "Variant< std::vector<T> >::get_child(): Index out of bounds.");
 
-  return array[index];
+  Glib::Variant<T> variant;
+
+  GVariant* gvariant =
+    g_variant_get_child_value(const_cast<GVariant*>(gobj()), index);
+
+  variant.init(gvariant);
+  return variant.get();
 }
 
 template<class T>
 std::vector<T> Variant< std::vector<T> >::get() const
 {
-  gsize n_elements = 0;
+  std::vector<T> result;
 
-  const T* array = reinterpret_cast<const T*>(
-    g_variant_get_fixed_array(const_cast<GVariant*>(gobj()), &n_elements,
-    sizeof(T)));
+  gsize n_children = g_variant_n_children(const_cast<GVariant*>(gobj()));
 
-  std::vector<T> result(array, array + n_elements);
+  for(gsize i = 0; i < n_children; i++)
+  {
+    Glib::Variant<T> variant;
+
+    GVariant* gvariant =
+      g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
+
+    variant.init(gvariant);
+    result.push_back(variant.get());
+  }
+
   return result;
 }
 

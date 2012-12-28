@@ -55,7 +55,7 @@ int main(int, char**)
   vec_strings.push_back("a");
   Glib::Variant<std::vector<std::string> > variant_vec_strings =
     Glib::Variant<std::vector<std::string> >::create(vec_strings);
-  
+
   //Dict:
 
   typedef std::pair<Glib::ustring, Glib::ustring> TypeDictEntry;
@@ -120,6 +120,61 @@ int main(int, char**)
       " in the variant are: " << value << '.' << std::endl;
   }
 
+  //std::vector< std::map< Glib::ustring, Glib::Variant<int> > >
+  typedef std::map< Glib::ustring, Glib::Variant<int> > ComplexDictType;
+
+  ComplexDictType complex_dict1;
+  ComplexDictType complex_dict2;
+
+  for(int i = 0; i < 10; i++)
+  {
+    // Convert integer i to string.
+    std::stringstream ss;
+    ss << i;
+
+    Glib::ustring s = "String " + ss.str();
+
+    Glib::Variant<int> v = Glib::Variant<int>::create(i);
+
+    complex_dict1.insert(
+      std::pair< Glib::ustring, Glib::Variant<int> >("Map 1 " + s, v));
+
+    complex_dict2.insert(
+      std::pair< Glib::ustring, Glib::Variant<int> >("Map 2 " + s, v));
+  }
+
+  typedef std::vector< std::map< Glib::ustring, Glib::Variant<int> > >
+    ComplexVecType;
+
+  ComplexVecType complex_vector;
+  complex_vector.push_back(complex_dict1);
+  complex_vector.push_back(complex_dict2);
+
+  Glib::Variant<ComplexVecType> complex_variant =
+    Glib::Variant<ComplexVecType>::create(complex_vector);
+
+  // This will output the type string aa{sv}.
+  ostr << "The type string of the variant containing a vector of "
+    "dictionaries is: " << std::endl << complex_variant.get_type_string() <<
+    "." << std::endl << std::endl;
+
+  ComplexVecType copy_complex_vector = complex_variant.get();
+
+  for(guint i = 0; i < copy_complex_vector.size(); i++)
+  {
+    ostr << "Printing dictionary # " << i + 1 << ":" << std::endl;
+
+    ComplexDictType map = copy_complex_vector[i];
+
+    for(ComplexDictType::const_iterator iter = map.begin();
+      iter != map.end(); iter++)
+    {
+      std::pair< Glib::ustring, Glib::Variant<int> > entry = *iter;
+      ostr << entry.first << " -> " << entry.second.get() << "." << std::endl;
+    }
+    ostr << std::endl;
+  }
+  
   test_variant_floating();
   test_dynamic_cast();
 

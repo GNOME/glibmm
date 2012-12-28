@@ -1,3 +1,30 @@
+2012-12-28  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Variant: Allow containing complex types in arrays and in variants.
+
+	* glib/src/variant.hg (Variant< Variant<T> >): Add a new class capable
+	of containing any Variant<>.  The class is just like
+	Variant<VariantBase> except that with it, it is now possible to store
+	and handle complex variant types in a variant easily in a C++ way.
+	The modified test below exemplifies.
+	(Variant< std::vector<T> >::create): Create a Variant<> for each of
+	the members in the vector and then use g_variant_builder_add_value()
+	to add the underlying GVariant of the wrapped elements in the builder
+	instead of using the variadic g_variant_builder_add() function which
+	causes problems when dealing with types that are more complex than
+	basic ones.
+	(Variant< std::vector<T> >::get_child): Rewritten to get the child as
+	a GVariant, wrap the GVariant in a Variant<> and then get its value
+	instead of assuming that the array in the variant is a fixed array of
+	basic types so that complex types are supported in arrays.
+	(Variant< std::vector<T> >::get): Rewritten as get_child() above so
+	that the elements in the array are gotten as a GVariant, wrapped in a
+	Variant<> and then retrieved and placed in the resulting vector,
+	again, to ensure that a vector of complex types can be stored in a
+	variant.
+	* tests/glibmm_variant/main.cc: Modify the test to ensure that any
+	type other than basic ones are supported.
+
 2012-12-28  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
 
 	Gio::Action: Add more documentation of get_state_hint() and get_state().
