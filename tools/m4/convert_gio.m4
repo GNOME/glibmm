@@ -40,6 +40,8 @@ _CONV_ENUM(G,SocketMsgFlags)
 _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketType)
 _CONV_ENUM(G,TlsCertificateFlags)
+_CONV_ENUM(G,TlsDatabaseVerifyFlags)
+_CONV_ENUM(G,TlsDatabaseLookupFlags)
 _CONV_ENUM(G,TlsInteractionResult)
 _CONV_ENUM(G,TlsPasswordFlags)
 _CONV_ENUM(G,UnixSocketAddressType)
@@ -267,6 +269,10 @@ _CONVERSION(`GTimeZoneMonitor*',`Glib::RefPtr<TimeZoneMonitor>',`Glib::wrap($3)'
 #TlsCertificate
 _CONVERSION(`GTlsCertificate*', `Glib::RefPtr<TlsCertificate>', `Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<const TlsCertificate>&', `GTlsCertificate*', `const_cast<GTlsCertificate*>(Glib::unwrap($3))')
+_CONVERSION(`const Glib::RefPtr<TlsCertificate>&',`GTlsCertificate*',`Glib::unwrap($3)')
+#
+#TlsInteraction
+_CONVERSION(`const Glib::RefPtr<TlsInteraction>&',`GTlsInteraction*',`Glib::unwrap($3)')
 
 #TlsPassword
 _CONVERSION(`const Glib::RefPtr<const TlsPassword>&',`GTlsPassword*',`const_cast<GTlsPassword*>(Glib::unwrap($3))')
