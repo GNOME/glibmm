@@ -281,7 +281,7 @@ _CONVERSION(`const Glib::RefPtr<TlsInteraction>&',`GTlsInteraction*',`Glib::unwr
 _CONVERSION(`GTlsInteraction*',`Glib::RefPtr<TlsInteraction>',`Glib::wrap($3)')
 
 #TlsPassword
-_CONVERSION(`const Glib::RefPtr<const TlsPassword>&',`GTlsPassword*',`const_cast<GTlsPassword*>(Glib::unwrap($3))')
+_CONVERSION(`const Glib::RefPtr<TlsPassword>&',`GTlsPassword*',`Glib::unwrap($3)')
 
 #UnixFDList
 _CONVERSION(`GUnixFDList*',`Glib::RefPtr<UnixFDList>',`Glib::wrap($3)')

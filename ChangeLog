@@ -1,3 +1,26 @@
+2013-01-07  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Tls[Database|Interaction|Passowrd]: Const corrections.
+
+	* gio/src/tlsdatabase.hg (verify_chain):
+	(verify_chain_async): Accept the SocketConnectable as a const because
+	it is used to check for certificates that have been pinned (marked as
+	good) for a specific domain in a browser session and not modified.
+	(lookup_certificate_issuer)
+	(lookup_certificate_issuer_async): Accept the TlsCertificate for which
+	to look for the issuer as const because it is not modified according
+	to the docs.
+	* gio/src/tlsinteraction.hg (ask_password):
+	(ask_password_async)
+	(invoke_ask_password): Accept the TlsPassword as non-const because the
+	docs say that it is filled in by the methods, not used to compare a
+	user entry with an existing password.
+	* gio/src/tlspassword.hg (get_value_vfunc):
+	(get_default_warning_vfunc): Make these const because they are getter
+	functions.
+	* tools/m4/convert_gio.m4: Adjust the conversions according to above
+	changes.
+
 2013-01-07  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
 
 	gmmproc: _WRAP_ENUM: Skip enum constants whose names are deleted.
