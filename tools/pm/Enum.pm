@@ -317,15 +317,15 @@ sub build_element_list($$$$)
     my $name  = $$elem_names[$i];
     my $value = $$elem_values[$i];
 
+    my $docs  =
+      DocsParser::lookup_enum_value_documentation("$$self{c_type}",
+        "$$self{c_prefix}$name");
+
     for(my $ii = 0; $ii < scalar(@subst_in); ++$ii)
     {
       $name  =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
       $value =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
     }
-
-    my $docs  =
-      DocsParser::lookup_enum_value_documentation("$$self{c_type}",
-        "$$self{c_prefix}$name");
 
     if($docs ne "")
     {
