@@ -327,6 +327,9 @@ sub build_element_list($$$$)
       $value =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
     }
 
+    # Skip this element, if its name has been deleted.
+    next if($name eq "");
+
     if($docs ne "")
     {
       # Make sure the docs is indented the right number of spaces.
@@ -338,10 +341,10 @@ sub build_element_list($$$$)
       $docs = "${indent}${docs}";
     }
 
+    $elements .= ",\n" if($elements ne "");
     $elements .= $docs;
     $elements .= "${indent}${name}";
     $elements .= " = ${value}" if($value ne "");
-    $elements .= ",\n" if($i < $num_elements - 1);
   }
 
   return $elements;
