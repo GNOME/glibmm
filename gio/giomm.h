@@ -128,6 +128,10 @@
 #include <giomm/themedicon.h>
 #include <giomm/threadedsocketservice.h>
 #include <giomm/tlscertificate.h>
+#include <giomm/tlsconnection.h>
+#include <giomm/tlsdatabase.h>
+#include <giomm/tlsfiledatabase.h>
+#include <giomm/tlsinteraction.h>
 #include <giomm/tlspassword.h>
 #ifndef G_OS_WIN32
 # include <giomm/unixconnection.h>
