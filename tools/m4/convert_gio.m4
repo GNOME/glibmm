@@ -256,6 +256,7 @@ _CONVERSION(`GSocketAddressEnumerator*',`Glib::RefPtr<SocketAddressEnumerator>',
 #SocketConnectable
 _CONVERSION(`const Glib::RefPtr<SocketConnectable>&',`GSocketConnectable*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<const SocketConnectable>&', `GSocketConnectable*', `const_cast<GSocketConnectable*>(Glib::unwrap($3))')
+_CONVERSION(`GSocketConnectable*',`Glib::RefPtr<SocketConnectable>',`Glib::wrap($3)')
 
 #SocketConnection
 _CONVERSION(`GSocketConnection*',`Glib::RefPtr<SocketConnection>',`Glib::wrap($3)')
