@@ -260,15 +260,26 @@ sub parse_param($$)
       # Determine if the param is optional, an output param or if a C param
       # name should be mapped to the current C++ index (if name ends with
       # {c_name>>?}). (A '.' for the name means use the C++ as the C name).
-      # '@' - Means that it is an output parameter.
+      # '>>' - Means that it is an output parameter.
       # '?' - Means that it is an optional parameter.
-      if ($name =~ /\{\s*(\w+|\.)?\s*(>>)?\s*(\??)\s*\}$/)
+      if ($name =~ /\{(.*)\}$/)
       {
-        $flags = FLAG_PARAM_OPTIONAL if($3);
-        $flags |= FLAG_PARAM_OUTPUT if($2);
-        $mapping = $1 if($1);
-        $name =~ s/\{\s*(\w+|\.)?\s*(>>)?\s*\??\s*\}$//;
-        $mapping = $name if($mapping eq ".");
+        # Get the options.
+        my $options = $1;
+ 
+        # Remove the options from the name.
+        $name =~ s/\{.*\}$//;
+ 
+        # Check if param should be optional or an output param.
+        $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
+        $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
+ 
+        # Check if it should be mapped to a C param.
+        if ($options =~ /(\w+|\.)/)
+        {
+          $mapping = $1;
+          $mapping = $name if($mapping eq ".");
+        }
       }
 
       push(@$param_types, $type);
@@ -335,13 +346,26 @@ sub parse_param($$)
   # Determine if the param is optional, an output param or if a C param
   # name should be mapped to the current C++ index (if name ends with
   # {c_name>>?}). (A '.' for the name means use the C++ as the C name).
-  if ($name =~ /\{\s*(\w+|\.)?\s*(>>)?\s*(\??)\s*\}$/)
+  # '>>' - Means that it is an output parameter.
+  # '?' - Means that it is an optional parameter.
+  if ($name =~ /\{(.*)\}$/)
   {
-    $flags = FLAG_PARAM_OPTIONAL if($3);
-    $flags |= FLAG_PARAM_OUTPUT if($2);
-    $mapping = $1 if($1);
-    $name =~ s/\{\s*(\w+|\.)?\s*(>>)?\??\s*\}$//;
-    $mapping = $name if($mapping eq ".");
+    # Get the options.
+    my $options = $1;
+ 
+    # Remove the options from the name.
+    $name =~ s/\{.*\}$//;
+        
+    # Check if param should be optional or an output param.
+    $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
+    $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
+      
+    # Check if it should be mapped to a C param.
+    if ($options =~ /(\w+|\.)/)
+    {
+      $mapping = $1;
+      $mapping = $name if($mapping eq ".");
+    }
   }
 
   push(@$param_types, $type);
