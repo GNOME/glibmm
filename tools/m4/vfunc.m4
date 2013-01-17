@@ -21,7 +21,9 @@ _POP()')
 dnl              $1      $2       $3        $4
 dnl _VFUNC_PCC(cppname,gtkname,cpprettype,crettype,
 dnl                         $5               $6           $7            $8         $9           $10      $11
-dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef, errthrow)
+dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef, errthrow,
+dnl                     $12           $13
+dnl                  slot_type, c_data_param_name)
 dnl
 dnl Note: _get_current_wrapper_inline() could be used throughout for performance instead of _get_current_wrapper(),
 dnl and is_derived_() instead of is_derived_(),
@@ -32,6 +34,10 @@ ifelse(`$10',,,`#ifdef $10'
 )dnl
 $4 __CPPNAME__`'_Class::$2_vfunc_callback`'($5)
 {
+ifelse(`$13',,,dnl
+`  const $12* slot = static_cast<$12*>($13);
+
+')dnl
 dnl  First, do a simple cast to ObjectBase. We will have to do a dynamic_cast
 dnl  eventually, but it is not necessary to check whether we need to call
 dnl  the vfunc.
@@ -106,8 +112,8 @@ ifelse(`$10',,,`#endif // $10
 ')dnl
 _POP()')
 
-#               $1        $2          $3         $4          $5             $6          $7        $8        $9        $10
-# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn, $ifdef, $errthrow)
+#               $1        $2          $3         $4          $5             $6          $7        $8        $9        $10         $11        $12          $13
+# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn, $ifdef, $errthrow, $slot_type, $slot_name, $no_slot_copy)
 #
 define(`_VFUNC_CC',`dnl
 _PUSH(SECTION_CC_VFUNCS)
@@ -115,6 +121,17 @@ ifelse(`$9',,,`#ifdef $9'
 )dnl
 $3 __NAMESPACE__::__CPPNAME__::$1`'($5) ifelse($7,1,const,)
 {
+dnl If a slot type has been specified, insert code to create a copy of it.
+ifelse(`$11',,,dnl
+dnl See if the slot should or should not be copied
+`ifelse(`$13',,dnl
+`  // Create a copy of the slot.
+  $11* slot_copy = new $11($12); ',dnl
+dnl
+`  // Use the original slot (not a copy).
+  $11* slot_copy = const_cast<$11*>(&$12);')
+
+')dnl
   BaseClassType *const base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
       _IFACE_PARENT_FROM_OBJECT(gobject_)dnl

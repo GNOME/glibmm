@@ -1252,6 +1252,9 @@ sub on_wrap_vfunc($)
   my $custom_vfunc_callback = 0;
   my $ifdef = "";
   my $errthrow = 0;
+  my $slot_name = "";
+  my $slot_callback = "";
+  my $no_slot_copy = 0;
 
   while($#args >= 2) # If optional arguments are there.
   {
@@ -1282,11 +1285,31 @@ sub on_wrap_vfunc($)
     {
     	$ifdef = $1;
     }
+    # The "slot_name" option tells gmmproc the name of the parameter
+    # that is a slot in the virtual function if there is one.
+    elsif($argRef =~ /^slot_name\s+(\w+)/)
+    {
+      $slot_name = $1;
+    }
+    # The "slot_callback" option tells gmmproc the name of the
+    # callback function that should be passed to the C function if the
+    # virtual function has a slot.
+    elsif($argRef =~ /^slot_callback\s+(\w+)/)
+    {
+      $slot_callback = $1;
+    }
+    # The "no_slot_copy" options tells gmmproc to pass the actual slot
+    # and not a copy of it to the C function in the data parameter.
+    elsif($argRef eq "no_slot_copy")
+    {
+      $no_slot_copy = 1;
+    }
   }
 
   $self->output_wrap_vfunc($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                            $refreturn, $refreturn_ctype, $custom_vfunc,
-                           $custom_vfunc_callback, $ifdef, $errthrow);
+                           $custom_vfunc_callback, $ifdef, $errthrow,
+                           $slot_name, $slot_callback, $no_slot_copy);
 }
 
 sub on_wrap_enum($)
@@ -1454,12 +1477,15 @@ sub output_wrap_signal($$$$$$$$$$$)
   }
 }
 
-# void output_wrap($CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
-#                  $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow)
-sub output_wrap_vfunc($$$$$$$$$)
+# void output_wrap_vfunc($CppDecl, $vfunc_name, $filename, $line_num,
+#                  $refreturn, $refreturn_ctype,
+#                  $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
+#                  $slot_name, $slot_callback, $no_slot_copy)
+sub output_wrap_vfunc($$$$$$$$$$$$)
 {
   my ($self, $CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
-      $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow) = @_;
+      $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
+      $slot_name, $slot_callback, $no_slot_copy) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, '_WRAP_VFUNC'));
@@ -1491,6 +1517,11 @@ sub output_wrap_vfunc($$$$$$$$$)
 
   $$objCppVfunc{rettype_needs_ref} = $refreturn;
   $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" suffix, and a separate easily-named invoker method.
+  
+  # Store the slot information in the vfunc if specified.
+  $$objCppVfunc{slot_name} = $slot_name if ($slot_name);
+  $$objCppVfunc{slot_callback} = $slot_callback if ($slot_callback);
+  $$objCppVfunc{no_slot_copy} = $no_slot_copy if ($no_slot_copy);
 
   $$objCVfunc{rettype_needs_ref} = $refreturn_ctype;
   $$objCVfunc{throw_any_errors} = 1 if($errthrow);

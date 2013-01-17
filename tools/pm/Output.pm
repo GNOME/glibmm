@@ -173,7 +173,10 @@ sub output_wrap_vfunc_cc($$$$$$$$)
     my ($conversions, $declarations, $initializations) =
       convert_args_cpp_to_c($objCppfunc, $objCFunc, 0, $line_num, $errthrow);
 
-    my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
+    my $no_slot_copy = "";
+    $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
+
+    my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -183,7 +186,10 @@ sub output_wrap_vfunc_cc($$$$$$$$)
       $objCppfunc->get_is_const(),
       $refreturn,
       $ifdef,
-      $errthrow);
+      $errthrow,
+      $$objCppfunc{slot_type},
+      $$objCppfunc{slot_name},
+      $no_slot_copy);
 
     $self->append($str);
   }
@@ -195,18 +201,24 @@ sub output_wrap_vfunc_cc($$$$$$$$)
     my $refreturn_ctype = "";
     $refreturn_ctype = "refreturn_ctype" if($$objCFunc{rettype_needs_ref});
 
-    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s)dnl\n",
+    # Get the conversions.
+    my $conversions =
+     convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num);
+
+    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
       $$objCFunc{rettype},
       $objCFunc->args_types_and_names(),
       $objCFunc->args_names_only(),
-      convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num),
+      $conversions,
       ${$objCFunc->get_param_names()}[0],
       $refreturn_ctype,
       $ifdef,
-      $errthrow);
+      $errthrow,
+      $$objCppfunc{slot_type},
+      $$objCppfunc{c_data_param_name});
 
     $self->append($str);
   }
@@ -398,9 +410,9 @@ sub output_wrap_meth($$$$$$$)
       # convert_args_cpp_to_c() to not be included, then don't.
       if ($$objCppfunc{include_slot})
       {
-        $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
         $slot_type = $$objCppfunc{slot_type};
         $slot_name = $$objCppfunc{slot_name};
+        $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
       }
 
       $str = sprintf("_STATIC_METHOD(%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,`%s',`%s',`%s',%s)dnl\n",
@@ -436,9 +448,9 @@ sub output_wrap_meth($$$$$$$)
       # convert_args_cpp_to_c() to not be included, then don't.
       if ($$objCppfunc{include_slot})
       {
-        $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
         $slot_type = $$objCppfunc{slot_type};
         $slot_name = $$objCppfunc{slot_name};
+        $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
       }
 
       $str = sprintf("_METHOD(%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,\`%s\',%s,%s,%s,`%s',`%s',`%s',%s)dnl\n",
@@ -984,14 +996,14 @@ sub convert_args_cpp_to_c($$$$$)
   # Get the desired argument list combination.
   my $possible_arg_list = $$objCppfunc{possible_args_list}[$index];
 
+  # Tells if slot code should be included or not based on if a slot
+  # parameter is optional.
+  $$objCppfunc{include_slot} = 0;
+
   # Loop through the parameters:
   my $i;
   my $cpp_param_max = $num_cpp_args;
   # if( !($static) ) { $cpp_param_max++; }
-
-  # Tells if slot code should be included or not based on if a slot
-  # parameter is optional.
-  $$objCppfunc{include_slot} = 0;
 
   for ($i = 0; $i < $cpp_param_max; $i++)
   {
@@ -1075,6 +1087,9 @@ sub convert_args_cpp_to_c($$$$$)
         Output::error(
           "convert_args_cpp_to_c(): Missing a slot callback.  " .
           "Specify it with the 'slot_callback' option.\n",);
+        $objCppfunc->dump();
+        $objCDefsFunc->dump();
+        return ("", "", "");
       }
 
       # Get the slot type without the const and the & and store it so
@@ -1104,14 +1119,16 @@ sub convert_args_cpp_to_c($$$$$)
     }
   }
 
-  # Append the final slot copy parameter to the C function if the
-  # method has a slot.  The parameter name is consistent with the name
-  # in the _*METHOD() m4 macros.
+  # Append the final slot copy parameter to the C function if the method
+  # has a slot.  The m4 macros assume that that parameter name is
+  # "slot_copy".  The m4 macros will either copy the slot to the
+  # "slot_copy variable or set it to the address of the slot itself if
+  # the slot should not be copied.
   if ($$objCppfunc{slot_name})
   {
     if ($$objCppfunc{include_slot})
     {
-      push(@conversions, "slot_copy")
+      push(@conversions, "slot_copy");
     }
     else
     {
@@ -1130,19 +1147,32 @@ sub convert_args_c_to_cpp($$$)
 {
   my ($objCDefsFunc, $objCppfunc, $wrap_line_number) = @_;
 
+  my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
   my $c_param_types = $$objCDefsFunc{param_types};
   my $c_param_names = $$objCDefsFunc{param_names};
+
+  # This variable stores the C++ parameter mappings from the C++
+  # index to the C param name if the mappings exist.
+  my %cpp_index_param_mappings;
+
+  @cpp_index_param_mappings{values $$objCppfunc{param_mappings}}
+    = keys $$objCppfunc{param_mappings};
 
   my @result;
 
   my $num_c_args = scalar(@{$c_param_types});
 
-  # If the the function has been marked as a function that throws errors (Glib::Error)
-  # don't count the last GError** argument.
+  # If the the function has been marked as a function that throws errors
+  # (Glib::Error) don't count the last GError** argument.
   $num_c_args-- if($$objCDefsFunc{throw_any_errors});
 
   my $num_cpp_args = scalar(@{$cpp_param_types});
+ 
+  # If the method has a slot temporarily increment the C++ arg count when
+  # comparing the C++ and C argument count because the C function would
+  # have a final 'gpointer data' parameter and the C++ method would not.
+  $num_cpp_args++ if ($$objCppfunc{slot_name});
 
   if ( ($num_cpp_args + 1) !=  $num_c_args )
   {
@@ -1155,30 +1185,82 @@ sub convert_args_c_to_cpp($$$)
     return "";
   }
 
+  # Re-decrement the expected C++ argument count if there is a slot.
+  $num_cpp_args-- if ($$objCppfunc{slot_name});
 
-  # Loop through the c parameters:
- my $i;
- my $c_param_max = $num_c_args;
+  # Loop through the C++ parameters:
+  my $i;
+  my $cpp_param_max = $num_cpp_args;
 
- for ($i = 1; $i < $c_param_max; $i++)
- {
-   #index of C parameter:
-   my $iCppParam = $i - 1;
+  for ($i = 0; $i < $cpp_param_max; $i++)
+  {
+    my $cParamName = "";
+    my $c_index = 0;
 
-   my $cppParamType = $$cpp_param_types[$iCppParam];
-   $cppParamType =~ s/ &/&/g; #Remove space between type and &.
-   $cppParamType =~ s/ \*/*/g; #Remove space between type and *
+    if (defined $cpp_index_param_mappings{$i})
+    {
+      # If a mapping exists from the current index to a C param name,
+      # use that C param for the conversion.
+      $cParamName = $cpp_index_param_mappings{$i};
 
-   my $cParamName = $$c_param_names[$i];
-   my $cParamType = $$c_param_types[$i];
+      # Get the C index based on the C param name.
+      ++$c_index until $$c_param_names[$c_index] eq $cParamName;
+    }
+    else
+    {
+      # If no mapping exists, the C index is the C++ index + 1 (to skip
+      # The 'self' argument of the C function).
+      $c_index = $i + 1;
+      $cParamName = $$c_param_names[$c_index];
+    }
 
-   if ($cParamType ne $cppParamType) #If a type conversion is needed.
-   {
-     push(@result, sprintf("_CONVERT(%s,%s,%s,%s)\n",
-                  $cParamType,
-                  $cppParamType,
-                  $cParamName,
-                  $wrap_line_number) );
+    my $cParamType = $$c_param_types[$c_index];
+
+    my $cppParamName = $$cpp_param_names[$i];
+    my $cppParamType = $$cpp_param_types[$i];
+    $cppParamType =~ s/ &/&/g; #Remove space between type and &.
+    $cppParamType =~ s/ \*/*/g; #Remove space between type and *
+
+    if ($$objCppfunc{slot_name})
+    {
+      # If the current parameter is the slot parameter insert the
+      # derefenced name of the variable containing the slot which is
+      # assumed to be '*slot'.  The m4 macro is responsible for ensuring
+      # that the variable is declared and the slot in the 'user_data' C
+      # param is placed in the variable.
+      if ($$objCppfunc{slot_name} eq $cppParamName)
+      {
+        push(@result, "*slot");
+  
+        # Get the slot type without the const and the '&' and store it so
+        # it can be passed to the m4 macro.
+        $cppParamType =~ /^const\s+(.*)&/;
+        
+        # If the type does not contain
+        # any '::' then assume that it is in the library standard namespace
+        # by prepending '__NAMESPACE__::' to it which the m4 macros will
+        # translate to the library namespace.
+        my $plainCppParamType = $1;
+        $plainCppParamType = "__NAMESPACE__::" . $plainCppParamType
+          if (!($plainCppParamType =~ /::/));
+
+        $$objCppfunc{slot_type} = $plainCppParamType;
+  
+        # Store the name of the C data parameter so it can be passed
+        # to the m4 macro so it can extract the slot.
+        $$objCppfunc{c_data_param_name} = $$c_param_names[$num_c_args - 1];
+        
+        next;
+      }
+    }
+
+    if ($cParamType ne $cppParamType) #If a type conversion is needed.
+    {
+      push(@result, sprintf("_CONVERT(%s,%s,%s,%s)\n",
+                   $cParamType,
+                   $cppParamType,
+                   $cParamName,
+                   $wrap_line_number) );
     }
     else
     {

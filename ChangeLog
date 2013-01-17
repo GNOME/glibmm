@@ -1,5 +1,44 @@
 2013-01-16  José Alburquerque  <jaalburquerque@gmail.com>
 
+	gmmproc: _WRAP_VFUNC: Support the wrapping of slots.
+
+	* tools/pm/WrapParser.pm (on_wrap_vfunc): Add support for parsing the
+	additional 'slot_name', 'slot_callback', and 'no_slot_copy' options
+	that do the same thing as the corresponding _WRAP_METHOD options (ie.
+	specify the name of the C++ slot parameter, the name of the callback
+	function and whether to use the original slot or a copy of it,
+	respectively.  Also pass the options along to:
+	(output_wrap_vfunc): Store the options in the C++ virtual function
+	object so they can be tested for when converting the parameters and
+	composing the _VFUNC* m4 macro calls.
+	* tools/pm/Output.pm (output_wrap_vfunc_cc):
+	- Append the additional 'slot_type', 'slot_name' and 'no_slot_copy'
+	parameters to the _VFUNC_CC m4 macro invocation so that it can include
+	code for the vfunc to copy the slot parameter and pass it on to the C
+	function.
+	- Also append the additional 'slot_type' and 'c_data_param_name' to
+	the _VFUNC_PCC m4 macro so that it knows the slot type and the C
+	gpointer parameter name that contains the slot so that the macro can
+	generate code to extract the slot from the data parameter and pass the
+	slot on to the C++ virtual function.
+	(convert_args_c_to_cpp):
+	- Rewritten so that it loops through the C++ parameters so that it is
+	possible to re-order the parameters using the existing mapping
+	functionality that allows parameters to be re-ordered for the
+	_WRAP_[CREATE|CTOR|METHOD] macros.  Also re-written so that it knows
+	how to deal with slot parameters.
+	* tools/m4/vfunc.m4 (_VFUNC_PCC): Modified to accept the additional
+	'slot_type' and 'c_data_param_name' arguments and to insert code to
+	extract the slot from the C gpointer data parameter to be passed on
+	to the C++ virtual function.
+	(_VFUNC_CC): Modified to accept the additional 'slot_type',
+	'slot_name' and 'no_slot_copy' arguments and to insert code to either
+	copy the slot in a 'slot_copy' variable or set the variable to the
+	actual slot (if it's so been specified) which is then passed on to the
+	C function.
+
+2013-01-16  José Alburquerque  <jaalburquerque@gmail.com>
+
 	gmmproc: _WRAP_[CREATE|CTOR|METHOD]: Allow any order of {} options.
 
 	* tools/pm/Function.pm: Make it possible to use any order desired of
