@@ -93,12 +93,12 @@ dnl  g_assert(base != 0);
   // Call the original underlying C function:
   if(base && base->$2)
   {
-    ifelse($4,void,,`$4 result = ')(*base->$2)`'($6);
+    ifelse($4,void,,`$4 retval = ')(*base->$2)`'($6);
 ifelse($11,errthrow,`dnl
     if(*error)
       ::Glib::Error::throw_exception(*error);
 ')dnl
-ifelse($4,void,,`    return result;
+ifelse($4,void,,`    return retval;
 ')dnl
   }
 
@@ -150,15 +150,15 @@ ifelse($3,void,`dnl
   }
 ',`dnl
 ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requested.
-    $3 result(Glib::wrap((*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6)), true));
+    $3 retval(Glib::wrap((*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6)), true));
 ',`dnl
-    $3 result(_CONVERT($4,$3,`(*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6))'));
+    $3 retval(_CONVERT($4,$3,`(*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6))'));
 ')dnl
 ifelse($10,errthrow,`dnl
     if(gerror)
       ::Glib::Error::throw_exception(gerror);
 ')dnl
-    return result;
+    return retval;
   }
 
   typedef $3 RType;

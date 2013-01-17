@@ -93,11 +93,11 @@ public:
 #m4 _CONVERSION(`GTlsCertificate*',`const Glib::RefPtr<const TlsCertificate>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(bool accept_certificate(const Glib::RefPtr<const TlsCertificate>& peer_cert, TlsCertificateFlags errors), "accept_certificate")
 
-/* TODO:
-  _WRAP_VFUNC(bool handshake(const Glib::RefPtr<GCancellable>& cancellable), "handshake", errthrow)
-  _WRAP_VFUNC(void handshake_async(int io_priority, const Glib::RefPtr<GCancellable>& cancellable, GAsyncReadyCallback callback, gpointer user_data), "handshake_async")
-  _WRAP_VFUNC(bool handshake_finish(const Glib::RefPtr<GAsyncResult>& result), "handshake_finish", errthrow)
-*/
+  _WRAP_VFUNC(bool handshake(const Glib::RefPtr<Cancellable>& cancellable), "handshake", errthrow)
+  _WRAP_VFUNC(void handshake_async(const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, int io_priority{.} = Glib::PRIORITY_DEFAULT), "handshake_async", slot_name slot, slot_callback SignalProxy_async_callback)
+
+#m4 _CONVERSION(`GAsyncResult*',`const Glib::RefPtr<AsyncResult>&',`Glib::wrap($3, true)')
+  _WRAP_VFUNC(bool handshake_finish(const Glib::RefPtr<AsyncResult>& result), "handshake_finish", errthrow)
 };
 
 } // namespace Gio
