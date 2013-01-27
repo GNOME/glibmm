@@ -49,6 +49,9 @@ public:
 
   /** GVariant constructor.
    * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
    */
   explicit Variant<$1>(GVariant* castitem, bool take_a_reference = false)
   : VariantBase(castitem, take_a_reference)

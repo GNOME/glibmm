@@ -60,7 +60,7 @@ public:
                                                        const std::string& application_name,
                                                        AppInfoCreateFlags flags);
 
-  /**  Creates a duplicate of a this AppInfo.
+  /**  Creates a duplicate of this AppInfo.
    * @return A duplicate of this AppInfo.
    * @newin{2,36}
    */
@@ -68,6 +68,10 @@ public:
   _IGNORE(g_app_info_dup)
 
   // Note that the implementation of equal() is virtual via equal_vfunc().
+  /** Checks if two AppInfo<!-- -->s are equal.
+   * @param other The other AppInfo.
+   * @return <tt>true</tt> if @a *this is equal to @a other, <tt>false</tt> otherwise.
+   */
   _WRAP_METHOD(bool equal(const Glib::RefPtr<AppInfo>& other) const, g_app_info_equal)
 
   _WRAP_METHOD(std::string get_id() const, g_app_info_get_id)
@@ -98,15 +102,15 @@ public:
    * a textual uri you want to pass in as argument, consider using
    * launch_uris() instead.
    *
-   * On UNIX, this function sets the <envar>GIO_LAUNCHED_DESKTOP_FILE</envar>
+   * On UNIX, this function sets the @c GIO_LAUNCHED_DESKTOP_FILE
    * environment variable with the path of the launched desktop file and
-   * <envar>GIO_LAUNCHED_DESKTOP_FILE_PID</envar> to the process
+   * @c GIO_LAUNCHED_DESKTOP_FILE_PID to the process
    * id of the launched process. This can be used to ignore
-   * <envar>GIO_LAUNCHED_DESKTOP_FILE</envar>, should it be inherited
-   * by further processes. The <envar>DISPLAY</envar> and
-   * <envar>DESKTOP_STARTUP_ID</envar> environment variables are also
+   * @c GIO_LAUNCHED_DESKTOP_FILE, should it be inherited
+   * by further processes. The @c DISPLAY and
+   * @c DESKTOP_STARTUP_ID environment variables are also
    * set, based on information provided in @a launch_context.
-   * @param files A List of File objects.
+   * @param file A File object.
    * @param launch_context An AppLaunchContext.
    * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
    *
@@ -115,7 +119,7 @@ public:
   bool launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& launch_context);
 
   /** Launches the application. This passes the @a file to the launched application
-   * as an arguments.
+   * as an argument.
    * On error, an exception will be thrown accordingly.
    *
    * Note that even if the launch is successful the application launched
@@ -127,15 +131,15 @@ public:
    * a textual uri you want to pass in as argument, consider using
    * launch_uris() instead.
    *
-   * On UNIX, this function sets the <envar>GIO_LAUNCHED_DESKTOP_FILE</envar>
+   * On UNIX, this function sets the @c GIO_LAUNCHED_DESKTOP_FILE
    * environment variable with the path of the launched desktop file and
-   * <envar>GIO_LAUNCHED_DESKTOP_FILE_PID</envar> to the process
+   * @c GIO_LAUNCHED_DESKTOP_FILE_PID to the process
    * id of the launched process. This can be used to ignore
-   * <envar>GIO_LAUNCHED_DESKTOP_FILE</envar>, should it be inherited
-   * by further processes. The <envar>DISPLAY</envar> and
-   * <envar>DESKTOP_STARTUP_ID</envar> environment variables are also
+   * @c GIO_LAUNCHED_DESKTOP_FILE, should it be inherited
+   * by further processes. The @c DISPLAY and
+   * @c DESKTOP_STARTUP_ID environment variables are also
    * set, based on information provided in @a launch_context.
-   * @param files A File object.
+   * @param file A File object.
    * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
    *
    * @newin{3,2}
@@ -215,7 +219,7 @@ public:
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type, bool must_support_uris = true), g_app_info_get_default_for_type)
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme), g_app_info_get_default_for_uri_scheme)
   _WRAP_METHOD(static void reset_type_associations(const std::string& content_type), g_app_info_reset_type_associations)
-  _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context{?}), g_app_info_launch_default_for_uri, errthrow)
+  _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context{?}), g_app_info_launch_default_for_uri, errthrow)
 
 protected:
   //_WRAP_VFUNC(Glib::RefPtr<AppInfo> dup(), "dup")

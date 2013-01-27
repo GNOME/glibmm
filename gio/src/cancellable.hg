@@ -67,9 +67,24 @@ public:
   // TODO: is this useful in the C++ API?
   //_WRAP_METHOD(void make_pollfd(PollFD* pollfd), g_cancellable_make_pollfd)
 
-  _WRAP_METHOD_DOCS_ONLY(g_cancellable_connect)
-  gulong connect(const SlotCancelledCallback& callback);
+  /** Convenience function to connect to the Cancellable::signal_cancelled()
+   * signal. Also handles the race condition that may happen
+   * if the cancellable is cancelled right before connecting.
+   * 
+   * @a slot is called at most once, either directly at the
+   * time of the connect if @a cancellable is already cancelled,
+   * or when @a cancellable is cancelled in some thread.
+   * 
+   * See Cancellable::signal_cancelled() for details on how to use this.
+   * 
+   * @newin{2,22}
+   * @param slot The slot to connect.
+   * @return The id of the signal handler or 0 if @a cancellable has already
+   * been cancelled.
+   */
+  gulong connect(const SlotCancelledCallback& slot);
   _IGNORE(g_cancellable_connect)
+
   _WRAP_METHOD(void disconnect(gulong handler_id), g_cancellable_disconnect)
 
   _WRAP_SIGNAL(void cancelled(), cancelled)

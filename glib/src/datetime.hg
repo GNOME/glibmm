@@ -90,11 +90,39 @@ public:
   _WRAP_METHOD(DateTime add_minutes(int minutes) const, g_date_time_add_minutes)
   _WRAP_METHOD(DateTime add_seconds(double seconds) const, g_date_time_add_seconds)
   _WRAP_METHOD(DateTime add_full(int years, int months, int days, int hours, int minutes, double seconds) const, g_date_time_add_full)
+
+  /** Calculates the difference in time between @a *this and @a other.  The
+   * TimeSpan that is returned is effectively @a *this - @a other.
+   * 
+   * @newin{2,26}
+   * @param other The other DateTime.
+   * @return The difference between the two DateTime, as a time
+   * span expressed in microseconds.
+   */
   _WRAP_METHOD(TimeSpan difference(const DateTime& other) const, g_date_time_difference)
 
 #m4 _CONVERSION(`const DateTime&',`gconstpointer',`static_cast<gconstpointer>(&($3))')
+  /** A comparison function for DateTimes that is suitable
+   * as a CompareFunc.
+   * 
+   * @newin{2,26}
+   * @param other The DateTime to compare with.
+   * @return -1, 0 or 1 if @a *this is less than, equal to or greater
+   * than @a other.
+   */
   _WRAP_METHOD(int compare(const DateTime& other) const, g_date_time_compare)
+
   _WRAP_METHOD(guint hash() const, g_date_time_hash)
+
+  /** Checks to see if @a *this and @a other are equal.
+   * 
+   * Equal here means that they represent the same moment after converting
+   * them to the same time zone.
+   * 
+   * @newin{2,26}
+   * @param other The DateTime to compare with.
+   * @return <tt>true</tt> if @a *this and @a other are equal.
+   */
   _WRAP_METHOD(bool equal(const DateTime& other) const, g_date_time_equal)
 
   _WRAP_METHOD(void get_ymd(int& year, int& month, int& day) const, g_date_time_get_ymd)

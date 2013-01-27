@@ -420,7 +420,7 @@ public:
   void close(const SlotAsyncReady& slot);
   _IGNORE(g_dbus_connection_close)
 
-  _WRAP_METHOD(bool close_finish(const Glib::RefPtr<AsyncResult>& result),
+  _WRAP_METHOD(bool close_finish(const Glib::RefPtr<AsyncResult>& res),
                g_dbus_connection_close_finish, errthrow)
 
   _WRAP_METHOD(void close_sync(const Glib::RefPtr<Cancellable>& cancellable{?}), g_dbus_connection_close_sync, errthrow)
@@ -477,7 +477,7 @@ public:
   void flush(const SlotAsyncReady& slot);
   _IGNORE(g_dbus_connection_flush)
 
-  _WRAP_METHOD(bool flush_finish(const Glib::RefPtr<AsyncResult>& result),
+  _WRAP_METHOD(bool flush_finish(const Glib::RefPtr<AsyncResult>& res),
                g_dbus_connection_flush_finish, errthrow)
 
   _WRAP_METHOD(void flush_sync(const Glib::RefPtr<Cancellable>& cancellable{?}), g_dbus_connection_flush_sync, errthrow)
@@ -537,7 +537,7 @@ public:
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_connection_send_message_with_reply_finish)
   /// @throw Glib::Error.
-  _WRAP_METHOD(Glib::RefPtr<Message> send_message_with_reply_finish(const Glib::RefPtr<AsyncResult>& result), g_dbus_connection_send_message_with_reply_finish, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<Message> send_message_with_reply_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_connection_send_message_with_reply_finish, errthrow)
 
   /** Synchronously sends @a message to the peer represented by the connection
    * and blocks the calling thread until a reply is received or the timeout is
@@ -780,7 +780,6 @@ public:
     int                                 timeout_msec = -1,
     CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType());
-#endif // G_OS_LINUX
 
   /** Finishes an operation started with call() (with a UnixFDList).
    * @param res A AsyncResult obtained from the SlotAsyncReady passed to
@@ -790,6 +789,7 @@ public:
    * @newin{2,34}
    */
   _WRAP_METHOD(Glib::VariantContainerBase call_finish(const Glib::RefPtr<AsyncResult>& res{.}, Glib::RefPtr<UnixFDList>& out_fd_list{.>>}), g_dbus_connection_call_with_unix_fd_list_finish, errthrow, ifdef G_OS_LINUX)
+#endif // G_OS_LINUX
 
   _WRAP_METHOD(
     Glib::VariantContainerBase call_sync(
@@ -947,8 +947,8 @@ public:
   /** Registers exported objects at @a object_path with the D-Bus
    * interface that is described in @a interface_info. This method overload,
    * which does not take a VTable, is useful for
-   * <a href=="http://en.wikipedia.org/wiki/Marker_interface_pattern">marker
-   * interfaces</href>.
+   * <a href="http://en.wikipedia.org/wiki/Marker_interface_pattern">marker
+   * interfaces</a>.
    *
    * If an existing slot is already registered at @a object_path and @a
    * interface_name, then a Glib::Error is thrown.

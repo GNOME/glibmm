@@ -51,7 +51,7 @@ public:
 
   /** Called by constructors of derived classes.
    *
-   * @param cast_item A C instance that will be wrapped by the new
+   * @param castitem A C instance that will be wrapped by the new
    * C++ instance. This does not take a reference, so call reference()
    * if necessary.
    */

@@ -98,7 +98,7 @@ double strtod(const std::string&      str,
               std::string::size_type& end_index,
               std::string::size_type  start_index = 0);
 
-/** Converts a <tt>double</tt> to a string, using the <tt>'.'</tt> as decimal point.
+/** Converts a <tt>double</tt> to a string, using the @c '.' as decimal point.
  * @ingroup StringUtils
  * This functions generates enough precision that converting the string back
  * using Glib::Ascii::strtod() gives the same machine-number (on machines with

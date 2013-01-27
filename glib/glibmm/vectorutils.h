@@ -276,7 +276,7 @@ public:
   typedef typename Tr::CppType        CppType;
   typedef typename Tr::CType          CType;
 
-  /** Constructs an ArrayKeeper holding @a array of size @array_size.
+  /** Constructs an ArrayKeeper holding @a array of size @a array_size.
    * @a ownership tells what should be destroyed with keeper destruction:
    * <ul>
    * <li>Glib::OWNERSHIP_NONE - keeper won't destroy data it holds.</li>

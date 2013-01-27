@@ -161,7 +161,7 @@ public:
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_finish)
   /// @throw Glib::Error.
-  _WRAP_METHOD(static Glib::RefPtr<Proxy> create_finish(const Glib::RefPtr<AsyncResult>& result), g_dbus_proxy_new_finish, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Proxy> create_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_proxy_new_finish, errthrow)
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_sync)
   static Glib::RefPtr<Proxy>
@@ -203,7 +203,7 @@ public:
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_for_bus_finish)
   /// @throw Glib::Error.
-  _WRAP_METHOD(static Glib::RefPtr<Proxy> create_for_bus_finish(const Glib::RefPtr<AsyncResult>& result), g_dbus_proxy_new_for_bus_finish, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Proxy> create_for_bus_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_proxy_new_for_bus_finish, errthrow)
 
   _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_new_for_bus_sync)
   static Glib::RefPtr<Proxy>
@@ -370,7 +370,6 @@ public:
     int                                 timeout_msec = -1,
     CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
     const Glib::VariantType&            reply_type = Glib::VariantType());
-#endif // G_OS_LINUX
 
   /** Finishes an operation started with call() (with a UnixFDList).
    * @param res A AsyncResult obtained from the SlotAsyncReady passed to
@@ -380,6 +379,7 @@ public:
    * @newin{2,34}
    */
   _WRAP_METHOD(Glib::VariantContainerBase call_finish(const Glib::RefPtr<AsyncResult>& res{.}, Glib::RefPtr<UnixFDList>& out_fd_list{.>>}), g_dbus_proxy_call_with_unix_fd_list_finish, errthrow, ifdef G_OS_LINUX)
+#endif // G_OS_LINUX
 
   _WRAP_METHOD(
     Glib::VariantContainerBase call_sync(
