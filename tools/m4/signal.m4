@@ -16,11 +16,11 @@ dnl               $10 = `refdoc_comment',
 dnl               $11 = ifdef)
 
 define(`_SIGNAL_PROXY',`
-$10
 ifelse(`$11',,,`#ifdef $11'
 )dnl
 ifelse(`$9',,,`_DEPRECATE_IFDEF_START
 ')dnl
+$10
   Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'();
 ifelse(`$9',,,`_DEPRECATE_IFDEF_END
 ')dnl

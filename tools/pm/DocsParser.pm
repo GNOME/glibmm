@@ -474,37 +474,40 @@ sub convert_tags_to_doxygen($)
   for($$text)
   {
     # Replace format tags.
-    s"<(/?)emphasis>"<$1em>"g;
-    s"<(/?)literal>"<$1tt>"g;
-    s"<(/?)constant>"<$1tt>"g;
-    s"<(/?)function>"<$1tt>"g;
+    s"<(/?)(?:emphasis|replaceable)>"<$1em>"g;
+    s"<(/?)(?:constant|envar|filename|function|guimenuitem|literal|option|structfield|varname)>"<$1tt>"g;
 
     # Some argument names are suffixed by "_" -- strip this.
     # gtk-doc uses @thearg, but doxygen uses @a thearg.
     s" ?\@([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?\b" \@a $1"g;
 
-    # Don't convert doxygen's @throws and @param, so these can be used in the
-    # docs_override.xml:
-    s" \@a (throws|param)" \@$1"g;
+    # Don't convert Doxygen's $throw, @throws and @param, so these can be used
+    # in the docs_override.xml.
+    s" \@a (throws?|param)\b" \@$1"g;
+
     s"^Note ?\d?: "\@note "mg;
-
     s"</?programlisting>""g;
-
     s"<!>""g;
 
     # Remove all link tags.
     s"</?u?link[^&]*?>""g;
 
-    # Remove all para tags (from tmpl sgml files).
-    s"</?para>""g;
+    # Remove all para tags and simpara tags (simple paragraph).
+    s"</?(sim)?para>""g;
 
-    # Convert <itemizedlist> tags to Doxygen format.
-    s"</?itemizedlist>\n?""g;
-    s"<listitem>(.*?)(\n?)</listitem>(\n?)"- $1\n"sg;
+    # Convert <simplelist>, <itemizedlist> and <variablelist> to something that
+    # Doxygen understands.
+    s"<simplelist>\n?(.*?)</simplelist>\n?"&DocsParser::convert_simplelist($1)"esg;
+    s"<itemizedlist>\n?(.*?)</itemizedlist>\n?"&DocsParser::convert_itemizedlist($1)"esg;
+    s"<variablelist>\n?(.*?)</variablelist>\n?"&DocsParser::convert_variablelist($1)"esg;
 
-    # Use our Doxygen @newin alias:
-    s/\bSince:\s*(\d+)\.(\d+)\.(\d+)\b/\@newin{$1,$2,$3}/g;
-    s/\bSince:\s*(\d+)\.(\d+)\b/\@newin{$1,$2}/g;
+    # Use our Doxygen @newin alias.
+    # If Since is not followed by a colon, substitute @newin only if it's
+    # in a sentence of its own at the end of the string. 
+    s/\bSince:\s*(\d+)\.(\d+)\.(\d+)\b\.?/\@newin{$1,$2,$3}/g;
+    s/\bSince:\s*(\d+)\.(\d+)\b\.?/\@newin{$1,$2}/g;
+    s/(\.\s+)Since\s+(\d+)\.(\d+)\.(\d+)\.?$/$1\@newin{$2,$3,$4}/;
+    s/(\.\s+)Since\s+(\d+)\.(\d+)\.?$/$1\@newin{$2,$3}/;
 
     s"\b->\b"->"g;
 
@@ -519,11 +522,41 @@ sub convert_tags_to_doxygen($)
     s"#?\bg(int|short|long)\b"<tt>$1</tt>"g;
     s"#?\bgu(int|short|long)\b"<tt>unsigned $1</tt>"g;
 
-    # For Gtk::TextIter.
-    s"(\\[rn])\b"<tt>\\$1</tt>"g;
+    # Escape all backslashes, except in \throw, \throws and \param, which can
+    # be Doxygen commands in the docs_override.xml.
+    s"\\"\\\\"g;
+    s"\\\\(throws?|param)\b"\\$1"g
   }
 }
 
+# Convert <simplelist> tags to a list of newline-separated elements.
+sub convert_simplelist($)
+{
+  my ($text) = @_;
+
+  $text =~ s"<member>(.*?)(\n?)</member>(\n?)"$1<br>\n"sg;
+  return "<br>\n" . $text . "<br>\n";
+}
+
+# Convert <itemizedlist> tags to Doxygen format.
+sub convert_itemizedlist($)
+{
+  my ($text) = @_;
+
+  $text =~ s"<listitem>(.*?)(\n?)</listitem>(\n?)"- $1\n"sg;
+  return $text;
+}
+
+# Convert <variablelist> tags to an HTML definition list.
+sub convert_variablelist($)
+{
+  my ($text) = @_;
+
+  $text =~ s"</?varlistentry>\n?""g;
+  $text =~ s"<(/?)term>"<$1dt>"g;
+  $text =~ s"<(/?)listitem>"<$1dd>"g;
+  return "<dl>\n" . $text . "</dl>\n";
+}
 
 sub substitute_identifiers($$)
 {

@@ -89,6 +89,13 @@ identifier_patterns = [ signal_name_pattern, property_name_pattern, enum_name_pa
 no_colon_return_pattern = re.compile(r'^@?(returns|return\s+value)\s*(.*\n?)$', re.IGNORECASE)
 since_pattern = re.compile(r'^(since\s*:\s*.*\n?)$', re.IGNORECASE)
 
+# This pattern is to match since sections that forget to have a colon (':')
+# after the initial 'Since' phrase.  It is not included by default in the list
+# of final sections below because some function descriptions contain
+# 'Since ...' and the process_description() function would stop at that
+# line, thinking it is a since section.
+no_colon_since_pattern = re.compile(r'^Since\s+[.0-9]+\n?$')
+
 # These patterns normally will be encountered after the description.  Knowing
 # the order of their appearance is difficult so this list is used to test when
 # one begins and the other ends when processing the rest of the sections after
@@ -317,7 +324,12 @@ def process_description(fp, line, cur_doc):
                 return line
 
         # If not, append lines to description in the doc comment block.
-        cur_doc.append_to_description(line)
+        # But if --no-since is specified, skip a no_colon_since_pattern line.
+        if no_since and \
+                no_colon_since_pattern.match(line) and prev_line == '\n':
+            pass
+        else:
+            cur_doc.append_to_description(line)
 
         prev_line = line
         line = fp.readline()
@@ -336,6 +348,12 @@ def process_description(fp, line, cur_doc):
 # sections) process the final sections ('Returns:', 'Since:', etc.) until the
 # end of the comment block or eof.  Return the line that ends the processing.
 def process_final_sections(fp, line, cur_doc):
+    # Temporarily append the no_colon_since_pattern to the final section
+    # patterns now that the description has been processed.  It will be
+    # removed at the end of this function so that future descriptions
+    # that begin with 'Since ...' are not interpreted as a since section.
+    final_section_patterns.append(no_colon_since_pattern)
+
     while line and not comment_end_pattern.match(line):
         # Remove leading ' * ' from current non-empty comment line.
         line = comment_line_lead_pattern.sub('', line)
@@ -374,10 +392,11 @@ def process_final_sections(fp, line, cur_doc):
                     cur_doc.add_annotation((match.group(1),
                             match.group(2)))
                 else:
-                    # For all others ('Since:' and 'Deprecated:') just append
-                    # the line to the description for now.
-                    # But if --no-since is specified, don't append it.
-                    if no_since and pattern == since_pattern:
+                    # For all others ('Since:', 'Since ' and 'Deprecated:')
+                    # just append the line to the description for now.
+                    # But if --no-since is specified, skip a Since line.
+                    if no_since and (pattern == since_pattern or \
+                            pattern == no_colon_since_pattern):
                         pass
                     else:
                         cur_doc.append_to_description(line)
@@ -419,6 +438,10 @@ def process_final_sections(fp, line, cur_doc):
 
             # Get the next line to continue processing.
             line = fp.readline()
+
+    # Remove the no_colon_since_pattern (which was temporarily added at
+    # the beginning of this function) from the list of final section patterns.
+    final_section_patterns.pop()
 
     return line
 

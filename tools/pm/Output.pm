@@ -118,6 +118,8 @@ sub output_wrap_vfunc_h($$$$$$)
 #   );
 #  $self->append($str);
 
+  $self->ifdef($ifdef);
+
   # Prepend a Doxygen @throws directive to the declaration if the virtual
   # function throws an error.
   if($$objCDefsFunc{throw_any_errors})
@@ -131,7 +133,6 @@ sub output_wrap_vfunc_h($$$$$$)
     $cppVfuncDecl .= " const";
   }
 
-  $self->ifdef($ifdef);
   $self->append("  $cppVfuncDecl;\n");
   $self->endif($ifdef);
 
@@ -355,6 +356,8 @@ sub output_wrap_meth($$$$$$$)
       $self->append("\n_DEPRECATE_IFDEF_START");
     }
 
+    $self->ifdef($ifdef);
+
     if($arg_list == 0)
     {
       # Doxygen documentation before the method declaration:
@@ -365,12 +368,9 @@ sub output_wrap_meth($$$$$$$)
       $self->append("\n\n  /// A $$objCppfunc{name}() convenience overload.\n");
     }
 
-    $self->ifdef($ifdef);
-
     $self->append("  " . $objCppfunc->get_declaration($arg_list));
 
     $self->endif($ifdef);
-
 
     if($deprecated ne "")
     {
