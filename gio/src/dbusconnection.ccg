@@ -719,7 +719,7 @@ Glib::VariantContainerBase Connection::call_sync(
   return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
 }
 
-#ifdef G_OS_LINUX
+#ifdef G_OS_UNIX
 // With a UnixFDList.
 void Connection::call(
   const Glib::ustring&                object_path,
@@ -770,7 +770,7 @@ void Connection::call(
     static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(fd_list),
     0, &SignalProxy_async_callback, slot_copy);
 }
-#endif // G_OS_LINUX
+#endif // G_OS_UNIX
 
 void Connection::emit_signal(
   const Glib::ustring&                object_path,

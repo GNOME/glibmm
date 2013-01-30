@@ -324,7 +324,7 @@ public:
   );
 
 
-#ifdef G_OS_LINUX
+#ifdef G_OS_UNIX
 //TODO: Use _WRAP_METHOD() for this?
   /** Like call() but also takes a GUnixFDList object.
    * This method is only available on UNIX.
@@ -360,16 +360,12 @@ public:
    * @newin{2,34}
    */
   void call(
-    const Glib::ustring&                object_path,
-    const Glib::ustring&                interface_name,
     const Glib::ustring&                method_name,
     const Glib::VariantContainerBase&   parameters,
     const SlotAsyncReady&               slot,
     const Glib::RefPtr<UnixFDList>&     fd_list,
-    const Glib::ustring&                bus_name = Glib::ustring(),
     int                                 timeout_msec = -1,
-    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE,
-    const Glib::VariantType&            reply_type = Glib::VariantType());
+    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE);
 
   /** Finishes an operation started with call() (with a UnixFDList).
    * @param res A AsyncResult obtained from the SlotAsyncReady passed to
@@ -378,8 +374,8 @@ public:
    * @throw Glib::Error.
    * @newin{2,34}
    */
-  _WRAP_METHOD(Glib::VariantContainerBase call_finish(const Glib::RefPtr<AsyncResult>& res{.}, Glib::RefPtr<UnixFDList>& out_fd_list{.>>}), g_dbus_proxy_call_with_unix_fd_list_finish, errthrow, ifdef G_OS_LINUX)
-#endif // G_OS_LINUX
+  _WRAP_METHOD(Glib::VariantContainerBase call_finish(const Glib::RefPtr<AsyncResult>& res{.}, Glib::RefPtr<UnixFDList>& out_fd_list{.>>}), g_dbus_proxy_call_with_unix_fd_list_finish, errthrow, ifdef G_OS_UNIX)
+#endif // G_OS_UNIX
 
   _WRAP_METHOD(
     Glib::VariantContainerBase call_sync(
@@ -391,7 +387,7 @@ public:
       int                                 timeout_msec{.} = -1,
       CallFlags                           flags{.} = Gio::DBus::CALL_FLAGS_NONE
     ),
-    g_dbus_proxy_call_with_unix_fd_list_sync, errthrow, ifdef G_OS_LINUX
+    g_dbus_proxy_call_with_unix_fd_list_sync, errthrow, ifdef G_OS_UNIX
   )
 
  //_WRAP_PROPERTY("g-bus-type", BusType) // write-only construct-only
