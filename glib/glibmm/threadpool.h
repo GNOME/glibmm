@@ -62,11 +62,21 @@ public:
   explicit ThreadPool(int max_threads = -1, bool exclusive = false);
   virtual ~ThreadPool();
 
+  //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
+  // TODO: At the next ABI break, consider changing const sigc::slot<void>& slot
+  // to const std::function<void()>& func, if it can be assumed that all supported
+  // compilers understand the C++11 template class std::function<>.
   /** Inserts @a slot into the list of tasks to be executed by the pool.
    * When the number of currently running threads is lower than the maximal
    * allowed number of threads, a new thread is started (or reused).  Otherwise
    * @a slot stays in the queue until a thread in this pool finishes its
    * previous task and processes @a slot.
+   *
+   * Because sigc::trackable is not thread-safe, if the slot represents a
+   * non-static class method and is created by sigc::mem_fun(), the class concerned
+   * should not derive from sigc::trackable. You can use, say, boost::bind() or,
+   * in C++11, std::bind() or a C++11 lambda expression instead of sigc::mem_fun().
+   *
    * @param slot A new task for the thread pool.
    * @throw Glib::ThreadError An error can only occur when a new thread
    * couldn't be created. In that case @a slot is simply appended to the
