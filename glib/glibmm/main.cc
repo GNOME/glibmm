@@ -214,9 +214,9 @@ static gboolean glibmm_source_callback(void* data)
   return 0;
 }
 
-/* Only used by SignalTimeout::connect_once() and SignalIdle::connect_once().
- * These don't use Glib::Source, to avoid the unnecessary overhead
- * of a completely unused wrapper object.
+/* Only used by SignalTimeout::connect_once(), SignalTimeout::connect_seconds_once()
+ * and SignalIdle::connect_once(). These don't use Glib::Source, to avoid the
+ * unnecessary overhead of a completely unused wrapper object.
  */
 static gboolean glibmm_source_callback_once(void* data)
 {

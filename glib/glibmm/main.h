@@ -70,6 +70,15 @@ private:
   GPollFD gobject_;
 };
 
+// Concerning SignalTimeout::connect_once(), SignalTimeout::connect_seconds_once()
+// and SignalIdle::connect_once():
+// See https://bugzilla.gnome.org/show_bug.cgi?id=396963 and
+// http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
+// It's recommended to replace sigc::slot<void>& by std::function<void()>& in
+// Threads::Thread::create() and ThreadPool::push() at the next ABI break.
+// Such a replacement would be a mixed blessing in SignalTimeout and SignalIdle.
+// In a single-threaded program auto-disconnection of trackable slots is safe
+// and can be useful.
 
 class SignalTimeout
 {
@@ -111,18 +120,25 @@ public:
   sigc::connection connect(const sigc::slot<bool>& slot, unsigned int interval,
                            int priority = PRIORITY_DEFAULT);
 
- /** Connects a timeout handler that runs only once.
-  * This method takes a function pointer to a function with a void return
-  * and no parameters. After running once it is not called again.
-  *
-  * @see connect()
-  * @param slot A slot to call when @a interval has elapsed. For example:
-  * @code
-  * void on_timeout_once()
-  * @endcode
-  * @param interval The timeout in milliseconds.
-  * @param priority The priority of the new event source.
-  */
+  /** Connects a timeout handler that runs only once.
+   * This method takes a function pointer to a function with a void return
+   * and no parameters. After running once it is not called again.
+   *
+   * Because sigc::trackable is not thread-safe, if the slot represents a
+   * non-static method of a class deriving from sigc::trackable, and the slot is
+   * created by sigc::mem_fun(), connect_once() should only be called from
+   * the thread where the SignalTimeout object's MainContext runs. You can use,
+   * say, boost::bind() or, in C++11, std::bind() or a C++11 lambda expression
+   * instead of sigc::mem_fun().
+   *
+   * @see connect()
+   * @param slot A slot to call when @a interval has elapsed. For example:
+   * @code
+   * void on_timeout_once()
+   * @endcode
+   * @param interval The timeout in milliseconds.
+   * @param priority The priority of the new event source.
+   */
   void connect_once(const sigc::slot<void>& slot, unsigned int interval,
                     int priority = PRIORITY_DEFAULT);
 
@@ -159,20 +175,27 @@ public:
   sigc::connection connect_seconds(const sigc::slot<bool>& slot, unsigned int interval,
                            int priority = PRIORITY_DEFAULT);
 
- /** Connects a timeout handler that runs only once with whole second
-  *  granularity.
-  *
-  * This method takes a function pointer to a function with a void return
-  * and no parameters. After running once it is not called again.
-  *
-  * @see connect_seconds()
-  * @param slot A slot to call when @a interval has elapsed. For example:
-  * @code
-  * void on_timeout_once()
-  * @endcode
-  * @param interval The timeout in seconds.
-  * @param priority The priority of the new event source.
-  */
+  /** Connects a timeout handler that runs only once with whole second
+   *  granularity.
+   *
+   * This method takes a function pointer to a function with a void return
+   * and no parameters. After running once it is not called again.
+   *
+   * Because sigc::trackable is not thread-safe, if the slot represents a
+   * non-static method of a class deriving from sigc::trackable, and the slot is
+   * created by sigc::mem_fun(), connect_seconds_once() should only be called from
+   * the thread where the SignalTimeout object's MainContext runs. You can use,
+   * say, boost::bind() or, in C++11, std::bind() or a C++11 lambda expression
+   * instead of sigc::mem_fun().
+   *
+   * @see connect_seconds()
+   * @param slot A slot to call when @a interval has elapsed. For example:
+   * @code
+   * void on_timeout_once()
+   * @endcode
+   * @param interval The timeout in seconds.
+   * @param priority The priority of the new event source.
+   */
   void connect_seconds_once(const sigc::slot<void>& slot, unsigned int interval,
                             int priority = PRIORITY_DEFAULT);
 
@@ -210,17 +233,24 @@ public:
    */
   sigc::connection connect(const sigc::slot<bool>& slot, int priority = PRIORITY_DEFAULT_IDLE);
 
- /** Connects an idle handler that runs only once.
-  * This method takes a function pointer to a function with a void return
-  * and no parameters. After running once it is not called again.
-  *
-  * @see connect()
-  * @param slot A slot to call when the main loop is idle. For example:
-  * @code
-  * void on_idle_once()
-  * @endcode
-  * @param priority The priority of the new event source.
-  */
+  /** Connects an idle handler that runs only once.
+   * This method takes a function pointer to a function with a void return
+   * and no parameters. After running once it is not called again.
+   *
+   * Because sigc::trackable is not thread-safe, if the slot represents a
+   * non-static method of a class deriving from sigc::trackable, and the slot is
+   * created by sigc::mem_fun(), connect_once() should only be called from
+   * the thread where the SignalIdle object's MainContext runs. You can use,
+   * say, boost::bind() or, in C++11, std::bind() or a C++11 lambda expression
+   * instead of sigc::mem_fun().
+   *
+   * @see connect()
+   * @param slot A slot to call when the main loop is idle. For example:
+   * @code
+   * void on_idle_once()
+   * @endcode
+   * @param priority The priority of the new event source.
+   */
   void connect_once(const sigc::slot<void>& slot, int priority = PRIORITY_DEFAULT_IDLE);
 
 private:
