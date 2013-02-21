@@ -1,3 +1,13 @@
+2013-02-21  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
+
+	Signal*::connect(): Make them less thread-unsafe.
+
+	* glib/glibmm/main.cc: Make SignalTimeout::connect(), connect_seconds(),
+	SignalIdle::connect() and SignalChildWatch::connect() less thread-unsafe
+	by moving conn_node->install() to before g_source_attach().
+	* glib/glibmm/main.h: Describe that the Signal*::connect*() methods that
+	return a sigc::connection are not thread-safe. Bug #396958.
+
 2013-02-20  Kjell Ahlstedt  <kjell.ahlstedt@bredband.net>
 
 	Signal[Timeout|Idle]::connect_once() docs: Warn about thread-unsafety.

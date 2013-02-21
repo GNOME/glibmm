@@ -285,7 +285,7 @@ static void glibmm_signal_connect_once(const sigc::slot<void>& slot, int priorit
 
   conn_node->install(source);
   g_source_attach(source, context);
-  g_source_unref(source);
+  g_source_unref(source); // GMainContext holds a reference
 }
 
 } // anonymous namespace
@@ -342,10 +342,10 @@ sigc::connection SignalTimeout::connect(const sigc::slot<bool>& slot,
       source, &glibmm_source_callback, conn_node,
       &SourceConnectionNode::destroy_notify_callback);
 
+  conn_node->install(source);
   g_source_attach(source, context_);
   g_source_unref(source); // GMainContext holds a reference
 
-  conn_node->install(source);
   return connection;
 }
 
@@ -372,10 +372,10 @@ sigc::connection SignalTimeout::connect_seconds(const sigc::slot<bool>& slot,
       source, &glibmm_source_callback, conn_node,
       &SourceConnectionNode::destroy_notify_callback);
 
+  conn_node->install(source);
   g_source_attach(source, context_);
   g_source_unref(source); // GMainContext holds a reference
 
-  conn_node->install(source);
   return connection;
 }
 
@@ -414,10 +414,10 @@ sigc::connection SignalIdle::connect(const sigc::slot<bool>& slot, int priority)
       source, &glibmm_source_callback, conn_node,
       &SourceConnectionNode::destroy_notify_callback);
 
+  conn_node->install(source);
   g_source_attach(source, context_);
   g_source_unref(source); // GMainContext holds a reference
 
-  conn_node->install(source);
   return connection;
 }
 
@@ -500,10 +500,10 @@ sigc::connection SignalChildWatch::connect(const sigc::slot<void, GPid, int>& sl
       source, (GSourceFunc)&glibmm_child_watch_callback, conn_node,
       &SourceConnectionNode::destroy_notify_callback);
 
+  conn_node->install(source);
   g_source_attach(source, context_);
   g_source_unref(source); // GMainContext holds a reference
 
-  conn_node->install(source);
   return connection;
 }
 

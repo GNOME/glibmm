@@ -111,6 +111,11 @@ public:
    * timeout_source->connect(sigc::ptr_fun(&timeout_handler));
    * timeout_source->attach(Glib::MainContext::get_default());
    * @endcode
+   *
+   * This method is not thread-safe. You should call it, or manipulate the
+   * returned sigc::connection object, only from the thread where the SignalTimeout
+   * object's MainContext runs.
+   *
    * @param slot A slot to call when @a interval has elapsed.
    * If <tt>timeout_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param interval The timeout in milliseconds.
@@ -164,6 +169,11 @@ public:
    * timeout_source->connect(sigc::ptr_fun(&timeout_handler));
    * timeout_source->attach(Glib::MainContext::get_default());
    * @endcode
+   *
+   * This method is not thread-safe. You should call it, or manipulate the
+   * returned sigc::connection object, only from the thread where the SignalTimeout
+   * object's MainContext runs.
+   *
    * @param slot A slot to call when @a interval has elapsed.
    * If <tt>timeout_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param interval The timeout in seconds.
@@ -226,6 +236,11 @@ public:
    * idle_source->connect(sigc::ptr_fun(&idle_handler));
    * idle_source->attach(Glib::MainContext::get_default());
    * @endcode
+   *
+   * This method is not thread-safe. You should call it, or manipulate the
+   * returned sigc::connection object, only from the thread where the SignalIdle
+   * object's MainContext runs.
+   *
    * @param slot A slot to call when the main loop is idle.
    * If <tt>idle_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param priority The priority of the new event source.
@@ -280,6 +295,11 @@ public:
    * io_source->connect(sigc::ptr_fun(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode
+   *
+   * This method is not thread-safe. You should call it, or manipulate the
+   * returned sigc::connection object, only from the thread where the SignalIO
+   * object's MainContext runs.
+   *
    * @param slot A slot to call when polling @a fd results in an event that matches @a condition.
    * The event will be passed as a parameter to @a slot.
    * If <tt>io_handler()</tt> returns <tt>false</tt> the handler is disconnected.
@@ -303,6 +323,11 @@ public:
    * io_source->connect(sigc::ptr_fun(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode
+   *
+   * This method is not thread-safe. You should call it, or manipulate the
+   * returned sigc::connection object, only from the thread where the SignalIO
+   * object's MainContext runs.
+   *
    * @param slot A slot to call when polling @a channel results in an event that matches @a condition.
    * The event will be passed as a parameter to @a slot.
    * If <tt>io_handler()</tt> returns <tt>false</tt> the handler is disconnected.
@@ -332,6 +357,11 @@ public:
    * void child_watch_handler(GPid pid, int child_status) { ... }
    * Glib::signal_child_watch().connect(sigc::ptr_fun(&child_watch_handler), pid);
    * @endcode
+   *
+   * This method is not thread-safe. You should call it, or manipulate the
+   * returned sigc::connection object, only from the thread where the SignalChildWatch
+   * object's MainContext runs.
+   *
    * @param slot A slot to call when child process @a pid exited.
    * @param pid The child process to watch for.
    * @param priority The priority of the new event source.
