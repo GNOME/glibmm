@@ -18,7 +18,35 @@
 _DEFS(glibmm,glib)
 _CONFIGINCLUDE(glibmmconfig.h)
 
+
+// We use the (now deprecated) GThread definition in the API,
+// and we cannot stop that without breaking ABI.
+// (see the comment below),
+// so we must temporarily undef G_DISABLE_DEPRECATED when
+// including glib.h.
+
+// Temporarily undef G_DISABLE_DEPRECATED, redefining it later if appropriate.
+#if defined(G_DISABLE_DEPRECATED) && !defined(GLIBMM_G_DISABLE_DEPRECATED_UNDEFED)
+
+//Stop the deprecation ifdef guards around the API declarations:
+#undef G_DISABLE_DEPRECATED
+
+//Stop the compiler warnings about using the deprecated API;
+#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
+
+#define GLIBMM_G_DISABLE_DEPRECATED_UNDEFED 1
+
+#endif
+
 #include <glib.h>
+
+// Redefine G_DISABLE_DEPRECATED if it was defined before we temporarily undefed it:
+#if defined(GLIBMM_G_DISABLE_DEPRECATED_UNDEFED)
+#define G_DISABLE_DEPRECATED 1
+#undef GLIB_DISABLE_DEPRECATION_WARNINGS
+#undef GLIBMM_G_DISABLE_DEPRECATED_UNDEFED
+#endif
+
 
 #include <glibmm/error.h>
 #include <sigc++/sigc++.h>
