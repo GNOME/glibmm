@@ -127,6 +127,9 @@ _CONVERSION(`GBytes*',`Glib::RefPtr<Glib::Bytes>',`Glib::wrap($3)')
 _CONVERSION(`GBytes*',`Glib::RefPtr<const Glib::Bytes>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<const Glib::Bytes>&',`GBytes*',__CONVERT_CONST_REFPTR_TO_P_SUN(Glib::Bytes)))
 
+dnl ByteArray
+_CONVERSION(`GByteArray*',`Glib::RefPtr<ByteArray>',`Glib::wrap($3)')
+
 dnl Regex
 _CONVERSION(`GRegex*',`Glib::RefPtr<Regex>',`Glib::wrap($3)')
 _CONVERSION(`GRegex*',`Glib::RefPtr<const Regex>',`Glib::wrap($3)')
