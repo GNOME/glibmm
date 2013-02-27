@@ -21,6 +21,14 @@
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
+namespace Glib
+{
+
+// Forward declaration.
+class ByteArray;
+
+}
+
 namespace Gio
 {
 
@@ -61,12 +69,12 @@ public:
   _WRAP_METHOD(TlsCertificateFlags verify(const Glib::RefPtr<const SocketConnectable>& identity{?}, const Glib::RefPtr<const TlsCertificate>& trusted_ca{?}) const, g_tls_certificate_verify)
   _WRAP_METHOD(bool is_same(const Glib::RefPtr<const TlsCertificate>& cert_two) const, g_tls_certificate_is_same)
 
-  //TODO: _WRAP_PROPERTY("certificate", GByteArray*)
-
+  _WRAP_PROPERTY("certificate", Glib::RefPtr<Glib::ByteArray>)
   _WRAP_PROPERTY("certificate-pem", char*)
   _WRAP_PROPERTY("issuer", Glib::RefPtr<TlsCertificate>)
 
-  //TODO: _WRAP_PROPERTY("private-key", GByteArray*)
+  // Write-only and construct-only
+  //_WRAP_PROPERTY("private-key", Glib::RefPtr<Glib::ByteArray>)
 
   // Write-only and construct-only
   //_WRAP_PROPERTY("private-key-pem", char*)

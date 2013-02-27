@@ -23,6 +23,14 @@
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
+namespace Glib
+{
+
+// Forward declaration.
+class ByteArray;
+
+}
+
 namespace Gio
 {
 
@@ -65,9 +73,14 @@ public:
   _WRAP_METHOD(void lookup_certificate_issuer_async(const Glib::RefPtr<const TlsCertificate>& certificate, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.?}, TlsDatabaseLookupFlags flags{.} = TLS_DATABASE_LOOKUP_NONE), g_tls_database_lookup_certificate_issuer_async, slot_name slot, slot_callback SignalProxy_async_callback)
   _WRAP_METHOD(Glib::RefPtr<TlsCertificate> lookup_certificate_issuer_finish(const Glib::RefPtr<AsyncResult>& result), g_tls_database_lookup_certificate_issuer_finish, errthrow)
 
-  //TODO: _WRAP_METHOD(GList* lookup_certificates_issued_by(GByteArray* issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, TlsDatabaseLookupFlags flags, const Glib::RefPtr<Cancellable>& cancellable), g_tls_database_lookup_certificates_issued_by, errthrow)
-  //TODO: _WRAP_METHOD(void lookup_certificates_issued_by_async(GByteArray* issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, TlsDatabaseLookupFlags flags, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot, gpointer user_data), g_tls_database_lookup_certificates_issued_by_async)
-  //TODO: _WRAP_METHOD(GList* lookup_certificates_issued_by_finish(const Glib::RefPtr<AsyncResult>& result), g_tls_database_lookup_certificates_issued_by_finish, errthrow)
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<TlsCertificate> >',`Glib::ListHandler< Glib::RefPtr<TlsCertificate> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<TlsCertificate> > lookup_certificates_issued_by(const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.} = Gio::TLS_DATABASE_LOOKUP_NONE), g_tls_database_lookup_certificates_issued_by, errthrow)
+
+#m4 _CONVERSION(`GList*',`std::vector< Glib::RefPtr<const TlsCertificate> >',`Glib::ListHandler< Glib::RefPtr<const TlsCertificate> >::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector< Glib::RefPtr<const TlsCertificate> > lookup_certificates_issued_by(const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.} = Gio::TLS_DATABASE_LOOKUP_NONE) const, g_tls_database_lookup_certificates_issued_by, errthrow)
+
+  _WRAP_METHOD(void lookup_certificates_issued_by_async(const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.} = Gio::TLS_DATABASE_LOOKUP_NONE), g_tls_database_lookup_certificates_issued_by_async, slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_METHOD(std::vector< Glib::RefPtr<TlsCertificate> > lookup_certificates_issued_by_finish(const Glib::RefPtr<AsyncResult>& result), g_tls_database_lookup_certificates_issued_by_finish, errthrow)
 
   _WRAP_METHOD(Glib::ustring create_certificate_handle(const Glib::RefPtr<const TlsCertificate>& certificate) const, g_tls_database_create_certificate_handle)
 
@@ -90,7 +103,7 @@ public:
 
   _WRAP_VFUNC(Glib::ustring create_certificate_handle(const Glib::RefPtr<TlsCertificate>& certificate) const, "create_certificate_handle")
 
-#m4 _CONVERSION(`Glib::RefPtr<TlsCertificate>',`GTlsCertificate*',`Glib::unwrap($3)')
+#m4 _CONVERSION(`Glib::RefPtr<TlsCertificate>',`GTlsCertificate*',`G_TLS_CERTIFICATE(g_object_ref(Glib::unwrap($3)))')
 
   _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_for_handle(const Glib::ustring& handle, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.}), "lookup_certificate_for_handle", errthrow)
   _WRAP_VFUNC(void lookup_certificate_for_handle_async(const Glib::ustring& handle, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.}), "lookup_certificate_for_handle_async", slot_name slot, slot_callback SignalProxy_async_callback)
@@ -100,11 +113,12 @@ public:
   _WRAP_VFUNC(void lookup_certificate_issuer_async(const Glib::RefPtr<TlsCertificate>& certificate, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.}), "lookup_certificate_issuer_async", slot_name slot, slot_callback SignalProxy_async_callback)
   _WRAP_VFUNC(Glib::RefPtr<TlsCertificate> lookup_certificate_issuer_finish(const Glib::RefPtr<AsyncResult>& result), "lookup_certificate_issuer_finish", errthrow)
 
-/* TODO:
-  _WRAP_VFUNC(GList* lookup_certificates_issued_by(GByteArray* issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.}), "lookup_certificates_issued_by", errthrow)
-  _WRAP_VFUNC(void lookup_certificates_issued_by_async(GByteArray* issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.}), "lookup_certificates_issued_by_async")
-  _WRAP_VFUNC(GList* lookup_certificates_issued_by_finish(const Glib::RefPtr<AsyncResult>& result), "lookup_certificates_issued_by_finish", errthrow)
-*/
+#m4 _CONVERSION(`std::vector< Glib::RefPtr<TlsCertificate> >',`GList*',`g_list_copy(Glib::ListHandler< Glib::RefPtr<TlsCertificate> >::vector_to_list($3).data())')
+#m4 _CONVERSION(`GByteArray*',`const Glib::RefPtr<Glib::ByteArray>&',`Glib::wrap($3, true)')
+
+  _WRAP_VFUNC(std::vector< Glib::RefPtr<TlsCertificate> > lookup_certificates_issued_by(const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.}), "lookup_certificates_issued_by", errthrow)
+  _WRAP_VFUNC(void lookup_certificates_issued_by_async(const Glib::RefPtr<Glib::ByteArray>& issuer_raw_dn, const Glib::RefPtr<TlsInteraction>& interaction, const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}, TlsDatabaseLookupFlags flags{.}), "lookup_certificates_issued_by_async", slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_VFUNC(std::vector< Glib::RefPtr<TlsCertificate> > lookup_certificates_issued_by_finish(const Glib::RefPtr<AsyncResult>& result), "lookup_certificates_issued_by_finish", errthrow)
 };
 
 } // namespace Gio

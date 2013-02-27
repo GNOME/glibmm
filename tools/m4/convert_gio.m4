@@ -73,9 +73,11 @@ _CONVERSION(`const Glib::RefPtr<ApplicationCommandLine>&',`GApplicationCommandLi
 
 # AsyncResult
 _CONVERSION(`Glib::RefPtr<Glib::Object>',`GObject*',__CONVERT_REFPTR_TO_P)
-
 _CONVERSION(`const Glib::RefPtr<AsyncResult>&',`GAsyncResult*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<AsyncResult>&',`GAsyncResult*',__CONVERT_REFPTR_TO_P)
+
+#ByteArray
+_CONVERSION(`const Glib::RefPtr<Glib::ByteArray>&',`GByteArray*',`Glib::unwrap($3)')
 
 # Cancellable
 _CONVERSION(`const Glib::RefPtr<Cancellable>&',`GCancellable*',__CONVERT_CONST_REFPTR_TO_P)
