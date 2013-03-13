@@ -16,19 +16,3 @@
  */
 
 #include <gio/gio.h>
-
-namespace Gio
-{
-
-Glib::RefPtr<TlsFileDatabase>
-TlsFileDatabase::create(const Glib::ustring& anchors)
-{
-  GError* gerror = 0;
-  GTlsFileDatabase* file_database = g_tls_file_database_new(anchors.c_str(),
-    &gerror);
-  if(gerror)
-    ::Glib::Error::throw_exception(gerror);
-  return Glib::wrap(file_database);
-}
-
-} // namespace Gio
