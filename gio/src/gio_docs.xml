@@ -1566,8 +1566,9 @@ Since: 2.28
 </parameter>
 <parameter name="G_APPLICATION_IS_SERVICE">
 <parameter_description> Run as a service. In this mode, registration
-fails if the service is already running, and the application will
-stay around for a while when the use count falls to zero.
+fails if the service is already running, and the application
+will initially wait up to 10 seconds for an initial activation
+message to arrive.
 </parameter_description>
 </parameter>
 <parameter name="G_APPLICATION_IS_LAUNCHER">
@@ -3430,6 +3431,11 @@ behaviour -without specifying this flag- is to send single DELETED
 and CREATED events).
 </parameter_description>
 </parameter>
+<parameter name="G_FILE_MONITOR_WATCH_HARD_LINKS">
+<parameter_description> Watch for changes to the file made
+via another hard link. Since 2.36.
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -3673,7 +3679,7 @@ this limit. Since 2.20
 </parameter_description>
 </parameter>
 <parameter name="G_IO_ERROR_INVALID_DATA">
-<parameter_description> There input data was invalid. Since 2.24
+<parameter_description> The input data was invalid. Since 2.24
 </parameter_description>
 </parameter>
 <parameter name="G_IO_ERROR_DBUS_ERROR">
@@ -3711,6 +3717,10 @@ message so it matches what was received on the wire. Since 2.26.
 <parameter name="G_IO_ERROR_PROXY_NOT_ALLOWED">
 <parameter_description> Proxy connection is not allowed by ruleset.
 Since 2.26
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_BROKEN_PIPE">
+<parameter_description> Broken pipe. Since 2.36
 </parameter_description>
 </parameter>
 </parameters>
@@ -5574,6 +5584,27 @@ Since: 2.24
 </parameter>
 </parameters>
 </enum>
+
+<function name="convert_kqueue_events_to_gio">
+<description>
+Translates kqueue filter flags into GIO event flags.
+
+
+</description>
+<parameters>
+<parameter name="flags">
+<parameter_description> a set of kqueue filter flags
+</parameter_description>
+</parameter>
+<parameter name="done">
+<parameter_description> a pointer to #gboolean indicating that the
+conversion has been done (out)
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GFileMonitorEvent
+</return>
+</function>
 
 <function name="example_animal_call_poke">
 <description>
@@ -19902,8 +19933,8 @@ Since: 2.32
 </parameter_description>
 </parameter>
 <parameter name="entries">
-<parameter_description> a pointer to the first item in an array of #GActionEntry
-structs
+<parameter_description> a pointer to
+the first item in an array of #GActionEntry structs
 </parameter_description>
 </parameter>
 <parameter name="n_entries">
@@ -20863,6 +20894,33 @@ Since: 2.28
 <return></return>
 </function>
 
+<function name="g_application_command_line_create_file_for_arg">
+<description>
+Creates a #GFile corresponding to a filename that was given as part
+of the invocation of @cmdline.
+
+This differs from g_file_new_for_commandline_arg() in that it
+resolves relative pathnames using the current working directory of
+the invoking process rather than the local process.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="cmdline">
+<parameter_description> a #GApplicationCommandLine
+</parameter_description>
+</parameter>
+<parameter name="arg">
+<parameter_description> an argument from @cmdline
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GFile
+
+</return>
+</function>
+
 <function name="g_application_command_line_get_arguments">
 <description>
 Gets the list of arguments that was passed on the command line.
@@ -21007,6 +21065,33 @@ Since: 2.28
 </parameter>
 </parameters>
 <return> the platform data, or %NULL
+
+</return>
+</function>
+
+<function name="g_application_command_line_get_stdin">
+<description>
+Gets the stdin of the invoking process.
+
+The #GInputStream can be used to read data passed to the standard
+input of the invoking process.
+This doesn't work on all platforms.  Presently, it is only available
+on UNIX when using a DBus daemon capable of passing file descriptors.
+If stdin is not available then %NULL will be returned.  In the
+future, support may be expanded to other platforms.
+
+You must only call this function once per commandline invocation.
+
+Since: 2.34
+
+</description>
+<parameters>
+<parameter name="cmdline">
+<parameter_description> a #GApplicationCommandLine
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GInputStream for stdin
 
 </return>
 </function>
@@ -21608,9 +21693,12 @@ then the exit status is returned immediately.  If the use count is
 non-zero then the default main context is iterated until the use count
 falls to zero, at which point 0 is returned.
 
-If the %G_APPLICATION_IS_SERVICE flag is set, then the exiting at
-use count of zero is delayed for a while (ie: the instance stays
-around to provide its &lt;emphasis&gt;service&lt;/emphasis&gt; to others).
+If the %G_APPLICATION_IS_SERVICE flag is set, then the service will
+run for as much as 10 seconds with a use count of zero while waiting
+for the message that caused the activation to arrive.  After that,
+if the use count falls to zero the application will exit immediately,
+except in the case that g_application_set_inactivity_timeout() is in
+use.
 
 Since: 2.28
 
@@ -21925,8 +22013,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly created #GObject, or %NULL on error.
-Free with g_object_unref().
+<return> a newly created #GObject,
+or %NULL on error. Free with g_object_unref().
 
 </return>
 </function>
@@ -24018,6 +24106,33 @@ data, it is owned by @credentials.
 </return>
 </function>
 
+<function name="g_credentials_get_unix_pid">
+<description>
+Tries to get the UNIX process identifier from @credentials. This
+method is only available on UNIX platforms.
+
+This operation can fail if #GCredentials is not supported on the
+OS or if the native credentials type does not contain information
+about the UNIX process ID.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="credentials">
+<parameter_description> A #GCredentials
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The UNIX process ID, or -1 if @error is set.
+
+</return>
+</function>
+
 <function name="g_credentials_get_unix_user">
 <description>
 Tries to get the UNIX user identifier from @credentials. This
@@ -25246,6 +25361,32 @@ Since: 2.32
 </return>
 </function>
 
+<function name="g_dbus_address_escape_value">
+<description>
+Escape @string so it can appear in a D-Bus address as the value
+part of a key-value pair.
+
+For instance, if @string is &lt;code&gt;/run/bus-for-:0&lt;/code&gt;,
+this function would return &lt;code&gt;/run/bus-for-%3A0&lt;/code&gt;,
+which could be used in a D-Bus address like
+&lt;code&gt;unix:nonce-tcp:host=127.0.0.1,port=42,noncefile=/run/bus-for-%3A0&lt;/code&gt;.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> an unescaped string to be included in a D-Bus address
+as the value in a key-value pair
+</parameter_description>
+</parameter>
+</parameters>
+<return> a copy of @string with all
+non-optionally-escaped bytes escaped
+
+</return>
+</function>
+
 <function name="g_dbus_address_get_for_bus_sync">
 <description>
 Synchronously looks up the D-Bus address for the well-known message
@@ -26199,7 +26340,7 @@ Exports @menu on @connection at @object_path.
 The implemented D-Bus API should be considered private.
 It is subject to change in the future.
 
-An object path can only have one action group exported on it. If this
+An object path can only have one menu model exported on it. If this
 constraint is violated, the export will fail and 0 will be
 returned (with @error set accordingly).
 
@@ -32191,6 +32332,31 @@ Since: 2.26
 <return></return>
 </function>
 
+<function name="g_desktop_app_info_get_boolean">
+<description>
+Looks up a boolean value in the keyfile backing @info.
+
+The @key is looked up in the &quot;Desktop Entry&quot; group.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GDesktopAppInfo
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the key to look up
+</parameter_description>
+</parameter>
+</parameters>
+<return> the boolean value, or %FALSE if the key
+is not found
+
+</return>
+</function>
+
 <function name="g_desktop_app_info_get_categories">
 <description>
 Gets the categories from the desktop file.
@@ -32347,6 +32513,54 @@ Since: 2.34
 </parameters>
 <return> the startup WM class, or %NULL if none is set
 in the desktop file.
+
+</return>
+</function>
+
+<function name="g_desktop_app_info_get_string">
+<description>
+Looks up a string value in the keyfile backing @info.
+
+The @key is looked up in the &quot;Desktop Entry&quot; group.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GDesktopAppInfo
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the key to look up
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string, or %NULL if the key
+is not found
+
+</return>
+</function>
+
+<function name="g_desktop_app_info_has_key">
+<description>
+Returns whether @key exists in the &quot;Desktop Entry&quot; group
+of the keyfile backing @info.
+
+Since: 2.26
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GDesktopAppInfo
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the key to look up
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @key exists
 
 </return>
 </function>
@@ -34511,7 +34725,7 @@ operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
 returned.
 
 If the file does not exist, the %G_IO_ERROR_NOT_FOUND error will
-be returned. If the file is not a directory, the %G_FILE_ERROR_NOTDIR
+be returned. If the file is not a directory, the %G_IO_ERROR_NOT_DIRECTORY
 error will be returned. Other errors are possible too.
 
 
@@ -34717,6 +34931,38 @@ ignore.
 </parameter>
 </parameters>
 <return> %TRUE if the close operation has finished successfully.
+</return>
+</function>
+
+<function name="g_file_enumerator_get_child">
+<description>
+Return a new #GFile which refers to the file named by @info in the source
+directory of @enumerator.  This function is primarily intended to be used
+inside loops with g_file_enumerator_next_file().
+
+This is a convenience method that's equivalent to:
+|[
+gchar *name = g_file_info_get_name (info);
+GFile *child = g_file_get_child (g_file_enumerator_get_container (enumr),
+name);
+]|
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="enumerator">
+<parameter_description> a #GFileEnumerator
+</parameter_description>
+</parameter>
+<parameter name="info">
+<parameter_description> a #GFileInfo gotten from g_file_enumerator_next_file()
+or the async equivalents.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GFile for the #GFileInfo passed it.
+
 </return>
 </function>
 
@@ -35756,6 +36002,26 @@ Gets the file's content type.
 </parameter>
 </parameters>
 <return> a string containing the file's content type.
+</return>
+</function>
+
+<function name="g_file_info_get_deletion_date">
+<description>
+Returns the #GDateTime representing the deletion date of the file, as
+available in G_FILE_ATTRIBUTE_TRASH_DELETION_DATE. If the
+G_FILE_ATTRIBUTE_TRASH_DELETION_DATE attribute is unset, %NULL is returned.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GFileInfo.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GDateTime, or %NULL.
+
 </return>
 </function>
 
@@ -37289,6 +37555,12 @@ If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
+It does not make sense for @flags to contain
+%G_FILE_MONITOR_WATCH_HARD_LINKS, since hard links can not be made to
+directories.  It is not possible to monitor all the files in a
+directory for changes made via hard links; if you want to do this then
+you must register individual watches with g_file_monitor().
+
 Virtual: monitor_dir
 
 </description>
@@ -37357,6 +37629,14 @@ mechanism exists, then regular polling of the file is used.
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
+
+If @flags contains %G_FILE_MONITOR_WATCH_HARD_LINKS then the monitor
+will also attempt to report changes made to the file via another
+filename (ie, a hard link). Without this flag, you can only rely on
+changes made through the filename contained in @file to be
+reported. Using this flag may result in an increase in resource
+usage, and may not have any effect depending on the #GFileMonitor
+backend and/or filesystem type.
 
 
 </description>
@@ -37665,6 +37945,38 @@ support any I/O operation if @arg points to a malformed path.
 </parameters>
 <return> a new #GFile.
 Free the returned object with g_object_unref().
+</return>
+</function>
+
+<function name="g_file_new_for_commandline_arg_and_cwd">
+<description>
+Creates a #GFile with the given argument from the command line.
+
+This function is similar to g_file_new_for_commandline_arg() except
+that it allows for passing the current working directory as an
+argument instead of using the current working directory of the
+process.
+
+This is useful if the commandline argument was given in a context
+other than the invocation of the current process.
+
+See also g_application_command_line_create_file_for_arg().
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="arg">
+<parameter_description> a command line string
+</parameter_description>
+</parameter>
+<parameter name="cwd">
+<parameter_description> the current working directory of the commandline
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GFile
+
 </return>
 </function>
 
@@ -39501,7 +39813,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if there was any error, %FALSE otherwise.
+<return> %FALSE if there was any error, %TRUE otherwise.
 </return>
 </function>
 
@@ -40976,7 +41288,8 @@ value pairs, and ended by %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated #GObject, or %NULL on error
+<return> a newly allocated
+#GObject, or %NULL on error
 
 </return>
 </function>
@@ -41014,7 +41327,8 @@ ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated #GObject, or %NULL on error
+<return> a newly allocated
+#GObject, or %NULL on error
 
 </return>
 </function>
@@ -41051,7 +41365,8 @@ ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated #GObject, or %NULL on error
+<return> a newly allocated
+#GObject, or %NULL on error
 
 </return>
 </function>
@@ -41242,7 +41557,8 @@ On error -1 is returned and @error is set accordingly.
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to read data into (which should be at least count bytes long).
+<parameter_description> a buffer to
+read data into (which should be at least count bytes long).
 </parameter_description>
 </parameter>
 <parameter name="count">
@@ -41286,7 +41602,8 @@ the number of bytes read into @buffer before the error occurred.
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to read data into (which should be at least count bytes long).
+<parameter_description> a buffer to
+read data into (which should be at least count bytes long).
 </parameter_description>
 </parameter>
 <parameter name="count">
@@ -41343,7 +41660,8 @@ override one you must override all.
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to read data into (which should be at least count bytes long).
+<parameter_description> a buffer to
+read data into (which should be at least count bytes long).
 </parameter_description>
 </parameter>
 <parameter name="count">
@@ -42876,6 +43194,7 @@ Since: 2.34
 </parameter>
 </parameters>
 <return> new #GInputStream read from @bytes
+
 </return>
 </function>
 
@@ -43013,6 +43332,19 @@ finalized, or %NULL
 </parameters>
 <return> A newly created #GMemoryOutputStream object.
 </return>
+</function>
+
+<function name="g_memory_output_stream_new_resizable">
+<description>
+Creates a new #GMemoryOutputStream, using g_realloc() and g_free()
+for memory allocation.
+
+Since: 2.36
+
+</description>
+<parameters>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_memory_output_stream_steal_as_bytes">
@@ -45970,6 +46302,21 @@ Since: 2.26
 <parameter_description> a URI scheme
 </parameter_description>
 </parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_networking_init">
+<description>
+Initializes the platform networking libraries (eg, on Windows, this
+calls WSAStartup()). GLib will call this itself if it is needed, so
+you only need to call it if you directly call system networking
+functions (without calling any GLib networking functions first).
+
+Since: 2.36
+
+</description>
+<parameters>
 </parameters>
 <return></return>
 </function>
@@ -51968,6 +52315,92 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_simple_proxy_resolver_new">
+<description>
+Creates a new #GSimpleProxyResolver. See
+#GSimpleProxyResolver:default-proxy and
+#GSimpleProxyResolver:ignore-hosts for more details on how the
+arguments are interpreted.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="default_proxy">
+<parameter_description> the default proxy to use, eg
+&quot;socks://192.168.1.1&quot;
+</parameter_description>
+</parameter>
+<parameter name="ignore_hosts">
+<parameter_description> an optional list of hosts/IP addresses
+to not use a proxy for.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GSimpleProxyResolver
+
+</return>
+</function>
+
+<function name="g_simple_proxy_resolver_set_default_proxy">
+<description>
+Sets the default proxy on @resolver, to be used for any URIs that
+don't match #GSimpleProxyResolver:ignore-hosts or a proxy set
+via g_simple_proxy_resolver_set_uri_proxy().
+
+If @default_proxy starts with &quot;&lt;literal&gt;socks://&lt;/literal&gt;&quot;,
+#GSimpleProxyResolver will treat it as referring to all three of
+the &lt;literal&gt;socks5&lt;/literal&gt;, &lt;literal&gt;socks4a&lt;/literal&gt;, and
+&lt;literal&gt;socks4&lt;/literal&gt; proxy types.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GSimpleProxyResolver
+</parameter_description>
+</parameter>
+<parameter name="default_proxy">
+<parameter_description> the default proxy to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_simple_proxy_resolver_set_uri_proxy">
+<description>
+Adds a URI-scheme-specific proxy to @resolver; URIs whose scheme
+matches @uri_scheme (and which don't match
+#GSimpleProxyResolver:ignore-hosts) will be proxied via @proxy.
+
+As with #GSimpleProxyResolver:default-proxy, if @proxy starts with
+&quot;&lt;literal&gt;socks://&lt;/literal&gt;&quot;, #GSimpleProxyResolver will treat it
+as referring to all three of the &lt;literal&gt;socks5&lt;/literal&gt;,
+&lt;literal&gt;socks4a&lt;/literal&gt;, and &lt;literal&gt;socks4&lt;/literal&gt; proxy
+types.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GSimpleProxyResolver
+</parameter_description>
+</parameter>
+<parameter name="uri_scheme">
+<parameter_description> the URI scheme to add a proxy for
+</parameter_description>
+</parameter>
+<parameter name="proxy">
+<parameter_description> the proxy to use for @uri_scheme
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_socket_accept">
 <description>
 Accept incoming connections on a connection-based socket. This removes
@@ -52855,6 +53288,27 @@ Since: 2.22
 </return>
 </function>
 
+<function name="g_socket_client_get_proxy_resolver">
+<description>
+Gets the #GProxyResolver being used by @client. Normally, this will
+be the resolver returned by g_proxy_resolver_get_default(), but you
+can override it with g_socket_client_set_proxy_resolver().
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="client">
+<parameter_description> a #GSocketClient.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The #GProxyResolver being used by
+@client.
+
+</return>
+</function>
+
 <function name="g_socket_client_get_socket_type">
 <description>
 Gets the socket type of the socket client.
@@ -52955,6 +53409,8 @@ proxy server. When enabled (the default), #GSocketClient will use a
 #GProxyResolver to determine if a proxy protocol such as SOCKS is
 needed, and automatically do the necessary proxy negotiation.
 
+See also g_socket_client_set_proxy_resolver().
+
 Since: 2.26
 
 </description>
@@ -53043,6 +53499,33 @@ Since: 2.22
 </parameter>
 <parameter name="protocol">
 <parameter_description> a #GSocketProtocol
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_socket_client_set_proxy_resolver">
+<description>
+Overrides the #GProxyResolver used by @client. You can call this if
+you want to use specific proxies, rather than using the system
+default proxy settings.
+
+Note that whether or not the proxy resolver is actually used
+depends on the setting of #GSocketClient:enable-proxy, which is not
+changed by this function (but which is %TRUE by default)
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="client">
+<parameter_description> a #GSocketClient.
+</parameter_description>
+</parameter>
+<parameter name="proxy_resolver">
+<parameter_description> a #GProxyResolver, or %NULL for the
+default.
 </parameter_description>
 </parameter>
 </parameters>
@@ -54073,6 +54556,56 @@ Since: 2.32
 </return>
 </function>
 
+<function name="g_socket_get_option">
+<description>
+Gets the value of an integer-valued option on @socket, as with
+&lt;literal&gt;getsockopt ()&lt;/literal&gt;. (If you need to fetch a
+non-integer-valued option, you will need to call
+&lt;literal&gt;getsockopt ()&lt;/literal&gt; directly.)
+
+The &lt;link linkend=&quot;gio-gnetworking.h&quot;&gt;&lt;literal&gt;&lt;gio/gnetworking.h&gt;&lt;/literal&gt;&lt;/link&gt;
+header pulls in system headers that will define most of the
+standard/portable socket options. For unusual socket protocols or
+platform-dependent options, you may need to include additional
+headers.
+
+Note that even for socket options that are a single byte in size,
+@value is still a pointer to a #gint variable, not a #guchar;
+g_socket_get_option() will handle the conversion internally.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="socket">
+<parameter_description> a #GSocket
+</parameter_description>
+</parameter>
+<parameter name="level">
+<parameter_description> the &quot;API level&quot; of the option (eg, &lt;literal&gt;SOL_SOCKET&lt;/literal&gt;)
+</parameter_description>
+</parameter>
+<parameter name="optname">
+<parameter_description> the &quot;name&quot; of the option (eg, &lt;literal&gt;SO_BROADCAST&lt;/literal&gt;)
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> return location for the option value
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> success or failure. On failure, @error will be set, and
+the system error value (&lt;literal&gt;errno&lt;/literal&gt; or
+&lt;literal&gt;WSAGetLastError ()&lt;/literal&gt;) will still be set to the
+result of the &lt;literal&gt;getsockopt ()&lt;/literal&gt; call.
+
+</return>
+</function>
+
 <function name="g_socket_get_protocol">
 <description>
 Gets the socket protocol id the socket was created with.
@@ -54861,8 +55394,8 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to read data into (which should be at least @size
-bytes long).
+<parameter_description> a buffer to
+read data into (which should be at least @size bytes long).
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -55056,8 +55589,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to read data into (which should be at least @size
-bytes long).
+<parameter_description> a buffer to
+read data into (which should be at least @size bytes long).
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -55535,6 +56068,52 @@ Since: 2.32
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_socket_set_option">
+<description>
+Sets the value of an integer-valued option on @socket, as with
+&lt;literal&gt;setsockopt ()&lt;/literal&gt;. (If you need to set a
+non-integer-valued option, you will need to call
+&lt;literal&gt;setsockopt ()&lt;/literal&gt; directly.)
+
+The &lt;link linkend=&quot;gio-gnetworking.h&quot;&gt;&lt;literal&gt;&lt;gio/gnetworking.h&gt;&lt;/literal&gt;&lt;/link&gt;
+header pulls in system headers that will define most of the
+standard/portable socket options. For unusual socket protocols or
+platform-dependent options, you may need to include additional
+headers.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="socket">
+<parameter_description> a #GSocket
+</parameter_description>
+</parameter>
+<parameter name="level">
+<parameter_description> the &quot;API level&quot; of the option (eg, &lt;literal&gt;SOL_SOCKET&lt;/literal&gt;)
+</parameter_description>
+</parameter>
+<parameter name="optname">
+<parameter_description> the &quot;name&quot; of the option (eg, &lt;literal&gt;SO_BROADCAST&lt;/literal&gt;)
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the value to set the option to
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> success or failure. On failure, @error will be set, and
+the system error value (&lt;literal&gt;errno&lt;/literal&gt; or
+&lt;literal&gt;WSAGetLastError ()&lt;/literal&gt;) will still be set to the
+result of the &lt;literal&gt;setsockopt ()&lt;/literal&gt; call.
+
+</return>
 </function>
 
 <function name="g_socket_set_timeout">
@@ -56105,8 +56684,8 @@ Since: 2.36
 </parameter_description>
 </parameter>
 <parameter name="source_object">
-<parameter_description> the source object expected to be
-associated with the task
+<parameter_description> the source object
+expected to be associated with the task
 </parameter_description>
 </parameter>
 </parameters>
@@ -56141,7 +56720,8 @@ Since: 2.36
 </description>
 <parameters>
 <parameter name="source_object">
-<parameter_description> the #GObject that owns this task, or %NULL.
+<parameter_description> the #GObject that owns
+this task, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
@@ -56263,7 +56843,8 @@ Since: 2.36
 </description>
 <parameters>
 <parameter name="source_object">
-<parameter_description> the #GObject that owns this task, or %NULL.
+<parameter_description> the #GObject that owns
+this task, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -56303,7 +56884,8 @@ Since: 2.36
 </description>
 <parameters>
 <parameter name="source_object">
-<parameter_description> the #GObject that owns this task, or %NULL.
+<parameter_description> the #GObject that owns
+this task, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -58486,8 +59068,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated list of #GTlsCertificate objects.
-Use g_object_unref() on each certificate, and g_list_free() on the release the list.
+<return> a newly allocated list of #GTlsCertificate
+objects. Use g_object_unref() on each certificate, and g_list_free() on the release the list.
 
 </return>
 </function>
@@ -62061,6 +62643,243 @@ the sublist occurs and no corresponding @close_func call is made.
 <return></return>
 </function>
 
+<function name="handle_created">
+<description>
+A callback function for the directory diff calculation routine,
+produces G_FILE_MONITOR_EVENT_CREATED event for a created file.
+
+</description>
+<parameters>
+<parameter name="udata">
+<parameter_description> a pointer to user data (#handle_context).
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> file name of a new file.
+</parameter_description>
+</parameter>
+<parameter name="inode">
+<parameter_description> inode number of a new file.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="handle_deleted">
+<description>
+A callback function for the directory diff calculation routine,
+produces G_FILE_MONITOR_EVENT_DELETED event for a deleted file.
+
+</description>
+<parameters>
+<parameter name="udata">
+<parameter_description> a pointer to user data (#handle_context).
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> file name of the removed file.
+</parameter_description>
+</parameter>
+<parameter name="inode">
+<parameter_description> inode number of the removed file.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="handle_moved">
+<description>
+A callback function for the directory diff calculation routine,
+produces G_FILE_MONITOR_EVENT_MOVED event on a move.
+
+</description>
+<parameters>
+<parameter name="udata">
+<parameter_description> a pointer to user data (#handle_context).
+</parameter_description>
+</parameter>
+<parameter name="from_path">
+<parameter_description> file name of the source file.
+</parameter_description>
+</parameter>
+<parameter name="from_inode">
+<parameter_description> inode number of the source file.
+</parameter_description>
+</parameter>
+<parameter name="to_path">
+<parameter_description> file name of the replaced file.
+</parameter_description>
+</parameter>
+<parameter name="to_inode">
+<parameter_description> inode number of the replaced file.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="handle_overwritten">
+<description>
+A callback function for the directory diff calculation routine,
+produces G_FILE_MONITOR_EVENT_DELETED/CREATED event pair when
+an overwrite occurs in the directory (see dep-list for details).
+
+</description>
+<parameters>
+<parameter name="data">
+<parameter_description> a pointer to user data (#handle_context).
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> file name of the overwritten file.
+</parameter_description>
+</parameter>
+<parameter name="node">
+<parameter_description> inode number of the overwritten file.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="kevents_extend_sz">
+<description>
+Extends the allocated memory, if needed.
+
+</description>
+<parameters>
+<parameter name="kv">
+<parameter_description> a #kevents
+</parameter_description>
+</parameter>
+<parameter name="n_new">
+<parameter_description> the number of new objects to be added
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="kevents_free">
+<description>
+Resets the kevents object and frees all the associated memory.
+
+</description>
+<parameters>
+<parameter name="kv">
+<parameter_description> a #kevents
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="kevents_init_sz">
+<description>
+Initializes a #kevents object.
+
+</description>
+<parameters>
+<parameter name="kv">
+<parameter_description> a #kevents
+</parameter_description>
+</parameter>
+<parameter name="n_initial">
+<parameter_description> the initial preallocated memory size. If it is less than
+%KEVENTS_EXTEND_COUNT, this value will be used instead.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="kevents_reduce">
+<description>
+Reduces the allocated heap size, if needed.
+
+If the allocated heap size is &gt;= 3*used
+and 2*used &gt;= %KEVENTS_EXTEND_COUNT, reduce it to 2*used.
+
+</description>
+<parameters>
+<parameter name="kv">
+<parameter_description> a #kevents
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="km_scan_missing">
+<description>
+The core missing files watching routine.
+
+Traverses through a list of missing files, tries to start watching each with
+kqueue, removes the appropriate entry and invokes a user callback if the file
+has appeared.
+
+
+</description>
+<parameters>
+<parameter name="user_data">
+<parameter_description> unused
+</parameter_description>
+</parameter>
+</parameters>
+<return> %FALSE if no missing files left, %TRUE otherwise.
+</return>
+</function>
+
+<function name="kqueue_notification">
+<description>
+Represents a pool of (struct kevent) objects.
+
+</description>
+<parameters>
+<parameter name="memory">
+<parameter_description> a pointer to the allocated memory
+</parameter_description>
+</parameter>
+<parameter name="kq_size">
+<parameter_description> the number of used items
+</parameter_description>
+</parameter>
+<parameter name="kq_allocated">
+<parameter_description> the number of allocated items
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="kqueue_sub">
+<description>
+Represents a subscription on a file or directory.
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> a name of the file to monitor
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the pointer to user data
+</parameter_description>
+</parameter>
+<parameter name="pair_moves">
+<parameter_description> unused (currently not implemented)
+</parameter_description>
+</parameter>
+<parameter name="fd">
+<parameter_description> the associated file descriptor (used by kqueue)
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="mime_info_cache_reload">
 <description>
 Reload the mime information for the @dir.
@@ -62073,6 +62892,35 @@ Reload the mime information for the @dir.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="process_kqueue_notifications">
+<description>
+Processes notifications, coming from the kqueue thread.
+
+Reads notifications from the command file descriptor, emits the
+&quot;changed&quot; event on the appropriate monitor.
+
+A typical GIO Channel callback function.
+
+
+</description>
+<parameters>
+<parameter name="gioc">
+<parameter_description> unused.
+</parameter_description>
+</parameter>
+<parameter name="cond">
+<parameter_description> unused.
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> unused.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE
+</return>
 </function>
 
 </root>

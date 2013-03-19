@@ -105,6 +105,10 @@ Since: 2.16
 <parameter_description> Use the SHA-256 hashing algorithm
 </parameter_description>
 </parameter>
+<parameter name="G_CHECKSUM_SHA512">
+<parameter_description> Use the SHA-512 hashing algorithm
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -6022,7 +6026,9 @@ Since: 2.30
 
 <function name="g_base64_decode">
 <description>
-Decode a sequence of Base-64 encoded text into binary data
+Decode a sequence of Base-64 encoded text into binary data.  Note
+that the returned binary data is not necessarily zero-terminated,
+so it should not be used as a character string.
 
 Since: 2.12
 
@@ -8327,7 +8333,8 @@ Since: 2.32
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the byte data
+<return> a pointer to the
+byte data
 
 </return>
 </function>
@@ -8384,7 +8391,8 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="data">
-<parameter_description> the data to be used for the bytes
+<parameter_description>
+the data to be used for the bytes
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -8438,7 +8446,8 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="data">
-<parameter_description> the data to be used for the bytes
+<parameter_description>
+          the data to be used for the bytes
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -8469,7 +8478,8 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="data">
-<parameter_description> the data to be used for the bytes
+<parameter_description>
+          the data to be used for the bytes
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -10177,6 +10187,30 @@ Since: 2.34
 <return></return>
 </function>
 
+<function name="g_close">
+<description>
+This wraps the close() call; in case of error, %errno will be
+preserved, but the error will also be stored as a #GError in @error.
+
+Besides using #GError, there is another major reason to prefer this
+function over the call provided by the system; on Unix, it will
+attempt to correctly handle %EINTR, which has platform-specific
+semantics.
+
+</description>
+<parameters>
+<parameter name="fd">
+<parameter_description> A file descriptor
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_closure_add_finalize_notifier">
 <description>
 Registers a finalization notifier which will be called when the
@@ -11105,6 +11139,8 @@ Deprecated:2.32: Use g_cond_wait_until() instead.
 <function name="g_cond_wait">
 <description>
 Atomically releases @mutex and waits until @cond is signalled.
+When this function returns, @mutex is locked again and owned by the
+calling thread.
 
 When using condition variables, it is possible that a spurious wakeup
 may occur (ie: g_cond_wait() returns even though g_cond_signal() was
@@ -13267,7 +13303,7 @@ than @dt2.
 <description>
 Calculates the difference in time between @end and @begin.  The
 #GTimeSpan that is returned is effectively @end - @begin (ie:
-positive if the first simparameter is larger).
+positive if the first parameter is larger).
 
 Since: 2.26
 
@@ -16441,31 +16477,31 @@ Since: 2.6
 
 <function name="g_get_home_dir">
 <description>
-Gets the current user's home directory as defined in the 
-password database.
+Gets the current user's home directory.
 
-Note that in contrast to traditional UNIX tools, this function 
-prefers &lt;filename&gt;passwd&lt;/filename&gt; entries over the &lt;envar&gt;HOME&lt;/envar&gt; 
-environment variable. 
+As with most UNIX tools, this function will return the value of the
+&lt;envar&gt;HOME&lt;/envar&gt; environment variable if it is set to an existing
+absolute path name, falling back to the &lt;filename&gt;passwd&lt;/filename&gt;
+file in the case that it is unset.
 
-One of the reasons for this decision is that applications in many 
-cases need special handling to deal with the case where 
-&lt;envar&gt;HOME&lt;/envar&gt; is
-&lt;simplelist&gt;
-&lt;member&gt;Not owned by the user&lt;/member&gt;
-&lt;member&gt;Not writeable&lt;/member&gt;
-&lt;member&gt;Not even readable&lt;/member&gt;
-&lt;/simplelist&gt;
-Since applications are in general &lt;emphasis&gt;not&lt;/emphasis&gt; written 
-to deal with these situations it was considered better to make 
-g_get_home_dir() not pay attention to &lt;envar&gt;HOME&lt;/envar&gt; and to 
-return the real home directory for the user. If applications
-want to pay attention to &lt;envar&gt;HOME&lt;/envar&gt;, they can do:
-|[
-const char *homedir = g_getenv (&quot;HOME&quot;);
-if (!homedir)
-homedir = g_get_home_dir (&lt;!-- --&gt;);
-]|
+If the path given in &lt;envar&gt;HOME&lt;/envar&gt; is non-absolute, does not
+exist, or is not a directory, the result is undefined.
+
+&lt;note&gt;&lt;para&gt;
+Before version 2.36 this function would ignore the
+&lt;envar&gt;HOME&lt;/envar&gt; environment variable, taking the value from the
+&lt;filename&gt;passwd&lt;/filename&gt; database instead.  This was changed to
+increase the compatibility of GLib with other programs (and the XDG
+basedir specification) and to increase testability of programs
+based on GLib (by making it easier to run them from test
+frameworks).
+&lt;/para&gt;&lt;para&gt;
+If your program has a strong requirement for either the new or the
+old behaviour (and if you don't wish to increase your GLib
+dependency to ensure that the new behaviour is in effect) then you
+should either directly check the &lt;envar&gt;HOME&lt;/envar&gt; environment
+variable yourself or unset it before calling any functions in GLib.
+&lt;/para&gt;&lt;/note&gt;
 
 
 </description>
@@ -16579,6 +16615,23 @@ Since: 2.28
 <parameters>
 </parameters>
 <return> the monotonic time, in microseconds
+
+</return>
+</function>
+
+<function name="g_get_num_processors">
+<description>
+Determine the approximate number of threads that the system will
+schedule simultaneously for this process.  This is intended to be
+used as a parameter to g_thread_pool_new() for CPU bound tasks and
+similar cases.
+
+Since: 2.36
+
+</description>
+<parameters>
+</parameters>
+<return> Number of schedulable threads, always greater than 0
 
 </return>
 </function>
@@ -17109,8 +17162,8 @@ release of GLib. It does nothing.
 
 <function name="g_hash_table_get_keys">
 <description>
-Retrieves every key inside @hash_table. The returned data
-is valid until @hash_table is modified.
+Retrieves every key inside @hash_table. The returned data is valid
+until changes to the hash release those keys.
 
 Since: 2.14
 
@@ -22083,9 +22136,9 @@ If none of the elements contain the data, the #GList is unchanged.
 
 <function name="g_list_remove_all">
 <description>
-Removes all list nodes with data equal to @data. 
-Returns the new head of the list. Contrast with 
-g_list_remove() which removes only the first node 
+Removes all list nodes with data equal to @data.
+Returns the new head of the list. Contrast with
+g_list_remove() which removes only the first node
 matching the given data.
 
 
@@ -22633,7 +22686,7 @@ this thread is now the owner of @context.
 <description>
 Adds a file descriptor to the set of file descriptors polled for
 this context. This will very seldom be used directly. Instead
-a typical event source will use g_source_add_poll() instead.
+a typical event source will use g_source_add_unix_fd() instead.
 
 </description>
 <parameters>
@@ -24409,6 +24462,41 @@ Since: 2.18
 </parameter>
 <parameter name="user_data">
 <parameter_description> user data to pass to #GMarkupParser functions
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_markup_parse_context_ref">
+<description>
+Increases the reference count of @context.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GMarkupParseContext
+</parameter_description>
+</parameter>
+</parameters>
+<return> the same @context
+
+</return>
+</function>
+
+<function name="g_markup_parse_context_unref">
+<description>
+Decreases the reference count of @context.  When its reference count
+drops to 0, it is freed.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GMarkupParseContext
 </parameter_description>
 </parameter>
 </parameters>
@@ -30354,8 +30442,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="default_value">
-<parameter_description> a #GVariant of type @type to use as the
-default value, or %NULL
+<parameter_description> a #GVariant of type @type to
+use as the default value, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -35738,7 +35826,8 @@ Since: 2.28
 </parameter>
 </parameters>
 <return> an #GSequenceIter pointing to the position of the
-first item found equal to @data according to @cmp_func and @cmp_data.
+first item found equal to @data according to @cmp_func and
+@cmp_data, or %NULL if no such item exists.
 
 </return>
 </function>
@@ -35784,7 +35873,7 @@ Since: 2.28
 </parameters>
 <return> an #GSequenceIter pointing to the position of
 the first item found equal to @data according to @cmp_func
-and @cmp_data.
+and @cmp_data, or %NULL if no such item exists.
 
 </return>
 </function>
@@ -36837,7 +36926,7 @@ This is similar to g_signal_connect_data(), but uses a closure which
 ensures that the @gobject stays alive during the call to @c_handler
 by temporarily adding a reference count to @gobject.
 
-When the object is destroyed the signal handler will be automatically
+When the @gobject is destroyed the signal handler will be automatically
 disconnected.  Note that this is not currently threadsafe (ie:
 emitting a signal while @gobject is being destroyed in another thread
 is not safe).
@@ -39108,6 +39197,10 @@ event source. The event source's check function will typically test
 the @revents field in the #GPollFD struct and return %TRUE if events need
 to be processed.
 
+Using this API forces the linear scanning of event sources on each
+main loop iteration.  Newly-written event sources should try to use
+g_source_add_unix_fd() instead of this API.
+
 </description>
 <parameters>
 <parameter name="source">
@@ -39121,6 +39214,41 @@ descriptor to watch.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_source_add_unix_fd">
+<description>
+Monitors @fd for the IO events in @events.
+
+The tag returned by this function can be used to remove or modify the
+monitoring of the fd using g_source_remove_unix_fd() or
+g_source_modify_unix_fd().
+
+It is not necessary to remove the fd before destroying the source; it
+will be cleaned up automatically.
+
+As the name suggests, this function is not available on Windows.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
+<parameter name="fd">
+<parameter_description> the fd to monitor
+</parameter_description>
+</parameter>
+<parameter name="events">
+<parameter_description> an event mask
+</parameter_description>
+</parameter>
+</parameters>
+<return> an opaque tag
+
+</return>
 </function>
 
 <function name="g_source_attach">
@@ -39278,6 +39406,26 @@ Gets the priority of a source.
 </return>
 </function>
 
+<function name="g_source_get_ready_time">
+<description>
+Gets the &quot;ready time&quot; of @source, as set by
+g_source_set_ready_time().
+
+Any time before the current monotonic time (including 0) is an
+indication that the source will fire immediately.
+
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
+</parameters>
+<return> the monotonic ready time, -1 for &quot;never&quot;
+</return>
+</function>
+
 <function name="g_source_get_time">
 <description>
 Gets the time to be used when checking this source. The advantage of
@@ -39379,6 +39527,37 @@ Since: 2.12
 </return>
 </function>
 
+<function name="g_source_modify_unix_fd">
+<description>
+Updates the event mask to watch for the fd identified by @tag.
+
+@tag is the tag returned from g_source_add_unix_fd().
+
+If you want to remove a fd, don't set its event mask to zero.
+Instead, call g_source_remove_unix_fd().
+
+As the name suggests, this function is not available on Windows.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> the tag from g_source_add_unix_fd()
+</parameter_description>
+</parameter>
+<parameter name="new_events">
+<parameter_description> the new event mask to watch
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_source_new">
 <description>
 Creates a new #GSource structure. The size is specified to
@@ -39404,6 +39583,34 @@ the sources behavior.
 </parameter>
 </parameters>
 <return> the newly-created #GSource.
+</return>
+</function>
+
+<function name="g_source_query_unix_fd">
+<description>
+Queries the events reported for the fd corresponding to @tag on
+@source during the last poll.
+
+The return value of this function is only defined when the function
+is called from the check or dispatch functions for @source.
+
+As the name suggests, this function is not available on Windows.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> the tag from g_source_add_unix_fd()
+</parameter_description>
+</parameter>
+</parameters>
+<return> the conditions reported on the fd
+
 </return>
 </function>
 
@@ -39521,6 +39728,32 @@ this source.
 </parameter>
 <parameter name="fd">
 <parameter_description> a #GPollFD structure previously passed to g_source_add_poll().
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_source_remove_unix_fd">
+<description>
+Reverses the effect of a previous call to g_source_add_unix_fd().
+
+You only need to call this if you want to remove an fd from being
+watched while keeping the same source around.  In the normal case you
+will just want to destroy the source.
+
+As the name suggests, this function is not available on Windows.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
+<parameter name="tag">
+<parameter_description> the tag from g_source_add_unix_fd()
 </parameter_description>
 </parameter>
 </parameters>
@@ -39744,6 +39977,42 @@ dispatched.
 </parameter>
 <parameter name="priority">
 <parameter_description> the new priority.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_source_set_ready_time">
+<description>
+Sets a #GSource to be dispatched when the given monotonic time is
+reached (or passed).  If the monotonic time is in the past (as it
+always will be if @ready_time is 0) then the source will be
+dispatched immediately.
+
+If @ready_time is -1 then the source is never woken up on the basis
+of the passage of time.
+
+Dispatching the source does not reset the ready time.  You should do
+so yourself, from the source dispatch function.
+
+Note that if you have a pair of sources where the ready time of one
+suggests that it will be delivered first but the priority for the
+other suggests that it would be delivered first, and the ready time
+for both sources is reached during the same main context iteration
+then the order of dispatch is undefined.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="source">
+<parameter_description> a #GSource
+</parameter_description>
+</parameter>
+<parameter name="ready_time">
+<parameter_description> the monotonic time at which the source will be ready,
+0 for &quot;immediately&quot;, -1 for &quot;never&quot;
 </parameter_description>
 </parameter>
 </parameters>
@@ -40382,7 +40651,7 @@ freed, you should also free the #GStaticMutex.
 &lt;note&gt;&lt;para&gt;Calling g_static_mutex_free() on a locked mutex may
 result in undefined behaviour.&lt;/para&gt;&lt;/note&gt;
 
-Deprecated: 2.32: Use g_mutex_free()
+Deprecated: 2.32: Use g_mutex_clear()
 
 </description>
 <parameters>
@@ -42573,9 +42842,10 @@ locale-sensitive, and it's broken if your string is localized, since
 it doesn't work on many encodings at all, including UTF-8, EUC-JP,
 etc.
 
-There are therefore two replacement functions: g_ascii_strncasecmp(),
+There are therefore two replacement techniques: g_ascii_strncasecmp(),
 which only works on ASCII and is not locale-sensitive, and
-g_utf8_casefold(), which is good for case-insensitive sorting of UTF-8.
+g_utf8_casefold() followed by strcmp() on the resulting strings, which is
+good for case-insensitive sorting of UTF-8.
 
 </description>
 <parameters>
@@ -43212,7 +43482,7 @@ For example:
 * /
 g_test_expect_message (G_LOG_DOMAIN,
 G_LOG_LEVEL_CRITICAL,
-&quot;assertion.*acquired_context.*failed&quot;);
+&quot;assertion*acquired_context*failed&quot;);
 g_main_context_push_thread_default (bad_context);
 g_test_assert_expected_messages ();
 ]|
@@ -43380,6 +43650,20 @@ Any parameters understood by g_test_init() stripped before return.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_test_initialized">
+<description>
+Returns %TRUE if g_test_init() has been called.
+
+Since: 2.36
+
+</description>
+<parameters>
+</parameters>
+<return> %TRUE if g_test_init() has been called.
+
+</return>
 </function>
 
 <function name="g_test_log_buffer_free">
@@ -45123,20 +45407,50 @@ Creates a #GTimeZone corresponding to @identifier.
 something that would pass as a valid value for the
 &lt;varname&gt;TZ&lt;/varname&gt; environment variable (including %NULL).
 
+In Windows, @identifier can also be the unlocalized name of a time
+zone for standard time, for example &quot;Pacific Standard Time&quot;.
+
 Valid RFC3339 time offsets are &lt;literal&gt;&quot;Z&quot;&lt;/literal&gt; (for UTC) or
 &lt;literal&gt;&quot;±hh:mm&quot;&lt;/literal&gt;.  ISO 8601 additionally specifies
-&lt;literal&gt;&quot;±hhmm&quot;&lt;/literal&gt; and &lt;literal&gt;&quot;±hh&quot;&lt;/literal&gt;.
+&lt;literal&gt;&quot;±hhmm&quot;&lt;/literal&gt; and &lt;literal&gt;&quot;±hh&quot;&lt;/literal&gt;.  Offsets are
+time values to be added to Coordinated Universal Time (UTC) to get
+the local time.
 
-The &lt;varname&gt;TZ&lt;/varname&gt; environment variable typically corresponds
-to the name of a file in the zoneinfo database, but there are many
-other possibilities.  Note that those other possibilities are not
-currently implemented, but are planned.
+In Unix, the &lt;varname&gt;TZ&lt;/varname&gt; environment variable typically
+corresponds to the name of a file in the zoneinfo database, or
+string in &quot;std offset [dst [offset],start[/time],end[/time]]&quot;
+(POSIX) format.  There  are  no spaces in the specification.  The
+name of standard and daylight savings time zone must be three or more
+alphabetic characters.  Offsets are time values to be added to local
+time to get Coordinated Universal Time (UTC) and should be
+&lt;literal&gt;&quot;[±]hh[[:]mm[:ss]]&quot;&lt;/literal&gt;.  Dates are either
+&lt;literal&gt;&quot;Jn&quot;&lt;/literal&gt; (Julian day with n between 1 and 365, leap
+years not counted), &lt;literal&gt;&quot;n&quot;&lt;/literal&gt; (zero-based Julian day
+with n between 0 and 365) or &lt;literal&gt;&quot;Mm.w.d&quot;&lt;/literal&gt; (day d
+(0 &lt;= d &lt;= 6) of week w (1 &lt;= w &lt;= 5) of month m (1 &lt;= m &lt;= 12), day
+0 is a Sunday).  Times are in local wall clock time, the default is
+02:00:00.
+
+In Windows, the &quot;tzn[+|–]hh[:mm[:ss]][dzn]&quot; format is used, but also
+accepts POSIX format.  The Windows format uses US rules for all time
+zones; daylight savings time is 60 minutes behind the standard time
+with date and time of change taken from Pacific Standard Time.
+Offsets are time values to be added to the local time to get
+Coordinated Universal Time (UTC).
 
 g_time_zone_new_local() calls this function with the value of the
 &lt;varname&gt;TZ&lt;/varname&gt; environment variable.  This function itself is
 independent of the value of &lt;varname&gt;TZ&lt;/varname&gt;, but if @identifier
 is %NULL then &lt;filename&gt;/etc/localtime&lt;/filename&gt; will be consulted
-to discover the correct timezone.
+to discover the correct time zone on Unix and the registry will be
+consulted or GetTimeZoneInformation() will be used to get the local
+time zone on Windows.
+
+If intervals are not available, only time zone rules from
+&lt;varname&gt;TZ&lt;/varname&gt; environment variable or other means, then they
+will be computed from year 1900 to 2037.  If the maximum year for the
+rules is available and it is greater than 2037, then it will followed
+instead.
 
 See &lt;ulink
 url='http://tools.ietf.org/html/rfc3339#section-5.6'&gt;RFC3339
@@ -45145,7 +45459,10 @@ url='http://tools.ietf.org/html/rfc3339#section-5.6'&gt;RFC3339
 full list of valid time offsets.  See &lt;ulink
 url='http://www.gnu.org/s/libc/manual/html_node/TZ-Variable.html'&gt;The
 GNU C Library manual&lt;/ulink&gt; for an explanation of the possible
-values of the &lt;varname&gt;TZ&lt;/varname&gt; environment variable.
+values of the &lt;varname&gt;TZ&lt;/varname&gt; environment variable.  See &lt;ulink
+url='http://msdn.microsoft.com/en-us/library/ms912391%28v=winembedded.11%29.aspx'&gt;
+Microsoft Time Zone Index Values&lt;/ulink&gt; for the list of time zones
+on Windows.
 
 You should release the return value by calling g_time_zone_unref()
 when you are done with it.
@@ -46550,7 +46867,7 @@ sequentially in the same memory block as the public
 structures.
 
 Note that the accumulated size of the private structures of
-a type and all its parent types cannot excced 64 KiB.
+a type and all its parent types cannot exceed 64 KiB.
 
 This function should be called in the type's class_init() function.
 The private structure can be retrieved using the
@@ -47001,6 +47318,24 @@ be retrieved from a subtype using g_type_get_qdata().
 </parameter>
 </parameters>
 <return> the data, or %NULL if no data was found
+</return>
+</function>
+
+<function name="g_type_get_type_registration_serial">
+<description>
+Returns an opaque serial number that represents the state of the set of registered
+types. Any time a type is registred this serial changes, which means you can
+cache information based on type lookups (such as g_type_from_name) and know if
+the cache is still valid at a later time by comparing the current serial with
+the one at the type lookup.
+
+Since: 2.36
+
+
+</description>
+<parameters>
+</parameters>
+<return> An unsigned int, representing the state of type registrations.
 </return>
 </function>
 
@@ -48712,6 +49047,116 @@ Since: 2.30
 <return> the ISO 15924 code for @script, encoded as an integer,
 of zero if @script is %G_UNICODE_SCRIPT_INVALID_CODE or
 ISO 15924 code 'Zzzz' (script code for UNKNOWN) if @script is not understood.
+
+</return>
+</function>
+
+<function name="g_unix_fd_add">
+<description>
+Sets a function to be called when the IO condition, as specified by
+@condition becomes true for @fd.
+
+@function will be called when the specified IO condition becomes
+%TRUE.  The function is expected to clear whatever event caused the
+IO condition to become true and return %TRUE in order to be notified
+when it happens again.  If @function returns %FALSE then the watch
+will be cancelled.
+
+The return value of this function can be passed to g_source_remove()
+to cancel the watch at any time that it exists.
+
+The source will never close the fd -- you must do it yourself.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="fd">
+<parameter_description> a file descriptor
+</parameter_description>
+</parameter>
+<parameter name="condition">
+<parameter_description> IO conditions to watch for on @fd
+</parameter_description>
+</parameter>
+<parameter name="function">
+<parameter_description> a #GPollFDFunc
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @function
+</parameter_description>
+</parameter>
+</parameters>
+<return> the ID (greater than 0) of the event source
+
+</return>
+</function>
+
+<function name="g_unix_fd_add_full">
+<description>
+Sets a function to be called when the IO condition, as specified by
+@condition becomes true for @fd.
+
+This is the same as g_unix_fd_add(), except that it allows you to
+specify a non-default priority and a provide a #GDestroyNotify for
+@user_data.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="priority">
+<parameter_description> the priority of the source
+</parameter_description>
+</parameter>
+<parameter name="fd">
+<parameter_description> a file descriptor
+</parameter_description>
+</parameter>
+<parameter name="condition">
+<parameter_description> IO conditions to watch for on @fd
+</parameter_description>
+</parameter>
+<parameter name="function">
+<parameter_description> a #GUnixFDSourceFunc
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @function
+</parameter_description>
+</parameter>
+<parameter name="notify">
+<parameter_description> function to call when the idle is removed, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> the ID (greater than 0) of the event source
+
+</return>
+</function>
+
+<function name="g_unix_fd_source_new">
+<description>
+Creates a #GSource to watch for a particular IO condition on a file
+descriptor.
+
+The source will never close the fd -- you must do it yourself.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="fd">
+<parameter_description> a file descriptor
+</parameter_description>
+</parameter>
+<parameter name="condition">
+<parameter_description> IO conditions to watch for on @fd
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created #GSource
 
 </return>
 </function>
@@ -54632,6 +55077,7 @@ avoid this situation.
 Makes a copy of a #GVariantType.  It is appropriate to call
 g_variant_type_free() on the return value.  @type may not be %NULL.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54642,7 +55088,6 @@ g_variant_type_free() on the return value.  @type may not be %NULL.
 </parameters>
 <return> a new #GVariantType
 
-Since 2.24
 </return>
 </function>
 
@@ -54652,6 +55097,7 @@ Returns a newly-allocated copy of the type string corresponding to
 @type.  The returned string is nul-terminated.  It is appropriate to
 call g_free() on the return value.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54662,7 +55108,6 @@ call g_free() on the return value.
 </parameters>
 <return> the corresponding type string
 
-Since 2.24
 </return>
 </function>
 
@@ -54672,6 +55117,7 @@ Determines the element type of an array or maybe type.
 
 This function may only be used with array or maybe types.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54682,7 +55128,6 @@ This function may only be used with array or maybe types.
 </parameters>
 <return> the element type of @type
 
-Since 2.24
 </return>
 </function>
 
@@ -54699,6 +55144,7 @@ The argument types of @type1 and @type2 are only #gconstpointer to
 allow use with #GHashTable without function pointer casting.  For
 both arguments, a valid #GVariantType must be provided.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54713,7 +55159,6 @@ both arguments, a valid #GVariantType must be provided.
 </parameters>
 <return> %TRUE if @type1 and @type2 are exactly equal
 
-Since 2.24
 </return>
 </function>
 
@@ -54734,6 +55179,7 @@ the key.
 This call, together with g_variant_type_next() provides an iterator
 interface over tuple and dictionary entry types.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54744,7 +55190,6 @@ interface over tuple and dictionary entry types.
 </parameters>
 <return> the first item type of @type, or %NULL
 
-Since 2.24
 </return>
 </function>
 
@@ -54774,6 +55219,7 @@ Returns the length of the type string corresponding to the given
 @type.  This function must be used to determine the valid extent of
 the memory region returned by g_variant_type_peek_string().
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54784,7 +55230,6 @@ the memory region returned by g_variant_type_peek_string().
 </parameters>
 <return> the length of the corresponding type string
 
-Since 2.24
 </return>
 </function>
 
@@ -54796,6 +55241,7 @@ The argument type of @type is only #gconstpointer to allow use with
 #GHashTable without function pointer casting.  A valid
 #GVariantType must be provided.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54806,7 +55252,6 @@ The argument type of @type is only #gconstpointer to allow use with
 </parameters>
 <return> the hash value
 
-Since 2.24
 </return>
 </function>
 
@@ -54819,6 +55264,7 @@ This function returns %TRUE for any indefinite type for which every
 definite subtype is an array type -- %G_VARIANT_TYPE_ARRAY, for
 example.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54829,7 +55275,6 @@ example.
 </parameters>
 <return> %TRUE if @type is an array type
 
-Since 2.24
 </return>
 </function>
 
@@ -54845,6 +55290,7 @@ Only a basic type may be used as the key of a dictionary entry.
 This function returns %FALSE for all indefinite types except
 %G_VARIANT_TYPE_BASIC.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54855,7 +55301,6 @@ This function returns %FALSE for all indefinite types except
 </parameters>
 <return> %TRUE if @type is a basic type
 
-Since 2.24
 </return>
 </function>
 
@@ -54870,6 +55315,7 @@ This function returns %TRUE for any indefinite type for which every
 definite subtype is a container -- %G_VARIANT_TYPE_ARRAY, for
 example.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54880,7 +55326,6 @@ example.
 </parameters>
 <return> %TRUE if @type is a container type
 
-Since 2.24
 </return>
 </function>
 
@@ -54897,6 +55342,7 @@ result in %TRUE being returned.  Calling this function on an
 indefinite type like %G_VARIANT_TYPE_ARRAY, however, will result in
 %FALSE being returned.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54907,7 +55353,6 @@ indefinite type like %G_VARIANT_TYPE_ARRAY, however, will result in
 </parameters>
 <return> %TRUE if @type is definite
 
-Since 2.24
 </return>
 </function>
 
@@ -54920,6 +55365,7 @@ This function returns %TRUE for any indefinite type for which every
 definite subtype is a dictionary entry type --
 %G_VARIANT_TYPE_DICT_ENTRY, for example.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54930,7 +55376,6 @@ definite subtype is a dictionary entry type --
 </parameters>
 <return> %TRUE if @type is a dictionary entry type
 
-Since 2.24
 </return>
 </function>
 
@@ -54943,6 +55388,7 @@ This function returns %TRUE for any indefinite type for which every
 definite subtype is a maybe type -- %G_VARIANT_TYPE_MAYBE, for
 example.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54953,7 +55399,6 @@ example.
 </parameters>
 <return> %TRUE if @type is a maybe type
 
-Since 2.24
 </return>
 </function>
 
@@ -54965,6 +55410,7 @@ This function returns %TRUE if @type is a subtype of @supertype.  All
 types are considered to be subtypes of themselves.  Aside from that,
 only indefinite types can have subtypes.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -54979,7 +55425,6 @@ only indefinite types can have subtypes.
 </parameters>
 <return> %TRUE if @type is a subtype of @supertype
 
-Since 2.24
 </return>
 </function>
 
@@ -54993,6 +55438,7 @@ This function returns %TRUE for any indefinite type for which every
 definite subtype is a tuple type -- %G_VARIANT_TYPE_TUPLE, for
 example.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55003,7 +55449,6 @@ example.
 </parameters>
 <return> %TRUE if @type is a tuple type
 
-Since 2.24
 </return>
 </function>
 
@@ -55011,6 +55456,7 @@ Since 2.24
 <description>
 Determines if the given @type is the variant type.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55021,7 +55467,6 @@ Determines if the given @type is the variant type.
 </parameters>
 <return> %TRUE if @type is the variant type
 
-Since 2.24
 </return>
 </function>
 
@@ -55033,6 +55478,7 @@ This function may only be used with a dictionary entry type.  Other
 than the additional restriction, this call is equivalent to
 g_variant_type_first().
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55043,7 +55489,6 @@ g_variant_type_first().
 </parameters>
 <return> the key type of the dictionary entry
 
-Since 2.24
 </return>
 </function>
 
@@ -55059,6 +55504,7 @@ but must not be used with the generic tuple type
 In the case of a dictionary entry type, this function will always
 return 2.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55069,7 +55515,6 @@ return 2.
 </parameters>
 <return> the number of items in @type
 
-Since 2.24
 </return>
 </function>
 
@@ -55103,6 +55548,7 @@ type @type.
 
 It is appropriate to call g_variant_type_free() on the return value.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55113,7 +55559,6 @@ It is appropriate to call g_variant_type_free() on the return value.
 </parameters>
 <return> a new array #GVariantType
 
-Since 2.24
 </return>
 </function>
 
@@ -55124,6 +55569,7 @@ of type @key and a value of type @value.
 
 It is appropriate to call g_variant_type_free() on the return value.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55138,7 +55584,6 @@ It is appropriate to call g_variant_type_free() on the return value.
 </parameters>
 <return> a new dictionary entry #GVariantType
 
-Since 2.24
 </return>
 </function>
 
@@ -55149,6 +55594,7 @@ type @type or Nothing.
 
 It is appropriate to call g_variant_type_free() on the return value.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55159,7 +55605,6 @@ It is appropriate to call g_variant_type_free() on the return value.
 </parameters>
 <return> a new maybe #GVariantType
 
-Since 2.24
 </return>
 </function>
 
@@ -55172,6 +55617,7 @@ Constructs a new tuple type, from @items.
 
 It is appropriate to call g_variant_type_free() on the return value.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55186,7 +55632,6 @@ It is appropriate to call g_variant_type_free() on the return value.
 </parameters>
 <return> a new tuple #GVariantType
 
-Since 2.24
 </return>
 </function>
 
@@ -55204,6 +55649,7 @@ entry then this call returns %NULL.
 
 For tuples, %NULL is returned when @type is the last item in a tuple.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55214,7 +55660,6 @@ For tuples, %NULL is returned when @type is the last item in a tuple.
 </parameters>
 <return> the next #GVariantType after @type, or %NULL
 
-Since 2.24
 </return>
 </function>
 
@@ -55226,6 +55671,7 @@ must call g_variant_type_get_string_length().
 
 To get a nul-terminated string, see g_variant_type_dup_string().
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55236,7 +55682,6 @@ To get a nul-terminated string, see g_variant_type_dup_string().
 </parameters>
 <return> the corresponding type string (not nul-terminated)
 
-Since 2.24
 </return>
 </function>
 
@@ -55246,6 +55691,7 @@ Checks if @type_string is a valid GVariant type string.  This call is
 equivalent to calling g_variant_type_string_scan() and confirming
 that the following character is a nul terminator.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55256,7 +55702,6 @@ that the following character is a nul terminator.
 </parameters>
 <return> %TRUE if @type_string is exactly one valid type string
 
-Since 2.24
 </return>
 </function>
 
@@ -55304,6 +55749,7 @@ Determines the value type of a dictionary entry type.
 
 This function may only be used with a dictionary entry type.
 
+Since 2.24
 
 </description>
 <parameters>
@@ -55314,7 +55760,6 @@ This function may only be used with a dictionary entry type.
 </parameters>
 <return> the value type of the dictionary entry
 
-Since 2.24
 </return>
 </function>
 
