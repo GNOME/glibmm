@@ -36,6 +36,7 @@
     '("md5" "G_CHECKSUM_MD5")
     '("sha1" "G_CHECKSUM_SHA1")
     '("sha256" "G_CHECKSUM_SHA256")
+    '("sha512" "G_CHECKSUM_SHA512")
   )
 )
 
@@ -210,20 +211,6 @@
   )
 )
 
-(define-enum n
-  (in-module "GIOConditio")
-  (c-name "GIOCondition")
-  (gtype-id "G_TYPE_IO_CONDITION")
-  (values
-    '("in" "G_IO_IN")
-    '("out" "G_IO_OUT")
-    '("pri" "G_IO_PRI")
-    '("err" "G_IO_ERR")
-    '("hup" "G_IO_HUP")
-    '("nval" "G_IO_NVAL")
-  )
-)
-
 (define-flags s
   (in-module "GIOFlag")
   (c-name "GIOFlags")
@@ -233,6 +220,7 @@
     '("nonblock" "G_IO_FLAG_NONBLOCK")
     '("is-readable" "G_IO_FLAG_IS_READABLE")
     '("is-writable" "G_IO_FLAG_IS_WRITABLE")
+    '("is-writeable" "G_IO_FLAG_IS_WRITEABLE")
     '("is-seekable" "G_IO_FLAG_IS_SEEKABLE")
     '("mask" "G_IO_FLAG_MASK")
     '("get-mask" "G_IO_FLAG_GET_MASK")
@@ -262,6 +250,20 @@
     '("none" "G_KEY_FILE_NONE")
     '("keep-comments" "G_KEY_FILE_KEEP_COMMENTS")
     '("keep-translations" "G_KEY_FILE_KEEP_TRANSLATIONS")
+  )
+)
+
+(define-enum n
+  (in-module "GIOConditio")
+  (c-name "GIOCondition")
+  (gtype-id "G_TYPE_IO_CONDITION")
+  (values
+    '("in" "G_IO_IN")
+    '("out" "G_IO_OUT")
+    '("pri" "G_IO_PRI")
+    '("err" "G_IO_ERR")
+    '("hup" "G_IO_HUP")
+    '("nval" "G_IO_NVAL")
   )
 )
 
@@ -752,6 +754,7 @@
     '("close-paranthesis" "G_UNICODE_BREAK_CLOSE_PARANTHESIS")
     '("conditional-japanese-starter" "G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER")
     '("hebrew-letter" "G_UNICODE_BREAK_HEBREW_LETTER")
+    '("regional-indicator" "G_UNICODE_BREAK_REGIONAL_INDICATOR")
   )
 )
 
@@ -1615,7 +1618,7 @@
   (c-name "g_atomic_int_get")
   (return-type "gint")
   (parameters
-    '("volatile-gint*" "atomic")
+    '("const-volatile-gint*" "atomic")
   )
 )
 
@@ -1694,7 +1697,7 @@
   (c-name "g_atomic_pointer_get")
   (return-type "gpointer")
   (parameters
-    '("volatile-void*" "atomic")
+    '("const-volatile-void*" "atomic")
   )
 )
 
@@ -2487,6 +2490,10 @@
 
 
 
+;; From gcharsetprivate.h
+
+
+
 ;; From gchecksum.h
 
 (define-method get_length
@@ -2756,6 +2763,50 @@
   (return-type "gchar**")
   (parameters
     '("const-gchar*" "uri_list")
+  )
+)
+
+(define-function g_filename_to_utf8_utf8
+  (c-name "g_filename_to_utf8_utf8")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "opsysstring")
+    '("gssize" "len")
+    '("gsize*" "bytes_read")
+    '("gsize*" "bytes_written")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_filename_from_utf8_utf8
+  (c-name "g_filename_from_utf8_utf8")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "utf8string")
+    '("gssize" "len")
+    '("gsize*" "bytes_read")
+    '("gsize*" "bytes_written")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_filename_from_uri_utf8
+  (c-name "g_filename_from_uri_utf8")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "uri")
+    '("gchar**" "hostname")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_filename_to_uri_utf8
+  (c-name "g_filename_to_uri_utf8")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "filename")
+    '("const-gchar*" "hostname")
+    '("GError**" "error")
   )
 )
 
@@ -3726,6 +3777,22 @@
   (return-type "none")
 )
 
+(define-function g_dir_open_utf8
+  (c-name "g_dir_open_utf8")
+  (return-type "GDir*")
+  (parameters
+    '("const-gchar*" "path")
+    '("guint" "flags")
+    '("GError**" "error")
+  )
+)
+
+(define-method read_name_utf8
+  (of-object "GDir")
+  (c-name "g_dir_read_name_utf8")
+  (return-type "const-gchar*")
+)
+
 
 
 ;; From genviron.h
@@ -3791,6 +3858,32 @@
   (return-type "gchar**")
   (parameters
     '("gchar**" "envp")
+    '("const-gchar*" "variable")
+  )
+)
+
+(define-function g_getenv_utf8
+  (c-name "g_getenv_utf8")
+  (return-type "const-gchar*")
+  (parameters
+    '("const-gchar*" "variable")
+  )
+)
+
+(define-function g_setenv_utf8
+  (c-name "g_setenv_utf8")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "variable")
+    '("const-gchar*" "value")
+    '("gboolean" "overwrite")
+  )
+)
+
+(define-function g_unsetenv_utf8
+  (c-name "g_unsetenv_utf8")
+  (return-type "none")
+  (parameters
     '("const-gchar*" "variable")
   )
 )
@@ -4114,6 +4207,49 @@
   (parameters
     '("const-gchar*" "file_name")
   )
+)
+
+(define-function g_file_test_utf8
+  (c-name "g_file_test_utf8")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "filename")
+    '("GFileTest" "test")
+  )
+)
+
+(define-function g_file_get_contents_utf8
+  (c-name "g_file_get_contents_utf8")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "filename")
+    '("gchar**" "contents")
+    '("gsize*" "length")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_mkstemp_utf8
+  (c-name "g_mkstemp_utf8")
+  (return-type "gint")
+  (parameters
+    '("gchar*" "tmpl")
+  )
+)
+
+(define-function g_file_open_tmp_utf8
+  (c-name "g_file_open_tmp_utf8")
+  (return-type "gint")
+  (parameters
+    '("const-gchar*" "tmpl")
+    '("gchar**" "name_used")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_get_current_dir_utf8
+  (c-name "g_get_current_dir_utf8")
+  (return-type "gchar*")
 )
 
 
@@ -5253,6 +5389,33 @@
   )
 )
 
+(define-function g_io_channel_win32_new_stream_socket
+  (c-name "g_io_channel_win32_new_stream_socket")
+  (return-type "GIOChannel*")
+  (parameters
+    '("gint" "socket")
+  )
+)
+
+(define-method win32_set_debug
+  (of-object "GIOChannel")
+  (c-name "g_io_channel_win32_set_debug")
+  (return-type "none")
+  (parameters
+    '("gboolean" "flag")
+  )
+)
+
+(define-function g_io_channel_new_file_utf8
+  (c-name "g_io_channel_new_file_utf8")
+  (return-type "GIOChannel*")
+  (parameters
+    '("const-gchar*" "filename")
+    '("const-gchar*" "mode")
+    '("GError**" "error")
+  )
+)
+
 
 
 ;; From gkeyfile.h
@@ -5766,6 +5929,21 @@
 
 ;; From glib-init.h
 
+(define-function g_thread_win32_thread_detach
+  (c-name "g_thread_win32_thread_detach")
+  (return-type "none")
+)
+
+(define-function g_thread_win32_init
+  (c-name "g_thread_win32_init")
+  (return-type "none")
+)
+
+(define-function g_clock_win32_init
+  (c-name "g_clock_win32_init")
+  (return-type "none")
+)
+
 
 
 ;; From glibintl.h
@@ -5795,14 +5973,28 @@
 
 ;; From glib-private.h
 
+(define-function g_get_worker_context
+  (c-name "g_get_worker_context")
+  (return-type "GMainContext*")
+)
+
+(define-function g_check_setuid
+  (c-name "g_check_setuid")
+  (return-type "gboolean")
+)
+
+(define-function g_main_context_new_with_next_id
+  (c-name "g_main_context_new_with_next_id")
+  (return-type "GMainContext*")
+  (parameters
+    '("guint" "next_id")
+  )
+)
+
 (define-function glib__private__
   (c-name "glib__private__")
   (return-type "GLibPrivateVTable*")
 )
-
-
-
-;; From glib_probes.h
 
 
 
@@ -5864,6 +6056,40 @@
   (parameters
     '("gint" "signum")
     '("GSourceFunc" "handler")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_unix_fd_source_new
+  (c-name "g_unix_fd_source_new")
+  (is-constructor-of "GUnixFdSource")
+  (return-type "GSource*")
+  (parameters
+    '("gint" "fd")
+    '("GIOCondition" "condition")
+  )
+)
+
+(define-function g_unix_fd_add_full
+  (c-name "g_unix_fd_add_full")
+  (return-type "guint")
+  (parameters
+    '("gint" "priority")
+    '("gint" "fd")
+    '("GIOCondition" "condition")
+    '("GUnixFDSourceFunc" "function")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+  )
+)
+
+(define-function g_unix_fd_add
+  (c-name "g_unix_fd_add")
+  (return-type "guint")
+  (parameters
+    '("gint" "fd")
+    '("GIOCondition" "condition")
+    '("GUnixFDSourceFunc" "function")
     '("gpointer" "user_data")
   )
 )
@@ -6522,6 +6748,59 @@
   )
 )
 
+(define-method set_ready_time
+  (of-object "GSource")
+  (c-name "g_source_set_ready_time")
+  (return-type "none")
+  (parameters
+    '("gint64" "ready_time")
+  )
+)
+
+(define-method get_ready_time
+  (of-object "GSource")
+  (c-name "g_source_get_ready_time")
+  (return-type "gint64")
+)
+
+(define-method add_unix_fd
+  (of-object "GSource")
+  (c-name "g_source_add_unix_fd")
+  (return-type "gpointer")
+  (parameters
+    '("gint" "fd")
+    '("GIOCondition" "events")
+  )
+)
+
+(define-method modify_unix_fd
+  (of-object "GSource")
+  (c-name "g_source_modify_unix_fd")
+  (return-type "none")
+  (parameters
+    '("gpointer" "tag")
+    '("GIOCondition" "new_events")
+  )
+)
+
+(define-method remove_unix_fd
+  (of-object "GSource")
+  (c-name "g_source_remove_unix_fd")
+  (return-type "none")
+  (parameters
+    '("gpointer" "tag")
+  )
+)
+
+(define-method query_unix_fd
+  (of-object "GSource")
+  (c-name "g_source_query_unix_fd")
+  (return-type "GIOCondition")
+  (parameters
+    '("gpointer" "tag")
+  )
+)
+
 (define-method set_callback_indirect
   (of-object "GSource")
   (c-name "g_source_set_callback_indirect")
@@ -6858,6 +7137,18 @@
     '("gpointer" "user_data")
     '("GDestroyNotify" "user_data_dnotify")
   )
+)
+
+(define-method ref
+  (of-object "GMarkupParseContext")
+  (c-name "g_markup_parse_context_ref")
+  (return-type "GMarkupParseContext*")
+)
+
+(define-method unref
+  (of-object "GMarkupParseContext")
+  (c-name "g_markup_parse_context_unref")
+  (return-type "none")
 )
 
 (define-method free
@@ -9370,6 +9661,11 @@
   )
 )
 
+(define-function g_slice_debug_tree_statistics
+  (c-name "g_slice_debug_tree_statistics")
+  (return-type "none")
+)
+
 
 
 ;; From gslist.h
@@ -9724,6 +10020,77 @@
   )
 )
 
+(define-function g_spawn_async_utf8
+  (c-name "g_spawn_async_utf8")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "working_directory")
+    '("gchar**" "argv")
+    '("gchar**" "envp")
+    '("GSpawnFlags" "flags")
+    '("GSpawnChildSetupFunc" "child_setup")
+    '("gpointer" "user_data")
+    '("GPid*" "child_pid")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_spawn_async_with_pipes_utf8
+  (c-name "g_spawn_async_with_pipes_utf8")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "working_directory")
+    '("gchar**" "argv")
+    '("gchar**" "envp")
+    '("GSpawnFlags" "flags")
+    '("GSpawnChildSetupFunc" "child_setup")
+    '("gpointer" "user_data")
+    '("GPid*" "child_pid")
+    '("gint*" "standard_input")
+    '("gint*" "standard_output")
+    '("gint*" "standard_error")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_spawn_sync_utf8
+  (c-name "g_spawn_sync_utf8")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "working_directory")
+    '("gchar**" "argv")
+    '("gchar**" "envp")
+    '("GSpawnFlags" "flags")
+    '("GSpawnChildSetupFunc" "child_setup")
+    '("gpointer" "user_data")
+    '("gchar**" "standard_output")
+    '("gchar**" "standard_error")
+    '("gint*" "exit_status")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_spawn_command_line_sync_utf8
+  (c-name "g_spawn_command_line_sync_utf8")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "command_line")
+    '("gchar**" "standard_output")
+    '("gchar**" "standard_error")
+    '("gint*" "exit_status")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_spawn_command_line_async_utf8
+  (c-name "g_spawn_command_line_async_utf8")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "command_line")
+    '("GError**" "error")
+  )
+)
+
 
 
 ;; From gstdio.h
@@ -9891,6 +10258,15 @@
   (parameters
     '("const-gchar*" "filename")
     '("struct-utimbuf*" "utb")
+  )
+)
+
+(define-function g_close
+  (c-name "g_close")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "fd")
+    '("GError**" "error")
   )
 )
 
@@ -11360,6 +11736,11 @@
   )
 )
 
+(define-function g_get_num_processors
+  (c-name "g_get_num_processors")
+  (return-type "guint")
+)
+
 
 
 ;; From gthreadpool.h
@@ -11474,6 +11855,67 @@
 
 
 ;; From gthreadprivate.h
+
+(define-function g_system_thread_wait
+  (c-name "g_system_thread_wait")
+  (return-type "none")
+  (parameters
+    '("GRealThread*" "thread")
+  )
+)
+
+(define-function g_system_thread_new
+  (c-name "g_system_thread_new")
+  (is-constructor-of "GSystemThread")
+  (return-type "GRealThread*")
+  (parameters
+    '("GThreadFunc" "func")
+    '("gulong" "stack_size")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_system_thread_free
+  (c-name "g_system_thread_free")
+  (return-type "none")
+  (parameters
+    '("GRealThread*" "thread")
+  )
+)
+
+(define-function g_system_thread_exit
+  (c-name "g_system_thread_exit")
+  (return-type "none")
+)
+
+(define-function g_system_thread_set_name
+  (c-name "g_system_thread_set_name")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-function g_thread_new_internal
+  (c-name "g_thread_new_internal")
+  (return-type "GThread*")
+  (parameters
+    '("const-gchar*" "name")
+    '("GThreadFunc" "proxy")
+    '("GThreadFunc" "func")
+    '("gpointer" "data")
+    '("gsize" "stack_size")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_thread_proxy
+  (c-name "g_thread_proxy")
+  (return-type "gpointer")
+  (parameters
+    '("gpointer" "thread")
+  )
+)
 
 
 
@@ -12454,7 +12896,7 @@
 
 (define-function g_get_prgname
   (c-name "g_get_prgname")
-  (return-type "gchar*")
+  (return-type "const-gchar*")
 )
 
 (define-function g_set_prgname
@@ -12642,6 +13084,29 @@
 
 
 ;; From gvariant-core.h
+
+(define-function g_variant_new_from_children
+  (c-name "g_variant_new_from_children")
+  (return-type "GVariant*")
+  (parameters
+    '("const-GVariantType*" "type")
+    '("GVariant**" "children")
+    '("gsize" "n_children")
+    '("gboolean" "trusted")
+  )
+)
+
+(define-method is_trusted
+  (of-object "GVariant")
+  (c-name "g_variant_is_trusted")
+  (return-type "gboolean")
+)
+
+(define-method get_type_info
+  (of-object "GVariant")
+  (c-name "g_variant_get_type_info")
+  (return-type "GVariantTypeInfo*")
+)
 
 
 
@@ -13147,6 +13612,12 @@
   (return-type "gconstpointer")
 )
 
+(define-method get_data_as_bytes
+  (of-object "GVariant")
+  (c-name "g_variant_get_data_as_bytes")
+  (return-type "GBytes*")
+)
+
 (define-method store
   (of-object "GVariant")
   (c-name "g_variant_store")
@@ -13208,6 +13679,16 @@
   (of-object "GVariant")
   (c-name "g_variant_byteswap")
   (return-type "GVariant*")
+)
+
+(define-function g_variant_new_from_bytes
+  (c-name "g_variant_new_from_bytes")
+  (return-type "GVariant*")
+  (parameters
+    '("const-GVariantType*" "type")
+    '("GBytes*" "bytes")
+    '("gboolean" "trusted")
+  )
 )
 
 (define-function g_variant_new_from_data
@@ -13872,6 +14353,39 @@
 
 ;; From gwakeup.h
 
+(define-function g_wakeup_new
+  (c-name "g_wakeup_new")
+  (is-constructor-of "GWakeup")
+  (return-type "GWakeup*")
+)
+
+(define-method free
+  (of-object "GWakeup")
+  (c-name "g_wakeup_free")
+  (return-type "none")
+)
+
+(define-method get_pollfd
+  (of-object "GWakeup")
+  (c-name "g_wakeup_get_pollfd")
+  (return-type "none")
+  (parameters
+    '("GPollFD*" "poll_fd")
+  )
+)
+
+(define-method signal
+  (of-object "GWakeup")
+  (c-name "g_wakeup_signal")
+  (return-type "none")
+)
+
+(define-method acknowledge
+  (of-object "GWakeup")
+  (c-name "g_wakeup_acknowledge")
+  (return-type "none")
+)
+
 
 
 ;; From gwin32.h
@@ -13935,6 +14449,16 @@
   (return-type "gchar*")
   (parameters
     '("const-gchar*" "utf8filename")
+  )
+)
+
+(define-function g_win32_get_package_installation_subdirectory_utf8
+  (c-name "g_win32_get_package_installation_subdirectory_utf8")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "package")
+    '("const-gchar*" "dll_name")
+    '("const-gchar*" "subdir")
   )
 )
 
