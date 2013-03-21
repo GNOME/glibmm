@@ -15,6 +15,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <giomm/file.h>
+#include <giomm/inputstream.h>
 #include <glibmm/object.h>
 #include <glibmm/variant.h>
 
@@ -63,6 +65,10 @@ public:
 
   _WRAP_METHOD(char** get_arguments(int& argc) const, g_application_command_line_get_arguments)
 
+  _WRAP_METHOD(Glib::RefPtr<InputStream> get_stdin(), g_application_command_line_get_stdin, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const InputStream> get_stdin() const, g_application_command_line_get_stdin, refreturn, constversion)
+
+
   //We use std::string instead of ustring because the C documentation says that it may be non-UTF-8 data:
   _WRAP_METHOD(std::string get_cwd() const, g_application_command_line_get_cwd)
 
@@ -98,6 +104,8 @@ public:
    */
   void printerr(const Glib::ustring& message);
   _IGNORE(g_application_command_line_printerr)
+
+  _WRAP_METHOD(Glib::RefPtr<File> create_file_for_arg(const Glib::ustring& arg) const, g_application_command_line_create_file_for_arg)
 };
 
 
