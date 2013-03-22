@@ -15,12 +15,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/object.h>
+#include <giomm/iostream.h>
 #include <giomm/tlscertificate.h>
 #include <giomm/asyncresult.h>
 
 _DEFS(giomm,gio)
-_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(giomm/private/iostream_p.h)
 
 namespace Gio
 {
@@ -28,7 +28,6 @@ namespace Gio
 _WRAP_ENUM(TlsRehandshakeMode,GTlsRehandshakeMode)
 
 class Cancellable;
-class IOStream;
 class TlsDatabase;
 class TlsInteraction;
 
@@ -39,9 +38,9 @@ class TlsInteraction;
  * server-side TLS, respectively. 
  * @newin{2,36}
  */
-class TlsConnection : public Glib::Object
+class TlsConnection : public IOStream
 {
-  _CLASS_GOBJECT(TlsConnection, GTlsConnection, G_TLS_CONNECTION, Glib::Object, GObject)
+  _CLASS_GOBJECT(TlsConnection, GTlsConnection, G_TLS_CONNECTION, IOStream, GIOStream)
 
 protected:
   _CTOR_DEFAULT
@@ -51,6 +50,9 @@ public:
 
   _WRAP_METHOD(Glib::RefPtr<TlsCertificate> get_certificate(), g_tls_connection_get_certificate)
   _WRAP_METHOD(Glib::RefPtr<const TlsCertificate> get_certificate() const, g_tls_connection_get_certificate, constversion)
+
+  _WRAP_METHOD(Glib::RefPtr<TlsCertificate> get_peer_certificate(), g_tls_connection_get_peer_certificate)
+  _WRAP_METHOD(Glib::RefPtr<const TlsCertificate> get_peer_certificate() const, g_tls_connection_get_peer_certificate, constversion)
 
   _WRAP_METHOD(TlsCertificateFlags get_peer_certificate_errors() const, g_tls_connection_get_peer_certificate_errors)
 
