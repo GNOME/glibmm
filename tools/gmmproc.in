@@ -62,6 +62,7 @@ $main::srcdir    = '.';
 $main::defsdir   = '.';
 $main::source    = '';
 $main::unwrapped = 1;
+$main::return_mismatches = 0;
 $main::debug     = (exists $ENV{'GMMPROC_DEBUG'}) ? $ENV{'GMMPROC_DEBUG'} : '';
 
 # prototypes
@@ -124,17 +125,17 @@ if ($main::unwrapped)
 
     if (@methods)
     {
-      print STDERR ('gmmproc: Unwrapped functions:',
+      print STDERR ("gmmproc: $main::source: Unwrapped functions:",
                     map($$_{c_name}, @methods));
     }
     if (@properties)
     {
-      print STDERR ('gmmproc: Unwrapped properties:',
+      print STDERR ("gmmproc: $main::source: Unwrapped properties:",
                     map($$_{class} . '::' . $$_{name}, @properties));
     }
     if (@signals)
     { 
-      print STDERR ('gmmproc: Unwrapped signals:',
+      print STDERR ("gmmproc: $main::source: Unwrapped signals:",
                     map($$_{class} . '::' . $$_{name}, @signals));
     }
   }
@@ -152,18 +153,20 @@ sub print_usage()
   print
 'Usage: gmmproc [options] name srcdir destdir
   -h 
-  --help      This usage message.
+  --help               This usage message.
 
-  --doc       Produces a header file for documentation.  (FIXME)
+  --doc                Produces a header file for documentation.  (FIXME)
 
-  --debug     Leave intermediate output arround for analysis.
-              Alternatively, set GMMPROC_DEBUG=1 in the environment.
+  --debug              Leave intermediate output arround for analysis.
+                       Alternatively, set GMMPROC_DEBUG=1 in the environment.
 
-  --unwrapped Warn about possible unwrapped functions.
+  --unwrapped          Warn about possible unwrapped functions.
  
-  --defs dir  Change the directory to seach for defs.
+  --return-mismatches  Warn about possible method return mismatches.
+ 
+  --defs dir           Change the directory to seach for defs.
 
-  -I dir      Specify the directory with m4 files.
+  -I dir               Specify the directory with m4 files.
 
 
 Note: This will read srcdir/name.{hg,ccg} file and generates destdir/name.cc
@@ -191,6 +194,10 @@ sub parse_command_line_args()
       elsif (/^--unwrapped/)
       {
         $main::unwrapped = 1;
+      }
+      elsif (/^--return-mismatches/)
+      {
+        $main::return_mismatches = 1;
       }
       elsif (/^--defs/)
       {

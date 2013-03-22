@@ -80,7 +80,7 @@ sub output_wrap_failed($$$)
 sub error
 {
   my $format=shift @_;
-  printf STDERR "Output.pm: $format",@_;
+  printf STDERR "Output.pm: $main::source: $format",@_;
 }
 
 sub ifdef($$)
@@ -950,6 +950,18 @@ sub convert_args_cpp_to_c($$$$$)
     $num_cpp_args--;
     $has_output_param = 1;
     $output_param_index = $$cpp_param_mappings{"OUT"};
+  }
+  else
+  {
+    # Check for possible void return mismatch (warn if the option was
+    # specified to gmmproc at the command line).
+    if($main::return_mismatches &&
+      $$objCppfunc{rettype} eq "void" && $$objCDefsFunc{rettype} ne "void")
+    {
+      Output::error(
+        "void return of $$objCppfunc{name}() does not match the "
+        . "$$objCDefsFunc{rettype} return type.\n");
+    }
   }
 
   # add implicit last error parameter;

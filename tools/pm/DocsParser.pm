@@ -365,7 +365,7 @@ sub remove_example_code($$)
     ($$text =~ s"<programlisting>.*?</programlisting>"\n[C example ellipted]"sg);
   $example_removals += ($$text =~ s"\|\[.*?]\|"\n[C example ellipted]"sg);
 
-  print STDERR "gmmproc: $obj_name: Example code discarded.\n"
+  print STDERR "gmmproc: $main::source: $obj_name: Example code discarded.\n"
     if ($example_removals);
 }
 
