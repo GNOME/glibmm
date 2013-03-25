@@ -24,12 +24,15 @@
 #include <giomm/enums.h>
 #include <giomm/socket.h>
 #include <giomm/socketconnection.h>
+#include <giomm/proxyresolver.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gio
 {
+
+_WRAP_ENUM(SocketClientEvent, GSocketClientEvent)
 
 /** Helper for connecting to a network service.
  *
@@ -140,6 +143,16 @@ public:
   _WRAP_METHOD(bool get_enable_proxy() const, g_socket_client_get_enable_proxy)
   _WRAP_METHOD(void set_enable_proxy(bool enable), g_socket_client_set_enable_proxy)
 
+
+  _WRAP_METHOD(bool get_tls() const, g_socket_client_get_tls)
+  _WRAP_METHOD(void set_tls(bool tls = true), g_socket_client_set_tls)
+  _WRAP_METHOD(TlsCertificateFlags get_tls_validation_flags() const, g_socket_client_get_tls_validation_flags)
+  _WRAP_METHOD(void set_tls_validation_flags(TlsCertificateFlags flags), g_socket_client_set_tls_validation_flags)
+
+  _WRAP_METHOD(Glib::RefPtr<ProxyResolver> get_proxy_resolver(), g_socket_client_get_proxy_resolver, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const ProxyResolver> get_proxy_resolver() const, g_socket_client_get_proxy_resolver, refreturn, constversion)
+  _WRAP_METHOD(void set_proxy_resolver(const Glib::RefPtr<ProxyResolver>& proxy_resolver), g_socket_client_set_proxy_resolver)
+
   _WRAP_METHOD(guint get_timeout() const, g_socket_client_get_timeout)
   _WRAP_METHOD(void set_timeout(guint timeout), g_socket_client_set_timeout)
 
@@ -150,6 +163,15 @@ public:
   _WRAP_PROPERTY("local-address", Glib::RefPtr<SocketAddress>)
   _WRAP_PROPERTY("protocol", SocketProtocol)
   _WRAP_PROPERTY("type", SocketType)
+  _WRAP_PROPERTY("timeout", guint)
+  _WRAP_PROPERTY("enable-proxy", bool)
+  _WRAP_PROPERTY("tls", bool)
+  _WRAP_PROPERTY("tls-validation-flags", TlsCertificateFlags)
+  _WRAP_PROPERTY("proxy-resolver", Glib::RefPtr<ProxyResolver>)
+
+#m4 _CONVERSION(`GSocketConnectable*',`const Glib::RefPtr<SocketConnectable>&',`Glib::wrap($3)')
+#m4 _CONVERSION(`GIOStream*',`const Glib::RefPtr<IOStream>&',`Glib::wrap($3)')
+  _WRAP_SIGNAL(void event(SocketClientEvent event, const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<IOStream>& connection), event, no_default_handler)
 };
 
 } // namespace Gio
