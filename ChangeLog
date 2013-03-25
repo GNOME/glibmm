@@ -1,5 +1,25 @@
 2013-03-24  José Alburquerque  <jaalburquerque@gmail.com>
 
+	Tls[Client|Server]Connection: Add the create() methods.
+
+	* gio/src/tlsclientconnection.hg:
+	* gio/src/tlsserverconnection.hg: Add the create() methods, wrapping
+	the *_new() functions of these classes.  Since these classes are
+	interfaces, it is not possible to use _WRAP_CTOR/WRAP_CREATE() to wrap
+	the new functions.
+
+	Also make these classes derive from TlsConnection which is their base
+	class (see [1][2][3][4]).  Its odd because the base class is a GObject
+	and the derived ones are GInterfaces, but that's how the C API has
+	done it.  Hopefully it will not be a problem.
+
+	[1] https://developer.gnome.org/gio/stable/GTlsConnection.html#GTlsConnection.description
+	[2] https://developer.gnome.org/gio/stable/GTlsConnection.html#GTlsConnection.derived-interfaces
+	[3] https://developer.gnome.org/gio/stable/GTlsClientConnection.html#GTlsClientConnection.description
+	[4] https://developer.gnome.org/gio/stable/GTlsServerConnection.html#GTlsServerConnection.description
+
+2013-03-24  José Alburquerque  <jaalburquerque@gmail.com>
+
 	gio/src/tls*.ccg: Remove empty namespaces.
 
 	* gio/src/tlsconnection.ccg:
