@@ -34,6 +34,7 @@ namespace Gio
  * TlsFileDatabase is implemented by TlsDatabase objects which load their
  * certificate information from a file. It is an interface which TLS library
  * specific subtypes implement.
+ *
  * @newin{2,36}
  */
 class TlsFileDatabase
@@ -45,12 +46,16 @@ class TlsFileDatabase
 public:
   //TODO: Should this create() method be in TlsDatabase since the _new()
   //function returns a GTlsDatabase?
-  //TODO: It is not possible to use _WRAP_CTR()/WRAP_CREATE() here because this
-  //class is an interface.
-#m4 _CONVERSION(`GTlsDatabase*',`Glib::RefPtr<TlsFileDatabase>',`Glib::wrap(G_TLS_FILE_DATABASE($3))')
-  _WRAP_METHOD(static Glib::RefPtr<TlsFileDatabase> create(const Glib::ustring& anchors), g_tls_file_database_new, errthrow)
+  //  No, it's normal for a G* C API to return a base type, but we correct that in C++.
+  //  For instance, many GTK+ _new() functions return GtkWidget*. murrayc.
 
-  _WRAP_PROPERTY("anchors", Glib::ustring)
+  //TODO: It is not possible to use _WRAP_CTOR()/WRAP_CREATE() here because this
+  //class is an interface.
+  //  So, should we make it possible to use them? murrayc.
+#m4 _CONVERSION(`GTlsDatabase*',`Glib::RefPtr<TlsFileDatabase>',`Glib::wrap(G_TLS_FILE_DATABASE($3))')
+  _WRAP_METHOD(static Glib::RefPtr<TlsFileDatabase> create(const std::string& anchors), g_tls_file_database_new, errthrow)
+
+  _WRAP_PROPERTY("anchors", std::string)
 };
 
 } // namespace Gio
