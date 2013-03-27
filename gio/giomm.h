@@ -127,6 +127,11 @@
 #include <giomm/tcpconnection.h>
 #include <giomm/themedicon.h>
 #include <giomm/threadedsocketservice.h>
+
+//TODO: Re-add these includes after the next stable release when the
+//development of these classes can continue without risking needing an API or
+//ABI break later.
+#if 0
 #include <giomm/tlscertificate.h>
 #include <giomm/tlsclientconnection.h>
 #include <giomm/tlsconnection.h>
@@ -134,6 +139,8 @@
 #include <giomm/tlsinteraction.h>
 #include <giomm/tlspassword.h>
 #include <giomm/tlsserverconnection.h>
+#endif
+
 #ifndef G_OS_WIN32
 # include <giomm/unixconnection.h>
 # include <giomm/unixcredentialsmessage.h>
