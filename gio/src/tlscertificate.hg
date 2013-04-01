@@ -46,13 +46,14 @@ class TlsCertificate : public Glib::Object
   _CLASS_GOBJECT(TlsCertificate, GTlsCertificate, G_TLS_CERTIFICATE, Glib::Object, GObject)
 
 protected:
-  _WRAP_CTOR(TlsCertificate(const char* data, gssize length = -1), g_tls_certificate_new_from_pem, errthrow)
+  _WRAP_CTOR(TlsCertificate(const std::string& data, gssize length), g_tls_certificate_new_from_pem, errthrow)
   _WRAP_CTOR(TlsCertificate(const std::string& file), g_tls_certificate_new_from_file, errthrow)
   _WRAP_CTOR(TlsCertificate(const std::string& cert_file, const std::string& key_file), g_tls_certificate_new_from_files, errthrow)
 
 public:
   _WRAP_METHOD_DOCS_ONLY(g_tls_certificate_new_from_pem)
-  _WRAP_CREATE(const char* data, gssize length = -1)
+  static Glib::RefPtr<TlsCertificate>
+    create_from_pem(const std::string& data, gssize length = -1);
 
   _WRAP_METHOD_DOCS_ONLY(g_tls_certificate_new_from_file)
   _WRAP_CREATE(const std::string& file)
@@ -70,14 +71,14 @@ public:
   _WRAP_METHOD(bool is_same(const Glib::RefPtr<const TlsCertificate>& cert_two) const, g_tls_certificate_is_same)
 
   _WRAP_PROPERTY("certificate", Glib::RefPtr<Glib::ByteArray>)
-  _WRAP_PROPERTY("certificate-pem", char*)
+  _WRAP_PROPERTY("certificate-pem", std::string)
   _WRAP_PROPERTY("issuer", Glib::RefPtr<TlsCertificate>)
 
   // Write-only and construct-only
   //_WRAP_PROPERTY("private-key", Glib::RefPtr<Glib::ByteArray>)
 
   // Write-only and construct-only
-  //_WRAP_PROPERTY("private-key-pem", char*)
+  //_WRAP_PROPERTY("private-key-pem", std::string)
 
 #m4 _CONVERSION(`GSocketConnectable*',`const Glib::RefPtr<const SocketConnectable>&',`Glib::wrap($3, true)')
 #m4 _CONVERSION(`GTlsCertificate*',`const Glib::RefPtr<const TlsCertificate>&',`Glib::wrap($3, true)')

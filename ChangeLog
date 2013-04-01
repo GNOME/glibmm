@@ -1,5 +1,24 @@
 2013-03-31  José Alburquerque  <jaalburquerque@gmail.com>
 
+	TlsCertificate: Use std::string for data instead of char*.
+
+	* gio/src/tlscertificate.{ccg,hg} (TlsCertificate): Use a std::string
+	in the data constructor instead of a char* because it is more C++
+	like.  Remove the default value for the length argument so there is no
+	ambiguity with the file constructor (which also uses std::string for
+	the filename).
+	(create_from_pem): Renamed from create() so that there is no ambiguity
+	with the other file create() methods (one with a filename argument and
+	the other with a filename and key file arguments).  Handwrote the
+	method in the .ccg file (_WRAP_CREATE does not allow a custom method
+	name).
+	(property_certificate_pem): Use a std::string instead of a char* for
+	the property type in keeping with the use of std::string for pem data.
+
+	These changes are for when the Tls* classes are re-added to the build.
+
+2013-03-31  José Alburquerque  <jaalburquerque@gmail.com>
+
 	Credentials: Add the get_unix_pid() method.
 
 	* gio/src/credentials.hg: Add the new method wrapping the
