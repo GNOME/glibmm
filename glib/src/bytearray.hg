@@ -39,6 +39,7 @@ class ByteArray
 {
   _CLASS_OPAQUE_REFCOUNTED(ByteArray, GByteArray, NONE, g_byte_array_ref, g_byte_array_unref)
   _IGNORE(g_byte_array_ref, g_byte_array_unref)
+
 public:
   /** A Slot type to compare two elements in the array.  The slot should return
    * -1 if the first value is less than the second, 0 if they are equal and 1
@@ -65,6 +66,21 @@ public:
   _IGNORE(g_byte_array_sort)
 
   _WRAP_METHOD(Glib::RefPtr<ByteArray> set_size(guint length), g_byte_array_set_size)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  static GType get_type() G_GNUC_CONST;
+#endif
 };
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+template <>
+class Value< Glib::RefPtr<Glib::ByteArray> > : public ValueBase_Boxed
+{
+public:
+  static GType value_type() { return Glib::ByteArray::get_type(); }
+  void set(const Glib::RefPtr<Glib::ByteArray>& array) { set_boxed(Glib::unwrap(array)); }
+  Glib::RefPtr<Glib::ByteArray> get()                  { return Glib::RefPtr<Glib::ByteArray>(reinterpret_cast<Glib::ByteArray*>(get_boxed())); }
+};
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib
