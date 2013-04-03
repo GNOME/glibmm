@@ -59,7 +59,7 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
     class_size,
     0, // base_init
     0, // base_finalize
-    class_init_func_,
+    class_init_func_, //Set by the caller ( *_Class::init() ).
     0, // class_finalize
     0, // class_data
     instance_size,
