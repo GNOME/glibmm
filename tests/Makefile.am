@@ -25,6 +25,7 @@ check_PROGRAMS =				\
 	glibmm_btree/test			\
 	glibmm_date/test			\
 	glibmm_buildfilename/test		\
+	glibmm_interface_implementation/test	\
 	glibmm_nodetree/test			\
 	glibmm_ustring_compose/test		\
 	glibmm_ustring_format/test		\
@@ -69,6 +70,10 @@ giomm_asyncresult_sourceobject_test_LDADD    = $(giomm_ldadd)
 glibmm_btree_test_SOURCES                = glibmm_btree/main.cc
 glibmm_buildfilename_test_SOURCES        = glibmm_buildfilename/main.cc
 glibmm_date_test_SOURCES                 = glibmm_date/main.cc
+
+glibmm_interface_implementation_test_SOURCES = glibmm_interface_implementation/main.cc
+glibmm_interface_implementation_test_LDADD = $(giomm_ldadd)
+
 glibmm_nodetree_test_SOURCES             = glibmm_nodetree/main.cc
 glibmm_ustring_compose_test_SOURCES      = glibmm_ustring_compose/main.cc
 glibmm_ustring_format_test_SOURCES       = glibmm_ustring_format/main.cc
