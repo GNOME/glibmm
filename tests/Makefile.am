@@ -22,6 +22,7 @@ check_PROGRAMS =				\
 	giomm_ioerror_and_iodbuserror/test	\
 	giomm_simple/test			\
 	giomm_asyncresult_sourceobject/test	\
+	giomm_tls_client/test			\
 	glibmm_btree/test			\
 	glibmm_date/test			\
 	glibmm_buildfilename/test		\
@@ -66,6 +67,9 @@ giomm_simple_test_LDADD    = $(giomm_ldadd)
 
 giomm_asyncresult_sourceobject_test_SOURCES  = giomm_asyncresult_sourceobject/main.cc
 giomm_asyncresult_sourceobject_test_LDADD    = $(giomm_ldadd)
+
+giomm_tls_client_test_SOURCES                = giomm_tls_client/main.cc
+giomm_tls_client_test_LDADD                  = $(giomm_ldadd)
 
 glibmm_btree_test_SOURCES                = glibmm_btree/main.cc
 glibmm_buildfilename_test_SOURCES        = glibmm_buildfilename/main.cc
