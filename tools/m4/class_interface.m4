@@ -16,6 +16,14 @@ define(`__PCAST__',`(__CPARENT__`'*)')
 define(`__BOOL_IS_INTERFACE__',`1')
 
 
+dnl For classes that need custom code in their cast constructor.
+define(`_CUSTOM_CTOR_CAST',`dnl
+_PUSH()
+dnl Define this macro to be tested for later.
+define(`__BOOL_CUSTOM_CTOR_CAST__',`$1')
+_POP()
+')
+
 _POP()
 _SECTION(SECTION_CLASS2)
 ') dnl end of _CLASS_INTERFACE
@@ -178,10 +186,13 @@ __CPPNAME__::__CPPNAME__`'()
   __CPPPARENT__`'(__BASE__`'_class_.init())
 {}
 
+ifdef(`__BOOL_CUSTOM_CTOR_CAST__',`dnl
+',`dnl
 __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem)
 :
   __CPPPARENT__`'(__PCAST__`'(castitem))
 {}
+')dnl
 
 __CPPNAME__::__CPPNAME__`'(const Glib::Interface_Class& interface_class)
 : __CPPPARENT__`'(interface_class)

@@ -1,3 +1,35 @@
+2013-04-07  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Gio::TlsClientConnection: Make the class work correctly.
+
+	* tools/m4/class_interface.m4 (_CUSTOM_CTOR_CAST): Add a new macro so
+	that classes wrapped by the _CLASS_INTERFACE() macro can implement a
+	custom cast constructor.  This is so that classes like
+	Tls[Client|Server]Connection, that derive from Glib::Interface but
+	should also derive from a Glib::Object derived type, though they do
+	not do so in the C API, don't produce warnings from an attempt to set
+	the non-existent properties of the GObject derived type when an
+	attempt to construct the C object is made in the default Glib::Object
+	constructor.  Glib::wrap_auto_interface<>(), which is called by
+	Glib::wrap() for interfaces, uses the cast constructor to create the
+	wrapper which calls the cast constructor of Glib::Interface.  If the
+	Glib::Object derived base class of the wrapper has a default
+	constructor, that constructor is then called which leads to the
+	Glib::Object default constructor being called, which tries to
+	construct the C object and set its properties thus producing the
+	property setting warnings.  A custom cast constructor can chain up to
+	the cast constructor of the Glib::Object derived type thus avoiding
+	the call to the Glib::Object default constructor and the non-existent
+	property setting warnings.
+	* glib/glibmm/interface.cc:
+	* glib/glibmm/interface.h (Interface): Add a default constructor so
+	that in the cases above (when the cast constructor of the
+	Glib::Object's derived type is used), the compiler can find a
+	Glib::Interface default constructor to use.  Using the Glib::Interface
+	cast constructor as well as the cast constructor of the Glib::Object
+	derived type would cause "ObjectBase::initialize() called twice
+	for the same GObject" errors.
+
 2013-04-06  Murray Cumming  <murrayc@murrayc.com>
 
 	Add a test of implementing an interface.

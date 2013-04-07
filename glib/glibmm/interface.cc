@@ -73,6 +73,10 @@ Interface::Interface(GObject* castitem)
   ObjectBase::initialize(castitem);
 }
 
+Interface::Interface()
+{
+}
+
 Interface::~Interface()
 {}
 

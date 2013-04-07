@@ -41,6 +41,10 @@ public:
   typedef GTypeInterface  BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+  /** A Default constructor.
+   */
+  Interface();
+
   /** Called by constructors of derived classes. Provide the result of
    * the Class object's init() function to ensure that it is properly
    * initialized.
