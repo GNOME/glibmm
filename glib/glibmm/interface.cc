@@ -74,8 +74,7 @@ Interface::Interface(GObject* castitem)
 }
 
 Interface::Interface()
-{
-}
+{}
 
 Interface::~Interface()
 {}
