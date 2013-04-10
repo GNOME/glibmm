@@ -211,7 +211,7 @@ sub parse_param($$)
   # parse through argument list
   my @str = ();
   my $par = 0;
-  foreach (split(/(const )|([,=&*()])|(<[^,{}]*>)|(\s+)/, $line)) #special characters OR <something> OR whitespace.
+  foreach (split(/(const )|([,=&*()])|({.*?})|(<[^,]*?>)|(\s+)/, $line)) #special characters OR <something> OR whitespace.
   {
     next if ( !defined($_) or $_ eq "" );
 
@@ -227,7 +227,27 @@ sub parse_param($$)
        $par--; #Decrement the number of parameters.
        next;
     }
-    elsif ( $par || /^(const )|(<[^,{}]*>)|([*&])|(\s+)/ ) #TODO: What's happening here?
+    elsif( $_ =~ /{(.*)}/)
+    {
+      # gmmproc options have been specified for the current parameter so
+      # process them.
+
+      # Get the options.
+      my $options = $1;
+ 
+      # Check if param should be optional or an output param.
+      $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
+      $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
+ 
+      # Check if it should be mapped to a C param.
+      if ($options =~ /(\w+|\.)/)
+      {
+        $mapping = $1;
+        $mapping = $name if($mapping eq ".");
+      }
+      next;
+    }
+    elsif ( $par || /^(const )|(<[^,]*>)|([*&>])|(\s+)/ ) #TODO: What's happening here?
     {
       push(@str, $_); #This looks like part of the type, so we store it.
       next;
@@ -256,31 +276,6 @@ sub parse_param($$)
       }
 
       $type = string_trim($type);
-
-      # Determine if the param is optional, an output param or if a C param
-      # name should be mapped to the current C++ index (if name ends with
-      # {c_name>>?}). (A '.' for the name means use the C++ as the C name).
-      # '>>' - Means that it is an output parameter.
-      # '?' - Means that it is an optional parameter.
-      if ($name =~ /\{(.*)\}$/)
-      {
-        # Get the options.
-        my $options = $1;
- 
-        # Remove the options from the name.
-        $name =~ s/\{.*\}$//;
- 
-        # Check if param should be optional or an output param.
-        $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
-        $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
- 
-        # Check if it should be mapped to a C param.
-        if ($options =~ /(\w+|\.)/)
-        {
-          $mapping = $1;
-          $mapping = $name if($mapping eq ".");
-        }
-      }
 
       push(@$param_types, $type);
       push(@$param_names, $name);
@@ -342,31 +337,6 @@ sub parse_param($$)
   }
 
   $type = string_trim($type);
-
-  # Determine if the param is optional, an output param or if a C param
-  # name should be mapped to the current C++ index (if name ends with
-  # {c_name>>?}). (A '.' for the name means use the C++ as the C name).
-  # '>>' - Means that it is an output parameter.
-  # '?' - Means that it is an optional parameter.
-  if ($name =~ /\{(.*)\}$/)
-  {
-    # Get the options.
-    my $options = $1;
- 
-    # Remove the options from the name.
-    $name =~ s/\{.*\}$//;
-        
-    # Check if param should be optional or an output param.
-    $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
-    $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
-      
-    # Check if it should be mapped to a C param.
-    if ($options =~ /(\w+|\.)/)
-    {
-      $mapping = $1;
-      $mapping = $name if($mapping eq ".");
-    }
-  }
 
   push(@$param_types, $type);
   push(@$param_names, $name);

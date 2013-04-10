@@ -1,3 +1,23 @@
+2013-04-09  José Alburquerque  <jaalburquerque@gmail.com>
+
+	gmmproc: Parse the argument list of methods correctly.
+
+	* tools/pm/Function.pm (parse_param): When splitting the argument
+	list split the parameter '{...}' options out and separately and deal
+	with them in their own 'elsif' which is more clear and avoids code
+	duplication.  Also, don't split the '<...>' matches greedily because
+	that causes problems when a Glib::RefPtr<> parameter has a default
+	value.
+
+	This problem was discovered while trying to not use the optional
+	parameter syntax for the Gio::TlsCertificate::verify() method by using
+	a default value for the 'trusted_ca' parameter although upon
+	investigation it became clear that keeping the syntax (and the method
+	overloads) would be useful because a verify() with no parameters can
+	be used to verify things about a certificate unrelated to the identity
+	and the trusted_ca (see the TlsCertificateFlags enum that the method
+	returns).
+
 2013-04-08  José Alburquerque  <jaalburquerque@gmail.com>
 
 	Interface: Fix a small typo.
