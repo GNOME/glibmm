@@ -16,7 +16,9 @@ bool on_accept_certificate(const Glib::RefPtr<const Gio::TlsCertificate>& cert, 
   std::cout << "Outputing the issuer's certificate data:" << std::endl <<
     issuer->property_certificate_pem().get_value();
 
-  std::cout << "Accepting the certificate." << std::endl;
+  std::cout << "Accepting the certificate (completing the handshake)." <<
+    std::endl;
+
   return true;
 }
 
@@ -87,49 +89,37 @@ int main(int, char**)
 
     tls_connection->handshake(); 
 
-    Glib::RefPtr<Gio::TlsCertificate> certificate =
-      tls_connection->get_peer_certificate();
+    std::cout << "Attempting to get the issuer's certificate from the "
+      "connection." << std::endl;
 
-    if(!certificate)
+    Glib::RefPtr<Gio::TlsCertificate> issuer_certificate =
+      tls_connection->get_peer_certificate()->get_issuer();
+
+    if(!issuer_certificate)
     {
-      std::cout << "Could not get the peer's certificate." << std::endl;
+      std::cout << "Could not get the issuer's certificate of the peer." <<
+        std::endl;
+      return EXIT_FAILURE;
     }
-
-    std::cout << "Successfully got the peer's certificate." << std::endl;
-    std::cout << "Getting the certificate's issuer." << std::endl;
-
-    Glib::RefPtr<Gio::TlsCertificate> issuer = certificate->get_issuer();
-
-    if(!issuer)
-    {
-      std::cout << "Could not get the peer's certificate." << std::endl;
-    }
-
-    std::cout << "Successfully got the peer's certificate issuer." << std::endl;
+    std::cout << "Successfully retrieved the issuer's certificate." <<
+      std::endl;
 
     std::cout << "Attempting to use the connection's database." << std::endl;
-
     Glib::RefPtr<Gio::TlsDatabase> database = tls_connection->get_database();
 
-    Glib::RefPtr<const Gio::SocketConnectable> connectable = address;
+    std::cout << "Looking up the certificate's issuer in the database." <<
+      std::endl;
 
-    database->verify_chain(certificate, G_TLS_DATABASE_PURPOSE_AUTHENTICATE_SERVER, connectable);
-
-    database->verify_chain(certificate, G_TLS_DATABASE_PURPOSE_AUTHENTICATE_SERVER, Glib::RefPtr<const Gio::SocketConnectable>::cast_static(address));
-
-    std::cout << "Looking up the main certificate's issuer in the "
-      "database." << std::endl;
-
-    Glib::RefPtr<Gio::TlsCertificate> db_certificate = database->lookup_certificate_issuer(certificate);
+    Glib::RefPtr<Gio::TlsCertificate> db_certificate =
+      database->lookup_certificate_issuer(issuer_certificate);
 
     if(!db_certificate)
     {
-      std::cout << "No certificate found in the database." << std::endl;
+      std::cout << "The issuer's certificate was not found in the database." << std::endl;
     }
     else
     {
-      std::cout << "Successfully found the issuer's certificate in the "
-        "database." << std::endl;
+      std::cout << "Successfully found the issuer's certificate in the database." << std::endl;
     }
   }
   catch (const Gio::TlsError& error)
