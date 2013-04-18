@@ -1,3 +1,150 @@
+Changes in 2.36 compared to 2.34:
+
+Glib:
+* AppInfo::get_all(): Fix ownerships.
+  (Pavel Vasi) Bug #694505
+  (José Alburquerque)
+* Add ByteArray, because it is used in the GTls* API.
+  (José Alburquerque)
+* Resolver: Add lookup_records(), lookup_records_async()
+  and lookup_records_finish().
+  (José Alburquerque)
+* Signal*::connect(): Make them less thread-unsafe.
+  (Kjell Ahlstedt) Bug #396958 (Daniel Elstner, Chris Vine)
+* Threads: Add create(slot, name) to create named threads.
+  (Andrew Potter) Bug #689863
+* Variant: Allow containing complex types in arrays and in variants.
+  (José Alburquerque)
+* Variant: Don't refsink variants created using the custom cast ctor.
+  (José Alburquerque)
+* Variant< std::vector<std::string> >: Add create_from_object_paths().
+  (José Alburquerque)
+* VariantBase: Add check_format_string().
+   (Murray Cumming)
+* VariantBase: Add operator for BoolExpr (const void*).
+  (Andrew Potter) Bug #690121
+* VariantType: Add create_tuple().
+  (Andrew Potter) Bug #688682
+* VariantType: Correct the referencing in the create*() methods.
+  (José Alburquerque) Bug #688440 (Andrew Potter)
+
+
+Gio:
+* AppInfo: Add create_duplicate().
+  (José Alburquerque)
+* ApplicationCommandLine: Add get_stdin() and
+  create_file_for_arg().
+  (Murray Cumming)
+* AsyncResult: Added is_tagged().
+  (Murray Cumming)
+* Credentials: Add get_unix_pid().
+  (José Alburquerque)
+* DesktopAppInfo: Add has_key(),
+  get_string() and get_boolean().
+  (Murray Cumming)
+* DesktopAppInfo: Add some new getter methods.
+  (José Alburquerque)
+* File: Remove refreturn to avoid memory leaks.
+  (Kjell Ahlstedt) Bug #691606 (Dodak4Gi)
+* FileEnumerator: Add get_child().
+  (Murray Cumming)
+* FileInfo: Add get_deletion_date().
+  (Murray Cumming)
+* MemoryOutputStream: Add the steal_as_bytes() method.
+  (José Alburquerque)
+* SimpleAction: Fix stateful action constructor typo, allowing use.
+  (Andrew Potter) Bug #690122
+* SocketClient: Add get/set_tls(),
+  get/set_tls_validation_flags(), get/set_proxy_resolver().
+  Added timeout, tls, enable-proxy, tls-validation, and 
+  proxy-resolver properties.
+  Added the event signal.
+  (Murray Cumming)
+* SocketConnection: Add connect*() and is_connected() methods.
+  (José Alburquerque)
+* ThemedIcon: Wrap the "names" property.
+  (José Alburquerque)
+* Add TlsConnection, TlsClient, TlsServer, TlsDatabase,
+  TlsCertificate, TlsPassword, TlsFileDatabase and TlsInteraction.
+  (José Alburquerque)
+* UnixConnection: Add [receive|send]_credentials_[async|finish]().
+  (José Alburquerque)
+
+Gio::DBus:
+* DBus::[Connection|Proxy]: Use ifdefs for the UnixFDList call*() methods.
+  (José Alburquerque)
+
+gmmproc:
+* Verify that void methods should not return a value.
+  (José Alburquerque) Bug #696364
+* Parse the argument list of methods correctly.
+  (José Alburquerque)
+* gmmproc: _WRAP_VFUNC: Support the wrapping of slots.
+  (José Alburquerque)
+* gmmproc: _WRAP_METHOD: Support wrapping methods with slots.
+  (José Alburquerque) Bug #688587
+* gmmproc: _WRAP_METHOD: Ensure that slot parameters can be optional.
+  (José Alburquerque)
+* gmmproc: _WRAP_[CREATE|CTOR|METHOD]: Allow any order of {} options.
+  (José Alburquerque)
+* gmmproc: _WRAP_ENUM: Skip enum constants whose names are deleted.
+  (Kjell Ahlstedt) Bug #544694 (Murray Cumming)
+* gmmproc: _WRAP_CTOR: Handle *_new() functions with a final GError**.
+  (José Alburquerque) Bug #687959
+
+Build:
+* Visual Studio Projects: Fix and update.
+  (Chun-wei Fan)
+* Add a test of implementing an interface,
+  to detect the problem in glib 2.36.0 and
+  the expected problem with glib >= 2.37.0
+  See bug #697229
+  (Murray Cumming)
+* DBus::[Connection|Proxy]: Change ifdef G_OS_LINUX to ifdef G_OS_UNIX.
+  (Kjell Ahlstedt)
+* ContentType: Fix typo in the content_type_get_symbolic_icon() implementation.
+  (José Alburquerque)
+* Remove the use of g_type_init() because it has been deprecated.
+  (José Alburquerque)
+* Strip trailing whitespace.
+  (Mark Vender) 
+* Fix the build with warnings enabled.
+  (Murray Cumming)
+
+
+
+
+Documentation:
+* Signal[Timeout|Idle]::connect_once() docs: Warn about thread-unsafety.
+  (Kjell Ahlstedt) Bug #396963 (Daniel Elstner, Chris Vine)
+* ThreadPool::push() docs: Note that sigc::trackable is not thread-safe.
+  (Kjell Ahlstedt) Bug #512348 (Chris Vine)
+* Threads::Thread::create(): Update the documentation.
+  (Kjell Ahlstedt) Bug #512348 (Chris Vine)
+* SignalProxy: Fix the documentation, especially of connect_notify().
+  (Kjell Ahlstedt) Bug #126213, comment 5.
+* Gio::Action: Add more documentation of get_state_hint() and get_state().
+  (Kjell Ahlstedt) Bug #690134 (Andrew Potter)
+* Predefine G_OS_UNIX or G_OS_WIN32 in Doxygen's configuration file.
+  (Kjell Ahlstedt)
+* gmmproc: Improve the conversion of documentation to Doxygen format.
+  (Kjell Ahlstedt)
+* Documentation: Fix many warnings from Doxygen.
+  (Kjell Ahlstedt)
+* gmmproc: Make enum documentation possible.
+  (José Alburquerque) Bug #544694 (Murray Cumming)
+* gmmproc: Improve the search for documentation of enums.
+  (Kjell Ahlstedt)
+* gmmproc: Documentation: Adjust if the method has a slot param.
+  (José Alburquerque) Bug #688587.
+* docextract_to_xml.py: Replace &colon; with ':' in generated XML files.
+  (José Alburquerque)
+* gmmproc: Improve the documentation of properties.
+  (Kjell Ahlstedt)
+* ustring docs: The global locale should be set when using C++ streams.
+  (Debarshi Ray) Bug #661588
+
+
 2.36.0 (stable):
 
 Changes since 2.35.9:
