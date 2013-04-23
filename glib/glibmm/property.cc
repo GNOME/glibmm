@@ -22,6 +22,7 @@
 
 
 #include <glibmm/object.h>
+#include <glibmm/class.h>
 #include <cstddef>
 
 // Temporary hack till GLib gets fixed.
@@ -106,31 +107,68 @@ namespace Glib
 void custom_get_property_callback(GObject* object, unsigned int property_id,
                                   GValue* value, GParamSpec* param_spec)
 {
-  if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
-  {
-    PropertyBase& property = property_from_id(*wrapper, property_id);
+  // If the id is zero there is no property to get.
+  g_return_if_fail(property_id != 0);
 
-    if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
-      g_value_copy(property.value_.gobj(), value);
-    else
-      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
+  GType custom_type = G_OBJECT_TYPE(object);
+
+  Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(custom_type, Class::properties_quark));
+  Class::properties_type::size_type props_size = 0;
+
+  if(props) props_size = props->size();
+
+  if(property_id <= props_size)
+  {
+    g_value_copy((*props)[property_id - 1], value);
+  }
+  else
+  {
+    if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
+    {
+      PropertyBase& property =
+        property_from_id(*wrapper, property_id - props_size);
+
+      if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
+        g_value_copy(property.value_.gobj(), value);
+      else
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
+    }
   }
 }
 
 void custom_set_property_callback(GObject* object, unsigned int property_id,
                                   const GValue* value, GParamSpec* param_spec)
 {
-  if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
-  {
-    PropertyBase& property = property_from_id(*wrapper, property_id);
+  // If the id is zero there is no property to get.
+  g_return_if_fail(property_id != 0);
 
-    if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
+  GType custom_type = G_OBJECT_TYPE(object);
+
+  Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(custom_type, Class::properties_quark));
+  Class::properties_type::size_type props_size = 0;
+
+  if(props) props_size = props->size();
+
+  if(property_id <= props_size)
+  {
+    g_value_copy(value, (*props)[property_id - 1]);
+    g_object_notify(object, g_param_spec_get_name(param_spec));
+  }
+  else
+  {
+    if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
-      g_value_copy(value, property.value_.gobj());
-      g_object_notify(object, g_param_spec_get_name(param_spec));
+      PropertyBase& property =
+        property_from_id(*wrapper, property_id - props_size);
+
+      if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
+      {
+        g_value_copy(value, property.value_.gobj());
+        g_object_notify(object, g_param_spec_get_name(param_spec));
+      }
+      else
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
     }
-    else
-      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
   }
 }
 
@@ -171,7 +209,18 @@ void PropertyBase::install_property(GParamSpec* param_spec)
 {
   g_return_if_fail(param_spec != 0);
 
-  const unsigned int property_id = property_to_id(*object_, *this);
+  // Ensure that there would not be id clashes with possible existing
+  // properties overridden from implemented interfaces if dealing with a custom
+  // type by offsetting the generated id with the number of already existing
+  // properties.
+
+  GType gtype = G_OBJECT_TYPE(object_->gobj());
+  Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(gtype, Class::properties_quark));
+
+  Class::properties_type::size_type props_size = 0;
+  if(props) props_size = props->size();
+
+  const unsigned int property_id = property_to_id(*object_, *this) + props_size;
 
   g_object_class_install_property(G_OBJECT_GET_CLASS(object_->gobj()), property_id, param_spec);
 
