@@ -1,3 +1,47 @@
+2013-04-25  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Implement derived interface properties in the present.
+
+	* glib/glibmm/class.cc (Class::properties_quark): Initialize this
+	GQuark which is used to store/get the data used for setting and
+	getting the properties of the interfaces that a custom type overrides.
+	(Class::interface_finalize_function): Add this function which
+	once invoked frees the property data stored as qata in the GType and
+	allocated/appended to in the Glib::Interface constructor below.
+	* glib/glibmm/class.h: Declare the interface_finalize_function above.
+	Also declare the quark used to store/get the property data and the
+	typedef data type of the property data.
+
+	* glib/glibmm/interface.cc (Interface_Class::add_interface): Specify a
+	custom interface finalize function when adding the interface so that
+	the resources allocated for handling the derived interface properties
+	can be freed if the type is a custom interface type.
+	(Interface::Interface(const Interface_Class&)): Modify the constructor
+	so that when dealing with a custom interface type, it gets a list of
+	the properties of the interface to be added and overrides these by
+	appending appropriate GValues to the data used to handle
+	getting/setting properties that is stored as qdata in the GType.  The
+	constructor uses g_param_spec_overrided() to override the properties
+	of the implemented interface and g_object_install_property() to
+	install the properties.
+
+	* glib/glibmm/property.cc (PropertyBase::install_property): Rewrite
+	this method so that the acquired generated id's of custom implemented
+	properties does not collide with the id's of properties of implemented
+	interfaces that have been overridden in a custom type.  This is done
+	by offsetting the acquired generated id (by addition) with the number
+	of already existing properties (the ones that have been overridden).
+	(custom_get_property_callback): Rewrite this function (which gets
+	properties for custom types) so that if the property id is less than
+	or equal to the number of overridden interface properties (which would
+	mean that an overridden interface property should be gotten) the
+	correct overridden interface property is gotten.  Otherwise, a custom
+	property should be retrieved, in which case the id is offset (by
+	subtraction) when the PropertyBase is retrieved from the id which
+	would ensure getting the correct PropertyBase.
+	(custom_set_property_callback): Rewrite this function as the above
+	custom_get_property_callback was rewritten.
+
 2013-04-14  José Alburquerque  <jaalburquerque@gmail.com>
 
 	ByteArray: get_data(): Add a const version.
