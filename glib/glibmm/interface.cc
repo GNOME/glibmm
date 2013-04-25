@@ -66,6 +66,8 @@ Interface::Interface(const Interface_Class& interface_class)
     {
       void* const g_iface = g_type_default_interface_ref(iface_type);
 
+      // Override the properties of the derived interface, if any.
+
       const GType custom_type = G_OBJECT_CLASS_TYPE(instance_class);
       Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(custom_type, Class::properties_quark));
 
