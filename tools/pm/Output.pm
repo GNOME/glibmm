@@ -1168,8 +1168,10 @@ sub convert_args_c_to_cpp($$$)
   # index to the C param name if the mappings exist.
   my %cpp_index_param_mappings;
 
-  @cpp_index_param_mappings{values $$objCppfunc{param_mappings}}
-    = keys $$objCppfunc{param_mappings};
+  # Fill the index to param names mappings from the c param names to index
+  # mappings variable above.
+  @cpp_index_param_mappings{values %{$$objCppfunc{param_mappings}}}
+    = keys %{$$objCppfunc{param_mappings}};
 
   my @result;
 
