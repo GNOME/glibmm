@@ -34,9 +34,10 @@ ifelse(`$11',,,`#ifdef $11'
 ifelse(`$9',,,`_DEPRECATE_IFDEF_START
 ')dnl
 dnl
-ifelse($2`'_NUM($3)`'$5`'_NUM($6),`void0void0',`dnl
+ifelse($2`'_NUM($3)`'$5`'_NUM($6)`'$8,`void0void00',`dnl
 dnl
-dnl Use predefined callback for SignalProxy0<void>, to reduce code size.
+dnl Use predefined callback for SignalProxy0<void>, to reduce code size,
+dnl if custom_c_callback is not specified.
 
 static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 {
