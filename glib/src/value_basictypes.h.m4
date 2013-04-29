@@ -80,4 +80,3 @@ GLIB_VALUE_BASIC(float, float)
 GLIB_VALUE_BASIC(double, double)
 GLIB_VALUE_BASIC(void*, pointer)
 } // namespace Glib
-

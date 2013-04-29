@@ -85,4 +85,3 @@ GLIB_VALUE_BASIC(float, float, -G_MAXFLOAT, G_MAXFLOAT)
 GLIB_VALUE_BASIC(double, double, -G_MAXDOUBLE, G_MAXDOUBLE)
 GLIB_VALUE_BASIC(void*, pointer)
 } // namespace Glib
-

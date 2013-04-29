@@ -142,4 +142,3 @@ GType custom_pointer_type_register(const char* type_name)
 
 
 } // namespace Glib
-
