@@ -1182,7 +1182,7 @@ sub convert_args_c_to_cpp($$$)
   $num_c_args-- if($$objCDefsFunc{throw_any_errors});
 
   my $num_cpp_args = scalar(@{$cpp_param_types});
- 
+
   # If the method has a slot temporarily increment the C++ arg count when
   # comparing the C++ and C argument count because the C function would
   # have a final 'gpointer data' parameter and the C++ method would not.
@@ -1245,11 +1245,11 @@ sub convert_args_c_to_cpp($$$)
       if ($$objCppfunc{slot_name} eq $cppParamName)
       {
         push(@result, "*slot");
-  
+
         # Get the slot type without the const and the '&' and store it so
         # it can be passed to the m4 macro.
         $cppParamType =~ /^const\s+(.*)&/;
-        
+
         # If the type does not contain
         # any '::' then assume that it is in the library standard namespace
         # by prepending '__NAMESPACE__::' to it which the m4 macros will
@@ -1259,11 +1259,11 @@ sub convert_args_c_to_cpp($$$)
           if (!($plainCppParamType =~ /::/));
 
         $$objCppfunc{slot_type} = $plainCppParamType;
-  
+
         # Store the name of the C data parameter so it can be passed
         # to the m4 macro so it can extract the slot.
         $$objCppfunc{c_data_param_name} = $$c_param_names[$num_c_args - 1];
-        
+
         next;
       }
     }
