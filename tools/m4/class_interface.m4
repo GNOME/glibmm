@@ -234,7 +234,7 @@ protected:
    * You should derive from this class to use it.
    */
   __CPPNAME__`'();
-  
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /** Called by constructors of derived classes. Provide the result of 
    * the Class init() function to ensure that it is properly 

@@ -234,11 +234,11 @@ sub parse_param($$)
 
       # Get the options.
       my $options = $1;
- 
+
       # Check if param should be optional or an output param.
       $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
       $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
- 
+
       # Check if it should be mapped to a C param.
       if ($options =~ /(\w+|\.)/)
       {

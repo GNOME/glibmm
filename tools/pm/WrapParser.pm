@@ -1517,7 +1517,7 @@ sub output_wrap_vfunc($$$$$$$$$$$$)
 
   $$objCppVfunc{rettype_needs_ref} = $refreturn;
   $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" suffix, and a separate easily-named invoker method.
-  
+
   # Store the slot information in the vfunc if specified.
   $$objCppVfunc{slot_name} = $slot_name if ($slot_name);
   $$objCppVfunc{slot_callback} = $slot_callback if ($slot_callback);
