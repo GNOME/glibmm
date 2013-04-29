@@ -288,5 +288,3 @@ void Value<T>::value_copy_func(const GValue* src_value, GValue* dest_value)
 } // namespace Glib
 
 #endif //_GLIBMM_VALUE_CUSTOM_H
-
-

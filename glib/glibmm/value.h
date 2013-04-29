@@ -327,4 +327,3 @@ public:
 
 
 #endif /* _GLIBMM_VALUE_H */
-

@@ -247,4 +247,3 @@ void Value<Glib::ustring>::set(const Glib::ustring& data)
 }
 
 } // namespace Glib
-
