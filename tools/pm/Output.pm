@@ -327,17 +327,17 @@ sub output_wrap_meth($$$$$$$)
 
   my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
-  my $cpp_param_mappings = $$objCppfunc{param_mappings};
+  my $c_param_name_mappings = $$objCppfunc{param_mappings};
 
   my $num_args_list = $objCppfunc->get_num_possible_args_list();
 
   my $output_var_name;
   my $output_var_type;
 
-  if(defined($$cpp_param_mappings{"OUT"}))
+  if(defined($$c_param_name_mappings{"OUT"}))
   {
-    $output_var_name = $$cpp_param_names[$$cpp_param_mappings{"OUT"}];
-    $output_var_type = $$cpp_param_types[$$cpp_param_mappings{"OUT"}];
+    $output_var_name = $$cpp_param_names[$$c_param_name_mappings{"OUT"}];
+    $output_var_type = $$cpp_param_types[$$c_param_name_mappings{"OUT"}];
   }
 
   for(my $arg_list = 0; $arg_list < $num_args_list; $arg_list++)
@@ -926,7 +926,7 @@ sub convert_args_cpp_to_c($$$$$)
   my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
   my $cpp_param_flags = $$objCppfunc{param_flags};
-  my $cpp_param_mappings = $$objCppfunc{param_mappings};
+  my $c_param_name_mappings = $$objCppfunc{param_mappings};
   my $c_param_types = $$objCDefsFunc{param_types};
   my $c_param_names = $$objCDefsFunc{param_names};
 
@@ -945,11 +945,11 @@ sub convert_args_cpp_to_c($$$$$)
   # See if there is an output parameter.  If so, temporarily decrement the
   # number of C++ arguments so that the possible GError addition works and
   # note the existence.
-  if(defined($$cpp_param_mappings{"OUT"}))
+  if(defined($$c_param_name_mappings{"OUT"}))
   {
     $num_cpp_args--;
     $has_output_param = 1;
-    $output_param_index = $$cpp_param_mappings{"OUT"};
+    $output_param_index = $$c_param_name_mappings{"OUT"};
   }
   else
   {
@@ -979,7 +979,7 @@ sub convert_args_cpp_to_c($$$$$)
     # is an output parameter since it will be readded.
     my $cpp_index = $num_cpp_args - 1;
     $cpp_index++ if($has_output_param);
-    $$cpp_param_mappings{@$c_param_names[$num_c_args_expected]} = $cpp_index;
+    $$c_param_name_mappings{@$c_param_names[$num_c_args_expected]} = $cpp_index;
   }
 
   # If the method has a slot temporarily decrement the C arg count when
@@ -1031,7 +1031,7 @@ sub convert_args_cpp_to_c($$$$$)
 
     my $c_param_name = @$c_param_names[$iCParam];
     my $cpp_param_index = $i;
-    $cpp_param_index = $$cpp_param_mappings{$c_param_name} if(defined($$cpp_param_mappings{$c_param_name}));
+    $cpp_param_index = $$c_param_name_mappings{$c_param_name} if(defined($$c_param_name_mappings{$c_param_name}));
 
     my $cppParamType = $$cpp_param_types[$cpp_param_index];
     $cppParamType =~ s/ &/&/g; #Remove space between type and &
@@ -1307,7 +1307,7 @@ sub get_ctor_properties($$$$$$)
   my $cpp_param_names = $$objCppfunc{param_names};
   my $cpp_param_types = $$objCppfunc{param_types};
   my $cpp_param_flags = $$objCppfunc{param_flags};
-  my $cpp_param_mappings = $$objCppfunc{param_mappings};
+  my $c_param_name_mappings = $$objCppfunc{param_mappings};
   my $c_param_types = $$objCDefsFunc{param_types};
   my $c_param_names = $$objCDefsFunc{param_names};
 
@@ -1338,7 +1338,7 @@ sub get_ctor_properties($$$$$$)
   {
     my $c_param_name = @$c_param_names[$i];
     my $cpp_param_index = $i;
-    $cpp_param_index = $$cpp_param_mappings{$c_param_name} if(defined($$cpp_param_mappings{$c_param_name}));
+    $cpp_param_index = $$c_param_name_mappings{$c_param_name} if(defined($$c_param_name_mappings{$c_param_name}));
 
     my $cppParamType = $$cpp_param_types[$cpp_param_index];
     $cppParamType =~ s/ &/&/g; #Remove space between type and &
