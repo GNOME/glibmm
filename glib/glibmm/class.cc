@@ -131,28 +131,6 @@ GType Class::clone_custom_type(const char* custom_type_name) const
   return custom_type;
 }
 
-// Initialize the static quark to store/get custom type properties.
-GQuark Class::properties_quark = g_quark_from_string("gtkmm_CustomObject_properties");
-
-// static
-void Class::interface_finalize_function(void* g_iface, void*)
-{
-  const GType gtype = G_TYPE_FROM_CLASS(g_iface);
-
-  // Free the data related to the properties for the custom type, if any.
-  properties_type* props = static_cast<properties_type*>(g_type_get_qdata(gtype, properties_quark));
-
-  if(props)
-  {
-    for(properties_type::size_type i = 0; i < props->size(); i++)
-    {
-      g_value_unset((*props)[i]);
-      g_free((*props)[i]);
-    }
-    delete props;
-  }
-}
-
 // static
 void Class::custom_class_init_function(void* g_class, void* class_data)
 {
@@ -171,3 +149,4 @@ void Class::custom_class_init_function(void* g_class, void* class_data)
 }
 
 } // namespace Glib
+

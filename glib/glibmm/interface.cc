@@ -19,7 +19,6 @@
  */
 
 #include <glibmm/interface.h>
-#include <glibmm/class.h>
 #include <glibmm/private/interface_p.h>
 
 
@@ -36,7 +35,7 @@ void Interface_Class::add_interface(GType instance_type) const
     const GInterfaceInfo interface_info =
     {
       class_init_func_,
-      &Class::interface_finalize_function, // interface_finalize
+      0, // interface_finalize
       0, // interface_data
     };
 
@@ -59,44 +58,11 @@ Interface::Interface(const Interface_Class& interface_class)
 
   if(custom_type_name_ && !is_anonymous_custom_())
   {
-    GObjectClass *const instance_class = G_OBJECT_GET_CLASS(gobject_);
-    const GType iface_type = interface_class.get_type();
+    void *const instance_class = G_OBJECT_GET_CLASS(gobject_);
 
-    if(!g_type_interface_peek(instance_class, iface_type))
+    if(!g_type_interface_peek(instance_class, interface_class.get_type()))
     {
-      void* const g_iface = g_type_default_interface_ref(iface_type);
-
-      // Override the properties of the derived interface, if any.
-
-      const GType custom_type = G_OBJECT_CLASS_TYPE(instance_class);
-      Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(custom_type, Class::properties_quark));
-
-      if(!props)
-      {
-        props = new Class::properties_type();
-        g_type_set_qdata(custom_type, Class::properties_quark, props);
-      }
-
-      const guint n_existing_props = props->size();
-
-      guint n_iface_props = 0;
-      GParamSpec** iface_props = g_object_interface_list_properties(g_iface, &n_iface_props);
-
-      for(guint p = 0; p < n_iface_props; p++)
-      {
-        GValue* g_value = g_new0(GValue, 1);
-        g_value_init(g_value, iface_props[p]->value_type);
-        props->push_back(g_value);
-
-        const gchar* prop_name = g_param_spec_get_name(iface_props[p]);
-        GParamSpec* new_spec = g_param_spec_override(prop_name, iface_props[p]);
-        g_object_class_install_property(instance_class, p + 1 + n_existing_props, new_spec);
-      }
-
-      interface_class.add_interface(custom_type);
-
-      g_type_default_interface_unref(g_iface);
-      g_free(iface_props);
+      interface_class.add_interface(G_OBJECT_CLASS_TYPE(instance_class));
     }
   }
 }
