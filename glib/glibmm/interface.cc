@@ -36,7 +36,7 @@ void Interface_Class::add_interface(GType instance_type) const
     const GInterfaceInfo interface_info =
     {
       class_init_func_,
-      &Class::interface_finalize_function, // interface_finalize
+      0, // interface_finalize
       0, // interface_data
     };
 
@@ -86,6 +86,7 @@ Interface::Interface(const Interface_Class& interface_class)
       {
         GValue* g_value = g_new0(GValue, 1);
         g_value_init(g_value, iface_props[p]->value_type);
+        g_param_value_set_default(iface_props[p], g_value);
         props->push_back(g_value);
 
         const gchar* prop_name = g_param_spec_get_name(iface_props[p]);

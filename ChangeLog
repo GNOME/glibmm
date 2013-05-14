@@ -1,3 +1,28 @@
+2013-05-14  José Alburquerque  <jaalburquerque@gmail.com>
+
+	Custom Interface Properties: Use base finalize function to free data.
+
+	* glib/glibmm/class.cc (Class::clone_custom_type): Specify a custom
+	base finalize function for the custom type which would free the
+	properties data that might exist due to properties of implemented
+	interfaces being overridden.  This is better than having an interface
+	finalize function because the custom type could implement several
+	interfaces which would mean that the interface finalize function would
+	execute more than once as opposed to just once for the base finalize
+	function.
+	* glib/glibmm/class.h (Class::interface_finalize_function): Replace
+	with Class::custom_class_base_finalize_function().
+
+	* glib/glibmm/interface.cc (Interface_Class::add_interface): Do not
+	specify a custom interface finalize function.
+
+	(Interface::Interface(const Interface_Class&): Also initialize the
+	property GValues using g_param_value_set_default() so that they are
+	initialized with the default values of the properties and not just the
+	default value of the GValue type.
+
+	Bug #697229.
+
 2013-05-07  José Alburquerque  <jaalburquerque@gmail.com>
 
 	UnixSocketAddress: Add the "path-as-array" property.

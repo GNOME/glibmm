@@ -67,10 +67,8 @@ protected:
    */
   void register_derived_type(GType base_type, GTypeModule* module);
 
-protected:
-  static void interface_finalize_function(void* g_iface, void* iface_data);
-
 private:
+  static void custom_class_base_finalize_function(void* g_class);
   static void custom_class_init_function(void* g_class, void* class_data);
 
 public:
