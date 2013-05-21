@@ -60,6 +60,11 @@ do
 done
 
 CFLAGS="$idirs `pkg-config --cflags $pkg`"
+if [ $? -ne 0 ]
+then
+  echo "pkg-config failed"
+  usage
+fi
 echo CFLAGS=$CFLAGS
 
 # Compile the specified files
