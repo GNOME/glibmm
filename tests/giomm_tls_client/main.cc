@@ -28,12 +28,27 @@ int main(int, char**)
 
   const Glib::ustring test_host = "www.google.com";
 
-  std::vector< Glib::RefPtr<Gio::InetAddress> > inet_addresses =
-    Gio::Resolver::get_default()->lookup_by_name(test_host);
+  std::vector< Glib::RefPtr<Gio::InetAddress> > inet_addresses;
 
+  try
+  {
+    inet_addresses =
+      Gio::Resolver::get_default()->lookup_by_name(test_host);
+  }
+  catch(const Gio::ResolverError& ex)
+  {
+    //This happens if it could not resolve the name,
+    //for instance if we are not connected to the internet.
+    //TODO: Change this test so it can do something useful and succeed even
+    //if the testing computer is not connected to the internet.
+    std::cerr << "Gio::Resolver::lookup_by_name() threw exception: " << ex.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  //Actually, it would throw an exception instead of reaching here with 0 addresses resolved.
   if(inet_addresses.size() == 0)
   {
-    std::cout << "Could not resolve test host '" << test_host << "'." <<
+    std::cerr << "Could not resolve test host '" << test_host << "'." <<
       std::endl;
     return EXIT_FAILURE;
   }
