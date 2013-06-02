@@ -524,6 +524,38 @@ public:
    */
   void remove_poll(PollFD& fd);
 
+  /** Invokes a function in such a way that this MainContext is owned during
+   * the invocation of @a slot.
+   *
+   * If the context is owned by the current thread, @a slot is called
+   * directly. Otherwise, if the context is the thread-default main context
+   * of the current thread and acquire() succeeds, then
+   * @a slot is called and release() is called afterwards.
+   *
+   * In any other case, an idle source is created to call @a slot and
+   * that source is attached to the context (presumably to be run in another
+   * thread).
+   *
+   * Note that, as with normal idle functions, @a slot should probably
+   * return <tt>false</tt>. If it returns <tt>true</tt>, it will be continuously
+   * run in a loop (and may prevent this call from returning).
+   *
+   * If an idle source is created to call @a slot, invoke() may return before
+   * @a slot is called.
+   *
+   * Because sigc::trackable is not thread-safe, if the slot represents a
+   * non-static method of a class deriving from sigc::trackable, and the slot is
+   * created by sigc::mem_fun(), invoke() should only be called from
+   * the thread where the context runs. You can use, say, boost::bind() or,
+   * in C++11, std::bind() or a C++11 lambda expression instead of sigc::mem_fun().
+   *
+   * @param slot A slot to call.
+   * @param priority The priority of the idle source, if one is created.
+   *
+   * @newin{2,38}
+   */
+  void invoke(const sigc::slot<bool>& slot, int priority = PRIORITY_DEFAULT);
+
   /** Timeout signal, attached to this MainContext.
    * @return A signal proxy; you want to use SignalTimeout::connect().
    */

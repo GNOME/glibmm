@@ -319,6 +319,28 @@ static void glibmm_signal_connect_once(const sigc::slot<void>& slot, int priorit
   g_source_unref(source); // GMainContext holds a reference
 }
 
+gboolean glibmm_main_context_invoke_callback(void* data)
+{
+  sigc::slot_base *const slot = reinterpret_cast<sigc::slot_base*>(data);
+
+  try
+  {
+    // Recreate the specific slot from the generic slot node.
+    return (*static_cast<sigc::slot<bool>*>(slot))();
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return 0;
+}
+
+void glibmm_main_context_invoke_destroy_notify_callback(void* data)
+{
+  sigc::slot_base *const slot = reinterpret_cast<sigc::slot_base*>(data);
+  delete slot;
+}
+
 } // anonymous namespace
 
 
@@ -653,6 +675,15 @@ void MainContext::add_poll(PollFD& fd, int priority)
 void MainContext::remove_poll(PollFD& fd)
 {
   g_main_context_remove_poll(gobj(), fd.gobj());
+}
+
+void MainContext::invoke(const sigc::slot<bool>& slot, int priority)
+{
+  // Make a copy of slot on the heap.
+  sigc::slot_base* const slot_copy = new sigc::slot<bool>(slot);
+
+  g_main_context_invoke_full(gobj(), priority, glibmm_main_context_invoke_callback,
+    slot_copy, glibmm_main_context_invoke_destroy_notify_callback);
 }
 
 SignalTimeout MainContext::signal_timeout()
