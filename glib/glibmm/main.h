@@ -435,7 +435,7 @@ public:
   void wakeup();
 
   /** Tries to become the owner of the specified context.
-   * If some other context is the owner of the context, returns FALSE immediately. Ownership is properly recursive:
+   * If some other thread is the owner of the context, returns <tt>false</tt> immediately. Ownership is properly recursive:
    * the owner can require ownership again and will release ownership when release() is called as many times as
    * acquire().
    * You must be the owner of a context before you can call prepare(), query(), check(), dispatch().
