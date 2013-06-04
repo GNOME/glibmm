@@ -42,29 +42,28 @@ bool mark_and_quit(const Glib::Threads::Thread* expected_thread,
   invoked_in_thread[thread_nr] =
     (Glib::Threads::Thread::self() == expected_thread) ?
     INVOKED_IN_RIGHT_THREAD : INVOKED_IN_WRONG_THREAD;
-  quit_loop(mainloop);
+  mainloop->get_context()->signal_idle().connect_once(
+    sigc::bind(sigc::ptr_fun(quit_loop), mainloop));
   return false;
 }
 
 void thread_function(const Glib::Threads::Thread* first_thread,
   const Glib::RefPtr<Glib::MainLoop>& first_mainloop)
 {
-  // Create a new MainContext.
-  Glib::RefPtr<Glib::MainContext> context = Glib::MainContext::create();
-  // Create a new MainLoop.
-  Glib::RefPtr<Glib::MainLoop> second_mainloop = Glib::MainLoop::create(context);
+  Glib::RefPtr<Glib::MainContext> second_context = Glib::MainContext::create();
+  Glib::RefPtr<Glib::MainLoop> second_mainloop = Glib::MainLoop::create(second_context);
 
   // Show how Glib::MainContext::invoke() can be used for calling a function,
   // possibly executed in another thread.
   Glib::MainContext::get_default()->invoke(sigc::bind(sigc::ptr_fun(mark_and_quit),
     first_thread, 0, first_mainloop));
-  context->invoke(sigc::bind(sigc::ptr_fun(mark_and_quit),
-    Glib::Threads::Thread::self(), 1, second_mainloop));
 
-  // Connect a one-shot timer that quits the main loop after a while,
-  // if mark_and_quit() is not called as expected.
-  context->signal_timeout().connect_seconds_once(
-    sigc::bind(sigc::ptr_fun(quit_loop), second_mainloop), 3);
+  // If this thread owns second_context, invoke() will call mark_and_quit() directly.
+  bool is_owner = second_context->acquire();
+  second_context->invoke(sigc::bind(sigc::ptr_fun(mark_and_quit),
+    Glib::Threads::Thread::self(), 1, second_mainloop));
+  if (is_owner)
+    second_context->release();
 
   // Start the second main loop.
   second_mainloop->run();
@@ -78,10 +77,11 @@ int main(int, char**)
 
   Glib::RefPtr<Glib::MainLoop> first_mainloop = Glib::MainLoop::create();
 
-  // Connect a one-shot timer that quits the main loop after a while,
-  // if mark_and_quit() is not called as expected.
-  Glib::signal_timeout().connect_seconds_once(
-    sigc::bind(sigc::ptr_fun(quit_loop), first_mainloop), 3);
+  // This thread shall be the owner of the default main context, when
+  // thread_function() calls mark_and_quit() via Glib::MainContext::invoke(),
+  // or else both calls to mark_and_quit() will execute in thread_function()'s
+  // thread. Glib::MainLoop::run() acquires ownership, but that may be too late.
+  bool is_owner = Glib::MainContext::get_default()->acquire();
 
   // Create a second thread.
   Glib::Threads::Thread* second_thread = Glib::Threads::Thread::create(
@@ -93,6 +93,9 @@ int main(int, char**)
 
   // Wait until the second thread has finished.
   second_thread->join();
+
+  if (is_owner)
+    Glib::MainContext::get_default()->release();
 
   if (invoked_in_thread[0] == INVOKED_IN_RIGHT_THREAD &&
       invoked_in_thread[1] == INVOKED_IN_RIGHT_THREAD)
