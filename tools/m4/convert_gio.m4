@@ -9,6 +9,7 @@ _CONV_ENUM(G,DataStreamByteOrder)
 _CONV_ENUM(G,DataStreamNewlineType)
 _CONV_ENUM(GDBus,CallFlags)
 _CONV_ENUM(GDBus,CapabilityFlags)
+_CONV_ENUM(GDBus, InterfaceSkeletonFlags)
 _CONV_ENUM(GDBus,MessageFlags)
 _CONV_ENUM(GDBus,MessageHeaderField)
 _CONV_ENUM(GDBus,MessageType)
@@ -122,6 +123,9 @@ _CONVERSION(`GDBusInterfaceInfo*',`const Glib::RefPtr<InterfaceInfo>',`Glib::wra
 _CONVERSION(`GDBusInterface*',`Glib::RefPtr<Gio::DBus::Interface>',`Glib::wrap($3)')
 _CONVERSION(`Glib::RefPtr<Gio::DBus::Interface>',`GDBusInterface*',`Glib::unwrap($3)')
 _CONVERSION(`const Glib::RefPtr<Gio::DBus::Interface>&',`GDBusInterface*',`Glib::unwrap($3)')
+
+# DBusMethodInvocation
+_CONVERSION(`const Glib::RefPtr<MethodInvocation>&',`GDBusMethodInvocation*',`Glib::unwrap($3)')
 
 # DBusObject
 _CONVERSION(`GDBusObject*',`Glib::RefPtr<Gio::DBus::Object>',`Glib::wrap($3)')
