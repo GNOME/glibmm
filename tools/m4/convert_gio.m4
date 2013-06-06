@@ -99,6 +99,7 @@ _CONVERSION(`GCredentials*',`Glib::RefPtr<const Credentials>',`Glib::wrap($3)')
 
 # DBusConnection
 _CONVERSION(`const Glib::RefPtr<Connection>&',`GDBusConnection*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const Connection>&',`GDBusConnection*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GDBusConnection*',`Glib::RefPtr<Connection>',Glib::wrap($3))
 _CONVERSION(`GDBusConnection*',`Glib::RefPtr<const Connection>',Glib::wrap($3))
 _CONVERSION(`GDBusConnection*',`Glib::RefPtr<DBus::Connection>',Glib::wrap($3))
