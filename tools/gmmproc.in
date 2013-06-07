@@ -27,7 +27,8 @@
 #
 # 'classes':
 # WrapParser: steps through .hg and .ccg files, outputting appropriate m4 code with Outputter.
-# Outputter: Used by WrapParser to ouput wrapper code. Ouputs *.g1 temp file and uses m4 to generate *.g2 from it. Then outputs .h and .cc files.
+# Outputter: Used by WrapParser to output wrapper code. Outputs *.g1 temp file
+#            and uses m4 to generate *.g2 from it. Then outputs .h and .cc files.
 # Function: Contains information about C and C++ functions and signals.
 #
 ######################################################################
@@ -36,6 +37,7 @@
 
 $main::procdir;
 $main::m4path;
+$main::glibmm_version;
 
 BEGIN {
   # get prefix info from configure
@@ -46,6 +48,7 @@ BEGIN {
   # This line must match the install directory
   $main::procdir = $libdir . '/@GLIBMM_MODULE_NAME@/proc';
   $main::m4path = "@M4@";
+  $main::glibmm_version = "@PACKAGE_VERSION@";
 
   push(@INC, $main::procdir . '/pm');
 }
@@ -89,7 +92,7 @@ $objWrapParser->read_file($main::srcdir, $main::source);
 $objWrapParser->parse_and_build_output();
 
 # Write out *.g1 temporary file:
-$objOutputter->output_temp_g1($$objWrapParser{module}); # e.g. "gtk"
+$objOutputter->output_temp_g1($$objWrapParser{module}, $main::glibmm_version); # e.g. gtkmm, 2.38.0
 
 # Execute m4 to get *.g2 file:
 {

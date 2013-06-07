@@ -817,19 +817,18 @@ sub add_m4_quotes($)
   $$text = "`" . $$text . "'";
 }
 
-# vpod output_temp_g1($filename, $section) e.g. output_temp_g1(button, gtk)
-sub output_temp_g1($$)
+# void output_temp_g1($module, $glibmm_version) e.g. output_temp_g1(gtkmm, 2.38.0)
+sub output_temp_g1($$$)
 {
-  my ($self, $section) = @_;
+  my ($self, $module, $glibmm_version) = @_;
 
   # Write out *.g1 temporary file
   open(FILE, '>', "$$self{tmpdir}/gtkmmproc_$$.g1");  # $$ is the Process ID
 
   print FILE "include(base.m4)dnl\n";
 
-  my $module = $section;
   my $module_canonical = Util::string_canonical($module); #In case there is a / character in the module.
-  print FILE "_START($$self{source},$module,$module_canonical)dnl\n";
+  print FILE "_START($$self{source},$module,$module_canonical,$glibmm_version)dnl\n";
   print FILE join("", @{$$self{out}});
   print FILE "_END()\n";
   close(FILE);
