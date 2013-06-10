@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Note that 
-# JHBUILD_SOURCES should be defined to contain the path to the root of the
-# jhbuild sources. The defs files will be placed in glib/src.
+# Note that JHBUILD_SOURCES should be defined to contain the path to the root
+# of the jhbuild sources. The script assumes it resides in the
+# tools/gen_scripts directory and the defs files will be placed in glib/src.
 
 if [ -z "$JHBUILD_SOURCES" ]; then
   echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
