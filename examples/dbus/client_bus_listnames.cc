@@ -60,8 +60,8 @@ void on_dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
 
     std::cout << "The names on the message bus are:" << std::endl;
 
-    for(unsigned i = 0; i < names.size(); i++)
-      std::cout << names[i] << "." << std::endl;
+    for(const auto& i : names)
+      std::cout << i << "." << std::endl;
   }
   catch(const Glib::Error& error)
   {
