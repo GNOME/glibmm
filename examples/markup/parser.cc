@@ -84,9 +84,9 @@ void DumpParser::on_start_element(Glib::Markup::ParseContext&,
   indent();
   std::cout << '<' << element_name;
 
-  for(AttributeMap::const_iterator p = attributes.begin(); p != attributes.end(); ++p)
+  for(const auto& p : attributes)
   {
-    std::cout << ' ' << p->first << "=\"" << p->second << '"';
+    std::cout << ' ' << p.first << "=\"" << p.second << '"';
   }
 
   std::cout << ">\n";
