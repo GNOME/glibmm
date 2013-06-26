@@ -24,7 +24,7 @@ int main(int, char**)
   Glib::init();
 
   /* Reusing one regex pattern: */
-  Glib::RefPtr<Glib::Regex> regex = Glib::Regex::create("(a)?(b)");
+  auto regex = Glib::Regex::create("(a)?(b)");
   std::cout << "Pattern=" << regex->get_pattern() 
      << ", with string=abcd, result=" 
      << std::boolalpha << regex->match("abcd")

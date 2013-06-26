@@ -152,7 +152,7 @@ Application::Application()
   {
     for (std::vector<ThreadProgress*>::size_type i = 0; i < progress_threads_.size(); ++i)
     {
-      ThreadProgress *const progress = new ThreadProgress(i + 1);
+      const auto progress = new ThreadProgress(i + 1);
       progress_threads_[i] = progress;
 
       progress->signal_finished().connect(

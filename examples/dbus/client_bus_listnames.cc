@@ -56,7 +56,7 @@ void on_dbus_proxy_available(Glib::RefPtr<Gio::AsyncResult>& result)
     result.get_child(names_variant);
 
     // Get the vector of strings.
-    std::vector<Glib::ustring> names = names_variant.get();
+    const auto names = names_variant.get();
 
     std::cout << "The names on the message bus are:" << std::endl;
 
@@ -81,7 +81,7 @@ int main(int, char**)
   loop = Glib::MainLoop::create();
 
   // Get the user session bus connection.
-  Glib::RefPtr<Gio::DBus::Connection> connection =
+  auto connection =
     Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
 
   // Check for an unavailable connection.

@@ -156,9 +156,10 @@ bool ThreadTimer::timeout_handler()
 void ThreadTimer::thread_function()
 {
   // create a new Main Context
-  Glib::RefPtr<Glib::MainContext> context = Glib::MainContext::create();
+  auto context = Glib::MainContext::create();
+
   // create a new Main Loop
-  Glib::RefPtr<Glib::MainLoop> mainloop = Glib::MainLoop::create(context, true);
+  auto mainloop = Glib::MainLoop::create(context, true);
 
   // attach a timeout handler, that is called every second, to the
   // newly created MainContext

@@ -222,7 +222,7 @@ int main(int argc, char** argv)
     
   //This one shows the results of multiple instance of the same option, such as --list=1 --list=a --list=b
   std::cout << "  list = ";
-  for(Glib::OptionGroup::vecustrings::const_iterator iter = group.m_arg_list.begin(); iter != group.m_arg_list.end(); ++iter)
+  for(auto iter = group.m_arg_list.begin(); iter != group.m_arg_list.end(); ++iter)
   {
     std::cout << *iter << ", ";
   }
@@ -230,7 +230,7 @@ int main(int argc, char** argv)
 
   //This one shows the remaining arguments on the command line, which had no name= form:
   std::cout << "  remaining = ";
-  for(Glib::OptionGroup::vecustrings::const_iterator iter = group.m_remaining_list.begin(); iter != group.m_remaining_list.end(); ++iter)
+  for(auto iter = group.m_remaining_list.begin(); iter != group.m_remaining_list.end(); ++iter)
   {
     std::cout << *iter << ", ";
   }

@@ -38,7 +38,7 @@ private:
 
 void ChildWatch::run()
 {
-  GPid pid = fork();
+  auto pid = fork();
   
   if(pid==0)
   {
@@ -59,7 +59,7 @@ void ChildWatch::on_child_exited(GPid pid, int status)
 
 int main()
 {
-  Glib::RefPtr<Glib::MainLoop> mainLoop = Glib::MainLoop::create();
+  auto mainLoop = Glib::MainLoop::create();
   
   ChildWatch cwatch(mainLoop);
   cwatch.run();

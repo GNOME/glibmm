@@ -30,7 +30,7 @@ static void on_key_changed(const Glib::ustring& key, const Glib::RefPtr<Gio::Set
   std::cout << Glib::ustring::compose("'%1' changed\n", key);
   if (key == STRING_KEY)
   {
-    Glib::ustring str = settings->get_string(key);
+    auto str = settings->get_string(key);
     std::cout << Glib::ustring::compose("New value of '%1': '%2'\n",
                       key, str);
                       
@@ -63,7 +63,7 @@ int main(int, char**)
   Glib::setenv("GSETTINGS_SCHEMA_DIR", ".", true);
   Glib::setenv("GSETTINGS_BACKEND", "memory", true);
 
-  const Glib::RefPtr<Gio::Settings> settings =
+  const auto settings =
     Gio::Settings::create("org.gtkmm.demo");
 
   settings->signal_changed().connect(sigc::bind(sigc::ptr_fun(&on_key_changed), settings));

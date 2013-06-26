@@ -42,7 +42,7 @@ int main(int, char**)
   // An exception will be thrown if the value is not in the file:
   try
   {
-    const Glib::ustring value = keyfile.get_value("somegroup", "somekey");
+    const auto value = keyfile.get_value("somegroup", "somekey");
     std::cout << "somekey value=" << value << std::endl;
   }
   catch(const Glib::KeyFileError& ex)
@@ -54,7 +54,7 @@ int main(int, char**)
   // An exception will be thrown if the value is not in the file:
   try
   {
-    const Glib::ustring value = keyfile.get_value("First Group", "Welcome");
+    const auto value = keyfile.get_value("First Group", "Welcome");
     std::cout << "Welcome value=" << value << std::endl;
   }
   catch(const Glib::KeyFileError& ex)
@@ -66,9 +66,9 @@ int main(int, char**)
   // An exception will be thrown if the value is not in the file:
   try
   {
-    const std::vector<int> values = keyfile.get_integer_list("Another Group", "Numbers");
+    const auto values = keyfile.get_integer_list("Another Group", "Numbers");
 
-    for(std::vector<int>::const_iterator p = values.begin(); p != values.end(); ++p)
+    for(auto p = values.begin(); p != values.end(); ++p)
       std::cout << "Number list value: item=" << *p << std::endl;
   }
   catch(const Glib::KeyFileError& ex)

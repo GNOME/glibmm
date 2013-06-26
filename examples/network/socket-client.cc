@@ -28,18 +28,14 @@ static GOptionEntry cmd_entries[] = {
 Glib::ustring
 socket_address_to_string (const Glib::RefPtr<Gio::SocketAddress>& address)
 {
-    Glib::RefPtr<Gio::InetAddress> inet_address;
-    Glib::ustring str, res;
-    int port;
-
-    Glib::RefPtr<Gio::InetSocketAddress> isockaddr =
+    auto isockaddr =
         Glib::RefPtr<Gio::InetSocketAddress>::cast_dynamic (address);
     if (!isockaddr)
         return Glib::ustring ();
-    inet_address = isockaddr->get_address ();
-    str = inet_address->to_string ();
-    port = isockaddr->get_port ();
-    res = Glib::ustring::compose ("%1:%2", str, port);
+    auto inet_address = isockaddr->get_address ();
+    auto str = inet_address->to_string ();
+    auto port = isockaddr->get_port ();
+    auto res = Glib::ustring::compose ("%1:%2", str, port);
     return res;
 }
 
@@ -57,14 +53,12 @@ ensure_condition (const Glib::RefPtr<Gio::Socket>& socket,
                   const Glib::RefPtr<Gio::Cancellable>& cancellable,
                   Glib::IOCondition condition)
 {
-    GSource *source;
-
     if (!non_blocking)
         return;
 
     if (use_source)
     {
-        source = g_socket_create_source (socket->gobj (),
+        auto source = g_socket_create_source (socket->gobj (),
                                          (GIOCondition) condition,
                                          cancellable->gobj ());
         g_source_set_callback (source,
@@ -103,14 +97,12 @@ main (int argc,
     Glib::RefPtr<Gio::SocketAddress> address;
     Gio::SocketType socket_type;
     GError *error = NULL;
-    GOptionContext *context;
     Glib::RefPtr<Gio::Cancellable> cancellable;
-    Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator;
     Glib::RefPtr<Gio::SocketConnectable> connectable;
 
     Gio::init ();
 
-    context = g_option_context_new (" <hostname>[:port] - Test GSocket client stuff");
+    auto context = g_option_context_new (" <hostname>[:port] - Test GSocket client stuff");
     g_option_context_add_main_entries (context, cmd_entries, NULL);
     if (!g_option_context_parse (context, &argc, &argv, &error))
     {
@@ -156,7 +148,7 @@ main (int argc,
         return 1;
     }
 
-    enumerator = connectable->enumerate ();
+    auto enumerator = connectable->enumerate ();
     while (true)
     {
         try {

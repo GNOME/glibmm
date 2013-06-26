@@ -62,14 +62,12 @@ ensure_condition (const Glib::RefPtr<Gio::Socket>& socket,
                   const Glib::RefPtr<Gio::Cancellable>& cancellable,
                   Glib::IOCondition condition)
 {
-    GSource *source;
-
     if (!non_blocking)
         return;
 
     if (use_source)
     {
-        source = g_socket_create_source (socket->gobj (),
+        const auto source = g_socket_create_source (socket->gobj (),
                                          (GIOCondition) condition,
                                          cancellable->gobj ());
         g_source_set_callback (source,
@@ -104,16 +102,14 @@ main (int argc,
       char *argv[])
 {
     Glib::RefPtr<Gio::Socket> socket, new_socket, recv_socket;
-    Glib::RefPtr<Gio::SocketAddress> src_address;
     Glib::RefPtr<Gio::SocketAddress> address;
     Gio::SocketType socket_type;
-    GError *error = NULL;
-    GOptionContext *context;
     Glib::RefPtr<Gio::Cancellable> cancellable;
+    GError *error = NULL;
 
     Gio::init ();
 
-    context = g_option_context_new (" - Test GSocket server stuff");
+    auto context = g_option_context_new (" - Test GSocket server stuff");
     g_option_context_add_main_entries (context, cmd_entries, NULL);
     if (!g_option_context_parse (context, &argc, &argv, &error))
     {
@@ -145,7 +141,7 @@ main (int argc,
     if (non_blocking)
         socket->set_blocking (false);
 
-    src_address = Gio::InetSocketAddress::create (Gio::InetAddress::create_any ((Gio::SocketFamily) G_SOCKET_FAMILY_IPV4), port);
+    auto src_address = Gio::InetSocketAddress::create (Gio::InetAddress::create_any ((Gio::SocketFamily) G_SOCKET_FAMILY_IPV4), port);
     try {
         socket->bind (src_address, !dont_reuse_address);
     } catch (const Gio::Error& error) {
@@ -181,7 +177,7 @@ main (int argc,
             new_socket->set_blocking (false);
 
         try {
-        address = new_socket->get_remote_address ();
+            address = new_socket->get_remote_address ();
         } catch (const Gio::Error& error)
         {
             std::cerr << Glib::ustring::compose ("Error getting remote address: %1\n",

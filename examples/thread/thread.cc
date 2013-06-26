@@ -70,7 +70,7 @@ void MessageQueue::consumer()
       while(queue_.empty())
         cond_push_.wait(mutex_);
 
-      const int i = queue_.front();
+      const auto i = queue_.front();
       queue_.pop();
       std::cout << "\x08 \x08";
       std::cout.flush();
@@ -97,10 +97,10 @@ int main(int, char**)
 
   MessageQueue queue;
 
-  Glib::Threads::Thread *const producer = Glib::Threads::Thread::create(
+  const auto producer = Glib::Threads::Thread::create(
       sigc::mem_fun(queue, &MessageQueue::producer));
 
-  Glib::Threads::Thread *const consumer = Glib::Threads::Thread::create(
+  const auto consumer = Glib::Threads::Thread::create(
       sigc::mem_fun(queue, &MessageQueue::consumer));
 
   producer->join();

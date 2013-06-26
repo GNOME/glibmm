@@ -35,7 +35,7 @@ namespace
 
 static Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
 
-static Glib::ustring introspection_xml =
+static auto introspection_xml =
   "<node>"
   "  <interface name='org.glibmm.DBus.Clock'>"
   "    <method name='GetTime'>"
@@ -67,12 +67,12 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connect
     Glib::TimeVal curr_time;
     curr_time.assign_current_time();
 
-    const Glib::ustring time_str = curr_time.as_iso8601();
-    const Glib::Variant<Glib::ustring> time_var =
+    const auto time_str = curr_time.as_iso8601();
+    const auto time_var =
       Glib::Variant<Glib::ustring>::create(time_str);
 
     // Create the tuple.
-    Glib::VariantContainerBase response =
+    auto response =
       Glib::VariantContainerBase::create_tuple(time_var);
 
     // Return the tuple with the included time.
@@ -89,7 +89,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connect
     parameters.get_child(param);
 
     // Get the time string.
-    const Glib::ustring time_str = param.get();
+    const auto time_str = param.get();
 
     if(!curr_alarm.assign_from_iso8601(time_str))
     {
@@ -114,7 +114,7 @@ const Gio::DBus::InterfaceVTable interface_vtable(sigc::ptr_fun(&on_method_call)
 
 bool on_server_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
 {
-  Glib::RefPtr<Gio::Credentials> credentials =
+  auto credentials =
     connection->get_peer_credentials();
 
   std::string credentials_str;
@@ -179,7 +179,7 @@ int main(int, char**)
 
   Glib::RefPtr<Gio::DBus::Server> server;
 
-  const Glib::ustring address = "unix:abstract=myadd";
+  const auto address = "unix:abstract=myadd";
   try
   {
     server = Gio::DBus::Server::create_sync(address,
@@ -200,7 +200,7 @@ int main(int, char**)
   server->signal_new_connection().connect(sigc::ptr_fun(&on_server_new_connection));
 
   //Keep the server running until the process is killed:
-  Glib::RefPtr<Glib::MainLoop> loop = Glib::MainLoop::create();
+  auto loop = Glib::MainLoop::create();
   loop->run();
 
   return EXIT_SUCCESS;

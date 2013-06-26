@@ -40,8 +40,10 @@ public:
     // the 'changed' signal, etc.
     Glib::PropertyProxy<Glib::ustring> property_firstname ()
     { return prop_firstname.get_proxy (); }
+    
     Glib::PropertyProxy<Glib::ustring> property_lastname ()
     { return prop_lastname.get_proxy (); }
+    
     Glib::PropertyProxy<int> property_age ()
     { return prop_age.get_proxy (); }
 

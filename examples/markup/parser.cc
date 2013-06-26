@@ -32,13 +32,13 @@ void file_get_contents(const std::string& filename, Glib::ustring& contents)
 
 Glib::ustring trim_whitespace(const Glib::ustring& text)
 {
-  Glib::ustring::const_iterator pbegin (text.begin());
-  Glib::ustring::const_iterator pend   (text.end());
+  auto pbegin (text.begin());
+  auto pend   (text.end());
 
   while(pbegin != pend && Glib::Unicode::isspace(*pbegin))
     ++pbegin;
 
-  Glib::ustring::const_iterator temp (pend);
+  auto temp (pend);
 
   while(pbegin != temp && Glib::Unicode::isspace(*--temp))
     pend = temp;
@@ -84,7 +84,7 @@ void DumpParser::on_start_element(Glib::Markup::ParseContext&,
   indent();
   std::cout << '<' << element_name;
 
-  for(AttributeMap::const_iterator p = attributes.begin(); p != attributes.end(); ++p)
+  for(auto p = attributes.begin(); p != attributes.end(); ++p)
   {
     std::cout << ' ' << p->first << "=\"" << p->second << '"';
   }
@@ -104,7 +104,7 @@ void DumpParser::on_end_element(Glib::Markup::ParseContext&, const Glib::ustring
 
 void DumpParser::on_text(Glib::Markup::ParseContext&, const Glib::ustring& text)
 {
-  const Glib::ustring trimmed_text = trim_whitespace(text);
+  const auto trimmed_text = trim_whitespace(text);
 
   if(!trimmed_text.empty())
   {
