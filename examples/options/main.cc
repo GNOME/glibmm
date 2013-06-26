@@ -222,17 +222,17 @@ int main(int argc, char** argv)
     
   //This one shows the results of multiple instance of the same option, such as --list=1 --list=a --list=b
   std::cout << "  list = ";
-  for(auto iter = group.m_arg_list.begin(); iter != group.m_arg_list.end(); ++iter)
+  for(const auto& i : group.m_arg_list)
   {
-    std::cout << *iter << ", ";
+    std::cout << i << ", ";
   }
   std::cout << std::endl;
 
   //This one shows the remaining arguments on the command line, which had no name= form:
   std::cout << "  remaining = ";
-  for(auto iter = group.m_remaining_list.begin(); iter != group.m_remaining_list.end(); ++iter)
+  for(const auto& i : group.m_remaining_list)
   {
-    std::cout << *iter << ", ";
+    std::cout << i << ", ";
   }
   std::cout << std::endl;
  
