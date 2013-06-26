@@ -95,10 +95,9 @@ print_resolved_addresses (const Glib::ustring& name,
 {
     G_LOCK (response);
     std::cout << Glib::ustring::compose ("Name:    %1\n", name);
-    for (std::list<Glib::RefPtr<Gio::InetAddress> >::const_iterator iter = addresses.begin ();
-         iter != addresses.end (); ++iter)
+    for (const auto& i : addresses)
     {
-        std::cout << Glib::ustring::compose ("Address: %1\n", (*iter)->to_string ());
+        std::cout << Glib::ustring::compose ("Address: %1\n", i->to_string ());
     }
     std::cout << std::endl;
 
@@ -112,15 +111,14 @@ print_resolved_service (const Glib::ustring& service,
 {
     G_LOCK (response);
     std::cout << Glib::ustring::compose ("Service: %1\n", service);
-    for (std::list<Gio::SrvTarget>::const_iterator iter = targets.begin ();
-         iter != targets.end (); ++iter)
+    for (const auto& i : targets)
     {
         std::cout <<
             Glib::ustring::compose ("%1:%2 (pri %3, weight %4)\n",
-                                    iter->get_hostname (),
-                                    iter->get_port (),
-                                    iter->get_priority (),
-                                    iter->get_weight ());
+                                    i.get_hostname (),
+                                    i.get_port (),
+                                    i.get_priority (),
+                                    i.get_weight ());
     }
     std::cout << std::endl;
 
