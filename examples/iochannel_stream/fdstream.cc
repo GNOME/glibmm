@@ -200,7 +200,7 @@ std::streamsize fdstreambuf::xsgetn(char* dest, std::streamsize num)
 
   // available would normally be 0, but could be up to 2 if there
   // have been putbacks or a peek and a putback
-  auto available = egptr() - gptr();
+  std::streamsize available = egptr() - gptr();
 
   // if num is less than or equal to the characters already in the
   // putback buffer, extract from buffer
