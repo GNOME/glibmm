@@ -80,7 +80,7 @@ public:
 
 ThreadProgress::ThreadProgress(int id)
 :
-  thread_   (0),
+  thread_   (nullptr),
   id_       (id),
   progress_ (0)
 {
@@ -91,7 +91,7 @@ ThreadProgress::ThreadProgress(int id)
 ThreadProgress::~ThreadProgress()
 {
   // It is an error if the thread is still running at this point.
-  g_return_if_fail(thread_ == 0);
+  g_return_if_fail(thread_ == nullptr);
 }
 
 int ThreadProgress::id() const
