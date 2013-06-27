@@ -40,7 +40,7 @@ void ChildWatch::run()
 {
   GPid pid = fork();
   
-  if(pid==0)
+  if(!pid)
   {
     sleep(5);
     exit(0);
