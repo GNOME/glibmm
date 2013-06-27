@@ -91,7 +91,7 @@ print_resolved_name (const Glib::ustring& phys,
 
 static void
 print_resolved_addresses (const Glib::ustring& name,
-                          const std::list<Glib::RefPtr<Gio::InetAddress> >& addresses)
+                          const std::list<Glib::RefPtr<Gio::InetAddress>>& addresses)
 {
     G_LOCK (response);
     std::cout << Glib::ustring::compose ("Name:    %1\n", name);
