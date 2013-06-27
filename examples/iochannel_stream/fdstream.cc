@@ -280,8 +280,8 @@ std::streamsize fdstreambuf::xsgetn(char* dest, std::streamsize num)
 }
 
 fdstream::fdstream(int fd, bool manage)
-: std::istream(0),
-  std::ostream(0),
+: std::istream(nullptr),
+  std::ostream(nullptr),
   buf(fd, manage)
 {
   std::istream::rdbuf(&buf);
@@ -289,8 +289,8 @@ fdstream::fdstream(int fd, bool manage)
 }
 
 fdstream::fdstream()
-: std::istream(0),
-  std::ostream(0)
+: std::istream(nullptr),
+  std::ostream(nullptr)
 {
   std::istream::rdbuf(&buf);
   std::ostream::rdbuf(&buf);

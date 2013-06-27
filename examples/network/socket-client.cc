@@ -13,15 +13,15 @@ int cancel_timeout = 0;
 
 static GOptionEntry cmd_entries[] = {
   {"cancel", 'c', 0, G_OPTION_ARG_INT, &cancel_timeout,
-   "Cancel any op after the specified amount of seconds", NULL},
+   "Cancel any op after the specified amount of seconds", nullptr},
   {"udp", 'u', 0, G_OPTION_ARG_NONE, &use_udp,
-   "Use udp instead of tcp", NULL},
+   "Use udp instead of tcp", nullptr},
   {"verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose,
-   "Be verbose", NULL},
+   "Be verbose", nullptr},
   {"non-blocking", 'n', 0, G_OPTION_ARG_NONE, &non_blocking,
-   "Enable non-blocking i/o", NULL},
+   "Enable non-blocking i/o", nullptr},
   {"use-source", 's', 0, G_OPTION_ARG_NONE, &use_source,
-   "Use GSource to wait for non-blocking i/o", NULL},
+   "Use GSource to wait for non-blocking i/o", nullptr},
   {0, 0, 0, G_OPTION_ARG_NONE, 0, 0, 0}
 };
 
@@ -63,8 +63,8 @@ ensure_condition (const Glib::RefPtr<Gio::Socket>& socket,
                                          cancellable->gobj ());
         g_source_set_callback (source,
                                (GSourceFunc) source_ready,
-                               NULL, NULL);
-        g_source_attach (source, NULL);
+                               nullptr, nullptr);
+        g_source_attach (source, nullptr);
         loop->run ();
     }
     else
@@ -96,14 +96,14 @@ main (int argc,
     Glib::RefPtr<Gio::SocketAddress> src_address;
     Glib::RefPtr<Gio::SocketAddress> address;
     Gio::SocketType socket_type;
-    GError *error = NULL;
+    GError *error = nullptr;
     Glib::RefPtr<Gio::Cancellable> cancellable;
     Glib::RefPtr<Gio::SocketConnectable> connectable;
 
     Gio::init ();
 
     auto context = g_option_context_new (" <hostname>[:port] - Test GSocket client stuff");
-    g_option_context_add_main_entries (context, cmd_entries, NULL);
+    g_option_context_add_main_entries (context, cmd_entries, nullptr);
     if (!g_option_context_parse (context, &argc, &argv, &error))
     {
         std::cerr << Glib::ustring::compose ("%1: %2\n", argv[0], error->message);

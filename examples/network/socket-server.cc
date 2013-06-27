@@ -14,19 +14,19 @@ int cancel_timeout = 0;
 
 static GOptionEntry cmd_entries[] = {
   {"port", 'p', 0, G_OPTION_ARG_INT, &port,
-   "Local port to bind to", NULL},
+   "Local port to bind to", nullptr},
   {"cancel", 'c', 0, G_OPTION_ARG_INT, &cancel_timeout,
-   "Cancel any op after the specified amount of seconds", NULL},
+   "Cancel any op after the specified amount of seconds", nullptr},
   {"udp", 'u', 0, G_OPTION_ARG_NONE, &use_udp,
-   "Use udp instead of tcp", NULL},
+   "Use udp instead of tcp", nullptr},
   {"verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose,
-   "Be verbose", NULL},
+   "Be verbose", nullptr},
   {"no-reuse", 0, 0, G_OPTION_ARG_NONE, &dont_reuse_address,
-   "Don't SOADDRREUSE", NULL},
+   "Don't SOADDRREUSE", nullptr},
   {"non-blocking", 'n', 0, G_OPTION_ARG_NONE, &non_blocking,
-   "Enable non-blocking i/o", NULL},
+   "Enable non-blocking i/o", nullptr},
   {"use-source", 's', 0, G_OPTION_ARG_NONE, &use_source,
-   "Use GSource to wait for non-blocking i/o", NULL},
+   "Use GSource to wait for non-blocking i/o", nullptr},
   {0, 0, 0, G_OPTION_ARG_NONE, 0, 0, 0}
 };
 
@@ -72,8 +72,8 @@ ensure_condition (const Glib::RefPtr<Gio::Socket>& socket,
                                          cancellable->gobj ());
         g_source_set_callback (source,
                                (GSourceFunc) source_ready,
-                               NULL, NULL);
-        g_source_attach (source, NULL);
+                               nullptr, nullptr);
+        g_source_attach (source, nullptr);
         loop->run ();
     }
     else
@@ -105,12 +105,12 @@ main (int argc,
     Glib::RefPtr<Gio::SocketAddress> address;
     Gio::SocketType socket_type;
     Glib::RefPtr<Gio::Cancellable> cancellable;
-    GError *error = NULL;
+    GError *error = nullptr;
 
     Gio::init ();
 
     auto context = g_option_context_new (" - Test GSocket server stuff");
-    g_option_context_add_main_entries (context, cmd_entries, NULL);
+    g_option_context_add_main_entries (context, cmd_entries, nullptr);
     if (!g_option_context_parse (context, &argc, &argv, &error))
     {
         std::cerr << Glib::ustring::compose ("%1: %1\n", argv[0], error->message);

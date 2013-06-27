@@ -30,7 +30,7 @@
  * GLIBMM_INITIALIZE_STRUCT(Var, Type) is provided.  It even avoids creating
  * a temporary if the compiler is GCC.
  */
-#if ((__GNUC__ >= 3) || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96)) && !defined(__STRICT_ANSI__)
+#if ((__GNUC__ >= 3) || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96))
 
 #define GLIBMM_INITIALIZE_STRUCT(Var, Type) __builtin_memset(&(Var), 0, sizeof(Type))
 
