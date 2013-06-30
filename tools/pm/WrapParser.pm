@@ -121,6 +121,7 @@ sub parse_and_build_output($)
     if ($token eq "_WRAP_CREATE") { $self->on_wrap_create(); next;}
 
     if ($token eq "_WRAP_ENUM")   { $self->on_wrap_enum(); next;}
+    if ($token eq "_WRAP_ENUM_DOCS_ONLY")   { $self->on_wrap_enum_docs_only(); next;}
     if ($token eq "_WRAP_GERROR") { $self->on_wrap_gerror(); next;}
     if ($token eq "_IMPLEMENTS_INTERFACE") { $self->on_implements_interface(); next;}
 
@@ -1331,6 +1332,32 @@ sub on_wrap_enum($)
 
   $outputter->output_wrap_enum(
       $$self{filename}, $$self{line_num}, $cpp_type, $c_type, $comment, @args);
+}
+
+sub on_wrap_enum_docs_only($)
+{
+  my ($self) = @_;
+
+  return unless ($self->check_for_eof());
+
+  my $outputter = $$self{objOutputter};
+  my $comment = $self->extract_preceding_documentation();
+
+  # get the arguments
+  my @args = string_split_commas($self->extract_bracketed_text());
+
+  my $cpp_type = string_trim(shift(@args));
+  my $c_type   = string_trim(shift(@args));
+
+  # Get the module name so the enum docs can be included in the module's
+  # Doxygen enum group.
+  my $module_canonical = Util::string_canonical($$self{module});
+
+  # The remaining elements in @args could be flags or s#^FOO_## substitutions.
+
+  $outputter->output_wrap_enum_docs_only(
+      $$self{filename}, $$self{line_num}, $module_canonical, $cpp_type, $c_type,
+      $comment, @args);
 }
 
 sub on_wrap_gerror($)

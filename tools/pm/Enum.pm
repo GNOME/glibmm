@@ -317,10 +317,6 @@ sub build_element_list($$$$)
     my $name  = $$elem_names[$i];
     my $value = $$elem_values[$i];
 
-    my $docs  =
-      DocsParser::lookup_enum_value_documentation("$$self{c_type}",
-        "$$self{c_prefix}$name");
-
     for(my $ii = 0; $ii < scalar(@subst_in); ++$ii)
     {
       $name  =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
@@ -330,19 +326,7 @@ sub build_element_list($$$$)
     # Skip this element, if its name has been deleted.
     next if($name eq "");
 
-    if($docs ne "")
-    {
-      # Make sure the docs is indented the right number of spaces.
-      # (First remove initial spaces in first line and then the rest
-      # and then indent the lines).
-      $docs =~ s/^\s+//;
-      $docs =~ s/\n\s+/\n/g;
-      $docs =~ s/\n(\s*\*)/\n${indent} $1/g;
-      $docs = "${indent}${docs}";
-    }
-
     $elements .= ",\n" if($elements ne "");
-    $elements .= $docs;
     $elements .= "${indent}${name}";
     $elements .= " = ${value}" if($value ne "");
   }

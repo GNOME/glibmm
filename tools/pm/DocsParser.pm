@@ -233,76 +233,82 @@ sub parse_on_cdata($$)
   }
 }
 
-
-# $text lookup_enum_description($enum_name)
-# Looks up the description of enum and returns it after converting it from
-# C to C++ format.
-sub lookup_enum_description($)
+sub lookup_enum_documentation($$$)
 {
-  my ($enum_name) = @_;
+  my ($c_enum_name, $cpp_enum_name, $ref_flags) = @_;
+  
+  my @subst_in  = [];
+  my @subst_out = [];
+ 
+ # Get the substitutions.
+  foreach(@$ref_flags)
+  {
+    if(/^\s*s#([^#]+)#([^#]*)#\s*$/)
+    {
+      push(@subst_in,  $1);
+      push(@subst_out, $2);
+    }
+  }
 
-  my $objFunction = $DocsParser::hasharrayFunctions{$enum_name};
+  my $objFunction = $DocsParser::hasharrayFunctions{$c_enum_name};
   if(!$objFunction)
   {
     #print "DocsParser.pm: Warning: enum not found: $enum_name\n";
     return ""
   }
 
-  my $text = $$objFunction{description};
+  my $docs = "";
 
-  if(length($text) eq 0)
+  my @param_names = @{$$objFunction{param_names}};
+  my $param_descriptions = \$$objFunction{param_descriptions};
+
+  # Append the param docs first so that the enum description can come last and
+  # the possible flag docs that the m4 _ENUM() macro appends goes in the right
+  # place.
+  foreach my $param (@param_names)
   {
-    print "DocsParser.pm: Warning: No C docs for: \"$enum_name\"\n";
-    return "";
+    my $desc = $$param_descriptions->{$param};
+
+    # Remove the initial prefix which would be something like GTK_.
+    $param =~ s/\b[A-Z]+_//g;
+    $desc =~ s/\b[A-Z]+_//g;
+
+    # Now apply custom substitutions.
+    for(my $i = 0; $i < scalar(@subst_in); ++$i)
+    {
+      $param  =~ s/${subst_in[$i]}/${subst_out[$i]}/;
+      $desc =~ s/${subst_in[$i]}/${subst_out[$i]}/;
+    }
+
+    # Skip this element, if its name has been deleted.
+    next if($param eq "");
+
+    $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
+    if(length($desc) > 0)
+    {
+      $desc =~ s/\n//g;
+      $desc  .= '.' unless($desc =~ /(?:^|\.)$/);
+      $docs .= "\@var $cpp_enum_name ${param}\n\u${desc}\n\n";
+    }
   }
 
-  DocsParser::convert_docs_to_cpp($objFunction, \$text);
-  DocsParser::add_m4_quotes(\$text);
+  # Append the enum description docs.
+  $docs .= "\@enum $cpp_enum_name\n"; 
+  $docs .= $$objFunction{description};
+
+  DocsParser::convert_docs_to_cpp($objFunction, \$docs);
+  DocsParser::add_m4_quotes(\$docs);
 
   # Escape the space after "i.e." or "e.g." in the brief description.
-  $text =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
-
-  remove_example_code($enum_name, \$text);
-
-  return $text;
-}
-
-# $strCommentBlock lookup_enum_value_documentation($enum_name, $c_val_name)
-# Returns a Doxygen comment block for the enum value.
-sub lookup_enum_value_documentation($$)
-{
-  my ($enum_name, $c_val_name) = @_;
-
-  # Assume that there is no description.
-  my $desc = "";
-
-  my $obj_function = $DocsParser::hasharrayFunctions{$enum_name};
-
-  if($obj_function)
-  {
-    my $param_descriptions = \$$obj_function{param_descriptions};
-    $desc = $$param_descriptions->{$c_val_name};
-  }
-
-  if(!$desc or length($desc) eq 0)
-  {
-    return "";
-  }
-
-  DocsParser::convert_docs_to_cpp($obj_function, \$desc);
-  DocsParser::add_m4_quotes(\$desc);
-
-  # Escape the space after "i.e." or "e.g." in the brief description.
-  $desc =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
-
-  remove_example_code($enum_name, \$desc);
+  $docs =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
+  
+  remove_example_code($c_enum_name, \$docs);
 
   # Convert to Doxygen-style comment.
-  $desc =~ s/\n/\n${DocsParser::commentMiddleStart}/g;
-  $desc =  $DocsParser::commentStart . $desc;
-  $desc .= "\n${DocsParser::commentEnd}\n";
+  $docs =~ s/\n/\n \* /g;
+  $docs =  "\/\*\* " . $docs;
 
-  return $desc;
+  return $docs;
 }
 
 # $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs, $objCppfunc)
@@ -483,7 +489,8 @@ sub convert_tags_to_doxygen($)
 
     # Don't convert Doxygen's $throw, @throws and @param, so these can be used
     # in the docs_override.xml.
-    s" \@a (throws?|param)\b" \@$1"g;
+    # Also don't convert @enum and @var which are used for enum documentation.
+    s" \@a (throws?|param|enum|var)\b" \@$1"g;
 
     s"^Note ?\d?: "\@note "mg;
     s"</?programlisting>""g;

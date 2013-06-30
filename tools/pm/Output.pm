@@ -73,7 +73,7 @@ sub output_wrap_failed($$$)
   my ($self, $cname, $error) = @_;
 
   my $str = sprintf("//gtkmmproc error: %s : %s", $cname, $error);
-  print STDERR "Output.pm: $cname : $error\n";
+  print STDERR "Output.pm: $main::source: $cname : $error\n";
   $self->append($str);
 }
 
@@ -652,17 +652,19 @@ sub output_wrap_enum($$$$$$$)
   my $value_suffix = "Enum";
   $value_suffix = "Flags" if($$objEnum{flags});
 
-  # Get the existing enum description from the parsed docs.
-  my $description = DocsParser::lookup_enum_description("$c_type");
+  # Get the enum documentation from the parsed docs.
+  my $enum_docs =
+    DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", \@flags);
 
-  # Prepend the Doxygen marker ' * ' to all but the first line.
-  $description =~ s/\n/\n * /g;
-
+  # Remove initial Doxygen comment block start ('/**') from the enum docs
+  # to merge the passed in Doxygen comment block.
+  $enum_docs =~ s/\/\*\*\s+//g;
+  
   # Make sure indentation of passed in comment is correct.
   $comment =~ s/\n\s*\*/\n */g;
 
   # Merge the passed in comment to the existing enum documentation.
-  $comment = $comment . "\n * " . $description;
+  $comment = $comment . "\n * " . $enum_docs;
 
   my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\')dnl\n",
     $cpp_type,
@@ -674,6 +676,37 @@ sub output_wrap_enum($$$$$$$)
   );
 
   $self->append($str);
+}
+
+sub output_wrap_enum_docs_only($$$$$$$)
+{
+  my ($self, $filename, $line_num, $module_canonical, $cpp_type, $c_type,
+      $comment, @flags) = @_;
+ 
+  # Get the existing enum description from the parsed docs.
+  my $enum_docs =
+    DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", \@flags);
+
+  if($enum_docs eq "")
+  {
+    $self->output_wrap_failed($c_type, "failed to find documentation.");
+    return;
+  }
+
+  # Include the enum docs in the module's enum docs group.
+  $enum_docs .= "\n * \@ingroup ${module_canonical}Enums\n";
+
+  # Remove initial Doxygen comment block start ('/**') from the enum docs
+  # to merge the passed in Doxygen comment block.
+  $enum_docs =~ s/\/\*\*\s+//g;
+  
+  # Merge the passed in comment to the existing enum documentation.
+  $comment = "\/\*\* " . $comment . "\n * " . $enum_docs . "\n */\n";
+
+  # Make sure indentation of passed in comment is correct.
+  $comment =~ s/\n\s*\*/\n */g;
+
+  $self->append($comment);
 }
 
 # void output_wrap_gerror($filename, $line_num, $cpp_type, $c_enum, $domain, @flags)
