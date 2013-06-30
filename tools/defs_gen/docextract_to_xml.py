@@ -39,6 +39,7 @@ def escape_text(unescaped_text):
     escaped_text = string.replace(escaped_text, '&nbsp;', '&#160;')
     escaped_text = string.replace(escaped_text, '&solidus;', '&#47;')
     escaped_text = string.replace(escaped_text, '&pi;', '&#8719;')
+    escaped_text = string.replace(escaped_text, '&rArr;', '&#8658;')
     # This represents a '/' before or after an '*' so replace with slash but
     # with spaces.
     escaped_text = string.replace(escaped_text, '&sol;', ' / ')
