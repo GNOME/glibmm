@@ -56,3 +56,6 @@ dist_noinst_DATA = $(text_files) $(msvc_files)
 dist_noinst_SCRIPTS = autogen.sh
 
 DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files))
+
+# Auto-generate the ChangeLog file from the git log on make dist
+include $(top_srcdir)/build/dist-changelog.am
