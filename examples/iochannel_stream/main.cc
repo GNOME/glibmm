@@ -81,7 +81,7 @@ int main( /* int argc, char *argv[] */)
     }
   }
  
-  int read_fd = open("testfifo", O_RDONLY);
+  const auto read_fd = open("testfifo", O_RDONLY);
   if(read_fd == -1)
   {
     std::cerr << "error opening fifo" << std::endl;
