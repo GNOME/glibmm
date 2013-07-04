@@ -166,7 +166,7 @@ int main(int, char**)
   std::locale::global(std::locale(""));
   Gio::init();
 
- try
+  try
   {
     introspection_data = Gio::DBus::NodeInfo::create_for_xml(introspection_xml);
   }

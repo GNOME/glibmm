@@ -15,7 +15,7 @@ void print_char(char c)
 {
   Glib::Rand rand;
 
-  for(int i = 0; i < 100; ++i)
+  for(auto i = 0; i < 100; ++i)
   {
     {
       Glib::Threads::Mutex::Lock lock (mutex);
@@ -33,7 +33,7 @@ int main(int, char**)
 {
   Glib::ThreadPool pool (10);
 
-  for(char c = 'a'; c <= 'z'; ++c)
+  for(auto c = 'a'; c <= 'z'; ++c)
   {
     pool.push(sigc::bind<1>(sigc::ptr_fun(&print_char), c));
   }

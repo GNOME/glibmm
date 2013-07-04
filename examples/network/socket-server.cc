@@ -68,19 +68,16 @@ public:
 Glib::ustring
 socket_address_to_string (const Glib::RefPtr<Gio::SocketAddress>& address)
 {
-    Glib::RefPtr<Gio::InetAddress> inet_address;
-    Glib::ustring str, res;
-    int port;
+  auto isockaddr =
+      Glib::RefPtr<Gio::InetSocketAddress>::cast_dynamic (address);
+  if (!isockaddr)
+      return Glib::ustring ();
 
-    Glib::RefPtr<Gio::InetSocketAddress> isockaddr =
-        Glib::RefPtr<Gio::InetSocketAddress>::cast_dynamic (address);
-    if (!isockaddr)
-        return Glib::ustring ();
-    inet_address = isockaddr->get_address ();
-    str = inet_address->to_string ();
-    port = isockaddr->get_port ();
-    res = Glib::ustring::compose ("%1:%2", str, port);
-    return res;
+  auto inet_address = isockaddr->get_address ();
+  auto str = inet_address->to_string ();
+  auto port = isockaddr->get_port ();
+  auto res = Glib::ustring::compose ("%1:%2", str, port);
+  return res;
 }
 
 static bool
@@ -132,10 +129,7 @@ main (int argc,
       char *argv[])
 {
     Glib::RefPtr<Gio::Socket> socket, new_socket, recv_socket;
-    Glib::RefPtr<Gio::SocketAddress> src_address;
     Glib::RefPtr<Gio::SocketAddress> address;
-    Gio::SocketType socket_type;
-    Gio::SocketFamily socket_family;
     Glib::RefPtr<Gio::Cancellable> cancellable;
 
     Gio::init ();
@@ -161,8 +155,8 @@ main (int argc,
 
     loop = Glib::MainLoop::create ();
 
-    socket_type = use_udp ? Gio::SOCKET_TYPE_DATAGRAM : Gio::SOCKET_TYPE_STREAM;
-    socket_family = use_ipv6 ? Gio::SOCKET_FAMILY_IPV6 : Gio::SOCKET_FAMILY_IPV4;
+    auto socket_type = use_udp ? Gio::SOCKET_TYPE_DATAGRAM : Gio::SOCKET_TYPE_STREAM;
+    auto socket_family = use_ipv6 ? Gio::SOCKET_FAMILY_IPV6 : Gio::SOCKET_FAMILY_IPV4;
 
     try {
         socket = Gio::Socket::create (socket_family, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
@@ -175,7 +169,7 @@ main (int argc,
     if (non_blocking)
         socket->set_blocking (false);
 
-    src_address = Gio::InetSocketAddress::create (Gio::InetAddress::create_any (socket_family), port);
+    auto src_address = Gio::InetSocketAddress::create (Gio::InetAddress::create_any (socket_family), port);
     try {
         socket->bind (src_address, !dont_reuse_address);
     } catch (const Gio::Error& error) {
@@ -234,7 +228,6 @@ main (int argc,
     {
         gchar buffer[4096] = { };
         gssize size;
-        gsize to_send;
 
         ensure_condition (recv_socket, "receive", cancellable, Glib::IO_IN);
         try {
@@ -266,7 +259,7 @@ main (int argc,
                      "-------------------------\n",
                      (int)size, buffer);
 
-        to_send = size;
+        auto to_send = size;
 
         while (to_send > 0)
         {
