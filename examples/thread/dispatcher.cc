@@ -134,7 +134,7 @@ void ThreadProgress::thread_function()
 {
   Glib::Rand rand;
 
-  for (int i = 0; i < ITERATIONS; ++i)
+  for (auto i = 0; i < ITERATIONS; ++i)
   {
     Glib::usleep(rand.get_int_range(2000, 20000));
 
