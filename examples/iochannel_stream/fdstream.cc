@@ -265,7 +265,8 @@ std::streamsize fdstreambuf::xsgetn(char* dest, std::streamsize num)
 	  *putback_buffer = *(gptr() - 1);
 	  putback_count = 2;
 	}
-	else putback_count = 1;
+	else
+          putback_count = 1;
       }
 
       *(putback_buffer + 1) = *(dest + (chars_read - 1));

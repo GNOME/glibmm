@@ -26,7 +26,7 @@ namespace
 
 void file_get_contents(const std::string& filename, Glib::ustring& contents)
 {
-  const Glib::RefPtr<Glib::IOChannel> channel = Glib::IOChannel::create_from_file(filename, "r");
+  const auto channel = Glib::IOChannel::create_from_file(filename, "r");
   channel->read_to_end(contents);
 }
 

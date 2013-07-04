@@ -36,7 +36,7 @@ void MessageQueue::producer()
 {
   Glib::Rand rand (1234);
 
-  for(int i = 0; i < 200; ++i)
+  for(auto i = 0; i < 200; ++i)
   {
     {
       Glib::Threads::Mutex::Lock lock (mutex_);
