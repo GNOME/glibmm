@@ -21,6 +21,7 @@
 #include <glibmm/exceptionhandler.h>
 //#include <glibmm/containers.h>
 #include <glib.h> // g_malloc
+#include <cstring> // std::memset()
 
 namespace Glib
 {
@@ -308,7 +309,7 @@ void OptionGroup::add_entry(const OptionEntry& entry)
   //Create a temporary array, just so we can give the correct thing to g_option_group_add_entries:
   GOptionEntry array[2];
   array[0] = *(entry.gobj()); //Copy contents.
-  GLIBMM_INITIALIZE_STRUCT(array[1], GOptionEntry);
+  std::memset(&array[1], 0, sizeof(GOptionEntry));
 
   g_option_group_add_entries(gobj(), array);
 }

@@ -22,7 +22,7 @@
 #include <glibmm/objectbase.h>
 #include <glibmm/utility.h>
 #include <glibmm/wrap.h>
-
+#include <cstring> // std::memset()
 
 namespace Glib
 {
@@ -31,7 +31,7 @@ namespace Glib
 
 ValueBase::ValueBase()
 {
-  GLIBMM_INITIALIZE_STRUCT(gobject_, GValue);
+  std::memset(&gobject_, 0, sizeof(GValue));
 }
 
 void ValueBase::init(GType type)
@@ -49,7 +49,7 @@ void ValueBase::init(const GValue* value)
 
 ValueBase::ValueBase(const ValueBase& other)
 {
-  GLIBMM_INITIALIZE_STRUCT(gobject_, GValue);
+  std::memset(&gobject_, 0, sizeof(GValue));
 
   g_value_init(&gobject_, G_VALUE_TYPE(&other.gobject_));
   g_value_copy(&other.gobject_, &gobject_);

@@ -70,6 +70,8 @@ class Value<__NAMESPACE__::__CPPNAME__> : public Glib::Value_Boxed<__NAMESPACE__
 
 } // namespace Glib
 
+_SECTION(SECTION_CC_INCLUDES)
+#include <cstring> // std::memset`'()
 _SECTION(SECTION_SRC_GENERATED)
 
 ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
@@ -109,7 +111,7 @@ GType __CPPNAME__::get_type()
 ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',,`dnl else
 __CPPNAME__::__CPPNAME__`'()
 {
-  GLIBMM_INITIALIZE_STRUCT`'(gobject_, __CNAME__);
+  std::memset`'(&gobject_, 0, sizeof(__CNAME__));
 }
 ')dnl
 
@@ -119,7 +121,7 @@ __CPPNAME__::__CPPNAME__`'(const __CNAME__* gobject)
   if(gobject)
     gobject_ = *gobject;
   else
-    GLIBMM_INITIALIZE_STRUCT`'(gobject_, __CNAME__);
+    std::memset`'(&gobject_, 0, sizeof(__CNAME__));
 }
 ')dnl
 
