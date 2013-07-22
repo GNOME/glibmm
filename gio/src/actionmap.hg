@@ -18,6 +18,7 @@
  */
 
 #include <glibmm/interface.h>
+#include <giomm/simpleaction.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
@@ -54,7 +55,24 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Action> lookup_action(const Glib::ustring& action_name), g_action_map_lookup_action)
   _WRAP_METHOD(Glib::RefPtr<const Action> lookup_action(const Glib::ustring& action_name) const, g_action_map_lookup_action, constversion)
 
-  //TODO: _WRAP_METHOD(void add_action_entries(const GActionEntry* entries, int n_entries, gpointer user_data), g_action_map_add_action_entries)
+  /** A Slot to be called when an action has been activated.
+   * See add_action().
+   *
+   * For instance,
+   * void on_slot_activated(const Glib::VariantBase& parameter);
+   */
+  typedef sigc::slot< void,const Glib::VariantBase& > ActivateSlot;
+
+  //This is our equivalent for g_action_map_add_action_entries().
+  /** A convenience method for creating a SimpleAction instance
+   * and adding it to the ActionMap.
+   *
+   * @param name The name of the Action.
+   * @param slot The callback method to be called when the action is activated.
+   * @return The Action.
+   */
+  Glib::RefPtr<SimpleAction> add_action(const Glib::ustring& name, const ActivateSlot& slot);
+  _IGNORE(g_action_map_add_action_entries)
 
   _WRAP_METHOD(void add_action(const Glib::RefPtr<Action>& action), g_action_map_add_action)
   _WRAP_METHOD(void remove_action(const Glib::ustring& action_name), g_action_map_remove_action)

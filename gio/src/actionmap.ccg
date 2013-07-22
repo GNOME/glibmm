@@ -18,8 +18,16 @@
  */
 
 #include <giomm/action.h>
+#include <giomm/simpleaction.h>
 
 namespace Gio
 {
+
+Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name, const ActivateSlot& slot)
+{
+  Glib::RefPtr<SimpleAction> action = SimpleAction::create(name);
+  action->signal_activate().connect(slot);
+  return action;
+}
 
 } // namespace Gio
