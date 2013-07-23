@@ -167,6 +167,10 @@ public:
 
 ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
 ',`dnl else
+  /** Constructs an invalid object.
+   * E.g. for output arguments to methods. There is not much you can do with
+   * the object before it has been assigned a valid value.
+   */
   __CPPNAME__`'();
 ')dnl
 
