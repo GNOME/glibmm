@@ -121,7 +121,7 @@ struct TypeTraits
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS /* hide the specializations */
 
-//For some (proably, more spec-compliant) compilers, these specializations must
+//For some (probably, more spec-compliant) compilers, these specializations must
 //be next to the objects that they use.
 #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
@@ -208,7 +208,7 @@ struct TypeTraits< Glib::RefPtr<T> >
     //because we can not use a specific Glib::wrap(CType) overload here,
     //because that would be "dependent", and g++ 3.4 does not allow that.
     //The specific Glib::wrap() overloads don't do anything special anyway.
-    GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
+    GObject* cobj = (GObject*)(ptr);
     return Glib::RefPtr<T>( dynamic_cast<T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
     //We use dynamic_cast<> in case of multiple inheritance.
   }
@@ -244,7 +244,7 @@ struct TypeTraits< Glib::RefPtr<const T> >
     //because we can not use a specific Glib::wrap(CType) overload here,
     //because that would be "dependent", and g++ 3.4 does not allow that.
     //The specific Glib::wrap() overloads don't do anything special anyway.
-    GObject* cobj = (GObject*)(ptr);
+    GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
     return Glib::RefPtr<const T>( dynamic_cast<const T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
     //We use dynamic_cast<> in case of multiple inheritance.
   }
