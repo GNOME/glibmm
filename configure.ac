@@ -115,7 +115,7 @@ GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING
 MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
                        [-Wall],
                        [-pedantic -Wall -Wextra -Wformat-security -Wno-long-long],
-                       [G])
+                       [G SIGCXX])
 
 # Offer the ability to omit some API from the library,
 # to reduce the code size:
