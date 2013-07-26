@@ -27,4 +27,14 @@ SimpleAction::SimpleAction(const Glib::ustring& name)
   _CONSTRUCT("name", name.c_str())
 {}
 
+SimpleAction::SimpleAction(const Glib::ustring& name, const Glib::VariantBase& state)
+:
+  _CONSTRUCT("name", name.c_str(), "state", const_cast<GVariant*>((state).gobj()))
+{}
+
+Glib::RefPtr<SimpleAction> SimpleAction::create_bool(const Glib::ustring&name, bool state)
+{
+  return create(name, Glib::Variant<bool>::create(state));
+}
+
 } // namespace Gio

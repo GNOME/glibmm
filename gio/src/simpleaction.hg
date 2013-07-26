@@ -45,7 +45,11 @@ class SimpleAction : public Glib::Object, public Action
   _STRUCT_NOT_HIDDEN
 
 protected:
+  //TODO: Docs
   explicit SimpleAction(const Glib::ustring& name);
+
+  //TODO: Docs
+  SimpleAction(const Glib::ustring& name, const Glib::VariantBase& state);
 
 #m4 _CONVERSION(`const Glib::VariantType&',`const GVariantType*',`$3.gobj()')
   _WRAP_CTOR(SimpleAction(const Glib::ustring& name, const Glib::VariantType& parameter_type), g_simple_action_new)
@@ -61,6 +65,32 @@ public:
 
   _WRAP_METHOD_DOCS_ONLY(g_simple_action_new_stateful)
   _WRAP_CREATE(const Glib::ustring& name, const Glib::VariantType& parameter_type, const Glib::VariantBase& state)
+
+  /** Creates a new stateful action.
+   * 
+   * @a state is the initial state of the action.  All future state values
+   * must have the same VariantType as the initial state.
+   * 
+   * @newin{2,38}
+   * @param name The name of the action.
+   * @param state The initial state of the action.
+   * @return A new SimpleAction.
+   */
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::VariantBase& state)
+
+  //TODO: Use similar C API if they ever add it. Doing this manually is tedious.
+  //TODO: Create a derived SimpleToggleAction class for this?
+  /** Creates a new boolean stateful action.
+   * 
+   * @a state is the initial state of the action.  All future state values
+   * must also be bool.
+   * 
+   * @newin{2,38}
+   * @param name The name of the action.
+   * @param state The initial state of the action.
+   * @return A new SimpleAction.
+   */
+  static Glib::RefPtr<SimpleAction> create_bool(const Glib::ustring&name, bool state);
 
   _WRAP_METHOD(void set_enabled(bool enabled = true), g_simple_action_set_enabled)
   _WRAP_METHOD(void set_state(const Glib::VariantBase& value), g_simple_action_set_state)

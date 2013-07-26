@@ -117,6 +117,8 @@ public:
 
   //TODO: Change the return type of get_state() when we can break ABI.
   // See https://bugzilla.gnome.org/show_bug.cgi?id=690134
+  // TODO: Surely it wouldn't really be an ABI break to change the return type,
+  // because nobody could possibly be using this method yet, because it is so utterly useless. murrayc
   /** Queries the current state of @a action.
    *
    * @note
@@ -144,7 +146,25 @@ public:
    */
   _WRAP_METHOD(void get_state() const, g_action_get_state)
 
+  //TODO: Docs
+  bool get_state_bool() const;
+
   _WRAP_METHOD(void change_state(const Glib::VariantBase& value), g_action_change_state)
+
+  /** Request for the state of @a action to be changed to @a value,
+   * assuming that the state is boolean.
+   * 
+   * See g_action_get_state_type().
+   * 
+   * This call merely requests a change.  The action may refuse to change
+   * its state or may change its state to something other than @a value.
+   * See g_action_get_state_hint().
+   * 
+   * @newin{2,38}
+   * @param value The new state.
+   */
+  void change_state(bool value);
+
   _WRAP_METHOD(void activate(const Glib::VariantBase& parameter), g_action_activate)
 
   _WRAP_PROPERTY("enabled", bool)
