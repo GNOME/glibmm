@@ -63,7 +63,17 @@ public:
    */
   typedef sigc::slot< void,const Glib::VariantBase& > ActivateSlot;
 
-  //This is our equivalent for g_action_map_add_action_entries().
+  //This is an equivalent for g_action_map_add_action_entries().
+  /** A convenience method for creating a SimpleAction instance
+   * and adding it to the ActionMap.
+   *
+   * @param name The name of the Action.
+   * @param slot The callback method to be called when the action is activated.
+   * @return The Action.
+   */
+  Glib::RefPtr<SimpleAction> add_action(const Glib::ustring& name);
+
+  //This is an equivalent for g_action_map_add_action_entries().
   /** A convenience method for creating a SimpleAction instance
    * and adding it to the ActionMap.
    *
@@ -73,6 +83,10 @@ public:
    */
   Glib::RefPtr<SimpleAction> add_action(const Glib::ustring& name, const ActivateSlot& slot);
   _IGNORE(g_action_map_add_action_entries)
+
+  Glib::RefPtr<SimpleAction> add_action_bool(const Glib::ustring& name, bool state);
+
+  Glib::RefPtr<SimpleAction> add_action_bool(const Glib::ustring& name, bool state, const ActivateSlot& slot);
 
   _WRAP_METHOD(void add_action(const Glib::RefPtr<Action>& action), g_action_map_add_action)
   _WRAP_METHOD(void remove_action(const Glib::ustring& action_name), g_action_map_remove_action)
