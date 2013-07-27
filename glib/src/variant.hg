@@ -360,7 +360,7 @@ public:
   void get_child(VariantBase& child, gsize index = 0) const;
   _IGNORE(g_variant_get_child, g_variant_get_child_value)
 
-#m4 _CONVERSION(`GVariant*',`VariantBase',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GVariant*',`VariantBase',`Glib::wrap($3)')
 
   _WRAP_METHOD(VariantBase get_child(gsize index = 0), g_variant_get_child_value)
 
@@ -988,7 +988,7 @@ template<class T>
 Variant<T> Variant< Variant<T> >::get() const
 {
   GVariant* const gvariant = g_variant_get_variant(gobject_);
-  return Variant<T>(gvariant, true);
+  return Variant<T>(gvariant);
 }
 
 /*--------------------Variant< std::pair<K, V> >---------------------*/
@@ -1070,6 +1070,8 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
   Variant< std::vector<T> > result =
     Variant< std::vector<T> >(g_variant_new(
       reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+
+  g_variant_builder_unref(builder);
 
   return result;
 }
@@ -1167,6 +1169,8 @@ Variant< std::map<K, V> >::create(const std::map<K, V>& data)
   // Create the variant using the builder.
   Variant< std::map<K, V> > result = Variant< std::map<K, V> >(g_variant_new(
     reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+
+  g_variant_builder_unref(builder);
 
   return result;
 }
