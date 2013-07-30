@@ -27,7 +27,7 @@ namespace Gio
 bool Action::get_state_bool() const
 {
   g_return_val_if_fail(
-    g_action_get_state_type(const_cast<GAction*>(gobj())) == G_VARIANT_TYPE_BOOLEAN,
+    g_variant_type_equal(g_action_get_state_type(const_cast<GAction*>(gobj())), G_VARIANT_TYPE_BOOLEAN),
     false);
 
   GVariant* state = g_action_get_state(const_cast<GAction*>(gobj()));
@@ -40,8 +40,7 @@ bool Action::get_state_bool() const
 void Action::change_state(bool value)
 {
   g_return_if_fail(
-    g_action_get_state_type(const_cast<GAction*>(gobj())) == G_VARIANT_TYPE_BOOLEAN);
-
+    g_variant_type_equal(g_action_get_state_type(const_cast<GAction*>(gobj())), G_VARIANT_TYPE_BOOLEAN));
   change_state(Glib::Variant<bool>::create(value));
 }
 
