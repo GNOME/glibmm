@@ -452,10 +452,10 @@ library function.
 <parameter name="G_FILE_ERROR_PIPE">
 <parameter_description> Broken pipe; there is no process reading from the
 other end of a pipe. Every library function that returns this
-error code also generates a `SIGPIPE' signal; this signal
+error code also generates a 'SIGPIPE' signal; this signal
 terminates the program if not handled or blocked. Thus, your
 program will never actually see this code unless it has handled
-or blocked `SIGPIPE'.
+or blocked 'SIGPIPE'.
 </parameter_description>
 </parameter>
 <parameter name="G_FILE_ERROR_AGAIN">
@@ -1264,7 +1264,7 @@ direct control. Since 2.8.
 <enum name="GParamFlags">
 <description>
 Through the #GParamFlags flag values, certain aspects of parameters
-can be configured.
+can be configured. See also #G_PARAM_READWRITE and #G_PARAM_STATIC_STRINGS.
 
 </description>
 <parameters>
@@ -1843,7 +1843,7 @@ U+2029 PARAGRAPH SEPARATOR. Since: 2.34
 <parameter_description> Turns on the partial matching feature. In contrast to
 to #G_REGEX_MATCH_PARTIAL_SOFT, this stops matching as soon as a partial match
 is found, without continuing to search for a possible complete match. See
-see g_match_info_is_partial_match() for more information. Since: 2.34
+g_match_info_is_partial_match() for more information. Since: 2.34
 </parameter_description>
 </parameter>
 <parameter name="G_REGEX_MATCH_NOTEMPTY_ATSTART">
@@ -2140,10 +2140,80 @@ environment. Since: 2.34
 </parameters>
 </enum>
 
+<enum name="GTestFileType">
+<description>
+The type of file to return the filename for, when used with
+g_test_build_filename().
+
+These two options correspond rather directly to the 'dist' and
+'built' terminology that automake uses and are explicitly used to
+distinguish between the 'srcdir' and 'builddir' being separate.  All
+files in your project should either be dist (in the
+&lt;literal&gt;DIST_EXTRA&lt;/literal&gt; or &lt;literal&gt;dist_schema_DATA&lt;/literal&gt;
+sense, in which case they will always be in the srcdir) or built (in
+the &lt;literal&gt;BUILT_SOURCES&lt;/literal&gt; sense, in which case they will
+always be in the builddir).
+
+Note: as a general rule of automake, files that are generated only as
+part of the build-from-git process (but then are distributed with the
+tarball) always go in srcdir (even if doing a srcdir != builddir
+build from git) and are considered as distributed files.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="G_TEST_DIST">
+<parameter_description> a file that was included in the distribution tarball
+</parameter_description>
+</parameter>
+<parameter name="G_TEST_BUILT">
+<parameter_description> a file that was built on the compiling machine
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GTestSubprocessFlags">
+<description>
+Flags to pass to g_test_trap_subprocess() to control input and output.
+
+Note that in contrast with g_test_trap_fork(), the default is to
+not show stdout and stderr.
+
+</description>
+<parameters>
+<parameter name="G_TEST_SUBPROCESS_INHERIT_STDIN">
+<parameter_description> If this flag is given, the child
+process will inherit the parent's stdin. Otherwise, the child's
+stdin is redirected to &lt;filename&gt;/dev/null&lt;/filename&gt;.
+</parameter_description>
+</parameter>
+<parameter name="G_TEST_SUBPROCESS_INHERIT_STDOUT">
+<parameter_description> If this flag is given, the child
+process will inherit the parent's stdout. Otherwise, the child's
+stdout will not be visible, but it will be captured to allow
+later tests with g_test_trap_assert_stdout().
+</parameter_description>
+</parameter>
+<parameter name="G_TEST_SUBPROCESS_INHERIT_STDERR">
+<parameter_description> If this flag is given, the child
+process will inherit the parent's stderr. Otherwise, the child's
+stderr will not be visible, but it will be captured to allow
+later tests with g_test_trap_assert_stderr().
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GTestTrapFlags">
 <description>
 Test traps are guards around forked tests.
 These flags determine what traps to set.
+
+Deprecated: #GTestTrapFlags is used only with g_test_trap_fork(),
+which is deprecated. g_test_trap_subprocess() uses
+#GTestTrapSubprocessFlags.
 
 </description>
 <parameters>
@@ -2163,7 +2233,7 @@ though to allow later tests with g_test_trap_assert_stderr().
 </parameter>
 <parameter name="G_TEST_TRAP_INHERIT_STDIN">
 <parameter_description> If this flag is given, stdin of the
-forked child process is shared with stdin of its parent process.
+child process is shared with stdin of its parent process.
 It is redirected to &lt;filename&gt;/dev/null&lt;/filename&gt; otherwise.
 </parameter_description>
 </parameter>
@@ -6348,6 +6418,28 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_binding_unbind">
+<description>
+Explicitly releases the binding between the source and the target
+property expressed by @binding.
+
+&lt;note&gt;This function will release the reference that is being held on
+the @binding instance; if you want to hold on to the #GBinding instance
+after calling g_binding_unbind(), you will need to hold a reference
+to it.&lt;/note&gt;
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="binding">
+<parameter_description> a #GBinding
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_bit_lock">
 <description>
 Sets the indicated @lock_bit in @address.  If the bit is already
@@ -6658,7 +6750,7 @@ Since: 2.12
 </parameter_description>
 </parameter>
 <parameter name="exec">
-<parameter_description> location for the command line of the application, or %NULL
+<parameter_description> return location for the command line of the application, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="count">
@@ -23300,8 +23392,34 @@ this thread is now the owner of @context.
 
 <function name="g_main_context_wakeup">
 <description>
-If @context is currently waiting in a poll(), interrupt
-the poll(), and continue the iteration process.
+If @context is currently blocking in g_main_context_iteration()
+waiting for a source to become ready, cause it to stop blocking
+and return.  Otherwise, cause the next invocation of
+g_main_context_iteration() to return without blocking.
+
+This API is useful for low-level control over #GMainContext; for
+example, integrating it with main loop implementations such as
+#GMainLoop.
+
+Another related use for this function is when implementing a main
+loop with a termination condition, computed from multiple threads:
+
+|[
+#define NUM_TASKS 10
+static volatile gint tasks_remaining = NUM_TASKS;
+...
+
+while (g_atomic_int_get (&amp;tasks_remaining) != 0)
+g_main_context_iteration (NULL, TRUE);
+]|
+
+Then in a thread:
+|[
+perform_work();
+
+if (g_atomic_int_dec_and_test (&amp;tasks_remaining))
+g_main_context_wakeup (NULL);
+]|
 
 </description>
 <parameters>
@@ -24909,19 +25027,11 @@ possible complete match, while with #G_REGEX_MATCH_PARTIAL_HARD matching
 stops at the partial match.
 When both #G_REGEX_MATCH_PARTIAL_SOFT and #G_REGEX_MATCH_PARTIAL_HARD
 are set, the latter takes precedence.
-See &lt;ulink&gt;man:pcrepartial&lt;/ulink&gt; for more information on partial matching.
 
-Because of the way certain internal optimizations are implemented
-the partial matching algorithm cannot be used with all patterns.
-So repeated single characters such as &quot;a{2,4}&quot; and repeated single
-meta-sequences such as &quot;\d+&quot; are not permitted if the maximum number
-of occurrences is greater than one. Optional items such as &quot;\d?&quot;
-(where the maximum is one) are permitted. Quantifiers with any values
-are permitted after parentheses, so the invalid examples above can be
-coded thus &quot;(a){2,4}&quot; and &quot;(\d)+&quot;. If #G_REGEX_MATCH_PARTIAL or 
-#G_REGEX_MATCH_PARTIAL_HARD is set
-for a pattern that does not conform to the restrictions, matching
-functions return an error.
+There were formerly some restrictions on the pattern for partial matching.
+The restrictions no longer apply.
+
+See &lt;ulink&gt;man:pcrepartial&lt;/ulink&gt; for more information on partial matching.
 
 Since: 2.14
 
@@ -27761,7 +27871,7 @@ operation, for user data on an object.
 
 If the previous value was replaced then ownership of the
 old value (@oldval) is passed to the caller, including
-the registred destroy notify for it (passed out in @old_destroy).
+the registered destroy notify for it (passed out in @old_destroy).
 Its up to the caller to free this as he wishes, which may
 or may not include using @old_destroy as sometimes replacement
 should not destroy the object in the normal way.
@@ -27812,7 +27922,7 @@ operation, for user data on an object.
 
 If the previous value was replaced then ownership of the
 old value (@oldval) is passed to the caller, including
-the registred destroy notify for it (passed out in @old_destroy).
+the registered destroy notify for it (passed out in @old_destroy).
 Its up to the caller to free this as he wishes, which may
 or may not include using @old_destroy as sometimes replacement
 should not destroy the object in the normal way.
@@ -29140,6 +29250,26 @@ Since: 2.6
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_param_get_default_value">
+<description>
+Gets the default value of @param as a pointer to a #GValue.
+
+The #GValue will remain value for the life of @param.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="param">
+<parameter_description> a #GParamSpec
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to a #GValue which must not be modified
+
+</return>
 </function>
 
 <function name="g_param_spec_boolean">
@@ -33349,6 +33479,26 @@ Since: 2.14
 </parameter>
 </parameters>
 <return> the number of the highest back reference
+
+</return>
+</function>
+
+<function name="g_regex_get_max_lookbehind">
+<description>
+Gets the number of characters in the longest lookbehind assertion in the
+pattern. This information is useful when doing multi-segment matching using
+the partial matching facilities.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="regex">
+<parameter_description> a #GRegex structure
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of characters in the longest lookbehind assertion.
 
 </return>
 </function>
@@ -37918,7 +38068,7 @@ for the signal.
 <description>
 Overrides the class closure (i.e. the default handler) for the
 given signal for emissions on instances of @instance_type with
-callabck @class_handler. @instance_type must be derived from the
+callback @class_handler. @instance_type must be derived from the
 type to which the signal belongs.
 
 See g_signal_chain_from_overridden() and
@@ -40500,7 +40650,7 @@ if those parameters are non-%NULL. Note that you must set the
 passing %NULL for @standard_output and @standard_error.
 
 If @exit_status is non-%NULL, the platform-specific exit status of
-the child is stored there; see the doucumentation of
+the child is stored there; see the documentation of
 g_spawn_check_exit_status() for how to use and interpret this.
 Note that it is invalid to pass %G_SPAWN_DO_NOT_REAP_CHILD in
 @flags.
@@ -43261,6 +43411,11 @@ created on the fly and added to the root fixture, based on the
 slash-separated portions of @testpath. The @test_data argument
 will be passed as first argument to @test_func.
 
+If @testpath includes the component &quot;subprocess&quot; anywhere in it,
+the test will be skipped by default, and only run if explicitly
+required via the &lt;option&gt;-p&lt;/option&gt; command-line option or
+g_test_trap_subprocess().
+
 Since: 2.16
 
 </description>
@@ -43316,6 +43471,11 @@ Create a new test case, similar to g_test_create_case(). However
 the test is assumed to use no fixture, and test suites are automatically
 created on the fly and added to the root fixture, based on the
 slash-separated portions of @testpath.
+
+If @testpath includes the component &quot;subprocess&quot; anywhere in it,
+the test will be skipped by default, and only run if explicitly
+required via the &lt;option&gt;-p&lt;/option&gt; command-line option or
+g_test_trap_subprocess().
 
 Since: 2.16
 
@@ -43389,6 +43549,53 @@ Since: 2.16
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_test_build_filename">
+<description>
+Creates the pathname to a data file that is required for a test.
+
+This function is conceptually similar to g_build_filename() except
+that the first argument has been replaced with a #GTestFileType
+argument.
+
+The data file should either have been distributed with the module
+containing the test (%G_TEST_DIST) or built as part of the build
+system of that module (%G_TEST_BUILT).
+
+In order for this function to work in srcdir != builddir situations,
+the G_TEST_SRCDIR and G_TEST_BUILDDIR environment variables need to
+have been defined.  As of 2.38, this is done by the Makefile.decl
+included in GLib.  Please ensure that your copy is up to date before
+using this function.
+
+In case neither variable is set, this function will fall back to
+using the dirname portion of argv[0], possibly removing &quot;.libs&quot;.
+This allows for casual running of tests directly from the commandline
+in the srcdir == builddir case and should also support running of
+installed tests, assuming the data files have been installed in the
+same relative path as the test binary.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="file_type">
+<parameter_description> the type of file (built vs. distributed)
+</parameter_description>
+</parameter>
+<parameter name="first_path">
+<parameter_description> the first segment of the pathname
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> %NULL-terminated additional path segments
+</parameter_description>
+</parameter>
+</parameters>
+<return> the path of the file, to be freed using g_free()
+
+</return>
 </function>
 
 <function name="g_test_create_case">
@@ -43489,7 +43696,7 @@ g_test_assert_expected_messages ();
 
 Note that you cannot use this to test g_error() messages, since
 g_error() intentionally never returns even if the program doesn't
-abort; use g_test_trap_fork() in this case.
+abort; use g_test_trap_subprocess() in this case.
 
 Since: 2.34
 
@@ -43534,6 +43741,65 @@ Since: 2.30
 <parameters>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_test_get_dir">
+<description>
+Gets the pathname of the directory containing test files of the type
+specified by @file_type.
+
+This is approximately the same as calling g_test_build_filename(&quot;.&quot;),
+but you don't need to free the return value.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="file_type">
+<parameter_description> the type of file (built vs. distributed)
+</parameter_description>
+</parameter>
+</parameters>
+<return> the path of the directory, owned by GLib
+
+</return>
+</function>
+
+<function name="g_test_get_filename">
+<description>
+Gets the pathname to a data file that is required for a test.
+
+This is the same as g_test_build_filename() with two differences.
+The first difference is that must only use this function from within
+a testcase function.  The second difference is that you need not free
+the return value -- it will be automatically freed when the testcase
+finishes running.
+
+It is safe to use this function from a thread inside of a testcase
+but you must ensure that all such uses occur before the main testcase
+function returns (ie: it is best to ensure that all threads have been
+joined).
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="file_type">
+<parameter_description> the type of file (built vs. distributed)
+</parameter_description>
+</parameter>
+<parameter name="first_path">
+<parameter_description> the first segment of the pathname
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> %NULL-terminated additional path segments
+</parameter_description>
+</parameter>
+</parameters>
+<return> the path, automatically freed at the end of the testcase
+
+</return>
 </function>
 
 <function name="g_test_get_root">
@@ -43581,6 +43847,8 @@ Provide a random seed to reproduce test runs using random numbers.
 &lt;term&gt;&lt;option&gt;-p &lt;replaceable&gt;TESTPATH&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
 Execute all tests matching &lt;replaceable&gt;TESTPATH&lt;/replaceable&gt;.
+This can also be used to force a test to run that would otherwise
+be skipped (ie, a test whose name contains &quot;/subprocess&quot;).
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
@@ -43611,8 +43879,8 @@ Quick tests, should run really quickly and give good coverage.
 &lt;term&gt;undefined&lt;/term&gt;
 &lt;listitem&gt;&lt;para&gt;
 Tests for undefined behaviour, may provoke programming errors
-under g_test_trap_fork() to check that appropriate assertions
-or warnings are given
+under g_test_trap_subprocess() or g_test_expect_messages() to check
+that appropriate assertions or warnings are given
 &lt;/para&gt;&lt;/listitem&gt;
 &lt;/varlistentry&gt;
 &lt;varlistentry&gt;
@@ -44079,6 +44347,22 @@ there is no &quot;medium speed&quot;.
 </return>
 </function>
 
+<function name="g_test_subprocess">
+<description>
+Returns %TRUE (after g_test_init() has been called) if the test
+program is running under g_test_trap_subprocess().
+
+Since: 2.38
+
+</description>
+<parameters>
+</parameters>
+<return> %TRUE if the test program is running under
+g_test_trap_subprocess().
+
+</return>
+</function>
+
 <function name="g_test_suite_add">
 <description>
 Adds @test_case to @suite.
@@ -44175,13 +44459,13 @@ Since: 2.16
 
 <function name="g_test_trap_assert_failed">
 <description>
-Assert that the last forked test failed.
-See g_test_trap_fork().
+Assert that the last test subprocess failed.
+See g_test_trap_subprocess().
 
 This is sometimes used to test situations that are formally considered to
 be undefined behaviour, like inputs that fail a g_return_if_fail()
 check. In these situations you should skip the entire test, including the
-call to g_test_trap_fork(), unless g_test_undefined() returns %TRUE
+call to g_test_trap_subprocess(), unless g_test_undefined() returns %TRUE
 to indicate that undefined behaviour may be tested.
 
 Since: 2.16
@@ -44194,8 +44478,8 @@ Since: 2.16
 
 <function name="g_test_trap_assert_passed">
 <description>
-Assert that the last forked test passed.
-See g_test_trap_fork().
+Assert that the last test subprocess passed.
+See g_test_trap_subprocess().
 
 Since: 2.16
 
@@ -44207,14 +44491,15 @@ Since: 2.16
 
 <function name="g_test_trap_assert_stderr">
 <description>
-Assert that the stderr output of the last forked test
-matches @serrpattern. See  g_test_trap_fork().
+Assert that the stderr output of the last test subprocess
+matches @serrpattern. See  g_test_trap_subprocess().
 
-This is sometimes used to test situations that are formally considered to
-be undefined behaviour, like inputs that fail a g_return_if_fail()
-check. In these situations you should skip the entire test, including the
-call to g_test_trap_fork(), unless g_test_undefined() returns %TRUE
-to indicate that undefined behaviour may be tested.
+This is sometimes used to test situations that are formally
+considered to be undefined behaviour, like code that hits a
+g_assert() or g_error(). In these situations you should skip the
+entire test, including the call to g_test_trap_subprocess(), unless
+g_test_undefined() returns %TRUE to indicate that undefined
+behaviour may be tested.
 
 Since: 2.16
 
@@ -44231,8 +44516,8 @@ Since: 2.16
 
 <function name="g_test_trap_assert_stderr_unmatched">
 <description>
-Assert that the stderr output of the last forked test
-does not match @serrpattern. See g_test_trap_fork().
+Assert that the stderr output of the last test subprocess
+does not match @serrpattern. See g_test_trap_subprocess().
 
 Since: 2.16
 
@@ -44249,8 +44534,8 @@ Since: 2.16
 
 <function name="g_test_trap_assert_stdout">
 <description>
-Assert that the stdout output of the last forked test matches
-@soutpattern. See g_test_trap_fork().
+Assert that the stdout output of the last test subprocess matches
+@soutpattern. See g_test_trap_subprocess().
 
 Since: 2.16
 
@@ -44267,8 +44552,8 @@ Since: 2.16
 
 <function name="g_test_trap_assert_stdout_unmatched">
 <description>
-Assert that the stdout output of the last forked test
-does not match @soutpattern. See g_test_trap_fork().
+Assert that the stdout output of the last test subprocess
+does not match @soutpattern. See g_test_trap_subprocess().
 
 Since: 2.16
 
@@ -44286,8 +44571,10 @@ Since: 2.16
 <function name="g_test_trap_fork">
 <description>
 Fork the current test program to execute a test case that might
-not return or that might abort. The forked test case is aborted
-and considered failing if its run time exceeds @usec_timeout.
+not return or that might abort.
+
+If @usec_timeout is non-0, the forked test case is aborted and
+considered failing if its run time exceeds it.
 
 The forking behavior can be configured with the #GTestTrapFlags flags.
 
@@ -44306,15 +44593,17 @@ g_print (&quot;some stdout text: somagic17\n&quot;);
 g_printerr (&quot;some stderr text: semagic43\n&quot;);
 exit (0); / * successful test run * /
 }
-g_test_trap_assert_passed();
+g_test_trap_assert_passed ();
 g_test_trap_assert_stdout (&quot;*somagic17*&quot;);
 g_test_trap_assert_stderr (&quot;*semagic43*&quot;);
 }
 ]|
 
-This function is implemented only on Unix platforms.
-
 Since: 2.16
+
+Deprecated: This function is implemented only on Unix platforms,
+and is not always reliable due to problems inherent in
+fork-without-exec. Use g_test_trap_subprocess() instead.
 
 </description>
 <parameters>
@@ -44334,38 +44623,121 @@ Since: 2.16
 
 <function name="g_test_trap_has_passed">
 <description>
-Check the result of the last g_test_trap_fork() call.
+Check the result of the last g_test_trap_subprocess() call.
 
 Since: 2.16
 
 </description>
 <parameters>
 </parameters>
-<return> %TRUE if the last forked child terminated successfully.
+<return> %TRUE if the last test subprocess terminated successfully.
 
 </return>
 </function>
 
 <function name="g_test_trap_reached_timeout">
 <description>
-Check the result of the last g_test_trap_fork() call.
+Check the result of the last g_test_trap_subprocess() call.
 
 Since: 2.16
 
 </description>
 <parameters>
 </parameters>
-<return> %TRUE if the last forked child got killed due to a fork timeout.
+<return> %TRUE if the last test subprocess got killed due to a timeout.
 
 </return>
+</function>
+
+<function name="g_test_trap_subprocess">
+<description>
+Respawns the test program to run only @test_path in a subprocess.
+This can be used for a test case that might not return, or that
+might abort. @test_path will normally be the name of the parent
+test, followed by &quot;&lt;literal&gt;/subprocess/&lt;/literal&gt;&quot; and then a name
+for the specific subtest (or just ending with
+&quot;&lt;literal&gt;/subprocess&lt;/literal&gt;&quot; if the test only has one child
+test); tests with names of this form will automatically be skipped
+in the parent process.
+
+If @usec_timeout is non-0, the test subprocess is aborted and
+considered failing if its run time exceeds it.
+
+The subprocess behavior can be configured with the
+#GTestSubprocessFlags flags.
+
+You can use methods such as g_test_trap_assert_passed(),
+g_test_trap_assert_failed(), and g_test_trap_assert_stderr() to
+check the results of the subprocess. (But note that
+g_test_trap_assert_stdout() and g_test_trap_assert_stderr()
+cannot be used if @test_flags specifies that the child should
+inherit the parent stdout/stderr.) 
+
+If your &lt;literal&gt;main ()&lt;/literal&gt; needs to behave differently in
+the subprocess, you can call g_test_subprocess() (after calling
+g_test_init()) to see whether you are in a subprocess.
+
+The following example tests that calling
+&lt;literal&gt;my_object_new(1000000)&lt;/literal&gt; will abort with an error
+message.
+
+|[
+static void
+test_create_large_object_subprocess (void)
+{
+my_object_new (1000000);
+}
+
+static void
+test_create_large_object (void)
+{
+g_test_trap_subprocess (&quot;/myobject/create_large_object/subprocess&quot;, 0, 0);
+g_test_trap_assert_failed ();
+g_test_trap_assert_stderr (&quot;*ERROR*too large*&quot;);
+}
+
+int
+main (int argc, char **argv)
+{
+g_test_init (&amp;argc, &amp;argv, NULL);
+
+g_test_add_func (&quot;/myobject/create_large_object&quot;,
+test_create_large_object);
+/ * Because of the '/subprocess' in the name, this test will
+* not be run by the g_test_run () call below.
+* /
+g_test_add_func (&quot;/myobject/create_large_object/subprocess&quot;,
+test_create_large_object_subprocess);
+
+return g_test_run ();
+}
+]|
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="test_path">
+<parameter_description>    Test to run in a subprocess
+</parameter_description>
+</parameter>
+<parameter name="usec_timeout">
+<parameter_description> Timeout for the subprocess test in micro seconds.
+</parameter_description>
+</parameter>
+<parameter name="test_flags">
+<parameter_description>   Flags to modify subprocess behaviour.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_test_undefined">
 <description>
 Returns %TRUE if tests may provoke assertions and other formally-undefined
-behaviour under g_test_trap_fork(), to verify that appropriate warnings
-are given. It can be useful to turn this off if running tests under
-valgrind.
+behaviour, to verify that appropriate warnings are given. It might, in some
+cases, be useful to turn this off if running tests under valgrind.
 
 
 </description>
@@ -46938,6 +47310,31 @@ Since: 2.4
 <return></return>
 </function>
 
+<function name="g_type_class_get_instance_private_offset">
+<description>
+Gets the offset of the private data for instances of @g_class.
+
+This is how many bytes you should add to the instance pointer of a
+class in order to get the private data for the type represented by
+@g_class.
+
+You can only call this function after you have registered a private
+data area for @g_class using g_type_class_add_private().
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="g_class">
+<parameter_description> a #GTypeClass
+</parameter_description>
+</parameter>
+</parameters>
+<return> the offset, in bytes
+
+</return>
+</function>
+
 <function name="g_type_class_peek">
 <description>
 This function is essentially the same as g_type_class_ref(), except that
@@ -47323,11 +47720,11 @@ be retrieved from a subtype using g_type_get_qdata().
 
 <function name="g_type_get_type_registration_serial">
 <description>
-Returns an opaque serial number that represents the state of the set of registered
-types. Any time a type is registred this serial changes, which means you can
-cache information based on type lookups (such as g_type_from_name) and know if
-the cache is still valid at a later time by comparing the current serial with
-the one at the type lookup.
+Returns an opaque serial number that represents the state of the set of
+registered types. Any time a type is registered this serial changes,
+which means you can cache information based on type lookups (such as
+g_type_from_name()) and know if the cache is still valid at a later
+time by comparing the current serial with the one at the type lookup.
 
 Since: 2.36
 
@@ -49411,8 +49808,8 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="reserved_chars_allowed">
-<parameter_description> a string of reserved characters that are
-allowed to be used, or %NULL.
+<parameter_description> a string of reserved characters that
+are allowed to be used, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="allow_utf8">
@@ -49525,7 +49922,8 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="illegal_characters">
-<parameter_description> an optional string of illegal characters not to be allowed.
+<parameter_description> a string of illegal characters not to be
+allowed, or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
@@ -50609,7 +51007,8 @@ linkend=&quot;GValueArray.n-values&quot;&gt;n_values&lt;/link&gt;&lt;/code&gt;
 Sort @value_array using @compare_func to compare the elements according to
 the semantics of #GCompareFunc.
 
-The current implementation uses Quick-Sort as sorting algorithm.
+The current implementation uses the same sorting algorithm as standard
+C qsort() function.
 
 Deprecated: 2.32: Use #GArray and g_array_sort().
 
@@ -50634,7 +51033,8 @@ Deprecated: 2.32: Use #GArray and g_array_sort().
 Sort @value_array using @compare_func to compare the elements according
 to the semantics of #GCompareDataFunc.
 
-The current implementation uses Quick-Sort as sorting algorithm.
+The current implementation uses the same sorting algorithm as standard
+C qsort() function.
 
 Deprecated: 2.32: Use #GArray and g_array_sort_with_data().
 
@@ -54590,6 +54990,33 @@ or by passing it to another g_variant_new() call.
 </return>
 </function>
 
+<function name="g_variant_new_printf">
+<description>
+Creates a string-type GVariant using printf formatting.
+
+This is similar to calling g_strdup_printf() and then
+g_variant_new_string() but it saves a temporary variable and an
+unnecessary copy.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="format_string">
+<parameter_description> a printf-style format string
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> arguments for @format_string
+</parameter_description>
+</parameter>
+</parameters>
+<return> a floating reference to a new string
+#GVariant instance
+
+</return>
+</function>
+
 <function name="g_variant_new_signature">
 <description>
 Creates a D-Bus type signature #GVariant with the contents of
@@ -54651,6 +55078,34 @@ Since: 2.24
 </parameter>
 </parameters>
 <return> a new floating #GVariant instance
+
+</return>
+</function>
+
+<function name="g_variant_new_take_string">
+<description>
+Creates a string #GVariant with the contents of @string.
+
+@string must be valid utf8.
+
+This function consumes @string.  g_free() will be called on @string
+when it is no longer required.
+
+You must not modify or access @string in any other way after passing
+it to this function.  It is even possible that @string is immediately
+freed.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="string">
+<parameter_description> a normal utf8 nul-terminated string
+</parameter_description>
+</parameter>
+</parameters>
+<return> a floating reference to a new string
+#GVariant instance
 
 </return>
 </function>

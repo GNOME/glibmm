@@ -2962,6 +2962,17 @@ D-Bus call for this signal subscription.  This gives you more control
 over which match rules you add (but you must add them manually).
 </parameter_description>
 </parameter>
+<parameter name="G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE">
+<parameter_description> Match first arguments that
+contain a bus or interface name with the given namespace.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH">
+<parameter_description> Match first arguments that
+contain an object path that is either equivalent to the given path,
+or one of the paths is a subpath of the other.
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -19223,6 +19234,8 @@ Activates the action.
 the parameter type given at construction time).  If the parameter
 type was %NULL then @parameter must also be %NULL.
 
+If the @parameter GVariant is floating, it is consumed.
+
 Since: 2.28
 
 </description>
@@ -19993,6 +20006,115 @@ Since: 2.32
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_action_name_is_valid">
+<description>
+Checks if @action_name is valid.
+
+@action_name is valid if it consists only of alphanumeric characters,
+plus '-' and '.'.  The empty string is not a valid action name.
+
+It is an error to call this function with a non-utf8 @action_name.
+@action_name must not be %NULL.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="action_name">
+<parameter_description> an potential action name
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @action_name is valid
+
+</return>
+</function>
+
+<function name="g_action_parse_detailed_name">
+<description>
+Parses a detailed action name into its separate name and target
+components.
+
+Detailed action names can have three formats.
+
+The first format is used to represent an action name with no target
+value and consists of just an action name containing no whitespace
+nor the characters ':', '(' or ')'.  For example: &quot;app.action&quot;.
+
+The second format is used to represent an action with a target value
+that is a non-empty string consisting only of alphanumerics, plus '-'
+and '.'.  In that case, the action name and target value are
+separated by a double colon (&quot;::&quot;).  For example:
+&quot;app.action::target&quot;.
+
+The third format is used to represent an action with any type of
+target value, including strings.  The target value follows the action
+name, surrounded in parens.  For example: &quot;app.action(42)&quot;.  The
+target value is parsed using g_variant_parse().  If a tuple-typed
+value is desired, it must be specified in the same way, resulting in
+two sets of parens, for example: &quot;app.action((1,2,3))&quot;.  A string
+target can be specified this way as well: &quot;app.action('target')&quot;.
+For strings, this third format must be used if * target value is
+empty or contains characters other than alphanumerics, '-' and '.'.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="detailed_name">
+<parameter_description> a detailed action name
+</parameter_description>
+</parameter>
+<parameter name="action_name">
+<parameter_description> the action name
+</parameter_description>
+</parameter>
+<parameter name="target_value">
+<parameter_description> the target value, or %NULL for no target
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to a %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if successful, else %FALSE with @error set
+
+</return>
+</function>
+
+<function name="g_action_print_detailed_name">
+<description>
+Formats a detailed action name from @action_name and @target_value.
+
+It is an error to call this function with an invalid action name.
+
+This function is the opposite of
+g_action_parse_detailed_action_name().  It will produce a string that
+can be parsed back to the @action_name and @target_value by that
+function.
+
+See that function for the types of strings that will be printed by
+this function.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="action_name">
+<parameter_description> a valid action name
+</parameter_description>
+</parameter>
+<parameter name="target_value">
+<parameter_description> a #GVariant target value, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a detailed format string
+
+</return>
 </function>
 
 <function name="g_app_info_add_supports_type">
@@ -21463,6 +21585,31 @@ reproduced here:
 </return>
 </function>
 
+<function name="g_application_mark_busy">
+<description>
+Increases the busy count of @application.
+
+Use this function to indicate that the application is busy, for instance
+while a long running operation is pending.
+
+The busy state will be exposed to other processes, so a session shell will
+use that information to indicate the state to the user (e.g. with a
+spinner).
+
+To cancel the busy indication, use g_application_unmark_busy().
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GApplication
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_application_new">
 <description>
 Creates a new #GApplication instance.
@@ -21700,6 +21847,13 @@ if the use count falls to zero the application will exit immediately,
 except in the case that g_application_set_inactivity_timeout() is in
 use.
 
+This function sets the prgname (g_set_prgname()), if not already set,
+to the basename of argv[0].  Since 2.38, if %G_APPLICATION_IS_SERVICE
+is specified, the prgname is set to the application ID.  The main
+impact of this is is that the wmclass of windows created by Gtk+ will
+be set accordingly, which helps the window manager determine which
+application is showing the window.
+
 Since: 2.28
 
 </description>
@@ -21842,6 +21996,28 @@ Since: 2.28
 </parameter>
 <parameter name="inactivity_timeout">
 <parameter_description> the timeout, in milliseconds
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_application_unmark_busy">
+<description>
+Decreases the busy count of @application.
+
+When the busy count reaches zero, the new state will be propagated
+to other processes.
+
+This function must only be called to cancel the effect of a previous
+call to g_application_mark_busy().
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GApplication
 </parameter_description>
 </parameter>
 </parameters>
@@ -23154,6 +23330,43 @@ to not exist or %NULL.
 </parameters>
 <return> An identifier (never 0) that an be used with
 g_bus_unwatch_name() to stop watching the name.
+
+</return>
+</function>
+
+<function name="g_bytes_icon_get_bytes">
+<description>
+Gets the #GBytes associated with the given @icon.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="icon">
+<parameter_description> a #GIcon.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GBytes, or %NULL.
+
+</return>
+</function>
+
+<function name="g_bytes_icon_new">
+<description>
+Creates a new icon for a bytes.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="bytes">
+<parameter_description> a #GBytes.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GIcon for the given
+@bytes, or %NULL on error.
 
 </return>
 </function>
@@ -27357,6 +27570,11 @@ name. As such, to avoid certain race conditions, users should be
 tracking the name owner of the well-known name and use that when
 processing the received signal.
 
+If one of %G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE or
+%G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH are given, @arg0 is
+interpreted as part of a namespace or path.  The first argument
+of a signal is matched against that part as specified by D-Bus.
+
 Since: 2.26
 
 </description>
@@ -29840,6 +30058,11 @@ Since: 2.26
 <description>
 Gets the name of the D-Bus interface the method was invoked on.
 
+If this method call is a property Get, Set or GetAll call that has
+been redirected to the method call handler then
+&quot;org.freedesktop.DBus.Properties&quot; will be returned.  See
+#GDBusInterfaceVTable for more information.
+
 Since: 2.26
 
 </description>
@@ -29882,6 +30105,11 @@ Since: 2.26
 <function name="g_dbus_method_invocation_get_method_info">
 <description>
 Gets information about the method call, if any.
+
+If this method invocation is a property Get, Set or GetAll call that
+has been redirected to the method call handler then %NULL will be
+returned.  See g_dbus_method_invocation_get_property_info() and
+#GDBusInterfaceVTable for more information.
 
 Since: 2.26
 
@@ -29948,6 +30176,34 @@ Since: 2.26
 </parameter>
 </parameters>
 <return> A #GVariant tuple. Do not unref this because it is owned by @invocation.
+
+</return>
+</function>
+
+<function name="g_dbus_method_invocation_get_property_info">
+<description>
+Gets information about the property that this method call is for, if
+any.
+
+This will only be set in the case of an invocation in response to a
+property Get or Set call that has been directed to the method call
+handler for an object on account of its property_get() or
+property_set() vtable pointers being unset.
+
+See #GDBusInterfaceVTable for more information.
+
+If the call was GetAll, %NULL will be returned.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GDBusPropertyInfo or %NULL
 
 </return>
 </function>
@@ -32332,6 +32588,33 @@ Since: 2.26
 <return></return>
 </function>
 
+<function name="g_desktop_app_info_get_action_name">
+<description>
+Gets the user-visible display name of the &quot;additional application
+action&quot; specified by @action_name.
+
+This corresponds to the &quot;Name&quot; key within the keyfile group for the
+action.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GDesktopAppInfo
+</parameter_description>
+</parameter>
+<parameter name="action_name">
+<parameter_description> the name of the action as from
+g_desktop_app_info_list_actions()
+</parameter_description>
+</parameter>
+</parameters>
+<return> the locale-specific action name
+
+</return>
+</function>
+
 <function name="g_desktop_app_info_get_boolean">
 <description>
 Looks up a boolean value in the keyfile backing @info.
@@ -32565,6 +32848,45 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_desktop_app_info_launch_action">
+<description>
+Activates the named application action.
+
+You may only call this function on action names that were
+returned from g_desktop_app_info_list_actions().
+
+Note that if the main entry of the desktop file indicates that the
+application supports startup notification, and @launch_context is
+non-%NULL, then startup notification will be used when activating the
+action (and as such, invocation of the action on the receiving side
+must signal the end of startup notification when it is completed).
+This is the expected behaviour of applications declaring additional
+actions, as per the desktop file specification.
+
+As with g_app_info_launch() there is no way to detect failures that
+occur while using this function.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GDesktopAppInfo
+</parameter_description>
+</parameter>
+<parameter name="action_name">
+<parameter_description> the name of the action as from
+g_desktop_app_info_list_actions()
+</parameter_description>
+</parameter>
+<parameter name="launch_context">
+<parameter_description> a #GAppLaunchContext
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_desktop_app_info_launch_uris_as_manager">
 <description>
 This function performs the equivalent of g_app_info_launch_uris(),
@@ -32572,15 +32894,15 @@ but is intended primarily for operating system components that
 launch applications.  Ordinary applications should use
 g_app_info_launch_uris().
 
-In contrast to g_app_info_launch_uris(), all processes created will
-always be run directly as children as if by the UNIX fork()/exec()
-calls.
+If the application is launched via traditional UNIX fork()/exec()
+then @spawn_flags, @user_setup and @user_setup_data are used for the
+call to g_spawn_async().  Additionally, @pid_callback (with
+@pid_callback_data) will be called to inform about the PID of the
+created process.
 
-This guarantee allows additional control over the exact environment
-of the child processes, which is provided via a setup function
-@user_setup, as well as the process identifier of each child process
-via @pid_callback. See g_spawn_async() for more information about the
-semantics of the @user_setup function.
+If application launching occurs via some other mechanism (eg: D-Bus
+activation) then @spawn_flags, @user_setup, @user_setup_data,
+@pid_callback and @pid_callback_data are ignored.
 
 
 </description>
@@ -32624,6 +32946,28 @@ each process.
 </parameter>
 </parameters>
 <return> %TRUE on successful launch, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_desktop_app_info_list_actions">
+<description>
+Returns the list of &quot;additional application actions&quot; supported on the
+desktop file, as per the desktop file specification.
+
+As per the specification, this is the list of actions that are
+explicitly listed in the &quot;Actions&quot; key of the [Desktop Entry] group.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GDesktopAppInfo
+</parameter_description>
+</parameter>
+</parameters>
+<return> a list of strings, always non-%NULL
+
 </return>
 </function>
 
@@ -34516,7 +34860,8 @@ Since: 2.34
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> %TRUE if the file was deleted. %FALSE otherwise.
+</return>
 </function>
 
 <function name="g_file_descriptor_based_get_fd">
@@ -35023,6 +35368,9 @@ Will block until the information is available. The #GFileInfo
 returned from this function will contain attributes that match the 
 attribute string that was passed when the #GFileEnumerator was created.
 
+See the documentation of #GFileEnumerator for information about the
+order of returned files.
+
 On error, returns %NULL and sets @error to the error. If the
 enumerator is at the end, %NULL will be returned and @error will
 be unset.
@@ -35053,6 +35401,9 @@ Free the returned object with g_object_unref() when no longer needed.
 Request information for a number of files from the enumerator asynchronously.
 When all i/o for the operation is finished the @callback will be called with
 the requested information. 
+
+See the documentation of #GFileEnumerator for information about the
+order of returned files.
 
 The callback can be called with less than @num_files files in case of error
 or at the end of the enumerator. In case of a partial error the callback will
@@ -37415,6 +37766,69 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter>
 </parameters>
 <return> %TRUE on successful creation, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_file_make_directory_async">
+<description>
+Asynchronously creates a directory.
+
+Virtual: make_directory_async
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_make_directory_finish">
+<description>
+Finishes an asynchronous directory creation, started with
+g_file_make_directory_async().
+
+Virtual: make_directory_finish
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on successful directory creation, %FALSE otherwise.
 </return>
 </function>
 
@@ -40118,6 +40532,7 @@ If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 
+Virtual: trash
 
 </description>
 <parameters>
@@ -40128,6 +40543,69 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 <parameter name="cancellable">
 <parameter_description> optional #GCancellable object,
 %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on successful trash, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_file_trash_async">
+<description>
+Asynchronously sends @file to the Trash location, if possible.
+
+Virtual: trash_async
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the &lt;link linkend=&quot;io-priority&quot;&gt;I/O priority&lt;/link&gt;
+of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object,
+%NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_trash_finish">
+<description>
+Finishes an asynchronous file trashing operation, started with
+g_file_trash_async().
+
+Virtual: trash_finish
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -40466,6 +40944,24 @@ Sets whether the base stream will be closed when @stream is closed.
 <return></return>
 </function>
 
+<function name="g_icon_deserialize">
+<description>
+Deserializes a #GIcon previously serialized using g_icon_serialize().
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="value">
+<parameter_description> a #GVariant created with g_icon_serialize()
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GIcon, or %NULL when deserialization fails.
+
+</return>
+</function>
+
 <function name="g_icon_equal">
 <description>
 Checks if two icons are equal.
@@ -40528,6 +41024,28 @@ Since: 2.20
 </parameters>
 <return> An object implementing the #GIcon
 interface or %NULL if @error is set.
+
+</return>
+</function>
+
+<function name="g_icon_serialize">
+<description>
+Serializes a #GIcon into a #GVariant. An equivalent #GIcon can be retrieved
+back by calling g_icon_deserialize() on the returned value.
+As serialization will avoid using raw icon data when possible, it only
+makes sense to transfer the #GVariant between processes on the same machine,
+(as opposed to over the network), and within the same file system namespace.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="icon">
+<parameter_description> a #GIcon
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GVariant, or %NULL when serialization fails.
 
 </return>
 </function>
@@ -44217,14 +44735,8 @@ Since: 2.32
 <description>
 Sets the &quot;action&quot; and possibly the &quot;target&quot; attribute of @menu_item.
 
-If @detailed_action contains a double colon (&quot;::&quot;) then it is used as
-a separator between an action name and a target string.  In this
-case, this call is equivalent to calling
-g_menu_item_set_action_and_target() with the part before the &quot;::&quot; and
-with a string-type #GVariant containing the part following the &quot;::&quot;.
-
-If @detailed_action doesn't contain &quot;::&quot; then the action is set to
-the given string (verbatim) and the target value is unset.
+The format of @detailed_action is the same format parsed by
+g_action_parse_detailed_name().
 
 See g_menu_item_set_action_and_target() or
 g_menu_item_set_action_and_target_value() for more flexible (but
@@ -44243,6 +44755,37 @@ Since: 2.32
 </parameter>
 <parameter name="detailed_action">
 <parameter_description> the &quot;detailed&quot; action string
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_menu_item_set_icon">
+<description>
+Sets (or unsets) the icon on @menu_item.
+
+This call is the same as calling g_icon_serialize() and using the
+result as the value to g_menu_item_set_attribute_value() for
+%G_MENU_ATTRIBUTE_ICON.
+
+This API is only intended for use with &quot;noun&quot; menu items; things like
+bookmarks or applications in an &quot;Open With&quot; menu.  Don't use it on
+menu items corresponding to verbs (eg: stock icons for 'Save' or
+'Quit').
+
+If @icon is %NULL then the icon is unset.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="menu_item">
+<parameter_description> a #GMenuItem
+</parameter_description>
+</parameter>
+<parameter name="icon">
+<parameter_description> a #GIcon, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -44853,6 +45396,22 @@ Since: 2.32
 </parameter>
 <parameter name="position">
 <parameter_description> the position of the item to remove
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_menu_remove_all">
+<description>
+Removes all items in the menu.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="menu">
+<parameter_description> a #GMenu
 </parameter_description>
 </parameter>
 </parameters>
@@ -47835,6 +48394,39 @@ written to the stream
 </parameter>
 </parameters>
 <return> %TRUE on success, %FALSE if there was an error
+
+</return>
+</function>
+
+<function name="g_property_action_new">
+<description>
+Creates a #GAction corresponding to the value of property
+@property_name on @object.
+
+The property must be existent and readable and writable (and not
+construct-only).
+
+This function takes a reference on @object and doesn't release it
+until the action is destroyed.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="name">
+<parameter_description> the name of the action to create
+</parameter_description>
+</parameter>
+<parameter name="object">
+<parameter_description> the object that has the property to wrap
+</parameter_description>
+</parameter>
+<parameter name="property_name">
+<parameter_description> the name of the property
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GPropertyAction
 
 </return>
 </function>
@@ -51633,6 +52225,8 @@ of the action should not attempt to directly modify the 'state'
 property.  Instead, they should call g_action_change_state() to
 request the change.
 
+If the @value GVariant is floating, it is consumed.
+
 Since: 2.30
 
 </description>
@@ -52363,6 +52957,30 @@ Since: 2.36
 </parameter>
 <parameter name="default_proxy">
 <parameter_description> the default proxy to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_simple_proxy_resolver_set_ignore_hosts">
+<description>
+Sets the list of ignored hosts.
+
+See #GSimpleProxyResolver:ignore-hosts for more details on how the
+@ignore_hosts argument is interpreted.
+
+Since: 2.36
+
+</description>
+<parameters>
+<parameter name="resolver">
+<parameter_description> a #GSimpleProxyResolver
+</parameter_description>
+</parameter>
+<parameter name="ignore_hosts">
+<parameter_description> %NULL-terminated list of hosts/IP addresses
+to not use a proxy for
 </parameter_description>
 </parameter>
 </parameters>
