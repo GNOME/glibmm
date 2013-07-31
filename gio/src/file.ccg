@@ -1873,5 +1873,71 @@ File::remove_async(const SlotAsyncReady& slot_ready,
 }
 
 
+void
+File::trash_async(const SlotAsyncReady& slot_ready,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  int io_priority)
+{
+  // Create copies of slots.
+  // Pointers to them will be passed through the callbacks' data parameter
+  // and deleted in the corresponding callback.
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  g_file_trash_async(gobj(),
+                    io_priority,
+                    Glib::unwrap(cancellable),
+                    &SignalProxy_async_callback,
+                    slot_ready_copy);
+}
+
+void
+File::trash_async(const SlotAsyncReady& slot_ready,
+  int io_priority)
+{
+  // Create copies of slots.
+  // Pointers to them will be passed through the callbacks' data parameter
+  // and deleted in the corresponding callback.
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  g_file_trash_async(gobj(),
+                    io_priority,
+                    0,
+                    &SignalProxy_async_callback,
+                    slot_ready_copy);
+}
+
+void
+File::make_directory_async(const SlotAsyncReady& slot_ready,
+  const Glib::RefPtr<Cancellable>& cancellable,
+  int io_priority)
+{
+  // Create copies of slots.
+  // Pointers to them will be passed through the callbacks' data parameter
+  // and deleted in the corresponding callback.
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  g_file_make_directory_async(gobj(),
+                    io_priority,
+                    Glib::unwrap(cancellable),
+                    &SignalProxy_async_callback,
+                    slot_ready_copy);
+}
+
+void
+File::make_directory_async(const SlotAsyncReady& slot_ready,
+  int io_priority)
+{
+  // Create copies of slots.
+  // Pointers to them will be passed through the callbacks' data parameter
+  // and deleted in the corresponding callback.
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  g_file_make_directory_async(gobj(),
+                    io_priority,
+                    0,
+                    &SignalProxy_async_callback,
+                    slot_ready_copy);
+}
+
 
 } // namespace Gio
