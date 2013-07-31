@@ -17,6 +17,7 @@
 
 #include <glibmm/object.h>
 #include <giomm/menumodel.h>
+#include <giomm/icon.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -44,6 +45,21 @@ public:
 
 
 
+/* TODO:
+GMenuItem * g_menu_item_new_from_model              (GMenuModel  *model,
+                                                     gint         item_index);
+
+
+GMenuItem * g_menu_item_new_submenu                 (const Glib::ustring& label,
+                                                     GMenuModel  *submenu);
+
+
+GMenuItem * g_menu_item_new_section                 (const Glib::ustring& label,
+                                                     GMenuModel  *section);
+*/
+
+
+
 //TODO: GMenuItem * g_menu_item_new_section                 (const Glib::ustring& label,
 //                                                     const Glib::RefPtr<MenuModel>& section);
 
@@ -54,8 +70,9 @@ public:
   _WRAP_METHOD(void set_attribute(const Glib::ustring& attribute, const Glib::VariantBase& value), g_menu_item_set_attribute_value)
   _IGNORE(g_menu_item_set_attribute)
 
-  _WRAP_METHOD(Glib::RefPtr<MenuModel> get_link(const Glib::ustring& link),  g_menu_item_get_link, refreturn)
-  _WRAP_METHOD(Glib::RefPtr<const MenuModel> get_link(const Glib::ustring& link) const,  g_menu_item_get_link, refreturn, constversion)
+//These are documented as transfer-full, so we don't need to use refreturn.
+  _WRAP_METHOD(Glib::RefPtr<MenuModel> get_link(const Glib::ustring& link), g_menu_item_get_link)
+  _WRAP_METHOD(Glib::RefPtr<const MenuModel> get_link(const Glib::ustring& link) const, g_menu_item_get_link, constversion)
 
   _WRAP_METHOD(void set_link(const Glib::ustring& link, const Glib::RefPtr<MenuModel>& model), g_menu_item_set_link)
   _WRAP_METHOD(void set_label(const Glib::ustring& label), g_menu_item_set_label)
@@ -80,6 +97,16 @@ public:
   _WRAP_METHOD(void set_action_and_target(const Glib::ustring& action, const Glib::VariantBase& target_value), g_menu_item_set_action_and_target_value)
   _IGNORE(g_menu_item_set_action_and_target)
   _WRAP_METHOD(void set_detailed_action(const Glib::ustring& detailed_action), g_menu_item_set_detailed_action)
+
+ _WRAP_METHOD(void set_icon(const Glib::RefPtr<Icon>& icon), g_menu_item_set_icon)
+
+  /** Unset the icon on the menu item.
+   * 
+   * See set_icon().
+   * 
+   * @newin{2,38}
+   */
+  void unset_icon();
 };
 
 } // namespace Gio

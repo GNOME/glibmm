@@ -219,6 +219,7 @@ _CONVERSION(`GMenuLinkIter*',`Glib::RefPtr<MenuLinkIter>',`Glib::wrap($3)')
 
 # MenuModel
 _CONVERSION(`GMenuModel*',`Glib::RefPtr<MenuModel>',`Glib::wrap($3)')
+_CONVERSION(`GMenuModel*',`Glib::RefPtr<const MenuModel>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<MenuModel>&',`GMenuModel*',__CONVERT_CONST_REFPTR_TO_P)
 
 # MenuItem
