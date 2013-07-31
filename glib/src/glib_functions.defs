@@ -623,6 +623,17 @@
   )
 )
 
+(define-flags SubprocessFlags
+  (in-module "GTest")
+  (c-name "GTestSubprocessFlags")
+  (gtype-id "G_TYPE_TEST_SUBPROCESS_FLAGS")
+  (values
+    '("stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN")
+    '("stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT")
+    '("stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR")
+  )
+)
+
 (define-enum LogType
   (in-module "GTest")
   (c-name "GTestLogType")
@@ -638,6 +649,16 @@
     '("min-result" "G_TEST_LOG_MIN_RESULT")
     '("max-result" "G_TEST_LOG_MAX_RESULT")
     '("message" "G_TEST_LOG_MESSAGE")
+  )
+)
+
+(define-enum FileType
+  (in-module "GTest")
+  (c-name "GTestFileType")
+  (gtype-id "G_TYPE_TEST_FILE_TYPE")
+  (values
+    '("dist" "G_TEST_DIST")
+    '("built" "G_TEST_BUILT")
   )
 )
 
@@ -7560,6 +7581,10 @@
 
 
 
+;; From gmessages-private.h
+
+
+
 ;; From gmirroringtable.h
 
 
@@ -8737,6 +8762,12 @@
   (of-object "GRegex")
   (c-name "g_regex_get_has_cr_or_lf")
   (return-type "gboolean")
+)
+
+(define-method get_max_lookbehind
+  (of-object "GRegex")
+  (c-name "g_regex_get_max_lookbehind")
+  (return-type "gint")
 )
 
 (define-method get_string_number
@@ -11104,6 +11135,11 @@
   (varargs #t)
 )
 
+(define-function g_test_subprocess
+  (c-name "g_test_subprocess")
+  (return-type "gboolean")
+)
+
 (define-function g_test_run
   (c-name "g_test_run")
   (return-type "int")
@@ -11201,12 +11237,13 @@
   )
 )
 
-(define-function g_test_trap_fork
-  (c-name "g_test_trap_fork")
-  (return-type "gboolean")
+(define-function g_test_trap_subprocess
+  (c-name "g_test_trap_subprocess")
+  (return-type "none")
   (parameters
+    '("const-char*" "test_path")
     '("guint64" "usec_timeout")
-    '("GTestTrapFlags" "test_trap_flags")
+    '("GTestSubprocessFlags" "test_flags")
   )
 )
 
@@ -11464,6 +11501,34 @@
     '("int" "line")
     '("const-char*" "func")
   )
+)
+
+(define-function g_test_build_filename
+  (c-name "g_test_build_filename")
+  (return-type "gchar*")
+  (parameters
+    '("GTestFileType" "file_type")
+    '("const-gchar*" "first_path")
+  )
+  (varargs #t)
+)
+
+(define-function g_test_get_dir
+  (c-name "g_test_get_dir")
+  (return-type "const-gchar*")
+  (parameters
+    '("GTestFileType" "file_type")
+  )
+)
+
+(define-function g_test_get_filename
+  (c-name "g_test_get_filename")
+  (return-type "const-gchar*")
+  (parameters
+    '("GTestFileType" "file_type")
+    '("const-gchar*" "first_path")
+  )
+  (varargs #t)
 )
 
 
@@ -13263,6 +13328,23 @@
   )
 )
 
+(define-function g_variant_new_take_string
+  (c-name "g_variant_new_take_string")
+  (return-type "GVariant*")
+  (parameters
+    '("gchar*" "string")
+  )
+)
+
+(define-function g_variant_new_printf
+  (c-name "g_variant_new_printf")
+  (return-type "GVariant*")
+  (parameters
+    '("const-gchar*" "format_string")
+  )
+  (varargs #t)
+)
+
 (define-function g_variant_new_object_path
   (c-name "g_variant_new_object_path")
   (return-type "GVariant*")
@@ -14461,6 +14543,10 @@
     '("const-gchar*" "subdir")
   )
 )
+
+
+
+;; From valgrind.h
 
 
 

@@ -1448,6 +1448,8 @@
   (values
     '("none" "G_DBUS_SIGNAL_FLAGS_NONE")
     '("no-match-rule" "G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE")
+    '("match-arg0-namespace" "G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE")
+    '("match-arg0-path" "G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH")
   )
 )
 
@@ -1874,6 +1876,34 @@
   (c-name "g_action_activate")
   (return-type "none")
   (parameters
+    '("GVariant*" "parameter")
+  )
+)
+
+(define-function g_action_name_is_valid
+  (c-name "g_action_name_is_valid")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "action_name")
+  )
+)
+
+(define-function g_action_parse_detailed_name
+  (c-name "g_action_parse_detailed_name")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "detailed_name")
+    '("gchar**" "action_name")
+    '("GVariant**" "target_value")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_action_print_detailed_name
+  (c-name "g_action_print_detailed_name")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "action_name")
     '("GVariant*" "parameter")
   )
 )
@@ -2517,6 +2547,18 @@
   (return-type "none")
 )
 
+(define-method mark_busy
+  (of-object "GApplication")
+  (c-name "g_application_mark_busy")
+  (return-type "none")
+)
+
+(define-method unmark_busy
+  (of-object "GApplication")
+  (c-name "g_application_unmark_busy")
+  (return-type "none")
+)
+
 
 
 ;; From gapplicationimpl.h
@@ -2588,6 +2630,15 @@
   (of-object "GApplicationImpl")
   (c-name "g_application_impl_get_dbus_object_path")
   (return-type "const-gchar*")
+)
+
+(define-method set_busy_state
+  (of-object "GApplicationImpl")
+  (c-name "g_application_impl_set_busy_state")
+  (return-type "none")
+  (parameters
+    '("gboolean" "busy")
+  )
 )
 
 
@@ -2883,6 +2934,27 @@
   (parameters
     '("gboolean" "auto_grow")
   )
+)
+
+
+
+;; From gbytesicon.h
+
+(define-function g_bytes_icon_get_type
+  (c-name "g_bytes_icon_get_type")
+  (return-type "GType")
+)
+
+(define-method icon_new
+  (of-object "GBytes")
+  (c-name "g_bytes_icon_new")
+  (return-type "GIcon*")
+)
+
+(define-method get_bytes
+  (of-object "GBytesIcon")
+  (c-name "g_bytes_icon_get_bytes")
+  (return-type "GBytes*")
 )
 
 
@@ -5242,6 +5314,12 @@
   (return-type "const-GDBusMethodInfo*")
 )
 
+(define-method get_property_info
+  (of-object "GDBusMethodInvocation")
+  (c-name "g_dbus_method_invocation_get_property_info")
+  (return-type "const-GDBusPropertyInfo*")
+)
+
 (define-method get_connection
   (of-object "GDBusMethodInvocation")
   (c-name "g_dbus_method_invocation_get_connection")
@@ -6365,6 +6443,31 @@
   (return-type "gboolean")
   (parameters
     '("const-char*" "key")
+  )
+)
+
+(define-method list_actions
+  (of-object "GDesktopAppInfo")
+  (c-name "g_desktop_app_info_list_actions")
+  (return-type "const-gchar*-const*")
+)
+
+(define-method launch_action
+  (of-object "GDesktopAppInfo")
+  (c-name "g_desktop_app_info_launch_action")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "action_name")
+    '("GAppLaunchContext*" "launch_context")
+  )
+)
+
+(define-method get_action_name
+  (of-object "GDesktopAppInfo")
+  (c-name "g_desktop_app_info_get_action_name")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "action_name")
   )
 )
 
@@ -7567,6 +7670,28 @@
   )
 )
 
+(define-method trash_async
+  (of-object "GFile")
+  (c-name "g_file_trash_async")
+  (return-type "none")
+  (parameters
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method trash_finish
+  (of-object "GFile")
+  (c-name "g_file_trash_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
 (define-method copy
   (of-object "GFile")
   (c-name "g_file_copy")
@@ -7627,6 +7752,28 @@
   (return-type "gboolean")
   (parameters
     '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method make_directory_async
+  (of-object "GFile")
+  (c-name "g_file_make_directory_async")
+  (return-type "none")
+  (parameters
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method make_directory_finish
+  (of-object "GFile")
+  (c-name "g_file_make_directory_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
     '("GError**" "error")
   )
 )
@@ -9128,6 +9275,20 @@
   )
 )
 
+(define-method serialize
+  (of-object "GIcon")
+  (c-name "g_icon_serialize")
+  (return-type "GVariant*")
+)
+
+(define-function g_icon_deserialize
+  (c-name "g_icon_deserialize")
+  (return-type "GIcon*")
+  (parameters
+    '("GVariant*" "value")
+  )
+)
+
 
 
 ;; From ginetaddress.h
@@ -10185,43 +10346,9 @@
 
 ;; From gioscheduler.h
 
-(define-function g_io_scheduler_push_job
-  (c-name "g_io_scheduler_push_job")
-  (return-type "none")
-  (parameters
-    '("GIOSchedulerJobFunc" "job_func")
-    '("gpointer" "user_data")
-    '("GDestroyNotify" "notify")
-    '("gint" "io_priority")
-    '("GCancellable*" "cancellable")
-  )
-)
-
 (define-function g_io_scheduler_cancel_all_jobs
   (c-name "g_io_scheduler_cancel_all_jobs")
   (return-type "none")
-)
-
-(define-method send_to_mainloop
-  (of-object "GIOSchedulerJob")
-  (c-name "g_io_scheduler_job_send_to_mainloop")
-  (return-type "gboolean")
-  (parameters
-    '("GSourceFunc" "func")
-    '("gpointer" "user_data")
-    '("GDestroyNotify" "notify")
-  )
-)
-
-(define-method send_to_mainloop_async
-  (of-object "GIOSchedulerJob")
-  (c-name "g_io_scheduler_job_send_to_mainloop_async")
-  (return-type "none")
-  (parameters
-    '("GSourceFunc" "func")
-    '("gpointer" "user_data")
-    '("GDestroyNotify" "notify")
-  )
 )
 
 
@@ -10612,6 +10739,12 @@
   )
 )
 
+(define-method remove_all
+  (of-object "GMenu")
+  (c-name "g_menu_remove_all")
+  (return-type "none")
+)
+
 (define-method insert
   (of-object "GMenu")
   (c-name "g_menu_insert")
@@ -10862,6 +10995,15 @@
   (return-type "none")
   (parameters
     '("const-gchar*" "detailed_action")
+  )
+)
+
+(define-method set_icon
+  (of-object "GMenuItem")
+  (c-name "g_menu_item_set_icon")
+  (return-type "none")
+  (parameters
+    '("GIcon*" "icon")
   )
 )
 
@@ -12089,6 +12231,26 @@
 
 
 ;; From gpollfilemonitor.h
+
+
+
+;; From gpropertyaction.h
+
+(define-function g_property_action_get_type
+  (c-name "g_property_action_get_type")
+  (return-type "GType")
+)
+
+(define-function g_property_action_new
+  (c-name "g_property_action_new")
+  (is-constructor-of "GPropertyAction")
+  (return-type "GPropertyAction*")
+  (parameters
+    '("const-gchar*" "name")
+    '("gpointer" "object")
+    '("const-gchar*" "property_name")
+  )
+)
 
 
 

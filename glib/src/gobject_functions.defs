@@ -167,6 +167,12 @@
   (return-type "const-gchar*")
 )
 
+(define-method unbind
+  (of-object "GBinding")
+  (c-name "g_binding_unbind")
+  (return-type "none")
+)
+
 (define-function g_object_bind_property
   (c-name "g_object_bind_property")
   (return-type "GBinding*")
@@ -2104,6 +2110,12 @@
   )
 )
 
+(define-method get_default_value
+  (of-object "GParamSpec")
+  (c-name "g_param_spec_get_default_value")
+  (return-type "const-GValue*")
+)
+
 (define-function g_param_type_register_static
   (c-name "g_param_type_register_static")
   (return-type "GType")
@@ -3207,12 +3219,30 @@
   )
 )
 
+(define-method add_instance_private
+  (of-object "GType")
+  (c-name "g_type_add_instance_private")
+  (return-type "gint")
+  (parameters
+    '("gsize" "private_size")
+  )
+)
+
 (define-method get_private
   (of-object "GTypeInstance")
   (c-name "g_type_instance_get_private")
   (return-type "gpointer")
   (parameters
     '("GType" "private_type")
+  )
+)
+
+(define-function g_type_class_adjust_private_offset
+  (c-name "g_type_class_adjust_private_offset")
+  (return-type "none")
+  (parameters
+    '("gpointer" "g_class")
+    '("gint*" "private_size_or_offset")
   )
 )
 
@@ -3231,6 +3261,14 @@
   (return-type "gpointer")
   (parameters
     '("GType" "private_type")
+  )
+)
+
+(define-function g_type_class_get_instance_private_offset
+  (c-name "g_type_class_get_instance_private_offset")
+  (return-type "gint")
+  (parameters
+    '("gpointer" "g_class")
   )
 )
 
@@ -3544,6 +3582,12 @@
 
 
 ;; From gtype-private.h
+
+(define-method is_in_init
+  (of-object "GType")
+  (c-name "g_type_is_in_init")
+  (return-type "gboolean")
+)
 
 
 
