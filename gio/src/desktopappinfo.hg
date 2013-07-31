@@ -69,6 +69,13 @@ public:
   _WRAP_METHOD(bool has_key(const Glib::ustring& key) const, g_desktop_app_info_has_key)
   _WRAP_METHOD(Glib::ustring get_string(const Glib::ustring& key), g_desktop_app_info_get_string )
   _WRAP_METHOD(bool get_boolean(const Glib::ustring& key) const, g_desktop_app_info_get_boolean)
+
+#m4 _CONVERSION(`const gchar* const*', `std::vector<Glib::ustring>', `Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(std::vector<Glib::ustring> list_actions() const, g_desktop_app_info_list_actions)
+
+  _WRAP_METHOD(void launch_action(const Glib::ustring& action_name, const Glib::RefPtr<AppLaunchContext>& launch_context{?}), g_desktop_app_info_launch_action)
+
+  _WRAP_METHOD(Glib::ustring get_action_name(const Glib::ustring& action_name) const, g_desktop_app_info_get_action_name)
 };
 
 } // namespace Gio
