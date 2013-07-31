@@ -20,6 +20,31 @@
 namespace Gio
 {
 
+MenuItem::MenuItem(const Glib::ustring& label, const Glib::ustring& detailed_action)
+: _CONSTRUCT()
+{
+  if(!label.empty())
+    set_label(label);
+
+  if(!detailed_action.empty())
+    set_detailed_action(detailed_action);
+}
+
+MenuItem::MenuItem(const Glib::ustring& label, const Glib::RefPtr<MenuModel>& submenu)
+: _CONSTRUCT()
+{
+  if(!label.empty())
+    set_label(label);
+
+  set_submenu(submenu);
+}
+
+MenuItem::MenuItem(const Glib::RefPtr<MenuModel>& submenu)
+: _CONSTRUCT()
+{
+  set_submenu(submenu);
+}
+
 void MenuItem::set_action_and_target(const Glib::ustring& action)
 {
   g_menu_item_set_action_and_target_value(gobj(), action.c_str(), 0);
