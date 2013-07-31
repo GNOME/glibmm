@@ -196,8 +196,33 @@ sub process($$)
   my $unknown_val = "";
   my $unknown_base = "";
   my $unknown_increment = 0;
-  foreach my $i (split(/,/, $line))
+
+  my @lines = split(/,/, $line);
+  my $iter = 0;
+
+  while ($iter < scalar @lines)
   {
+    my $brackets_count = 0;
+    my $begin = $iter;
+
+    # ignore ',' inside () brackets
+    # except '(' and ')' enum values
+    if ($lines[$iter] =~ /^\s*\S+\s*=\s*'[\(\)]'$/)
+    {
+	$iter++;
+    }
+    else
+    {
+      do
+      {							        
+        $brackets_count += () = $lines[$iter] =~ /\(/g;
+	$brackets_count -= () = $lines[$iter] =~ /\)/g;	
+	$iter++;
+      } while ($iter < scalar @lines && $brackets_count != 0);
+    }
+
+    my $i = join(',', @lines[$begin..$iter-1]);
+    
     # remove leading and trailing spaces.
     $i =~ s/^\s+//;
     $i =~ s/\s+$//;
@@ -255,7 +280,8 @@ sub process($$)
     # if name with other name exists [like MY_FLAG_VALUE = MY_PREV_FLAG_VALUE
     # or ~(MY_PREV_FLAG_VALUE | MY_EARLIER_VALUE | (1 << 5) - 1 | 0x200)].
     # [MY_FLAG MY_OTHER_FLAG is also supported - note lack of equal char.]
-    elsif ($i =~ /^(\S+)\s*=?\s*([ _x0-9a-fA-Z|()<~]+)$/)
+    # [SOME_DEFINITION([X, [Y, [...]]]) definition is also supported.]
+    elsif ($i =~ /^(\S+)\s*=?\s*([ _x0-9a-fA-Z|()<~,]+)$/)
     {
       my ($tmp1, $tmp2) = ($1, $2);
       push(@c_names, $tmp1);
