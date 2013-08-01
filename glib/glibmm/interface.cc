@@ -18,8 +18,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/threads.h> // Needed until the next ABI break.
 #include <glibmm/interface.h>
-#include <glibmm/class.h>
 #include <glibmm/private/interface_p.h>
 
 
@@ -52,52 +52,58 @@ Interface::Interface(const Interface_Class& interface_class)
   //gobject_ will be set in the Object constructor.
   //Any instantiable class that derives from Interface should also inherit from Object.
 
-  // If I understand it correctly, gobject_ shouldn't be 0 now.  daniel.
-  // TODO: Make this a g_assert() if the assumption above is correct.
-
-  g_return_if_fail(gobject_ != 0);
-
   if(custom_type_name_ && !is_anonymous_custom_())
   {
-    GObjectClass *const instance_class = G_OBJECT_GET_CLASS(gobject_);
-    const GType iface_type = interface_class.get_type();
-
-    if(!g_type_interface_peek(instance_class, iface_type))
+    if (gobject_)
     {
-      void* const g_iface = g_type_default_interface_ref(iface_type);
+      GObjectClass *const instance_class = G_OBJECT_GET_CLASS(gobject_);
+      const GType iface_type = interface_class.get_type();
 
-      // Override the properties of the derived interface, if any.
-
-      const GType custom_type = G_OBJECT_CLASS_TYPE(instance_class);
-      Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(custom_type, Class::properties_quark));
-
-      if(!props)
+      if(!g_type_interface_peek(instance_class, iface_type))
       {
-        props = new Class::properties_type();
-        g_type_set_qdata(custom_type, Class::properties_quark, props);
+        void* const g_iface = g_type_default_interface_ref(iface_type);
+
+        // Override the properties of the derived interface, if any.
+
+        const GType custom_type = G_OBJECT_CLASS_TYPE(instance_class);
+        Class::properties_type* props = static_cast<Class::properties_type*>(
+          g_type_get_qdata(custom_type, Class::properties_quark));
+
+        if(!props)
+        {
+          props = new Class::properties_type();
+          g_type_set_qdata(custom_type, Class::properties_quark, props);
+        }
+
+        const guint n_existing_props = props->size();
+
+        guint n_iface_props = 0;
+        GParamSpec** iface_props = g_object_interface_list_properties(g_iface, &n_iface_props);
+
+        for(guint p = 0; p < n_iface_props; p++)
+        {
+          GValue* g_value = g_new0(GValue, 1);
+          g_value_init(g_value, iface_props[p]->value_type);
+          g_param_value_set_default(iface_props[p], g_value);
+          props->push_back(g_value);
+
+          const gchar* prop_name = g_param_spec_get_name(iface_props[p]);
+          GParamSpec* new_spec = g_param_spec_override(prop_name, iface_props[p]);
+          g_object_class_install_property(instance_class, p + 1 + n_existing_props, new_spec);
+        }
+
+        interface_class.add_interface(custom_type);
+
+        g_type_default_interface_unref(g_iface);
+        g_free(iface_props);
       }
-
-      const guint n_existing_props = props->size();
-
-      guint n_iface_props = 0;
-      GParamSpec** iface_props = g_object_interface_list_properties(g_iface, &n_iface_props);
-
-      for(guint p = 0; p < n_iface_props; p++)
-      {
-        GValue* g_value = g_new0(GValue, 1);
-        g_value_init(g_value, iface_props[p]->value_type);
-        g_param_value_set_default(iface_props[p], g_value);
-        props->push_back(g_value);
-
-        const gchar* prop_name = g_param_spec_get_name(iface_props[p]);
-        GParamSpec* new_spec = g_param_spec_override(prop_name, iface_props[p]);
-        g_object_class_install_property(instance_class, p + 1 + n_existing_props, new_spec);
-      }
-
-      interface_class.add_interface(custom_type);
-
-      g_type_default_interface_unref(g_iface);
-      g_free(iface_props);
+    }
+    else // gobject_ == 0
+    {
+      // The GObject is not instantiated yet. Add to the custom_interface_classes
+      // and add the interface in the Glib::Object constructor.
+      Threads::Mutex::Lock lock(*extra_object_base_data_mutex);
+      extra_object_base_data[this].custom_interface_classes.push_back(&interface_class);
     }
   }
 }

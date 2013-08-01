@@ -18,12 +18,14 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/threads.h> // Needed until the next ABI break.
 #include <glib-object.h>
 
 #include <glibmm/quark.h>
 #include <glibmm/objectbase.h>
 #include <glibmm/propertyproxy_base.h> //For PropertyProxyConnectionNode
-
+#include <glibmm/interface.h>
+#include <glibmm/private/interface_p.h>
 
 namespace
 {
@@ -41,6 +43,10 @@ namespace Glib
 {
 
 /**** Glib::ObjectBase *****************************************************/
+
+// static data members
+ObjectBase::extra_object_base_data_type ObjectBase::extra_object_base_data;
+std::auto_ptr<Threads::Mutex> ObjectBase::extra_object_base_data_mutex(new Threads::Mutex());
 
 ObjectBase::ObjectBase()
 :
@@ -102,6 +108,14 @@ ObjectBase::~ObjectBase()
   // happens if a derived class's ctor throws an exception.  In that case
   // we have to call g_object_unref() on our own.
   //
+
+  // Just a precaution. Unless a derived class's ctor has thrown an exception,
+  // 'this' should have been erased from extra_object_base_data by
+  // Glib::Object's constructor.
+  Threads::Mutex::Lock lock(*extra_object_base_data_mutex);
+  extra_object_base_data.erase(this);
+  lock.release();
+
   if(GObject *const gobject = gobject_)
   {
 #ifdef GLIBMM_DEBUG_REFCOUNTING

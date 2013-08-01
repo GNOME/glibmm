@@ -18,6 +18,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmm/threads.h> // Needed until the next ABI break.
 #include <glibmm/object.h>
 #include <glibmm/private/object_p.h>
 #include <glibmm/property.h>
@@ -200,16 +201,27 @@ Object::Object()
 
   if(custom_type_name_ && !is_anonymous_custom_())
   {
+    Class::interface_class_vector_type custom_interface_classes;
+
+    Threads::Mutex::Lock lock(*extra_object_base_data_mutex);
+    const extra_object_base_data_type::iterator iter = extra_object_base_data.find(this);
+    if (iter != extra_object_base_data.end())
+    {
+      custom_interface_classes = iter->second.custom_interface_classes;
+      extra_object_base_data.erase(iter);
+    }
+    lock.release();
+
     object_class_.init();
     // This creates a type that is derived (indirectly) from GObject.
-    object_type = object_class_.clone_custom_type(custom_type_name_);
+    object_type = object_class_.clone_custom_type(
+      custom_type_name_, custom_interface_classes);
   }
 
   void *const new_object = g_object_newv(object_type, 0, 0);
 
   // Connect the GObject and Glib::Object instances.
   ObjectBase::initialize(static_cast<GObject*>(new_object));
-
 }
 
 Object::Object(const Glib::ConstructParams& construct_params)
@@ -221,7 +233,21 @@ Object::Object(const Glib::ConstructParams& construct_params)
   // class, therefore its constructor is always executed first.
 
   if(custom_type_name_ && !is_anonymous_custom_())
-    object_type = construct_params.glibmm_class.clone_custom_type(custom_type_name_);
+  {
+    Class::interface_class_vector_type custom_interface_classes;
+
+    Threads::Mutex::Lock lock(*extra_object_base_data_mutex);
+    const extra_object_base_data_type::iterator iter = extra_object_base_data.find(this);
+    if (iter != extra_object_base_data.end())
+    {
+      custom_interface_classes = iter->second.custom_interface_classes;
+      extra_object_base_data.erase(iter);
+    }
+    lock.release();
+
+    object_type = construct_params.glibmm_class.clone_custom_type(
+      custom_type_name_, custom_interface_classes);
+  }
 
   // Create a new GObject with the specified array of construct properties.
   // This works with custom types too, since those inherit the properties of
