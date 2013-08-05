@@ -1,3 +1,80 @@
+2.37.5 (unstable):
+
+Glib
+* Object: Add interfaces to custom types before class_init.
+  This deprecates the use of Glib::Object as a base class
+  anywhere but in the last in the list of base classes when
+  implementing an interface, such as TreeModel or 
+  CellRenderer.
+  Having it, for instance, as the first base class,
+  is unfortunately likely to break with glib 3.40.
+  (Kjell Ahlstedt) Bug #697229
+* DateTime: Fix compare() and equal().
+  (Kjell Ahlstedt) Bug #704639 (Aurimas Černius)
+* Regex: Add get_max_lookbehind().
+  (Murray Cumming)
+* Variant: Fix memory leaks.
+  (Kjell Ahlstedt) Bug #704851 (xanm)
+
+Gio:
+* Action:
+  - get_state() and get_state_hint() now return something.
+  We choose not to consider this an ABI break because these
+  methods were impossible to use for anything useful before.
+  (Andrew Potter) Bug #690134.
+  - Add get_state_bool() and change_state(bool),
+  to make it easier to deal with toggle actions.
+  However, we might add a whole derived convenience class for these
+  instead.
+  (Murray Cumming, Kjell Ahlstedt)
+  - Add create_radio_string() and create_radio_integer() for
+  radio items, though we might change this API lots.
+  (Murray Cumming)
+  - Add name_is_valid() and print_detailed_name().
+  (Murray Cumming)
+* ActionMap:
+  - Add add_action(name, slot).
+  This is a convenience method similar to
+  g_action_map_add_action_entries() in C.
+  (Murray Cumming, Kjell Ahlstedt)
+  - Add add_action_radio_string() and add_action_radio_integer()
+  for radio items, though we might change this API lots.
+  (Murray Cumming)
+* Application: Add mark/unmark_busy().
+  (Murray Cumming)
+* DesktopInfo: Add list_actions(), launch_action() and get_action_name().
+  (Murray Cumming)
+* File: Add trash_async(), trash_finish(), make_directory_async()
+  and make_directory_finish().
+  (Murray Cumming)
+* Menu: Add remove_all().
+  (Murray Cumming)
+* MenuItem:
+  - Add set/unset_icon().
+  (Murray Cumming)
+  - Reimplement the constructors.
+  (Murray Cumming) Bug #705199 (Pete Woods)
+* SimpleAction:
+  - set_enabled(): Add default parameter value.
+  (Murray Cumming)
+  - Add constructors and create_bool() methods that take a bool instead of
+  a VariantBase for the state, to make it easier to deal with toggle actions.
+  However, we might add a whole derived convenience class for these
+  instead.
+  (Murray Cumming)
+
+Documentation:
+* gmmproc: Add docs to the default constructor of _CLASS_OPAQUE_COPYABLE.
+  mentioning that the constructed object is invalid.
+  (Kjell Ahlstedt) Bug #704639 (Aurimas Černius)
+
+Build:
+* Glib::TypeTraits<>: Avoid warnings when compiling with -Wcast-qual.
+  (Kjell Ahlstedt) Bug #704640 (Aurimas Černius)
+* enums.pl: fixed multi-argument defines as enum values.
+  (Marcin Kolny) Bug #705113 
+
+
 2.37.4 (unstable):
 
 glibmm:
