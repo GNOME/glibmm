@@ -115,7 +115,11 @@ public:
 
   //TODO: _WRAP_METHOD(static bool parse_detailed_name(const Glib::ustring& detailed_name, gchar** action_name, GVariant** target_value), g_action_parse_detailed_name, errthrow)
 
-  _WRAP_METHOD(static Glib::ustring print_detailed_name(const Glib::ustring& action_name, const Glib::VariantBase& parameter), g_action_print_detailed_name)
+  //TODO: Docs.
+  template <typename T_Value>
+  Glib::ustring print_detailed_name(const Glib::ustring& action_name, const T_Value& value);
+
+  _WRAP_METHOD(static Glib::ustring print_detailed_name_variant(const Glib::ustring& action_name, const Glib::VariantBase& parameter), g_action_print_detailed_name)
 
   _WRAP_PROPERTY("enabled", bool)
   _WRAP_PROPERTY("name", Glib::ustring)
@@ -172,6 +176,17 @@ void Action::get_state_hint(T_Value& value) const
   const Glib::VariantBase variantBase = get_state_hint_variant();
   const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
   value = variantDerived.get();
+}
+
+template <typename T_Value>
+Glib::ustring Action::print_detailed_name(const Glib::ustring& action_name, const T_Value& parameter)
+{
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  g_return_val_if_fail(
+    g_variant_type_equal(g_action_get_parameter_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()),
+    Glib::ustring());
+  return print_detailed_name_variant(type_glib_variant::create(parameter));
 }
 
 } // namespace Gio
