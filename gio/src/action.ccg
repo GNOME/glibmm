@@ -24,19 +24,6 @@
 namespace Gio
 {
 
-bool Action::get_state_bool() const
-{
-  g_return_val_if_fail(
-    g_variant_type_equal(g_action_get_state_type(const_cast<GAction*>(gobj())), G_VARIANT_TYPE_BOOLEAN),
-    false);
-
-  GVariant* state = g_action_get_state(const_cast<GAction*>(gobj()));
-  g_return_val_if_fail(state, false);
-  const bool result = g_variant_get_boolean(state);
-  g_variant_unref(state);
-  return result;
-}
-
 void Action::change_state(bool value)
 {
   g_return_if_fail(
