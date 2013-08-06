@@ -87,6 +87,12 @@ public:
 
   _WRAP_METHOD(bool get_enabled() const, g_action_get_enabled)
 
+  //TODO: Do this when we can break ABI, removing change_state(const Glib::VariantBase& value) and change_state(bool)
+  //template <typename T_Value>
+  //void change_state(const T_Value& value);
+  //
+  //_WRAP_METHOD(void change_state_variant(const Glib::VariantBase& value), g_action_change_state)
+
   _WRAP_METHOD(void change_state(const Glib::VariantBase& value), g_action_change_state)
 
   /** Request for the state of @a action to be changed to @a value,
@@ -108,6 +114,12 @@ public:
   void get_state(T_Value& value) const;
 
   _WRAP_METHOD(Glib::VariantBase get_state_variant() const, g_action_get_state)
+
+   //TODO: Do this when we can break ABI, removing activate_variant(const Glib::VariantBase& parameter);
+   //template <typename T_Value>
+   //void activate(const T_Value& parameter);
+   //
+   //_WRAP_METHOD(void activate_variant(const Glib::VariantBase& parameter), g_action_activate)
 
   _WRAP_METHOD(void activate(const Glib::VariantBase& parameter), g_action_activate)
 
@@ -188,5 +200,27 @@ Glib::ustring Action::print_detailed_name(const Glib::ustring& action_name, cons
     Glib::ustring());
   return print_detailed_name_variant(type_glib_variant::create(parameter));
 }
+
+/* See the TODOs above for when we can break ABI:
+template <typename T_Value>
+void Action::change_state(const T_Value& value)
+{
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  g_return_if_fail(
+    g_variant_type_equal(g_action_get_state_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()));
+  change_state_variant(type_glib_variant::create(value));
+}
+
+template <typename T_Value>
+void Action::activate(const T_Value& parameter)
+{
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  g_return_if_fail(
+    g_variant_type_equal(g_action_get_parameter_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()));
+  activate_variant(type_glib_variant::create(parameter));
+}
+*/
 
 } // namespace Gio
