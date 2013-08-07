@@ -30,12 +30,21 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name)
   return action;
 }
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name, const ActivateSlot& slot)
+Glib::RefPtr<SimpleAction> ActionMap::add_action_with_parameter(const Glib::ustring& name, const ActivateWithParameterSlot& slot)
 {
   Glib::RefPtr<SimpleAction> action = add_action(name);
   action->signal_activate().connect(slot);
   return action;
 }
+
+Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name, const ActivateSlot& slot)
+{
+  Glib::RefPtr<SimpleAction> action = add_action(name);
+  action->signal_activate().connect(
+    sigc::hide(slot));
+  return action;
+}
+
 
 Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name, bool state)
 {
@@ -44,13 +53,16 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name,
   return action;
 }
 
+//TODO: Use a slot that takes a bool?
 Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name, const ActivateSlot& slot, bool state)
 {
   Glib::RefPtr<SimpleAction> action = add_action_bool(name, state);
-  action->signal_activate().connect(slot);
+  action->signal_activate().connect(
+    sigc::hide(slot));
   return action;
 }
 
+//TODO: Use a slot that takes a string?
 Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const Glib::ustring& state)
 {
   Glib::RefPtr<SimpleAction> action = SimpleAction::create_radio_string(name, state);
@@ -58,13 +70,14 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustrin
   return action;
 }
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const ActivateSlot& slot, const Glib::ustring& state)
+Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const ActivateWithParameterSlot& slot, const Glib::ustring& state)
 {
   Glib::RefPtr<SimpleAction> action = add_action_radio_string(name, state);
   action->signal_activate().connect(slot);
   return action;
 }
 
+//TODO: Use a slot that takes an integer?
 Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, gint32 state)
 {
   Glib::RefPtr<SimpleAction> action = SimpleAction::create_radio_integer(name, state);
@@ -72,7 +85,7 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustri
   return action;
 }
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, const ActivateSlot& slot, gint32 state)
+Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, const ActivateWithParameterSlot& slot, gint32 state)
 {
   Glib::RefPtr<SimpleAction> action = add_action_radio_integer(name, state);
   action->signal_activate().connect(slot);
