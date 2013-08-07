@@ -70,12 +70,42 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustrin
   return action;
 }
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const ActivateWithParameterSlot& slot, const Glib::ustring& state)
+
+namespace {
+
+//Handle the normal activate signal, calling instead a slot that takes the specific type:
+static void on_action_radio_string(const Glib::VariantBase& parameter, const Gio::ActionMap::ActivateWithStringParameterSlot& slot)
+{
+  //TODO: This syntax is odd:
+  const Glib::Variant<Glib::ustring> variantDerived =
+    parameter.cast_dynamic< Glib::Variant<Glib::ustring> >(parameter);
+  const Glib::ustring str = variantDerived.get();
+  slot(str);
+}
+
+} //anonymous namespace
+
+Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const ActivateWithStringParameterSlot& slot, const Glib::ustring& state)
 {
   Glib::RefPtr<SimpleAction> action = add_action_radio_string(name, state);
-  action->signal_activate().connect(slot);
+  action->signal_activate().connect(
+    sigc::bind(sigc::ptr_fun(&on_action_radio_string), slot));
   return action;
 }
+
+namespace {
+
+//Handle the normal activate signal, calling instead a slot that takes the specific type:
+static void on_action_radio_int(const Glib::VariantBase& parameter, const Gio::ActionMap::ActivateWithIntParameterSlot& slot)
+{
+  //TODO: This syntax is odd:
+  const Glib::Variant<int> variantDerived =
+    parameter.cast_dynamic< Glib::Variant<int> >(parameter);
+  const int str = variantDerived.get();
+  slot(str);
+}
+
+} //anonymous namespace
 
 //TODO: Use a slot that takes an integer?
 Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, gint32 state)
@@ -85,10 +115,11 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustri
   return action;
 }
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, const ActivateWithParameterSlot& slot, gint32 state)
+Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, const ActivateWithIntParameterSlot& slot, gint32 state)
 {
   Glib::RefPtr<SimpleAction> action = add_action_radio_integer(name, state);
-  action->signal_activate().connect(slot);
+  action->signal_activate().connect(
+    sigc::bind(sigc::ptr_fun(&on_action_radio_int), slot));
   return action;
 }
 
