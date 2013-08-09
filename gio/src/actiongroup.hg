@@ -19,6 +19,7 @@
 
 #include <glibmm/interface.h>
 #include <glibmm/varianttype.h>
+#include <gio/gio.h> //To declare g_action_group_get_action_state_type().
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/interface_p.h)
@@ -74,11 +75,23 @@ public:
   _WRAP_METHOD(Glib::VariantType get_action_parameter_type(const Glib::ustring& action_name) const, g_action_group_get_action_parameter_type)
   _WRAP_METHOD(Glib::VariantType get_action_state_type(const Glib::ustring& action_name) const, g_action_group_get_action_state_type)
 
-  //TODO: Add templated method, renaming this to get_actino_state_hint_variant(). See Action::get_state_hint().
-  _WRAP_METHOD(Glib::VariantContainerBase get_action_state_hint(const Glib::ustring& action_name) const, g_action_group_get_action_state_hint)
 
-  //TODO: Add templated method, renaming this to get_action_state_variant().
-  _WRAP_METHOD(Glib::VariantBase get_action_state(const Glib::ustring& action_name) const, g_action_group_get_action_state)
+  _WRAP_METHOD(Glib::VariantContainerBase get_action_state_hint(const Glib::ustring& action_name) const, g_action_group_get_action_state_hint, deprecated "Use the get_action_state() method that takes an output parameter instead.")
+
+  //TODO: Docs
+  template <typename T_Value>
+  void get_action_state_hint(const Glib::ustring& action_name, T_Value& value) const;
+
+  _WRAP_METHOD(Glib::VariantContainerBase get_action_state_hint_variant(const Glib::ustring& action_name) const, g_action_group_get_action_state_hint)
+
+
+  _WRAP_METHOD(Glib::VariantBase get_action_state(const Glib::ustring& action_name) const, g_action_group_get_action_state, deprecated "Use the get_action_state() method that takes an output parameter instead.")
+
+  //TODO: Docs
+  template <typename T_Value>
+  void get_action_state(const Glib::ustring& action_name, T_Value& value) const;
+
+  _WRAP_METHOD(Glib::VariantBase get_action_state_variant(const Glib::ustring& action_name) const, g_action_group_get_action_state)
 
   //TODO: Add templated method, renaming this to change_action_state_variant().
   _WRAP_METHOD(void change_action_state(const Glib::ustring& action_name, const Glib::VariantBase& value), g_action_group_change_action_state)
@@ -119,5 +132,40 @@ public:
   _WRAP_VFUNC(void change_action_state(const Glib::ustring& name, const Glib::VariantBase& value), "change_action_state")
   _WRAP_VFUNC(void activate_action(const Glib::ustring& name, const Glib::VariantBase& parameter), "activate_action")
 };
+
+template <typename T_Value>
+void ActionGroup::get_action_state(const Glib::ustring& action_name, T_Value& value) const
+{
+  value = T_Value(); //Make sure that it is initialized.
+
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  g_return_if_fail(
+    g_variant_type_equal(g_action_group_get_action_state_type(const_cast<GActionGroup*>(gobj()), action_name.c_str()), type_glib_variant::variant_type().gobj()));
+
+  const Glib::VariantBase variantBase = get_action_state_variant(action_name);
+  const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
+  value = variantDerived.get();
+}
+
+template <typename T_Value>
+void ActionGroup::get_action_state_hint(const Glib::ustring& action_name, T_Value& value) const
+{
+  value = T_Value(); //Make sure that it is initialized.
+
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  g_return_if_fail(
+    g_variant_type_equal(g_action_get_state_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()));
+
+  const Glib::VariantBase variantBase = get_action_state_hint_variant(action_name);
+
+  // We can't check the type (a range) that will be returned before getting the range hint.
+  g_return_if_fail(
+    variantBase.is_of_type(type_glib_variant::variant_type()) );
+
+  const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
+  value = variantDerived.get();
+}
 
 } // namespace Gio
