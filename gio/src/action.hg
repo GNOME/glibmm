@@ -80,9 +80,14 @@ public:
   _WRAP_METHOD(Glib::VariantType get_state_type() const, g_action_get_state_type)
 
   //TODO: Docs
+  //TODO: Is there any specific type that can really be used with this? A std::list<>. We must test this.
+  //  See also ActionGroup:::get_action_state_hint().
   template <typename T_Value>
   void get_state_hint(T_Value& value) const;
 
+  //TODO: When we can break ABI, Return a Glib::VariantContainerBase,
+  // as we already do for ActionGroup::get_action_state_hint(), 
+  // because that is what this returns (to specify a range).
   _WRAP_METHOD(Glib::VariantBase get_state_hint_variant() const, g_action_get_state_hint)
 
   _WRAP_METHOD(bool get_enabled() const, g_action_get_enabled)
@@ -182,10 +187,12 @@ void Action::get_state_hint(T_Value& value) const
 
   typedef Glib::Variant<T_Value> type_glib_variant;
 
-  g_return_if_fail(
-    g_variant_type_equal(g_action_get_state_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()));
-
   const Glib::VariantBase variantBase = get_state_hint_variant();
+
+  // We can't check the type (a range) that will be returned before getting the range hint.
+  g_return_if_fail(
+    variantBase.is_of_type(type_glib_variant::variant_type()) );
+
   const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
   value = variantDerived.get();
 }
