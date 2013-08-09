@@ -92,27 +92,31 @@ public:
 
   _WRAP_METHOD(bool get_enabled() const, g_action_get_enabled)
 
-  //TODO: Do this when we can break ABI, removing change_state(const Glib::VariantBase& value) and change_state(bool)
-  //template <typename T_Value>
-  //void change_state(const T_Value& value);
-  //
-  //_WRAP_METHOD(void change_state_variant(const Glib::VariantBase& value), g_action_change_state)
-
-  _WRAP_METHOD(void change_state(const Glib::VariantBase& value), g_action_change_state)
-
   /** Request for the state of @a action to be changed to @a value,
-   * assuming that the state is boolean.
+   * assuming that the action has the expected state type.
    * 
-   * See g_action_get_state_type().
+   * See get_state_type().
    * 
    * This call merely requests a change.  The action may refuse to change
    * its state or may change its state to something other than @a value.
-   * See g_action_get_state_hint().
+   * See get_state_hint().
    * 
    * @newin{2,38}
    * @param value The new state.
    */
-  void change_state(bool value);
+  template <typename T_Value>
+  void change_state(const T_Value& value);
+
+  //This is just here to maintain API compatibility,
+  //by stopping the compiler from calling the
+  //regular change_state() with a Variant,
+  //if the application code previously called change_state(VariantBase).
+  template <typename T_Value>
+  void change_state(const Glib::Variant<T_Value>& value);
+
+  _WRAP_METHOD(void change_state_variant(const Glib::VariantBase& value), g_action_change_state)
+
+  _WRAP_METHOD(void change_state(const Glib::VariantBase& value), g_action_change_state, deprecated "Use the templated method instead, passing a normal C++ type.")
 
   //TODO: Docs
   template <typename T_Value>
@@ -120,13 +124,20 @@ public:
 
   _WRAP_METHOD(Glib::VariantBase get_state_variant() const, g_action_get_state)
 
-   //TODO: Do this when we can break ABI, removing activate_variant(const Glib::VariantBase& parameter);
-   //template <typename T_Value>
-   //void activate(const T_Value& parameter);
-   //
-   //_WRAP_METHOD(void activate_variant(const Glib::VariantBase& parameter), g_action_activate)
+  //TODO: Docs
+  template <typename T_Value>
+  void activate(const T_Value& parameter);
 
-  _WRAP_METHOD(void activate(const Glib::VariantBase& parameter), g_action_activate)
+  //This is just here to maintain API compatibility,
+  //by stopping the compiler from calling the
+  //regular change_state() with a Variant,
+  //if the application code previously called activate(VariantBase).
+  template <typename T_Value>
+  void activate(const Glib::Variant<T_Value>& parameter);
+
+  _WRAP_METHOD(void activate_variant(const Glib::VariantBase& parameter), g_action_activate)
+
+  _WRAP_METHOD(void activate(const Glib::VariantBase& parameter), g_action_activate, deprecated "Use the templated method instead, passing a normal C++ type.")
 
   _WRAP_METHOD(static bool name_is_valid(const Glib::ustring& action_name), g_action_name_is_valid )
 
@@ -208,7 +219,6 @@ Glib::ustring Action::print_detailed_name(const Glib::ustring& action_name, cons
   return print_detailed_name_variant(type_glib_variant::create(parameter));
 }
 
-/* See the TODOs above for when we can break ABI:
 template <typename T_Value>
 void Action::change_state(const T_Value& value)
 {
@@ -216,7 +226,14 @@ void Action::change_state(const T_Value& value)
 
   g_return_if_fail(
     g_variant_type_equal(g_action_get_state_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()));
+
   change_state_variant(type_glib_variant::create(value));
+}
+
+template <typename T_Value>
+void Action::change_state(const Glib::Variant<T_Value>& value)
+{
+  change_state_variant(value);
 }
 
 template <typename T_Value>
@@ -226,8 +243,16 @@ void Action::activate(const T_Value& parameter)
 
   g_return_if_fail(
     g_variant_type_equal(g_action_get_parameter_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()));
+
   activate_variant(type_glib_variant::create(parameter));
 }
-*/
+
+
+template <typename T_Value>
+void Action::activate(const Glib::Variant<T_Value>& value)
+{
+  activate(value);
+}
+
 
 } // namespace Gio
