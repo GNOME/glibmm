@@ -272,6 +272,9 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
     my $refreturn = "";
     $refreturn = "refreturn" if($bRefreturn eq 1);
 
+    my ($conversions, $declarations, $initializations) =
+      convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num);
+
     # The default signal handler is a virtual function.
     # It's not hidden by deprecation, since that would break ABI.
     my $str = sprintf("_SIGNAL_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s)dnl\n",
@@ -280,7 +283,7 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
       $$objCppfunc{rettype},
       $$objDefsSignal{rettype},
       $objCppfunc->args_types_and_names(),
-      convert_args_cpp_to_c($objCppfunc, $objDefsSignal, 0, $line_num), #$objCppfunc->args_names_only(),
+      $conversions,
       $$objCppfunc{const},
       $refreturn,
       $ifdef);
@@ -301,6 +304,9 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
 
   if($bCustomCCallback ne 1)
   {
+    my $conversions =
+      convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num);
+
     #This is hidden by deprecation.
     my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s)dnl\n",
       $$objCppfunc{name},
@@ -309,7 +315,7 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
       $$objDefsSignal{rettype},
       $objDefsSignal->args_types_and_names(),
       $objDefsSignal->args_names_only(),
-      convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num),
+      $conversions,
       ${$objDefsSignal->get_param_names()}[0],
       $ifdef,
       $deprecated);
@@ -561,11 +567,11 @@ sub output_wrap_create($$$)
   }
 }
 
-# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs)
+# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs)
 # custom_signalproxy_name is "" when no type conversion is required - a normal templates SignalProxy will be used instead.
 sub output_wrap_sig_decl($$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous, $deprecated, $deprecation_docs) = @_;
+  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs) = @_;
 
 # _SIGNAL_PROXY(c_signal_name, c_return_type, `<c_arg_types_and_names>',
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
@@ -585,38 +591,41 @@ sub output_wrap_sig_decl($$$$$$$$$$)
   my $doxycomment = $objCppfunc->get_refdoc_comment($documentation);
 
   # If there was already a previous doxygen comment, we want to merge this
-  # one with the previous so it is one big comment. If it were two separate
-  # comments, doxygen would ignore the first one. If
-  # $merge_doxycomment_with_previous is nonzero, the first comment is
-  # already open but not yet closed.
-  if($merge_doxycomment_with_previous)
+  # one with the previous so it is one big comment. If
+  # $commentblock is not emtpy, it contains the previous doxygen comment without
+  # opening and closing tokens (/** and */).
+  if($commentblock ne "")
   {
     # Strip leading whitespace
     $doxycomment =~ s/^\s+//;
 
-    # We don't have something to add, so just close the comment.
+    # We don't have something to add, so just use $commentblock with
+    # opening and closing tokens added.
     if($doxycomment eq "")
     {
-      $doxycomment = "   */";
+      $doxycomment = '  /**' . $commentblock . "\n   */";
     }
     else
     {
-      # Append the new comment, but remove the first three leading characters
-      # (which are /**) that mark the beginning of the comment.
+      # Merge the two comments, but remove the first three characters from the
+      # second comment (/**) that mark the beginning of the comment.
       $doxycomment = substr($doxycomment, 3);
       $doxycomment =~ s/^\s+//;
-      $doxycomment = "   " . $doxycomment;
+      $doxycomment = '  /**' . $commentblock . "\n   *\n   " . $doxycomment;
     }
   }
 
-  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',%s)dnl\n",
+  my $conversions =
+    convert_args_c_to_cpp($objCSignal, $objCppfunc, $line_num);
+
+  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',%s,\`%s\',%s)dnl\n",
     $signal_name,
     $$objCSignal{rettype},
     $objCSignal->args_types_and_names_without_object(),
     $$objCppfunc{name},
     $$objCppfunc{rettype},
     $objCppfunc->args_types_only(),
-    convert_args_c_to_cpp($objCSignal, $objCppfunc, $line_num),
+    $conversions,
     $bCustomCCallback, #When this is true, it will not write the *_callback implementation for you.
     $deprecated,
     $doxycomment,

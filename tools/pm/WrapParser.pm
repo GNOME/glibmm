@@ -114,7 +114,7 @@ sub parse_and_build_output($)
     if ($token eq "_WRAP_METHOD")     { $self->on_wrap_method(); next;}
     if ($token eq "_WRAP_METHOD_DOCS_ONLY")     { $self->on_wrap_method_docs_only(); next;}
     if ($token eq "_WRAP_CORBA_METHOD")     { $self->on_wrap_corba_method(); next;} #Used in libbonobo*mm.
-    if ($token eq "_WRAP_SIGNAL") { $self->on_wrap_signal(0); next;}
+    if ($token eq "_WRAP_SIGNAL") { $self->on_wrap_signal(); next;}
     if ($token eq "_WRAP_PROPERTY") { $self->on_wrap_property(); next;}
     if ($token eq "_WRAP_VFUNC") { $self->on_wrap_vfunc(); next;}
     if ($token eq "_WRAP_CTOR")   { $self->on_wrap_ctor(); next;}
@@ -333,40 +333,26 @@ sub on_comment_doxygen($)
 
     if ($_ eq "*/")
     {
-      push (@out,"\'*");
+      push (@out,"\'*/");
       $objOutputter->append(join("", @out));
 
-      # Find next non-whitespace token, but remember whitespace so that we
-      # can print it if the next real token is not _WRAP_SIGNAL
+      # Extract all following whitespace tokens.
       my @whitespace;
       my $next_token = $self->peek_token();
       while ($next_token !~ /\S/)
       {
         push(@whitespace, $self->extract_token());
-	$next_token = $self->peek_token();
+        $next_token = $self->peek_token();
       }
+      # Do not extract the following non-whitespace token so that
+      # parse_and_build_output() will process it.
 
-      # If the next token is a signal, do not close this comment, to merge
-      # this doxygen comment with the one from the signal.
-      if($next_token eq '_WRAP_SIGNAL')
-      {
-	# Extract token and process
-	$self->extract_token();
-	# Tell wrap_signal to merge automatically generated comment with
-	# already existing comment. This is why we do not close the comment
-	# here.
-        $self->on_wrap_signal(1);
-      }
-      else
-      {
-        # Something other than signal follows, so close comment normally
-        $objOutputter->append("/");
-        # And append whitespace we ignored so far
-        $objOutputter->append(join("", @whitespace));
-        # Do not extract the token so that parse_and_build_output() will
-        # process it.
-      }
-
+      # Append whitespace.
+      # extract_preceding_documentation() expects to find a preceding
+      # doxygen comment, if any, as two array elements, one with the whole
+      # comment, the following (possibly empty) with the following
+      # whitespace.
+      $objOutputter->append(join("", @whitespace));
       last;
     }
 
@@ -821,10 +807,10 @@ sub extract_preceding_documentation ($)
 
   my $comment = '';
 
-  if ($#$out >= 2)
+  if ($#$out >= 1)
   {
-    # steal the last three tokens
-    my @back = splice(@$out, -3);
+    # steal the last two tokens
+    my @back = splice(@$out, -2);
     local $_ = join('', @back);
 
     # Check for /*[*!] ... */ or //[/!] comments.  The closing */ _must_
@@ -1160,12 +1146,19 @@ sub on_wrap_create($)
 
 sub on_wrap_signal($$)
 {
-  my ($self, $merge_doxycomment_with_previous) = @_;
+  my ($self) = @_;
 
   if( !($self->check_for_eof()) )
   {
     return;
   }
+
+  my $commentblock = $self->extract_preceding_documentation();
+  # Remove leading and trailing m4 quotes, if any.
+  # M4 quotes will be added around the whole comment, after $commentblock has
+  # possibly been merged with a second comment block.
+  $commentblock =~ s/^`//;
+  $commentblock =~ s/'$//;
 
   my $str = $self->extract_bracketed_text();
   my @args = string_split_commas($str);
@@ -1225,7 +1218,7 @@ sub on_wrap_signal($$)
 
   $self->output_wrap_signal($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                             $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback,
-                            $bRefreturn, $ifdef, $merge_doxycomment_with_previous, $argDeprecated, $deprecation_docs);
+                            $bRefreturn, $ifdef, $commentblock, $argDeprecated, $deprecation_docs);
 }
 
 # void on_wrap_vfunc()
@@ -1450,12 +1443,12 @@ sub output_wrap_check($$$$$$)
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
 #                  $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
-#                  $merge_doxycomment_with_previous, $deprecated, $deprecation_docs)
+#                  $commentblock, $deprecated, $deprecation_docs)
 sub output_wrap_signal($$$$$$$$$$$)
 {
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
       $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
-      $merge_doxycomment_with_previous, $deprecated, $deprecation_docs) = @_;
+      $commentblock, $deprecated, $deprecation_docs) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $signal_name,
@@ -1488,7 +1481,7 @@ sub output_wrap_signal($$$$$$$$$$$)
   }
 
   $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal,
-    $signal_name, $bCustomCCallback, $ifdef, $merge_doxycomment_with_previous,
+    $signal_name, $bCustomCCallback, $ifdef, $commentblock,
     $deprecated, $deprecation_docs);
 
   if($bNoDefaultHandler eq 0)
