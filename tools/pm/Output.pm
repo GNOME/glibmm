@@ -170,6 +170,7 @@ sub output_wrap_vfunc_cc($$$$$$$$)
   {
     my $refreturn = "";
     $refreturn = "refreturn" if($$objCppfunc{rettype_needs_ref});
+    my $returnValue = $$objCppfunc{return_value};
 
     my ($conversions, $declarations, $initializations) =
       convert_args_cpp_to_c($objCppfunc, $objCFunc, 0, $line_num, $errthrow);
@@ -177,7 +178,7 @@ sub output_wrap_vfunc_cc($$$$$$$$)
     my $no_slot_copy = "";
     $no_slot_copy = "no_slot_copy" if ($$objCppfunc{no_slot_copy});
 
-    my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
+    my $str = sprintf("_VFUNC_CC(%s,%s,%s,%s,\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -190,7 +191,8 @@ sub output_wrap_vfunc_cc($$$$$$$$)
       $errthrow,
       $$objCppfunc{slot_type},
       $$objCppfunc{slot_name},
-      $no_slot_copy);
+      $no_slot_copy,
+      $returnValue);
 
     $self->append($str);
   }
@@ -206,7 +208,9 @@ sub output_wrap_vfunc_cc($$$$$$$$)
     my $conversions =
      convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num);
 
-    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s)dnl\n",
+    my $returnValue = $$objCppfunc{return_value};
+
+    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -219,7 +223,8 @@ sub output_wrap_vfunc_cc($$$$$$$$)
       $ifdef,
       $errthrow,
       $$objCppfunc{slot_type},
-      $$objCppfunc{c_data_param_name});
+      $$objCppfunc{c_data_param_name},
+      $returnValue);
 
     $self->append($str);
   }

@@ -22,8 +22,8 @@ dnl              $1      $2       $3        $4
 dnl _VFUNC_PCC(cppname,gtkname,cpprettype,crettype,
 dnl                         $5               $6           $7            $8         $9           $10      $11
 dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef, errthrow,
-dnl                     $12           $13
-dnl                  slot_type, c_data_param_name)
+dnl                     $12           $13            $14
+dnl                  slot_type, c_data_param_name, return_value)
 dnl
 dnl Note: _get_current_wrapper_inline() could be used throughout for performance instead of _get_current_wrapper(),
 dnl and is_derived_() instead of is_derived_(),
@@ -103,17 +103,20 @@ ifelse($4,void,,`    return retval;
   }
 
 ifelse($4,void,,`dnl
-
+ifelse(`$14', `',`dnl
   typedef $4 RType;
   return RType`'();
+',`dnl
+  return _CONVERT($3,$4,`$14');
+')dnl
 ')dnl
 }
 ifelse(`$10',,,`#endif // $10
 ')dnl
 _POP()')
 
-#               $1        $2          $3         $4          $5             $6          $7        $8        $9        $10         $11        $12          $13
-# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn, $ifdef, $errthrow, $slot_type, $slot_name, $no_slot_copy)
+#               $1        $2          $3         $4          $5             $6          $7        $8        $9        $10         $11        $12          $13           $14
+# _VFUNC_CC(vfunc_name, gtkname, cpp_rettype, c_rettype, `<cppargs>', `<carg_names>', is_const, refreturn, $ifdef, $errthrow, $slot_type, $slot_name, $no_slot_copy, $returnValue)
 #
 define(`_VFUNC_CC',`dnl
 _PUSH(SECTION_CC_VFUNCS)
@@ -161,8 +164,12 @@ ifelse($10,errthrow,`dnl
     return retval;
   }
 
+ifelse(`$14', `',`dnl
   typedef $3 RType;
   return RType`'();
+',`dnl
+  return $14;
+')dnl
 ')dnl
 }
 ifelse(`$9',,,`#endif // $9

@@ -1242,6 +1242,7 @@ sub on_wrap_vfunc($)
 
   my $refreturn = 0;
   my $refreturn_ctype = 0;
+  my $returnValue = "";
   my $custom_vfunc = 0;
   my $custom_vfunc_callback = 0;
   my $ifdef = "";
@@ -1262,6 +1263,13 @@ sub on_wrap_vfunc($)
     elsif($argRef eq "refreturn_ctype")
     {
       $refreturn_ctype = 1;
+    }
+    # Return value, if neither the underlying C class defines the vfunc
+    # nor the C++ vfunc is overridden in a user-defined subclass.
+    # (Default is the default value of the return type, e.g. false or 0.)
+    elsif($argRef =~ /^return_value\s+(.*)/)
+    {
+      $returnValue = $1;
     }
     elsif($argRef eq "custom_vfunc")
     {
@@ -1303,7 +1311,7 @@ sub on_wrap_vfunc($)
   $self->output_wrap_vfunc($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                            $refreturn, $refreturn_ctype, $custom_vfunc,
                            $custom_vfunc_callback, $ifdef, $errthrow,
-                           $slot_name, $slot_callback, $no_slot_copy);
+                           $slot_name, $slot_callback, $no_slot_copy, $returnValue);
 }
 
 sub on_wrap_enum($)
@@ -1500,12 +1508,12 @@ sub output_wrap_signal($$$$$$$$$$$)
 # void output_wrap_vfunc($CppDecl, $vfunc_name, $filename, $line_num,
 #                  $refreturn, $refreturn_ctype,
 #                  $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
-#                  $slot_name, $slot_callback, $no_slot_copy)
-sub output_wrap_vfunc($$$$$$$$$$$$)
+#                  $slot_name, $slot_callback, $no_slot_copy, $returnValue)
+sub output_wrap_vfunc($$$$$$$$$$$$$)
 {
   my ($self, $CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
       $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
-      $slot_name, $slot_callback, $no_slot_copy) = @_;
+      $slot_name, $slot_callback, $no_slot_copy, $returnValue) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, '_WRAP_VFUNC'));
@@ -1536,6 +1544,7 @@ sub output_wrap_vfunc($$$$$$$$$$$$)
   # These macros are defined in vfunc.m4:
 
   $$objCppVfunc{rettype_needs_ref} = $refreturn;
+  $$objCppVfunc{return_value} = $returnValue;
   $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" suffix, and a separate easily-named invoker method.
 
   # Store the slot information in the vfunc if specified.
