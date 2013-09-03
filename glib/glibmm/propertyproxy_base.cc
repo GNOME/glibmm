@@ -26,6 +26,7 @@
 #include <glibmm/signalproxy_connectionnode.h>
 #include <glibmm/object.h>
 #include <glibmm/private/object_p.h>
+#include <cstring>
 
 namespace Glib
 {
@@ -98,7 +99,19 @@ SignalProxyProperty PropertyProxy_Base::signal_changed()
 
 void PropertyProxy_Base::set_property_(const Glib::ValueBase& value)
 {
-  g_object_set_property(obj_->gobj(), property_name_, value.gobj());
+  const GValue* cvalue = value.gobj();
+  if(cvalue && G_VALUE_HOLDS(cvalue, G_TYPE_STRING))
+  {
+    const gchar* str = g_value_get_string (cvalue);
+    if(str && (strcmp(str, "") == 0))
+    {
+      //Pass NULL to the C API instead of "":
+      g_object_set(obj_->gobj(), property_name_, (void*)0, (void*)0);
+      return;
+    }
+  }
+
+  g_object_set_property(obj_->gobj(), property_name_, cvalue);
 }
 
 void PropertyProxy_Base::get_property_(Glib::ValueBase& value) const
