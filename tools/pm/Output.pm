@@ -1163,13 +1163,21 @@ sub convert_args_cpp_to_c($$$$$)
 
     if ($cppParamType ne $cParamType) #If a type conversion is needed.
     {
+      my $std_conversion = sprintf("_CONVERT(%s,%s,%s,%s)",
+            $cppParamType,
+            $cParamType,
+            $cppParamName,
+            $wrap_line_number);
 
-
-      push(@conversions, sprintf("_CONVERT(%s,%s,%s,%s)",
-                  $cppParamType,
-                  $cParamType,
-                  $cppParamName,
-                  $wrap_line_number) );
+      if (($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL) &&
+       $cppParamType =~ /^(const\s+)?(std::string|Glib::ustring)&?/)
+      {
+        push(@conversions, "$cppParamName.empty() ? 0 : " . $std_conversion);
+      }
+      else
+      {
+        push(@conversions, $std_conversion);
+      }
     }
     else
     {
