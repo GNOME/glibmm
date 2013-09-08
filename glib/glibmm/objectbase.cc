@@ -1,4 +1,7 @@
-/* Copyright 2002-2013 The gtkmm Development Team
+// -*- c++ -*-
+/* $Id$ */
+
+/* Copyright 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -261,7 +264,7 @@ void ObjectBase::set_property_value(const Glib::ustring& property_name, const Gl
   if(cvalue && G_VALUE_HOLDS(cvalue, G_TYPE_STRING))
   {
     const gchar* str = g_value_get_string (cvalue);
-    if(g_strcmp0(str, "") == 0)
+    if(str && (strcmp(str, "") == 0))
     {
       //Pass NULL to the C API instead of "":
       g_object_set(gobj(), property_name.c_str(), (void*)0, (void*)0);
