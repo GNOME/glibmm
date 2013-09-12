@@ -47,54 +47,54 @@ class DefsParser(IncludeParser):
         self.defines = defines      # -Dfoo=bar options, as dictionary
 
     def define_object(self, *args):
-        odef = apply(ObjectDef, args)
+        odef = ObjectDef(*args)
         self.objects.append(odef)
         self.c_name[odef.c_name] = odef
     def define_interface(self, *args):
-        idef = apply(InterfaceDef, args)
+        idef = InterfaceDef(*args)
         self.interfaces.append(idef)
         self.c_name[idef.c_name] = idef
     def define_enum(self, *args):
-        edef = apply(EnumDef, args)
+        edef = EnumDef(*args)
         self.enums.append(edef)
         self.c_name[edef.c_name] = edef
     def define_flags(self, *args):
-        fdef = apply(FlagsDef, args)
+        fdef = FlagsDef(*args)
         self.enums.append(fdef)
         self.c_name[fdef.c_name] = fdef
     def define_boxed(self, *args):
-        bdef = apply(BoxedDef, args)
+        bdef = BoxedDef(*args)
         self.boxes.append(bdef)
         self.c_name[bdef.c_name] = bdef
     def define_pointer(self, *args):
-        pdef = apply(PointerDef, args)
+        pdef = PointerDef(*args)
         self.pointers.append(pdef)
         self.c_name[pdef.c_name] = pdef
     def define_function(self, *args):
-        fdef = apply(FunctionDef, args)
+        fdef = FunctionDef(*args)
         self.functions.append(fdef)
         self.c_name[fdef.c_name] = fdef
     def define_method(self, *args):
-        mdef = apply(MethodDef, args)
+        mdef = MethodDef(*args)
         self.functions.append(mdef)
         self.c_name[mdef.c_name] = mdef
     def define_virtual(self, *args):
-        vdef = apply(VirtualDef, args)
+        vdef = VirtualDef(*args)
         self.virtuals.append(vdef)
     def merge(self, old, parmerge):
         for obj in self.objects:
-            if old.c_name.has_key(obj.c_name):
+            if obj.c_name in old.c_name:
                 obj.merge(old.c_name[obj.c_name])
         for f in self.functions:
-            if old.c_name.has_key(f.c_name):
+            if f.c_name in old.c_name:
                 f.merge(old.c_name[f.c_name], parmerge)
 
     def printMissing(self, old):
         for obj in self.objects:
-            if not old.c_name.has_key(obj.c_name):
+            if obj.c_name not in old.c_name:
                 obj.write_defs()
         for f in self.functions:
-            if not old.c_name.has_key(f.c_name):
+            if f.c_name not in old.c_name:
                 f.write_defs()
 
     def write_defs(self, fp=sys.stdout):
@@ -125,18 +125,18 @@ class DefsParser(IncludeParser):
 
     def find_methods(self, obj):
         objname = obj.c_name
-        return filter(lambda func, on=objname: isinstance(func, MethodDef) and
-                      func.of_object == on, self.functions)
+        return list(filter(lambda func, on=objname: isinstance(func, MethodDef) and
+                      func.of_object == on, self.functions))
 
     def find_virtuals(self, obj):
         objname = obj.c_name
-        retval = filter(lambda func, on=objname: isinstance(func, VirtualDef) and
-                        func.of_object == on, self.virtuals)
+        retval = list(filter(lambda func, on=objname: isinstance(func, VirtualDef) and
+                        func.of_object == on, self.virtuals))
         return retval
 
     def find_functions(self):
-        return filter(lambda func: isinstance(func, FunctionDef) and
-                      not func.is_constructor_of, self.functions)
+        return [func for func in self.functions if isinstance(func, FunctionDef) and
+                      not func.is_constructor_of]
 
     def ifdef(self, *args):
         if args[0] in self.defines:

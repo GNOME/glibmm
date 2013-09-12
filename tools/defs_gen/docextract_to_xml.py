@@ -8,7 +8,6 @@
 
 import getopt
 import re
-import string
 import sys
 
 import docextract
@@ -30,35 +29,35 @@ def escape_text(unescaped_text):
     escaped_text = re.sub(r'&(?![A-Za-z]+;)', '&amp;', unescaped_text)
 
     # These weird entities turn up in the output...
-    escaped_text = string.replace(escaped_text, '&mdash;', '&#8212;')
-    escaped_text = string.replace(escaped_text, '&ast;', '*')
-    escaped_text = string.replace(escaped_text, '&percnt;', '%')
-    escaped_text = string.replace(escaped_text, '&commat;', '@')
-    escaped_text = string.replace(escaped_text, '&colon;', ':')
-    escaped_text = string.replace(escaped_text, '&num;', '&#35;')
-    escaped_text = string.replace(escaped_text, '&nbsp;', '&#160;')
-    escaped_text = string.replace(escaped_text, '&solidus;', '&#47;')
-    escaped_text = string.replace(escaped_text, '&pi;', '&#8719;')
-    escaped_text = string.replace(escaped_text, '&rArr;', '&#8658;')
+    escaped_text = escaped_text.replace('&mdash;', '&#8212;')
+    escaped_text = escaped_text.replace('&ast;', '*')
+    escaped_text = escaped_text.replace('&percnt;', '%')
+    escaped_text = escaped_text.replace('&commat;', '@')
+    escaped_text = escaped_text.replace('&colon;', ':')
+    escaped_text = escaped_text.replace('&num;', '&#35;')
+    escaped_text = escaped_text.replace('&nbsp;', '&#160;')
+    escaped_text = escaped_text.replace('&solidus;', '&#47;')
+    escaped_text = escaped_text.replace('&pi;', '&#8719;')
+    escaped_text = escaped_text.replace('&rArr;', '&#8658;')
     # This represents a '/' before or after an '*' so replace with slash but
     # with spaces.
-    escaped_text = string.replace(escaped_text, '&sol;', ' / ')
+    escaped_text = escaped_text.replace('&sol;', ' / ')
 
     # Escape for both tag contents and attribute values
-    escaped_text = string.replace(escaped_text, '<', '&lt;')
-    escaped_text = string.replace(escaped_text, '>', '&gt;')
-    escaped_text = string.replace(escaped_text, '"', '&quot;')
+    escaped_text = escaped_text.replace('<', '&lt;')
+    escaped_text = escaped_text.replace('>', '&gt;')
+    escaped_text = escaped_text.replace('"', '&quot;')
 
     # Replace C++ comment begin and ends to ones that don't affect Doxygen.
-    escaped_text = string.replace(escaped_text, '/*', '/ *')
-    escaped_text = string.replace(escaped_text, '*/', '* /')
+    escaped_text = escaped_text.replace('/*', '/ *')
+    escaped_text = escaped_text.replace('*/', '* /')
 
     return escaped_text
 
 def print_annotations(annotations):
     for annotation in annotations:
-        print "<annotation name=" + annotation[0] +  ">" + \
-                escape_text(annotation[1]) + "</annotation>"
+        print("<annotation name=" + annotation[0] +  ">" + \
+                escape_text(annotation[1]) + "</annotation>")
 
 if __name__ == '__main__':
     try:
@@ -66,7 +65,7 @@ if __name__ == '__main__':
                                    ["source-dir=", "with-annotations",
                                      "with-properties", "no-since",
                                      "no-signals", "no-enums"])
-    except getopt.error, e:
+    except getopt.error as e:
         sys.stderr.write('docextract_to_xml.py: %s\n' % e)
         usage()
     source_dirs = []
@@ -97,7 +96,7 @@ if __name__ == '__main__':
 
     if docs:
 
-        print "<root>"
+        print("<root>")
 
         for name, value in sorted(docs.items()):
             # Get the type of comment block ('function', 'signal' or
@@ -114,41 +113,41 @@ if __name__ == '__main__':
             elif block_type == 'enum' and not with_enums:
                 continue
 
-            print "<" + block_type + " name=\"" + escape_text(name) + "\">"
+            print("<" + block_type + " name=\"" + escape_text(name) + "\">")
 
-            print "<description>"
-            print escape_text(value.get_description())
-            print "</description>"
+            print("<description>")
+            print(escape_text(value.get_description()))
+            print("</description>")
 
             # Loop through the parameters if not dealing with a property:
             if block_type != 'property':
-                print "<parameters>"
+                print("<parameters>")
                 for name, description, annotations in value.params:
-                        print "<parameter name=\"" + escape_text(name) + "\">"
-                        print "<parameter_description>" + escape_text(description) + "</parameter_description>"
+                        print("<parameter name=\"" + escape_text(name) + "\">")
+                        print("<parameter_description>" + escape_text(description) + "</parameter_description>")
 
                         if with_annotations:
                             print_annotations(annotations)
 
-                        print "</parameter>"
+                        print("</parameter>")
 
-                print "</parameters>"
+                print("</parameters>")
 
             if block_type != 'property' and block_type != 'enum':
               # Show the return-type (also if not dealing with a property or
               # enum):
               if with_annotations:
-                  print "<return>"
-                  print "<return_description>" + escape_text(value.ret[0]) + \
-                          "</return_description>"
+                  print("<return>")
+                  print("<return_description>" + escape_text(value.ret[0]) + \
+                          "</return_description>")
                   print_annotations(value.ret[1])
-                  print "</return>"
+                  print("</return>")
               else:
-                  print "<return>" + escape_text(value.ret[0]) + "</return>"
+                  print("<return>" + escape_text(value.ret[0]) + "</return>")
 
             if with_annotations:
                 print_annotations(value.get_annotations())
 
-            print "</" + block_type + ">\n"
+            print("</" + block_type + ">\n")
 
-        print "</root>"
+        print("</root>")

@@ -86,14 +86,14 @@ def to_upper_str(name):
     name = _upperstr_pat1.sub(r'\1_\2', name)
     name = _upperstr_pat2.sub(r'\1_\2', name)
     name = _upperstr_pat3.sub(r'\1_\2', name, count=1)
-    return string.upper(name)
+    return name.upper()
 
 def typecode(typename, namespace=None):
     """create a typecode (eg. GTK_TYPE_WIDGET) from a typename"""
     if namespace:
-      return string.replace(string.upper(namespace) + "_" + to_upper_str(typename[len(namespace):]), '_', '_TYPE_', 1)
+      return (namespace.upper() + "_" + to_upper_str(typename[len(namespace):])).replace('_', '_TYPE_', 1)
 
-    return string.replace(to_upper_str(typename), '_', '_TYPE_', 1)
+    return to_upper_str(typename).replace('_', '_TYPE_', 1)
 
 
 # ------------------ Find object definitions -----------------
@@ -102,10 +102,10 @@ def strip_comments(buf):
     parts = []
     lastpos = 0
     while 1:
-        pos = string.find(buf, '/*', lastpos)
+        pos = buf.find('/*', lastpos)
         if pos >= 0:
             parts.append(buf[lastpos:pos])
-            pos = string.find(buf, '*/', pos)
+            pos = buf.find('*/', pos)
             if pos >= 0:
                 lastpos = pos + 2
             else:
@@ -113,7 +113,7 @@ def strip_comments(buf):
         else:
             parts.append(buf[lastpos:])
             break
-    return string.join(parts, '')
+    return ''.join(parts)
 
 # Strips the dll API from buffer, for example WEBKIT_API
 def strip_dll_api(buf):
@@ -259,11 +259,11 @@ def find_enum_defs(buf, enums=[]):
 
         name = m.group(2)
         vals = m.group(1)
-        isflags = string.find(vals, '<<') >= 0
+        isflags = '<<' in vals
         entries = []
         for val in splitter.split(vals):
-            if not string.strip(val): continue
-            entries.append(string.split(val)[0])
+            if not val.strip(): continue
+            entries.append(val.split()[0])
         if name != 'GdkCursorType':
             enums.append((name, isflags, entries))
 
@@ -340,10 +340,10 @@ def clean_func(buf):
 
     # make return types that are const work.
     buf = re.sub(r'\s*\*\s*G_CONST_RETURN\s*\*\s*', '** ', buf)
-    buf = string.replace(buf, 'G_CONST_RETURN ', 'const-')
-    buf = string.replace(buf, 'const ', 'const-')
+    buf = buf.replace('G_CONST_RETURN ', 'const-')
+    buf = buf.replace('const ', 'const-')
     # This is for types such as 'const gchar* const *'
-    buf = string.replace(buf, '* const', '*-const')
+    buf = buf.replace('* const', '*-const')
 
     #strip GSEAL macros from the middle of function declarations:
     pat = re.compile(r"""GSEAL""", re.VERBOSE)
@@ -381,7 +381,7 @@ class DefsWriter:
         if defsfilter:
             filter = defsparser.DefsParser(defsfilter)
             filter.startParsing()
-            for func in filter.functions + filter.methods.values():
+            for func in filter.functions + list(filter.methods.values()):
                 self._functions[func.c_name] = func
             for obj in filter.objects + filter.boxes + filter.interfaces:
                 self._objects[obj.c_name] = obj
@@ -400,8 +400,6 @@ class DefsWriter:
             fp = self.fp
 
         fp.write(';; Enumerations and flags ...\n\n')
-        trans = string.maketrans(string.uppercase + '_',
-                                 string.lowercase + '-')
         filter = self._enums
         for cname, isflags, entries in enums:
             if filter:
@@ -436,7 +434,7 @@ class DefsWriter:
             fp.write('  (values\n')
             for ent in entries:
                 fp.write('    \'("%s" "%s")\n' %
-                         (string.translate(ent[prefix_len:], trans), ent))
+                         (ent[prefix_len:].lower().replace('_', '-'), ent))
             fp.write('  )\n')
             fp.write(')\n\n')
 
@@ -474,7 +472,7 @@ class DefsWriter:
 
     def _define_func(self, buf):
         buf = clean_func(buf)
-        buf = string.split(buf,'\n')
+        buf = buf.split('\n')
         filter = self._functions
         for p in buf:
             if not p:
@@ -494,9 +492,9 @@ class DefsWriter:
             args = m.group('args')
             args = arg_split_pat.split(args)
             for i in range(len(args)):
-                spaces = string.count(args[i], ' ')
+                spaces = args[i].count(' ')
                 if spaces > 1:
-                    args[i] = string.replace(args[i], ' ', '-', spaces - 1)
+                    args[i] = args[i].replace(' ', '-', spaces - 1)
 
             self._write_func(func, ret, args)
 
@@ -538,7 +536,7 @@ class DefsWriter:
         self._write_arguments(args)
 
     def _write_method(self, obj, name, ret, args):
-        regex = string.join(map(lambda x: x+'_?', string.lower(obj)),'')
+        regex = ''.join([x+'_?' for x in obj.lower()])
         mname = re.sub(regex, '', name, 1)
         if self.prefix:
             l = len(self.prefix) + 1
@@ -568,7 +566,7 @@ class DefsWriter:
             self.fp.write('  (parameters\n')
             for arg in args:
                 if arg != '...':
-                    tupleArg = tuple(string.split(arg))
+                    tupleArg = tuple(arg.split())
                     if len(tupleArg) == 2:
                         self.fp.write('    \'("%s" "%s")\n' % tupleArg)
             self.fp.write('  )\n')
@@ -607,7 +605,7 @@ def main(args):
             defsfilter = v
 
     if not args[0:1]:
-        print 'Must specify at least one input file name'
+        print('Must specify at least one input file name')
         return -1
 
     # read all the object definitions in
@@ -627,11 +625,11 @@ def main(args):
                         verbose=verbose, defsfilter=defsfilter)
         dw.write_obj_defs(objdefs, types)
         dw.write_enum_defs(enums, types)
-        print "Wrote %s-types.defs" % separate
+        print("Wrote %s-types.defs" % separate)
 
         for filename in args:
             dw.write_def(filename)
-        print "Wrote %s.defs" % separate
+        print("Wrote %s.defs" % separate)
     else:
         dw = DefsWriter(prefix=modulename, ns=namespace,
                         verbose=verbose, defsfilter=defsfilter)

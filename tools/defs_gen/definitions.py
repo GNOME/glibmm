@@ -210,7 +210,7 @@ class EnumDef(Definition):
 
 class FlagsDef(EnumDef):
     def __init__(self, *args):
-        apply(EnumDef.__init__, (self,) + args)
+        EnumDef.__init__(*(self,) + args)
         self.deftype = 'flags'
 
 class BoxedDef(Definition):
@@ -463,8 +463,8 @@ class FunctionDef(Definition):
                     self.params.append(Parameter(ptype, pname, pdflt, pnull))
             elif arg[0] == 'properties':
                 if self.is_constructor_of is None:
-                    print >> sys.stderr, "Warning: (properties ...) "\
-                          "is only valid for constructors"
+                    sys.stderr.write("Warning: (properties ...) "\
+                          "is only valid for constructors")
                 for prop in arg[1:]:
                     pname = prop[0]
                     optional = False
@@ -516,7 +516,7 @@ class FunctionDef(Definition):
             raise RuntimeError("could not find %s in old_parameters %r" % (
                 param.pname, [p.pname for p in old.params]))
         try:
-            self.params = map(merge_param, self.params)
+            self.params = list(map(merge_param, self.params))
         except RuntimeError:
             # parameter names changed and we can't find a match; it's
             # safer to keep the old parameter list untouched.
