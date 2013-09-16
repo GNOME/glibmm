@@ -52,8 +52,8 @@ class ActionMap : public Glib::Interface
   _CLASS_INTERFACE(ActionMap, GActionMap, G_ACTION_MAP, GActionMapInterface)
 
 public:
-  _WRAP_METHOD(Glib::RefPtr<Action> lookup_action(const Glib::ustring& action_name), g_action_map_lookup_action)
-  _WRAP_METHOD(Glib::RefPtr<const Action> lookup_action(const Glib::ustring& action_name) const, g_action_map_lookup_action, constversion)
+  _WRAP_METHOD(Glib::RefPtr<Action> lookup_action(const Glib::ustring& action_name), g_action_map_lookup_action, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Action> lookup_action(const Glib::ustring& action_name) const, g_action_map_lookup_action, constversion, refreturn)
 
   /** A Slot to be called when an action has been activated.
    * See add_action_with_parameter().
@@ -189,6 +189,7 @@ public:
 #m4 _CONVERSION(`Glib::RefPtr<Action>', `GAction*', `Glib::unwrap($3)')
   _WRAP_VFUNC(Glib::RefPtr<Action> lookup_action(const Glib::ustring& name) const, "lookup_action")
 
+  //TODO: Change this to use const & when we can break ABI.
   _WRAP_VFUNC(void add_action(Glib::RefPtr<Action> action) const, "add_action")
   _WRAP_VFUNC(void remove_action(const Glib::ustring& name), "remove_action")
 };
