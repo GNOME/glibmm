@@ -21,6 +21,7 @@ _DEFS(glibmm,glib)
 #include <glibmm/varianttype.h>
 #include <glibmm/variantiter.h>
 #include <glibmm/ustring.h>
+#include <glibmm/error.h>
 #include <utility>
 #include <vector>
 #include <map>
@@ -59,6 +60,13 @@ namespace Glib
  * values. Variant includes a printer for this language and a parser
  * with type inferencing.</a>.
  */
+
+//Note: So far we only wrap this because it is thrown by GtkBuilder's functions.
+// See https://bugzilla.gnome.org/show_bug.cgi?id=708206
+// It would also be thrown by parse() if we wrap g_variant_parse().
+/** Exception class for Variant parse errors.
+ */
+_WRAP_GERROR(VariantParseError, GVariantParseError, G_VARIANT_PARSE_ERROR, NO_GTYPE)
 
 //TODO: VariantBase class can be copied, so suggest how it can be dynamic casted to
 //derived types: See https://bugzilla.gnome.org/show_bug.cgi?id=644146
