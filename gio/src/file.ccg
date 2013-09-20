@@ -28,6 +28,7 @@ namespace
 {
 
 typedef std::pair<Gio::File::SlotFileProgress*, Gio::SlotAsyncReady*> CopySlots;
+typedef std::pair<Gio::File::SlotFileMeasureProgress*, Gio::SlotAsyncReady*> MeasureSlots;
 typedef std::pair<Gio::File::SlotReadMore*, Gio::SlotAsyncReady*> LoadPartialSlots;
 
 static void
@@ -53,9 +54,37 @@ SignalProxy_file_progress_callback(goffset current_num_bytes,
 // the slot is packed in a pair. The operation is assumed to be finished
 // after the callback is triggered, so we delete that pair here.
 static void
-SignalProxy_file_ready_callback(GObject*, GAsyncResult* res, void* data)
+SignalProxy_file_copy_async_callback(GObject*, GAsyncResult* res, void* data)
 {
   CopySlots* slot_pair = static_cast<CopySlots*>(data);
+  Gio::SlotAsyncReady* the_slot = slot_pair->second;
+
+  try
+  {
+    if(*the_slot)
+    {
+      Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
+      (*the_slot)(result);
+    }
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  delete the_slot;
+  delete slot_pair->first; // progress slot
+  delete slot_pair;
+}
+
+
+// Same as SignalProxy_async_callback, except that this one knows that
+// the slot is packed in a pair. The operation is assumed to be finished
+// after the callback is triggered, so we delete that pair here.
+static void
+SignalProxy_file_measure_async_callback(GObject*, GAsyncResult* res, void* data)
+{
+  MeasureSlots* slot_pair = static_cast<MeasureSlots*>(data);
   Gio::SlotAsyncReady* the_slot = slot_pair->second;
 
   try
@@ -120,6 +149,27 @@ SignalProxy_load_partial_contents_ready_callback(GObject*, GAsyncResult* res, vo
   delete the_slot;
   delete slot_pair->first; // read_more slot
   delete slot_pair;
+}
+
+static void
+SignalProxy_file_measure_progress_callback(gboolean reporting,
+  guint64  current_size,
+  guint64  num_dirs,
+  guint64  num_files,
+  gpointer data)
+{
+  Gio::File::SlotFileMeasureProgress* the_slot = static_cast<Gio::File::SlotFileMeasureProgress*>(data);
+
+  try
+  {
+
+    (*the_slot)(reporting, current_size, num_dirs, num_files);
+
+  }
+  catch(...)
+  {
+    Glib::exception_handlers_invoke();
+  }
 }
 
 } // anonymous namespace
@@ -662,7 +712,7 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                  int io_priority)
 {
   // Create a new pair which will hold copies of passed slots.
-  // This will be deleted in the SignalProxy_file_ready_callback() callback
+  // This will be deleted in the SignalProxy_file_copy_async_callback() callback
   CopySlots* slots = new CopySlots();
   SlotFileProgress* slot_progress_copy = new SlotFileProgress(slot_progress);
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
@@ -677,7 +727,7 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                     Glib::unwrap(cancellable),
                     &SignalProxy_file_progress_callback,
                     slot_progress_copy,
-                    &SignalProxy_file_ready_callback,
+                    &SignalProxy_file_copy_async_callback,
                     slots);
 }
 
@@ -712,7 +762,7 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                  int io_priority)
 {
   // Create a new pair which will hold copies of passed slots.
-  // This will be deleted in the SignalProxy_file_ready_callback() callback
+  // This will be deleted in the SignalProxy_file_copy_async_callback() callback
   CopySlots* slots = new CopySlots();
   SlotFileProgress* slot_progress_copy = new SlotFileProgress(slot_progress);
   SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
@@ -727,7 +777,7 @@ File::copy_async(const Glib::RefPtr<File>& destination,
                     0,
                     &SignalProxy_file_progress_callback,
                     slot_progress_copy,
-                    &SignalProxy_file_ready_callback,
+                    &SignalProxy_file_copy_async_callback,
                     slots);
 }
 
@@ -1508,6 +1558,37 @@ Glib::RefPtr<FileMonitor> File::monitor(FileMonitorFlags flags)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
+}
+
+
+void File::measure_disk_usage(const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot_progress, guint64& disk_usage, guint64& num_dirs, guint64& num_files, FileMeasureFlags flags)
+{
+  GError* gerror = 0;
+  g_file_measure_disk_usage(gobj(), ((GFileMeasureFlags)(flags)),
+    const_cast<GCancellable*>(Glib::unwrap(cancellable)),
+    &SignalProxy_file_measure_progress_callback, const_cast<SlotFileMeasureProgress*>(&slot_progress),
+    &disk_usage, &num_dirs, &num_files, &(gerror));
+  if(gerror)
+    ::Glib::Error::throw_exception(gerror);
+}
+
+void File::measure_disk_usage_async(const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot_progress, FileMeasureFlags flags, int io_priority)
+{
+  // Create a new pair which will hold copies of passed slots.
+  // This will be deleted in the SignalProxy_file_measure_async_callback() callback
+  MeasureSlots* slots = new MeasureSlots();
+  SlotFileMeasureProgress* slot_progress_copy = new SlotFileMeasureProgress(slot_progress);
+  SlotAsyncReady* slot_ready_copy = new SlotAsyncReady(slot_ready);
+
+  slots->first = slot_progress_copy;
+  slots->second = slot_ready_copy;
+
+  g_file_measure_disk_usage_async(gobj(),
+    ((GFileMeasureFlags)(flags)),
+    io_priority,
+    const_cast<GCancellable*>(Glib::unwrap(cancellable)),
+    &SignalProxy_file_measure_progress_callback, const_cast<SlotFileMeasureProgress*>(&slot_progress),
+    &SignalProxy_file_measure_async_callback, slots);
 }
 
 void File::start_mountable(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<MountOperation>& start_operation, DriveStartFlags flags)
