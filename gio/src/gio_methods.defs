@@ -879,6 +879,18 @@
   )
 )
 
+(define-flags MeasureFlags
+  (in-module "GFile")
+  (c-name "GFileMeasureFlags")
+  (gtype-id "G_TYPE_FILE_MEASURE_FLAGS")
+  (values
+    '("none" "G_FILE_MEASURE_NONE")
+    '("report-any-error" "G_FILE_MEASURE_REPORT_ANY_ERROR")
+    '("apparent-size" "G_FILE_MEASURE_APPARENT_SIZE")
+    '("no-xdev" "G_FILE_MEASURE_NO_XDEV")
+  )
+)
+
 (define-enum MountFlags
   (in-module "GMount")
   (c-name "GMountMountFlags")
@@ -8129,6 +8141,50 @@
   )
 )
 
+(define-method measure_disk_usage
+  (of-object "GFile")
+  (c-name "g_file_measure_disk_usage")
+  (return-type "gboolean")
+  (parameters
+    '("GFileMeasureFlags" "flags")
+    '("GCancellable*" "cancellable")
+    '("GFileMeasureProgressCallback" "progress_callback")
+    '("gpointer" "progress_data")
+    '("guint64*" "disk_usage")
+    '("guint64*" "num_dirs")
+    '("guint64*" "num_files")
+    '("GError**" "error")
+  )
+)
+
+(define-method measure_disk_usage_async
+  (of-object "GFile")
+  (c-name "g_file_measure_disk_usage_async")
+  (return-type "none")
+  (parameters
+    '("GFileMeasureFlags" "flags")
+    '("gint" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GFileMeasureProgressCallback" "progress_callback")
+    '("gpointer" "progress_data")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method measure_disk_usage_finish
+  (of-object "GFile")
+  (c-name "g_file_measure_disk_usage_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("guint64*" "disk_usage")
+    '("guint64*" "num_dirs")
+    '("guint64*" "num_files")
+    '("GError**" "error")
+  )
+)
+
 (define-method start_mountable
   (of-object "GFile")
   (c-name "g_file_start_mountable")
@@ -9832,6 +9888,11 @@
 
 (define-function g_file_create_flags_get_type
   (c-name "g_file_create_flags_get_type")
+  (return-type "GType")
+)
+
+(define-function g_file_measure_flags_get_type
+  (c-name "g_file_measure_flags_get_type")
   (return-type "GType")
 )
 
@@ -13775,44 +13836,6 @@
   (c-name "g_simple_action_group_new")
   (is-constructor-of "GSimpleActionGroup")
   (return-type "GSimpleActionGroup*")
-)
-
-(define-method lookup
-  (of-object "GSimpleActionGroup")
-  (c-name "g_simple_action_group_lookup")
-  (return-type "GAction*")
-  (parameters
-    '("const-gchar*" "action_name")
-  )
-)
-
-(define-method insert
-  (of-object "GSimpleActionGroup")
-  (c-name "g_simple_action_group_insert")
-  (return-type "none")
-  (parameters
-    '("GAction*" "action")
-  )
-)
-
-(define-method remove
-  (of-object "GSimpleActionGroup")
-  (c-name "g_simple_action_group_remove")
-  (return-type "none")
-  (parameters
-    '("const-gchar*" "action_name")
-  )
-)
-
-(define-method add_entries
-  (of-object "GSimpleActionGroup")
-  (c-name "g_simple_action_group_add_entries")
-  (return-type "none")
-  (parameters
-    '("const-GActionEntry*" "entries")
-    '("gint" "n_entries")
-    '("gpointer" "user_data")
-  )
 )
 
 
