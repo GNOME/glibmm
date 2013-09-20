@@ -2091,6 +2091,10 @@ Flags passed to g_spawn_sync(), g_spawn_async() and g_spawn_async_with_pipes().
 
 </description>
 <parameters>
+<parameter name="G_SPAWN_DEFAULT">
+<parameter_description> no flags, default behaviour
+</parameter_description>
+</parameter>
 <parameter name="G_SPAWN_LEAVE_DESCRIPTORS_OPEN">
 <parameter_description> the parent's open file descriptors will be
 inherited by the child; otherwise all descriptors except stdin/stdout/stderr
@@ -4799,11 +4803,10 @@ The macro can be turned off in final releases of code by defining
 
 <function name="g_assert_cmpfloat">
 <description>
-Debugging macro to terminate the application with a warning
-message if a floating point number comparison fails.
+Debugging macro to compare two floating point numbers.
 
 The effect of &lt;literal&gt;g_assert_cmpfloat (n1, op, n2)&lt;/literal&gt; is
-the same as &lt;literal&gt;g_assert (n1 op n2)&lt;/literal&gt;. The advantage
+the same as &lt;literal&gt;g_assert_true (n1 op n2)&lt;/literal&gt;. The advantage
 of this macro is that it can produce a message that includes the
 actual values of @n1 and @n2.
 
@@ -4830,8 +4833,7 @@ One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
 
 <function name="g_assert_cmphex">
 <description>
-Debugging macro to terminate the application with a warning
-message if an unsigned integer comparison fails.
+Debugging macro to compare to unsigned integers.
 
 This is a variant of g_assert_cmpuint() that displays the numbers
 in hexadecimal notation in the message.
@@ -4859,11 +4861,10 @@ One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
 
 <function name="g_assert_cmpint">
 <description>
-Debugging macro to terminate the application with a warning
-message if an integer comparison fails.
+Debugging macro to compare two integers.
 
 The effect of &lt;literal&gt;g_assert_cmpint (n1, op, n2)&lt;/literal&gt; is
-the same as &lt;literal&gt;g_assert (n1 op n2)&lt;/literal&gt;. The advantage
+the same as &lt;literal&gt;g_assert_true (n1 op n2)&lt;/literal&gt;. The advantage
 of this macro is that it can produce a message that includes the
 actual values of @n1 and @n2.
 
@@ -4890,12 +4891,13 @@ One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
 
 <function name="g_assert_cmpstr">
 <description>
-Debugging macro to terminate the application with a warning
-message if a string comparison fails. The strings are compared
-using g_strcmp0().
+Debugging macro to compare two strings. If the comparison fails,
+an error message is logged and the application is either terminated
+or the testcase marked as failed.
+The strings are compared using g_strcmp0().
 
 The effect of &lt;literal&gt;g_assert_cmpstr (s1, op, s2)&lt;/literal&gt; is
-the same as &lt;literal&gt;g_assert (g_strcmp0 (s1, s2) op 0)&lt;/literal&gt;.
+the same as &lt;literal&gt;g_assert_true (g_strcmp0 (s1, s2) op 0)&lt;/literal&gt;.
 The advantage of this macro is that it can produce a message that
 includes the actual values of @s1 and @s2.
 
@@ -4926,11 +4928,10 @@ One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
 
 <function name="g_assert_cmpuint">
 <description>
-Debugging macro to terminate the application with a warning
-message if an unsigned integer comparison fails.
+Debugging macro to compare two unsigned integers.
 
 The effect of &lt;literal&gt;g_assert_cmpuint (n1, op, n2)&lt;/literal&gt; is
-the same as &lt;literal&gt;g_assert (n1 op n2)&lt;/literal&gt;. The advantage
+the same as &lt;literal&gt;g_assert_true (n1 op n2)&lt;/literal&gt;. The advantage
 of this macro is that it can produce a message that includes the
 actual values of @n1 and @n2.
 
@@ -4957,11 +4958,11 @@ One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
 
 <function name="g_assert_error">
 <description>
-Debugging macro to terminate the application with a warning
-message if a method has not returned the correct #GError.
+Debugging macro to check that a method has returned
+the correct #GError.
 
 The effect of &lt;literal&gt;g_assert_error (err, dom, c)&lt;/literal&gt; is
-the same as &lt;literal&gt;g_assert (err != NULL &amp;&amp; err-&gt;domain
+the same as &lt;literal&gt;g_assert_true (err != NULL &amp;&amp; err-&gt;domain
 == dom &amp;&amp; err-&gt;code == c)&lt;/literal&gt;. The advantage of this
 macro is that it can produce a message that includes the incorrect
 error message and code.
@@ -4990,13 +4991,34 @@ Since: 2.20
 <return></return>
 </function>
 
+<function name="g_assert_false">
+<description>
+Debugging macro to check an expression is false.
+
+If the assertion fails (i.e. the expression is not false),
+an error message is logged and the application is either
+terminated or the testcase marked as failed.
+
+See g_test_set_nonfatal_assertions().
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="expr">
+<parameter_description> the expression to check
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_assert_no_error">
 <description>
-Debugging macro to terminate the application with a warning
-message if a method has returned a #GError.
+Debugging macro to check that a #GError is not set.
 
 The effect of &lt;literal&gt;g_assert_no_error (err)&lt;/literal&gt; is
-the same as &lt;literal&gt;g_assert (err == NULL)&lt;/literal&gt;. The advantage
+the same as &lt;literal&gt;g_assert_true (err == NULL)&lt;/literal&gt;. The advantage
 of this macro is that it can produce a message that includes
 the error message and code.
 
@@ -5023,6 +5045,50 @@ The macro can be turned off in final releases of code by defining
 
 </description>
 <parameters>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_assert_null">
+<description>
+Debugging macro to check an expression is %NULL.
+
+If the assertion fails (i.e. the expression is not %NULL),
+an error message is logged and the application is either
+terminated or the testcase marked as failed.
+
+See g_test_set_nonfatal_assertions().
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="expr">
+<parameter_description> the expression to check
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_assert_true">
+<description>
+Debugging macro to check that an expression is true.
+
+If the assertion fails (i.e. the expression is not true),
+an error message is logged and the application is either
+terminated or the testcase marked as failed.
+
+See g_test_set_nonfatal_assertions().
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="expr">
+<parameter_description> the expression to check
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
@@ -10289,6 +10355,8 @@ function over the call provided by the system; on Unix, it will
 attempt to correctly handle %EINTR, which has platform-specific
 semantics.
 
+Since: 2.36
+
 </description>
 <parameters>
 <parameter name="fd">
@@ -13650,7 +13718,23 @@ the year as a decimal number including the century
 &lt;varlistentry&gt;&lt;term&gt;
 &lt;literal&gt;\%z&lt;/literal&gt;:
 &lt;/term&gt;&lt;listitem&gt;&lt;simpara&gt;
-the time-zone as hour offset from UTC
+the time zone as an offset from UTC (+hhmm)
+&lt;/simpara&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;
+&lt;varlistentry&gt;&lt;term&gt;
+&lt;literal&gt;\%:z&lt;/literal&gt;:
+&lt;/term&gt;&lt;listitem&gt;&lt;simpara&gt;
+the time zone as an offset from UTC (+hh:mm). This is a gnulib strftime extension. Since: 2.38
+&lt;/simpara&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;
+&lt;varlistentry&gt;&lt;term&gt;
+&lt;literal&gt;\%::z&lt;/literal&gt;:
+&lt;/term&gt;&lt;listitem&gt;&lt;simpara&gt;
+the time zone as an offset from UTC (+hh:mm:ss). This is a gnulib strftime extension. Since: 2.38
+&lt;/simpara&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;
+&lt;varlistentry&gt;&lt;term&gt;
+&lt;literal&gt;\%:::z&lt;/literal&gt;:
+&lt;/term&gt;&lt;listitem&gt;&lt;simpara&gt;
+the time zone as an offset from UTC, with : to necessary precision
+(e.g., -04, +05:30). This is a gnulib strftime extension. Since: 2.38
 &lt;/simpara&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;
 &lt;varlistentry&gt;&lt;term&gt;
 &lt;literal&gt;\%Z&lt;/literal&gt;:
@@ -16854,12 +16938,19 @@ not be modified or freed.
 
 <function name="g_get_tmp_dir">
 <description>
-Gets the directory to use for temporary files. This is found from 
-inspecting the environment variables &lt;envar&gt;TMPDIR&lt;/envar&gt;, 
-&lt;envar&gt;TMP&lt;/envar&gt;, and &lt;envar&gt;TEMP&lt;/envar&gt; in that order. If none 
-of those are defined &quot;/tmp&quot; is returned on UNIX and &quot;C:\&quot; on Windows. 
-The encoding of the returned string is system-defined. On Windows, 
-it is always UTF-8. The return value is never %NULL or the empty string.
+Gets the directory to use for temporary files.
+
+On UNIX, this is taken from the &lt;envar&gt;TMPDIR&lt;/envar&gt; environment
+variable.  If the variable is not set, &lt;literal&gt;P_tmpdir&lt;/literal&gt; is
+used, as defined by the system C library.  Failing that, a hard-coded
+default of &quot;/tmp&quot; is returned.
+
+On Windows, the &lt;envar&gt;TEMP&lt;/envar&gt; environment variable is used,
+with the root directory of the Windows installation (eg: &quot;C:\&quot;) used
+as a default.
+
+The encoding of the returned string is system-defined. On Windows, it
+is always UTF-8. The return value is never %NULL or the empty string.
 
 
 </description>
@@ -37490,6 +37581,19 @@ and/or @data the handlers have to match.
 </return>
 </function>
 
+<function name="g_signal_handlers_destroy">
+<description>
+
+</description>
+<parameters>
+<parameter name="instance">
+<parameter_description> The instance where a signal handler is sought.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_signal_handlers_disconnect_by_data">
 <description>
 Disconnects all handlers on an instance that match @data.
@@ -42240,7 +42344,7 @@ For use with #GHashTable.
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if they strings are the same length and contain the
+<return> %TRUE if the strings are the same length and contain the
 same bytes
 </return>
 </function>
@@ -43743,6 +43847,29 @@ Since: 2.30
 <return></return>
 </function>
 
+<function name="g_test_failed">
+<description>
+Returns whether a test has already failed. This will
+be the case when g_test_fail(), g_test_incomplete()
+or g_test_skip() have been called, but also if an
+assertion has failed.
+
+This can be useful to return early from a test if
+continuing after a failed assertion might be harmful.
+
+The return value of this function is only meaningful
+if it is called from inside a test function.
+
+Since: 2.38
+
+</description>
+<parameters>
+</parameters>
+<return> %TRUE if the test has failed
+
+</return>
+</function>
+
 <function name="g_test_get_dir">
 <description>
 Gets the pathname of the directory containing test files of the type
@@ -43814,6 +43941,31 @@ Since: 2.16
 <return> the toplevel #GTestSuite
 
 </return>
+</function>
+
+<function name="g_test_incomplete">
+<description>
+Indicates that a test failed because of some incomplete
+functionality. This function can be called multiple times
+from the same test.
+
+Calling this function will not stop the test from running, you
+need to return from the test function yourself. So you can
+produce additional diagnostic messages or even continue running
+the test.
+
+If not called from inside a test, this function does nothing.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> explanation
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_test_init">
@@ -44331,6 +44483,51 @@ Since: 2.16
 <return> 0 on success
 
 </return>
+</function>
+
+<function name="g_test_set_nonfatal_assertions">
+<description>
+Changes the behaviour of g_assert_cmpstr(), g_assert_cmpint(),
+g_assert_cmpuint(), g_assert_cmphex(), g_assert_cmpfloat(),
+g_assert_true(), g_assert_false(), g_assert_null(), g_assert_no_error(),
+g_assert_error(), g_test_assert_expected_messages() and the various
+g_test_trap_assert_*() macros to not abort to program, but instead
+call g_test_fail() and continue.
+
+Note that the g_assert_not_reached() and g_assert() are not
+affected by this.
+
+This function can only be called after g_test_init().
+
+Since: 2.38
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_test_skip">
+<description>
+Indicates that a test was skipped.
+
+Calling this function will not stop the test from running, you
+need to return from the test function yourself. So you can
+produce additional diagnostic messages or even continue running
+the test.
+
+If not called from inside a test, this function does nothing.
+
+Since: 2.38
+
+</description>
+<parameters>
+<parameter name="msg">
+<parameter_description> explanation
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_test_slow">
@@ -44997,6 +45194,7 @@ of @func becomes the return value of the thread, which can be obtained
 with g_thread_join().
 
 The @name can be useful for discriminating threads in a debugger.
+It is not used for other purposes and does not have to be unique.
 Some systems restrict the length of @name to 16 bytes.
 
 If the thread can not be created the program aborts. See
@@ -45010,7 +45208,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="name">
-<parameter_description> a name for the new thread
+<parameter_description> an (optional) name for the new thread
 </parameter_description>
 </parameter>
 <parameter name="func">
@@ -45470,7 +45668,7 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="name">
-<parameter_description> a name for the new thread
+<parameter_description> an (optional) name for the new thread
 </parameter_description>
 </parameter>
 <parameter name="func">
