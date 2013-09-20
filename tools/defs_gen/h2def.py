@@ -304,6 +304,10 @@ def clean_func(buf):
     pat = re.compile(r"""G_GNUC_WARN_UNUSED_RESULT|G_INLINE_FUNC""", re.MULTILINE)
     buf = pat.sub('', buf)
 
+    #strip *_DEPRECATED_IN_*_FOR (*):
+    pat = re.compile(r"""[A-Z]+_DEPRECATED_IN_[1-9]_([1-9]*)_FOR \(\S*\)\S*""", re.MULTILINE)
+    buf = pat.sub('', buf)
+
     #strip *_DEPRECATED*
     pat = re.compile(r"""[A-Z]+_DEPRECATED\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
