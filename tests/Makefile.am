@@ -39,9 +39,10 @@ check_PROGRAMS =				\
 	glibmm_bool_vector/test			\
 	glibmm_bool_arrayhandle/test		\
 	glibmm_null_vectorutils/test		\
-	glibmm_null_containerhandle/test \
-	glibmm_refptr_sigc_bind/test
-	
+	glibmm_null_containerhandle/test	\
+	glibmm_refptr_sigc_bind/test		\
+	glibmm_bytearray/test
+
 TESTS =	$(check_PROGRAMS)
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
@@ -97,3 +98,4 @@ glibmm_null_vectorutils_test_LDADD       = $(giomm_ldadd)
 glibmm_null_containerhandle_test_SOURCES = glibmm_null_containerhandle/main.cc
 glibmm_null_containerhandle_test_LDADD   = $(giomm_ldadd)
 glibmm_refptr_sigc_bind_test_SOURCES     = glibmm_refptr_sigc_bind/main.cc
+glibmm_bytearray_test_SOURCES            = glibmm_bytearray/main.cc
