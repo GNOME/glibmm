@@ -71,10 +71,12 @@ GMenuItem * g_menu_item_new_section                 (const Glib::ustring& label,
 //                                                     const Glib::RefPtr<MenuModel>& section);
 
   //TODO: Add a set_attribute() templated method to get values directly instead
-  //of requiring a Glib::VariantBase?
+  //of requiring a Glib::VariantBase, when we can break ABI:
+  //template <typename T_Value>
+  //void set_attribute(const Glib::ustring& attribute, const T_Value& value) const;
 
-  _WRAP_METHOD(void set_attribute_value(const Glib::ustring& attribute, const Glib::VariantBase& value), g_menu_item_set_attribute_value, deprecated "Use set_attribute() instead.")
-  _WRAP_METHOD(void set_attribute(const Glib::ustring& attribute, const Glib::VariantBase& value), g_menu_item_set_attribute_value)
+  _WRAP_METHOD(void set_attribute_value(const Glib::ustring& attribute, const Glib::VariantBase& value), g_menu_item_set_attribute_value)
+  _WRAP_METHOD(void set_attribute(const Glib::ustring& attribute, const Glib::VariantBase& value), g_menu_item_set_attribute_value, deprecated "Use set_attribute() instead.")
   _IGNORE(g_menu_item_set_attribute)
 
 //These are documented as transfer-full, so we don't need to use refreturn.
@@ -87,9 +89,13 @@ GMenuItem * g_menu_item_new_section                 (const Glib::ustring& label,
   _WRAP_METHOD(void set_section(const Glib::RefPtr<MenuModel>& section), g_menu_item_set_section)
 
   //TODO: Add a get_attribute() templated method to get values directly instead
-  //of returning a Glib::VariantBase?
- 
-  _WRAP_METHOD(Glib::VariantBase get_attribute(const Glib::ustring& attribute, const Glib::VariantType& expected_type{?}) const, g_menu_item_get_attribute_value)
+  //of returning a Glib::VariantBase, when we can break ABI.
+  //template <typename T_Value>
+  //void get_attribute(const Glib::ustring& attribute, T_Value& value) const;
+  //_WRAP_METHOD(Glib::VariantBase get_attribute_value(const Glib::ustring& attribute, const Glib::VariantType& expected_type{?}) const, g_menu_item_get_attribute_value)
+
+  _WRAP_METHOD(Glib::VariantBase get_attribute(const Glib::ustring& attribute, const Glib::VariantType& expected_type{?}) const, g_menu_item_get_attribute_value, deprecated "Use get_attribute_value() instead.")
+  _WRAP_METHOD(Glib::VariantBase get_attribute_value(const Glib::ustring& attribute, const Glib::VariantType& expected_type{?}) const, g_menu_item_get_attribute_value)
 
   // Ignore varargs function.
   _IGNORE(g_menu_item_get_attribute)
