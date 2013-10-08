@@ -78,7 +78,27 @@ public:
 
   _WRAP_METHOD(Glib::VariantContainerBase get_action_state_hint(const Glib::ustring& action_name) const, g_action_group_get_action_state_hint, deprecated "Use the get_action_state() method that takes an output parameter instead.")
 
-  //TODO: Docs
+  //TODO: How do we check for a NULL Variant?
+  /**
+   * Requests a hint about the valid range of values for the state of the
+   * named action within the action group
+   *
+   * If a null Variant is returned it either means that the action is not stateful
+   * or that there is no hint about the valid range of values for the
+   * state of the action.
+   *
+   * If a ariant array is returned then each item in the array is a
+   * possible value for the state.  If Variant pair (ie: two-tuple) is
+   * returned then the tuple specifies the inclusive lower and upper bound
+   * of valid values for the state.
+   *
+   * In any case, the information is merely a hint.  It may be possible to
+   * have a state value outside of the hinted range and setting a value
+   * within the range may fail.
+   *
+   * @param action_name The name of the action to query.
+   * @param value This will be set to the state range hint.
+   */
   template <typename T_Value>
   void get_action_state_hint(const Glib::ustring& action_name, T_Value& value) const;
 
@@ -87,7 +107,16 @@ public:
 
   _WRAP_METHOD(Glib::VariantBase get_action_state(const Glib::ustring& action_name) const, g_action_group_get_action_state, deprecated "Use the get_action_state() method that takes an output parameter instead.")
 
-  //TODO: Docs
+  //TODO: How do we check for a NULL Variant?
+  /** Queries the current state of the named action within the action group.
+   *
+   * If the action is not stateful then a null Variant will be returned.  If the
+   * action is stateful then the type of the return value is the type
+   * given by get_action_state_type().
+   *
+   * @param action_name The name of the action to query.
+   * @param value This will be set to the current state of the action.
+   */
   template <typename T_Value>
   void get_action_state(const Glib::ustring& action_name, T_Value& value) const;
 

@@ -79,9 +79,26 @@ public:
   _WRAP_METHOD(Glib::VariantType get_parameter_type() const, g_action_get_parameter_type)
   _WRAP_METHOD(Glib::VariantType get_state_type() const, g_action_get_state_type)
 
-  //TODO: Docs
   //TODO: Is there any specific type that can really be used with this? A std::list<>. We must test this.
   //  See also ActionGroup:::get_action_state_hint().
+  /** Requests a hint about the valid range of values for the state of
+   * the action.
+   *
+   * If a null Variant is returned it either means that the action is not stateful
+   * or that there is no hint about the valid range of values for the
+   * state of the action.
+   *
+   * If a Variant array is returned then each item in the array is a
+   * possible value for the state.  If a Variant pair (ie: two-tuple) is
+   * returned then the tuple specifies the inclusive lower and upper bound
+   * of valid values for the state.
+   *
+   * In any case, the information is merely a hint.  It may be possible to
+   * have a state value outside of the hinted range and setting a value
+   * within the range may fail.
+   *
+   * @param value This will be set to the state range hint.
+   */
   template <typename T_Value>
   void get_state_hint(T_Value& value) const;
 
@@ -118,13 +135,26 @@ public:
 
   _WRAP_METHOD(void change_state(const Glib::VariantBase& value), g_action_change_state, deprecated "Use the templated method instead, passing a normal C++ type.")
 
-  //TODO: Docs
+  /** Queries the current state of the action.
+   *
+   * If the action is not stateful then a null Variant will be returned.  If the
+   * action is stateful then the type of the return value is the type
+   * given by get_state_type().
+   *
+   * @param value This will be set to the current state of the action.
+   */
   template <typename T_Value>
   void get_state(T_Value& value) const;
 
   _WRAP_METHOD(Glib::VariantBase get_state_variant() const, g_action_get_state)
 
-  //TODO: Docs
+  /** Activates the action.
+   *
+   * The @a parameter must be the correct type of parameter for the action (ie:
+   * the parameter type given at construction time), if any.
+   *
+   * @param parameter: The parameter to the activation
+   */
   template <typename T_Value>
   void activate(const T_Value& parameter);
 
@@ -143,7 +173,22 @@ public:
 
   //TODO: _WRAP_METHOD(static bool parse_detailed_name(const Glib::ustring& detailed_name, gchar** action_name, GVariant** target_value), g_action_parse_detailed_name, errthrow)
 
-  //TODO: Docs.
+
+  /** Formats a detailed action name from @a action_name and @a target_value.
+   *
+   * It is an error to call this function with an invalid action name.
+   *
+   * This function is the opposite of parse_detailed_action_name(). 
+   * It will produce a string that can be parsed back to the @a action_name
+   * and @a target_value by that function.
+   *
+   * See that function for the types of strings that will be printed by
+   * this function.
+   *
+   * @param action_name A valid action name.
+   * @param target_value A Variant target value.
+   * @result A detailed format string.
+   */
   template <typename T_Value>
   Glib::ustring print_detailed_name(const Glib::ustring& action_name, const T_Value& value);
 
