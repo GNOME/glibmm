@@ -174,9 +174,7 @@ public:
   //TODO: _WRAP_METHOD(static bool parse_detailed_name(const Glib::ustring& detailed_name, gchar** action_name, GVariant** target_value), g_action_parse_detailed_name, errthrow)
 
 
-  /** Formats a detailed action name from @a action_name and @a target_value.
-   *
-   * It is an error to call this function with an invalid action name.
+  /** Formats a detailed action name from the action's action_name and @a target_value.
    *
    * This function is the opposite of parse_detailed_action_name(). 
    * It will produce a string that can be parsed back to the @a action_name
@@ -185,12 +183,11 @@ public:
    * See that function for the types of strings that will be printed by
    * this function.
    *
-   * @param action_name A valid action name.
    * @param target_value A Variant target value.
    * @result A detailed format string.
    */
   template <typename T_Value>
-  Glib::ustring print_detailed_name(const Glib::ustring& action_name, const T_Value& value);
+  Glib::ustring print_detailed_name(const T_Value& value);
 
   _WRAP_METHOD(static Glib::ustring print_detailed_name_variant(const Glib::ustring& action_name, const Glib::VariantBase& parameter), g_action_print_detailed_name)
 
@@ -254,14 +251,14 @@ void Action::get_state_hint(T_Value& value) const
 }
 
 template <typename T_Value>
-Glib::ustring Action::print_detailed_name(const Glib::ustring& action_name, const T_Value& parameter)
+Glib::ustring Action::print_detailed_name(const T_Value& parameter)
 {
   typedef Glib::Variant<T_Value> type_glib_variant;
 
   g_return_val_if_fail(
     g_variant_type_equal(g_action_get_parameter_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()),
     Glib::ustring());
-  return print_detailed_name_variant(type_glib_variant::create(parameter));
+  return print_detailed_name_variant(get_name(), type_glib_variant::create(parameter));
 }
 
 template <typename T_Value>
