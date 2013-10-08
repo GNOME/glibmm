@@ -50,6 +50,24 @@ void MenuItem::set_action_and_target(const Glib::ustring& action)
   g_menu_item_set_action_and_target_value(gobj(), action.c_str(), 0);
 }
 
+void MenuItem::set_action(const Glib::ustring& action)
+{
+  g_menu_item_set_action_and_target_value(gobj(), action.c_str(), 0);
+}
+
+void MenuItem::unset_target()
+{
+  const gchar *action_name = 0;
+  g_menu_item_get_attribute (gobj(), G_MENU_ATTRIBUTE_ACTION, "&s", &action_name);
+ 
+  g_menu_item_set_action_and_target_value(gobj(), action_name, 0);
+}
+
+void MenuItem::unset_action_and_target()
+{
+  g_menu_item_set_action_and_target_value(gobj(), 0, 0);
+}
+
 void MenuItem::unset_icon()
 {
   g_menu_item_set_icon(gobj(), 0);
