@@ -1,3 +1,199 @@
+Changes in 2.38 compared to 2.36:
+
+Glib:
+* Object: Add interfaces to custom types before class_init.
+  This deprecates the use of Glib::Object as a base class
+  anywhere but in the last in the list of base classes when
+  implementing an interface, such as TreeModel or 
+  CellRenderer.
+  Having it, for instance, as the first base class,
+  is unfortunately likely to break with glib 3.40.
+  (Kjell Ahlstedt) Bug #697229
+* Use std::memset() instead of GLIBMM_INITIALIZE_STRUCT
+  (Because it causes compiler warnings with --std=c++ with g++,
+  because that defines __STRICT_ANSI__.) and deprecate
+  GLIBMM_INITIALIZE_STRUCT.
+  (Kjell Ahlstedt)
+* ByteArray:
+  - Fix refcount problems.
+    (Krzesimir Nowak)
+  - ByteArray: Add some tests for methods returning self.
+    (Krzesimir Nowak)
+* DateTime: Fix compare() and equal().
+  (Kjell Ahlstedt) Bug #704639 (Aurimas Černius)
+* Regex: Add get_max_lookbehind().
+  (Murray Cumming)
+* Variant: Fix memory leaks.
+  (Kjell Ahlstedt) Bug #704851 (xanm)
+
+Gio:
+* Action:
+  - get_state() and get_state_hint() now return something.
+    We choose not to consider this an ABI break because these
+    methods were impossible to use for anything useful before.
+   (Andrew Potter) Bug #690134.
+  - Add get_state_bool() and change_state(bool),
+    to make it easier to deal with toggle actions.
+    However, we might add a whole derived convenience class for these
+    instead.
+    (Murray Cumming, Kjell Ahlstedt)
+  - Add create_radio_string() and create_radio_integer() for
+    radio items, though we might change this API lots.
+    (Murray Cumming)
+  - Add name_is_valid() and print_detailed_name().
+    (Murray Cumming)
+  - Add an activate() method that takes no parameter.
+    (Murray Cumming)
+  - print_detailed_name(): Remove the action_name parameter.
+    (Murray Cumming)
+  - print_detailed_name() Make this templated.
+   (Murray Cumming)
+  - Make get_state() templated.
+    (Murray Cumming)
+  - get_state_hint(): Correct a check.
+    (Murray Cumming)
+  - Add templated change_state() and activate().
+    (Murray Cumming)
+* Application: Add mark/unmark_busy().
+  (Murray Cumming)
+* ActionGroup:
+  - Add templated getters.
+    (Murray Cumming)
+  - activate_action(): Add a method overload
+    that takes no parameter parameter.
+    (Murray Cumming)
+* ActionMap:
+  - Add add_action(name, slot).
+    This is a convenience method similar to
+    g_action_map_add_action_entries() in C.
+    (Murray Cumming, Kjell Ahlstedt)
+  - Add add_action_radio_string() and add_action_radio_integer()
+    for radio items, though we might change this API lots.
+    (Murray Cumming)
+* DesktopInfo: Add list_actions(), launch_action() and get_action_name().
+  (Murray Cumming)
+* File:
+  - Add measure_disk_usage() and measure_disk_usage_async().
+    (Murray Cumming)
+  - Add trash_async(), trash_finish(), make_directory_async()
+    and make_directory_finish().
+    (Murray Cumming)
+* Menu: Add remove_all().
+  (Murray Cumming)
+* MenuItem:
+  - Add set/unset_icon().
+    (Murray Cumming)
+  - Reimplement the constructors.
+    (Murray Cumming) Bug #705199 (Pete Woods)
+  - Add set_action(), unset_target() and
+    unset_action_and_target().
+    (Murray Cumming)
+  - MenuItem: get/set_attribute(): Deprecated for
+    get/set_attribute_value() methods.
+    (Murray Cumming)
+  - Add insert/append/prepend_section() with no label parameter.
+   (Murray Cumming) Bug #702456 (Aurimas Černius)
+* Settings:
+  - Add create_action().
+    (Murray Cumming)
+  - Add get/set_uint().
+    (Murray Cumming)
+* SimpleAction:
+  - Make set_state() protected.
+    (Murray Cumming)
+  - add_action() now takes a slot with no parameter.
+    Added add_action_with_parameter().
+    (Murray Cumming)
+  - set_enabled(): Add default parameter value.
+    (Murray Cumming)
+  - Add constructors and create_bool() methods that take a bool instead of
+    a VariantBase for the state, to make it easier to deal with toggle actions.
+    However, we might add a whole derived convenience class for these
+    instead.
+    (Murray Cumming)
+* SimpleActionGroup:
+  - lookup(): Add a const version and use refreturn.
+    (Murray Cumming)
+  - Deprecate all methods, because they just call methods in
+    the base ActionMap. The C functions are now deprecated too.
+    See glib bug #705600 .
+    (Murray Cumming)
+* Add VariantParseError.
+  Because it is thrown by GtkBuilder, at least for now.
+  (Murray Cumming
+
+Gio::DBus:
+* Add InterfaceSkeleton.
+  (José Alburquerque)
+
+Build:
+* Port tools/defs_gen to Python 3.
+  (Kjell Ahlstedt) Bug #690969
+* tools/h2def.py: Handle functions with Handle *_DEPRECATED_IN_*_FOR (*).
+  (Murray Cumming)
+* Update Visual Studio Projects
+  (Chun-wei Fan)
+* Glib::TypeTraits<>: Avoid warnings when compiling with -Wcast-qual.
+  (Kjell Ahlstedt) Bug #704640 (Aurimas Černius)
+* enums.pl: fixed multi-argument defines as enum values.
+  (Marcin Kolny) Bug #705113
+* Move to a generated ChangeLog.
+  (José Alburquerque)
+
+gmmproc:
+* Pass NULL to C function calls for optional empty strings.
+  (José Alburquerque) Bug #686909. Bug #702456
+* Add parameter return_value in _WRAP_VFUNC.
+  (Marcin Kolny) Bug #705699.
+* Fix _WRAP_SIGNAL with 'ifdef' and 'deprecated'.
+  (Kjell Ahlstedt)
+* docextract_to_xml.py: Add '&rArr;' to the list of escape sequences.
+  (José Alburquerque)
+* Add _WRAP_ENUM_DOCS_ONLY() and simplify enum docs process.
+  (José Alburquerque) Bug #703155
+*  gmmproc: Use GMMPROC_RETURN_MISMATCHES environment variable.
+  (José Alburquerque)
+* Write glibmm version in generated files.
+  (Kjell Ahlstedt) Bug #697835 and Bug #700495
+    
+Documentation:
+* gmmproc: Add docs to the default constructor of _CLASS_OPAQUE_COPYABLE.
+  mentioning that the constructed object is invalid.
+  (Kjell Ahlstedt) Bug #704639 (Aurimas Černius)
+
+
+
+2.38.0 (stable):
+
+Glib:
+* ByteArray:
+  - Fix refcount problems.
+  (Krzesimir Nowak)
+  - ByteArray: Add some tests for methods returning self.
+  (Krzesimir Nowak)
+
+Gio
+* Action:
+  - Add an activate() method that takes no parameter.
+  (Murray Cumming)
+  - print_detailed_name(): Remove the action_name parameter.
+  (Murray Cumming)
+* ActionGroup: activate_action(): Add a method overload
+  that takes no parameter parameter.
+  (Murray Cumming)
+* ActionMap: Fix a reference-counting problem.
+  (Murray Cumming)
+* MenuItem:
+  - Add set_action(), unset_target() and
+  unset_action_and_target().
+  (Murray Cumming)
+  - MenuItem: get/set_attribute(): Deprecated for
+    get/set_attribute_value() methods.
+  (Murray Cumming)
+* Settings: Add create_action().
+  (Murray Cumming)
+
+
 2.37.93 (unstable):
 
 Gio
