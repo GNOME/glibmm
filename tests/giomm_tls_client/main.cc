@@ -1,3 +1,21 @@
+// This test case fails unless an implementation of TLS backend is installed.
+// (Exception caught: TLS support is not available.)
+// Module glib-networking implements TLS backend.
+//
+// Even if glib-networking is installed, it's possible that glib does not find it.
+// That's very probable if glib and glib-networking are installed with different
+// directory prefixes, e.g. glib in /opt/gnome and glib-networking in /usr.
+// You can fix that by setting the GIO_EXTRA_MODULES environment variable to
+// the directory to search for implementations of gio extension points.
+// Example:
+//   export GIO_EXTRA_MODULES=/usr/lib/x86_64-linux-gnu/gio/modules
+// If you don't know where the implementations of gio extension points are stored,
+// search for a file named giomodule.cache.
+//
+// https://developer.gnome.org/gio/stable/extending-gio.html (G_TLS_BACKEND_EXTENSION_POINT_NAME)
+// https://developer.gnome.org/gio/stable/gio-Extension-Points.html
+// https://developer.gnome.org/gio/stable/gio-querymodules.html
+
 #include <giomm.h>
 #include <iostream>
 #include <cstdlib>
