@@ -27,6 +27,15 @@
 
 namespace Gio
 {
+/** @defgroup giommContentType Platform-specific content typing
+ * A content type is a platform specific string that defines the type of a file.
+ * On UNIX it is a <a href="http://www.wikipedia.org/wiki/Internet_media_type">mime type</a>
+ * like "text/plain" or "image/png".
+ * On Win32 it is an extension string like ".doc", ".txt" or a perceived
+ * string like "audio". Such strings can be looked up in the registry at
+ * HKEY_CLASSES_ROOT.
+ * @{
+ */
 
 /**
  * Compares two content types for equality.
@@ -43,7 +52,7 @@ bool content_type_equals(const Glib::ustring& type1,
  * Determines if @a type is a subset of @a supertype.
  *
  * @param type A content type string.
- * @param supertype A string.
+ * @param supertype A content type string.
  *
  * @return true if @a type is a kind of @a supertype, false otherwise.
  */
@@ -71,18 +80,18 @@ bool content_type_is_unknown(const Glib::ustring& type);
 Glib::ustring content_type_get_description(const Glib::ustring& type);
 
 /**
- * Gets the mime-type for the content type. If one is registered
+ * Gets the mime-type for the content type, if one is registered.
  *
  * @param type A content type string.
  *
- * @return the registered mime-type for the given @a type, or NULL if unknown.
+ * @return the registered mime-type for the given @a type, or an empty string if unknown.
  */
 Glib::ustring content_type_get_mime_type(const Glib::ustring& type);
 
 /**
- * @param type A content type string.
- *
  * Gets the icon for a content type.
+ *
+ * @param type A content type string.
  *
  * @return Icon corresponding to the content type.
  */
@@ -92,7 +101,7 @@ Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
  * Gets the symbolic icon for a content type.
  *
  * @param type A content type string.
- * @return Icon corresponding to the content type.
+ * @return symbolic Icon corresponding to the content type.
  *
  * @newin{2,34}
  */
@@ -120,12 +129,14 @@ Glib::ustring content_type_from_mime_type(const Glib::ustring& mime_type);
 
 /**
  * Guesses the content type based on example data. If the function is uncertain,
- * @a result_uncertain will be set to true
+ * @a result_uncertain will be set to true. Either @a filename may be an empty
+ * string or @a data may be <tt>0</tt>, in which case the guess will be based
+ * solely on the other argument.
  *
  * @param filename a string.
  * @param data A stream of data.
  * @param data_size The size of @a data.
- * @param result_uncertain A flag indicating the certainty of the result.
+ * @param[out] result_uncertain A flag indicating the certainty of the result.
  * @return A string indicating a guessed content type for the
  * given data.
  */
@@ -135,11 +146,12 @@ Glib::ustring content_type_guess(const std::string& filename,
 
 /**
  * Guesses the content type based on example data. If the function is uncertain,
- * @a result_uncertain will be set to true
+ * @a result_uncertain will be set to true. @a filename may be an empty string,
+ * in which case the guess will be based solely on @a data.
  *
  * @param filename a string.
  * @param data A stream of data.
- * @param result_uncertain A flag indicating the certainty of the result.
+ * @param[out] result_uncertain A flag indicating the certainty of the result.
  * @return A string indicating a guessed content type for the
  * given data.
  */
@@ -153,7 +165,7 @@ Glib::ustring content_type_guess(const std::string& filename,
  *
  * The types returned all have the form x-content/foo, e.g.
  * x-content/audio-cdda (for audio CDs) or x-content/image-dcf
- * (for a camera memory card). See the <ulink url="http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec">shared-mime-info</ulink>
+ * (for a camera memory card). See the <a href="http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec">shared-mime-info</a>
  * specification for more on x-content types.
  *
  * @param root The root of the tree to guess a type for.
@@ -170,6 +182,8 @@ Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const Fil
  * @return List of the registered content types.
  */
 Glib::ListHandle<Glib::ustring> content_types_get_registered();
+
+/** @} group giommContentType */
 
 } // namespace Gio
 #endif // _GIOMM_CONTENTTYPE_H
