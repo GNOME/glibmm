@@ -80,8 +80,8 @@ int main(int, char**)
     first_inet_address->to_string() << "." << std::endl;
 
   Glib::RefPtr<Gio::Socket> socket =
-    Gio::Socket::create(Gio::SOCKET_FAMILY_IPV4, Gio::SOCKET_TYPE_STREAM,
-    Gio::SOCKET_PROTOCOL_TCP);
+    Gio::Socket::create(first_inet_address->get_family(),
+    Gio::SOCKET_TYPE_STREAM, Gio::SOCKET_PROTOCOL_TCP);
 
   Glib::RefPtr<Gio::InetSocketAddress> address =
     Gio::InetSocketAddress::create(first_inet_address, 443);
