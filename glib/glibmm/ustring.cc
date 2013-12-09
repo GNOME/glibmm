@@ -1389,9 +1389,6 @@ std::wostream& operator<<(std::wostream& os, const ustring& utf8_string)
   const ScopedPtr<gunichar2> buf (g_utf8_to_utf16(utf8_string.raw().data(),
                                                   utf8_string.raw().size(), 0, 0, &error));
 #else
-  // TODO: For some reason the conversion from UTF-8 to WCHAR_T doesn't work
-  // with g_convert(), while iconv on the command line handles it just fine.
-  // Maybe a bug in GLib?
   const ScopedPtr<char> buf (g_convert(utf8_string.raw().data(), utf8_string.raw().size(),
                                        "WCHAR_T", "UTF-8", 0, 0, &error));
 #endif // !(__STDC_ISO_10646__ || G_OS_WIN32)
