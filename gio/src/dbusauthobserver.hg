@@ -32,12 +32,39 @@ namespace DBus
 
 _GMMPROC_EXTRA_NAMESPACE(DBus)
 
-//TODO: Add example from the C API docs in class docs.
 /** AuthObserver - An object used for authenticating connections.
  * The AuthObserver type provides a mechanism for participating in how a
  * Server (or a Connection) authenticates remote peers.  Simply
  * instantiate an AuthObserver and connect to the signals you are
  * interested in. Note that new signals may be added in the future.
+ *
+ * For example, if you only want to allow D-Bus connections from
+ * processes owned by the same uid as the server, you would use a
+ * signal handler like the following:
+ * @code
+ * bool on_authorize_authenticated_peer(
+ *   const Glib::RefPtr<const Gio::IOStream>&,
+ *   const Glib::RefPtr<const Gio::Credentials>& credentials)
+ * {
+ *   bool authorized = false;
+ *
+ *   if (credentials)
+ *   {
+ *     Glib::RefPtr<Gio::Credentials> own_credentials = Gio::Credentials::create();
+ *     try
+ *     {
+ *       if (credentials->is_same_user(own_credentials))
+ *         authorized = true;
+ *     }
+ *     catch (const Gio::Error& ex)
+ *     {
+ *       std::cerr << "Gio::Error: " << ex.what() << std::endl;
+ *     }
+ *   }
+ *
+ *   return authorized;
+ * }
+ * @endcode
  *
  * @newin{2,28}
  * @ingroup DBus
