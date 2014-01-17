@@ -56,6 +56,7 @@ namespace Glib
 
 // These are used by gtkmmproc-generated type conversions:
 
+// TODO: Replace this with std::unique_ptr?
 // Helper to deal with memory allocated
 // by GLib functions in an exception-safe manner.
 template <typename T>
