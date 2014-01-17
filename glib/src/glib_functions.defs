@@ -51,6 +51,7 @@
     '("partial-input" "G_CONVERT_ERROR_PARTIAL_INPUT")
     '("bad-uri" "G_CONVERT_ERROR_BAD_URI")
     '("not-absolute-path" "G_CONVERT_ERROR_NOT_ABSOLUTE_PATH")
+    '("no-memory" "G_CONVERT_ERROR_NO_MEMORY")
   )
 )
 
@@ -290,6 +291,7 @@
     '("do-not-use-this-unsupported-flag" "G_MARKUP_DO_NOT_USE_THIS_UNSUPPORTED_FLAG")
     '("treat-cdata-as-text" "G_MARKUP_TREAT_CDATA_AS_TEXT")
     '("prefix-error-position" "G_MARKUP_PREFIX_ERROR_POSITION")
+    '("ignore-qualified" "G_MARKUP_IGNORE_QUALIFIED")
   )
 )
 
@@ -591,6 +593,7 @@
     '("child-inherits-stdin" "G_SPAWN_CHILD_INHERITS_STDIN")
     '("file-and-argv-zero" "G_SPAWN_FILE_AND_ARGV_ZERO")
     '("search-path-from-envp" "G_SPAWN_SEARCH_PATH_FROM_ENVP")
+    '("cloexec-pipes" "G_SPAWN_CLOEXEC_PIPES")
   )
 )
 
@@ -1272,7 +1275,7 @@
 (define-method remove_range
   (of-object "GPtrArray")
   (c-name "g_ptr_array_remove_range")
-  (return-type "none")
+  (return-type "GPtrArray*")
   (parameters
     '("guint" "index_")
     '("guint" "length")
@@ -1284,6 +1287,16 @@
   (c-name "g_ptr_array_add")
   (return-type "none")
   (parameters
+    '("gpointer" "data")
+  )
+)
+
+(define-method insert
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_insert")
+  (return-type "none")
+  (parameters
+    '("gint" "index_")
     '("gpointer" "data")
   )
 )
@@ -4373,7 +4386,7 @@
 (define-method insert
   (of-object "GHashTable")
   (c-name "g_hash_table_insert")
-  (return-type "none")
+  (return-type "gboolean")
   (parameters
     '("gpointer" "key")
     '("gpointer" "value")
@@ -4383,7 +4396,7 @@
 (define-method replace
   (of-object "GHashTable")
   (c-name "g_hash_table_replace")
-  (return-type "none")
+  (return-type "gboolean")
   (parameters
     '("gpointer" "key")
     '("gpointer" "value")
@@ -4393,7 +4406,7 @@
 (define-method add
   (of-object "GHashTable")
   (c-name "g_hash_table_add")
-  (return-type "none")
+  (return-type "gboolean")
   (parameters
     '("gpointer" "key")
   )
@@ -4514,6 +4527,15 @@
   (of-object "GHashTable")
   (c-name "g_hash_table_get_values")
   (return-type "GList*")
+)
+
+(define-method get_keys_as_array
+  (of-object "GHashTable")
+  (c-name "g_hash_table_get_keys_as_array")
+  (return-type "gpointer*")
+  (parameters
+    '("guint*" "length")
+  )
 )
 
 (define-method init
@@ -5540,6 +5562,16 @@
   )
 )
 
+(define-method save_to_file
+  (of-object "GKeyFile")
+  (c-name "g_key_file_save_to_file")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "filename")
+    '("GError**" "error")
+  )
+)
+
 (define-method get_start_group
   (of-object "GKeyFile")
   (c-name "g_key_file_get_start_group")
@@ -6036,10 +6068,6 @@
   (c-name "glib__private__")
   (return-type "GLibPrivateVTable*")
 )
-
-
-
-;; From glib_probes.h
 
 
 
@@ -7605,10 +7633,6 @@
 
 
 
-;; From gmessages-private.h
-
-
-
 ;; From gmirroringtable.h
 
 
@@ -7930,6 +7954,16 @@
   (parameters
     '("gint*" "argc")
     '("gchar***" "argv")
+    '("GError**" "error")
+  )
+)
+
+(define-method parse_strv
+  (of-object "GOptionContext")
+  (c-name "g_option_context_parse_strv")
+  (return-type "gboolean")
+  (parameters
+    '("gchar***" "arguments")
     '("GError**" "error")
   )
 )
@@ -10584,6 +10618,14 @@
   )
 )
 
+(define-function g_str_is_ascii
+  (c-name "g_str_is_ascii")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "str")
+  )
+)
+
 (define-function g_strcasecmp
   (c-name "g_strcasecmp")
   (return-type "gint")
@@ -10766,6 +10808,26 @@
   (parameters
     '("gchar*" "dest")
     '("const-char*" "src")
+  )
+)
+
+(define-function g_str_tokenize_and_fold
+  (c-name "g_str_tokenize_and_fold")
+  (return-type "gchar**")
+  (parameters
+    '("const-gchar*" "string")
+    '("const-gchar*" "translit_locale")
+    '("gchar***" "ascii_alternates")
+  )
+)
+
+(define-function g_str_match_string
+  (c-name "g_str_match_string")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "search_term")
+    '("const-gchar*" "potential_hit")
+    '("gboolean" "accept_alternates")
   )
 )
 
@@ -13909,6 +13971,11 @@
   (return-type "GQuark")
 )
 
+(define-function g_variant_parse_error_quark
+  (c-name "g_variant_parse_error_quark")
+  (return-type "GQuark")
+)
+
 (define-function g_variant_builder_new
   (c-name "g_variant_builder_new")
   (is-constructor-of "GVariantBuilder")
@@ -14073,6 +14140,15 @@
   (parameters
     '("const-gchar*" "format")
     '("va_list*" "app")
+  )
+)
+
+(define-function g_variant_parse_error_print_context
+  (c-name "g_variant_parse_error_print_context")
+  (return-type "gchar*")
+  (parameters
+    '("GError*" "error")
+    '("const-gchar*" "source_str")
   )
 )
 
