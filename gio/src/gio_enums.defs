@@ -877,7 +877,8 @@
 ;;   G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES = (1<<0),
 ;;   G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS = (1<<1),
 ;;   G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START = (1<<2),
-;;   G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES = (1<<3)
+;;   G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES = (1<<3),
+;;   G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION = (1<<4)
 ;; } GDBusProxyFlags;
 
 (define-flags-extended DBusProxyFlags
@@ -889,6 +890,7 @@
     '("do-not-connect-signals" "G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS" "(1<<1)")
     '("do-not-auto-start" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START" "(1<<2)")
     '("get-invalidated-properties" "G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES" "(1<<3)")
+    '("do-not-auto-start-at-construction" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION" "(1<<4)")
   )
 )
 
@@ -1203,7 +1205,8 @@
 ;;   G_CREDENTIALS_TYPE_INVALID,
 ;;   G_CREDENTIALS_TYPE_LINUX_UCRED,
 ;;   G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED,
-;;   G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED
+;;   G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED,
+;;   G_CREDENTIALS_TYPE_SOLARIS_UCRED
 ;; } GCredentialsType;
 
 (define-enum-extended CredentialsType
@@ -1214,6 +1217,7 @@
     '("linux-ucred" "G_CREDENTIALS_TYPE_LINUX_UCRED" "1")
     '("freebsd-cmsgcred" "G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED" "2")
     '("openbsd-sockpeercred" "G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED" "3")
+    '("solaris-ucred" "G_CREDENTIALS_TYPE_SOLARIS_UCRED" "4")
   )
 )
 
@@ -1447,6 +1451,19 @@
 
 ;; Original typedef:
 ;; typedef enum {
+;;   G_TLS_CERTIFICATE_REQUEST_NONE = 0
+;; } GTlsCertificateRequestFlags;
+
+(define-flags-extended TlsCertificateRequestFlags
+  (in-module "G")
+  (c-name "GTlsCertificateRequestFlags")
+  (values
+    '("none" "G_TLS_CERTIFICATE_REQUEST_NONE" "0x0")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
 ;;   G_IO_MODULE_SCOPE_NONE,
 ;;   G_IO_MODULE_SCOPE_BLOCK_DUPLICATES
 ;; } GIOModuleScopeFlags;
@@ -1499,6 +1516,27 @@
   (c-name "GTestDBusFlags")
   (values
     '("us-none" "G_TEST_DBUS_NONE" "0x0")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_SUBPROCESS_FLAGS_NONE                  = 0,
+;;   G_SUBPROCESS_FLAGS_STDIN_PIPE            = (1u << 0),
+;;   G_SUBPROCESS_FLAGS_STDIN_INHERIT         = (1u << 1),
+;;   G_SUBPROCESS_FLAGS_STDOUT_PIPE           = (1u << 2),
+;;   G_SUBPROCESS_FLAGS_STDOUT_SILENCE        = (1u << 3),
+;;   G_SUBPROCESS_FLAGS_STDERR_PIPE           = (1u << 4),
+;;   G_SUBPROCESS_FLAGS_STDERR_SILENCE        = (1u << 5),
+;;   G_SUBPROCESS_FLAGS_STDERR_MERGE          = (1u << 6),
+;;   G_SUBPROCESS_FLAGS_INHERIT_FDS           = (1u << 7)
+;; } GSubprocessFlags;
+
+(define-flags-extended SubprocessFlags
+  (in-module "G")
+  (c-name "GSubprocessFlags")
+  (values
+    '("none" "G_SUBPROCESS_FLAGS_NONE" "0x0")
   )
 )
 
