@@ -65,15 +65,15 @@ public:
   // See here about whether the parameters should be ustring or std::string:
   // http://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names
   // They are generally UTF-8 that can only contain the ASCII subset,
-  // so ustring still seems preferrable to std::string, which generally implies an unknown endoding for us.
+  // so ustring still seems preferrable to std::string, which generally implies an unknown encoding for us.
 
   _WRAP_METHOD(static Glib::RefPtr<Message> create_signal(const Glib::ustring& path, const Glib::ustring& interface, const Glib::ustring& signal), g_dbus_message_new_signal)
   _WRAP_METHOD(static Glib::RefPtr<Message> create_method_call(const Glib::ustring& name, const Glib::ustring& path, const Glib::ustring& interface, const Glib::ustring& method), g_dbus_message_new_method_call)
   _WRAP_METHOD(static Glib::RefPtr<Message> create_method_reply(const Glib::RefPtr<Message>& method_call_message), g_dbus_message_new_method_reply)
   _WRAP_METHOD(static Glib::RefPtr<Message> create_method_error_literal(const Glib::RefPtr<const Message>& method_call_message, const Glib::ustring& error_name, const Glib::ustring& error_message), g_dbus_message_new_method_error_literal)
 
-  // Ignore variable argument function.
-  _IGNORE(g_dbus_message_new_method_error)
+  // Ignore variable argument functions.
+  _IGNORE(g_dbus_message_new_method_error, g_dbus_message_new_method_error_valist)
 
   _WRAP_METHOD(static Glib::RefPtr<Message> create_from_blob(const guchar* blob,  gsize blob_len, CapabilityFlags capabilities = CAPABILITY_FLAGS_NONE), g_dbus_message_new_from_blob, errthrow)
 
@@ -127,8 +127,6 @@ public:
 
   _WRAP_METHOD(guint32 get_num_unix_fds() const, g_dbus_message_get_num_unix_fds)
   _WRAP_METHOD(void set_num_unix_fds(guint32 value), g_dbus_message_set_num_unix_fds)
-
-  //TODO: _WRAP_METHOD(std::vector<whattypeshallweuse>) get_header_fields() const, g_dbus_message_get_header_fields)
 
   /** Gets a header field on the message.  The header is returned in @a value.
    * @param value Location in which to store the header.

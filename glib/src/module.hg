@@ -41,7 +41,7 @@ _WRAP_ENUM(ModuleFlags, GModuleFlags, NO_GTYPE)
 class Module
 {
   _CLASS_GENERIC(Module, GModule)
-  _IGNORE(g_module_open, g_module_close)
+  _IGNORE(g_module_open, g_module_open_utf8, g_module_close)
 
 public:
 
@@ -106,6 +106,7 @@ public:
    * @returns The name of the module
    */
   _WRAP_METHOD(std::string get_name() const, g_module_name)
+  _IGNORE(g_module_name_utf8)
 
   /** A portable way to build the filename of a module. The
    * platform-specific prefix and suffix are added to the filename, if
@@ -117,7 +118,7 @@ public:
    * module is in a standard platform-specific directory, though this
    * is not recommended since the wrong module may be found.
    *
-   * For example, calling <tt>g_module_build_path()</tt> on a Linux
+   * For example, calling <tt>build_path()</tt> on a Linux
    * system with a directory of <tt>/lib</tt> and a module_name of
    * "mylibrary" will return <tt>/lib/libmylibrary.so</tt>. On a
    * Windows system, using <tt>\\Windows</tt> as the directory it will
