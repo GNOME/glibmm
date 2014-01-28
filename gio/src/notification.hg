@@ -1,0 +1,133 @@
+/* Copyright (C) 2014 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <glibmm/ustring.h>
+#include <glibmm/variant.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+class Icon;
+
+/** User Notifications (pop up messages).
+ *
+ * Gio::Notification is a mechanism for creating a notification to be shown
+ * to the user -- typically as a pop-up notification presented by the
+ * desktop environment shell.
+ *
+ * The key difference between Notification and other similar APIs is
+ * that, if supported by the desktop environment, notifications sent
+ * with Notification will persist after the application has exited,
+ * and even across system reboots.
+ *
+ * Since the user may click on a notification while the application is
+ * not running, applications using Notification should be able to be
+ * started as a D-Bus service, using Gio::Application.
+ *
+ * User interaction with a notification (either the default action, or
+ * buttons) must be associated with actions on the application (ie:
+ * "app." actions).  It is not possible to route user interaction
+ * through the notification itself, because the object will not exist if
+ * the application is autostarted as a result of a notification being
+ * clicked.
+ *
+ * A notification can be sent with Gio::Application::send_notification().
+ *
+ * @newin{2,40}
+ */
+class Notification : public Glib::Object
+{
+  _CLASS_GOBJECT(Notification, GNotification, G_NOTIFICATION, Glib::Object, GObject)
+
+protected:
+  // Can't use _WRAP_CTOR. GNotification has no properties, but it must have a title.
+  explicit Notification(const Glib::ustring& title);
+  _IGNORE(g_notification_new)
+
+public:
+  _WRAP_METHOD_DOCS_ONLY(g_notification_new)
+  _WRAP_CREATE(const Glib::ustring& title)
+
+  _WRAP_METHOD(void set_title(const Glib::ustring& title), g_notification_set_title)
+  _WRAP_METHOD(void set_body(const Glib::ustring& body), g_notification_set_body)
+  _WRAP_METHOD(void set_icon(const Glib::RefPtr<Icon>& icon), g_notification_set_icon)
+  _WRAP_METHOD(void set_urgent(bool urgent = true), g_notification_set_urgent)
+
+  _WRAP_METHOD(void add_button(const Glib::ustring& label, const Glib::ustring& detailed_action), g_notification_add_button)
+
+  /** Adds a button that activates @a action when clicked.
+   * @a action must be an application-wide action (it must start with "app.").
+   * @a action will be activated with @a target as its parameter.
+   *
+   * @newin{2,40}
+   * @param label Label of the button.
+   * @param action An action name.
+   * @param target @a action's parameter.
+   */
+  template <typename T_Value>
+  void add_button(const Glib::ustring& label, const Glib::ustring& action, const T_Value& target);
+
+  _WRAP_METHOD(void add_button_variant(const Glib::ustring& label, const Glib::ustring& action, const Glib::VariantBase& target), g_notification_add_button_with_target_value)
+
+  _WRAP_METHOD(void set_default_action(const Glib::ustring& detailed_action), g_notification_set_default_action)
+
+  /** Sets the default action to @a action.
+   * This action is activated when the notification is clicked on. It must be an
+   * application-wide action (start with "app.").
+   * @a action will be activated with @a target as its parameter.
+   *
+   * When no default action is set, the application that the notification
+   * was sent on is activated.
+   *
+   * @newin{2,40}
+   * @param action An action name.
+   * @param target @a action's parameter.
+   */
+  template <typename T_Value>
+  void set_default_action(const Glib::ustring& action, const T_Value& target);
+
+  _WRAP_METHOD(void set_default_action_variant(const Glib::ustring& action, const Glib::VariantBase& target), g_notification_set_default_action_and_target_value)
+
+  // Ignore functions with variable-length parameter lists.
+  _IGNORE(g_notification_add_button_with_target, g_notification_set_default_action_and_target)
+  // Ignore private methods
+  _IGNORE(g_notification_get_urgent, g_notification_get_button, g_notification_get_default_action)
+  _IGNORE(g_notification_get_n_buttons, g_notification_get_button_with_action, g_notification_serialize)
+  _IGNORE(g_notification_get_icon, g_notification_get_id, g_notification_get_body, g_notification_get_title)
+
+  // There are no properties, signals, vfuncs.
+};
+
+template <typename T_Value>
+void Notification::add_button(const Glib::ustring& label, const Glib::ustring& action, const T_Value& target)
+{
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  add_button_variant(label, action, type_glib_variant::create(target));
+}
+
+template <typename T_Value>
+void Notification::set_default_action(const Glib::ustring& action, const T_Value& target)
+{
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  set_default_action_variant(action, type_glib_variant::create(target));
+}
+
+} // namespace Gio

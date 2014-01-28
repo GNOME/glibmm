@@ -237,6 +237,10 @@ _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 #MountOperation
 #_CONVERSION(`GAskPasswordFlags',`AskPasswordFlags',`($2)$3')
 
+# Notification
+_CONVERSION(`GNotification*',`Glib::RefPtr<Notification>',`Glib::wrap($3)')
+_CONVERSION(`const Glib::RefPtr<Notification>&',`GNotification*',__CONVERT_CONST_REFPTR_TO_P)
+
 # OutputStream
 _CONVERSION(`GOutputStream*',`Glib::RefPtr<OutputStream>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<OutputStream>&',`GOutputStream*',__CONVERT_CONST_REFPTR_TO_P)
