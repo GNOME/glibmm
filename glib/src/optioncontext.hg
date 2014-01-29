@@ -95,7 +95,7 @@ public:
    */
   explicit OptionContext(const Glib::ustring& parameter_string = Glib::ustring());
 
-  //Note that, unlike Glib::Wrap(), this would create a second C++ instance for the same C instance,
+  //Note that, unlike Glib::Wrap(), this would create a second C++ instance for the same C instance,u
   //so it should be used carefully. For instance you could not access data in a derived class via this second instance.
   explicit OptionContext(GOptionContext* castitem, bool take_ownership = false);
   virtual ~OptionContext();
@@ -107,6 +107,12 @@ public:
 
 #m4 _CONVERSION(`char**&',`gchar***',`&($3)')
   _WRAP_METHOD(bool parse(int& argc, char**& argv), g_option_context_parse, errthrow)
+
+  //TODO: Document ths as useful (only?) with the result from g_win32_get_command_line?
+  //goption.c has example code that suggests always using this, and ifdefing for G_OS_WIN32, with a g_strdupv for the non-win32 case.
+  //Presumably we cannot hide that ifdeffing from application code because the argument-removal would be invisible to the caller.
+  //So can we hide it for people who don't care about arguments being removed from argv?
+  //TODO? _WRAP_METHOD(bool parse(char**& argv), g_option_context_parse_strv, errthrow)
 
   //g_option_context_add_main_entries(), just creates a group internally, adds them to it, and does a set_main_group()
   //- a group without callbacks seems to do some simple default parsing.
