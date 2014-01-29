@@ -83,14 +83,59 @@ public:
   typedef std::vector<Glib::ustring> vecustrings;
   typedef std::vector<std::string> vecstrings;
 
+  /** Add a boolean option @a entry.
+   * The @arg parameter will be set to the option's extra argument
+   * after OptionContext::parse() has returned.
+   */
   void add_entry(const OptionEntry& entry, bool& arg);
+
+  /** Add an integer option @a entry.
+   * The @arg parameter will be set to the option's extra argument
+   * after OptionContext::parse() has returned.
+   */
   void add_entry(const OptionEntry& entry, int& arg);
+
+  /** Add a double option @a entry.
+   * The @arg parameter will be set to the option's extra argument
+   * after OptionContext::parse() has returned.
+   */
   void add_entry(const OptionEntry& entry, double& arg);
+
+  /** Add a UTF-8 string option @a entry.
+   * The @arg parameter will be set to the option's extra argument
+   * after OptionContext::parse() has returned.
+   *
+   * As indicated by the Glib::ustring type, the string will be
+   * UTF-8 encoded.
+   */
   void add_entry(const OptionEntry& entry, Glib::ustring& arg);
+
+  /** Add a filename string option @a entry.
+   * The @arg parameter will be set to the option's extra argument
+   * after OptionContext::parse() has returned.
+   *
+   * The string will be in glib's filename encoding.
+   */
   void add_entry_filename(const OptionEntry& entry, std::string& arg);
+
+  /** Add an option @a entry that provides a list of UTF-8 strings.
+   * The @arg parameter will be set to the option's extra argument
+   * after OptionContext::parse() has returned.
+   *
+   * As indicated by the Glib::ustring type, the strings will be
+   * UTF-8 encoded.
+   */
   void add_entry(const OptionEntry& entry, vecustrings& arg);
   void add_entry_filename(const OptionEntry& entry, vecstrings& arg);
+
+  /** Add a string option @a entry, but let a callback slot parse the extra argument
+   * instead of just setting a variable to its value.
+   */
   void add_entry(const OptionEntry& entry, const SlotOptionArgString& slot);
+
+  /** Add a filename option @a entry, but let a callback slot parse the extra argument
+   * instead of just setting a variable to its value.
+   */
   void add_entry_filename(const OptionEntry& entry, const SlotOptionArgFilename& slot);
 
   /** Sets the function which is used to translate user-visible strings, for
