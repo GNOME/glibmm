@@ -175,8 +175,21 @@ public:
 
   _WRAP_METHOD(static bool name_is_valid(const Glib::ustring& action_name), g_action_name_is_valid )
 
-  //TODO: _WRAP_METHOD(static bool parse_detailed_name(const Glib::ustring& detailed_name, gchar** action_name, GVariant** target_value), g_action_parse_detailed_name, errthrow)
+  /** Parses a detailed action name into its separate name and target components.
+   *
+   * Detailed action names can have three formats. See parse_detailed_name_variant().
+   *
+   * @newin{2,40}
+   * @param detailed_name A detailed action name.
+   * @param[out] action_name The action name.
+   * @param[out] target_value The target value.
+   * @throw Glib::VariantParseError if @a detailed_name has an invalid format or a target of an unexpected type.
+   */
+  template <typename T_Value>
+  static void parse_detailed_name(const Glib::ustring& detailed_name, Glib::ustring& action_name, T_Value& target_value);
 
+  _WRAP_METHOD(static void parse_detailed_name_variant(const Glib::ustring& detailed_name,
+    Glib::ustring& action_name{>>}, Glib::VariantBase& target_value{>>}), g_action_parse_detailed_name, errthrow)
 
   /** Formats a detailed action name from the action's action_name and @a target_value.
    *
@@ -253,6 +266,36 @@ void Action::get_state_hint(T_Value& value) const
   const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
   value = variantDerived.get();
 }
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// Doxygen 1.8.4 does not understand that this is the static function previously declared.
+template <typename T_Value>
+//static
+void Action::parse_detailed_name(const Glib::ustring& detailed_name, Glib::ustring& action_name, T_Value& target_value)
+{
+  action_name.clear(); //Make sure the output arguments are initialized.
+  target_value = T_Value();
+
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  Glib::VariantBase target_value_variantBase;
+  parse_detailed_name_variant(detailed_name, action_name, target_value_variantBase);
+
+  if (!target_value_variantBase)
+    throw Glib::VariantParseError(Glib::VariantParseError::TYPE_ERROR,
+      "Detailed action name '" + detailed_name + "' has no target. Expected a target of type " +
+      type_glib_variant::variant_type().get_string());
+
+  if (!target_value_variantBase.is_of_type(type_glib_variant::variant_type()))
+    throw Glib::VariantParseError(Glib::VariantParseError::TYPE_ERROR,
+      "Detailed action name '" + detailed_name + "' has a target of type " +
+      target_value_variantBase.get_type_string() + ". Expected " + type_glib_variant::variant_type().get_string());
+
+  const type_glib_variant target_value_variantDerived =
+    target_value_variantBase.cast_dynamic<type_glib_variant>(target_value_variantBase);
+  target_value = target_value_variantDerived.get();
+}
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 template <typename T_Value>
 Glib::ustring Action::print_detailed_name(const T_Value& parameter)
