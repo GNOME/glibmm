@@ -521,9 +521,9 @@ sub convert_tags_to_doxygen($)
     # Doxygen is too dumb to handle &mdash;
     s"&mdash;" \@htmlonly&mdash;\@endhtmlonly "g;
 
-    s"\%?FALSE\b"<tt>false</tt>"g;
-    s"\%?TRUE\b"<tt>true</tt>"g;
-    s"\%?NULL\b"<tt>0</tt>"g;
+    s"\%?\bFALSE\b"<tt>false</tt>"g;
+    s"\%?\bTRUE\b"<tt>true</tt>"g;
+    s"\%?\bNULL\b"<tt>0</tt>"g;
 
     s"#?\bgboolean\b"<tt>bool</tt>"g;
     s"#?\bg(int|short|long)\b"<tt>$1</tt>"g;
