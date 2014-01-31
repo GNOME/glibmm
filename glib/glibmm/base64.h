@@ -38,7 +38,7 @@ namespace Base64
  *  line breaking, that is usually used in mail systems. The new line
  *  character will appear for every 72 bytes.
  * @param source A string to encode.
- * @param line_break Enables/disables line breaking.
+ * @param break_lines Enables/disables line breaking.
  * @return The string encoded in Base-64.
  */
 std::string encode(const std::string& source, bool break_lines = false);

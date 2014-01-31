@@ -220,7 +220,7 @@ public:
   void read_async(const SlotAsyncReady& slot, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_read_async)
 
-  _WRAP_METHOD(Glib::RefPtr<FileInputStream> read_finish(const Glib::RefPtr<AsyncResult>& result),
+  _WRAP_METHOD(Glib::RefPtr<FileInputStream> read_finish(const Glib::RefPtr<AsyncResult>& res),
                g_file_read_finish,
                errthrow)
 
@@ -410,6 +410,7 @@ public:
    * name is to longa Gio::Error with FILENAME_TOO_LONG will be thrown. Other errors are possible too, and
    * depend on what kind of filesystem the file is on.
    *
+   * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
    * @param flags A set of FileCreateFlags.
@@ -717,7 +718,7 @@ public:
    * be a comma-separated list of attribute or attribute wildcards. The wildcard "*"
    * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
    * namespace. An example attribute query be "standard::*,owner::user".
-   * The standard attributes are available as defines, like #G_FILE_ATTRIBUTE_STANDARD_NAME.
+   * The standard attributes are available as defines, like G_FILE_ATTRIBUTE_STANDARD_NAME.
    *
    * The operation can be cancelled by
    * triggering the cancellable object from another thread. If the operation
@@ -750,7 +751,7 @@ public:
    * be a comma-separated list of attribute or attribute wildcards. The wildcard "*"
    * means all attributes, and a wildcard like "standard::*" means all attributes in the standard
    * namespace. An example attribute query be "standard::*,owner::user".
-   * The standard attributes are available as defines, like #G_FILE_ATTRIBUTE_STANDARD_NAME.
+   * The standard attributes are available as defines, like G_FILE_ATTRIBUTE_STANDARD_NAME.
    *
    * For symlinks, normally the information about the target of the
    * symlink is returned, rather than information about the symlink itself.
@@ -782,7 +783,7 @@ public:
    * directory, or symlink.
    *
    * @param flags: a set of FileQueryInfoFlags passed to query_info().
-   * @results The FileType of the file, or FILE_TYPE_UNKNOWN if the file does not exist.
+   * @result The FileType of the file, or FILE_TYPE_UNKNOWN if the file does not exist.
    *
    * @newin{2,18}
    */
@@ -1098,7 +1099,7 @@ public:
                g_file_trash,
                errthrow)
 
-   /** Asynchronously sends @file to the Trash location, if possible.
+   /** Asynchronously sends the file to the Trash location, if possible.
     *
     * @param slot_ready A SlotAsyncReady to call when the request is satisfied
     * @param cancellable A Cancellable object which can be used to cancel the operation
@@ -1107,7 +1108,7 @@ public:
     */
   void trash_async(const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
 
-   /** Asynchronously sends @file to the Trash location, if possible.
+   /** Asynchronously sends the file to the Trash location, if possible.
     *
     * @param slot_ready A SlotAsyncReady to call when the request is satisfied
     * @param io_priority The I/O priority of the request
@@ -1815,7 +1816,7 @@ public:
   //We ignore the gboolean result, because we throw an exception if it is false.
   /** Recursively measures the disk usage of the file.
    *
-   * This is essentially an analog of the '<literal>du</literal>' command,
+   * This is essentially an analog of the '<tt>du</tt>' command,
    * but it also reports the number of directories and non-directory files
    * encountered (including things like symbolic links).
    *
@@ -1835,7 +1836,7 @@ public:
    * If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * @param cancellable A Cancellable object which can be used to cancel the operation
-   * @param progress_callback A SlotFileMeasureProgress to call periodically while scanning.
+   * @param slot_progress A SlotFileMeasureProgress to call periodically while scanning.
    * @param disk_usage The number of bytes of disk space used.
    * @param num_dirs The number of directories encountered.
    * @param num_files The number of non-directories encountered.
@@ -1858,7 +1859,7 @@ public:
    * @param flags Set of FileMeasureFlags
    * @param io_priority The I/O priority of the request
    */
-  void measure_disk_usage_async(const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot, FileMeasureFlags flags = FILE_MEASURE_NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void measure_disk_usage_async(const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot_progress, FileMeasureFlags flags = FILE_MEASURE_NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_measure_disk_usage_async)
 
   _WRAP_METHOD(bool measure_disk_usage_finish(const Glib::RefPtr<AsyncResult>& result, guint64& disk_usage, guint64& num_dirs, guint64& num_files), g_file_measure_disk_usage_finish, errthrow)
@@ -2350,7 +2351,7 @@ public:
    * @param new_etag A location of a new entity tag
    * for the document.
    */
-  void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& etag);
+  void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result, std::string& new_etag);
 
   /** Finishes an asynchronous replace of the given file . See
    * replace_contents_async(). Sets @a new_etag to the new entity

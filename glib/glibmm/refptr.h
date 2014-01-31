@@ -59,7 +59,7 @@ public:
   /// Destructor - decrements reference count.
   inline ~RefPtr();
 
-  /// For use only by the ::create() methods.
+  /// For use only by the \::create() methods.
   explicit inline RefPtr(T_CppObject* pCppObject);
 
   /** Copy constructor
