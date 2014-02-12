@@ -19,15 +19,54 @@
 
 #include <gio/gio.h>
 
+namespace
+{
+
+class SlotWithData
+{
+public:
+  SlotWithData(const Gio::MemoryInputStream::SlotDestroyData& slot, void* data)
+  :
+  m_slot(new Gio::MemoryInputStream::SlotDestroyData(slot)), m_data(data)
+  { }
+
+  ~SlotWithData() { delete m_slot; }
+
+  void operator()() { (*m_slot)(m_data); }
+
+private:
+  Gio::MemoryInputStream::SlotDestroyData* m_slot;
+  void* m_data;
+};
+
+void destroy_data_callback(void* user_data)
+{
+  SlotWithData* slot_with_data = static_cast<SlotWithData*>(user_data);
+  g_return_if_fail(slot_with_data != 0);
+
+  try
+  {
+    (*slot_with_data)(); // Invoke callback
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+
+  delete slot_with_data;
+}
+
+} // anonymous namespace
+
 namespace Gio
 {
 
+_DEPRECATE_IFDEF_START
 void MemoryInputStream::add_data(const std::string& data)
 {
   char *data_copy = g_strdup (data.c_str ());
   g_memory_input_stream_add_data(gobj(), data_copy, -1, g_free);
 }
-
 
 void MemoryInputStream::add_data(const void* data, gssize len)
 {
@@ -41,10 +80,14 @@ void MemoryInputStream::add_data(const void* data, gssize len)
 
   g_memory_input_stream_add_data(gobj(), data_copy, len, g_free);
 }
+_DEPRECATE_IFDEF_END
 
-void MemoryInputStream::add_data(const void* data, gssize len, GDestroyNotify destroy)
+void MemoryInputStream::add_data(const void* data, gssize len, const SlotDestroyData& destroy_slot)
 {
-  g_memory_input_stream_add_data(gobj(), data, len, destroy);
+  SlotWithData* slot_with_data = new SlotWithData(destroy_slot, const_cast<void*>(data));
+  GBytes* bytes = g_bytes_new_with_free_func(data, len, &destroy_data_callback, slot_with_data);
+  g_memory_input_stream_add_bytes(gobj(), bytes);
+  g_bytes_unref(bytes); // g_memory_input_stream_add_bytes() takes a reference
 }
 
 } // namespace Gio

@@ -46,31 +46,47 @@ protected:
 public:
   _WRAP_CREATE()
 
+_DEPRECATE_IFDEF_START
   /** Appends to data that can be read from the input stream.
    *
    * @param data Input data.
+   *
+   * @deprecated Use add_data() with SlotDestroyData or GDestroyNotify instead.
    */
   void add_data(const std::string& data);
 
   /** Appends to data that can be read from the input stream.
    *
-   * Note that the data will copied internally and freed when no longer needed.
+   * Note that the data will be copied internally and freed when no longer needed.
    *
    * @param data Input data.
    * @param len Length of the data, may be -1 if data is a null-terminated string.
    *
-   * @deprecated Use version with destroy notification
+   * @deprecated Use add_data() with SlotDestroyData or GDestroyNotify instead.
    */
   void add_data(const void* data, gssize len);
+_DEPRECATE_IFDEF_END
+
+  _WRAP_METHOD(void add_data(const void* data, gssize len, GDestroyNotify destroy), g_memory_input_stream_add_data)
+
+  /** For example,
+   * void on_destroy_data(void* data);
+   *
+   * @param data The data to free.
+   *
+   * @newin{2,40}
+   */
+  typedef sigc::slot<void, void*> SlotDestroyData;
 
   /** Appends to data that can be read from the input stream.
    *
    * @param data Input data.
    * @param len Length of the data, may be -1 if data is a null-terminated string.
-   * @param destroy A function to be called to free the data when it is no
-   * longer needed
+   * @param destroy_slot A slot to be called to free the data when it is no longer needed.
+   *
+   * @newin{2,40}
    */
-  void add_data(const void* data, gssize len, GDestroyNotify destroy);
+  void add_data(const void* data, gssize len, const SlotDestroyData& destroy_slot);
 };
 
 } // namespace Gio
