@@ -20,6 +20,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 check_PROGRAMS =				\
 	giomm_ioerror/test			\
 	giomm_ioerror_and_iodbuserror/test	\
+	giomm_memoryinputstream/test			\
 	giomm_simple/test			\
 	giomm_asyncresult_sourceobject/test	\
 	giomm_tls_client/test			\
@@ -64,6 +65,9 @@ giomm_ioerror_test_LDADD   = $(giomm_ldadd)
 
 giomm_ioerror_and_iodbuserror_test_SOURCES = giomm_ioerror_and_iodbuserror/main.cc
 giomm_ioerror_and_iodbuserror_test_LDADD   = $(giomm_ldadd)
+
+giomm_memoryinputstream_test_SOURCES = giomm_memoryinputstream/main.cc
+giomm_memoryinputstream_test_LDADD   = $(giomm_ldadd)
 
 giomm_simple_test_SOURCES  = giomm_simple/main.cc
 giomm_simple_test_LDADD    = $(giomm_ldadd)
