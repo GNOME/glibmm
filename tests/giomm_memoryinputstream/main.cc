@@ -1,37 +1,38 @@
 #include <giomm.h>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <cstring>
+#include <cstdlib>
 
+namespace
+{
 //Use this line if you want debug output:
 //std::ostream& ostr = std::cout;
 
 //This seems nicer and more useful than putting an ifdef around the use of ostr:
-std::stringstream debug;
+std::ostringstream debug;
 std::ostream& ostr = debug;
 
-namespace
+std::string func1_output;
+std::string func2_output;
+
+void destroy_func1(void* data)
 {
-  int n_called1 = 0;
-  int n_called2 = 0;
-
-  void destroy_func1(void* data)
-  {
-    ++n_called1;
-    char* cdata = static_cast<char*>(data);
-    // cdata is not null-terminated.
-    ostr << "Deleting " << std::string(cdata, cdata+6);
-    delete[] cdata;
-  }
-
-  void destroy_func2(void* data, const Glib::ustring& intro)
-  {
-    ++n_called2;
-    char* cdata = static_cast<char*>(data);
-    // cdata is not null-terminated.
-    ostr << intro << std::string(cdata, cdata+6);
-    delete[] cdata;
-  }
+  char* cdata = static_cast<char*>(data);
+  func1_output += "Deleting ";
+  func1_output += cdata;
+  delete[] cdata;
 }
+
+void destroy_func2(void* data, const Glib::ustring& intro)
+{
+  char* cdata = static_cast<char*>(data);
+  func2_output += intro + cdata;
+  delete[] cdata;
+}
+
+} // anonymous namespace
 
 int main(int, char**)
 {
@@ -79,8 +80,16 @@ int main(int, char**)
     return EXIT_FAILURE; 
   }
 
+  ostr << func1_output << std::endl;
+  ostr << func2_output << std::endl;
+
   if (std::strcmp(buffer, "Data not owned by stream.\ndata2\ndata3\n") == 0 &&
-      n_called1 == 1 && n_called2 == 1)
+      func1_output == "Deleting data2\n" &&
+      func2_output == "Now deleting data3\n")
     return EXIT_SUCCESS;
+
+  std::cerr << "buffer: \"" << buffer << "\"" << std::endl;
+  std::cerr << "func1_output: \"" << func1_output << "\"" << std::endl;
+  std::cerr << "func2_output: \"" << func2_output << "\"" << std::endl;
   return EXIT_FAILURE; 
 }
