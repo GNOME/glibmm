@@ -119,12 +119,86 @@ public:
   static Glib::RefPtr<Socket> create_from_fd(int fd, const Glib::RefPtr<Cancellable>&
                                              cancellable = Glib::RefPtr<Cancellable>());
 
-  //TODO: Write custom documetation, mentioning, for instance, the exception, instead of a bool return.
+  /** When a socket is created it is attached to an address family, but it doesn't 
+   * have an address in this family. Socket::bind() assigns the address (sometimes 
+   * called name) of the socket.
+   *
+   * It is generally required to bind to a local address before you can receive 
+   * connections. (See Socket::listen() and Socket::accept()). In certain situations, 
+   * you may also want to bind a socket that will be used to initiate connections, 
+   * though this is not normally required.
+   *
+   * If socket is a TCP socket, then <tt>allow_reuse</tt> controls the setting of the SO_REUSEADDR 
+   * socket option; normally it should be <tt>true</tt> for server sockets (sockets that you 
+   * will eventually call Socket::accept() on), and <tt>false</tt> for client sockets. 
+   * (Failing to set this flag on a server socket may cause Socket::bind() to 
+   * throw Gio::Error with ADDRESS_IN_USE if the server program 
+   * is stopped and then immediately restarted.)
+   *
+   * If socket is a UDP socket, then allow_reuse determines whether or not 
+   * other UDP sockets can be bound to the same address at the same time. In particular, 
+   * you can have several UDP sockets bound to the same address, and they will all 
+   * receive all of the multicast and broadcast packets sent to that address. 
+   * (The behavior of unicast UDP packets to an address with multiple listeners is not defined.)
+   *
+   * @param address a SocketAddress specifying the local address.	 
+   * @param allow_reuse whether to allow reusing this address
+   *
+   * @throw Gio::Error
+   */
   _WRAP_METHOD(void bind(const Glib::RefPtr<SocketAddress>& address, bool allow_reuse), g_socket_bind, errthrow)
+  
+  /** Marks the socket as a server socket - a socket that is used to accept 
+   * incoming requests using Socket::accept().
+   *
+   * Before calling this the socket must be bound to a local address using Socket::bind().
+   *
+   * To set the maximum amount of outstanding clients, use Socket::set_listen_backlog().
+   *
+   * @throw Gio::Error
+   */
   _WRAP_METHOD(void listen(), g_socket_listen, errthrow)
+  
+  /** Accept incoming connections on a connection-based socket. This removes the 
+   * first outstanding connection request from the listening socket and creates 
+   * a GSocket object for it.
+   * 
+   * The socket must be bound to a local address with g_socket_bind() and must 
+   * be listening for incoming connections (Socket::listen()).
+   *
+   * If there are no outstanding connections then the operation will block or 
+   * throw Gio::Error with ERROR_WOULD_BLOCK if non-blocking 
+   * I/O is enabled. To be notified of an incoming connection, wait for the 
+   * Glib::IO_IN condition.
+   *
+   * @param cancellable a Gio::Cancellable or <tt>0</tt>.
+   *
+   * @return a Gio::Socket
+   *
+   * @throw Gio::Error
+   */
   _WRAP_METHOD(Glib::RefPtr<Socket> accept(const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_accept, errthrow)
 
-  //TODO: Write custom documetation, mentioning, for instance, the exception, instead of a bool return.
+  /** Connect the socket to the specified remote address.
+   *
+   * For connection oriented socket this generally means we attempt to make a 
+   * connection to the address . For a connection-less socket it sets the default 
+   * address for Socket::send() and discards all incoming datagrams from other sources.
+   *
+   * Generally connection oriented sockets can only connect once, but 
+   * connection-less sockets can connect multiple times to change the default address.
+   *
+   * If the connect call needs to do network I/O it will block, unless non-blocking 
+   * I/O is enabled. Then Gio::Error with ERROR_PENDING is thrown 
+   * and the user can be notified of the connection finishing by waiting for the 
+   * Glib::IO_OUT condition. The result of the connection must then be checked 
+   * with Socket::check_connect_result().
+   *
+   * @param address	a SocketAddress specifying the remote address.	 
+   * @param cancellable	 a Cancellable or <tt>0</tt>.
+   *
+   * @throw Gio::Error
+   */
   _WRAP_METHOD(void connect(const Glib::RefPtr<SocketAddress>& address, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_connect, errthrow)
 
   // FIXME: it doesn't really seem like this is a proper use of exceptions...
