@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([glibmm], [2.39.4],
+AC_INIT([glibmm], [2.39.91],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=glibmm],
         [glibmm], [http://www.gtkmm.org/])
 AC_PREREQ([2.59])
@@ -60,7 +60,7 @@ AS_IF([test "x$enable_static" = xyes],
   AC_DEFINE([GIOMM_STATIC_LIB],  [1], [Define if giomm is built as a static library])
 ])
 
-glibreq='2.0 >= 2.39.4'
+glibreq='2.0 >= 2.39.91'
 
 GLIBMM_MODULES="sigc++-2.0 >= 2.2.10 glib-$glibreq gobject-$glibreq gmodule-$glibreq"
 GIOMM_MODULES="$GLIBMM_MODULES gio-$glibreq"
