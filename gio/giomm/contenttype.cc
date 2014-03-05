@@ -56,6 +56,7 @@ Glib::RefPtr<Gio::Icon> content_type_get_icon(const Glib::ustring& type)
   return retvalue;
 }
 
+#ifdef G_OS_UNIX
 Glib::RefPtr<Gio::Icon> content_type_get_symbolic_icon(const Glib::ustring& type)
 {
   Glib::RefPtr<Icon> retvalue = Glib::wrap(g_content_type_get_symbolic_icon(type.c_str()));
@@ -63,6 +64,7 @@ Glib::RefPtr<Gio::Icon> content_type_get_symbolic_icon(const Glib::ustring& type
     retvalue->reference(); //The function does not do a ref for us.
   return retvalue;
 }
+#endif
 
 bool content_type_can_be_executable(const Glib::ustring& type)
 {
