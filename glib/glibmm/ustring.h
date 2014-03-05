@@ -84,6 +84,20 @@ struct IteratorTraits<const T*>
  * the old UTF-8 character and the new one to write could be different.
  * Therefore, any write operation would invalidate all other iterators
  * pointing into the same string.
+ *
+ * The Glib::ustring iterated over must contain only valid UTF-8 data.
+ * If it does not, operator++(), operator-\-() and operator*() may make
+ * accesses outside the bounds of the string. A loop such as the following
+ * one would not stop at the end of the string.
+ * @code
+ * // Bad code! Don't do this!
+ * const char not_utf8[] = { '\x80', '\xef', '\x80', '\x80', '\xef', '\x80' };
+ * const Glib::ustring s(not_utf8, not_utf8 + sizeof not_utf8);
+ * for (Glib::ustring::const_iterator it = s.begin(); it != s.end(); ++it)
+ *   std::cout << *it << std::endl;
+ * @endcode
+ *
+ * @tparam T std::string::iterator or std::string::const_iterator
  */
 template <class T>
 class ustring_Iterator
@@ -156,8 +170,13 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  * character, and <tt>std::string::length()</tt> returns the number of bytes
  * rather than characters.  So don't do that without a good reason.
  * @par
+ * Many member functions and operators of Glib::ustring and Glib::ustring_Iterator
+ * assume that the string contains only valid UTF-8 data. If it does not, memory
+ * outside the bounds of the string can be accessed.
+ * @par
  * In a perfect world the C++ Standard Library would contain a UTF-8 string
- * class.  Unfortunately, the C++ standard doesn't mention UTF-8 at all.  Note
+ * class.  Unfortunately, the C++98 standard doesn't mention UTF-8 at all.
+ * C++11 has UTF-8 literals but no UTF-8 string class. Note
  * that std::wstring is not a UTF-8 string class because it contains only
  * fixed-width characters (where width could be 32, 16, or even 8 bits).
  *
