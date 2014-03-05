@@ -97,6 +97,7 @@ Glib::ustring content_type_get_mime_type(const Glib::ustring& type);
  */
 Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
 
+#ifdef G_OS_UNIX
 /**
  * Gets the symbolic icon for a content type.
  *
@@ -106,6 +107,7 @@ Glib::RefPtr<Icon> content_type_get_icon(const Glib::ustring& type);
  * @newin{2,34}
  */
 Glib::RefPtr<Icon> content_type_get_symbolic_icon(const Glib::ustring& type);
+#endif
 
 /**
  * Checks if a content type can be executable. Note that for instance
