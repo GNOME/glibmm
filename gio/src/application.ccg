@@ -21,6 +21,7 @@
 #include <giomm/file.h>
 #include <giomm/actiongroup.h>
 #include <giomm/init.h>
+#include <cstring> // std::memset()
 
 namespace
 {
@@ -205,6 +206,16 @@ void Application::open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring&
   type_vec_files files(1);
   files[0] = file;
   open(files, hint);
+}
+
+void Application::add_main_option_entry(Glib::OptionEntry& entry)
+{
+  //Create a temporary array, just so we can give the correct thing to g_application_add_main_option_entries():
+  GOptionEntry array[2];
+  array[0] = *(entry.gobj()); //Copy contents.
+  std::memset(&array[1], 0, sizeof(GOptionEntry));
+
+  g_application_add_main_option_entries(gobj(), array);
 }
 
 } // namespace Gio

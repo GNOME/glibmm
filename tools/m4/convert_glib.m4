@@ -122,7 +122,7 @@ _CONVERSION(`GObject*',`Glib::RefPtr<const Glib::ObjectBase>',`Glib::wrap($3)')
 
 dnl OptionGroup
 _CONVERSION(`OptionGroup&',`GOptionGroup*',`($3).gobj()')
-#_CONVERSION(`GOptionGroup*',`OptionGroup',`Glib::wrap(($3), true /* take_copy */)')
+_CONVERSION(`Glib::OptionGroup&',`GOptionGroup*',`($3).gobj()')
 
 dnl Bytes
 _CONVERSION(`GBytes*',`Glib::RefPtr<Glib::Bytes>',`Glib::wrap($3)')
