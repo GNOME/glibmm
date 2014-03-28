@@ -305,7 +305,7 @@ def clean_func(buf):
     buf = pat.sub('', buf)
 
     #strip *_DEPRECATED_IN_*_FOR (*):
-    pat = re.compile(r"""[A-Z]+_DEPRECATED_IN_[1-9]_([1-9]*)_FOR \(\S*\)\S*""", re.MULTILINE)
+    pat = re.compile(r"""[A-Z]+_DEPRECATED_IN_[1-9]_([1-9]*)_FOR\s*\(\S*\)\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #strip *_DEPRECATED*
