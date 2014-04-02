@@ -31,6 +31,7 @@ int main()
             << get_defs( G_TYPE_IO_CHANNEL )
             << get_defs( G_TYPE_REGEX )
             << get_defs( G_TYPE_VARIANT )
+            << get_defs( G_TYPE_VARIANT_DICT )
             << std::endl;
 
   return 0;
