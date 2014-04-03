@@ -173,6 +173,8 @@ void ActionGroup::get_action_state(const Glib::ustring& action_name, T_Value& va
     g_variant_type_equal(g_action_group_get_action_state_type(const_cast<GActionGroup*>(gobj()), action_name.c_str()), type_glib_variant::variant_type().gobj()));
 
   const Glib::VariantBase variantBase = get_action_state_variant(action_name);
+
+  //TODO: Add a bool return instead of letting a std::bad_cast from the cast_dynamic() be thrown up to the caller?
   const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
   value = variantDerived.get();
 }
