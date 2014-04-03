@@ -13600,7 +13600,7 @@ The following format specifiers are supported:
 - \%C: the century number (year/100) as a 2-digit integer (00-99)
 - \%d: the day of the month as a decimal number (range 01 to 31)
 - \%e: the day of the month as a decimal number (range  1 to 31)
-- \%F: equivalent to `\%Y-\%m-\%d` (the ISO 8601 date format)
+- \%F: equivalent to `%Y-%m-%d` (the ISO 8601 date format)
 - \%g: the last two digits of the ISO 8601 week-based year as a
 decimal number (00-99). This works well with \%V and \%u.
 - \%G: the ISO 8601 week-based year as a decimal number. This works
@@ -15455,6 +15455,13 @@ Frees a #GError and associated resources.
 Returns %TRUE if @error matches @domain and @code, %FALSE
 otherwise. In particular, when @error is %NULL, %FALSE will
 be returned.
+
+If @domain contains a `FAILED` (or otherwise generic) error code,
+you should generally not check for it explicitly, but should
+instead treat any not-explicitly-recognized error code as being
+equilalent to the `FAILED` code. This way, if the domain is
+extended in the future to provide a more specific error code for
+a certain case, your code will still work.
 
 
 </description>
@@ -57365,12 +57372,12 @@ Since: 2.32
 
 <function name="g_win32_error_message">
 <description>
-Translate a Win32 error code (as returned by GetLastError()) into
-the corresponding message. The message is either language neutral,
-or in the thread's language, or the user's language, the system's
-language, or US English (see docs for FormatMessage()). The
-returned string is in UTF-8. It should be deallocated with
-g_free().
+Translate a Win32 error code (as returned by GetLastError() or
+WSAGetLastError()) into the corresponding message. The message is
+either language neutral, or in the thread's language, or the user's
+language, the system's language, or US English (see docs for
+FormatMessage()). The returned string is in UTF-8. It should be
+deallocated with g_free().
 
 
 </description>

@@ -3644,11 +3644,25 @@ previewed in a file manager. Returned as the value of the key
 <description>
 Error codes returned by GIO functions.
 
+Note that this domain may be extended in future GLib releases. In
+general, new error codes either only apply to new APIs, or else
+replace #G_IO_ERROR_FAILED in cases that were not explicitly
+distinguished before. You should therefore avoid writing code like
+|[&lt;!-- language=&quot;C&quot; --&gt;
+if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED))
+{
+// Assume that this is EPRINTERONFIRE
+...
+}
+]|
+but should instead treat all unrecognized error codes the same as
+#G_IO_ERROR_FAILED.
 
 </description>
 <parameters>
 <parameter name="G_IO_ERROR_FAILED">
-<parameter_description> Generic error condition for when any operation fails.
+<parameter_description> Generic error condition for when an operation fails
+and no more specific #GIOErrorEnum value is defined.
 </parameter_description>
 </parameter>
 <parameter name="G_IO_ERROR_NOT_FOUND">
@@ -3708,7 +3722,7 @@ Error codes returned by GIO functions.
 </parameter_description>
 </parameter>
 <parameter name="G_IO_ERROR_NOT_SUPPORTED">
-<parameter_description> Operation not supported for the current backend.
+<parameter_description> Operation (or one of its parameters) not supported
 </parameter_description>
 </parameter>
 <parameter name="G_IO_ERROR_NOT_MOUNTED">
@@ -41648,7 +41662,7 @@ in the following two cases
 (such as `/path/to/my icon.png`) without escaping
 if the #GFile for @icon is a native file.  If the file is not
 native, the returned string is the result of g_file_get_uri()
-(such as `sftp://path/to/my\%20icon.png`).
+(such as `sftp://path/to/my%20icon.png`).
 
 - If @icon is a #GThemedIcon with exactly one name, the encoding is
 simply the name (such as `network-server`).
@@ -43127,7 +43141,10 @@ ignore.
 
 <function name="g_io_error_from_errno">
 <description>
-Converts errno.h error codes into GIO error codes.
+Converts errno.h error codes into GIO error codes. The fallback
+value %G_IO_ERROR_FAILED is returned for error codes not currently
+handled (but note that future GLib releases may return a more
+specific value instead).
 
 
 </description>
@@ -43143,9 +43160,15 @@ Converts errno.h error codes into GIO error codes.
 
 <function name="g_io_error_from_win32_error">
 <description>
-Converts some common error codes into GIO error codes. The
-fallback value G_IO_ERROR_FAILED is returned for error codes not
-handled.
+Converts some common error codes (as returned from GetLastError()
+or WSAGetLastError()) into GIO error codes. The fallback value
+%G_IO_ERROR_FAILED is returned for error codes not currently
+handled (but note that future GLib releases may return a more
+specific value instead).
+
+You can use g_win32_error_message() to get a localized string
+corresponding to @error_code. (But note that unlike g_strerror(),
+g_win32_error_message() returns a string that must be freed.)
 
 Since: 2.26
 
@@ -47565,8 +47588,8 @@ Adds a button to @notification that activates @action when clicked.
 @action must be an application-wide action (it must start with &quot;app.&quot;).
 
 If @target_format is given, it is used to collect remaining
-positional parameters into a GVariant instance, similar to
-g_variant_new(). @action will be activated with that GVariant as its
+positional parameters into a #GVariant instance, similar to
+g_variant_new(). @action will be activated with that #GVariant as its
 parameter.
 
 Since: 2.40
@@ -47586,11 +47609,11 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="target_format">
-<parameter_description> a GVariant format string, or %NULL
+<parameter_description> a #GVariant format string, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
-<parameter_description> positional parameters, as determined by @format_string
+<parameter_description> positional parameters, as determined by @target_format
 </parameter_description>
 </parameter>
 </parameters>
@@ -47622,7 +47645,7 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="target">
-<parameter_description> a GVariant to use as @action's parameter, or %NULL
+<parameter_description> a #GVariant to use as @action's parameter, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -47709,8 +47732,8 @@ activated when the notification is clicked on. It must be an
 application-wide action (it must start with &quot;app.&quot;).
 
 If @target_format is given, it is used to collect remaining
-positional parameters into a GVariant instance, similar to
-g_variant_new(). @action will be activated with that GVariant as its
+positional parameters into a #GVariant instance, similar to
+g_variant_new(). @action will be activated with that #GVariant as its
 parameter.
 
 When no default action is set, the application that the notification
@@ -47729,11 +47752,11 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="target_format">
-<parameter_description> a GVariant format string, or %NULL
+<parameter_description> a #GVariant format string, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
-<parameter_description> positional parameters, as determined by @format_string
+<parameter_description> positional parameters, as determined by @target_format
 </parameter_description>
 </parameter>
 </parameters>
@@ -47745,10 +47768,6 @@ Since: 2.40
 Sets the default action of @notification to @action. This action is
 activated when the notification is clicked on. It must be an
 application-wide action (start with &quot;app.&quot;).
-
-If @target_format is given, it is used to collect remaining
-positional parameters into a GVariant instance, similar to
-g_variant_new().
 
 If @target is non-%NULL, @action will be activated with @target as
 its parameter.
@@ -47769,7 +47788,7 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="target">
-<parameter_description> a GVariant to use as @action's parameter, or %NULL
+<parameter_description> a #GVariant to use as @action's parameter, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
