@@ -27,10 +27,20 @@ int main()
   // g_type_init() is deprecated as of 2.36.
   // g_type_init();
 
-  std::cout << get_defs( G_TYPE_DATE )
+  std::cout << get_defs( G_TYPE_BYTES )
+            << get_defs( G_TYPE_CHECKSUM )
+            << get_defs( G_TYPE_DATE )
+            << get_defs( G_TYPE_DATE_TIME )
             << get_defs( G_TYPE_IO_CHANNEL )
+            << get_defs( G_TYPE_KEY_FILE )
+            << get_defs( G_TYPE_MAIN_CONTEXT )
+            << get_defs( G_TYPE_MAIN_LOOP )
+            << get_defs( G_TYPE_MATCH_INFO )
             << get_defs( G_TYPE_REGEX )
+            << get_defs( G_TYPE_SOURCE )
+            << get_defs( G_TYPE_THREAD )
             << get_defs( G_TYPE_VARIANT )
+            << get_defs( G_TYPE_VARIANT_BUILDER )
             << get_defs( G_TYPE_VARIANT_DICT )
             << std::endl;
 
