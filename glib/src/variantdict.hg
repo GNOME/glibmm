@@ -1,0 +1,140 @@
+/*
+ * Copyright (C) 2014 The glibmm Development Team
+ *
+ * This library is free software, ) you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation, ) either
+ * version 2.1 of the License, or(at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY, ) without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library, ) if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include <glibmm/variant.h>
+
+_DEFS(glibmm,glib)
+
+namespace Glib
+{
+
+/** VariantDict is a mutable interface to Variant dictionaries.
+ *
+ * It can be used for doing a sequence of dictionary lookups in an
+ * efficient way on an existing Variant dictionary or it can be used
+ * to construct new dictionaries with a hashtable-like interface.  It
+ * can also be used for taking existing dictionaries and modifying them
+ * in order to create new ones.
+ *
+ * newin{2,40}
+ */
+class VariantDict
+{
+  //GVariantDict is registered as a boxed type, but it has ref/unref functions instead of copy/free,
+  //so we use it via RefPtr.
+  _CLASS_OPAQUE_REFCOUNTED(VariantDict, GVariantDict, NONE, g_variant_dict_ref, g_variant_dict_unref)
+  _IGNORE(g_variant_dict_ref, g_variant_dict_unref, g_variant_dict_init)
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<VariantDict> create(const VariantBase& from_asv{?}), g_variant_dict_new)
+
+
+//TODO: Add a method overload that does not take expected_type (which can be null),
+//just returning a VariantBase that should be cast_dynamic()ed?
+
+  /** Looks up a value in the VariantDict. See also lookup_value().
+   *
+   * If the @a key is not found the false is returned.
+   *
+   * The @a expected_type string specifies what type of value is expected.
+   * If the value associated with @a key has a different type then false is
+   * returned.
+   *
+   * If the key is found and the value has the correct type, it is
+   * returned in the @a value output variable.
+   */
+  bool lookup_value_variant(const Glib::ustring& key, const VariantType& expected_type, VariantBase& value) const;
+  _IGNORE(g_variant_dict_lookup_value)
+
+  /** Looks up a value in the VariantDict.
+   *
+   * If the @a key is not found the false is returned.
+   *
+   * If the value associated with @a key has a different type than expected then false is
+   * returned.
+   *
+   * If the key is found and the value has the correct type, it is
+   * returned in the @a value output variable.
+   */
+  template <typename T_Value>
+  bool lookup_value(const Glib::ustring& key, T_Value& value) const;
+  _IGNORE(g_variant_dict_lookup)
+
+
+  _WRAP_METHOD(bool contains(const Glib::ustring& key) const, g_variant_dict_contains)
+
+  _IGNORE(g_variant_dict_insert)
+
+
+  _WRAP_METHOD(void insert_value_variant(const Glib::ustring& key, const VariantBase& value), g_variant_dict_insert_value)
+
+  /** Inserts (or replaces) a key in a VariantDict.
+   * 
+   * @param key The key to insert a value for.
+   * @param value The value to insert.
+   */
+  template <typename T_Value>
+  void insert_value(const Glib::ustring& key, const T_Value& value);
+
+
+  _WRAP_METHOD(bool remove(const Glib::ustring& key), g_variant_dict_remove)
+
+  _WRAP_METHOD(void clear(), g_variant_dict_clear)
+
+  _IGNORE(g_variant_dict_end)
+};
+
+template <typename T_Value>
+void VariantDict::insert_value(const Glib::ustring& key, const T_Value& value)
+{
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  //TODO: Can we do any check like this here, before glib does?
+  //g_return_val_if_fail(
+  //  g_variant_type_equal(g_action_get_parameter_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()),
+  //  Glib::ustring());
+  return insert_value_variant(key, type_glib_variant::create(value));
+}
+
+template <typename T_Value>
+bool VariantDict::lookup_value(const Glib::ustring& key, T_Value& value) const
+{
+  value = T_Value(); //Make sure that it is initialized.
+
+  typedef Glib::Variant<T_Value> type_glib_variant;
+
+  //TODO: Can we do any check like this here, before glib does?
+  //g_variant_type_equal(g_action_group_get_action_state_type(const_cast<GActionGroup*>(gobj()), action_name.c_str()), type_glib_variant::variant_type().gobj()));
+
+  Glib::VariantBase variantBase;
+  const bool result = lookup_value_variant(key, type_glib_variant::variant_type(), variantBase);
+
+  try
+  {
+    const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
+    value = variantDerived.get();
+  }
+  catch(const std::bad_cast& ex)
+  {
+    return false;
+  }
+}
+
+} //namespace Glib
+
+

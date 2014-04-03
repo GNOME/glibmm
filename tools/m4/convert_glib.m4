@@ -154,10 +154,21 @@ _CONVERSION(`const Glib::ValueBase&',`GValue*',`const_cast<GValue*>(($3).gobj())
 _CONVERSION(`GValue*', `Glib::ValueBase&', `*reinterpret_cast<Glib::ValueBase*>($3)')
 _CONVERSION(`const GValue*', `const Glib::ValueBase&', `*reinterpret_cast<const Glib::ValueBase*>($3)')
 
-dnl VariantContainerBase
+#Variant
+_CONVERSION(`GVariant*',`Glib::VariantBase',`Glib::wrap($3, false)')
+_CONVERSION(`GVariant*',`Glib::VariantContainerBase',`Glib::VariantContainerBase($3, false)')
+_CONVERSION(`const VariantBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
+_CONVERSION(`const Glib::VariantBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
+_CONVERSION(`const Glib::VariantContainerBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
+
+# VariantContainerBase
 _CONVERSION(`const VariantContainerBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
 
-dnl VariantType
+#VariantDict
+_CONVERSION(`GVariantDict*',`Glib::RefPtr<VariantDict>',`Glib::wrap($3)')
+
+#VariantType
+_CONVERSION(`const GVariantType*',`Glib::VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
 _CONVERSION(`const VariantType&',`const GVariantType*',`($3).gobj()')
 _CONVERSION(`const Glib::VariantType&',`const GVariantType*',`($3).gobj()')
 _CONVERSION(`GVariantType*',`VariantType',`Glib::wrap($3)')

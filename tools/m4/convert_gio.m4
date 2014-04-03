@@ -302,16 +302,6 @@ _CONVERSION(`const Glib::RefPtr<TlsPassword>&',`GTlsPassword*',`Glib::unwrap($3)
 _CONVERSION(`GUnixFDList*',`Glib::RefPtr<UnixFDList>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<UnixFDList>&',`GUnixFDList*',`Glib::unwrap($3)')
 
-#Variant
-_CONVERSION(`GVariant*',`Glib::VariantBase',`Glib::wrap($3, false)')
-_CONVERSION(`GVariant*',`Glib::VariantContainerBase',`Glib::VariantContainerBase($3, false)')
-_CONVERSION(`const Glib::VariantBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
-_CONVERSION(`const Glib::VariantContainerBase&',`GVariant*',`const_cast<GVariant*>(($3).gobj())')
-
-#VariantType
-_CONVERSION(`const GVariantType*',`Glib::VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
-_CONVERSION(`const Glib::VariantType&',`const GVariantType*',`$3.gobj()')
-
 #Volume
 _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')
 
