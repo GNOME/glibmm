@@ -166,6 +166,8 @@ _CONVERSION(`const VariantContainerBase&',`GVariant*',`const_cast<GVariant*>(($3
 
 #VariantDict
 _CONVERSION(`GVariantDict*',`Glib::RefPtr<VariantDict>',`Glib::wrap($3)')
+_CONVERSION(`GVariantDict*',`Glib::RefPtr<Glib::VariantDict>',`Glib::wrap($3)')
+_CONVERSION(`GVariantDict*',`Glib::RefPtr<const Glib::VariantDict>',`Glib::wrap($3)')
 
 #VariantType
 _CONVERSION(`const GVariantType*',`Glib::VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
