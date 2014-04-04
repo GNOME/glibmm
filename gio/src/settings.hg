@@ -51,7 +51,9 @@ public:
   //TODO: Requires SettingsBackend: _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend)
   //TODO: Requires SettingsBackend: _WRAP_CREATE(const Glib::ustring& schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
 
+  //TODO: Rename these to get/set_*_value_variant() and add templated get/set_*_value() methods as elsewhere?
   _WRAP_METHOD(bool set_value(const Glib::ustring& key, const Glib::VariantBase& value),  g_settings_set_value)
+
 
   /** Gets the value that is stored in the settings for a @a key.
    *
@@ -65,6 +67,67 @@ public:
    */
   void get_value(const Glib::ustring& key, Glib::VariantBase& value) const;
   _IGNORE(g_settings_get_value)
+
+  //TODO: We've added a bool return to handle the NULL return value case,
+  //but maybe other get_value() methods can return NULLs too.
+
+  /** Checks the "user value" of a @a key, if there is one.
+   *
+   * The user value of a key is the last value that was set by the user.
+   *
+   * After calling reset() this function should always return
+   * false (assuming something is not wrong with the system
+   * configuration).
+   *
+   * It is possible that get_value() will return a different
+   * value than this method.  This can happen in the case that the user
+   * set a value for a key that was subsequently locked down by the system
+   * administrator -- this method will return the user's old value.
+   *
+   * This method may be useful for adding a "reset" option to a UI or
+   * for providing indication that a particular value has been changed.
+   *
+   * It is a programmer error to give a @a key that isn't contained in the
+   * schema for the settings.
+   *
+   * @param key The key to get the user value for.
+   * @param value A Variant of the expected type.
+   * @result true if a user value was found.
+   *
+   * @newin{2,40}
+   */
+  bool get_user_value(const Glib::ustring& key, Glib::VariantBase& value) const;
+  _IGNORE(g_settings_get_user_value)
+
+  /** Gets the "default value" of a key.
+   *
+   * This is the value that would be read if reset() were to be
+   * called on the key.
+   *
+   * Note that this may be a different value than returned by
+   * get_default_value() if the system administrator
+   * has provided a default value.
+   *
+   * Comparing the return values of get_default_value() and
+   * value() is not sufficient for determining if a value
+   * has been set because the user may have explicitly set the value to
+   * something that happens to be equal to the default.  The difference
+   * here is that if the default changes in the future, the user's key
+   * will still be set.
+   *
+   * This method may be useful for adding an indication to a UI of what
+   * the default value was before the user set it.
+   *
+   * It is a programmer error to give a @a key that isn't contained in the
+   * schema for the settings.
+   *
+   * @param key The key to get the default value for.
+   * @param value A Variant of the expected type.
+   *
+   * @newin{2,40}
+   */
+  void get_default_value(const Glib::ustring& key, Glib::VariantBase& value) const;
+  _IGNORE(g_settings_get_default_value)
 
   _WRAP_METHOD(int get_int(const Glib::ustring& key) const, g_settings_get_int)
   _WRAP_METHOD(void set_int(const Glib::ustring& key, int value), g_settings_set_int)

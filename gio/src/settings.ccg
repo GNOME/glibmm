@@ -31,6 +31,24 @@ void Settings::get_value(const Glib::ustring& key, Glib::VariantBase& value) con
   value.init(g_value, false /* don't take a reference */);
 }
 
+bool Settings::get_user_value(const Glib::ustring& key, Glib::VariantBase& value) const
+{
+  GVariant* const g_value = g_settings_get_user_value(const_cast<GSettings*>(gobj()), key.c_str());
+  if(!g_value)
+    return false;
+
+  value.init(g_value, false /* don't take a reference */);
+  return true;
+}
+
+void Settings::get_default_value(const Glib::ustring& key, Glib::VariantBase& value) const
+{
+  GVariant* const g_value = g_settings_get_default_value(const_cast<GSettings*>(gobj()), key.c_str());
+  if(!g_value)
+    return;
+
+  value.init(g_value, false /* don't take a reference */);
+}
 void Settings::bind(const Glib::ustring& key,
                     const Glib::PropertyProxy_Base& property_proxy,
                     SettingsBindFlags flags)
