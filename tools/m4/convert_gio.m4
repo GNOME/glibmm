@@ -42,6 +42,7 @@ _CONV_ENUM(G,SocketMsgFlags)
 _CONV_ENUM(G,SocketProtocol)
 _CONV_ENUM(G,SocketType)
 _CONV_ENUM(G,TlsCertificateFlags)
+_CONV_ENUM(G,TlsCertificateRequestFlags)
 _CONV_ENUM(G,TlsDatabaseVerifyFlags)
 _CONV_ENUM(G,TlsDatabaseLookupFlags)
 _CONV_ENUM(G,TlsInteractionResult)
@@ -287,20 +288,23 @@ _CONVERSION(`GTlsCertificate*', `Glib::RefPtr<TlsCertificate>', `Glib::wrap($3)'
 _CONVERSION(`const Glib::RefPtr<const TlsCertificate>&', `GTlsCertificate*', `const_cast<GTlsCertificate*>(Glib::unwrap($3))')
 _CONVERSION(`const Glib::RefPtr<TlsCertificate>&',`GTlsCertificate*',`Glib::unwrap($3)')
 
+#TlsConnection:
+_CONVERSION(`const Glib::RefPtr<TlsConnection>&',`GTlsConnection*',`Glib::unwrap($3)')
+
 #TlsDatabase
 _CONVERSION(`GTlsDatabase*',`Glib::RefPtr<TlsDatabase>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<TlsDatabase>&',`GTlsDatabase*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<TlsDatabase>&',`GTlsDatabase*',__CONVERT_REFPTR_TO_P)
 
 #TlsInteraction
 _CONVERSION(`const Glib::RefPtr<TlsInteraction>&',`GTlsInteraction*',`Glib::unwrap($3)')
 _CONVERSION(`GTlsInteraction*',`Glib::RefPtr<TlsInteraction>',`Glib::wrap($3)')
 
 #TlsPassword
-_CONVERSION(`const Glib::RefPtr<TlsPassword>&',`GTlsPassword*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<TlsPassword>&',`GTlsPassword*',__CONVERT_REFPTR_TO_P)
 
 #UnixFDList
 _CONVERSION(`GUnixFDList*',`Glib::RefPtr<UnixFDList>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<UnixFDList>&',`GUnixFDList*',`Glib::unwrap($3)')
+_CONVERSION(`const Glib::RefPtr<UnixFDList>&',`GUnixFDList*',__CONVERT_REFPTR_TO_P)
 
 #Volume
 _CONVERSION(`GVolume*',`Glib::RefPtr<Volume>',`Glib::wrap($3)')
