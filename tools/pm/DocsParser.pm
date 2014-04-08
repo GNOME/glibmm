@@ -269,15 +269,14 @@ sub lookup_enum_documentation($$$)
   {
     my $desc = $$param_descriptions->{$param};
 
-    # Remove the initial prefix which would be something like GTK_.
-    $param =~ s/\b[A-Z]+_//g;
-    $desc =~ s/\b[A-Z]+_//g;
+    # Remove the initial prefix in the name of the enum constant. Would be something like GTK_.
+    $param =~ s/\b[A-Z]+_//;
 
     # Now apply custom substitutions.
     for(my $i = 0; $i < scalar(@subst_in); ++$i)
     {
-      $param  =~ s/${subst_in[$i]}/${subst_out[$i]}/;
-      $desc =~ s/${subst_in[$i]}/${subst_out[$i]}/;
+      $param =~ s/${subst_in[$i]}/${subst_out[$i]}/;
+      $desc  =~ s/${subst_in[$i]}/${subst_out[$i]}/;
     }
 
     # Skip this element, if its name has been deleted.
@@ -286,9 +285,11 @@ sub lookup_enum_documentation($$$)
     $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
     if(length($desc) > 0)
     {
-      $desc =~ s/\n//g;
-      $desc  .= '.' unless($desc =~ /(?:^|\.)$/);
-      $docs .= "\@var $cpp_enum_name ${param}\n\u${desc}\n\n";
+      $desc =~ s/\n/ /g;
+      $desc =~ s/ $//;
+      $desc =~ s/^\s+//; # Chop off leading whitespace
+      $desc .= '.' unless($desc =~ /(?:^|\.)$/);
+      $docs .= "\@var $cpp_enum_name ${param}\n \u${desc}\n\n"; # \u = Convert next char to uppercase
     }
   }
 
@@ -600,7 +601,8 @@ sub substitute_identifiers($$)
     # Undo wrong substitutions.
     s/\bHas::/HAS_/g;
     s/\bNo::/NO_/g;
-    s/\bG:://g; #Rename G::Something to Something. Doesn't seem to work. murrayc.
+    s/\bO::/O_/g;
+    s/\bG:://g; #Rename G::Something to Something.
 
     # Substitute callback types to slot types.
     s/(\b\w+)Callback/Slot$1/g;
