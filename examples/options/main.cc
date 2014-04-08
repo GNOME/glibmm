@@ -98,7 +98,6 @@ ExampleOptionGroup::ExampleOptionGroup()
 
   Glib::OptionEntry entry_remaining;
   entry_remaining.set_long_name(G_OPTION_REMAINING);
-  entry_remaining.set_arg_description(G_OPTION_REMAINING);
 
   add_entry(entry_remaining, m_remaining_list);
 }
