@@ -44,26 +44,7 @@ return %FALSE.  The operation may have been
 cancelled by triggering the cancellable object from another thread. If the operation
 was cancelled, a Gio::Error with CANCELLED will be thrown, and %FALSE will be 
 returned.
-
-
 </description>
-<parameters>
-<parameter name="enumerator">
-<parameter_description> a #GFileEnumerator.
-</parameter_description>
-</parameter>
-<parameter name="result">
-<parameter_description> a #GAsyncResult.
-</parameter_description>
-</parameter>
-<parameter name="error">
-<parameter_description> a #GError location to store the error occuring, or %NULL to 
-ignore.
-</parameter_description>
-</parameter>
-</parameters>
-<return> %TRUE if the close operation has finished successfully.
-</return>
 </function>
 
 <function name="g_file_append_to">
@@ -1730,51 +1711,6 @@ errors that can happen due to races when you execute the operation.
 </parameter>
 </parameters>
 <return> %TRUE if the file exists (and can be detected without error), %FALSE otherwise (or if cancelled).
-</return>
-</function>
-
-<function name="g_volume_get_activation_root">
-<description>
-Gets the activation root for a #GVolume if it is known ahead of
-mount time. Returns %NULL otherwise. If not %NULL and if @volume
-is mounted, then the result of g_mount_get_root() on the
-#GMount object obtained from g_volume_get_mount() will always
-either be equal or a prefix of what this function returns. In
-other words, in code
-
-&lt;programlisting&gt;
-GMount *mount;
-GFile *mount_root
-GFile *volume_activation_root;
-
-mount = g_volume_get_mount (volume); // mounted, so never NULL
-mount_root = g_mount_get_root (mount);
-volume_activation_root = g_volume_get_activation_root(volume); // assume not NULL
-&lt;/programlisting&gt;
-
-then the expression
-
-&lt;programlisting&gt;
-(g_file_has_prefix (volume_activation_root, mount_root) ||
-      g_file_equal (volume_activation_root, mount_root))
-&lt;/programlisting&gt;
-
-will always be %TRUE.
-
-Activation roots are typically used in #GVolumeMonitor
-implementations to find the underlying mount to shadow, see
-g_mount_is_shadowed() for more details.
-
-Since: 2.18
-</description>
-<parameters>
-<parameter name="volume">
-<parameter_description> a #GVolume
-</parameter_description>
-</parameter>
-</parameters>
-<return> the activation root of @volume or %NULL. Use
-g_object_unref() to free.
 </return>
 </function>
 
