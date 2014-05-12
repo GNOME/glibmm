@@ -22,9 +22,38 @@
 #include <giomm/actiongroup.h>
 #include <giomm/init.h>
 #include <cstring> // std::memset()
+#include <vector>
 
-namespace
+namespace // anonymous
 {
+//TODO: At the next ABI break, implement the pimpl idiom. Then we need not use
+// a GQuark for ExtraApplicationData, which should be renamed to
+// struct Gio::Application::Impl.
+// These are new data members that can't be added to Gio::Application now,
+// because it would break ABI.
+struct ExtraApplicationData
+{
+  std::vector<gchar*> option_entry_strings;
+
+  ~ExtraApplicationData()
+  {
+    for (std::vector<gchar*>::iterator iter = option_entry_strings.begin();
+         iter != option_entry_strings.end(); ++iter)
+    {
+      g_free(*iter);
+      *iter = 0;
+    }
+  }
+};
+
+GQuark quark_extra_application_data =
+  g_quark_from_static_string("glibmm__Gio::Application::quark_extra_application_data");
+
+void Application_delete_extra_application_data(gpointer data)
+{
+  ExtraApplicationData* extra_application_data = static_cast<ExtraApplicationData*>(data);
+  delete extra_application_data;
+}
 
 static void Application_signal_open_callback(GApplication* self, GFile** files,
   gint n_files, const gchar* hint, void* data)
@@ -99,7 +128,7 @@ static const Glib::SignalProxyInfo Application_signal_open_info =
   (GCallback) &Application_signal_open_notify_callback
 };
 
-}
+} // anonymous namespace
 
 namespace Gio
 {
@@ -208,16 +237,49 @@ void Application::open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring&
   open(files, hint);
 }
 
-/*
-void Application::add_main_option_entry(Glib::OptionEntry& entry)
+void Application::add_main_option_entry(OptionType arg_type, const Glib::ustring& long_name,
+  gchar short_name, const Glib::ustring& description, const Glib::ustring& arg_description, int flags)
 {
-  //Create a temporary array, just so we can give the correct thing to g_application_add_main_option_entries():
+  // Create a temporary array, just so we can give the correct thing to g_application_add_main_option_entries():
   GOptionEntry array[2];
-  array[0] = *(entry.gobj()); //Copy contents.
-  std::memset(&array[1], 0, sizeof(GOptionEntry));
+  std::memset(array, 0, 2 * sizeof(GOptionEntry)); // null-termination
+
+  // g_application_add_main_option_entries() does not take its own copy
+  // of the strings. We must keep them alive, and keep pointers to them,
+  // so we can delete them when the Application instance is deleted.
+
+  // GOptionEntry.long_name must be set, even if it's an empty string.
+  gchar* lname = g_strdup(long_name.c_str());
+  gchar* desc = description.empty() ? 0 : g_strdup(description.c_str());
+  gchar* arg_desc = arg_description.empty() ? 0 : g_strdup(arg_description.c_str());
+
+  ExtraApplicationData* extra_application_data =
+    static_cast<ExtraApplicationData*>(g_object_get_qdata(gobject_, quark_extra_application_data));
+  if (!extra_application_data)
+  {
+    extra_application_data = new ExtraApplicationData();
+    g_object_set_qdata_full(gobject_, quark_extra_application_data, extra_application_data,
+      Application_delete_extra_application_data);
+  }
+
+  extra_application_data->option_entry_strings.push_back(lname);
+  if (desc)
+    extra_application_data->option_entry_strings.push_back(desc);
+  if (arg_desc)
+    extra_application_data->option_entry_strings.push_back(arg_desc);
+
+  // Fill in array[0].
+  array[0].arg = (GOptionArg)arg_type;
+  array[0].long_name = lname;
+  array[0].short_name = short_name;
+  array[0].description = desc;
+  array[0].arg_description = arg_desc;
+  array[0].flags = flags;
+  // We ensure that this is null to ensure that it is not used,
+  // telling GApplication to put the parsed value in the options VariantDict instead.
+  array[0].arg_data = 0;
 
   g_application_add_main_option_entries(gobj(), array);
 }
-*/
 
 } // namespace Gio

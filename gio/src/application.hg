@@ -27,7 +27,7 @@
 #include <giomm/applicationcommandline.h>
 #include <giomm/file.h>
 #include <glibmm/object.h>
-//#include <glibmm/optiongroup.h>
+#include <glibmm/optionentry.h>
 #include <glibmm/variant.h>
 #include <glibmm/variantdict.h>
 #include <giomm/dbusconnection.h>
@@ -104,6 +104,31 @@ protected:
   _IGNORE(g_application_new)
 
 public:
+  /** The OptionType enum values determine the expected type of a command line option.
+   * If an option expects an extra argument, it can be specified in several ways;
+   * with a short option: "-x arg", with a long option: "--name arg" or combined
+   * in a single argument: "--name=arg". All option types except OPTION_TYPE_BOOL
+   * expect an extra argument. OPTION_TYPE_STRING_VECTOR and
+   * OPTION_TYPE_FILENAME_VECTOR accept more than one extra argument.
+   *
+   * The descriptions of the enum values show what type of Glib::Variant<>
+   * is stored in a Glib::VariantDict.
+   *
+   * @ingroup glibmmEnums
+   */
+  enum OptionType
+  {
+    OPTION_TYPE_BOOL,   ///< bool
+    OPTION_TYPE_STRING, ///< Glib::ustring
+    OPTION_TYPE_INT,    ///< gint32
+    //OPTION_TYPE_CALLBACK,
+    OPTION_TYPE_FILENAME = OPTION_TYPE_INT+2, ///< std::string
+    OPTION_TYPE_STRING_VECTOR,   ///< std::vector<Glib::ustring>
+    OPTION_TYPE_FILENAME_VECTOR, ///< std::vector<std::string>
+    OPTION_TYPE_DOUBLE,          ///< double
+    OPTION_TYPE_INT64            ///< gint64
+  };
+
   /** Creates an application instance.
    * If no application ID is given then some features (most notably application uniqueness) will be disabled.
    *
@@ -131,16 +156,78 @@ public:
 
   _WRAP_METHOD(void set_action_group(const Glib::RefPtr<ActionGroup>& action_group), g_application_set_action_group)
 
-
-  //TODO: We need to be able to add a group, not just some entries,
+  //Note: We would like to add a group, not just some entries,
   //so we can do pre and post parsing. See https://bugzilla.gnome.org/show_bug.cgi?id=727602
-  //
-  //TODO: Custom write the documentation for this method?
-  //_WRAP_METHOD_DOCS_ONLY(g_application_add_main_option_entries)
-  //void add_main_option_entry(Glib::OptionEntry& entry);
-  //_IGNORE(g_application_add_main_option_entries)
+  //but instead we need to use the VariantDict passed to the handle_local_options signal
+  //and provided by ApplicationCommandLine::get_options_dict() in on_command_line().
 
-  //TODO: _WRAP_METHOD(void add_option_group(Glib::OptionGroup& group), g_application_add_option_group)
+  /** Adds a main option entry to be handled by the Application.
+   *
+   * This function is comparable to Glib::OptionGroup::add_entry() +
+   * Glib::OptionContext::set_main_group().
+   *
+   * After the commandline arguments are parsed, the
+   * signal_handle_local_options() signal will be emitted.  At this
+   * point, the application can inspect the parsed values.
+   *
+   * Unlike OptionGroup + OptionContext, Application packs the arguments
+   * into a Glib::VariantDict which is passed to the
+   * signal_handle_local_options() handler, where it can be
+   * inspected and modified. If Gio::APPLICATION_HANDLES_COMMAND_LINE is
+   * set, then the resulting dictionary is sent to the primary instance,
+   * where Gio::ApplicationCommandLine::get_options_dict() will return it.
+   * This "packing" is done according to the type of the argument --
+   * booleans for normal flags, Glib::ustring's for strings, std::string's for
+   * filenames, etc.  The packing only occurs if the flag is given (ie: we
+   * do not pack a "false" Variant in the case that a flag is missing).
+   *
+   * In general, it is recommended that all commandline arguments are
+   * parsed locally.  The options dictionary should then be used to
+   * transmit the result of the parsing to the primary instance, where
+   * Glib::VariantDict::lookup_value() can be used.  For local options, it is
+   * possible to consult (and potentially remove) the option from the options dictionary.
+   *
+   * This function is new in GLib 2.40.  Before then, the only real choice
+   * was to send all of the commandline arguments (options and all) to the
+   * primary instance for handling.  Application ignored them completely
+   * on the local side.  Calling this function "opts in" to the new
+   * behaviour, and in particular, means that unrecognised options will be
+   * treated as errors.  Unrecognised options have never been ignored when
+   * Gio::APPLICATION_HANDLES_COMMAND_LINE is unset.
+   *
+   * If signal_handle_local_options() needs to see the list of
+   * filenames, then the use of G_OPTION_REMAINING as @a long_name is recommended.
+   * G_OPTION_REMAINING can be used as a key into
+   * the options dictionary.  If you do use G_OPTION_REMAINING then you
+   * need to handle these arguments for yourself because once they are
+   * consumed, they will no longer be visible to the default handling
+   * (which treats them as filenames to be opened).
+   *
+   * @newin{2,42}
+   *
+   * @param arg_type A Gio::Application::OptionType.
+   * @param long_name The long name of an option can be used to specify it
+   *     in a commandline as `--long_name`. Every option must have a
+   *     long name.
+   * @param short_name If an option has a short name, it can be specified
+   *     `-short_name` in a commandline. @a short_name must be a printable
+   *     ASCII character different from '-', or '\0' if the option has no
+   *     short name.
+   * @param description The description for the option in `--help` output.
+   * @param arg_description The placeholder to use for the extra argument parsed
+   *     by the option in `--help` output.
+   * @param flags Flags from Glib::OptionEntry::Flags. Do not set FLAG_FILENAME.
+   *     Character encoding is chosen with @a arg_type.
+   */
+  void add_main_option_entry(OptionType arg_type, const Glib::ustring& long_name,
+    gchar short_name = '\0', const Glib::ustring& description = Glib::ustring(),
+    const Glib::ustring& arg_description = Glib::ustring(), int flags = 0);
+  _IGNORE(g_application_add_main_option_entries)
+
+  // _WRAP_METHOD(void add_option_group(Glib::OptionGroup& group), g_application_add_option_group)
+  // add_option_group() is probably not very useful. If implemented, it must probably
+  // be custom-implemented. See https://bugzilla.gnome.org/show_bug.cgi?id=727822#c10
+  _IGNORE(g_application_add_option_group)
 
   _WRAP_METHOD(bool is_registered() const, g_application_get_is_registered)
   _WRAP_METHOD(bool is_remote() const, g_application_get_is_remote)
@@ -273,6 +360,5 @@ private:
    */
   const Glib::Class& custom_class_init();
 };
-
 
 } // namespace Gio
