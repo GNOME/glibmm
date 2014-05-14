@@ -28,6 +28,7 @@
 #include <giomm/file.h>
 #include <glibmm/object.h>
 #include <glibmm/optionentry.h>
+#include <glibmm/optiongroup.h>
 #include <glibmm/variant.h>
 #include <glibmm/variantdict.h>
 #include <giomm/dbusconnection.h>
@@ -104,6 +105,8 @@ protected:
   _IGNORE(g_application_new)
 
 public:
+  _CUSTOM_DTOR()
+
   /** The OptionType enum values determine the expected type of a command line option.
    * If an option expects an extra argument, it can be specified in several ways;
    * with a short option: "-x arg", with a long option: "--name arg" or combined
@@ -224,6 +227,42 @@ public:
     const Glib::ustring& arg_description = Glib::ustring(), int flags = 0);
   _IGNORE(g_application_add_main_option_entries)
 
+  /** Adds a main option entry to be handled by the Application.
+   *
+   * Adds a string option entry, but lets the callback @a slot parse the extra
+   * argument instead of having it packed in a Glib::VariantDict.
+   *
+   * If you create more than one Application instance (unusual),
+   * one Application instance can't add an option with the same name as
+   * another instance adds. This restriction does not apply to the
+   * add_main_option_entry() that takes an OptionType parameter.
+   *
+   * @see add_main_option_entry(OptionType, const Glib::ustring&,
+   *   gchar, const Glib::ustring&, const Glib::ustring&, int)
+   */
+  void add_main_option_entry(const Glib::OptionGroup::SlotOptionArgString& slot,
+    const Glib::ustring& long_name,
+    gchar short_name = '\0', const Glib::ustring& description = Glib::ustring(),
+    const Glib::ustring& arg_description = Glib::ustring(), int flags = 0);
+
+  /** Adds a main option entry to be handled by the Application.
+   *
+   * Adds a filename option entry, but lets the callback @a slot parse the extra
+   * argument instead of having it packed in a Glib::VariantDict.
+   *
+   * If you create more than one Application instance (unusual),
+   * one Application instance can't add an option with the same name as
+   * another instance adds. This restriction does not apply to the
+   * add_main_option_entry() that takes an OptionType parameter.
+   *
+   * @see add_main_option_entry(OptionType, const Glib::ustring&,
+   *   gchar, const Glib::ustring&, const Glib::ustring&, int)
+   */
+  void add_main_option_entry_filename(const Glib::OptionGroup::SlotOptionArgFilename& slot,
+    const Glib::ustring& long_name,
+    gchar short_name = '\0', const Glib::ustring& description = Glib::ustring(),
+    const Glib::ustring& arg_description = Glib::ustring(), int flags = 0);
+
   // _WRAP_METHOD(void add_option_group(Glib::OptionGroup& group), g_application_add_option_group)
   // add_option_group() is probably not very useful. If implemented, it must probably
   // be custom-implemented. See https://bugzilla.gnome.org/show_bug.cgi?id=727822#c10
@@ -321,7 +360,8 @@ public:
 
   //TODO: Remove no_default_handler when we can break ABI
   //TODO: Avoid the use of the Variants in the VariantDict?
-  //TODO: Should options definitely be non-const? Confirm that the handler is meant to modify it.
+  //options must be non-const. The handler is meant to modify it. See the description
+  //of add_main_option_entry(OptionType, ...).
 #m4 _CONVERSION(`GVariantDict*',`const Glib::RefPtr<Glib::VariantDict>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(int handle_local_options(const Glib::RefPtr<Glib::VariantDict>& options), "handle-local-options", no_default_handler)
 
@@ -359,6 +399,11 @@ private:
    * See https://bugzilla.gnome.org/show_bug.cgi?id=639925
    */
   const Glib::Class& custom_class_init();
+
+  // Code, common to the public add_main_option_entry*() methods.
+  void add_main_option_entry_private(GOptionArg arg, const Glib::ustring& long_name,
+    gchar short_name, const Glib::ustring& description,
+    const Glib::ustring& arg_description, int flags);
 };
 
 } // namespace Gio

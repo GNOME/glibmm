@@ -22,6 +22,8 @@
 #include <giomm/actiongroup.h>
 #include <giomm/init.h>
 #include <cstring> // std::memset()
+#include <glibmm/threads.h>
+#include <map>
 #include <vector>
 
 namespace // anonymous
@@ -128,6 +130,130 @@ static const Glib::SignalProxyInfo Application_signal_open_info =
   (GCallback) &Application_signal_open_notify_callback
 };
 
+// The add_main_option_entry*() methods that take a slot parameter are handled
+// similarly to the corresponding Glib::OptionGroup::add_entry*() methods.
+// There is an important difference: In add_main_option_entry*() we can't pass
+// an Application pointer to the used GOptionGroup.
+// g_application_add_main_option_entries() creates a GOptionGroup with user_data == NULL.
+// Therefore Application_option_arg_callback() is called with data == NULL.
+// Application_option_arg_callback() does not know which Application instance
+// the command-line option belongs to. All Application instances (usually only one)
+// share a map, mapping the long command option name to an OptionArgCallbackData.
+class OptionArgCallbackData
+{
+public:
+  explicit OptionArgCallbackData(const Gio::Application* application, gchar short_name,
+    const Glib::OptionGroup::SlotOptionArgString& slot)
+  : application_(application), short_name_(short_name),
+    slot_string_(new Glib::OptionGroup::SlotOptionArgString(slot)), slot_filename_(0)
+  { }
+
+  explicit OptionArgCallbackData(const Gio::Application* application, gchar short_name,
+    const Glib::OptionGroup::SlotOptionArgFilename& slot)
+  : application_(application), short_name_(short_name),
+    slot_string_(0), slot_filename_(new Glib::OptionGroup::SlotOptionArgFilename(slot))
+  { }
+
+  const Gio::Application* get_application() const  { return application_; }
+  gchar get_short_name() const { return short_name_; }
+  bool is_filename_option() const { return slot_filename_ != 0; }
+
+  const Glib::OptionGroup::SlotOptionArgString* get_slot_string() const
+  { return slot_string_; }
+
+  const Glib::OptionGroup::SlotOptionArgFilename* get_slot_filename() const
+  { return slot_filename_; }
+
+  ~OptionArgCallbackData()
+  {
+    delete slot_string_;
+    delete slot_filename_;
+    // Don't delete application_. It's not owned by this class.
+  }
+
+private:
+  const Gio::Application* application_;
+  gchar short_name_;
+  // One of these slot pointers is 0 and the other one points to a slot.
+  Glib::OptionGroup::SlotOptionArgString* slot_string_;
+  Glib::OptionGroup::SlotOptionArgFilename* slot_filename_;
+
+  // Not copyable
+  OptionArgCallbackData(const OptionArgCallbackData&);
+  OptionArgCallbackData& operator=(const OptionArgCallbackData&);
+};
+
+typedef std::map<Glib::ustring, OptionArgCallbackData*> OptionArgCallbackDataMap;
+OptionArgCallbackDataMap option_arg_callback_data;
+
+// Gio::Application instances may be used in different threads.
+// Accesses to option_arg_callback_data must be thread-safe.
+Glib::Threads::Mutex option_arg_callback_data_mutex;
+
+gboolean Application_option_arg_callback(const gchar* option_name, const gchar* value,
+  gpointer /* data */, GError** error)
+{
+  const Glib::ustring cpp_option_name(option_name);
+
+  // option_name is either a single dash followed by a single letter (for a
+  // short name) or two dashes followed by a long option name.
+  Glib::Threads::Mutex::Lock lock(option_arg_callback_data_mutex);
+  OptionArgCallbackDataMap::const_iterator iterFind = option_arg_callback_data.end();
+  if (option_name[1] == '-')
+  {
+    // Long option name.
+    const Glib::ustring long_option_name = Glib::ustring(option_name+2);
+    iterFind = option_arg_callback_data.find(long_option_name);
+  }
+  else
+  {
+    // Short option name.
+    const gchar short_option_name = option_name[1];
+    for (iterFind = option_arg_callback_data.begin();
+         iterFind != option_arg_callback_data.end(); ++iterFind)
+    {
+      if (iterFind->second->get_short_name() == short_option_name)
+        break;
+    }
+  }
+
+  if (iterFind == option_arg_callback_data.end())
+  {
+    Glib::OptionError(Glib::OptionError::UNKNOWN_OPTION, "Application_option_arg_callback(): "
+      "Unknown option " + cpp_option_name).propagate(error);
+    return false;
+  }
+
+  const bool has_value = (value != 0);
+  const OptionArgCallbackData* const option_arg = iterFind->second;
+  try
+  {
+    if (option_arg->is_filename_option())
+    {
+      const Glib::OptionGroup::SlotOptionArgFilename* the_slot = option_arg->get_slot_filename();
+      lock.release();
+      const std::string cpp_value(value ? value : "");
+      return (*the_slot)(cpp_option_name, cpp_value, has_value);
+    }
+    else
+    {
+      const Glib::OptionGroup::SlotOptionArgString* the_slot = option_arg->get_slot_string();
+      lock.release();
+      const Glib::ustring cpp_value(value ? value : "");
+      return (*the_slot)(cpp_option_name, cpp_value, has_value);
+    }
+  }
+  catch (Glib::Error& err)
+  {
+    err.propagate(error);
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return false;
+}
+
 } // anonymous namespace
 
 namespace Gio
@@ -149,6 +275,23 @@ Application::Application(const Glib::ustring& application_id, ApplicationFlags f
   Glib::Object(Glib::ConstructParams(custom_class_init(), "application_id", (application_id.empty() ? 0 : application_id.c_str()), "flags", ((GApplicationFlags)(flags)), static_cast<char*>(0)))
 {
 
+}
+
+Application::~Application()
+{
+  // Delete all OptionArgCallbackData instances that belong to this application.
+  Glib::Threads::Mutex::Lock lock(option_arg_callback_data_mutex);
+  OptionArgCallbackDataMap::iterator iter = option_arg_callback_data.begin();
+  while (iter != option_arg_callback_data.end())
+  {
+    OptionArgCallbackDataMap::iterator saved_iter = iter;
+    ++iter;
+    if (saved_iter->second->get_application() == this)
+    {
+      delete saved_iter->second;
+      option_arg_callback_data.erase(saved_iter);
+    }
+  }
 }
 
 //static
@@ -240,6 +383,49 @@ void Application::open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring&
 void Application::add_main_option_entry(OptionType arg_type, const Glib::ustring& long_name,
   gchar short_name, const Glib::ustring& description, const Glib::ustring& arg_description, int flags)
 {
+  add_main_option_entry_private((GOptionArg)arg_type, long_name, short_name,
+    description, arg_description, flags);
+}
+
+void Application::add_main_option_entry(
+  const Glib::OptionGroup::SlotOptionArgString& slot, const Glib::ustring& long_name,
+  gchar short_name, const Glib::ustring& description,
+  const Glib::ustring& arg_description, int flags)
+{
+  Glib::Threads::Mutex::Lock lock(option_arg_callback_data_mutex);
+  OptionArgCallbackDataMap::iterator iterFind = option_arg_callback_data.find(long_name);
+  if (iterFind != option_arg_callback_data.end())
+    return; // Ignore duplicates
+
+  OptionArgCallbackData* callback_data = new OptionArgCallbackData(this, short_name, slot);
+  option_arg_callback_data[long_name] = callback_data;
+  lock.release();
+
+  add_main_option_entry_private(G_OPTION_ARG_CALLBACK, long_name, short_name,
+    description, arg_description, flags & ~Glib::OptionEntry::FLAG_FILENAME);
+}
+
+void Application::add_main_option_entry_filename(
+  const Glib::OptionGroup::SlotOptionArgFilename& slot, const Glib::ustring& long_name,
+  gchar short_name, const Glib::ustring& description,
+  const Glib::ustring& arg_description, int flags)
+{
+  Glib::Threads::Mutex::Lock lock(option_arg_callback_data_mutex);
+  OptionArgCallbackDataMap::iterator iterFind = option_arg_callback_data.find(long_name);
+  if (iterFind != option_arg_callback_data.end())
+    return; // Ignore duplicates
+
+  OptionArgCallbackData* callback_data = new OptionArgCallbackData(this, short_name, slot);
+  option_arg_callback_data[long_name] = callback_data;
+  lock.release();
+
+  add_main_option_entry_private(G_OPTION_ARG_CALLBACK, long_name, short_name,
+    description, arg_description, flags | Glib::OptionEntry::FLAG_FILENAME);
+}
+
+void Application::add_main_option_entry_private(GOptionArg arg, const Glib::ustring& long_name,
+  gchar short_name, const Glib::ustring& description, const Glib::ustring& arg_description, int flags)
+{
   // Create a temporary array, just so we can give the correct thing to g_application_add_main_option_entries():
   GOptionEntry array[2];
   std::memset(array, 0, 2 * sizeof(GOptionEntry)); // null-termination
@@ -269,15 +455,29 @@ void Application::add_main_option_entry(OptionType arg_type, const Glib::ustring
     extra_application_data->option_entry_strings.push_back(arg_desc);
 
   // Fill in array[0].
-  array[0].arg = (GOptionArg)arg_type;
+  array[0].arg = arg;
   array[0].long_name = lname;
   array[0].short_name = short_name;
   array[0].description = desc;
   array[0].arg_description = arg_desc;
   array[0].flags = flags;
-  // We ensure that this is null to ensure that it is not used,
-  // telling GApplication to put the parsed value in the options VariantDict instead.
-  array[0].arg_data = 0;
+
+  if (arg == G_OPTION_ARG_CALLBACK)
+  {
+    // GoptionEntry.arg_data is a function pointer, cast to void*.
+    // See Glib::OptionGroup::CppOptionEntry::allocate_c_arg() for a discussion
+    // of this hack.
+    union {
+      void* dp;
+      GOptionArgFunc fp;
+    } u;
+    u.fp = &Application_option_arg_callback;
+    array[0].arg_data = u.dp;
+  }
+  else
+    // We ensure that this is null to ensure that it is not used,
+    // telling GApplication to put the parsed value in the options VariantDict instead.
+    array[0].arg_data = 0;
 
   g_application_add_main_option_entries(gobj(), array);
 }
