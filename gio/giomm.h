@@ -124,6 +124,7 @@
 #include <giomm/socketcontrolmessage.h>
 #include <giomm/socketlistener.h>
 #include <giomm/socketservice.h>
+#include <giomm/socketsource.h>
 #include <giomm/srvtarget.h>
 #include <giomm/tcpconnection.h>
 #include <giomm/themedicon.h>

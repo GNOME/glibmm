@@ -784,8 +784,7 @@ protected:
 private:
   GSource* gobject_;
 
-#ifndef DOXGEN_SHOULD_SKIP_THIS
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   static inline Source* get_wrapper(GSource* source);
 
   static const GSourceFuncs vfunc_table_;
@@ -793,11 +792,19 @@ private:
   static gboolean prepare_vfunc(GSource* source, int* timeout);
   static gboolean check_vfunc(GSource* source);
   static gboolean dispatch_vfunc(GSource* source, GSourceFunc callback, void* user_data);
+
 public:
   static void destroy_notify_callback(void* data);
-private:
+  // Used by SignalXyz, possibly in other files.
+  static sigc::connection attach_signal_source(const sigc::slot_base& slot, int priority,
+    GSource* source, GMainContext* context, GSourceFunc callback_func);
+  // Used by SignalXyz in other files.
+  static sigc::slot_base* get_slot_from_connection_node(void* data);
+  // Used by derived Source classes in other files.
+  static sigc::slot_base* get_slot_from_callback_data(void* data);
 
-#endif /* DOXGEN_SHOULD_SKIP_THIS */
+private:
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   // noncopyable
   Source(const Source&);
@@ -859,6 +866,14 @@ public:
 protected:
   IOSource(int fd, IOCondition condition);
   IOSource(const Glib::RefPtr<IOChannel>& channel, IOCondition condition);
+
+  /** Wrap an existing GSource object and install the given callback function.
+   * This constructor is for use by derived types that need to wrap a GSource object.
+   * @see Source::Source(GSource*, GSourceFunc).
+   * @newin{2,42}
+   */
+  IOSource(GSource* cast_item, GSourceFunc callback_func);
+
   virtual ~IOSource();
 
   virtual bool prepare(int& timeout);

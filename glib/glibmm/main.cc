@@ -1064,6 +1064,40 @@ void Source::destroy_notify_callback(void* data)
   }
 }
 
+// static
+sigc::connection Source::attach_signal_source(const sigc::slot_base& slot, int priority,
+  GSource* source, GMainContext* context, GSourceFunc callback_func)
+{
+  SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
+  const sigc::connection connection(*conn_node->get_slot());
+
+  if (priority != G_PRIORITY_DEFAULT)
+    g_source_set_priority(source, priority);
+
+  g_source_set_callback(source, callback_func, conn_node,
+                        &SourceConnectionNode::destroy_notify_callback);
+
+  conn_node->install(source);
+  g_source_attach(source, context);
+  g_source_unref(source); // GMainContext holds a reference
+
+  return connection;
+}
+
+// static
+sigc::slot_base* Source::get_slot_from_connection_node(void* data)
+{
+  return static_cast<SourceConnectionNode*>(data)->get_slot();
+}
+
+// static
+sigc::slot_base* Source::get_slot_from_callback_data(void* data)
+{
+  SourceCallbackData* const callback_data = static_cast<SourceCallbackData*>(data);
+  g_return_val_if_fail(callback_data->node != 0, 0);
+  return callback_data->node->get_slot();
+}
+
 
 /**** Glib::TimeoutSource **************************************************/
 
@@ -1227,6 +1261,11 @@ IOSource::IOSource(const Glib::RefPtr<IOChannel>& channel, IOCondition condition
 :
   Source(g_io_create_watch(channel->gobj(), (GIOCondition) condition),
          (GSourceFunc) &glibmm_iosource_callback)
+{}
+
+IOSource::IOSource(GSource* cast_item, GSourceFunc callback_func)
+:
+  Source(cast_item, callback_func)
 {}
 
 IOSource::~IOSource()

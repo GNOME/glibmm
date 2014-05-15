@@ -31,6 +31,7 @@ _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gio
 {
+class SocketSource;
 
 _WRAP_ENUM(SocketType, GSocketType)
 _WRAP_ENUM(SocketProtocol, GSocketProtocol)
@@ -120,36 +121,36 @@ public:
   static Glib::RefPtr<Socket> create_from_fd(int fd, const Glib::RefPtr<Cancellable>&
                                              cancellable = Glib::RefPtr<Cancellable>());
 
-  /** When a socket is created it is attached to an address family, but it doesn't 
-   * have an address in this family. Socket::bind() assigns the address (sometimes 
+  /** When a socket is created it is attached to an address family, but it doesn't
+   * have an address in this family. Socket::bind() assigns the address (sometimes
    * called name) of the socket.
    *
-   * It is generally required to bind to a local address before you can receive 
-   * connections. (See Socket::listen() and Socket::accept()). In certain situations, 
-   * you may also want to bind a socket that will be used to initiate connections, 
+   * It is generally required to bind to a local address before you can receive
+   * connections. (See Socket::listen() and Socket::accept()). In certain situations,
+   * you may also want to bind a socket that will be used to initiate connections,
    * though this is not normally required.
    *
-   * If socket is a TCP socket, then @a allow_reuse controls the setting of the SO_REUSEADDR 
-   * socket option; normally it should be <tt>true</tt> for server sockets (sockets that you 
-   * will eventually call Socket::accept() on), and <tt>false</tt> for client sockets. 
-   * (Failing to set this flag on a server socket may cause Socket::bind() to 
-   * throw Gio::Error with ADDRESS_IN_USE if the server program 
+   * If socket is a TCP socket, then @a allow_reuse controls the setting of the SO_REUSEADDR
+   * socket option; normally it should be <tt>true</tt> for server sockets (sockets that you
+   * will eventually call Socket::accept() on), and <tt>false</tt> for client sockets.
+   * (Failing to set this flag on a server socket may cause Socket::bind() to
+   * throw Gio::Error with ADDRESS_IN_USE if the server program
    * is stopped and then immediately restarted.)
    *
-   * If socket is a UDP socket, then @a allow_reuse determines whether or not 
-   * other UDP sockets can be bound to the same address at the same time. In particular, 
-   * you can have several UDP sockets bound to the same address, and they will all 
-   * receive all of the multicast and broadcast packets sent to that address. 
+   * If socket is a UDP socket, then @a allow_reuse determines whether or not
+   * other UDP sockets can be bound to the same address at the same time. In particular,
+   * you can have several UDP sockets bound to the same address, and they will all
+   * receive all of the multicast and broadcast packets sent to that address.
    * (The behavior of unicast UDP packets to an address with multiple listeners is not defined.)
    *
-   * @param address a SocketAddress specifying the local address.	 
+   * @param address a SocketAddress specifying the local address.
    * @param allow_reuse whether to allow reusing this address
    *
    * @throw Gio::Error
    */
   _WRAP_METHOD(void bind(const Glib::RefPtr<SocketAddress>& address, bool allow_reuse), g_socket_bind, errthrow)
-  
-  /** Marks the socket as a server socket - a socket that is used to accept 
+
+  /** Marks the socket as a server socket - a socket that is used to accept
    * incoming requests using Socket::accept().
    *
    * Before calling this the socket must be bound to a local address using Socket::bind().
@@ -159,17 +160,17 @@ public:
    * @throw Gio::Error
    */
   _WRAP_METHOD(void listen(), g_socket_listen, errthrow)
-  
-  /** Accept incoming connections on a connection-based socket. This removes the 
-   * first outstanding connection request from the listening socket and creates 
+
+  /** Accept incoming connections on a connection-based socket. This removes the
+   * first outstanding connection request from the listening socket and creates
    * a GSocket object for it.
-   * 
-   * The socket must be bound to a local address with g_socket_bind() and must 
+   *
+   * The socket must be bound to a local address with g_socket_bind() and must
    * be listening for incoming connections (Socket::listen()).
    *
-   * If there are no outstanding connections then the operation will block or 
-   * throw Gio::Error with ERROR_WOULD_BLOCK if non-blocking 
-   * I/O is enabled. To be notified of an incoming connection, wait for the 
+   * If there are no outstanding connections then the operation will block or
+   * throw Gio::Error with ERROR_WOULD_BLOCK if non-blocking
+   * I/O is enabled. To be notified of an incoming connection, wait for the
    * Glib::IO_IN condition.
    *
    * @param cancellable A Cancellable object which can be used to cancel the operation.
@@ -182,20 +183,20 @@ public:
 
   /** Connect the socket to the specified remote address.
    *
-   * For connection oriented socket this generally means we attempt to make a 
-   * connection to the address . For a connection-less socket it sets the default 
+   * For connection oriented socket this generally means we attempt to make a
+   * connection to the address . For a connection-less socket it sets the default
    * address for Socket::send() and discards all incoming datagrams from other sources.
    *
-   * Generally connection oriented sockets can only connect once, but 
+   * Generally connection oriented sockets can only connect once, but
    * connection-less sockets can connect multiple times to change the default address.
    *
-   * If the connect call needs to do network I/O it will block, unless non-blocking 
-   * I/O is enabled. Then Gio::Error with ERROR_PENDING is thrown 
-   * and the user can be notified of the connection finishing by waiting for the 
-   * Glib::IO_OUT condition. The result of the connection must then be checked 
+   * If the connect call needs to do network I/O it will block, unless non-blocking
+   * I/O is enabled. Then Gio::Error with ERROR_PENDING is thrown
+   * and the user can be notified of the connection finishing by waiting for the
+   * Glib::IO_OUT condition. The result of the connection must then be checked
    * with Socket::check_connect_result().
    *
-   * @param address	a SocketAddress specifying the remote address.	 
+   * @param address	a SocketAddress specifying the remote address.
    * @param cancellable	A Cancellable object which can be used to cancel the operation.
    *
    * @throw Gio::Error
@@ -223,16 +224,42 @@ public:
   _WRAP_METHOD(void close(), g_socket_close, errthrow)
   _WRAP_METHOD(bool is_closed(), g_socket_is_closed)
 
-  //TODO: Glib::Source has no wrap() method: _WRAP_METHOD(Glib::RefPtr<Glib::Source> create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_create_source)
+  /** Creates a SocketSource that can be attached to a Glib::MainContext to monitor
+   * for the availability of the specified @a condition on the socket.
+   *
+   * Create a slot from a function to be called when @a condition is met
+   * for the socket with sigc::ptr_fun() or sigc::mem_fun() and pass
+   * it into the connect() function of the returned SocketSource object.
+   * Polling of the socket will start when you attach a Glib::MainContext
+   * object to the returned SocketSource object using its attach() function.
+   *
+   * It is meaningless to specify Glib::IO_ERR or Glib::IO_HUP in @a condition;
+   * these conditions will always be reported output if they are true.
+   *
+   * @a cancellable can be used to cancel the source, which will
+   * cause the source to trigger, reporting the current condition (which
+   * is likely 0 unless cancellation happened at the same time as a
+   * condition change). You can check for this in the callback using
+   * Cancellable::is_cancelled().
+   *
+   * If the socket has a timeout set, and it is reached before @a condition
+   * occurs, the source will then trigger anyway, reporting Glib::IO_IN or
+   * Glib::IO_OUT depending on @a condition. However, the socket will have been
+   * marked as having had a timeout, and so the next Socket I/O method
+   * you call will then fail with a Gio::IO_ERROR_TIMED_OUT.
+   *
+   * Gio::signal_socket().connect() is a simpler interface to the same functionality.
+   *
+   * @newin{2,42}
+   * @param condition A Glib::IOCondition mask to monitor.
+   * @param cancellable A Cancellable. The default value means the source is not cancellable.
+   * @return A newly allocated SocketSource.
+   */
+  Glib::RefPtr<SocketSource> create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+  _IGNORE(g_socket_create_source)
 
   _WRAP_METHOD(void shutdown(bool shutdown_read, bool shutdown_write), g_socket_shutdown, errthrow)
   _WRAP_METHOD(bool is_connected(), g_socket_is_connected)
-
-  // TODO: non-cancellable version
-  // This won't work because Glib::Source is abstract, and Glib::IOSource has no
-  // constructor that takes a GSource*
-//#m4 _CONVERSION(`GSource*',`Glib::RefPtr<Glib::Source>',`Glib::RefPtr<Glib::Source>(new ::Glib::Source($3))')
-  //_WRAP_METHOD(Glib::RefPtr<Glib::Source> create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable{?}), g_socket_create_source)
 
   _WRAP_METHOD(gssize get_available_bytes() const,  g_socket_get_available_bytes)
 
