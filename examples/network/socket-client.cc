@@ -44,8 +44,7 @@ socket_address_to_string (const Glib::RefPtr<Gio::SocketAddress>& address)
 }
 
 static bool
-source_ready (gpointer /*data*/,
-              GIOCondition /*condition*/)
+source_ready(Glib::IOCondition /*condition*/)
 {
   loop->quit ();
   return false;
@@ -57,21 +56,15 @@ ensure_condition (const Glib::RefPtr<Gio::Socket>& socket,
                   const Glib::RefPtr<Gio::Cancellable>& cancellable,
                   Glib::IOCondition condition)
 {
-    GSource *source;
-
     if (!non_blocking)
         return;
 
     if (use_source)
     {
-        source = g_socket_create_source (socket->gobj (),
-                                         (GIOCondition) condition,
-                                         cancellable->gobj ());
-        g_source_set_callback (source,
-                               (GSourceFunc) source_ready,
-                               NULL, NULL);
-        g_source_attach (source, NULL);
-        loop->run ();
+      Glib::RefPtr<Gio::SocketSource> source = socket->create_source(condition, cancellable);
+      source->connect(sigc::ptr_fun(&source_ready));
+      source->attach();
+      loop->run();
     }
     else
     {
