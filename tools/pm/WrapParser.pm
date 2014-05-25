@@ -635,6 +635,7 @@ sub extract_bracketed_text($)
   my ($self) = @_;
 
   my $level = 1;
+  my $in_quotes = 0;
   my $str = "";
 
   # Move to the first "(":
@@ -644,14 +645,24 @@ sub extract_bracketed_text($)
       last if ($t eq "(");
     }
 
+  # TODO: Don't count "(" and ")" within double quotes.
+  # There may be .hg files with unpaired quotes that generate correct
+  # .h and .cc files. Don't want to break such code yet.
+  # See also TODO in string_split_commas().
+
   # Concatenate until the corresponding ")":
   while ( scalar(@tokens) )
     {
       my $t = $self->extract_token();
+      $in_quotes = !$in_quotes if ($t eq '"');
       $level++ if ($t eq "(");
       $level-- if ($t eq ")");
 
-      return $str if (!$level);
+      if (!$level)
+      {
+        $self->error("End of gmmproc directive within a quoted string.\n") if $in_quotes;
+        return $str;
+      }
       $str .= $t;
     }
 
@@ -669,15 +680,22 @@ sub string_split_commas($)
   my @out;
   my $level = 0;
   my $in_braces = 0;
+  my $in_quotes = 0;
   my $str = "";
-  my @in = split(/([,()<>{}])/, $in);
+  my @in = split(/([,"()<>{}])/, $in);
 
-  while ($#in > -1)
+  while (scalar(@in))
+  {
+    my $t = shift @in;
+
+    next if ($t eq "");
+
+    # TODO: Delete the test for scalar(@out) >= 2 when we can stop accepting
+    # .hg files with unpaired quotes, such as _WRAP_PROPERTY("text_column, int).
+    # See also TODO in extract_bracketed_text().
+    $in_quotes = !$in_quotes if ($t eq '"' and scalar(@out) >= 2);
+    if (!$in_quotes)
     {
-      my $t = shift @in;
-
-      next if ($t eq "");
-
       $in_braces++ if ($t eq "{");
       $in_braces-- if ($t eq "}");
 
@@ -688,18 +706,21 @@ sub string_split_commas($)
       # a parameter in a method declaration is an output param. 
       $level-- if ($t eq ")" or ($t eq ">" && !$in_braces));
 
-      # skip , inside functions  Ie.  void (*)(int,int)
-      if ( ($t eq ",") && !$level) 
-        {
-          push(@out, $str);
-          $str="";
-          next;
-        }
-
-      $str .= $t;
+      # Don't split at comma, if inside a function, e.g. void f1(int x, int y)
+      # or std::map<Glib::ustring, float> f2(),
+      # or inside a quoted string, e.g. deprecated "Use f1(), f2() or f3() instead.".
+      if ($t eq "," && !$level)
+      {
+        push(@out, $str);
+        $str = "";
+        next;
+      }
     }
 
-  push(@out,$str);
+    $str .= $t;
+  }
+
+  push(@out, $str);
   return @out;
 }
 
