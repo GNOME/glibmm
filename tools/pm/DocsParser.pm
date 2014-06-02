@@ -335,11 +335,14 @@ sub lookup_documentation($$;$)
   }
 
   DocsParser::convert_docs_to_cpp($objFunction, \$text);
+  # A blank line, marking the end of a paragraph, is needed after @newin.
+  # Most @newins are at the end of a function description.
+  $text .= "\n";
 
   #Add note about deprecation if we have specified that in our _WRAP_METHOD() call:
   if($deprecation_docs ne "")
   {
-    $text .= "\n\@deprecated $deprecation_docs";
+    $text .= "\n\@deprecated $deprecation_docs\n";
   }
 
   DocsParser::append_parameter_docs($objFunction, \$text, $objCppfunc);
