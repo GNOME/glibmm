@@ -15,6 +15,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+_CONFIGINCLUDE(giommconfig.h)
+
 #include <glibmm/arrayhandle.h>
 #include <glibmm/object.h>
 #include <glibmm/variant.h>
@@ -22,6 +24,11 @@
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
+
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+#undef G_DISABLE_DEPRECATED
+#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
+#m4 _POP()
 
 namespace Gio
 {
@@ -164,19 +171,23 @@ public:
 
   _WRAP_METHOD(void reset(const Glib::ustring& key), g_settings_reset)
 
+_DEPRECATE_IFDEF_START
 //We must hand-code this because gmmproc is confused by the static keyword with the vector.
 //#m4 _CONVERSION(`const gchar*const*',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD_DOCS_ONLY(g_settings_list_schemas)
   static std::vector<Glib::ustring> list_schemas();
   _IGNORE(g_settings_list_schemas)
+_DEPRECATE_IFDEF_END
 
 #m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(std::vector<Glib::ustring> list_children() const, g_settings_list_children)
   _WRAP_METHOD(std::vector<Glib::ustring> list_keys() const, g_settings_list_keys)
 
-  //TODO: Choose an appropriate Variant template type: GVariant* g_settings_get_range(const gchar* key)
+  _IGNORE(g_settings_get_range, g_settings_list_relocatable_schemas) // deprecated
 
-  _WRAP_METHOD(bool range_check(const Glib::ustring& key, const Glib::VariantBase& value) const, g_settings_range_check)
+  _WRAP_METHOD(bool range_check(const Glib::ustring& key, const Glib::VariantBase& value) const, g_settings_range_check,
+    deprecated "Use g_settings_schema_key_range_check() instead.")
+  //TODO: Wrap GSettingsSchema
 
 #m4 _CONVERSION(`Glib::ObjectBase*',`gpointer',(gpointer)$3->gobj())
   _WRAP_METHOD(void bind(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, SettingsBindFlags flags=SETTINGS_BIND_DEFAULT), g_settings_bind)
@@ -193,7 +204,7 @@ public:
   _WRAP_PROPERTY("delay-apply", bool)
   _WRAP_PROPERTY("has-unapplied", bool)
   _WRAP_PROPERTY("path", std::string)
-  _WRAP_PROPERTY("schema", Glib::ustring)
+  _WRAP_PROPERTY("schema", Glib::ustring, deprecated "Use the 'schema-id' property instead. In a future version, this property may instead refer to a SettingsSchema.")
   _WRAP_PROPERTY("schema-id", Glib::ustring)
 
   //TODO: _WRAP_PROPERTY("settings-schema", Glib::RefPtr<SettingsSchema>)

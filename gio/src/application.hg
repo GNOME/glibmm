@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+_CONFIGINCLUDE(giommconfig.h)
+
 #m4 _PUSH(SECTION_CC_PRE_INCLUDES)
 #undef G_DISABLE_DEPRECATED
 #define GLIB_DISABLE_DEPRECATION_WARNINGS 1
@@ -70,10 +72,11 @@ _WRAP_ENUM(ApplicationFlags, GApplicationFlags, NO_GTYPE)
  * changed using hold() and release(). If it drops to zero, the application
  * exits.
  *
- * Application also implements the ActionGroup interface and lets you easily
- * export actions by adding them with set_action_group(). When
- * invoking an action by calling Gio::ActionGroup::activate_action() on the
- * application, it is always invoked in the primary instance.
+ * Application also implements the ActionGroup and ActionMap
+ * interfaces and lets you easily export actions by adding them with
+ * Gio::ActionMap::add_action(). When invoking an action by calling
+ * Gio::ActionGroup::activate_action() on the application, it is always
+ * invoked in the primary instance.
  *
  * There is a number of different entry points into an Application:
  *
@@ -159,7 +162,8 @@ public:
   _WRAP_METHOD(ApplicationFlags get_flags() const, g_application_get_flags)
   _WRAP_METHOD(void set_flags(ApplicationFlags flags), g_application_set_flags)
 
-  _WRAP_METHOD(void set_action_group(const Glib::RefPtr<ActionGroup>& action_group), g_application_set_action_group)
+  _WRAP_METHOD(void set_action_group(const Glib::RefPtr<ActionGroup>& action_group), g_application_set_action_group,
+    deprecated "Use the Gio::ActionMap interface instead.")
 
   //Note: We would like to add a group, not just some entries,
   //so we can do pre and post parsing. See https://bugzilla.gnome.org/show_bug.cgi?id=727602

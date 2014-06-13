@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+_CONFIGINCLUDE(giommconfig.h)
+
 #m4 _PUSH(SECTION_CC_PRE_INCLUDES)
 #undef G_DISABLE_DEPRECATED
 #define GLIB_DISABLE_DEPRECATION_WARNINGS 1
@@ -60,11 +62,8 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Volume> get_volume_for_uuid(const std::string& uuid), g_volume_monitor_get_volume_for_uuid, refreturn)
   _WRAP_METHOD(Glib::RefPtr<Mount> get_mount_for_uuid(const std::string& uuid), g_volume_monitor_get_mount_for_uuid, refreturn)
 
-_DEPRECATE_IFDEF_START
-
-  _WRAP_METHOD(static Glib::RefPtr<Volume> adopt_orphan_mount(const Glib::RefPtr<Mount>& mount), g_volume_monitor_adopt_orphan_mount)
-
-_DEPRECATE_IFDEF_END
+  _WRAP_METHOD(static Glib::RefPtr<Volume> adopt_orphan_mount(const Glib::RefPtr<Mount>& mount), g_volume_monitor_adopt_orphan_mount,
+    deprecated "Instead of using this function, create shadow mounts with the URI of the mount you intend to adopt.")
 
 #m4 _CONVERSION(`GVolume*',`const Glib::RefPtr<Volume>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(void volume_added(const Glib::RefPtr<Volume>& volume), volume_added)

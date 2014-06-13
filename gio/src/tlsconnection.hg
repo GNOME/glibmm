@@ -15,12 +15,19 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+_CONFIGINCLUDE(giommconfig.h)
+
 #include <giomm/iostream.h>
 #include <giomm/tlscertificate.h>
 #include <giomm/asyncresult.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(giomm/private/iostream_p.h)
+
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+#undef G_DISABLE_DEPRECATED
+#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
+#m4 _POP()
 
 namespace Gio
 {
@@ -62,8 +69,10 @@ public:
   _WRAP_METHOD(void set_rehandshake_mode(TlsRehandshakeMode mode), g_tls_connection_set_rehandshake_mode)
   _WRAP_METHOD(TlsRehandshakeMode get_rehandshake_mode() const, g_tls_connection_get_rehandshake_mode)
 
-  _WRAP_METHOD(void set_use_system_certdb(bool use_system_certdb = true), g_tls_connection_set_use_system_certdb)
-  _WRAP_METHOD(bool get_use_system_certdb() const, g_tls_connection_get_use_system_certdb)
+  _WRAP_METHOD(void set_use_system_certdb(bool use_system_certdb = true), g_tls_connection_set_use_system_certdb,
+    deprecated "Use set_database() instead.")
+  _WRAP_METHOD(bool get_use_system_certdb() const, g_tls_connection_get_use_system_certdb,
+    deprecated "Use get_database() instead.")
 
   _WRAP_METHOD(Glib::RefPtr<TlsDatabase> get_database(), g_tls_connection_get_database)
   _WRAP_METHOD(Glib::RefPtr<const TlsDatabase> get_database() const, g_tls_connection_get_database, constversion)
@@ -90,7 +99,7 @@ public:
   _WRAP_PROPERTY("peer-certificate-errors", TlsCertificateFlags)
   _WRAP_PROPERTY("rehandshake-mode", TlsRehandshakeMode)
   _WRAP_PROPERTY("require-close-notify", bool)
-  _WRAP_PROPERTY("use-system-certdb", bool)
+  _WRAP_PROPERTY("use-system-certdb", bool, deprecated "Use property_database() instead.")
 
 #m4 _CONVERSION(`GTlsCertificate*',`const Glib::RefPtr<const TlsCertificate>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(bool accept_certificate(const Glib::RefPtr<const TlsCertificate>& peer_cert, TlsCertificateFlags errors), "accept_certificate")

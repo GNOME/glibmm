@@ -1,5 +1,20 @@
+// Glib::ValueArray is deprecated, but let's keep the test.
+// The recommended replacement is std::vector<> which requires no test here.
+#undef GLIBMM_DISABLE_DEPRECATED
+
 #include <glibmm.h>
 #include <iostream>
+
+#ifdef GLIBMM_DISABLE_DEPRECATED
+int main(int, char**)
+{
+  // If glibmm is configured with --disable-deprecated-api, GLIBMM_DISABLE_DEPRECATED
+  // is defined in glibmm.h (actually in glibmmconfig.h). The undef at the start of
+  // this file has no effect.
+  return 77; // Tell automake's test harness to skip this test.
+}
+
+#else
 
 //Use this line if you want debug output:
 //std::ostream& ostr = std::cout;
@@ -84,3 +99,4 @@ int main(int, char**)
 
   return EXIT_SUCCESS;
 }
+#endif //GLIBMM_DISABLE_DEPRECATED
