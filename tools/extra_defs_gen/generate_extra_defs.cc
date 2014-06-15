@@ -23,6 +23,43 @@
 #include "generate_extra_defs.h"
 #include <algorithm>
 
+std::string get_property_with_node_name(GParamSpec* pParamSpec, const std::string& strObjectName, const std::string& strNodeName)
+{
+  std::string strResult;
+
+  //Name and type:
+  const std::string strName = g_param_spec_get_name(pParamSpec);
+  const std::string strTypeName = G_PARAM_SPEC_TYPE_NAME(pParamSpec);
+
+  const gchar* pchBlurb = g_param_spec_get_blurb(pParamSpec);
+  std::string strDocs = (pchBlurb) ? pchBlurb : "";
+  // Quick hack to get rid of nested double quotes:
+  std::replace(strDocs.begin(), strDocs.end(), '"', '\'');
+
+  strResult += "(" + strNodeName + " " + strName + "\n";
+  strResult += "  (of-object \"" + strObjectName + "\")\n";
+  strResult += "  (prop-type \"" + strTypeName + "\")\n";
+  strResult += "  (docs \"" + strDocs + "\")\n";
+
+  //Flags:
+  GParamFlags flags = pParamSpec->flags;
+  bool bReadable = (flags & G_PARAM_READABLE) == G_PARAM_READABLE;
+  bool bWritable = (flags & G_PARAM_WRITABLE) == G_PARAM_WRITABLE;
+  bool bConstructOnly = (flags & G_PARAM_CONSTRUCT_ONLY) == G_PARAM_CONSTRUCT_ONLY;
+
+  //#t and #f aren't documented, but I guess that it's correct based on the example in the .defs spec.
+  const std::string strTrue = "#t";
+  const std::string strFalse = "#f";
+
+  strResult += "  (readable " + (bReadable ? strTrue : strFalse) + ")\n";
+  strResult += "  (writable " + (bWritable ? strTrue : strFalse) + ")\n";
+  strResult += "  (construct-only " + (bConstructOnly ? strTrue : strFalse) + ")\n";
+
+  strResult += ")\n\n"; //close (strNodeName
+
+  return strResult;
+}
+
 // Until the glib bug https://bugzilla.gnome.org/show_bug.cgi?id=465631
 // is fixed, get_properties() must be called for a GObject before it's
 // called for a GInterface.
@@ -75,35 +112,7 @@ std::string get_properties(GType gtype)
     // The base classes' properties should not be generated).
     if(pParamSpec && pParamSpec->owner_type == gtype)
     {
-      //Name and type:
-      const std::string strName = g_param_spec_get_name(pParamSpec);
-      const std::string strTypeName = G_PARAM_SPEC_TYPE_NAME(pParamSpec);
-
-      const gchar* pchBlurb = g_param_spec_get_blurb(pParamSpec);
-      std::string strDocs = (pchBlurb) ? pchBlurb : "";
-      // Quick hack to get rid of nested double quotes:
-      std::replace(strDocs.begin(), strDocs.end(), '"', '\'');
-
-      strResult += "(define-property " + strName + "\n";
-      strResult += "  (of-object \"" + strObjectName + "\")\n";
-      strResult += "  (prop-type \"" + strTypeName + "\")\n";
-      strResult += "  (docs \"" + strDocs + "\")\n";
-
-      //Flags:
-      GParamFlags flags = pParamSpec->flags;
-      bool bReadable = (flags & G_PARAM_READABLE) == G_PARAM_READABLE;
-      bool bWritable = (flags & G_PARAM_WRITABLE) == G_PARAM_WRITABLE;
-      bool bConstructOnly = (flags & G_PARAM_CONSTRUCT_ONLY) == G_PARAM_CONSTRUCT_ONLY;
-
-      //#t and #f aren't documented, but I guess that it's correct based on the example in the .defs spec.
-      const std::string strTrue = "#t";
-      const std::string strFalse = "#f";
-
-      strResult += "  (readable " + (bReadable ? strTrue : strFalse) + ")\n";
-      strResult += "  (writable " + (bWritable ? strTrue : strFalse) + ")\n";
-      strResult += "  (construct-only " + (bConstructOnly ? strTrue : strFalse) + ")\n";
-
-      strResult += ")\n\n"; //close (define-property		
+      strResult += get_property_with_node_name(pParamSpec, strObjectName, "define-property");
     }
   }
 

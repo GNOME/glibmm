@@ -40,7 +40,7 @@ sub new
   $def=~s/\)$//;
   # snarf down the fields
   $$self{mark} = 0;
-  $$self{name} = $1                     if ($def =~ s/^define-property (\S+)//);
+  $$self{name} = $2                     if ($def =~ s/(^define-property|^define-child-property) (\S+)//);
   $$self{class} = $1                    if ($def =~ s/\(of-object "(\S+)"\)//);
   $$self{type} = $1                     if ($def =~ s/\(prop-type "(\S+)"\)//);
   $$self{readable} = ($1 eq "#t")       if ($def =~ s/\(readable (\S+)\)//);

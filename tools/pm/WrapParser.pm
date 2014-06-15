@@ -116,6 +116,7 @@ sub parse_and_build_output($)
     if ($token eq "_WRAP_CORBA_METHOD")     { $self->on_wrap_corba_method(); next;} #Used in libbonobo*mm.
     if ($token eq "_WRAP_SIGNAL") { $self->on_wrap_signal(); next;}
     if ($token eq "_WRAP_PROPERTY") { $self->on_wrap_property(); next;}
+    if ($token eq "_WRAP_CHILD_PROPERTY") { $self->on_wrap_child_property(); next;}
     if ($token eq "_WRAP_VFUNC") { $self->on_wrap_vfunc(); next;}
     if ($token eq "_WRAP_CTOR")   { $self->on_wrap_ctor(); next;}
     if ($token eq "_WRAP_CREATE") { $self->on_wrap_create(); next;}
@@ -1401,12 +1402,9 @@ sub on_wrap_gerror($)
       $$self{filename}, $$self{line_num}, $cpp_type, $c_enum, $domain, @args);
 }
 
-sub on_wrap_property($)
+sub on_wrap_any_property($)
 {
   my ($self) = @_;
-  my $objOutputter = $$self{objOutputter};
-
-  return unless ($self->check_for_eof());
 
   my $str = $self->extract_bracketed_text();
   my @args = string_split_commas($str);
@@ -1446,10 +1444,32 @@ sub on_wrap_property($)
     }
   }
 
+  return ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated, $deprecation_docs);
+}
+
+sub on_wrap_property($)
+{
+  my ($self) = @_;
+  my $objOutputter = $$self{objOutputter};
+
+  return unless ($self->check_for_eof());
+
+  my ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated, $deprecation_docs) = $self->on_wrap_any_property();
 
   $objOutputter->output_wrap_property($filename, $line_num, $argPropertyName, $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs);
 }
 
+sub on_wrap_child_property($)
+{
+  my ($self) = @_;
+  my $objOutputter = $$self{objOutputter};
+
+  return unless ($self->check_for_eof());
+
+  my ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated, $deprecation_docs) = $self->on_wrap_any_property();
+
+  $objOutputter->output_wrap_child_property($filename, $line_num, $argPropertyName, $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs);
+}
 
 sub output_wrap_check($$$$$$)
 {

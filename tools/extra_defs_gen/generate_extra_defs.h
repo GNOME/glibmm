@@ -39,6 +39,9 @@ bool gtype_is_a_pointer(GType gtype);
 std::string get_defs(GType gtype,
                 GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
 
+std::string get_property_with_node_name(GParamSpec* pParamSpec,
+                const std::string& strObjectName, const std::string& strNodeName);
+
 std::string get_properties(GType gtype);
 
 std::string get_type_name(GType gtype,

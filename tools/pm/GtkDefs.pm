@@ -34,6 +34,7 @@ use FunctionBase;
 #    @ get_methods()
 #    @ get_signals()
 #    @ get_properties()
+#    @ get_child_properties()
 #    @ get_unwrapped()
 #
 #    $ lookup_enum(c_type)
@@ -43,6 +44,7 @@ use FunctionBase;
 #    $ lookup_method(c_name)
 #    $ lookup_function(c_name)
 #    $ lookup_property(object, c_name)
+#    $ lookup_child_property(object, c_name)
 #    $ lookup_signal(object, c_name)
 #
 
@@ -75,6 +77,7 @@ use warnings;
 %GtkDefs::methods = (); #GtkDefs::Function
 %GtkDefs::signals = (); #GtkDefs::Signal
 %GtkDefs::properties = (); #Property
+%GtkDefs::child_properties = (); #Property
 
 @GtkDefs::read = ();
 @GtkDefs::file = ();
@@ -152,6 +155,8 @@ sub read_defs($$;$)
     { on_method($token); }
     elsif ($token =~ /^\(define-property.*\)$/)
     { on_property($token); }
+    elsif ($token =~ /^\(define-child-property.*\)$/)
+    { on_child_property($token); }
     elsif ($token =~ /^\(define-signal.*\)$/)
     { on_signal($token);  }
     elsif ($token =~ /^\(define-vfunc.*\)$/)
@@ -334,6 +339,12 @@ sub on_property($)
   $GtkDefs::properties{"$$thing{class}::$$thing{name}"} = $thing;
 }
 
+sub on_child_property($)
+{
+  my $thing = Property::new(shift(@_));
+  $GtkDefs::child_properties{"$$thing{class}::$$thing{name}"} = $thing;
+}
+
 sub on_signal($)
 {
   my $thing = GtkDefs::Signal::new(shift(@_));
@@ -365,6 +376,11 @@ sub get_properties
   return sort {$$a{name} cmp $$b{name}} values %GtkDefs::properties;
 }
 
+sub get_child_properties
+{
+  return sort {$$a{name} cmp $$b{name}} values %GtkDefs::child_properties;
+}
+
 sub get_marked
 {
   no warnings;
@@ -380,6 +396,7 @@ sub get_unwrapped
   push @targets,grep {$$_{entity_type} eq "method" && $$_{mark}==1} values %GtkDefs::methods;
   push @targets,grep {$$_{mark}==1} values %GtkDefs::signals;
   push @targets,grep {$$_{mark}==1} values %GtkDefs::properties;
+  push @targets,grep {$$_{mark}==1} values %GtkDefs::child_properties;
 
   # find the classes which used them.
   my @classes = unique(map { $$_{class} } @targets);
@@ -412,10 +429,12 @@ sub get_unwrapped
     if ($detailed)
     {
       push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0 && not exists $GtkDefs::properties{$parent . '::' . $_->{name}}} values %GtkDefs::properties;
+      push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0 && not exists $GtkDefs::child_properties{$parent . '::' . $_->{name}}} values %GtkDefs::child_properties;
     }
     else
     {
       push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::properties;
+      push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::child_properties;
     }
 
     push @unwrapped, grep {$$_{class} eq $class && $$_{mark}==0} values %GtkDefs::methods;
@@ -469,6 +488,18 @@ sub lookup_property($$)
   my ($parent_object_name, $name) = @_;
   $name =~ s/-/_/g;
   my $obj = $GtkDefs::properties{"${parent_object_name}::${name}"};
+  return 0 if ($obj eq "");
+  $$obj{mark} = 1;
+  return $obj;
+}
+
+# $objChildProperty lookup_child_property($name, $parent_object_name)
+sub lookup_child_property($$)
+{
+  no warnings;
+  my ($parent_object_name, $name) = @_;
+  $name =~ s/-/_/g;
+  my $obj = $GtkDefs::child_properties{"${parent_object_name}::${name}"};
   return 0 if ($obj eq "");
   $$obj{mark} = 1;
   return $obj;

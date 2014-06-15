@@ -763,13 +763,89 @@ sub output_wrap_gerror($$$$$$$)
   $self->append($str);
 }
 
+# _PROPERTY_PROXY(name, cpp_type) and _CHILD_PROPERTY_PROXY(name, cpp_type)
+# void output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objProperty, $proxy_macro)
+sub output_wrap_any_property($$$$$$$$$$)
+{
+  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objProperty, $proxy_macro) = @_;
+
+  my $objDefsParser = $$self{objDefsParser};
+
+  # We use a suffix to specify a particular Glib::PropertyProxy* class.
+  my $proxy_suffix = "";
+
+  # Read/Write:
+  if($objProperty->get_construct_only() eq 1)
+  {
+    # construct-only functions can be read, but not written.
+    $proxy_suffix = "_ReadOnly";
+
+    if($objProperty->get_readable() ne 1)
+    {
+      $self->output_wrap_failed($name, "attempt to wrap write-only and construct-only property.");
+      return;
+    }
+  }
+  elsif($objProperty->get_readable() ne 1)
+  {
+    $proxy_suffix = "_WriteOnly";
+  }
+  elsif($objProperty->get_writable() ne 1)
+  {
+    $proxy_suffix = "_ReadOnly";
+  }
+
+  # Convert - to _ so we can use it in C++ method and variable names:
+  my $name_underscored = $name;
+  $name_underscored =~ tr/-/_/;
+
+  # Get the property documentation, if any, and add m4 quotes.
+  my $documentation = $objProperty->get_docs($deprecation_docs);
+  add_m4_quotes(\$documentation) if ($documentation ne "");
+
+  #Declaration:
+  if($deprecated ne "")
+  {
+    $self->append("\n_DEPRECATE_IFDEF_START\n");
+  }
+
+  my $str = sprintf("$proxy_macro(%s,%s,%s,%s,%s,`%s')dnl\n",
+    $name,
+    $name_underscored,
+    $cpp_type,
+    $proxy_suffix,
+    $deprecated,
+    $documentation
+  );
+  $self->append($str);
+  $self->append("\n");
+
+  # If the property is not already read-only, and the property can be read,
+  # then add a second const accessor for a read-only propertyproxy:
+  if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
+  {
+    my $str = sprintf("$proxy_macro(%s,%s,%s,%s,%s,`%s')dnl\n",
+      $name,
+      $name_underscored,
+      $cpp_type,
+      "_ReadOnly",
+      $deprecated,
+      $documentation
+    );
+    $self->append($str);
+  }
+
+  if($deprecated ne "")
+  {
+    $self->append("\n_DEPRECATE_IFDEF_END");
+  }
+}
+
 # _PROPERTY_PROXY(name, cpp_type)
 # void output_wrap_property($filename, $line_num, $name, $cpp_type, $deprecated, $deprecation_docs)
 sub output_wrap_property($$$$$$$$)
 {
   my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs) = @_;
-
-  my $objDefsParser = $$self{objDefsParser};
 
   my $objProperty = GtkDefs::lookup_property($c_class, $name);
   if($objProperty eq 0) #If the lookup failed:
@@ -778,74 +854,24 @@ sub output_wrap_property($$$$$$$$)
   }
   else
   {
-    # We use a suffix to specify a particular Glib::PropertyProxy* class.
-    my $proxy_suffix = "";
+    $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objProperty, "_PROPERTY_PROXY");
+  }
+}
 
-    # Read/Write:
-    if($objProperty->get_construct_only() eq 1)
-    {
-      # construct-only functions can be read, but not written.
-      $proxy_suffix = "_ReadOnly";
+# _CHILD_PROPERTY_PROXY(name, cpp_type)
+# void output_wrap_child_property($filename, $line_num, $name, $cpp_type, $deprecated, $deprecation_docs)
+sub output_wrap_child_property($$$$$$$$)
+{
+  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs) = @_;
 
-      if($objProperty->get_readable() ne 1)
-      {
-        $self->output_wrap_failed($name, "attempt to wrap write-only and construct-only property.");
-        return;
-      }
-    }
-    elsif($objProperty->get_readable() ne 1)
-    {
-      $proxy_suffix = "_WriteOnly";
-    }
-    elsif($objProperty->get_writable() ne 1)
-    {
-       $proxy_suffix = "_ReadOnly";
-    }
-
-    # Convert - to _ so we can use it in C++ method and variable names:
-    my $name_underscored = $name;
-    $name_underscored =~ tr/-/_/;
-
-    # Get the property documentation, if any, and add m4 quotes.
-    my $documentation = $objProperty->get_docs($deprecation_docs);
-    add_m4_quotes(\$documentation) if ($documentation ne "");
-
-    #Declaration:
-    if($deprecated ne "")
-    {
-      $self->append("\n_DEPRECATE_IFDEF_START\n");
-    }
-
-    my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s,`%s')dnl\n",
-      $name,
-      $name_underscored,
-      $cpp_type,
-      $proxy_suffix,
-      $deprecated,
-      $documentation
-    );
-    $self->append($str);
-    $self->append("\n");
-
-    # If the property is not already read-only, and the property can be read,
-    # then add a second const accessor for a read-only propertyproxy:
-    if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
-    {
-      my $str = sprintf("_PROPERTY_PROXY(%s,%s,%s,%s,%s,`%s')dnl\n",
-        $name,
-        $name_underscored,
-        $cpp_type,
-        "_ReadOnly",
-        $deprecated,
-        $documentation
-      );
-      $self->append($str);
-    }
-
-    if($deprecated ne "")
-    {
-      $self->append("\n_DEPRECATE_IFDEF_END");
-    }
+  my $objChildProperty = GtkDefs::lookup_child_property($c_class, $name);
+  if($objChildProperty eq 0) #If the lookup failed:
+  {
+    $self->output_wrap_failed($name, "child property defs lookup failed.");
+  }
+  else
+  {
+    $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objChildProperty, "_CHILD_PROPERTY_PROXY");
   }
 }
 
