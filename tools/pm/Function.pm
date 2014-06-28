@@ -179,15 +179,14 @@ sub num_args #($)
 }
 
 # parses C++ parameter lists.
-# forms a list of types, names, and initial values
-#  (we don't currently use values)
+# forms a list of types, names, and default values
 sub parse_param($$)
 {
   my ($self, $line) = @_;
 
-
   my $type = "";
   my $name = "";
+  my $name_pos = -1;
   my $value = "";
   my $id = 0;
   my $has_value = 0;
@@ -254,6 +253,7 @@ sub parse_param($$)
     }
     elsif ( $_ eq "=" ) #Default value
     {
+      $str[$name_pos] = "" if ($name_pos >= 0);
       $type = join("", @str); #The type is everything before the = character.
       @str = (); #Wipe it so that it will only contain the default value, which comes next.
       $has_value = 1;
@@ -267,6 +267,7 @@ sub parse_param($$)
       }
       else
       {
+        $str[$name_pos] = "" if ($name_pos >= 0);
         $type = join("", @str);
       }
 
@@ -291,6 +292,7 @@ sub parse_param($$)
       $value = "";
       $has_value = 0;
       $name = "";
+      $name_pos = -1;
       $flags = 0;
       $curr_param++;
 
@@ -308,16 +310,16 @@ sub parse_param($$)
       next;
     }
 
+    # The last identifier before ',', '=', or '{.*}' is the parameter name.
+    # E.g. int name, unsigned long int name = 42, const unsigned int& name.
+    # The name must be preceded by at least one other identifier (the type).
+    # 'const ' is treated specially, as it can't by itself denote the type.
     $id++;
-    $name = $_ if ($id == 2);
-    push(@str, $_) if ($id == 1);
-
-    if ($id > 2)
+    push(@str, $_);
+    if ($id >= 2)
     {
-      print STDERR "Can't parse $line.\n";
-      print STDERR "  arg type so far: $type\n";
-      print STDERR "  arg name so far: $name\n";
-      print STDERR "  arg default value so far: $value\n";
+      $name = $_;
+      $name_pos = $#str;
     }
   }
 
@@ -328,6 +330,7 @@ sub parse_param($$)
   }
   else
   {
+    $str[$name_pos] = "" if ($name_pos >= 0);
     $type = join("", @str);
   }
 
