@@ -150,19 +150,20 @@ GType Class::clone_custom_type(const char* custom_type_name,
 }
 
 // Initialize the static quark to store/get custom type properties.
-GQuark Class::properties_quark = g_quark_from_string("gtkmm_CustomObject_properties");
+GQuark Class::iface_properties_quark = g_quark_from_string("gtkmm_CustomObject_iface_properties");
 
 // static
 void Class::custom_class_base_finalize_function(void* g_class)
 {
   const GType gtype = G_TYPE_FROM_CLASS(g_class);
 
-  // Free the data related to the properties for the custom type, if any.
-  properties_type* props = static_cast<properties_type*>(g_type_get_qdata(gtype, properties_quark));
+  // Free the data related to the interface properties for the custom type, if any.
+  iface_properties_type* props = static_cast<iface_properties_type*>(
+    g_type_get_qdata(gtype, iface_properties_quark));
 
   if(props)
   {
-    for(properties_type::size_type i = 0; i < props->size(); i++)
+    for(iface_properties_type::size_type i = 0; i < props->size(); i++)
     {
       g_value_unset((*props)[i]);
       g_free((*props)[i]);
@@ -190,12 +191,12 @@ void Class::custom_class_init_function(void* g_class, void* class_data)
   // Override the properties of implemented interfaces, if any.
   const GType object_type = G_TYPE_FROM_CLASS(g_class);
 
-  Class::properties_type* props = static_cast<Class::properties_type*>(
-    g_type_get_qdata(object_type, Class::properties_quark));
+  Class::iface_properties_type* props = static_cast<Class::iface_properties_type*>(
+    g_type_get_qdata(object_type, Class::iface_properties_quark));
   if (!props)
   {
-    props = new Class::properties_type();
-    g_type_set_qdata(object_type, Class::properties_quark, props);
+    props = new Class::iface_properties_type();
+    g_type_set_qdata(object_type, Class::iface_properties_quark, props);
   }
 
   guint n_interfaces = 0;

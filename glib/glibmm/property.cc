@@ -112,21 +112,24 @@ void custom_get_property_callback(GObject* object, unsigned int property_id,
 
   GType custom_type = G_OBJECT_TYPE(object);
 
-  Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(custom_type, Class::properties_quark));
-  Class::properties_type::size_type props_size = 0;
+  Class::iface_properties_type* iface_props = static_cast<Class::iface_properties_type*>(
+    g_type_get_qdata(custom_type, Class::iface_properties_quark));
 
-  if(props) props_size = props->size();
+  Class::iface_properties_type::size_type iface_props_size = 0;
 
-  if(property_id <= props_size)
+  if (iface_props)
+    iface_props_size = iface_props->size();
+
+  if (property_id <= iface_props_size)
   {
-    g_value_copy((*props)[property_id - 1], value);
+    g_value_copy((*iface_props)[property_id - 1], value);
   }
   else
   {
     if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
       PropertyBase& property =
-        property_from_id(*wrapper, property_id - props_size);
+        property_from_id(*wrapper, property_id - iface_props_size);
 
       if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
         g_value_copy(property.value_.gobj(), value);
@@ -144,14 +147,17 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
 
   GType custom_type = G_OBJECT_TYPE(object);
 
-  Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(custom_type, Class::properties_quark));
-  Class::properties_type::size_type props_size = 0;
+  Class::iface_properties_type* iface_props = static_cast<Class::iface_properties_type*>(
+    g_type_get_qdata(custom_type, Class::iface_properties_quark));
 
-  if(props) props_size = props->size();
+  Class::iface_properties_type::size_type iface_props_size = 0;
 
-  if(property_id <= props_size)
+  if (iface_props)
+    iface_props_size = iface_props->size();
+
+  if (property_id <= iface_props_size)
   {
-    g_value_copy(value, (*props)[property_id - 1]);
+    g_value_copy(value, (*iface_props)[property_id - 1]);
     g_object_notify(object, g_param_spec_get_name(param_spec));
   }
   else
@@ -159,7 +165,7 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
     if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
       PropertyBase& property =
-        property_from_id(*wrapper, property_id - props_size);
+        property_from_id(*wrapper, property_id - iface_props_size);
 
       if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
       {
@@ -215,12 +221,14 @@ void PropertyBase::install_property(GParamSpec* param_spec)
   // properties.
 
   GType gtype = G_OBJECT_TYPE(object_->gobj());
-  Class::properties_type* props = static_cast<Class::properties_type*>(g_type_get_qdata(gtype, Class::properties_quark));
+  Class::iface_properties_type* iface_props = static_cast<Class::iface_properties_type*>(
+    g_type_get_qdata(gtype, Class::iface_properties_quark));
 
-  Class::properties_type::size_type props_size = 0;
-  if(props) props_size = props->size();
+  Class::iface_properties_type::size_type iface_props_size = 0;
+  if (iface_props)
+    iface_props_size = iface_props->size();
 
-  const unsigned int property_id = property_to_id(*object_, *this) + props_size;
+  const unsigned int property_id = property_to_id(*object_, *this) + iface_props_size;
 
   g_object_class_install_property(G_OBJECT_GET_CLASS(object_->gobj()), property_id, param_spec);
 
@@ -246,5 +254,3 @@ void PropertyBase::notify()
 }
 
 } // namespace Glib
-
-

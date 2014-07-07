@@ -25,7 +25,7 @@
 #include <glib-object.h>
 #include <glibmmconfig.h> //Include this here so that the /private/*.h classes have access to GLIBMM_VFUNCS_ENABLED
 
-#include <vector> //For properties that custom types might override.
+#include <vector> //For interface properties that custom types might override.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -101,10 +101,10 @@ private:
 
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // The type that holds the values of the properties of custom types.
-  typedef std::vector<GValue*> properties_type;
-  // The quark used for storing/getting the properties of custom types.
-  static GQuark properties_quark;
+  // The type that holds the values of the interface properties of custom types.
+  typedef std::vector<GValue*> iface_properties_type;
+  // The quark used for storing/getting the interface properties of custom types.
+  static GQuark iface_properties_quark;
 #endif
 };
 
