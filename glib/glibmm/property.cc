@@ -158,7 +158,7 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
   if (property_id <= iface_props_size)
   {
     g_value_copy(value, (*iface_props)[property_id - 1]);
-    g_object_notify(object, g_param_spec_get_name(param_spec));
+    g_object_notify_by_pspec(object, param_spec);
   }
   else
   {
@@ -170,7 +170,7 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
       if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
       {
         g_value_copy(value, property.value_.gobj());
-        g_object_notify(object, g_param_spec_get_name(param_spec));
+        g_object_notify_by_pspec(object, param_spec);
       }
       else
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
@@ -250,7 +250,7 @@ Glib::ustring PropertyBase::get_name() const
 
 void PropertyBase::notify()
 {
-  g_object_notify(object_->gobj(), g_param_spec_get_name(param_spec_));
+  g_object_notify_by_pspec(object_->gobj(), param_spec_);
 }
 
 } // namespace Glib
