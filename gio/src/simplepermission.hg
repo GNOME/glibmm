@@ -1,0 +1,50 @@
+/* Copyright (C) 2014 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <giomm/permission.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(giomm/private/permission_p.h)
+
+namespace Gio
+{
+
+/** A Permission that doesn't change value.
+ *
+ * SimplePermission is a trivial implementation of Permission that
+ * represents a permission that is either always or never allowed.  The
+ * value is given at construction and doesn't change.
+ *
+ * Calling Permission::acquire() or Permission::release() will result
+ * in errors.
+ */
+class SimplePermission : public Permission
+{
+  _CLASS_GOBJECT(SimplePermission, GSimplePermission, G_SIMPLE_PERMISSION, Gio::Permission, GPermission)
+
+protected:
+
+  _WRAP_CTOR(SimplePermission(bool allowed), g_simple_permission_new)
+
+public:
+
+  _WRAP_CREATE(bool allowed)
+
+  // SimplePermission has no properties nor signals.
+};
+
+} // namespace Gio
