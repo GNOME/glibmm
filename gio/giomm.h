@@ -103,6 +103,7 @@
 #include <giomm/networkservice.h>
 #include <giomm/notification.h>
 #include <giomm/outputstream.h>
+#include <giomm/permission.h>
 #include <giomm/pollableinputstream.h>
 #include <giomm/pollableoutputstream.h>
 #include <giomm/proxy.h>

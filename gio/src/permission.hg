@@ -1,0 +1,91 @@
+/* Copyright (C) 2014 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/cancellable.h>
+#include <giomm/asyncresult.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+_PINCLUDE(gio/gio.h)
+
+namespace Gio
+{
+
+/** An object representing the permission to perform a certain action.
+ *
+ * A Permission represents the status of the caller's permission to
+ * perform a certain action.
+ *
+ * You can query if the action is currently allowed and if it is
+ * possible to acquire the permission so that the action will be allowed
+ * in the future.
+ *
+ * There is also an API to actually acquire the permission and one to
+ * release it.
+ *
+ * As an example, a Permission might represent the ability for the
+ * user to write to a Settings object.  This Permission object could
+ * then be used to decide if it is appropriate to show a "Click here to
+ * unlock" button in a dialog and to provide the mechanism to invoke
+ * when that button is clicked.
+ *
+ * @newin{2,42}
+ */
+class Permission : public Glib::Object
+{
+  _CLASS_GOBJECT(Permission, GPermission, G_PERMISSION, Glib::Object, GObject)
+
+public:
+
+  _WRAP_METHOD(bool acquire(const Glib::RefPtr<Cancellable>& cancellable{?}), g_permission_acquire, errthrow)
+  _WRAP_METHOD(void acquire_async(const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.?}), g_permission_acquire_async, slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_METHOD(bool acquire_finish(const Glib::RefPtr<AsyncResult>& result), g_permission_acquire_finish, errthrow)
+
+  _WRAP_METHOD(bool release(const Glib::RefPtr<Cancellable>& cancellable{?}), g_permission_release, errthrow)
+  _WRAP_METHOD(void release_async(const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.?}), g_permission_release_async, slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_METHOD(bool release_finish(const Glib::RefPtr<AsyncResult>& result), g_permission_release_finish, errthrow)
+
+  _WRAP_METHOD(bool get_allowed() const, g_permission_get_allowed)
+  _WRAP_METHOD(bool get_can_acquire() const, g_permission_get_can_acquire)
+  _WRAP_METHOD(bool get_can_release() const, g_permission_get_can_release)
+
+  _WRAP_PROPERTY("allowed", bool)
+  _WRAP_PROPERTY("can-acquire", bool)
+  _WRAP_PROPERTY("can-release", bool)
+
+protected:
+
+  _CTOR_DEFAULT
+
+// A copy is needed for vfuncs, i.e. Glib::wrap($3, true)
+#m4 _CONVERSION(`GAsyncResult*',`const Glib::RefPtr<AsyncResult>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`GCancellable*',`const Glib::RefPtr<Cancellable>&',`Glib::wrap($3, true)')
+
+  _WRAP_VFUNC(bool acquire(const Glib::RefPtr<Cancellable>& cancellable), acquire, errthrow)
+  _WRAP_VFUNC(void acquire_async(const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}), acquire_async, slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_VFUNC(bool acquire_finish(const Glib::RefPtr<AsyncResult>& result), acquire_finish, errthrow)
+
+  _WRAP_VFUNC(bool release(const Glib::RefPtr<Cancellable>& cancellable), release, errthrow)
+  _WRAP_VFUNC(void release_async(const SlotAsyncReady& slot{callback}, const Glib::RefPtr<Cancellable>& cancellable{.}), release_async, slot_name slot, slot_callback SignalProxy_async_callback)
+  _WRAP_VFUNC(bool release_finish(const Glib::RefPtr<AsyncResult>& result), release_finish, errthrow)
+
+  // You should never call this function except from a Gio::Permission implementation.
+  _WRAP_METHOD(void impl_update(bool allowed, bool can_acquire, bool can_release), g_permission_impl_update)
+};
+
+} // namespace Gio
