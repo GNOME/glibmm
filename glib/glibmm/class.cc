@@ -214,10 +214,13 @@ void Class::custom_class_init_function(void* g_class, void* class_data)
       const gchar* prop_name = g_param_spec_get_name(iface_props[p]);
 
       // Override only properties which have not been overridden in a base class.
+      // Store the default values belonging to the class.
+      // They are copied to an object in custom_set_property_callback() in property.cc.
       if (!g_object_class_find_property(gobject_class, prop_name))
       {
         GValue* g_value = g_new0(GValue, 1);
         g_value_init(g_value, iface_props[p]->value_type);
+        g_param_value_set_default(iface_props[p], g_value);
         props->push_back(g_value);
 
         g_object_class_override_property(gobject_class, props->size(), prop_name);

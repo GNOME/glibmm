@@ -98,6 +98,23 @@ Glib::PropertyBase& property_from_id(Glib::ObjectBase& object, unsigned int prop
   return *static_cast<Glib::PropertyBase*>(prop_ptr);
 }
 
+// Delete the interface property values when an object of a custom type is finalized.
+void destroy_notify_obj_iface_props(void* data)
+{
+  Glib::Class::iface_properties_type* obj_iface_props =
+    static_cast<Glib::Class::iface_properties_type*>(data);
+
+  if (obj_iface_props)
+  {
+    for (Glib::Class::iface_properties_type::size_type i = 0; i < obj_iface_props->size(); i++)
+    {
+      g_value_unset((*obj_iface_props)[i]);
+      g_free((*obj_iface_props)[i]);
+    }
+    delete obj_iface_props;
+  }
+}
+
 } // anonymous namespace
 
 
@@ -122,7 +139,13 @@ void custom_get_property_callback(GObject* object, unsigned int property_id,
 
   if (property_id <= iface_props_size)
   {
-    g_value_copy((*iface_props)[property_id - 1], value);
+    // Get the object's property value if there is one, else the class's default value.
+    Class::iface_properties_type* obj_iface_props = static_cast<Class::iface_properties_type*>(
+      g_object_get_qdata(object, Class::iface_properties_quark));
+    if (obj_iface_props)
+      g_value_copy((*obj_iface_props)[property_id - 1], value);
+    else
+      g_value_copy((*iface_props)[property_id - 1], value);
   }
   else
   {
@@ -157,7 +180,25 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
 
   if (property_id <= iface_props_size)
   {
-    g_value_copy(value, (*iface_props)[property_id - 1]);
+    // If the object does not have interface property values,
+    // copy the class's default values to the object.
+    Class::iface_properties_type* obj_iface_props = static_cast<Class::iface_properties_type*>(
+      g_object_get_qdata(object, Class::iface_properties_quark));
+    if (!obj_iface_props)
+    {
+      obj_iface_props = new Class::iface_properties_type();
+      g_object_set_qdata_full(object, Class::iface_properties_quark, obj_iface_props,
+                              destroy_notify_obj_iface_props);
+      for (Class::iface_properties_type::size_type p = 0; p < iface_props_size; ++p)
+      {
+        GValue* g_value = g_new0(GValue, 1);
+        g_value_init(g_value, G_VALUE_TYPE((*iface_props)[p]));
+        g_value_copy((*iface_props)[p], g_value);
+        obj_iface_props->push_back(g_value);
+      }
+    }
+
+    g_value_copy(value, (*obj_iface_props)[property_id - 1]);
     g_object_notify_by_pspec(object, param_spec);
   }
   else
