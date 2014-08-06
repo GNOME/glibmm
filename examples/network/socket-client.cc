@@ -9,6 +9,7 @@ gboolean verbose = FALSE;
 gboolean non_blocking = FALSE;
 gboolean use_udp = FALSE;
 gboolean use_source = FALSE;
+gboolean use_ipv6 = FALSE;
 int cancel_timeout = 0;
 
 static GOptionEntry cmd_entries[] = {
@@ -22,6 +23,8 @@ static GOptionEntry cmd_entries[] = {
    "Enable non-blocking i/o", NULL},
   {"use-source", 's', 0, G_OPTION_ARG_NONE, &use_source,
    "Use GSource to wait for non-blocking i/o", NULL},
+  {"use-ipv6", 'i', 0, G_OPTION_ARG_NONE, &use_ipv6,
+   "Use ipv6 address family", NULL},
   {0, 0, 0, G_OPTION_ARG_NONE, 0, 0, 0}
 };
 
@@ -134,7 +137,14 @@ main (int argc,
     try {
         // FIXME: enum.pl has a problem generating the SocketFamily enum
         // correctly, so I'm using the C enum directly for now as a workaround.
-        socket = Gio::Socket::create ((Gio::SocketFamily)G_SOCKET_FAMILY_IPV4, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
+        if (use_ipv6)
+        {
+            socket = Gio::Socket::create ((Gio::SocketFamily)G_SOCKET_FAMILY_IPV6, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
+        }
+        else
+        {
+            socket = Gio::Socket::create ((Gio::SocketFamily)G_SOCKET_FAMILY_IPV4, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
+        }
     } catch (const Gio::Error& error)
     {
         std::cerr << Glib::ustring::compose ("%1: %2\n", argv[0], error.what ());
