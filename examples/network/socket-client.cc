@@ -3,30 +3,56 @@
 #include <glibmm.h>
 #include <iostream>
 
+namespace
+{
+
 Glib::RefPtr<Glib::MainLoop> loop;
 
-gboolean verbose = FALSE;
-gboolean non_blocking = FALSE;
-gboolean use_udp = FALSE;
-gboolean use_source = FALSE;
-gboolean use_ipv6 = FALSE;
+bool verbose = false;
+bool non_blocking = false;
+bool use_udp = false;
+bool use_source = false;
+bool use_ipv6 = false;
 int cancel_timeout = 0;
 
-static GOptionEntry cmd_entries[] = {
-  {"cancel", 'c', 0, G_OPTION_ARG_INT, &cancel_timeout,
-   "Cancel any op after the specified amount of seconds", NULL},
-  {"udp", 'u', 0, G_OPTION_ARG_NONE, &use_udp,
-   "Use udp instead of tcp", NULL},
-  {"verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose,
-   "Be verbose", NULL},
-  {"non-blocking", 'n', 0, G_OPTION_ARG_NONE, &non_blocking,
-   "Enable non-blocking i/o", NULL},
-  {"use-source", 's', 0, G_OPTION_ARG_NONE, &use_source,
-   "Use GSource to wait for non-blocking i/o", NULL},
-  {"use-ipv6", 'i', 0, G_OPTION_ARG_NONE, &use_ipv6,
-   "Use ipv6 address family", NULL},
-  {0, 0, 0, G_OPTION_ARG_NONE, 0, 0, 0}
-};
+class ClientOptionGroup : public Glib::OptionGroup
+{
+public:
+  ClientOptionGroup()
+  : Glib::OptionGroup("client_group", "", "")
+  {
+    Glib::OptionEntry entry;
+    entry.set_long_name("cancel");
+    entry.set_short_name('c');
+    entry.set_description("Cancel any op after the specified amount of seconds");
+    add_entry(entry, cancel_timeout);
+
+    entry.set_long_name("udp");
+    entry.set_short_name('u');
+    entry.set_description("Use UDP instead of TCP");
+    add_entry(entry, use_udp);
+
+    entry.set_long_name("verbose");
+    entry.set_short_name('v');
+    entry.set_description("Be verbose");
+    add_entry(entry, verbose);
+
+    entry.set_long_name("non-blocking");
+    entry.set_short_name('n');
+    entry.set_description("Enable non-blocking I/O");
+    add_entry(entry, non_blocking);
+
+    entry.set_long_name("use-source");
+    entry.set_short_name('s');
+    entry.set_description("Use Gio::SocketSource to wait for non-blocking I/O");
+    add_entry(entry, use_source);
+
+    entry.set_long_name("use-ipv6");
+    entry.set_short_name('6');
+    entry.set_description("Use IPv6 address family");
+    add_entry(entry, use_ipv6);
+  }
+};  
 
 Glib::ustring
 socket_address_to_string (const Glib::RefPtr<Gio::SocketAddress>& address)
@@ -90,6 +116,8 @@ cancel_thread (Glib::RefPtr<Gio::Cancellable> cancellable)
     cancellable->cancel ();
 }
 
+} // end anonymous namespace
+
 int
 main (int argc,
       char *argv[])
@@ -98,20 +126,30 @@ main (int argc,
     Glib::RefPtr<Gio::SocketAddress> src_address;
     Glib::RefPtr<Gio::SocketAddress> address;
     Gio::SocketType socket_type;
-    GError *error = NULL;
-    GOptionContext *context;
+    Gio::SocketFamily socket_family;
     Glib::RefPtr<Gio::Cancellable> cancellable;
     Glib::RefPtr<Gio::SocketAddressEnumerator> enumerator;
     Glib::RefPtr<Gio::SocketConnectable> connectable;
 
     Gio::init ();
 
-    context = g_option_context_new (" <hostname>[:port] - Test GSocket client stuff");
-    g_option_context_add_main_entries (context, cmd_entries, NULL);
-    if (!g_option_context_parse (context, &argc, &argv, &error))
+    Glib::OptionContext option_context(" <hostname>[:port] - Test Gio::Socket client stuff");
+    option_context.set_summary("Default port: 7777\n"
+    "For a local test with socket-server:\n"
+    "  ./socket-client [option...] localhost\n"
+    "or, if that fails\n"
+    "  ./socket-client [option...] 127.0.0.1  (IPv4)\n"
+    "  ./socket-client [option...] ::1        (IPv6)");
+    ClientOptionGroup option_group;
+    option_context.set_main_group(option_group);
+    try
     {
-        std::cerr << Glib::ustring::compose ("%1: %2\n", argv[0], error->message);
-        return 1;
+      option_context.parse(argc, argv);
+    }
+    catch (const Glib::Error& error)
+    {
+      std::cerr << Glib::ustring::compose ("%1: %2\n", argv[0], error.what());
+      return 1;
     }
 
     if (argc != 2)
@@ -129,22 +167,11 @@ main (int argc,
 
     loop = Glib::MainLoop::create ();
 
-    if (use_udp)
-        socket_type = Gio::SOCKET_TYPE_DATAGRAM;
-    else
-        socket_type = Gio::SOCKET_TYPE_STREAM;
+    socket_type = use_udp ? Gio::SOCKET_TYPE_DATAGRAM : Gio::SOCKET_TYPE_STREAM;
+    socket_family = use_ipv6 ? Gio::SOCKET_FAMILY_IPV6 : Gio::SOCKET_FAMILY_IPV4;
 
     try {
-        // FIXME: enum.pl has a problem generating the SocketFamily enum
-        // correctly, so I'm using the C enum directly for now as a workaround.
-        if (use_ipv6)
-        {
-            socket = Gio::Socket::create ((Gio::SocketFamily)G_SOCKET_FAMILY_IPV6, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
-        }
-        else
-        {
-            socket = Gio::Socket::create ((Gio::SocketFamily)G_SOCKET_FAMILY_IPV4, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
-        }
+        socket = Gio::Socket::create (socket_family, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
     } catch (const Gio::Error& error)
     {
         std::cerr << Glib::ustring::compose ("%1: %2\n", argv[0], error.what ());
