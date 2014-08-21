@@ -209,8 +209,9 @@ sub output_wrap_vfunc_cc($$$$$$$$)
      convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num);
 
     my $returnValue = $$objCppfunc{return_value};
+    my $exceptionHandler = $$objCppfunc{exception_handler};
 
-    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s)dnl\n",
+    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -224,7 +225,8 @@ sub output_wrap_vfunc_cc($$$$$$$$)
       $errthrow,
       $$objCppfunc{slot_type},
       $$objCppfunc{c_data_param_name},
-      $returnValue);
+      $returnValue,
+      $exceptionHandler);
 
     $self->append($str);
   }
@@ -234,10 +236,10 @@ sub output_wrap_vfunc_cc($$$$$$$$)
 # _SIGNAL_H(signame,rettype, `<cppargs>', ifdef)
 # _SIGNAL_PH(gtkname,crettype, cargs and names, ifdef, deprecated)
 # void output_wrap_default_signal_handler_h($filename, $line_num, $objCppfunc,
-#      $objCDefsFunc, $ifdef, $deprecated)
-sub output_wrap_default_signal_handler_h($$$$$$$)
+#      $objCDefsFunc, $ifdef, $deprecated, $exceptionHandler)
+sub output_wrap_default_signal_handler_h($$$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef, $deprecated) = @_;
+  my ($self, $filename, $line_num, $objCppfunc, $objCDefsFunc, $ifdef, $deprecated, $exceptionHandler) = @_;
 
   # The default signal handler is a virtual function.
   # It's not hidden by deprecation, since that would break ABI.
@@ -253,21 +255,23 @@ sub output_wrap_default_signal_handler_h($$$$$$$)
   #The default callback, which will call on_* or the base default callback.
   #Declares the callback in the private *Class class and sets it in the class_init function.
   #This is hidden by deprecation.
-  $str = sprintf("_SIGNAL_PH(%s,%s,\`%s\',%s,%s)dnl\n",
+  $str = sprintf("_SIGNAL_PH(%s,%s,\`%s\',%s,%s,%s)dnl\n",
     $$objCDefsFunc{name},
     $$objCDefsFunc{rettype},
     $objCDefsFunc->args_types_and_names(),
     $ifdef,
-    $deprecated
+    $deprecated,
+    $exceptionHandler
    );
   $self->append($str);
 }
 
-# _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>', const, refreturn, ifdef)
-sub output_wrap_default_signal_handler_cc($$$$$$$$$)
+# _SIGNAL_CC(signame, gtkname, rettype, crettype,`<cppargs>',`<cargs>', const, refreturn, ifdef, exceptionHandler)
+sub output_wrap_default_signal_handler_cc($$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $objCppfunc, $objDefsSignal, $bImplement,
-      $bCustomCCallback, $bRefreturn, $ifdef, $deprecated) = @_;
+      $bCustomCCallback, $bRefreturn, $ifdef, $deprecated, $exceptionHandler) = @_;
+
   my $cname = $$objDefsSignal{name};
   # $cname = $1 if ($args[3] =~ /"(.*)"/); #TODO: What's this about?
 
@@ -291,7 +295,8 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
       $conversions,
       $$objCppfunc{const},
       $refreturn,
-      $ifdef);
+      $ifdef
+      );
     $self->append($str);
   }
 
@@ -313,7 +318,7 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
       convert_args_c_to_cpp($objDefsSignal, $objCppfunc, $line_num);
 
     #This is hidden by deprecation.
-    my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s)dnl\n",
+    my $str = sprintf("_SIGNAL_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -323,7 +328,8 @@ sub output_wrap_default_signal_handler_cc($$$$$$$$$)
       $conversions,
       ${$objDefsSignal->get_param_names()}[0],
       $ifdef,
-      $deprecated);
+      $deprecated,
+      $exceptionHandler);
     $self->append($str);
   }
 }
@@ -572,15 +578,15 @@ sub output_wrap_create($$$)
   }
 }
 
-# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs)
+# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs, $exceptionHandler)
 # custom_signalproxy_name is "" when no type conversion is required - a normal templates SignalProxy will be used instead.
-sub output_wrap_sig_decl($$$$$$$$$$)
+sub output_wrap_sig_decl($$$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs) = @_;
+  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs, $exceptionHandler) = @_;
 
 # _SIGNAL_PROXY(c_signal_name, c_return_type, `<c_arg_types_and_names>',
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
-#               refdoc_comment)
+#               refdoc_comment, exceptionHandler)
 
   # Get the signal name with underscores only (to look up docs -- they are
   # stored that way).
@@ -623,7 +629,7 @@ sub output_wrap_sig_decl($$$$$$$$$$)
   my $conversions =
     convert_args_c_to_cpp($objCSignal, $objCppfunc, $line_num);
 
-  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',%s,\`%s\',%s)dnl\n",
+  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',%s,\`%s\',%s,%s)dnl\n",
     $signal_name,
     $$objCSignal{rettype},
     $objCSignal->args_types_and_names_without_object(),
@@ -634,7 +640,8 @@ sub output_wrap_sig_decl($$$$$$$$$$)
     $bCustomCCallback, #When this is true, it will not write the *_callback implementation for you.
     $deprecated,
     $doxycomment,
-    $ifdef
+    $ifdef,
+    $exceptionHandler
   );
 
   $self->append($str);

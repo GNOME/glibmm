@@ -22,8 +22,8 @@ dnl              $1      $2       $3        $4
 dnl _VFUNC_PCC(cppname,gtkname,cpprettype,crettype,
 dnl                         $5               $6           $7            $8         $9           $10      $11
 dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef, errthrow,
-dnl                     $12           $13            $14
-dnl                  slot_type, c_data_param_name, return_value)
+dnl                     $12           $13            $14             $15
+dnl                  slot_type, c_data_param_name, return_value, exception_handler)
 dnl
 dnl Note: _get_current_wrapper_inline() could be used throughout for performance instead of _get_current_wrapper(),
 dnl and is_derived_() instead of is_derived_(),
@@ -76,7 +76,22 @@ ifelse($9,refreturn_ctype,`dnl Assume Glib::unwrap_copy() is correct if refretur
       }
       catch(...)
       {
+ifelse($15, `', `dnl
         Glib::exception_handlers_invoke`'();
+', `dnl
+        try
+        {
+ifelse($9,refreturn_ctype,`dnl
+          return Glib::unwrap_copy`'(obj->$15`'());
+', `dnl
+          return _CONVERT($3, $4, `obj->$15`'()');
+')dnl
+        }
+        catch(...)
+        {
+          Glib::exception_handlers_invoke`'();
+        }
+')dnl
       }
       #endif //GLIBMM_EXCEPTIONS_ENABLED
     }

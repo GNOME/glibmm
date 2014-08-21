@@ -1198,6 +1198,7 @@ sub on_wrap_signal($$)
   my $ifdef;
   my $argDeprecated = "";
   my $deprecation_docs = "";
+  my $exceptionHandler = "";
 
   while($#args >= 2) # If optional arguments are there.
   {
@@ -1236,11 +1237,16 @@ sub on_wrap_signal($$)
     {
     	$ifdef = $1;
     }
+    
+    elsif($argRef =~ /^exception_handler\s+(.*)/) #If exception_handler at the start.
+    {
+        $exceptionHandler = $1;
+    }
   }
 
   $self->output_wrap_signal($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                             $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback,
-                            $bRefreturn, $ifdef, $commentblock, $argDeprecated, $deprecation_docs);
+                            $bRefreturn, $ifdef, $commentblock, $argDeprecated, $deprecation_docs, $exceptionHandler);
 }
 
 # void on_wrap_vfunc()
@@ -1265,6 +1271,7 @@ sub on_wrap_vfunc($)
   my $refreturn = 0;
   my $refreturn_ctype = 0;
   my $returnValue = "";
+  my $exceptionHandler = "";
   my $custom_vfunc = 0;
   my $custom_vfunc_callback = 0;
   my $ifdef = "";
@@ -1292,6 +1299,12 @@ sub on_wrap_vfunc($)
     elsif($argRef =~ /^return_value\s+(.*)/)
     {
       $returnValue = $1;
+    }
+    # If exception handler is not defined, then Glib::exception_handlers_invoke
+    # method will be used for exception handling.
+    elsif($argRef =~ /^exception_handler\s+(.*)/)
+    {
+      $exceptionHandler = $1;
     }
     elsif($argRef eq "custom_vfunc")
     {
@@ -1333,7 +1346,7 @@ sub on_wrap_vfunc($)
   $self->output_wrap_vfunc($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                            $refreturn, $refreturn_ctype, $custom_vfunc,
                            $custom_vfunc_callback, $ifdef, $errthrow,
-                           $slot_name, $slot_callback, $no_slot_copy, $returnValue);
+                           $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler);
 }
 
 sub on_wrap_enum($)
@@ -1492,12 +1505,12 @@ sub output_wrap_check($$$$$$)
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
 #                  $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
-#                  $commentblock, $deprecated, $deprecation_docs)
-sub output_wrap_signal($$$$$$$$$$$)
+#                  $commentblock, $deprecated, $deprecation_docs, $exceptionHandler)
+sub output_wrap_signal($$$$$$$$$$$$)
 {
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
       $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
-      $commentblock, $deprecated, $deprecation_docs) = @_;
+      $commentblock, $deprecated, $deprecation_docs, $exceptionHandler) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $signal_name,
@@ -1531,30 +1544,30 @@ sub output_wrap_signal($$$$$$$$$$$)
 
   $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal,
     $signal_name, $bCustomCCallback, $ifdef, $commentblock,
-    $deprecated, $deprecation_docs);
+    $deprecated, $deprecation_docs, $exceptionHandler);
 
   if($bNoDefaultHandler eq 0)
   {
     $objOutputter->output_wrap_default_signal_handler_h($filename, $line_num,
-      $objCppSignal, $objCSignal, $ifdef, $deprecated);
+      $objCppSignal, $objCSignal, $ifdef, $deprecated, $exceptionHandler);
 
     my $bImplement = 1;
     if($bCustomDefaultHandler) { $bImplement = 0; }
     $objOutputter->output_wrap_default_signal_handler_cc($filename, $line_num,
       $objCppSignal, $objCSignal, $bImplement, $bCustomCCallback, $bRefreturn,
-      $ifdef, $deprecated);
+      $ifdef, $deprecated, $exceptionHandler);
   }
 }
 
 # void output_wrap_vfunc($CppDecl, $vfunc_name, $filename, $line_num,
 #                  $refreturn, $refreturn_ctype,
 #                  $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
-#                  $slot_name, $slot_callback, $no_slot_copy, $returnValue)
-sub output_wrap_vfunc($$$$$$$$$$$$$)
+#                  $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler)
+sub output_wrap_vfunc($$$$$$$$$$$$$$)
 {
   my ($self, $CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
       $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
-      $slot_name, $slot_callback, $no_slot_copy, $returnValue) = @_;
+      $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, '_WRAP_VFUNC'));
@@ -1586,6 +1599,7 @@ sub output_wrap_vfunc($$$$$$$$$$$$$)
 
   $$objCppVfunc{rettype_needs_ref} = $refreturn;
   $$objCppVfunc{return_value} = $returnValue;
+  $$objCppVfunc{exception_handler} = $exceptionHandler;
   $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" suffix, and a separate easily-named invoker method.
 
   # Store the slot information in the vfunc if specified.

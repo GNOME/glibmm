@@ -13,7 +13,8 @@ dnl               $7 = `<c_args_to_cpp>',
 dnl               $8 = `custom_c_callback (boolean)',
 dnl               $9 = `deprecated' (boolean),
 dnl               $10 = `refdoc_comment',
-dnl               $11 = ifdef)
+dnl               $11 = ifdef,
+dnl               $12 = exceptionHandler)
 
 define(`_SIGNAL_PROXY',`
 ifelse(`$11',,,`#ifdef $11'
@@ -34,10 +35,10 @@ ifelse(`$11',,,`#ifdef $11'
 ifelse(`$9',,,`_DEPRECATE_IFDEF_START
 ')dnl
 dnl
-ifelse($2`'_NUM($3)`'$5`'_NUM($6)`'$8,`void0void00',`dnl
+ifelse($2`'_NUM($3)`'$5`'_NUM($6)`'$8`'_NUM($12),`void0void000',`dnl
 dnl
 dnl Use predefined callback for SignalProxy0<void>, to reduce code size,
-dnl if custom_c_callback is not specified.
+dnl if custom_c_callback or exception_handler is not specified.
 
 static const Glib::SignalProxyInfo __CPPNAME__`'_signal_$4_info =
 {
@@ -53,8 +54,9 @@ static $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3
   using namespace __NAMESPACE__;
   typedef sigc::slot< $5`'_COMMA_PREFIX($6) > SlotType;
 
+  __CPPNAME__* obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
   // Do not try to call a signal on a disassociated wrapper.
-  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  if(obj)
   {
     #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
@@ -70,7 +72,18 @@ ifelse(`$2',void,`dnl
     }
     catch(...)
     {
-      Glib::exception_handlers_invoke();
+ifelse($15, `', `dnl
+       Glib::exception_handlers_invoke`'();
+', `dnl
+       try
+       {
+         return _CONVERT($5, $2, `obj->$12`'()');
+       }
+       catch(...)
+       {
+          Glib::exception_handlers_invoke`'();
+       }
+')dnl
     }
     #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
@@ -87,8 +100,9 @@ static $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SU
   using namespace __NAMESPACE__;
   typedef sigc::slot< void`'_COMMA_PREFIX($6) > SlotType;
 
+  __CPPNAME__* obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
   // Do not try to call a signal on a disassociated wrapper.
-  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  if(obj)
   {
     #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
@@ -100,7 +114,18 @@ static $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SU
     }
     catch(...)
     {
-      Glib::exception_handlers_invoke();
+ifelse($12, `', `dnl
+      Glib::exception_handlers_invoke`'();
+', `dnl
+      try
+      {
+        return _CONVERT($5, $2, `obj->$12`'()');
+      }
+      catch(...)
+      {
+        Glib::exception_handlers_invoke`'();
+      }
+')dnl
     }
     #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
@@ -142,8 +167,8 @@ ifelse(`$11',,,`#endif // $11
 _POP()')
 
 
-dnl              $1      $2            $3          $4       $5
-dnl _SIGNAL_PH(gname, crettype, cargs and names, ifdef, deprecated)
+dnl              $1      $2            $3          $4       $5           $6
+dnl _SIGNAL_PH(gname, crettype, cargs and names, ifdef, deprecated, exceptionHandler)
 dnl Create a callback and set it in our derived G*Class.
 dnl
 define(`_SIGNAL_PH',`dnl
@@ -173,8 +198,8 @@ _POP()')
 
 dnl                $1      $2       $3        $4         $5               $6
 dnl _SIGNAL_PCC(cppname,gname,cpprettype,crettype,`<cargs and names>',`<cnames>',
-dnl                  $7            $8      $9       $10
-dnl            `<cpparg names>',firstarg,<ifdef>,deprecated)
+dnl                  $7            $8      $9       $10          $11
+dnl            `<cpparg names>',firstarg,<ifdef>,deprecated,exceptionHandler)
 dnl
 define(`_SIGNAL_PCC',`dnl
 _PUSH(SECTION_PCC_DEFAULT_SIGNAL_HANDLERS)
@@ -218,7 +243,18 @@ ifelse($4,void,`dnl
       }
       catch(...)
       {
+ifelse($15, `', `dnl
         Glib::exception_handlers_invoke`'();
+', `dnl
+        try
+        {
+          return _CONVERT($3, $4, `obj->$15`'()');
+        }
+        catch(...)
+        {
+          Glib::exception_handlers_invoke`'();
+        }
+')dnl
       }
       #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
