@@ -34,6 +34,7 @@
   (values
     '("readable" "G_PARAM_READABLE")
     '("writable" "G_PARAM_WRITABLE")
+    '("readwrite" "G_PARAM_READWRITE")
     '("construct" "G_PARAM_CONSTRUCT")
     '("construct-only" "G_PARAM_CONSTRUCT_ONLY")
     '("lax-validation" "G_PARAM_LAX_VALIDATION")
@@ -41,6 +42,7 @@
     '("private" "G_PARAM_PRIVATE")
     '("static-nick" "G_PARAM_STATIC_NICK")
     '("static-blurb" "G_PARAM_STATIC_BLURB")
+    '("explicit-notify" "G_PARAM_EXPLICIT_NOTIFY")
     '("deprecated" "G_PARAM_DEPRECATED")
   )
 )
@@ -3409,6 +3411,15 @@
   )
 )
 
+(define-function g_type_check_instance_is_fundamentally_a
+  (c-name "g_type_check_instance_is_fundamentally_a")
+  (return-type "gboolean")
+  (parameters
+    '("GTypeInstance*" "instance")
+    '("GType" "fundamental_type")
+  )
+)
+
 (define-function g_type_check_class_cast
   (c-name "g_type_check_class_cast")
   (return-type "GTypeClass*")
@@ -3593,12 +3604,6 @@
 
 ;; From gtype-private.h
 
-(define-method is_in_init
-  (of-object "GType")
-  (c-name "g_type_is_in_init")
-  (return-type "gboolean")
-)
-
 
 
 ;; From gvaluearray.h
@@ -3735,6 +3740,15 @@
 (define-method set_instance
   (of-object "GValue")
   (c-name "g_value_set_instance")
+  (return-type "none")
+  (parameters
+    '("gpointer" "instance")
+  )
+)
+
+(define-method init_from_instance
+  (of-object "GValue")
+  (c-name "g_value_init_from_instance")
   (return-type "none")
   (parameters
     '("gpointer" "instance")

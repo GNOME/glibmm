@@ -1350,6 +1350,10 @@
     '("selinux-security-context-unknown" "G_DBUS_ERROR_SELINUX_SECURITY_CONTEXT_UNKNOWN")
     '("adt-audit-data-unknown" "G_DBUS_ERROR_ADT_AUDIT_DATA_UNKNOWN")
     '("object-path-in-use" "G_DBUS_ERROR_OBJECT_PATH_IN_USE")
+    '("unknown-object" "G_DBUS_ERROR_UNKNOWN_OBJECT")
+    '("unknown-interface" "G_DBUS_ERROR_UNKNOWN_INTERFACE")
+    '("unknown-property" "G_DBUS_ERROR_UNKNOWN_PROPERTY")
+    '("property-read-only" "G_DBUS_ERROR_PROPERTY_READ_ONLY")
   )
 )
 
@@ -1491,6 +1495,7 @@
     '("invalid" "G_CREDENTIALS_TYPE_INVALID")
     '("linux-ucred" "G_CREDENTIALS_TYPE_LINUX_UCRED")
     '("freebsd-cmsgcred" "G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED")
+    '("netbsd-unpcbid" "G_CREDENTIALS_TYPE_NETBSD_UNPCBID")
     '("openbsd-sockpeercred" "G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED")
     '("solaris-ucred" "G_CREDENTIALS_TYPE_SOLARIS_UCRED")
   )
@@ -1683,6 +1688,18 @@
     '("stderr-silence" "G_SUBPROCESS_FLAGS_STDERR_SILENCE")
     '("stderr-merge" "G_SUBPROCESS_FLAGS_STDERR_MERGE")
     '("inherit-fds" "G_SUBPROCESS_FLAGS_INHERIT_FDS")
+  )
+)
+
+(define-enum Priority
+  (in-module "GNotification")
+  (c-name "GNotificationPriority")
+  (gtype-id "G_TYPE_NOTIFICATION_PRIORITY")
+  (values
+    '("normal" "G_NOTIFICATION_PRIORITY_NORMAL")
+    '("low" "G_NOTIFICATION_PRIORITY_LOW")
+    '("high" "G_NOTIFICATION_PRIORITY_HIGH")
+    '("urgent" "G_NOTIFICATION_PRIORITY_URGENT")
   )
 )
 
@@ -2532,6 +2549,21 @@
   )
 )
 
+(define-method get_resource_base_path
+  (of-object "GApplication")
+  (c-name "g_application_get_resource_base_path")
+  (return-type "const-gchar*")
+)
+
+(define-method set_resource_base_path
+  (of-object "GApplication")
+  (c-name "g_application_set_resource_base_path")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "resource_base_path")
+  )
+)
+
 (define-method set_action_group
   (of-object "GApplication")
   (c-name "g_application_set_action_group")
@@ -2547,6 +2579,20 @@
   (return-type "none")
   (parameters
     '("const-GOptionEntry*" "entries")
+  )
+)
+
+(define-method add_main_option
+  (of-object "GApplication")
+  (c-name "g_application_add_main_option")
+  (return-type "none")
+  (parameters
+    '("const-char*" "long_name")
+    '("char" "short_name")
+    '("gint" "flags")
+    '("GOptionArg" "arg")
+    '("const-char*" "description")
+    '("const-char*" "arg_description")
   )
 )
 
@@ -6622,6 +6668,14 @@
   )
 )
 
+(define-function g_desktop_app_info_get_implementations
+  (c-name "g_desktop_app_info_get_implementations")
+  (return-type "GList*")
+  (parameters
+    '("const-gchar*" "interface")
+  )
+)
+
 
 
 ;; From gdrive.h
@@ -10334,6 +10388,11 @@
   (return-type "GType")
 )
 
+(define-function g_notification_priority_get_type
+  (c-name "g_notification_priority_get_type")
+  (return-type "GType")
+)
+
 (define-function g_settings_bind_flags_get_type
   (c-name "g_settings_bind_flags_get_type")
   (return-type "GType")
@@ -12142,6 +12201,15 @@
   )
 )
 
+(define-method set_priority
+  (of-object "GNotification")
+  (c-name "g_notification_set_priority")
+  (return-type "none")
+  (parameters
+    '("GNotificationPriority" "priority")
+  )
+)
+
 (define-method add_button
   (of-object "GNotification")
   (c-name "g_notification_add_button")
@@ -12233,10 +12301,10 @@
   (return-type "GIcon*")
 )
 
-(define-method get_urgent
+(define-method get_priority
   (of-object "GNotification")
-  (c-name "g_notification_get_urgent")
-  (return-type "gboolean")
+  (c-name "g_notification_get_priority")
+  (return-type "GNotificationPriority")
 )
 
 (define-method get_n_buttons
