@@ -1915,6 +1915,10 @@ Since: 2.26
 <parameter_description> The native credentials type is a &lt;type&gt;struct cmsgcred&lt;/type&gt;.
 </parameter_description>
 </parameter>
+<parameter name="G_CREDENTIALS_TYPE_NETBSD_UNPCBID">
+<parameter_description> The native credentials type is a &lt;type&gt;struct unpcbid&lt;/type&gt;.
+</parameter_description>
+</parameter>
 <parameter name="G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED">
 <parameter_description> The native credentials type is a &lt;type&gt;struct sockpeercred&lt;/type&gt;. Added in 2.30.
 </parameter_description>
@@ -2209,6 +2213,26 @@ Existing file and the operation you're using does not silently overwrite.
 <parameter name="G_DBUS_ERROR_UNKNOWN_METHOD">
 <parameter_description>
 Method name you invoked isn't known by the object you invoked it on.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_UNKNOWN_OBJECT">
+<parameter_description>
+Object you invoked a method on isn't known. Since 2.42
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_UNKNOWN_INTERFACE">
+<parameter_description>
+Interface you invoked a method on isn't known by the object. Since 2.42
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_UNKNOWN_PROPERTY">
+<parameter_description>
+Property you tried to access isn't known by the object. Since 2.42
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_ERROR_PROPERTY_READ_ONLY">
+<parameter_description>
+Property you tried to set is read-only. Since 2.42
 </parameter_description>
 </parameter>
 <parameter name="G_DBUS_ERROR_TIMED_OUT">
@@ -2924,7 +2948,7 @@ and only if %G_DBUS_PROXY_FLAGS_DO_NOT_AUTOSTART is not also specified.
 
 <enum name="GDBusSendMessageFlags">
 <description>
-Flags used when sending #GDBusMessage&lt;!-- --&gt;s on a #GDBusConnection.
+Flags used when sending #GDBusMessages on a #GDBusConnection.
 
 Since: 2.26
 
@@ -4257,6 +4281,41 @@ Since: 2.32
 <return></return>
 </signal>
 
+<enum name="GNotificationPriority">
+<description>
+Priority levels for #GNotifications.
+
+Since: 2.42
+
+</description>
+<parameters>
+<parameter name="G_NOTIFICATION_PRIORITY_LOW">
+<parameter_description> for notifications that do not require
+immediate attention - typically used for contextual background
+information, such as contact birthdays or local weather
+</parameter_description>
+</parameter>
+<parameter name="G_NOTIFICATION_PRIORITY_NORMAL">
+<parameter_description> the default priority, to be used for the
+majority of notifications (for example email messages, software updates,
+completed download/sync operations)
+</parameter_description>
+</parameter>
+<parameter name="G_NOTIFICATION_PRIORITY_HIGH">
+<parameter_description> for events that require more attention,
+usually because responses are time-sensitive (for example chat and SMS
+messages or alarms)
+</parameter_description>
+</parameter>
+<parameter name="G_NOTIFICATION_PRIORITY_URGENT">
+<parameter_description> for urgent notifications, or notifications
+that require a response in a short space of time (for example phone calls
+or emergency warnings)
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <enum name="GOutputStreamSpliceFlags">
 <description>
 GOutputStreamSpliceFlags determine how streams should be spliced.
@@ -5452,6 +5511,67 @@ Emitted when the unix mounts have changed.
 </parameters>
 <return></return>
 </signal>
+
+<enum name="GUnixMountType">
+<description>
+Types of UNIX mounts.
+
+</description>
+<parameters>
+<parameter name="G_UNIX_MOUNT_TYPE_UNKNOWN">
+<parameter_description> Unknown UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_FLOPPY">
+<parameter_description> Floppy disk UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_CDROM">
+<parameter_description> CDROM UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_NFS">
+<parameter_description> Network File System (NFS) UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_ZIP">
+<parameter_description> ZIP UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_JAZ">
+<parameter_description> JAZZ UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_MEMSTICK">
+<parameter_description> Memory Stick UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_CF">
+<parameter_description> Compact Flash UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_SM">
+<parameter_description> Smart Media UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_SDMMC">
+<parameter_description> SD/MMC UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_IPOD">
+<parameter_description> iPod UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_CAMERA">
+<parameter_description> Digital camera UNIX mount type.
+</parameter_description>
+</parameter>
+<parameter name="G_UNIX_MOUNT_TYPE_HD">
+<parameter_description> Hard drive UNIX mount type.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
 
 <enum name="GUnixSocketAddressType">
 <description>
@@ -19919,7 +20039,8 @@ Since: 2.28
 </parameter_description>
 </parameter>
 </parameters>
-<return> the state type, if the action is stateful
+<return> the state type, if the action
+is stateful
 
 </return>
 </function>
@@ -21198,6 +21319,59 @@ Since: 2.28
 <return></return>
 </function>
 
+<function name="g_application_add_main_option">
+<description>
+Add an option to be handled by @application.
+
+Calling this function is the equivalent of calling
+g_application_add_main_option_entries() with a single #GOptionEntry
+that has its arg_data member set to %NULL.
+
+The parsed arguments will be packed into a #GVariantDict which
+is passed to #GApplication::handle-local-options. If
+%G_APPLICATION_HANDLES_COMMAND_LINE is set, then it will also
+be sent to the primary instance. See
+g_application_add_main_option_entries() for more details.
+
+See #GOptionEntry for more documentation of the arguments.
+
+Since: 2.42
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the #GApplication
+</parameter_description>
+</parameter>
+<parameter name="long_name">
+<parameter_description> the long name of an option used to specify it in a commandline
+</parameter_description>
+</parameter>
+<parameter name="short_name">
+<parameter_description> the short name of an option
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags from #GOptionFlags
+</parameter_description>
+</parameter>
+<parameter name="arg">
+<parameter_description> the type of the option, as a #GOptionArg
+</parameter_description>
+</parameter>
+<parameter name="description">
+<parameter_description> the description for the option in `--help` output
+</parameter_description>
+</parameter>
+<parameter name="arg_description">
+<parameter_description> the placeholder to use for the extra argument
+parsed by the option in `--help` output
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_application_add_main_option_entries">
 <description>
 Adds main option entries to be handled by @application.
@@ -21856,6 +22030,26 @@ Since: 2.28
 </return>
 </function>
 
+<function name="g_application_get_resource_base_path">
+<description>
+Gets the resource base path of @application.
+
+See g_application_set_resource_base_path() for more information.
+
+Since: 2.42
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GApplication
+</parameter_description>
+</parameter>
+</parameters>
+<return> the base resource path, if one is set
+
+</return>
+</function>
+
 <function name="g_application_hold">
 <description>
 Increases the use count of @application.
@@ -22372,6 +22566,53 @@ Since: 2.28
 </parameter>
 <parameter name="inactivity_timeout">
 <parameter_description> the timeout, in milliseconds
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_application_set_resource_base_path">
+<description>
+Sets (or unsets) the base resource path of @application.
+
+The path is used to automatically load various [application
+resources][gresource] such as menu layouts and action descriptions.
+The various types of resources will be found at fixed names relative
+to the given base path.
+
+By default, the resource base path is determined from the application
+ID by prefixing '/' and replacing each '.' with '/'.  This is done at
+the time that the #GApplication object is constructed.  Changes to
+the application ID after that point will not have an impact on the
+resource base path.
+
+As an example, if the application has an ID of &quot;org.example.app&quot; then
+the default resource base path will be &quot;/org/example/app&quot;.  If this
+is a #GtkApplication (and you have not manually changed the path)
+then Gtk will then search for the menus of the application at
+&quot;/org/example/app/gtk/menus.ui&quot;.
+
+See #GResource for more information about adding resources to your
+application.
+
+You can disable automatic resource loading functionality by setting
+the path to %NULL.
+
+Changing the resource base path once the application is running is
+not recommended.  The point at which the resource path is consulted
+for forming paths for various purposes is unspecified.
+
+Since: 2.42
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> a #GApplication
+</parameter_description>
+</parameter>
+<parameter name="resource_path">
+<parameter_description> the resource path to use
 </parameter_description>
 </parameter>
 </parameters>
@@ -23891,8 +24132,8 @@ Gets the top cancellable from the stack.
 </description>
 <parameters>
 </parameters>
-<return> a #GCancellable from the top of the stack, or %NULL
-if the stack is empty.
+<return> a #GCancellable from the top
+of the stack, or %NULL if the stack is empty.
 </return>
 </function>
 
@@ -24257,8 +24498,8 @@ Since: 2.18
 </parameter_description>
 </parameter>
 </parameters>
-<return> Newly allocated string with content type
-or %NULL. Free with g_free()
+<return> Newly allocated string with content type or
+%NULL. Free with g_free()
 
 </return>
 </function>
@@ -25104,12 +25345,12 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a
-NUL terminated byte array with the line that was read in (without
-the newlines).  Set @length to a #gsize to get the length of the
-read line.  On an error, it will return %NULL and @error will be
-set. If there's no content to read, it will still return %NULL,
-but @error won't be set.
+<return>
+a NUL terminated byte array with the line that was read in
+(without the newlines).  Set @length to a #gsize to get the length
+of the read line.  On an error, it will return %NULL and @error
+will be set. If there's no content to read, it will still return
+%NULL, but @error won't be set.
 </return>
 </function>
 
@@ -25178,12 +25419,12 @@ Since: 2.20
 </parameter_description>
 </parameter>
 </parameters>
-<return>  a 
-NUL-terminated byte array with the line that was read in
-(without the newlines).  Set @length to a #gsize to get the
-length of the read line.  On an error, it will return %NULL and
-@error will be set. If there's no content to read, it will
-still return %NULL, but @error won't be set.
+<return>
+a NUL-terminated byte array with the line that was read in
+(without the newlines).  Set @length to a #gsize to get the length
+of the read line.  On an error, it will return %NULL and @error
+will be set. If there's no content to read, it will still return
+%NULL, but @error won't be set.
 
 </return>
 </function>
@@ -25214,12 +25455,12 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string with the line that was read in
-(without the newlines).  Set @length to a #gsize to get the length
-of the read line.  On an error, it will return %NULL and @error
-will be set. For UTF-8 conversion errors, the set error domain is
-%G_CONVERT_ERROR.  If there's no content to read, it will still
-return %NULL, but @error won't be set.
+<return> a string with the line that
+was read in (without the newlines).  Set @length to a #gsize to
+get the length of the read line.  On an error, it will return
+%NULL and @error will be set. For UTF-8 conversion errors, the set
+error domain is %G_CONVERT_ERROR.  If there's no content to read,
+it will still return %NULL, but @error won't be set.
 
 </return>
 </function>
@@ -25253,12 +25494,13 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> a NUL terminated UTF-8 string with the
-line that was read in (without the newlines).  Set @length to a
-#gsize to get the length of the read line.  On an error, it will
-return %NULL and @error will be set.  For UTF-8 conversion errors,
-the set error domain is %G_CONVERT_ERROR.  If there's no content to
-read, it will still return %NULL, but @error won't be set.
+<return> a NUL terminated UTF-8 string
+with the line that was read in (without the newlines).  Set
+@length to a #gsize to get the length of the read line.  On an
+error, it will return %NULL and @error will be set.  For UTF-8
+conversion errors, the set error domain is %G_CONVERT_ERROR.  If
+there's no content to read, it will still return %NULL, but @error
+won't be set.
 
 </return>
 </function>
@@ -29387,7 +29629,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GVariant or %NULL if the body is empty. Do not free, it is owned by @message.
+<return> A #GVariant or %NULL if the body is
+empty. Do not free, it is owned by @message.
 
 </return>
 </function>
@@ -31119,8 +31362,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> The name owner or %NULL if no name owner exists. Free with
-g_free().
+<return> The name owner or %NULL if no name owner
+exists. Free with g_free().
 
 </return>
 </function>
@@ -33074,6 +33317,25 @@ Gets the generic name from the destkop file.
 </return>
 </function>
 
+<function name="g_desktop_app_info_get_implementations">
+<description>
+Gets all applications that implement @interface.
+
+An application implements an interface if that interface is listed in
+the Implements= line of the desktop file of the application.
+
+Since: 2.42
+
+</description>
+<parameters>
+<parameter name="interface">
+<parameter_description> the name of the interface
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_desktop_app_info_get_is_hidden">
 <description>
 A desktop file is hidden if the Hidden key in it is
@@ -33135,8 +33397,10 @@ Checks if the application info should be shown in menus that list available
 applications for a specific name of the desktop, based on the
 `OnlyShowIn` and `NotShowIn` keys.
 
-If @desktop_env is %NULL, then the name of the desktop set with
-g_desktop_app_info_set_desktop_env() is used.
+@desktop_env should typically be given as %NULL, in which case the
+`XDG_CURRENT_DESKTOP` environment variable is consulted.  If you want
+to override the default mechanism then you may specify @desktop_env,
+but this is not recommended.
 
 Note that g_app_info_should_show() for @info will include this check (with
 %NULL for @desktop_env) as well as additional checks.
@@ -33475,18 +33739,10 @@ g_desktop_app_info_get_show_in() to evaluate the
 `OnlyShowIn` and `NotShowIn`
 desktop entry fields.
 
-The 
-[Desktop Menu specification](http://standards.freedesktop.org/menu-spec/latest/)
-recognizes the following:
-- GNOME
-- KDE
-- ROX
-- XFCE
-- LXDE
-- Unity
-- Old
-
 Should be called only once; subsequent calls are ignored.
+
+Deprecated:2.42:do not use this API.  Since 2.42 the value of the
+`XDG_CURRENT_DESKTOP` environment variable will be used.
 
 </description>
 <parameters>
@@ -34720,6 +34976,40 @@ the @matcher is automatically freed.
 <return></return>
 </function>
 
+<function name="g_file_attribute_value_dup">
+<description>
+Duplicates a file attribute.
+
+
+</description>
+<parameters>
+<parameter name="other">
+<parameter_description> a #GFileAttributeValue to duplicate.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a duplicate of the @other.
+</return>
+</function>
+
+<function name="g_file_attribute_value_set">
+<description>
+Sets an attribute's value from another attribute.
+
+</description>
+<parameters>
+<parameter name="attr">
+<parameter_description> a #GFileAttributeValue to set the value in.
+</parameter_description>
+</parameter>
+<parameter name="new_value">
+<parameter_description> a #GFileAttributeValue to get the value from.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_file_copy">
 <description>
 Copies the file @source to the location specified by @destination.
@@ -34803,8 +35093,9 @@ Copies the file @source to the location specified by @destination
 asynchronously. For details of the behaviour, see g_file_copy().
 
 If @progress_callback is not %NULL, then that function that will be called
-just like in g_file_copy(), however the callback will run in the main loop,
-not in the thread that is doing the I/O operation.
+just like in g_file_copy(). The callback will run in the default main context
+of the thread calling g_file_copy_async() — the same context as @callback is
+run in.
 
 When the operation is finished, @callback will be called. You can then call
 g_file_copy_finish() to get the result of the operation.
@@ -35785,8 +36076,9 @@ be unset.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GFileInfo or %NULL on error or end of enumerator.
-Free the returned object with g_object_unref() when no longer needed.
+<return> A #GFileInfo or %NULL on error
+or end of enumerator.  Free the returned object with
+g_object_unref() when no longer needed.
 </return>
 </function>
 
@@ -35863,7 +36155,7 @@ ignore.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of #GFileInfo&lt;!----&gt;s. You must free the list with 
+<return> a #GList of #GFileInfos. You must free the list with 
 g_list_free() and unref the infos with g_object_unref() when you're 
 done with them.
 </return>
@@ -35910,7 +36202,6 @@ This call does no blocking I/O.
 </parameter>
 </parameters>
 <return> %TRUE if @file1 and @file2 are equal.
-%FALSE if either is not a #GFile.
 </return>
 </function>
 
@@ -36038,8 +36329,8 @@ This call does no blocking I/O.
 </parameter_description>
 </parameter>
 </parameters>
-<return> string containing the #GFile's base name, or %NULL
-if given #GFile is invalid. The returned string should be
+<return> string containing the #GFile's base name, or
+%NULL if given #GFile is invalid. The returned string should be
 freed with g_free() when no longer needed.
 </return>
 </function>
@@ -36121,8 +36412,8 @@ This call does no blocking I/O.
 </parameter>
 </parameters>
 <return> a #GFile structure to the
-parent of the given #GFile or %NULL if there is
-no parent. Free the returned object with g_object_unref().
+parent of the given #GFile or %NULL if there is no parent. Free
+the returned object with g_object_unref().
 </return>
 </function>
 
@@ -36171,9 +36462,9 @@ This call does no blocking I/O.
 </parameter_description>
 </parameter>
 </parameters>
-<return> string containing the #GFile's path, or %NULL if
-no such path exists. The returned string should be
-freed with g_free() when no longer needed.
+<return> string containing the #GFile's path, or %NULL
+if no such path exists. The returned string should be freed
+with g_free() when no longer needed.
 </return>
 </function>
 
@@ -36196,9 +36487,9 @@ This call does no blocking I/O.
 </parameter>
 </parameters>
 <return> string with the relative path from @descendant
-to @parent, or %NULL if @descendant doesn't have @parent
-as prefix. The returned string should be freed with g_free()
-when no longer needed.
+to @parent, or %NULL if @descendant doesn't have @parent as
+prefix. The returned string should be freed with g_free() when
+no longer needed.
 </return>
 </function>
 
@@ -37061,9 +37352,9 @@ Lists the file info structure's attributes.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a null-terminated array of strings of all of the
-possible attribute types for the given @name_space, or
-%NULL on error.
+<return> a
+null-terminated array of strings of all of the possible attribute
+types for the given @name_space, or %NULL on error.
 </return>
 </function>
 
@@ -41677,8 +41968,8 @@ Since: 2.20
 </parameter_description>
 </parameter>
 </parameters>
-<return> An allocated NUL-terminated UTF8 string or %NULL if @icon can't
-be serialized. Use g_free() to free.
+<return> An allocated NUL-terminated UTF8 string or
+%NULL if @icon can't be serialized. Use g_free() to free.
 
 </return>
 </function>
@@ -42692,6 +42983,9 @@ It is not an error if this is not the same as the requested size, as it
 can happen e.g. near the end of a file. Zero is returned on end of file
 (or if @count is zero),  but never otherwise.
 
+The returned @buffer is not a nul-terminated string, it can contain nul bytes
+at any position, and this function doesn't nul-terminate the @buffer.
+
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. If an
@@ -42866,6 +43160,7 @@ partial result will be returned, without an error.
 
 On error %NULL is returned and @error is set accordingly.
 
+Since: 2.34
 
 </description>
 <parameters>
@@ -42888,6 +43183,7 @@ values include 4096 and 8192.
 </parameter>
 </parameters>
 <return> a new #GBytes, or %NULL on error
+
 </return>
 </function>
 
@@ -42913,6 +43209,8 @@ many bytes as requested. Zero is returned on end of file (or if
 Any outstanding I/O request with higher priority (lower numerical
 value) will be executed before an outstanding request with lower
 priority. Default priority is %G_PRIORITY_DEFAULT.
+
+Since: 2.34
 
 </description>
 <parameters>
@@ -42948,6 +43246,7 @@ priority. Default priority is %G_PRIORITY_DEFAULT.
 <description>
 Finishes an asynchronous stream read-into-#GBytes operation.
 
+Since: 2.34
 
 </description>
 <parameters>
@@ -42966,6 +43265,7 @@ ignore.
 </parameter>
 </parameters>
 <return> the newly-allocated #GBytes, or %NULL on error
+
 </return>
 </function>
 
@@ -44192,17 +44492,18 @@ see g_loadable_icon_load_async().
 </parameter_description>
 </parameter>
 <parameter name="type">
-<parameter_description> a location to store the type of the
-loaded icon, %NULL to ignore.
+<parameter_description> a location to store the type of the loaded
+icon, %NULL to ignore.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
+<parameter_description> optional #GCancellable object, %NULL to
+ignore.
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError location to store the error occurring, or %NULL to 
-ignore.
+<parameter_description> a #GError location to store the error occurring, or %NULL
+to ignore.
 </parameter_description>
 </parameter>
 </parameters>
@@ -44259,8 +44560,8 @@ Finishes an asynchronous icon load started in g_loadable_icon_load_async().
 </parameter_description>
 </parameter>
 <parameter name="type">
-<parameter_description> a location to store the type of the
-loaded icon, %NULL to ignore.
+<parameter_description> a location to store the type of the loaded
+icon, %NULL to ignore.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -47815,6 +48116,25 @@ Since: 2.40
 <return></return>
 </function>
 
+<function name="g_notification_set_priority">
+<description>
+Sets the priority of @notification to @priority. See
+#GNotificationPriority for possible values.
+
+</description>
+<parameters>
+<parameter name="notification">
+<parameter_description> a #GNotification
+</parameter_description>
+</parameter>
+<parameter name="priority">
+<parameter_description> a #GNotificationPriority
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_notification_set_title">
 <description>
 Sets the title of @notification to @title.
@@ -47837,7 +48157,7 @@ Since: 2.40
 
 <function name="g_notification_set_urgent">
 <description>
-Sets or unsets whether @notification is marked as urgent.
+Deprecated in favor of g_notification_set_priority().
 
 Since: 2.40
 
@@ -49117,8 +49437,8 @@ Virtual: read_nonblocking
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to read data into (which should be at least @count
-bytes long).
+<parameter_description> a buffer to
+read data into (which should be at least @count bytes long).
 </parameter_description>
 </parameter>
 <parameter name="count">
@@ -49338,7 +49658,8 @@ Since: 2.34
 </parameter_description>
 </parameter>
 <parameter name="buffer">
-<parameter_description> a buffer to read data into
+<parameter_description> a buffer to
+read data into
 </parameter_description>
 </parameter>
 <parameter name="count">
@@ -50225,7 +50546,7 @@ address(es). @hostname may be an ASCII-only or UTF-8 hostname, or
 the textual form of an IP address (in which case this just becomes
 a wrapper around g_inet_address_new_from_string()).
 
-On success, g_resolver_lookup_by_name() will return a #GList of
+On success, g_resolver_lookup_by_name() will return a non-empty #GList of
 #GInetAddress, sorted in order of preference and guaranteed to not
 contain duplicates. That is, if using the result to connect to
 @hostname, you should attempt to connect to the first address
@@ -50234,7 +50555,7 @@ the result to listen on a socket, it is appropriate to add each
 result using e.g. g_socket_listener_add_address().
 
 If the DNS resolution fails, @error (if non-%NULL) will be set to a
-value from #GResolverError.
+value from #GResolverError and %NULL will be returned.
 
 If @cancellable is non-%NULL, it can be used to cancel the
 operation, in which case @error (if non-%NULL) will be set to
@@ -50265,7 +50586,7 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList
+<return> a non-empty #GList
 of #GInetAddress, or %NULL on error. You
 must unref each of the addresses and free the list when you are
 done with it. (You can use g_resolver_free_addresses() to do this.)
@@ -50348,7 +50669,7 @@ a list of records as #GVariant tuples. See #GResolverRecordType for
 information on what the records contain for each @record_type.
 
 If the DNS resolution fails, @error (if non-%NULL) will be set to
-a value from #GResolverError.
+a value from #GResolverError and %NULL will be returned.
 
 If @cancellable is non-%NULL, it can be used to cancel the
 operation, in which case @error (if non-%NULL) will be set to
@@ -50379,9 +50700,10 @@ Since: 2.34
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of #GVariant,
-or %NULL on error. You must free each of the records and the list when you are
-done with it. (You can use g_list_free_full() with g_variant_unref() to do this.)
+<return> a non-empty #GList of
+#GVariant, or %NULL on error. You must free each of the records and the list
+when you are done with it. (You can use g_list_free_full() with
+g_variant_unref() to do this.)
 
 </return>
 </function>
@@ -50428,8 +50750,9 @@ Since: 2.34
 <function name="g_resolver_lookup_records_finish">
 <description>
 Retrieves the result of a previous call to
-g_resolver_lookup_records_async(). Returns a list of records as #GVariant
-tuples. See #GResolverRecordType for information on what the records contain.
+g_resolver_lookup_records_async(). Returns a non-empty list of records as
+#GVariant tuples. See #GResolverRecordType for information on what the
+records contain.
 
 If the DNS resolution failed, @error (if non-%NULL) will be set to
 a value from #GResolverError. If the operation was cancelled,
@@ -50452,9 +50775,10 @@ Since: 2.34
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of #GVariant,
-or %NULL on error. You must free each of the records and the list when you are
-done with it. (You can use g_list_free_full() with g_variant_unref() to do this.)
+<return> a non-empty #GList of
+#GVariant, or %NULL on error. You must free each of the records and the list
+when you are done with it. (You can use g_list_free_full() with
+g_variant_unref() to do this.)
 
 </return>
 </function>
@@ -50467,13 +50791,13 @@ Synchronously performs a DNS SRV lookup for the given @service and
 @service and @protocol arguments do not include the leading underscore
 that appears in the actual DNS entry.
 
-On success, g_resolver_lookup_service() will return a #GList of
+On success, g_resolver_lookup_service() will return a non-empty #GList of
 #GSrvTarget, sorted in order of preference. (That is, you should
 attempt to connect to the first target first, then the second if
 the first fails, etc.)
 
 If the DNS resolution fails, @error (if non-%NULL) will be set to
-a value from #GResolverError.
+a value from #GResolverError and %NULL will be returned.
 
 If @cancellable is non-%NULL, it can be used to cancel the
 operation, in which case @error (if non-%NULL) will be set to
@@ -50512,9 +50836,10 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of #GSrvTarget,
-or %NULL on error. You must free each of the targets and the list when you are
-done with it. (You can use g_resolver_free_targets() to do this.)
+<return> a non-empty #GList of
+#GSrvTarget, or %NULL on error. You must free each of the targets and the
+list when you are done with it. (You can use g_resolver_free_targets() to do
+this.)
 
 </return>
 </function>
@@ -50589,8 +50914,9 @@ Since: 2.22
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList of #GSrvTarget,
-or %NULL on error. See g_resolver_lookup_service() for more details.
+<return> a non-empty #GList of
+#GSrvTarget, or %NULL on error. See g_resolver_lookup_service() for more
+details.
 
 </return>
 </function>
@@ -50804,6 +51130,20 @@ Since: 2.32
 </parameters>
 <return> a new #GResource, or %NULL on error
 
+</return>
+</function>
+
+<function name="g_resource_new_from_table">
+<description>
+
+</description>
+<parameters>
+<parameter name="table">
+<parameter_description> a GvdbTable
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GResource for @table
 </return>
 </function>
 
@@ -52896,12 +53236,13 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="non_relocatable">
-<parameter_description> the list of non-relocatable
-schemas
+<parameter_description> the
+list of non-relocatable schemas
 </parameter_description>
 </parameter>
 <parameter name="relocatable">
-<parameter_description> the list of relocatable schemas
+<parameter_description> the list
+of relocatable schemas
 </parameter_description>
 </parameter>
 </parameters>
@@ -56322,8 +56663,9 @@ Since: 2.22
 
 <function name="g_socket_create_source">
 <description>
-Creates a %GSource that can be attached to a %GMainContext to monitor
-for the availability of the specified @condition on the socket.
+Creates a #GSource that can be attached to a %GMainContext to monitor
+for the availability of the specified @condition on the socket. The #GSource
+keeps a reference to the @socket.
 
 The callback on the source is of the #GSocketSourceFunc type.
 
@@ -57257,6 +57599,11 @@ address and listened to.
 to accept to identify this particular source, which is
 useful if you're listening on multiple addresses and do
 different things depending on what address is connected to.
+
+The @socket will not be automatically closed when the @listener is finalized
+unless the listener held the final reference to the socket. Before GLib 2.42,
+the @socket was automatically closed on finalization of the @listener, even
+if references to it were held elsewhere.
 
 Since: 2.22
 
@@ -58702,7 +59049,7 @@ process as UTF-8, and returns it as a regular NUL terminated string.
 
 <function name="g_subprocess_communicate_utf8_async">
 <description>
-Asynchronous version of g_subprocess_communicate_utf().  Complete
+Asynchronous version of g_subprocess_communicate_utf8().  Complete
 invocation with g_subprocess_communicate_utf8_finish().
 
 </description>
@@ -59313,8 +59660,7 @@ Since: 2.40
 
 <function name="g_subprocess_launcher_spawn">
 <description>
-A convenience helper for creating a #GSubprocess given a provided
-varargs list of arguments.
+Creates a #GSubprocess given a provided varargs list of arguments.
 
 Since: 2.40
 
@@ -59343,8 +59689,7 @@ Since: 2.40
 
 <function name="g_subprocess_launcher_spawnv">
 <description>
-A convenience helper for creating a #GSubprocess given a provided
-array of arguments.
+Creates a #GSubprocess given a provided array of arguments.
 
 Since: 2.40
 
@@ -59556,8 +59901,11 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="argv0">
-<parameter_description> first commandline argument to pass to the subprocess,
-followed by more arguments, followed by %NULL
+<parameter_description> first commandline argument to pass to the subprocess
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description>   more commandline arguments, followed by %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -59632,6 +59980,9 @@ g_subprocess_get_exit_status().
 
 This function does not fail in the case of the subprocess having
 abnormal termination.  See g_subprocess_wait_check() for that.
+
+Cancelling @cancellable doesn't kill the subprocess.  Call
+g_subprocess_force_exit() if it is desirable.
 
 Since: 2.40
 
@@ -62034,7 +62385,9 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string containing the handle.
+<return> a newly allocated string containing the
+handle.
+
 </return>
 </function>
 
@@ -64143,6 +64496,23 @@ Since: 2.34
 </return>
 </function>
 
+<function name="g_unix_mount_guess_type">
+<description>
+Guesses the type of a unix mount. If the mount type cannot be 
+determined, returns %G_UNIX_MOUNT_TYPE_UNKNOWN.
+
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a #GUnixMount.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GUnixMountType. 
+</return>
+</function>
+
 <function name="g_unix_mount_is_readonly">
 <description>
 Checks if a unix mount is mounted read only.
@@ -64378,6 +64748,24 @@ Since: 2.34
 </parameters>
 <return> a #GIcon
 
+</return>
+</function>
+
+<function name="g_unix_mount_point_guess_type">
+<description>
+Guesses the type of a unix mount point. 
+If the mount type cannot be determined, 
+returns %G_UNIX_MOUNT_TYPE_UNKNOWN.
+
+
+</description>
+<parameters>
+<parameter name="mount_point">
+<parameter_description> a #GUnixMountPoint.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GUnixMountType.
 </return>
 </function>
 
@@ -65117,8 +65505,8 @@ Since: 2.18
 </parameter_description>
 </parameter>
 </parameters>
-<return> the activation root of @volume or %NULL. Use
-g_object_unref() to free.
+<return> the activation root of @volume
+or %NULL. Use g_object_unref() to free.
 
 </return>
 </function>
@@ -65690,6 +66078,62 @@ Since: 2.26
 <return></return>
 </function>
 
+<function name="g_winhttp_file_input_stream_new">
+<description>
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> the GWinHttpFile being read
+</parameter_description>
+</parameter>
+<parameter name="connection">
+<parameter_description> handle to the HTTP connection, as from WinHttpConnect()
+</parameter_description>
+</parameter>
+<parameter name="request">
+<parameter_description> handle to the HTTP request, as from WinHttpOpenRequest
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GFileInputStream for the given request
+</return>
+</function>
+
+<function name="g_winhttp_file_output_stream_new">
+<description>
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> the GWinHttpFile being read
+</parameter_description>
+</parameter>
+<parameter name="connection">
+<parameter_description> handle to the HTTP connection, as from WinHttpConnect()
+</parameter_description>
+</parameter>
+<parameter name="request">
+<parameter_description> handle to the HTTP request, as from WinHttpOpenRequest
+</parameter_description>
+</parameter>
+</parameters>
+<return> #GFileOutputStream for the given request
+</return>
+</function>
+
+<function name="g_winhttp_vfs_new">
+<description>
+Returns a new #GVfs handle for a WinHttp vfs.
+
+
+</description>
+<parameters>
+</parameters>
+<return> a new #GVfs handle.
+</return>
+</function>
+
 <function name="g_zlib_compressor_get_file_info">
 <description>
 Returns the #GZlibCompressor:file-info property.
@@ -65797,29 +66241,38 @@ Since: 2.24
 </return>
 </function>
 
-<function name="get_all_desktop_entries_for_mime_type">
+<function name="get_sync_in_thread">
 <description>
-Returns all the desktop ids for @mime_type. The desktop files
-are listed in an order so that default applications are listed before
-non-default ones, and handlers for inherited mimetypes are listed
-after the base ones.
+Sleep for a short time, then get a session bus connection and call
+a method on it.
 
-Optionally doesn't list the desktop ids given in the @except
+Runs in a non-main thread.
 
 
 </description>
 <parameters>
-<parameter name="mime_type">
-<parameter_description> a mime type.
-</parameter_description>
-</parameter>
-<parameter name="except">
-<parameter_description> NULL or a strv list
+<parameter name="data">
+<parameter_description> delay in microseconds
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList containing the desktop ids which claim
-to handle @mime_type.
+<return> the connection
+</return>
+</function>
+
+<function name="get_viewable_logical_drives">
+<description>
+Returns the list of logical and viewable drives as defined by
+GetLogicalDrives() and the registry keys
+Software\Microsoft\Windows\CurrentVersion\Policies\Explorer under
+HKLM or HKCU. If neither key exists the result of
+GetLogicalDrives() is returned.
+
+
+</description>
+<parameters>
+</parameters>
+<return> bitmask with same meaning as returned by GetLogicalDrives()
 </return>
 </function>
 
@@ -66370,16 +66823,28 @@ Represents a subscription on a file or directory.
 <return></return>
 </function>
 
-<function name="mime_info_cache_reload">
+<function name="port_add">
 <description>
-Reload the mime information for the @dir.
+Unsafe, need lock fen_lock.
+port_add will associate a GSource to @f-&gt;source
 
 </description>
 <parameters>
-<parameter name="dir">
-<parameter_description> directory path which needs reloading.
+<parameter name="f">
+<parameter_description>
 </parameter_description>
 </parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="port_remove">
+<description>
+&lt; private &gt;
+Unsafe, need lock fen_lock.
+
+</description>
+<parameters>
 </parameters>
 <return></return>
 </function>
@@ -66410,6 +66875,86 @@ A typical GIO Channel callback function.
 </parameter>
 </parameters>
 <return> %TRUE
+</return>
+</function>
+
+<function name="test_bidi_pipe">
+<description>
+Return two #GIOStream&lt;!----&gt;s connected to each other with pipes.
+The &quot;left&quot; input stream is connected by a unidirectional pipe
+to the &quot;right&quot; output stream, and vice versa. This can be used
+as a bidirectional pipe to a child process, for instance.
+
+See test_pipe() if you only need a one-way pipe.
+
+
+</description>
+<parameters>
+<parameter name="left">
+<parameter_description> used to return one #GIOStream
+</parameter_description>
+</parameter>
+<parameter name="right">
+<parameter_description> used to return the other #GIOStream
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> used to raise an error
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success
+</return>
+</function>
+
+<function name="test_io_stream_new">
+<description>
+Return a simple #GIOStream binding together @input_stream and
+@output_stream. They have no additional semantics as a result of being
+part of this I/O stream: in particular, closing one does not close
+the other (although closing the #GIOStream will close both sub-streams).
+
+
+</description>
+<parameters>
+<parameter name="input_stream">
+<parameter_description> an input stream
+</parameter_description>
+</parameter>
+<parameter name="output_stream">
+<parameter_description> an output stream
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GIOStream
+</return>
+</function>
+
+<function name="test_pipe">
+<description>
+Return a &quot;pipe to self&quot; connecting @is to @os. This can be used
+as a unidirectional pipe to or from a child process, for instance.
+
+See test_bidi_pipe() if you want to emulate a bidirectional pipe
+via a pair of unidirectional pipes.
+
+
+</description>
+<parameters>
+<parameter name="is">
+<parameter_description> used to return a #GInputStream
+</parameter_description>
+</parameter>
+<parameter name="os">
+<parameter_description> used to return a #GOutputStream
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> used to raise an error
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success
 </return>
 </function>
 
