@@ -1051,7 +1051,7 @@ sub convert_args_cpp_to_c($$$$$)
     # is an output parameter since it will be readded.
     my $cpp_index = $num_cpp_args - 1;
     $cpp_index++ if($has_output_param);
-    $$c_param_name_mappings{@$c_param_names[$num_c_args_expected]} = $cpp_index;
+    $$c_param_name_mappings{$$c_param_names[$num_c_args_expected]} = $cpp_index;
   }
 
   # If the method has a slot temporarily decrement the C arg count when
@@ -1077,6 +1077,22 @@ sub convert_args_cpp_to_c($$$$$)
   # the number of C++ arguments.
   $num_cpp_args++ if($has_output_param);
 
+  if ($index == 0)
+  {
+    # Check if the C param names in %$c_param_name_mappings exist.
+    foreach my $mapped_c_param_name (keys %$c_param_name_mappings)
+    {
+      next if $mapped_c_param_name eq "" || $mapped_c_param_name eq "OUT";
+
+      if (!grep($_ eq $mapped_c_param_name, @$c_param_names))
+      {
+        Output::error("convert_args_cpp_to_c(): There is no C argument called \"$mapped_c_param_name\"\n");
+        $objCDefsFunc->dump();
+        return ("", "", "");
+      }
+    }
+  }
+
   # Get the desired argument list combination.
   my $possible_arg_list = $$objCppfunc{possible_args_list}[$index];
 
@@ -1101,7 +1117,7 @@ sub convert_args_cpp_to_c($$$$$)
     # Account for a possible C++ output param in the C++ arg list.
     $iCParam-- if($has_output_param && $i > $output_param_index);
 
-    my $c_param_name = @$c_param_names[$iCParam];
+    my $c_param_name = $$c_param_names[$iCParam];
     my $cpp_param_index = $i;
     $cpp_param_index = $$c_param_name_mappings{$c_param_name} if(defined($$c_param_name_mappings{$c_param_name}));
 
@@ -1285,6 +1301,7 @@ sub convert_args_c_to_cpp($$$)
   # Loop through the C++ parameters:
   my $i;
   my $cpp_param_max = $num_cpp_args;
+  my $num_c_args = scalar(@{$c_param_names});
 
   for ($i = 0; $i < $cpp_param_max; $i++)
   {
@@ -1298,7 +1315,13 @@ sub convert_args_c_to_cpp($$$)
       $cParamName = $cpp_index_param_mappings{$i};
 
       # Get the C index based on the C param name.
-      ++$c_index until $$c_param_names[$c_index] eq $cParamName;
+      ++$c_index until $c_index >= $num_c_args || $$c_param_names[$c_index] eq $cParamName;
+      if ($c_index >= $num_c_args)
+      {
+        Output::error("convert_args_c_to_cpp(): There is no C argument called \"$cParamName\"\n");
+        $objCDefsFunc->dump();
+        return "";
+      }
     }
     else
     {
@@ -1407,6 +1430,21 @@ sub get_ctor_properties($$$$$$)
     return "";
   }
 
+  if ($index == 0)
+  {
+    # Check if the C param names in %$c_param_name_mappings exist.
+    foreach my $mapped_c_param_name (keys %$c_param_name_mappings)
+    {
+      next if $mapped_c_param_name eq "";
+
+      if (!grep($_ eq $mapped_c_param_name, @$c_param_names))
+      {
+        Output::error("get_ctor_properties(): There is no C argument called \"$mapped_c_param_name\"\n");
+        $objCDefsFunc->dump();
+        return ("", "", "");
+      }
+    }
+  }
 
   # Get the desired argument list combination.
   my $possible_arg_list = $$objCppfunc{possible_args_list}[$index];
@@ -1416,7 +1454,7 @@ sub get_ctor_properties($$$$$$)
 
   for ($i = 0; $i < $num_args; $i++)
   {
-    my $c_param_name = @$c_param_names[$i];
+    my $c_param_name = $$c_param_names[$i];
     my $cpp_param_index = $i;
     $cpp_param_index = $$c_param_name_mappings{$c_param_name} if(defined($$c_param_name_mappings{$c_param_name}));
 
