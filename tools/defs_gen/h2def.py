@@ -73,6 +73,8 @@ import sys
 
 import defsparser
 
+from sets import Set
+
 # ------------------ Create typecodes from typenames ---------
 
 _upperstr_pat1 = re.compile(r'([^A-Z])([A-Z])')
@@ -353,6 +355,34 @@ def clean_func(buf):
     pat = re.compile(r"""GSEAL""", re.VERBOSE)
     buf = pat.sub('', buf)
 
+    # remove inline method's body
+    pos = 0
+    start = 0
+    bracket_cnt = 0
+    brackets = re.compile("{|}")
+    while (True):
+        match = brackets.search(buf, pos)
+        if (match == None):
+            break;
+        pos = match.start() + 1
+        if (match.group() == "{"):
+            if (bracket_cnt == 0):
+                start = match.start()
+            bracket_cnt += 1
+        else:
+            if (bracket_cnt == 0): 
+                continue
+            if (bracket_cnt == 1):
+                buf = buf.replace(buf[start:match.start()+1], "\n")
+                pos = start
+            bracket_cnt -= 1
+    buf = re.sub("^\s+", "", buf, flags=re.MULTILINE)
+
+    # remove static and inline keywords
+    buf = re.sub('^\s*static\s+', '', buf, flags = re.MULTILINE)
+    buf = re.sub('^\s*inline\s+', '', buf, flags = re.MULTILINE)
+    buf = re.sub('^\s*static\s+', '', buf, flags = re.MULTILINE) # in case of "inline static" function declaration
+
     return buf
 
 proto_pat=re.compile(r"""
@@ -477,6 +507,7 @@ class DefsWriter:
     def _define_func(self, buf):
         buf = clean_func(buf)
         buf = buf.split('\n')
+        all_functions = Set()
         filter = self._functions
         for p in buf:
             if not p:
@@ -492,6 +523,12 @@ class DefsWriter:
             if filter:
                 if func in filter:
                     continue
+
+            if (func in all_functions):
+                continue
+
+            all_functions.add(func)
+
             ret = m.group('ret')
             args = m.group('args')
             args = arg_split_pat.split(args)
