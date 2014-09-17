@@ -9,6 +9,12 @@
 std::stringstream debug;
 std::ostream& ostr = debug;
 
+#ifdef G_OS_WIN32
+#define TEST_FILE "c:/windows/write.exe"
+#else
+#define TEST_FILE "/etc/fstab"
+#endif
+
 int main(int, char**)
 {
   Glib::init();
@@ -16,7 +22,7 @@ int main(int, char**)
 
   try
   {
-    Glib::RefPtr<Gio::File> file = Gio::File::create_for_path("/etc/fstab");
+    Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(TEST_FILE);
     if(!file)
     {
       std::cerr << "Gio::File::create_for_path() returned an empty RefPtr." << std::endl;
