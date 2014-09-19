@@ -1326,6 +1326,24 @@ public:
   inline const ustring* ptr() const { return &string_; }
 };
 
+/** A template specialization for Stringify<const char[N]> (for string literals),
+ * because the regular template has ambiguous constructor overloads for char*.
+ */
+template <std::size_t N>
+class ustring::Stringify<const char[N]>
+{
+private:
+  const ustring string_;
+
+  // noncopyable
+  Stringify(const ustring::Stringify<const char[N]>&);
+  Stringify<ustring>& operator=(const ustring::Stringify<const char[N]>&);
+
+public:
+  explicit inline Stringify(const char arg[N]) : string_(arg) {}
+  inline const ustring* ptr() const { return &string_; }
+};
+
 template <class T1>
 inline // static
 ustring ustring::compose(const ustring& fmt)
