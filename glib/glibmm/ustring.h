@@ -1327,7 +1327,8 @@ public:
 };
 
 /** A template specialization for Stringify<const char[N]> (for string literals),
- * because the regular template has ambiguous constructor overloads for char*.
+ * because the regular template has ambiguous constructor overloads for char*
+ * on later versions of Visual C++ (2008 and later at least).
  */
 template <std::size_t N>
 class ustring::Stringify<const char[N]>
