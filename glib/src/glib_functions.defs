@@ -357,6 +357,7 @@
   (c-name "GOptionFlags")
   (gtype-id "G_TYPE_OPTION_FLAGS")
   (values
+    '("none" "G_OPTION_FLAG_NONE")
     '("hidden" "G_OPTION_FLAG_HIDDEN")
     '("in-main" "G_OPTION_FLAG_IN_MAIN")
     '("reverse" "G_OPTION_FLAG_REVERSE")
@@ -2381,19 +2382,91 @@
 
 ;; From gbsearcharray.h
 
-(define-function if
-  (c-name "if")
-  (return-type "else")
+(define-function g_bsearch_array_create
+  (c-name "g_bsearch_array_create")
+  (return-type "GBSearchArray*")
   (parameters
-    '("cmp-<" "0")
+    '("const-GBSearchConfig*" "bconfig")
   )
 )
 
-(define-function MIN
-  (c-name "MIN")
-  (return-type "return")
+(define-method get_nth
+  (of-object "GBSearchArray")
+  (c-name "g_bsearch_array_get_nth")
+  (return-type "gpointer")
   (parameters
-    '("barray->n_nodes-+" "1")
+    '("const-GBSearchConfig*" "bconfig")
+    '("guint" "nth")
+  )
+)
+
+(define-method get_index
+  (of-object "GBSearchArray")
+  (c-name "g_bsearch_array_get_index")
+  (return-type "guint")
+  (parameters
+    '("const-GBSearchConfig*" "bconfig")
+    '("gconstpointer" "node_in_array")
+  )
+)
+
+(define-method remove
+  (of-object "GBSearchArray")
+  (c-name "g_bsearch_array_remove")
+  (return-type "GBSearchArray*")
+  (parameters
+    '("const-GBSearchConfig*" "bconfig")
+    '("guint" "index_")
+  )
+)
+
+(define-method grow
+  (of-object "GBSearchArray")
+  (c-name "g_bsearch_array_grow")
+  (return-type "GBSearchArray*")
+  (parameters
+    '("const-GBSearchConfig*" "bconfig")
+    '("guint" "index")
+  )
+)
+
+(define-method insert
+  (of-object "GBSearchArray")
+  (c-name "g_bsearch_array_insert")
+  (return-type "GBSearchArray*")
+  (parameters
+    '("const-GBSearchConfig*" "bconfig")
+    '("gconstpointer" "key_node")
+  )
+)
+
+(define-method replace
+  (of-object "GBSearchArray")
+  (c-name "g_bsearch_array_replace")
+  (return-type "GBSearchArray*")
+  (parameters
+    '("const-GBSearchConfig*" "bconfig")
+    '("gconstpointer" "key_node")
+  )
+)
+
+(define-method free
+  (of-object "GBSearchArray")
+  (c-name "g_bsearch_array_free")
+  (return-type "none")
+  (parameters
+    '("const-GBSearchConfig*" "bconfig")
+  )
+)
+
+(define-method lookup_fuzzy
+  (of-object "GBSearchArray")
+  (c-name "g_bsearch_array_lookup_fuzzy")
+  (return-type "gpointer")
+  (parameters
+    '("const-GBSearchConfig*" "bconfig")
+    '("gconstpointer" "key_node")
+    '("const-guint" "sibling_or_after")
   )
 )
 
@@ -5428,14 +5501,6 @@
   )
 )
 
-(define-function g_io_channel_win32_new_messages
-  (c-name "g_io_channel_win32_new_messages")
-  (return-type "GIOChannel*")
-  (parameters
-    '("guint" "hwnd")
-  )
-)
-
 (define-function g_io_channel_win32_new_fd
   (c-name "g_io_channel_win32_new_fd")
   (return-type "GIOChannel*")
@@ -7627,6 +7692,69 @@
     '("const-char*" "pretty_function")
     '("const-char*" "expression")
   )
+)
+
+(define-function g_error
+  (c-name "g_error")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_critical
+  (c-name "g_critical")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_message
+  (c-name "g_message")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_warning
+  (c-name "g_warning")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_info
+  (c-name "g_info")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_debug
+  (c-name "g_debug")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function g_print
+  (c-name "g_print")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "format")
+  )
+  (varargs #t)
 )
 
 (define-function g_set_print_handler
@@ -10240,15 +10368,6 @@
   )
 )
 
-(define-function g_access
-  (c-name "g_access")
-  (return-type "int")
-  (parameters
-    '("const-gchar*" "filename")
-    '("int" "mode")
-  )
-)
-
 (define-function g_chmod
   (c-name "g_chmod")
   (return-type "int")
@@ -10295,14 +10414,6 @@
   )
 )
 
-(define-function g_chdir
-  (c-name "g_chdir")
-  (return-type "int")
-  (parameters
-    '("const-gchar*" "path")
-  )
-)
-
 (define-function g_stat
   (c-name "g_stat")
   (return-type "int")
@@ -10321,24 +10432,8 @@
   )
 )
 
-(define-function g_unlink
-  (c-name "g_unlink")
-  (return-type "int")
-  (parameters
-    '("const-gchar*" "filename")
-  )
-)
-
 (define-function g_remove
   (c-name "g_remove")
-  (return-type "int")
-  (parameters
-    '("const-gchar*" "filename")
-  )
-)
-
-(define-function g_rmdir
-  (c-name "g_rmdir")
   (return-type "int")
   (parameters
     '("const-gchar*" "filename")
@@ -11202,6 +11297,21 @@
     '("const-gchar*" "reserved_chars_allowed")
     '("gboolean" "allow_utf8")
   )
+)
+
+(define-method append_c_inline
+  (of-object "GString")
+  (c-name "g_string_append_c_inline")
+  (return-type "GString*")
+  (parameters
+    '("gchar" "c")
+  )
+)
+
+(define-method down
+  (of-object "GString")
+  (c-name "g_string_down")
+  (return-type "GString*")
 )
 
 (define-method up
@@ -12339,15 +12449,6 @@
   )
 )
 
-(define-function g_trash_stack_push
-  (c-name "g_trash_stack_push")
-  (return-type "none")
-  (parameters
-    '("GTrashStack**" "stack_p")
-    '("gpointer" "data_p")
-  )
-)
-
 
 
 ;; From gtree.h
@@ -13171,6 +13272,11 @@
 ;; has a function pointer parameter and that is not handled correctly by
 ;; h2def.py.
 
+(define-function g_get_system_config_dirs
+  (c-name "g_get_system_config_dirs")
+  (return-type "const-gchar*-const*")
+)
+
 (define-function g_get_user_runtime_dir
   (c-name "g_get_user_runtime_dir")
   (return-type "const-gchar*")
@@ -13291,15 +13397,6 @@
   (return-type "guint")
   (parameters
     '("gulong" "number")
-  )
-)
-
-(define-function g_bit_nth_lsf
-  (c-name "g_bit_nth_lsf")
-  (return-type "gint")
-  (parameters
-    '("gulong" "mask")
-    '("gint" "nth_bit")
   )
 )
 
@@ -14822,6 +14919,24 @@
 
 
 ;; From valgrind.h
+
+(define-function VALGRIND_PRINTF
+  (c-name "VALGRIND_PRINTF")
+  (return-type "int")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
+
+(define-function VALGRIND_PRINTF_BACKTRACE
+  (c-name "VALGRIND_PRINTF_BACKTRACE")
+  (return-type "int")
+  (parameters
+    '("const-char*" "format")
+  )
+  (varargs #t)
+)
 
 
 
