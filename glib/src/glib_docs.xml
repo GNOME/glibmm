@@ -1232,6 +1232,10 @@ Flags which modify individual options.
 
 </description>
 <parameters>
+<parameter name="G_OPTION_FLAG_NONE">
+<parameter_description> No flags. Since: 2.42.
+</parameter_description>
+</parameter>
 <parameter name="G_OPTION_FLAG_HIDDEN">
 <parameter_description> The option doesn't appear in `--help` output.
 </parameter_description>
@@ -23070,6 +23074,17 @@ the first one found will be returned.
 <description>
 Finds a #GSource given a pair of context and ID.
 
+It is a programmer error to attempt to lookup a non-existent source.
+
+More specifically: source IDs can be reissued after a source has been
+destroyed and therefore it is never valid to use this function with a
+source ID which may have already been removed.  An example is when
+scheduling an idle to run in another thread with g_idle_add(): the
+idle may already have run and been removed by the time this function
+is called on its (now invalid) source ID.  This source ID may have
+been reissued, leading to the operation being performed against the
+wrong source.
+
 
 </description>
 <parameters>
@@ -23082,7 +23097,7 @@ Finds a #GSource given a pair of context and ID.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the #GSource if found, otherwise, %NULL
+<return> the #GSource
 </return>
 </function>
 
@@ -39752,9 +39767,8 @@ mapping from ID to source is done by g_main_context_find_source_by_id().
 
 <function name="g_source_get_name">
 <description>
-Gets a name for the source, used in debugging and profiling.
-The name may be #NULL if it has never been set with
-g_source_set_name().
+Gets a name for the source, used in debugging and profiling.  The
+name may be #NULL if it has never been set with g_source_set_name().
 
 Since: 2.26
 
@@ -39766,6 +39780,7 @@ Since: 2.26
 </parameter>
 </parameters>
 <return> the name of the source
+
 </return>
 </function>
 
@@ -40029,6 +40044,15 @@ See also g_source_destroy(). You must use g_source_destroy() for sources
 added to a non-default main context.
 
 It is a programmer error to attempt to remove a non-existent source.
+
+More specifically: source IDs can be reissued after a source has been
+destroyed and therefore it is never valid to use this function with a
+source ID which may have already been removed.  An example is when
+scheduling an idle to run in another thread with g_idle_add(): the
+idle may already have run and been removed by the time this function
+is called on its (now invalid) source ID.  This source ID may have
+been reissued, leading to the operation being performed against the
+wrong source.
 
 
 </description>
@@ -40317,8 +40341,13 @@ or &quot;GTK+ repaint idle handler&quot; or whatever it is.
 
 It is permitted to call this function multiple times, but is not
 recommended due to the potential performance impact.  For example,
-one could change the name in the &quot;check&quot; function of a #GSourceFuncs 
+one could change the name in the &quot;check&quot; function of a #GSourceFuncs
 to include details like the event type in the source name.
+
+Use caution if changing the name while another thread may be
+accessing it with g_source_get_name(); that function does not copy
+the value, and changing the value will free it while the other thread
+may be attempting to use it.
 
 Since: 2.26
 
@@ -40342,6 +40371,18 @@ Sets the name of a source using its ID.
 
 This is a convenience utility to set source names from the return
 value of g_idle_add(), g_timeout_add(), etc.
+
+It is a programmer error to attempt to set the name of a non-existent
+source.
+
+More specifically: source IDs can be reissued after a source has been
+destroyed and therefore it is never valid to use this function with a
+source ID which may have already been removed.  An example is when
+scheduling an idle to run in another thread with g_idle_add(): the
+idle may already have run and been removed by the time this function
+is called on its (now invalid) source ID.  This source ID may have
+been reissued, leading to the operation being performed against the
+wrong source.
 
 Since: 2.26
 
@@ -45619,11 +45660,16 @@ immediately and they will run exclusively for this thread pool
 until it is destroyed by g_thread_pool_free(). If @exclusive is
 %FALSE, threads are created when needed and shared between all
 non-exclusive thread pools. This implies that @max_threads may
-not be -1 for exclusive thread pools.
+not be -1 for exclusive thread pools. Besides, exclusive thread
+pools are not affected by g_thread_pool_set_max_idle_time()
+since their threads are never considered idle and returned to the
+global pool.
 
 @error can be %NULL to ignore errors, or non-%NULL to report
 errors. An error can only occur when @exclusive is set to %TRUE
 and not all @max_threads threads could be created.
+See #GThreadError for possible errors that may occurr.
+Note, even in case of error a valid #GThreadPool is returned.
 
 
 </description>

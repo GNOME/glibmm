@@ -1509,11 +1509,6 @@ from the @arg_data of an installed #GOptionEntrys) in order to
 decide to perform certain actions, including direct local handling
 (which may be useful for options like --version).
 
-If the options have been &quot;handled&quot; then a non-negative value should
-be returned.   In this case, the return value is the exit status: 0
-for success and a positive value for failure.  -1 means to continue
-normal processing.
-
 In the event that the application is marked
 %G_APPLICATION_HANDLES_COMMAND_LINE the &quot;normal processing&quot; will
 send the @option dictionary to the primary instance where it can be
@@ -1557,7 +1552,12 @@ Since: 2.40
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> an exit code. If you have handled your options and want
+to exit the process, return a non-negative option, 0 for success,
+and a positive value for failure. To continue, return -1 to let
+the default option processing continue.
+
+</return>
 </signal>
 
 <signal name="GApplication::open">
@@ -33333,7 +33333,10 @@ Since: 2.42
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a list of #GDesktopAppInfo
+objects.
+
+</return>
 </function>
 
 <function name="g_desktop_app_info_get_is_hidden">
