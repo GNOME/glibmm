@@ -457,18 +457,24 @@ sub on_namespace($)
 sub on_ignore($)
 {
   my ($self) = @_;
+  my $objOutputter = $$self{objOutputter};
   my $str = $self->extract_bracketed_text();
   my @args = split(/\s+|,/,$str);
   foreach (@args)
   {
     next if ($_ eq "");
-    GtkDefs::lookup_function($_); #Pretend that we've used it.
+    my $objCfunc = GtkDefs::lookup_function($_); #Pretend that we've used it.
+    if(!$objCfunc)
+    {
+      $objOutputter->output_wrap_failed($_, "ignored method defs lookup failed");
+    }
   }
 }
 
 sub on_ignore_signal($)
 {
   my ($self) = @_;
+  my $objOutputter = $$self{objOutputter};
   my $str = $self->extract_bracketed_text();
   $str = string_trim($str);
   $str = string_unquote($str);
@@ -476,7 +482,11 @@ sub on_ignore_signal($)
   foreach (@args)
   {
     next if ($_ eq "");
-    GtkDefs::lookup_signal($$self{c_class}, $_); #Pretend that we've used it.
+    my $objCsignal = GtkDefs::lookup_signal($$self{c_class}, $_); #Pretend that we've used it.
+    if(!$objCsignal)
+    {
+      $objOutputter->output_wrap_failed($_, "ignored signal defs lookup failed");
+    }
   }
 }
 
