@@ -137,6 +137,36 @@ private:
  * A property can be used only as direct data member of a type, inheriting from
  * Glib::Object. A reference to the object must be passed to the constructor of
  * the property.
+ *
+ * You may register new properties for your class (actually for the underlying GType)
+ * simply by adding a Property instance as a class member.
+ * However, your constructor must call the Glib::ObjectBase constructor with a new GType name,
+ * in order to register a new GType.
+ *
+ * Example:
+ * @code
+ * class MyCellRenderer : public Gtk::CellRenderer
+ * {
+ * public:
+ *   MyCellRenderer()
+ *   :
+ *   Glib::ObjectBase (typeid(MyCellRenderer)),
+ *   Gtk::CellRenderer(),
+ *   property_mybool  (*this, "mybool", true),
+ *   property_myint_  (*this, "myint",    42)
+ *   {}
+ *
+ *   virtual ~MyCellRenderer() {}
+ *
+ *   // Glib::Property<> can be public,
+ *   Glib::Property<bool> property_mybool;
+ *   // or private, and combined with Glib::PropertyProxy<>.
+ *   Glib::PropertyProxy<int> property_myint() { return property_myint_.get_proxy(); }
+ *
+ * private:
+ *   Glib::Property<int> property_myint_;
+ * };
+ * @endcode
  */
 template <class T>
 class Property : public PropertyBase
@@ -146,7 +176,7 @@ public:
   typedef Glib::Value<T> ValueType;
 
   /**  Constructs a property of the @a object with the specified @a name.
-   * For each instance of the object, the same property must be constructed with the same name
+   * For each instance of the object, the same property must be constructed with the same name.
    */
   Property(Glib::Object& object, const Glib::ustring& name);
 

@@ -38,11 +38,6 @@ namespace Glib
  * @endcode
  *
  * You may also receive notification when a property's value changes, by connecting to signal_changed().
- *
- * You may register new properties for your class (actually for the underlying GType)
- * simply by adding a PropertyProxy instance as a class member.
- * However, your constructor must call the Glib::ObjectBase constructor with a new GType name,
- * in order to register a new GType.
  */
 template <class T>
 class PropertyProxy : public PropertyProxy_Base
