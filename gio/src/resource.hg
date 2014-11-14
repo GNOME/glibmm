@@ -1,5 +1,3 @@
-// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-
 /* Copyright (C) 2012 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -18,8 +16,18 @@
  */
 
 #include <glibmm/error.h>
+#include <glibmm/refptr.h>
+#include <glibmm/bytes.h>
+#include <glibmm/ustring.h>
+#include <giomm/inputstream.h>
+#include <vector>
+#include <string>
 
 _DEFS(giomm,gio)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GResource GResource;
+#endif
 
 namespace Gio
 {
@@ -27,5 +35,179 @@ namespace Gio
 /** Exception class for resource file handling errors.
  */
 _WRAP_GERROR(ResourceError, GResourceError, G_RESOURCE_ERROR, NO_GTYPE)
+
+_WRAP_ENUM(ResourceFlags, GResourceFlags)
+_WRAP_ENUM(ResourceLookupFlags, GResourceLookupFlags)
+
+/** Resource framework.
+ *
+ * Applications and libraries often contain binary or textual data that is
+ * really part of the application, rather than user data. For instance
+ * Gtk::Builder .ui files, splashscreen images, Gio::Menu markup xml, CSS files,
+ * icons, etc. These are often shipped as files in `$datadir/appname`, or
+ * manually included as literal strings in the code.
+ *
+ * The Gio::Resource API and the <tt>glib-compile-resources</tt> program
+ * provide a convenient and efficient alternative to this which has some nice properties. You
+ * maintain the files as normal files, so its easy to edit them, but during the build the files
+ * are combined into a binary bundle that is linked into the executable. This means that loading
+ * the resource files is efficient (as they are already in memory, shared with other instances) and
+ * simple (no need to check for things like I/O errors or locate the files in the filesystem). It
+ * also makes it easier to create relocatable applications.
+ *
+ * Resource files can also be marked as compressed. Such files will be included in the resource bundle
+ * in a compressed form, but will be automatically uncompressed when the resource is used. This
+ * is very useful e.g. for larger text files that are parsed once (or rarely) and then thrown away.
+ *
+ * Resource files can also be marked to be preprocessed, by setting the value of the
+ * `preprocess` attribute to a comma-separated list of preprocessing options.
+ * The only options currently supported are:
+ *
+ * <dl>
+ * <dt>xml-stripblanks</dt>
+ *   <dd>which will use the <tt>xmllint</tt> command
+ *   to strip ignorable whitespace from the xml file. For this to work,
+ *   the `XMLLINT` environment variable must be set to the full path to
+ *   the <tt>xmllint</tt> executable, or <tt>xmllint</tt> must be in the `PATH`; otherwise
+ *   the preprocessing step is skipped.</dd>
+ *
+ * <dt>to-pixdata</dt>
+ *   <dd>which will use the <tt>gdk-pixbuf-pixdata</tt> command to convert
+ *   images to the GdkPixdata format, which allows you to create pixbufs directly using the data inside
+ *   the resource file, rather than an (uncompressed) copy of it. For this, the <tt>gdk-pixbuf-pixdata</tt>
+ *   program must be in the PATH, or the `GDK_PIXBUF_PIXDATA` environment variable must be
+ *   set to the full path to the <tt>gdk-pixbuf-pixdata</tt> executable; otherwise the resource compiler will
+ *   abort.</dd>
+ * </dl>
+ *
+ * Resource bundles are created by the <tt>glib-compile-resources</tt> program
+ * which takes an xml file that describes the bundle, and a set of files that the xml references. These
+ * are combined into a binary resource bundle.
+ *
+ * An example resource description:
+ * @code
+ * <?xml version="1.0" encoding="UTF-8"?>
+ * <gresources>
+ *   <gresource prefix="/org/gtk/Example">
+ *     <file>data/splashscreen.png</file>
+ *     <file compressed="true">dialog.ui</file>
+ *     <file preprocess="xml-stripblanks">menumarkup.xml</file>
+ *   </gresource>
+ * </gresources>
+ * @endcode
+ *
+ * This will create a resource bundle with the following files:
+ * @code
+ * /org/gtk/Example/data/splashscreen.png
+ * /org/gtk/Example/dialog.ui
+ * /org/gtk/Example/menumarkup.xml
+ * @endcode
+ *
+ * Note that all resources in the process share the same namespace, so use java-style
+ * path prefixes (like in the above example) to avoid conflicts.
+ *
+ * You can then use <tt>glib-compile-resources</tt> to compile the xml to a binary bundle
+ * that you can load with Gio::Resource::create_from_file(). However, its more common to use the --generate-source and
+ * --generate-header arguments to create a source file and header to link directly into your application.
+ *
+ * Once a Gio::Resource has been created and registered all the data in it can be accessed globally in the process by
+ * using API calls like Gio::Resource::open_stream_from_global_resources() to stream the data
+ * or Gio::Resource::lookup_data_in_global_resources() to get a direct pointer
+ * to the data. You can also use uris like "resource:///org/gtk/Example/data/splashscreen.png" with Gio::File to access
+ * the resource data.
+ *
+ * There are two forms of the generated source, the default version uses the compiler support for constructor
+ * and destructor functions (where available) to automatically create and register the Gio::Resource on startup
+ * or library load time. If you pass --manual-register, two functions to register/unregister the resource is instead
+ * created. This requires an explicit initialization call in your application/library, but it works on all platforms,
+ * even on the minor ones where this is not available. (Constructor support is available for at least Win32, MacOS and Linux.)
+ *
+ * Note that resource data can point directly into the data segment of e.g. a library, so if you are unloading libraries
+ * during runtime you need to be very careful with keeping around pointers to data from a resource, as this goes away
+ * when the library is unloaded. However, in practice this is not generally a problem, since most resource accesses
+ * is for your own resources, and resource data is often used once, during parsing, and then released.
+ *
+ * @newin{2,44}
+ */
+class Resource
+{
+  _CLASS_OPAQUE_REFCOUNTED(Resource, GResource, NONE, g_resource_ref, g_resource_unref)
+  _IGNORE(g_resource_ref, g_resource_unref)
+
+public:
+  _WRAP_METHOD(static Glib::RefPtr<Resource> create_from_data(const Glib::RefPtr<const Glib::Bytes>& data), g_resource_new_from_data, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Resource> create_from_file(const std::string& filename), g_resource_load, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<InputStream> open_stream(const Glib::ustring& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_open_stream, errthrow)
+  _WRAP_METHOD(Glib::RefPtr<const Glib::Bytes> lookup_data(const Glib::ustring& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_lookup_data, errthrow)
+
+#m4 _CONVERSION(`char**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> enumerate_children(const Glib::ustring& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_enumerate_children, errthrow)
+
+  /** Looks for a file at the specified @a path in the resource and
+   * if found returns information about it.
+   * 
+   * @a lookup_flags controls the behaviour of the lookup.
+   * 
+   * @newin{2,44}
+   * 
+   * @param path A pathname inside the resource.
+   * @param[out] size A location to place the length of the contents of the file.
+   * @param[out] flags A location to place the flags about the file.
+   * @param lookup_flags A ResourceLookupFlags.
+   * @throw Gio::ResourceError if the file was not found.
+   */
+  void get_info(const Glib::ustring& path, gsize& size, ResourceFlags& flags, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const;
+  _IGNORE(g_resource_get_info)
+
+  /** Looks for a file at the specified @a path in the resource.
+   * 
+   * @a lookup_flags controls the behaviour of the lookup.
+   * 
+   * @newin{2,44}
+   * 
+   * @param path A pathname inside the resource.
+   * @param lookup_flags A ResourceLookupFlags.
+   * @throw Gio::ResourceError if the file was not found.
+   */
+  void get_info(const Glib::ustring& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const;
+
+  // 'register' is a keyword. Can't be the name of a method.
+  _WRAP_METHOD(void register_global(), g_resources_register)
+  _WRAP_METHOD(void unregister_global(), g_resources_unregister)
+  _WRAP_METHOD(static Glib::RefPtr<InputStream> open_stream_global(const Glib::ustring& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_open_stream, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<const Glib::Bytes> lookup_data_global(const Glib::ustring& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_lookup_data, errthrow)
+  _WRAP_METHOD(static std::vector<Glib::ustring> enumerate_children_global(const Glib::ustring& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_enumerate_children, errthrow)
+
+  /** Looks for a file at the specified @a path in the set of
+   * globally registered resources and if found returns information about it.
+   * 
+   * @a lookup_flags controls the behaviour of the lookup.
+   * 
+   * @newin{2,44}
+   * 
+   * @param path A pathname inside the resource.
+   * @param[out] size A location to place the length of the contents of the file.
+   * @param[out] flags A location to place the flags about the file.
+   * @param lookup_flags A ResourceLookupFlags.
+   * @throw Gio::ResourceError if the file was not found.
+   */
+  static void get_info_global(const Glib::ustring& path, gsize& size, ResourceFlags& flags, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE);
+  _IGNORE(g_resources_get_info)
+
+  /** Looks for a file at the specified @a path in the set of
+   * globally registered resources.
+   * 
+   * @a lookup_flags controls the behaviour of the lookup.
+   * 
+   * @newin{2,44}
+   * 
+   * @param path A pathname inside the resource.
+   * @param lookup_flags A ResourceLookupFlags.
+   * @throw Gio::ResourceError if the file was not found.
+   */
+  static void get_info_global(const Glib::ustring& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE);
+
+  _IGNORE(g_static_resource_init, g_static_resource_fini, g_static_resource_get_resource)dnl//Used only by the glib-compile-resources command
+};
 
 } // namespace Gio

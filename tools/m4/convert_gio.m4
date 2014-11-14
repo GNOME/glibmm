@@ -35,6 +35,8 @@ _CONV_ENUM(G,MountUnmountFlags)
 _CONV_ENUM(G,OutputStreamSpliceFlags)
 _CONV_ENUM(G,PasswordSave)
 _CONV_ENUM(G,ResolverRecordType)
+_CONV_ENUM(G,ResourceFlags)
+_CONV_ENUM(G,ResourceLookupFlags)
 _CONV_ENUM(G,SettingsBindFlags)
 _CONV_ENUM(G,SocketClientEvent)
 _CONV_ENUM(G,SocketFamily)
@@ -251,6 +253,9 @@ _CONVERSION(`GProxyResolver*',`Glib::RefPtr<ProxyResolver>',`Glib::wrap($3)')
 _CONVERSION(`GProxy*',`Glib::RefPtr<Proxy>',`Glib::wrap($3)')
 
 _CONVERSION(`const Glib::RefPtr<const ProxyAddress>&',`GProxyAddress*',__CONVERT_CONST_REFPTR_TO_P)
+
+#Resource
+_CONVERSION(`GResource*',`Glib::RefPtr<Resource>',`Glib::wrap($3)')
 
 #Settings
 _CONVERSION(`GSettings*',`Glib::RefPtr<Settings>',`Glib::wrap($3)')
