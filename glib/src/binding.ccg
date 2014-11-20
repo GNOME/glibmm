@@ -1,0 +1,148 @@
+/* Copyright (C) 2014 The glibmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/binding.h>
+#include <glib.h>
+
+namespace
+{
+struct BindingTransformSlots
+{
+  BindingTransformSlots(
+    const Glib::Binding::BindingTransformSlot& transform_to,
+    const Glib::Binding::BindingTransformSlot& transform_from)
+  :
+  from_source_to_target(transform_to), from_target_to_source(transform_from)
+  {}
+
+  Glib::Binding::BindingTransformSlot from_source_to_target;
+  Glib::Binding::BindingTransformSlot from_target_to_source;
+};
+
+gboolean Binding_transform_callback_common(GBinding* binding,
+  const GValue* from_value, GValue* to_value,
+  Glib::Binding::BindingTransformSlot& the_slot)
+{
+  bool result = false;
+  try
+  {
+    Glib::RefPtr<Glib::Binding> cpp_binding = Glib::wrap(binding, true);
+    result = the_slot(cpp_binding, from_value, to_value);
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return result;
+}
+
+gboolean Binding_transform_to_callback(GBinding* binding,
+  const GValue* from_value, GValue* to_value, gpointer user_data)
+{
+  Glib::Binding::BindingTransformSlot& the_slot =
+    static_cast<BindingTransformSlots*>(user_data)->from_source_to_target;
+
+  return Binding_transform_callback_common(binding, from_value, to_value, the_slot);
+}
+
+gboolean Binding_transform_from_callback(GBinding* binding,
+  const GValue* from_value, GValue* to_value, gpointer user_data)
+{
+  Glib::Binding::BindingTransformSlot& the_slot =
+    static_cast<BindingTransformSlots*>(user_data)->from_target_to_source;
+
+  return Binding_transform_callback_common(binding, from_value, to_value, the_slot);
+}
+
+void Binding_transform_callback_destroy(gpointer user_data)
+{
+  delete static_cast<BindingTransformSlots*>(user_data);
+}
+
+} // anonymous namespace
+
+namespace Glib
+{
+//static
+Glib::RefPtr<Binding> Binding::bind_property_value(
+  const PropertyProxy_Base& source_property,
+  const PropertyProxy_Base& target_property,
+  BindingFlags flags,
+  const BindingTransformSlot& transform_to,
+  const BindingTransformSlot& transform_from)
+{
+  GBinding* binding = 0;
+  if (transform_to.empty() && transform_from.empty())
+  {
+    // No user-supplied transformations.
+    binding = g_object_bind_property(
+      source_property.get_object()->gobj(), source_property.get_name(),
+      target_property.get_object()->gobj(), target_property.get_name(),
+      (GBindingFlags)flags);
+  }
+  else
+  {
+    // Create copies of the slots. A pointer to this will be passed
+    // through the callback's data parameter. It will be deleted
+    // when Binding_transform_callback_destroy() is called.
+    BindingTransformSlots* slots_copy = new BindingTransformSlots(transform_to, transform_from);
+
+    binding = g_object_bind_property_full(
+      source_property.get_object()->gobj(), source_property.get_name(),
+      target_property.get_object()->gobj(), target_property.get_name(),
+      (GBindingFlags)flags,
+      transform_to.empty() ? 0 : &Binding_transform_to_callback,
+      transform_from.empty() ? 0 : &Binding_transform_from_callback,
+      slots_copy, &Binding_transform_callback_destroy);
+  }
+
+  if (!binding)
+    return Glib::RefPtr<Binding>();
+
+  // Take an extra ref. GBinding uses one ref itself, and drops it if
+  // either the source object or the target object is finalized.
+  // The GBinding object must not be destroyed while there are RefPtrs around.
+  g_object_ref(binding);
+  return Glib::RefPtr<Binding>(new Binding(binding));
+}
+
+void Binding::unbind()
+{
+  // Call g_binding_unbind() only once. It always calls g_object_unref().
+  if (g_binding_get_source(gobj()))
+    g_binding_unbind(gobj());
+}
+
+// Override unreference() from ObjectBase.
+//
+// Why is this necessary? Because GBinding is an unusual kind of GObject.
+// It calls g_object_unref() itself, if either the source object or the
+// target object is finalized, almost like g_binding_unbind().
+// But the GBinding object shall be destroyed when and only when the last
+// reference from a Glib::RefPtr is dropped.
+void Binding::unreference() const
+{
+  GBinding* const binding = const_cast<GBinding*>(gobj());
+
+  // If the last Glib::RefPtr is being deleted, and the binding has not been unbound,
+  // then drop the extra reference that was added by bind_property_value().
+  if (gobject_->ref_count == 2 && g_binding_get_source(binding))
+    g_object_unref(binding);
+
+  Object::unreference();
+}
+
+} // namespace Glib

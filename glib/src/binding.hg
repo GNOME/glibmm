@@ -1,0 +1,423 @@
+/* Copyright (C) 2014 The glibmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <glibmm/refptr.h>
+#include <glibmm/ustring.h>
+#include <glibmm/value.h>
+
+_DEFS(glibmm,glib)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Glib
+{
+_WRAP_ENUM(BindingFlags, GBindingFlags)
+
+/** Bind two object properties.
+ *
+ * Glib::Binding is the representation of a binding between a property on a
+ * Glib::ObjectBase instance (or source) and another property on another Glib::ObjectBase
+ * instance (or target). Whenever the source property changes, the same
+ * value is applied to the target property; for instance, the following binding:
+ *
+ * @code
+ * Glib::Binding::bind_property(object1->property_a(), object2->property_b());
+ * @endcode
+ *
+ * will cause property_b() of @a object2 to be updated
+ * every time the value of property_a() of @a object1 changes.
+ *
+ * It is possible to create a bidirectional binding between two properties
+ * of two Glib::ObjectBase instances, so that if either property changes, the
+ * other is updated as well, for instance:
+ *
+ * @code
+ * Glib::Binding::bind_property(object1->property_a(), object2->property_b(),
+ *   Glib::BINDING_BIDIRECTIONAL);
+ * @endcode
+ *
+ * will keep the two properties in sync.
+ *
+ * It is also possible to set a custom transformation function (in both
+ * directions, in case of a bidirectional binding) to apply a custom
+ * transformation from the source value to the target value before
+ * applying it; for instance, the following binding:
+ *
+ * @code
+ * bool celsius_to_fahrenheit(const Glib::RefPtr<Glib::Binding>& binding,
+ *                            const double& celsius, double& fahrenheit);
+ * bool fahrenheit_to_celsius(const Glib::RefPtr<Glib::Binding>& binding,
+ *                            const double& fahrenheit, double& celsius);
+ * Glib::Binding::bind_property(adjustment1->property_value(),
+ *   adjustment2->property_value(), Glib::BINDING_BIDIRECTIONAL,
+ *   sigc::ptr_fun(celsius_to_fahrenheit), sigc::ptr_fun(fahrenheit_to_celsius));
+ * @endcode
+ *
+ * will keep property_value() of the two adjustments in sync; the
+ * celsius_to_fahrenheit() function will be called whenever
+ * property_value() of @a adjustment1 changes and will transform the current value
+ * of the property before applying it to property_value() of @a adjustment2.
+ *
+ * Vice versa, the fahrenheit_to_celsius() function will be called whenever
+ * property_value() of @a adjustment2 changes, and will transform the
+ * current value of the property before applying it to property_value()
+ * of @a adjustment1.
+ *
+ * Note that Glib::Binding does not resolve cycles by itself; a cycle like
+ *
+ * @code
+ *   object1->property_A() -> object2->property_B()
+ *   object2->property_B() -> object3->property_C()
+ *   object3->property_C() -> object1->property_A()
+ * @endcode
+ *
+ * might lead to an infinite loop. The loop, in this particular case,
+ * can be avoided if the objects emit the GObject::notify signal only
+ * if the value has effectively been changed. A binding is implemented
+ * using the GObject::notify signal, so it is susceptible to all the
+ * various ways of blocking a signal emission, like Glib::SignalProxyNormal::emission_stop()
+ * or g_signal_handler_block().
+ *
+ * A binding will be severed, and the resources it allocates freed, whenever
+ * either one of the Glib::ObjectBase instances it refers to is deleted,
+ * when unbind() is called, or when the Glib::Binding instance loses
+ * its last reference.
+ *
+ * @newin{2,44}
+ */
+class Binding : public Glib::Object
+{
+  _CLASS_GOBJECT(Binding, GBinding, G_BINDING, Glib::Object, GObject)
+
+public:
+  /** For instance,<br>
+   *   bool on_transform_to(const Glib::RefPtr<Binding>& binding, const GValue* from_value, GValue* to_value);
+   *
+   * @return <tt>true</tt> if the transformation was successful, and <tt>false</tt> otherwise.
+   */
+  typedef sigc::slot<bool, const Glib::RefPtr<Binding>&, const GValue*, GValue*> BindingTransformSlot;
+
+  /** Creates a binding between @a source_property and @a target_property,
+   * allowing you to set the transformation functions to be used by the binding.
+   *
+   * If @a flags contains Glib::BINDING_BIDIRECTIONAL then the binding will be mutual:
+   * if @a target_property changes then the @a source_property
+   * will be updated as well. The @a transform_from function is only used in case
+   * of bidirectional bindings, otherwise it will be ignored.
+   *
+   * The binding will automatically be removed when either the source or the
+   * target instance is deleted. To remove the binding without affecting the
+   * source and the target you can call unbind() on the returned Binding instance.
+   *
+   * A Glib::ObjectBase instance can have multiple bindings.
+   *
+   * If you supply transformation functions, it is usually easier to use one of the
+   * bind_property() overloads, to avoid the use of GValue in the transformation functions.
+   *
+   * @param source_property The source property to bind.
+   * @param target_property The target property to bind.
+   * @param flags Flags to pass to Binding.
+   * @param transform_to The transformation function from the source to the target,
+   *        or an empty slot to use the default.
+   * @param transform_from The transformation function from the target to the source,
+   *        or an empty slot to use the default.
+   * @return The Binding instance representing the binding between the two
+   *         Glib::ObjectBase instances, or <tt>0</tt> in case of error.
+   *
+   * @newin{2,44}
+   */
+  static Glib::RefPtr<Binding> bind_property_value(
+    const PropertyProxy_Base& source_property,
+    const PropertyProxy_Base& target_property,
+    BindingFlags flags = BINDING_DEFAULT,
+    const BindingTransformSlot& transform_to = BindingTransformSlot(),
+    const BindingTransformSlot& transform_from = BindingTransformSlot());
+
+  _IGNORE(g_object_bind_property, g_object_bind_property_full, g_object_bind_property_with_closures)
+
+  /** Creates a binding between @a source_property and @a target_property.
+   *
+   * @param source_property The source property to bind.
+   * @param target_property The target property to bind.
+   * @param flags Flags to pass to Binding.
+   * @return The Binding instance representing the binding between the two
+   *         Glib::ObjectBase instances, or <tt>0</tt> in case of error.
+   *
+   * @see bind_property_value()
+   *
+   * @newin{2,44}
+   */
+  static Glib::RefPtr<Binding> bind_property(
+    const PropertyProxy_Base& source_property,
+    const PropertyProxy_Base& target_property,
+    BindingFlags flags = BINDING_DEFAULT)
+  {
+    return bind_property_value(source_property, target_property, flags);
+  }
+
+  /** Creates a binding between @a source_property and @a target_property,
+   * allowing you to set a transformation function to be used by the binding.
+   *
+   * @param source_property The source property to bind.
+   * @param target_property The target property to bind.
+   * @param flags Flags to pass to Binding.
+   * @param transform_to The transformation function from the source to the target,
+   *        or an empty slot to use the default.
+   * @return The Binding instance representing the binding between the two
+   *         Glib::ObjectBase instances, or <tt>0</tt> in case of error.
+   *
+   * @tparam T_source Type of the source property. Must be a type that can be
+   *         stored in a Glib::Value<T_source> object.
+   * @tparam T_target Type of the target property. Must be a type that can be
+   *         stored in a Glib::Value<T_target> object.
+   * @tparam T_functor_to Type of functor that translates from the source to the target.
+   *         Must be convertible to<br>
+   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *
+   * @see bind_property_value()
+   *
+   * @newin{2,44}
+   */
+  template <typename T_source, typename T_target, typename T_functor_to>
+  static Glib::RefPtr<Binding> bind_property(
+    const PropertyProxy<T_source>& source_property,
+    const PropertyProxy<T_target>& target_property,
+    BindingFlags flags,
+    const T_functor_to& transform_to)
+  {
+    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+
+    return bind_property_value(source_property, target_property, flags,
+      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to));
+  }
+
+  /** Creates a binding between @a source_property and @a target_property,
+   * allowing you to set a transformation function to be used by the binding.
+   *
+   * @param source_property The source property to bind.
+   * @param target_property The target property to bind.
+   * @param flags Flags to pass to Binding.
+   * @param transform_to The transformation function from the source to the target,
+   *        or an empty slot to use the default.
+   * @return The Binding instance representing the binding between the two
+   *         Glib::ObjectBase instances, or <tt>0</tt> in case of error.
+   *
+   * @tparam T_source Type of the source property. Must be a type that can be
+   *         stored in a Glib::Value<T_source> object.
+   * @tparam T_target Type of the target property. Must be a type that can be
+   *         stored in a Glib::Value<T_target> object.
+   * @tparam T_functor_to Type of functor that translates from the source to the target.
+   *         Must be convertible to<br>
+   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *
+   * @see bind_property_value()
+   *
+   * @newin{2,44}
+   */
+  template <typename T_source, typename T_target, typename T_functor_to>
+  static Glib::RefPtr<Binding> bind_property(
+    const PropertyProxy<T_source>& source_property,
+    const PropertyProxy_WriteOnly<T_target>& target_property,
+    BindingFlags flags,
+    const T_functor_to& transform_to)
+  {
+    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+
+    return bind_property_value(source_property, target_property, flags,
+      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to));
+  }
+
+  /** Creates a binding between @a source_property and @a target_property,
+   * allowing you to set a transformation function to be used by the binding.
+   *
+   * @param source_property The source property to bind.
+   * @param target_property The target property to bind.
+   * @param flags Flags to pass to Binding.
+   * @param transform_to The transformation function from the source to the target,
+   *        or an empty slot to use the default.
+   * @return The Binding instance representing the binding between the two
+   *         Glib::ObjectBase instances, or <tt>0</tt> in case of error.
+   *
+   * @tparam T_source Type of the source property. Must be a type that can be
+   *         stored in a Glib::Value<T_source> object.
+   * @tparam T_target Type of the target property. Must be a type that can be
+   *         stored in a Glib::Value<T_target> object.
+   * @tparam T_functor_to Type of functor that translates from the source to the target.
+   *         Must be convertible to<br>
+   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *
+   * @see bind_property_value()
+   *
+   * @newin{2,44}
+   */
+  template <typename T_source, typename T_target, typename T_functor_to>
+  static Glib::RefPtr<Binding> bind_property(
+    const PropertyProxy_ReadOnly<T_source>& source_property,
+    const PropertyProxy<T_target>& target_property,
+    BindingFlags flags,
+    const T_functor_to& transform_to)
+  {
+    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+
+    return bind_property_value(source_property, target_property, flags,
+      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to));
+  }
+
+  /** Creates a binding between @a source_property and @a target_property,
+   * allowing you to set a transformation function to be used by the binding.
+   *
+   * @param source_property The source property to bind.
+   * @param target_property The target property to bind.
+   * @param flags Flags to pass to Binding.
+   * @param transform_to The transformation function from the source to the target,
+   *        or an empty slot to use the default.
+   * @return The Binding instance representing the binding between the two
+   *         Glib::ObjectBase instances, or <tt>0</tt> in case of error.
+   *
+   * @tparam T_source Type of the source property. Must be a type that can be
+   *         stored in a Glib::Value<T_source> object.
+   * @tparam T_target Type of the target property. Must be a type that can be
+   *         stored in a Glib::Value<T_target> object.
+   * @tparam T_functor_to Type of functor that translates from the source to the target.
+   *         Must be convertible to<br>
+   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *
+   * @see bind_property_value()
+   *
+   * @newin{2,44}
+   */
+  template <typename T_source, typename T_target, typename T_functor_to>
+  static Glib::RefPtr<Binding> bind_property(
+    const PropertyProxy_ReadOnly<T_source>& source_property,
+    const PropertyProxy_WriteOnly<T_target>& target_property,
+    BindingFlags flags,
+    const T_functor_to& transform_to)
+  {
+    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+
+    return bind_property_value(source_property, target_property, flags,
+      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to));
+  }
+
+  /** Creates a binding between @a source_property and @a target_property,
+   * allowing you to set the transformation functions to be used by the binding.
+   *
+   * @param source_property The source property to bind.
+   * @param target_property The target property to bind.
+   * @param flags Flags to pass to Binding.
+   * @param transform_to The transformation function from the source to the target,
+   *        or an empty slot to use the default.
+   * @param transform_from The transformation function from the target to the source,
+   *        or an empty slot to use the default.
+   * @return The Binding instance representing the binding between the two
+   *         Glib::ObjectBase instances, or <tt>0</tt> in case of error.
+   *
+   * @tparam T_source Type of the source property. Must be a type that can be
+   *         stored in a Glib::Value<T_source> object.
+   * @tparam T_target Type of the target property. Must be a type that can be
+   *         stored in a Glib::Value<T_target> object.
+   * @tparam T_functor_to Type of functor that translates from the source to the target.
+   *         Must be convertible to<br>
+   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   * @tparam T_functor_from Type of functor that translates from the target to the source.
+   *         Must be convertible to<br>
+   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_target&, T_source&>.
+   *
+   * @see bind_property_value()
+   *
+   * @newin{2,44}
+   */
+  template <typename T_source, typename T_target, typename T_functor_to, typename T_functor_from>
+  static Glib::RefPtr<Binding> bind_property(
+    const PropertyProxy<T_source>& source_property,
+    const PropertyProxy<T_target>& target_property,
+    BindingFlags flags,
+    const T_functor_to& transform_to,
+    const T_functor_from& transform_from)
+  {
+    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_target&, T_source&> slot_transform_from = transform_from;
+
+    return bind_property_value(source_property, target_property, flags,
+      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to),
+      slot_transform_from.empty() ? BindingTransformSlot() : TransformProp<T_target, T_source>(slot_transform_from));
+  }
+
+  _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_source(), g_binding_get_source, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_source() const, g_binding_get_source, refreturn, constversion)
+  _WRAP_METHOD(Glib::ustring get_source_property() const, g_binding_get_source_property)
+  _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_target(), g_binding_get_target, refreturn)
+  _WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_target() const, g_binding_get_target, refreturn, constversion)
+  _WRAP_METHOD(Glib::ustring get_target_property() const, g_binding_get_target_property)
+  _WRAP_METHOD(BindingFlags get_flags() const, g_binding_get_flags)
+
+  /** Explicitly releases the binding between the source and the target
+   * property expressed by this Binding instance.
+   *
+   * The binding is also released if either the source object or the target
+   * object is deleted, or this Binding instance loses its last reference,
+   * i.e. there is no more Glib::RefPtr that holds a pointer to it.
+   *
+   * @newin{2,44}
+   */
+  void unbind();
+  _IGNORE(g_binding_unbind)
+
+  _WRAP_PROPERTY("flags", Glib::BindingFlags)
+  _WRAP_PROPERTY("source", Glib::RefPtr<Glib::ObjectBase>)
+  _WRAP_PROPERTY("source-property", Glib::ustring)
+  _WRAP_PROPERTY("target", Glib::RefPtr<Glib::ObjectBase>)
+  _WRAP_PROPERTY("target-property", Glib::ustring)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  /** Decrement the reference count for this object.
+   * You should never need to do this manually - use the object via a RefPtr instead.
+   */
+  virtual void unreference() const;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+private:
+  // The functor TransformProp can be implicitly converted to a BindingTransformSlot
+  // and used in a call to bind_property_value().
+  template <typename T_from, typename T_to>
+  class TransformProp : public sigc::functor_base
+  {
+  public:
+    typedef bool result_type;
+    typedef sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_from&, T_to&> TypedBindingTransformSlot;
+
+    TransformProp(const TypedBindingTransformSlot& slot) : typed_transform(slot) {}
+
+    bool operator()(const Glib::RefPtr<Binding>& binding, const GValue* from_value, GValue* to_value)
+    {
+      Glib::Value<T_from> from_glib_value;
+      from_glib_value.init(from_value);
+      Glib::Value<T_to> to_glib_value;
+      to_glib_value.init(to_value);
+      T_to to = to_glib_value.get();
+
+      const bool result = typed_transform(binding, from_glib_value.get(), to);
+      to_glib_value.set(to);
+      g_value_copy(to_glib_value.gobj(), to_value);
+      return result;
+    }
+
+  private:
+    TypedBindingTransformSlot typed_transform;
+  };
+};
+
+} // namespace Glib

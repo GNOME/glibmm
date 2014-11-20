@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* generate_defs_gtk.cc
  *
  * Copyright (C) 2001 The Free Software Foundation
@@ -27,7 +25,8 @@ int main()
   // g_type_init() is deprecated as of 2.36.
   // g_type_init();
 
-  std::cout << get_defs( G_TYPE_BYTES )
+  std::cout << get_defs( G_TYPE_BINDING )
+            << get_defs( G_TYPE_BYTES )
             << get_defs( G_TYPE_CHECKSUM )
             << get_defs( G_TYPE_DATE )
             << get_defs( G_TYPE_DATE_TIME )

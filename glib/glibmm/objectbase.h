@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_OBJECTBASE_H
 #define _GLIBMM_OBJECTBASE_H
 
@@ -144,7 +143,9 @@ public:
    */
   void thaw_notify();
 
-  //TODO: Why are these virtual?
+  // Why are these virtual?
+  // Don't know why they were originally made virtual, but it came in handy when
+  // I wrapped GBinding in Glib::Binding. /Kjell
   /** Increment the reference count for this object.
    * You should never need to do this manually - use the object via a RefPtr instead.
    */
