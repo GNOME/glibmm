@@ -20,7 +20,7 @@
 namespace Gio
 {
 // Hand-coded because we want ResourceFlags& instead of guint32&.
-void Resource::get_info(const Glib::ustring& path, gsize& size,
+void Resource::get_info(const std::string& path, gsize& size,
   ResourceFlags& flags, ResourceLookupFlags lookup_flags) const
 {
   guint32 file_flags = 0;
@@ -34,7 +34,7 @@ void Resource::get_info(const Glib::ustring& path, gsize& size,
   flags = static_cast<ResourceFlags>(file_flags);
 }
 
-void Resource::get_info(const Glib::ustring& path, ResourceLookupFlags lookup_flags) const
+void Resource::get_file_exists(const std::string& path, ResourceLookupFlags lookup_flags) const
 {
   GError* gerror = 0;
   g_resource_get_info(const_cast<GResource*>(gobj()), path.c_str(),
@@ -43,9 +43,15 @@ void Resource::get_info(const Glib::ustring& path, ResourceLookupFlags lookup_fl
     ::Glib::Error::throw_exception(gerror);
 }
 
+bool Resource::get_file_exists_nothrow(const std::string& path, ResourceLookupFlags lookup_flags) const
+{
+  return g_resource_get_info(const_cast<GResource*>(gobj()), path.c_str(),
+    (GResourceLookupFlags)lookup_flags, 0, 0, 0);
+}
+
 // Hand-coded because we want ResourceFlags& instead of guint32&.
 //static
-void Resource::get_info_global(const Glib::ustring& path, gsize& size,
+void Resource::get_info_global(const std::string& path, gsize& size,
   ResourceFlags& flags, ResourceLookupFlags lookup_flags)
 {
   guint32 file_flags = 0;
@@ -60,13 +66,19 @@ void Resource::get_info_global(const Glib::ustring& path, gsize& size,
 }
 
 //static
-void Resource::get_info_global(const Glib::ustring& path, ResourceLookupFlags lookup_flags)
+void Resource::get_file_exists_global(const std::string& path, ResourceLookupFlags lookup_flags)
 {
   GError* gerror = 0;
   g_resources_get_info(path.c_str(),
     (GResourceLookupFlags)lookup_flags, 0, 0, &gerror);
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
+}
+
+//static
+bool Resource::get_file_exists_global_nothrow(const std::string& path, ResourceLookupFlags lookup_flags)
+{
+  return g_resources_get_info(path.c_str(), (GResourceLookupFlags)lookup_flags, 0, 0, 0);
 }
 
 } // namespace Gio
