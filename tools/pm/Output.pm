@@ -759,12 +759,23 @@ sub output_wrap_gerror($$$$$$$)
   my $no_gtype = "";
   my $elements = $objEnum->build_element_list(\@flags, \$no_gtype, "    ");
 
-  my $str = sprintf("_GERROR(%s,%s,%s,\`%s\',%s)dnl\n",
+  # Get the enum documentation from the parsed docs.
+  my $enum_docs =
+    DocsParser::lookup_enum_documentation("$c_enum", "Code", \@flags);
+
+  # Make sure indentation of enum documentation is correct.
+  $enum_docs =~ s/\n\s*\*/\n   \*/g;
+
+  # Prevent Doxygen from auto-linking to a class called Error.
+  $enum_docs =~ s/([^%])(Error code)/$1%$2/g;
+
+  my $str = sprintf("_GERROR(%s,%s,%s,\`%s\',%s,\`%s\')dnl\n",
     $cpp_type,
     $c_enum,
     $domain,
     $elements,
-    $no_gtype
+    $no_gtype,
+    $enum_docs
   );
 
   $self->append($str);

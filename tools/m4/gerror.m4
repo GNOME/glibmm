@@ -1,7 +1,6 @@
-dnl $Id$
-
 dnl
-dnl  _GERROR(PixbufError,GdkPixbufError,GDK_PIXBUF_ERROR,`<enum_value_list>',[NO_GTYPE])
+dnl  _GERROR(PixbufError,GdkPixbufError,GDK_PIXBUF_ERROR,`<enum_value_list>',[NO_GTYPE], `<enum_docs>')
+dnl             $1             $2             $3                $4               $5           $6
 dnl
 
 m4_define(`_GERROR',`dnl
@@ -16,6 +15,8 @@ _POP()
 class __CPPNAME__ : public Glib::Error
 {
 public:
+  $6
+   */
   enum Code
   {
 $4
