@@ -72,15 +72,16 @@ sub output_wrap_failed($$$)
 {
   my ($self, $cname, $error) = @_;
 
+  # See "MS Visual Studio" comment in gmmproc.in.
   my $str = sprintf("//gtkmmproc error: %s : %s", $cname, $error);
-  print STDERR "Output.pm: $main::source: $cname : $error\n";
+  print STDERR "Output.pm, $main::source, $cname : $error\n";
   $self->append($str);
 }
 
 sub error
 {
   my $format=shift @_;
-  printf STDERR "Output.pm: $main::source: $format",@_;
+  printf STDERR "Output.pm, $main::source: $format",@_;
 }
 
 sub ifdef($$)

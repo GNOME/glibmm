@@ -123,22 +123,27 @@ if ($main::unwrapped)
     # Don't take non-readable construct-only properties into account.
     my @properties = grep { $$_{entity_type} eq 'property' and ( $$_{readable} or not $$_{construct_only} ) } @unwrapped;
 
+    # Don't print a name of any kind between the first and second colon on a line,
+    # if there is any chance that "error" is (part of) the name.
+    # MS Visual Studio will misunderstand.
+    # See https://mail.gnome.org/archives/gtkmm-list/2014-November/msg00044.html
+
     local $, = "\ngmmproc:   ";
     local $\ = "\n";
 
     if (@methods)
     {
-      print STDERR ("gmmproc: $main::source: Unwrapped functions:",
+      print STDERR ("gmmproc, $main::source: Unwrapped functions:",
                     map($$_{c_name}, @methods));
     }
     if (@properties)
     {
-      print STDERR ("gmmproc: $main::source: Unwrapped properties:",
+      print STDERR ("gmmproc, $main::source: Unwrapped properties:",
                     map($$_{class} . '::' . $$_{name}, @properties));
     }
     if (@signals)
     { 
-      print STDERR ("gmmproc: $main::source: Unwrapped signals:",
+      print STDERR ("gmmproc, $main::source: Unwrapped signals:",
                     map($$_{class} . '::' . $$_{name}, @signals));
     }
   }

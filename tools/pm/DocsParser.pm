@@ -375,7 +375,8 @@ sub remove_example_code($$)
     ($$text =~ s"<programlisting>.*?</programlisting>"\n[C example ellipted]"sg);
   $example_removals += ($$text =~ s"\|\[.*?]\|"\n[C example ellipted]"sg);
 
-  print STDERR "gmmproc: $main::source: $obj_name: Example code discarded.\n"
+  # See "MS Visual Studio" comment in gmmproc.in.
+  print STDERR "gmmproc, $main::source, $obj_name: Example code discarded.\n"
     if ($example_removals);
 }
 
@@ -691,7 +692,7 @@ sub lookup_object_of_method($$)
     }
     else
     {
-      print "DocsParser.pm:lookup_object_of_method(): Warning: GtkDefs::lookup_object() failed for object name=" . $object . ", function name=" . $name . "\n";
+      print "DocsParser.pm: lookup_object_of_method(): Warning: GtkDefs::lookup_object() failed for object name=" . $object . ", function name=" . $name . "\n";
       print "  This may be a missing define-object in a *.defs file.\n"
     }
   }
