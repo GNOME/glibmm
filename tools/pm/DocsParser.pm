@@ -233,9 +233,9 @@ sub parse_on_cdata($$)
   }
 }
 
-sub lookup_enum_documentation($$$)
+sub lookup_enum_documentation($$$$)
 {
-  my ($c_enum_name, $cpp_enum_name, $ref_flags) = @_;
+  my ($c_enum_name, $cpp_enum_name, $indent, $ref_flags) = @_;
   
   my @subst_in  = [];
   my @subst_out = [];
@@ -305,9 +305,9 @@ sub lookup_enum_documentation($$$)
   
   remove_example_code($c_enum_name, \$docs);
 
-  # Convert to Doxygen-style comment.
-  $docs =~ s/\n/\n \* /g;
-  $docs =  "\/\*\* " . $docs;
+  # Add indentation and an asterisk on all lines except the first.
+  # $docs does not contain leading "/**" and trailing "*/".
+  $docs =~ s/\n/\n${indent}\* /g;
 
   return $docs;
 }

@@ -676,14 +676,7 @@ sub output_wrap_enum($$$$$$$)
 
   # Get the enum documentation from the parsed docs.
   my $enum_docs =
-    DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", \@flags);
-
-  # Remove initial Doxygen comment block start ('/**') from the enum docs
-  # to merge the passed in Doxygen comment block.
-  $enum_docs =~ s/\/\*\*\s+//g;
-  
-  # Make sure indentation of passed in comment is correct.
-  $comment =~ s/\n\s*\*/\n */g;
+    DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", " ", \@flags);
 
   # Merge the passed in comment to the existing enum documentation.
   $comment = $comment . "\n * " . $enum_docs;
@@ -707,7 +700,7 @@ sub output_wrap_enum_docs_only($$$$$$$)
  
   # Get the existing enum description from the parsed docs.
   my $enum_docs =
-    DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", \@flags);
+    DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", " ", \@flags);
 
   if($enum_docs eq "")
   {
@@ -718,15 +711,8 @@ sub output_wrap_enum_docs_only($$$$$$$)
   # Include the enum docs in the module's enum docs group.
   $enum_docs .= "\n * \@ingroup ${module_canonical}Enums\n";
 
-  # Remove initial Doxygen comment block start ('/**') from the enum docs
-  # to merge the passed in Doxygen comment block.
-  $enum_docs =~ s/\/\*\*\s+//g;
-  
   # Merge the passed in comment to the existing enum documentation.
-  $comment = "\/\*\* " . $comment . "\n * " . $enum_docs . "\n */\n";
-
-  # Make sure indentation of passed in comment is correct.
-  $comment =~ s/\n\s*\*/\n */g;
+  $comment = "/** " . $comment . "\n * " . $enum_docs . "\n */\n";
 
   $self->append($comment);
 }
@@ -762,10 +748,7 @@ sub output_wrap_gerror($$$$$$$)
 
   # Get the enum documentation from the parsed docs.
   my $enum_docs =
-    DocsParser::lookup_enum_documentation("$c_enum", "Code", \@flags);
-
-  # Make sure indentation of enum documentation is correct.
-  $enum_docs =~ s/\n\s*\*/\n   \*/g;
+    DocsParser::lookup_enum_documentation("$c_enum", "Code", "   ", \@flags);
 
   # Prevent Doxygen from auto-linking to a class called Error.
   $enum_docs =~ s/([^%])(Error code)/$1%$2/g;

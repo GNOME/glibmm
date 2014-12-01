@@ -15,7 +15,7 @@ _POP()
 class __CPPNAME__ : public Glib::Error
 {
 public:
-  $6
+  /** $6
    */
   enum Code
   {
