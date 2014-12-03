@@ -86,7 +86,17 @@ int main(int, char**)
   Glib::RefPtr<Gio::InetSocketAddress> address =
     Gio::InetSocketAddress::create(first_inet_address, 443);
 
-  socket->connect(address);
+  try
+  {
+    socket->connect(address);
+  }
+  catch(const Gio::Error& ex)
+  {
+    std::cout << "Could not connect socket to " <<
+      address->get_address()->to_string() << ":" << address->get_port() <<
+      ". Exception: " << ex.what() << std::endl;
+    return EXIT_FAILURE;
+  }
 
   if(!socket->is_connected())
   {
