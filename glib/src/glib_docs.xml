@@ -1284,7 +1284,7 @@ your direct control. Since 2.8.
 <enum name="GParamFlags">
 <description>
 Through the #GParamFlags flag values, certain aspects of parameters
-can be configured. See also #G_PARAM_READWRITE and #G_PARAM_STATIC_STRINGS.
+can be configured. See also #G_PARAM_STATIC_STRINGS.
 
 </description>
 <parameters>
@@ -1305,7 +1305,7 @@ can be configured. See also #G_PARAM_READWRITE and #G_PARAM_STATIC_STRINGS.
 </parameter_description>
 </parameter>
 <parameter name="G_PARAM_CONSTRUCT_ONLY">
-<parameter_description> the parameter will only be set upon object construction
+<parameter_description> the parameter can only be set upon object construction
 </parameter_description>
 </parameter>
 <parameter name="G_PARAM_LAX_VALIDATION">
@@ -2556,6 +2556,10 @@ Deprecated: 2.36: g_type_init() is now done automatically
 </parameter>
 <parameter name="G_TYPE_DEBUG_MASK">
 <parameter_description> Mask covering all debug flags
+</parameter_description>
+</parameter>
+<parameter name="G_TYPE_DEBUG_INSTANCE_COUNT">
+<parameter_description> Keep a count of instances of each type
 </parameter_description>
 </parameter>
 </parameters>
@@ -17686,6 +17690,13 @@ count of 1 and allows to specify functions to free the memory
 allocated for the key and value that get called when removing the
 entry from the #GHashTable.
 
+Since version 2.42 it is permissible for destroy notify functions to
+recursively remove further items from the hash table. This is only
+permissible if the application still holds a reference to the hash table.
+This means that you may need to ensure that the hash table is empty by
+calling g_hash_table_remove_all before releasing the last reference using
+g_hash_table_unref().
+
 
 </description>
 <parameters>
@@ -28925,6 +28936,24 @@ not be modified or freed.
 </return>
 </function>
 
+<function name="g_option_context_get_strict_posix">
+<description>
+Returns whether strict POSIX code is enabled.
+
+See g_option_context_set_strict_posix() for more information.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GoptionContext
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_option_context_get_summary">
 <description>
 Returns the summary. See g_option_context_set_summary().
@@ -29168,6 +29197,45 @@ Since: 2.6
 </parameter>
 <parameter name="group">
 <parameter_description> the group to set as main group
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_option_context_set_strict_posix">
+<description>
+Sets strict POSIX mode.
+
+By default, this mode is disabled.
+
+In strict POSIX mode, the first non-argument parameter encountered
+(eg: filename) terminates argument processing.  Remaining arguments
+are treated as non-options and are not attempted to be parsed.
+
+If strict POSIX mode is disabled then parsing is done in the GNU way
+where option arguments can be freely mixed with non-options.
+
+As an example, consider &quot;ls foo -l&quot;.  With GNU style parsing, this
+will list &quot;foo&quot; in long mode.  In strict POSIX style, this will list
+the files named &quot;foo&quot; and &quot;-l&quot;.
+
+It may be useful to force strict POSIX mode when creating &quot;verb
+style&quot; command line tools.  For example, the &quot;gsettings&quot; command line
+tool supports the global option &quot;--schemadir&quot; as well as many
+subcommands (&quot;get&quot;, &quot;set&quot;, etc.) which each have their own set of
+arguments.  Using strict POSIX mode will allow parsing the global
+options up to the verb name while leaving the remaining options to be
+parsed by the relevant subcommand (which can be determined by
+examining the verb name, which should be present in argv[1] after
+parsing).
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="context">
+<parameter_description> a #GoptionContext
 </parameter_description>
 </parameter>
 </parameters>
@@ -31560,6 +31628,10 @@ the #GDestroyNotify for @key is not called on the old value.
 If @dest is %NULL, free @src; otherwise, moves @src into *@dest.
 The error variable @dest points to must be %NULL.
 
+Note that @src is no longer valid after this call. If you want
+to keep using the same GError*, you need to set it to %NULL
+after calling this function on it.
+
 </description>
 <parameters>
 <parameter name="dest">
@@ -32429,9 +32501,10 @@ Since: 2.14
 
 <function name="g_queue_insert_after">
 <description>
-Inserts @data into @queue after @sibling
+Inserts @data into @queue after @sibling.
 
-@sibling must be part of @queue
+@sibling must be part of @queue. Since GLib 2.44 a %NULL sibling pushes the
+data at the head of the queue.
 
 Since: 2.4
 
@@ -32442,7 +32515,8 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="sibling">
-<parameter_description> a #GList link that must be part of @queue
+<parameter_description> a #GList link that must be part of @queue, or %NULL to
+push at the head of the queue.
 </parameter_description>
 </parameter>
 <parameter name="data">
@@ -32457,7 +32531,8 @@ Since: 2.4
 <description>
 Inserts @data into @queue before @sibling.
 
-@sibling must be part of @queue.
+@sibling must be part of @queue. Since GLib 2.44 a %NULL sibling pushes the
+data at the tail of the queue.
 
 Since: 2.4
 
@@ -32468,7 +32543,8 @@ Since: 2.4
 </parameter_description>
 </parameter>
 <parameter name="sibling">
-<parameter_description> a #GList link that must be part of @queue
+<parameter_description> a #GList link that must be part of @queue, or %NULL to
+push at the tail of the queue.
 </parameter_description>
 </parameter>
 <parameter name="data">
@@ -37917,6 +37993,12 @@ and/or @data the handlers have to match.
 Returns whether there are any handlers connected to @instance for the
 given signal id and detail.
 
+If @detail is 0 then it will only match handlers that were connected
+without detail.  If @detail is non-zero then it will match handlers
+connected both without detail and with the given detail.  This is
+consistent with how a signal emitted with @detail would be delivered
+to those handlers.
+
 One example of when you might use this is when the arguments to the
 signal are difficult to compute. A class implementor may opt to not
 emit the signal if no one is attached anyway, thus saving the cost
@@ -42231,8 +42313,10 @@ characters escaped. See above.
 
 <function name="g_strfreev">
 <description>
-Frees a %NULL-terminated array of strings, and the array itself.
-If called on a %NULL value, g_strfreev() simply returns.
+Frees a %NULL-terminated array of strings, as well as each
+string it contains.
+
+If @str_array is %NULL, this function simply returns.
 
 </description>
 <parameters>
@@ -43771,6 +43855,28 @@ or g_utf8_strup() instead.
 </parameter>
 </parameters>
 <return> the string
+
+</return>
+</function>
+
+<function name="g_strv_contains">
+<description>
+Checks if @strv contains @str. @strv must not be %NULL.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="strv">
+<parameter_description> a %NULL-terminated array of strings
+</parameter_description>
+</parameter>
+<parameter name="str">
+<parameter_description> a string
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @str is an element of @strv, according to g_str_equal().
 
 </return>
 </function>
@@ -45668,7 +45774,7 @@ global pool.
 @error can be %NULL to ignore errors, or non-%NULL to report
 errors. An error can only occur when @exclusive is set to %TRUE
 and not all @max_threads threads could be created.
-See #GThreadError for possible errors that may occurr.
+See #GThreadError for possible errors that may occur.
 Note, even in case of error a valid #GThreadPool is returned.
 
 
@@ -48179,6 +48285,28 @@ fundamental type identifier.
 </parameters>
 <return> the next available fundamental type ID to be registered,
 or 0 if the type system ran out of fundamental type IDs
+</return>
+</function>
+
+<function name="g_type_get_instance_count">
+<description>
+Returns the number of instances allocated of the particular type;
+this is only available if GLib is built with debugging support and
+the instance_count debug flag is set (by setting the GOBJECT_DEBUG
+variable to include instance-count).
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> a #GType
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of instances allocated of the given type;
+if instance counts are not available, returns 0.
+
 </return>
 </function>
 

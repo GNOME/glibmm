@@ -1915,16 +1915,16 @@ Since: 2.26
 <parameter_description> The native credentials type is a &lt;type&gt;struct cmsgcred&lt;/type&gt;.
 </parameter_description>
 </parameter>
-<parameter name="G_CREDENTIALS_TYPE_NETBSD_UNPCBID">
-<parameter_description> The native credentials type is a &lt;type&gt;struct unpcbid&lt;/type&gt;.
-</parameter_description>
-</parameter>
 <parameter name="G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED">
 <parameter_description> The native credentials type is a &lt;type&gt;struct sockpeercred&lt;/type&gt;. Added in 2.30.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_SOLARIS_UCRED">
 <parameter_description> The native credentials type is a &lt;type&gt;ucred_t&lt;/type&gt;. Added in 2.40.
+</parameter_description>
+</parameter>
+<parameter name="G_CREDENTIALS_TYPE_NETBSD_UNPCBID">
+<parameter_description> The native credentials type is a &lt;type&gt;struct unpcbid&lt;/type&gt;.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3670,7 +3670,7 @@ Error codes returned by GIO functions.
 
 Note that this domain may be extended in future GLib releases. In
 general, new error codes either only apply to new APIs, or else
-replace #G_IO_ERROR_FAILED in cases that were not explicitly
+replace %G_IO_ERROR_FAILED in cases that were not explicitly
 distinguished before. You should therefore avoid writing code like
 |[&lt;!-- language=&quot;C&quot; --&gt;
 if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED))
@@ -3871,6 +3871,18 @@ Since 2.26
 </parameter>
 <parameter name="G_IO_ERROR_BROKEN_PIPE">
 <parameter_description> Broken pipe. Since 2.36
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_CONNECTION_CLOSED">
+<parameter_description> Connection closed by peer. Note that this
+is the same code as %G_IO_ERROR_BROKEN_PIPE; before 2.44 some
+&quot;connection closed&quot; errors returned %G_IO_ERROR_BROKEN_PIPE, but others
+returned %G_IO_ERROR_FAILED. Now they should all return the same
+value, which has this more logical name. Since 2.44.
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_NOT_CONNECTED">
+<parameter_description> Transport endpoint is not connected. Since 2.44
 </parameter_description>
 </parameter>
 </parameters>
@@ -24309,6 +24321,13 @@ Resets @cancellable to its uncancelled state.
 If cancellable is currently in use by any cancellable operation
 then the behavior of this function is undefined.
 
+Note that it is generally not a good idea to reuse an existing
+cancellable for more operations after it has been cancelled once,
+as this function might tempt you to do. The recommended practice
+is to drop the reference to a cancellable after cancelling it,
+and let it die with the outstanding async operations. You should
+create a fresh cancellable for further async operations.
+
 </description>
 <parameters>
 <parameter name="cancellable">
@@ -24349,6 +24368,8 @@ with g_source_add_child_source() to add cancellability to it.
 
 For convenience, you can call this with a %NULL #GCancellable,
 in which case the source will never trigger.
+
+The new #GSource will hold a reference to the #GCancellable.
 
 Since: 2.28
 
@@ -36184,7 +36205,7 @@ Sets the file enumerator as having pending operations.
 
 <function name="g_file_equal">
 <description>
-Checks equality of two given #GFiles.
+Checks if the two given #GFiles refer to the same file.
 
 Note that two #GFiles that differ can still refer to the same
 file on the filesystem due to various forms of filename
@@ -36576,6 +36597,9 @@ In other words, if the names of initial elements of @file's
 pathname match @prefix. Only full pathname elements are matched,
 so a path like /foo is not considered a prefix of /foobar, only
 of /foo/bar.
+
+A #GFile is not a prefix of itself. If you want to check for
+equality, use g_file_equal().
 
 This call does no I/O, as it works purely on names. As such it can
 sometimes return %FALSE even if @file is inside a @prefix (from a
@@ -40196,14 +40220,14 @@ by triggering the cancellable object from another thread. If the
 operation was cancelled, the error %G_IO_ERROR_CANCELLED will be
 returned.
 
-If you pass in a non-%NULL @etag value, then this value is
-compared to the current entity tag of the file, and if they differ
-an %G_IO_ERROR_WRONG_ETAG error is returned. This generally means
-that the file has been changed since you last read it. You can get
-the new etag from g_file_output_stream_get_etag() after you've
-finished writing and closed the #GFileOutputStream. When you load
-a new file you can use g_file_input_stream_query_info() to get
-the etag of the file.
+If you pass in a non-%NULL @etag value and @file already exists, then
+this value is compared to the current entity tag of the file, and if
+they differ an %G_IO_ERROR_WRONG_ETAG error is returned. This
+generally means that the file has been changed since you last read
+it. You can get the new etag from g_file_output_stream_get_etag()
+after you've finished writing and closed the #GFileOutputStream. When
+you load a new file you can use g_file_input_stream_query_info() to
+get the etag of the file.
 
 If @make_backup is %TRUE, this function will attempt to make a
 backup of the current file before overwriting it. If this fails
@@ -43039,8 +43063,14 @@ stream,  %TRUE is returned, and @bytes_read is set to the number of bytes
 read into @buffer.
 
 If there is an error during the operation %FALSE is returned and @error
-is set to indicate the error status, @bytes_read is updated to contain
-the number of bytes read into @buffer before the error occurred.
+is set to indicate the error status.
+
+As a special exception to the normal conventions for functions that
+use #GError, if this function returns %FALSE (and sets @error) then
+@bytes_read will be set to the number of bytes that were successfully
+read before the error was encountered.  This functionality is only
+available from C.  If you need it from another language then you must
+write your own loop around g_input_stream_read().
 
 
 </description>
@@ -43072,6 +43102,94 @@ read data into (which should be at least count bytes long).
 </parameter>
 </parameters>
 <return> %TRUE on success, %FALSE if there was an error
+</return>
+</function>
+
+<function name="g_input_stream_read_all_async">
+<description>
+Request an asynchronous read of @count bytes from the stream into the
+buffer starting at @buffer.
+
+This is the asynchronous equivalent of g_input_stream_read_all().
+
+Call g_input_stream_read_all_finish() to collect the result.
+
+Any outstanding I/O request with higher priority (lower numerical
+value) will be executed before an outstanding request with lower
+priority. Default priority is %G_PRIORITY_DEFAULT.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> A #GInputStream
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> a buffer to
+read data into (which should be at least count bytes long)
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of bytes that will be read from the stream
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the [I/O priority][io-priority] of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_input_stream_read_all_finish">
+<description>
+Finishes an asynchronous stream read operation started with
+g_input_stream_read_all_async().
+
+As a special exception to the normal conventions for functions that
+use #GError, if this function returns %FALSE (and sets @error) then
+@bytes_read will be set to the number of bytes that were successfully
+read before the error was encountered.  This functionality is only
+available from C.  If you need it from another language then you must
+write your own loop around g_input_stream_read_async().
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GInputStream
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="bytes_read">
+<parameter_description> location to store the number of bytes that was read from the stream
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occurring, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if there was an error
+
 </return>
 </function>
 
@@ -47414,6 +47532,12 @@ Since: 2.26
 Creates a new #GSocketConnectable for connecting to the given
 @hostname and @port.
 
+Note that depending on the configuration of the machine, a
+@hostname of `localhost` may refer to the IPv4 loopback address
+only, or to both IPv4 and IPv6; use
+g_network_address_new_loopback() to create a #GNetworkAddress that
+is guaranteed to resolve to both addresses.
+
 Since: 2.22
 
 </description>
@@ -47422,6 +47546,35 @@ Since: 2.22
 <parameter_description> the hostname
 </parameter_description>
 </parameter>
+<parameter name="port">
+<parameter_description> the port
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new #GNetworkAddress
+
+</return>
+</function>
+
+<function name="g_network_address_new_loopback">
+<description>
+Creates a new #GSocketConnectable for connecting to the local host
+over a loopback connection to the given @port. This is intended for
+use in connecting to local services which may be running on IPv4 or
+IPv6.
+
+The connectable will return IPv4 and IPv6 loopback addresses,
+regardless of how the host resolves `localhost`. By contrast,
+g_network_address_new() will often only return an IPv4 address when
+resolving `localhost`, and an IPv6 address for `localhost6`.
+
+g_network_address_get_hostname() will always return `localhost` for
+#GNetworkAddresses created with this constructor.
+
+Since: 2.44
+
+</description>
+<parameters>
 <parameter name="port">
 <parameter_description> the port
 </parameter_description>
@@ -48784,8 +48937,15 @@ On a successful write of @count bytes, %TRUE is returned, and @bytes_written
 is set to @count.
 
 If there is an error during the operation %FALSE is returned and @error
-is set to indicate the error status, @bytes_written is updated to contain
-the number of bytes written into the stream before the error occurred.
+is set to indicate the error status.
+
+As a special exception to the normal conventions for functions that
+use #GError, if this function returns %FALSE (and sets @error) then
+@bytes_written will be set to the number of bytes that were
+successfully written before the error was encountered.  This
+functionality is only available from C.  If you need it from another
+language then you must write your own loop around
+g_output_stream_write().
 
 
 </description>
@@ -48817,6 +48977,99 @@ written to the stream
 </parameter>
 </parameters>
 <return> %TRUE on success, %FALSE if there was an error
+</return>
+</function>
+
+<function name="g_output_stream_write_all_async">
+<description>
+Request an asynchronous write of @count bytes from @buffer into
+the stream. When the operation is finished @callback will be called.
+You can then call g_output_stream_write_all_finish() to get the result of the
+operation.
+
+This is the asynchronous version of g_output_stream_write_all().
+
+Call g_output_stream_write_all_finish() to collect the result.
+
+Any outstanding I/O request with higher priority (lower numerical
+value) will be executed before an outstanding request with lower
+priority. Default priority is %G_PRIORITY_DEFAULT.
+
+Note that no copy of @buffer will be made, so it must stay valid
+until @callback is called.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> A #GOutputStream
+</parameter_description>
+</parameter>
+<parameter name="buffer">
+<parameter_description> the buffer containing the data to write
+</parameter_description>
+</parameter>
+<parameter name="count">
+<parameter_description> the number of bytes to write
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the io priority of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> optional #GCancellable object, %NULL to ignore
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_output_stream_write_all_finish">
+<description>
+Finishes an asynchronous stream write operation started with
+g_output_stream_write_all_async().
+
+As a special exception to the normal conventions for functions that
+use #GError, if this function returns %FALSE (and sets @error) then
+@bytes_written will be set to the number of bytes that were
+successfully written before the error was encountered.  This
+functionality is only available from C.  If you need it from another
+language then you must write your own loop around
+g_output_stream_write_async().
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="stream">
+<parameter_description> a #GOutputStream
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="bytes_written">
+<parameter_description> location to store the number of bytes that was written to the stream
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError location to store the error occurring, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if there was an error
+
 </return>
 </function>
 
@@ -61005,7 +61258,7 @@ Since: 2.22
 
 <function name="g_tcp_connection_set_graceful_disconnect">
 <description>
-This enabled graceful disconnects on close. A graceful disconnect
+This enables graceful disconnects on close. A graceful disconnect
 means that we signal the receiving end that the connection is terminated
 and wait for it to close the connection before closing the connection.
 
@@ -61561,8 +61814,17 @@ and its contents when you are done with it.
 
 <function name="g_tls_certificate_new_from_file">
 <description>
-Creates a #GTlsCertificate from the PEM-encoded data in @file. If
-@file cannot be read or parsed, the function will return %NULL and
+Creates a #GTlsCertificate from the PEM-encoded data in @file. The
+returned certificate will be the first certificate found in @file. As
+of GLib 2.44, if @file contains more certificates it will try to load
+a certificate chain. All certificates will be verified in the order
+found (top-level certificate should be the last one in the file) and
+the #GTlsCertificate:issuer property of each certificate will be set
+accordingly if the verification succeeds. If any certificate in the
+chain cannot be verified, the first certificate in the file will
+still be returned.
+
+If @file cannot be read or parsed, the function will return %NULL and
 set @error. Otherwise, this behaves like
 g_tls_certificate_new_from_pem().
 
@@ -61587,16 +61849,27 @@ Since: 2.28
 <function name="g_tls_certificate_new_from_files">
 <description>
 Creates a #GTlsCertificate from the PEM-encoded data in @cert_file
-and @key_file. If either file cannot be read or parsed, the
-function will return %NULL and set @error. Otherwise, this behaves
-like g_tls_certificate_new_from_pem().
+and @key_file. The returned certificate will be the first certificate
+found in @cert_file. As of GLib 2.44, if @cert_file contains more
+certificates it will try to load a certificate chain. All
+certificates will be verified in the order found (top-level
+certificate should be the last one in the file) and the
+#GTlsCertificate:issuer property of each certificate will be set
+accordingly if the verification succeeds. If any certificate in the
+chain cannot be verified, the first certificate in the file will
+still be returned.
+
+If either file cannot be read or parsed, the function will return
+%NULL and set @error. Otherwise, this behaves like
+g_tls_certificate_new_from_pem().
 
 Since: 2.28
 
 </description>
 <parameters>
 <parameter name="cert_file">
-<parameter_description> file containing a PEM-encoded certificate to import
+<parameter_description> file containing one or more PEM-encoded certificates to
+import
 </parameter_description>
 </parameter>
 <parameter name="key_file">
@@ -61615,14 +61888,20 @@ Since: 2.28
 
 <function name="g_tls_certificate_new_from_pem">
 <description>
-Creates a new #GTlsCertificate from the PEM-encoded data in @data.
-If @data includes both a certificate and a private key, then the
+Creates a #GTlsCertificate from the PEM-encoded data in @data. If
+@data includes both a certificate and a private key, then the
 returned certificate will include the private key data as well. (See
 the #GTlsCertificate:private-key-pem property for information about
 supported formats.)
 
-If @data includes multiple certificates, only the first one will be
-parsed.
+The returned certificate will be the first certificate found in
+@data. As of GLib 2.44, if @data contains more certificates it will
+try to load a certificate chain. All certificates will be verified in
+the order found (top-level certificate should be the last one in the
+file) and the #GTlsCertificate:issuer property of each certificate
+will be set accordingly if the verification succeeds. If any
+certificate in the chain cannot be verified, the first certificate in
+the file will still be returned.
 
 Since: 2.28
 
