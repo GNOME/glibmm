@@ -1058,6 +1058,8 @@
     '("proxy-need-auth" "G_IO_ERROR_PROXY_NEED_AUTH")
     '("proxy-not-allowed" "G_IO_ERROR_PROXY_NOT_ALLOWED")
     '("broken-pipe" "G_IO_ERROR_BROKEN_PIPE")
+    '("connection-closed" "G_IO_ERROR_CONNECTION_CLOSED")
+    '("not-connected" "G_IO_ERROR_NOT_CONNECTED")
   )
 )
 
@@ -1495,9 +1497,9 @@
     '("invalid" "G_CREDENTIALS_TYPE_INVALID")
     '("linux-ucred" "G_CREDENTIALS_TYPE_LINUX_UCRED")
     '("freebsd-cmsgcred" "G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED")
-    '("netbsd-unpcbid" "G_CREDENTIALS_TYPE_NETBSD_UNPCBID")
     '("openbsd-sockpeercred" "G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED")
     '("solaris-ucred" "G_CREDENTIALS_TYPE_SOLARIS_UCRED")
+    '("netbsd-unpcbid" "G_CREDENTIALS_TYPE_NETBSD_UNPCBID")
   )
 )
 
@@ -9925,6 +9927,31 @@
   )
 )
 
+(define-method read_all_async
+  (of-object "GInputStream")
+  (c-name "g_input_stream_read_all_async")
+  (return-type "none")
+  (parameters
+    '("void*" "buffer")
+    '("gsize" "count")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method read_all_finish
+  (of-object "GInputStream")
+  (c-name "g_input_stream_read_all_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("gsize*" "bytes_read")
+    '("GError**" "error")
+  )
+)
+
 (define-method read_bytes_async
   (of-object "GInputStream")
   (c-name "g_input_stream_read_bytes_async")
@@ -11896,6 +11923,14 @@
   )
 )
 
+(define-function g_network_address_new_loopback
+  (c-name "g_network_address_new_loopback")
+  (return-type "GSocketConnectable*")
+  (parameters
+    '("guint16" "port")
+  )
+)
+
 (define-function g_network_address_parse
   (c-name "g_network_address_parse")
   (return-type "GSocketConnectable*")
@@ -12473,6 +12508,31 @@
   (return-type "gssize")
   (parameters
     '("GAsyncResult*" "result")
+    '("GError**" "error")
+  )
+)
+
+(define-method write_all_async
+  (of-object "GOutputStream")
+  (c-name "g_output_stream_write_all_async")
+  (return-type "none")
+  (parameters
+    '("const-void*" "buffer")
+    '("gsize" "count")
+    '("int" "io_priority")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method write_all_finish
+  (of-object "GOutputStream")
+  (c-name "g_output_stream_write_all_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
+    '("gsize*" "bytes_written")
     '("GError**" "error")
   )
 )
