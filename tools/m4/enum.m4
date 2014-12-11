@@ -1,5 +1,6 @@
 dnl
 dnl _ENUM(cpp_type, c_type, value_suffix, `element_list', `flags', `optional_refdoc_comment', 'get_type_function_name')
+dnl          $1       $2         $3             $4           $5              $6                        $7
 dnl
 m4_define(`_ENUM',`dnl
 _PUSH()
@@ -20,6 +21,7 @@ m4_define(`__DOCGROUP_'__MODULE_CANONICAL__`_ENUMS__')dnl
 dnl
 dnl
 /** $6
+ *
  * @ingroup __MODULE_CANONICAL__`'Enums
 m4_ifelse($3,Flags,`dnl
  * @par Bitwise operators:

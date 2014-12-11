@@ -679,7 +679,7 @@ sub output_wrap_enum($$$$$$$)
     DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", " ", \@flags);
 
   # Merge the passed in comment to the existing enum documentation.
-  $comment = $comment . "\n * " . $enum_docs;
+  $comment .= "\n * " . $enum_docs if $enum_docs ne "";
 
   my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\')dnl\n",
     $cpp_type,

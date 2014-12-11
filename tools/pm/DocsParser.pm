@@ -514,14 +514,20 @@ sub convert_tags_to_doxygen($)
     s"<variablelist>\n?(.*?)</variablelist>\n?"&DocsParser::convert_variablelist($1)"esg;
 
     # Use our Doxygen @newin alias.
-    # If Since is not followed by a colon, substitute @newin only if it's
-    # in a sentence of its own at the end of the string. 
-    s/\bSince:\s*(\d+)\.(\d+)\.(\d+)\b\.?/\@newin{$1,$2,$3}/g;
-    s/\bSince:\s*(\d+)\.(\d+)\b\.?/\@newin{$1,$2}/g;
-    s/(\.\s+)Since\s+(\d+)\.(\d+)\.(\d+)\.?$/$1\@newin{$2,$3,$4}/;
-    s/(\.\s+)Since\s+(\d+)\.(\d+)\.?$/$1\@newin{$2,$3}/;
-
-    s"\b->\b"->"g;
+    # Accept "Since" with or without a following colon.
+    # Require the Since clause to be
+    # - at the end of the string,
+    # - at the end of a line and followed by a blank line, or
+    # - followed by "Deprecated".
+    # If none of these requirements is met, "Since" may be embedded inside
+    # a function description, referring to only a part of the description.
+    # See e.g. g_date_time_format() and gdk_cursor_new_from_pixbuf().
+    # Doxygen assumes that @newin is followed by a paragraph that describes
+    # what is new, but we don't use it that way.
+    my $first_part = '\bSince[:\h]\h*(\d+)\.(\d+)'; # \h == [\t ] (horizontal whitespace)
+    my $last_part = '\.?(\s*$|\h*\n\h*\n|\s+Deprecated)';
+    s/$first_part\.(\d+)$last_part/\@newin{$1,$2,$3}$4/g;
+    s/$first_part$last_part/\@newin{$1,$2}$3/g;
 
     # Doxygen is too dumb to handle &mdash;
     s"&mdash;" \@htmlonly&mdash;\@endhtmlonly "g;
