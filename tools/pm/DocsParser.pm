@@ -285,11 +285,11 @@ sub lookup_enum_documentation($$$$)
     $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
     if(length($desc) > 0)
     {
-      $desc =~ s/\n/ /g;
-      $desc =~ s/ $//;
-      $desc =~ s/^\s+//; # Chop off leading whitespace
+      # Chop off leading and trailing whitespace.
+      $desc =~ s/^\s+//;
+      $desc =~ s/\s+$//;
       $desc .= '.' unless($desc =~ /(?:^|\.)$/);
-      $docs .= "\@var $cpp_enum_name ${param}\n \u${desc}\n\n"; # \u = Convert next char to uppercase
+      $docs .= "\@var $cpp_enum_name ${param}\n\u${desc}\n\n"; # \u = Convert next char to uppercase
     }
   }
 
