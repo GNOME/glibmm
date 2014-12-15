@@ -370,6 +370,13 @@
   (gtype-id "G_TYPE_NETWORK_MONITOR_NETLINK")
 )
 
+(define-object MonitorNM
+  (in-module "GNetwork")
+  (parent "GNetworkMonitorNetlink")
+  (c-name "GNetworkMonitorNM")
+  (gtype-id "G_TYPE_NETWORK_MONITOR_NM")
+)
+
 (define-object Service
   (in-module "GNetwork")
   (parent "GObject")
@@ -1702,6 +1709,18 @@
     '("low" "G_NOTIFICATION_PRIORITY_LOW")
     '("high" "G_NOTIFICATION_PRIORITY_HIGH")
     '("urgent" "G_NOTIFICATION_PRIORITY_URGENT")
+  )
+)
+
+(define-enum Connectivity
+  (in-module "GNetwork")
+  (c-name "GNetworkConnectivity")
+  (gtype-id "G_TYPE_NETWORK_CONNECTIVITY")
+  (values
+    '("local" "G_NETWORK_CONNECTIVITY_LOCAL")
+    '("limited" "G_NETWORK_CONNECTIVITY_LIMITED")
+    '("portal" "G_NETWORK_CONNECTIVITY_PORTAL")
+    '("full" "G_NETWORK_CONNECTIVITY_FULL")
   )
 )
 
@@ -10420,6 +10439,11 @@
   (return-type "GType")
 )
 
+(define-function g_network_connectivity_get_type
+  (c-name "g_network_connectivity_get_type")
+  (return-type "GType")
+)
+
 (define-function g_settings_bind_flags_get_type
   (c-name "g_settings_bind_flags_get_type")
   (return-type "GType")
@@ -12056,6 +12080,12 @@
   (return-type "gboolean")
 )
 
+(define-method get_connectivity
+  (of-object "GNetworkMonitor")
+  (c-name "g_network_monitor_get_connectivity")
+  (return-type "GNetworkConnectivity")
+)
+
 (define-method can_reach
   (of-object "GNetworkMonitor")
   (c-name "g_network_monitor_can_reach")
@@ -12092,6 +12122,10 @@
 
 
 ;; From gnetworkmonitornetlink.h
+
+
+
+;; From gnetworkmonitornm.h
 
 
 
@@ -15880,6 +15914,19 @@
     '("gint" "num_vectors")
     '("GSocketControlMessage**" "messages")
     '("gint" "num_messages")
+    '("gint" "flags")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method send_messages
+  (of-object "GSocket")
+  (c-name "g_socket_send_messages")
+  (return-type "gint")
+  (parameters
+    '("GOutputMessage*" "messages")
+    '("guint" "num_messages")
     '("gint" "flags")
     '("GCancellable*" "cancellable")
     '("GError**" "error")
