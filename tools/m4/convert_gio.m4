@@ -32,6 +32,7 @@ _CONV_ENUM(G,FileType)
 _CONV_ENUM(G,MountMountFlags)
 _CONV_ENUM(G,MountOperationResult)
 _CONV_ENUM(G,MountUnmountFlags)
+_CONV_ENUM(G,NetworkConnectivity)
 _CONV_ENUM(G,OutputStreamSpliceFlags)
 _CONV_ENUM(G,PasswordSave)
 _CONV_ENUM(G,ResolverRecordType)
@@ -239,6 +240,10 @@ _CONVERSION(`PasswordSave',`GPasswordSave',`($2)$3')
 
 #MountOperation
 #_CONVERSION(`GAskPasswordFlags',`AskPasswordFlags',`($2)$3')
+
+# NetworkMonitor
+_CONVERSION(`GNetworkMonitor*',`Glib::RefPtr<NetworkMonitor>',`Glib::wrap($3)')
+
 
 # Notification
 _CONVERSION(`GNotification*',`Glib::RefPtr<Notification>',`Glib::wrap($3)')
