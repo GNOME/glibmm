@@ -35,9 +35,14 @@ _WRAP_ENUM(SpawnFlags, GSpawnFlags, NO_GTYPE)
  * @{
  */
 
-/** Exception class for errors occuring when spawning processes.
+/** %Exception class for errors occuring when spawning processes.
  */
 _WRAP_GERROR(SpawnError, GSpawnError, G_SPAWN_ERROR, NO_GTYPE, s#^2BIG$#TOOBIG#)
+
+/** For instance,<br>
+ *   void on_child_setup();
+ */
+typedef sigc::slot<void> SlotSpawnChildSetup;
 
 /** Executes a child program asynchronously (your program will not
  * block waiting for the child to exit). The child program is
@@ -175,7 +180,7 @@ _WRAP_GERROR(SpawnError, GSpawnError, G_SPAWN_ERROR, NO_GTYPE, s#^2BIG$#TOOBIG#)
  * @param argv Child's argument vector.
  * @param envp Child's environment.
  * @param flags Flags from SpawnFlags
- * @param child_setup Slot to run in the child just before exec().
+ * @param child_setup Slot to run in the child just before exec(), or an empty slot.
  * @param child_pid Return location for child process ID, or NULL.
  * @param standard_input Return location for file descriptor to write to child's stdin, or NULL.
  * @param standard_output Return location for file descriptor to read child's stdout, or NULL.
@@ -191,7 +196,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& argv,
                             const Glib::ArrayHandle<std::string>& envp,
                             SpawnFlags flags = SPAWN_DEFAULT,
-                            const sigc::slot<void>& child_setup = sigc::slot<void>(),
+                            const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                             Pid* child_pid = 0,
                             int* standard_input = 0,
                             int* standard_output = 0,
@@ -202,7 +207,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
  * @param working_directory Child's current working directory, or an empty string to inherit the parent's, in the GLib file name encoding.
  * @param argv Child's argument vector.
  * @param flags Flags from SpawnFlags
- * @param child_setup Slot to run in the child just before exec().
+ * @param child_setup Slot to run in the child just before exec(), or an empty slot.
  * @param child_pid Return location for child process ID, or NULL.
  * @param standard_input Return location for file descriptor to write to child's stdin, or NULL.
  * @param standard_output Return location for file descriptor to read child's stdout, or NULL.
@@ -217,7 +222,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
 void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& argv,
                             SpawnFlags flags = SPAWN_DEFAULT,
-                            const sigc::slot<void>& child_setup = sigc::slot<void>(),
+                            const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                             Pid* child_pid = 0,
                             int* standard_input = 0,
                             int* standard_output = 0,
@@ -236,7 +241,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
  * @param argv Child's argument vector.
  * @param envp Child's environment.
  * @param flags Flags from SpawnFlags.
- * @param child_setup Slot to run in the child just before exec().
+ * @param child_setup Slot to run in the child just before exec(), or an empty slot.
  * @param child_pid Return location for child process ID, or NULL
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
@@ -248,7 +253,7 @@ void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& argv,
                  const Glib::ArrayHandle<std::string>& envp,
                  SpawnFlags flags = SPAWN_DEFAULT,
-                 const sigc::slot<void>& child_setup = sigc::slot<void>(),
+                 const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                  Pid* child_pid = 0);
 
 /** Like the main spawn_async() method, but inheriting the parent's environment.
@@ -256,7 +261,7 @@ void spawn_async(const std::string& working_directory,
  * @param working_directory Child's current working directory, or an empty string to inherit parent's.
  * @param argv Child's argument vector.
  * @param flags Flags from SpawnFlags.
- * @param child_setup Slot to run in the child just before exec().
+ * @param child_setup Slot to run in the child just before exec(), or an empty slot.
  * @param child_pid Return location for child process ID, or NULL
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
@@ -267,7 +272,7 @@ void spawn_async(const std::string& working_directory,
 void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& argv,
                  SpawnFlags flags = SPAWN_DEFAULT,
-                 const sigc::slot<void>& child_setup = sigc::slot<void>(),
+                 const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                  Pid* child_pid = 0);
 
 /** Executes a child synchronously (waits for the child to exit before returning).
@@ -291,7 +296,7 @@ void spawn_async(const std::string& working_directory,
  * @param argv Child's argument vector.
  * @param envp Child's environment.
  * @param flags Flags from SpawnFlags
- * @param child_setup Slot to run in the child just before exec().
+ * @param child_setup Slot to run in the child just before exec(), or an empty slot.
  * @param standard_output Return location for file descriptor to read child's stdout, or NULL.
  * @param standard_error Return location for file descriptor to read child's stderr, or NULL.
  * @param exit_status Return location for child exit status, as returned by waitpid(), or NULL
@@ -306,7 +311,7 @@ void spawn_sync(const std::string& working_directory,
                 const Glib::ArrayHandle<std::string>& argv,
                 const Glib::ArrayHandle<std::string>& envp,
                 SpawnFlags flags = SPAWN_DEFAULT,
-                const sigc::slot<void>& child_setup = sigc::slot<void>(),
+                const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                 std::string* standard_output = 0,
                 std::string* standard_error = 0,
                 int* exit_status = 0);
@@ -316,7 +321,7 @@ void spawn_sync(const std::string& working_directory,
  * @param working_directory Child's current working directory, or an empty string to inherit the parent's, in the GLib file name encoding.
  * @param argv Child's argument vector.
  * @param flags Flags from SpawnFlags
- * @param child_setup Slot to run in the child just before exec().
+ * @param child_setup Slot to run in the child just before exec(), or an empty slot.
  * @param standard_output Return location for file descriptor to read child's stdout, or NULL.
  * @param standard_error Return location for file descriptor to read child's stderr, or NULL.
  * @param exit_status Return location for child exit status, as returned by waitpid(), or NULL
@@ -330,7 +335,7 @@ void spawn_sync(const std::string& working_directory,
 void spawn_sync(const std::string& working_directory,
                 const Glib::ArrayHandle<std::string>& argv,
                 SpawnFlags flags = SPAWN_DEFAULT,
-                const sigc::slot<void>& child_setup = sigc::slot<void>(),
+                const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                 std::string* standard_output = 0,
                 std::string* standard_error = 0,
                 int* exit_status = 0);

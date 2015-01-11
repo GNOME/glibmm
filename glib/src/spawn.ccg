@@ -34,7 +34,7 @@ static void child_setup_callback(void* user_data)
 {
   try
   {
-    (*reinterpret_cast<sigc::slot<void>*>(user_data))();
+    (*reinterpret_cast<Glib::SlotSpawnChildSetup*>(user_data))();
   }
   catch(...)
   {
@@ -67,14 +67,14 @@ void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& argv,
                             const Glib::ArrayHandle<std::string>& envp,
                             SpawnFlags flags,
-                            const sigc::slot<void>& child_setup,
+                            const SlotSpawnChildSetup& child_setup,
                             Pid* child_pid,
                             int* standard_input,
                             int* standard_output,
                             int* standard_error)
 {
   const bool setup_slot = !child_setup.empty();
-  sigc::slot<void> child_setup_ = child_setup;
+  SlotSpawnChildSetup child_setup_ = child_setup;
   GError* gerror = 0;
 
   g_spawn_async_with_pipes(
@@ -95,14 +95,14 @@ void spawn_async_with_pipes(const std::string& working_directory,
 void spawn_async_with_pipes(const std::string& working_directory,
                             const Glib::ArrayHandle<std::string>& argv,
                             SpawnFlags flags,
-                            const sigc::slot<void>& child_setup,
+                            const SlotSpawnChildSetup& child_setup,
                             Pid* child_pid,
                             int* standard_input,
                             int* standard_output,
                             int* standard_error)
 {
   const bool setup_slot = !child_setup.empty();
-  sigc::slot<void> child_setup_ = child_setup;
+  SlotSpawnChildSetup child_setup_ = child_setup;
   GError* gerror = 0;
 
   g_spawn_async_with_pipes(
@@ -123,11 +123,11 @@ void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& argv,
                  const Glib::ArrayHandle<std::string>& envp,
                  SpawnFlags flags,
-                 const sigc::slot<void>& child_setup,
+                 const SlotSpawnChildSetup& child_setup,
                  Pid* child_pid)
 {
   const bool setup_slot = !child_setup.empty();
-  sigc::slot<void> child_setup_ = child_setup;
+  SlotSpawnChildSetup child_setup_ = child_setup;
   GError* gerror = 0;
 
   g_spawn_async(
@@ -147,11 +147,11 @@ void spawn_async(const std::string& working_directory,
 void spawn_async(const std::string& working_directory,
                  const Glib::ArrayHandle<std::string>& argv,
                  SpawnFlags flags,
-                 const sigc::slot<void>& child_setup,
+                 const SlotSpawnChildSetup& child_setup,
                  Pid* child_pid)
 {
   const bool setup_slot = !child_setup.empty();
-  sigc::slot<void> child_setup_ = child_setup;
+  SlotSpawnChildSetup child_setup_ = child_setup;
   GError* gerror = 0;
 
   g_spawn_async(
@@ -171,13 +171,13 @@ void spawn_sync(const std::string& working_directory,
                 const Glib::ArrayHandle<std::string>& argv,
                 const Glib::ArrayHandle<std::string>& envp,
                 SpawnFlags flags,
-                const sigc::slot<void>& child_setup,
+                const SlotSpawnChildSetup& child_setup,
                 std::string* standard_output,
                 std::string* standard_error,
                 int* exit_status)
 {
   const bool setup_slot = !child_setup.empty();
-  sigc::slot<void> child_setup_ = child_setup;
+  SlotSpawnChildSetup child_setup_ = child_setup;
 
   Glib::ScopedPtr<char> buf_standard_output;
   Glib::ScopedPtr<char> buf_standard_error;
@@ -205,13 +205,13 @@ void spawn_sync(const std::string& working_directory,
 void spawn_sync(const std::string& working_directory,
                 const Glib::ArrayHandle<std::string>& argv,
                 SpawnFlags flags,
-                const sigc::slot<void>& child_setup,
+                const SlotSpawnChildSetup& child_setup,
                 std::string* standard_output,
                 std::string* standard_error,
                 int* exit_status)
 {
   const bool setup_slot = !child_setup.empty();
-  sigc::slot<void> child_setup_ = child_setup;
+  SlotSpawnChildSetup child_setup_ = child_setup;
 
   Glib::ScopedPtr<char> buf_standard_output;
   Glib::ScopedPtr<char> buf_standard_error;
