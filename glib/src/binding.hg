@@ -57,10 +57,8 @@ _WRAP_ENUM(BindingFlags, GBindingFlags)
  * applying it; for instance, the following binding:
  *
  * @code
- * bool celsius_to_fahrenheit(const Glib::RefPtr<Glib::Binding>& binding,
- *                            const double& celsius, double& fahrenheit);
- * bool fahrenheit_to_celsius(const Glib::RefPtr<Glib::Binding>& binding,
- *                            const double& fahrenheit, double& celsius);
+ * bool celsius_to_fahrenheit(const double& celsius, double& fahrenheit);
+ * bool fahrenheit_to_celsius(const double& fahrenheit, double& celsius);
  * Glib::Binding::bind_property(adjustment1->property_value(),
  *   adjustment2->property_value(), Glib::BINDING_BIDIRECTIONAL,
  *   sigc::ptr_fun(celsius_to_fahrenheit), sigc::ptr_fun(fahrenheit_to_celsius));
@@ -104,11 +102,11 @@ class Binding : public Glib::Object
 
 public:
   /** For instance,<br>
-   *   bool on_transform_to(const Glib::RefPtr<Binding>& binding, const GValue* from_value, GValue* to_value);
+   *   bool on_transform_to(const GValue* from_value, GValue* to_value);
    *
    * @return <tt>true</tt> if the transformation was successful, and <tt>false</tt> otherwise.
    */
-  typedef sigc::slot<bool, const Glib::RefPtr<Binding>&, const GValue*, GValue*> BindingTransformSlot;
+  typedef sigc::slot<bool, const GValue*, GValue*> SlotTransform;
 
   /** Creates a binding between @a source_property and @a target_property,
    * allowing you to set the transformation functions to be used by the binding.
@@ -143,8 +141,8 @@ public:
     const PropertyProxy_Base& source_property,
     const PropertyProxy_Base& target_property,
     BindingFlags flags = BINDING_DEFAULT,
-    const BindingTransformSlot& transform_to = BindingTransformSlot(),
-    const BindingTransformSlot& transform_from = BindingTransformSlot());
+    const SlotTransform& transform_to = SlotTransform(),
+    const SlotTransform& transform_from = SlotTransform());
 
   _IGNORE(g_object_bind_property, g_object_bind_property_full, g_object_bind_property_with_closures)
 
@@ -185,7 +183,7 @@ public:
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
    *         Must be convertible to<br>
-   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *         sigc::slot<bool, const T_source&, T_target&>.
    *
    * @see bind_property_value()
    *
@@ -198,10 +196,10 @@ public:
     BindingFlags flags,
     const T_functor_to& transform_to)
   {
-    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
 
     return bind_property_value(source_property, target_property, flags,
-      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to));
+      slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to));
   }
 
   /** Creates a binding between @a source_property and @a target_property,
@@ -221,7 +219,7 @@ public:
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
    *         Must be convertible to<br>
-   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *         sigc::slot<bool, const T_source&, T_target&>.
    *
    * @see bind_property_value()
    *
@@ -234,10 +232,10 @@ public:
     BindingFlags flags,
     const T_functor_to& transform_to)
   {
-    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
 
     return bind_property_value(source_property, target_property, flags,
-      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to));
+      slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to));
   }
 
   /** Creates a binding between @a source_property and @a target_property,
@@ -257,7 +255,7 @@ public:
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
    *         Must be convertible to<br>
-   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *         sigc::slot<bool, const T_source&, T_target&>.
    *
    * @see bind_property_value()
    *
@@ -270,10 +268,10 @@ public:
     BindingFlags flags,
     const T_functor_to& transform_to)
   {
-    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
 
     return bind_property_value(source_property, target_property, flags,
-      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to));
+      slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to));
   }
 
   /** Creates a binding between @a source_property and @a target_property,
@@ -293,7 +291,7 @@ public:
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
    *         Must be convertible to<br>
-   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *         sigc::slot<bool, const T_source&, T_target&>.
    *
    * @see bind_property_value()
    *
@@ -306,10 +304,10 @@ public:
     BindingFlags flags,
     const T_functor_to& transform_to)
   {
-    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
+    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
 
     return bind_property_value(source_property, target_property, flags,
-      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to));
+      slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to));
   }
 
   /** Creates a binding between @a source_property and @a target_property,
@@ -331,10 +329,10 @@ public:
    *         stored in a Glib::Value<T_target> object.
    * @tparam T_functor_to Type of functor that translates from the source to the target.
    *         Must be convertible to<br>
-   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&>.
+   *         sigc::slot<bool, const T_source&, T_target&>.
    * @tparam T_functor_from Type of functor that translates from the target to the source.
    *         Must be convertible to<br>
-   *         sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_target&, T_source&>.
+   *         sigc::slot<bool, const T_target&, T_source&>.
    *
    * @see bind_property_value()
    *
@@ -348,12 +346,12 @@ public:
     const T_functor_to& transform_to,
     const T_functor_from& transform_from)
   {
-    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_source&, T_target&> slot_transform_to = transform_to;
-    sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_target&, T_source&> slot_transform_from = transform_from;
+    sigc::slot<bool, const T_source&, T_target&> slot_transform_to = transform_to;
+    sigc::slot<bool, const T_target&, T_source&> slot_transform_from = transform_from;
 
     return bind_property_value(source_property, target_property, flags,
-      slot_transform_to.empty() ? BindingTransformSlot() : TransformProp<T_source, T_target>(slot_transform_to),
-      slot_transform_from.empty() ? BindingTransformSlot() : TransformProp<T_target, T_source>(slot_transform_from));
+      slot_transform_to.empty() ? SlotTransform() : TransformProp<T_source, T_target>(slot_transform_to),
+      slot_transform_from.empty() ? SlotTransform() : TransformProp<T_target, T_source>(slot_transform_from));
   }
 
   _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_source(), g_binding_get_source, refreturn)
@@ -390,18 +388,18 @@ public:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 private:
-  // The functor TransformProp can be implicitly converted to a BindingTransformSlot
+  // The functor TransformProp can be implicitly converted to a SlotTransform
   // and used in a call to bind_property_value().
   template <typename T_from, typename T_to>
   class TransformProp : public sigc::functor_base
   {
   public:
     typedef bool result_type;
-    typedef sigc::slot<bool, const Glib::RefPtr<Binding>&, const T_from&, T_to&> TypedBindingTransformSlot;
+    typedef sigc::slot<bool, const T_from&, T_to&> SlotTypedTransform;
 
-    TransformProp(const TypedBindingTransformSlot& slot) : typed_transform(slot) {}
+    TransformProp(const SlotTypedTransform& slot) : typed_transform(slot) {}
 
-    bool operator()(const Glib::RefPtr<Binding>& binding, const GValue* from_value, GValue* to_value)
+    bool operator()(const GValue* from_value, GValue* to_value)
     {
       Glib::Value<T_from> from_glib_value;
       from_glib_value.init(from_value);
@@ -409,14 +407,14 @@ private:
       to_glib_value.init(to_value);
       T_to to = to_glib_value.get();
 
-      const bool result = typed_transform(binding, from_glib_value.get(), to);
+      const bool result = typed_transform(from_glib_value.get(), to);
       to_glib_value.set(to);
       g_value_copy(to_glib_value.gobj(), to_value);
       return result;
     }
 
   private:
-    TypedBindingTransformSlot typed_transform;
+    SlotTypedTransform typed_transform;
   };
 };
 

@@ -22,25 +22,24 @@ namespace
 struct BindingTransformSlots
 {
   BindingTransformSlots(
-    const Glib::Binding::BindingTransformSlot& transform_to,
-    const Glib::Binding::BindingTransformSlot& transform_from)
+    const Glib::Binding::SlotTransform& transform_to,
+    const Glib::Binding::SlotTransform& transform_from)
   :
   from_source_to_target(transform_to), from_target_to_source(transform_from)
   {}
 
-  Glib::Binding::BindingTransformSlot from_source_to_target;
-  Glib::Binding::BindingTransformSlot from_target_to_source;
+  Glib::Binding::SlotTransform from_source_to_target;
+  Glib::Binding::SlotTransform from_target_to_source;
 };
 
-gboolean Binding_transform_callback_common(GBinding* binding,
+gboolean Binding_transform_callback_common(
   const GValue* from_value, GValue* to_value,
-  Glib::Binding::BindingTransformSlot& the_slot)
+  Glib::Binding::SlotTransform& the_slot)
 {
   bool result = false;
   try
   {
-    Glib::RefPtr<Glib::Binding> cpp_binding = Glib::wrap(binding, true);
-    result = the_slot(cpp_binding, from_value, to_value);
+    result = the_slot(from_value, to_value);
   }
   catch (...)
   {
@@ -49,22 +48,22 @@ gboolean Binding_transform_callback_common(GBinding* binding,
   return result;
 }
 
-gboolean Binding_transform_to_callback(GBinding* binding,
+gboolean Binding_transform_to_callback(GBinding*,
   const GValue* from_value, GValue* to_value, gpointer user_data)
 {
-  Glib::Binding::BindingTransformSlot& the_slot =
+  Glib::Binding::SlotTransform& the_slot =
     static_cast<BindingTransformSlots*>(user_data)->from_source_to_target;
 
-  return Binding_transform_callback_common(binding, from_value, to_value, the_slot);
+  return Binding_transform_callback_common(from_value, to_value, the_slot);
 }
 
-gboolean Binding_transform_from_callback(GBinding* binding,
+gboolean Binding_transform_from_callback(GBinding*,
   const GValue* from_value, GValue* to_value, gpointer user_data)
 {
-  Glib::Binding::BindingTransformSlot& the_slot =
+  Glib::Binding::SlotTransform& the_slot =
     static_cast<BindingTransformSlots*>(user_data)->from_target_to_source;
 
-  return Binding_transform_callback_common(binding, from_value, to_value, the_slot);
+  return Binding_transform_callback_common(from_value, to_value, the_slot);
 }
 
 void Binding_transform_callback_destroy(gpointer user_data)
@@ -81,8 +80,8 @@ Glib::RefPtr<Binding> Binding::bind_property_value(
   const PropertyProxy_Base& source_property,
   const PropertyProxy_Base& target_property,
   BindingFlags flags,
-  const BindingTransformSlot& transform_to,
-  const BindingTransformSlot& transform_from)
+  const SlotTransform& transform_to,
+  const SlotTransform& transform_from)
 {
   GBinding* binding = 0;
   if (transform_to.empty() && transform_from.empty())
