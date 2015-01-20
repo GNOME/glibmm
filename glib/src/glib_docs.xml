@@ -14033,7 +14033,7 @@ this may mean that the week-numbering year is one greater than the
 calendar year (so that these days have the same week-numbering year
 as the Thursday occurring early in the next year).
 
-For Friday, Saturaday and Sunday occurring near the start of the year,
+For Friday, Saturday and Sunday occurring near the start of the year,
 this may mean that the week-numbering year is one less than the
 calendar year (so that these days have the same week-numbering year
 as the Thursday occurring late in the previous year).
@@ -36854,6 +36854,52 @@ Since: 2.18
 <return></return>
 </function>
 
+<function name="g_set_object">
+<description>
+Updates a #GObject pointer to refer to @new_object. It increments the
+reference count of @new_object (if non-%NULL), decrements the reference
+count of the current value of @object_ptr (if non-%NULL), and assigns
+@new_object to @object_ptr. The assignment is not atomic.
+
+@object_ptr must not be %NULL.
+
+A macro is also included that allows this function to be used without
+pointer casts. The function itself is static inline, so its address may vary
+between compilation units.
+
+One convenient usage of this function is in implementing property setters:
+|[
+void
+foo_set_bar (Foo *foo,
+Bar *new_bar)
+{
+g_return_if_fail (IS_FOO (foo));
+g_return_if_fail (new_bar == NULL || IS_BAR (new_bar));
+
+if (g_set_object (&amp;foo-&gt;bar, new_bar))
+g_object_notify (foo, &quot;bar&quot;);
+}
+]|
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="object_ptr">
+<parameter_description> a pointer to a #GObject reference
+</parameter_description>
+</parameter>
+<parameter name="new_object">
+<parameter_description> a pointer to the new #GObject to
+assign to it, or %NULL to clear the pointer
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value of @object_ptr changed, %FALSE otherwise
+
+</return>
+</function>
+
 <function name="g_set_prgname">
 <description>
 Sets the name of the program. This name should not be localized,
@@ -43916,11 +43962,12 @@ Since: 2.6
 <function name="g_test_add">
 <description>
 Hook up a new test case at @testpath, similar to g_test_add_func().
-A fixture data structure with setup and teardown function may be provided
-though, similar to g_test_create_case().
+A fixture data structure with setup and teardown functions may be provided,
+similar to g_test_create_case().
+
 g_test_add() is implemented as a macro, so that the fsetup(), ftest() and
-fteardown() callbacks can expect a @Fixture pointer as first argument in
-a type safe manner.
+fteardown() callbacks can expect a @Fixture pointer as their first argument
+in a type safe manner. They otherwise have type #GTestFixtureFunc.
 
 Since: 2.16
 
@@ -44155,14 +44202,14 @@ Since: 2.38
 Create a new #GTestCase, named @test_name, this API is fairly
 low level, calling g_test_add() or g_test_add_func() is preferable.
 When this test is executed, a fixture structure of size @data_size
-will be allocated and filled with 0s. Then @data_setup is called
-to initialize the fixture. After fixture setup, the actual test
-function @data_test is called. Once the test run completed, the
-fixture structure is torn down  by calling @data_teardown and
-after that the memory is released.
+will be automatically allocated and filled with zeros. Then @data_setup is
+called to initialize the fixture. After fixture setup, the actual test
+function @data_test is called. Once the test run completes, the
+fixture structure is torn down by calling @data_teardown and
+after that the memory is automatically released by the test framework.
 
 Splitting up a test run into fixture setup, test function and
-fixture teardown is most usful if the same fixture is used for
+fixture teardown is most useful if the same fixture is used for
 multiple tests. In this cases, g_test_create_case() will be
 called with the same fixture, but varying @test_name and
 @data_test arguments.
