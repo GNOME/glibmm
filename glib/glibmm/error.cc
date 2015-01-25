@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /* error.cc
  *
  * Copyright 2002 The gtkmm Development Team
@@ -21,6 +19,7 @@
 
 #include <glibmmconfig.h>
 #include <glibmm/error.h>
+#include <glibmm/wrap.h>
 #include <glibmm/wrap_init.h>
 #include <glib.h>
 #include <map>
@@ -131,6 +130,7 @@ void Error::register_init()
   if(!throw_func_table)
   {
     throw_func_table = new ThrowFuncTable();
+    Glib::wrap_register_init();
     Glib::wrap_init(); // make sure that at least the Glib exceptions are registered
   }
 }
@@ -176,6 +176,4 @@ void Error::throw_exception(GError* gobject)
   throw Glib::Error(gobject);
 }
 
-
 } // namespace Glib
-

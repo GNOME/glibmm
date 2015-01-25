@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright (C) 2003 The glibmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -18,7 +15,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/wrap.h>
+#include <glibmm/init.h>
 #include <glibmm/error.h>
 
 namespace Glib
@@ -26,9 +23,8 @@ namespace Glib
 
 void init()
 {
-  Glib::wrap_register_init();
-  Glib::Error::register_init(); //also calls Glib::wrap_init();
+  // Also calls Glib::wrap_register_init() and Glib::wrap_init().
+  Glib::Error::register_init();
 }
 
 } // namespace Glib
-
