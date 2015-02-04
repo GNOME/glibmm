@@ -10068,6 +10068,10 @@
 
 
 
+;; From gio-autocleanups.h
+
+
+
 ;; From gioenums.h
 
 
@@ -10829,6 +10833,117 @@
   (parameters
     '("gint" "fd")
     '("gboolean" "close_fd")
+  )
+)
+
+
+
+;; From glistmodel.h
+
+(define-function g_list_model_get_type
+  (c-name "g_list_model_get_type")
+  (return-type "GType")
+)
+
+(define-method get_item_type
+  (of-object "GListModel")
+  (c-name "g_list_model_get_item_type")
+  (return-type "GType")
+)
+
+(define-method get_n_items
+  (of-object "GListModel")
+  (c-name "g_list_model_get_n_items")
+  (return-type "guint")
+)
+
+(define-method get_item
+  (of-object "GListModel")
+  (c-name "g_list_model_get_item")
+  (return-type "gpointer")
+  (parameters
+    '("guint" "position")
+  )
+)
+
+(define-method get_object
+  (of-object "GListModel")
+  (c-name "g_list_model_get_object")
+  (return-type "GObject*")
+  (parameters
+    '("guint" "position")
+  )
+)
+
+(define-method items_changed
+  (of-object "GListModel")
+  (c-name "g_list_model_items_changed")
+  (return-type "none")
+  (parameters
+    '("guint" "position")
+    '("guint" "removed")
+    '("guint" "added")
+  )
+)
+
+
+
+;; From gliststore.h
+
+(define-method insert
+  (of-object "GListStore")
+  (c-name "g_list_store_insert")
+  (return-type "none")
+  (parameters
+    '("guint" "position")
+    '("gpointer" "item")
+  )
+)
+
+(define-method insert_sorted
+  (of-object "GListStore")
+  (c-name "g_list_store_insert_sorted")
+  (return-type "guint")
+  (parameters
+    '("gpointer" "item")
+    '("GCompareDataFunc" "compare_func")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method append
+  (of-object "GListStore")
+  (c-name "g_list_store_append")
+  (return-type "none")
+  (parameters
+    '("gpointer" "item")
+  )
+)
+
+(define-method remove
+  (of-object "GListStore")
+  (c-name "g_list_store_remove")
+  (return-type "none")
+  (parameters
+    '("guint" "position")
+  )
+)
+
+(define-method remove_all
+  (of-object "GListStore")
+  (c-name "g_list_store_remove_all")
+  (return-type "none")
+)
+
+(define-method splice
+  (of-object "GListStore")
+  (c-name "g_list_store_splice")
+  (return-type "none")
+  (parameters
+    '("guint" "position")
+    '("guint" "n_removals")
+    '("gpointer*" "additions")
+    '("guint" "n_additions")
   )
 )
 
@@ -14402,6 +14517,12 @@
   )
 )
 
+(define-method list_children
+  (of-object "GSettingsSchema")
+  (c-name "g_settings_schema_list_children")
+  (return-type "gchar**")
+)
+
 (define-function g_settings_schema_key_get_type
   (c-name "g_settings_schema_key_get_type")
   (return-type "GType")
@@ -14444,6 +14565,12 @@
   (parameters
     '("GVariant*" "value")
   )
+)
+
+(define-method get_name
+  (of-object "GSettingsSchemaKey")
+  (c-name "g_settings_schema_key_get_name")
+  (return-type "const-gchar*")
 )
 
 (define-method get_summary
@@ -14668,6 +14795,15 @@
   (return-type "none")
   (parameters
     '("GVariant*" "value")
+  )
+)
+
+(define-method set_state_hint
+  (of-object "GSimpleAction")
+  (c-name "g_simple_action_set_state_hint")
+  (return-type "none")
+  (parameters
+    '("GVariant*" "state_hint")
   )
 )
 
@@ -18230,14 +18366,6 @@
 
 
 ;; From gunixmounts.h
-
-(define-function g_unix_mount_free
-  (c-name "g_unix_mount_free")
-  (return-type "none")
-  (parameters
-    '("GUnixMountEntry*" "mount_entry")
-  )
-)
 
 (define-method free
   (of-object "GUnixMountPoint")
