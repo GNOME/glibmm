@@ -3673,6 +3673,30 @@ Error codes returned by parsing text-format GVariants.
 </parameters>
 </enum>
 
+<enum name="GWin32OSType">
+<description>
+Type of Windows edition to check for at run-time.
+
+</description>
+<parameters>
+<parameter name="G_WIN32_OS_ANY">
+<parameter_description> The running system can be a workstation or a server edition of
+Windows.  The type of the running system is therefore not checked.
+</parameter_description>
+</parameter>
+<parameter name="G_WIN32_OS_WORKSTATION">
+<parameter_description> The running system is a workstation edition of Windows,
+such as Windows 7 Professional.
+</parameter_description>
+</parameter>
+<parameter name="G_WIN32_OS_SERVER">
+<parameter_description> The running system is a server edition of Windows, such as
+Windows Server 2008 R2.
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
 <function name="g_access">
 <description>
 A wrapper for the POSIX access() function. This function is used to
@@ -4287,7 +4311,8 @@ This function generates enough precision that converting
 the string back using g_ascii_strtod() gives the same machine-number
 (on machines with IEEE compatible 64bit doubles). It is
 guaranteed that the size of the resulting string will never
-be larger than @G_ASCII_DTOSTR_BUF_SIZE bytes.
+be larger than @G_ASCII_DTOSTR_BUF_SIZE bytes, including the terminating
+nul character, which is always added.
 
 
 </description>
@@ -4315,6 +4340,8 @@ Converts a #gdouble to a string, using the '.' as
 decimal point. To format the number you pass in
 a printf()-style format string. Allowed conversion
 specifiers are 'e', 'E', 'f', 'F', 'g' and 'G'.
+
+The returned buffer is guaranteed to be nul-terminated.
 
 If you just want to want to serialize the value into a
 string, use g_ascii_dtostr().
@@ -6302,6 +6329,130 @@ Since: 2.30
 <return> the value of @atomic before the operation, unsigned
 
 </return>
+</function>
+
+<function name="g_auto">
+<description>
+Helper to declare a variable with automatic cleanup.
+
+The variable is cleaned up in a way appropriate to its type when the
+variable goes out of scope.  The type must support this.
+
+This feature is only supported on GCC and clang.  This macro is not
+defined on other compilers and should not be used in programs that
+are intended to be portable to those compilers.
+
+This is meant to be used with stack-allocated structures and
+non-pointer types.  For the (more commonly used) pointer version, see
+g_autoptr().
+
+This macro can be used to avoid having to do explicit cleanups of
+local variables when exiting functions.  It often vastly simplifies
+handling of error conditions, removing the need for various tricks
+such as 'goto out' or repeating of cleanup code.  It is also helpful
+for non-error cases.
+
+Consider the following example:
+
+|[
+GVariant *
+my_func(void)
+{
+g_auto(GQueue) queue = G_QUEUE_INIT;
+g_auto(GVariantBuilder) builder;
+
+g_variant_builder_init (&amp;builder, G_VARIANT_TYPE_VARDICT);
+
+...
+
+if (error_condition)
+return NULL;
+
+...
+
+return g_variant_builder_end (&amp;builder);
+}
+]|
+
+You must initialise the variable in some way -- either by use of an
+initialiser or by ensuring that an _init function will be called on
+it unconditionally before it goes out of scope.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="typename">
+<parameter_description> a supported variable type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_autoptr">
+<description>
+Helper to declare a pointer variable with automatic cleanup.
+
+The variable is cleaned up in a way appropriate to its type when the
+variable goes out of scope.  The type must support this.
+
+This feature is only supported on GCC and clang.  This macro is not
+defined on other compilers and should not be used in programs that
+are intended to be portable to those compilers.
+
+This is meant to be used to declare pointers to types with cleanup
+functions.  The type of the variable is a pointer to @typename.  You
+must not add your own '*'.
+
+This macro can be used to avoid having to do explicit cleanups of
+local variables when exiting functions.  It often vastly simplifies
+handling of error conditions, removing the need for various tricks
+such as 'goto out' or repeating of cleanup code.  It is also helpful
+for non-error cases.
+
+Consider the following example:
+
+|[
+gboolean
+check_exists(GVariant *dict)
+{
+g_autoptr(GVariant) dirname;
+g_autoptr(GVariant) basename = NULL;
+g_autoptr(gchar) path = NULL;
+
+dirname = g_variant_lookup_value (dict, &quot;dirname&quot;, G_VARIANT_TYPE_STRING);
+
+if (dirname == NULL)
+return FALSE;
+
+basename = g_variant_lookup_value (dict, &quot;basename&quot;, G_VARIANT_TYPE_STRING);
+
+if (basename == NULL)
+return FALSE;
+
+path = g_build_filename (g_variant_get_string (dirname, NULL),
+g_variant_get_string (basename, NULL),
+NULL);
+
+return g_access (path, R_OK) == 0;
+}
+]|
+
+You must initialise the variable in some way -- either by use of an
+initialiser or by ensuring that it is assigned to unconditionally
+before it goes out of scope.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="typename">
+<parameter_description> a supported variable type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_base64_decode">
@@ -28136,7 +28287,7 @@ by @newval, %FALSE otherwise.
 Releases all references to other objects. This can be used to break
 reference cycles.
 
-This functions should only be called from object system implementations.
+This function should only be called from object system implementations.
 
 </description>
 <parameters>
@@ -46076,7 +46227,7 @@ Since: 2.32
 
 <function name="g_thread_self">
 <description>
-This functions returns the #GThread corresponding to the
+This function returns the #GThread corresponding to the
 current thread. Note that this function does not increase
 the reference count of the returned struct.
 
@@ -57766,6 +57917,48 @@ Since: 2.32
 <return></return>
 </function>
 
+<function name="g_win32_check_windows_version">
+<description>
+Returns whether the version of the Windows operating system the
+code is running on is at least the specified major, minor and
+service pack versions.  See MSDN documentation for the Operating
+System Version.  Software that needs even more detailed version and
+feature information should use the Win32 API VerifyVersionInfo()
+directly.
+
+Successive calls of this function can be used for enabling or
+disabling features at run-time for a range of Windows versions,
+as per the VerifyVersionInfo() API documentation.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="major">
+<parameter_description> major version of Windows
+</parameter_description>
+</parameter>
+<parameter name="minor">
+<parameter_description> minor version of Windows
+</parameter_description>
+</parameter>
+<parameter name="spver">
+<parameter_description> Windows Service Pack Level, 0 if none
+</parameter_description>
+</parameter>
+<parameter name="os_type">
+<parameter_description> Type of Windows OS
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the Windows Version is the same or greater than
+the specified major, minor and service pack versions, and
+whether the running Windows is a workstation or server edition
+of Windows, if specifically specified.
+
+</return>
+</function>
+
 <function name="g_win32_error_message">
 <description>
 Translate a Win32 error code (as returned by GetLastError() or
@@ -57976,17 +58169,14 @@ freed with g_free() when no longer needed. If something goes wrong,
 
 <function name="g_win32_get_windows_version">
 <description>
-Returns version information for the Windows operating system the
-code is running on. See MSDN documentation for the GetVersion()
-function. To summarize, the most significant bit is one on Win9x,
-and zero on NT-based systems. Since version 2.14, GLib works only
-on NT-based systems, so checking whether your are running on Win9x
-in your own software is moot. The least significant byte is 4 on
-Windows NT 4, and 5 on Windows XP. Software that needs really
-detailed version and feature information should use Win32 API like
-GetVersionEx() and VerifyVersionInfo().
+This function is deprecated. Use
+g_win32_check_windows_version() instead.
 
-Since: 2.6
+Deprecated: 2.44: Be aware that for Windows 8.1 and Windows Server
+2012 R2 and later, this will return 62 unless the application is
+manifested for Windows 8.1/Windows Server 2012 R2, for example.
+MSDN stated that GetVersion(), which is used here, is subject to
+further change or removal after Windows 8.1.
 
 </description>
 <parameters>

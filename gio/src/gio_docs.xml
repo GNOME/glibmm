@@ -3939,6 +3939,36 @@ before calling the callback.
 </parameters>
 </enum>
 
+<signal name="GListModel::items-changed">
+<description>
+This signal is emitted whenever items were added or removed to
+@list. At @position, @removed items were removed and @added items
+were added in their place.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> the #GListModel that changed
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position at which @list changed
+</parameter_description>
+</parameter>
+<parameter name="removed">
+<parameter_description> the number of items removed
+</parameter_description>
+</parameter>
+<parameter name="added">
+<parameter_description> the number of items added
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
 <signal name="GMenuModel::items-changed">
 <description>
 Emitted when a change has occured to the menu.
@@ -44629,6 +44659,337 @@ trouble.
 </return>
 </function>
 
+<function name="g_list_model_get_item">
+<description>
+Get the item at @position. If @position is greater than the number of
+items in @list, %NULL is returned.
+
+%NULL is never returned for an index that is smaller than the length
+of the list.  See g_list_model_get_n_items().
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GListModel
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position of the item to fetch
+</parameter_description>
+</parameter>
+</parameters>
+<return> the item at @position.
+
+</return>
+</function>
+
+<function name="g_list_model_get_item_type">
+<description>
+Gets the type of the items in @list. All items returned from
+g_list_model_get_type() are of that type or a subtype, or are an
+implementation of that interface.
+
+The item type of a #GListModel can not change during the life of the
+model.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GListModel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GType of the items contained in @list.
+
+</return>
+</function>
+
+<function name="g_list_model_get_n_items">
+<description>
+Gets the number of items in @list.
+
+Depending on the model implementation, calling this function may be
+less efficient than iterating the list with increasing values for
+@position until g_list_model_get_item() returns %NULL.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GListModel
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of items in @list.
+
+</return>
+</function>
+
+<function name="g_list_model_get_object">
+<description>
+Get the item at @position. If @position is greater than the number of
+items in @list, %NULL is returned.
+
+%NULL is never returned for an index that is smaller than the length
+of the list.  See g_list_model_get_n_items().
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GListModel
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position of the item to fetch
+</parameter_description>
+</parameter>
+</parameters>
+<return> the object at @position.
+
+</return>
+</function>
+
+<function name="g_list_model_items_changed">
+<description>
+Emits the #GListModel::items-changed signal on @list.
+
+This function should only be called by classes implementing
+#GListModel. It has to be called after the internal representation
+of @list has been updated, because handlers connected to this signal
+might query the new state of the list.
+
+Implementations must only make changes to the model (as visible to
+its consumer) in places that will not cause problems for that
+consumer.  For models that are driven directly by a write API (such
+as #GListStore), changes can be reported in response to uses of that
+API.  For models that represent remote data, changes should only be
+made from a fresh mainloop dispatch.  It is particularly not
+permitted to make changes in response to a call to the #GListModel
+consumer API.
+
+Stated another way: in general, it is assumed that code making a
+series of accesses to the model via the API, without returning to the
+mainloop, and without calling other code, will continue to view the
+same contents of the model.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="list">
+<parameter_description> a #GListModel
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position at which @list changed
+</parameter_description>
+</parameter>
+<parameter name="removed">
+<parameter_description> the number of items removed
+</parameter_description>
+</parameter>
+<parameter name="added">
+<parameter_description> the number of items added
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_list_store_append">
+<description>
+Appends @item to @store. @item must be of type #GListStore:item-type.
+
+This function takes a ref on @item.
+
+Use g_list_store_splice() to append multiple items at the same time
+efficiently.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="item">
+<parameter_description> the new item
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_list_store_insert">
+<description>
+Inserts @item into @store at @position. @item must be of type
+#GListStore:item-type or derived from it. @position must be smaller
+than the length of the list, or equal to it to append.
+
+This function takes a ref on @item.
+
+Use g_list_store_splice() to insert multiple items at the same time
+efficiently.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position at which to insert the new item
+</parameter_description>
+</parameter>
+<parameter name="item">
+<parameter_description> the new item
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_list_store_insert_sorted">
+<description>
+Inserts @item into @store at a position to be determined by the
+@compare_func.
+
+The list must already be sorted before calling this function or the
+result is undefined.  Usually you would approach this by only ever
+inserting items by way of this function.
+
+This function takes a ref on @item.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="item">
+<parameter_description> the new item
+</parameter_description>
+</parameter>
+</parameters>
+<return> the position at which @item was inserted
+
+</return>
+</function>
+
+<function name="g_list_store_new">
+<description>
+Creates a new #GListStore with items of type @item_type. @item_type
+must be a subclass of #GObject.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="item_type">
+<parameter_description> the #GType of items in the list
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GListStore
+</return>
+</function>
+
+<function name="g_list_store_remove">
+<description>
+Removes the item from @store that is at @position. @position must be
+smaller than the current length of the list.
+
+Use g_list_store_splice() to remove multiple items at the same time
+efficiently.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position of the item that is to be removed
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_list_store_remove_all">
+<description>
+Removes all items from @store.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_list_store_splice">
+<description>
+Changes @store by removing @n_removals items and adding @n_additions
+items to it. @additions must contain @n_additions items of type
+#GListStore:item-type.  %NULL is not permitted.
+
+This function is more efficient than g_list_store_insert() and
+g_list_store_remove(), because it only emits
+#GListModel::items-changed once for the change.
+
+This function takes a ref on each item in @additions.
+
+The parameters @position and @n_removals must be correct (ie:
+@position + @n_removals must be less than or equal to the length of
+the list at the time this function is called).
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="position">
+<parameter_description> the position at which to make the change
+</parameter_description>
+</parameter>
+<parameter name="n_removals">
+<parameter_description> the number of items to remove
+</parameter_description>
+</parameter>
+<parameter name="additions">
+<parameter_description> the items to add
+</parameter_description>
+</parameter>
+<parameter name="n_additions">
+<parameter_description> the number of items to add
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_loadable_icon_load">
 <description>
 Loads a loadable icon. For the asynchronous version of this function, 
@@ -53328,6 +53689,24 @@ Since: 2.34
 </return>
 </function>
 
+<function name="g_settings_schema_key_get_name">
+<description>
+Gets the name of @key.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a #GSettingsSchemaKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> the name of @key.
+
+</return>
+</function>
+
 <function name="g_settings_schema_key_get_range">
 <description>
 Queries the range of a key.
@@ -53487,6 +53866,27 @@ Since: 2.40
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_settings_schema_list_children">
+<description>
+Gets the list of children in @schema.
+
+You should free the return value with g_strfreev() when you are done
+with it.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="schema">
+<parameter_description> a #GSettingsSchema
+</parameter_description>
+</parameter>
+</parameters>
+<return> a list of the children on @settings
+
+</return>
 </function>
 
 <function name="g_settings_schema_ref">
@@ -54317,6 +54717,29 @@ Since: 2.30
 </parameter>
 <parameter name="value">
 <parameter_description> the new #GVariant for the state
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_simple_action_set_state_hint">
+<description>
+Sets the state hint for the action.
+
+See g_action_get_state_hint() for more information about
+action state hints.
+
+Since: 2.44
+
+</description>
+<parameters>
+<parameter name="simple">
+<parameter_description> a #GSimpleAction
+</parameter_description>
+</parameter>
+<parameter name="state_hint">
+<parameter_description> a #GVariant representing the state hint
 </parameter_description>
 </parameter>
 </parameters>
