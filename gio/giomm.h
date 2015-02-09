@@ -129,6 +129,7 @@
 #include <giomm/socketsource.h>
 #include <giomm/srvtarget.h>
 #include <giomm/tcpconnection.h>
+#include <giomm/tcpwrapperconnection.h>
 #include <giomm/themedicon.h>
 #include <giomm/threadedsocketservice.h>
 #include <giomm/tlscertificate.h>
