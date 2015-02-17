@@ -37,6 +37,8 @@ class OptionEntry;
 class OptionContext;
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
+//TODO: GOptionGroup is now refcounted. See https://bugzilla.gnome.org/show_bug.cgi?id=743349
+//When we can break API/ABI, make Glib::OptionGroup refcounted. _CLASS_OPAQUE_REFCOUNTED?
 /** An OptionGroup defines the options in a single group.
  * Libraries which need to parse commandline options are expected to provide a function that allows their OptionGroups to
  * be added to the application's OptionContext.
@@ -65,10 +67,10 @@ public:
    * so it is only useful with C functions that return newly-allocated GOptionGroups.
    */
   explicit OptionGroup(GOptionGroup* castitem);
-  _IGNORE(g_option_group_new)
+  _IGNORE(g_option_group_new, g_option_group_ref)
 
   virtual ~OptionGroup();
-  _IGNORE(g_option_group_free)
+  _IGNORE(g_option_group_free, g_option_group_unref)
 
 
   virtual bool on_pre_parse(OptionContext& context, OptionGroup& group);
