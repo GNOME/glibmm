@@ -1,7 +1,5 @@
 divert(-1)
 
-dnl $Id$
-
 dnl  Glib::Value specializations for fundamental types
 dnl
 dnl  Copyright 2002 The gtkmm Development Team
@@ -50,7 +48,6 @@ public:
 ])
 
 divert[]dnl
-// -*- c++ -*-
 // This is a generated file, do not edit.  Generated from __file__
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -68,7 +65,12 @@ divert[]dnl
 namespace Glib
 {
 GLIB_VALUE_BASIC(bool, boolean)
+#ifndef GLIBMM_DISABLE_DEPRECATED
+/// @deprecated Use Value<signed char> instead.
 GLIB_VALUE_BASIC(char, char)
+#endif // GLIBMM_DISABLE_DEPRECATED
+/// @newin{2,44}
+GLIB_VALUE_BASIC(signed char, int8)
 GLIB_VALUE_BASIC(unsigned char, uchar)
 GLIB_VALUE_BASIC(int, int)
 GLIB_VALUE_BASIC(unsigned int, uint)

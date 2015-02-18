@@ -1,7 +1,5 @@
 divert(-1)
 
-dnl $Id$
-
 dnl  Glib::Value specializations for fundamental types
 dnl
 dnl  Copyright 2002 The gtkmm Development Team
@@ -34,7 +32,7 @@ dnl Please ignore the format stuff.  I was just tired and played a little.
 // static
 GType Value<$1>::value_type()
 {
-  return G_TYPE_[]UPPER($2);
+  return G_TYPE_[]UPPER(ifelse($2,schar,char,$2));
 }
 
 void Value<$1>::set($1 data)
@@ -49,7 +47,7 @@ $1 Value<$1>::get() const
 
 GParamSpec* Value<$1>::create_param_spec(const Glib::ustring& name) const
 {
-  return g_param_spec_$2(
+  return g_param_spec_[]ifelse($2,schar,char,$2)(
       name.c_str(), 0, 0,ifelse($2,pointer,,[
       ifelse($3,,,[$3, $4, ])[]g_value_get_$2(&gobject_),])
       GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
@@ -57,7 +55,6 @@ GParamSpec* Value<$1>::create_param_spec(const Glib::ustring& name) const
 ])
 
 divert[]dnl
-// -*- c++ -*-
 // This is a generated file, do not edit.  Generated from __file__
 
 /* So we can use deprecated functions in our deprecated methods */
@@ -73,7 +70,10 @@ G_GNUC_EXTENSION typedef long long long_long;
 G_GNUC_EXTENSION typedef unsigned long long unsigned_long_long;
 
 GLIB_VALUE_BASIC(bool, boolean)
+#ifndef GLIBMM_DISABLE_DEPRECATED
 GLIB_VALUE_BASIC(char, char, -128, 127)
+#endif // GLIBMM_DISABLE_DEPRECATED
+GLIB_VALUE_BASIC(signed char, schar, -128, 127)
 GLIB_VALUE_BASIC(unsigned char, uchar, 0, 255)
 GLIB_VALUE_BASIC(int, int, G_MININT, G_MAXINT)
 GLIB_VALUE_BASIC(unsigned int, uint, 0, G_MAXUINT)
