@@ -289,11 +289,11 @@ def clean_func(buf):
     pat = re.compile(r"""\\\n""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    # Preprocess directives
+    # Preprocessor directives
     pat = re.compile(r"""^[#].*?$""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    #typedefs, stucts, and enums
+    #typedefs, structs, and enums
     pat = re.compile(r"""^(typedef|struct|enum)(\s|.|\n)*?;\s*""",
                      re.MULTILINE)
     buf = pat.sub('', buf)
@@ -307,7 +307,7 @@ def clean_func(buf):
     buf = pat.sub('', buf)
 
     #strip *_DEPRECATED_IN_*_FOR (*):
-    pat = re.compile(r"""[A-Z]+_DEPRECATED_IN_[0-9]_([0-9]*)_FOR\s*\(\S*\)\S*""", re.MULTILINE)
+    pat = re.compile(r"""[A-Z]+_DEPRECATED_IN_[0-9]_([0-9]*)_FOR\s*\(.*\)\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #strip *_DEPRECATED*
