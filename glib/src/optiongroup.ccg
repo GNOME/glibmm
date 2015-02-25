@@ -377,29 +377,55 @@ void OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg ar
 {
   const Glib::ustring name = entry.get_long_name();
   type_map_entries::iterator iterFind = map_entries_.find(name);
-  if( iterFind == map_entries_.end() ) //If we have not added this entry already
+  if (iterFind == map_entries_.end()) //If we have not added this entry already
   {
     CppOptionEntry cppEntry;
     //g_option_group_add_entry() does not take its own copy, so we must keep the instance alive.
     cppEntry.entry_ = new OptionEntry(entry);
     //cppEntry.entry_ is deleted in release_c_arg(), via the destructor.
 
-    cppEntry.carg_type_ = arg_type;
-    cppEntry.allocate_c_arg();
-    cppEntry.set_c_arg_default(cpp_arg);
+    // Several options can refer to the same C++ variable,
+    // typically a pair of --enable-x / --disable-x options.
+    // Only one C variable shall be allocated for them.
+    // See https://bugzilla.gnome.org/show_bug.cgi?id=744854.
+    bool is_duplicate = false;
+    void* carg = 0;
+    if (arg_type != G_OPTION_ARG_CALLBACK)
+    {
+      for (type_map_entries::iterator iter = map_entries_.begin();
+           iter != map_entries_.end(); ++iter)
+      {
+        const CppOptionEntry& cpp_entry = iter->second;
+        if (cpp_entry.cpparg_ == cpp_arg &&
+            cpp_entry.carg_type_ == arg_type &&
+            cpp_entry.carg_)
+        {
+          is_duplicate = true;
+          carg = cpp_entry.carg_;
+          break;
+        }
+      }
+    }
 
+    cppEntry.carg_type_ = arg_type;
+    if (!is_duplicate)
+    {
+      cppEntry.allocate_c_arg();
+      cppEntry.set_c_arg_default(cpp_arg);
+      carg = cppEntry.carg_;
+    }
     cppEntry.cpparg_ = cpp_arg;
 
     //Give the information to the C API:
     cppEntry.entry_->gobj()->arg = arg_type;
-    cppEntry.entry_->gobj()->arg_data = cppEntry.carg_;
+    cppEntry.entry_->gobj()->arg_data = carg;
 
     //Remember the C++/C mapping so that we can use it later:
     map_entries_[name] = cppEntry;
 
     add_entry(*(cppEntry.entry_));
   }
-  else if( arg_type == G_OPTION_ARG_CALLBACK )
+  else if (arg_type == G_OPTION_ARG_CALLBACK)
   {
     //Delete the OptionArgCallback instance that was allocated by add_entry()
     //or add_entry_filename().
@@ -448,7 +474,7 @@ void OptionGroup::CppOptionEntry::allocate_c_arg()
   //defaults based on the C++-typed arguments.
   switch(carg_type_)
   {
-    case G_OPTION_ARG_STRING: //The char* will be for UTF8 strins.
+    case G_OPTION_ARG_STRING: //The char* will be for UTF8 strings.
     case G_OPTION_ARG_FILENAME: //The char* will be for strings in the current locale's encoding.
     {
       char** typed_arg = new char*;
@@ -697,6 +723,9 @@ void OptionGroup::CppOptionEntry::release_c_arg()
 
 void OptionGroup::CppOptionEntry::convert_c_to_cpp()
 {
+  if (!carg_)
+    return;
+
   switch(carg_type_)
   {
     case G_OPTION_ARG_STRING:
