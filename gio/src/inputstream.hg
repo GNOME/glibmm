@@ -205,6 +205,80 @@ public:
                g_input_stream_read_finish,
                errthrow)
 
+
+  /** Request an asynchronous read of @a count bytes from the stream into the buffer
+   * starting at @a buffer. This is the asynchronous equivalent of read_all().
+   *
+   * When the operation is finished @a slot will be called.
+   * You can then call read_all_finish() to get the result of the
+   * operation.
+   *
+   * During an async request no other sync and async calls are allowed, and will
+   * result in Gio::Error with PENDING being thrown.
+   *
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
+   *
+   * On success, the number of bytes read into the buffer will be passed to the
+   * @a slot callback. It is not an error if this is not the same as the requested size, as it
+   * can happen e.g. near the end of a file, but generally we try to read
+   * as many bytes as requested. Zero is returned on end of file
+   * (or if @a count is zero), but never otherwise.
+   *
+   * Any outstanding i/o request with higher priority (lower numerical value) will
+   * be executed before an outstanding request with lower priority. Default
+   * priority is PRIORITY_DEFAULT.
+   *
+   * The asyncronous methods have a default fallback that uses threads to implement
+   * asynchronicity, so they are optional for inheriting classes. However, if you
+   * override one you must override all.
+   *
+   * @param buffer A buffer to read data into (which should be at least count bytes long).
+   * @param count The number of bytes that will be read from the stream.
+   * @param slot Callback to call when the request is satisfied.
+   * @param cancellable A Cancellable object.
+   * @param io_priority The I/O priority of the request.
+   */
+  void read_all_async(void* buffer, gsize count, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  /** Request an asynchronous read of @a count bytes from the stream into the buffer
+   * starting at @a buffer. This is the asynchronous equivalent of read_all().
+   *
+   * When the operation is finished @a slot will be called.
+   * You can then call read_all_finish() to get the result of the
+   * operation.
+   *
+   * During an async request no other sync and async calls are allowed, and will
+   * result in a Gio::Error with PENDING being thrown.
+   *
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with INVALID_ARGUMENT to be thrown.
+   *
+   * On success, the number of bytes read into the buffer will be passed to the
+   * @a slot callback. It is not an error if this is not the same as the requested size, as it
+   * can happen e.g. near the end of a file, but generally we try to read
+   * as many bytes as requested. Zero is returned on end of file
+   * (or if @a count is zero), but never otherwise.
+   *
+   * Any outstanding i/o request with higher priority (lower numerical value) will
+   * be executed before an outstanding request with lower priority. Default
+   * priority is PRIORITY_DEFAULT.
+   *
+   * The asyncronous methods have a default fallback that uses threads to implement
+   * asynchronicity, so they are optional for inheriting classes. However, if you
+   * override one you must override all.
+   *
+   * @param buffer A buffer to read data into (which should be at least count bytes long).
+   * @param count The number of bytes that will be read from the stream.
+   * @param slot Callback to call when the request is satisfied.
+   * @param io_priority The I/O priority of the request.
+   */
+  void read_all_async(void* buffer, gsize count, const SlotAsyncReady& slot, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_input_stream_read_all_async)
+
+  _WRAP_METHOD(bool read_all_finish(const Glib::RefPtr<AsyncResult>& result, gsize& bytes_read),
+               g_input_stream_read_all_finish,
+               errthrow)
+
+
   //TODO: Use std::size_type instead of gsize?
 
   /** Request an asynchronous skip of @a count bytes from the stream into the buffer
