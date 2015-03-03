@@ -2716,6 +2716,12 @@
   (return-type "none")
 )
 
+(define-method get_is_busy
+  (of-object "GApplication")
+  (c-name "g_application_get_is_busy")
+  (return-type "gboolean")
+)
+
 (define-method send_notification
   (of-object "GApplication")
   (c-name "g_application_send_notification")
@@ -2738,6 +2744,16 @@
 (define-method bind_busy_property
   (of-object "GApplication")
   (c-name "g_application_bind_busy_property")
+  (return-type "none")
+  (parameters
+    '("gpointer" "object")
+    '("const-gchar*" "property")
+  )
+)
+
+(define-method unbind_busy_property
+  (of-object "GApplication")
+  (c-name "g_application_unbind_busy_property")
   (return-type "none")
   (parameters
     '("gpointer" "object")
@@ -3406,6 +3422,41 @@
 
 
 ;; From gcontenttypeprivate.h
+
+
+
+;; From gcontextspecificgroup.h
+
+(define-method get
+  (of-object "GContextSpecificGroup")
+  (c-name "g_context_specific_group_get")
+  (return-type "gpointer")
+  (parameters
+    '("GType" "type")
+    '("goffset" "context_offset")
+    '("GCallback" "start_func")
+  )
+)
+
+(define-method remove
+  (of-object "GContextSpecificGroup")
+  (c-name "g_context_specific_group_remove")
+  (return-type "none")
+  (parameters
+    '("GMainContext*" "context")
+    '("gpointer" "instance")
+    '("GCallback" "stop_func")
+  )
+)
+
+(define-method emit
+  (of-object "GContextSpecificGroup")
+  (c-name "g_context_specific_group_emit")
+  (return-type "none")
+  (parameters
+    '("guint" "signal_id")
+  )
+)
 
 
 
@@ -7212,6 +7263,18 @@
   )
 )
 
+(define-method iterate
+  (of-object "GFileEnumerator")
+  (c-name "g_file_enumerator_iterate")
+  (return-type "gboolean")
+  (parameters
+    '("GFileInfo**" "out_info")
+    '("GFile**" "out_child")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
 
 
 ;; From gfile.h
@@ -10680,9 +10743,21 @@
   (return-type "gboolean")
 )
 
+(define-method async_close_is_via_threads
+  (of-object "GInputStream")
+  (c-name "g_input_stream_async_close_is_via_threads")
+  (return-type "gboolean")
+)
+
 (define-method async_write_is_via_threads
   (of-object "GOutputStream")
   (c-name "g_output_stream_async_write_is_via_threads")
+  (return-type "gboolean")
+)
+
+(define-method async_close_is_via_threads
+  (of-object "GOutputStream")
+  (c-name "g_output_stream_async_close_is_via_threads")
   (return-type "gboolean")
 )
 
@@ -10698,6 +10773,18 @@
 
 
 ;; From gioscheduler.h
+
+(define-function g_io_scheduler_push_job
+  (c-name "g_io_scheduler_push_job")
+  (return-type "none")
+  (parameters
+    '("GIOSchedulerJobFunc" "job_func")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "notify")
+    '("gint" "io_priority")
+    '("GCancellable*" "cancellable")
+  )
+)
 
 (define-function g_io_scheduler_cancel_all_jobs
   (c-name "g_io_scheduler_cancel_all_jobs")
@@ -15061,6 +15148,25 @@
 
 
 
+;; From gsimpleiostream.h
+
+(define-function g_simple_io_stream_get_type
+  (c-name "g_simple_io_stream_get_type")
+  (return-type "GType")
+)
+
+(define-function g_simple_io_stream_new
+  (c-name "g_simple_io_stream_new")
+  (is-constructor-of "GSimpleIoStream")
+  (return-type "GIOStream*")
+  (parameters
+    '("GInputStream*" "input_stream")
+    '("GOutputStream*" "output_stream")
+  )
+)
+
+
+
 ;; From gsimplepermission.h
 
 (define-function g_simple_permission_get_type
@@ -18586,6 +18692,11 @@
 (define-function g_unix_mount_monitor_get_type
   (c-name "g_unix_mount_monitor_get_type")
   (return-type "GType")
+)
+
+(define-function g_unix_mount_monitor_get
+  (c-name "g_unix_mount_monitor_get")
+  (return-type "GUnixMountMonitor*")
 )
 
 (define-function g_unix_mount_monitor_new
