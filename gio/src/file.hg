@@ -2360,6 +2360,51 @@ public:
   void replace_contents_finish(const Glib::RefPtr<AsyncResult>& result);
   _IGNORE(g_file_replace_contents_finish)
 
+
+ /** Same as replace_contents_async() but takes a Gio::Bytes input instead.
+  *
+  * When this operation has completed, @a slot will be called
+  * and the operation can be finalized with replace_contents_finish().
+  *
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
+  *
+  * If @a make_backup is true, this function will attempt to
+  * make a backup of the file.
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param cancellable A Cancellable object.
+  * @param contents Bytes of contents to replace the file with.
+  * @param etag a new entity tag for the file.
+  * @param make_backup true if a backup should be created.
+  * @param flags A set of FileCreateFlags.
+  */
+  void replace_contents_bytes_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<const Glib::Bytes>& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+
+ /** Same as replace_contents_async() but takes a Gio::Bytes input instead.
+  *
+  * When this operation has completed, @a slot will be called
+  * and the operation can be finalized with replace_contents_finish().
+  *
+  * The operation can be cancelled by
+  * triggering the cancellable object from another thread. If the operation
+  * was cancelled, a Gio::Error with CANCELLED will be thrown.
+  *
+  * If @a make_backup is true, this function will attempt to
+  * make a backup of the file.
+  *
+  * @param slot: A callback to call when the request is satisfied.
+  * @param contents Bytes of contents to replace the file with.
+  * @param etag a new entity tag for the file.
+  * @param make_backup true if a backup should be created.
+  * @param flags A set of FileCreateFlags.
+  */
+  void replace_contents_bytes_async(const SlotAsyncReady& slot, const Glib::RefPtr<const Glib::Bytes>& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FILE_CREATE_NONE);
+
+  _IGNORE(g_file_replace_contents_async)
+
+
   _WRAP_METHOD(bool supports_thread_contexts() const, g_file_supports_thread_contexts)
 
   // *** vfuncs ***

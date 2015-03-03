@@ -1456,6 +1456,52 @@ void File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result)
 }
 
 
+void
+File::replace_contents_bytes_async(const SlotAsyncReady& slot,
+                             const Glib::RefPtr<Cancellable>& cancellable,
+                             const Glib::RefPtr<const Glib::Bytes>& contents,
+                             const std::string& etag,
+                             bool make_backup,
+                             FileCreateFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_replace_contents_bytes_async(gobj(),
+                                const_cast<GBytes*>(Glib::unwrap(contents)),
+                                etag.empty() ? 0 : etag.c_str(),
+                                make_backup,
+                                static_cast<GFileCreateFlags>(flags),
+                                Glib::unwrap(cancellable),
+                                &SignalProxy_async_callback,
+                                slot_copy);
+}
+
+void
+File::replace_contents_bytes_async(const SlotAsyncReady& slot,
+                             const Glib::RefPtr<const Glib::Bytes>& contents,
+                             const std::string& etag,
+                             bool make_backup,
+                             FileCreateFlags flags)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+
+  g_file_replace_contents_bytes_async(gobj(),
+                                const_cast<GBytes*>(Glib::unwrap(contents)),
+                                etag.empty() ? 0 : etag.c_str(),
+                                make_backup,
+                                static_cast<GFileCreateFlags>(flags),
+                                0,
+                                &SignalProxy_async_callback,
+                                slot_copy);
+}
+
+
 Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags)
 {
   GError* gerror = 0;
