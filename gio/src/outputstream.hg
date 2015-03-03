@@ -303,6 +303,86 @@ public:
                g_output_stream_write_finish,
                errthrow)
 
+
+  /** Request an asynchronous write of @a count bytes from @a buffer into
+   * the stream. When the operation is finished @a slot will be called.
+   * You can then call write_all_finish() to get the result of the
+   * operation.
+   *
+   * This is the asynchronous version of write_all().
+   *
+   * During an async request no other sync and async calls are allowed,
+   * and will result in Gio::Error with PENDING being thrown.
+   *
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with
+   * INVALID_ARGUMENT to be thrown.
+   *
+   * On success, the number of bytes written will be passed to the
+   * callback @a slot. It is not an error if this is not the same as the
+   * requested size, as it can happen e.g. on a partial I/O error,
+   * but generally we try to write as many bytes as requested.
+   *
+   * Any outstanding I/O request with higher priority (lower numerical
+   * value) will be executed before an outstanding request with lower
+   * priority. Default priority is Glib::PRIORITY_DEFAULT.
+   *
+   * The asyncronous methods have a default fallback that uses threads
+   * to implement asynchronicity, so they are optional for inheriting
+   * classes. However, if you override one you must override all.
+   *
+   * For the synchronous, blocking version of this function, see
+   * write().
+   *
+   * @param buffer The buffer containing the data to write.
+   * @param count The number of bytes to write
+   * @param slot Callback slot to call when the request is satisfied.
+   * @param cancellable Cancellable object.
+   * @param io_priority The io priority of the request.
+   */
+  void write_all_async(const void* buffer, gsize count, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
+
+  /** Request an asynchronous write of @a count bytes from @a buffer into
+   * the stream. When the operation is finished @a slot will be called.
+   * You can then call write_finish() to get the result of the
+   * operation.
+   *
+   * This is the asynchronous version of write_all().
+   *
+   * During an async request no other sync and async calls are allowed,
+   * and will result in Gio::Error with PENDING being thrown.
+   *
+   * A value of @a count larger than MAXSSIZE will cause a Gio::Error with
+   * INVALID_ARGUMENT to be thrown.
+   *
+   * On success, the number of bytes written will be passed to the
+   * callback @a slot. It is not an error if this is not the same as the
+   * requested size, as it can happen e.g. on a partial I/O error,
+   * but generally we try to write as many bytes as requested.
+   *
+   * Any outstanding I/O request with higher priority (lower numerical
+   * value) will be executed before an outstanding request with lower
+   * priority. Default priority is Glib::PRIORITY_DEFAULT.
+   *
+   * The asyncronous methods have a default fallback that uses threads
+   * to implement asynchronicity, so they are optional for inheriting
+   * classes. However, if you override one you must override all.
+   *
+   * For the synchronous, blocking version of this function, see
+   * write().
+   *
+   * @param buffer The buffer containing the data to write.
+   * @param count The number of bytes to write
+   * @param slot Callback slot to call when the request is satisfied.
+   * @param io_priority The io priority of the request.
+   */
+  void write_all_async(const void* buffer, gsize count, const SlotAsyncReady& slot, int io_priority = Glib::PRIORITY_DEFAULT);
+  _IGNORE(g_output_stream_write_all_async)
+
+  _WRAP_METHOD(bool write_all_finish(const Glib::RefPtr<AsyncResult>& result, gsize& bytes_written),
+               g_output_stream_write_all_finish,
+               errthrow)
+
+
   /** Splices a stream asynchronously.
    *  When the operation is finished @a slot will be called.
    * You can then call splice_finish() to get the result of the
