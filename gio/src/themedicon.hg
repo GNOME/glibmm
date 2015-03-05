@@ -1,5 +1,3 @@
-// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-
 /* Copyright (C) 2007 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -28,7 +26,7 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-/** Icon theming support
+/** Icon theming support.
  * ThemedIcon is an implementation of Gio::Icon that supports icon themes.
  * ThemedIcon contains a list of all of the icons present in an icon
  * theme, so that icons can be looked up quickly. ThemedIcon does
@@ -47,21 +45,33 @@ class ThemedIcon
   _IMPLEMENTS_INTERFACE(Icon)
 
 protected:
-  /** Creates a new themed icon for @ iconname, and optionally all the names that can be created by shortening @a iconname at '-' characters.
+  /** Creates a new themed icon for @a iconname, and optionally all the names that can be created by shortening @a iconname at '-' characters.
    *
    * @param iconname A string containing an icon name.
-   * @param use_default_callbacks Whether to use all the names that can be created by shortening @a iconname at '-' characters.
+   * @param use_default_fallbacks Whether to use all the names that can be created by shortening @a iconname at '-' characters.
    */
-  explicit ThemedIcon(const std::string& iconname, bool use_default_callbacks = false);
+  explicit ThemedIcon(const std::string& iconname, bool use_default_fallbacks = false);
   _IGNORE(g_themed_icon_new, g_themed_icon_new_with_default_fallbacks)
 
 public:
-  /** Creates a new themed icon for @ iconname, and optionally all the names that can be created by shortening @a iconname at '-' characters.
+  /** Creates a new themed icon for @a iconname, and optionally all the names that can be created by shortening @a iconname at '-' characters.
+   *
+   * For example
+   * @code
+   * Glib::RefPtr<Gio::ThemedIcon> icon = Gio::ThemedIcon::create("gnome-dev-cdrom-audio", true);
+   * @endcode
+   * is equivalent to
+   * @code
+   * Glib::RefPtr<Gio::ThemedIcon> icon = Gio::ThemedIcon::create("gnome-dev-cdrom-audio", false);
+   * icon->append_name("gnome-dev-cdrom");
+   * icon->append_name("gnome-dev");
+   * icon->append_name("gnome");
+   * @endcode
    *
    * @param iconname A string containing an icon name.
-   * @param use_default_callbacks Whether to use all the names that can be created by shortening @a iconname at '-' characters.
+   * @param use_default_fallbacks Whether to use all the names that can be created by shortening @a iconname at '-' characters.
    */
-  _WRAP_CREATE(const std::string& iconname, bool use_default_callbacks = false)
+  _WRAP_CREATE(const std::string& iconname, bool use_default_fallbacks = false)
 
   //TODO: GIcon *g_themed_icon_new_from_names (char **iconnames, int len);
 
