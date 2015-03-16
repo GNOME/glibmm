@@ -1169,8 +1169,8 @@ option: `--name arg` or combined in a single argument: `--name=arg`.
 </parameter_description>
 </parameter>
 <parameter name="G_OPTION_ARG_CALLBACK">
-<parameter_description> The option provides a callback to parse the
-extra argument.
+<parameter_description> The option provides a callback (of type
+#GOptionArgFunc) to parse the extra argument.
 </parameter_description>
 </parameter>
 <parameter name="G_OPTION_ARG_FILENAME">
@@ -17699,7 +17699,9 @@ Since: 2.2
 <function name="g_free">
 <description>
 Frees the memory pointed to by @mem.
-If @mem is %NULL it simply returns.
+
+If @mem is %NULL it simply returns, so there is no need to check @mem
+against %NULL before calling this function.
 
 </description>
 <parameters>
@@ -18601,6 +18603,10 @@ release of GLib. It does nothing.
 Retrieves every key inside @hash_table. The returned data is valid
 until changes to the hash release those keys.
 
+This iterates over every entry in the hash table to build its return value.
+To iterate over the entries in a #GHashTable more efficiently, use a
+#GHashTableIter.
+
 Since: 2.14
 
 </description>
@@ -18628,6 +18634,10 @@ key.  Use @length to determine the true length if it's possible that
 
 Note: in the common case of a string-keyed #GHashTable, the return
 value of this function can be conveniently cast to (const gchar **).
+
+This iterates over every entry in the hash table to build its return value.
+To iterate over the entries in a #GHashTable more efficiently, use a
+#GHashTableIter.
 
 You should always free the return result with g_free().  In the
 above-mentioned case of a string-keyed hash table, it may be
@@ -18657,6 +18667,10 @@ Since: 2.40
 <description>
 Retrieves every value inside @hash_table. The returned data
 is valid until @hash_table is modified.
+
+This iterates over every entry in the hash table to build its return value.
+To iterate over the entries in a #GHashTable more efficiently, use a
+#GHashTableIter.
 
 Since: 2.14
 
@@ -20138,8 +20152,10 @@ returns %FALSE it is automatically removed from the list of event
 sources and will not be called again.
 
 This internally creates a main loop source using g_idle_source_new()
-and attaches it to the main loop context using g_source_attach(). 
-You can do these steps manually if you need greater control.
+and attaches it to the global #GMainContext using g_source_attach(), so
+the callback will be invoked in whichever thread is running that main
+context. You can do these steps manually if you need greater control or to
+use a custom main context.
 
 
 </description>
@@ -20164,8 +20180,10 @@ events pending.  If the function returns %FALSE it is automatically
 removed from the list of event sources and will not be called again.
 
 This internally creates a main loop source using g_idle_source_new()
-and attaches it to the main loop context using g_source_attach(). 
-You can do these steps manually if you need greater control.
+and attaches it to the global #GMainContext using g_source_attach(), so
+the callback will be invoked in whichever thread is running that main
+context. You can do these steps manually if you need greater control or to
+use a custom main context.
 
 
 </description>
@@ -23283,7 +23301,10 @@ Another name for g_list_free_1().
 
 <function name="g_list_free_1">
 <description>
-Frees one #GList element.
+Frees one #GList element, but does not update links from the next and
+previous elements in the list, so you should not call this function on an
+element that is currently part of a list.
+
 It is usually used after g_list_remove_link().
 
 </description>
@@ -23522,6 +23543,10 @@ Note that it is considered perfectly acceptable to access
 <description>
 Gets the element at the given position in a #GList.
 
+This iterates over the list until it reaches the @n-th position. If you
+intend to iterate over every element, it is better to use a for-loop as
+described in the #GList introduction.
+
 
 </description>
 <parameters>
@@ -23542,6 +23567,10 @@ the end of the #GList
 <function name="g_list_nth_data">
 <description>
 Gets the data of the element at the given position.
+
+This iterates over the list until it reaches the @n-th position. If you
+intend to iterate over every element, it is better to use a for-loop as
+described in the #GList introduction.
 
 
 </description>
@@ -29766,6 +29795,11 @@ It is an error to call this function when the freeze count is zero.
 Decreases the reference count of @object. When its reference count
 drops to 0, the object is finalized (i.e. its memory is freed).
 
+If the pointer to the #GObject may be reused in future (for example, if it is
+an instance variable of another object), it is recommended to clear the
+pointer to %NULL rather than retain a dangling pointer to a potentially
+invalid #GObject instance. Use g_clear_object() for this.
+
 </description>
 <parameters>
 <parameter name="object">
@@ -30893,7 +30927,10 @@ Since: 2.44
 <function name="g_param_spec_boolean">
 <description>
 Creates a new #GParamSpecBoolean instance specifying a %G_TYPE_BOOLEAN
-property.
+property. In many cases, it may be more appropriate to use an enum with
+g_param_spec_enum(), both to improve code clarity by using explicitly named
+values, and to allow for more values to be added in future without breaking
+API.
 
 See g_param_spec_internal() for details on property names.
 
@@ -31588,6 +31625,8 @@ See g_param_spec_internal() for details on property names.
 <function name="g_param_spec_pointer">
 <description>
 Creates a new #GParamSpecPointer instance specifying a pointer property.
+Where possible, it is better to use g_param_spec_object() or
+g_param_spec_boxed() to expose memory management information.
 
 See g_param_spec_internal() for details on property names.
 
@@ -48075,8 +48114,10 @@ g_timeout_add_seconds() function; this function allows for more
 optimizations and more efficient system power usage.
 
 This internally creates a main loop source using g_timeout_source_new()
-and attaches it to the main loop context using g_source_attach(). You can
-do these steps manually if you need greater control.
+and attaches it to the global #GMainContext using g_source_attach(), so
+the callback will be invoked in whichever thread is running that main
+context. You can do these steps manually if you need greater control or to
+use a custom main context.
 
 The interval given is in terms of monotonic time, not wall clock
 time.  See g_get_monotonic_time().
@@ -48118,8 +48159,10 @@ timeout is recalculated based on the current time and the given interval
 (it does not try to 'catch up' time lost in delays).
 
 This internally creates a main loop source using g_timeout_source_new()
-and attaches it to the main loop context using g_source_attach(). You can
-do these steps manually if you need greater control.
+and attaches it to the global #GMainContext using g_source_attach(), so
+the callback will be invoked in whichever thread is running that main
+context. You can do these steps manually if you need greater control or to
+use a custom main context.
 
 The interval given in terms of monotonic time, not wall clock time.
 See g_get_monotonic_time().
@@ -49068,7 +49111,9 @@ Since: 2.8
 <description>
 Attempts to realloc @mem to a new size, @n_bytes, and returns %NULL
 on failure. Contrast with g_realloc(), which aborts the program
-on failure. If @mem is %NULL, behaves the same as g_try_malloc().
+on failure.
+
+If @mem is %NULL, behaves the same as g_try_malloc().
 
 
 </description>
@@ -55420,7 +55465,7 @@ Since: 2.30
 Similar to g_variant_get_string() except that instead of returning
 a constant string, the string is duplicated.
 
-The string will always be utf8 encoded.
+The string will always be UTF-8 encoded.
 
 The return value must be freed using g_free().
 
@@ -55437,7 +55482,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string, utf8 encoded
+<return> a newly allocated string, UTF-8 encoded
 
 </return>
 </function>
@@ -56053,7 +56098,7 @@ Returns the string value of a #GVariant instance with a string
 type.  This includes the types %G_VARIANT_TYPE_STRING,
 %G_VARIANT_TYPE_OBJECT_PATH and %G_VARIANT_TYPE_SIGNATURE.
 
-The string will always be utf8 encoded.
+The string will always be UTF-8 encoded.
 
 If @length is non-%NULL then the length of the string (in bytes) is
 returned there.  For trusted values, this information is already
@@ -56078,7 +56123,7 @@ to store the length
 </parameter_description>
 </parameter>
 </parameters>
-<return> the constant string, utf8 encoded
+<return> the constant string, UTF-8 encoded
 
 </return>
 </function>
@@ -57020,7 +57065,7 @@ Since: 2.24
 <description>
 Creates an array-of-bytes #GVariant with the contents of @string.
 This function is just like g_variant_new_string() except that the
-string need not be valid utf8.
+string need not be valid UTF-8.
 
 The nul terminator character at the end of the string is stored in
 the array.
@@ -57540,14 +57585,14 @@ Since: 2.24
 <description>
 Creates a string #GVariant with the contents of @string.
 
-@string must be valid utf8.
+@string must be valid UTF-8.
 
 Since: 2.24
 
 </description>
 <parameters>
 <parameter name="string">
-<parameter_description> a normal utf8 nul-terminated string
+<parameter_description> a normal UTF-8 nul-terminated string
 </parameter_description>
 </parameter>
 </parameters>
@@ -57585,7 +57630,7 @@ Since: 2.24
 <description>
 Creates a string #GVariant with the contents of @string.
 
-@string must be valid utf8.
+@string must be valid UTF-8.
 
 This function consumes @string.  g_free() will be called on @string
 when it is no longer required.
@@ -57599,7 +57644,7 @@ Since: 2.38
 </description>
 <parameters>
 <parameter name="string">
-<parameter_description> a normal utf8 nul-terminated string
+<parameter_description> a normal UTF-8 nul-terminated string
 </parameter_description>
 </parameter>
 </parameters>
