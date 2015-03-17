@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_WRAP_H
 #define _GLIBMM_WRAP_H
-
-/* $Id$ */
 
 /* Copyright (C) 1998-2002 The gtkmm Development Team
  *
@@ -141,6 +138,20 @@ template <class T> inline
 const typename T::BaseObjectType* unwrap(const Glib::RefPtr<const T>& ptr)
 {
   return (ptr) ? ptr->gobj() : 0;
+}
+
+// This unwrap_copy() overload is intended primarily for classes wrapped as
+// _CLASS_BOXEDTYPE, _CLASS_OPAQUE_COPYABLE or _CLASS_OPAQUE_REFCOUNTED,
+// where the C++ objects are not stored in Glib::RefPtr<>s. They have a const
+// gobj_copy() member that returns a non-const pointer to the underlying C instance.
+/** Get the underlying C instance from the C++ instance and acquire a
+ * reference or copy. This is just like calling gobj_copy(), but it does its own
+ * check for a NULL pointer to the underlying C instance.
+ */
+template <class T> inline
+typename T::BaseObjectType* unwrap_copy(const T& obj)
+{
+  return obj.gobj() ? obj.gobj_copy() : 0;
 }
 
 /** Get the underlying C instance from the C++ instance and acquire a
