@@ -20,22 +20,24 @@ _POP()')
 
 dnl              $1      $2       $3        $4
 dnl _VFUNC_PCC(cppname,gtkname,cpprettype,crettype,
-dnl                         $5               $6           $7            $8         $9           $10      $11
-dnl                  `<cargs and names>',`<cnames>',`<cpparg names>',firstarg, refreturn_ctype, ifdef, errthrow,
-dnl                     $12           $13            $14             $15
-dnl                  slot_type, c_data_param_name, return_value, exception_handler)
+dnl                   $5               $6           $7            $8
+dnl            `<cargs and names>',`<cnames>',`<cpparg names>',firstarg,
+dnl                $9               $10        $11     $12
+dnl             refreturn_ctype, keep_return, ifdef, errthrow,
+dnl               $13           $14            $15             $16
+dnl            slot_type, c_data_param_name, return_value, exception_handler)
 dnl
 dnl Note: _get_current_wrapper_inline() could be used throughout for performance instead of _get_current_wrapper(),
 dnl and is_derived_() instead of is_derived_(),
 dnl but it is not yet clear whether that would be a worthwhile performance optimization.
 define(`_VFUNC_PCC',`dnl
 _PUSH(SECTION_PCC_VFUNCS)
-ifelse(`$10',,,`#ifdef $10'
+ifelse(`$11',,,`#ifdef $11'
 )dnl
 $4 __CPPNAME__`'_Class::$2_vfunc_callback`'($5)
 {
-ifelse(`$13',,,dnl
-`  const $12* slot = static_cast<$12*>($13);
+ifelse(`$14',,,dnl
+`  const $13* slot = static_cast<$13*>($14);
 
 ')dnl
 dnl  First, do a simple cast to ObjectBase. We will have to do a dynamic_cast
@@ -65,26 +67,42 @@ dnl  C++ vfunc on it.
 ifelse($4,void,`dnl
         obj->$1`'($7);
         return;
-',`dnl
+',`dnl not void
 ifelse($9,refreturn_ctype,`dnl Assume Glib::unwrap_copy() is correct if refreturn_ctype is requested.
         return Glib::unwrap_copy`'(`obj->$1'($7));
-',`dnl
+',`dnl not refreturn_ctype
+ifelse($10,keep_return,`dnl
+        static GQuark quark_return_value = g_quark_from_static_string("__NAMESPACE__::__CPPNAME__::$1");
+
+        $3* return_value = static_cast<$3*>(g_object_get_qdata(obj_base->gobj(), quark_return_value));
+        if (!return_value)
+        {
+          return_value = new $3`'();
+          g_object_set_qdata_full(obj_base->gobj(), quark_return_value, return_value,
+          &Glib::destroy_notify_delete<$3>);
+        }
+        // Keep a copy of the return value. The caller is not expected
+        // to free the object that the returned pointer points to.
+        *return_value = obj->$1`'($7);
+        return _CONVERT($3,$4,`(*return_value)');
+',`dnl not keep_return
         return _CONVERT($3,$4,`obj->$1`'($7)');
-')dnl
-')dnl
+')dnl end keep_return
+')dnl end refreturn_ctype
+')dnl end void
       #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
-ifelse($15, `', `dnl
+ifelse($16, `', `dnl
         Glib::exception_handlers_invoke`'();
 ', `dnl
         try
         {
 ifelse($9,refreturn_ctype,`dnl
-          return Glib::unwrap_copy`'(obj->$15`'());
+          return Glib::unwrap_copy`'(obj->$16`'());
 ', `dnl
-          return _CONVERT($3, $4, `obj->$15`'()');
+          return _CONVERT($3, $4, `obj->$16`'()');
 ')dnl
         }
         catch(...)
@@ -109,7 +127,7 @@ dnl  g_assert(base != 0);
   if(base && base->$2)
   {
     ifelse($4,void,,`$4 retval = ')(*base->$2)`'($6);
-ifelse($11,errthrow,`dnl
+ifelse($12,errthrow,`dnl
     if(*error)
       ::Glib::Error::throw_exception(*error);
 ')dnl
@@ -118,15 +136,15 @@ ifelse($4,void,,`    return retval;
   }
 
 ifelse($4,void,,`dnl
-ifelse(`$14', `',`dnl
+ifelse(`$15', `',`dnl
   typedef $4 RType;
   return RType`'();
 ',`dnl
-  return _CONVERT($3,$4,`$14');
+  return _CONVERT($3,$4,`$15');
 ')dnl
 ')dnl
 }
-ifelse(`$10',,,`#endif // $10
+ifelse(`$11',,,`#endif // $11
 ')dnl
 _POP()')
 

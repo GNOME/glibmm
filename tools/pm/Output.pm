@@ -205,6 +205,9 @@ sub output_wrap_vfunc_cc($$$$$$$$)
     my $refreturn_ctype = "";
     $refreturn_ctype = "refreturn_ctype" if($$objCFunc{rettype_needs_ref});
 
+    my $keep_return = "";
+    $keep_return = "keep_return" if($$objCppfunc{keep_return});
+
     # Get the conversions.
     my $conversions =
      convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num);
@@ -212,7 +215,7 @@ sub output_wrap_vfunc_cc($$$$$$$$)
     my $returnValue = $$objCppfunc{return_value};
     my $exceptionHandler = $$objCppfunc{exception_handler};
 
-    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s,%s)dnl\n",
+    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -222,6 +225,7 @@ sub output_wrap_vfunc_cc($$$$$$$$)
       $conversions,
       ${$objCFunc->get_param_names()}[0],
       $refreturn_ctype,
+      $keep_return,
       $ifdef,
       $errthrow,
       $$objCppfunc{slot_type},

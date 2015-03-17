@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_UTILITY_H
 #define _GLIBMM_UTILITY_H
 
@@ -112,6 +111,16 @@ std::string convert_return_gchar_ptr_to_stdstring(char* str)
 
 // Append type_name to dest, while replacing special characters with '+'.
 void append_canonical_typename(std::string& dest, const char* type_name);
+
+// Delete data referred to by a void*.
+// Instantiations can be used as destroy callbacks in glib functions
+// that take a GDestroyNotify parameter, such as g_object_set_qdata_full()
+// and g_option_group_set_translate_func().
+template <typename T>
+void destroy_notify_delete(void* data)
+{
+  delete static_cast<T*>(data);
+}
 
 } // namespace Glib
 

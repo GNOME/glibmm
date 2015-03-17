@@ -1279,6 +1279,7 @@ sub on_wrap_vfunc($)
   $argCName = string_unquote($argCName);
 
   my $refreturn = 0;
+  my $keep_return = 0;
   my $refreturn_ctype = 0;
   my $returnValue = "";
   my $exceptionHandler = "";
@@ -1298,6 +1299,12 @@ sub on_wrap_vfunc($)
     if($argRef eq "refreturn")
     {
       $refreturn = 1;
+    }
+    # Must a copy of the return value be kept, because the caller does not
+    # get its own copy?
+    elsif($argRef eq "keep_return")
+    {
+      $keep_return = 1;
     }
     elsif($argRef eq "refreturn_ctype")
     {
@@ -1354,7 +1361,7 @@ sub on_wrap_vfunc($)
   }
 
   $self->output_wrap_vfunc($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
-                           $refreturn, $refreturn_ctype, $custom_vfunc,
+                           $refreturn, $keep_return, $refreturn_ctype, $custom_vfunc,
                            $custom_vfunc_callback, $ifdef, $errthrow,
                            $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler);
 }
@@ -1570,12 +1577,12 @@ sub output_wrap_signal($$$$$$$$$$$$)
 }
 
 # void output_wrap_vfunc($CppDecl, $vfunc_name, $filename, $line_num,
-#                  $refreturn, $refreturn_ctype,
+#                  $refreturn, $keep_return, $refreturn_ctype,
 #                  $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
 #                  $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler)
-sub output_wrap_vfunc($$$$$$$$$$$$$$)
+sub output_wrap_vfunc($$$$$$$$$$$$$$$$$)
 {
-  my ($self, $CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $refreturn_ctype,
+  my ($self, $CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $keep_return, $refreturn_ctype,
       $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
       $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler) = @_;
 
@@ -1608,6 +1615,7 @@ sub output_wrap_vfunc($$$$$$$$$$$$$$)
   # These macros are defined in vfunc.m4:
 
   $$objCppVfunc{rettype_needs_ref} = $refreturn;
+  $$objCppVfunc{keep_return} = $keep_return;
   $$objCppVfunc{return_value} = $returnValue;
   $$objCppVfunc{exception_handler} = $exceptionHandler;
   $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" suffix, and a separate easily-named invoker method.
