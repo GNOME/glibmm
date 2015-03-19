@@ -55,6 +55,7 @@ public:
    * object's MainContext runs.
    *
    * @newin{2,42}
+   *
    * @param slot A slot to call when polling @a socket results in an event that matches @a condition.
    * The event will be passed as a parameter to @a slot.
    * If <tt>io_handler()</tt> returns <tt>false</tt> the handler is disconnected.
