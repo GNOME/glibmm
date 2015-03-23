@@ -1,5 +1,3 @@
-// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-
 /* Copyright (C) 2010 The giomm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -66,10 +64,8 @@ void AsyncInitable_Class::init_async_vfunc_callback(GAsyncInitable* self,
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Get the slot.
         Gio::SlotAsyncReady* the_slot =
           static_cast<Gio::SlotAsyncReady*>(user_data);
@@ -78,13 +74,11 @@ void AsyncInitable_Class::init_async_vfunc_callback(GAsyncInitable* self,
         obj->init_async_vfunc(*the_slot, Glib::wrap(cancellable, true),
           io_priority);
         return;
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
 
@@ -129,19 +123,15 @@ gboolean AsyncInitable_Class::init_finish_vfunc_callback(GAsyncInitable* self,
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
         return static_cast<int>(obj->init_finish_vfunc(Glib::wrap(res, true)));
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
         Glib::exception_handlers_invoke();
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
 

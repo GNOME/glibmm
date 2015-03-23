@@ -1,4 +1,3 @@
-
 #
 # --------------------------- Signal Decl----------------------------
 #
@@ -58,17 +57,14 @@ static $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3
   // Do not try to call a signal on a disassociated wrapper.
   if(obj)
   {
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
       if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot`'(data))
 ifelse(`$2',void,`dnl
         (*static_cast<SlotType*>(slot))($7);
 ',`dnl else
         return _CONVERT($5,$2,`(*static_cast<SlotType*>(slot))($7)');
 ')dnl endif
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
@@ -85,7 +81,6 @@ ifelse($15, `', `dnl
        }
 ')dnl
     }
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 ifelse($2,void,,`dnl else
 
@@ -104,13 +99,10 @@ static $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SU
   // Do not try to call a signal on a disassociated wrapper.
   if(obj)
   {
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     try
     {
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
       if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot`'(data))
         (*static_cast<SlotType*>(slot))($7);
-    #ifdef GLIBMM_EXCEPTIONS_ENABLED
     }
     catch(...)
     {
@@ -127,7 +119,6 @@ ifelse($12, `', `dnl
       }
 ')dnl
     }
-    #endif //GLIBMM_EXCEPTIONS_ENABLED
   }
 
   typedef $2 RType;
@@ -228,10 +219,8 @@ dnl  C++ vfunc on it.
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
 ifelse($4,void,`dnl
         obj->on_$1`'($7);
@@ -239,7 +228,6 @@ ifelse($4,void,`dnl
 ',`dnl
         return _CONVERT($3,$4,`obj->on_$1`'($7)');
 ')dnl
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
@@ -256,7 +244,6 @@ ifelse($15, `', `dnl
         }
 ')dnl
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
 

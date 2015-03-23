@@ -59,10 +59,8 @@ dnl  C++ vfunc on it.
     CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
         // Call the virtual member method, which derived classes might override.
 ifelse($4,void,`dnl
         obj->$1`'($7);
@@ -90,7 +88,6 @@ ifelse($10,keep_return,`dnl
 ')dnl end keep_return
 ')dnl end refreturn_ctype
 ')dnl end void
-      #ifdef GLIBMM_EXCEPTIONS_ENABLED
       }
       catch(...)
       {
@@ -111,7 +108,6 @@ ifelse($9,refreturn_ctype,`dnl
         }
 ')dnl
       }
-      #endif //GLIBMM_EXCEPTIONS_ENABLED
     }
   }
 
@@ -226,5 +222,4 @@ virtual $2 $1`'($3);
 ifelse(`$5',,,`#endif // $5
 ')dnl
 _POP()')
-
 
