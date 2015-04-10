@@ -116,6 +116,7 @@
 #include <giomm/settings.h>
 #include <giomm/simpleaction.h>
 #include <giomm/simpleactiongroup.h>
+#include <giomm/simpleiostream.h>
 #include <giomm/simplepermission.h>
 #include <giomm/socket.h>
 #include <giomm/socketaddress.h>

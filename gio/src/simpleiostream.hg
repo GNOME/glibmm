@@ -1,0 +1,75 @@
+/* Copyright (C) 2015 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <giomm/iostream.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(giomm/private/iostream_p.h)
+
+namespace Gio
+{
+/** A wrapper around an input and an output stream.
+ *
+ * SimpleIOStream creates an IOStream from an arbitrary InputStream and
+ * OutputStream. This allows any pair of input and output streams to be used
+ * with IOStream methods.
+ *
+ * This is useful when you obtained an InputStream and an OutputStream
+ * by other means, for instance creating them with platform specific methods
+ * such as Gio::UnixInputStream::create(), and you want
+ * to take advantage of the methods provided by IOStream.
+ *
+ * @ingroup Streams
+ *
+ * @newin{2,46}
+ */
+class SimpleIOStream : public Gio::IOStream
+{
+  _CLASS_GOBJECT(SimpleIOStream, GSimpleIOStream, G_SIMPLE_IO_STREAM, Gio::IOStream, GIOStream)
+
+protected:
+  /** Creates a new SimpleIOStream wrapping @a input_stream and @a output_stream.
+   *
+   * @see IOStream
+   *
+   * @newin{2,46}
+   *
+   * @param input_stream An InputStream.
+   * @param output_stream An OutputStream.
+   * @returns A new SimpleIOStream instance.
+	 */
+  _WRAP_CTOR(SimpleIOStream(const Glib::RefPtr<InputStream>& input_stream, const Glib::RefPtr<OutputStream>& output_stream), g_simple_io_stream_new)
+
+public:
+  /** Creates a new SimpleIOStream wrapping @a input_stream and @a output_stream.
+   *
+   * @see IOStream
+   *
+   * @newin{2,46}
+   *
+   * @param input_stream An InputStream.
+   * @param output_stream An OutputStream.
+   * @returns A new SimpleIOStream instance.
+	 */
+  _WRAP_CREATE(const Glib::RefPtr<InputStream>& input_stream, const Glib::RefPtr<OutputStream>& output_stream)
+
+  _WRAP_PROPERTY("input-stream", Glib::RefPtr<InputStream>)
+  _WRAP_PROPERTY("output-stream", Glib::RefPtr<OutputStream>)
+
+  // SimpleIOStream has no methods other than create(), signals nor vfuncs.
+};
+
+} // namespace Gio
