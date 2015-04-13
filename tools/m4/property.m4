@@ -17,7 +17,6 @@ Glib::PropertyProxy$4< _QUOTE($3) >'dnl
 )dnl
 /** $6
    *
-   * You rarely need to use properties because there are get_ and set_ methods for almost all of them.
    * @return A PropertyProxy$4 that allows you to dnl
 ifelse($4,_ReadOnly,get,`ifelse($4,_WriteOnly,set,get or set)') the value of the property,
    * or receive notification when the value of the property changes.
