@@ -213,6 +213,23 @@ public:
 
    _IGNORE(g_variant_dict_new)
 
+protected:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  /** Used by cast_dynamic().
+   * In addition to an exact match, the following casts are possible:
+   * - VARIANT_TYPE_OBJECT_PATH and VARIANT_TYPE_SIGNATURE can be cast to
+   *   VARIANT_TYPE_STRING (Glib::ustring).
+   * - VARIANT_TYPE_STRING, VARIANT_TYPE_OBJECT_PATH and VARIANT_TYPE_SIGNATURE
+   *   can be cast to VARIANT_TYPE_BYTESTRING (std::string).
+   *
+   * These casts are possible also when they are parts of a more complicated type.
+   * E.g. in Variant<std::map<Glib::ustring, std::vector<std::string> > > the map's keys
+   * can be VARIANT_TYPE_OBJECT_PATH and the vector's elements can be VARIANT_TYPE_SIGNATURE.
+   * @newin{2,46}
+   */
+  bool is_castable_to(const VariantType& supertype) const;
+#endif //DOXYGEN_SHOULD_SKIP_THIS
+
 private:
   /** Relational operators are deleted to prevent invalid conversion
    * to const void*.
@@ -243,7 +260,7 @@ throw(std::bad_cast)
   {
     return V_CastTo();
   }
-  if(v.is_of_type(V_CastTo::variant_type()))
+  if(v.is_castable_to(V_CastTo::variant_type()))
   {
     return V_CastTo(const_cast<GVariant*>(v.gobj()), true);
   }
@@ -259,8 +276,7 @@ throw(std::bad_cast)
  */
 class VariantStringBase : public VariantBase
 {
-  // Trick gmmproc into thinking this is derived from GVariant to wrap a
-  // some methods.
+  // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(VariantStringBase, GVariant)
 
 public:
@@ -315,8 +331,7 @@ public:
  */
 class VariantContainerBase : public VariantBase
 {
-  // Trick gmmproc into thinking this is derived from GVariant to wrap a
-  // some methods.
+  // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(VariantContainerBase, GVariant)
 
 public:
@@ -380,7 +395,7 @@ public:
   */
 
   /** If this is a maybe-typed instance, extract its value. If the value is
-   * Nothing, then this function returns <tt>0</tt>.
+   * Nothing, then this function returns <tt>false</tt>.
    *
    * @param maybe A place in which to return the value (the value may be
    * <tt>0</tt>).
@@ -388,6 +403,14 @@ public:
    */
   bool get_maybe(VariantBase& maybe) const;
   _IGNORE(g_variant_get_maybe)
+
+protected:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  /** Used by get_iter() in the subclasses.
+   * @newin{2,46}
+   */
+  VariantIter get_iter(const VariantType& container_variant_type) const;
+#endif //DOXYGEN_SHOULD_SKIP_THIS
 };
 
 template<>
@@ -405,10 +428,6 @@ public:
   typedef T CppType;
 };
 
-// Each specialization has (or should have) a variant_type() method that gets
-// the type. So the C g_variant_get_type() function can be ignored.
-_IGNORE(g_variant_get_type)
-
 /****************** Specializations ***********************************/
 
 /** Specialization of Variant containing a VariantBase.
@@ -418,8 +437,7 @@ _IGNORE(g_variant_get_type)
 template<>
 class Variant<VariantBase> : public VariantContainerBase
 {
-  // Trick gmmproc into thinking this is derived from GVariant to wrap a
-  // some methods.
+  // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<VariantBase>, GVariant)
 
 public:
@@ -506,15 +524,14 @@ public:
 };
 
 /** Specialization of Variant containing a Glib::ustring, for variants of type
- * string, bytestring, object path, or signature.
+ * string, object path, or signature.
  * @newin{2,28}
  * @ingroup Variant
  */
 template<>
 class Variant<Glib::ustring> : public VariantStringBase
 {
-  // Trick gmmproc into thinking this is derived from GVariant to wrap a
-  // some methods.
+  // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<Glib::ustring>, GVariant)
 public:
   typedef char*                 CType;
@@ -553,12 +570,13 @@ public:
   _IGNORE(g_variant_get_string, g_variant_dup_string)
 };
 
+//TODO: When we can break ABI, remove this template specialization.
 template<>
 Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v)
 throw(std::bad_cast);
 
 /** Specialization of Variant containing a std::string, for variants of type
- * bytestring, object path, or signature.
+ * bytestring, string, object path, or signature.
  * See also Variant<Glib::ustring> for UTF-8 strings.
  * @newin{2,28}
  * @ingroup Variant
@@ -566,8 +584,7 @@ throw(std::bad_cast);
 template<>
 class Variant<std::string> : public VariantStringBase
 {
-  // Trick gmmproc into thinking this is derived from GVariant to wrap a
-  // some methods.
+  // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<std::string>, GVariant)
 public:
   typedef char*                 CType;
@@ -602,6 +619,7 @@ public:
   _IGNORE(g_variant_get_bytestring, g_variant_dup_bytestring)
 };
 
+//TODO: When we can break ABI, remove this template specialization.
 template<>
 Variant<std::string> VariantBase::cast_dynamic< Variant<std::string> >(const VariantBase& v)
 throw(std::bad_cast);
@@ -1030,11 +1048,11 @@ Variant< std::pair<K, V> >::create(const std::pair<K, V>& data)
 template<class K, class V>
 std::pair<K, V> Variant< std::pair<K, V> >::get() const
 {
-  // Get the key (the first element of the this VariantContainerBase).
+  // Get the key (the first element of this VariantContainerBase).
   Variant<K> key;
   VariantContainerBase::get_child(key, 0);
 
-  // Get the value (the second element of the this VariantContainerBase).
+  // Get the value (the second element of this VariantContainerBase).
   Variant<V> value;
   VariantContainerBase::get_child(value, 1);
 
@@ -1059,9 +1077,6 @@ template<class T>
 Variant< std::vector<T> >
 Variant< std::vector<T> >::create(const std::vector<T>& data)
 {
-  // Get the variant type of the elements.
-  VariantType element_variant_type = Variant<T>::variant_type();
-
   // Get the variant type of the array.
   VariantType array_variant_type = Variant< std::vector<T> >::variant_type();
 
@@ -1079,7 +1094,7 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
   // Create the variant using the builder.
   Variant< std::vector<T> > result =
     Variant< std::vector<T> >(g_variant_new(
-      reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+      reinterpret_cast<const gchar*>(array_variant_type.gobj()), builder));
 
   g_variant_builder_unref(builder);
 
@@ -1126,18 +1141,7 @@ std::vector<T> Variant< std::vector<T> >::get() const
 template<class T>
 VariantIter Variant< std::vector<T> >::get_iter() const
 {
-  // Get the variant type of the elements.
-  VariantType element_variant_type = Variant<T>::variant_type();
-
-  // Get the variant type of the array.
-  VariantType array_variant_type = Variant< std::vector<T> >::variant_type();
-
-  // Get the GVariantIter.
-  GVariantIter* g_iter = 0;
-  g_variant_get(const_cast<GVariant*>(gobj()),
-    reinterpret_cast<gchar*>(array_variant_type.gobj()), &g_iter);
-
-  return VariantIter(g_iter);
+  return VariantContainerBase::get_iter(variant_type());
 }
 
 /*---------------------Variant< std::map<K, V> > --------------------*/
@@ -1166,7 +1170,7 @@ Variant< std::map<K, V> >::create(const std::map<K, V>& data)
   // Create a GVariantBuilder to build the array.
   GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
 
-  // Add the elements of the vector into the builder.
+  // Add the elements of the map into the builder.
   for(typename std::map<K, V>::const_iterator iter = data.begin();
     iter != data.end(); iter++)
   {
@@ -1178,7 +1182,7 @@ Variant< std::map<K, V> >::create(const std::map<K, V>& data)
 
   // Create the variant using the builder.
   Variant< std::map<K, V> > result = Variant< std::map<K, V> >(g_variant_new(
-    reinterpret_cast<gchar*>(array_variant_type.gobj()), builder));
+    reinterpret_cast<const gchar*>(array_variant_type.gobj()), builder));
 
   g_variant_builder_unref(builder);
 
@@ -1236,19 +1240,7 @@ std::map<K, V> Variant< std::map<K, V> >::get() const
 template<class K, class V>
 VariantIter Variant< std::map<K, V> >::get_iter() const
 {
-  // Get the variant type of the elements.
-  VariantType element_variant_type =
-    Variant< std::pair<K, V> >::variant_type();
-
-  // Get the variant type of the array.
-  VariantType array_variant_type = Variant< std::map<K, V> >::variant_type();
-
-  // Get the GVariantIter.
-  GVariantIter* g_iter = 0;
-  g_variant_get(const_cast<GVariant*>(gobj()),
-    reinterpret_cast<gchar*>(array_variant_type.gobj()), &g_iter);
-
-  return VariantIter(g_iter);
+  return VariantContainerBase::get_iter(variant_type());
 }
 
 } // namespace Glib

@@ -276,6 +276,64 @@ static void test_dynamic_cast_string_types()
   }
 }
 
+// Test casting a complicated type, containing an object path and a DBus type signature.
+void test_dynamic_cast_composite_types()
+{
+  // Build a GVaraint of type a{oag}, and cast it to
+  // Glib::Variant<std::map<Glib::ustring, std::vector<std::string>>>.
+  // 'o' is VARIANT_TYPE_OBJECT_PATH and 'g' is VARIANT_TYPE_SIGNATURE.
+
+  GVariantBuilder dict_builder;
+  GVariantBuilder array_builder;
+  g_variant_builder_init(&dict_builder, G_VARIANT_TYPE("a{oag}"));
+
+  g_variant_builder_init(&array_builder, G_VARIANT_TYPE("ag"));
+  g_variant_builder_add(&array_builder, "g","id");
+  g_variant_builder_add(&array_builder, "g","isi");
+  g_variant_builder_add(&array_builder, "g","ia{si}");
+  g_variant_builder_add(&dict_builder, "{oag}", "/remote/object/path1", &array_builder);
+
+  g_variant_builder_init(&array_builder, G_VARIANT_TYPE("ag"));
+  g_variant_builder_add(&array_builder, "g","i(d)");
+  g_variant_builder_add(&array_builder, "g","i(si)");
+  g_variant_builder_add(&dict_builder, "{oag}", "/remote/object/path2", &array_builder);
+
+  Glib::VariantBase cppdict(g_variant_builder_end(&dict_builder));
+
+  try
+  {
+    typedef std::map<Glib::ustring, std::vector<std::string> > composite_type;
+    Glib::Variant<composite_type> derived =
+      Glib::VariantBase::cast_dynamic<Glib::Variant<composite_type> >(cppdict);
+
+    ostr << "Cast composite type (get_type_string()=" << derived.get_type_string()
+         << ", variant_type().get_string()=" << derived.variant_type().get_string() << "): ";
+    composite_type var = derived.get();
+    for (composite_type::const_iterator iter1 = var.begin(); iter1 != var.end(); ++iter1)
+    {
+      ostr << "\n  " << iter1->first << ":";
+      const std::vector<std::string>& vec = iter1->second;
+      for (std::vector<std::string>::const_iterator iter2 = vec.begin(); iter2 != vec.end(); ++iter2)
+        ostr << "  " << *iter2;
+    }
+    ostr << std::endl;
+  }
+  catch (const std::bad_cast& e)
+  {
+    g_assert_not_reached();
+  }
+
+  try
+  {
+    Glib::Variant<std::map<Glib::ustring, std::string > > derived =
+      Glib::VariantBase::cast_dynamic<Glib::Variant<std::map<Glib::ustring, std::string> > >(cppdict);
+    g_assert_not_reached();
+  }
+  catch (const std::bad_cast& e)
+  {
+  }
+}
+
 static void test_dynamic_cast()
 {
   Glib::Variant<int> v1 = Glib::Variant<int>::create(10);
@@ -359,6 +417,7 @@ static void test_dynamic_cast()
 
   test_dynamic_cast_ustring_types();
   test_dynamic_cast_string_types();
+  test_dynamic_cast_composite_types();
 }
 
 static GLogLevelFlags
