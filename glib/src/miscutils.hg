@@ -22,6 +22,7 @@ _DEFS(glibmm,glib)
 
 namespace Glib
 {
+_WRAP_ENUM(UserDirectory, GUserDirectory, NO_GTYPE)
 _WRAP_ENUM(FormatSizeFlags, GFormatSizeFlags, NO_GTYPE)
 
 /** @defgroup MiscUtils Miscellaneous Utility Functions
@@ -164,23 +165,46 @@ std::string get_tmp_dir();
  */
 std::string get_current_dir();
 
-//TODO: We could create a C++ enum to wrap the C GUserDirectory enum,
-//but we would have to either be very careful, or define the enum
-//values in terms of the C enums anyway.
+#ifndef GLIBMM_DISABLE_DEPRECATED
 /** Returns the full path of a special directory using its logical id.
  *
  * On Unix this is done using the XDG special user directories.
+ * For compatibility with existing practise, G_USER_DIRECTORY_DESKTOP
+ * falls back to `$HOME/Desktop` when XDG special user directories have
+ * not been set up.
  *
  * Depending on the platform, the user might be able to change the path
  * of the special directory without requiring the session to restart; GLib
  * will not reflect any change once the special directories are loaded.
  *
- * Return value: the path to the specified special directory.
- * @param directory Te logical id of special directory
+ * @param directory The logical id of special directory.
+ * @return The path to the specified special directory, or an empty string
+ *         if the logical id was not found.
  *
  * @newin{2,14}
+ * @deprecated Use get_user_special_dir(Glib::UserDirectory directory) instead.
  */
 std::string get_user_special_dir(GUserDirectory directory);
+#endif // GLIBMM_DISABLE_DEPRECATED
+
+/** Returns the full path of a special directory using its logical id.
+ *
+ * On Unix this is done using the XDG special user directories.
+ * For compatibility with existing practise, Glib::USER_DIRECTORY_DESKTOP
+ * falls back to `$HOME/Desktop` when XDG special user directories have
+ * not been set up.
+ *
+ * Depending on the platform, the user might be able to change the path
+ * of the special directory without requiring the session to restart; GLib
+ * will not reflect any change once the special directories are loaded.
+ *
+ * @param directory The logical id of special directory.
+ * @return The path to the specified special directory, or an empty string
+ *         if the logical id was not found.
+ *
+ * @newin{2,46}
+ */
+std::string get_user_special_dir(UserDirectory directory);
 
 /** Returns a base directory in which to access application data such as icons
  * that is customized for a particular user.
