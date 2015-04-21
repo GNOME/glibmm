@@ -111,6 +111,8 @@ sub parse_and_build_output($)
     if ($token eq "_DEFS")     { $self->on_defs(); next;} #Read the defs file.
     if ($token eq "_IGNORE")     { $self->on_ignore(); next;} #Ignore a function.
     if ($token eq "_IGNORE_SIGNAL")     { $self->on_ignore_signal(); next;} #Ignore a signal.
+    if ($token eq "_IGNORE_PROPERTY")   { $self->on_ignore_property(); next;} #Ignore a property.
+    if ($token eq "_IGNORE_CHILD_PROPERTY") { $self->on_ignore_child_property(); next;} #Ignore a child property.
     if ($token eq "_WRAP_METHOD")     { $self->on_wrap_method(); next;}
     if ($token eq "_WRAP_METHOD_DOCS_ONLY")     { $self->on_wrap_method_docs_only(); next;}
     if ($token eq "_WRAP_CORBA_METHOD")     { $self->on_wrap_corba_method(); next;} #Used in libbonobo*mm.
@@ -471,23 +473,40 @@ sub on_ignore($)
   }
 }
 
-sub on_ignore_signal($)
+# void on_ignore_signal_or_property(\&lookup_function, $type)
+sub on_ignore_signal_or_property($$$)
 {
-  my ($self) = @_;
-  my $objOutputter = $$self{objOutputter};
+  my ($self, $lookup_function, $type) = @_;
   my $str = $self->extract_bracketed_text();
-  $str = string_trim($str);
-  $str = string_unquote($str);
   my @args = split(/\s+|,/,$str);
   foreach (@args)
   {
-    next if ($_ eq "");
-    my $objCsignal = GtkDefs::lookup_signal($$self{c_class}, $_); #Pretend that we've used it.
-    if(!$objCsignal)
+    my $name = string_unquote($_);
+    next if ($name eq "");
+    my $objCentity = $lookup_function->($$self{c_class}, $name); #Pretend that we've used it.
+    if (!$objCentity)
     {
-      $objOutputter->output_wrap_failed($_, "ignored signal defs lookup failed");
+      $$self{objOutputter}->output_wrap_failed($name, "ignored $type defs lookup failed");
     }
   }
+}
+
+sub on_ignore_signal($)
+{
+  my ($self) = @_;
+  $self->on_ignore_signal_or_property(\&GtkDefs::lookup_signal, "signal");
+}
+
+sub on_ignore_property($)
+{
+  my ($self) = @_;
+  $self->on_ignore_signal_or_property(\&GtkDefs::lookup_property, "property");
+}
+
+sub on_ignore_child_property($)
+{
+  my ($self) = @_;
+  $self->on_ignore_signal_or_property(\&GtkDefs::lookup_child_property, "child property");
 }
 
 ########################################
