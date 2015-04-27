@@ -66,10 +66,12 @@ bool VariantBase::is_castable_to(const VariantType& supertype) const
   // - Both types are assumed to be definite types (no indefinite types,
   //   no 'r', '?' or '*').
   // - VARIANT_TYPE_OBJECT_PATH (o) and VARIANT_TYPE_SIGNATURE (g) can be cast to
-  //   VARIANT_TYPE_STRING (s), the type of Glib::ustring.
+  //   VARIANT_TYPE_STRING (s), (Variant<Glib::ustring>::variant_type()).
   // - VARIANT_TYPE_STRING (s), VARIANT_TYPE_OBJECT_PATH (o) and
-  //   VARIANT_TYPE_SIGNATURE (g) can be cast to
-  //   VARIANT_TYPE_BYTESTRING (ay), the type of std::string.
+  //   VARIANT_TYPE_SIGNATURE (g) can be cast to VARIANT_TYPE_BYTESTRING (ay),
+  //   (Variant<std::string>::variant_type()).
+  // - VARIANT_TYPE_HANDLE (h) can be cast to VARIANT_TYPE_INT32 (i),
+  //   (Variant<gint32>::variant_type()).
 
   std::size_t subtype_index = 0;
   std::size_t supertype_index = 0;
@@ -94,6 +96,11 @@ bool VariantBase::is_castable_to(const VariantType& supertype) const
          (subtype_char == 's' || subtype_char == 'o' || subtype_char == 'g')))
         return false;
       supertype_index++;
+      break;
+
+    case 'i':
+      if (!(subtype_char == 'h'))
+        return false;
       break;
 
     default:

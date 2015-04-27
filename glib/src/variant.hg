@@ -20,6 +20,7 @@ _DEFS(glibmm,glib)
 #include <glibmmconfig.h>
 #include <glibmm/varianttype.h>
 #include <glibmm/variantiter.h>
+#include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <glibmm/error.h>
 #include <utility>
@@ -30,6 +31,7 @@ _DEFS(glibmm,glib)
 
 namespace Glib
 {
+class Bytes;
 
 /** @defgroup Variant Variant Data Types
  *
@@ -38,7 +40,7 @@ namespace Glib
  * information about the type of that value. The range of possible
  * values is determined by the type. The type system used is VariantType.
  *
- * See the VariantBase class and it's derived types, such as VariantContainerBase,
+ * See the VariantBase class and its derived types, such as VariantContainerBase,
  * and the Variant<> template type.
  *
  * Variant instances always have a type and a value (which are given
@@ -58,14 +60,14 @@ namespace Glib
  *
  * There is a Python-inspired text language for describing Variant
  * values. Variant includes a printer for this language and a parser
- * with type inferencing.</a>.
+ * with type inferencing.
  */
 
 //Note: We wrap this because it is thrown by GtkBuilder's functions.
 // See https://bugzilla.gnome.org/show_bug.cgi?id=708206
 // It would also be thrown by parse() if we wrap g_variant_parse().
 // Now (2014-01-30) it's also thrown by Gio::Action::parse_detailed_name().
-/** Exception class for Variant parse errors.
+/** %Exception class for Variant parse errors.
  */
 _WRAP_GERROR(VariantParseError, GVariantParseError, G_VARIANT_PARSE_ERROR, NO_GTYPE)
 
@@ -132,7 +134,9 @@ public:
   _WRAP_METHOD(GVariantClass classify() const, g_variant_classify)
 
   _WRAP_METHOD(gsize get_size() const, g_variant_get_size)
-  _WRAP_METHOD(gconstpointer get_data(), g_variant_get_data)
+  _WRAP_METHOD(gconstpointer get_data(), g_variant_get_data, deprecated "Use the const version instead.")
+  _WRAP_METHOD(gconstpointer get_data() const, g_variant_get_data)
+  _WRAP_METHOD(Glib::RefPtr<const Glib::Bytes> get_data_as_bytes() const, g_variant_get_data_as_bytes)
   _WRAP_METHOD(void store(gpointer data) const, g_variant_store)
 
   _WRAP_METHOD(Glib::ustring print(bool type_annotate = false) const, g_variant_print)
@@ -221,6 +225,7 @@ protected:
    *   VARIANT_TYPE_STRING (Glib::ustring).
    * - VARIANT_TYPE_STRING, VARIANT_TYPE_OBJECT_PATH and VARIANT_TYPE_SIGNATURE
    *   can be cast to VARIANT_TYPE_BYTESTRING (std::string).
+   * - VARIANT_TYPE_HANDLE can be cast to VARIANT_TYPE_INT32.
    *
    * These casts are possible also when they are parts of a more complicated type.
    * E.g. in Variant<std::map<Glib::ustring, std::vector<std::string> > > the map's keys
@@ -964,11 +969,12 @@ public:
 _IGNORE(
   g_variant_get_boolean,
   g_variant_get_byte,
-  g_variant_get_uint16,
-  g_variant_get_int64,
-  g_variant_get_int32,
   g_variant_get_int16,
+  g_variant_get_uint16,
+  g_variant_get_int32,
+  g_variant_get_handle,
   g_variant_get_uint32,
+  g_variant_get_int64,
   g_variant_get_uint64,
   g_variant_get_double,
   g_variant_iter_new
