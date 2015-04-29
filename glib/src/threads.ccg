@@ -18,6 +18,19 @@
 #include <glibmm/exceptionhandler.h>
 #include <glib.h>
 
+/* Why reinterpret_cast<Thread*>(gobject) is needed:
+ *
+ * A Thread instance is in fact always a GThread instance.
+ * Unfortunately, GThread cannot be a member of Thread,
+ * because it is an opaque struct. Also, the C interface does not provide
+ * any hooks to install a destroy notification handler, thus we cannot
+ * wrap it dynamically either.
+ *
+ * The cast works because Thread does not have any member data, and
+ * it is impossible to derive from it. This is ensured by not implementing
+ * the (private) default constructor.
+ * This trick is used also in classes declared as _CLASS_OPAQUE_REFCOUNTED.
+ */
 
 namespace
 {
@@ -31,15 +44,15 @@ static void* call_thread_entry_slot(void* data)
 
   try
   {
-    // Recreate the specific slot, and drop the reference obtained by create().
+    // Recreate the specific slot.
     (*static_cast<sigc::slot<void>*>(slot))();
   }
-  catch(Glib::Threads::Thread::Exit&)
+  catch (Glib::Threads::Thread::Exit&)
   {
     // Just exit from the thread.  The Threads::Thread::Exit exception
     // is our sane C++ replacement of g_thread_exit().
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
@@ -59,30 +72,27 @@ namespace Glib
 namespace Threads
 {
 
-/**** Glib::Thread *********************************************************/
+/**** Glib::Threads::Thread ************************************************/
 
 // static
 Thread* Thread::create(const sigc::slot<void>& slot, const std::string& name)
 {
-  // Make a copy of slot on the heap
+  // Make a copy of slot on the heap.
   sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
 
   GError* error = 0;
-  GThread* thread;
+  GThread* thread = g_thread_try_new(name.empty() ? 0 : name.c_str(),
+    &call_thread_entry_slot, slot_copy, &error);
 
-  if (name.size() > 0)
-    thread = g_thread_try_new(name.c_str(), &call_thread_entry_slot,
-        slot_copy, &error);
-  else
-    thread = g_thread_try_new(NULL, &call_thread_entry_slot,
-        slot_copy, &error);
-
-  if(error)
+  if (error)
   {
     delete slot_copy;
     Glib::Error::throw_exception(error);
   }
-
+  if (!thread)
+  {
+    delete slot_copy;
+  }
   return reinterpret_cast<Thread*>(thread);
 }
 
@@ -100,7 +110,7 @@ Thread* Thread::self()
 
 void Thread::join()
 {
-  g_thread_join(&gobject_);
+  g_thread_join(reinterpret_cast<GThread*>(this));
 }
 
 // static
@@ -109,6 +119,15 @@ void Thread::yield()
   g_thread_yield();
 }
 
+GThread* Thread::gobj()
+{
+  return reinterpret_cast<GThread*>(this);
+}
+
+const GThread* Thread::gobj() const
+{
+  return reinterpret_cast<const GThread*>(this);
+}
 
 Thread* wrap(GThread* gobject)
 {
@@ -116,7 +135,7 @@ Thread* wrap(GThread* gobject)
 }
 
 
-/**** Glib::Mutex **********************************************************/
+/**** Glib::Threads::Mutex *************************************************/
 
 Mutex::Mutex()
 {
@@ -148,7 +167,7 @@ Mutex* wrap(GMutex* gobject)
   return reinterpret_cast<Mutex*>(gobject);
 }
 
-/**** Glib::RecMutex *******************************************************/
+/**** Glib::Threads::RecMutex **********************************************/
 
 RecMutex::RecMutex()
 {
@@ -180,7 +199,7 @@ RecMutex* wrap(GRecMutex* gobject)
   return reinterpret_cast<RecMutex*>(gobject);
 }
 
-/**** Glib::RWLock ***************************************************/
+/**** Glib::Threads::RWLock ************************************************/
 
 void RWLock::reader_lock()
 {
@@ -212,8 +231,6 @@ void RWLock::writer_unlock()
   g_rw_lock_writer_unlock(&gobject_);
 }
 
-/**** Glib::RWLock *********************************************************/
-
 RWLock::RWLock()
 {
   g_rw_lock_init(&gobject_);
@@ -225,7 +242,7 @@ RWLock::~RWLock()
 }
 
 
-/**** Glib::Cond ***********************************************************/
+/**** Glib::Threads::Cond **************************************************/
 
 Cond::Cond()
 {

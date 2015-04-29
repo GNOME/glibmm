@@ -18,39 +18,17 @@
 _DEFS(glibmm,glib)
 _CONFIGINCLUDE(glibmmconfig.h)
 
-
-// We use the (now deprecated) GThread definition in the API,
-// and we cannot stop that without breaking ABI.
-// (see the comment below),
-// so we must temporarily undef G_DISABLE_DEPRECATED when
-// including glib.h.
-
-// Temporarily undef G_DISABLE_DEPRECATED, redefining it later if appropriate.
-#if defined(G_DISABLE_DEPRECATED) && !defined(GLIBMM_G_DISABLE_DEPRECATED_UNDEFED)
-
-//Stop the deprecation ifdef guards around the API declarations:
-#undef G_DISABLE_DEPRECATED
-
-//Stop the compiler warnings about using the deprecated API;
-#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
-
-#define GLIBMM_G_DISABLE_DEPRECATED_UNDEFED 1
-
-#endif
+#m4 _PUSH(SECTION_CC_PRE_INCLUDES)
+// Don't let glibmm.h include thread.h. Pretend that it's already included.
+// glib.h can then be included with G_DISABLE_DEPRECATED defined, and
+// the compiler can react if deprecated glib functions are used.
+#define _GLIBMM_THREAD_H
+#m4 _POP()
 
 #include <glib.h>
-
-// Redefine G_DISABLE_DEPRECATED if it was defined before we temporarily undefed it:
-#if defined(GLIBMM_G_DISABLE_DEPRECATED_UNDEFED)
-#define G_DISABLE_DEPRECATED 1
-#undef GLIB_DISABLE_DEPRECATION_WARNINGS
-#undef GLIBMM_G_DISABLE_DEPRECATED_UNDEFED
-#endif
-
-
 #include <glibmm/error.h>
 #include <sigc++/sigc++.h>
-
+#include <string>
 #include <cstddef>
 
 namespace Glib
@@ -62,7 +40,7 @@ namespace Threads
 _GMMPROC_EXTRA_NAMESPACE(Threads)
 
 /** @defgroup Threads Threads
- * Thread abstraction; including threads, different mutexes,
+ * %Thread abstraction; including threads, different mutexes,
  * conditions and thread private data.
  * @{
  */
@@ -74,7 +52,7 @@ class Mutex;
 class RecMutex;
 class RWLock;
 
-/** Exception class for thread-related errors.
+/** %Exception class for thread-related errors.
  */
 _WRAP_GERROR(ThreadError, GThreadError, G_THREAD_ERROR, NO_GTYPE)
 
@@ -90,8 +68,8 @@ _WRAP_GERROR(ThreadError, GThreadError, G_THREAD_ERROR, NO_GTYPE)
  * a Threads::Thread::Exit exception, which will be caught by the internal thread
  * entry function.
  *
- * @note You might have noticed that the thread entry slot doesn't have the
- * usual void* return value.  If you want to return any data from your thread
+ * @note The thread entry slot doesn't have the void* return value that a
+ * GThreadFunc has.  If you want to return any data from your thread,
  * you can pass an additional output argument to the thread's entry slot.
  */
 class Thread
@@ -169,12 +147,10 @@ public:
    */
   static void yield();
 
-  GThread*       gobj()       { return &gobject_; }
-  const GThread* gobj() const { return &gobject_; }
+  GThread*       gobj();
+  const GThread* gobj() const;
 
 private:
-  GThread gobject_;
-
   // Glib::Thread can neither be constructed nor deleted.
   Thread();
   void operator delete(void*, std::size_t);
@@ -195,7 +171,13 @@ private:
 class Thread::Exit
 {};
 
-/** @relates Glib::Threads::Thread */
+/** A C++ wrapper for the C object.
+ *
+ * @param gobject The C instance.
+ * @return The C++ wrapper.
+ *
+ * @relates Glib::Threads::Thread
+ */
 Thread* wrap(GThread* gobject);
 
 /** Represents a mutex (mutual exclusion).
@@ -203,8 +185,8 @@ Thread* wrap(GThread* gobject);
  * Mutex::Lock instead of calling lock() and unlock() directly&nbsp;--
  * it will make your life much easier.
  *
- * @note Glib::Mutex is not recursive, i.e. a thread will deadlock, if it
- * already has locked the mutex while calling lock().  Use Glib::RecMutex
+ * @note Glib::Threads::Mutex is not recursive, i.e. a thread will deadlock, if it
+ * already has locked the mutex while calling lock().  Use Glib::Threads::RecMutex
  * instead, if you need recursive mutexes.
  */
 class Mutex
@@ -251,12 +233,12 @@ private:
  * @par Usage example:
  * @code
  * {
- *   Glib::Mutex::Lock lock (mutex); // calls mutex.lock()
+ *   Glib::Threads::Mutex::Lock lock(mutex); // calls mutex.lock()
  *   do_something();
  * } // the destructor calls mutex.unlock()
  * @endcode
  * As you can see, the compiler takes care of the unlocking.  This is not
- * only exception safe but also much less error-prone.  You could even
+ * only exception-safe but also much less error-prone.  You could even
  * <tt>return</tt> while still holding the lock and it will be released
  * properly.
  */
@@ -319,10 +301,7 @@ private:
   RecMutex(const RecMutex&);
   RecMutex& operator=(const RecMutex&);
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Must be public to allow initialization at compile time.
   GRecMutex gobject_;
-#endif
 };
 
 /** Utility class for exception-safe locking of recursive mutexes.
@@ -396,10 +375,7 @@ private:
   RWLock(const RWLock&);
   RWLock& operator=(const RWLock&);
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Must be public to allow initialization at compile time.
   GRWLock gobject_;
-#endif
 };
 
 /** Utility class for exception-safe locking of read/write locks.
@@ -456,13 +432,13 @@ private:
  * they can signal the @a Cond, such that the waiting thread is woken up.
  * @par Usage example:
  * @code
- * Glib::Cond  data_cond;
- * Glib::Mutex data_mutex;
+ * Glib::Threads::Cond  data_cond;
+ * Glib::Threads::Mutex data_mutex;
  * void* current_data = 0;
  *
  * void push_data(void* data)
  * {
- *   Glib::Mutex::Lock lock (data_mutex);
+ *   Glib::Threads::Mutex::Lock lock(data_mutex);
  *
  *   current_data = data;
  *   data_cond.signal();
@@ -470,18 +446,18 @@ private:
  *
  * void* pop_data()
  * {
- *   Glib::Mutex::Lock lock (data_mutex);
+ *   Glib::Threads::Mutex::Lock lock(data_mutex);
  *
  *   while (!current_data)
  *     data_cond.wait(data_mutex);
  *
- *   void *const data = current_data;
+ *   void* const data = current_data;
  *   current_data = 0;
  *
  *   return data;
  * }
  * @endcode
-*/
+ */
 class Cond
 {
 public:
@@ -491,12 +467,11 @@ public:
   /** If threads are waiting for this @a Cond, exactly one of them is woken up.
    * It is good practice to hold the same lock as the waiting thread, while calling
    * this method, though not required.
-   *
    */
   void signal();
 
   /** If threads are waiting for this @a Cond, all of them are woken up.
-   * It is good practice to hold the same lock as the waiting thread, while calling
+   * It is good practice to hold the same lock as the waiting threads, while calling
    * this method, though not required.
    */
   void broadcast();
@@ -504,7 +479,7 @@ public:
   /** Waits until this thread is woken up on this @a Cond.
    * The mutex is unlocked before falling asleep and locked again before resuming.
    *
-   * @param mutex a @a Mutex that is currently locked.
+   * @param mutex A @a Mutex that is currently locked.
    *
    * @note It is important to use the @a wait() and @a wait_until() methods
    * only inside a loop, which checks for the condition to be true as it is not
@@ -515,11 +490,40 @@ public:
    */
   void wait(Mutex& mutex);
 
-  /** Waits until this thread is woken up on this @a Cond, but not longer than until the time, that is specified by @a end_time.
+  /** Waits until this thread is woken up on this @a Cond, but not longer
+   * than until the time specified by @a end_time.
    * The mutex is unlocked before falling asleep and locked again before resuming.
    *
-   * @param mutex a @a Mutex that is currently locked.
-   * @param end_time a max time to wait.
+   * @par Usage example:
+   * Extending the example presented in the documentation of class Cond.
+   * @code
+   * void* pop_data_timed()
+   * {
+   *   Glib::Threads::Mutex::Lock lock(data_mutex);
+   *
+   *   // Wait at most 5 seconds.
+   *   const gint64 end_time = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
+   *   while (!current_data)
+   *     if (!data_cond.wait_until(data_mutex, end_time)
+   *       return 0; // timeout
+   *
+   *   void* const data = current_data;
+   *   current_data = 0;
+   *
+   *   return data;
+   * }
+   * @endcode
+   * The end time is calculated once, before entering the loop, and reused.
+   * This is the motivation behind the use of absolute time. If a relative time
+   * of 5 seconds were passed directly to the call and a spurious wakeup
+   * occurred, the program would have to start over waiting again, which would
+   * lead to a total wait time of more than 5 seconds.
+   *
+   * @param mutex A @a Mutex that is currently locked.
+   * @param end_time The monotonic time to wait until, in microseconds.
+   *                 See g_get_monotonic_time().
+   * @return <tt>true</tt> if the condition variable was signalled (or in the case
+   *         of a spurious wakeup), <tt>false</tt> if @a end_time has passed.
    *
    * @note It is important to use the @a wait() and @a wait_until() methods
    * only inside a loop, which checks for the condition to be true as it is not
@@ -544,7 +548,7 @@ private:
  *
  * It is recommended that all instances of this class are statically allocated.
  * The first time an instance is used (get(), set() or replace() is called)
- * gtk+ allocates a scarce OS resource that cannot be deallocated.
+ * glib allocates a scarce OS resource that cannot be deallocated.
  */
 template <class T>
 class Private
@@ -606,8 +610,7 @@ private:
 /*  inline implementation                                                  */
 /***************************************************************************/
 
-
-/**** Glib::Mutex::Lock ****************************************************/
+/**** Glib::Threads::Mutex::Lock *******************************************/
 
 inline
 Mutex::Lock::Lock(Mutex& mutex)
@@ -667,7 +670,7 @@ bool Mutex::Lock::locked() const
 }
 
 
-/**** Glib::RecMutex::Lock *************************************************/
+/**** Glib::Threads::RecMutex::Lock ****************************************/
 
 inline
 RecMutex::Lock::Lock(RecMutex& mutex)
@@ -727,7 +730,7 @@ bool RecMutex::Lock::locked() const
 }
 
 
-/**** Glib::RWLock::ReaderLock *********************************************/
+/**** Glib::Threads::RWLock::ReaderLock ************************************/
 
 inline
 RWLock::ReaderLock::ReaderLock(RWLock& rwlock)
@@ -787,7 +790,7 @@ bool RWLock::ReaderLock::locked() const
 }
 
 
-/**** Glib::RWLock::WriterLock *********************************************/
+/**** Glib::Threads::RWLock::WriterLock ************************************/
 
 inline
 RWLock::WriterLock::WriterLock(RWLock& rwlock)
@@ -846,7 +849,7 @@ bool RWLock::WriterLock::locked() const
   return locked_;
 }
 
-/**** Glib::Private ********************************************************/
+/**** Glib::Threads::Private<T> ********************************************/
 
 // static
 template <class T>
