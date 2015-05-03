@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -46,7 +43,7 @@ namespace Glib
 
 // static data members
 ObjectBase::extra_object_base_data_type ObjectBase::extra_object_base_data;
-std::auto_ptr<Threads::Mutex> ObjectBase::extra_object_base_data_mutex(new Threads::Mutex());
+Threads::Mutex* ObjectBase::extra_object_base_data_mutex = new Threads::Mutex();
 
 ObjectBase::ObjectBase()
 :
