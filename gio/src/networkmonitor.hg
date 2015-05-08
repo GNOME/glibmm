@@ -37,28 +37,28 @@ _WRAP_ENUM(NetworkConnectivity, GNetworkConnectivity, NO_GTYPE)
 
 /** TODO
  *
- * @newin{2,42}
+ * @newin{2,44}
  */
 class NetworkMonitor : public Glib::Interface
 {
   _CLASS_INTERFACE(NetworkMonitor, GNetworkMonitor, G_NETWORK_MONITOR, GNetworkMonitorInterface)
 
 public:
-  _WRAP_METHOD(static Glib::RefPtr<NetworkMonitor> get_default(), g_network_monitor_get_default)
+  _WRAP_METHOD(static Glib::RefPtr<NetworkMonitor> get_default(), g_network_monitor_get_default, newin "2,44")
 
-  _WRAP_METHOD(bool get_network_available() const, g_network_monitor_get_network_available)
+  _WRAP_METHOD(bool get_network_available() const, g_network_monitor_get_network_available, newin "2,44")
 
   _WRAP_METHOD(NetworkConnectivity get_connectivity() const, g_network_monitor_get_connectivity)
 
-  _WRAP_METHOD(bool can_reach(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable{?}), g_network_monitor_can_reach, errthrow)
+  _WRAP_METHOD(bool can_reach(const Glib::RefPtr<SocketConnectable>& connectable, const Glib::RefPtr<Cancellable>& cancellable{?}), g_network_monitor_can_reach, errthrow, newin "2,44")
 
   //TODO:
   void can_reach_async(const Glib::RefPtr<SocketConnectable>& connectable, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable);
   _IGNORE(g_network_monitor_can_reach_async)
 
-  _WRAP_METHOD(bool can_reach_finish(const Glib::RefPtr<AsyncResult>& result), g_network_monitor_can_reach_finish, errthrow)
+  _WRAP_METHOD(bool can_reach_finish(const Glib::RefPtr<AsyncResult>& result), g_network_monitor_can_reach_finish, errthrow, newin "2,44")
 
-  _WRAP_SIGNAL(void network_changed(bool available), "network-changed")
+  _WRAP_SIGNAL(void network_changed(bool available), "network-changed", newin "2,44")
 
   //TODO: Wrap vfuncs?
 

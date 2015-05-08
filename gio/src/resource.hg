@@ -33,10 +33,10 @@ namespace Gio
 
 /** Exception class for resource file handling errors.
  */
-_WRAP_GERROR(ResourceError, GResourceError, G_RESOURCE_ERROR, NO_GTYPE)
+_WRAP_GERROR(ResourceError, GResourceError, G_RESOURCE_ERROR, NO_GTYPE, newin "2,34")
 
-_WRAP_ENUM(ResourceFlags, GResourceFlags)
-_WRAP_ENUM(ResourceLookupFlags, GResourceLookupFlags)
+_WRAP_ENUM(ResourceFlags, GResourceFlags, newin "2,44")
+_WRAP_ENUM(ResourceLookupFlags, GResourceLookupFlags, newin "2,44")
 
 /** %Resource framework.
  *
@@ -134,13 +134,13 @@ class Resource
   _IGNORE(g_resource_ref, g_resource_unref)
 
 public:
-  _WRAP_METHOD(static Glib::RefPtr<Resource> create_from_data(const Glib::RefPtr<const Glib::Bytes>& data), g_resource_new_from_data, errthrow)
-  _WRAP_METHOD(static Glib::RefPtr<Resource> create_from_file(const std::string& filename), g_resource_load, errthrow)
-  _WRAP_METHOD(Glib::RefPtr<InputStream> open_stream(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_open_stream, errthrow)
-  _WRAP_METHOD(Glib::RefPtr<const Glib::Bytes> lookup_data(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_lookup_data, errthrow)
+  _WRAP_METHOD(static Glib::RefPtr<Resource> create_from_data(const Glib::RefPtr<const Glib::Bytes>& data), g_resource_new_from_data, errthrow, newin "2,44")
+  _WRAP_METHOD(static Glib::RefPtr<Resource> create_from_file(const std::string& filename), g_resource_load, errthrow, newin "2,44")
+  _WRAP_METHOD(Glib::RefPtr<InputStream> open_stream(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_open_stream, errthrow, newin "2,44")
+  _WRAP_METHOD(Glib::RefPtr<const Glib::Bytes> lookup_data(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_lookup_data, errthrow, newin "2,44")
 
 #m4 _CONVERSION(`char**',`std::vector<std::string>',`Glib::ArrayHandler<std::string>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(std::vector<std::string> enumerate_children(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_enumerate_children, errthrow)
+  _WRAP_METHOD(std::vector<std::string> enumerate_children(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const, g_resource_enumerate_children, errthrow, newin "2,44")
 
   /** Looks for a file at the specified @a path in the resource and
    * if found returns information about it.
@@ -184,11 +184,11 @@ public:
   bool get_file_exists_nothrow(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE) const;
 
   // 'register' is a keyword. Can't be the name of a method.
-  _WRAP_METHOD(void register_global(), g_resources_register)
-  _WRAP_METHOD(void unregister_global(), g_resources_unregister)
-  _WRAP_METHOD(static Glib::RefPtr<InputStream> open_stream_global(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_open_stream, errthrow)
-  _WRAP_METHOD(static Glib::RefPtr<const Glib::Bytes> lookup_data_global(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_lookup_data, errthrow)
-  _WRAP_METHOD(static std::vector<std::string> enumerate_children_global(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_enumerate_children, errthrow)
+  _WRAP_METHOD(void register_global(), g_resources_register, newin "2,44")
+  _WRAP_METHOD(void unregister_global(), g_resources_unregister, newin "2,44")
+  _WRAP_METHOD(static Glib::RefPtr<InputStream> open_stream_global(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_open_stream, errthrow, newin "2,44")
+  _WRAP_METHOD(static Glib::RefPtr<const Glib::Bytes> lookup_data_global(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_lookup_data, errthrow, newin "2,44")
+  _WRAP_METHOD(static std::vector<std::string> enumerate_children_global(const std::string& path, ResourceLookupFlags lookup_flags = RESOURCE_LOOKUP_FLAGS_NONE), g_resources_enumerate_children, errthrow, newin "2,44")
 
   /** Looks for a file at the specified @a path in the set of
    * globally registered resources and if found returns information about it.
