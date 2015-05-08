@@ -583,11 +583,14 @@ sub output_wrap_create($$$)
   }
 }
 
-# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs, $exceptionHandler)
-# custom_signalproxy_name is "" when no type conversion is required - a normal templates SignalProxy will be used instead.
-sub output_wrap_sig_decl($$$$$$$$$$$)
+# void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name,
+#   $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs,
+#   $newin, $exceptionHandler)
+sub output_wrap_sig_decl($$$$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name, $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs, $exceptionHandler) = @_;
+  my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name,
+      $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs,
+      $newin, $exceptionHandler) = @_;
 
 # _SIGNAL_PROXY(c_signal_name, c_return_type, `<c_arg_types_and_names>',
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
@@ -599,8 +602,8 @@ sub output_wrap_sig_decl($$$$$$$$$$$)
   $underscored_signal_name =~ s/-/_/g;
 
   # Get the existing signal documentation from the parsed docs.
-  my $documentation =
-    DocsParser::lookup_documentation("$$objCSignal{class}::$underscored_signal_name", $deprecation_docs);
+  my $documentation = DocsParser::lookup_documentation(
+    "$$objCSignal{class}::$underscored_signal_name", $deprecation_docs, $newin);
 
   # Create a merged Doxygen comment block for the signal from the looked up
   # docs (the block will also contain a prototype of the slot as an example).
@@ -713,7 +716,7 @@ sub output_wrap_enum_docs_only($$$$$$$)
   }
 
   # Include the enum docs in the module's enum docs group.
-  $enum_docs .= "\n * \@ingroup ${module_canonical}Enums\n";
+  $enum_docs .= "\n *\n * \@ingroup ${module_canonical}Enums";
 
   # Merge the passed in comment to the existing enum documentation.
   $comment = "/** " . $comment . "\n * " . $enum_docs . "\n */\n";

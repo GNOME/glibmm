@@ -25,7 +25,7 @@ use XML::Parser;
 use strict;
 use warnings;
 
-# use Util;
+use Util;
 use Function;
 use GtkDefs;
 use Object;
@@ -239,14 +239,19 @@ sub lookup_enum_documentation($$$$)
   
   my @subst_in  = [];
   my @subst_out = [];
+  my $newin = "";
  
- # Get the substitutions.
+ # Get the substitutions, and recognize some flags too.
   foreach(@$ref_flags)
   {
     if(/^\s*s#([^#]+)#([^#]*)#\s*$/)
     {
       push(@subst_in,  $1);
       push(@subst_out, $2);
+    }
+    elsif(/^\s*newin(.*)/) #If newin is at the start.
+    {
+      $newin = string_unquote(string_trim($1));
     }
   }
 
@@ -293,11 +298,15 @@ sub lookup_enum_documentation($$$$)
     }
   }
 
-  # Append the enum description docs.
-  $docs .= "\@enum $cpp_enum_name\n"; 
-  $docs .= $$objFunction{description};
+  # Replace @newin in the enum description, but don't in the element descriptions.
+  my $description = "\@enum $cpp_enum_name\n";
+  $description .= $$objFunction{description};
+  DocsParser::convert_docs_to_cpp($objFunction, \$description);
+  DocsParser::replace_or_add_newin(\$description, $newin);
 
+  # Append the enum description docs.
   DocsParser::convert_docs_to_cpp($objFunction, \$docs);
+  $docs .= "\n\n$description";
   DocsParser::add_m4_quotes(\$docs);
 
   # Escape the space after "i.e." or "e.g." in the brief description.
@@ -312,13 +321,13 @@ sub lookup_enum_documentation($$$$)
   return $docs;
 }
 
-# $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs, $objCppfunc)
+# $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs, $newin, $objCppfunc)
 # The final objCppfunc parameter is optional.  If passed, it is used to
 # decide if the final C parameter should be omitted if the C++ method
 # has a slot parameter.
-sub lookup_documentation($$;$)
+sub lookup_documentation($$$;$)
 {
-  my ($functionName, $deprecation_docs, $objCppfunc) = @_;
+  my ($functionName, $deprecation_docs, $newin, $objCppfunc) = @_;
 
   my $objFunction = $DocsParser::hasharrayFunctions{$functionName};
   if(!$objFunction)
@@ -335,6 +344,7 @@ sub lookup_documentation($$;$)
   }
 
   DocsParser::convert_docs_to_cpp($objFunction, \$text);
+  DocsParser::replace_or_add_newin(\$text, $newin);
   # A blank line, marking the end of a paragraph, is needed after @newin.
   # Most @newins are at the end of a function description.
   $text .= "\n";
@@ -544,6 +554,21 @@ sub convert_tags_to_doxygen($)
     # be Doxygen commands in the docs_override.xml.
     s"\\"\\\\"g;
     s"\\\\(throws?|param)\b"\\$1"g
+  }
+}
+
+# void replace_or_add_newin(\$text, $newin)
+# If $newin is not empty, replace the version numbers in an existing @newin
+# Doxygen alias, or add one if there is none.
+sub replace_or_add_newin($$)
+{
+  my ($text, $newin) = @_;
+
+  return if ($newin eq "");
+
+  if (!($$text =~ s/\@newin\{[\d,]+\}/\@newin{$newin}/))
+  {
+    $$text .= "\n\n\@newin{$newin}";
   }
 }
 

@@ -702,11 +702,12 @@ sub extract_bracketed_text($)
 
 ########################################
 ###  breaks up a string by commas (smart)
-# @strings string_split_commas($string)
-sub string_split_commas($)
+# @strings string_split_commas($string [, $ignore_quotes])
+sub string_split_commas($;$)
 {
-  my ($in) = @_;
+  my ($in, $ignore_quotes) = @_;
 
+  $ignore_quotes = 2 unless defined $ignore_quotes;
   my @out;
   my $level = 0;
   my $in_braces = 0;
@@ -720,10 +721,10 @@ sub string_split_commas($)
 
     next if ($t eq "");
 
-    # TODO: Delete the test for scalar(@out) >= 2 when we can stop accepting
+    # TODO: Delete the test for scalar(@out) >= $ignore_quotes when we can stop accepting
     # .hg files with unpaired quotes, such as _WRAP_PROPERTY("text_column, int).
     # See also TODO in extract_bracketed_text().
-    $in_quotes = !$in_quotes if ($t eq '"' and scalar(@out) >= 2);
+    $in_quotes = !$in_quotes if ($t eq '"' and scalar(@out) >= $ignore_quotes);
     if (!$in_quotes)
     {
       $in_braces++ if ($t eq "{");
@@ -950,6 +951,7 @@ sub on_wrap_method($)
   $$objCfunc{constversion} = 0;
   $$objCfunc{deprecated} = "";
   my $deprecation_docs = "";
+  my $newin = "";
   my $ifdef;
   while($#args >= 2) # If the optional ref/err/deprecated arguments are there.
   {
@@ -975,6 +977,10 @@ sub on_wrap_method($)
       {
         $deprecation_docs = string_unquote(string_trim($1));
       }
+    }
+    elsif($argRef =~ /^newin(.*)/) #If newin is at the start.
+    {
+      $newin = string_unquote(string_trim($1));
     }
     elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
@@ -1008,7 +1014,7 @@ sub on_wrap_method($)
   else
   {
     $commentblock = DocsParser::lookup_documentation($argCFunctionName,
-      $deprecation_docs, $objCppfunc);
+      $deprecation_docs, $newin, $objCppfunc);
   }
 
   $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock, $ifdef);
@@ -1026,7 +1032,7 @@ sub on_wrap_method_docs_only($)
   my $line_num = $$self{line_num};
 
   my $str = $self->extract_bracketed_text();
-  my @args = string_split_commas($str);
+  my @args = string_split_commas($str, 1);
 
   my $entity_type = "method";
 
@@ -1057,8 +1063,8 @@ sub on_wrap_method_docs_only($)
     }
   }
 
-  # Extra ref needed?
   $$objCfunc{throw_any_errors} = 0;
+  my $newin = "";
   while($#args >= 1) # If the optional ref/err arguments are there.
   {
     my $argRef = string_trim(pop @args);
@@ -1066,11 +1072,14 @@ sub on_wrap_method_docs_only($)
     {
       $$objCfunc{throw_any_errors} = 1;
     }
+    elsif($argRef =~ /^newin(.*)/) #If newin is at the start.
+    {
+      $newin = string_unquote(string_trim($1));
+    }
   }
 
   my $commentblock = "";
-  $commentblock = DocsParser::lookup_documentation($argCFunctionName, "");
-
+  $commentblock = DocsParser::lookup_documentation($argCFunctionName, "", $newin);
   $objOutputter->output_wrap_meth_docs_only($filename, $line_num, $commentblock);
 }
 
@@ -1227,6 +1236,7 @@ sub on_wrap_signal($$)
   my $ifdef;
   my $argDeprecated = "";
   my $deprecation_docs = "";
+  my $newin = "";
   my $exceptionHandler = "";
 
   while($#args >= 2) # If optional arguments are there.
@@ -1262,6 +1272,11 @@ sub on_wrap_signal($$)
       }
     }
 
+    elsif($argRef =~ /^newin(.*)/) #If newin is at the start.
+    {
+      $newin = string_unquote(string_trim($1));
+    }
+
     elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
     	$ifdef = $1;
@@ -1275,7 +1290,8 @@ sub on_wrap_signal($$)
 
   $self->output_wrap_signal($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                             $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback,
-                            $bRefreturn, $ifdef, $commentblock, $argDeprecated, $deprecation_docs, $exceptionHandler);
+                            $bRefreturn, $ifdef, $commentblock, $argDeprecated, $deprecation_docs,
+                            $newin, $exceptionHandler);
 }
 
 # void on_wrap_vfunc()
@@ -1541,12 +1557,12 @@ sub output_wrap_check($$$$$$)
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
 #                  $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
-#                  $commentblock, $deprecated, $deprecation_docs, $exceptionHandler)
-sub output_wrap_signal($$$$$$$$$$$$)
+#                  $commentblock, $deprecated, $deprecation_docs, $newin, $exceptionHandler)
+sub output_wrap_signal($$$$$$$$$$$$$$)
 {
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
       $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
-      $commentblock, $deprecated, $deprecation_docs, $exceptionHandler) = @_;
+      $commentblock, $deprecated, $deprecation_docs, $newin, $exceptionHandler) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $signal_name,
@@ -1580,7 +1596,7 @@ sub output_wrap_signal($$$$$$$$$$$$)
 
   $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal,
     $signal_name, $bCustomCCallback, $ifdef, $commentblock,
-    $deprecated, $deprecation_docs, $exceptionHandler);
+    $deprecated, $deprecation_docs, $newin, $exceptionHandler);
 
   if($bNoDefaultHandler eq 0)
   {

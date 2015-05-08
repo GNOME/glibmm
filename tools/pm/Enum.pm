@@ -300,7 +300,7 @@ sub build_element_list($$$$)
       push(@subst_in,  $1);
       push(@subst_out, $2);
     }
-    elsif($_ !~ /^\s*$/)
+    elsif($_ !~ /^\s*(?:newin.*)?$/) # newin or only white space
     {
       return undef;
     }
