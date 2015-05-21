@@ -68,7 +68,7 @@ ifelse(`$2',void,`dnl
     }
     catch(...)
     {
-ifelse($15, `', `dnl
+ifelse($12, `', `dnl
        Glib::exception_handlers_invoke`'();
 ', `dnl
        try
@@ -231,12 +231,12 @@ ifelse($4,void,`dnl
       }
       catch(...)
       {
-ifelse($15, `', `dnl
+ifelse($11, `', `dnl
         Glib::exception_handlers_invoke`'();
 ', `dnl
         try
         {
-          return _CONVERT($3, $4, `obj->$15`'()');
+          return _CONVERT($3, $4, `obj->$11`'()');
         }
         catch(...)
         {
