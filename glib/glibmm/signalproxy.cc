@@ -1,7 +1,3 @@
-// -*- c++ -*-
-
-/* $Id$ */
-
 /* signalproxy.cc
  *
  * Copyright (C) 2002 The gtkmm Development Team
@@ -101,5 +97,42 @@ void SignalProxyNormal::slot0_void_callback(GObject* self, void* data)
   }
 }
 
-} // namespace Glib
 
+// SignalProxyDetailed implementation:
+
+SignalProxyDetailed::SignalProxyDetailed(Glib::ObjectBase* obj,
+  const SignalProxyInfo* info, const Glib::ustring& detail_name)
+:
+  SignalProxyBase (obj),
+  info_           (info),
+  detailed_name_  (Glib::ustring(info->signal_name) +
+                   (detail_name.empty() ? Glib::ustring() : ("::" + detail_name)))
+{}
+
+SignalProxyDetailed::~SignalProxyDetailed()
+{}
+
+sigc::slot_base&
+SignalProxyDetailed::connect_impl_(bool notify, const sigc::slot_base& slot, bool after)
+{
+  // create a proxy to hold our connection info
+  SignalProxyConnectionNode *const pConnectionNode =
+      new SignalProxyConnectionNode(slot, obj_->gobj());
+
+  // connect it to glib
+  // pConnectionNode will be passed in the data argument to the callback.
+  pConnectionNode->connection_id_ = g_signal_connect_data(
+      obj_->gobj(), detailed_name_.c_str(),
+      notify ? info_->notify_callback : info_->callback,
+      pConnectionNode, &SignalProxyConnectionNode::destroy_notify_handler,
+      static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
+
+  return pConnectionNode->slot_;
+}
+
+void SignalProxyDetailed::emission_stop()
+{
+  g_signal_stop_emission_by_name(obj_->gobj(), detailed_name_.c_str());
+}
+
+} // namespace Glib
