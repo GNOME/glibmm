@@ -1233,11 +1233,13 @@ sub on_wrap_signal($$)
   my $bNoDefaultHandler = 0;
   my $bCustomCCallback = 0;
   my $bRefreturn = 0;
-  my $ifdef;
+  my $ifdef = "";
   my $argDeprecated = "";
   my $deprecation_docs = "";
   my $newin = "";
   my $exceptionHandler = "";
+  my $detail_name = "";
+  my $bTwoSignalMethods = 0;
 
   while($#args >= 2) # If optional arguments are there.
   {
@@ -1246,23 +1248,19 @@ sub on_wrap_signal($$)
     {
       $bCustomDefaultHandler = 1;
     }
-
-    if($argRef eq "no_default_handler")
+    elsif($argRef eq "no_default_handler")
     {
       $bNoDefaultHandler = 1;
     }
-
-    if($argRef eq "custom_c_callback")
+    elsif($argRef eq "custom_c_callback")
     {
       $bCustomCCallback = 1;
     }
-
-    if($argRef eq "refreturn")
+    elsif($argRef eq "refreturn")
     {
       $bRefreturn = 1;
     }
-
-    if($argRef =~ /^deprecated(.*)/) #If deprecated is at the start.
+    elsif($argRef =~ /^deprecated(.*)/) #If deprecated is at the start.
     {
       $argDeprecated = "deprecated";
 
@@ -1271,27 +1269,36 @@ sub on_wrap_signal($$)
         $deprecation_docs = string_unquote(string_trim($1));
       }
     }
-
     elsif($argRef =~ /^newin(.*)/) #If newin is at the start.
     {
       $newin = string_unquote(string_trim($1));
     }
-
     elsif($argRef =~ /^ifdef(.*)/) #If ifdef is at the start.
     {
     	$ifdef = $1;
     }
-    
     elsif($argRef =~ /^exception_handler\s+(.*)/) #If exception_handler at the start.
     {
-        $exceptionHandler = $1;
+      $exceptionHandler = $1;
+    }
+    elsif($argRef =~ /^detail_name\s+(.+)/) #If detail_name at the start.
+    {
+      $detail_name = $1;
+    }
+    elsif($argRef eq "two_signal_methods")
+    {
+      $bTwoSignalMethods = 1;
+    }
+    else
+    {
+      $self->error("_WRAP_SIGNAL: Invalid option '$argRef'.\n");
     }
   }
 
   $self->output_wrap_signal($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                             $bCustomDefaultHandler, $bNoDefaultHandler, $bCustomCCallback,
                             $bRefreturn, $ifdef, $commentblock, $argDeprecated, $deprecation_docs,
-                            $newin, $exceptionHandler);
+                            $newin, $exceptionHandler, $detail_name, $bTwoSignalMethods);
 }
 
 # void on_wrap_vfunc()
@@ -1557,12 +1564,14 @@ sub output_wrap_check($$$$$$)
 
 # void output_wrap($CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
 #                  $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
-#                  $commentblock, $deprecated, $deprecation_docs, $newin, $exceptionHandler)
-sub output_wrap_signal($$$$$$$$$$$$$$)
+#                  $commentblock, $deprecated, $deprecation_docs, $newin, $exceptionHandler,
+#                  $detail_name, $bTwoSignalMethods)
+sub output_wrap_signal($$$$$$$$$$$$$$$$$)
 {
   my ($self, $CppDecl, $signal_name, $filename, $line_num, $bCustomDefaultHandler,
       $bNoDefaultHandler, $bCustomCCallback, $bRefreturn, $ifdef,
-      $commentblock, $deprecated, $deprecation_docs, $newin, $exceptionHandler) = @_;
+      $commentblock, $deprecated, $deprecation_docs, $newin, $exceptionHandler,
+      $detail_name, $bTwoSignalMethods) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $signal_name,
@@ -1596,7 +1605,8 @@ sub output_wrap_signal($$$$$$$$$$$$$$)
 
   $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal,
     $signal_name, $bCustomCCallback, $ifdef, $commentblock,
-    $deprecated, $deprecation_docs, $newin, $exceptionHandler);
+    $deprecated, $deprecation_docs, $newin, $exceptionHandler,
+    $detail_name, $bTwoSignalMethods);
 
   if($bNoDefaultHandler eq 0)
   {

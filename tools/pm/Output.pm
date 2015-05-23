@@ -585,12 +585,12 @@ sub output_wrap_create($$$)
 
 # void output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppfunc, $signal_name,
 #   $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs,
-#   $newin, $exceptionHandler)
-sub output_wrap_sig_decl($$$$$$$$$$$$)
+#   $newin, $exceptionHandler, $detail_name, $bTwoSignalMethods)
+sub output_wrap_sig_decl($$$$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $objCSignal, $objCppfunc, $signal_name,
       $bCustomCCallback, $ifdef, $commentblock, $deprecated, $deprecation_docs,
-      $newin, $exceptionHandler) = @_;
+      $newin, $exceptionHandler, $detail_name, $bTwoSignalMethods) = @_;
 
 # _SIGNAL_PROXY(c_signal_name, c_return_type, `<c_arg_types_and_names>',
 #               cpp_signal_name, cpp_return_type, `<cpp_arg_types>',`<c_args_to_cpp>',
@@ -637,7 +637,7 @@ sub output_wrap_sig_decl($$$$$$$$$$$$)
   my $conversions =
     convert_args_c_to_cpp($objCSignal, $objCppfunc, $line_num);
 
-  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',%s,\`%s\',%s,%s)dnl\n",
+  my $str = sprintf("_SIGNAL_PROXY(%s,%s,\`%s\',%s,%s,\`%s\',\`%s\',\`%s\',%s,\`%s\',%s,%s,%s,%s)dnl\n",
     $signal_name,
     $$objCSignal{rettype},
     $objCSignal->args_types_and_names_without_object(),
@@ -649,7 +649,9 @@ sub output_wrap_sig_decl($$$$$$$$$$$$)
     $deprecated,
     $doxycomment,
     $ifdef,
-    $exceptionHandler
+    $exceptionHandler,
+    $detail_name, # If a detailed name is supported (signal_name::detail_name)
+    $bTwoSignalMethods # If separate signal_xxx() methods for detailed and general name.
   );
 
   $self->append($str);

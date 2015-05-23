@@ -13,15 +13,29 @@ dnl               $8 = `custom_c_callback (boolean)',
 dnl               $9 = `deprecated' (boolean),
 dnl               $10 = `refdoc_comment',
 dnl               $11 = ifdef,
-dnl               $12 = exceptionHandler)
+dnl               $12 = exceptionHandler,
+dnl               $13 = detail_name,
+dnl               $14 = two_signal_methods (boolean))
 
 define(`_SIGNAL_PROXY',`
 ifelse(`$11',,,`#ifdef $11'
 )dnl
 ifelse(`$9',,,`_DEPRECATE_IFDEF_START
 ')dnl
+ifelse($13,,`dnl no detail_name
 $10
   Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'();
+',dnl detail_name
+$14,0,`dnl
+$10
+  Glib::SignalProxyDetailed`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'(const Glib::ustring& $13 = Glib::ustring());
+',`dnl detail_name and two_signal_methods
+$10
+  Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'();
+
+$10
+  Glib::SignalProxyDetailed`'_NUM($6)< $5`'_COMMA_PREFIX($6) > signal_$4`'(const Glib::ustring& $13);
+')dnl end detail_name
 ifelse(`$9',,,`_DEPRECATE_IFDEF_END
 ')dnl
 ifelse(`$11',,,`#endif // $11
@@ -146,10 +160,28 @@ ifelse(`$11',,,`#ifdef $11'
 )dnl
 ifelse(`$9',,,`_DEPRECATE_IFDEF_START
 ')dnl
+ifelse($13,,`dnl no detail_name
 Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > __CPPNAME__::signal_$4`'()
 {
   return Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) >(this, &__CPPNAME__`'_signal_$4_info);
 }
+',dnl detail_name
+$14,0,`dnl
+Glib::SignalProxyDetailed`'_NUM($6)< $5`'_COMMA_PREFIX($6) > __CPPNAME__::signal_$4`'(const Glib::ustring& $13)
+{
+  return Glib::SignalProxyDetailed`'_NUM($6)< $5`'_COMMA_PREFIX($6) >(this, &__CPPNAME__`'_signal_$4_info, $13);
+}
+',`dnl detail_name and two_signal_methods
+Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) > __CPPNAME__::signal_$4`'()
+{
+  return Glib::SignalProxy`'_NUM($6)< $5`'_COMMA_PREFIX($6) >(this, &__CPPNAME__`'_signal_$4_info);
+}
+
+Glib::SignalProxyDetailed`'_NUM($6)< $5`'_COMMA_PREFIX($6) > __CPPNAME__::signal_$4`'(const Glib::ustring& $13)
+{
+  return Glib::SignalProxyDetailed`'_NUM($6)< $5`'_COMMA_PREFIX($6) >(this, &__CPPNAME__`'_signal_$4_info, $13);
+}
+')dnl end detail_name
 ifelse(`$9',,,`_DEPRECATE_IFDEF_END
 ')dnl
 ifelse(`$11',,,`#endif // $11
