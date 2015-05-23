@@ -50,6 +50,18 @@ static void on_key_changed(const Glib::ustring& key, const Glib::RefPtr<Gio::Set
     std::cerr << "Unknown key\n";
 }
 
+static void on_key_changed_all(const Glib::ustring& key)
+{
+  std::cout << "on_key_changed_all(" << key << ")\n";
+}
+
+static void on_key_changed_int(const Glib::ustring& key)
+{
+  std::cout << "on_key_changed_int(" << key << ")\n";
+  if (key != INT_KEY)
+    std::cerr << "Unexpected key\n";
+}
+
 int main(int, char**)
 {
   std::locale::global(std::locale(""));
@@ -67,6 +79,8 @@ int main(int, char**)
     Gio::Settings::create("org.gtkmm.demo");
 
   settings->signal_changed().connect(sigc::bind(sigc::ptr_fun(&on_key_changed), settings));
+  settings->signal_changed("").connect(sigc::ptr_fun(&on_key_changed_all));
+  settings->signal_changed(INT_KEY).connect(sigc::ptr_fun(&on_key_changed_int));
 
   std::cout << Glib::ustring::compose("Initial value of '%1': '%2'\n",
                     STRING_KEY, settings->get_string(STRING_KEY));

@@ -201,19 +201,6 @@ _DEPRECATE_IFDEF_END
 
   //TODO?: _WRAP_PROPERTY("backend", Glib::RefPtr<SettingsBackend>)
 
-  /** See connect_changed().
-   * @newin{2,46}
-   */
-  typedef sigc::slot<void> SlotChanged;
-
-  /** Connect a callback @a slot to the "changed" signal for the @a key.
-   * This will be emitted whenever the the value for that key has been changed.
-   * @result A sigc::connection
-   *
-   * @newin{2,46}
-   */
-  sigc::connection connect_changed(const Glib::ustring& key, const SlotChanged& slot);
-
   _WRAP_PROPERTY("delay-apply", bool)
   _WRAP_PROPERTY("has-unapplied", bool)
   _WRAP_PROPERTY("path", std::string)
@@ -224,8 +211,9 @@ _DEPRECATE_IFDEF_END
 
   //TODO?: _WRAP_SIGNAL(bool change_event(const Glib::ArrayHandle<Glib::QueryQuark>& keys, int n_keys), "change-event")
 
+  //TODO: Remove two_signal_methods when we can break ABI.
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
-  _WRAP_SIGNAL(void changed(const Glib::ustring& key), "changed")
+  _WRAP_SIGNAL(void changed(const Glib::ustring& key), "changed", detail_name key, two_signal_methods)
 
   _WRAP_SIGNAL(bool writable_change_event(guint key), "writable-change-event")
   _WRAP_SIGNAL(void writable_changed(const Glib::ustring& key), writable_changed)

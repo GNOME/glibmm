@@ -18,7 +18,6 @@
 #include <gio/gio.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/vectorutils.h>
-#include <glibmm/propertyproxy_base.h> //For PropertyProxyConnectionNode
 
 namespace Gio
 {
@@ -70,19 +69,5 @@ std::vector<Glib::ustring> Settings::list_schemas()
   return Glib::ArrayHandler<Glib::ustring>::array_to_vector(g_settings_list_schemas(), Glib::OWNERSHIP_NONE);
 }
 _DEPRECATE_IFDEF_END
-
-sigc::connection Settings::connect_changed(const Glib::ustring& key, const SlotChanged& slot)
-{
-  // Create a proxy to hold our connection info
-  // This will be deleted by destroy_notify_handler.
-  Glib::PropertyProxyConnectionNode* pConnectionNode = new Glib::PropertyProxyConnectionNode(slot, G_OBJECT(gobj()));
-
-  const Glib::ustring signal_name = "changed::" + key;
-  g_signal_connect_data(gobj(),
-    signal_name.c_str(), (GCallback)(&Glib::PropertyProxyConnectionNode::callback), pConnectionNode,
-    &Glib::PropertyProxyConnectionNode::destroy_notify_handler,
-    G_CONNECT_AFTER);
-  return sigc::connection(pConnectionNode->slot_);
-}
 
 }
