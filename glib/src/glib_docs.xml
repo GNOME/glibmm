@@ -1,4 +1,51 @@
 <root>
+<property name="GBinding:flags">
+<description>
+Flags to be used to control the #GBinding
+
+Since: 2.26
+
+</description>
+</property>
+
+<property name="GBinding:source">
+<description>
+The #GObject that should be used as the source of the binding
+
+Since: 2.26
+
+</description>
+</property>
+
+<property name="GBinding:source-property">
+<description>
+The name of the property of #GBinding:source that should be used
+as the source of the binding
+
+Since: 2.26
+
+</description>
+</property>
+
+<property name="GBinding:target">
+<description>
+The #GObject that should be used as the target of the binding
+
+Since: 2.26
+
+</description>
+</property>
+
+<property name="GBinding:target-property">
+<description>
+The name of the property of #GBinding:target that should be used
+as the target of the binding
+
+Since: 2.26
+
+</description>
+</property>
+
 <enum name="GBindingFlags">
 <description>
 Flags to be passed to g_object_bind_property() or
@@ -9377,35 +9424,40 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_BOOLEAN__FLAGS">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`gboolean (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter
-denotes a flags type.
+A #GClosureMarshal function for use with signals with handlers that
+take a flags type as an argument and return a boolean.  If you have
+such a signal, you will probably also need to use an accumulator,
+such as g_signal_accumulator_true_handled().
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> a #GValue which can store the returned #gboolean
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding instance and arg1
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -9534,44 +9586,78 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_BOOL__FLAGS">
 <description>
-Another name for g_cclosure_marshal_BOOLEAN__FLAGS().
+An old alias for g_cclosure_marshal_BOOLEAN__FLAGS().
 
 </description>
 <parameters>
+<parameter name="closure">
+<parameter_description> A #GClosure.
+</parameter_description>
+</parameter>
+<parameter name="return_value">
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
+</parameter_description>
+</parameter>
+<parameter name="n_param_values">
+<parameter_description> The length of the @param_values array.
+</parameter_description>
+</parameter>
+<parameter name="param_values">
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
+</parameter_description>
+</parameter>
+<parameter name="invocation_hint">
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
+</parameter_description>
+</parameter>
+<parameter name="marshal_data">
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
 
 <function name="g_cclosure_marshal_STRING__OBJECT_POINTER">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`gchar* (*callback) (gpointer instance, GObject *arg1, gpointer arg2, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with handlers that
+take a #GObject and a pointer and produce a string.  It is highly
+unlikely that your signal handler fits this description.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> a #GValue, which can store the returned string
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 3
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding instance, arg1 and arg2
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -9623,34 +9709,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__BOOLEAN">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gboolean arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+boolean argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gboolean parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -9702,34 +9792,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__BOXED">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, GBoxed *arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+argument which is any boxed pointer type.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #GBoxed* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -9781,34 +9875,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__CHAR">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gchar arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+character argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gchar parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -9860,34 +9958,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__DOUBLE">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gdouble arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with one
+double-precision floating point argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gdouble parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -9939,34 +10041,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__ENUM">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter denotes an enumeration type..
+A #GClosureMarshal function for use with signals with a single
+argument with an enumerated type.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the enumeration parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10018,34 +10124,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__FLAGS">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gint arg1, gpointer user_data)` where the #gint parameter denotes a flags type.
+A #GClosureMarshal function for use with signals with a single
+argument with a flags types.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the flags parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10097,34 +10207,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__FLOAT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gfloat arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with one
+single-precision floating point argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gfloat parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10176,34 +10290,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__INT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gint arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+integer argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gint parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10255,34 +10373,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__LONG">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, glong arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with with a single
+long integer argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #glong parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10334,34 +10456,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__OBJECT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, GObject *arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+#GObject argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #GObject* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10413,34 +10539,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__PARAM">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, GParamSpec *arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+argument of type #GParamSpec.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #GParamSpec* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10492,34 +10622,42 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__POINTER">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gpointer arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single raw
+pointer argument type.
+
+If it is possible, it is better to use one of the more specific
+functions such as g_cclosure_marshal_VOID__OBJECT() or
+g_cclosure_marshal_VOID__OBJECT().
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gpointer parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10571,34 +10709,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__STRING">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, const gchar *arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single string
+argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gchar* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10650,34 +10792,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__UCHAR">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, guchar arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+unsigned character argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #guchar parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10729,34 +10875,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__UINT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, guint arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with with a single
+unsigned integer argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #guint parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10765,34 +10915,38 @@ to g_closure_invoke()
 
 <function name="g_cclosure_marshal_VOID__UINT_POINTER">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, guint arg1, gpointer arg2, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a unsigned int
+and a pointer as arguments.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 3
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding instance, arg1 and arg2
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10887,34 +11041,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__ULONG">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gulong arg1, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with a single
+unsigned long integer argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #gulong parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -10966,36 +11124,38 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__VARIANT">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, GVariant *arg1, gpointer user_data)`.
-
-Since: 2.26
+A #GClosureMarshal function for use with signals with a single
+#GVariant argument.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 2
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding the instance and the #GVariant* parameter
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -11047,34 +11207,37 @@ g_closure_set_meta_marshal()
 
 <function name="g_cclosure_marshal_VOID__VOID">
 <description>
-A marshaller for a #GCClosure with a callback of type
-`void (*callback) (gpointer instance, gpointer user_data)`.
+A #GClosureMarshal function for use with signals with no arguments.
 
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> the #GClosure to which the marshaller belongs
+<parameter_description> A #GClosure.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> ignored
+<parameter_description> A #GValue to store the return value. May be %NULL
+if the callback of closure doesn't return a value.
 </parameter_description>
 </parameter>
 <parameter name="n_param_values">
-<parameter_description> 1
+<parameter_description> The length of the @param_values array.
 </parameter_description>
 </parameter>
 <parameter name="param_values">
-<parameter_description> a #GValue array holding only the instance
+<parameter_description> An array of #GValues holding the arguments
+on which to invoke the callback of closure.
 </parameter_description>
 </parameter>
 <parameter name="invocation_hint">
-<parameter_description> the invocation hint given as the last argument
-to g_closure_invoke()
+<parameter_description> The invocation hint given as the last argument to
+g_closure_invoke().
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> additional data specified when registering the marshaller
+<parameter_description> Additional data specified when registering the
+marshaller, see g_closure_set_marshal() and
+g_closure_set_meta_marshal()
 </parameter_description>
 </parameter>
 </parameters>
@@ -14966,7 +15129,7 @@ The following format specifiers are supported:
 - \%A: the full weekday name according to the current locale
 - \%b: the abbreviated month name according to the current locale
 - \%B: the full month name according to the current locale
-- \%c: the  preferred date and time rpresentation for the current locale
+- \%c: the preferred date and time representation for the current locale
 - \%C: the century number (year/100) as a 2-digit integer (00-99)
 - \%d: the day of the month as a decimal number (range 01 to 31)
 - \%e: the day of the month as a decimal number (range  1 to 31)
@@ -39031,7 +39194,9 @@ is being emitted on. The rest are any arguments to be passed to the signal.
 </parameter_description>
 </parameter>
 <parameter name="return_value">
-<parameter_description> Location to store the return value of the signal emission.
+<parameter_description> Location to
+store the return value of the signal emission. This must be provided if the
+specified signal returns a value, but may be ignored otherwise.
 </parameter_description>
 </parameter>
 </parameters>
@@ -57846,7 +58011,8 @@ errors (in the case that the type would have been ambiguous, such as
 with empty arrays).
 
 In the event that the parsing is successful, the resulting #GVariant
-is returned.
+is returned. It is never floating, and must be freed with
+g_variant_unref().
 
 In case of any error, %NULL will be returned.  If @error is non-%NULL
 then it will be set to reflect the error that occurred.
@@ -57878,7 +58044,7 @@ produced by g_variant_print()&quot;.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a reference to a #GVariant, or %NULL
+<return> a non-floating reference to a #GVariant, or %NULL
 </return>
 </function>
 

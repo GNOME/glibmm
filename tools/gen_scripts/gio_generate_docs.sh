@@ -13,6 +13,7 @@ PREFIX="$JHBUILD_SOURCES"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gio/src"
 
+PARAMS="--with-properties"
 for dir in "$PREFIX"/glib/gio; do
   PARAMS="$PARAMS -s $dir"
 done
