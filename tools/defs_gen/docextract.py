@@ -12,12 +12,17 @@ import sys, os, re
 # option being specified.
 no_since = False
 
+# Used to tell if extract() shall collect information from subdirectories.
+# This variable is modified from docextract_to_xml based on the --no-recursion
+# option being specified.
+no_recursion = False
+
 __all__ = ['extract']
 
 class GtkDoc:
     def __init__(self):
         self.name = None
-        # The block type ('function', 'signal', property', 'enum')
+        # The block type ('function', 'signal', property', 'section', 'enum')
         self.block_type = ''
         self.params = []
         self.annotations = []
@@ -457,8 +462,9 @@ def parse_dir(dir, doc_dict):
         if file in ('.', '..'): continue
         path = os.path.join(dir, file)
         if os.path.isdir(path):
-            parse_dir(path, doc_dict)
-        if len(file) > 2 and (file[-2:] == '.c' or file[-2:] == '.h'):
+            if not no_recursion:
+                parse_dir(path, doc_dict)
+        elif len(file) > 2 and file[-2:] in ('.c', '.h'):
             sys.stderr.write("Processing " + path + '\n')
             parse_file(open(path, 'r'), doc_dict)
 
@@ -511,6 +517,6 @@ def extract_tmpl(dirs, doc_dict=None):
             path = os.path.join(dir, file)
             if os.path.isdir(path):
                 continue
-            if len(file) > 2 and file[-2:] == '.sgml':
+            if len(file) > 5 and file[-5:] == '.sgml':
                 parse_tmpl(open(path, 'r'), doc_dict)
     return doc_dict

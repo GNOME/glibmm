@@ -15,7 +15,7 @@ import docextract
 def usage():
     sys.stderr.write('usage: docextract_to_xml.py ' +
         '[-s /src/dir | --source-dir=/src/dir] [-a | --with-annotations] ' +
-        '[-p | --with-properties] [-c | --with-sections] ' +
+        '[-p | --with-properties] [-c | --with-sections] [-r | --no-recursion] ' +
         '[-n | --no-since] [-i | --no-signals ] [-e | --no-enums ]\n')
     sys.exit(1)
 
@@ -61,10 +61,11 @@ def print_annotations(annotations):
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:s:o:apcnie",
+        opts, args = getopt.getopt(sys.argv[1:], "d:s:o:apcrnie",
                                    ["source-dir=", "with-annotations",
                                     "with-properties", "with-sections",
-                                    "no-since", "no-signals", "no-enums"])
+                                    "no-recursion", "no-since",
+                                    "no-signals", "no-enums"])
     except getopt.error as e:
         sys.stderr.write('docextract_to_xml.py: %s\n' % e)
         usage()
@@ -83,6 +84,8 @@ if __name__ == '__main__':
             with_properties = True
         if opt in ('-c', '--with-sections'):
             with_sections = True
+        if opt in ('-r', '--no-recursion'):
+            docextract.no_recursion = True
         if opt in ('-n', '--no-since'):
             docextract.no_since = True
         if opt in ('-i', '--no-signals'):
