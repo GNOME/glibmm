@@ -778,7 +778,8 @@ sub output_wrap_gerror($$$$$$$)
 # void output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objProperty, $proxy_macro)
 sub output_wrap_any_property($$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objProperty, $proxy_macro) = @_;
+  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated,
+      $deprecation_docs, $newin, $objProperty, $proxy_macro) = @_;
 
   my $objDefsParser = $$self{objDefsParser};
 
@@ -810,9 +811,44 @@ sub output_wrap_any_property($$$$$$$$$$)
   my $name_underscored = $name;
   $name_underscored =~ tr/-/_/;
 
-  # Get the property documentation, if any, and add m4 quotes.
-  my $documentation = $objProperty->get_docs($deprecation_docs);
-  add_m4_quotes(\$documentation) if ($documentation ne "");
+  # Get the existing property documentation, if any, from the parsed docs.
+  my $documentation = DocsParser::lookup_documentation(
+    "$$objProperty{class}:$name_underscored", $deprecation_docs, $newin);
+
+  if ($documentation ne "")
+  {
+    # Remove leading "/**" and trailing "*/". They will be added by the m4 macro.
+    $documentation =~ s/^\s*\/\*\*\s*//;
+    $documentation =~ s/\s*\*\/\s*$//;
+  }
+
+  if ($documentation =~ /^`?[*\s]*
+      (?:
+        \@newin\{[\d,]+\}
+        |[Ss]ince[:\h]+\d+\.\d+
+        |\@deprecated\s
+        |[Dd]eprecated[:\s]
+      )/x)
+  {
+    # The documentation begins with a "@newin", "Since", "@deprecated" or
+    # "Deprecated" line. Get documentation also from the Property object,
+    # but don't add another @newin or @deprecated.
+    my $objdoc = $objProperty->get_docs("", "");
+    if ($objdoc ne "")
+    {
+      add_m4_quotes(\$objdoc);
+      $documentation = "$objdoc\n   *\n   * $documentation";
+    }
+  }
+  elsif ($documentation eq "")
+  {
+    # Try to get the (usually short) documentation from the Property object.
+    $documentation = $objProperty->get_docs($deprecation_docs, $newin);
+    if ($documentation ne "")
+    {
+      add_m4_quotes(\$documentation);
+    }
+  }
 
   #Declaration:
   if($deprecated ne "")
@@ -856,7 +892,8 @@ sub output_wrap_any_property($$$$$$$$$$)
 # void output_wrap_property($filename, $line_num, $name, $cpp_type, $deprecated, $deprecation_docs)
 sub output_wrap_property($$$$$$$$)
 {
-  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs) = @_;
+  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated,
+      $deprecation_docs, $newin) = @_;
 
   my $objProperty = GtkDefs::lookup_property($c_class, $name);
   if($objProperty eq 0) #If the lookup failed:
@@ -865,7 +902,8 @@ sub output_wrap_property($$$$$$$$)
   }
   else
   {
-    $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objProperty, "_PROPERTY_PROXY");
+    $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class,
+      $deprecated, $deprecation_docs, $newin, $objProperty, "_PROPERTY_PROXY");
   }
 }
 
@@ -873,7 +911,8 @@ sub output_wrap_property($$$$$$$$)
 # void output_wrap_child_property($filename, $line_num, $name, $cpp_type, $deprecated, $deprecation_docs)
 sub output_wrap_child_property($$$$$$$$)
 {
-  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs) = @_;
+  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated,
+      $deprecation_docs, $newin) = @_;
 
   my $objChildProperty = GtkDefs::lookup_child_property($c_class, $name);
   if($objChildProperty eq 0) #If the lookup failed:
@@ -882,7 +921,8 @@ sub output_wrap_child_property($$$$$$$$)
   }
   else
   {
-    $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objChildProperty, "_CHILD_PROPERTY_PROXY");
+    $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class,
+      $deprecated, $deprecation_docs, $newin, $objChildProperty, "_CHILD_PROPERTY_PROXY");
   }
 }
 

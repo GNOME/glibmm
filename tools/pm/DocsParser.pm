@@ -112,18 +112,19 @@ sub parse_on_start($$%)
 
   $tag = lc($tag);
 
-  if($tag eq "function" or $tag eq "signal" or $tag eq "enum")
+  if($tag eq "function" or $tag eq "signal" or $tag eq "property" or $tag eq "enum")
   {
     if(defined $DocsParser::objCurrentFunction)
     {
       $objParser->xpcroak(
-        "\nClose a function, signal or enum tag before you open another one.");
+        "\nClose a function, signal, property or enum tag before you open another one.");
     }
 
     my $functionName = $attr{name};
 
-    # Change signal name from Class::a-signal-name to Class::a_signal_name.
-    $functionName =~ s/-/_/g if($tag eq "signal");
+    # Change signal name from Class::a-signal-name to Class::a_signal_name
+    # and property name from Class:a-property-name to Class:a_property_name
+    $functionName =~ s/-/_/g if ($tag eq "signal" or $tag eq "property");
 
     #Reuse existing Function, if it exists:
     #(For instance, if this is the override parse)
@@ -195,7 +196,7 @@ sub parse_on_end($$)
 
   $tag = lc($tag);
 
-  if($tag eq "function" or $tag eq "signal" or $tag eq "enum")
+  if($tag eq "function" or $tag eq "signal" or $tag eq "property" or $tag eq "enum")
   {
     # Store the Function structure in the array:
     my $functionName = $$DocsParser::objCurrentFunction{name};
@@ -349,7 +350,8 @@ sub lookup_documentation($$$;$)
   # Most @newins are at the end of a function description.
   $text .= "\n";
 
-  #Add note about deprecation if we have specified that in our _WRAP_METHOD() call:
+  # Add note about deprecation if we have specified that in our _WRAP_METHOD(),
+  # _WRAP_SIGNAL(), _WRAP_PROPERTY() or _WRAP_CHILD_PROPERTY() call:
   if($deprecation_docs ne "")
   {
     $text .= "\n\@deprecated $deprecation_docs\n";
@@ -357,6 +359,10 @@ sub lookup_documentation($$$;$)
 
   DocsParser::append_parameter_docs($objFunction, \$text, $objCppfunc);
   DocsParser::append_return_docs($objFunction, \$text);
+
+  # Remove leading and trailing white space.
+  $text = string_trim($text);
+
   DocsParser::add_m4_quotes(\$text);
 
   # Escape the space after "i.e." or "e.g." in the brief description.

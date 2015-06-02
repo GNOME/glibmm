@@ -1501,6 +1501,7 @@ sub on_wrap_any_property($)
   #TODO: Reduce duplication with on_wrap_method():
   my $argDeprecated = "";
   my $deprecation_docs = "";
+  my $newin = "";
   while($#args >= 2) # If the optional arguments are there.
   {
     my $argRef = string_trim(pop @args);
@@ -1514,9 +1515,14 @@ sub on_wrap_any_property($)
         $deprecation_docs = string_unquote(string_trim($1));
       }
     }
+    elsif($argRef =~ /^newin(.*)/) #If newin is at the start.
+    {
+      $newin = string_unquote(string_trim($1));
+    }
   }
 
-  return ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated, $deprecation_docs);
+  return ($filename, $line_num, $argPropertyName, $argCppType,
+          $argDeprecated, $deprecation_docs, $newin);
 }
 
 sub on_wrap_property($)
@@ -1526,9 +1532,11 @@ sub on_wrap_property($)
 
   return unless ($self->check_for_eof());
 
-  my ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated, $deprecation_docs) = $self->on_wrap_any_property();
+  my ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated,
+      $deprecation_docs, $newin) = $self->on_wrap_any_property();
 
-  $objOutputter->output_wrap_property($filename, $line_num, $argPropertyName, $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs);
+  $objOutputter->output_wrap_property($filename, $line_num, $argPropertyName,
+    $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs, $newin);
 }
 
 sub on_wrap_child_property($)
@@ -1538,9 +1546,11 @@ sub on_wrap_child_property($)
 
   return unless ($self->check_for_eof());
 
-  my ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated, $deprecation_docs) = $self->on_wrap_any_property();
+  my ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated,
+      $deprecation_docs, $newin) = $self->on_wrap_any_property();
 
-  $objOutputter->output_wrap_child_property($filename, $line_num, $argPropertyName, $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs);
+  $objOutputter->output_wrap_child_property($filename, $line_num, $argPropertyName,
+    $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs, $newin);
 }
 
 sub output_wrap_check($$$$$$)

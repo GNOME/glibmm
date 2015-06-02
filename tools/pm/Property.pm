@@ -112,13 +112,19 @@ sub get_writable($)
 
 sub get_docs($$)
 {
-  my ($self, $deprecation_docs) = @_;
+  my ($self, $deprecation_docs, $newin) = @_;
   my $text = $$self{docs};
 
-  #Add note about deprecation if we have specified that in our _WRAP_METHOD() call:
+  #Add note about deprecation if we have specified that in our _WRAP_PROPERTY()
+  #or_WRAP_CHILD_PROPERTY() call:
   if($deprecation_docs ne "")
   {
     $text .= "\n   * \@deprecated $deprecation_docs";
+  }
+
+  if ($newin ne "")
+  {
+    $text .= "\n   *\n   * \@newin{$newin}";
   }
 
   return $text;
