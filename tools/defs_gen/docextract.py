@@ -65,6 +65,7 @@ function_name_pattern = re.compile(r'^([a-z]\w*)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
 signal_name_pattern = re.compile(r'^([A-Z]\w+::[a-z0-9-]+)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
 property_name_pattern = re.compile(r'^([A-Z]\w+:[a-z0-9-]+)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
 enum_name_pattern = re.compile(r'^([A-Z]\w+)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
+section_name_pattern = re.compile(r'^SECTION:([a-z0-9_-]+)\s*:?(\s*\(.*\)\s*){0,2}\s*$')
 return_pattern = re.compile(r'^@?(returns:|return\s+value:)(.*\n?)$', re.IGNORECASE)
 deprecated_pattern = re.compile(r'^(deprecated\s*:\s*.*\n?)$', re.IGNORECASE)
 rename_to_pattern = re.compile(r'^(rename\s+to)\s*:\s*(.*\n?)$', re.IGNORECASE)
@@ -77,9 +78,13 @@ annotation_lead_pattern = re.compile(r'^\s*\(\s*(.*?)\s*\)\s*')
 
 # These patterns determine the identifier of the current comment block.  They
 # are grouped in a list for easy determination of block identifiers (in
-# skip_to_identifier).  The function_name_pattern should be tested for last
-# because it always matches signal and property identifiers.
-identifier_patterns = [ signal_name_pattern, property_name_pattern, enum_name_pattern, function_name_pattern ]
+# skip_to_identifier).
+# The function_name_pattern shall be tested for last, because it always matches
+# signal and property identifiers.
+# The property_name_pattern shall be tested for after the section_name_pattern,
+# because the property_name_pattern matches most section identifiers.
+identifier_patterns = [ signal_name_pattern, section_name_pattern,
+    property_name_pattern, enum_name_pattern, function_name_pattern ]
 
 # This pattern is to match return sections that forget to have a colon (':')
 # after the initial 'Return' phrase.  It is not included by default in the list
@@ -195,6 +200,8 @@ def skip_to_identifier(fp, line, cur_doc):
                 # Set the GtkDoc type.
                 if pattern == signal_name_pattern:
                     cur_doc.set_type('signal')
+                elif pattern == section_name_pattern:
+                    cur_doc.set_type('section')
                 elif pattern == property_name_pattern:
                     cur_doc.set_type('property')
                 elif pattern == enum_name_pattern:

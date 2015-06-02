@@ -14,8 +14,8 @@ import docextract
 
 def usage():
     sys.stderr.write('usage: docextract_to_xml.py ' +
-        '[-s /src/dir | --source-dir=/src/dir] ' +
-        '[-a | --with-annotations] [-p | --with-properties] ' +
+        '[-s /src/dir | --source-dir=/src/dir] [-a | --with-annotations] ' +
+        '[-p | --with-properties] [-c | --with-sections] ' +
         '[-n | --no-since] [-i | --no-signals ] [-e | --no-enums ]\n')
     sys.exit(1)
 
@@ -61,10 +61,10 @@ def print_annotations(annotations):
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:s:o:apnie",
+        opts, args = getopt.getopt(sys.argv[1:], "d:s:o:apcnie",
                                    ["source-dir=", "with-annotations",
-                                     "with-properties", "no-since",
-                                     "no-signals", "no-enums"])
+                                    "with-properties", "with-sections",
+                                    "no-since", "no-signals", "no-enums"])
     except getopt.error as e:
         sys.stderr.write('docextract_to_xml.py: %s\n' % e)
         usage()
@@ -72,6 +72,7 @@ if __name__ == '__main__':
     with_annotations = False
     with_signals = True
     with_properties = False
+    with_sections = False
     with_enums = True
     for opt, arg in opts:
         if opt in ('-s', '--source-dir'):
@@ -80,6 +81,8 @@ if __name__ == '__main__':
             with_annotations = True
         if opt in ('-p', '--with-properties'):
             with_properties = True
+        if opt in ('-c', '--with-sections'):
+            with_sections = True
         if opt in ('-n', '--no-since'):
             docextract.no_since = True
         if opt in ('-i', '--no-signals'):
@@ -99,8 +102,8 @@ if __name__ == '__main__':
         print("<root>")
 
         for name, value in sorted(docs.items()):
-            # Get the type of comment block ('function', 'signal' or
-            # 'property') (the value is a GtkDoc).
+            # Get the type of comment block ('function', 'signal',
+            # 'property', 'section' or 'enum') (the value is a GtkDoc).
             block_type = value.get_type()
 
             # Skip signals if the option was not specified.
@@ -108,6 +111,9 @@ if __name__ == '__main__':
                 continue
             # Likewise for properties.
             elif block_type == 'property' and not with_properties:
+                continue
+            # Likewise for sections.
+            elif block_type == 'section' and not with_sections:
                 continue
             # Likewise for enums.
             elif block_type == 'enum' and not with_enums:
@@ -133,9 +139,9 @@ if __name__ == '__main__':
 
                 print("</parameters>")
 
-            if block_type != 'property' and block_type != 'enum':
-              # Show the return-type (also if not dealing with a property or
-              # enum):
+            if block_type not in ('property', 'section', 'enum'):
+              # Show the return-type if not dealing with a property, section
+              # or enum:
               if with_annotations:
                   print("<return>")
                   print("<return_description>" + escape_text(value.ret[0]) + \
