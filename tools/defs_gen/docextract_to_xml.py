@@ -116,8 +116,17 @@ if __name__ == '__main__':
             elif block_type == 'property' and not with_properties:
                 continue
             # Likewise for sections.
-            elif block_type == 'section' and not with_sections:
-                continue
+            elif block_type == 'section':
+                if not with_sections:
+                    continue
+                # Delete 'SECTION:' from the name.
+                # (It could easily be deleted by docextract.extract(), but then
+                # there would be a theoretical risk that a section name would
+                # be identical to a function name, when all kinds of elements
+                # are stored in the docs dictionary with their names as key.)
+                last_colon_pos = name.rfind(':')
+                if last_colon_pos >= 0:
+                    name = name[last_colon_pos+1:]
             # Likewise for enums.
             elif block_type == 'enum' and not with_enums:
                 continue
