@@ -420,15 +420,6 @@
   (construct-only #f)
 )
 
-(define-property context
-  (of-object "GFileMonitor")
-  (prop-type "GParamBoxed")
-  (docs "The main context to dispatch from")
-  (readable #f)
-  (writable #t)
-  (construct-only #t)
-)
-
 ;; From GFilenameCompleter
 
 (define-signal got-completion-data
@@ -876,6 +867,15 @@
   (prop-type "GParamString")
   (docs "The name of the property to wrap")
   (readable #f)
+  (writable #t)
+  (construct-only #t)
+)
+
+(define-property invert-boolean
+  (of-object "GPropertyAction")
+  (prop-type "GParamBoolean")
+  (docs "Whether to invert the value of a boolean property")
+  (readable #t)
   (writable #t)
   (construct-only #t)
 )
@@ -2279,6 +2279,16 @@
 ;; From GUnixConnection
 
 ;; From GSocketListener
+
+(define-signal event
+  (of-object "GSocketListener")
+  (return-type "void")
+  (when "last")
+  (parameters
+    '("GSocketListenerEvent" "p0")
+    '("GSocket*" "p1")
+  )
+)
 
 (define-property listen-backlog
   (of-object "GSocketListener")

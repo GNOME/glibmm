@@ -280,13 +280,6 @@
   (gtype-id "G_TYPE_LOADABLE_ICON")
 )
 
-(define-object DirectoryMonitor
-  (in-module "GLocal")
-  (parent "GFileMonitor")
-  (c-name "GLocalDirectoryMonitor")
-  (gtype-id "G_TYPE_LOCAL_DIRECTORY_MONITOR")
-)
-
 (define-object FileIOStream
   (in-module "GLocal")
   (parent "GFileIOStream")
@@ -514,6 +507,13 @@
   (parent "GObject")
   (c-name "GSocketAddress")
   (gtype-id "G_TYPE_SOCKET_ADDRESS")
+)
+
+(define-object SocketAddress
+  (in-module "GNative")
+  (parent "GSocketAddress")
+  (c-name "GNativeSocketAddress")
+  (gtype-id "G_TYPE_NATIVE_SOCKET_ADDRESS")
 )
 
 (define-object SocketAddress
@@ -759,6 +759,13 @@
   (gtype-id "G_TYPE_WIN32_OUTPUT_STREAM")
 )
 
+(define-object 32RegistryKey
+  (in-module "GWin")
+  (parent "GObject")
+  (c-name "GWin32RegistryKey")
+  (gtype-id "G_TYPE_WIN32_REGISTRY_KEY")
+)
+
 ;; Enumerations and flags ...
 
 (define-enum AuthMechanismState
@@ -970,6 +977,7 @@
     '("watch-mounts" "G_FILE_MONITOR_WATCH_MOUNTS")
     '("send-moved" "G_FILE_MONITOR_SEND_MOVED")
     '("watch-hard-links" "G_FILE_MONITOR_WATCH_HARD_LINKS")
+    '("watch-moves" "G_FILE_MONITOR_WATCH_MOVES")
   )
 )
 
@@ -1012,6 +1020,9 @@
     '("pre-unmount" "G_FILE_MONITOR_EVENT_PRE_UNMOUNT")
     '("unmounted" "G_FILE_MONITOR_EVENT_UNMOUNTED")
     '("moved" "G_FILE_MONITOR_EVENT_MOVED")
+    '("renamed" "G_FILE_MONITOR_EVENT_RENAMED")
+    '("moved-in" "G_FILE_MONITOR_EVENT_MOVED_IN")
+    '("moved-out" "G_FILE_MONITOR_EVENT_MOVED_OUT")
   )
 )
 
@@ -1397,6 +1408,7 @@
   (values
     '("none" "G_DBUS_CALL_FLAGS_NONE")
     '("no-auto-start" "G_DBUS_CALL_FLAGS_NO_AUTO_START")
+    '("allow-interactive-authorization" "G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION")
   )
 )
 
@@ -1421,6 +1433,7 @@
     '("none" "G_DBUS_MESSAGE_FLAGS_NONE")
     '("no-reply-expected" "G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED")
     '("no-auto-start" "G_DBUS_MESSAGE_FLAGS_NO_AUTO_START")
+    '("allow-interactive-authorization" "G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION")
   )
 )
 
@@ -1671,6 +1684,18 @@
     '("tls-handshaking" "G_SOCKET_CLIENT_TLS_HANDSHAKING")
     '("tls-handshaked" "G_SOCKET_CLIENT_TLS_HANDSHAKED")
     '("complete" "G_SOCKET_CLIENT_COMPLETE")
+  )
+)
+
+(define-enum ListenerEvent
+  (in-module "GSocket")
+  (c-name "GSocketListenerEvent")
+  (gtype-id "G_TYPE_SOCKET_LISTENER_EVENT")
+  (values
+    '("binding" "G_SOCKET_LISTENER_BINDING")
+    '("bound" "G_SOCKET_LISTENER_BOUND")
+    '("listening" "G_SOCKET_LISTENER_LISTENING")
+    '("listened" "G_SOCKET_LISTENER_LISTENED")
   )
 )
 
@@ -10505,6 +10530,11 @@
   (return-type "GType")
 )
 
+(define-function g_socket_listener_event_get_type
+  (c-name "g_socket_listener_event_get_type")
+  (return-type "GType")
+)
+
 (define-function g_test_dbus_flags_get_type
   (c-name "g_test_dbus_flags_get_type")
   (return-type "GType")
@@ -11089,36 +11119,28 @@
 
 
 
-;; From glocaldirectorymonitor.h
-
-(define-function g_local_directory_monitor_get_type
-  (c-name "g_local_directory_monitor_get_type")
-  (return-type "GType")
-)
-
-(define-method start
-  (of-object "GLocalDirectoryMonitor")
-  (c-name "g_local_directory_monitor_start")
-  (return-type "none")
-)
-
-(define-function g_local_directory_monitor_new_in_worker
-  (c-name "g_local_directory_monitor_new_in_worker")
-  (return-type "GLocalDirectoryMonitor*")
-  (parameters
-    '("const-char*" "pathname")
-    '("GFileMonitorFlags" "flags")
-    '("GError**" "error")
-  )
-)
-
-
-
 ;; From glocalfileenumerator.h
 
 
 
 ;; From glocalfile.h
+
+(define-function g_local_file_is_remote
+  (c-name "g_local_file_is_remote")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "filename")
+  )
+)
+
+(define-function g_local_file_new_from_dirname_and_basename
+  (c-name "g_local_file_new_from_dirname_and_basename")
+  (return-type "GFile*")
+  (parameters
+    '("const-char*" "dirname")
+    '("const-char*" "basename")
+  )
+)
 
 
 
@@ -11141,19 +11163,40 @@
   (return-type "GType")
 )
 
-(define-method start
-  (of-object "GLocalFileMonitor")
-  (c-name "g_local_file_monitor_start")
-  (return-type "none")
+(define-function g_local_file_monitor_new_for_path
+  (c-name "g_local_file_monitor_new_for_path")
+  (return-type "GFileMonitor*")
+  (parameters
+    '("const-gchar*" "pathname")
+    '("gboolean" "is_directory")
+    '("GFileMonitorFlags" "flags")
+    '("GError**" "error")
+  )
 )
 
 (define-function g_local_file_monitor_new_in_worker
   (c-name "g_local_file_monitor_new_in_worker")
-  (return-type "GLocalFileMonitor*")
+  (return-type "GFileMonitor*")
   (parameters
-    '("const-char*" "pathname")
+    '("const-gchar*" "pathname")
+    '("gboolean" "is_directory")
     '("GFileMonitorFlags" "flags")
+    '("GFileMonitorCallback" "callback")
+    '("gpointer" "user_data")
     '("GError**" "error")
+  )
+)
+
+(define-method handle_event
+  (of-object "GFileMonitorSource")
+  (c-name "g_file_monitor_source_handle_event")
+  (return-type "gboolean")
+  (parameters
+    '("GFileMonitorEvent" "event_type")
+    '("const-gchar*" "child")
+    '("const-gchar*" "rename_to")
+    '("GFile*" "other")
+    '("gint64" "event_time")
   )
 )
 
@@ -12129,6 +12172,25 @@
 
 
 ;; From gmountprivate.h
+
+
+
+;; From gnativesocketaddress.h
+
+(define-function g_native_socket_address_get_type
+  (c-name "g_native_socket_address_get_type")
+  (return-type "GType")
+)
+
+(define-function g_native_socket_address_new
+  (c-name "g_native_socket_address_new")
+  (is-constructor-of "GNativeSocketAddress")
+  (return-type "GSocketAddress*")
+  (parameters
+    '("gpointer" "native")
+    '("gsize" "len")
+  )
+)
 
 
 
@@ -14611,6 +14673,12 @@
   (parameters
     '("const-gchar*" "name")
   )
+)
+
+(define-method list_keys
+  (of-object "GSettingsSchema")
+  (c-name "g_settings_schema_list_keys")
+  (return-type "gchar**")
 )
 
 (define-method list_children
@@ -17633,6 +17701,15 @@
   (return-type "GList*")
 )
 
+(define-method copy_session_state
+  (of-object "GTlsClientConnection")
+  (c-name "g_tls_client_connection_copy_session_state")
+  (return-type "none")
+  (parameters
+    '("GTlsClientConnection*" "source")
+  )
+)
+
 
 
 ;; From gtlsconnection.h
@@ -19215,6 +19292,313 @@
   (of-object "GWin32OutputStream")
   (c-name "g_win32_output_stream_get_handle")
   (return-type "void*")
+)
+
+
+
+;; From gwin32registrykey.h
+
+(define-method copy
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_copy")
+  (return-type "GWin32RegistrySubkeyIter*")
+)
+
+(define-method free
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_free")
+  (return-type "none")
+)
+
+(define-method assign
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_assign")
+  (return-type "none")
+  (parameters
+    '("const-GWin32RegistrySubkeyIter*" "other")
+  )
+)
+
+(define-function g_win32_registry_subkey_iter_get_type
+  (c-name "g_win32_registry_subkey_iter_get_type")
+  (return-type "GType")
+)
+
+(define-method copy
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_copy")
+  (return-type "GWin32RegistryValueIter*")
+)
+
+(define-method free
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_free")
+  (return-type "none")
+)
+
+(define-method assign
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_assign")
+  (return-type "none")
+  (parameters
+    '("const-GWin32RegistryValueIter*" "other")
+  )
+)
+
+(define-function g_win32_registry_value_iter_get_type
+  (c-name "g_win32_registry_value_iter_get_type")
+  (return-type "GType")
+)
+
+(define-function g_win32_registry_key_get_type
+  (c-name "g_win32_registry_key_get_type")
+  (return-type "GType")
+)
+
+(define-function g_win32_registry_key_new
+  (c-name "g_win32_registry_key_new")
+  (is-constructor-of "GWin32RegistryKey")
+  (return-type "GWin32RegistryKey*")
+  (parameters
+    '("const-gchar*" "path")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_win32_registry_key_new_w
+  (c-name "g_win32_registry_key_new_w")
+  (return-type "GWin32RegistryKey*")
+  (parameters
+    '("const-gunichar2*" "path")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_child
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_get_child")
+  (return-type "GWin32RegistryKey*")
+  (parameters
+    '("const-gchar*" "subkey")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_child_w
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_get_child_w")
+  (return-type "GWin32RegistryKey*")
+  (parameters
+    '("const-gunichar2*" "subkey")
+    '("GError**" "error")
+  )
+)
+
+(define-method init
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_init")
+  (return-type "gboolean")
+  (parameters
+    '("GWin32RegistryKey*" "key")
+    '("GError**" "error")
+  )
+)
+
+(define-method clear
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_clear")
+  (return-type "none")
+)
+
+(define-method n_subkeys
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_n_subkeys")
+  (return-type "gsize")
+)
+
+(define-method next
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_next")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "skip_errors")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_name
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_get_name")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "subkey_name")
+    '("gsize*" "subkey_name_len")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_name_w
+  (of-object "GWin32RegistrySubkeyIter")
+  (c-name "g_win32_registry_subkey_iter_get_name_w")
+  (return-type "gboolean")
+  (parameters
+    '("gunichar2**" "subkey_name")
+    '("gsize*" "subkey_name_len")
+    '("GError**" "error")
+  )
+)
+
+(define-method init
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_init")
+  (return-type "gboolean")
+  (parameters
+    '("GWin32RegistryKey*" "key")
+    '("GError**" "error")
+  )
+)
+
+(define-method clear
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_clear")
+  (return-type "none")
+)
+
+(define-method n_values
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_n_values")
+  (return-type "gsize")
+)
+
+(define-method next
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_next")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "skip_errors")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_value_type
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_get_value_type")
+  (return-type "gboolean")
+  (parameters
+    '("GWin32RegistryValueType*" "value_type")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_name
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_get_name")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "value_name")
+    '("gsize*" "value_name_len")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_name_w
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_get_name_w")
+  (return-type "gboolean")
+  (parameters
+    '("gunichar2**" "value_name")
+    '("gsize*" "value_name_len")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_data
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_get_data")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "auto_expand")
+    '("gpointer*" "value_data")
+    '("gsize*" "value_data_size")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_data_w
+  (of-object "GWin32RegistryValueIter")
+  (c-name "g_win32_registry_value_iter_get_data_w")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "auto_expand")
+    '("gpointer*" "value_data")
+    '("gsize*" "value_data_size")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_value
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_get_value")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "auto_expand")
+    '("const-gchar*" "value_name")
+    '("GWin32RegistryValueType*" "value_type")
+    '("gpointer*" "value_data")
+    '("gsize*" "value_data_size")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_value_w
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_get_value_w")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "auto_expand")
+    '("const-gunichar2*" "value_name")
+    '("GWin32RegistryValueType*" "value_type")
+    '("gpointer*" "value_data")
+    '("gsize*" "value_data_size")
+    '("GError**" "error")
+  )
+)
+
+(define-method get_path
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_get_path")
+  (return-type "const-gchar*")
+)
+
+(define-method get_path_w
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_get_path_w")
+  (return-type "const-gunichar2*")
+)
+
+(define-method watch
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_watch")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "watch_children")
+    '("GWin32RegistryKeyWatcherFlags" "watch_flags")
+    '("GWin32RegistryKeyWatchCallbackFunc" "callback")
+    '("gpointer" "user_data")
+    '("GError**" "error")
+  )
+)
+
+(define-method has_changed
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_has_changed")
+  (return-type "gboolean")
+)
+
+(define-method erase_change_indicator
+  (of-object "GWin32RegistryKey")
+  (c-name "g_win32_registry_key_erase_change_indicator")
+  (return-type "none")
 )
 
 

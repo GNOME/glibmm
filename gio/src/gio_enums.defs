@@ -322,7 +322,8 @@
 ;;   G_FILE_MONITOR_NONE             = 0,
 ;;   G_FILE_MONITOR_WATCH_MOUNTS     = (1 << 0),
 ;;   G_FILE_MONITOR_SEND_MOVED       = (1 << 1),
-;;   G_FILE_MONITOR_WATCH_HARD_LINKS = (1 << 2)
+;;   G_FILE_MONITOR_WATCH_HARD_LINKS = (1 << 2),
+;;   G_FILE_MONITOR_WATCH_MOVES      = (1 << 3)
 ;; } GFileMonitorFlags;
 
 (define-flags-extended FileMonitorFlags
@@ -333,6 +334,7 @@
     '("watch-mounts" "G_FILE_MONITOR_WATCH_MOUNTS" "(1 << 0)")
     '("send-moved" "G_FILE_MONITOR_SEND_MOVED" "(1 << 1)")
     '("watch-hard-links" "G_FILE_MONITOR_WATCH_HARD_LINKS" "(1 << 2)")
+    '("watch-moves" "G_FILE_MONITOR_WATCH_MOVES" "(1 << 3)")
   )
 )
 
@@ -387,7 +389,10 @@
 ;;   G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
 ;;   G_FILE_MONITOR_EVENT_PRE_UNMOUNT,
 ;;   G_FILE_MONITOR_EVENT_UNMOUNTED,
-;;   G_FILE_MONITOR_EVENT_MOVED
+;;   G_FILE_MONITOR_EVENT_MOVED,
+;;   G_FILE_MONITOR_EVENT_RENAMED,
+;;   G_FILE_MONITOR_EVENT_MOVED_IN,
+;;   G_FILE_MONITOR_EVENT_MOVED_OUT
 ;; } GFileMonitorEvent;
 
 (define-enum-extended FileMonitorEvent
@@ -402,6 +407,9 @@
     '("pre-unmount" "G_FILE_MONITOR_EVENT_PRE_UNMOUNT" "5")
     '("unmounted" "G_FILE_MONITOR_EVENT_UNMOUNTED" "6")
     '("moved" "G_FILE_MONITOR_EVENT_MOVED" "7")
+    '("renamed" "G_FILE_MONITOR_EVENT_RENAMED" "8")
+    '("moved-in" "G_FILE_MONITOR_EVENT_MOVED_IN" "9")
+    '("moved-out" "G_FILE_MONITOR_EVENT_MOVED_OUT" "10")
   )
 )
 
@@ -1042,7 +1050,8 @@
 ;; Original typedef:
 ;; typedef enum {
 ;;   G_DBUS_CALL_FLAGS_NONE = 0,
-;;   G_DBUS_CALL_FLAGS_NO_AUTO_START = (1<<0)
+;;   G_DBUS_CALL_FLAGS_NO_AUTO_START = (1<<0),
+;;   G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION = (1<<1)
 ;; } GDBusCallFlags;
 
 (define-flags-extended DBusCallFlags
@@ -1051,6 +1060,7 @@
   (values
     '("none" "G_DBUS_CALL_FLAGS_NONE" "0x0")
     '("no-auto-start" "G_DBUS_CALL_FLAGS_NO_AUTO_START" "(1<<0)")
+    '("allow-interactive-authorization" "G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION" "(1<<1)")
   )
 )
 
@@ -1079,7 +1089,8 @@
 ;; typedef enum {
 ;;   G_DBUS_MESSAGE_FLAGS_NONE = 0,
 ;;   G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED = (1<<0),
-;;   G_DBUS_MESSAGE_FLAGS_NO_AUTO_START = (1<<1)
+;;   G_DBUS_MESSAGE_FLAGS_NO_AUTO_START = (1<<1),
+;;   G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION = (1<<2)
 ;; } GDBusMessageFlags;
 
 (define-flags-extended DBusMessageFlags
@@ -1089,6 +1100,7 @@
     '("none" "G_DBUS_MESSAGE_FLAGS_NONE" "0x0")
     '("no-reply-expected" "G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED" "(1<<0)")
     '("no-auto-start" "G_DBUS_MESSAGE_FLAGS_NO_AUTO_START" "(1<<1)")
+    '("allow-interactive-authorization" "G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION" "(1<<2)")
   )
 )
 
@@ -1521,6 +1533,25 @@
 )
 
 ;; Original typedef:
+;; typedef enum {
+;;   G_SOCKET_LISTENER_BINDING,
+;;   G_SOCKET_LISTENER_BOUND,
+;;   G_SOCKET_LISTENER_LISTENING,
+;;   G_SOCKET_LISTENER_LISTENED
+;; } GSocketListenerEvent;
+
+(define-enum-extended SocketListenerEvent
+  (in-module "G")
+  (c-name "GSocketListenerEvent")
+  (values
+    '("binding" "G_SOCKET_LISTENER_BINDING" "0")
+    '("bound" "G_SOCKET_LISTENER_BOUND" "1")
+    '("listening" "G_SOCKET_LISTENER_LISTENING" "2")
+    '("listened" "G_SOCKET_LISTENER_LISTENED" "3")
+  )
+)
+
+;; Original typedef:
 ;; typedef enum /*< flags >*/ {
 ;;   G_TEST_DBUS_NONE = 0
 ;; } GTestDBusFlags;
@@ -1615,6 +1646,67 @@
     '("no-sensitivity" "G_SETTINGS_BIND_NO_SENSITIVITY" "(1<<2)")
     '("get-no-changes" "G_SETTINGS_BIND_GET_NO_CHANGES" "(1<<3)")
     '("invert-boolean" "G_SETTINGS_BIND_INVERT_BOOLEAN" "(1<<4)")
+  )
+)
+
+;; From gwin32registrykey.h
+
+;; Original typedef:
+;; typedef enum {
+;;   G_WIN32_REGISTRY_VALUE_NONE = 0,
+;;   G_WIN32_REGISTRY_VALUE_BINARY = 1,
+;;   G_WIN32_REGISTRY_VALUE_UINT32LE = 2,
+;;   G_WIN32_REGISTRY_VALUE_UINT32BE = 3,
+;; #if G_BYTE_ORDER == G_BIG_ENDIAN
+;;   G_WIN32_REGISTRY_VALUE_UINT32 = G_WIN32_REGISTRY_VALUE_UINT32BE,
+;; #else
+;;   G_WIN32_REGISTRY_VALUE_UINT32 = G_WIN32_REGISTRY_VALUE_UINT32LE,
+;; #endif
+;;   G_WIN32_REGISTRY_VALUE_EXPAND_STR = 4,
+;;   G_WIN32_REGISTRY_VALUE_LINK = 5,
+;;   G_WIN32_REGISTRY_VALUE_MULTI_STR = 6,
+;;   G_WIN32_REGISTRY_VALUE_UINT64LE = 7,
+;; #if G_BYTE_ORDER == G_LITTLE_ENDIAN
+;;   G_WIN32_REGISTRY_VALUE_UINT64 = G_WIN32_REGISTRY_VALUE_UINT64LE,
+;; #endif
+;;   G_WIN32_REGISTRY_VALUE_STR = 8
+;; } GWin32RegistryValueType;
+
+(define-enum-extended Win32RegistryValueType
+  (in-module "G")
+  (c-name "GWin32RegistryValueType")
+  (values
+    '("none" "G_WIN32_REGISTRY_VALUE_NONE" "0")
+    '("binary" "G_WIN32_REGISTRY_VALUE_BINARY" "1")
+    '("uint32le" "G_WIN32_REGISTRY_VALUE_UINT32LE" "2")
+    '("uint32be" "G_WIN32_REGISTRY_VALUE_UINT32BE" "3")
+    '("uint32" "G_WIN32_REGISTRY_VALUE_UINT32" "3")
+    '("uint32" "G_WIN32_REGISTRY_VALUE_UINT32" "2")
+    '("expand-str" "G_WIN32_REGISTRY_VALUE_EXPAND_STR" "4")
+    '("link" "G_WIN32_REGISTRY_VALUE_LINK" "5")
+    '("multi-str" "G_WIN32_REGISTRY_VALUE_MULTI_STR" "6")
+    '("uint64le" "G_WIN32_REGISTRY_VALUE_UINT64LE" "7")
+    '("uint64" "G_WIN32_REGISTRY_VALUE_UINT64" "7")
+    '("str" "G_WIN32_REGISTRY_VALUE_STR" "8")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_WIN32_REGISTRY_WATCH_NAME = 1 << 0,
+;;   G_WIN32_REGISTRY_WATCH_ATTRIBUTES = 1 << 1,
+;;   G_WIN32_REGISTRY_WATCH_VALUES = 1 << 2,
+;;   G_WIN32_REGISTRY_WATCH_SECURITY = 1 << 3,
+;; } GWin32RegistryKeyWatcherFlags;
+
+(define-flags-extended Win32RegistryKeyWatcherFlags
+  (in-module "G")
+  (c-name "GWin32RegistryKeyWatcherFlags")
+  (values
+    '("name" "G_WIN32_REGISTRY_WATCH_NAME" "1 << 0")
+    '("attributes" "G_WIN32_REGISTRY_WATCH_ATTRIBUTES" "1 << 1")
+    '("values" "G_WIN32_REGISTRY_WATCH_VALUES" "1 << 2")
+    '("security" "G_WIN32_REGISTRY_WATCH_SECURITY" "1 << 3")
   )
 )
 
