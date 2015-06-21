@@ -1,0 +1,65 @@
+/* Copyright (C) 2015 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_CONFIGINCLUDE(giommconfig.h)
+
+#include <giomm/settingsschema.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GSettingsSchemaSource GSettingsSchemaSource;
+#endif
+
+namespace Gio
+{
+
+//TODO: Add some class documentation, though there is none in the C docs.
+
+/** See SettingsSchema.
+ *
+ * @newin{2,32}
+ */
+class SettingsSchemaSource
+{
+  _CLASS_OPAQUE_REFCOUNTED(SettingsSchemaSource, GSettingsSchemaSource, NONE, g_settings_schema_source_ref, g_settings_schema_source_unref)
+
+protected:
+  _IGNORE(g_settings_schema_source_ref, g_settings_schema_source_unref)
+
+public:
+
+  _WRAP_METHOD(static Glib::RefPtr<SettingsSchemaSource> get_default(), g_settings_schema_source_get_default)
+
+/* TODO:
+GLIB_AVAILABLE_IN_2_32
+GSettingsSchemaSource * g_settings_schema_source_new_from_directory     (const gchar            *directory,
+                                                                         GSettingsSchemaSource  *parent,
+                                                                         gboolean                trusted,
+                                                                         GError                **error);
+*/
+
+  //Note this doesn't need refreturn because the C function returns a reference.
+  //- it is documented as transfer:full
+  _WRAP_METHOD(Glib::RefPtr<SettingsSchema> lookup(const Glib::ustring& schema_id, bool recursive), g_settings_schema_source_lookup)
+  _WRAP_METHOD(Glib::RefPtr<const SettingsSchema> lookup(const Glib::ustring& schema_id, bool recursive) const, g_settings_schema_source_lookup)
+
+  //TODO:_WRAP_METHOD(void list_schemas(bool recursive,  gchar*** non_relocatable, gchar*** relocatable), g_settings_schema_source_list_schemas)
+};
+
+} // namespace Gio

@@ -268,6 +268,14 @@ _CONVERSION(`GSettings*',`Glib::RefPtr<Settings>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::StringArrayHandle&',`const gchar*-const*',`($3).data()')
 _CONVERSION(`const Glib::RefPtr<SettingsBackend>&',`GSettingsBackend*',__CONVERT_REFPTR_TO_P)
 
+_CONVERSION(`GSettingsSchemaKey*',`Glib::RefPtr<SettingsSchemaKey>',`Glib::wrap($3)')
+_CONVERSION(`GSettingsSchemaKey*',`Glib::RefPtr<const SettingsSchemaKey>',`Glib::wrap($3)')
+
+_CONVERSION(`GSettingsSchema*',`Glib::RefPtr<SettingsSchema>',`Glib::wrap($3)')
+_CONVERSION(`GSettingsSchema*',`Glib::RefPtr<const SettingsSchema>',`Glib::wrap($3)')
+
+_CONVERSION(`GSettingsSchemaSource*',`Glib::RefPtr<SettingsSchemaSource>',`Glib::wrap($3)')
+
 
 #Socket
 _CONVERSION(`const Glib::RefPtr<Socket>&',`GSocket*',__CONVERT_CONST_REFPTR_TO_P)

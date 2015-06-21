@@ -1,0 +1,82 @@
+/* Copyright (C) 2015 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+_CONFIGINCLUDE(giommconfig.h)
+
+#include <giomm/settingsschemakey.h>
+#include <glibmm/arrayhandle.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GSettingsSchema GSettingsSchema;
+#endif
+
+namespace Gio
+{
+
+//TODO: Translate more of the class documentation from the C docs.
+
+/** Introspecting and controlling the loading of GSettings schemas.
+ *
+ * The SettingsSchemaSource and SettingsSchema APIs provide a
+ * mechanism for advanced control over the loading of schemas and a
+ * mechanism for introspecting their content.
+ *
+ * Plugin loading systems that wish to provide plugins a way to access
+ * settings face the problem of how to make the schemas for these
+ * settings visible to GSettings.  Typically, a plugin will want to ship
+ * the schema along with itself and it won't be installed into the
+ * standard system directories for schemas.
+ *
+ * SettingsSchemaSource provides a mechanism for dealing with this by
+ * allowing the creation of a new 'schema source' from which schemas can
+ * be acquired.  This schema source can then become part of the metadata
+ * associated with the plugin and queried whenever the plugin requires
+ * access to some settings.
+ *
+ * @newin{2,32}
+ */
+class SettingsSchema
+{
+  _CLASS_OPAQUE_REFCOUNTED(SettingsSchema, GSettingsSchema, NONE, g_settings_schema_ref, g_settings_schema_unref)
+
+protected:
+  _IGNORE(g_settings_schema_ref, g_settings_schema_unref)
+
+  //Ignore internal GSettingsSchema functions.
+  _IGNORE(g_settings_schema_get_value, g_settings_schema_list, g_settings_schema_get_string, g_settings_schema_get_gettext_domain)
+
+public:
+  _WRAP_METHOD(Glib::ustring get_id() const, g_settings_schema_get_id)
+  _WRAP_METHOD(Glib::ustring get_path() const, g_settings_schema_get_path)
+
+  //Note that these don't need refreturn because they seem to return a reference
+  //(they are documented as transfer:full)
+  _WRAP_METHOD(Glib::RefPtr<SettingsSchemaKey> get_key(const Glib::ustring& name), g_settings_schema_get_key)
+  _WRAP_METHOD(Glib::RefPtr<const SettingsSchemaKey> get_key(const Glib::ustring& name) const, g_settings_schema_get_key)
+
+  _WRAP_METHOD(bool has_key(const Glib::ustring& name) const, g_settings_schema_has_key)
+
+#m4 _CONVERSION(`gchar**',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::ustring> list_keys() const, g_settings_schema_list_keys)
+
+  _WRAP_METHOD(std::vector<Glib::ustring> list_children() const, g_settings_schema_list_children)
+};
+
+} // namespace Gio

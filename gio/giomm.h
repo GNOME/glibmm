@@ -114,6 +114,8 @@
 #include <giomm/resource.h>
 #include <giomm/seekable.h>
 #include <giomm/settings.h>
+#include <giomm/settingsschema.h>
+#include <giomm/settingsschemakey.h>
 #include <giomm/simpleaction.h>
 #include <giomm/simpleactiongroup.h>
 #include <giomm/simpleiostream.h>
