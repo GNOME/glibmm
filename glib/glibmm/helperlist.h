@@ -22,12 +22,19 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
+
 #include <glibmm/containers.h>
 
 namespace Glib
 {
 
 // This class has some pure virtual methods which need to be implemented by derived classes.
+
+/**
+ * @deprecated This class should no longer be necessary. It has not been used
+ * by glibmm or gtkmm since gtkmm-2.4.
+ */
 template< typename T_Child, typename T_CppElement, typename T_Iterator >
 class HelperList
 {
@@ -161,6 +168,8 @@ protected:
 
 
 } /* namespace Glib */
+
+#endif //GLIBMM_DISABLE_DEPRECATED
 
 #endif /* _GLIBMM_HELPERLIST_H */
 
