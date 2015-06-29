@@ -210,6 +210,10 @@ private:
 } // namespace Container_Helpers
 
 
+//TODO: When we can break ABI, remove this and replace uses of it with std::vector.
+//We cannot deprecate it yet, because we cannot easily deprecate methods that use it
+//- for instance, we cannot just override methods that use it as a return type.
+
 /** This is an intermediate type. When a method takes this, or returns this, you
  * should use a standard C++ container of your choice, such as std::list or
  * std::vector.
