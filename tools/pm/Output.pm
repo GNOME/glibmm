@@ -617,6 +617,9 @@ sub output_wrap_sig_decl($$$$$$$$$$$$$$)
   {
     # Strip leading whitespace
     $doxycomment =~ s/^\s+//;
+    # Add a level of m4 quotes. Necessary if $commentblock contains __FT__ or __BT__.
+    # DocsParser::lookup_documentation() adds it in $documentation.
+    $commentblock = "`" . $commentblock . "'";
 
     # We don't have something to add, so just use $commentblock with
     # opening and closing tokens added.
