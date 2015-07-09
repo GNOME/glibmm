@@ -135,6 +135,20 @@ __CPPNAME__::__CPPNAME__`'(const __CPPNAME__& other)
   gobject_ ((other.gobject_) ? __BOXEDTYPE_FUNC_COPY`'(other.gobject_) : 0)
 {}
 
+__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& other)
+:
+  gobject_(other.gobject_)
+{
+  other.gobject_ = 0;
+}
+
+__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__`'&& other)
+{
+  __CPPNAME__ temp (other);
+  swap(temp);
+  return *this;
+}
+
 ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
 __CPPNAME__::__CPPNAME__`'(__CNAME__* gobject, bool make_a_copy)
 :
@@ -207,6 +221,9 @@ ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
 
   __CPPNAME__`'(const __CPPNAME__& other);
   __CPPNAME__& operator=(const __CPPNAME__& other);
+
+  __CPPNAME__`'(__CPPNAME__&& other);
+  __CPPNAME__& operator=(__CPPNAME__&& other);
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
   ~__CPPNAME__`'();
