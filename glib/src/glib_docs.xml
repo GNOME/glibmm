@@ -5468,6 +5468,54 @@ Pushes the @data into the @queue. @data must not be %NULL.
 <return></return>
 </function>
 
+<function name="g_async_queue_push_front">
+<description>
+Pushes the @data into the @queue. @data must not be %NULL.
+In contrast to g_async_queue_push(), this function
+pushes the new item ahead of the items already in the queue,
+so that it will be the next one to be popped off the queue.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GAsyncQueue
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> @data to push into the @queue
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_async_queue_push_front_unlocked">
+<description>
+Pushes the @data into the @queue. @data must not be %NULL.
+In contrast to g_async_queue_push_unlocked(), this function
+pushes the new item ahead of the items already in the queue,
+so that it will be the next one to be popped off the queue.
+
+This function must be called while holding the @queue's lock.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GAsyncQueue
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> @data to push into the @queue
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_async_queue_push_sorted">
 <description>
 Inserts @data into @queue using @func to determine the new
@@ -5600,6 +5648,52 @@ lock.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_async_queue_remove">
+<description>
+Remove an item from the queue. This function does not block.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GAsyncQueue
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the @data to remove from the @queue
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the item was removed
+
+</return>
+</function>
+
+<function name="g_async_queue_remove_unlocked">
+<description>
+Remove an item from the queue. This function does not block.
+
+This function must be called while holding the @queue's lock.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="queue">
+<parameter_description> a #GAsyncQueue
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> the @data to remove from the @queue
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the item was removed
+
+</return>
 </function>
 
 <function name="g_async_queue_sort">
@@ -47388,6 +47482,29 @@ Returns the number of currently unused threads.
 <parameters>
 </parameters>
 <return> the number of currently unused threads
+</return>
+</function>
+
+<function name="g_thread_pool_move_to_front">
+<description>
+Moves the item to the front of the queue of unprocessed
+items, so that it will be processed next.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="pool">
+<parameter_description> a #GThreadPool
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> an unprocessed item in the pool
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the item was found and moved
+
 </return>
 </function>
 
