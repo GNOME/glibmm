@@ -43,7 +43,7 @@ int main(int, char**)
   std::memset(buffer, 0, sizeof buffer);
   try
   {
-    Glib::RefPtr<Gio::MemoryInputStream> stream = Gio::MemoryInputStream::create();
+    auto stream = Gio::MemoryInputStream::create();
     if (!stream)
     {
       std::cerr << "Could not create a MemoryInputStream." << std::endl;

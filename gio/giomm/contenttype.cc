@@ -50,7 +50,7 @@ Glib::ustring content_type_get_mime_type(const Glib::ustring& type)
 
 Glib::RefPtr<Gio::Icon> content_type_get_icon(const Glib::ustring& type)
 {
- Glib::RefPtr<Icon> retvalue = Glib::wrap(g_content_type_get_icon(type.c_str()));
+ auto retvalue = Glib::wrap(g_content_type_get_icon(type.c_str()));
   if(retvalue)
     retvalue->reference(); //The function does not do a ref for us.
   return retvalue;
@@ -59,7 +59,7 @@ Glib::RefPtr<Gio::Icon> content_type_get_icon(const Glib::ustring& type)
 #ifdef G_OS_UNIX
 Glib::RefPtr<Gio::Icon> content_type_get_symbolic_icon(const Glib::ustring& type)
 {
-  Glib::RefPtr<Icon> retvalue = Glib::wrap(g_content_type_get_symbolic_icon(type.c_str()));
+  auto retvalue = Glib::wrap(g_content_type_get_symbolic_icon(type.c_str()));
   if(retvalue)
     retvalue->reference(); //The function does not do a ref for us.
   return retvalue;

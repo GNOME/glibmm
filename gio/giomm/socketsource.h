@@ -45,7 +45,7 @@ public:
    * is equivalent to:
    * @code
    * bool io_handler(Glib::IOCondition io_condition) { ... }
-   * const Glib::RefPtr<Gio::SocketSource> socket_source = Gio::SocketSource::create(socket, Glib::IO_IN | Glib::IO_OUT);
+   * const auto socket_source = Gio::SocketSource::create(socket, Glib::IO_IN | Glib::IO_OUT);
    * socket_source->connect(sigc::ptr_fun(&io_handler));
    * socket_source->attach(Glib::MainContext::get_default());
    * @endcode

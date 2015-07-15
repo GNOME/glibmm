@@ -50,8 +50,8 @@ bool mark_and_quit(const Glib::Threads::Thread* expected_thread,
 void thread_function(const Glib::Threads::Thread* first_thread,
   const Glib::RefPtr<Glib::MainLoop>& first_mainloop)
 {
-  Glib::RefPtr<Glib::MainContext> second_context = Glib::MainContext::create();
-  Glib::RefPtr<Glib::MainLoop> second_mainloop = Glib::MainLoop::create(second_context);
+  auto second_context = Glib::MainContext::create();
+  auto second_mainloop = Glib::MainLoop::create(second_context);
 
   // Show how Glib::MainContext::invoke() can be used for calling a function,
   // possibly executed in another thread.
@@ -75,7 +75,7 @@ int main(int, char**)
 {
   Glib::init();
 
-  Glib::RefPtr<Glib::MainLoop> first_mainloop = Glib::MainLoop::create();
+  auto first_mainloop = Glib::MainLoop::create();
 
   // This thread shall be the owner of the default main context, when
   // thread_function() calls mark_and_quit() via Glib::MainContext::invoke(),

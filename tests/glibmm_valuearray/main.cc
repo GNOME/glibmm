@@ -69,7 +69,7 @@ int main(int, char**)
       break;
     }
 
-    Glib::Value<int> int_val = static_cast< Glib::Value<int>& >(value);
+    auto int_val = static_cast< Glib::Value<int>& >(value);
     ostr << int_val.get() << " ";
   }
   ostr << std::endl; // End of line for list of array elements.
@@ -92,7 +92,7 @@ int main(int, char**)
       break;
     }
 
-    Glib::Value<int> int_val = static_cast< Glib::Value<int>& >(value);
+    auto int_val = static_cast< Glib::Value<int>& >(value);
     ostr << int_val.get() << " ";
   }
   ostr << std::endl; // End of line for list of array elements.

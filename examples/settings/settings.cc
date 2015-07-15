@@ -75,7 +75,7 @@ int main(int, char**)
   Glib::setenv("GSETTINGS_SCHEMA_DIR", ".", true);
   Glib::setenv("GSETTINGS_BACKEND", "memory", true);
 
-  const Glib::RefPtr<Gio::Settings> settings =
+  const auto settings =
     Gio::Settings::create("org.gtkmm.demo");
 
   settings->signal_changed().connect(sigc::bind(sigc::ptr_fun(&on_key_changed), settings));

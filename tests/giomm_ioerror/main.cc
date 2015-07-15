@@ -34,14 +34,14 @@ int main(int, char**)
 
   try
   {
-    Glib::RefPtr<Gio::File> file = Gio::File::create_for_path(TEST_FILE);
+    auto file = Gio::File::create_for_path(TEST_FILE);
     if(!file)
     {
       std::cerr << "Gio::File::create_for_path() returned an empty RefPtr." << std::endl;
       return EXIT_FAILURE; 
     }
 
-    Glib::RefPtr<Gio::FileInputStream> stream = file->read();
+    auto stream = file->read();
     if(!stream)
     {
       std::cerr << "Gio::File::read() returned an empty RefPtr." << std::endl;

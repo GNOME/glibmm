@@ -29,9 +29,9 @@ int main(int, char**)
   Glib::init();
   Gio::init();
 
-  Glib::RefPtr<Glib::MainLoop> mainloop = Glib::MainLoop::create();
+  auto mainloop = Glib::MainLoop::create();
 
-  Glib::RefPtr<Gio::File> file = Gio::File::create_for_path("/etc/passwd");
+  auto file = Gio::File::create_for_path("/etc/passwd");
   file->read_async(&on_read_async);
 
   mainloop->run();

@@ -68,7 +68,7 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connect
     curr_time.assign_current_time();
 
     const Glib::ustring time_str = curr_time.as_iso8601();
-    const Glib::Variant<Glib::ustring> time_var =
+    const auto time_var =
       Glib::Variant<Glib::ustring>::create(time_str);
 
     // Create the tuple.
@@ -114,7 +114,7 @@ const Gio::DBus::InterfaceVTable interface_vtable(sigc::ptr_fun(&on_method_call)
 
 bool on_server_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
 {
-  Glib::RefPtr<Gio::Credentials> credentials =
+  auto credentials =
     connection->get_peer_credentials();
 
   std::string credentials_str;
@@ -200,7 +200,7 @@ int main(int, char**)
   server->signal_new_connection().connect(sigc::ptr_fun(&on_server_new_connection));
 
   //Keep the server running until the process is killed:
-  Glib::RefPtr<Glib::MainLoop> loop = Glib::MainLoop::create();
+  auto loop = Glib::MainLoop::create();
   loop->run();
 
   return EXIT_SUCCESS;

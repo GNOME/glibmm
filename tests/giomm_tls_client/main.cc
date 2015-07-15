@@ -29,7 +29,7 @@ bool on_accept_certificate(const Glib::RefPtr<const Gio::TlsCertificate>& cert, 
   std::cout << "Outputing certificate data:" << std::endl <<
     cert->property_certificate_pem().get_value();
 
-  Glib::RefPtr<const Gio::TlsCertificate> issuer = cert->get_issuer();
+  auto issuer = cert->get_issuer();
 
   std::cout << "Outputing the issuer's certificate data:" << std::endl <<
     issuer->property_certificate_pem().get_value();
@@ -74,16 +74,16 @@ int main(int, char**)
   std::cout << "Successfully resolved address of test host '" << test_host <<
     "'." << std::endl;
 
-  Glib::RefPtr<Gio::InetAddress> first_inet_address = inet_addresses[0];
+  auto first_inet_address = inet_addresses[0];
 
   std::cout << "First address of test host is " <<
     first_inet_address->to_string() << "." << std::endl;
 
-  Glib::RefPtr<Gio::Socket> socket =
+  auto socket =
     Gio::Socket::create(first_inet_address->get_family(),
     Gio::SOCKET_TYPE_STREAM, Gio::SOCKET_PROTOCOL_TCP);
 
-  Glib::RefPtr<Gio::InetSocketAddress> address =
+  auto address =
     Gio::InetSocketAddress::create(first_inet_address, 443);
 
   try
@@ -105,7 +105,7 @@ int main(int, char**)
       "." << std::endl;
   }
 
-  Glib::RefPtr<Gio::TcpConnection> conn = Glib::RefPtr<Gio::TcpConnection>::cast_dynamic(Gio::SocketConnection::create(socket));
+  auto conn = Glib::RefPtr<Gio::TcpConnection>::cast_dynamic(Gio::SocketConnection::create(socket));
 
   if(!conn || !conn->is_connected())
   {
@@ -122,7 +122,7 @@ int main(int, char**)
 
   try
   {
-    Glib::RefPtr<Gio::TlsClientConnection> tls_connection =
+    auto tls_connection =
       Gio::TlsClientConnection::create(conn, address);
 
     tls_connection->signal_accept_certificate().connect(
@@ -133,7 +133,7 @@ int main(int, char**)
     std::cout << "Attempting to get the issuer's certificate from the "
       "connection." << std::endl;
 
-    Glib::RefPtr<Gio::TlsCertificate> issuer_certificate =
+    auto issuer_certificate =
       tls_connection->get_peer_certificate()->get_issuer();
 
     if(!issuer_certificate)
@@ -146,12 +146,12 @@ int main(int, char**)
       std::endl;
 
     std::cout << "Attempting to use the connection's database." << std::endl;
-    Glib::RefPtr<Gio::TlsDatabase> database = tls_connection->get_database();
+    auto database = tls_connection->get_database();
 
     std::cout << "Looking up the certificate's issuer in the database." <<
       std::endl;
 
-    Glib::RefPtr<Gio::TlsCertificate> db_certificate =
+    auto db_certificate =
       database->lookup_certificate_issuer(issuer_certificate);
 
     if(!db_certificate)

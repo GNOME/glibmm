@@ -74,7 +74,7 @@ my_p_key_compare(const type_p_key_value& key_a, const type_p_key_value& key_b)
 int
 main()
 {
-  Glib::RefPtr< Glib::BalancedTree<type_key_value, type_key_value> > tree = Glib::BalancedTree<type_key_value, type_key_value>::create();
+  auto tree = Glib::BalancedTree<type_key_value, type_key_value>::create();
 
   for (type_key_value::size_type i = 0; i < str.size(); ++i)
     tree->insert(str.substr(i, 1), str.substr(i, 1));
@@ -137,7 +137,7 @@ main()
   value = tree->search(sigc::ptr_fun(my_search), "|");
   g_assert(value == NULL);
 
-  Glib::RefPtr< Glib::BalancedTree<type_p_key_value, type_p_key_value> > ptree = Glib::BalancedTree<type_p_key_value, type_p_key_value>::create(sigc::ptr_fun(my_p_key_compare));
+  auto ptree = Glib::BalancedTree<type_p_key_value, type_p_key_value>::create(sigc::ptr_fun(my_p_key_compare));
 
   for (type_key_value::size_type i = 0; i < str.size(); ++i)
     pstr.push_back(new type_key_value(str.substr(i, 1)));

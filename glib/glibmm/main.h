@@ -107,7 +107,7 @@ public:
    * is equivalent to:
    * @code
    * bool timeout_handler() { ... }
-   * const Glib::RefPtr<Glib::TimeoutSource> timeout_source = Glib::TimeoutSource::create(1000);
+   * const auto timeout_source = Glib::TimeoutSource::create(1000);
    * timeout_source->connect(sigc::ptr_fun(&timeout_handler));
    * timeout_source->attach(Glib::MainContext::get_default());
    * @endcode
@@ -165,7 +165,7 @@ public:
    * is equivalent to:
    * @code
    * bool timeout_handler() { ... }
-   * const Glib::RefPtr<Glib::TimeoutSource> timeout_source = Glib::TimeoutSource::create(5000);
+   * const auto timeout_source = Glib::TimeoutSource::create(5000);
    * timeout_source->connect(sigc::ptr_fun(&timeout_handler));
    * timeout_source->attach(Glib::MainContext::get_default());
    * @endcode
@@ -232,7 +232,7 @@ public:
    * is equivalent to:
    * @code
    * bool idle_handler() { ... }
-   * const Glib::RefPtr<Glib::IdleSource> idle_source = Glib::IdleSource::create();
+   * const auto idle_source = Glib::IdleSource::create();
    * idle_source->connect(sigc::ptr_fun(&idle_handler));
    * idle_source->attach(Glib::MainContext::get_default());
    * @endcode
@@ -291,7 +291,7 @@ public:
    * is equivalent to:
    * @code
    * bool io_handler(Glib::IOCondition io_condition) { ... }
-   * const Glib::RefPtr<Glib::IOSource> io_source = Glib::IOSource::create(fd, Glib::IO_IN | Glib::IO_HUP);
+   * const auto io_source = Glib::IOSource::create(fd, Glib::IO_IN | Glib::IO_HUP);
    * io_source->connect(sigc::ptr_fun(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode
@@ -319,7 +319,7 @@ public:
    * is equivalent to:
    * @code
    * bool io_handler(Glib::IOCondition io_condition) { ... }
-   * const Glib::RefPtr<Glib::IOSource> io_source = Glib::IOSource::create(channel, Glib::IO_IN | Glib::IO_HUP);
+   * const auto io_source = Glib::IOSource::create(channel, Glib::IO_IN | Glib::IO_HUP);
    * io_source->connect(sigc::ptr_fun(&io_handler));
    * io_source->attach(Glib::MainContext::get_default());
    * @endcode

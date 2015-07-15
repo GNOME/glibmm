@@ -170,7 +170,7 @@ lookup_one_sync (const Glib::ustring& arg)
     }
     else if (Gio::hostname_is_ip_address (arg))
     {
-        Glib::RefPtr<Gio::InetAddress> addr = Gio::InetAddress::create (arg);
+        auto addr = Gio::InetAddress::create (arg);
         try
         {
             Glib::ustring name = resolver->lookup_by_address (addr, cancellable);
@@ -266,7 +266,7 @@ start_async_lookups (char **argv, int argc)
         if (arg.find ('/') != std::string::npos)
         {
             /* service/protocol/domain */
-            std::vector<Glib::ustring> parts = split_service_parts (arg);
+            auto parts = split_service_parts (arg);
             if (parts.size () != 3) {
                 usage ();
                 return;
@@ -281,7 +281,7 @@ start_async_lookups (char **argv, int argc)
         }
         else if (Gio::hostname_is_ip_address (argv[i]))
         {
-            Glib::RefPtr<Gio::InetAddress> addr = Gio::InetAddress::create (argv[i]);
+            auto addr = Gio::InetAddress::create (argv[i]);
 
             resolver->lookup_by_address_async (addr,
                                                sigc::bind (sigc::ptr_fun
@@ -307,7 +307,7 @@ static void
 print_connectable_sockaddr (Glib::RefPtr<Gio::SocketAddress> sockaddr)
 {
     Glib::ustring phys;
-    Glib::RefPtr<Gio::InetSocketAddress> isa =
+    auto isa =
         Glib::RefPtr<Gio::InetSocketAddress>::cast_dynamic (sockaddr);
 
     if (!isa)

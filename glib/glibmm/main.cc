@@ -497,7 +497,7 @@ SignalIO::SignalIO(GMainContext* context)
 sigc::connection SignalIO::connect(const sigc::slot<bool,IOCondition>& slot,
                                    int fd, IOCondition condition, int priority)
 {
-  const Glib::RefPtr<IOSource> source = IOSource::create(fd, condition);
+  const auto source = IOSource::create(fd, condition);
 
   if(priority != G_PRIORITY_DEFAULT)
     source->set_priority(priority);
@@ -513,7 +513,7 @@ sigc::connection SignalIO::connect(const sigc::slot<bool,IOCondition>& slot,
                                    const Glib::RefPtr<IOChannel>& channel,
                                    IOCondition condition, int priority)
 {
-  const Glib::RefPtr<IOSource> source = IOSource::create(channel, condition);
+  const auto source = IOSource::create(channel, condition);
 
   if(priority != G_PRIORITY_DEFAULT)
     source->set_priority(priority);
