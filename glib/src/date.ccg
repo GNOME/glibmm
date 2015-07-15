@@ -305,7 +305,7 @@ Glib::ustring Date::format_string(const Glib::ustring& format) const
   struct tm tm_data;
   g_date_to_struct_tm(&gobject_, &tm_data);
 
-  const std::string locale_format = locale_from_utf8(format);
+  const auto locale_format = locale_from_utf8(format);
 
   gsize bufsize = std::max<gsize>(2 * locale_format.size(), 128);
 
@@ -316,7 +316,7 @@ Glib::ustring Date::format_string(const Glib::ustring& format) const
     // Set the first byte to something other than '\0', to be able to
     // recognize whether strftime actually failed or just returned "".
     buf.get()[0] = '\1';
-    const gsize len = strftime(buf.get(), bufsize, locale_format.c_str(), &tm_data);
+    const auto len = strftime(buf.get(), bufsize, locale_format.c_str(), &tm_data);
 
     if(len != 0 || buf.get()[0] == '\0')
     {

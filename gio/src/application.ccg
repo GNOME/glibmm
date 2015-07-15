@@ -68,7 +68,7 @@ static void Application_signal_open_callback(GApplication* self, GFile** files,
     vec_files[i] = Glib::wrap(files[i], true);
   }
 
-  const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
+  const auto hint_str = (hint ? hint : Glib::ustring());
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
@@ -101,7 +101,7 @@ static void Application_signal_open_notify_callback(GApplication* self, GFile** 
     vec_files[i] = Glib::wrap(files[i], true);
   }
 
-  const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
+  const auto hint_str = (hint ? hint : Glib::ustring());
 
   // Do not try to call a signal on a disassociated wrapper.
   if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
@@ -202,13 +202,13 @@ gboolean Application_option_arg_callback(const gchar* option_name, const gchar* 
   if (option_name[1] == '-')
   {
     // Long option name.
-    const Glib::ustring long_option_name = Glib::ustring(option_name+2);
+    const auto long_option_name = Glib::ustring(option_name+2);
     iterFind = option_arg_callback_data.find(long_option_name);
   }
   else
   {
     // Short option name.
-    const gchar short_option_name = option_name[1];
+    const auto short_option_name = option_name[1];
     for (iterFind = option_arg_callback_data.begin();
          iterFind != option_arg_callback_data.end(); ++iterFind)
     {
@@ -230,14 +230,14 @@ gboolean Application_option_arg_callback(const gchar* option_name, const gchar* 
   {
     if (option_arg->is_filename_option())
     {
-      const Glib::OptionGroup::SlotOptionArgFilename* the_slot = option_arg->get_slot_filename();
+      const auto the_slot = option_arg->get_slot_filename();
       lock.release();
       const std::string cpp_value(value ? value : "");
       return (*the_slot)(cpp_option_name, cpp_value, has_value);
     }
     else
     {
-      const Glib::OptionGroup::SlotOptionArgString* the_slot = option_arg->get_slot_string();
+      const auto the_slot = option_arg->get_slot_string();
       lock.release();
       const Glib::ustring cpp_value(value ? value : "");
       return (*the_slot)(cpp_option_name, cpp_value, has_value);
@@ -303,7 +303,7 @@ void Application::unset_default()
 void Application_Class::open_callback(GApplication* self, GFile** files,
   gint n_files, const gchar *hint)
 {
-  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper((GObject*)self));
 
   // Non-gtkmmproc-generated custom classes implicitly call the default
@@ -314,7 +314,7 @@ void Application_Class::open_callback(GApplication* self, GFile** files,
 
   if(obj_base && obj_base->is_derived_())
   {
-    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
@@ -325,7 +325,7 @@ void Application_Class::open_callback(GApplication* self, GFile** files,
           vec_files[i] = Glib::wrap(files[i], true);
         }
 
-        const Glib::ustring hint_str = (hint ? hint : Glib::ustring());
+        const auto hint_str = (hint ? hint : Glib::ustring());
 
         obj->on_open(vec_files, hint_str);
         return;
@@ -337,7 +337,7 @@ void Application_Class::open_callback(GApplication* self, GFile** files,
     }
   }
 
-  BaseClassType *const base = static_cast<BaseClassType*>(
+  const auto base = static_cast<BaseClassType*>(
     g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
     );
 
@@ -353,7 +353,7 @@ Glib::SignalProxy2< void, const Application::type_vec_files&, const Glib::ustrin
 
 void Gio::Application::on_open(const Application::type_vec_files& files, const Glib::ustring& hint)
 {
-  BaseClassType *const base = static_cast<BaseClassType*>(
+  const auto base = static_cast<BaseClassType*>(
       g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
   );
 
@@ -397,7 +397,7 @@ void Application::add_main_option_entry(
   if (iterFind != option_arg_callback_data.end())
     return; // Ignore duplicates
 
-  OptionArgCallbackData* callback_data = new OptionArgCallbackData(this, short_name, slot);
+  auto callback_data = new OptionArgCallbackData(this, short_name, slot);
   option_arg_callback_data[long_name] = callback_data;
   lock.release();
 
@@ -415,7 +415,7 @@ void Application::add_main_option_entry_filename(
   if (iterFind != option_arg_callback_data.end())
     return; // Ignore duplicates
 
-  OptionArgCallbackData* callback_data = new OptionArgCallbackData(this, short_name, slot);
+  auto callback_data = new OptionArgCallbackData(this, short_name, slot);
   option_arg_callback_data[long_name] = callback_data;
   lock.release();
 

@@ -27,7 +27,7 @@ namespace Gio
 Glib::RefPtr<FileInfo> FileInputStream::query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_input_stream_query_info(gobj(), g_strdup((attributes).c_str()), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_input_stream_query_info(gobj(), g_strdup((attributes).c_str()), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -37,7 +37,7 @@ Glib::RefPtr<FileInfo> FileInputStream::query_info(const Glib::RefPtr<Cancellabl
 Glib::RefPtr<FileInfo> FileInputStream::query_info(const std::string& attributes)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_input_stream_query_info(gobj(), g_strdup((attributes).c_str()), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_input_stream_query_info(gobj(), g_strdup((attributes).c_str()), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -50,7 +50,7 @@ FileInputStream::query_info_async(const SlotAsyncReady& slot, const Glib::RefPtr
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
-  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
 
   g_file_input_stream_query_info_async(gobj(),
                                        const_cast<char*>(attributes.c_str()),
@@ -66,7 +66,7 @@ FileInputStream::query_info_async(const SlotAsyncReady& slot, const std::string&
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
-  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
 
   g_file_input_stream_query_info_async(gobj(),
                                        const_cast<char*>(attributes.c_str()),

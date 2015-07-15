@@ -75,7 +75,7 @@ static gboolean g_callback_pre_parse(GOptionContext* context,
 {
   OptionContext cppContext(context, false /* take_ownership */);
 
-  OptionGroup* option_group = static_cast<OptionGroup*>(data);
+  auto option_group = static_cast<OptionGroup*>(data);
   if(!option_group)
   {
     OptionError(OptionError::FAILED, "Glib::OptionGroup: g_callback_pre_parse(): "
@@ -108,7 +108,7 @@ static void g_callback_error(GOptionContext* context,
 
   OptionContext cppContext(context, false /* take_ownership */);
 
-  OptionGroup* option_group = static_cast<OptionGroup*>(data);
+  auto option_group = static_cast<OptionGroup*>(data);
   if(option_group)
     return option_group->on_error(cppContext, *option_group);
 }
@@ -160,7 +160,7 @@ gboolean OptionGroup::post_parse_callback(GOptionContext* context,
   for(type_map_entries::iterator iter = option_group->map_entries_.begin();
       iter != option_group->map_entries_.end(); ++iter)
   {
-    CppOptionEntry& cpp_entry = iter->second;
+    auto& cpp_entry = iter->second;
     cpp_entry.convert_c_to_cpp();
   }
 
@@ -198,17 +198,17 @@ gboolean OptionGroup::option_arg_callback(const gchar* option_name, const gchar*
   if(option_name[1] == '-')
   {
     //Long option name.
-    const Glib::ustring long_option_name = Glib::ustring(option_name+2);
+    const auto long_option_name = Glib::ustring(option_name+2);
     iterFind = option_group->map_entries_.find(long_option_name);
   }
   else
   {
     //Short option name.
-    const gchar short_option_name = option_name[1];
+    const auto short_option_name = option_name[1];
     for(iterFind = option_group->map_entries_.begin();
         iterFind != option_group->map_entries_.end(); ++iterFind)
     {
-      const OptionGroup::CppOptionEntry& cppOptionEntry = iterFind->second;
+      const auto& cppOptionEntry = iterFind->second;
       if (cppOptionEntry.entry_ &&
           cppOptionEntry.entry_->get_short_name() == short_option_name)
         break;
@@ -222,7 +222,7 @@ gboolean OptionGroup::option_arg_callback(const gchar* option_name, const gchar*
     return false;
   }
 
-  const OptionGroup::CppOptionEntry& cppOptionEntry = iterFind->second;
+  const auto& cppOptionEntry = iterFind->second;
   if (cppOptionEntry.carg_type_ != G_OPTION_ARG_CALLBACK)
   {
     OptionError(OptionError::FAILED, "Glib::OptionGroup::option_arg_callback() "
@@ -237,13 +237,13 @@ gboolean OptionGroup::option_arg_callback(const gchar* option_name, const gchar*
   {
     if (option_arg->is_filename_option())
     {
-      const OptionGroup::SlotOptionArgFilename* the_slot = option_arg->get_slot_filename();
+      const auto the_slot = option_arg->get_slot_filename();
       const std::string cpp_value(value ? value : "");
       return (*the_slot)(cpp_option_name, cpp_value, has_value);
     }
     else
     {
-      const OptionGroup::SlotOptionArgString* the_slot = option_arg->get_slot_string();
+      const auto the_slot = option_arg->get_slot_string();
       const Glib::ustring cpp_value(value ? value : "");
       return (*the_slot)(cpp_option_name, cpp_value, has_value);
     }
@@ -288,7 +288,7 @@ OptionGroup::~OptionGroup()
   //Free any C types that were allocated during add_entry():
   for(type_map_entries::iterator iter = map_entries_.begin(); iter != map_entries_.end(); ++iter)
   {
-    CppOptionEntry& cpp_entry = iter->second;
+    auto& cpp_entry = iter->second;
     cpp_entry.release_c_arg();
   }
 
@@ -375,7 +375,7 @@ void OptionGroup::add_entry_filename(const OptionEntry& entry, const SlotOptionA
 
 void OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg arg_type, void* cpp_arg)
 {
-  const Glib::ustring name = entry.get_long_name();
+  const auto name = entry.get_long_name();
   type_map_entries::iterator iterFind = map_entries_.find(name);
   if (iterFind == map_entries_.end()) //If we have not added this entry already
   {
@@ -395,7 +395,7 @@ void OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg ar
       for (type_map_entries::iterator iter = map_entries_.begin();
            iter != map_entries_.end(); ++iter)
       {
-        const CppOptionEntry& cpp_entry = iter->second;
+        const auto& cpp_entry = iter->second;
         if (cpp_entry.cpparg_ == cpp_arg &&
             cpp_entry.carg_type_ == arg_type &&
             cpp_entry.carg_)
@@ -429,7 +429,7 @@ void OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg ar
   {
     //Delete the OptionArgCallback instance that was allocated by add_entry()
     //or add_entry_filename().
-    OptionArgCallback* option_arg = static_cast<OptionArgCallback*>(cpp_arg);
+    auto option_arg = static_cast<OptionArgCallback*>(cpp_arg);
     delete option_arg;
   }
 }
@@ -454,7 +454,7 @@ void OptionGroup::set_translate_func(const SlotTranslate& slot)
   // Create a copy of the slot. A pointer to this will be passed through the
   // callback's data parameter.  It will be deleted when
   // OptionGroup_Translate_glibmm_callback_destroy() is called.
-  SlotTranslate* slot_copy = new SlotTranslate(slot);
+  auto slot_copy = new SlotTranslate(slot);
   g_option_group_set_translate_func(gobj(),
     &OptionGroup_Translate_glibmm_callback, slot_copy,
     &OptionGroup_Translate_glibmm_callback_destroy);
@@ -658,7 +658,7 @@ void OptionGroup::CppOptionEntry::release_c_arg()
       {
         //Delete the OptionArgCallback instance that was allocated by add_entry()
         //or add_entry_filename().
-        OptionArgCallback* option_arg = static_cast<OptionArgCallback*>(cpparg_);
+        auto option_arg = static_cast<OptionArgCallback*>(cpparg_);
         delete option_arg;
         cpparg_ = 0;
 
@@ -687,7 +687,7 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
     case G_OPTION_ARG_STRING:
     {
       char** typed_arg = static_cast<char**>(carg_);
-      Glib::ustring* typed_cpp_arg = static_cast<Glib::ustring*>(cpparg_);
+      auto typed_cpp_arg = static_cast<Glib::ustring*>(cpparg_);
       if(typed_arg && *typed_arg && typed_cpp_arg)
       {
         *typed_cpp_arg = *typed_arg;
@@ -697,7 +697,7 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
     case G_OPTION_ARG_FILENAME:
     {
       char** typed_arg = static_cast<char**>(carg_);
-      std::string* typed_cpp_arg = static_cast<std::string*>(cpparg_);
+      auto typed_cpp_arg = static_cast<std::string*>(cpparg_);
       if(typed_arg && *typed_arg && typed_cpp_arg)
       {
         *typed_cpp_arg = *typed_arg;
@@ -717,7 +717,7 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
     case G_OPTION_ARG_STRING_ARRAY:
     {
       char*** typed_arg = static_cast<char***>(carg_);
-      vecustrings* typed_cpp_arg = static_cast<vecustrings*>(cpparg_);
+      auto typed_cpp_arg = static_cast<vecustrings*>(cpparg_);
       if(typed_arg && *typed_arg && typed_cpp_arg)
       {
         typed_cpp_arg->clear();
@@ -757,7 +757,7 @@ void OptionGroup::CppOptionEntry::convert_c_to_cpp()
     case G_OPTION_ARG_FILENAME_ARRAY:
     {
       char*** typed_arg = static_cast<char***>(carg_);
-      vecstrings* typed_cpp_arg = static_cast<vecstrings*>(cpparg_);
+      auto typed_cpp_arg = static_cast<vecstrings*>(cpparg_);
       if(typed_arg && *typed_arg && typed_cpp_arg)
       {
         typed_cpp_arg->clear();

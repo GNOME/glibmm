@@ -25,7 +25,7 @@ namespace Gio
 Glib::ArrayHandle<int> UnixFDMessage::steal_fds()
 {
   int length = 0;
-  const int* fds = g_unix_fd_message_steal_fds(gobj(), &length);
+  const auto fds = g_unix_fd_message_steal_fds(gobj(), &length);
   // The array is terminated with a -1, but that terminating element is
   // not included in the length that g_unix_fd_message_steal_fds() returns.
   return Glib::ArrayHandle<int>(fds, length, Glib::OWNERSHIP_DEEP);

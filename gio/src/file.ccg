@@ -36,7 +36,7 @@ SignalProxy_file_progress_callback(goffset current_num_bytes,
                                    goffset total_num_bytes,
                                    gpointer data)
 {
-  Gio::File::SlotFileProgress* the_slot = static_cast<Gio::File::SlotFileProgress*>(data);
+  auto the_slot = static_cast<Gio::File::SlotFileProgress*>(data);
 
   try
   {
@@ -56,14 +56,14 @@ SignalProxy_file_progress_callback(goffset current_num_bytes,
 static void
 SignalProxy_file_copy_async_callback(GObject*, GAsyncResult* res, void* data)
 {
-  CopySlots* slot_pair = static_cast<CopySlots*>(data);
-  Gio::SlotAsyncReady* the_slot = slot_pair->second;
+  auto slot_pair = static_cast<CopySlots*>(data);
+  auto the_slot = slot_pair->second;
 
   try
   {
     if(*the_slot)
     {
-      Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
+      auto result = Glib::wrap(res, true /* take copy */);
       (*the_slot)(result);
     }
   }
@@ -84,14 +84,14 @@ SignalProxy_file_copy_async_callback(GObject*, GAsyncResult* res, void* data)
 static void
 SignalProxy_file_measure_async_callback(GObject*, GAsyncResult* res, void* data)
 {
-  MeasureSlots* slot_pair = static_cast<MeasureSlots*>(data);
-  Gio::SlotAsyncReady* the_slot = slot_pair->second;
+  auto slot_pair = static_cast<MeasureSlots*>(data);
+  auto the_slot = slot_pair->second;
 
   try
   {
     if(*the_slot)
     {
-      Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
+      auto result = Glib::wrap(res, true /* take copy */);
       (*the_slot)(result);
     }
   }
@@ -108,8 +108,8 @@ SignalProxy_file_measure_async_callback(GObject*, GAsyncResult* res, void* data)
 static gboolean
 SignalProxy_load_partial_contents_read_more_callback(const char* file_contents, goffset file_size, gpointer data)
 {
-  LoadPartialSlots* slot_pair = static_cast<LoadPartialSlots*>(data);
-  Gio::File::SlotReadMore* the_slot = slot_pair->first;
+  auto slot_pair = static_cast<LoadPartialSlots*>(data);
+  auto the_slot = slot_pair->first;
 
   bool result = false;
 

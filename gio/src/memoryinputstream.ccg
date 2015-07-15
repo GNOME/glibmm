@@ -41,7 +41,7 @@ private:
 
 void destroy_data_callback(void* user_data)
 {
-  SlotWithData* slot_with_data = static_cast<SlotWithData*>(user_data);
+  auto slot_with_data = static_cast<SlotWithData*>(user_data);
   g_return_if_fail(slot_with_data != 0);
 
   try
@@ -84,8 +84,8 @@ _DEPRECATE_IFDEF_END
 
 void MemoryInputStream::add_data(const void* data, gssize len, const SlotDestroyData& destroy_slot)
 {
-  SlotWithData* slot_with_data = new SlotWithData(destroy_slot, const_cast<void*>(data));
-  GBytes* bytes = g_bytes_new_with_free_func(data, len, &destroy_data_callback, slot_with_data);
+  auto slot_with_data = new SlotWithData(destroy_slot, const_cast<void*>(data));
+  auto bytes = g_bytes_new_with_free_func(data, len, &destroy_data_callback, slot_with_data);
   g_memory_input_stream_add_bytes(gobj(), bytes);
   g_bytes_unref(bytes); // g_memory_input_stream_add_bytes() takes a reference
 }

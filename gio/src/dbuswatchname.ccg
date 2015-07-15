@@ -36,8 +36,8 @@ extern "C"
 static void Bus_Name_Appeared_giomm_callback(GDBusConnection* connection,
   const gchar* name, const char* name_owner, gpointer data)
 {
-  WatchSlots* slots = static_cast<WatchSlots*>(data);
-  Gio::DBus::SlotNameAppeared* the_slot = slots->name_appeared_slot;
+  auto slots = static_cast<WatchSlots*>(data);
+  auto the_slot = slots->name_appeared_slot;
 
   try
   {
@@ -53,8 +53,8 @@ static void Bus_Name_Appeared_giomm_callback(GDBusConnection* connection,
 static void Bus_Name_Vanished_giomm_callback(GDBusConnection* connection,
   const gchar* name, gpointer data)
 {
-  WatchSlots* slots = static_cast<WatchSlots*>(data);
-  Gio::DBus::SlotNameVanished* the_slot = slots->name_vanished_slot;
+  auto slots = static_cast<WatchSlots*>(data);
+  auto the_slot = slots->name_vanished_slot;
 
   try
   {
@@ -68,7 +68,7 @@ static void Bus_Name_Vanished_giomm_callback(GDBusConnection* connection,
 
 static void Bus_Watch_Name_giomm_callback_destroy(void* data)
 {
-  WatchSlots* slots =  static_cast<WatchSlots*>(data);
+  auto slots =  static_cast<WatchSlots*>(data);
 
   if(slots->name_appeared_slot)
     delete slots->name_appeared_slot;
@@ -98,7 +98,7 @@ guint watch_name(
   BusNameWatcherFlags flags
 )
 {
-  struct WatchSlots* slots = new WatchSlots;
+  auto slots = new WatchSlots;
 
   // Make copies of the slots which will be deleted on destroy notification.
   slots->name_appeared_slot = new SlotNameAppeared(name_appeared_slot);
@@ -118,7 +118,7 @@ guint watch_name(
   BusNameWatcherFlags flags
 )
 {
-  struct WatchSlots* slots = new WatchSlots;
+  auto slots = new WatchSlots;
 
   // Make copies of the slots which will be deleted on destroy notification.
   slots->name_appeared_slot = new SlotNameAppeared(name_appeared_slot);

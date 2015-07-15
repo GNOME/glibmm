@@ -25,21 +25,21 @@ namespace Gio
 
 Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name)
 {
-  Glib::RefPtr<SimpleAction> action = SimpleAction::create(name);
+  auto action = SimpleAction::create(name);
   add_action(action);
   return action;
 }
 
 Glib::RefPtr<SimpleAction> ActionMap::add_action_with_parameter(const Glib::ustring& name, const ActivateWithParameterSlot& slot)
 {
-  Glib::RefPtr<SimpleAction> action = add_action(name);
+  auto action = add_action(name);
   action->signal_activate().connect(slot);
   return action;
 }
 
 Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name, const ActivateSlot& slot)
 {
-  Glib::RefPtr<SimpleAction> action = add_action(name);
+  auto action = add_action(name);
   action->signal_activate().connect(
     sigc::hide(slot));
   return action;
@@ -48,7 +48,7 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name, cons
 
 Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name, bool state)
 {
-  Glib::RefPtr<SimpleAction> action = SimpleAction::create_bool(name, state);
+  auto action = SimpleAction::create_bool(name, state);
   add_action(action);
   return action;
 }
@@ -56,7 +56,7 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name,
 //TODO: Use a slot that takes a bool?
 Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name, const ActivateSlot& slot, bool state)
 {
-  Glib::RefPtr<SimpleAction> action = add_action_bool(name, state);
+  auto action = add_action_bool(name, state);
   action->signal_activate().connect(
     sigc::hide(slot));
   return action;
@@ -65,7 +65,7 @@ Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name,
 //TODO: Use a slot that takes a string?
 Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const Glib::ustring& state)
 {
-  Glib::RefPtr<SimpleAction> action = SimpleAction::create_radio_string(name, state);
+  auto action = SimpleAction::create_radio_string(name, state);
   add_action(action);
   return action;
 }
@@ -79,7 +79,7 @@ static void on_action_radio_string(const Glib::VariantBase& parameter, const Gio
   //TODO: This syntax is odd:
   const Glib::Variant<Glib::ustring> variantDerived =
     parameter.cast_dynamic< Glib::Variant<Glib::ustring> >(parameter);
-  const Glib::ustring str = variantDerived.get();
+  const auto str = variantDerived.get();
   slot(str);
 }
 
@@ -87,7 +87,7 @@ static void on_action_radio_string(const Glib::VariantBase& parameter, const Gio
 
 Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const ActivateWithStringParameterSlot& slot, const Glib::ustring& state)
 {
-  Glib::RefPtr<SimpleAction> action = add_action_radio_string(name, state);
+  auto action = add_action_radio_string(name, state);
   action->signal_activate().connect(
     sigc::bind(sigc::ptr_fun(&on_action_radio_string), slot));
   return action;
@@ -101,7 +101,7 @@ static void on_action_radio_int(const Glib::VariantBase& parameter, const Gio::A
   //TODO: This syntax is odd:
   const Glib::Variant<int> variantDerived =
     parameter.cast_dynamic< Glib::Variant<int> >(parameter);
-  const int str = variantDerived.get();
+  const auto str = variantDerived.get();
   slot(str);
 }
 
@@ -110,14 +110,14 @@ static void on_action_radio_int(const Glib::VariantBase& parameter, const Gio::A
 //TODO: Use a slot that takes an integer?
 Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, gint32 state)
 {
-  Glib::RefPtr<SimpleAction> action = SimpleAction::create_radio_integer(name, state);
+  auto action = SimpleAction::create_radio_integer(name, state);
   add_action(action);
   return action;
 }
 
 Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, const ActivateWithIntParameterSlot& slot, gint32 state)
 {
-  Glib::RefPtr<SimpleAction> action = add_action_radio_integer(name, state);
+  auto action = add_action_radio_integer(name, state);
   action->signal_activate().connect(
     sigc::bind(sigc::ptr_fun(&on_action_radio_int), slot));
   return action;

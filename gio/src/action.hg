@@ -243,8 +243,8 @@ void Action::get_state(T_Value& value) const
   g_return_if_fail(
     g_variant_type_equal(g_action_get_state_type(const_cast<GAction*>(gobj())), type_glib_variant::variant_type().gobj()));
 
-  const Glib::VariantBase variantBase = get_state_variant();
-  const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
+  const auto variantBase = get_state_variant();
+  const auto variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
   value = variantDerived.get();
 }
 
@@ -255,13 +255,13 @@ void Action::get_state_hint(T_Value& value) const
 
   typedef Glib::Variant<T_Value> type_glib_variant;
 
-  const Glib::VariantBase variantBase = get_state_hint_variant();
+  const auto variantBase = get_state_hint_variant();
 
   // We can't check the type (a range) that will be returned before getting the range hint.
   g_return_if_fail(
     variantBase.is_of_type(type_glib_variant::variant_type()) );
 
-  const type_glib_variant variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
+  const auto variantDerived = variantBase.cast_dynamic<type_glib_variant>(variantBase);
   value = variantDerived.get();
 }
 

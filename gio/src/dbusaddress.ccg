@@ -47,14 +47,14 @@ bool is_supported(const std::string& address)
 void get_stream(const std::string& address, const SlotAsyncReady slot,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
-  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
   g_dbus_address_get_stream(address.c_str(), Glib::unwrap(cancellable),
     &SignalProxy_async_callback, slot_copy);
 }
 
 void get_stream(const std::string& address, const SlotAsyncReady slot)
 {
-  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
   g_dbus_address_get_stream(address.c_str(), 0, &SignalProxy_async_callback,
     slot_copy);
 }

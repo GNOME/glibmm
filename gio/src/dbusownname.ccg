@@ -37,8 +37,8 @@ extern "C"
 static void Bus_Acquired_giomm_callback(GDBusConnection* connection,
   const gchar* name, gpointer data)
 {
-  OwnSlots* slots = static_cast<OwnSlots*>(data);
-  Gio::DBus::SlotBusAcquired* the_slot = slots->bus_acquired_slot;
+  auto slots = static_cast<OwnSlots*>(data);
+  auto the_slot = slots->bus_acquired_slot;
 
   try
   {
@@ -53,8 +53,8 @@ static void Bus_Acquired_giomm_callback(GDBusConnection* connection,
 static void Bus_Name_Acquired_giomm_callback(GDBusConnection* connection,
   const gchar* name, gpointer data)
 {
-  OwnSlots* slots = static_cast<OwnSlots*>(data);
-  Gio::DBus::SlotNameAcquired* the_slot = slots->name_acquired_slot;
+  auto slots = static_cast<OwnSlots*>(data);
+  auto the_slot = slots->name_acquired_slot;
 
   try
   {
@@ -69,8 +69,8 @@ static void Bus_Name_Acquired_giomm_callback(GDBusConnection* connection,
 static void Bus_Name_Lost_giomm_callback(GDBusConnection* connection,
   const gchar* name, gpointer data)
 {
-  OwnSlots* slots = static_cast<OwnSlots*>(data);
-  Gio::DBus::SlotNameLost* the_slot = slots->name_lost_slot;
+  auto slots = static_cast<OwnSlots*>(data);
+  auto the_slot = slots->name_lost_slot;
 
   try
   {
@@ -84,7 +84,7 @@ static void Bus_Name_Lost_giomm_callback(GDBusConnection* connection,
 
 static void Bus_Own_Name_giomm_callback_destroy(void* data)
 {
-  OwnSlots* slots =  static_cast<OwnSlots*>(data);
+  auto slots =  static_cast<OwnSlots*>(data);
 
   if(slots->bus_acquired_slot)
     delete slots->bus_acquired_slot;
@@ -118,7 +118,7 @@ guint own_name(
   BusNameOwnerFlags flags
 )
 {
-  struct OwnSlots* slots = new OwnSlots;
+  auto slots = new OwnSlots;
 
   // Make copies of the slots which will be deleted on destroy notification.
   slots->bus_acquired_slot = new SlotBusAcquired(bus_acquired_slot);

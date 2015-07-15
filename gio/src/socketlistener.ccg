@@ -93,7 +93,7 @@ bool SocketListener::add_inet_port(guint16 port)
 guint16 SocketListener::add_any_inet_port()
 {
   GError* gerror = 0;
-  const guint16 retvalue = g_socket_listener_add_any_inet_port(gobj(), 0, &gerror);
+  const auto retvalue = g_socket_listener_add_any_inet_port(gobj(), 0, &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -105,7 +105,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket(Glib::RefPtr<Glib::Object>& s
 {
   GError* gerror = 0;
   GObject *retobj = 0;
-  GSocket* retvalue = g_socket_listener_accept_socket(gobj(),
+  auto retvalue = g_socket_listener_accept_socket(gobj(),
                                                       &retobj,
                                                       Glib::unwrap(cancellable),
                                                       &gerror);
@@ -122,7 +122,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket(Glib::RefPtr<Glib::Object>& s
 {
   GError* gerror = 0;
   GObject *retobj = 0;
-  GSocket* retvalue = g_socket_listener_accept_socket(gobj(),
+  auto retvalue = g_socket_listener_accept_socket(gobj(),
                                                       &retobj,
                                                       0,
                                                       &gerror);
@@ -138,7 +138,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket(Glib::RefPtr<Glib::Object>& s
 Glib::RefPtr<Socket> SocketListener::accept_socket(const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = 0;
-  GSocket* retvalue = g_socket_listener_accept_socket(gobj(),
+  auto retvalue = g_socket_listener_accept_socket(gobj(),
                                                       0,
                                                       Glib::unwrap(cancellable),
                                                       &gerror);
@@ -151,7 +151,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket(const Glib::RefPtr<Cancellabl
 Glib::RefPtr<Socket> SocketListener::accept_socket()
 {
   GError* gerror = 0;
-  GSocket* retvalue = g_socket_listener_accept_socket(gobj(),
+  auto retvalue = g_socket_listener_accept_socket(gobj(),
                                                       0,
                                                       0,
                                                       &gerror);
@@ -167,7 +167,7 @@ void SocketListener::accept_socket_async(const Glib::RefPtr<Cancellable>& cancel
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
-  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_listener_accept_socket_async(gobj(),
                                         Glib::unwrap(cancellable),
@@ -180,7 +180,7 @@ void SocketListener::accept_socket_async(const SlotAsyncReady& slot)
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
-  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_listener_accept_socket_async(gobj(),
                                         0,
@@ -192,7 +192,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket_finish(const Glib::RefPtr<Asy
 {
   GError* gerror = 0;
   GObject *retobj = 0;
-  GSocket* retvalue = g_socket_listener_accept_socket_finish(gobj(),
+  auto retvalue = g_socket_listener_accept_socket_finish(gobj(),
                                                              Glib::unwrap(result),
                                                              &retobj,
                                                              &gerror);
@@ -207,7 +207,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket_finish(const Glib::RefPtr<Asy
 Glib::RefPtr<Socket> SocketListener::accept_socket_finish(const Glib::RefPtr<AsyncResult>& result)
 {
   GError* gerror = 0;
-  GSocket* retvalue = g_socket_listener_accept_socket_finish(gobj(),
+  auto retvalue = g_socket_listener_accept_socket_finish(gobj(),
                                                              Glib::unwrap(result),
                                                              0,
                                                              &gerror);
@@ -222,7 +222,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept(Glib::RefPtr<Object>& sour
 {
   GError* gerror = 0;
   GObject *retobj = 0;
-  GSocketConnection* retvalue = g_socket_listener_accept(gobj(),
+  auto retvalue = g_socket_listener_accept(gobj(),
                                                          &retobj,
                                                          Glib::unwrap(cancellable),
                                                          &gerror);
@@ -239,7 +239,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept(Glib::RefPtr<Object>& sour
 {
   GError* gerror = 0;
   GObject *retobj = 0;
-  GSocketConnection* retvalue = g_socket_listener_accept(gobj(),
+  auto retvalue = g_socket_listener_accept(gobj(),
                                                          &retobj,
                                                          0,
                                                          &gerror);
@@ -255,7 +255,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept(Glib::RefPtr<Object>& sour
 Glib::RefPtr<SocketConnection> SocketListener::accept(const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = 0;
-  GSocketConnection* retvalue = g_socket_listener_accept(gobj(),
+  auto retvalue = g_socket_listener_accept(gobj(),
                                                          0,
                                                          Glib::unwrap(cancellable),
                                                          &gerror);
@@ -268,7 +268,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept(const Glib::RefPtr<Cancell
 Glib::RefPtr<SocketConnection> SocketListener::accept()
 {
   GError* gerror = 0;
-  GSocketConnection* retvalue = g_socket_listener_accept(gobj(),
+  auto retvalue = g_socket_listener_accept(gobj(),
                                                          0,
                                                          0,
                                                          &gerror);
@@ -284,7 +284,7 @@ void SocketListener::accept_async(const SlotAsyncReady& slot)
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
-  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_listener_accept_async(gobj(),
                                  0,
@@ -297,7 +297,7 @@ void SocketListener::accept_async(const Glib::RefPtr<Cancellable>& cancellable, 
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
-  SlotAsyncReady* slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_listener_accept_async(gobj(),
                                  Glib::unwrap(cancellable),
@@ -309,7 +309,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept_finish(const Glib::RefPtr<
 {
   GError* gerror = 0;
   GObject *retobj = 0;
-  GSocketConnection* retvalue = g_socket_listener_accept_finish(gobj(),
+  auto retvalue = g_socket_listener_accept_finish(gobj(),
                                                                 Glib::unwrap(result),
                                                                 &retobj,
                                                                 &gerror);
@@ -324,7 +324,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept_finish(const Glib::RefPtr<
 Glib::RefPtr<SocketConnection> SocketListener::accept_finish(const Glib::RefPtr<AsyncResult>& result)
 {
   GError* gerror = 0;
-  GSocketConnection* retvalue = g_socket_listener_accept_finish(gobj(),
+  auto retvalue = g_socket_listener_accept_finish(gobj(),
                                                                 Glib::unwrap(result),
                                                                 0,
                                                                 &gerror);

@@ -40,7 +40,7 @@ extern "C"
 
 static void* call_thread_entry_slot(void* data)
 {
-  sigc::slot_base *const slot = reinterpret_cast<sigc::slot_base*>(data);
+  const auto slot = reinterpret_cast<sigc::slot_base*>(data);
 
   try
   {
@@ -78,10 +78,10 @@ namespace Threads
 Thread* Thread::create(const sigc::slot<void>& slot, const std::string& name)
 {
   // Make a copy of slot on the heap.
-  sigc::slot_base *const slot_copy = new sigc::slot<void>(slot);
+  const auto slot_copy = new sigc::slot<void>(slot);
 
   GError* error = 0;
-  GThread* thread = g_thread_try_new(name.empty() ? 0 : name.c_str(),
+  auto thread = g_thread_try_new(name.empty() ? 0 : name.c_str(),
     &call_thread_entry_slot, slot_copy, &error);
 
   if (error)

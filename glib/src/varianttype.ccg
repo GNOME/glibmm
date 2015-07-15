@@ -54,14 +54,14 @@ VariantType& VariantType::operator=(const GVariantType* castitem)
 VariantType VariantType::create_tuple(const std::vector<VariantType>& items)
 {
   typedef GVariantType* var_ptr;
-  var_ptr* const var_array = new var_ptr[items.size()];
+  const auto var_array = new var_ptr[items.size()];
 
   for(std::vector<VariantType>::size_type i = 0; i < items.size(); i++)
   {
     var_array[i] = const_cast<GVariantType*>(items[i].gobj());
   }
 
-  VariantType result = Glib::wrap(g_variant_type_new_tuple(var_array, items.size()));
+  auto result = Glib::wrap(g_variant_type_new_tuple(var_array, items.size()));
   delete[] var_array;
   return result;
 }

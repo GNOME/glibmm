@@ -50,7 +50,7 @@ UnixFDList::UnixFDList(const Glib::ArrayHandle<int>& fds, int n_fds)
 const Glib::ArrayHandle<int> UnixFDList::peek_fds() const
 {
   int length = 0;
-  const int* fds = g_unix_fd_list_peek_fds(const_cast<GUnixFDList*>(gobj()), &length);
+  const auto fds = g_unix_fd_list_peek_fds(const_cast<GUnixFDList*>(gobj()), &length);
   // The array is terminated with a -1, but that terminating element is
   // not included in the length that g_unix_fd_list_peek_fds() returns.
   return Glib::ArrayHandle<int>(fds, length, Glib::OWNERSHIP_NONE);
@@ -59,7 +59,7 @@ const Glib::ArrayHandle<int> UnixFDList::peek_fds() const
 Glib::ArrayHandle<int> UnixFDList::steal_fds()
 {
   int length = 0;
-  const int* fds = g_unix_fd_list_steal_fds(gobj(), &length);
+  const auto fds = g_unix_fd_list_steal_fds(gobj(), &length);
   // The array is terminated with a -1, but that terminating element is
   // not included in the length that g_unix_fd_list_steal_fds() returns.
   return Glib::ArrayHandle<int>(fds, length, Glib::OWNERSHIP_DEEP);

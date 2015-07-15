@@ -125,7 +125,7 @@ bool file_test(const std::string& filename, FileTest test)
 int mkstemp(std::string& filename_template)
 {
   const ScopedPtr<char> buf (g_strndup(filename_template.data(), filename_template.size()));
-  const int fileno = g_mkstemp(buf.get());
+  const auto fileno = g_mkstemp(buf.get());
 
   filename_template = buf.get();
   return fileno;
@@ -139,7 +139,7 @@ int file_open_tmp(std::string& name_used, const std::string& prefix)
   GError* error = 0;
   ScopedPtr<char> buf_name_used;
 
-  const int fileno = g_file_open_tmp(basename_template.c_str(), buf_name_used.addr(), &error);
+  const auto fileno = g_file_open_tmp(basename_template.c_str(), buf_name_used.addr(), &error);
 
   if(error)
     Glib::Error::throw_exception(error);
@@ -153,7 +153,7 @@ int file_open_tmp(std::string& name_used)
   GError* error = 0;
   ScopedPtr<char> buf_name_used;
 
-  const int fileno = g_file_open_tmp(0, buf_name_used.addr(), &error);
+  const auto fileno = g_file_open_tmp(0, buf_name_used.addr(), &error);
 
   if(error)
     Glib::Error::throw_exception(error);
