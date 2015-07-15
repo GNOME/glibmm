@@ -54,14 +54,14 @@ public:
   virtual ~DumpParser();
 
 protected:
-  virtual void on_start_element(Glib::Markup::ParseContext& context,
+  void on_start_element(Glib::Markup::ParseContext& context,
                                 const Glib::ustring&        element_name,
-                                const AttributeMap&         attributes);
+                                const AttributeMap&         attributes) override;
 
-  virtual void on_end_element(Glib::Markup::ParseContext& context,
-                              const Glib::ustring& element_name);
+  void on_end_element(Glib::Markup::ParseContext& context,
+                              const Glib::ustring& element_name) override;
 
-  virtual void on_text(Glib::Markup::ParseContext& context, const Glib::ustring& text);
+  void on_text(Glib::Markup::ParseContext& context, const Glib::ustring& text) override;
 
 private:
   int parse_depth_;

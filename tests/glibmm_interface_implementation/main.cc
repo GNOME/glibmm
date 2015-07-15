@@ -20,9 +20,9 @@ public:
 
 protected:
   //Implement vfuncs:
-  virtual Glib::ustring get_name_vfunc() const;
-  virtual Glib::VariantType get_state_type_vfunc() const;
-  virtual Glib::VariantBase get_state_hint_vfunc() const;
+  Glib::ustring get_name_vfunc() const override;
+  Glib::VariantType get_state_type_vfunc() const override;
+  Glib::VariantBase get_state_hint_vfunc() const override;
 };
 
 CustomAction::CustomAction()

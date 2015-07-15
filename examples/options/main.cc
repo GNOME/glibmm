@@ -25,9 +25,10 @@ class ExampleOptionGroup : public Glib::OptionGroup
 public:
   ExampleOptionGroup();
 
-  virtual bool on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group);
-  virtual bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group);
-  virtual void on_error(Glib::OptionContext& context, Glib::OptionGroup& group);
+private:
+  bool on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
+  bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
+  void on_error(Glib::OptionContext& context, Glib::OptionGroup& group) override;
 
   bool on_option_arg_string(const Glib::ustring& option_name,
     const Glib::ustring& value, bool has_value);
