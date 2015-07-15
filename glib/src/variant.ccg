@@ -287,7 +287,7 @@ const VariantType& Variant<VariantBase>::variant_type()
 
 Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
 {
-  Variant<VariantBase> result = Variant<VariantBase>(g_variant_new_variant(const_cast<GVariant*>(data.gobj())));
+  auto result = Variant<VariantBase>(g_variant_new_variant(const_cast<GVariant*>(data.gobj())));
   return result;
 }
 
@@ -318,7 +318,7 @@ const VariantType& Variant<Glib::ustring>::variant_type()
 Variant<Glib::ustring>
 Variant<Glib::ustring>::create(const Glib::ustring& data)
 {
-  Variant<Glib::ustring> result =
+  auto result =
     Variant<Glib::ustring>(g_variant_new_string(data.c_str()));
   return result;
 }
@@ -374,7 +374,7 @@ const VariantType& Variant<std::string>::variant_type()
 Variant<std::string>
 Variant<std::string>::create(const std::string& data)
 {
-  Variant<std::string> result =
+  auto result =
     Variant<std::string>(g_variant_new_bytestring(data.c_str()));
   return result;
 }
@@ -458,7 +458,7 @@ Variant<type_vec_ustring>::create(const type_vec_ustring& data)
   }
 
   // Create the variant using the builder.
-  Variant<type_vec_ustring> result =
+  auto result =
     Variant<type_vec_ustring>(g_variant_new(
       array_variant_type.get_string().c_str(), builder));
 
@@ -540,7 +540,7 @@ Variant<type_vec_string>::create(const type_vec_string& data)
 
   // Create the variant using g_variant_new_bytestring_array() (passing the
   // newly constructed array.
-  Variant<type_vec_string> result =
+  auto result =
     Variant<type_vec_string>(g_variant_new_bytestring_array(str_array,
       data.size()));
 
@@ -565,7 +565,7 @@ Variant<type_vec_string>::create_from_object_paths(const type_vec_string& data)
 
   // Create the variant using g_variant_new_objv() (passing the
   // newly constructed array.
-  Variant<type_vec_string> result =
+  auto result =
     Variant<type_vec_string>(g_variant_new_objv(str_array, data.size()));
 
   g_strfreev(str_array);

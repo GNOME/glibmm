@@ -138,7 +138,7 @@ SignalProxy_load_partial_contents_ready_callback(GObject*, GAsyncResult* res, vo
 
   try
   {
-    Glib::RefPtr<Gio::AsyncResult> result = Glib::wrap(res, true /* take copy */);
+    auto result = Glib::wrap(res, true /* take copy */);
     (*the_slot)(result);
   }
   catch(...)
@@ -441,7 +441,7 @@ FileType File::query_file_type(FileQueryInfoFlags flags) const
 Glib::RefPtr<FileInfo> File::query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags) const
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_info(const_cast<GFile*>(gobj()), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_query_info(const_cast<GFile*>(gobj()), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -451,7 +451,7 @@ Glib::RefPtr<FileInfo> File::query_info(const Glib::RefPtr<Cancellable>& cancell
 Glib::RefPtr<FileInfo> File::query_info(const std::string& attributes, FileQueryInfoFlags flags) const
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_info(const_cast<GFile*>(gobj()), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_query_info(const_cast<GFile*>(gobj()), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -496,7 +496,7 @@ File::query_info_async(const SlotAsyncReady& slot, const std::string& attributes
 Glib::RefPtr<FileInfo> File::query_filesystem_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_filesystem_info(gobj(), attributes.c_str(), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_query_filesystem_info(gobj(), attributes.c_str(), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -506,7 +506,7 @@ Glib::RefPtr<FileInfo> File::query_filesystem_info(const Glib::RefPtr<Cancellabl
 Glib::RefPtr<FileInfo> File::query_filesystem_info(const std::string& attributes)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileInfo> retvalue = Glib::wrap(g_file_query_filesystem_info(gobj(), attributes.c_str(), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_query_filesystem_info(gobj(), attributes.c_str(), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -548,7 +548,7 @@ File::query_filesystem_info_async(const SlotAsyncReady& slot, const std::string&
 Glib::RefPtr<FileEnumerator> File::enumerate_children(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, FileQueryInfoFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileEnumerator> retvalue = Glib::wrap(g_file_enumerate_children(gobj(), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_enumerate_children(gobj(), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -558,7 +558,7 @@ Glib::RefPtr<FileEnumerator> File::enumerate_children(const Glib::RefPtr<Cancell
 Glib::RefPtr<FileEnumerator> File::enumerate_children(const std::string& attributes, FileQueryInfoFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileEnumerator> retvalue = Glib::wrap(g_file_enumerate_children(gobj(), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_enumerate_children(gobj(), attributes.c_str(), ((GFileQueryInfoFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1505,7 +1505,7 @@ File::replace_contents_bytes_async(const SlotAsyncReady& slot,
 Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1515,7 +1515,7 @@ Glib::RefPtr<FileOutputStream> File::replace(const Glib::RefPtr<Cancellable>& ca
 Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_backup, FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_replace(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1526,7 +1526,7 @@ Glib::RefPtr<FileOutputStream> File::replace(const std::string& etag, bool make_
 Glib::RefPtr<FileIOStream> File::replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup, FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1536,7 +1536,7 @@ Glib::RefPtr<FileIOStream> File::replace_readwrite(const Glib::RefPtr<Cancellabl
 Glib::RefPtr<FileIOStream> File::replace_readwrite(const std::string& etag, bool make_backup, FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), etag.empty() ? 0 : etag.c_str(), static_cast<int>(make_backup), ((GFileCreateFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1548,7 +1548,7 @@ Glib::RefPtr<FileIOStream> File::replace_readwrite(const std::string& etag, bool
 Glib::RefPtr<FileMonitor> File::monitor_directory(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1558,7 +1558,7 @@ Glib::RefPtr<FileMonitor> File::monitor_directory(const Glib::RefPtr<Cancellable
 Glib::RefPtr<FileMonitor> File::monitor_directory(FileMonitorFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_monitor_directory(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1568,7 +1568,7 @@ Glib::RefPtr<FileMonitor> File::monitor_directory(FileMonitorFlags flags)
 Glib::RefPtr<FileMonitor> File::monitor_file(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1578,7 +1578,7 @@ Glib::RefPtr<FileMonitor> File::monitor_file(const Glib::RefPtr<Cancellable>& ca
 Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_monitor_file(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1589,7 +1589,7 @@ Glib::RefPtr<FileMonitor> File::monitor_file(FileMonitorFlags flags)
 Glib::RefPtr<FileMonitor> File::monitor(const Glib::RefPtr<Cancellable>& cancellable, FileMonitorFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1599,7 +1599,7 @@ Glib::RefPtr<FileMonitor> File::monitor(const Glib::RefPtr<Cancellable>& cancell
 Glib::RefPtr<FileMonitor> File::monitor(FileMonitorFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileMonitor> retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_monitor(gobj(), ((GFileMonitorFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1811,7 +1811,7 @@ File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags
 Glib::RefPtr<FileOutputStream> File::create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1821,7 +1821,7 @@ Glib::RefPtr<FileOutputStream> File::create_file(const Glib::RefPtr<Cancellable>
 Glib::RefPtr<FileOutputStream> File::create_file(FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1831,7 +1831,7 @@ Glib::RefPtr<FileOutputStream> File::create_file(FileCreateFlags flags)
 Glib::RefPtr<FileIOStream> File::create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1841,7 +1841,7 @@ Glib::RefPtr<FileIOStream> File::create_file_readwrite(const Glib::RefPtr<Cancel
 Glib::RefPtr<FileIOStream> File::create_file_readwrite(FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileIOStream> retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1851,7 +1851,7 @@ Glib::RefPtr<FileIOStream> File::create_file_readwrite(FileCreateFlags flags)
 Glib::RefPtr<FileOutputStream> File::append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  auto retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -1861,7 +1861,7 @@ Glib::RefPtr<FileOutputStream> File::append_to(const Glib::RefPtr<Cancellable>& 
 Glib::RefPtr<FileOutputStream> File::append_to(FileCreateFlags flags)
 {
   GError* gerror = 0;
-  Glib::RefPtr<FileOutputStream> retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)), 0, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
