@@ -37,13 +37,13 @@ ifelse(`$11',,,`#ifdef $11'
 $4 __CPPNAME__`'_Class::$2_vfunc_callback`'($5)
 {
 ifelse(`$14',,,dnl
-`  const $13* slot = static_cast<$13*>($14);
+`  const auto slot = static_cast<$13*>($14);
 
 ')dnl
 dnl  First, do a simple cast to ObjectBase. We will have to do a dynamic_cast
 dnl  eventually, but it is not necessary to check whether we need to call
 dnl  the vfunc.
-  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper`'((GObject*)$8));
 
 _IMPORT(SECTION_CHECK)
@@ -56,7 +56,7 @@ _IMPORT(SECTION_CHECK)
   {
 dnl  We need to do a dynamic cast to get the real object type, to call the
 dnl  C++ vfunc on it.
-    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
@@ -70,9 +70,9 @@ ifelse($9,refreturn_ctype,`dnl Assume Glib::unwrap_copy() is correct if refretur
         return Glib::unwrap_copy`'(`obj->$1'($7));
 ',`dnl not refreturn_ctype
 ifelse($10,keep_return,`dnl
-        static GQuark quark_return_value = g_quark_from_static_string("__NAMESPACE__::__CPPNAME__::$1");
+        static auto quark_return_value = g_quark_from_static_string("__NAMESPACE__::__CPPNAME__::$1");
 
-        $3* return_value = static_cast<$3*>(g_object_get_qdata(obj_base->gobj(), quark_return_value));
+        auto return_value = static_cast<$3*>(g_object_get_qdata(obj_base->gobj(), quark_return_value));
         if (!return_value)
         {
           return_value = new $3`'();
@@ -158,13 +158,13 @@ ifelse(`$11',,,dnl
 dnl See if the slot should or should not be copied
 `ifelse(`$13',,dnl
 `  // Create a copy of the slot.
-  $11* slot_copy = new $11($12); ',dnl
+  auto slot_copy = new $11($12); ',dnl
 dnl
 `  // Use the original slot (not a copy).
-  $11* slot_copy = const_cast<$11*>(&$12);')
+  auto slot_copy = const_cast<$11*>(&$12);')
 
 ')dnl
-  BaseClassType *const base = static_cast<BaseClassType*>(
+  const auto base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
       _IFACE_PARENT_FROM_OBJECT(gobject_)dnl
 ',`dnl

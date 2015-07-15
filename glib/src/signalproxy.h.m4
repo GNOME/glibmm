@@ -58,7 +58,7 @@ public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   static inline sigc::slot_base* data_to_slot(void* data)
   {
-    SignalProxyConnectionNode *const pConnectionNode = static_cast<SignalProxyConnectionNode*>(data);
+    const auto pConnectionNode = static_cast<SignalProxyConnectionNode*>(data);
 
     // Return 0 if the connection is blocked.
     return (!pConnectionNode->slot_.blocked()) ? &pConnectionNode->slot_ : 0;

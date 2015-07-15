@@ -92,7 +92,7 @@ const Glib::Interface_Class& __CPPNAME__`'_Class::init()
 
 void __CPPNAME__`'_Class::iface_init_function(void* g_iface, void*)
 {
-  BaseClassType *const klass = static_cast<BaseClassType*>(g_iface);
+  const auto klass = static_cast<BaseClassType*>(g_iface);
 
   //This is just to avoid an "unused variable" warning when there are no vfuncs or signal handlers to connect.
   //This is a temporary fix until I find out why I can not seem to derive a GtkFileChooser interface. murrayc

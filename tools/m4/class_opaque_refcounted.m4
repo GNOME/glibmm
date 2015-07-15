@@ -116,7 +116,7 @@ const __CNAME__* __CPPNAME__::gobj() const
 __CNAME__* __CPPNAME__::gobj_copy() const
 {
   // See the comment at the top of this file, if you want to know why the cast works.
-  __CNAME__ *const gobject = reinterpret_cast<__CNAME__*>(const_cast<__CPPNAME__*>(this));
+  const auto gobject = reinterpret_cast<__CNAME__*>(const_cast<__CPPNAME__*>(this));
   __OPAQUE_FUNC_REF`'(gobject);
   return gobject;
 }

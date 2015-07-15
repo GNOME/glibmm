@@ -28,10 +28,10 @@ dnl If a slot type has been specified insert a slot copy declaration.
 dnl See if the slot should or should not be copied
 `ifelse(`$20',,dnl
 `  // Create a copy of the slot.
-  $18* slot_copy = new $18($19); ',dnl
+  auto slot_copy = new $18($19); ',dnl
 dnl
 `  // Use the original slot (not a copy).
-  $18* slot_copy = const_cast<$18*>(&$19);')
+  auto slot_copy = const_cast<$18*>(&$19);')
 
 ')`'dnl
 dnl Insert the declarations for C output parameters
@@ -68,10 +68,10 @@ ifelse(`$18',,,dnl
 dnl See if the slot should or should not be copied
 `ifelse(`$20',,dnl
 `  // Create a copy of the slot.
-  $18* slot_copy = new $18($19); ',dnl
+  auto slot_copy = new $18($19); ',dnl
 dnl
 `  // Use the original slot (not a copy).
-  $18* slot_copy = const_cast<$18*>(&$19);')
+  auto slot_copy = const_cast<$18*>(&$19);')
 
 ')`'dnl
 dnl Insert the declarations for C output parameters
@@ -130,10 +130,10 @@ ifelse(`$15',,,dnl
 dnl See if the slot should or should not be copied
 `ifelse(`$17',,dnl
 `  // Create a copy of the slot.
-  $15* slot_copy = new $15($16); ',dnl
+  auto slot_copy = new $15($16); ',dnl
 dnl
 `  // Use the original slot (not a copy).
-  $15* slot_copy = const_cast<$15*>(&$16);')
+  auto slot_copy = const_cast<$15*>(&$16);')
 
 ')`'dnl
 dnl Insert declarations for C the output parameters
@@ -161,10 +161,10 @@ ifelse(`$15',,,dnl
 dnl See if the slot should or should not be copied
 `ifelse(`$17',,dnl
 `  // Create a copy of the slot.
-  $15* slot_copy = new $15($16); ',dnl
+  auto slot_copy = new $15($16); ',dnl
 dnl
 `  // Use the original slot (not a copy).
-  $15* slot_copy = const_cast<$15*>(&$16);')
+  auto slot_copy = const_cast<$15*>(&$16);')
 
 ')`'dnl
 dnl Insert the declarations for the C output parameters

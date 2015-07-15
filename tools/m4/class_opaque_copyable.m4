@@ -122,7 +122,7 @@ ifelse(__OPAQUE_FUNC_COPY,NONE,`dnl
 ',`dnl else
 __CPPNAME__& __CPPNAME__::operator=(const __CPPNAME__`'& src)
 {
-  __CNAME__ *const new_gobject = (src.gobject_) ? __OPAQUE_FUNC_COPY`'(src.gobject_) : 0;
+  const auto new_gobject = (src.gobject_) ? __OPAQUE_FUNC_COPY`'(src.gobject_) : 0;
 
   if(gobject_)
     __OPAQUE_FUNC_FREE`'(gobject_);

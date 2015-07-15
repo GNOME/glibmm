@@ -47,13 +47,13 @@ const VariantType& Variant<$1>::variant_type()
 
 Variant<$1> Variant<$1>::create($1 data)
 {
-  Variant<$1> result = Variant<$1>(g_variant_new_$3(data));
+  auto result = Variant<$1>(g_variant_new_$3(data));
   return result;
 }
 ifelse($4,,,[
 Variant<$1> Variant<$1>::create_$4($1 data)
 {
-  Variant<$1> result = Variant<$1>(g_variant_new_$4(data));
+  auto result = Variant<$1>(g_variant_new_$4(data));
   return result;
 }
 ])dnl

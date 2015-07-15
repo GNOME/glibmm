@@ -190,7 +190,7 @@ ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
 
 void __CPPNAME__`'_Class::class_init_function(void* g_class, void* class_data)
 {
-  BaseClassType *const klass = static_cast<BaseClassType*>(g_class);
+  const auto klass = static_cast<BaseClassType*>(g_class);
   CppClassParent::class_init_function(klass, class_data);
 
 _IMPORT(SECTION_PCC_CLASS_INIT_VFUNCS)

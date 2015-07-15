@@ -67,13 +67,13 @@ static $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3
   using namespace __NAMESPACE__;
   typedef sigc::slot< $5`'_COMMA_PREFIX($6) > SlotType;
 
-  __CPPNAME__* obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
+  auto obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
   // Do not try to call a signal on a disassociated wrapper.
   if(obj)
   {
     try
     {
-      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot`'(data))
+      if(const auto slot = Glib::SignalProxyNormal::data_to_slot`'(data))
 ifelse(`$2',void,`dnl
         (*static_cast<SlotType*>(slot))($7);
 ',`dnl else
@@ -109,13 +109,13 @@ static $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SU
   using namespace __NAMESPACE__;
   typedef sigc::slot< void`'_COMMA_PREFIX($6) > SlotType;
 
-  __CPPNAME__* obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
+  auto obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
   // Do not try to call a signal on a disassociated wrapper.
   if(obj)
   {
     try
     {
-      if(sigc::slot_base *const slot = Glib::SignalProxyNormal::data_to_slot`'(data))
+      if(const auto slot = Glib::SignalProxyNormal::data_to_slot`'(data))
         (*static_cast<SlotType*>(slot))($7);
     }
     catch(...)
@@ -235,7 +235,7 @@ $4 __CPPNAME__`'_Class::$2_callback`'($5)
 dnl  First, do a simple cast to ObjectBase. We will have to do a dynamic_cast
 dnl  eventually, but it is not necessary to check whether we need to call
 dnl  the vfunc.
-  Glib::ObjectBase *const obj_base = static_cast<Glib::ObjectBase*>(
+  const auto obj_base = static_cast<Glib::ObjectBase*>(
       Glib::ObjectBase::_get_current_wrapper`'((GObject*)$8));
 
 _IMPORT(SECTION_CHECK)
@@ -248,7 +248,7 @@ _IMPORT(SECTION_CHECK)
   {
 dnl  We need to do a dynamic cast to get the real object type, to call the
 dnl  C++ vfunc on it.
-    CppObjectType *const obj = dynamic_cast<CppObjectType* const>(obj_base);
+    const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
     if(obj) // This can be NULL during destruction.
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
@@ -279,7 +279,7 @@ ifelse($11, `', `dnl
     }
   }
 
-  BaseClassType *const base = static_cast<BaseClassType*>(
+  const auto base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
         _IFACE_PARENT_FROM_OBJECT($8)dnl
 ',`dnl
@@ -325,7 +325,7 @@ ifelse(`$9',,,`#ifdef $9'
 )dnl
 $3 __NAMESPACE__::__CPPNAME__::on_$1`'($5)
 {
-  BaseClassType *const base = static_cast<BaseClassType*>(
+  const auto base = static_cast<BaseClassType*>(
 ifdef(`__BOOL_IS_INTERFACE__',`dnl
       _IFACE_PARENT_FROM_OBJECT(gobject_)dnl
 ',`dnl
