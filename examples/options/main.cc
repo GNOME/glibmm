@@ -35,6 +35,7 @@ private:
   bool on_option_arg_filename(const Glib::ustring& option_name,
     const std::string& value, bool has_value);
 
+public:
   //These members should live as long as the OptionGroup to which they are added, 
   //and as long as the OptionContext to which that OptionGroup is added.
   int m_arg_foo;
