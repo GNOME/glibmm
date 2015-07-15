@@ -435,9 +435,9 @@ interrupted (int /*sig*/)
 }
 
 static bool
-async_cancel (Glib::IOCondition /*cond*/, Glib::RefPtr<Gio::Cancellable> cancellable)
+async_cancel (Glib::IOCondition /*cond*/, Glib::RefPtr<Gio::Cancellable> the_cancellable)
 {
-    cancellable->cancel ();
+    the_cancellable->cancel ();
     return false;
 }
 #endif

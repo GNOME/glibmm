@@ -75,8 +75,8 @@ socket_address_to_string (const Glib::RefPtr<Gio::SocketAddress>& address)
 
   auto inet_address = isockaddr->get_address ();
   auto str = inet_address->to_string ();
-  auto port = isockaddr->get_port ();
-  auto res = Glib::ustring::compose ("%1:%2", str, port);
+  auto the_port = isockaddr->get_port ();
+  auto res = Glib::ustring::compose ("%1:%2", str, the_port);
   return res;
 }
 

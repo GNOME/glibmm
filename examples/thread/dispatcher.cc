@@ -29,7 +29,7 @@ namespace
 class ThreadProgress
 {
 public:
-  explicit ThreadProgress(int id);
+  explicit ThreadProgress(int the_id);
   virtual ~ThreadProgress();
 
   int  id() const;
@@ -78,10 +78,10 @@ public:
   void operator()(T ptr) const { delete ptr; }
 };
 
-ThreadProgress::ThreadProgress(int id)
+ThreadProgress::ThreadProgress(int the_id)
 :
   thread_   (nullptr),
-  id_       (id),
+  id_       (the_id),
   progress_ (0)
 {
   // Connect to the cross-thread signal.
