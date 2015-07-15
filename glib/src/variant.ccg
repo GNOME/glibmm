@@ -451,11 +451,10 @@ Variant<type_vec_ustring>::create(const type_vec_ustring& data)
   GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
 
   // Add the elements of the vector into the builder.
-  for(type_vec_ustring::const_iterator iter = data.begin();
-   iter < data.end(); iter++)
+  for(const auto& str : data)
   {
     g_variant_builder_add(builder,
-      element_variant_type.get_string().c_str(), iter->c_str());
+      element_variant_type.get_string().c_str(), str.c_str());
   }
 
   // Create the variant using the builder.

@@ -157,10 +157,9 @@ gboolean OptionGroup::post_parse_callback(GOptionContext* context,
 
   //The C args have now been given values by g_option_context_parse().
   //Convert C values to C++ values:
-  for(type_map_entries::iterator iter = option_group->map_entries_.begin();
-      iter != option_group->map_entries_.end(); ++iter)
+  for(auto& the_pair : option_group->map_entries_)
   {
-    auto& cpp_entry = iter->second;
+    auto& cpp_entry = the_pair.second;
     cpp_entry.convert_c_to_cpp();
   }
 
@@ -286,9 +285,9 @@ OptionGroup::OptionGroup(GOptionGroup* castitem)
 OptionGroup::~OptionGroup()
 {
   //Free any C types that were allocated during add_entry():
-  for(type_map_entries::iterator iter = map_entries_.begin(); iter != map_entries_.end(); ++iter)
+  for(auto& the_pair : map_entries_)
   {
-    auto& cpp_entry = iter->second;
+    auto& cpp_entry = the_pair.second;
     cpp_entry.release_c_arg();
   }
 

@@ -166,10 +166,8 @@ int main(int, char**)
 
     ComplexDictType map = copy_complex_vector[i];
 
-    for(ComplexDictType::const_iterator iter = map.begin();
-      iter != map.end(); iter++)
+    for(const auto& entry : map)
     {
-      std::pair< Glib::ustring, Glib::Variant<int> > entry = *iter;
       ostr << entry.first << " -> " << entry.second.get() << "." << std::endl;
     }
     ostr << std::endl;
@@ -309,12 +307,12 @@ void test_dynamic_cast_composite_types()
     ostr << "Cast composite type (get_type_string()=" << derived.get_type_string()
          << ", variant_type().get_string()=" << derived.variant_type().get_string() << "): ";
     composite_type var = derived.get();
-    for (composite_type::const_iterator iter1 = var.begin(); iter1 != var.end(); ++iter1)
+    for (const auto& the_pair : var)
     {
-      ostr << "\n  " << iter1->first << ":";
-      const std::vector<std::string>& vec = iter1->second;
-      for (std::vector<std::string>::const_iterator iter2 = vec.begin(); iter2 != vec.end(); ++iter2)
-        ostr << "  " << *iter2;
+      ostr << "\n  " << the_pair.first << ":";
+      const auto& vec = the_pair.second;
+      for (const auto& str : vec)
+        ostr << "  " << str;
     }
     ostr << std::endl;
   }

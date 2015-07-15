@@ -1090,10 +1090,9 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
   GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
 
   // Add the elements of the vector into the builder.
-  for(typename std::vector<T>::const_iterator iter = data.begin();
-   iter < data.end(); iter++)
+  for(const auto& element : data)
   {
-    Glib::Variant<T> variant = Glib::Variant<T>::create(*iter);
+    Glib::Variant<T> variant = Glib::Variant<T>::create(element);
     g_variant_builder_add_value(builder, variant.gobj());
   }
 
@@ -1177,11 +1176,10 @@ Variant< std::map<K, V> >::create(const std::map<K, V>& data)
   GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
 
   // Add the elements of the map into the builder.
-  for(typename std::map<K, V>::const_iterator iter = data.begin();
-    iter != data.end(); iter++)
+  for(const auto& element : data)
   {
-    Variant< std::pair<K, V> > dict_entry =
-      Variant< std::pair<K, V> >::create(*iter);
+    auto dict_entry =
+      Variant< std::pair<K, V> >::create(element);
 
     g_variant_builder_add_value(builder, dict_entry.gobj());
   }
