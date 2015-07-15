@@ -220,13 +220,13 @@ std::string get_signals(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
       {
         strResult += "  (parameters\n";
 
-        for(unsigned i = 0; i < signalQuery.n_params; i++)
+        for(unsigned j = 0; j < signalQuery.n_params; j++)
         {
-          GType typeParamMangled = pParameters[i];
+          GType typeParamMangled = pParameters[j];
 
           //Parameter name:
           //We can't get the real parameter name from the GObject system. It's not registered with g_signal_new().
-          gchar* pchNum = g_strdup_printf("%d", i);
+          gchar* pchNum = g_strdup_printf("%d", j);
           std::string strParamName = "p" + std::string(pchNum);
           g_free(pchNum);
           pchNum = 0;

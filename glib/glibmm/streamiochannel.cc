@@ -133,23 +133,23 @@ IOStatus StreamIOChannel::close_vfunc()
 {
   bool failed = false;
 
-  if(std::fstream *const stream = dynamic_cast<std::fstream*>(stream_in_))
+  if(std::fstream *const fstream = dynamic_cast<std::fstream*>(stream_in_))
   {
-    stream->clear();
-    stream->close();
-    failed = stream->fail();
+    fstream->clear();
+    fstream->close();
+    failed = fstream->fail();
   }
-  else if(std::ifstream *const stream = dynamic_cast<std::ifstream*>(stream_in_))
+  else if(std::ifstream *const ifstream = dynamic_cast<std::ifstream*>(stream_in_))
   {
-    stream->clear();
-    stream->close();
-    failed = stream->fail();
+    ifstream->clear();
+    ifstream->close();
+    failed = ifstream->fail();
   }
-  else if(std::ofstream *const stream = dynamic_cast<std::ofstream*>(stream_out_))
+  else if(std::ofstream *const ofstream = dynamic_cast<std::ofstream*>(stream_out_))
   {
-    stream->clear();
-    stream->close();
-    failed = stream->fail();
+    ofstream->clear();
+    ofstream->close();
+    failed = ofstream->fail();
   }
   else
   {

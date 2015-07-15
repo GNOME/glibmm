@@ -105,21 +105,21 @@ static const GDBusInterfaceVTable* DBusSubtreeVTable_Dispatch_giomm_callback(
   const char* interface_name, const char* node, void** out_user_data,
   void* user_data)
 {
-  Gio::DBus::SubtreeVTable* vtable =
+  Gio::DBus::SubtreeVTable* vtable_subtree =
     static_cast<Gio::DBus::SubtreeVTable*>(user_data);
 
   Gio::DBus::SubtreeVTable::SlotSubtreeDispatch* the_slot =
-    vtable->get_slot_dispatch();
+    vtable_subtree->get_slot_dispatch();
 
   try
   {
-    const Gio::DBus::InterfaceVTable* vtable =
+    const Gio::DBus::InterfaceVTable* vtable_iface =
       (*the_slot)(Glib::wrap(connection, true), sender, object_path,
       interface_name, (node ? node : ""));
 
-    *out_user_data = const_cast<Gio::DBus::InterfaceVTable*>(vtable);
+    *out_user_data = const_cast<Gio::DBus::InterfaceVTable*>(vtable_iface);
 
-    return vtable->gobj();
+    return vtable_iface->gobj();
   }
   catch(...)
   {

@@ -74,7 +74,6 @@ my_p_key_compare(const type_p_key_value& key_a, const type_p_key_value& key_b)
 int
 main()
 {
-  type_key_value::const_iterator i;
   Glib::RefPtr< Glib::BalancedTree<type_key_value, type_key_value> > tree = Glib::BalancedTree<type_key_value, type_key_value>::create();
 
   for (type_key_value::size_type i = 0; i < str.size(); ++i)

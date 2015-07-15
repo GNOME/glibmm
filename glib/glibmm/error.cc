@@ -42,9 +42,9 @@ Error::Error()
   gobject_ (0)
 {}
 
-Error::Error(GQuark domain, int code, const Glib::ustring& message)
+Error::Error(GQuark error_domain, int error_code, const Glib::ustring& message)
 :
-  gobject_ (g_error_new_literal(domain, code, message.c_str()))
+  gobject_ (g_error_new_literal(error_domain, error_code, message.c_str()))
 {}
 
 Error::Error(GError* gobject, bool take_copy)
@@ -103,9 +103,9 @@ Glib::ustring Error::what() const
   return gobject_->message;
 }
 
-bool Error::matches(GQuark domain, int code) const
+bool Error::matches(GQuark error_domain, int error_code) const
 {
-  return g_error_matches(gobject_, domain, code);
+  return g_error_matches(gobject_, error_domain, error_code);
 }
 
 GError* Error::gobj()
@@ -146,11 +146,11 @@ void Error::register_cleanup()
 }
 
 // static
-void Error::register_domain(GQuark domain, Error::ThrowFunc throw_func)
+void Error::register_domain(GQuark error_domain, Error::ThrowFunc throw_func)
 {
   g_assert(throw_func_table != 0);
 
-  (*throw_func_table)[domain] = throw_func;
+  (*throw_func_table)[error_domain] = throw_func;
 }
 
 // static, noreturn

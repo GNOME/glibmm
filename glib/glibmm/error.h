@@ -32,7 +32,7 @@ class Error : public Glib::Exception
 {
 public:
   Error();
-  Error(GQuark domain, int code, const Glib::ustring& message);
+  Error(GQuark error_domain, int error_code, const Glib::ustring& message);
   explicit Error(GError* gobject, bool take_copy = false);
 
   Error(const Error& other);
@@ -44,7 +44,7 @@ public:
   int code() const;
   virtual Glib::ustring what() const;
 
-  bool matches(GQuark domain, int code) const;
+  bool matches(GQuark error_domain, int error_code) const;
 
   GError* gobj();
   const GError* gobj() const;
@@ -57,7 +57,7 @@ public:
 
   static void register_init();
   static void register_cleanup();
-  static void register_domain(GQuark domain, ThrowFunc throw_func);
+  static void register_domain(GQuark error_domain, ThrowFunc throw_func);
 
   static void throw_exception(GError* gobject) G_GNUC_NORETURN;
 

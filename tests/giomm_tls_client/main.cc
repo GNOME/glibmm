@@ -120,8 +120,6 @@ int main(int, char**)
     address->get_address()->to_string() << ":" << address->get_port() <<
     "." << std::endl;
 
-  Glib::RefPtr<Gio::TlsClientConnection> tls_connection;
-
   try
   {
     Glib::RefPtr<Gio::TlsClientConnection> tls_connection =
