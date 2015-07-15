@@ -798,6 +798,11 @@ an owner for the destination name in response to this method
 invocation.
 </parameter_description>
 </parameter>
+<parameter name="G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION">
+<parameter_description> the caller is prepared to
+wait for interactive authorization. Since 2.46.
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -1386,6 +1391,12 @@ Since: 2.26
 <parameter name="G_DBUS_MESSAGE_FLAGS_NO_AUTO_START">
 <parameter_description> The bus must not launch an
 owner for the destination name in response to this message.
+</parameter_description>
+</parameter>
+<parameter name="G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION">
+<parameter_description> If set on a method
+call, this flag means that the caller is prepared to wait for interactive
+authorization. Since 2.46.
 </parameter_description>
 </parameter>
 </parameters>
@@ -4035,6 +4046,16 @@ Since: 2.38
 </description>
 </property>
 
+<property name="GPropertyAction:invert-boolean">
+<description>
+If %TRUE, the state of the action will be the negation of the
+property value, provided the property is boolean.
+
+Since: 2.46
+
+</description>
+</property>
+
 <property name="GPropertyAction:name">
 <description>
 The name of the action.  This is mostly meaningful for identifying
@@ -6347,6 +6368,24 @@ Since: 2.26
 </description>
 </property>
 
+<property name="GWin32RegistryKey:path">
+<description>
+A path to the key in the registry, in UTF-8.
+
+Since: 2.46
+
+</description>
+</property>
+
+<property name="GWin32RegistryKey:path-utf16">
+<description>
+A path to the key in the registry, in UTF-16.
+
+Since: 2.46
+
+</description>
+</property>
+
 <property name="GZlibCompressor:file-info">
 <description>
 If set to a non-%NULL #GFileInfo object, and #GZlibCompressor:format is
@@ -6920,8 +6959,7 @@ Since: 2.28
 </parameter_description>
 </parameter>
 </parameters>
-<return> the state type, if the action
-is stateful
+<return> the state type, if the action is stateful
 
 </return>
 </function>
@@ -27317,7 +27355,9 @@ If @etag is specified (not %NULL), any existing file must have that etag,
 or the error %G_IO_ERROR_WRONG_ETAG will be returned.
 
 If @make_backup is %TRUE, this function will attempt to make a backup
-of @file.
+of @file. Internally, it uses g_file_replace(), so will try to replace the
+file contents in the safest way possible. For example, atomic renames are
+used when replacing local files’ contents.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -34774,6 +34814,28 @@ Since: 2.20
 <return></return>
 </function>
 
+<function name="g_native_socket_address_new">
+<description>
+Creates a new #GNativeSocketAddress for @address and @port.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="address">
+<parameter_description> a #GNativeAddress
+</parameter_description>
+</parameter>
+<parameter name="port">
+<parameter_description> a port number
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GNativeSocketAddress
+
+</return>
+</function>
+
 <function name="g_network_address_get_hostname">
 <description>
 Gets @addr's hostname. This might be either UTF-8 or ASCII-encoded,
@@ -38750,7 +38812,7 @@ Free the returned object with g_object_unref()
 
 <function name="g_resource_ref">
 <description>
-Atomically increments the reference count of @array by one. This
+Atomically increments the reference count of @resource by one. This
 function is MT-safe and may be called from any thread.
 
 Since: 2.32
@@ -38770,7 +38832,7 @@ Since: 2.32
 <function name="g_resource_unref">
 <description>
 Atomically decrements the reference count of @resource by one. If the
-reference count drops to 0, all memory allocated by the array is
+reference count drops to 0, all memory allocated by the resource is
 released. This function is MT-safe and may be called from any
 thread.
 
@@ -40770,6 +40832,29 @@ Since: 2.44
 </parameter>
 </parameters>
 <return> a list of the children on @settings
+
+</return>
+</function>
+
+<function name="g_settings_schema_list_keys">
+<description>
+Introspects the list of keys on @schema.
+
+You should probably not be calling this function from &quot;normal&quot; code
+(since you should already know what keys are in your schema).  This
+function is intended for introspection reasons.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="schema">
+<parameter_description> a #GSettingsSchema
+</parameter_description>
+</parameter>
+</parameters>
+<return> a list of the keys on
+@schema
 
 </return>
 </function>
@@ -45447,6 +45532,9 @@ mode of the #GSocket.
 On success, the returned #GSocket takes ownership of @fd. On failure, the
 caller must close @fd themselves.
 
+Since GLib 2.46, it is no longer a fatal error to call this on a non-socket
+descriptor.  Instead, a GError will be set with code %G_IO_ERROR_FAILED
+
 Since: 2.22
 
 </description>
@@ -47144,9 +47232,8 @@ Since: 2.40
 Returns the value of the environment variable @variable in the
 environment of processes launched from this launcher.
 
-The returned string is in the GLib file name encoding.  On UNIX, this
-means that it can be an arbitrary byte string.  On Windows, it will
-be UTF-8.
+On UNIX, the returned string can be an arbitrary byte string.
+On Windows, it will be UTF-8.
 
 Since: 2.40
 
@@ -47262,9 +47349,8 @@ g_environ_unsetenv(), etc.
 As an alternative, you can use g_subprocess_launcher_setenv(),
 g_subprocess_launcher_unsetenv(), etc.
 
-All strings in this array are expected to be in the GLib file name
-encoding.  On UNIX, this means that they can be arbitrary byte
-strings.  On Windows, they should be in UTF-8.
+On UNIX, all strings in this array can be arbitrary byte strings.
+On Windows, they should be in UTF-8.
 
 Since: 2.40
 
@@ -47410,10 +47496,9 @@ Since: 2.40
 Sets the environment variable @variable in the environment of
 processes launched from this launcher.
 
-Both the variable's name and value should be in the GLib file name
-encoding. On UNIX, this means that they can be arbitrary byte
-strings. On Windows, they should be in UTF-8.
-
+On UNIX, both the variable's name and value can be arbitrary byte
+strings, except that the variable's name cannot contain '='.
+On Windows, they should be in UTF-8.
 
 Since: 2.40
 
@@ -47639,9 +47724,8 @@ Since: 2.40
 Removes the environment variable @variable from the environment of
 processes launched from this launcher.
 
-The variable name should be in the GLib file name encoding.  On UNIX,
-this means that they can be arbitrary byte strings.  On Windows, they
-should be in UTF-8.
+On UNIX, the variable's name can be an arbitrary byte string not
+containing '='. On Windows, it should be in UTF-8.
 
 Since: 2.40
 
@@ -53972,6 +54056,971 @@ Since: 2.26
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_win32_registry_key_erase_change_indicator">
+<description>
+Erases change indicator of the @key.
+
+Subsequent calls to g_win32_registry_key_has_changed() will return %FALSE
+until the key is put on watch again by calling
+g_win32_registry_key_watch() again.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_win32_registry_key_get_child">
+<description>
+Opens a @subkey of the @key.
+
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a parent #GWin32RegistryKey
+</parameter_description>
+</parameter>
+<parameter name="subkey">
+<parameter_description> name of a child key to open (in UTF-8), relative to @key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to a %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GWin32RegistryKey or %NULL if can't be opened. Free
+with g_object_unref().
+</return>
+</function>
+
+<function name="g_win32_registry_key_get_child_w">
+<description>
+Opens a @subkey of the @key.
+
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a parent #GWin32RegistryKey
+</parameter_description>
+</parameter>
+<parameter name="subkey">
+<parameter_description> name of a child key to open (in UTF-8), relative to @key
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to a %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GWin32RegistryKey or %NULL if can't be opened. Free
+with g_object_unref().
+</return>
+</function>
+
+<function name="g_win32_registry_key_get_path">
+<description>
+Get full path to the key
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> a full path to the key (in UTF-8),
+or %NULL if it can't be converted to UTF-8.
+
+</return>
+</function>
+
+<function name="g_win32_registry_key_get_path_w">
+<description>
+Get full path to the key
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> a full path to the key (in UTF-16)
+
+</return>
+</function>
+
+<function name="g_win32_registry_key_get_value">
+<description>
+Get data from a value of a key. String data is guaranteed to be
+appropriately terminated and will be in UTF-8.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+<parameter name="auto_expand">
+<parameter_description> (in) %TRUE to automatically expand G_WIN32_REGISTRY_VALUE_EXPAND_STR
+to G_WIN32_REGISTRY_VALUE_STR.
+</parameter_description>
+</parameter>
+<parameter name="value_name">
+<parameter_description> name of the value to get (in UTF-8).
+Empty string means the '(Default)' value.
+</parameter_description>
+</parameter>
+<parameter name="value_type">
+<parameter_description> type of the value retrieved.
+</parameter_description>
+</parameter>
+<parameter name="value_data">
+<parameter_description> contents of the value.
+</parameter_description>
+</parameter>
+<parameter name="value_data_size">
+<parameter_description> size of the buffer pointed
+by @value_data.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on failure.
+
+</return>
+</function>
+
+<function name="g_win32_registry_key_get_value_w">
+<description>
+Get data from a value of a key.
+
+Get data from a value of a key. String data is guaranteed to be
+appropriately terminated and will be in UTF-16.
+
+When calling with value_data == NULL (to get data size without getting
+the data itself) remember that returned size corresponds to possibly
+unterminated string data (if value is some kind of string), because
+termination cannot be checked and fixed unless the data is retreived
+too.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+<parameter name="auto_expand">
+<parameter_description> (in) %TRUE to automatically expand G_WIN32_REGISTRY_VALUE_EXPAND_STR
+to G_WIN32_REGISTRY_VALUE_STR.
+</parameter_description>
+</parameter>
+<parameter name="value_name">
+<parameter_description> name of the value to get (in UTF-16).
+Empty string means the '(Default)' value.
+</parameter_description>
+</parameter>
+<parameter name="value_type">
+<parameter_description> type of the value retrieved.
+</parameter_description>
+</parameter>
+<parameter name="value_data">
+<parameter_description> contents of the value.
+</parameter_description>
+</parameter>
+<parameter name="value_data_size">
+<parameter_description> size of the buffer pointed
+by @value_data.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on failure.
+
+</return>
+</function>
+
+<function name="g_win32_registry_key_has_changed">
+<description>
+Check the @key's status indicator.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the @key was put under watch at some point and has changed
+since then, %FALSE if it either wasn't changed or wasn't watched at all.
+
+</return>
+</function>
+
+<function name="g_win32_registry_key_new">
+<description>
+Creates an object that represents a registry key specified by @path.
+@path must start with one of the following pre-defined names:
+- HKEY_CLASSES_ROOT
+- HKEY_CURRENT_CONFIG
+- HKEY_CURRENT_USER
+- HKEY_CURRENT_USER_LOCAL_SETTINGS
+- HKEY_LOCAL_MACHINE
+- HKEY_PERFORMANCE_DATA
+- HKEY_PERFORMANCE_NLSTEXT
+- HKEY_PERFORMANCE_TEXT
+- HKEY_USERS
+@path must not end with '\\'.
+
+
+</description>
+<parameters>
+<parameter name="path">
+<parameter_description> absolute full name of a key to open (in UTF-8)
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to a %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GWin32RegistryKey or %NULL if can't
+be opened. Free with g_object_unref().
+</return>
+</function>
+
+<function name="g_win32_registry_key_new_w">
+<description>
+Creates an object that represents a registry key specified by @path.
+@path must start with one of the following pre-defined names:
+- HKEY_CLASSES_ROOT
+- HKEY_CURRENT_CONFIG
+- HKEY_CURRENT_USER
+- HKEY_CURRENT_USER_LOCAL_SETTINGS
+- HKEY_LOCAL_MACHINE
+- HKEY_PERFORMANCE_DATA
+- HKEY_PERFORMANCE_NLSTEXT
+- HKEY_PERFORMANCE_TEXT
+- HKEY_USERS
+@path must not end with L'\\'.
+
+
+</description>
+<parameters>
+<parameter name="path">
+<parameter_description> absolute full name of a key to open (in UTF-16)
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to a %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GWin32RegistryKey or %NULL if can't
+be opened. Free with g_object_unref().
+</return>
+</function>
+
+<function name="g_win32_registry_key_watch">
+<description>
+Puts @key under a watch.
+
+When the key changes, an APC will be queued in the current thread. The APC
+will run when the current thread enters alertable state (GLib main loop
+should do that; if you are not using it, see MSDN documentation for W32API
+calls that put thread into alertable state). When it runs, it will
+atomically switch an indicator in the @key. If a callback was specified,
+it is invoked at that point. Subsequent calls to
+g_win32_registry_key_has_changed() will return %TRUE, and the callback (if
+it was specified) will not be invoked anymore.
+Calling g_win32_registry_key_erase_change_indicator() will reset the indicator,
+and g_win32_registry_key_has_changed() will start returning %FALSE.
+To resume the watch, call g_win32_registry_key_watch_for_changes() again.
+
+Calling g_win32_registry_key_watch_for_changes() for a key that is already
+being watched is allowed and affects nothing.
+
+The fact that the key is being watched will be used internally to update
+key path (if it changes).
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey
+</parameter_description>
+</parameter>
+<parameter name="watch_children">
+<parameter_description> (in) %TRUE also watch the children of the @key, %FALSE
+to watch the key only.
+</parameter_description>
+</parameter>
+<parameter name="change_flags">
+<parameter_description> specifies the types of changes to watch for.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a function to invoke when a change occurs.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> a pointer to pass to @callback on invocation.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on failure.
+
+</return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_assign">
+<description>
+Assigns the value of @other to @iter.  This function
+is not useful in applications, because iterators can be assigned
+with `GWin32RegistrySubkeyIter i = j;`. The
+function is used by language bindings.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistrySubkeyIter
+</parameter_description>
+</parameter>
+<parameter name="other">
+<parameter_description> another #GWin32RegistrySubkeyIter
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_clear">
+<description>
+Frees internal buffers of a #GWin32RegistrySubkeyIter.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistrySubkeyIter
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_copy">
+<description>
+Creates a dynamically-allocated copy of an iterator. Dynamically-allocated
+state of the iterator is duplicated too.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> an iterator
+</parameter_description>
+</parameter>
+</parameters>
+<return> a copy of the @iter,
+free with g_win32_registry_subkey_iter_free ()
+
+</return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_free">
+<description>
+Free an iterator allocated on the heap. For iterators that are allocated
+on the stack use g_win32_registry_subkey_iter_clear () instead.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a dynamically-allocated iterator
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_get_name">
+<description>
+Gets the name of the subkey at the @iter potision.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistrySubkeyIter
+</parameter_description>
+</parameter>
+<parameter name="subkey_name">
+<parameter_description> Pointer to a location
+to store the name of a subkey (in UTF-8). Free with g_free().
+</parameter_description>
+</parameter>
+<parameter name="subkey_name_len">
+<parameter_description> Pointer to a location to store the
+length of @subkey_name, in gchars, excluding NUL-terminator.
+%NULL if length is not needed.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the name was retrieved, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_get_name_w">
+<description>
+Same as g_win32_registry_subkey_iter_get_next(), but outputs UTF-16-encoded
+data, without converting it to UTF-8 first.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistrySubkeyIter
+</parameter_description>
+</parameter>
+<parameter name="subkey_name">
+<parameter_description> Pointer to a location
+to store the name of a subkey (in UTF-16).
+</parameter_description>
+</parameter>
+<parameter name="subkey_name_len">
+<parameter_description> Pointer to a location
+to store the length of @subkey_name, in gunichar2s, excluding
+NUL-terminator.
+%NULL if length is not needed.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the name was retrieved, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_init">
+<description>
+Initialises (without allocating) a #GWin32RegistrySubkeyIter.  @iter may be
+completely uninitialised prior to this call; its old value is
+ignored.
+
+The iterator remains valid for as long as @key exists.
+Clean up its internal buffers with a call to
+g_win32_registry_subkey_iter_clear() when done.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a pointer to a #GWin32RegistrySubkeyIter
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey to iterate over
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if iterator was initialized successfully, %FALSE on error.
+
+</return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_n_subkeys">
+<description>
+Queries the number of subkeys items in the key that we are
+iterating over.  This is the total number of subkeys -- not the number
+of items remaining.
+
+This information is accurate at the point of iterator initialization,
+and may go out of sync with reality even while subkeys are enumerated.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistrySubkeyIter
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of subkeys in the key
+
+</return>
+</function>
+
+<function name="g_win32_registry_subkey_iter_next">
+<description>
+Moves iterator to the next subkey.
+Enumeration errors can be ignored if @skip_errors is %TRUE
+
+Here is an example for iterating with g_win32_registry_subkey_iter_next():
+|[&lt;!-- language=&quot;C&quot; --&gt;
+// recursively iterate a key
+void
+iterate_key_recursive (GWin32RegistryKey *key)
+{
+GWin32RegistrySubkeyIter iter;
+gchar *name;
+GWin32RegistryKey *child;
+
+if (!g_win32_registry_subkey_iter_init (&amp;iter, key, NULL))
+return;
+
+while (g_win32_registry_subkey_iter_next (&amp;iter, TRUE, NULL))
+{
+if (!g_win32_registry_subkey_iter_get_name (&amp;iter, &amp;name, NULL, NULL))
+continue;
+
+g_print (&quot;subkey '%s'\n&quot;, name);
+child = g_win32_registry_key_get_child (key, name, NULL);
+
+if (child)
+iterate_key_recursive (child);
+}
+
+g_win32_registry_subkey_iter_clear (&amp;iter);
+}
+]|
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistrySubkeyIter
+</parameter_description>
+</parameter>
+<parameter name="skip_errors">
+<parameter_description> %TRUE if iterator should silently ignore errors (such as
+the actual number of subkeys being less than expected) and
+proceed forward
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if next subkey info was retrieved, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_assign">
+<description>
+Assigns the value of @other to @iter.  This function
+is not useful in applications, because iterators can be assigned
+with `GWin32RegistryValueIter i = j;`. The
+function is used by language bindings.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+<parameter name="other">
+<parameter_description> another #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_win32_registry_value_iter_clear">
+<description>
+Frees internal buffers of a #GWin32RegistryValueIter.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_win32_registry_value_iter_copy">
+<description>
+Creates a dynamically-allocated copy of an iterator. Dynamically-allocated
+state of the iterator is duplicated too.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> an iterator
+</parameter_description>
+</parameter>
+</parameters>
+<return> a copy of the @iter,
+free with g_win32_registry_value_iter_free ().
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_free">
+<description>
+Free an iterator allocated on the heap. For iterators that are allocated
+on the stack use g_win32_registry_value_iter_clear () instead.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a dynamically-allocated iterator
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_win32_registry_value_iter_get_data">
+<description>
+Stores the data of the value currently being iterated over in @value_data,
+and its length - in @value_data_len (if not %NULL).
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+<parameter name="value_data">
+<parameter_description> Pointer to a
+location to store the data of the value (in UTF-8, if it's a string).
+</parameter_description>
+</parameter>
+<parameter name="value_data_size">
+<parameter_description> Pointer to a location to store the length
+of @value_data, in bytes (including any NUL-terminators, if it's a
+string).
+%NULL if length is not needed.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if value data was retrieved, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_get_data_w">
+<description>
+Stores the data of the value currently being iterated over in @value_data,
+and its length - in @value_data_len (if not %NULL).
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+<parameter name="auto_expand">
+<parameter_description> %TRUE to automatically expand G_WIN32_REGISTRY_VALUE_EXPAND_STR to
+G_WIN32_REGISTRY_VALUE_STR.
+</parameter_description>
+</parameter>
+<parameter name="value_data">
+<parameter_description> Pointer to a
+location to store the data of the value (in UTF-16, if it's a string).
+</parameter_description>
+</parameter>
+<parameter name="value_data_len">
+<parameter_description> Pointer to a location to store the size
+of @value_data, in bytes (including any NUL-terminators, if it's a
+string).
+%NULL if length is not needed.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if value data was retrieved, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_get_name">
+<description>
+Stores the name of the value currently being iterated over in @value_name,
+and its length - in @value_name_len (if not %NULL).
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+<parameter name="value_name">
+<parameter_description> Pointer to a location
+to store the name of a value (in UTF-8).
+</parameter_description>
+</parameter>
+<parameter name="value_name_len">
+<parameter_description> Pointer to a location to store the length
+of @value_name, in gchars, excluding NUL-terminator.
+%NULL if length is not needed.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if value name was retrieved, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_get_name_w">
+<description>
+Stores the name of the value currently being iterated over in @value_name,
+and its length - in @value_name (if not %NULL).
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+<parameter name="value_name">
+<parameter_description> Pointer to a location
+to store the name of a value (in UTF-16).
+</parameter_description>
+</parameter>
+<parameter name="value_name_len">
+<parameter_description> Pointer to a location to store the length
+of @value_name, in gunichar2s, excluding NUL-terminator.
+%NULL if length is not needed.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if value name was retrieved, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_get_value_type">
+<description>
+Stores the type of the value currently being iterated over in @value_type.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+<parameter name="value_type">
+<parameter_description> Pointer to a location to store the type of
+the value.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if value type was retrieved, %FALSE otherwise.
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_init">
+<description>
+Initialises (without allocating) a #GWin32RegistryValueIter.  @iter may be
+completely uninitialised prior to this call; its old value is
+ignored.
+
+The iterator remains valid for as long as @key exists.
+Clean up its internal buffers with a call to
+g_win32_registry_value_iter_clear() when done.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a pointer to a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a #GWin32RegistryKey to iterate over
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if iterator was initialized successfully, %FALSE on error.
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_n_values">
+<description>
+Queries the number of values items in the key that we are
+iterating over.  This is the total number of values -- not the number
+of items remaining.
+
+This information is accurate at the point of iterator initialization,
+and may go out of sync with reality even while values are enumerated.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+</parameters>
+<return> the number of values in the key
+
+</return>
+</function>
+
+<function name="g_win32_registry_value_iter_next">
+<description>
+Advances iterator to the next value in the key. If no more values remain then
+FALSE is returned.
+Enumeration errors can be ignored if @skip_errors is %TRUE
+
+Here is an example for iterating with g_win32_registry_value_iter_next():
+|[&lt;!-- language=&quot;C&quot; --&gt;
+// iterate values of a key
+void
+iterate_values_recursive (GWin32RegistryKey *key)
+{
+GWin32RegistryValueIter iter;
+gchar *name;
+GWin32RegistryValueType val_type;
+gchar *val_data;
+
+if (!g_win32_registry_value_iter_init (&amp;iter, key, NULL))
+return;
+
+while (g_win32_registry_value_iter_next (&amp;iter, TRUE, NULL))
+{
+if ((!g_win32_registry_value_iter_get_value_type (&amp;iter, &amp;value)) ||
+((val_type != G_WIN32_REGISTRY_VALUE_STR) &amp;&amp;
+(val_type != G_WIN32_REGISTRY_VALUE_EXPAND_STR)))
+continue;
+
+if (g_win32_registry_value_iter_get_value (&amp;iter, TRUE, &amp;name, NULL,
+&amp;val_data, NULL, NULL))
+g_print (&quot;value '%s' = '%s'\n&quot;, name, val_data);
+}
+
+g_win32_registry_value_iter_clear (&amp;iter);
+}
+]|
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="iter">
+<parameter_description> a #GWin32RegistryValueIter
+</parameter_description>
+</parameter>
+<parameter name="skip_errors">
+<parameter_description> %TRUE if iterator should silently ignore errors (such as
+the actual number of values being less than expected) and
+proceed forward
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a pointer to %NULL #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if next value info was retrieved, %FALSE otherwise.
+
+</return>
 </function>
 
 <function name="g_zlib_compressor_get_file_info">
