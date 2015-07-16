@@ -56,8 +56,8 @@ Glib::RefPtr<Socket> Socket::create_from_fd(int fd, const Glib::RefPtr<Cancellab
 
 gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size, const Glib::RefPtr<Cancellable>& cancellable)
 {
-  GError* gerror = 0;
-  GSocketAddress* caddr = 0;
+  GError* gerror = nullptr;
+  GSocketAddress* caddr = nullptr;
   auto retvalue = g_socket_receive_from(gobj(), &caddr, buffer, size, const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -70,8 +70,8 @@ gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, 
 
 gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, gsize size)
 {
-  GError* gerror = 0;
-  GSocketAddress* caddr = 0;
+  GError* gerror = nullptr;
+  GSocketAddress* caddr = nullptr;
   auto retvalue = g_socket_receive_from(gobj(), &caddr, buffer, size, 0, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -85,7 +85,7 @@ gssize Socket::receive_from(Glib::RefPtr<SocketAddress>& address, char* buffer, 
 gssize Socket::receive_with_blocking(gchar* buffer, gsize size, bool blocking,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   const auto retvalue = g_socket_receive_with_blocking(gobj(), buffer, size,
     blocking, Glib::unwrap(cancellable), &(gerror));
   if(gerror)
@@ -97,7 +97,7 @@ gssize Socket::receive_with_blocking(gchar* buffer, gsize size, bool blocking,
 gssize Socket::send_with_blocking(gchar* buffer, gsize size, bool blocking,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   const auto retvalue = g_socket_send_with_blocking(gobj(), buffer, size,
     blocking, Glib::unwrap(cancellable), &(gerror));
   if(gerror)

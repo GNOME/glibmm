@@ -73,7 +73,7 @@ TInterface* wrap_auto_interface(GObject* object, bool take_copy = false)
   //If no exact wrapper was created,
   //create an instance of the interface,
   //so we at least get the expected type:
-  TInterface* result = 0;
+  TInterface* result = nullptr;
   if(pCppObject)
   {
     result = dynamic_cast<TInterface*>(pCppObject);

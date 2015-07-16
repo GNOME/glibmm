@@ -113,7 +113,7 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem, bool make_a_copy /* = false */)
     if(castitem)
       gobject_ = __OPAQUE_FUNC_COPY`'(castitem);
     else
-      gobject_ = 0;
+      gobject_ = nullptr;
   }
 }
 ')

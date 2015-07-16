@@ -73,7 +73,7 @@ Thread* Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
   // Make a copy of slot on the heap
   const auto slot_copy = new sigc::slot<void>(slot);
 
-  GError* error = 0;
+  GError* error = nullptr;
 
   const auto thread = g_thread_try_new(NULL,
       &call_thread_entry_slot, slot_copy, &error);
@@ -99,7 +99,7 @@ Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
   // Make a copy of slot on the heap
   const auto slot_copy = new sigc::slot<void>(slot);
 
-  GError* error = 0;
+  GError* error = nullptr;
 
   const auto thread = g_thread_create_full(
       &call_thread_entry_slot, slot_copy, stack_size, joinable,

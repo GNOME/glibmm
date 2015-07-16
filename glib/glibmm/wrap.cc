@@ -38,7 +38,7 @@ namespace
 
 typedef std::vector<Glib::WrapNewFunction> WrapFuncTable;
 
-static WrapFuncTable* wrap_func_table = 0;
+static WrapFuncTable* wrap_func_table = nullptr;
 
 } // anonymous namespace
 
@@ -70,7 +70,7 @@ void wrap_register_cleanup()
   if(wrap_func_table)
   {
     delete wrap_func_table;
-    wrap_func_table = 0;
+    wrap_func_table = nullptr;
   }
 }
 
@@ -95,7 +95,7 @@ void wrap_register(GType type, WrapNewFunction func)
 
 static Glib::ObjectBase* wrap_create_new_wrapper(GObject* object)
 {
-  g_return_val_if_fail(wrap_func_table != 0, 0);
+  g_return_val_if_fail(wrap_func_table != nullptr, 0);
 
   const bool gtkmm_wrapper_already_deleted = (bool)g_object_get_qdata((GObject*)object, Glib::quark_cpp_wrapper_deleted_);
   if(gtkmm_wrapper_already_deleted)
@@ -140,7 +140,7 @@ static gboolean gtype_wraps_interface(GType implementer_type, GType interface_ty
 
 Glib::ObjectBase* wrap_create_new_wrapper_for_interface(GObject* object, GType interface_gtype)
 {
-  g_return_val_if_fail(wrap_func_table != 0, 0);
+  g_return_val_if_fail(wrap_func_table != nullptr, 0);
 
   const bool gtkmm_wrapper_already_deleted = (bool)g_object_get_qdata((GObject*)object, Glib::quark_cpp_wrapper_deleted_);
   if(gtkmm_wrapper_already_deleted)

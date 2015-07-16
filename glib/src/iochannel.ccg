@@ -136,7 +136,7 @@ IOChannel::IOChannel(GIOChannel* gobject, bool take_copy)
   gobject_ (gobject)
 {
   // This ctor should never be called for GlibmmIOChannel instances.
-  g_assert(gobject != 0);
+  g_assert(gobject != nullptr);
   g_assert(gobject->funcs != &GlibmmIOChannel::vfunc_table);
 
   if(take_copy)
@@ -157,11 +157,11 @@ IOChannel::~IOChannel()
     if(gobject_->funcs == &GlibmmIOChannel::vfunc_table)
     {
       // Disconnect the wrapper object so that it won't be deleted twice.
-      reinterpret_cast<GlibmmIOChannel*>(gobject_)->wrapper = 0;
+      reinterpret_cast<GlibmmIOChannel*>(gobject_)->wrapper = nullptr;
     }
 
     const auto tmp_gobject = gobject_;
-    gobject_ = 0;
+    gobject_ = nullptr;
 
     g_io_channel_unref(tmp_gobject);
   }
@@ -169,7 +169,7 @@ IOChannel::~IOChannel()
 
 Glib::RefPtr<IOChannel> IOChannel::create_from_file(const std::string& filename, const std::string& mode)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   const auto channel = g_io_channel_new_file(filename.c_str(), mode.c_str(), &gerror);
 
   if(gerror)
@@ -208,7 +208,7 @@ IOStatus IOChannel::write(const Glib::ustring& str)
 IOStatus IOChannel::read_line(Glib::ustring& line)
 {
   Glib::ScopedPtr<char> buf;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   gsize   bytes = 0;
 
   const auto status = g_io_channel_read_line(gobj(), buf.addr(), &bytes, 0, &gerror);
@@ -229,7 +229,7 @@ IOStatus IOChannel::read_line(Glib::ustring& line)
 IOStatus IOChannel::read_to_end(Glib::ustring& str)
 {
   Glib::ScopedPtr<char> buf;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   gsize   bytes = 0;
 
   const auto status = g_io_channel_read_to_end(gobj(), buf.addr(), &bytes, &gerror);
@@ -250,7 +250,7 @@ IOStatus IOChannel::read_to_end(Glib::ustring& str)
 IOStatus IOChannel::read(Glib::ustring& str, gsize count)
 {
   Glib::ScopedPtr<char> buf (g_new(char, count));
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   gsize   bytes = 0;
 
   const auto status = g_io_channel_read_chars(gobj(), buf.get(), count, &bytes, &gerror);
@@ -270,7 +270,7 @@ IOStatus IOChannel::read(Glib::ustring& str, gsize count)
 
 IOStatus IOChannel::set_encoding(const std::string& encoding)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   const auto status = g_io_channel_set_encoding(
       gobj(), (encoding.empty()) ? 0 : encoding.c_str(), &gerror);
@@ -367,7 +367,7 @@ void IOChannel::unreference() const
 
 Glib::RefPtr<IOChannel> wrap(GIOChannel* gobject, bool take_copy)
 {
-  IOChannel* cpp_object = 0;
+  IOChannel* cpp_object = nullptr;
 
   if(gobject)
   {
@@ -497,7 +497,7 @@ void GlibmmIOChannel::io_free(GIOChannel* channel)
 {
   if(IOChannel *const wrapper = reinterpret_cast<GlibmmIOChannel*>(channel)->wrapper)
   {
-    wrapper->gobject_ = 0;
+    wrapper->gobject_ = nullptr;
     delete wrapper;
   }
 

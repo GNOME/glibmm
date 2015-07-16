@@ -40,7 +40,7 @@ static Glib::Threads::Private<HandlerList> thread_specific_handler_list;
 
 static void glibmm_exception_warning(const GError* error)
 {
-  g_assert(error != 0);
+  g_assert(error != nullptr);
 
   g_critical("\n"
       "unhandled exception (type Glib::Error) in signal handler:\n"

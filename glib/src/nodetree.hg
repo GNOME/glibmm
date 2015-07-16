@@ -337,7 +337,7 @@ public:
   {
     sigc::slot<void, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_child);
 
-    GNode* child = 0;
+    GNode* child = nullptr;
     typedef sigc::slot<void, GNode*> type_foreach_gnode_slot;
     type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
 
@@ -370,7 +370,7 @@ public:
   {
     //We use a sigc::slot for the C callback, so we can bind some extra data.
     sigc::slot<gboolean, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_node);
-    GNode* child = 0;
+    GNode* child = nullptr;
 
     typedef sigc::slot<gboolean, GNode*> type_traverse_gnode_slot;
     type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
@@ -690,11 +690,11 @@ private:
 
     //Free the wrapped object (g_node_free not available)
     g_slice_free(GNode, gobject_);
-    gobject_ = 0;
+    gobject_ = nullptr;
   }
 
   ///Create a new GNode, taking the contents of an existing node if one is specified.
-  void clone(const NodeTree<T>* node = 0)
+  void clone(const NodeTree<T>* node = nullptr)
   {
     //Store the this pointer in the GNode so we can discover this wrapper later:
     gobject_ = g_node_new(reinterpret_cast<gpointer>(this));
@@ -702,7 +702,7 @@ private:
     if(node)
     {
       //Prepend the copied children of @node to the constructing node.
-      for(const NodeTree<T>* i = node->last_child();  i != 0; i = i->prev_sibling())
+      for(const NodeTree<T>* i = node->last_child();  i != nullptr; i = i->prev_sibling())
         prepend(*(new NodeTree<T>(*i)));
     }
   }

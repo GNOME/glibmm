@@ -139,7 +139,7 @@ __CPPNAME__::__CPPNAME__`'(__CPPNAME__&& other)
 :
   gobject_(other.gobject_)
 {
-  other.gobject_ = 0;
+  other.gobject_ = nullptr;
 }
 
 __CPPNAME__& __CPPNAME__::operator=(__CPPNAME__`'&& other)

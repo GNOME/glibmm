@@ -61,7 +61,7 @@ ifelse(`$8',,,`$8
 ')dnl
 ')',dnl End if a C++ output parameter is specified.
 dnl If is errthrow or refreturn
-`ifelse(`$11',,,`  GError* gerror = 0;
+`ifelse(`$11',,,`  GError* gerror = nullptr;
 ')dnl
 dnl If a slot type has been specified insert a slot copy declaration.
 ifelse(`$18',,,dnl
@@ -155,7 +155,7 @@ dnl Return the value if it was stored and if the method returns something
 ifelse(`$3',void,,`ifelse(`$6',,,`  return retval;
 ')')dnl
 ',dnl End if a C++ output parameter is specified.
-`ifelse(`$10',,,`  GError* gerror = 0;')
+`ifelse(`$10',,,`  GError* gerror = nullptr;')
 dnl If a slot type has been specified insert a slot copy declaration.
 ifelse(`$15',,,dnl
 dnl See if the slot should or should not be copied

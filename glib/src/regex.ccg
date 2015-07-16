@@ -24,7 +24,7 @@ Glib::RefPtr<Glib::Regex> Regex::create(const Glib::ustring& pattern,
                                         RegexCompileFlags compile_options,
                                         RegexMatchFlags match_options)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   auto regex  = g_regex_new(pattern.c_str(), (GRegexCompileFlags)compile_options,
                                (GRegexMatchFlags)match_options, &gerror);
 
@@ -47,7 +47,7 @@ bool Regex::match(
   RegexMatchFlags match_options
 )
 {
-  GMatchInfo* ginfo = 0;
+  GMatchInfo* ginfo = nullptr;
   bool const result = static_cast<bool>(g_regex_match(gobj(), string.c_str(),
     static_cast<GRegexMatchFlags>(match_options), &ginfo));
   match_info.set_gobject(ginfo);
@@ -66,8 +66,8 @@ bool Regex::match(
   RegexMatchFlags match_options
 )
 {
-  GError* gerror = 0;
-  GMatchInfo* ginfo = 0;
+  GError* gerror = nullptr;
+  GMatchInfo* ginfo = nullptr;
 
   bool const result = static_cast<bool>(g_regex_match_full(gobj(),
     string.c_str(), -1, start_position,
@@ -88,8 +88,8 @@ bool Regex::match(
   RegexMatchFlags match_options
 )
 {
-  GError* gerror = 0;
-  GMatchInfo* ginfo = 0;
+  GError* gerror = nullptr;
+  GMatchInfo* ginfo = nullptr;
 
   bool const result = static_cast<bool>(g_regex_match_full(gobj(),
     string.c_str(), string_len, start_position,
@@ -104,7 +104,7 @@ bool Regex::match(
 
 bool Regex::match(const Glib::ustring& string, int start_position, RegexMatchFlags match_options)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   bool retvalue = g_regex_match_full(gobj(), string.c_str(), -1, start_position, ((GRegexMatchFlags)(match_options)), 0, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -114,7 +114,7 @@ bool Regex::match(const Glib::ustring& string, int start_position, RegexMatchFla
 
 bool Regex::match(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   bool retvalue = g_regex_match_full(gobj(), string.c_str(), string_len, start_position, ((GRegexMatchFlags)(match_options)), 0, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -128,7 +128,7 @@ bool Regex::match_all(
   RegexMatchFlags match_options
 )
 {
-  GMatchInfo* ginfo = 0;
+  GMatchInfo* ginfo = nullptr;
   bool const result = static_cast<bool>(g_regex_match_all(gobj(),
     string.c_str(), static_cast<GRegexMatchFlags>(match_options),
     &ginfo));
@@ -148,8 +148,8 @@ bool Regex::match_all(
   RegexMatchFlags match_options
 )
 {
-  GError* gerror = 0;
-  GMatchInfo* ginfo = 0;
+  GError* gerror = nullptr;
+  GMatchInfo* ginfo = nullptr;
 
   bool const retvalue = static_cast<bool>(g_regex_match_all_full(gobj(),
     string.c_str(), -1, start_position,
@@ -170,8 +170,8 @@ bool Regex::match_all(
   RegexMatchFlags match_options
 )
 {
-  GError* gerror = 0;
-  GMatchInfo* ginfo = 0;
+  GError* gerror = nullptr;
+  GMatchInfo* ginfo = nullptr;
 
   bool const retvalue = static_cast<bool>(g_regex_match_all_full(gobj(),
     string.c_str(), string_len, start_position,
@@ -186,7 +186,7 @@ bool Regex::match_all(
 
 bool Regex::match_all(const Glib::ustring& string, int start_position, RegexMatchFlags match_options)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   bool retvalue = g_regex_match_all_full(gobj(), string.c_str(), -1, start_position, ((GRegexMatchFlags)(match_options)), 0, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -196,7 +196,7 @@ bool Regex::match_all(const Glib::ustring& string, int start_position, RegexMatc
 
 bool Regex::match_all(const Glib::ustring& string, gssize string_len, int start_position, RegexMatchFlags match_options)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   bool retvalue = g_regex_match_all_full(gobj(), string.c_str(), string_len, start_position, ((GRegexMatchFlags)(match_options)), 0, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -206,7 +206,7 @@ bool Regex::match_all(const Glib::ustring& string, gssize string_len, int start_
 
 Glib::ustring Regex::replace(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   auto retvalue = Glib::convert_return_gchar_ptr_to_ustring(g_regex_replace(gobj(), string.c_str(), -1, start_position, replacement.c_str(), ((GRegexMatchFlags)(match_options)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -217,7 +217,7 @@ Glib::ustring Regex::replace(const Glib::ustring& string, int start_position, co
 
 Glib::ustring Regex::replace_literal(const Glib::ustring& string, int start_position, const Glib::ustring& replacement, RegexMatchFlags match_options)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   auto retvalue = Glib::convert_return_gchar_ptr_to_ustring(g_regex_replace_literal(gobj(), string.c_str(), -1, start_position, replacement.c_str(), ((GRegexMatchFlags)(match_options)), &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -227,7 +227,7 @@ Glib::ustring Regex::replace_literal(const Glib::ustring& string, int start_posi
 
 Glib::StringArrayHandle Regex::split(const Glib::ustring& string, int start_position, RegexMatchFlags match_options, int max_tokens) const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   auto retvalue = Glib::StringArrayHandle(g_regex_split_full(const_cast<GRegex*>(gobj()), string.c_str(), -1, start_position, ((GRegexMatchFlags)(match_options)), max_tokens, &(gerror)), Glib::OWNERSHIP_DEEP);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);

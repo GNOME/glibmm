@@ -81,7 +81,7 @@ public:
   }
 
   inline size_type max_size() { return size_type(-1); }
-  inline bool empty() { return glist() == 0; }
+  inline bool empty() { return glist() == nullptr; }
 
   inline iterator begin()
     {return begin_();}

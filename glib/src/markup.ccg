@@ -110,7 +110,7 @@ void ParserCallbacks::start_element(GMarkupParseContext* context,
       for(; *pname && *pvalue; ++pname, ++pvalue)
         attributes.insert(Parser::AttributeMap::value_type(*pname, *pvalue));
 
-      g_return_if_fail(*pname == 0 && *pvalue == 0);
+      g_return_if_fail(*pname == nullptr && *pvalue == nullptr);
     }
 
     cpp_context.get_parser()->on_start_element(cpp_context, element_name, attributes);
@@ -249,13 +249,13 @@ ParseContext::ParseContext(Parser& parser, ParseFlags flags)
 
 ParseContext::~ParseContext()
 {
-  parser_ = 0;
+  parser_ = nullptr;
   g_markup_parse_context_free(gobject_);
 }
 
 void ParseContext::parse(const Glib::ustring& text)
 {
-  GError* error = 0;
+  GError* error = nullptr;
   g_markup_parse_context_parse(gobject_, text.data(), text.bytes(), &error);
 
   if(error)
@@ -264,7 +264,7 @@ void ParseContext::parse(const Glib::ustring& text)
 
 void ParseContext::parse(const char* text_begin, const char* text_end)
 {
-  GError* error = 0;
+  GError* error = nullptr;
   g_markup_parse_context_parse(gobject_, text_begin, text_end - text_begin, &error);
 
   if(error)
@@ -273,7 +273,7 @@ void ParseContext::parse(const char* text_begin, const char* text_end)
 
 void ParseContext::end_parse()
 {
-  GError* error = 0;
+  GError* error = nullptr;
   g_markup_parse_context_end_parse(gobject_, &error);
 
   if(error)
@@ -306,7 +306,7 @@ void ParseContext::destroy_notify_callback(void* data)
   ParseContext *const self = static_cast<ParseContext*>(data);
 
   // Detect premature destruction.
-  g_return_if_fail(self->parser_ == 0);
+  g_return_if_fail(self->parser_ == nullptr);
 }
 
 } // namespace Markup

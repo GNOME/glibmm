@@ -37,7 +37,7 @@ namespace Container_Helpers
 template <class Bi, class Tr>
 GSList* create_slist(Bi pbegin, Bi pend, Tr)
 {
-  GSList* head = 0;
+  GSList* head = nullptr;
 
   while(pend != pbegin)
   {
@@ -56,7 +56,7 @@ GSList* create_slist(Bi pbegin, Bi pend, Tr)
 template <class For, class Tr>
 GSList* create_slist(For pbegin, Tr)
 {
-  GSList* head = 0;
+  GSList* head = nullptr;
 
   while(*pbegin)
   {
@@ -296,7 +296,7 @@ SListHandle<T,Tr>::~SListHandle()
     if(ownership_ != Glib::OWNERSHIP_SHALLOW)
     {
       // Deep ownership: release each container element.
-      for(GSList* node = pslist_; node != 0; node = node->next)
+      for(GSList* node = pslist_; node != nullptr; node = node->next)
         Tr::release_c_type(static_cast<typename Tr::CTypeNonConst>(node->data));
     }
     g_slist_free(pslist_);
@@ -395,7 +395,7 @@ std::size_t SListHandle<T,Tr>::size() const
 template <class T, class Tr> inline
 bool SListHandle<T,Tr>::empty() const
 {
-  return (pslist_ == 0);
+  return (pslist_ == nullptr);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

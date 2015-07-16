@@ -43,7 +43,7 @@ public:
   { }
 
   bool is_filename_option() const
-  { return slot_filename_ != 0; }
+  { return slot_filename_ != nullptr; }
 
   const OptionGroup::SlotOptionArgString* get_slot_string() const
   { return slot_string_; }
@@ -229,7 +229,7 @@ gboolean OptionGroup::option_arg_callback(const gchar* option_name, const gchar*
     return false;
   }
 
-  const bool has_value = (value != 0);
+  const bool has_value = (value != nullptr);
   const OptionArgCallback* const option_arg =
     static_cast<const OptionArgCallback*>(cppOptionEntry.cpparg_);
   try
@@ -294,7 +294,7 @@ OptionGroup::~OptionGroup()
   if(has_ownership_)
   {
     g_option_group_unref(gobj());
-    gobject_ = 0;
+    gobject_ = nullptr;
   }
 }
 
@@ -388,7 +388,7 @@ void OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg ar
     // Only one C variable shall be allocated for them.
     // See https://bugzilla.gnome.org/show_bug.cgi?id=744854.
     bool is_duplicate = false;
-    void* carg = 0;
+    void* carg = nullptr;
     if (arg_type != G_OPTION_ARG_CALLBACK)
     {
       for (type_map_entries::iterator iter = map_entries_.begin();
@@ -478,7 +478,7 @@ void OptionGroup::CppOptionEntry::allocate_c_arg()
     {
       char** typed_arg = new char*;
       //The C code will allocate a char* and put it here, for us to g_free() later.
-      *typed_arg = 0;
+      *typed_arg = nullptr;
       carg_ = typed_arg;
 
       break;
@@ -512,7 +512,7 @@ void OptionGroup::CppOptionEntry::allocate_c_arg()
     case G_OPTION_ARG_NONE: // Actually a boolean.
     {
       gboolean* typed_arg = new gboolean;
-      *typed_arg = 0;
+      *typed_arg = false;
       carg_ = typed_arg;
 
       break;
@@ -659,7 +659,7 @@ void OptionGroup::CppOptionEntry::release_c_arg()
         //or add_entry_filename().
         auto option_arg = static_cast<OptionArgCallback*>(cpparg_);
         delete option_arg;
-        cpparg_ = 0;
+        cpparg_ = nullptr;
 
         break;
       }
@@ -669,7 +669,7 @@ void OptionGroup::CppOptionEntry::release_c_arg()
       }
     }
 
-    carg_ = 0;
+    carg_ = nullptr;
   }
 
   if(entry_)

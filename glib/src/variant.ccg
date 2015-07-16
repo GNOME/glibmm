@@ -125,7 +125,7 @@ VariantStringBase::VariantStringBase(GVariant* castitem, bool take_a_reference)
 void VariantStringBase::create_object_path(VariantStringBase& output,
   const std::string& object_path)
 {
-  GVariant* result = 0;
+  GVariant* result = nullptr;
   result = g_variant_new_object_path(object_path.c_str());
   g_variant_ref_sink(result);
   output.init(result);
@@ -135,7 +135,7 @@ void VariantStringBase::create_object_path(VariantStringBase& output,
 void VariantStringBase::create_signature(VariantStringBase& output,
   const std::string& signature)
 {
-  GVariant* result = 0;
+  GVariant* result = nullptr;
   result = g_variant_new_signature(signature.c_str());
   g_variant_ref_sink(result);
   output.init(result);
@@ -241,7 +241,7 @@ VariantIter VariantContainerBase::get_iter(const VariantType& container_variant_
   // use the actual type (which may differ from container_variant_type, if
   // the GVariant contains strings, object paths or DBus type signatures),
   // otherwise let g_variant_get() report what's wrong with the type.
-  GVariantIter* g_iter = 0;
+  GVariantIter* g_iter = nullptr;
   g_variant_get(const_cast<GVariant*>(gobj()),
     is_castable_to(container_variant_type) ?
       get_type_string().c_str() : container_variant_type.get_string().c_str(),
@@ -409,7 +409,7 @@ std::string Variant<std::string>::get() const
 {
   const VariantType vtype = get_type();
 
-  const char* pch = 0;
+  const char* pch = nullptr;
   if(vtype.equal(VARIANT_TYPE_BYTESTRING))
     pch = g_variant_get_bytestring(gobject_);
   else //g_variant_get_string() can handle strings, object paths, and signatures.

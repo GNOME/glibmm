@@ -545,7 +545,7 @@ void Connection::flush(const SlotAsyncReady& slot)
 bool Connection::send_message(const Glib::RefPtr<Message>& message,
   SendMessageFlags flags)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   const bool result = g_dbus_connection_send_message(gobj(),
     Glib::unwrap(message), static_cast<GDBusSendMessageFlags>(flags), 0,
@@ -587,7 +587,7 @@ Glib::RefPtr<Message> Connection::send_message_with_reply_sync(
   gint timeout_msec)
 {
   volatile guint32 out_serial = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   GDBusMessage* result =
     g_dbus_connection_send_message_with_reply_sync(gobj(),
@@ -606,7 +606,7 @@ Glib::RefPtr<Message> Connection::send_message_with_reply_sync(
   gint timeout_msec)
 {
   volatile guint32 out_serial = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   GDBusMessage* result =
     g_dbus_connection_send_message_with_reply_sync(gobj(),
@@ -679,7 +679,7 @@ Glib::VariantContainerBase Connection::call_sync(
   CallFlags                             flags,
   const Glib::VariantType&              reply_type)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   GVariant* const gvariant =
     g_dbus_connection_call_sync(gobj(), bus_name.c_str(), object_path.c_str(),
@@ -705,7 +705,7 @@ Glib::VariantContainerBase Connection::call_sync(
   CallFlags                             flags,
   const Glib::VariantType&              reply_type)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   GVariant* const gvariant =
     g_dbus_connection_call_sync(gobj(), bus_name.c_str(), object_path.c_str(),
@@ -779,7 +779,7 @@ void Connection::emit_signal(
   const Glib::ustring&                destination_bus_name,
   const Glib::VariantContainerBase&   parameters)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   // Strings are checked to see if they are empty so that NULL can be passed
   // for those strings to the C API.  This is done because some strings such as
@@ -827,7 +827,7 @@ guint Connection::register_object(const Glib::ustring& object_path,
   const Glib::RefPtr<InterfaceInfo>& interface_info,
   const InterfaceVTable& vtable)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   const guint result = g_dbus_connection_register_object(gobj(),
     object_path.c_str(), Glib::unwrap(interface_info),
@@ -842,7 +842,7 @@ guint Connection::register_object(const Glib::ustring& object_path,
 guint Connection::register_object(const Glib::ustring& object_path,
   const Glib::RefPtr<InterfaceInfo>& interface_info)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   const guint result = g_dbus_connection_register_object(gobj(),
     object_path.c_str(), Glib::unwrap(interface_info),
@@ -857,7 +857,7 @@ guint Connection::register_object(const Glib::ustring& object_path,
 guint Connection::register_subtree(const Glib::ustring& object_path,
   const SubtreeVTable& vtable, SubtreeFlags flags)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   const guint result = g_dbus_connection_register_subtree(gobj(),
     object_path.c_str(),

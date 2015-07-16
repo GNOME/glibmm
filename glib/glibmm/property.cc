@@ -239,7 +239,7 @@ PropertyBase::~PropertyBase()
 
 bool PropertyBase::lookup_property(const Glib::ustring& name)
 {
-  g_assert(param_spec_ == 0);
+  g_assert(param_spec_ == nullptr);
 
   param_spec_ = g_object_class_find_property(G_OBJECT_GET_CLASS(object_->gobj()), name.c_str());
 
@@ -249,12 +249,12 @@ bool PropertyBase::lookup_property(const Glib::ustring& name)
     g_param_spec_ref(param_spec_);
   }
 
-  return (param_spec_ != 0);
+  return (param_spec_ != nullptr);
 }
 
 void PropertyBase::install_property(GParamSpec* param_spec)
 {
-  g_return_if_fail(param_spec != 0);
+  g_return_if_fail(param_spec != nullptr);
 
   // Ensure that there would not be id clashes with possible existing
   // properties overridden from implemented interfaces if dealing with a custom
@@ -280,7 +280,7 @@ void PropertyBase::install_property(GParamSpec* param_spec)
 const char* PropertyBase::get_name_internal() const
 {
   const char *const name = g_param_spec_get_name(param_spec_);
-  g_return_val_if_fail(name != 0, "");
+  g_return_val_if_fail(name != nullptr, "");
   return name;
 }
 

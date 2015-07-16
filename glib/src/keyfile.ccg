@@ -40,7 +40,7 @@ KeyFile::~KeyFile()
 
 bool KeyFile::load_from_data(const Glib::ustring& data, KeyFileFlags flags)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   const gboolean result = g_key_file_load_from_data(
       gobj(), data.c_str(), data.bytes(),
@@ -55,8 +55,8 @@ bool KeyFile::load_from_data(const Glib::ustring& data, KeyFileFlags flags)
 
 bool KeyFile::load_from_data_dirs(const std::string& file, std::string& full_path, KeyFileFlags flags)
 {
-  GError* gerror = 0;
-  char* full_path_c = 0;
+  GError* gerror = nullptr;
+  char* full_path_c = nullptr;
 
   const gboolean result = g_key_file_load_from_data_dirs(
       gobj(), file.c_str(), &full_path_c,
@@ -76,8 +76,8 @@ bool KeyFile::load_from_data_dirs(const std::string& file, std::string& full_pat
 
 bool KeyFile::load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, std::string& full_path, KeyFileFlags flags)
 {
-  GError* gerror = 0;
-  char* full_path_c = 0;
+  GError* gerror = nullptr;
+  char* full_path_c = nullptr;
 
   const gboolean result = g_key_file_load_from_dirs(
       gobj(), file.c_str(), const_cast<const gchar**>(search_dirs.data()),
@@ -103,7 +103,7 @@ bool KeyFile::load_from_dirs(const std::string& file, const Glib::ArrayHandle<st
 
 Glib::ustring KeyFile::to_data()
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   char *const str = g_key_file_to_data(gobj(), 0, &gerror);
 
   if(gerror)
@@ -123,7 +123,7 @@ Glib::ArrayHandle<Glib::ustring> KeyFile::get_groups() const
 Glib::ArrayHandle<Glib::ustring> KeyFile::get_keys(const Glib::ustring& group_name) const
 {
   gsize length  = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   char** const array = g_key_file_get_keys(
       const_cast<GKeyFile*>(gobj()),
@@ -139,7 +139,7 @@ Glib::ArrayHandle<Glib::ustring> KeyFile::get_keys(const Glib::ustring& group_na
 Glib::ustring KeyFile::get_locale_string(const Glib::ustring& group_name,
   const Glib::ustring& key) const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   char *const str = g_key_file_get_locale_string(
       const_cast<GKeyFile*>(gobj()),
       (group_name.empty()) ? 0 : group_name.c_str(),
@@ -153,7 +153,7 @@ Glib::ustring KeyFile::get_locale_string(const Glib::ustring& group_name,
 
 bool KeyFile::get_boolean(const Glib::ustring& key) const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   const bool value =
     static_cast<bool>(g_key_file_get_boolean(const_cast<GKeyFile*>(gobj()),
     0, key.c_str(), &gerror));
@@ -165,7 +165,7 @@ bool KeyFile::get_boolean(const Glib::ustring& key) const
 
 int KeyFile::get_integer(const Glib::ustring& key) const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   const int value = g_key_file_get_integer(const_cast<GKeyFile*>(gobj()),
                                            0, key.c_str(), &gerror);
   if(gerror)
@@ -176,7 +176,7 @@ int KeyFile::get_integer(const Glib::ustring& key) const
 
 gint64 KeyFile::get_int64(const Glib::ustring& key) const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   const gint64 value = g_key_file_get_int64(const_cast<GKeyFile*>(gobj()), 0,
     key.c_str(), &gerror);
@@ -189,7 +189,7 @@ gint64 KeyFile::get_int64(const Glib::ustring& key) const
 
 guint64 KeyFile::get_uint64(const Glib::ustring& key) const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   const guint64 value = g_key_file_get_uint64(const_cast<GKeyFile*>(gobj()),
     0, key.c_str(), &gerror);
@@ -202,7 +202,7 @@ guint64 KeyFile::get_uint64(const Glib::ustring& key) const
 
 double KeyFile::get_double(const Glib::ustring& key) const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   double retvalue = g_key_file_get_double(const_cast<GKeyFile*>(gobj()), 0, key.c_str(), &(gerror));
 
   if(gerror)
@@ -224,7 +224,7 @@ Glib::ArrayHandle<Glib::ustring> KeyFile::get_string_list(const Glib::ustring& g
                                                           GLIBMM_ERROR_ARG) const
 {
   gsize   length = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   char** const array = g_key_file_get_string_list(
       const_cast<GKeyFile*>(gobj()),
@@ -242,7 +242,7 @@ Glib::ArrayHandle<Glib::ustring> KeyFile::get_locale_string_list(const Glib::ust
                                                                  GLIBMM_ERROR_ARG) const
 {
   gsize   length = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   char** const array = g_key_file_get_locale_string_list(
       const_cast<GKeyFile*>(gobj()),
@@ -259,7 +259,7 @@ Glib::ArrayHandle<bool> KeyFile::get_boolean_list(const Glib::ustring& group_nam
                                                   GLIBMM_ERROR_ARG) const
 {
   gsize   length = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   gboolean *const array = g_key_file_get_boolean_list(
       const_cast<GKeyFile*>(gobj()),
@@ -276,7 +276,7 @@ Glib::ArrayHandle<int> KeyFile::get_integer_list(const Glib::ustring& group_name
                                                  GLIBMM_ERROR_ARG) const
 {
   gsize   length = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   int *const array = g_key_file_get_integer_list(
       const_cast<GKeyFile*>(gobj()),
@@ -293,7 +293,7 @@ Glib::ArrayHandle<double> KeyFile::get_double_list(const Glib::ustring& group_na
                                                    GLIBMM_ERROR_ARG) const
 {
   gsize   length = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   double *const array = g_key_file_get_double_list(const_cast<GKeyFile*>(gobj()),
                                                    group_name.c_str(), key.c_str(),
@@ -341,7 +341,7 @@ void KeyFile::set_boolean_list(const Glib::ustring& group_name, const Glib::ustr
 
 Glib::ustring KeyFile::get_comment() const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   char *const str = g_key_file_get_comment(const_cast<GKeyFile*>(gobj()), 0, 0, &gerror);
 
   GLIBMM_THROW(gerror);
@@ -351,7 +351,7 @@ Glib::ustring KeyFile::get_comment() const
 
 Glib::ustring KeyFile::get_comment(const Glib::ustring& group_name GLIBMM_ERROR_ARG) const
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   char *const str = g_key_file_get_comment(const_cast<GKeyFile*>(gobj()),
                                            (group_name.empty()) ? 0 : group_name.c_str(),
                                            0, &gerror);
@@ -362,7 +362,7 @@ Glib::ustring KeyFile::get_comment(const Glib::ustring& group_name GLIBMM_ERROR_
 
 void KeyFile::set_comment(const Glib::ustring& comment GLIBMM_ERROR_ARG)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   g_key_file_set_comment(gobj(), 0, 0, comment.c_str(), &gerror);
 
   GLIBMM_THROW(gerror);
@@ -371,7 +371,7 @@ void KeyFile::set_comment(const Glib::ustring& comment GLIBMM_ERROR_ARG)
 void KeyFile::set_comment(const Glib::ustring& group_name, const Glib::ustring& comment
                           GLIBMM_ERROR_ARG)
 {
-  GError* gerror = 0;
+  GError* gerror = nullptr;
   g_key_file_set_comment(gobj(), (group_name.empty()) ? 0 : group_name.c_str(),
                          0, comment.c_str(), &gerror);
   GLIBMM_THROW(gerror);

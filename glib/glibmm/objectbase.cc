@@ -119,7 +119,7 @@ ObjectBase::~ObjectBase()
     g_warning("(Glib::ObjectBase::~ObjectBase): gobject_ = %p", (void*) gobject_);
 #endif
 
-    gobject_ = 0;
+    gobject_ = nullptr;
 
 #ifdef GLIBMM_DEBUG_REFCOUNTING
     g_warning("(Glib::ObjectBase::~ObjectBase): before g_object_steal_qdata()");
@@ -222,7 +222,7 @@ void ObjectBase::destroy_notify_()
   g_warning("Glib::ObjectBase::destroy_notify_: gobject_ = %p", (void*) gobject_);
 #endif
 
-  gobject_ = 0; // Make sure we don't unref it again in the dtor.
+  gobject_ = nullptr; // Make sure we don't unref it again in the dtor.
 
   delete this;
 }
@@ -236,7 +236,7 @@ bool ObjectBase::is_anonymous_custom_() const
 bool ObjectBase::is_derived_() const
 {
   // gtkmmproc-generated classes initialize this to 0 by default.
-  return (custom_type_name_ != 0);
+  return (custom_type_name_ != nullptr);
 }
 
 void ObjectBase::set_manage()

@@ -51,7 +51,7 @@ void* SignalProxyConnectionNode::notify(void* data)
   if(conn && conn->object_)
   {
     GObject* o = conn->object_;
-    conn->object_ = 0;
+    conn->object_ = nullptr;
 
     if(g_signal_handler_is_connected(o, conn->connection_id_)) //We check first, because during destruction, GTK+ sometimes seems to disconnect them for us, before we expect it to.  See bug #87912
     {
@@ -84,7 +84,7 @@ void SignalProxyConnectionNode::destroy_notify_handler(gpointer data, GClosure*)
   if(conn)
   {
     // the object has already lost track of this object.
-    conn->object_ = 0;
+    conn->object_ = nullptr;
 
     delete conn; // if there are connection objects referring to slot_ they are notified during destruction of slot_
   }

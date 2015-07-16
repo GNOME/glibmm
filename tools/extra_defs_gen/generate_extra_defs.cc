@@ -69,7 +69,7 @@ std::string get_properties(GType gtype)
   std::string strObjectName = g_type_name(gtype);
 
   //Get the list of properties:
-  GParamSpec** ppParamSpec = 0;
+  GParamSpec** ppParamSpec = nullptr;
   guint iCount = 0;
   if(G_TYPE_IS_OBJECT(gtype))
   {
@@ -160,8 +160,8 @@ std::string get_signals(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
   std::string strResult;
   std::string strObjectName = g_type_name(gtype);
 
-  gpointer gclass_ref = 0;
-  gpointer ginterface_ref = 0;
+  gpointer gclass_ref = nullptr;
+  gpointer ginterface_ref = nullptr;
 
   if(G_TYPE_IS_OBJECT(gtype))
     gclass_ref = g_type_class_ref(gtype); //Ensures that class_init() is called.
@@ -229,7 +229,7 @@ std::string get_signals(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
           gchar* pchNum = g_strdup_printf("%d", j);
           std::string strParamName = "p" + std::string(pchNum);
           g_free(pchNum);
-          pchNum = 0;
+          pchNum = nullptr;
 
           //Just like above, for the return type:
           std::string strTypeName = get_type_name_signal( typeParamMangled & ~G_SIGNAL_TYPE_STATIC_SCOPE, is_a_pointer_func ); //The type is mangled with a flag. Hacky.

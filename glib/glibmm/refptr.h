@@ -305,7 +305,7 @@ bool RefPtr<T_CppObject>::operator!=(const RefPtr<T_CppObject>& src) const
 template <class T_CppObject> inline
 RefPtr<T_CppObject>::operator bool() const
 {
-  return (pCppObject_ != 0);
+  return (pCppObject_ != nullptr);
 }
 
 #ifndef GLIBMM_DISABLE_DEPRECATED

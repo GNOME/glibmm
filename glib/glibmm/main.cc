@@ -102,7 +102,7 @@ void* SourceConnectionNode::notify(void* data)
   if (self->source_)
   {
     GSource* s = self->source_;
-    self->source_ = 0;
+    self->source_ = nullptr;
     g_source_destroy(s);
 
     // Destroying the object triggers execution of destroy_notify_handler(),
@@ -120,7 +120,7 @@ void SourceConnectionNode::destroy_notify_callback(void* data)
   if (self)
   {
     // The GLib side is disconnected now, thus the GSource* is no longer valid.
-    self->source_ = 0;
+    self->source_ = nullptr;
 
     delete self;
   }
@@ -200,10 +200,10 @@ void SourceCallbackData::destroy_notify_callback(void* data)
  */
 static SourceCallbackData* glibmm_source_get_callback_data(GSource* source)
 {
-  g_return_val_if_fail(source->callback_funcs != 0, 0);
+  g_return_val_if_fail(source->callback_funcs != nullptr, 0);
 
   GSourceFunc func;
-  void* user_data = 0;
+  void* user_data = nullptr;
 
   // Retrieve the callback function and data.
   (*source->callback_funcs->get)(source->callback_data, source, &func, &user_data);
@@ -268,7 +268,7 @@ static gboolean glibmm_source_callback_once(void* data)
 static gboolean glibmm_iosource_callback(GIOChannel*, GIOCondition condition, void* data)
 {
   SourceCallbackData *const callback_data = static_cast<SourceCallbackData*>(data);
-  g_return_val_if_fail(callback_data->node != 0, 0);
+  g_return_val_if_fail(callback_data->node != nullptr, 0);
 
   try
   {
@@ -943,10 +943,10 @@ Source::~Source()
   if(gobject_)
   {
     SourceCallbackData *const data = glibmm_source_get_callback_data(gobject_);
-    data->wrapper = 0;
+    data->wrapper = nullptr;
 
     GSource *const tmp_gobject = gobject_;
-    gobject_ = 0;
+    gobject_ = nullptr;
 
     g_source_unref(tmp_gobject);
 
@@ -1035,7 +1035,7 @@ gboolean Source::dispatch_vfunc(GSource*, GSourceFunc callback, void* user_data)
   SourceCallbackData *const callback_data = static_cast<SourceCallbackData*>(user_data);
 
   g_return_val_if_fail(callback == &glibmm_dummy_source_callback, 0);
-  g_return_val_if_fail(callback_data != 0 && callback_data->node != 0, 0);
+  g_return_val_if_fail(callback_data != nullptr && callback_data->node != nullptr, 0);
 
   try
   {
@@ -1057,7 +1057,7 @@ void Source::destroy_notify_callback(void* data)
     Source *const self = static_cast<Source*>(data);
 
     // gobject_ is already invalid at this point.
-    self->gobject_ = 0;
+    self->gobject_ = nullptr;
 
     // No exception checking: if the dtor throws, you're out of luck anyway.
     delete self;
@@ -1094,7 +1094,7 @@ sigc::slot_base* Source::get_slot_from_connection_node(void* data)
 sigc::slot_base* Source::get_slot_from_callback_data(void* data)
 {
   SourceCallbackData* const callback_data = static_cast<SourceCallbackData*>(data);
-  g_return_val_if_fail(callback_data->node != 0, 0);
+  g_return_val_if_fail(callback_data->node != nullptr, 0);
   return callback_data->node->get_slot();
 }
 

@@ -40,7 +40,7 @@ const unsigned int magic_limit(5);
 GList*
 create_list()
 {
-  GList* head = 0;
+  GList* head = nullptr;
 
   for(unsigned int iter(0); iter < magic_limit; ++iter)
   {
@@ -142,7 +142,7 @@ copy_array(GCredentials** array)
   {
     dup[iter] = array[iter];
   }
-  dup[magic_limit] = 0;
+  dup[magic_limit] = nullptr;
   return dup;
 }
 

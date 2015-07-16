@@ -98,7 +98,7 @@ Interface::Interface(const Interface_Class& interface_class)
         g_free(iface_props);
       }
     }
-    else // gobject_ == 0
+    else // gobject_ == nullptr
     {
       // The GObject is not instantiated yet. Add to the custom_interface_classes
       // and add the interface in the Glib::Object constructor.

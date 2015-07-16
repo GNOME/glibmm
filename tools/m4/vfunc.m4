@@ -117,7 +117,7 @@ ifdef(`__BOOL_IS_INTERFACE__',`dnl
 ',`dnl
       _PARENT_GCLASS_FROM_OBJECT($8)dnl
 ')  );
-dnl  g_assert(base != 0);
+dnl  g_assert(base != nullptr);
 
   // Call the original underlying C function:
   if(base && base->$2)
@@ -170,12 +170,12 @@ ifdef(`__BOOL_IS_INTERFACE__',`dnl
 ',`dnl
       _PARENT_GCLASS_FROM_OBJECT(gobject_)dnl
 ')  );
-dnl  g_assert(base != 0);
+dnl  g_assert(base != nullptr);
 
   if(base && base->$2)
   {
 ifelse($10,errthrow,`dnl
-    GError* gerror = 0;
+    GError* gerror = nullptr;
 ')dnl
 ifelse($3,void,`dnl
     (*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6));

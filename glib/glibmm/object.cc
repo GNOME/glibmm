@@ -84,10 +84,10 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_,
       static_cast<GObjectClass*>(g_type_class_ref(glibmm_class.get_type()));
 
   unsigned int n_alloced_params = 0;
-  char*        collect_error    = 0; // output argument of G_VALUE_COLLECT()
+  char*        collect_error    = nullptr; // output argument of G_VALUE_COLLECT()
 
   for(const char* name = first_property_name;
-      name != 0;
+      name != nullptr;
       name = va_arg(var_args, char*))
   {
     GParamSpec *const pspec = g_object_class_find_property(g_class, name);

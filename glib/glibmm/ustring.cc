@@ -1260,7 +1260,7 @@ ustring::FormatStream::~FormatStream()
 
 ustring ustring::FormatStream::to_string() const
 {
-  GError* error = 0;
+  GError* error = nullptr;
 
 #ifdef GLIBMM_HAVE_WIDE_STREAM
   const std::wstring str = stream_.str();
@@ -1304,7 +1304,7 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
   std::string str;
   is >> str;
 
-  GError* error = 0;
+  GError* error = nullptr;
   gsize n_bytes = 0;
   const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), 0, &n_bytes, &error));
 
@@ -1320,7 +1320,7 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
 
 std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string)
 {
-  GError* error = 0;
+  GError* error = nullptr;
   const ScopedPtr<char> buf (g_locale_from_utf8(utf8_string.raw().data(),
                                                 utf8_string.raw().size(), 0, 0, &error));
   if (error)
@@ -1344,7 +1344,7 @@ std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string)
 
 std::wistream& operator>>(std::wistream& is, ustring& utf8_string)
 {
-  GError* error = 0;
+  GError* error = nullptr;
 
   std::wstring wstr;
   is >> wstr;
@@ -1378,7 +1378,7 @@ std::wistream& operator>>(std::wistream& is, ustring& utf8_string)
 
 std::wostream& operator<<(std::wostream& os, const ustring& utf8_string)
 {
-  GError* error = 0;
+  GError* error = nullptr;
 
 #if defined(__STDC_ISO_10646__) && SIZEOF_WCHAR_T == 4
   // Avoid going through iconv if wchar_t always contains UCS-4.

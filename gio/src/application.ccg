@@ -154,7 +154,7 @@ public:
 
   const Gio::Application* get_application() const  { return application_; }
   gchar get_short_name() const { return short_name_; }
-  bool is_filename_option() const { return slot_filename_ != 0; }
+  bool is_filename_option() const { return slot_filename_ != nullptr; }
 
   const Glib::OptionGroup::SlotOptionArgString* get_slot_string() const
   { return slot_string_; }
@@ -222,7 +222,7 @@ gboolean Application_option_arg_callback(const gchar* option_name, const gchar* 
     return false;
   }
 
-  const bool has_value = (value != 0);
+  const bool has_value = (value != nullptr);
   const OptionArgCallbackData* const option_arg = iterFind->second;
   try
   {
@@ -475,7 +475,7 @@ void Application::add_main_option_entry_private(GOptionArg arg, const Glib::ustr
   else
     // We ensure that this is null to ensure that it is not used,
     // telling GApplication to put the parsed value in the options VariantDict instead.
-    array[0].arg_data = 0;
+    array[0].arg_data = nullptr;
 
   g_application_add_main_option_entries(gobj(), array);
 }

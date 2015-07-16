@@ -128,7 +128,7 @@ ThreadPool::ThreadPool(int max_threads, bool exclusive)
   gobject_   (0),
   slot_list_ (new SlotList())
 {
-  GError* error = 0;
+  GError* error = nullptr;
 
   gobject_ = g_thread_pool_new(
       &call_thread_entry_slot, slot_list_, max_threads, exclusive, &error);
@@ -136,7 +136,7 @@ ThreadPool::ThreadPool(int max_threads, bool exclusive)
   if(error)
   {
     delete slot_list_;
-    slot_list_ = 0;
+    slot_list_ = nullptr;
     Glib::Error::throw_exception(error);
   }
 }
@@ -157,7 +157,7 @@ void ThreadPool::push(const sigc::slot<void>& slot)
 {
   sigc::slot<void> *const slot_ptr = slot_list_->push(slot);
 
-  GError* error = 0;
+  GError* error = nullptr;
   g_thread_pool_push(gobject_, slot_ptr, &error);
 
   if(error)
@@ -169,7 +169,7 @@ void ThreadPool::push(const sigc::slot<void>& slot)
 
 void ThreadPool::set_max_threads(int max_threads)
 {
-  GError* error = 0;
+  GError* error = nullptr;
   g_thread_pool_set_max_threads(gobject_, max_threads, &error);
 
   if(error)
@@ -193,7 +193,7 @@ unsigned int ThreadPool::unprocessed() const
 
 bool ThreadPool::get_exclusive() const
 {
-  g_return_val_if_fail(gobject_ != 0, false);
+  g_return_val_if_fail(gobject_ != nullptr, false);
 
   return gobject_->exclusive;
 }
@@ -203,14 +203,14 @@ void ThreadPool::shutdown(bool immediately)
   if(gobject_)
   {
     g_thread_pool_free(gobject_, immediately, 1);
-    gobject_ = 0;
+    gobject_ = nullptr;
   }
 
   if(slot_list_)
   {
     slot_list_->lock_and_unlock();
     delete slot_list_;
-    slot_list_ = 0;
+    slot_list_ = nullptr;
   }
 }
 

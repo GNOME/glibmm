@@ -96,7 +96,7 @@ void __CPPNAME__`'_Class::iface_init_function(void* g_iface, void*)
 
   //This is just to avoid an "unused variable" warning when there are no vfuncs or signal handlers to connect.
   //This is a temporary fix until I find out why I can not seem to derive a GtkFileChooser interface. murrayc
-  g_assert(klass != 0); 
+  g_assert(klass != nullptr); 
 
 _IMPORT(SECTION_PCC_CLASS_INIT_VFUNCS)
 

@@ -26,7 +26,7 @@ namespace Glib
 
 Dir::Dir(const std::string& path)
 {
-  GError* error = 0;
+  GError* error = nullptr;
   gobject_ = g_dir_open(path.c_str(), 0, &error);
 
   if(error)
@@ -60,7 +60,7 @@ void Dir::close()
   if(gobject_)
   {
     g_dir_close(gobject_);
-    gobject_ = 0;
+    gobject_ = nullptr;
   }
 }
 
@@ -136,7 +136,7 @@ int file_open_tmp(std::string& name_used, const std::string& prefix)
   std::string basename_template (prefix);
   basename_template += "XXXXXX"; // this sillyness shouldn't be in the interface
 
-  GError* error = 0;
+  GError* error = nullptr;
   ScopedPtr<char> buf_name_used;
 
   const auto fileno = g_file_open_tmp(basename_template.c_str(), buf_name_used.addr(), &error);
@@ -150,7 +150,7 @@ int file_open_tmp(std::string& name_used, const std::string& prefix)
 
 int file_open_tmp(std::string& name_used)
 {
-  GError* error = 0;
+  GError* error = nullptr;
   ScopedPtr<char> buf_name_used;
 
   const auto fileno = g_file_open_tmp(0, buf_name_used.addr(), &error);
@@ -166,7 +166,7 @@ std::string file_get_contents(const std::string& filename)
 {
   ScopedPtr<char> contents;
   gsize   length = 0;
-  GError* error  = 0;
+  GError* error  = nullptr;
 
   g_file_get_contents(filename.c_str(), contents.addr(), &length, &error);
 
@@ -181,7 +181,7 @@ file_set_contents(const std::string& filename,
                   const gchar *contents,
                   gssize length)
 {
-  GError* error  = 0;
+  GError* error  = nullptr;
 
   g_file_set_contents(filename.c_str(), contents, length, &error);
 

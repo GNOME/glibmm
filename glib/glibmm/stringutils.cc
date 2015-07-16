@@ -51,7 +51,7 @@ double Glib::Ascii::strtod(const std::string&      str,
   }
 
   const char *const bufptr = str.c_str();
-  char* endptr = 0;
+  char* endptr = nullptr;
 
   const double result = g_ascii_strtod(bufptr + start_index, &endptr);
   const int    err_no = errno;

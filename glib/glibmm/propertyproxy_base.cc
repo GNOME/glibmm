@@ -112,7 +112,7 @@ void PropertyProxy_Base::reset_property_()
   const GParamSpec *const pParamSpec =
       g_object_class_find_property(G_OBJECT_GET_CLASS(obj_->gobj()), property_name_);
 
-  g_return_if_fail(pParamSpec != 0);
+  g_return_if_fail(pParamSpec != nullptr);
 
   Glib::ValueBase value;
   value.init(G_PARAM_SPEC_VALUE_TYPE(pParamSpec));
