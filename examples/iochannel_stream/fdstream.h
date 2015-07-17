@@ -77,11 +77,11 @@ public:
   fdstream_error get_error() const;
 
 protected:
-  virtual int_type underflow();
-  virtual std::streamsize xsgetn(char* dest, std::streamsize num);
-  virtual int sync();
-  virtual int_type overflow(int_type c);
-  virtual std::streamsize xsputn(const char* source, std::streamsize num);
+  int_type underflow() override;
+  std::streamsize xsgetn(char* dest, std::streamsize num) override;
+  int sync() override;
+  int_type overflow(int_type c) override;
+  std::streamsize xsputn(const char* source, std::streamsize num) override;
 
 private:
   Glib::RefPtr<Glib::IOChannel> iochannel_;
