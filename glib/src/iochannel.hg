@@ -78,15 +78,7 @@ class GlibmmIOChannel;
  * set_encoding("ISO-8859-15"). To set the channel to no encoding, use
  * set_encoding() without any arguments.
  *
- * You can create an IOChannel with one of the static create methods, or
- * implement one yourself, in which case you have to 1)&nbsp;override all
- * _vfunc() members. 2)&nbsp;set the GIOChannel flags in your constructor.
- *
- * @note This feature of being able to implement a custom Glib::IOChannel is
- * deprecated in glibmm&nbsp;2.2.  The vfunc interface has not yet stabilized
- * enough to allow that -- the C++ wrapper went in by pure accident.  Besides,
- * it isn't terribly useful either.  Thus please refrain from overriding any
- * IOChannel vfuncs.
+ * You can create an IOChannel with one of the static create methods.
  */
 class IOChannel : public sigc::trackable
 {
@@ -437,12 +429,42 @@ protected:
   IOChannel(GIOChannel* gobject, bool take_copy);
 #endif
 
+  //We don't put GLIBMM_DISABLE_DEPRECATED around these deprecated methods
+  //because they are virtual and that would make the ABI dependent on the ifdef.
+
+  /**
+   * @deprecated Custom Glib::IOChannel implementation was never really supported.
+   */
   virtual IOStatus read_vfunc(char* buf, gsize count, gsize& bytes_read);
+
+  /**
+   * @deprecated Custom Glib::IOChannel implementation was never really supported.
+   */
   virtual IOStatus write_vfunc(const char* buf, gsize count, gsize& bytes_written);
+
+  /**
+   * @deprecated Custom Glib::IOChannel implementation was never really supported.
+   */
   virtual IOStatus seek_vfunc(gint64 offset, SeekType type);
+
+  /**
+   * @deprecated Custom Glib::IOChannel implementation was never really supported.
+   */
   virtual IOStatus close_vfunc();
+
+  /**
+   * @deprecated Custom Glib::IOChannel implementation was never really supported.
+   */
   virtual IOStatus set_flags_vfunc(IOFlags flags);
+
+  /**
+   * @deprecated Custom Glib::IOChannel implementation was never really supported.
+   */
   virtual IOFlags  get_flags_vfunc();
+
+  /**
+   * @deprecated Custom Glib::IOChannel implementation was never really supported.
+   */
   virtual Glib::RefPtr<Glib::Source> create_watch_vfunc(IOCondition cond);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
