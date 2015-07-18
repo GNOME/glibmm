@@ -68,6 +68,10 @@ public:
    */
   inline RefPtr(const RefPtr& src);
 
+  /** Move constructor
+   */
+  inline RefPtr(RefPtr&& src);
+
   /** Copy constructor (from different, but castable type).
    *
    * Increments the reference count.
@@ -84,6 +88,9 @@ public:
 
   /// Copy from another RefPtr:
   inline RefPtr& operator=(const RefPtr& src);
+
+  /// Move assignment operator:
+  inline RefPtr& operator=(RefPtr&& src);
 
   /** Copy from different, but castable type).
    *
@@ -223,6 +230,14 @@ RefPtr<T_CppObject>::RefPtr(const RefPtr& src)
     pCppObject_->reference();
 }
 
+template <class T_CppObject> inline
+RefPtr<T_CppObject>::RefPtr(RefPtr&& src)
+:
+  pCppObject_ (src.pCppObject_)
+{
+  src.pCppObject_ = nullptr;
+}
+
 // The templated ctor allows copy construction from any object that's
 // castable.  Thus, it does downcasts:
 //   base_ref = derived_ref
@@ -277,6 +292,14 @@ RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr& src)
 
   RefPtr<T_CppObject> temp (src);
   this->swap(temp);
+  return *this;
+}
+
+template <class T_CppObject> inline
+RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(RefPtr&& src)
+{
+  pCppObject_ = src.pCppObject_;
+  src.pCppObject_ = nullptr;
   return *this;
 }
 
