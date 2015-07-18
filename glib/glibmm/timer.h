@@ -41,6 +41,10 @@ public:
   Timer();
   ~Timer();
 
+  // not copyable
+  Timer(const Timer&) = delete;
+  Timer& operator=(const Timer&) = delete;
+
   void start();
   void stop();
   void reset();
@@ -63,10 +67,6 @@ public:
 
 private:
   GTimer* gobject_;
-
-  // not copyable
-  Timer(const Timer&);
-  Timer& operator=(const Timer&);
 };
 
 

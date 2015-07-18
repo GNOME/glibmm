@@ -34,6 +34,10 @@ public:
   SlotList();
   ~SlotList();
 
+  // noncopyable
+  SlotList(const ThreadPool::SlotList&) = delete;
+  ThreadPool::SlotList& operator=(const ThreadPool::SlotList&) = delete;
+
   sigc::slot<void>* push(const sigc::slot<void>& slot);
   sigc::slot<void>  pop(sigc::slot<void>* slot_ptr);
 
@@ -42,10 +46,6 @@ public:
 private:
   Glib::Threads::Mutex                     mutex_;
   std::list< sigc::slot<void> >  list_;
-
-  // noncopyable
-  SlotList(const ThreadPool::SlotList&);
-  ThreadPool::SlotList& operator=(const ThreadPool::SlotList&);
 };
 
 ThreadPool::SlotList::SlotList()

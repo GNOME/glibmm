@@ -127,6 +127,10 @@ class DispatchNotifier : public sigc::trackable
 public:
   ~DispatchNotifier();
 
+  // noncopyable
+  DispatchNotifier(const DispatchNotifier&) = delete;
+  DispatchNotifier& operator=(const DispatchNotifier&) = delete;
+
   static DispatchNotifier* reference_instance(
     const Glib::RefPtr<MainContext>& context, const Dispatcher* dispatcher);
   static void unreference_instance(
@@ -158,10 +162,6 @@ private:
   void create_pipe();
   bool pipe_io_handler(Glib::IOCondition condition);
   bool pipe_is_empty();
-
-  // noncopyable
-  DispatchNotifier(const DispatchNotifier&);
-  DispatchNotifier& operator=(const DispatchNotifier&);
 };
 
 /**** Glib::DispatchNotifier ***********************************************/

@@ -171,11 +171,11 @@ protected:
   __CPPNAME__`'();
   void operator delete(void*, std::size_t);
 
-private:
   // noncopyable
-  __CPPNAME__`'(const __CPPNAME__&);
-  __CPPNAME__& operator=(const __CPPNAME__&);
+  __CPPNAME__`'(const __CPPNAME__&) = delete;
+  __CPPNAME__& operator=(const __CPPNAME__&) = delete;
 
+private:
 _IMPORT(SECTION_CLASS2)
 ')
 

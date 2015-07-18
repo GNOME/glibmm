@@ -103,6 +103,10 @@ public:
   typedef GObjectClass BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
+  // noncopyable
+  Object(const Object&) = delete;
+  Object& operator=(const Object&) = delete;
+
 protected:
   Object(); //For use by C++-only sub-types.
   explicit Object(const Glib::ConstructParams& construct_params);
@@ -144,10 +148,6 @@ public:
 private:
   friend class Glib::Object_Class;
   static CppClassType object_class_;
-
-  // noncopyable
-  Object(const Object&);
-  Object& operator=(const Object&);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 

@@ -248,10 +248,9 @@ private:')dnl endif
   friend class __CPPNAME__`'_Class;
   static CppClassType `'__BASE__`'_class_;
 
-private:
   // noncopyable
-  __CPPNAME__`'(const __CPPNAME__&);
-  __CPPNAME__& operator=(const __CPPNAME__&);
+  __CPPNAME__`'(const __CPPNAME__&) = delete;
+  __CPPNAME__& operator=(const __CPPNAME__&) = delete;
 
 protected:
   explicit __CPPNAME__`'(const Glib::ConstructParams& construct_params);

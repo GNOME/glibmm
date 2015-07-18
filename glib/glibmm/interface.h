@@ -62,6 +62,10 @@ public:
   explicit Interface(GObject* castitem);
   virtual ~Interface();
 
+  // noncopyable
+  Interface(const Interface&) = delete;
+  Interface& operator=(const Interface&) = delete;
+
   //void add_interface(GType gtype_implementer);
 
   // Hook for translating API
@@ -74,11 +78,6 @@ public:
 
   inline GObject* gobj()             { return gobject_; }
   inline const GObject* gobj() const { return gobject_; }
-
-private:
-  // noncopyable
-  Interface(const Interface&);
-  Interface& operator=(const Interface&);
 };
 
 RefPtr<ObjectBase> wrap_interface(GObject* object, bool take_copy = false);

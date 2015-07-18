@@ -875,6 +875,12 @@ struct ustring::SequenceToString<Glib::ustring::const_iterator, gunichar> : publ
 
 class ustring::FormatStream
 {
+public:
+
+  // noncopyable
+  FormatStream(const ustring::FormatStream&) = delete;
+  FormatStream& operator=(const ustring::FormatStream&) = delete;
+
 private:
 #ifdef GLIBMM_HAVE_WIDE_STREAM
   typedef std::wostringstream StreamType;
@@ -882,10 +888,6 @@ private:
   typedef std::ostringstream StreamType;
 #endif
   StreamType stream_;
-
-  // noncopyable
-  FormatStream(const ustring::FormatStream&);
-  FormatStream& operator=(const ustring::FormatStream&);
 
 public:
   FormatStream();
@@ -1261,15 +1263,15 @@ class ustring::Stringify
 private:
   ustring string_;
 
-  // noncopyable
-  Stringify(const ustring::Stringify<T>&);
-  Stringify<T>& operator=(const ustring::Stringify<T>&);
-
 public:
   explicit inline Stringify(const T& arg) : string_ (ustring::format(arg)) {}
 
   //TODO: Why is this here? See the template specialization:
   explicit inline Stringify(const char* arg) : string_(arg) {}
+
+  // noncopyable
+  Stringify(const ustring::Stringify<T>&) = delete;
+  Stringify<T>& operator=(const ustring::Stringify<T>&) = delete;
 
   inline const ustring* ptr() const { return &string_; }
 };
@@ -1281,12 +1283,13 @@ class ustring::Stringify<ustring>
 private:
   const ustring& string_;
 
-  // noncopyable
-  Stringify(const ustring::Stringify<ustring>&);
-  Stringify<ustring>& operator=(const ustring::Stringify<ustring>&);
-
 public:
   explicit inline Stringify(const ustring& arg) : string_(arg) {}
+
+  // noncopyable
+  Stringify(const ustring::Stringify<ustring>&) = delete;
+  Stringify<ustring>& operator=(const ustring::Stringify<ustring>&) = delete;
+
   inline const ustring* ptr() const { return &string_; }
 };
 
@@ -1299,12 +1302,13 @@ class ustring::Stringify<const char*>
 private:
   const ustring string_;
 
-  // noncopyable
-  Stringify(const ustring::Stringify<const char*>&);
-  Stringify<ustring>& operator=(const ustring::Stringify<const char*>&);
-
 public:
   explicit inline Stringify(const char* arg) : string_(arg) {}
+
+  // noncopyable
+  Stringify(const ustring::Stringify<const char*>&) = delete;
+  Stringify<ustring>& operator=(const ustring::Stringify<const char*>&) = delete;
+
   inline const ustring* ptr() const { return &string_; }
 };
 
@@ -1317,12 +1321,13 @@ class ustring::Stringify<char[N]>
 private:
   const ustring string_;
 
-  // noncopyable
-  Stringify(const ustring::Stringify<char[N]>&);
-  Stringify<ustring>& operator=(const ustring::Stringify<char[N]>&);
-
 public:
   explicit inline Stringify(const char arg[N]) : string_(arg) {}
+
+  // noncopyable
+  Stringify(const ustring::Stringify<char[N]>&) = delete;
+  Stringify<ustring>& operator=(const ustring::Stringify<char[N]>&) = delete;
+
   inline const ustring* ptr() const { return &string_; }
 };
 
@@ -1336,12 +1341,13 @@ class ustring::Stringify<const char[N]>
 private:
   const ustring string_;
 
-  // noncopyable
-  Stringify(const ustring::Stringify<const char[N]>&);
-  Stringify<ustring>& operator=(const ustring::Stringify<const char[N]>&);
-
 public:
   explicit inline Stringify(const char arg[N]) : string_(arg) {}
+
+  // noncopyable
+  Stringify(const ustring::Stringify<const char[N]>&) = delete;
+  Stringify<ustring>& operator=(const ustring::Stringify<const char[N]>&) = delete;
+
   inline const ustring* ptr() const { return &string_; }
 };
 

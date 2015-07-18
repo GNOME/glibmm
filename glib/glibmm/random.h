@@ -43,6 +43,10 @@ public:
   explicit Rand(guint32 seed);
   ~Rand();
 
+  // noncopyable
+  Rand(const Rand&) = delete;
+  Rand& operator=(const Rand&) = delete;
+
   void set_seed(guint32 seed);
 
   bool get_bool();
@@ -58,10 +62,6 @@ public:
 
 private:
   GRand* gobject_;
-
-  // noncopyable
-  Rand(const Rand&);
-  Rand& operator=(const Rand&);
 };
 
 /** @} group Random */

@@ -234,13 +234,13 @@ public:
   typedef __CNAME__ BaseObjectType;
   typedef __CCLASS__ BaseClassType;
 
+  // noncopyable
+  __CPPNAME__`'(const __CPPNAME__&) = delete;
+  __CPPNAME__& operator=(const __CPPNAME__&) = delete;
+
 private:
   friend class __CPPNAME__`'_Class;
   static CppClassType `'__BASE__`'_class_;
-
-  // noncopyable
-  __CPPNAME__`'(const __CPPNAME__&);
-  __CPPNAME__& operator=(const __CPPNAME__&);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 protected:

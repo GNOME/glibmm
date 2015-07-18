@@ -57,6 +57,12 @@ class Mutex;
  */
 class GLIBMM_API ObjectBase : virtual public sigc::trackable
 {
+public:
+
+  // noncopyable
+  ObjectBase(const ObjectBase&) = delete;
+  ObjectBase& operator=(const ObjectBase&) = delete;
+
 protected:
   /** This default constructor is called implicitly from the constructor of user-derived
    * classes, even if, for instance, Gtk::Button calls a different ObjectBase constructor.
@@ -235,9 +241,6 @@ protected:
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
 private:
-  // noncopyable
-  ObjectBase(const ObjectBase&);
-  ObjectBase& operator=(const ObjectBase&);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   virtual void set_manage(); // calls g_error()

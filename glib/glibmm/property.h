@@ -57,6 +57,10 @@ class PropertyBase
 {
 public:
 
+  // noncopyable
+  PropertyBase(const PropertyBase&) = delete;
+  PropertyBase& operator=(const PropertyBase&) = delete;
+
   /** Returns the name of the property.
    */
   Glib::ustring get_name() const;
@@ -98,9 +102,6 @@ protected:
   const char* get_name_internal() const;
 
 private:
-  // noncopyable
-  PropertyBase(const PropertyBase&);
-  PropertyBase& operator=(const PropertyBase&);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

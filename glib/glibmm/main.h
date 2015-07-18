@@ -405,6 +405,10 @@ public:
   typedef Glib::MainContext  CppObjectType;
   typedef GMainContext       BaseObjectType;
 
+  // noncopyable
+  MainContext(const MainContext& other) = delete;
+  MainContext& operator=(const MainContext& other) = delete;
+
   /** Creates a new MainContext.
    * @return The new MainContext.
    */
@@ -587,11 +591,6 @@ private:
   // Glib::MainContext can neither be constructed nor deleted.
   MainContext();
   void operator delete(void*, std::size_t);
-
-  // noncopyable
-  MainContext(const MainContext& other);
-  MainContext& operator=(const MainContext& other);
-
 };
 
 /** @relates Glib::MainContext */
@@ -661,6 +660,10 @@ class Source
 public:
   typedef Glib::Source  CppObjectType;
   typedef GSource       BaseObjectType;
+
+  // noncopyable
+  Source(const Source&) = delete;
+  Source& operator=(const Source&) = delete;
 
   static Glib::RefPtr<Source> create() /* = 0 */;
 
@@ -802,13 +805,7 @@ public:
   static sigc::slot_base* get_slot_from_connection_node(void* data);
   // Used by derived Source classes in other files.
   static sigc::slot_base* get_slot_from_callback_data(void* data);
-
-private:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
-  // noncopyable
-  Source(const Source&);
-  Source& operator=(const Source&);
 };
 
 

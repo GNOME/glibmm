@@ -78,6 +78,10 @@ public:
    */
   Dispatcher();
 
+  // noncopyable
+  Dispatcher(const Dispatcher&) = delete;
+  Dispatcher& operator=(const Dispatcher&) = delete;
+
   /** Create new Dispatcher instance using an arbitrary main context.
    * @throw Glib::FileError
    */
@@ -92,10 +96,6 @@ public:
 private:
   sigc::signal<void> signal_;
   DispatchNotifier*  notifier_;
-
-  // noncopyable
-  Dispatcher(const Dispatcher&);
-  Dispatcher& operator=(const Dispatcher&);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   friend class Glib::DispatchNotifier;

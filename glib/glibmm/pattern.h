@@ -43,6 +43,10 @@ public:
   explicit PatternSpec(GPatternSpec* gobject);
   ~PatternSpec();
 
+  // noncopyable
+  PatternSpec(const PatternSpec&) = delete;
+  PatternSpec& operator=(const PatternSpec&) = delete;
+
   bool match(const Glib::ustring& str) const;
   bool match(const Glib::ustring& str, const Glib::ustring& str_reversed) const;
 
@@ -54,10 +58,6 @@ public:
 
 private:
   GPatternSpec* gobject_;
-
-  // noncopyable
-  PatternSpec(const PatternSpec&);
-  PatternSpec& operator=(const PatternSpec&);
 };
 
 /** @} group PatternMatching */
