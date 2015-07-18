@@ -66,7 +66,7 @@ public:
    *
    * This increments the shared reference count.
    */
-  inline RefPtr(const RefPtr<T_CppObject>& src);
+  inline RefPtr(const RefPtr& src);
 
   /** Copy constructor (from different, but castable type).
    *
@@ -80,23 +80,23 @@ public:
    * done safely without involving a reference/unreference cycle and is
    * therefore highly efficient.
    */
-  inline void swap(RefPtr<T_CppObject>& other);
+  inline void swap(RefPtr& other);
 
   /// Copy from another RefPtr:
-  inline RefPtr<T_CppObject>& operator=(const RefPtr<T_CppObject>& src);
+  inline RefPtr& operator=(const RefPtr& src);
 
   /** Copy from different, but castable type).
    *
    * Increments the reference count.
    */
   template <class T_CastFrom>
-  inline RefPtr<T_CppObject>& operator=(const RefPtr<T_CastFrom>& src);
+  inline RefPtr& operator=(const RefPtr<T_CastFrom>& src);
 
   /// Tests whether the RefPtr<> point to the same underlying instance.
-  inline bool operator==(const RefPtr<T_CppObject>& src) const;
+  inline bool operator==(const RefPtr& src) const;
 
   /// See operator==().
-  inline bool operator!=(const RefPtr<T_CppObject>& src) const;
+  inline bool operator!=(const RefPtr& src) const;
 
   /** Dereferencing.
    *
@@ -133,7 +133,7 @@ public:
    * @endcode
    */
   template <class T_CastFrom>
-  static inline RefPtr<T_CppObject> cast_dynamic(const RefPtr<T_CastFrom>& src);
+  static inline RefPtr cast_dynamic(const RefPtr<T_CastFrom>& src);
 
   /** Static cast to derived class.
    *
@@ -143,7 +143,7 @@ public:
    * @endcode
    */
   template <class T_CastFrom>
-  static inline RefPtr<T_CppObject> cast_static(const RefPtr<T_CastFrom>& src);
+  static inline RefPtr cast_static(const RefPtr<T_CastFrom>& src);
 
   /** Cast to non-const.
    *
@@ -153,7 +153,7 @@ public:
    * @endcode
    */
   template <class T_CastFrom>
-  static inline RefPtr<T_CppObject> cast_const(const RefPtr<T_CastFrom>& src);
+  static inline RefPtr cast_const(const RefPtr<T_CastFrom>& src);
 
   //TODO: Maybe remove these if we replace operator bool() with operator const void* after
   //an API/ABI break, as suggested by Daniel Elstner? murrayc.
@@ -168,16 +168,16 @@ public:
    * is still syntactically possible, but the result is semantically
    * wrong, as p1 REL_OP p2 is interpreted as (bool)p1 REL_OP (bool)p2.
    */
-  inline bool operator<(const RefPtr<T_CppObject>& src) const;
+  inline bool operator<(const RefPtr& src) const;
 
   /// See operator<().
-  inline bool operator<=(const RefPtr<T_CppObject>& src) const;
+  inline bool operator<=(const RefPtr& src) const;
 
   /// See operator<().
-  inline bool operator>(const RefPtr<T_CppObject>& src) const;
+  inline bool operator>(const RefPtr& src) const;
 
   /// See operator<().
-  inline bool operator>=(const RefPtr<T_CppObject>& src) const;
+  inline bool operator>=(const RefPtr& src) const;
 
 private:
   T_CppObject* pCppObject_;
@@ -215,7 +215,7 @@ RefPtr<T_CppObject>::RefPtr(T_CppObject* pCppObject)
 {}
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>::RefPtr(const RefPtr<T_CppObject>& src)
+RefPtr<T_CppObject>::RefPtr(const RefPtr& src)
 :
   pCppObject_ (src.pCppObject_)
 {
@@ -241,7 +241,7 @@ RefPtr<T_CppObject>::RefPtr(const RefPtr<T_CastFrom>& src)
 }
 
 template <class T_CppObject> inline
-void RefPtr<T_CppObject>::swap(RefPtr<T_CppObject>& other)
+void RefPtr<T_CppObject>::swap(RefPtr& other)
 {
   T_CppObject *const temp = pCppObject_;
   pCppObject_ = other.pCppObject_;
@@ -249,7 +249,7 @@ void RefPtr<T_CppObject>::swap(RefPtr<T_CppObject>& other)
 }
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr<T_CppObject>& src)
+RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr& src)
 {
   // In case you haven't seen the swap() technique to implement copy
   // assignment before, here's what it does:
@@ -291,13 +291,13 @@ RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr<T_CastFrom>& sr
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator==(const RefPtr<T_CppObject>& src) const
+bool RefPtr<T_CppObject>::operator==(const RefPtr& src) const
 {
   return (pCppObject_ == src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator!=(const RefPtr<T_CppObject>& src) const
+bool RefPtr<T_CppObject>::operator!=(const RefPtr& src) const
 {
   return (pCppObject_ != src.pCppObject_);
 }
@@ -363,25 +363,25 @@ RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_const(const RefPtr<T_CastFrom>& sr
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator<(const RefPtr<T_CppObject>& src) const
+bool RefPtr<T_CppObject>::operator<(const RefPtr& src) const
 {
   return (pCppObject_ < src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator<=(const RefPtr<T_CppObject>& src) const
+bool RefPtr<T_CppObject>::operator<=(const RefPtr& src) const
 {
   return (pCppObject_ <= src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator>(const RefPtr<T_CppObject>& src) const
+bool RefPtr<T_CppObject>::operator>(const RefPtr& src) const
 {
   return (pCppObject_ > src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator>=(const RefPtr<T_CppObject>& src) const
+bool RefPtr<T_CppObject>::operator>=(const RefPtr& src) const
 {
   return (pCppObject_ >= src.pCppObject_);
 }
