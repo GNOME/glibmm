@@ -34,7 +34,7 @@ sigc::connection add_exception_handler(const sigc::slot<void>& slot);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // internal
-void exception_handlers_invoke() throw();
+void exception_handlers_invoke() noexcept;
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
 } // namespace Glib

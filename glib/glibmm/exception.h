@@ -31,7 +31,7 @@ namespace Glib
 class Exception
 {
 public:
-  virtual ~Exception() throw() = 0;
+  virtual ~Exception() noexcept = 0;
   virtual Glib::ustring what() const = 0;
 };
 

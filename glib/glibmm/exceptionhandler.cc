@@ -99,7 +99,7 @@ sigc::connection add_exception_handler(const sigc::slot<void>& slot)
 }
 
 // internal
-void exception_handlers_invoke() throw()
+void exception_handlers_invoke() noexcept
 {
   // This function will be called from our GLib signal handler proxies
   // if an exception has been caught.  It's not possible to throw C++

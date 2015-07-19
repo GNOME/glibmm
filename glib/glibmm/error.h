@@ -38,7 +38,7 @@ public:
   Error(const Error& other);
   Error& operator=(const Error& other);
 
-  virtual ~Error() throw();
+  virtual ~Error() noexcept;
 
   GQuark domain() const;
   int code() const;

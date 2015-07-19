@@ -30,7 +30,7 @@
 namespace Glib
 {
 
-Exception::~Exception() throw()
+Exception::~Exception() noexcept
 {}
 
 Glib::ustring Exception::what() const

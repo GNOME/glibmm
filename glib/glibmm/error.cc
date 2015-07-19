@@ -75,7 +75,7 @@ Error& Error::operator=(const Error& other)
   return *this;
 }
 
-Error::~Error() throw()
+Error::~Error() noexcept
 {
   if(gobject_)
     g_error_free(gobject_);
