@@ -75,11 +75,11 @@ do
     for headerfile in $i/${i}mm/*.h
     do
       echo "=== $headerfile"
-      g++ -c -x c++ -o /dev/null $headerfile $CFLAGS
+      g++ -c -x c++ -std=c++11 -o /dev/null $headerfile $CFLAGS
     done
   else
     echo "=== $i"
-    g++ -c -x c++ -o /dev/null $i $CFLAGS
+    g++ -c -x c++ -std=c++11 -o /dev/null $i $CFLAGS
   fi
 done
 
