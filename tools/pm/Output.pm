@@ -603,7 +603,7 @@ sub output_wrap_sig_decl($$$$$$$$$$$$$$)
 
   # Get the existing signal documentation from the parsed docs.
   my $documentation = DocsParser::lookup_documentation(
-    "$$objCSignal{class}::$underscored_signal_name", $deprecation_docs, $newin);
+    "$$objCSignal{class}::$underscored_signal_name", $deprecation_docs, $newin, $objCppfunc);
 
   # Create a merged Doxygen comment block for the signal from the looked up
   # docs (the block will also contain a prototype of the slot as an example).
