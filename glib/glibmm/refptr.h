@@ -132,6 +132,13 @@ public:
    */
   inline void reset();
 
+  /** Release the ownership of underlying instance.
+   *
+   * RefPtr's underlying instance is set to nullptr, therefore underlying object can't be accessed through this RefPtr anymore.
+   * @return an underlying instance.
+   */
+  inline T_CppObject* release() __attribute__((warn_unused_result));
+
   /** Dynamic cast to derived class.
    *
    * The RefPtr can't be cast with the usual notation so instead you can use
@@ -353,6 +360,14 @@ void RefPtr<T_CppObject>::reset()
 {
   RefPtr<T_CppObject> temp; // swap with an empty RefPtr<> to clear *this
   this->swap(temp);
+}
+
+template <class T_CppObject> inline
+T_CppObject* RefPtr<T_CppObject>::release()
+{
+  T_CppObject *tmp = pCppObject_;
+  pCppObject_ = nullptr;
+  return tmp;
 }
 
 template <class T_CppObject>
