@@ -21,8 +21,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef GLIBMM_DISABLE_DEPRECATED
-
 #include <glibmmconfig.h>
 #include <glibmm/sarray.h> /* for backward compatibility */
 #include <glib.h>
@@ -359,7 +357,5 @@ public:
 } // namespace Glib
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
-#endif //GLIBMM_DISABLE_DEPRECATED
 
 #endif /* _GLIBMM_CONTAINERS_H */
