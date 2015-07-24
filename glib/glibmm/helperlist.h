@@ -22,7 +22,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef GLIBMM_DISABLE_DEPRECATED
+//This is not hidden by GLIBMM_DISABLE_DEPRECATED
+//because gtkmm-2.24 still uses this type in its public API.
+//Note that gtkmm-2.24 itself is completely deprecated, so we really
+//can remove this whole class some time soon.
+//#ifndef GLIBMM_DISABLE_DEPRECATED
 
 #include <glibmm/containers.h>
 
@@ -169,7 +173,7 @@ protected:
 
 } /* namespace Glib */
 
-#endif //GLIBMM_DISABLE_DEPRECATED
+//#endif //GLIBMM_DISABLE_DEPRECATED
 
 #endif /* _GLIBMM_HELPERLIST_H */
 
