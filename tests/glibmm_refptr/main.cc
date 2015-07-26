@@ -51,6 +51,10 @@ private:
   int max_ref_count_;
 };
 
+class SomethingDerived : public Something
+{
+};
+
 class Parent
 {
 public:
@@ -192,6 +196,27 @@ void test_refptr_with_parent_move_constructor()
   g_assert_cmpint(parent.something_max_ref_count(), ==, 2);
 }
 
+static
+void test_refptr_universal_reference_move_constructor()
+{
+  Glib::RefPtr<SomethingDerived> refSomethingDerived(new SomethingDerived());
+  Glib::RefPtr<Something> refSomething = std::move(refSomethingDerived);
+  g_assert_cmpint(refSomething->ref_count(), ==, 1);
+  g_assert(!refSomethingDerived);
+  g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
+}
+
+static
+void test_refptr_universal_reference_asignment_operator()
+{
+  Glib::RefPtr<SomethingDerived> refSomethingDerived(new SomethingDerived());
+  Glib::RefPtr<Something> refSomething;
+  refSomething = std::move(refSomethingDerived);
+  g_assert_cmpint(refSomething->ref_count(), ==, 1);
+  g_assert(!refSomethingDerived);
+  g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
+}
+
 int main(int, char**)
 {
   //Test initial refcount:
@@ -210,6 +235,14 @@ int main(int, char**)
   //(perfect-forwarding)move constructor, which should not involve a temporary
   //instance:
   test_refptr_with_parent_move_constructor();  
+
+  //Test the refcount when using the RefPtr move constructor with derived class
+  //as an argument.
+  test_refptr_universal_reference_move_constructor();
+
+  //Test the refcount when using the RefPtr assignment operator (operator=)
+  //with derived class as an argument.
+  test_refptr_universal_reference_asignment_operator();
 
   return EXIT_SUCCESS;
 }
