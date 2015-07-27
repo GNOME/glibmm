@@ -1,7 +1,6 @@
 // Bug 564005 - Valgrind errors and crash on exit with Gtk::UIManager
 // Bug 154498 - Unnecessary warning on console: signalproxy_connectionnode.cc
 
-// libsigc++-only test case. (Or almost so. glib_refptr.h is stolen from glibmm.)
 
 #include <glibmm/refptr.h>
 #include <sigc++/sigc++.h>
