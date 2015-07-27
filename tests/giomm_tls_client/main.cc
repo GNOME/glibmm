@@ -44,7 +44,7 @@ int main(int, char**)
 {
   Gio::init();
 
-  const Glib::ustring test_host = "www.google.com";
+  const Glib::ustring test_host = "www.gnome.org";
 
   std::vector< Glib::RefPtr<Gio::InetAddress> > inet_addresses;
 
