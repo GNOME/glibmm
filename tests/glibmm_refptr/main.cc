@@ -61,7 +61,7 @@ public:
   {
   }
 
-  explicit Parent(const Glib::RefPtr<Something>&& something)
+  explicit Parent(Glib::RefPtr<Something>&& something)
   : something_(std::move(something)),
     was_constructed_via_copy_constructor_(false),
     was_constructed_via_move_constructor_(true)
@@ -189,7 +189,7 @@ void test_refptr_with_parent_move_constructor()
   g_assert(parent.was_constructed_via_move_constructor());
   g_assert(!parent.was_constructed_via_copy_constructor());
   g_assert_cmpint(parent.something_ref_count(), ==, 2); //1 in parent and 1 inside get_something()
-  g_assert_cmpint(parent.something_max_ref_count(), ==, 3); //TODO: Avoid the extra ref in RefPtr::swap()?
+  g_assert_cmpint(parent.something_max_ref_count(), ==, 2);
 }
 
 int main(int, char**)
