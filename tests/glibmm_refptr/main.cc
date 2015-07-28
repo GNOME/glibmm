@@ -197,6 +197,27 @@ void test_refptr_with_parent_move_constructor()
 }
 
 static
+void test_refptr_move_constructor()
+{
+  Glib::RefPtr<Something> refSomething(new Something());
+  Glib::RefPtr<Something> refSomething2(std::move(refSomething));
+  g_assert_cmpint(refSomething2->ref_count(), ==, 1);
+  g_assert(!refSomething);
+  g_assert_cmpint(refSomething2->max_ref_count(), ==, 1);
+}
+
+static
+void test_refptr_move_assignment_operator()
+{
+  Glib::RefPtr<Something> refSomething(new Something());
+  Glib::RefPtr<Something> refSomething2;
+  refSomething2 = std::move(refSomething);
+  g_assert_cmpint(refSomething2->ref_count(), ==, 1);
+  g_assert(!refSomething);
+  g_assert_cmpint(refSomething2->max_ref_count(), ==, 1);
+}
+
+static
 void test_refptr_universal_reference_move_constructor()
 {
   Glib::RefPtr<SomethingDerived> refSomethingDerived(new SomethingDerived());
@@ -228,11 +249,17 @@ int main(int, char**)
   //Test refcount when using the RefPtr assignment operator (operator=):
   test_refptr_assignment_operator();
 
+  //Test the refcount when using the RefPtr move constuctor:
+  test_refptr_move_constructor();
+
+  //Test the refcount when using the RefPtr move asignment operator (operator=):
+  test_refptr_move_assignment_operator();
+
   //Test the refcount when another class makes a copy via its constructor:
   test_refptr_with_parent_copy_constructor();
 
   //Test the refcount when another class makes a copy via its
-  //(perfect-forwarding)move constructor, which should not involve a temporary
+  //(perfect-forwarding) move constructor, which should not involve a temporary
   //instance:
   test_refptr_with_parent_move_constructor();  
 
