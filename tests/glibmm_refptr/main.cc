@@ -200,7 +200,7 @@ static
 void test_refptr_universal_reference_move_constructor()
 {
   Glib::RefPtr<SomethingDerived> refSomethingDerived(new SomethingDerived());
-  Glib::RefPtr<Something> refSomething = std::move(refSomethingDerived);
+  Glib::RefPtr<Something> refSomething(std::move(refSomethingDerived));
   g_assert_cmpint(refSomething->ref_count(), ==, 1);
   g_assert(!refSomethingDerived);
   g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
