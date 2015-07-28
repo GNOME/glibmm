@@ -20,6 +20,7 @@
  */
 
 #include <glibmmconfig.h>
+#include <utility>
 
 namespace Glib
 {
@@ -323,16 +324,9 @@ RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr& src)
 template <class T_CppObject> inline
 RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(RefPtr&& src)
 {
-  if (pCppObject_)
-    pCppObject_->unreference();
-
-  pCppObject_ = src.pCppObject_;
+  RefPtr<T_CppObject> temp (std::move(src));
+  this->swap(temp);
   src.pCppObject_ = nullptr;
-
-  //This should work instead, but seems less efficient:
-  //RefPtr<T_CppObject> temp (src);
-  //this->swap(temp);
-  //src.pCppObject_ = nullptr;
 
   return *this;
 }
