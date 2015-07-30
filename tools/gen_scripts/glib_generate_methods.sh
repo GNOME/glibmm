@@ -26,12 +26,14 @@ PREFIX="$JHBUILD_SOURCES/glib"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/glib/src"
 
+shopt -s extglob # Enable extended pattern matching
 if [ $# -eq 0 ]
 then
   H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
-  $H2DEF_PY "$PREFIX"/glib/*.h "$PREFIX"/glib/deprecated/*.h > "$OUT_DIR"/glib_functions.defs
-  $H2DEF_PY "$PREFIX"/gmodule/*.h > "$OUT_DIR"/gmodule_functions.defs
-  $H2DEF_PY "$PREFIX"/gobject/*.h > "$OUT_DIR"/gobject_functions.defs
+  # Process files whose names end with .h, but not with private.h.
+  $H2DEF_PY "$PREFIX"/glib/!(*private).h "$PREFIX"/glib/deprecated/!(*private).h > "$OUT_DIR"/glib_functions.defs
+  $H2DEF_PY "$PREFIX"/gmodule/!(*private).h > "$OUT_DIR"/gmodule_functions.defs
+  $H2DEF_PY "$PREFIX"/gobject/!(*private).h > "$OUT_DIR"/gobject_functions.defs
   # patch version 2.7.5 does not like directory names.
   cd "$OUT_DIR"
   PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"

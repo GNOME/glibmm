@@ -13,6 +13,8 @@ PREFIX="$JHBUILD_SOURCES/glib"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/gio/src"
 
+shopt -s extglob # Enable extended pattern matching
 H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
-$H2DEF_PY "$PREFIX"/gio/*.h > "$OUT_DIR"/gio_methods.defs
+# Process files whose names end with .h, but not with private.h.
+$H2DEF_PY "$PREFIX"/gio/!(*private).h > "$OUT_DIR"/gio_methods.defs
 #patch "$OUT_DIR"/gio_methods.defs "$OUT_DIR"/gio_methods.defs.patch

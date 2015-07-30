@@ -26,12 +26,14 @@ PREFIX="$JHBUILD_SOURCES/glib"
 ROOT_DIR="$(dirname "$0")/../.."
 OUT_DIR="$ROOT_DIR/glib/src"
 
+shopt -s extglob # Enable extended pattern matching
 if [ $# -eq 0 ]
 then
   ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
-  $ENUM_PL "$PREFIX"/glib/*.h "$PREFIX"/glib/deprecated/*.h > "$OUT_DIR"/glib_enums.defs
-  $ENUM_PL "$PREFIX"/gmodule/*.h > "$OUT_DIR"/gmodule_enums.defs
-  $ENUM_PL "$PREFIX"/gobject/*.h > "$OUT_DIR"/gobject_enums.defs
+  # Process files whose names end with .h, but not with private.h.
+  $ENUM_PL "$PREFIX"/glib/!(*private).h "$PREFIX"/glib/deprecated/!(*private).h > "$OUT_DIR"/glib_enums.defs
+  $ENUM_PL "$PREFIX"/gmodule/!(*private).h > "$OUT_DIR"/gmodule_enums.defs
+  $ENUM_PL "$PREFIX"/gobject/!(*private).h > "$OUT_DIR"/gobject_enums.defs
   # patch version 2.7.5 does not like directory names.
   cd "$OUT_DIR"
   PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"

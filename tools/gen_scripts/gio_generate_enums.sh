@@ -28,10 +28,12 @@ OUT_DIR="$ROOT_DIR/gio/src"
 OUT_FILE=gio_enums.defs
 OUT_DIR_FILE="$OUT_DIR"/$OUT_FILE
 
+shopt -s extglob # Enable extended pattern matching
 if [ $# -eq 0 ]
 then
   ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
-  $ENUM_PL "$PREFIX"/gio/*.h > "$OUT_DIR_FILE"
+  # Process files whose names end with .h, but not with private.h.
+  $ENUM_PL "$PREFIX"/gio/!(*private).h > "$OUT_DIR_FILE"
   # patch version 2.7.5 does not like directory names.
   cd "$OUT_DIR"
   PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"
