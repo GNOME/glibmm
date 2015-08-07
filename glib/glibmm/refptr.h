@@ -20,6 +20,7 @@
  */
 
 #include <glibmmconfig.h>
+#include <glib.h>
 #include <utility>
 
 namespace Glib
@@ -146,8 +147,12 @@ public:
    *
    * RefPtr's underlying instance is set to nullptr, therefore underlying object can't be accessed through this RefPtr anymore.
    * @return an underlying instance.
+   *
+   * Most users should not use release(). It can spoil the automatic destruction
+   * of the managed object. A legitimate use is if you immediately give RefPtr's
+   * reference to another object.
    */
-  inline T_CppObject* release() __attribute__((warn_unused_result));
+  inline T_CppObject* release() G_GNUC_WARN_UNUSED_RESULT;
 
   /** Dynamic cast to derived class.
    *
