@@ -5652,7 +5652,7 @@ lock.
 
 <function name="g_async_queue_remove">
 <description>
-Remove an item from the queue. This function does not block.
+Remove an item from the queue.
 
 Since: 2.46
 
@@ -5674,7 +5674,7 @@ Since: 2.46
 
 <function name="g_async_queue_remove_unlocked">
 <description>
-Remove an item from the queue. This function does not block.
+Remove an item from the queue.
 
 This function must be called while holding the @queue's lock.
 
@@ -19239,7 +19239,7 @@ If you supplied a @key_destroy_func when creating the
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE of the key did not exist yet
+<return> %TRUE if the key did not exist yet
 </return>
 </function>
 
@@ -26833,28 +26833,24 @@ malloc() can be used interchangeable with memory allocated using g_malloc().
 This function is useful for avoiding an extra copy of allocated memory returned
 by a non-GLib-based API.
 
-A different allocator can be set using g_mem_set_vtable().
-
+Deprecated: 2.46: GLib always uses the system malloc, so this function always
+returns %TRUE.
 
 </description>
 <parameters>
 </parameters>
 <return> if %TRUE, malloc() and g_malloc() can be mixed.
+
 </return>
 </function>
 
 <function name="g_mem_profile">
 <description>
-Outputs a summary of memory usage.
+GLib used to support some tools for memory profiling, but this
+no longer works. There are many other useful tools for memory
+profiling these days which can be used instead.
 
-It outputs the frequency of allocations of different sizes,
-the total number of bytes which have been allocated,
-the total number of bytes which have been freed,
-and the difference between the previous two values, i.e. the number of bytes
-still in use.
-
-Note that this function will not output anything unless you have
-previously installed the #glib_mem_profiler_table with g_mem_set_vtable().
+Deprecated: 2.46: Use other memory profiling tools instead
 
 </description>
 <parameters>
@@ -26864,17 +26860,12 @@ previously installed the #glib_mem_profiler_table with g_mem_set_vtable().
 
 <function name="g_mem_set_vtable">
 <description>
-Sets the #GMemVTable to use for memory allocation. You can use this
-to provide custom memory allocation routines.
+This function used to let you override the memory allocation function.
+However, its use was incompatible with the use of global constructors
+in GLib and GIO, because those use the GLib allocators before main is
+reached. Therefore this function is now deprecated and is just a stub.
 
-The @vtable only needs to provide malloc(), realloc(), and free()
-functions; GLib can provide default implementations of the others.
-The malloc() and realloc() implementations should return %NULL on
-failure, GLib will handle error-checking for you. @vtable is copied,
-so need not persist after this function has been called.
-
-Note that this function must be called before using any other GLib
-functions.
+Deprecated: 2.46: Use other memory profiling tools instead
 
 </description>
 <parameters>
@@ -42347,13 +42338,8 @@ tools it is enough to make the program have a wmain() instead of
 main(). wmain() has a wide character argument vector as parameter.
 
 At least currently, mingw doesn't support wmain(), so if you use
-mingw to develop the spawned program, it will have to call the
-undocumented function __wgetmainargs() to get the wide character
-argument vector and environment. See gspawn-win32-helper.c in the
-GLib sources or init.c in the mingw runtime sources for a prototype
-for that function. Alternatively, you can retrieve the Win32 system
-level wide character command line passed to the spawned program
-using the GetCommandLineW() function.
+mingw to develop the spawned program, it should call
+g_win32_get_command_line() to get arguments in UTF-8.
 
 On Windows the low-level child process creation API CreateProcess()
 doesn't use argument vectors, but a command line. The C runtime
@@ -43507,6 +43493,10 @@ uses the signed value of each byte.
 
 It can be passed to g_hash_table_new() as the @hash_func parameter,
 when using non-%NULL strings as keys in a #GHashTable.
+
+Note that this function may not be a perfect fit for all use cases.
+For example, it produces some hash collisions with strings as short
+as 2.
 
 
 </description>
@@ -60058,10 +60048,7 @@ against at application run time.
 
 <function name="glib_mem_profiler_table">
 <description>
-A #GMemVTable containing profiling variants of the memory
-allocation functions. Use them together with g_mem_profile()
-in order to get information about the memory allocation pattern
-of your program.
+Deprecated: 2.46: Use other memory profiling tools instead
 
 </description>
 <parameters>

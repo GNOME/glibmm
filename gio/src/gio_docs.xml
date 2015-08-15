@@ -284,8 +284,8 @@ decide to perform certain actions, including direct local handling
 
 In the event that the application is marked
 %G_APPLICATION_HANDLES_COMMAND_LINE the &quot;normal processing&quot; will
-send the @option dictionary to the primary instance where it can be
-read with g_application_command_line_get_options().  The signal
+send the @options dictionary to the primary instance where it can be
+read with g_application_command_line_get_options_dict().  The signal
 handler can modify the dictionary before returning, and the
 modified dictionary will be sent.
 
@@ -3928,6 +3928,31 @@ Since: 2.32
 </description>
 </property>
 
+<property name="GNetworkMonitor:network-metered">
+<description>
+Whether the network is considered metered. That is, whether the
+system has traffic flowing through the default connection that is
+subject to limitations set by service providers. For example, traffic
+might be billed by the amount of data transmitted, or there might be a
+quota on the amount of traffic per month. This is typical with tethered
+connections (3G and 4G) and in such situations, bandwidth intensive
+applications may wish to avoid network activity where possible if it will
+cost the user money or use up their limited quota.
+
+If more information is required about specific devices then the
+system network management API should be used instead (for example,
+NetworkManager or ConnMan).
+
+If this information is not available then no networks will be
+marked as metered.
+
+See also #GNetworkMonitor:network-available.
+
+Since: 2.46
+
+</description>
+</property>
+
 <enum name="GNotificationPriority">
 <description>
 Priority levels for #GNotifications.
@@ -5120,6 +5145,15 @@ g_socket_listener_add_address()
 
 </return>
 </signal>
+
+<property name="GSocketService:active">
+<description>
+Whether the service is currently accepting connections.
+
+Since: 2.46
+
+</description>
+</property>
 
 <enum name="GSocketType">
 <description>
@@ -15271,7 +15305,8 @@ to match on all kinds of arguments
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> flags describing how to subscribe to the signal (currently unused)
+<parameter_description> #GDBusSignalFlags describing how arg0 is used in subscribing to the
+signal
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -35272,6 +35307,25 @@ Since: 2.32
 </return>
 </function>
 
+<function name="g_network_monitor_get_network_metered">
+<description>
+Checks if the network is metered.
+See #GNetworkMonitor:network-metered for more details.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="monitor">
+<parameter_description> the #GNetworkMonitor
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether the connection is metered
+
+</return>
+</function>
+
 <function name="g_network_service_get_domain">
 <description>
 Gets the domain that @srv serves. This might be either UTF-8 or
@@ -38593,6 +38647,9 @@ Since: 2.22
 Returns all the names of children at the specified @path in the resource.
 The return result is a %NULL terminated list of strings which should
 be released with g_strfreev().
+
+If @path is invalid or does not exist in the #GResource,
+%G_RESOURCE_ERROR_NOT_FOUND will be returned.
 
 @lookup_flags controls the behaviour of the lookup.
 
