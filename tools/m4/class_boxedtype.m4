@@ -135,14 +135,14 @@ __CPPNAME__::__CPPNAME__`'(const __CPPNAME__& other)
   gobject_ ((other.gobject_) ? __BOXEDTYPE_FUNC_COPY`'(other.gobject_) : 0)
 {}
 
-__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& other)
+__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& other) noexcept
 :
   gobject_(other.gobject_)
 {
   other.gobject_ = nullptr;
 }
 
-__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__`'&& other)
+__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__`'&& other) noexcept
 {
   __CPPNAME__ temp (other);
   swap(temp);
@@ -173,7 +173,7 @@ dnl This could be a free or an unref, we do not need to know.
     __BOXEDTYPE_FUNC_FREE`'(gobject_);
 }
 
-void __CPPNAME__::swap(__CPPNAME__& other)
+void __CPPNAME__::swap(__CPPNAME__& other) noexcept
 {
   __CNAME__ *const temp = gobject_;
   gobject_ = other.gobject_;
@@ -222,13 +222,13 @@ ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
   __CPPNAME__`'(const __CPPNAME__& other);
   __CPPNAME__& operator=(const __CPPNAME__& other);
 
-  __CPPNAME__`'(__CPPNAME__&& other);
-  __CPPNAME__& operator=(__CPPNAME__&& other);
+  __CPPNAME__`'(__CPPNAME__&& other) noexcept;
+  __CPPNAME__& operator=(__CPPNAME__&& other) noexcept;
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
   ~__CPPNAME__`'();
 
-  void swap(__CPPNAME__& other);
+  void swap(__CPPNAME__& other) noexcept;
 
   ///Provides access to the underlying C instance.
   __CNAME__*       gobj()       { return gobject_; }
