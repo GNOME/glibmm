@@ -16908,6 +16908,10 @@ updated environment list. Free it using g_strfreev().
 <description>
 A convenience function/macro to log an error message.
 
+This is not intended for end user error reporting. Use of #GError is
+preferred for that instead, as it allows calling functions to perform actions
+conditional on the type of error.
+
 Error messages are always fatal, resulting in a call to
 abort() to terminate the application. This function will
 result in a core dump; don't use it for errors you expect.
@@ -20290,6 +20294,9 @@ default idle priority, #G_PRIORITY_DEFAULT_IDLE.  If the function
 returns %FALSE it is automatically removed from the list of event
 sources and will not be called again.
 
+See [memory management of sources][mainloop-memory-management] for details
+on how to handle the return value and memory management of @data.
+
 This internally creates a main loop source using g_idle_source_new()
 and attaches it to the global #GMainContext using g_source_attach(), so
 the callback will be invoked in whichever thread is running that main
@@ -20317,6 +20324,9 @@ use a custom main context.
 Adds a function to be called whenever there are no higher priority
 events pending.  If the function returns %FALSE it is automatically
 removed from the list of event sources and will not be called again.
+
+See [memory management of sources][mainloop-memory-management] for details
+on how to handle the return value and memory management of @data.
 
 This internally creates a main loop source using g_idle_source_new()
 and attaches it to the global #GMainContext using g_source_attach(), so
@@ -38843,6 +38853,9 @@ Connects a #GCallback function to a signal for a particular object.
 
 The handler will be called before the default handler of the signal.
 
+See [memory management of signal handlers][signal-memory-management] for
+details on how to handle the return value and memory management of @data.
+
 
 </description>
 <parameters>
@@ -41936,6 +41949,9 @@ called from the source's dispatch function.
 The exact type of @func depends on the type of source; ie. you
 should not count on @func being called with @data as its first
 parameter.
+
+See [memory management of sources][mainloop-memory-management] for details
+on how to handle memory management of @data.
 
 Typically, you won't use this function. Instead use functions specific
 to the type of source you are using.
@@ -47338,6 +47354,10 @@ Some systems restrict the length of @name to 16 bytes.
 If the thread can not be created the program aborts. See
 g_thread_try_new() if you want to attempt to deal with failures.
 
+If you are using threads to offload (potentially many) short-lived tasks,
+#GThreadPool may be more appropriate than manually spawning and tracking
+multiple #GThreads.
+
 To free the struct returned by this function, use g_thread_unref().
 Note that g_thread_join() implicitly unrefs the #GThread as well.
 
@@ -48305,6 +48325,9 @@ After each call to the timeout function, the time of the next
 timeout is recalculated based on the current time and the given interval
 (it does not try to 'catch up' time lost in delays).
 
+See [memory management of sources][mainloop-memory-management] for details
+on how to handle the return value and memory management of @data.
+
 If you want to have a timer in the &quot;seconds&quot; range and do not care
 about the exact time of the first call of the timer, use the
 g_timeout_add_seconds() function; this function allows for more
@@ -48354,6 +48377,9 @@ event sources. Thus they should not be relied on for precise timing.
 After each call to the timeout function, the time of the next
 timeout is recalculated based on the current time and the given interval
 (it does not try to 'catch up' time lost in delays).
+
+See [memory management of sources][mainloop-memory-management] for details
+on how to handle the return value and memory management of @data.
 
 This internally creates a main loop source using g_timeout_source_new()
 and attaches it to the global #GMainContext using g_source_attach(), so
@@ -48410,6 +48436,9 @@ Note that the first call of the timer may not be precise for timeouts
 of one second. If you need finer precision and have such a timeout,
 you may want to use g_timeout_add() instead.
 
+See [memory management of sources][mainloop-memory-management] for details
+on how to handle the return value and memory management of @data.
+
 The interval given is in terms of monotonic time, not wall clock
 time.  See g_get_monotonic_time().
 
@@ -48454,6 +48483,9 @@ Note that timeout functions may be delayed, due to the processing of other
 event sources. Thus they should not be relied on for precise timing.
 After each call to the timeout function, the time of the next
 timeout is recalculated based on the current time and the given @interval
+
+See [memory management of sources][mainloop-memory-management] for details
+on how to handle the return value and memory management of @data.
 
 If you want timing more precise than whole seconds, use g_timeout_add()
 instead.
@@ -56295,7 +56327,7 @@ Returns the string value of a #GVariant instance with a string
 type.  This includes the types %G_VARIANT_TYPE_STRING,
 %G_VARIANT_TYPE_OBJECT_PATH and %G_VARIANT_TYPE_SIGNATURE.
 
-The string will always be UTF-8 encoded.
+The string will always be UTF-8 encoded, and will never be %NULL.
 
 If @length is non-%NULL then the length of the string (in bytes) is
 returned there.  For trusted values, this information is already
@@ -57782,7 +57814,9 @@ Since: 2.24
 <description>
 Creates a string #GVariant with the contents of @string.
 
-@string must be valid UTF-8.
+@string must be valid UTF-8, and must not be %NULL. To encode
+potentially-%NULL strings, use g_variant_new() with `ms` as the
+[format string][gvariant-format-strings-maybe-types].
 
 Since: 2.24
 
@@ -57827,7 +57861,8 @@ Since: 2.24
 <description>
 Creates a string #GVariant with the contents of @string.
 
-@string must be valid UTF-8.
+@string must be valid UTF-8, and must not be %NULL. To encode
+potentially-%NULL strings, use this with g_variant_new_maybe().
 
 This function consumes @string.  g_free() will be called on @string
 when it is no longer required.
@@ -59332,6 +59367,10 @@ Since: 2.16
 <function name="g_warning">
 <description>
 A convenience function/macro to log a warning message.
+
+This is not intended for end user error reporting. Use of #GError is
+preferred for that instead, as it allows calling functions to perform actions
+conditional on the type of error.
 
 You can make warnings fatal at runtime by setting the `G_DEBUG`
 environment variable (see
