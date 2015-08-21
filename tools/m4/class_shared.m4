@@ -39,6 +39,22 @@ ifelse(`$2',,,`
 #endif // $2
 ')dnl
 _POP()
+_PUSH(SECTION_CC_MOVE_CONSTRUCTOR_INTERFACES)
+ifelse(`$2',,,`#ifdef $2'
+)dnl
+  , $1`'(std::move(src))
+ifelse(`$2',,,`
+#endif // $2
+')dnl
+_POP()
+_PUSH(SECTION_CC_MOVE_ASSIGNMENT_OPERATOR_INTERFACES)
+ifelse(`$2',,,`#ifdef $2'
+)dnl
+  $1`'::operator=(std::move(src));
+ifelse(`$2',,,`
+#endif // $2
+')dnl
+_POP()
 ')
 
 dnl GVolumeMonitor can be broken/impeded by defining a sub-type.

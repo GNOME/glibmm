@@ -213,11 +213,13 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem)
 
 __CPPNAME__::__CPPNAME__`'(__CPPNAME__&& src)
 : __CPPPARENT__`'(std::move(src))
+_IMPORT(SECTION_CC_MOVE_CONSTRUCTOR_INTERFACES)
 {}
 
 __CPPNAME__& __CPPNAME__::operator=(__CPPNAME__&& src)
 {
   __CPPPARENT__::operator=`'(std::move(src));
+_IMPORT(SECTION_CC_MOVE_ASSIGNMENT_OPERATOR_INTERFACES)
   return *this;
 }
 

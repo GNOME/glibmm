@@ -179,6 +179,8 @@ _NEW_SECTION(SECTION_CLASS2)      dnl  _CLASS to end of class
 _NEW_SECTION(SECTION_CC)   dnl  section for methods (in current namespace)
 
 _NEW_SECTION(SECTION_CC_IMPLEMENTS_INTERFACES)   dnl Calls SomeBaseInterface::add_interface(get_type()).
+_NEW_SECTION(SECTION_CC_MOVE_CONSTRUCTOR_INTERFACES)   dnl Calls the base constructors
+_NEW_SECTION(SECTION_CC_MOVE_ASSIGNMENT_OPERATOR_INTERFACES)   dnl Calls the base move assignment operator
 
 dnl Virtual Functions and Default Signal Handlers (Very similar)
 _NEW_SECTION(SECTION_H_VFUNCS)      dnl Declaration of vfunc hooks.
