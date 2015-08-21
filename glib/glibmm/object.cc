@@ -285,6 +285,16 @@ Object::Object(GObject* castitem)
   ObjectBase::initialize(castitem);
 }
 
+Object::Object(Object&& src) noexcept
+: ObjectBase(std::move(src))
+{}
+
+Object& Object::operator=(Object&& src) noexcept
+{
+  ObjectBase::operator=(std::move(src));
+  return *this;
+}
+
 Object::~Object()
 {
   cpp_destruction_in_progress_ = true;

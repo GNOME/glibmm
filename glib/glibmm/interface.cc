@@ -117,6 +117,16 @@ Interface::Interface(GObject* castitem)
 Interface::Interface()
 {}
 
+Interface::Interface(Interface&& src)
+: ObjectBase(std::move(src))
+{}
+
+Interface& Interface::operator=(Interface&& src)
+{
+  ObjectBase::operator=(std::move(src));
+  return *this;
+}
+
 Interface::~Interface()
 {}
 

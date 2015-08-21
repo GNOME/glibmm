@@ -90,6 +90,24 @@ void ObjectBase::initialize(GObject* castitem)
   _set_current_wrapper(castitem);
 }
 
+ObjectBase::ObjectBase(ObjectBase&& src) noexcept
+: gobject_(std::move(src.gobject_)),
+  custom_type_name_(std::move(src.custom_type_name_)),
+  cpp_destruction_in_progress_(std::move(src.custom_type_name_))
+{}
+
+ObjectBase& ObjectBase::operator=(ObjectBase&& src) noexcept
+{
+  if(gobject_)
+    unreference();
+
+  gobject_ = std::move(src.gobject_);
+  custom_type_name_ = std::move(src.custom_type_name_);
+  cpp_destruction_in_progress_ = std::move(src.custom_type_name_);
+
+  return *this;
+}
+
 ObjectBase::~ObjectBase()
 {
   // Normally, gobject_ should always be 0 at this point, because:

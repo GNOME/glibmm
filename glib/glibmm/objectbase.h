@@ -95,6 +95,9 @@ protected:
    */
   explicit ObjectBase(const std::type_info& custom_type_info);
 
+  ObjectBase(ObjectBase&& src) noexcept;
+  ObjectBase& operator=(ObjectBase&& src) noexcept;
+
   virtual ~ObjectBase() = 0;
 
   // Called by Glib::Object and Glib::Interface constructors. See comments there.

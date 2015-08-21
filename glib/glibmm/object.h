@@ -107,6 +107,9 @@ public:
   Object(const Object&) = delete;
   Object& operator=(const Object&) = delete;
 
+  Object(Object&& src) noexcept;
+  Object& operator=(Object&& src) noexcept;
+
 protected:
   Object(); //For use by C++-only sub-types.
   explicit Object(const Glib::ConstructParams& construct_params);
