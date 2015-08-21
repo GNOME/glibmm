@@ -202,6 +202,16 @@ __CPPNAME__::__CPPNAME__`'(const Glib::Interface_Class& interface_class)
 {
 }
 
+__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& src)
+: __CPPPARENT__`'(std::move(src))
+{}
+
+__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__&& src)
+{
+  __CPPPARENT__::operator=`'(std::move(src));
+  return *this;
+}
+
 __CPPNAME__::~__CPPNAME__`'()
 {}
 
@@ -268,6 +278,10 @@ protected:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 public:
+
+  __CPPNAME__`'(__CPPNAME__&& src);
+  __CPPNAME__& operator=(__CPPNAME__&& src);
+
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
   virtual ~__CPPNAME__`'();
 
