@@ -211,6 +211,16 @@ __CPPNAME__::__CPPNAME__`'(__CNAME__* castitem)
 
 ')dnl
 
+__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& src)
+: __CPPPARENT__`'(std::move(src))
+{}
+
+__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__&& src)
+{
+  __CPPPARENT__::operator=`'(std::move(src));
+  return *this;
+}
+
 ifdef(`__BOOL_CUSTOM_DTOR__',`dnl
 ',`dnl
 __CPPNAME__::~__CPPNAME__`'()
@@ -259,6 +269,10 @@ protected:
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 public:
+
+  __CPPNAME__`'(__CPPNAME__&& src);
+  __CPPNAME__& operator=(__CPPNAME__&& src);
+
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
   virtual ~__CPPNAME__`'();
 
