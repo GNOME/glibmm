@@ -119,7 +119,13 @@ Interface::Interface()
 
 Interface::Interface(Interface&& src)
 : ObjectBase(std::move(src))
-{}
+{
+  //We don't call initialize_move() because we 
+  //want the derived move constructor to only cause it
+  //to be called once, so we just let it be called
+  //by the implementing class, such as Entry (implementing Editable).
+  //ObjectBase::initialize_move(src.gobject_, &src);
+}
 
 Interface& Interface::operator=(Interface&& src)
 {
