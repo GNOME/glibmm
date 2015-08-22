@@ -61,7 +61,7 @@ __NAMESPACE_BEGIN__
  * @param lhs The left-hand side
  * @param rhs The right-hand side
  */
-inline void swap(__CPPNAME__& lhs, __CPPNAME__& rhs)
+inline void swap(__CPPNAME__& lhs, __CPPNAME__& rhs) noexcept
   { lhs.swap(rhs); }
 
 __NAMESPACE_END__
