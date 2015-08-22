@@ -53,9 +53,8 @@ _SECTION(SECTION_SRC_GENERATED)
  * wrap it dynamically either.
  *
  * The cast works because __CPPNAME__ does not have any member data, and
- * it is impossible to derive from it.  This is ensured by not implementing
- * the (protected) default constructor.  The ctor is protected rather than
- * private just to avoid a compile warning.
+ * it is impossible to derive from it.  This is ensured by using final on the
+ * class and by using = delete on the default constructor.
  */
 
 namespace Glib
