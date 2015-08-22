@@ -41,6 +41,17 @@ define(`_END_CLASS_OPAQUE_COPYABLE',`
 
 _SECTION(SECTION_HEADER3)
 
+__NAMESPACE_BEGIN__
+
+/** @relates __NAMESPACE__::__CPPNAME__
+ * @param lhs The left-hand side
+ * @param rhs The right-hand side
+ */
+inline void swap(__CPPNAME__& lhs, __CPPNAME__& rhs) noexcept
+  { lhs.swap(rhs); }
+
+__NAMESPACE_END__
+
 ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl else
 namespace Glib
