@@ -99,6 +99,18 @@ dnl
 dnl The implementation:
 dnl
 
+__CPPNAME__::__CPPNAME__`'(const __CPPNAME__& other) noexcept
+:
+  gobject_(other.gobject_)
+{
+}
+
+__CPPNAME__& __CPPNAME__::operator=(const __CPPNAME__`'& other) noexcept
+{
+  gobject_ = other.gobject_;
+  return *this;
+}
+
 __CPPNAME__::__CPPNAME__`'(__CPPNAME__&& other) noexcept
 :
   gobject_(std::move(other.gobject_))
@@ -159,6 +171,9 @@ public:
   typedef __CPPNAME__ CppObjectType;
   typedef __CNAME__ BaseObjectType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+  __CPPNAME__`'(const __CPPNAME__& other) noexcept;
+  __CPPNAME__& operator=(const __CPPNAME__& other) noexcept;
 
   __CPPNAME__`'(__CPPNAME__&& other) noexcept;
   __CPPNAME__& operator=(__CPPNAME__&& other) noexcept;
