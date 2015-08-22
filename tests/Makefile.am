@@ -31,6 +31,7 @@ check_PROGRAMS =				\
 	glibmm_interface_implementation/test	\
 	glibmm_mainloop/test			\
 	glibmm_nodetree/test			\
+	glibmm_object_move/test			\
 	glibmm_ustring_compose/test		\
 	glibmm_ustring_format/test		\
 	glibmm_value/test			\
@@ -89,6 +90,7 @@ glibmm_interface_implementation_test_LDADD = $(giomm_ldadd)
 
 glibmm_mainloop_test_SOURCES             = glibmm_mainloop/main.cc
 glibmm_nodetree_test_SOURCES             = glibmm_nodetree/main.cc
+glibmm_object_move_test_SOURCES          = glibmm_object_move/main.cc
 glibmm_ustring_compose_test_SOURCES      = glibmm_ustring_compose/main.cc
 glibmm_ustring_format_test_SOURCES       = glibmm_ustring_format/main.cc
 glibmm_value_test_SOURCES                = glibmm_value/glibmm_value.cc glibmm_value/main.cc
