@@ -23,28 +23,30 @@ static void test_derived_init       (TestDerived *)
 
 G_DEFINE_TYPE(TestDerived, test_derived, G_TYPE_OBJECT)
 
-class DerivedObject : public Glib::Object
+
+class DerivedObjectBase : public Glib::ObjectBase
 {
 public:
   //A real application would never make the constructor public.
   //It would instead have a protectd constructor and a public create() method.
-  DerivedObject(GObject* gobject, int i)
-  : Glib::Object(gobject),
+  DerivedObjectBase(GObject* gobject, int i)
+  : Glib::ObjectBase(nullptr),
     i_(i)
   {
+    Glib::ObjectBase::initialize(gobject);
   }
 
-  DerivedObject(const DerivedObject& src) = delete;
-  DerivedObject& operator=(const DerivedObject& src) = delete;
+  DerivedObjectBase(const DerivedObjectBase& src) = delete;
+  DerivedObjectBase& operator=(const DerivedObjectBase& src) = delete;
 
-  DerivedObject(DerivedObject&& src) noexcept
-  : Glib::Object(std::move(src)),
+  DerivedObjectBase(DerivedObjectBase&& src) noexcept
+  : Glib::ObjectBase(std::move(src)),
     i_(std::move(src.i_))
   {}
 
-  DerivedObject& operator=(DerivedObject&& src) noexcept
+  DerivedObjectBase& operator=(DerivedObjectBase&& src) noexcept
   {
-    Glib::Object::operator=(std::move(src));
+    Glib::ObjectBase::operator=(std::move(src));
     i_ = std::move(src.i_);
 
     return *this;
@@ -54,43 +56,41 @@ public:
 };
 
 static
-void test_object_move_constructor()
+void test_objectbase_move_constructor()
 {
   GObject *gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
   g_object_ref(gobject);
 
-  DerivedObject derived(gobject, 5);
-  std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
-  g_assert(derived.gobj() == gobject);
-  DerivedObject derived2(std::move(derived));
-  g_assert_cmpint(derived2.i_, ==, 5);
-  std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
-  g_assert(derived2.gobj() == gobject);
-}
-
-
-static
-void test_object_move_assignment_operator()
-{
-  GObject *gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
-  g_object_ref(gobject);
-
-  DerivedObject derived(gobject, 5);
+  DerivedObjectBase derived(gobject, 5);
   //std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
   g_assert(derived.gobj() == gobject);
-  DerivedObject derived2 = std::move(derived);
+  DerivedObjectBase derived2(std::move(derived));
   g_assert_cmpint(derived2.i_, ==, 5);
   //std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
   g_assert(derived2.gobj() == gobject);
 }
 
+static
+void test_objectbase_move_assignment_operator()
+{
+  GObject *gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
+  g_object_ref(gobject);
+
+  DerivedObjectBase derived(gobject, 5);
+  //std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
+  g_assert(derived.gobj() == gobject);
+  DerivedObjectBase derived2 = std::move(derived);
+  g_assert_cmpint(derived2.i_, ==, 5);
+  //std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
+  g_assert(derived2.gobj() == gobject);
+}
 
 int main(int, char**)
 {
   Glib::init();
 
-  test_object_move_constructor();
-  test_object_move_assignment_operator();
+  test_objectbase_move_constructor();
+  test_objectbase_move_assignment_operator();
 
   return EXIT_SUCCESS;
 }
