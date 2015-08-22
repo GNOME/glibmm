@@ -103,6 +103,9 @@ protected:
   // Called by Glib::Object and Glib::Interface constructors. See comments there.
   void initialize(GObject* castitem);
 
+  // Called by Glib::Object and Glib::Interface C++ move operations.
+  void initialize_move(GObject* castitem, Glib::ObjectBase* previous_wrapper);
+
 public:
 
   /// You probably want to use a specific property_*() accessor method instead.
@@ -241,6 +244,9 @@ protected:
   virtual void destroy_notify_();
 
   void _set_current_wrapper(GObject* object);
+
+  /// For (indirect) use by C++ move operations.
+  void _move_current_wrapper(GObject* object, Glib::ObjectBase* previous_wrapper) noexcept;
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
 private:

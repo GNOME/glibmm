@@ -90,6 +90,28 @@ void ObjectBase::initialize(GObject* castitem)
   _set_current_wrapper(castitem);
 }
 
+void ObjectBase::initialize_move(GObject* castitem, Glib::ObjectBase* previous_wrapper)
+{
+  if(gobject_)
+  {
+    g_assert(gobject_ == castitem);
+
+    // TODO: Think about it.  Will this really be called twice?
+    g_printerr("ObjectBase::initialize_move() called twice for the same GObject\n");
+
+    return; // Don't initialize the wrapper twice.
+  }
+
+  gobject_ = castitem;
+  _move_current_wrapper(castitem, previous_wrapper);
+  custom_type_name_ = previous_wrapper->custom_type_name_;
+  cpp_destruction_in_progress_ = previous_wrapper->cpp_destruction_in_progress_;
+
+  //Clear the previous wrapper:
+  previous_wrapper->custom_type_name_ = nullptr;
+  previous_wrapper->cpp_destruction_in_progress_ = false;
+}
+
 ObjectBase::ObjectBase(ObjectBase&& src) noexcept
 : gobject_(std::move(src.gobject_)),
   custom_type_name_(std::move(src.custom_type_name_)),
@@ -193,6 +215,28 @@ void ObjectBase::_set_current_wrapper(GObject* object)
                 G_OBJECT_TYPE_NAME(object));
     }
   }
+}
+
+void ObjectBase::_move_current_wrapper(GObject* object, Glib::ObjectBase* previous_wrapper) noexcept
+{
+  //See _set_current_wrapper().
+  ObjectBase* current_wrapper = _get_current_wrapper(object);
+  if(current_wrapper != previous_wrapper)
+  {
+    g_warning("%s: Unexpected previous wrapper, for object of type %s.\n"
+              "previous_wrapper=%p, current_wrapper=%p",
+                G_STRFUNC, G_OBJECT_TYPE_NAME(object),
+                previous_wrapper, current_wrapper);
+  }
+
+  //Remove the previous wrapper, without invoking destroy_notify_callback_():
+  g_object_steal_qdata(object, Glib::quark_);
+
+  //Set the new wrapper:
+  g_object_set_qdata_full(object, Glib::quark_, this, &destroy_notify_callback_);
+
+  //Clear the previous wrapper:
+  previous_wrapper->gobject_ = nullptr;
 }
 
 // static
