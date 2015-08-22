@@ -133,10 +133,31 @@ __CPPNAME__& __CPPNAME__::operator=(const __CPPNAME__`'& src)
 }
 ')dnl
 
+__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& other) noexcept
+:
+  gobject_(other.gobject_)
+{
+  other.gobject_ = nullptr;
+}
+
+__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__`'&& other) noexcept
+{
+  __CPPNAME__ temp (other);
+  swap(temp);
+  return *this;
+}
+
 __CPPNAME__::~__CPPNAME__`'()
 {
   if(gobject_)
     __OPAQUE_FUNC_FREE`'(gobject_);
+}
+
+void __CPPNAME__::swap(__CPPNAME__& other) noexcept
+{
+  __CNAME__ *const temp = gobject_;
+  gobject_ = other.gobject_;
+  other.gobject_ = temp;
 }
 
 __CNAME__* __CPPNAME__::gobj_copy() const
@@ -180,8 +201,13 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
   __CPPNAME__`'(const __CPPNAME__& src);
   __CPPNAME__& operator=(const __CPPNAME__& src);
 
+  __CPPNAME__`'(__CPPNAME__&& other) noexcept;
+  __CPPNAME__& operator=(__CPPNAME__&& other) noexcept;
+
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
   ~__CPPNAME__`'();
+
+  void swap(__CPPNAME__& other) noexcept;
 
   __CNAME__*       gobj()       { return gobject_; }
   const __CNAME__* gobj() const { return gobject_; }
