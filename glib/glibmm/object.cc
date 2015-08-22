@@ -286,8 +286,10 @@ Object::Object(GObject* castitem)
 }
 
 Object::Object(Object&& src) noexcept
-: ObjectBase(std::move(src))
-{}
+: ObjectBase(std::move(src)) //not actually called because it's a virtual base
+{
+  ObjectBase::initialize_move(src.gobject_, &src);
+}
 
 Object& Object::operator=(Object&& src) noexcept
 {
