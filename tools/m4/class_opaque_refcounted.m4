@@ -166,14 +166,16 @@ ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
   ///Provides access to the underlying C instance. The caller is responsible for unrefing it. Use when directly setting fields in structs.
   __CNAME__* gobj_copy() const;
 
-protected:
-  // Do not derive this.  __NAMESPACE__::__CPPNAME__ can neither be constructed nor deleted.
-  __CPPNAME__`'();
-  void operator delete(void*, std::size_t);
+  __CPPNAME__`'() = delete;
 
   // noncopyable
   __CPPNAME__`'(const __CPPNAME__&) = delete;
   __CPPNAME__& operator=(const __CPPNAME__&) = delete;
+
+protected:
+  // Do not derive this.  __NAMESPACE__::__CPPNAME__ can neither be constructed nor deleted.
+
+  void operator delete(void*, std::size_t);
 
 private:
 _IMPORT(SECTION_CLASS2)
