@@ -127,6 +127,22 @@ IOChannel::IOChannel()
   reinterpret_cast<GlibmmIOChannel*>(gobject_)->wrapper = this;
 }
 
+IOChannel::IOChannel(IOChannel&& other) noexcept
+: gobject_(std::move(other.gobject_))
+{
+  other.gobject_ = nullptr;
+}
+
+IOChannel& IOChannel::operator=(IOChannel&& other) noexcept
+{
+  release_gobject();
+
+  gobject_ = std::move(other.gobject_);
+  other.gobject_ = nullptr;
+
+  return *this;
+}
+
 /* Construct an IOChannel wrapper for an already created GIOChannel.
  * See the comment at the top of this file for an explanation of the
  * problems with this approach.
@@ -143,7 +159,7 @@ IOChannel::IOChannel(GIOChannel* gobject, bool take_copy)
     g_io_channel_ref(gobject_);
 }
 
-IOChannel::~IOChannel()
+void IOChannel::release_gobject()
 {
   if(gobject_)
   {
@@ -165,6 +181,11 @@ IOChannel::~IOChannel()
 
     g_io_channel_unref(tmp_gobject);
   }
+}
+
+IOChannel::~IOChannel()
+{
+  release_gobject();
 }
 
 Glib::RefPtr<IOChannel> IOChannel::create_from_file(const std::string& filename, const std::string& mode)

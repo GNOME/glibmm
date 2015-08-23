@@ -59,6 +59,10 @@ public:
 
   OptionEntry();
   OptionEntry(const OptionEntry& src);
+
+  OptionEntry(OptionEntry&& other) noexcept;
+  OptionEntry& operator=(OptionEntry&& other) noexcept;
+
   virtual ~OptionEntry();
 
   OptionEntry& operator=(const OptionEntry& src);
@@ -90,6 +94,9 @@ public:
 
   GOptionEntry*       gobj()       { return gobject_; }
   const GOptionEntry* gobj() const { return gobject_; }
+
+private:
+  void release_gobject() noexcept;
 
 protected:
 

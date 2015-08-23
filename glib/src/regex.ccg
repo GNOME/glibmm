@@ -248,6 +248,29 @@ MatchInfo::MatchInfo(GMatchInfo* castitem, bool take_the_ownership)
 {
 }
 
+
+MatchInfo::MatchInfo(MatchInfo&& other) noexcept
+: gobject_(std::move(other.gobject_)),
+  take_ownership(std::move(other.take_ownership))
+{
+  other.gobject_ = nullptr;
+  other.take_ownership = false;
+}
+
+MatchInfo& MatchInfo::operator=(MatchInfo&& other) noexcept
+{
+  if(take_ownership && gobject_)
+    g_match_info_free(gobject_);
+
+  gobject_ = std::move(other.gobject_);
+  take_ownership = std::move(other.take_ownership);
+
+  other.gobject_ = nullptr;
+  other.take_ownership = false;
+
+  return *this;
+}
+
 void MatchInfo::set_gobject(GMatchInfo* castitem, bool take_the_ownership)
 {
   if(gobject_ && this->take_ownership)

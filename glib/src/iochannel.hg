@@ -84,6 +84,9 @@ class IOChannel : public sigc::trackable
 {
   _CLASS_GENERIC(IOChannel, GIOChannel)
 
+  IOChannel(IOChannel&& other) noexcept;
+  IOChannel& operator=(IOChannel&& other) noexcept;
+
   dnl // We can't support get_fd() properly because it is impossible
   dnl // to detect the specific GIOChannel type at runtime.
   _IGNORE(g_io_channel_unix_get_fd, g_io_channel_win32_get_fd)
@@ -470,6 +473,9 @@ protected:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   friend class Glib::GlibmmIOChannel;
 #endif
+
+private:
+  void release_gobject();
 };
 
 Glib::RefPtr<IOChannel> wrap(GIOChannel* gobject, bool take_copy = false);

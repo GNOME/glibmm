@@ -28,6 +28,14 @@ OptionEntry::OptionEntry()
 
 OptionEntry::~OptionEntry()
 {
+  release_gobject();
+}
+
+void OptionEntry::release_gobject() noexcept
+{
+  if(!gobject_)
+    return;
+
   g_free(const_cast<char*>(gobject_->long_name));
   g_free(const_cast<char*>(gobject_->description));
   g_free(const_cast<char*>(gobject_->arg_description));
@@ -66,6 +74,22 @@ OptionEntry& OptionEntry::operator=(const OptionEntry& src)
 
     gobject_->arg_description = g_strdup(src.gobject_->arg_description);
   }
+
+  return *this;
+}
+
+OptionEntry::OptionEntry(OptionEntry&& other) noexcept
+: gobject_(std::move(other.gobject_))
+{
+  other.gobject_ = nullptr;
+}
+
+OptionEntry& OptionEntry::operator=(OptionEntry&& other) noexcept
+{
+  release_gobject();
+
+  gobject_ = std::move(other.gobject_);
+  other.gobject_ = nullptr;
 
   return *this;
 }

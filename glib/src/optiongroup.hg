@@ -69,6 +69,9 @@ public:
   explicit OptionGroup(GOptionGroup* castitem);
   _IGNORE(g_option_group_new, g_option_group_ref)
 
+  OptionGroup(OptionGroup&& other) noexcept;
+  OptionGroup& operator=(OptionGroup&& other) noexcept;
+
   virtual ~OptionGroup();
   _IGNORE(g_option_group_free, g_option_group_unref)
 
@@ -196,6 +199,9 @@ protected:
   GOptionGroup* gobject_;
   bool has_ownership_; //Whether the gobject_ belongs to this C++ instance.
 #endif //DOXYGEN_SHOULD_SKIP_THIS
+
+private:
+  void release_gobject() noexcept;
 };
 
 } // namespace Glib

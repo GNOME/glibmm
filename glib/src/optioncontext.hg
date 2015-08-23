@@ -98,6 +98,14 @@ public:
   //Note that, unlike Glib::Wrap(), this would create a second C++ instance for the same C instance,u
   //so it should be used carefully. For instance you could not access data in a derived class via this second instance.
   explicit OptionContext(GOptionContext* castitem, bool take_ownership = false);
+
+  //TODO?:
+  //OptionContext(const OptionContext& other) = delete;
+  //OptionContext& operator=(const OptionContext& other) = delete;
+
+  OptionContext(OptionContext&& other) noexcept;
+  OptionContext& operator=(OptionContext&& other) noexcept;
+
   virtual ~OptionContext();
 
   _WRAP_METHOD(void set_help_enabled(bool help_enabled = true), g_option_context_set_help_enabled)

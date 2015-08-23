@@ -154,6 +154,35 @@ SubtreeVTable::SubtreeVTable(
   gobject_.dispatch = &DBusSubtreeVTable_Dispatch_giomm_callback;
 }
 
+SubtreeVTable::SubtreeVTable(SubtreeVTable&& other) noexcept
+: gobject_(std::move(other.gobject_)),
+  slot_enumerate_(std::move(other.slot_enumerate_)),
+  slot_introspect_(std::move(other.slot_introspect_)),
+  slot_dispatch_(std::move(other.slot_dispatch_))
+{
+  other.slot_enumerate_ = nullptr;
+  other.slot_introspect_ = nullptr;
+  other.slot_dispatch_ = nullptr;
+}
+
+SubtreeVTable& SubtreeVTable::operator=(SubtreeVTable&& other) noexcept
+{
+  delete slot_enumerate_;
+  delete slot_introspect_;
+  delete slot_dispatch_;
+
+  gobject_ = std::move(other.gobject_);
+  slot_enumerate_ = std::move(other.slot_enumerate_);
+  slot_introspect_ = std::move(other.slot_introspect_);
+  slot_dispatch_ = std::move(other.slot_dispatch_);
+
+  other.slot_enumerate_ = nullptr;
+  other.slot_introspect_ = nullptr;
+  other.slot_dispatch_ = nullptr;
+
+  return *this;
+}
+
 SubtreeVTable::~SubtreeVTable()
 {
   delete slot_enumerate_;

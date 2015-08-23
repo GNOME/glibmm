@@ -60,6 +60,28 @@ OptionContext::OptionContext(GOptionContext* castitem, bool take_ownership)
 {
 }
 
+OptionContext::OptionContext(OptionContext&& other) noexcept
+: gobject_(std::move(other.gobject_)),
+  has_ownership_(std::move(other.has_ownership_))
+{
+  other.gobject_ = nullptr;
+  other.has_ownership_ = false;
+}
+
+OptionContext& OptionContext::operator=(OptionContext&& other) noexcept
+{
+  if(has_ownership_)
+    g_option_context_free(gobj());
+
+  gobject_ = std::move(other.gobject_);
+  has_ownership_ = std::move(other.has_ownership_);
+
+  other.gobject_ = nullptr;
+  other.has_ownership_ = false;
+
+  return *this;
+}
+
 OptionContext::~OptionContext()
 {
   if(has_ownership_)

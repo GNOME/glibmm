@@ -281,8 +281,30 @@ OptionGroup::OptionGroup(GOptionGroup* castitem)
   //Always takes ownership - never takes copy.
 }
 
+OptionGroup::OptionGroup(OptionGroup&& other) noexcept
+: map_entries_(std::move(other.map_entries_)),
+  gobject_(std::move(other.gobject_)),
+  has_ownership_(std::move(other.has_ownership_))
+{
+  other.gobject_ = nullptr;
+  other.has_ownership_ = false;
+}
 
-OptionGroup::~OptionGroup()
+OptionGroup& OptionGroup::operator=(OptionGroup&& other) noexcept
+{
+  release_gobject();
+
+  map_entries_ = std::move(other.map_entries_);
+  gobject_ = std::move(other.gobject_);
+  has_ownership_ = std::move(other.has_ownership_);
+
+  other.gobject_ = nullptr;
+  other.has_ownership_ = false;
+
+  return *this;
+}
+
+void OptionGroup::release_gobject() noexcept
 {
   //Free any C types that were allocated during add_entry():
   for(auto& the_pair : map_entries_)
@@ -291,11 +313,16 @@ OptionGroup::~OptionGroup()
     cpp_entry.release_c_arg();
   }
 
-  if(has_ownership_)
+  if(has_ownership_ && gobject_)
   {
     g_option_group_unref(gobj());
     gobject_ = nullptr;
   }
+}
+
+OptionGroup::~OptionGroup()
+{
+  release_gobject();
 }
 
 void OptionGroup::add_entry(const OptionEntry& entry)

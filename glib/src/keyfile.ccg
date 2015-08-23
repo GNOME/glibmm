@@ -32,6 +32,28 @@ KeyFile::KeyFile(GKeyFile* castitem, bool takes_ownership)
   owns_gobject_ = takes_ownership;
 }
 
+KeyFile::KeyFile(KeyFile&& other) noexcept
+: gobject_(std::move(other.gobject_)),
+  owns_gobject_(std::move(other.owns_gobject_))
+{
+  other.gobject_ = nullptr;
+  other.owns_gobject_ = false;
+}
+
+KeyFile& KeyFile::operator=(KeyFile&& other) noexcept
+{
+  if (owns_gobject_)
+    g_key_file_free(gobject_);
+
+  gobject_ = std::move(other.gobject_);
+  owns_gobject_ = std::move(other.owns_gobject_);
+
+  other.gobject_ = nullptr;
+  other.owns_gobject_ = false;
+
+  return *this;
+}
+
 KeyFile::~KeyFile()
 {
   if (owns_gobject_)

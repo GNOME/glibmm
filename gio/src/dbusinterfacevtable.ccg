@@ -143,6 +143,35 @@ InterfaceVTable::InterfaceVTable(
   gobject_.set_property = &DBusInterfaceVTable_SetProperty_giomm_callback;
 }
 
+InterfaceVTable::InterfaceVTable(InterfaceVTable&& other) noexcept
+: gobject_(std::move(other.gobject_)),
+  slot_method_call_(std::move(other.slot_method_call_)),
+  slot_get_property_(std::move(other.slot_get_property_)),
+  slot_set_property_(std::move(other.slot_set_property_))
+{
+  other.slot_method_call_ = nullptr;
+  other.slot_get_property_ = nullptr;
+  other.slot_set_property_ = nullptr;
+}
+
+InterfaceVTable& InterfaceVTable::operator=(InterfaceVTable&& other) noexcept
+{
+  delete slot_method_call_;
+  delete slot_get_property_;
+  delete slot_set_property_;
+
+  gobject_ = std::move(other.gobject_);
+  slot_method_call_ = std::move(other.slot_method_call_);
+  slot_get_property_ = std::move(other.slot_get_property_);
+  slot_set_property_ = std::move(other.slot_set_property_);
+
+  other.slot_method_call_ = nullptr;
+  other.slot_get_property_ = nullptr;
+  other.slot_set_property_ = nullptr;
+
+  return *this;
+}
+
 InterfaceVTable::~InterfaceVTable()
 {
   delete slot_method_call_;
