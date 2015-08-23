@@ -173,6 +173,9 @@ protected:
    */
   Parser();
 
+  Parser(const Parser&) = delete;
+  Parser& operator=(const Parser&) = delete;
+
   /** Called for open tags <tt>\<foo bar="baz"\></tt>.
    * This virtual method is invoked when the opening tag of an element is seen.
    * @param context The Markup::ParseContext object the parsed data belongs to.
@@ -235,9 +238,6 @@ protected:
   virtual void on_error(ParseContext& context, const MarkupError& error);
 
 private:
-  // noncopyable
-  Parser(const Parser&);
-  Parser& operator=(const Parser&);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   friend class Glib::Markup::ParserCallbacks;
@@ -259,6 +259,10 @@ public:
    * @param flags Bitwise combination of Markup::ParseFlags.
    */
   explicit ParseContext(Parser& parser, ParseFlags flags = ParseFlags(0));
+
+  ParseContext(const ParseContext&) = delete;
+  ParseContext& operator=(const ParseContext&) = delete;
+
   virtual ~ParseContext();
 
   /** Feed some data to the ParseContext.
@@ -325,10 +329,6 @@ public:
 private:
   Markup::Parser*       parser_;
   GMarkupParseContext*  gobject_;
-
-  // noncopyable
-  ParseContext(const ParseContext&);
-  ParseContext& operator=(const ParseContext&);
 
   static void destroy_notify_callback(void* data);
 };

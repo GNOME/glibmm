@@ -160,6 +160,10 @@ _WRAP_GERROR(ThreadError, GThreadError, G_THREAD_ERROR, NO_GTYPE)
 class Thread
 {
 public:
+
+  Thread(const Thread&) = delete;
+  Thread& operator=(const Thread&) = delete;
+
   class Exit;
 
   //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
@@ -287,10 +291,6 @@ private:
   // Glib::Thread can neither be constructed nor deleted.
   Thread();
   void operator delete(void*, std::size_t);
-
-  // noncopyable
-  Thread(const Thread&);
-  Thread& operator=(const Thread&);
 };
 
 /** %Exception class used to exit from a thread.
@@ -371,6 +371,10 @@ public:
   class Lock;
 
   Mutex();
+
+  Mutex(const Mutex&) = delete;
+  Mutex& operator=(const Mutex&) = delete;
+
   ~Mutex();
 
   /** Locks the mutex.
@@ -399,10 +403,6 @@ public:
 
 private:
   GMutex* gobject_;
-
-  // noncopyable
-  Mutex(const Mutex&);
-  Mutex& operator=(const Mutex&);
 };
 
 /** Utility class for exception-safe mutex locking.
@@ -437,9 +437,7 @@ private:
   Mutex&  mutex_;
   bool    locked_;
 
-  // noncopyable
-  Lock(const Mutex::Lock&);
-  Mutex::Lock& operator=(const Mutex::Lock&);
+
 };
 
 
@@ -502,6 +500,10 @@ public:
   explicit inline Lock(RecMutex& mutex);
   inline Lock(RecMutex& mutex, NotLock);
   inline Lock(RecMutex& mutex, TryLock);
+
+  Lock(const RecMutex::Lock&) = delete;
+  RecMutex::Lock& operator=(const RecMutex::Lock&) = delete;
+
   inline ~Lock();
 
   inline void acquire();
@@ -512,10 +514,6 @@ public:
 private:
   RecMutex& mutex_;
   bool      locked_;
-
-  // noncopyable
-  Lock(const RecMutex::Lock&);
-  RecMutex::Lock& operator=(const RecMutex::Lock&);
 };
 
 
@@ -562,12 +560,11 @@ public:
   class WriterLock;
 
   RWLock();
-  ~RWLock();
 
-private:
-  // noncopyable
-  RWLock(const RWLock&);
-  RWLock& operator=(const RWLock&);
+  RWLock(const RWLock&) = delete;
+  RWLock& operator=(const RWLock&) = delete;
+
+  ~RWLock();
 };
 
 /** Utility class for exception-safe locking of read/write locks.
@@ -580,6 +577,10 @@ public:
   explicit inline ReaderLock(RWLock& rwlock);
   inline ReaderLock(RWLock& rwlock, NotLock);
   inline ReaderLock(RWLock& rwlock, TryLock);
+
+  ReaderLock(const RWLock::ReaderLock&) = delete;
+  RWLock::ReaderLock& operator=(const RWLock::ReaderLock&) = delete;
+
   inline ~ReaderLock();
 
   inline void acquire();
@@ -590,10 +591,6 @@ public:
 private:
   RWLock& rwlock_;
   bool    locked_;
-
-  // noncopyable
-  ReaderLock(const RWLock::ReaderLock&);
-  RWLock::ReaderLock& operator=(const RWLock::ReaderLock&);
 };
 
 /** Utility class for exception-safe locking of read/write locks.
@@ -606,6 +603,10 @@ public:
   explicit inline WriterLock(RWLock& rwlock);
   inline WriterLock(RWLock& rwlock, NotLock);
   inline WriterLock(RWLock& rwlock, TryLock);
+
+  WriterLock(const RWLock::WriterLock&) = delete;
+  RWLock::WriterLock& operator=(const RWLock::WriterLock&) = delete;
+
   inline ~WriterLock();
 
   inline void acquire();
@@ -616,10 +617,6 @@ public:
 private:
   RWLock& rwlock_;
   bool    locked_;
-
-  // noncopyable
-  WriterLock(const RWLock::WriterLock&);
-  RWLock::WriterLock& operator=(const RWLock::WriterLock&);
 };
 
 /** An opaque data structure to represent a condition.
@@ -660,6 +657,10 @@ class Cond
 {
 public:
   Cond();
+
+  Cond(const Cond&) = delete;
+  Cond& operator=(const Cond&) = delete;
+
   ~Cond();
 
   /** If threads are waiting for this @a Cond, exactly one of them is woken up.
@@ -708,10 +709,6 @@ public:
 
 private:
   GCond* gobject_;
-
-  // noncopyable
-  Cond(const Cond&);
-  Cond& operator=(const Cond&);
 };
 
 
@@ -745,6 +742,10 @@ template <class T>
 class Private
 {
 public:
+
+  Private(const Private<T>&) = delete;
+  Private<T>& operator=(const Private<T>&) = delete;
+
   typedef void (*DestructorFunc) (void*);
 
   static void delete_ptr(void* data);
@@ -757,10 +758,6 @@ public:
 
 private:
   GPrivate* gobject_;
-
-  // noncopyable
-  Private(const Private<T>&);
-  Private<T>& operator=(const Private<T>&);
 };
 
 /** @} group Threads */
