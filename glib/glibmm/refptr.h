@@ -41,7 +41,8 @@ namespace Glib
  * zero, the contained object is deleted, meaning  you don't need to remember
  * to delete the object.
  *
- * RefPtr<> can store any class that has reference() and unreference() methods.
+ * RefPtr<> can store any class that has reference() and unreference() methods,
+ * and whose destructor is noexcept (the default for destructors).
  * In gtkmm, that is anything derived from Glib::ObjectBase, such as
  * Gdk::Pixmap.
  *
@@ -56,19 +57,19 @@ public:
    *
    * Afterwards it will be null and use of -> will cause a segmentation fault.
    */
-  inline RefPtr();
+  inline RefPtr() noexcept;
 
   /// Destructor - decrements reference count.
   inline ~RefPtr() noexcept;
 
   /// For use only by the \::create() methods.
-  explicit inline RefPtr(T_CppObject* pCppObject);
+  explicit inline RefPtr(T_CppObject* pCppObject) noexcept;
 
   /** Copy constructor
    *
    * This increments the shared reference count.
    */
-  inline RefPtr(const RefPtr& src);
+  inline RefPtr(const RefPtr& src) noexcept;
 
   /** Move constructor
    */
@@ -84,7 +85,7 @@ public:
    * Increments the reference count.
    */
   template <class T_CastFrom>
-  inline RefPtr(const RefPtr<T_CastFrom>& src);
+  inline RefPtr(const RefPtr<T_CastFrom>& src) noexcept;
 
   /** Swap the contents of two RefPtr<>.
    * This method swaps the internal pointers to T_CppObject.  This can be
@@ -94,7 +95,7 @@ public:
   inline void swap(RefPtr& other) noexcept;
 
   /// Copy from another RefPtr:
-  inline RefPtr& operator=(const RefPtr& src);
+  inline RefPtr& operator=(const RefPtr& src) noexcept;
 
   /// Move assignment operator:
   inline RefPtr& operator=(RefPtr&& src) noexcept;
@@ -108,20 +109,20 @@ public:
    * Increments the reference count.
    */
   template <class T_CastFrom>
-  inline RefPtr& operator=(const RefPtr<T_CastFrom>& src);
+  inline RefPtr& operator=(const RefPtr<T_CastFrom>& src) noexcept;
 
   /// Tests whether the RefPtr<> point to the same underlying instance.
-  inline bool operator==(const RefPtr& src) const;
+  inline bool operator==(const RefPtr& src) const noexcept;
 
   /// See operator==().
-  inline bool operator!=(const RefPtr& src) const;
+  inline bool operator!=(const RefPtr& src) const noexcept;
 
   /** Dereferencing.
    *
    * Use the methods of the underlying instance like so:
    * <code>refptr->memberfun()</code>.
    */
-  inline T_CppObject* operator->() const;
+  inline T_CppObject* operator->() const noexcept;
 
   /** Test whether the RefPtr<> points to any underlying instance.
    *
@@ -131,17 +132,17 @@ public:
    *     do_something();
    * @endcode
    */
-  inline operator bool() const;
+  inline operator bool() const noexcept;
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
   /// @deprecated Use reset() instead because this leads to confusion with clear() methods on the underlying class. For instance, people use .clear() when they mean ->clear().
-  inline void clear();
+  inline void clear() noexcept;
 #endif //GLIBMM_DISABLE_DEPRECATED
 
   /** Set underlying instance to 0, decrementing reference count of existing instance appropriately.
    * @newin{2,16}
    */
-  inline void reset();
+  inline void reset() noexcept;
 
   /** Release the ownership of underlying instance.
    *
@@ -152,7 +153,7 @@ public:
    * of the managed object. A legitimate use is if you immediately give RefPtr's
    * reference to another object.
    */
-  inline T_CppObject* release() G_GNUC_WARN_UNUSED_RESULT;
+  inline T_CppObject* release() noexcept G_GNUC_WARN_UNUSED_RESULT;
 
   /** Dynamic cast to derived class.
    *
@@ -162,7 +163,7 @@ public:
    * @endcode
    */
   template <class T_CastFrom>
-  static inline RefPtr cast_dynamic(const RefPtr<T_CastFrom>& src);
+  static inline RefPtr cast_dynamic(const RefPtr<T_CastFrom>& src) noexcept;
 
   /** Static cast to derived class.
    *
@@ -172,7 +173,7 @@ public:
    * @endcode
    */
   template <class T_CastFrom>
-  static inline RefPtr cast_static(const RefPtr<T_CastFrom>& src);
+  static inline RefPtr cast_static(const RefPtr<T_CastFrom>& src) noexcept;
 
   /** Cast to non-const.
    *
@@ -182,7 +183,7 @@ public:
    * @endcode
    */
   template <class T_CastFrom>
-  static inline RefPtr cast_const(const RefPtr<T_CastFrom>& src);
+  static inline RefPtr cast_const(const RefPtr<T_CastFrom>& src) noexcept;
 
   //TODO: Maybe remove these if we replace operator bool() with operator const void* after
   //an API/ABI break, as suggested by Daniel Elstner? murrayc.
@@ -197,16 +198,16 @@ public:
    * is still syntactically possible, but the result is semantically
    * wrong, as p1 REL_OP p2 is interpreted as (bool)p1 REL_OP (bool)p2.
    */
-  inline bool operator<(const RefPtr& src) const;
+  inline bool operator<(const RefPtr& src) const noexcept;
 
   /// See operator<().
-  inline bool operator<=(const RefPtr& src) const;
+  inline bool operator<=(const RefPtr& src) const noexcept;
 
   /// See operator<().
-  inline bool operator>(const RefPtr& src) const;
+  inline bool operator>(const RefPtr& src) const noexcept;
 
   /// See operator<().
-  inline bool operator>=(const RefPtr& src) const;
+  inline bool operator>=(const RefPtr& src) const noexcept;
 
 private:
   T_CppObject* pCppObject_;
@@ -219,13 +220,13 @@ private:
 // If it would come after them it wouldn't be inlined.
 
 template <class T_CppObject> inline
-T_CppObject* RefPtr<T_CppObject>::operator->() const
+T_CppObject* RefPtr<T_CppObject>::operator->() const noexcept
 {
   return pCppObject_;
 }
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>::RefPtr()
+RefPtr<T_CppObject>::RefPtr() noexcept
 :
   pCppObject_ (0)
 {}
@@ -238,13 +239,13 @@ RefPtr<T_CppObject>::~RefPtr() noexcept
 }
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>::RefPtr(T_CppObject* pCppObject)
+RefPtr<T_CppObject>::RefPtr(T_CppObject* pCppObject) noexcept
 :
   pCppObject_ (pCppObject)
 {}
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>::RefPtr(const RefPtr& src)
+RefPtr<T_CppObject>::RefPtr(const RefPtr& src) noexcept
 :
   pCppObject_ (src.pCppObject_)
 {
@@ -275,7 +276,7 @@ RefPtr<T_CppObject>::RefPtr(RefPtr<T_CastFrom>&& src) noexcept
 template <class T_CppObject>
   template <class T_CastFrom>
 inline
-RefPtr<T_CppObject>::RefPtr(const RefPtr<T_CastFrom>& src)
+RefPtr<T_CppObject>::RefPtr(const RefPtr<T_CastFrom>& src) noexcept
 :
   // A different RefPtr<> will not allow us access to pCppObject_.  We need
   // to add a get_underlying() for this, but that would encourage incorrect
@@ -295,7 +296,7 @@ void RefPtr<T_CppObject>::swap(RefPtr& other) noexcept
 }
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr& src)
+RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr& src) noexcept
 {
   // In case you haven't seen the swap() technique to implement copy
   // assignment before, here's what it does:
@@ -351,7 +352,7 @@ RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(RefPtr<T_CastFrom>&& src) no
 template <class T_CppObject>
   template <class T_CastFrom>
 inline
-RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr<T_CastFrom>& src)
+RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr<T_CastFrom>& src) noexcept
 {
   RefPtr<T_CppObject> temp (src);
   this->swap(temp);
@@ -359,40 +360,40 @@ RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr<T_CastFrom>& sr
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator==(const RefPtr& src) const
+bool RefPtr<T_CppObject>::operator==(const RefPtr& src) const noexcept
 {
   return (pCppObject_ == src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator!=(const RefPtr& src) const
+bool RefPtr<T_CppObject>::operator!=(const RefPtr& src) const noexcept
 {
   return (pCppObject_ != src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>::operator bool() const
+RefPtr<T_CppObject>::operator bool() const noexcept
 {
   return (pCppObject_ != nullptr);
 }
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
 template <class T_CppObject> inline
-void RefPtr<T_CppObject>::clear()
+void RefPtr<T_CppObject>::clear() noexcept
 {
   reset();
 }
 #endif //GLIBMM_DISABLE_DEPRECATED
 
 template <class T_CppObject> inline
-void RefPtr<T_CppObject>::reset()
+void RefPtr<T_CppObject>::reset() noexcept
 {
   RefPtr<T_CppObject> temp; // swap with an empty RefPtr<> to clear *this
   this->swap(temp);
 }
 
 template <class T_CppObject> inline
-T_CppObject* RefPtr<T_CppObject>::release()
+T_CppObject* RefPtr<T_CppObject>::release() noexcept
 {
   T_CppObject *tmp = pCppObject_;
   pCppObject_ = nullptr;
@@ -402,7 +403,7 @@ T_CppObject* RefPtr<T_CppObject>::release()
 template <class T_CppObject>
   template <class T_CastFrom>
 inline
-RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_dynamic(const RefPtr<T_CastFrom>& src)
+RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_dynamic(const RefPtr<T_CastFrom>& src) noexcept
 {
   T_CppObject *const pCppObject = dynamic_cast<T_CppObject*>(src.operator->());
 
@@ -415,7 +416,7 @@ RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_dynamic(const RefPtr<T_CastFrom>& 
 template <class T_CppObject>
   template <class T_CastFrom>
 inline
-RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_static(const RefPtr<T_CastFrom>& src)
+RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_static(const RefPtr<T_CastFrom>& src) noexcept
 {
   T_CppObject *const pCppObject = static_cast<T_CppObject*>(src.operator->());
 
@@ -428,7 +429,7 @@ RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_static(const RefPtr<T_CastFrom>& s
 template <class T_CppObject>
   template <class T_CastFrom>
 inline
-RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_const(const RefPtr<T_CastFrom>& src)
+RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_const(const RefPtr<T_CastFrom>& src) noexcept
 {
   T_CppObject *const pCppObject = const_cast<T_CppObject*>(src.operator->());
 
@@ -439,25 +440,25 @@ RefPtr<T_CppObject> RefPtr<T_CppObject>::cast_const(const RefPtr<T_CastFrom>& sr
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator<(const RefPtr& src) const
+bool RefPtr<T_CppObject>::operator<(const RefPtr& src) const noexcept
 {
   return (pCppObject_ < src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator<=(const RefPtr& src) const
+bool RefPtr<T_CppObject>::operator<=(const RefPtr& src) const noexcept
 {
   return (pCppObject_ <= src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator>(const RefPtr& src) const
+bool RefPtr<T_CppObject>::operator>(const RefPtr& src) const noexcept
 {
   return (pCppObject_ > src.pCppObject_);
 }
 
 template <class T_CppObject> inline
-bool RefPtr<T_CppObject>::operator>=(const RefPtr& src) const
+bool RefPtr<T_CppObject>::operator>=(const RefPtr& src) const noexcept
 {
   return (pCppObject_ >= src.pCppObject_);
 }
