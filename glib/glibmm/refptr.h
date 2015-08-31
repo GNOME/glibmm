@@ -59,7 +59,7 @@ public:
   inline RefPtr();
 
   /// Destructor - decrements reference count.
-  inline ~RefPtr();
+  inline ~RefPtr() noexcept;
 
   /// For use only by the \::create() methods.
   explicit inline RefPtr(T_CppObject* pCppObject);
@@ -72,12 +72,12 @@ public:
 
   /** Move constructor
    */
-  inline RefPtr(RefPtr&& src);
+  inline RefPtr(RefPtr&& src) noexcept;
 
   /** Move constructor (from different, but castable type).
    */
   template <class T_CastFrom>
-  inline RefPtr(RefPtr<T_CastFrom>&& src);
+  inline RefPtr(RefPtr<T_CastFrom>&& src) noexcept;
 
   /** Copy constructor (from different, but castable type).
    *
@@ -91,17 +91,17 @@ public:
    * done safely without involving a reference/unreference cycle and is
    * therefore highly efficient.
    */
-  inline void swap(RefPtr& other);
+  inline void swap(RefPtr& other) noexcept;
 
   /// Copy from another RefPtr:
   inline RefPtr& operator=(const RefPtr& src);
 
   /// Move assignment operator:
-  inline RefPtr& operator=(RefPtr&& src);
+  inline RefPtr& operator=(RefPtr&& src) noexcept;
 
   /// Move assignment operator (from different, but castable type):
   template <class T_CastFrom>
-  inline RefPtr& operator=(RefPtr<T_CastFrom>&& src);
+  inline RefPtr& operator=(RefPtr<T_CastFrom>&& src) noexcept;
 
   /** Copy from different, but castable type).
    *
@@ -231,7 +231,7 @@ RefPtr<T_CppObject>::RefPtr()
 {}
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>::~RefPtr()
+RefPtr<T_CppObject>::~RefPtr() noexcept
 {
   if(pCppObject_)
     pCppObject_->unreference(); // This could cause pCppObject to be deleted.
@@ -253,7 +253,7 @@ RefPtr<T_CppObject>::RefPtr(const RefPtr& src)
 }
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>::RefPtr(RefPtr&& src)
+RefPtr<T_CppObject>::RefPtr(RefPtr&& src) noexcept
 :
   pCppObject_ (src.pCppObject_)
 {
@@ -263,7 +263,7 @@ RefPtr<T_CppObject>::RefPtr(RefPtr&& src)
 template <class T_CppObject>
   template <class T_CastFrom>
 inline
-RefPtr<T_CppObject>::RefPtr(RefPtr<T_CastFrom>&& src)
+RefPtr<T_CppObject>::RefPtr(RefPtr<T_CastFrom>&& src) noexcept
 :
   pCppObject_ (src.release())
 {
@@ -287,7 +287,7 @@ RefPtr<T_CppObject>::RefPtr(const RefPtr<T_CastFrom>& src)
 }
 
 template <class T_CppObject> inline
-void RefPtr<T_CppObject>::swap(RefPtr& other)
+void RefPtr<T_CppObject>::swap(RefPtr& other) noexcept
 {
   T_CppObject *const temp = pCppObject_;
   pCppObject_ = other.pCppObject_;
@@ -327,7 +327,7 @@ RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(const RefPtr& src)
 }
 
 template <class T_CppObject> inline
-RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(RefPtr&& src)
+RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(RefPtr&& src) noexcept
 {
   RefPtr<T_CppObject> temp (std::move(src));
   this->swap(temp);
@@ -339,7 +339,7 @@ RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(RefPtr&& src)
 template <class T_CppObject>
   template <class T_CastFrom>
 inline
-RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(RefPtr<T_CastFrom>&& src)
+RefPtr<T_CppObject>& RefPtr<T_CppObject>::operator=(RefPtr<T_CastFrom>&& src) noexcept
 {
   if (pCppObject_)
     pCppObject_->unreference();
@@ -466,7 +466,7 @@ bool RefPtr<T_CppObject>::operator>=(const RefPtr& src) const
 
 /** @relates Glib::RefPtr */
 template <class T_CppObject> inline
-void swap(RefPtr<T_CppObject>& lhs, RefPtr<T_CppObject>& rhs)
+void swap(RefPtr<T_CppObject>& lhs, RefPtr<T_CppObject>& rhs) noexcept
 {
   lhs.swap(rhs);
 }
