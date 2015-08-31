@@ -34,7 +34,7 @@ namespace Glib
 class StreamIOChannel : public Glib::IOChannel
 {
 public:
-  virtual ~StreamIOChannel();
+  virtual ~StreamIOChannel() noexcept;
 
   static Glib::RefPtr<StreamIOChannel> create(std::istream& stream);
   static Glib::RefPtr<StreamIOChannel> create(std::ostream& stream);

@@ -264,7 +264,7 @@ public:
    */
   ustring();
 
-  ~ustring();
+  ~ustring() noexcept;
 
   /*! Construct a ustring as a copy of another ustring.
    * @param other A source string.
@@ -891,7 +891,7 @@ private:
 
 public:
   FormatStream();
-  ~FormatStream();
+  ~FormatStream() noexcept;
 
   template <class T> inline void stream(const T& value);
 

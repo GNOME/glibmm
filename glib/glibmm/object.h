@@ -77,7 +77,7 @@ public:
   explicit ConstructParams(const Glib::Class& glibmm_class_);
   ConstructParams(const Glib::Class& glibmm_class_, const char* first_property_name, ...)
     G_GNUC_NULL_TERMINATED; // warn if called without a trailing NULL pointer
-  ~ConstructParams();
+  ~ConstructParams() noexcept;
 
   // The copy constructor is semantically required by the C++ compiler
   // (since g++ 3.4) to be able to create temporary instances, depending
@@ -114,7 +114,7 @@ protected:
   Object(); //For use by C++-only sub-types.
   explicit Object(const Glib::ConstructParams& construct_params);
   explicit Object(GObject* castitem);
-  virtual ~Object(); //It should only be deleted by the callback.
+  virtual ~Object() noexcept; //It should only be deleted by the callback.
 
 public:
   //static RefPtr<Object> create(); //You must reimplement this in each derived class.

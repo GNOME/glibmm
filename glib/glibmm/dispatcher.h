@@ -86,7 +86,7 @@ public:
    * @throw Glib::FileError
    */
   explicit Dispatcher(const Glib::RefPtr<MainContext>& context);
-  ~Dispatcher();
+  ~Dispatcher() noexcept;
 
   void emit();
   void operator()();

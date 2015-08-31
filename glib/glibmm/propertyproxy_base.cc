@@ -53,7 +53,7 @@ SignalProxyProperty::SignalProxyProperty(Glib::ObjectBase* obj, const gchar* pro
 {
 }
 
-SignalProxyProperty::~SignalProxyProperty()
+SignalProxyProperty::~SignalProxyProperty() noexcept
 {
 }
 

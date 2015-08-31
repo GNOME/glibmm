@@ -741,7 +741,7 @@ protected:
    */
   Source(GSource* cast_item, GSourceFunc callback_func);
 
-  virtual ~Source();
+  virtual ~Source() noexcept;
 
   sigc::connection connect_generic(const sigc::slot_base& slot);
 
@@ -819,7 +819,7 @@ public:
 
 protected:
   explicit TimeoutSource(unsigned int interval);
-  virtual ~TimeoutSource();
+  virtual ~TimeoutSource() noexcept;
 
   virtual bool prepare(int& timeout);
   virtual bool check();
@@ -843,7 +843,7 @@ public:
 
 protected:
   IdleSource();
-  virtual ~IdleSource();
+  virtual ~IdleSource() noexcept;
 
   virtual bool prepare(int& timeout);
   virtual bool check();
@@ -871,7 +871,7 @@ protected:
    */
   IOSource(GSource* cast_item, GSourceFunc callback_func);
 
-  virtual ~IOSource();
+  virtual ~IOSource() noexcept;
 
   virtual bool prepare(int& timeout);
   virtual bool check();

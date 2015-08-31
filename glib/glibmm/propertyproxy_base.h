@@ -38,7 +38,7 @@ public:
   friend class PropertyProxy_Base;
 
   SignalProxyProperty(Glib::ObjectBase* obj, const gchar* property_name);
-  ~SignalProxyProperty();
+  ~SignalProxyProperty() noexcept;
 
   typedef sigc::slot<void> SlotType;
   sigc::connection connect(const SlotType& sl);

@@ -125,7 +125,7 @@ namespace Glib
 class DispatchNotifier : public sigc::trackable
 {
 public:
-  ~DispatchNotifier();
+  ~DispatchNotifier() noexcept;
 
   // noncopyable
   DispatchNotifier(const DispatchNotifier&) = delete;
@@ -218,7 +218,7 @@ DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
   }
 }
 
-DispatchNotifier::~DispatchNotifier()
+DispatchNotifier::~DispatchNotifier() noexcept
 {
 #ifndef G_OS_WIN32
   fd_close_and_invalidate(fd_sender_);
@@ -481,7 +481,7 @@ Dispatcher::Dispatcher(const Glib::RefPtr<MainContext>& context)
   notifier_ (DispatchNotifier::reference_instance(context, this))
 {}
 
-Dispatcher::~Dispatcher()
+Dispatcher::~Dispatcher() noexcept
 {
   DispatchNotifier::unreference_instance(notifier_, this);
 }

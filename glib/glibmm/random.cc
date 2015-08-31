@@ -36,7 +36,7 @@ Rand::Rand(guint32 seed)
   gobject_ (g_rand_new_with_seed(seed))
 {}
 
-Rand::~Rand()
+Rand::~Rand() noexcept
 {
   g_rand_free(gobject_);
 }

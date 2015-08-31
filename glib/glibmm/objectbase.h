@@ -98,7 +98,7 @@ protected:
   ObjectBase(ObjectBase&& src) noexcept;
   ObjectBase& operator=(ObjectBase&& src) noexcept;
 
-  virtual ~ObjectBase() = 0;
+  virtual ~ObjectBase() noexcept = 0;
 
   // Called by Glib::Object and Glib::Interface constructors. See comments there.
   void initialize(GObject* castitem);

@@ -55,7 +55,7 @@ Quark::Quark(const char* s)
 : QueryQuark(g_quark_from_string(s))
 {}
 
-Quark::~Quark()
+Quark::~Quark() noexcept
 {}
 
 

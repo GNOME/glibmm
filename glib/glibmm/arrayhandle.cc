@@ -20,7 +20,7 @@
 namespace Glib
 {
 
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::~ArrayHandle()
+ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::~ArrayHandle() noexcept
 {
   if(parray_ && ownership_ != Glib::OWNERSHIP_NONE)
   {

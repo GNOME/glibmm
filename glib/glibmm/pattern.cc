@@ -37,7 +37,7 @@ PatternSpec::PatternSpec(GPatternSpec* gobject)
   gobject_ (gobject)
 {}
 
-PatternSpec::~PatternSpec()
+PatternSpec::~PatternSpec() noexcept
 {
   g_pattern_spec_free(gobject_);
 }

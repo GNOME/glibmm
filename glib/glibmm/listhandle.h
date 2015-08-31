@@ -181,7 +181,7 @@ public:
   // Copying clears the ownership flag of the source handle.
   inline ListHandle(const ListHandle<T,Tr>& other);
 
-  ~ListHandle();
+  ~ListHandle() noexcept;
 
   inline const_iterator begin() const;
   inline const_iterator end()   const;
@@ -290,7 +290,7 @@ ListHandle<T,Tr>::ListHandle(const ListHandle<T,Tr>& other)
 }
 
 template <class T, class Tr>
-ListHandle<T,Tr>::~ListHandle()
+ListHandle<T,Tr>::~ListHandle() noexcept
 {
   if(ownership_ != Glib::OWNERSHIP_NONE)
   {

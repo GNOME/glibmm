@@ -130,7 +130,7 @@ ObjectBase& ObjectBase::operator=(ObjectBase&& src) noexcept
   return *this;
 }
 
-ObjectBase::~ObjectBase()
+ObjectBase::~ObjectBase() noexcept
 {
   // Normally, gobject_ should always be 0 at this point, because:
   //

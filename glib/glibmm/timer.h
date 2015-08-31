@@ -39,7 +39,7 @@ public:
    * Also starts timing by calling start() implicitly.
    */
   Timer();
-  ~Timer();
+  ~Timer() noexcept;
 
   // not copyable
   Timer(const Timer&) = delete;

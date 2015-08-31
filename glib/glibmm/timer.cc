@@ -32,7 +32,7 @@ Timer::Timer()
   gobject_ (g_timer_new())
 {}
 
-Timer::~Timer()
+Timer::~Timer() noexcept
 {
   g_timer_destroy(gobject_);
 }

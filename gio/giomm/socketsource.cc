@@ -95,7 +95,7 @@ SocketSource::SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition
            (GSourceFunc)&giomm_socketsource_callback)
 {}
 
-SocketSource::~SocketSource()
+SocketSource::~SocketSource() noexcept
 {}
 
 } // namespace Gio

@@ -247,7 +247,7 @@ public:
   // Copying clears the ownership flag of the source handle.
   inline ArrayHandle(const ArrayHandle<T,Tr>& other);
 
-  ~ArrayHandle();
+  ~ArrayHandle() noexcept;
 
   inline const_iterator begin() const;
   inline const_iterator end()   const;
@@ -302,7 +302,7 @@ public:
   // Copying clears the ownership flag of the source handle.
   inline ArrayHandle(const Me& other);
 
-  ~ArrayHandle();
+  ~ArrayHandle() noexcept;
 
   inline const_iterator begin() const;
   inline const_iterator end()   const;
@@ -549,7 +549,7 @@ ArrayHandle<T,Tr>::ArrayHandle(const ArrayHandle<T,Tr>& other)
 }
 
 template <class T, class Tr>
-ArrayHandle<T,Tr>::~ArrayHandle()
+ArrayHandle<T,Tr>::~ArrayHandle() noexcept
 {
   if(parray_ && ownership_ != Glib::OWNERSHIP_NONE)
   {

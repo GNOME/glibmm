@@ -231,7 +231,7 @@ PropertyBase::PropertyBase(Glib::Object& object, GType value_type)
   value_.init(value_type);
 }
 
-PropertyBase::~PropertyBase()
+PropertyBase::~PropertyBase() noexcept
 {
   if(param_spec_)
     g_param_spec_unref(param_spec_);

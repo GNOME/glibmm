@@ -60,7 +60,7 @@ public:
    * set to <tt>true</tt> and not all @a max_threads threads could be created.
    */
   explicit ThreadPool(int max_threads = -1, bool exclusive = false);
-  virtual ~ThreadPool();
+  virtual ~ThreadPool() noexcept;
 
   //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
   // TODO: At the next ABI break, consider changing const sigc::slot<void>& slot

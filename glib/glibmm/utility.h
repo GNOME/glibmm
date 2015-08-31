@@ -69,7 +69,7 @@ private:
 public:
   ScopedPtr()                 : ptr_ (0)   {}
   explicit ScopedPtr(T* ptr)  : ptr_ (ptr) {}
-  ~ScopedPtr()                { g_free(ptr_); }
+  ~ScopedPtr()  noexcept      { g_free(ptr_); }
   T*  get() const             { return ptr_;  }
   T** addr()                  { return &ptr_; }
 };

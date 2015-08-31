@@ -47,7 +47,7 @@ class QueryQuark
     QueryQuark(const GQuark& q);
     QueryQuark(const ustring& s);
     QueryQuark(const char*s);
-    ~QueryQuark() {}
+    ~QueryQuark() noexcept {}
     QueryQuark& operator=(const QueryQuark& q);
     operator ustring() const;
 
@@ -63,7 +63,7 @@ class Quark: public QueryQuark
   public:
     Quark(const ustring& s);
     Quark(const char* s);
-    ~Quark();
+    ~Quark() noexcept;
 };
 
 /** @relates Glib::QueryQuark */

@@ -345,7 +345,7 @@ ustring::ustring(const std::string& src)
   string_ (src)
 {}
 
-ustring::~ustring()
+ustring::~ustring() noexcept
 {}
 
 void ustring::swap(ustring& other)
@@ -1255,7 +1255,7 @@ ustring::FormatStream::FormatStream()
   stream_ ()
 {}
 
-ustring::FormatStream::~FormatStream()
+ustring::FormatStream::~FormatStream() noexcept
 {}
 
 ustring ustring::FormatStream::to_string() const

@@ -32,7 +32,7 @@ class ThreadPool::SlotList
 {
 public:
   SlotList();
-  ~SlotList();
+  ~SlotList() noexcept;
 
   // noncopyable
   SlotList(const ThreadPool::SlotList&) = delete;
@@ -51,7 +51,7 @@ private:
 ThreadPool::SlotList::SlotList()
 {}
 
-ThreadPool::SlotList::~SlotList()
+ThreadPool::SlotList::~SlotList() noexcept
 {}
 
 sigc::slot<void>* ThreadPool::SlotList::push(const sigc::slot<void>& slot)
@@ -141,7 +141,7 @@ ThreadPool::ThreadPool(int max_threads, bool exclusive)
   }
 }
 
-ThreadPool::~ThreadPool()
+ThreadPool::~ThreadPool() noexcept
 {
   if(gobject_)
     g_thread_pool_free(gobject_, 1, 1);

@@ -42,7 +42,7 @@ SignalProxyNormal::SignalProxyNormal(Glib::ObjectBase* obj, const SignalProxyInf
   info_           (info)
 {}
 
-SignalProxyNormal::~SignalProxyNormal()
+SignalProxyNormal::~SignalProxyNormal() noexcept
 {}
 
 sigc::slot_base&
@@ -109,7 +109,7 @@ SignalProxyDetailed::SignalProxyDetailed(Glib::ObjectBase* obj,
                    (detail_name.empty() ? Glib::ustring() : ("::" + detail_name)))
 {}
 
-SignalProxyDetailed::~SignalProxyDetailed()
+SignalProxyDetailed::~SignalProxyDetailed() noexcept
 {}
 
 sigc::slot_base&

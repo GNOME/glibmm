@@ -290,7 +290,7 @@ public:
    */
   explicit inline ArrayKeeper(const CType* array, std::size_t array_size, Glib::OwnershipType ownership);
   inline ArrayKeeper(const ArrayKeeper& keeper);
-  ~ArrayKeeper();
+  ~ArrayKeeper() noexcept;
 
   /** Gets data the keeper holds.
    *
@@ -348,7 +348,7 @@ public:
    */
   explicit inline GListKeeper(const GList* glist, Glib::OwnershipType ownership);
   inline GListKeeper(const GListKeeper& keeper);
-  ~GListKeeper();
+  ~GListKeeper() noexcept;
 
   /** Gets data the keeper holds.
    *
@@ -405,7 +405,7 @@ public:
    */
   explicit inline GSListKeeper(const GSList* gslist, Glib::OwnershipType ownership);
   inline GSListKeeper(const GSListKeeper& keeper);
-  ~GSListKeeper();
+  ~GSListKeeper() noexcept;
 
   /** Gets data the keeper holds.
    *
@@ -787,7 +787,7 @@ inline ArrayKeeper<Tr>::ArrayKeeper(const ArrayKeeper& keeper)
 }
 
 template <typename Tr>
-ArrayKeeper<Tr>::~ArrayKeeper()
+ArrayKeeper<Tr>::~ArrayKeeper() noexcept
 {
   if(array_ && ownership_ != Glib::OWNERSHIP_NONE)
   {
@@ -830,7 +830,7 @@ inline GListKeeper<Tr>::GListKeeper(const GListKeeper& keeper)
 }
 
 template <typename Tr>
-GListKeeper<Tr>::~GListKeeper()
+GListKeeper<Tr>::~GListKeeper() noexcept
 {
   typedef typename Tr::CTypeNonConst CTypeNonConst;
 
@@ -873,7 +873,7 @@ inline GSListKeeper<Tr>::GSListKeeper(const GSListKeeper& keeper)
 }
 
 template <typename Tr>
-GSListKeeper<Tr>::~GSListKeeper()
+GSListKeeper<Tr>::~GSListKeeper() noexcept
 {
   typedef typename Tr::CTypeNonConst CTypeNonConst;
   if(gslist_ && ownership_ != Glib::OWNERSHIP_NONE)

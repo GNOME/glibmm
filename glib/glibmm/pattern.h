@@ -41,7 +41,7 @@ class PatternSpec
 public:
   explicit PatternSpec(const Glib::ustring& pattern);
   explicit PatternSpec(GPatternSpec* gobject);
-  ~PatternSpec();
+  ~PatternSpec() noexcept;
 
   // noncopyable
   PatternSpec(const PatternSpec&) = delete;

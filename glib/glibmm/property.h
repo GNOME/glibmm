@@ -84,7 +84,7 @@ protected:
    * first instance of an object.
    */
   PropertyBase(Glib::Object& object, GType value_type);
-  ~PropertyBase();
+  ~PropertyBase() noexcept;
 
   /**
    * Checks if the property has already been installed.

@@ -41,7 +41,7 @@ class Rand
 public:
   Rand();
   explicit Rand(guint32 seed);
-  ~Rand();
+  ~Rand() noexcept;
 
   // noncopyable
   Rand(const Rand&) = delete;

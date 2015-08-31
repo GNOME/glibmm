@@ -43,7 +43,7 @@ public:
    * is zero-initialized at program start.
    */
   //Class();
-  //~Class();
+  //~Class() noexcept;
 
   //static void class_init_function(BaseClassType *p);
   //static void object_init_function(BaseObjectType *o);

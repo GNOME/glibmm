@@ -108,7 +108,7 @@ public:
 protected:
   SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable);
-  virtual ~SocketSource();
+  virtual ~SocketSource() noexcept;
 };
 
 } // namespace Gio

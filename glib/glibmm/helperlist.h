@@ -51,7 +51,7 @@ public:
   : gparent_(gp)
   {}
 
-  virtual ~HelperList()
+  virtual ~HelperList() noexcept
   {}
 
   typedef T_Child value_type;

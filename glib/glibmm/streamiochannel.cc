@@ -54,7 +54,7 @@ StreamIOChannel::StreamIOChannel(std::istream* stream_in, std::ostream* stream_o
   get_flags_vfunc(); // initialize GIOChannel flag bits
 }
 
-StreamIOChannel::~StreamIOChannel()
+StreamIOChannel::~StreamIOChannel() noexcept
 {}
 
 IOStatus StreamIOChannel::read_vfunc(char* buf, gsize count, gsize& bytes_read)

@@ -934,7 +934,7 @@ Source::Source(GSource* cast_item, GSourceFunc callback_func)
       &SourceCallbackData::destroy_notify_callback);
 }
 
-Source::~Source()
+Source::~Source() noexcept
 {
   // The dtor should be invoked by destroy_notify_callback() only, which clears
   // gobject_ before deleting.  However, we might also get to this point if
@@ -1120,7 +1120,7 @@ TimeoutSource::TimeoutSource(unsigned int interval)
   expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
 }
 
-TimeoutSource::~TimeoutSource()
+TimeoutSource::~TimeoutSource() noexcept
 {}
 
 bool TimeoutSource::prepare(int& timeout)
@@ -1212,7 +1212,7 @@ IdleSource::IdleSource()
   set_priority(PRIORITY_DEFAULT_IDLE);
 }
 
-IdleSource::~IdleSource()
+IdleSource::~IdleSource() noexcept
 {}
 
 bool IdleSource::prepare(int& timeout)
@@ -1268,7 +1268,7 @@ IOSource::IOSource(GSource* cast_item, GSourceFunc callback_func)
   Source(cast_item, callback_func)
 {}
 
-IOSource::~IOSource()
+IOSource::~IOSource() noexcept
 {}
 
 bool IOSource::prepare(int& timeout)

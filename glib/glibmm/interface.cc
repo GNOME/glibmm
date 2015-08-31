@@ -133,7 +133,7 @@ Interface& Interface::operator=(Interface&& src)
   return *this;
 }
 
-Interface::~Interface()
+Interface::~Interface() noexcept
 {}
 
 GType Interface::get_type()

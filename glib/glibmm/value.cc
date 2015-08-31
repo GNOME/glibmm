@@ -62,7 +62,7 @@ ValueBase& ValueBase::operator=(const ValueBase& other)
   return *this;
 }
 
-ValueBase::~ValueBase()
+ValueBase::~ValueBase() noexcept
 {
   g_value_unset(&gobject_);
 }

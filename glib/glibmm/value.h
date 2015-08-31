@@ -60,7 +60,7 @@ public:
   ValueBase(const ValueBase& other);
   ValueBase& operator=(const ValueBase& other);
 
-  ~ValueBase();
+  ~ValueBase() noexcept;
 
   /** Setup the GValue for storing the specified @a type.
    * The contents will be initialized to the default value for this type.

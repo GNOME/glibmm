@@ -128,7 +128,7 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_,
   va_end(var_args);
 }
 
-ConstructParams::~ConstructParams()
+ConstructParams::~ConstructParams() noexcept
 {
   while(n_parameters > 0)
     g_value_unset(&parameters[--n_parameters].value);
@@ -297,7 +297,7 @@ Object& Object::operator=(Object&& src) noexcept
   return *this;
 }
 
-Object::~Object()
+Object::~Object() noexcept
 {
   cpp_destruction_in_progress_ = true;
 }
