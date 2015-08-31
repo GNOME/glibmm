@@ -202,11 +202,11 @@ __CPPNAME__::__CPPNAME__`'(const Glib::Interface_Class& interface_class)
 {
 }
 
-__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& src)
+__CPPNAME__::__CPPNAME__`'(__CPPNAME__&& src) noexcept
 : __CPPPARENT__`'(std::move(src))
 {}
 
-__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__&& src)
+__CPPNAME__& __CPPNAME__::operator=(__CPPNAME__&& src) noexcept
 {
   __CPPPARENT__::operator=`'(std::move(src));
   return *this;
@@ -279,8 +279,8 @@ protected:
 
 public:
 
-  __CPPNAME__`'(__CPPNAME__&& src);
-  __CPPNAME__& operator=(__CPPNAME__&& src);
+  __CPPNAME__`'(__CPPNAME__&& src) noexcept;
+  __CPPNAME__& operator=(__CPPNAME__&& src) noexcept;
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
   virtual ~__CPPNAME__`'() noexcept;
