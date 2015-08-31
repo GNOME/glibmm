@@ -45,8 +45,8 @@ public:
    */
   Interface();
 
-  Interface(Interface&& src);
-  Interface& operator=(Interface&& src);
+  Interface(Interface&& src) noexcept;
+  Interface& operator=(Interface&& src) noexcept;
 
   /** Called by constructors of derived classes. Provide the result of
    * the Class object's init() function to ensure that it is properly

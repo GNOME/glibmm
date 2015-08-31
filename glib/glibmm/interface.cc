@@ -117,7 +117,7 @@ Interface::Interface(GObject* castitem)
 Interface::Interface()
 {}
 
-Interface::Interface(Interface&& src)
+Interface::Interface(Interface&& src) noexcept
 : ObjectBase(std::move(src))
 {
   //We don't call initialize_move() because we 
@@ -127,7 +127,7 @@ Interface::Interface(Interface&& src)
   //ObjectBase::initialize_move(src.gobject_, &src);
 }
 
-Interface& Interface::operator=(Interface&& src)
+Interface& Interface::operator=(Interface&& src) noexcept
 {
   ObjectBase::operator=(std::move(src));
   return *this;
