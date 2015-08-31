@@ -87,7 +87,7 @@ private:
 class SignalProxyNormal : public SignalProxyBase
 {
 public:
-  ~SignalProxyNormal();
+  ~SignalProxyNormal() noexcept;
 
   /// Stops the current signal emission (not in libsigc++)
   void emission_stop();
@@ -147,7 +147,7 @@ private:
 class SignalProxyDetailed : public SignalProxyBase
 {
 public:
-  ~SignalProxyDetailed();
+  ~SignalProxyDetailed() noexcept;
 
   /// Stops the current signal emission (not in libsigc++)
   void emission_stop();

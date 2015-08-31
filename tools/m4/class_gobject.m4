@@ -225,7 +225,7 @@ _IMPORT(SECTION_CC_MOVE_ASSIGNMENT_OPERATOR_INTERFACES)
 
 ifdef(`__BOOL_CUSTOM_DTOR__',`dnl
 ',`dnl
-__CPPNAME__::~__CPPNAME__`'()
+__CPPNAME__::~__CPPNAME__`'() noexcept
 {}
 
 ')dnl
@@ -276,7 +276,7 @@ public:
   __CPPNAME__& operator=(__CPPNAME__&& src);
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
-  virtual ~__CPPNAME__`'();
+  virtual ~__CPPNAME__`'() noexcept;
 
   /** Get the GType for this class, for use with the underlying GObject type system.
    */

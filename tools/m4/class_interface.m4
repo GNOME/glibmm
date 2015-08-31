@@ -212,7 +212,7 @@ __CPPNAME__& __CPPNAME__::operator=(__CPPNAME__&& src)
   return *this;
 }
 
-__CPPNAME__::~__CPPNAME__`'()
+__CPPNAME__::~__CPPNAME__`'() noexcept
 {}
 
 // static
@@ -283,7 +283,7 @@ public:
   __CPPNAME__& operator=(__CPPNAME__&& src);
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
-  virtual ~__CPPNAME__`'();
+  virtual ~__CPPNAME__`'() noexcept;
 
   static void add_interface(GType gtype_implementer);
 

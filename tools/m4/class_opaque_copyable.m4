@@ -158,7 +158,7 @@ __CPPNAME__& __CPPNAME__::operator=(__CPPNAME__`'&& other) noexcept
   return *this;
 }
 
-__CPPNAME__::~__CPPNAME__`'()
+__CPPNAME__::~__CPPNAME__`'() noexcept
 {
   if(gobject_)
     __OPAQUE_FUNC_FREE`'(gobject_);
@@ -216,7 +216,7 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
   __CPPNAME__& operator=(__CPPNAME__&& other) noexcept;
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
-  ~__CPPNAME__`'();
+  ~__CPPNAME__`'() noexcept;
 
   void swap(__CPPNAME__& other) noexcept;
 

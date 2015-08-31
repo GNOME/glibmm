@@ -166,7 +166,7 @@ __CPPNAME__& __CPPNAME__::operator=(const __CPPNAME__`'& other)
   return *this;
 }
 
-__CPPNAME__::~__CPPNAME__`'()
+__CPPNAME__::~__CPPNAME__`'() noexcept
 {
 dnl This could be a free or an unref, we do not need to know.
   if(gobject_)
@@ -226,7 +226,7 @@ ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
   __CPPNAME__& operator=(__CPPNAME__&& other) noexcept;
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
-  ~__CPPNAME__`'();
+  ~__CPPNAME__`'() noexcept;
 
   void swap(__CPPNAME__& other) noexcept;
 
