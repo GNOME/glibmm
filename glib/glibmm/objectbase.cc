@@ -113,13 +113,16 @@ void ObjectBase::initialize_move(GObject* castitem, Glib::ObjectBase* previous_w
 }
 
 ObjectBase::ObjectBase(ObjectBase&& src) noexcept
-: gobject_(std::move(src.gobject_)),
+: sigc::trackable(std::move(src)),
+  gobject_(std::move(src.gobject_)),
   custom_type_name_(std::move(src.custom_type_name_)),
   cpp_destruction_in_progress_(std::move(src.custom_type_name_))
 {}
 
 ObjectBase& ObjectBase::operator=(ObjectBase&& src) noexcept
 {
+  sigc::trackable::operator=(std::move(src));
+
   if(gobject_)
     unreference();
 
