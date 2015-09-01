@@ -31,7 +31,6 @@ check_PROGRAMS =			\
 	network/socket-server		\
 	options/example			\
 	properties/example		\
-	regex/example			\
 	settings/settings		\
 	thread/dispatcher		\
 	thread/dispatcher2		\
