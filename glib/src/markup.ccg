@@ -219,6 +219,17 @@ void ParserCallbacks::error(GMarkupParseContext* context,
 Parser::Parser()
 {}
 
+Parser::Parser(Parser&& other) noexcept
+: sigc::trackable(std::move(other))
+{
+}
+
+Parser& Parser::operator=(Parser&& other) noexcept
+{
+  sigc::trackable::operator=(std::move(other));
+  return *this;
+}
+
 Parser::~Parser()
 {}
 
@@ -246,6 +257,26 @@ ParseContext::ParseContext(Parser& parser, ParseFlags flags)
   gobject_ (g_markup_parse_context_new(&ParserCallbacks::vfunc_table, (GMarkupParseFlags) flags,
                                        this, &ParseContext::destroy_notify_callback))
 {}
+
+ParseContext::ParseContext(ParseContext&& other) noexcept
+: sigc::trackable(std::move(other)),
+  parser_(std::move(other.parser_)),
+  gobject_(std::move(other.gobject_))
+{
+}
+
+ParseContext& ParseContext::operator=(ParseContext&& other) noexcept
+{
+  sigc::trackable::operator=(std::move(other));
+
+  parser_ = std::move(other.parser_);
+  gobject_ = std::move(other.gobject_);
+
+  other.parser_ = nullptr;
+  other.gobject_ = nullptr;
+
+  return *this;
+}
 
 ParseContext::~ParseContext()
 {
