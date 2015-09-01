@@ -36,6 +36,7 @@
  * - Glib::ustring: A UTF-8 string class that can be used interchangably with std::string. Plus @ref StringUtils
  * - Glib::RefPtr: A reference-counting smartpointer, for use with Glib::ObjectBase or similar
  * - @ref CharsetConv
+ * - Glib::Regex: Regular expression string matching.
  * - Glib::KeyFile: Parsing and writing of key files (similar to .ini files)
  * - Glib::Checksum
  * - Glib::Date, Glib::Timer, Glib::TimeVal
