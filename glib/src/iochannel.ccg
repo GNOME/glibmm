@@ -128,13 +128,16 @@ IOChannel::IOChannel()
 }
 
 IOChannel::IOChannel(IOChannel&& other) noexcept
-: gobject_(std::move(other.gobject_))
+: sigc::trackable(std::move(other)),
+  gobject_(std::move(other.gobject_))
 {
   other.gobject_ = nullptr;
 }
 
 IOChannel& IOChannel::operator=(IOChannel&& other) noexcept
 {
+  sigc::trackable::operator=(std::move(other));
+
   release_gobject();
 
   gobject_ = std::move(other.gobject_);
