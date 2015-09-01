@@ -401,7 +401,7 @@ do_connectable (const std::string& arg, gboolean synchronous)
         {
             host = arg.substr (0, pos);
             port_str = arg.substr(pos);
-            port = strtoul (port_str.c_str (), nullptr, 10);
+            port = std::strtoul (port_str.c_str (), nullptr, 10);
         }
         else
             port = 0;
