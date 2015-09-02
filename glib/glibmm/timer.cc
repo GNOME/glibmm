@@ -21,7 +21,7 @@
  */
 
 #include <glib.h>
-#include <glibmm/timer.h>
+#include <glibmm.h>
 
 
 namespace Glib
