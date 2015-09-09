@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* timer.cc
  *
  * Copyright (C) 2002 The gtkmm Development Team
@@ -20,9 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glib.h>
 #include <glibmm.h>
-
+#include <glib.h>
 
 namespace Glib
 {
