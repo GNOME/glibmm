@@ -145,24 +145,12 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  docs/Makefile
                  docs/reference/Doxyfile
-                 MSVC_Net2005/glibmm/glibmm.rc
-                 MSVC_Net2005/giomm/giomm.rc
-                 MSVC_Net2008/glibmm/glibmm.rc
-                 MSVC_Net2008/giomm/giomm.rc
-                 MSVC_Net2010/glibmm/glibmm.rc
-                 MSVC_Net2010/giomm/giomm.rc])
+                 MSVC_Net2013/glibmm/glibmm.rc
+                 MSVC_Net2013/giomm/giomm.rc])
 
 # Copy the generated configuration headers into the MSVC project directories.
-AC_CONFIG_COMMANDS([MSVC_Net2005/glibmm/glibmmconfig.h],
-                   [cp -f glib/glibmmconfig.h MSVC_Net2005/glibmm/glibmmconfig.h])
-AC_CONFIG_COMMANDS([MSVC_Net2005/giomm/giommconfig.h],
-                   [cp -f gio/giommconfig.h MSVC_Net2005/giomm/giommconfig.h])
-AC_CONFIG_COMMANDS([MSVC_Net2008/glibmm/glibmmconfig.h],
-                   [cp -f glib/glibmmconfig.h MSVC_Net2008/glibmm/glibmmconfig.h])
-AC_CONFIG_COMMANDS([MSVC_Net2008/giomm/giommconfig.h],
-                   [cp -f gio/giommconfig.h MSVC_Net2008/giomm/giommconfig.h])
-AC_CONFIG_COMMANDS([MSVC_Net2010/glibmm/glibmmconfig.h],
-                   [cp -f glib/glibmmconfig.h MSVC_Net2010/glibmm/glibmmconfig.h])
-AC_CONFIG_COMMANDS([MSVC_Net2010/giomm/giommconfig.h],
-                   [cp -f gio/giommconfig.h MSVC_Net2010/giomm/giommconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2013/glibmm/glibmmconfig.h],
+                   [cp -f glib/glibmmconfig.h MSVC_Net2013/glibmm/glibmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2013/giomm/giommconfig.h],
+                   [cp -f gio/giommconfig.h MSVC_Net2013/giomm/giommconfig.h])
 AC_OUTPUT
