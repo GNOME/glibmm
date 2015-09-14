@@ -310,6 +310,9 @@ _CONVERSION(`const Glib::RefPtr<TlsCertificate>&',`GTlsCertificate*',`Glib::unwr
 #TlsConnection:
 _CONVERSION(`const Glib::RefPtr<TlsConnection>&',`GTlsConnection*',`Glib::unwrap($3)')
 
+#TlsClientConnection:
+_CONVERSION(`const Glib::RefPtr<TlsClientConnection>&',`GTlsClientConnection*',__CONVERT_REFPTR_TO_P)
+
 #TlsDatabase
 _CONVERSION(`GTlsDatabase*',`Glib::RefPtr<TlsDatabase>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<TlsDatabase>&',`GTlsDatabase*',__CONVERT_REFPTR_TO_P)
