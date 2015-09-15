@@ -52,6 +52,41 @@ namespace Glib
 template <class T_CppObject>
 class RefPtr
 {
+private:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  /** Helper class for disallowing use of Glib::RefPtr with certain classes.
+   *
+   * Disallow for instance in Gtk::Widget and its subclasses.
+   * Glib::RefPtr<T>::is_allowed_type::value is false if
+   * T:dont_allow_use_in_glib_refptr_ is a public type, else it's true.
+   * Example:
+   * @code
+   * typedef int dont_allow_use_in_glib_refptr_;
+   * @endcode
+   */
+  class is_allowed_type
+  {
+  private:
+    struct big
+    {
+      int memory[64];
+    };
+
+    static big check(...);
+
+    // If X::dont_allow_use_in_glib_refptr_ is not a type, this check() overload
+    // is ignored because of the SFINAE rule (Substitution Failure Is Not An Error).
+    template <typename X>
+    static typename X::dont_allow_use_in_glib_refptr_ check(X* obj);
+
+  public:
+    static const bool value = sizeof(check(static_cast<T_CppObject*>(nullptr))) == sizeof(big);
+  };
+
+  static_assert(is_allowed_type::value,
+    "Glib::RefPtr must not be used with this class.");
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
 public:
   /** Default constructor
    *
