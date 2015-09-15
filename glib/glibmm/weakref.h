@@ -28,7 +28,9 @@ namespace Glib
 
 /** WeakRef<> is a weak reference smartpointer.
  *
- * WeakRef can store a pointer to any class that is derived from Glib::ObjectBase.
+ * WeakRef can store a pointer to any class that is derived from Glib::ObjectBase,
+ * and whose reference() method is noexcept.
+ * In glibmm and gtkmm, that is anything derived from Glib::ObjectBase.
  *
  * Unlike a RefPtr, a WeakRef does not contribute to the reference counting of
  * the underlying object.
@@ -46,21 +48,21 @@ public:
    *
    * Create an empty weak reference.
    */
-  inline WeakRef();
+  inline WeakRef() noexcept;
 
   /// Copy constructor.
-  inline WeakRef(const WeakRef& src);
+  inline WeakRef(const WeakRef& src) noexcept;
 
   /// Move constructor.
-  inline WeakRef(WeakRef&& src);
+  inline WeakRef(WeakRef&& src) noexcept;
 
   /// Copy constructor from different, but castable type.
   template <typename T_CastFrom>
-  inline WeakRef(const WeakRef<T_CastFrom>& src);
+  inline WeakRef(const WeakRef<T_CastFrom>& src) noexcept;
 
   /// Move constructor from different, but castable type.
   template <typename T_CastFrom>
-  inline WeakRef(WeakRef<T_CastFrom>&& src);
+  inline WeakRef(WeakRef<T_CastFrom>&& src) noexcept;
 
   /** Constructor from a RefPtr of the same or a castable type.
    *
@@ -68,31 +70,31 @@ public:
    * If the RefPtr references nothing, an empty weak reference will be constructed.
    */
   template <typename T_CastFrom>
-  inline WeakRef(const RefPtr<T_CastFrom>& src);
+  inline WeakRef(const RefPtr<T_CastFrom>& src) noexcept;
 
   /// Destructor.
-  inline ~WeakRef();
+  inline ~WeakRef() noexcept;
 
   /// Swap the contents of two WeakRef<>.
-  inline void swap(WeakRef& other);
+  inline void swap(WeakRef& other) noexcept;
 
   /// Copy assignment operator.
-  inline WeakRef& operator=(const WeakRef& src);
+  inline WeakRef& operator=(const WeakRef& src) noexcept;
 
   /// Move assignment operator.
-  inline WeakRef& operator=(WeakRef&& src);
+  inline WeakRef& operator=(WeakRef&& src) noexcept;
 
   /// Copy assignment from different, but castable type.
   template <typename T_CastFrom>
-  inline WeakRef& operator=(const WeakRef<T_CastFrom>& src);
+  inline WeakRef& operator=(const WeakRef<T_CastFrom>& src) noexcept;
 
   /// Move assignment from different, but castable type.
   template <typename T_CastFrom>
-  inline WeakRef& operator=(WeakRef<T_CastFrom>&& src);
+  inline WeakRef& operator=(WeakRef<T_CastFrom>&& src) noexcept;
 
   /// Assignment from a RefPtr of the same or a castable type.
   template <typename T_CastFrom>
-  inline WeakRef& operator=(const RefPtr<T_CastFrom>& src);
+  inline WeakRef& operator=(const RefPtr<T_CastFrom>& src) noexcept;
 
   /** Test whether the WeakRef<> points to any underlying instance.
    *
@@ -107,17 +109,17 @@ public:
    * because the underlying instance may lose its last reference in another
    * thread. Use get() if this is not acceptable.
    */
-  inline explicit operator bool() const;
+  inline explicit operator bool() const noexcept;
 
   /** Create a strong reference to the underlying object.
    *
    * This is a thread-safe way to acquire a strong reference to the underlying
    * object. If the WeakRef is empty, the returned RefPtr will reference nothing.
    */
-  inline RefPtr<T_CppObject> get() const;
+  inline RefPtr<T_CppObject> get() const noexcept;
 
   /// Make this WeakRef empty.
-  inline void reset();
+  inline void reset() noexcept;
 
   /** Dynamic cast to derived class.
    *
@@ -127,7 +129,7 @@ public:
    * @endcode
    */
   template <typename T_CastFrom>
-  static inline WeakRef cast_dynamic(const WeakRef<T_CastFrom>& src);
+  static inline WeakRef cast_dynamic(const WeakRef<T_CastFrom>& src) noexcept;
 
   /** Static cast to derived class.
    *
@@ -137,7 +139,7 @@ public:
    * @endcode
    */
   template <typename T_CastFrom>
-  static inline WeakRef cast_static(const WeakRef<T_CastFrom>& src);
+  static inline WeakRef cast_static(const WeakRef<T_CastFrom>& src) noexcept;
 
   /** Cast to non-const.
    *
@@ -147,7 +149,7 @@ public:
    * @endcode
    */
   template <typename T_CastFrom>
-  static inline WeakRef cast_const(const WeakRef<T_CastFrom>& src);
+  static inline WeakRef cast_const(const WeakRef<T_CastFrom>& src) noexcept;
 
 private:
   // Let all instantiations of WeakRef access private data.
@@ -156,7 +158,7 @@ private:
 
   // If pCppObject != nullptr && gobject == nullptr,
   // then the caller holds a strong reference.
-  inline void set(T_CppObject* pCppObject, GWeakRef* gobject);
+  void set(T_CppObject* pCppObject, GWeakRef* gobject) noexcept;
 
   // WeakRef owns *gobject_, but it does not own *pCppObject_.
   // Invariant: (!pCppObject_ || gobject_),
@@ -174,14 +176,14 @@ private:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 template <typename T_CppObject>
-WeakRef<T_CppObject>::WeakRef()
+WeakRef<T_CppObject>::WeakRef() noexcept
 :
 pCppObject_(nullptr), gobject_(nullptr)
 {
 }
 
 template <typename T_CppObject>
-WeakRef<T_CppObject>::WeakRef(const WeakRef& src)
+WeakRef<T_CppObject>::WeakRef(const WeakRef& src) noexcept
 :
 pCppObject_(src.pCppObject_), gobject_(nullptr)
 {
@@ -202,7 +204,7 @@ pCppObject_(src.pCppObject_), gobject_(nullptr)
 }
 
 template <typename T_CppObject>
-WeakRef<T_CppObject>::WeakRef(WeakRef&& src)
+WeakRef<T_CppObject>::WeakRef(WeakRef&& src) noexcept
 :
 pCppObject_(src.pCppObject_), gobject_(src.gobject_)
 {
@@ -214,7 +216,7 @@ pCppObject_(src.pCppObject_), gobject_(src.gobject_)
 // castable. Thus, it does downcasts:
 //   base_ref = derived_ref
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject>::WeakRef(const WeakRef<T_CastFrom>& src)
+WeakRef<T_CppObject>::WeakRef(const WeakRef<T_CastFrom>& src) noexcept
 :
 pCppObject_(src.pCppObject_), gobject_(nullptr)
 {
@@ -238,7 +240,7 @@ pCppObject_(src.pCppObject_), gobject_(nullptr)
 // castable. Thus, it does downcasts:
 //   base_ref = std::move(derived_ref)
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject>::WeakRef(WeakRef<T_CastFrom>&& src)
+WeakRef<T_CppObject>::WeakRef(WeakRef<T_CastFrom>&& src) noexcept
 :
 pCppObject_(src.pCppObject_), gobject_(src.gobject_)
 {
@@ -247,7 +249,7 @@ pCppObject_(src.pCppObject_), gobject_(src.gobject_)
 }
 
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject>::WeakRef(const RefPtr<T_CastFrom>& src)
+WeakRef<T_CppObject>::WeakRef(const RefPtr<T_CastFrom>& src) noexcept
 :
 pCppObject_(src.operator->()), gobject_(nullptr)
 {
@@ -259,7 +261,7 @@ pCppObject_(src.operator->()), gobject_(nullptr)
 }
 
 template <typename T_CppObject>
-WeakRef<T_CppObject>::~WeakRef()
+WeakRef<T_CppObject>::~WeakRef() noexcept
 {
   if (gobject_)
   {
@@ -269,21 +271,21 @@ WeakRef<T_CppObject>::~WeakRef()
 }
 
 template <class T_CppObject>
-void WeakRef<T_CppObject>::swap(WeakRef& other)
+void WeakRef<T_CppObject>::swap(WeakRef& other) noexcept
 {
   std::swap(pCppObject_, other.pCppObject_);
   std::swap(gobject_, other.gobject_);
 }
 
 template <typename T_CppObject>
-WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(const WeakRef& src)
+WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(const WeakRef& src) noexcept
 {
   set(src.pCppObject_, src.gobject_);
   return *this;
 }
 
 template <typename T_CppObject>
-WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(WeakRef&& src)
+WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(WeakRef&& src) noexcept
 {
   // See RefPtr for an explanation of the swap() technique to implement
   // copy assignment and move assignment.
@@ -297,14 +299,14 @@ WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(WeakRef&& src)
 }
 
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(const WeakRef<T_CastFrom>& src)
+WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(const WeakRef<T_CastFrom>& src) noexcept
 {
   set(src.pCppObject_, src.gobject_);
   return *this;
 }
 
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(WeakRef<T_CastFrom>&& src)
+WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(WeakRef<T_CastFrom>&& src) noexcept
 {
   WeakRef<T_CppObject> temp(std::forward<WeakRef<T_CastFrom>>(src));
   this->swap(temp);
@@ -312,7 +314,7 @@ WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(WeakRef<T_CastFrom>&& src)
 }
 
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(const RefPtr<T_CastFrom>& src)
+WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(const RefPtr<T_CastFrom>& src) noexcept
 {
   T_CppObject* pCppObject = src.operator->();
   set(pCppObject, nullptr);
@@ -320,7 +322,7 @@ WeakRef<T_CppObject>& WeakRef<T_CppObject>::operator=(const RefPtr<T_CastFrom>& 
 }
 
 template <class T_CppObject>
-WeakRef<T_CppObject>::operator bool() const
+WeakRef<T_CppObject>::operator bool() const noexcept
 {
   if (!pCppObject_)
     return false;
@@ -334,7 +336,7 @@ WeakRef<T_CppObject>::operator bool() const
 }
 
 template <typename T_CppObject>
-RefPtr<T_CppObject> WeakRef<T_CppObject>::get() const
+RefPtr<T_CppObject> WeakRef<T_CppObject>::get() const noexcept
 {
   RefPtr<T_CppObject> ret;
 
@@ -355,13 +357,13 @@ RefPtr<T_CppObject> WeakRef<T_CppObject>::get() const
 }
 
 template <typename T_CppObject>
-void WeakRef<T_CppObject>::reset()
+void WeakRef<T_CppObject>::reset() noexcept
 {
   set(nullptr, nullptr);
 }
 
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_dynamic(const WeakRef<T_CastFrom>& src)
+WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_dynamic(const WeakRef<T_CastFrom>& src) noexcept
 {
   WeakRef<T_CppObject> ret;
 
@@ -382,7 +384,7 @@ WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_dynamic(const WeakRef<T_CastFrom
 }
 
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_static(const WeakRef<T_CastFrom>& src)
+WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_static(const WeakRef<T_CastFrom>& src) noexcept
 {
   T_CppObject *const pCppObject = static_cast<T_CppObject*>(src.pCppObject_);
 
@@ -392,7 +394,7 @@ WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_static(const WeakRef<T_CastFrom>
 }
 
 template <typename T_CppObject> template <typename T_CastFrom>
-WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_const(const WeakRef<T_CastFrom>& src)
+WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_const(const WeakRef<T_CastFrom>& src) noexcept
 {
   T_CppObject *const pCppObject = const_cast<T_CppObject*>(src.pCppObject_);
 
@@ -402,7 +404,7 @@ WeakRef<T_CppObject> WeakRef<T_CppObject>::cast_const(const WeakRef<T_CastFrom>&
 }
 
 template <typename T_CppObject>
-void WeakRef<T_CppObject>::set(T_CppObject* pCppObject, GWeakRef* gobject)
+void WeakRef<T_CppObject>::set(T_CppObject* pCppObject, GWeakRef* gobject) noexcept
 {
   // We must own a strong reference to the underlying GObject while
   // calling g_weak_ref_init() or g_weak_ref_set().
@@ -437,7 +439,7 @@ void WeakRef<T_CppObject>::set(T_CppObject* pCppObject, GWeakRef* gobject)
  * @relates Glib::WeakRef
  */
 template <class T_CppObject> inline
-void swap(WeakRef<T_CppObject>& lhs, WeakRef<T_CppObject>& rhs)
+void swap(WeakRef<T_CppObject>& lhs, WeakRef<T_CppObject>& rhs) noexcept
 {
   lhs.swap(rhs);
 }

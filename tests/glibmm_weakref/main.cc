@@ -19,7 +19,6 @@
 #include <iostream>
 #include <cstring>
 #include <utility> // std::move
-#include <glibmm/weakref.h> //!! Until it's included in glibmm.h
 
 int main(int, char**)
 {
