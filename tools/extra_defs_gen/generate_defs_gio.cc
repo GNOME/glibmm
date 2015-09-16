@@ -74,6 +74,7 @@ int main(int, char**)
 #endif
 
             << get_defs(G_TYPE_INPUT_STREAM)
+            << get_defs(G_TYPE_LIST_MODEL)
             << get_defs(G_TYPE_LOADABLE_ICON)
             << get_defs(G_TYPE_MEMORY_INPUT_STREAM)
             << get_defs(G_TYPE_MEMORY_OUTPUT_STREAM)
