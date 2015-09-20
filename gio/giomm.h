@@ -89,7 +89,6 @@
 #include <giomm/initable.h>
 #include <giomm/inputstream.h>
 #include <giomm/iostream.h>
-#include <giomm/listmodel.h>
 #include <giomm/loadableicon.h>
 #include <giomm/memoryinputstream.h>
 #include <giomm/memoryoutputstream.h>
