@@ -807,8 +807,12 @@ guint Connection::signal_subscribe(
 {
   auto slot_copy = new SlotSignal(slot);
 
-  return g_dbus_connection_signal_subscribe(gobj(), sender.c_str(),
-    interface_name.c_str(), member.c_str(), object_path.c_str(), arg0.c_str(),
+  return g_dbus_connection_signal_subscribe(gobj(),
+    (sender.empty() ? nullptr : sender.c_str()),
+    (interface_name.empty() ? nullptr : interface_name.c_str()),
+    (member.empty() ? nullptr : member.c_str()),
+    (object_path.empty() ? nullptr : object_path.c_str()),
+    (arg0.empty() ? nullptr : arg0.c_str()),
     static_cast<GDBusSignalFlags>(flags),
     &DBusConnection_Signal_giomm_callback, slot_copy,
     &DBusConnection_Signal_giomm_callback_destroy);
