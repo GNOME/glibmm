@@ -254,15 +254,15 @@ public:
   typedef __CNAME__ BaseObjectType;
   typedef __REAL_CNAME__`'Class BaseClassType;
 
+  // noncopyable
+  __CPPNAME__`'(const __CPPNAME__&) = delete;
+  __CPPNAME__& operator=(const __CPPNAME__&) = delete;
+
 m4_ifdef(`__BOOL_PROTECTED_GCLASS__',
 `protected:',`dnl else
 private:')dnl endif
   friend class __CPPNAME__`'_Class;
   static CppClassType `'__BASE__`'_class_;
-
-  // noncopyable
-  __CPPNAME__`'(const __CPPNAME__&) = delete;
-  __CPPNAME__& operator=(const __CPPNAME__&) = delete;
 
 protected:
   explicit __CPPNAME__`'(const Glib::ConstructParams& construct_params);
