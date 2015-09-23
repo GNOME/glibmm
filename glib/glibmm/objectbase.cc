@@ -229,7 +229,8 @@ void ObjectBase::_move_current_wrapper(GObject* object, Glib::ObjectBase* previo
     g_warning("%s: Unexpected previous wrapper, for object of type %s.\n"
               "previous_wrapper=%p, current_wrapper=%p",
                 G_STRFUNC, G_OBJECT_TYPE_NAME(object),
-                previous_wrapper, current_wrapper);
+                static_cast<void*>(previous_wrapper),
+                static_cast<void*>(current_wrapper));
   }
 
   //Remove the previous wrapper, without invoking destroy_notify_callback_():
