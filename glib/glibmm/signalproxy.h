@@ -1,26 +1,24 @@
-dnl Glib SignalProxy Templates
-dnl 
-dnl  Copyright 2001 Free Software Foundation
-dnl  Copyright 1999 Karl Nelson <kenelson@ece.ucdavis.edu>
-dnl 
-dnl  This library is free software; you can redistribute it and/or
-dnl  modify it under the terms of the GNU Lesser General Public
-dnl  License as published by the Free Software Foundation; either
-dnl  version 2.1 of the License, or (at your option) any later version.
-dnl 
-dnl  This library is distributed in the hope that it will be useful,
-dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-dnl  Lesser General Public License for more details.
-dnl 
-dnl  You should have received a copy of the GNU Lesser General Public
-dnl  License along with this library; if not, write to the Free
-dnl  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-dnl 
-/* This is a generated file, do not edit.  Generated from __file__ */
-include(template.macros.m4)
-#ifndef __header__
-#define __header__
+#ifndef _GLIBMM_SIGNALPROXY_H
+#define _GLIBMM_SIGNALPROXY_H
+
+/* signalproxy.h
+ *
+ * Copyright (C) 2015 The gtkmm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
 
 extern "C"
 {
@@ -60,7 +58,7 @@ public:
   {
     const auto pConnectionNode = static_cast<SignalProxyConnectionNode*>(data);
 
-    // Return nullptr if the connection is blocked.
+    // Return null pointer if the connection is blocked.
     return (!pConnectionNode->slot_.blocked()) ? &pConnectionNode->slot_ : nullptr;
   }
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
@@ -93,7 +91,7 @@ public:
   void emission_stop();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // This callback for SignalProxy0<void>
+  // This callback for SignalProxy<void>
   // is defined here to avoid code duplication.
   static void slot0_void_callback(GObject*, void* data);
 #endif
@@ -135,6 +133,77 @@ private:
   SignalProxyNormal& operator=(const SignalProxyNormal&);
 };
 
+/**** Glib::SignalProxy ***************************************************/
+
+/** Proxy for signals with any number of arguments.
+ * Use the connect() or connect_notify() method, with sigc::mem_fun() or sigc::ptr_fun()
+ * to connect signal handlers to signals.
+ */
+template <class R, class ...T>
+class SignalProxy : public SignalProxyNormal
+{
+public:
+  typedef sigc::slot<R, T...>    SlotType;
+  typedef sigc::slot<void, T...> VoidSlotType;
+
+  SignalProxy(ObjectBase* obj, const SignalProxyInfo* info)
+    : SignalProxyNormal(obj, info) {}
+
+  /** Connects a signal handler to a signal.
+   *
+   * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
+   *
+   * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
+   * @param after Whether this signal handler should be called before or after the default signal handler.
+   */
+  sigc::connection connect(const SlotType& slot, bool after = true)
+    { return sigc::connection(connect_(slot, after)); }
+
+  /** Connects a signal handler without a return value to a signal.
+   * By default, the signal handler will be called before the default signal handler.
+   *
+   * For instance, connect_notify( sigc::mem_fun(*this, &TheClass::on_something) );
+   *
+   * If the signal requires signal handlers with a @c void return type,
+   * the only difference between connect() and connect_notify() is the default
+   * value of @a after.
+   *
+   * If the signal requires signal handlers with a return value of type T,
+   * connect_notify() binds <tt>return T()</tt> to the connected signal handler.
+   * For instance, if the return type is @c bool, the following two calls are equivalent.
+   * @code
+   * connect_notify( sigc::mem_fun(*this, &TheClass::on_something) );
+   * connect( sigc::bind_return<bool>(sigc::mem_fun(*this, &TheClass::on_something), false), false );
+   * @endcode
+   *
+   * @param slot The signal handler, which should have a @c void return type,
+   *        usually created with sigc::mem_fun() or sigc::ptr_fun().
+   * @param after Whether this signal handler should be called before or after the default signal handler.
+   */
+  sigc::connection connect_notify(const VoidSlotType& slot, bool after = false)
+    { return sigc::connection(connect_notify_(slot, after)); }
+};
+
+/* Templates below has been added to avoid API break, and should not be
+ * used in a newly created code. SignalProxy class should be used instead
+ * of SignalProxy# class.
+ */
+template <typename R>
+using SignalProxy0 = SignalProxy<R>;
+template <typename R, typename T1>
+using SignalProxy1 = SignalProxy<R, T1>;
+template <typename R, typename T1, typename T2>
+using SignalProxy2 = SignalProxy<R, T1, T2>;
+template <typename R, typename T1, typename T2, typename T3>
+using SignalProxy3 = SignalProxy<R, T1, T2, T3>;
+template <typename R, typename T1, typename T2, typename T3, typename T4>
+using SignalProxy4 = SignalProxy<R, T1, T2, T3, T4>;
+template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5>
+using SignalProxy5 = SignalProxy<R, T1, T2, T3, T4, T5>;
+template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+using SignalProxy6 = SignalProxy<R, T1, T2, T3, T4, T5, T6>;
+
+ 
 // Shared portion of a Signal with detail
 /** The SignalProxy provides an API similar to sigc::signal that can be used to
  * connect sigc::slots to glib signals.
@@ -173,39 +242,25 @@ protected:
 
 private:
   const SignalProxyInfo* info_; // Pointer to statically allocated structure.
-  const Glib::ustring detailed_name_; // signal_name[[::detail_name]]dnl one pair of [] in the generated .h file
-
+  const Glib::ustring detailed_name_; // signal_name[::detail_name]
 
   // no copy assignment
   SignalProxyDetailed& operator=(const SignalProxyDetailed&);
 };
 
-dnl
-dnl GLIB_SIGNAL_PROXY([P1, P2, ...], Normal or Detailed)
-dnl
-define([GLIB_SIGNAL_PROXY],[dnl
-LINE(]__line__[)dnl
-
-/**** Glib::[SignalProxy]ifelse($2,Normal,,$2)[]NUM($1) ***************************************************/
-
-/** Proxy for signals with NUM($1) arguments[]ifelse($2,Normal,,[ and possibly a detailed name]).
+/** Proxy for signals with any number of arguments and possibly a detailed name.
  * Use the connect() or connect_notify() method, with sigc::mem_fun() or sigc::ptr_fun()
  * to connect signal handlers to signals.
  */
-template <LIST(class R,ARG_CLASS($1))>
-class [SignalProxy]ifelse($2,Normal,,$2)[]NUM($1) : public SignalProxy$2
+template <class R,class ...T>
+class SignalProxyDetailedAnyType : public SignalProxyDetailed
 {
 public:
-  typedef sigc::slot<LIST(R,ARG_TYPE($1))>    SlotType;
-  typedef sigc::slot<LIST(void,ARG_TYPE($1))> VoidSlotType;
+  typedef sigc::slot<R,T...>    SlotType;
+  typedef sigc::slot<void,T...> VoidSlotType;
 
-ifelse($2,Normal,dnl
-  [SignalProxy]NUM($1)[(ObjectBase* obj, const SignalProxyInfo* info)
-    : SignalProxyNormal(obj, info) {}
-],dnl Detailed
-  [SignalProxyDetailed]NUM($1)[(ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name)
+  SignalProxyDetailedAnyType(ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name)
     : SignalProxyDetailed(obj, info, detail_name) {}
-])dnl
 
   /** Connects a signal handler to a signal.
    *
@@ -215,7 +270,7 @@ ifelse($2,Normal,dnl
    * @param after Whether this signal handler should be called before or after the default signal handler.
    */
   sigc::connection connect(const SlotType& slot, bool after = true)
-    { return sigc::connection(ifelse($2,Normal,[connect_(slot, after)],[connect_impl_(false, slot, after)])); }
+    { return sigc::connection(connect_impl_(false, slot, after)); }
 
   /** Connects a signal handler without a return value to a signal.
    * By default, the signal handler will be called before the default signal handler.
@@ -239,29 +294,29 @@ ifelse($2,Normal,dnl
    * @param after Whether this signal handler should be called before or after the default signal handler.
    */
   sigc::connection connect_notify(const VoidSlotType& slot, bool after = false)
-    { return sigc::connection(ifelse($2,Normal,[connect_notify_(slot, after)],[connect_impl_(true, slot, after)])); }
+    { return sigc::connection(connect_impl_(true, slot, after)); }
 };
-])dnl
-dnl
-dnl Template forms of SignalProxy
-dnl
-GLIB_SIGNAL_PROXY(ARGS(P,0), Normal)
-GLIB_SIGNAL_PROXY(ARGS(P,1), Normal)
-GLIB_SIGNAL_PROXY(ARGS(P,2), Normal)
-GLIB_SIGNAL_PROXY(ARGS(P,3), Normal)
-GLIB_SIGNAL_PROXY(ARGS(P,4), Normal)
-GLIB_SIGNAL_PROXY(ARGS(P,5), Normal)
-GLIB_SIGNAL_PROXY(ARGS(P,6), Normal)
-dnl
-GLIB_SIGNAL_PROXY(ARGS(P,0), Detailed)
-GLIB_SIGNAL_PROXY(ARGS(P,1), Detailed)
-GLIB_SIGNAL_PROXY(ARGS(P,2), Detailed)
-GLIB_SIGNAL_PROXY(ARGS(P,3), Detailed)
-GLIB_SIGNAL_PROXY(ARGS(P,4), Detailed)
-GLIB_SIGNAL_PROXY(ARGS(P,5), Detailed)
-GLIB_SIGNAL_PROXY(ARGS(P,6), Detailed)
-dnl
+
+/* Templates below has been added to avoid API break, and should not be
+ * used in a newly created code. SignalProxyDetailedAnyType class should be
+ * used instead of SignalProxyDetailed# class.
+ */
+template <typename R>
+using SignalProxyDetailed0 = SignalProxyDetailedAnyType<R>;
+template <typename R, typename T1>
+using SignalProxyDetailed1 = SignalProxyDetailedAnyType<R, T1>;
+template <typename R, typename T1, typename T2>
+using SignalProxyDetailed2 = SignalProxyDetailedAnyType<R, T1, T2>;
+template <typename R, typename T1, typename T2, typename T3>
+using SignalProxyDetailed3 = SignalProxyDetailedAnyType<R, T1, T2, T3>;
+template <typename R, typename T1, typename T2, typename T3, typename T4>
+using SignalProxyDetailed4 = SignalProxyDetailedAnyType<R, T1, T2, T3, T4>;
+template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5>
+using SignalProxyDetailed5 = SignalProxyDetailedAnyType<R, T1, T2, T3, T4, T5>;
+template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+using SignalProxyDetailed6 = SignalProxyDetailedAnyType<R, T1, T2, T3, T4, T5, T6>;
+ 
 } // namespace Glib
 
-#endif /* __header__ */
+#endif /* _GLIBMM_SIGNALPROXY_H */
 
