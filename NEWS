@@ -1,3 +1,90 @@
+Changes in 2.46 compared to 2.44:
+
+General:
+* Use, and require C++11, using features such as move operations, noexcept
+  auto, = delete, nulltpr, override.
+  (Murray Cumming, Kjell Ahlstedt))
+
+Glib::
+* RefPtr:
+  - Make it possible to stop use of RefPtr with certain classes.
+  (Kjell Ahlstedt)
+  - Make methods noexcept (C++11).
+  (Murray Cumming)
+  - Add move operations.
+  (Murray Cumming, Marcin Kolny, Kjell Ahlstedt)
+  * Add release():
+  (Marcin Kolny)
+* ObjectBase: Don't use std::auto_ptr (deprecated in C++11).
+  (Kjell Ahlstedt)
+* ObjectBase, Object, Interface, IOChannel, Markup: Add move operations
+  (Murray Cumming) Add C++11 move operations.
+  (Murray Cumming)
+* HelperList: fix iterator check in operator[]
+  (Maks Naumov)
+* Add SettingsSchema, SettingsSchemaKey and SettingsSchemaSource.
+  (Murray Cumming)
+* Add Glib::format_size().
+  (Kjell Ahlstedt)
+* Add get_user_special_dir(UserDirectory), deprecating 
+  get_user_special_dir(GUserDirectory directory).
+  (Kjell Ahlstedt)
+* Threads::Thread: Use GThread only via a pointer.
+  Kjell Ahlstedt
+* VariantBase: Add is_castable_to().
+* VariantContainerBase: get_iter(): Accept casts of complicated types
+  containing object paths and DBus type signatures to Variant<> types
+  containing Glib::ustring and std::string.
+  (Kjell Ahlstedt)
+* Variant: Wrap handles and add get_data_as_bytes()
+  (Kjell Ahlstedt)
+* Added SignalProxyDetailed.
+
+
+Gio:
+* Application: Add the shutdown signal.
+  (Murray Cumming)
+* NetworkMonitor: Add get_network_metered() and property.
+  (Murray Cumming)
+* Settings: Add signal_changed(key).
+  (Kjell Ahlstedt, Murray Cumming)
+* Added SimpleIOStream.
+  (Kjell Ahlstedt)
+* SocketService: Add active property.
+  (Murray Cumming)
+* TlsClientConnection: Add copy_session_state().
+  (Murray Cumming)
+
+Gio::Dbus:
+* Connection::signal_subscribe(): Pass nullptr instead of "".
+  (Murray Cumming)
+
+gmmproc:
+* Generate C++11 move operations.
+  (Murray Cumming)
+* Mark all _CLASS_OPAQUE_REFCOUNTED classes as final (C++11).
+  (Murray Cumming)
+* generate_wrap_init.pl: Allow use of nested namespaces for whole module.
+  (Marcin Kolny)
+* _WRAP_METHOD: deprecated: Use G_GNUC_[BEGIN|END]_IGNORE_DEPRECATIONS
+  per function, instead of one big undef [G|GDK|GTK]_DISABLE_DEPRECATED.
+  (Kjell Ahlstedt)
+* Add _IGNORE_PROPERTY() and _IGNORE_CHILD_PROPERTY() macros.
+  (Kjell Ahlstedt)
+* Add support for 'newin "n,m"' in some _WRAP macros.
+  (Kjell Ahlstedt)
+* _WRAP_SIGNAL: Add support for detail_name.
+  (Kjell Ahlstedt)
+* Fetch property documentation from the docs.xml file, if available there.
+  (Kjell Ahlstedt)
+
+Build:
+* MSVC Builds: Many improvements
+  (Chun-wei Fan)
+* Add missing GLIBMM_API for Interface
+  (Mikhail Titov)
+
+
 2.46.1 (stable):
 
 * gmmmproc: _CLASS_GOBJECT():
