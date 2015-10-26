@@ -821,9 +821,9 @@ protected:
   explicit TimeoutSource(unsigned int interval);
   virtual ~TimeoutSource() noexcept;
 
-  virtual bool prepare(int& timeout);
-  virtual bool check();
-  virtual bool dispatch(sigc::slot_base* slot);
+  bool prepare(int& timeout) override;
+  bool check() override;
+  bool dispatch(sigc::slot_base* slot) override;
 
 private:
   //TODO: Replace with gint64, because TimeVal is deprecated, when we can break ABI.
@@ -845,9 +845,9 @@ protected:
   IdleSource();
   virtual ~IdleSource() noexcept;
 
-  virtual bool prepare(int& timeout);
-  virtual bool check();
-  virtual bool dispatch(sigc::slot_base* slot_data);
+  bool prepare(int& timeout) override;
+  bool check() override;
+  bool dispatch(sigc::slot_base* slot_data) override;
 };
 
 
@@ -873,9 +873,9 @@ protected:
 
   virtual ~IOSource() noexcept;
 
-  virtual bool prepare(int& timeout);
-  virtual bool check();
-  virtual bool dispatch(sigc::slot_base* slot);
+  bool prepare(int& timeout) override;
+  bool check() override;
+  bool dispatch(sigc::slot_base* slot) override;
 
 private:
   PollFD poll_fd_;
