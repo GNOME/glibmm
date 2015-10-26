@@ -42,7 +42,7 @@ public:
 
   GQuark domain() const;
   int code() const;
-  virtual Glib::ustring what() const;
+  Glib::ustring what() const override;
 
   bool matches(GQuark error_domain, int error_code) const;
 
