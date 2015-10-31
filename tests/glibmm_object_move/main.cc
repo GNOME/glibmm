@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-//A basic derived GObject, just to test Glib::ObjectBase.
+//A basic derived GObject, just to test Glib::Object.
 typedef struct {
     GObject parent;
 } TestDerived;
@@ -27,7 +27,7 @@ class DerivedObject : public Glib::Object
 {
 public:
   //A real application would never make the constructor public.
-  //It would instead have a protectd constructor and a public create() method.
+  //It would instead have a protected constructor and a public create() method.
   DerivedObject(GObject* gobject, int i)
   : Glib::Object(gobject),
     i_(i)
@@ -56,32 +56,34 @@ public:
 static
 void test_object_move_constructor()
 {
-  GObject *gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
-  g_object_ref(gobject);
-
+  GObject* gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
   DerivedObject derived(gobject, 5);
   std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
   g_assert(derived.gobj() == gobject);
+
   DerivedObject derived2(std::move(derived));
   g_assert_cmpint(derived2.i_, ==, 5);
   std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
   g_assert(derived2.gobj() == gobject);
+  g_assert(derived.gobj() == nullptr);
 }
 
 
 static
 void test_object_move_assignment_operator()
 {
-  GObject *gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
-  g_object_ref(gobject);
-
+  GObject* gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
   DerivedObject derived(gobject, 5);
   //std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
   g_assert(derived.gobj() == gobject);
-  DerivedObject derived2 = std::move(derived);
+
+  GObject* gobject2 = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
+  DerivedObject derived2(gobject2, 6);
+  derived2 = std::move(derived);
   g_assert_cmpint(derived2.i_, ==, 5);
   //std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
   g_assert(derived2.gobj() == gobject);
+  g_assert(derived.gobj() == nullptr);
 }
 
 

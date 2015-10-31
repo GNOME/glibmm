@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright 1998-2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -286,8 +283,13 @@ Object::Object(GObject* castitem)
 }
 
 Object::Object(Object&& src) noexcept
-: ObjectBase(std::move(src)) //not actually called because it's a virtual base
+: sigc::trackable(std::move(src)), //not actually called because it's a virtual base
+  ObjectBase(std::move(src)) //not actually called because it's a virtual base
 {
+  // Perhaps trackable's move constructor has not been called. Do its job here.
+  // (No harm is done if notify_callbacks() is called twice. The second call
+  // won't do anything.)
+  src.notify_callbacks();
   ObjectBase::initialize_move(src.gobject_, &src);
 }
 

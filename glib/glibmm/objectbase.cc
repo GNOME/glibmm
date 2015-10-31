@@ -113,22 +113,28 @@ void ObjectBase::initialize_move(GObject* castitem, Glib::ObjectBase* previous_w
 }
 
 ObjectBase::ObjectBase(ObjectBase&& src) noexcept
-: sigc::trackable(std::move(src)),
-  gobject_(std::move(src.gobject_)),
-  custom_type_name_(std::move(src.custom_type_name_)),
-  cpp_destruction_in_progress_(std::move(src.custom_type_name_))
+: sigc::trackable(std::move(src)), //not actually called because it's a virtual base
+  gobject_(nullptr),
+  custom_type_name_(src.custom_type_name_),
+  cpp_destruction_in_progress_(src.cpp_destruction_in_progress_)
 {}
 
 ObjectBase& ObjectBase::operator=(ObjectBase&& src) noexcept
 {
+  if (this == &src)
+    return *this;
+
   sigc::trackable::operator=(std::move(src));
 
-  if(gobject_)
+  if (gobject_)
+  {
+    // Remove the wrapper, without invoking destroy_notify_callback_():
+    g_object_steal_qdata(gobject_, Glib::quark_);
+    // Remove a reference, without deleting *this.
     unreference();
-
-  gobject_ = std::move(src.gobject_);
-  custom_type_name_ = std::move(src.custom_type_name_);
-  cpp_destruction_in_progress_ = std::move(src.custom_type_name_);
+    gobject_ = nullptr;
+  }
+  initialize_move(src.gobject_, &src);
 
   return *this;
 }

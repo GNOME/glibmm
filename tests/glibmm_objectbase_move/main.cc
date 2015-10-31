@@ -28,7 +28,7 @@ class DerivedObjectBase : public Glib::ObjectBase
 {
 public:
   //A real application would never make the constructor public.
-  //It would instead have a protectd constructor and a public create() method.
+  //It would instead have a protected constructor and a public create() method.
   DerivedObjectBase(GObject* gobject, int i)
   : Glib::ObjectBase(nullptr),
     i_(i)
@@ -42,7 +42,9 @@ public:
   DerivedObjectBase(DerivedObjectBase&& src) noexcept
   : Glib::ObjectBase(std::move(src)),
     i_(std::move(src.i_))
-  {}
+  {
+    ObjectBase::initialize_move(src.gobject_, &src);
+  }
 
   DerivedObjectBase& operator=(DerivedObjectBase&& src) noexcept
   {
@@ -58,31 +60,33 @@ public:
 static
 void test_objectbase_move_constructor()
 {
-  GObject *gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
-  g_object_ref(gobject);
-
+  GObject* gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
   DerivedObjectBase derived(gobject, 5);
   //std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
   g_assert(derived.gobj() == gobject);
+
   DerivedObjectBase derived2(std::move(derived));
   g_assert_cmpint(derived2.i_, ==, 5);
   //std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
   g_assert(derived2.gobj() == gobject);
+  g_assert(derived.gobj() == nullptr);
 }
 
 static
 void test_objectbase_move_assignment_operator()
 {
-  GObject *gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
-  g_object_ref(gobject);
-
+  GObject* gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
   DerivedObjectBase derived(gobject, 5);
   //std::cout << "debug: gobj(): " << derived.gobj() << std::endl;
   g_assert(derived.gobj() == gobject);
-  DerivedObjectBase derived2 = std::move(derived);
+
+  GObject* gobject2 = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
+  DerivedObjectBase derived2(gobject2, 6);
+  derived2 = std::move(derived);
   g_assert_cmpint(derived2.i_, ==, 5);
   //std::cout << "debug: gobj(): " << derived2.gobj() << std::endl;
   g_assert(derived2.gobj() == gobject);
+  g_assert(derived.gobj() == nullptr);
 }
 
 int main(int, char**)

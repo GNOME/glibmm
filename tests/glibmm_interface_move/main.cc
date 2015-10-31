@@ -106,7 +106,7 @@ protected:
 
 public:
   //A real application would never make the constructor public.
-  //It would instead have a protectd constructor and a public create() method.
+  //It would instead have a protected constructor and a public create() method.
   TestInterface(GObject* gobject, int i)
   : Glib::Interface(gobject),
     i_(i)
@@ -220,7 +220,10 @@ private:
 
 DerivedObject::CppClassType DerivedObject::derived_object_class_; // initialize static member
 
-/* TODO: Shouldn't this work too?
+/* Shouldn't this work too?
+ * No, because Glib::Interface::Interface(Interface&& src) does not call
+ * Glib::ObjectBase::initialize_move(), and Glib::Interface::operator=(Interface&& src)
+ * does not call Glib::ObjectBase::operator=(std::move(src)).
 static
 void test_interface_move_constructor()
 {
@@ -258,11 +261,13 @@ void test_object_with_interface_move_constructor()
 {
   DerivedObject derived(5);
   g_assert_cmpint(derived.i_, ==, 5);
-  GObject *gobject = derived.gobj();
+  GObject* gobject = derived.gobj();
   g_assert(derived.gobj() == gobject);
+
   DerivedObject derived2(std::move(derived));
   g_assert_cmpint(derived2.i_, ==, 5);
   g_assert(derived2.gobj() == gobject);
+  g_assert(derived.gobj() == nullptr);
 }
 
 static
@@ -270,11 +275,14 @@ void test_object_with_interface_move_assignment_operator()
 {
   DerivedObject derived(5);
   g_assert_cmpint(derived.i_, ==, 5);
-  GObject *gobject = derived.gobj();
+  GObject* gobject = derived.gobj();
   g_assert(derived.gobj() == gobject);
-  DerivedObject derived2 = std::move(derived);
+
+  DerivedObject derived2(6);
+  derived2 = std::move(derived);
   g_assert_cmpint(derived2.i_, ==, 5);
   g_assert(derived2.gobj() == gobject);
+  g_assert(derived.gobj() == nullptr);
 }
 
 

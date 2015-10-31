@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -118,18 +115,25 @@ Interface::Interface()
 {}
 
 Interface::Interface(Interface&& src) noexcept
-: ObjectBase(std::move(src))
+: sigc::trackable(std::move(src)), //not actually called because it's a virtual base
+  ObjectBase(std::move(src)) //not actually called because it's a virtual base
 {
-  //We don't call initialize_move() because we 
+  //We don't call initialize_move() because we
   //want the derived move constructor to only cause it
   //to be called once, so we just let it be called
-  //by the implementing class, such as Entry (implementing Editable).
+  //by the implementing class, such as Gtk::Entry (implementing Gtk::Editable
+  //and Gtk::CellEditable), via the call to Object::Object(Object&& src).
   //ObjectBase::initialize_move(src.gobject_, &src);
 }
 
-Interface& Interface::operator=(Interface&& src) noexcept
+Interface& Interface::operator=(Interface&& /* src */) noexcept
 {
-  ObjectBase::operator=(std::move(src));
+  //We don't call ObjectBase::operator=(ObjectBase&& src) because we
+  //want the derived move assignment operator to only cause it
+  //to be called once, so we just let it be called
+  //by the implementing class, such as Gtk::Entry (implementing Gtk::Editable
+  //and Gtk::CellEditable), via the call to Object::operator=(Object&& src).
+  //ObjectBase::operator=(std::move(src));
   return *this;
 }
 
