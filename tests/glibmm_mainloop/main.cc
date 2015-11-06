@@ -17,6 +17,7 @@
  */
 
 #include <glibmm.h>
+#include <thread>
 #include <iostream>
 #include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE
 
@@ -36,18 +37,18 @@ void quit_loop(const Glib::RefPtr<Glib::MainLoop>& mainloop)
   mainloop->quit();
 }
 
-bool mark_and_quit(const Glib::Threads::Thread* expected_thread,
+bool mark_and_quit(const std::thread::id& expected_thread_id,
   int thread_nr, const Glib::RefPtr<Glib::MainLoop>& mainloop)
 {
   invoked_in_thread[thread_nr] =
-    (Glib::Threads::Thread::self() == expected_thread) ?
+    (std::this_thread::get_id() == expected_thread_id) ?
     INVOKED_IN_RIGHT_THREAD : INVOKED_IN_WRONG_THREAD;
   mainloop->get_context()->signal_idle().connect_once(
     sigc::bind(sigc::ptr_fun(quit_loop), mainloop));
   return false;
 }
 
-void thread_function(const Glib::Threads::Thread* first_thread,
+void thread_function(const std::thread::id& first_thread_id,
   const Glib::RefPtr<Glib::MainLoop>& first_mainloop)
 {
   auto second_context = Glib::MainContext::create();
@@ -56,12 +57,12 @@ void thread_function(const Glib::Threads::Thread* first_thread,
   // Show how Glib::MainContext::invoke() can be used for calling a function,
   // possibly executed in another thread.
   Glib::MainContext::get_default()->invoke(sigc::bind(sigc::ptr_fun(mark_and_quit),
-    first_thread, 0, first_mainloop));
+    first_thread_id, 0, first_mainloop));
 
   // If this thread owns second_context, invoke() will call mark_and_quit() directly.
   bool is_owner = second_context->acquire();
   second_context->invoke(sigc::bind(sigc::ptr_fun(mark_and_quit),
-    Glib::Threads::Thread::self(), 1, second_mainloop));
+    std::this_thread::get_id(), 1, second_mainloop));
   if (is_owner)
     second_context->release();
 
@@ -84,15 +85,20 @@ int main(int, char**)
   bool is_owner = Glib::MainContext::get_default()->acquire();
 
   // Create a second thread.
-  Glib::Threads::Thread* second_thread = Glib::Threads::Thread::create(
-    sigc::bind(sigc::ptr_fun(thread_function),
-    Glib::Threads::Thread::self(), first_mainloop));
+  const std::thread::id first_thread_id = std::this_thread::get_id();
+  std::thread* second_thread = new std::thread(
+    [first_thread_id, first_mainloop]
+    {
+      thread_function(first_thread_id, first_mainloop);
+    });
 
   // Start the first main loop.
   first_mainloop->run();
 
   // Wait until the second thread has finished.
   second_thread->join();
+  delete second_thread;
+  second_thread = nullptr;
 
   if (is_owner)
     Glib::MainContext::get_default()->release();
