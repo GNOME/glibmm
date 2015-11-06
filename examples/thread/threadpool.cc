@@ -1,6 +1,7 @@
 
 #include <iostream>
-#include <glibmm/threads.h>
+#include <thread>
+#include <mutex>
 #include <glibmm/random.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/timer.h>
@@ -9,7 +10,7 @@
 namespace
 {
 
-Glib::Threads::Mutex mutex;
+std::mutex mutex;
 
 void print_char(char c)
 {
@@ -18,7 +19,7 @@ void print_char(char c)
   for(auto i = 0; i < 100; ++i)
   {
     {
-      Glib::Threads::Mutex::Lock lock (mutex);
+      std::lock_guard<std::mutex> lock (mutex);
       std::cout << c;
       std::cout.flush();
     }
