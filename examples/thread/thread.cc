@@ -1,7 +1,9 @@
 
 #include <iostream>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <queue>
-#include <glibmm/threads.h>
 #include <glibmm/random.h>
 #include <glibmm/timer.h>
 #include <glibmm/init.h>
@@ -19,9 +21,9 @@ public:
   void consumer();
 
 private:
-  Glib::Threads::Mutex mutex_;
-  Glib::Threads::Cond cond_push_;
-  Glib::Threads::Cond cond_pop_;
+  std::mutex mutex_;
+  std::condition_variable cond_push_;
+  std::condition_variable cond_pop_;
   std::queue<int> queue_;
 };
 
@@ -39,16 +41,22 @@ void MessageQueue::producer()
   for(auto i = 0; i < 200; ++i)
   {
     {
-      Glib::Threads::Mutex::Lock lock (mutex_);
+      std::unique_lock<std::mutex> lock (mutex_);
 
-      while(queue_.size() >= 64)
-        cond_pop_.wait(mutex_);
+      cond_pop_.wait(lock,
+        [this] () -> bool
+        {
+          return queue_.size() < 64;
+        });
 
       queue_.push(i);
       std::cout << '*';
       std::cout.flush();
 
-      cond_push_.signal();
+      //We unlock before notifying, because that is what the documentation suggests:
+      //http://en.cppreference.com/w/cpp/thread/condition_variable
+      lock.unlock();
+      cond_push_.notify_one();
     }
 
     if(rand.get_bool())
@@ -65,17 +73,23 @@ void MessageQueue::consumer()
   for(;;)
   {
     {
-      Glib::Threads::Mutex::Lock lock (mutex_);
+      std::unique_lock<std::mutex> lock (mutex_);
 
-      while(queue_.empty())
-        cond_push_.wait(mutex_);
+      cond_push_.wait(lock,
+        [this] () -> bool
+        {
+          return !queue_.empty();
+        });
 
       const int i = queue_.front();
       queue_.pop();
       std::cout << "\x08 \x08";
       std::cout.flush();
 
-      cond_pop_.signal();
+      //We unlock before notifying, because that is what the documentation suggests:
+      //http://en.cppreference.com/w/cpp/thread/condition_variable
+      lock.unlock();
+      cond_pop_.notify_one();
 
       if(i >= 199)
         break;
@@ -97,14 +111,23 @@ int main(int, char**)
 
   MessageQueue queue;
 
-  Glib::Threads::Thread *const producer = Glib::Threads::Thread::create(
-      sigc::mem_fun(queue, &MessageQueue::producer));
+  auto *const producer = new std::thread(
+    [&queue] ()
+    {
+      queue.producer();
+    });
 
-  Glib::Threads::Thread *const consumer = Glib::Threads::Thread::create(
-      sigc::mem_fun(queue, &MessageQueue::consumer));
+  auto *const consumer = new std::thread(
+    [&queue] ()
+    {
+      queue.consumer();
+    });
 
   producer->join();
+  delete producer;
+
   consumer->join();
+  delete consumer;
 
   std::cout << std::endl;
 
