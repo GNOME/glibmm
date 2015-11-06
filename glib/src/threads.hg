@@ -18,6 +18,8 @@
 _DEFS(glibmm,glib)
 _CONFIGINCLUDE(glibmmconfig.h)
 
+_IS_DEPRECATED // This whole file is deprecated.
+
 #m4 _PUSH(SECTION_CC_PRE_INCLUDES)
 // Don't let glibmm.h include thread.h. Pretend that it's already included.
 // glib.h can then be included with G_DISABLE_DEPRECATED defined, and
@@ -34,6 +36,10 @@ _CONFIGINCLUDE(glibmmconfig.h)
 namespace Glib
 {
 
+/**
+ * @deprecated The entire Glib::Threads API is deprecated in favour of the 
+ * standard C++ concurrency API in C++11 and C++14.
+ */
 namespace Threads
 {
 //The GMMPROC_EXTRA_NAMESPACE() macro is a hint to generate_wrap_init.pl to put it in the Threads sub-namespace
@@ -71,6 +77,8 @@ _WRAP_GERROR(ThreadError, GThreadError, G_THREAD_ERROR, NO_GTYPE)
  * @note The thread entry slot doesn't have the void* return value that a
  * GThreadFunc has.  If you want to return any data from your thread,
  * you can pass an additional output argument to the thread's entry slot.
+ *
+ * @deprecated Please use std::thread instead.
  */
 class Thread
 {
@@ -188,6 +196,8 @@ Thread* wrap(GThread* gobject);
  * @note Glib::Threads::Mutex is not recursive, i.e. a thread will deadlock, if it
  * already has locked the mutex while calling lock().  Use Glib::Threads::RecMutex
  * instead, if you need recursive mutexes.
+ *
+ * @deprecated Please use std::mutex instead.
  */
 class Mutex
 {
@@ -241,6 +251,8 @@ private:
  * only exception-safe but also much less error-prone.  You could even
  * <tt>return</tt> while still holding the lock and it will be released
  * properly.
+ *
+ * @deprecated Please use std::lock_guard or std::unique_lock instead.
  */
 class Mutex::Lock
 {
@@ -281,6 +293,8 @@ Mutex* wrap(GMutex* gobject);
  * that it is possible to lock a RecMutex multiple times in the same
  * thread without deadlock. When doing so, care has to be taken to
  * unlock the recursive mutex as often as it has been locked.
+ *
+ * @deprecated Please use std::recursive_mutex instead.
  */
 class RecMutex
 {
@@ -305,6 +319,8 @@ private:
 };
 
 /** Utility class for exception-safe locking of recursive mutexes.
+ *
+ * @deprecated Please use std::lock_guard or std::unique_lock instead.
  */
 class RecMutex::Lock
 {
@@ -350,6 +366,8 @@ RecMutex* wrap(GRecMutex* gobject);
  * lock via writer_lock()), multiple threads can gain
  * simultaneous read-only access (by holding the 'reader' lock via
  * reader_lock()).
+ *
+ * @deprecated Please use std::lock_guard or std::unique_lock instead, with std::shared_timed_mutex.
  */
 class RWLock
 {
@@ -379,6 +397,8 @@ private:
 };
 
 /** Utility class for exception-safe locking of read/write locks.
+ *
+ * @deprecated Please use std::lock_guard or std::unique_lock instead, with std::shared_timed_mutex.
  */
 class RWLock::ReaderLock
 {
@@ -403,6 +423,8 @@ private:
 };
 
 /** Utility class for exception-safe locking of read/write locks.
+ *
+ * @deprecated Please use std::lock_guard or std::unique_lock instead, with std::shared_timed_mutex.
  */
 class RWLock::WriterLock
 {
@@ -430,6 +452,9 @@ private:
  * A @a Cond is an object that threads can block on, if they find a certain
  * condition to be false. If other threads change the state of this condition
  * they can signal the @a Cond, such that the waiting thread is woken up.
+ *
+ * @deprecated Please use std::condition_variable instead.
+ *
  * @par Usage example:
  * @code
  * Glib::Threads::Cond  data_cond;
