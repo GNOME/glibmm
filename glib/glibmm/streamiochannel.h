@@ -46,13 +46,13 @@ protected:
 
   StreamIOChannel(std::istream* stream_in, std::ostream* stream_out);
 
-  virtual IOStatus read_vfunc(char* buf, gsize count, gsize& bytes_read);
-  virtual IOStatus write_vfunc(const char* buf, gsize count, gsize& bytes_written);
-  virtual IOStatus seek_vfunc(gint64 offset, SeekType type);
-  virtual IOStatus close_vfunc();
-  virtual IOStatus set_flags_vfunc(IOFlags flags);
-  virtual IOFlags  get_flags_vfunc();
-  virtual Glib::RefPtr<Glib::Source> create_watch_vfunc(IOCondition cond);
+  IOStatus read_vfunc(char* buf, gsize count, gsize& bytes_read) override;
+  IOStatus write_vfunc(const char* buf, gsize count, gsize& bytes_written) override;
+  IOStatus seek_vfunc(gint64 offset, SeekType type) override;
+  IOStatus close_vfunc() override;
+  IOStatus set_flags_vfunc(IOFlags flags) override;
+  IOFlags get_flags_vfunc() override;
+  Glib::RefPtr<Glib::Source> create_watch_vfunc(IOCondition cond) override;
 };
 
 #endif //#GLIBMM_DISABLE_DEPRECATED
