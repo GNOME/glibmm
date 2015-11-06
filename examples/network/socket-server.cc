@@ -1,3 +1,4 @@
+#include <thread>
 #include <iostream>
 #include <giomm.h>
 #include <glibmm.h>
@@ -147,10 +148,15 @@ main (int argc,
       return 1;
     }
 
+    std::thread* thread = nullptr;
     if (cancel_timeout)
     {
         cancellable = Gio::Cancellable::create ();
-        Glib::Threads::Thread::create (sigc::bind (sigc::ptr_fun (cancel_thread), cancellable));
+        thread = new std::thread(
+          [cancellable] ()
+          {
+            cancel_thread(cancellable);
+          });
     }
 
     loop = Glib::MainLoop::create ();
@@ -319,6 +325,14 @@ main (int argc,
         std::cerr << Glib::ustring::compose ("Error closing master socket: %1\n",
                                              error.what ());
         return 1;
+    }
+
+
+    //TODO: This won't happen if we returned earlier.
+    if(thread)
+    {
+      thread->join();
+      delete thread;
     }
 
     return 0;

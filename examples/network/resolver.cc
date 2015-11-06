@@ -23,6 +23,7 @@
 # include <config.h>
 #endif
 #include <giomm.h>
+#include <thread>
 #include <iostream>
 
 #include <cerrno>
@@ -203,14 +204,22 @@ lookup_thread (const Glib::ustring& arg)
   lookup_one_sync (arg);
 }
 
-static void
+static std::vector<std::thread*>
 start_threaded_lookups (char **argv, int argc)
 {
+  std::vector<std::thread*> result;
   for (auto i = 0; i < argc; i++)
   {
-    Glib::Threads::Thread::create (sigc::bind (sigc::ptr_fun (lookup_thread),
-      argv[i]));
-   }
+    const Glib::ustring arg = argv[i];
+    const auto thread = new std::thread(
+      [arg]
+      {
+        lookup_thread(arg);
+      });
+    result.push_back(thread);
+  }
+
+  return result;
 }
 
 static void
@@ -497,17 +506,26 @@ main (int argc, char **argv)
     nlookups = argc - 1;
     loop = Glib::MainLoop::create (true);
 
+    std::vector<std::thread*> threads;
     if (use_connectable)
         do_connectable (argv[1], synchronous);
     else
     {
         if (synchronous)
-            start_threaded_lookups (argv + 1, argc - 1);
+            threads = start_threaded_lookups (argv + 1, argc - 1);
         else
             start_async_lookups (argv + 1, argc - 1);
     }
 
     loop->run ();
+
+    //Join and delete each thread:
+    std::for_each(threads.begin(), threads.end(),
+      [] (std::thread* thread)
+      {
+        thread->join();
+        delete thread;
+      });
 
 #ifdef G_OS_UNIX
     watch_conn.disconnect ();
