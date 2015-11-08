@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_CONTAINERS_H
 #define _GLIBMM_CONTAINERS_H
 
@@ -23,6 +22,7 @@
 
 #include <glibmmconfig.h>
 #include <glibmm/sarray.h> /* for backward compatibility */
+#include <glibmm/wrap.h>
 #include <glib.h>
 #include <iterator>
 #include <cstddef>
