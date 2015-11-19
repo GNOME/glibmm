@@ -111,13 +111,13 @@ typedef sigc::slot<void> SlotSpawnChildSetup;
  * will be looked for in the user's PATH.
  * SPAWN_STDOUT_TO_DEV_NULL means that the child's standard output will
  * be discarded, instead of going to the same location as the parent's
- * standard output. If you use this flag, @a standard_output must be NULL.
+ * standard output. If you use this flag, @a standard_output must be nullptr.
  * SPAWN_STDERR_TO_DEV_NULL means that the child's standard error
  * will be discarded, instead of going to the same location as the parent's
- * standard error. If you use this flag, @a standard_error must be NULL.
+ * standard error. If you use this flag, @a standard_error must be nullptr.
  * SPAWN_CHILD_INHERITS_STDIN means that the child will inherit the parent's
  * standard input (by default, the child's standard input is attached to
- * /dev/null). If you use this flag, @a standard_input must be NULL.
+ * /dev/null). If you use this flag, @a standard_input must be nullptr.
  * G_SPAWN_FILE_AND_ARGV_ZERO means that the first element of @a argv is
  * the file to execute, while the remaining elements are the
  * actual argument vector to pass to the file. Normally
@@ -138,7 +138,7 @@ typedef sigc::slot<void> SlotSpawnChildSetup;
  * process. You should carefully consider what you do in @a child_setup
  * if you intend your software to be portable to Windows.
  *
- * If non-NULL, @a child_pid will on Unix be filled with the child's
+ * If non-nullptr, @a child_pid will on Unix be filled with the child's
  * process ID. You can use the process ID to send signals to the
  * child, or to use child_watch_add() (or waitpid()) if you specified the
  * SPAWN_DO_NOT_REAP_CHILD flag. On Windows, @a child_pid will be
@@ -149,25 +149,25 @@ typedef sigc::slot<void> SlotSpawnChildSetup;
  * exit code with GetExitCodeProcess(). You should close the handle
  * with CloseHandle() or spawn_close_pid() when you no longer need it.
  *
- * If non-NULL, the @a standard_input, @a standard_output, @a standard_error
+ * If non-nullptr, the @a standard_input, @a standard_output, @a standard_error
  * locations will be filled with file descriptors for writing to the child's
  * standard input or reading from its standard output or standard error.
  * The caller of pawn_async_with_pipes() must close these file descriptors
- * when they are no longer in use. If these parameters are NULL, the corresponding
+ * when they are no longer in use. If these parameters are nullptr, the corresponding
  * pipe won't be created.
  *
- * If @a standard_input is NULL, the child's standard input is attached to
+ * If @a standard_input is nullptr, the child's standard input is attached to
  * /dev/null unless SPAWN_CHILD_INHERITS_STDIN is set.
  *
- * If @a standard_error is NULL, the child's standard error goes to the same
+ * If @a standard_error is nullptr, the child's standard error goes to the same
  * location as the parent's standard error unless SPAWN_STDERR_TO_DEV_NULL
  * is set.
  *
- * If @a standard_output is NULL, the child's standard output goes to the same
+ * If @a standard_output is nullptr, the child's standard output goes to the same
  * location as the parent's standard output unless SPAWN_STDOUT_TO_DEV_NULL
  * is set.
  *
- * If @a child_pid is not NULL and an error does not occur then the returned
+ * If @a child_pid is not nullptr and an error does not occur then the returned
  * pid must be closed using spawn_close_pid().
  *
  * @note
@@ -181,10 +181,10 @@ typedef sigc::slot<void> SlotSpawnChildSetup;
  * @param envp Child's environment.
  * @param flags Flags from SpawnFlags
  * @param child_setup Slot to run in the child just before exec(), or an empty slot.
- * @param child_pid Return location for child process ID, or NULL.
- * @param standard_input Return location for file descriptor to write to child's stdin, or NULL.
- * @param standard_output Return location for file descriptor to read child's stdout, or NULL.
- * @param standard_error Return location for file descriptor to read child's stderr, or NULL.
+ * @param child_pid Return location for child process ID, or nullptr.
+ * @param standard_input Return location for file descriptor to write to child's stdin, or nullptr.
+ * @param standard_output Return location for file descriptor to read child's stdout, or nullptr.
+ * @param standard_error Return location for file descriptor to read child's stderr, or nullptr.
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -208,10 +208,10 @@ void spawn_async_with_pipes(const std::string& working_directory,
  * @param argv Child's argument vector.
  * @param flags Flags from SpawnFlags
  * @param child_setup Slot to run in the child just before exec(), or an empty slot.
- * @param child_pid Return location for child process ID, or NULL.
- * @param standard_input Return location for file descriptor to write to child's stdin, or NULL.
- * @param standard_output Return location for file descriptor to read child's stdout, or NULL.
- * @param standard_error Return location for file descriptor to read child's stderr, or NULL.
+ * @param child_pid Return location for child process ID, or nullptr.
+ * @param standard_input Return location for file descriptor to write to child's stdin, or nullptr.
+ * @param standard_output Return location for file descriptor to read child's stdout, or nullptr.
+ * @param standard_error Return location for file descriptor to read child's stderr, or nullptr.
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -242,7 +242,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
  * @param envp Child's environment.
  * @param flags Flags from SpawnFlags.
  * @param child_setup Slot to run in the child just before exec(), or an empty slot.
- * @param child_pid Return location for child process ID, or NULL
+ * @param child_pid Return location for child process ID, or nullptr
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -262,7 +262,7 @@ void spawn_async(const std::string& working_directory,
  * @param argv Child's argument vector.
  * @param flags Flags from SpawnFlags.
  * @param child_setup Slot to run in the child just before exec(), or an empty slot.
- * @param child_pid Return location for child process ID, or NULL
+ * @param child_pid Return location for child process ID, or nullptr
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -277,13 +277,13 @@ void spawn_async(const std::string& working_directory,
 
 /** Executes a child synchronously (waits for the child to exit before returning).
  * All output from the child is stored in @a standard_output and @a standard_error,
- * if those parameters are non-NULL. Note that you must set the
+ * if those parameters are non-nullptr. Note that you must set the
  * SPAWN_STDOUT_TO_DEV_NULL and SPAWN_STDERR_TO_DEV_NULL flags when
- * passing NULL for @a standard_output and @a standard_error.
- * If @a exit_status is non-NULL, the exit status of the child is stored
+ * passing nullptr for @a standard_output and @a standard_error.
+ * If @a exit_status is non-nullptr, the exit status of the child is stored
  * there as it would be returned by waitpid(); standard UNIX macros such
  * as WIFEXITED() and WEXITSTATUS() must be used to evaluate the exit status.
- * Note that this function calls waitpid() even if @a exit_status is NULL, and
+ * Note that this function calls waitpid() even if @a exit_status is nullptr, and
  * does not accept the SPAWN_DO_NOT_REAP_CHILD flag.
  * If an error occurs, no data is returned in @a standard_output,
  * @a standard_error, or @a exit_status.
@@ -297,9 +297,9 @@ void spawn_async(const std::string& working_directory,
  * @param envp Child's environment.
  * @param flags Flags from SpawnFlags
  * @param child_setup Slot to run in the child just before exec(), or an empty slot.
- * @param standard_output Return location for file descriptor to read child's stdout, or NULL.
- * @param standard_error Return location for file descriptor to read child's stderr, or NULL.
- * @param exit_status Return location for child exit status, as returned by waitpid(), or NULL
+ * @param standard_output Return location for file descriptor to read child's stdout, or nullptr.
+ * @param standard_error Return location for file descriptor to read child's stderr, or nullptr.
+ * @param exit_status Return location for child exit status, as returned by waitpid(), or nullptr
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -322,9 +322,9 @@ void spawn_sync(const std::string& working_directory,
  * @param argv Child's argument vector.
  * @param flags Flags from SpawnFlags
  * @param child_setup Slot to run in the child just before exec(), or an empty slot.
- * @param standard_output Return location for file descriptor to read child's stdout, or NULL.
- * @param standard_error Return location for file descriptor to read child's stderr, or NULL.
- * @param exit_status Return location for child exit status, as returned by waitpid(), or NULL
+ * @param standard_output Return location for file descriptor to read child's stdout, or nullptr.
+ * @param standard_error Return location for file descriptor to read child's stderr, or nullptr.
+ * @param exit_status Return location for child exit status, as returned by waitpid(), or nullptr
  *
  * @throws SpawnError Errors are reported even if they occur in the child (for example if the
  * executable in argv[0] is not found). Typically
@@ -367,7 +367,7 @@ void spawn_command_line_async(const std::string& command_line);
  * implications, so consider using spawn_sync() directly if
  * appropriate.
  *
- * If @a exit_status is non-NULL, the exit status of the child is stored there as
+ * If @a exit_status is non-nullptr, the exit status of the child is stored there as
  * it would be returned by waitpid(); standard UNIX macros such as WIFEXITED()
  * and WEXITSTATUS() must be used to evaluate the exit status.
  *
