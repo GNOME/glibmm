@@ -101,7 +101,7 @@ void Date::set_time(std::time_t timet)
 void Date::set_time_current()
 {
   //As suggested in the C documentation:
-  g_date_set_time_t(&gobject_, time(0));
+  g_date_set_time_t(&gobject_, time(nullptr));
 }
 
 void Date::set_time(const GTimeVal& timeval)
@@ -206,13 +206,13 @@ Date& Date::clamp(const Date& min_date, const Date& max_date)
 
 Date& Date::clamp_min(const Date& min_date)
 {
-  g_date_clamp(&gobject_, &min_date.gobject_, 0 /* see the C docs */);
+  g_date_clamp(&gobject_, &min_date.gobject_, nullptr /* see the C docs */);
   return *this;
 }
 
 Date& Date::clamp_max(const Date& max_date)
 {
-  g_date_clamp(&gobject_, 0 /* see the C docs */, &max_date.gobject_);
+  g_date_clamp(&gobject_, nullptr /* see the C docs */, &max_date.gobject_);
   return *this;
 }
 

@@ -40,7 +40,7 @@ IConv::IConv(const std::string& to_codeset, const std::string& from_codeset)
     // Abuse g_convert() to create a GError object.  This may seem a weird
     // thing to do, but it gives us consistently translated error messages
     // at no further cost.
-    g_convert("", 0, to_codeset.c_str(), from_codeset.c_str(), 0, 0, &gerror);
+    g_convert("", 0, to_codeset.c_str(), from_codeset.c_str(), nullptr, nullptr, &gerror);
 
     // If this should ever fail we're fucked.
     g_assert(gerror != nullptr);
@@ -83,7 +83,7 @@ std::string IConv::convert(const std::string& str)
   GError* gerror = nullptr;
 
   char *const buf = g_convert_with_iconv(
-      str.data(), str.size(), gobject_, 0, &bytes_written, &gerror);
+      str.data(), str.size(), gobject_, nullptr, &bytes_written, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -95,7 +95,7 @@ std::string IConv::convert(const std::string& str)
 
 bool get_charset()
 {
-  return g_get_charset(0);
+  return g_get_charset(nullptr);
 }
 
 bool get_charset(std::string& charset)
@@ -117,7 +117,7 @@ std::string convert(const std::string& str,
 
   char *const buf = g_convert(
       str.data(), str.size(), to_codeset.c_str(), from_codeset.c_str(),
-      0, &bytes_written, &gerror);
+      nullptr, &bytes_written, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -130,11 +130,11 @@ std::string convert_with_fallback(const std::string& str,
                                   const std::string& from_codeset)
 {
   gsize bytes_written = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   char *const buf = g_convert_with_fallback(
-      str.data(), str.size(), to_codeset.c_str(), from_codeset.c_str(), 0,
-      0, &bytes_written, &gerror);
+      str.data(), str.size(), to_codeset.c_str(), from_codeset.c_str(), nullptr,
+      nullptr, &bytes_written, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -148,11 +148,11 @@ std::string convert_with_fallback(const std::string& str,
                                   const Glib::ustring& fallback)
 {
   gsize bytes_written = 0;
-  GError* gerror = 0;
+  GError* gerror = nullptr;
 
   char *const buf = g_convert_with_fallback(
       str.data(), str.size(), to_codeset.c_str(), from_codeset.c_str(),
-      const_cast<char*>(fallback.c_str()), 0, &bytes_written, &gerror);
+      const_cast<char*>(fallback.c_str()), nullptr, &bytes_written, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -166,7 +166,7 @@ Glib::ustring locale_to_utf8(const std::string& opsys_string)
   GError* gerror = nullptr;
 
   char *const buf = g_locale_to_utf8(
-      opsys_string.data(), opsys_string.size(), 0, &bytes_written, &gerror);
+      opsys_string.data(), opsys_string.size(), nullptr, &bytes_written, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -181,7 +181,7 @@ std::string locale_from_utf8(const Glib::ustring& utf8_string)
   GError* gerror = nullptr;
 
   char *const buf = g_locale_from_utf8(
-      utf8_string.data(), utf8_string.bytes(), 0, &bytes_written, &gerror);
+      utf8_string.data(), utf8_string.bytes(), nullptr, &bytes_written, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -195,7 +195,7 @@ Glib::ustring filename_to_utf8(const std::string& opsys_string)
   GError* gerror = nullptr;
 
   char *const buf = g_filename_to_utf8(
-      opsys_string.data(), opsys_string.size(), 0, &bytes_written, &gerror);
+      opsys_string.data(), opsys_string.size(), nullptr, &bytes_written, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -210,7 +210,7 @@ std::string filename_from_utf8(const Glib::ustring& utf8_string)
   GError* gerror = nullptr;
 
   char *const buf = g_filename_from_utf8(
-      utf8_string.data(), utf8_string.bytes(), 0, &bytes_written, &gerror);
+      utf8_string.data(), utf8_string.bytes(), nullptr, &bytes_written, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -242,7 +242,7 @@ std::string filename_from_uri(const Glib::ustring& uri, Glib::ustring& hostname)
 std::string filename_from_uri(const Glib::ustring& uri)
 {
   GError* gerror = nullptr;
-  char *const buf = g_filename_from_uri(uri.c_str(), 0, &gerror);
+  char *const buf = g_filename_from_uri(uri.c_str(), nullptr, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
@@ -264,7 +264,7 @@ Glib::ustring filename_to_uri(const std::string& filename, const Glib::ustring& 
 Glib::ustring filename_to_uri(const std::string& filename)
 {
   GError* gerror = nullptr;
-  char *const buf = g_filename_to_uri(filename.c_str(), 0, &gerror);
+  char *const buf = g_filename_to_uri(filename.c_str(), nullptr, &gerror);
 
   if(gerror) ::Glib::Error::throw_exception(gerror);
 
