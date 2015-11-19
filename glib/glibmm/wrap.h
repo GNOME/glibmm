@@ -57,7 +57,7 @@ template<class TInterface>
 TInterface* wrap_auto_interface(GObject* object, bool take_copy = false)
 {
   if(!object)
-    return 0;
+    return nullptr;
 
   // Look up current C++ wrapper instance:
   ObjectBase* pCppObject = ObjectBase::_get_current_wrapper(object);
@@ -110,7 +110,7 @@ Glib::RefPtr<Glib::Object> wrap(GObject* object, bool take_copy = false);
 template <class T> inline
 typename T::BaseObjectType* unwrap(T* ptr)
 {
-  return (ptr) ? ptr->gobj() : 0;
+  return (ptr) ? ptr->gobj() : nullptr;
 }
 
 /** Get the underlying C instance from the C++ instance.  This is just
@@ -119,7 +119,7 @@ typename T::BaseObjectType* unwrap(T* ptr)
 template <class T> inline
 const typename T::BaseObjectType* unwrap(const T* ptr)
 {
-  return (ptr) ? ptr->gobj() : 0;
+  return (ptr) ? ptr->gobj() : nullptr;
 }
 
 /** Get the underlying C instance from the C++ instance.  This is just
@@ -128,7 +128,7 @@ const typename T::BaseObjectType* unwrap(const T* ptr)
 template <class T> inline
 typename T::BaseObjectType* unwrap(const Glib::RefPtr<T>& ptr)
 {
-  return (ptr) ? ptr->gobj() : 0;
+  return (ptr) ? ptr->gobj() : nullptr;
 }
 
 /** Get the underlying C instance from the C++ instance.  This is just
@@ -137,7 +137,7 @@ typename T::BaseObjectType* unwrap(const Glib::RefPtr<T>& ptr)
 template <class T> inline
 const typename T::BaseObjectType* unwrap(const Glib::RefPtr<const T>& ptr)
 {
-  return (ptr) ? ptr->gobj() : 0;
+  return (ptr) ? ptr->gobj() : nullptr;
 }
 
 // This unwrap_copy() overload is intended primarily for classes wrapped as
@@ -151,7 +151,7 @@ const typename T::BaseObjectType* unwrap(const Glib::RefPtr<const T>& ptr)
 template <class T> inline
 typename T::BaseObjectType* unwrap_copy(const T& obj)
 {
-  return obj.gobj() ? obj.gobj_copy() : 0;
+  return obj.gobj() ? obj.gobj_copy() : nullptr;
 }
 
 /** Get the underlying C instance from the C++ instance and acquire a
@@ -161,7 +161,7 @@ typename T::BaseObjectType* unwrap_copy(const T& obj)
 template <class T> inline
 typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<T>& ptr)
 {
-  return (ptr) ? ptr->gobj_copy() : 0;
+  return (ptr) ? ptr->gobj_copy() : nullptr;
 }
 
 /** Get the underlying C instance from the C++ instance and acquire a
@@ -171,7 +171,7 @@ typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<T>& ptr)
 template <class T> inline
 const typename T::BaseObjectType* unwrap_copy(const Glib::RefPtr<const T>& ptr)
 {
-  return (ptr) ? ptr->gobj_copy() : 0;
+  return (ptr) ? ptr->gobj_copy() : nullptr;
 }
 
 } // namespace Glib

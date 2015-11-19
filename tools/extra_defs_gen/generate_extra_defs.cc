@@ -187,7 +187,7 @@ std::string get_signals(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
 
 
       //Other information about the signal:
-      GSignalQuery signalQuery = { 0, 0, 0, GSignalFlags(0), 0, 0, 0, };
+      GSignalQuery signalQuery = { 0, nullptr, 0, GSignalFlags(0), 0, 0, nullptr, };
       g_signal_query(signal_id, &signalQuery);
 
       //Return type:
