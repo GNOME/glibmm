@@ -19,7 +19,7 @@ _PUSH(SECTION_CC)
 __CPPNAME__::__CPPNAME__`'()
 :
   // Mark this class as non-derived to allow C++ vfuncs to be skipped.
-  Glib::ObjectBase(0),
+  Glib::ObjectBase(nullptr),
   __CPPPARENT__`'(Glib::ConstructParams(__BASE__`'_class_.init()))
 {
   _IMPORT(SECTION_CC_INITIALIZE_CLASS_EXTRA)
@@ -39,8 +39,8 @@ _PUSH(SECTION_CC)
 __CPPNAME__::$1`'($3)
 :
   // Mark this class as non-derived to allow C++ vfuncs to be skipped.
-  Glib::ObjectBase(0),
-  __CPPPARENT__`'(Glib::ConstructParams(__BASE__`'_class_.init()m4_ifelse(`$4',,,`, $4, static_cast<char*>(0)')))
+  Glib::ObjectBase(nullptr),
+  __CPPPARENT__`'(Glib::ConstructParams(__BASE__`'_class_.init()m4_ifelse(`$4',,,`, $4, nullptr')))
 {
   _IMPORT(SECTION_CC_INITIALIZE_CLASS_EXTRA)
 
@@ -51,16 +51,16 @@ _POP()')
 
 m4_define(`_CONSTRUCT',
  `// Mark this class as non-derived to allow C++ vfuncs to be skipped.
-  Glib::ObjectBase(0),
-  __CPPPARENT__`'(Glib::ConstructParams(__BASE__`'_class_.init()m4_ifelse(`$1',,,`, $@, static_cast<char*>(0)')))')
+  Glib::ObjectBase(nullptr),
+  __CPPPARENT__`'(Glib::ConstructParams(__BASE__`'_class_.init()m4_ifelse(`$1',,,`, $@, nullptr')))')
 
 dnl _CONSTRUCT() does not deal with multiple class definitions in one file.
 dnl If necessary, _CONSTRUCT_SPECIFIC(BaseClass, Class) must be used instead.
 dnl
 m4_define(`_CONSTRUCT_SPECIFIC',
  `// Mark this class as non-derived to allow C++ vfuncs to be skipped.
-  Glib::ObjectBase(0),
-  $1`'(Glib::ConstructParams(_LOWER(`$2')_class_.init()m4_ifelse(`$3',,,`, m4_shift(m4_shift($@)), static_cast<char*>(0)')))')
+  Glib::ObjectBase(nullptr),
+  $1`'(Glib::ConstructParams(_LOWER(`$2')_class_.init()m4_ifelse(`$3',,,`, m4_shift(m4_shift($@)), nullptr')))')
 
 dnl Extra code for initialize_class.
 dnl Not commonly used.

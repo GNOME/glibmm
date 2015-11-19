@@ -97,7 +97,7 @@ ifdef(`__BOOL_CUSTOM_DEFAULT_CTOR__',`dnl
 __CPPNAME__::__CPPNAME__`'()
 :
 ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
-  gobject_ (0) // Allows creation of invalid wrapper, e.g. for output arguments to methods.
+  gobject_ (nullptr) // Allows creation of invalid wrapper, e.g. for output arguments to methods.
 ',`dnl else
   gobject_ (__OPAQUE_FUNC_NEW`'())
 ')dnl
@@ -106,7 +106,7 @@ ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
 
 __CPPNAME__::__CPPNAME__`'(const __CPPNAME__& src)
 :
-  gobject_ ((src.gobject_) ? __OPAQUE_FUNC_COPY`'(src.gobject_) : 0)
+  gobject_ ((src.gobject_) ? __OPAQUE_FUNC_COPY`'(src.gobject_) : nullptr)
 {}
 
 ifdef(`__BOOL_CUSTOM_CTOR_CAST__',,`dnl else
@@ -133,7 +133,7 @@ ifelse(__OPAQUE_FUNC_COPY,NONE,`dnl
 ',`dnl else
 __CPPNAME__& __CPPNAME__::operator=(const __CPPNAME__`'& src)
 {
-  const auto new_gobject = (src.gobject_) ? __OPAQUE_FUNC_COPY`'(src.gobject_) : 0;
+  const auto new_gobject = (src.gobject_) ? __OPAQUE_FUNC_COPY`'(src.gobject_) : nullptr;
 
   if(gobject_)
     __OPAQUE_FUNC_FREE`'(gobject_);

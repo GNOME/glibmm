@@ -48,7 +48,7 @@ $1 Value<$1>::get() const
 GParamSpec* Value<$1>::create_param_spec(const Glib::ustring& name) const
 {
   return g_param_spec_[]ifelse($2,schar,char,$2)(
-      name.c_str(), 0, 0,ifelse($2,pointer,,[
+      name.c_str(), nullptr, nullptr,ifelse($2,pointer,,[
       ifelse($3,,,[$3, $4, ])[]g_value_get_$2(&gobject_),])
       GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
 }

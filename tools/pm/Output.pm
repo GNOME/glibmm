@@ -1185,11 +1185,11 @@ sub convert_args_cpp_to_c($$$$$)
     if(!($possible_arg_list =~ /\b$cpp_param_index\b/))
     {
       # If the C++ index is not found in the list of desired parameters, pass
-      # NULL to the C func unless the param is not optional (applies to a
+      # nullptr to the C func unless the param is not optional (applies to a
       # possibly added GError parameter).
       if (($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL))
       {
-        push(@conversions, "0");
+        push(@conversions, "nullptr");
         next;
       }
     }
@@ -1268,7 +1268,7 @@ sub convert_args_cpp_to_c($$$$$)
       if (($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL) &&
        $cppParamType =~ /^(const\s+)?(std::string|Glib::ustring)&?/)
       {
-        push(@conversions, "$cppParamName.empty() ? 0 : " . $std_conversion);
+        push(@conversions, "$cppParamName.empty() ? nullptr : " . $std_conversion);
       }
       else
       {
@@ -1294,7 +1294,7 @@ sub convert_args_cpp_to_c($$$$$)
     }
     else
     {
-      push(@conversions, "0")
+      push(@conversions, "nullptr")
     }
   }
 
@@ -1528,7 +1528,7 @@ sub get_ctor_properties($$$$$$)
       # NULL to the C func unless the param is not optional.
       if (~($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL))
       {
-        push(@result, "0");
+        push(@result, "nullptr");
         next;
       }
     }
