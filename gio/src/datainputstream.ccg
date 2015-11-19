@@ -47,7 +47,7 @@ bool DataInputStream::read_line(std::string& line)
   GError* gerror = nullptr;
   char* c_line = g_data_input_stream_read_line(gobj(),
                                                nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-                                               0,
+                                               nullptr,
                                                &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -120,7 +120,7 @@ bool DataInputStream::read_until(std::string& data, const std::string& stop_char
   char* c_str = g_data_input_stream_read_until(gobj(),
                                                stop_chars.c_str(),
                                                nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-                                               0,
+                                               nullptr,
                                                &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -194,7 +194,7 @@ bool DataInputStream::read_upto(std::string& data, const std::string& stop_chars
   char* c_str = g_data_input_stream_read_upto(gobj(),
     stop_chars.c_str(), -1, /* null-terminated */
     nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-    0,
+    nullptr,
     &gerror);
 
   if(gerror)

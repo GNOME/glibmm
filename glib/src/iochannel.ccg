@@ -235,7 +235,7 @@ IOStatus IOChannel::read_line(Glib::ustring& line)
   GError* gerror = nullptr;
   gsize   bytes = 0;
 
-  const auto status = g_io_channel_read_line(gobj(), buf.addr(), &bytes, 0, &gerror);
+  const auto status = g_io_channel_read_line(gobj(), buf.addr(), &bytes, nullptr, &gerror);
 
   if(gerror)
   {
@@ -297,7 +297,7 @@ IOStatus IOChannel::set_encoding(const std::string& encoding)
   GError* gerror = nullptr;
 
   const auto status = g_io_channel_set_encoding(
-      gobj(), (encoding.empty()) ? 0 : encoding.c_str(), &gerror);
+      gobj(), (encoding.empty()) ? nullptr : encoding.c_str(), &gerror);
 
   if(gerror)
   {
@@ -316,7 +316,7 @@ std::string IOChannel::get_encoding() const
 void IOChannel::set_line_term(const std::string& term)
 {
   if(term.empty())
-    g_io_channel_set_line_term(gobj(), 0, 0);
+    g_io_channel_set_line_term(gobj(), nullptr, 0);
   else
     g_io_channel_set_line_term(gobj(), term.data(), term.size());
 }
@@ -506,7 +506,7 @@ GSource* GlibmmIOChannel::io_create_watch(GIOChannel* channel, GIOCondition cond
   try
   {
     const auto source = wrapper->create_watch_vfunc((IOCondition) condition);
-    return (source) ? source->gobj_copy() : 0;
+    return (source) ? source->gobj_copy() : nullptr;
   }
   catch(...)
   {

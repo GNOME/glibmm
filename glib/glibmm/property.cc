@@ -226,7 +226,7 @@ PropertyBase::PropertyBase(Glib::Object& object, GType value_type)
 :
   object_     (&object),
   value_      (),
-  param_spec_ (0)
+  param_spec_ (nullptr)
 {
   value_.init(value_type);
 }

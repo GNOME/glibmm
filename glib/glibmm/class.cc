@@ -58,14 +58,14 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
   const GTypeInfo derived_info =
   {
     class_size,
-    0, // base_init
-    0, // base_finalize
+    nullptr, // base_init
+    nullptr, // base_finalize
     class_init_func_, //Set by the caller ( *_Class::init() ).
-    0, // class_finalize
-    0, // class_data
+    nullptr, // class_finalize
+    nullptr, // class_data
     instance_size,
     0, // n_preallocs
-    0, // instance_init
+    nullptr, // instance_init
     0, // value_table
   };
 

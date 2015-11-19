@@ -95,13 +95,13 @@ void wrap_register(GType type, WrapNewFunction func)
 
 static Glib::ObjectBase* wrap_create_new_wrapper(GObject* object)
 {
-  g_return_val_if_fail(wrap_func_table != nullptr, 0);
+  g_return_val_if_fail(wrap_func_table != nullptr, nullptr);
 
   const bool gtkmm_wrapper_already_deleted = (bool)g_object_get_qdata((GObject*)object, Glib::quark_cpp_wrapper_deleted_);
   if(gtkmm_wrapper_already_deleted)
   {
     g_warning("Glib::wrap_create_new_wrapper: Attempted to create a 2nd C++ wrapper for a C instance whose C++ wrapper has been deleted.");
-    return 0;
+    return nullptr;
   }
 
   // Traverse upwards through the inheritance hierarchy
@@ -119,7 +119,7 @@ static Glib::ObjectBase* wrap_create_new_wrapper(GObject* object)
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 static gboolean gtype_wraps_interface(GType implementer_type, GType interface_type)
@@ -140,13 +140,13 @@ static gboolean gtype_wraps_interface(GType implementer_type, GType interface_ty
 
 Glib::ObjectBase* wrap_create_new_wrapper_for_interface(GObject* object, GType interface_gtype)
 {
-  g_return_val_if_fail(wrap_func_table != nullptr, 0);
+  g_return_val_if_fail(wrap_func_table != nullptr, nullptr);
 
   const bool gtkmm_wrapper_already_deleted = (bool)g_object_get_qdata((GObject*)object, Glib::quark_cpp_wrapper_deleted_);
   if(gtkmm_wrapper_already_deleted)
   {
     g_warning("Glib::wrap_create_new_wrapper: Attempted to create a 2nd C++ wrapper for a C instance whose C++ wrapper has been deleted.");
-    return 0;
+    return nullptr;
   }
 
   // Traverse upwards through the inheritance hierarchy
@@ -167,7 +167,7 @@ Glib::ObjectBase* wrap_create_new_wrapper_for_interface(GObject* object, GType i
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 
@@ -177,7 +177,7 @@ Glib::ObjectBase* wrap_create_new_wrapper_for_interface(GObject* object, GType i
 ObjectBase* wrap_auto(GObject* object, bool take_copy)
 {
   if(!object)
-    return 0;
+    return nullptr;
 
   // Look up current C++ wrapper instance:
   ObjectBase* pCppObject = ObjectBase::_get_current_wrapper(object);
@@ -190,7 +190,7 @@ ObjectBase* wrap_auto(GObject* object, bool take_copy)
     if(!pCppObject)
     {
       g_warning("Failed to wrap object of type '%s'. Hint: this error is commonly caused by failing to call a library init() function.", G_OBJECT_TYPE_NAME(object));
-      return 0;
+      return nullptr;
     }
   }
 

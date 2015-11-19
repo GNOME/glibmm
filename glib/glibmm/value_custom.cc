@@ -71,24 +71,24 @@ GType custom_boxed_type_register(const char*   type_name,
     init_func,
     free_func,
     copy_func,
-    0, // value_peek_pointer
-    0, // collect_format
-    0, // collect_value
-    0, // lcopy_format
-    0, // lcopy_value
+    nullptr, // value_peek_pointer
+    nullptr, // collect_format
+    nullptr, // collect_value
+    nullptr, // lcopy_format
+    nullptr, // lcopy_value
   };
 
   const GTypeInfo type_info =
   {
     0, // class_size
-    0, // base_init
-    0, // base_finalize
-    0, // class_init_func
-    0, // class_finalize
-    0, // class_data
+    nullptr, // base_init
+    nullptr, // base_finalize
+    nullptr, // class_init_func
+    nullptr, // class_finalize
+    nullptr, // class_data
     0, // instance_size
     0, // n_preallocs
-    0, // instance_init
+    nullptr, // instance_init
     &value_table,
   };
 
@@ -122,15 +122,15 @@ GType custom_pointer_type_register(const char* type_name)
   const GTypeInfo type_info =
   {
     0, // class_size
-    0, // base_init
-    0, // base_finalize
-    0, // class_init_func
-    0, // class_finalize
-    0, // class_data
+    nullptr, // base_init
+    nullptr, // base_finalize
+    nullptr, // class_init_func
+    nullptr, // class_finalize
+    nullptr, // class_data
     0, // instance_size
     0, // n_preallocs
-    0, // instance_init
-    0, // value_table
+    nullptr, // instance_init
+    nullptr, // value_table
   };
 
   // We could probably use g_pointer_type_register_static(), but I want
