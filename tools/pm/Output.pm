@@ -1208,7 +1208,7 @@ sub convert_args_cpp_to_c($$$$$)
       my $initialization = "";
       if($cOutputParamType =~ /\*$/)
       {
-        $initialization = " = 0"; 
+        $initialization = " = nullptr"; 
       }
       else
       {

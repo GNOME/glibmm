@@ -60,8 +60,8 @@ public:
   {
     const auto pConnectionNode = static_cast<SignalProxyConnectionNode*>(data);
 
-    // Return 0 if the connection is blocked.
-    return (!pConnectionNode->slot_.blocked()) ? &pConnectionNode->slot_ : 0;
+    // Return nullptr if the connection is blocked.
+    return (!pConnectionNode->slot_.blocked()) ? &pConnectionNode->slot_ : nullptr;
   }
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
