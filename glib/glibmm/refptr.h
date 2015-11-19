@@ -263,7 +263,7 @@ T_CppObject* RefPtr<T_CppObject>::operator->() const noexcept
 template <class T_CppObject> inline
 RefPtr<T_CppObject>::RefPtr() noexcept
 :
-  pCppObject_ (0)
+  pCppObject_ (nullptr)
 {}
 
 template <class T_CppObject> inline
