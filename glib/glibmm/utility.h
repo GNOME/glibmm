@@ -67,7 +67,7 @@ private:
   ScopedPtr<T>& operator=(const ScopedPtr<T>&);
 
 public:
-  ScopedPtr()                 : ptr_ (0)   {}
+  ScopedPtr()                 : ptr_ (nullptr)   {}
   explicit ScopedPtr(T* ptr)  : ptr_ (ptr) {}
   ~ScopedPtr()  noexcept      { g_free(ptr_); }
   T*  get() const             { return ptr_;  }

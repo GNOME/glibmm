@@ -78,12 +78,12 @@ void spawn_async_with_pipes(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async_with_pipes(
-      (working_directory.empty()) ? 0 : working_directory.c_str(),
+      (working_directory.empty()) ? nullptr : working_directory.c_str(),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
-      (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? &child_setup_         : 0,
+      (setup_slot) ? &child_setup_callback : nullptr,
+      (setup_slot) ? &child_setup_         : nullptr,
       child_pid,
       standard_input, standard_output, standard_error,
       &gerror);
@@ -106,11 +106,11 @@ void spawn_async_with_pipes(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async_with_pipes(
-      (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()), 0,
+      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      const_cast<char**>(argv.data()), nullptr,
       static_cast<GSpawnFlags>(unsigned(flags)),
-      (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? &child_setup_         : 0,
+      (setup_slot) ? &child_setup_callback : nullptr,
+      (setup_slot) ? &child_setup_         : nullptr,
       child_pid,
       standard_input, standard_output, standard_error,
       &gerror);
@@ -131,12 +131,12 @@ void spawn_async(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async(
-      (working_directory.empty()) ? 0 : working_directory.c_str(),
+      (working_directory.empty()) ? nullptr : working_directory.c_str(),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
-      (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? &child_setup_         : 0,
+      (setup_slot) ? &child_setup_callback : nullptr,
+      (setup_slot) ? &child_setup_         : nullptr,
       child_pid,
       &gerror);
 
@@ -155,11 +155,11 @@ void spawn_async(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async(
-      (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()), 0,
+      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      const_cast<char**>(argv.data()), nullptr,
       static_cast<GSpawnFlags>(unsigned(flags)),
-      (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? &child_setup_         : 0,
+      (setup_slot) ? &child_setup_callback : nullptr,
+      (setup_slot) ? &child_setup_         : nullptr,
       child_pid,
       &gerror);
 
@@ -184,14 +184,14 @@ void spawn_sync(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_sync(
-      (working_directory.empty()) ? 0 : working_directory.c_str(),
+      (working_directory.empty()) ? nullptr : working_directory.c_str(),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
-      (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? &child_setup_         : 0,
-      (standard_output) ? buf_standard_output.addr() : 0,
-      (standard_error)  ? buf_standard_error.addr()  : 0,
+      (setup_slot) ? &child_setup_callback : nullptr,
+      (setup_slot) ? &child_setup_         : nullptr,
+      (standard_output) ? buf_standard_output.addr() : nullptr,
+      (standard_error)  ? buf_standard_error.addr()  : nullptr,
       exit_status,
       &gerror);
 
@@ -218,13 +218,13 @@ void spawn_sync(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_sync(
-      (working_directory.empty()) ? 0 : working_directory.c_str(),
-      const_cast<char**>(argv.data()), 0,
+      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      const_cast<char**>(argv.data()), nullptr,
       static_cast<GSpawnFlags>(unsigned(flags)),
-      (setup_slot) ? &child_setup_callback : 0,
-      (setup_slot) ? &child_setup_         : 0,
-      (standard_output) ? buf_standard_output.addr() : 0,
-      (standard_error)  ? buf_standard_error.addr()  : 0,
+      (setup_slot) ? &child_setup_callback : nullptr,
+      (setup_slot) ? &child_setup_         : nullptr,
+      (standard_output) ? buf_standard_output.addr() : nullptr,
+      (standard_error)  ? buf_standard_error.addr()  : nullptr,
       exit_status,
       &gerror);
 
@@ -255,8 +255,8 @@ void spawn_command_line_sync(const std::string& command_line,
 
   g_spawn_command_line_sync(
       command_line.c_str(),
-      (standard_output) ? buf_standard_output.addr() : 0,
-      (standard_error)  ? buf_standard_error.addr()  : 0,
+      (standard_output) ? buf_standard_output.addr() : nullptr,
+      (standard_error)  ? buf_standard_error.addr()  : nullptr,
       exit_status,
       &gerror);
 

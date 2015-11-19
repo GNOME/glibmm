@@ -35,11 +35,11 @@ class OptionArgCallback
 {
 public:
   explicit OptionArgCallback(const OptionGroup::SlotOptionArgString& slot)
-  : slot_string_(new OptionGroup::SlotOptionArgString(slot)), slot_filename_(0)
+  : slot_string_(new OptionGroup::SlotOptionArgString(slot)), slot_filename_(nullptr)
   { }
 
   explicit OptionArgCallback(const OptionGroup::SlotOptionArgFilename& slot)
-  : slot_string_(0), slot_filename_(new OptionGroup::SlotOptionArgFilename(slot))
+  : slot_string_(nullptr), slot_filename_(new OptionGroup::SlotOptionArgFilename(slot))
   { }
 
   bool is_filename_option() const
@@ -129,7 +129,7 @@ const gchar* OptionGroup_Translate_glibmm_callback(const gchar* string,
     Glib::exception_handlers_invoke();
   }
 
-  return 0;
+  return nullptr;
 }
 
 static void OptionGroup_Translate_glibmm_callback_destroy(void* data)
@@ -260,7 +260,7 @@ gboolean OptionGroup::option_arg_callback(const gchar* option_name, const gchar*
 
 OptionGroup::OptionGroup(const Glib::ustring& name, const Glib::ustring& description, const Glib::ustring& help_description)
 : gobject_( g_option_group_new(name.c_str(), description.c_str(), help_description.c_str(),
-            this /* user_data */, 0 /* destroy_func */) ),
+            this /* user_data */, nullptr /* destroy_func */) ),
   has_ownership_(true)
 {
   //g_callback_pre_parse(), post_parse_callback(), g_callback_error(), and
@@ -488,7 +488,7 @@ void OptionGroup::set_translate_func(const SlotTranslate& slot)
 
 
 OptionGroup::CppOptionEntry::CppOptionEntry()
-: carg_type_(G_OPTION_ARG_NONE), carg_(0), cpparg_(0), entry_(0)
+: carg_type_(G_OPTION_ARG_NONE), carg_(nullptr), cpparg_(nullptr), entry_(nullptr)
 {}
 
 void OptionGroup::CppOptionEntry::allocate_c_arg()
@@ -531,7 +531,7 @@ void OptionGroup::CppOptionEntry::allocate_c_arg()
     {
       char*** typed_arg = new char**;
       //The C code will allocate a char** and put it here, for us to g_strfreev() later.
-      *typed_arg = 0;
+      *typed_arg = nullptr;
       carg_ = typed_arg;
 
       break;

@@ -254,7 +254,7 @@ VariantIter VariantContainerBase::get_iter(const VariantType& container_variant_
 
 VariantBase::operator const void*() const
 {
-  return gobj() ? GINT_TO_POINTER(1) : 0;
+  return gobj() ? GINT_TO_POINTER(1) : nullptr;
 }
 
 void VariantBase::init(const GVariant* cobject, bool take_a_reference)
@@ -325,7 +325,7 @@ Variant<Glib::ustring>::create(const Glib::ustring& data)
 
 Glib::ustring Variant<Glib::ustring>::get() const
 {
-  return convert_const_gchar_ptr_to_ustring(g_variant_get_string(gobject_, 0));
+  return convert_const_gchar_ptr_to_ustring(g_variant_get_string(gobject_, nullptr));
 }
 
 // Variant<Glib::ustring> makes sense for multiple types.
@@ -413,7 +413,7 @@ std::string Variant<std::string>::get() const
   if(vtype.equal(VARIANT_TYPE_BYTESTRING))
     pch = g_variant_get_bytestring(gobject_);
   else //g_variant_get_string() can handle strings, object paths, and signatures.
-    pch = g_variant_get_string(gobject_, 0);
+    pch = g_variant_get_string(gobject_, nullptr);
 
   return convert_const_gchar_ptr_to_stdstring(pch);
 }
@@ -536,7 +536,7 @@ Variant<type_vec_string>::create(const type_vec_string& data)
   }
 
   // Terminate the string array.
-  str_array[data.size()] = NULL;
+  str_array[data.size()] = nullptr;
 
   // Create the variant using g_variant_new_bytestring_array() (passing the
   // newly constructed array.
@@ -561,7 +561,7 @@ Variant<type_vec_string>::create_from_object_paths(const type_vec_string& data)
   }
 
   // Terminate the string array.
-  str_array[data.size()] = NULL;
+  str_array[data.size()] = nullptr;
 
   // Create the variant using g_variant_new_objv() (passing the
   // newly constructed array.
