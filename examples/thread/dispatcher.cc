@@ -108,7 +108,7 @@ void ThreadProgress::launch()
 void ThreadProgress::join()
 {
   thread_->join();
-  thread_ = 0;
+  thread_ = nullptr;
 }
 
 bool ThreadProgress::unfinished() const
