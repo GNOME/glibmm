@@ -2113,9 +2113,9 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START">
-<parameter_description> If not set and the proxy if for a well-known name,
-then request the bus to launch an owner for the name if no-one owns the name. This flag can
-only be used in proxies for well-known names.
+<parameter_description> If the proxy is for a well-known name,
+do not ask the bus to launch an owner during proxy initialization or a method call.
+This flag is only meaningful in proxies for well-known names.
 </parameter_description>
 </parameter>
 <parameter name="G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES">
@@ -2126,7 +2126,7 @@ only be used in proxies for well-known names.
 <parameter_description> If the proxy is for a well-known name,
 do not ask the bus to launch an owner during proxy initialization, but allow it to be
 autostarted by a method call. This flag is only meaningful in proxies for well-known names,
-and only if %G_DBUS_PROXY_FLAGS_DO_NOT_AUTOSTART is not also specified.
+and only if %G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START is not also specified.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3210,6 +3210,10 @@ value, which has this more logical name. Since 2.44.
 </parameter>
 <parameter name="G_IO_ERROR_NOT_CONNECTED">
 <parameter_description> Transport endpoint is not connected. Since 2.44
+</parameter_description>
+</parameter>
+<parameter name="G_IO_ERROR_MESSAGE_TOO_LARGE">
+<parameter_description> Message too large. Since 2.48.
 </parameter_description>
 </parameter>
 </parameters>
@@ -5670,7 +5674,7 @@ Since: 2.28
 <property name="GTlsConnection:database">
 <description>
 The certificate database to use when verifying this TLS connection.
-If no cerificate database is set, then the default database will be
+If no certificate database is set, then the default database will be
 used. See g_tls_backend_get_default_database().
 
 Since: 2.30
@@ -11851,7 +11855,8 @@ containing the data to convert.
 </parameter_description>
 </parameter>
 <parameter name="outbuf">
-<parameter_description> a buffer to write converted data in.
+<parameter_description> a buffer to write
+converted data in.
 </parameter_description>
 </parameter>
 <parameter name="outbuf_size">
@@ -13220,6 +13225,324 @@ Sets the byte order of the data output stream to @order.
 <return></return>
 </function>
 
+<function name="g_datagram_based_condition_check">
+<description>
+Checks on the readiness of @datagram_based to perform operations. The
+operations specified in @condition are checked for and masked against the
+currently-satisfied conditions on @datagram_based. The result is returned.
+
+%G_IO_IN will be set in the return value if data is available to read with
+g_datagram_based_receive_messages(), or if the connection is closed remotely
+(EOS); and if the datagram_based has not been closed locally using some
+implementation-specific method (such as g_socket_close() or
+g_socket_shutdown() with @shutdown_read set, if it’s a #GSocket).
+
+If the connection is shut down or closed (by calling g_socket_close() or
+g_socket_shutdown() with @shutdown_read set, if it’s a #GSocket, for
+example), all calls to this function will return %G_IO_ERROR_CLOSED.
+
+%G_IO_OUT will be set if it is expected that at least one byte can be sent
+using g_datagram_based_send_messages() without blocking. It will not be set
+if the datagram_based has been closed locally.
+
+%G_IO_HUP will be set if the connection has been closed locally.
+
+%G_IO_ERR will be set if there was an asynchronous error in transmitting data
+previously enqueued using g_datagram_based_send_messages().
+
+Note that on Windows, it is possible for an operation to return
+%G_IO_ERROR_WOULD_BLOCK even immediately after
+g_datagram_based_condition_check() has claimed that the #GDatagramBased is
+ready for writing. Rather than calling g_datagram_based_condition_check() and
+then writing to the #GDatagramBased if it succeeds, it is generally better to
+simply try writing right away, and try again later if the initial attempt
+returns %G_IO_ERROR_WOULD_BLOCK.
+
+It is meaningless to specify %G_IO_ERR or %G_IO_HUP in @condition; these
+conditions will always be set in the output if they are true. Apart from
+these flags, the output is guaranteed to be masked by @condition.
+
+This call never blocks.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="datagram_based">
+<parameter_description> a #GDatagramBased
+</parameter_description>
+</parameter>
+<parameter name="condition">
+<parameter_description> a #GIOCondition mask to check
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GIOCondition mask of the current state
+
+</return>
+</function>
+
+<function name="g_datagram_based_condition_wait">
+<description>
+Waits for up to @timeout microseconds for condition to become true on
+@datagram_based. If the condition is met, %TRUE is returned.
+
+If @cancellable is cancelled before the condition is met, or if @timeout is
+reached before the condition is met, then %FALSE is returned and @error is
+set appropriately (%G_IO_ERROR_CANCELLED or %G_IO_ERROR_TIMED_OUT).
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="datagram_based">
+<parameter_description> a #GDatagramBased
+</parameter_description>
+</parameter>
+<parameter name="condition">
+<parameter_description> a #GIOCondition mask to wait for
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> the maximum time (in microseconds) to wait, 0 to not block, or -1
+to block indefinitely
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the condition was met, %FALSE otherwise
+
+</return>
+</function>
+
+<function name="g_datagram_based_create_source">
+<description>
+Creates a #GSource that can be attached to a #GMainContext to monitor for
+the availability of the specified @condition on the #GDatagramBased. The
+#GSource keeps a reference to the @datagram_based.
+
+The callback on the source is of the #GDatagramBasedSourceFunc type.
+
+It is meaningless to specify %G_IO_ERR or %G_IO_HUP in @condition; these
+conditions will always be reported in the callback if they are true.
+
+If non-%NULL, @cancellable can be used to cancel the source, which will
+cause the source to trigger, reporting the current condition (which is
+likely 0 unless cancellation happened at the same time as a condition
+change). You can check for this in the callback using
+g_cancellable_is_cancelled().
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="datagram_based">
+<parameter_description> a #GDatagramBased
+</parameter_description>
+</parameter>
+<parameter name="condition">
+<parameter_description> a #GIOCondition mask to monitor
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated #GSource
+
+</return>
+</function>
+
+<function name="g_datagram_based_receive_messages">
+<description>
+Receive one or more data messages from @datagram_based in one go.
+
+@messages must point to an array of #GInputMessage structs and
+@num_messages must be the length of this array. Each #GInputMessage
+contains a pointer to an array of #GInputVector structs describing the
+buffers that the data received in each message will be written to.
+
+@flags modify how all messages are received. The commonly available
+arguments for this are available in the #GSocketMsgFlags enum, but the
+values there are the same as the system values, and the flags
+are passed in as-is, so you can pass in system-specific flags too. These
+flags affect the overall receive operation. Flags affecting individual
+messages are returned in #GInputMessage.flags.
+
+The other members of #GInputMessage are treated as described in its
+documentation.
+
+If @timeout is negative the call will block until @num_messages have been
+received, the connection is closed remotely (EOS), @cancellable is cancelled,
+or an error occurs.
+
+If @timeout is 0 the call will return up to @num_messages without blocking,
+or %G_IO_ERROR_WOULD_BLOCK if no messages are queued in the operating system
+to be received.
+
+If @timeout is positive the call will block on the same conditions as if
+@timeout were negative. If the timeout is reached
+before any messages are received, %G_IO_ERROR_TIMED_OUT is returned,
+otherwise it will return the number of messages received before timing out.
+(Note: This is effectively the behaviour of `MSG_WAITFORONE` with
+recvmmsg().)
+
+To be notified when messages are available, wait for the %G_IO_IN condition.
+Note though that you may still receive %G_IO_ERROR_WOULD_BLOCK from
+g_datagram_based_receive_messages() even if you were previously notified of a
+%G_IO_IN condition.
+
+If the remote peer closes the connection, any messages queued in the
+underlying receive buffer will be returned, and subsequent calls to
+g_datagram_based_receive_messages() will return 0 (with no error set).
+
+If the connection is shut down or closed (by calling g_socket_close() or
+g_socket_shutdown() with @shutdown_read set, if it’s a #GSocket, for
+example), all calls to this function will return %G_IO_ERROR_CLOSED.
+
+On error -1 is returned and @error is set accordingly. An error will only
+be returned if zero messages could be received; otherwise the number of
+messages successfully received before the error will be returned. If
+@cancellable is cancelled, %G_IO_ERROR_CANCELLED is returned as with any
+other error.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="datagram_based">
+<parameter_description> a #GDatagramBased
+</parameter_description>
+</parameter>
+<parameter name="messages">
+<parameter_description> an array of #GInputMessage structs
+</parameter_description>
+</parameter>
+<parameter name="num_messages">
+<parameter_description> the number of elements in @messages
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> an int containing #GSocketMsgFlags flags for the overall operation
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> the maximum time (in microseconds) to wait, 0 to not block, or -1
+to block indefinitely
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a %GCancellable
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> number of messages received, or -1 on error. Note that the number
+of messages received may be smaller than @num_messages if @timeout is
+zero or positive, if the peer closed the connection, or if @num_messages
+was larger than `UIO_MAXIOV` (1024), in which case the caller may re-try
+to receive the remaining messages.
+
+</return>
+</function>
+
+<function name="g_datagram_based_send_messages">
+<description>
+Send one or more data messages from @datagram_based in one go.
+
+@messages must point to an array of #GOutputMessage structs and
+@num_messages must be the length of this array. Each #GOutputMessage
+contains an address to send the data to, and a pointer to an array of
+#GOutputVector structs to describe the buffers that the data to be sent
+for each message will be gathered from.
+
+@flags modify how the message is sent. The commonly available arguments
+for this are available in the #GSocketMsgFlags enum, but the
+values there are the same as the system values, and the flags
+are passed in as-is, so you can pass in system-specific flags too.
+
+The other members of #GOutputMessage are treated as described in its
+documentation.
+
+If @timeout is negative the call will block until @num_messages have been
+sent, @cancellable is cancelled, or an error occurs.
+
+If @timeout is 0 the call will send up to @num_messages without blocking,
+or will return %G_IO_ERROR_WOULD_BLOCK if there is no space to send messages.
+
+If @timeout is positive the call will block on the same conditions as if
+@timeout were negative. If the timeout is reached before any messages are
+sent, %G_IO_ERROR_TIMED_OUT is returned, otherwise it will return the number
+of messages sent before timing out.
+
+To be notified when messages can be sent, wait for the %G_IO_OUT condition.
+Note though that you may still receive %G_IO_ERROR_WOULD_BLOCK from
+g_datagram_based_send_messages() even if you were previously notified of a
+%G_IO_OUT condition. (On Windows in particular, this is very common due to
+the way the underlying APIs work.)
+
+If the connection is shut down or closed (by calling g_socket_close() or
+g_socket_shutdown() with @shutdown_write set, if it’s a #GSocket, for
+example), all calls to this function will return %G_IO_ERROR_CLOSED.
+
+On error -1 is returned and @error is set accordingly. An error will only
+be returned if zero messages could be sent; otherwise the number of messages
+successfully sent before the error will be returned. If @cancellable is
+cancelled, %G_IO_ERROR_CANCELLED is returned as with any other error.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="datagram_based">
+<parameter_description> a #GDatagramBased
+</parameter_description>
+</parameter>
+<parameter name="messages">
+<parameter_description> an array of #GOutputMessage structs
+</parameter_description>
+</parameter>
+<parameter name="num_messages">
+<parameter_description> the number of elements in @messages
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> an int containing #GSocketMsgFlags flags
+</parameter_description>
+</parameter>
+<parameter name="timeout">
+<parameter_description> the maximum time (in microseconds) to wait, 0 to not block, or -1
+to block indefinitely
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a %GCancellable
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError
+</parameter_description>
+</parameter>
+</parameters>
+<return> number of messages sent, or -1 on error. Note that the number of
+messages sent may be smaller than @num_messages if @timeout is zero
+or positive, or if @num_messages was larger than `UIO_MAXIOV` (1024), in
+which case the caller may re-try to send the remaining messages.
+
+</return>
+</function>
+
 <function name="g_dbus_action_group_get">
 <description>
 Obtains a #GDBusActionGroup for the action group which is exported at
@@ -13593,6 +13916,13 @@ dispatched anywhere else - not even the standard dispatch machinery
 g_dbus_connection_send_message_with_reply() relies on) will see the
 message. Similary, if a filter consumes an outgoing message, the
 message will not be sent to the other peer.
+
+If @user_data_free_func is non-%NULL, it will be called (in the
+thread-default main context of the thread you are calling this
+method from) at some point after @user_data is no longer
+needed. (It is not guaranteed to be called synchronously when the
+filter is removed, and may be called after @connection has been
+destroyed.)
 
 Since: 2.26
 
@@ -14476,8 +14806,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GCredentials or %NULL if not available.
-Do not free this object, it is owned by @connection.
+<return> a #GCredentials or %NULL if not
+available. Do not free this object, it is owned by @connection.
 
 </return>
 </function>
@@ -15012,6 +15342,13 @@ that can be used with g_dbus_connection_unregister_subtree() .
 <description>
 Removes a filter.
 
+Note that since filters run in a different thread, there is a race
+condition where it is possible that the filter will be running even
+after calling g_dbus_connection_remove_filter(), so you cannot just
+free data that the filter might be using. Instead, you should pass
+a #GDestroyNotify to g_dbus_connection_add_filter(), which will be
+called when it is guaranteed that the data is no longer needed.
+
 Since: 2.26
 
 </description>
@@ -15314,6 +15651,13 @@ If one of %G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE or
 %G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH are given, @arg0 is
 interpreted as part of a namespace or path.  The first argument
 of a signal is matched against that part as specified by D-Bus.
+
+If @user_data_free_func is non-%NULL, it will be called (in the
+thread-default main context of the thread you are calling this
+method from) at some point after @user_data is no longer
+needed. (It is not guaranteed to be called synchronously when the
+signal is unsubscribed from, and may be called after @connection
+has been destroyed.)
 
 Since: 2.26
 
@@ -23601,7 +23945,8 @@ when no longer needed.
 
 <function name="g_file_get_path">
 <description>
-Gets the local pathname for #GFile, if one exists.
+Gets the local pathname for #GFile, if one exists. If non-%NULL, this is
+guaranteed to be an absolute, canonical path. It might contain symlinks.
 
 This call does no blocking I/O.
 
@@ -23695,7 +24040,7 @@ Checks if @file has a parent, and optionally, if it is @parent.
 
 If @parent is %NULL then this function returns %TRUE if @file has any
 parent at all.  If @parent is non-%NULL then %TRUE is only returned
-if @file is a child of @parent.
+if @file is an immediate child of @parent.
 
 Since: 2.24
 
@@ -23710,8 +24055,8 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> %TRUE if @file is a child of @parent (or any parent in the
-case that @parent is %NULL).
+<return> %TRUE if @file is an immediate child of @parent (or any parent in
+the case that @parent is %NULL).
 
 </return>
 </function>
@@ -23965,7 +24310,8 @@ Gets the attribute type, value and status for an attribute key.
 </parameter_description>
 </parameter>
 <parameter name="value_pp">
-<parameter_description> return location for the attribute value, or %NULL
+<parameter_description> return location for the
+attribute value, or %NULL; the attribute value will not be %NULL
 </parameter_description>
 </parameter>
 <parameter name="status">
@@ -25991,6 +26337,38 @@ Virtual: monitor_dir
 or %NULL on error.
 Free the returned object with g_object_unref().
 </return>
+</function>
+
+<function name="g_file_monitor_emit_event">
+<description>
+Emits the #GFileMonitor::changed signal if a change
+has taken place. Should be called from file monitor
+implementations only.
+
+Implementations are responsible to call this method from the
+[thread-default main context][g-main-context-push-thread-default] of the
+thread that the monitor was created in.
+
+</description>
+<parameters>
+<parameter name="monitor">
+<parameter_description> a #GFileMonitor.
+</parameter_description>
+</parameter>
+<parameter name="child">
+<parameter_description> a #GFile.
+</parameter_description>
+</parameter>
+<parameter name="other_file">
+<parameter_description> a #GFile.
+</parameter_description>
+</parameter>
+<parameter name="event_type">
+<parameter_description> a set of #GFileMonitorEvent flags.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="g_file_monitor_file">
@@ -31317,7 +31695,7 @@ Since: 2.22
 <function name="g_io_stream_close">
 <description>
 Closes the stream, releasing resources related to it. This will also
-closes the individual input and output streams, if they are not already
+close the individual input and output streams, if they are not already
 closed.
 
 Once the stream is closed, all other operations will return
@@ -31973,6 +32351,30 @@ Since: 2.44
 <return></return>
 </function>
 
+<function name="g_list_store_sort">
+<description>
+Sort the items in @store according to @compare_func.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="store">
+<parameter_description> a #GListStore
+</parameter_description>
+</parameter>
+<parameter name="compare_func">
+<parameter_description> pairwise comparison function for sorting
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data for @compare_func
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_list_store_splice">
 <description>
 Changes @store by removing @n_removals items and adding @n_additions
@@ -32243,7 +32645,8 @@ write or truncate operation on the stream.
 </parameter_description>
 </parameter>
 </parameters>
-<return> pointer to the stream's data
+<return> pointer to the stream's data, or %NULL if the data
+has been stolen
 </return>
 </function>
 
@@ -32416,7 +32819,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> the stream's data
+<return> the stream's data, or %NULL if it has previously
+been stolen
 
 </return>
 </function>
@@ -34895,18 +35299,18 @@ Since: 2.20
 
 <function name="g_native_socket_address_new">
 <description>
-Creates a new #GNativeSocketAddress for @address and @port.
+Creates a new #GNativeSocketAddress for @native and @len.
 
 Since: 2.46
 
 </description>
 <parameters>
-<parameter name="address">
-<parameter_description> a #GNativeAddress
+<parameter name="native">
+<parameter_description> a native address object
 </parameter_description>
 </parameter>
-<parameter name="port">
-<parameter_description> a port number
+<parameter name="len">
+<parameter_description> the length of @native, in bytes
 </parameter_description>
 </parameter>
 </parameters>
@@ -37054,22 +37458,6 @@ Since: 2.26
 </parameters>
 <return> %TRUE if the permission was successfully released
 
-</return>
-</function>
-
-<function name="g_poll_file_monitor_new">
-<description>
-Polls @file for changes.
-
-
-</description>
-<parameters>
-<parameter name="file">
-<parameter_description> a #GFile.
-</parameter_description>
-</parameter>
-</parameters>
-<return> a new #GFileMonitor for the given #GFile. 
 </return>
 </function>
 
@@ -44171,6 +44559,30 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_socket_connectable_to_string">
+<description>
+Format a #GSocketConnectable as a string. This is a human-readable format for
+use in debugging output, and is not a stable serialization format. It is not
+suitable for use in user interfaces as it exposes too much information for a
+user.
+
+If the #GSocketConnectable implementation does not support string formatting,
+the implementation’s type name will be returned as a fallback.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="connectable">
+<parameter_description> a #GSocketConnectable
+</parameter_description>
+</parameter>
+</parameters>
+<return> the formatted string
+
+</return>
+</function>
+
 <function name="g_socket_connection_connect">
 <description>
 Connect @connection to the specified remote address.
@@ -44600,7 +45012,7 @@ Since: 2.22
 
 <function name="g_socket_get_available_bytes">
 <description>
-Get the amount of data pending in the OS input buffer.
+Get the amount of data pending in the OS input buffer, without blocking.
 
 If @socket is a UDP or SCTP socket, this will return the size of
 just the next packet, even if additional packets are buffered after
@@ -45012,6 +45424,11 @@ Since: 2.22
 <description>
 Check whether the socket is connected. This is only useful for
 connection-oriented sockets.
+
+If using g_socket_shutdown(), this function will return %TRUE until the
+socket has been shut down for reading and writing. If you do a non-blocking
+connect, this function will not return %TRUE until after you call
+g_socket_check_connect_result().
 
 Since: 2.22
 
@@ -45762,8 +46179,8 @@ the peer, or -1 on error
 
 <function name="g_socket_receive_message">
 <description>
-Receive data from a socket.  This is the most complicated and
-fully-featured version of this call. For easier use, see
+Receive data from a socket.  For receiving multiple messages, see
+g_socket_receive_messages(); for easier use, see
 g_socket_receive() and g_socket_receive_from().
 
 If @address is non-%NULL then @address will be set equal to the
@@ -45802,6 +46219,8 @@ for this are available in the #GSocketMsgFlags enum, but the
 values there are the same as the system values, and the flags
 are passed in as-is, so you can pass in system-specific flags too
 (and g_socket_receive_message() may pass system-specific flags out).
+Flags passed in to the parameter affect the receive operation; flags returned
+out of it are relevant to the specific returned message.
 
 As with g_socket_receive(), data may be discarded if @socket is
 %G_SOCKET_TYPE_DATAGRAM or %G_SOCKET_TYPE_SEQPACKET and you do not
@@ -45866,6 +46285,95 @@ elements in @messages, or %NULL
 </parameters>
 <return> Number of bytes read, or 0 if the connection was closed by
 the peer, or -1 on error
+
+</return>
+</function>
+
+<function name="g_socket_receive_messages">
+<description>
+Receive multiple data messages from @socket in one go.  This is the most
+complicated and fully-featured version of this call. For easier use, see
+g_socket_receive(), g_socket_receive_from(), and g_socket_receive_message().
+
+@messages must point to an array of #GInputMessage structs and
+@num_messages must be the length of this array. Each #GInputMessage
+contains a pointer to an array of #GInputVector structs describing the
+buffers that the data received in each message will be written to. Using
+multiple #GInputVectors is more memory-efficient than manually copying data
+out of a single buffer to multiple sources, and more system-call-efficient
+than making multiple calls to g_socket_receive(), such as in scenarios where
+a lot of data packets need to be received (e.g. high-bandwidth video
+streaming over RTP/UDP).
+
+@flags modify how all messages are received. The commonly available
+arguments for this are available in the #GSocketMsgFlags enum, but the
+values there are the same as the system values, and the flags
+are passed in as-is, so you can pass in system-specific flags too. These
+flags affect the overall receive operation. Flags affecting individual
+messages are returned in #GInputMessage.flags.
+
+The other members of #GInputMessage are treated as described in its
+documentation.
+
+If #GSocket:blocking is %TRUE the call will block until @num_messages have
+been received, or the end of the stream is reached.
+
+If #GSocket:blocking is %FALSE the call will return up to @num_messages
+without blocking, or %G_IO_ERROR_WOULD_BLOCK if no messages are queued in the
+operating system to be received.
+
+In blocking mode, if #GSocket:timeout is positive and is reached before any
+messages are received, %G_IO_ERROR_TIMED_OUT is returned, otherwise up to
+@num_messages are returned. (Note: This is effectively the
+behaviour of `MSG_WAITFORONE` with recvmmsg().)
+
+To be notified when messages are available, wait for the
+%G_IO_IN condition. Note though that you may still receive
+%G_IO_ERROR_WOULD_BLOCK from g_socket_receive_messages() even if you were
+previously notified of a %G_IO_IN condition.
+
+If the remote peer closes the connection, any messages queued in the
+operating system will be returned, and subsequent calls to
+g_socket_receive_messages() will return 0 (with no error set).
+
+On error -1 is returned and @error is set accordingly. An error will only
+be returned if zero messages could be received; otherwise the number of
+messages successfully received before the error will be returned.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="socket">
+<parameter_description> a #GSocket
+</parameter_description>
+</parameter>
+<parameter name="messages">
+<parameter_description> an array of #GInputMessage structs
+</parameter_description>
+</parameter>
+<parameter name="num_messages">
+<parameter_description> the number of elements in @messages
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> an int containing #GSocketMsgFlags flags for the overall operation
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a %GCancellable or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> number of messages received, or -1 on error. Note that the number
+of messages received may be smaller than @num_messages if in non-blocking
+mode, if the peer closed the connection, or if @num_messages
+was larger than `UIO_MAXIOV` (1024), in which case the caller may re-try
+to receive the remaining messages.
 
 </return>
 </function>
@@ -45963,8 +46471,8 @@ on error
 
 <function name="g_socket_send_message">
 <description>
-Send data to @address on @socket.  This is the most complicated and
-fully-featured version of this call. For easier use, see
+Send data to @address on @socket.  For sending multiple messages see
+g_socket_send_messages(); for easier use, see
 g_socket_send() and g_socket_send_to().
 
 If @address is %NULL then the message is sent to the default receiver
@@ -46082,7 +46590,9 @@ wait for the %G_IO_OUT condition. Note though that you may still receive
 notified of a %G_IO_OUT condition. (On Windows in particular, this is
 very common due to the way the underlying APIs work.)
 
-On error -1 is returned and @error is set accordingly.
+On error -1 is returned and @error is set accordingly. An error will only
+be returned if zero messages could be sent; otherwise the number of messages
+successfully sent before the error will be returned.
 
 Since: 2.44
 
@@ -46293,7 +46803,8 @@ Since: 2.22
 <function name="g_socket_set_blocking">
 <description>
 Sets the blocking mode of the socket. In blocking mode
-all operations block until they succeed or there is an error. In
+all operations (which don’t take an explicit blocking parameter) block until
+they succeed or there is an error. In
 non-blocking mode all functions return results immediately or
 with a %G_IO_ERROR_WOULD_BLOCK error.
 
@@ -46550,7 +47061,7 @@ Since: 2.32
 
 <function name="g_socket_shutdown">
 <description>
-Shut down part of a full-duplex connection.
+Shut down part or all of a full-duplex connection.
 
 If @shutdown_read is %TRUE then the receiving side of the connection
 is shut down, and further reading is disallowed.
@@ -46560,9 +47071,10 @@ is shut down, and further writing is disallowed.
 
 It is allowed for both @shutdown_read and @shutdown_write to be %TRUE.
 
-One example where this is used is graceful disconnect for TCP connections
-where you close the sending side, then wait for the other side to close
-the connection, thus ensuring that the other side saw all sent data.
+One example where it is useful to shut down only one side of a connection is
+graceful disconnect for TCP connections where you close the sending side,
+then wait for the other side to close the connection, thus ensuring that the
+other side saw all sent data.
 
 Since: 2.22
 
@@ -53197,6 +53709,9 @@ Creates a new #GUnixSocketAddress of type @type with name @path.
 If @type is %G_UNIX_SOCKET_ADDRESS_PATH, this is equivalent to
 calling g_unix_socket_address_new().
 
+If @type is %G_UNIX_SOCKET_ADDRESS_ANONYMOUS, @path and @path_len will be
+ignored.
+
 If @path_type is %G_UNIX_SOCKET_ADDRESS_ABSTRACT, then @path_len
 bytes of @path will be copied to the socket's path, and only those
 bytes will be considered part of the name. (If @path_len is -1,
@@ -54484,7 +54999,7 @@ Since: 2.46
 to watch the key only.
 </parameter_description>
 </parameter>
-<parameter name="change_flags">
+<parameter name="watch_flags">
 <parameter_description> specifies the types of changes to watch for.
 </parameter_description>
 </parameter>
@@ -54852,16 +55367,20 @@ Since: 2.46
 <parameter_description> a #GWin32RegistryValueIter
 </parameter_description>
 </parameter>
+<parameter name="auto_expand">
+<parameter_description> %TRUE to automatically expand G_WIN32_REGISTRY_VALUE_EXPAND_STR to
+G_WIN32_REGISTRY_VALUE_STR
+</parameter_description>
+</parameter>
 <parameter name="value_data">
 <parameter_description> Pointer to a
-location to store the data of the value (in UTF-8, if it's a string).
+location to store the data of the value (in UTF-8, if it's a string)
 </parameter_description>
 </parameter>
 <parameter name="value_data_size">
 <parameter_description> Pointer to a location to store the length
-of @value_data, in bytes (including any NUL-terminators, if it's a
-string).
-%NULL if length is not needed.
+of @value_data, in bytes (including any NUL-terminators, if it's a string).
+%NULL if length is not needed
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -54889,18 +55408,17 @@ Since: 2.46
 </parameter>
 <parameter name="auto_expand">
 <parameter_description> %TRUE to automatically expand G_WIN32_REGISTRY_VALUE_EXPAND_STR to
-G_WIN32_REGISTRY_VALUE_STR.
+G_WIN32_REGISTRY_VALUE_STR
 </parameter_description>
 </parameter>
 <parameter name="value_data">
 <parameter_description> Pointer to a
-location to store the data of the value (in UTF-16, if it's a string).
+location to store the data of the value (in UTF-16, if it's a string)
 </parameter_description>
 </parameter>
-<parameter name="value_data_len">
+<parameter name="value_data_size">
 <parameter_description> Pointer to a location to store the size
-of @value_data, in bytes (including any NUL-terminators, if it's a
-string).
+of @value_data, in bytes (including any NUL-terminators, if it's a string).
 %NULL if length is not needed.
 </parameter_description>
 </parameter>

@@ -3367,6 +3367,30 @@ Old South Arabian. Since 2.26
 <parameter_description>          Warang Citi. Since: 2.42
 </parameter_description>
 </parameter>
+<parameter name="G_UNICODE_SCRIPT_AHOM">
+<parameter_description>                 Ahom. Since 2.48
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS">
+<parameter_description> Anatolian Hieroglyphs. Since 2.48
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_HATRAN">
+<parameter_description>               Hatran. Since 2.48
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_MULTANI">
+<parameter_description>              Multani. Since 2.48
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_OLD_HUNGARIAN">
+<parameter_description>        Old Hungarian. Since 2.48
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_SIGNWRITING">
+<parameter_description>          Signwriting. Since 2.48
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -4791,8 +4815,8 @@ you can reliably detect overflow and underflow.
 </parameter_description>
 </parameter>
 <parameter name="endptr">
-<parameter_description>  if non-%NULL, it returns the character after
-the last character used in the conversion.
+<parameter_description> if non-%NULL, it returns the
+character after the last character used in the conversion.
 </parameter_description>
 </parameter>
 </parameters>
@@ -4829,8 +4853,8 @@ Since: 2.12
 </parameter_description>
 </parameter>
 <parameter name="endptr">
-<parameter_description>  if non-%NULL, it returns the character after
-the last character used in the conversion.
+<parameter_description> if non-%NULL, it returns the
+character after the last character used in the conversion.
 </parameter_description>
 </parameter>
 <parameter name="base">
@@ -4872,8 +4896,8 @@ Since: 2.2
 </parameter_description>
 </parameter>
 <parameter name="endptr">
-<parameter_description>  if non-%NULL, it returns the character after
-the last character used in the conversion.
+<parameter_description> if non-%NULL, it returns the
+character after the last character used in the conversion.
 </parameter_description>
 </parameter>
 <parameter name="base">
@@ -5080,6 +5104,45 @@ One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
 </parameter>
 <parameter name="n2">
 <parameter_description> another integer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_assert_cmpmem">
+<description>
+Debugging macro to compare memory regions. If the comparison fails,
+an error message is logged and the application is either terminated
+or the testcase marked as failed.
+
+The effect of `g_assert_cmpmem (m1, l1, m2, l2)` is
+the same as `g_assert_true (l1 == l2 &amp;&amp; memcmp (m1, m2, l1) == 0)`.
+The advantage of this macro is that it can produce a message that
+includes the actual values of @l1 and @l2.
+
+|[&lt;!-- language=&quot;C&quot; --&gt;
+g_assert_cmpmem (buf-&gt;data, buf-&gt;len, expected, sizeof (expected));
+]|
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="m1">
+<parameter_description> pointer to a buffer
+</parameter_description>
+</parameter>
+<parameter name="l1">
+<parameter_description> length of @m1
+</parameter_description>
+</parameter>
+<parameter name="m2">
+<parameter_description> pointer to another buffer
+</parameter_description>
+</parameter>
+<parameter name="l2">
+<parameter_description> length of @m2
 </parameter_description>
 </parameter>
 </parameters>
@@ -5312,6 +5375,35 @@ Since: 2.38
 <return></return>
 </function>
 
+<function name="g_assertion_message_expr">
+<description>
+
+</description>
+<parameters>
+<parameter name="domain">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="file">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="line">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="expr">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_async_queue_length">
 <description>
 Returns the length of the queue.
@@ -5470,7 +5562,7 @@ Pushes the @data into the @queue. @data must not be %NULL.
 
 <function name="g_async_queue_push_front">
 <description>
-Pushes the @data into the @queue. @data must not be %NULL.
+Pushes the @item into the @queue. @item must not be %NULL.
 In contrast to g_async_queue_push(), this function
 pushes the new item ahead of the items already in the queue,
 so that it will be the next one to be popped off the queue.
@@ -5483,8 +5575,8 @@ Since: 2.46
 <parameter_description> a #GAsyncQueue
 </parameter_description>
 </parameter>
-<parameter name="data">
-<parameter_description> @data to push into the @queue
+<parameter name="item">
+<parameter_description> data to push into the @queue
 </parameter_description>
 </parameter>
 </parameters>
@@ -5493,7 +5585,7 @@ Since: 2.46
 
 <function name="g_async_queue_push_front_unlocked">
 <description>
-Pushes the @data into the @queue. @data must not be %NULL.
+Pushes the @item into the @queue. @item must not be %NULL.
 In contrast to g_async_queue_push_unlocked(), this function
 pushes the new item ahead of the items already in the queue,
 so that it will be the next one to be popped off the queue.
@@ -5508,8 +5600,8 @@ Since: 2.46
 <parameter_description> a #GAsyncQueue
 </parameter_description>
 </parameter>
-<parameter name="data">
-<parameter_description> @data to push into the @queue
+<parameter name="item">
+<parameter_description> data to push into the @queue
 </parameter_description>
 </parameter>
 </parameters>
@@ -5662,8 +5754,8 @@ Since: 2.46
 <parameter_description> a #GAsyncQueue
 </parameter_description>
 </parameter>
-<parameter name="data">
-<parameter_description> the @data to remove from the @queue
+<parameter name="item">
+<parameter_description> the data to remove from the @queue
 </parameter_description>
 </parameter>
 </parameters>
@@ -5686,8 +5778,8 @@ Since: 2.46
 <parameter_description> a #GAsyncQueue
 </parameter_description>
 </parameter>
-<parameter name="data">
-<parameter_description> the @data to remove from the @queue
+<parameter name="item">
+<parameter_description> the data to remove from the @queue
 </parameter_description>
 </parameter>
 </parameters>
@@ -6501,8 +6593,10 @@ my_func(void)
 {
 g_auto(GQueue) queue = G_QUEUE_INIT;
 g_auto(GVariantBuilder) builder;
+g_auto(GStrv) strv;
 
 g_variant_builder_init (&amp;builder, G_VARIANT_TYPE_VARDICT);
+strv = g_strsplit(&quot;a:b:c&quot;, &quot;:&quot;, -1);
 
 ...
 
@@ -6515,7 +6609,7 @@ return g_variant_builder_end (&amp;builder);
 }
 ]|
 
-You must initialise the variable in some way -- either by use of an
+You must initialize the variable in some way -- either by use of an
 initialiser or by ensuring that an _init function will be called on
 it unconditionally before it goes out of scope.
 
@@ -6596,9 +6690,8 @@ Consider the following example:
 gboolean
 check_exists(GVariant *dict)
 {
-g_autoptr(GVariant) dirname;
-g_autoptr(GVariant) basename = NULL;
-g_autoptr(gchar) path = NULL;
+g_autoptr(GVariant) dirname, basename = NULL;
+g_autofree gchar *path = NULL;
 
 dirname = g_variant_lookup_value (dict, &quot;dirname&quot;, G_VARIANT_TYPE_STRING);
 
@@ -6621,6 +6714,8 @@ return g_access (path, R_OK) == 0;
 You must initialise the variable in some way -- either by use of an
 initialiser or by ensuring that it is assigned to unconditionally
 before it goes out of scope.
+
+See also g_auto(), g_autofree() and g_steal_pointer().
 
 Since: 2.44
 
@@ -7031,7 +7126,8 @@ usually). To start searching from the 0th bit, set @nth_bit to -1.
 </parameter_description>
 </parameter>
 </parameters>
-<return> the index of the first bit set which is higher than @nth_bit
+<return> the index of the first bit set which is higher than @nth_bit, or -1
+if no higher bits are set
 </return>
 </function>
 
@@ -7055,7 +7151,8 @@ usually). To start searching from the last bit, set @nth_bit to
 </parameter_description>
 </parameter>
 </parameters>
-<return> the index of the first bit set which is lower than @nth_bit
+<return> the index of the first bit set which is lower than @nth_bit, or -1
+if no lower bits are set
 </return>
 </function>
 
@@ -8385,7 +8482,8 @@ Provide a copy of a boxed structure @src_boxed which is of type @boxed_type.
 </parameter_description>
 </parameter>
 </parameters>
-<return> The newly created copy of the boxed structure.
+<return> The newly created copy of the boxed
+structure.
 </return>
 </function>
 
@@ -8967,8 +9065,8 @@ Since: 2.32
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the
-byte data, or %NULL
+<return>
+a pointer to the byte data, or %NULL
 
 </return>
 </function>
@@ -9146,7 +9244,8 @@ Since: 2.32
 </description>
 <parameters>
 <parameter name="data">
-<parameter_description> the data to be used for the bytes
+<parameter_description>
+          the data to be used for the bytes
 </parameter_description>
 </parameter>
 <parameter name="size">
@@ -9249,8 +9348,9 @@ Since: 2.32
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the same byte data, which should
-be freed with g_free()
+<return> (transfer full) (array length=size) (element-type guint8)
+(not nullable): a pointer to the same byte data, which should be
+freed with g_free()
 
 </return>
 </function>
@@ -11330,7 +11430,8 @@ value.
 </parameter_description>
 </parameter>
 <parameter name="instance">
-<parameter_description> the instance on which the closure is invoked.
+<parameter_description> the instance on which the closure is
+invoked.
 </parameter_description>
 </parameter>
 <parameter name="args_list">
@@ -11889,7 +11990,8 @@ Since: 2.34
 </description>
 <parameters>
 <parameter name="pp">
-<parameter_description> a pointer to a variable, struct member etc. holding a pointer
+<parameter_description> a pointer to a variable, struct member etc. holding a
+pointer
 </parameter_description>
 </parameter>
 <parameter name="destroy">
@@ -11994,7 +12096,8 @@ g_object_watch_closure() for an example of marshal guards.
 </parameter_description>
 </parameter>
 <parameter name="pre_marshal_data">
-<parameter_description> data to pass to @pre_marshal_notify
+<parameter_description> data to pass
+to @pre_marshal_notify
 </parameter_description>
 </parameter>
 <parameter name="pre_marshal_notify">
@@ -12002,7 +12105,8 @@ g_object_watch_closure() for an example of marshal guards.
 </parameter_description>
 </parameter>
 <parameter name="post_marshal_data">
-<parameter_description> data to pass to @post_marshal_notify
+<parameter_description> data to pass
+to @post_marshal_notify
 </parameter_description>
 </parameter>
 <parameter name="post_marshal_notify">
@@ -12268,7 +12372,8 @@ the right callback and passes it to the marshaller as the
 </parameter_description>
 </parameter>
 <parameter name="marshal_data">
-<parameter_description> context-dependent data to pass to @meta_marshal
+<parameter_description> context-dependent data to pass
+to @meta_marshal
 </parameter_description>
 </parameter>
 <parameter name="meta_marshal">
@@ -16981,7 +17086,7 @@ a certain case, your code will still work.
 </description>
 <parameters>
 <parameter name="error">
-<parameter_description> a #GError or %NULL
+<parameter_description> a #GError
 </parameter_description>
 </parameter>
 <parameter name="domain">
@@ -17409,7 +17514,8 @@ encoding used for filenames.
 </parameter_description>
 </parameter>
 <parameter name="hostname">
-<parameter_description> Location to store hostname for the URI, or %NULL.
+<parameter_description> Location to store hostname for the
+URI.
 If there is no hostname in the URI, %NULL will be
 stored in this location.
 </parameter_description>
@@ -17522,7 +17628,7 @@ for the @len parameter is unsafe)
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
-<parameter_description>    location to store the number of bytes in the
+<parameter_description> location to store the number of bytes in the
 input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
@@ -17533,8 +17639,8 @@ input sequence.
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
+<parameter_description> the number of bytes stored in the output
+buffer (not including the terminating nul).
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -18759,10 +18865,10 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList containing all the keys inside the hash
-table. The content of the list is owned by the hash table and
-should not be modified or freed. Use g_list_free() when done
-using the list.
+<return> a #GList containing all the keys
+inside the hash table. The content of the list is owned by the
+hash table and should not be modified or freed. Use g_list_free()
+when done using the list.
 
 </return>
 </function>
@@ -18824,10 +18930,10 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GList containing all the values inside the hash
-table. The content of the list is owned by the hash table and
-should not be modified or freed. Use g_list_free() when done
-using the list.
+<return> a #GList containing all the values
+inside the hash table. The content of the list is owned by the
+hash table and should not be modified or freed. Use g_list_free()
+when done using the list.
 
 </return>
 </function>
@@ -18928,11 +19034,11 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="key">
-<parameter_description> a location to store the key, or %NULL
+<parameter_description> a location to store the key
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> a location to store the value, or %NULL
+<parameter_description> a location to store the value
 </parameter_description>
 </parameter>
 </parameters>
@@ -19065,11 +19171,12 @@ of @hash_table are %NULL-safe.
 </parameter_description>
 </parameter>
 <parameter name="orig_key">
-<parameter_description> return location for the original key, or %NULL
+<parameter_description> return location for the original key
 </parameter_description>
 </parameter>
 <parameter name="value">
-<parameter_description> return location for the value associated with the key, or %NULL
+<parameter_description> return location for the value associated
+with the key
 </parameter_description>
 </parameter>
 </parameters>
@@ -24028,7 +24135,7 @@ for the @len parameter is unsafe)
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
-<parameter_description>    location to store the number of bytes in the
+<parameter_description> location to store the number of bytes in the
 input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
@@ -24039,8 +24146,8 @@ input sequence.
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
+<parameter_description> the number of bytes stored in the output
+buffer (not including the terminating nul).
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -24076,7 +24183,7 @@ for the @len parameter is unsafe)
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
-<parameter_description>    location to store the number of bytes in the
+<parameter_description> location to store the number of bytes in the
 input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
@@ -24087,8 +24194,8 @@ input sequence.
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
+<parameter_description> the number of bytes stored in the output
+buffer (not including the terminating nul).
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -24116,7 +24223,8 @@ manually.
 </description>
 <parameters>
 <parameter name="log_domain">
-<parameter_description> the log domain, usually #G_LOG_DOMAIN
+<parameter_description> the log domain, usually #G_LOG_DOMAIN, or %NULL
+for the default
 </parameter_description>
 </parameter>
 <parameter name="log_level">
@@ -24164,7 +24272,8 @@ the rest.
 </description>
 <parameters>
 <parameter name="log_domain">
-<parameter_description> the log domain of the message
+<parameter_description> the log domain of the message, or %NULL for the
+default &quot;&quot; application domain
 </parameter_description>
 </parameter>
 <parameter name="log_level">
@@ -24382,7 +24491,8 @@ manually.
 </description>
 <parameters>
 <parameter name="log_domain">
-<parameter_description> the log domain
+<parameter_description> the log domain, or %NULL for the default &quot;&quot;
+application domain
 </parameter_description>
 </parameter>
 <parameter name="log_level">
@@ -28455,7 +28565,8 @@ thread. Use #GWeakRef if thread-safety is required.
 </parameter_description>
 </parameter>
 <parameter name="weak_pointer_location">
-<parameter_description> The memory address of a pointer.
+<parameter_description> The memory address
+of a pointer.
 </parameter_description>
 </parameter>
 </parameters>
@@ -29217,8 +29328,8 @@ Since: 2.4
 </description>
 <parameters>
 <parameter name="g_iface">
-<parameter_description> any interface vtable for the interface, or the default
-vtable for the interface
+<parameter_description> any interface vtable for the
+interface, or the default vtable for the interface
 </parameter_description>
 </parameter>
 <parameter name="property_name">
@@ -29254,7 +29365,8 @@ Since: 2.4
 </description>
 <parameters>
 <parameter name="g_iface">
-<parameter_description> any interface vtable for the interface, or the default
+<parameter_description> any interface vtable for the
+interface, or the default
 vtable for the interface.
 </parameter_description>
 </parameter>
@@ -29279,8 +29391,8 @@ Since: 2.4
 </description>
 <parameters>
 <parameter name="g_iface">
-<parameter_description> any interface vtable for the interface, or the default
-vtable for the interface
+<parameter_description> any interface vtable for the
+interface, or the default vtable for the interface
 </parameter_description>
 </parameter>
 <parameter name="n_properties_p">
@@ -29338,7 +29450,8 @@ name/value pairs, followed by %NULL
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new instance of @object_type
+<return> a new instance of
+@object_type
 </return>
 </function>
 
@@ -29563,7 +29676,8 @@ to match the one used with g_object_add_weak_pointer().
 </parameter_description>
 </parameter>
 <parameter name="weak_pointer_location">
-<parameter_description> The memory address of a pointer.
+<parameter_description> The memory address
+of a pointer.
 </parameter_description>
 </parameter>
 </parameters>
@@ -30231,7 +30345,8 @@ Since: 2.14
 </description>
 <parameters>
 <parameter name="location">
-<parameter_description> location of a static initializable variable containing 0
+<parameter_description> location of a static initializable variable
+containing 0
 </parameter_description>
 </parameter>
 </parameters>
@@ -30254,7 +30369,8 @@ Since: 2.14
 </description>
 <parameters>
 <parameter name="location">
-<parameter_description> location of a static initializable variable containing 0
+<parameter_description> location of a static initializable variable
+containing 0
 </parameter_description>
 </parameter>
 <parameter name="result">
@@ -31402,15 +31518,15 @@ Get the short description of a #GParamSpec.
 
 <function name="g_param_spec_get_default_value">
 <description>
-Gets the default value of @param as a pointer to a #GValue.
+Gets the default value of @pspec as a pointer to a #GValue.
 
-The #GValue will remain value for the life of @param.
+The #GValue will remain value for the life of @pspec.
 
 Since: 2.38
 
 </description>
 <parameters>
-<parameter name="param">
+<parameter name="pspec">
 <parameter_description> a #GParamSpec
 </parameter_description>
 </parameter>
@@ -31436,6 +31552,24 @@ This allows for pointer-value comparisons.
 </parameter>
 </parameters>
 <return> the name of @pspec.
+</return>
+</function>
+
+<function name="g_param_spec_get_name_quark">
+<description>
+Gets the GQuark for the name.
+
+Since: 2.46
+
+</description>
+<parameters>
+<parameter name="pspec">
+<parameter_description> a #GParamSpec
+</parameter_description>
+</parameter>
+</parameters>
+<return> the GQuark for @pspec-&gt;name.
+
 </return>
 </function>
 
@@ -33021,7 +33155,7 @@ Since: 2.16
 </description>
 <parameters>
 <parameter name="err">
-<parameter_description> a return location for a #GError, or %NULL
+<parameter_description> a return location for a #GError
 </parameter_description>
 </parameter>
 <parameter name="format">
@@ -33227,6 +33361,8 @@ the #GDestroyNotify for @key is not called on the old value.
 <description>
 If @dest is %NULL, free @src; otherwise, moves @src into *@dest.
 The error variable @dest points to must be %NULL.
+
+@src must be non-%NULL.
 
 Note that @src is no longer valid after this call. If you want
 to keep using the same GError*, you need to set it to %NULL
@@ -36554,6 +36690,27 @@ should therefore not depend on any side effects of @expr.
 <return></return>
 </function>
 
+<function name="g_return_if_fail_warning">
+<description>
+
+</description>
+<parameters>
+<parameter name="log_domain">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="pretty_function">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="expression">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_return_if_reached">
 <description>
 Logs a critical message and returns from the current function.
@@ -37555,7 +37712,9 @@ Since: 2.14
 
 <function name="g_sequence_get_length">
 <description>
-Returns the length of @seq
+Returns the length of @seq. Note that this method is O(h) where `h' is the
+height of the tree. It is thus more efficient to use g_sequence_is_empty()
+when comparing the length to zero.
 
 Since: 2.14
 
@@ -37668,6 +37827,28 @@ Since: 2.14
 </parameter>
 </parameters>
 <return> a #GSequenceIter pointing to the new item
+
+</return>
+</function>
+
+<function name="g_sequence_is_empty">
+<description>
+Returns %TRUE if the sequence contains zero items.
+
+This function is functionally identical to checking the result of
+g_sequence_get_length() being equal to zero. However this function is
+implemented in O(1) running time.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="seq">
+<parameter_description> a #GSequence
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the sequence is empty, otherwise %FALSE.
 
 </return>
 </function>
@@ -38386,7 +38567,7 @@ must be %NULL. A new #GError is created and assigned to *@err.
 </description>
 <parameters>
 <parameter name="err">
-<parameter_description> a return location for a #GError, or %NULL
+<parameter_description> a return location for a #GError
 </parameter_description>
 </parameter>
 <parameter name="domain">
@@ -38422,7 +38603,7 @@ Since: 2.18
 </description>
 <parameters>
 <parameter name="err">
-<parameter_description> a return location for a #GError, or %NULL
+<parameter_description> a return location for a #GError
 </parameter_description>
 </parameter>
 <parameter name="domain">
@@ -38612,16 +38793,16 @@ domain. Free the returned vector with g_strfreev().
 </parameter_description>
 </parameter>
 <parameter name="argcp">
-<parameter_description> return location for number of args, or %NULL
+<parameter_description> return location for number of args
 </parameter_description>
 </parameter>
 <parameter name="argvp">
 <parameter_description> return
-location for array of args, or %NULL
+location for array of args
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> return location for error, or %NULL
+<parameter_description> return location for error
 </parameter_description>
 </parameter>
 </parameters>
@@ -38834,7 +39015,8 @@ Since: 2.18
 </description>
 <parameters>
 <parameter name="instance">
-<parameter_description> the instance the signal is being emitted on.
+<parameter_description> the instance the signal is being
+emitted on.
 </parameter_description>
 </parameter>
 <parameter name="Varargs">
@@ -39039,7 +39221,8 @@ is not safe).
 </parameter_description>
 </parameter>
 <parameter name="gobject">
-<parameter_description> the object to pass as data to @c_handler.
+<parameter_description> the object to pass as data
+to @c_handler.
 </parameter_description>
 </parameter>
 <parameter name="connect_flags">
@@ -39172,7 +39355,8 @@ if no handlers are connected, in contrast to g_signal_emitv().
 </description>
 <parameters>
 <parameter name="instance">
-<parameter_description> the instance the signal is being emitted on.
+<parameter_description> the instance the signal is being
+emitted on.
 </parameter_description>
 </parameter>
 <parameter name="signal_id">
@@ -39648,6 +39832,9 @@ without detail.  If @detail is non-zero then it will match handlers
 connected both without detail and with the given detail.  This is
 consistent with how a signal emitted with @detail would be delivered
 to those handlers.
+
+Since 2.46 this also checks for a non-default class closure being
+installed, as this is basically always what you want.
 
 One example of when you might use this is when the arguments to the
 signal are difficult to compute. A class implementor may opt to not
@@ -40258,6 +40445,66 @@ structure which is to be invoked by the new closure
 </return>
 </function>
 
+<function name="g_size_checked_add">
+<description>
+Performs a checked addition of @a and @b, storing the result in
+@dest.
+
+If the operation is successful, %TRUE is returned.  If the operation
+overflows then the state of @dest is undefined and %FALSE is
+returned.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a pointer to the #gsize destination
+</parameter_description>
+</parameter>
+<parameter name="a">
+<parameter_description> the #gsize left operand
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> the #gsize right operand
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if there was no overflow
+</return>
+</function>
+
+<function name="g_size_checked_mul">
+<description>
+Performs a checked multiplication of @a and @b, storing the result in
+@dest.
+
+If the operation is successful, %TRUE is returned.  If the operation
+overflows then the state of @dest is undefined and %FALSE is
+returned.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a pointer to the #gsize destination
+</parameter_description>
+</parameter>
+<parameter name="a">
+<parameter_description> the #gsize left operand
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> the #gsize right operand
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if there was no overflow
+</return>
+</function>
+
 <function name="g_slice_alloc">
 <description>
 Allocates a block of memory from the slice allocator.
@@ -40279,7 +40526,8 @@ Since: 2.10
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the allocated memory block
+<return> a pointer to the allocated memory block, which will be %NULL if and
+only if @mem_size is 0
 
 </return>
 </function>
@@ -40300,7 +40548,8 @@ Since: 2.10
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the allocated block
+<return> a pointer to the allocated block, which will be %NULL if and only
+if @mem_size is 0
 
 </return>
 </function>
@@ -40309,6 +40558,8 @@ Since: 2.10
 <description>
 Allocates a block of memory from the slice allocator
 and copies @block_size bytes into it from @mem_block.
+
+@mem_block must be non-%NULL if @block_size is non-zero.
 
 Since: 2.14
 
@@ -40323,7 +40574,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the allocated memory block
+<return> a pointer to the allocated memory block, which will be %NULL if and
+only if @mem_size is 0
 
 </return>
 </function>
@@ -40340,6 +40592,8 @@ Note that the underlying slice allocation mechanism can
 be changed with the [`G_SLICE=always-malloc`][G_SLICE]
 environment variable.
 
+This can never return %NULL.
+
 Since: 2.14
 
 </description>
@@ -40353,7 +40607,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the allocated block, cast to a pointer to @type
+<return> a pointer to the allocated block, cast to a pointer
+to @type
 
 </return>
 </function>
@@ -40368,6 +40623,8 @@ as the block size.
 Note that the exact release behaviour can be changed with the
 [`G_DEBUG=gc-friendly`][G_DEBUG] environment variable, also see
 [`G_SLICE`][G_SLICE] for related debugging options.
+
+If @mem is %NULL, this macro does nothing.
 
 Since: 2.10
 
@@ -40395,6 +40652,8 @@ specified upon allocation. Note that the exact release behaviour
 can be changed with the [`G_DEBUG=gc-friendly`][G_DEBUG] environment
 variable, also see [`G_SLICE`][G_SLICE] for related debugging options.
 
+If @mem_block is %NULL, this function does nothing.
+
 Since: 2.10
 
 </description>
@@ -40421,6 +40680,8 @@ a @next pointer (similar to #GSList). The name of the
 Note that the exact release behaviour can be changed with the
 [`G_DEBUG=gc-friendly`][G_DEBUG] environment variable, also see
 [`G_SLICE`][G_SLICE] for related debugging options.
+
+If @mem_chain is %NULL, this function does nothing.
 
 Since: 2.10
 
@@ -40454,6 +40715,8 @@ Note that the exact release behaviour can be changed with the
 [`G_DEBUG=gc-friendly`][G_DEBUG] environment variable, also see
 [`G_SLICE`][G_SLICE] for related debugging options.
 
+If @mem_chain is %NULL, this function does nothing.
+
 Since: 2.10
 
 </description>
@@ -40485,6 +40748,9 @@ cast in the source code. Note that the underlying slice allocation
 mechanism can be changed with the [`G_SLICE=always-malloc`][G_SLICE]
 environment variable.
 
+This can never return %NULL as the minimum allocation size from
+`sizeof (@type)` is 1 byte.
+
 Since: 2.10
 
 </description>
@@ -40494,7 +40760,8 @@ Since: 2.10
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer to the allocated block, cast to a pointer to @type
+<return> a pointer to the allocated block, cast to a pointer
+to @type
 
 </return>
 </function>
@@ -40511,6 +40778,9 @@ Note that the underlying slice allocation mechanism can
 be changed with the [`G_SLICE=always-malloc`][G_SLICE]
 environment variable.
 
+This can never return %NULL as the minimum allocation size from
+`sizeof (@type)` is 1 byte.
+
 Since: 2.10
 
 </description>
@@ -40520,7 +40790,10 @@ Since: 2.10
 </parameter_description>
 </parameter>
 </parameters>
-<return></return>
+<return> a pointer to the allocated block, cast to a pointer
+to @type
+
+</return>
 </function>
 
 <function name="g_slist_alloc">
@@ -44007,10 +44280,14 @@ on a %NULL value, g_strdupv() simply returns %NULL.
 
 <function name="g_strerror">
 <description>
-Returns a string corresponding to the given error code, e.g.
-&quot;no such process&quot;. You should use this function in preference to
-strerror(), because it returns a string in UTF-8 encoding, and since
-not all platforms support the strerror() function.
+Returns a string corresponding to the given error code, e.g. &quot;no
+such process&quot;. Unlike strerror(), this always returns a string in
+UTF-8 encoding, and the pointer is guaranteed to remain valid for
+the lifetime of the process.
+
+Note that the string may be translated according to the current locale.
+
+The value of %errno will not be changed by this function.
 
 
 </description>
@@ -44022,7 +44299,7 @@ documentation
 </parameter>
 </parameters>
 <return> a UTF-8 string describing the error code. If the error code
-is unknown, it returns &quot;unknown error (&lt;code&gt;)&quot;.
+is unknown, it returns a string like &quot;unknown error (&lt;code&gt;)&quot;.
 </return>
 </function>
 
@@ -44711,7 +44988,7 @@ Creates a new #GString, initialized with the given string.
 <parameters>
 <parameter name="init">
 <parameter_description> the initial text to copy into the string, or %NULL to
-start with an empty string.
+start with an empty string
 </parameter_description>
 </parameter>
 </parameters>
@@ -45573,8 +45850,8 @@ point in some locales, causing unexpected results.
 </parameter_description>
 </parameter>
 <parameter name="endptr">
-<parameter_description>  if non-%NULL, it returns the character after
-the last character used in the conversion.
+<parameter_description> if non-%NULL, it returns the
+character after the last character used in the conversion.
 </parameter_description>
 </parameter>
 </parameters>
@@ -47041,7 +47318,7 @@ message.
 
 |[&lt;!-- language=&quot;C&quot; --&gt; 
 static void
-test_create_large_object_subprocess (void)
+test_create_large_object (void)
 {
 if (g_test_subprocess ())
 {
@@ -48713,6 +48990,7 @@ Returns the height of a #GTrashStack.
 Note that execution of this function is of O(N) complexity
 where N denotes the number of items on the stack.
 
+Deprecated: 2.48: #GTrashStack is deprecated without replacement
 
 </description>
 <parameters>
@@ -48730,6 +49008,7 @@ where N denotes the number of items on the stack.
 Returns the element at the top of a #GTrashStack
 which may be %NULL.
 
+Deprecated: 2.48: #GTrashStack is deprecated without replacement
 
 </description>
 <parameters>
@@ -48746,6 +49025,7 @@ which may be %NULL.
 <description>
 Pops a piece of memory off a #GTrashStack.
 
+Deprecated: 2.48: #GTrashStack is deprecated without replacement
 
 </description>
 <parameters>
@@ -48761,6 +49041,7 @@ Pops a piece of memory off a #GTrashStack.
 <function name="g_trash_stack_push">
 <description>
 Pushes a piece of memory onto a #GTrashStack.
+Deprecated: 2.48: #GTrashStack is deprecated without replacement
 
 </description>
 <parameters>
@@ -49317,7 +49598,7 @@ Attempts to allocate @n_structs elements of type @struct_type, initialized
 to 0's, and returns %NULL on failure. Contrast with g_new0(), which aborts
 the program on failure.
 The returned pointer is cast to a pointer to the given type.
-The function returns %NULL when @n_structs is 0 of if an overflow occurs.
+The function returns %NULL when @n_structs is 0 or if an overflow occurs.
 
 Since: 2.8
 
@@ -49703,7 +49984,8 @@ Since: 2.4
 </description>
 <parameters>
 <parameter name="g_class">
-<parameter_description> class structure for an instantiatable type
+<parameter_description> class structure for an instantiatable
+type
 </parameter_description>
 </parameter>
 <parameter name="private_size">
@@ -50997,15 +51279,15 @@ If @len &lt; 0, then the string is nul-terminated.
 </parameter_description>
 </parameter>
 <parameter name="items_read">
-<parameter_description> location to store number of bytes read,
-or %NULL. If an error occurs then the index of the invalid input
-is stored here.
+<parameter_description> location to store number of
+bytes read, or %NULL. If an error occurs then the index of the invalid
+input is stored here.
 </parameter_description>
 </parameter>
 <parameter name="items_written">
-<parameter_description> location to store number of #gunichar2 
-written, or %NULL. The value stored here does not include the
-trailing 0.
+<parameter_description> location to store number
+of #gunichar2  written, or %NULL. The value stored here does not include
+the trailing 0.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -51039,14 +51321,14 @@ If @len &lt; 0, then the string is nul-terminated.
 </parameter_description>
 </parameter>
 <parameter name="items_read">
-<parameter_description> location to store number of characters
-read, or %NULL.
+<parameter_description> location to store number of
+characters read, or %NULL.
 </parameter_description>
 </parameter>
 <parameter name="items_written">
-<parameter_description> location to store number of bytes
-written or %NULL. The value here stored does not include the
-trailing 0 byte. 
+<parameter_description> location to store number
+of bytes written or %NULL. The value here stored does not include the
+trailing 0 byte.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -51060,6 +51342,126 @@ errors. Any of the errors in #GConvertError other than
 This value must be freed with g_free(). If an error occurs,
 %NULL will be returned and @error set. In that case, @items_read
 will be set to the position of the first invalid input character.
+</return>
+</function>
+
+<function name="g_uint64_checked_add">
+<description>
+Performs a checked addition of @a and @b, storing the result in
+@dest.
+
+If the operation is successful, %TRUE is returned.  If the operation
+overflows then the state of @dest is undefined and %FALSE is
+returned.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a pointer to the #guint64 destination
+</parameter_description>
+</parameter>
+<parameter name="a">
+<parameter_description> the #guint64 left operand
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> the #guint64 right operand
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if there was no overflow
+</return>
+</function>
+
+<function name="g_uint64_checked_mul">
+<description>
+Performs a checked multiplication of @a and @b, storing the result in
+@dest.
+
+If the operation is successful, %TRUE is returned.  If the operation
+overflows then the state of @dest is undefined and %FALSE is
+returned.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a pointer to the #guint64 destination
+</parameter_description>
+</parameter>
+<parameter name="a">
+<parameter_description> the #guint64 left operand
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> the #guint64 right operand
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if there was no overflow
+</return>
+</function>
+
+<function name="g_uint_checked_add">
+<description>
+Performs a checked addition of @a and @b, storing the result in
+@dest.
+
+If the operation is successful, %TRUE is returned.  If the operation
+overflows then the state of @dest is undefined and %FALSE is
+returned.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a pointer to the #guint destination
+</parameter_description>
+</parameter>
+<parameter name="a">
+<parameter_description> the #guint left operand
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> the #guint right operand
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if there was no overflow
+</return>
+</function>
+
+<function name="g_uint_checked_mul">
+<description>
+Performs a checked multiplication of @a and @b, storing the result in
+@dest.
+
+If the operation is successful, %TRUE is returned.  If the operation
+overflows then the state of @dest is undefined and %FALSE is
+returned.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="dest">
+<parameter_description> a pointer to the #guint destination
+</parameter_description>
+</parameter>
+<parameter name="a">
+<parameter_description> the #guint left operand
+</parameter_description>
+</parameter>
+<parameter name="b">
+<parameter_description> the #guint right operand
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if there was no overflow
 </return>
 </function>
 
@@ -51658,9 +52060,9 @@ Converts a single character to UTF-8.
 </parameter_description>
 </parameter>
 <parameter name="outbuf">
-<parameter_description> output buffer, must have at least 6 bytes of space.
-If %NULL, the length will be computed and returned
-and nothing will be written to @outbuf.
+<parameter_description> output buffer, must have at
+least 6 bytes of space. If %NULL, the length will be computed and
+returned and nothing will be written to @outbuf.
 </parameter_description>
 </parameter>
 </parameters>
@@ -52391,16 +52793,16 @@ If @len &lt; 0, then the string is nul-terminated.
 </parameter_description>
 </parameter>
 <parameter name="items_read">
-<parameter_description> location to store number of words read,
-or %NULL. If %NULL, then %G_CONVERT_ERROR_PARTIAL_INPUT will be
-returned in case @str contains a trailing partial character. If
+<parameter_description> location to store number of
+words read, or %NULL. If %NULL, then %G_CONVERT_ERROR_PARTIAL_INPUT will
+be returned in case @str contains a trailing partial character. If
 an error occurs then the index of the invalid input is stored here.
 </parameter_description>
 </parameter>
 <parameter name="items_written">
-<parameter_description> location to store number of characters
-written, or %NULL. The value stored here does not include the trailing
-0 character.
+<parameter_description> location to store number
+of characters written, or %NULL. The value stored here does not include
+the trailing 0 character.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -52445,15 +52847,16 @@ If @len &lt; 0, then the string is nul-terminated.
 </parameter_description>
 </parameter>
 <parameter name="items_read">
-<parameter_description> location to store number of words read,
-or %NULL. If %NULL, then %G_CONVERT_ERROR_PARTIAL_INPUT will be
-returned in case @str contains a trailing partial character. If
+<parameter_description> location to store number of
+words read, or %NULL. If %NULL, then %G_CONVERT_ERROR_PARTIAL_INPUT will
+be returned in case @str contains a trailing partial character. If
 an error occurs then the index of the invalid input is stored here.
 </parameter_description>
 </parameter>
 <parameter name="items_written">
-<parameter_description> location to store number of bytes written,
-or %NULL. The value stored here does not include the trailing 0 byte.
+<parameter_description> location to store number
+of bytes written, or %NULL. The value stored here does not include the
+trailing 0 byte.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -53074,7 +53477,8 @@ then the string is nul-terminated.
 </parameter_description>
 </parameter>
 <parameter name="items_read">
-<parameter_description> location to store number of bytes read, or %NULL.
+<parameter_description> location to store number of
+bytes read, or %NULL.
 If %NULL, then %G_CONVERT_ERROR_PARTIAL_INPUT will be
 returned in case @str contains a trailing partial
 character. If an error occurs then the index of the
@@ -53082,9 +53486,9 @@ invalid input is stored here.
 </parameter_description>
 </parameter>
 <parameter name="items_written">
-<parameter_description> location to store number of characters
-written or %NULL. The value here stored does not include the
-trailing 0 character. 
+<parameter_description> location to store number
+of characters written or %NULL. The value here stored does not include
+the trailing 0 character.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -53121,8 +53525,8 @@ then the string is nul-terminated.
 </parameter_description>
 </parameter>
 <parameter name="items_written">
-<parameter_description> location to store the number of
-characters in the result, or %NULL.
+<parameter_description> location to store the
+number of characters in the result, or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
@@ -53149,16 +53553,16 @@ If @len &lt; 0, then the string is nul-terminated.
 </parameter_description>
 </parameter>
 <parameter name="items_read">
-<parameter_description> location to store number of bytes read,
-or %NULL. If %NULL, then %G_CONVERT_ERROR_PARTIAL_INPUT will be
-returned in case @str contains a trailing partial character. If
+<parameter_description> location to store number of
+bytes read, or %NULL. If %NULL, then %G_CONVERT_ERROR_PARTIAL_INPUT will
+be returned in case @str contains a trailing partial character. If
 an error occurs then the index of the invalid input is stored here.
 </parameter_description>
 </parameter>
 <parameter name="items_written">
-<parameter_description> location to store number of #gunichar2
-written, or %NULL. The value stored here does not include the
-trailing 0.
+<parameter_description> location to store number
+of #gunichar2 written, or %NULL. The value stored here does not include
+the trailing 0.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -54769,10 +55173,10 @@ transform function must be registered.
 
 <function name="g_value_unset">
 <description>
-Clears the current value in @value and &quot;unsets&quot; the type,
-this releases all resources associated with this GValue.
-An unset value is the same as an uninitialized (zero-filled)
-#GValue structure.
+Clears the current value in @value (if any) and &quot;unsets&quot; the type,
+this releases all resources associated with this GValue. An unset
+value is the same as an uninitialized (zero-filled) #GValue
+structure.
 
 </description>
 <parameters>
@@ -59364,6 +59768,35 @@ Since: 2.16
 <return></return>
 </function>
 
+<function name="g_warn_message">
+<description>
+
+</description>
+<parameters>
+<parameter name="domain">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="file">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="line">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="func">
+<parameter_description>
+</parameter_description>
+</parameter>
+<parameter name="warnexpr">
+<parameter_description>
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_warning">
 <description>
 A convenience function/macro to log a warning message.
@@ -60087,6 +60520,9 @@ against at application run time.
 
 <function name="glib_mem_profiler_table">
 <description>
+Used to be a #GMemVTable containing profiling variants of the memory
+allocation functions, but this variable shouldn't be modified anymore.
+
 Deprecated: 2.46: Use other memory profiling tools instead
 
 </description>
