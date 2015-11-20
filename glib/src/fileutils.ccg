@@ -72,7 +72,7 @@ DirIterator Dir::begin()
 
 DirIterator Dir::end()
 {
-  return DirIterator(gobject_, 0);
+  return DirIterator(gobject_, nullptr);
 }
 
 
@@ -80,8 +80,8 @@ DirIterator Dir::end()
 
 DirIterator::DirIterator()
 :
-  gobject_ (0),
-  current_ (0)
+  gobject_ (nullptr),
+  current_ (nullptr)
 {}
 
 DirIterator::DirIterator(GDir* gobject, const char* current)
@@ -153,7 +153,7 @@ int file_open_tmp(std::string& name_used)
   GError* error = nullptr;
   ScopedPtr<char> buf_name_used;
 
-  const auto fileno = g_file_open_tmp(0, buf_name_used.addr(), &error);
+  const auto fileno = g_file_open_tmp(nullptr, buf_name_used.addr(), &error);
 
   if(error)
     Glib::Error::throw_exception(error);

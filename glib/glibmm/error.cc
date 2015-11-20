@@ -39,7 +39,7 @@ namespace Glib
 
 Error::Error()
 :
-  gobject_ (0)
+  gobject_ (nullptr)
 {}
 
 Error::Error(GQuark error_domain, int error_code, const Glib::ustring& message)
@@ -55,7 +55,7 @@ Error::Error(GError* gobject, bool take_copy)
 Error::Error(const Error& other)
 :
   Exception(other),
-  gobject_ ((other.gobject_) ? g_error_copy(other.gobject_) : 0)
+  gobject_ ((other.gobject_) ? g_error_copy(other.gobject_) : nullptr)
 {}
 
 Error& Error::operator=(const Error& other)

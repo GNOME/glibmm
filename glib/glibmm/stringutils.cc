@@ -87,7 +87,7 @@ std::string Glib::Ascii::dtostr(double d)
 
 std::string Glib::strescape(const std::string& source)
 {
-  const Glib::ScopedPtr<char> buf (g_strescape(source.c_str(), 0));
+  const Glib::ScopedPtr<char> buf (g_strescape(source.c_str(), nullptr));
   return buf.get();
 }
 

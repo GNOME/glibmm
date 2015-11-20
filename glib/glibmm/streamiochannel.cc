@@ -31,13 +31,13 @@ namespace Glib
 // static
 Glib::RefPtr<StreamIOChannel> StreamIOChannel::create(std::istream& stream)
 {
-  return Glib::RefPtr<StreamIOChannel>(new StreamIOChannel(&stream, 0));
+  return Glib::RefPtr<StreamIOChannel>(new StreamIOChannel(&stream, nullptr));
 }
 
 // static
 Glib::RefPtr<StreamIOChannel> StreamIOChannel::create(std::ostream& stream)
 {
-  return Glib::RefPtr<StreamIOChannel>(new StreamIOChannel(0, &stream));
+  return Glib::RefPtr<StreamIOChannel>(new StreamIOChannel(nullptr, &stream));
 }
 
 // static

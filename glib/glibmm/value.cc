@@ -94,7 +94,7 @@ void* ValueBase_Boxed::get_boxed() const
 GParamSpec* ValueBase_Boxed::create_param_spec(const Glib::ustring& name) const
 {
   return g_param_spec_boxed(
-      name.c_str(), 0, 0, G_VALUE_TYPE(&gobject_),
+      name.c_str(), nullptr, nullptr, G_VALUE_TYPE(&gobject_),
       GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
 }
 
@@ -109,7 +109,7 @@ GType ValueBase_Object::value_type()
 
 void ValueBase_Object::set_object(Glib::ObjectBase* data)
 {
-  g_value_set_object(&gobject_, (data) ? data->gobj() : 0);
+  g_value_set_object(&gobject_, (data) ? data->gobj() : nullptr);
 }
 
 Glib::ObjectBase* ValueBase_Object::get_object() const
@@ -134,15 +134,15 @@ GParamSpec* ValueBase_Object::create_param_spec(const Glib::ustring& name) const
   if(G_VALUE_HOLDS_OBJECT(&gobject_))
   {
     return g_param_spec_object(
-        name.c_str(), 0, 0, G_VALUE_TYPE(&gobject_),
+        name.c_str(), nullptr, nullptr, G_VALUE_TYPE(&gobject_),
         GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
   }
   else
   {
-    g_return_val_if_fail(G_VALUE_HOLDS_POINTER(&gobject_), 0);
+    g_return_val_if_fail(G_VALUE_HOLDS_POINTER(&gobject_), nullptr);
 
     return g_param_spec_pointer(
-        name.c_str(), 0, 0,
+        name.c_str(), nullptr, nullptr,
         GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
   }
 }
@@ -169,7 +169,7 @@ int ValueBase_Enum::get_enum() const
 GParamSpec* ValueBase_Enum::create_param_spec(const Glib::ustring& name) const
 {
   return g_param_spec_enum(
-      name.c_str(), 0, 0,
+      name.c_str(), nullptr, nullptr,
       G_VALUE_TYPE(&gobject_), g_value_get_enum(&gobject_),
       GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
 }
@@ -196,7 +196,7 @@ unsigned int ValueBase_Flags::get_flags() const
 GParamSpec* ValueBase_Flags::create_param_spec(const Glib::ustring& name) const
 {
   return g_param_spec_flags(
-      name.c_str(), 0, 0,
+      name.c_str(), nullptr, nullptr,
       G_VALUE_TYPE(&gobject_), g_value_get_flags(&gobject_),
       GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
 }
@@ -226,7 +226,7 @@ const char* ValueBase_String::get_cstring() const
 GParamSpec* ValueBase_String::create_param_spec(const Glib::ustring& name) const
 {
   return g_param_spec_string(
-      name.c_str(), 0, 0, get_cstring(),
+      name.c_str(), nullptr, nullptr, get_cstring(),
       GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
 }
 

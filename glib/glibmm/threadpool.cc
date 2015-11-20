@@ -125,7 +125,7 @@ namespace Glib
 
 ThreadPool::ThreadPool(int max_threads, bool exclusive)
 :
-  gobject_   (0),
+  gobject_   (nullptr),
   slot_list_ (new SlotList())
 {
   GError* error = nullptr;

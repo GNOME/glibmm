@@ -50,7 +50,7 @@ void Timer::reset()
 
 double Timer::elapsed() const
 {
-  return g_timer_elapsed(gobject_, 0);
+  return g_timer_elapsed(gobject_, nullptr);
 }
 
 double Timer::elapsed(unsigned long& microseconds) const

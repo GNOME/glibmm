@@ -69,7 +69,7 @@ void* SignalProxyConnectionNode::notify(void* data)
     }
   }
 
-  return 0; // apparently unused in libsigc++
+  return nullptr; // apparently unused in libsigc++
 }
 
 //static

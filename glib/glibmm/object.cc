@@ -54,7 +54,7 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_)
 :
   glibmm_class (glibmm_class_),
   n_parameters (0),
-  parameters   (0)
+  parameters   (nullptr)
 {}
 
 /*
@@ -72,7 +72,7 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_,
 :
   glibmm_class (glibmm_class_),
   n_parameters (0),
-  parameters   (0)
+  parameters   (nullptr)
 {
   va_list var_args;
   va_start(var_args, first_property_name);
@@ -215,7 +215,7 @@ Object::Object()
       custom_type_name_, custom_interface_classes);
   }
 
-  void *const new_object = g_object_newv(object_type, 0, 0);
+  void *const new_object = g_object_newv(object_type, 0, nullptr);
 
   // Connect the GObject and Glib::Object instances.
   ObjectBase::initialize(static_cast<GObject*>(new_object));

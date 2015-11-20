@@ -47,21 +47,21 @@ Threads::Mutex* ObjectBase::extra_object_base_data_mutex = new Threads::Mutex();
 
 ObjectBase::ObjectBase()
 :
-  gobject_                      (0),
+  gobject_                      (nullptr),
   custom_type_name_             (anonymous_custom_type_name),
   cpp_destruction_in_progress_  (false)
 {}
 
 ObjectBase::ObjectBase(const char* custom_type_name)
 :
-  gobject_                      (0),
+  gobject_                      (nullptr),
   custom_type_name_             (custom_type_name),
   cpp_destruction_in_progress_  (false)
 {}
 
 ObjectBase::ObjectBase(const std::type_info& custom_type_info)
 :
-  gobject_                      (0),
+  gobject_                      (nullptr),
   custom_type_name_             (custom_type_info.name()),
   cpp_destruction_in_progress_  (false)
 {}
@@ -255,7 +255,7 @@ ObjectBase* ObjectBase::_get_current_wrapper(GObject* object)
   if(object)
     return static_cast<ObjectBase*>(g_object_get_qdata(object, Glib::quark_));
   else
-    return 0;
+    return nullptr;
 }
 
 // static

@@ -44,7 +44,7 @@ PatternSpec::~PatternSpec() noexcept
 
 bool PatternSpec::match(const Glib::ustring& str) const
 {
-  return g_pattern_match(gobject_, str.bytes(), str.c_str(), 0);
+  return g_pattern_match(gobject_, str.bytes(), str.c_str(), nullptr);
 }
 
 bool PatternSpec::match(const Glib::ustring& str, const Glib::ustring& str_reversed) const

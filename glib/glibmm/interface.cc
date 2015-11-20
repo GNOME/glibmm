@@ -33,8 +33,8 @@ void Interface_Class::add_interface(GType instance_type) const
     const GInterfaceInfo interface_info =
     {
       class_init_func_,
-      0, // interface_finalize
-      0, // interface_data
+      nullptr, // interface_finalize
+      nullptr, // interface_data
     };
 
     g_type_add_interface_static(instance_type, gtype_, &interface_info);

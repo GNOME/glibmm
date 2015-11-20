@@ -313,7 +313,7 @@ typename ListHandle<T,Tr>::const_iterator ListHandle<T,Tr>::begin() const
 template <class T, class Tr> inline
 typename ListHandle<T,Tr>::const_iterator ListHandle<T,Tr>::end() const
 {
-  return Glib::Container_Helpers::ListHandleIterator<Tr>(0);
+  return Glib::Container_Helpers::ListHandleIterator<Tr>(nullptr);
 }
 
 template <class T, class Tr>

@@ -30,7 +30,7 @@ namespace Glib
 
 void Class::register_derived_type(GType base_type)
 {
-  return register_derived_type(base_type, 0);
+  return register_derived_type(base_type, nullptr);
 }
 
 void Class::register_derived_type(GType base_type, GTypeModule* module)
@@ -44,7 +44,7 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
   if(base_type == 0)
     return; // already initialized
 
-  GTypeQuery base_query = { 0, 0, 0, 0, };
+  GTypeQuery base_query = { 0, nullptr, 0, 0, };
   g_type_query(base_type, &base_query);
 
   //GTypeQuery::class_size is guint but GTypeInfo::class_size is guint16.
@@ -75,7 +75,7 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
     return;
   }
 
-  gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, (void*)0);
+  gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, nullptr);
 
   if(module)
     gtype_ = g_type_module_register_type(module, base_type, derived_name, &derived_info, GTypeFlags(0));
@@ -106,7 +106,7 @@ GType Class::clone_custom_type(const char* custom_type_name,
     // so that g_type_class_peek_parent() works correctly.
     const GType base_type = g_type_parent(gtype_);
 
-    GTypeQuery base_query = { 0, 0, 0, 0, };
+    GTypeQuery base_query = { 0, nullptr, 0, 0, };
     g_type_query(base_type, &base_query);
 
     //GTypeQuery::class_size is guint but GTypeInfo::class_size is guint16.
@@ -120,15 +120,15 @@ GType Class::clone_custom_type(const char* custom_type_name,
     const GTypeInfo derived_info =
     {
       class_size,
-      0, // base_init
+      nullptr, // base_init
       &Class::custom_class_base_finalize_function, // base_finalize
       &Class::custom_class_init_function,
-      0, // class_finalize
+      nullptr, // class_finalize
       this, // class_data
       instance_size,
       0, // n_preallocs
-      0, // instance_init
-      0, // value_table
+      nullptr, // instance_init
+      nullptr, // value_table
     };
 
     custom_type = g_type_register_static(
@@ -178,11 +178,11 @@ void Class::custom_class_init_function(void* g_class, void* class_data)
   // The class_data pointer is set to 'this' by clone_custom_type().
   const Class *const self = static_cast<Class*>(class_data);
 
-  g_return_if_fail(self->class_init_func_ != 0);
+  g_return_if_fail(self->class_init_func_ != nullptr);
 
   // Call the wrapper's class_init_function() to redirect
   // the vfunc and default signal handler callbacks.
-  (*self->class_init_func_)(g_class, 0);
+  (*self->class_init_func_)(g_class, nullptr);
 
   GObjectClass *const gobject_class = static_cast<GObjectClass*>(g_class);
   gobject_class->get_property = &Glib::custom_get_property_callback;

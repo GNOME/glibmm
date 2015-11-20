@@ -120,7 +120,7 @@ template <class Tr>
 GList* create_glist(const typename std::vector<typename Tr::CppType>::const_iterator pbegin,
                      typename std::vector<typename Tr::CppType>::const_iterator pend)
 {
-  GList* head(0);
+  GList* head(nullptr);
 
   while(pend != pbegin)
   {
@@ -139,7 +139,7 @@ template <class Tr>
 GSList* create_gslist(const typename std::vector<typename Tr::CppType>::const_iterator pbegin,
                        typename std::vector<typename Tr::CppType>::const_iterator pend)
 {
-  GSList* head(0);
+  GSList* head(nullptr);
 
   while(pend != pbegin)
   {
@@ -943,11 +943,11 @@ ListHandler<T, Tr>::list_to_vector(GList* glist, Glib::OwnershipType ownership)
   // it will handle destroying data depending on passed ownership.
   GListKeeperType keeper(glist, ownership);
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
-  return VectorType(ListIteratorType(glist), ListIteratorType(0));
+  return VectorType(ListIteratorType(glist), ListIteratorType(nullptr));
 #else
   VectorType temp;
   temp.reserve(g_list_length(glist));
-  Glib::Container_Helpers::fill_container(temp, ListIteratorType(glist), ListIteratorType(0));
+  Glib::Container_Helpers::fill_container(temp, ListIteratorType(glist), ListIteratorType(nullptr));
   return temp;
 #endif
 }
@@ -968,11 +968,11 @@ SListHandler<T, Tr>::slist_to_vector(GSList* gslist, Glib::OwnershipType ownersh
   // it will handle destroying data depending on passed ownership.
   GSListKeeperType keeper(gslist, ownership);
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
-  return VectorType(SListIteratorType(gslist), SListIteratorType(0));
+  return VectorType(SListIteratorType(gslist), SListIteratorType(nullptr));
 #else
   VectorType temp;
   temp.reserve(g_slist_length(gslist));
-  Glib::Container_Helpers::fill_container(temp, SListIteratorType(gslist), SListIteratorType(0));
+  Glib::Container_Helpers::fill_container(temp, SListIteratorType(gslist), SListIteratorType(nullptr));
   return temp;
 #endif
 }

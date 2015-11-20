@@ -81,7 +81,7 @@ Thread* Thread::create(const sigc::slot<void>& slot, const std::string& name)
   const auto slot_copy = new sigc::slot<void>(slot);
 
   GError* error = nullptr;
-  auto thread = g_thread_try_new(name.empty() ? 0 : name.c_str(),
+  auto thread = g_thread_try_new(name.empty() ? nullptr : name.c_str(),
     &call_thread_entry_slot, slot_copy, &error);
 
   if (error)

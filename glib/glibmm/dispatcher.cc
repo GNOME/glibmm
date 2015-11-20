@@ -58,7 +58,7 @@ struct DispatchNotifyData
   Glib::DispatchNotifier* notifier;
 
   DispatchNotifyData()
-    : dispatcher (0), notifier (0) {}
+    : dispatcher (nullptr), notifier (nullptr) {}
 
   DispatchNotifyData(Glib::Dispatcher* d, Glib::DispatchNotifier* n)
     : dispatcher (d), notifier (n) {}
@@ -280,7 +280,7 @@ DispatchNotifier* DispatchNotifier::reference_instance
   else
   {
     // Prevent massive mess-up.
-    g_return_val_if_fail(instance->context_ == context, 0);
+    g_return_val_if_fail(instance->context_ == context, nullptr);
 
     // In the possible but unlikely case that a new dispatcher gets the same
     // address as a newly deleted one, if the pipe still contains messages to
@@ -321,7 +321,7 @@ void DispatchNotifier::unreference_instance(
     g_return_if_fail(instance->ref_count_ == 0); // could be < 0 if messed up
 
     // This causes deletion of the notifier object.
-    thread_specific_instance_.replace(0);
+    thread_specific_instance_.replace(nullptr);
   }
 }
 

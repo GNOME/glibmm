@@ -88,7 +88,7 @@ inline
 SourceConnectionNode::SourceConnectionNode(const sigc::slot_base& slot)
 :
   slot_ (slot),
-  source_ (0)
+  source_ (nullptr)
 {
   slot_.set_parent(this, &SourceConnectionNode::notify);
 }
@@ -98,7 +98,7 @@ void* SourceConnectionNode::notify(void* data)
   SourceConnectionNode *const self = static_cast<SourceConnectionNode*>(data);
 
   // if there is no object, this call was triggered from destroy_notify_handler(),
-  // because we set self->source_ to 0 there:
+  // because we set self->source_ to nullptr there:
   if (self->source_)
   {
     GSource* s = self->source_;
@@ -109,7 +109,7 @@ void* SourceConnectionNode::notify(void* data)
     // either immediately or later, so we leave that to do the deletion.
   }
 
-  return 0;
+  return nullptr;
 }
 
 // static
@@ -161,7 +161,7 @@ inline
 SourceCallbackData::SourceCallbackData(Glib::Source* wrapper_)
 :
   wrapper (wrapper_),
-  node    (0)
+  node    (nullptr)
 {}
 
 void SourceCallbackData::set_node(SourceConnectionNode* node_)
@@ -200,7 +200,7 @@ void SourceCallbackData::destroy_notify_callback(void* data)
  */
 static SourceCallbackData* glibmm_source_get_callback_data(GSource* source)
 {
-  g_return_val_if_fail(source->callback_funcs != nullptr, 0);
+  g_return_val_if_fail(source->callback_funcs != nullptr, nullptr);
 
   GSourceFunc func;
   void* user_data = nullptr;
@@ -482,7 +482,7 @@ void SignalIdle::connect_once(const sigc::slot<void>& slot, int priority)
 
 SignalIdle signal_idle()
 {
-  return SignalIdle(0); // 0 means default context
+  return SignalIdle(nullptr); // nullptr means default context
 }
 
 
@@ -527,7 +527,7 @@ sigc::connection SignalIO::connect(const sigc::slot<bool,IOCondition>& slot,
 
 SignalIO signal_io()
 {
-  return SignalIO(0); // 0 means default context
+  return SignalIO(nullptr); // nullptr means default context
 }
 
 /**** Glib::SignalChildWatch **************************************************/
@@ -562,7 +562,7 @@ sigc::connection SignalChildWatch::connect(const sigc::slot<void, GPid, int>& sl
 
 SignalChildWatch signal_child_watch()
 {
-  return SignalChildWatch(0); // 0 means default context
+  return SignalChildWatch(nullptr); // nullptr means default context
 }
 
 /**** Glib::MainContext ****************************************************/
@@ -623,7 +623,7 @@ bool MainContext::prepare(int& priority)
 
 bool MainContext::prepare()
 {
-  return g_main_context_prepare(gobj(), 0);
+  return g_main_context_prepare(gobj(), nullptr);
 }
 
 void MainContext::query(int max_priority, int& timeout, std::vector<PollFD>& fds)
@@ -746,7 +746,7 @@ Glib::RefPtr<MainContext> wrap(GMainContext* gobject, bool take_copy)
 Glib::RefPtr<MainLoop> MainLoop::create(bool is_running)
 {
   return Glib::RefPtr<MainLoop>(
-      reinterpret_cast<MainLoop*>(g_main_loop_new(0, is_running)));
+      reinterpret_cast<MainLoop*>(g_main_loop_new(nullptr, is_running)));
 }
 
 Glib::RefPtr<MainLoop> MainLoop::create(const Glib::RefPtr<MainContext>& context, bool is_running)
@@ -824,11 +824,11 @@ const GSourceFuncs Source::vfunc_table_ =
   &Source::prepare_vfunc,
   &Source::check_vfunc,
   &Source::dispatch_vfunc,
-  0, // finalize_vfunc // We can't use finalize_vfunc because there is no way
+  nullptr, // finalize_vfunc // We can't use finalize_vfunc because there is no way
                        // to store a pointer to our wrapper anywhere in GSource so
                        // that it persists until finalize_vfunc would be called from here.
-  0, // closure_callback
-  0, // closure_marshal
+  nullptr, // closure_callback
+  nullptr, // closure_marshal
 };
 
 unsigned int Source::attach(const Glib::RefPtr<MainContext>& context)
@@ -838,7 +838,7 @@ unsigned int Source::attach(const Glib::RefPtr<MainContext>& context)
 
 unsigned int Source::attach()
 {
-  return g_source_attach(gobject_, 0);
+  return g_source_attach(gobject_, nullptr);
 }
 
 void Source::destroy()
@@ -1094,7 +1094,7 @@ sigc::slot_base* Source::get_slot_from_connection_node(void* data)
 sigc::slot_base* Source::get_slot_from_callback_data(void* data)
 {
   SourceCallbackData* const callback_data = static_cast<SourceCallbackData*>(data);
-  g_return_val_if_fail(callback_data->node != nullptr, 0);
+  g_return_val_if_fail(callback_data->node != nullptr, nullptr);
   return callback_data->node->get_slot();
 }
 

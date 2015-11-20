@@ -1105,7 +1105,7 @@ ustring::size_type ustring::copy(char* dest, ustring::size_type n, ustring::size
 
 bool ustring::validate() const
 {
-  return (g_utf8_validate(string_.data(), string_.size(), 0) != 0);
+  return (g_utf8_validate(string_.data(), string_.size(), nullptr) != 0);
 }
 
 bool ustring::validate(ustring::iterator& first_invalid)
@@ -1269,17 +1269,17 @@ ustring ustring::FormatStream::to_string() const
   // Avoid going through iconv if wchar_t always contains UCS-4.
   glong n_bytes = 0;
   const ScopedPtr<char> buf (g_ucs4_to_utf8(reinterpret_cast<const gunichar*>(str.data()),
-                                            str.size(), 0, &n_bytes, &error));
+                                            str.size(), nullptr, &n_bytes, &error));
 # elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
   glong n_bytes = 0;
   const ScopedPtr<char> buf (g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(str.data()),
-                                             str.size(), 0, &n_bytes, &error));
+                                             str.size(), nullptr, &n_bytes, &error));
 # else
   gsize n_bytes = 0;
   const ScopedPtr<char> buf (g_convert(reinterpret_cast<const char*>(str.data()),
                                        str.size() * sizeof(std::wstring::value_type),
-                                       "UTF-8", "WCHAR_T", 0, &n_bytes, &error));
+                                       "UTF-8", "WCHAR_T", nullptr, &n_bytes, &error));
 # endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
 
 #else /* !GLIBMM_HAVE_WIDE_STREAM */
@@ -1306,7 +1306,7 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
 
   GError* error = nullptr;
   gsize n_bytes = 0;
-  const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), 0, &n_bytes, &error));
+  const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), nullptr, &n_bytes, &error));
 
   if (error)
   {
@@ -1322,7 +1322,7 @@ std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string)
 {
   GError* error = nullptr;
   const ScopedPtr<char> buf (g_locale_from_utf8(utf8_string.raw().data(),
-                                                utf8_string.raw().size(), 0, 0, &error));
+                                                utf8_string.raw().size(), nullptr, nullptr, &error));
   if (error)
   {
     Glib::Error::throw_exception(error);
@@ -1353,17 +1353,17 @@ std::wistream& operator>>(std::wistream& is, ustring& utf8_string)
   // Avoid going through iconv if wchar_t always contains UCS-4.
   glong n_bytes = 0;
   const ScopedPtr<char> buf (g_ucs4_to_utf8(reinterpret_cast<const gunichar*>(wstr.data()),
-                                            wstr.size(), 0, &n_bytes, &error));
+                                            wstr.size(), nullptr, &n_bytes, &error));
 #elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
   glong n_bytes = 0;
   const ScopedPtr<char> buf (g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(wstr.data()),
-                                             wstr.size(), 0, &n_bytes, &error));
+                                             wstr.size(), nullptr, &n_bytes, &error));
 #else
   gsize n_bytes = 0;
   const ScopedPtr<char> buf (g_convert(reinterpret_cast<const char*>(wstr.data()),
                                        wstr.size() * sizeof(std::wstring::value_type),
-                                       "UTF-8", "WCHAR_T", 0, &n_bytes, &error));
+                                       "UTF-8", "WCHAR_T", nullptr, &n_bytes, &error));
 #endif // !(__STDC_ISO_10646__ || G_OS_WIN32)
 
   if (error)
@@ -1383,14 +1383,14 @@ std::wostream& operator<<(std::wostream& os, const ustring& utf8_string)
 #if defined(__STDC_ISO_10646__) && SIZEOF_WCHAR_T == 4
   // Avoid going through iconv if wchar_t always contains UCS-4.
   const ScopedPtr<gunichar> buf (g_utf8_to_ucs4(utf8_string.raw().data(),
-                                                utf8_string.raw().size(), 0, 0, &error));
+                                                utf8_string.raw().size(), nullptr, nullptr, &error));
 #elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
   const ScopedPtr<gunichar2> buf (g_utf8_to_utf16(utf8_string.raw().data(),
-                                                  utf8_string.raw().size(), 0, 0, &error));
+                                                  utf8_string.raw().size(), nullptr, nullptr, &error));
 #else
   const ScopedPtr<char> buf (g_convert(utf8_string.raw().data(), utf8_string.raw().size(),
-                                       "WCHAR_T", "UTF-8", 0, 0, &error));
+                                       "WCHAR_T", "UTF-8", nullptr, nullptr, &error));
 #endif // !(__STDC_ISO_10646__ || G_OS_WIN32)
 
   if (error)
