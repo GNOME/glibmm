@@ -25,7 +25,7 @@ namespace
 
 gboolean giomm_generic_socket_callback(sigc::slot_base* slot, GIOCondition condition)
 {
-  g_return_val_if_fail(slot != 0, 0);
+  g_return_val_if_fail(slot != nullptr, FALSE);
 
   try
   {

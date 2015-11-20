@@ -50,7 +50,7 @@ IOStream::close_async(const SlotAsyncReady& slot, int io_priority)
 
   g_io_stream_close_async(gobj(),
                           io_priority,
-                          0,
+                          nullptr,
                           &SignalProxy_async_callback,
                           slot_copy);
 }
@@ -80,7 +80,7 @@ IOStream::splice_async(const Glib::RefPtr<IOStream>& stream2,
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_io_stream_splice_async(gobj(), Glib::unwrap(stream2),
-    static_cast<GIOStreamSpliceFlags>(flags), io_priority, 0,
+    static_cast<GIOStreamSpliceFlags>(flags), io_priority, nullptr,
     &SignalProxy_async_callback, slot_copy);
 }
 

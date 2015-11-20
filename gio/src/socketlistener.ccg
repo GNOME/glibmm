@@ -28,7 +28,7 @@ bool SocketListener::add_socket(const Glib::RefPtr<Socket>& socket)
   GError* gerror = nullptr;
   const bool retval = g_socket_listener_add_socket(gobj(),
     Glib::unwrap(socket),
-    0,
+    nullptr,
   &gerror);
 
   if(gerror)
@@ -66,7 +66,7 @@ bool SocketListener::add_address(const Glib::RefPtr<SocketAddress>& address, Soc
                                           Glib::unwrap(address),
                                           static_cast<GSocketType>(type),
                                           static_cast<GSocketProtocol>(protocol),
-                                          0,
+                                          nullptr,
                                           &retaddr,
                                           &gerror);
   if(gerror)
@@ -82,7 +82,7 @@ bool SocketListener::add_address(const Glib::RefPtr<SocketAddress>& address, Soc
 bool SocketListener::add_inet_port(guint16 port)
 {
   GError* gerror = nullptr;
-  const bool retvalue = g_socket_listener_add_inet_port(gobj(), port, 0, &gerror);
+  const bool retvalue = g_socket_listener_add_inet_port(gobj(), port, nullptr, &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -93,7 +93,7 @@ bool SocketListener::add_inet_port(guint16 port)
 guint16 SocketListener::add_any_inet_port()
 {
   GError* gerror = nullptr;
-  const auto retvalue = g_socket_listener_add_any_inet_port(gobj(), 0, &gerror);
+  const auto retvalue = g_socket_listener_add_any_inet_port(gobj(), nullptr, &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -124,7 +124,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket(Glib::RefPtr<Glib::Object>& s
   GObject *retobj = nullptr;
   auto retvalue = g_socket_listener_accept_socket(gobj(),
                                                       &retobj,
-                                                      0,
+                                                      nullptr,
                                                       &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -139,7 +139,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket(const Glib::RefPtr<Cancellabl
 {
   GError* gerror = nullptr;
   auto retvalue = g_socket_listener_accept_socket(gobj(),
-                                                      0,
+                                                      nullptr,
                                                       Glib::unwrap(cancellable),
                                                       &gerror);
   if(gerror)
@@ -152,8 +152,8 @@ Glib::RefPtr<Socket> SocketListener::accept_socket()
 {
   GError* gerror = nullptr;
   auto retvalue = g_socket_listener_accept_socket(gobj(),
-                                                      0,
-                                                      0,
+                                                      nullptr,
+                                                      nullptr,
                                                       &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -183,7 +183,7 @@ void SocketListener::accept_socket_async(const SlotAsyncReady& slot)
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_listener_accept_socket_async(gobj(),
-                                        0,
+                                        nullptr,
                                         &SignalProxy_async_callback,
                                         slot_copy);
 }
@@ -209,7 +209,7 @@ Glib::RefPtr<Socket> SocketListener::accept_socket_finish(const Glib::RefPtr<Asy
   GError* gerror = nullptr;
   auto retvalue = g_socket_listener_accept_socket_finish(gobj(),
                                                              Glib::unwrap(result),
-                                                             0,
+                                                             nullptr,
                                                              &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -241,7 +241,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept(Glib::RefPtr<Object>& sour
   GObject *retobj = nullptr;
   auto retvalue = g_socket_listener_accept(gobj(),
                                                          &retobj,
-                                                         0,
+                                                         nullptr,
                                                          &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -256,7 +256,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept(const Glib::RefPtr<Cancell
 {
   GError* gerror = nullptr;
   auto retvalue = g_socket_listener_accept(gobj(),
-                                                         0,
+                                                         nullptr,
                                                          Glib::unwrap(cancellable),
                                                          &gerror);
   if(gerror)
@@ -269,8 +269,8 @@ Glib::RefPtr<SocketConnection> SocketListener::accept()
 {
   GError* gerror = nullptr;
   auto retvalue = g_socket_listener_accept(gobj(),
-                                                         0,
-                                                         0,
+                                                         nullptr,
+                                                         nullptr,
                                                          &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -287,7 +287,7 @@ void SocketListener::accept_async(const SlotAsyncReady& slot)
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_socket_listener_accept_async(gobj(),
-                                 0,
+                                 nullptr,
                                  &SignalProxy_async_callback,
                                  slot_copy);
 }
@@ -326,7 +326,7 @@ Glib::RefPtr<SocketConnection> SocketListener::accept_finish(const Glib::RefPtr<
   GError* gerror = nullptr;
   auto retvalue = g_socket_listener_accept_finish(gobj(),
                                                                 Glib::unwrap(result),
-                                                                0,
+                                                                nullptr,
                                                                 &gerror);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);

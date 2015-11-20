@@ -37,7 +37,7 @@ Glib::RefPtr<FileInfo> FileInputStream::query_info(const Glib::RefPtr<Cancellabl
 Glib::RefPtr<FileInfo> FileInputStream::query_info(const std::string& attributes)
 {
   GError* gerror = nullptr;
-  auto retvalue = Glib::wrap(g_file_input_stream_query_info(gobj(), g_strdup((attributes).c_str()), 0, &(gerror)));
+  auto retvalue = Glib::wrap(g_file_input_stream_query_info(gobj(), g_strdup((attributes).c_str()), nullptr, &(gerror)));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -71,7 +71,7 @@ FileInputStream::query_info_async(const SlotAsyncReady& slot, const std::string&
   g_file_input_stream_query_info_async(gobj(),
                                        const_cast<char*>(attributes.c_str()),
                                        io_priority,
-                                       0,
+                                       nullptr,
                                        &SignalProxy_async_callback,
                                        slot_copy);
 }

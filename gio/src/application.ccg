@@ -142,14 +142,18 @@ class OptionArgCallbackData
 public:
   explicit OptionArgCallbackData(const Gio::Application* application, gchar short_name,
     const Glib::OptionGroup::SlotOptionArgString& slot)
-  : application_(application), short_name_(short_name),
-    slot_string_(new Glib::OptionGroup::SlotOptionArgString(slot)), slot_filename_(0)
+  : application_(application),
+    short_name_(short_name),
+    slot_string_(new Glib::OptionGroup::SlotOptionArgString(slot)),
+    slot_filename_(nullptr)
   { }
 
   explicit OptionArgCallbackData(const Gio::Application* application, gchar short_name,
     const Glib::OptionGroup::SlotOptionArgFilename& slot)
-  : application_(application), short_name_(short_name),
-    slot_string_(0), slot_filename_(new Glib::OptionGroup::SlotOptionArgFilename(slot))
+  : application_(application),
+    short_name_(short_name),
+    slot_string_(nullptr),
+    slot_filename_(new Glib::OptionGroup::SlotOptionArgFilename(slot))
   { }
 
   const Gio::Application* get_application() const  { return application_; }
@@ -172,7 +176,7 @@ public:
 private:
   const Gio::Application* application_;
   gchar short_name_;
-  // One of these slot pointers is 0 and the other one points to a slot.
+  // One of these slot pointers is nullptr and the other one points to a slot.
   Glib::OptionGroup::SlotOptionArgString* slot_string_;
   Glib::OptionGroup::SlotOptionArgFilename* slot_filename_;
 
@@ -269,8 +273,10 @@ const Glib::Class& Application::custom_class_init()
 Application::Application(const Glib::ustring& application_id, ApplicationFlags flags)
 :
   // Mark this class as non-derived to allow C++ vfuncs to be skipped.
-  Glib::ObjectBase(0),
-  Glib::Object(Glib::ConstructParams(custom_class_init(), "application_id", (application_id.empty() ? 0 : application_id.c_str()), "flags", ((GApplicationFlags)(flags)), nullptr))
+  Glib::ObjectBase(nullptr),
+  Glib::Object(Glib::ConstructParams(custom_class_init(), "application_id",
+    (application_id.empty() ? nullptr : application_id.c_str()),
+    "flags", ((GApplicationFlags)(flags)), nullptr))
 {
 
 }
@@ -295,7 +301,7 @@ Application::~Application()
 //static
 void Application::unset_default()
 {
-  g_application_set_default(0);
+  g_application_set_default(nullptr);
 }
 
 void Application_Class::open_callback(GApplication* self, GFile** files,
@@ -434,8 +440,8 @@ void Application::add_main_option_entry_private(GOptionArg arg, const Glib::ustr
 
   // GOptionEntry.long_name must be set, even if it's an empty string.
   gchar* lname = g_strdup(long_name.c_str());
-  gchar* desc = description.empty() ? 0 : g_strdup(description.c_str());
-  gchar* arg_desc = arg_description.empty() ? 0 : g_strdup(arg_description.c_str());
+  gchar* desc = description.empty() ? nullptr : g_strdup(description.c_str());
+  gchar* arg_desc = arg_description.empty() ? nullptr : g_strdup(arg_description.c_str());
 
   ExtraApplicationData* extra_application_data =
     static_cast<ExtraApplicationData*>(g_object_get_qdata(gobject_, quark_extra_application_data));
@@ -482,7 +488,7 @@ void Application::add_main_option_entry_private(GOptionArg arg, const Glib::ustr
 
 void Application::unset_resource_base_path()
 {
-  g_application_set_resource_base_path(gobj(), 0 /* see the C docs. */);
+  g_application_set_resource_base_path(gobj(), nullptr /* see the C docs. */);
 }
 
 } // namespace Gio

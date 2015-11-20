@@ -53,7 +53,7 @@ OutputStream::write_async(const void* buffer, gsize count, const SlotAsyncReady&
                               buffer,
                               count,
                               io_priority,
-                              0,
+                              nullptr,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -89,7 +89,7 @@ OutputStream::write_all_async(const void* buffer, gsize count, const SlotAsyncRe
                               buffer,
                               count,
                               io_priority,
-                              0,
+                              nullptr,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -124,7 +124,7 @@ OutputStream::splice_async(const Glib::RefPtr<InputStream>& source, const SlotAs
                                Glib::unwrap(source),
                                static_cast<GOutputStreamSpliceFlags>(flags),
                                io_priority,
-                               0,
+                               nullptr,
                                &SignalProxy_async_callback,
                                slot_copy);
 }
@@ -154,7 +154,7 @@ OutputStream::flush_async(const SlotAsyncReady& slot, int io_priority)
 
   g_output_stream_flush_async(gobj(),
                               io_priority,
-                              0,
+                              nullptr,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -184,7 +184,7 @@ OutputStream::close_async(const SlotAsyncReady& slot, int io_priority)
 
   g_output_stream_close_async(gobj(),
                               io_priority,
-                              0,
+                              nullptr,
                               &SignalProxy_async_callback,
                               slot_copy);
 }
@@ -202,7 +202,7 @@ gssize OutputStream::write(const std::string& buffer, const Glib::RefPtr<Cancell
 gssize OutputStream::write(const std::string& buffer)
 {
   GError* gerror = nullptr;
-  gssize retvalue = g_output_stream_write(gobj(), buffer.data(), buffer.size(), 0, &(gerror));
+  gssize retvalue = g_output_stream_write(gobj(), buffer.data(), buffer.size(), nullptr, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -222,7 +222,7 @@ bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written, co
 bool OutputStream::write_all(const std::string& buffer, gsize& bytes_written)
 {
   GError* gerror = nullptr;
-  bool retvalue = g_output_stream_write_all(gobj(), buffer.data(), buffer.size(), &(bytes_written), 0, &(gerror));
+  bool retvalue = g_output_stream_write_all(gobj(), buffer.data(), buffer.size(), &(bytes_written), nullptr, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -257,7 +257,7 @@ OutputStream::write_bytes_async(const Glib::RefPtr<const Glib::Bytes>& bytes, co
   g_output_stream_write_bytes_async(gobj(),
                             const_cast<GBytes*>(Glib::unwrap(bytes)),
                             io_priority,
-                            0,
+                            nullptr,
                             &SignalProxy_async_callback,
                             slot_copy);
 }
@@ -275,7 +275,7 @@ gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, const Glib:
 gssize OutputStream::splice(const Glib::RefPtr<InputStream>& source, OutputStreamSpliceFlags flags)
 {
   GError* gerror = nullptr;
-  gssize retvalue = g_output_stream_splice(gobj(), Glib::unwrap(source), ((GOutputStreamSpliceFlags)(flags)), 0, &(gerror));
+  gssize retvalue = g_output_stream_splice(gobj(), Glib::unwrap(source), ((GOutputStreamSpliceFlags)(flags)), nullptr, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 

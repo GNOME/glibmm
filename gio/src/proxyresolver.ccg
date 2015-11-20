@@ -31,7 +31,7 @@ std::vector<Glib::ustring> ProxyResolver::lookup(const Glib::ustring& uri)
 {
   GError* gerror = nullptr;
   auto retvalue =
-    Glib::ArrayHandler<Glib::ustring>::array_to_vector(g_proxy_resolver_lookup(gobj(), uri.c_str(), 0, &(gerror)), Glib::OWNERSHIP_DEEP);
+    Glib::ArrayHandler<Glib::ustring>::array_to_vector(g_proxy_resolver_lookup(gobj(), uri.c_str(), nullptr, &(gerror)), Glib::OWNERSHIP_DEEP);
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -61,7 +61,7 @@ void ProxyResolver::lookup_async(const Glib::ustring& uri, const SlotAsyncReady&
 
   g_proxy_resolver_lookup_async(gobj(),
     uri.c_str(),
-    0,
+    nullptr,
     &SignalProxy_async_callback,
     slot_copy);
 }

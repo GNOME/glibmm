@@ -35,7 +35,7 @@ void Drive::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& c
 
   g_drive_eject_with_operation(gobj(),
                                static_cast<GMountUnmountFlags>(flags),
-                               0, // mount_operation
+                               nullptr, // mount_operation
                                Glib::unwrap(cancellable),
                                &SignalProxy_async_callback,
                                slot_copy);
@@ -50,8 +50,8 @@ void Drive::eject(const SlotAsyncReady& slot, MountUnmountFlags flags)
 
   g_drive_eject_with_operation(gobj(),
                                static_cast<GMountUnmountFlags>(flags),
-                               0, // mount_operation
-                               0, // cancellable
+                               nullptr, // mount_operation
+                               nullptr, // cancellable
                                &SignalProxy_async_callback,
                                slot_copy);
 }
@@ -81,7 +81,7 @@ void Drive::eject(const Glib::RefPtr<MountOperation>& mount_operation, const Slo
   g_drive_eject_with_operation(gobj(),
                                static_cast<GMountUnmountFlags>(flags),
                                Glib::unwrap(mount_operation),
-                               0, // cancellable
+                               nullptr, // cancellable
                                &SignalProxy_async_callback,
                                slot_copy);
 }
@@ -91,19 +91,19 @@ void Drive::eject(const Glib::RefPtr<MountOperation>& mount_operation, MountUnmo
   g_drive_eject_with_operation(gobj(),
                                static_cast<GMountUnmountFlags>(flags),
                                Glib::unwrap(mount_operation),
-                               0, // cancellable
-                               0, // callback
-                               0); // user_data
+                               nullptr, // cancellable
+                               nullptr, // callback
+                               nullptr); // user_data
 }
 
 void Drive::eject(MountUnmountFlags flags)
 {
   g_drive_eject_with_operation(gobj(),
                                static_cast<GMountUnmountFlags>(flags),
-                               0, // mount_operation
-                               0, // cancellable
-                               0, // callback
-                               0); // user_data
+                               nullptr, // mount_operation
+                               nullptr, // cancellable
+                               nullptr, // callback
+                               nullptr); // user_data
 }
 
 void Drive::poll_for_media(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
@@ -127,7 +127,7 @@ void Drive::poll_for_media(const SlotAsyncReady& slot)
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_drive_poll_for_media(gobj(),
-                         0, // cancellable
+                         nullptr, // cancellable
                          &SignalProxy_async_callback,
                          slot_copy);
 }
@@ -135,9 +135,9 @@ void Drive::poll_for_media(const SlotAsyncReady& slot)
 void Drive::poll_for_media()
 {
   g_drive_poll_for_media(gobj(),
-                         0, // cancellable
-                         0,
-                         0);
+                         nullptr, // cancellable
+                         nullptr,
+                         nullptr);
 }
 
 void
@@ -172,7 +172,7 @@ Drive::stop(const Glib::RefPtr<MountOperation>& mount_operation,
   g_drive_stop(gobj(),
                static_cast<GMountUnmountFlags>(flags),
                Glib::unwrap(mount_operation),
-               0,
+               nullptr,
                &SignalProxy_async_callback,
                slot_copy);
 }
@@ -210,7 +210,7 @@ Drive::start(const Glib::RefPtr<MountOperation>& mount_operation,
   g_drive_start(gobj(),
                 static_cast<GDriveStartFlags>(flags),
                 Glib::unwrap(mount_operation),
-                0,
+                nullptr,
                 &SignalProxy_async_callback,
                 slot_copy);
 }

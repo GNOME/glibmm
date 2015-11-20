@@ -55,7 +55,9 @@ bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<App
   vec.push_back(file);
 
   GError* gerror = nullptr;
-  bool retvalue = g_app_info_launch(gobj(), Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list(vec).data (), Glib::unwrap(launch_context), &(gerror));
+  const bool retvalue = g_app_info_launch(gobj(),
+    Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list(vec).data(),
+    Glib::unwrap(launch_context), &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -68,7 +70,9 @@ bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file)
   vec.push_back(file);
 
   GError* gerror = nullptr;
-  bool retvalue = g_app_info_launch(gobj(), Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list(vec).data (), 0, &(gerror));
+  const bool retvalue = g_app_info_launch(gobj(),
+    Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list(vec).data (),
+    nullptr, &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -81,7 +85,9 @@ bool AppInfo::launch_uri(const std::string& uri, const Glib::RefPtr<AppLaunchCon
   vec.push_back(uri);
 
   GError* gerror = nullptr;
-  bool retvalue = g_app_info_launch_uris(gobj(), Glib::ListHandler<std::string>::vector_to_list(vec).data (), Glib::unwrap(launch_context), &(gerror));
+  const bool retvalue = g_app_info_launch_uris(gobj(),
+    Glib::ListHandler<std::string>::vector_to_list(vec).data (),
+    Glib::unwrap(launch_context), &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -94,7 +100,9 @@ bool AppInfo::launch_uri(const std::string& uri)
   vec.push_back(uri);
 
   GError* gerror = nullptr;
-  bool retvalue = g_app_info_launch_uris(gobj(), Glib::ListHandler<std::string>::vector_to_list(vec).data (), 0, &(gerror));
+  const bool retvalue = g_app_info_launch_uris(gobj(),
+    Glib::ListHandler<std::string>::vector_to_list(vec).data (), nullptr,
+    &(gerror));
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
 
