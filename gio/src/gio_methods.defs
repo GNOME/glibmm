@@ -1078,6 +1078,7 @@
     '("broken-pipe" "G_IO_ERROR_BROKEN_PIPE")
     '("connection-closed" "G_IO_ERROR_CONNECTION_CLOSED")
     '("not-connected" "G_IO_ERROR_NOT_CONNECTED")
+    '("message-too-large" "G_IO_ERROR_MESSAGE_TOO_LARGE")
   )
 )
 
@@ -3625,6 +3626,74 @@
   (return-type "gboolean")
   (parameters
     '("uid_t" "uid")
+    '("GError**" "error")
+  )
+)
+
+
+
+;; From gdatagrambased.h
+
+(define-function g_datagram_based_get_type
+  (c-name "g_datagram_based_get_type")
+  (return-type "GType")
+)
+
+(define-method receive_messages
+  (of-object "GDatagramBased")
+  (c-name "g_datagram_based_receive_messages")
+  (return-type "gint")
+  (parameters
+    '("GInputMessage*" "messages")
+    '("guint" "num_messages")
+    '("gint" "flags")
+    '("gint64" "timeout")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method send_messages
+  (of-object "GDatagramBased")
+  (c-name "g_datagram_based_send_messages")
+  (return-type "gint")
+  (parameters
+    '("GOutputMessage*" "messages")
+    '("guint" "num_messages")
+    '("gint" "flags")
+    '("gint64" "timeout")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method create_source
+  (of-object "GDatagramBased")
+  (c-name "g_datagram_based_create_source")
+  (return-type "GSource*")
+  (parameters
+    '("GIOCondition" "condition")
+    '("GCancellable*" "cancellable")
+  )
+)
+
+(define-method condition_check
+  (of-object "GDatagramBased")
+  (c-name "g_datagram_based_condition_check")
+  (return-type "GIOCondition")
+  (parameters
+    '("GIOCondition" "condition")
+  )
+)
+
+(define-method condition_wait
+  (of-object "GDatagramBased")
+  (c-name "g_datagram_based_condition_wait")
+  (return-type "gboolean")
+  (parameters
+    '("GIOCondition" "condition")
+    '("gint64" "timeout")
+    '("GCancellable*" "cancellable")
     '("GError**" "error")
   )
 )
@@ -10988,6 +11057,16 @@
   )
 )
 
+(define-method sort
+  (of-object "GListStore")
+  (c-name "g_list_store_sort")
+  (return-type "none")
+  (parameters
+    '("GCompareDataFunc" "compare_func")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method append
   (of-object "GListStore")
   (c-name "g_list_store_append")
@@ -15556,6 +15635,12 @@
   (return-type "GSocketAddressEnumerator*")
 )
 
+(define-method to_string
+  (of-object "GSocketConnectable")
+  (c-name "g_socket_connectable_to_string")
+  (return-type "gchar*")
+)
+
 
 
 ;; From gsocketconnection.h
@@ -16088,6 +16173,19 @@
     '("gint" "num_vectors")
     '("GSocketControlMessage**" "messages")
     '("gint" "num_messages")
+    '("gint" "flags")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method receive_messages
+  (of-object "GSocket")
+  (c-name "g_socket_receive_messages")
+  (return-type "gint")
+  (parameters
+    '("GInputMessage*" "messages")
+    '("guint" "num_messages")
     '("gint" "flags")
     '("GCancellable*" "cancellable")
     '("GError**" "error")
