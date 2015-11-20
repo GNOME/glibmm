@@ -55,7 +55,7 @@ void get_stream(const std::string& address, const SlotAsyncReady slot,
 void get_stream(const std::string& address, const SlotAsyncReady slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
-  g_dbus_address_get_stream(address.c_str(), 0, &SignalProxy_async_callback,
+  g_dbus_address_get_stream(address.c_str(), nullptr, &SignalProxy_async_callback,
     slot_copy);
 }
 
@@ -81,7 +81,7 @@ Glib::RefPtr<IOStream> get_stream_finish(const Glib::RefPtr<AsyncResult>& res)
   GError* gerror = nullptr;
 
   auto result =
-    Glib::wrap(g_dbus_address_get_stream_finish(Glib::unwrap(res), 0,
+    Glib::wrap(g_dbus_address_get_stream_finish(Glib::unwrap(res), nullptr,
     &gerror));
 
   if(gerror)
@@ -115,7 +115,7 @@ Glib::RefPtr<IOStream> get_stream_sync(const std::string& address,
 
   auto result =
     Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(),
-    &g_out_guid, 0, &gerror));
+    &g_out_guid, nullptr, &gerror));
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -130,7 +130,7 @@ Glib::RefPtr<IOStream> get_stream_sync(const std::string& address,
   GError* gerror = nullptr;
 
   auto result =
-    Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(), 0,
+    Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(), nullptr,
     Glib::unwrap(cancellable), &gerror));
 
   if(gerror)
@@ -144,7 +144,7 @@ Glib::RefPtr<IOStream> get_stream_sync(const std::string& address)
   GError* gerror = nullptr;
 
   auto result =
-    Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(), 0, 0, &gerror));
+    Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(), nullptr, nullptr, &gerror));
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -171,7 +171,7 @@ std::string get_for_bus_sync(BusType bus_type)
   GError* gerror = nullptr;
 
   std::string result(g_dbus_address_get_for_bus_sync(
-    static_cast<GBusType>(bus_type), 0, &gerror));
+    static_cast<GBusType>(bus_type), nullptr, &gerror));
 
   if(gerror)
     ::Glib::Error::throw_exception(gerror);
