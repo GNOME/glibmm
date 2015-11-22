@@ -1187,7 +1187,7 @@ sub convert_args_cpp_to_c($$$$$)
       # If the C++ index is not found in the list of desired parameters, pass
       # nullptr to the C func unless the param is not optional (applies to a
       # possibly added GError parameter).
-      if (($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL))
+      if ($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL)
       {
         push(@conversions, "nullptr");
         next;
@@ -1526,7 +1526,7 @@ sub get_ctor_properties($$$$$$)
     {
       # If the C++ index is not found in the list of desired parameters, pass
       # NULL to the C func unless the param is not optional.
-      if (~($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL))
+      if ($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL)
       {
         push(@result, "nullptr");
         next;
