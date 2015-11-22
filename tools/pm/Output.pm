@@ -1203,7 +1203,7 @@ sub convert_args_cpp_to_c($$$$$)
       # will be passed by C reference (&name).
       $cOutputParamType =~ s/\*$//;
 
-      # Only initialize pointers to zero.  Otherwise, use the default
+      # Only initialize pointers to nullptr.  Otherwise, use the default
       # constructor of the type.
       my $initialization = "";
       if($cOutputParamType =~ /\*$/)
@@ -1284,7 +1284,7 @@ sub convert_args_cpp_to_c($$$$$)
   # Append the final slot copy parameter to the C function if the method
   # has a slot.  The m4 macros assume that that parameter name is
   # "slot_copy".  The m4 macros will either copy the slot to the
-  # "slot_copy variable or set it to the address of the slot itself if
+  # "slot_copy" variable or set it to the address of the slot itself if
   # the slot should not be copied.
   if ($$objCppfunc{slot_name})
   {
@@ -1525,7 +1525,7 @@ sub get_ctor_properties($$$$$$)
     if(!($possible_arg_list =~ /\b$cpp_param_index\b/))
     {
       # If the C++ index is not found in the list of desired parameters, pass
-      # NULL to the C func unless the param is not optional.
+      # nullptr to the C func unless the param is not optional.
       if ($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL)
       {
         push(@result, "nullptr");

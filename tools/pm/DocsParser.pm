@@ -649,7 +649,7 @@ sub convert_tags_to_doxygen($)
 
     s"\%?\bFALSE\b"<tt>false</tt>"g;
     s"\%?\bTRUE\b"<tt>true</tt>"g;
-    s"\%?\bNULL\b"<tt>0</tt>"g;
+    s"\%?\bNULL\b"<tt>nullptr</tt>"g;
 
     s"#?\bgboolean\b"<tt>bool</tt>"g;
     s"#?\bg(int|short|long)\b"<tt>$1</tt>"g;
