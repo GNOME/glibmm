@@ -26,12 +26,12 @@ main()
   Gio::init();
   typedef Glib::RefPtr<Gio::Credentials> CrePtr;
 
-  std::vector<CrePtr> v1(Glib::ArrayHandler<CrePtr>::array_to_vector(0, Glib::OWNERSHIP_DEEP));
-  std::vector<CrePtr> v2(Glib::ArrayHandler<CrePtr>::array_to_vector(0, 5, Glib::OWNERSHIP_DEEP));
-  std::vector<CrePtr> v3(Glib::ListHandler<CrePtr>::list_to_vector(0, Glib::OWNERSHIP_DEEP));
-  std::vector<CrePtr> v4(Glib::SListHandler<CrePtr>::slist_to_vector(0, Glib::OWNERSHIP_DEEP));
-  std::vector<bool>   v5(Glib::ArrayHandler<bool>::array_to_vector(0, Glib::OWNERSHIP_DEEP));
-  std::vector<bool>   v6(Glib::ArrayHandler<bool>::array_to_vector(0, 5, Glib::OWNERSHIP_DEEP));
+  std::vector<CrePtr> v1(Glib::ArrayHandler<CrePtr>::array_to_vector(nullptr, Glib::OWNERSHIP_DEEP));
+  std::vector<CrePtr> v2(Glib::ArrayHandler<CrePtr>::array_to_vector(nullptr, 5, Glib::OWNERSHIP_DEEP));
+  std::vector<CrePtr> v3(Glib::ListHandler<CrePtr>::list_to_vector(nullptr, Glib::OWNERSHIP_DEEP));
+  std::vector<CrePtr> v4(Glib::SListHandler<CrePtr>::slist_to_vector(nullptr, Glib::OWNERSHIP_DEEP));
+  std::vector<bool>   v5(Glib::ArrayHandler<bool>::array_to_vector(nullptr, Glib::OWNERSHIP_DEEP));
+  std::vector<bool>   v6(Glib::ArrayHandler<bool>::array_to_vector(nullptr, 5, Glib::OWNERSHIP_DEEP));
 
   if (v1.empty() && v2.empty() && v3.empty() && v4.empty() && v5.empty() && v6.empty())
   {

@@ -38,7 +38,7 @@ setup_rand()
   if(!setup)
   {
     setup = true;
-    std::srand(std::time(0));
+    std::srand(std::time(nullptr));
   }
 }
 

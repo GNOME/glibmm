@@ -72,7 +72,7 @@ print_list(GList* list)
 GSList*
 create_slist()
 {
-  GSList* head = 0;
+  GSList* head = nullptr;
 
   for(unsigned int iter(0); iter < magic_limit; ++iter)
   {
@@ -202,12 +202,12 @@ public:
   {
     if(glist_)
     {
-      g_list_foreach(glist_, reinterpret_cast<GFunc>(g_object_unref), 0);
+      g_list_foreach(glist_, reinterpret_cast<GFunc>(g_object_unref), nullptr);
       g_list_free(glist_);
     }
     if(gslist_)
     {
-      g_slist_foreach(gslist_, reinterpret_cast<GFunc>(g_object_unref), 0);
+      g_slist_foreach(gslist_, reinterpret_cast<GFunc>(g_object_unref), nullptr);
       g_slist_free(gslist_);
     }
     if(garray_)

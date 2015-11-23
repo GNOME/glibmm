@@ -52,7 +52,7 @@ int main(int, char**)
 
     // Add data that shall not be deleted by stream.
     static const char data1[] = "Data not owned by stream.\n";
-    stream->add_data(data1, sizeof data1 - 1, 0);
+    stream->add_data(data1, sizeof data1 - 1, nullptr);
 
     // Add data that shall be deleted by destroy_func1().
     char* data2 = new char[7];
