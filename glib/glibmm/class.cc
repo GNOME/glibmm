@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright (C) 1998-2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -66,7 +63,7 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
     instance_size,
     0, // n_preallocs
     nullptr, // instance_init
-    0, // value_table
+    nullptr, // value_table
   };
 
   if(!(base_query.type_name))

@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_USTRING_H
 #define _GLIBMM_USTRING_H
-
-/* $Id$ */
 
 /* Copyright (C) 2002 The gtkmm Development Team
  *
@@ -1355,7 +1352,7 @@ template <class T1>
 inline // static
 ustring ustring::compose(const ustring& fmt)
 {
-  return ustring::compose_argv(fmt, 0, 0);
+  return ustring::compose_argv(fmt, 0, nullptr);
 }
 
 template <class T1>

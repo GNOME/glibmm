@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_REFPTR_H
 #define _GLIBMM_REFPTR_H
 
@@ -174,7 +173,7 @@ public:
   inline void clear() noexcept;
 #endif //GLIBMM_DISABLE_DEPRECATED
 
-  /** Set underlying instance to 0, decrementing reference count of existing instance appropriately.
+  /** Set underlying instance to nullptr, decrementing reference count of existing instance appropriately.
    * @newin{2,16}
    */
   inline void reset() noexcept;

@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_LISTHANDLE_H
 #define _GLIBMM_LISTHANDLE_H
 
@@ -88,7 +87,7 @@ template <class Tr, class Cont>
 struct ListSourceTraits<Tr,Cont*>
 {
   static GList* get_data(const Cont* array)
-    { return (array) ? Glib::Container_Helpers::create_list(array, Tr()) : 0; }
+    { return (array) ? Glib::Container_Helpers::create_list(array, Tr()) : nullptr; }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_SHALLOW;
 };

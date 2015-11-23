@@ -1,7 +1,5 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_HELPERLIST_H
 #define _GLIBMM_HELPERLIST_H
-/* $Id$ */
 
 /* helperlist.h
  *
@@ -44,7 +42,7 @@ class HelperList
 {
 public:
   HelperList()
-  : gparent_(0)
+  : gparent_(nullptr)
   {}
 
   HelperList(GObject* gp) //We use gp instead of gparent because that can cause warnings about a shadowed member.
@@ -164,7 +162,7 @@ protected:
 
   iterator end_() const
   {
-    return iterator(glist(), (GList*)0);
+    return iterator(glist(), (GList*)nullptr);
   }
 
   GObject* gparent_;

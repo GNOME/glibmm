@@ -75,7 +75,7 @@ public:
   {}
 
   List_Iterator()
-   : head_(0), node_(0)
+   : head_(nullptr), node_(nullptr)
   {}
 
   List_Iterator(const Self& src)
@@ -146,7 +146,7 @@ public:
    {}
 
   SList_Iterator()
-   : node_(0)
+   : node_(nullptr)
    {}
 
   SList_Iterator(const Self& src)
@@ -205,7 +205,7 @@ public:
   {}
 
   List_Cpp_Iterator()
-  : head_(0), node_(0)
+  : head_(nullptr), node_(nullptr)
   {}
 
   List_Cpp_Iterator(const Self& src)
@@ -229,7 +229,7 @@ public:
       return *static_cast<pointer>(Glib::wrap_auto(cobj, false));
 #endif
     }
-    return *static_cast<pointer>(0); // boom!
+    return *static_cast<pointer>(nullptr); // boom!
   }
 
   pointer operator->() const { return &**this; }

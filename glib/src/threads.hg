@@ -509,7 +509,7 @@ public:
    *   const gint64 end_time = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
    *   while (!current_data)
    *     if (!data_cond.wait_until(data_mutex, end_time)
-   *       return 0; // timeout
+   *       return nullptr; // timeout
    *
    *   void* const data = current_data;
    *   current_data = nullptr;
@@ -565,15 +565,15 @@ public:
 
   /** Constructor.
    *
-   * @param destructor_func Function pointer, or 0. If @a destructor_func is not 0
-   * and the stored data pointer is not 0, this function is called when replace()
+   * @param destructor_func Function pointer, or <tt>nullptr</tt>. If @a destructor_func is not <tt>nullptr</tt>
+   * and the stored data pointer is not <tt>nullptr</tt>, this function is called when replace()
    * is called and when the thread exits.
    */
   explicit inline Private(DestructorFunc destructor_func = &Private<T>::delete_ptr);
 
   /** Gets the pointer stored in the calling thread.
    *
-   * @return If no value has yet been set in this thread, 0 is returned.
+   * @return If no value has yet been set in this thread, <tt>nullptr</tt> is returned.
    */
   inline T* get();
 
@@ -582,8 +582,8 @@ public:
   inline void set(T* data);
 
   /** Sets the pointer in the calling thread and calls <tt>destructor_func()</tt>.
-   * If a function pointer (and not 0) was specified in the constructor, and
-   * the stored data pointer before the call to replace() is not 0, then
+   * If a function pointer (and not <tt>nullptr</tt>) was specified in the constructor, and
+   * the stored data pointer before the call to replace() is not <tt>nullptr</tt>, then
    * <tt>destructor_func()</tt> is called with this old pointer value.
    *
    * @newin{2,32}

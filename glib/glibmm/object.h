@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_OBJECT_H
 #define _GLIBMM_OBJECT_H
 
@@ -195,7 +194,7 @@ struct TypeTraits< Glib::RefPtr<T> >
 
   static void release_c_type(CType ptr)
   {
-    GLIBMM_DEBUG_UNREFERENCE(0, ptr);
+    GLIBMM_DEBUG_UNREFERENCE(nullptr, ptr);
     g_object_unref(ptr);
   }
 };
@@ -231,7 +230,7 @@ struct TypeTraits< Glib::RefPtr<const T> >
 
   static void release_c_type (CType ptr)
   {
-    GLIBMM_DEBUG_UNREFERENCE(0, ptr);
+    GLIBMM_DEBUG_UNREFERENCE(nullptr, ptr);
     g_object_unref(const_cast<CTypeNonConst>(ptr));
   }
 };

@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_SLISTHANDLE_H
 #define _GLIBMM_SLISTHANDLE_H
 
@@ -88,7 +87,7 @@ template <class Tr, class Cont>
 struct SListSourceTraits<Tr,Cont*>
 {
   static GSList* get_data(const Cont* array)
-    { return (array) ? Glib::Container_Helpers::create_slist(array, Tr()) : 0; }
+    { return (array) ? Glib::Container_Helpers::create_slist(array, Tr()) : nullptr; }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_SHALLOW;
 };
@@ -312,7 +311,7 @@ typename SListHandle<T,Tr>::const_iterator SListHandle<T,Tr>::begin() const
 template <class T, class Tr> inline
 typename SListHandle<T,Tr>::const_iterator SListHandle<T,Tr>::end() const
 {
-  return Glib::Container_Helpers::SListHandleIterator<Tr>(0);
+  return Glib::Container_Helpers::SListHandleIterator<Tr>(nullptr);
 }
 
 template <class T, class Tr>

@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_VALUE_H
 #define _GLIBMM_VALUE_H
 
@@ -184,7 +183,7 @@ public:
 
 protected:
   void set_cstring(const char* data);
-  const char* get_cstring() const; // never returns 0
+  const char* get_cstring() const; // never returns nullptr
 };
 
 } // namespace Glib

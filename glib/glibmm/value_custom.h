@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -206,21 +203,21 @@ template <class T, class PtrT> inline
 GType Value_Pointer<T,PtrT>::value_type()
 {
   // Dispatch to the specific value_type_() overload.
-  return Value_Pointer<T,PtrT>::value_type_(static_cast<T*>(0));
+  return Value_Pointer<T,PtrT>::value_type_(static_cast<T*>(nullptr));
 }
 
 template <class T, class PtrT> inline
 void Value_Pointer<T,PtrT>::set(PtrT data)
 {
   // Dispatch to the specific set_() overload.
-  this->set_(data, static_cast<T*>(0));
+  this->set_(data, static_cast<T*>(nullptr));
 }
 
 template <class T, class PtrT> inline
 PtrT Value_Pointer<T,PtrT>::get() const
 {
   // Dispatch to the specific get_() overload.
-  return this->get_(static_cast<T*>(0));
+  return this->get_(static_cast<T*>(nullptr));
 }
 
 

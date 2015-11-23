@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -441,7 +438,7 @@ void SignalTimeout::connect_seconds_once(const sigc::slot<void>& slot,
 
 SignalTimeout signal_timeout()
 {
-  return SignalTimeout(0); // 0 means default context
+  return SignalTimeout(nullptr); // nullptr means default context
 }
 
 
