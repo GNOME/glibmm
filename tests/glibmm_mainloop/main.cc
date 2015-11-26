@@ -86,16 +86,13 @@ int main(int, char**)
 
   // Create a second thread.
   const std::thread::id first_thread_id = std::this_thread::get_id();
-  std::thread* second_thread =
-    new std::thread(&thread_function, first_thread_id, first_mainloop);
+  std::thread second_thread(&thread_function, first_thread_id, first_mainloop);
 
   // Start the first main loop.
   first_mainloop->run();
 
   // Wait until the second thread has finished.
-  second_thread->join();
-  delete second_thread;
-  second_thread = nullptr;
+  second_thread.join();
 
   if (is_owner)
     Glib::MainContext::get_default()->release();
