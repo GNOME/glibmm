@@ -458,16 +458,19 @@ public:
    * @deprecated Use wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex) instead.
    */
   bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
-#endif //GLIBMM_DISABLE_DEPRECATED
 
+  //Deprecated mostly because it uses deprecated Glib::Threads:: for parameters.
   /** Tries to become the owner of the specified context, as with acquire(). But if another thread is the owner,
    * atomically drop mutex and wait on cond until that owner releases ownership or until cond is signaled, then try
    * again (once) to become the owner.
    * @param cond A condition variable.
    * @param mutex A mutex, currently held.
    * @return true if the operation succeeded, and this thread is now the owner of context.
+   *
+   * @deprecated Please use the underlying g_main_context_wait() function if you really need this functionality.
    */
   bool wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex);
+#endif //GLIBMM_DISABLE_DEPRECATED
 
   /** Releases ownership of a context previously acquired by this thread with acquire(). If the context was acquired
    * multiple times, the only release ownership when release() is called as many times as it was acquired.
