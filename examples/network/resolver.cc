@@ -25,6 +25,7 @@
 #include <giomm.h>
 #include <thread>
 #include <iostream>
+#include <mutex>
 
 #include <cerrno>
 #include <csignal>
@@ -54,7 +55,7 @@ usage (void)
     exit (1);
 }
 
-G_LOCK_DEFINE_STATIC (response);
+static std::mutex response_mutex;
 
 static bool
 idle_quit ()
@@ -80,21 +81,20 @@ static void
 print_resolved_name (const Glib::ustring& phys,
                      const Glib::ustring& name)
 {
-  G_LOCK (response);
+  std::lock_guard<std::mutex> lock_guard (response_mutex);
   std::cout
       << Glib::ustring::compose ("Address: %1\n", phys)
       << Glib::ustring::compose ("Name:    %1\n", name)
       << std::endl;
 
   done_lookup ();
-  G_UNLOCK (response);
 }
 
 static void
 print_resolved_addresses (const Glib::ustring& name,
                           const std::list<Glib::RefPtr<Gio::InetAddress>>& addresses)
 {
-    G_LOCK (response);
+    std::lock_guard<std::mutex> lock_guard (response_mutex);
     std::cout << Glib::ustring::compose ("Name:    %1\n", name);
     for (const auto& i : addresses)
     {
@@ -103,14 +103,13 @@ print_resolved_addresses (const Glib::ustring& name,
     std::cout << std::endl;
 
     done_lookup ();
-    G_UNLOCK (response);
 }
 
 static void
 print_resolved_service (const Glib::ustring& service,
                         const std::list<Gio::SrvTarget>& targets)
 {
-    G_LOCK (response);
+    std::lock_guard<std::mutex> lock_guard (response_mutex);
     std::cout << Glib::ustring::compose ("Service: %1\n", service);
     for (const auto& i : targets)
     {
@@ -124,7 +123,6 @@ print_resolved_service (const Glib::ustring& service,
     std::cout << std::endl;
 
     done_lookup ();
-    G_UNLOCK (response);
 }
 
 static std::vector<Glib::ustring>
