@@ -2,9 +2,15 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+
+//TODO: Remove this example sometime. Glib::ThreadPool is deprecated.
+//TODO: Maybe use std::async() instead?
+#undef GLIBMM_DISABLE_DEPRECATED
+
 #include <glibmm/random.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/timer.h>
+
 
 
 namespace

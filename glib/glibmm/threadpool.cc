@@ -17,6 +17,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
+
 #include <glibmmconfig.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/exceptionhandler.h>
@@ -239,4 +241,6 @@ void ThreadPool::stop_unused_threads()
 }
 
 } // namespace Glib
+
+#endif // GLIBMM_DISABLE_DEPRECATED
 

@@ -21,6 +21,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
+
 #include <sigc++/sigc++.h>
 
 extern "C" { typedef struct _GThreadPool GThreadPool; }
@@ -31,10 +33,17 @@ namespace Glib
 
 /** @defgroup ThreadPools Thread Pools
  * Pools of threads to execute work concurrently.
+ *
+ * @deprecated This is deprecated in favor of the standard C++ concurrency API in C++11 and C++14.
+ *
  * @{
  */
 
+//TODO: Is std::async() an appropriate replacement to mention for this deprecated API?
+
 /** A pool of threads to execute work concurrently.
+ *
+ * @deprecated This is deprecated in favor of the standard C++ concurrency API in C++11 and C++14.
  */
 class ThreadPool
 {
@@ -188,6 +197,7 @@ private:
 
 } // namespace Glib
 
+#endif // GLIBMM_DISABLE_DEPRECATED
 
 #endif /* _GLIBMM_THREADPOOL_H */
 
