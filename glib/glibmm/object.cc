@@ -200,14 +200,15 @@ Object::Object()
   {
     Class::interface_class_vector_type custom_interface_classes;
 
-    Threads::Mutex::Lock lock(*extra_object_base_data_mutex);
-    const extra_object_base_data_type::iterator iter = extra_object_base_data.find(this);
-    if (iter != extra_object_base_data.end())
     {
-      custom_interface_classes = iter->second.custom_interface_classes;
-      extra_object_base_data.erase(iter);
+      std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+      const extra_object_base_data_type::iterator iter = extra_object_base_data.find(this);
+      if (iter != extra_object_base_data.end())
+      {
+        custom_interface_classes = iter->second.custom_interface_classes;
+        extra_object_base_data.erase(iter);
+      }
     }
-    lock.release();
 
     object_class_.init();
     // This creates a type that is derived (indirectly) from GObject.
@@ -233,14 +234,15 @@ Object::Object(const Glib::ConstructParams& construct_params)
   {
     Class::interface_class_vector_type custom_interface_classes;
 
-    Threads::Mutex::Lock lock(*extra_object_base_data_mutex);
-    const extra_object_base_data_type::iterator iter = extra_object_base_data.find(this);
-    if (iter != extra_object_base_data.end())
     {
-      custom_interface_classes = iter->second.custom_interface_classes;
-      extra_object_base_data.erase(iter);
+      std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+      const extra_object_base_data_type::iterator iter = extra_object_base_data.find(this);
+      if (iter != extra_object_base_data.end())
+      {
+        custom_interface_classes = iter->second.custom_interface_classes;
+        extra_object_base_data.erase(iter);
+      }
     }
-    lock.release();
 
     object_type = construct_params.glibmm_class.clone_custom_type(
       custom_type_name_, custom_interface_classes);

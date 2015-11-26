@@ -99,7 +99,7 @@ Interface::Interface(const Interface_Class& interface_class)
     {
       // The GObject is not instantiated yet. Add to the custom_interface_classes
       // and add the interface in the Glib::Object constructor.
-      Threads::Mutex::Lock lock(*extra_object_base_data_mutex);
+      std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
       extra_object_base_data[this].custom_interface_classes.push_back(&interface_class);
     }
   }

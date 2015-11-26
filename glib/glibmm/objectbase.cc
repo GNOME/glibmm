@@ -43,7 +43,7 @@ namespace Glib
 
 // static data members
 ObjectBase::extra_object_base_data_type ObjectBase::extra_object_base_data;
-Threads::Mutex* ObjectBase::extra_object_base_data_mutex = new Threads::Mutex();
+std::mutex ObjectBase::extra_object_base_data_mutex;
 
 ObjectBase::ObjectBase()
 :
@@ -158,9 +158,10 @@ ObjectBase::~ObjectBase() noexcept
   // Just a precaution. Unless a derived class's ctor has thrown an exception,
   // 'this' should have been erased from extra_object_base_data by
   // Glib::Object's constructor.
-  Threads::Mutex::Lock lock(*extra_object_base_data_mutex);
-  extra_object_base_data.erase(this);
-  lock.release();
+  {
+    std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
+    extra_object_base_data.erase(this);
+  }
 
   if(GObject *const gobject = gobject_)
   {

@@ -30,6 +30,7 @@
 #include <typeinfo>
 #include <map> // Needed until the next ABI break.
 #include <memory> // Not used by ObjectBase any more, but user code may rely on it being here.
+#include <mutex>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" { typedef struct _GObject GObject; }
@@ -41,10 +42,6 @@ namespace Glib
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 class GSigConnectionNode;
 class Interface_Class;
-namespace Threads
-{
-class Mutex;
-}
 #endif
 
 //This inherits virtually from sigc::trackable so that people can multiply inherit glibmm classes from other sigc::trackable-derived classes.
@@ -221,10 +218,7 @@ typedef std::map<const ObjectBase*, ExtraObjectBaseData> extra_object_base_data_
 static extra_object_base_data_type extra_object_base_data;
 // ObjectBase instances may be used in different threads.
 // Accesses to extra_object_base_data must be thread-safe.
-// Threads::Mutex*, because we don't want to include glibmm/threads.h in objectbase.h.
-// threads.h must be the first included file that includes glib.h. That could cause
-// problems in files that directly or indirectly include objectbase.h.
-static Threads::Mutex* extra_object_base_data_mutex;
+static std::mutex extra_object_base_data_mutex;
 
 public: //  is_derived_() must be public, so that overridden vfuncs and signal handlers can call it via ObjectBase.
 
