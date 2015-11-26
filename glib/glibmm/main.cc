@@ -63,7 +63,7 @@ struct ExtraSourceData
 std::map<const Glib::Source*, ExtraSourceData> extra_source_data;
 // Source instances may be used in different threads.
 // Accesses to extra_source_data must be thread-safe.
-Glib::Threads::Mutex extra_source_data_mutex;
+std::mutex extra_source_data_mutex;
 
 class SourceConnectionNode
 {
@@ -179,7 +179,7 @@ void SourceCallbackData::destroy_notify_callback(void* data)
 
   if(self->wrapper)
   {
-    Glib::Threads::Mutex::Lock lock(extra_source_data_mutex);
+    std::unique_lock<std::mutex> lock(extra_source_data_mutex);
     if (--extra_source_data[self->wrapper].keep_wrapper == 0)
     {
       // No other reference exists to the wrapper. Delete it!
@@ -880,13 +880,13 @@ GSource* Source::gobj_copy() const
 
 void Source::reference() const
 {
-  Glib::Threads::Mutex::Lock lock(extra_source_data_mutex);
+  std::lock_guard<std::mutex> lock(extra_source_data_mutex);
   ++extra_source_data[this].ref_count;
 }
 
 void Source::unreference() const
 {
-  Glib::Threads::Mutex::Lock lock(extra_source_data_mutex);
+  std::unique_lock<std::mutex> lock(extra_source_data_mutex);
   if (--extra_source_data[this].ref_count == 0)
   {
     GSource* const tmp_gobject = gobject_;
