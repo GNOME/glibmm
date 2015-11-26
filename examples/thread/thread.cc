@@ -112,17 +112,11 @@ int main(int, char**)
   MessageQueue queue;
 
   //TODO: Use std::make_unique() when we use C++14:
-  const auto producer = std::unique_ptr<std::thread>(new std::thread(
-    [&queue] ()
-    {
-      queue.producer();
-    }));
+  const auto producer = std::unique_ptr<std::thread>(
+    new std::thread(&MessageQueue::producer, &queue));
 
-   const auto consumer = std::unique_ptr<std::thread>(new std::thread(
-    [&queue] ()
-    {
-      queue.consumer();
-    }));
+  const auto consumer = std::unique_ptr<std::thread>(
+    new std::thread(&MessageQueue::consumer, &queue));
 
   producer->join();
   consumer->join();

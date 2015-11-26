@@ -209,11 +209,7 @@ start_threaded_lookups (char **argv, int argc)
   for (auto i = 0; i < argc; i++)
   {
     const Glib::ustring arg = argv[i];
-    const auto thread = new std::thread(
-      [arg]
-      {
-        lookup_thread(arg);
-      });
+    const auto thread = new std::thread(&lookup_thread, arg);
     result.push_back(thread);
   }
 

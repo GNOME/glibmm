@@ -152,11 +152,7 @@ main (int argc,
     if (cancel_timeout)
     {
         cancellable = Gio::Cancellable::create ();
-        thread = new std::thread(
-          [cancellable] ()
-          {
-            cancel_thread(cancellable);
-          });
+        thread = new std::thread(&cancel_thread, cancellable);
     }
 
     loop = Glib::MainLoop::create ();
