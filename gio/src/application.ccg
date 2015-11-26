@@ -190,7 +190,7 @@ OptionArgCallbackDataMap option_arg_callback_data;
 
 // Gio::Application instances may be used in different threads.
 // Accesses to option_arg_callback_data must be thread-safe.
-Glib::Threads::Mutex option_arg_callback_data_mutex;
+std::mutex option_arg_callback_data_mutex;
 
 gboolean Application_option_arg_callback(const gchar* option_name, const gchar* value,
   gpointer /* data */, GError** error)
@@ -199,7 +199,7 @@ gboolean Application_option_arg_callback(const gchar* option_name, const gchar* 
 
   // option_name is either a single dash followed by a single letter (for a
   // short name) or two dashes followed by a long option name.
-  Glib::Threads::Mutex::Lock lock(option_arg_callback_data_mutex);
+  std::unique_lock<std::mutex> lock(option_arg_callback_data_mutex);
   OptionArgCallbackDataMap::const_iterator iterFind = option_arg_callback_data.end();
   if (option_name[1] == '-')
   {
@@ -284,7 +284,7 @@ Application::Application(const Glib::ustring& application_id, ApplicationFlags f
 Application::~Application()
 {
   // Delete all OptionArgCallbackData instances that belong to this application.
-  Glib::Threads::Mutex::Lock lock(option_arg_callback_data_mutex);
+  std::lock_guard<std::mutex> lock(option_arg_callback_data_mutex);
   OptionArgCallbackDataMap::iterator iter = option_arg_callback_data.begin();
   while (iter != option_arg_callback_data.end())
   {
@@ -396,7 +396,7 @@ void Application::add_main_option_entry(
   gchar short_name, const Glib::ustring& description,
   const Glib::ustring& arg_description, int flags)
 {
-  Glib::Threads::Mutex::Lock lock(option_arg_callback_data_mutex);
+  std::unique_lock<std::mutex> lock(option_arg_callback_data_mutex);
   OptionArgCallbackDataMap::iterator iterFind = option_arg_callback_data.find(long_name);
   if (iterFind != option_arg_callback_data.end())
     return; // Ignore duplicates
@@ -414,7 +414,7 @@ void Application::add_main_option_entry_filename(
   gchar short_name, const Glib::ustring& description,
   const Glib::ustring& arg_description, int flags)
 {
-  Glib::Threads::Mutex::Lock lock(option_arg_callback_data_mutex);
+  std::unique_lock<std::mutex> lock(option_arg_callback_data_mutex);
   OptionArgCallbackDataMap::iterator iterFind = option_arg_callback_data.find(long_name);
   if (iterFind != option_arg_callback_data.end())
     return; // Ignore duplicates
