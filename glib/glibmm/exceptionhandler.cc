@@ -20,7 +20,6 @@
  */
 
 #include <glibmmconfig.h>
-#include <glibmm/threads.h>
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
 #include <glib.h>
@@ -35,7 +34,7 @@ typedef sigc::signal<void> HandlerList;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.
-static Glib::Threads::Private<HandlerList> thread_specific_handler_list;
+static thread_local HandlerList* thread_specific_handler_list = nullptr;
 
 
 static void glibmm_exception_warning(const GError* error)
@@ -86,12 +85,12 @@ namespace Glib
 
 sigc::connection add_exception_handler(const sigc::slot<void>& slot)
 {
-  HandlerList* handler_list = thread_specific_handler_list.get();
+  HandlerList* handler_list = thread_specific_handler_list;
 
   if(!handler_list)
   {
     handler_list = new HandlerList();
-    thread_specific_handler_list.set(handler_list);
+    thread_specific_handler_list = handler_list;
   }
 
   handler_list->slots().push_front(slot);
@@ -114,7 +113,7 @@ void exception_handlers_invoke() noexcept
   // handled.  If there are no more handlers in the list and the exception
   // is still unhandled, call glibmm_unexpected_exception().
 
-  if(HandlerList *const handler_list = thread_specific_handler_list.get())
+  if(HandlerList *const handler_list = thread_specific_handler_list)
   {
     HandlerList::iterator pslot = handler_list->slots().begin();
 

@@ -18,7 +18,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/threads.h>
 #include <glibmm/dispatcher.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/fileutils.h>
@@ -144,7 +143,7 @@ protected:
   explicit DispatchNotifier(const Glib::RefPtr<MainContext>& context);
 
 private:
-  static Glib::Threads::Private<DispatchNotifier> thread_specific_instance_;
+  static thread_local DispatchNotifier* thread_specific_instance_;
 
   std::set<const Dispatcher*>   deleted_dispatchers_;
 
@@ -167,7 +166,7 @@ private:
 /**** Glib::DispatchNotifier ***********************************************/
 
 // static
-Glib::Threads::Private<DispatchNotifier> DispatchNotifier::thread_specific_instance_;
+thread_local DispatchNotifier* DispatchNotifier::thread_specific_instance_ = nullptr;
 
 DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
 :
@@ -270,12 +269,12 @@ void DispatchNotifier::create_pipe()
 DispatchNotifier* DispatchNotifier::reference_instance
   (const Glib::RefPtr<MainContext>& context, const Dispatcher* dispatcher)
 {
-  DispatchNotifier* instance = thread_specific_instance_.get();
+  DispatchNotifier* instance = thread_specific_instance_;
 
   if(!instance)
   {
     instance = new DispatchNotifier(context);
-    thread_specific_instance_.replace(instance);
+    thread_specific_instance_ = instance;
   }
   else
   {
@@ -303,7 +302,7 @@ DispatchNotifier* DispatchNotifier::reference_instance
 void DispatchNotifier::unreference_instance(
   DispatchNotifier* notifier, const Dispatcher* dispatcher)
 {
-  DispatchNotifier* const instance = thread_specific_instance_.get();
+  DispatchNotifier* const instance = thread_specific_instance_;
 
   // Yes, the notifier argument is only used to check for sanity.
   g_return_if_fail(instance == notifier);
@@ -321,7 +320,7 @@ void DispatchNotifier::unreference_instance(
     g_return_if_fail(instance->ref_count_ == 0); // could be < 0 if messed up
 
     // This causes deletion of the notifier object.
-    thread_specific_instance_.replace(nullptr);
+    thread_specific_instance_ = nullptr;
   }
 }
 
