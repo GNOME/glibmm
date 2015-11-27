@@ -151,7 +151,7 @@ private:
   long                          ref_count_;
   Glib::RefPtr<MainContext>     context_;
 #ifdef G_OS_WIN32
-  Glib::Threads::Mutex          mutex_;
+  std::mutex                    mutex_;
   std::list<DispatchNotifyData> notify_queue_;
   HANDLE                        fd_receiver_;
 #else
@@ -329,7 +329,7 @@ void DispatchNotifier::send_notification(Dispatcher* dispatcher)
 {
 #ifdef G_OS_WIN32
   {
-    const Threads::Mutex::Lock lock (mutex_);
+    const std::lock_guard<std::mutex> lock (mutex_);
 
     const bool was_empty = notify_queue_.empty();
     notify_queue_.push_back(DispatchNotifyData(dispatcher, this));
@@ -389,7 +389,7 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
 
 #ifdef G_OS_WIN32
   {
-    const Threads::Mutex::Lock lock (mutex_);
+    const std::lock_guard<std::mutex> lock (mutex_);
 
     // Should never be empty at this point, but let's allow for bogus
     // notifications with no data available anyway; just to be safe.
