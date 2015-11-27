@@ -15,7 +15,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/threads.h> // Needed until the next ABI break.
 #include <glibmm/object.h>
 #include <glibmm/private/object_p.h>
 #include <glibmm/property.h>

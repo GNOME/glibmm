@@ -15,7 +15,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/threads.h> // Needed until the next ABI break.
 #include <glib-object.h>
 
 #include <glibmm/quark.h>
