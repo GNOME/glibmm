@@ -184,7 +184,7 @@ void SourceCallbackData::destroy_notify_callback(void* data)
     {
       // No other reference exists to the wrapper. Delete it!
       extra_source_data.erase(self->wrapper);
-      lock.release();
+      lock.unlock();
       Glib::Source::destroy_notify_callback(self->wrapper);
     }
   }
@@ -898,11 +898,11 @@ void Source::unreference() const
       // extra_source_data[this].keep_wrapper was > 1.
       // Delete the wrapper!
       extra_source_data.erase(this);
-      lock.release();
+      lock.unlock();
       destroy_notify_callback(const_cast<Source*>(this));
     }
     else
-      lock.release();
+      lock.unlock();
 
     // Drop the one and only GSource reference held by the C++ wrapper.
     // If the GSource instance is attached to a main context, the GMainContext
