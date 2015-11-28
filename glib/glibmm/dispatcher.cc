@@ -319,7 +319,7 @@ void DispatchNotifier::unreference_instance(
   {
     g_return_if_fail(instance->ref_count_ == 0); // could be < 0 if messed up
 
-    // This causes deletion of the notifier object.
+    delete thread_specific_instance_;
     thread_specific_instance_ = nullptr;
   }
 }
