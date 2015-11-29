@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_MAIN_H
 #define _GLIBMM_MAIN_H
 
@@ -34,13 +33,13 @@ namespace Glib
 #ifndef GLIBMM_DISABLE_DEPRECATED
 class Cond;
 class Mutex;
-#endif //GLIBMM_DISABLE_DEPRECATED
 
 namespace Threads
 {
   class Cond;
   class Mutex;
 }
+#endif //GLIBMM_DISABLE_DEPRECATED
 
 /** @defgroup MainLoop The Main Event Loop
  * Manages all available sources of events.

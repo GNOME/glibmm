@@ -15,13 +15,13 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#undef G_DISABLE_DEPRECATED //So we can use newly-deprecated API, to preserve our API.
-#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
-
-#include <glibmm/threads.h>
+#include <glibmmconfig.h> // May define GLIBMM_DISABLE_DEPRECATED
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
+//Include glibmm/thread.h first because we need it to be first to include <glib.h>,
+//so we can do an undef trick to still use deprecated API in the header:
 #include <glibmm/thread.h>
+#include <glibmm/threads.h>
 #endif //GLIBMM_DISABLE_DEPRECATED
 
 #include <glibmm/main.h>
@@ -976,10 +976,12 @@ void Source::remove_poll(Glib::PollFD& poll_fd)
 }
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void Source::get_current_time(Glib::TimeVal& current_time)
 {
   g_source_get_current_time(gobject_, &current_time);
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 #endif //GLIBMM_DISABLE_DEPRECATED
 
 gint64 Source::get_time() const
