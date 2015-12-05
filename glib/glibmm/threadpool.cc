@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -17,9 +15,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
 #ifndef GLIBMM_DISABLE_DEPRECATED
 
-#include <glibmmconfig.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/threads.h>

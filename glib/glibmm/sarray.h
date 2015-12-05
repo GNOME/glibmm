@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_SARRAY_H
 #define _GLIBMM_SARRAY_H
-
-/* $Id$ */
 
 /* array.h
  *
@@ -23,6 +20,8 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <glibmmconfig.h>
+
 #ifndef GLIBMM_DISABLE_DEPRECATED
 #include <glibmm/arrayhandle.h>
 #include <glibmm/ustring.h>
@@ -39,4 +38,3 @@ typedef Glib::ArrayHandle<Glib::ustring> SArray;
 #endif //GLIBMM_DISABLE_DEPRECATED
 
 #endif // _GLIBMM_SARRAY_H
-

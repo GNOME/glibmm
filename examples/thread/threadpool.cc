@@ -7,11 +7,22 @@
 //TODO: Maybe use std::async() instead?
 #undef GLIBMM_DISABLE_DEPRECATED
 
+#include <glibmmconfig.h>
+
+#ifdef GLIBMM_DISABLE_DEPRECATED
+int main(int, char**)
+{
+  // If glibmm is configured with --disable-deprecated-api,
+  // GLIBMM_DISABLE_DEPRECATED is defined in glibmmconfig.h.
+  std::cout << "Glib::ThreadPool not available because deprecated API has been disabled." << std::endl;
+  return 77; // Tell automake's test harness to skip this test.
+}
+
+#else
+
 #include <glibmm/random.h>
 #include <glibmm/threadpool.h>
 #include <glibmm/timer.h>
-
-
 
 namespace
 {
@@ -51,4 +62,4 @@ int main(int, char**)
 
   return 0;
 }
-
+#endif //GLIBMM_DISABLE_DEPRECATED
