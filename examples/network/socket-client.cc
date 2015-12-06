@@ -2,6 +2,10 @@
 #include <giomm.h>
 #include <glibmm.h>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
+#include <memory>
 #include <iostream>
 
 namespace
@@ -15,6 +19,9 @@ bool use_udp = false;
 bool use_source = false;
 bool use_ipv6 = false;
 int cancel_timeout = 0;
+bool stop_thread = false;
+std::mutex mutex_thread;
+std::condition_variable cond_thread;
 
 class ClientOptionGroup : public Glib::OptionGroup
 {
@@ -112,10 +119,27 @@ ensure_condition (const Glib::RefPtr<Gio::Socket>& socket,
 static void
 cancel_thread (Glib::RefPtr<Gio::Cancellable> cancellable)
 {
-    g_usleep (1000*1000*cancel_timeout);
+  std::unique_lock<std::mutex> lock(mutex_thread);
+  if (!cond_thread.wait_for(lock, std::chrono::seconds(cancel_timeout),
+      [](){ return stop_thread; }))
+  {
+    // !stop_thread, i.e. timeout
     std::cout << "Cancelling\n";
-    cancellable->cancel ();
+    cancellable->cancel();
+  }
 }
+
+class JoinAndDelete
+{
+public:
+  void operator()(std::thread* thread)
+  {
+    stop_thread = true;
+    cond_thread.notify_all();
+    thread->join();
+    delete thread;
+  }
+};
 
 } // end anonymous namespace
 
@@ -160,11 +184,11 @@ main (int argc,
         return 1;
     }
 
-    std::thread* thread = nullptr;
+    std::unique_ptr<std::thread, JoinAndDelete> thread;
     if (cancel_timeout)
     {
         cancellable = Gio::Cancellable::create ();
-        thread = new std::thread(&cancel_thread, cancellable);
+        thread.reset(new std::thread(&cancel_thread, cancellable));
     }
 
     loop = Glib::MainLoop::create ();
@@ -320,13 +344,6 @@ main (int argc,
         std::cerr << Glib::ustring::compose ("Error closing master socket: %1\n",
                                              error.what ());
         return 1;
-    }
-
-    //TODO: This won't happen if we returned earlier.
-    if(thread)
-    {
-      thread->join();
-      delete thread;
     }
 
     return 0;
