@@ -1591,6 +1591,24 @@ inline bool operator>=(const ustring& lhs, const char* rhs)
 inline bool operator>=(const char* lhs, const ustring& rhs)
   { return (rhs.compare(lhs) <= 0); }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// Don't allow implicit conversion of integer 0 to nullptr in the relational operators.
+// If the int versions of the relational operators are not deleted, attempts to
+// compare with other integer values than 0 can result in really unexpected behaviour.
+// See https://bugzilla.gnome.org/show_bug.cgi?id=572978#c10
+bool operator==(const ustring& lhs, int rhs) = delete;
+bool operator==(int lhs, const ustring& rhs) = delete;
+bool operator!=(const ustring& lhs, int rhs) = delete;
+bool operator!=(int lhs, const ustring& rhs) = delete;
+bool operator<(const ustring& lhs, int rhs) = delete;
+bool operator<(int lhs, const ustring& rhs) = delete;
+bool operator>(const ustring& lhs, int rhs) = delete;
+bool operator>(int lhs, const ustring& rhs) = delete;
+bool operator<=(const ustring& lhs, int rhs) = delete;
+bool operator<=(int lhs, const ustring& rhs) = delete;
+bool operator>=(const ustring& lhs, int rhs) = delete;
+bool operator>=(int lhs, const ustring& rhs) = delete;
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /**** Glib::ustring -- concatenation operators *****************************/
 
