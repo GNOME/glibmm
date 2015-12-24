@@ -276,7 +276,7 @@ public:
   __CPPNAME__& operator=(__CPPNAME__&& src) noexcept;
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
-  virtual ~__CPPNAME__`'() noexcept;
+  ~__CPPNAME__`'() noexcept override;
 
   /** Get the GType for this class, for use with the underlying GObject type system.
    */

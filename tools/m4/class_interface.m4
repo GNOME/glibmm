@@ -283,7 +283,7 @@ public:
   __CPPNAME__& operator=(__CPPNAME__&& src) noexcept;
 
 _IMPORT(SECTION_DTOR_DOCUMENTATION)
-  virtual ~__CPPNAME__`'() noexcept;
+  ~__CPPNAME__`'() noexcept override;
 
   static void add_interface(GType gtype_implementer);
 
