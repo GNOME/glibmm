@@ -113,7 +113,7 @@ protected:
   Object(); //For use by C++-only sub-types.
   explicit Object(const Glib::ConstructParams& construct_params);
   explicit Object(GObject* castitem);
-  virtual ~Object() noexcept; //It should only be deleted by the callback.
+  ~Object() noexcept override; //It should only be deleted by the callback.
 
 public:
   //static RefPtr<Object> create(); //You must reimplement this in each derived class.

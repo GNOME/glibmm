@@ -63,7 +63,7 @@ public:
    * if necessary.
    */
   explicit Interface(GObject* castitem);
-  virtual ~Interface() noexcept;
+  ~Interface() noexcept override;
 
   // noncopyable
   Interface(const Interface&) = delete;

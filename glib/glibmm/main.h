@@ -821,7 +821,7 @@ public:
 
 protected:
   explicit TimeoutSource(unsigned int interval);
-  virtual ~TimeoutSource() noexcept;
+  ~TimeoutSource() noexcept override;
 
   bool prepare(int& timeout) override;
   bool check() override;
@@ -845,7 +845,7 @@ public:
 
 protected:
   IdleSource();
-  virtual ~IdleSource() noexcept;
+  ~IdleSource() noexcept override;
 
   bool prepare(int& timeout) override;
   bool check() override;
@@ -873,7 +873,7 @@ protected:
    */
   IOSource(GSource* cast_item, GSourceFunc callback_func);
 
-  virtual ~IOSource() noexcept;
+  ~IOSource() noexcept override;
 
   bool prepare(int& timeout) override;
   bool check() override;
