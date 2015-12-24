@@ -31,7 +31,7 @@ class ThreadProgress
 {
 public:
   explicit ThreadProgress(int the_id);
-  virtual ~ThreadProgress();
+  ~ThreadProgress();
 
   int  id() const;
   void launch();
@@ -60,7 +60,7 @@ class Application : public sigc::trackable
 {
 public:
   Application();
-  virtual ~Application();
+  ~Application();
 
   void run();
 

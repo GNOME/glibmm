@@ -51,7 +51,7 @@ class DumpParser : public Glib::Markup::Parser
 {
 public:
   DumpParser();
-  virtual ~DumpParser();
+  ~DumpParser() override;
 
 protected:
   void on_start_element(Glib::Markup::ParseContext& context,
