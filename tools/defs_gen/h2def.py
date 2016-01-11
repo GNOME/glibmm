@@ -349,7 +349,7 @@ def clean_func(buf):
     buf = buf.replace('G_CONST_RETURN ', 'const-')
     buf = buf.replace('const ', 'const-')
     # This is for types such as 'const gchar* const *'
-    buf = buf.replace('* const', '*-const')
+    buf = re.sub(r'\* const\b', '*-const', buf)
 
     #strip GSEAL macros from the middle of function declarations:
     pat = re.compile(r"""GSEAL""", re.VERBOSE)
