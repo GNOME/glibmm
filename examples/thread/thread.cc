@@ -4,6 +4,11 @@
 #include <mutex>
 #include <condition_variable>
 #include <queue>
+#include <memory>
+#if defined (_MSC_VER) && (_MSC_VER < 1900)
+/* For using noexcept on Visual Studio 2013 */
+#include <glibmmconfig.h>
+#endif
 #include <glibmm/random.h>
 #include <glibmm/timer.h>
 #include <glibmm/init.h>
