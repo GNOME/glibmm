@@ -268,20 +268,35 @@ public:
    */
   ustring(const ustring& other);
 
-  /*! Assign the value of another string to this string.
+  /*! Construct a ustring by moving from another ustring.
+   * @param other A source string.
+   */
+  ustring(ustring&& other);
+
+  /*! Assign the value of another string by copying to this string.
    * @param other A source string.
    */
   ustring& operator=(const ustring& other);
+
+  /*! Assign the value of another string by moving to this string.
+   * @param other A source string.
+   */
+  ustring& operator=(ustring&& other);
 
   /*! Swap contents with another string.
    * @param other String to swap with.
    */
   void swap(ustring& other);
 
-  /*! Construct a ustring as a copy of another std::string.
+  /*! Construct a ustring as a copy of a std::string.
    * @param src A source <tt>std::string</tt> containing text encoded as UTF-8.
    */
   ustring(const std::string& src);
+
+  /*! Construct a ustring by moving from a std::string.
+   * @param src A source <tt>std::string</tt> containing text encoded as UTF-8.
+   */
+  ustring(std::string&& src);
 
   /*! Construct a ustring as a copy of a substring.
    * @param src %Source ustring.
@@ -324,11 +339,13 @@ public:
 //! @{
 
   ustring& operator=(const std::string& src);
+  ustring& operator=(std::string&& src);
   ustring& operator=(const char* src);
   ustring& operator=(gunichar uc);
   ustring& operator=(char c);
 
   ustring& assign(const ustring& src);
+  ustring& assign(ustring&& src);
   ustring& assign(const ustring& src, size_type i, size_type n);
   ustring& assign(const char* src, size_type n);
   ustring& assign(const char* src);

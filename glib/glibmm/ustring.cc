@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright (C) 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -27,7 +24,8 @@
 #include <algorithm>
 #include <iostream>
 #include <cstring>
-# include <stdexcept>
+#include <stdexcept>
+#include <utility> // For std::move()
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -298,6 +296,11 @@ ustring::ustring(const ustring& other)
   string_ (other.string_)
 {}
 
+ustring::ustring(ustring&& other)
+:
+  string_ (std::move(other.string_))
+{}
+
 ustring::ustring(const ustring& src, ustring::size_type i, ustring::size_type n)
 :
   string_ ()
@@ -345,6 +348,11 @@ ustring::ustring(const std::string& src)
   string_ (src)
 {}
 
+ustring::ustring(std::string&& src)
+:
+  string_ (std::move(src))
+{}
+
 ustring::~ustring() noexcept
 {}
 
@@ -362,9 +370,21 @@ ustring& ustring::operator=(const ustring& other)
   return *this;
 }
 
+ustring& ustring::operator=(ustring&& other)
+{
+  string_ = std::move(other.string_);
+  return *this;
+}
+
 ustring& ustring::operator=(const std::string& src)
 {
   string_ = src;
+  return *this;
+}
+
+ustring& ustring::operator=(std::string&& src)
+{
+  string_ = std::move(src);
   return *this;
 }
 
@@ -393,6 +413,12 @@ ustring& ustring::operator=(char c)
 ustring& ustring::assign(const ustring& src)
 {
   string_ = src.string_;
+  return *this;
+}
+
+ustring& ustring::assign(ustring&& src)
+{
+  string_ = std::move(src.string_);
   return *this;
 }
 
