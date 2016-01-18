@@ -56,14 +56,13 @@
 namespace Glib
 {
 
-// These are used by gtkmmproc-generated type conversions:
+// These are used by gmmproc-generated type conversions:
 
-#ifdef GLIBMM_DISABLE_DEPRECATED
-// TODO: Replace this with std::unique_ptr?
+#ifndef GLIBMM_DISABLE_DEPRECATED
 /** Helper to deal with memory allocated
  * by GLib functions in an exception-safe manner.
  *
- * @deprecated Use UniquePtrGFree instead.
+ * @deprecated Use make_unique_ptr_gfree() instead.
  */
 template <typename T>
 class ScopedPtr
@@ -85,7 +84,7 @@ public:
 /** Helper to deal with memory allocated
  * by GLib functions in an exception-safe manner.
  *
- * This just creates a unique_ptr that uses g_free as its deleter.
+ * This just creates a std::unique_ptr that uses g_free() as its deleter.
  */
 template <typename T>
 std::unique_ptr<T[], decltype(&g_free)> make_unique_ptr_gfree(T* p)
