@@ -21,6 +21,7 @@
 #include <glibmmconfig.h>
 #include <glibmm/ustring.h>
 #include <glib.h>
+#include <memory> //For std::unique_ptr.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -57,9 +58,13 @@ namespace Glib
 
 // These are used by gtkmmproc-generated type conversions:
 
+#ifdef GLIBMM_DISABLE_DEPRECATED
 // TODO: Replace this with std::unique_ptr?
-// Helper to deal with memory allocated
-// by GLib functions in an exception-safe manner.
+/** Helper to deal with memory allocated
+ * by GLib functions in an exception-safe manner.
+ *
+ * @deprecated Use UniquePtrGFree instead.
+ */
 template <typename T>
 class ScopedPtr
 {
@@ -75,6 +80,18 @@ public:
   T*  get() const             { return ptr_;  }
   T** addr()                  { return &ptr_; }
 };
+#endif //GLIBMM_DISABLE_DEPRECATED
+
+/** Helper to deal with memory allocated
+ * by GLib functions in an exception-safe manner.
+ *
+ * This just creates a unique_ptr that uses g_free as its deleter.
+ */
+template <typename T>
+std::unique_ptr<T[], decltype(&g_free)> make_unique_ptr_gfree(T* p)
+{
+  return std::unique_ptr<T[], decltype(&g_free)>(p, &g_free);
+}
 
 //TODO: Deprecate this? We don't use it ourselves.
 /** Removes the const nature of a ptr
@@ -102,7 +119,7 @@ std::string convert_const_gchar_ptr_to_stdstring(const char* str)
 inline
 Glib::ustring convert_return_gchar_ptr_to_ustring(char* str)
 {
-  return (str) ? Glib::ustring(Glib::ScopedPtr<char>(str).get())
+  return (str) ? Glib::ustring(Glib::make_unique_ptr_gfree(str).get())
                : Glib::ustring();
 }
 
@@ -110,7 +127,7 @@ Glib::ustring convert_return_gchar_ptr_to_ustring(char* str)
 inline
 std::string convert_return_gchar_ptr_to_stdstring(char* str)
 {
-  return (str) ? std::string(Glib::ScopedPtr<char>(str).get())
+  return (str) ? std::string(Glib::make_unique_ptr_gfree(str).get())
                : std::string();
 }
 

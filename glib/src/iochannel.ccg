@@ -231,12 +231,12 @@ IOStatus IOChannel::write(const Glib::ustring& str)
 
 IOStatus IOChannel::read_line(Glib::ustring& line)
 {
-  Glib::ScopedPtr<char> buf;
   GError* gerror = nullptr;
   gsize   bytes = 0;
+  char* pch_buf = nullptr;
 
-  const auto status = g_io_channel_read_line(gobj(), buf.addr(), &bytes, nullptr, &gerror);
-
+  const auto status = g_io_channel_read_line(gobj(), &pch_buf, &bytes, nullptr, &gerror);
+  auto buf = make_unique_ptr_gfree(pch_buf);
   if(gerror)
   {
     Glib::Error::throw_exception(gerror);
@@ -252,12 +252,12 @@ IOStatus IOChannel::read_line(Glib::ustring& line)
 
 IOStatus IOChannel::read_to_end(Glib::ustring& str)
 {
-  Glib::ScopedPtr<char> buf;
   GError* gerror = nullptr;
   gsize   bytes = 0;
+  char* pch_buf = nullptr;
 
-  const auto status = g_io_channel_read_to_end(gobj(), buf.addr(), &bytes, &gerror);
-
+  const auto status = g_io_channel_read_to_end(gobj(), &pch_buf, &bytes, &gerror);
+  auto buf = make_unique_ptr_gfree(pch_buf);
   if(gerror)
   {
     Glib::Error::throw_exception(gerror);
@@ -273,13 +273,13 @@ IOStatus IOChannel::read_to_end(Glib::ustring& str)
 
 IOStatus IOChannel::read(Glib::ustring& str, gsize count)
 {
-  Glib::ScopedPtr<char> buf (g_new(char, count));
+  Glib::UniquePtrGFree<char> buf (g_new(char, count));
   GError* gerror = nullptr;
   gsize   bytes = 0;
 
   const auto status = g_io_channel_read_chars(gobj(), buf.get(), count, &bytes, &gerror);
 
- if(gerror)
+  if(gerror)
   {
     Glib::Error::throw_exception(gerror);
   }

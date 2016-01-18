@@ -149,8 +149,9 @@ ustring::size_type utf8_find_first_of(const std::string& str, ustring::size_type
     return ustring::npos;
 
   long ucs4_match_size = 0;
-  const Glib::ScopedPtr<gunichar> ucs4_match
-      (g_utf8_to_ucs4_fast(utf8_match, utf8_match_size, &ucs4_match_size));
+  const auto ucs4_match =
+      Glib::make_unique_ptr_gfree(
+        g_utf8_to_ucs4_fast(utf8_match, utf8_match_size, &ucs4_match_size));
 
   const gunichar *const match_begin = ucs4_match.get();
   const gunichar *const match_end   = match_begin + ucs4_match_size;
@@ -181,8 +182,9 @@ ustring::size_type utf8_find_last_of(const std::string& str, ustring::size_type 
                                      bool find_not_of)
 {
   long ucs4_match_size = 0;
-  const Glib::ScopedPtr<gunichar> ucs4_match
-      (g_utf8_to_ucs4_fast(utf8_match, utf8_match_size, &ucs4_match_size));
+  const auto ucs4_match =
+      Glib::make_unique_ptr_gfree(
+        g_utf8_to_ucs4_fast(utf8_match, utf8_match_size, &ucs4_match_size));
 
   const gunichar *const match_begin = ucs4_match.get();
   const gunichar *const match_end   = match_begin + ucs4_match_size;
@@ -1170,32 +1172,32 @@ bool ustring::is_ascii() const
 
 ustring ustring::normalize(NormalizeMode mode) const
 {
-  const ScopedPtr<char> buf (g_utf8_normalize(string_.data(), string_.size(),
+  const auto buf = make_unique_ptr_gfree(g_utf8_normalize(string_.data(), string_.size(),
                                               static_cast<GNormalizeMode>(int(mode))));
   return ustring(buf.get());
 }
 
 ustring ustring::uppercase() const
 {
-  const ScopedPtr<char> buf (g_utf8_strup(string_.data(), string_.size()));
+  const auto buf = make_unique_ptr_gfree(g_utf8_strup(string_.data(), string_.size()));
   return ustring(buf.get());
 }
 
 ustring ustring::lowercase() const
 {
-  const ScopedPtr<char> buf (g_utf8_strdown(string_.data(), string_.size()));
+  const auto buf = make_unique_ptr_gfree(g_utf8_strdown(string_.data(), string_.size()));
   return ustring(buf.get());
 }
 
 ustring ustring::casefold() const
 {
-  const ScopedPtr<char> buf (g_utf8_casefold(string_.data(), string_.size()));
+  const auto buf = make_unique_ptr_gfree(g_utf8_casefold(string_.data(), string_.size()));
   return ustring(buf.get());
 }
 
 std::string ustring::collate_key() const
 {
-  const ScopedPtr<char> buf (g_utf8_collate_key(string_.data(), string_.size()));
+  const auto buf = make_unique_ptr_gfree(g_utf8_collate_key(string_.data(), string_.size()));
   return std::string(buf.get());
 }
 
@@ -1204,7 +1206,7 @@ std::string ustring::casefold_collate_key() const
   char *const casefold_buf = g_utf8_casefold(string_.data(), string_.size());
   char *const key_buf      = g_utf8_collate_key(casefold_buf, -1);
   g_free(casefold_buf);
-  return std::string(ScopedPtr<char>(key_buf).get());
+  return std::string(make_unique_ptr_gfree(key_buf).get());
 }
 
 /**** Glib::ustring -- Message formatting **********************************/
@@ -1294,16 +1296,16 @@ ustring ustring::FormatStream::to_string() const
 # if defined(__STDC_ISO_10646__) && SIZEOF_WCHAR_T == 4
   // Avoid going through iconv if wchar_t always contains UCS-4.
   glong n_bytes = 0;
-  const ScopedPtr<char> buf (g_ucs4_to_utf8(reinterpret_cast<const gunichar*>(str.data()),
+  const auto buf = make_unique_ptr_gfree(g_ucs4_to_utf8(reinterpret_cast<const gunichar*>(str.data()),
                                             str.size(), nullptr, &n_bytes, &error));
 # elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
   glong n_bytes = 0;
-  const ScopedPtr<char> buf (g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(str.data()),
+  const auto buf = make_unique_ptr_gfree(g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(str.data()),
                                              str.size(), nullptr, &n_bytes, &error));
 # else
   gsize n_bytes = 0;
-  const ScopedPtr<char> buf (g_convert(reinterpret_cast<const char*>(str.data()),
+  const auto buf = make_unique_ptr_gfree(g_convert(reinterpret_cast<const char*>(str.data()),
                                        str.size() * sizeof(std::wstring::value_type),
                                        "UTF-8", "WCHAR_T", nullptr, &n_bytes, &error));
 # endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
@@ -1312,7 +1314,7 @@ ustring ustring::FormatStream::to_string() const
   const std::string str = stream_.str();
 
   gsize n_bytes = 0;
-  const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), 0, &n_bytes, &error));
+  const auto buf = make_unique_ptr_gfree(g_locale_to_utf8(str.data(), str.size(), 0, &n_bytes, &error));
 #endif /* !GLIBMM_HAVE_WIDE_STREAM */
 
   if (error)
@@ -1332,7 +1334,7 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
 
   GError* error = nullptr;
   gsize n_bytes = 0;
-  const ScopedPtr<char> buf (g_locale_to_utf8(str.data(), str.size(), nullptr, &n_bytes, &error));
+  const auto buf = make_unique_ptr_gfree(g_locale_to_utf8(str.data(), str.size(), nullptr, &n_bytes, &error));
 
   if (error)
   {
@@ -1347,7 +1349,7 @@ std::istream& operator>>(std::istream& is, Glib::ustring& utf8_string)
 std::ostream& operator<<(std::ostream& os, const Glib::ustring& utf8_string)
 {
   GError* error = nullptr;
-  const ScopedPtr<char> buf (g_locale_from_utf8(utf8_string.raw().data(),
+  const auto buf = make_unique_ptr_gfree(g_locale_from_utf8(utf8_string.raw().data(),
                                                 utf8_string.raw().size(), nullptr, nullptr, &error));
   if (error)
   {
@@ -1378,16 +1380,16 @@ std::wistream& operator>>(std::wistream& is, ustring& utf8_string)
 #if defined(__STDC_ISO_10646__) && SIZEOF_WCHAR_T == 4
   // Avoid going through iconv if wchar_t always contains UCS-4.
   glong n_bytes = 0;
-  const ScopedPtr<char> buf (g_ucs4_to_utf8(reinterpret_cast<const gunichar*>(wstr.data()),
+  const auto buf = make_unique_ptr_gfree(g_ucs4_to_utf8(reinterpret_cast<const gunichar*>(wstr.data()),
                                             wstr.size(), nullptr, &n_bytes, &error));
 #elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
   glong n_bytes = 0;
-  const ScopedPtr<char> buf (g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(wstr.data()),
+  const auto buf = make_unique_ptr_gfree(g_utf16_to_utf8(reinterpret_cast<const gunichar2*>(wstr.data()),
                                              wstr.size(), nullptr, &n_bytes, &error));
 #else
   gsize n_bytes = 0;
-  const ScopedPtr<char> buf (g_convert(reinterpret_cast<const char*>(wstr.data()),
+  const auto buf = make_unique_ptr_gfree(g_convert(reinterpret_cast<const char*>(wstr.data()),
                                        wstr.size() * sizeof(std::wstring::value_type),
                                        "UTF-8", "WCHAR_T", nullptr, &n_bytes, &error));
 #endif // !(__STDC_ISO_10646__ || G_OS_WIN32)
@@ -1408,14 +1410,14 @@ std::wostream& operator<<(std::wostream& os, const ustring& utf8_string)
 
 #if defined(__STDC_ISO_10646__) && SIZEOF_WCHAR_T == 4
   // Avoid going through iconv if wchar_t always contains UCS-4.
-  const ScopedPtr<gunichar> buf (g_utf8_to_ucs4(utf8_string.raw().data(),
+  const auto buf = make_unique_ptr_gfree(g_utf8_to_ucs4(utf8_string.raw().data(),
                                                 utf8_string.raw().size(), nullptr, nullptr, &error));
 #elif defined(G_OS_WIN32) && SIZEOF_WCHAR_T == 2
   // Avoid going through iconv if wchar_t always contains UTF-16.
-  const ScopedPtr<gunichar2> buf (g_utf8_to_utf16(utf8_string.raw().data(),
+  const auto buf = make_unique_ptr_gfree(g_utf8_to_utf16(utf8_string.raw().data(),
                                                   utf8_string.raw().size(), nullptr, nullptr, &error));
 #else
-  const ScopedPtr<char> buf (g_convert(utf8_string.raw().data(), utf8_string.raw().size(),
+  const auto buf = make_unique_ptr_gfree(g_convert(utf8_string.raw().data(), utf8_string.raw().size(),
                                        "WCHAR_T", "UTF-8", nullptr, nullptr, &error));
 #endif // !(__STDC_ISO_10646__ || G_OS_WIN32)
 

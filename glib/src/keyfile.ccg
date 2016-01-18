@@ -89,7 +89,7 @@ bool KeyFile::load_from_data_dirs(const std::string& file, std::string& full_pat
     Glib::Error::throw_exception(gerror);
 
   if(full_path_c)
-    full_path = Glib::ScopedPtr<char>(full_path_c).get();
+    full_path = Glib::make_unique_ptr_gfree(buf).get();
   else
     full_path.erase();
 
@@ -116,7 +116,7 @@ bool KeyFile::load_from_dirs(const std::string& file, const Glib::ArrayHandle<st
   }
 
   if(full_path_c)
-    full_path = Glib::ScopedPtr<char>(full_path_c).get();
+    full_path = Glib::make_unique_ptr_gfree(buf).get();
   else
     full_path.erase();
 

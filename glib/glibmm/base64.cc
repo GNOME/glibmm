@@ -32,7 +32,7 @@ std::string Base64::encode(const std::string& source, bool break_lines)
   */
   gsize length = (source.length() / 3 + 1) * 4 + 1; // + 1 for the terminating zero
   length += ((length / 72) + 1); // in case break_lines = true
-  const Glib::ScopedPtr<char> buf ((char*) g_malloc(length));
+  const auto buf = make_unique_ptr_gfree((char*) g_malloc(length));
   gint state = 0, save = 0;
   const guchar* src = reinterpret_cast<const unsigned char*>(source.data());
   gsize out = g_base64_encode_step (src, source.length(), break_lines,
@@ -44,7 +44,7 @@ std::string Base64::encode(const std::string& source, bool break_lines)
 std::string Base64::decode(const std::string& source)
 {
   gsize size;
-  const Glib::ScopedPtr<char> buf((char*)g_base64_decode(source.c_str(), &size));
+  const auto buf = make_unique_ptr_gfree((char*)g_base64_decode(source.c_str(), &size));
   return std::string(buf.get(), buf.get() + size);
 }
 

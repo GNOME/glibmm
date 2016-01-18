@@ -124,7 +124,7 @@ bool file_test(const std::string& filename, FileTest test)
 
 int mkstemp(std::string& filename_template)
 {
-  const ScopedPtr<char> buf (g_strndup(filename_template.data(), filename_template.size()));
+  const auto buf = make_unique_ptr_gfree(g_strndup(filename_template.data(), filename_template.size()));
   const auto fileno = g_mkstemp(buf.get());
 
   filename_template = buf.get();
@@ -137,10 +137,10 @@ int file_open_tmp(std::string& name_used, const std::string& prefix)
   basename_template += "XXXXXX"; // this sillyness shouldn't be in the interface
 
   GError* error = nullptr;
-  ScopedPtr<char> buf_name_used;
+  char* pch_buf_name_used = nullptr;
 
-  const auto fileno = g_file_open_tmp(basename_template.c_str(), buf_name_used.addr(), &error);
-
+  const auto fileno = g_file_open_tmp(basename_template.c_str(), &pch_buf_name_used, &error);
+  auto buf_name_used = make_unique_ptr_gfree(pch_buf_name_used);
   if(error)
     Glib::Error::throw_exception(error);
 
@@ -151,10 +151,10 @@ int file_open_tmp(std::string& name_used, const std::string& prefix)
 int file_open_tmp(std::string& name_used)
 {
   GError* error = nullptr;
-  ScopedPtr<char> buf_name_used;
+  char* pch_buf_name_used = nullptr;
 
-  const auto fileno = g_file_open_tmp(nullptr, buf_name_used.addr(), &error);
-
+  const auto fileno = g_file_open_tmp(nullptr, &pch_buf_name_used, &error);
+  auto buf_name_used = make_unique_ptr_gfree(pch_buf_name_used);
   if(error)
     Glib::Error::throw_exception(error);
 
@@ -164,12 +164,12 @@ int file_open_tmp(std::string& name_used)
 
 std::string file_get_contents(const std::string& filename)
 {
-  ScopedPtr<char> contents;
   gsize   length = 0;
   GError* error  = nullptr;
 
-  g_file_get_contents(filename.c_str(), contents.addr(), &length, &error);
-
+  char* pch_contents = nullptr;
+  g_file_get_contents(filename.c_str(), &pch_contents, &length, &error);
+  auto contents = make_unique_ptr_gfree(pch_contents);
   if(error)
     Glib::Error::throw_exception(error);
 

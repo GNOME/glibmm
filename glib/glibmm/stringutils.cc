@@ -87,19 +87,19 @@ std::string Glib::Ascii::dtostr(double d)
 
 std::string Glib::strescape(const std::string& source)
 {
-  const Glib::ScopedPtr<char> buf (g_strescape(source.c_str(), nullptr));
+  const auto buf = make_unique_ptr_gfree(g_strescape(source.c_str(), nullptr));
   return buf.get();
 }
 
 std::string Glib::strescape(const std::string& source, const std::string& exceptions)
 {
-  const Glib::ScopedPtr<char> buf (g_strescape(source.c_str(), exceptions.c_str()));
+  const auto buf = make_unique_ptr_gfree(g_strescape(source.c_str(), exceptions.c_str()));
   return buf.get();
 }
 
 std::string Glib::strcompress(const std::string& source)
 {
-  const Glib::ScopedPtr<char> buf (g_strcompress(source.c_str()));
+  const auto buf = make_unique_ptr_gfree(g_strcompress(source.c_str()));
   return buf.get();
 }
 

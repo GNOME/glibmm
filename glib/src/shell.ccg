@@ -39,7 +39,7 @@ Glib::ArrayHandle<std::string> shell_parse_argv(const std::string& command_line)
 
 std::string shell_quote(const std::string& unquoted_string)
 {
-  const ScopedPtr<char> buf (g_shell_quote(unquoted_string.c_str()));
+  const auto buf = make_unique_ptr_gfree(g_shell_quote(unquoted_string.c_str()));
   return std::string(buf.get());
 }
 
@@ -51,7 +51,7 @@ std::string shell_unquote(const std::string& quoted_string)
   if(error)
     Glib::Error::throw_exception(error);
 
-  return std::string(ScopedPtr<char>(buf).get());
+  return std::string(make_unique_ptr_gfree(buf).get());
 }
 
 } // namespace Glib
