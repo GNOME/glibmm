@@ -273,7 +273,7 @@ IOStatus IOChannel::read_to_end(Glib::ustring& str)
 
 IOStatus IOChannel::read(Glib::ustring& str, gsize count)
 {
-  Glib::UniquePtrGFree<char> buf (g_new(char, count));
+  auto buf = make_unique_ptr_gfree(g_new(char, count));
   GError* gerror = nullptr;
   gsize   bytes = 0;
 

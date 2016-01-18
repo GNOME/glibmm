@@ -36,7 +36,7 @@ Glib::RefPtr<Glib::Regex> Regex::create(const Glib::ustring& pattern,
 // static
 Glib::ustring Regex::escape_string(const Glib::ustring& string)
 {
-  const Glib::UniquePtrGFree<char> buf (g_regex_escape_string(string.raw().c_str(),
+  const auto buf = make_unique_ptr_gfree(g_regex_escape_string(string.raw().c_str(),
                                                          string.raw().size()));
   return Glib::ustring(buf.get());
 }
