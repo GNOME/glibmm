@@ -78,7 +78,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async_with_pipes(
-      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      Glib::c_str_or_nullptr(working_directory),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
@@ -106,7 +106,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async_with_pipes(
-      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      Glib::c_str_or_nullptr(working_directory),
       const_cast<char**>(argv.data()), nullptr,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : nullptr,
@@ -131,7 +131,7 @@ void spawn_async(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async(
-      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      Glib::c_str_or_nullptr(working_directory),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
@@ -155,7 +155,7 @@ void spawn_async(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async(
-      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      Glib::c_str_or_nullptr(working_directory),
       const_cast<char**>(argv.data()), nullptr,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : nullptr,
@@ -184,7 +184,7 @@ void spawn_sync(const std::string& working_directory,
   char* pch_buf_standard_output = nullptr;
   char* pch_buf_standard_error = nullptr;
   g_spawn_sync(
-      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      Glib::c_str_or_nullptr(working_directory),
       const_cast<char**>(argv.data()),
       const_cast<char**>(envp.data()),
       static_cast<GSpawnFlags>(unsigned(flags)),
@@ -220,7 +220,7 @@ void spawn_sync(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_sync(
-      (working_directory.empty()) ? nullptr : working_directory.c_str(),
+      Glib::c_str_or_nullptr(working_directory),
       const_cast<char**>(argv.data()), nullptr,
       static_cast<GSpawnFlags>(unsigned(flags)),
       (setup_slot) ? &child_setup_callback : nullptr,

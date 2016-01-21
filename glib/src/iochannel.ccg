@@ -297,7 +297,7 @@ IOStatus IOChannel::set_encoding(const std::string& encoding)
   GError* gerror = nullptr;
 
   const auto status = g_io_channel_set_encoding(
-      gobj(), (encoding.empty()) ? nullptr : encoding.c_str(), &gerror);
+      gobj(), Glib::c_str_or_nullptr(encoding), &gerror);
 
   if(gerror)
   {
