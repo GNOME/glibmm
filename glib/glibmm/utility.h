@@ -130,6 +130,15 @@ std::string convert_return_gchar_ptr_to_stdstring(char* str)
                : std::string();
 }
 
+/** Get a pointer to the C style string in a std::string or Glib::ustring.
+ * If the string is empty, a nullptr is returned.
+ */
+template <typename T>
+inline const char* c_str_or_nullptr(const T& str)
+{
+  return str.empty() ? nullptr : str.c_str();
+}
+
 // Append type_name to dest, while replacing special characters with '+'.
 void append_canonical_typename(std::string& dest, const char* type_name);
 
