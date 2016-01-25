@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -20,7 +17,6 @@
 
 #include <glibmm/property.h>
 
-
 #include <glibmm/object.h>
 #include <glibmm/class.h>
 #include <cstddef>
@@ -32,13 +28,10 @@
 
 namespace
 {
-
-// OK guys, please don't kill me for that.  Let me explain what happens here.
-//
 // The task:
 // ---------
 // a) Autogenerate a property ID number for each custom property.  This is an
-//    unsigned integer, which doesn't have to be assigned continuously.  I.e.,
+//    unsigned integer, which doesn't have to be assigned contiguously.  I.e.,
 //    it can be everything but 0.
 // b) If more than one object of the same class is instantiated, then of course
 //    the already installed properties must be used.  That means, a property ID
@@ -50,60 +43,30 @@ namespace
 //
 // The current solution:
 // ---------------------
-// a) Assign an ID to a Glib::PropertyBase by calculating its offset in bytes
-//    relative to the beginning of the object's memory.  dynamic_cast<void*>
-//    is used to retrieve a pointer to the very beginning of an instance.
-// b) Recalculate a specific PropertyBase pointer by adding the property ID
-//    (i.e. the byte offset) to the object start pointer.  The result is then
-//    just casted to PropertyBase*.
+// a) Assign an ID to a Glib::PropertyBase by keeping track of the number of
+//    properties that have been already installed. Since C++ always calls
+//    the constructors of sub-objects in an object in the same order, we can
+//    rely on the same ID being assigned to the same property.
+// b) Store addresses to PropertyBase objects in a separate, per-object vector
+//    and use the property ID as the index in that vector.
 //
 // Drawbacks:
 // ----------
-// a) It's a low-level hack.  Should be portable, yes, but we can only do very
-//    limited error checking.
-// b) All Glib::Property<> instances are absolutely required to be direct data
-//    members of the class that implements the property.  That seems a natural
-//    thing to do, but it's questionable whether it should be a requirement.
+// a) An additional GQuark and a vector lookup need to be done to retrieve the
+//    address of PropertyBase.
+// b) In the given run of a program, all Glib::Property<> instances related to
+//    a given Glib::Object must be constructed in the same order.
 //
 // Advantages:
 // -----------
-// a) Although low-level, it's extremely easy to implement.  The nasty code is
-//    concentrated in only two non-exposed utility functions, and it works
-//    just fine.
-// b) It's efficient, and the memory footprint is very small too.
-// c) I actually tried other ways, too, but ran into dead-ends everywhere.
-//    It's probably possible to implement this without calculating offsets,
-//    but it'll be very complicated, and involve a lot of qdata pointers to
-//    property tables andwhatnot.
-//
-// We can reimplement this later if necessary.
+// a) Almost all conceivable use-cases are supported by this approach.
+// b) It's comparatively efficient, and does not need a hash-table lookup.
 
-static unsigned int property_to_id(Glib::ObjectBase& object, Glib::PropertyBase& property)
-{
-  void *const base_ptr = dynamic_cast<void*>(&object);
-  void *const prop_ptr = &property;
-
-  const std::ptrdiff_t offset = static_cast<guint8*>(prop_ptr) - static_cast<guint8*>(base_ptr);
-
-  g_return_val_if_fail(offset > 0 && offset < G_MAXINT, 0);
-
-  return static_cast<unsigned int>(offset);
-}
-
-Glib::PropertyBase& property_from_id(Glib::ObjectBase& object, unsigned int property_id)
-{
-  void *const base_ptr = dynamic_cast<void*>(&object);
-  void *const prop_ptr = static_cast<guint8*>(base_ptr) + property_id;
-
-  return *static_cast<Glib::PropertyBase*>(prop_ptr);
-}
 
 // Delete the interface property values when an object of a custom type is finalized.
 void destroy_notify_obj_iface_props(void* data)
 {
-  Glib::Class::iface_properties_type* obj_iface_props =
-    static_cast<Glib::Class::iface_properties_type*>(data);
-
+  auto obj_iface_props = static_cast<Glib::Class::iface_properties_type*>(data);
   if (obj_iface_props)
   {
     for (Glib::Class::iface_properties_type::size_type i = 0; i < obj_iface_props->size(); i++)
@@ -113,6 +76,32 @@ void destroy_notify_obj_iface_props(void* data)
     }
     delete obj_iface_props;
   }
+}
+
+// The type that holds pointers to the custom properties of custom types.
+using custom_properties_type = std::vector<Glib::PropertyBase*>;
+// The quark used for storing/getting the custom properties of custom types.
+static const GQuark custom_properties_quark = g_quark_from_string("gtkmm_CustomObject_custom_properties");
+
+// Delete the vector of pointers to custom properties when an object of
+// a custom type is finalized.
+void destroy_notify_obj_custom_props(void* data)
+{
+  // Shallow deletion. The vector does not own the objects pointed to.
+  delete static_cast<custom_properties_type*>(data);
+}
+
+custom_properties_type* get_obj_custom_props(GObject* obj)
+{
+  auto obj_custom_props = static_cast<custom_properties_type*>(
+    g_object_get_qdata(obj, custom_properties_quark));
+  if (!obj_custom_props)
+  {
+    obj_custom_props = new custom_properties_type();
+    g_object_set_qdata_full(obj, custom_properties_quark, obj_custom_props,
+                            destroy_notify_obj_custom_props);
+  }
+  return obj_custom_props;
 }
 
 } // anonymous namespace
@@ -129,7 +118,7 @@ void custom_get_property_callback(GObject* object, unsigned int property_id,
 
   GType custom_type = G_OBJECT_TYPE(object);
 
-  Class::iface_properties_type* iface_props = static_cast<Class::iface_properties_type*>(
+  auto iface_props = static_cast<Class::iface_properties_type*>(
     g_type_get_qdata(custom_type, Class::iface_properties_quark));
 
   Class::iface_properties_type::size_type iface_props_size = 0;
@@ -140,7 +129,7 @@ void custom_get_property_callback(GObject* object, unsigned int property_id,
   if (property_id <= iface_props_size)
   {
     // Get the object's property value if there is one, else the class's default value.
-    Class::iface_properties_type* obj_iface_props = static_cast<Class::iface_properties_type*>(
+    auto obj_iface_props = static_cast<Class::iface_properties_type*>(
       g_object_get_qdata(object, Class::iface_properties_quark));
     if (obj_iface_props)
       g_value_copy((*obj_iface_props)[property_id - 1], value);
@@ -149,13 +138,16 @@ void custom_get_property_callback(GObject* object, unsigned int property_id,
   }
   else
   {
-    if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
+    if (Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
-      PropertyBase& property =
-        property_from_id(*wrapper, property_id - iface_props_size);
+      auto obj_custom_props = static_cast<custom_properties_type*>(
+        g_object_get_qdata(object, custom_properties_quark));
+      const unsigned index = property_id - iface_props_size - 1;
 
-      if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
-        g_value_copy(property.value_.gobj(), value);
+      if (obj_custom_props && index < obj_custom_props->size() &&
+          (*obj_custom_props)[index]->object_ == wrapper &&
+          (*obj_custom_props)[index]->param_spec_ == param_spec)
+        g_value_copy((*obj_custom_props)[index]->value_.gobj(), value);
       else
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, param_spec);
     }
@@ -165,7 +157,7 @@ void custom_get_property_callback(GObject* object, unsigned int property_id,
 void custom_set_property_callback(GObject* object, unsigned int property_id,
                                   const GValue* value, GParamSpec* param_spec)
 {
-  // If the id is zero there is no property to get.
+  // If the id is zero there is no property to set.
   g_return_if_fail(property_id != 0);
 
   GType custom_type = G_OBJECT_TYPE(object);
@@ -205,12 +197,15 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
   {
     if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
-      PropertyBase& property =
-        property_from_id(*wrapper, property_id - iface_props_size);
+      auto obj_custom_props = static_cast<custom_properties_type*>(
+        g_object_get_qdata(object, custom_properties_quark));
+      const unsigned index = property_id - iface_props_size - 1;
 
-      if((property.object_ == wrapper) && (property.param_spec_ == param_spec))
+      if (obj_custom_props && index < obj_custom_props->size() &&
+          (*obj_custom_props)[index]->object_ == wrapper &&
+          (*obj_custom_props)[index]->param_spec_ == param_spec)
       {
-        g_value_copy(value, property.value_.gobj());
+        g_value_copy(value, (*obj_custom_props)[index]->value_.gobj());
         g_object_notify_by_pspec(object, param_spec);
       }
       else
@@ -245,8 +240,12 @@ bool PropertyBase::lookup_property(const Glib::ustring& name)
 
   if(param_spec_)
   {
+    // This property has already been installed, when another instance
+    // of the object_ class was constructed.
     g_assert(G_PARAM_SPEC_VALUE_TYPE(param_spec_) == G_VALUE_TYPE(value_.gobj()));
     g_param_spec_ref(param_spec_);
+
+    get_obj_custom_props(object_->gobj())->push_back(this);
   }
 
   return (param_spec_ != nullptr);
@@ -262,14 +261,20 @@ void PropertyBase::install_property(GParamSpec* param_spec)
   // properties.
 
   GType gtype = G_OBJECT_TYPE(object_->gobj());
-  Class::iface_properties_type* iface_props = static_cast<Class::iface_properties_type*>(
+  auto iface_props = static_cast<Class::iface_properties_type*>(
     g_type_get_qdata(gtype, Class::iface_properties_quark));
 
   Class::iface_properties_type::size_type iface_props_size = 0;
   if (iface_props)
     iface_props_size = iface_props->size();
 
-  const unsigned int property_id = property_to_id(*object_, *this) + iface_props_size;
+  auto obj_custom_props = get_obj_custom_props(object_->gobj());
+
+  const unsigned int pos_in_obj_custom_props = obj_custom_props->size();
+  obj_custom_props->push_back(this);
+
+  // We need to offset by 1 as zero is an invalid property id.
+  const unsigned int property_id = pos_in_obj_custom_props + iface_props_size + 1;
 
   g_object_class_install_property(G_OBJECT_GET_CLASS(object_->gobj()), property_id, param_spec);
 

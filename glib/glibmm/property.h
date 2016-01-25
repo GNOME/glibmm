@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_PROPERTY_H
 #define _GLIBMM_PROPERTY_H
 
@@ -21,8 +20,6 @@
 
 #include <glibmmconfig.h>
 #include <glibmm/propertyproxy.h>
-
-
 #include <glibmm/value.h>
 
 namespace Glib
@@ -135,9 +132,12 @@ private:
  * The class information must be installed into the GObject system once per
  * property, but this is handled automatically.
  *
- * A property can be used only as direct data member of a type, inheriting from
- * Glib::Object. A reference to the object must be passed to the constructor of
- * the property.
+ * Each property belongs to an object, inheriting from Glib::Object.
+ * A reference to the object must be passed to the constructor of the property.
+ *
+ * Each instance of a Glib::Object-derived type must construct the same properties
+ * (same type, same name) in the same order. One way to achieve this is to
+ * declare all properties as direct data members of the type.
  *
  * You may register new properties for your class (actually for the underlying GType)
  * simply by adding a Property instance as a class member.
