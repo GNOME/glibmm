@@ -22,6 +22,7 @@
 #include <glibmm/propertyproxy_base.h> //For PropertyProxyConnectionNode
 #include <glibmm/interface.h>
 #include <glibmm/private/interface_p.h>
+#include <utility> // For std::move()
 
 namespace
 {
@@ -342,23 +343,31 @@ void ObjectBase::connect_property_changed(const Glib::ustring& property_name, co
   connect_property_changed_with_return(property_name, slot);
 }
 
+void ObjectBase::connect_property_changed(const Glib::ustring& property_name, sigc::slot<void>&& slot)
+{
+  connect_property_changed_with_return(property_name, std::move(slot));
+}
+
 sigc::connection ObjectBase::connect_property_changed_with_return(const Glib::ustring& property_name, const sigc::slot<void>& slot)
 {
   // Create a proxy to hold our connection info
   // This will be deleted by destroy_notify_handler.
-  PropertyProxyConnectionNode* pConnectionNode = new PropertyProxyConnectionNode(slot, gobj());
+  auto pConnectionNode = new PropertyProxyConnectionNode(slot, gobj());
 
-  // connect it to gtk+
+  // connect it to glib
   // pConnectionNode will be passed as the data argument to the callback.
-  // The callback will then call the virtual Object::property_change_notify() method,
-  // which will contain a switch/case statement which will examine the property name.
-  const Glib::ustring notify_signal_name = "notify::" + property_name;
-  pConnectionNode->connection_id_ = g_signal_connect_data(gobj(),
-         notify_signal_name.c_str(), (GCallback)(&PropertyProxyConnectionNode::callback), pConnectionNode,
-         &PropertyProxyConnectionNode::destroy_notify_handler,
-         G_CONNECT_AFTER);
+  return pConnectionNode->connect_changed(property_name);
+}
 
-  return sigc::connection(pConnectionNode->slot_);
+sigc::connection ObjectBase::connect_property_changed_with_return(const Glib::ustring& property_name, sigc::slot<void>&& slot)
+{
+  // Create a proxy to hold our connection info
+  // This will be deleted by destroy_notify_handler.
+  auto pConnectionNode = new PropertyProxyConnectionNode(std::move(slot), gobj());
+
+  // connect it to glib
+  // pConnectionNode will be passed as the data argument to the callback.
+  return pConnectionNode->connect_changed(property_name);
 }
 
 void ObjectBase::freeze_notify()

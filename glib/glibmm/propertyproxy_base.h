@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_PROPERTYPROXY_BASE_H
 #define _GLIBMM_PROPERTYPROXY_BASE_H
 
@@ -41,7 +40,10 @@ public:
   ~SignalProxyProperty() noexcept;
 
   typedef sigc::slot<void> SlotType;
-  sigc::connection connect(const SlotType& sl);
+  sigc::connection connect(const SlotType& slot);
+  /** @newin{2,48}
+   */
+  sigc::connection connect(SlotType&& slot);
 
 protected:
 
@@ -84,7 +86,7 @@ private:
 class SignalProxyProperty;
 
 /** PropertyProxyConnectionNode is a connection node for use with SignalProxyProperty.
-  * It's like ProxyConnectionNode, but it contains the property name too.
+  * It's like SignalProxyConnectionNode, but it contains the property name too.
   * This is not public API.
   */
 class PropertyProxyConnectionNode : public SignalProxyConnectionNode
@@ -93,6 +95,16 @@ public:
   friend class SignalProxyProperty;
 
   PropertyProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject);
+  /** @newin{2,48}
+   */
+  PropertyProxyConnectionNode(sigc::slot_base&& slot, GObject* gobject);
+
+  /** Connect callback() to the notify::property_name signal.
+   * It invokes the slot, supplied in the constructor.
+   *
+   * @newin{2,48}
+   */
+  sigc::connection connect_changed(const Glib::ustring& property_name);
 
   static void callback(GObject* object, GParamSpec* pspec, gpointer data);
 };
@@ -101,7 +113,4 @@ public:
 
 } // namespace Glib
 
-
-
 #endif /* _GLIBMM_PROPERTYPROXY_BASE_H */
-

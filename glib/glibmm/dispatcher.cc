@@ -1,6 +1,3 @@
-// -*- c++ -*-
-/* $Id$ */
-
 /* Copyright 2002 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -27,6 +24,7 @@
 #include <fcntl.h>
 #include <glib.h>
 #include <set>
+#include <utility> // For std::move()
 
 #ifdef G_OS_WIN32
 # include <windows.h>
@@ -499,6 +497,11 @@ void Dispatcher::operator()()
 sigc::connection Dispatcher::connect(const sigc::slot<void>& slot)
 {
   return signal_.connect(slot);
+}
+
+sigc::connection Dispatcher::connect(sigc::slot<void>&& slot)
+{
+  return signal_.connect(std::move(slot));
 }
 
 } // namespace Glib

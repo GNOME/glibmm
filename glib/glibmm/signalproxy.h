@@ -29,6 +29,7 @@ extern "C"
 #include <sigc++/sigc++.h>
 #include <glibmm/signalproxy_connectionnode.h>
 #include <glibmm/ustring.h>
+#include <utility> // std::move()
 
 namespace Glib
 {
@@ -121,6 +122,14 @@ protected:
    */
   sigc::slot_base& connect_notify_(const sigc::slot_base& slot, bool after);
 
+  /** Connects a signal handler to a signal.
+   * @see connect_(const sigc::slot_base& slot, bool after) and
+   * connect_notify_(const sigc::slot_base& slot, bool after).
+   *
+   * @newin{2,48}
+   */
+  sigc::slot_base& connect_impl_(bool notify, sigc::slot_base&& slot, bool after);
+
 private:
   const SignalProxyInfo* info_;
 
@@ -159,6 +168,14 @@ public:
   sigc::connection connect(const SlotType& slot, bool after = true)
     { return sigc::connection(connect_(slot, after)); }
 
+  /** Connects a signal handler to a signal.
+   * @see connect(const SlotType& slot, bool after).
+   *
+   * @newin{2,48}
+   */
+  sigc::connection connect(SlotType&& slot, bool after = true)
+    { return sigc::connection(connect_impl_(false, std::move(slot), after)); }
+
   /** Connects a signal handler without a return value to a signal.
    * By default, the signal handler will be called before the default signal handler.
    *
@@ -182,6 +199,14 @@ public:
    */
   sigc::connection connect_notify(const VoidSlotType& slot, bool after = false)
     { return sigc::connection(connect_notify_(slot, after)); }
+
+  /** Connects a signal handler without a return value to a signal.
+   * @see connect_notify(const VoidSlotType& slot, bool after).
+   *
+   * @newin{2,48}
+   */
+  sigc::connection connect_notify(VoidSlotType&& slot, bool after = false)
+    { return sigc::connection(connect_impl_(true, std::move(slot), after)); }
 };
 
 /* Templates below has been added to avoid API break, and should not be
@@ -204,6 +229,10 @@ template <typename R, typename T1, typename T2, typename T3, typename T4, typena
 using SignalProxy6 = SignalProxy<R, T1, T2, T3, T4, T5, T6>;
 
  
+//TODO: When we can break ABI, consider renaming
+// SignalProxyDetailed => SignalProxyDetailedBase
+// SignalProxyDetailedAnyType => SignalProxyDetailed
+
 // Shared portion of a Signal with detail
 /** The SignalProxy provides an API similar to sigc::signal that can be used to
  * connect sigc::slots to glib signals.
@@ -232,13 +261,20 @@ protected:
   SignalProxyDetailed(Glib::ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name);
 
   /** Connects a signal handler to a signal.
-   * This is called by connect() and connect_notify() in derived SignalProxy classes.
+   * This is called by connect() and connect_notify() in derived SignalProxyDetailedAnyType classes.
    *
    * @param notify Whether this method is called by connect_notify() or by connect().
    * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
    * @param after Whether this signal handler should be called before or after the default signal handler.
    */
   sigc::slot_base& connect_impl_(bool notify, const sigc::slot_base& slot, bool after);
+
+  /** Connects a signal handler to a signal.
+   * @see connect_impl_(bool notify, const sigc::slot_base& slot, bool after).
+   *
+   * @newin{2,48}
+   */
+  sigc::slot_base& connect_impl_(bool notify, sigc::slot_base&& slot, bool after);
 
 private:
   const SignalProxyInfo* info_; // Pointer to statically allocated structure.
@@ -272,6 +308,14 @@ public:
   sigc::connection connect(const SlotType& slot, bool after = true)
     { return sigc::connection(connect_impl_(false, slot, after)); }
 
+  /** Connects a signal handler to a signal.
+   * @see connect(const SlotType& slot, bool after).
+   *
+   * @newin{2,48}
+   */
+  sigc::connection connect(SlotType&& slot, bool after = true)
+    { return sigc::connection(connect_impl_(false, std::move(slot), after)); }
+
   /** Connects a signal handler without a return value to a signal.
    * By default, the signal handler will be called before the default signal handler.
    *
@@ -295,6 +339,14 @@ public:
    */
   sigc::connection connect_notify(const VoidSlotType& slot, bool after = false)
     { return sigc::connection(connect_impl_(true, slot, after)); }
+
+  /** Connects a signal handler without a return value to a signal.
+   * @see connect_notify(const VoidSlotType& slot, bool after).
+   *
+   * @newin{2,48}
+   */
+  sigc::connection connect_notify(VoidSlotType&& slot, bool after = false)
+    { return sigc::connection(connect_impl_(true, std::move(slot), after)); }
 };
 
 /* Templates below has been added to avoid API break, and should not be

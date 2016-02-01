@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_DISPATCHER_H
 #define _GLIBMM_DISPATCHER_H
-
-/* $Id$ */
 
 /* Copyright 2002 The gtkmm Development Team
  *
@@ -92,6 +89,9 @@ public:
   void operator()();
 
   sigc::connection connect(const sigc::slot<void>& slot);
+  /** @newin{2,48}
+   */
+  sigc::connection connect(sigc::slot<void>&& slot);
 
 private:
   sigc::signal<void> signal_;

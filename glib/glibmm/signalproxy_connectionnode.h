@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_SIGNALPROXY_CONNECTIONNODE_H
 #define _GLIBMM_SIGNALPROXY_CONNECTIONNODE_H
-
-/* $Id$ */
 
 /* signalproxy_connectionnode.h
  *
@@ -49,6 +46,13 @@ public:
    */
   SignalProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject);
 
+  /** @param slot The signal handler for the glib signal.
+   *  @param gobject The GObject that might emit this glib signal
+   *
+   * @newin{2,48}
+   */
+  SignalProxyConnectionNode(sigc::slot_base&& slot, GObject* gobject);
+
   /** Callback that is executed when the slot becomes invalid.
    * This callback is registered in the slot.
    * @param data The SignalProxyConnectionNode object (@p this).
@@ -72,6 +76,4 @@ protected:
 
 } /* namespace Glib */
 
-
 #endif /* _GLIBMM_SIGNALPROXY_CONNECTIONNODE_H */
-

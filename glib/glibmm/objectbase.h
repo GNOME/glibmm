@@ -119,20 +119,32 @@ public:
   template <class PropertyType>
   void get_property(const Glib::ustring& property_name, PropertyType& value) const;
 
-  /** You can use the signal_changed() signal of the property proxy instead,
-   * but this is necessary when using the reduced API.
+  //TODO: At the next ABI break, delete connect_property_changed_with_return()
+  // and let connect_property_changed() return sigc::connection.
+  /** You can use the signal_changed() signal of the property proxy instead.
    *
    * See also connect_property_changed_with_return().
    */
   void connect_property_changed(const Glib::ustring& property_name, const sigc::slot<void>& slot);
 
-  /** You can use the signal_changed() signal of the property proxy instead,
-   * but this is necessary when using the reduced API.
+  /** You can use the signal_changed() signal of the property proxy instead.
+   *
+   * @newin{2,48}
+   */
+  void connect_property_changed(const Glib::ustring& property_name, sigc::slot<void>&& slot);
+
+  /** You can use the signal_changed() signal of the property proxy instead.
    *
    * This method was added because connect_property_changed() does not return a sigc::connection,
    * and we could not break the ABI by changing that function.
    */
   sigc::connection connect_property_changed_with_return(const Glib::ustring& property_name, const sigc::slot<void>& slot);
+
+  /** You can use the signal_changed() signal of the property proxy instead.
+   *
+   * @newin{2,48}
+   */
+  sigc::connection connect_property_changed_with_return(const Glib::ustring& property_name, sigc::slot<void>&& slot);
 
   /** Increases the freeze count on object. If the freeze count is non-zero, the
    * emission of "notify" signals on object is stopped. The signals are queued

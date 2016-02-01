@@ -1,7 +1,3 @@
-// -*- c++ -*-
-
-/* $Id$ */
-
 /* signalproxy_connectionnode.cc
  *
  * Copyright (C) 2002 The gtkmm Development Team
@@ -23,7 +19,7 @@
 
 #include <glibmm/signalproxy_connectionnode.h>
 #include <glibmm/object.h>
-
+#include <utility> // std::move()
 
 namespace Glib
 {
@@ -32,6 +28,16 @@ SignalProxyConnectionNode::SignalProxyConnectionNode(const sigc::slot_base& slot
 :
   connection_id_ (0),
   slot_          (slot),
+  object_        (gobject)
+{
+  //The cleanup callback will be called when the connection is disconnected.
+  slot_.set_parent(this, &SignalProxyConnectionNode::notify /* cleanup callback */);
+}
+
+SignalProxyConnectionNode::SignalProxyConnectionNode(sigc::slot_base&& slot, GObject* gobject)
+:
+  connection_id_ (0),
+  slot_          (std::move(slot)),
   object_        (gobject)
 {
   //The cleanup callback will be called when the connection is disconnected.
@@ -91,4 +97,3 @@ void SignalProxyConnectionNode::destroy_notify_handler(gpointer data, GClosure*)
 }
 
 } /* namespace Glib */
-
