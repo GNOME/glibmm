@@ -635,7 +635,7 @@ void Connection::call(
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_call(gobj(), bus_name.c_str(), object_path.c_str(),
+  g_dbus_connection_call(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
     interface_name.c_str(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
     static_cast<GDBusCallFlags>(flags), timeout_msec,
@@ -659,7 +659,7 @@ void Connection::call(
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_call(gobj(), bus_name.c_str(), object_path.c_str(),
+  g_dbus_connection_call(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
     interface_name.c_str(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
     static_cast<GDBusCallFlags>(flags), timeout_msec, nullptr,
@@ -680,7 +680,7 @@ Glib::VariantContainerBase Connection::call_sync(
   GError* gerror = nullptr;
 
   GVariant* const gvariant =
-    g_dbus_connection_call_sync(gobj(), bus_name.c_str(), object_path.c_str(),
+    g_dbus_connection_call_sync(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
     interface_name.c_str(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
     static_cast<GDBusCallFlags>(flags), timeout_msec,
@@ -706,7 +706,7 @@ Glib::VariantContainerBase Connection::call_sync(
   GError* gerror = nullptr;
 
   GVariant* const gvariant =
-    g_dbus_connection_call_sync(gobj(), bus_name.c_str(), object_path.c_str(),
+    g_dbus_connection_call_sync(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
     interface_name.c_str(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
     static_cast<GDBusCallFlags>(flags), timeout_msec, nullptr, &gerror);
@@ -737,7 +737,7 @@ void Connection::call(
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_call_with_unix_fd_list(gobj(), bus_name.c_str(),
+  g_dbus_connection_call_with_unix_fd_list(gobj(), Glib::c_str_or_nullptr(bus_name),
     object_path.c_str(), interface_name.c_str(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
     static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(fd_list),
@@ -762,7 +762,7 @@ void Connection::call(
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_call_with_unix_fd_list(gobj(), bus_name.c_str(),
+  g_dbus_connection_call_with_unix_fd_list(gobj(), Glib::c_str_or_nullptr(bus_name),
     object_path.c_str(), interface_name.c_str(), method_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
     static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(fd_list),
@@ -779,15 +779,12 @@ void Connection::emit_signal(
 {
   GError* gerror = nullptr;
 
-  // Strings are checked to see if they are empty so that nullptr can be passed
-  // for those strings to the C API.  This is done because some strings such as
-  // the bus name can be nullptr in the C API meaning that the signal should be
-  // emitted to all the listeners.
+  // destination_bus_name is checked to see if it is empty so that nullptr can be passed
+  // to the C API. This is done because the bus name can be nullptr in the C API,
+  // meaning that the signal should be emitted to all the listeners.
   g_dbus_connection_emit_signal(gobj(),
     Glib::c_str_or_nullptr(destination_bus_name),
-    Glib::c_str_or_nullptr(object_path),
-    Glib::c_str_or_nullptr(interface_name),
-    Glib::c_str_or_nullptr(signal_name),
+    object_path.c_str(), interface_name.c_str(), signal_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), &gerror);
 
   if(gerror)
