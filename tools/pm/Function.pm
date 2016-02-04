@@ -5,10 +5,13 @@ use warnings;
 use Util;
 use FunctionBase;
 
-# These are flags that indicate whether parameters are optional or output
-# parameters.
+# These flags indicate whether parameters are optional or output parameters.
 use constant FLAG_PARAM_OPTIONAL => 1;
 use constant FLAG_PARAM_OUTPUT => 2;
+# These flags indicate how an empty string shall be translated to a C string:
+# to a nullptr or to a pointer to an empty string.
+use constant FLAG_PARAM_NULLPTR => 4;
+use constant FLAG_PARAM_EMPTY_STRING => 8;
 
 BEGIN {
      use Exporter   ();
@@ -21,7 +24,8 @@ BEGIN {
      %EXPORT_TAGS = ( );
      # your exported package globals go here,
      # as well as any optionally exported functions
-     @EXPORT_OK   = qw($Var1 %Hashit &func3 FLAG_PARAM_OPTIONAL FLAG_PARAM_OUTPUT);
+     @EXPORT_OK   = qw($Var1 %Hashit &func3 FLAG_PARAM_OPTIONAL FLAG_PARAM_OUTPUT
+                       FLAG_PARAM_NULLPTR FLAG_PARAM_EMPTY_STRING);
      }
 our @EXPORT_OK;
 
@@ -237,6 +241,12 @@ sub parse_param($$)
       # Check if param should be optional or an output param.
       $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
       $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
+
+      # Delete "NULL" from $options, so it won't be interpreted as a parameter name.
+      if ($options =~ s/(!?\bNULL\b)//)
+      {
+        $flags |= ($1 eq "!NULL") ? FLAG_PARAM_EMPTY_STRING : FLAG_PARAM_NULLPTR;
+      }
 
       # Check if it should be mapped to a C param.
       if ($options =~ /(\w+|\.)/)

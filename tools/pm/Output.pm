@@ -19,7 +19,8 @@
 package Output;
 use strict;
 use open IO => ":utf8";
-use Function qw(FLAG_PARAM_OPTIONAL FLAG_PARAM_OUTPUT);
+use Function qw(FLAG_PARAM_OPTIONAL FLAG_PARAM_OUTPUT FLAG_PARAM_NULLPTR
+                FLAG_PARAM_EMPTY_STRING);
 
 use DocsParser;
 
@@ -1265,8 +1266,13 @@ sub convert_args_cpp_to_c($$$$$)
             $cppParamName,
             $wrap_line_number);
 
-      if (($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_OPTIONAL) &&
-       $cppParamType =~ /^(const\s+)?(std::string|Glib::ustring)&?/)
+      # Shall an empty string be translated to a nullptr or to a pointer to
+      # an empty string? The default is "pointer to an empty string" for
+      # mandatory parameters, nullptr for optional parameters.
+      if (($$cpp_param_flags[$cpp_param_index] & FLAG_PARAM_NULLPTR) ||
+        (($$cpp_param_flags[$cpp_param_index] &
+         (FLAG_PARAM_OPTIONAL | FLAG_PARAM_EMPTY_STRING)) == FLAG_PARAM_OPTIONAL && # OPTIONAL and not EMPTY_STRING
+        $cppParamType =~ /^(const\s+)?(std::string|Glib::ustring)&?/))
       {
         push(@conversions, "$cppParamName.empty() ? nullptr : " . $std_conversion);
       }
