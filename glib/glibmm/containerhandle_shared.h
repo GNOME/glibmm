@@ -378,7 +378,7 @@ template <class Cont, class In>
 void fill_container(Cont& container, In pbegin, In pend)
 {
   for(; pbegin != pend; ++pbegin)
-    container.push_back(*pbegin);
+    container.emplace_back(*pbegin);
 }
 
 #endif /* GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS */

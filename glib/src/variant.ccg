@@ -175,7 +175,7 @@ VariantContainerBase
 VariantContainerBase::create_tuple(const VariantBase& child)
 {
   std::vector<VariantBase> vec;
-  vec.push_back(child);
+  vec.emplace_back(child);
   return create_tuple(vec);
 }
 
@@ -492,7 +492,7 @@ type_vec_ustring Variant<type_vec_ustring>::get() const
     GVariant* gvariant =
       g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
 
-    result.push_back(Glib::Variant<Glib::ustring>(gvariant).get());
+    result.emplace_back(Glib::Variant<Glib::ustring>(gvariant).get());
   }
 
   return result;
@@ -597,7 +597,7 @@ type_vec_string Variant<type_vec_string>::get() const
     GVariant* gvariant =
       g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
 
-    result.push_back(Glib::Variant<std::string>(gvariant).get());
+    result.emplace_back(Glib::Variant<std::string>(gvariant).get());
   }
 
   return result;

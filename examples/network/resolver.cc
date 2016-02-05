@@ -137,9 +137,9 @@ split_service_parts (const Glib::ustring& arg)
     delim2 = arg.find ('/', delim1 + 1);
     if (delim2 == std::string::npos)
         return parts;
-    parts.push_back (arg.substr (0, delim1));
-    parts.push_back (arg.substr (delim1 + 1, delim2 - delim1 - 1));
-    parts.push_back (arg.substr (delim2 + 1));
+    parts.emplace_back (arg.substr (0, delim1));
+    parts.emplace_back (arg.substr (delim1 + 1, delim2 - delim1 - 1));
+    parts.emplace_back (arg.substr (delim2 + 1));
 
     return parts;
 }
@@ -210,7 +210,7 @@ start_threaded_lookups (char **argv, int argc)
   {
     const Glib::ustring arg = argv[i];
     const auto thread = new std::thread(&lookup_thread, arg);
-    result.push_back(thread);
+    result.emplace_back(thread);
   }
 
   return result;

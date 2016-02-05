@@ -140,9 +140,9 @@ main()
   auto ptree = Glib::BalancedTree<type_p_key_value, type_p_key_value>::create(sigc::ptr_fun(my_p_key_compare));
 
   for (type_key_value::size_type i = 0; i < str.size(); ++i)
-    pstr.push_back(new type_key_value(str.substr(i, 1)));
+    pstr.emplace_back(new type_key_value(str.substr(i, 1)));
   for (type_key_value::size_type i = 0; i < str2.size(); ++i)
-    pstr2.push_back(new type_key_value(str2.substr(i, 1)));
+    pstr2.emplace_back(new type_key_value(str2.substr(i, 1)));
 
   for (type_key_value::size_type i = 0; i < str.size(); ++i)
     ptree->insert(pstr[i], pstr[i]);

@@ -186,7 +186,7 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
         GValue* g_value = g_new0(GValue, 1);
         g_value_init(g_value, G_VALUE_TYPE((*iface_props)[p]));
         g_value_copy((*iface_props)[p], g_value);
-        obj_iface_props->push_back(g_value);
+        obj_iface_props->emplace_back(g_value);
       }
     }
 
@@ -245,7 +245,7 @@ bool PropertyBase::lookup_property(const Glib::ustring& name)
     g_assert(G_PARAM_SPEC_VALUE_TYPE(param_spec_) == G_VALUE_TYPE(value_.gobj()));
     g_param_spec_ref(param_spec_);
 
-    get_obj_custom_props(object_->gobj())->push_back(this);
+    get_obj_custom_props(object_->gobj())->emplace_back(this);
   }
 
   return (param_spec_ != nullptr);
@@ -271,7 +271,7 @@ void PropertyBase::install_property(GParamSpec* param_spec)
   auto obj_custom_props = get_obj_custom_props(object_->gobj());
 
   const unsigned int pos_in_obj_custom_props = obj_custom_props->size();
-  obj_custom_props->push_back(this);
+  obj_custom_props->emplace_back(this);
 
   // We need to offset by 1 as zero is an invalid property id.
   const unsigned int property_id = pos_in_obj_custom_props + iface_props_size + 1;

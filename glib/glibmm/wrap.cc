@@ -86,7 +86,7 @@ void wrap_register(GType type, WrapNewFunction func)
     return;
 
   const guint idx = wrap_func_table->size();
-  wrap_func_table->push_back(func);
+  wrap_func_table->emplace_back(func);
 
   // Store the table index in the type's static data.
   g_type_set_qdata(type, Glib::quark_, GUINT_TO_POINTER(idx));

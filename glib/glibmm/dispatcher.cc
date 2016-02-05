@@ -330,7 +330,7 @@ void DispatchNotifier::send_notification(Dispatcher* dispatcher)
     const std::lock_guard<std::mutex> lock (mutex_);
 
     const bool was_empty = notify_queue_.empty();
-    notify_queue_.push_back(DispatchNotifyData(dispatcher, this));
+    notify_queue_.emplace_back(DispatchNotifyData(dispatcher, this));
 
     if(was_empty)
     {

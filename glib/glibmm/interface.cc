@@ -81,7 +81,7 @@ Interface::Interface(const Interface_Class& interface_class)
           GValue* g_value = g_new0(GValue, 1);
           g_value_init(g_value, iface_props[p]->value_type);
           g_param_value_set_default(iface_props[p], g_value);
-          props->push_back(g_value);
+          props->emplace_back(g_value);
 
           const gchar* prop_name = g_param_spec_get_name(iface_props[p]);
           GParamSpec* new_spec = g_param_spec_override(prop_name, iface_props[p]);
@@ -99,7 +99,7 @@ Interface::Interface(const Interface_Class& interface_class)
       // The GObject is not instantiated yet. Add to the custom_interface_classes
       // and add the interface in the Glib::Object constructor.
       std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
-      extra_object_base_data[this].custom_interface_classes.push_back(&interface_class);
+      extra_object_base_data[this].custom_interface_classes.emplace_back(&interface_class);
     }
   }
 }

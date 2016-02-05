@@ -58,7 +58,7 @@ sigc::slot<void>* ThreadPool::SlotList::push(const sigc::slot<void>& slot)
 {
   Threads::Mutex::Lock lock (mutex_);
 
-  list_.push_back(slot);
+  list_.emplace_back(slot);
   return &list_.back();
 }
 
