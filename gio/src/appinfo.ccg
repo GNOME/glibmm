@@ -51,8 +51,7 @@ Glib::RefPtr<AppInfo> AppInfo::create_duplicate() const
 
 bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& launch_context)
 {
-  std::vector< Glib::RefPtr<Gio::File> > vec;
-  vec.push_back(file);
+  std::vector< Glib::RefPtr<Gio::File> > vec = {file};
 
   GError* gerror = nullptr;
   const bool retvalue = g_app_info_launch(gobj(),
@@ -66,8 +65,7 @@ bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<App
 
 bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file)
 {
-  std::vector< Glib::RefPtr<Gio::File> > vec;
-  vec.push_back(file);
+  std::vector< Glib::RefPtr<Gio::File> > vec = {file};
 
   GError* gerror = nullptr;
   const bool retvalue = g_app_info_launch(gobj(),
@@ -81,8 +79,7 @@ bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file)
 
 bool AppInfo::launch_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context)
 {
-  std::vector<std::string> vec;
-  vec.push_back(uri);
+  std::vector<std::string> vec = {uri};
 
   GError* gerror = nullptr;
   const bool retvalue = g_app_info_launch_uris(gobj(),
@@ -96,8 +93,7 @@ bool AppInfo::launch_uri(const std::string& uri, const Glib::RefPtr<AppLaunchCon
 
 bool AppInfo::launch_uri(const std::string& uri)
 {
-  std::vector<std::string> vec;
-  vec.push_back(uri);
+  std::vector<std::string> vec = {uri};
 
   GError* gerror = nullptr;
   const bool retvalue = g_app_info_launch_uris(gobj(),

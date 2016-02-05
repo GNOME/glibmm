@@ -51,8 +51,7 @@ int main(int, char**)
   
   
   //vector<std::string>:
-  std::vector<std::string> vec_strings;
-  vec_strings.push_back("a");
+  std::vector<std::string> vec_strings = {"a"};
   auto variant_vec_strings =
     Glib::Variant<std::vector<std::string> >::create(vec_strings);
 
@@ -146,9 +145,7 @@ int main(int, char**)
   typedef std::vector< std::map< Glib::ustring, Glib::Variant<int> > >
     ComplexVecType;
 
-  ComplexVecType complex_vector;
-  complex_vector.push_back(complex_dict1);
-  complex_vector.push_back(complex_dict2);
+  ComplexVecType complex_vector = {complex_dict1, complex_dict2};
 
   auto complex_variant =
     Glib::Variant<ComplexVecType>::create(complex_vector);
