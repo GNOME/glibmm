@@ -30,7 +30,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 AM_MAINTAINER_MODE
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
-MM_PREREQ([0.9.8])
+MM_PREREQ([0.9.10])
 MM_INIT_MODULE([glibmm-2.4])
 MM_INIT_MODULE([giomm-2.4])
 
@@ -43,7 +43,7 @@ MM_CONFIG_DOCTOOL_DIR([docs])
 AC_SUBST([LIBGLIBMM_SO_VERSION], [4:0:3])
 
 AC_PROG_CXX
-MM_AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
+MM_AX_CXX_COMPILE_STDCXX([11], [noext],[mandatory])
 
 AC_DISABLE_STATIC
 LT_INIT([win32-dll])
