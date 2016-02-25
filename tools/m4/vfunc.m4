@@ -89,11 +89,9 @@ ifelse($10,keep_return,`dnl
 ')dnl end refreturn_ctype
 ')dnl end void
       }
+ifelse($16,,,`dnl if (exception_handler)
       catch(...)
       {
-ifelse($16, `', `dnl
-        Glib::exception_handlers_invoke`'();
-', `dnl
         try
         {
 ifelse($9,refreturn_ctype,`dnl
@@ -102,12 +100,30 @@ ifelse($9,refreturn_ctype,`dnl
           return _CONVERT($3, $4, `obj->$16`'()');
 ')dnl
         }
-        catch(...)
-        {
-          Glib::exception_handlers_invoke`'();
-        }
+')dnl end exception_handler
+ifelse($12,errthrow,`dnl
+      catch(Glib::Error& errormm)
+      {
+        errormm.propagate(error);
+ifelse($4,void,`dnl
+        return;
+',`dnl
+ifelse(`$15', `',`dnl
+        using RType = $4;
+        return RType`'();
+',`dnl
+        return _CONVERT($3,$4,`$15');
+')dnl
 ')dnl
       }
+')dnl end errthrow
+      catch(...)
+      {
+        Glib::exception_handlers_invoke`'();
+      }
+ifelse($16,,,`dnl if (exception_handler)
+      }
+')dnl
     }
   }
 
@@ -121,17 +137,9 @@ dnl  g_assert(base != nullptr);
 
   // Call the original underlying C function:
   if(base && base->$2)
-  {
-    ifelse($4,void,,`$4 retval = ')(*base->$2)`'($6);
-ifelse($12,errthrow,`dnl
-    if(*error)
-      ::Glib::Error::throw_exception(*error);
-')dnl
-ifelse($4,void,,`    return retval;
-')dnl
-  }
-
+    ifelse($4,void,,`return ')(*base->$2)`'($6);
 ifelse($4,void,,`dnl
+
 ifelse(`$15', `',`dnl
   typedef $4 RType;
   return RType`'();
