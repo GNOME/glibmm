@@ -23,7 +23,8 @@
 namespace
 {
 
-gboolean giomm_generic_socket_callback(sigc::slot_base* slot, GIOCondition condition)
+gboolean
+giomm_generic_socket_callback(sigc::slot_base* slot, GIOCondition condition)
 {
   g_return_val_if_fail(slot != nullptr, FALSE);
 
@@ -39,13 +40,15 @@ gboolean giomm_generic_socket_callback(sigc::slot_base* slot, GIOCondition condi
   return 0;
 }
 
-gboolean giomm_signalsocket_callback(GSocket*, GIOCondition condition, void* user_data)
+gboolean
+giomm_signalsocket_callback(GSocket*, GIOCondition condition, void* user_data)
 {
   sigc::slot_base* const slot = Glib::Source::get_slot_from_connection_node(user_data);
   return giomm_generic_socket_callback(slot, condition);
 }
 
-gboolean giomm_socketsource_callback(GSocket*, GIOCondition condition, void* user_data)
+gboolean
+giomm_socketsource_callback(GSocket*, GIOCondition condition, void* user_data)
 {
   sigc::slot_base* const slot = Glib::Source::get_slot_from_callback_data(user_data);
   return giomm_generic_socket_callback(slot, condition);
@@ -53,28 +56,28 @@ gboolean giomm_socketsource_callback(GSocket*, GIOCondition condition, void* use
 
 } // anonymous namespace
 
-
 namespace Gio
 {
 
 /**** Glib::SignalSocket *******************************************************/
 
-inline
-SignalSocket::SignalSocket(GMainContext* context)
-:
-  context_(context)
-{}
-
-sigc::connection SignalSocket::connect(const sigc::slot<bool,Glib::IOCondition>& slot,
-                                       const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
-                                       const Glib::RefPtr<Cancellable>& cancellable, int priority)
+inline SignalSocket::SignalSocket(GMainContext* context) : context_(context)
 {
-  GSource* const source = g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable));
-  return Glib::Source::attach_signal_source(slot, priority, source, context_,
-                                            (GSourceFunc)&giomm_signalsocket_callback);
 }
 
-SignalSocket signal_socket(const Glib::RefPtr<Glib::MainContext>& context)
+sigc::connection
+SignalSocket::connect(const sigc::slot<bool, Glib::IOCondition>& slot,
+  const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
+  const Glib::RefPtr<Cancellable>& cancellable, int priority)
+{
+  GSource* const source =
+    g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable));
+  return Glib::Source::attach_signal_source(
+    slot, priority, source, context_, (GSourceFunc)&giomm_signalsocket_callback);
+}
+
+SignalSocket
+signal_socket(const Glib::RefPtr<Glib::MainContext>& context)
 {
   return SignalSocket(Glib::unwrap(context)); // 0 means default context
 }
@@ -82,20 +85,23 @@ SignalSocket signal_socket(const Glib::RefPtr<Glib::MainContext>& context)
 /**** Glib::SocketSource *******************************************************/
 
 // static
-Glib::RefPtr<SocketSource> SocketSource::create(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
-                                                const Glib::RefPtr<Cancellable>& cancellable)
+Glib::RefPtr<SocketSource>
+SocketSource::create(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
+  const Glib::RefPtr<Cancellable>& cancellable)
 {
   return Glib::RefPtr<SocketSource>(new SocketSource(socket, condition, cancellable));
 }
 
 SocketSource::SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
-                           const Glib::RefPtr<Cancellable>& cancellable)
-:
-  IOSource(g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable)),
-           (GSourceFunc)&giomm_socketsource_callback)
-{}
+  const Glib::RefPtr<Cancellable>& cancellable)
+: IOSource(
+    g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable)),
+    (GSourceFunc)&giomm_socketsource_callback)
+{
+}
 
 SocketSource::~SocketSource() noexcept
-{}
+{
+}
 
 } // namespace Gio
