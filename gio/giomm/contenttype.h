@@ -45,8 +45,7 @@ namespace Gio
  *
  * @return true if the two strings are identical or equivalent, false otherwise.
  */
-bool content_type_equals(const Glib::ustring& type1,
-                         const Glib::ustring& type2);
+bool content_type_equals(const Glib::ustring& type1, const Glib::ustring& type2);
 
 /**
  * Determines if @a type is a subset of @a supertype.
@@ -56,8 +55,7 @@ bool content_type_equals(const Glib::ustring& type1,
  *
  * @return true if @a type is a kind of @a supertype, false otherwise.
  */
-bool content_type_is_a(const Glib::ustring& type,
-                       const Glib::ustring& supertype);
+bool content_type_is_a(const Glib::ustring& type, const Glib::ustring& supertype);
 
 /**
  * Checks if the content type is the generic "unknown" type.
@@ -142,9 +140,8 @@ Glib::ustring content_type_from_mime_type(const Glib::ustring& mime_type);
  * @return A string indicating a guessed content type for the
  * given data.
  */
-Glib::ustring content_type_guess(const std::string& filename,
-                                 const guchar* data, gsize data_size,
-                                 bool& result_uncertain);
+Glib::ustring content_type_guess(
+  const std::string& filename, const guchar* data, gsize data_size, bool& result_uncertain);
 
 /**
  * Guesses the content type based on example data. If the function is uncertain,
@@ -157,9 +154,8 @@ Glib::ustring content_type_guess(const std::string& filename,
  * @return A string indicating a guessed content type for the
  * given data.
  */
-Glib::ustring content_type_guess(const std::string& filename,
-                                 const std::string& data,
-                                 bool& result_uncertain);
+Glib::ustring content_type_guess(
+  const std::string& filename, const std::string& data, bool& result_uncertain);
 
 /** Tries to guess the type of the tree with root @a root, by
  * looking at the files it contains. The result is a list

@@ -56,7 +56,8 @@ public:
    *
    * @newin{2,42}
    *
-   * @param slot A slot to call when polling @a socket results in an event that matches @a condition.
+   * @param slot A slot to call when polling @a socket results in an event that matches @a
+   * condition.
    * The event will be passed as a parameter to @a slot.
    * If <tt>io_handler()</tt> returns <tt>false</tt> the handler is disconnected.
    * @param socket The Socket object to watch.
@@ -80,7 +81,6 @@ private:
   SignalSocket& operator=(const SignalSocket&);
 };
 
-
 /** Convenience socket signal.
  * @param context The main context to which the signal shall be attached.
  * @return A signal proxy; you want to use SignalSocket::connect().
@@ -88,8 +88,8 @@ private:
  * @newin{2,42}
  * @ingroup NetworkIO
  */
-SignalSocket signal_socket(const Glib::RefPtr<Glib::MainContext>& context = Glib::RefPtr<Glib::MainContext>());
-
+SignalSocket signal_socket(
+  const Glib::RefPtr<Glib::MainContext>& context = Glib::RefPtr<Glib::MainContext>());
 
 /** An event source that can monitor a Gio::Socket.
  * @see Gio::Socket::create_source().
@@ -102,7 +102,8 @@ class SocketSource : public Glib::IOSource
 public:
   typedef Gio::SocketSource CppObjectType;
 
-  static Glib::RefPtr<SocketSource> create(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
+  static Glib::RefPtr<SocketSource> create(const Glib::RefPtr<Socket>& socket,
+    Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
 
 protected:

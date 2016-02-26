@@ -21,7 +21,6 @@
 namespace Gio
 {
 
-void
-SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data);
+void SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data);
 
-} //namespace Gio
+} // namespace Gio

@@ -30,7 +30,6 @@ namespace Gio
  */
 void init();
 
-}//end namespace Gio
+} // end namespace Gio
 
 #endif //_GIOMM_INIT_H
-

@@ -23,8 +23,7 @@
 
 namespace Gio
 {
-  void wrap_init() ;
+void wrap_init();
 }
 
 #endif //_GIOMM_WRAP_INIT_H
-
