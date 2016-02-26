@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
 #include <giomm/file.h>
@@ -25,143 +24,127 @@
 #include <gio/gio.h>
 #include "slot_async.h"
 
-namespace Gio {
+namespace Gio
+{
 
 void
-Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags)
+Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_volume_mount(gobj(),
-                 static_cast<GMountMountFlags>(flags),
-                 Glib::unwrap(mount_operation),
-                 Glib::unwrap(cancellable),
-                 &SignalProxy_async_callback,
-                 slot_copy);
-
+  g_volume_mount(gobj(), static_cast<GMountMountFlags>(flags), Glib::unwrap(mount_operation),
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
 void
-Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountMountFlags flags)
+Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot,
+  MountMountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_volume_mount(gobj(),
-                 static_cast<GMountMountFlags>(flags),
-                 Glib::unwrap(mount_operation),
-                 nullptr, // cancellable
-                 &SignalProxy_async_callback,
-                 slot_copy);
+  g_volume_mount(gobj(), static_cast<GMountMountFlags>(flags), Glib::unwrap(mount_operation),
+    nullptr, // cancellable
+    &SignalProxy_async_callback, slot_copy);
 }
 
 void
 Volume::mount(const Glib::RefPtr<MountOperation>& mount_operation, MountMountFlags flags)
 {
-  g_volume_mount(gobj(),
-                 static_cast<GMountMountFlags>(flags),
-                 Glib::unwrap(mount_operation),
-                 nullptr, // cancellable
-                 nullptr,
-                 nullptr);
+  g_volume_mount(gobj(), static_cast<GMountMountFlags>(flags), Glib::unwrap(mount_operation),
+    nullptr, // cancellable
+    nullptr, nullptr);
 }
 
 void
 Volume::mount(MountMountFlags flags)
 {
-  g_volume_mount(gobj(),
-                 static_cast<GMountMountFlags>(flags),
-                 nullptr,
-                 nullptr, // cancellable
-                 nullptr,
-                 nullptr);
+  g_volume_mount(gobj(), static_cast<GMountMountFlags>(flags), nullptr,
+    nullptr, // cancellable
+    nullptr, nullptr);
 }
 
-
-void Volume::eject(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
+void
+Volume::eject(
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_volume_eject_with_operation(gobj(),
-                                static_cast<GMountUnmountFlags>(flags),
-                                nullptr, // mount_operation
-                                Glib::unwrap(cancellable),
-                                &SignalProxy_async_callback,
-                                slot_copy);
+  g_volume_eject_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
+    nullptr, // mount_operation
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-void Volume::eject(const SlotAsyncReady& slot, MountUnmountFlags flags)
+void
+Volume::eject(const SlotAsyncReady& slot, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_volume_eject_with_operation(gobj(),
-                                static_cast<GMountUnmountFlags>(flags),
-                                nullptr, // mount_operation
-                                nullptr, // cancellable
-                                &SignalProxy_async_callback,
-                                slot_copy);
+  g_volume_eject_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
+    nullptr, // mount_operation
+    nullptr, // cancellable
+    &SignalProxy_async_callback, slot_copy);
 }
 
-void Volume::eject(MountUnmountFlags flags)
+void
+Volume::eject(MountUnmountFlags flags)
 {
-  g_volume_eject_with_operation(gobj(),
-                                static_cast<GMountUnmountFlags>(flags),
-                                nullptr, // mount_operation
-                                nullptr, // cancellable
-                                nullptr, // callback
-                                nullptr); // data
+  g_volume_eject_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
+    nullptr, // mount_operation
+    nullptr, // cancellable
+    nullptr, // callback
+    nullptr); // data
 }
 
-void Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
-{
-  // Create a copy of the slot.
-  // A pointer to it will be passed through the callback's data parameter
-  // and deleted in the callback.
-  auto slot_copy = new SlotAsyncReady(slot);
-
-  g_volume_eject_with_operation(gobj(),
-                                static_cast<GMountUnmountFlags>(flags),
-                                Glib::unwrap(mount_operation),
-                                Glib::unwrap(cancellable),
-                                &SignalProxy_async_callback,
-                                slot_copy);
-}
-
-void Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot, MountUnmountFlags flags)
+void
+Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, MountUnmountFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_volume_eject_with_operation(gobj(),
-                                static_cast<GMountUnmountFlags>(flags),
-                                Glib::unwrap(mount_operation),
-                                nullptr, // cancellable
-                                &SignalProxy_async_callback,
-                                slot_copy);
+  g_volume_eject_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
+    Glib::unwrap(mount_operation), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+    slot_copy);
 }
 
-void Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, MountUnmountFlags flags)
+void
+Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, const SlotAsyncReady& slot,
+  MountUnmountFlags flags)
 {
-    g_volume_eject_with_operation(gobj(),
-                                  static_cast<GMountUnmountFlags>(flags),
-                                  Glib::unwrap(mount_operation),
-                                  nullptr, // cancellable
-                                  nullptr, // callback
-                                  nullptr); // data
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  auto slot_copy = new SlotAsyncReady(slot);
+
+  g_volume_eject_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
+    Glib::unwrap(mount_operation),
+    nullptr, // cancellable
+    &SignalProxy_async_callback, slot_copy);
+}
+
+void
+Volume::eject(const Glib::RefPtr<MountOperation>& mount_operation, MountUnmountFlags flags)
+{
+  g_volume_eject_with_operation(gobj(), static_cast<GMountUnmountFlags>(flags),
+    Glib::unwrap(mount_operation),
+    nullptr, // cancellable
+    nullptr, // callback
+    nullptr); // data
 }
 
 } // namespace Gio
-

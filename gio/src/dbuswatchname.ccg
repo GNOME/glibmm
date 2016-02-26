@@ -30,11 +30,11 @@ struct WatchSlots
   Gio::DBus::SlotNameVanished* name_vanished_slot;
 };
 
-extern "C"
-{
+extern "C" {
 
-static void Bus_Name_Appeared_giomm_callback(GDBusConnection* connection,
-  const gchar* name, const char* name_owner, gpointer data)
+static void
+Bus_Name_Appeared_giomm_callback(
+  GDBusConnection* connection, const gchar* name, const char* name_owner, gpointer data)
 {
   auto slots = static_cast<WatchSlots*>(data);
   auto the_slot = slots->name_appeared_slot;
@@ -44,14 +44,14 @@ static void Bus_Name_Appeared_giomm_callback(GDBusConnection* connection,
     (*the_slot)(Glib::wrap(connection, true), Glib::convert_const_gchar_ptr_to_ustring(name),
       Glib::convert_const_gchar_ptr_to_ustring(name_owner));
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-static void Bus_Name_Vanished_giomm_callback(GDBusConnection* connection,
-  const gchar* name, gpointer data)
+static void
+Bus_Name_Vanished_giomm_callback(GDBusConnection* connection, const gchar* name, gpointer data)
 {
   auto slots = static_cast<WatchSlots*>(data);
   auto the_slot = slots->name_vanished_slot;
@@ -60,20 +60,21 @@ static void Bus_Name_Vanished_giomm_callback(GDBusConnection* connection,
   {
     (*the_slot)(Glib::wrap(connection, true), Glib::convert_const_gchar_ptr_to_ustring(name));
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-static void Bus_Watch_Name_giomm_callback_destroy(void* data)
+static void
+Bus_Watch_Name_giomm_callback_destroy(void* data)
 {
-  auto slots =  static_cast<WatchSlots*>(data);
+  auto slots = static_cast<WatchSlots*>(data);
 
-  if(slots->name_appeared_slot)
+  if (slots->name_appeared_slot)
     delete slots->name_appeared_slot;
 
-  if(slots->name_vanished_slot)
+  if (slots->name_vanished_slot)
     delete slots->name_vanished_slot;
 
   delete slots;
@@ -83,20 +84,15 @@ static void Bus_Watch_Name_giomm_callback_destroy(void* data)
 
 } // anonymous namespace
 
-
 namespace Gio
 {
 
 namespace DBus
 {
 
-guint watch_name(
-  BusType bus_type,
-  const Glib::ustring& name,
-  const SlotNameAppeared& name_appeared_slot,
-  const SlotNameVanished& name_vanished_slot,
-  BusNameWatcherFlags flags
-)
+guint
+watch_name(BusType bus_type, const Glib::ustring& name, const SlotNameAppeared& name_appeared_slot,
+  const SlotNameVanished& name_vanished_slot, BusNameWatcherFlags flags)
 {
   auto slots = new WatchSlots;
 
@@ -105,18 +101,14 @@ guint watch_name(
   slots->name_vanished_slot = new SlotNameVanished(name_vanished_slot);
 
   return g_bus_watch_name(static_cast<GBusType>(bus_type), name.c_str(),
-    static_cast<GBusNameWatcherFlags>(flags),
-    &Bus_Name_Appeared_giomm_callback, &Bus_Name_Vanished_giomm_callback,
-    slots, &Bus_Watch_Name_giomm_callback_destroy);
+    static_cast<GBusNameWatcherFlags>(flags), &Bus_Name_Appeared_giomm_callback,
+    &Bus_Name_Vanished_giomm_callback, slots, &Bus_Watch_Name_giomm_callback_destroy);
 }
 
-guint watch_name(
-  const Glib::RefPtr<Connection>& connection,
-  const Glib::ustring& name,
-  const SlotNameAppeared& name_appeared_slot,
-  const SlotNameVanished& name_vanished_slot,
-  BusNameWatcherFlags flags
-)
+guint
+watch_name(const Glib::RefPtr<Connection>& connection, const Glib::ustring& name,
+  const SlotNameAppeared& name_appeared_slot, const SlotNameVanished& name_vanished_slot,
+  BusNameWatcherFlags flags)
 {
   auto slots = new WatchSlots;
 
@@ -124,13 +116,13 @@ guint watch_name(
   slots->name_appeared_slot = new SlotNameAppeared(name_appeared_slot);
   slots->name_vanished_slot = new SlotNameVanished(name_vanished_slot);
 
-  return g_bus_watch_name_on_connection(Glib::unwrap(connection),
-    name.c_str(), static_cast<GBusNameWatcherFlags>(flags),
-    &Bus_Name_Appeared_giomm_callback, &Bus_Name_Vanished_giomm_callback,
-    slots, &Bus_Watch_Name_giomm_callback_destroy);
+  return g_bus_watch_name_on_connection(Glib::unwrap(connection), name.c_str(),
+    static_cast<GBusNameWatcherFlags>(flags), &Bus_Name_Appeared_giomm_callback,
+    &Bus_Name_Vanished_giomm_callback, slots, &Bus_Watch_Name_giomm_callback_destroy);
 }
 
-void unwatch_name(guint watcher_id)
+void
+unwatch_name(guint watcher_id)
 {
   g_bus_unwatch_name(watcher_id);
 }

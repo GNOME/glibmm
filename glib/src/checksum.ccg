@@ -21,8 +21,7 @@
 namespace Glib
 {
 
-Checksum::Checksum(ChecksumType type)
-: gobject_(g_checksum_new((GChecksumType)type))
+Checksum::Checksum(ChecksumType type) : gobject_(g_checksum_new((GChecksumType)type))
 {
 }
 
@@ -31,17 +30,21 @@ Checksum::operator bool() const
   return gobject_ != nullptr;
 }
 
-gssize Checksum::get_length(ChecksumType checksum_type)
+gssize
+Checksum::get_length(ChecksumType checksum_type)
 {
   return g_checksum_type_get_length((GChecksumType)checksum_type);
 }
 
-std::string Checksum::compute_checksum(ChecksumType checksum_type, const std::string& data)
+std::string
+Checksum::compute_checksum(ChecksumType checksum_type, const std::string& data)
 {
-  return Glib::convert_return_gchar_ptr_to_ustring(g_compute_checksum_for_string(((GChecksumType)checksum_type), data.c_str(), data.size()));
+  return Glib::convert_return_gchar_ptr_to_ustring(
+    g_compute_checksum_for_string(((GChecksumType)checksum_type), data.c_str(), data.size()));
 }
 
-void Checksum::update(const std::string& data)
+void
+Checksum::update(const std::string& data)
 {
   g_checksum_update(gobj(), (const guchar*)data.c_str(), data.size());
 }

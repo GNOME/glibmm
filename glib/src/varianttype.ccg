@@ -24,7 +24,7 @@ namespace Glib
 
 VariantType::VariantType(const GVariantType* castitem)
 {
-  if(castitem)
+  if (castitem)
     gobject_ = g_variant_type_copy(castitem);
   else
     gobject_ = nullptr;
@@ -35,14 +35,15 @@ VariantType::VariantType(const std::string& type_string)
 {
 }
 
-VariantType& VariantType::operator=(const GVariantType* castitem)
+VariantType&
+VariantType::operator=(const GVariantType* castitem)
 {
-  if(gobject_)
+  if (gobject_)
   {
-    g_variant_type_free (gobject_);
+    g_variant_type_free(gobject_);
   }
 
-  if(castitem)
+  if (castitem)
     gobject_ = g_variant_type_copy(castitem);
   else
     gobject_ = nullptr;
@@ -50,13 +51,13 @@ VariantType& VariantType::operator=(const GVariantType* castitem)
   return *this;
 }
 
-
-VariantType VariantType::create_tuple(const std::vector<VariantType>& items)
+VariantType
+VariantType::create_tuple(const std::vector<VariantType>& items)
 {
   typedef GVariantType* var_ptr;
   const auto var_array = new var_ptr[items.size()];
 
-  for(std::vector<VariantType>::size_type i = 0; i < items.size(); i++)
+  for (std::vector<VariantType>::size_type i = 0; i < items.size(); i++)
   {
     var_array[i] = const_cast<GVariantType*>(items[i].gobj());
   }
@@ -116,9 +117,9 @@ const VariantType VARIANT_TYPE_BYTESTRING(G_VARIANT_TYPE_BYTESTRING);
 
 const VariantType VARIANT_TYPE_BYTESTRING_ARRAY(G_VARIANT_TYPE_BYTESTRING_ARRAY);
 
-std::string VariantType::get_string() const
+std::string
+VariantType::get_string() const
 {
   return std::string(g_variant_type_peek_string(gobj()), g_variant_type_get_string_length(gobj()));
 }
-
 }

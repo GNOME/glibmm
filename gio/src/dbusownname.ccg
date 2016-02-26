@@ -31,11 +31,10 @@ struct OwnSlots
   Gio::DBus::SlotNameLost* name_lost_slot;
 };
 
-extern "C"
-{
+extern "C" {
 
-static void Bus_Acquired_giomm_callback(GDBusConnection* connection,
-  const gchar* name, gpointer data)
+static void
+Bus_Acquired_giomm_callback(GDBusConnection* connection, const gchar* name, gpointer data)
 {
   auto slots = static_cast<OwnSlots*>(data);
   auto the_slot = slots->bus_acquired_slot;
@@ -44,14 +43,14 @@ static void Bus_Acquired_giomm_callback(GDBusConnection* connection,
   {
     (*the_slot)(Glib::wrap(connection, true), Glib::convert_const_gchar_ptr_to_ustring(name));
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-static void Bus_Name_Acquired_giomm_callback(GDBusConnection* connection,
-  const gchar* name, gpointer data)
+static void
+Bus_Name_Acquired_giomm_callback(GDBusConnection* connection, const gchar* name, gpointer data)
 {
   auto slots = static_cast<OwnSlots*>(data);
   auto the_slot = slots->name_acquired_slot;
@@ -60,14 +59,14 @@ static void Bus_Name_Acquired_giomm_callback(GDBusConnection* connection,
   {
     (*the_slot)(Glib::wrap(connection, true), Glib::convert_const_gchar_ptr_to_ustring(name));
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-static void Bus_Name_Lost_giomm_callback(GDBusConnection* connection,
-  const gchar* name, gpointer data)
+static void
+Bus_Name_Lost_giomm_callback(GDBusConnection* connection, const gchar* name, gpointer data)
 {
   auto slots = static_cast<OwnSlots*>(data);
   auto the_slot = slots->name_lost_slot;
@@ -76,23 +75,24 @@ static void Bus_Name_Lost_giomm_callback(GDBusConnection* connection,
   {
     (*the_slot)(Glib::wrap(connection, true), Glib::convert_const_gchar_ptr_to_ustring(name));
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-static void Bus_Own_Name_giomm_callback_destroy(void* data)
+static void
+Bus_Own_Name_giomm_callback_destroy(void* data)
 {
-  auto slots =  static_cast<OwnSlots*>(data);
+  auto slots = static_cast<OwnSlots*>(data);
 
-  if(slots->bus_acquired_slot)
+  if (slots->bus_acquired_slot)
     delete slots->bus_acquired_slot;
 
-  if(slots->name_acquired_slot)
+  if (slots->name_acquired_slot)
     delete slots->name_acquired_slot;
 
-  if(slots->name_lost_slot)
+  if (slots->name_lost_slot)
     delete slots->name_lost_slot;
 
   delete slots;
@@ -102,21 +102,16 @@ static void Bus_Own_Name_giomm_callback_destroy(void* data)
 
 } // anonymous namespace
 
-
 namespace Gio
 {
 
 namespace DBus
 {
 
-guint own_name(
-  BusType bus_type,
-  const Glib::ustring& name,
-  const SlotBusAcquired& bus_acquired_slot,
-  const SlotNameAcquired& name_acquired_slot,
-  const SlotNameLost& name_lost_slot,
-  BusNameOwnerFlags flags
-)
+guint
+own_name(BusType bus_type, const Glib::ustring& name, const SlotBusAcquired& bus_acquired_slot,
+  const SlotNameAcquired& name_acquired_slot, const SlotNameLost& name_lost_slot,
+  BusNameOwnerFlags flags)
 {
   auto slots = new OwnSlots;
 
@@ -131,7 +126,8 @@ guint own_name(
     &Bus_Own_Name_giomm_callback_destroy);
 }
 
-void unown_name(guint owner_id)
+void
+unown_name(guint owner_id)
 {
   g_bus_unown_name(owner_id);
 }

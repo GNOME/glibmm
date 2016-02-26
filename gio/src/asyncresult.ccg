@@ -24,22 +24,26 @@
 namespace Gio
 {
 
-static GObject* unwrap_objectbase_custom(const Glib::RefPtr<Glib::ObjectBase>& cpp_instance)
+static GObject*
+unwrap_objectbase_custom(const Glib::RefPtr<Glib::ObjectBase>& cpp_instance)
 {
   return (cpp_instance ? cpp_instance->gobj() : nullptr);
 }
 
-Glib::RefPtr<Glib::ObjectBase> AsyncResult::get_source_object_base()
+Glib::RefPtr<Glib::ObjectBase>
+AsyncResult::get_source_object_base()
 {
   auto cobj = g_async_result_get_source_object(gobj());
-  auto cppobj = Glib::wrap_auto(cobj); //ObjectBase::_get_current_wrapper(cobj);
-  return Glib::RefPtr<Glib::ObjectBase>(cppobj); //g_async_result_get_source_object() gives us a ref, unusually.
-  //TODO: For some reason this fails: Glib::wrap(cobj);
+  auto cppobj = Glib::wrap_auto(cobj); // ObjectBase::_get_current_wrapper(cobj);
+  return Glib::RefPtr<Glib::ObjectBase>(
+    cppobj); // g_async_result_get_source_object() gives us a ref, unusually.
+  // TODO: For some reason this fails: Glib::wrap(cobj);
 }
 
-Glib::RefPtr<const Glib::ObjectBase> AsyncResult::get_source_object_base() const
+Glib::RefPtr<const Glib::ObjectBase>
+AsyncResult::get_source_object_base() const
 {
   return const_cast<AsyncResult*>(this)->get_source_object_base();
 }
 
-} //namespace Gio
+} // namespace Gio

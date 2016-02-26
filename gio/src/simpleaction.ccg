@@ -22,32 +22,36 @@
 namespace Gio
 {
 
-SimpleAction::SimpleAction(const Glib::ustring& name)
-:
-  _CONSTRUCT("name", name.c_str())
-{}
+SimpleAction::SimpleAction(const Glib::ustring& name) : _CONSTRUCT("name", name.c_str())
+{
+}
 
 SimpleAction::SimpleAction(const Glib::ustring& name, const Glib::VariantBase& state)
-:
-  _CONSTRUCT("name", name.c_str(), "state", const_cast<GVariant*>((state).gobj()))
-{}
-
-Glib::RefPtr<SimpleAction> SimpleAction::create_bool(const Glib::ustring& name, bool state)
+: _CONSTRUCT("name", name.c_str(), "state", const_cast<GVariant*>((state).gobj()))
 {
-  //We must provide some initial state, as a way to specify the type of the state.
+}
+
+Glib::RefPtr<SimpleAction>
+SimpleAction::create_bool(const Glib::ustring& name, bool state)
+{
+  // We must provide some initial state, as a way to specify the type of the state.
   return create(name, Glib::Variant<bool>::create(state));
 }
 
-
-Glib::RefPtr<SimpleAction> SimpleAction::create_radio_string(const Glib::ustring& name, const Glib::ustring& initial_state)
+Glib::RefPtr<SimpleAction>
+SimpleAction::create_radio_string(const Glib::ustring& name, const Glib::ustring& initial_state)
 {
-  //See https://developer.gnome.org/glib/stable/gvariant-format-strings.html#gvariant-format-strings-strings
-  return create(name, Glib::VARIANT_TYPE_STRING, Glib::Variant<Glib::ustring>::create(initial_state));
+  // See
+  // https://developer.gnome.org/glib/stable/gvariant-format-strings.html#gvariant-format-strings-strings
+  return create(
+    name, Glib::VARIANT_TYPE_STRING, Glib::Variant<Glib::ustring>::create(initial_state));
 }
 
-Glib::RefPtr<SimpleAction> SimpleAction::create_radio_integer(const Glib::ustring& name, gint32 initial_state)
+Glib::RefPtr<SimpleAction>
+SimpleAction::create_radio_integer(const Glib::ustring& name, gint32 initial_state)
 {
-  //See https://developer.gnome.org/glib/stable/gvariant-format-strings.html#gvariant-format-strings-numeric-types
+  // See
+  // https://developer.gnome.org/glib/stable/gvariant-format-strings.html#gvariant-format-strings-numeric-types
   return create(name, Glib::VARIANT_TYPE_INT32, Glib::Variant<gint32>::create(initial_state));
 }
 

@@ -17,18 +17,17 @@
 
 #include <glibmm/exceptionhandler.h>
 
-static int ValueArray_Compare_glibmm_callback(gconstpointer a,
-  gconstpointer b, gpointer user_data)
+static int
+ValueArray_Compare_glibmm_callback(gconstpointer a, gconstpointer b, gpointer user_data)
 {
-  Glib::ValueArray::SlotCompare* the_slot =
-    static_cast<Glib::ValueArray::SlotCompare*>(user_data);
+  Glib::ValueArray::SlotCompare* the_slot = static_cast<Glib::ValueArray::SlotCompare*>(user_data);
 
   try
   {
-    return (*the_slot)(*reinterpret_cast<const Glib::ValueBase*>(a),
-      *reinterpret_cast<const Glib::ValueBase*>(b));
+    return (*the_slot)(
+      *reinterpret_cast<const Glib::ValueBase*>(a), *reinterpret_cast<const Glib::ValueBase*>(b));
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
@@ -40,17 +39,19 @@ namespace Glib
 {
 
 ValueArray::ValueArray() : gobject_(g_value_array_new(0))
-{}
+{
+}
 
-ValueArray::ValueArray(guint n_preallocated) :
-  gobject_(g_value_array_new(n_preallocated))
-{}
+ValueArray::ValueArray(guint n_preallocated) : gobject_(g_value_array_new(n_preallocated))
+{
+}
 
-bool ValueArray::get_nth(guint index, Glib::ValueBase& value)
+bool
+ValueArray::get_nth(guint index, Glib::ValueBase& value)
 {
   const auto g_value = g_value_array_get_nth(gobj(), index);
 
-  if(g_value)
+  if (g_value)
   {
     value.init(g_value);
     return true;
@@ -59,35 +60,39 @@ bool ValueArray::get_nth(guint index, Glib::ValueBase& value)
     return false;
 }
 
-Glib::ValueArray& ValueArray::append(const Glib::ValueBase& value)
+Glib::ValueArray&
+ValueArray::append(const Glib::ValueBase& value)
 {
   g_value_array_append(gobj(), value.gobj());
   return *this;
 }
 
-Glib::ValueArray& ValueArray::prepend(const Glib::ValueBase& value)
+Glib::ValueArray&
+ValueArray::prepend(const Glib::ValueBase& value)
 {
   g_value_array_prepend(gobj(), value.gobj());
   return *this;
 }
 
-Glib::ValueArray& ValueArray::insert(guint index, const Glib::ValueBase& value)
+Glib::ValueArray&
+ValueArray::insert(guint index, const Glib::ValueBase& value)
 {
   g_value_array_insert(gobj(), index, value.gobj());
   return *this;
 }
 
-Glib::ValueArray& ValueArray::remove(guint index)
+Glib::ValueArray&
+ValueArray::remove(guint index)
 {
   g_value_array_remove(gobj(), index);
   return *this;
 }
 
-Glib::ValueArray& ValueArray::sort(const SlotCompare& compare_func)
+Glib::ValueArray&
+ValueArray::sort(const SlotCompare& compare_func)
 {
   SlotCompare slot_copy(compare_func);
-  g_value_array_sort_with_data(gobj(), &ValueArray_Compare_glibmm_callback,
-    &slot_copy);
+  g_value_array_sort_with_data(gobj(), &ValueArray_Compare_glibmm_callback, &slot_copy);
   return *this;
 }
 

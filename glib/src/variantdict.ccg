@@ -21,19 +21,17 @@
 namespace Glib
 {
 
-bool VariantDict::lookup_value_variant(const Glib::ustring& key, const VariantType& expected_type, VariantBase& value) const
+bool
+VariantDict::lookup_value_variant(
+  const Glib::ustring& key, const VariantType& expected_type, VariantBase& value) const
 {
-  GVariant* const g_value =
-    g_variant_dict_lookup_value(const_cast<GVariantDict*>(gobj()),
-      key.c_str(),
-      expected_type.gobj());
-  if(!g_value)
-    return false;  
+  GVariant* const g_value = g_variant_dict_lookup_value(
+    const_cast<GVariantDict*>(gobj()), key.c_str(), expected_type.gobj());
+  if (!g_value)
+    return false;
 
   value.init(g_value); // g_value is already referenced.
   return true;
 }
 
-} //namespace Glib
-
-
+} // namespace Glib

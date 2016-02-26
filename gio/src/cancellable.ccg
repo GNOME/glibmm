@@ -20,22 +20,25 @@
 #include <gio/gio.h>
 #include <glibmm/exceptionhandler.h>
 
-namespace Gio {
+namespace Gio
+{
 
 extern "C" {
 
-void delete_slot(gpointer data)
+void
+delete_slot(gpointer data)
 {
-    Cancellable::SlotCancelledCallback* callback =
-        reinterpret_cast<Cancellable::SlotCancelledCallback*>(data);
-    delete callback;
+  Cancellable::SlotCancelledCallback* callback =
+    reinterpret_cast<Cancellable::SlotCancelledCallback*>(data);
+  delete callback;
 }
 
-void slot_cancelled_proxy(GCancellable * /*cancellable*/, gpointer data)
+void
+slot_cancelled_proxy(GCancellable* /*cancellable*/, gpointer data)
 {
-    Cancellable::SlotCancelledCallback* callback =
-        reinterpret_cast<Cancellable::SlotCancelledCallback*>(data);
-    (*callback)();
+  Cancellable::SlotCancelledCallback* callback =
+    reinterpret_cast<Cancellable::SlotCancelledCallback*>(data);
+  (*callback)();
 }
 
 } // extern "C"
@@ -43,11 +46,8 @@ void slot_cancelled_proxy(GCancellable * /*cancellable*/, gpointer data)
 gulong
 Cancellable::connect(const SlotCancelledCallback& slot)
 {
-    auto slot_copy = new SlotCancelledCallback(slot);
-    return g_cancellable_connect (gobj(),
-                                  G_CALLBACK(slot_cancelled_proxy),
-                                  slot_copy,
-                                  &delete_slot);
+  auto slot_copy = new SlotCancelledCallback(slot);
+  return g_cancellable_connect(gobj(), G_CALLBACK(slot_cancelled_proxy), slot_copy, &delete_slot);
 }
 
 } // namespace Gio

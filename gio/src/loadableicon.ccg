@@ -31,18 +31,14 @@ LoadableIcon::load(int size, Glib::ustring& type, const Glib::RefPtr<Cancellable
   char* c_type;
   GError* gerror = nullptr;
   auto retval =
-      Glib::wrap(g_loadable_icon_load(gobj(),
-                 size,
-                 &c_type,
-                 Glib::unwrap(cancellable),
-                 &gerror));
-  if(gerror)
+    Glib::wrap(g_loadable_icon_load(gobj(), size, &c_type, Glib::unwrap(cancellable), &gerror));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   type = c_type;
   g_free(c_type);
-  if(retval)
-    retval->reference(); //The function does not do a ref for us.
+  if (retval)
+    retval->reference(); // The function does not do a ref for us.
   return retval;
 }
 
@@ -51,36 +47,28 @@ LoadableIcon::load(int size, Glib::ustring& type)
 {
   char* c_type;
   GError* gerror = nullptr;
-  auto retval =
-      Glib::wrap(g_loadable_icon_load(gobj(),
-                 size,
-                 &c_type,
-                 nullptr,
-                 &gerror));
-  if(gerror)
+  auto retval = Glib::wrap(g_loadable_icon_load(gobj(), size, &c_type, nullptr, &gerror));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   type = c_type;
   g_free(c_type);
-  if(retval)
-    retval->reference(); //The function does not do a ref for us.
+  if (retval)
+    retval->reference(); // The function does not do a ref for us.
   return retval;
 }
 
 void
-LoadableIcon::load_async(int size, const SlotAsyncReady& slot, const
-                         Glib::RefPtr<Cancellable>& cancellable)
+LoadableIcon::load_async(
+  int size, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_loadable_icon_load_async(gobj(),
-                             size,
-                             Glib::unwrap(cancellable),
-                             &SignalProxy_async_callback,
-                             slot_copy);
+  g_loadable_icon_load_async(
+    gobj(), size, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -91,11 +79,7 @@ LoadableIcon::load_async(int size, const SlotAsyncReady& slot)
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_loadable_icon_load_async(gobj(),
-                             size,
-                             nullptr,
-                             &SignalProxy_async_callback,
-                             slot_copy);
+  g_loadable_icon_load_async(gobj(), size, nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 } // namespace Gio

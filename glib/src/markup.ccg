@@ -20,27 +20,26 @@
 #include <glibmm/utility.h>
 #include <glib.h>
 
-
 namespace Glib
 {
 
 namespace Markup
 {
 
-Glib::ustring escape_text(const Glib::ustring& text)
+Glib::ustring
+escape_text(const Glib::ustring& text)
 {
   const auto buf = make_unique_ptr_gfree(g_markup_escape_text(text.data(), text.bytes()));
   return Glib::ustring(buf.get());
 }
 
-
 /**** Glib::Markup::AttributeKeyLess ***************************************/
 
-bool AttributeKeyLess::operator()(const Glib::ustring& lhs, const Glib::ustring& rhs) const
+bool
+AttributeKeyLess::operator()(const Glib::ustring& lhs, const Glib::ustring& rhs) const
 {
   return (lhs.raw() < rhs.raw());
 }
-
 
 /**** Glib::Markup::ParserCallbacks ****************************************/
 
@@ -49,51 +48,29 @@ class ParserCallbacks
 public:
   static const GMarkupParser vfunc_table;
 
-  static void start_element(GMarkupParseContext* context,
-                            const char*          element_name,
-                            const char**         attribute_names,
-                            const char**         attribute_values,
-                            void*                user_data,
-                            GError**             error);
+  static void start_element(GMarkupParseContext* context, const char* element_name,
+    const char** attribute_names, const char** attribute_values, void* user_data, GError** error);
 
-  static void end_element(GMarkupParseContext* context,
-                          const char*          element_name,
-                          void*                user_data,
-                          GError**             error);
+  static void end_element(
+    GMarkupParseContext* context, const char* element_name, void* user_data, GError** error);
 
-  static void text(GMarkupParseContext* context,
-                   const char*          text,
-                   gsize                text_len,
-                   void*                user_data,
-                   GError**             error);
+  static void text(GMarkupParseContext* context, const char* text, gsize text_len, void* user_data,
+    GError** error);
 
-  static void passthrough(GMarkupParseContext* context,
-                          const char*          passthrough_text,
-                          gsize                text_len,
-                          void*                user_data,
-                          GError**             error);
+  static void passthrough(GMarkupParseContext* context, const char* passthrough_text,
+    gsize text_len, void* user_data, GError** error);
 
-  static void error(GMarkupParseContext* context,
-                    GError*              error,
-                    void*                user_data);
+  static void error(GMarkupParseContext* context, GError* error, void* user_data);
 };
 
-
-const GMarkupParser ParserCallbacks::vfunc_table =
-{
-  &ParserCallbacks::start_element,
-  &ParserCallbacks::end_element,
-  &ParserCallbacks::text,
-  &ParserCallbacks::passthrough,
-  &ParserCallbacks::error,
+const GMarkupParser ParserCallbacks::vfunc_table = {
+  &ParserCallbacks::start_element, &ParserCallbacks::end_element, &ParserCallbacks::text,
+  &ParserCallbacks::passthrough, &ParserCallbacks::error,
 };
 
-void ParserCallbacks::start_element(GMarkupParseContext* context,
-                                    const char*          element_name,
-                                    const char**         attribute_names,
-                                    const char**         attribute_values,
-                                    void*                user_data,
-                                    GError**             error)
+void
+ParserCallbacks::start_element(GMarkupParseContext* context, const char* element_name,
+  const char** attribute_names, const char** attribute_values, void* user_data, GError** error)
 {
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
   g_return_if_fail(context == cpp_context.gobj());
@@ -102,12 +79,12 @@ void ParserCallbacks::start_element(GMarkupParseContext* context,
   {
     Parser::AttributeMap attributes;
 
-    if(attribute_names && attribute_values)
+    if (attribute_names && attribute_values)
     {
-      const char *const * pname  = attribute_names;
-      const char *const * pvalue = attribute_values;
+      const char* const* pname = attribute_names;
+      const char* const* pvalue = attribute_values;
 
-      for(; *pname && *pvalue; ++pname, ++pvalue)
+      for (; *pname && *pvalue; ++pname, ++pvalue)
         attributes.insert(Parser::AttributeMap::value_type(*pname, *pvalue));
 
       g_return_if_fail(*pname == nullptr && *pvalue == nullptr);
@@ -115,20 +92,19 @@ void ParserCallbacks::start_element(GMarkupParseContext* context,
 
     cpp_context.get_parser()->on_start_element(cpp_context, element_name, attributes);
   }
-  catch(MarkupError& err)
+  catch (MarkupError& err)
   {
     err.propagate(error);
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-void ParserCallbacks::end_element(GMarkupParseContext* context,
-                                  const char*          element_name,
-                                  void*                user_data,
-                                  GError**             error)
+void
+ParserCallbacks::end_element(
+  GMarkupParseContext* context, const char* element_name, void* user_data, GError** error)
 {
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
   g_return_if_fail(context == cpp_context.gobj());
@@ -137,21 +113,19 @@ void ParserCallbacks::end_element(GMarkupParseContext* context,
   {
     cpp_context.get_parser()->on_end_element(cpp_context, element_name);
   }
-  catch(MarkupError& err)
+  catch (MarkupError& err)
   {
     err.propagate(error);
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-void ParserCallbacks::text(GMarkupParseContext* context,
-                           const char*          text,
-                           gsize                text_len,
-                           void*                user_data,
-                           GError**             error)
+void
+ParserCallbacks::text(
+  GMarkupParseContext* context, const char* text, gsize text_len, void* user_data, GError** error)
 {
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
   g_return_if_fail(context == cpp_context.gobj());
@@ -160,21 +134,19 @@ void ParserCallbacks::text(GMarkupParseContext* context,
   {
     cpp_context.get_parser()->on_text(cpp_context, Glib::ustring(text, text + text_len));
   }
-  catch(MarkupError& err)
+  catch (MarkupError& err)
   {
     err.propagate(error);
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-void ParserCallbacks::passthrough(GMarkupParseContext* context,
-                                  const char*          passthrough_text,
-                                  gsize                text_len,
-                                  void*                user_data,
-                                  GError**             error)
+void
+ParserCallbacks::passthrough(GMarkupParseContext* context, const char* passthrough_text,
+  gsize text_len, void* user_data, GError** error)
 {
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
   g_return_if_fail(context == cpp_context.gobj());
@@ -182,21 +154,20 @@ void ParserCallbacks::passthrough(GMarkupParseContext* context,
   try
   {
     cpp_context.get_parser()->on_passthrough(
-        cpp_context, Glib::ustring(passthrough_text, passthrough_text + text_len));
+      cpp_context, Glib::ustring(passthrough_text, passthrough_text + text_len));
   }
-  catch(MarkupError& err)
+  catch (MarkupError& err)
   {
     err.propagate(error);
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-void ParserCallbacks::error(GMarkupParseContext* context,
-                            GError*              error,
-                            void*                user_data)
+void
+ParserCallbacks::error(GMarkupParseContext* context, GError* error, void* user_data)
 {
   ParseContext& cpp_context = *static_cast<ParseContext*>(user_data);
 
@@ -207,65 +178,75 @@ void ParserCallbacks::error(GMarkupParseContext* context,
   {
     cpp_context.get_parser()->on_error(cpp_context, MarkupError(g_error_copy(error)));
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-
 /**** Glib::Markup::Parser *************************************************/
 
 Parser::Parser()
-{}
-
-Parser::Parser(Parser&& other) noexcept
-: sigc::trackable(std::move(other))
 {
 }
 
-Parser& Parser::operator=(Parser&& other) noexcept
+Parser::Parser(Parser&& other) noexcept : sigc::trackable(std::move(other))
+{
+}
+
+Parser&
+Parser::operator=(Parser&& other) noexcept
 {
   sigc::trackable::operator=(std::move(other));
   return *this;
 }
 
 Parser::~Parser()
-{}
+{
+}
 
-void Parser::on_start_element(ParseContext&, const Glib::ustring&, const Parser::AttributeMap&)
-{}
+void
+Parser::on_start_element(ParseContext&, const Glib::ustring&, const Parser::AttributeMap&)
+{
+}
 
-void Parser::on_end_element(ParseContext&, const Glib::ustring&)
-{}
+void
+Parser::on_end_element(ParseContext&, const Glib::ustring&)
+{
+}
 
-void Parser::on_text(ParseContext&, const Glib::ustring&)
-{}
+void
+Parser::on_text(ParseContext&, const Glib::ustring&)
+{
+}
 
-void Parser::on_passthrough(ParseContext&, const Glib::ustring&)
-{}
+void
+Parser::on_passthrough(ParseContext&, const Glib::ustring&)
+{
+}
 
-void Parser::on_error(ParseContext&, const MarkupError&)
-{}
-
+void
+Parser::on_error(ParseContext&, const MarkupError&)
+{
+}
 
 /**** Glib::Markup::ParseContext *******************************************/
 
 ParseContext::ParseContext(Parser& parser, ParseFlags flags)
-:
-  parser_  (&parser),
-  gobject_ (g_markup_parse_context_new(&ParserCallbacks::vfunc_table, (GMarkupParseFlags) flags,
-                                       this, &ParseContext::destroy_notify_callback))
-{}
-
-ParseContext::ParseContext(ParseContext&& other) noexcept
-: sigc::trackable(std::move(other)),
-  parser_(std::move(other.parser_)),
-  gobject_(std::move(other.gobject_))
+: parser_(&parser),
+  gobject_(g_markup_parse_context_new(&ParserCallbacks::vfunc_table, (GMarkupParseFlags)flags, this,
+    &ParseContext::destroy_notify_callback))
 {
 }
 
-ParseContext& ParseContext::operator=(ParseContext&& other) noexcept
+ParseContext::ParseContext(ParseContext&& other) noexcept : sigc::trackable(std::move(other)),
+                                                            parser_(std::move(other.parser_)),
+                                                            gobject_(std::move(other.gobject_))
+{
+}
+
+ParseContext&
+ParseContext::operator=(ParseContext&& other) noexcept
 {
   sigc::trackable::operator=(std::move(other));
 
@@ -284,47 +265,53 @@ ParseContext::~ParseContext()
   g_markup_parse_context_free(gobject_);
 }
 
-void ParseContext::parse(const Glib::ustring& text)
+void
+ParseContext::parse(const Glib::ustring& text)
 {
   GError* error = nullptr;
   g_markup_parse_context_parse(gobject_, text.data(), text.bytes(), &error);
 
-  if(error)
+  if (error)
     Glib::Error::throw_exception(error);
 }
 
-void ParseContext::parse(const char* text_begin, const char* text_end)
+void
+ParseContext::parse(const char* text_begin, const char* text_end)
 {
   GError* error = nullptr;
   g_markup_parse_context_parse(gobject_, text_begin, text_end - text_begin, &error);
 
-  if(error)
+  if (error)
     Glib::Error::throw_exception(error);
 }
 
-void ParseContext::end_parse()
+void
+ParseContext::end_parse()
 {
   GError* error = nullptr;
   g_markup_parse_context_end_parse(gobject_, &error);
 
-  if(error)
+  if (error)
     Glib::Error::throw_exception(error);
 }
 
-Glib::ustring ParseContext::get_element() const
+Glib::ustring
+ParseContext::get_element() const
 {
-  const char *const element_name = g_markup_parse_context_get_element(gobject_);
+  const char* const element_name = g_markup_parse_context_get_element(gobject_);
   return convert_const_gchar_ptr_to_ustring(element_name);
 }
 
-int ParseContext::get_line_number() const
+int
+ParseContext::get_line_number() const
 {
   int line_number = 0;
   g_markup_parse_context_get_position(gobject_, &line_number, nullptr);
   return line_number;
 }
 
-int ParseContext::get_char_number() const
+int
+ParseContext::get_char_number() const
 {
   int char_number = 0;
   g_markup_parse_context_get_position(gobject_, nullptr, &char_number);
@@ -332,9 +319,10 @@ int ParseContext::get_char_number() const
 }
 
 // static
-void ParseContext::destroy_notify_callback(void* data)
+void
+ParseContext::destroy_notify_callback(void* data)
 {
-  ParseContext *const self = static_cast<ParseContext*>(data);
+  ParseContext* const self = static_cast<ParseContext*>(data);
 
   // Detect premature destruction.
   g_return_if_fail(self->parser_ == nullptr);
@@ -343,4 +331,3 @@ void ParseContext::destroy_notify_callback(void* data)
 } // namespace Markup
 
 } // namespace Glib
-

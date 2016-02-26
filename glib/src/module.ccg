@@ -22,19 +22,19 @@ namespace Glib
 {
 
 Module::Module(const std::string& file_name, ModuleFlags flags)
-:
-  gobject_ (g_module_open(file_name.c_str(), (GModuleFlags) flags))
-{}
+: gobject_(g_module_open(file_name.c_str(), (GModuleFlags)flags))
+{
+}
 
-Module::Module(Module&& other) noexcept
-: gobject_(std::move(other.gobject_))
+Module::Module(Module&& other) noexcept : gobject_(std::move(other.gobject_))
 {
   other.gobject_ = nullptr;
 }
 
-Module& Module::operator=(Module&& other) noexcept
+Module&
+Module::operator=(Module&& other) noexcept
 {
-  if(gobject_)
+  if (gobject_)
     g_module_close(gobject_);
 
   gobject_ = std::move(other.gobject_);
@@ -45,7 +45,7 @@ Module& Module::operator=(Module&& other) noexcept
 
 Module::~Module()
 {
-  if(gobject_)
+  if (gobject_)
     g_module_close(gobject_);
 }
 
@@ -55,4 +55,3 @@ Module::operator bool() const
 }
 
 } // namespace Glib
-

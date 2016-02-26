@@ -25,7 +25,7 @@
 
 namespace // anonymous
 {
-//TODO: At the next ABI break, implement the pimpl idiom. Then we need not use
+// TODO: At the next ABI break, implement the pimpl idiom. Then we need not use
 // a GQuark for ExtraApplicationData, which should be renamed to
 // struct Gio::Application::Impl.
 // These are new data members that can't be added to Gio::Application now,
@@ -36,7 +36,7 @@ struct ExtraApplicationData
 
   ~ExtraApplicationData()
   {
-    for(auto str : option_entry_strings)
+    for (auto str : option_entry_strings)
     {
       g_free(str);
     }
@@ -46,19 +46,21 @@ struct ExtraApplicationData
 GQuark quark_extra_application_data =
   g_quark_from_static_string("glibmm__Gio::Application::quark_extra_application_data");
 
-void Application_delete_extra_application_data(gpointer data)
+void
+Application_delete_extra_application_data(gpointer data)
 {
   ExtraApplicationData* extra_application_data = static_cast<ExtraApplicationData*>(data);
   delete extra_application_data;
 }
 
-static void Application_signal_open_callback(GApplication* self, GFile** files,
-  gint n_files, const gchar* hint, void* data)
+static void
+Application_signal_open_callback(
+  GApplication* self, GFile** files, gint n_files, const gchar* hint, void* data)
 {
-  typedef sigc::slot< void, const Gio::Application::type_vec_files&, const Glib::ustring& > SlotType;
+  typedef sigc::slot<void, const Gio::Application::type_vec_files&, const Glib::ustring&> SlotType;
 
   Gio::Application::type_vec_files vec_files(n_files);
-  for(int i = 0; i < n_files; ++i)
+  for (int i = 0; i < n_files; ++i)
   {
     vec_files[i] = Glib::wrap(files[i], true);
   }
@@ -66,16 +68,17 @@ static void Application_signal_open_callback(GApplication* self, GFile** files,
   const auto hint_str = (hint ? hint : Glib::ustring());
 
   // Do not try to call a signal on a disassociated wrapper.
-  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  if (Glib::ObjectBase::_get_current_wrapper((GObject*)self))
   {
     try
     {
-      if(const auto slot = Glib::SignalProxyNormal::data_to_slot(data)) {
+      if (const auto slot = Glib::SignalProxyNormal::data_to_slot(data))
+      {
         (*static_cast<SlotType*>(slot))(vec_files, hint_str);
         return;
       }
     }
-    catch(...)
+    catch (...)
     {
       Glib::exception_handlers_invoke();
     }
@@ -84,11 +87,12 @@ static void Application_signal_open_callback(GApplication* self, GFile** files,
   return;
 }
 
-static void Application_signal_open_notify_callback(GApplication* self, GFile** files,
-                                             gint n_files, const gchar *hint, void* data)
+static void
+Application_signal_open_notify_callback(
+  GApplication* self, GFile** files, gint n_files, const gchar* hint, void* data)
 {
   using namespace Gio;
-  typedef sigc::slot< void, const Application::type_vec_files&, const Glib::ustring& > SlotType;
+  typedef sigc::slot<void, const Application::type_vec_files&, const Glib::ustring&> SlotType;
 
   Application::type_vec_files vec_files(n_files);
   for (int i = 0; i < n_files; i++)
@@ -99,17 +103,17 @@ static void Application_signal_open_notify_callback(GApplication* self, GFile** 
   const auto hint_str = (hint ? hint : Glib::ustring());
 
   // Do not try to call a signal on a disassociated wrapper.
-  if(Glib::ObjectBase::_get_current_wrapper((GObject*) self))
+  if (Glib::ObjectBase::_get_current_wrapper((GObject*)self))
   {
     try
     {
-      if(const auto slot = Glib::SignalProxyNormal::data_to_slot(data))
+      if (const auto slot = Glib::SignalProxyNormal::data_to_slot(data))
       {
         (*static_cast<SlotType*>(slot))(vec_files, hint_str);
         return;
       }
     }
-    catch(...)
+    catch (...)
     {
       Glib::exception_handlers_invoke();
     }
@@ -118,12 +122,9 @@ static void Application_signal_open_notify_callback(GApplication* self, GFile** 
   return;
 }
 
-static const Glib::SignalProxyInfo Application_signal_open_info =
-{
-  "open",
-  (GCallback) &Application_signal_open_callback,
-  (GCallback) &Application_signal_open_notify_callback
-};
+static const Glib::SignalProxyInfo Application_signal_open_info = { "open",
+  (GCallback)&Application_signal_open_callback,
+  (GCallback)&Application_signal_open_notify_callback };
 
 // The add_main_option_entry*() methods that take a slot parameter are handled
 // similarly to the corresponding Glib::OptionGroup::add_entry*() methods.
@@ -143,7 +144,8 @@ public:
     short_name_(short_name),
     slot_string_(new Glib::OptionGroup::SlotOptionArgString(slot)),
     slot_filename_(nullptr)
-  { }
+  {
+  }
 
   explicit OptionArgCallbackData(const Gio::Application* application, gchar short_name,
     const Glib::OptionGroup::SlotOptionArgFilename& slot)
@@ -151,17 +153,19 @@ public:
     short_name_(short_name),
     slot_string_(nullptr),
     slot_filename_(new Glib::OptionGroup::SlotOptionArgFilename(slot))
-  { }
+  {
+  }
 
-  const Gio::Application* get_application() const  { return application_; }
+  const Gio::Application* get_application() const { return application_; }
   gchar get_short_name() const { return short_name_; }
   bool is_filename_option() const { return slot_filename_ != nullptr; }
 
-  const Glib::OptionGroup::SlotOptionArgString* get_slot_string() const
-  { return slot_string_; }
+  const Glib::OptionGroup::SlotOptionArgString* get_slot_string() const { return slot_string_; }
 
   const Glib::OptionGroup::SlotOptionArgFilename* get_slot_filename() const
-  { return slot_filename_; }
+  {
+    return slot_filename_;
+  }
 
   ~OptionArgCallbackData()
   {
@@ -189,8 +193,9 @@ OptionArgCallbackDataMap option_arg_callback_data;
 // Accesses to option_arg_callback_data must be thread-safe.
 std::mutex option_arg_callback_data_mutex;
 
-gboolean Application_option_arg_callback(const gchar* option_name, const gchar* value,
-  gpointer /* data */, GError** error)
+gboolean
+Application_option_arg_callback(
+  const gchar* option_name, const gchar* value, gpointer /* data */, GError** error)
 {
   const Glib::ustring cpp_option_name(option_name);
 
@@ -201,15 +206,15 @@ gboolean Application_option_arg_callback(const gchar* option_name, const gchar* 
   if (option_name[1] == '-')
   {
     // Long option name.
-    const auto long_option_name = Glib::ustring(option_name+2);
+    const auto long_option_name = Glib::ustring(option_name + 2);
     iterFind = option_arg_callback_data.find(long_option_name);
   }
   else
   {
     // Short option name.
     const auto short_option_name = option_name[1];
-    for (iterFind = option_arg_callback_data.begin();
-         iterFind != option_arg_callback_data.end(); ++iterFind)
+    for (iterFind = option_arg_callback_data.begin(); iterFind != option_arg_callback_data.end();
+         ++iterFind)
     {
       if (iterFind->second->get_short_name() == short_option_name)
         break;
@@ -219,7 +224,9 @@ gboolean Application_option_arg_callback(const gchar* option_name, const gchar* 
   if (iterFind == option_arg_callback_data.end())
   {
     Glib::OptionError(Glib::OptionError::UNKNOWN_OPTION, "Application_option_arg_callback(): "
-      "Unknown option " + cpp_option_name).propagate(error);
+                                                         "Unknown option " +
+                                                           cpp_option_name)
+      .propagate(error);
     return false;
   }
 
@@ -258,24 +265,20 @@ gboolean Application_option_arg_callback(const gchar* option_name, const gchar* 
 namespace Gio
 {
 
-
-const Glib::Class& Application::custom_class_init()
+const Glib::Class&
+Application::custom_class_init()
 {
   Glib::init();
   Gio::init();
   return application_class_.init();
 }
 
-
 Application::Application(const Glib::ustring& application_id, ApplicationFlags flags)
-:
-  // Mark this class as non-derived to allow C++ vfuncs to be skipped.
+: // Mark this class as non-derived to allow C++ vfuncs to be skipped.
   Glib::ObjectBase(nullptr),
   Glib::Object(Glib::ConstructParams(custom_class_init(), "application_id",
-    Glib::c_str_or_nullptr(application_id),
-    "flags", ((GApplicationFlags)(flags)), nullptr))
+    Glib::c_str_or_nullptr(application_id), "flags", ((GApplicationFlags)(flags)), nullptr))
 {
-
 }
 
 Application::~Application() noexcept
@@ -295,17 +298,18 @@ Application::~Application() noexcept
   }
 }
 
-//static
-void Application::unset_default()
+// static
+void
+Application::unset_default()
 {
   g_application_set_default(nullptr);
 }
 
-void Application_Class::open_callback(GApplication* self, GFile** files,
-  gint n_files, const gchar *hint)
+void
+Application_Class::open_callback(GApplication* self, GFile** files, gint n_files, const gchar* hint)
 {
-  const auto obj_base = static_cast<Glib::ObjectBase*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+  const auto obj_base =
+    static_cast<Glib::ObjectBase*>(Glib::ObjectBase::_get_current_wrapper((GObject*)self));
 
   // Non-gtkmmproc-generated custom classes implicitly call the default
   // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
@@ -313,16 +317,17 @@ void Application_Class::open_callback(GApplication* self, GFile** files,
   // parameter conversions if there is no possibility of the virtual function
   // being overridden:
 
-  if(obj_base && obj_base->is_derived_())
+  if (obj_base && obj_base->is_derived_())
   {
     const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
-    if(obj) // This can be nullptr during destruction.
+    if (obj) // This can be nullptr during destruction.
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes might override.
         Application::type_vec_files vec_files(n_files);
-        for (int i = 0; i < n_files; i++) {
+        for (int i = 0; i < n_files; i++)
+        {
           vec_files[i] = Glib::wrap(files[i], true);
         }
 
@@ -331,66 +336,72 @@ void Application_Class::open_callback(GApplication* self, GFile** files,
         obj->on_open(vec_files, hint_str);
         return;
       }
-      catch(...)
+      catch (...)
       {
         Glib::exception_handlers_invoke();
       }
     }
   }
 
-  const auto base = static_cast<BaseClassType*>(
-    g_type_class_peek_parent(G_OBJECT_GET_CLASS(self)) // Get the parent class of the object class (The original underlying C class).
+  const auto base = static_cast<BaseClassType*>(g_type_class_peek_parent(G_OBJECT_GET_CLASS(
+    self)) // Get the parent class of the object class (The original underlying C class).
     );
 
   // Call the original underlying C function:
-  if(base && base->open)
+  if (base && base->open)
     (*base->open)(self, files, n_files, hint);
 }
 
-Glib::SignalProxy< void, const Application::type_vec_files&, const Glib::ustring& > Application::signal_open()
+Glib::SignalProxy<void, const Application::type_vec_files&, const Glib::ustring&>
+Application::signal_open()
 {
-  return Glib::SignalProxy< void, const Application::type_vec_files&, const Glib::ustring& >(this, &Application_signal_open_info);
+  return Glib::SignalProxy<void, const Application::type_vec_files&, const Glib::ustring&>(
+    this, &Application_signal_open_info);
 }
 
-void Gio::Application::on_open(const Application::type_vec_files& files, const Glib::ustring& hint)
+void
+Gio::Application::on_open(const Application::type_vec_files& files, const Glib::ustring& hint)
 {
-  const auto base = static_cast<BaseClassType*>(
-      g_type_class_peek_parent(G_OBJECT_GET_CLASS(gobject_)) // Get the parent class of the object class (The original underlying C class).
-  );
+  const auto base = static_cast<BaseClassType*>(g_type_class_peek_parent(G_OBJECT_GET_CLASS(
+    gobject_)) // Get the parent class of the object class (The original underlying C class).
+    );
 
-  if(base && base->open) {
+  if (base && base->open)
+  {
     (*base->open)(gobj(),
-      Glib::ArrayHandler<type_vec_files::value_type>::vector_to_array(files).data(),
-      files.size(),
+      Glib::ArrayHandler<type_vec_files::value_type>::vector_to_array(files).data(), files.size(),
       hint.c_str());
   }
 }
 
-void Application::open(const type_vec_files& files, const Glib::ustring& hint)
+void
+Application::open(const type_vec_files& files, const Glib::ustring& hint)
 {
   g_application_open(gobj(),
-    Glib::ArrayHandler<type_vec_files::value_type>::vector_to_array(files).data(),
-    files.size(),
+    Glib::ArrayHandler<type_vec_files::value_type>::vector_to_array(files).data(), files.size(),
     hint.c_str());
 }
 
-void Application::open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring& hint)
+void
+Application::open(const Glib::RefPtr<Gio::File>& file, const Glib::ustring& hint)
 {
   type_vec_files files(1);
   files[0] = file;
   open(files, hint);
 }
 
-void Application::add_main_option_entry(OptionType arg_type, const Glib::ustring& long_name,
-  gchar short_name, const Glib::ustring& description, const Glib::ustring& arg_description, int flags)
+void
+Application::add_main_option_entry(OptionType arg_type, const Glib::ustring& long_name,
+  gchar short_name, const Glib::ustring& description, const Glib::ustring& arg_description,
+  int flags)
 {
-  add_main_option_entry_private((GOptionArg)arg_type, long_name, short_name,
-    description, arg_description, flags);
+  add_main_option_entry_private(
+    (GOptionArg)arg_type, long_name, short_name, description, arg_description, flags);
 }
 
-void Application::add_main_option_entry(
-  const Glib::OptionGroup::SlotOptionArgString& slot, const Glib::ustring& long_name,
-  gchar short_name, const Glib::ustring& description,
+void
+Application::add_main_option_entry(const Glib::OptionGroup::SlotOptionArgString& slot,
+  const Glib::ustring& long_name, gchar short_name, const Glib::ustring& description,
   const Glib::ustring& arg_description, int flags)
 {
   {
@@ -403,13 +414,13 @@ void Application::add_main_option_entry(
     option_arg_callback_data[long_name] = callback_data;
   } // option_arg_callback_data_mutex.unlock()
 
-  add_main_option_entry_private(G_OPTION_ARG_CALLBACK, long_name, short_name,
-    description, arg_description, flags & ~Glib::OptionEntry::FLAG_FILENAME);
+  add_main_option_entry_private(G_OPTION_ARG_CALLBACK, long_name, short_name, description,
+    arg_description, flags & ~Glib::OptionEntry::FLAG_FILENAME);
 }
 
-void Application::add_main_option_entry_filename(
-  const Glib::OptionGroup::SlotOptionArgFilename& slot, const Glib::ustring& long_name,
-  gchar short_name, const Glib::ustring& description,
+void
+Application::add_main_option_entry_filename(const Glib::OptionGroup::SlotOptionArgFilename& slot,
+  const Glib::ustring& long_name, gchar short_name, const Glib::ustring& description,
   const Glib::ustring& arg_description, int flags)
 {
   {
@@ -422,14 +433,17 @@ void Application::add_main_option_entry_filename(
     option_arg_callback_data[long_name] = callback_data;
   } // option_arg_callback_data_mutex.unlock()
 
-  add_main_option_entry_private(G_OPTION_ARG_CALLBACK, long_name, short_name,
-    description, arg_description, flags | Glib::OptionEntry::FLAG_FILENAME);
+  add_main_option_entry_private(G_OPTION_ARG_CALLBACK, long_name, short_name, description,
+    arg_description, flags | Glib::OptionEntry::FLAG_FILENAME);
 }
 
-void Application::add_main_option_entry_private(GOptionArg arg, const Glib::ustring& long_name,
-  gchar short_name, const Glib::ustring& description, const Glib::ustring& arg_description, int flags)
+void
+Application::add_main_option_entry_private(GOptionArg arg, const Glib::ustring& long_name,
+  gchar short_name, const Glib::ustring& description, const Glib::ustring& arg_description,
+  int flags)
 {
-  // Create a temporary array, just so we can give the correct thing to g_application_add_main_option_entries():
+  // Create a temporary array, just so we can give the correct thing to
+  // g_application_add_main_option_entries():
   GOptionEntry array[2];
   std::memset(array, 0, 2 * sizeof(GOptionEntry)); // null-termination
 
@@ -485,7 +499,8 @@ void Application::add_main_option_entry_private(GOptionArg arg, const Glib::ustr
   g_application_add_main_option_entries(gobj(), array);
 }
 
-void Application::unset_resource_base_path()
+void
+Application::unset_resource_base_path()
 {
   g_application_set_resource_base_path(gobj(), nullptr /* see the C docs. */);
 }

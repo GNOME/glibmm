@@ -21,10 +21,10 @@
 namespace
 {
 
-extern "C"
-{
+extern "C" {
 
-static void* call_thread_entry_slot(void* data)
+static void*
+call_thread_entry_slot(void* data)
 {
   const auto slot = reinterpret_cast<sigc::slot_base*>(data);
 
@@ -33,12 +33,12 @@ static void* call_thread_entry_slot(void* data)
     // Recreate the specific slot, and drop the reference obtained by create().
     (*static_cast<sigc::slot<void>*>(slot))();
   }
-  catch(Glib::Thread::Exit&)
+  catch (Glib::Thread::Exit&)
   {
     // Just exit from the thread.  The Thread::Exit exception
     // is our sane C++ replacement of g_thread_exit().
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
@@ -47,10 +47,9 @@ static void* call_thread_entry_slot(void* data)
   return nullptr;
 }
 
-} //extern "C"
+} // extern "C"
 
 } // anonymous namespace
-
 
 namespace Glib
 {
@@ -59,7 +58,8 @@ namespace Glib
 // and no longer needs to be called. We are keeping it just to avoid
 // breaking ABI, though hopefully nobody is using it anyway.
 // TODO: Remove this when we can break ABI.
-void thread_init_impl()
+void
+thread_init_impl()
 {
   // Make sure the exception map is initialized before creating any thread.
   Glib::Error::register_init();
@@ -68,17 +68,17 @@ void thread_init_impl()
 /**** Glib::Thread *********************************************************/
 
 // static
-Thread* Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
+Thread*
+Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
 {
   // Make a copy of slot on the heap
   const auto slot_copy = new sigc::slot<void>(slot);
 
   GError* error = nullptr;
 
-  const auto thread = g_thread_try_new(nullptr,
-      &call_thread_entry_slot, slot_copy, &error);
+  const auto thread = g_thread_try_new(nullptr, &call_thread_entry_slot, slot_copy, &error);
 
-  if(error)
+  if (error)
   {
     delete slot_copy;
     // Glib::Error::throw_exception() will probably wrap G_THREAD_ERROR in a
@@ -93,19 +93,19 @@ Thread* Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
 }
 
 // static
-Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
-                       bool joinable, bool bound, ThreadPriority priority)
+Thread*
+Thread::create(const sigc::slot<void>& slot, unsigned long stack_size, bool joinable, bool bound,
+  ThreadPriority priority)
 {
   // Make a copy of slot on the heap
   const auto slot_copy = new sigc::slot<void>(slot);
 
   GError* error = nullptr;
 
-  const auto thread = g_thread_create_full(
-      &call_thread_entry_slot, slot_copy, stack_size, joinable,
-      bound, (GThreadPriority) priority, &error);
+  const auto thread = g_thread_create_full(&call_thread_entry_slot, slot_copy, stack_size, joinable,
+    bound, (GThreadPriority)priority, &error);
 
-  if(error)
+  if (error)
   {
     delete slot_copy;
     // Glib::Error::throw_exception() will probably wrap G_THREAD_ERROR in a
@@ -120,74 +120,85 @@ Thread* Thread::create(const sigc::slot<void>& slot, unsigned long stack_size,
 }
 
 // static
-Thread* Thread::self()
+Thread*
+Thread::self()
 {
   return reinterpret_cast<Thread*>(g_thread_self());
 }
 
-void Thread::join()
+void
+Thread::join()
 {
   g_thread_join(&gobject_);
 }
 
-bool Thread::joinable() const
+bool
+Thread::joinable() const
 {
-  return true; //An appropriate result now that this is deprecated because all threads are now joinable.
+  return true; // An appropriate result now that this is deprecated because all threads are now
+               // joinable.
 }
 
-void Thread::set_priority(ThreadPriority priority)
+void
+Thread::set_priority(ThreadPriority priority)
 {
-  g_thread_set_priority(&gobject_, (GThreadPriority) priority);
+  g_thread_set_priority(&gobject_, (GThreadPriority)priority);
 }
 
-ThreadPriority Thread::get_priority() const
+ThreadPriority
+Thread::get_priority() const
 {
-  return THREAD_PRIORITY_NORMAL; //An appropriate result now that this is deprecated because the priority concept has been removed.
+  return THREAD_PRIORITY_NORMAL; // An appropriate result now that this is deprecated because the
+                                 // priority concept has been removed.
 }
 
-void thread_init(GThreadFunctions* /* vtable */)
+void
+thread_init(GThreadFunctions* /* vtable */)
 {
-  //g_thread_init() is deprecated and now does nothing,
-  //so we do not even call it. That avoids a need to link to gthread-2.0,
-  //which contains the empty g_thread_init() implementation.
-  //g_thread_init(vtable);
+  // g_thread_init() is deprecated and now does nothing,
+  // so we do not even call it. That avoids a need to link to gthread-2.0,
+  // which contains the empty g_thread_init() implementation.
+  // g_thread_init(vtable);
 
   Glib::thread_init_impl();
 }
 
-bool thread_supported()
+bool
+thread_supported()
 {
-  //MSVC++ needs the != 0 to avoid an int -> bool cast warning.
+  // MSVC++ needs the != 0 to avoid an int -> bool cast warning.
   return (g_thread_supported() != 0);
 }
 
-
 // static
-void Thread::yield()
+void
+Thread::yield()
 {
   g_thread_yield();
 }
 
-
-Thread* wrap(GThread* gobject)
+Thread*
+wrap(GThread* gobject)
 {
   return reinterpret_cast<Thread*>(gobject);
 }
 
-
 /**** Glib::StaticMutex ****************************************************/
 
-void StaticMutex::lock()
+void
+StaticMutex::lock()
 {
   g_static_mutex_lock(&gobject_);
 }
 
-bool StaticMutex::trylock()
+bool
+StaticMutex::trylock()
 {
   return g_static_mutex_trylock(&gobject_);
 }
 
-void StaticMutex::unlock()
+void
+StaticMutex::unlock()
 {
   g_static_mutex_unlock(&gobject_);
 }
@@ -216,58 +227,64 @@ StaticMutex::operator Mutex&()
   return reinterpret_cast<Mutex&>(runtime_mutex);
 }
 
-
 /**** Glib::Mutex **********************************************************/
 
 Mutex::Mutex()
-:
-  gobject_ (g_mutex_new()) //TODO: Use a statically-allocated GMutext instead, with g_mutex_init().
-{}
+: gobject_(g_mutex_new()) // TODO: Use a statically-allocated GMutext instead, with g_mutex_init().
+{
+}
 
 Mutex::~Mutex()
 {
   g_mutex_free(gobject_);
 }
 
-void Mutex::lock()
+void
+Mutex::lock()
 {
   g_mutex_lock(gobject_);
 }
 
-bool Mutex::trylock()
+bool
+Mutex::trylock()
 {
   return g_mutex_trylock(gobject_);
 }
 
-void Mutex::unlock()
+void
+Mutex::unlock()
 {
   g_mutex_unlock(gobject_);
 }
 
-
 /**** Glib::StaticRecMutex *************************************************/
 
-void StaticRecMutex::lock()
+void
+StaticRecMutex::lock()
 {
   g_static_rec_mutex_lock(&gobject_);
 }
 
-bool StaticRecMutex::trylock()
+bool
+StaticRecMutex::trylock()
 {
   return g_static_rec_mutex_trylock(&gobject_);
 }
 
-void StaticRecMutex::unlock()
+void
+StaticRecMutex::unlock()
 {
   g_static_rec_mutex_unlock(&gobject_);
 }
 
-void StaticRecMutex::lock_full(unsigned int depth)
+void
+StaticRecMutex::lock_full(unsigned int depth)
 {
   g_static_rec_mutex_lock_full(&gobject_, depth);
 }
 
-unsigned int StaticRecMutex::unlock_full()
+unsigned int
+StaticRecMutex::unlock_full()
 {
   return g_static_rec_mutex_unlock_full(&gobject_);
 }
@@ -276,7 +293,6 @@ StaticRecMutex::operator RecMutex&()
 {
   return static_cast<RecMutex&>(*this);
 }
-
 
 /**** Glib::RecMutex *******************************************************/
 
@@ -290,35 +306,40 @@ RecMutex::~RecMutex()
   g_static_rec_mutex_free(&gobject_);
 }
 
-
 /**** Glib::StaticRWLock ***************************************************/
 
-void StaticRWLock::reader_lock()
+void
+StaticRWLock::reader_lock()
 {
   g_static_rw_lock_reader_lock(&gobject_);
 }
 
-bool StaticRWLock::reader_trylock()
+bool
+StaticRWLock::reader_trylock()
 {
   return g_static_rw_lock_reader_trylock(&gobject_);
 }
 
-void StaticRWLock::reader_unlock()
+void
+StaticRWLock::reader_unlock()
 {
   g_static_rw_lock_reader_unlock(&gobject_);
 }
 
-void StaticRWLock::writer_lock()
+void
+StaticRWLock::writer_lock()
 {
   g_static_rw_lock_writer_lock(&gobject_);
 }
 
-bool StaticRWLock::writer_trylock()
+bool
+StaticRWLock::writer_trylock()
 {
   return g_static_rw_lock_writer_trylock(&gobject_);
 }
 
-void StaticRWLock::writer_unlock()
+void
+StaticRWLock::writer_unlock()
 {
   g_static_rw_lock_writer_unlock(&gobject_);
 }
@@ -327,7 +348,6 @@ StaticRWLock::operator RWLock&()
 {
   return static_cast<RWLock&>(*this);
 }
-
 
 /**** Glib::RWLock *********************************************************/
 
@@ -339,9 +359,9 @@ RWLock::RWLock()
   // of the mutex and the condition variables now, to mimic the behaviour
   // of a (hypothetical) GRWLock.
 
-  if(g_static_mutex_get_mutex(&gobject_.mutex))
+  if (g_static_mutex_get_mutex(&gobject_.mutex))
   {
-    gobject_.read_cond  = g_cond_new();
+    gobject_.read_cond = g_cond_new();
     gobject_.write_cond = g_cond_new();
   }
 }
@@ -351,51 +371,57 @@ RWLock::~RWLock()
   g_static_rw_lock_free(&gobject_);
 }
 
-
 /**** Glib::Cond ***********************************************************/
 
-Cond::Cond()
-:
-  gobject_ (g_cond_new())
-{}
+Cond::Cond() : gobject_(g_cond_new())
+{
+}
 
 Cond::~Cond()
 {
   g_cond_free(gobject_);
 }
 
-void Cond::signal()
+void
+Cond::signal()
 {
   g_cond_signal(gobject_);
 }
 
-void Cond::broadcast()
+void
+Cond::broadcast()
 {
   g_cond_broadcast(gobject_);
 }
 
-void Cond::wait(Mutex& mutex)
+void
+Cond::wait(Mutex& mutex)
 {
   g_cond_wait(gobject_, mutex.gobj());
 }
 
-bool Cond::timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time)
+bool
+Cond::timed_wait(Mutex& mutex, const Glib::TimeVal& abs_time)
 {
   return g_cond_timed_wait(gobject_, mutex.gobj(), const_cast<Glib::TimeVal*>(&abs_time));
 }
 
-void* StaticPrivate_get_helper(GStaticPrivate *private_key) {
+void*
+StaticPrivate_get_helper(GStaticPrivate* private_key)
+{
   return g_static_private_get(private_key);
 }
 
-void StaticPrivate_set_helper(GStaticPrivate *private_key, gpointer data, GDestroyNotify notify) {
+void
+StaticPrivate_set_helper(GStaticPrivate* private_key, gpointer data, GDestroyNotify notify)
+{
   return g_static_private_set(private_key, data, notify);
 }
 
-GPrivate* GPrivate_new_helper(GDestroyNotify notify) {
+GPrivate*
+GPrivate_new_helper(GDestroyNotify notify)
+{
   return g_private_new(notify);
 }
 
-
 } // namespace Glib
-

@@ -18,7 +18,6 @@
 #include <glib.h>
 #include <glibmm/utility.h>
 
-
 namespace Glib
 {
 
@@ -29,66 +28,65 @@ Dir::Dir(const std::string& path)
   GError* error = nullptr;
   gobject_ = g_dir_open(path.c_str(), 0, &error);
 
-  if(error)
+  if (error)
     Glib::Error::throw_exception(error);
 }
 
-Dir::Dir(GDir* gobject)
-:
-  gobject_ (gobject)
-{}
+Dir::Dir(GDir* gobject) : gobject_(gobject)
+{
+}
 
 Dir::~Dir()
 {
-  if(gobject_)
+  if (gobject_)
     g_dir_close(gobject_);
 }
 
-std::string Dir::read_name()
+std::string
+Dir::read_name()
 {
-  const char *const name = g_dir_read_name(gobject_);
+  const char* const name = g_dir_read_name(gobject_);
   return Glib::convert_const_gchar_ptr_to_stdstring(name);
 }
 
-void Dir::rewind()
+void
+Dir::rewind()
 {
   g_dir_rewind(gobject_);
 }
 
-void Dir::close()
+void
+Dir::close()
 {
-  if(gobject_)
+  if (gobject_)
   {
     g_dir_close(gobject_);
     gobject_ = nullptr;
   }
 }
 
-DirIterator Dir::begin()
+DirIterator
+Dir::begin()
 {
   g_dir_rewind(gobject_);
   return DirIterator(gobject_, g_dir_read_name(gobject_));
 }
 
-DirIterator Dir::end()
+DirIterator
+Dir::end()
 {
   return DirIterator(gobject_, nullptr);
 }
 
-
 /**** Glib::DirIterator ****************************************************/
 
-DirIterator::DirIterator()
-:
-  gobject_ (nullptr),
-  current_ (nullptr)
-{}
+DirIterator::DirIterator() : gobject_(nullptr), current_(nullptr)
+{
+}
 
-DirIterator::DirIterator(GDir* gobject, const char* current)
-:
-  gobject_ (gobject),
-  current_ (current)
-{}
+DirIterator::DirIterator(GDir* gobject, const char* current) : gobject_(gobject), current_(current)
+{
+}
 
 std::string DirIterator::operator*() const
 {
@@ -106,34 +104,39 @@ void DirIterator::operator++(int)
   current_ = g_dir_read_name(gobject_);
 }
 
-bool DirIterator::operator==(const DirIterator& rhs) const
+bool
+DirIterator::operator==(const DirIterator& rhs) const
 {
   return (current_ == rhs.current_);
 }
 
-bool DirIterator::operator!=(const DirIterator& rhs) const
+bool
+DirIterator::operator!=(const DirIterator& rhs) const
 {
   return (current_ != rhs.current_);
 }
 
-
-bool file_test(const std::string& filename, FileTest test)
+bool
+file_test(const std::string& filename, FileTest test)
 {
   return g_file_test(filename.c_str(), static_cast<GFileTest>(unsigned(test)));
 }
 
-int mkstemp(std::string& filename_template)
+int
+mkstemp(std::string& filename_template)
 {
-  const auto buf = make_unique_ptr_gfree(g_strndup(filename_template.data(), filename_template.size()));
+  const auto buf =
+    make_unique_ptr_gfree(g_strndup(filename_template.data(), filename_template.size()));
   const auto fileno = g_mkstemp(buf.get());
 
   filename_template = buf.get();
   return fileno;
 }
 
-int file_open_tmp(std::string& name_used, const std::string& prefix)
+int
+file_open_tmp(std::string& name_used, const std::string& prefix)
 {
-  std::string basename_template (prefix);
+  std::string basename_template(prefix);
   basename_template += "XXXXXX"; // this sillyness shouldn't be in the interface
 
   GError* error = nullptr;
@@ -141,58 +144,58 @@ int file_open_tmp(std::string& name_used, const std::string& prefix)
 
   const auto fileno = g_file_open_tmp(basename_template.c_str(), &pch_buf_name_used, &error);
   auto buf_name_used = make_unique_ptr_gfree(pch_buf_name_used);
-  if(error)
+  if (error)
     Glib::Error::throw_exception(error);
 
   name_used = buf_name_used.get();
   return fileno;
 }
 
-int file_open_tmp(std::string& name_used)
+int
+file_open_tmp(std::string& name_used)
 {
   GError* error = nullptr;
   char* pch_buf_name_used = nullptr;
 
   const auto fileno = g_file_open_tmp(nullptr, &pch_buf_name_used, &error);
   auto buf_name_used = make_unique_ptr_gfree(pch_buf_name_used);
-  if(error)
+  if (error)
     Glib::Error::throw_exception(error);
 
   name_used = buf_name_used.get();
   return fileno;
 }
 
-std::string file_get_contents(const std::string& filename)
+std::string
+file_get_contents(const std::string& filename)
 {
-  gsize   length = 0;
-  GError* error  = nullptr;
+  gsize length = 0;
+  GError* error = nullptr;
 
   char* pch_contents = nullptr;
   g_file_get_contents(filename.c_str(), &pch_contents, &length, &error);
   auto contents = make_unique_ptr_gfree(pch_contents);
-  if(error)
+  if (error)
     Glib::Error::throw_exception(error);
 
   return std::string(contents.get(), length);
 }
 
 void
-file_set_contents(const std::string& filename,
-                  const gchar *contents,
-                  gssize length)
+file_set_contents(const std::string& filename, const gchar* contents, gssize length)
 {
-  GError* error  = nullptr;
+  GError* error = nullptr;
 
   g_file_set_contents(filename.c_str(), contents, length, &error);
 
-  if(error)
+  if (error)
     Glib::Error::throw_exception(error);
 }
 
 void
-file_set_contents (const std::string& filename, const std::string& contents)
+file_set_contents(const std::string& filename, const std::string& contents)
 {
-    file_set_contents(filename, contents.c_str(), contents.size());
+  file_set_contents(filename, contents.c_str(), contents.size());
 }
 
 } // namespace Glib

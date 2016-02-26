@@ -29,34 +29,36 @@ VariantBase::VariantBase(GVariant* castitem, bool make_a_copy /* = false */)
   {
     if (g_variant_is_floating(castitem))
     {
-      g_variant_ref_sink (castitem);
+      g_variant_ref_sink(castitem);
     }
     if (make_a_copy)
     {
-      g_variant_ref (castitem);
+      g_variant_ref(castitem);
     }
   }
 
   gobject_ = castitem;
 }
 
-void VariantBase::get_normal_form(VariantBase& result) const
+void
+VariantBase::get_normal_form(VariantBase& result) const
 {
-  GVariant* const g_value =
-    g_variant_get_normal_form(const_cast<GVariant*>(gobj()));
+  GVariant* const g_value = g_variant_get_normal_form(const_cast<GVariant*>(gobj()));
 
-  //The C function never returns NULL, according to its documenation,
-  //so we don't need a bool return value.
+  // The C function never returns NULL, according to its documenation,
+  // so we don't need a bool return value.
   result.init(g_value); // g_value is already referenced.
 }
 
-void VariantBase::byteswap(VariantBase& result) const
+void
+VariantBase::byteswap(VariantBase& result) const
 {
   GVariant* const g_value = g_variant_byteswap(const_cast<GVariant*>(gobj()));
   result.init(g_value); // g_value is already referenced.
 }
 
-bool VariantBase::is_castable_to(const VariantType& supertype) const
+bool
+VariantBase::is_castable_to(const VariantType& supertype) const
 {
   const std::string subtype_string = get_type_string();
   const std::string supertype_string = supertype.get_string();
@@ -93,7 +95,7 @@ bool VariantBase::is_castable_to(const VariantType& supertype) const
 
     case 'a':
       if (!(supertype_string[supertype_index] == 'y' &&
-         (subtype_char == 's' || subtype_char == 'o' || subtype_char == 'g')))
+            (subtype_char == 's' || subtype_char == 'o' || subtype_char == 'g')))
         return false;
       supertype_index++;
       break;
@@ -110,9 +112,7 @@ bool VariantBase::is_castable_to(const VariantType& supertype) const
   return true;
 }
 
-
-VariantStringBase::VariantStringBase()
-: VariantBase()
+VariantStringBase::VariantStringBase() : VariantBase()
 {
 }
 
@@ -121,9 +121,9 @@ VariantStringBase::VariantStringBase(GVariant* castitem, bool take_a_reference)
 {
 }
 
-//static
-void VariantStringBase::create_object_path(VariantStringBase& output,
-  const std::string& object_path)
+// static
+void
+VariantStringBase::create_object_path(VariantStringBase& output, const std::string& object_path)
 {
   GVariant* result = nullptr;
   result = g_variant_new_object_path(object_path.c_str());
@@ -131,9 +131,9 @@ void VariantStringBase::create_object_path(VariantStringBase& output,
   output.init(result);
 }
 
-//static
-void VariantStringBase::create_signature(VariantStringBase& output,
-  const std::string& signature)
+// static
+void
+VariantStringBase::create_signature(VariantStringBase& output, const std::string& signature)
 {
   GVariant* result = nullptr;
   result = g_variant_new_signature(signature.c_str());
@@ -141,9 +141,7 @@ void VariantStringBase::create_signature(VariantStringBase& output,
   output.init(result);
 }
 
-
-VariantContainerBase::VariantContainerBase()
-: VariantBase()
+VariantContainerBase::VariantContainerBase() : VariantBase()
 {
 }
 
@@ -152,25 +150,25 @@ VariantContainerBase::VariantContainerBase(GVariant* castitem, bool take_a_refer
 {
 }
 
-//static
+// static
 VariantContainerBase
 VariantContainerBase::create_tuple(const std::vector<VariantBase>& children)
 {
   typedef GVariant* var_ptr;
   var_ptr* const var_array = new var_ptr[children.size()];
 
-  for(std::vector<VariantBase>::size_type i = 0; i < children.size(); i++)
+  for (std::vector<VariantBase>::size_type i = 0; i < children.size(); i++)
   {
     var_array[i] = const_cast<GVariant*>(children[i].gobj());
   }
 
-  VariantContainerBase result = VariantContainerBase(g_variant_new_tuple(
-    var_array, children.size()));
+  VariantContainerBase result =
+    VariantContainerBase(g_variant_new_tuple(var_array, children.size()));
   delete[] var_array;
   return result;
 }
 
-//static
+// static
 VariantContainerBase
 VariantContainerBase::create_tuple(const VariantBase& child)
 {
@@ -179,53 +177,51 @@ VariantContainerBase::create_tuple(const VariantBase& child)
   return create_tuple(vec);
 }
 
-//static
+// static
 VariantContainerBase
-VariantContainerBase::create_maybe(const VariantType& child_type,
-  const VariantBase& child)
+VariantContainerBase::create_maybe(const VariantType& child_type, const VariantBase& child)
 {
-  GVariant* g_variant = g_variant_new_maybe(child_type.gobj(),
-    const_cast<GVariant*>(child.gobj()));
+  GVariant* g_variant = g_variant_new_maybe(child_type.gobj(), const_cast<GVariant*>(child.gobj()));
   VariantContainerBase result = VariantContainerBase(g_variant);
   return result;
 }
 
-void VariantContainerBase::get_child(VariantBase& child, gsize index) const
+void
+VariantContainerBase::get_child(VariantBase& child, gsize index) const
 {
-  if(index >= g_variant_n_children(gobject_))
-    throw std::out_of_range(
-      "VariantContainerBase::get_child(): Index out of bounds.");
+  if (index >= g_variant_n_children(gobject_))
+    throw std::out_of_range("VariantContainerBase::get_child(): Index out of bounds.");
 
   GVariant* const gvariant = g_variant_get_child_value(gobject_, index);
   child.init(gvariant);
 }
 
 // VariantContainerBase has no method variant_type()
-template<>
-VariantContainerBase VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v)
-throw(std::bad_cast)
+template <>
+VariantContainerBase
+VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v) throw(std::bad_cast)
 {
-  if(!v.gobj())
+  if (!v.gobj())
   {
     return VariantContainerBase();
   }
-  if(v.get_type().is_container())
+  if (v.get_type().is_container())
   {
     return VariantContainerBase(const_cast<GVariant*>(v.gobj()), true);
   }
   else
   {
-    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
+    // std::cerr << "vtype=" << v.get_type_string() << std::endl;
     throw std::bad_cast();
   }
 }
 
-bool VariantContainerBase::get_maybe(VariantBase& maybe) const
+bool
+VariantContainerBase::get_maybe(VariantBase& maybe) const
 {
-  GVariant* const g_value =
-    g_variant_get_maybe(const_cast<GVariant*>(gobj()));
+  GVariant* const g_value = g_variant_get_maybe(const_cast<GVariant*>(gobj()));
 
-  if(g_value)
+  if (g_value)
   {
     maybe.init(g_value); // g_value is already referenced.
     return true;
@@ -234,7 +230,8 @@ bool VariantContainerBase::get_maybe(VariantBase& maybe) const
     return false;
 }
 
-VariantIter VariantContainerBase::get_iter(const VariantType& container_variant_type) const
+VariantIter
+VariantContainerBase::get_iter(const VariantType& container_variant_type) const
 {
   // Get the GVariantIter.
   // If the underlying GVariant can be cast to the type of the container,
@@ -243,8 +240,8 @@ VariantIter VariantContainerBase::get_iter(const VariantType& container_variant_
   // otherwise let g_variant_get() report what's wrong with the type.
   GVariantIter* g_iter = nullptr;
   g_variant_get(const_cast<GVariant*>(gobj()),
-    is_castable_to(container_variant_type) ?
-      get_type_string().c_str() : container_variant_type.get_string().c_str(),
+    is_castable_to(container_variant_type) ? get_type_string().c_str()
+                                           : container_variant_type.get_string().c_str(),
     &g_iter);
 
   return VariantIter(g_iter);
@@ -257,20 +254,20 @@ VariantBase::operator const void*() const
   return gobj() ? GINT_TO_POINTER(1) : nullptr;
 }
 
-void VariantBase::init(const GVariant* cobject, bool take_a_reference)
+void
+VariantBase::init(const GVariant* cobject, bool take_a_reference)
 {
-  if(gobject_)
+  if (gobject_)
     g_variant_unref(gobject_);
 
   gobject_ = const_cast<GVariant*>(cobject);
-  if(take_a_reference)
+  if (take_a_reference)
     g_variant_ref(gobject_);
 }
 
 /*--------------------Variant<VariantBase>---------------------*/
 
-Variant<VariantBase>::Variant()
-: VariantContainerBase()
+Variant<VariantBase>::Variant() : VariantContainerBase()
 {
 }
 
@@ -280,18 +277,21 @@ Variant<VariantBase>::Variant(GVariant* castitem, bool take_a_reference)
 }
 
 // static
-const VariantType& Variant<VariantBase>::variant_type()
+const VariantType&
+Variant<VariantBase>::variant_type()
 {
   return VARIANT_TYPE_VARIANT;
 }
 
-Variant<VariantBase> Variant<VariantBase>::create(const VariantBase& data)
+Variant<VariantBase>
+Variant<VariantBase>::create(const VariantBase& data)
 {
   auto result = Variant<VariantBase>(g_variant_new_variant(const_cast<GVariant*>(data.gobj())));
   return result;
 }
 
-void Variant<VariantBase>::get(VariantBase& variant) const
+void
+Variant<VariantBase>::get(VariantBase& variant) const
 {
   GVariant* const gvariant = g_variant_get_variant(gobject_);
   variant.init(gvariant);
@@ -299,8 +299,7 @@ void Variant<VariantBase>::get(VariantBase& variant) const
 
 /*--------------------Variant<Glib::ustring>---------------------*/
 
-Variant<Glib::ustring>::Variant()
-: VariantStringBase()
+Variant<Glib::ustring>::Variant() : VariantStringBase()
 {
 }
 
@@ -310,7 +309,8 @@ Variant<Glib::ustring>::Variant(GVariant* castitem, bool take_a_reference)
 }
 
 // static
-const VariantType& Variant<Glib::ustring>::variant_type()
+const VariantType&
+Variant<Glib::ustring>::variant_type()
 {
   return VARIANT_TYPE_STRING;
 }
@@ -318,45 +318,43 @@ const VariantType& Variant<Glib::ustring>::variant_type()
 Variant<Glib::ustring>
 Variant<Glib::ustring>::create(const Glib::ustring& data)
 {
-  auto result =
-    Variant<Glib::ustring>(g_variant_new_string(data.c_str()));
+  auto result = Variant<Glib::ustring>(g_variant_new_string(data.c_str()));
   return result;
 }
 
-Glib::ustring Variant<Glib::ustring>::get() const
+Glib::ustring
+Variant<Glib::ustring>::get() const
 {
   return convert_const_gchar_ptr_to_ustring(g_variant_get_string(gobject_, nullptr));
 }
 
 // Variant<Glib::ustring> makes sense for multiple types.
 // See http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-get-string
-template<>
-Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v)
-throw(std::bad_cast)
+template <>
+Variant<Glib::ustring>
+VariantBase::cast_dynamic<Variant<Glib::ustring>>(const VariantBase& v) throw(std::bad_cast)
 {
-  if(!v.gobj())
+  if (!v.gobj())
   {
     return Variant<Glib::ustring>();
   }
 
   const VariantType vtype = v.get_type();
-  if( vtype.equal(VARIANT_TYPE_STRING) ||
-      vtype.equal(VARIANT_TYPE_OBJECT_PATH) ||
-      vtype.equal(VARIANT_TYPE_SIGNATURE) )
+  if (vtype.equal(VARIANT_TYPE_STRING) || vtype.equal(VARIANT_TYPE_OBJECT_PATH) ||
+      vtype.equal(VARIANT_TYPE_SIGNATURE))
   {
     return Variant<Glib::ustring>(const_cast<GVariant*>(v.gobj()), true);
   }
   else
   {
-    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
+    // std::cerr << "vtype=" << v.get_type_string() << std::endl;
     throw std::bad_cast();
   }
 }
 
 /*--------------------Variant<std::string>---------------------*/
 
-Variant<std::string>::Variant()
-: VariantStringBase()
+Variant<std::string>::Variant() : VariantStringBase()
 {
 }
 
@@ -366,7 +364,8 @@ Variant<std::string>::Variant(GVariant* castitem, bool take_a_reference)
 }
 
 // static
-const VariantType& Variant<std::string>::variant_type()
+const VariantType&
+Variant<std::string>::variant_type()
 {
   return VARIANT_TYPE_BYTESTRING;
 }
@@ -374,45 +373,43 @@ const VariantType& Variant<std::string>::variant_type()
 Variant<std::string>
 Variant<std::string>::create(const std::string& data)
 {
-  auto result =
-    Variant<std::string>(g_variant_new_bytestring(data.c_str()));
+  auto result = Variant<std::string>(g_variant_new_bytestring(data.c_str()));
   return result;
 }
 
 // Variant<std::string> makes sense for multiple types.
 // See http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-get-string
-template<>
-Variant<std::string> VariantBase::cast_dynamic< Variant<std::string> >(const VariantBase& v)
-throw(std::bad_cast)
+template <>
+Variant<std::string>
+VariantBase::cast_dynamic<Variant<std::string>>(const VariantBase& v) throw(std::bad_cast)
 {
-  if(!v.gobj())
+  if (!v.gobj())
   {
     return Variant<std::string>();
   }
 
   const VariantType vtype = v.get_type();
-  if( vtype.equal(VARIANT_TYPE_STRING) ||
-      vtype.equal(VARIANT_TYPE_BYTESTRING) ||
-      vtype.equal(VARIANT_TYPE_OBJECT_PATH) ||
-      vtype.equal(VARIANT_TYPE_SIGNATURE) )
+  if (vtype.equal(VARIANT_TYPE_STRING) || vtype.equal(VARIANT_TYPE_BYTESTRING) ||
+      vtype.equal(VARIANT_TYPE_OBJECT_PATH) || vtype.equal(VARIANT_TYPE_SIGNATURE))
   {
     return Variant<std::string>(const_cast<GVariant*>(v.gobj()), true);
   }
   else
   {
-    //std::cerr << "vtype=" << v.get_type_string() << std::endl;
+    // std::cerr << "vtype=" << v.get_type_string() << std::endl;
     throw std::bad_cast();
   }
 }
 
-std::string Variant<std::string>::get() const
+std::string
+Variant<std::string>::get() const
 {
   const VariantType vtype = get_type();
 
   const char* pch = nullptr;
-  if(vtype.equal(VARIANT_TYPE_BYTESTRING))
+  if (vtype.equal(VARIANT_TYPE_BYTESTRING))
     pch = g_variant_get_bytestring(gobject_);
-  else //g_variant_get_string() can handle strings, object paths, and signatures.
+  else // g_variant_get_string() can handle strings, object paths, and signatures.
     pch = g_variant_get_string(gobject_, nullptr);
 
   return convert_const_gchar_ptr_to_stdstring(pch);
@@ -422,8 +419,7 @@ std::string Variant<std::string>::get() const
 
 typedef std::vector<Glib::ustring> type_vec_ustring;
 
-Variant<type_vec_ustring>::Variant()
-: VariantContainerBase()
+Variant<type_vec_ustring>::Variant() : VariantContainerBase()
 {
 }
 
@@ -433,7 +429,8 @@ Variant<type_vec_ustring>::Variant(GVariant* castitem, bool take_a_reference)
 }
 
 // static
-const VariantType& Variant<type_vec_ustring>::variant_type()
+const VariantType&
+Variant<type_vec_ustring>::variant_type()
 {
   return VARIANT_TYPE_STRING_ARRAY;
 }
@@ -451,35 +448,34 @@ Variant<type_vec_ustring>::create(const type_vec_ustring& data)
   GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
 
   // Add the elements of the vector into the builder.
-  for(const auto& str : data)
+  for (const auto& str : data)
   {
-    g_variant_builder_add(builder,
-      element_variant_type.get_string().c_str(), str.c_str());
+    g_variant_builder_add(builder, element_variant_type.get_string().c_str(), str.c_str());
   }
 
   // Create the variant using the builder.
   auto result =
-    Variant<type_vec_ustring>(g_variant_new(
-      array_variant_type.get_string().c_str(), builder));
+    Variant<type_vec_ustring>(g_variant_new(array_variant_type.get_string().c_str(), builder));
 
   g_variant_builder_unref(builder);
 
   return result;
 }
 
-Glib::ustring Variant<type_vec_ustring>::get_child(gsize index) const
+Glib::ustring
+Variant<type_vec_ustring>::get_child(gsize index) const
 {
   if (index >= g_variant_n_children(const_cast<GVariant*>(gobj())))
     throw std::out_of_range(
       "Variant< std::vector<Glib::ustring> >::get_child(): Index out of bounds.");
 
-  GVariant* gvariant =
-    g_variant_get_child_value(const_cast<GVariant*>(gobj()), index);
+  GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), index);
 
   return Glib::Variant<Glib::ustring>(gvariant).get();
 }
 
-type_vec_ustring Variant<type_vec_ustring>::get() const
+type_vec_ustring
+Variant<type_vec_ustring>::get() const
 {
   // g_variant_get_strv() can be used only if the type is VARIANT_TYPE_STRING_ARRAY,
   // but the Variant can alternatively hold an array of object paths or DBus type signatures.
@@ -489,8 +485,7 @@ type_vec_ustring Variant<type_vec_ustring>::get() const
 
   for (gsize i = 0; i < n_children; i++)
   {
-    GVariant* gvariant =
-      g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
+    GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
 
     result.emplace_back(Glib::Variant<Glib::ustring>(gvariant).get());
   }
@@ -498,7 +493,8 @@ type_vec_ustring Variant<type_vec_ustring>::get() const
   return result;
 }
 
-VariantIter Variant<type_vec_ustring>::get_iter() const
+VariantIter
+Variant<type_vec_ustring>::get_iter() const
 {
   return VariantContainerBase::get_iter(variant_type());
 }
@@ -507,8 +503,7 @@ VariantIter Variant<type_vec_ustring>::get_iter() const
 
 typedef std::vector<std::string> type_vec_string;
 
-Variant<type_vec_string>::Variant()
-: VariantContainerBase()
+Variant<type_vec_string>::Variant() : VariantContainerBase()
 {
 }
 
@@ -518,7 +513,8 @@ Variant<type_vec_string>::Variant(GVariant* castitem, bool take_a_reference)
 }
 
 // static
-const VariantType& Variant<type_vec_string>::variant_type()
+const VariantType&
+Variant<type_vec_string>::variant_type()
 {
   return VARIANT_TYPE_BYTESTRING_ARRAY;
 }
@@ -530,7 +526,7 @@ Variant<type_vec_string>::create(const type_vec_string& data)
   char** str_array = g_new(char*, data.size() + 1);
 
   // Add the elements of the vector into the string array.
-  for(type_vec_string::size_type i = 0; i < data.size(); i++)
+  for (type_vec_string::size_type i = 0; i < data.size(); i++)
   {
     str_array[i] = g_strdup(data[i].c_str());
   }
@@ -540,9 +536,7 @@ Variant<type_vec_string>::create(const type_vec_string& data)
 
   // Create the variant using g_variant_new_bytestring_array() (passing the
   // newly constructed array.
-  auto result =
-    Variant<type_vec_string>(g_variant_new_bytestring_array(str_array,
-      data.size()));
+  auto result = Variant<type_vec_string>(g_variant_new_bytestring_array(str_array, data.size()));
 
   g_strfreev(str_array);
   return result;
@@ -555,7 +549,7 @@ Variant<type_vec_string>::create_from_object_paths(const type_vec_string& data)
   char** str_array = g_new(char*, data.size() + 1);
 
   // Add the elements of the vector into the string array.
-  for(type_vec_string::size_type i = 0; i < data.size(); i++)
+  for (type_vec_string::size_type i = 0; i < data.size(); i++)
   {
     str_array[i] = g_strdup(data[i].c_str());
   }
@@ -565,37 +559,37 @@ Variant<type_vec_string>::create_from_object_paths(const type_vec_string& data)
 
   // Create the variant using g_variant_new_objv() (passing the
   // newly constructed array.
-  auto result =
-    Variant<type_vec_string>(g_variant_new_objv(str_array, data.size()));
+  auto result = Variant<type_vec_string>(g_variant_new_objv(str_array, data.size()));
 
   g_strfreev(str_array);
   return result;
 }
 
-std::string Variant<type_vec_string>::get_child(gsize index) const
+std::string
+Variant<type_vec_string>::get_child(gsize index) const
 {
   if (index >= g_variant_n_children(const_cast<GVariant*>(gobj())))
     throw std::out_of_range(
       "Variant< std::vector<std::string> >::get_child(): Index out of bounds.");
 
-  GVariant* gvariant =
-    g_variant_get_child_value(const_cast<GVariant*>(gobj()), index);
+  GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), index);
 
   return Glib::Variant<std::string>(gvariant).get();
 }
 
-type_vec_string Variant<type_vec_string>::get() const
+type_vec_string
+Variant<type_vec_string>::get() const
 {
   // g_variant_get_bytestring_array() can be used only if the type is VARIANT_TYPE_BYTESTRING_ARRAY,
-  // but the Variant can alternatively hold an array of strings, object paths or DBus type signatures.
+  // but the Variant can alternatively hold an array of strings, object paths or DBus type
+  // signatures.
   type_vec_string result;
 
   gsize n_children = g_variant_n_children(const_cast<GVariant*>(gobj()));
 
   for (gsize i = 0; i < n_children; i++)
   {
-    GVariant* gvariant =
-      g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
+    GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
 
     result.emplace_back(Glib::Variant<std::string>(gvariant).get());
   }
@@ -603,7 +597,8 @@ type_vec_string Variant<type_vec_string>::get() const
   return result;
 }
 
-VariantIter Variant<type_vec_string>::get_iter() const
+VariantIter
+Variant<type_vec_string>::get_iter() const
 {
   return VariantContainerBase::get_iter(variant_type());
 }

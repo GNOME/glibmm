@@ -27,19 +27,16 @@ namespace Gio
 {
 
 void
-FileEnumerator::next_files_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int num_files, int io_priority)
+FileEnumerator::next_files_async(const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, int num_files, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_file_enumerator_next_files_async(gobj(),
-                                     num_files,
-                                     io_priority,
-                                     Glib::unwrap(cancellable),
-                                     &SignalProxy_async_callback,
-                                     slot_copy);
+  g_file_enumerator_next_files_async(gobj(), num_files, io_priority, Glib::unwrap(cancellable),
+    &SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -50,45 +47,35 @@ FileEnumerator::next_files_async(const SlotAsyncReady& slot, int num_files, int 
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_file_enumerator_next_files_async(gobj(),
-                                     num_files,
-                                     io_priority,
-                                     nullptr, // cancellable
-                                     &SignalProxy_async_callback,
-                                     slot_copy);
+  g_file_enumerator_next_files_async(gobj(), num_files, io_priority,
+    nullptr, // cancellable
+    &SignalProxy_async_callback, slot_copy);
 }
 
 void
-FileEnumerator::close_async(int io_priority,
-                            const Glib::RefPtr<Cancellable>& cancellable,
-                            const SlotAsyncReady& slot)
-{
-// Create a copy of the slot.
-  // A pointer to it will be passed through the callback's data parameter
-  // and deleted in the callback.
-  auto slot_copy = new SlotAsyncReady(slot);
-
-  g_file_enumerator_close_async(gobj(),
-                                io_priority,
-                                Glib::unwrap(cancellable),
-                                &SignalProxy_async_callback,
-                                slot_copy);
-}
-
-void
-FileEnumerator::close_async(int io_priority,
-                            const SlotAsyncReady& slot)
+FileEnumerator::close_async(
+  int io_priority, const Glib::RefPtr<Cancellable>& cancellable, const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_file_enumerator_close_async(gobj(),
-                                io_priority,
-                                nullptr, // cancellable
-                                &SignalProxy_async_callback,
-                                slot_copy);
+  g_file_enumerator_close_async(
+    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+}
+
+void
+FileEnumerator::close_async(int io_priority, const SlotAsyncReady& slot)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  auto slot_copy = new SlotAsyncReady(slot);
+
+  g_file_enumerator_close_async(gobj(), io_priority,
+    nullptr, // cancellable
+    &SignalProxy_async_callback, slot_copy);
 }
 
 } // namespace Gio

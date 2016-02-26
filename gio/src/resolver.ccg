@@ -22,166 +22,127 @@
 namespace Gio
 {
 
-Glib::RefPtr<Resolver> Resolver::get_default()
+Glib::RefPtr<Resolver>
+Resolver::get_default()
 {
-    return Glib::wrap(g_resolver_get_default());
-}
-
-void Resolver::set_default(const Glib::RefPtr<Resolver>& resolver)
-{
-    g_resolver_set_default(Glib::unwrap(resolver));
+  return Glib::wrap(g_resolver_get_default());
 }
 
 void
-Resolver::lookup_by_name_async(const Glib::ustring& hostname,
-                               const SlotAsyncReady& slot,
-                               const Glib::RefPtr<Cancellable>& cancellable)
+Resolver::set_default(const Glib::RefPtr<Resolver>& resolver)
 {
-  auto slot_copy = new SlotAsyncReady(slot);
-
-  g_resolver_lookup_by_name_async (gobj(),
-                                   hostname.c_str(),
-                                   Glib::unwrap(cancellable),
-                                   &SignalProxy_async_callback,
-                                   slot_copy);
+  g_resolver_set_default(Glib::unwrap(resolver));
 }
 
 void
-Resolver::lookup_by_name_async(const Glib::ustring& hostname,
-                               const SlotAsyncReady& slot)
+Resolver::lookup_by_name_async(const Glib::ustring& hostname, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_resolver_lookup_by_name_async (gobj(),
-                                   hostname.c_str(),
-                                   nullptr,
-                                   &SignalProxy_async_callback,
-                                   slot_copy);
+  g_resolver_lookup_by_name_async(
+    gobj(), hostname.c_str(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+}
+
+void
+Resolver::lookup_by_name_async(const Glib::ustring& hostname, const SlotAsyncReady& slot)
+{
+  auto slot_copy = new SlotAsyncReady(slot);
+
+  g_resolver_lookup_by_name_async(
+    gobj(), hostname.c_str(), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 void
 Resolver::lookup_by_address_async(const Glib::RefPtr<InetAddress>& address,
-                                  const SlotAsyncReady& slot,
-                                  const Glib::RefPtr<Cancellable>& cancellable)
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_resolver_lookup_by_address_async (gobj(),
-                                      Glib::unwrap(address),
-                                      Glib::unwrap(cancellable),
-                                      &SignalProxy_async_callback,
-                                      slot_copy);
+  g_resolver_lookup_by_address_async(gobj(), Glib::unwrap(address), Glib::unwrap(cancellable),
+    &SignalProxy_async_callback, slot_copy);
 }
 
 void
-Resolver::lookup_by_address_async(const Glib::RefPtr<InetAddress>& address,
-                                  const SlotAsyncReady& slot)
+Resolver::lookup_by_address_async(
+  const Glib::RefPtr<InetAddress>& address, const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_resolver_lookup_by_address_async (gobj(),
-                                      Glib::unwrap(address),
-                                      nullptr,
-                                      &SignalProxy_async_callback,
-                                      slot_copy);
+  g_resolver_lookup_by_address_async(
+    gobj(), Glib::unwrap(address), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 void
-Resolver::lookup_service_async(const Glib::ustring& service,
-                               const Glib::ustring& protocol,
-                               const Glib::ustring& domain,
-                               const SlotAsyncReady& slot,
-                               const Glib::RefPtr<Cancellable>& cancellable)
+Resolver::lookup_service_async(const Glib::ustring& service, const Glib::ustring& protocol,
+  const Glib::ustring& domain, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_resolver_lookup_service_async (gobj(),
-                                   service.c_str(),
-                                   protocol.c_str(),
-                                   domain.c_str(),
-                                   Glib::unwrap(cancellable),
-                                   &SignalProxy_async_callback,
-                                   slot_copy);
+  g_resolver_lookup_service_async(gobj(), service.c_str(), protocol.c_str(), domain.c_str(),
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
 void
-Resolver::lookup_service_async(const Glib::ustring& service,
-                               const Glib::ustring& protocol,
-                               const Glib::ustring& domain,
-                               const SlotAsyncReady& slot)
+Resolver::lookup_service_async(const Glib::ustring& service, const Glib::ustring& protocol,
+  const Glib::ustring& domain, const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_resolver_lookup_service_async (gobj(),
-                                   service.c_str(),
-                                   protocol.c_str(),
-                                   domain.c_str(),
-                                   nullptr,
-                                   &SignalProxy_async_callback,
-                                   slot_copy);
+  g_resolver_lookup_service_async(gobj(), service.c_str(), protocol.c_str(), domain.c_str(),
+    nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 void
-Resolver::lookup_records_async(const Glib::ustring& rrname,
-                               ResolverRecordType record_type,
-                               const SlotAsyncReady& slot,
-                               const Glib::RefPtr<Cancellable>& cancellable)
+Resolver::lookup_records_async(const Glib::ustring& rrname, ResolverRecordType record_type,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_resolver_lookup_records_async(gobj(),
-                                  Glib::c_str_or_nullptr(rrname),
-                                  static_cast<GResolverRecordType>(record_type),
-                                  Glib::unwrap(cancellable),
-                                  &SignalProxy_async_callback,
-                                  slot_copy);
+  g_resolver_lookup_records_async(gobj(), Glib::c_str_or_nullptr(rrname),
+    static_cast<GResolverRecordType>(record_type), Glib::unwrap(cancellable),
+    &SignalProxy_async_callback, slot_copy);
 }
 
 void
-Resolver::lookup_records_async(const Glib::ustring& rrname,
-                               ResolverRecordType record_type,
-                               const SlotAsyncReady& slot)
+Resolver::lookup_records_async(
+  const Glib::ustring& rrname, ResolverRecordType record_type, const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_resolver_lookup_records_async(gobj(),
-                                  Glib::c_str_or_nullptr(rrname),
-                                  static_cast<GResolverRecordType>(record_type),
-                                  nullptr,
-                                  &SignalProxy_async_callback,
-                                  slot_copy);
+  g_resolver_lookup_records_async(gobj(), Glib::c_str_or_nullptr(rrname),
+    static_cast<GResolverRecordType>(record_type), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 std::string
-hostname_to_ascii (const Glib::ustring& hostname)
+hostname_to_ascii(const Glib::ustring& hostname)
 {
-    return Glib::convert_return_gchar_ptr_to_stdstring
-        (g_hostname_to_ascii (hostname.c_str ()));
+  return Glib::convert_return_gchar_ptr_to_stdstring(g_hostname_to_ascii(hostname.c_str()));
 }
 
 Glib::ustring
-hostname_to_unicode (const Glib::ustring& hostname)
+hostname_to_unicode(const Glib::ustring& hostname)
 {
-    return Glib::convert_return_gchar_ptr_to_ustring
-        (g_hostname_to_unicode (hostname.c_str ()));
+  return Glib::convert_return_gchar_ptr_to_ustring(g_hostname_to_unicode(hostname.c_str()));
 }
 
 bool
-hostname_is_non_ascii (const Glib::ustring& hostname)
+hostname_is_non_ascii(const Glib::ustring& hostname)
 {
-    return g_hostname_is_non_ascii (hostname.c_str ());
+  return g_hostname_is_non_ascii(hostname.c_str());
 }
 
 bool
-hostname_is_ascii_encoded (const Glib::ustring& hostname)
+hostname_is_ascii_encoded(const Glib::ustring& hostname)
 {
-    return g_hostname_is_ascii_encoded (hostname.c_str ());
+  return g_hostname_is_ascii_encoded(hostname.c_str());
 }
 
 bool
-hostname_is_ip_address (const Glib::ustring& hostname)
+hostname_is_ip_address(const Glib::ustring& hostname)
 {
-    return g_hostname_is_ip_address (hostname.c_str ());
+  return g_hostname_is_ip_address(hostname.c_str());
 }
 
-} //namespace Gio
+} // namespace Gio

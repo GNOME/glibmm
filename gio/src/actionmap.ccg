@@ -23,105 +23,114 @@
 namespace Gio
 {
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name)
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action(const Glib::ustring& name)
 {
   auto action = SimpleAction::create(name);
   add_action(action);
   return action;
 }
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action_with_parameter(const Glib::ustring& name, const ActivateWithParameterSlot& slot)
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action_with_parameter(
+  const Glib::ustring& name, const ActivateWithParameterSlot& slot)
 {
   auto action = add_action(name);
   action->signal_activate().connect(slot);
   return action;
 }
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action(const Glib::ustring& name, const ActivateSlot& slot)
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action(const Glib::ustring& name, const ActivateSlot& slot)
 {
   auto action = add_action(name);
-  action->signal_activate().connect(
-    sigc::hide(slot));
+  action->signal_activate().connect(sigc::hide(slot));
   return action;
 }
 
-
-Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name, bool state)
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action_bool(const Glib::ustring& name, bool state)
 {
   auto action = SimpleAction::create_bool(name, state);
   add_action(action);
   return action;
 }
 
-//TODO: Use a slot that takes a bool?
-Glib::RefPtr<SimpleAction> ActionMap::add_action_bool(const Glib::ustring& name, const ActivateSlot& slot, bool state)
+// TODO: Use a slot that takes a bool?
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action_bool(const Glib::ustring& name, const ActivateSlot& slot, bool state)
 {
   auto action = add_action_bool(name, state);
-  action->signal_activate().connect(
-    sigc::hide(slot));
+  action->signal_activate().connect(sigc::hide(slot));
   return action;
 }
 
-//TODO: Use a slot that takes a string?
-Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const Glib::ustring& state)
+// TODO: Use a slot that takes a string?
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action_radio_string(const Glib::ustring& name, const Glib::ustring& state)
 {
   auto action = SimpleAction::create_radio_string(name, state);
   add_action(action);
   return action;
 }
 
-
-namespace {
-
-//Handle the normal activate signal, calling instead a slot that takes the specific type:
-static void on_action_radio_string(const Glib::VariantBase& parameter, const Gio::ActionMap::ActivateWithStringParameterSlot& slot)
+namespace
 {
-  //TODO: This syntax is odd:
-  const auto variantDerived =
-    parameter.cast_dynamic< Glib::Variant<Glib::ustring> >(parameter);
+
+// Handle the normal activate signal, calling instead a slot that takes the specific type:
+static void
+on_action_radio_string(
+  const Glib::VariantBase& parameter, const Gio::ActionMap::ActivateWithStringParameterSlot& slot)
+{
+  // TODO: This syntax is odd:
+  const auto variantDerived = parameter.cast_dynamic<Glib::Variant<Glib::ustring>>(parameter);
   const auto str = variantDerived.get();
   slot(str);
 }
 
-} //anonymous namespace
+} // anonymous namespace
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_string(const Glib::ustring& name, const ActivateWithStringParameterSlot& slot, const Glib::ustring& state)
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action_radio_string(const Glib::ustring& name,
+  const ActivateWithStringParameterSlot& slot, const Glib::ustring& state)
 {
   auto action = add_action_radio_string(name, state);
-  action->signal_activate().connect(
-    sigc::bind(sigc::ptr_fun(&on_action_radio_string), slot));
+  action->signal_activate().connect(sigc::bind(sigc::ptr_fun(&on_action_radio_string), slot));
   return action;
 }
 
-namespace {
-
-//Handle the normal activate signal, calling instead a slot that takes the specific type:
-static void on_action_radio_int(const Glib::VariantBase& parameter, const Gio::ActionMap::ActivateWithIntParameterSlot& slot)
+namespace
 {
-  //TODO: This syntax is odd:
-  const auto variantDerived =
-    parameter.cast_dynamic< Glib::Variant<int> >(parameter);
+
+// Handle the normal activate signal, calling instead a slot that takes the specific type:
+static void
+on_action_radio_int(
+  const Glib::VariantBase& parameter, const Gio::ActionMap::ActivateWithIntParameterSlot& slot)
+{
+  // TODO: This syntax is odd:
+  const auto variantDerived = parameter.cast_dynamic<Glib::Variant<int>>(parameter);
   const auto str = variantDerived.get();
   slot(str);
 }
 
-} //anonymous namespace
+} // anonymous namespace
 
-//TODO: Use a slot that takes an integer?
-Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, gint32 state)
+// TODO: Use a slot that takes an integer?
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action_radio_integer(const Glib::ustring& name, gint32 state)
 {
   auto action = SimpleAction::create_radio_integer(name, state);
   add_action(action);
   return action;
 }
 
-Glib::RefPtr<SimpleAction> ActionMap::add_action_radio_integer(const Glib::ustring& name, const ActivateWithIntParameterSlot& slot, gint32 state)
+Glib::RefPtr<SimpleAction>
+ActionMap::add_action_radio_integer(
+  const Glib::ustring& name, const ActivateWithIntParameterSlot& slot, gint32 state)
 {
   auto action = add_action_radio_integer(name, state);
-  action->signal_activate().connect(
-    sigc::bind(sigc::ptr_fun(&on_action_radio_int), slot));
+  action->signal_activate().connect(sigc::bind(sigc::ptr_fun(&on_action_radio_int), slot));
   return action;
 }
-
 
 } // namespace Gio

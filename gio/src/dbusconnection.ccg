@@ -29,13 +29,12 @@
 namespace
 {
 
-extern "C"
-{
+extern "C" {
 
-static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection,
-  const char* sender_name, const char* object_path,
-  const char* interface_name, const char* signal_name, GVariant* parameters,
-  void* user_data)
+static void
+DBusConnection_Signal_giomm_callback(GDBusConnection* connection, const char* sender_name,
+  const char* object_path, const char* interface_name, const char* signal_name,
+  GVariant* parameters, void* user_data)
 {
   Gio::DBus::Connection::SlotSignal* the_slot =
     static_cast<Gio::DBus::Connection::SlotSignal*>(user_data);
@@ -46,20 +45,21 @@ static void DBusConnection_Signal_giomm_callback(GDBusConnection* connection,
       (object_path ? object_path : ""), (interface_name ? interface_name : ""),
       (signal_name ? signal_name : ""), Glib::VariantContainerBase(parameters, true));
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
 }
 
-static void DBusConnection_Signal_giomm_callback_destroy(void* data)
+static void
+DBusConnection_Signal_giomm_callback_destroy(void* data)
 {
   delete static_cast<Gio::DBus::Connection::SlotSignal*>(data);
 }
 
-static GDBusMessage* DBusConnection_Message_Filter_giomm_callback(
-  GDBusConnection* connection, GDBusMessage* message, gboolean incoming,
-  void* user_data)
+static GDBusMessage*
+DBusConnection_Message_Filter_giomm_callback(
+  GDBusConnection* connection, GDBusMessage* message, gboolean incoming, void* user_data)
 {
   Gio::DBus::Connection::SlotMessageFilter* the_slot =
     static_cast<Gio::DBus::Connection::SlotMessageFilter*>(user_data);
@@ -67,11 +67,10 @@ static GDBusMessage* DBusConnection_Message_Filter_giomm_callback(
   try
   {
     auto result = (*the_slot)(
-      Glib::wrap(connection, true), Glib::wrap(message, true),
-      static_cast<bool>(incoming));
+      Glib::wrap(connection, true), Glib::wrap(message, true), static_cast<bool>(incoming));
     return (result) ? result->gobj_copy() : nullptr;
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
@@ -79,13 +78,13 @@ static GDBusMessage* DBusConnection_Message_Filter_giomm_callback(
   return message;
 }
 
-static void DBusConnection_Message_Filter_giomm_callback_destroy(void* data)
+static void
+DBusConnection_Message_Filter_giomm_callback_destroy(void* data)
 {
   delete static_cast<Gio::DBus::Connection::SlotMessageFilter*>(data);
 }
 
 } // extern "C"
-
 }
 
 namespace Gio
@@ -94,213 +93,148 @@ namespace Gio
 namespace DBus
 {
 
-Connection::Connection(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("stream", Glib::unwrap(stream),
-    "guid", Glib::c_str_or_nullptr(guid),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", Glib::unwrap(observer))
+Connection::Connection(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<AuthObserver>& observer, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
+: _CONSTRUCT("stream", Glib::unwrap(stream), "guid", Glib::c_str_or_nullptr(guid), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer", Glib::unwrap(observer))
 {
   init_async(slot, cancellable);
 }
 
-Connection::Connection(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("stream", Glib::unwrap(stream),
-    "guid", Glib::c_str_or_nullptr(guid),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
+Connection::Connection(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
+: _CONSTRUCT("stream", Glib::unwrap(stream), "guid", Glib::c_str_or_nullptr(guid), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer",
+    static_cast<GDBusAuthObserver*>(nullptr))
 {
   init_async(slot, cancellable);
 }
 
-Connection::Connection(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("stream", Glib::unwrap(stream),
-    "guid", Glib::c_str_or_nullptr(guid),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", Glib::unwrap(observer))
+Connection::Connection(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<AuthObserver>& observer, const SlotAsyncReady& slot, ConnectionFlags flags)
+: _CONSTRUCT("stream", Glib::unwrap(stream), "guid", Glib::c_str_or_nullptr(guid), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer", Glib::unwrap(observer))
 {
   init_async(slot);
 }
 
-Connection::Connection(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const SlotAsyncReady& slot,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("stream", Glib::unwrap(stream),
-    "guid", Glib::c_str_or_nullptr(guid),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
+Connection::Connection(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const SlotAsyncReady& slot, ConnectionFlags flags)
+: _CONSTRUCT("stream", Glib::unwrap(stream), "guid", Glib::c_str_or_nullptr(guid), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer",
+    static_cast<GDBusAuthObserver*>(nullptr))
 {
   init_async(slot);
 }
 
-Connection::Connection(const std::string& address,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("address", Glib::c_str_or_nullptr(address),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", Glib::unwrap(observer))
+Connection::Connection(const std::string& address, const Glib::RefPtr<AuthObserver>& observer,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
+: _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer", Glib::unwrap(observer))
 {
   init_async(slot, cancellable);
 }
 
-Connection::Connection(const std::string& address,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("address", Glib::c_str_or_nullptr(address),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
+Connection::Connection(const std::string& address, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
+: _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer",
+    static_cast<GDBusAuthObserver*>(nullptr))
 {
   init_async(slot, cancellable);
 }
 
-Connection::Connection(const std::string& address,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("address", Glib::c_str_or_nullptr(address),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", Glib::unwrap(observer))
+Connection::Connection(const std::string& address, const Glib::RefPtr<AuthObserver>& observer,
+  const SlotAsyncReady& slot, ConnectionFlags flags)
+: _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer", Glib::unwrap(observer))
 {
   init_async(slot);
 }
 
-Connection::Connection(const std::string& address,
-  const SlotAsyncReady& slot,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("address", Glib::c_str_or_nullptr(address),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
+Connection::Connection(
+  const std::string& address, const SlotAsyncReady& slot, ConnectionFlags flags)
+: _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer",
+    static_cast<GDBusAuthObserver*>(nullptr))
 {
   init_async(slot);
 }
 
-Connection::Connection(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const Glib::RefPtr<Cancellable>& cancellable,
+Connection::Connection(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<AuthObserver>& observer, const Glib::RefPtr<Cancellable>& cancellable,
   ConnectionFlags flags)
-:
-  _CONSTRUCT("stream", Glib::unwrap(stream),
-    "guid", Glib::c_str_or_nullptr(guid),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", Glib::unwrap(observer))
+: _CONSTRUCT("stream", Glib::unwrap(stream), "guid", Glib::c_str_or_nullptr(guid), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer", Glib::unwrap(observer))
 {
   init(cancellable);
 }
 
-Connection::Connection(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("stream", Glib::unwrap(stream),
-    "guid", Glib::c_str_or_nullptr(guid),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
+Connection::Connection(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
+: _CONSTRUCT("stream", Glib::unwrap(stream), "guid", Glib::c_str_or_nullptr(guid), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer",
+    static_cast<GDBusAuthObserver*>(nullptr))
 {
   init(cancellable);
 }
 
-Connection::Connection(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("stream", Glib::unwrap(stream),
-    "guid", Glib::c_str_or_nullptr(guid),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", Glib::unwrap(observer))
+Connection::Connection(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<AuthObserver>& observer, ConnectionFlags flags)
+: _CONSTRUCT("stream", Glib::unwrap(stream), "guid", Glib::c_str_or_nullptr(guid), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer", Glib::unwrap(observer))
 {
   init();
 }
 
-Connection::Connection(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("stream", Glib::unwrap(stream),
-    "guid", Glib::c_str_or_nullptr(guid),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
+Connection::Connection(
+  const Glib::RefPtr<IOStream>& stream, const std::string& guid, ConnectionFlags flags)
+: _CONSTRUCT("stream", Glib::unwrap(stream), "guid", Glib::c_str_or_nullptr(guid), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer",
+    static_cast<GDBusAuthObserver*>(nullptr))
 {
   init();
 }
 
-Connection::Connection(const std::string& address,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("address", Glib::c_str_or_nullptr(address),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", Glib::unwrap(observer))
+Connection::Connection(const std::string& address, const Glib::RefPtr<AuthObserver>& observer,
+  const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
+: _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer", Glib::unwrap(observer))
 {
   init(cancellable);
 }
 
-Connection::Connection(const std::string& address,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("address", Glib::c_str_or_nullptr(address),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
+Connection::Connection(
+  const std::string& address, const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
+: _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer",
+    static_cast<GDBusAuthObserver*>(nullptr))
 {
   init(cancellable);
 }
 
-Connection::Connection(const std::string& address,
-  const Glib::RefPtr<AuthObserver>& observer,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("address", Glib::c_str_or_nullptr(address),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", Glib::unwrap(observer))
+Connection::Connection(
+  const std::string& address, const Glib::RefPtr<AuthObserver>& observer, ConnectionFlags flags)
+: _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer", Glib::unwrap(observer))
 {
   init();
 }
 
-Connection::Connection(const std::string& address,
-  ConnectionFlags flags)
-:
-  _CONSTRUCT("address", Glib::c_str_or_nullptr(address),
-    "flags", static_cast<GDBusConnectionFlags>(flags),
-    "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
+Connection::Connection(const std::string& address, ConnectionFlags flags)
+: _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
+    static_cast<GDBusConnectionFlags>(flags), "authentication-observer",
+    static_cast<GDBusAuthObserver*>(nullptr))
 {
   init();
 }
 
-//static
-void Connection::create(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
+// static
+void
+Connection::create(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<AuthObserver>& observer, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
@@ -308,12 +242,10 @@ void Connection::create(const Glib::RefPtr<IOStream>& stream,
   Connection(stream, guid, observer, slot, cancellable, flags);
 }
 
-//static
-void Connection::create(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
+// static
+void
+Connection::create(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
@@ -321,314 +253,275 @@ void Connection::create(const Glib::RefPtr<IOStream>& stream,
   Connection(stream, guid, slot, cancellable, flags);
 }
 
-//static
-void Connection::create(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  ConnectionFlags flags)
+// static
+void
+Connection::create(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<AuthObserver>& observer, const SlotAsyncReady& slot, ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
   Connection(stream, guid, observer, slot, flags);
 }
 
-//static
-void Connection::create(const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const SlotAsyncReady& slot,
-  ConnectionFlags flags)
+// static
+void
+Connection::create(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const SlotAsyncReady& slot, ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
   Connection(stream, guid, slot, flags);
 }
 
-//static
-Glib::RefPtr<Connection> Connection::create_sync(
-  const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const Glib::RefPtr<Cancellable>& cancellable,
+// static
+Glib::RefPtr<Connection>
+Connection::create_sync(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<AuthObserver>& observer, const Glib::RefPtr<Cancellable>& cancellable,
   ConnectionFlags flags)
 {
-  return Glib::RefPtr<Connection>(new Connection(stream, guid,
-    observer, cancellable, flags));
+  return Glib::RefPtr<Connection>(new Connection(stream, guid, observer, cancellable, flags));
 }
 
-//static
-Glib::RefPtr<Connection> Connection::create_sync(
-  const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
+// static
+Glib::RefPtr<Connection>
+Connection::create_sync(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
 {
-  return Glib::RefPtr<Connection>(new Connection(stream, guid,
-    cancellable, flags));
+  return Glib::RefPtr<Connection>(new Connection(stream, guid, cancellable, flags));
 }
 
-//static
-Glib::RefPtr<Connection> Connection::create_sync(
-  const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer,
-  ConnectionFlags flags)
+// static
+Glib::RefPtr<Connection>
+Connection::create_sync(const Glib::RefPtr<IOStream>& stream, const std::string& guid,
+  const Glib::RefPtr<AuthObserver>& observer, ConnectionFlags flags)
 {
-  return Glib::RefPtr<Connection>(new Connection(stream, guid,
-    observer, flags));
+  return Glib::RefPtr<Connection>(new Connection(stream, guid, observer, flags));
 }
 
-//static
-Glib::RefPtr<Connection> Connection::create_sync(
-  const Glib::RefPtr<IOStream>& stream,
-  const std::string& guid,
-  ConnectionFlags flags)
+// static
+Glib::RefPtr<Connection>
+Connection::create_sync(
+  const Glib::RefPtr<IOStream>& stream, const std::string& guid, ConnectionFlags flags)
 {
-  return Glib::RefPtr<Connection>(new Connection(stream, guid,
-    flags));
+  return Glib::RefPtr<Connection>(new Connection(stream, guid, flags));
 }
 
-//static
-void Connection::create_for_address(const std::string& address,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
+// static
+void
+Connection::create_for_address(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
   Connection(address, observer, slot, cancellable, flags);
 }
 
-//static
-void Connection::create_for_address(const std::string& address,
-  const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
+// static
+void
+Connection::create_for_address(const std::string& address, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
   Connection(address, slot, cancellable, flags);
 }
 
-//static
-void Connection::create_for_address(const std::string& address,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const SlotAsyncReady& slot,
-  ConnectionFlags flags)
+// static
+void
+Connection::create_for_address(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer, const SlotAsyncReady& slot, ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
   Connection(address, observer, slot, flags);
 }
 
-//static
-void Connection::create_for_address(const std::string& address,
-  const SlotAsyncReady& slot,
-  ConnectionFlags flags)
+// static
+void
+Connection::create_for_address(
+  const std::string& address, const SlotAsyncReady& slot, ConnectionFlags flags)
 {
   // Note that this does not return anything, because it is async - see
   // create_finish().
   Connection(address, slot, flags);
 }
 
-//static
-Glib::RefPtr<Connection> Connection::create_for_address_sync(
-  const std::string& address,
-  const Glib::RefPtr<AuthObserver>& observer,
-  const Glib::RefPtr<Cancellable>& cancellable,
+// static
+Glib::RefPtr<Connection>
+Connection::create_for_address_sync(const std::string& address,
+  const Glib::RefPtr<AuthObserver>& observer, const Glib::RefPtr<Cancellable>& cancellable,
   ConnectionFlags flags)
 {
-  return Glib::RefPtr<Connection>(new Connection(address, observer,
-    cancellable, flags));
+  return Glib::RefPtr<Connection>(new Connection(address, observer, cancellable, flags));
 }
 
-//static
-Glib::RefPtr<Connection> Connection::create_for_address_sync(
-  const std::string& address,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  ConnectionFlags flags)
+// static
+Glib::RefPtr<Connection>
+Connection::create_for_address_sync(
+  const std::string& address, const Glib::RefPtr<Cancellable>& cancellable, ConnectionFlags flags)
 {
-  return Glib::RefPtr<Connection>(new Connection(address, cancellable,
-    flags));
+  return Glib::RefPtr<Connection>(new Connection(address, cancellable, flags));
 }
 
-//static
-Glib::RefPtr<Connection> Connection::create_for_address_sync(
-  const std::string& address,
-  const Glib::RefPtr<AuthObserver>& observer,
-  ConnectionFlags flags)
+// static
+Glib::RefPtr<Connection>
+Connection::create_for_address_sync(
+  const std::string& address, const Glib::RefPtr<AuthObserver>& observer, ConnectionFlags flags)
 {
-  return Glib::RefPtr<Connection>(new Connection(address, observer,
-    flags));
+  return Glib::RefPtr<Connection>(new Connection(address, observer, flags));
 }
 
-//static
-Glib::RefPtr<Connection> Connection::create_for_address_sync(
-  const std::string& address,
-  ConnectionFlags flags)
+// static
+Glib::RefPtr<Connection>
+Connection::create_for_address_sync(const std::string& address, ConnectionFlags flags)
 {
   return Glib::RefPtr<Connection>(new Connection(address, flags));
 }
 
-//static
-void Connection::get(BusType bus_type, const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable)
+// static
+void
+Connection::get(
+  BusType bus_type, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_bus_get(static_cast<GBusType>(bus_type), Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
-}
-
-//static
-void Connection::get(BusType bus_type, const SlotAsyncReady& slot)
-{
-  auto slot_copy = new SlotAsyncReady(slot);
-
-  g_bus_get(static_cast<GBusType>(bus_type), nullptr, &SignalProxy_async_callback,
+  g_bus_get(static_cast<GBusType>(bus_type), Glib::unwrap(cancellable), &SignalProxy_async_callback,
     slot_copy);
 }
 
-void Connection::close()
+// static
+void
+Connection::get(BusType bus_type, const SlotAsyncReady& slot)
+{
+  auto slot_copy = new SlotAsyncReady(slot);
+
+  g_bus_get(static_cast<GBusType>(bus_type), nullptr, &SignalProxy_async_callback, slot_copy);
+}
+
+void
+Connection::close()
 {
   g_dbus_connection_close(gobj(), nullptr, nullptr, nullptr);
 }
 
-void Connection::close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void
+Connection::close(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_close(gobj(),
-                    Glib::unwrap(cancellable),
-                    &SignalProxy_async_callback,
-                    slot_copy);
+  g_dbus_connection_close(
+    gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-void Connection::close(const SlotAsyncReady& slot)
+void
+Connection::close(const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_close(gobj(),
-                    nullptr,
-                    &SignalProxy_async_callback,
-                    slot_copy);
+  g_dbus_connection_close(gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
-void Connection::flush()
+void
+Connection::flush()
 {
   g_dbus_connection_flush(gobj(), nullptr, nullptr, nullptr);
 }
 
-void Connection::flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void
+Connection::flush(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_flush(gobj(),
-                    Glib::unwrap(cancellable),
-                    &SignalProxy_async_callback,
-                    slot_copy);
+  g_dbus_connection_flush(
+    gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-void Connection::flush(const SlotAsyncReady& slot)
+void
+Connection::flush(const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_dbus_connection_flush(gobj(),
-                    nullptr,
-                    &SignalProxy_async_callback,
-                    slot_copy);
+  g_dbus_connection_flush(gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
-bool Connection::send_message(const Glib::RefPtr<Message>& message,
-  SendMessageFlags flags)
+bool
+Connection::send_message(const Glib::RefPtr<Message>& message, SendMessageFlags flags)
 {
   GError* gerror = nullptr;
 
-  const bool result = g_dbus_connection_send_message(gobj(),
-    Glib::unwrap(message), static_cast<GDBusSendMessageFlags>(flags), nullptr,
-    &gerror);
+  const bool result = g_dbus_connection_send_message(
+    gobj(), Glib::unwrap(message), static_cast<GDBusSendMessageFlags>(flags), nullptr, &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
 
-void Connection::send_message_with_reply(const Glib::RefPtr<Message>& message, int timeout_msec,const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void
+Connection::send_message_with_reply(const Glib::RefPtr<Message>& message, int timeout_msec,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
   volatile guint32 out_serial = 0;
   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
-                                      static_cast<GDBusSendMessageFlags>(message->get_flags()),
-                                      timeout_msec, &out_serial,
-                                      Glib::unwrap(cancellable), &SignalProxy_async_callback,
-                                      slot_copy);
+    static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec, &out_serial,
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
   message->set_serial(out_serial);
 }
 
-void Connection::send_message_with_reply(const Glib::RefPtr<Message>& message, int timeout_msec,const SlotAsyncReady& slot)
+void
+Connection::send_message_with_reply(
+  const Glib::RefPtr<Message>& message, int timeout_msec, const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
   volatile guint32 out_serial = 0;
   g_dbus_connection_send_message_with_reply(gobj(), Glib::unwrap(message),
-                                      static_cast<GDBusSendMessageFlags>(message->get_flags()),
-                                      timeout_msec, &out_serial,
-                                      nullptr, &SignalProxy_async_callback,
-                                      slot_copy);
+    static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec, &out_serial, nullptr,
+    &SignalProxy_async_callback, slot_copy);
   message->set_serial(out_serial);
 }
 
-Glib::RefPtr<Message> Connection::send_message_with_reply_sync(
-  const Glib::RefPtr<Message>& message,
-  const Glib::RefPtr<Cancellable>& cancellable,
-  gint timeout_msec)
+Glib::RefPtr<Message>
+Connection::send_message_with_reply_sync(const Glib::RefPtr<Message>& message,
+  const Glib::RefPtr<Cancellable>& cancellable, gint timeout_msec)
 {
   volatile guint32 out_serial = 0;
   GError* gerror = nullptr;
 
-  GDBusMessage* result =
-    g_dbus_connection_send_message_with_reply_sync(gobj(),
-    Glib::unwrap(message),
-    static_cast<GDBusSendMessageFlags>(message->get_flags()),
-    timeout_msec, &out_serial, Glib::unwrap(cancellable), &gerror);
+  GDBusMessage* result = g_dbus_connection_send_message_with_reply_sync(gobj(),
+    Glib::unwrap(message), static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec,
+    &out_serial, Glib::unwrap(cancellable), &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
   message->set_serial(out_serial);
   return Glib::wrap(result);
 }
 
-Glib::RefPtr<Message> Connection::send_message_with_reply_sync(
-  const Glib::RefPtr<Message>& message,
-  gint timeout_msec)
+Glib::RefPtr<Message>
+Connection::send_message_with_reply_sync(const Glib::RefPtr<Message>& message, gint timeout_msec)
 {
   volatile guint32 out_serial = 0;
   GError* gerror = nullptr;
 
-  GDBusMessage* result =
-    g_dbus_connection_send_message_with_reply_sync(gobj(),
-    Glib::unwrap(message),
-    static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec,
+  GDBusMessage* result = g_dbus_connection_send_message_with_reply_sync(gobj(),
+    Glib::unwrap(message), static_cast<GDBusSendMessageFlags>(message->get_flags()), timeout_msec,
     &out_serial, nullptr, &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
   message->set_serial(out_serial);
   return Glib::wrap(result);
 }
 
-void Connection::call(
-  const Glib::ustring&                  object_path,
-  const Glib::ustring&                  interface_name,
-  const Glib::ustring&                  method_name,
-  const Glib::VariantContainerBase&     parameters,
-  const SlotAsyncReady&                 slot,
-  const Glib::RefPtr<Cancellable>&      cancellable,
-  const Glib::ustring&                  bus_name,
-  int                                   timeout_msec,
-  CallFlags                             flags,
-  const Glib::VariantType&              reply_type)
+void
+Connection::call(const Glib::ustring& object_path, const Glib::ustring& interface_name,
+  const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable,
+  const Glib::ustring& bus_name, int timeout_msec, CallFlags flags,
+  const Glib::VariantType& reply_type)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -636,101 +529,76 @@ void Connection::call(
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_dbus_connection_call(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
-    interface_name.c_str(), method_name.c_str(),
-    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
-    static_cast<GDBusCallFlags>(flags), timeout_msec,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
-}
-
-// Non-cancellable version.
-void Connection::call(
-  const Glib::ustring&                  object_path,
-  const Glib::ustring&                  interface_name,
-  const Glib::ustring&                  method_name,
-  const Glib::VariantContainerBase&     parameters,
-  const SlotAsyncReady&                 slot,
-  const Glib::ustring&                  bus_name,
-  int                                   timeout_msec,
-  CallFlags                             flags,
-  const Glib::VariantType&              reply_type)
-{
-  // Create a copy of the slot.
-  // A pointer to it will be passed through the callback's data parameter
-  // and deleted in the callback.
-  auto slot_copy = new SlotAsyncReady(slot);
-
-  g_dbus_connection_call(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
-    interface_name.c_str(), method_name.c_str(),
-    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
-    static_cast<GDBusCallFlags>(flags), timeout_msec, nullptr,
+    interface_name.c_str(), method_name.c_str(), const_cast<GVariant*>(parameters.gobj()),
+    reply_type.gobj(), static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(cancellable),
     &SignalProxy_async_callback, slot_copy);
 }
 
-Glib::VariantContainerBase Connection::call_sync(
-  const Glib::ustring&                  object_path,
-  const Glib::ustring&                  interface_name,
-  const Glib::ustring&                  method_name,
-  const Glib::VariantContainerBase&     parameters,
-  const Glib::RefPtr<Cancellable>&      cancellable,
-  const Glib::ustring&                  bus_name,
-  int                                   timeout_msec,
-  CallFlags                             flags,
-  const Glib::VariantType&              reply_type)
+// Non-cancellable version.
+void
+Connection::call(const Glib::ustring& object_path, const Glib::ustring& interface_name,
+  const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters,
+  const SlotAsyncReady& slot, const Glib::ustring& bus_name, int timeout_msec, CallFlags flags,
+  const Glib::VariantType& reply_type)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  auto slot_copy = new SlotAsyncReady(slot);
+
+  g_dbus_connection_call(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
+    interface_name.c_str(), method_name.c_str(), const_cast<GVariant*>(parameters.gobj()),
+    reply_type.gobj(), static_cast<GDBusCallFlags>(flags), timeout_msec, nullptr,
+    &SignalProxy_async_callback, slot_copy);
+}
+
+Glib::VariantContainerBase
+Connection::call_sync(const Glib::ustring& object_path, const Glib::ustring& interface_name,
+  const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters,
+  const Glib::RefPtr<Cancellable>& cancellable, const Glib::ustring& bus_name, int timeout_msec,
+  CallFlags flags, const Glib::VariantType& reply_type)
 {
   GError* gerror = nullptr;
 
-  GVariant* const gvariant =
-    g_dbus_connection_call_sync(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
-    interface_name.c_str(), method_name.c_str(),
-    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
-    static_cast<GDBusCallFlags>(flags), timeout_msec,
-    Glib::unwrap(cancellable), &gerror);
+  GVariant* const gvariant = g_dbus_connection_call_sync(gobj(), Glib::c_str_or_nullptr(bus_name),
+    object_path.c_str(), interface_name.c_str(), method_name.c_str(),
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(), static_cast<GDBusCallFlags>(flags),
+    timeout_msec, Glib::unwrap(cancellable), &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
-  return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
+  return Glib::VariantContainerBase(gvariant, false); // Dont' take an extra reference.
 }
 
 // Non-cancellable version.
-Glib::VariantContainerBase Connection::call_sync(
-  const Glib::ustring&                  object_path,
-  const Glib::ustring&                  interface_name,
-  const Glib::ustring&                  method_name,
-  const Glib::VariantContainerBase&     parameters,
-  const Glib::ustring&                  bus_name,
-  int                                   timeout_msec,
-  CallFlags                             flags,
-  const Glib::VariantType&              reply_type)
+Glib::VariantContainerBase
+Connection::call_sync(const Glib::ustring& object_path, const Glib::ustring& interface_name,
+  const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters,
+  const Glib::ustring& bus_name, int timeout_msec, CallFlags flags,
+  const Glib::VariantType& reply_type)
 {
   GError* gerror = nullptr;
 
   GVariant* const gvariant =
     g_dbus_connection_call_sync(gobj(), Glib::c_str_or_nullptr(bus_name), object_path.c_str(),
-    interface_name.c_str(), method_name.c_str(),
-    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
-    static_cast<GDBusCallFlags>(flags), timeout_msec, nullptr, &gerror);
+      interface_name.c_str(), method_name.c_str(), const_cast<GVariant*>(parameters.gobj()),
+      reply_type.gobj(), static_cast<GDBusCallFlags>(flags), timeout_msec, nullptr, &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
-  return Glib::VariantContainerBase(gvariant, false); //Dont' take an extra reference.
+  return Glib::VariantContainerBase(gvariant, false); // Dont' take an extra reference.
 }
 
 #ifdef G_OS_UNIX
 // With a UnixFDList.
-void Connection::call(
-  const Glib::ustring&                object_path,
-  const Glib::ustring&                interface_name,
-  const Glib::ustring&                method_name,
-  const Glib::VariantContainerBase&   parameters,
-  const SlotAsyncReady&               slot,
-  const Glib::RefPtr<Cancellable>&    cancellable,
-  const Glib::RefPtr<UnixFDList>&     fd_list,
-  const Glib::ustring&                bus_name,
-  int                                 timeout_msec,
-  CallFlags                           flags,
-  const Glib::VariantType&            reply_type)
+void
+Connection::call(const Glib::ustring& object_path, const Glib::ustring& interface_name,
+  const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable,
+  const Glib::RefPtr<UnixFDList>& fd_list, const Glib::ustring& bus_name, int timeout_msec,
+  CallFlags flags, const Glib::VariantType& reply_type)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -739,23 +607,18 @@ void Connection::call(
 
   g_dbus_connection_call_with_unix_fd_list(gobj(), Glib::c_str_or_nullptr(bus_name),
     object_path.c_str(), interface_name.c_str(), method_name.c_str(),
-    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
-    static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(fd_list),
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(), static_cast<GDBusCallFlags>(flags),
+    timeout_msec, Glib::unwrap(fd_list), Glib::unwrap(cancellable), &SignalProxy_async_callback,
+    slot_copy);
 }
 
 // Non-cancellable version (with a UnixFDList).
-void Connection::call(
-  const Glib::ustring&                object_path,
-  const Glib::ustring&                interface_name,
-  const Glib::ustring&                method_name,
-  const Glib::VariantContainerBase&   parameters,
-  const SlotAsyncReady&               slot,
-  const Glib::RefPtr<UnixFDList>&     fd_list,
-  const Glib::ustring&                bus_name,
-  int                                 timeout_msec,
-  CallFlags                           flags,
-  const Glib::VariantType&            reply_type)
+void
+Connection::call(const Glib::ustring& object_path, const Glib::ustring& interface_name,
+  const Glib::ustring& method_name, const Glib::VariantContainerBase& parameters,
+  const SlotAsyncReady& slot, const Glib::RefPtr<UnixFDList>& fd_list,
+  const Glib::ustring& bus_name, int timeout_msec, CallFlags flags,
+  const Glib::VariantType& reply_type)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -764,111 +627,99 @@ void Connection::call(
 
   g_dbus_connection_call_with_unix_fd_list(gobj(), Glib::c_str_or_nullptr(bus_name),
     object_path.c_str(), interface_name.c_str(), method_name.c_str(),
-    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(),
-    static_cast<GDBusCallFlags>(flags), timeout_msec, Glib::unwrap(fd_list),
-    nullptr, &SignalProxy_async_callback, slot_copy);
+    const_cast<GVariant*>(parameters.gobj()), reply_type.gobj(), static_cast<GDBusCallFlags>(flags),
+    timeout_msec, Glib::unwrap(fd_list), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 #endif // G_OS_UNIX
 
-void Connection::emit_signal(
-  const Glib::ustring&                object_path,
-  const Glib::ustring&                interface_name,
-  const Glib::ustring&                signal_name,
-  const Glib::ustring&                destination_bus_name,
-  const Glib::VariantContainerBase&   parameters)
+void
+Connection::emit_signal(const Glib::ustring& object_path, const Glib::ustring& interface_name,
+  const Glib::ustring& signal_name, const Glib::ustring& destination_bus_name,
+  const Glib::VariantContainerBase& parameters)
 {
   GError* gerror = nullptr;
 
   // destination_bus_name is checked to see if it is empty so that nullptr can be passed
   // to the C API. This is done because the bus name can be nullptr in the C API,
   // meaning that the signal should be emitted to all the listeners.
-  g_dbus_connection_emit_signal(gobj(),
-    Glib::c_str_or_nullptr(destination_bus_name),
+  g_dbus_connection_emit_signal(gobj(), Glib::c_str_or_nullptr(destination_bus_name),
     object_path.c_str(), interface_name.c_str(), signal_name.c_str(),
     const_cast<GVariant*>(parameters.gobj()), &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 }
 
-guint Connection::signal_subscribe(
-  const SlotSignal& slot,
-  const Glib::ustring& sender,
-  const Glib::ustring& interface_name,
-  const Glib::ustring& member,
-  const Glib::ustring& object_path,
-  const Glib::ustring& arg0,
-  SignalFlags flags)
+guint
+Connection::signal_subscribe(const SlotSignal& slot, const Glib::ustring& sender,
+  const Glib::ustring& interface_name, const Glib::ustring& member,
+  const Glib::ustring& object_path, const Glib::ustring& arg0, SignalFlags flags)
 {
   auto slot_copy = new SlotSignal(slot);
 
-  return g_dbus_connection_signal_subscribe(gobj(),
-    Glib::c_str_or_nullptr(sender),
-    Glib::c_str_or_nullptr(interface_name),
-    Glib::c_str_or_nullptr(member),
-    Glib::c_str_or_nullptr(object_path),
-    Glib::c_str_or_nullptr(arg0),
-    static_cast<GDBusSignalFlags>(flags),
-    &DBusConnection_Signal_giomm_callback, slot_copy,
+  return g_dbus_connection_signal_subscribe(gobj(), Glib::c_str_or_nullptr(sender),
+    Glib::c_str_or_nullptr(interface_name), Glib::c_str_or_nullptr(member),
+    Glib::c_str_or_nullptr(object_path), Glib::c_str_or_nullptr(arg0),
+    static_cast<GDBusSignalFlags>(flags), &DBusConnection_Signal_giomm_callback, slot_copy,
     &DBusConnection_Signal_giomm_callback_destroy);
 }
 
-guint Connection::add_filter(const SlotMessageFilter& slot)
+guint
+Connection::add_filter(const SlotMessageFilter& slot)
 {
   auto slot_copy = new SlotMessageFilter(slot);
 
-  return g_dbus_connection_add_filter(gobj(),
-    &DBusConnection_Message_Filter_giomm_callback, slot_copy,
-    DBusConnection_Message_Filter_giomm_callback_destroy);
+  return g_dbus_connection_add_filter(gobj(), &DBusConnection_Message_Filter_giomm_callback,
+    slot_copy, DBusConnection_Message_Filter_giomm_callback_destroy);
 }
 
-guint Connection::register_object(const Glib::ustring& object_path,
-  const Glib::RefPtr<InterfaceInfo>& interface_info,
-  const InterfaceVTable& vtable)
+guint
+Connection::register_object(const Glib::ustring& object_path,
+  const Glib::RefPtr<InterfaceInfo>& interface_info, const InterfaceVTable& vtable)
 {
   GError* gerror = nullptr;
 
-  const guint result = g_dbus_connection_register_object(gobj(),
-    object_path.c_str(), Glib::unwrap(interface_info),
-    vtable.gobj(), const_cast<InterfaceVTable*>(&vtable), nullptr, &gerror);
+  const guint result =
+    g_dbus_connection_register_object(gobj(), object_path.c_str(), Glib::unwrap(interface_info),
+      vtable.gobj(), const_cast<InterfaceVTable*>(&vtable), nullptr, &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
 
-guint Connection::register_object(const Glib::ustring& object_path,
-  const Glib::RefPtr<InterfaceInfo>& interface_info)
+guint
+Connection::register_object(
+  const Glib::ustring& object_path, const Glib::RefPtr<InterfaceInfo>& interface_info)
 {
   GError* gerror = nullptr;
 
-  const guint result = g_dbus_connection_register_object(gobj(),
-    object_path.c_str(), Glib::unwrap(interface_info),
-    nullptr, nullptr, nullptr, &gerror);
+  const guint result = g_dbus_connection_register_object(
+    gobj(), object_path.c_str(), Glib::unwrap(interface_info), nullptr, nullptr, nullptr, &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
 
-guint Connection::register_subtree(const Glib::ustring& object_path,
-  const SubtreeVTable& vtable, SubtreeFlags flags)
+guint
+Connection::register_subtree(
+  const Glib::ustring& object_path, const SubtreeVTable& vtable, SubtreeFlags flags)
 {
   GError* gerror = nullptr;
 
-  const guint result = g_dbus_connection_register_subtree(gobj(),
-    object_path.c_str(),
-    vtable.gobj(), static_cast<GDBusSubtreeFlags>(flags),
-    const_cast<SubtreeVTable*>(&vtable), nullptr, &gerror);
+  const guint result =
+    g_dbus_connection_register_subtree(gobj(), object_path.c_str(), vtable.gobj(),
+      static_cast<GDBusSubtreeFlags>(flags), const_cast<SubtreeVTable*>(&vtable), nullptr, &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
 
-} //namespace DBus
+} // namespace DBus
 
 } // namespace Gio

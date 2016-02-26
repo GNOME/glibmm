@@ -22,55 +22,56 @@
 namespace Glib
 {
 
-  namespace OptionContextPrivate
+namespace OptionContextPrivate
+{
+static const gchar*
+SignalProxy_translate_gtk_callback(const gchar* str, gpointer data)
+{
+  Glib::ustring translated_str;
+  Glib::OptionContext::SlotTranslate* the_slot =
+    static_cast<Glib::OptionContext::SlotTranslate*>(data);
+
+  try
   {
-    static const gchar* SignalProxy_translate_gtk_callback (const gchar* str, gpointer data)
-    {
-      Glib::ustring translated_str;
-      Glib::OptionContext::SlotTranslate* the_slot =
-        static_cast<Glib::OptionContext::SlotTranslate*>(data);
+    translated_str = (*the_slot)(str);
+  }
+  catch (...)
+  {
+    Glib::exception_handlers_invoke();
+  }
+  return translated_str.c_str();
+}
 
-      try
-      {
-        translated_str = (*the_slot)(str);
-      }
-      catch(...)
-      {
-        Glib::exception_handlers_invoke();
-      }
-      return translated_str.c_str ();
-    }
+static void
+SignalProxy_translate_gtk_callback_destroy(gpointer data)
+{
+  delete static_cast<Glib::OptionContext::SlotTranslate*>(data);
+}
 
-    static void SignalProxy_translate_gtk_callback_destroy (gpointer data)
-    {
-      delete static_cast<Glib::OptionContext::SlotTranslate*>(data);
-    }
-
-  } //namespace OptionContextPrivate
+} // namespace OptionContextPrivate
 
 OptionContext::OptionContext(const Glib::ustring& parameter_string)
-: gobject_( g_option_context_new(parameter_string.c_str()) ),
-  has_ownership_(true)
+: gobject_(g_option_context_new(parameter_string.c_str())), has_ownership_(true)
 {
 }
 
 OptionContext::OptionContext(GOptionContext* castitem, bool take_ownership)
-: gobject_(castitem),
-  has_ownership_(take_ownership)
+: gobject_(castitem), has_ownership_(take_ownership)
 {
 }
 
 OptionContext::OptionContext(OptionContext&& other) noexcept
-: gobject_(std::move(other.gobject_)),
-  has_ownership_(std::move(other.has_ownership_))
+  : gobject_(std::move(other.gobject_)),
+    has_ownership_(std::move(other.has_ownership_))
 {
   other.gobject_ = nullptr;
   other.has_ownership_ = false;
 }
 
-OptionContext& OptionContext::operator=(OptionContext&& other) noexcept
+OptionContext&
+OptionContext::operator=(OptionContext&& other) noexcept
 {
-  if(has_ownership_)
+  if (has_ownership_)
     g_option_context_free(gobj());
 
   gobject_ = std::move(other.gobject_);
@@ -84,24 +85,25 @@ OptionContext& OptionContext::operator=(OptionContext&& other) noexcept
 
 OptionContext::~OptionContext()
 {
-  if(has_ownership_)
+  if (has_ownership_)
     g_option_context_free(gobj());
 
   gobject_ = nullptr;
 }
 
-void OptionContext::add_group(OptionGroup& group)
+void
+OptionContext::add_group(OptionGroup& group)
 {
-  //Strangely, GObjectContext actually takes ownership of the GOptionGroup, deleting it later.
+  // Strangely, GObjectContext actually takes ownership of the GOptionGroup, deleting it later.
   g_option_context_add_group(gobj(), (group).gobj_give_ownership());
 }
 
-void OptionContext::set_main_group(OptionGroup& group)
+void
+OptionContext::set_main_group(OptionGroup& group)
 {
-  //Strangely, GObjectContext actually takes ownership of the GOptionGroup, deleting it later.
+  // Strangely, GObjectContext actually takes ownership of the GOptionGroup, deleting it later.
   g_option_context_set_main_group(gobj(), (group).gobj_give_ownership());
 }
-
 
 /*
 OptionGroup OptionContext::get_main_group() const
@@ -113,18 +115,21 @@ OptionGroup OptionContext::get_main_group() const
 
 */
 
-void OptionContext::set_translate_func (const SlotTranslate& slot)
+void
+OptionContext::set_translate_func(const SlotTranslate& slot)
 {
-  //Create a copy of the slot. A pointer to this will be passed through the callback's data parameter.
-  //It will be deleted when SignalProxy_translate_gtk_callback_destroy() is called.
+  // Create a copy of the slot. A pointer to this will be passed through the callback's data
+  // parameter.
+  // It will be deleted when SignalProxy_translate_gtk_callback_destroy() is called.
   auto slot_copy = new SlotTranslate(slot);
 
-  g_option_context_set_translate_func(
-      gobj(), &OptionContextPrivate::SignalProxy_translate_gtk_callback, slot_copy,
-      &OptionContextPrivate::SignalProxy_translate_gtk_callback_destroy);
+  g_option_context_set_translate_func(gobj(),
+    &OptionContextPrivate::SignalProxy_translate_gtk_callback, slot_copy,
+    &OptionContextPrivate::SignalProxy_translate_gtk_callback_destroy);
 }
 
-Glib::ustring OptionContext::get_help(bool main_help) const
+Glib::ustring
+OptionContext::get_help(bool main_help) const
 {
   return Glib::convert_return_gchar_ptr_to_ustring(g_option_context_get_help(
     const_cast<GOptionContext*>(gobj()), static_cast<int>(main_help), nullptr));

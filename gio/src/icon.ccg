@@ -20,21 +20,22 @@
 #include <gio/gio.h>
 #include <glibmm/error.h>
 
-namespace Gio {
+namespace Gio
+{
 
 bool
 Icon::equal(const Glib::RefPtr<Icon>& other) const
 {
   return static_cast<bool>(
-    g_icon_equal(const_cast<GIcon*>(this->gobj()),
-                 const_cast<GIcon*>(other->gobj())));
+    g_icon_equal(const_cast<GIcon*>(this->gobj()), const_cast<GIcon*>(other->gobj())));
 }
 
-Glib::RefPtr<Icon> Icon::create(const std::string& str)
+Glib::RefPtr<Icon>
+Icon::create(const std::string& str)
 {
   GError* gerror = nullptr;
   auto icon = g_icon_new_for_string(str.c_str(), &gerror);
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return Glib::wrap(icon);

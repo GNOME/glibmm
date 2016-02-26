@@ -24,193 +24,200 @@
 namespace Gio
 {
 
-bool DataInputStream::read_line(std::string& line, const Glib::RefPtr<Cancellable>& cancellable)
+bool
+DataInputStream::read_line(std::string& line, const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = nullptr;
   char* c_line = g_data_input_stream_read_line(gobj(),
-                                               nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-                                               Glib::unwrap(cancellable),
-                                               &gerror);
-  if(gerror)
+    nullptr, // pass nullptr since we can easily determine the length from the returned std::string
+    Glib::unwrap(cancellable), &gerror);
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
-    if (c_line) {
-        line = c_line;
-        g_free (c_line);
-        return true;
-    }
-    // end of stream reached, return failure status
-    return false;
+  if (c_line)
+  {
+    line = c_line;
+    g_free(c_line);
+    return true;
+  }
+  // end of stream reached, return failure status
+  return false;
 }
 
-bool DataInputStream::read_line(std::string& line)
+bool
+DataInputStream::read_line(std::string& line)
 {
   GError* gerror = nullptr;
   char* c_line = g_data_input_stream_read_line(gobj(),
-                                               nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-                                               nullptr,
-                                               &gerror);
-  if(gerror)
+    nullptr, // pass nullptr since we can easily determine the length from the returned std::string
+    nullptr, &gerror);
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
-    if (c_line) {
-        line = c_line;
-        g_free(c_line);
-        return true;
-    }
-    // end of stream reached, return failure status
-    return false;
+  if (c_line)
+  {
+    line = c_line;
+    g_free(c_line);
+    return true;
+  }
+  // end of stream reached, return failure status
+  return false;
 }
 
-void DataInputStream::read_line_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+void
+DataInputStream::read_line_async(
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_data_input_stream_read_line_async(gobj(),
-                            io_priority,
-                            Glib::unwrap(cancellable),
-                            &SignalProxy_async_callback,
-                            slot_copy);
+  g_data_input_stream_read_line_async(
+    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-bool DataInputStream::read_line_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
+bool
+DataInputStream::read_line_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
 {
   GError* gerror = nullptr;
   gsize size = 0;
-  gchar* buffer = g_data_input_stream_read_line_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
-  if(gerror)
+  gchar* buffer =
+    g_data_input_stream_read_line_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   bool retval = false;
-  if(buffer && size)
+  if (buffer && size)
   {
     retval = (buffer != nullptr);
     data = std::string(buffer, size);
-    g_free (buffer);
+    g_free(buffer);
   }
 
   return retval;
 }
 
-bool DataInputStream::read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable)
+bool
+DataInputStream::read_until(
+  std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = nullptr;
-  char* c_str = g_data_input_stream_read_until(gobj(),
-                                               stop_chars.c_str(),
-                                               nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-                                               Glib::unwrap(cancellable),
-                                               &gerror);
-  if(gerror)
+  char* c_str = g_data_input_stream_read_until(gobj(), stop_chars.c_str(),
+    nullptr, // pass nullptr since we can easily determine the length from the returned std::string
+    Glib::unwrap(cancellable), &gerror);
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
-    if (c_str) {
-        data = c_str;
-        g_free (c_str);
-        return true;
-    }
-    // end of stream reached, return failure status
-    return false;
+  if (c_str)
+  {
+    data = c_str;
+    g_free(c_str);
+    return true;
+  }
+  // end of stream reached, return failure status
+  return false;
 }
 
 /** non-cancellable version of read_until()
  */
-bool DataInputStream::read_until(std::string& data, const std::string& stop_chars)
+bool
+DataInputStream::read_until(std::string& data, const std::string& stop_chars)
 {
   GError* gerror = nullptr;
-  char* c_str = g_data_input_stream_read_until(gobj(),
-                                               stop_chars.c_str(),
-                                               nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-                                               nullptr,
-                                               &gerror);
-  if(gerror)
+  char* c_str = g_data_input_stream_read_until(gobj(), stop_chars.c_str(),
+    nullptr, // pass nullptr since we can easily determine the length from the returned std::string
+    nullptr, &gerror);
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
-    if (c_str) {
-        data = c_str;
-        g_free (c_str);
-        return true;
-    }
-    // end of stream reached, return failure status
-    return false;
+  if (c_str)
+  {
+    data = c_str;
+    g_free(c_str);
+    return true;
+  }
+  // end of stream reached, return failure status
+  return false;
 }
 
-void DataInputStream::read_until_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+void
+DataInputStream::read_until_async(const std::string& stop_chars, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_data_input_stream_read_until_async(gobj(), stop_chars.c_str(),
-                            io_priority,
-                            Glib::unwrap(cancellable),
-                            &SignalProxy_async_callback,
-                            slot_copy);
+  g_data_input_stream_read_until_async(gobj(), stop_chars.c_str(), io_priority,
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-bool DataInputStream::read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
+bool
+DataInputStream::read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
 {
   GError* gerror = nullptr;
   gsize size = 0;
-  gchar* buffer = g_data_input_stream_read_until_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
-  if(gerror)
+  gchar* buffer =
+    g_data_input_stream_read_until_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   bool retval = false;
-  if(buffer && size)
+  if (buffer && size)
   {
     retval = (buffer != nullptr);
     data = std::string(buffer, size);
-    g_free (buffer);
+    g_free(buffer);
   }
 
   return retval;
 }
 
-
-bool DataInputStream::read_upto(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable)
+bool
+DataInputStream::read_upto(
+  std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = nullptr;
-  char* c_str = g_data_input_stream_read_upto(gobj(),
-                                               stop_chars.c_str(), -1, /* null-terminated */
-                                               nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-                                               Glib::unwrap(cancellable),
-                                               &gerror);
-  if(gerror)
+  char* c_str = g_data_input_stream_read_upto(gobj(), stop_chars.c_str(), -1, /* null-terminated */
+    nullptr, // pass nullptr since we can easily determine the length from the returned std::string
+    Glib::unwrap(cancellable), &gerror);
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
-    if (c_str) {
-        data = c_str;
-        g_free (c_str);
-        return true;
-    }
-    // end of stream reached, return failure status
-    return false;
+  if (c_str)
+  {
+    data = c_str;
+    g_free(c_str);
+    return true;
+  }
+  // end of stream reached, return failure status
+  return false;
 }
 
 /** non-cancellable version of read_upto()
  */
-bool DataInputStream::read_upto(std::string& data, const std::string& stop_chars)
+bool
+DataInputStream::read_upto(std::string& data, const std::string& stop_chars)
 {
   GError* gerror = nullptr;
-  char* c_str = g_data_input_stream_read_upto(gobj(),
-    stop_chars.c_str(), -1, /* null-terminated */
+  char* c_str = g_data_input_stream_read_upto(gobj(), stop_chars.c_str(), -1, /* null-terminated */
     nullptr, // pass nullptr since we can easily determine the length from the returned std::string
-    nullptr,
-    &gerror);
+    nullptr, &gerror);
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
-  if (c_str) {
-      data = c_str;
-      g_free (c_str);
-      return true;
+  if (c_str)
+  {
+    data = c_str;
+    g_free(c_str);
+    return true;
   }
 
   // end of stream reached, return failure status
   return false;
 }
 
-void DataInputStream::read_upto_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+void
+DataInputStream::read_upto_async(const std::string& stop_chars, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -218,30 +225,28 @@ void DataInputStream::read_upto_async(const std::string& stop_chars, const SlotA
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_data_input_stream_read_upto_async(gobj(), stop_chars.c_str(), -1, /* null-terminated */
-                            io_priority,
-                            Glib::unwrap(cancellable),
-                            &SignalProxy_async_callback,
-                            slot_copy);
+    io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-bool DataInputStream::read_upto_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
+bool
+DataInputStream::read_upto_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data)
 {
   GError* gerror = nullptr;
   gsize size = 0;
-  gchar* buffer = g_data_input_stream_read_upto_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
-  if(gerror)
+  gchar* buffer =
+    g_data_input_stream_read_upto_finish(gobj(), Glib::unwrap(result), &size, &(gerror));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   bool retval = false;
-  if(buffer && size)
+  if (buffer && size)
   {
     retval = (buffer != nullptr);
     data = std::string(buffer, size);
-    g_free (buffer);
+    g_free(buffer);
   }
 
   return retval;
 }
-
 
 } // namespace Gio

@@ -31,9 +31,10 @@ OptionEntry::~OptionEntry()
   release_gobject();
 }
 
-void OptionEntry::release_gobject() noexcept
+void
+OptionEntry::release_gobject() noexcept
 {
-  if(!gobject_)
+  if (!gobject_)
     return;
 
   g_free(const_cast<char*>(gobject_->long_name));
@@ -49,27 +50,30 @@ OptionEntry::OptionEntry(const OptionEntry& src)
   operator=(src);
 }
 
-OptionEntry& OptionEntry::operator=(const OptionEntry& src)
+OptionEntry&
+OptionEntry::operator=(const OptionEntry& src)
 {
-  if(this != &src)
+  if (this != &src)
   {
-    if(gobject_->long_name)
+    if (gobject_->long_name)
       g_free(const_cast<char*>(gobject_->long_name));
 
     gobject_->long_name = g_strdup(src.gobject_->long_name);
 
-    gobject_->short_name = src.gobject_->short_name; //It's just one char.
+    gobject_->short_name = src.gobject_->short_name; // It's just one char.
 
     gobject_->flags = src.gobject_->flags;
     gobject_->arg = src.gobject_->arg;
-    gobject_->arg_data = src.gobject_->arg_data; //Shared, because it's not owned by any instance of this class anyway.
+    gobject_->arg_data =
+      src.gobject_
+        ->arg_data; // Shared, because it's not owned by any instance of this class anyway.
 
-    if(gobject_->description)
+    if (gobject_->description)
       g_free(const_cast<char*>(gobject_->description));
 
     gobject_->description = g_strdup(src.gobject_->description);
 
-    if(gobject_->arg_description)
+    if (gobject_->arg_description)
       g_free(const_cast<char*>(gobject_->arg_description));
 
     gobject_->arg_description = g_strdup(src.gobject_->arg_description);
@@ -78,13 +82,13 @@ OptionEntry& OptionEntry::operator=(const OptionEntry& src)
   return *this;
 }
 
-OptionEntry::OptionEntry(OptionEntry&& other) noexcept
-: gobject_(std::move(other.gobject_))
+OptionEntry::OptionEntry(OptionEntry&& other) noexcept : gobject_(std::move(other.gobject_))
 {
   other.gobject_ = nullptr;
 }
 
-OptionEntry& OptionEntry::operator=(OptionEntry&& other) noexcept
+OptionEntry&
+OptionEntry::operator=(OptionEntry&& other) noexcept
 {
   release_gobject();
 
@@ -94,23 +98,26 @@ OptionEntry& OptionEntry::operator=(OptionEntry&& other) noexcept
   return *this;
 }
 
-void OptionEntry::set_long_name(const Glib::ustring& value)
+void
+OptionEntry::set_long_name(const Glib::ustring& value)
 {
-  if(gobject_->long_name)
+  if (gobject_->long_name)
   {
     g_free((gchar*)(gobject_->long_name));
     gobject_->long_name = nullptr;
   }
 
-  //Note that we do not use nullptr for an empty string,
-  //because G_OPTION_REMAINING is actually a "", so it actually has a distinct meaning:
-  //TODO: Wrap G_OPTION_REMAINING in C++ somehow, maybe as an explicit set_long_name(void) or set_is_remaining()? murrayc.
+  // Note that we do not use nullptr for an empty string,
+  // because G_OPTION_REMAINING is actually a "", so it actually has a distinct meaning:
+  // TODO: Wrap G_OPTION_REMAINING in C++ somehow, maybe as an explicit set_long_name(void) or
+  // set_is_remaining()? murrayc.
   gobj()->long_name = (value).c_str() ? g_strdup((value).c_str()) : nullptr;
 }
 
-void OptionEntry::set_description(const Glib::ustring& value)
+void
+OptionEntry::set_description(const Glib::ustring& value)
 {
-  if(gobject_->description)
+  if (gobject_->description)
   {
     g_free((gchar*)(gobject_->description));
     gobject_->description = nullptr;
@@ -119,9 +126,10 @@ void OptionEntry::set_description(const Glib::ustring& value)
   gobj()->description = (value).empty() ? nullptr : g_strdup((value).c_str());
 }
 
-void OptionEntry::set_arg_description(const Glib::ustring& value)
+void
+OptionEntry::set_arg_description(const Glib::ustring& value)
 {
-  if(gobject_->arg_description)
+  if (gobject_->arg_description)
   {
     g_free((gchar*)(gobject_->arg_description));
     gobject_->arg_description = nullptr;
@@ -130,6 +138,4 @@ void OptionEntry::set_arg_description(const Glib::ustring& value)
   gobj()->arg_description = (value).empty() ? nullptr : g_strdup((value).c_str());
 }
 
-
 } // namespace Glib
-

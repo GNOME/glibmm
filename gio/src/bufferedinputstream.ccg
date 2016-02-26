@@ -23,44 +23,35 @@
 
 namespace Gio
 {
-Glib::RefPtr<BufferedInputStream> BufferedInputStream::create_sized(const Glib::RefPtr<InputStream>& base_stream, gsize buffer_size)
+Glib::RefPtr<BufferedInputStream>
+BufferedInputStream::create_sized(const Glib::RefPtr<InputStream>& base_stream, gsize buffer_size)
 {
   return Glib::RefPtr<Gio::BufferedInputStream>(new BufferedInputStream(base_stream, buffer_size));
 }
 
-void BufferedInputStream::fill_async(const SlotAsyncReady& slot,
-                                     gssize count,
-                                     const Glib::RefPtr<Cancellable>& cancellable,
-                                     int io_priority)
+void
+BufferedInputStream::fill_async(const SlotAsyncReady& slot, gssize count,
+  const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
-    auto slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
 
-    g_buffered_input_stream_fill_async(gobj(),
-            count,
-            io_priority,
-            Glib::unwrap(cancellable),
-            &SignalProxy_async_callback,
-            slot_copy);
+  g_buffered_input_stream_fill_async(
+    gobj(), count, io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-void BufferedInputStream::fill_async(const SlotAsyncReady& slot,
-                                     gssize count,
-                                     int io_priority)
+void
+BufferedInputStream::fill_async(const SlotAsyncReady& slot, gssize count, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
-    auto slot_copy = new SlotAsyncReady(slot);
+  auto slot_copy = new SlotAsyncReady(slot);
 
-    g_buffered_input_stream_fill_async(gobj(),
-            count,
-            io_priority,
-            nullptr,
-            &SignalProxy_async_callback,
-            slot_copy);
+  g_buffered_input_stream_fill_async(
+    gobj(), count, io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
-}   // namespace Gio
+} // namespace Gio

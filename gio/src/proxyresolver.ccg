@@ -27,43 +27,41 @@
 namespace Gio
 {
 
-std::vector<Glib::ustring> ProxyResolver::lookup(const Glib::ustring& uri)
+std::vector<Glib::ustring>
+ProxyResolver::lookup(const Glib::ustring& uri)
 {
   GError* gerror = nullptr;
-  auto retvalue =
-    Glib::ArrayHandler<Glib::ustring>::array_to_vector(g_proxy_resolver_lookup(gobj(), uri.c_str(), nullptr, &(gerror)), Glib::OWNERSHIP_DEEP);
-  if(gerror)
+  auto retvalue = Glib::ArrayHandler<Glib::ustring>::array_to_vector(
+    g_proxy_resolver_lookup(gobj(), uri.c_str(), nullptr, &(gerror)), Glib::OWNERSHIP_DEEP);
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
 }
 
-void ProxyResolver::lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void
+ProxyResolver::lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_proxy_resolver_lookup_async(gobj(),
-    uri.c_str(),
-    Glib::unwrap(cancellable),
-    &SignalProxy_async_callback,
-    slot_copy);
+  g_proxy_resolver_lookup_async(
+    gobj(), uri.c_str(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-void ProxyResolver::lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot)
+void
+ProxyResolver::lookup_async(const Glib::ustring& uri, const SlotAsyncReady& slot)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_proxy_resolver_lookup_async(gobj(),
-    uri.c_str(),
-    nullptr,
-    &SignalProxy_async_callback,
-    slot_copy);
+  g_proxy_resolver_lookup_async(
+    gobj(), uri.c_str(), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
-} //namespace Gio
+} // namespace Gio

@@ -30,150 +30,151 @@ namespace DBus
 namespace Address
 {
 
-bool is_address(const std::string& string)
+bool
+is_address(const std::string& string)
 {
   return static_cast<bool>(g_dbus_is_address(string.c_str()));
 }
 
-bool is_supported(const std::string& address)
+bool
+is_supported(const std::string& address)
 {
   GError* gerror = nullptr;
   bool const result = g_dbus_is_supported_address(address.c_str(), &gerror);
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
   return result;
 }
 
-void get_stream(const std::string& address, const SlotAsyncReady slot,
+void
+get_stream(const std::string& address, const SlotAsyncReady slot,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
-  g_dbus_address_get_stream(address.c_str(), Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
+  g_dbus_address_get_stream(
+    address.c_str(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-void get_stream(const std::string& address, const SlotAsyncReady slot)
+void
+get_stream(const std::string& address, const SlotAsyncReady slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
-  g_dbus_address_get_stream(address.c_str(), nullptr, &SignalProxy_async_callback,
-    slot_copy);
+  g_dbus_address_get_stream(address.c_str(), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
-Glib::RefPtr<IOStream> get_stream_finish(const Glib::RefPtr<AsyncResult>& res,
-  std::string& out_guid)
+Glib::RefPtr<IOStream>
+get_stream_finish(const Glib::RefPtr<AsyncResult>& res, std::string& out_guid)
 {
   GError* gerror = nullptr;
   gchar* g_out_guid = nullptr;
 
   auto result =
-    Glib::wrap(g_dbus_address_get_stream_finish(Glib::unwrap(res),
-    &g_out_guid, &gerror));
+    Glib::wrap(g_dbus_address_get_stream_finish(Glib::unwrap(res), &g_out_guid, &gerror));
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   out_guid = g_out_guid;
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_finish(const Glib::RefPtr<AsyncResult>& res)
+Glib::RefPtr<IOStream>
+get_stream_finish(const Glib::RefPtr<AsyncResult>& res)
 {
   GError* gerror = nullptr;
 
-  auto result =
-    Glib::wrap(g_dbus_address_get_stream_finish(Glib::unwrap(res), nullptr,
-    &gerror));
+  auto result = Glib::wrap(g_dbus_address_get_stream_finish(Glib::unwrap(res), nullptr, &gerror));
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_sync(const std::string& address,
-  const Glib::RefPtr<Cancellable>& cancellable, std::string& out_guid)
+Glib::RefPtr<IOStream>
+get_stream_sync(
+  const std::string& address, const Glib::RefPtr<Cancellable>& cancellable, std::string& out_guid)
 {
   GError* gerror = nullptr;
   gchar* g_out_guid = nullptr;
 
-  auto result =
-    Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(),
-    &g_out_guid, Glib::unwrap(cancellable), &gerror));
+  auto result = Glib::wrap(g_dbus_address_get_stream_sync(
+    address.c_str(), &g_out_guid, Glib::unwrap(cancellable), &gerror));
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   out_guid = g_out_guid;
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_sync(const std::string& address,
-  std::string& out_guid)
+Glib::RefPtr<IOStream>
+get_stream_sync(const std::string& address, std::string& out_guid)
 {
   GError* gerror = nullptr;
   gchar* g_out_guid = nullptr;
 
   auto result =
-    Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(),
-    &g_out_guid, nullptr, &gerror));
+    Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(), &g_out_guid, nullptr, &gerror));
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   out_guid = g_out_guid;
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_sync(const std::string& address,
-  const Glib::RefPtr<Cancellable>& cancellable)
+Glib::RefPtr<IOStream>
+get_stream_sync(const std::string& address, const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = nullptr;
 
-  auto result =
-    Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(), nullptr,
-    Glib::unwrap(cancellable), &gerror));
+  auto result = Glib::wrap(
+    g_dbus_address_get_stream_sync(address.c_str(), nullptr, Glib::unwrap(cancellable), &gerror));
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
 
-Glib::RefPtr<IOStream> get_stream_sync(const std::string& address)
+Glib::RefPtr<IOStream>
+get_stream_sync(const std::string& address)
 {
   GError* gerror = nullptr;
 
   auto result =
     Glib::wrap(g_dbus_address_get_stream_sync(address.c_str(), nullptr, nullptr, &gerror));
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
 
-std::string get_for_bus_sync(BusType bus_type,
-  const Glib::RefPtr<Cancellable>& cancellable)
+std::string
+get_for_bus_sync(BusType bus_type, const Glib::RefPtr<Cancellable>& cancellable)
 {
   GError* gerror = nullptr;
 
   std::string result(g_dbus_address_get_for_bus_sync(
     static_cast<GBusType>(bus_type), Glib::unwrap(cancellable), &gerror));
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;
 }
 
-std::string get_for_bus_sync(BusType bus_type)
+std::string
+get_for_bus_sync(BusType bus_type)
 {
   GError* gerror = nullptr;
 
-  std::string result(g_dbus_address_get_for_bus_sync(
-    static_cast<GBusType>(bus_type), nullptr, &gerror));
+  std::string result(
+    g_dbus_address_get_for_bus_sync(static_cast<GBusType>(bus_type), nullptr, &gerror));
 
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return result;

@@ -21,20 +21,19 @@ namespace
 {
 struct BindingTransformSlots
 {
-  BindingTransformSlots(
-    const Glib::Binding::SlotTransform& transform_to,
+  BindingTransformSlots(const Glib::Binding::SlotTransform& transform_to,
     const Glib::Binding::SlotTransform& transform_from)
-  :
-  from_source_to_target(transform_to), from_target_to_source(transform_from)
-  {}
+  : from_source_to_target(transform_to), from_target_to_source(transform_from)
+  {
+  }
 
   Glib::Binding::SlotTransform from_source_to_target;
   Glib::Binding::SlotTransform from_target_to_source;
 };
 
-gboolean Binding_transform_callback_common(
-  const GValue* from_value, GValue* to_value,
-  Glib::Binding::SlotTransform& the_slot)
+gboolean
+Binding_transform_callback_common(
+  const GValue* from_value, GValue* to_value, Glib::Binding::SlotTransform& the_slot)
 {
   bool result = false;
   try
@@ -48,8 +47,9 @@ gboolean Binding_transform_callback_common(
   return result;
 }
 
-gboolean Binding_transform_to_callback(GBinding*,
-  const GValue* from_value, GValue* to_value, gpointer user_data)
+gboolean
+Binding_transform_to_callback(
+  GBinding*, const GValue* from_value, GValue* to_value, gpointer user_data)
 {
   Glib::Binding::SlotTransform& the_slot =
     static_cast<BindingTransformSlots*>(user_data)->from_source_to_target;
@@ -57,8 +57,9 @@ gboolean Binding_transform_to_callback(GBinding*,
   return Binding_transform_callback_common(from_value, to_value, the_slot);
 }
 
-gboolean Binding_transform_from_callback(GBinding*,
-  const GValue* from_value, GValue* to_value, gpointer user_data)
+gboolean
+Binding_transform_from_callback(
+  GBinding*, const GValue* from_value, GValue* to_value, gpointer user_data)
 {
   Glib::Binding::SlotTransform& the_slot =
     static_cast<BindingTransformSlots*>(user_data)->from_target_to_source;
@@ -66,7 +67,8 @@ gboolean Binding_transform_from_callback(GBinding*,
   return Binding_transform_callback_common(from_value, to_value, the_slot);
 }
 
-void Binding_transform_callback_destroy(gpointer user_data)
+void
+Binding_transform_callback_destroy(gpointer user_data)
 {
   delete static_cast<BindingTransformSlots*>(user_data);
 }
@@ -75,22 +77,19 @@ void Binding_transform_callback_destroy(gpointer user_data)
 
 namespace Glib
 {
-//static
-Glib::RefPtr<Binding> Binding::bind_property_value(
-  const PropertyProxy_Base& source_property,
-  const PropertyProxy_Base& target_property,
-  BindingFlags flags,
-  const SlotTransform& transform_to,
+// static
+Glib::RefPtr<Binding>
+Binding::bind_property_value(const PropertyProxy_Base& source_property,
+  const PropertyProxy_Base& target_property, BindingFlags flags, const SlotTransform& transform_to,
   const SlotTransform& transform_from)
 {
   GBinding* binding = nullptr;
   if (transform_to.empty() && transform_from.empty())
   {
     // No user-supplied transformations.
-    binding = g_object_bind_property(
-      source_property.get_object()->gobj(), source_property.get_name(),
-      target_property.get_object()->gobj(), target_property.get_name(),
-      (GBindingFlags)flags);
+    binding =
+      g_object_bind_property(source_property.get_object()->gobj(), source_property.get_name(),
+        target_property.get_object()->gobj(), target_property.get_name(), (GBindingFlags)flags);
   }
   else
   {
@@ -99,13 +98,11 @@ Glib::RefPtr<Binding> Binding::bind_property_value(
     // when Binding_transform_callback_destroy() is called.
     BindingTransformSlots* slots_copy = new BindingTransformSlots(transform_to, transform_from);
 
-    binding = g_object_bind_property_full(
-      source_property.get_object()->gobj(), source_property.get_name(),
-      target_property.get_object()->gobj(), target_property.get_name(),
-      (GBindingFlags)flags,
-      transform_to.empty() ? nullptr : &Binding_transform_to_callback,
-      transform_from.empty() ? nullptr : &Binding_transform_from_callback,
-      slots_copy, &Binding_transform_callback_destroy);
+    binding = g_object_bind_property_full(source_property.get_object()->gobj(),
+      source_property.get_name(), target_property.get_object()->gobj(), target_property.get_name(),
+      (GBindingFlags)flags, transform_to.empty() ? nullptr : &Binding_transform_to_callback,
+      transform_from.empty() ? nullptr : &Binding_transform_from_callback, slots_copy,
+      &Binding_transform_callback_destroy);
   }
 
   if (!binding)
@@ -118,7 +115,8 @@ Glib::RefPtr<Binding> Binding::bind_property_value(
   return Glib::RefPtr<Binding>(new Binding(binding));
 }
 
-void Binding::unbind()
+void
+Binding::unbind()
 {
   // Call g_binding_unbind() only once. It always calls g_object_unref().
   if (g_binding_get_source(gobj()))
@@ -132,7 +130,8 @@ void Binding::unbind()
 // target object is finalized, almost like g_binding_unbind().
 // But the GBinding object shall be destroyed when and only when the last
 // reference from a Glib::RefPtr is dropped.
-void Binding::unreference() const
+void
+Binding::unreference() const
 {
   GBinding* const binding = const_cast<GBinding*>(gobj());
 

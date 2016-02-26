@@ -19,20 +19,20 @@
 #include <gio/gio.h>
 #include "slot_async.h"
 
-namespace Gio {
+namespace Gio
+{
 
-void NetworkMonitor::can_reach_async(const Glib::RefPtr<SocketConnectable>& connectable, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+void
+NetworkMonitor::can_reach_async(const Glib::RefPtr<SocketConnectable>& connectable,
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_network_monitor_can_reach_async(gobj(),
-    Glib::unwrap(connectable),
-    Glib::unwrap(cancellable),
-    &SignalProxy_async_callback,
-    slot_copy);
+  g_network_monitor_can_reach_async(gobj(), Glib::unwrap(connectable), Glib::unwrap(cancellable),
+    &SignalProxy_async_callback, slot_copy);
 }
 
 } // namespace Gio

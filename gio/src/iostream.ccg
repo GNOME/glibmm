@@ -26,18 +26,16 @@ namespace Gio
 {
 
 void
-IOStream::close_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+IOStream::close_async(
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_io_stream_close_async(gobj(),
-                          io_priority,
-                          Glib::unwrap(cancellable),
-                          &SignalProxy_async_callback,
-                          slot_copy);
+  g_io_stream_close_async(
+    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -48,16 +46,24 @@ IOStream::close_async(const SlotAsyncReady& slot, int io_priority)
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_io_stream_close_async(gobj(),
-                          io_priority,
-                          nullptr,
-                          &SignalProxy_async_callback,
-                          slot_copy);
+  g_io_stream_close_async(gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 void
-IOStream::splice_async(const Glib::RefPtr<IOStream>& stream2,
-  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable,
+IOStream::splice_async(const Glib::RefPtr<IOStream>& stream2, const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, IOStreamSpliceFlags flags, int io_priority)
+{
+  // Create a copy of the slot.
+  // A pointer to it will be passed through the callback's data parameter
+  // and deleted in the callback.
+  auto slot_copy = new SlotAsyncReady(slot);
+
+  g_io_stream_splice_async(gobj(), Glib::unwrap(stream2), static_cast<GIOStreamSpliceFlags>(flags),
+    io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
+}
+
+void
+IOStream::splice_async(const Glib::RefPtr<IOStream>& stream2, const SlotAsyncReady& slot,
   IOStreamSpliceFlags flags, int io_priority)
 {
   // Create a copy of the slot.
@@ -65,23 +71,8 @@ IOStream::splice_async(const Glib::RefPtr<IOStream>& stream2,
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_io_stream_splice_async(gobj(), Glib::unwrap(stream2),
-    static_cast<GIOStreamSpliceFlags>(flags), io_priority,
-    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
-}
-
-void
-IOStream::splice_async(const Glib::RefPtr<IOStream>& stream2,
-  const SlotAsyncReady& slot, IOStreamSpliceFlags flags, int io_priority)
-{
-  // Create a copy of the slot.
-  // A pointer to it will be passed through the callback's data parameter
-  // and deleted in the callback.
-  auto slot_copy = new SlotAsyncReady(slot);
-
-  g_io_stream_splice_async(gobj(), Glib::unwrap(stream2),
-    static_cast<GIOStreamSpliceFlags>(flags), io_priority, nullptr,
-    &SignalProxy_async_callback, slot_copy);
+  g_io_stream_splice_async(gobj(), Glib::unwrap(stream2), static_cast<GIOStreamSpliceFlags>(flags),
+    io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 } // namespace Gio

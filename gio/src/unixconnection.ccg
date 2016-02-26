@@ -24,37 +24,33 @@
 namespace Gio
 {
 
-void UnixConnection::receive_credentials_async(const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable)
+void
+UnixConnection::receive_credentials_async(
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_unix_connection_receive_credentials_async(gobj(),
-                                              Glib::unwrap(cancellable),
-                                              &SignalProxy_async_callback,
-                                              slot_copy);
-}
-
-void UnixConnection::receive_credentials_async(const SlotAsyncReady& slot)
-{
-  auto slot_copy = new SlotAsyncReady(slot);
-
-  g_unix_connection_receive_credentials_async(gobj(),
-                                              nullptr,
-                                              &SignalProxy_async_callback,
-                                              slot_copy);
+  g_unix_connection_receive_credentials_async(
+    gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
 void
-UnixConnection::send_credentials_async(const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable)
+UnixConnection::receive_credentials_async(const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_unix_connection_send_credentials_async(gobj(),
-                                           Glib::unwrap(cancellable),
-                                           &SignalProxy_async_callback,
-                                           slot_copy);
+  g_unix_connection_receive_credentials_async(
+    gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
+}
+
+void
+UnixConnection::send_credentials_async(
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable)
+{
+  auto slot_copy = new SlotAsyncReady(slot);
+
+  g_unix_connection_send_credentials_async(
+    gobj(), Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
 void
@@ -63,10 +59,7 @@ UnixConnection::send_credentials_async(const SlotAsyncReady& slot)
 {
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_unix_connection_send_credentials_async(gobj(),
-                                           nullptr,
-                                           &SignalProxy_async_callback,
-                                           slot_copy);
+  g_unix_connection_send_credentials_async(gobj(), nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 } // namespace Gio

@@ -24,58 +24,57 @@
 namespace Gio
 {
 
-void AsyncInitable::init_async(const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+void
+AsyncInitable::init_async(
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_async_initable_init_async(gobj(), io_priority, Glib::unwrap(cancellable),
-    &SignalProxy_async_callback, slot_copy);
+  g_async_initable_init_async(
+    gobj(), io_priority, Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
-void AsyncInitable::init_async(const SlotAsyncReady& slot, int io_priority)
+void
+AsyncInitable::init_async(const SlotAsyncReady& slot, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_async_initable_init_async(gobj(), io_priority, nullptr,
-    &SignalProxy_async_callback, slot_copy);
+  g_async_initable_init_async(gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
-void AsyncInitable_Class::init_async_vfunc_callback(GAsyncInitable* self,
-  int io_priority, GCancellable* cancellable, GAsyncReadyCallback callback,
-  gpointer user_data)
+void
+AsyncInitable_Class::init_async_vfunc_callback(GAsyncInitable* self, int io_priority,
+  GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data)
 {
-  const auto obj_base = static_cast<Glib::ObjectBase*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+  const auto obj_base =
+    static_cast<Glib::ObjectBase*>(Glib::ObjectBase::_get_current_wrapper((GObject*)self));
 
   // Non-gtkmmproc-generated custom classes implicitly call the default
   // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
   // generated classes can use this optimisation, which avoids the unnecessary
   // parameter conversions if there is no possibility of the virtual function
   // being overridden:
-  if(obj_base && obj_base->is_derived_())
+  if (obj_base && obj_base->is_derived_())
   {
     const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
-    if(obj) // This can be nullptr during destruction.
+    if (obj) // This can be nullptr during destruction.
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Get the slot.
-        Gio::SlotAsyncReady* the_slot =
-          static_cast<Gio::SlotAsyncReady*>(user_data);
+        Gio::SlotAsyncReady* the_slot = static_cast<Gio::SlotAsyncReady*>(user_data);
 
         // Call the virtual member method, which derived classes might override.
-        obj->init_async_vfunc(*the_slot, Glib::wrap(cancellable, true),
-          io_priority);
+        obj->init_async_vfunc(*the_slot, Glib::wrap(cancellable, true), io_priority);
         return;
       }
-      catch(...)
+      catch (...)
       {
         Glib::exception_handlers_invoke();
       }
@@ -83,52 +82,56 @@ void AsyncInitable_Class::init_async_vfunc_callback(GAsyncInitable* self,
   }
 
   const auto base = static_cast<BaseClassType*>(
-      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
-g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
-)  );
+    g_type_interface_peek_parent( // Get the parent interface of the interface (The original
+                                  // underlying C interface).
+      g_type_interface_peek(
+        G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
+      ));
 
   // Call the original underlying C function:
-  if(base && base->init_async)
+  if (base && base->init_async)
     (*base->init_async)(self, io_priority, cancellable, callback, user_data);
-
 }
-void Gio::AsyncInitable::init_async_vfunc(const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
+void
+Gio::AsyncInitable::init_async_vfunc(
+  const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority)
 {
   const auto base = static_cast<BaseClassType*>(
-      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
-g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
-)  );
+    g_type_interface_peek_parent( // Get the parent interface of the interface (The original
+                                  // underlying C interface).
+      g_type_interface_peek(
+        G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
+      ));
 
-  if(base && base->init_async)
+  if (base && base->init_async)
   {
-    (*base->init_async)(gobj(), io_priority,
-      const_cast<GCancellable*>(Glib::unwrap(cancellable)),
+    (*base->init_async)(gobj(), io_priority, const_cast<GCancellable*>(Glib::unwrap(cancellable)),
       &SignalProxy_async_callback, const_cast<SlotAsyncReady*>(&slot));
   }
 }
-gboolean AsyncInitable_Class::init_finish_vfunc_callback(GAsyncInitable* self,
-  GAsyncResult* res, GError** error)
+gboolean
+AsyncInitable_Class::init_finish_vfunc_callback(
+  GAsyncInitable* self, GAsyncResult* res, GError** error)
 {
-  const auto obj_base = static_cast<Glib::ObjectBase*>(
-      Glib::ObjectBase::_get_current_wrapper((GObject*)self));
+  const auto obj_base =
+    static_cast<Glib::ObjectBase*>(Glib::ObjectBase::_get_current_wrapper((GObject*)self));
 
   // Non-gtkmmproc-generated custom classes implicitly call the default
   // Glib::ObjectBase constructor, which sets is_derived_. But gtkmmproc-
   // generated classes can use this optimisation, which avoids the unnecessary
   // parameter conversions if there is no possibility of the virtual function
   // being overridden:
-  if(obj_base && obj_base->is_derived_())
+  if (obj_base && obj_base->is_derived_())
   {
     const auto obj = dynamic_cast<CppObjectType* const>(obj_base);
-    if(obj) // This can be nullptr during destruction.
+    if (obj) // This can be nullptr during destruction.
     {
       try // Trap C++ exceptions which would normally be lost because this is a C callback.
       {
         // Call the virtual member method, which derived classes might override.
         return static_cast<int>(obj->init_finish_vfunc(Glib::wrap(res, true)));
       }
-      catch(...)
+      catch (...)
       {
         Glib::exception_handlers_invoke();
       }
@@ -136,33 +139,36 @@ gboolean AsyncInitable_Class::init_finish_vfunc_callback(GAsyncInitable* self,
   }
 
   const auto base = static_cast<BaseClassType*>(
-      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
-g_type_interface_peek(G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
-)  );
+    g_type_interface_peek_parent( // Get the parent interface of the interface (The original
+                                  // underlying C interface).
+      g_type_interface_peek(
+        G_OBJECT_GET_CLASS(self), CppObjectType::get_type()) // Get the interface.
+      ));
 
   // Call the original underlying C function:
-  if(base && base->init_finish)
+  if (base && base->init_finish)
     return (*base->init_finish)(self, res, error);
-
 
   typedef gboolean RType;
   return RType();
 }
-bool Gio::AsyncInitable::init_finish_vfunc(const Glib::RefPtr<AsyncResult>& res)
+bool
+Gio::AsyncInitable::init_finish_vfunc(const Glib::RefPtr<AsyncResult>& res)
 {
   const auto base = static_cast<BaseClassType*>(
-      g_type_interface_peek_parent( // Get the parent interface of the interface (The original underlying C interface).
-g_type_interface_peek(G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
-)  );
+    g_type_interface_peek_parent( // Get the parent interface of the interface (The original
+                                  // underlying C interface).
+      g_type_interface_peek(
+        G_OBJECT_GET_CLASS(gobject_), CppObjectType::get_type()) // Get the interface.
+      ));
 
-  if(base && base->init_finish)
+  if (base && base->init_finish)
   {
     GError* gerror = nullptr;
 
-    bool const result = (*base->init_finish)(gobj(), Glib::unwrap(res),
-      &gerror);
+    bool const result = (*base->init_finish)(gobj(), Glib::unwrap(res), &gerror);
 
-    if(gerror)
+    if (gerror)
       ::Glib::Error::throw_exception(gerror);
 
     return result;

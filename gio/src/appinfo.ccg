@@ -26,17 +26,14 @@ namespace Gio
 {
 
 Glib::RefPtr<AppInfo>
-AppInfo::create_from_commandline(const std::string& commandline,
-                                 const std::string& application_name,
-                                 AppInfoCreateFlags flags)
+AppInfo::create_from_commandline(
+  const std::string& commandline, const std::string& application_name, AppInfoCreateFlags flags)
 {
   GAppInfo* capp_info = nullptr;
   GError* gerror = nullptr;
 
-  capp_info = g_app_info_create_from_commandline(commandline.c_str(),
-                                                 application_name.c_str(),
-                                                 static_cast<GAppInfoCreateFlags>(flags),
-                                                 &gerror);
+  capp_info = g_app_info_create_from_commandline(commandline.c_str(), application_name.c_str(),
+    static_cast<GAppInfoCreateFlags>(flags), &gerror);
 
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
@@ -44,62 +41,66 @@ AppInfo::create_from_commandline(const std::string& commandline,
   return Glib::wrap(capp_info);
 }
 
-Glib::RefPtr<AppInfo> AppInfo::create_duplicate() const
+Glib::RefPtr<AppInfo>
+AppInfo::create_duplicate() const
 {
-   return Glib::wrap(g_app_info_dup(const_cast<GAppInfo*>(gobj())));
+  return Glib::wrap(g_app_info_dup(const_cast<GAppInfo*>(gobj())));
 }
 
-bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& launch_context)
+bool
+AppInfo::launch(
+  const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& launch_context)
 {
-  std::vector< Glib::RefPtr<Gio::File> > vec = {file};
+  std::vector<Glib::RefPtr<Gio::File>> vec = { file };
 
   GError* gerror = nullptr;
   const bool retvalue = g_app_info_launch(gobj(),
-    Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list(vec).data(),
+    Glib::ListHandler<Glib::RefPtr<Gio::File>>::vector_to_list(vec).data(),
     Glib::unwrap(launch_context), &(gerror));
-  if(gerror)
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
 }
 
-bool AppInfo::launch(const Glib::RefPtr<Gio::File>& file)
+bool
+AppInfo::launch(const Glib::RefPtr<Gio::File>& file)
 {
-  std::vector< Glib::RefPtr<Gio::File> > vec = {file};
+  std::vector<Glib::RefPtr<Gio::File>> vec = { file };
 
   GError* gerror = nullptr;
   const bool retvalue = g_app_info_launch(gobj(),
-    Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list(vec).data (),
-    nullptr, &(gerror));
-  if(gerror)
+    Glib::ListHandler<Glib::RefPtr<Gio::File>>::vector_to_list(vec).data(), nullptr, &(gerror));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
 }
 
-bool AppInfo::launch_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context)
+bool
+AppInfo::launch_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context)
 {
-  std::vector<std::string> vec = {uri};
+  std::vector<std::string> vec = { uri };
 
   GError* gerror = nullptr;
-  const bool retvalue = g_app_info_launch_uris(gobj(),
-    Glib::ListHandler<std::string>::vector_to_list(vec).data (),
-    Glib::unwrap(launch_context), &(gerror));
-  if(gerror)
+  const bool retvalue =
+    g_app_info_launch_uris(gobj(), Glib::ListHandler<std::string>::vector_to_list(vec).data(),
+      Glib::unwrap(launch_context), &(gerror));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
 }
 
-bool AppInfo::launch_uri(const std::string& uri)
+bool
+AppInfo::launch_uri(const std::string& uri)
 {
-  std::vector<std::string> vec = {uri};
+  std::vector<std::string> vec = { uri };
 
   GError* gerror = nullptr;
-  const bool retvalue = g_app_info_launch_uris(gobj(),
-    Glib::ListHandler<std::string>::vector_to_list(vec).data (), nullptr,
-    &(gerror));
-  if(gerror)
+  const bool retvalue = g_app_info_launch_uris(
+    gobj(), Glib::ListHandler<std::string>::vector_to_list(vec).data(), nullptr, &(gerror));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;

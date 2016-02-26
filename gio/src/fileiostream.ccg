@@ -24,56 +24,55 @@
 namespace Gio
 {
 
-Glib::RefPtr<FileInfo> FileIOStream::query_info(const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes)
+Glib::RefPtr<FileInfo>
+FileIOStream::query_info(
+  const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes)
 {
   GError* gerror = nullptr;
-  auto retvalue = Glib::wrap(g_file_io_stream_query_info(gobj(), g_strdup((attributes).c_str()), const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
-  if(gerror)
+  auto retvalue = Glib::wrap(g_file_io_stream_query_info(gobj(), g_strdup((attributes).c_str()),
+    const_cast<GCancellable*>(Glib::unwrap(cancellable)), &(gerror)));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
 }
 
-Glib::RefPtr<FileInfo> FileIOStream::query_info(const std::string& attributes)
+Glib::RefPtr<FileInfo>
+FileIOStream::query_info(const std::string& attributes)
 {
   GError* gerror = nullptr;
-  auto retvalue = Glib::wrap(g_file_io_stream_query_info(gobj(), g_strdup((attributes).c_str()), nullptr, &(gerror)));
-  if(gerror)
+  auto retvalue = Glib::wrap(
+    g_file_io_stream_query_info(gobj(), g_strdup((attributes).c_str()), nullptr, &(gerror)));
+  if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
   return retvalue;
 }
 
 void
-FileIOStream::query_info_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, int io_priority)
+FileIOStream::query_info_async(const SlotAsyncReady& slot,
+  const Glib::RefPtr<Cancellable>& cancellable, const std::string& attributes, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_file_io_stream_query_info_async(gobj(),
-                                    const_cast<char*>(attributes.c_str()),
-                                    io_priority,
-                                    Glib::unwrap(cancellable),
-                                    &SignalProxy_async_callback,
-                                    slot_copy);
+  g_file_io_stream_query_info_async(gobj(), const_cast<char*>(attributes.c_str()), io_priority,
+    Glib::unwrap(cancellable), &SignalProxy_async_callback, slot_copy);
 }
 
 void
-FileIOStream::query_info_async(const SlotAsyncReady& slot, const std::string& attributes, int io_priority)
+FileIOStream::query_info_async(
+  const SlotAsyncReady& slot, const std::string& attributes, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
   // and deleted in the callback.
   auto slot_copy = new SlotAsyncReady(slot);
 
-  g_file_io_stream_query_info_async(gobj(),
-                                    const_cast<char*>(attributes.c_str()),
-                                    io_priority,
-                                    nullptr,
-                                    &SignalProxy_async_callback,
-                                    slot_copy);
+  g_file_io_stream_query_info_async(gobj(), const_cast<char*>(attributes.c_str()), io_priority,
+    nullptr, &SignalProxy_async_callback, slot_copy);
 }
 
 } // namespace Gio
