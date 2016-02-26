@@ -16,145 +16,130 @@
 // https://developer.gnome.org/gio/stable/gio-Extension-Points.html
 // https://developer.gnome.org/gio/stable/gio-querymodules.html
 
+#include <cstdlib>
 #include <giomm.h>
 #include <iostream>
-#include <cstdlib>
 
-bool on_accept_certificate(const Glib::RefPtr<const Gio::TlsCertificate>& cert, Gio::TlsCertificateFlags)
+bool
+on_accept_certificate(const Glib::RefPtr<const Gio::TlsCertificate>& cert, Gio::TlsCertificateFlags)
 {
   std::cout << "Handshake is ocurring." << std::endl
-    << "The server is requesting that its certificate be accepted." <<
-    std::endl;
+            << "The server is requesting that its certificate be accepted." << std::endl;
 
-  std::cout << "Outputing certificate data:" << std::endl <<
-    cert->property_certificate_pem().get_value();
+  std::cout << "Outputing certificate data:" << std::endl
+            << cert->property_certificate_pem().get_value();
 
   auto issuer = cert->get_issuer();
 
-  std::cout << "Outputing the issuer's certificate data:" << std::endl <<
-    issuer->property_certificate_pem().get_value();
+  std::cout << "Outputing the issuer's certificate data:" << std::endl
+            << issuer->property_certificate_pem().get_value();
 
-  std::cout << "Accepting the certificate (completing the handshake)." <<
-    std::endl;
+  std::cout << "Accepting the certificate (completing the handshake)." << std::endl;
 
   return true;
 }
 
-int main(int, char**)
+int
+main(int, char**)
 {
   Gio::init();
 
   const Glib::ustring test_host = "www.gnome.org";
 
-  std::vector< Glib::RefPtr<Gio::InetAddress> > inet_addresses;
+  std::vector<Glib::RefPtr<Gio::InetAddress>> inet_addresses;
 
   try
   {
-    inet_addresses =
-      Gio::Resolver::get_default()->lookup_by_name(test_host);
+    inet_addresses = Gio::Resolver::get_default()->lookup_by_name(test_host);
   }
-  catch(const Gio::ResolverError& ex)
+  catch (const Gio::ResolverError& ex)
   {
-    //This happens if it could not resolve the name,
-    //for instance if we are not connected to the internet.
-    //TODO: Change this test so it can do something useful and succeed even
-    //if the testing computer is not connected to the internet.
+    // This happens if it could not resolve the name,
+    // for instance if we are not connected to the internet.
+    // TODO: Change this test so it can do something useful and succeed even
+    // if the testing computer is not connected to the internet.
     std::cerr << "Gio::Resolver::lookup_by_name() threw exception: " << ex.what() << std::endl;
     return EXIT_FAILURE;
   }
 
-  //Actually, it would throw an exception instead of reaching here with 0 addresses resolved.
-  if(inet_addresses.size() == 0)
+  // Actually, it would throw an exception instead of reaching here with 0 addresses resolved.
+  if (inet_addresses.size() == 0)
   {
-    std::cerr << "Could not resolve test host '" << test_host << "'." <<
-      std::endl;
+    std::cerr << "Could not resolve test host '" << test_host << "'." << std::endl;
     return EXIT_FAILURE;
   }
 
-  std::cout << "Successfully resolved address of test host '" << test_host <<
-    "'." << std::endl;
+  std::cout << "Successfully resolved address of test host '" << test_host << "'." << std::endl;
 
   auto first_inet_address = inet_addresses[0];
 
-  std::cout << "First address of test host is " <<
-    first_inet_address->to_string() << "." << std::endl;
+  std::cout << "First address of test host is " << first_inet_address->to_string() << "."
+            << std::endl;
 
-  auto socket =
-    Gio::Socket::create(first_inet_address->get_family(),
-    Gio::SOCKET_TYPE_STREAM, Gio::SOCKET_PROTOCOL_TCP);
+  auto socket = Gio::Socket::create(
+    first_inet_address->get_family(), Gio::SOCKET_TYPE_STREAM, Gio::SOCKET_PROTOCOL_TCP);
 
-  auto address =
-    Gio::InetSocketAddress::create(first_inet_address, 443);
+  auto address = Gio::InetSocketAddress::create(first_inet_address, 443);
 
   try
   {
     socket->connect(address);
   }
-  catch(const Gio::Error& ex)
+  catch (const Gio::Error& ex)
   {
-    std::cout << "Could not connect socket to " <<
-      address->get_address()->to_string() << ":" << address->get_port() <<
-      ". Exception: " << ex.what() << std::endl;
+    std::cout << "Could not connect socket to " << address->get_address()->to_string() << ":"
+              << address->get_port() << ". Exception: " << ex.what() << std::endl;
     return EXIT_FAILURE;
   }
 
-  if(!socket->is_connected())
+  if (!socket->is_connected())
   {
-    std::cout << "Could not connect socket to " <<
-      address->get_address()->to_string() << ":" << address->get_port() <<
-      "." << std::endl;
+    std::cout << "Could not connect socket to " << address->get_address()->to_string() << ":"
+              << address->get_port() << "." << std::endl;
   }
 
   auto conn = Glib::RefPtr<Gio::TcpConnection>::cast_dynamic(Gio::SocketConnection::create(socket));
 
-  if(!conn || !conn->is_connected())
+  if (!conn || !conn->is_connected())
   {
-    std::cout << "Could not establish connection to " <<
-      address->get_address()->to_string() << ":" << address->get_port() <<
-      "." << std::endl;
+    std::cout << "Could not establish connection to " << address->get_address()->to_string() << ":"
+              << address->get_port() << "." << std::endl;
     socket->close();
     return EXIT_FAILURE;
   }
 
-  std::cout << "Successfully established connection to " <<
-    address->get_address()->to_string() << ":" << address->get_port() <<
-    "." << std::endl;
+  std::cout << "Successfully established connection to " << address->get_address()->to_string()
+            << ":" << address->get_port() << "." << std::endl;
 
   try
   {
-    auto tls_connection =
-      Gio::TlsClientConnection::create(conn, address);
+    auto tls_connection = Gio::TlsClientConnection::create(conn, address);
 
-    tls_connection->signal_accept_certificate().connect(
-      sigc::ptr_fun(&on_accept_certificate));
+    tls_connection->signal_accept_certificate().connect(sigc::ptr_fun(&on_accept_certificate));
 
-    tls_connection->handshake(); 
+    tls_connection->handshake();
 
     std::cout << "Attempting to get the issuer's certificate from the "
-      "connection." << std::endl;
+                 "connection."
+              << std::endl;
 
-    auto issuer_certificate =
-      tls_connection->get_peer_certificate()->get_issuer();
+    auto issuer_certificate = tls_connection->get_peer_certificate()->get_issuer();
 
-    if(!issuer_certificate)
+    if (!issuer_certificate)
     {
-      std::cout << "Could not get the issuer's certificate of the peer." <<
-        std::endl;
+      std::cout << "Could not get the issuer's certificate of the peer." << std::endl;
       return EXIT_FAILURE;
     }
-    std::cout << "Successfully retrieved the issuer's certificate." <<
-      std::endl;
+    std::cout << "Successfully retrieved the issuer's certificate." << std::endl;
 
     std::cout << "Attempting to use the connection's database." << std::endl;
     auto database = tls_connection->get_database();
 
-    std::cout << "Looking up the certificate's issuer in the database." <<
-      std::endl;
+    std::cout << "Looking up the certificate's issuer in the database." << std::endl;
 
-    auto db_certificate =
-      database->lookup_certificate_issuer(issuer_certificate);
+    auto db_certificate = database->lookup_certificate_issuer(issuer_certificate);
 
-    if(!db_certificate)
+    if (!db_certificate)
     {
       std::cout << "The issuer's certificate was not found in the database." << std::endl;
     }

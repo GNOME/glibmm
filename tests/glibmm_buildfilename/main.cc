@@ -2,17 +2,18 @@
 #include <iostream>
 #include <string.h>
 
-//Use this line if you want debug output:
-//std::ostream& ostr = std::cout;
+// Use this line if you want debug output:
+// std::ostream& ostr = std::cout;
 
-//This seems nicer and more useful than putting an ifdef around the use of ostr:
+// This seems nicer and more useful than putting an ifdef around the use of ostr:
 std::stringstream debug;
 std::ostream& ostr = debug;
 
 #define DIR "/dir1/dir_2/dir-3"
 #define FILE "dir/file.ext"
 
-int main(int, char**)
+int
+main(int, char**)
 {
   gchar* dir_1 = g_strdup(DIR);
   std::string dir_2(DIR);
@@ -35,10 +36,8 @@ int main(int, char**)
   path = Glib::build_filename(dir_1, dir_2, dir_3, file_1);
   ostr << "Path 4: " << path << std::endl;
 
-  path = Glib::build_filename(dir_1, dir_2, dir_1, dir_3, dir_2, dir_3,
-    dir_1, dir_2, file_2);
+  path = Glib::build_filename(dir_1, dir_2, dir_1, dir_3, dir_2, dir_3, dir_1, dir_2, file_2);
   ostr << "Path 5: " << path << std::endl;
 
   return EXIT_SUCCESS;
 }
-

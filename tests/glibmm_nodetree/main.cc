@@ -1,16 +1,18 @@
-#include <iostream>
 #include <glibmm.h>
+#include <iostream>
 
 typedef Glib::NodeTree<const std::string> type_nodetree_string;
 
-static bool node_build_string(type_nodetree_string& node, std::string& string)
+static bool
+node_build_string(type_nodetree_string& node, std::string& string)
 {
   string += node.data();
 
   return false;
 }
 
-int main()
+int
+main()
 {
   std::list<std::string> alma;
   std::string tstring, cstring;
@@ -31,7 +33,7 @@ int main()
 
   node_B->append_data("E");
   node_B->prepend_data("C");
-  /* node_D = & */node_B->insert(1, *(new type_nodetree_string("D")));
+  /* node_D = & */ node_B->insert(1, *(new type_nodetree_string("D")));
 
   node_F = new type_nodetree_string("F");
   root->append(*node_F);
@@ -54,16 +56,18 @@ int main()
   g_assert(node_F->get_max_height() == 3);
   g_assert(node_G->child_count() == 4);
   g_assert(root->find_child("F", type_nodetree_string::TRAVERSE_ALL) == node_F);
-  g_assert(root->find("I", Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_NON_LEAVES) == NULL);
-  g_assert(root->find("J", Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_LEAVES) == node_J);
+  g_assert(
+    root->find("I", Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_NON_LEAVES) == NULL);
+  g_assert(
+    root->find("J", Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_LEAVES) == node_J);
 
-  for(guint i = 0; i < node_B->child_count(); i++)
-    {
-      node = node_B->nth_child(i);
-      g_assert(node->data() == std::string(1, ('C' + i)));
-    }
-  
-  for(guint i = 0; i < node_G->child_count(); i++)
+  for (guint i = 0; i < node_B->child_count(); i++)
+  {
+    node = node_B->nth_child(i);
+    g_assert(node->data() == std::string(1, ('C' + i)));
+  }
+
+  for (guint i = 0; i < node_G->child_count(); i++)
     g_assert(node_G->child_position(*node_G->nth_child(i)) == (int)i);
 
   /* we have built:                    A
@@ -79,39 +83,48 @@ int main()
    */
 
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_PRE_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+    Glib::TRAVERSE_PRE_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "ABCDEFGHIJK");
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_POST_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+    Glib::TRAVERSE_POST_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "CDEBHIJKGFA");
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+    Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "CBDEAHGIJKF");
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+    Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "ABFCDEGHIJK");
   tstring.clear();
-  
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_LEAVES, -1);
+
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+    Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_LEAVES, -1);
   g_assert(tstring == "CDEHIJK");
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_PRE_ORDER, type_nodetree_string::TRAVERSE_NON_LEAVES, -1);
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+    Glib::TRAVERSE_PRE_ORDER, type_nodetree_string::TRAVERSE_NON_LEAVES, -1);
   g_assert(tstring == "ABFG");
   tstring.clear();
 
   node_B->reverse_children();
   node_G->reverse_children();
 
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+    Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "ABFEDCGKJIH");
   tstring.clear();
 
-
-  node = new type_nodetree_string(*root); //A deep copy.
-  g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) == node->node_count(type_nodetree_string::TRAVERSE_ALL));
+  node = new type_nodetree_string(*root); // A deep copy.
+  g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) ==
+           node->node_count(type_nodetree_string::TRAVERSE_ALL));
   g_assert(root->get_max_height() == node->get_max_height());
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)), Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
-  node->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(cstring)), Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+    Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
+  node->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(cstring)),
+    Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == cstring);
 
   delete node;
@@ -123,12 +136,12 @@ int main()
   root = new type_nodetree_string();
   node = root;
 
-  for(guint i = 0; i < 2048; i++)
-    {
-      node->append(*(new type_nodetree_string()));
-      if((i % 5) == 4)
-        node = node->first_child()->next_sibling();
-    }
+  for (guint i = 0; i < 2048; i++)
+  {
+    node->append(*(new type_nodetree_string()));
+    if ((i % 5) == 4)
+      node = node->first_child()->next_sibling();
+  }
   g_assert(root->get_max_height() > 100);
   g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) == 1 + 2048);
 

@@ -32,8 +32,8 @@ main()
   std::vector<CrePtr> v2(Glib::ArrayHandle<CrePtr>(nullptr, 5, Glib::OWNERSHIP_DEEP));
   std::vector<CrePtr> v3(Glib::ListHandle<CrePtr>(nullptr, Glib::OWNERSHIP_DEEP));
   std::vector<CrePtr> v4(Glib::SListHandle<CrePtr>(nullptr, Glib::OWNERSHIP_DEEP));
-  std::vector<bool>   v5(Glib::ArrayHandle<bool>(nullptr, Glib::OWNERSHIP_DEEP));
-  std::vector<bool>   v6(Glib::ArrayHandle<bool>(nullptr, 5, Glib::OWNERSHIP_DEEP));
+  std::vector<bool> v5(Glib::ArrayHandle<bool>(nullptr, Glib::OWNERSHIP_DEEP));
+  std::vector<bool> v6(Glib::ArrayHandle<bool>(nullptr, 5, Glib::OWNERSHIP_DEEP));
 
   if (v1.empty() && v2.empty() && v3.empty() && v4.empty() && v5.empty() && v6.empty())
   {

@@ -28,10 +28,10 @@
 
 // utilities
 
-//Use this line if you want debug output:
-//std::ostream& ostr = std::cout;
+// Use this line if you want debug output:
+// std::ostream& ostr = std::cout;
 
-//This seems nicer and more useful than putting an ifdef around the use of std::cout:
+// This seems nicer and more useful than putting an ifdef around the use of std::cout:
 std::stringstream debug;
 std::ostream& ostr = debug;
 
@@ -42,7 +42,7 @@ create_list()
 {
   GList* head = nullptr;
 
-  for(unsigned int iter(0); iter < magic_limit; ++iter)
+  for (unsigned int iter(0); iter < magic_limit; ++iter)
   {
     head = g_list_prepend(head, g_credentials_new());
   }
@@ -55,12 +55,12 @@ print_list(GList* list)
 {
   unsigned int counter(1);
 
-  for(GList* node(list); node; node = node->next, ++counter)
+  for (GList *node(list); node; node = node->next, ++counter)
   {
     ostr << counter << ": ";
-    if(G_IS_CREDENTIALS(node->data))
+    if (G_IS_CREDENTIALS(node->data))
     {
-      ostr << node->data << ", ref: " << G_OBJECT(node->data)->ref_count <<"\n";
+      ostr << node->data << ", ref: " << G_OBJECT(node->data)->ref_count << "\n";
     }
     else
     {
@@ -74,7 +74,7 @@ create_slist()
 {
   GSList* head = nullptr;
 
-  for(unsigned int iter(0); iter < magic_limit; ++iter)
+  for (unsigned int iter(0); iter < magic_limit; ++iter)
   {
     head = g_slist_prepend(head, g_credentials_new());
   }
@@ -87,12 +87,12 @@ print_slist(GSList* slist)
 {
   unsigned int counter(1);
 
-  for(GSList* node(slist); node; node = node->next, ++counter)
+  for (GSList *node(slist); node; node = node->next, ++counter)
   {
     ostr << counter << ": ";
-    if(G_IS_CREDENTIALS(node->data))
+    if (G_IS_CREDENTIALS(node->data))
     {
-      ostr << node->data << ", ref: " << G_OBJECT(node->data)->ref_count <<"\n";
+      ostr << node->data << ", ref: " << G_OBJECT(node->data)->ref_count << "\n";
     }
     else
     {
@@ -106,7 +106,7 @@ create_array()
 {
   GCredentials** array = g_new0(GCredentials*, magic_limit + 1);
 
-  for(unsigned int iter(0); iter < magic_limit; ++iter)
+  for (unsigned int iter(0); iter < magic_limit; ++iter)
   {
     array[iter] = g_credentials_new();
   }
@@ -116,14 +116,15 @@ create_array()
 void
 print_array(GCredentials** array)
 {
-  for(unsigned int iter(0); iter < magic_limit; ++iter)
+  for (unsigned int iter(0); iter < magic_limit; ++iter)
   {
     GCredentials* credentials(array[iter]);
 
     ostr << iter + 1 << ": ";
-    if(G_IS_CREDENTIALS(credentials))
+    if (G_IS_CREDENTIALS(credentials))
     {
-      ostr << reinterpret_cast<gpointer>(credentials) << ", ref: " << G_OBJECT(credentials)->ref_count << "\n";
+      ostr << reinterpret_cast<gpointer>(credentials)
+           << ", ref: " << G_OBJECT(credentials)->ref_count << "\n";
     }
     else
     {
@@ -138,7 +139,7 @@ copy_array(GCredentials** array)
 {
   GCredentials** dup = g_new0(GCredentials*, magic_limit + 1);
 
-  for(unsigned int iter(0); iter < magic_limit; ++iter)
+  for (unsigned int iter(0); iter < magic_limit; ++iter)
   {
     dup[iter] = array[iter];
   }
@@ -149,31 +150,31 @@ copy_array(GCredentials** array)
 void
 free_array(GCredentials** array, bool container_too = true)
 {
-  for(unsigned int iter(0); iter < magic_limit; ++iter)
+  for (unsigned int iter(0); iter < magic_limit; ++iter)
   {
     g_object_unref(array[iter]);
   }
-  if(container_too)
+  if (container_too)
   {
     g_free(array);
   }
 }
 
 void
-print_vector(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
+print_vector(const std::vector<Glib::RefPtr<Gio::Credentials>>& v)
 {
   const unsigned int size(v.size());
 
-  for(unsigned int iter(0); iter < size; ++iter)
+  for (unsigned int iter(0); iter < size; ++iter)
   {
     const Glib::RefPtr<Gio::Credentials>& obj_ptr(v[iter]);
 
     ostr << iter + 1 << ": ";
-    if(obj_ptr)
+    if (obj_ptr)
     {
       GCredentials* gobj(obj_ptr->gobj());
 
-      if(G_IS_CREDENTIALS(gobj))
+      if (G_IS_CREDENTIALS(gobj))
       {
         ostr << static_cast<gpointer>(gobj) << ", ref: " << G_OBJECT(gobj)->ref_count << "\n";
       }
@@ -192,47 +193,31 @@ print_vector(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 struct Cache
 {
 public:
-  Cache()
-  : glist_(create_list()),
-    gslist_(create_slist()),
-    garray_(create_array())
-  {}
+  Cache() : glist_(create_list()), gslist_(create_slist()), garray_(create_array()) {}
 
   ~Cache()
   {
-    if(glist_)
+    if (glist_)
     {
       g_list_foreach(glist_, reinterpret_cast<GFunc>(g_object_unref), nullptr);
       g_list_free(glist_);
     }
-    if(gslist_)
+    if (gslist_)
     {
       g_slist_foreach(gslist_, reinterpret_cast<GFunc>(g_object_unref), nullptr);
       g_slist_free(gslist_);
     }
-    if(garray_)
+    if (garray_)
     {
       free_array(garray_);
     }
   }
 
-  GList*
-  get_list() const
-  {
-    return glist_;
-  }
+  GList* get_list() const { return glist_; }
 
-  GSList*
-  get_slist() const
-  {
-    return gslist_;
-  }
+  GSList* get_slist() const { return gslist_; }
 
-  GCredentials**
-  get_array() const
-  {
-    return garray_;
-  }
+  GCredentials** get_array() const { return garray_; }
 
 private:
   // just in case
@@ -334,7 +319,7 @@ c_take_list_members(GList* list)
 void
 c_take_list_nothing(GList* list)
 {
-  if(list)
+  if (list)
   {
     print_list(list);
   }
@@ -366,7 +351,7 @@ c_take_list_members(GSList* slist)
 void
 c_take_slist_nothing(GSList* slist)
 {
-  if(slist)
+  if (slist)
   {
     print_slist(slist);
   }
@@ -397,7 +382,7 @@ c_take_array_members(GCredentials** array)
 void
 c_take_array_nothing(GCredentials** array)
 {
-  if(array)
+  if (array)
   {
     print_array(array);
   }
@@ -405,58 +390,67 @@ c_take_array_nothing(GCredentials** array)
 
 // C++ wrappers.
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_deep_owned_list()
 {
-  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector(c_get_deep_owned_list(), Glib::OWNERSHIP_NONE);
+  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials>>::list_to_vector(
+    c_get_deep_owned_list(), Glib::OWNERSHIP_NONE);
 }
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_shallow_owned_list()
 {
-  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector(c_get_shallow_owned_list(), Glib::OWNERSHIP_SHALLOW);
+  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials>>::list_to_vector(
+    c_get_shallow_owned_list(), Glib::OWNERSHIP_SHALLOW);
 }
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_unowned_list()
 {
-  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::list_to_vector(c_get_unowned_list(), Glib::OWNERSHIP_DEEP);
+  return Glib::ListHandler<Glib::RefPtr<Gio::Credentials>>::list_to_vector(
+    c_get_unowned_list(), Glib::OWNERSHIP_DEEP);
 }
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_deep_owned_slist()
 {
-  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector(c_get_deep_owned_slist(), Glib::OWNERSHIP_NONE);
+  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials>>::slist_to_vector(
+    c_get_deep_owned_slist(), Glib::OWNERSHIP_NONE);
 }
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_shallow_owned_slist()
 {
-  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector(c_get_shallow_owned_slist(), Glib::OWNERSHIP_SHALLOW);
+  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials>>::slist_to_vector(
+    c_get_shallow_owned_slist(), Glib::OWNERSHIP_SHALLOW);
 }
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_unowned_slist()
 {
-  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::slist_to_vector(c_get_unowned_slist(), Glib::OWNERSHIP_DEEP);
+  return Glib::SListHandler<Glib::RefPtr<Gio::Credentials>>::slist_to_vector(
+    c_get_unowned_slist(), Glib::OWNERSHIP_DEEP);
 }
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_deep_owned_array()
 {
-  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector(c_get_deep_owned_array(), Glib::OWNERSHIP_NONE);
+  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials>>::array_to_vector(
+    c_get_deep_owned_array(), Glib::OWNERSHIP_NONE);
 }
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_shallow_owned_array()
 {
-  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector(c_get_shallow_owned_array(), Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials>>::array_to_vector(
+    c_get_shallow_owned_array(), Glib::OWNERSHIP_SHALLOW);
 }
 
-std::vector<Glib::RefPtr<Gio::Credentials> >
+std::vector<Glib::RefPtr<Gio::Credentials>>
 cxx_get_unowned_array()
 {
-  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::array_to_vector(c_get_unowned_array(), Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials>>::array_to_vector(
+    c_get_unowned_array(), Glib::OWNERSHIP_DEEP);
 }
 
 /* they are probably buggy by design...
@@ -474,9 +468,9 @@ cxx_list_take_members(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 */
 
 void
-cxx_list_take_nothing(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
+cxx_list_take_nothing(const std::vector<Glib::RefPtr<Gio::Credentials>>& v)
 {
-  c_take_list_nothing(Glib::ListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_list(v).data());
+  c_take_list_nothing(Glib::ListHandler<Glib::RefPtr<Gio::Credentials>>::vector_to_list(v).data());
 }
 
 /* they are probably buggy by design...
@@ -489,14 +483,16 @@ cxx_slist_take_all(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 void
 cxx_slist_take_members(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  c_take_slist_members(Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist(v).data());
+  c_take_slist_members(Glib::SListHandler<Glib::RefPtr<Gio::Credentials>
+>::vector_to_slist(v).data());
 }
 */
 
 void
-cxx_slist_take_nothing(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
+cxx_slist_take_nothing(const std::vector<Glib::RefPtr<Gio::Credentials>>& v)
 {
-  c_take_slist_nothing(Glib::SListHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_slist(v).data());
+  c_take_slist_nothing(
+    Glib::SListHandler<Glib::RefPtr<Gio::Credentials>>::vector_to_slist(v).data());
 }
 
 /* they are probably buggy by design...
@@ -509,16 +505,17 @@ cxx_array_take_all(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 void
 cxx_array_take_members(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
 {
-  c_take_array_members(Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array(v).data());
+  c_take_array_members(Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials>
+>::vector_to_array(v).data());
 }
 */
 
 void
-cxx_array_take_nothing(const std::vector<Glib::RefPtr<Gio::Credentials> >& v)
+cxx_array_take_nothing(const std::vector<Glib::RefPtr<Gio::Credentials>>& v)
 {
-  c_take_array_nothing(Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials> >::vector_to_array(v).data());
+  c_take_array_nothing(
+    Glib::ArrayHandler<Glib::RefPtr<Gio::Credentials>>::vector_to_array(v).data());
 }
-
 
 int
 main()
@@ -558,30 +555,30 @@ main()
   ostr << "Cache array after:\n";
   print_array(cache.get_array());
 
-  std::vector<Glib::RefPtr<Gio::Credentials> > v(cxx_get_unowned_list());
+  std::vector<Glib::RefPtr<Gio::Credentials>> v(cxx_get_unowned_list());
 
   ostr << "Gotten vector before:\n";
   print_vector(v);
   // I am wondering if C functions wrapped by the ones below are not buggy by
   // design. Anyway - it segfaults. Maybe the test case is just wrong.
-  //ostr << "Take list all:\n";
-  //cxx_list_take_all(v);
-  //ostr << "Take list members:\n";
-  //cxx_list_take_members(v);
+  // ostr << "Take list all:\n";
+  // cxx_list_take_all(v);
+  // ostr << "Take list members:\n";
+  // cxx_list_take_members(v);
   ostr << "Take list nothing:\n";
   cxx_list_take_nothing(v);
   // Ditto.
-  //ostr << "Take slist all:\n";
-  //cxx_slist_take_all(v);
-  //ostr << "Take slist members:\n";
-  //cxx_slist_take_members(v);
+  // ostr << "Take slist all:\n";
+  // cxx_slist_take_all(v);
+  // ostr << "Take slist members:\n";
+  // cxx_slist_take_members(v);
   ostr << "Take slist nothing:\n";
   cxx_slist_take_nothing(v);
   // Ditto.
-  //ostr << "Take array all:\n";
-  //cxx_array_take_all(v);
-  //ostr << "Take array members:\n";
-  //cxx_array_take_members(v);
+  // ostr << "Take array all:\n";
+  // cxx_array_take_all(v);
+  // ostr << "Take array members:\n";
+  // cxx_array_take_members(v);
   ostr << "Take array nothing:\n";
   cxx_array_take_nothing(v);
   ostr << "Gotten vector after:\n";

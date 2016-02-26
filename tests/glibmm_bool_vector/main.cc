@@ -21,10 +21,10 @@
 
 #include <glibmm.h>
 
-//Use this line if you want debug output:
-//std::ostream& ostr = std::cout;
+// Use this line if you want debug output:
+// std::ostream& ostr = std::cout;
 
-//This seems nicer and more useful than putting an ifdef around the use of ostr:
+// This seems nicer and more useful than putting an ifdef around the use of ostr:
 std::stringstream debug;
 std::ostream& ostr = debug;
 
@@ -35,7 +35,7 @@ setup_rand()
 {
   static bool setup(false);
 
-  if(!setup)
+  if (!setup)
   {
     setup = true;
     std::srand(std::time(nullptr));
@@ -48,7 +48,7 @@ c_get_bool_array()
   gboolean* array(static_cast<gboolean*>(g_malloc((magic_limit + 1) * sizeof(gboolean))));
 
   setup_rand();
-  for(unsigned int iter(0); iter < magic_limit; ++iter)
+  for (unsigned int iter(0); iter < magic_limit; ++iter)
   {
     array[iter] = std::rand() % 2 ? TRUE : FALSE;
   }
@@ -59,16 +59,17 @@ c_get_bool_array()
 void
 c_print_bool_array(gboolean* array)
 {
-  for(unsigned int iter(0); iter < magic_limit; ++iter)
+  for (unsigned int iter(0); iter < magic_limit; ++iter)
   {
-    ostr << iter << ": " <<(array[iter] ? "TRUE" : "FALSE") << "\n";
+    ostr << iter << ": " << (array[iter] ? "TRUE" : "FALSE") << "\n";
   }
 }
 
 std::vector<bool>
 cxx_get_bool_array()
 {
-  return Glib::ArrayHandler<bool>::array_to_vector(c_get_bool_array(), magic_limit, Glib::OWNERSHIP_SHALLOW);
+  return Glib::ArrayHandler<bool>::array_to_vector(
+    c_get_bool_array(), magic_limit, Glib::OWNERSHIP_SHALLOW);
 }
 
 void
@@ -77,7 +78,8 @@ cxx_print_bool_array(const std::vector<bool>& v)
   c_print_bool_array(const_cast<gboolean*>(Glib::ArrayHandler<bool>::vector_to_array(v).data()));
 }
 
-int main(int, char**)
+int
+main(int, char**)
 {
   Glib::init();
 

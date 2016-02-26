@@ -4,72 +4,76 @@
 #include <iostream>
 #include <stdlib.h>
 
-//A basic derived GInterface, just to test Glib::Interface
+// A basic derived GInterface, just to test Glib::Interface
 
-G_DECLARE_INTERFACE (TestIface, test_Iface, TEST, IFACE, GObject)
+G_DECLARE_INTERFACE(TestIface, test_Iface, TEST, IFACE, GObject)
 
 struct _TestIface
 {
   GTypeInterface g_iface;
 };
 
-static void
-test_Iface_init (gpointer)
-{}
+static void test_Iface_init(gpointer)
+{
+}
 
 GType
-test_Iface_get_type (void)
+test_Iface_get_type(void)
 {
   static GType type = 0;
 
   if (!type)
-    {
-      const GTypeInfo info =
-      {
-        sizeof (TestIface), // class_size
-        test_Iface_init,    // base_init
-        nullptr, // base_finalize
-        nullptr, // class_init
-        nullptr, // class_finalize
-        nullptr, // class_data
-        0,       // instance_size
-        0,       // n_preallocs
-        nullptr, // instance_init
-        nullptr  // value_table
-      };
+  {
+    const GTypeInfo info = {
+      sizeof(TestIface), // class_size
+      test_Iface_init,   // base_init
+      nullptr,           // base_finalize
+      nullptr,           // class_init
+      nullptr,           // class_finalize
+      nullptr,           // class_data
+      0,                 // instance_size
+      0,                 // n_preallocs
+      nullptr,           // instance_init
+      nullptr            // value_table
+    };
 
-      type = g_type_register_static (G_TYPE_INTERFACE, "TestIface",
-					      &info, GTypeFlags(0));
-    }
+    type = g_type_register_static(G_TYPE_INTERFACE, "TestIface", &info, GTypeFlags(0));
+  }
 
   return type;
 }
 
-#define TEST_TYPE_IFACE           (test_Iface_get_type               ())
+#define TEST_TYPE_IFACE (test_Iface_get_type())
 
-
-//A basic derived GObject, just to test Glib::Object.
-typedef struct {
-    GObject parent;
+// A basic derived GObject, just to test Glib::Object.
+typedef struct
+{
+  GObject parent;
 } TestDerived;
 
-typedef struct {
-    GObjectClass parent;
+typedef struct
+{
+  GObjectClass parent;
 } TestDerivedClass;
 
-#define TEST_TYPE_DERIVED           (test_derived_get_type               ())
-#define TEST_DERIVED(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), TEST_TYPE_DERIVED, TestDerived))
-#define TEST_DERIVED_CLASS(cls)     (G_TYPE_CHECK_CLASS_CAST    ((cls), TEST_TYPE_DERIVED, TestDerivedClass))
-#define TEST_DERIVED_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS  ((obj), TEST_TYPE_DERIVED, TestDerivedClass))
+#define TEST_TYPE_DERIVED (test_derived_get_type())
+#define TEST_DERIVED(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), TEST_TYPE_DERIVED, TestDerived))
+#define TEST_DERIVED_CLASS(cls) \
+  (G_TYPE_CHECK_CLASS_CAST((cls), TEST_TYPE_DERIVED, TestDerivedClass))
+#define TEST_DERIVED_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS((obj), TEST_TYPE_DERIVED, TestDerivedClass))
 
-static void test_derived_class_init (TestDerivedClass *)
-{}
-static void test_derived_init       (TestDerived *)
-{}
+static void
+test_derived_class_init(TestDerivedClass*)
+{
+}
+static void
+test_derived_init(TestDerived*)
+{
+}
 
-G_DEFINE_TYPE_EXTENDED(TestDerived, test_derived, G_TYPE_OBJECT,
-  0, G_IMPLEMENT_INTERFACE (TEST_TYPE_IFACE,
-                            test_Iface_init))
+G_DEFINE_TYPE_EXTENDED(TestDerived, test_derived, G_TYPE_OBJECT, 0,
+  G_IMPLEMENT_INTERFACE(TEST_TYPE_IFACE, test_Iface_init))
 
 class TestInterface;
 
@@ -82,7 +86,7 @@ public:
 
   const Glib::Interface_Class& init()
   {
-    if(!gtype_) // create the GType if necessary
+    if (!gtype_) // create the GType if necessary
     {
       // Glib::Interface_Class has to know the interface init function
       // in order to add interfaces to implementing types.
@@ -90,16 +94,14 @@ public:
 
       // We can not derive from another interface, and it is not necessary anyway.
       gtype_ = test_Iface_get_type();
+    }
+
+    return *this;
   }
 
-  return *this;
-  }
+  static void iface_init_function(void* /* g_iface */, void* /* iface_data */) {}
 
-  static void iface_init_function(void* /* g_iface */, void* /* iface_data */)
-  {
-  }
-
-  //static Glib::ObjectBase* wrap_new(GObject*);
+  // static Glib::ObjectBase* wrap_new(GObject*);
 };
 
 class TestInterface : public Glib::Interface
@@ -107,18 +109,12 @@ class TestInterface : public Glib::Interface
 protected:
   typedef TestInterface_Class CppClassType;
 
-  TestInterface()
-  : Glib::Interface(derived_interface_class_.init())
-  {}
+  TestInterface() : Glib::Interface(derived_interface_class_.init()) {}
 
 public:
-  //A real application would never make the constructor public.
-  //It would instead have a protected constructor and a public create() method.
-  TestInterface(GObject* gobject, int i)
-  : Glib::Interface(gobject),
-    i_(i)
-  {
-  }
+  // A real application would never make the constructor public.
+  // It would instead have a protected constructor and a public create() method.
+  TestInterface(GObject* gobject, int i) : Glib::Interface(gobject), i_(i) {}
 
   static void add_interface(GType gtype_implementer)
   {
@@ -128,10 +124,10 @@ public:
   TestInterface(const TestInterface& src) = delete;
   TestInterface& operator=(const TestInterface& src) = delete;
 
-  TestInterface(TestInterface&& src) noexcept
-  : Glib::Interface(std::move(src)),
-    i_(std::move(src.i_))
-  {}
+  TestInterface(TestInterface&& src) noexcept : Glib::Interface(std::move(src)),
+                                                i_(std::move(src.i_))
+  {
+  }
 
   TestInterface& operator=(TestInterface&& src) noexcept
   {
@@ -162,14 +158,14 @@ public:
 
   const Glib::Class& init()
   {
-    if(!gtype_) // create the GType if necessary
+    if (!gtype_) // create the GType if necessary
     {
       // Glib::Class has to know the class init function to clone custom types.
       class_init_func_ = &DerivedObject_Class::class_init_function;
 
       // This is actually just optimized away, apparently with no harm.
       // Make sure that the parent type has been created.
-      //CppClassParent::CppObjectType::get_type();
+      // CppClassParent::CppObjectType::get_type();
 
       // Create the wrapper type, with the same class/instance size as the base type.
       register_derived_type(test_derived_get_type());
@@ -184,15 +180,13 @@ public:
 
 TestInterface::CppClassType TestInterface::derived_interface_class_; // initialize static member
 
-class DerivedObject
-: public Glib::Object,
-  public TestInterface
+class DerivedObject : public Glib::Object, public TestInterface
 {
 public:
   typedef DerivedObject_Class CppClassType;
 
-  //A real application would never make the constructor public.
-  //It would instead have a protected constructor and a public create() method.
+  // A real application would never make the constructor public.
+  // It would instead have a protected constructor and a public create() method.
   DerivedObject(int i)
   : Glib::ObjectBase(nullptr),
     Glib::Object(Glib::ConstructParams(derived_object_class_.init())),
@@ -203,11 +197,11 @@ public:
   DerivedObject(const DerivedObject& src) = delete;
   DerivedObject& operator=(const DerivedObject& src) = delete;
 
-  DerivedObject(DerivedObject&& src) noexcept
-  : Glib::Object(std::move(src)),
-    TestInterface(std::move(src)),
-    i_(std::move(src.i_))
-  {}
+  DerivedObject(DerivedObject&& src) noexcept : Glib::Object(std::move(src)),
+                                                TestInterface(std::move(src)),
+                                                i_(std::move(src.i_))
+  {
+  }
 
   DerivedObject& operator=(DerivedObject&& src) noexcept
   {
@@ -262,9 +256,8 @@ void test_interface_move_assignment_operator()
 }
 */
 
-
-static
-void test_object_with_interface_move_constructor()
+static void
+test_object_with_interface_move_constructor()
 {
   DerivedObject derived(5);
   g_assert_cmpint(derived.i_, ==, 5);
@@ -277,8 +270,8 @@ void test_object_with_interface_move_constructor()
   g_assert(derived.gobj() == nullptr);
 }
 
-static
-void test_object_with_interface_move_assignment_operator()
+static void
+test_object_with_interface_move_assignment_operator()
 {
   DerivedObject derived(5);
   g_assert_cmpint(derived.i_, ==, 5);
@@ -292,13 +285,13 @@ void test_object_with_interface_move_assignment_operator()
   g_assert(derived.gobj() == nullptr);
 }
 
-
-int main(int, char**)
+int
+main(int, char**)
 {
   Glib::init();
 
-  //test_interface_move_constructor();
-  //test_interface_move_assignment_operator();
+  // test_interface_move_constructor();
+  // test_interface_move_assignment_operator();
 
   test_object_with_interface_move_constructor();
   test_object_with_interface_move_assignment_operator();

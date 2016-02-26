@@ -3,14 +3,12 @@
 // or printed unjustified critical messages in glibmm before version 2.44.
 // See https://bugzilla.gnome.org/show_bug.cgi?id=705124.
 
-#include <glibmm.h>
-#include <giomm.h> //There are no Interfaces in glibmm, but there are in giomm.
-#include <iostream>
 #include <cstring>
+#include <giomm.h> //There are no Interfaces in glibmm, but there are in giomm.
+#include <glibmm.h>
+#include <iostream>
 
-class CustomAction :
-  public Gio::Action,
-  public Glib::Object
+class CustomAction : public Gio::Action, public Glib::Object
 {
 public:
   CustomAction();
@@ -19,14 +17,14 @@ public:
   Glib::Property<Glib::ustring> property;
 
 protected:
-  //Implement vfuncs:
+  // Implement vfuncs:
   Glib::ustring get_name_vfunc() const override;
   Glib::VariantType get_state_type_vfunc() const override;
   Glib::VariantBase get_state_hint_vfunc() const override;
 };
 
 CustomAction::CustomAction()
-: Glib::ObjectBase( typeid(CustomAction) ),
+: Glib::ObjectBase(typeid(CustomAction)),
   Glib::Object(),
   property(*this, "custom_property", "Initial value.")
 {
@@ -34,23 +32,27 @@ CustomAction::CustomAction()
 
 static bool get_name_called = false;
 
-Glib::ustring CustomAction::get_name_vfunc() const
+Glib::ustring
+CustomAction::get_name_vfunc() const
 {
   get_name_called = true;
   return "custom-name";
 }
 
-Glib::VariantType CustomAction::get_state_type_vfunc() const
+Glib::VariantType
+CustomAction::get_state_type_vfunc() const
 {
   return Glib::VariantType(G_VARIANT_TYPE_INT16);
 }
 
-Glib::VariantBase CustomAction::get_state_hint_vfunc() const
+Glib::VariantBase
+CustomAction::get_state_hint_vfunc() const
 {
   return Glib::Variant<gint16>::create(42);
 }
 
-int main(int, char**)
+int
+main(int, char**)
 {
   Glib::init();
 
@@ -65,20 +67,20 @@ int main(int, char**)
             << action.property_name().get_value() << "'." << std::endl;
   success &= action.property_name().get_value() == "";
 
-  std::cout << "The custom string property is '"
-            << action.property.get_value() << "'." << std::endl;
+  std::cout << "The custom string property is '" << action.property.get_value() << "'."
+            << std::endl;
   success &= action.property.get_value() == "Initial value.";
 
   action.property = "A new value.";
-  std::cout << "The custom string property (after changing it) is '"
-            << action.property.get_value() << "'." << std::endl;
+  std::cout << "The custom string property (after changing it) is '" << action.property.get_value()
+            << "'." << std::endl;
   success &= action.property.get_value() == "A new value.";
 
   gchar* prop_value = nullptr;
   g_object_set(action.gobj(), "custom_property", "Another value", NULL);
   g_object_get(action.gobj(), "custom_property", &prop_value, NULL);
-  std::cout << "The custom property after g_object_set/get() is '"
-            << prop_value << "'." << std::endl;
+  std::cout << "The custom property after g_object_set/get() is '" << prop_value << "'."
+            << std::endl;
   success &= std::strcmp(prop_value, "Another value") == 0;
   g_free(prop_value);
   prop_value = nullptr;

@@ -14,22 +14,23 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <glibmm.h>
-#include <giomm.h> //There is no class derived from Glib::Object in glibmm
-#include <iostream>
 #include <cstring>
+#include <giomm.h> //There is no class derived from Glib::Object in glibmm
+#include <glibmm.h>
+#include <iostream>
 #include <utility> // std::move
 
-int main(int, char**)
+int
+main(int, char**)
 {
   Glib::init();
   bool success = true;
 
   // A Glib::WeakRef cannot be created from a Glib::RefPtr<Glib::Bytes>,
   // because Glib::Bytes is not derived from Glib::ObjectBase.
-  //const int bdata = 1234;
-  //Glib::RefPtr<Glib::Bytes> bytes = Glib::Bytes::create(&bdata, sizeof bdata);
-  //Glib::WeakRef<Glib::Bytes> weakbytes = bytes; // does not compile
+  // const int bdata = 1234;
+  // Glib::RefPtr<Glib::Bytes> bytes = Glib::Bytes::create(&bdata, sizeof bdata);
+  // Glib::WeakRef<Glib::Bytes> weakbytes = bytes; // does not compile
 
   // Gio::MemoryInputStream
   Glib::RefPtr<Gio::MemoryInputStream> memstream1 = Gio::MemoryInputStream::create();

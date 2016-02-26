@@ -1,23 +1,24 @@
+#include <cstdlib>
+#include <cstring>
 #include <giomm.h>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <cstring>
-#include <cstdlib>
 
 namespace
 {
-//Use this line if you want debug output:
-//std::ostream& ostr = std::cout;
+// Use this line if you want debug output:
+// std::ostream& ostr = std::cout;
 
-//This seems nicer and more useful than putting an ifdef around the use of ostr:
+// This seems nicer and more useful than putting an ifdef around the use of ostr:
 std::ostringstream debug;
 std::ostream& ostr = debug;
 
 std::string func1_output;
 std::string func2_output;
 
-void destroy_func1(void* data)
+void
+destroy_func1(void* data)
 {
   char* cdata = static_cast<char*>(data);
   func1_output += "Deleting ";
@@ -25,7 +26,8 @@ void destroy_func1(void* data)
   delete[] cdata;
 }
 
-void destroy_func2(void* data, const Glib::ustring& intro)
+void
+destroy_func2(void* data, const Glib::ustring& intro)
 {
   char* cdata = static_cast<char*>(data);
   func2_output += intro + cdata;
@@ -34,7 +36,8 @@ void destroy_func2(void* data, const Glib::ustring& intro)
 
 } // anonymous namespace
 
-int main(int, char**)
+int
+main(int, char**)
 {
   Glib::init();
   Gio::init();
@@ -47,7 +50,7 @@ int main(int, char**)
     if (!stream)
     {
       std::cerr << "Could not create a MemoryInputStream." << std::endl;
-      return EXIT_FAILURE; 
+      return EXIT_FAILURE;
     }
 
     // Add data that shall not be deleted by stream.
@@ -71,25 +74,24 @@ int main(int, char**)
     else
     {
       std::cerr << "Gio::InputStream::read() read 0 bytes." << std::endl;
-      return EXIT_FAILURE; 
+      return EXIT_FAILURE;
     }
   }
   catch (const Glib::Exception& ex)
   {
     std::cerr << "Exception caught: " << ex.what() << std::endl;
-    return EXIT_FAILURE; 
+    return EXIT_FAILURE;
   }
 
   ostr << func1_output << std::endl;
   ostr << func2_output << std::endl;
 
   if (std::strcmp(buffer, "Data not owned by stream.\ndata2\ndata3\n") == 0 &&
-      func1_output == "Deleting data2\n" &&
-      func2_output == "Now deleting data3\n")
+      func1_output == "Deleting data2\n" && func2_output == "Now deleting data3\n")
     return EXIT_SUCCESS;
 
   std::cerr << "buffer: \"" << buffer << "\"" << std::endl;
   std::cerr << "func1_output: \"" << func1_output << "\"" << std::endl;
   std::cerr << "func2_output: \"" << func2_output << "\"" << std::endl;
-  return EXIT_FAILURE; 
+  return EXIT_FAILURE;
 }

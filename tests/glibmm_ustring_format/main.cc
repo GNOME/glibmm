@@ -2,12 +2,13 @@
 
 #include <iostream>
 
-int main(int, char**)
+int
+main(int, char**)
 {
   Glib::init();
 
   char carr[10] = "Užduotys";
-  char * const cptr = carr;
+  char* const cptr = carr;
 
   /*
   std::wostringstream wsout;
@@ -20,10 +21,10 @@ int main(int, char**)
     std::cout << data[i] << std::endl;
   */
 
-  //Check both the const char* and char* versions.
+  // Check both the const char* and char* versions.
   Glib::ustring::format(carr);
 
-  //This threw an exception before we added a ustring::FormatStream::stream(char*) overload.
+  // This threw an exception before we added a ustring::FormatStream::stream(char*) overload.
   Glib::ustring::format(cptr);
 
   return EXIT_SUCCESS;
