@@ -26,18 +26,18 @@
 
 #include <glibmm/exception.h>
 
-
 namespace Glib
 {
 
 Exception::~Exception() noexcept
-{}
+{
+}
 
-Glib::ustring Exception::what() const
+Glib::ustring
+Exception::what() const
 {
   g_assert_not_reached();
   return Glib::ustring();
 }
 
 } // namespace Glib
-

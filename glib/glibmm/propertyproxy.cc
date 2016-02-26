@@ -21,4 +21,3 @@
  */
 
 #include <glibmm/propertyproxy.h>
-

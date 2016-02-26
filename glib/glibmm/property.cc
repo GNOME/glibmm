@@ -22,9 +22,8 @@
 #include <cstddef>
 
 // Temporary hack till GLib gets fixed.
-#undef  G_STRLOC
+#undef G_STRLOC
 #define G_STRLOC __FILE__ ":" G_STRINGIFY(__LINE__)
-
 
 namespace
 {
@@ -62,9 +61,9 @@ namespace
 // a) Almost all conceivable use-cases are supported by this approach.
 // b) It's comparatively efficient, and does not need a hash-table lookup.
 
-
 // Delete the interface property values when an object of a custom type is finalized.
-void destroy_notify_obj_iface_props(void* data)
+void
+destroy_notify_obj_iface_props(void* data)
 {
   auto obj_iface_props = static_cast<Glib::Class::iface_properties_type*>(data);
   if (obj_iface_props)
@@ -81,37 +80,40 @@ void destroy_notify_obj_iface_props(void* data)
 // The type that holds pointers to the custom properties of custom types.
 using custom_properties_type = std::vector<Glib::PropertyBase*>;
 // The quark used for storing/getting the custom properties of custom types.
-static const GQuark custom_properties_quark = g_quark_from_string("gtkmm_CustomObject_custom_properties");
+static const GQuark custom_properties_quark =
+  g_quark_from_string("gtkmm_CustomObject_custom_properties");
 
 // Delete the vector of pointers to custom properties when an object of
 // a custom type is finalized.
-void destroy_notify_obj_custom_props(void* data)
+void
+destroy_notify_obj_custom_props(void* data)
 {
   // Shallow deletion. The vector does not own the objects pointed to.
   delete static_cast<custom_properties_type*>(data);
 }
 
-custom_properties_type* get_obj_custom_props(GObject* obj)
+custom_properties_type*
+get_obj_custom_props(GObject* obj)
 {
-  auto obj_custom_props = static_cast<custom_properties_type*>(
-    g_object_get_qdata(obj, custom_properties_quark));
+  auto obj_custom_props =
+    static_cast<custom_properties_type*>(g_object_get_qdata(obj, custom_properties_quark));
   if (!obj_custom_props)
   {
     obj_custom_props = new custom_properties_type();
-    g_object_set_qdata_full(obj, custom_properties_quark, obj_custom_props,
-                            destroy_notify_obj_custom_props);
+    g_object_set_qdata_full(
+      obj, custom_properties_quark, obj_custom_props, destroy_notify_obj_custom_props);
   }
   return obj_custom_props;
 }
 
 } // anonymous namespace
 
-
 namespace Glib
 {
 
-void custom_get_property_callback(GObject* object, unsigned int property_id,
-                                  GValue* value, GParamSpec* param_spec)
+void
+custom_get_property_callback(
+  GObject* object, unsigned int property_id, GValue* value, GParamSpec* param_spec)
 {
   // If the id is zero there is no property to get.
   g_return_if_fail(property_id != 0);
@@ -138,10 +140,10 @@ void custom_get_property_callback(GObject* object, unsigned int property_id,
   }
   else
   {
-    if (Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
+    if (Glib::ObjectBase* const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
-      auto obj_custom_props = static_cast<custom_properties_type*>(
-        g_object_get_qdata(object, custom_properties_quark));
+      auto obj_custom_props =
+        static_cast<custom_properties_type*>(g_object_get_qdata(object, custom_properties_quark));
       const unsigned index = property_id - iface_props_size - 1;
 
       if (obj_custom_props && index < obj_custom_props->size() &&
@@ -154,8 +156,9 @@ void custom_get_property_callback(GObject* object, unsigned int property_id,
   }
 }
 
-void custom_set_property_callback(GObject* object, unsigned int property_id,
-                                  const GValue* value, GParamSpec* param_spec)
+void
+custom_set_property_callback(
+  GObject* object, unsigned int property_id, const GValue* value, GParamSpec* param_spec)
 {
   // If the id is zero there is no property to set.
   g_return_if_fail(property_id != 0);
@@ -179,8 +182,8 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
     if (!obj_iface_props)
     {
       obj_iface_props = new Class::iface_properties_type();
-      g_object_set_qdata_full(object, Class::iface_properties_quark, obj_iface_props,
-                              destroy_notify_obj_iface_props);
+      g_object_set_qdata_full(
+        object, Class::iface_properties_quark, obj_iface_props, destroy_notify_obj_iface_props);
       for (Class::iface_properties_type::size_type p = 0; p < iface_props_size; ++p)
       {
         GValue* g_value = g_new0(GValue, 1);
@@ -195,10 +198,10 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
   }
   else
   {
-    if(Glib::ObjectBase *const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
+    if (Glib::ObjectBase* const wrapper = Glib::ObjectBase::_get_current_wrapper(object))
     {
-      auto obj_custom_props = static_cast<custom_properties_type*>(
-        g_object_get_qdata(object, custom_properties_quark));
+      auto obj_custom_props =
+        static_cast<custom_properties_type*>(g_object_get_qdata(object, custom_properties_quark));
       const unsigned index = property_id - iface_props_size - 1;
 
       if (obj_custom_props && index < obj_custom_props->size() &&
@@ -214,31 +217,28 @@ void custom_set_property_callback(GObject* object, unsigned int property_id,
   }
 }
 
-
 /**** Glib::PropertyBase ***************************************************/
 
 PropertyBase::PropertyBase(Glib::Object& object, GType value_type)
-:
-  object_     (&object),
-  value_      (),
-  param_spec_ (nullptr)
+: object_(&object), value_(), param_spec_(nullptr)
 {
   value_.init(value_type);
 }
 
 PropertyBase::~PropertyBase() noexcept
 {
-  if(param_spec_)
+  if (param_spec_)
     g_param_spec_unref(param_spec_);
 }
 
-bool PropertyBase::lookup_property(const Glib::ustring& name)
+bool
+PropertyBase::lookup_property(const Glib::ustring& name)
 {
   g_assert(param_spec_ == nullptr);
 
   param_spec_ = g_object_class_find_property(G_OBJECT_GET_CLASS(object_->gobj()), name.c_str());
 
-  if(param_spec_)
+  if (param_spec_)
   {
     // This property has already been installed, when another instance
     // of the object_ class was constructed.
@@ -251,7 +251,8 @@ bool PropertyBase::lookup_property(const Glib::ustring& name)
   return (param_spec_ != nullptr);
 }
 
-void PropertyBase::install_property(GParamSpec* param_spec)
+void
+PropertyBase::install_property(GParamSpec* param_spec)
 {
   g_return_if_fail(param_spec != nullptr);
 
@@ -282,19 +283,22 @@ void PropertyBase::install_property(GParamSpec* param_spec)
   g_param_spec_ref(param_spec_);
 }
 
-const char* PropertyBase::get_name_internal() const
+const char*
+PropertyBase::get_name_internal() const
 {
-  const char *const name = g_param_spec_get_name(param_spec_);
+  const char* const name = g_param_spec_get_name(param_spec_);
   g_return_val_if_fail(name != nullptr, "");
   return name;
 }
 
-Glib::ustring PropertyBase::get_name() const
+Glib::ustring
+PropertyBase::get_name() const
 {
   return Glib::ustring(get_name_internal());
 }
 
-void PropertyBase::notify()
+void
+PropertyBase::notify()
 {
   g_object_notify_by_pspec(object_->gobj(), param_spec_);
 }

@@ -28,6 +28,4 @@ namespace Glib
 
 gpointer glibmm_null_pointer = nullptr;
 
-
-} //namespace Glib
-
+} // namespace Glib

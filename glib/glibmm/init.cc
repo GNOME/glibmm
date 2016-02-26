@@ -21,7 +21,8 @@
 namespace Glib
 {
 
-void init()
+void
+init()
 {
   // Also calls Glib::wrap_register_init() and Glib::wrap_init().
   Glib::Error::register_init();

@@ -23,44 +23,45 @@
 #include <glib.h>
 #include <glibmm/pattern.h>
 
-
 namespace Glib
 {
 
 PatternSpec::PatternSpec(const Glib::ustring& pattern)
-:
-  gobject_ (g_pattern_spec_new(pattern.c_str()))
-{}
+: gobject_(g_pattern_spec_new(pattern.c_str()))
+{
+}
 
-PatternSpec::PatternSpec(GPatternSpec* gobject)
-:
-  gobject_ (gobject)
-{}
+PatternSpec::PatternSpec(GPatternSpec* gobject) : gobject_(gobject)
+{
+}
 
 PatternSpec::~PatternSpec() noexcept
 {
   g_pattern_spec_free(gobject_);
 }
 
-bool PatternSpec::match(const Glib::ustring& str) const
+bool
+PatternSpec::match(const Glib::ustring& str) const
 {
   return g_pattern_match(gobject_, str.bytes(), str.c_str(), nullptr);
 }
 
-bool PatternSpec::match(const Glib::ustring& str, const Glib::ustring& str_reversed) const
+bool
+PatternSpec::match(const Glib::ustring& str, const Glib::ustring& str_reversed) const
 {
   return g_pattern_match(gobject_, str.bytes(), str.c_str(), str_reversed.c_str());
 }
 
-bool PatternSpec::operator==(const PatternSpec& rhs) const
+bool
+PatternSpec::operator==(const PatternSpec& rhs) const
 {
   return g_pattern_spec_equal(gobject_, rhs.gobject_);
 }
 
-bool PatternSpec::operator!=(const PatternSpec& rhs) const
+bool
+PatternSpec::operator!=(const PatternSpec& rhs) const
 {
   return !g_pattern_spec_equal(gobject_, rhs.gobject_);
 }
 
 } // namespace Glib
-

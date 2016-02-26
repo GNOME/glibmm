@@ -21,4 +21,3 @@
  */
 
 #include <glibmm/sarray.h>
-

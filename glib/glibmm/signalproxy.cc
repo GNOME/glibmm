@@ -22,28 +22,25 @@
 #include <glibmm/object.h>
 #include <glibmm/signalproxy.h>
 
-
 namespace Glib
 {
 
 // SignalProxyBase implementation:
 
-SignalProxyBase::SignalProxyBase(Glib::ObjectBase* obj)
-:
-  obj_ (obj)
-{}
-
+SignalProxyBase::SignalProxyBase(Glib::ObjectBase* obj) : obj_(obj)
+{
+}
 
 // SignalProxyNormal implementation:
 
 SignalProxyNormal::SignalProxyNormal(Glib::ObjectBase* obj, const SignalProxyInfo* info)
-:
-  SignalProxyBase (obj),
-  info_           (info)
-{}
+: SignalProxyBase(obj), info_(info)
+{
+}
 
 SignalProxyNormal::~SignalProxyNormal() noexcept
-{}
+{
+}
 
 sigc::slot_base&
 SignalProxyNormal::connect_(const sigc::slot_base& slot, bool after)
@@ -65,10 +62,9 @@ SignalProxyNormal::connect_impl_(GCallback callback, const sigc::slot_base& slot
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
-  pConnectionNode->connection_id_ = g_signal_connect_data(
-      obj_->gobj(), info_->signal_name, callback, pConnectionNode,
-      &SignalProxyConnectionNode::destroy_notify_handler,
-      static_cast<GConnectFlags>((after) ? G_CONNECT_AFTER : 0));
+  pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), info_->signal_name,
+    callback, pConnectionNode, &SignalProxyConnectionNode::destroy_notify_handler,
+    static_cast<GConnectFlags>((after) ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;
 }
@@ -81,52 +77,53 @@ SignalProxyNormal::connect_impl_(bool notify, sigc::slot_base&& slot, bool after
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
-  pConnectionNode->connection_id_ = g_signal_connect_data(
-      obj_->gobj(), info_->signal_name,
-      notify ? info_->notify_callback : info_->callback,
-      pConnectionNode, &SignalProxyConnectionNode::destroy_notify_handler,
-      static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
+  pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), info_->signal_name,
+    notify ? info_->notify_callback : info_->callback, pConnectionNode,
+    &SignalProxyConnectionNode::destroy_notify_handler,
+    static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;
 }
 
-void SignalProxyNormal::emission_stop()
+void
+SignalProxyNormal::emission_stop()
 {
   g_signal_stop_emission_by_name(obj_->gobj(), info_->signal_name);
 }
 
 // static
-void SignalProxyNormal::slot0_void_callback(GObject* self, void* data)
+void
+SignalProxyNormal::slot0_void_callback(GObject* self, void* data)
 {
   // Do not try to call a signal on a disassociated wrapper.
-  if(Glib::ObjectBase::_get_current_wrapper(self))
+  if (Glib::ObjectBase::_get_current_wrapper(self))
   {
     try
     {
-      if(sigc::slot_base *const slot = data_to_slot(data))
+      if (sigc::slot_base* const slot = data_to_slot(data))
         (*static_cast<sigc::slot<void>*>(slot))();
     }
-    catch(...)
+    catch (...)
     {
       Glib::exception_handlers_invoke();
     }
   }
 }
 
-
 // SignalProxyDetailed implementation:
 
-SignalProxyDetailed::SignalProxyDetailed(Glib::ObjectBase* obj,
-  const SignalProxyInfo* info, const Glib::ustring& detail_name)
-:
-  SignalProxyBase (obj),
-  info_           (info),
-  detailed_name_  (Glib::ustring(info->signal_name) +
-                   (detail_name.empty() ? Glib::ustring() : ("::" + detail_name)))
-{}
+SignalProxyDetailed::SignalProxyDetailed(
+  Glib::ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name)
+: SignalProxyBase(obj),
+  info_(info),
+  detailed_name_(Glib::ustring(info->signal_name) +
+                 (detail_name.empty() ? Glib::ustring() : ("::" + detail_name)))
+{
+}
 
 SignalProxyDetailed::~SignalProxyDetailed() noexcept
-{}
+{
+}
 
 sigc::slot_base&
 SignalProxyDetailed::connect_impl_(bool notify, const sigc::slot_base& slot, bool after)
@@ -136,11 +133,10 @@ SignalProxyDetailed::connect_impl_(bool notify, const sigc::slot_base& slot, boo
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
-  pConnectionNode->connection_id_ = g_signal_connect_data(
-      obj_->gobj(), detailed_name_.c_str(),
-      notify ? info_->notify_callback : info_->callback,
-      pConnectionNode, &SignalProxyConnectionNode::destroy_notify_handler,
-      static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
+  pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), detailed_name_.c_str(),
+    notify ? info_->notify_callback : info_->callback, pConnectionNode,
+    &SignalProxyConnectionNode::destroy_notify_handler,
+    static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;
 }
@@ -153,16 +149,16 @@ SignalProxyDetailed::connect_impl_(bool notify, sigc::slot_base&& slot, bool aft
 
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
-  pConnectionNode->connection_id_ = g_signal_connect_data(
-      obj_->gobj(), detailed_name_.c_str(),
-      notify ? info_->notify_callback : info_->callback,
-      pConnectionNode, &SignalProxyConnectionNode::destroy_notify_handler,
-      static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
+  pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), detailed_name_.c_str(),
+    notify ? info_->notify_callback : info_->callback, pConnectionNode,
+    &SignalProxyConnectionNode::destroy_notify_handler,
+    static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;
 }
 
-void SignalProxyDetailed::emission_stop()
+void
+SignalProxyDetailed::emission_stop()
 {
   g_signal_stop_emission_by_name(obj_->gobj(), detailed_name_.c_str());
 }

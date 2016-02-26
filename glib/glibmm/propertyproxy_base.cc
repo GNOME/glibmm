@@ -19,7 +19,6 @@
 
 #include <glibmm/propertyproxy_base.h>
 
-
 #include <glibmm/signalproxy_connectionnode.h>
 #include <glibmm/object.h>
 #include <glibmm/private/object_p.h>
@@ -28,9 +27,10 @@
 namespace Glib
 {
 
-//PropertyProxyConnectionNode implementation:
+// PropertyProxyConnectionNode implementation:
 
-PropertyProxyConnectionNode::PropertyProxyConnectionNode(const sigc::slot_base& slot, GObject* gobject)
+PropertyProxyConnectionNode::PropertyProxyConnectionNode(
+  const sigc::slot_base& slot, GObject* gobject)
 : SignalProxyConnectionNode(slot, gobject)
 {
 }
@@ -40,7 +40,8 @@ PropertyProxyConnectionNode::PropertyProxyConnectionNode(sigc::slot_base&& slot,
 {
 }
 
-sigc::connection PropertyProxyConnectionNode::connect_changed(const Glib::ustring& property_name)
+sigc::connection
+PropertyProxyConnectionNode::connect_changed(const Glib::ustring& property_name)
 {
   // connect it to glib
   // 'this' will be passed as the data argument to the callback.
@@ -52,21 +53,19 @@ sigc::connection PropertyProxyConnectionNode::connect_changed(const Glib::ustrin
   return sigc::connection(slot_);
 }
 
-void PropertyProxyConnectionNode::callback(GObject*, GParamSpec* pspec, gpointer data) //static
+void PropertyProxyConnectionNode::callback(GObject*, GParamSpec* pspec, gpointer data) // static
 {
-  if(pspec && data)
+  if (pspec && data)
   {
-    if(sigc::slot_base *const slot = SignalProxyBase::data_to_slot(data))
+    if (sigc::slot_base* const slot = SignalProxyBase::data_to_slot(data))
       (*static_cast<sigc::slot<void>*>(slot))();
   }
 }
 
-
-//SignalProxyProperty implementation:
+// SignalProxyProperty implementation:
 
 SignalProxyProperty::SignalProxyProperty(Glib::ObjectBase* obj, const gchar* property_name)
-: SignalProxyBase(obj),
-  property_name_(property_name)
+: SignalProxyBase(obj), property_name_(property_name)
 {
 }
 
@@ -74,7 +73,8 @@ SignalProxyProperty::~SignalProxyProperty() noexcept
 {
 }
 
-sigc::connection SignalProxyProperty::connect(const SlotType& slot)
+sigc::connection
+SignalProxyProperty::connect(const SlotType& slot)
 {
   // Create a proxy to hold our connection info
   // This will be deleted by destroy_notify_handler.
@@ -85,7 +85,8 @@ sigc::connection SignalProxyProperty::connect(const SlotType& slot)
   return pConnectionNode->connect_changed(property_name_);
 }
 
-sigc::connection SignalProxyProperty::connect(SlotType&& slot)
+sigc::connection
+SignalProxyProperty::connect(SlotType&& slot)
 {
   // Create a proxy to hold our connection info
   // This will be deleted by destroy_notify_handler.
@@ -96,41 +97,42 @@ sigc::connection SignalProxyProperty::connect(SlotType&& slot)
   return pConnectionNode->connect_changed(property_name_);
 }
 
-
-//PropertyProxy_Base implementation:
+// PropertyProxy_Base implementation:
 
 PropertyProxy_Base::PropertyProxy_Base(ObjectBase* obj, const char* property_name)
-:
-  obj_           (obj),
-  property_name_ (property_name)
-{}
+: obj_(obj), property_name_(property_name)
+{
+}
 
 PropertyProxy_Base::PropertyProxy_Base(const PropertyProxy_Base& other)
-:
-  obj_           (other.obj_),
-  property_name_ (other.property_name_)
-{}
+: obj_(other.obj_), property_name_(other.property_name_)
+{
+}
 
-SignalProxyProperty PropertyProxy_Base::signal_changed()
+SignalProxyProperty
+PropertyProxy_Base::signal_changed()
 {
   return SignalProxyProperty(obj_, property_name_);
 }
 
-void PropertyProxy_Base::set_property_(const Glib::ValueBase& value)
+void
+PropertyProxy_Base::set_property_(const Glib::ValueBase& value)
 {
   g_object_set_property(obj_->gobj(), property_name_, value.gobj());
 }
 
-void PropertyProxy_Base::get_property_(Glib::ValueBase& value) const
+void
+PropertyProxy_Base::get_property_(Glib::ValueBase& value) const
 {
   g_object_get_property(obj_->gobj(), property_name_, value.gobj());
 }
 
-void PropertyProxy_Base::reset_property_()
+void
+PropertyProxy_Base::reset_property_()
 {
   // Get information about the parameter:
-  const GParamSpec *const pParamSpec =
-      g_object_class_find_property(G_OBJECT_GET_CLASS(obj_->gobj()), property_name_);
+  const GParamSpec* const pParamSpec =
+    g_object_class_find_property(G_OBJECT_GET_CLASS(obj_->gobj()), property_name_);
 
   g_return_if_fail(pParamSpec != nullptr);
 

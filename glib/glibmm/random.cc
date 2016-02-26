@@ -22,54 +22,56 @@
 
 #include <glibmm.h>
 
-
 namespace Glib
 {
 
-Rand::Rand()
-:
-  gobject_ (g_rand_new())
-{}
+Rand::Rand() : gobject_(g_rand_new())
+{
+}
 
-Rand::Rand(guint32 seed)
-:
-  gobject_ (g_rand_new_with_seed(seed))
-{}
+Rand::Rand(guint32 seed) : gobject_(g_rand_new_with_seed(seed))
+{
+}
 
 Rand::~Rand() noexcept
 {
   g_rand_free(gobject_);
 }
 
-void Rand::set_seed(guint32 seed)
+void
+Rand::set_seed(guint32 seed)
 {
   g_rand_set_seed(gobject_, seed);
 }
 
-bool Rand::get_bool()
+bool
+Rand::get_bool()
 {
   return g_rand_boolean(gobject_);
 }
 
-guint32 Rand::get_int()
+guint32
+Rand::get_int()
 {
   return g_rand_int(gobject_);
 }
 
-gint32 Rand::get_int_range(gint32 begin, gint32 end)
+gint32
+Rand::get_int_range(gint32 begin, gint32 end)
 {
   return g_rand_int_range(gobject_, begin, end);
 }
 
-double Rand::get_double()
+double
+Rand::get_double()
 {
   return g_rand_double(gobject_);
 }
 
-double Rand::get_double_range(double begin, double end)
+double
+Rand::get_double_range(double begin, double end)
 {
   return g_rand_double_range(gobject_, begin, end);
 }
 
 } // namespace Glib
-

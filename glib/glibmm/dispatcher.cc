@@ -27,13 +27,13 @@
 #include <utility> // For std::move()
 
 #ifdef G_OS_WIN32
-# include <windows.h>
-# include <io.h>
-# include <direct.h>
-# include <list>
-# include <mutex>
+#include <windows.h>
+#include <io.h>
+#include <direct.h>
+#include <list>
+#include <mutex>
 #else
-# include <unistd.h>
+#include <unistd.h>
 #endif
 
 // EINTR is not defined on Tru64. I have tried including these:
@@ -44,7 +44,7 @@
 // for "tru64 EINTR" returns lots of hits telling me that handling EINTR is
 // actually a requirement on Tru64.  So it must exist.
 #if defined(_tru64) && !defined(EINTR)
-# define EINTR 0 /* TODO: should use the real define */
+#define EINTR 0 /* TODO: should use the real define */
 #endif
 
 namespace
@@ -52,62 +52,64 @@ namespace
 
 struct DispatchNotifyData
 {
-  Glib::Dispatcher*       dispatcher;
+  Glib::Dispatcher* dispatcher;
   Glib::DispatchNotifier* notifier;
 
-  DispatchNotifyData()
-    : dispatcher (nullptr), notifier (nullptr) {}
+  DispatchNotifyData() : dispatcher(nullptr), notifier(nullptr) {}
 
-  DispatchNotifyData(Glib::Dispatcher* d, Glib::DispatchNotifier* n)
-    : dispatcher (d), notifier (n) {}
+  DispatchNotifyData(Glib::Dispatcher* d, Glib::DispatchNotifier* n) : dispatcher(d), notifier(n) {}
 };
 
-static void warn_failed_pipe_io(const char* what)
+static void
+warn_failed_pipe_io(const char* what)
 {
 #ifdef G_OS_WIN32
-  const char *const message = g_win32_error_message(GetLastError());
+  const char* const message = g_win32_error_message(GetLastError());
 #else
-  const char *const message = g_strerror(errno);
+  const char* const message = g_strerror(errno);
 #endif
   g_critical("Error in inter-thread communication: %s() failed: %s", what, message);
 }
 
 #ifdef G_OS_WIN32
 
-static void fd_close_and_invalidate(HANDLE& fd)
+static void
+fd_close_and_invalidate(HANDLE& fd)
 {
-  if(fd != 0)
+  if (fd != 0)
   {
-    if(!CloseHandle(fd))
+    if (!CloseHandle(fd))
       warn_failed_pipe_io("CloseHandle");
 
     fd = 0;
   }
 }
-#else /* !G_OS_WIN32 */
+#else  /* !G_OS_WIN32 */
 /*
  * Set the close-on-exec flag on the file descriptor,
  * so that it won't be leaked if a new process is spawned.
  */
-static void fd_set_close_on_exec(int fd)
+static void
+fd_set_close_on_exec(int fd)
 {
   const int flags = fcntl(fd, F_GETFD, 0);
 
-  if(flags < 0 || fcntl(fd, F_SETFD, unsigned(flags) | FD_CLOEXEC) < 0)
+  if (flags < 0 || fcntl(fd, F_SETFD, unsigned(flags) | FD_CLOEXEC) < 0)
     warn_failed_pipe_io("fcntl");
 }
 
-static void fd_close_and_invalidate(int& fd)
+static void
+fd_close_and_invalidate(int& fd)
 {
-  if(fd >= 0)
+  if (fd >= 0)
   {
     int result;
 
     do
       result = close(fd);
-    while(G_UNLIKELY(result < 0) && errno == EINTR);
+    while (G_UNLIKELY(result < 0) && errno == EINTR);
 
-    if(G_UNLIKELY(result < 0))
+    if (G_UNLIKELY(result < 0))
       warn_failed_pipe_io("close");
 
     fd = -1;
@@ -131,8 +133,7 @@ public:
 
   static DispatchNotifier* reference_instance(
     const Glib::RefPtr<MainContext>& context, const Dispatcher* dispatcher);
-  static void unreference_instance(
-    DispatchNotifier* notifier, const Dispatcher* dispatcher);
+  static void unreference_instance(DispatchNotifier* notifier, const Dispatcher* dispatcher);
 
   void send_notification(Dispatcher* dispatcher);
 
@@ -144,17 +145,17 @@ protected:
 private:
   static thread_local DispatchNotifier* thread_specific_instance_;
 
-  std::set<const Dispatcher*>   deleted_dispatchers_;
+  std::set<const Dispatcher*> deleted_dispatchers_;
 
-  long                          ref_count_;
-  Glib::RefPtr<MainContext>     context_;
+  long ref_count_;
+  Glib::RefPtr<MainContext> context_;
 #ifdef G_OS_WIN32
-  std::mutex                    mutex_;
+  std::mutex mutex_;
   std::list<DispatchNotifyData> notify_queue_;
-  HANDLE                        fd_receiver_;
+  HANDLE fd_receiver_;
 #else
-  int                           fd_receiver_;
-  int                           fd_sender_;
+  int fd_receiver_;
+  int fd_sender_;
 #endif
 
   void create_pipe();
@@ -168,17 +169,16 @@ private:
 thread_local DispatchNotifier* DispatchNotifier::thread_specific_instance_ = nullptr;
 
 DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
-:
-  deleted_dispatchers_(),
-  ref_count_    (0),
-  context_      (context),
+: deleted_dispatchers_(),
+  ref_count_(0),
+  context_(context),
 #ifdef G_OS_WIN32
-  mutex_        (),
-  notify_queue_ (),
-  fd_receiver_  (0)
+  mutex_(),
+  notify_queue_(),
+  fd_receiver_(0)
 #else
-  fd_receiver_  (-1),
-  fd_sender_    (-1)
+  fd_receiver_(-1),
+  fd_sender_(-1)
 #endif
 {
   create_pipe();
@@ -205,11 +205,11 @@ DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
     source->connect(sigc::mem_fun(*this, &DispatchNotifier::pipe_io_handler));
     g_source_attach(source->gobj(), context_->gobj());
   }
-  catch(...)
+  catch (...)
   {
-# ifndef G_OS_WIN32
+#ifndef G_OS_WIN32
     fd_close_and_invalidate(fd_sender_);
-# endif
+#endif
     fd_close_and_invalidate(fd_receiver_);
 
     throw;
@@ -224,7 +224,8 @@ DispatchNotifier::~DispatchNotifier() noexcept
   fd_close_and_invalidate(fd_receiver_);
 }
 
-void DispatchNotifier::create_pipe()
+void
+DispatchNotifier::create_pipe()
 {
 #ifdef G_OS_WIN32
 
@@ -233,11 +234,11 @@ void DispatchNotifier::create_pipe()
   // we can closely match the behavior on Unix in pipe_io_handler().
   const HANDLE event = CreateEvent(0, TRUE, FALSE, 0);
 
-  if(!event)
+  if (!event)
   {
     GError* const error = g_error_new(G_FILE_ERROR, G_FILE_ERROR_FAILED,
-                                      "Failed to create event for inter-thread communication: %s",
-                                      g_win32_error_message(GetLastError()));
+      "Failed to create event for inter-thread communication: %s",
+      g_win32_error_message(GetLastError()));
     throw Glib::FileError(error);
   }
 
@@ -247,11 +248,10 @@ void DispatchNotifier::create_pipe()
 
   int filedes[2] = { -1, -1 };
 
-  if(pipe(filedes) < 0)
+  if (pipe(filedes) < 0)
   {
     GError* const error = g_error_new(G_FILE_ERROR, g_file_error_from_errno(errno),
-                                      "Failed to create pipe for inter-thread communication: %s",
-                                      g_strerror(errno));
+      "Failed to create pipe for inter-thread communication: %s", g_strerror(errno));
     throw Glib::FileError(error);
   }
 
@@ -259,18 +259,19 @@ void DispatchNotifier::create_pipe()
   fd_set_close_on_exec(filedes[1]);
 
   fd_receiver_ = filedes[0];
-  fd_sender_   = filedes[1];
+  fd_sender_ = filedes[1];
 
 #endif /* !G_OS_WIN32 */
 }
 
 // static
-DispatchNotifier* DispatchNotifier::reference_instance
-  (const Glib::RefPtr<MainContext>& context, const Dispatcher* dispatcher)
+DispatchNotifier*
+DispatchNotifier::reference_instance(
+  const Glib::RefPtr<MainContext>& context, const Dispatcher* dispatcher)
 {
   DispatchNotifier* instance = thread_specific_instance_;
 
-  if(!instance)
+  if (!instance)
   {
     instance = new DispatchNotifier(context);
     thread_specific_instance_ = instance;
@@ -286,7 +287,7 @@ DispatchNotifier* DispatchNotifier::reference_instance
     // Not ideal, but perhaps the best that can be done without breaking ABI.
     // The alternative would be to remove the following erase(), and risk not
     // delivering messages sent to the new dispatcher.
-    //TODO: When we can break ABI, a better solution without this drawback can
+    // TODO: When we can break ABI, a better solution without this drawback can
     // be implemented. See https://bugzilla.gnome.org/show_bug.cgi?id=651942
     // especially comment 16.
     instance->deleted_dispatchers_.erase(dispatcher);
@@ -298,8 +299,8 @@ DispatchNotifier* DispatchNotifier::reference_instance
 }
 
 // static
-void DispatchNotifier::unreference_instance(
-  DispatchNotifier* notifier, const Dispatcher* dispatcher)
+void
+DispatchNotifier::unreference_instance(DispatchNotifier* notifier, const Dispatcher* dispatcher)
 {
   DispatchNotifier* const instance = thread_specific_instance_;
 
@@ -314,7 +315,7 @@ void DispatchNotifier::unreference_instance(
     // Keep its address, so pipe_io_handler() can avoid delivering messages to it.
     instance->deleted_dispatchers_.insert(dispatcher);
 
-  if(--instance->ref_count_ <= 0)
+  if (--instance->ref_count_ <= 0)
   {
     g_return_if_fail(instance->ref_count_ == 0); // could be < 0 if messed up
 
@@ -323,31 +324,32 @@ void DispatchNotifier::unreference_instance(
   }
 }
 
-void DispatchNotifier::send_notification(Dispatcher* dispatcher)
+void
+DispatchNotifier::send_notification(Dispatcher* dispatcher)
 {
 #ifdef G_OS_WIN32
   {
-    const std::lock_guard<std::mutex> lock (mutex_);
+    const std::lock_guard<std::mutex> lock(mutex_);
 
     const bool was_empty = notify_queue_.empty();
     notify_queue_.emplace_back(DispatchNotifyData(dispatcher, this));
 
-    if(was_empty)
+    if (was_empty)
     {
       // The event will stay in signaled state until it is reset
       // in pipe_io_handler() after processing the last queued event.
-      if(!SetEvent(fd_receiver_))
+      if (!SetEvent(fd_receiver_))
         warn_failed_pipe_io("SetEvent");
     }
   }
 #else /* !G_OS_WIN32 */
 
-  DispatchNotifyData data (dispatcher, this);
+  DispatchNotifyData data(dispatcher, this);
   gssize n_written;
 
   do
     n_written = write(fd_sender_, &data, sizeof(data));
-  while(G_UNLIKELY(n_written < 0) && errno == EINTR);
+  while (G_UNLIKELY(n_written < 0) && errno == EINTR);
 
   // All data must be written in a single call to write(), otherwise we cannot
   // guarantee reentrancy since another thread might be scheduled between two
@@ -363,13 +365,14 @@ void DispatchNotifier::send_notification(Dispatcher* dispatcher)
   // The minimum value allowed by POSIX for PIPE_BUF is 512, so we are on safe
   // grounds here.
 
-  if(G_UNLIKELY(n_written != sizeof(data)))
+  if (G_UNLIKELY(n_written != sizeof(data)))
     warn_failed_pipe_io("write");
 
 #endif /* !G_OS_WIN32 */
 }
 
-bool DispatchNotifier::pipe_is_empty()
+bool
+DispatchNotifier::pipe_is_empty()
 {
 #ifdef G_OS_WIN32
   return notify_queue_.empty();
@@ -387,13 +390,13 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
 
 #ifdef G_OS_WIN32
   {
-    const std::lock_guard<std::mutex> lock (mutex_);
+    const std::lock_guard<std::mutex> lock(mutex_);
 
     // Should never be empty at this point, but let's allow for bogus
     // notifications with no data available anyway; just to be safe.
-    if(notify_queue_.empty())
+    if (notify_queue_.empty())
     {
-      if(!ResetEvent(fd_receiver_))
+      if (!ResetEvent(fd_receiver_))
         warn_failed_pipe_io("ResetEvent");
 
       return true;
@@ -405,28 +408,28 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
     // Handle only a single event with each invocation of the I/O handler,
     // and reset to nonsignaled state only after the last event in the queue
     // has been processed.  This matches the behavior on Unix.
-    if(notify_queue_.empty())
+    if (notify_queue_.empty())
     {
-      if(!ResetEvent(fd_receiver_))
+      if (!ResetEvent(fd_receiver_))
         warn_failed_pipe_io("ResetEvent");
     }
   }
-#else /* !G_OS_WIN32 */
+#else  /* !G_OS_WIN32 */
 
   gssize n_read;
 
   do
     n_read = read(fd_receiver_, &data, sizeof(data));
-  while(G_UNLIKELY(n_read < 0) && errno == EINTR);
+  while (G_UNLIKELY(n_read < 0) && errno == EINTR);
 
   // Pipe I/O of a block size not greater than PIPE_BUF should be atomic.
   // See the comment on atomicity in send_notification() for details.
-  if(G_UNLIKELY(n_read != sizeof(data)))
+  if (G_UNLIKELY(n_read != sizeof(data)))
   {
     // Should probably never be zero, but for safety let's allow for bogus
     // notifications when no data is actually available.  Although in fact
     // the read() should block in that case.
-    if(n_read != 0)
+    if (n_read != 0)
       warn_failed_pipe_io("read");
 
     return true;
@@ -457,7 +460,7 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
   {
     data.dispatcher->signal_(); // emit
   }
-  catch(...)
+  catch (...)
   {
     Glib::exception_handlers_invoke();
   }
@@ -468,38 +471,40 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
 /**** Glib::Dispatcher *****************************************************/
 
 Dispatcher::Dispatcher()
-:
-  signal_   (),
-  notifier_ (DispatchNotifier::reference_instance(MainContext::get_default(), this))
-{}
+: signal_(), notifier_(DispatchNotifier::reference_instance(MainContext::get_default(), this))
+{
+}
 
 Dispatcher::Dispatcher(const Glib::RefPtr<MainContext>& context)
-:
-  signal_   (),
-  notifier_ (DispatchNotifier::reference_instance(context, this))
-{}
+: signal_(), notifier_(DispatchNotifier::reference_instance(context, this))
+{
+}
 
 Dispatcher::~Dispatcher() noexcept
 {
   DispatchNotifier::unreference_instance(notifier_, this);
 }
 
-void Dispatcher::emit()
+void
+Dispatcher::emit()
 {
   notifier_->send_notification(this);
 }
 
-void Dispatcher::operator()()
+void
+Dispatcher::operator()()
 {
   notifier_->send_notification(this);
 }
 
-sigc::connection Dispatcher::connect(const sigc::slot<void>& slot)
+sigc::connection
+Dispatcher::connect(const sigc::slot<void>& slot)
 {
   return signal_.connect(slot);
 }
 
-sigc::connection Dispatcher::connect(sigc::slot<void>&& slot)
+sigc::connection
+Dispatcher::connect(sigc::slot<void>&& slot)
 {
   return signal_.connect(std::move(slot));
 }

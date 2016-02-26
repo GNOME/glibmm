@@ -18,4 +18,3 @@
  */
 
 #include <glibmm/debug.h>
-

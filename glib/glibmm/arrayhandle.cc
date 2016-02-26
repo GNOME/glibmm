@@ -20,15 +20,15 @@
 namespace Glib
 {
 
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::~ArrayHandle() noexcept
+ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::~ArrayHandle() noexcept
 {
-  if(parray_ && ownership_ != Glib::OWNERSHIP_NONE)
+  if (parray_ && ownership_ != Glib::OWNERSHIP_NONE)
   {
-    if(ownership_ != Glib::OWNERSHIP_SHALLOW)
+    if (ownership_ != Glib::OWNERSHIP_SHALLOW)
     {
       // Deep ownership: release each container element.
-      const CType *const pend = parray_ + size_;
-      for(const CType* p = parray_; p != pend; ++p)
+      const CType* const pend = parray_ + size_;
+      for (const CType* p = parray_; p != pend; ++p)
         Tr::release_c_type(*p);
     }
     g_free(const_cast<CType*>(parray_));

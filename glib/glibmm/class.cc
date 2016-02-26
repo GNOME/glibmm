@@ -25,48 +25,49 @@
 namespace Glib
 {
 
-void Class::register_derived_type(GType base_type)
+void
+Class::register_derived_type(GType base_type)
 {
   return register_derived_type(base_type, nullptr);
 }
 
-void Class::register_derived_type(GType base_type, GTypeModule* module)
+void
+Class::register_derived_type(GType base_type, GTypeModule* module)
 {
-  if(gtype_)
+  if (gtype_)
     return; // already initialized
 
-  //0 is not a valid GType.
-  //It would lead to a crash later.
-  //We allow this, failing silently, to make life easier for gstreamermm.
-  if(base_type == 0)
+  // 0 is not a valid GType.
+  // It would lead to a crash later.
+  // We allow this, failing silently, to make life easier for gstreamermm.
+  if (base_type == 0)
     return; // already initialized
 
-  GTypeQuery base_query = { 0, nullptr, 0, 0, };
+  GTypeQuery base_query = {
+    0, nullptr, 0, 0,
+  };
   g_type_query(base_type, &base_query);
 
-  //GTypeQuery::class_size is guint but GTypeInfo::class_size is guint16.
-  const guint16 class_size =
-   (guint16)base_query.class_size;
+  // GTypeQuery::class_size is guint but GTypeInfo::class_size is guint16.
+  const guint16 class_size = (guint16)base_query.class_size;
 
-  //GTypeQuery::instance_size is guint but GTypeInfo::instance_size is guint16.
-  const guint16 instance_size =
-   (guint16)base_query.instance_size;
+  // GTypeQuery::instance_size is guint but GTypeInfo::instance_size is guint16.
+  const guint16 instance_size = (guint16)base_query.instance_size;
 
-  const GTypeInfo derived_info =
-  {
+  const GTypeInfo derived_info = {
     class_size,
     nullptr, // base_init
     nullptr, // base_finalize
-    class_init_func_, //Set by the caller ( *_Class::init() ).
+    class_init_func_, // Set by the caller ( *_Class::init() ).
     nullptr, // class_finalize
     nullptr, // class_data
     instance_size,
-    0, // n_preallocs
+    0,       // n_preallocs
     nullptr, // instance_init
     nullptr, // value_table
   };
 
-  if(!(base_query.type_name))
+  if (!(base_query.type_name))
   {
     g_critical("Class::register_derived_type(): base_query.type_name is NULL.");
     return;
@@ -74,28 +75,31 @@ void Class::register_derived_type(GType base_type, GTypeModule* module)
 
   gchar* derived_name = g_strconcat("gtkmm__", base_query.type_name, nullptr);
 
-  if(module)
-    gtype_ = g_type_module_register_type(module, base_type, derived_name, &derived_info, GTypeFlags(0));
+  if (module)
+    gtype_ =
+      g_type_module_register_type(module, base_type, derived_name, &derived_info, GTypeFlags(0));
   else
     gtype_ = g_type_register_static(base_type, derived_name, &derived_info, GTypeFlags(0));
 
   g_free(derived_name);
 }
 
-GType Class::clone_custom_type(const char* custom_type_name) const
+GType
+Class::clone_custom_type(const char* custom_type_name) const
 {
   return clone_custom_type(custom_type_name, interface_class_vector_type());
 }
 
-GType Class::clone_custom_type(const char* custom_type_name,
-  const interface_class_vector_type& interface_classes) const
+GType
+Class::clone_custom_type(
+  const char* custom_type_name, const interface_class_vector_type& interface_classes) const
 {
-  std::string full_name ("gtkmm__CustomObject_");
+  std::string full_name("gtkmm__CustomObject_");
   Glib::append_canonical_typename(full_name, custom_type_name);
 
   GType custom_type = g_type_from_name(full_name.c_str());
 
-  if(!custom_type)
+  if (!custom_type)
   {
     g_return_val_if_fail(gtype_ != 0, 0);
 
@@ -103,36 +107,35 @@ GType Class::clone_custom_type(const char* custom_type_name,
     // so that g_type_class_peek_parent() works correctly.
     const GType base_type = g_type_parent(gtype_);
 
-    GTypeQuery base_query = { 0, nullptr, 0, 0, };
+    GTypeQuery base_query = {
+      0, nullptr, 0, 0,
+    };
     g_type_query(base_type, &base_query);
 
-    //GTypeQuery::class_size is guint but GTypeInfo::class_size is guint16.
-    const guint16 class_size =
-      (guint16)base_query.class_size;
+    // GTypeQuery::class_size is guint but GTypeInfo::class_size is guint16.
+    const guint16 class_size = (guint16)base_query.class_size;
 
-    //GTypeQuery::instance_size is guint but GTypeInfo::instance_size is guint16.
-    const guint16 instance_size =
-      (guint16)base_query.instance_size;
+    // GTypeQuery::instance_size is guint but GTypeInfo::instance_size is guint16.
+    const guint16 instance_size = (guint16)base_query.instance_size;
 
-    const GTypeInfo derived_info =
-    {
+    const GTypeInfo derived_info = {
       class_size,
-      nullptr, // base_init
+      nullptr,                                     // base_init
       &Class::custom_class_base_finalize_function, // base_finalize
       &Class::custom_class_init_function,
       nullptr, // class_finalize
-      this, // class_data
+      this,    // class_data
       instance_size,
-      0, // n_preallocs
+      0,       // n_preallocs
       nullptr, // instance_init
       nullptr, // value_table
     };
 
-    custom_type = g_type_register_static(
-        base_type, full_name.c_str(), &derived_info, GTypeFlags(0));
+    custom_type =
+      g_type_register_static(base_type, full_name.c_str(), &derived_info, GTypeFlags(0));
 
-    //Add derived versions of interfaces, if the C type implements any interfaces.
-    //For instance, TreeModel_Class::add_interface().
+    // Add derived versions of interfaces, if the C type implements any interfaces.
+    // For instance, TreeModel_Class::add_interface().
     for (interface_class_vector_type::size_type i = 0; i < interface_classes.size(); i++)
     {
       const Interface_Class* interface_class = interface_classes[i];
@@ -150,17 +153,18 @@ GType Class::clone_custom_type(const char* custom_type_name,
 GQuark Class::iface_properties_quark = g_quark_from_string("gtkmm_CustomObject_iface_properties");
 
 // static
-void Class::custom_class_base_finalize_function(void* g_class)
+void
+Class::custom_class_base_finalize_function(void* g_class)
 {
   const GType gtype = G_TYPE_FROM_CLASS(g_class);
 
   // Free the data related to the interface properties for the custom type, if any.
-  iface_properties_type* props = static_cast<iface_properties_type*>(
-    g_type_get_qdata(gtype, iface_properties_quark));
+  iface_properties_type* props =
+    static_cast<iface_properties_type*>(g_type_get_qdata(gtype, iface_properties_quark));
 
-  if(props)
+  if (props)
   {
-    for(iface_properties_type::size_type i = 0; i < props->size(); i++)
+    for (iface_properties_type::size_type i = 0; i < props->size(); i++)
     {
       g_value_unset((*props)[i]);
       g_free((*props)[i]);
@@ -170,10 +174,11 @@ void Class::custom_class_base_finalize_function(void* g_class)
 }
 
 // static
-void Class::custom_class_init_function(void* g_class, void* class_data)
+void
+Class::custom_class_init_function(void* g_class, void* class_data)
 {
   // The class_data pointer is set to 'this' by clone_custom_type().
-  const Class *const self = static_cast<Class*>(class_data);
+  const Class* const self = static_cast<Class*>(class_data);
 
   g_return_if_fail(self->class_init_func_ != nullptr);
 
@@ -181,7 +186,7 @@ void Class::custom_class_init_function(void* g_class, void* class_data)
   // the vfunc and default signal handler callbacks.
   (*self->class_init_func_)(g_class, nullptr);
 
-  GObjectClass *const gobject_class = static_cast<GObjectClass*>(g_class);
+  GObjectClass* const gobject_class = static_cast<GObjectClass*>(g_class);
   gobject_class->get_property = &Glib::custom_get_property_callback;
   gobject_class->set_property = &Glib::custom_set_property_callback;
 
