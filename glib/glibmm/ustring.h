@@ -40,35 +40,34 @@ template <class T>
 struct IteratorTraits
 {
   typedef typename T::iterator_category iterator_category;
-  typedef typename T::value_type        value_type;
-  typedef typename T::difference_type   difference_type;
-  typedef typename T::pointer           pointer;
-  typedef typename T::reference         reference;
+  typedef typename T::value_type value_type;
+  typedef typename T::difference_type difference_type;
+  typedef typename T::pointer pointer;
+  typedef typename T::reference reference;
 };
 
 template <class T>
 struct IteratorTraits<T*>
 {
   typedef std::random_access_iterator_tag iterator_category;
-  typedef T                               value_type;
-  typedef std::ptrdiff_t                  difference_type;
-  typedef T*                              pointer;
-  typedef T&                              reference;
+  typedef T value_type;
+  typedef std::ptrdiff_t difference_type;
+  typedef T* pointer;
+  typedef T& reference;
 };
 
 template <class T>
 struct IteratorTraits<const T*>
 {
   typedef std::random_access_iterator_tag iterator_category;
-  typedef T                               value_type;
-  typedef std::ptrdiff_t                  difference_type;
-  typedef const T*                        pointer;
-  typedef const T&                        reference;
+  typedef T value_type;
+  typedef std::ptrdiff_t difference_type;
+  typedef const T* pointer;
+  typedef const T& reference;
 };
 
 #endif /* GLIBMM_HAVE_STD_ITERATOR_TRAITS */
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
 
 /** The iterator type of Glib::ustring.
  * Note this is not a random access iterator but a bidirectional one,
@@ -100,20 +99,20 @@ template <class T>
 class ustring_Iterator
 {
 public:
-  typedef std::bidirectional_iterator_tag   iterator_category;
-  typedef gunichar                          value_type;
-  typedef std::string::difference_type      difference_type;
-  typedef value_type                        reference;
-  typedef void                              pointer;
+  typedef std::bidirectional_iterator_tag iterator_category;
+  typedef gunichar value_type;
+  typedef std::string::difference_type difference_type;
+  typedef value_type reference;
+  typedef void pointer;
 
   inline ustring_Iterator();
   inline ustring_Iterator(const ustring_Iterator<std::string::iterator>& other);
 
   inline value_type operator*() const;
 
-  inline ustring_Iterator<T> &     operator++();
+  inline ustring_Iterator<T>& operator++();
   inline const ustring_Iterator<T> operator++(int);
-  inline ustring_Iterator<T> &     operator--();
+  inline ustring_Iterator<T>& operator--();
   inline const ustring_Iterator<T> operator--(int);
 
   explicit inline ustring_Iterator(T pos);
@@ -122,7 +121,6 @@ public:
 private:
   T pos_;
 };
-
 
 /** Extract a UCS-4 character from UTF-8 data.
  * Convert a single UTF-8 (multibyte) character starting at @p pos to
@@ -135,7 +133,6 @@ private:
  * std::string even for UTF-8 encoding.
  */
 gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_PURE;
-
 
 /** Glib::ustring has much the same interface as std::string, but contains
  * %Unicode characters encoded as UTF-8.
@@ -217,43 +214,38 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
 class ustring
 {
 public:
-  typedef std::string::size_type                        size_type;
-  typedef std::string::difference_type                  difference_type;
+  typedef std::string::size_type size_type;
+  typedef std::string::difference_type difference_type;
 
-  typedef gunichar                                      value_type;
-  typedef gunichar &                                    reference;
-  typedef const gunichar &                              const_reference;
+  typedef gunichar value_type;
+  typedef gunichar& reference;
+  typedef const gunichar& const_reference;
 
-  typedef ustring_Iterator<std::string::iterator>       iterator;
+  typedef ustring_Iterator<std::string::iterator> iterator;
   typedef ustring_Iterator<std::string::const_iterator> const_iterator;
 
 #ifndef GLIBMM_HAVE_SUN_REVERSE_ITERATOR
 
-  typedef std::reverse_iterator<iterator>               reverse_iterator;
-  typedef std::reverse_iterator<const_iterator>         const_reverse_iterator;
+  typedef std::reverse_iterator<iterator> reverse_iterator;
+  typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
 #else
 
-  typedef std::reverse_iterator<iterator,
-                                iterator::iterator_category,
-                                iterator::value_type,
-                                iterator::reference,
-                                iterator::pointer,
-                                iterator::difference_type> reverse_iterator;
-  typedef std::reverse_iterator<const_iterator,
-                                const_iterator::iterator_category,
-                                const_iterator::value_type,
-                                const_iterator::reference,
-                                const_iterator::pointer,
-                                const_iterator::difference_type> const_reverse_iterator;
+  typedef std::reverse_iterator<iterator, iterator::iterator_category, iterator::value_type,
+    iterator::reference, iterator::pointer, iterator::difference_type>
+    reverse_iterator;
+  typedef std::reverse_iterator<const_iterator, const_iterator::iterator_category,
+    const_iterator::value_type, const_iterator::reference, const_iterator::pointer,
+    const_iterator::difference_type>
+    const_reverse_iterator;
 
 #endif /* GLIBMM_HAVE_SUN_REVERSE_ITERATOR */
 
 #ifdef GLIBMM_HAVE_ALLOWS_STATIC_INLINE_NPOS
   static GLIBMM_API const size_type npos = std::string::npos;
 #else
-  //The IRIX MipsPro compiler says "The indicated constant value is not known",
-  //so we need to initalize the static member data elsewhere.
+  // The IRIX MipsPro compiler says "The indicated constant value is not known",
+  // so we need to initalize the static member data elsewhere.
   static GLIBMM_API const size_type npos;
 #endif
 
@@ -303,7 +295,7 @@ public:
    * @param i Index of first character to copy from.
    * @param n Number of UTF-8 characters to copy (defaults to copying the remainder).
    */
-  ustring(const ustring& src, size_type i, size_type n=npos);
+  ustring(const ustring& src, size_type i, size_type n = npos);
 
   /*! Construct a ustring as a partial copy of a C string.
    * @param src %Source C string encoded as UTF-8.
@@ -332,11 +324,11 @@ public:
    * @param pbegin Start of range.
    * @param pend End of range.
    */
-  template <class In> ustring(In pbegin, In pend);
+  template <class In>
+  ustring(In pbegin, In pend);
 
-
-//! @name Assign new contents.
-//! @{
+  //! @name Assign new contents.
+  //! @{
 
   ustring& operator=(const std::string& src);
   ustring& operator=(std::string&& src);
@@ -351,11 +343,12 @@ public:
   ustring& assign(const char* src);
   ustring& assign(size_type n, gunichar uc);
   ustring& assign(size_type n, char c);
-  template <class In> ustring& assign(In pbegin, In pend);
+  template <class In>
+  ustring& assign(In pbegin, In pend);
 
-//! @}
-//! @name Append to the string.
-//! @{
+  //! @}
+  //! @name Append to the string.
+  //! @{
 
   ustring& operator+=(const ustring& src);
   ustring& operator+=(const char* src);
@@ -370,11 +363,12 @@ public:
   ustring& append(const char* src);
   ustring& append(size_type n, gunichar uc);
   ustring& append(size_type n, char c);
-  template <class In> ustring& append(In pbegin, In pend);
+  template <class In>
+  ustring& append(In pbegin, In pend);
 
-//! @}
-//! @name Insert into the string.
-//! @{
+  //! @}
+  //! @name Insert into the string.
+  //! @{
 
   ustring& insert(size_type i, const ustring& src);
   ustring& insert(size_type i, const ustring& src, size_type i2, size_type n);
@@ -385,13 +379,14 @@ public:
 
   iterator insert(iterator p, gunichar uc);
   iterator insert(iterator p, char c);
-  void     insert(iterator p, size_type n, gunichar uc);
-  void     insert(iterator p, size_type n, char c);
-  template <class In> void insert(iterator p, In pbegin, In pend);
+  void insert(iterator p, size_type n, gunichar uc);
+  void insert(iterator p, size_type n, char c);
+  template <class In>
+  void insert(iterator p, In pbegin, In pend);
 
-//! @}
-//! @name Replace sub-strings.
-//! @{
+  //! @}
+  //! @name Replace sub-strings.
+  //! @{
 
   ustring& replace(size_type i, size_type n, const ustring& src);
   ustring& replace(size_type i, size_type n, const ustring& src, size_type i2, size_type n2);
@@ -405,24 +400,25 @@ public:
   ustring& replace(iterator pbegin, iterator pend, const char* src);
   ustring& replace(iterator pbegin, iterator pend, size_type n, gunichar uc);
   ustring& replace(iterator pbegin, iterator pend, size_type n, char c);
-  template <class In> ustring& replace(iterator pbegin, iterator pend, In pbegin2, In pend2);
+  template <class In>
+  ustring& replace(iterator pbegin, iterator pend, In pbegin2, In pend2);
 
-//! @}
-//! @name Erase sub-strings.
-//! @{
+  //! @}
+  //! @name Erase sub-strings.
+  //! @{
 
   void clear();
-  ustring& erase(size_type i, size_type n=npos);
+  ustring& erase(size_type i, size_type n = npos);
   ustring& erase();
   iterator erase(iterator p);
   iterator erase(iterator pbegin, iterator pend);
 
-//! @}
-//! @name Compare and collate.
-//! @{
+  //! @}
+  //! @name Compare and collate.
+  //! @{
 
   int compare(const ustring& rhs) const;
-  int compare(const char* rhs)    const;
+  int compare(const char* rhs) const;
   int compare(size_type i, size_type n, const ustring& rhs) const;
   int compare(size_type i, size_type n, const ustring& rhs, size_type i2, size_type n2) const;
   int compare(size_type i, size_type n, const char* rhs, size_type n2) const;
@@ -448,9 +444,9 @@ public:
    */
   std::string casefold_collate_key() const;
 
-//! @}
-//! @name Extract characters and sub-strings.
-//! @{
+  //! @}
+  //! @name Extract characters and sub-strings.
+  //! @{
 
   /*! No reference return; use replace() to write characters. */
   value_type operator[](size_type i) const;
@@ -458,82 +454,82 @@ public:
   /*! No reference return; use replace() to write characters. @throw std::out_of_range */
   value_type at(size_type i) const;
 
-  inline ustring substr(size_type i=0, size_type n=npos) const;
+  inline ustring substr(size_type i = 0, size_type n = npos) const;
 
-//! @}
-//! @name Access a sequence of characters.
-//! @{
+  //! @}
+  //! @name Access a sequence of characters.
+  //! @{
 
   iterator begin();
   iterator end();
   const_iterator begin() const;
-  const_iterator end()   const;
+  const_iterator end() const;
   reverse_iterator rbegin();
   reverse_iterator rend();
   const_reverse_iterator rbegin() const;
-  const_reverse_iterator rend()   const;
+  const_reverse_iterator rend() const;
 
-//! @}
-//! @name Find sub-strings.
-//! @{
+  //! @}
+  //! @name Find sub-strings.
+  //! @{
 
-  size_type find(const ustring& str, size_type i=0) const;
+  size_type find(const ustring& str, size_type i = 0) const;
   size_type find(const char* str, size_type i, size_type n) const;
-  size_type find(const char* str, size_type i=0) const;
-  size_type find(gunichar uc, size_type i=0) const;
-  size_type find(char c, size_type i=0) const;
+  size_type find(const char* str, size_type i = 0) const;
+  size_type find(gunichar uc, size_type i = 0) const;
+  size_type find(char c, size_type i = 0) const;
 
-  size_type rfind(const ustring& str, size_type i=npos) const;
+  size_type rfind(const ustring& str, size_type i = npos) const;
   size_type rfind(const char* str, size_type i, size_type n) const;
-  size_type rfind(const char* str, size_type i=npos) const;
-  size_type rfind(gunichar uc, size_type i=npos) const;
-  size_type rfind(char c, size_type i=npos) const;
+  size_type rfind(const char* str, size_type i = npos) const;
+  size_type rfind(gunichar uc, size_type i = npos) const;
+  size_type rfind(char c, size_type i = npos) const;
 
-//! @}
-//! @name Match against a set of characters.
-//! @{
+  //! @}
+  //! @name Match against a set of characters.
+  //! @{
 
-  size_type find_first_of(const ustring& match, size_type i=0) const;
+  size_type find_first_of(const ustring& match, size_type i = 0) const;
   size_type find_first_of(const char* match, size_type i, size_type n) const;
-  size_type find_first_of(const char* match, size_type i=0) const;
-  size_type find_first_of(gunichar uc, size_type i=0) const;
-  size_type find_first_of(char c, size_type i=0) const;
+  size_type find_first_of(const char* match, size_type i = 0) const;
+  size_type find_first_of(gunichar uc, size_type i = 0) const;
+  size_type find_first_of(char c, size_type i = 0) const;
 
-  size_type find_last_of(const ustring& match, size_type i=npos) const;
+  size_type find_last_of(const ustring& match, size_type i = npos) const;
   size_type find_last_of(const char* match, size_type i, size_type n) const;
-  size_type find_last_of(const char* match, size_type i=npos) const;
-  size_type find_last_of(gunichar uc, size_type i=npos) const;
-  size_type find_last_of(char c, size_type i=npos) const;
+  size_type find_last_of(const char* match, size_type i = npos) const;
+  size_type find_last_of(gunichar uc, size_type i = npos) const;
+  size_type find_last_of(char c, size_type i = npos) const;
 
-  size_type find_first_not_of(const ustring& match, size_type i=0) const;
+  size_type find_first_not_of(const ustring& match, size_type i = 0) const;
   size_type find_first_not_of(const char* match, size_type i, size_type n) const;
-  size_type find_first_not_of(const char* match, size_type i=0) const;
-  size_type find_first_not_of(gunichar uc, size_type i=0) const;
-  size_type find_first_not_of(char c, size_type i=0) const;
+  size_type find_first_not_of(const char* match, size_type i = 0) const;
+  size_type find_first_not_of(gunichar uc, size_type i = 0) const;
+  size_type find_first_not_of(char c, size_type i = 0) const;
 
-  size_type find_last_not_of(const ustring& match, size_type i=npos) const;
+  size_type find_last_not_of(const ustring& match, size_type i = npos) const;
   size_type find_last_not_of(const char* match, size_type i, size_type n) const;
-  size_type find_last_not_of(const char* match, size_type i=npos) const;
-  size_type find_last_not_of(gunichar uc, size_type i=npos) const;
-  size_type find_last_not_of(char c, size_type i=npos) const;
+  size_type find_last_not_of(const char* match, size_type i = npos) const;
+  size_type find_last_not_of(gunichar uc, size_type i = npos) const;
+  size_type find_last_not_of(char c, size_type i = npos) const;
 
-//! @}
-//! @name Retrieve the string's size.
-//! @{
+  //! @}
+  //! @name Retrieve the string's size.
+  //! @{
 
   /** Returns true if the string is empty. Equivalent to *this == "".
    * @result Whether the string is empty.
    */
-  bool empty()  const;
+  bool empty() const;
 
   /** Returns the number of characters in the string, not including any null-termination.
    * @result The number of UTF-8 characters.
    *
    * @see bytes(), empty()
    */
-  size_type size()   const;
+  size_type size() const;
 
-  //We have length() as well as size(), because std::string has both.
+  // We have length() as well as size(), because std::string has both.
 
   /** This is the same as size().
    */
@@ -544,40 +540,40 @@ public:
    *
    * @see size(), empty()
    */
-  size_type bytes()  const;
+  size_type bytes() const;
 
-//! @}
-//! @name Change the string's size.
-//! @{
+  //! @}
+  //! @name Change the string's size.
+  //! @{
 
   void resize(size_type n, gunichar uc);
-  void resize(size_type n, char c='\0');
+  void resize(size_type n, char c = '\0');
 
-//! @}
-//! @name Control the allocated memory.
-//! @{
+  //! @}
+  //! @name Control the allocated memory.
+  //! @{
 
   size_type capacity() const;
   size_type max_size() const;
-  void reserve(size_type n=0);
+  void reserve(size_type n = 0);
 
-//! @}
-//! @name Get a per-byte representation of the string.
-//! @{
+  //! @}
+  //! @name Get a per-byte representation of the string.
+  //! @{
 
   inline operator std::string() const; // e.g. std::string str = ustring();
   inline const std::string& raw() const;
 
   // Not necessarily an ASCII char*. Use g_utf8_*() where necessary.
-  const char* data()  const;
+  const char* data() const;
   const char* c_str() const;
 
   /*! @return Number of copied @em bytes, not characters. */
-  size_type copy(char* dest, size_type n, size_type i=0) const;
+  size_type copy(char* dest, size_type n, size_type i = 0) const;
 
-//! @}
-//! @name UTF-8 utilities.
-//! @{
+  //! @}
+  //! @name UTF-8 utilities.
+  //! @{
 
   /*! Check whether the string is valid UTF-8. */
   bool validate() const;
@@ -599,9 +595,9 @@ public:
   /*! "Normalize" the %Unicode character representation of the string. */
   ustring normalize(NormalizeMode mode = NORMALIZE_DEFAULT_COMPOSE) const;
 
-//! @}
-//! @name Character case conversion.
-//! @{
+  //! @}
+  //! @name Character case conversion.
+  //! @{
 
   /*! Returns a new UTF-8 string with all characters characters converted to
    * their uppercase equivalent, while honoring the current locale.  The
@@ -626,16 +622,15 @@ public:
    */
   ustring casefold() const;
 
-//! @}
-//! @name Message formatting.
-//! @{
+  //! @}
+  //! @name Message formatting.
+  //! @{
 
   /* Returns fmt as is, but checks for invalid references in the format string.
    * @newin{2,18}
    */
   template <class T1>
-  static inline
-  ustring compose(const ustring& fmt);
+  static inline ustring compose(const ustring& fmt);
 
   /*! Substitute placeholders in a format string with the referenced arguments.
    * The template string should be in <tt>qt-format</tt>, that is
@@ -656,82 +651,62 @@ public:
    * @newin{2,16}
    */
   template <class T1>
-  static inline
-  ustring compose(const ustring& fmt, const T1& a1);
+  static inline ustring compose(const ustring& fmt, const T1& a1);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
    * @newin{2,16}
    */
   template <class T1, class T2>
-  static inline
-  ustring compose(const ustring& fmt, const T1& a1, const T2& a2);
+  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
    * @newin{2,16}
    */
   template <class T1, class T2, class T3>
-  static inline
-  ustring compose(const ustring& fmt,
-                  const T1& a1, const T2& a2, const T3& a3);
+  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
    * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4>
-  static inline
-  ustring compose(const ustring& fmt,
-                  const T1& a1, const T2& a2, const T3& a3,
-                  const T4& a4);
+  static inline ustring compose(
+    const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
    * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5>
-  static inline
-  ustring compose(const ustring& fmt,
-                  const T1& a1, const T2& a2, const T3& a3,
-                  const T4& a4, const T5& a5);
+  static inline ustring compose(
+    const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
    * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6>
-  static inline
-  ustring compose(const ustring& fmt,
-                  const T1& a1, const T2& a2, const T3& a3,
-                  const T4& a4, const T5& a5, const T6& a6);
+  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3,
+    const T4& a4, const T5& a5, const T6& a6);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
    * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-  static inline
-  ustring compose(const ustring& fmt,
-                  const T1& a1, const T2& a2, const T3& a3,
-                  const T4& a4, const T5& a5, const T6& a6,
-                  const T7& a7);
+  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3,
+    const T4& a4, const T5& a5, const T6& a6, const T7& a7);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
    * @newin{2,16}
    */
-  template <class T1, class T2, class T3, class T4,
-            class T5, class T6, class T7, class T8>
-  static inline
-  ustring compose(const ustring& fmt,
-                  const T1& a1, const T2& a2, const T3& a3,
-                  const T4& a4, const T5& a5, const T6& a6,
-                  const T7& a7, const T8& a8);
+  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3,
+    const T4& a4, const T5& a5, const T6& a6, const T7& a7, const T8& a8);
 
   /* See the documentation for compose(const ustring& fmt, const T1& a1).
    * @newin{2,16}
    */
-  template <class T1, class T2, class T3, class T4, class T5,
-            class T6, class T7, class T8, class T9>
-  static inline
-  ustring compose(const ustring& fmt,
-                  const T1& a1, const T2& a2, const T3& a3,
-                  const T4& a4, const T5& a5, const T6& a6,
-                  const T7& a7, const T8& a8, const T9& a9);
+  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8,
+    class T9>
+  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3,
+    const T4& a4, const T5& a5, const T6& a6, const T7& a7, const T8& a8, const T9& a9);
 
   /*! Format the argument to its string representation.
    * Applies the arguments in order to an std::wostringstream and returns the
@@ -764,74 +739,63 @@ public:
    * @newin{2,16}
    */
   template <class T1>
-  static inline
-  ustring format(const T1& a1);
+  static inline ustring format(const T1& a1);
 
   /* See the documentation for format(const T1& a1).
    *
    * @newin{2,16}
    */
   template <class T1, class T2>
-  static inline
-  ustring format(const T1& a1, const T2& a2);
+  static inline ustring format(const T1& a1, const T2& a2);
 
   /* See the documentation for format(const T1& a1).
    *
    * @newin{2,16}
    */
   template <class T1, class T2, class T3>
-  static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3);
+  static inline ustring format(const T1& a1, const T2& a2, const T3& a3);
 
   /* See the documentation for format(const T1& a1).
    *
    * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4>
-  static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4);
+  static inline ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4);
 
   /* See the documentation for format(const T1& a1).
    *
    * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5>
-  static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3,
-                 const T4& a4, const T5& a5);
+  static inline ustring format(
+    const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5);
 
   /* See the documentation for format(const T1& a1).
    *
    * @newin{2,16}
    */
   template <class T1, class T2, class T3, class T4, class T5, class T6>
-  static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3,
-                 const T4& a4, const T5& a5, const T6& a6);
+  static inline ustring format(
+    const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5, const T6& a6);
 
   /* See the documentation for format(const T1& a1).
    *
    * @newin{2,16}
    */
-  template <class T1, class T2, class T3, class T4,
-            class T5, class T6, class T7>
-  static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
-                 const T5& a5, const T6& a6, const T7& a7);
+  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+  static inline ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
+    const T6& a6, const T7& a7);
 
   /* See the documentation for format(const T1& a1).
    *
    * @newin{2,16}
    */
-  template <class T1, class T2, class T3, class T4,
-            class T5, class T6, class T7, class T8>
-  static inline
-  ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
-                 const T5& a5, const T6& a6, const T7& a7, const T8& a8);
-//! @}
+  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+  static inline ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
+    const T6& a6, const T7& a7, const T8& a8);
+  //! @}
 
 private:
-
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 #ifdef GLIBMM_HAVE_STD_ITERATOR_TRAITS
@@ -841,12 +805,15 @@ private:
 #endif
   struct SequenceToString;
 
-  //The Tru64 compiler needs these partial specializations to be declared here,
-  //as well as defined later. That's probably correct. murrayc.
-  template <class In> struct SequenceToString<In, char>;
-  template <class In> struct SequenceToString<In, gunichar>;
+  // The Tru64 compiler needs these partial specializations to be declared here,
+  // as well as defined later. That's probably correct. murrayc.
+  template <class In>
+  struct SequenceToString<In, char>;
+  template <class In>
+  struct SequenceToString<In, gunichar>;
 
-  template <class T> class Stringify;
+  template <class T>
+  class Stringify;
   class FormatStream;
 
   static ustring compose_argv(const ustring& fmt, int argc, const ustring* const* argv);
@@ -856,12 +823,12 @@ private:
   std::string string_;
 };
 
-
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 template <class In, class ValueType>
 struct ustring::SequenceToString
-{};
+{
+};
 
 template <class In>
 struct ustring::SequenceToString<In, char> : public std::string
@@ -890,7 +857,6 @@ struct ustring::SequenceToString<Glib::ustring::const_iterator, gunichar> : publ
 class ustring::FormatStream
 {
 public:
-
   // noncopyable
   FormatStream(const ustring::FormatStream&) = delete;
   FormatStream& operator=(const ustring::FormatStream&) = delete;
@@ -907,18 +873,18 @@ public:
   FormatStream();
   ~FormatStream() noexcept;
 
-  template <class T> inline void stream(const T& value);
+  template <class T>
+  inline void stream(const T& value);
 
   inline void stream(const char* value);
 
-  //This overload exists to avoid the templated stream() being called for non-const char*.
+  // This overload exists to avoid the templated stream() being called for non-const char*.
   inline void stream(char* value);
 
   ustring to_string() const;
 };
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
 
 /** Stream input operator.
  * @relates Glib::ustring
@@ -956,129 +922,126 @@ std::wostream& operator<<(std::wostream& os, const ustring& utf8_string);
 
 /**** Glib::ustring_Iterator<> *********************************************/
 
-template <class T> inline
-ustring_Iterator<T>::ustring_Iterator(T pos)
-:
-  pos_ (pos)
-{}
+template <class T>
+inline ustring_Iterator<T>::ustring_Iterator(T pos) : pos_(pos)
+{
+}
 
-template <class T> inline
-T ustring_Iterator<T>::base() const
+template <class T>
+inline T
+ustring_Iterator<T>::base() const
 {
   return pos_;
 }
 
-template <class T> inline
-ustring_Iterator<T>::ustring_Iterator()
-:
-  pos_ ()
-{}
+template <class T>
+inline ustring_Iterator<T>::ustring_Iterator() : pos_()
+{
+}
 
-template <class T> inline
-ustring_Iterator<T>::ustring_Iterator(const ustring_Iterator<std::string::iterator>& other)
-:
-  pos_ (other.base())
-{}
+template <class T>
+inline ustring_Iterator<T>::ustring_Iterator(const ustring_Iterator<std::string::iterator>& other)
+: pos_(other.base())
+{
+}
 
-template <class T> inline
-typename ustring_Iterator<T>::value_type ustring_Iterator<T>::operator*() const
+template <class T>
+inline typename ustring_Iterator<T>::value_type ustring_Iterator<T>::operator*() const
 {
   return Glib::get_unichar_from_std_iterator(pos_);
 }
 
-template <class T> inline
-ustring_Iterator<T>& ustring_Iterator<T>::operator++()
+template <class T>
+inline ustring_Iterator<T>& ustring_Iterator<T>::operator++()
 {
   pos_ += g_utf8_skip[static_cast<unsigned char>(*pos_)];
   return *this;
 }
 
-template <class T> inline
-const ustring_Iterator<T> ustring_Iterator<T>::operator++(int)
+template <class T>
+inline const ustring_Iterator<T> ustring_Iterator<T>::operator++(int)
 {
-  const ustring_Iterator<T> temp (*this);
+  const ustring_Iterator<T> temp(*this);
   this->operator++();
   return temp;
 }
 
-template <class T> inline
-ustring_Iterator<T>& ustring_Iterator<T>::operator--()
+template <class T>
+inline ustring_Iterator<T>& ustring_Iterator<T>::operator--()
 {
   while ((static_cast<unsigned char>(*--pos_) & 0xC0u) == 0x80)
     ;
   return *this;
 }
 
-template <class T> inline
-const ustring_Iterator<T> ustring_Iterator<T>::operator--(int)
+template <class T>
+inline const ustring_Iterator<T> ustring_Iterator<T>::operator--(int)
 {
-  const ustring_Iterator<T> temp (*this);
+  const ustring_Iterator<T> temp(*this);
   this->operator--();
   return temp;
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
-
 /** @relates Glib::ustring_Iterator */
-inline
-bool operator==(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
+inline bool
+operator==(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() == rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-inline
-bool operator!=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
+inline bool
+operator!=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() != rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-inline
-bool operator<(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
+inline bool
+operator<(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() < rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-inline
-bool operator>(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
+inline bool
+operator>(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() > rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-inline
-bool operator<=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
+inline bool
+operator<=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() <= rhs.base());
 }
 
 /** @relates Glib::ustring_Iterator */
-inline
-bool operator>=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
+inline bool
+operator>=(const Glib::ustring::const_iterator& lhs, const Glib::ustring::const_iterator& rhs)
 {
   return (lhs.base() >= rhs.base());
 }
-
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 /**** Glib::ustring::SequenceToString **************************************/
 
 template <class In>
-ustring::SequenceToString<In,char>::SequenceToString(In pbegin, In pend)
-:
-  std::string(pbegin, pend)
-{}
+ustring::SequenceToString<In, char>::SequenceToString(In pbegin, In pend)
+: std::string(pbegin, pend)
+{
+}
 
 template <class In>
-ustring::SequenceToString<In,gunichar>::SequenceToString(In pbegin, In pend)
+ustring::SequenceToString<In, gunichar>::SequenceToString(In pbegin, In pend)
 {
   char utf8_buf[6]; // stores a single UTF-8 character
 
-  for(; pbegin != pend; ++pbegin)
+  for (; pbegin != pend; ++pbegin)
   {
     const std::string::size_type utf8_len = g_unichar_to_utf8(*pbegin, utf8_buf);
     this->append(utf8_buf, utf8_len);
@@ -1087,20 +1050,21 @@ ustring::SequenceToString<In,gunichar>::SequenceToString(In pbegin, In pend)
 
 /**** Glib::ustring::FormatStream ******************************************/
 
-template <class T> inline
-void ustring::FormatStream::stream(const T& value)
+template <class T>
+inline void
+ustring::FormatStream::stream(const T& value)
 {
   stream_ << value;
 }
 
-inline
-void ustring::FormatStream::stream(const char* value)
+inline void
+ustring::FormatStream::stream(const char* value)
 {
   stream_ << ustring(value);
 }
 
-inline
-void ustring::FormatStream::stream(char* value)
+inline void
+ustring::FormatStream::stream(char* value)
 {
   stream_ << ustring(value);
 }
@@ -1108,65 +1072,66 @@ void ustring::FormatStream::stream(char* value)
 /**** Glib::ustring ********************************************************/
 
 template <class In>
-ustring::ustring(In pbegin, In pend)
-:
-  string_ (Glib::ustring::SequenceToString<In>(pbegin, pend))
-{}
+ustring::ustring(In pbegin, In pend) : string_(Glib::ustring::SequenceToString<In>(pbegin, pend))
+{
+}
 
 template <class In>
-ustring& ustring::assign(In pbegin, In pend)
+ustring&
+ustring::assign(In pbegin, In pend)
 {
-  Glib::ustring::SequenceToString<In> temp_string (pbegin, pend);
+  Glib::ustring::SequenceToString<In> temp_string(pbegin, pend);
   string_.swap(temp_string); // constant-time operation
   return *this;
 }
 
 template <class In>
-ustring& ustring::append(In pbegin, In pend)
+ustring&
+ustring::append(In pbegin, In pend)
 {
   string_.append(Glib::ustring::SequenceToString<In>(pbegin, pend));
   return *this;
 }
 
 template <class In>
-void ustring::insert(ustring::iterator p, In pbegin, In pend)
+void
+ustring::insert(ustring::iterator p, In pbegin, In pend)
 {
   string_.insert(p.base(), Glib::ustring::SequenceToString<In>(pbegin, pend));
 }
 
 template <class In>
-ustring& ustring::replace(ustring::iterator pbegin, ustring::iterator pend, In pbegin2, In pend2)
+ustring&
+ustring::replace(ustring::iterator pbegin, ustring::iterator pend, In pbegin2, In pend2)
 {
-  string_.replace(
-      pbegin.base(), pend.base(),
-      Glib::ustring::SequenceToString<In>(pbegin2, pend2));
+  string_.replace(pbegin.base(), pend.base(), Glib::ustring::SequenceToString<In>(pbegin2, pend2));
   return *this;
 }
 
 // The ustring methods substr() and operator std::string() are inline,
 // so that the compiler has a fair chance to optimize the copy ctor away.
 
-inline
-ustring ustring::substr(ustring::size_type i, ustring::size_type n) const
+inline ustring
+ustring::substr(ustring::size_type i, ustring::size_type n) const
 {
   return ustring(*this, i, n);
 }
 
-inline
-ustring::operator std::string() const
+inline ustring::operator std::string() const
 {
   return string_;
 }
 
-inline
-const std::string& ustring::raw() const
+inline const std::string&
+ustring::raw() const
 {
   return string_;
 }
 
 template <class T1>
 inline // static
-ustring ustring::format(const T1& a1)
+  ustring
+  ustring::format(const T1& a1)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1175,7 +1140,8 @@ ustring ustring::format(const T1& a1)
 
 template <class T1, class T2>
 inline // static
-ustring ustring::format(const T1& a1, const T2& a2)
+  ustring
+  ustring::format(const T1& a1, const T2& a2)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1185,7 +1151,8 @@ ustring ustring::format(const T1& a1, const T2& a2)
 
 template <class T1, class T2, class T3>
 inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3)
+  ustring
+  ustring::format(const T1& a1, const T2& a2, const T3& a3)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1196,7 +1163,8 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3)
 
 template <class T1, class T2, class T3, class T4>
 inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4)
+  ustring
+  ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1208,8 +1176,8 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4)
 
 template <class T1, class T2, class T3, class T4, class T5>
 inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
-                        const T4& a4, const T5& a5)
+  ustring
+  ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1222,8 +1190,9 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
 
 template <class T1, class T2, class T3, class T4, class T5, class T6>
 inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
-                        const T4& a4, const T5& a5, const T6& a6)
+  ustring
+  ustring::format(
+    const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5, const T6& a6)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1235,11 +1204,11 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3,
   return buf.to_string();
 }
 
-template <class T1, class T2, class T3, class T4,
-          class T5, class T6, class T7>
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
-                        const T5& a5, const T6& a6, const T7& a7)
+  ustring
+  ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
+    const T6& a6, const T7& a7)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1252,11 +1221,11 @@ ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
   return buf.to_string();
 }
 
-template <class T1, class T2, class T3, class T4,
-          class T5, class T6, class T7, class T8>
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline // static
-ustring ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4,
-                        const T5& a5, const T6& a6, const T7& a7, const T8& a8)
+  ustring
+  ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
+    const T6& a6, const T7& a7, const T8& a8)
 {
   ustring::FormatStream buf;
   buf.stream(a1);
@@ -1279,9 +1248,9 @@ private:
   ustring string_;
 
 public:
-  explicit inline Stringify(const T& arg) : string_ (ustring::format(arg)) {}
+  explicit inline Stringify(const T& arg) : string_(ustring::format(arg)) {}
 
-  //TODO: Why is this here? See the template specialization:
+  // TODO: Why is this here? See the template specialization:
   explicit inline Stringify(const char* arg) : string_(arg) {}
 
   // noncopyable
@@ -1368,64 +1337,67 @@ public:
 
 template <class T1>
 inline // static
-ustring ustring::compose(const ustring& fmt)
+  ustring
+  ustring::compose(const ustring& fmt)
 {
   return ustring::compose_argv(fmt, 0, nullptr);
 }
 
 template <class T1>
 inline // static
-ustring ustring::compose(const ustring& fmt, const T1& a1)
+  ustring
+  ustring::compose(const ustring& fmt, const T1& a1)
 {
   const ustring::Stringify<T1> s1(a1);
 
-  const ustring *const argv[] = { s1.ptr() };
+  const ustring* const argv[] = { s1.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2>
 inline // static
-ustring ustring::compose(const ustring& fmt, const T1& a1, const T2& a2)
+  ustring
+  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2)
 {
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
 
-  const ustring *const argv[] = { s1.ptr(), s2.ptr() };
+  const ustring* const argv[] = { s1.ptr(), s2.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3>
 inline // static
-ustring ustring::compose(const ustring& fmt,
-                         const T1& a1, const T2& a2, const T3& a3)
+  ustring
+  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3)
 {
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
   const ustring::Stringify<T3> s3(a3);
 
-  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr() };
+  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4>
 inline // static
-ustring ustring::compose(const ustring& fmt,
-                         const T1& a1, const T2& a2, const T3& a3, const T4& a4)
+  ustring
+  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4)
 {
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
   const ustring::Stringify<T3> s3(a3);
   const ustring::Stringify<T4> s4(a4);
 
-  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr() };
+  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4, class T5>
 inline // static
-ustring ustring::compose(const ustring& fmt,
-                         const T1& a1, const T2& a2, const T3& a3,
-                         const T4& a4, const T5& a5)
+  ustring
+  ustring::compose(
+    const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5)
 {
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
@@ -1433,15 +1405,15 @@ ustring ustring::compose(const ustring& fmt,
   const ustring::Stringify<T4> s4(a4);
   const ustring::Stringify<T5> s5(a5);
 
-  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr() };
+  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6>
 inline // static
-ustring ustring::compose(const ustring& fmt,
-                         const T1& a1, const T2& a2, const T3& a3,
-                         const T4& a4, const T5& a5, const T6& a6)
+  ustring
+  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4,
+    const T5& a5, const T6& a6)
 {
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
@@ -1450,16 +1422,15 @@ ustring ustring::compose(const ustring& fmt,
   const ustring::Stringify<T5> s5(a5);
   const ustring::Stringify<T6> s6(a6);
 
-  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
-                                  s5.ptr(), s6.ptr() };
+  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
 inline // static
-ustring ustring::compose(const ustring& fmt,
-                         const T1& a1, const T2& a2, const T3& a3,
-                         const T4& a4, const T5& a5, const T6& a6, const T7& a7)
+  ustring
+  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4,
+    const T5& a5, const T6& a6, const T7& a7)
 {
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
@@ -1469,18 +1440,16 @@ ustring ustring::compose(const ustring& fmt,
   const ustring::Stringify<T6> s6(a6);
   const ustring::Stringify<T7> s7(a7);
 
-  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
-                                  s5.ptr(), s6.ptr(), s7.ptr() };
+  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(),
+    s7.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
-template <class T1, class T2, class T3, class T4,
-          class T5, class T6, class T7, class T8>
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
 inline // static
-ustring ustring::compose(const ustring& fmt,
-                         const T1& a1, const T2& a2, const T3& a3,
-                         const T4& a4, const T5& a5, const T6& a6,
-                         const T7& a7, const T8& a8)
+  ustring
+  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4,
+    const T5& a5, const T6& a6, const T7& a7, const T8& a8)
 {
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
@@ -1491,18 +1460,16 @@ ustring ustring::compose(const ustring& fmt,
   const ustring::Stringify<T7> s7(a7);
   const ustring::Stringify<T8> s8(a8);
 
-  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
-                                  s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr() };
+  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(),
+    s7.ptr(), s8.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
-template <class T1, class T2, class T3, class T4, class T5,
-          class T6, class T7, class T8, class T9>
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 inline // static
-ustring ustring::compose(const ustring& fmt,
-                         const T1& a1, const T2& a2, const T3& a3,
-                         const T4& a4, const T5& a5, const T6& a6,
-                         const T7& a7, const T8& a8, const T9& a9)
+  ustring
+  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4,
+    const T5& a5, const T6& a6, const T7& a7, const T8& a8, const T9& a9)
 {
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
@@ -1514,100 +1481,147 @@ ustring ustring::compose(const ustring& fmt,
   const ustring::Stringify<T8> s8(a8);
   const ustring::Stringify<T9> s9(a9);
 
-  const ustring *const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(),
-                                  s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr(), s9.ptr() };
+  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(),
+    s7.ptr(), s8.ptr(), s9.ptr() };
   return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
-
 /** @relates Glib::ustring */
-inline
-void swap(ustring& lhs, ustring& rhs)
+inline void
+swap(ustring& lhs, ustring& rhs)
 {
   lhs.swap(rhs);
 }
 
-
 /**** Glib::ustring -- comparison operators ********************************/
 
 /** @relates Glib::ustring */
-inline bool operator==(const ustring& lhs, const ustring& rhs)
-  { return (lhs.compare(rhs) == 0); }
+inline bool
+operator==(const ustring& lhs, const ustring& rhs)
+{
+  return (lhs.compare(rhs) == 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator==(const ustring& lhs, const char* rhs)
-  { return (lhs.compare(rhs) == 0); }
+inline bool
+operator==(const ustring& lhs, const char* rhs)
+{
+  return (lhs.compare(rhs) == 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator==(const char* lhs, const ustring& rhs)
-  { return (rhs.compare(lhs) == 0); }
-
-
-/** @relates Glib::ustring */
-inline bool operator!=(const ustring& lhs, const ustring& rhs)
-  { return (lhs.compare(rhs) != 0); }
+inline bool
+operator==(const char* lhs, const ustring& rhs)
+{
+  return (rhs.compare(lhs) == 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator!=(const ustring& lhs, const char* rhs)
-  { return (lhs.compare(rhs) != 0); }
+inline bool
+operator!=(const ustring& lhs, const ustring& rhs)
+{
+  return (lhs.compare(rhs) != 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator!=(const char* lhs, const ustring& rhs)
-  { return (rhs.compare(lhs) != 0); }
-
-
-/** @relates Glib::ustring */
-inline bool operator<(const ustring& lhs, const ustring& rhs)
-  { return (lhs.compare(rhs) < 0); }
+inline bool
+operator!=(const ustring& lhs, const char* rhs)
+{
+  return (lhs.compare(rhs) != 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator<(const ustring& lhs, const char* rhs)
-  { return (lhs.compare(rhs) < 0); }
+inline bool
+operator!=(const char* lhs, const ustring& rhs)
+{
+  return (rhs.compare(lhs) != 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator<(const char* lhs, const ustring& rhs)
-  { return (rhs.compare(lhs) > 0); }
-
-
-/** @relates Glib::ustring */
-inline bool operator>(const ustring& lhs, const ustring& rhs)
-  { return (lhs.compare(rhs) > 0); }
+inline bool
+operator<(const ustring& lhs, const ustring& rhs)
+{
+  return (lhs.compare(rhs) < 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator>(const ustring& lhs, const char* rhs)
-  { return (lhs.compare(rhs) > 0); }
+inline bool
+operator<(const ustring& lhs, const char* rhs)
+{
+  return (lhs.compare(rhs) < 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator>(const char* lhs, const ustring& rhs)
-  { return (rhs.compare(lhs) < 0); }
-
-
-/** @relates Glib::ustring */
-inline bool operator<=(const ustring& lhs, const ustring& rhs)
-  { return (lhs.compare(rhs) <= 0); }
+inline bool
+operator<(const char* lhs, const ustring& rhs)
+{
+  return (rhs.compare(lhs) > 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator<=(const ustring& lhs, const char* rhs)
-  { return (lhs.compare(rhs) <= 0); }
+inline bool
+operator>(const ustring& lhs, const ustring& rhs)
+{
+  return (lhs.compare(rhs) > 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator<=(const char* lhs, const ustring& rhs)
-  { return (rhs.compare(lhs) >= 0); }
-
-
-/** @relates Glib::ustring */
-inline bool operator>=(const ustring& lhs, const ustring& rhs)
-  { return (lhs.compare(rhs) >= 0); }
+inline bool
+operator>(const ustring& lhs, const char* rhs)
+{
+  return (lhs.compare(rhs) > 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator>=(const ustring& lhs, const char* rhs)
-  { return (lhs.compare(rhs) >= 0); }
+inline bool
+operator>(const char* lhs, const ustring& rhs)
+{
+  return (rhs.compare(lhs) < 0);
+}
 
 /** @relates Glib::ustring */
-inline bool operator>=(const char* lhs, const ustring& rhs)
-  { return (rhs.compare(lhs) <= 0); }
+inline bool
+operator<=(const ustring& lhs, const ustring& rhs)
+{
+  return (lhs.compare(rhs) <= 0);
+}
+
+/** @relates Glib::ustring */
+inline bool
+operator<=(const ustring& lhs, const char* rhs)
+{
+  return (lhs.compare(rhs) <= 0);
+}
+
+/** @relates Glib::ustring */
+inline bool
+operator<=(const char* lhs, const ustring& rhs)
+{
+  return (rhs.compare(lhs) >= 0);
+}
+
+/** @relates Glib::ustring */
+inline bool
+operator>=(const ustring& lhs, const ustring& rhs)
+{
+  return (lhs.compare(rhs) >= 0);
+}
+
+/** @relates Glib::ustring */
+inline bool
+operator>=(const ustring& lhs, const char* rhs)
+{
+  return (lhs.compare(rhs) >= 0);
+}
+
+/** @relates Glib::ustring */
+inline bool
+operator>=(const char* lhs, const ustring& rhs)
+{
+  return (rhs.compare(lhs) <= 0);
+}
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // Don't allow implicit conversion of integer 0 to nullptr in the relational operators.
@@ -1631,7 +1645,8 @@ bool operator>=(int lhs, const ustring& rhs) = delete;
 /**** Glib::ustring -- concatenation operators *****************************/
 
 /** @relates Glib::ustring */
-inline ustring operator+(const ustring& lhs, const ustring& rhs)
+inline ustring
+operator+(const ustring& lhs, const ustring& rhs)
 {
   ustring temp(lhs);
   temp += rhs;
@@ -1639,7 +1654,8 @@ inline ustring operator+(const ustring& lhs, const ustring& rhs)
 }
 
 /** @relates Glib::ustring */
-inline ustring operator+(const ustring& lhs, const char* rhs)
+inline ustring
+operator+(const ustring& lhs, const char* rhs)
 {
   ustring temp(lhs);
   temp += rhs;
@@ -1647,7 +1663,8 @@ inline ustring operator+(const ustring& lhs, const char* rhs)
 }
 
 /** @relates Glib::ustring */
-inline ustring operator+(const char* lhs, const ustring& rhs)
+inline ustring
+operator+(const char* lhs, const ustring& rhs)
 {
   ustring temp(lhs);
   temp += rhs;
@@ -1655,7 +1672,8 @@ inline ustring operator+(const char* lhs, const ustring& rhs)
 }
 
 /** @relates Glib::ustring */
-inline ustring operator+(const ustring& lhs, gunichar rhs)
+inline ustring
+operator+(const ustring& lhs, gunichar rhs)
 {
   ustring temp(lhs);
   temp += rhs;
@@ -1663,7 +1681,8 @@ inline ustring operator+(const ustring& lhs, gunichar rhs)
 }
 
 /** @relates Glib::ustring */
-inline ustring operator+(gunichar lhs, const ustring& rhs)
+inline ustring
+operator+(gunichar lhs, const ustring& rhs)
 {
   ustring temp(1, lhs);
   temp += rhs;
@@ -1671,7 +1690,8 @@ inline ustring operator+(gunichar lhs, const ustring& rhs)
 }
 
 /** @relates Glib::ustring */
-inline ustring operator+(const ustring& lhs, char rhs)
+inline ustring
+operator+(const ustring& lhs, char rhs)
 {
   ustring temp(lhs);
   temp += rhs;
@@ -1679,7 +1699,8 @@ inline ustring operator+(const ustring& lhs, char rhs)
 }
 
 /** @relates Glib::ustring */
-inline ustring operator+(char lhs, const ustring& rhs)
+inline ustring
+operator+(char lhs, const ustring& rhs)
 {
   ustring temp(1, lhs);
   temp += rhs;
@@ -1687,6 +1708,5 @@ inline ustring operator+(char lhs, const ustring& rhs)
 }
 
 } // namespace Glib
-
 
 #endif /* _GLIBMM_USTRING_H */

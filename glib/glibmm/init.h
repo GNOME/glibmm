@@ -33,7 +33,4 @@ void init();
 
 } // namespace Glib
 
-
-
 #endif /* _GLIBMM_INIT_H */
-

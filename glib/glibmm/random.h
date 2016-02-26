@@ -25,8 +25,9 @@
 
 #include <glib.h>
 
-extern "C" { typedef struct _GRand GRand; }
-
+extern "C" {
+typedef struct _GRand GRand;
+}
 
 namespace Glib
 {
@@ -52,12 +53,12 @@ public:
   bool get_bool();
 
   guint32 get_int();
-  gint32  get_int_range(gint32 begin, gint32 end);
+  gint32 get_int_range(gint32 begin, gint32 end);
 
   double get_double();
   double get_double_range(double begin, double end);
 
-  GRand*       gobj()       { return gobject_; }
+  GRand* gobj() { return gobject_; }
   const GRand* gobj() const { return gobject_; }
 
 private:
@@ -68,6 +69,4 @@ private:
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_RANDOM_H */
-

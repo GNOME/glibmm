@@ -42,19 +42,19 @@ public:
    * because the C/C++ standard explicitly specifies that all _static_ data
    * is zero-initialized at program start.
    */
-  //Class();
+  // Class();
   //~Class() noexcept;
 
-  //static void class_init_function(BaseClassType *p);
-  //static void object_init_function(BaseObjectType *o);
-  //GType get_type() = 0; //Creates the GType when this is first called.
+  // static void class_init_function(BaseClassType *p);
+  // static void object_init_function(BaseObjectType *o);
+  // GType get_type() = 0; //Creates the GType when this is first called.
 
   // Hook for translating API
-  //static Glib::Object* wrap_new(GObject*);
+  // static Glib::Object* wrap_new(GObject*);
 
   inline GType get_type() const;
 
-  //TODO: Remove this method at the next ABI/API break.
+  // TODO: Remove this method at the next ABI/API break.
   /** Register a static custom GType, derived from the parent of this class's type.
    * The parent type of the registered custom type is the same C class as the parent
    * of the get_type() type. If a type with the specified name is already registered,
@@ -79,19 +79,20 @@ public:
    * @param interface_classes Interfaces that the custom type implements.
    * @return The registered type.
    */
-  GType clone_custom_type(const char* custom_type_name,
-    const interface_class_vector_type& interface_classes) const;
+  GType clone_custom_type(
+    const char* custom_type_name, const interface_class_vector_type& interface_classes) const;
 
 protected:
-  GType           gtype_;
-  GClassInitFunc  class_init_func_;
+  GType gtype_;
+  GClassInitFunc class_init_func_;
 
   /** Register a GType, derived from the @a base_type.
    */
   void register_derived_type(GType base_type);
 
   /** Register a GType, derived from the @a base_type.
-   * @param module If this is not 0 then g_type_module_register_type() will be used. Otherwise g_type_register_static() will be used.
+   * @param module If this is not 0 then g_type_module_register_type() will be used. Otherwise
+   * g_type_register_static() will be used.
    */
   void register_derived_type(GType base_type, GTypeModule* module);
 
@@ -108,8 +109,8 @@ public:
 #endif
 };
 
-inline
-GType Class::get_type() const
+inline GType
+Class::get_type() const
 {
   return gtype_;
 }
@@ -119,4 +120,3 @@ GType Class::get_type() const
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 #endif /* _GLIBMM_CLASS_H */
-

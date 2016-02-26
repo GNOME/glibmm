@@ -29,7 +29,8 @@ namespace Glib
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
 
-/** @deprecated This whole class was deprecated in glibmm 2.2 - See the Glib::IOChannel documentation for an explanation.
+/** @deprecated This whole class was deprecated in glibmm 2.2 - See the Glib::IOChannel
+ * documentation for an explanation.
  */
 class StreamIOChannel : public Glib::IOChannel
 {

@@ -26,7 +26,7 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct _GObject GObject;
 typedef struct _GClosure GClosure;
-#endif //DOXYGEN_SHOULD_SKIP_THIS
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 namespace Glib
 {
@@ -40,7 +40,6 @@ namespace Glib
 class SignalProxyConnectionNode
 {
 public:
-
   /** @param slot The signal handler for the glib signal.
    *  @param gobject The GObject that might emit this glib signal
    */
@@ -72,7 +71,7 @@ protected:
   GObject* object_;
 };
 
-#endif //DOXYGEN_SHOULD_SKIP_THIS
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 } /* namespace Glib */
 

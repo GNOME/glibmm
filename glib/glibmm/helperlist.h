@@ -20,10 +20,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-//This is not hidden by GLIBMM_DISABLE_DEPRECATED
-//because gtkmm-2.24 still uses this type in its public API.
-//Note that gtkmm-2.24 itself is completely deprecated, so we really
-//can remove this whole class some time soon.
+// This is not hidden by GLIBMM_DISABLE_DEPRECATED
+// because gtkmm-2.24 still uses this type in its public API.
+// Note that gtkmm-2.24 itself is completely deprecated, so we really
+// can remove this whole class some time soon.
 //#ifndef GLIBMM_DISABLE_DEPRECATED
 
 #include <glibmm/containers.h>
@@ -37,20 +37,19 @@ namespace Glib
  * @deprecated This class should no longer be necessary. It has not been used
  * by glibmm or gtkmm since gtkmm-2.4.
  */
-template< typename T_Child, typename T_CppElement, typename T_Iterator >
+template <typename T_Child, typename T_CppElement, typename T_Iterator>
 class HelperList
 {
 public:
-  HelperList()
-  : gparent_(nullptr)
-  {}
+  HelperList() : gparent_(nullptr) {}
 
-  HelperList(GObject* gp) //We use gp instead of gparent because that can cause warnings about a shadowed member.
-  : gparent_(gp)
-  {}
+  HelperList(GObject*
+      gp) // We use gp instead of gparent because that can cause warnings about a shadowed member.
+    : gparent_(gp)
+  {
+  }
 
-  virtual ~HelperList() noexcept
-  {}
+  virtual ~HelperList() noexcept {}
 
   typedef T_Child value_type;
   typedef value_type& reference;
@@ -63,115 +62,91 @@ public:
 
   typedef T_CppElement element_type;
 
-  typedef std::size_t difference_type; //TODO Why not std::ptrdiff_t?
+  typedef std::size_t difference_type; // TODO Why not std::ptrdiff_t?
   typedef std::size_t size_type;
 
-  //These are implemented differently for each Helper List.
+  // These are implemented differently for each Helper List.
   virtual iterator erase(iterator) = 0;
 
   virtual void erase(iterator start, iterator stop)
   {
-    while(start != stop)
-      start = erase(start); //Implemented in derived class.
+    while (start != stop)
+      start = erase(start); // Implemented in derived class.
   }
 
   virtual void remove(const_reference) = 0;
 
-  size_type size() const
-  {
-    return g_list_length(glist());
-  }
+  size_type size() const { return g_list_length(glist()); }
 
   inline size_type max_size() { return size_type(-1); }
   inline bool empty() { return glist() == nullptr; }
 
-  inline iterator begin()
-    {return begin_();}
-  inline iterator end()
-    {return end_();}
+  inline iterator begin() { return begin_(); }
+  inline iterator end() { return end_(); }
 
-  inline const_iterator begin() const
-    { return const_iterator(begin_()); }
-  inline const_iterator end() const
-    { return const_iterator(end_()); }
+  inline const_iterator begin() const { return const_iterator(begin_()); }
+  inline const_iterator end() const { return const_iterator(end_()); }
 
-  inline reverse_iterator rbegin()
-    { return reverse_iterator(end_()); }
-  inline reverse_iterator rend()
-    { return reverse_iterator(begin_()); }
+  inline reverse_iterator rbegin() { return reverse_iterator(end_()); }
+  inline reverse_iterator rend() { return reverse_iterator(begin_()); }
 
   inline const_reverse_iterator rbegin() const
-    { return const_reverse_iterator(reverse_iterator(end_())); }
+  {
+    return const_reverse_iterator(reverse_iterator(end_()));
+  }
   inline const_reverse_iterator rend() const
-    { return const_reverse_iterator(reverse_iterator(begin_())); }
-
-  reference front() const
   {
-    return *begin();
+    return const_reverse_iterator(reverse_iterator(begin_()));
   }
 
-  reference back() const
-  {
-    return *(--end());
-  }
+  reference front() const { return *begin(); }
+
+  reference back() const { return *(--end()); }
 
   reference operator[](size_type l) const
   {
     size_type j = 0;
     iterator i;
-    for(i = begin(), j = 0; i != end() && j < l; ++i, ++j)
+    for (i = begin(), j = 0; i != end() && j < l; ++i, ++j)
       ;
     return (*i);
   }
 
-//  iterator find(const_reference w)
-//  {
-//    iterator i = begin();
-//    for(i = begin(); i != end() && (*i != w); i++);
-//    return i;
-//  }
-//
-//  iterator find(Widget& w)
-//  {
-//    iterator i;
-//    for (i = begin(); i != end() && ((*i)->$1() != &w); i++);
-//    return i;
-//  }
+  //  iterator find(const_reference w)
+  //  {
+  //    iterator i = begin();
+  //    for(i = begin(); i != end() && (*i != w); i++);
+  //    return i;
+  //  }
+  //
+  //  iterator find(Widget& w)
+  //  {
+  //    iterator i;
+  //    for (i = begin(); i != end() && ((*i)->$1() != &w); i++);
+  //    return i;
+  //  }
 
-  //Derived classes might choose to reimplement these as public:
-  inline void pop_front()
-    { erase(begin()); }
-  inline void pop_back()
-    { erase(--end()); }
+  // Derived classes might choose to reimplement these as public:
+  inline void pop_front() { erase(begin()); }
+  inline void pop_back() { erase(--end()); }
 
-  void clear()
-    { erase(begin(), end()); }
+  void clear() { erase(begin(), end()); }
 
-  GObject* gparent()
-    { return gparent_; };
-  const GObject* gparent() const
-    { return gparent_; };
+  GObject* gparent() { return gparent_; };
+  const GObject* gparent() const { return gparent_; };
 
 protected:
-  virtual GList*& glist() const = 0;      // front of list
+  virtual GList*& glist() const = 0; // front of list
 
-  iterator begin_() const
-  {
-    return iterator(glist(), glist());
-  }
+  iterator begin_() const { return iterator(glist(), glist()); }
 
-  iterator end_() const
-  {
-    return iterator(glist(), (GList*)nullptr);
-  }
+  iterator end_() const { return iterator(glist(), (GList*)nullptr); }
 
   GObject* gparent_;
 };
-
 
 } /* namespace Glib */
 
 //#endif //GLIBMM_DISABLE_DEPRECATED
 
 #endif /* _GLIBMM_HELPERLIST_H */
-

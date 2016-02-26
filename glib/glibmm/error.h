@@ -23,8 +23,6 @@
 #include <glibmm/exception.h>
 #include <glib.h>
 
-
-
 namespace Glib
 {
 
@@ -53,7 +51,7 @@ public:
 
   void propagate(GError** dest);
 
-  typedef void (* ThrowFunc) (GError*);
+  typedef void (*ThrowFunc)(GError*);
 
   static void register_init();
   static void register_cleanup();
@@ -69,6 +67,4 @@ protected:
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_ERROR_H */
-

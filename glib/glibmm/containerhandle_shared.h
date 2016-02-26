@@ -50,10 +50,9 @@ namespace Glib
 enum OwnershipType
 {
   OWNERSHIP_NONE = 0, /*!< Do not release anything */
-  OWNERSHIP_SHALLOW, /*!< Release the list, but not its elements, when the container is deleted */
-  OWNERSHIP_DEEP /*!< Release the list, and its elements, when the container is deleted. */
+  OWNERSHIP_SHALLOW,  /*!< Release the list, but not its elements, when the container is deleted */
+  OWNERSHIP_DEEP      /*!< Release the list, and its elements, when the container is deleted. */
 };
-
 
 /** Utility class holding an iterator sequence.
  * @ingroup ContHandles
@@ -69,12 +68,11 @@ private:
   Iterator pend_;
 
 public:
-  Sequence(Iterator pbegin, Iterator pend)
-    : pbegin_(pbegin), pend_(pend) {}
+  Sequence(Iterator pbegin, Iterator pend) : pbegin_(pbegin), pend_(pend) {}
 
   Iterator begin() const { return pbegin_; }
-  Iterator end()   const { return pend_;   }
-  std::size_t size()  const { return std::distance(pbegin_, pend_); }
+  Iterator end() const { return pend_; }
+  std::size_t size() const { return std::distance(pbegin_, pend_); }
 };
 
 /** Helper function to create a Glib::Sequence<> object, which
@@ -86,12 +84,12 @@ public:
  * combo.set_popdown_strings(Glib::sequence(foo_begin, foo_end));
  * @endcode
  */
-template <class Iterator> inline
-Sequence<Iterator> sequence(Iterator pbegin, Iterator pend)
+template <class Iterator>
+inline Sequence<Iterator>
+sequence(Iterator pbegin, Iterator pend)
 {
   return Sequence<Iterator>(pbegin, pend);
 }
-
 
 namespace Container_Helpers
 {
@@ -113,15 +111,15 @@ struct TypeTraits
   typedef T CType;
   typedef T CTypeNonConst;
 
-  static CType   to_c_type      (const CppType& item) { return item; }
-  static CppType to_cpp_type    (const CType&   item) { return item; }
-  static void    release_c_type (const CType&)        {}
+  static CType to_c_type(const CppType& item) { return item; }
+  static CppType to_cpp_type(const CType& item) { return item; }
+  static void release_c_type(const CType&) {}
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS /* hide the specializations */
 
-//For some (probably, more spec-compliant) compilers, these specializations must
-//be next to the objects that they use.
+// For some (probably, more spec-compliant) compilers, these specializations must
+// be next to the objects that they use.
 #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 /** Partial specialization for pointers to GtkObject instances.
@@ -130,30 +128,30 @@ struct TypeTraits
 template <class T>
 struct TypeTraits<T*>
 {
-  typedef T *                          CppType;
-  typedef typename T::BaseObjectType * CType;
-  typedef typename T::BaseObjectType * CTypeNonConst;
+  typedef T* CppType;
+  typedef typename T::BaseObjectType* CType;
+  typedef typename T::BaseObjectType* CTypeNonConst;
 
-  static CType   to_c_type      (CppType ptr) { return Glib::unwrap(ptr);      }
-  static CType   to_c_type      (CType   ptr) { return ptr;                    }
-  static CppType to_cpp_type    (CType   ptr)
+  static CType to_c_type(CppType ptr) { return Glib::unwrap(ptr); }
+  static CType to_c_type(CType ptr) { return ptr; }
+  static CppType to_cpp_type(CType ptr)
   {
-    //We copy/paste the widget wrap() implementation here,
-    //because we can not use a specific Glib::wrap(T_Impl) overload here,
-    //because that would be "dependent", and g++ 3.4 does not allow that.
-    //The specific Glib::wrap() overloads don't do anything special anyway.
+    // We copy/paste the widget wrap() implementation here,
+    // because we can not use a specific Glib::wrap(T_Impl) overload here,
+    // because that would be "dependent", and g++ 3.4 does not allow that.
+    // The specific Glib::wrap() overloads don't do anything special anyway.
     GObject* cobj = (GObject*)ptr;
     return dynamic_cast<CppType>(Glib::wrap_auto(cobj, false /* take_copy */));
   }
 
-  static void    release_c_type (CType   ptr)
+  static void release_c_type(CType ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(nullptr, ptr);
     g_object_unref(ptr);
   }
 };
 
-//This confuse the SUN Forte compiler, so we ifdef it out:
+// This confuse the SUN Forte compiler, so we ifdef it out:
 #ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for pointers to const GtkObject instances.
@@ -162,64 +160,64 @@ struct TypeTraits<T*>
 template <class T>
 struct TypeTraits<const T*>
 {
-  typedef const T *                          CppType;
-  typedef const typename T::BaseObjectType * CType;
-  typedef typename T::BaseObjectType *       CTypeNonConst;
+  typedef const T* CppType;
+  typedef const typename T::BaseObjectType* CType;
+  typedef typename T::BaseObjectType* CTypeNonConst;
 
-  static CType   to_c_type      (CppType ptr) { return Glib::unwrap(ptr);      }
-  static CType   to_c_type      (CType   ptr) { return ptr;                    }
-  static CppType to_cpp_type    (CType   ptr)
+  static CType to_c_type(CppType ptr) { return Glib::unwrap(ptr); }
+  static CType to_c_type(CType ptr) { return ptr; }
+  static CppType to_cpp_type(CType ptr)
   {
-     //We copy/paste the widget wrap() implementation here,
-     //because we can not use a specific Glib::wrap(T_Impl) overload here,
-     //because that would be "dependent", and g++ 3.4 does not allow that.
-     //The specific Glib::wrap() overloads don't do anything special anyway.
-     GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
-     return dynamic_cast<CppType>(Glib::wrap_auto(cobj, false /* take_copy */));
+    // We copy/paste the widget wrap() implementation here,
+    // because we can not use a specific Glib::wrap(T_Impl) overload here,
+    // because that would be "dependent", and g++ 3.4 does not allow that.
+    // The specific Glib::wrap() overloads don't do anything special anyway.
+    GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
+    return dynamic_cast<CppType>(Glib::wrap_auto(cobj, false /* take_copy */));
   }
 
-  static void    release_c_type (CType   ptr)
+  static void release_c_type(CType ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(nullptr, ptr);
     g_object_unref(const_cast<CTypeNonConst>(ptr));
   }
 };
-#endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+#endif // GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for pointers to GObject instances.
  * @ingroup ContHelpers
  * The C++ type is always a Glib::RefPtr<>.
  */
 template <class T>
-struct TypeTraits< Glib::RefPtr<T> >
+struct TypeTraits<Glib::RefPtr<T>>
 {
-  typedef Glib::RefPtr<T>              CppType;
-  typedef typename T::BaseObjectType * CType;
-  typedef typename T::BaseObjectType * CTypeNonConst;
+  typedef Glib::RefPtr<T> CppType;
+  typedef typename T::BaseObjectType* CType;
+  typedef typename T::BaseObjectType* CTypeNonConst;
 
-  static CType   to_c_type      (const CppType& ptr) { return Glib::unwrap(ptr);     }
-  static CType   to_c_type      (CType          ptr) { return ptr;                   }
-  static CppType to_cpp_type    (CType          ptr)
+  static CType to_c_type(const CppType& ptr) { return Glib::unwrap(ptr); }
+  static CType to_c_type(CType ptr) { return ptr; }
+  static CppType to_cpp_type(CType ptr)
   {
-    //return Glib::wrap(ptr, true);
+    // return Glib::wrap(ptr, true);
 
-    //We copy/paste the wrap() implementation here,
-    //because we can not use a specific Glib::wrap(CType) overload here,
-    //because that would be "dependent", and g++ 3.4 does not allow that.
-    //The specific Glib::wrap() overloads don't do anything special anyway.
+    // We copy/paste the wrap() implementation here,
+    // because we can not use a specific Glib::wrap(CType) overload here,
+    // because that would be "dependent", and g++ 3.4 does not allow that.
+    // The specific Glib::wrap() overloads don't do anything special anyway.
     GObject* cobj = (GObject*)(ptr);
-    return Glib::RefPtr<T>( dynamic_cast<T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
-    //We use dynamic_cast<> in case of multiple inheritance.
+    return Glib::RefPtr<T>(dynamic_cast<T*>(Glib::wrap_auto(cobj, true /* take_copy */)));
+    // We use dynamic_cast<> in case of multiple inheritance.
   }
 
-  static void    release_c_type (CType          ptr)
+  static void release_c_type(CType ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(nullptr, ptr);
     g_object_unref(ptr);
   }
 };
 
-//This confuse the SUN Forte compiler, so we ifdef it out:
+// This confuse the SUN Forte compiler, so we ifdef it out:
 #ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for pointers to const GObject instances.
@@ -227,37 +225,38 @@ struct TypeTraits< Glib::RefPtr<T> >
  * The C++ type is always a Glib::RefPtr<>.
  */
 template <class T>
-struct TypeTraits< Glib::RefPtr<const T> >
+struct TypeTraits<Glib::RefPtr<const T>>
 {
-  typedef Glib::RefPtr<const T>              CppType;
-  typedef const typename T::BaseObjectType * CType;
-  typedef typename T::BaseObjectType *       CTypeNonConst;
+  typedef Glib::RefPtr<const T> CppType;
+  typedef const typename T::BaseObjectType* CType;
+  typedef typename T::BaseObjectType* CTypeNonConst;
 
-  static CType   to_c_type      (const CppType& ptr) { return Glib::unwrap(ptr);     }
-  static CType   to_c_type      (CType          ptr) { return ptr;                   }
-  static CppType to_cpp_type    (CType          ptr)
+  static CType to_c_type(const CppType& ptr) { return Glib::unwrap(ptr); }
+  static CType to_c_type(CType ptr) { return ptr; }
+  static CppType to_cpp_type(CType ptr)
   {
-    //return Glib::wrap(ptr, true);
+    // return Glib::wrap(ptr, true);
 
-    //We copy/paste the wrap() implementation here,
-    //because we can not use a specific Glib::wrap(CType) overload here,
-    //because that would be "dependent", and g++ 3.4 does not allow that.
-    //The specific Glib::wrap() overloads don't do anything special anyway.
+    // We copy/paste the wrap() implementation here,
+    // because we can not use a specific Glib::wrap(CType) overload here,
+    // because that would be "dependent", and g++ 3.4 does not allow that.
+    // The specific Glib::wrap() overloads don't do anything special anyway.
     GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
-    return Glib::RefPtr<const T>( dynamic_cast<const T*>(Glib::wrap_auto(cobj, true /* take_copy */)) );
-    //We use dynamic_cast<> in case of multiple inheritance.
+    return Glib::RefPtr<const T>(
+      dynamic_cast<const T*>(Glib::wrap_auto(cobj, true /* take_copy */)));
+    // We use dynamic_cast<> in case of multiple inheritance.
   }
 
-  static void    release_c_type (CType          ptr)
+  static void release_c_type(CType ptr)
   {
     GLIBMM_DEBUG_UNREFERENCE(nullptr, ptr);
     g_object_unref(const_cast<CTypeNonConst>(ptr));
   }
 };
 
-#endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+#endif // GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
-#endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+#endif // GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 /** Specialization for UTF-8 strings.
  * @ingroup ContHelpers
@@ -269,18 +268,16 @@ template <>
 struct TypeTraits<Glib::ustring>
 {
   typedef Glib::ustring CppType;
-  typedef const char *  CType;
-  typedef char *        CTypeNonConst;
+  typedef const char* CType;
+  typedef char* CTypeNonConst;
 
-  static CType to_c_type (const Glib::ustring& str) { return str.c_str(); }
-  static CType to_c_type (const std::string&   str) { return str.c_str(); }
-  static CType to_c_type (CType                str) { return str;         }
+  static CType to_c_type(const Glib::ustring& str) { return str.c_str(); }
+  static CType to_c_type(const std::string& str) { return str.c_str(); }
+  static CType to_c_type(CType str) { return str; }
 
-  static CppType to_cpp_type(CType str)
-    { return (str) ? Glib::ustring(str) : Glib::ustring(); }
+  static CppType to_cpp_type(CType str) { return (str) ? Glib::ustring(str) : Glib::ustring(); }
 
-  static void release_c_type(CType str)
-    { g_free(const_cast<CTypeNonConst>(str)); }
+  static void release_c_type(CType str) { g_free(const_cast<CTypeNonConst>(str)); }
 };
 
 /** Specialization for std::string.
@@ -292,19 +289,17 @@ struct TypeTraits<Glib::ustring>
 template <>
 struct TypeTraits<std::string>
 {
-  typedef std::string   CppType;
-  typedef const char *  CType;
-  typedef char *        CTypeNonConst;
+  typedef std::string CppType;
+  typedef const char* CType;
+  typedef char* CTypeNonConst;
 
-  static CType to_c_type (const std::string&   str) { return str.c_str(); }
-  static CType to_c_type (const Glib::ustring& str) { return str.c_str(); }
-  static CType to_c_type (CType                str) { return str;         }
+  static CType to_c_type(const std::string& str) { return str.c_str(); }
+  static CType to_c_type(const Glib::ustring& str) { return str.c_str(); }
+  static CType to_c_type(CType str) { return str; }
 
-  static CppType to_cpp_type(CType str)
-    { return (str) ? std::string(str) : std::string(); }
+  static CppType to_cpp_type(CType str) { return (str) ? std::string(str) : std::string(); }
 
-  static void release_c_type(CType str)
-    { g_free(const_cast<CTypeNonConst>(str)); }
+  static void release_c_type(CType str) { g_free(const_cast<CTypeNonConst>(str)); }
 };
 
 /** Specialization for bool.
@@ -313,14 +308,14 @@ struct TypeTraits<std::string>
 template <>
 struct TypeTraits<bool>
 {
-  typedef bool     CppType;
+  typedef bool CppType;
   typedef gboolean CType;
   typedef gboolean CTypeNonConst;
 
-  static CType   to_c_type      (CppType item) { return static_cast<CType>(item); }
-  static CType   to_c_type      (CType   item) { return item; }
-  static CppType to_cpp_type    (CType   item) { return (item != 0); }
-  static void    release_c_type (CType) {}
+  static CType to_c_type(CppType item) { return static_cast<CType>(item); }
+  static CType to_c_type(CType item) { return item; }
+  static CppType to_cpp_type(CType item) { return (item != 0); }
+  static void release_c_type(CType) {}
 };
 
 /** Specialization for Glib::VariantBase.
@@ -329,20 +324,17 @@ struct TypeTraits<bool>
 template <>
 struct TypeTraits<Glib::VariantBase>
 {
-  typedef Glib::VariantBase     CppType;
-  typedef GVariant *            CType;
-  typedef GVariant *            CTypeNonConst;
+  typedef Glib::VariantBase CppType;
+  typedef GVariant* CType;
+  typedef GVariant* CTypeNonConst;
 
-  static CType to_c_type (const Glib::VariantBase& v)
-    { return const_cast<CTypeNonConst>(v.gobj()); }
+  static CType to_c_type(const Glib::VariantBase& v) { return const_cast<CTypeNonConst>(v.gobj()); }
 
-  static CType to_c_type (CType v) { return v; }
+  static CType to_c_type(CType v) { return v; }
 
-  static CppType to_cpp_type(CType v)
-    { return Glib::VariantBase(v, true); }
+  static CppType to_cpp_type(CType v) { return Glib::VariantBase(v, true); }
 
-  static void release_c_type(CType v)
-    { g_variant_unref(const_cast<CTypeNonConst>(v)); }
+  static void release_c_type(CType v) { g_variant_unref(const_cast<CTypeNonConst>(v)); }
 };
 
 /** Specialization for Glib::VariantContainerBase.
@@ -351,22 +343,21 @@ struct TypeTraits<Glib::VariantBase>
 template <>
 struct TypeTraits<Glib::VariantContainerBase>
 {
-  typedef Glib::VariantContainerBase    CppType;
-  typedef GVariant *                    CType;
-  typedef GVariant *                    CTypeNonConst;
+  typedef Glib::VariantContainerBase CppType;
+  typedef GVariant* CType;
+  typedef GVariant* CTypeNonConst;
 
-  static CType to_c_type (const Glib::VariantContainerBase& v)
-    { return const_cast<CTypeNonConst>(v.gobj()); }
+  static CType to_c_type(const Glib::VariantContainerBase& v)
+  {
+    return const_cast<CTypeNonConst>(v.gobj());
+  }
 
-  static CType to_c_type (CType v) { return v; }
+  static CType to_c_type(CType v) { return v; }
 
-  static CppType to_cpp_type(CType v)
-    { return Glib::VariantContainerBase(v, true); }
+  static CppType to_cpp_type(CType v) { return Glib::VariantContainerBase(v, true); }
 
-  static void release_c_type(CType v)
-    { g_variant_unref(const_cast<CTypeNonConst>(v)); }
+  static void release_c_type(CType v) { g_variant_unref(const_cast<CTypeNonConst>(v)); }
 };
-
 
 #ifndef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
 
@@ -375,9 +366,10 @@ struct TypeTraits<Glib::VariantContainerBase>
  * is used in the ContainerHandle -> STL-container conversion workarounds.
  */
 template <class Cont, class In>
-void fill_container(Cont& container, In pbegin, In pend)
+void
+fill_container(Cont& container, In pbegin, In pend)
 {
-  for(; pbegin != pend; ++pbegin)
+  for (; pbegin != pend; ++pbegin)
     container.emplace_back(*pbegin);
 }
 

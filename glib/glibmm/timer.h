@@ -23,8 +23,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-extern "C" { typedef struct _GTimer GTimer; }
-
+extern "C" {
+typedef struct _GTimer GTimer;
+}
 
 namespace Glib
 {
@@ -61,7 +62,7 @@ public:
   double elapsed(unsigned long& microseconds) const;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GTimer*       gobj()       { return gobject_; }
+  GTimer* gobj() { return gobject_; }
   const GTimer* gobj() const { return gobject_; }
 #endif
 
@@ -69,11 +70,8 @@ private:
   GTimer* gobject_;
 };
 
-
 void usleep(unsigned long microseconds);
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_TIMER_H */
-

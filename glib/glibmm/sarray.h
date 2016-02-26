@@ -26,15 +26,15 @@
 #include <glibmm/arrayhandle.h>
 #include <glibmm/ustring.h>
 
-namespace Glib {
+namespace Glib
+{
 
 /**
  * @deprecated Use a std::vector instead.
  */
 typedef Glib::ArrayHandle<Glib::ustring> SArray;
-
 }
 
-#endif //GLIBMM_DISABLE_DEPRECATED
+#endif // GLIBMM_DISABLE_DEPRECATED
 
 #endif // _GLIBMM_SARRAY_H

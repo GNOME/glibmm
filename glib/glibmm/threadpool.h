@@ -24,8 +24,9 @@
 
 #include <sigc++/sigc++.h>
 
-extern "C" { typedef struct _GThreadPool GThreadPool; }
-
+extern "C" {
+typedef struct _GThreadPool GThreadPool;
+}
 
 namespace Glib
 {
@@ -38,7 +39,7 @@ namespace Glib
  * @{
  */
 
-//TODO: Is std::async() an appropriate replacement to mention for this deprecated API?
+// TODO: Is std::async() an appropriate replacement to mention for this deprecated API?
 
 /** A pool of threads to execute work concurrently.
  *
@@ -70,7 +71,7 @@ public:
   explicit ThreadPool(int max_threads = -1, bool exclusive = false);
   virtual ~ThreadPool() noexcept;
 
-  //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
+  // See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
   // TODO: At the next ABI break, consider changing const sigc::slot<void>& slot
   // to const std::function<void()>& func, if it can be assumed that all supported
   // compilers understand the C++11 template class std::function<>.
@@ -165,7 +166,7 @@ public:
    */
   static void stop_unused_threads();
 
-  GThreadPool*       gobj()       { return gobject_; }
+  GThreadPool* gobj() { return gobject_; }
   const GThreadPool* gobj() const { return gobject_; }
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -174,14 +175,13 @@ public:
 
 private:
   GThreadPool* gobject_;
-  SlotList*    slot_list_;
+  SlotList* slot_list_;
 
   ThreadPool(const ThreadPool&);
   ThreadPool& operator=(const ThreadPool&);
 };
 
 /** @} group ThreadPools */
-
 
 /***************************************************************************/
 /*  inline implementation                                                  */
@@ -191,7 +191,6 @@ private:
 
 /**** Glib::Private ********************************************************/
 
-
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib
@@ -199,4 +198,3 @@ private:
 #endif // GLIBMM_DISABLE_DEPRECATED
 
 #endif /* _GLIBMM_THREADPOOL_H */
-

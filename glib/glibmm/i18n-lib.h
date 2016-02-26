@@ -27,4 +27,3 @@
 #include <glib/gi18n-lib.h>
 
 #endif /* _GLIBMM_I18N_LIB_H */
-

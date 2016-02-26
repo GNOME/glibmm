@@ -23,7 +23,6 @@
 
 #include <glibmm/ustring.h>
 
-
 namespace Glib
 {
 
@@ -48,7 +47,6 @@ bool str_has_prefix(const std::string& str, const std::string& prefix);
  * @return <tt>true</tt> if @a str ends with @a suffix, <tt>false</tt> otherwise.
  */
 bool str_has_suffix(const std::string& str, const std::string& suffix);
-
 
 namespace Ascii
 {
@@ -94,9 +92,8 @@ double strtod(const std::string& str);
  * @throw std::overflow_error  Thrown if the correct value would cause overflow.
  * @throw std::underflow_error Thrown if the correct value would cause underflow.
  */
-double strtod(const std::string&      str,
-              std::string::size_type& end_index,
-              std::string::size_type  start_index = 0);
+double strtod(const std::string& str, std::string::size_type& end_index,
+  std::string::size_type start_index = 0);
 
 /** Converts a <tt>double</tt> to a string, using the @c '.' as decimal point.
  * @ingroup StringUtils
@@ -110,7 +107,6 @@ double strtod(const std::string&      str,
 std::string dtostr(double d);
 
 } // namespace Ascii
-
 
 /** Escapes all special characters in the string.
  * @ingroup StringUtils
@@ -179,6 +175,4 @@ Glib::ustring strsignal(int signum);
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_STRINGUTILS_H */
-

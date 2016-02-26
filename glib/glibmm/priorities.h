@@ -59,7 +59,6 @@ enum
   PRIORITY_LOW = 300
 };
 
-} //namespace Glib
+} // namespace Glib
 
 #endif //#ifndef _GLIBMM_PRIORITIES_H
-

@@ -86,7 +86,7 @@ public:
    */
   void reset();
 
-  GValue*       gobj()       { return &gobject_; }
+  GValue* gobj() { return &gobject_; }
   const GValue* gobj() const { return &gobject_; }
 
 protected:
@@ -106,10 +106,9 @@ public:
 #endif
 
 protected:
-  void  set_boxed(const void* data);
+  void set_boxed(const void* data);
   void* get_boxed() const; // doesn't copy
 };
-
 
 /**
  * @ingroup glibmmValue
@@ -129,7 +128,6 @@ protected:
   Glib::RefPtr<Glib::ObjectBase> get_object_copy() const;
 };
 
-
 /**
  * @ingroup glibmmValue
  */
@@ -145,9 +143,8 @@ public:
 
 protected:
   void set_enum(int data);
-  int  get_enum() const;
+  int get_enum() const;
 };
-
 
 /**
  * @ingroup glibmmValue
@@ -166,7 +163,6 @@ protected:
   void set_flags(unsigned int data);
   unsigned int get_flags() const;
 };
-
 
 /**
  * @ingroup glibmmValue
@@ -188,13 +184,11 @@ protected:
 
 } // namespace Glib
 
-
 /* Include generic Glib::Value<> template, before any specializations:
  */
 #define _GLIBMM_VALUE_H_INCLUDE_VALUE_CUSTOM_H
 #include <glibmm/value_custom.h>
 #undef _GLIBMM_VALUE_H_INCLUDE_VALUE_CUSTOM_H
-
 
 namespace Glib
 {
@@ -206,65 +200,63 @@ template <class T>
 class Value_Boxed : public ValueBase_Boxed
 {
 public:
-  typedef T                           CppType;
+  typedef T CppType;
   typedef typename T::BaseObjectType* CType;
 
   static GType value_type() { return T::get_type(); }
 
   void set(const CppType& data) { set_boxed(data.gobj()); }
-  CppType get() const           { return CppType(static_cast<CType>(get_boxed())); }
+  CppType get() const { return CppType(static_cast<CType>(get_boxed())); }
 };
 
-//More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
+// More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
 #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 /** Partial specialization for RefPtr<> to Glib::Object.
  * @ingroup glibmmValue
  */
 template <class T>
-class Value< Glib::RefPtr<T> > : public ValueBase_Object
+class Value<Glib::RefPtr<T>> : public ValueBase_Object
 {
 public:
-  typedef Glib::RefPtr<T>             CppType;
+  typedef Glib::RefPtr<T> CppType;
   typedef typename T::BaseObjectType* CType;
 
   static GType value_type() { return T::get_base_type(); }
 
   void set(const CppType& data) { set_object(data.operator->()); }
-  CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
+  CppType get() const { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
 
-//The SUN Forte Compiler has a problem with this:
+// The SUN Forte Compiler has a problem with this:
 #ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
 /** Partial specialization for RefPtr<> to const Glib::Object.
  * @ingroup glibmmValue
  */
 template <class T>
-class Value< Glib::RefPtr<const T> > : public ValueBase_Object
+class Value<Glib::RefPtr<const T>> : public ValueBase_Object
 {
 public:
-  typedef Glib::RefPtr<const T>       CppType;
+  typedef Glib::RefPtr<const T> CppType;
   typedef typename T::BaseObjectType* CType;
 
   static GType value_type() { return T::get_base_type(); }
 
   void set(const CppType& data) { set_object(const_cast<T*>(data.operator->())); }
-  CppType get() const           { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
+  CppType get() const { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
-#endif //GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
+#endif // GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
-#endif //GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
+#endif // GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
 } // namespace Glib
-
 
 /* Include generated specializations of Glib::Value<> for fundamental types:
  */
 #define _GLIBMM_VALUE_H_INCLUDE_VALUE_BASICTYPES_H
 #include <glibmm/value_basictypes.h>
 #undef _GLIBMM_VALUE_H_INCLUDE_VALUE_BASICTYPES_H
-
 
 namespace Glib
 {
@@ -295,7 +287,6 @@ public:
   Glib::ustring get() const { return get_cstring(); }
 };
 
-
 /** Base class of Glib::Value<T> specializations for enum types.
  * @ingroup glibmmValue
  */
@@ -306,7 +297,7 @@ public:
   typedef T CppType;
 
   void set(CppType data) { set_enum(data); }
-  CppType get() const    { return CppType(get_enum()); }
+  CppType get() const { return CppType(get_enum()); }
 };
 
 /** Base class of Glib::Value<T> specializations for flags types.
@@ -319,10 +310,9 @@ public:
   typedef T CppType;
 
   void set(CppType data) { set_flags(data); }
-  CppType get() const    { return CppType(get_flags()); }
+  CppType get() const { return CppType(get_flags()); }
 };
 
 } // namespace Glib
-
 
 #endif /* _GLIBMM_VALUE_H */

@@ -48,13 +48,10 @@ std::string encode(const std::string& source, bool break_lines = false);
  * @return The resulting decode string
  */
 std::string decode(const std::string& source);
-
 }
 
 /** @} group Base64 */
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_BASE64_H */
-

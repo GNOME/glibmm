@@ -25,7 +25,6 @@
 
 #include <glibmm/error.h>
 
-
 namespace Glib
 {
 
@@ -33,6 +32,4 @@ void wrap_init();
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_WRAP_INIT_H */
-

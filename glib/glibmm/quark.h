@@ -43,36 +43,42 @@ namespace Glib
  */
 class QueryQuark
 {
-  public:
-    QueryQuark(const GQuark& q);
-    QueryQuark(const ustring& s);
-    QueryQuark(const char*s);
-    ~QueryQuark() noexcept {}
-    QueryQuark& operator=(const QueryQuark& q);
-    operator ustring() const;
+public:
+  QueryQuark(const GQuark& q);
+  QueryQuark(const ustring& s);
+  QueryQuark(const char* s);
+  ~QueryQuark() noexcept {}
+  QueryQuark& operator=(const QueryQuark& q);
+  operator ustring() const;
 
-    operator GQuark() const {return quark_;}
-    GQuark id() const       {return quark_;}
+  operator GQuark() const { return quark_; }
+  GQuark id() const { return quark_; }
 
-  private:
-    GQuark quark_;
+private:
+  GQuark quark_;
 };
 
-class Quark: public QueryQuark
+class Quark : public QueryQuark
 {
-  public:
-    Quark(const ustring& s);
-    Quark(const char* s);
-    ~Quark() noexcept;
+public:
+  Quark(const ustring& s);
+  Quark(const char* s);
+  ~Quark() noexcept;
 };
 
 /** @relates Glib::QueryQuark */
-inline bool operator==(const QueryQuark& a, const QueryQuark& b)
-  { return a.id() == b.id(); }
+inline bool
+operator==(const QueryQuark& a, const QueryQuark& b)
+{
+  return a.id() == b.id();
+}
 
 /** @relates Glib::QueryQuark */
-inline bool operator!=(const QueryQuark& a, const QueryQuark& b)
-  { return a.id() != b.id(); }
+inline bool
+operator!=(const QueryQuark& a, const QueryQuark& b)
+{
+  return a.id() != b.id();
+}
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // TODO: Put this somewhere else.
@@ -84,4 +90,3 @@ extern GLIBMM_API GQuark quark_cpp_wrapper_deleted_;
 } /* namespace Glib */
 
 #endif /* _GLIBMM_QUARK_H */
-

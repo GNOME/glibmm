@@ -41,17 +41,20 @@
 
 #else
 
-//TODO: This causes warnings like this:
+// TODO: This causes warnings like this:
 //"missing initializer for member"
 #define GLIBMM_INITIALIZE_STRUCT(Var, Type) \
-    G_STMT_START{ \
-        Type const temp_initializer__ = { 0, }; \
-        (Var) = temp_initializer__; \
-    }G_STMT_END
+  G_STMT_START                              \
+  {                                         \
+    Type const temp_initializer__ = {       \
+      0,                                    \
+    };                                      \
+    (Var) = temp_initializer__;             \
+  }                                         \
+  G_STMT_END
 
 #endif
-#endif //GLIBMM_DISABLE_DEPRECATED
-
+#endif // GLIBMM_DISABLE_DEPRECATED
 
 namespace Glib
 {
@@ -73,13 +76,13 @@ private:
   ScopedPtr<T>& operator=(const ScopedPtr<T>&);
 
 public:
-  ScopedPtr()                 : ptr_ (nullptr)   {}
-  explicit ScopedPtr(T* ptr)  : ptr_ (ptr) {}
-  ~ScopedPtr()  noexcept      { g_free(ptr_); }
-  T*  get() const             { return ptr_;  }
-  T** addr()                  { return &ptr_; }
+  ScopedPtr() : ptr_(nullptr) {}
+  explicit ScopedPtr(T* ptr) : ptr_(ptr) {}
+  ~ScopedPtr() noexcept { g_free(ptr_); }
+  T* get() const { return ptr_; }
+  T** addr() { return &ptr_; }
 };
-#endif //GLIBMM_DISABLE_DEPRECATED
+#endif // GLIBMM_DISABLE_DEPRECATED
 
 /** Helper to deal with memory allocated
  * by GLib functions in an exception-safe manner.
@@ -87,54 +90,57 @@ public:
  * This just creates a std::unique_ptr that uses g_free() as its deleter.
  */
 template <typename T>
-std::unique_ptr<T[], decltype(&g_free)> make_unique_ptr_gfree(T* p)
+std::unique_ptr<T[], decltype(&g_free)>
+make_unique_ptr_gfree(T* p)
 {
   return std::unique_ptr<T[], decltype(&g_free)>(p, &g_free);
 }
 
-//TODO: Deprecate this? We don't use it ourselves.
+// TODO: Deprecate this? We don't use it ourselves.
 /** Removes the const nature of a ptr
  *
  */
 template <class T>
-inline T* unconst(const T* t)
-  { return const_cast<T*>(t); }
+inline T*
+unconst(const T* t)
+{
+  return const_cast<T*>(t);
+}
 
 // Convert const gchar* to ustring, while treating NULL as empty string.
-inline
-Glib::ustring convert_const_gchar_ptr_to_ustring(const char* str)
+inline Glib::ustring
+convert_const_gchar_ptr_to_ustring(const char* str)
 {
   return (str) ? Glib::ustring(str) : Glib::ustring();
 }
 
 // Convert const gchar* to std::string, while treating NULL as empty string.
-inline
-std::string convert_const_gchar_ptr_to_stdstring(const char* str)
+inline std::string
+convert_const_gchar_ptr_to_stdstring(const char* str)
 {
   return (str) ? std::string(str) : std::string();
 }
 
 // Convert a non-const gchar* return value to ustring, freeing it too.
-inline
-Glib::ustring convert_return_gchar_ptr_to_ustring(char* str)
+inline Glib::ustring
+convert_return_gchar_ptr_to_ustring(char* str)
 {
-  return (str) ? Glib::ustring(Glib::make_unique_ptr_gfree(str).get())
-               : Glib::ustring();
+  return (str) ? Glib::ustring(Glib::make_unique_ptr_gfree(str).get()) : Glib::ustring();
 }
 
 // Convert a non-const gchar* return value to std::string, freeing it too.
-inline
-std::string convert_return_gchar_ptr_to_stdstring(char* str)
+inline std::string
+convert_return_gchar_ptr_to_stdstring(char* str)
 {
-  return (str) ? std::string(Glib::make_unique_ptr_gfree(str).get())
-               : std::string();
+  return (str) ? std::string(Glib::make_unique_ptr_gfree(str).get()) : std::string();
 }
 
 /** Get a pointer to the C style string in a std::string or Glib::ustring.
  * If the string is empty, a nullptr is returned.
  */
 template <typename T>
-inline const char* c_str_or_nullptr(const T& str)
+inline const char*
+c_str_or_nullptr(const T& str)
 {
   return str.empty() ? nullptr : str.c_str();
 }
@@ -147,7 +153,8 @@ void append_canonical_typename(std::string& dest, const char* type_name);
 // that take a GDestroyNotify parameter, such as g_object_set_qdata_full()
 // and g_option_group_set_translate_func().
 template <typename T>
-void destroy_notify_delete(void* data)
+void
+destroy_notify_delete(void* data)
 {
   delete static_cast<T*>(data);
 }

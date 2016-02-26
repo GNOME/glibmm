@@ -32,12 +32,13 @@ namespace Container_Helpers
 
 /* Count the number of elements in a 0-terminated sequence.
  */
-template <class T> inline
-std::size_t compute_array_size(const T* array)
+template <class T>
+inline std::size_t
+compute_array_size(const T* array)
 {
   const T* pend = array;
 
-  while(*pend)
+  while (*pend)
     ++pend;
 
   return (pend - array);
@@ -47,14 +48,15 @@ std::size_t compute_array_size(const T* array)
  * specifies the number of elements in the input sequence.
  */
 template <class For, class Tr>
-typename Tr::CType* create_array(For pbegin, std::size_t size, Tr)
+typename Tr::CType*
+create_array(For pbegin, std::size_t size, Tr)
 {
   typedef typename Tr::CType CType;
 
-  CType *const array = static_cast<CType*>(g_malloc((size + 1) * sizeof(CType)));
-  CType *const array_end = array + size;
+  CType* const array = static_cast<CType*>(g_malloc((size + 1) * sizeof(CType)));
+  CType* const array_end = array + size;
 
-  for(CType* pdest = array; pdest != array_end; ++pdest)
+  for (CType* pdest = array; pdest != array_end; ++pdest)
   {
     // Use & to force a warning if the iterator returns a temporary object.
     *pdest = Tr::to_c_type(*&*pbegin);
@@ -66,12 +68,13 @@ typename Tr::CType* create_array(For pbegin, std::size_t size, Tr)
 }
 
 template <class For>
-gboolean* create_bool_array(For pbegin, std::size_t size)
+gboolean*
+create_bool_array(For pbegin, std::size_t size)
 {
-  gboolean *const array(static_cast<gboolean*>(g_malloc((size + 1) * sizeof(gboolean))));
-  gboolean *const array_end(array + size);
+  gboolean* const array(static_cast<gboolean*>(g_malloc((size + 1) * sizeof(gboolean))));
+  gboolean* const array_end(array + size);
 
-  for(gboolean* pdest(array); pdest != array_end; ++pdest)
+  for (gboolean* pdest(array); pdest != array_end; ++pdest)
   {
     *pdest = *pbegin;
     ++pbegin;
@@ -89,11 +92,12 @@ struct ArraySourceTraits
 {
   typedef typename Tr::CType CType;
 
-  static std::size_t get_size(const Cont& cont)
-    { return cont.size(); }
+  static std::size_t get_size(const Cont& cont) { return cont.size(); }
 
   static const CType* get_data(const Cont& cont, std::size_t size)
-    { return Glib::Container_Helpers::create_array(cont.begin(), size, Tr()); }
+  {
+    return Glib::Container_Helpers::create_array(cont.begin(), size, Tr());
+  }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_SHALLOW;
 };
@@ -104,11 +108,12 @@ struct BoolArraySourceTraits
 {
   typedef gboolean CType;
 
-  static std::size_t get_size(const Cont& cont)
-    { return cont.size(); }
+  static std::size_t get_size(const Cont& cont) { return cont.size(); }
 
   static const CType* get_data(const Cont& cont, std::size_t size)
-    { return Glib::Container_Helpers::create_bool_array(cont.begin(), size); }
+  {
+    return Glib::Container_Helpers::create_bool_array(cont.begin(), size);
+  }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_SHALLOW;
 };
@@ -116,22 +121,24 @@ struct BoolArraySourceTraits
  * to the first element.  Note that only arrays of the C type are supported.
  */
 template <class Tr, class Cont>
-struct ArraySourceTraits<Tr,Cont*>
+struct ArraySourceTraits<Tr, Cont*>
 {
   typedef typename Tr::CType CType;
 
   static std::size_t get_size(const CType* array)
-    { return (array) ? Glib::Container_Helpers::compute_array_size(array) : 0; }
+  {
+    return (array) ? Glib::Container_Helpers::compute_array_size(array) : 0;
+  }
 
-  static const CType* get_data(const CType* array, std::size_t)
-    { return array; }
+  static const CType* get_data(const CType* array, std::size_t) { return array; }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_NONE;
 };
 
 template <class Tr, class Cont>
-struct ArraySourceTraits<Tr,const Cont*> : ArraySourceTraits<Tr,Cont*>
-{};
+struct ArraySourceTraits<Tr, const Cont*> : ArraySourceTraits<Tr, Cont*>
+{
+};
 
 /* Convert from a 0-terminated array.  The Cont argument must be a pointer
  * to the first element.  Note that only arrays of the C type are supported.
@@ -139,25 +146,23 @@ struct ArraySourceTraits<Tr,const Cont*> : ArraySourceTraits<Tr,Cont*>
  * size is known at compile time.
  */
 template <class Tr, class Cont, std::size_t N>
-struct ArraySourceTraits<Tr,Cont[N]>
+struct ArraySourceTraits<Tr, Cont[N]>
 {
   typedef typename Tr::CType CType;
 
-  static std::size_t get_size(const CType*)
-    { return (N - 1); }
+  static std::size_t get_size(const CType*) { return (N - 1); }
 
-  static const CType* get_data(const CType* array, std::size_t)
-    { return array; }
+  static const CType* get_data(const CType* array, std::size_t) { return array; }
 
   static const Glib::OwnershipType initial_ownership = Glib::OWNERSHIP_NONE;
 };
 
 template <class Tr, class Cont, std::size_t N>
-struct ArraySourceTraits<Tr,const Cont[N]> : ArraySourceTraits<Tr,Cont[N]>
-{};
+struct ArraySourceTraits<Tr, const Cont[N]> : ArraySourceTraits<Tr, Cont[N]>
+{
+};
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
 
 /**
  * @ingroup ContHelpers
@@ -166,40 +171,40 @@ template <class Tr>
 class ArrayHandleIterator
 {
 public:
-  typedef typename Tr::CppType              CppType;
-  typedef typename Tr::CType                CType;
+  typedef typename Tr::CppType CppType;
+  typedef typename Tr::CType CType;
 
-  typedef std::random_access_iterator_tag   iterator_category;
-  typedef CppType                           value_type;
-  typedef std::ptrdiff_t                    difference_type;
-  typedef value_type                        reference;
-  typedef void                              pointer;
+  typedef std::random_access_iterator_tag iterator_category;
+  typedef CppType value_type;
+  typedef std::ptrdiff_t difference_type;
+  typedef value_type reference;
+  typedef void pointer;
 
   explicit inline ArrayHandleIterator(const CType* pos);
 
   inline value_type operator*() const;
   inline value_type operator[](difference_type offset) const;
 
-  inline ArrayHandleIterator<Tr> &     operator++();
+  inline ArrayHandleIterator<Tr>& operator++();
   inline const ArrayHandleIterator<Tr> operator++(int);
   // these are needed by msvc 2005 when using deque.
-  inline ArrayHandleIterator<Tr> &     operator--();
+  inline ArrayHandleIterator<Tr>& operator--();
   inline const ArrayHandleIterator<Tr> operator--(int);
 
   // All this random access stuff is only there because STL algorithms
   // usually have optimized specializations for random access iterators,
   // and we don't want to give away efficiency for nothing.
   //
-  inline ArrayHandleIterator<Tr> &     operator+=(difference_type rhs);
-  inline ArrayHandleIterator<Tr> &     operator-=(difference_type rhs);
-  inline const ArrayHandleIterator<Tr> operator+ (difference_type rhs) const;
-  inline const ArrayHandleIterator<Tr> operator- (difference_type rhs) const;
+  inline ArrayHandleIterator<Tr>& operator+=(difference_type rhs);
+  inline ArrayHandleIterator<Tr>& operator-=(difference_type rhs);
+  inline const ArrayHandleIterator<Tr> operator+(difference_type rhs) const;
+  inline const ArrayHandleIterator<Tr> operator-(difference_type rhs) const;
   inline difference_type operator-(const ArrayHandleIterator<Tr>& rhs) const;
 
   inline bool operator==(const ArrayHandleIterator<Tr>& rhs) const;
   inline bool operator!=(const ArrayHandleIterator<Tr>& rhs) const;
-  inline bool operator< (const ArrayHandleIterator<Tr>& rhs) const;
-  inline bool operator> (const ArrayHandleIterator<Tr>& rhs) const;
+  inline bool operator<(const ArrayHandleIterator<Tr>& rhs) const;
+  inline bool operator>(const ArrayHandleIterator<Tr>& rhs) const;
   inline bool operator<=(const ArrayHandleIterator<Tr>& rhs) const;
   inline bool operator>=(const ArrayHandleIterator<Tr>& rhs) const;
 
@@ -209,9 +214,8 @@ private:
 
 } // namespace Container_Helpers
 
-
-//TODO: When we can break ABI, remove this and replace uses of it with std::vector.
-//We cannot deprecate it yet, because we cannot easily deprecate methods that use it
+// TODO: When we can break ABI, remove this and replace uses of it with std::vector.
+// We cannot deprecate it yet, because we cannot easily deprecate methods that use it
 //- for instance, we cannot just override methods that use it as a return type.
 
 /** This is an intermediate type. When a method takes this, or returns this, you
@@ -223,77 +227,80 @@ private:
  *
  * @ingroup ContHandles
  */
-template < class T, class Tr = Glib::Container_Helpers::TypeTraits<T> >
+template <class T, class Tr = Glib::Container_Helpers::TypeTraits<T>>
 class ArrayHandle
 {
 public:
-  typedef typename Tr::CppType  CppType;
-  typedef typename Tr::CType    CType;
+  typedef typename Tr::CppType CppType;
+  typedef typename Tr::CType CType;
 
-  typedef CppType               value_type;
-  typedef std::size_t           size_type;
-  typedef std::ptrdiff_t        difference_type;
+  typedef CppType value_type;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
 
-  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr>   const_iterator;
-  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr>   iterator;
+  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr> const_iterator;
+  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr> iterator;
 
-  template <class Cont> inline
-    ArrayHandle(const Cont& container);
+  template <class Cont>
+  inline ArrayHandle(const Cont& container);
 
   // Take over ownership of an array created by GTK+ functions.
   inline ArrayHandle(const CType* array, std::size_t array_size, Glib::OwnershipType ownership);
   inline ArrayHandle(const CType* array, Glib::OwnershipType ownership);
 
   // Copying clears the ownership flag of the source handle.
-  inline ArrayHandle(const ArrayHandle<T,Tr>& other);
+  inline ArrayHandle(const ArrayHandle<T, Tr>& other);
 
   ~ArrayHandle() noexcept;
 
   inline const_iterator begin() const;
-  inline const_iterator end()   const;
+  inline const_iterator end() const;
 
-  template <class U> inline operator std::vector<U>() const;
-  template <class U> inline operator std::deque<U>()  const;
-  template <class U> inline operator std::list<U>()   const;
+  template <class U>
+  inline operator std::vector<U>() const;
+  template <class U>
+  inline operator std::deque<U>() const;
+  template <class U>
+  inline operator std::list<U>() const;
 
-  template <class Cont> inline
-    void assign_to(Cont& container) const;
+  template <class Cont>
+  inline void assign_to(Cont& container) const;
 
-  template <class Out> inline
-    void copy(Out pdest) const;
+  template <class Out>
+  inline void copy(Out pdest) const;
 
-  inline const CType* data()  const;
-  inline std::size_t  size()  const;
-  inline bool         empty() const;
+  inline const CType* data() const;
+  inline std::size_t size() const;
+  inline bool empty() const;
 
 private:
-  std::size_t                 size_;
-  const CType*                parray_;
+  std::size_t size_;
+  const CType* parray_;
   mutable Glib::OwnershipType ownership_;
 
   // No copy assignment.
-  ArrayHandle<T, Tr>& operator=(const ArrayHandle<T,Tr>&);
+  ArrayHandle<T, Tr>& operator=(const ArrayHandle<T, Tr>&);
 };
 
-template<>
-class ArrayHandle<bool, Container_Helpers::TypeTraits<bool> >
+template <>
+class ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>
 {
 public:
-  typedef ArrayHandle<bool, Container_Helpers::TypeTraits<bool> > Me;
-  typedef Container_Helpers::TypeTraits<bool>      Tr;
+  typedef ArrayHandle<bool, Container_Helpers::TypeTraits<bool>> Me;
+  typedef Container_Helpers::TypeTraits<bool> Tr;
 
-  typedef Tr::CppType  CppType;
-  typedef Tr::CType    CType;
+  typedef Tr::CppType CppType;
+  typedef Tr::CType CType;
 
-  typedef CppType               value_type;
-  typedef std::size_t           size_type;
-  typedef std::ptrdiff_t        difference_type;
+  typedef CppType value_type;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
 
-  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr>   const_iterator;
-  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr>   iterator;
+  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr> const_iterator;
+  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr> iterator;
 
-  template <class Cont> inline
-    ArrayHandle(const Cont& container);
+  template <class Cont>
+  inline ArrayHandle(const Cont& container);
 
   // Take over ownership of an array created by GTK+ functions.
   inline ArrayHandle(const CType* array, std::size_t array_size, Glib::OwnershipType ownership);
@@ -305,10 +312,11 @@ public:
   ~ArrayHandle() noexcept;
 
   inline const_iterator begin() const;
-  inline const_iterator end()   const;
+  inline const_iterator end() const;
 
   // this is inside class definition, so msvc 2005, 2008 and 2010 can compile this code.
-  template <class U> inline operator std::vector<U>() const
+  template <class U>
+  inline operator std::vector<U>() const
   {
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
     return std::vector<U>(this->begin(), this->end());
@@ -321,7 +329,8 @@ public:
   }
 
   // this is inside class definition, so msvc 2005, 2008 and 2010 can compile this code.
-  template <class U> inline operator std::deque<U>() const
+  template <class U>
+  inline operator std::deque<U>() const
   {
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
     return std::deque<U>(this->begin(), this->end());
@@ -333,7 +342,8 @@ public:
   }
 
   // this is inside class definition, so msvc 2005, 2008 and 2010 can compile this code.
-  template <class U> inline operator std::list<U>() const
+  template <class U>
+  inline operator std::list<U>() const
   {
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
     return std::list<U>(this->begin(), this->end());
@@ -344,26 +354,26 @@ public:
 #endif
   }
 
-  template <class Cont> inline
-    void assign_to(Cont& container) const;
+  template <class Cont>
+  inline void assign_to(Cont& container) const;
 
-  template <class Out> inline
-    void copy(Out pdest) const;
+  template <class Out>
+  inline void copy(Out pdest) const;
 
-  inline const CType* data()  const;
-  inline std::size_t  size()  const;
-  inline bool         empty() const;
+  inline const CType* data() const;
+  inline std::size_t size() const;
+  inline bool empty() const;
 
 private:
-  std::size_t                 size_;
-  const CType*                parray_;
+  std::size_t size_;
+  const CType* parray_;
   mutable Glib::OwnershipType ownership_;
 
   // No copy assignment.
   Me& operator=(const Me&);
 };
 
-//TODO: Remove this when we can break glibmm API.
+// TODO: Remove this when we can break glibmm API.
 /** If a method takes this as an argument, or has this as a return type, then you can use a standard
  * container such as std::list<Glib::ustring> or std::vector<Glib::ustring>.
  *
@@ -374,7 +384,6 @@ private:
  * @ingroup ContHandles
  */
 typedef ArrayHandle<Glib::ustring> StringArrayHandle;
-
 
 /***************************************************************************/
 /*  Inline implementation                                                  */
@@ -387,199 +396,198 @@ namespace Container_Helpers
 
 /**** Glib::Container_Helpers::ArrayHandleIterator<> ***********************/
 
-template <class Tr> inline
-ArrayHandleIterator<Tr>::ArrayHandleIterator(const CType* pos)
-:
-  pos_ (pos)
-{}
+template <class Tr>
+inline ArrayHandleIterator<Tr>::ArrayHandleIterator(const CType* pos) : pos_(pos)
+{
+}
 
-template <class Tr> inline
-typename ArrayHandleIterator<Tr>::value_type ArrayHandleIterator<Tr>::operator*() const
+template <class Tr>
+inline typename ArrayHandleIterator<Tr>::value_type ArrayHandleIterator<Tr>::operator*() const
 {
   return Tr::to_cpp_type(*pos_);
 }
 
-template <class Tr> inline
-typename ArrayHandleIterator<Tr>::value_type
-ArrayHandleIterator<Tr>::operator[](difference_type offset) const
+template <class Tr>
+inline typename ArrayHandleIterator<Tr>::value_type ArrayHandleIterator<Tr>::operator[](
+  difference_type offset) const
 {
   return Tr::to_cpp_type(pos_[offset]);
 }
 
-template <class Tr> inline
-ArrayHandleIterator<Tr>& ArrayHandleIterator<Tr>::operator++()
+template <class Tr>
+inline ArrayHandleIterator<Tr>& ArrayHandleIterator<Tr>::operator++()
 {
   ++pos_;
   return *this;
 }
 
-template <class Tr> inline
-const ArrayHandleIterator<Tr> ArrayHandleIterator<Tr>::operator++(int)
+template <class Tr>
+inline const ArrayHandleIterator<Tr> ArrayHandleIterator<Tr>::operator++(int)
 {
   return ArrayHandleIterator<Tr>(pos_++);
 }
 
-template <class Tr> inline
-ArrayHandleIterator<Tr>& ArrayHandleIterator<Tr>::operator--()
+template <class Tr>
+inline ArrayHandleIterator<Tr>& ArrayHandleIterator<Tr>::operator--()
 {
   --pos_;
   return *this;
 }
 
-template <class Tr> inline
-const ArrayHandleIterator<Tr> ArrayHandleIterator<Tr>::operator--(int)
+template <class Tr>
+inline const ArrayHandleIterator<Tr> ArrayHandleIterator<Tr>::operator--(int)
 {
   return ArrayHandleIterator<Tr>(pos_--);
 }
 
-template <class Tr> inline
-ArrayHandleIterator<Tr>&
+template <class Tr>
+inline ArrayHandleIterator<Tr>&
 ArrayHandleIterator<Tr>::operator+=(typename ArrayHandleIterator<Tr>::difference_type rhs)
 {
   pos_ += rhs;
   return *this;
 }
 
-template <class Tr> inline
-ArrayHandleIterator<Tr>&
+template <class Tr>
+inline ArrayHandleIterator<Tr>&
 ArrayHandleIterator<Tr>::operator-=(typename ArrayHandleIterator<Tr>::difference_type rhs)
 {
   pos_ -= rhs;
   return *this;
 }
 
-template <class Tr> inline
-const ArrayHandleIterator<Tr>
+template <class Tr>
+inline const ArrayHandleIterator<Tr>
 ArrayHandleIterator<Tr>::operator+(typename ArrayHandleIterator<Tr>::difference_type rhs) const
 {
   return ArrayHandleIterator<Tr>(pos_ + rhs);
 }
 
-template <class Tr> inline
-const ArrayHandleIterator<Tr>
+template <class Tr>
+inline const ArrayHandleIterator<Tr>
 ArrayHandleIterator<Tr>::operator-(typename ArrayHandleIterator<Tr>::difference_type rhs) const
 {
   return ArrayHandleIterator<Tr>(pos_ - rhs);
 }
 
-template <class Tr> inline
-typename ArrayHandleIterator<Tr>::difference_type
+template <class Tr>
+inline typename ArrayHandleIterator<Tr>::difference_type
 ArrayHandleIterator<Tr>::operator-(const ArrayHandleIterator<Tr>& rhs) const
 {
   return (pos_ - rhs.pos_);
 }
 
-template <class Tr> inline
-bool ArrayHandleIterator<Tr>::operator==(const ArrayHandleIterator<Tr>& rhs) const
+template <class Tr>
+inline bool
+ArrayHandleIterator<Tr>::operator==(const ArrayHandleIterator<Tr>& rhs) const
 {
   return (pos_ == rhs.pos_);
 }
 
-template <class Tr> inline
-bool ArrayHandleIterator<Tr>::operator!=(const ArrayHandleIterator<Tr>& rhs) const
+template <class Tr>
+inline bool
+ArrayHandleIterator<Tr>::operator!=(const ArrayHandleIterator<Tr>& rhs) const
 {
   return (pos_ != rhs.pos_);
 }
 
-template <class Tr> inline
-bool ArrayHandleIterator<Tr>::operator<(const ArrayHandleIterator<Tr>& rhs) const
+template <class Tr>
+inline bool
+ArrayHandleIterator<Tr>::operator<(const ArrayHandleIterator<Tr>& rhs) const
 {
   return (pos_ < rhs.pos_);
 }
 
-template <class Tr> inline
-bool ArrayHandleIterator<Tr>::operator>(const ArrayHandleIterator<Tr>& rhs) const
+template <class Tr>
+inline bool
+ArrayHandleIterator<Tr>::operator>(const ArrayHandleIterator<Tr>& rhs) const
 {
   return (pos_ > rhs.pos_);
 }
 
-template <class Tr> inline
-bool ArrayHandleIterator<Tr>::operator<=(const ArrayHandleIterator<Tr>& rhs) const
+template <class Tr>
+inline bool
+ArrayHandleIterator<Tr>::operator<=(const ArrayHandleIterator<Tr>& rhs) const
 {
   return (pos_ <= rhs.pos_);
 }
 
-template <class Tr> inline
-bool ArrayHandleIterator<Tr>::operator>=(const ArrayHandleIterator<Tr>& rhs) const
+template <class Tr>
+inline bool
+ArrayHandleIterator<Tr>::operator>=(const ArrayHandleIterator<Tr>& rhs) const
 {
   return (pos_ >= rhs.pos_);
 }
 
 } // namespace Container_Helpers
 
-
 /**** Glib::ArrayHandle<> **************************************************/
 
 template <class T, class Tr>
-  template <class Cont>
-inline
-ArrayHandle<T,Tr>::ArrayHandle(const Cont& container)
-:
-  size_      (Glib::Container_Helpers::ArraySourceTraits<Tr,Cont>::get_size(container)),
-  parray_    (Glib::Container_Helpers::ArraySourceTraits<Tr,Cont>::get_data(container, size_)),
-  ownership_ (Glib::Container_Helpers::ArraySourceTraits<Tr,Cont>::initial_ownership)
-{}
+template <class Cont>
+inline ArrayHandle<T, Tr>::ArrayHandle(const Cont& container)
+: size_(Glib::Container_Helpers::ArraySourceTraits<Tr, Cont>::get_size(container)),
+  parray_(Glib::Container_Helpers::ArraySourceTraits<Tr, Cont>::get_data(container, size_)),
+  ownership_(Glib::Container_Helpers::ArraySourceTraits<Tr, Cont>::initial_ownership)
+{
+}
 
-template <class T, class Tr> inline
-ArrayHandle<T,Tr>::ArrayHandle(const typename ArrayHandle<T,Tr>::CType* array, std::size_t array_size,
-                               Glib::OwnershipType ownership)
-:
-  size_      ((array) ? array_size : 0),
-  parray_    (array),
-  ownership_ (ownership)
-{}
+template <class T, class Tr>
+inline ArrayHandle<T, Tr>::ArrayHandle(const typename ArrayHandle<T, Tr>::CType* array,
+  std::size_t array_size, Glib::OwnershipType ownership)
+: size_((array) ? array_size : 0), parray_(array), ownership_(ownership)
+{
+}
 
-template <class T, class Tr> inline
-ArrayHandle<T,Tr>::ArrayHandle(const typename ArrayHandle<T,Tr>::CType* array,
-                               Glib::OwnershipType ownership)
-:
-  size_      ((array) ? Glib::Container_Helpers::compute_array_size(array) : 0),
-  parray_    (array),
-  ownership_ (ownership)
-{}
+template <class T, class Tr>
+inline ArrayHandle<T, Tr>::ArrayHandle(
+  const typename ArrayHandle<T, Tr>::CType* array, Glib::OwnershipType ownership)
+: size_((array) ? Glib::Container_Helpers::compute_array_size(array) : 0),
+  parray_(array),
+  ownership_(ownership)
+{
+}
 
-template <class T, class Tr> inline
-ArrayHandle<T,Tr>::ArrayHandle(const ArrayHandle<T,Tr>& other)
-:
-  size_      (other.size_),
-  parray_    (other.parray_),
-  ownership_ (other.ownership_)
+template <class T, class Tr>
+inline ArrayHandle<T, Tr>::ArrayHandle(const ArrayHandle<T, Tr>& other)
+: size_(other.size_), parray_(other.parray_), ownership_(other.ownership_)
 {
   other.ownership_ = Glib::OWNERSHIP_NONE;
 }
 
 template <class T, class Tr>
-ArrayHandle<T,Tr>::~ArrayHandle() noexcept
+ArrayHandle<T, Tr>::~ArrayHandle() noexcept
 {
-  if(parray_ && ownership_ != Glib::OWNERSHIP_NONE)
+  if (parray_ && ownership_ != Glib::OWNERSHIP_NONE)
   {
-    if(ownership_ != Glib::OWNERSHIP_SHALLOW)
+    if (ownership_ != Glib::OWNERSHIP_SHALLOW)
     {
       // Deep ownership: release each container element.
-      const CType *const pend = parray_ + size_;
-      for(const CType* p = parray_; p != pend; ++p)
+      const CType* const pend = parray_ + size_;
+      for (const CType* p = parray_; p != pend; ++p)
         Tr::release_c_type(*p);
     }
     g_free(const_cast<CType*>(parray_));
   }
 }
 
-template <class T, class Tr> inline
-typename ArrayHandle<T,Tr>::const_iterator ArrayHandle<T,Tr>::begin() const
+template <class T, class Tr>
+inline typename ArrayHandle<T, Tr>::const_iterator
+ArrayHandle<T, Tr>::begin() const
 {
   return Glib::Container_Helpers::ArrayHandleIterator<Tr>(parray_);
 }
 
-template <class T, class Tr> inline
-typename ArrayHandle<T,Tr>::const_iterator ArrayHandle<T,Tr>::end() const
+template <class T, class Tr>
+inline typename ArrayHandle<T, Tr>::const_iterator
+ArrayHandle<T, Tr>::end() const
 {
   return Glib::Container_Helpers::ArrayHandleIterator<Tr>(parray_ + size_);
 }
 
 template <class T, class Tr>
-  template <class U>
-inline
-ArrayHandle<T,Tr>::operator std::vector<U>() const
+template <class U>
+inline ArrayHandle<T, Tr>::operator std::vector<U>() const
 {
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   return std::vector<U>(this->begin(), this->end());
@@ -592,9 +600,8 @@ ArrayHandle<T,Tr>::operator std::vector<U>() const
 }
 
 template <class T, class Tr>
-  template <class U>
-inline
-ArrayHandle<T,Tr>::operator std::deque<U>() const
+template <class U>
+inline ArrayHandle<T, Tr>::operator std::deque<U>() const
 {
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   return std::deque<U>(this->begin(), this->end());
@@ -606,9 +613,8 @@ ArrayHandle<T,Tr>::operator std::deque<U>() const
 }
 
 template <class T, class Tr>
-  template <class U>
-inline
-ArrayHandle<T,Tr>::operator std::list<U>() const
+template <class U>
+inline ArrayHandle<T, Tr>::operator std::list<U>() const
 {
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   return std::list<U>(this->begin(), this->end());
@@ -620,9 +626,9 @@ ArrayHandle<T,Tr>::operator std::list<U>() const
 }
 
 template <class T, class Tr>
-  template <class Cont>
-inline
-void ArrayHandle<T,Tr>::assign_to(Cont& container) const
+template <class Cont>
+inline void
+ArrayHandle<T, Tr>::assign_to(Cont& container) const
 {
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   container.assign(this->begin(), this->end());
@@ -634,86 +640,80 @@ void ArrayHandle<T,Tr>::assign_to(Cont& container) const
 }
 
 template <class T, class Tr>
-  template <class Out>
-inline
-void ArrayHandle<T,Tr>::copy(Out pdest) const
+template <class Out>
+inline void
+ArrayHandle<T, Tr>::copy(Out pdest) const
 {
   std::copy(this->begin(), this->end(), pdest);
 }
 
-template <class T, class Tr> inline
-const typename ArrayHandle<T,Tr>::CType* ArrayHandle<T,Tr>::data() const
+template <class T, class Tr>
+inline const typename ArrayHandle<T, Tr>::CType*
+ArrayHandle<T, Tr>::data() const
 {
   return parray_;
 }
 
-template <class T, class Tr> inline
-std::size_t ArrayHandle<T,Tr>::size() const
+template <class T, class Tr>
+inline std::size_t
+ArrayHandle<T, Tr>::size() const
 {
   return size_;
 }
 
-template <class T, class Tr> inline
-bool ArrayHandle<T,Tr>::empty() const
+template <class T, class Tr>
+inline bool
+ArrayHandle<T, Tr>::empty() const
 {
   return (size_ == 0);
 }
 
-
 /**** Glib::ArrayHandle<bool> **********************************************/
 
 template <class Cont>
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::ArrayHandle(const Cont& container)
-:
-  size_      (Glib::Container_Helpers::BoolArraySourceTraits<Cont>::get_size(container)),
-  parray_    (Glib::Container_Helpers::BoolArraySourceTraits<Cont>::get_data(container, size_)),
-  ownership_ (Glib::Container_Helpers::BoolArraySourceTraits<Cont>::initial_ownership)
-{}
+inline ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::ArrayHandle(const Cont& container)
+: size_(Glib::Container_Helpers::BoolArraySourceTraits<Cont>::get_size(container)),
+  parray_(Glib::Container_Helpers::BoolArraySourceTraits<Cont>::get_data(container, size_)),
+  ownership_(Glib::Container_Helpers::BoolArraySourceTraits<Cont>::initial_ownership)
+{
+}
 
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::ArrayHandle(const gboolean* array, std::size_t array_size,
-                                                                    Glib::OwnershipType ownership)
-:
-  size_      ((array) ? array_size : 0),
-  parray_    (array),
-  ownership_ (ownership)
-{}
+inline ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::ArrayHandle(
+  const gboolean* array, std::size_t array_size, Glib::OwnershipType ownership)
+: size_((array) ? array_size : 0), parray_(array), ownership_(ownership)
+{
+}
 
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::ArrayHandle(const gboolean* array,
-                                                                    Glib::OwnershipType ownership)
-:
-  size_      ((array) ? Glib::Container_Helpers::compute_array_size(array) : 0),
-  parray_    (array),
-  ownership_ (ownership)
-{}
+inline ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::ArrayHandle(
+  const gboolean* array, Glib::OwnershipType ownership)
+: size_((array) ? Glib::Container_Helpers::compute_array_size(array) : 0),
+  parray_(array),
+  ownership_(ownership)
+{
+}
 
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::ArrayHandle(const ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >& other)
-:
-  size_      (other.size_),
-  parray_    (other.parray_),
-  ownership_ (other.ownership_)
+inline ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::ArrayHandle(
+  const ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>& other)
+: size_(other.size_), parray_(other.parray_), ownership_(other.ownership_)
 {
   other.ownership_ = Glib::OWNERSHIP_NONE;
 }
 
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::const_iterator ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::begin() const
+inline ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::const_iterator
+ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::begin() const
 {
   return Glib::Container_Helpers::ArrayHandleIterator<Tr>(parray_);
 }
 
-inline
-ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::const_iterator ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::end() const
+inline ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::const_iterator
+ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::end() const
 {
   return Glib::Container_Helpers::ArrayHandleIterator<Tr>(parray_ + size_);
 }
 
 template <class Cont>
-inline
-void ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::assign_to(Cont& container) const
+inline void
+ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::assign_to(Cont& container) const
 {
 #ifdef GLIBMM_HAVE_TEMPLATE_SEQUENCE_CTORS
   container.assign(this->begin(), this->end());
@@ -725,26 +725,26 @@ void ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::assign_to(Cont& con
 }
 
 template <class Out>
-inline
-void ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::copy(Out pdest) const
+inline void
+ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::copy(Out pdest) const
 {
   std::copy(this->begin(), this->end(), pdest);
 }
 
-inline
-const gboolean* ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::data() const
+inline const gboolean*
+ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::data() const
 {
   return parray_;
 }
 
-inline
-std::size_t ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::size() const
+inline std::size_t
+ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::size() const
 {
   return size_;
 }
 
-inline
-bool ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::empty() const
+inline bool
+ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>::empty() const
 {
   return (size_ == 0);
 }
@@ -753,6 +753,4 @@ bool ArrayHandle<bool,Container_Helpers::TypeTraits<bool> >::empty() const
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_ARRAYHANDLE_H */
-

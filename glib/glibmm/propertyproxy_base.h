@@ -27,10 +27,10 @@
 namespace Glib
 {
 
-
 class ObjectBase;
 
-/// Use the connect() method, with sigc::ptr_fun() or sig::mem_fun() to connect signals to signal handlers.
+/// Use the connect() method, with sigc::ptr_fun() or sig::mem_fun() to connect signals to signal
+/// handlers.
 class SignalProxyProperty : public SignalProxyBase
 {
 public:
@@ -46,13 +46,11 @@ public:
   sigc::connection connect(SlotType&& slot);
 
 protected:
-
-  const char* property_name_; //Should be a static string literal.
+  const char* property_name_; // Should be a static string literal.
 
 private:
   SignalProxyProperty& operator=(const SignalProxyProperty&); // not implemented
 };
-
 
 class PropertyProxy_Base
 {
@@ -60,10 +58,10 @@ public:
   PropertyProxy_Base(ObjectBase* obj, const char* property_name);
   PropertyProxy_Base(const PropertyProxy_Base& other);
 
-  ///This signal will be emitted when the property changes.
+  /// This signal will be emitted when the property changes.
   SignalProxyProperty signal_changed();
 
-  ObjectBase* get_object()   const { return obj_; }
+  ObjectBase* get_object() const { return obj_; }
   const char* get_name() const { return property_name_; }
 
 protected:
@@ -71,15 +69,14 @@ protected:
   void get_property_(Glib::ValueBase& value) const;
   void reset_property_();
 
-  ObjectBase* obj_; //The C++ wrapper instance of which this PropertyProxy is a member.
+  ObjectBase* obj_; // The C++ wrapper instance of which this PropertyProxy is a member.
 
-  const char* property_name_; //Should be a static string literal.
+  const char* property_name_; // Should be a static string literal.
 
 private:
-  //Declared as private, but not implemented to prevent any automatically generated implementation.
+  // Declared as private, but not implemented to prevent any automatically generated implementation.
   PropertyProxy_Base& operator=(const PropertyProxy_Base&);
 };
-
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

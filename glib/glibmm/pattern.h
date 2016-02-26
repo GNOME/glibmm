@@ -23,10 +23,11 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-extern "C" { typedef struct _GPatternSpec GPatternSpec; }
+extern "C" {
+typedef struct _GPatternSpec GPatternSpec;
+}
 
 #include <glibmm/ustring.h>
-
 
 namespace Glib
 {
@@ -53,7 +54,7 @@ public:
   bool operator==(const PatternSpec& rhs) const;
   bool operator!=(const PatternSpec& rhs) const;
 
-  GPatternSpec*       gobj()       { return gobject_; }
+  GPatternSpec* gobj() { return gobject_; }
   const GPatternSpec* gobj() const { return gobject_; }
 
 private:
@@ -64,6 +65,4 @@ private:
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_PATTERN_H */
-

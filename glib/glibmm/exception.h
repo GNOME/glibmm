@@ -24,7 +24,6 @@
 
 #include <glibmm/ustring.h>
 
-
 namespace Glib
 {
 
@@ -37,6 +36,4 @@ public:
 
 } // namespace Glib
 
-
 #endif /* _GLIBMM_EXCEPTION_H */
-

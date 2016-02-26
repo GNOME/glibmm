@@ -23,7 +23,6 @@
 
 #include <glibmm/object.h>
 
-
 namespace Glib
 {
 
@@ -36,9 +35,9 @@ class GLIBMM_API Interface : virtual public Glib::ObjectBase
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  typedef Interface       CppObjectType;
+  typedef Interface CppObjectType;
   typedef Interface_Class CppClassType;
-  typedef GTypeInterface  BaseClassType;
+  typedef GTypeInterface BaseClassType;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   /** A Default constructor.
@@ -69,17 +68,17 @@ public:
   Interface(const Interface&) = delete;
   Interface& operator=(const Interface&) = delete;
 
-  //void add_interface(GType gtype_implementer);
+// void add_interface(GType gtype_implementer);
 
-  // Hook for translating API
-  //static Glib::Interface* wrap_new(GTypeInterface*);
+// Hook for translating API
+// static Glib::Interface* wrap_new(GTypeInterface*);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  static GType get_type()      G_GNUC_CONST;
+  static GType get_type() G_GNUC_CONST;
   static GType get_base_type() G_GNUC_CONST;
 #endif
 
-  inline GObject* gobj()             { return gobject_; }
+  inline GObject* gobj() { return gobject_; }
   inline const GObject* gobj() const { return gobject_; }
 };
 
@@ -88,4 +87,3 @@ RefPtr<ObjectBase> wrap_interface(GObject* object, bool take_copy = false);
 } // namespace Glib
 
 #endif /* _GLIBMM_INTERFACE_H */
-
