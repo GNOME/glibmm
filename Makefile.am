@@ -55,3 +55,7 @@ DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files))
 
 # Auto-generate the ChangeLog file from the git log on make dist
 include $(top_srcdir)/build/dist-changelog.am
+
+reformat:
+	$(CLANG_FORMAT) -i `find . -name "*.h"`
+	$(CLANG_FORMAT) -i `find . -name "*.cc"`
