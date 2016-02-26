@@ -22,68 +22,78 @@
 
 /* Modified by Cedric Gustin <cedric.gustin@gmail.com> on 2006/01/13 :
  * Redirect the output of dumpbin to dumpbin.out instead of reading the
- * output stream of popen, as it fails with Visual Studio 2005 in 
+ * output stream of popen, as it fails with Visual Studio 2005 in
  * pre-link build events.
  */
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <stdio.h>
 
 using namespace std;
 
-int main(int argc,char** argv)
+int
+main(int argc, char** argv)
 {
-  if (argc < 4) {
-	  cerr << "Usage: " << argv[0] << " <def-file-name> <dll-base-name> <obj-file> ...." << endl;
-	  return 2;
+  if (argc < 4)
+  {
+    cerr << "Usage: " << argv[0] << " <def-file-name> <dll-base-name> <obj-file> ...." << endl;
+    return 2;
   }
 
   // CG : Explicitly redirect stdout to dumpbin.out.
   string dumpbin = "dumpbin /SYMBOLS /OUT:dumpbin.out";
   int i = 3;
 
-  for(;i<argc;) {
-	  dumpbin += " ";
-	  dumpbin += argv[i++];
+  for (; i < argc;)
+  {
+    dumpbin += " ";
+    dumpbin += argv[i++];
   }
 
-  FILE * dump; 
-  
-  if( (dump = _popen(dumpbin.c_str(),"r")) == NULL ) {
-	  cerr << "could not popen dumpbin" << endl;
-	  return 3;
+  FILE* dump;
+
+  if ((dump = _popen(dumpbin.c_str(), "r")) == NULL)
+  {
+    cerr << "could not popen dumpbin" << endl;
+    return 3;
   }
 
   // CG : Wait for the dumpbin process to finish and open dumpbin.out.
   _pclose(dump);
-  dump=fopen("dumpbin.out","r");
+  dump = fopen("dumpbin.out", "r");
 
   ofstream def_file(argv[1]);
 
   def_file << "LIBRARY " << argv[2] << endl;
   def_file << "EXPORTS" << endl;
 
-  i=0;
-  while( !feof(dump)) {
-	  char buf [65000]; 
-	  
-	  if( fgets( buf, 64999, dump ) != NULL ) {
-		  if(!strstr(buf," UNDEF ") && strstr(buf," External ")) {
-			  char *s = strchr(buf,'|') + 1;
-			  while(*s == ' ' || *s == '\t') s++;
-			  char *e=s;
-			  while(*e != ' ' && *e != '\t' && *e != '\0' && *e!= '\n') e++;
-			  *e = '\0';
-			
-			if(strchr(s,'?')==0 && s[0]=='_' && strchr(s,'@') == 0 )//this is a C export type: _fct -> fct
-				  def_file << "    " << (s+1) << endl;			
-			else
-			if(strchr(s,'?')!=0 && strncmp(s,"??_G",4)!=0 && strncmp(s,"??_E",4)!=0) {
-				  def_file << "    " << s << endl;
-			  }
-		  }
-	  }
+  i = 0;
+  while (!feof(dump))
+  {
+    char buf[65000];
+
+    if (fgets(buf, 64999, dump) != NULL)
+    {
+      if (!strstr(buf, " UNDEF ") && strstr(buf, " External "))
+      {
+        char* s = strchr(buf, '|') + 1;
+        while (*s == ' ' || *s == '\t')
+          s++;
+        char* e = s;
+        while (*e != ' ' && *e != '\t' && *e != '\0' && *e != '\n')
+          e++;
+        *e = '\0';
+
+        if (strchr(s, '?') == 0 && s[0] == '_' &&
+            strchr(s, '@') == 0) // this is a C export type: _fct -> fct
+          def_file << "    " << (s + 1) << endl;
+        else if (strchr(s, '?') != 0 && strncmp(s, "??_G", 4) != 0 && strncmp(s, "??_E", 4) != 0)
+        {
+          def_file << "    " << s << endl;
+        }
+      }
+    }
   }
 
   // CG : Close dumpbin.out and delete it.
