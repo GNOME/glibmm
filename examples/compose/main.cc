@@ -23,35 +23,34 @@
 namespace
 {
 
-void show_examples()
+void
+show_examples()
 {
   using Glib::ustring;
 
   const double a = 3456.78;
   const double b = 7890.12;
-  const int    i = int(a / (a + b) * 40.0);
+  const int i = int(a / (a + b) * 40.0);
 
-  std::cout
-    << ustring::compose("%1 is lower than %2.", a, b)
-    << std::endl
-    << ustring::compose("%2 is greater than %1.", a, b)
-    << std::endl
-    // ustring::format does only work with std::fixed with MSVC2008 or above.
-    // See https://bugzilla.gnome.org/show_bug.cgi?id=599340
+  std::cout << ustring::compose("%1 is lower than %2.", a, b) << std::endl
+            << ustring::compose("%2 is greater than %1.", a, b) << std::endl
+// ustring::format does only work with std::fixed with MSVC2008 or above.
+// See https://bugzilla.gnome.org/show_bug.cgi?id=599340
 #if !defined(_MSC_VER) || _MSC_VER >= 1500
-    << ustring::compose("%1 € are %3 %% of %2 €.", a, b,
-    ustring::format(std::fixed, std::setprecision(1), a / b * 100.0))
-    << std::endl
+            << ustring::compose("%1 € are %3 %% of %2 €.", a, b,
+                 ustring::format(std::fixed, std::setprecision(1), a / b * 100.0))
+            << std::endl
 #endif
-    << ustring::compose("a : b = [%1|%2]",
-    ustring::format(std::setfill(L'a'), std::setw(i), ""),
-                        ustring::format(std::setfill(L'b'), std::setw(40 - i), ""))
-    << std::endl;
+            << ustring::compose("a : b = [%1|%2]",
+                 ustring::format(std::setfill(L'a'), std::setw(i), ""),
+                 ustring::format(std::setfill(L'b'), std::setw(40 - i), ""))
+            << std::endl;
 }
 
 } // anonymous namespace
 
-int main(int, char**)
+int
+main(int, char**)
 {
   std::locale::global(std::locale(""));
   std::cout.imbue(std::locale());

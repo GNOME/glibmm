@@ -18,8 +18,8 @@
 #include <glibmm.h>
 #include <iostream>
 
-
-int main(int, char**)
+int
+main(int, char**)
 {
   Glib::init();
 
@@ -32,7 +32,7 @@ int main(int, char**)
   {
     keyfile.load_from_file(filepath);
   }
-  catch(const Glib::Error& ex)
+  catch (const Glib::Error& ex)
   {
     std::cerr << "Exception while loading key file: " << ex.what() << std::endl;
     return 1;
@@ -45,7 +45,7 @@ int main(int, char**)
     const Glib::ustring value = keyfile.get_value("somegroup", "somekey");
     std::cout << "somekey value=" << value << std::endl;
   }
-  catch(const Glib::KeyFileError& ex)
+  catch (const Glib::KeyFileError& ex)
   {
     std::cerr << "Exception while getting value: " << ex.what() << std::endl;
   }
@@ -57,7 +57,7 @@ int main(int, char**)
     const Glib::ustring value = keyfile.get_value("First Group", "Welcome");
     std::cout << "Welcome value=" << value << std::endl;
   }
-  catch(const Glib::KeyFileError& ex)
+  catch (const Glib::KeyFileError& ex)
   {
     std::cerr << "Exception while getting value: " << ex.what() << std::endl;
   }
@@ -68,14 +68,13 @@ int main(int, char**)
   {
     const auto values = keyfile.get_integer_list("Another Group", "Numbers");
 
-    for(const auto& p : values)
+    for (const auto& p : values)
       std::cout << "Number list value: item=" << p << std::endl;
   }
-  catch(const Glib::KeyFileError& ex)
+  catch (const Glib::KeyFileError& ex)
   {
     std::cerr << "Exception while getting list value: " << ex.what() << std::endl;
   }
 
   return 0;
 }
-

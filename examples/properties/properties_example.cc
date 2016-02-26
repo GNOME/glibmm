@@ -24,59 +24,64 @@
 class Person : public Glib::Object
 {
 public:
-    Person () :
-        // to register custom properties, you must register a custom GType.  If
-        // you don't know what that means, don't worry, just remember to add
-        // this Glib::ObjectBase constructor call to your class' constructor
-        Glib::ObjectBase (typeid (Person)),
-        // register the properties with the object and give them names
-        prop_firstname (*this, "firstname"),
-        prop_lastname (*this, "lastname"),
-        // this one has a default value
-        prop_age (*this, "age", 10)
-    {}
+  Person()
+  : // to register custom properties, you must register a custom GType.  If
+    // you don't know what that means, don't worry, just remember to add
+    // this Glib::ObjectBase constructor call to your class' constructor
+    Glib::ObjectBase(typeid(Person)),
+    // register the properties with the object and give them names
+    prop_firstname(*this, "firstname"),
+    prop_lastname(*this, "lastname"),
+    // this one has a default value
+    prop_age(*this, "age", 10)
+  {
+  }
 
-    // provide proxies for the properties.  The proxy allows you to connect to
-    // the 'changed' signal, etc.
-    Glib::PropertyProxy<Glib::ustring> property_firstname ()
-    { return prop_firstname.get_proxy (); }
-    Glib::PropertyProxy<Glib::ustring> property_lastname ()
-    { return prop_lastname.get_proxy (); }
-    Glib::PropertyProxy<int> property_age ()
-    { return prop_age.get_proxy (); }
+  // provide proxies for the properties.  The proxy allows you to connect to
+  // the 'changed' signal, etc.
+  Glib::PropertyProxy<Glib::ustring> property_firstname() { return prop_firstname.get_proxy(); }
+  Glib::PropertyProxy<Glib::ustring> property_lastname() { return prop_lastname.get_proxy(); }
+  Glib::PropertyProxy<int> property_age() { return prop_age.get_proxy(); }
 
 private:
-    Glib::Property<Glib::ustring> prop_firstname;
-    Glib::Property<Glib::ustring> prop_lastname;
-    Glib::Property<int> prop_age;
+  Glib::Property<Glib::ustring> prop_firstname;
+  Glib::Property<Glib::ustring> prop_lastname;
+  Glib::Property<int> prop_age;
 };
 
-void on_firstname_changed ()
-{ std::cout << "- firstname changed!" << std::endl; }
-void on_lastname_changed ()
-{ std::cout << "- lastname changed!" << std::endl; }
-void on_age_changed ()
-{ std::cout << "- age changed!" << std::endl; }
-
-int main(int, char**)
+void
+on_firstname_changed()
 {
-    Glib::init ();
-    Person p;
-    // Register some handlers that will be called when the values of the
-    // specified parameters are changed
-    p.property_firstname ().signal_changed ()
-        .connect (sigc::ptr_fun (&on_firstname_changed));
-    p.property_lastname ().signal_changed ()
-        .connect (sigc::ptr_fun (&on_lastname_changed));
-    p.property_age ().signal_changed ()
-        .connect (sigc::ptr_fun (&on_age_changed));
+  std::cout << "- firstname changed!" << std::endl;
+}
+void
+on_lastname_changed()
+{
+  std::cout << "- lastname changed!" << std::endl;
+}
+void
+on_age_changed()
+{
+  std::cout << "- age changed!" << std::endl;
+}
 
-    // now change the properties and see that the handlers get called
-    std::cout << "Changing the properties of 'p'" << std::endl;
-    p.property_firstname () = "John";
-    p.property_lastname () = "Doe";
-    p.property_age () = 43;
-    std::cout << "Done changing the properties of 'p'" << std::endl;
+int
+main(int, char**)
+{
+  Glib::init();
+  Person p;
+  // Register some handlers that will be called when the values of the
+  // specified parameters are changed
+  p.property_firstname().signal_changed().connect(sigc::ptr_fun(&on_firstname_changed));
+  p.property_lastname().signal_changed().connect(sigc::ptr_fun(&on_lastname_changed));
+  p.property_age().signal_changed().connect(sigc::ptr_fun(&on_age_changed));
 
-    return 0;
+  // now change the properties and see that the handlers get called
+  std::cout << "Changing the properties of 'p'" << std::endl;
+  p.property_firstname() = "John";
+  p.property_lastname() = "Doe";
+  p.property_age() = 43;
+  std::cout << "Done changing the properties of 'p'" << std::endl;
+
+  return 0;
 }

@@ -34,46 +34,52 @@ fdstreambuf::~fdstreambuf()
   sync();
 }
 
-void fdstreambuf::reset()
+void
+fdstreambuf::reset()
 {
   setg(putback_buffer + 1, putback_buffer + 1, putback_buffer + 1);
   error_condition.error = false;
 }
 
-void fdstreambuf::create_iochannel(int fd, bool manage)
+void
+fdstreambuf::create_iochannel(int fd, bool manage)
 {
   sync();
   reset();
 
-  if(fd >= 0)
+  if (fd >= 0)
   {
     iochannel_ = Glib::IOChannel::create_from_fd(fd);
 
     iochannel_->set_encoding("");
-   
+
     iochannel_->set_buffered(true);
     iochannel_->set_close_on_unref(manage);
-  }  
+  }
 }
 
-void fdstreambuf::detach_fd()
+void
+fdstreambuf::detach_fd()
 {
   iochannel_->set_close_on_unref(false);
 }
 
-void fdstreambuf::connect(const sigc::slot<bool, Glib::IOCondition>& callback,
-			  Glib::IOCondition condition)
+void
+fdstreambuf::connect(
+  const sigc::slot<bool, Glib::IOCondition>& callback, Glib::IOCondition condition)
 {
   Glib::signal_io().connect(callback, iochannel_, condition);
 }
 
-fdstream_error fdstreambuf::get_error() const
+fdstream_error
+fdstreambuf::get_error() const
 {
   return error_condition;
 }
 
 // the standard requires sync to return 0 for success and -1 for error
-int fdstreambuf::sync()
+int
+fdstreambuf::sync()
 {
   if (!iochannel_)
     return -1;
@@ -82,7 +88,7 @@ int fdstreambuf::sync()
   {
     iochannel_->flush();
   }
-  catch(Glib::IOChannelError& io_error)
+  catch (Glib::IOChannelError& io_error)
   {
     error_condition.error = true;
     error_condition.code = io_error.code();
@@ -92,7 +98,8 @@ int fdstreambuf::sync()
   return 0;
 }
 
-void fdstreambuf::close_iochannel()
+void
+fdstreambuf::close_iochannel()
 {
   iochannel_->set_close_on_unref(false);
   reset();
@@ -101,19 +108,19 @@ void fdstreambuf::close_iochannel()
   {
     iochannel_->close(true);
   }
-  catch(Glib::IOChannelError& io_error)
+  catch (Glib::IOChannelError& io_error)
   {
     error_condition.error = true;
     error_condition.code = io_error.code();
   }
-
 }
 
 // the standard requires this to return either the character
 // written on overflow or traits_type::eof() (= EOF with char_type == char)
-fdstreambuf::traits_type::int_type fdstreambuf::overflow(int_type c)
+fdstreambuf::traits_type::int_type
+fdstreambuf::overflow(int_type c)
 {
-  if(!traits_type::eq_int_type(c, traits_type::eof()))
+  if (!traits_type::eq_int_type(c, traits_type::eof()))
   {
     try
     {
@@ -121,7 +128,7 @@ fdstreambuf::traits_type::int_type fdstreambuf::overflow(int_type c)
       char write_char = c;
       iochannel_->write(&write_char, 1, result);
     }
-    catch(Glib::IOChannelError& io_error)
+    catch (Glib::IOChannelError& io_error)
     {
       error_condition.error = true;
       error_condition.code = io_error.code();
@@ -133,7 +140,8 @@ fdstreambuf::traits_type::int_type fdstreambuf::overflow(int_type c)
 
 // the standard requires this to return the number of characters written
 // (which will be 0 for stream failure - it is not correct to return EOF)
-std::streamsize fdstreambuf::xsputn(const char* source, std::streamsize num)
+std::streamsize
+fdstreambuf::xsputn(const char* source, std::streamsize num)
 {
   gsize result = 0;
 
@@ -145,7 +153,7 @@ std::streamsize fdstreambuf::xsputn(const char* source, std::streamsize num)
   {
     iochannel_->write(source, num, result);
   }
-  catch(Glib::IOChannelError& io_error)
+  catch (Glib::IOChannelError& io_error)
   {
     error_condition.error = true;
     error_condition.code = io_error.code();
@@ -157,13 +165,14 @@ std::streamsize fdstreambuf::xsputn(const char* source, std::streamsize num)
 
 // the standard requires this to return the first character available
 // on underflow or traits_type::eof() (= EOF with char_type == char)
-fdstreambuf::traits_type::int_type fdstreambuf::underflow()
+fdstreambuf::traits_type::int_type
+fdstreambuf::underflow()
 {
-  if(gptr() < egptr())
+  if (gptr() < egptr())
     return traits_type::to_int_type(*gptr());
 
   // copy the character in bump position (if any) to putback position
-  if(gptr() - eback())
+  if (gptr() - eback())
     *putback_buffer = *(gptr() - 1);
 
   // now insert a character into the bump position
@@ -172,7 +181,7 @@ fdstreambuf::traits_type::int_type fdstreambuf::underflow()
   {
     iochannel_->read(putback_buffer + 1, 1, result);
   }
-  catch(Glib::IOChannelError& io_error)
+  catch (Glib::IOChannelError& io_error)
   {
     error_condition.error = true;
     error_condition.code = io_error.code();
@@ -182,11 +191,9 @@ fdstreambuf::traits_type::int_type fdstreambuf::underflow()
   // some other error - is this possible?  In case it is, cater for it
   if (result == 0)
     return traits_type::eof();
-  
+
   // reset buffer pointers
-  setg(putback_buffer,
-       putback_buffer + 1,
-       putback_buffer + 2);
+  setg(putback_buffer, putback_buffer + 1, putback_buffer + 2);
 
   // return character in bump/peek position
   return traits_type::to_int_type(*gptr()); // == *(putback_buffer + 1)
@@ -194,7 +201,8 @@ fdstreambuf::traits_type::int_type fdstreambuf::underflow()
 
 // the standard requires this to return the number of characters fetched
 // (which will be 0 for stream failure - it is not correct to return EOF)
-std::streamsize fdstreambuf::xsgetn(char* dest, std::streamsize num)
+std::streamsize
+fdstreambuf::xsgetn(char* dest, std::streamsize num)
 {
   std::streamsize chars_read = 0;
 
@@ -225,100 +233,95 @@ std::streamsize fdstreambuf::xsgetn(char* dest, std::streamsize num)
     {
       do
       {
-	iochannel_->read(dest + chars_read,
-			 num - chars_read,
-			 result);
+        iochannel_->read(dest + chars_read, num - chars_read, result);
 
-	if (result > 0)
+        if (result > 0)
           chars_read += result;
-      }
-      while (result > 0 && result < static_cast<gsize>(num - chars_read));
+      } while (result > 0 && result < static_cast<gsize>(num - chars_read));
     }
-    catch(Glib::IOChannelError& io_error)
+    catch (Glib::IOChannelError& io_error)
     {
       error_condition.error = true;
-  
+
       error_condition.code = io_error.code();
       return chars_read;
     }
 
-    if(chars_read)
+    if (chars_read)
     {
       // now mimic extraction of all characters by sbumpc() by putting
       // two characters into the buffer (if available) and resetting the
       // buffer pointers
       int putback_count = 0;
-      if(chars_read >= 2)
+      if (chars_read >= 2)
       {
-	*putback_buffer = *(dest + (chars_read - 2));
-	putback_count = 2;
+        *putback_buffer = *(dest + (chars_read - 2));
+        putback_count = 2;
       }
       else
-      {      // if we have reached here then we have only fetched
-             // one character and it must have been read with
-             // Glib::IOChannel::read() and not taken from the
-             // putback buffer - otherwise we would have ended
-             // at the first if block in this method
-             // - and this also means that gptr() == egptr()
-	if(gptr() - eback())
-	{
-	  *putback_buffer = *(gptr() - 1);
-	  putback_count = 2;
-	}
-	else
+      { // if we have reached here then we have only fetched
+        // one character and it must have been read with
+        // Glib::IOChannel::read() and not taken from the
+        // putback buffer - otherwise we would have ended
+        // at the first if block in this method
+        // - and this also means that gptr() == egptr()
+        if (gptr() - eback())
+        {
+          *putback_buffer = *(gptr() - 1);
+          putback_count = 2;
+        }
+        else
           putback_count = 1;
       }
 
       *(putback_buffer + 1) = *(dest + (chars_read - 1));
 
       // reset buffer pointers
-      this->setg(putback_buffer + (2 - putback_count),
-		 putback_buffer + 2,
-		 putback_buffer + 2);
+      this->setg(putback_buffer + (2 - putback_count), putback_buffer + 2, putback_buffer + 2);
     }
   }
   return chars_read;
 }
 
 fdstream::fdstream(int fd, bool manage)
-: std::istream(nullptr),
-  std::ostream(nullptr),
-  buf(fd, manage)
+: std::istream(nullptr), std::ostream(nullptr), buf(fd, manage)
 {
   std::istream::rdbuf(&buf);
   std::ostream::rdbuf(&buf);
 }
 
-fdstream::fdstream()
-: std::istream(nullptr),
-  std::ostream(nullptr)
+fdstream::fdstream() : std::istream(nullptr), std::ostream(nullptr)
 {
   std::istream::rdbuf(&buf);
   std::ostream::rdbuf(&buf);
 }
 
-void fdstream::attach(int fd, bool manage)
+void
+fdstream::attach(int fd, bool manage)
 {
   buf.create_iochannel(fd, manage);
 }
 
-void fdstream::detach()
+void
+fdstream::detach()
 {
   buf.detach_fd();
 }
 
-void fdstream::close()
+void
+fdstream::close()
 {
   buf.close_iochannel();
 }
 
-void fdstream::connect(const sigc::slot<bool, Glib::IOCondition>& callback,
-	     Glib::IOCondition condition)
+void
+fdstream::connect(const sigc::slot<bool, Glib::IOCondition>& callback, Glib::IOCondition condition)
 {
   buf.connect(callback, condition);
 }
 
-fdstream_error fdstream::get_error() const
+fdstream_error
+fdstream::get_error() const
 {
   return buf.get_error();
 }

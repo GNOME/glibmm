@@ -35,17 +35,16 @@ namespace
 
 static Glib::RefPtr<Gio::DBus::NodeInfo> introspection_data;
 
-static Glib::ustring introspection_xml =
-  "<node>"
-  "  <interface name='org.glibmm.DBusExample.Clock'>"
-  "    <method name='GetTime'>"
-  "      <arg type='s' name='iso8601' direction='out'/>"
-  "    </method>"
-  "    <method name='SetAlarm'>"
-  "      <arg type='s' name='iso8601' direction='in'/>"
-  "    </method>"
-  "  </interface>"
-  "</node>";
+static Glib::ustring introspection_xml = "<node>"
+                                         "  <interface name='org.glibmm.DBusExample.Clock'>"
+                                         "    <method name='GetTime'>"
+                                         "      <arg type='s' name='iso8601' direction='out'/>"
+                                         "    </method>"
+                                         "    <method name='SetAlarm'>"
+                                         "      <arg type='s' name='iso8601' direction='in'/>"
+                                         "    </method>"
+                                         "  </interface>"
+                                         "</node>";
 
 guint registered_id = 0;
 
@@ -54,33 +53,32 @@ static Glib::TimeVal curr_alarm;
 
 } // anonymous namespace
 
-static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
+static void
+on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */,
   const Glib::ustring& /* sender */, const Glib::ustring& /* object_path */,
   const Glib::ustring& /* interface_name */, const Glib::ustring& method_name,
   const Glib::VariantContainerBase& parameters,
   const Glib::RefPtr<Gio::DBus::MethodInvocation>& invocation)
 {
-  if(method_name == "GetTime")
+  if (method_name == "GetTime")
   {
     Glib::TimeVal curr_time;
     curr_time.assign_current_time();
 
     const Glib::ustring time_str = curr_time.as_iso8601();
-    const auto time_var =
-      Glib::Variant<Glib::ustring>::create(time_str);
+    const auto time_var = Glib::Variant<Glib::ustring>::create(time_str);
 
     // Create the tuple.
-    Glib::VariantContainerBase response =
-      Glib::VariantContainerBase::create_tuple(time_var);
+    Glib::VariantContainerBase response = Glib::VariantContainerBase::create_tuple(time_var);
 
     // Return the tuple with the included time.
     invocation->return_value(response);
   }
-  else if(method_name == "SetAlarm")
+  else if (method_name == "SetAlarm")
   {
     // Get the parameter tuple.
-    //Glib::VariantContainerBase parameters;
-    //invocation->get_parameters(parameters);
+    // Glib::VariantContainerBase parameters;
+    // invocation->get_parameters(parameters);
 
     // Get the variant string.
     Glib::Variant<Glib::ustring> param;
@@ -89,28 +87,29 @@ static void on_method_call(const Glib::RefPtr<Gio::DBus::Connection>& /* connect
     // Get the time string.
     const Glib::ustring time_str = param.get();
 
-    if(!curr_alarm.assign_from_iso8601(time_str))
+    if (!curr_alarm.assign_from_iso8601(time_str))
     {
       // If setting alarm was not successful, return an error.
-      Gio::DBus::Error error(Gio::DBus::Error::INVALID_ARGS,
-          "Alarm string is not in ISO8601 format.");
+      Gio::DBus::Error error(
+        Gio::DBus::Error::INVALID_ARGS, "Alarm string is not in ISO8601 format.");
       invocation->return_error(error);
     }
   }
   else
   {
     // Non-existent method on the interface.
-    Gio::DBus::Error error(Gio::DBus::Error::UNKNOWN_METHOD,
-      "Method does not exist.");
+    Gio::DBus::Error error(Gio::DBus::Error::UNKNOWN_METHOD, "Method does not exist.");
     invocation->return_error(error);
   }
 }
 
-//This must be a global instance. See the InterfaceVTable documentation.
-//TODO: Make that unnecessary.
+// This must be a global instance. See the InterfaceVTable documentation.
+// TODO: Make that unnecessary.
 const Gio::DBus::InterfaceVTable interface_vtable(sigc::ptr_fun(&on_method_call));
 
-void on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /* name */)
+void
+on_bus_acquired(
+  const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /* name */)
 {
   // Export an object to the bus:
 
@@ -118,11 +117,10 @@ void on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, cons
   // the repetition of the interface name:
   try
   {
-    registered_id = connection->register_object("/org/glibmm/DBus/TestObject",
-      introspection_data->lookup_interface(),
-      interface_vtable);
+    registered_id = connection->register_object(
+      "/org/glibmm/DBus/TestObject", introspection_data->lookup_interface(), interface_vtable);
   }
-  catch(const Glib::Error& ex)
+  catch (const Glib::Error& ex)
   {
     std::cerr << "Registration of object failed." << std::endl;
   }
@@ -130,39 +128,40 @@ void on_bus_acquired(const Glib::RefPtr<Gio::DBus::Connection>& connection, cons
   return;
 }
 
-void on_name_acquired(const Glib::RefPtr<Gio::DBus::Connection>& /* connection */, const Glib::ustring& /* name */)
+void
+on_name_acquired(
+  const Glib::RefPtr<Gio::DBus::Connection>& /* connection */, const Glib::ustring& /* name */)
 {
-  //TODO: What is this good for? See https://bugzilla.gnome.org/show_bug.cgi?id=646427
+  // TODO: What is this good for? See https://bugzilla.gnome.org/show_bug.cgi?id=646427
 }
 
-void on_name_lost(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /* name */)
+void
+on_name_lost(const Glib::RefPtr<Gio::DBus::Connection>& connection, const Glib::ustring& /* name */)
 {
   connection->unregister_object(registered_id);
 }
 
-int main(int, char**)
+int
+main(int, char**)
 {
   std::locale::global(std::locale(""));
   Gio::init();
 
- try
+  try
   {
     introspection_data = Gio::DBus::NodeInfo::create_for_xml(introspection_xml);
   }
-  catch(const Glib::Error& ex)
+  catch (const Glib::Error& ex)
   {
-    std::cerr << "Unable to create introspection data: " << ex.what() <<
-      "." << std::endl;
+    std::cerr << "Unable to create introspection data: " << ex.what() << "." << std::endl;
     return 1;
   }
 
-  const auto id = Gio::DBus::own_name(Gio::DBus::BUS_TYPE_SESSION,
-    "org.glibmm.DBusExample",
-    sigc::ptr_fun(&on_bus_acquired),
-    sigc::ptr_fun(&on_name_acquired),
+  const auto id = Gio::DBus::own_name(Gio::DBus::BUS_TYPE_SESSION, "org.glibmm.DBusExample",
+    sigc::ptr_fun(&on_bus_acquired), sigc::ptr_fun(&on_name_acquired),
     sigc::ptr_fun(&on_name_lost));
 
-  //Keep the service running until the process is killed:
+  // Keep the service running until the process is killed:
   auto loop = Glib::MainLoop::create();
   loop->run();
 

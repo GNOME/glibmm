@@ -16,30 +16,25 @@
  */
 
 #include <glibmm.h>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
-int main(int, char**)
+int
+main(int, char**)
 {
   Glib::init();
 
   /* Reusing one regex pattern: */
   const auto regex = Glib::Regex::create("(a)?(b)");
-  std::cout << "Pattern=" << regex->get_pattern() 
-     << ", with string=abcd, result=" 
-     << std::boolalpha << regex->match("abcd")
-     << std::endl;
-  std::cout << "Pattern=" << regex->get_pattern()
-     << ", with string=1234, result=" 
-     << std::boolalpha << regex->match("1234")
-     << std::endl;
+  std::cout << "Pattern=" << regex->get_pattern() << ", with string=abcd, result=" << std::boolalpha
+            << regex->match("abcd") << std::endl;
+  std::cout << "Pattern=" << regex->get_pattern() << ", with string=1234, result=" << std::boolalpha
+            << regex->match("1234") << std::endl;
   std::cout << std::endl;
 
   /* Using the static function without a regex instance: */
-  std::cout << "Pattern=b* with string=abcd, result=" 
-    << std::boolalpha << Glib::Regex::match_simple("b*", "abcd")
-    << std::endl;
+  std::cout << "Pattern=b* with string=abcd, result=" << std::boolalpha
+            << Glib::Regex::match_simple("b*", "abcd") << std::endl;
 
   return 0;
 }
-

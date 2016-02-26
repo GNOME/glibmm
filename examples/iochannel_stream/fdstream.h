@@ -21,7 +21,7 @@
  * used with fifos, pipes and sockets, with safe temporary files
  * opened with mkstemp() and with files opened with other system
  * functions such as Unix open().
- * 
+ *
  * It does not make use of the Glib::IOChannel automatic charset code
  * conversion facilities (which when enabled will convert from UTF-8
  * to the locale codeset when writing out, and vice-versa when reading
@@ -48,22 +48,21 @@
  * fdstream provides both read and write facilities.
 */
 
-
 #ifndef GLIBMMEXAMPLE_FDSTREAM_H
 #define GLIBMMEXAMPLE_FDSTREAM_H
 
+#include <glibmm/iochannel.h>
 #include <istream>
 #include <ostream>
 #include <streambuf>
-#include <glibmm/iochannel.h>
 
 struct fdstream_error
 {
   bool error;
-  Glib::IOChannelError::Code code;  
+  Glib::IOChannelError::Code code;
 };
 
-class fdstreambuf: public std::streambuf
+class fdstreambuf : public std::streambuf
 {
 public:
   fdstreambuf(int fd, bool manage);
@@ -95,12 +94,9 @@ private:
   void reset();
 };
 
-class fdstream : 
-  public std::istream, 
-  public std::ostream
+class fdstream : public std::istream, public std::ostream
 {
 public:
-
   explicit fdstream(int fd, bool manage = true);
   fdstream();
 
@@ -110,8 +106,7 @@ public:
   void detach();
 
   void close();
-  void connect(const sigc::slot<bool, Glib::IOCondition>& callback,
-	       Glib::IOCondition condition);
+  void connect(const sigc::slot<bool, Glib::IOCondition>& callback, Glib::IOCondition condition);
   fdstream_error get_error() const;
 
 private:

@@ -15,14 +15,14 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <glibmm.h>
 #include <iostream>
+#include <limits.h>
 #include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "fdstream.h"
 
@@ -41,14 +41,15 @@ Glib::RefPtr<Glib::MainLoop> mainloop;
 // it will print out the message sent to the fifo
 // and quit the program if the message was, or began
 // with, 'Q'
-bool MyCallback(Glib::IOCondition io_condition)
+bool
+MyCallback(Glib::IOCondition io_condition)
 {
   if ((io_condition & Glib::IO_IN) == 0)
   {
     std::cerr << "Invalid fifo response" << std::endl;
   }
   else
-  {  
+  {
     // stream for stdout (does the same as std::cout
     // - this is an example of using fdstream for output)
     fdstream out(1, false);
@@ -63,15 +64,14 @@ bool MyCallback(Glib::IOCondition io_condition)
   return true;
 }
 
-
-int main( /* int argc, char *argv[] */)
+int main(/* int argc, char *argv[] */)
 {
   Glib::init();
 
   // the usual Glib::Main object
   mainloop = Glib::MainLoop::create();
 
-  if(access("testfifo", F_OK) == -1)
+  if (access("testfifo", F_OK) == -1)
   {
     // fifo doesn't exit - create it
     if (mkfifo("testfifo", 0666) != 0)
@@ -80,9 +80,9 @@ int main( /* int argc, char *argv[] */)
       return -1;
     }
   }
- 
+
   const auto read_fd = open("testfifo", O_RDONLY);
-  if(read_fd == -1)
+  if (read_fd == -1)
   {
     std::cerr << "error opening fifo" << std::endl;
     return -1;
@@ -90,12 +90,12 @@ int main( /* int argc, char *argv[] */)
 
   input_stream.attach(read_fd);
   input_stream.connect(sigc::ptr_fun(MyCallback), Glib::IO_IN);
-  
+
   // and last but not least - run the application main loop
   mainloop->run();
 
   // now remove the temporary fifo
-  if(unlink("testfifo"))
+  if (unlink("testfifo"))
     std::cerr << "error removing fifo" << std::endl;
 
   return 0;
