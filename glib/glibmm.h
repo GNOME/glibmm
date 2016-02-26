@@ -33,7 +33,8 @@
  *
  * @section features Features
  *
- * - Glib::ustring: A UTF-8 string class that can be used interchangably with std::string. Plus @ref StringUtils
+ * - Glib::ustring: A UTF-8 string class that can be used interchangably with std::string. Plus @ref
+ * StringUtils
  * - Glib::RefPtr: A reference-counting smartpointer, for use with Glib::ObjectBase or similar
  * - @ref CharsetConv
  * - Glib::Regex: Regular expression string matching.
@@ -80,10 +81,11 @@
  */
 
 #include <glibmmconfig.h>
-//#include <glibmm/i18n.h> //This must be included by the application, after system headers such as <iostream>.
+//#include <glibmm/i18n.h> //This must be included by the application, after system headers such as
+//<iostream>.
 
-//Include this first because we need it to be the first thing to include <glib.h>,
-//so we can do an undef trick to still use deprecated API in the header:
+// Include this first because we need it to be the first thing to include <glib.h>,
+// so we can do an undef trick to still use deprecated API in the header:
 #include <glibmm/thread.h>
 
 #include <glibmm/threads.h>
