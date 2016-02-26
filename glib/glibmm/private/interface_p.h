@@ -5,15 +5,14 @@
 
 #include <glibmm/class.h>
 
-
 namespace Glib
 {
 
 class Interface_Class : public Glib::Class
 {
 public:
-  typedef Interface       CppObjectType;
-  typedef GTypeInterface  BaseClassType;
+  typedef Interface CppObjectType;
+  typedef GTypeInterface BaseClassType;
 
   void add_interface(GType instance_type) const;
 };
@@ -21,4 +20,3 @@ public:
 } // namespace Glib
 
 #endif /* _GLIBMM_INTERFACE_P_H */
-
