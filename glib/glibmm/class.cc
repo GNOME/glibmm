@@ -62,7 +62,7 @@ Class::register_derived_type(GType base_type, GTypeModule* module)
     nullptr, // class_finalize
     nullptr, // class_data
     instance_size,
-    0,       // n_preallocs
+    0, // n_preallocs
     nullptr, // instance_init
     nullptr, // value_table
   };
@@ -120,13 +120,13 @@ Class::clone_custom_type(
 
     const GTypeInfo derived_info = {
       class_size,
-      nullptr,                                     // base_init
+      nullptr, // base_init
       &Class::custom_class_base_finalize_function, // base_finalize
       &Class::custom_class_init_function,
       nullptr, // class_finalize
-      this,    // class_data
+      this, // class_data
       instance_size,
-      0,       // n_preallocs
+      0, // n_preallocs
       nullptr, // instance_init
       nullptr, // value_table
     };

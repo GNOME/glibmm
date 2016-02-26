@@ -84,7 +84,7 @@ fd_close_and_invalidate(HANDLE& fd)
     fd = 0;
   }
 }
-#else  /* !G_OS_WIN32 */
+#else /* !G_OS_WIN32 */
 /*
  * Set the close-on-exec flag on the file descriptor,
  * so that it won't be leaked if a new process is spawned.
@@ -414,7 +414,7 @@ bool DispatchNotifier::pipe_io_handler(Glib::IOCondition)
         warn_failed_pipe_io("ResetEvent");
     }
   }
-#else  /* !G_OS_WIN32 */
+#else /* !G_OS_WIN32 */
 
   gssize n_read;
 

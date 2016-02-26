@@ -31,7 +31,7 @@
 #include <glibmm/wrap.h>
 #include <glibmm/quark.h>
 #include <glibmm/refptr.h>
-#include <glibmm/utility.h>                /* Could be private, but that would be tedious. */
+#include <glibmm/utility.h> /* Could be private, but that would be tedious. */
 #include <glibmm/containerhandle_shared.h> /* Because its specializations may be here. */
 #include <glibmm/value.h>
 #include <glib.h> /* for G_GNUC_NULL_TERMINATED */

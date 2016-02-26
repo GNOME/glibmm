@@ -28,7 +28,7 @@
 #include <glibmm/debug.h>
 #include <sigc++/trackable.h>
 #include <typeinfo>
-#include <map>    // Needed until the next ABI break.
+#include <map> // Needed until the next ABI break.
 #include <memory> // Not used by ObjectBase any more, but user code may rely on it being here.
 #include <mutex>
 
@@ -236,7 +236,7 @@ protected:
   static std::mutex extra_object_base_data_mutex;
 
 public: //  is_derived_() must be public, so that overridden vfuncs and signal handlers can call it
-        //  via ObjectBase.
+  //  via ObjectBase.
   /// This is for use by gtkmm wrappers only, and not by applications.
   bool is_derived_() const; // We keep this non-inline version, to preserve ABI.
 

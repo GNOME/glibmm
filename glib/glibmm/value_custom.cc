@@ -74,14 +74,14 @@ custom_boxed_type_register(
   };
 
   const GTypeInfo type_info = {
-    0,       // class_size
+    0, // class_size
     nullptr, // base_init
     nullptr, // base_finalize
     nullptr, // class_init_func
     nullptr, // class_finalize
     nullptr, // class_data
-    0,       // instance_size
-    0,       // n_preallocs
+    0, // instance_size
+    0, // n_preallocs
     nullptr, // instance_init
     &value_table,
   };
@@ -115,14 +115,14 @@ custom_pointer_type_register(const char* type_name)
   }
 
   const GTypeInfo type_info = {
-    0,       // class_size
+    0, // class_size
     nullptr, // base_init
     nullptr, // base_finalize
     nullptr, // class_init_func
     nullptr, // class_finalize
     nullptr, // class_data
-    0,       // instance_size
-    0,       // n_preallocs
+    0, // instance_size
+    0, // n_preallocs
     nullptr, // instance_init
     nullptr, // value_table
   };

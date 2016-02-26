@@ -288,7 +288,7 @@ protected:
   sigc::slot_base& connect_impl_(bool notify, sigc::slot_base&& slot, bool after);
 
 private:
-  const SignalProxyInfo* info_;       // Pointer to statically allocated structure.
+  const SignalProxyInfo* info_; // Pointer to statically allocated structure.
   const Glib::ustring detailed_name_; // signal_name[::detail_name]
 
   // no copy assignment

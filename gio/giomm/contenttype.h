@@ -163,7 +163,8 @@ Glib::ustring content_type_guess(
  *
  * The types returned all have the form x-content/foo, e.g.
  * x-content/audio-cdda (for audio CDs) or x-content/image-dcf
- * (for a camera memory card). See the <a href="http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec">shared-mime-info</a>
+ * (for a camera memory card). See the <a
+ * href="http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec">shared-mime-info</a>
  * specification for more on x-content types.
  *
  * @param root The root of the tree to guess a type for.

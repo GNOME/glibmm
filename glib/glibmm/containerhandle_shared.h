@@ -50,8 +50,8 @@ namespace Glib
 enum OwnershipType
 {
   OWNERSHIP_NONE = 0, /*!< Do not release anything */
-  OWNERSHIP_SHALLOW,  /*!< Release the list, but not its elements, when the container is deleted */
-  OWNERSHIP_DEEP      /*!< Release the list, and its elements, when the container is deleted. */
+  OWNERSHIP_SHALLOW, /*!< Release the list, but not its elements, when the container is deleted */
+  OWNERSHIP_DEEP /*!< Release the list, and its elements, when the container is deleted. */
 };
 
 /** Utility class holding an iterator sequence.

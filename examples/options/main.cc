@@ -70,7 +70,7 @@ ExampleOptionGroup::ExampleOptionGroup()
   entry3.set_short_name('g');
   entry3.set_description("The Goo");
   m_arg_goo = "default-goo-value"; // We can choose a default to be used if the user doesn't specify
-                                   // this option.
+  // this option.
   add_entry(entry3, m_arg_goo);
 
   Glib::OptionEntry entry4;

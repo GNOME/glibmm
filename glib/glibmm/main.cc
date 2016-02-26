@@ -856,8 +856,8 @@ wrap(GMainLoop* gobject, bool take_copy)
 const GSourceFuncs Source::vfunc_table_ = {
   &Source::prepare_vfunc, &Source::check_vfunc, &Source::dispatch_vfunc,
   nullptr, // finalize_vfunc // We can't use finalize_vfunc because there is no way
-           // to store a pointer to our wrapper anywhere in GSource so
-           // that it persists until finalize_vfunc would be called from here.
+  // to store a pointer to our wrapper anywhere in GSource so
+  // that it persists until finalize_vfunc would be called from here.
   nullptr, // closure_callback
   nullptr, // closure_marshal
 };

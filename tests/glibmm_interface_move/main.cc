@@ -26,15 +26,15 @@ test_Iface_get_type(void)
   {
     const GTypeInfo info = {
       sizeof(TestIface), // class_size
-      test_Iface_init,   // base_init
-      nullptr,           // base_finalize
-      nullptr,           // class_init
-      nullptr,           // class_finalize
-      nullptr,           // class_data
-      0,                 // instance_size
-      0,                 // n_preallocs
-      nullptr,           // instance_init
-      nullptr            // value_table
+      test_Iface_init, // base_init
+      nullptr, // base_finalize
+      nullptr, // class_init
+      nullptr, // class_finalize
+      nullptr, // class_data
+      0, // instance_size
+      0, // n_preallocs
+      nullptr, // instance_init
+      nullptr // value_table
     };
 
     type = g_type_register_static(G_TYPE_INTERFACE, "TestIface", &info, GTypeFlags(0));

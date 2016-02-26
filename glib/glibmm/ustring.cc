@@ -1369,7 +1369,7 @@ ustring::FormatStream::to_string() const
     str.size() * sizeof(std::wstring::value_type), "UTF-8", "WCHAR_T", nullptr, &n_bytes, &error));
 #endif /* !(__STDC_ISO_10646__ || G_OS_WIN32) */
 
-#else  /* !GLIBMM_HAVE_WIDE_STREAM */
+#else /* !GLIBMM_HAVE_WIDE_STREAM */
   const std::string str = stream_.str();
 
   gsize n_bytes = 0;

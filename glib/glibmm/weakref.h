@@ -21,7 +21,7 @@
 #include <glibmm/refptr.h>
 #include <glibmm/objectbase.h>
 #include <type_traits> // std::is_base_of<>
-#include <utility>     // std::swap<>, std::forward<>
+#include <utility> // std::swap<>, std::forward<>
 
 namespace Glib
 {
