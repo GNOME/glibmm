@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 #include <glib-object.h>
 #include <iostream>
 #include <string>
@@ -36,22 +35,19 @@ typedef bool (*GTypeIsAPointerFunc)(GType gtype);
  */
 bool gtype_is_a_pointer(GType gtype);
 
-std::string get_defs(GType gtype,
-                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
+std::string get_defs(GType gtype, GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
 
-std::string get_property_with_node_name(GParamSpec* pParamSpec,
-                const std::string& strObjectName, const std::string& strNodeName);
+std::string get_property_with_node_name(
+  GParamSpec* pParamSpec, const std::string& strObjectName, const std::string& strNodeName);
 
 std::string get_properties(GType gtype);
 
-std::string get_type_name(GType gtype,
-                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
+std::string get_type_name(GType gtype, GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
 
-std::string get_type_name_parameter(GType gtype,
-                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
+std::string get_type_name_parameter(
+  GType gtype, GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
 
-std::string get_type_name_signal(GType gtype,
-                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
+std::string get_type_name_signal(
+  GType gtype, GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
 
-std::string get_signals(GType gtype,
-                GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
+std::string get_signals(GType gtype, GTypeIsAPointerFunc is_a_pointer_func = gtype_is_a_pointer);
