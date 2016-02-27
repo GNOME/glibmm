@@ -235,7 +235,8 @@ protected:
   // Accesses to extra_object_base_data must be thread-safe.
   static std::mutex extra_object_base_data_mutex;
 
-public: //  is_derived_() must be public, so that overridden vfuncs and signal handlers can call it
+public:
+  //  is_derived_() must be public, so that overridden vfuncs and signal handlers can call it
   //  via ObjectBase.
   /// This is for use by gtkmm wrappers only, and not by applications.
   bool is_derived_() const; // We keep this non-inline version, to preserve ABI.

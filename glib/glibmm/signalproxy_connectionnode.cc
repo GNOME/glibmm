@@ -54,10 +54,9 @@ SignalProxyConnectionNode::notify(void* data)
     GObject* o = conn->object_;
     conn->object_ = nullptr;
 
-    if (g_signal_handler_is_connected(o, conn->connection_id_)) // We check first, because during
-    // destruction, GTK+ sometimes seems
-    // to disconnect them for us, before
-    // we expect it to.  See bug #87912
+    // We check first, because during destruction, GTK+ sometimes seems to
+    // disconnect them for us, before we expect it to. See bug #87912
+    if (g_signal_handler_is_connected(o, conn->connection_id_))
     {
       // Disconnecting triggers execution of destroy_notify_handler(), eiter immediately or later:
       //   When the signal handler is currently running. (for instance, if the callback disconnects
@@ -93,8 +92,9 @@ SignalProxyConnectionNode::destroy_notify_handler(gpointer data, GClosure*)
     // the object has already lost track of this object.
     conn->object_ = nullptr;
 
-    delete conn; // if there are connection objects referring to slot_ they are notified during
-    // destruction of slot_
+    // If there are connection objects referring to slot_ they are notified during
+    // destruction of slot_.
+    delete conn;
   }
 }
 
