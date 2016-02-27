@@ -57,5 +57,9 @@ DISTCLEANFILES = $(filter %mmconfig.h,$(msvc_files))
 include $(top_srcdir)/build/dist-changelog.am
 
 reformat:
+if HAVE_CLANG_FORMAT
 	$(CLANG_FORMAT) -i `find . -name "*.h"`
 	$(CLANG_FORMAT) -i `find . -name "*.cc"`
+else
+	$(error clang-format was not not found during configure.)
+endif

@@ -129,7 +129,8 @@ AC_DEFINE([GLIBMM_PROPERTIES_ENABLED],[1], [This is always set. This is only for
 AC_DEFINE([GLIBMM_VFUNCS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
 AC_DEFINE([GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
 
-AC_CHECK_PROGS([CLANG_FORMAT], [clang-format clang-format-3.9 clang-format-3.8 clang-format-3.7], [clang-format])
+AC_CHECK_PROGS([CLANG_FORMAT], [clang-format clang-format-3.9 clang-format-3.8 clang-format-3.7], [])
+AM_CONDITIONAL([HAVE_CLANG_FORMAT], test -n "$CLANG_FORMAT")
 
 AC_CONFIG_FILES([Makefile
                  tools/Makefile
