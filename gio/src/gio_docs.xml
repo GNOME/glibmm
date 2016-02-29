@@ -443,7 +443,7 @@ See g_application_run() for details.
 launching process to the primary instance. Set this flag if your
 application is expected to behave differently depending on certain
 environment variables. For instance, an editor might be expected
-to use the &lt;envar&gt;GIT_COMMITTER_NAME&lt;/envar&gt; environment variable
+to use the `GIT_COMMITTER_NAME` environment variable
 when editing a git commit message. The environment is available
 to the #GApplication::command-line signal handler, via
 g_application_command_line_getenv().
@@ -456,6 +456,12 @@ ID is given.  The application neither attempts to become the
 owner of the application ID nor does it check if an existing
 owner already exists.  Everything occurs in the local process.
 Since: 2.30.
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_CAN_OVERRIDE_APP_ID">
+<parameter_description> Allow users to override the
+application ID from the command line with `--gapplication-app-id`.
+Since: 2.48
 </parameter_description>
 </parameter>
 </parameters>
@@ -2525,6 +2531,218 @@ UNLOCK DEVICE&lt;/quote&gt; command)
 </parameter>
 </parameters>
 </enum>
+
+<property name="GDtlsClientConnection:accepted-cas">
+<description>
+A list of the distinguished names of the Certificate Authorities
+that the server will accept client certificates signed by. If the
+server requests a client certificate during the handshake, then
+this property will be set after the handshake completes.
+
+Each item in the list is a #GByteArray which contains the complete
+subject DN of the certificate authority.
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsClientConnection:server-identity">
+<description>
+A #GSocketConnectable describing the identity of the server that
+is expected on the other end of the connection.
+
+If the %G_TLS_CERTIFICATE_BAD_IDENTITY flag is set in
+#GDtlsClientConnection:validation-flags, this object will be used
+to determine the expected identify of the remote end of the
+connection; if #GDtlsClientConnection:server-identity is not set,
+or does not match the identity presented by the server, then the
+%G_TLS_CERTIFICATE_BAD_IDENTITY validation will fail.
+
+In addition to its use in verifying the server certificate,
+this is also used to give a hint to the server about what
+certificate we expect, which is useful for servers that serve
+virtual hosts.
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsClientConnection:validation-flags">
+<description>
+What steps to perform when validating a certificate received from
+a server. Server certificates that fail to validate in all of the
+ways indicated here will be rejected unless the application
+overrides the default via #GDtlsConnection::accept-certificate.
+
+Since: 2.48
+
+</description>
+</property>
+
+<signal name="GDtlsConnection::accept-certificate">
+<description>
+Emitted during the TLS handshake after the peer certificate has
+been received. You can examine @peer_cert's certification path by
+calling g_tls_certificate_get_issuer() on it.
+
+For a client-side connection, @peer_cert is the server's
+certificate, and the signal will only be emitted if the
+certificate was not acceptable according to @conn's
+#GDtlsClientConnection:validation_flags. If you would like the
+certificate to be accepted despite @errors, return %TRUE from the
+signal handler. Otherwise, if no handler accepts the certificate,
+the handshake will fail with %G_TLS_ERROR_BAD_CERTIFICATE.
+
+For a server-side connection, @peer_cert is the certificate
+presented by the client, if this was requested via the server's
+#GDtlsServerConnection:authentication_mode. On the server side,
+the signal is always emitted when the client presents a
+certificate, and the certificate will only be accepted if a
+handler returns %TRUE.
+
+Note that if this signal is emitted as part of asynchronous I/O
+in the main thread, then you should not attempt to interact with
+the user before returning from the signal handler. If you want to
+let the user decide whether or not to accept the certificate, you
+would have to return %FALSE from the signal handler on the first
+attempt, and then after the connection attempt returns a
+%G_TLS_ERROR_HANDSHAKE, you can interact with the user, and if
+the user decides to accept the certificate, remember that fact,
+create a new connection, and return %TRUE from the signal handler
+the next time.
+
+If you are doing I/O in another thread, you do not
+need to worry about this, and can simply block in the signal
+handler until the UI thread returns an answer.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="peer_cert">
+<parameter_description> the peer's #GTlsCertificate
+</parameter_description>
+</parameter>
+<parameter name="errors">
+<parameter_description> the problems with @peer_cert.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE to accept @peer_cert (which will also
+immediately end the signal emission). %FALSE to allow the signal
+emission to continue, which will cause the handshake to fail if
+no one else overrides it.
+
+</return>
+</signal>
+
+<property name="GDtlsConnection:base-socket">
+<description>
+The #GDatagramBased that the connection wraps. Note that this may be any
+implementation of #GDatagramBased, not just a #GSocket.
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:certificate">
+<description>
+The connection's certificate; see
+g_dtls_connection_set_certificate().
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:database">
+<description>
+The certificate database to use when verifying this TLS connection.
+If no certificate database is set, then the default database will be
+used. See g_dtls_backend_get_default_database().
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:interaction">
+<description>
+A #GTlsInteraction object to be used when the connection or certificate
+database need to interact with the user. This will be used to prompt the
+user for passwords where necessary.
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:peer-certificate">
+<description>
+The connection's peer's certificate, after the TLS handshake has
+completed and the certificate has been accepted. Note in
+particular that this is not yet set during the emission of
+#GDtlsConnection::accept-certificate.
+
+(You can watch for a #GObject::notify signal on this property to
+detect when a handshake has occurred.)
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:peer-certificate-errors">
+<description>
+The errors noticed-and-ignored while verifying
+#GDtlsConnection:peer-certificate. Normally this should be 0, but
+it may not be if #GDtlsClientConnection:validation-flags is not
+%G_TLS_CERTIFICATE_VALIDATE_ALL, or if
+#GDtlsConnection::accept-certificate overrode the default
+behavior.
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:rehandshake-mode">
+<description>
+The rehandshaking mode. See
+g_dtls_connection_set_rehandshake_mode().
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsConnection:require-close-notify">
+<description>
+Whether or not proper TLS close notification is required.
+See g_dtls_connection_set_require_close_notify().
+
+Since: 2.48
+
+</description>
+</property>
+
+<property name="GDtlsServerConnection:authentication-mode">
+<description>
+The #GTlsAuthenticationMode for the server. This can be changed
+before calling g_dtls_connection_handshake() if you want to
+rehandshake with a different mode from the initial handshake.
+
+Since: 2.48
+
+</description>
+</property>
 
 <enum name="GEmblemOrigin">
 <description>
@@ -19292,8 +19510,8 @@ Creates a new #GDBusObjectManagerServer object.
 
 The returned server isn't yet exported on any connection. To do so,
 use g_dbus_object_manager_server_set_connection(). Normally you
-want to export all of your objects before doing so to avoid &lt;ulink
-url=&quot;http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager&quot;&gt;InterfacesAdded&lt;/ulink&gt;
+want to export all of your objects before doing so to avoid
+[InterfacesAdded](http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager)
 signals being emitted.
 
 Since: 2.30
@@ -19301,7 +19519,8 @@ Since: 2.30
 </description>
 <parameters>
 <parameter name="object_path">
-<parameter_description> The object path to export the manager object at.
+<parameter_description> The object path to export the manager object at, which should
+not be `/`.
 </parameter_description>
 </parameter>
 </parameters>
@@ -21836,6 +22055,838 @@ Since: 2.22
 </return>
 </function>
 
+<function name="g_dtls_client_connection_get_accepted_cas">
+<description>
+Gets the list of distinguished names of the Certificate Authorities
+that the server will accept certificates from. This will be set
+during the TLS handshake if the server requests a certificate.
+Otherwise, it will be %NULL.
+
+Each item in the list is a #GByteArray which contains the complete
+subject DN of the certificate authority.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> the #GDtlsClientConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> the list of
+CA DNs. You should unref each element with g_byte_array_unref() and then
+the free the list with g_list_free().
+
+</return>
+</function>
+
+<function name="g_dtls_client_connection_get_server_identity">
+<description>
+Gets @conn's expected server identity
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> the #GDtlsClientConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GSocketConnectable describing the
+expected server identity, or %NULL if the expected identity is not
+known.
+
+</return>
+</function>
+
+<function name="g_dtls_client_connection_get_validation_flags">
+<description>
+Gets @conn's validation flags
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> the #GDtlsClientConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> the validation flags
+
+</return>
+</function>
+
+<function name="g_dtls_client_connection_new">
+<description>
+Creates a new #GDtlsClientConnection wrapping @base_socket which is
+assumed to communicate with the server identified by @server_identity.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="base_socket">
+<parameter_description> the #GDatagramBased to wrap
+</parameter_description>
+</parameter>
+<parameter name="server_identity">
+<parameter_description> the expected identity of the server
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new
+#GDtlsClientConnection, or %NULL on error
+
+</return>
+</function>
+
+<function name="g_dtls_client_connection_set_server_identity">
+<description>
+Sets @conn's expected server identity, which is used both to tell
+servers on virtual hosts which certificate to present, and also
+to let @conn know what name to look for in the certificate when
+performing %G_TLS_CERTIFICATE_BAD_IDENTITY validation, if enabled.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> the #GDtlsClientConnection
+</parameter_description>
+</parameter>
+<parameter name="identity">
+<parameter_description> a #GSocketConnectable describing the expected server identity
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_client_connection_set_validation_flags">
+<description>
+Sets @conn's validation flags, to override the default set of
+checks performed when validating a server certificate. By default,
+%G_TLS_CERTIFICATE_VALIDATE_ALL is used.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> the #GDtlsClientConnection
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> the #GTlsCertificateFlags to use
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_close">
+<description>
+Close the DTLS connection. This is equivalent to calling
+g_dtls_connection_shutdown() to shut down both sides of the connection.
+
+Closing a #GDtlsConnection waits for all buffered but untransmitted data to
+be sent before it completes. It then sends a `close_notify` DTLS alert to the
+peer and may wait for a `close_notify` to be received from the peer. It does
+not close the underlying #GDtlsConnection:base-socket; that must be closed
+separately.
+
+Once @conn is closed, all other operations will return %G_IO_ERROR_CLOSED.
+Closing a #GDtlsConnection multiple times will not return an error.
+
+#GDtlsConnections will be automatically closed when the last reference is
+dropped, but you might want to call this function to make sure resources are
+released as early as possible.
+
+If @cancellable is cancelled, the #GDtlsConnection may be left
+partially-closed and any pending untransmitted data may be lost. Call
+g_dtls_connection_close() again to complete closing the #GDtlsConnection.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE otherwise
+
+</return>
+</function>
+
+<function name="g_dtls_connection_close_async">
+<description>
+Asynchronously close the DTLS connection. See g_dtls_connection_close() for
+more information.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the [I/O priority][io-priority] of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the close operation is complete
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to the callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_close_finish">
+<description>
+Finish an asynchronous TLS close operation. See g_dtls_connection_close()
+for more information.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError pointer, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on failure, in which
+case @error will be set
+
+</return>
+</function>
+
+<function name="g_dtls_connection_emit_accept_certificate">
+<description>
+Used by #GDtlsConnection implementations to emit the
+#GDtlsConnection::accept-certificate signal.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="peer_cert">
+<parameter_description> the peer's #GTlsCertificate
+</parameter_description>
+</parameter>
+<parameter name="errors">
+<parameter_description> the problems with @peer_cert
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if one of the signal handlers has returned
+%TRUE to accept @peer_cert
+
+</return>
+</function>
+
+<function name="g_dtls_connection_get_certificate">
+<description>
+Gets @conn's certificate, as set by
+g_dtls_connection_set_certificate().
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> @conn's certificate, or %NULL
+
+</return>
+</function>
+
+<function name="g_dtls_connection_get_database">
+<description>
+Gets the certificate database that @conn uses to verify
+peer certificates. See g_dtls_connection_set_database().
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> the certificate database that @conn uses or %NULL
+
+</return>
+</function>
+
+<function name="g_dtls_connection_get_interaction">
+<description>
+Get the object that will be used to interact with the user. It will be used
+for things like prompting the user for passwords. If %NULL is returned, then
+no user interaction will occur for this connection.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a connection
+</parameter_description>
+</parameter>
+</parameters>
+<return> The interaction object.
+
+</return>
+</function>
+
+<function name="g_dtls_connection_get_peer_certificate">
+<description>
+Gets @conn's peer's certificate after the handshake has completed.
+(It is not set during the emission of
+#GDtlsConnection::accept-certificate.)
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> @conn's peer's certificate, or %NULL
+
+</return>
+</function>
+
+<function name="g_dtls_connection_get_peer_certificate_errors">
+<description>
+Gets the errors associated with validating @conn's peer's
+certificate, after the handshake has completed. (It is not set
+during the emission of #GDtlsConnection::accept-certificate.)
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> @conn's peer's certificate errors
+
+</return>
+</function>
+
+<function name="g_dtls_connection_get_rehandshake_mode">
+<description>
+Gets @conn rehandshaking mode. See
+g_dtls_connection_set_rehandshake_mode() for details.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> @conn's rehandshaking mode
+
+</return>
+</function>
+
+<function name="g_dtls_connection_get_require_close_notify">
+<description>
+Tests whether or not @conn expects a proper TLS close notification
+when the connection is closed. See
+g_dtls_connection_set_require_close_notify() for details.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @conn requires a proper TLS close notification.
+
+</return>
+</function>
+
+<function name="g_dtls_connection_handshake">
+<description>
+Attempts a TLS handshake on @conn.
+
+On the client side, it is never necessary to call this method;
+although the connection needs to perform a handshake after
+connecting (or after sending a &quot;STARTTLS&quot;-type command) and may
+need to rehandshake later if the server requests it,
+#GDtlsConnection will handle this for you automatically when you try
+to send or receive data on the connection. However, you can call
+g_dtls_connection_handshake() manually if you want to know for sure
+whether the initial handshake succeeded or failed (as opposed to
+just immediately trying to write to @conn, in which
+case if it fails, it may not be possible to tell if it failed
+before or after completing the handshake).
+
+Likewise, on the server side, although a handshake is necessary at
+the beginning of the communication, you do not need to call this
+function explicitly unless you want clearer error reporting.
+However, you may call g_dtls_connection_handshake() later on to
+renegotiate parameters (encryption methods, etc) with the client.
+
+#GDtlsConnection::accept_certificate may be emitted during the
+handshake.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> success or failure
+
+</return>
+</function>
+
+<function name="g_dtls_connection_handshake_async">
+<description>
+Asynchronously performs a TLS handshake on @conn. See
+g_dtls_connection_handshake() for more information.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the [I/O priority][io-priority] of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the handshake is complete
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to the callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_handshake_finish">
+<description>
+Finish an asynchronous TLS handshake operation. See
+g_dtls_connection_handshake() for more information.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError pointer, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on failure, in which
+case @error will be set.
+
+</return>
+</function>
+
+<function name="g_dtls_connection_set_certificate">
+<description>
+This sets the certificate that @conn will present to its peer
+during the TLS handshake. For a #GDtlsServerConnection, it is
+mandatory to set this, and that will normally be done at construct
+time.
+
+For a #GDtlsClientConnection, this is optional. If a handshake fails
+with %G_TLS_ERROR_CERTIFICATE_REQUIRED, that means that the server
+requires a certificate, and if you try connecting again, you should
+call this method first. You can call
+g_dtls_client_connection_get_accepted_cas() on the failed connection
+to get a list of Certificate Authorities that the server will
+accept certificates from.
+
+(It is also possible that a server will allow the connection with
+or without a certificate; in that case, if you don't provide a
+certificate, you can tell that the server requested one by the fact
+that g_dtls_client_connection_get_accepted_cas() will return
+non-%NULL.)
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="certificate">
+<parameter_description> the certificate to use for @conn
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_set_database">
+<description>
+Sets the certificate database that is used to verify peer certificates.
+This is set to the default database by default. See
+g_dtls_backend_get_default_database(). If set to %NULL, then
+peer certificate validation will always set the
+%G_TLS_CERTIFICATE_UNKNOWN_CA error (meaning
+#GDtlsConnection::accept-certificate will always be emitted on
+client-side connections, unless that bit is not set in
+#GDtlsClientConnection:validation-flags).
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="database">
+<parameter_description> a #GTlsDatabase
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_set_interaction">
+<description>
+Set the object that will be used to interact with the user. It will be used
+for things like prompting the user for passwords.
+
+The @interaction argument will normally be a derived subclass of
+#GTlsInteraction. %NULL can also be provided if no user interaction
+should occur for this connection.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a connection
+</parameter_description>
+</parameter>
+<parameter name="interaction">
+<parameter_description> an interaction object, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_set_rehandshake_mode">
+<description>
+Sets how @conn behaves with respect to rehandshaking requests.
+
+%G_TLS_REHANDSHAKE_NEVER means that it will never agree to
+rehandshake after the initial handshake is complete. (For a client,
+this means it will refuse rehandshake requests from the server, and
+for a server, this means it will close the connection with an error
+if the client attempts to rehandshake.)
+
+%G_TLS_REHANDSHAKE_SAFELY means that the connection will allow a
+rehandshake only if the other end of the connection supports the
+TLS `renegotiation_info` extension. This is the default behavior,
+but means that rehandshaking will not work against older
+implementations that do not support that extension.
+
+%G_TLS_REHANDSHAKE_UNSAFELY means that the connection will allow
+rehandshaking even without the `renegotiation_info` extension. On
+the server side in particular, this is not recommended, since it
+leaves the server open to certain attacks. However, this mode is
+necessary if you need to allow renegotiation with older client
+software.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="mode">
+<parameter_description> the rehandshaking mode
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_set_require_close_notify">
+<description>
+Sets whether or not @conn expects a proper TLS close notification
+before the connection is closed. If this is %TRUE (the default),
+then @conn will expect to receive a TLS close notification from its
+peer before the connection is closed, and will return a
+%G_TLS_ERROR_EOF error if the connection is closed without proper
+notification (since this may indicate a network error, or
+man-in-the-middle attack).
+
+In some protocols, the application will know whether or not the
+connection was closed cleanly based on application-level data
+(because the application-level data includes a length field, or is
+somehow self-delimiting); in this case, the close notify is
+redundant and may be omitted. You
+can use g_dtls_connection_set_require_close_notify() to tell @conn
+to allow an &quot;unannounced&quot; connection close, in which case the close
+will show up as a 0-length read, as in a non-TLS
+#GDatagramBased, and it is up to the application to check that
+the data has been fully received.
+
+Note that this only affects the behavior when the peer closes the
+connection; when the application calls g_dtls_connection_close_async() on
+@conn itself, this will send a close notification regardless of the
+setting of this property. If you explicitly want to do an unclean
+close, you can close @conn's #GDtlsConnection:base-socket rather
+than closing @conn itself.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="require_close_notify">
+<parameter_description> whether or not to require close notification
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_shutdown">
+<description>
+Shut down part or all of a DTLS connection.
+
+If @shutdown_read is %TRUE then the receiving side of the connection is shut
+down, and further reading is disallowed. Subsequent calls to
+g_datagram_based_receive_messages() will return %G_IO_ERROR_CLOSED.
+
+If @shutdown_write is %TRUE then the sending side of the connection is shut
+down, and further writing is disallowed. Subsequent calls to
+g_datagram_based_send_messages() will return %G_IO_ERROR_CLOSED.
+
+It is allowed for both @shutdown_read and @shutdown_write to be TRUE — this
+is equivalent to calling g_dtls_connection_close().
+
+If @cancellable is cancelled, the #GDtlsConnection may be left
+partially-closed and any pending untransmitted data may be lost. Call
+g_dtls_connection_shutdown() again to complete closing the #GDtlsConnection.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="shutdown_read">
+<parameter_description> %TRUE to stop reception of incoming datagrams
+</parameter_description>
+</parameter>
+<parameter name="shutdown_write">
+<parameter_description> %TRUE to stop sending outgoing datagrams
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE otherwise
+
+</return>
+</function>
+
+<function name="g_dtls_connection_shutdown_async">
+<description>
+Asynchronously shut down part or all of the DTLS connection. See
+g_dtls_connection_shutdown() for more information.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="shutdown_read">
+<parameter_description> %TRUE to stop reception of incoming datagrams
+</parameter_description>
+</parameter>
+<parameter name="shutdown_write">
+<parameter_description> %TRUE to stop sending outgoing datagrams
+</parameter_description>
+</parameter>
+<parameter name="io_priority">
+<parameter_description> the [I/O priority][io-priority] of the request
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> callback to call when the shutdown operation is complete
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to the callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_dtls_connection_shutdown_finish">
+<description>
+Finish an asynchronous TLS shutdown operation. See
+g_dtls_connection_shutdown() for more information.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="conn">
+<parameter_description> a #GDtlsConnection
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a #GError pointer, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on failure, in which
+case @error will be set
+
+</return>
+</function>
+
+<function name="g_dtls_server_connection_new">
+<description>
+Creates a new #GDtlsServerConnection wrapping @base_socket.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="base_socket">
+<parameter_description> the #GDatagramBased to wrap
+</parameter_description>
+</parameter>
+<parameter name="certificate">
+<parameter_description> the default server certificate, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore
+</parameter_description>
+</parameter>
+</parameters>
+<return> the new
+#GDtlsServerConnection, or %NULL on error
+
+</return>
+</function>
+
 <function name="g_emblem_get_icon">
 <description>
 Gives back the icon from @emblem.
@@ -24223,8 +25274,8 @@ Clears the status information from @info.
 
 <function name="g_file_info_copy_into">
 <description>
-Copies all of the [GFileAttribute][gio-GFileAttribute]
-from @src_info to @dest_info.
+First clears all of the [GFileAttribute][gio-GFileAttribute] of @dest_info,
+and then copies all of the file attributes from @src_info to @dest_info.
 
 </description>
 <parameters>
@@ -24880,7 +25931,8 @@ Lists the file info structure's attributes.
 </parameter_description>
 </parameter>
 <parameter name="name_space">
-<parameter_description> a file attribute key's namespace.
+<parameter_description> a file attribute key's namespace, or %NULL to list
+all attributes.
 </parameter_description>
 </parameter>
 </parameters>
@@ -49973,6 +51025,44 @@ unreffed when done.
 </return>
 </function>
 
+<function name="g_tls_backend_get_dtls_client_connection_type">
+<description>
+Gets the #GType of @backend’s #GDtlsClientConnection implementation.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="backend">
+<parameter_description> the #GTlsBackend
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GType of @backend’s #GDtlsClientConnection
+implementation.
+
+</return>
+</function>
+
+<function name="g_tls_backend_get_dtls_server_connection_type">
+<description>
+Gets the #GType of @backend’s #GDtlsServerConnection implementation.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="backend">
+<parameter_description> the #GTlsBackend
+</parameter_description>
+</parameter>
+</parameters>
+<return> the #GType of @backend’s #GDtlsServerConnection
+implementation.
+
+</return>
+</function>
+
 <function name="g_tls_backend_get_file_database_type">
 <description>
 Gets the #GType of @backend's #GTlsFileDatabase implementation.
@@ -50006,6 +51096,25 @@ Since: 2.28
 </parameters>
 <return> the #GType of @backend's #GTlsServerConnection
 implementation.
+
+</return>
+</function>
+
+<function name="g_tls_backend_supports_dtls">
+<description>
+Checks if DTLS is supported. DTLS support may not be available even if TLS
+support is available, and vice-versa.
+
+Since: 2.48
+
+</description>
+<parameters>
+<parameter name="backend">
+<parameter_description> the #GTlsBackend
+</parameter_description>
+</parameter>
+</parameters>
+<return> whether DTLS is supported
 
 </return>
 </function>
