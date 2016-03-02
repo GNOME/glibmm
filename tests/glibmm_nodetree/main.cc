@@ -83,28 +83,28 @@ main()
    */
 
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(tstring)),
     Glib::TRAVERSE_PRE_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "ABCDEFGHIJK");
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(tstring)),
     Glib::TRAVERSE_POST_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "CDEBHIJKGFA");
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(tstring)),
     Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "CBDEAHGIJKF");
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(tstring)),
     Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "ABFCDEGHIJK");
   tstring.clear();
 
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(tstring)),
     Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_LEAVES, -1);
   g_assert(tstring == "CDEHIJK");
   tstring.clear();
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(tstring)),
     Glib::TRAVERSE_PRE_ORDER, type_nodetree_string::TRAVERSE_NON_LEAVES, -1);
   g_assert(tstring == "ABFG");
   tstring.clear();
@@ -112,7 +112,7 @@ main()
   node_B->reverse_children();
   node_G->reverse_children();
 
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(tstring)),
     Glib::TRAVERSE_LEVEL_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == "ABFEDCGKJIH");
   tstring.clear();
@@ -121,9 +121,9 @@ main()
   g_assert(root->node_count(type_nodetree_string::TRAVERSE_ALL) ==
            node->node_count(type_nodetree_string::TRAVERSE_ALL));
   g_assert(root->get_max_height() == node->get_max_height());
-  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(tstring)),
+  root->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(tstring)),
     Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
-  node->traverse(sigc::bind(sigc::ptr_fun(node_build_string), sigc::ref(cstring)),
+  node->traverse(sigc::bind(sigc::ptr_fun(node_build_string), std::ref(cstring)),
     Glib::TRAVERSE_IN_ORDER, type_nodetree_string::TRAVERSE_ALL, -1);
   g_assert(tstring == cstring);
 
