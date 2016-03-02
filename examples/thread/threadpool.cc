@@ -56,7 +56,7 @@ main(int, char**)
 
   for (auto c = 'a'; c <= 'z'; ++c)
   {
-    pool.push(sigc::bind<1>(sigc::ptr_fun(&print_char), c));
+    pool.push(sigc::bind(sigc::ptr_fun(&print_char), c));
   }
 
   pool.shutdown();
