@@ -113,10 +113,16 @@ MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
 # Check whether --enable-debug-refcounting was given.
 GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING
 
+glibmm_warnings_fatal='-pedantic -Wall -Wextra -Wformat-security -Wsuggest-override -Wshadow -Wno-long-long'
 # Evaluate the --enable-warnings=level option.
 MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
                        [-Wall],
-                       [-pedantic -Wall -Wextra -Wformat-security -Wsuggest-override -Wshadow -Wno-long-long],
+                       [$glibmm_warnings_fatal],
+                       [G SIGCXX])
+
+MM_ARG_ENABLE_WARNINGS([GLIBMM_INTERFACE_TEST_WXXFLAGS],
+                       [-Wall],
+                       [$glibmm_warnings_fatal -Wno-unused-function],
                        [G SIGCXX])
 
 # Offer the ability to omit some API from the library,
