@@ -55,8 +55,9 @@ glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
 local_cppflags  = -I$(top_builddir) $(glibmm_includes) $(giomm_includes)
 
+cxxflags_disable_deprecated = $(GLIBMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED
 AM_CPPFLAGS = $(local_cppflags) $(GIOMM_CFLAGS)
-AM_CXXFLAGS = $(GLIBMM_WXXFLAGS) -DGLIBMM_DISABLE_DEPRECATED -DGIOMM_DISABLE_DEPRECATED
+AM_CXXFLAGS = $(GLIBMM_WXXFLAGS) $(cxxflags_disable_deprecated)
 
 
 local_libglibmm = $(top_builddir)/glib/glibmm/libglibmm-$(GLIBMM_API_VERSION).la
@@ -92,6 +93,8 @@ glibmm_interface_implementation_test_SOURCES = glibmm_interface_implementation/m
 glibmm_interface_implementation_test_LDADD = $(giomm_ldadd)
 
 glibmm_interface_move_test_SOURCES       = glibmm_interface_move/main.cc
+glibmm_interface_move_test_CXXFLAGS = $(GLIBMM_INTERFACE_TEST_WXXFLAGS) $(cxxflags_disable_deprecated)
+
 glibmm_mainloop_test_SOURCES             = glibmm_mainloop/main.cc
 glibmm_nodetree_test_SOURCES             = glibmm_nodetree/main.cc
 glibmm_object_move_test_SOURCES          = glibmm_object_move/main.cc
