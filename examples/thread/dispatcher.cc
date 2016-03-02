@@ -161,7 +161,7 @@ Application::Application() : main_loop_(Glib::MainLoop::create()), progress_thre
       progress_threads_[i] = progress;
 
       progress->signal_finished().connect(
-        sigc::bind<1>(sigc::mem_fun(*this, &Application::on_progress_finished), progress));
+        sigc::bind(sigc::mem_fun(*this, &Application::on_progress_finished), progress));
     }
   }
   catch (...)
