@@ -41,8 +41,8 @@ SignalProxyConnectionNode::SignalProxyConnectionNode(sigc::slot_base&& slot, GOb
 // notify is a message coming up from the slot to be passed back to Gtk+
 // disconnect is a message coming up from the Gtk+ to be passed down to SigC++
 // static
-void*
-SignalProxyConnectionNode::notify(void* data)
+void
+SignalProxyConnectionNode::notify(sigc::notifiable* data)
 {
   // notification from libsigc++.
   SignalProxyConnectionNode* conn = static_cast<SignalProxyConnectionNode*>(data);
@@ -73,8 +73,6 @@ SignalProxyConnectionNode::notify(void* data)
       g_signal_handler_disconnect(o, connection_id);
     }
   }
-
-  return nullptr; // apparently unused in libsigc++
 }
 
 // static
