@@ -64,13 +64,13 @@ std::map<const Glib::Source*, ExtraSourceData> extra_source_data;
 // Accesses to extra_source_data must be thread-safe.
 std::mutex extra_source_data_mutex;
 
-class SourceConnectionNode
+class SourceConnectionNode : public sigc::notifiable
 {
 public:
   explicit inline SourceConnectionNode(const sigc::slot_base& slot);
 
-  static void* notify(void* data);
-  static void destroy_notify_callback(void* data);
+  static void notify(sigc::notifiable* data);
+  static void destroy_notify_callback(sigc::notifiable* data);
 
   inline void install(GSource* source);
   inline sigc::slot_base* get_slot();
@@ -86,8 +86,8 @@ inline SourceConnectionNode::SourceConnectionNode(const sigc::slot_base& slot)
   slot_.set_parent(this, &SourceConnectionNode::notify);
 }
 
-void*
-SourceConnectionNode::notify(void* data)
+void
+SourceConnectionNode::notify(sigc::notifiable* data)
 {
   SourceConnectionNode* const self = static_cast<SourceConnectionNode*>(data);
 
@@ -102,13 +102,11 @@ SourceConnectionNode::notify(void* data)
     // Destroying the object triggers execution of destroy_notify_handler(),
     // either immediately or later, so we leave that to do the deletion.
   }
-
-  return nullptr;
 }
 
 // static
 void
-SourceConnectionNode::destroy_notify_callback(void* data)
+SourceConnectionNode::destroy_notify_callback(sigc::notifiable* data)
 {
   SourceConnectionNode* const self = static_cast<SourceConnectionNode*>(data);
 
@@ -262,6 +260,13 @@ glibmm_source_callback_once(void* data)
   return 0; // Destroy the event source after one call
 }
 
+static void
+glibmm_source_destroy_notify_callback(void* data)
+{
+  SourceConnectionNode* const conn_data = static_cast<SourceConnectionNode*>(data);
+  SourceConnectionNode::destroy_notify_callback(conn_data);
+}
+
 static gboolean
 glibmm_iosource_callback(GIOChannel*, GIOCondition condition, void* data)
 {
@@ -312,7 +317,7 @@ glibmm_signal_connect_once(
     g_source_set_priority(source, priority);
 
   g_source_set_callback(source, &glibmm_source_callback_once, conn_node,
-    &SourceConnectionNode::destroy_notify_callback);
+    &glibmm_source_destroy_notify_callback);
 
   conn_node->install(source);
   g_source_attach(source, context);
@@ -390,7 +395,8 @@ SignalTimeout::connect(const sigc::slot<bool>& slot, unsigned int interval, int 
     g_source_set_priority(source, priority);
 
   g_source_set_callback(
-    source, &glibmm_source_callback, conn_node, &SourceConnectionNode::destroy_notify_callback);
+    source, &glibmm_source_callback, conn_node,
+    &glibmm_source_destroy_notify_callback);
 
   conn_node->install(source);
   g_source_attach(source, context_);
@@ -419,7 +425,8 @@ SignalTimeout::connect_seconds(const sigc::slot<bool>& slot, unsigned int interv
     g_source_set_priority(source, priority);
 
   g_source_set_callback(
-    source, &glibmm_source_callback, conn_node, &SourceConnectionNode::destroy_notify_callback);
+    source, &glibmm_source_callback, conn_node,
+    &glibmm_source_destroy_notify_callback);
 
   conn_node->install(source);
   g_source_attach(source, context_);
@@ -460,7 +467,8 @@ SignalIdle::connect(const sigc::slot<bool>& slot, int priority)
     g_source_set_priority(source, priority);
 
   g_source_set_callback(
-    source, &glibmm_source_callback, conn_node, &SourceConnectionNode::destroy_notify_callback);
+    source, &glibmm_source_callback, conn_node,
+    &glibmm_source_destroy_notify_callback);
 
   conn_node->install(source);
   g_source_attach(source, context_);
@@ -543,8 +551,9 @@ SignalChildWatch::connect(const sigc::slot<void, GPid, int>& slot, GPid pid, int
   if (priority != G_PRIORITY_DEFAULT)
     g_source_set_priority(source, priority);
 
-  g_source_set_callback(source, (GSourceFunc)&glibmm_child_watch_callback, conn_node,
-    &SourceConnectionNode::destroy_notify_callback);
+  g_source_set_callback(source, (GSourceFunc)&glibmm_child_watch_callback,
+    conn_node,
+    &glibmm_source_destroy_notify_callback);
 
   conn_node->install(source);
   g_source_attach(source, context_);
@@ -1126,7 +1135,8 @@ Source::attach_signal_source(const sigc::slot_base& slot, int priority, GSource*
     g_source_set_priority(source, priority);
 
   g_source_set_callback(
-    source, callback_func, conn_node, &SourceConnectionNode::destroy_notify_callback);
+    source, callback_func, conn_node,
+    &glibmm_source_destroy_notify_callback);
 
   conn_node->install(source);
   g_source_attach(source, context);
