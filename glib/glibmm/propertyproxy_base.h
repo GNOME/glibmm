@@ -29,7 +29,7 @@ namespace Glib
 
 class ObjectBase;
 
-/// Use the connect() method, with sigc::ptr_fun() or sig::mem_fun() to connect signals to signal
+/// Use the connect() method, with sigc::ptr_fun() or sigc::mem_fun() to connect signals to signal
 /// handlers.
 class SignalProxyProperty : public SignalProxyBase
 {
