@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /* generate_extra_defs.cc
  *
  * Copyright (C) 2001 The Free Software Foundation
@@ -47,6 +45,7 @@ get_property_with_node_name(
   bool bReadable = (flags & G_PARAM_READABLE) == G_PARAM_READABLE;
   bool bWritable = (flags & G_PARAM_WRITABLE) == G_PARAM_WRITABLE;
   bool bConstructOnly = (flags & G_PARAM_CONSTRUCT_ONLY) == G_PARAM_CONSTRUCT_ONLY;
+  bool bDeprecated = (flags & G_PARAM_DEPRECATED) == G_PARAM_DEPRECATED;
 
   //#t and #f aren't documented, but I guess that it's correct based on the example in the .defs
   // spec.
@@ -56,6 +55,8 @@ get_property_with_node_name(
   strResult += "  (readable " + (bReadable ? strTrue : strFalse) + ")\n";
   strResult += "  (writable " + (bWritable ? strTrue : strFalse) + ")\n";
   strResult += "  (construct-only " + (bConstructOnly ? strTrue : strFalse) + ")\n";
+  if (bDeprecated)
+    strResult += "  (deprecated #t)\n"; // Default: not deprecated
 
   strResult += ")\n\n"; // close (strNodeName
 
@@ -225,6 +226,9 @@ get_signals(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
 
         strResult += "  (when \"" + strWhen + "\")\n";
       }
+      bool bDeprecated = (signalQuery.signal_flags & G_SIGNAL_DEPRECATED) == G_SIGNAL_DEPRECATED;
+      if (bDeprecated)
+        strResult += "  (deprecated #t)\n"; // Default: not deprecated
 
       // Loop through the list of parameters:
       const GType* pParameters = signalQuery.param_types;
