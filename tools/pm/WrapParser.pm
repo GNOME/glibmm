@@ -144,7 +144,8 @@ sub parse_and_build_output($)
       # _CLASS_OPAQUE_REFCOUNTED
     }
 
-    if ($token eq "namespace") { $self->on_namespace() };
+    if ($token eq "namespace") { $self->on_namespace(); }
+    if ($token eq "_IS_DEPRECATED") { $$self{deprecated} = 1; }
 
     # After all token manipulations
     if($bAppend)
@@ -1536,7 +1537,7 @@ sub on_wrap_property($)
       $deprecation_docs, $newin) = $self->on_wrap_any_property();
 
   $objOutputter->output_wrap_property($filename, $line_num, $argPropertyName,
-    $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs, $newin);
+    $argCppType, $$self{c_class}, $$self{deprecated}, $argDeprecated, $deprecation_docs, $newin);
 }
 
 sub on_wrap_child_property($)
@@ -1550,7 +1551,7 @@ sub on_wrap_child_property($)
       $deprecation_docs, $newin) = $self->on_wrap_any_property();
 
   $objOutputter->output_wrap_child_property($filename, $line_num, $argPropertyName,
-    $argCppType, $$self{c_class}, $argDeprecated, $deprecation_docs, $newin);
+    $argCppType, $$self{c_class}, $$self{deprecated}, $argDeprecated, $deprecation_docs, $newin);
 }
 
 sub output_wrap_check($$$$$$)
@@ -1612,6 +1613,9 @@ sub output_wrap_signal($$$$$$$$$$$$$$$$$)
       return;
     }
   }
+
+  Output::check_deprecation($$self{deprecated}, $objCSignal->get_deprecated(),
+    $deprecated, $signal_name, "signal", "SIGNAL");
 
   $objOutputter->output_wrap_sig_decl($filename, $line_num, $objCSignal, $objCppSignal,
     $signal_name, $bCustomCCallback, $ifdef, $commentblock,

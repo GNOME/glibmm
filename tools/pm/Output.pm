@@ -85,6 +85,32 @@ sub error
   printf STDERR "Output.pm, $main::source: $format",@_;
 }
 
+# void check_deprecation($file_deprecated, $defs_deprecated, $wrap_deprecated,
+#   $entity_name, $entity_type, $wrapper)
+sub check_deprecation($$$$$$)
+{
+  my ($file_deprecated, $defs_deprecated, $wrap_deprecated,
+      $entity_name, $entity_type, $wrapper) = @_;
+
+  # Don't print a warning if the whole .hg file is deprecated.
+  return if ($file_deprecated);
+
+  if ($defs_deprecated && !$wrap_deprecated)
+  {
+    print STDERR "Warning, $main::source: The $entity_name $entity_type" .
+      " is deprecated in the .defs file, but not in _WRAP_$wrapper.\n";
+  }
+  # Uncomment the following lines some time in the future, when most
+  # signal.defs files have been updated with deprecation information.
+  # generate_extra_defs.cc was updated to generate this info soon after
+  # glibmm 2.47.6.
+  #elsif (!$defs_deprecated && $wrap_deprecated)
+  #{
+  #  print STDERR "Warning, $main::source: The $entity_name $entity_type" .
+  #    " is deprecated in _WRAP_$wrapper, but not in the .defs file.\n";
+  #}
+}
+
 sub ifdef($$)
 {
 	my ($self, $ifdef) = @_;
@@ -893,11 +919,12 @@ sub output_wrap_any_property($$$$$$$$$$)
 }
 
 # _PROPERTY_PROXY(name, cpp_type)
-# void output_wrap_property($filename, $line_num, $name, $cpp_type, $deprecated, $deprecation_docs)
-sub output_wrap_property($$$$$$$$)
+# void output_wrap_property($filename, $line_num, $name, $cpp_type, $file_deprecated,
+#   $deprecated, $deprecation_docs)
+sub output_wrap_property($$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated,
-      $deprecation_docs, $newin) = @_;
+  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $file_deprecated,
+      $deprecated, $deprecation_docs, $newin) = @_;
 
   my $objProperty = GtkDefs::lookup_property($c_class, $name);
   if($objProperty eq 0) #If the lookup failed:
@@ -906,17 +933,21 @@ sub output_wrap_property($$$$$$$$)
   }
   else
   {
+    Output::check_deprecation($file_deprecated, $objProperty->get_deprecated(),
+      $deprecated, $name, "property", "PROPERTY");
+
     $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class,
       $deprecated, $deprecation_docs, $newin, $objProperty, "_PROPERTY_PROXY");
   }
 }
 
 # _CHILD_PROPERTY_PROXY(name, cpp_type)
-# void output_wrap_child_property($filename, $line_num, $name, $cpp_type, $deprecated, $deprecation_docs)
-sub output_wrap_child_property($$$$$$$$)
+# void output_wrap_child_property($filename, $line_num, $name, $cpp_type, $file_deprecated,
+#   $deprecated, $deprecation_docs)
+sub output_wrap_child_property($$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated,
-      $deprecation_docs, $newin) = @_;
+  my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $file_deprecated,
+      $deprecated, $deprecation_docs, $newin) = @_;
 
   my $objChildProperty = GtkDefs::lookup_child_property($c_class, $name);
   if($objChildProperty eq 0) #If the lookup failed:
@@ -925,6 +956,9 @@ sub output_wrap_child_property($$$$$$$$)
   }
   else
   {
+    Output::check_deprecation($file_deprecated, $objChildProperty->get_deprecated(),
+      $deprecated, $name, "child property", "CHILD_PROPERTY");
+
     $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class,
       $deprecated, $deprecation_docs, $newin, $objChildProperty, "_CHILD_PROPERTY_PROXY");
   }

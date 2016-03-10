@@ -715,7 +715,8 @@ BEGIN { @GtkDefs::Signal::ISA=qw(GtkDefs::Function); }
 #       string rettype;
 #
 #       string when. e.g. first, last, or both.
-#       string entity_type. e.g. method or signal
+#       string entity_type. e.g. vfunc or signal
+#       bool deprecated; # optional
 #    }
 
 # "new" can't have prototype
@@ -770,6 +771,8 @@ sub new
     $$self{rettype} = "void"
   }
 
+  $$self{deprecated} = ($1 eq "#t") if ($def =~ s/\(deprecated (\S+)\)//);
+
   # signals always have a parameter
   push(@{$$self{param_types}}, "$$self{class}*");
   push(@{$$self{param_names}}, "self");
@@ -786,6 +789,13 @@ sub new
   }
 
   return $self;
+}
+
+# bool get_deprecated()
+sub get_deprecated($)
+{
+  my ($self) = @_;
+  return $$self{deprecated}; # undef, 0 or 1
 }
 
 # bool has_same_types($objFunction)

@@ -26,6 +26,7 @@ our @EXPORT_OK;
 #       bool readable;
 #       bool writable;
 #       bool construct_only;
+#       bool deprecated; # optional
 #       string docs;
 #    }
 
@@ -46,6 +47,7 @@ sub new
   $$self{readable} = ($1 eq "#t")       if ($def =~ s/\(readable (\S+)\)//);
   $$self{writable} = ($1 eq "#t")       if ($def =~ s/\(writable (\S+)\)//);
   $$self{construct_only} = ($1 eq "#t") if ($def =~ s/\(construct-only (\S+)\)//);
+  $$self{deprecated} = ($1 eq "#t")     if ($def =~ s/\(deprecated (\S+)\)//);
   $$self{entity_type} = 'property';
 
   # Property documentation:
@@ -108,6 +110,12 @@ sub get_writable($)
 {
   my ($self) = @_;
   return $$self{writable};
+}
+
+sub get_deprecated($)
+{
+  my ($self) = @_;
+  return $$self{deprecated}; # undef, 0 or 1
 }
 
 sub get_docs($$)
