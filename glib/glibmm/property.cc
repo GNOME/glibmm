@@ -297,6 +297,20 @@ PropertyBase::get_name() const
   return Glib::ustring(get_name_internal());
 }
 
+Glib::ustring
+PropertyBase::get_nick() const
+{
+  return Glib::convert_const_gchar_ptr_to_ustring(
+    g_param_spec_get_nick(param_spec_));
+}
+
+Glib::ustring
+PropertyBase::get_blurb() const
+{
+  return Glib::convert_const_gchar_ptr_to_ustring(
+    g_param_spec_get_blurb(param_spec_));
+}
+
 void
 PropertyBase::notify()
 {

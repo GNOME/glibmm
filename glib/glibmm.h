@@ -106,6 +106,7 @@
 #include <glibmm/date.h>
 #include <glibmm/datetime.h>
 #include <glibmm/dispatcher.h>
+#include <glibmm/enums.h>
 #include <glibmm/error.h>
 #include <glibmm/exception.h>
 #include <glibmm/exceptionhandler.h>

@@ -47,10 +47,18 @@ $1 Value<$1>::get() const
 
 GParamSpec* Value<$1>::create_param_spec(const Glib::ustring& name) const
 {
+  return create_param_spec(name, Glib::ustring(), Glib::ustring(),
+      Glib::PARAM_READWRITE);
+}
+
+GParamSpec* Value<$1>::create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
+                                         const Glib::ustring& blurb, Glib::ParamFlags flags) const
+{
   return g_param_spec_[]ifelse($2,schar,char,$2)(
-      name.c_str(), nullptr, nullptr,ifelse($2,pointer,,[
+      name.c_str(), nick.empty() ? nullptr : nick.c_str(),
+      blurb.empty() ? nullptr : blurb.c_str(), ifelse($2,pointer,,[
       ifelse($3,,,[$3, $4, ])[]g_value_get_$2(&gobject_),])
-      GParamFlags(G_PARAM_READABLE | G_PARAM_WRITABLE));
+      static_cast<GParamFlags>(flags));
 }
 ])
 

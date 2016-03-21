@@ -21,6 +21,7 @@
 #include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
+#include <glibmm/enums.h>
 #include <glib-object.h>
 
 namespace Glib
@@ -103,6 +104,8 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
+  GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
+                                const Glib::ustring& blurb, Glib::ParamFlags flags) const;
 #endif
 
 protected:
@@ -120,6 +123,9 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
+  GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
+                                const Glib::ustring& blurb, Glib::ParamFlags flags) const;
+
 #endif
 
 protected:
@@ -139,6 +145,9 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
+  GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
+                                const Glib::ustring& blurb, Glib::ParamFlags flags) const;
+
 #endif
 
 protected:
@@ -157,6 +166,9 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
+  GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
+                                const Glib::ustring& blurb, Glib::ParamFlags flags) const;
+
 #endif
 
 protected:
@@ -175,6 +187,9 @@ public:
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   GParamSpec* create_param_spec(const Glib::ustring& name) const;
+  GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
+                                const Glib::ustring& blurb, Glib::ParamFlags flags) const;
+
 #endif
 
 protected:

@@ -61,6 +61,14 @@ public:
    */
   Glib::ustring get_name() const;
 
+  /** Returns the nickname of the property.
+   */
+  Glib::ustring get_nick() const;
+
+  /** Returns the short description of the property.
+   */
+  Glib::ustring get_blurb() const;
+
   /** Notifies the object containing the property that the property has changed.
    * This emits the "notify" signal, passing the property name.
    */
@@ -122,10 +130,11 @@ private:
  *  * The default value and the minimum and maximum bounds (depending on the type of the property).
  *  * Flags, defining, among other things, whether the property can be read or written.
  *
- * This Property class currently supports only the name and default value. The
- * minimum and maximum bounds are set to the full range of the value. The nick
- * and the explanation are set to empty. The flags are set to indicate that the
- * property can be both read from and written to.
+ * This Property class currently supports the name, nick name, description default value and flags.
+ * The minimum and maximum bounds are set to the full range of the value.
+ * Because of internal implementation, flags shouldn't be set to values: Glib::PARAM_STATIC_NAME,
+ * Glib::PARAM_STATIC_NICK, Glib::PARAM_STATIC_BLURB, Glib::PARAM_CONSTRUCT and
+ * Glib::PARAM_CONSTRUCT_ONLY.
  *
  * The class information must be installed into the GObject system once per
  * property, but this is handled automatically.
@@ -184,6 +193,20 @@ public:
    */
   Property(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value);
 
+  /** Constructs a property of the @a object with the specified @a name, @a nick, @a blurb and
+   * @a flags.
+   * For  each instance of the object, the same property must be constructed with the same name.
+   */
+  Property(Glib::Object& object, const Glib::ustring& name, const Glib::ustring& nick,
+           const Glib::ustring& blurb, Glib::ParamFlags flags);
+
+  /** Constructs a property of the @a object with the specified @a name, @a default_value, @a nick,
+   * @a blurb and @a flags.
+   * For  each instance of the object, the same property must be constructed with the same name.
+   */
+  Property(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags);
+
   /** Sets the value of the property to @a data.
    * The object containing the property will be notified about the change.
    */
@@ -207,27 +230,143 @@ public:
   inline Glib::PropertyProxy<T> get_proxy();
 };
 
+/** See Property.
+ * This property can be read, but not written, so there is no set_value() method.
+ */
+template <class T>
+class Property_ReadOnly : public PropertyBase
+{
+public:
+  typedef T PropertyType;
+  typedef Glib::Value<T> ValueType;
+
+  /**  Constructs a property of the @a object with the specified @a name.
+   * For each instance of the object, the same property must be constructed with the same name.
+   */
+  Property_ReadOnly(Glib::Object& object, const Glib::ustring& name);
+
+  /** Constructs a property of the @a object with the specified @a name and @a default_value.
+   * For  each instance of the object, the same property must be constructed with the same name.
+   */
+  Property_ReadOnly(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value);
+
+  /** Constructs a property of the @a object with the specified @a name, @a nick, @a blurb and
+   * @a flags.
+   * For  each instance of the object, the same property must be constructed with the same name.
+   */
+  Property_ReadOnly(Glib::Object& object, const Glib::ustring& name, const Glib::ustring& nick,
+           const Glib::ustring& blurb, Glib::ParamFlags flags);
+
+  /** Constructs a property of the @a object with the specified @a name, @a default_value, @a nick,
+   * @a blurb and @a flags.
+   * For  each instance of the object, the same property must be constructed with the same name.
+   */
+  Property_ReadOnly(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags);
+
+  /** Returns the value of the property.
+   */
+  inline PropertyType get_value() const;
+
+  /** Returns the value of the property.
+   */
+  inline operator PropertyType() const;
+
+  /** Returns a proxy object that can be used to manipulate this property.
+   */
+  inline Glib::PropertyProxy_ReadOnly<T> get_proxy();
+};
+
+/** See Property.
+ * This property can be written, but not read, so there is no get_value() method.
+ */
+template <class T>
+class Property_WriteOnly : public PropertyBase
+{
+public:
+  typedef T PropertyType;
+  typedef Glib::Value<T> ValueType;
+
+  /**  Constructs a property of the @a object with the specified @a name.
+   * For each instance of the object, the same property must be constructed with the same name.
+   */
+  Property_WriteOnly(Glib::Object& object, const Glib::ustring& name);
+
+  /** Constructs a property of the @a object with the specified @a name and @a default_value.
+   * For  each instance of the object, the same property must be constructed with the same name.
+   */
+  Property_WriteOnly(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value);
+
+  /** Constructs a property of the @a object with the specified @a name, @a nick, @a blurb and
+   * @a flags.
+   * For  each instance of the object, the same property must be constructed with the same name.
+   */
+  Property_WriteOnly(Glib::Object& object, const Glib::ustring& name, const Glib::ustring& nick,
+           const Glib::ustring& blurb, Glib::ParamFlags flags);
+
+  /** Constructs a property of the @a object with the specified @a name, @a default_value, @a nick,
+   * @a blurb and @a flags.
+   * For  each instance of the object, the same property must be constructed with the same name.
+   */
+  Property_WriteOnly(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags);
+
+  /** Sets the value of the property to @a data.
+   * The object containing the property will be notified about the change.
+   */
+  inline void set_value(const PropertyType& data);
+
+  /** Sets the value of the property to @a data.
+   * The object containing the property will be notified about the change.
+   */
+  inline Property_WriteOnly<T>& operator=(const PropertyType& data);
+
+  /** Returns a proxy object that can be used to manipulate this property.
+   */
+  inline Glib::PropertyProxy_WriteOnly<T> get_proxy();
+};
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 /**** Glib::Property<T> ****************************************************/
 
 template <class T>
 Property<T>::Property(Glib::Object& object, const Glib::ustring& name)
-: PropertyBase(object, ValueType::value_type())
+: Property(object, name, Glib::ustring(), Glib::ustring(), Glib::PARAM_READWRITE)
 {
-  if (!lookup_property(name))
-    install_property(static_cast<ValueType&>(value_).create_param_spec(name));
 }
 
 template <class T>
 Property<T>::Property(Glib::Object& object, const Glib::ustring& name,
   const typename Property<T>::PropertyType& default_value)
+: Property(object, name, default_value, Glib::ustring(),
+    Glib::ustring(), Glib::PARAM_READWRITE)
+{
+}
+
+template <class T>
+Property<T>::Property(Glib::Object& object, const Glib::ustring& name,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags)
 : PropertyBase(object, ValueType::value_type())
 {
+  flags |= Glib::PARAM_READWRITE;
+
+  if (!lookup_property(name))
+    install_property(static_cast<ValueType&>(value_).create_param_spec(name, nick, blurb, flags));
+}
+
+template <class T>
+Property<T>::Property(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags)
+:
+  PropertyBase(object, ValueType::value_type())
+{
+  flags |= Glib::PARAM_READWRITE;
+
   static_cast<ValueType&>(value_).set(default_value);
 
   if (!lookup_property(name))
-    install_property(static_cast<ValueType&>(value_).create_param_spec(name));
+    install_property(static_cast<ValueType&>(value_).create_param_spec(name, nick, blurb, flags));
 }
 
 template <class T>
@@ -267,7 +406,136 @@ Property<T>::get_proxy()
   return Glib::PropertyProxy<T>(object_, get_name_internal());
 }
 
+/**** Glib::Property_ReadOnly<T> ****************************************************/
+
+template <class T>
+Property_ReadOnly<T>::Property_ReadOnly(Glib::Object& object, const Glib::ustring& name)
+: Property_ReadOnly(object, name, Glib::ustring(), Glib::ustring(), Glib::PARAM_READABLE)
+{
+}
+
+template <class T>
+Property_ReadOnly<T>::Property_ReadOnly(Glib::Object& object, const Glib::ustring& name,
+  const typename Property_ReadOnly<T>::PropertyType& default_value)
+: Property_ReadOnly(object, name, default_value, Glib::ustring(), Glib::ustring(),
+    Glib::PARAM_READABLE)
+{
+}
+
+template <class T>
+Property_ReadOnly<T>::Property_ReadOnly(Glib::Object& object, const Glib::ustring& name,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags)
+: PropertyBase(object, ValueType::value_type())
+{
+  flags |= Glib::PARAM_READABLE;
+  flags &= ~Glib::PARAM_WRITABLE;
+
+  if (!lookup_property(name))
+    install_property(static_cast<ValueType&>(value_).create_param_spec(name, nick, blurb, flags));
+}
+
+template <class T>
+Property_ReadOnly<T>::Property_ReadOnly(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags)
+: PropertyBase(object, ValueType::value_type())
+{
+  flags |= Glib::PARAM_READABLE;
+  flags &= ~Glib::PARAM_WRITABLE;
+
+  static_cast<ValueType&>(value_).set(default_value);
+
+  if (!lookup_property(name))
+    install_property(static_cast<ValueType&>(value_).create_param_spec(name, nick, blurb, flags));
+}
+
+template <class T>
+inline typename Property_ReadOnly<T>::PropertyType
+Property_ReadOnly<T>::get_value() const
+{
+  return static_cast<const ValueType&>(value_).get();
+}
+
+template <class T>
+inline Property_ReadOnly<T>::operator T() const
+{
+  return static_cast<const ValueType&>(value_).get();
+}
+
+template <class T>
+inline Glib::PropertyProxy_ReadOnly<T>
+Property_ReadOnly<T>::get_proxy()
+{
+  return Glib::PropertyProxy_ReadOnly<T>(object_, get_name_internal());
+}
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+/**** Glib::Property_WriteOnly<T> ****************************************************/
+
+template <class T>
+Property_WriteOnly<T>::Property_WriteOnly(Glib::Object& object, const Glib::ustring& name)
+: Property_WriteOnly(object, name, Glib::ustring(),
+    Glib::ustring(), Glib::PARAM_WRITABLE)
+{
+}
+
+template <class T>
+Property_WriteOnly<T>::Property_WriteOnly(Glib::Object& object, const Glib::ustring& name,
+  const typename Property_WriteOnly<T>::PropertyType& default_value)
+: Property_WriteOnly(object, name, default_value, Glib::ustring(),
+    Glib::ustring(), Glib::PARAM_WRITABLE)
+{
+}
+
+template <class T>
+Property_WriteOnly<T>::Property_WriteOnly(Glib::Object& object, const Glib::ustring& name,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags)
+: PropertyBase(object, ValueType::value_type())
+{
+  flags |= Glib::PARAM_WRITABLE;
+  flags &= ~Glib::PARAM_READABLE;
+
+  if (!lookup_property(name))
+    install_property(static_cast<ValueType&>(value_).create_param_spec(name, nick, blurb, flags));
+
+}
+
+template <class T>
+Property_WriteOnly<T>::Property_WriteOnly(Glib::Object& object, const Glib::ustring& name, const PropertyType& default_value,
+           const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags)
+: PropertyBase(object, ValueType::value_type())
+{
+  flags |= Glib::PARAM_WRITABLE;
+  flags &= ~Glib::PARAM_READABLE;
+
+  static_cast<ValueType&>(value_).set(default_value);
+
+  if (!lookup_property(name))
+    install_property(static_cast<ValueType&>(value_).create_param_spec(name, nick, blurb, flags));
+}
+
+template <class T>
+inline void
+Property_WriteOnly<T>::set_value(const typename Property_WriteOnly<T>::PropertyType& data)
+{
+  static_cast<ValueType&>(value_).set(data);
+  this->notify();
+}
+
+template <class T>
+inline Property_WriteOnly<T>&
+Property_WriteOnly<T>::operator=(const typename Property_WriteOnly<T>::PropertyType& data)
+{
+  static_cast<ValueType&>(value_).set(data);
+  this->notify();
+  return *this;
+}
+
+template <class T>
+inline Glib::PropertyProxy_WriteOnly<T>
+Property_WriteOnly<T>::get_proxy()
+{
+  return Glib::PropertyProxy_WriteOnly<T>(object_, get_name_internal());
+}
 
 } // namespace Glib
 
