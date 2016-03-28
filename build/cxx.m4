@@ -236,3 +236,24 @@ AS_VAR_IF([glibmm_cv_cxx_can_use_namespaces_inside_externc], ['yes'],
           [AC_DEFINE([GLIBMM_CAN_USE_NAMESPACES_INSIDE_EXTERNC], [1],
                      [Define if the compiler honors namespaces inside extern "C" blocks.])])[]dnl
 ])
+
+## GLIBMM_CXX_CAN_USE_THREAD_LOCAL
+##
+## Check for thread_local support
+##
+AC_DEFUN([GLIBMM_CXX_CAN_USE_THREAD_LOCAL],
+[dnl
+AC_CACHE_CHECK(
+  [whether the thread_local keyword is supported],
+  [glibmm_cv_cxx_can_use_thread_local],
+  [AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[
+thread_local int i=0;
+]], [])],
+    [glibmm_cv_cxx_can_use_thread_local=yes],
+    [glibmm_cv_cxx_can_use_thread_local=no])])
+
+AS_VAR_IF([glibmm_cv_cxx_can_use_thread_local], ['yes'],
+          [AC_DEFINE([GLIBMM_CAN_USE_THREAD_LOCAL], [1],
+                     [Define if the thread_local keyword is supported.])])[]dnl
+])

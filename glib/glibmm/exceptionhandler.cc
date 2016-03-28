@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef GLIBMM_THREAD_LOCAL_ENABLED
+#ifndef GLIBMM_CAN_USE_THREAD_LOCAL
 #include <glibmm/threads.h>
 #endif
 #include <glibmmconfig.h>
@@ -36,7 +36,7 @@ typedef sigc::signal<void> HandlerList;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
 static thread_local HandlerList* thread_specific_handler_list = nullptr;
 #else
 static Glib::Threads::Private<HandlerList> thread_specific_handler_list;
@@ -92,7 +92,7 @@ namespace Glib
 sigc::connection
 add_exception_handler(const sigc::slot<void>& slot)
 {
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
   HandlerList* handler_list = thread_specific_handler_list;
 #else
   HandlerList* handler_list = thread_specific_handler_list.get();
@@ -101,7 +101,7 @@ add_exception_handler(const sigc::slot<void>& slot)
   if (!handler_list)
   {
     handler_list = new HandlerList();
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
     thread_specific_handler_list = handler_list;
 #else
     thread_specific_handler_list.set(handler_list);
@@ -129,7 +129,7 @@ exception_handlers_invoke() noexcept
   // handled.  If there are no more handlers in the list and the exception
   // is still unhandled, call glibmm_unexpected_exception().
 
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
   if (HandlerList* const handler_list = thread_specific_handler_list)
 #else
   if(HandlerList *const handler_list = thread_specific_handler_list.get())

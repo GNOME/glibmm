@@ -15,7 +15,7 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef GLIBMM_THREAD_LOCAL_ENABLED
+#ifndef GLIBMM_CAN_USE_THREAD_LOCAL
 #include <glibmm/threads.h>
 #endif
 
@@ -147,7 +147,7 @@ protected:
   explicit DispatchNotifier(const Glib::RefPtr<MainContext>& context);
 
 private:
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
   static thread_local DispatchNotifier* thread_specific_instance_;
 #else
   static Glib::Threads::Private<DispatchNotifier> thread_specific_instance_;
@@ -175,7 +175,7 @@ private:
 
 // static
 
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
 thread_local DispatchNotifier* DispatchNotifier::thread_specific_instance_ = nullptr;
 #else
 Glib::Threads::Private<DispatchNotifier> DispatchNotifier::thread_specific_instance_;
@@ -282,7 +282,7 @@ DispatchNotifier*
 DispatchNotifier::reference_instance(
   const Glib::RefPtr<MainContext>& context, const Dispatcher* dispatcher)
 {
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
   DispatchNotifier* instance = thread_specific_instance_;
 #else
   DispatchNotifier* instance = thread_specific_instance_.get();
@@ -291,7 +291,7 @@ DispatchNotifier::reference_instance(
   if (!instance)
   {
     instance = new DispatchNotifier(context);
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
     thread_specific_instance_ = instance;
 #else
     thread_specific_instance_.replace(instance);
@@ -323,7 +323,7 @@ DispatchNotifier::reference_instance(
 void
 DispatchNotifier::unreference_instance(DispatchNotifier* notifier, const Dispatcher* dispatcher)
 {
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
   DispatchNotifier* const instance = thread_specific_instance_;
 #else
   DispatchNotifier* const instance = thread_specific_instance_.get();
@@ -344,7 +344,7 @@ DispatchNotifier::unreference_instance(DispatchNotifier* notifier, const Dispatc
   {
     g_return_if_fail(instance->ref_count_ == 0); // could be < 0 if messed up
 
-#ifdef GLIBMM_THREAD_LOCAL_ENABLED
+#ifdef GLIBMM_CAN_USE_THREAD_LOCAL
     delete thread_specific_instance_;
     thread_specific_instance_ = nullptr;
 #else
