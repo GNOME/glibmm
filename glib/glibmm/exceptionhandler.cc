@@ -19,6 +19,9 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef GLIBMM_THREAD_LOCAL_ENABLED
+#include <glibmm/threads.h>
+#endif
 #include <glibmmconfig.h>
 #include <glibmm/error.h>
 #include <glibmm/exceptionhandler.h>
@@ -33,7 +36,11 @@ typedef sigc::signal<void> HandlerList;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.
+#ifdef GLIBMM_THREAD_LOCAL_ENABLED
 static thread_local HandlerList* thread_specific_handler_list = nullptr;
+#else
+static Glib::Threads::Private<HandlerList> thread_specific_handler_list;
+#endif
 
 static void
 glibmm_exception_warning(const GError* error)
@@ -85,12 +92,20 @@ namespace Glib
 sigc::connection
 add_exception_handler(const sigc::slot<void>& slot)
 {
+#ifdef GLIBMM_THREAD_LOCAL_ENABLED
   HandlerList* handler_list = thread_specific_handler_list;
+#else
+  HandlerList* handler_list = thread_specific_handler_list.get();
+#endif
 
   if (!handler_list)
   {
     handler_list = new HandlerList();
+#ifdef GLIBMM_THREAD_LOCAL_ENABLED
     thread_specific_handler_list = handler_list;
+#else
+    thread_specific_handler_list.set(handler_list);
+#endif
   }
 
   handler_list->slots().push_front(slot);
@@ -114,7 +129,11 @@ exception_handlers_invoke() noexcept
   // handled.  If there are no more handlers in the list and the exception
   // is still unhandled, call glibmm_unexpected_exception().
 
+#ifdef GLIBMM_THREAD_LOCAL_ENABLED
   if (HandlerList* const handler_list = thread_specific_handler_list)
+#else
+  if(HandlerList *const handler_list = thread_specific_handler_list.get())
+#endif
   {
     HandlerList::iterator pslot = handler_list->slots().begin();
 

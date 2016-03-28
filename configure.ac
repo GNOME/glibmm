@@ -106,6 +106,12 @@ GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS
 GLIBMM_C_STD_TIME_T_IS_NOT_INT32
 
+# check for thread_local support
+AC_MSG_CHECKING([whether the thread_local keyword is supported])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([thread_local int i=0;], [])],
+	AC_DEFINE([GLIBMM_THREAD_LOCAL_ENABLED], [1], [thread_local keyword is available])
+	AC_MSG_RESULT([yes]) , AC_MSG_RESULT([no]))
+
 MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
 MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
