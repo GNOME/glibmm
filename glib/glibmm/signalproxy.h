@@ -150,7 +150,14 @@ private:
  * to connect signal handlers to signals.
  */
 template <class R, class... T>
-class SignalProxy : public SignalProxyNormal
+class SignalProxy;
+
+/** Proxy for signals with any number of arguments.
+ * Use the connect() or connect_notify() method, with sigc::mem_fun() or sigc::ptr_fun()
+ * to connect signal handlers to signals.
+ */
+template <class R, class... T>
+class SignalProxy<R(T...)> : public SignalProxyNormal
 {
 public:
   using SlotType = sigc::slot<R(T...)>;
@@ -281,7 +288,10 @@ private:
  * to connect signal handlers to signals.
  */
 template <class R, class... T>
-class SignalProxyDetailedAnyType : public SignalProxyDetailed
+class SignalProxyDetailedAnyType;
+
+template <class R, class... T>
+class SignalProxyDetailedAnyType<R(T...)> : public SignalProxyDetailed
 {
 public:
   using SlotType = sigc::slot<R(T...)>;
