@@ -65,7 +65,7 @@ ifelse($8,`1',,`dnl Do not generate the implementation if it should be custom:
 static $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
 {
   using namespace __NAMESPACE__;
-  using SlotType = sigc::slot< $5`'_COMMA_PREFIX($6) >;
+  using SlotType = sigc::slot<$5`'($6)>;
 
   auto obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
   // Do not try to call a signal on a disassociated wrapper.
@@ -107,7 +107,7 @@ ifelse($2,void,,`dnl else
 static $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`' void* data)
 {
   using namespace __NAMESPACE__;
-  using SlotType = sigc::slot< void`'_COMMA_PREFIX($6) >;
+  using SlotType = sigc::slot<void($6)>;
 
   auto obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
   // Do not try to call a signal on a disassociated wrapper.
