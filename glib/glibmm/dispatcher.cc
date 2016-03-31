@@ -527,13 +527,13 @@ Dispatcher::operator()()
 }
 
 sigc::connection
-Dispatcher::connect(const sigc::slot<void>& slot)
+Dispatcher::connect(const sigc::slot<void()>& slot)
 {
   return signal_.connect(slot);
 }
 
 sigc::connection
-Dispatcher::connect(sigc::slot<void>&& slot)
+Dispatcher::connect(sigc::slot<void()>&& slot)
 {
   return signal_.connect(std::move(slot));
 }

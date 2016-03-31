@@ -31,7 +31,7 @@ giomm_generic_socket_callback(sigc::slot_base* slot, GIOCondition condition)
   try
   {
     // Recreate the specific slot from the generic slot node.
-    return (*static_cast<sigc::slot<bool, Glib::IOCondition>*>(slot))((Glib::IOCondition)condition);
+    return (*static_cast<sigc::slot<bool(Glib::IOCondition)>*>(slot))((Glib::IOCondition)condition);
   }
   catch (...)
   {
@@ -66,7 +66,7 @@ inline SignalSocket::SignalSocket(GMainContext* context) : context_(context)
 }
 
 sigc::connection
-SignalSocket::connect(const sigc::slot<bool, Glib::IOCondition>& slot,
+SignalSocket::connect(const sigc::slot<bool(Glib::IOCondition)>& slot,
   const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
   const Glib::RefPtr<Cancellable>& cancellable, int priority)
 {

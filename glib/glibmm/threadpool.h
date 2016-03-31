@@ -72,7 +72,7 @@ public:
   virtual ~ThreadPool() noexcept;
 
   // See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
-  // TODO: At the next ABI break, consider changing const sigc::slot<void>& slot
+  // TODO: At the next ABI break, consider changing const sigc::slot<void()>& slot
   // to const std::function<void()>& func, if it can be assumed that all supported
   // compilers understand the C++11 template class std::function<>.
   /** Inserts @a slot into the list of tasks to be executed by the pool.
@@ -91,7 +91,7 @@ public:
    * couldn't be created. In that case @a slot is simply appended to the
    * queue of work to do.
    */
-  void push(const sigc::slot<void>& slot);
+  void push(const sigc::slot<void()>& slot);
 
   /** Sets the maximal allowed number of threads for the pool.
    * A value of -1 means that the maximal number of threads is unlimited.

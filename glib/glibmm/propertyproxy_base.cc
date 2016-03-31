@@ -58,7 +58,7 @@ void PropertyProxyConnectionNode::callback(GObject*, GParamSpec* pspec, gpointer
   if (pspec && data)
   {
     if (sigc::slot_base* const slot = SignalProxyBase::data_to_slot(data))
-      (*static_cast<sigc::slot<void>*>(slot))();
+      (*static_cast<sigc::slot<void()>*>(slot))();
   }
 }
 

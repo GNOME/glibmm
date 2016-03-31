@@ -30,7 +30,7 @@ class DispatchNotifier;
 
 /** Signal class for inter-thread communication.
  * @ingroup Threads
- * Glib::Dispatcher works similar to sigc::signal<void>.  But unlike normal
+ * Glib::Dispatcher works similar to sigc::signal<void()>.  But unlike normal
  * signals, the notification happens asynchronously through a pipe.  This is
  * a simple and efficient way of communicating between threads, and especially
  * useful in a thread model with a single GUI thread.
@@ -88,13 +88,13 @@ public:
   void emit();
   void operator()();
 
-  sigc::connection connect(const sigc::slot<void>& slot);
+  sigc::connection connect(const sigc::slot<void()>& slot);
   /** @newin{2,48}
    */
-  sigc::connection connect(sigc::slot<void>&& slot);
+  sigc::connection connect(sigc::slot<void()>&& slot);
 
 private:
-  sigc::signal<void> signal_;
+  sigc::signal<void()> signal_;
   DispatchNotifier* notifier_;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

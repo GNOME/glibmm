@@ -29,7 +29,7 @@ namespace Glib
 
 /** Specify a slot to be called when an exception is thrown by a signal handler.
  */
-sigc::connection add_exception_handler(const sigc::slot<void>& slot);
+sigc::connection add_exception_handler(const sigc::slot<void()>& slot);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // internal

@@ -101,7 +101,7 @@ SignalProxyNormal::slot0_void_callback(GObject* self, void* data)
     try
     {
       if (sigc::slot_base* const slot = data_to_slot(data))
-        (*static_cast<sigc::slot<void>*>(slot))();
+        (*static_cast<sigc::slot<void()>*>(slot))();
     }
     catch (...)
     {

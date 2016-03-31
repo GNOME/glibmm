@@ -38,14 +38,14 @@ public:
   SlotList(const ThreadPool::SlotList&) = delete;
   ThreadPool::SlotList& operator=(const ThreadPool::SlotList&) = delete;
 
-  sigc::slot<void>* push(const sigc::slot<void>& slot);
-  sigc::slot<void> pop(sigc::slot<void>* slot_ptr);
+  sigc::slot<void()>* push(const sigc::slot<void()>& slot);
+  sigc::slot<void()> pop(sigc::slot<void()>* slot_ptr);
 
   void lock_and_unlock();
 
 private:
   Glib::Threads::Mutex mutex_;
-  std::list<sigc::slot<void>> list_;
+  std::list<sigc::slot<void()>> list_;
 };
 
 ThreadPool::SlotList::SlotList()
@@ -56,8 +56,8 @@ ThreadPool::SlotList::~SlotList() noexcept
 {
 }
 
-sigc::slot<void>*
-ThreadPool::SlotList::push(const sigc::slot<void>& slot)
+sigc::slot<void()>*
+ThreadPool::SlotList::push(const sigc::slot<void()>& slot)
 {
   Threads::Mutex::Lock lock(mutex_);
 
@@ -65,15 +65,15 @@ ThreadPool::SlotList::push(const sigc::slot<void>& slot)
   return &list_.back();
 }
 
-sigc::slot<void>
-ThreadPool::SlotList::pop(sigc::slot<void>* slot_ptr)
+sigc::slot<void()>
+ThreadPool::SlotList::pop(sigc::slot<void()>* slot_ptr)
 {
-  sigc::slot<void> slot;
+  sigc::slot<void()> slot;
 
   {
     Threads::Mutex::Lock lock(mutex_);
 
-    std::list<sigc::slot<void>>::iterator pslot = list_.begin();
+    std::list<sigc::slot<void()>>::iterator pslot = list_.begin();
     while (pslot != list_.end() && slot_ptr != &*pslot)
       ++pslot;
 
@@ -107,7 +107,7 @@ call_thread_entry_slot(void* data, void* user_data)
     Glib::ThreadPool::SlotList* const slot_list =
       static_cast<Glib::ThreadPool::SlotList*>(user_data);
 
-    sigc::slot<void> slot(slot_list->pop(static_cast<sigc::slot<void>*>(data)));
+    sigc::slot<void()> slot(slot_list->pop(static_cast<sigc::slot<void()>*>(data)));
 
     slot();
   }
@@ -155,9 +155,9 @@ ThreadPool::~ThreadPool() noexcept
 }
 
 void
-ThreadPool::push(const sigc::slot<void>& slot)
+ThreadPool::push(const sigc::slot<void()>& slot)
 {
-  sigc::slot<void>* const slot_ptr = slot_list_->push(slot);
+  sigc::slot<void()>* const slot_ptr = slot_list_->push(slot);
 
   GError* error = nullptr;
   g_thread_pool_push(gobject_, slot_ptr, &error);
