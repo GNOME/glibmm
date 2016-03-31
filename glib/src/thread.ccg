@@ -31,7 +31,7 @@ call_thread_entry_slot(void* data)
   try
   {
     // Recreate the specific slot, and drop the reference obtained by create().
-    (*static_cast<sigc::slot<void>*>(slot))();
+    (*static_cast<sigc::slot<void()>*>(slot))();
   }
   catch (Glib::Thread::Exit&)
   {
@@ -69,10 +69,10 @@ thread_init_impl()
 
 // static
 Thread*
-Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
+Thread::create(const sigc::slot<void()>& slot, bool /* joinable */)
 {
   // Make a copy of slot on the heap
-  const auto slot_copy = new sigc::slot<void>(slot);
+  const auto slot_copy = new sigc::slot<void()>(slot);
 
   GError* error = nullptr;
 
@@ -94,11 +94,11 @@ Thread::create(const sigc::slot<void>& slot, bool /* joinable */)
 
 // static
 Thread*
-Thread::create(const sigc::slot<void>& slot, unsigned long stack_size, bool joinable, bool bound,
+Thread::create(const sigc::slot<void()>& slot, unsigned long stack_size, bool joinable, bool bound,
   ThreadPriority priority)
 {
   // Make a copy of slot on the heap
-  const auto slot_copy = new sigc::slot<void>(slot);
+  const auto slot_copy = new sigc::slot<void()>(slot);
 
   GError* error = nullptr;
 

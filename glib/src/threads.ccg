@@ -45,7 +45,7 @@ call_thread_entry_slot(void* data)
   try
   {
     // Recreate the specific slot.
-    (*static_cast<sigc::slot<void>*>(slot))();
+    (*static_cast<sigc::slot<void()>*>(slot))();
   }
   catch (Glib::Threads::Thread::Exit&)
   {
@@ -75,10 +75,10 @@ namespace Threads
 
 // static
 Thread*
-Thread::create(const sigc::slot<void>& slot, const std::string& name)
+Thread::create(const sigc::slot<void()>& slot, const std::string& name)
 {
   // Make a copy of slot on the heap.
-  const auto slot_copy = new sigc::slot<void>(slot);
+  const auto slot_copy = new sigc::slot<void()>(slot);
 
   GError* error = nullptr;
   auto thread = g_thread_try_new(
@@ -98,7 +98,7 @@ Thread::create(const sigc::slot<void>& slot, const std::string& name)
 
 // static
 Thread*
-Thread::create(const sigc::slot<void>& slot)
+Thread::create(const sigc::slot<void()>& slot)
 {
   return create(slot, std::string());
 }
