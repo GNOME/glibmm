@@ -57,8 +57,8 @@ class BalancedTree
 {
   _CLASS_GENERIC(BalancedTree, GTree)
 public:
-  using TraverseFunc = sigc::slot<bool, const K&, const V&>;
-  using CompareFunc = sigc::slot<int, const K&, const K&>;
+  using TraverseFunc = sigc::slot<bool(const K&, const V&)>;
+  using CompareFunc = sigc::slot<int(const K&, const K&)>;
 
 protected:
   BalancedTree() :
@@ -235,8 +235,8 @@ public:
    */
   V* search(const CompareFunc &search_func, const K& key)
   {
-    sigc::slot<int, const K&, const CompareFunc&, const K&> real_slot = sigc::ptr_fun(on_compare_key);
-    sigc::slot<int, const K&> bound_slot = sigc::bind(real_slot, search_func, key);
+    sigc::slot<int(const K&, const CompareFunc&, const K&)> real_slot = sigc::ptr_fun(on_compare_key);
+    sigc::slot<int(const K&)> bound_slot = sigc::bind(real_slot, search_func, key);
     gpointer value = g_tree_search(gobj(), c_callback_search, reinterpret_cast<gconstpointer>(&bound_slot));
 
     return reinterpret_cast<V*>(value);
@@ -278,7 +278,7 @@ private:
   /// Wrapper for invoking GCompareFunc.
   static gint c_callback_search(gconstpointer a, gconstpointer b)
   {
-    const sigc::slot<int, const K&>* slot = reinterpret_cast<const sigc::slot<int, const K&> *>(b);
+    const auto slot = reinterpret_cast<const sigc::slot<int(const K&)> *>(b);
     return (*slot)(*reinterpret_cast<const K*>(a));
   }
 

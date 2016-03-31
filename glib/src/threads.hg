@@ -98,7 +98,7 @@ public:
   class Exit;
 
   //See http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
-  // TODO: At the next ABI break, consider changing const sigc::slot<void>& slot
+  // TODO: At the next ABI break, consider changing const sigc::slot<void()>& slot
   // to const std::function<void()>& func, if it can be assumed that all supported
   // compilers understand the C++11 template class std::function<>.
   /** Creates a new thread.
@@ -117,7 +117,7 @@ public:
    * @return The new Thread* on success.
    * @throw Glib::Threads::ThreadError
    */
-  static Thread* create(const sigc::slot<void>& slot);
+  static Thread* create(const sigc::slot<void()>& slot);
 
   // TODO: At next ABI break, remove the single parameter create
   //       method and default name to std::string()
@@ -145,7 +145,7 @@ public:
    *
    * @newin{2,36}
    */
-  static Thread* create(const sigc::slot<void>& slot, const std::string& name);
+  static Thread* create(const sigc::slot<void()>& slot, const std::string& name);
 
   /** Returns the Thread* corresponding to the calling thread.
    * @return The current thread.
