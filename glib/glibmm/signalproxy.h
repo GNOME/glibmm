@@ -220,25 +220,6 @@ public:
   }
 };
 
-/* Templates below has been added to avoid API break, and should not be
- * used in a newly created code. SignalProxy class should be used instead
- * of SignalProxy# class.
- */
-template <typename R>
-using SignalProxy0 = SignalProxy<R>;
-template <typename R, typename T1>
-using SignalProxy1 = SignalProxy<R, T1>;
-template <typename R, typename T1, typename T2>
-using SignalProxy2 = SignalProxy<R, T1, T2>;
-template <typename R, typename T1, typename T2, typename T3>
-using SignalProxy3 = SignalProxy<R, T1, T2, T3>;
-template <typename R, typename T1, typename T2, typename T3, typename T4>
-using SignalProxy4 = SignalProxy<R, T1, T2, T3, T4>;
-template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5>
-using SignalProxy5 = SignalProxy<R, T1, T2, T3, T4, T5>;
-template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-using SignalProxy6 = SignalProxy<R, T1, T2, T3, T4, T5, T6>;
-
 // TODO: When we can break ABI, consider renaming
 // SignalProxyDetailed => SignalProxyDetailedBase
 // SignalProxyDetailedAnyType => SignalProxyDetailed
