@@ -36,7 +36,7 @@ namespace
 // on any platform.  Nevertheless, indexing a vector costs almost nothing
 // compared to a map lookup.
 
-typedef std::vector<Glib::WrapNewFunction> WrapFuncTable;
+using WrapFuncTable = std::vector<Glib::WrapNewFunction>;
 
 static WrapFuncTable* wrap_func_table = nullptr;
 

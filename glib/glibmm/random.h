@@ -26,7 +26,7 @@
 #include <glib.h>
 
 extern "C" {
-typedef struct _GRand GRand;
+using GRand = struct _GRand;
 }
 
 namespace Glib

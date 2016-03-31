@@ -400,8 +400,8 @@ SignalChildWatch signal_child_watch();
 class MainContext
 {
 public:
-  typedef Glib::MainContext CppObjectType;
-  typedef GMainContext BaseObjectType;
+  using CppObjectType = Glib::MainContext;
+  using BaseObjectType = GMainContext;
 
   // noncopyable
   MainContext(const MainContext& other) = delete;
@@ -624,8 +624,8 @@ Glib::RefPtr<MainContext> wrap(GMainContext* gobject, bool take_copy = false);
 class MainLoop
 {
 public:
-  typedef Glib::MainLoop CppObjectType;
-  typedef GMainLoop BaseObjectType;
+  using CppObjectType = Glib::MainLoop;
+  using BaseObjectType = GMainLoop;
 
   static Glib::RefPtr<MainLoop> create(bool is_running = false);
   static Glib::RefPtr<MainLoop> create(
@@ -682,8 +682,8 @@ Glib::RefPtr<MainLoop> wrap(GMainLoop* gobject, bool take_copy = false);
 class Source
 {
 public:
-  typedef Glib::Source CppObjectType;
-  typedef GSource BaseObjectType;
+  using CppObjectType = Glib::Source;
+  using BaseObjectType = GSource;
 
   // noncopyable
   Source(const Source&) = delete;
@@ -845,7 +845,7 @@ public:
 class TimeoutSource : public Glib::Source
 {
 public:
-  typedef Glib::TimeoutSource CppObjectType;
+  using CppObjectType = Glib::TimeoutSource;
 
   static Glib::RefPtr<TimeoutSource> create(unsigned int interval);
   sigc::connection connect(const sigc::slot<bool>& slot);
@@ -868,7 +868,7 @@ private:
 class IdleSource : public Glib::Source
 {
 public:
-  typedef Glib::IdleSource CppObjectType;
+  using CppObjectType = Glib::IdleSource;
 
   static Glib::RefPtr<IdleSource> create();
   sigc::connection connect(const sigc::slot<bool>& slot);
@@ -885,7 +885,7 @@ protected:
 class IOSource : public Glib::Source
 {
 public:
-  typedef Glib::IOSource CppObjectType;
+  using CppObjectType = Glib::IOSource;
 
   static Glib::RefPtr<IOSource> create(int fd, IOCondition condition);
   static Glib::RefPtr<IOSource> create(

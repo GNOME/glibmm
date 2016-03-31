@@ -67,7 +67,7 @@ public:
   GType clone_custom_type(const char* custom_type_name) const;
 
   /// The type that holds pointers to the interfaces of custom types.
-  typedef std::vector<const Interface_Class*> interface_class_vector_type;
+  using interface_class_vector_type = std::vector<const Interface_Class*>;
 
   /** Register a static custom GType, derived from the parent of this class's type.
    * The parent type of the registered custom type is the same C class as the parent
@@ -103,7 +103,7 @@ private:
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // The type that holds the values of the interface properties of custom types.
-  typedef std::vector<GValue*> iface_properties_type;
+  using iface_properties_type = std::vector<GValue*>;
   // The quark used for storing/getting the interface properties of custom types.
   static GQuark iface_properties_quark;
 #endif

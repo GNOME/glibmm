@@ -131,14 +131,14 @@ template <class Tr>
 class SListHandleIterator
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
-  typedef std::forward_iterator_tag iterator_category;
-  typedef CppType value_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef value_type reference;
-  typedef void pointer;
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = CppType;
+  using difference_type = std::ptrdiff_t;
+  using reference = value_type;
+  using pointer = void;
 
   explicit inline SListHandleIterator(const GSList* node);
 
@@ -168,15 +168,15 @@ template <class T, class Tr = Glib::Container_Helpers::TypeTraits<T>>
 class SListHandle
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
-  typedef CppType value_type;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
+  using value_type = CppType;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
 
-  typedef Glib::Container_Helpers::SListHandleIterator<Tr> const_iterator;
-  typedef Glib::Container_Helpers::SListHandleIterator<Tr> iterator;
+  using const_iterator = Glib::Container_Helpers::SListHandleIterator<Tr>;
+  using iterator = Glib::Container_Helpers::SListHandleIterator<Tr>;
 
   template <class Cont>
   inline SListHandle(const Cont& container);

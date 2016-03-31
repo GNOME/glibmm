@@ -93,7 +93,7 @@ template <class Tr>
 typename Tr::CType*
 create_array(typename std::vector<typename Tr::CppType>::const_iterator pbegin, std::size_t size)
 {
-  typedef typename Tr::CType CType;
+  using CType = typename Tr::CType;
 
   CType* const array(static_cast<CType*>(g_malloc((size + 1) * sizeof(CType))));
   CType* const array_end(array + size);
@@ -160,14 +160,14 @@ template <class Tr>
 class ArrayIterator
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
-  typedef std::random_access_iterator_tag iterator_category;
-  typedef CppType value_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef value_type reference;
-  typedef void pointer;
+  using iterator_category = std::random_access_iterator_tag;
+  using value_type = CppType;
+  using difference_type = std::ptrdiff_t;
+  using reference = value_type;
+  using pointer = void;
 
   explicit inline ArrayIterator(const CType* pos);
 
@@ -201,14 +201,14 @@ template <class Tr>
 class ListIterator
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
-  typedef std::forward_iterator_tag iterator_category;
-  typedef CppType value_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef value_type reference;
-  typedef void pointer;
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = CppType;
+  using difference_type = std::ptrdiff_t;
+  using reference = value_type;
+  using pointer = void;
 
   explicit inline ListIterator(const GList* node);
 
@@ -227,14 +227,14 @@ template <class Tr>
 class SListIterator
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
-  typedef std::forward_iterator_tag iterator_category;
-  typedef CppType value_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef value_type reference;
-  typedef void pointer;
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = CppType;
+  using difference_type = std::ptrdiff_t;
+  using reference = value_type;
+  using pointer = void;
 
   explicit inline SListIterator(const GSList* node);
 
@@ -275,8 +275,8 @@ template <typename Tr>
 class ArrayKeeper
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
   /** Constructs an ArrayKeeper holding @a array of size @a array_size.
    * @a ownership tells what should be destroyed with keeper destruction:
@@ -335,8 +335,8 @@ template <typename Tr>
 class GListKeeper
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
   /** Constructs an GListKeeper holding @a glist.
    * @a ownership tells what should be destroyed with keeper destruction:
@@ -392,8 +392,8 @@ template <typename Tr>
 class GSListKeeper
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
   /** Constructs an GSListKeeper holding @a gslist.
    * @a ownership tells what should be destroyed with keeper destruction:
@@ -467,11 +467,11 @@ template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T>>
 class ArrayHandler
 {
 public:
-  typedef typename Tr::CType CType;
-  typedef T CppType;
-  typedef std::vector<CppType> VectorType;
-  typedef typename Glib::Container_Helpers::ArrayKeeper<Tr> ArrayKeeperType;
-  typedef typename Glib::Container_Helpers::ArrayIterator<Tr> ArrayIteratorType;
+  using CType = typename Tr::CType;
+  using CppType = T;
+  using VectorType = std::vector<CppType>;
+  using ArrayKeeperType = typename Glib::Container_Helpers::ArrayKeeper<Tr>;
+  using ArrayIteratorType = typename Glib::Container_Helpers::ArrayIterator<Tr>;
 
   // maybe think about using C++0x move constructors?
   static VectorType array_to_vector(
@@ -484,9 +484,9 @@ template <>
 class ArrayHandler<bool>
 {
 public:
-  typedef gboolean CType;
-  typedef bool CppType;
-  typedef std::vector<bool> VectorType;
+  using CType = gboolean;
+  using CppType = bool;
+  using VectorType = std::vector<bool>;
   typedef Glib::Container_Helpers::ArrayKeeper<Glib::Container_Helpers::TypeTraits<bool>>
     ArrayKeeperType;
   typedef Glib::Container_Helpers::ArrayIterator<Glib::Container_Helpers::TypeTraits<bool>>
@@ -530,11 +530,11 @@ template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T>>
 class ListHandler
 {
 public:
-  typedef typename Tr::CType CType;
-  typedef T CppType;
-  typedef std::vector<CppType> VectorType;
-  typedef typename Glib::Container_Helpers::GListKeeper<Tr> GListKeeperType;
-  typedef typename Glib::Container_Helpers::ListIterator<Tr> ListIteratorType;
+  using CType = typename Tr::CType;
+  using CppType = T;
+  using VectorType = std::vector<CppType>;
+  using GListKeeperType = typename Glib::Container_Helpers::GListKeeper<Tr>;
+  using ListIteratorType = typename Glib::Container_Helpers::ListIterator<Tr>;
 
   // maybe think about using C++0x move constructors?
   static VectorType list_to_vector(GList* glist, Glib::OwnershipType ownership);
@@ -571,11 +571,11 @@ template <typename T, typename Tr = Glib::Container_Helpers::TypeTraits<T>>
 class SListHandler
 {
 public:
-  typedef typename Tr::CType CType;
-  typedef T CppType;
-  typedef std::vector<CppType> VectorType;
-  typedef typename Glib::Container_Helpers::GSListKeeper<Tr> GSListKeeperType;
-  typedef typename Glib::Container_Helpers::SListIterator<Tr> SListIteratorType;
+  using CType = typename Tr::CType;
+  using CppType = T;
+  using VectorType = std::vector<CppType>;
+  using GSListKeeperType = typename Glib::Container_Helpers::GSListKeeper<Tr>;
+  using SListIteratorType = typename Glib::Container_Helpers::SListIterator<Tr>;
 
   // maybe think about using C++0x move constructors?
   static VectorType slist_to_vector(GSList* gslist, Glib::OwnershipType ownership);
@@ -847,7 +847,7 @@ inline GListKeeper<Tr>::GListKeeper(const GListKeeper& keeper)
 template <typename Tr>
 GListKeeper<Tr>::~GListKeeper() noexcept
 {
-  typedef typename Tr::CTypeNonConst CTypeNonConst;
+  using CTypeNonConst = typename Tr::CTypeNonConst;
 
   if (glist_ && ownership_ != Glib::OWNERSHIP_NONE)
   {
@@ -888,7 +888,7 @@ inline GSListKeeper<Tr>::GSListKeeper(const GSListKeeper& keeper)
 template <typename Tr>
 GSListKeeper<Tr>::~GSListKeeper() noexcept
 {
-  typedef typename Tr::CTypeNonConst CTypeNonConst;
+  using CTypeNonConst = typename Tr::CTypeNonConst;
   if (gslist_ && ownership_ != Glib::OWNERSHIP_NONE)
   {
     if (ownership_ != Glib::OWNERSHIP_SHALLOW)

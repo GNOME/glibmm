@@ -35,9 +35,9 @@ class GLIBMM_API Interface : virtual public Glib::ObjectBase
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  typedef Interface CppObjectType;
-  typedef Interface_Class CppClassType;
-  typedef GTypeInterface BaseClassType;
+  using CppObjectType = Interface;
+  using CppClassType = Interface_Class;
+  using BaseClassType = GTypeInterface;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   /** A Default constructor.

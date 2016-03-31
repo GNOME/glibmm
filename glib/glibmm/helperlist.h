@@ -51,19 +51,19 @@ public:
 
   virtual ~HelperList() noexcept {}
 
-  typedef T_Child value_type;
-  typedef value_type& reference;
-  typedef const value_type& const_reference;
+  using value_type = T_Child;
+  using reference = value_type&;
+  using const_reference = const value_type&;
 
-  typedef T_Iterator iterator;
-  typedef List_ConstIterator<iterator> const_iterator;
-  typedef List_ReverseIterator<iterator> reverse_iterator;
-  typedef List_ConstIterator<reverse_iterator> const_reverse_iterator;
+  using iterator = T_Iterator;
+  using const_iterator = List_ConstIterator<iterator>;
+  using reverse_iterator = List_ReverseIterator<iterator>;
+  using const_reverse_iterator = List_ConstIterator<reverse_iterator>;
 
-  typedef T_CppElement element_type;
+  using element_type = T_CppElement;
 
-  typedef std::size_t difference_type; // TODO Why not std::ptrdiff_t?
-  typedef std::size_t size_type;
+  using difference_type = std::size_t; // TODO Why not std::ptrdiff_t?
+  using size_type = std::size_t;
 
   // These are implemented differently for each Helper List.
   virtual iterator erase(iterator) = 0;

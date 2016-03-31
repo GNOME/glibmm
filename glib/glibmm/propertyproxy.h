@@ -44,7 +44,7 @@ template <class T>
 class PropertyProxy : public PropertyProxy_Base
 {
 public:
-  typedef T PropertyType;
+  using PropertyType = T;
 
   PropertyProxy(ObjectBase* obj, const char* name) : PropertyProxy_Base(obj, name) {}
 
@@ -78,7 +78,7 @@ template <class T>
 class PropertyProxy_WriteOnly : public PropertyProxy_Base
 {
 public:
-  typedef T PropertyType;
+  using PropertyType = T;
 
   PropertyProxy_WriteOnly(ObjectBase* obj, const char* name) : PropertyProxy_Base(obj, name) {}
 
@@ -105,7 +105,7 @@ template <class T>
 class PropertyProxy_ReadOnly : public PropertyProxy_Base
 {
 public:
-  typedef T PropertyType;
+  using PropertyType = T;
 
   // obj is const, because this should be returned by const accessors.
   PropertyProxy_ReadOnly(const ObjectBase* obj, const char* name)

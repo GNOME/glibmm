@@ -27,7 +27,7 @@
 namespace
 {
 
-typedef std::map<GQuark, Glib::Error::ThrowFunc> ThrowFuncTable;
+using ThrowFuncTable = std::map<GQuark, Glib::Error::ThrowFunc>;
 
 static ThrowFuncTable* throw_func_table = nullptr;
 

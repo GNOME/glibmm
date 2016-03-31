@@ -26,7 +26,7 @@ int
 main()
 {
   Gio::init();
-  typedef Glib::RefPtr<Gio::Credentials> CrePtr;
+  using CrePtr = Glib::RefPtr<Gio::Credentials>;
 
   std::vector<CrePtr> v1(Glib::ArrayHandle<CrePtr>(nullptr, Glib::OWNERSHIP_DEEP));
   std::vector<CrePtr> v2(Glib::ArrayHandle<CrePtr>(nullptr, 5, Glib::OWNERSHIP_DEEP));

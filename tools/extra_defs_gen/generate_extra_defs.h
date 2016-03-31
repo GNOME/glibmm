@@ -26,7 +26,7 @@
 /** Function pointer type for functions that determine if a GType is a pointer
  * type.
  */
-typedef bool (*GTypeIsAPointerFunc)(GType gtype);
+using GTypeIsAPointerFunc = bool(*)(GType gtype);
 
 /** Default extra defs utility function to determine if a GType is a pointer
  * type.

@@ -61,8 +61,8 @@ template <class T, class PtrT>
 class Value_Pointer : public ValueBase_Object
 {
 public:
-  typedef PtrT CppType;
-  typedef void* CType;
+  using CppType = PtrT;
+  using CType = void*;
 
   static inline GType value_type() G_GNUC_CONST;
 
@@ -100,8 +100,8 @@ template <class T>
 class Value : public ValueBase_Boxed
 {
 public:
-  typedef T CppType;
-  typedef T* CType;
+  using CppType = T;
+  using CType = T*;
 
   static GType value_type() G_GNUC_CONST;
 

@@ -50,9 +50,9 @@ template <class T>
 class List_Iterator_Base
 {
 public:
-  typedef T value_type;
-  typedef T* pointer;
-  typedef T& reference;
+  using value_type = T;
+  using pointer = T*;
+  using reference = T&;
 };
 
 /// For instance, List_Iterator< Gtk::Widget >
@@ -60,17 +60,17 @@ template <class T>
 class List_Iterator : public List_Iterator_Base<T>
 {
 public:
-  typedef std::bidirectional_iterator_tag iterator_category;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
+  using iterator_category = std::bidirectional_iterator_tag;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
 
-  typedef typename List_Iterator_Base<T>::pointer pointer;
-  typedef typename List_Iterator_Base<T>::reference reference;
+  using pointer = typename List_Iterator_Base<T>::pointer;
+  using reference = typename List_Iterator_Base<T>::reference;
 
   GList* const* head_;
   GList* node_;
 
-  typedef List_Iterator<T> Self;
+  using Self = List_Iterator<T>;
 
   List_Iterator(GList* const& head, GList* node) : head_(&head), node_(node) {}
 
@@ -124,15 +124,15 @@ template <class T>
 class SList_Iterator : public List_Iterator_Base<T>
 {
 public:
-  typedef std::forward_iterator_tag iterator_category;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
+  using iterator_category = std::forward_iterator_tag;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
 
-  typedef typename List_Iterator_Base<T>::pointer pointer;
-  typedef typename List_Iterator_Base<T>::reference reference;
+  using pointer = typename List_Iterator_Base<T>::pointer;
+  using reference = typename List_Iterator_Base<T>::reference;
 
   GSList* node_;
-  typedef SList_Iterator<T> Self;
+  using Self = SList_Iterator<T>;
 
   SList_Iterator(GSList* node) : node_(node) {}
 
@@ -171,14 +171,14 @@ template <class T_Impl, class T_IFace>
 class List_Cpp_Iterator : public List_Iterator_Base<T_IFace>
 {
 public:
-  typedef std::bidirectional_iterator_tag iterator_category;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
+  using iterator_category = std::bidirectional_iterator_tag;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
 
-  typedef typename List_Iterator_Base<T_IFace>::pointer pointer;
-  typedef typename List_Iterator_Base<T_IFace>::reference reference;
+  using pointer = typename List_Iterator_Base<T_IFace>::pointer;
+  using reference = typename List_Iterator_Base<T_IFace>::reference;
 
-  typedef List_Cpp_Iterator<T_Impl, T_IFace> Self;
+  using Self = List_Cpp_Iterator<T_Impl, T_IFace>;
 
   GList** head_;
   GList* node_;
@@ -254,15 +254,15 @@ template <class T_Base>
 class List_ReverseIterator : private T_Base
 {
 public:
-  typedef typename T_Base::iterator_category iterator_category;
-  typedef typename T_Base::size_type size_type;
-  typedef typename T_Base::difference_type difference_type;
+  using iterator_category = typename T_Base::iterator_category;
+  using size_type = typename T_Base::size_type;
+  using difference_type = typename T_Base::difference_type;
 
-  typedef typename T_Base::value_type value_type;
-  typedef typename T_Base::pointer pointer;
-  typedef typename T_Base::reference reference;
+  using value_type = typename T_Base::value_type;
+  using pointer = typename T_Base::pointer;
+  using reference = typename T_Base::reference;
 
-  typedef List_ReverseIterator<T_Base> Self;
+  using Self = List_ReverseIterator<T_Base>;
 
   bool operator==(const Self& src) const { return T_Base::operator==(src); }
   bool operator!=(const Self& src) const { return T_Base::operator!=(src); }
@@ -306,15 +306,15 @@ template <class T_Base>
 class List_ConstIterator : public T_Base
 {
 public:
-  typedef typename T_Base::iterator_category iterator_category;
-  typedef typename T_Base::size_type size_type;
-  typedef typename T_Base::difference_type difference_type;
+  using iterator_category = typename T_Base::iterator_category;
+  using size_type = typename T_Base::size_type;
+  using difference_type = typename T_Base::difference_type;
 
-  typedef const typename T_Base::value_type value_type;
-  typedef const typename T_Base::pointer pointer;
-  typedef const typename T_Base::reference reference;
+  using value_type = const typename T_Base::value_type;
+  using pointer = const typename T_Base::pointer;
+  using reference = const typename T_Base::reference;
 
-  typedef List_ConstIterator<T_Base> Self;
+  using Self = List_ConstIterator<T_Base>;
 
   bool operator==(const Self& src) const { return T_Base::operator==(src); }
   bool operator!=(const Self& src) const { return T_Base::operator!=(src); }

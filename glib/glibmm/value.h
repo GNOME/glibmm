@@ -134,7 +134,7 @@ protected:
 class ValueBase_Enum : public ValueBase
 {
 public:
-  typedef gint CType;
+  using CType = gint;
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -152,7 +152,7 @@ protected:
 class ValueBase_Flags : public ValueBase
 {
 public:
-  typedef guint CType;
+  using CType = guint;
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -170,7 +170,7 @@ protected:
 class ValueBase_String : public ValueBase
 {
 public:
-  typedef const gchar* CType;
+  using CType = const gchar*;
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -200,8 +200,8 @@ template <class T>
 class Value_Boxed : public ValueBase_Boxed
 {
 public:
-  typedef T CppType;
-  typedef typename T::BaseObjectType* CType;
+  using CppType = T;
+  using CType = typename T::BaseObjectType*;
 
   static GType value_type() { return T::get_type(); }
 
@@ -219,8 +219,8 @@ template <class T>
 class Value<Glib::RefPtr<T>> : public ValueBase_Object
 {
 public:
-  typedef Glib::RefPtr<T> CppType;
-  typedef typename T::BaseObjectType* CType;
+  using CppType = Glib::RefPtr<T>;
+  using CType = typename T::BaseObjectType*;
 
   static GType value_type() { return T::get_base_type(); }
 
@@ -238,8 +238,8 @@ template <class T>
 class Value<Glib::RefPtr<const T>> : public ValueBase_Object
 {
 public:
-  typedef Glib::RefPtr<const T> CppType;
-  typedef typename T::BaseObjectType* CType;
+  using CppType = Glib::RefPtr<const T>;
+  using CType = typename T::BaseObjectType*;
 
   static GType value_type() { return T::get_base_type(); }
 
@@ -268,7 +268,7 @@ template <>
 class Value<std::string> : public ValueBase_String
 {
 public:
-  typedef std::string CppType;
+  using CppType = std::string;
 
   void set(const std::string& data);
   std::string get() const { return get_cstring(); }
@@ -281,7 +281,7 @@ template <>
 class Value<Glib::ustring> : public ValueBase_String
 {
 public:
-  typedef Glib::ustring CppType;
+  using CppType = Glib::ustring;
 
   void set(const Glib::ustring& data);
   Glib::ustring get() const { return get_cstring(); }
@@ -294,7 +294,7 @@ template <class T>
 class Value_Enum : public ValueBase_Enum
 {
 public:
-  typedef T CppType;
+  using CppType = T;
 
   void set(CppType data) { set_enum(data); }
   CppType get() const { return CppType(get_enum()); }
@@ -307,7 +307,7 @@ template <class T>
 class Value_Flags : public ValueBase_Flags
 {
 public:
-  typedef T CppType;
+  using CppType = T;
 
   void set(CppType data) { set_flags(data); }
   CppType get() const { return CppType(get_flags()); }

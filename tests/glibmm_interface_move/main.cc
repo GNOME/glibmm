@@ -80,7 +80,7 @@ class TestInterface;
 class TestInterface_Class : public Glib::Interface_Class
 {
 public:
-  typedef TestInterface BaseClassType;
+  using BaseClassType = TestInterface;
 
   friend class TestInterface;
 
@@ -107,7 +107,7 @@ public:
 class TestInterface : public Glib::Interface
 {
 protected:
-  typedef TestInterface_Class CppClassType;
+  using CppClassType = TestInterface_Class;
 
   TestInterface() : Glib::Interface(derived_interface_class_.init()) {}
 
@@ -147,8 +147,8 @@ private:
 class DerivedObject_Class : public Glib::Class
 {
 public:
-  typedef GObjectClass BaseClassType;
-  typedef Glib::Object_Class CppClassParent;
+  using BaseClassType = GObjectClass;
+  using CppClassParent = Glib::Object_Class;
 
   static void class_init_function(void* g_class, void* class_data)
   {
@@ -183,7 +183,7 @@ TestInterface::CppClassType TestInterface::derived_interface_class_; // initiali
 class DerivedObject : public Glib::Object, public TestInterface
 {
 public:
-  typedef DerivedObject_Class CppClassType;
+  using CppClassType = DerivedObject_Class;
 
   // A real application would never make the constructor public.
   // It would instead have a protected constructor and a public create() method.

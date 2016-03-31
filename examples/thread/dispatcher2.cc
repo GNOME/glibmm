@@ -41,7 +41,7 @@ public:
   void signal_finished_emit();
   void print() const;
 
-  typedef sigc::signal<void> type_signal_end;
+  using type_signal_end = sigc::signal<void>;
   static type_signal_end& signal_end();
 
 private:

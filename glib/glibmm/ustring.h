@@ -39,31 +39,31 @@ namespace Glib
 template <class T>
 struct IteratorTraits
 {
-  typedef typename T::iterator_category iterator_category;
-  typedef typename T::value_type value_type;
-  typedef typename T::difference_type difference_type;
-  typedef typename T::pointer pointer;
-  typedef typename T::reference reference;
+  using iterator_category = typename T::iterator_category;
+  using value_type = typename T::value_type;
+  using difference_type = typename T::difference_type;
+  using pointer = typename T::pointer;
+  using reference = typename T::reference;
 };
 
 template <class T>
 struct IteratorTraits<T*>
 {
-  typedef std::random_access_iterator_tag iterator_category;
-  typedef T value_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef T* pointer;
-  typedef T& reference;
+  using iterator_category = std::random_access_iterator_tag;
+  using value_type = T;
+  using difference_type = std::ptrdiff_t;
+  using pointer = T*;
+  using reference = T&;
 };
 
 template <class T>
 struct IteratorTraits<const T*>
 {
-  typedef std::random_access_iterator_tag iterator_category;
-  typedef T value_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef const T* pointer;
-  typedef const T& reference;
+  using iterator_category = std::random_access_iterator_tag;
+  using value_type = T;
+  using difference_type = std::ptrdiff_t;
+  using pointer = const T*;
+  using reference = const T&;
 };
 
 #endif /* GLIBMM_HAVE_STD_ITERATOR_TRAITS */
@@ -99,11 +99,11 @@ template <class T>
 class ustring_Iterator
 {
 public:
-  typedef std::bidirectional_iterator_tag iterator_category;
-  typedef gunichar value_type;
-  typedef std::string::difference_type difference_type;
-  typedef value_type reference;
-  typedef void pointer;
+  using iterator_category = std::bidirectional_iterator_tag;
+  using value_type = gunichar;
+  using difference_type = std::string::difference_type;
+  using reference = value_type;
+  using pointer = void;
 
   inline ustring_Iterator();
   inline ustring_Iterator(const ustring_Iterator<std::string::iterator>& other);
@@ -214,20 +214,20 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
 class ustring
 {
 public:
-  typedef std::string::size_type size_type;
-  typedef std::string::difference_type difference_type;
+  using size_type = std::string::size_type;
+  using difference_type = std::string::difference_type;
 
-  typedef gunichar value_type;
-  typedef gunichar& reference;
-  typedef const gunichar& const_reference;
+  using value_type = gunichar;
+  using reference = gunichar&;
+  using const_reference = const gunichar&;
 
-  typedef ustring_Iterator<std::string::iterator> iterator;
-  typedef ustring_Iterator<std::string::const_iterator> const_iterator;
+  using iterator = ustring_Iterator<std::string::iterator>;
+  using const_iterator = ustring_Iterator<std::string::const_iterator>;
 
 #ifndef GLIBMM_HAVE_SUN_REVERSE_ITERATOR
 
-  typedef std::reverse_iterator<iterator> reverse_iterator;
-  typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+  using reverse_iterator = std::reverse_iterator<iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 #else
 
@@ -863,9 +863,9 @@ public:
 
 private:
 #ifdef GLIBMM_HAVE_WIDE_STREAM
-  typedef std::wostringstream StreamType;
+  using StreamType = std::wostringstream;
 #else
-  typedef std::ostringstream StreamType;
+  using StreamType = std::ostringstream;
 #endif
   StreamType stream_;
 

@@ -24,8 +24,8 @@
 #include <glib.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef struct _GObject GObject;
-typedef struct _GClosure GClosure;
+using GObject = struct _GObject;
+using GClosure = struct _GClosure;
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 namespace Glib

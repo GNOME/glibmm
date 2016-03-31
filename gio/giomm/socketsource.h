@@ -100,7 +100,7 @@ SignalSocket signal_socket(
 class SocketSource : public Glib::IOSource
 {
 public:
-  typedef Gio::SocketSource CppObjectType;
+  using CppObjectType = Gio::SocketSource;
 
   static Glib::RefPtr<SocketSource> create(const Glib::RefPtr<Socket>& socket,
     Glib::IOCondition condition,

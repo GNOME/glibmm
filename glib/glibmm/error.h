@@ -51,7 +51,7 @@ public:
 
   void propagate(GError** dest);
 
-  typedef void (*ThrowFunc)(GError*);
+  using ThrowFunc = void(*)(GError*);
 
   static void register_init();
   static void register_cleanup();

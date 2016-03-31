@@ -51,7 +51,7 @@ template <class For, class Tr>
 typename Tr::CType*
 create_array(For pbegin, std::size_t size, Tr)
 {
-  typedef typename Tr::CType CType;
+  using CType = typename Tr::CType;
 
   CType* const array = static_cast<CType*>(g_malloc((size + 1) * sizeof(CType)));
   CType* const array_end = array + size;
@@ -90,7 +90,7 @@ create_bool_array(For pbegin, std::size_t size)
 template <class Tr, class Cont>
 struct ArraySourceTraits
 {
-  typedef typename Tr::CType CType;
+  using CType = typename Tr::CType;
 
   static std::size_t get_size(const Cont& cont) { return cont.size(); }
 
@@ -106,7 +106,7 @@ struct ArraySourceTraits
 template <class Cont>
 struct BoolArraySourceTraits
 {
-  typedef gboolean CType;
+  using CType = gboolean;
 
   static std::size_t get_size(const Cont& cont) { return cont.size(); }
 
@@ -123,7 +123,7 @@ struct BoolArraySourceTraits
 template <class Tr, class Cont>
 struct ArraySourceTraits<Tr, Cont*>
 {
-  typedef typename Tr::CType CType;
+  using CType = typename Tr::CType;
 
   static std::size_t get_size(const CType* array)
   {
@@ -148,7 +148,7 @@ struct ArraySourceTraits<Tr, const Cont*> : ArraySourceTraits<Tr, Cont*>
 template <class Tr, class Cont, std::size_t N>
 struct ArraySourceTraits<Tr, Cont[N]>
 {
-  typedef typename Tr::CType CType;
+  using CType = typename Tr::CType;
 
   static std::size_t get_size(const CType*) { return (N - 1); }
 
@@ -171,14 +171,14 @@ template <class Tr>
 class ArrayHandleIterator
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
-  typedef std::random_access_iterator_tag iterator_category;
-  typedef CppType value_type;
-  typedef std::ptrdiff_t difference_type;
-  typedef value_type reference;
-  typedef void pointer;
+  using iterator_category = std::random_access_iterator_tag;
+  using value_type = CppType;
+  using difference_type = std::ptrdiff_t;
+  using reference = value_type;
+  using pointer = void;
 
   explicit inline ArrayHandleIterator(const CType* pos);
 
@@ -231,15 +231,15 @@ template <class T, class Tr = Glib::Container_Helpers::TypeTraits<T>>
 class ArrayHandle
 {
 public:
-  typedef typename Tr::CppType CppType;
-  typedef typename Tr::CType CType;
+  using CppType = typename Tr::CppType;
+  using CType = typename Tr::CType;
 
-  typedef CppType value_type;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
+  using value_type = CppType;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
 
-  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr> const_iterator;
-  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr> iterator;
+  using const_iterator = Glib::Container_Helpers::ArrayHandleIterator<Tr>;
+  using iterator = Glib::Container_Helpers::ArrayHandleIterator<Tr>;
 
   template <class Cont>
   inline ArrayHandle(const Cont& container);
@@ -286,18 +286,18 @@ template <>
 class ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>
 {
 public:
-  typedef ArrayHandle<bool, Container_Helpers::TypeTraits<bool>> Me;
-  typedef Container_Helpers::TypeTraits<bool> Tr;
+  using Me = ArrayHandle<bool, Container_Helpers::TypeTraits<bool>>;
+  using Tr = Container_Helpers::TypeTraits<bool>;
 
-  typedef Tr::CppType CppType;
-  typedef Tr::CType CType;
+  using CppType = Tr::CppType;
+  using CType = Tr::CType;
 
-  typedef CppType value_type;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
+  using value_type = CppType;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
 
-  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr> const_iterator;
-  typedef Glib::Container_Helpers::ArrayHandleIterator<Tr> iterator;
+  using const_iterator = Glib::Container_Helpers::ArrayHandleIterator<Tr>;
+  using iterator = Glib::Container_Helpers::ArrayHandleIterator<Tr>;
 
   template <class Cont>
   inline ArrayHandle(const Cont& container);
@@ -383,7 +383,7 @@ private:
  *
  * @ingroup ContHandles
  */
-typedef ArrayHandle<Glib::ustring> StringArrayHandle;
+using StringArrayHandle = ArrayHandle<Glib::ustring>;
 
 /***************************************************************************/
 /*  Inline implementation                                                  */

@@ -32,7 +32,7 @@ namespace Glib
 /**
  * @deprecated Use a std::vector instead.
  */
-typedef Glib::ArrayHandle<Glib::ustring> SArray;
+using SArray = Glib::ArrayHandle<Glib::ustring>;
 }
 
 #endif // GLIBMM_DISABLE_DEPRECATED

@@ -171,8 +171,8 @@ template <class T>
 class Property : public PropertyBase
 {
 public:
-  typedef T PropertyType;
-  typedef Glib::Value<T> ValueType;
+  using PropertyType = T;
+  using ValueType = Glib::Value<T>;
 
   /**  Constructs a property of the @a object with the specified @a name.
    * For each instance of the object, the same property must be constructed with the same name.

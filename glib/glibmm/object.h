@@ -38,8 +38,8 @@
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" {
-typedef struct _GObject GObject;
-typedef struct _GObjectClass GObjectClass;
+using GObject = struct _GObject;
+using GObjectClass = struct _GObjectClass;
 }
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -95,10 +95,10 @@ class GLIBMM_API Object : virtual public ObjectBase
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  typedef Object CppObjectType;
-  typedef Object_Class CppClassType;
-  typedef GObject BaseObjectType;
-  typedef GObjectClass BaseClassType;
+  using CppObjectType = Object;
+  using CppClassType = Object_Class;
+  using BaseObjectType = GObject;
+  using BaseClassType = GObjectClass;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   // noncopyable
@@ -129,7 +129,7 @@ public:
   // TODO: Use slots instead:
   void* get_data(const QueryQuark& key);
   void set_data(const Quark& key, void* data);
-  typedef void (*DestroyNotify)(gpointer data);
+  using DestroyNotify = void (*)(gpointer data);
   void set_data(const Quark& key, void* data, DestroyNotify notify);
   void remove_data(const QueryQuark& quark);
   // same as remove without notifying
@@ -171,9 +171,9 @@ namespace Container_Helpers
 template <class T>
 struct TypeTraits<Glib::RefPtr<T>>
 {
-  typedef Glib::RefPtr<T> CppType;
-  typedef typename T::BaseObjectType* CType;
-  typedef typename T::BaseObjectType* CTypeNonConst;
+  using CppType = Glib::RefPtr<T>;
+  using CType = typename T::BaseObjectType*;
+  using CTypeNonConst = typename T::BaseObjectType*;
 
   static CType to_c_type(const CppType& ptr) { return Glib::unwrap(ptr); }
   static CType to_c_type(CType ptr) { return ptr; }
@@ -207,9 +207,9 @@ struct TypeTraits<Glib::RefPtr<T>>
 template <class T>
 struct TypeTraits<Glib::RefPtr<const T>>
 {
-  typedef Glib::RefPtr<const T> CppType;
-  typedef const typename T::BaseObjectType* CType;
-  typedef typename T::BaseObjectType* CTypeNonConst;
+  using CppType = Glib::RefPtr<const T>;
+  using CType = const typename T::BaseObjectType*;
+  using CTypeNonConst = typename T::BaseObjectType*;
 
   static CType to_c_type(const CppType& ptr) { return Glib::unwrap(ptr); }
   static CType to_c_type(CType ptr) { return ptr; }
@@ -252,8 +252,8 @@ template <class T>
 class Value<Glib::RefPtr<T>> : public ValueBase_Object
 {
 public:
-  typedef Glib::RefPtr<T> CppType;
-  typedef typename T::BaseObjectType* CType;
+  using CppType = Glib::RefPtr<T>;
+  using CType = typename T::BaseObjectType*;
 
   static GType value_type() { return T::get_base_type(); }
 
@@ -271,8 +271,8 @@ template <class T>
 class Value<Glib::RefPtr<const T>> : public ValueBase_Object
 {
 public:
-  typedef Glib::RefPtr<const T> CppType;
-  typedef typename T::BaseObjectType* CType;
+  using CppType = Glib::RefPtr<const T>;
+  using CType = typename T::BaseObjectType*;
 
   static GType value_type() { return T::get_base_type(); }
 

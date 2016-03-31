@@ -60,7 +60,7 @@ private:
    * T:dont_allow_use_in_glib_refptr_ is a public type, else it's true.
    * Example:
    * @code
-   * typedef int dont_allow_use_in_glib_refptr_;
+   * using dont_allow_use_in_glib_refptr_ = int;
    * @endcode
    */
   class is_allowed_type

@@ -24,7 +24,7 @@
  */
 
 extern "C" {
-typedef struct _GTimer GTimer;
+using GTimer = struct _GTimer;
 }
 
 namespace Glib

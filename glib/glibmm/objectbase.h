@@ -34,7 +34,7 @@
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" {
-typedef struct _GObject GObject;
+using GObject = struct _GObject;
 }
 #endif
 
@@ -229,7 +229,7 @@ protected:
     Class::interface_class_vector_type custom_interface_classes;
   };
 
-  typedef std::map<const ObjectBase*, ExtraObjectBaseData> extra_object_base_data_type;
+  using extra_object_base_data_type = std::map<const ObjectBase*, ExtraObjectBaseData>;
   static extra_object_base_data_type extra_object_base_data;
   // ObjectBase instances may be used in different threads.
   // Accesses to extra_object_base_data must be thread-safe.

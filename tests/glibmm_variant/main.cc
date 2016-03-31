@@ -52,7 +52,7 @@ main(int, char**)
 
   // Dict:
 
-  typedef std::pair<Glib::ustring, Glib::ustring> TypeDictEntry;
+  using TypeDictEntry = std::pair<Glib::ustring, Glib::ustring>;
 
   TypeDictEntry dict_entry("A key", "A value");
 
@@ -68,7 +68,7 @@ main(int, char**)
 
   ostr << std::endl;
 
-  typedef std::map<unsigned, Glib::ustring> TypeDict;
+  using TypeDict = std::map<unsigned, Glib::ustring>;
 
   TypeDict orig_dict;
 
@@ -112,7 +112,7 @@ main(int, char**)
   }
 
   // std::vector< std::map< Glib::ustring, Glib::Variant<int> > >
-  typedef std::map<Glib::ustring, Glib::Variant<int>> ComplexDictType;
+  using ComplexDictType = std::map<Glib::ustring, Glib::Variant<int>>;
 
   ComplexDictType complex_dict1;
   ComplexDictType complex_dict2;
@@ -132,7 +132,7 @@ main(int, char**)
     complex_dict2.insert(std::pair<Glib::ustring, Glib::Variant<int>>("Map 2 " + s, v));
   }
 
-  typedef std::vector<std::map<Glib::ustring, Glib::Variant<int>>> ComplexVecType;
+  using ComplexVecType = std::vector<std::map<Glib::ustring, Glib::Variant<int>>>;
 
   ComplexVecType complex_vector = { complex_dict1, complex_dict2 };
 
@@ -275,7 +275,7 @@ test_dynamic_cast_composite_types()
 
   try
   {
-    typedef std::map<Glib::ustring, std::vector<std::string>> composite_type;
+    using composite_type = std::map<Glib::ustring, std::vector<std::string>>;
     auto derived = Glib::VariantBase::cast_dynamic<Glib::Variant<composite_type>>(cppdict);
 
     ostr << "Cast composite type (get_type_string()=" << derived.get_type_string()
@@ -352,8 +352,8 @@ test_dynamic_cast()
   }
 
   // A variant of type a{sv}
-  typedef std::map<Glib::ustring, Glib::VariantBase> type_map_sv;
-  typedef Glib::Variant<type_map_sv> type_dict_sv;
+  using type_map_sv = std::map<Glib::ustring, Glib::VariantBase>;
+  using type_dict_sv = Glib::Variant<type_map_sv>;
   g_assert((type_dict_sv::variant_type().get_string()) == "a{sv}");
 
   type_dict_sv var_map;

@@ -1,7 +1,7 @@
 #include <glibmm.h>
 #include <iostream>
 
-typedef Glib::NodeTree<const std::string> type_nodetree_string;
+using type_nodetree_string = Glib::NodeTree<const std::string>;
 
 static bool
 node_build_string(type_nodetree_string& node, std::string& string)

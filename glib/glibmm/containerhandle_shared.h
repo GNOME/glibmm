@@ -107,9 +107,9 @@ namespace Container_Helpers
 template <class T>
 struct TypeTraits
 {
-  typedef T CppType;
-  typedef T CType;
-  typedef T CTypeNonConst;
+  using CppType = T;
+  using CType = T;
+  using CTypeNonConst = T;
 
   static CType to_c_type(const CppType& item) { return item; }
   static CppType to_cpp_type(const CType& item) { return item; }
@@ -128,9 +128,9 @@ struct TypeTraits
 template <class T>
 struct TypeTraits<T*>
 {
-  typedef T* CppType;
-  typedef typename T::BaseObjectType* CType;
-  typedef typename T::BaseObjectType* CTypeNonConst;
+  using CppType = T*;
+  using CType = typename T::BaseObjectType*;
+  using CTypeNonConst = typename T::BaseObjectType*;
 
   static CType to_c_type(CppType ptr) { return Glib::unwrap(ptr); }
   static CType to_c_type(CType ptr) { return ptr; }
@@ -160,9 +160,9 @@ struct TypeTraits<T*>
 template <class T>
 struct TypeTraits<const T*>
 {
-  typedef const T* CppType;
-  typedef const typename T::BaseObjectType* CType;
-  typedef typename T::BaseObjectType* CTypeNonConst;
+  using CppType = const T*;
+  using CType = const typename T::BaseObjectType*;
+  using CTypeNonConst = typename T::BaseObjectType*;
 
   static CType to_c_type(CppType ptr) { return Glib::unwrap(ptr); }
   static CType to_c_type(CType ptr) { return ptr; }
@@ -191,9 +191,9 @@ struct TypeTraits<const T*>
 template <class T>
 struct TypeTraits<Glib::RefPtr<T>>
 {
-  typedef Glib::RefPtr<T> CppType;
-  typedef typename T::BaseObjectType* CType;
-  typedef typename T::BaseObjectType* CTypeNonConst;
+  using CppType = Glib::RefPtr<T>;
+  using CType = typename T::BaseObjectType*;
+  using CTypeNonConst = typename T::BaseObjectType*;
 
   static CType to_c_type(const CppType& ptr) { return Glib::unwrap(ptr); }
   static CType to_c_type(CType ptr) { return ptr; }
@@ -227,9 +227,9 @@ struct TypeTraits<Glib::RefPtr<T>>
 template <class T>
 struct TypeTraits<Glib::RefPtr<const T>>
 {
-  typedef Glib::RefPtr<const T> CppType;
-  typedef const typename T::BaseObjectType* CType;
-  typedef typename T::BaseObjectType* CTypeNonConst;
+  using CppType = Glib::RefPtr<const T>;
+  using CType = const typename T::BaseObjectType*;
+  using CTypeNonConst = typename T::BaseObjectType*;
 
   static CType to_c_type(const CppType& ptr) { return Glib::unwrap(ptr); }
   static CType to_c_type(CType ptr) { return ptr; }
@@ -267,9 +267,9 @@ struct TypeTraits<Glib::RefPtr<const T>>
 template <>
 struct TypeTraits<Glib::ustring>
 {
-  typedef Glib::ustring CppType;
-  typedef const char* CType;
-  typedef char* CTypeNonConst;
+  using CppType = Glib::ustring;
+  using CType = const char*;
+  using CTypeNonConst = char*;
 
   static CType to_c_type(const Glib::ustring& str) { return str.c_str(); }
   static CType to_c_type(const std::string& str) { return str.c_str(); }
@@ -289,9 +289,9 @@ struct TypeTraits<Glib::ustring>
 template <>
 struct TypeTraits<std::string>
 {
-  typedef std::string CppType;
-  typedef const char* CType;
-  typedef char* CTypeNonConst;
+  using CppType = std::string;
+  using CType = const char*;
+  using CTypeNonConst = char*;
 
   static CType to_c_type(const std::string& str) { return str.c_str(); }
   static CType to_c_type(const Glib::ustring& str) { return str.c_str(); }
@@ -308,9 +308,9 @@ struct TypeTraits<std::string>
 template <>
 struct TypeTraits<bool>
 {
-  typedef bool CppType;
-  typedef gboolean CType;
-  typedef gboolean CTypeNonConst;
+  using CppType = bool;
+  using CType = gboolean;
+  using CTypeNonConst = gboolean;
 
   static CType to_c_type(CppType item) { return static_cast<CType>(item); }
   static CType to_c_type(CType item) { return item; }
@@ -324,9 +324,9 @@ struct TypeTraits<bool>
 template <>
 struct TypeTraits<Glib::VariantBase>
 {
-  typedef Glib::VariantBase CppType;
-  typedef GVariant* CType;
-  typedef GVariant* CTypeNonConst;
+  using CppType = Glib::VariantBase;
+  using CType = GVariant*;
+  using CTypeNonConst = GVariant*;
 
   static CType to_c_type(const Glib::VariantBase& v) { return const_cast<CTypeNonConst>(v.gobj()); }
 
@@ -343,9 +343,9 @@ struct TypeTraits<Glib::VariantBase>
 template <>
 struct TypeTraits<Glib::VariantContainerBase>
 {
-  typedef Glib::VariantContainerBase CppType;
-  typedef GVariant* CType;
-  typedef GVariant* CTypeNonConst;
+  using CppType = Glib::VariantContainerBase;
+  using CType = GVariant*;
+  using CTypeNonConst = GVariant*;
 
   static CType to_c_type(const Glib::VariantContainerBase& v)
   {

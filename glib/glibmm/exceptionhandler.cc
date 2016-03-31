@@ -32,7 +32,7 @@
 namespace
 {
 
-typedef sigc::signal<void> HandlerList;
+using HandlerList = sigc::signal<void>;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.

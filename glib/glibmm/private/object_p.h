@@ -11,9 +11,9 @@ namespace Glib
 class Object_Class : public Glib::Class
 {
 public:
-  typedef Object CppObjectType;
-  typedef GObject BaseObjectType;
-  typedef GObjectClass BaseClassType;
+  using CppObjectType = Object;
+  using BaseObjectType = GObject;
+  using BaseClassType = GObjectClass;
 
   static void class_init_function(void* g_class, void* class_data);
 

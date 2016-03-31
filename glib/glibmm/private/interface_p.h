@@ -11,8 +11,8 @@ namespace Glib
 class Interface_Class : public Glib::Class
 {
 public:
-  typedef Interface CppObjectType;
-  typedef GTypeInterface BaseClassType;
+  using CppObjectType = Interface;
+  using BaseClassType = GTypeInterface;
 
   void add_interface(GType instance_type) const;
 };

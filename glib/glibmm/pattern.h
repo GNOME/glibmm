@@ -24,7 +24,7 @@
  */
 
 extern "C" {
-typedef struct _GPatternSpec GPatternSpec;
+using GPatternSpec = struct _GPatternSpec;
 }
 
 #include <glibmm/ustring.h>

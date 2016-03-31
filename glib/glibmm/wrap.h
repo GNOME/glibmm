@@ -31,7 +31,7 @@ class ObjectBase;
 class Object;
 
 // Type of the per-class wrap_new() functions.
-typedef Glib::ObjectBase* (*WrapNewFunction)(GObject*);
+using WrapNewFunction = Glib::ObjectBase*(*)(GObject*);
 
 // Setup and free the structures used by wrap_register().
 // Both functions might be called more than once.

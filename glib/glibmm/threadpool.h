@@ -25,7 +25,7 @@
 #include <sigc++/sigc++.h>
 
 extern "C" {
-typedef struct _GThreadPool GThreadPool;
+using GThreadPool = struct _GThreadPool;
 }
 
 namespace Glib

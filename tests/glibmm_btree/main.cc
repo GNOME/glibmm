@@ -1,7 +1,7 @@
 #include <glibmm.h>
 
-typedef Glib::ustring type_key_value;
-typedef type_key_value* type_p_key_value;
+using type_key_value = Glib::ustring;
+using type_p_key_value = type_key_value*;
 
 static int
 my_search(const type_key_value& key_a, const type_key_value& key_b)

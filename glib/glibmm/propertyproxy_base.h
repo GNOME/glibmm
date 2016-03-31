@@ -39,7 +39,7 @@ public:
   SignalProxyProperty(Glib::ObjectBase* obj, const gchar* property_name);
   ~SignalProxyProperty() noexcept;
 
-  typedef sigc::slot<void> SlotType;
+  using SlotType = sigc::slot<void>;
   sigc::connection connect(const SlotType& slot);
   /** @newin{2,48}
    */
