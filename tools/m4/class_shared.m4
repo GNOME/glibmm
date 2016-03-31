@@ -105,14 +105,14 @@ class __CPPNAME__`'_Class : public Glib::Class
 {
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  typedef __CPPNAME__ CppObjectType;
-  typedef __REAL_CNAME__ BaseObjectType;
+  using CppObjectType = __CPPNAME__;
+  using BaseObjectType = __REAL_CNAME__;
 ifdef(`__BOOL_DO_NOT_DERIVE_GTYPE__',`dnl
-  typedef __CPPPARENT__`'_Class CppClassParent;
+  using CppClassParent = __CPPPARENT__`'_Class;
 ',`dnl
-  typedef __REAL_CNAME__`'Class BaseClassType;
-  typedef __CPPPARENT__`'_Class CppClassParent;
-  typedef __REAL_CPARENT__`'Class BaseClassParent;
+  using BaseClassType = __REAL_CNAME__`'Class;
+  using CppClassParent = __CPPPARENT__`'_Class;
+  using BaseClassParent = __REAL_CPARENT__`'Class;
 ')dnl
 
   friend class __CPPNAME__;
@@ -286,8 +286,8 @@ define(`_STRUCT_PROTOTYPE',`dnl
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 ifdef(`__BOOL_STRUCT_NOT_HIDDEN__',`dnl
 ',`dnl
-typedef struct _`'__CNAME__ __CNAME__;
-typedef struct _`'__CNAME__`'Class __CNAME__`'Class;
+using __CNAME__ = struct _`'__CNAME__;
+using __CNAME__`'Class = struct _`'__CNAME__`'Class;
 ')dnl
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 undefine(`__BOOL_STRUCT_NOT_HIDDEN__')dnl

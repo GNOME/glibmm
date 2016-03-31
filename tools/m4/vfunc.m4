@@ -141,7 +141,7 @@ dnl  g_assert(base != nullptr);
 ifelse($4,void,,`dnl
 
 ifelse(`$15', `',`dnl
-  typedef $4 RType;
+  using RType = $4;
   return RType`'();
 ',`dnl
   return _CONVERT($3,$4,`$15');
@@ -202,7 +202,7 @@ ifelse($10,errthrow,`dnl
   }
 
 ifelse(`$14', `',`dnl
-  typedef $3 RType;
+  using RType = $3;
   return RType`'();
 ',`dnl
   return $14;

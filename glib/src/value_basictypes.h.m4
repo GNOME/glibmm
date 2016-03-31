@@ -33,8 +33,8 @@ template <>
 class Value<$1> : public ValueBase
 {
 public:
-  typedef $1 CppType;
-  typedef g$2 CType;
+  using CppType = $1;
+  using CType = g$2;
 
   static GType value_type() G_GNUC_CONST;
 

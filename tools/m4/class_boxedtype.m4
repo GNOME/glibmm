@@ -202,8 +202,8 @@ dnl
 _IMPORT(SECTION_CLASS1)
 public:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  typedef __CPPNAME__ CppObjectType;
-  typedef __CNAME__ BaseObjectType;
+  using CppObjectType = __CPPNAME__;
+  using BaseObjectType = __CNAME__;
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   /** Get the GType for this class, for use with the underlying GObject type system.

@@ -45,10 +45,10 @@ define(`_PH_CLASS_DECLARATION_INTERFACE',`dnl
 class __CPPNAME__`'_Class : public __CPPPARENT__`'_Class
 {
 public:
-  typedef __CPPNAME__ CppObjectType;
-  typedef __CNAME__ BaseObjectType;
-  typedef __CCLASS__ BaseClassType;
-  typedef __CPPPARENT__`'_Class CppClassParent;
+  using CppObjectType = __CPPNAME__;
+  using BaseObjectType = __CNAME__;
+  using BaseClassType = __CCLASS__;
+  using CppClassParent = __CPPPARENT__`'_Class;
 
   friend class __CPPNAME__;
 
@@ -239,10 +239,10 @@ _IMPORT(SECTION_CLASS1)
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 public:
-  typedef __CPPNAME__ CppObjectType;
-  typedef __CPPNAME__`'_Class CppClassType;
-  typedef __CNAME__ BaseObjectType;
-  typedef __CCLASS__ BaseClassType;
+  using CppObjectType = __CPPNAME__;
+  using CppClassType = __CPPNAME__`'_Class;
+  using BaseObjectType = __CNAME__;
+  using BaseClassType = __CCLASS__;
 
   // noncopyable
   __CPPNAME__`'(const __CPPNAME__&) = delete;

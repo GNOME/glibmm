@@ -249,10 +249,10 @@ _IMPORT(SECTION_CLASS1)
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 public:
-  typedef __CPPNAME__ CppObjectType;
-  typedef __CPPNAME__`'_Class CppClassType;
-  typedef __CNAME__ BaseObjectType;
-  typedef __REAL_CNAME__`'Class BaseClassType;
+  using CppObjectType = __CPPNAME__;
+  using CppClassType = __CPPNAME__`'_Class;
+  using BaseObjectType = __CNAME__;
+  using BaseClassType = __REAL_CNAME__`'Class;
 
   // noncopyable
   __CPPNAME__`'(const __CPPNAME__&) = delete;

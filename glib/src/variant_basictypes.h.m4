@@ -43,7 +43,7 @@ template <>
 class Variant<$1> : public VariantBase
 {
 public:
-  typedef $2 CType;
+  using CType = $2;
 
   /// Default constructor.
   Variant<$1>()

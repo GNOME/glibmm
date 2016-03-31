@@ -65,7 +65,7 @@ ifelse($8,`1',,`dnl Do not generate the implementation if it should be custom:
 static $2 __CPPNAME__`'_signal_$4_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`'void* data)
 {
   using namespace __NAMESPACE__;
-  typedef sigc::slot< $5`'_COMMA_PREFIX($6) > SlotType;
+  using SlotType = sigc::slot< $5`'_COMMA_PREFIX($6) >;
 
   auto obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
   // Do not try to call a signal on a disassociated wrapper.
@@ -98,7 +98,7 @@ ifelse($12, `', `dnl
   }
 ifelse($2,void,,`dnl else
 
-  typedef $2 RType;
+  using RType = $2;
   return RType`'();
 ')dnl
 }
@@ -107,7 +107,7 @@ ifelse($2,void,,`dnl else
 static $2 __CPPNAME__`'_signal_$4_notify_callback`'(__CNAME__`'* self, _COMMA_SUFFIX($3)`' void* data)
 {
   using namespace __NAMESPACE__;
-  typedef sigc::slot< void`'_COMMA_PREFIX($6) > SlotType;
+  using SlotType = sigc::slot< void`'_COMMA_PREFIX($6) >;
 
   auto obj = dynamic_cast<__CPPNAME__*>(Glib::ObjectBase::_get_current_wrapper((GObject*) self));
   // Do not try to call a signal on a disassociated wrapper.
@@ -135,7 +135,7 @@ ifelse($12, `', `dnl
     }
   }
 
-  typedef $2 RType;
+  using RType = $2;
   return RType`'();
 }
 ')dnl endif
@@ -292,7 +292,7 @@ dnl    g_assert(base != nullptr);
     ifelse($4,void,,`return ')(*base->$2)`'($6);
 ifelse($4,void,,`dnl
 
-  typedef $4 RType;
+  using RType = $4;
   return RType`'();
 ')dnl
 }
@@ -343,7 +343,7 @@ ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requeste
     return _CONVERT($4,$3,`(*base->$2)`'(ifelse(`$7',1,const_cast<__CNAME__*>(gobj()),gobj())`'_COMMA_PREFIX($6))');
 ')dnl
 
-  typedef $3 RType;
+  using RType = $3;
   return RType`'();
 ')dnl
 }
