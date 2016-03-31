@@ -69,8 +69,8 @@ class NodeTree
 {
   _CLASS_GENERIC(NodeTree, GNode)
 public:
-  typedef sigc::slot<bool, NodeTree<T>&> TraverseFunc;
-  typedef sigc::slot<void, NodeTree<T>&> ForeachFunc;
+  using TraverseFunc = sigc::slot<bool, NodeTree<T>&>;
+  using ForeachFunc = sigc::slot<void, NodeTree<T>&>;
 
 private:
   static NodeTree<T>* wrap(GNode* node)
@@ -340,7 +340,7 @@ public:
     sigc::slot<void, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_child);
 
     GNode* child = nullptr;
-    typedef sigc::slot<void, GNode*> type_foreach_gnode_slot;
+    using type_foreach_gnode_slot = sigc::slot<void, GNode*>;
     type_foreach_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
 
     g_node_children_foreach(gobj(), (GTraverseFlags)flags, c_callback_foreach_compare_child, reinterpret_cast<gpointer>(&bound_slot));
@@ -374,7 +374,7 @@ public:
     sigc::slot<gboolean, GNode*, const T&, GNode**> real_slot = sigc::ptr_fun(on_compare_node);
     GNode* child = nullptr;
 
-    typedef sigc::slot<gboolean, GNode*> type_traverse_gnode_slot;
+    using type_traverse_gnode_slot = sigc::slot<gboolean, GNode*>;
     type_traverse_gnode_slot bound_slot = sigc::bind(real_slot, the_data, &child);
 
     g_node_traverse(const_cast<GNode*>(gobj()), (GTraverseType)order, (GTraverseFlags)flags, -1, c_callback_traverse_compare_node, reinterpret_cast<gpointer>(&bound_slot));

@@ -98,7 +98,7 @@ public:
   /** This typedef is just to make it more obvious that
    * our operator const void* should be used like operator bool().
    */
-  typedef const void* BoolExpr;
+  using BoolExpr = const void*;
 
   /** Test whether the Variant has an underlying instance.
    *
@@ -285,8 +285,8 @@ class VariantStringBase : public VariantBase
   _CLASS_GENERIC(VariantStringBase, GVariant)
 
 public:
-  typedef GVariant*                     CType;
-  typedef VariantStringBase             CppType;
+  using CType = GVariant*;
+  using CppType = VariantStringBase;
 
   /// Default constructor.
   VariantStringBase();
@@ -340,8 +340,8 @@ class VariantContainerBase : public VariantBase
   _CLASS_GENERIC(VariantContainerBase, GVariant)
 
 public:
-  typedef GVariant*                     CType;
-  typedef VariantContainerBase          CppType;
+  using CType = GVariant*;
+  using CppType = VariantContainerBase;
 
   /// Default constructor.
   VariantContainerBase();
@@ -430,7 +430,7 @@ template<class T>
 class Variant : public VariantBase
 {
 public:
-  typedef T CppType;
+  using CppType = T;
 };
 
 /****************** Specializations ***********************************/
@@ -446,9 +446,9 @@ class Variant<VariantBase> : public VariantContainerBase
   _CLASS_GENERIC(Variant<VariantBase>, GVariant)
 
 public:
-  typedef GVariant*                     CType;
-  typedef VariantBase                   CppType;
-  typedef Variant<VariantBase>          CppContainerType;
+  using CType = GVariant*;
+  using CppType = VariantBase;
+  using CppContainerType = Variant<VariantBase>;
 
   /// Default constructor.
   Variant<VariantBase>();
@@ -492,9 +492,9 @@ template<class T>
 class Variant< Variant<T> > : public VariantContainerBase
 {
 public:
-  typedef GVariant*                     CType;
-  typedef Variant<T>                    CppType;
-  typedef Variant<CppType>              CppContainerType;
+  using CType = GVariant*;
+  using CppType = Variant<T>;
+  using CppContainerType = Variant<CppType>;
 
   /// Default constructor.
   Variant< Variant<T> >();
@@ -539,8 +539,8 @@ class Variant<Glib::ustring> : public VariantStringBase
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<Glib::ustring>, GVariant)
 public:
-  typedef char*                 CType;
-  typedef Glib::ustring         CppType;
+  using CType = char*;
+  using CppType = Glib::ustring;
 
   /// Default constructor.
   Variant<Glib::ustring>();
@@ -592,8 +592,8 @@ class Variant<std::string> : public VariantStringBase
   // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
   _CLASS_GENERIC(Variant<std::string>, GVariant)
 public:
-  typedef char*                 CType;
-  typedef std::string           CppType;
+  using CType = char*                ;
+  using CppType = std::string;
 
   /// Default constructor.
   Variant<std::string>();
@@ -638,8 +638,8 @@ template<class K, class V>
 class Variant< std::pair<K, V> > : public VariantContainerBase
 {
 public:
-  typedef std::pair<K, V>               CppType;
-  typedef Variant<CppType>        CppContainerType;
+  using CppType = std::pair<K, V>;
+  using CppContainerType = Variant<CppType>;
 
   /// Default constructor.
   Variant< std::pair<K, V> >()
@@ -687,8 +687,8 @@ template<class T>
 class Variant< std::vector<T> > : public VariantContainerBase
 {
 public:
-  typedef T                     CppType;
-  typedef std::vector<T>        CppContainerType;
+  using CppType = T                    ;
+  using CppContainerType = std::vector<T>;
 
   /// Default constructor.
   Variant< std::vector<T> >()
@@ -756,8 +756,8 @@ template<>
 class Variant< std::vector<Glib::ustring> > : public VariantContainerBase
 {
 public:
-  typedef Glib::ustring                 CppType;
-  typedef std::vector<Glib::ustring>    CppContainerType;
+  using CppType = Glib::ustring                ;
+  using CppContainerType = std::vector<Glib::ustring>;
 
   /// Default constructor.
   Variant< std::vector<Glib::ustring> >();
@@ -820,8 +820,8 @@ template<>
 class Variant< std::vector<std::string> > : public VariantContainerBase
 {
 public:
-  typedef std::string                   CppType;
-  typedef std::vector<std::string>      CppContainerType;
+  using CppType = std::string                  ;
+  using CppContainerType = std::vector<std::string>;
 
   /// Default constructor.
   Variant< std::vector<std::string> >();
@@ -896,8 +896,8 @@ template<class K, class V>
 class Variant< std::map<K, V> >: public VariantContainerBase
 {
 public:
-  typedef std::pair<K, V>               CppType;
-  typedef std::map<K, V>                CppContainerType;
+  using CppType = std::pair<K, V>;
+  using CppContainerType = std::map<K, V>;
 
   /// Default constructor.
   Variant< std::map<K, V> >()
