@@ -66,7 +66,7 @@ fdstreambuf::detach_fd()
 
 void
 fdstreambuf::connect(
-  const sigc::slot<bool, Glib::IOCondition>& callback, Glib::IOCondition condition)
+  const sigc::slot<bool(Glib::IOCondition)>& callback, Glib::IOCondition condition)
 {
   Glib::signal_io().connect(callback, iochannel_, condition);
 }
@@ -315,7 +315,7 @@ fdstream::close()
 }
 
 void
-fdstream::connect(const sigc::slot<bool, Glib::IOCondition>& callback, Glib::IOCondition condition)
+fdstream::connect(const sigc::slot<bool(Glib::IOCondition)>& callback, Glib::IOCondition condition)
 {
   buf.connect(callback, condition);
 }

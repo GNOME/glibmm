@@ -41,7 +41,7 @@ public:
   void signal_finished_emit();
   void print() const;
 
-  using type_signal_end = sigc::signal<void>;
+  using type_signal_end = sigc::signal<void()>;
   static type_signal_end& signal_end();
 
 private:
@@ -128,7 +128,7 @@ ThreadTimer::print() const
   std::cout << time_ << " seconds since start" << std::endl;
 }
 
-sigc::signal<void>&
+sigc::signal<void()>&
 ThreadTimer::signal_end()
 {
   return signal_end_;

@@ -38,7 +38,7 @@ public:
   void join();
   bool unfinished() const;
 
-  sigc::signal<void>& signal_finished();
+  sigc::signal<void()>& signal_finished();
 
 private:
   enum
@@ -53,7 +53,7 @@ private:
   int id_;
   unsigned int progress_;
   Glib::Dispatcher signal_increment_;
-  sigc::signal<void> signal_finished_;
+  sigc::signal<void()> signal_finished_;
 
   void progress_increment();
   void thread_function();
@@ -121,7 +121,7 @@ ThreadProgress::unfinished() const
   return (progress_ < ITERATIONS);
 }
 
-sigc::signal<void>&
+sigc::signal<void()>&
 ThreadProgress::signal_finished()
 {
   return signal_finished_;

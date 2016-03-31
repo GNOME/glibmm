@@ -72,7 +72,7 @@ public:
   void create_iochannel(int fd, bool manage);
   void detach_fd();
   void close_iochannel();
-  void connect(const sigc::slot<bool, Glib::IOCondition>& callback, Glib::IOCondition condition);
+  void connect(const sigc::slot<bool(Glib::IOCondition)>& callback, Glib::IOCondition condition);
   fdstream_error get_error() const;
 
 protected:
@@ -106,7 +106,7 @@ public:
   void detach();
 
   void close();
-  void connect(const sigc::slot<bool, Glib::IOCondition>& callback, Glib::IOCondition condition);
+  void connect(const sigc::slot<bool(Glib::IOCondition)>& callback, Glib::IOCondition condition);
   fdstream_error get_error() const;
 
 private:
