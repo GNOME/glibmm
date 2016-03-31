@@ -153,8 +153,8 @@ template <class R, class... T>
 class SignalProxy : public SignalProxyNormal
 {
 public:
-  using SlotType = sigc::slot<R, T...>;
-  using VoidSlotType = sigc::slot<void, T...>;
+  using SlotType = sigc::slot<R(T...)>;
+  using VoidSlotType = sigc::slot<void(T...)>;
 
   SignalProxy(ObjectBase* obj, const SignalProxyInfo* info) : SignalProxyNormal(obj, info) {}
 
@@ -303,8 +303,8 @@ template <class R, class... T>
 class SignalProxyDetailedAnyType : public SignalProxyDetailed
 {
 public:
-  using SlotType = sigc::slot<R, T...>;
-  using VoidSlotType = sigc::slot<void, T...>;
+  using SlotType = sigc::slot<R(T...)>;
+  using VoidSlotType = sigc::slot<void(T...)>;
 
   SignalProxyDetailedAnyType(
     ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name)

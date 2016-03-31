@@ -230,7 +230,7 @@ glibmm_source_callback(void* data)
   try
   {
     // Recreate the specific slot from the generic slot node.
-    return (*static_cast<sigc::slot<bool>*>(conn_data->get_slot()))();
+    return (*static_cast<sigc::slot<bool()>*>(conn_data->get_slot()))();
   }
   catch (...)
   {
@@ -251,7 +251,7 @@ glibmm_source_callback_once(void* data)
   try
   {
     // Recreate the specific slot from the generic slot node.
-    (*static_cast<sigc::slot<void>*>(conn_data->get_slot()))();
+    (*static_cast<sigc::slot<void()>*>(conn_data->get_slot()))();
   }
   catch (...)
   {
@@ -276,7 +276,7 @@ glibmm_iosource_callback(GIOChannel*, GIOCondition condition, void* data)
   try
   {
     // Recreate the specific slot from the generic slot node.
-    return (*static_cast<sigc::slot<bool, Glib::IOCondition>*>(callback_data->node->get_slot()))(
+    return (*static_cast<sigc::slot<bool(Glib::IOCondition)>*>(callback_data->node->get_slot()))(
       (Glib::IOCondition)condition);
   }
   catch (...)
@@ -298,7 +298,7 @@ glibmm_child_watch_callback(GPid pid, gint child_status, void* data)
   try
   {
     // Recreate the specific slot from the generic slot node.
-    (*static_cast<sigc::slot<void, GPid, int>*>(conn_data->get_slot()))(pid, child_status);
+    (*static_cast<sigc::slot<void(GPid, int)>*>(conn_data->get_slot()))(pid, child_status);
   }
   catch (...)
   {
@@ -309,7 +309,7 @@ glibmm_child_watch_callback(GPid pid, gint child_status, void* data)
 
 static void
 glibmm_signal_connect_once(
-  const sigc::slot<void>& slot, int priority, GSource* source, GMainContext* context)
+  const sigc::slot<void()>& slot, int priority, GSource* source, GMainContext* context)
 {
   SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
 
@@ -332,7 +332,7 @@ glibmm_main_context_invoke_callback(void* data)
   try
   {
     // Recreate the specific slot from the generic slot node.
-    return (*static_cast<sigc::slot<bool>*>(slot))();
+    return (*static_cast<sigc::slot<bool()>*>(slot))();
   }
   catch (...)
   {
@@ -384,7 +384,7 @@ inline SignalTimeout::SignalTimeout(GMainContext* context) : context_(context)
 
 /* Note that this is our equivalent of g_timeout_add(). */
 sigc::connection
-SignalTimeout::connect(const sigc::slot<bool>& slot, unsigned int interval, int priority)
+SignalTimeout::connect(const sigc::slot<bool()>& slot, unsigned int interval, int priority)
 {
   SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
   const sigc::connection connection(*conn_node->get_slot());
@@ -406,7 +406,7 @@ SignalTimeout::connect(const sigc::slot<bool>& slot, unsigned int interval, int 
 }
 
 void
-SignalTimeout::connect_once(const sigc::slot<void>& slot, unsigned int interval, int priority)
+SignalTimeout::connect_once(const sigc::slot<void()>& slot, unsigned int interval, int priority)
 {
   GSource* const source = g_timeout_source_new(interval);
   glibmm_signal_connect_once(slot, priority, source, context_);
@@ -414,7 +414,7 @@ SignalTimeout::connect_once(const sigc::slot<void>& slot, unsigned int interval,
 
 /* Note that this is our equivalent of g_timeout_add_seconds(). */
 sigc::connection
-SignalTimeout::connect_seconds(const sigc::slot<bool>& slot, unsigned int interval, int priority)
+SignalTimeout::connect_seconds(const sigc::slot<bool()>& slot, unsigned int interval, int priority)
 {
   SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
   const sigc::connection connection(*conn_node->get_slot());
@@ -437,7 +437,7 @@ SignalTimeout::connect_seconds(const sigc::slot<bool>& slot, unsigned int interv
 
 void
 SignalTimeout::connect_seconds_once(
-  const sigc::slot<void>& slot, unsigned int interval, int priority)
+  const sigc::slot<void()>& slot, unsigned int interval, int priority)
 {
   GSource* const source = g_timeout_source_new_seconds(interval);
   glibmm_signal_connect_once(slot, priority, source, context_);
@@ -456,7 +456,7 @@ inline SignalIdle::SignalIdle(GMainContext* context) : context_(context)
 }
 
 sigc::connection
-SignalIdle::connect(const sigc::slot<bool>& slot, int priority)
+SignalIdle::connect(const sigc::slot<bool()>& slot, int priority)
 {
   SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
   const sigc::connection connection(*conn_node->get_slot());
@@ -478,7 +478,7 @@ SignalIdle::connect(const sigc::slot<bool>& slot, int priority)
 }
 
 void
-SignalIdle::connect_once(const sigc::slot<void>& slot, int priority)
+SignalIdle::connect_once(const sigc::slot<void()>& slot, int priority)
 {
   GSource* const source = g_idle_source_new();
   glibmm_signal_connect_once(slot, priority, source, context_);
@@ -498,7 +498,7 @@ inline SignalIO::SignalIO(GMainContext* context) : context_(context)
 
 sigc::connection
 SignalIO::connect(
-  const sigc::slot<bool, IOCondition>& slot, int fd, IOCondition condition, int priority)
+  const sigc::slot<bool(IOCondition)>& slot, int fd, IOCondition condition, int priority)
 {
   const auto source = IOSource::create(fd, condition);
 
@@ -513,7 +513,7 @@ SignalIO::connect(
 }
 
 sigc::connection
-SignalIO::connect(const sigc::slot<bool, IOCondition>& slot, const Glib::RefPtr<IOChannel>& channel,
+SignalIO::connect(const sigc::slot<bool(IOCondition)>& slot, const Glib::RefPtr<IOChannel>& channel,
   IOCondition condition, int priority)
 {
   const auto source = IOSource::create(channel, condition);
@@ -541,7 +541,7 @@ inline SignalChildWatch::SignalChildWatch(GMainContext* context) : context_(cont
 }
 
 sigc::connection
-SignalChildWatch::connect(const sigc::slot<void, GPid, int>& slot, GPid pid, int priority)
+SignalChildWatch::connect(const sigc::slot<void(GPid, int)>& slot, GPid pid, int priority)
 {
   SourceConnectionNode* const conn_node = new SourceConnectionNode(slot);
   const sigc::connection connection(*conn_node->get_slot());
@@ -700,10 +700,10 @@ MainContext::remove_poll(PollFD& fd)
 }
 
 void
-MainContext::invoke(const sigc::slot<bool>& slot, int priority)
+MainContext::invoke(const sigc::slot<bool()>& slot, int priority)
 {
   // Make a copy of slot on the heap.
-  sigc::slot_base* const slot_copy = new sigc::slot<bool>(slot);
+  sigc::slot_base* const slot_copy = new sigc::slot<bool()>(slot);
 
   g_main_context_invoke_full(gobj(), priority, glibmm_main_context_invoke_callback, slot_copy,
     glibmm_main_context_invoke_destroy_notify_callback);
@@ -1171,7 +1171,7 @@ TimeoutSource::create(unsigned int interval)
 }
 
 sigc::connection
-TimeoutSource::connect(const sigc::slot<bool>& slot)
+TimeoutSource::connect(const sigc::slot<bool()>& slot)
 {
   return connect_generic(slot);
 }
@@ -1243,7 +1243,7 @@ TimeoutSource::check()
 bool
 TimeoutSource::dispatch(sigc::slot_base* slot)
 {
-  const bool again = (*static_cast<sigc::slot<bool>*>(slot))();
+  const bool again = (*static_cast<sigc::slot<bool()>*>(slot))();
 
   if (again)
   {
@@ -1268,7 +1268,7 @@ IdleSource::create()
 }
 
 sigc::connection
-IdleSource::connect(const sigc::slot<bool>& slot)
+IdleSource::connect(const sigc::slot<bool()>& slot)
 {
   return connect_generic(slot);
 }
@@ -1298,7 +1298,7 @@ IdleSource::check()
 bool
 IdleSource::dispatch(sigc::slot_base* slot)
 {
-  return (*static_cast<sigc::slot<bool>*>(slot))();
+  return (*static_cast<sigc::slot<bool()>*>(slot))();
 }
 
 /**** Glib::IOSource *******************************************************/
@@ -1317,7 +1317,7 @@ IOSource::create(const Glib::RefPtr<IOChannel>& channel, IOCondition condition)
 }
 
 sigc::connection
-IOSource::connect(const sigc::slot<bool, IOCondition>& slot)
+IOSource::connect(const sigc::slot<bool(IOCondition)>& slot)
 {
   return connect_generic(slot);
 }
@@ -1357,7 +1357,7 @@ IOSource::check()
 bool
 IOSource::dispatch(sigc::slot_base* slot)
 {
-  return (*static_cast<sigc::slot<bool, IOCondition>*>(slot))(poll_fd_.get_revents());
+  return (*static_cast<sigc::slot<bool(IOCondition)>*>(slot))(poll_fd_.get_revents());
 }
 
 } // namespace Glib

@@ -126,13 +126,13 @@ public:
    *
    * See also connect_property_changed_with_return().
    */
-  void connect_property_changed(const Glib::ustring& property_name, const sigc::slot<void>& slot);
+  void connect_property_changed(const Glib::ustring& property_name, const sigc::slot<void()>& slot);
 
   /** You can use the signal_changed() signal of the property proxy instead.
    *
    * @newin{2,48}
    */
-  void connect_property_changed(const Glib::ustring& property_name, sigc::slot<void>&& slot);
+  void connect_property_changed(const Glib::ustring& property_name, sigc::slot<void()>&& slot);
 
   /** You can use the signal_changed() signal of the property proxy instead.
    *
@@ -140,14 +140,14 @@ public:
    * and we could not break the ABI by changing that function.
    */
   sigc::connection connect_property_changed_with_return(
-    const Glib::ustring& property_name, const sigc::slot<void>& slot);
+    const Glib::ustring& property_name, const sigc::slot<void()>& slot);
 
   /** You can use the signal_changed() signal of the property proxy instead.
    *
    * @newin{2,48}
    */
   sigc::connection connect_property_changed_with_return(
-    const Glib::ustring& property_name, sigc::slot<void>&& slot);
+    const Glib::ustring& property_name, sigc::slot<void()>&& slot);
 
   /** Increases the freeze count on object. If the freeze count is non-zero, the
    * emission of "notify" signals on object is stopped. The signals are queued

@@ -69,7 +69,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  sigc::connection connect(const sigc::slot<bool, Glib::IOCondition>& slot,
+  sigc::connection connect(const sigc::slot<bool(Glib::IOCondition)>& slot,
     const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>(),
     int priority = Glib::PRIORITY_DEFAULT);

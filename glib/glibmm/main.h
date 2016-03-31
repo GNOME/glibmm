@@ -73,7 +73,7 @@ private:
 // and SignalIdle::connect_once():
 // See https://bugzilla.gnome.org/show_bug.cgi?id=396963 and
 // http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
-// It's recommended to replace sigc::slot<void>& by std::function<void()>& in
+// It's recommended to replace sigc::slot<void()>& by std::function<void()>& in
 // Threads::Thread::create() and ThreadPool::push() at the next ABI break.
 // Such a replacement would be a mixed blessing in SignalTimeout and SignalIdle.
 // In a single-threaded program auto-disconnection of trackable slots is safe
@@ -122,7 +122,7 @@ public:
    * @return A connection handle, which can be used to disconnect the handler.
    */
   sigc::connection connect(
-    const sigc::slot<bool>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
+    const sigc::slot<bool()>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
 
   /** Connects a timeout handler that runs only once.
    * This method takes a function pointer to a function with a void return
@@ -144,7 +144,7 @@ public:
    * @param priority The priority of the new event source.
    */
   void connect_once(
-    const sigc::slot<void>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
+    const sigc::slot<void()>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
 
   /** Connects a timeout handler with whole second granularity.
    *
@@ -182,7 +182,7 @@ public:
    * @newin{2,14}
    */
   sigc::connection connect_seconds(
-    const sigc::slot<bool>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
+    const sigc::slot<bool()>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
 
   /** Connects a timeout handler that runs only once with whole second
    *  granularity.
@@ -206,7 +206,7 @@ public:
    * @param priority The priority of the new event source.
    */
   void connect_seconds_once(
-    const sigc::slot<void>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
+    const sigc::slot<void()>& slot, unsigned int interval, int priority = PRIORITY_DEFAULT);
 
 private:
   GMainContext* context_;
@@ -244,7 +244,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  sigc::connection connect(const sigc::slot<bool>& slot, int priority = PRIORITY_DEFAULT_IDLE);
+  sigc::connection connect(const sigc::slot<bool()>& slot, int priority = PRIORITY_DEFAULT_IDLE);
 
   /** Connects an idle handler that runs only once.
    * This method takes a function pointer to a function with a void return
@@ -264,7 +264,7 @@ public:
    * @endcode
    * @param priority The priority of the new event source.
    */
-  void connect_once(const sigc::slot<void>& slot, int priority = PRIORITY_DEFAULT_IDLE);
+  void connect_once(const sigc::slot<void()>& slot, int priority = PRIORITY_DEFAULT_IDLE);
 
 private:
   GMainContext* context_;
@@ -305,7 +305,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  sigc::connection connect(const sigc::slot<bool, IOCondition>& slot, int fd, IOCondition condition,
+  sigc::connection connect(const sigc::slot<bool(IOCondition)>& slot, int fd, IOCondition condition,
     int priority = PRIORITY_DEFAULT);
 
   /** Connects an I/O handler that watches an I/O channel.
@@ -334,7 +334,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  sigc::connection connect(const sigc::slot<bool, IOCondition>& slot,
+  sigc::connection connect(const sigc::slot<bool(IOCondition)>& slot,
     const Glib::RefPtr<IOChannel>& channel, IOCondition condition, int priority = PRIORITY_DEFAULT);
 
 private:
@@ -366,7 +366,7 @@ public:
    * @return A connection handle, which can be used to disconnect the handler.
    */
   sigc::connection connect(
-    const sigc::slot<void, GPid, int>& slot, GPid pid, int priority = PRIORITY_DEFAULT);
+    const sigc::slot<void(GPid, int)>& slot, GPid pid, int priority = PRIORITY_DEFAULT);
 
 private:
   GMainContext* context_;
@@ -583,7 +583,7 @@ public:
    *
    * @newin{2,38}
    */
-  void invoke(const sigc::slot<bool>& slot, int priority = PRIORITY_DEFAULT);
+  void invoke(const sigc::slot<bool()>& slot, int priority = PRIORITY_DEFAULT);
 
   /** Timeout signal, attached to this MainContext.
    * @return A signal proxy; you want to use SignalTimeout::connect().
@@ -848,7 +848,7 @@ public:
   using CppObjectType = Glib::TimeoutSource;
 
   static Glib::RefPtr<TimeoutSource> create(unsigned int interval);
-  sigc::connection connect(const sigc::slot<bool>& slot);
+  sigc::connection connect(const sigc::slot<bool()>& slot);
 
 protected:
   explicit TimeoutSource(unsigned int interval);
@@ -871,7 +871,7 @@ public:
   using CppObjectType = Glib::IdleSource;
 
   static Glib::RefPtr<IdleSource> create();
-  sigc::connection connect(const sigc::slot<bool>& slot);
+  sigc::connection connect(const sigc::slot<bool()>& slot);
 
 protected:
   IdleSource();
@@ -890,7 +890,7 @@ public:
   static Glib::RefPtr<IOSource> create(int fd, IOCondition condition);
   static Glib::RefPtr<IOSource> create(
     const Glib::RefPtr<IOChannel>& channel, IOCondition condition);
-  sigc::connection connect(const sigc::slot<bool, IOCondition>& slot);
+  sigc::connection connect(const sigc::slot<bool(IOCondition)>& slot);
 
 protected:
   IOSource(int fd, IOCondition condition);

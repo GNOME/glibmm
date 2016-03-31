@@ -32,7 +32,7 @@
 namespace
 {
 
-using HandlerList = sigc::signal<void>;
+using HandlerList = sigc::signal<void()>;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.
@@ -90,7 +90,7 @@ namespace Glib
 {
 
 sigc::connection
-add_exception_handler(const sigc::slot<void>& slot)
+add_exception_handler(const sigc::slot<void()>& slot)
 {
 #ifdef GLIBMM_CAN_USE_THREAD_LOCAL
   HandlerList* handler_list = thread_specific_handler_list;
