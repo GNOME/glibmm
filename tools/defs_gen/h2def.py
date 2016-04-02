@@ -322,6 +322,10 @@ def clean_func(buf):
     pat = re.compile(r"""[A-Z]+_AVAILABLE_IN_ALL\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
+    #strip G_DECLARE_FINAL_TYPE (*)
+    pat = re.compile(r"""G_DECLARE_FINAL_TYPE\s*\(.*?\)""", re.MULTILINE)
+    buf = pat.sub('', buf)
+    
     #we are not stripping G_GNUC_INTERNAL
 
     #extern "C"
