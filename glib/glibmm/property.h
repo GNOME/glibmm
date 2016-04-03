@@ -467,7 +467,6 @@ Property_ReadOnly<T>::get_proxy()
 {
   return Glib::PropertyProxy_ReadOnly<T>(object_, get_name_internal());
 }
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 /**** Glib::Property_WriteOnly<T> ****************************************************/
 
@@ -536,6 +535,7 @@ Property_WriteOnly<T>::get_proxy()
 {
   return Glib::PropertyProxy_WriteOnly<T>(object_, get_name_internal());
 }
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib
 

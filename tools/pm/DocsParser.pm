@@ -504,6 +504,8 @@ sub append_parameter_docs($$;$)
   {
     my $param = $docs_param_names[$i];
     my $desc = $$param_descriptions->{$param};
+    my $param_without_trailing_underscore = $param;
+    $param_without_trailing_underscore =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
 
     if (defined($objCppfunc))
     {
@@ -538,7 +540,7 @@ sub append_parameter_docs($$;$)
       }
       if ($cpp_name ne $param)
       {
-        $param_name_mappings{$param} = $cpp_name;
+        $param_name_mappings{$param_without_trailing_underscore} = $cpp_name;
       }
     }
     elsif ($param eq "callback")
@@ -548,12 +550,11 @@ sub append_parameter_docs($$;$)
       $param_name_mappings{$param} = "slot";
     }
 
-    $param =~ s/([a-zA-Z0-9]*(_[a-zA-Z0-9]+)*)_?/$1/g;
     DocsParser::convert_docs_to_cpp($obj_function, \$desc);
     if(length($desc) > 0)
     {
       $desc  .= '.' unless($desc =~ /(?:^|\.)$/);
-      $$text .= "\n\@param ${param} \u${desc}";
+      $$text .= "\n\@param ${param_without_trailing_underscore} \u${desc}";
     }
   }
   return %param_name_mappings;
