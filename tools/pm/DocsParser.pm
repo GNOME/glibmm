@@ -234,28 +234,11 @@ sub parse_on_cdata($$)
   }
 }
 
-sub lookup_enum_documentation($$$$)
+sub lookup_enum_documentation($$$$$$$)
 {
-  my ($c_enum_name, $cpp_enum_name, $indent, $ref_flags) = @_;
+  my ($c_enum_name, $cpp_enum_name, $indent, $ref_subst_in, $ref_subst_out,
+    $deprecation_docs, $newin) = @_;
   
-  my @subst_in  = [];
-  my @subst_out = [];
-  my $newin = "";
- 
- # Get the substitutions, and recognize some flags too.
-  foreach(@$ref_flags)
-  {
-    if(/^\s*s#([^#]+)#([^#]*)#\s*$/)
-    {
-      push(@subst_in,  $1);
-      push(@subst_out, $2);
-    }
-    elsif(/^\s*newin(.*)/) #If newin is at the start.
-    {
-      $newin = string_unquote(string_trim($1));
-    }
-  }
-
   my $objFunction = $DocsParser::hasharrayFunctions{$c_enum_name};
   if(!$objFunction)
   {
@@ -279,10 +262,10 @@ sub lookup_enum_documentation($$$$)
     $param =~ s/\b[A-Z]+_//;
 
     # Now apply custom substitutions.
-    for(my $i = 0; $i < scalar(@subst_in); ++$i)
+    for(my $i = 0; $i < scalar(@$ref_subst_in); ++$i)
     {
-      $param =~ s/${subst_in[$i]}/${subst_out[$i]}/;
-      $desc  =~ s/${subst_in[$i]}/${subst_out[$i]}/;
+      $param =~ s/$$ref_subst_in[$i]/$$ref_subst_out[$i]/;
+      $desc  =~ s/$$ref_subst_in[$i]/$$ref_subst_out[$i]/;
     }
 
     # Skip this element, if its name has been deleted.
@@ -304,6 +287,13 @@ sub lookup_enum_documentation($$$$)
   $description .= $$objFunction{description};
   DocsParser::convert_docs_to_cpp($objFunction, \$description);
   DocsParser::replace_or_add_newin(\$description, $newin);
+
+  # Add note about deprecation if we have specified that in our _WRAP_ENUM(),
+  # _WRAP_ENUM_DOCS_ONLY() or _WRAP_GERROR() call:
+  if($deprecation_docs ne "")
+  {
+    $description .= "\n\@deprecated $deprecation_docs\n";
+  }
 
   # Append the enum description docs.
   DocsParser::convert_docs_to_cpp($objFunction, \$docs);

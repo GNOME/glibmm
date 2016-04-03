@@ -1409,25 +1409,79 @@ sub on_wrap_vfunc($)
                            $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler);
 }
 
+# Common part of _WRAP_ENUM(), _WRAP_ENUM_DOCS_ONLY() and _WRAP_GERROR().
+sub on_wrap_any_enum($$)
+{
+  my ($self, $is_gerror) = @_;
+
+  my $str = $self->extract_bracketed_text();
+  my @args = string_split_commas($str);
+
+  #Get the arguments:
+  my $cpp_type = string_trim(shift(@args));
+  my $c_type   = string_trim(shift(@args));
+  my $domain   = $is_gerror ? string_trim(shift(@args)) : "";
+
+  my @subst_in  = [];
+  my @subst_out = [];
+  my $no_gtype = "";
+  my $argDeprecated = "";
+  my $deprecation_docs = "";
+  my $newin = "";
+
+  # Build a list of custom substitutions, and recognize some flags too.
+  foreach (@args)
+  {
+    my $arg = string_trim($_);
+
+    if ($arg eq "NO_GTYPE")
+    {
+      $no_gtype = "NO_GTYPE";
+    }
+    elsif ($arg =~ /^(get_type_func=)(\s*)$/)
+    {
+      my $part1 = $1;
+      my $part2 = $2;
+    }
+    elsif ($arg =~ /^s#([^#]+)#([^#]*)#$/)
+    {
+      push(@subst_in,  $1);
+      push(@subst_out, $2);
+    }
+    elsif ($arg =~ /^deprecated(.*)/) #If deprecated is at the start.
+    {
+      $argDeprecated = "deprecated";
+
+      if ($1 ne "")
+      {
+        $deprecation_docs = string_unquote(string_trim($1));
+      }
+    }
+    elsif ($arg =~ /^newin(.*)/) #If newin is at the start.
+    {
+      $newin = string_unquote(string_trim($1));
+    }
+  }
+  return ($cpp_type, $c_type, $domain, \@subst_in, \@subst_out, $no_gtype,
+    $argDeprecated, $deprecation_docs, $newin);
+}
+
 sub on_wrap_enum($)
 {
   my ($self) = @_;
 
   return unless ($self->check_for_eof());
 
-  my $outputter = $$self{objOutputter};
   my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
-  my @args = string_split_commas($self->extract_bracketed_text());
+  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(0);
 
-  my $cpp_type = string_trim(shift(@args));
-  my $c_type   = string_trim(shift(@args));
-
-  # The remaining elements in @args could be flags or s#^FOO_## substitutions.
-
-  $outputter->output_wrap_enum(
-      $$self{filename}, $$self{line_num}, $cpp_type, $c_type, $comment, @args);
+  $$self{objOutputter}->output_wrap_enum(
+    $$self{filename}, $$self{line_num}, $cpp_type, $c_type,
+    $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $argDeprecated, $deprecation_docs, $newin);
 }
 
 sub on_wrap_enum_docs_only($)
@@ -1436,24 +1490,19 @@ sub on_wrap_enum_docs_only($)
 
   return unless ($self->check_for_eof());
 
-  my $outputter = $$self{objOutputter};
   my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
-  my @args = string_split_commas($self->extract_bracketed_text());
-
-  my $cpp_type = string_trim(shift(@args));
-  my $c_type   = string_trim(shift(@args));
+  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, undef,
+    $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(0);
 
   # Get the module name so the enum docs can be included in the module's
   # Doxygen enum group.
   my $module_canonical = Util::string_canonical($$self{module});
 
-  # The remaining elements in @args could be flags or s#^FOO_## substitutions.
-
-  $outputter->output_wrap_enum_docs_only(
-      $$self{filename}, $$self{line_num}, $module_canonical, $cpp_type, $c_type,
-      $comment, @args);
+  $$self{objOutputter}->output_wrap_enum_docs_only(
+    $$self{filename}, $$self{line_num}, $module_canonical, $cpp_type, $c_type,
+    $comment, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
 }
 
 sub on_wrap_gerror($)
@@ -1462,17 +1511,19 @@ sub on_wrap_gerror($)
 
   return unless ($self->check_for_eof());
 
+  # If _WRAP_GERROR is preceded by a doxygen comment, it will be applied
+  # to the generated exception class as a whole, and not to the enum Code
+  # inside the class.
+  my $class_docs = $self->extract_preceding_documentation();
+
   # get the arguments
-  my @args = string_split_commas($self->extract_bracketed_text());
-
-  my $cpp_type = string_trim(shift(@args));
-  my $c_enum   = string_trim(shift(@args));
-  my $domain   = string_trim(shift(@args));
-
-  # The remaining elements in @args could be flags or s#^FOO_## substitutions.
+  my ($cpp_type, $c_type, $domain, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(1);
 
   $$self{objOutputter}->output_wrap_gerror(
-      $$self{filename}, $$self{line_num}, $cpp_type, $c_enum, $domain, @args);
+    $$self{filename}, $$self{line_num}, $cpp_type, $c_type, $domain,
+    $class_docs, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $argDeprecated, $deprecation_docs, $newin);
 }
 
 sub on_wrap_any_property($)

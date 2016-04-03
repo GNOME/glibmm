@@ -1,6 +1,6 @@
 dnl
-dnl  _GERROR(PixbufError,GdkPixbufError,GDK_PIXBUF_ERROR,`<enum_value_list>',[NO_GTYPE], `<enum_docs>')
-dnl             $1             $2             $3                $4               $5           $6
+dnl _GERROR(cpp_type, c_type, domain, `element_list', `no_gtype', `class_docs', `enum_docs', 'deprecated')
+dnl            $1       $2      $3         $4             $5           $6           $7            $8
 dnl
 
 m4_define(`_GERROR',`dnl
@@ -12,10 +12,15 @@ m4_define(`__CNAME__',`$2')
 m4_define(`__CQUARK__',`$3')
 m4_define(`__VALUE_BASE__',`Glib::Value_Enum<__NAMESPACE__::__CPPNAME__::Code>')
 _POP()
+ifelse(`$8',,,`_DEPRECATE_IFDEF_START')`'dnl The expansion of _DEPRECATE_IFDEF_START ends with a newline
+ifelse(`$6',,,`dnl
+/** $6
+ */
+')dnl
 class __CPPNAME__ : public Glib::Error
 {
 public:
-  /** $6
+  /** $7
    */
   enum Code
   {
@@ -36,6 +41,7 @@ private:
   _IMPORT(SECTION_H_GERROR_PRIVATE)
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 };
+ifelse(`$8',,,`_DEPRECATE_IFDEF_END')`'dnl The expansion of _DEPRECATE_IFDEF_END ends with a newline
 
 m4_ifelse($5,`NO_GTYPE',,`dnl else
 __NAMESPACE_END__
@@ -44,21 +50,23 @@ __NAMESPACE_END__
 namespace Glib
 {
 
+ifelse(`$8',,,`_DEPRECATE_IFDEF_START')`'dnl
 template <>
 class Value<__NAMESPACE__::__CPPNAME__::Code> : public __VALUE_BASE__
 {
 public:
   static GType value_type() G_GNUC_CONST;
 };
+ifelse(`$8',,,`_DEPRECATE_IFDEF_END')`'dnl
 
 } // namespace Glib
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-
 
 __NAMESPACE_BEGIN__
 ')dnl endif !NO_GTYPE
 _PUSH(SECTION_SRC_GENERATED)
 
+ifelse(`$8',,,`_DEPRECATE_IFDEF_START')`'dnl
 __NAMESPACE__::__CPPNAME__::__CPPNAME__`'(__NAMESPACE__::__CPPNAME__::Code error_code, const Glib::ustring& error_message)
 :
   Glib::Error (__CQUARK__, error_code, error_message)
@@ -87,6 +95,6 @@ GType Glib::Value<__NAMESPACE__::__CPPNAME__::Code>::value_type()
 }
 
 ')dnl endif !NO_GTYPE
+ifelse(`$8',,,`_DEPRECATE_IFDEF_END')`'dnl
 _POP()
-') dnl enddef _GERROR
-
+')dnl enddef _GERROR

@@ -687,10 +687,14 @@ sub output_wrap_sig_decl($$$$$$$$$$$$$$)
   $self->append($str);
 }
 
-# void output_wrap_enum($filename, $line_num, $cpp_type, $c_type, $comment, @flags)
-sub output_wrap_enum($$$$$$$)
+# void output_wrap_enum($filename, $line_num, $cpp_type, $c_type,
+#   $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+#   $deprecated, $deprecation_docs, $newin)
+sub output_wrap_enum($$$$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $cpp_type, $c_type, $comment, @flags) = @_;
+  my ($self, $filename, $line_num, $cpp_type, $c_type,
+    $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $deprecated, $deprecation_docs, $newin) = @_;
 
   my $objEnum = GtkDefs::lookup_enum($c_type);
   if(!$objEnum)
@@ -701,8 +705,7 @@ sub output_wrap_enum($$$$$$$)
 
   $objEnum->beautify_values();
 
-  my $no_gtype = "";
-  my $elements = $objEnum->build_element_list(\@flags, \$no_gtype, "  ");
+  my $elements = $objEnum->build_element_list($ref_subst_in, $ref_subst_out, "  ");
 
   if(!$elements)
   {
@@ -714,32 +717,33 @@ sub output_wrap_enum($$$$$$$)
   $value_suffix = "Flags" if($$objEnum{flags});
 
   # Get the enum documentation from the parsed docs.
-  my $enum_docs =
-    DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", " ", \@flags);
+  my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
+    " ", $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
 
   # Merge the passed in comment to the existing enum documentation.
   $comment .= "\n * " . $enum_docs if $enum_docs ne "";
 
-  my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\')dnl\n",
+  my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\')dnl\n",
     $cpp_type,
     $c_type,
     $value_suffix,
     $elements,
     $no_gtype,
-    $comment
+    $comment,
+    $deprecated
   );
 
   $self->append($str);
 }
 
-sub output_wrap_enum_docs_only($$$$$$$)
+sub output_wrap_enum_docs_only($$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $module_canonical, $cpp_type, $c_type,
-      $comment, @flags) = @_;
+    $comment, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin) = @_;
  
   # Get the existing enum description from the parsed docs.
-  my $enum_docs =
-    DocsParser::lookup_enum_documentation("$c_type", "$cpp_type", " ", \@flags);
+  my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
+    " ", $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
 
   if($enum_docs eq "")
   {
@@ -756,17 +760,21 @@ sub output_wrap_enum_docs_only($$$$$$$)
   $self->append($comment);
 }
 
-# void output_wrap_gerror($filename, $line_num, $cpp_type, $c_enum, $domain, @flags)
-sub output_wrap_gerror($$$$$$$)
+# void output_wrap_gerror($filename, $line_num, $cpp_type, $c_type, $domain,
+#  $class_docs, $ref_subst_in, $ref_subst_out, $no_gtype,
+#  $deprecated, $deprecation_docs, $newin)
+sub output_wrap_gerror($$$$$$$$$$$$$)
 {
-  my ($self, $filename, $line_num, $cpp_type, $c_enum, $domain, @flags) = @_;
+  my ($self, $filename, $line_num, $cpp_type, $c_type, $domain,
+    $class_docs, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $deprecated, $deprecation_docs, $newin) = @_;
 
   my $objDefsParser = $$self{objDefsParser};
 
-  my $objEnum = GtkDefs::lookup_enum($c_enum);
+  my $objEnum = GtkDefs::lookup_enum($c_type);
   if(!$objEnum)
   {
-    $self->output_wrap_failed($c_enum, "enum defs lookup failed.");
+    $self->output_wrap_failed($c_type, "enum defs lookup failed.");
     return;
   }
 
@@ -780,25 +788,51 @@ sub output_wrap_gerror($$$$$$$)
   $prefix =~ s/^[^_]+_//;
 
   # Chop off the domain prefix, because we put the enum into the class.
-  unshift(@flags, "s#^${prefix}_##");
+  unshift(@$ref_subst_in, "^${prefix}_");
+  unshift(@$ref_subst_out, "");
 
-  my $no_gtype = "";
-  my $elements = $objEnum->build_element_list(\@flags, \$no_gtype, "    ");
+  my $elements = $objEnum->build_element_list($ref_subst_in, $ref_subst_out, "    ");
 
   # Get the enum documentation from the parsed docs.
-  my $enum_docs =
-    DocsParser::lookup_enum_documentation("$c_enum", "Code", "   ", \@flags);
+  my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "Code",
+    "   ", $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
 
   # Prevent Doxygen from auto-linking to a class called Error.
   $enum_docs =~ s/([^%])(Error code)/$1%$2/g;
 
-  my $str = sprintf("_GERROR(%s,%s,%s,\`%s\',%s,\`%s\')dnl\n",
+  # Add @newin and @deprecated to the class documentation, if appropriate.
+  my $extra_class_docs = "";
+  if ($newin ne "" and !($class_docs =~ /\@newin/))
+  {
+    $extra_class_docs .= "\n *\n *" if $class_docs;
+    $extra_class_docs .= " \@newin{$newin}";
+  }
+  if ($deprecation_docs ne "" and !($class_docs =~ /\@deprecated/))
+  {
+    $extra_class_docs .= "\n *\n *" if $class_docs or $extra_class_docs;
+    $extra_class_docs .= " \@deprecated $deprecation_docs";
+  }
+  if ($extra_class_docs ne "")
+  {
+    # $class_docs has got ` and ' replaced and m4 quotes added in WrapParser::
+    # on_comment_doxygen() and extract_preceding_documentation().
+    # Fix $extra_class_docs here. $deprecation_docs can contain any characters.
+    DocsParser::add_m4_quotes(\$extra_class_docs);
+    $class_docs .= $extra_class_docs;
+  }
+
+  # Prevent Doxygen from auto-linking to a class called Exception.
+  $class_docs =~ s/([^%])(Exception class)/$1%$2/g;
+
+  my $str = sprintf("_GERROR(%s,%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\')dnl\n",
     $cpp_type,
-    $c_enum,
+    $c_type,
     $domain,
     $elements,
     $no_gtype,
-    $enum_docs
+    $class_docs,
+    $enum_docs,
+    $deprecated
   );
 
   $self->append($str);

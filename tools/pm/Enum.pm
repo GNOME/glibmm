@@ -277,34 +277,7 @@ sub beautify_values($)
 
 sub build_element_list($$$$)
 {
-  my ($self, $ref_flags, $ref_no_gtype, $indent) = @_;
-
-  my @subst_in  = [];
-  my @subst_out = [];
-
-  # Build a list of custom substitutions, and recognize some flags too.
-
-  foreach(@$ref_flags)
-  {
-    if(/^\s*(NO_GTYPE)\s*$/)
-    {
-      $$ref_no_gtype = $1;
-    }
-    elsif(/^\s*(get_type_func=)(\s*)\s*$/)
-    {
-      my $part1 = $1;
-      my $part2 = $2;
-    }
-    elsif(/^\s*s#([^#]+)#([^#]*)#\s*$/)
-    {
-      push(@subst_in,  $1);
-      push(@subst_out, $2);
-    }
-    elsif($_ !~ /^\s*(?:newin.*)?$/) # newin or only white space
-    {
-      return undef;
-    }
-  }
+  my ($self, $ref_subst_in, $ref_subst_out, $indent) = @_;
 
   my $elem_names  = $$self{elem_names};
   my $elem_values = $$self{elem_values};
@@ -317,10 +290,10 @@ sub build_element_list($$$$)
     my $name  = $$elem_names[$i];
     my $value = $$elem_values[$i];
 
-    for(my $ii = 0; $ii < scalar(@subst_in); ++$ii)
+    for(my $ii = 0; $ii < scalar(@$ref_subst_in); ++$ii)
     {
-      $name  =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
-      $value =~ s/${subst_in[$ii]}/${subst_out[$ii]}/;
+      $name  =~ s/$$ref_subst_in[$ii]/$$ref_subst_out[$ii]/;
+      $value =~ s/$$ref_subst_in[$ii]/$$ref_subst_out[$ii]/;
     }
 
     # Skip this element, if its name has been deleted.
