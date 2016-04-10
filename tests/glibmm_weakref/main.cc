@@ -67,38 +67,29 @@ main(int, char**)
 
   // Move construction.
   Glib::WeakRef<Gio::MemoryInputStream> weakmemstream3(std::move(weakmemstream1));
-  if (weakmemstream1.get() || !weakmemstream3.get())
+  if (!weakmemstream3.get())
   {
     success = false;
-    if (weakmemstream1.get())
-      std::cout << "weakmemstream1 || !weakmemstream3: weakmemstream1" << std::endl;
-    if (!weakmemstream3.get())
-      std::cout << "weakmemstream1 || !weakmemstream3: !weakmemstream3" << std::endl;
+    std::cout << "weakmemstream1 || !weakmemstream3: !weakmemstream3" << std::endl;
   }
   else
   {
     // Move assignment.
     weakmemstream2 = std::move(weakmemstream3);
-    if (!weakmemstream2 || weakmemstream3)
+    if (!weakmemstream2)
     {
       success = false;
-      if (!weakmemstream2.get())
-        std::cout << "!weakmemstream2 || weakmemstream3: !weakmemstream2" << std::endl;
-      if (weakmemstream3.get())
-        std::cout << "!weakmemstream2 || weakmemstream3: weakmemstream3" << std::endl;
+      std::cout << "!weakmemstream2 || weakmemstream3: !weakmemstream2" << std::endl;
     }
     else
     {
       // Downcast move, followed by upcast.
       weakstream1 = std::move(weakmemstream2);
       weakmemstream1 = Glib::WeakRef<Gio::MemoryInputStream>::cast_dynamic(weakstream1);
-      if (weakmemstream2 || !weakmemstream1)
+      if (!weakmemstream1)
       {
         success = false;
-        if (weakmemstream2)
-          std::cout << "weakmemstream2 || !weakmemstream1: weakmemstream2" << std::endl;
-        if (!weakmemstream1)
-          std::cout << "weakmemstream2 || !weakmemstream1: !weakmemstream1" << std::endl;
+        std::cout << "weakmemstream2 || !weakmemstream1: !weakmemstream1" << std::endl;
       }
     }
   }
