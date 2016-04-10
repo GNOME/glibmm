@@ -247,7 +247,7 @@ WeakRef<T_CppObject>::WeakRef(WeakRef<T_CastFrom>&& src) noexcept : pCppObject_(
 template <typename T_CppObject>
 template <typename T_CastFrom>
 WeakRef<T_CppObject>::WeakRef(const RefPtr<T_CastFrom>& src) noexcept
-  : pCppObject_(src.operator->()),
+  : pCppObject_(src.get()),
     gobject_(nullptr)
 {
   if (pCppObject_)
@@ -320,7 +320,7 @@ template <typename T_CastFrom>
 WeakRef<T_CppObject>&
 WeakRef<T_CppObject>::operator=(const RefPtr<T_CastFrom>& src) noexcept
 {
-  T_CppObject* pCppObject = src.operator->();
+  T_CppObject* pCppObject = src.get();
   set(pCppObject, nullptr);
   return *this;
 }
