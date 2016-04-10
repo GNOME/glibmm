@@ -101,16 +101,18 @@ test_refptr_copy_constructor()
   g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
 
   {
+    //The reference count should not change,
+    //because we only take and release a single reference:
     Glib::RefPtr<Something> refSomething2(refSomething);
-    g_assert_cmpint(refSomething->ref_count(), ==, 2);
-    g_assert_cmpint(refSomething2->ref_count(), ==, 2);
-    g_assert_cmpint(refSomething->max_ref_count(), ==, 2);
+    g_assert_cmpint(refSomething->ref_count(), ==, 1);
+    g_assert_cmpint(refSomething2->ref_count(), ==, 1);
+    g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
   }
 
   // Test the refcount after other references should have been released
   // when other RefPtrs went out of scope:
   g_assert_cmpint(refSomething->ref_count(), ==, 1);
-  g_assert_cmpint(refSomething->max_ref_count(), ==, 2);
+  g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
 }
 
 static void
@@ -121,16 +123,18 @@ test_refptr_assignment_operator()
   g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
 
   {
+    //The reference count should not change,
+    //because we only take and release a single reference:
     Glib::RefPtr<Something> refSomething2 = refSomething;
-    g_assert_cmpint(refSomething->ref_count(), ==, 2);
-    g_assert_cmpint(refSomething2->ref_count(), ==, 2);
-    g_assert_cmpint(refSomething->max_ref_count(), ==, 2);
+    g_assert_cmpint(refSomething->ref_count(), ==, 1);
+    g_assert_cmpint(refSomething2->ref_count(), ==, 1);
+    g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
   }
 
   // Test the refcount after other references should have been released
   // when other RefPtrs went out of scope:
   g_assert_cmpint(refSomething->ref_count(), ==, 1);
-  g_assert_cmpint(refSomething->max_ref_count(), ==, 2);
+  g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
 }
 
 static Glib::RefPtr<Something>
@@ -148,23 +152,25 @@ static void
 test_refptr_with_parent_copy_constructor()
 {
   // We use get_something() because test_refptr_with_parent_move_constructor() does.
+  //The reference count should not change,
+  //because we only take and release a single reference:
   Glib::RefPtr<Something> refSomething = get_something();
-  g_assert_cmpint(refSomething->ref_count(), ==, 2); // 1 here and 1 inside get_something()
-  g_assert_cmpint(refSomething->max_ref_count(), ==, 2);
+  g_assert_cmpint(refSomething->ref_count(), ==, 1);
+  g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
 
   {
     Parent parent(refSomething);
     g_assert(!parent.was_constructed_via_move_constructor());
     g_assert(parent.was_constructed_via_copy_constructor());
     g_assert_cmpint(
-      parent.something_ref_count(), ==, 3); // 1 here, 1 in parent, and 1 inside get_something()
-    g_assert_cmpint(parent.something_max_ref_count(), ==, 3);
+      parent.something_ref_count(), ==, 1);
+    g_assert_cmpint(parent.something_max_ref_count(), ==, 1);
   }
 
   // Test the refcount after other references should have been released
   // when other RefPtrs went out of scope:
-  g_assert_cmpint(refSomething->ref_count(), ==, 2); // 1 here and 1 inside get_something()
-  g_assert_cmpint(refSomething->max_ref_count(), ==, 3);
+  g_assert_cmpint(refSomething->ref_count(), ==, 1);
+  g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
 }
 
 static void
@@ -173,8 +179,8 @@ test_refptr_with_parent_move_constructor()
   Parent parent(get_something());
   g_assert(parent.was_constructed_via_move_constructor());
   g_assert(!parent.was_constructed_via_copy_constructor());
-  g_assert_cmpint(parent.something_ref_count(), ==, 2); // 1 in parent and 1 inside get_something()
-  g_assert_cmpint(parent.something_max_ref_count(), ==, 2);
+  g_assert_cmpint(parent.something_ref_count(), ==, 1);
+  g_assert_cmpint(parent.something_max_ref_count(), ==, 1);
 }
 
 static void

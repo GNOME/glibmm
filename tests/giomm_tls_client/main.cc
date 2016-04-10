@@ -98,7 +98,7 @@ main(int, char**)
               << address->get_port() << "." << std::endl;
   }
 
-  auto conn = Glib::RefPtr<Gio::TcpConnection>::cast_dynamic(Gio::SocketConnection::create(socket));
+  auto conn = std::dynamic_pointer_cast<Gio::TcpConnection>(Gio::SocketConnection::create(socket));
 
   if (!conn || !conn->is_connected())
   {

@@ -287,8 +287,6 @@ template <typename T_CppObject>
 WeakRef<T_CppObject>&
 WeakRef<T_CppObject>::operator=(WeakRef&& src) noexcept
 {
-  // See RefPtr for an explanation of the swap() technique to implement
-  // copy assignment and move assignment.
   // This technique is inefficient for copy assignment of WeakRef,
   // because it involves copy construction + destruction, i.e. in a typical
   // case g_weak_ref_init() + g_weak_ref_clear(), when a g_weak_ref_set()
