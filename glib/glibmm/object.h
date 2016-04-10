@@ -259,7 +259,7 @@ public:
 
   static GType value_type() { return T::get_base_type(); }
 
-  void set(const CppType& data) { set_object(data.operator->()); }
+  void set(const CppType& data) { set_object(data.get()); }
   CppType get() const { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
 
@@ -278,7 +278,7 @@ public:
 
   static GType value_type() { return T::get_base_type(); }
 
-  void set(const CppType& data) { set_object(const_cast<T*>(data.operator->())); }
+  void set(const CppType& data) { set_object(const_cast<T*>(data.get())); }
   CppType get() const { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
 };
 #endif /* GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS */
