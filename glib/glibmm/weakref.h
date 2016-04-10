@@ -354,7 +354,7 @@ WeakRef<T_CppObject>::get() const noexcept
 
   // A RefPtr constructed from pointer expects reference to be done externally.
   pCppObject_->reference();
-  ret = RefPtr<T_CppObject>(pCppObject_);
+  ret = make_refptr_for_instance<T_CppObject>(pCppObject_);
 
   g_object_unref(ptr);
 
