@@ -216,7 +216,7 @@ wrap_auto(GObject* object, bool take_copy)
 Glib::RefPtr<Object>
 wrap(GObject* object, bool take_copy /* = false */)
 {
-  return Glib::RefPtr<Object>(dynamic_cast<Object*>(wrap_auto(object, take_copy)));
+  return Glib::make_refptr_for_instance<Object>(dynamic_cast<Object*>(wrap_auto(object, take_copy)));
 }
 
 } /* namespace Glib */

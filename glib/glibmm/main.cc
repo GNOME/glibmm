@@ -565,7 +565,7 @@ signal_child_watch()
 Glib::RefPtr<MainContext>
 MainContext::create()
 {
-  return Glib::RefPtr<MainContext>(reinterpret_cast<MainContext*>(g_main_context_new()));
+  return Glib::make_refptr_for_instance<MainContext>(reinterpret_cast<MainContext*>(g_main_context_new()));
 }
 
 // static
@@ -761,7 +761,7 @@ wrap(GMainContext* gobject, bool take_copy)
   if (take_copy && gobject)
     g_main_context_ref(gobject);
 
-  return Glib::RefPtr<MainContext>(reinterpret_cast<MainContext*>(gobject));
+  return Glib::make_refptr_for_instance<MainContext>(reinterpret_cast<MainContext*>(gobject));
 }
 
 /**** Glib::MainLoop *******************************************************/
@@ -769,13 +769,13 @@ wrap(GMainContext* gobject, bool take_copy)
 Glib::RefPtr<MainLoop>
 MainLoop::create(bool is_running)
 {
-  return Glib::RefPtr<MainLoop>(reinterpret_cast<MainLoop*>(g_main_loop_new(nullptr, is_running)));
+  return Glib::make_refptr_for_instance<MainLoop>(reinterpret_cast<MainLoop*>(g_main_loop_new(nullptr, is_running)));
 }
 
 Glib::RefPtr<MainLoop>
 MainLoop::create(const Glib::RefPtr<MainContext>& context, bool is_running)
 {
-  return Glib::RefPtr<MainLoop>(
+  return Glib::make_refptr_for_instance<MainLoop>(
     reinterpret_cast<MainLoop*>(g_main_loop_new(Glib::unwrap(context), is_running)));
 }
 
@@ -847,7 +847,7 @@ wrap(GMainLoop* gobject, bool take_copy)
   if (take_copy && gobject)
     g_main_loop_ref(gobject);
 
-  return Glib::RefPtr<MainLoop>(reinterpret_cast<MainLoop*>(gobject));
+  return Glib::make_refptr_for_instance<MainLoop>(reinterpret_cast<MainLoop*>(gobject));
 }
 
 /**** Glib::Source *********************************************************/
@@ -1157,7 +1157,7 @@ Source::get_slot_from_callback_data(void* data)
 Glib::RefPtr<TimeoutSource>
 TimeoutSource::create(unsigned int interval)
 {
-  return Glib::RefPtr<TimeoutSource>(new TimeoutSource(interval));
+  return Glib::make_refptr_for_instance<TimeoutSource>(new TimeoutSource(interval));
 }
 
 sigc::connection
@@ -1254,7 +1254,7 @@ TimeoutSource::dispatch(sigc::slot_base* slot)
 Glib::RefPtr<IdleSource>
 IdleSource::create()
 {
-  return Glib::RefPtr<IdleSource>(new IdleSource());
+  return Glib::make_refptr_for_instance<IdleSource>(new IdleSource());
 }
 
 sigc::connection
@@ -1297,13 +1297,13 @@ IdleSource::dispatch(sigc::slot_base* slot)
 Glib::RefPtr<IOSource>
 IOSource::create(int fd, IOCondition condition)
 {
-  return Glib::RefPtr<IOSource>(new IOSource(fd, condition));
+  return Glib::make_refptr_for_instance<IOSource>(new IOSource(fd, condition));
 }
 
 Glib::RefPtr<IOSource>
 IOSource::create(const Glib::RefPtr<IOChannel>& channel, IOCondition condition)
 {
-  return Glib::RefPtr<IOSource>(new IOSource(channel, condition));
+  return Glib::make_refptr_for_instance<IOSource>(new IOSource(channel, condition));
 }
 
 sigc::connection

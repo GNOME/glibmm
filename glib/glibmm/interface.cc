@@ -157,7 +157,7 @@ Interface::get_base_type()
 RefPtr<ObjectBase>
 wrap_interface(GObject* object, bool take_copy)
 {
-  return Glib::RefPtr<ObjectBase>(wrap_auto(object, take_copy));
+  return Glib::make_refptr_for_instance<ObjectBase>(wrap_auto(object, take_copy));
 }
 
 } // namespace Glib
