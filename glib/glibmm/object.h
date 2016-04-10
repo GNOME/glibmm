@@ -186,7 +186,7 @@ struct TypeTraits<Glib::RefPtr<T>>
     // because that would be "dependent", and g++ 3.4 does not allow that.
     // The specific Glib::wrap() overloads don't do anything special anyway.
     GObject* cobj = (GObject*)const_cast<CTypeNonConst>(ptr);
-    return Glib::RefPtr<T>(dynamic_cast<T*>(Glib::wrap_auto(cobj, true /* take_copy */)));
+    return Glib::make_refptr_for_instance<T>(dynamic_cast<T*>(Glib::wrap_auto(cobj, true /* take_copy */)));
     // We use dynamic_cast<> in case of multiple inheritance.
   }
 
@@ -222,7 +222,7 @@ struct TypeTraits<Glib::RefPtr<const T>>
     // because that would be "dependent", and g++ 3.4 does not allow that.
     // The specific Glib::wrap() overloads don't do anything special anyway.
     GObject* cobj = (GObject*)(ptr);
-    return Glib::RefPtr<const T>(
+    return Glib::make_refptr_for_instance<const T>(
       dynamic_cast<const T*>(Glib::wrap_auto(cobj, true /* take_copy */)));
     // We use dynamic_cast<> in case of multiple inheritance.
   }
@@ -258,7 +258,7 @@ public:
   static GType value_type() { return T::get_base_type(); }
 
   void set(const CppType& data) { set_object(data.operator->()); }
-  CppType get() const { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
+  CppType get() const { return Glib::make_refptr_for_instance<T>::cast_dynamic(get_object_copy()); }
 };
 
 // The SUN Forte Compiler has a problem with this:
@@ -277,7 +277,7 @@ public:
   static GType value_type() { return T::get_base_type(); }
 
   void set(const CppType& data) { set_object(const_cast<T*>(data.operator->())); }
-  CppType get() const { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
+  CppType get() const { return Glib::make_refptr_for_instance<T>::cast_dynamic(get_object_copy()); }
 };
 #endif /* GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS */
 

@@ -161,7 +161,7 @@ namespace Glib
 
 Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__`'* object, bool take_copy)
 {
-  return Glib::RefPtr<__NAMESPACE__::__CPPNAME__>( dynamic_cast<__NAMESPACE__::__CPPNAME__*> (Glib::wrap_auto_interface<__NAMESPACE__::__CPPNAME__> ((GObject*)(object), take_copy)) );
+  return Glib::make_refptr_for_instance<__NAMESPACE__::__CPPNAME__>( dynamic_cast<__NAMESPACE__::__CPPNAME__*> (Glib::wrap_auto_interface<__NAMESPACE__::__CPPNAME__> ((GObject*)(object), take_copy)) );
   //We use dynamic_cast<> in case of multiple inheritance.
 }
 
