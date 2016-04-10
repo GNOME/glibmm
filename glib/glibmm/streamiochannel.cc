@@ -32,21 +32,21 @@ namespace Glib
 Glib::RefPtr<StreamIOChannel>
 StreamIOChannel::create(std::istream& stream)
 {
-  return Glib::RefPtr<StreamIOChannel>(new StreamIOChannel(&stream, nullptr));
+  return Glib::make_refptr_for_instance<StreamIOChannel>(new StreamIOChannel(&stream, nullptr));
 }
 
 // static
 Glib::RefPtr<StreamIOChannel>
 StreamIOChannel::create(std::ostream& stream)
 {
-  return Glib::RefPtr<StreamIOChannel>(new StreamIOChannel(nullptr, &stream));
+  return Glib::make_refptr_for_instance<StreamIOChannel>(new StreamIOChannel(nullptr, &stream));
 }
 
 // static
 Glib::RefPtr<StreamIOChannel>
 StreamIOChannel::create(std::iostream& stream)
 {
-  return Glib::RefPtr<StreamIOChannel>(new StreamIOChannel(&stream, &stream));
+  return Glib::make_refptr_for_instance<StreamIOChannel>(new StreamIOChannel(&stream, &stream));
 }
 
 StreamIOChannel::StreamIOChannel(std::istream* stream_in, std::ostream* stream_out)

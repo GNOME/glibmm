@@ -139,7 +139,7 @@ get_something()
   static Glib::RefPtr<Something> something_to_get;
 
   // Reinitialize it each time:
-  something_to_get = Glib::RefPtr<Something>(new Something());
+  something_to_get = Glib::make_refptr_for_instance<Something>(new Something());
 
   return something_to_get;
 }

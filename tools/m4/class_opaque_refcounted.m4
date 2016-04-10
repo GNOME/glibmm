@@ -66,7 +66,7 @@ Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__CNAME__* object, bool take_copy)
     __OPAQUE_FUNC_REF`'(object);
 
   // See the comment at the top of this file, if you want to know why the cast works.
-  return Glib::RefPtr<__NAMESPACE__::__CPPNAME__>(reinterpret_cast<__NAMESPACE__::__CPPNAME__*>(object));
+  return Glib::make_refptr_for_instance<__NAMESPACE__::__CPPNAME__>(reinterpret_cast<__NAMESPACE__::__CPPNAME__*>(object));
 }
 
 } // namespace Glib
@@ -84,7 +84,7 @@ ifelse(__OPAQUE_FUNC_NEW,NONE,`dnl
 Glib::RefPtr<__CPPNAME__> __CPPNAME__::create()
 {
   // See the comment at the top of this file, if you want to know why the cast works.
-  return Glib::RefPtr<__CPPNAME__>(reinterpret_cast<__CPPNAME__*>(__OPAQUE_FUNC_NEW`'()));
+  return Glib::make_refptr_for_instance<__CPPNAME__>(reinterpret_cast<__CPPNAME__*>(__OPAQUE_FUNC_NEW`'()));
 }
 ')dnl endif __OPAQUE_FUNC_NEW
 
