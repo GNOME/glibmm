@@ -247,7 +247,7 @@ WeakRef<T_CppObject>::WeakRef(WeakRef<T_CastFrom>&& src) noexcept : pCppObject_(
 template <typename T_CppObject>
 template <typename T_CastFrom>
 WeakRef<T_CppObject>::WeakRef(const RefPtr<T_CastFrom>& src) noexcept
-  : pCppObject_(src.operator->()),
+  : pCppObject_(src.get()),
     gobject_(nullptr)
 {
   if (pCppObject_)
@@ -287,8 +287,6 @@ template <typename T_CppObject>
 WeakRef<T_CppObject>&
 WeakRef<T_CppObject>::operator=(WeakRef&& src) noexcept
 {
-  // See RefPtr for an explanation of the swap() technique to implement
-  // copy assignment and move assignment.
   // This technique is inefficient for copy assignment of WeakRef,
   // because it involves copy construction + destruction, i.e. in a typical
   // case g_weak_ref_init() + g_weak_ref_clear(), when a g_weak_ref_set()
@@ -322,7 +320,7 @@ template <typename T_CastFrom>
 WeakRef<T_CppObject>&
 WeakRef<T_CppObject>::operator=(const RefPtr<T_CastFrom>& src) noexcept
 {
-  T_CppObject* pCppObject = src.operator->();
+  T_CppObject* pCppObject = src.get();
   set(pCppObject, nullptr);
   return *this;
 }
