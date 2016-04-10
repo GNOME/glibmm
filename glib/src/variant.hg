@@ -95,8 +95,11 @@ class VariantBase
     g_variant_get, g_variant_get_va)
 public:
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
   /** This typedef is just to make it more obvious that
    * our operator const void* should be used like operator bool().
+   *
+   * @deprecated Use the explicit operator bool() instead.
    */
   using BoolExpr = const void*;
 
@@ -108,9 +111,18 @@ public:
    *     do_something();
    * @endcode
    *
+   * @deprecated Use the explicit operator bool() instead.
+   *
    * @newin{2,36}
    */
    operator BoolExpr() const;
+#endif // GLIBMM_DISABLE_DEPRECATED
+
+   /** Test whether the Variant has an underlying instance.
+    *
+    * @newin{2,50}
+    */
+   explicit operator bool() const;
 
   /** Replace the underlying GVariant.
    * This is for use by methods that take a VariantBase& as an output

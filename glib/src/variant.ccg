@@ -249,7 +249,14 @@ VariantContainerBase::get_iter(const VariantType& container_variant_type) const
 
 /****************** Specializations ***********************************/
 
+#ifndef GLIBMM_DISABLE_DEPRECATED
 VariantBase::operator const void*() const
+{
+  return gobj() ? GINT_TO_POINTER(1) : nullptr;
+}
+#endif // GLIBMM_DISABLE_DEPRECATED
+
+VariantBase::operator bool() const
 {
   return gobj() ? GINT_TO_POINTER(1) : nullptr;
 }
