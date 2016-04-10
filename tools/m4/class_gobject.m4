@@ -105,7 +105,7 @@ define(`_CREATE_METHOD',`
 _PUSH(SECTION_CC)
 Glib::RefPtr<`'__CPPNAME__`'> __CPPNAME__`'::create(`'$2`')
 {
-  return Glib::RefPtr<`'__CPPNAME__`'>( new __CPPNAME__`'(`'$3`') );
+  return Glib::make_refptr_for_instance<`'__CPPNAME__`'>( new __CPPNAME__`'(`'$3`') );
 }
 
 _POP()
@@ -169,7 +169,7 @@ namespace Glib
 
 Glib::RefPtr<__NAMESPACE__::__CPPNAME__> wrap(__REAL_CNAME__`'* object, bool take_copy)
 {
-  return Glib::RefPtr<__NAMESPACE__::__CPPNAME__>( dynamic_cast<__NAMESPACE__::__CPPNAME__*> (Glib::wrap_auto ((GObject*)(object), take_copy)) );
+  return Glib::make_refptr_for_instance<__NAMESPACE__::__CPPNAME__>( dynamic_cast<__NAMESPACE__::__CPPNAME__*> (Glib::wrap_auto ((GObject*)(object), take_copy)) );
   //We use dynamic_cast<> in case of multiple inheritance.
 }
 

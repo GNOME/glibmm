@@ -28,7 +28,7 @@ public:
   void set_column_width(unsigned cw) { column_width = cw; }
   static Glib::RefPtr<Base64OutputStream> create(const Glib::RefPtr<OutputStream>& base_stream)
   {
-    return Glib::RefPtr<Base64OutputStream>(new Base64OutputStream(base_stream));
+    return Glib::make_refptr_for_instance<Base64OutputStream>(new Base64OutputStream(base_stream));
   }
 
 protected:
