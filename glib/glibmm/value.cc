@@ -138,7 +138,7 @@ Glib::RefPtr<Glib::ObjectBase>
 ValueBase_Object::get_object_copy() const
 {
   GObject* const data = static_cast<GObject*>(g_value_get_object(&gobject_));
-  return Glib::RefPtr<Glib::ObjectBase>(Glib::wrap_auto(data, true));
+  return Glib::make_refptr_for_instance<Glib::ObjectBase>(Glib::wrap_auto(data, true));
 }
 
 GParamSpec*

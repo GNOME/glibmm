@@ -260,7 +260,7 @@ protected:
 public:
   static Glib::RefPtr<MyObject> create(int id)
   {
-    return Glib::RefPtr<MyObject>(new MyObject(id));
+    return Glib::make_refptr_for_instance<MyObject>(new MyObject(id));
   }
 
   int get_id() const { return m_id; }

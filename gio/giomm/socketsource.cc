@@ -89,7 +89,7 @@ Glib::RefPtr<SocketSource>
 SocketSource::create(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
-  return Glib::RefPtr<SocketSource>(new SocketSource(socket, condition, cancellable));
+  return Glib::make_refptr_for_instance<SocketSource>(new SocketSource(socket, condition, cancellable));
 }
 
 // static
@@ -97,7 +97,7 @@ Glib::RefPtr<SocketSource>
 SocketSource::create(GSocket* socket, Glib::IOCondition condition,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
-  return Glib::RefPtr<SocketSource>(new SocketSource(socket, condition, cancellable));
+  return Glib::make_refptr_for_instance<SocketSource>(new SocketSource(socket, condition, cancellable));
 }
 
 SocketSource::SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
