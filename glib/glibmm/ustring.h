@@ -970,7 +970,10 @@ template <class T>
 inline ustring_Iterator<T>& ustring_Iterator<T>::operator--()
 {
   while ((static_cast<unsigned char>(*--pos_) & 0xC0u) == 0x80)
+  {
     ;
+  }
+
   return *this;
 }
 
