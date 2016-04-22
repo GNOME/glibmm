@@ -32,7 +32,7 @@
 namespace
 {
 
-using HandlerList = sigc::signal<void()>;
+using HandlerList = std::list<sigc::slot<void()>>;
 
 // Each thread has its own list of exception handlers
 // to avoid thread synchronization problems.
@@ -108,8 +108,9 @@ add_exception_handler(const sigc::slot<void()>& slot)
 #endif
   }
 
-  handler_list->slots().push_front(slot);
-  return handler_list->slots().begin();
+  handler_list->emplace_back(slot);
+  auto& added_slot = handler_list->back();
+  return sigc::connection(added_slot);
 }
 
 // internal
@@ -135,15 +136,15 @@ exception_handlers_invoke() noexcept
   if(HandlerList *const handler_list = thread_specific_handler_list.get())
 #endif
   {
-    HandlerList::iterator pslot = handler_list->slots().begin();
+    HandlerList::iterator pslot = handler_list->begin();
 
-    while (pslot != handler_list->slots().end())
+    while (pslot != handler_list->end())
     {
       // Calling an empty slot would mean ignoring the exception,
       // thus we have to check for dead slots explicitly.
       if (pslot->empty())
       {
-        pslot = handler_list->slots().erase(pslot);
+        pslot = handler_list->erase(pslot);
         continue;
       }
 
