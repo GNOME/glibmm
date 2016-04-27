@@ -1,0 +1,53 @@
+/* Copyright (C) 2016 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gio/gio.h>
+#include <memory>
+
+namespace
+{
+extern "C"
+{
+int ListStoreBase_CompareDataFunc(gconstpointer a, gconstpointer b, gpointer user_data)
+{
+  auto slot = static_cast<Gio::ListStoreBase::SlotCompare*>(user_data);
+
+  const Glib::RefPtr<const Glib::ObjectBase> item_a =
+    Glib::wrap(static_cast<Glib::Object::BaseObjectType*>(const_cast<gpointer>(a)), true);
+  const Glib::RefPtr<const Glib::ObjectBase> item_b =
+    Glib::wrap(static_cast<Glib::Object::BaseObjectType*>(const_cast<gpointer>(b)), true);
+
+  return (*slot)(item_a, item_b);
+}
+}
+} // anonymous namespace
+
+namespace Gio
+{
+void ListStoreBase::splice(guint position, guint n_removals,
+  const std::vector<Glib::RefPtr<Glib::ObjectBase>>& additions)
+{
+  const std::size_t n_additions = additions.size();
+  std::unique_ptr<gpointer[]> g_additions{new gpointer[n_additions]};
+  for (std::size_t i = 0; i < n_additions; i++)
+  {
+    g_additions[i] = additions[i]->gobj();
+  }
+  g_list_store_splice(gobj(), position, n_removals, g_additions.get(), n_additions);
+}
+
+} // namespace Gio

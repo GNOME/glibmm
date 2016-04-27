@@ -1,0 +1,102 @@
+/* Copyright (C) 2016 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/interface.h>
+#include <gio/gio.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(gio/gio.h)
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+typedef struct _GListModelInterface GListModelInterface;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+
+namespace Gio
+{
+
+/** A dynamic list of objects.
+ *
+ * A ListModel represents a mutable list of
+ * Glib::Objects. Its main intention is as a model for various widgets in
+ * user interfaces, such as list views, but it can also be used as a
+ * convenient method of returning lists of data, with support for
+ * updates.
+ *
+ * Each object in the list may also report changes in itself via some
+ * mechanism (normally the Glib::PropertyProxy<>::signal_changed() signal
+ * of one or more of the object's properties). Taken together
+ * with the signal_items_changed() signal, this provides for a list
+ * that can change its membership, and in which the members can change
+ * their individual properties.
+ *
+ * A good example would be the list of visible wireless network access
+ * points, where each access point can report dynamic properties such as
+ * signal strength.
+ *
+ * It is important to note that the ListModel itself does not report
+ * changes to the individual items.  It only reports changes to the list
+ * membership.  If you want to observe changes to the objects themselves
+ * then you need to connect signals to the objects that you are
+ * interested in.
+ *
+ * All items in a ListModel are of (or derived from) the same type.
+ * get_item_type() returns that type.  The type may be an
+ * interface, in which case all objects in the list must implement it.
+ *
+ * The semantics are close to that of an array:
+ * get_n_items() returns the number of items in the list and
+ * get_object() returns an item at a (0-based) position. In
+ * order to allow implementations to calculate the list length lazily,
+ * you can also iterate over items: starting from 0, repeatedly call
+ * get_object() until it returns nullptr.
+ *
+ * This interface is intended only to be used from a single thread.  The
+ * thread in which it is appropriate to use it depends on the particular
+ * implementation, but typically it will be from the thread that owns
+ * the thread-default main context
+ * in effect at the time that the model was created.
+ *
+ * @newin{2,50}
+ */
+class ListModel : public Glib::Interface
+{
+  _CLASS_INTERFACE(ListModel, GListModel, G_LIST_MODEL, GListModelInterface)
+
+protected:
+  _WRAP_METHOD(void items_changed(guint position, guint removed, guint added), g_list_model_items_changed, newin "2,50")
+
+public:
+  _WRAP_METHOD(GType get_item_type() const, g_list_model_get_item_type, newin "2,50")
+  _WRAP_METHOD(guint get_n_items() const, g_list_model_get_n_items, newin "2,50")
+
+  //g_list_model_get_item is useless as long as we have g_list_model_get_object().
+  //It doesn't do anything differently.
+  _IGNORE(g_list_model_get_item)
+
+  _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_object(guint position), g_list_model_get_object, newin "2,50")
+  _WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_object(guint position) const, g_list_model_get_object, constversion, newin "2,50")
+
+  _WRAP_SIGNAL(void items_changed(guint position, guint removed, guint added), "items-changed", no_default_handler, newin "2,50")
+
+  _WRAP_VFUNC(GType get_item_type(), "get_item_type")
+  _WRAP_VFUNC(guint get_n_items(), "get_n_items")
+  _WRAP_VFUNC(gpointer get_item(guint position), "get_item")
+};
+
+} // namespace Gio

@@ -1,0 +1,323 @@
+/* Copyright (C) 2016 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <glibmm/object.h>
+#include <giomm/listmodel.h>
+#include <vector>
+#include <type_traits>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+
+/** A simple implementation of Gio::ListModel that stores all items in memory.
+ *
+ * The templated subclass ListStore<> provides better compile-time type safety.
+ *
+ * It provides insertions, deletions, and lookups in logarithmic time
+ * with a fast path for the common case of iterating the list linearly.
+ *
+ * @newin{2,50}
+ */
+class ListStoreBase
+: public Glib::Object,
+  public ListModel
+{
+  _CLASS_GOBJECT(ListStoreBase, GListStore, G_LIST_STORE, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(ListModel)
+  _STRUCT_NOT_HIDDEN
+
+protected:
+  _WRAP_CTOR(ListStoreBase(GType item_type), g_list_store_new)
+
+public:
+  _WRAP_CREATE(GType item_type)
+
+#m4 _CONVERSION(`const Glib::RefPtr<Glib::ObjectBase>&',`gpointer',`($3)->gobj()')
+
+  _WRAP_METHOD(void insert(guint position, const Glib::RefPtr<Glib::ObjectBase>& item), g_list_store_insert, newin "2,50")
+
+  /** A slot that will be called to compare two items.
+   * The slot should return a negative integer if the first item comes before the second,
+   * 0 if they are equal, or a positive integer if the first value comes after the second.
+   * For instance,
+   * @code
+   * int on_compare_item(const Glib::RefPtr<const Glib::ObjectBase>& item1, const Glib::RefPtr<const Glib::ObjectBase>& item2);
+   * @endcode
+   *
+   * @newin{2,50}
+   */
+  using SlotCompare = sigc::slot<int, const Glib::RefPtr<const Glib::ObjectBase>&, const Glib::RefPtr<const Glib::ObjectBase>&>;
+
+  _WRAP_METHOD(guint insert_sorted(const Glib::RefPtr<Glib::ObjectBase>& item,
+    const SlotCompare& slot{compare_func}), g_list_store_insert_sorted,
+    slot_name slot, slot_callback ListStoreBase_CompareDataFunc, no_slot_copy, newin "2,50")
+
+  _WRAP_METHOD(void sort(const SlotCompare& slot{compare_func}), g_list_store_sort,
+    slot_name slot, slot_callback ListStoreBase_CompareDataFunc, no_slot_copy, newin "2,50")
+
+  _WRAP_METHOD(void append(const Glib::RefPtr<Glib::ObjectBase>& item), g_list_store_append, newin "2,50")
+  _WRAP_METHOD(void remove(guint position), g_list_store_remove, newin "2,50")
+  _WRAP_METHOD(void remove_all(), g_list_store_remove_all, newin "2,50")
+
+  /** Removes @a n_removals items and adds @a additions.size() items.
+   * @a additions must contain items of type property_item_type() or derived from it.
+   * Empty RefPtr is not permitted.
+   *
+   * This function is more efficient than insert() and remove(), because it only emits
+   * ListModel::signal_items_changed() once for the change.
+   *
+   * The parameters @a position and @a n_removals must be correct (i.e.
+   * @a position + @a n_removals must be less than or equal to the length of
+   * the list at the time this function is called).
+   *
+   * @newin{2,50}
+   *
+   * @param position The position at which to make the change.
+   * @param n_removals The number of items to remove.
+   * @param additions The items to add.
+   */
+  void splice(guint position, guint n_removals,
+    const std::vector<Glib::RefPtr<Glib::ObjectBase>>& additions);
+  _IGNORE(g_list_store_splice)
+
+  _WRAP_PROPERTY("item-type", GType, newin "2,50")
+
+}; // end class ListStoreBase
+
+/** A simple implementation of Gio::ListModel that stores all items in memory.
+ *
+ * It provides insertions, deletions, and lookups in logarithmic time
+ * with a fast path for the common case of iterating the list linearly.
+ *
+ * @newin{2,50}
+ *
+ * @tparam T_item Base class of the items in the ListStore. All items must
+ *                be of type T_item or a type derived from T_item.
+ *                T_item must be Glib::Object or a type derived from Glib::Object.
+ */
+template <typename T_item>
+class ListStore : public ListStoreBase
+{
+  static_assert(std::is_base_of<Glib::Object, T_item>::value,
+    "T_item must be Glib::Object or derived from Glib::Object.");
+
+protected:
+  ListStore();
+
+public:
+  static Glib::RefPtr<ListStore> create();
+
+  /** Get the item at @a position.
+   * If @a position is greater than or equal to the number of
+   * items in @a list, an empty Glib::RefPtr is returned.
+   *
+   * An empty Glib::RefPtr is never returned for an index that is less than the length
+   * of the list.  See ListModel::get_n_items().
+   *
+   * @newin{2,50}
+   *
+   * @param position The position of the item to fetch.
+   * @return The object at @a position.
+   */
+  Glib::RefPtr<T_item> get_item(guint position);
+
+  /** Get the item at @a position.
+   * If @a position is greater than or equal to the number of
+   * items in @a list, an empty Glib::RefPtr is returned.
+   *
+   * An empty Glib::RefPtr is never returned for an index that is less than the length
+   * of the list.  See ListModel::get_n_items().
+   *
+   * @newin{2,50}
+   *
+   * @param position The position of the item to fetch.
+   * @return The object at @a position.
+   */
+  Glib::RefPtr<const T_item> get_item(guint position) const;
+
+  /** Inserts @a item at @a position.
+   * @a item must be of type ListStoreBase::property_item_type() or derived from it.
+   * @a position must be smaller than the length of the list, or equal to it to append.
+   *
+   * Use splice() to insert multiple items at the same time efficiently.
+   *
+   * @newin{2,50}
+   *
+   * @param position The position at which to insert the new item.
+   * @param item The new item.
+   */
+  void insert(guint position, const Glib::RefPtr<T_item>& item);
+
+  /** A slot that will be called to compare two items.
+   * The slot should return a negative integer if the first item comes before the second,
+   * 0 if they are equal, or a positive integer if the first value comes after the second.
+   * For instance,
+   * @code
+   * int on_compare_item(const Glib::RefPtr<const T_item>& item1, const Glib::RefPtr<const T_item>& item2);
+   * @endcode
+   *
+   * @newin{2,50}
+   */
+  using SlotCompare = sigc::slot<int, const Glib::RefPtr<const T_item>&, const Glib::RefPtr<const T_item>&>;
+
+  /** Inserts @a item at a position to be determined by the @a slot.
+   *
+   * The list must already be sorted before calling this function or the
+   * result is undefined.  Usually you would approach this by only ever
+   * inserting items by way of this function.
+   *
+   * @newin{2,50}
+   *
+   * @param item The new item.
+   * @param slot Pairwise comparison function for sorting.
+   * @return The position at which @a item was inserted.
+   */
+  guint insert_sorted(const Glib::RefPtr<T_item>& item, const SlotCompare& slot);
+
+  /** Sorts the items according to @a slot.
+   *
+   * @newin{2,50}
+   *
+   * @param slot Pairwise comparison function for sorting.
+   */
+  void sort(const SlotCompare& slot);
+
+  /** Appends @a item.
+   * @a item must be of type ListStoreBase::property_item_type() or derived from it.
+   *
+   * Use splice() to append multiple items at the same time efficiently.
+   *
+   * @newin{2,50}
+   *
+   * @param item The new item.
+   */
+  void append(const Glib::RefPtr<T_item>& item);
+
+  /** Removes @a n_removals items and adds @a additions.size() items.
+   * @a additions must contain items of type ListStoreBase::property_item_type()
+   * or derived from it. Empty RefPtr is not permitted.
+   *
+   * This function is more efficient than insert() and remove(), because it only emits
+   * ListModel::signal_items_changed() once for the change.
+   *
+   * The parameters @a position and @a n_removals must be correct (i.e.
+   * @a position + @a n_removals must be less than or equal to the length of
+   * the list at the time this function is called).
+   *
+   * @newin{2,50}
+   *
+   * @param position The position at which to make the change.
+   * @param n_removals The number of items to remove.
+   * @param additions The items to add.
+   */
+  void splice(guint position, guint n_removals,
+    const std::vector<Glib::RefPtr<T_item>>& additions);
+
+private:
+  static int compare_data_func(gconstpointer a, gconstpointer b, gpointer user_data);
+}; // end class ListStore
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+template <typename T_item>
+ListStore<T_item>::ListStore()
+: ListStoreBase(T_item::get_base_type())
+{ }
+
+template <typename T_item>
+Glib::RefPtr<ListStore<T_item>> ListStore<T_item>::create()
+{
+  return Glib::RefPtr<ListStore<T_item>>(new ListStore<T_item>());
+}
+
+template <typename T_item>
+Glib::RefPtr<T_item> ListStore<T_item>::get_item(guint position)
+{
+  return Glib::RefPtr<T_item>::cast_dynamic(ListModel::get_object(position));
+}
+
+template <typename T_item>
+Glib::RefPtr<const T_item> ListStore<T_item>::get_item(guint position) const
+{
+  return const_cast<ListStore<T_item>*>(this)->get_item(position);
+}
+
+template <typename T_item>
+void ListStore<T_item>::insert(guint position, const Glib::RefPtr<T_item>& item)
+{
+  ListStoreBase::insert(position, item);
+}
+
+template <typename T_item>
+guint ListStore<T_item>::insert_sorted(
+  const Glib::RefPtr<T_item>& item, const SlotCompare& slot)
+{
+  // Use the original slot (not a copy).
+  auto slot_copy = const_cast<SlotCompare*>(&slot);
+
+  return g_list_store_insert_sorted(gobj(), item->gobj(), &compare_data_func, slot_copy);
+}
+
+template <typename T_item>
+void ListStore<T_item>::sort(const SlotCompare& slot)
+{
+  // Use the original slot (not a copy).
+  auto slot_copy = const_cast<SlotCompare*>(&slot);
+
+  g_list_store_sort(gobj(), &compare_data_func, slot_copy);
+}
+
+template <typename T_item>
+void ListStore<T_item>::append(const Glib::RefPtr<T_item>& item)
+{
+  ListStoreBase::append(item);
+}
+
+template <typename T_item>
+void ListStore<T_item>::splice(guint position, guint n_removals,
+  const std::vector<Glib::RefPtr<T_item>>& additions)
+{
+  const std::size_t n_additions = additions.size();
+  std::unique_ptr<gpointer[]> g_additions{new gpointer[n_additions]};
+  for (std::size_t i = 0; i < n_additions; i++)
+  {
+    g_additions[i] = additions[i]->gobj();
+  }
+  g_list_store_splice(gobj(), position, n_removals, g_additions.get(), n_additions);
+}
+
+template <typename T_item>
+int ListStore<T_item>::compare_data_func(gconstpointer a, gconstpointer b, gpointer user_data)
+{
+  auto slot = static_cast<SlotCompare*>(user_data);
+
+  // cast_dynamic is necessary if T_item is a user-derived class, such as
+  // class MyObject : public Glib::Object
+  const Glib::RefPtr<const T_item> item_a = Glib::RefPtr<T_item>::cast_dynamic(
+    Glib::wrap(static_cast<typename T_item::BaseObjectType*>(const_cast<gpointer>(a)), true));
+  const Glib::RefPtr<const T_item> item_b = Glib::RefPtr<T_item>::cast_dynamic(
+    Glib::wrap(static_cast<typename T_item::BaseObjectType*>(const_cast<gpointer>(b)), true));
+
+  return (*slot)(item_a, item_b);
+}
+
+#endif // DOXYGEN_SHOULD_SKIP_THIS
+
+} // namespace Gio
