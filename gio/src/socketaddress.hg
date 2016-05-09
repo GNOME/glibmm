@@ -41,10 +41,13 @@ class SocketAddress : public Glib::Object,
   _CLASS_GOBJECT(SocketAddress, GSocketAddress, G_SOCKET_ADDRESS, Glib::Object, GObject)
   _IMPLEMENTS_INTERFACE(SocketConnectable)
 
-  _WRAP_CTOR(SocketAddress(gpointer native, gsize len), g_socket_address_new_from_native)
-
 public:
-  _WRAP_CREATE(gpointer native, gsize len)
+
+  // Note that we can't use _WRAP_CTOR() and _WRAP_CREATE() because the C
+  // function does more than just call g_object_new():
+  // See https://bugzilla.gnome.org/show_bug.cgi?id=766150
+  _WRAP_METHOD(static Glib::RefPtr<SocketAddress> create(gpointer native, gsize len), g_socket_address_new_from_native)
+
   _WRAP_METHOD(SocketFamily get_family() const, g_socket_address_get_family)
   _WRAP_METHOD(bool to_native(gpointer dest, gsize destlen), g_socket_address_to_native, errthrow)
   _WRAP_METHOD(gssize get_native_size() const, g_socket_address_get_native_size)
