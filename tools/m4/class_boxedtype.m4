@@ -72,7 +72,7 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 ',`dnl else
 
 /** A Glib::wrap() method for this object.
- * 
+ *
  * @param object The C instance.
  * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
  * @result A C++ instance that wraps this C instance.

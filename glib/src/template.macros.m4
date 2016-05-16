@@ -1,27 +1,27 @@
 dnl-----------------------------------------------------------------------
-dnl 
+dnl
 dnl Karls M4 macros for the signal system used by gtk--
-dnl 
+dnl
 dnl  Copyright (C) 1998-2002 The gtkmm Development Team
-dnl 
+dnl
 dnl  Currently maintained by Tero Pulkkinen. <terop@modeemi.cs.tut.fi>
-dnl                                                         
+dnl
 dnl  This library is free software; you can redistribute it and/or
 dnl  modify it under the terms of the GNU Lesser General Public
 dnl  License as published by the Free Software Foundation; either
 dnl  version 2.1 of the License, or (at your option) any later version.
-dnl 
+dnl
 dnl  This library is distributed in the hope that it will be useful,
 dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
 dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 dnl  Lesser General Public License for more details.
-dnl 
+dnl
 dnl  You should have received a copy of the GNU Lesser General Public
 dnl  License along with this library; if not, write to the Free
 dnl  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-dnl 
+dnl
 dnl-----------------------------------------------------------------------
-dnl  Recursion prevention.  (Don't attempt to understand why this works!) 
+dnl  Recursion prevention.  (Don't attempt to understand why this works!)
 changequote(, )dnl
 changequote([, ])dnl
 pushdef([DIVERSION],divnum)dnl
@@ -33,7 +33,7 @@ dnl-----------------------------------------------------------------------
 
 
 dnl
-dnl  M4 macros for general sanity 
+dnl  M4 macros for general sanity
 dnl
 
 dnl  M4 Quotas are hard to work with, so use braces like autoconf
@@ -46,7 +46,7 @@ dnl  M4 comments conflict with compiler directives
 changecom(, )
 
 dnl  BRACE(text) => [text]
-dnl    When we want something to appear with braces 
+dnl    When we want something to appear with braces
 define([BRACE],[[[$*]]])
 
 dnl
@@ -99,12 +99,12 @@ divert(CURRENT_DIVERSION)dnl
 popdef([CURRENT_DIVERSION])dnl],[[minclude]])])
 
 dnl
-dnl    makes the current filename into a string approprate for use as 
+dnl    makes the current filename into a string approprate for use as
 dnl    C identified define.  (Defaults to this library name)
 dnl
-dnl    example:  (filename test.hh.m4) 
-dnl      __header__          => SIGCXX_TEST_H 
-dnl      __header__(MYHEAD)  => MYHEAD_TEST_H 
+dnl    example:  (filename test.hh.m4)
+dnl      __header__          => SIGCXX_TEST_H
+dnl      __header__(MYHEAD)  => MYHEAD_TEST_H
 dnl define([__header__],[ifelse($1,,[SIGCXX],UPPER($1))[_]UPPER(patsubst(translit(BASENAME(__file__),[.-],[__]),[_m4],[]))])
 define([__header__],[ifelse($1,,[_GLIBMM],UPPER($1))[_]UPPER_SAFE(M4NAME(__file__))])
 
@@ -113,7 +113,7 @@ dnl Set of M4 macros for variable argument template building
 dnl
 
 dnl ARGS(name,number)
-dnl  Builds a comma seperated protected list of numbered names  
+dnl  Builds a comma seperated protected list of numbered names
 dnl  Use this as short hand to specify arguement names
 dnl
 dnl  ARGS(arg,3)  => ARG1,ARG2,ARG3
@@ -123,8 +123,8 @@ define([ARGS],[ifelse(eval($2>0),1,[PROT(_ARGS(UPPER([$1]),1,$2))],[PROT])])
 dnl
 dnl LIST(string1,string2,...)
 dnl   These are intended for making extended argument lists
-dnl   parameters are in pairs,  the first is output if the 
-dnl   2nd is nonzero length,  the process is then repeated 
+dnl   parameters are in pairs,  the first is output if the
+dnl   2nd is nonzero length,  the process is then repeated
 dnl   with the next set of arguments.
 dnl
 dnl   Macro expansions that expand to result in commas must call
@@ -132,7 +132,7 @@ dnl   PROT to prevent permature expansion.  ARG* macros do
 dnl   this automatically.  (If unsure, add braces until it stops
 dnl   interpreting inter macros, remove one set of braces, if
 dnl   still not right use PROT)
-dnl 
+dnl
 dnl   (LIST is probably the most useful macro in the set.)
 define([LIST],[ifelse($#,0,,$#,1,[$1],[$1],,[LIST(shift($@))],[__LIST($@)])])
 define([__LIST],[ifelse($#,0,,$#,1,[$1],[$1[]ifelse([$2],,,[[,]])__LIST(shift($@))])])
@@ -150,7 +150,7 @@ dnl     define([FOO],[foo([$1])])
 dnl     ARG_LOOP([FOO],[[, ]],A,B,C)
 dnl
 dnl     Gives:  foo(A), foo(B), foo(C)
-dnl 
+dnl
 define([_ARG_LOOP],[dnl
 ifelse(NUM($*),0,,NUM($*),1,[dnl
 indir(LOOP_FORMAT,[$1])],[dnl
@@ -165,7 +165,7 @@ popdef([LOOP_SEPERATOR])dnl
 ])
 
 
-dnl 
+dnl
 dnl  Define some useful formats for use with ARG_LOOP.
 define([FORMAT_ARG_CLASS],[class [$1]])
 define([FORMAT_ARG_BOTH],[[$1] LOWER([$1])])
@@ -212,12 +212,12 @@ dnl   (occasionally useful)
 define([DROP],[ifelse([$1],[$2],,[$*])])
 
 dnl
-dnl LINE(linenum) 
+dnl LINE(linenum)
 dnl   places a #line statement if __debug__ set
-dnl   Use this at top of macro template and following 
+dnl   Use this at top of macro template and following
 dnl   macros that contain newlines.
 dnl
-dnl   example:  
+dnl   example:
 dnl      LINE(]__line__[)dnl
 define([LINE],[ifdef([__debug__],[#line $1 "]__file__["
 ])])

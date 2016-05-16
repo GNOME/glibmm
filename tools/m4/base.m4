@@ -2,9 +2,9 @@ dnl $Id$
 divert(-1)
 
 dnl
-dnl The general convention is 
+dnl The general convention is
 dnl   _* are macros
-dnl   __*__ are variables 
+dnl   __*__ are variables
 
 dnl
 dnl  rename several m4 builtins to avoid name clashes
@@ -66,7 +66,7 @@ m4_include(initialize.m4)
 
 dnl
 dnl ----------------------- Utility Macros -------------------------
-dnl 
+dnl
 
 dnl
 dnl Add a comma before the arg if any, do nothing otherwise
@@ -93,7 +93,7 @@ dnl  _LOWER(string)
 dnl    lower a string
 define(`_LOWER',`m4_translit(`$*',`ABCDEFGHIJKLMNOPQRSTUVWXYZ',`abcdefghijklmnopqrstuvwxyz')')
 
-dnl 
+dnl
 dnl  _QUOTE(macro)
 dnl    If a macro generates an output with commas we need to protect it
 dnl    from being broken down and interpreted
@@ -206,7 +206,7 @@ dnl _NEW_SECTION(SECTION_H_SIGNALPROXIES) dnl signal member objects
 _NEW_SECTION(SECTION_CC_SIGNALPROXIES) dnl signal member objects
 
 dnl Property Proxies:
-dnl _NEW_SECTION(SECTION_H_PROPERTYPROXIES) 
+dnl _NEW_SECTION(SECTION_H_PROPERTYPROXIES)
 _NEW_SECTION(SECTION_CC_PROPERTYPROXIES)
 
 dnl Just a hack for some GError wrappers:
@@ -408,8 +408,8 @@ _POP()
 
 define(`_PINCLUDE', defn(`_PH_INCLUDE'))
 
-# Put these, for instance, around gtkmmproc macros (_WRAP_SIGNAL) 
-# to make the #ifndef appear around the generated code in both the .h 
+# Put these, for instance, around gtkmmproc macros (_WRAP_SIGNAL)
+# to make the #ifndef appear around the generated code in both the .h
 # and .cc files.
 # e.g.  _GTKMMPROC_H_AND_CC(#ifndef _SUN_CC_)
 # e.g.  _GTKMMPROC_H_AND_CC(#endif //_SUN_CC_)

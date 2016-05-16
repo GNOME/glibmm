@@ -179,7 +179,7 @@ AC_DEFUN([GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS],
     [[
       #include <string>
       #include <iostream>
-      
+
       class ustringtest
       {
         public:

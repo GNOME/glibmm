@@ -214,15 +214,15 @@ sub process($$)
     else
     {
       do
-      {							        
+      {
         $brackets_count += () = $lines[$iter] =~ /\(/g;
-	$brackets_count -= () = $lines[$iter] =~ /\)/g;	
+	$brackets_count -= () = $lines[$iter] =~ /\)/g;
 	$iter++;
       } while ($iter < scalar @lines && $brackets_count != 0);
     }
 
     my $i = join(',', @lines[$begin..$iter-1]);
-    
+
     # remove leading and trailing spaces.
     $i =~ s/^\s+//;
     $i =~ s/\s+$//;

@@ -96,7 +96,7 @@ void __CPPNAME__`'_Class::iface_init_function(void* g_iface, void*)
 
   //This is just to avoid an "unused variable" warning when there are no vfuncs or signal handlers to connect.
   //This is a temporary fix until I find out why I can not seem to derive a GtkFileChooser interface. murrayc
-  g_assert(klass != nullptr); 
+  g_assert(klass != nullptr);
 
 _IMPORT(SECTION_PCC_CLASS_INIT_VFUNCS)
 
@@ -128,7 +128,7 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 namespace Glib
 {
   /** A Glib::wrap() method for this object.
-   * 
+   *
    * @param object The C instance.
    * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
    * @result A C++ instance that wraps this C instance.
@@ -260,10 +260,10 @@ protected:
   __CPPNAME__`'();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  /** Called by constructors of derived classes. Provide the result of 
-   * the Class init() function to ensure that it is properly 
+  /** Called by constructors of derived classes. Provide the result of
+   * the Class init() function to ensure that it is properly
    * initialized.
-   * 
+   *
    * @param interface_class The Class object for the derived type.
    */
   explicit __CPPNAME__`'(const Glib::Interface_Class& interface_class);
@@ -271,7 +271,7 @@ protected:
 public:
   // This is public so that C++ wrapper instances can be
   // created for C instances of unwrapped types.
-  // For instance, if an unexpected C type implements the C interface. 
+  // For instance, if an unexpected C type implements the C interface.
   explicit __CPPNAME__`'(__CNAME__* castitem);
 
 protected:

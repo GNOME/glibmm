@@ -87,7 +87,7 @@ _POP()
 ')
 
 dnl Some gobjects actually derive from GInitiallyUnowned, which does some odd reference-counting that is useful to C coders.
-dnl We don't want to expose that base class in our API, 
+dnl We don't want to expose that base class in our API,
 dnl but we do want to reverse what it does:
 define(`_DERIVES_INITIALLY_UNOWNED',`dnl
 _PUSH()
@@ -134,7 +134,7 @@ ifdef(`__BOOL_NO_WRAP_FUNCTION__',`dnl
 namespace Glib
 {
   /** A Glib::wrap() method for this object.
-   * 
+   *
    * @param object The C instance.
    * @param take_copy False if the result should take ownership of the C instance. True if it should take a new copy or ref.
    * @result A C++ instance that wraps this C instance.

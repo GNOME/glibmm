@@ -238,7 +238,7 @@ sub lookup_enum_documentation($$$$$$$)
 {
   my ($c_enum_name, $cpp_enum_name, $indent, $ref_subst_in, $ref_subst_out,
     $deprecation_docs, $newin) = @_;
-  
+
   my $objFunction = $DocsParser::hasharrayFunctions{$c_enum_name};
   if(!$objFunction)
   {
@@ -302,7 +302,7 @@ sub lookup_enum_documentation($$$$$$$)
 
   # Escape the space after "i.e." or "e.g." in the brief description.
   $docs =~ s/^([^.]*\b(?:i\.e\.|e\.g\.))\s/$1\\ /;
-  
+
   remove_example_code($c_enum_name, \$docs);
 
   # Add indentation and an asterisk on all lines except the first.

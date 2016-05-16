@@ -740,7 +740,7 @@ sub output_wrap_enum_docs_only($$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $module_canonical, $cpp_type, $c_type,
     $comment, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin) = @_;
- 
+
   # Get the existing enum description from the parsed docs.
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
     " ", $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
@@ -1277,11 +1277,11 @@ sub convert_args_cpp_to_c($$$$$)
       my $initialization = "";
       if($cOutputParamType =~ /\*$/)
       {
-        $initialization = " = nullptr"; 
+        $initialization = " = nullptr";
       }
       else
       {
-        $initialization = " = $cOutputParamType()"; 
+        $initialization = " = $cOutputParamType()";
       }
 
       push(@declarations, "  $cOutputParamType $cOutputParamName$initialization;");

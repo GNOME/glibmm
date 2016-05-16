@@ -4,13 +4,13 @@
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or 
+# the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-# GNU General Public License for more details. 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
@@ -384,7 +384,7 @@ sub get_child_properties
 sub get_marked
 {
   no warnings;
-  return grep {$$_{mark}==1} values %GtkDefs::methods; 
+  return grep {$$_{mark}==1} values %GtkDefs::methods;
 }
 
 # This searches for items wrapped by this file and then tries to locate
@@ -465,7 +465,7 @@ sub lookup_object($)
 
   if (not defined($result))
   {
-    # We do not print this error because it's not always an error, 
+    # We do not print this error because it's not always an error,
     # because the caller will often try several object names,
     # while guessing an object name prefix from a function name.
     #

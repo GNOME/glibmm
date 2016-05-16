@@ -159,8 +159,8 @@ AS_VAR_IF([glibmm_cv_cxx_can_use_dynamic_cast_in_unused_template_without_definit
 
 ## GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
 ##
-## Check whether the compiler allows us to use a non-extern "C" function, 
-## such as a static member function, to an extern "C" function pointer, 
+## Check whether the compiler allows us to use a non-extern "C" function,
+## such as a static member function, to an extern "C" function pointer,
 ## such as a GTK+ callback.
 ##
 AC_DEFUN([GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS],
