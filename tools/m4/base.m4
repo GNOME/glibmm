@@ -355,7 +355,7 @@ _IMPORT(SECTION_SRC_GENERATED)
 _DEPRECATE_IFDEF_CLASS_END
 
 m4_divert(-1)
-m4_undivert()
+m4_undivert
 ')
 
 define(`_NAMESPACE',`dnl
