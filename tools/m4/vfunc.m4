@@ -24,8 +24,8 @@ dnl                   $5               $6           $7            $8
 dnl            `<cargs and names>',`<cnames>',`<cpparg names>',firstarg,
 dnl                $9               $10        $11     $12
 dnl             refreturn_ctype, keep_return, ifdef, errthrow,
-dnl               $13           $14            $15             $16
-dnl            slot_type, c_data_param_name, return_value, exception_handler)
+dnl               $13           $14            $15             $16               $17
+dnl            slot_type, c_data_param_name, return_value, err_return_value, exception_handler)
 dnl
 dnl Note: _get_current_wrapper_inline() could be used throughout for performance instead of _get_current_wrapper(),
 dnl and is_derived_() instead of is_derived_(),
@@ -89,15 +89,15 @@ ifelse($10,keep_return,`dnl
 ')dnl end refreturn_ctype
 ')dnl end void
       }
-ifelse($16,,,`dnl if (exception_handler)
+ifelse($17,,,`dnl if (exception_handler)
       catch(...)
       {
         try
         {
 ifelse($9,refreturn_ctype,`dnl
-          return Glib::unwrap_copy`'(obj->$16`'());
+          return Glib::unwrap_copy`'(obj->$17`'());
 ', `dnl
-          return _CONVERT($3, $4, `obj->$16`'()');
+          return _CONVERT($3, $4, `obj->$17`'()');
 ')dnl
         }
 ')dnl end exception_handler
@@ -108,11 +108,11 @@ ifelse($12,errthrow,`dnl
 ifelse($4,void,`dnl
         return;
 ',`dnl
-ifelse(`$15', `',`dnl
+ifelse(`$16', `',`dnl
         using RType = $4;
         return RType`'();
 ',`dnl
-        return _CONVERT($3,$4,`$15');
+        return _CONVERT($3,$4,`$16');
 ')dnl
 ')dnl
       }
@@ -121,7 +121,7 @@ ifelse(`$15', `',`dnl
       {
         Glib::exception_handlers_invoke`'();
       }
-ifelse($16,,,`dnl if (exception_handler)
+ifelse($17,,,`dnl if (exception_handler)
       }
 ')dnl
     }

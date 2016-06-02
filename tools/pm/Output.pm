@@ -240,9 +240,10 @@ sub output_wrap_vfunc_cc($$$$$$$$)
      convert_args_c_to_cpp($objCFunc, $objCppfunc, $line_num);
 
     my $returnValue = $$objCppfunc{return_value};
+    my $errReturnValue = $$objCppfunc{err_return_value};
     my $exceptionHandler = $$objCppfunc{exception_handler};
 
-    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s,%s,%s)dnl\n",
+    my $str = sprintf("_VFUNC_PCC(%s,%s,%s,%s,\`%s\',\`%s\',\`%s\',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)dnl\n",
       $$objCppfunc{name},
       $cname,
       $$objCppfunc{rettype},
@@ -258,6 +259,7 @@ sub output_wrap_vfunc_cc($$$$$$$$)
       $$objCppfunc{slot_type},
       $$objCppfunc{c_data_param_name},
       $returnValue,
+      $errReturnValue,
       $exceptionHandler);
 
     $self->append($str);

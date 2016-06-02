@@ -1325,6 +1325,7 @@ sub on_wrap_vfunc($)
   my $keep_return = 0;
   my $refreturn_ctype = 0;
   my $returnValue = "";
+  my $errReturnValue = "";
   my $exceptionHandler = "";
   my $custom_vfunc = 0;
   my $custom_vfunc_callback = 0;
@@ -1359,6 +1360,14 @@ sub on_wrap_vfunc($)
     elsif($argRef =~ /^return_value\s+(.*)/)
     {
       $returnValue = $1;
+    }
+    # Return value, if the C++ vfunc throws an exception which is propagated
+    # to the C callback.
+    # (Default is the default value of the return type or, if return_value
+    # is specified, the return_value.)
+    elsif($argRef =~ /^err_return_value\s+(.*)/)
+    {
+      $errReturnValue = $1;
     }
     # If exception handler is not defined, then Glib::exception_handlers_invoke
     # method will be used for exception handling.
@@ -1402,11 +1411,13 @@ sub on_wrap_vfunc($)
       $no_slot_copy = 1;
     }
   }
+  $errReturnValue = $returnValue if ($returnValue ne "" and $errReturnValue eq "");
 
   $self->output_wrap_vfunc($argCppDecl, $argCName, $$self{filename}, $$self{line_num},
                            $refreturn, $keep_return, $refreturn_ctype, $custom_vfunc,
                            $custom_vfunc_callback, $ifdef, $errthrow,
-                           $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler);
+                           $slot_name, $slot_callback, $no_slot_copy,
+                           $returnValue, $errReturnValue, $exceptionHandler);
 }
 
 # Common part of _WRAP_ENUM(), _WRAP_ENUM_DOCS_ONLY() and _WRAP_GERROR().
@@ -1689,12 +1700,13 @@ sub output_wrap_signal($$$$$$$$$$$$$$$$$)
 # void output_wrap_vfunc($CppDecl, $vfunc_name, $filename, $line_num,
 #                  $refreturn, $keep_return, $refreturn_ctype,
 #                  $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
-#                  $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler)
-sub output_wrap_vfunc($$$$$$$$$$$$$$$$$)
+#                  $slot_name, $slot_callback, $no_slot_copy, $returnValue,
+#                  $errReturnValue, $exceptionHandler)
+sub output_wrap_vfunc($$$$$$$$$$$$$$$$$$)
 {
   my ($self, $CppDecl, $vfunc_name, $filename, $line_num, $refreturn, $keep_return, $refreturn_ctype,
       $custom_vfunc, $custom_vfunc_callback, $ifdef, $errthrow,
-      $slot_name, $slot_callback, $no_slot_copy, $returnValue, $exceptionHandler) = @_;
+      $slot_name, $slot_callback, $no_slot_copy, $returnValue, $errReturnValue, $exceptionHandler) = @_;
 
   #Some checks:
   return if ($self->output_wrap_check($CppDecl, $vfunc_name, $filename, $line_num, '_WRAP_VFUNC'));
@@ -1727,6 +1739,7 @@ sub output_wrap_vfunc($$$$$$$$$$$$$$$$$)
   $$objCppVfunc{rettype_needs_ref} = $refreturn;
   $$objCppVfunc{keep_return} = $keep_return;
   $$objCppVfunc{return_value} = $returnValue;
+  $$objCppVfunc{err_return_value} = $errReturnValue;
   $$objCppVfunc{exception_handler} = $exceptionHandler;
   $$objCppVfunc{name} .= "_vfunc"; #All vfuncs should have the "_vfunc" suffix, and a separate easily-named invoker method.
 
