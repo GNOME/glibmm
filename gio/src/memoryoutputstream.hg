@@ -49,11 +49,18 @@ class MemoryOutputStream :
 {
   _CLASS_GOBJECT(MemoryOutputStream, GMemoryOutputStream, G_MEMORY_OUTPUT_STREAM, Gio::OutputStream, GOutputStream)
   _IMPLEMENTS_INTERFACE(Seekable)
+
 protected:
+  // Hand-coded because it's equivalent to g_memory_output_stream_new_resizable(),
+  // which sets some properties to non-default values.
+  /** Creates a resizable stream.
+   */
+  MemoryOutputStream();
   // TODO: more C++-like interface using sigc++
   _WRAP_CTOR(MemoryOutputStream(void* data, gsize size, GReallocFunc realloc_function, GDestroyNotify destroy_function), g_memory_output_stream_new)
 
 public:
+  _WRAP_CREATE()
   // TODO: more C++-like interface using sigc++
   _WRAP_CREATE(void* data, gsize size, GReallocFunc realloc_function, GDestroyNotify destroy_function)
 

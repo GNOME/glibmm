@@ -40,6 +40,9 @@ class InputStream : public Glib::Object
 {
   _CLASS_GOBJECT(InputStream, GInputStream, G_INPUT_STREAM, Glib::Object, GObject)
 
+protected:
+  _CTOR_DEFAULT
+
 public:
   _WRAP_METHOD(gssize read(void* buffer, gsize count, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_input_stream_read,
@@ -380,8 +383,18 @@ public:
                g_input_stream_close_finish,
                errthrow)
 
-  // These are private inside the module (for implementations)
-  _IGNORE(g_input_stream_has_pending, g_input_stream_is_closed, g_input_stream_set_pending, g_input_stream_clear_pending)
+  _WRAP_METHOD(bool is_closed(), g_input_stream_is_closed, newin "2,50")
+  _WRAP_METHOD(bool has_pending(), g_input_stream_has_pending, newin "2,50")
+
+protected:
+  _WRAP_METHOD(bool set_pending(), g_input_stream_set_pending, errthrow, newin "2,50")
+  _WRAP_METHOD(void clear_pending(), g_input_stream_clear_pending, newin "2,50")
+
+  //TODO: When we can break ABI, add vfuncs. See https://bugzilla.gnome.org/show_bug.cgi?id=572471
+#m4 _CONVERSION(`GCancellable*', `const Glib::RefPtr<Cancellable>&', `Glib::wrap($3, true)')
+  //_WRAP_VFUNC(gssize read(void* buffer, gsize count, const Glib::RefPtr<Cancellable>& cancellable), read_fn, errthrow, err_return_value -1)
+  //_WRAP_VFUNC(gssize skip(gsize count, const Glib::RefPtr<Cancellable>& cancellable), skip, errthrow, err_return_value -1)
+  //_WRAP_VFUNC(bool close(const Glib::RefPtr<Cancellable>& cancellable), close_fn, errthrow)
 };
 
 } // namespace Gio
