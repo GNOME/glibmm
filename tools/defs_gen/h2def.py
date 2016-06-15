@@ -306,20 +306,21 @@ def clean_func(buf):
     pat = re.compile(r"""G_GNUC_WARN_UNUSED_RESULT|G_INLINE_FUNC""", re.MULTILINE)
     buf = pat.sub('', buf)
 
-    #strip *_DEPRECATED_IN_*_FOR (*):
-    pat = re.compile(r"""[A-Z]+_DEPRECATED_IN_[0-9]_([0-9]*)_FOR\s*\(.*\)\S*""", re.MULTILINE)
+    #strip *_DEPRECATED_IN_*_FOR (*)
+    #e.g. GDK_DEPRECATED_IN_*_FOR (*) and GDK_PIXBUF_DEPRECATED_IN_*_FOR (*)
+    pat = re.compile(r"""([A-Z]+_){1,2}?DEPRECATED_IN_[0-9]_([0-9]*)_FOR\s*\(.*\)\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #strip *_DEPRECATED*
-    pat = re.compile(r"""[A-Z]+_DEPRECATED\S*""", re.MULTILINE)
+    pat = re.compile(r"""([A-Z]+_){1,2}?DEPRECATED\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #strip *_AVAILABLE_IN_*
-    pat = re.compile(r"""[A-Z]+_AVAILABLE_IN_[0-9]_[0-9]\S*""", re.MULTILINE)
+    pat = re.compile(r"""([A-Z]+_){1,2}?AVAILABLE_IN_[0-9]_[0-9]\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #strip *_AVAILABLE_IN_ALL
-    pat = re.compile(r"""[A-Z]+_AVAILABLE_IN_ALL\S*""", re.MULTILINE)
+    pat = re.compile(r"""([A-Z]+_){1,2}?AVAILABLE_IN_ALL\S*""", re.MULTILINE)
     buf = pat.sub('', buf)
 
     #strip G_DECLARE_FINAL_TYPE (*)
