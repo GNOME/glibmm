@@ -166,9 +166,7 @@ __CPPNAME__::~__CPPNAME__`'() noexcept
 
 void __CPPNAME__::swap(__CPPNAME__& other) noexcept
 {
-  __CNAME__ *const temp = gobject_;
-  gobject_ = other.gobject_;
-  other.gobject_ = temp;
+  std::swap(gobject_, other.gobject_);
 }
 
 __CNAME__* __CPPNAME__::gobj_copy() const
