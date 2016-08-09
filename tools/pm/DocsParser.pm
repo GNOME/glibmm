@@ -759,9 +759,7 @@ sub substitute_function($$)
     }
     else
     {
-      print "Documentation: Transformed C name $name into ";
-      non_object_method_name($doc_func, \$name);
-      print "C++ name $name\n";
+      print STDERR "Documentation: Class/Namespace for $name not found\n";
     }
   }
   else
@@ -771,37 +769,6 @@ sub substitute_function($$)
   }
 
   return $name . "()";
-}
-
-sub non_object_method_name($$)
-{
-  my ($doc_func, $name) = @_;
-  if ($$name =~ m/^gtk_/)
-  {
-    my %gtk_objects = ("gtk_accel_map" => "AccelMap",
-                       "gtk_clipboard" => "Clipboard",
-                       "gtk_file_filter" => "FileFilter",
-                       "gtk_icon_set" => "IconSet",
-                       "gtk_icon_source" => "IconSource",
-                       "gtk_icon_info" => "IconInfo",
-                       "gtk_page_setup" => "PageSetup",
-                       "gtk_recent_info" => "RecentInfo",
-                       "gtk_tooltip" => "Tooltip",
-                       "gtk_target_list" => "TargetList",
-                       "gtk_drag_source" => "DragSource",
-                       "gtk_print_settings" => "PrintSettings",
-                       "gtk_recent_filter" => "RecentFilter");
-    foreach my $key (keys(%gtk_objects))
-    {
-      if ($$name =~ m/^\Q$key\E/)
-      {
-        DocsParser::build_method_name($doc_func, "Gtk", $gtk_objects{$key}, $name);
-        return;
-      }
-    }
-  }
-
-  print STDERR "Documentation: Class/Namespace for $$name not found\n";
 }
 
 sub lookup_object_of_method($$)
