@@ -61,7 +61,6 @@ $DocsParser::currentParam = undef;
 
 $DocsParser::objCurrentFunction = undef; #Function
 %DocsParser::hasharrayFunctions = (); #Function elements
-#~ $DocsParser::bOverride = 0; #First we parse the C docs, then we parse the C++ override docs.
 
 $DocsParser::commentStart = "  /** ";
 $DocsParser::commentMiddleStart = "   * ";
@@ -144,8 +143,6 @@ sub parse_on_start($$%)
       $$DocsParser::objCurrentFunction{param_descriptions} = ();
       $$DocsParser::objCurrentFunction{return_description} = "";
       $$DocsParser::objCurrentFunction{mapped_class} = "";
-      # We don't need this any more, the only reference to this field is commented
-      # $$DocsParser::objCurrentFunction{description_overridden} = $DocsParser::bOverride;
     }
   }
   elsif($tag eq "parameters")
@@ -570,19 +567,66 @@ sub convert_docs_to_cpp($$)
   # Chop off leading and trailing whitespace.
   $$text =~ s/^\s+//;
   $$text =~ s/\s+$//;
-# HagenM: this is the only reference to $$obj_function{description_overridden}
-# and it seems not to be in use.
-#  if(!$$obj_function{description_overridden})
-#  {
-    # Convert C documentation to C++.
-    DocsParser::convert_tags_to_doxygen($text);
-    DocsParser::substitute_identifiers($$obj_function{name}, $text);
 
-    $$text =~ s/\bX\s+Window\b/X&nbsp;\%Window/g;
-    $$text =~ s/\bWindow\s+manager/\%Window manager/g;
-#  }
+  # Convert C documentation to C++.
+  DocsParser::remove_c_memory_handling_info($text);
+  DocsParser::convert_tags_to_doxygen($text);
+  DocsParser::substitute_identifiers($$obj_function{name}, $text);
+
+  $$text =~ s/\bX\s+Window\b/X&nbsp;\%Window/g;
+  $$text =~ s/\bWindow\s+manager/\%Window manager/g;
 }
 
+sub remove_c_memory_handling_info($)
+{
+  my ($text) = @_;
+
+  # These C memory handling functions are removed, in most cases:
+  # g_free, g_strfreev, g_list_free, g_slist_free
+  my $mem_funcs = '\\bg_(?:free|strfreev|s?list_free)\\b';
+
+  return if ($$text !~ /$mem_funcs/);
+
+  # The text contains $mem_funcs. That's usually not relevant to C++ programmers.
+  # Try to remove irrelevant text without removing too much.
+
+  # This function is called separately for the description of each method,
+  # parameter and return value. Let's assume that only one removal is necessary.
+
+  # Don't modify the text, if $mem_funcs is part of example code.
+  # remove_c_memory_handling_info() is called before remove_example_code().
+  return if ($$text =~ m"(?:<informalexample>|<programlisting>|\|\[).*?$mem_funcs.*?(?:</informalexample>|</programlisting>|]\|)"s);
+
+  # First try to remove the sentence containing $mem_funcs.
+  # For simplicity, assume that a sentence is any string ending with a period.
+  my $tmp = $$text;
+  if ($tmp =~ s/[^.]*$mem_funcs.*?(?:\.|$)//s)
+  {
+    if ($tmp =~ /\w/)
+    {
+      # A sentence contains $mem_funcs, and it's not the only sentence in the text.
+      # Remove that sentence.
+      $$text = $tmp;
+      return;
+    }
+  }
+
+  $tmp = $$text;
+  if ($tmp =~ s/[^.,]*$mem_funcs.*?(?:\.|,|$)//s)
+  {
+    if ($tmp =~ /\w/)
+    {
+      # A clause, delimited by comma or period, contains $mem_funcs,
+      # and it's not the only clause in the text. Remove that clause.
+      $tmp =~ s/,\s*$/./;
+      $$text = $tmp;
+      return;
+    }
+  }
+
+  # Last attempt. If this doesn't remove anything, don't modify the text.
+  $$text =~ s/ that (?:must|should) be freed with g_free(?:\(\))?//;
+}
 
 sub convert_tags_to_doxygen($)
 {
