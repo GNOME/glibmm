@@ -41,9 +41,9 @@ _WRAP_GERROR(OptionError, GOptionError, G_OPTION_ERROR, NO_GTYPE)
  * <tt>testtreemodel -r 1 --max-size 20 --rand --display=:1.0 -vb -- file1 file2</tt>
  *
  * The example demonstrates a number of features of the GOption
- * commandline parser
+ * commandline parser:
  * - Options can be single letters, prefixed by a single dash.
-     Multiple short options can be grouped behind a single dash.
+ * - Multiple short options can be grouped behind a single dash.
  * - Long options are prefixed by two consecutive dashes.
  * - Options can have an extra argument, which can be a number, a string or
  *   a filename. For long options, the extra argument can be appended with
@@ -95,7 +95,7 @@ public:
    */
   explicit OptionContext(const Glib::ustring& parameter_string = Glib::ustring());
 
-  //Note that, unlike Glib::Wrap(), this would create a second C++ instance for the same C instance,u
+  //Note that, unlike Glib::wrap(), this would create a second C++ instance for the same C instance,
   //so it should be used carefully. For instance you could not access data in a derived class via this second instance.
   explicit OptionContext(GOptionContext* castitem, bool take_ownership = false);
 
@@ -119,11 +119,32 @@ public:
 #m4 _CONVERSION(`char**&',`gchar***',`&($3)')
   _WRAP_METHOD(bool parse(int& argc, char**& argv), g_option_context_parse, errthrow)
 
-  //TODO: Document this as useful (only?) with the result from g_win32_get_command_line?
-  //goption.c has example code that suggests always using this, and ifdefing for G_OS_WIN32, with a g_strdupv for the non-win32 case.
-  //Presumably we cannot hide that ifdeffing from application code because the argument-removal would be invisible to the caller.
-  //So can we hide it for people who don't care about arguments being removed from argv?
-  //TODO? _WRAP_METHOD(bool parse(char**& argv), g_option_context_parse_strv, errthrow)
+  /** Parses the command line arguments.
+   *
+   * This function is similar to parse(int& argc, char**& argv) except that it
+   * respects the normal memory rules when dealing with a strv instead of
+   * assuming that the passed-in array is the argv of the main function.
+   * In particular, strings that are removed from the arguments list will
+   * be freed using g_free().
+   *
+   * On Windows, the strings are expected to be in UTF-8. This is in
+   * contrast to parse(int& argc, char**& argv) which expects them to be in the
+   * system codepage, which is how they are passed as @a argv to main().
+   * See g_win32_get_command_line() or Gio::ApplicationCommandLine::get_arguments()
+   * for a solution.
+   *
+   * This function is useful if you are trying to use OptionContext with
+   * Gio::Application.
+   *
+   * @newin{2,50}
+   *
+   * @param[in,out] argv A pointer to the command line arguments
+   *   (which must be in UTF-8 on Windows).
+   * @return <tt>true</tt> if the parsing was successful,
+   *         <tt>false</tt> if an error occurred.
+   * @throw Glib::OptionError
+   */
+  _WRAP_METHOD(bool parse(char**& argv), g_option_context_parse_strv, errthrow)
 
   //g_option_context_add_main_entries(), just creates a group internally, adds them to it, and does a set_main_group()
   //- a group without callbacks seems to do some simple default parsing.
@@ -155,9 +176,10 @@ public:
   _WRAP_METHOD(Glib::ustring get_help(bool main_help, const OptionGroup& group) const, g_option_context_get_help)
 
   /** Returns a formatted, translated help text for the given context.
-   * To obtain the text produced by --help, call get_help (true).
-   * To obtain the text produced by --help-all, call get_help(false).
-   * To obtain the help text for an option group, call get_help(false, group).
+   *
+   * - To obtain the text produced by --help, call get_help(true).
+   * - To obtain the text produced by --help-all, call get_help(false).
+   * - To obtain the help text for an option group, call get_help(false, group).
    *
    * @param main_help If true, only include the main group.
    * @result string containing the help text.
