@@ -326,6 +326,16 @@
   )
 )
 
+(define-enum WriterOutput
+  (in-module "GLog")
+  (c-name "GLogWriterOutput")
+  (gtype-id "G_TYPE_LOG_WRITER_OUTPUT")
+  (values
+    '("handled" "G_LOG_WRITER_HANDLED")
+    '("unhandled" "G_LOG_WRITER_UNHANDLED")
+  )
+)
+
 (define-flags Flags
   (in-module "GTraverse")
   (c-name "GTraverseFlags")
@@ -4890,6 +4900,16 @@
   )
 )
 
+(define-function g_compute_hmac_for_bytes
+  (c-name "g_compute_hmac_for_bytes")
+  (return-type "gchar*")
+  (parameters
+    '("GChecksumType" "digest_type")
+    '("GBytes*" "key")
+    '("GBytes*" "data")
+  )
+)
+
 
 
 ;; From ghook.h
@@ -5645,6 +5665,17 @@
   )
 )
 
+(define-method load_from_bytes
+  (of-object "GKeyFile")
+  (c-name "g_key_file_load_from_bytes")
+  (return-type "gboolean")
+  (parameters
+    '("GBytes*" "bytes")
+    '("GKeyFileFlags" "flags")
+    '("GError**" "error")
+  )
+)
+
 (define-method load_from_dirs
   (of-object "GKeyFile")
   (c-name "g_key_file_load_from_dirs")
@@ -6133,6 +6164,11 @@
   (return-type "none")
 )
 
+(define-function g_thread_win32_process_detach
+  (c-name "g_thread_win32_process_detach")
+  (return-type "none")
+)
+
 (define-function g_thread_win32_thread_detach
   (c-name "g_thread_win32_thread_detach")
   (return-type "none")
@@ -6172,6 +6208,10 @@
 
 
 ;; From glib-object.h
+
+
+
+;; From glib_probes.h
 
 
 
@@ -7693,6 +7733,106 @@
   (return-type "GLogLevelFlags")
   (parameters
     '("GLogLevelFlags" "fatal_mask")
+  )
+)
+
+(define-function g_log_structured
+  (c-name "g_log_structured")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "log_domain")
+    '("GLogLevelFlags" "log_level")
+  )
+  (varargs #t)
+)
+
+(define-function g_log_structured_array
+  (c-name "g_log_structured_array")
+  (return-type "none")
+  (parameters
+    '("GLogLevelFlags" "log_level")
+    '("const-GLogField*" "fields")
+    '("gsize" "n_fields")
+  )
+)
+
+(define-function g_log_variant
+  (c-name "g_log_variant")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "log_domain")
+    '("GLogLevelFlags" "log_level")
+    '("GVariant*" "fields")
+  )
+)
+
+(define-function g_log_set_writer_func
+  (c-name "g_log_set_writer_func")
+  (return-type "none")
+  (parameters
+    '("GLogWriterFunc" "func")
+    '("gpointer" "user_data")
+    '("GDestroyNotify" "user_data_free")
+  )
+)
+
+(define-function g_log_writer_supports_color
+  (c-name "g_log_writer_supports_color")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "output_fd")
+  )
+)
+
+(define-function g_log_writer_is_journald
+  (c-name "g_log_writer_is_journald")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "output_fd")
+  )
+)
+
+(define-function g_log_writer_format_fields
+  (c-name "g_log_writer_format_fields")
+  (return-type "gchar*")
+  (parameters
+    '("GLogLevelFlags" "log_level")
+    '("const-GLogField*" "fields")
+    '("gsize" "n_fields")
+    '("gboolean" "use_color")
+  )
+)
+
+(define-function g_log_writer_journald
+  (c-name "g_log_writer_journald")
+  (return-type "GLogWriterOutput")
+  (parameters
+    '("GLogLevelFlags" "log_level")
+    '("const-GLogField*" "fields")
+    '("gsize" "n_fields")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_log_writer_standard_streams
+  (c-name "g_log_writer_standard_streams")
+  (return-type "GLogWriterOutput")
+  (parameters
+    '("GLogLevelFlags" "log_level")
+    '("const-GLogField*" "fields")
+    '("gsize" "n_fields")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_log_writer_default
+  (c-name "g_log_writer_default")
+  (return-type "GLogWriterOutput")
+  (parameters
+    '("GLogLevelFlags" "log_level")
+    '("const-GLogField*" "fields")
+    '("gsize" "n_fields")
+    '("gpointer" "user_data")
   )
 )
 
@@ -13428,6 +13568,11 @@
   (parameters
     '("gulong" "number")
   )
+)
+
+(define-function g_abort
+  (c-name "g_abort")
+  (return-type "none")
 )
 
 
