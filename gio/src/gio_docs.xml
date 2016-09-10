@@ -704,23 +704,23 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_LINUX_UCRED">
-<parameter_description> The native credentials type is a &lt;type&gt;struct ucred&lt;/type&gt;.
+<parameter_description> The native credentials type is a struct ucred.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED">
-<parameter_description> The native credentials type is a &lt;type&gt;struct cmsgcred&lt;/type&gt;.
+<parameter_description> The native credentials type is a struct cmsgcred.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED">
-<parameter_description> The native credentials type is a &lt;type&gt;struct sockpeercred&lt;/type&gt;. Added in 2.30.
+<parameter_description> The native credentials type is a struct sockpeercred. Added in 2.30.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_SOLARIS_UCRED">
-<parameter_description> The native credentials type is a &lt;type&gt;ucred_t&lt;/type&gt;. Added in 2.40.
+<parameter_description> The native credentials type is a ucred_t. Added in 2.40.
 </parameter_description>
 </parameter>
 <parameter name="G_CREDENTIALS_TYPE_NETBSD_UNPCBID">
-<parameter_description> The native credentials type is a &lt;type&gt;struct unpcbid&lt;/type&gt;.
+<parameter_description> The native credentials type is a struct unpcbid.
 </parameter_description>
 </parameter>
 </parameters>
@@ -2973,7 +2973,7 @@ Compare with `du -x`.
 <description>
 Emitted when @file has been changed.
 
-If using %G_FILE_MONITOR_WATCH_RENAMES on a directory monitor, and
+If using %G_FILE_MONITOR_WATCH_MOVES on a directory monitor, and
 the information is available (and if supported by the backend),
 @event_type may be %G_FILE_MONITOR_EVENT_RENAMED,
 %G_FILE_MONITOR_EVENT_MOVED_IN or %G_FILE_MONITOR_EVENT_MOVED_OUT.
@@ -2992,7 +2992,7 @@ equivalent to %G_FILE_MONITOR_EVENT_CREATED and
 %G_FILE_MONITOR_EVENT_DELETED, with extra information.
 %G_FILE_MONITOR_EVENT_RENAMED is equivalent to a delete/create
 pair.  This is exactly how the events will be reported in the case
-that the %G_FILE_MONITOR_WATCH_RENAMES flag is not in use.
+that the %G_FILE_MONITOR_WATCH_MOVES flag is not in use.
 
 If using the deprecated flag %G_FILE_MONITOR_SEND_MOVED flag and @event_type is
 #G_FILE_MONITOR_EVENT_MOVED, @file will be set to a #GFile containing the
@@ -4603,6 +4603,9 @@ value.
 This signal supports detailed connections.  You can connect to the
 detailed signal &quot;changed::x&quot; in order to only receive callbacks
 when key &quot;x&quot; changes.
+
+Note that @settings only emits this signal if you have read @key at
+least once while a signal handler was already connected for @key.
 
 </description>
 <parameters>
@@ -6646,6 +6649,353 @@ Since: 2.46
 </description>
 </property>
 
+<signal name="GXdpDocuments::handle-add">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Add&quot;&gt;Add()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_add() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_fd">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_reuse_existing">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_persistent">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-add-named">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddNamed&quot;&gt;AddNamed()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_add_named() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_parent_fd">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_filename">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_reuse_existing">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_persistent">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-delete">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Delete&quot;&gt;Delete()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_delete() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-get-mount-point">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.GetMountPoint&quot;&gt;GetMountPoint()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_get_mount_point() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-grant-permissions">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.GrantPermissions&quot;&gt;GrantPermissions()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_grant_permissions() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-info">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Info&quot;&gt;Info()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_info() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-list">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.List&quot;&gt;List()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_list() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-lookup">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Lookup&quot;&gt;Lookup()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_lookup() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_filename">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-revoke-permissions">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.RevokePermissions&quot;&gt;RevokePermissions()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_revoke_permissions() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpNetworkMonitor::changed">
+<description>
+On the client-side, this signal is emitted whenever the D-Bus signal &lt;link linkend=&quot;gdbus-signal-org-freedesktop-portal-NetworkMonitor.changed&quot;&gt;&quot;changed&quot;&lt;/link&gt; is received.
+
+On the service-side, this signal can be used with e.g. g_signal_emit_by_name() to make the object emit the D-Bus signal.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpNetworkMonitor.
+</parameter_description>
+</parameter>
+<parameter name="arg_available">
+<parameter_description> Argument.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</signal>
+
+<property name="GXdpNetworkMonitor:available">
+<description>
+Represents the D-Bus property &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.available&quot;&gt;&quot;available&quot;&lt;/link&gt;.
+
+Since the D-Bus property for this #GObject property is readable but not writable, it is meaningful to read from it on both the client- and service-side. It is only meaningful, however, to write to it on the service-side.
+
+</description>
+</property>
+
+<property name="GXdpNetworkMonitor:connectivity">
+<description>
+Represents the D-Bus property &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.connectivity&quot;&gt;&quot;connectivity&quot;&lt;/link&gt;.
+
+Since the D-Bus property for this #GObject property is readable but not writable, it is meaningful to read from it on both the client- and service-side. It is only meaningful, however, to write to it on the service-side.
+
+</description>
+</property>
+
+<property name="GXdpNetworkMonitor:metered">
+<description>
+Represents the D-Bus property &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.metered&quot;&gt;&quot;metered&quot;&lt;/link&gt;.
+
+Since the D-Bus property for this #GObject property is readable but not writable, it is meaningful to read from it on both the client- and service-side. It is only meaningful, however, to write to it on the service-side.
+
+</description>
+</property>
+
+<signal name="GXdpProxyResolver::handle-lookup">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-ProxyResolver.Lookup&quot;&gt;Lookup()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_proxy_resolver_complete_lookup() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpProxyResolver.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_uri">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
 <property name="GZlibCompressor:file-info">
 <description>
 If set to a non-%NULL #GFileInfo object, and #GZlibCompressor:format is
@@ -7555,10 +7905,9 @@ Formats a detailed action name from @action_name and @target_value.
 
 It is an error to call this function with an invalid action name.
 
-This function is the opposite of
-g_action_parse_detailed_action_name().  It will produce a string that
-can be parsed back to the @action_name and @target_value by that
-function.
+This function is the opposite of g_action_parse_detailed_name().
+It will produce a string that can be parsed back to the @action_name
+and @target_value by that function.
 
 See that function for the types of strings that will be printed by
 this function.
@@ -7788,7 +8137,7 @@ Since: 2.20
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the @appinfo's commandline, 
+<return> a string containing the @appinfo's commandline,
 or %NULL if this information is not available
 
 </return>
@@ -7884,7 +8233,7 @@ Gets the executable's name for the installed application.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a string containing the @appinfo's application 
+<return> a string containing the @appinfo's application
 binaries name
 </return>
 </function>
@@ -8082,15 +8431,71 @@ required.
 </parameter_description>
 </parameter>
 <parameter name="launch_context">
-<parameter_description> an optional #GAppLaunchContext.
+<parameter_description> an optional #GAppLaunchContext
 </parameter_description>
 </parameter>
 <parameter name="error">
-<parameter_description> a #GError.
+<parameter_description> return location for an error, or %NULL
 </parameter_description>
 </parameter>
 </parameters>
 <return> %TRUE on success, %FALSE on error.
+</return>
+</function>
+
+<function name="g_app_info_launch_default_for_uri_async">
+<description>
+Async version of g_app_info_launch_default_for_uri().
+
+This version is useful if you are interested in receiving
+error information in the case where the application is
+sandboxed and the portal may present an application chooser
+dialog to the user.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="uri">
+<parameter_description> the uri to show
+</parameter_description>
+</parameter>
+<parameter name="context">
+<parameter_description> an optional #GAppLaunchContext
+cancellable: (allow-none): a #GCancellable
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GASyncReadyCallback to call when the request is done
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> data to pass to @callback
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_app_info_launch_default_for_uri_finish">
+<description>
+Finishes an asynchronous launch-default-for-uri operation.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="result">
+<parameter_description> a #GAsyncResult
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for an error, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the launch was successful, %FALSE if @error is set
+
 </return>
 </function>
 
@@ -8209,7 +8614,8 @@ Sets the application as the default handler for the given file extension.
 </parameter_description>
 </parameter>
 <parameter name="extension">
-<parameter_description> a string containing the file extension (without the dot).
+<parameter_description> a string containing the file extension
+(without the dot).
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -19519,8 +19925,7 @@ Since: 2.30
 </description>
 <parameters>
 <parameter name="object_path">
-<parameter_description> The object path to export the manager object at, which should
-not be `/`.
+<parameter_description> The object path to export the manager object at.
 </parameter_description>
 </parameter>
 </parameters>
@@ -20970,7 +21375,8 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> The full path to the file for @info, or %NULL if not known.
+<return> The full path to the file for @info,
+or %NULL if not known.
 </return>
 </function>
 
@@ -21356,7 +21762,8 @@ Creates a new #GDesktopAppInfo.
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> the path of a desktop file, in the GLib filename encoding
+<parameter_description> the path of a desktop file, in the GLib
+filename encoding
 </parameter_description>
 </parameter>
 </parameters>
@@ -21861,6 +22268,25 @@ Checks if the @drive supports removable media.
 </parameter>
 </parameters>
 <return> %TRUE if @drive supports removable media, %FALSE otherwise.
+</return>
+</function>
+
+<function name="g_drive_is_removable">
+<description>
+Checks if the #GDrive and/or its media is considered removable by the user.
+See g_drive_is_media_removable().
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="drive">
+<parameter_description> a #GDrive.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @drive and/or its media is considered removable, %FALSE otherwise.
+
 </return>
 </function>
 
@@ -24562,7 +24988,7 @@ the gboolean return value signifies &quot;end of iteration or error&quot;, which
 requires allocation of a temporary #GError.
 
 In contrast, with this function, a %FALSE return from
-gs_file_enumerator_iterate() *always* means
+g_file_enumerator_iterate() *always* means
 &quot;error&quot;.  End of iteration is signaled by @out_info or @out_child being %NULL.
 
 Another crucial difference is that the references for @out_info and
@@ -24907,9 +25333,9 @@ This call does no blocking I/O.
 </parameter_description>
 </parameter>
 </parameters>
-<return> string containing the #GFile's base name, or
-%NULL if given #GFile is invalid. The returned string should be
-freed with g_free() when no longer needed.
+<return> string containing the #GFile's
+base name, or %NULL if given #GFile is invalid. The returned string
+should be freed with g_free() when no longer needed.
 </return>
 </function>
 
@@ -25041,8 +25467,8 @@ This call does no blocking I/O.
 </parameter_description>
 </parameter>
 </parameters>
-<return> string containing the #GFile's path, or %NULL
-if no such path exists. The returned string should be freed
+<return> string containing the #GFile's path,
+or %NULL if no such path exists. The returned string should be freed
 with g_free() when no longer needed.
 </return>
 </function>
@@ -25065,8 +25491,8 @@ This call does no blocking I/O.
 </parameter_description>
 </parameter>
 </parameters>
-<return> string with the relative path from @descendant
-to @parent, or %NULL if @descendant doesn't have @parent as
+<return> string with the relative path from
+@descendant to @parent, or %NULL if @descendant doesn't have @parent as
 prefix. The returned string should be freed with g_free() when
 no longer needed.
 </return>
@@ -27153,7 +27579,8 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="symlink_value">
-<parameter_description> a string with the path for the target of the new symlink
+<parameter_description> a string with the path for the target
+of the new symlink
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
@@ -31202,7 +31629,7 @@ Since: 2.22
 Creates a new #GInetSocketAddress for @address and @port.
 
 If @address is an IPv6 address, it can also contain a scope ID
-(separated from the address by a &quot;&lt;literal&gt;%&lt;/literal&gt;&quot;).
+(separated from the address by a `%`).
 
 Since: 2.40
 
@@ -32539,7 +32966,8 @@ which allows delayed/lazy loading of modules.
 </description>
 <parameters>
 <parameter name="dirname">
-<parameter_description> pathname for a directory containing modules to load.
+<parameter_description> pathname for a directory containing modules
+to load.
 </parameter_description>
 </parameter>
 </parameters>
@@ -32565,7 +32993,8 @@ Since: 2.30
 </description>
 <parameters>
 <parameter name="dirname">
-<parameter_description> pathname for a directory containing modules to load.
+<parameter_description> pathname for a directory containing modules
+to load.
 </parameter_description>
 </parameter>
 <parameter name="scope">
@@ -32602,7 +33031,8 @@ Since: 2.24
 </description>
 <parameters>
 <parameter name="dirname">
-<parameter_description> pathname for a directory containing modules to scan.
+<parameter_description> pathname for a directory containing modules
+to scan.
 </parameter_description>
 </parameter>
 </parameters>
@@ -32628,7 +33058,8 @@ Since: 2.30
 </description>
 <parameters>
 <parameter name="dirname">
-<parameter_description> pathname for a directory containing modules to scan.
+<parameter_description> pathname for a directory containing modules
+to scan.
 </parameter_description>
 </parameter>
 <parameter name="scope">
@@ -41496,6 +41927,33 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_settings_get_int64">
+<description>
+Gets the value that is stored at @key in @settings.
+
+A convenience variant of g_settings_get() for 64-bit integers.
+
+It is a programmer error to give a @key that isn't specified as
+having a int64 type in the schema for @settings.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description> a #GSettings object
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the key to get the value for
+</parameter_description>
+</parameter>
+</parameters>
+<return> a 64-bit integer
+
+</return>
+</function>
+
 <function name="g_settings_get_mapped">
 <description>
 Gets the value that is stored at @key in @settings, subject to
@@ -41651,6 +42109,34 @@ Since: 2.30
 </parameter>
 </parameters>
 <return> an unsigned integer
+
+</return>
+</function>
+
+<function name="g_settings_get_uint64">
+<description>
+Gets the value that is stored at @key in @settings.
+
+A convenience variant of g_settings_get() for 64-bit unsigned
+integers.
+
+It is a programmer error to give a @key that isn't specified as
+having a uint64 type in the schema for @settings.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description> a #GSettings object
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the key to get the value for
+</parameter_description>
+</parameter>
+</parameters>
+<return> a 64-bit unsigned integer
 
 </return>
 </function>
@@ -42862,6 +43348,38 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_settings_set_int64">
+<description>
+Sets @key in @settings to @value.
+
+A convenience variant of g_settings_set() for 64-bit integers.
+
+It is a programmer error to give a @key that isn't specified as
+having a int64 type in the schema for @settings.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description> a #GSettings object
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the name of the key to set
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the value to set it to
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if setting the key succeeded,
+%FALSE if the key was not writable
+
+</return>
+</function>
+
 <function name="g_settings_set_string">
 <description>
 Sets @key in @settings to @value.
@@ -42938,6 +43456,39 @@ It is a programmer error to give a @key that isn't specified as
 having a uint32 type in the schema for @settings.
 
 Since: 2.30
+
+</description>
+<parameters>
+<parameter name="settings">
+<parameter_description> a #GSettings object
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the name of the key to set
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> the value to set it to
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if setting the key succeeded,
+%FALSE if the key was not writable
+
+</return>
+</function>
+
+<function name="g_settings_set_uint64">
+<description>
+Sets @key in @settings to @value.
+
+A convenience variant of g_settings_set() for 64-bit unsigned
+integers.
+
+It is a programmer error to give a @key that isn't specified as
+having a uint64 type in the schema for @settings.
+
+Since: 2.50
 
 </description>
 <parameters>
@@ -47832,6 +48383,10 @@ Creates a new #GSocketService with no sockets to listen for.
 New listeners can be added with e.g. g_socket_listener_add_address()
 or g_socket_listener_add_inet_port().
 
+New services are created active, there is no need to call
+g_socket_service_start(), unless g_socket_service_stop() has been
+called before.
+
 Since: 2.22
 
 </description>
@@ -47844,8 +48399,10 @@ Since: 2.22
 
 <function name="g_socket_service_start">
 <description>
-Starts the service, i.e. start accepting connections
-from the added sockets when the mainloop runs.
+Restarts the service, i.e. start accepting connections
+from the added sockets when the mainloop runs. This only needs
+to be called after the service has been stopped from
+g_socket_service_stop().
 
 This call is thread-safe, so it may be called from a thread
 handling an incoming client request.
@@ -47875,6 +48432,10 @@ close the listening sockets, and you can call
 g_socket_service_start() again later to begin listening again. To
 close the listening sockets, call g_socket_listener_close(). (This
 will happen automatically when the #GSocketService is finalized.)
+
+This must be called before calling g_socket_listener_close() as
+the socket service will start accepting connections immediately
+when a new socket is added.
 
 Since: 2.22
 
@@ -49155,7 +49716,7 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="path">
-<parameter_description> a filename or %NULL
+<parameter_description> (type filename) (nullable: a filename or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -51268,12 +51829,13 @@ Since: 2.28
 </description>
 <parameters>
 <parameter name="cert_file">
-<parameter_description> file containing one or more PEM-encoded certificates to
-import
+<parameter_description> file containing one or more PEM-encoded
+certificates to import
 </parameter_description>
 </parameter>
 <parameter name="key_file">
-<parameter_description> file containing a PEM-encoded private key to import
+<parameter_description> file containing a PEM-encoded private key
+to import
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -55040,6 +55602,101 @@ Free the returned object with g_object_unref().
 </return>
 </function>
 
+<function name="g_vfs_register_uri_scheme">
+<description>
+Registers @uri_func and @parse_name_func as the #GFile URI and parse name
+lookup functions for URIs with a scheme matching @scheme.
+Note that @scheme is registered only within the running application, as
+opposed to desktop-wide as it happens with GVfs backends.
+
+When a #GFile is requested with an URI containing @scheme (e.g. through
+g_file_new_for_uri()), @uri_func will be called to allow a custom
+constructor. The implementation of @uri_func should not be blocking, and
+must not call g_vfs_register_uri_scheme() or g_vfs_unregister_uri_scheme().
+
+When g_file_parse_name() is called with a parse name obtained from such file,
+@parse_name_func will be called to allow the #GFile to be created again. In
+that case, it's responsibility of @parse_name_func to make sure the parse
+name matches what the custom #GFile implementation returned when
+g_file_get_parse_name() was previously called. The implementation of
+@parse_name_func should not be blocking, and must not call
+g_vfs_register_uri_scheme() or g_vfs_unregister_uri_scheme().
+
+It's an error to call this function twice with the same scheme. To unregister
+a custom URI scheme, use g_vfs_unregister_uri_scheme().
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="vfs">
+<parameter_description> a #GVfs
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> an URI scheme, e.g. &quot;http&quot;
+</parameter_description>
+</parameter>
+<parameter name="uri_func">
+<parameter_description> a #GVfsFileLookupFunc
+</parameter_description>
+</parameter>
+<parameter name="uri_data">
+<parameter_description> custom data passed to be passed to @uri_func, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="uri_destroy">
+<parameter_description> function to be called when unregistering the
+URI scheme, or when @vfs is disposed, to free the resources used
+by the URI lookup function
+</parameter_description>
+</parameter>
+<parameter name="parse_name_func">
+<parameter_description> a #GVfsFileLookupFunc
+</parameter_description>
+</parameter>
+<parameter name="parse_name_data">
+<parameter_description> custom data passed to be passed to
+@parse_name_func, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="parse_name_destroy">
+<parameter_description> function to be called when unregistering the
+URI scheme, or when @vfs is disposed, to free the resources used
+by the parse name lookup function
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @scheme was successfully registered, or %FALSE if a handler
+for @scheme already exists.
+
+</return>
+</function>
+
+<function name="g_vfs_unregister_uri_scheme">
+<description>
+Unregisters the URI handler for @scheme previously registered with
+g_vfs_register_uri_scheme().
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="vfs">
+<parameter_description> a #GVfs
+</parameter_description>
+</parameter>
+<parameter name="scheme">
+<parameter_description> an URI scheme, e.g. &quot;http&quot;
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @scheme was successfully unregistered, or %FALSE if a
+handler for @scheme does not exist.
+
+</return>
+</function>
+
 <function name="g_volume_can_eject">
 <description>
 Checks if a volume can be ejected.
@@ -56916,6 +57573,2171 @@ GetLogicalDrives() is returned.
 <parameters>
 </parameters>
 <return> bitmask with same meaning as returned by GetLogicalDrives()
+</return>
+</function>
+
+<function name="gxdp_documents_call_add">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Add&quot;&gt;Add()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_add_finish() to get the result of the operation.
+
+See gxdp_documents_call_add_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_fd">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_reuse_existing">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_persistent">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_add_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_add().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_doc_id">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_fd_list">
+<parameter_description> Return location for a #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_add().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_add_named">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddNamed&quot;&gt;AddNamed()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_add_named_finish() to get the result of the operation.
+
+See gxdp_documents_call_add_named_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_parent_fd">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_filename">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_reuse_existing">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_persistent">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_add_named_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_add_named().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_doc_id">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_fd_list">
+<parameter_description> Return location for a #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_add_named().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_add_named_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddNamed&quot;&gt;AddNamed()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_add_named() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_parent_fd">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_filename">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_reuse_existing">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_persistent">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="out_doc_id">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_fd_list">
+<parameter_description> Return location for a #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_add_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Add&quot;&gt;Add()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_add() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_fd">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_reuse_existing">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_persistent">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="out_doc_id">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_fd_list">
+<parameter_description> Return location for a #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_delete">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Delete&quot;&gt;Delete()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_delete_finish() to get the result of the operation.
+
+See gxdp_documents_call_delete_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_delete_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_delete().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_delete().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_delete_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Delete&quot;&gt;Delete()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_delete() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_get_mount_point">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.GetMountPoint&quot;&gt;GetMountPoint()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_get_mount_point_finish() to get the result of the operation.
+
+See gxdp_documents_call_get_mount_point_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_get_mount_point_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_get_mount_point().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_path">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_get_mount_point().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_get_mount_point_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.GetMountPoint&quot;&gt;GetMountPoint()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_get_mount_point() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_path">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_grant_permissions">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.GrantPermissions&quot;&gt;GrantPermissions()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_grant_permissions_finish() to get the result of the operation.
+
+See gxdp_documents_call_grant_permissions_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_grant_permissions_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_grant_permissions().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_grant_permissions().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_grant_permissions_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.GrantPermissions&quot;&gt;GrantPermissions()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_grant_permissions() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_info">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Info&quot;&gt;Info()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_info_finish() to get the result of the operation.
+
+See gxdp_documents_call_info_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_info_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_info().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_path">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_apps">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_info().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_info_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Info&quot;&gt;Info()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_info() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="out_path">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_apps">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_list">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.List&quot;&gt;List()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_list_finish() to get the result of the operation.
+
+See gxdp_documents_call_list_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_list_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_list().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_docs">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_list().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_list_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.List&quot;&gt;List()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_list() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="out_docs">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_lookup">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Lookup&quot;&gt;Lookup()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_lookup_finish() to get the result of the operation.
+
+See gxdp_documents_call_lookup_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_filename">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_lookup_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_lookup().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_doc_id">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_lookup().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_lookup_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Lookup&quot;&gt;Lookup()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_lookup() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_filename">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="out_doc_id">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_revoke_permissions">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.RevokePermissions&quot;&gt;RevokePermissions()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_revoke_permissions_finish() to get the result of the operation.
+
+See gxdp_documents_call_revoke_permissions_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_revoke_permissions_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_revoke_permissions().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_revoke_permissions().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_revoke_permissions_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.RevokePermissions&quot;&gt;RevokePermissions()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_revoke_permissions() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_doc_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_complete_add">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Add&quot;&gt;Add()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="doc_id">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_complete_add_named">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddNamed&quot;&gt;AddNamed()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="doc_id">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_complete_delete">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Delete&quot;&gt;Delete()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_complete_get_mount_point">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.GetMountPoint&quot;&gt;GetMountPoint()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_complete_grant_permissions">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.GrantPermissions&quot;&gt;GrantPermissions()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_complete_info">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Info&quot;&gt;Info()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="path">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+<parameter name="apps">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_complete_list">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.List&quot;&gt;List()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="docs">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_complete_lookup">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.Lookup&quot;&gt;Lookup()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="doc_id">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_complete_revoke_permissions">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.RevokePermissions&quot;&gt;RevokePermissions()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_interface_info">
+<description>
+Gets a machine-readable description of the &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-Documents.top_of_page&quot;&gt;org.freedesktop.portal.Documents&lt;/link&gt; D-Bus interface.
+
+
+</description>
+<parameters>
+</parameters>
+<return> A #GDBusInterfaceInfo. Do not free.
+</return>
+</function>
+
+<function name="gxdp_documents_override_properties">
+<description>
+Overrides all #GObject properties in the #GXdpDocuments interface for a concrete class.
+The properties are overridden in the order they are defined.
+
+
+</description>
+<parameters>
+<parameter name="klass">
+<parameter_description> The class structure for a #GObject&lt;!-- --&gt;-derived class.
+</parameter_description>
+</parameter>
+<parameter name="property_id_begin">
+<parameter_description> The property id to assign to the first overridden property.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The last property id.
+</return>
+</function>
+
+<function name="gxdp_documents_proxy_new">
+<description>
+Asynchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-Documents.top_of_page&quot;&gt;org.freedesktop.portal.Documents&lt;/link&gt;. See g_dbus_proxy_new() for more details.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_proxy_new_finish() to get the result of the operation.
+
+See gxdp_documents_proxy_new_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_proxy_new_finish">
+<description>
+Finishes an operation started with gxdp_documents_proxy_new().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_proxy_new().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_proxy_new_for_bus">
+<description>
+Like gxdp_documents_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_proxy_new_for_bus_finish() to get the result of the operation.
+
+See gxdp_documents_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_proxy_new_for_bus_finish">
+<description>
+Finishes an operation started with gxdp_documents_proxy_new_for_bus().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_proxy_new_for_bus().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_proxy_new_for_bus_sync">
+<description>
+Like gxdp_documents_proxy_new_sync() but takes a #GBusType instead of a #GDBusConnection.
+
+The calling thread is blocked until a reply is received.
+
+See gxdp_documents_proxy_new_for_bus() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_proxy_new_sync">
+<description>
+Synchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-Documents.top_of_page&quot;&gt;org.freedesktop.portal.Documents&lt;/link&gt;. See g_dbus_proxy_new_sync() for more details.
+
+The calling thread is blocked until a reply is received.
+
+See gxdp_documents_proxy_new() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_skeleton_new">
+<description>
+Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-Documents.top_of_page&quot;&gt;org.freedesktop.portal.Documents&lt;/link&gt;.
+
+
+</description>
+<parameters>
+</parameters>
+<return> The skeleton object.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_emit_changed">
+<description>
+Emits the &lt;link linkend=&quot;gdbus-signal-org-freedesktop-portal-NetworkMonitor.changed&quot;&gt;&quot;changed&quot;&lt;/link&gt; D-Bus signal.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpNetworkMonitor.
+</parameter_description>
+</parameter>
+<parameter name="arg_available">
+<parameter_description> Argument to pass with the signal.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_network_monitor_get_available">
+<description>
+Gets the value of the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.available&quot;&gt;&quot;available&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpNetworkMonitor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_get_connectivity">
+<description>
+Gets the value of the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.connectivity&quot;&gt;&quot;connectivity&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpNetworkMonitor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_get_metered">
+<description>
+Gets the value of the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.metered&quot;&gt;&quot;metered&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpNetworkMonitor.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_interface_info">
+<description>
+Gets a machine-readable description of the &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-NetworkMonitor.top_of_page&quot;&gt;org.freedesktop.portal.NetworkMonitor&lt;/link&gt; D-Bus interface.
+
+
+</description>
+<parameters>
+</parameters>
+<return> A #GDBusInterfaceInfo. Do not free.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_override_properties">
+<description>
+Overrides all #GObject properties in the #GXdpNetworkMonitor interface for a concrete class.
+The properties are overridden in the order they are defined.
+
+
+</description>
+<parameters>
+<parameter name="klass">
+<parameter_description> The class structure for a #GObject&lt;!-- --&gt;-derived class.
+</parameter_description>
+</parameter>
+<parameter name="property_id_begin">
+<parameter_description> The property id to assign to the first overridden property.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The last property id.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_proxy_new">
+<description>
+Asynchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-NetworkMonitor.top_of_page&quot;&gt;org.freedesktop.portal.NetworkMonitor&lt;/link&gt;. See g_dbus_proxy_new() for more details.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_network_monitor_proxy_new_finish() to get the result of the operation.
+
+See gxdp_network_monitor_proxy_new_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_network_monitor_proxy_new_finish">
+<description>
+Finishes an operation started with gxdp_network_monitor_proxy_new().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_network_monitor_proxy_new().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_proxy_new_for_bus">
+<description>
+Like gxdp_network_monitor_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_network_monitor_proxy_new_for_bus_finish() to get the result of the operation.
+
+See gxdp_network_monitor_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_network_monitor_proxy_new_for_bus_finish">
+<description>
+Finishes an operation started with gxdp_network_monitor_proxy_new_for_bus().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_network_monitor_proxy_new_for_bus().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_proxy_new_for_bus_sync">
+<description>
+Like gxdp_network_monitor_proxy_new_sync() but takes a #GBusType instead of a #GDBusConnection.
+
+The calling thread is blocked until a reply is received.
+
+See gxdp_network_monitor_proxy_new_for_bus() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_proxy_new_sync">
+<description>
+Synchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-NetworkMonitor.top_of_page&quot;&gt;org.freedesktop.portal.NetworkMonitor&lt;/link&gt;. See g_dbus_proxy_new_sync() for more details.
+
+The calling thread is blocked until a reply is received.
+
+See gxdp_network_monitor_proxy_new() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_network_monitor_set_available">
+<description>
+Sets the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.available&quot;&gt;&quot;available&quot;&lt;/link&gt; D-Bus property to @value.
+
+Since this D-Bus property is not writable, it is only meaningful to use this function on the service-side.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpNetworkMonitor.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The value to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_network_monitor_set_connectivity">
+<description>
+Sets the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.connectivity&quot;&gt;&quot;connectivity&quot;&lt;/link&gt; D-Bus property to @value.
+
+Since this D-Bus property is not writable, it is only meaningful to use this function on the service-side.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpNetworkMonitor.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The value to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_network_monitor_set_metered">
+<description>
+Sets the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.metered&quot;&gt;&quot;metered&quot;&lt;/link&gt; D-Bus property to @value.
+
+Since this D-Bus property is not writable, it is only meaningful to use this function on the service-side.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpNetworkMonitor.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The value to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_network_monitor_skeleton_new">
+<description>
+Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-NetworkMonitor.top_of_page&quot;&gt;org.freedesktop.portal.NetworkMonitor&lt;/link&gt;.
+
+
+</description>
+<parameters>
+</parameters>
+<return> The skeleton object.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_call_lookup">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-ProxyResolver.Lookup&quot;&gt;Lookup()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_proxy_resolver_call_lookup_finish() to get the result of the operation.
+
+See gxdp_proxy_resolver_call_lookup_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpProxyResolverProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_uri">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_proxy_resolver_call_lookup_finish">
+<description>
+Finishes an operation started with gxdp_proxy_resolver_call_lookup().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpProxyResolverProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_proxies">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_proxy_resolver_call_lookup().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_call_lookup_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-ProxyResolver.Lookup&quot;&gt;Lookup()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_proxy_resolver_call_lookup() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpProxyResolverProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_uri">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="out_proxies">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_complete_lookup">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-ProxyResolver.Lookup&quot;&gt;Lookup()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpProxyResolver.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="proxies">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_proxy_resolver_interface_info">
+<description>
+Gets a machine-readable description of the &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-ProxyResolver.top_of_page&quot;&gt;org.freedesktop.portal.ProxyResolver&lt;/link&gt; D-Bus interface.
+
+
+</description>
+<parameters>
+</parameters>
+<return> A #GDBusInterfaceInfo. Do not free.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_override_properties">
+<description>
+Overrides all #GObject properties in the #GXdpProxyResolver interface for a concrete class.
+The properties are overridden in the order they are defined.
+
+
+</description>
+<parameters>
+<parameter name="klass">
+<parameter_description> The class structure for a #GObject&lt;!-- --&gt;-derived class.
+</parameter_description>
+</parameter>
+<parameter name="property_id_begin">
+<parameter_description> The property id to assign to the first overridden property.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The last property id.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_proxy_new">
+<description>
+Asynchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-ProxyResolver.top_of_page&quot;&gt;org.freedesktop.portal.ProxyResolver&lt;/link&gt;. See g_dbus_proxy_new() for more details.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_proxy_resolver_proxy_new_finish() to get the result of the operation.
+
+See gxdp_proxy_resolver_proxy_new_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_proxy_resolver_proxy_new_finish">
+<description>
+Finishes an operation started with gxdp_proxy_resolver_proxy_new().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_proxy_resolver_proxy_new().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_proxy_new_for_bus">
+<description>
+Like gxdp_proxy_resolver_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_proxy_resolver_proxy_new_for_bus_finish() to get the result of the operation.
+
+See gxdp_proxy_resolver_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_proxy_resolver_proxy_new_for_bus_finish">
+<description>
+Finishes an operation started with gxdp_proxy_resolver_proxy_new_for_bus().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_proxy_resolver_proxy_new_for_bus().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_proxy_new_for_bus_sync">
+<description>
+Like gxdp_proxy_resolver_proxy_new_sync() but takes a #GBusType instead of a #GDBusConnection.
+
+The calling thread is blocked until a reply is received.
+
+See gxdp_proxy_resolver_proxy_new_for_bus() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_proxy_new_sync">
+<description>
+Synchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-ProxyResolver.top_of_page&quot;&gt;org.freedesktop.portal.ProxyResolver&lt;/link&gt;. See g_dbus_proxy_new_sync() for more details.
+
+The calling thread is blocked until a reply is received.
+
+See gxdp_proxy_resolver_proxy_new() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_proxy_resolver_skeleton_new">
+<description>
+Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-ProxyResolver.top_of_page&quot;&gt;org.freedesktop.portal.ProxyResolver&lt;/link&gt;.
+
+
+</description>
+<parameters>
+</parameters>
+<return> The skeleton object.
 </return>
 </function>
 

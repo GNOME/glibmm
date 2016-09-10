@@ -153,7 +153,7 @@ Since: 2.16
 </parameter_description>
 </parameter>
 <parameter name="G_CHECKSUM_SHA512">
-<parameter_description> Use the SHA-512 hashing algorithm
+<parameter_description> Use the SHA-512 hashing algorithm (Since: 2.36)
 </parameter_description>
 </parameter>
 </parameters>
@@ -923,6 +923,30 @@ and g_return_val_if_fail().
 </parameter>
 <parameter name="G_LOG_LEVEL_MASK">
 <parameter_description> a mask including all log levels
+</parameter_description>
+</parameter>
+</parameters>
+</enum>
+
+<enum name="GLogWriterOutput">
+<description>
+Return values from #GLogWriterFuncs to indicate whether the given log entry
+was successfully handled by the writer, or whether there was an error in
+handling it (and hence a fallback writer should be used).
+
+If a #GLogWriterFunc ignores a log entry, it should return
+%G_LOG_WRITER_HANDLED.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="G_LOG_WRITER_HANDLED">
+<parameter_description> Log writer has handled the log entry.
+</parameter_description>
+</parameter>
+<parameter name="G_LOG_WRITER_UNHANDLED">
+<parameter_description> Log writer could not handle the log entry.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3399,7 +3423,7 @@ Old South Arabian. Since 2.26
 <description>
 These are the possible character classifications from the
 Unicode specification.
-See &lt;ulink url=&quot;http://www.unicode.org/Public/UNIDATA/UnicodeData.html&quot;&gt;http://www.unicode.org/Public/UNIDATA/UnicodeData.html&lt;/ulink&gt;.
+See &lt;ulink url=&quot;http://www.unicode.org/reports/tr44/#General_Category_Values&quot;&gt;Unicode Character Database&lt;/unlink&gt;.
 
 </description>
 <parameters>
@@ -3769,6 +3793,24 @@ Windows Server 2008 R2.
 </parameters>
 </enum>
 
+<function name="g_abort">
+<description>
+A wrapper for the POSIX abort() function.
+
+On Windows it is a function that makes extra effort (including a call
+to abort()) to ensure that a debugger-catchable exception is thrown
+before the program terminates.
+
+See your C library manual for more details about abort().
+
+Since: 2.50
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_access">
 <description>
 A wrapper for the POSIX access() function. This function is used to
@@ -3789,7 +3831,8 @@ Since: 2.8
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -6649,9 +6692,9 @@ g_autofree guint8* membuf = NULL;
 
 membuf = g_malloc (8192);
 
-/ * Some computation on membuf * /
+/&lt;!-- --&gt;* Some computation on membuf *&lt;!-- --&gt;/
 
-/ * membuf will be automatically freed here * /
+/&lt;!-- --&gt;* membuf will be automatically freed here *&lt;!-- --&gt;/
 return TRUE;
 }
 ]|
@@ -7888,8 +7931,8 @@ Since: 2.12
 </parameter_description>
 </parameter>
 <parameter name="full_path">
-<parameter_description> return location for a string containing the full path
-of the file, or %NULL
+<parameter_description> return location for a string
+containing the full path of the file, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -7917,7 +7960,8 @@ Since: 2.12
 </parameter_description>
 </parameter>
 <parameter name="filename">
-<parameter_description> the path of a filename to load, in the GLib file name encoding
+<parameter_description> the path of a filename to load, in the
+GLib file name encoding
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -8562,7 +8606,8 @@ be a relative path.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed with g_free().
+<return> a newly-allocated string that must be freed with
+g_free().
 </return>
 </function>
 
@@ -8577,11 +8622,13 @@ Since: 2.8
 </description>
 <parameters>
 <parameter name="args">
-<parameter_description> %NULL-terminated array of strings containing the path elements.
+<parameter_description> %NULL-terminated
+array of strings containing the path elements.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed with g_free().
+<return> a newly-allocated string that must be freed
+with g_free().
 
 </return>
 </function>
@@ -8631,7 +8678,8 @@ of the separator are ignored.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed with g_free().
+<return> a newly-allocated string that must be freed with
+g_free().
 </return>
 </function>
 
@@ -8650,11 +8698,13 @@ Since: 2.8
 </parameter_description>
 </parameter>
 <parameter name="args">
-<parameter_description> %NULL-terminated array of strings containing the path elements.
+<parameter_description> %NULL-terminated
+array of strings containing the path elements.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string that must be freed with g_free().
+<return> a newly-allocated string that must be freed
+with g_free().
 
 </return>
 </function>
@@ -11568,7 +11618,8 @@ Since: 2.8
 </description>
 <parameters>
 <parameter name="path">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 </parameters>
@@ -11920,7 +11971,8 @@ Since: 2.8
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -12729,6 +12781,37 @@ should be freed with g_free() when done using it.
 </return>
 </function>
 
+<function name="g_compute_hmac_for_bytes">
+<description>
+Computes the HMAC for a binary @data. This is a
+convenience wrapper for g_hmac_new(), g_hmac_get_string()
+and g_hmac_unref().
+
+The hexadecimal string returned will be in lower case.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="digest_type">
+<parameter_description> a #GChecksumType to use for the HMAC
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the key to use in the HMAC
+</parameter_description>
+</parameter>
+<parameter name="data">
+<parameter_description> binary blob to compute the HMAC of
+</parameter_description>
+</parameter>
+</parameters>
+<return> the HMAC of the binary data as a string in hexadecimal.
+The returned string should be freed with g_free() when done using it.
+
+</return>
+</function>
+
 <function name="g_compute_hmac_for_data">
 <description>
 Computes the HMAC for a binary @data of @length. This is a
@@ -13291,7 +13374,8 @@ Since: 2.8
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -13322,6 +13406,10 @@ setting the `G_DEBUG` environment variable (see
 If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
 manually.
+
+If structured logging is enabled, this will use g_log_structured();
+otherwise it will use g_log(). See
+[Using Structured Logging][using-structured-logging].
 
 </description>
 <parameters>
@@ -14374,7 +14462,7 @@ Returns the month of the year. The date must be valid.
 <function name="g_date_get_sunday_week_of_year">
 <description>
 Returns the week of the year during which this date falls, if
-weeks are understood to being on Sunday. The date must be valid.
+weeks are understood to begin on Sunday. The date must be valid.
 Can return 0 if the day is before the first Sunday of the year.
 
 
@@ -16362,8 +16450,13 @@ If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
 manually.
 
-Such messages are suppressed by the g_log_default_handler() unless
-the G_MESSAGES_DEBUG environment variable is set appropriately.
+Such messages are suppressed by the g_log_default_handler() and
+g_log_writer_default() unless the `G_MESSAGES_DEBUG` environment variable is
+set appropriately.
+
+If structured logging is enabled, this will use g_log_structured();
+otherwise it will use g_log(). See
+[Using Structured Logging][using-structured-logging].
 
 Since: 2.6
 
@@ -17028,6 +17121,9 @@ If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
 manually.
 
+If structured logging is enabled, this will use g_log_structured();
+otherwise it will use g_log(). See
+[Using Structured Logging][using-structured-logging].
 
 </description>
 <parameters>
@@ -17314,8 +17410,8 @@ Since: 2.4
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly-allocated string with the contents of the symbolic link, 
-or %NULL if an error occurred.
+<return> A newly-allocated string with the contents of
+the symbolic link, or %NULL if an error occurred.
 
 </return>
 </function>
@@ -17423,7 +17519,8 @@ extensions and those listed in the `PATHEXT` environment variable.
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a filename to test in the GLib file name encoding
+<parameter_description> a filename to test in the
+GLib file name encoding
 </parameter_description>
 </parameter>
 <parameter name="test">
@@ -17459,7 +17556,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> an absolute pathname in the GLib file name encoding
+<parameter_description> an absolute pathname in the
+GLib file name encoding
 </parameter_description>
 </parameter>
 </parameters>
@@ -17492,7 +17590,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname hopefully in the GLib file name encoding
+<parameter_description> a pathname hopefully in the
+GLib file name encoding
 </parameter_description>
 </parameter>
 </parameters>
@@ -17587,9 +17686,9 @@ component following Section 3.3. of RFC 2396.
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> an absolute filename specified in the GLib file name encoding,
-which is the on-disk file name bytes on Unix, and UTF-8 on 
-Windows
+<parameter_description> an absolute filename specified in the GLib file
+name encoding, which is the on-disk file name bytes on Unix, and UTF-8
+on Windows
 </parameter_description>
 </parameter>
 <parameter name="hostname">
@@ -17618,7 +17717,7 @@ the [current locale][setlocale].
 </description>
 <parameters>
 <parameter name="opsysstring">
-<parameter_description>   a string in the encoding for filenames
+<parameter_description> a string in the encoding for filenames
 </parameter_description>
 </parameter>
 <parameter name="len">
@@ -17682,7 +17781,8 @@ including the type suffix.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly-allocated string with the absolute path, or %NULL
+<return> a newly-allocated string with the absolute path,
+or %NULL
 </return>
 </function>
 
@@ -17820,7 +17920,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -17976,7 +18077,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -18133,7 +18235,7 @@ On Windows, the character set used in the GLib API is always UTF-8
 and said environment variables have no effect.
 
 `G_FILENAME_ENCODING` may be set to a comma-separated list of
-character set names. The special token &quot;@locale&quot; is taken
+character set names. The special token &quot;\@locale&quot; is taken
 to  mean the character set for the [current locale][setlocale].
 If `G_FILENAME_ENCODING` is not set, but `G_BROKEN_FILENAMES` is,
 the character set of the current locale is taken as the filename
@@ -18389,8 +18491,10 @@ Since: 2.6
 </description>
 <parameters>
 </parameters>
-<return> a %NULL-terminated array of strings owned by GLib that must 
-not be modified or freed.
+<return>
+a %NULL-terminated array of strings owned by GLib that must not be
+modified or freed.
+
 </return>
 </function>
 
@@ -18431,8 +18535,10 @@ Since: 2.6
 </description>
 <parameters>
 </parameters>
-<return> a %NULL-terminated array of strings owned by GLib that must 
-not be modified or freed.
+<return>
+a %NULL-terminated array of strings owned by GLib that must not be
+modified or freed.
+
 </return>
 </function>
 
@@ -18481,7 +18587,7 @@ Since: 2.6
 </description>
 <parameters>
 </parameters>
-<return> a string owned by GLib that must not be modified 
+<return> a string owned by GLib that must not be modified
 or freed.
 </return>
 </function>
@@ -18506,7 +18612,7 @@ Since: 2.6
 </description>
 <parameters>
 </parameters>
-<return> a string owned by GLib that must not be modified 
+<return> a string owned by GLib that must not be modified
 or freed.
 </return>
 </function>
@@ -18531,7 +18637,7 @@ Since: 2.6
 </description>
 <parameters>
 </parameters>
-<return> a string owned by GLib that must not be modified 
+<return> a string owned by GLib that must not be modified
 or freed.
 </return>
 </function>
@@ -18574,7 +18680,8 @@ Since: 2.28
 </description>
 <parameters>
 </parameters>
-<return> a string owned by GLib that must not be modified or freed.
+<return> a string owned by GLib that must not be
+modified or freed.
 
 </return>
 </function>
@@ -18601,8 +18708,8 @@ Since: 2.14
 </parameter_description>
 </parameter>
 </parameters>
-<return> the path to the specified special directory, or %NULL
-if the logical id was not found. The returned string is owned by
+<return> the path to the specified special directory, or
+%NULL if the logical id was not found. The returned string is owned by
 GLib and should not be modified or freed.
 
 </return>
@@ -20509,8 +20616,13 @@ If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
 manually.
 
-Such messages are suppressed by the g_log_default_handler() unless
-the G_MESSAGES_DEBUG environment variable is set appropriately.
+Such messages are suppressed by the g_log_default_handler() and
+g_log_writer_default() unless the `G_MESSAGES_DEBUG` environment variable is
+set appropriately.
+
+If structured logging is enabled, this will use g_log_structured();
+otherwise it will use g_log(). See
+[Using Structured Logging][using-structured-logging].
 
 Since: 2.40
 
@@ -22443,6 +22555,37 @@ Since: 2.6
 </return>
 </function>
 
+<function name="g_key_file_load_from_bytes">
+<description>
+Loads a key file from the data in @bytes into an empty #GKeyFile structure.
+If the object cannot be created then %error is set to a #GKeyFileError.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> an empty #GKeyFile struct
+</parameter_description>
+</parameter>
+<parameter name="bytes">
+<parameter_description> a #GBytes
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags from #GKeyFileFlags
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if a key file could be loaded, %FALSE otherwise
+
+</return>
+</function>
+
 <function name="g_key_file_load_from_data">
 <description>
 Loads a key file from memory into an empty #GKeyFile structure.  
@@ -24221,6 +24364,9 @@ If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
 manually.
 
+If [structured logging is enabled][using-structured-logging] this will
+output via the structured log writer function (see g_log_set_writer_func()).
+
 </description>
 <parameters>
 <parameter name="log_domain">
@@ -24270,6 +24416,9 @@ stderr is used for levels %G_LOG_LEVEL_ERROR, %G_LOG_LEVEL_CRITICAL,
 %G_LOG_LEVEL_WARNING and %G_LOG_LEVEL_MESSAGE. stdout is used for
 the rest.
 
+This has no effect if structured logging is enabled; see
+[Using Structured Logging][using-structured-logging].
+
 </description>
 <parameters>
 <parameter name="log_domain">
@@ -24297,6 +24446,9 @@ default &quot;&quot; application domain
 <description>
 Removes the log handler.
 
+This has no effect if structured logging is enabled; see
+[Using Structured Logging][using-structured-logging].
+
 </description>
 <parameters>
 <parameter name="log_domain">
@@ -24323,6 +24475,14 @@ You can also make some message levels fatal at runtime by setting
 the `G_DEBUG` environment variable (see
 [Running GLib Applications](glib-running.html)).
 
+Libraries should not call this function, as it affects all messages logged
+by a process, including those from other libraries.
+
+Structured log messages (using g_log_structured() and
+g_log_structured_array()) are fatal only if the default log writer is used;
+otherwise it is up to the writer function to determine which log messages
+are fatal. See [Using Structured Logging][using-structured-logging].
+
 
 </description>
 <parameters>
@@ -24342,6 +24502,9 @@ Installs a default log handler which is used if no
 log handler has been set for the particular log domain
 and log level combination. By default, GLib uses
 g_log_default_handler() as default log handler.
+
+This has no effect if structured logging is enabled; see
+[Using Structured Logging][using-structured-logging].
 
 Since: 2.6
 
@@ -24365,6 +24528,12 @@ Since: 2.6
 <description>
 Sets the log levels which are fatal in the given domain.
 %G_LOG_LEVEL_ERROR is always fatal.
+
+This has no effect on structured log messages (using g_log_structured() or
+g_log_structured_array()). To change the fatal behaviour for specific log
+messages, programs must install a custom log writer function using
+g_log_set_writer_func(). See
+[Using Structured Logging][using-structured-logging].
 
 
 </description>
@@ -24392,6 +24561,9 @@ bit flags.
 Note that since the #G_LOG_LEVEL_ERROR log level is always fatal, if
 you want to set a handler for this log level you must combine it with
 #G_LOG_FLAG_FATAL.
+
+This has no effect if structured logging is enabled; see
+[Using Structured Logging][using-structured-logging].
 
 Here is an example for adding a log handler for all warning messages
 in the default domain:
@@ -24444,6 +24616,9 @@ the log levels with the #G_LOG_FLAG_FATAL and
 <description>
 Like g_log_sets_handler(), but takes a destroy notify for the @user_data.
 
+This has no effect if structured logging is enabled; see
+[Using Structured Logging][using-structured-logging].
+
 Since: 2.46
 
 </description>
@@ -24478,6 +24653,418 @@ the log levels with the #G_LOG_FLAG_FATAL and
 </return>
 </function>
 
+<function name="g_log_set_writer_func">
+<description>
+Set a writer function which will be called to format and write out each log
+message. Each program should set a writer function, or the default writer
+(g_log_writer_default()) will be used.
+
+Libraries **must not** call this function — only programs are allowed to
+install a writer function, as there must be a single, central point where
+log messages are formatted and outputted.
+
+There can only be one writer function. It is an error to set more than one.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="func">
+<parameter_description> log writer function, which must not be %NULL
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data to pass to @func
+</parameter_description>
+</parameter>
+<parameter name="user_data_free">
+<parameter_description> function to free @user_data once it’s
+finished with, if non-%NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_log_structured">
+<description>
+Log a message with structured data. The message will be passed through to
+the log writer set by the application using g_log_set_writer_func(). If the
+message is fatal (i.e. its log level is %G_LOG_LEVEL_ERROR), the program will
+be aborted at the end of this function.
+
+The structured data is provided as key–value pairs, where keys are UTF-8
+strings, and values are arbitrary pointers — typically pointing to UTF-8
+strings, but that is not a requirement. To pass binary (non-nul-terminated)
+structured data, use g_log_structured_array(). The keys for structured data
+should follow the [systemd journal
+fields](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html)
+specification. It is suggested that custom keys are namespaced according to
+the code which sets them. For example, custom keys from GLib all have a
+`GLIB_` prefix.
+
+The @log_domain will be converted into a `GLIB_DOMAIN` field. @log_level will
+be converted into a
+[`PRIORITY`](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#PRIORITY=)
+field. The format string will have its placeholders substituted for the provided
+values and be converted into a
+[`MESSAGE`](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#MESSAGE=)
+field.
+
+Other fields you may commonly want to pass into this function:
+
+* [`MESSAGE_ID`](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#MESSAGE_ID=)
+* [`CODE_FILE`](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#CODE_FILE=)
+* [`CODE_LINE`](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#CODE_LINE=)
+* [`CODE_FUNC`](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#CODE_FUNC=)
+* [`ERRNO`](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#ERRNO=)
+
+Note that `CODE_FILE`, `CODE_LINE` and `CODE_FUNC` are automatically set by
+the logging macros, G_DEBUG_HERE(), g_message(), g_warning(), g_critical(),
+g_error(), etc, if the symbols `G_LOG_USE_STRUCTURED` is defined before including
+glib.h.
+
+For example:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+g_log_structured (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
+&quot;MESSAGE_ID&quot;, &quot;06d4df59e6c24647bfe69d2c27ef0b4e&quot;,
+&quot;MY_APPLICATION_CUSTOM_FIELD&quot;, &quot;some debug string&quot;,
+&quot;MESSAGE&quot;, &quot;This is a debug message about pointer %p and integer %u.&quot;,
+some_pointer, some_integer);
+]|
+
+Note that each `MESSAGE_ID` must be [uniquely and randomly
+generated](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html#MESSAGE_ID=).
+If adding a `MESSAGE_ID`, consider shipping a [message
+catalog](https://www.freedesktop.org/wiki/Software/systemd/catalog/) with
+your software.
+
+To pass a user data pointer to the log writer function which is specific to
+this logging call, you must use g_log_structured_array() and pass the pointer
+as a field with #GLogField.length set to zero, otherwise it will be
+interpreted as a string.
+
+For example:
+|[&lt;!-- language=&quot;C&quot; --&gt;
+const GLogField fields[] = {
+{ &quot;MESSAGE&quot;, &quot;This is a debug message.&quot;, -1 },
+{ &quot;MESSAGE_ID&quot;, &quot;fcfb2e1e65c3494386b74878f1abf893&quot;, -1 },
+{ &quot;MY_APPLICATION_CUSTOM_FIELD&quot;, &quot;some debug string&quot;, -1 },
+{ &quot;MY_APPLICATION_STATE&quot;, state_object, 0 },
+};
+g_log_structured_array (G_LOG_LEVEL_DEBUG, fields, G_N_ELEMENTS (fields));
+]|
+
+Note also that, even if no other structured fields are specified, there
+must always be a &quot;MESSAGE&quot; key before the format string. The &quot;MESSAGE&quot;-format
+pair has to be the last of the key-value pairs, and &quot;MESSAGE&quot; is the only
+field for which printf()-style formatting is supported.
+
+The default writer function for `stdout` and `stderr` will automatically
+append a new-line character after the message, so you should not add one
+manually to the format string.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="log_domain">
+<parameter_description> log domain, usually %G_LOG_DOMAIN
+</parameter_description>
+</parameter>
+<parameter name="log_level">
+<parameter_description> log level, either from #GLogLevelFlags, or a user-defined
+level
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> key-value pairs of structured data to add to the log entry, followed
+by the key &quot;MESSAGE&quot;, followed by a printf()-style message format,
+followed by parameters to insert in the format string
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_log_structured_array">
+<description>
+Log a message with structured data. The message will be passed through to the
+log writer set by the application using g_log_set_writer_func(). If the
+message is fatal (i.e. its log level is %G_LOG_LEVEL_ERROR), the program will
+be aborted at the end of this function.
+
+See g_log_structured() for more documentation.
+
+This assumes that @log_level is already present in @fields (typically as the
+`PRIORITY` field).
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="log_level">
+<parameter_description> log level, either from #GLogLevelFlags, or a user-defined
+level
+</parameter_description>
+</parameter>
+<parameter name="fields">
+<parameter_description> key–value pairs of structured data to add
+to the log message
+</parameter_description>
+</parameter>
+<parameter name="n_fields">
+<parameter_description> number of elements in the @fields array
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_log_variant">
+<description>
+Log a message with structured data, accepting the data within a #GVariant. This
+version is especially useful for use in other languages, via introspection.
+
+The only mandatory item in the @fields dictionary is the &quot;MESSAGE&quot; which must
+contain the text shown to the user.
+
+The values in the @fields dictionary are likely to be of type String
+(#G_VARIANT_TYPE_STRING). Array of bytes (#G_VARIANT_TYPE_BYTESTRING) is also
+supported. In this case the message is handled as binary and will be forwarded
+to the log writer as such. The size of the array should not be higher than
+%G_MAXSSIZE. Otherwise it will be truncated to this size. For other types
+g_variant_print() will be used to convert the value into a string.
+
+For more details on its usage and about the parameters, see g_log_structured().
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="log_domain">
+<parameter_description> log domain, usually %G_LOG_DOMAIN
+</parameter_description>
+</parameter>
+<parameter name="log_level">
+<parameter_description> log level, either from #GLogLevelFlags, or a user-defined
+level
+</parameter_description>
+</parameter>
+<parameter name="fields">
+<parameter_description> a dictionary (#GVariant of the type %G_VARIANT_TYPE_VARDICT)
+containing the key-value pairs of message data.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_log_writer_default">
+<description>
+Format a structured log message and output it to the default log destination
+for the platform. On Linux, this is typically the systemd journal, falling
+back to `stdout` or `stderr` if running from the terminal or if output is
+being redirected to a file.
+
+Support for other platform-specific logging mechanisms may be added in
+future. Distributors of GLib may modify this function to impose their own
+(documented) platform-specific log writing policies.
+
+This is suitable for use as a #GLogWriterFunc, and is the default writer used
+if no other is set using g_log_set_writer_func().
+
+As with g_log_default_handler(), this function drops debug and informational
+messages unless their log domain (or `all`) is listed in the space-separated
+`G_MESSAGES_DEBUG` environment variable.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="log_level">
+<parameter_description> log level, either from #GLogLevelFlags, or a user-defined
+level
+</parameter_description>
+</parameter>
+<parameter name="fields">
+<parameter_description> key–value pairs of structured data forming
+the log message
+</parameter_description>
+</parameter>
+<parameter name="n_fields">
+<parameter_description> number of elements in the @fields array
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to g_log_set_writer_func()
+</parameter_description>
+</parameter>
+</parameters>
+<return> %G_LOG_WRITER_HANDLED on success, %G_LOG_WRITER_UNHANDLED otherwise
+</return>
+</function>
+
+<function name="g_log_writer_format_fields">
+<description>
+Format a structured log message as a string suitable for outputting to the
+terminal (or elsewhere). This will include the values of all fields it knows
+how to interpret, which includes `MESSAGE` and `GLIB_DOMAIN` (see the
+documentation for g_log_structured()). It does not include values from
+unknown fields.
+
+The returned string does **not** have a trailing new-line character. It is
+encoded in the character set of the current locale, which is not necessarily
+UTF-8.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="log_level">
+<parameter_description> log level, either from #GLogLevelFlags, or a user-defined
+level
+</parameter_description>
+</parameter>
+<parameter name="fields">
+<parameter_description> key–value pairs of structured data forming
+the log message
+</parameter_description>
+</parameter>
+<parameter name="n_fields">
+<parameter_description> number of elements in the @fields array
+</parameter_description>
+</parameter>
+<parameter name="use_color">
+<parameter_description> %TRUE to use ANSI color escape sequences when formatting the
+message, %FALSE to not
+</parameter_description>
+</parameter>
+</parameters>
+<return> string containing the formatted log message, in
+the character set of the current locale
+</return>
+</function>
+
+<function name="g_log_writer_is_journald">
+<description>
+Check whether the given @output_fd file descriptor is a connection to the
+systemd journal, or something else (like a log file or `stdout` or
+`stderr`).
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="output_fd">
+<parameter_description> output file descriptor to check
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @output_fd points to the journal, %FALSE otherwise
+</return>
+</function>
+
+<function name="g_log_writer_journald">
+<description>
+Format a structured log message and send it to the systemd journal as a set
+of key–value pairs. All fields are sent to the journal, but if a field has
+length zero (indicating program-specific data) then only its key will be
+sent.
+
+This is suitable for use as a #GLogWriterFunc.
+
+If GLib has been compiled without systemd support, this function is still
+defined, but will always return %G_LOG_WRITER_UNHANDLED.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="log_level">
+<parameter_description> log level, either from #GLogLevelFlags, or a user-defined
+level
+</parameter_description>
+</parameter>
+<parameter name="fields">
+<parameter_description> key–value pairs of structured data forming
+the log message
+</parameter_description>
+</parameter>
+<parameter name="n_fields">
+<parameter_description> number of elements in the @fields array
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to g_log_set_writer_func()
+</parameter_description>
+</parameter>
+</parameters>
+<return> %G_LOG_WRITER_HANDLED on success, %G_LOG_WRITER_UNHANDLED otherwise
+</return>
+</function>
+
+<function name="g_log_writer_standard_streams">
+<description>
+Format a structured log message and print it to either `stdout` or `stderr`,
+depending on its log level. %G_LOG_LEVEL_INFO and %G_LOG_LEVEL_DEBUG messages
+are sent to `stdout`; all other log levels are sent to `stderr`. Only fields
+which are understood by this function are included in the formatted string
+which is printed.
+
+If the output stream supports ANSI color escape sequences, they will be used
+in the output.
+
+A trailing new-line character is added to the log message when it is printed.
+
+This is suitable for use as a #GLogWriterFunc.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="log_level">
+<parameter_description> log level, either from #GLogLevelFlags, or a user-defined
+level
+</parameter_description>
+</parameter>
+<parameter name="fields">
+<parameter_description> key–value pairs of structured data forming
+the log message
+</parameter_description>
+</parameter>
+<parameter name="n_fields">
+<parameter_description> number of elements in the @fields array
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data passed to g_log_set_writer_func()
+</parameter_description>
+</parameter>
+</parameters>
+<return> %G_LOG_WRITER_HANDLED on success, %G_LOG_WRITER_UNHANDLED otherwise
+</return>
+</function>
+
+<function name="g_log_writer_supports_color">
+<description>
+Check whether the given @output_fd file descriptor supports ANSI color
+escape sequences. If so, they can safely be used when formatting log
+messages.
+
+Since: 2.50
+
+</description>
+<parameters>
+<parameter name="output_fd">
+<parameter_description> output file descriptor to check
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if ANSI color escapes are supported, %FALSE otherwise
+</return>
+</function>
+
 <function name="g_logv">
 <description>
 Logs an error or debugging message.
@@ -24488,6 +25075,9 @@ function is called to terminate the program.
 If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
 manually.
+
+If [structured logging is enabled][using-structured-logging] this will
+output via the structured log writer function (see g_log_set_writer_func()).
 
 </description>
 <parameters>
@@ -24527,7 +25117,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="buf">
@@ -25001,9 +25592,20 @@ the context used by functions like g_idle_add().
 Normally you would call this function shortly after creating a new
 thread, passing it a #GMainContext which will be run by a
 #GMainLoop in that thread, to set a new default context for all
-async operations in that thread. (In this case, you don't need to
-ever call g_main_context_pop_thread_default().) In some cases
-however, you may want to schedule a single operation in a
+async operations in that thread. In this case you may not need to
+ever call g_main_context_pop_thread_default(), assuming you want the
+new #GMainContext to be the default for the whole lifecycle of the
+thread.
+
+If you don't have control over how the new thread was created (e.g.
+in the new thread isn't newly created, or if the thread life
+cycle is managed by a #GThreadPool), it is always suggested to wrap
+the logic that needs to use the new #GMainContext inside a
+g_main_context_push_thread_default() / g_main_context_pop_thread_default()
+pair, otherwise threads that are re-used will end up never explicitly
+releasing the #GMainContext reference they hold.
+
+In some cases you may want to schedule a single operation in a
 non-default context, or temporarily use a non-default context in
 the main thread. In that case, you can wrap the call to the
 asynchronous operation inside a
@@ -25815,7 +26417,8 @@ Since: 2.8
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> The path of the file to load, in the GLib filename encoding
+<parameter_description> The path of the file to load, in the GLib
+filename encoding
 </parameter_description>
 </parameter>
 <parameter name="writable">
@@ -27053,6 +27656,10 @@ If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
 manually.
 
+If structured logging is enabled, this will use g_log_structured();
+otherwise it will use g_log(). See
+[Using Structured Logging][using-structured-logging].
+
 </description>
 <parameters>
 <parameter name="Varargs">
@@ -27077,7 +27684,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="mode">
@@ -27138,8 +27746,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> A pointer to @tmpl, which has been modified
-to hold the directory name.  In case of errors, %NULL is
+<return> A pointer to @tmpl, which has been
+modified to hold the directory name.  In case of errors, %NULL is
 returned and %errno will be set.
 
 </return>
@@ -27172,8 +27780,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 </parameters>
-<return> A pointer to @tmpl, which has been modified
-to hold the directory name. In case of errors, %NULL is
+<return> A pointer to @tmpl, which has been
+modified to hold the directory name. In case of errors, %NULL is
 returned, and %errno will be set.
 
 </return>
@@ -30408,7 +31016,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -32861,7 +33470,8 @@ is not an absolute path it returns %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a pointer into @file_name after the root component
+<return> a pointer into @file_name after the
+root component
 </return>
 </function>
 
@@ -33181,8 +33791,8 @@ its own new-line character.
 g_print() should not be used from within libraries for debugging
 messages, since it may be redirected by applications to special
 purpose message windows or even files. Instead, libraries should
-use g_log(), or the convenience functions g_message(), g_warning()
-and g_error().
+use g_log(), g_log_structured(), or the convenience macros g_message(),
+g_warning() and g_error().
 
 </description>
 <parameters>
@@ -33206,8 +33816,8 @@ a trailing new-line character. Typically, @format should end with its own
 new-line character.
 
 g_printerr() should not be used from within libraries.
-Instead g_log() should be used, or the convenience functions
-g_message(), g_warning() and g_error().
+Instead g_log() or g_log_structured() should be used, or the convenience
+macros g_message(), g_warning() and g_error().
 
 </description>
 <parameters>
@@ -35455,6 +36065,10 @@ Since: 2.14
 <description>
 Returns the compile options that @regex was created with.
 
+Depending on the version of PCRE that is used, this may or may not
+include flags set by option expressions such as `(?i)` found at the
+top-level within the compiled pattern.
+
 Since: 2.26
 
 </description>
@@ -36599,7 +37213,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 </parameters>
@@ -36623,7 +37238,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="oldfilename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="newfilename">
@@ -36783,7 +37399,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 </parameters>
@@ -39258,7 +39875,7 @@ button_clicked_cb (GtkButton *button, GtkWidget *other_widget)
 gtk_widget_hide (other_widget);
 }
 
-…
+...
 
 g_signal_connect (button, &quot;clicked&quot;,
 (GCallback) button_clicked_cb, other_widget);
@@ -43088,7 +43705,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="buf">
@@ -45419,6 +46037,10 @@ Joins a number of strings together to form one long string, with the
 optional @separator inserted between each of them. The returned string
 should be freed with g_free().
 
+If @str_array has no items, the return value will be an
+empty string. If @str_array contains a single item, @separator will not
+appear in the resulting string.
+
 
 </description>
 <parameters>
@@ -46058,6 +46680,10 @@ Since: 2.16
 Asserts that all messages previously indicated via
 g_test_expect_message() have been seen and suppressed.
 
+This API may only be used with the old logging API (g_log() without
+%G_LOG_USE_STRUCTURED defined). It will not work with the structured logging
+API. See [Testing for Messages][testing-for-messages].
+
 If messages at %G_LOG_LEVEL_DEBUG are emitted, but not explicitly
 expected via g_test_expect_message() then they will be ignored.
 
@@ -46236,6 +46862,10 @@ Indicates that a message with the given @log_domain and @log_level,
 with text matching @pattern, is expected to be logged. When this
 message is logged, it will not be printed, and the test case will
 not abort.
+
+This API may only be used with the old logging API (g_log() without
+%G_LOG_USE_STRUCTURED defined). It will not work with the structured logging
+API. See [Testing for Messages][testing-for-messages].
 
 Use g_test_assert_expected_messages() to assert that all
 previously-expected messages have been seen and suppressed.
@@ -46453,7 +47083,7 @@ be skipped (ie, a test whose name contains &quot;/subprocess&quot;).
 `quick`: Quick tests, should run really quickly and give good coverage.
 
 `undefined`: Tests for undefined behaviour, may provoke programming errors
-under g_test_trap_subprocess() or g_test_expect_messages() to check
+under g_test_trap_subprocess() or g_test_expect_message() to check
 that appropriate assertions or warnings are given
 
 `no-undefined`: Avoid tests for undefined behaviour
@@ -46565,6 +47195,12 @@ any test case, so you have to set it inside each test
 function which needs the special behavior.
 
 This handler has no effect on g_error messages.
+
+This handler also has no effect on structured log messages (using
+g_log_structured() or g_log_structured_array()). To change the fatal
+behaviour for specific log messages, programs must install a custom log
+writer function using g_log_set_writer_func().See
+[Using Structured Logging][using-structured-logging].
 
 Since: 2.22
 
@@ -52572,7 +53208,8 @@ Since: 2.6
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 </parameters>
@@ -53627,7 +54264,8 @@ Since: 2.18
 </description>
 <parameters>
 <parameter name="filename">
-<parameter_description> a pathname in the GLib file name encoding (UTF-8 on Windows)
+<parameter_description> a pathname in the GLib file name encoding
+(UTF-8 on Windows)
 </parameter_description>
 </parameter>
 <parameter name="utb">
@@ -53734,7 +54372,7 @@ Deprecated: 2.32: Use #GArray and g_array_insert_val() instead.
 </parameter_description>
 </parameter>
 <parameter name="index_">
-<parameter_description> insertion position, must be &lt;= value_array-&gt;n_values
+<parameter_description> insertion position, must be &lt;= value_array-&gt;;n_values
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -55155,8 +55793,8 @@ a #GValue of type @dest_type.
 <description>
 Check whether g_value_transform() is able to transform values
 of type @src_type into values of type @dest_type. Note that for
-the types to be transformable, they must be compatible and a
-transform function must be registered.
+the types to be transformable, they must be compatible or a
+transformation function must be registered.
 
 
 </description>
@@ -55379,7 +56017,10 @@ Ends the builder process and returns the constructed value.
 It is not permissible to use @builder in any way after this call
 except for reference counting operations (in the case of a
 heap-allocated #GVariantBuilder) or by reinitialising it with
-g_variant_builder_init() (in the case of stack-allocated).
+g_variant_builder_init() (in the case of stack-allocated). This
+means that for the stack-allocated builders there is no need to
+call g_variant_builder_clear() after the call to
+g_variant_builder_end().
 
 It is an error to call this function in any way that would create an
 inconsistent value to be constructed (ie: insufficient number of
@@ -56272,6 +56913,9 @@ non-%NULL nul-terminated string will be returned by this function.
 If the array contains a nul terminator character somewhere other than
 the last byte then the returned string is the string, up to the first
 such nul character.
+
+g_variant_get_fixed_array() should be used instead if the array contains
+arbitrary data that could not be nul-terminated or could contain nul bytes.
 
 It is an error to call this function with a @value that is not an
 array of bytes.
@@ -59815,6 +60459,10 @@ environment variable (see
 If g_log_default_handler() is used as the log handler function,
 a newline character will automatically be appended to @..., and
 need not be entered manually.
+
+If structured logging is enabled, this will use g_log_structured();
+otherwise it will use g_log(). See
+[Using Structured Logging][using-structured-logging].
 
 </description>
 <parameters>
