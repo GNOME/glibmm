@@ -370,6 +370,13 @@
   (gtype-id "G_TYPE_NETWORK_MONITOR_NM")
 )
 
+(define-object MonitorPortal
+  (in-module "GNetwork")
+  (parent "GNetworkMonitorBase")
+  (c-name "GNetworkMonitorPortal")
+  (gtype-id "G_TYPE_NETWORK_MONITOR_PORTAL")
+)
+
 (define-object Service
   (in-module "GNetwork")
   (parent "GObject")
@@ -764,6 +771,66 @@
   (parent "GObject")
   (c-name "GWin32RegistryKey")
   (gtype-id "G_TYPE_WIN32_REGISTRY_KEY")
+)
+
+(define-object Documents
+  (in-module "GXdp")
+  (c-name "GXdpDocuments")
+  (gtype-id "G_TYPE_XDP_DOCUMENTS")
+)
+
+(define-object DocumentsProxy
+  (in-module "GXdp")
+  (parent "GDBusProxy")
+  (c-name "GXdpDocumentsProxy")
+  (gtype-id "G_TYPE_XDP_DOCUMENTS_PROXY")
+)
+
+(define-object DocumentsSkeleton
+  (in-module "GXdp")
+  (parent "GDBusInterfaceSkeleton")
+  (c-name "GXdpDocumentsSkeleton")
+  (gtype-id "G_TYPE_XDP_DOCUMENTS_SKELETON")
+)
+
+(define-object NetworkMonitor
+  (in-module "GXdp")
+  (c-name "GXdpNetworkMonitor")
+  (gtype-id "G_TYPE_XDP_NETWORK_MONITOR")
+)
+
+(define-object NetworkMonitorProxy
+  (in-module "GXdp")
+  (parent "GDBusProxy")
+  (c-name "GXdpNetworkMonitorProxy")
+  (gtype-id "G_TYPE_XDP_NETWORK_MONITOR_PROXY")
+)
+
+(define-object NetworkMonitorSkeleton
+  (in-module "GXdp")
+  (parent "GDBusInterfaceSkeleton")
+  (c-name "GXdpNetworkMonitorSkeleton")
+  (gtype-id "G_TYPE_XDP_NETWORK_MONITOR_SKELETON")
+)
+
+(define-object ProxyResolver
+  (in-module "GXdp")
+  (c-name "GXdpProxyResolver")
+  (gtype-id "G_TYPE_XDP_PROXY_RESOLVER")
+)
+
+(define-object ProxyResolverProxy
+  (in-module "GXdp")
+  (parent "GDBusProxy")
+  (c-name "GXdpProxyResolverProxy")
+  (gtype-id "G_TYPE_XDP_PROXY_RESOLVER_PROXY")
+)
+
+(define-object ProxyResolverSkeleton
+  (in-module "GXdp")
+  (parent "GDBusInterfaceSkeleton")
+  (c-name "GXdpProxyResolverSkeleton")
+  (gtype-id "G_TYPE_XDP_PROXY_RESOLVER_SKELETON")
 )
 
 ;; Enumerations and flags ...
@@ -2318,6 +2385,27 @@
   (parameters
     '("const-char*" "uri")
     '("GAppLaunchContext*" "launch_context")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_app_info_launch_default_for_uri_async
+  (c-name "g_app_info_launch_default_for_uri_async")
+  (return-type "none")
+  (parameters
+    '("const-char*" "uri")
+    '("GAppLaunchContext*" "launch_context")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function g_app_info_launch_default_for_uri_finish
+  (c-name "g_app_info_launch_default_for_uri_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "result")
     '("GError**" "error")
   )
 )
@@ -6834,6 +6922,19 @@
 
 
 
+;; From gdocumentportal.h
+
+(define-function g_document_portal_add_document
+  (c-name "g_document_portal_add_document")
+  (return-type "char*")
+  (parameters
+    '("GFile*" "file")
+    '("GError**" "error")
+  )
+)
+
+
+
 ;; From gdrive.h
 
 (define-function g_drive_get_type
@@ -6869,6 +6970,12 @@
   (of-object "GDrive")
   (c-name "g_drive_get_volumes")
   (return-type "GList*")
+)
+
+(define-method is_removable
+  (of-object "GDrive")
+  (c-name "g_drive_is_removable")
+  (return-type "gboolean")
 )
 
 (define-method is_media_removable
@@ -11100,6 +11207,10 @@
 
 
 
+;; From gio_probes.h
+
+
+
 ;; From gioscheduler.h
 
 (define-function g_io_scheduler_push_job
@@ -11243,6 +11354,232 @@
   (c-name "g_io_stream_clear_pending")
   (return-type "none")
 )
+
+
+
+;; From gio-tool.h
+
+(define-function print_file_error
+  (c-name "print_file_error")
+  (return-type "none")
+  (parameters
+    '("GFile*" "file")
+    '("const-char*" "message")
+  )
+)
+
+(define-function show_help
+  (c-name "show_help")
+  (return-type "none")
+  (parameters
+    '("GOptionContext*" "context")
+    '("const-char*" "message")
+  )
+)
+
+(define-function file_type_to_string
+  (c-name "file_type_to_string")
+  (return-type "const-char*")
+  (parameters
+    '("GFileType" "type")
+  )
+)
+
+(define-function attribute_type_to_string
+  (c-name "attribute_type_to_string")
+  (return-type "const-char*")
+  (parameters
+    '("GFileAttributeType" "type")
+  )
+)
+
+(define-function attribute_type_from_string
+  (c-name "attribute_type_from_string")
+  (return-type "GFileAttributeType")
+  (parameters
+    '("const-char*" "str")
+  )
+)
+
+(define-function attribute_flags_to_string
+  (c-name "attribute_flags_to_string")
+  (return-type "char*")
+  (parameters
+    '("GFileAttributeInfoFlags" "flags")
+  )
+)
+
+(define-function file_is_dir
+  (c-name "file_is_dir")
+  (return-type "gboolean")
+  (parameters
+    '("GFile*" "file")
+  )
+)
+
+(define-function handle_cat
+  (c-name "handle_cat")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_copy
+  (c-name "handle_copy")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_info
+  (c-name "handle_info")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_list
+  (c-name "handle_list")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_mime
+  (c-name "handle_mime")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_mkdir
+  (c-name "handle_mkdir")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_monitor
+  (c-name "handle_monitor")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_mount
+  (c-name "handle_mount")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_move
+  (c-name "handle_move")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_open
+  (c-name "handle_open")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_rename
+  (c-name "handle_rename")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_remove
+  (c-name "handle_remove")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_save
+  (c-name "handle_save")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_set
+  (c-name "handle_set")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_trash
+  (c-name "handle_trash")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+(define-function handle_tree
+  (c-name "handle_tree")
+  (return-type "int")
+  (parameters
+    '("int" "argc")
+    '("char*[]" "argv")
+    '("gboolean" "do_help")
+  )
+)
+
+
+
+;; From gio_trace.h
 
 
 
@@ -12696,6 +13033,15 @@
 
 
 
+;; From gnetworkmonitorportal.h
+
+(define-function g_network_monitor_portal_get_type
+  (c-name "g_network_monitor_portal_get_type")
+  (return-type "GType")
+)
+
+
+
 ;; From gnetworkservice.h
 
 (define-function g_network_service_get_type
@@ -13438,6 +13784,20 @@
 
 
 
+;; From gportalsupport.h
+
+(define-function glib_should_use_portal
+  (c-name "glib_should_use_portal")
+  (return-type "gboolean")
+)
+
+(define-function glib_network_available_in_sandbox
+  (c-name "glib_network_available_in_sandbox")
+  (return-type "gboolean")
+)
+
+
+
 ;; From gpropertyaction.h
 
 (define-function g_property_action_get_type
@@ -13640,6 +14000,15 @@
     '("GAsyncResult*" "result")
     '("GError**" "error")
   )
+)
+
+
+
+;; From gproxyresolverportal.h
+
+(define-function g_proxy_resolver_portal_get_type
+  (c-name "g_proxy_resolver_portal_get_type")
+  (return-type "GType")
 )
 
 
@@ -14505,6 +14874,25 @@
   )
 )
 
+(define-method get_int64
+  (of-object "GSettings")
+  (c-name "g_settings_get_int64")
+  (return-type "gint64")
+  (parameters
+    '("const-gchar*" "key")
+  )
+)
+
+(define-method set_int64
+  (of-object "GSettings")
+  (c-name "g_settings_set_int64")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "key")
+    '("gint64" "value")
+  )
+)
+
 (define-method get_uint
   (of-object "GSettings")
   (c-name "g_settings_get_uint")
@@ -14521,6 +14909,25 @@
   (parameters
     '("const-gchar*" "key")
     '("guint" "value")
+  )
+)
+
+(define-method get_uint64
+  (of-object "GSettings")
+  (c-name "g_settings_get_uint64")
+  (return-type "guint64")
+  (parameters
+    '("const-gchar*" "key")
+  )
+)
+
+(define-method set_uint64
+  (of-object "GSettings")
+  (c-name "g_settings_set_uint64")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "key")
+    '("guint64" "value")
   )
 )
 
@@ -19222,6 +19629,30 @@
   (return-type "GVfs*")
 )
 
+(define-method register_uri_scheme
+  (of-object "GVfs")
+  (c-name "g_vfs_register_uri_scheme")
+  (return-type "gboolean")
+  (parameters
+    '("const-char*" "scheme")
+    '("GVfsFileLookupFunc" "uri_func")
+    '("gpointer" "uri_data")
+    '("GDestroyNotify" "uri_destroy")
+    '("GVfsFileLookupFunc" "parse_name_func")
+    '("gpointer" "parse_name_data")
+    '("GDestroyNotify" "parse_name_destroy")
+  )
+)
+
+(define-method unregister_uri_scheme
+  (of-object "GVfs")
+  (c-name "g_vfs_unregister_uri_scheme")
+  (return-type "gboolean")
+  (parameters
+    '("const-char*" "scheme")
+  )
+)
+
 
 
 ;; From gvolume.h
@@ -19916,6 +20347,795 @@
     '("const-gchar*" "file_uri")
     '("const-GLocalFileStat*" "file_stat_buf")
   )
+)
+
+
+
+;; From xdp-dbus.h
+
+(define-function gxdp_documents_get_type
+  (c-name "gxdp_documents_get_type")
+  (return-type "GType")
+)
+
+(define-function gxdp_documents_interface_info
+  (c-name "gxdp_documents_interface_info")
+  (return-type "GDBusInterfaceInfo*")
+)
+
+(define-function gxdp_documents_override_properties
+  (c-name "gxdp_documents_override_properties")
+  (return-type "guint")
+  (parameters
+    '("GObjectClass*" "klass")
+    '("guint" "property_id_begin")
+  )
+)
+
+(define-method complete_get_mount_point
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_get_mount_point")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+    '("const-gchar*" "path")
+  )
+)
+
+(define-method complete_add
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_add")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+    '("GUnixFDList*" "fd_list")
+    '("const-gchar*" "doc_id")
+  )
+)
+
+(define-method complete_add_named
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_add_named")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+    '("GUnixFDList*" "fd_list")
+    '("const-gchar*" "doc_id")
+  )
+)
+
+(define-method complete_grant_permissions
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_grant_permissions")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+  )
+)
+
+(define-method complete_revoke_permissions
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_revoke_permissions")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+  )
+)
+
+(define-method complete_delete
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_delete")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+  )
+)
+
+(define-method complete_lookup
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_lookup")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+    '("const-gchar*" "doc_id")
+  )
+)
+
+(define-method complete_info
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_info")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+    '("const-gchar*" "path")
+    '("GVariant*" "apps")
+  )
+)
+
+(define-method complete_list
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_complete_list")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+    '("GVariant*" "docs")
+  )
+)
+
+(define-method call_get_mount_point
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_get_mount_point")
+  (return-type "none")
+  (parameters
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_get_mount_point_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_get_mount_point_finish")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "out_path")
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_get_mount_point_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_get_mount_point_sync")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "out_path")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_add
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_add")
+  (return-type "none")
+  (parameters
+    '("GVariant*" "arg_o_path_fd")
+    '("gboolean" "arg_reuse_existing")
+    '("gboolean" "arg_persistent")
+    '("GUnixFDList*" "fd_list")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_add_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_add_finish")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "out_doc_id")
+    '("GUnixFDList**" "out_fd_list")
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_add_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_add_sync")
+  (return-type "gboolean")
+  (parameters
+    '("GVariant*" "arg_o_path_fd")
+    '("gboolean" "arg_reuse_existing")
+    '("gboolean" "arg_persistent")
+    '("GUnixFDList*" "fd_list")
+    '("gchar**" "out_doc_id")
+    '("GUnixFDList**" "out_fd_list")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_add_named
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_add_named")
+  (return-type "none")
+  (parameters
+    '("GVariant*" "arg_o_path_parent_fd")
+    '("const-gchar*" "arg_filename")
+    '("gboolean" "arg_reuse_existing")
+    '("gboolean" "arg_persistent")
+    '("GUnixFDList*" "fd_list")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_add_named_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_add_named_finish")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "out_doc_id")
+    '("GUnixFDList**" "out_fd_list")
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_add_named_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_add_named_sync")
+  (return-type "gboolean")
+  (parameters
+    '("GVariant*" "arg_o_path_parent_fd")
+    '("const-gchar*" "arg_filename")
+    '("gboolean" "arg_reuse_existing")
+    '("gboolean" "arg_persistent")
+    '("GUnixFDList*" "fd_list")
+    '("gchar**" "out_doc_id")
+    '("GUnixFDList**" "out_fd_list")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_grant_permissions
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_grant_permissions")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "arg_doc_id")
+    '("const-gchar*" "arg_app_id")
+    '("const-gchar*-const*" "arg_permissions")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_grant_permissions_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_grant_permissions_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_grant_permissions_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_grant_permissions_sync")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "arg_doc_id")
+    '("const-gchar*" "arg_app_id")
+    '("const-gchar*-const*" "arg_permissions")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_revoke_permissions
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_revoke_permissions")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "arg_doc_id")
+    '("const-gchar*" "arg_app_id")
+    '("const-gchar*-const*" "arg_permissions")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_revoke_permissions_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_revoke_permissions_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_revoke_permissions_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_revoke_permissions_sync")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "arg_doc_id")
+    '("const-gchar*" "arg_app_id")
+    '("const-gchar*-const*" "arg_permissions")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_delete
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_delete")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "arg_doc_id")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_delete_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_delete_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_delete_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_delete_sync")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "arg_doc_id")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_lookup
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_lookup")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "arg_filename")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_lookup_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_lookup_finish")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "out_doc_id")
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_lookup_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_lookup_sync")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "arg_filename")
+    '("gchar**" "out_doc_id")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_info
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_info")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "arg_doc_id")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_info_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_info_finish")
+  (return-type "gboolean")
+  (parameters
+    '("gchar**" "out_path")
+    '("GVariant**" "out_apps")
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_info_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_info_sync")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "arg_doc_id")
+    '("gchar**" "out_path")
+    '("GVariant**" "out_apps")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_list
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_list")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "arg_app_id")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_list_finish
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_list_finish")
+  (return-type "gboolean")
+  (parameters
+    '("GVariant**" "out_docs")
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_list_sync
+  (of-object "GXdpDocuments")
+  (c-name "gxdp_documents_call_list_sync")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "arg_app_id")
+    '("GVariant**" "out_docs")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_documents_proxy_get_type
+  (c-name "gxdp_documents_proxy_get_type")
+  (return-type "GType")
+)
+
+(define-function gxdp_documents_proxy_new_finish
+  (c-name "gxdp_documents_proxy_new_finish")
+  (return-type "GXdpDocuments*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_documents_proxy_new_sync
+  (c-name "gxdp_documents_proxy_new_sync")
+  (return-type "GXdpDocuments*")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_documents_proxy_new_for_bus
+  (c-name "gxdp_documents_proxy_new_for_bus")
+  (return-type "none")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function gxdp_documents_proxy_new_for_bus_finish
+  (c-name "gxdp_documents_proxy_new_for_bus_finish")
+  (return-type "GXdpDocuments*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_documents_proxy_new_for_bus_sync
+  (c-name "gxdp_documents_proxy_new_for_bus_sync")
+  (return-type "GXdpDocuments*")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_documents_skeleton_get_type
+  (c-name "gxdp_documents_skeleton_get_type")
+  (return-type "GType")
+)
+
+(define-function gxdp_network_monitor_get_type
+  (c-name "gxdp_network_monitor_get_type")
+  (return-type "GType")
+)
+
+(define-function gxdp_network_monitor_interface_info
+  (c-name "gxdp_network_monitor_interface_info")
+  (return-type "GDBusInterfaceInfo*")
+)
+
+(define-function gxdp_network_monitor_override_properties
+  (c-name "gxdp_network_monitor_override_properties")
+  (return-type "guint")
+  (parameters
+    '("GObjectClass*" "klass")
+    '("guint" "property_id_begin")
+  )
+)
+
+(define-method emit_changed
+  (of-object "GXdpNetworkMonitor")
+  (c-name "gxdp_network_monitor_emit_changed")
+  (return-type "none")
+  (parameters
+    '("gboolean" "arg_available")
+  )
+)
+
+(define-method get_available
+  (of-object "GXdpNetworkMonitor")
+  (c-name "gxdp_network_monitor_get_available")
+  (return-type "gboolean")
+)
+
+(define-method set_available
+  (of-object "GXdpNetworkMonitor")
+  (c-name "gxdp_network_monitor_set_available")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method get_metered
+  (of-object "GXdpNetworkMonitor")
+  (c-name "gxdp_network_monitor_get_metered")
+  (return-type "gboolean")
+)
+
+(define-method set_metered
+  (of-object "GXdpNetworkMonitor")
+  (c-name "gxdp_network_monitor_set_metered")
+  (return-type "none")
+  (parameters
+    '("gboolean" "value")
+  )
+)
+
+(define-method get_connectivity
+  (of-object "GXdpNetworkMonitor")
+  (c-name "gxdp_network_monitor_get_connectivity")
+  (return-type "guint")
+)
+
+(define-method set_connectivity
+  (of-object "GXdpNetworkMonitor")
+  (c-name "gxdp_network_monitor_set_connectivity")
+  (return-type "none")
+  (parameters
+    '("guint" "value")
+  )
+)
+
+(define-function gxdp_network_monitor_proxy_get_type
+  (c-name "gxdp_network_monitor_proxy_get_type")
+  (return-type "GType")
+)
+
+(define-function gxdp_network_monitor_proxy_new_finish
+  (c-name "gxdp_network_monitor_proxy_new_finish")
+  (return-type "GXdpNetworkMonitor*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_network_monitor_proxy_new_sync
+  (c-name "gxdp_network_monitor_proxy_new_sync")
+  (return-type "GXdpNetworkMonitor*")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_network_monitor_proxy_new_for_bus
+  (c-name "gxdp_network_monitor_proxy_new_for_bus")
+  (return-type "none")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function gxdp_network_monitor_proxy_new_for_bus_finish
+  (c-name "gxdp_network_monitor_proxy_new_for_bus_finish")
+  (return-type "GXdpNetworkMonitor*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_network_monitor_proxy_new_for_bus_sync
+  (c-name "gxdp_network_monitor_proxy_new_for_bus_sync")
+  (return-type "GXdpNetworkMonitor*")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_network_monitor_skeleton_get_type
+  (c-name "gxdp_network_monitor_skeleton_get_type")
+  (return-type "GType")
+)
+
+(define-function gxdp_proxy_resolver_get_type
+  (c-name "gxdp_proxy_resolver_get_type")
+  (return-type "GType")
+)
+
+(define-function gxdp_proxy_resolver_interface_info
+  (c-name "gxdp_proxy_resolver_interface_info")
+  (return-type "GDBusInterfaceInfo*")
+)
+
+(define-function gxdp_proxy_resolver_override_properties
+  (c-name "gxdp_proxy_resolver_override_properties")
+  (return-type "guint")
+  (parameters
+    '("GObjectClass*" "klass")
+    '("guint" "property_id_begin")
+  )
+)
+
+(define-method complete_lookup
+  (of-object "GXdpProxyResolver")
+  (c-name "gxdp_proxy_resolver_complete_lookup")
+  (return-type "none")
+  (parameters
+    '("GDBusMethodInvocation*" "invocation")
+    '("const-gchar*-const*" "proxies")
+  )
+)
+
+(define-method call_lookup
+  (of-object "GXdpProxyResolver")
+  (c-name "gxdp_proxy_resolver_call_lookup")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "arg_uri")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-method call_lookup_finish
+  (of-object "GXdpProxyResolver")
+  (c-name "gxdp_proxy_resolver_call_lookup_finish")
+  (return-type "gboolean")
+  (parameters
+    '("gchar***" "out_proxies")
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-method call_lookup_sync
+  (of-object "GXdpProxyResolver")
+  (c-name "gxdp_proxy_resolver_call_lookup_sync")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "arg_uri")
+    '("gchar***" "out_proxies")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_proxy_resolver_proxy_get_type
+  (c-name "gxdp_proxy_resolver_proxy_get_type")
+  (return-type "GType")
+)
+
+(define-function gxdp_proxy_resolver_proxy_new_finish
+  (c-name "gxdp_proxy_resolver_proxy_new_finish")
+  (return-type "GXdpProxyResolver*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_proxy_resolver_proxy_new_sync
+  (c-name "gxdp_proxy_resolver_proxy_new_sync")
+  (return-type "GXdpProxyResolver*")
+  (parameters
+    '("GDBusConnection*" "connection")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_proxy_resolver_proxy_new_for_bus
+  (c-name "gxdp_proxy_resolver_proxy_new_for_bus")
+  (return-type "none")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GAsyncReadyCallback" "callback")
+    '("gpointer" "user_data")
+  )
+)
+
+(define-function gxdp_proxy_resolver_proxy_new_for_bus_finish
+  (c-name "gxdp_proxy_resolver_proxy_new_for_bus_finish")
+  (return-type "GXdpProxyResolver*")
+  (parameters
+    '("GAsyncResult*" "res")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_proxy_resolver_proxy_new_for_bus_sync
+  (c-name "gxdp_proxy_resolver_proxy_new_for_bus_sync")
+  (return-type "GXdpProxyResolver*")
+  (parameters
+    '("GBusType" "bus_type")
+    '("GDBusProxyFlags" "flags")
+    '("const-gchar*" "name")
+    '("const-gchar*" "object_path")
+    '("GCancellable*" "cancellable")
+    '("GError**" "error")
+  )
+)
+
+(define-function gxdp_proxy_resolver_skeleton_get_type
+  (c-name "gxdp_proxy_resolver_skeleton_get_type")
+  (return-type "GType")
 )
 
 
