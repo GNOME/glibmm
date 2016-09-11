@@ -18,6 +18,8 @@
 _CONFIGINCLUDE(giommconfig.h)
 
 #include <giomm/applaunchcontext.h>
+#include <giomm/asyncresult.h>
+#include <giomm/cancellable.h>
 
 #include <exception>
 
@@ -220,6 +222,11 @@ public:
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme), g_app_info_get_default_for_uri_scheme)
   _WRAP_METHOD(static void reset_type_associations(const std::string& content_type), g_app_info_reset_type_associations)
   _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context{?}), g_app_info_launch_default_for_uri, errthrow)
+
+  _WRAP_METHOD(static void launch_default_for_uri_async(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context{.?},
+    const SlotAsyncReady& slot{callback?}, const Glib::RefPtr<Cancellable>& cancellable{.?}), g_app_info_launch_default_for_uri_async, slot_name slot, slot_callback SignalProxy_async_callback)
+  _IGNORE(g_app_info_launch_default_for_uri_async)
+  _WRAP_METHOD(static bool launch_default_for_uri_finish(const Glib::RefPtr<AsyncResult>& result), g_app_info_launch_default_for_uri_finish, errthrow)
 
 protected:
   //_WRAP_VFUNC(Glib::RefPtr<AppInfo> dup(), "dup")
