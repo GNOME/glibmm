@@ -1,287 +1,48 @@
-;; -*- scheme -*-
-; virtual function definitions
-; define-vfunc is g*mm-specific
-; These are hand-written.
-
-; GAction
-
-(define-vfunc get_name
-  (of-object "GAction")
-  (return-type "const-gchar*")
+(define-vfunc get_display
+  (of-object "GAppLaunchContext")
+  (return-type "char*")
+  (parameters
+   '("GAppInfo*" "info")
+   '("GList*" "files")
+  )
 )
 
-(define-vfunc get_parameter_type
-  (of-object "GAction")
-  (return-type "const-GVariantType*")
+(define-vfunc get_startup_notify_id
+  (of-object "GAppLaunchContext")
+  (return-type "char*")
+  (parameters
+   '("GAppInfo*" "info")
+   '("GList*" "files")
+  )
 )
 
-(define-vfunc get_state_type
-  (of-object "GAction")
-  (return-type "const-GVariantType*")
-)
-
-(define-vfunc get_state_hint
-  (of-object "GAction")
-  (return-type "GVariant*")
-)
-
-(define-vfunc get_enabled
-  (of-object "GAction")
-  (return-type "gboolean")
-)
-
-(define-vfunc get_state
-  (of-object "GAction")
-  (return-type "GVariant*")
-)
-
-(define-vfunc change_state
-  (of-object "GAction")
+(define-vfunc launch_failed
+  (of-object "GAppLaunchContext")
   (return-type "void")
   (parameters
-   '("GVariant*" "value")
+   '("const-char*" "startup_notify_id")
+  )
+)
+
+(define-vfunc launched
+  (of-object "GAppLaunchContext")
+  (return-type "void")
+  (parameters
+   '("GAppInfo*" "info")
+   '("GVariant*" "platform_data")
   )
 )
 
 (define-vfunc activate
-  (of-object "GAction")
-  (return-type "void")
-  (parameters
-   '("GVariant*" "parameter")
-  )
-)
-
-; GActionGroup
-
-(define-vfunc has_action
-  (of-object "GActionGroup")
-  (return-type "gboolean")
-  (parameters
-   '("const-gchar*" "action_name")
-  )
-)
-
-(define-vfunc list_actions
-  (of-object "GActionGroup")
-  (return-type "gchar**")
-)
-
-(define-vfunc get_action_enabled
-  (of-object "GActionGroup")
-  (return-type "gboolean")
-  (parameters
-   '("const-gchar*" "action_name")
-  )
-)
-
-(define-vfunc get_action_parameter_type
-  (of-object "GActionGroup")
-  (return-type "const-GVariantType*")
-  (parameters
-   '("const-gchar*" "action_name")
-  )
-)
-
-(define-vfunc get_action_state_type
-  (of-object "GActionGroup")
-  (return-type "const-GVariantType*")
-  (parameters
-   '("const-gchar*" "action_name")
-  )
-)
-
-(define-vfunc get_action_state_hint
-  (of-object "GActionGroup")
-  (return-type "GVariant*")
-  (parameters
-   '("const-gchar*" "action_name")
-  )
-)
-
-(define-vfunc get_action_state
-  (of-object "GActionGroup")
-  (return-type "GVariant*")
-  (parameters
-   '("const-gchar*" "action_name")
-  )
-)
-
-(define-vfunc change_action_state
-  (of-object "GActionGroup")
-  (return-type "void")
-  (parameters
-   '("const-gchar*" "action_name")
-   '("GVariant*" "value")
-  )
-)
-
-(define-vfunc activate_action
-  (of-object "GActionGroup")
-  (return-type "void")
-  (parameters
-   '("const-gchar*" "action_name")
-   '("GVariant*" "parameter")
-  )
-)
-
-;GActionMap
-
-(define-vfunc lookup_action
-  (of-object "GActionMap")
-  (return-type "GAction*")
-  (parameters
-   '("const-gchar*" "action_name")
-  )
-)
-
-(define-vfunc add_action
-  (of-object "GActionMap")
-  (return-type "void")
-  (parameters
-   '("GAction*" "action")
-  )
-)
-
-(define-vfunc remove_action
-  (of-object "GActionMap")
-  (return-type "void")
-  (parameters
-   '("const-gchar*" "action_name")
-  )
-)
-
-; GAppInfo
-
-(define-vfunc dup
- (of-object "GAppInfo")
- (return-type "GAppInfo*")
-)
-
-(define-vfunc equal
- (of-object "GAppInfo")
- (return-type "gboolean")
- (parameters
-  '("GAppInfo*" "appinfo2")
- )
-)
-
-(define-vfunc get_id
-  (of-object "GAppInfo")
-  (return-type "const-char*")
-)
-
-(define-vfunc get_name
-  (of-object "GAppInfo")
-  (return-type "const-char*")
-)
-
-(define-vfunc get_description
-  (of-object "GAppInfo")
-  (return-type "const-char*")
-)
-
-(define-vfunc get_executable
-  (of-object "GAppInfo")
-  (return-type "const-char*")
-)
-
-(define-vfunc get_icon
-  (of-object "GAppInfo")
-  (return-type "GIcon*")
-)
-
-(define-vfunc launch
-  (of-object "GAppInfo")
-  (return-type "gboolean")
- (parameters
-  '("GList*" "filenames")
-  '("GAppLaunchContext*" "launch_context")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc supports_uris
-  (of-object "GAppInfo")
-  (return-type "gboolean")
-)
-
-(define-vfunc supports_files
-  (of-object "GAppInfo")
-  (return-type "gboolean")
-)
-
-(define-vfunc launch_uris
-  (of-object "GAppInfo")
-  (return-type "gboolean")
- (parameters
-  '("GList*" "uris")
-  '("GAppLaunchContext*" "launch_context")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc should_show
-  (of-object "GAppInfo")
-  (return-type "gboolean")
-)
-
-(define-vfunc set_as_default_for_type
-  (of-object "GAppInfo")
-  (return-type "gboolean")
-  (parameters
-  '("const-char*" "content_type")
-  '("GError**" "error")
-  )
-)
-
-(define-vfunc set_as_default_for_extension
-  (of-object "GAppInfo")
-  (return-type "gboolean")
-  (parameters
-   '("const-char*" "extension")
-   '("GError**" "error")
-  )
-)
-
-(define-vfunc add_supports_type
-  (of-object "GAppInfo")
-  (return-type "gboolean")
-  (parameters
-   '("const-char*" "content_type")
-   '("GError**" "error")
-  )
-)
-
-(define-vfunc can_remove_supports_type
-  (of-object "GAppInfo")
-  (return-type "gboolean")
-)
-
-(define-vfunc remove_supports_type
-  (of-object "GAppInfo")
-  (return-type "gboolean")
-  (parameters
-   '("const-char*" "content_type")
-   '("GError**" "error")
-  )
-)
-
-; GApplication
-
-(define-vfunc local_command_line
   (of-object "GApplication")
-  (return-type "gboolean")
-  (parameters
-   '("gchar***" "arguments")
-   '("int*" "exit_status")
-  )
+  (return-type "void")
 )
 
-(define-vfunc before_emit
+(define-vfunc add_platform_data
   (of-object "GApplication")
   (return-type "void")
   (parameters
-   '("GVariant*" "platform_data")
+   '("GVariantBuilder*" "builder")
   )
 )
 
@@ -293,11 +54,65 @@
   )
 )
 
-(define-vfunc add_platform_data
+(define-vfunc before_emit
   (of-object "GApplication")
   (return-type "void")
   (parameters
-   '("GVariantBuilder*" "builder")
+   '("GVariant*" "platform_data")
+  )
+)
+
+(define-vfunc command_line
+  (of-object "GApplication")
+  (return-type "int")
+  (parameters
+   '("GApplicationCommandLine*" "command_line")
+  )
+)
+
+(define-vfunc dbus_register
+  (of-object "GApplication")
+  (return-type "gboolean")
+  (parameters
+   '("GDBusConnection*" "connection")
+   '("const-gchar*" "object_path")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc dbus_unregister
+  (of-object "GApplication")
+  (return-type "void")
+  (parameters
+   '("GDBusConnection*" "connection")
+   '("const-gchar*" "object_path")
+  )
+)
+
+(define-vfunc handle_local_options
+  (of-object "GApplication")
+  (return-type "gint")
+  (parameters
+   '("GVariantDict*" "options")
+  )
+)
+
+(define-vfunc local_command_line
+  (of-object "GApplication")
+  (return-type "gboolean")
+  (parameters
+   '("gchar***" "arguments")
+   '("int*" "exit_status")
+  )
+)
+
+(define-vfunc open
+  (of-object "GApplication")
+  (return-type "void")
+  (parameters
+   '("GFile**" "files")
+   '("gint" "n_files")
+   '("const-gchar*" "hint")
   )
 )
 
@@ -316,10 +131,149 @@
   (return-type "void")
 )
 
-; GAsyncInitable
+(define-vfunc startup
+  (of-object "GApplication")
+  (return-type "void")
+)
 
-(define-vfunc init_async
-  (of-object "GAsyncInitable")
+(define-vfunc get_stdin
+  (of-object "GApplicationCommandLine")
+  (return-type "GInputStream*")
+)
+
+(define-vfunc print_literal
+  (of-object "GApplicationCommandLine")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "message")
+  )
+)
+
+(define-vfunc printerr_literal
+  (of-object "GApplicationCommandLine")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "message")
+  )
+)
+
+(define-vfunc fill
+  (of-object "GBufferedInputStream")
+  (return-type "gssize")
+  (parameters
+   '("gssize" "count")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc fill_async
+  (of-object "GBufferedInputStream")
+  (return-type "void")
+  (parameters
+   '("gssize" "count")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc fill_finish
+  (of-object "GBufferedInputStream")
+  (return-type "gssize")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc cancelled
+  (of-object "GCancellable")
+  (return-type "void")
+)
+
+(define-vfunc flush
+  (of-object "GDBusInterfaceSkeleton")
+  (return-type "void")
+)
+
+(define-vfunc g_authorize_method
+  (of-object "GDBusInterfaceSkeleton")
+  (return-type "gboolean")
+  (parameters
+   '("GDBusMethodInvocation*" "invocation")
+  )
+)
+
+(define-vfunc get_info
+  (of-object "GDBusInterfaceSkeleton")
+  (return-type "GDBusInterfaceInfo*")
+)
+
+(define-vfunc get_properties
+  (of-object "GDBusInterfaceSkeleton")
+  (return-type "GVariant*")
+)
+
+(define-vfunc get_vtable
+  (of-object "GDBusInterfaceSkeleton")
+  (return-type "GDBusInterfaceVTable*")
+)
+
+(define-vfunc interface_proxy_properties_changed
+  (of-object "GDBusObjectManagerClient")
+  (return-type "void")
+  (parameters
+   '("GDBusObjectProxy*" "object_proxy")
+   '("GDBusProxy*" "interface_proxy")
+   '("GVariant*" "changed_properties")
+   '("const-gchar*const*" "invalidated_properties")
+  )
+)
+
+(define-vfunc interface_proxy_signal
+  (of-object "GDBusObjectManagerClient")
+  (return-type "void")
+  (parameters
+   '("GDBusObjectProxy*" "object_proxy")
+   '("GDBusProxy*" "interface_proxy")
+   '("const-gchar*" "sender_name")
+   '("const-gchar*" "signal_name")
+   '("GVariant*" "parameters")
+  )
+)
+
+(define-vfunc authorize_method
+  (of-object "GDBusObjectSkeleton")
+  (return-type "gboolean")
+  (parameters
+   '("GDBusInterfaceSkeleton*" "interface_")
+   '("GDBusMethodInvocation*" "invocation")
+  )
+)
+
+(define-vfunc g_properties_changed
+  (of-object "GDBusProxy")
+  (return-type "void")
+  (parameters
+   '("GVariant*" "changed_properties")
+   '("const-gchar*const*" "invalidated_properties")
+  )
+)
+
+(define-vfunc g_signal
+  (of-object "GDBusProxy")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "sender_name")
+   '("const-gchar*" "signal_name")
+   '("GVariant*" "parameters")
+  )
+)
+
+(define-vfunc close_async
+  (of-object "GFileEnumerator")
   (return-type "void")
   (parameters
    '("int" "io_priority")
@@ -329,830 +283,998 @@
   )
 )
 
-(define-vfunc init_finish
-  (of-object "GAsyncInitable")
+(define-vfunc close_finish
+  (of-object "GFileEnumerator")
   (return-type "gboolean")
   (parameters
-   '("GAsyncResult*" "res")
+   '("GAsyncResult*" "result")
    '("GError**" "error")
   )
 )
 
-; GAsyncResult
-
-(define-vfunc get_source_object
-  (of-object "GAsyncResult")
-  (return-type "GObject*")
-)
-
-; GBufferedInputStream
-
-(define-vfunc fill
- (of-object "GBufferedInputStream")
- (return-type "gssize")
- (parameters
-  '("gssize" "count")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc fill_async
- (of-object "GBufferedInputStream")
- (return-type "void")
- (parameters
-  '("gssize" "count")
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc fill_finish
- (of-object "GBufferedInputStream")
- (return-type "gssize")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-; GConverter
-
-(define-vfunc convert
-  (of-object "GConverter")
-  (return-type "GConverterResult")
+(define-vfunc close_fn
+  (of-object "GFileEnumerator")
+  (return-type "gboolean")
   (parameters
-   '("const-void*" "inbuf")
-   '("gsize" "inbuf_size")
-   '("void*" "outbuf")
-   '("gsize" "outbuf_size")
-   '("GConverterFlags" "flags")
-   '("gsize*" "bytes_read")
-   '("gsize*" "bytes_written")
+   '("GCancellable*" "cancellable")
    '("GError**" "error")
   )
 )
 
-(define-vfunc reset
-  (of-object "GConverter")
-  (return-type "void")
-)
-
-; GDBusInterface
-
-(define-vfunc get_info
-  (of-object "GDBusInterface")
-  (return-type "GDBusInterfaceInfo*")
-)
-
-(define-vfunc get_object
-  (of-object "GDBusInterface")
-  (return-type "GDBusObject*")
-)
-
-(define-vfunc set_object
-  (of-object "GDBusInterface")
-  (return-type "void")
+(define-vfunc next_file
+  (of-object "GFileEnumerator")
+  (return-type "GFileInfo*")
   (parameters
-   '("GDBusObject*" "object")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
   )
 )
 
-(define-vfunc dup_object
-  (of-object "GDBusInterface")
-  (return-type "GDBusObject*")
+(define-vfunc next_files_async
+  (of-object "GFileEnumerator")
+  (return-type "void")
+  (parameters
+   '("int" "num_files")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
 )
 
-; GDBusObject
-
-(define-vfunc get_object_path
-  (of-object "GDBusObject")
-  (return-type "const-gchar*")
-)
-
-(define-vfunc get_interfaces
-  (of-object "GDBusObject")
+(define-vfunc next_files_finish
+  (of-object "GFileEnumerator")
   (return-type "GList*")
-)
-
-(define-vfunc get_interface
-  (of-object "GDBusObject")
-  (return-type "GDBusInterface*")
   (parameters
-   '("const-gchar*" "interface_name")
-  )
-)
-
-; GDrive
-
-(define-vfunc get_name
-  (of-object "GDrive")
-  (return-type "char*")
-)
-
-(define-vfunc has_volumes
-  (of-object "GDrive")
-  (return-type "gboolean")
-)
-
-(define-vfunc is_automounted
-  (of-object "GDrive")
-  (return-type "gboolean")
-)
-
-(define-vfunc can_mount
-  (of-object "GDrive")
-  (return-type "gboolean")
-)
-
-(define-vfunc can_eject
-  (of-object "GDrive")
-  (return-type "gboolean")
-)
-
-; GFile
-
-(define-vfunc dup
-  (of-object "GFile")
-  (return-type "GFile*")
-)
-
-(define-vfunc hash
-  (of-object "GFile")
-  (return-type "guint")
-)
-
-(define-vfunc get_basename
-  (of-object "GFile")
-  (return-type "char*")
-)
-
-(define-vfunc get_path
-  (of-object "GFile")
-  (return-type "char*")
-)
-
-(define-vfunc get_uri
-  (of-object "GFile")
-  (return-type "char*")
-)
-
-(define-vfunc get_parse_name
-  (of-object "GFile")
-  (return-type "char*")
-)
-
-(define-vfunc get_parent
-  (of-object "GFile")
-  (return-type "GFile*")
-)
-
-(define-vfunc get_child_for_display_name
-  (of-object "GFile")
-  (return-type "GFile*")
-  (parameters
-   '("const-char*" "display_name")
+   '("GAsyncResult*" "result")
    '("GError**" "error")
   )
 )
 
-(define-vfunc has_prefix
-  (of-object "GFile")
-  (return-type "gboolean")
-  (parameters
-   '("GFile*" "prefix")
-  )
-)
-
-(define-vfunc get_relative_path
-  (of-object "GFile")
-  (return-type "char*")
-  (parameters
-   '("GFile*" "descendant")
-  )
-)
-
-(define-vfunc resolve_relative_path
-  (of-object "GFile")
-  (return-type "GFile*")
-  (parameters
-   '("const-char*" "relative_path")
-  )
-)
-
-(define-vfunc is_native
-  (of-object "GFile")
-  (return-type "gboolean")
-)
-
-(define-vfunc has_uri_scheme
-  (of-object "GFile")
-  (return-type "gboolean")
-  (parameters
-   '("const-char*" "uri_scheme")
-  )
-)
-
-; GFileInputStream
-
-(define-vfunc tell
- (of-object "GFileInputStream")
- (return-type "goffset")
-)
-
 (define-vfunc can_seek
- (of-object "GFileInputStream")
- (return-type "gboolean")
-)
-
-(define-vfunc seek
- (of-object "GFileInputStream")
- (return-type "gboolean")
- (parameters
-  '("goffset" "offset")
-  '("GSeekType" "type")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc query_info
- (of-object "GFileInputStream")
- (return-type "GFileInfo*")
- (parameters
-  '("const-char*" "attributes")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc query_info_async
- (of-object "GFileInputStream")
- (return-type "void")
- (parameters
-  '("const-char*" "attributes")
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc query_info_finish
- (of-object "GFileInputStream")
- (return-type "GFileInfo*")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-; GFileOutputStream
-
-(define-vfunc tell
- (of-object "GFileOutputStream")
- (return-type "goffset")
-)
-
-(define-vfunc can_seek
- (of-object "GFileOutputStream")
- (return-type "gboolean")
-)
-
-(define-vfunc seek
- (of-object "GFileOutputStream")
- (return-type "gboolean")
- (parameters
-  '("goffset" "offset")
-  '("GSeekType" "type")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
+  (of-object "GFileIOStream")
+  (return-type "gboolean")
 )
 
 (define-vfunc can_truncate
- (of-object "GFileOutputStream")
- (return-type "gboolean")
-)
-
-(define-vfunc truncate_fn
- (of-object "GFileOutputStream")
- (return-type "gboolean")
- (parameters
-  '("goffset" "offset")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc query_info
- (of-object "GFileOutputStream")
- (return-type "GFileInfo*")
- (parameters
-  '("const-char*" "attributes")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc query_info_async
- (of-object "GFileOutputStream")
- (return-type "void")
- (parameters
-  '("const-char*" "attributes")
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc query_info_finish
- (of-object "GFileOutputStream")
- (return-type "GFileInfo*")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
+  (of-object "GFileIOStream")
+  (return-type "gboolean")
 )
 
 (define-vfunc get_etag
- (of-object "GFileOutputStream")
- (return-type "char*")
+  (of-object "GFileIOStream")
+  (return-type "char*")
 )
 
-; GIcon
-
-(define-vfunc hash
-  (of-object "GIcon")
-  (return-type "guint")
-)
-
-; GInitable
-
-(define-vfunc init
-  (of-object "GInitable")
-  (return-type "gboolean")
+(define-vfunc query_info
+  (of-object "GFileIOStream")
+  (return-type "GFileInfo*")
   (parameters
-    '("GCancellable*" "cancellable")
-    '("GError**" "error")
+   '("const-char*" "attributes")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
   )
 )
 
-; GInputStream
-
-(define-vfunc read_fn
- (of-object "GInputStream")
- (return-type "gssize")
- (parameters
-  '("void*" "buffer")
-  '("gsize" "count")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
+(define-vfunc query_info_async
+  (of-object "GFileIOStream")
+  (return-type "void")
+  (parameters
+   '("const-char*" "attributes")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
 )
 
-(define-vfunc skip
- (of-object "GInputStream")
- (return-type "gssize")
- (parameters
-  '("gsize" "count")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
+(define-vfunc query_info_finish
+  (of-object "GFileIOStream")
+  (return-type "GFileInfo*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc seek
+  (of-object "GFileIOStream")
+  (return-type "gboolean")
+  (parameters
+   '("goffset" "offset")
+   '("GSeekType" "type")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc tell
+  (of-object "GFileIOStream")
+  (return-type "goffset")
+)
+
+(define-vfunc truncate_fn
+  (of-object "GFileIOStream")
+  (return-type "gboolean")
+  (parameters
+   '("goffset" "size")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc can_seek
+  (of-object "GFileInputStream")
+  (return-type "gboolean")
+)
+
+(define-vfunc query_info
+  (of-object "GFileInputStream")
+  (return-type "GFileInfo*")
+  (parameters
+   '("const-char*" "attributes")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc query_info_async
+  (of-object "GFileInputStream")
+  (return-type "void")
+  (parameters
+   '("const-char*" "attributes")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc query_info_finish
+  (of-object "GFileInputStream")
+  (return-type "GFileInfo*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc seek
+  (of-object "GFileInputStream")
+  (return-type "gboolean")
+  (parameters
+   '("goffset" "offset")
+   '("GSeekType" "type")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc tell
+  (of-object "GFileInputStream")
+  (return-type "goffset")
+)
+
+(define-vfunc cancel
+  (of-object "GFileMonitor")
+  (return-type "gboolean")
+)
+
+(define-vfunc changed
+  (of-object "GFileMonitor")
+  (return-type "void")
+  (parameters
+   '("GFile*" "file")
+   '("GFile*" "other_file")
+   '("GFileMonitorEvent" "event_type")
+  )
+)
+
+(define-vfunc can_seek
+  (of-object "GFileOutputStream")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_truncate
+  (of-object "GFileOutputStream")
+  (return-type "gboolean")
+)
+
+(define-vfunc get_etag
+  (of-object "GFileOutputStream")
+  (return-type "char*")
+)
+
+(define-vfunc query_info
+  (of-object "GFileOutputStream")
+  (return-type "GFileInfo*")
+  (parameters
+   '("const-char*" "attributes")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc query_info_async
+  (of-object "GFileOutputStream")
+  (return-type "void")
+  (parameters
+   '("const-char*" "attributes")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc query_info_finish
+  (of-object "GFileOutputStream")
+  (return-type "GFileInfo*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc seek
+  (of-object "GFileOutputStream")
+  (return-type "gboolean")
+  (parameters
+   '("goffset" "offset")
+   '("GSeekType" "type")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc tell
+  (of-object "GFileOutputStream")
+  (return-type "goffset")
+)
+
+(define-vfunc truncate_fn
+  (of-object "GFileOutputStream")
+  (return-type "gboolean")
+  (parameters
+   '("goffset" "size")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc got_completion_data
+  (of-object "GFilenameCompleter")
+  (return-type "void")
+)
+
+(define-vfunc close_async
+  (of-object "GIOStream")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc close_finish
+  (of-object "GIOStream")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
 )
 
 (define-vfunc close_fn
- (of-object "GInputStream")
- (return-type "gboolean")
- (parameters
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
+  (of-object "GIOStream")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_input_stream
+  (of-object "GIOStream")
+  (return-type "GInputStream*")
+)
+
+(define-vfunc get_output_stream
+  (of-object "GIOStream")
+  (return-type "GOutputStream*")
+)
+
+(define-vfunc to_bytes
+  (of-object "GInetAddress")
+  (return-type "const-guint8*")
+)
+
+(define-vfunc to_string
+  (of-object "GInetAddress")
+  (return-type "gchar*")
+)
+
+(define-vfunc close_async
+  (of-object "GInputStream")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc close_finish
+  (of-object "GInputStream")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc close_fn
+  (of-object "GInputStream")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
 )
 
 (define-vfunc read_async
- (of-object "GInputStream")
- (return-type "void")
- (parameters
-  '("void*" "buffer")
-  '("gsize" "count")
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
+  (of-object "GInputStream")
+  (return-type "void")
+  (parameters
+   '("void*" "buffer")
+   '("gsize" "count")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
 )
 
 (define-vfunc read_finish
- (of-object "GInputStream")
- (return-type "gssize")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc skip_async
- (of-object "GInputStream")
- (return-type "void")
- (parameters
-  '("gsize" "count")
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc skip_finish
- (of-object "GInputStream")
- (return-type "gssize")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc close_async
- (of-object "GInputStream")
- (return-type "void")
- (parameters
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc close_finish
- (of-object "GInputStream")
- (return-type "gboolean")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-; GListModel
-
-(define-vfunc get_item_type
-  (of-object "GListModel")
-  (return-type "GType")
-)
-
-(define-vfunc get_n_items
-  (of-object "GListModel")
-  (return-type "guint")
-)
-
-(define-vfunc get_item
-  (of-object "GListModel")
-  (return-type "gpointer")
+  (of-object "GInputStream")
+  (return-type "gssize")
   (parameters
-   '("guint" "position")
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
   )
 )
 
-; GLoadableIcon
-
-(define-vfunc load
- (of-object "GLoadableIcon")
- (return-type "GInputStream*")
- (parameters
-  '("int" "size")
-  '("char**" "type")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc load_async
- (of-object "GLoadableIcon")
- (return-type "void")
- (parameters
-  '("int" "size")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc load_finish
- (of-object "GLoadableIcon")
- (return-type "GInputStream*")
- (parameters
-  '("GAsyncResult*" "res")
-  '("char**" "type")
-  '("GError**" "error")
- )
-)
-
-; GOutputStream
-
-(define-vfunc write_fn
- (of-object "GOutputStream")
- (return-type "gssize")
- (parameters
-  '("const-void*" "buffer")
-  '("gsize" "count")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc splice
- (of-object "GOutputStream")
- (return-type "gssize")
- (parameters
-  '("GInputStream*" "source")
-  '("GOutputStreamSpliceFlags" "flags")
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc flush
- (of-object "GOutputStream")
- (return-type "gboolean")
- (parameters
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc close_fn
- (of-object "GOutputStream")
- (return-type "gboolean")
- (parameters
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc write_async
- (of-object "GOutputStream")
- (return-type "void")
- (parameters
-  '("const-void*" "buffer")
-  '("gsize" "count")
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc write_finish
- (of-object "GOutputStream")
- (return-type "gssize")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc splice_async
- (of-object "GOutputStream")
- (return-type "void")
- (parameters
-  '("GInputStream*" "source")
-  '("GOutputStreamSpliceFlags" "flags")
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc splice_finish
- (of-object "GOutputStream")
- (return-type "gssize")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc flush_async
- (of-object "GOutputStream")
- (return-type "void")
- (parameters
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc flush_finish
- (of-object "GOutputStream")
- (return-type "gboolean")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc close_async
- (of-object "GOutputStream")
- (return-type "void")
- (parameters
-  '("int" "io_priority")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc close_finish
- (of-object "GOutputStream")
- (return-type "gboolean")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-; GPermission
-
-(define-vfunc acquire
- (of-object "GPermission")
- (return-type "gboolean")
- (parameters
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc acquire_async
- (of-object "GPermission")
- (return-type "void")
- (parameters
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc acquire_finish
- (of-object "GPermission")
- (return-type "gboolean")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc release
- (of-object "GPermission")
- (return-type "gboolean")
- (parameters
-  '("GCancellable*" "cancellable")
-  '("GError**" "error")
- )
-)
-
-(define-vfunc release_async
- (of-object "GPermission")
- (return-type "void")
- (parameters
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
-)
-
-(define-vfunc release_finish
- (of-object "GPermission")
- (return-type "gboolean")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
-)
-
-; GPollableInputStream
-
-(define-vfunc can_poll
-  (of-object "GPollableInputStream")
-  (return-type "gboolean")
-)
-
-(define-vfunc is_readable
-  (of-object "GPollableInputStream")
-  (return-type "gboolean")
-)
-
-(define-vfunc create_source
-  (of-object "GPollableInputStream")
-  (return-type "GSource*")
-  (parameters
-   '("GCancellable*" "cancellable")
-  )
-)
-
-(define-vfunc read_nonblocking
-  (of-object "GPollableInputStream")
+(define-vfunc read_fn
+  (of-object "GInputStream")
   (return-type "gssize")
   (parameters
    '("void*" "buffer")
    '("gsize" "count")
+   '("GCancellable*" "cancellable")
    '("GError**" "error")
   )
 )
 
-; GPollableOutputStream
-
-(define-vfunc can_poll
-  (of-object "GPollableOutputStream")
-  (return-type "gboolean")
-)
-
-(define-vfunc is_writable
-  (of-object "GPollableOutputStream")
-  (return-type "gboolean")
-)
-
-(define-vfunc create_source
-  (of-object "GPollableOutputStream")
-  (return-type "GSource*")
-  (parameters
-   '("GCancellable*" "cancellable")
-  )
-)
-
-(define-vfunc write_nonblocking
-  (of-object "GPollableOutputStream")
+(define-vfunc skip
+  (of-object "GInputStream")
   (return-type "gssize")
   (parameters
-   '("const-void*" "buffer")
    '("gsize" "count")
+   '("GCancellable*" "cancellable")
    '("GError**" "error")
   )
 )
 
-; GRemoteActionGroup
-
-(define-vfunc activate_action_full
- (of-object "GRemoteActionGroup")
- (return-type "void")
- (parameters
-  '("const-gchar*" "action_name")
-  '("GVariant*" "parameter")
-  '("GVariant*" "platform_data")
- )
+(define-vfunc skip_async
+  (of-object "GInputStream")
+  (return-type "void")
+  (parameters
+   '("gsize" "count")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
 )
 
-(define-vfunc change_action_state_full
- (of-object "GRemoteActionGroup")
- (return-type "void")
- (parameters
-  '("const-gchar*" "action_name")
-  '("GVariant*" "value")
-  '("GVariant*" "platform_data")
- )
+(define-vfunc skip_finish
+  (of-object "GInputStream")
+  (return-type "gssize")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
 )
 
-; GSocketControlMessage
-
-(define-vfunc deserialize
- (of-object "GSocketControlMessage")
- (return-type "GSocketControlMessage*")
- (parameters
-  '("int" "level")
-  '("int" "type")
-  '("gsize" "size")
-  '("gpointer" "data")
- )
+(define-vfunc get_next
+  (of-object "GMenuAttributeIter")
+  (return-type "gboolean")
+  (parameters
+   '("const-gchar**" "out_name")
+   '("GVariant**" "value")
+  )
 )
 
-(define-vfunc get_size
- (of-object "GSocketControlMessage")
- (return-type "gsize")
+(define-vfunc get_next
+  (of-object "GMenuLinkIter")
+  (return-type "gboolean")
+  (parameters
+   '("const-gchar**" "out_link")
+   '("GMenuModel**" "value")
+  )
+)
+
+(define-vfunc get_item_attribute_value
+  (of-object "GMenuModel")
+  (return-type "GVariant*")
+  (parameters
+   '("gint" "item_index")
+   '("const-gchar*" "attribute")
+   '("const-GVariantType*" "expected_type")
+  )
+)
+
+(define-vfunc get_item_attributes
+  (of-object "GMenuModel")
+  (return-type "void")
+  (parameters
+   '("gint" "item_index")
+   '("GHashTable**" "attributes")
+  )
+)
+
+(define-vfunc get_item_link
+  (of-object "GMenuModel")
+  (return-type "GMenuModel*")
+  (parameters
+   '("gint" "item_index")
+   '("const-gchar*" "link")
+  )
+)
+
+(define-vfunc get_item_links
+  (of-object "GMenuModel")
+  (return-type "void")
+  (parameters
+   '("gint" "item_index")
+   '("GHashTable**" "links")
+  )
+)
+
+(define-vfunc get_n_items
+  (of-object "GMenuModel")
+  (return-type "gint")
+)
+
+(define-vfunc is_mutable
+  (of-object "GMenuModel")
+  (return-type "gboolean")
+)
+
+(define-vfunc iterate_item_attributes
+  (of-object "GMenuModel")
+  (return-type "GMenuAttributeIter*")
+  (parameters
+   '("gint" "item_index")
+  )
+)
+
+(define-vfunc iterate_item_links
+  (of-object "GMenuModel")
+  (return-type "GMenuLinkIter*")
+  (parameters
+   '("gint" "item_index")
+  )
+)
+
+(define-vfunc aborted
+  (of-object "GMountOperation")
+  (return-type "void")
+)
+
+(define-vfunc ask_password
+  (of-object "GMountOperation")
+  (return-type "void")
+  (parameters
+   '("const-char*" "message")
+   '("const-char*" "default_user")
+   '("const-char*" "default_domain")
+   '("GAskPasswordFlags" "flags")
+  )
+)
+
+(define-vfunc ask_question
+  (of-object "GMountOperation")
+  (return-type "void")
+  (parameters
+   '("const-char*" "message")
+   '("const-gchar**" "choices")
+  )
+)
+
+(define-vfunc reply
+  (of-object "GMountOperation")
+  (return-type "void")
+  (parameters
+   '("GMountOperationResult" "result")
+  )
+)
+
+(define-vfunc show_processes
+  (of-object "GMountOperation")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "message")
+   '("GArray*" "processes")
+   '("const-gchar*" "choices")
+  )
+)
+
+(define-vfunc show_unmount_progress
+  (of-object "GMountOperation")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "message")
+   '("gint64" "time_left")
+   '("gint64" "bytes_left")
+  )
+)
+
+(define-vfunc close_async
+  (of-object "GOutputStream")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc close_finish
+  (of-object "GOutputStream")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc close_fn
+  (of-object "GOutputStream")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc flush
+  (of-object "GOutputStream")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc flush_async
+  (of-object "GOutputStream")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc flush_finish
+  (of-object "GOutputStream")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc splice
+  (of-object "GOutputStream")
+  (return-type "gssize")
+  (parameters
+   '("GInputStream*" "source")
+   '("GOutputStreamSpliceFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc splice_async
+  (of-object "GOutputStream")
+  (return-type "void")
+  (parameters
+   '("GInputStream*" "source")
+   '("GOutputStreamSpliceFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc splice_finish
+  (of-object "GOutputStream")
+  (return-type "gssize")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc write_async
+  (of-object "GOutputStream")
+  (return-type "void")
+  (parameters
+   '("void*" "buffer")
+   '("gsize" "count")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc write_finish
+  (of-object "GOutputStream")
+  (return-type "gssize")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc write_fn
+  (of-object "GOutputStream")
+  (return-type "gssize")
+  (parameters
+   '("void*" "buffer")
+   '("gsize" "count")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc acquire
+  (of-object "GPermission")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc acquire_async
+  (of-object "GPermission")
+  (return-type "void")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc acquire_finish
+  (of-object "GPermission")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc release
+  (of-object "GPermission")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc release_async
+  (of-object "GPermission")
+  (return-type "void")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc release_finish
+  (of-object "GPermission")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_by_address
+  (of-object "GResolver")
+  (return-type "gchar*")
+  (parameters
+   '("GInetAddress*" "address")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_by_address_async
+  (of-object "GResolver")
+  (return-type "void")
+  (parameters
+   '("GInetAddress*" "address")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc lookup_by_address_finish
+  (of-object "GResolver")
+  (return-type "gchar*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_by_name
+  (of-object "GResolver")
+  (return-type "GList*")
+  (parameters
+   '("const-gchar*" "hostname")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_by_name_async
+  (of-object "GResolver")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "hostname")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc lookup_by_name_finish
+  (of-object "GResolver")
+  (return-type "GList*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_records
+  (of-object "GResolver")
+  (return-type "GList*")
+  (parameters
+   '("const-gchar*" "rrname")
+   '("GResolverRecordType" "record_type")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_records_async
+  (of-object "GResolver")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "rrname")
+   '("GResolverRecordType" "record_type")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc lookup_records_finish
+  (of-object "GResolver")
+  (return-type "GList*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_service
+  (of-object "GResolver")
+  (return-type "GList*")
+  (parameters
+   '("const-gchar*" "rrname")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_service_async
+  (of-object "GResolver")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "rrname")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc lookup_service_finish
+  (of-object "GResolver")
+  (return-type "GList*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc reload
+  (of-object "GResolver")
+  (return-type "void")
+)
+
+(define-vfunc change_event
+  (of-object "GSettings")
+  (return-type "gboolean")
+  (parameters
+   '("const-GQuark*" "keys")
+   '("gint" "n_keys")
+  )
+)
+
+(define-vfunc changed
+  (of-object "GSettings")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "key")
+  )
+)
+
+(define-vfunc writable_change_event
+  (of-object "GSettings")
+  (return-type "gboolean")
+  (parameters
+   '("GQuark" "key")
+  )
+)
+
+(define-vfunc writable_changed
+  (of-object "GSettings")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "key")
+  )
+)
+
+(define-vfunc get_family
+  (of-object "GSocketAddress")
+  (return-type "GSocketFamily")
+)
+
+(define-vfunc get_native_size
+  (of-object "GSocketAddress")
+  (return-type "gssize")
+)
+
+(define-vfunc to_native
+  (of-object "GSocketAddress")
+  (return-type "gboolean")
+  (parameters
+   '("gpointer" "dest")
+   '("gsize" "destlen")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc next
+  (of-object "GSocketAddressEnumerator")
+  (return-type "GSocketAddress*")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc next_async
+  (of-object "GSocketAddressEnumerator")
+  (return-type "void")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc next_finish
+  (of-object "GSocketAddressEnumerator")
+  (return-type "GSocketAddress*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc event
+  (of-object "GSocketClient")
+  (return-type "void")
+  (parameters
+   '("GSocketClientEvent" "event")
+   '("GSocketConnectable*" "connectable")
+   '("GIOStream*" "connection")
+  )
 )
 
 (define-vfunc get_level
- (of-object "GSocketControlMessage")
- (return-type "int")
+  (of-object "GSocketControlMessage")
+  (return-type "int")
+)
+
+(define-vfunc get_size
+  (of-object "GSocketControlMessage")
+  (return-type "gsize")
 )
 
 (define-vfunc get_type
- (of-object "GSocketControlMessage")
- (return-type "int")
+  (of-object "GSocketControlMessage")
+  (return-type "int")
 )
 
 (define-vfunc serialize
- (of-object "GSocketControlMessage")
- (return-type "void")
- (parameters
-  '("gpointer" "data")
- )
+  (of-object "GSocketControlMessage")
+  (return-type "void")
+  (parameters
+   '("gpointer" "data")
+  )
 )
 
-; GTlsCertificate
+(define-vfunc changed
+  (of-object "GSocketListener")
+  (return-type "void")
+)
+
+(define-vfunc event
+  (of-object "GSocketListener")
+  (return-type "void")
+  (parameters
+   '("GSocketListenerEvent*" "event")
+   '("GSocket*" "socket")
+  )
+)
+
+(define-vfunc incoming
+  (of-object "GSocketService")
+  (return-type "gboolean")
+  (parameters
+   '("GSocketConnection*" "connection")
+   '("GObject*" "source_object")
+  )
+)
+
+(define-vfunc run
+  (of-object "GThreadedSocketService")
+  (return-type "gboolean")
+  (parameters
+   '("GSocketConnection*" "connection")
+   '("GObject*" "source_object")
+  )
+)
 
 (define-vfunc verify
   (of-object "GTlsCertificate")
@@ -1163,7 +1285,14 @@
   )
 )
 
-; GTlsConnection
+(define-vfunc accept_certificate
+  (of-object "GTlsConnection")
+  (return-type "gboolean")
+  (parameters
+   '("GTlsCertificate*" "peer_cert")
+   '("GTlsCertificateFlags" "errors")
+  )
+)
 
 (define-vfunc handshake
   (of-object "GTlsConnection")
@@ -1188,46 +1317,6 @@
 (define-vfunc handshake_finish
   (of-object "GTlsConnection")
   (return-type "gboolean")
-  (parameters
-   '("GAsyncResult*" "result")
-   '("GError**" "error")
-  )
-)
-
-; GTlsDatabase
-
-(define-vfunc verify_chain
-  (of-object "GTlsDatabase")
-  (return-type "GTlsCertificateFlags")
-  (parameters
-   '("GTlsCertificate*" "chain")
-   '("const-gchar*" "purpose")
-   '("GSocketConnectable*" "identity")
-   '("GTlsInteraction*" "interaction")
-   '("GTlsDatabaseVerifyFlags" "flags")
-   '("GCancellable*" "cancellable")
-   '("GError**" "error")
-  )
-)
-
-(define-vfunc verify_chain_async
-  (of-object "GTlsDatabase")
-  (return-type "void")
-  (parameters
-   '("GTlsCertificate*" "chain")
-   '("const-gchar*" "purpose")
-   '("GSocketConnectable*" "identity")
-   '("GTlsInteraction*" "interaction")
-   '("GTlsDatabaseVerifyFlags" "flags")
-   '("GCancellable*" "cancellable")
-   '("GAsyncReadyCallback" "callback")
-   '("gpointer" "user_data")
-  )
-)
-
-(define-vfunc verify_chain_finish
-  (of-object "GTlsDatabase")
-  (return-type "GTlsCertificateFlags")
   (parameters
    '("GAsyncResult*" "result")
    '("GError**" "error")
@@ -1344,7 +1433,43 @@
   )
 )
 
-; GTlsInteraction
+(define-vfunc verify_chain
+  (of-object "GTlsDatabase")
+  (return-type "GTlsCertificateFlags")
+  (parameters
+   '("GTlsCertificate*" "chain")
+   '("const-gchar*" "purpose")
+   '("GSocketConnectable*" "identity")
+   '("GTlsInteraction*" "interaction")
+   '("GTlsDatabaseVerifyFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc verify_chain_async
+  (of-object "GTlsDatabase")
+  (return-type "void")
+  (parameters
+   '("GTlsCertificate*" "chain")
+   '("const-gchar*" "purpose")
+   '("GSocketConnectable*" "identity")
+   '("GTlsInteraction*" "interaction")
+   '("GTlsDatabaseVerifyFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc verify_chain_finish
+  (of-object "GTlsDatabase")
+  (return-type "GTlsCertificateFlags")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
 
 (define-vfunc ask_password
   (of-object "GTlsInteraction")
@@ -1376,7 +1501,42 @@
   )
 )
 
-; GTlsPassword
+(define-vfunc request_certificate
+  (of-object "GTlsInteraction")
+  (return-type "GTlsInteractionResult")
+  (parameters
+   '("GTlsConnection*" "connection")
+   '("GTlsCertificateRequestFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc request_certificate_async
+  (of-object "GTlsInteraction")
+  (return-type "void")
+  (parameters
+   '("GTlsConnection*" "connection")
+   '("GTlsCertificateRequestFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc request_certificate_finish
+  (of-object "GTlsInteraction")
+  (return-type "GTlsInteractionResult")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_default_warning
+  (of-object "GTlsPassword")
+  (return-type "const-gchar*")
+)
 
 (define-vfunc get_value
   (of-object "GTlsPassword")
@@ -1396,161 +1556,2707 @@
   )
 )
 
-(define-vfunc get_default_warning
-  (of-object "GTlsPassword")
-  (return-type "const-gchar*")
+(define-vfunc add_writable_namespaces
+  (of-object "GVfs")
+  (return-type "void")
+  (parameters
+   '("GFileAttributeInfoList*" "list")
+  )
 )
 
-; GVolume
-
-(define-vfunc get_name
- (of-object "GVolume")
- (return-type "char*")
+(define-vfunc deserialize_icon
+  (of-object "GVfs")
+  (return-type "GIcon*")
+  (parameters
+   '("GVariant*" "value")
+  )
 )
 
-(define-vfunc get_icon
- (of-object "GVolume")
- (return-type "GIcon*")
+(define-vfunc get_file_for_path
+  (of-object "GVfs")
+  (return-type "GFile*")
+  (parameters
+   '("const-char*" "path")
+  )
 )
 
-(define-vfunc get_uuid
- (of-object "GVolume")
- (return-type "char*")
+(define-vfunc get_file_for_uri
+  (of-object "GVfs")
+  (return-type "GFile*")
+  (parameters
+   '("const-char*" "uri")
+  )
 )
 
-(define-vfunc get_drive
- (of-object "GVolume")
- (return-type "GDrive*")
+(define-vfunc get_supported_uri_schemes
+  (of-object "GVfs")
+  (return-type "const-gchar*const*")
 )
 
-(define-vfunc get_mount
- (of-object "GVolume")
- (return-type "GMount*")
+(define-vfunc is_active
+  (of-object "GVfs")
+  (return-type "gboolean")
 )
 
-(define-vfunc can_mount
- (of-object "GVolume")
- (return-type "gboolean")
+(define-vfunc local_file_add_info
+  (of-object "GVfs")
+  (return-type "void")
+  (parameters
+   '("const-char*" "filename")
+   '("guint64" "device")
+   '("GFileAttributeMatcher*" "attribute_matcher")
+   '("GFileInfo*" "info")
+   '("GCancellable*" "cancellable")
+   '("gpointer*" "extra_data")
+   '("GDestroyNotify*" "free_extra_data")
+  )
 )
 
-(define-vfunc can_eject
- (of-object "GVolume")
- (return-type "gboolean")
+(define-vfunc local_file_moved
+  (of-object "GVfs")
+  (return-type "void")
+  (parameters
+   '("const-char*" "source")
+   '("const-char*" "dest")
+  )
 )
 
-(define-vfunc mount_fn
- (of-object "GVolume")
- (return-type "void")
- (parameters
-  '("GMountMountFlags" "flags")
-  '("GMountOperation*" "mount_operation")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
+(define-vfunc local_file_removed
+  (of-object "GVfs")
+  (return-type "void")
+  (parameters
+   '("const-char*" "filename")
+  )
 )
 
-(define-vfunc mount_finish
- (of-object "GVolume")
- (return-type "gboolean")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
+(define-vfunc local_file_set_attributes
+  (of-object "GVfs")
+  (return-type "gboolean")
+  (parameters
+   '("const-char*" "filename")
+   '("GFileInfo*" "info")
+   '("GFileQueryInfoFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
 )
 
-
-(define-vfunc eject
- (of-object "GVolume")
- (return-type "void")
- (parameters
-  '("GMountUnmountFlags" "flags")
-  '("GCancellable*" "cancellable")
-  '("GAsyncReadyCallback" "callback")
-  '("gpointer" "user_data")
- )
+(define-vfunc parse_name
+  (of-object "GVfs")
+  (return-type "GFile*")
+  (parameters
+   '("const-char*" "parse_name")
+  )
 )
 
-(define-vfunc eject_finish
- (of-object "GVolume")
- (return-type "gboolean")
- (parameters
-  '("GAsyncResult*" "result")
-  '("GError**" "error")
- )
+(define-vfunc drive_changed
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GDrive*" "drive")
+  )
 )
 
-(define-vfunc get_identifier
- (of-object "GVolume")
- (return-type "char*")
- (parameters
-  '("const-char*" "kind")
- )
+(define-vfunc drive_connected
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GDrive*" "drive")
+  )
 )
 
-(define-vfunc enumerate_identifiers
- (of-object "GVolume")
- (return-type "char**")
+(define-vfunc drive_disconnected
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GDrive*" "drive")
+  )
 )
 
-(define-vfunc should_automount
- (of-object "GVolume")
- (return-type "gboolean")
+(define-vfunc drive_eject_button
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GDrive*" "drive")
+  )
 )
 
-
-; GVolumeMonitor
-
-; This doesn't even take a GVolumeMonitor.
-; Maybe it is not a real vfunc. murrayc.
-(define-vfunc is_supported
- (of-object "GVolumeMonitor")
- (return-type "gboolean")
+(define-vfunc drive_stop_button
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GDrive*" "drive")
+  )
 )
 
 (define-vfunc get_connected_drives
- (of-object "GVolumeMonitor")
- (return-type "GList*")
-)
-
-(define-vfunc get_connected_drives
- (of-object "GVolumeMonitor")
- (return-type "GList*")
-)
-
-(define-vfunc get_volumes
- (of-object "GVolumeMonitor")
- (return-type "GList*")
-)
-
-(define-vfunc get_mounts
- (of-object "GVolumeMonitor")
- (return-type "GList*")
-)
-
-(define-vfunc get_volume_for_uuid
- (of-object "GVolumeMonitor")
- (return-type "GVolume*")
- (parameters
-  '("const-char*" "uuid")
- )
+  (of-object "GVolumeMonitor")
+  (return-type "GList*")
 )
 
 (define-vfunc get_mount_for_uuid
- (of-object "GVolumeMonitor")
- (return-type "GMount*")
- (parameters
-  '("const-char*" "uuid")
- )
+  (of-object "GVolumeMonitor")
+  (return-type "GMount*")
+  (parameters
+   '("const-char*" "uuid")
+  )
 )
 
-; This doesn't take a GVolumeMonitor.
-; Maybe it is not a real vfunc. murrayc
-(define-vfunc adopt_orphan_mount
- (of-object "GVolumeMonitor")
- (return-type "GVolume*")
- (parameters
-  '("GMount*" "mount")
- )
+(define-vfunc get_mounts
+  (of-object "GVolumeMonitor")
+  (return-type "GList*")
+)
+
+(define-vfunc get_volume_for_uuid
+  (of-object "GVolumeMonitor")
+  (return-type "GVolume*")
+  (parameters
+   '("const-char*" "uuid")
+  )
+)
+
+(define-vfunc get_volumes
+  (of-object "GVolumeMonitor")
+  (return-type "GList*")
+)
+
+(define-vfunc mount_added
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GMount*" "mount")
+  )
+)
+
+(define-vfunc mount_changed
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GMount*" "mount")
+  )
+)
+
+(define-vfunc mount_pre_unmount
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GMount*" "mount")
+  )
+)
+
+(define-vfunc mount_removed
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GMount*" "mount")
+  )
+)
+
+(define-vfunc volume_added
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GVolume*" "volume")
+  )
+)
+
+(define-vfunc volume_changed
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GVolume*" "volume")
+  )
+)
+
+(define-vfunc volume_removed
+  (of-object "GVolumeMonitor")
+  (return-type "void")
+  (parameters
+   '("GVolume*" "volume")
+  )
+)
+
+(define-vfunc activate
+  (of-object "GAction")
+  (return-type "void")
+  (parameters
+   '("GVariant*" "parameter")
+  )
+)
+
+(define-vfunc change_state
+  (of-object "GAction")
+  (return-type "void")
+  (parameters
+   '("GVariant*" "value")
+  )
+)
+
+(define-vfunc get_enabled
+  (of-object "GAction")
+  (return-type "gboolean")
+)
+
+(define-vfunc get_name
+  (of-object "GAction")
+  (return-type "const-gchar*")
+)
+
+(define-vfunc get_parameter_type
+  (of-object "GAction")
+  (return-type "const-GVariantType*")
+)
+
+(define-vfunc get_state
+  (of-object "GAction")
+  (return-type "GVariant*")
+)
+
+(define-vfunc get_state_hint
+  (of-object "GAction")
+  (return-type "GVariant*")
+)
+
+(define-vfunc get_state_type
+  (of-object "GAction")
+  (return-type "const-GVariantType*")
+)
+
+(define-vfunc action_added
+  (of-object "GActionGroup")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc action_enabled_changed
+  (of-object "GActionGroup")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+   '("gboolean" "enabled")
+  )
+)
+
+(define-vfunc action_removed
+  (of-object "GActionGroup")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc action_state_changed
+  (of-object "GActionGroup")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+   '("GVariant*" "state")
+  )
+)
+
+(define-vfunc activate_action
+  (of-object "GActionGroup")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+   '("GVariant*" "parameter")
+  )
+)
+
+(define-vfunc change_action_state
+  (of-object "GActionGroup")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+   '("GVariant*" "value")
+  )
+)
+
+(define-vfunc get_action_enabled
+  (of-object "GActionGroup")
+  (return-type "gboolean")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc get_action_parameter_type
+  (of-object "GActionGroup")
+  (return-type "const-GVariantType*")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc get_action_state
+  (of-object "GActionGroup")
+  (return-type "GVariant*")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc get_action_state_hint
+  (of-object "GActionGroup")
+  (return-type "GVariant*")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc get_action_state_type
+  (of-object "GActionGroup")
+  (return-type "const-GVariantType*")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc has_action
+  (of-object "GActionGroup")
+  (return-type "gboolean")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc list_actions
+  (of-object "GActionGroup")
+  (return-type "gchar**")
+)
+
+(define-vfunc query_action
+  (of-object "GActionGroup")
+  (return-type "gboolean")
+  (parameters
+   '("const-gchar*" "action_name")
+   '("gboolean*" "enabled")
+   '("const-GVariantType**" "parameter_type")
+   '("const-GVariantType**" "state_type")
+   '("GVariant**" "state_hint")
+   '("GVariant**" "state")
+  )
+)
+
+(define-vfunc add_action
+  (of-object "GActionMap")
+  (return-type "void")
+  (parameters
+   '("GAction*" "action")
+  )
+)
+
+(define-vfunc lookup_action
+  (of-object "GActionMap")
+  (return-type "GAction*")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc remove_action
+  (of-object "GActionMap")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+  )
+)
+
+(define-vfunc add_supports_type
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+  (parameters
+   '("const-char*" "content_type")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc can_delete
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_remove_supports_type
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+)
+
+(define-vfunc do_delete
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+)
+
+(define-vfunc dup
+  (of-object "GAppInfo")
+  (return-type "GAppInfo*")
+)
+
+(define-vfunc equal
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+  (parameters
+   '("GAppInfo*" "appinfo2")
+  )
+)
+
+(define-vfunc get_commandline
+  (of-object "GAppInfo")
+  (return-type "const-char*")
+)
+
+(define-vfunc get_description
+  (of-object "GAppInfo")
+  (return-type "const-char*")
+)
+
+(define-vfunc get_display_name
+  (of-object "GAppInfo")
+  (return-type "const-char*")
+)
+
+(define-vfunc get_executable
+  (of-object "GAppInfo")
+  (return-type "const-char*")
+)
+
+(define-vfunc get_icon
+  (of-object "GAppInfo")
+  (return-type "GIcon*")
+)
+
+(define-vfunc get_id
+  (of-object "GAppInfo")
+  (return-type "const-char*")
+)
+
+(define-vfunc get_name
+  (of-object "GAppInfo")
+  (return-type "const-char*")
+)
+
+(define-vfunc get_supported_types
+  (of-object "GAppInfo")
+  (return-type "char**")
+)
+
+(define-vfunc launch
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+  (parameters
+   '("GList*" "files")
+   '("GAppLaunchContext*" "launch_context")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc launch_uris
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+  (parameters
+   '("GList*" "uris")
+   '("GAppLaunchContext*" "launch_context")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc remove_supports_type
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+  (parameters
+   '("const-char*" "content_type")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc set_as_default_for_extension
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+  (parameters
+   '("char*" "extension")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc set_as_default_for_type
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+  (parameters
+   '("const-char*" "content_type")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc set_as_last_used_for_type
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+  (parameters
+   '("const-char*" "content_type")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc should_show
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+)
+
+(define-vfunc supports_files
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+)
+
+(define-vfunc supports_uris
+  (of-object "GAppInfo")
+  (return-type "gboolean")
+)
+
+(define-vfunc init_async
+  (of-object "GAsyncInitable")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc init_finish
+  (of-object "GAsyncInitable")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_source_object
+  (of-object "GAsyncResult")
+  (return-type "GObject*")
+)
+
+(define-vfunc get_user_data
+  (of-object "GAsyncResult")
+  (return-type "gpointer")
+)
+
+(define-vfunc is_tagged
+  (of-object "GAsyncResult")
+  (return-type "gboolean")
+  (parameters
+   '("gpointer" "source_tag")
+  )
+)
+
+(define-vfunc convert
+  (of-object "GConverter")
+  (return-type "GConverterResult")
+  (parameters
+   '("const-void*" "inbuf")
+   '("gsize" "inbuf_size")
+   '("void*" "outbuf")
+   '("gsize" "outbuf_size")
+   '("GConverterFlags" "flags")
+   '("gsize*" "bytes_read")
+   '("gsize*" "bytes_written")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc reset
+  (of-object "GConverter")
+  (return-type "void")
+)
+
+(define-vfunc dup_object
+  (of-object "GDBusInterface")
+  (return-type "GDBusObject*")
+)
+
+(define-vfunc get_info
+  (of-object "GDBusInterface")
+  (return-type "GDBusInterfaceInfo*")
+)
+
+(define-vfunc get_object
+  (of-object "GDBusInterface")
+  (return-type "GDBusObject*")
+)
+
+(define-vfunc set_object
+  (of-object "GDBusInterface")
+  (return-type "void")
+  (parameters
+   '("GDBusObject*" "object")
+  )
+)
+
+(define-vfunc get_interface
+  (of-object "GDBusObject")
+  (return-type "GDBusInterface*")
+  (parameters
+   '("const-gchar*" "interface_name")
+  )
+)
+
+(define-vfunc get_interfaces
+  (of-object "GDBusObject")
+  (return-type "GList*")
+)
+
+(define-vfunc get_object_path
+  (of-object "GDBusObject")
+  (return-type "const-gchar*")
+)
+
+(define-vfunc interface_added
+  (of-object "GDBusObject")
+  (return-type "void")
+  (parameters
+   '("GDBusInterface*" "interface_")
+  )
+)
+
+(define-vfunc interface_removed
+  (of-object "GDBusObject")
+  (return-type "void")
+  (parameters
+   '("GDBusInterface*" "interface_")
+  )
+)
+
+(define-vfunc get_interface
+  (of-object "GDBusObjectManager")
+  (return-type "GDBusInterface*")
+  (parameters
+   '("const-gchar*" "object_path")
+   '("const-gchar*" "interface_name")
+  )
+)
+
+(define-vfunc get_object
+  (of-object "GDBusObjectManager")
+  (return-type "GDBusObject*")
+  (parameters
+   '("const-gchar*" "object_path")
+  )
+)
+
+(define-vfunc get_object_path
+  (of-object "GDBusObjectManager")
+  (return-type "const-gchar*")
+)
+
+(define-vfunc get_objects
+  (of-object "GDBusObjectManager")
+  (return-type "GList*")
+)
+
+(define-vfunc interface_added
+  (of-object "GDBusObjectManager")
+  (return-type "void")
+  (parameters
+   '("GDBusObject*" "object")
+   '("GDBusInterface*" "interface_")
+  )
+)
+
+(define-vfunc interface_removed
+  (of-object "GDBusObjectManager")
+  (return-type "void")
+  (parameters
+   '("GDBusObject*" "object")
+   '("GDBusInterface*" "interface_")
+  )
+)
+
+(define-vfunc object_added
+  (of-object "GDBusObjectManager")
+  (return-type "void")
+  (parameters
+   '("GDBusObject*" "object")
+  )
+)
+
+(define-vfunc object_removed
+  (of-object "GDBusObjectManager")
+  (return-type "void")
+  (parameters
+   '("GDBusObject*" "object")
+  )
+)
+
+(define-vfunc condition_check
+  (of-object "GDatagramBased")
+  (return-type "GIOCondition")
+  (parameters
+   '("GIOCondition" "condition")
+  )
+)
+
+(define-vfunc condition_wait
+  (of-object "GDatagramBased")
+  (return-type "gboolean")
+  (parameters
+   '("GIOCondition" "condition")
+   '("gint64" "timeout")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc create_source
+  (of-object "GDatagramBased")
+  (return-type "GSource*")
+  (parameters
+   '("GIOCondition" "condition")
+   '("GCancellable*" "cancellable")
+  )
+)
+
+(define-vfunc receive_messages
+  (of-object "GDatagramBased")
+  (return-type "gint")
+  (parameters
+   '("GInputMessage*" "messages")
+   '("guint" "num_messages")
+   '("gint" "flags")
+   '("gint64" "timeout")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc send_messages
+  (of-object "GDatagramBased")
+  (return-type "gint")
+  (parameters
+   '("GOutputMessage*" "messages")
+   '("guint" "num_messages")
+   '("gint" "flags")
+   '("gint64" "timeout")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_default_for_uri_scheme
+  (of-object "GDesktopAppInfoLookup")
+  (return-type "GAppInfo*")
+  (parameters
+   '("const-char*" "uri_scheme")
+  )
+)
+
+(define-vfunc can_eject
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_poll_for_media
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_start
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_start_degraded
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_stop
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc changed
+  (of-object "GDrive")
+  (return-type "void")
+)
+
+(define-vfunc disconnected
+  (of-object "GDrive")
+  (return-type "void")
+)
+
+(define-vfunc eject
+  (of-object "GDrive")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc eject_button
+  (of-object "GDrive")
+  (return-type "void")
+)
+
+(define-vfunc eject_finish
+  (of-object "GDrive")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc eject_with_operation
+  (of-object "GDrive")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc eject_with_operation_finish
+  (of-object "GDrive")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc enumerate_identifiers
+  (of-object "GDrive")
+  (return-type "char**")
+)
+
+(define-vfunc get_icon
+  (of-object "GDrive")
+  (return-type "GIcon*")
+)
+
+(define-vfunc get_identifier
+  (of-object "GDrive")
+  (return-type "char*")
+  (parameters
+   '("const-char*" "kind")
+  )
+)
+
+(define-vfunc get_name
+  (of-object "GDrive")
+  (return-type "char*")
+)
+
+(define-vfunc get_sort_key
+  (of-object "GDrive")
+  (return-type "const-gchar*")
+)
+
+(define-vfunc get_start_stop_type
+  (of-object "GDrive")
+  (return-type "GDriveStartStopType")
+)
+
+(define-vfunc get_symbolic_icon
+  (of-object "GDrive")
+  (return-type "GIcon*")
+)
+
+(define-vfunc get_volumes
+  (of-object "GDrive")
+  (return-type "GList*")
+)
+
+(define-vfunc has_media
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc has_volumes
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc is_media_check_automatic
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc is_media_removable
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc is_removable
+  (of-object "GDrive")
+  (return-type "gboolean")
+)
+
+(define-vfunc poll_for_media
+  (of-object "GDrive")
+  (return-type "void")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc poll_for_media_finish
+  (of-object "GDrive")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc start
+  (of-object "GDrive")
+  (return-type "void")
+  (parameters
+   '("GDriveStartFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc start_finish
+  (of-object "GDrive")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc stop
+  (of-object "GDrive")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc stop_button
+  (of-object "GDrive")
+  (return-type "void")
+)
+
+(define-vfunc stop_finish
+  (of-object "GDrive")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc accept_certificate
+  (of-object "GDtlsConnection")
+  (return-type "gboolean")
+  (parameters
+   '("GTlsCertificate*" "peer_cert")
+   '("GTlsCertificateFlags" "errors")
+  )
+)
+
+(define-vfunc handshake
+  (of-object "GDtlsConnection")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc handshake_async
+  (of-object "GDtlsConnection")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc handshake_finish
+  (of-object "GDtlsConnection")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc shutdown
+  (of-object "GDtlsConnection")
+  (return-type "gboolean")
+  (parameters
+   '("gboolean" "shutdown_read")
+   '("gboolean" "shutdown_write")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc shutdown_async
+  (of-object "GDtlsConnection")
+  (return-type "void")
+  (parameters
+   '("gboolean" "shutdown_read")
+   '("gboolean" "shutdown_write")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc shutdown_finish
+  (of-object "GDtlsConnection")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc append_to
+  (of-object "GFile")
+  (return-type "GFileOutputStream*")
+  (parameters
+   '("GFileCreateFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc append_to_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GFileCreateFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc append_to_finish
+  (of-object "GFile")
+  (return-type "GFileOutputStream*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc copy
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GFile*" "destination")
+   '("GFileCopyFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GFileProgressCallback" "progress_callback")
+   '("gpointer" "progress_callback_data")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc copy_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GFile*" "destination")
+   '("GFileCopyFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GFileProgressCallback" "progress_callback")
+   '("gpointer" "progress_callback_data")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc copy_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc create
+  (of-object "GFile")
+  (return-type "GFileOutputStream*")
+  (parameters
+   '("GFileCreateFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc create_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GFileCreateFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc create_finish
+  (of-object "GFile")
+  (return-type "GFileOutputStream*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc create_readwrite
+  (of-object "GFile")
+  (return-type "GFileIOStream*")
+  (parameters
+   '("GFileCreateFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc create_readwrite_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GFileCreateFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc create_readwrite_finish
+  (of-object "GFile")
+  (return-type "GFileIOStream*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc delete_file
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc delete_file_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc delete_file_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc dup
+  (of-object "GFile")
+  (return-type "GFile*")
+)
+
+(define-vfunc eject_mountable
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc eject_mountable_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc eject_mountable_with_operation
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc eject_mountable_with_operation_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc enumerate_children
+  (of-object "GFile")
+  (return-type "GFileEnumerator*")
+  (parameters
+   '("const-char*" "attributes")
+   '("GFileQueryInfoFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc enumerate_children_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("const-char*" "attributes")
+   '("GFileQueryInfoFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc enumerate_children_finish
+  (of-object "GFile")
+  (return-type "GFileEnumerator*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc equal
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GFile*" "file2")
+  )
+)
+
+(define-vfunc find_enclosing_mount
+  (of-object "GFile")
+  (return-type "GMount*")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc find_enclosing_mount_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc find_enclosing_mount_finish
+  (of-object "GFile")
+  (return-type "GMount*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_basename
+  (of-object "GFile")
+  (return-type "char*")
+)
+
+(define-vfunc get_child_for_display_name
+  (of-object "GFile")
+  (return-type "GFile*")
+  (parameters
+   '("const-char*" "display_name")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_parent
+  (of-object "GFile")
+  (return-type "GFile*")
+)
+
+(define-vfunc get_parse_name
+  (of-object "GFile")
+  (return-type "char*")
+)
+
+(define-vfunc get_path
+  (of-object "GFile")
+  (return-type "char*")
+)
+
+(define-vfunc get_relative_path
+  (of-object "GFile")
+  (return-type "char*")
+  (parameters
+   '("GFile*" "descendant")
+  )
+)
+
+(define-vfunc get_uri
+  (of-object "GFile")
+  (return-type "char*")
+)
+
+(define-vfunc get_uri_scheme
+  (of-object "GFile")
+  (return-type "char*")
+)
+
+(define-vfunc has_uri_scheme
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("const-char*" "uri_scheme")
+  )
+)
+
+(define-vfunc hash
+  (of-object "GFile")
+  (return-type "guint")
+)
+
+(define-vfunc is_native
+  (of-object "GFile")
+  (return-type "gboolean")
+)
+
+(define-vfunc make_directory
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc make_directory_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc make_directory_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc make_symbolic_link
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("char*" "symlink_value")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc measure_disk_usage
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GFileMeasureFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GFileMeasureProgressCallback" "progress_callback")
+   '("gpointer" "progress_data")
+   '("guint64*" "disk_usage")
+   '("guint64*" "num_dirs")
+   '("guint64*" "num_files")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc measure_disk_usage_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GFileMeasureFlags" "flags")
+   '("gint" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GFileMeasureProgressCallback" "progress_callback")
+   '("gpointer" "progress_data")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc measure_disk_usage_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("guint64*" "disk_usage")
+   '("guint64*" "num_dirs")
+   '("guint64*" "num_files")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc monitor_dir
+  (of-object "GFile")
+  (return-type "GFileMonitor*")
+  (parameters
+   '("GFileMonitorFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc monitor_file
+  (of-object "GFile")
+  (return-type "GFileMonitor*")
+  (parameters
+   '("GFileMonitorFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc mount_enclosing_volume
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GMountMountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc mount_enclosing_volume_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc mount_mountable
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GMountMountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc mount_mountable_finish
+  (of-object "GFile")
+  (return-type "GFile*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc move
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GFile*" "destination")
+   '("GFileCopyFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GFileProgressCallback" "progress_callback")
+   '("gpointer" "progress_callback_data")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc open_readwrite
+  (of-object "GFile")
+  (return-type "GFileIOStream*")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc open_readwrite_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc open_readwrite_finish
+  (of-object "GFile")
+  (return-type "GFileIOStream*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc poll_mountable
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc poll_mountable_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc prefix_matches
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GFile*" "file")
+  )
+)
+
+(define-vfunc query_filesystem_info
+  (of-object "GFile")
+  (return-type "GFileInfo*")
+  (parameters
+   '("const-char*" "attributes")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc query_filesystem_info_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("const-char*" "attributes")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc query_filesystem_info_finish
+  (of-object "GFile")
+  (return-type "GFileInfo*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc query_info
+  (of-object "GFile")
+  (return-type "GFileInfo*")
+  (parameters
+   '("const-char*" "attributes")
+   '("GFileQueryInfoFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc query_info_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("const-char*" "attributes")
+   '("GFileQueryInfoFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc query_info_finish
+  (of-object "GFile")
+  (return-type "GFileInfo*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc query_settable_attributes
+  (of-object "GFile")
+  (return-type "GFileAttributeInfoList*")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc query_writable_namespaces
+  (of-object "GFile")
+  (return-type "GFileAttributeInfoList*")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc read_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc read_finish
+  (of-object "GFile")
+  (return-type "GFileInputStream*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc read_fn
+  (of-object "GFile")
+  (return-type "GFileInputStream*")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc replace
+  (of-object "GFile")
+  (return-type "GFileOutputStream*")
+  (parameters
+   '("const-char*" "etag")
+   '("gboolean" "make_backup")
+   '("GFileCreateFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc replace_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("const-char*" "etag")
+   '("gboolean" "make_backup")
+   '("GFileCreateFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc replace_finish
+  (of-object "GFile")
+  (return-type "GFileOutputStream*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc replace_readwrite
+  (of-object "GFile")
+  (return-type "GFileIOStream*")
+  (parameters
+   '("const-char*" "etag")
+   '("gboolean" "make_backup")
+   '("GFileCreateFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc replace_readwrite_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("const-char*" "etag")
+   '("gboolean" "make_backup")
+   '("GFileCreateFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc replace_readwrite_finish
+  (of-object "GFile")
+  (return-type "GFileIOStream*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc resolve_relative_path
+  (of-object "GFile")
+  (return-type "GFile*")
+  (parameters
+   '("char*" "relative_path")
+  )
+)
+
+(define-vfunc set_attribute
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("const-char*" "attribute")
+   '("GFileAttributeType" "type")
+   '("gpointer" "value_p")
+   '("GFileQueryInfoFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc set_attributes_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GFileInfo*" "info")
+   '("GFileQueryInfoFlags" "flags")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc set_attributes_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GFileInfo**" "info")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc set_attributes_from_info
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GFileInfo*" "info")
+   '("GFileQueryInfoFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc set_display_name
+  (of-object "GFile")
+  (return-type "GFile*")
+  (parameters
+   '("const-char*" "display_name")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc set_display_name_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("const-char*" "display_name")
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc set_display_name_finish
+  (of-object "GFile")
+  (return-type "GFile*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc start_mountable
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GDriveStartFlags" "flags")
+   '("GMountOperation*" "start_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc start_mountable_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc stop_mountable
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc stop_mountable_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc trash
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc trash_async
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("int" "io_priority")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc trash_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc unmount_mountable
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc unmount_mountable_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc unmount_mountable_with_operation
+  (of-object "GFile")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc unmount_mountable_with_operation_finish
+  (of-object "GFile")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_fd
+  (of-object "GFileDescriptorBased")
+  (return-type "int")
+)
+
+(define-vfunc equal
+  (of-object "GIcon")
+  (return-type "gboolean")
+  (parameters
+   '("GIcon*" "icon2")
+  )
+)
+
+(define-vfunc hash
+  (of-object "GIcon")
+  (return-type "guint")
+)
+
+(define-vfunc serialize
+  (of-object "GIcon")
+  (return-type "GVariant*")
+)
+
+(define-vfunc to_tokens
+  (of-object "GIcon")
+  (return-type "gboolean")
+  (parameters
+   '("GPtrArray*" "tokens")
+   '("gint*" "out_version")
+  )
+)
+
+(define-vfunc init
+  (of-object "GInitable")
+  (return-type "gboolean")
+  (parameters
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_item
+  (of-object "GListModel")
+  (return-type "gpointer")
+  (parameters
+   '("guint" "position")
+  )
+)
+
+(define-vfunc get_item_type
+  (of-object "GListModel")
+  (return-type "GType")
+)
+
+(define-vfunc get_n_items
+  (of-object "GListModel")
+  (return-type "guint")
+)
+
+(define-vfunc load
+  (of-object "GLoadableIcon")
+  (return-type "GInputStream*")
+  (parameters
+   '("int" "size")
+   '("char**" "type")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc load_async
+  (of-object "GLoadableIcon")
+  (return-type "void")
+  (parameters
+   '("int" "size")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc load_finish
+  (of-object "GLoadableIcon")
+  (return-type "GInputStream*")
+  (parameters
+   '("GAsyncResult*" "res")
+   '("char**" "type")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc can_eject
+  (of-object "GMount")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_unmount
+  (of-object "GMount")
+  (return-type "gboolean")
+)
+
+(define-vfunc changed
+  (of-object "GMount")
+  (return-type "void")
+)
+
+(define-vfunc eject
+  (of-object "GMount")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc eject_finish
+  (of-object "GMount")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc eject_with_operation
+  (of-object "GMount")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc eject_with_operation_finish
+  (of-object "GMount")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc get_default_location
+  (of-object "GMount")
+  (return-type "GFile*")
+)
+
+(define-vfunc get_drive
+  (of-object "GMount")
+  (return-type "GDrive*")
+)
+
+(define-vfunc get_icon
+  (of-object "GMount")
+  (return-type "GIcon*")
+)
+
+(define-vfunc get_name
+  (of-object "GMount")
+  (return-type "char*")
+)
+
+(define-vfunc get_root
+  (of-object "GMount")
+  (return-type "GFile*")
+)
+
+(define-vfunc get_sort_key
+  (of-object "GMount")
+  (return-type "const-gchar*")
+)
+
+(define-vfunc get_symbolic_icon
+  (of-object "GMount")
+  (return-type "GIcon*")
+)
+
+(define-vfunc get_uuid
+  (of-object "GMount")
+  (return-type "char*")
+)
+
+(define-vfunc get_volume
+  (of-object "GMount")
+  (return-type "GVolume*")
+)
+
+(define-vfunc guess_content_type
+  (of-object "GMount")
+  (return-type "void")
+  (parameters
+   '("gboolean" "force_rescan")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc guess_content_type_finish
+  (of-object "GMount")
+  (return-type "gchar**")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc guess_content_type_sync
+  (of-object "GMount")
+  (return-type "gchar**")
+  (parameters
+   '("gboolean" "force_rescan")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc pre_unmount
+  (of-object "GMount")
+  (return-type "void")
+)
+
+(define-vfunc remount
+  (of-object "GMount")
+  (return-type "void")
+  (parameters
+   '("GMountMountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc remount_finish
+  (of-object "GMount")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc unmount
+  (of-object "GMount")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc unmount_finish
+  (of-object "GMount")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc unmount_with_operation
+  (of-object "GMount")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc unmount_with_operation_finish
+  (of-object "GMount")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc unmounted
+  (of-object "GMount")
+  (return-type "void")
+)
+
+(define-vfunc can_reach
+  (of-object "GNetworkMonitor")
+  (return-type "gboolean")
+  (parameters
+   '("GSocketConnectable*" "connectable")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc can_reach_async
+  (of-object "GNetworkMonitor")
+  (return-type "void")
+  (parameters
+   '("GSocketConnectable*" "connectable")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc can_reach_finish
+  (of-object "GNetworkMonitor")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc network_changed
+  (of-object "GNetworkMonitor")
+  (return-type "void")
+  (parameters
+   '("gboolean" "available")
+  )
+)
+
+(define-vfunc can_poll
+  (of-object "GPollableInputStream")
+  (return-type "gboolean")
+)
+
+(define-vfunc create_source
+  (of-object "GPollableInputStream")
+  (return-type "GSource*")
+  (parameters
+   '("GCancellable*" "cancellable")
+  )
+)
+
+(define-vfunc is_readable
+  (of-object "GPollableInputStream")
+  (return-type "gboolean")
+)
+
+(define-vfunc read_nonblocking
+  (of-object "GPollableInputStream")
+  (return-type "gssize")
+  (parameters
+   '("void*" "buffer")
+   '("gsize" "count")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc can_poll
+  (of-object "GPollableOutputStream")
+  (return-type "gboolean")
+)
+
+(define-vfunc create_source
+  (of-object "GPollableOutputStream")
+  (return-type "GSource*")
+  (parameters
+   '("GCancellable*" "cancellable")
+  )
+)
+
+(define-vfunc is_writable
+  (of-object "GPollableOutputStream")
+  (return-type "gboolean")
+)
+
+(define-vfunc write_nonblocking
+  (of-object "GPollableOutputStream")
+  (return-type "gssize")
+  (parameters
+   '("const-void*" "buffer")
+   '("gsize" "count")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc connect
+  (of-object "GProxy")
+  (return-type "GIOStream*")
+  (parameters
+   '("GIOStream*" "connection")
+   '("GProxyAddress*" "proxy_address")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc connect_async
+  (of-object "GProxy")
+  (return-type "void")
+  (parameters
+   '("GIOStream*" "connection")
+   '("GProxyAddress*" "proxy_address")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc connect_finish
+  (of-object "GProxy")
+  (return-type "GIOStream*")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc supports_hostname
+  (of-object "GProxy")
+  (return-type "gboolean")
+)
+
+(define-vfunc is_supported
+  (of-object "GProxyResolver")
+  (return-type "gboolean")
+)
+
+(define-vfunc lookup
+  (of-object "GProxyResolver")
+  (return-type "gchar**")
+  (parameters
+   '("const-gchar*" "uri")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc lookup_async
+  (of-object "GProxyResolver")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "uri")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc lookup_finish
+  (of-object "GProxyResolver")
+  (return-type "gchar**")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc activate_action_full
+  (of-object "GRemoteActionGroup")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+   '("GVariant*" "parameter")
+   '("GVariant*" "platform_data")
+  )
+)
+
+(define-vfunc change_action_state_full
+  (of-object "GRemoteActionGroup")
+  (return-type "void")
+  (parameters
+   '("const-gchar*" "action_name")
+   '("GVariant*" "value")
+   '("GVariant*" "platform_data")
+  )
+)
+
+(define-vfunc can_seek
+  (of-object "GSeekable")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_truncate
+  (of-object "GSeekable")
+  (return-type "gboolean")
+)
+
+(define-vfunc seek
+  (of-object "GSeekable")
+  (return-type "gboolean")
+  (parameters
+   '("goffset" "offset")
+   '("GSeekType" "type")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc tell
+  (of-object "GSeekable")
+  (return-type "goffset")
+)
+
+(define-vfunc truncate_fn
+  (of-object "GSeekable")
+  (return-type "gboolean")
+  (parameters
+   '("goffset" "offset")
+   '("GCancellable*" "cancellable")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc enumerate
+  (of-object "GSocketConnectable")
+  (return-type "GSocketAddressEnumerator*")
+)
+
+(define-vfunc proxy_enumerate
+  (of-object "GSocketConnectable")
+  (return-type "GSocketAddressEnumerator*")
+)
+
+(define-vfunc to_string
+  (of-object "GSocketConnectable")
+  (return-type "gchar*")
+)
+
+(define-vfunc get_default_database
+  (of-object "GTlsBackend")
+  (return-type "GTlsDatabase*")
+)
+
+(define-vfunc supports_dtls
+  (of-object "GTlsBackend")
+  (return-type "gboolean")
+)
+
+(define-vfunc supports_tls
+  (of-object "GTlsBackend")
+  (return-type "gboolean")
+)
+
+(define-vfunc copy_session_state
+  (of-object "GTlsClientConnection")
+  (return-type "void")
+  (parameters
+   '("GTlsClientConnection*" "source")
+  )
+)
+
+(define-vfunc can_eject
+  (of-object "GVolume")
+  (return-type "gboolean")
+)
+
+(define-vfunc can_mount
+  (of-object "GVolume")
+  (return-type "gboolean")
+)
+
+(define-vfunc changed
+  (of-object "GVolume")
+  (return-type "void")
+)
+
+(define-vfunc eject
+  (of-object "GVolume")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc eject_finish
+  (of-object "GVolume")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc eject_with_operation
+  (of-object "GVolume")
+  (return-type "void")
+  (parameters
+   '("GMountUnmountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc eject_with_operation_finish
+  (of-object "GVolume")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc enumerate_identifiers
+  (of-object "GVolume")
+  (return-type "char**")
+)
+
+(define-vfunc get_activation_root
+  (of-object "GVolume")
+  (return-type "GFile*")
+)
+
+(define-vfunc get_drive
+  (of-object "GVolume")
+  (return-type "GDrive*")
+)
+
+(define-vfunc get_icon
+  (of-object "GVolume")
+  (return-type "GIcon*")
+)
+
+(define-vfunc get_identifier
+  (of-object "GVolume")
+  (return-type "char*")
+  (parameters
+   '("const-char*" "kind")
+  )
+)
+
+(define-vfunc get_mount
+  (of-object "GVolume")
+  (return-type "GMount*")
+)
+
+(define-vfunc get_name
+  (of-object "GVolume")
+  (return-type "char*")
+)
+
+(define-vfunc get_sort_key
+  (of-object "GVolume")
+  (return-type "const-gchar*")
+)
+
+(define-vfunc get_symbolic_icon
+  (of-object "GVolume")
+  (return-type "GIcon*")
+)
+
+(define-vfunc get_uuid
+  (of-object "GVolume")
+  (return-type "char*")
+)
+
+(define-vfunc mount_finish
+  (of-object "GVolume")
+  (return-type "gboolean")
+  (parameters
+   '("GAsyncResult*" "result")
+   '("GError**" "error")
+  )
+)
+
+(define-vfunc mount_fn
+  (of-object "GVolume")
+  (return-type "void")
+  (parameters
+   '("GMountMountFlags" "flags")
+   '("GMountOperation*" "mount_operation")
+   '("GCancellable*" "cancellable")
+   '("GAsyncReadyCallback" "callback")
+   '("gpointer" "user_data")
+  )
+)
+
+(define-vfunc removed
+  (of-object "GVolume")
+  (return-type "void")
+)
+
+(define-vfunc should_automount
+  (of-object "GVolume")
+  (return-type "gboolean")
 )
 

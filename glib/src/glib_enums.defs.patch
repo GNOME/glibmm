@@ -1,37 +1,17 @@
---- ./../../glib/src/glib_enums.defs.orig	2015-07-24 16:56:29.570857821 +0200
-+++ ./../../glib/src/glib_enums.defs	2015-07-24 16:56:29.706864274 +0200
-@@ -464,20 +464,28 @@
- ;;   G_IO_ERR	GLIB_SYSDEF_POLLERR,
- ;;   G_IO_HUP	GLIB_SYSDEF_POLLHUP,
- ;;   G_IO_NVAL	GLIB_SYSDEF_POLLNVAL
- ;; } GIOCondition;
- 
-+;; We hand-edit these to use the actual enum values,
-+;; because the values are actually defines that contain a =,
-+;; which is very bizarre.
-+;; We would need to include the header anyway,
-+;; because we can't just use numeric values.
-+;; If you regenerate this .defs file and forget to make this change
-+;; then you will see compiler errors like this:
-+;; ../glibmm/iochannel.h:154:12: error: expected primary-expression before '=' token
- (define-flags-extended IOCondition
-   (in-module "G")
-   (c-name "GIOCondition")
-   (values
--    '("in" "G_IO_IN" "GLIB_SYSDEF_POLLIN")
--    '("out" "G_IO_OUT" "GLIB_SYSDEF_POLLOUT")
--    '("pri" "G_IO_PRI" "GLIB_SYSDEF_POLLPRI")
--    '("err" "G_IO_ERR" "GLIB_SYSDEF_POLLERR")
--    '("hup" "G_IO_HUP" "GLIB_SYSDEF_POLLHUP")
--    '("nval" "G_IO_NVAL" "GLIB_SYSDEF_POLLNVAL")
-+    '("in" "G_IO_IN" "G_IO_IN")
-+    '("out" "G_IO_OUT" "G_IO_OUT")
-+    '("pri" "G_IO_PRI" "G_IO_PRI")
-+    '("err" "G_IO_ERR" "G_IO_ERR")
-+    '("hup" "G_IO_HUP" "G_IO_HUP")
-+    '("nval" "G_IO_NVAL" "G_IO_NVAL")
+--- glib_enums.defs
++++ glib_enums.defs
+@@ -1108,3 +1108,14 @@
    )
  )
  
- ;; From gmarkup.h
- 
++(define-enum-extended ThreadPriority
++  (in-module "G")
++  (c-name "GThreadPriority")
++  (values
++    '("low" "G_THREAD_PRIORITY_LOW" "0")
++    '("normal" "G_THREAD_PRIORITY_NORMAL" "1")
++    '("high" "G_THREAD_PRIORITY_HIGH" "2")
++    '("urgent" "G_THREAD_PRIORITY_URGENT" "3")
++  )
++)
++

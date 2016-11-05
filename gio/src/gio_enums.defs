@@ -1,74 +1,83 @@
-;; From gdbusauthmechanism.h
-
-;; Original typedef:
-;; typedef enum {
-;;   G_DBUS_AUTH_MECHANISM_STATE_INVALID,
-;;   G_DBUS_AUTH_MECHANISM_STATE_WAITING_FOR_DATA,
-;;   G_DBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND,
-;;   G_DBUS_AUTH_MECHANISM_STATE_REJECTED,
-;;   G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED,
-;; } GDBusAuthMechanismState;
-
-(define-enum-extended DBusAuthMechanismState
-  (in-module "G")
-  (c-name "GDBusAuthMechanismState")
-  (values
-    '("invalid" "G_DBUS_AUTH_MECHANISM_STATE_INVALID" "0")
-    '("waiting-for-data" "G_DBUS_AUTH_MECHANISM_STATE_WAITING_FOR_DATA" "1")
-    '("have-data-to-send" "G_DBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND" "2")
-    '("rejected" "G_DBUS_AUTH_MECHANISM_STATE_REJECTED" "3")
-    '("accepted" "G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED" "4")
-  )
-)
-
-;; From gioenums.h
-
-;; Original typedef:
-;; typedef enum {
-;;   G_APP_INFO_CREATE_NONE                           = 0,         /*< nick=none >*/
-;;   G_APP_INFO_CREATE_NEEDS_TERMINAL                 = (1 << 0),  /*< nick=needs-terminal >*/
-;;   G_APP_INFO_CREATE_SUPPORTS_URIS                  = (1 << 1),  /*< nick=supports-uris >*/
-;;   G_APP_INFO_CREATE_SUPPORTS_STARTUP_NOTIFICATION  = (1 << 2)   /*< nick=supports-startup-notification >*/
-;; } GAppInfoCreateFlags;
-
 (define-flags-extended AppInfoCreateFlags
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GAppInfoCreateFlags")
   (values
-    '("none" "G_APP_INFO_CREATE_NONE" "0x0")
-    '("needs-terminal" "G_APP_INFO_CREATE_NEEDS_TERMINAL" "(1 << 0)")
-    '("supports-uris" "G_APP_INFO_CREATE_SUPPORTS_URIS" "(1 << 1)")
-    '("supports-startup-notification" "G_APP_INFO_CREATE_SUPPORTS_STARTUP_NOTIFICATION" "(1 << 2)")
+    '("none" "G_APP_INFO_CREATE_NONE" "0")
+    '("needs_terminal" "G_APP_INFO_CREATE_NEEDS_TERMINAL" "1")
+    '("supports_uris" "G_APP_INFO_CREATE_SUPPORTS_URIS" "2")
+    '("supports_startup_notification" "G_APP_INFO_CREATE_SUPPORTS_STARTUP_NOTIFICATION" "4")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_CONVERTER_NO_FLAGS     = 0,         /*< nick=none >*/
-;;   G_CONVERTER_INPUT_AT_END = (1 << 0),  /*< nick=input-at-end >*/
-;;   G_CONVERTER_FLUSH        = (1 << 1)   /*< nick=flush >*/
-;; } GConverterFlags;
+(define-flags-extended ApplicationFlags
+  (in-module "Gio")
+  (c-name "GApplicationFlags")
+  (values
+    '("flags_none" "G_APPLICATION_FLAGS_NONE" "0")
+    '("is_service" "G_APPLICATION_IS_SERVICE" "1")
+    '("is_launcher" "G_APPLICATION_IS_LAUNCHER" "2")
+    '("handles_open" "G_APPLICATION_HANDLES_OPEN" "4")
+    '("handles_command_line" "G_APPLICATION_HANDLES_COMMAND_LINE" "8")
+    '("send_environment" "G_APPLICATION_SEND_ENVIRONMENT" "16")
+    '("non_unique" "G_APPLICATION_NON_UNIQUE" "32")
+    '("can_override_app_id" "G_APPLICATION_CAN_OVERRIDE_APP_ID" "64")
+  )
+)
+
+(define-flags-extended AskPasswordFlags
+  (in-module "Gio")
+  (c-name "GAskPasswordFlags")
+  (values
+    '("need_password" "G_ASK_PASSWORD_NEED_PASSWORD" "1")
+    '("need_username" "G_ASK_PASSWORD_NEED_USERNAME" "2")
+    '("need_domain" "G_ASK_PASSWORD_NEED_DOMAIN" "4")
+    '("saving_supported" "G_ASK_PASSWORD_SAVING_SUPPORTED" "8")
+    '("anonymous_supported" "G_ASK_PASSWORD_ANONYMOUS_SUPPORTED" "16")
+  )
+)
+
+(define-flags-extended BusNameOwnerFlags
+  (in-module "Gio")
+  (c-name "GBusNameOwnerFlags")
+  (values
+    '("none" "G_BUS_NAME_OWNER_FLAGS_NONE" "0")
+    '("allow_replacement" "G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT" "1")
+    '("replace" "G_BUS_NAME_OWNER_FLAGS_REPLACE" "2")
+  )
+)
+
+(define-flags-extended BusNameWatcherFlags
+  (in-module "Gio")
+  (c-name "GBusNameWatcherFlags")
+  (values
+    '("none" "G_BUS_NAME_WATCHER_FLAGS_NONE" "0")
+    '("auto_start" "G_BUS_NAME_WATCHER_FLAGS_AUTO_START" "1")
+  )
+)
+
+(define-enum-extended BusType
+  (in-module "Gio")
+  (c-name "GBusType")
+  (values
+    '("starter" "G_BUS_TYPE_STARTER" "-1")
+    '("none" "G_BUS_TYPE_NONE" "0")
+    '("system" "G_BUS_TYPE_SYSTEM" "1")
+    '("session" "G_BUS_TYPE_SESSION" "2")
+  )
+)
 
 (define-flags-extended ConverterFlags
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GConverterFlags")
   (values
-    '("no-flags" "G_CONVERTER_NO_FLAGS" "0x0")
-    '("input-at-end" "G_CONVERTER_INPUT_AT_END" "(1 << 0)")
-    '("flush" "G_CONVERTER_FLUSH" "(1 << 1)")
+    '("none" "G_CONVERTER_NO_FLAGS" "0")
+    '("input_at_end" "G_CONVERTER_INPUT_AT_END" "1")
+    '("flush" "G_CONVERTER_FLUSH" "2")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_CONVERTER_ERROR     = 0,  /*< nick=error >*/
-;;   G_CONVERTER_CONVERTED = 1,  /*< nick=converted >*/
-;;   G_CONVERTER_FINISHED  = 2,  /*< nick=finished >*/
-;;   G_CONVERTER_FLUSHED   = 3   /*< nick=flushed >*/
-;; } GConverterResult;
-
 (define-enum-extended ConverterResult
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GConverterResult")
   (values
     '("error" "G_CONVERTER_ERROR" "0")
@@ -78,210 +87,263 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN,
-;;   G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN,
-;;   G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN
-;; } GDataStreamByteOrder;
-
-(define-enum-extended DataStreamByteOrder
-  (in-module "G")
-  (c-name "GDataStreamByteOrder")
+(define-enum-extended CredentialsType
+  (in-module "Gio")
+  (c-name "GCredentialsType")
   (values
-    '("big-endian" "G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN" "0")
-    '("little-endian" "G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN" "1")
-    '("host-endian" "G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN" "2")
+    '("invalid" "G_CREDENTIALS_TYPE_INVALID" "0")
+    '("linux_ucred" "G_CREDENTIALS_TYPE_LINUX_UCRED" "1")
+    '("freebsd_cmsgcred" "G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED" "2")
+    '("openbsd_sockpeercred" "G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED" "3")
+    '("solaris_ucred" "G_CREDENTIALS_TYPE_SOLARIS_UCRED" "4")
+    '("netbsd_unpcbid" "G_CREDENTIALS_TYPE_NETBSD_UNPCBID" "5")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_DATA_STREAM_NEWLINE_TYPE_LF,
-;;   G_DATA_STREAM_NEWLINE_TYPE_CR,
-;;   G_DATA_STREAM_NEWLINE_TYPE_CR_LF,
-;;   G_DATA_STREAM_NEWLINE_TYPE_ANY
-;; } GDataStreamNewlineType;
+(define-flags-extended DBusCallFlags
+  (in-module "Gio")
+  (c-name "GDBusCallFlags")
+  (values
+    '("none" "G_DBUS_CALL_FLAGS_NONE" "0")
+    '("no_auto_start" "G_DBUS_CALL_FLAGS_NO_AUTO_START" "1")
+    '("allow_interactive_authorization" "G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION" "2")
+  )
+)
+
+(define-flags-extended DBusCapabilityFlags
+  (in-module "Gio")
+  (c-name "GDBusCapabilityFlags")
+  (values
+    '("none" "G_DBUS_CAPABILITY_FLAGS_NONE" "0")
+    '("unix_fd_passing" "G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING" "1")
+  )
+)
+
+(define-flags-extended DBusConnectionFlags
+  (in-module "Gio")
+  (c-name "GDBusConnectionFlags")
+  (values
+    '("none" "G_DBUS_CONNECTION_FLAGS_NONE" "0")
+    '("authentication_client" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT" "1")
+    '("authentication_server" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER" "2")
+    '("authentication_allow_anonymous" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS" "4")
+    '("message_bus_connection" "G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION" "8")
+    '("delay_message_processing" "G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING" "16")
+  )
+)
+
+(define-enum-extended DBusError
+  (in-module "Gio")
+  (c-name "GDBusError")
+  (values
+    '("failed" "G_DBUS_ERROR_FAILED" "0")
+    '("no_memory" "G_DBUS_ERROR_NO_MEMORY" "1")
+    '("service_unknown" "G_DBUS_ERROR_SERVICE_UNKNOWN" "2")
+    '("name_has_no_owner" "G_DBUS_ERROR_NAME_HAS_NO_OWNER" "3")
+    '("no_reply" "G_DBUS_ERROR_NO_REPLY" "4")
+    '("io_error" "G_DBUS_ERROR_IO_ERROR" "5")
+    '("bad_address" "G_DBUS_ERROR_BAD_ADDRESS" "6")
+    '("not_supported" "G_DBUS_ERROR_NOT_SUPPORTED" "7")
+    '("limits_exceeded" "G_DBUS_ERROR_LIMITS_EXCEEDED" "8")
+    '("access_denied" "G_DBUS_ERROR_ACCESS_DENIED" "9")
+    '("auth_failed" "G_DBUS_ERROR_AUTH_FAILED" "10")
+    '("no_server" "G_DBUS_ERROR_NO_SERVER" "11")
+    '("timeout" "G_DBUS_ERROR_TIMEOUT" "12")
+    '("no_network" "G_DBUS_ERROR_NO_NETWORK" "13")
+    '("address_in_use" "G_DBUS_ERROR_ADDRESS_IN_USE" "14")
+    '("disconnected" "G_DBUS_ERROR_DISCONNECTED" "15")
+    '("invalid_args" "G_DBUS_ERROR_INVALID_ARGS" "16")
+    '("file_not_found" "G_DBUS_ERROR_FILE_NOT_FOUND" "17")
+    '("file_exists" "G_DBUS_ERROR_FILE_EXISTS" "18")
+    '("unknown_method" "G_DBUS_ERROR_UNKNOWN_METHOD" "19")
+    '("timed_out" "G_DBUS_ERROR_TIMED_OUT" "20")
+    '("match_rule_not_found" "G_DBUS_ERROR_MATCH_RULE_NOT_FOUND" "21")
+    '("match_rule_invalid" "G_DBUS_ERROR_MATCH_RULE_INVALID" "22")
+    '("spawn_exec_failed" "G_DBUS_ERROR_SPAWN_EXEC_FAILED" "23")
+    '("spawn_fork_failed" "G_DBUS_ERROR_SPAWN_FORK_FAILED" "24")
+    '("spawn_child_exited" "G_DBUS_ERROR_SPAWN_CHILD_EXITED" "25")
+    '("spawn_child_signaled" "G_DBUS_ERROR_SPAWN_CHILD_SIGNALED" "26")
+    '("spawn_failed" "G_DBUS_ERROR_SPAWN_FAILED" "27")
+    '("spawn_setup_failed" "G_DBUS_ERROR_SPAWN_SETUP_FAILED" "28")
+    '("spawn_config_invalid" "G_DBUS_ERROR_SPAWN_CONFIG_INVALID" "29")
+    '("spawn_service_invalid" "G_DBUS_ERROR_SPAWN_SERVICE_INVALID" "30")
+    '("spawn_service_not_found" "G_DBUS_ERROR_SPAWN_SERVICE_NOT_FOUND" "31")
+    '("spawn_permissions_invalid" "G_DBUS_ERROR_SPAWN_PERMISSIONS_INVALID" "32")
+    '("spawn_file_invalid" "G_DBUS_ERROR_SPAWN_FILE_INVALID" "33")
+    '("spawn_no_memory" "G_DBUS_ERROR_SPAWN_NO_MEMORY" "34")
+    '("unix_process_id_unknown" "G_DBUS_ERROR_UNIX_PROCESS_ID_UNKNOWN" "35")
+    '("invalid_signature" "G_DBUS_ERROR_INVALID_SIGNATURE" "36")
+    '("invalid_file_content" "G_DBUS_ERROR_INVALID_FILE_CONTENT" "37")
+    '("selinux_security_context_unknown" "G_DBUS_ERROR_SELINUX_SECURITY_CONTEXT_UNKNOWN" "38")
+    '("adt_audit_data_unknown" "G_DBUS_ERROR_ADT_AUDIT_DATA_UNKNOWN" "39")
+    '("object_path_in_use" "G_DBUS_ERROR_OBJECT_PATH_IN_USE" "40")
+    '("unknown_object" "G_DBUS_ERROR_UNKNOWN_OBJECT" "41")
+    '("unknown_interface" "G_DBUS_ERROR_UNKNOWN_INTERFACE" "42")
+    '("unknown_property" "G_DBUS_ERROR_UNKNOWN_PROPERTY" "43")
+    '("property_read_only" "G_DBUS_ERROR_PROPERTY_READ_ONLY" "44")
+  )
+)
+
+(define-flags-extended DBusInterfaceSkeletonFlags
+  (in-module "Gio")
+  (c-name "GDBusInterfaceSkeletonFlags")
+  (values
+    '("none" "G_DBUS_INTERFACE_SKELETON_FLAGS_NONE" "0")
+    '("handle_method_invocations_in_thread" "G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD" "1")
+  )
+)
+
+(define-enum-extended DBusMessageByteOrder
+  (in-module "Gio")
+  (c-name "GDBusMessageByteOrder")
+  (values
+    '("big_endian" "G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN" "66")
+    '("little_endian" "G_DBUS_MESSAGE_BYTE_ORDER_LITTLE_ENDIAN" "108")
+  )
+)
+
+(define-flags-extended DBusMessageFlags
+  (in-module "Gio")
+  (c-name "GDBusMessageFlags")
+  (values
+    '("none" "G_DBUS_MESSAGE_FLAGS_NONE" "0")
+    '("no_reply_expected" "G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED" "1")
+    '("no_auto_start" "G_DBUS_MESSAGE_FLAGS_NO_AUTO_START" "2")
+    '("allow_interactive_authorization" "G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION" "4")
+  )
+)
+
+(define-enum-extended DBusMessageHeaderField
+  (in-module "Gio")
+  (c-name "GDBusMessageHeaderField")
+  (values
+    '("invalid" "G_DBUS_MESSAGE_HEADER_FIELD_INVALID" "0")
+    '("path" "G_DBUS_MESSAGE_HEADER_FIELD_PATH" "1")
+    '("interface" "G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE" "2")
+    '("member" "G_DBUS_MESSAGE_HEADER_FIELD_MEMBER" "3")
+    '("error_name" "G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME" "4")
+    '("reply_serial" "G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL" "5")
+    '("destination" "G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION" "6")
+    '("sender" "G_DBUS_MESSAGE_HEADER_FIELD_SENDER" "7")
+    '("signature" "G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE" "8")
+    '("num_unix_fds" "G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS" "9")
+  )
+)
+
+(define-enum-extended DBusMessageType
+  (in-module "Gio")
+  (c-name "GDBusMessageType")
+  (values
+    '("invalid" "G_DBUS_MESSAGE_TYPE_INVALID" "0")
+    '("method_call" "G_DBUS_MESSAGE_TYPE_METHOD_CALL" "1")
+    '("method_return" "G_DBUS_MESSAGE_TYPE_METHOD_RETURN" "2")
+    '("error" "G_DBUS_MESSAGE_TYPE_ERROR" "3")
+    '("signal" "G_DBUS_MESSAGE_TYPE_SIGNAL" "4")
+  )
+)
+
+(define-flags-extended DBusObjectManagerClientFlags
+  (in-module "Gio")
+  (c-name "GDBusObjectManagerClientFlags")
+  (values
+    '("none" "G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE" "0")
+    '("do_not_auto_start" "G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START" "1")
+  )
+)
+
+(define-flags-extended DBusPropertyInfoFlags
+  (in-module "Gio")
+  (c-name "GDBusPropertyInfoFlags")
+  (values
+    '("none" "G_DBUS_PROPERTY_INFO_FLAGS_NONE" "0")
+    '("readable" "G_DBUS_PROPERTY_INFO_FLAGS_READABLE" "1")
+    '("writable" "G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE" "2")
+  )
+)
+
+(define-flags-extended DBusProxyFlags
+  (in-module "Gio")
+  (c-name "GDBusProxyFlags")
+  (values
+    '("none" "G_DBUS_PROXY_FLAGS_NONE" "0")
+    '("do_not_load_properties" "G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES" "1")
+    '("do_not_connect_signals" "G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS" "2")
+    '("do_not_auto_start" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START" "4")
+    '("get_invalidated_properties" "G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES" "8")
+    '("do_not_auto_start_at_construction" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION" "16")
+  )
+)
+
+(define-flags-extended DBusSendMessageFlags
+  (in-module "Gio")
+  (c-name "GDBusSendMessageFlags")
+  (values
+    '("none" "G_DBUS_SEND_MESSAGE_FLAGS_NONE" "0")
+    '("preserve_serial" "G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL" "1")
+  )
+)
+
+(define-flags-extended DBusServerFlags
+  (in-module "Gio")
+  (c-name "GDBusServerFlags")
+  (values
+    '("none" "G_DBUS_SERVER_FLAGS_NONE" "0")
+    '("run_in_thread" "G_DBUS_SERVER_FLAGS_RUN_IN_THREAD" "1")
+    '("authentication_allow_anonymous" "G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS" "2")
+  )
+)
+
+(define-flags-extended DBusSignalFlags
+  (in-module "Gio")
+  (c-name "GDBusSignalFlags")
+  (values
+    '("none" "G_DBUS_SIGNAL_FLAGS_NONE" "0")
+    '("no_match_rule" "G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE" "1")
+    '("match_arg0_namespace" "G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE" "2")
+    '("match_arg0_path" "G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH" "4")
+  )
+)
+
+(define-flags-extended DBusSubtreeFlags
+  (in-module "Gio")
+  (c-name "GDBusSubtreeFlags")
+  (values
+    '("none" "G_DBUS_SUBTREE_FLAGS_NONE" "0")
+    '("dispatch_to_unenumerated_nodes" "G_DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES" "1")
+  )
+)
+
+(define-enum-extended DataStreamByteOrder
+  (in-module "Gio")
+  (c-name "GDataStreamByteOrder")
+  (values
+    '("big_endian" "G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN" "0")
+    '("little_endian" "G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN" "1")
+    '("host_endian" "G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN" "2")
+  )
+)
 
 (define-enum-extended DataStreamNewlineType
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GDataStreamNewlineType")
   (values
     '("lf" "G_DATA_STREAM_NEWLINE_TYPE_LF" "0")
     '("cr" "G_DATA_STREAM_NEWLINE_TYPE_CR" "1")
-    '("cr-lf" "G_DATA_STREAM_NEWLINE_TYPE_CR_LF" "2")
+    '("cr_lf" "G_DATA_STREAM_NEWLINE_TYPE_CR_LF" "2")
     '("any" "G_DATA_STREAM_NEWLINE_TYPE_ANY" "3")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_ATTRIBUTE_TYPE_INVALID = 0,
-;;   G_FILE_ATTRIBUTE_TYPE_STRING,
-;;   G_FILE_ATTRIBUTE_TYPE_BYTE_STRING, /* zero terminated string of non-zero bytes */
-;;   G_FILE_ATTRIBUTE_TYPE_BOOLEAN,
-;;   G_FILE_ATTRIBUTE_TYPE_UINT32,
-;;   G_FILE_ATTRIBUTE_TYPE_INT32,
-;;   G_FILE_ATTRIBUTE_TYPE_UINT64,
-;;   G_FILE_ATTRIBUTE_TYPE_INT64,
-;;   G_FILE_ATTRIBUTE_TYPE_OBJECT,
-;;   G_FILE_ATTRIBUTE_TYPE_STRINGV
-;; } GFileAttributeType;
-
-(define-enum-extended FileAttributeType
-  (in-module "G")
-  (c-name "GFileAttributeType")
-  (values
-    '("invalid" "G_FILE_ATTRIBUTE_TYPE_INVALID" "0")
-    '("string" "G_FILE_ATTRIBUTE_TYPE_STRING" "1")
-    '("byte-string" "G_FILE_ATTRIBUTE_TYPE_BYTE_STRING" "2")
-    '("boolean" "G_FILE_ATTRIBUTE_TYPE_BOOLEAN" "3")
-    '("uint32" "G_FILE_ATTRIBUTE_TYPE_UINT32" "4")
-    '("int32" "G_FILE_ATTRIBUTE_TYPE_INT32" "5")
-    '("uint64" "G_FILE_ATTRIBUTE_TYPE_UINT64" "6")
-    '("int64" "G_FILE_ATTRIBUTE_TYPE_INT64" "7")
-    '("object" "G_FILE_ATTRIBUTE_TYPE_OBJECT" "8")
-    '("stringv" "G_FILE_ATTRIBUTE_TYPE_STRINGV" "9")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_ATTRIBUTE_INFO_NONE            = 0,
-;;   G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE  = (1 << 0),
-;;   G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED = (1 << 1)
-;; } GFileAttributeInfoFlags;
-
-(define-flags-extended FileAttributeInfoFlags
-  (in-module "G")
-  (c-name "GFileAttributeInfoFlags")
-  (values
-    '("none" "G_FILE_ATTRIBUTE_INFO_NONE" "0x0")
-    '("copy-with-file" "G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE" "(1 << 0)")
-    '("copy-when-moved" "G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED" "(1 << 1)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_ATTRIBUTE_STATUS_UNSET = 0,
-;;   G_FILE_ATTRIBUTE_STATUS_SET,
-;;   G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING
-;; } GFileAttributeStatus;
-
-(define-enum-extended FileAttributeStatus
-  (in-module "G")
-  (c-name "GFileAttributeStatus")
-  (values
-    '("unset" "G_FILE_ATTRIBUTE_STATUS_UNSET" "0")
-    '("set" "G_FILE_ATTRIBUTE_STATUS_SET" "1")
-    '("error-setting" "G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING" "2")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_QUERY_INFO_NONE              = 0,
-;;   G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS = (1 << 0)   /*< nick=nofollow-symlinks >*/
-;; } GFileQueryInfoFlags;
-
-(define-flags-extended FileQueryInfoFlags
-  (in-module "G")
-  (c-name "GFileQueryInfoFlags")
-  (values
-    '("none" "G_FILE_QUERY_INFO_NONE" "0x0")
-    '("nofollow-symlinks" "G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS" "(1 << 0)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_CREATE_NONE    = 0,
-;;   G_FILE_CREATE_PRIVATE = (1 << 0),
-;;   G_FILE_CREATE_REPLACE_DESTINATION = (1 << 1)
-;; } GFileCreateFlags;
-
-(define-flags-extended FileCreateFlags
-  (in-module "G")
-  (c-name "GFileCreateFlags")
-  (values
-    '("none" "G_FILE_CREATE_NONE" "0x0")
-    '("private" "G_FILE_CREATE_PRIVATE" "(1 << 0)")
-    '("replace-destination" "G_FILE_CREATE_REPLACE_DESTINATION" "(1 << 1)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_MEASURE_NONE                 = 0,
-;;   G_FILE_MEASURE_REPORT_ANY_ERROR     = (1 << 1),
-;;   G_FILE_MEASURE_APPARENT_SIZE        = (1 << 2),
-;;   G_FILE_MEASURE_NO_XDEV              = (1 << 3)
-;; } GFileMeasureFlags;
-
-(define-flags-extended FileMeasureFlags
-  (in-module "G")
-  (c-name "GFileMeasureFlags")
-  (values
-    '("none" "G_FILE_MEASURE_NONE" "0x0")
-    '("report-any-error" "G_FILE_MEASURE_REPORT_ANY_ERROR" "(1 << 1)")
-    '("apparent-size" "G_FILE_MEASURE_APPARENT_SIZE" "(1 << 2)")
-    '("no-xdev" "G_FILE_MEASURE_NO_XDEV" "(1 << 3)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum /*< flags >*/ {
-;;   G_MOUNT_MOUNT_NONE = 0
-;; } GMountMountFlags;
-
-(define-flags-extended MountMountFlags
-  (in-module "G")
-  (c-name "GMountMountFlags")
-  (values
-    '("none" "G_MOUNT_MOUNT_NONE" "0x0")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_MOUNT_UNMOUNT_NONE  = 0,
-;;   G_MOUNT_UNMOUNT_FORCE = (1 << 0)
-;; } GMountUnmountFlags;
-
-(define-flags-extended MountUnmountFlags
-  (in-module "G")
-  (c-name "GMountUnmountFlags")
-  (values
-    '("none" "G_MOUNT_UNMOUNT_NONE" "0x0")
-    '("force" "G_MOUNT_UNMOUNT_FORCE" "(1 << 0)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum /*< flags >*/ {
-;;   G_DRIVE_START_NONE = 0
-;; } GDriveStartFlags;
-
 (define-flags-extended DriveStartFlags
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GDriveStartFlags")
   (values
-    '("none" "G_DRIVE_START_NONE" "0x0")
+    '("none" "G_DRIVE_START_NONE" "0")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_DRIVE_START_STOP_TYPE_UNKNOWN,
-;;   G_DRIVE_START_STOP_TYPE_SHUTDOWN,
-;;   G_DRIVE_START_STOP_TYPE_NETWORK,
-;;   G_DRIVE_START_STOP_TYPE_MULTIDISK,
-;;   G_DRIVE_START_STOP_TYPE_PASSWORD
-;; } GDriveStartStopType;
-
 (define-enum-extended DriveStartStopType
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GDriveStartStopType")
   (values
     '("unknown" "G_DRIVE_START_STOP_TYPE_UNKNOWN" "0")
@@ -292,336 +354,8 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_COPY_NONE                 = 0,          /*< nick=none >*/
-;;   G_FILE_COPY_OVERWRITE            = (1 << 0),
-;;   G_FILE_COPY_BACKUP               = (1 << 1),
-;;   G_FILE_COPY_NOFOLLOW_SYMLINKS    = (1 << 2),
-;;   G_FILE_COPY_ALL_METADATA         = (1 << 3),
-;;   G_FILE_COPY_NO_FALLBACK_FOR_MOVE = (1 << 4),
-;;   G_FILE_COPY_TARGET_DEFAULT_PERMS = (1 << 5)
-;; } GFileCopyFlags;
-
-(define-flags-extended FileCopyFlags
-  (in-module "G")
-  (c-name "GFileCopyFlags")
-  (values
-    '("none" "G_FILE_COPY_NONE" "0x0")
-    '("overwrite" "G_FILE_COPY_OVERWRITE" "(1 << 0)")
-    '("backup" "G_FILE_COPY_BACKUP" "(1 << 1)")
-    '("nofollow-symlinks" "G_FILE_COPY_NOFOLLOW_SYMLINKS" "(1 << 2)")
-    '("all-metadata" "G_FILE_COPY_ALL_METADATA" "(1 << 3)")
-    '("no-fallback-for-move" "G_FILE_COPY_NO_FALLBACK_FOR_MOVE" "(1 << 4)")
-    '("target-default-perms" "G_FILE_COPY_TARGET_DEFAULT_PERMS" "(1 << 5)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_MONITOR_NONE             = 0,
-;;   G_FILE_MONITOR_WATCH_MOUNTS     = (1 << 0),
-;;   G_FILE_MONITOR_SEND_MOVED       = (1 << 1),
-;;   G_FILE_MONITOR_WATCH_HARD_LINKS = (1 << 2),
-;;   G_FILE_MONITOR_WATCH_MOVES      = (1 << 3)
-;; } GFileMonitorFlags;
-
-(define-flags-extended FileMonitorFlags
-  (in-module "G")
-  (c-name "GFileMonitorFlags")
-  (values
-    '("none" "G_FILE_MONITOR_NONE" "0x0")
-    '("watch-mounts" "G_FILE_MONITOR_WATCH_MOUNTS" "(1 << 0)")
-    '("send-moved" "G_FILE_MONITOR_SEND_MOVED" "(1 << 1)")
-    '("watch-hard-links" "G_FILE_MONITOR_WATCH_HARD_LINKS" "(1 << 2)")
-    '("watch-moves" "G_FILE_MONITOR_WATCH_MOVES" "(1 << 3)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_TYPE_UNKNOWN = 0,
-;;   G_FILE_TYPE_REGULAR,
-;;   G_FILE_TYPE_DIRECTORY,
-;;   G_FILE_TYPE_SYMBOLIC_LINK,
-;;   G_FILE_TYPE_SPECIAL, /* socket, fifo, blockdev, chardev */
-;;   G_FILE_TYPE_SHORTCUT,
-;;   G_FILE_TYPE_MOUNTABLE
-;; } GFileType;
-
-(define-enum-extended FileType
-  (in-module "G")
-  (c-name "GFileType")
-  (values
-    '("unknown" "G_FILE_TYPE_UNKNOWN" "0")
-    '("regular" "G_FILE_TYPE_REGULAR" "1")
-    '("directory" "G_FILE_TYPE_DIRECTORY" "2")
-    '("symbolic-link" "G_FILE_TYPE_SYMBOLIC_LINK" "3")
-    '("special" "G_FILE_TYPE_SPECIAL" "4")
-    '("shortcut" "G_FILE_TYPE_SHORTCUT" "5")
-    '("mountable" "G_FILE_TYPE_MOUNTABLE" "6")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS = 0,
-;;   G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL,
-;;   G_FILESYSTEM_PREVIEW_TYPE_NEVER
-;; } GFilesystemPreviewType;
-
-(define-enum-extended FilesystemPreviewType
-  (in-module "G")
-  (c-name "GFilesystemPreviewType")
-  (values
-    '("if-always" "G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS" "0")
-    '("if-local" "G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL" "1")
-    '("never" "G_FILESYSTEM_PREVIEW_TYPE_NEVER" "2")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_FILE_MONITOR_EVENT_CHANGED,
-;;   G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT,
-;;   G_FILE_MONITOR_EVENT_DELETED,
-;;   G_FILE_MONITOR_EVENT_CREATED,
-;;   G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
-;;   G_FILE_MONITOR_EVENT_PRE_UNMOUNT,
-;;   G_FILE_MONITOR_EVENT_UNMOUNTED,
-;;   G_FILE_MONITOR_EVENT_MOVED,
-;;   G_FILE_MONITOR_EVENT_RENAMED,
-;;   G_FILE_MONITOR_EVENT_MOVED_IN,
-;;   G_FILE_MONITOR_EVENT_MOVED_OUT
-;; } GFileMonitorEvent;
-
-(define-enum-extended FileMonitorEvent
-  (in-module "G")
-  (c-name "GFileMonitorEvent")
-  (values
-    '("changed" "G_FILE_MONITOR_EVENT_CHANGED" "0")
-    '("changes-done-hint" "G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT" "1")
-    '("deleted" "G_FILE_MONITOR_EVENT_DELETED" "2")
-    '("created" "G_FILE_MONITOR_EVENT_CREATED" "3")
-    '("attribute-changed" "G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED" "4")
-    '("pre-unmount" "G_FILE_MONITOR_EVENT_PRE_UNMOUNT" "5")
-    '("unmounted" "G_FILE_MONITOR_EVENT_UNMOUNTED" "6")
-    '("moved" "G_FILE_MONITOR_EVENT_MOVED" "7")
-    '("renamed" "G_FILE_MONITOR_EVENT_RENAMED" "8")
-    '("moved-in" "G_FILE_MONITOR_EVENT_MOVED_IN" "9")
-    '("moved-out" "G_FILE_MONITOR_EVENT_MOVED_OUT" "10")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_IO_ERROR_FAILED,
-;;   G_IO_ERROR_NOT_FOUND,
-;;   G_IO_ERROR_EXISTS,
-;;   G_IO_ERROR_IS_DIRECTORY,
-;;   G_IO_ERROR_NOT_DIRECTORY,
-;;   G_IO_ERROR_NOT_EMPTY,
-;;   G_IO_ERROR_NOT_REGULAR_FILE,
-;;   G_IO_ERROR_NOT_SYMBOLIC_LINK,
-;;   G_IO_ERROR_NOT_MOUNTABLE_FILE,
-;;   G_IO_ERROR_FILENAME_TOO_LONG,
-;;   G_IO_ERROR_INVALID_FILENAME,
-;;   G_IO_ERROR_TOO_MANY_LINKS,
-;;   G_IO_ERROR_NO_SPACE,
-;;   G_IO_ERROR_INVALID_ARGUMENT,
-;;   G_IO_ERROR_PERMISSION_DENIED,
-;;   G_IO_ERROR_NOT_SUPPORTED,
-;;   G_IO_ERROR_NOT_MOUNTED,
-;;   G_IO_ERROR_ALREADY_MOUNTED,
-;;   G_IO_ERROR_CLOSED,
-;;   G_IO_ERROR_CANCELLED,
-;;   G_IO_ERROR_PENDING,
-;;   G_IO_ERROR_READ_ONLY,
-;;   G_IO_ERROR_CANT_CREATE_BACKUP,
-;;   G_IO_ERROR_WRONG_ETAG,
-;;   G_IO_ERROR_TIMED_OUT,
-;;   G_IO_ERROR_WOULD_RECURSE,
-;;   G_IO_ERROR_BUSY,
-;;   G_IO_ERROR_WOULD_BLOCK,
-;;   G_IO_ERROR_HOST_NOT_FOUND,
-;;   G_IO_ERROR_WOULD_MERGE,
-;;   G_IO_ERROR_FAILED_HANDLED,
-;;   G_IO_ERROR_TOO_MANY_OPEN_FILES,
-;;   G_IO_ERROR_NOT_INITIALIZED,
-;;   G_IO_ERROR_ADDRESS_IN_USE,
-;;   G_IO_ERROR_PARTIAL_INPUT,
-;;   G_IO_ERROR_INVALID_DATA,
-;;   G_IO_ERROR_DBUS_ERROR,
-;;   G_IO_ERROR_HOST_UNREACHABLE,
-;;   G_IO_ERROR_NETWORK_UNREACHABLE,
-;;   G_IO_ERROR_CONNECTION_REFUSED,
-;;   G_IO_ERROR_PROXY_FAILED,
-;;   G_IO_ERROR_PROXY_AUTH_FAILED,
-;;   G_IO_ERROR_PROXY_NEED_AUTH,
-;;   G_IO_ERROR_PROXY_NOT_ALLOWED,
-;;   G_IO_ERROR_BROKEN_PIPE,
-;;   G_IO_ERROR_CONNECTION_CLOSED = G_IO_ERROR_BROKEN_PIPE,
-;;   G_IO_ERROR_NOT_CONNECTED,
-;;   G_IO_ERROR_MESSAGE_TOO_LARGE
-;; } GIOErrorEnum;
-
-(define-enum-extended IOErrorEnum
-  (in-module "G")
-  (c-name "GIOErrorEnum")
-  (values
-    '("failed" "G_IO_ERROR_FAILED" "0")
-    '("not-found" "G_IO_ERROR_NOT_FOUND" "1")
-    '("exists" "G_IO_ERROR_EXISTS" "2")
-    '("is-directory" "G_IO_ERROR_IS_DIRECTORY" "3")
-    '("not-directory" "G_IO_ERROR_NOT_DIRECTORY" "4")
-    '("not-empty" "G_IO_ERROR_NOT_EMPTY" "5")
-    '("not-regular-file" "G_IO_ERROR_NOT_REGULAR_FILE" "6")
-    '("not-symbolic-link" "G_IO_ERROR_NOT_SYMBOLIC_LINK" "7")
-    '("not-mountable-file" "G_IO_ERROR_NOT_MOUNTABLE_FILE" "8")
-    '("filename-too-long" "G_IO_ERROR_FILENAME_TOO_LONG" "9")
-    '("invalid-filename" "G_IO_ERROR_INVALID_FILENAME" "10")
-    '("too-many-links" "G_IO_ERROR_TOO_MANY_LINKS" "11")
-    '("no-space" "G_IO_ERROR_NO_SPACE" "12")
-    '("invalid-argument" "G_IO_ERROR_INVALID_ARGUMENT" "13")
-    '("permission-denied" "G_IO_ERROR_PERMISSION_DENIED" "14")
-    '("not-supported" "G_IO_ERROR_NOT_SUPPORTED" "15")
-    '("not-mounted" "G_IO_ERROR_NOT_MOUNTED" "16")
-    '("already-mounted" "G_IO_ERROR_ALREADY_MOUNTED" "17")
-    '("closed" "G_IO_ERROR_CLOSED" "18")
-    '("cancelled" "G_IO_ERROR_CANCELLED" "19")
-    '("pending" "G_IO_ERROR_PENDING" "20")
-    '("read-only" "G_IO_ERROR_READ_ONLY" "21")
-    '("cant-create-backup" "G_IO_ERROR_CANT_CREATE_BACKUP" "22")
-    '("wrong-etag" "G_IO_ERROR_WRONG_ETAG" "23")
-    '("timed-out" "G_IO_ERROR_TIMED_OUT" "24")
-    '("would-recurse" "G_IO_ERROR_WOULD_RECURSE" "25")
-    '("busy" "G_IO_ERROR_BUSY" "26")
-    '("would-block" "G_IO_ERROR_WOULD_BLOCK" "27")
-    '("host-not-found" "G_IO_ERROR_HOST_NOT_FOUND" "28")
-    '("host-not-found" "G_IO_ERROR_HOST_WAS_NOT_FOUND" "28")
-    '("would-merge" "G_IO_ERROR_WOULD_MERGE" "29")
-    '("failed-handled" "G_IO_ERROR_FAILED_HANDLED" "30")
-    '("too-many-open-files" "G_IO_ERROR_TOO_MANY_OPEN_FILES" "31")
-    '("not-initialized" "G_IO_ERROR_NOT_INITIALIZED" "32")
-    '("address-in-use" "G_IO_ERROR_ADDRESS_IN_USE" "33")
-    '("partial-input" "G_IO_ERROR_PARTIAL_INPUT" "34")
-    '("invalid-data" "G_IO_ERROR_INVALID_DATA" "35")
-    '("dbus-error" "G_IO_ERROR_DBUS_ERROR" "36")
-    '("host-unreachable" "G_IO_ERROR_HOST_UNREACHABLE" "37")
-    '("network-unreachable" "G_IO_ERROR_NETWORK_UNREACHABLE" "38")
-    '("connection-refused" "G_IO_ERROR_CONNECTION_REFUSED" "39")
-    '("proxy-failed" "G_IO_ERROR_PROXY_FAILED" "40")
-    '("proxy-auth-failed" "G_IO_ERROR_PROXY_AUTH_FAILED" "41")
-    '("proxy-need-auth" "G_IO_ERROR_PROXY_NEED_AUTH" "42")
-    '("proxy-not-allowed" "G_IO_ERROR_PROXY_NOT_ALLOWED" "43")
-    '("broken-pipe" "G_IO_ERROR_BROKEN_PIPE" "44")
-    '("connection-closed" "G_IO_ERROR_CONNECTION_CLOSED" "44")
-    '("not-connected" "G_IO_ERROR_NOT_CONNECTED" "45")
-    '("message-too-large" "G_IO_ERROR_MESSAGE_TOO_LARGE" "46")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_ASK_PASSWORD_NEED_PASSWORD       = (1 << 0),
-;;   G_ASK_PASSWORD_NEED_USERNAME       = (1 << 1),
-;;   G_ASK_PASSWORD_NEED_DOMAIN         = (1 << 2),
-;;   G_ASK_PASSWORD_SAVING_SUPPORTED    = (1 << 3),
-;;   G_ASK_PASSWORD_ANONYMOUS_SUPPORTED = (1 << 4)
-;; } GAskPasswordFlags;
-
-(define-flags-extended AskPasswordFlags
-  (in-module "G")
-  (c-name "GAskPasswordFlags")
-  (values
-    '("need-password" "G_ASK_PASSWORD_NEED_PASSWORD" "(1 << 0)")
-    '("need-username" "G_ASK_PASSWORD_NEED_USERNAME" "(1 << 1)")
-    '("need-domain" "G_ASK_PASSWORD_NEED_DOMAIN" "(1 << 2)")
-    '("saving-supported" "G_ASK_PASSWORD_SAVING_SUPPORTED" "(1 << 3)")
-    '("anonymous-supported" "G_ASK_PASSWORD_ANONYMOUS_SUPPORTED" "(1 << 4)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_PASSWORD_SAVE_NEVER,
-;;   G_PASSWORD_SAVE_FOR_SESSION,
-;;   G_PASSWORD_SAVE_PERMANENTLY
-;; } GPasswordSave;
-
-(define-enum-extended PasswordSave
-  (in-module "G")
-  (c-name "GPasswordSave")
-  (values
-    '("never" "G_PASSWORD_SAVE_NEVER" "0")
-    '("for-session" "G_PASSWORD_SAVE_FOR_SESSION" "1")
-    '("permanently" "G_PASSWORD_SAVE_PERMANENTLY" "2")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_MOUNT_OPERATION_HANDLED,
-;;   G_MOUNT_OPERATION_ABORTED,
-;;   G_MOUNT_OPERATION_UNHANDLED
-;; } GMountOperationResult;
-
-(define-enum-extended MountOperationResult
-  (in-module "G")
-  (c-name "GMountOperationResult")
-  (values
-    '("handled" "G_MOUNT_OPERATION_HANDLED" "0")
-    '("aborted" "G_MOUNT_OPERATION_ABORTED" "1")
-    '("unhandled" "G_MOUNT_OPERATION_UNHANDLED" "2")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_OUTPUT_STREAM_SPLICE_NONE         = 0,
-;;   G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE = (1 << 0),
-;;   G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET = (1 << 1)
-;; } GOutputStreamSpliceFlags;
-
-(define-flags-extended OutputStreamSpliceFlags
-  (in-module "G")
-  (c-name "GOutputStreamSpliceFlags")
-  (values
-    '("none" "G_OUTPUT_STREAM_SPLICE_NONE" "0x0")
-    '("close-source" "G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE" "(1 << 0)")
-    '("close-target" "G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET" "(1 << 1)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_IO_STREAM_SPLICE_NONE          = 0,
-;;   G_IO_STREAM_SPLICE_CLOSE_STREAM1 = (1 << 0),
-;;   G_IO_STREAM_SPLICE_CLOSE_STREAM2 = (1 << 1),
-;;   G_IO_STREAM_SPLICE_WAIT_FOR_BOTH = (1 << 2)
-;; } GIOStreamSpliceFlags;
-
-(define-flags-extended IOStreamSpliceFlags
-  (in-module "G")
-  (c-name "GIOStreamSpliceFlags")
-  (values
-    '("none" "G_IO_STREAM_SPLICE_NONE" "0x0")
-    '("close-stream1" "G_IO_STREAM_SPLICE_CLOSE_STREAM1" "(1 << 0)")
-    '("close-stream2" "G_IO_STREAM_SPLICE_CLOSE_STREAM2" "(1 << 1)")
-    '("wait-for-both" "G_IO_STREAM_SPLICE_WAIT_FOR_BOTH" "(1 << 2)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum  {
-;;   G_EMBLEM_ORIGIN_UNKNOWN,
-;;   G_EMBLEM_ORIGIN_DEVICE,
-;;   G_EMBLEM_ORIGIN_LIVEMETADATA,
-;;   G_EMBLEM_ORIGIN_TAG
-;; } GEmblemOrigin;
-
 (define-enum-extended EmblemOrigin
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GEmblemOrigin")
   (values
     '("unknown" "G_EMBLEM_ORIGIN_UNKNOWN" "0")
@@ -631,34 +365,298 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_RESOLVER_ERROR_NOT_FOUND,
-;;   G_RESOLVER_ERROR_TEMPORARY_FAILURE,
-;;   G_RESOLVER_ERROR_INTERNAL
-;; } GResolverError;
+(define-flags-extended FileAttributeInfoFlags
+  (in-module "Gio")
+  (c-name "GFileAttributeInfoFlags")
+  (values
+    '("none" "G_FILE_ATTRIBUTE_INFO_NONE" "0")
+    '("copy_with_file" "G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE" "1")
+    '("copy_when_moved" "G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED" "2")
+  )
+)
+
+(define-enum-extended FileAttributeStatus
+  (in-module "Gio")
+  (c-name "GFileAttributeStatus")
+  (values
+    '("unset" "G_FILE_ATTRIBUTE_STATUS_UNSET" "0")
+    '("set" "G_FILE_ATTRIBUTE_STATUS_SET" "1")
+    '("error_setting" "G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING" "2")
+  )
+)
+
+(define-enum-extended FileAttributeType
+  (in-module "Gio")
+  (c-name "GFileAttributeType")
+  (values
+    '("invalid" "G_FILE_ATTRIBUTE_TYPE_INVALID" "0")
+    '("string" "G_FILE_ATTRIBUTE_TYPE_STRING" "1")
+    '("byte_string" "G_FILE_ATTRIBUTE_TYPE_BYTE_STRING" "2")
+    '("boolean" "G_FILE_ATTRIBUTE_TYPE_BOOLEAN" "3")
+    '("uint32" "G_FILE_ATTRIBUTE_TYPE_UINT32" "4")
+    '("int32" "G_FILE_ATTRIBUTE_TYPE_INT32" "5")
+    '("uint64" "G_FILE_ATTRIBUTE_TYPE_UINT64" "6")
+    '("int64" "G_FILE_ATTRIBUTE_TYPE_INT64" "7")
+    '("object" "G_FILE_ATTRIBUTE_TYPE_OBJECT" "8")
+    '("stringv" "G_FILE_ATTRIBUTE_TYPE_STRINGV" "9")
+  )
+)
+
+(define-flags-extended FileCopyFlags
+  (in-module "Gio")
+  (c-name "GFileCopyFlags")
+  (values
+    '("none" "G_FILE_COPY_NONE" "0")
+    '("overwrite" "G_FILE_COPY_OVERWRITE" "1")
+    '("backup" "G_FILE_COPY_BACKUP" "2")
+    '("nofollow_symlinks" "G_FILE_COPY_NOFOLLOW_SYMLINKS" "4")
+    '("all_metadata" "G_FILE_COPY_ALL_METADATA" "8")
+    '("no_fallback_for_move" "G_FILE_COPY_NO_FALLBACK_FOR_MOVE" "16")
+    '("target_default_perms" "G_FILE_COPY_TARGET_DEFAULT_PERMS" "32")
+  )
+)
+
+(define-flags-extended FileCreateFlags
+  (in-module "Gio")
+  (c-name "GFileCreateFlags")
+  (values
+    '("none" "G_FILE_CREATE_NONE" "0")
+    '("private" "G_FILE_CREATE_PRIVATE" "1")
+    '("replace_destination" "G_FILE_CREATE_REPLACE_DESTINATION" "2")
+  )
+)
+
+(define-flags-extended FileMeasureFlags
+  (in-module "Gio")
+  (c-name "GFileMeasureFlags")
+  (values
+    '("none" "G_FILE_MEASURE_NONE" "0")
+    '("report_any_error" "G_FILE_MEASURE_REPORT_ANY_ERROR" "2")
+    '("apparent_size" "G_FILE_MEASURE_APPARENT_SIZE" "4")
+    '("no_xdev" "G_FILE_MEASURE_NO_XDEV" "8")
+  )
+)
+
+(define-enum-extended FileMonitorEvent
+  (in-module "Gio")
+  (c-name "GFileMonitorEvent")
+  (values
+    '("changed" "G_FILE_MONITOR_EVENT_CHANGED" "0")
+    '("changes_done_hint" "G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT" "1")
+    '("deleted" "G_FILE_MONITOR_EVENT_DELETED" "2")
+    '("created" "G_FILE_MONITOR_EVENT_CREATED" "3")
+    '("attribute_changed" "G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED" "4")
+    '("pre_unmount" "G_FILE_MONITOR_EVENT_PRE_UNMOUNT" "5")
+    '("unmounted" "G_FILE_MONITOR_EVENT_UNMOUNTED" "6")
+    '("moved" "G_FILE_MONITOR_EVENT_MOVED" "7")
+    '("renamed" "G_FILE_MONITOR_EVENT_RENAMED" "8")
+    '("moved_in" "G_FILE_MONITOR_EVENT_MOVED_IN" "9")
+    '("moved_out" "G_FILE_MONITOR_EVENT_MOVED_OUT" "10")
+  )
+)
+
+(define-flags-extended FileMonitorFlags
+  (in-module "Gio")
+  (c-name "GFileMonitorFlags")
+  (values
+    '("none" "G_FILE_MONITOR_NONE" "0")
+    '("watch_mounts" "G_FILE_MONITOR_WATCH_MOUNTS" "1")
+    '("send_moved" "G_FILE_MONITOR_SEND_MOVED" "2")
+    '("watch_hard_links" "G_FILE_MONITOR_WATCH_HARD_LINKS" "4")
+    '("watch_moves" "G_FILE_MONITOR_WATCH_MOVES" "8")
+  )
+)
+
+(define-flags-extended FileQueryInfoFlags
+  (in-module "Gio")
+  (c-name "GFileQueryInfoFlags")
+  (values
+    '("none" "G_FILE_QUERY_INFO_NONE" "0")
+    '("nofollow_symlinks" "G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS" "1")
+  )
+)
+
+(define-enum-extended FileType
+  (in-module "Gio")
+  (c-name "GFileType")
+  (values
+    '("unknown" "G_FILE_TYPE_UNKNOWN" "0")
+    '("regular" "G_FILE_TYPE_REGULAR" "1")
+    '("directory" "G_FILE_TYPE_DIRECTORY" "2")
+    '("symbolic_link" "G_FILE_TYPE_SYMBOLIC_LINK" "3")
+    '("special" "G_FILE_TYPE_SPECIAL" "4")
+    '("shortcut" "G_FILE_TYPE_SHORTCUT" "5")
+    '("mountable" "G_FILE_TYPE_MOUNTABLE" "6")
+  )
+)
+
+(define-enum-extended FilesystemPreviewType
+  (in-module "Gio")
+  (c-name "GFilesystemPreviewType")
+  (values
+    '("if_always" "G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS" "0")
+    '("if_local" "G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL" "1")
+    '("never" "G_FILESYSTEM_PREVIEW_TYPE_NEVER" "2")
+  )
+)
+
+(define-enum-extended IOErrorEnum
+  (in-module "Gio")
+  (c-name "GIOErrorEnum")
+  (values
+    '("failed" "G_IO_ERROR_FAILED" "0")
+    '("not_found" "G_IO_ERROR_NOT_FOUND" "1")
+    '("exists" "G_IO_ERROR_EXISTS" "2")
+    '("is_directory" "G_IO_ERROR_IS_DIRECTORY" "3")
+    '("not_directory" "G_IO_ERROR_NOT_DIRECTORY" "4")
+    '("not_empty" "G_IO_ERROR_NOT_EMPTY" "5")
+    '("not_regular_file" "G_IO_ERROR_NOT_REGULAR_FILE" "6")
+    '("not_symbolic_link" "G_IO_ERROR_NOT_SYMBOLIC_LINK" "7")
+    '("not_mountable_file" "G_IO_ERROR_NOT_MOUNTABLE_FILE" "8")
+    '("filename_too_long" "G_IO_ERROR_FILENAME_TOO_LONG" "9")
+    '("invalid_filename" "G_IO_ERROR_INVALID_FILENAME" "10")
+    '("too_many_links" "G_IO_ERROR_TOO_MANY_LINKS" "11")
+    '("no_space" "G_IO_ERROR_NO_SPACE" "12")
+    '("invalid_argument" "G_IO_ERROR_INVALID_ARGUMENT" "13")
+    '("permission_denied" "G_IO_ERROR_PERMISSION_DENIED" "14")
+    '("not_supported" "G_IO_ERROR_NOT_SUPPORTED" "15")
+    '("not_mounted" "G_IO_ERROR_NOT_MOUNTED" "16")
+    '("already_mounted" "G_IO_ERROR_ALREADY_MOUNTED" "17")
+    '("closed" "G_IO_ERROR_CLOSED" "18")
+    '("cancelled" "G_IO_ERROR_CANCELLED" "19")
+    '("pending" "G_IO_ERROR_PENDING" "20")
+    '("read_only" "G_IO_ERROR_READ_ONLY" "21")
+    '("cant_create_backup" "G_IO_ERROR_CANT_CREATE_BACKUP" "22")
+    '("wrong_etag" "G_IO_ERROR_WRONG_ETAG" "23")
+    '("timed_out" "G_IO_ERROR_TIMED_OUT" "24")
+    '("would_recurse" "G_IO_ERROR_WOULD_RECURSE" "25")
+    '("busy" "G_IO_ERROR_BUSY" "26")
+    '("would_block" "G_IO_ERROR_WOULD_BLOCK" "27")
+    '("host_not_found" "G_IO_ERROR_HOST_NOT_FOUND" "28")
+    '("host-not-found" "G_IO_ERROR_HOST_WAS_NOT_FOUND" "28")
+    '("would_merge" "G_IO_ERROR_WOULD_MERGE" "29")
+    '("failed_handled" "G_IO_ERROR_FAILED_HANDLED" "30")
+    '("too_many_open_files" "G_IO_ERROR_TOO_MANY_OPEN_FILES" "31")
+    '("not_initialized" "G_IO_ERROR_NOT_INITIALIZED" "32")
+    '("address_in_use" "G_IO_ERROR_ADDRESS_IN_USE" "33")
+    '("partial_input" "G_IO_ERROR_PARTIAL_INPUT" "34")
+    '("invalid_data" "G_IO_ERROR_INVALID_DATA" "35")
+    '("dbus_error" "G_IO_ERROR_DBUS_ERROR" "36")
+    '("host_unreachable" "G_IO_ERROR_HOST_UNREACHABLE" "37")
+    '("network_unreachable" "G_IO_ERROR_NETWORK_UNREACHABLE" "38")
+    '("connection_refused" "G_IO_ERROR_CONNECTION_REFUSED" "39")
+    '("proxy_failed" "G_IO_ERROR_PROXY_FAILED" "40")
+    '("proxy_auth_failed" "G_IO_ERROR_PROXY_AUTH_FAILED" "41")
+    '("proxy_need_auth" "G_IO_ERROR_PROXY_NEED_AUTH" "42")
+    '("proxy_not_allowed" "G_IO_ERROR_PROXY_NOT_ALLOWED" "43")
+    '("broken_pipe" "G_IO_ERROR_BROKEN_PIPE" "44")
+    '("connection_closed" "G_IO_ERROR_CONNECTION_CLOSED" "44")
+    '("not_connected" "G_IO_ERROR_NOT_CONNECTED" "45")
+    '("message_too_large" "G_IO_ERROR_MESSAGE_TOO_LARGE" "46")
+  )
+)
+
+(define-enum-extended IOModuleScopeFlags
+  (in-module "Gio")
+  (c-name "GIOModuleScopeFlags")
+  (values
+    '("none" "G_IO_MODULE_SCOPE_NONE" "0")
+    '("block_duplicates" "G_IO_MODULE_SCOPE_BLOCK_DUPLICATES" "1")
+  )
+)
+
+(define-flags-extended IOStreamSpliceFlags
+  (in-module "Gio")
+  (c-name "GIOStreamSpliceFlags")
+  (values
+    '("none" "G_IO_STREAM_SPLICE_NONE" "0")
+    '("close_stream1" "G_IO_STREAM_SPLICE_CLOSE_STREAM1" "1")
+    '("close_stream2" "G_IO_STREAM_SPLICE_CLOSE_STREAM2" "2")
+    '("wait_for_both" "G_IO_STREAM_SPLICE_WAIT_FOR_BOTH" "4")
+  )
+)
+
+(define-flags-extended MountMountFlags
+  (in-module "Gio")
+  (c-name "GMountMountFlags")
+  (values
+    '("none" "G_MOUNT_MOUNT_NONE" "0")
+  )
+)
+
+(define-enum-extended MountOperationResult
+  (in-module "Gio")
+  (c-name "GMountOperationResult")
+  (values
+    '("handled" "G_MOUNT_OPERATION_HANDLED" "0")
+    '("aborted" "G_MOUNT_OPERATION_ABORTED" "1")
+    '("unhandled" "G_MOUNT_OPERATION_UNHANDLED" "2")
+  )
+)
+
+(define-flags-extended MountUnmountFlags
+  (in-module "Gio")
+  (c-name "GMountUnmountFlags")
+  (values
+    '("none" "G_MOUNT_UNMOUNT_NONE" "0")
+    '("force" "G_MOUNT_UNMOUNT_FORCE" "1")
+  )
+)
+
+(define-enum-extended NetworkConnectivity
+  (in-module "Gio")
+  (c-name "GNetworkConnectivity")
+  (values
+    '("local" "G_NETWORK_CONNECTIVITY_LOCAL" "1")
+    '("limited" "G_NETWORK_CONNECTIVITY_LIMITED" "2")
+    '("portal" "G_NETWORK_CONNECTIVITY_PORTAL" "3")
+    '("full" "G_NETWORK_CONNECTIVITY_FULL" "4")
+  )
+)
+
+(define-enum-extended NotificationPriority
+  (in-module "Gio")
+  (c-name "GNotificationPriority")
+  (values
+    '("normal" "G_NOTIFICATION_PRIORITY_NORMAL" "0")
+    '("low" "G_NOTIFICATION_PRIORITY_LOW" "1")
+    '("high" "G_NOTIFICATION_PRIORITY_HIGH" "2")
+    '("urgent" "G_NOTIFICATION_PRIORITY_URGENT" "3")
+  )
+)
+
+(define-flags-extended OutputStreamSpliceFlags
+  (in-module "Gio")
+  (c-name "GOutputStreamSpliceFlags")
+  (values
+    '("none" "G_OUTPUT_STREAM_SPLICE_NONE" "0")
+    '("close_source" "G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE" "1")
+    '("close_target" "G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET" "2")
+  )
+)
+
+(define-enum-extended PasswordSave
+  (in-module "Gio")
+  (c-name "GPasswordSave")
+  (values
+    '("never" "G_PASSWORD_SAVE_NEVER" "0")
+    '("for_session" "G_PASSWORD_SAVE_FOR_SESSION" "1")
+    '("permanently" "G_PASSWORD_SAVE_PERMANENTLY" "2")
+  )
+)
 
 (define-enum-extended ResolverError
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GResolverError")
   (values
-    '("not-found" "G_RESOLVER_ERROR_NOT_FOUND" "0")
-    '("temporary-failure" "G_RESOLVER_ERROR_TEMPORARY_FAILURE" "1")
+    '("not_found" "G_RESOLVER_ERROR_NOT_FOUND" "0")
+    '("temporary_failure" "G_RESOLVER_ERROR_TEMPORARY_FAILURE" "1")
     '("internal" "G_RESOLVER_ERROR_INTERNAL" "2")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_RESOLVER_RECORD_SRV = 1,
-;;   G_RESOLVER_RECORD_MX,
-;;   G_RESOLVER_RECORD_TXT,
-;;   G_RESOLVER_RECORD_SOA,
-;;   G_RESOLVER_RECORD_NS
-;; } GResolverRecordType;
-
 (define-enum-extended ResolverRecordType
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GResolverRecordType")
   (values
     '("srv" "G_RESOLVER_RECORD_SRV" "1")
@@ -669,119 +667,96 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_RESOURCE_ERROR_NOT_FOUND,
-;;   G_RESOURCE_ERROR_INTERNAL
-;; } GResourceError;
-
 (define-enum-extended ResourceError
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GResourceError")
   (values
-    '("not-found" "G_RESOURCE_ERROR_NOT_FOUND" "0")
+    '("not_found" "G_RESOURCE_ERROR_NOT_FOUND" "0")
     '("internal" "G_RESOURCE_ERROR_INTERNAL" "1")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_RESOURCE_FLAGS_NONE       = 0,
-;;   G_RESOURCE_FLAGS_COMPRESSED = (1<<0)
-;; } GResourceFlags;
-
 (define-flags-extended ResourceFlags
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GResourceFlags")
   (values
-    '("none" "G_RESOURCE_FLAGS_NONE" "0x0")
-    '("compressed" "G_RESOURCE_FLAGS_COMPRESSED" "(1<<0)")
+    '("none" "G_RESOURCE_FLAGS_NONE" "0")
+    '("compressed" "G_RESOURCE_FLAGS_COMPRESSED" "1")
   )
 )
-
-;; Original typedef:
-;; typedef enum /*< flags >*/ {
-;;   G_RESOURCE_LOOKUP_FLAGS_NONE       = 0
-;; } GResourceLookupFlags;
 
 (define-flags-extended ResourceLookupFlags
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GResourceLookupFlags")
   (values
-    '("none" "G_RESOURCE_LOOKUP_FLAGS_NONE" "0x0")
+    '("none" "G_RESOURCE_LOOKUP_FLAGS_NONE" "0")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_SOCKET_FAMILY_INVALID,
-;;   G_SOCKET_FAMILY_UNIX = GLIB_SYSDEF_AF_UNIX,
-;;   G_SOCKET_FAMILY_IPV4 = GLIB_SYSDEF_AF_INET,
-;;   G_SOCKET_FAMILY_IPV6 = GLIB_SYSDEF_AF_INET6
-;; } GSocketFamily;
+(define-flags-extended SettingsBindFlags
+  (in-module "Gio")
+  (c-name "GSettingsBindFlags")
+  (values
+    '("default" "G_SETTINGS_BIND_DEFAULT" "0")
+    '("get" "G_SETTINGS_BIND_GET" "1")
+    '("set" "G_SETTINGS_BIND_SET" "2")
+    '("no_sensitivity" "G_SETTINGS_BIND_NO_SENSITIVITY" "4")
+    '("get_no_changes" "G_SETTINGS_BIND_GET_NO_CHANGES" "8")
+    '("invert_boolean" "G_SETTINGS_BIND_INVERT_BOOLEAN" "16")
+  )
+)
+
+(define-enum-extended SocketClientEvent
+  (in-module "Gio")
+  (c-name "GSocketClientEvent")
+  (values
+    '("resolving" "G_SOCKET_CLIENT_RESOLVING" "0")
+    '("resolved" "G_SOCKET_CLIENT_RESOLVED" "1")
+    '("connecting" "G_SOCKET_CLIENT_CONNECTING" "2")
+    '("connected" "G_SOCKET_CLIENT_CONNECTED" "3")
+    '("proxy_negotiating" "G_SOCKET_CLIENT_PROXY_NEGOTIATING" "4")
+    '("proxy_negotiated" "G_SOCKET_CLIENT_PROXY_NEGOTIATED" "5")
+    '("tls_handshaking" "G_SOCKET_CLIENT_TLS_HANDSHAKING" "6")
+    '("tls_handshaked" "G_SOCKET_CLIENT_TLS_HANDSHAKED" "7")
+    '("complete" "G_SOCKET_CLIENT_COMPLETE" "8")
+  )
+)
 
 (define-enum-extended SocketFamily
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GSocketFamily")
   (values
     '("invalid" "G_SOCKET_FAMILY_INVALID" "0")
-    '("unix" "G_SOCKET_FAMILY_UNIX" "GLIB_SYSDEF_AF_UNIX")
-    '("ipv4" "G_SOCKET_FAMILY_IPV4" "GLIB_SYSDEF_AF_INET")
-    '("ipv6" "G_SOCKET_FAMILY_IPV6" "GLIB_SYSDEF_AF_INET6")
+    '("unix" "G_SOCKET_FAMILY_UNIX" "1")
+    '("ipv4" "G_SOCKET_FAMILY_IPV4" "2")
+    '("ipv6" "G_SOCKET_FAMILY_IPV6" "10")
   )
 )
 
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_SOCKET_TYPE_INVALID,
-;;   G_SOCKET_TYPE_STREAM,
-;;   G_SOCKET_TYPE_DATAGRAM,
-;;   G_SOCKET_TYPE_SEQPACKET
-;; } GSocketType;
-
-(define-enum-extended SocketType
-  (in-module "G")
-  (c-name "GSocketType")
+(define-enum-extended SocketListenerEvent
+  (in-module "Gio")
+  (c-name "GSocketListenerEvent")
   (values
-    '("invalid" "G_SOCKET_TYPE_INVALID" "0")
-    '("stream" "G_SOCKET_TYPE_STREAM" "1")
-    '("datagram" "G_SOCKET_TYPE_DATAGRAM" "2")
-    '("seqpacket" "G_SOCKET_TYPE_SEQPACKET" "3")
+    '("binding" "G_SOCKET_LISTENER_BINDING" "0")
+    '("bound" "G_SOCKET_LISTENER_BOUND" "1")
+    '("listening" "G_SOCKET_LISTENER_LISTENING" "2")
+    '("listened" "G_SOCKET_LISTENER_LISTENED" "3")
   )
 )
-
-;; Original typedef:
-;; typedef enum /*< flags >*/
-;; {
-;;   G_SOCKET_MSG_NONE,
-;;   G_SOCKET_MSG_OOB = GLIB_SYSDEF_MSG_OOB,
-;;   G_SOCKET_MSG_PEEK = GLIB_SYSDEF_MSG_PEEK,
-;;   G_SOCKET_MSG_DONTROUTE = GLIB_SYSDEF_MSG_DONTROUTE
-;; } GSocketMsgFlags;
 
 (define-flags-extended SocketMsgFlags
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GSocketMsgFlags")
   (values
-    '("none" "G_SOCKET_MSG_NONE" "0x0")
-    '("oob" "G_SOCKET_MSG_OOB" "GLIB_SYSDEF_MSG_OOB")
-    '("peek" "G_SOCKET_MSG_PEEK" "GLIB_SYSDEF_MSG_PEEK")
-    '("dontroute" "G_SOCKET_MSG_DONTROUTE" "GLIB_SYSDEF_MSG_DONTROUTE")
+    '("none" "G_SOCKET_MSG_NONE" "0")
+    '("oob" "G_SOCKET_MSG_OOB" "1")
+    '("peek" "G_SOCKET_MSG_PEEK" "2")
+    '("dontroute" "G_SOCKET_MSG_DONTROUTE" "4")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_SOCKET_PROTOCOL_UNKNOWN = -1,
-;;   G_SOCKET_PROTOCOL_DEFAULT = 0,
-;;   G_SOCKET_PROTOCOL_TCP     = 6,
-;;   G_SOCKET_PROTOCOL_UDP     = 17,
-;;   G_SOCKET_PROTOCOL_SCTP    = 132
-;; } GSocketProtocol;
-
 (define-enum-extended SocketProtocol
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GSocketProtocol")
   (values
     '("unknown" "G_SOCKET_PROTOCOL_UNKNOWN" "-1")
@@ -792,572 +767,43 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_ZLIB_COMPRESSOR_FORMAT_ZLIB,
-;;   G_ZLIB_COMPRESSOR_FORMAT_GZIP,
-;;   G_ZLIB_COMPRESSOR_FORMAT_RAW
-;; } GZlibCompressorFormat;
-
-(define-enum-extended ZlibCompressorFormat
-  (in-module "G")
-  (c-name "GZlibCompressorFormat")
+(define-enum-extended SocketType
+  (in-module "Gio")
+  (c-name "GSocketType")
   (values
-    '("zlib" "G_ZLIB_COMPRESSOR_FORMAT_ZLIB" "0")
-    '("gzip" "G_ZLIB_COMPRESSOR_FORMAT_GZIP" "1")
-    '("raw" "G_ZLIB_COMPRESSOR_FORMAT_RAW" "2")
+    '("invalid" "G_SOCKET_TYPE_INVALID" "0")
+    '("stream" "G_SOCKET_TYPE_STREAM" "1")
+    '("datagram" "G_SOCKET_TYPE_DATAGRAM" "2")
+    '("seqpacket" "G_SOCKET_TYPE_SEQPACKET" "3")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_UNIX_SOCKET_ADDRESS_INVALID,
-;;   G_UNIX_SOCKET_ADDRESS_ANONYMOUS,
-;;   G_UNIX_SOCKET_ADDRESS_PATH,
-;;   G_UNIX_SOCKET_ADDRESS_ABSTRACT,
-;;   G_UNIX_SOCKET_ADDRESS_ABSTRACT_PADDED
-;; } GUnixSocketAddressType;
-
-(define-enum-extended UnixSocketAddressType
-  (in-module "G")
-  (c-name "GUnixSocketAddressType")
+(define-flags-extended SubprocessFlags
+  (in-module "Gio")
+  (c-name "GSubprocessFlags")
   (values
-    '("invalid" "G_UNIX_SOCKET_ADDRESS_INVALID" "0")
-    '("anonymous" "G_UNIX_SOCKET_ADDRESS_ANONYMOUS" "1")
-    '("path" "G_UNIX_SOCKET_ADDRESS_PATH" "2")
-    '("abstract" "G_UNIX_SOCKET_ADDRESS_ABSTRACT" "3")
-    '("abstract-padded" "G_UNIX_SOCKET_ADDRESS_ABSTRACT_PADDED" "4")
+    '("none" "G_SUBPROCESS_FLAGS_NONE" "0")
+    '("stdin_pipe" "G_SUBPROCESS_FLAGS_STDIN_PIPE" "1")
+    '("stdin_inherit" "G_SUBPROCESS_FLAGS_STDIN_INHERIT" "2")
+    '("stdout_pipe" "G_SUBPROCESS_FLAGS_STDOUT_PIPE" "4")
+    '("stdout_silence" "G_SUBPROCESS_FLAGS_STDOUT_SILENCE" "8")
+    '("stderr_pipe" "G_SUBPROCESS_FLAGS_STDERR_PIPE" "16")
+    '("stderr_silence" "G_SUBPROCESS_FLAGS_STDERR_SILENCE" "32")
+    '("stderr_merge" "G_SUBPROCESS_FLAGS_STDERR_MERGE" "64")
+    '("inherit_fds" "G_SUBPROCESS_FLAGS_INHERIT_FDS" "128")
   )
 )
 
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_BUS_TYPE_STARTER = -1,
-;;   G_BUS_TYPE_NONE = 0,
-;;   G_BUS_TYPE_SYSTEM  = 1,
-;;   G_BUS_TYPE_SESSION = 2
-;; } GBusType;
-
-(define-enum-extended BusType
-  (in-module "G")
-  (c-name "GBusType")
+(define-flags-extended TestDBusFlags
+  (in-module "Gio")
+  (c-name "GTestDBusFlags")
   (values
-    '("starter" "G_BUS_TYPE_STARTER" "-1")
-    '("none" "G_BUS_TYPE_NONE" "0")
-    '("system" "G_BUS_TYPE_SYSTEM" "1")
-    '("session" "G_BUS_TYPE_SESSION" "2")
+    '("none" "G_TEST_DBUS_NONE" "0")
   )
 )
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_BUS_NAME_OWNER_FLAGS_NONE = 0,                    /*< nick=none >*/
-;;   G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT = (1<<0),  /*< nick=allow-replacement >*/
-;;   G_BUS_NAME_OWNER_FLAGS_REPLACE = (1<<1)            /*< nick=replace >*/
-;; } GBusNameOwnerFlags;
-
-(define-flags-extended BusNameOwnerFlags
-  (in-module "G")
-  (c-name "GBusNameOwnerFlags")
-  (values
-    '("none" "G_BUS_NAME_OWNER_FLAGS_NONE" "0x0")
-    '("allow-replacement" "G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT" "(1<<0)")
-    '("replace" "G_BUS_NAME_OWNER_FLAGS_REPLACE" "(1<<1)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_BUS_NAME_WATCHER_FLAGS_NONE = 0,
-;;   G_BUS_NAME_WATCHER_FLAGS_AUTO_START = (1<<0)
-;; } GBusNameWatcherFlags;
-
-(define-flags-extended BusNameWatcherFlags
-  (in-module "G")
-  (c-name "GBusNameWatcherFlags")
-  (values
-    '("none" "G_BUS_NAME_WATCHER_FLAGS_NONE" "0x0")
-    '("auto-start" "G_BUS_NAME_WATCHER_FLAGS_AUTO_START" "(1<<0)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_DBUS_PROXY_FLAGS_NONE = 0,
-;;   G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES = (1<<0),
-;;   G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS = (1<<1),
-;;   G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START = (1<<2),
-;;   G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES = (1<<3),
-;;   G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION = (1<<4)
-;; } GDBusProxyFlags;
-
-(define-flags-extended DBusProxyFlags
-  (in-module "G")
-  (c-name "GDBusProxyFlags")
-  (values
-    '("none" "G_DBUS_PROXY_FLAGS_NONE" "0x0")
-    '("do-not-load-properties" "G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES" "(1<<0)")
-    '("do-not-connect-signals" "G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS" "(1<<1)")
-    '("do-not-auto-start" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START" "(1<<2)")
-    '("get-invalidated-properties" "G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES" "(1<<3)")
-    '("do-not-auto-start-at-construction" "G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION" "(1<<4)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   /* Well-known errors in the org.freedesktop.DBus.Error namespace */
-;;   G_DBUS_ERROR_FAILED,                           /* org.freedesktop.DBus.Error.Failed */
-;;   G_DBUS_ERROR_NO_MEMORY,                        /* org.freedesktop.DBus.Error.NoMemory */
-;;   G_DBUS_ERROR_SERVICE_UNKNOWN,                  /* org.freedesktop.DBus.Error.ServiceUnknown */
-;;   G_DBUS_ERROR_NAME_HAS_NO_OWNER,                /* org.freedesktop.DBus.Error.NameHasNoOwner */
-;;   G_DBUS_ERROR_NO_REPLY,                         /* org.freedesktop.DBus.Error.NoReply */
-;;   G_DBUS_ERROR_IO_ERROR,                         /* org.freedesktop.DBus.Error.IOError */
-;;   G_DBUS_ERROR_BAD_ADDRESS,                      /* org.freedesktop.DBus.Error.BadAddress */
-;;   G_DBUS_ERROR_NOT_SUPPORTED,                    /* org.freedesktop.DBus.Error.NotSupported */
-;;   G_DBUS_ERROR_LIMITS_EXCEEDED,                  /* org.freedesktop.DBus.Error.LimitsExceeded */
-;;   G_DBUS_ERROR_ACCESS_DENIED,                    /* org.freedesktop.DBus.Error.AccessDenied */
-;;   G_DBUS_ERROR_AUTH_FAILED,                      /* org.freedesktop.DBus.Error.AuthFailed */
-;;   G_DBUS_ERROR_NO_SERVER,                        /* org.freedesktop.DBus.Error.NoServer */
-;;   G_DBUS_ERROR_TIMEOUT,                          /* org.freedesktop.DBus.Error.Timeout */
-;;   G_DBUS_ERROR_NO_NETWORK,                       /* org.freedesktop.DBus.Error.NoNetwork */
-;;   G_DBUS_ERROR_ADDRESS_IN_USE,                   /* org.freedesktop.DBus.Error.AddressInUse */
-;;   G_DBUS_ERROR_DISCONNECTED,                     /* org.freedesktop.DBus.Error.Disconnected */
-;;   G_DBUS_ERROR_INVALID_ARGS,                     /* org.freedesktop.DBus.Error.InvalidArgs */
-;;   G_DBUS_ERROR_FILE_NOT_FOUND,                   /* org.freedesktop.DBus.Error.FileNotFound */
-;;   G_DBUS_ERROR_FILE_EXISTS,                      /* org.freedesktop.DBus.Error.FileExists */
-;;   G_DBUS_ERROR_UNKNOWN_METHOD,                   /* org.freedesktop.DBus.Error.UnknownMethod */
-;;   G_DBUS_ERROR_TIMED_OUT,                        /* org.freedesktop.DBus.Error.TimedOut */
-;;   G_DBUS_ERROR_MATCH_RULE_NOT_FOUND,             /* org.freedesktop.DBus.Error.MatchRuleNotFound */
-;;   G_DBUS_ERROR_MATCH_RULE_INVALID,               /* org.freedesktop.DBus.Error.MatchRuleInvalid */
-;;   G_DBUS_ERROR_SPAWN_EXEC_FAILED,                /* org.freedesktop.DBus.Error.Spawn.ExecFailed */
-;;   G_DBUS_ERROR_SPAWN_FORK_FAILED,                /* org.freedesktop.DBus.Error.Spawn.ForkFailed */
-;;   G_DBUS_ERROR_SPAWN_CHILD_EXITED,               /* org.freedesktop.DBus.Error.Spawn.ChildExited */
-;;   G_DBUS_ERROR_SPAWN_CHILD_SIGNALED,             /* org.freedesktop.DBus.Error.Spawn.ChildSignaled */
-;;   G_DBUS_ERROR_SPAWN_FAILED,                     /* org.freedesktop.DBus.Error.Spawn.Failed */
-;;   G_DBUS_ERROR_SPAWN_SETUP_FAILED,               /* org.freedesktop.DBus.Error.Spawn.FailedToSetup */
-;;   G_DBUS_ERROR_SPAWN_CONFIG_INVALID,             /* org.freedesktop.DBus.Error.Spawn.ConfigInvalid */
-;;   G_DBUS_ERROR_SPAWN_SERVICE_INVALID,            /* org.freedesktop.DBus.Error.Spawn.ServiceNotValid */
-;;   G_DBUS_ERROR_SPAWN_SERVICE_NOT_FOUND,          /* org.freedesktop.DBus.Error.Spawn.ServiceNotFound */
-;;   G_DBUS_ERROR_SPAWN_PERMISSIONS_INVALID,        /* org.freedesktop.DBus.Error.Spawn.PermissionsInvalid */
-;;   G_DBUS_ERROR_SPAWN_FILE_INVALID,               /* org.freedesktop.DBus.Error.Spawn.FileInvalid */
-;;   G_DBUS_ERROR_SPAWN_NO_MEMORY,                  /* org.freedesktop.DBus.Error.Spawn.NoMemory */
-;;   G_DBUS_ERROR_UNIX_PROCESS_ID_UNKNOWN,          /* org.freedesktop.DBus.Error.UnixProcessIdUnknown */
-;;   G_DBUS_ERROR_INVALID_SIGNATURE,                /* org.freedesktop.DBus.Error.InvalidSignature */
-;;   G_DBUS_ERROR_INVALID_FILE_CONTENT,             /* org.freedesktop.DBus.Error.InvalidFileContent */
-;;   G_DBUS_ERROR_SELINUX_SECURITY_CONTEXT_UNKNOWN, /* org.freedesktop.DBus.Error.SELinuxSecurityContextUnknown */
-;;   G_DBUS_ERROR_ADT_AUDIT_DATA_UNKNOWN,           /* org.freedesktop.DBus.Error.AdtAuditDataUnknown */
-;;   G_DBUS_ERROR_OBJECT_PATH_IN_USE,               /* org.freedesktop.DBus.Error.ObjectPathInUse */
-;;   G_DBUS_ERROR_UNKNOWN_OBJECT,                   /* org.freedesktop.DBus.Error.UnknownObject */
-;;   G_DBUS_ERROR_UNKNOWN_INTERFACE,                /* org.freedesktop.DBus.Error.UnknownInterface */
-;;   G_DBUS_ERROR_UNKNOWN_PROPERTY,                 /* org.freedesktop.DBus.Error.UnknownProperty */
-;;   G_DBUS_ERROR_PROPERTY_READ_ONLY                /* org.freedesktop.DBus.Error.PropertyReadOnly */
-;; } GDBusError;
-
-(define-enum-extended DBusError
-  (in-module "G")
-  (c-name "GDBusError")
-  (values
-    '("failed" "G_DBUS_ERROR_FAILED" "0")
-    '("no-memory" "G_DBUS_ERROR_NO_MEMORY" "1")
-    '("service-unknown" "G_DBUS_ERROR_SERVICE_UNKNOWN" "2")
-    '("name-has-no-owner" "G_DBUS_ERROR_NAME_HAS_NO_OWNER" "3")
-    '("no-reply" "G_DBUS_ERROR_NO_REPLY" "4")
-    '("io-error" "G_DBUS_ERROR_IO_ERROR" "5")
-    '("bad-address" "G_DBUS_ERROR_BAD_ADDRESS" "6")
-    '("not-supported" "G_DBUS_ERROR_NOT_SUPPORTED" "7")
-    '("limits-exceeded" "G_DBUS_ERROR_LIMITS_EXCEEDED" "8")
-    '("access-denied" "G_DBUS_ERROR_ACCESS_DENIED" "9")
-    '("auth-failed" "G_DBUS_ERROR_AUTH_FAILED" "10")
-    '("no-server" "G_DBUS_ERROR_NO_SERVER" "11")
-    '("timeout" "G_DBUS_ERROR_TIMEOUT" "12")
-    '("no-network" "G_DBUS_ERROR_NO_NETWORK" "13")
-    '("address-in-use" "G_DBUS_ERROR_ADDRESS_IN_USE" "14")
-    '("disconnected" "G_DBUS_ERROR_DISCONNECTED" "15")
-    '("invalid-args" "G_DBUS_ERROR_INVALID_ARGS" "16")
-    '("file-not-found" "G_DBUS_ERROR_FILE_NOT_FOUND" "17")
-    '("file-exists" "G_DBUS_ERROR_FILE_EXISTS" "18")
-    '("unknown-method" "G_DBUS_ERROR_UNKNOWN_METHOD" "19")
-    '("timed-out" "G_DBUS_ERROR_TIMED_OUT" "20")
-    '("match-rule-not-found" "G_DBUS_ERROR_MATCH_RULE_NOT_FOUND" "21")
-    '("match-rule-invalid" "G_DBUS_ERROR_MATCH_RULE_INVALID" "22")
-    '("spawn-exec-failed" "G_DBUS_ERROR_SPAWN_EXEC_FAILED" "23")
-    '("spawn-fork-failed" "G_DBUS_ERROR_SPAWN_FORK_FAILED" "24")
-    '("spawn-child-exited" "G_DBUS_ERROR_SPAWN_CHILD_EXITED" "25")
-    '("spawn-child-signaled" "G_DBUS_ERROR_SPAWN_CHILD_SIGNALED" "26")
-    '("spawn-failed" "G_DBUS_ERROR_SPAWN_FAILED" "27")
-    '("spawn-setup-failed" "G_DBUS_ERROR_SPAWN_SETUP_FAILED" "28")
-    '("spawn-config-invalid" "G_DBUS_ERROR_SPAWN_CONFIG_INVALID" "29")
-    '("spawn-service-invalid" "G_DBUS_ERROR_SPAWN_SERVICE_INVALID" "30")
-    '("spawn-service-not-found" "G_DBUS_ERROR_SPAWN_SERVICE_NOT_FOUND" "31")
-    '("spawn-permissions-invalid" "G_DBUS_ERROR_SPAWN_PERMISSIONS_INVALID" "32")
-    '("spawn-file-invalid" "G_DBUS_ERROR_SPAWN_FILE_INVALID" "33")
-    '("spawn-no-memory" "G_DBUS_ERROR_SPAWN_NO_MEMORY" "34")
-    '("unix-process-id-unknown" "G_DBUS_ERROR_UNIX_PROCESS_ID_UNKNOWN" "35")
-    '("invalid-signature" "G_DBUS_ERROR_INVALID_SIGNATURE" "36")
-    '("invalid-file-content" "G_DBUS_ERROR_INVALID_FILE_CONTENT" "37")
-    '("selinux-security-context-unknown" "G_DBUS_ERROR_SELINUX_SECURITY_CONTEXT_UNKNOWN" "38")
-    '("adt-audit-data-unknown" "G_DBUS_ERROR_ADT_AUDIT_DATA_UNKNOWN" "39")
-    '("object-path-in-use" "G_DBUS_ERROR_OBJECT_PATH_IN_USE" "40")
-    '("unknown-object" "G_DBUS_ERROR_UNKNOWN_OBJECT" "41")
-    '("unknown-interface" "G_DBUS_ERROR_UNKNOWN_INTERFACE" "42")
-    '("unknown-property" "G_DBUS_ERROR_UNKNOWN_PROPERTY" "43")
-    '("property-read-only" "G_DBUS_ERROR_PROPERTY_READ_ONLY" "44")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_DBUS_CONNECTION_FLAGS_NONE = 0,
-;;   G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT = (1<<0),
-;;   G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER = (1<<1),
-;;   G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS = (1<<2),
-;;   G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION = (1<<3),
-;;   G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING = (1<<4)
-;; } GDBusConnectionFlags;
-
-(define-flags-extended DBusConnectionFlags
-  (in-module "G")
-  (c-name "GDBusConnectionFlags")
-  (values
-    '("none" "G_DBUS_CONNECTION_FLAGS_NONE" "0x0")
-    '("authentication-client" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT" "(1<<0)")
-    '("authentication-server" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER" "(1<<1)")
-    '("authentication-allow-anonymous" "G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS" "(1<<2)")
-    '("message-bus-connection" "G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION" "(1<<3)")
-    '("delay-message-processing" "G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING" "(1<<4)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_DBUS_CAPABILITY_FLAGS_NONE = 0,
-;;   G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING = (1<<0)
-;; } GDBusCapabilityFlags;
-
-(define-flags-extended DBusCapabilityFlags
-  (in-module "G")
-  (c-name "GDBusCapabilityFlags")
-  (values
-    '("none" "G_DBUS_CAPABILITY_FLAGS_NONE" "0x0")
-    '("unix-fd-passing" "G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING" "(1<<0)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_DBUS_CALL_FLAGS_NONE = 0,
-;;   G_DBUS_CALL_FLAGS_NO_AUTO_START = (1<<0),
-;;   G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION = (1<<1)
-;; } GDBusCallFlags;
-
-(define-flags-extended DBusCallFlags
-  (in-module "G")
-  (c-name "GDBusCallFlags")
-  (values
-    '("none" "G_DBUS_CALL_FLAGS_NONE" "0x0")
-    '("no-auto-start" "G_DBUS_CALL_FLAGS_NO_AUTO_START" "(1<<0)")
-    '("allow-interactive-authorization" "G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION" "(1<<1)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_DBUS_MESSAGE_TYPE_INVALID,
-;;   G_DBUS_MESSAGE_TYPE_METHOD_CALL,
-;;   G_DBUS_MESSAGE_TYPE_METHOD_RETURN,
-;;   G_DBUS_MESSAGE_TYPE_ERROR,
-;;   G_DBUS_MESSAGE_TYPE_SIGNAL
-;; } GDBusMessageType;
-
-(define-enum-extended DBusMessageType
-  (in-module "G")
-  (c-name "GDBusMessageType")
-  (values
-    '("invalid" "G_DBUS_MESSAGE_TYPE_INVALID" "0")
-    '("method-call" "G_DBUS_MESSAGE_TYPE_METHOD_CALL" "1")
-    '("method-return" "G_DBUS_MESSAGE_TYPE_METHOD_RETURN" "2")
-    '("error" "G_DBUS_MESSAGE_TYPE_ERROR" "3")
-    '("signal" "G_DBUS_MESSAGE_TYPE_SIGNAL" "4")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_DBUS_MESSAGE_FLAGS_NONE = 0,
-;;   G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED = (1<<0),
-;;   G_DBUS_MESSAGE_FLAGS_NO_AUTO_START = (1<<1),
-;;   G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION = (1<<2)
-;; } GDBusMessageFlags;
-
-(define-flags-extended DBusMessageFlags
-  (in-module "G")
-  (c-name "GDBusMessageFlags")
-  (values
-    '("none" "G_DBUS_MESSAGE_FLAGS_NONE" "0x0")
-    '("no-reply-expected" "G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED" "(1<<0)")
-    '("no-auto-start" "G_DBUS_MESSAGE_FLAGS_NO_AUTO_START" "(1<<1)")
-    '("allow-interactive-authorization" "G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION" "(1<<2)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_DBUS_MESSAGE_HEADER_FIELD_INVALID,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_PATH,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_MEMBER,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_SENDER,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE,
-;;   G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS
-;; } GDBusMessageHeaderField;
-
-(define-enum-extended DBusMessageHeaderField
-  (in-module "G")
-  (c-name "GDBusMessageHeaderField")
-  (values
-    '("invalid" "G_DBUS_MESSAGE_HEADER_FIELD_INVALID" "0")
-    '("path" "G_DBUS_MESSAGE_HEADER_FIELD_PATH" "1")
-    '("interface" "G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE" "2")
-    '("member" "G_DBUS_MESSAGE_HEADER_FIELD_MEMBER" "3")
-    '("error-name" "G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME" "4")
-    '("reply-serial" "G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL" "5")
-    '("destination" "G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION" "6")
-    '("sender" "G_DBUS_MESSAGE_HEADER_FIELD_SENDER" "7")
-    '("signature" "G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE" "8")
-    '("num-unix-fds" "G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS" "9")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_DBUS_PROPERTY_INFO_FLAGS_NONE = 0,
-;;   G_DBUS_PROPERTY_INFO_FLAGS_READABLE = (1<<0),
-;;   G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE = (1<<1)
-;; } GDBusPropertyInfoFlags;
-
-(define-flags-extended DBusPropertyInfoFlags
-  (in-module "G")
-  (c-name "GDBusPropertyInfoFlags")
-  (values
-    '("none" "G_DBUS_PROPERTY_INFO_FLAGS_NONE" "0x0")
-    '("readable" "G_DBUS_PROPERTY_INFO_FLAGS_READABLE" "(1<<0)")
-    '("writable" "G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE" "(1<<1)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_DBUS_SUBTREE_FLAGS_NONE = 0,
-;;   G_DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES = (1<<0)
-;; } GDBusSubtreeFlags;
-
-(define-flags-extended DBusSubtreeFlags
-  (in-module "G")
-  (c-name "GDBusSubtreeFlags")
-  (values
-    '("none" "G_DBUS_SUBTREE_FLAGS_NONE" "0x0")
-    '("dispatch-to-unenumerated-nodes" "G_DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES" "(1<<0)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_DBUS_SERVER_FLAGS_NONE = 0,
-;;   G_DBUS_SERVER_FLAGS_RUN_IN_THREAD = (1<<0),
-;;   G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS = (1<<1)
-;; } GDBusServerFlags;
-
-(define-flags-extended DBusServerFlags
-  (in-module "G")
-  (c-name "GDBusServerFlags")
-  (values
-    '("none" "G_DBUS_SERVER_FLAGS_NONE" "0x0")
-    '("run-in-thread" "G_DBUS_SERVER_FLAGS_RUN_IN_THREAD" "(1<<0)")
-    '("authentication-allow-anonymous" "G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS" "(1<<1)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum /*< flags >*/
-;; {
-;;   G_DBUS_SIGNAL_FLAGS_NONE = 0,
-;;   G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE = (1<<0),
-;;   G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE = (1<<1),
-;;   G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH = (1<<2)
-;; } GDBusSignalFlags;
-
-(define-flags-extended DBusSignalFlags
-  (in-module "G")
-  (c-name "GDBusSignalFlags")
-  (values
-    '("none" "G_DBUS_SIGNAL_FLAGS_NONE" "0x0")
-    '("no-match-rule" "G_DBUS_SIGNAL_FLAGS_NO_MATCH_RULE" "(1<<0)")
-    '("match-arg0-namespace" "G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE" "(1<<1)")
-    '("match-arg0-path" "G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH" "(1<<2)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_DBUS_SEND_MESSAGE_FLAGS_NONE = 0,
-;;   G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL = (1<<0)
-;; } GDBusSendMessageFlags;
-
-(define-flags-extended DBusSendMessageFlags
-  (in-module "G")
-  (c-name "GDBusSendMessageFlags")
-  (values
-    '("none" "G_DBUS_SEND_MESSAGE_FLAGS_NONE" "0x0")
-    '("preserve-serial" "G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL" "(1<<0)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_CREDENTIALS_TYPE_INVALID,
-;;   G_CREDENTIALS_TYPE_LINUX_UCRED,
-;;   G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED,
-;;   G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED,
-;;   G_CREDENTIALS_TYPE_SOLARIS_UCRED,
-;;   G_CREDENTIALS_TYPE_NETBSD_UNPCBID
-;; } GCredentialsType;
-
-(define-enum-extended CredentialsType
-  (in-module "G")
-  (c-name "GCredentialsType")
-  (values
-    '("invalid" "G_CREDENTIALS_TYPE_INVALID" "0")
-    '("linux-ucred" "G_CREDENTIALS_TYPE_LINUX_UCRED" "1")
-    '("freebsd-cmsgcred" "G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED" "2")
-    '("openbsd-sockpeercred" "G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED" "3")
-    '("solaris-ucred" "G_CREDENTIALS_TYPE_SOLARIS_UCRED" "4")
-    '("netbsd-unpcbid" "G_CREDENTIALS_TYPE_NETBSD_UNPCBID" "5")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN    = 'B',
-;;   G_DBUS_MESSAGE_BYTE_ORDER_LITTLE_ENDIAN = 'l'
-;; } GDBusMessageByteOrder;
-
-(define-enum-extended DBusMessageByteOrder
-  (in-module "G")
-  (c-name "GDBusMessageByteOrder")
-  (values
-    '("big-endian" "G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN" "0")
-    '("little-endian" "G_DBUS_MESSAGE_BYTE_ORDER_LITTLE_ENDIAN" "'l'")
-  )
-)
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_APPLICATION_FLAGS_NONE,
-;;   G_APPLICATION_IS_SERVICE  =          (1 << 0),
-;;   G_APPLICATION_IS_LAUNCHER =          (1 << 1),
-;; 
-;;   G_APPLICATION_HANDLES_OPEN =         (1 << 2),
-;;   G_APPLICATION_HANDLES_COMMAND_LINE = (1 << 3),
-;;   G_APPLICATION_SEND_ENVIRONMENT    =  (1 << 4),
-;; 
-;;   G_APPLICATION_NON_UNIQUE =           (1 << 5),
-;; 
-;;   G_APPLICATION_CAN_OVERRIDE_APP_ID =  (1 << 6)
-;; } GApplicationFlags;
-
-(define-flags-extended ApplicationFlags
-  (in-module "G")
-  (c-name "GApplicationFlags")
-  (values
-    '("flags-none" "G_APPLICATION_FLAGS_NONE" "0x0")
-    '("is-service" "G_APPLICATION_IS_SERVICE" "(1 << 0)")
-    '("is-launcher" "G_APPLICATION_IS_LAUNCHER" "(1 << 1)")
-    '("handles-open" "G_APPLICATION_HANDLES_OPEN" "(1 << 2)")
-    '("handles-command-line" "G_APPLICATION_HANDLES_COMMAND_LINE" "(1 << 3)")
-    '("send-environment" "G_APPLICATION_SEND_ENVIRONMENT" "(1 << 4)")
-    '("non-unique" "G_APPLICATION_NON_UNIQUE" "(1 << 5)")
-    '("can-override-app-id" "G_APPLICATION_CAN_OVERRIDE_APP_ID" "(1 << 6)")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_TLS_ERROR_UNAVAILABLE,
-;;   G_TLS_ERROR_MISC,
-;;   G_TLS_ERROR_BAD_CERTIFICATE,
-;;   G_TLS_ERROR_NOT_TLS,
-;;   G_TLS_ERROR_HANDSHAKE,
-;;   G_TLS_ERROR_CERTIFICATE_REQUIRED,
-;;   G_TLS_ERROR_EOF
-;; } GTlsError;
-
-(define-enum-extended TlsError
-  (in-module "G")
-  (c-name "GTlsError")
-  (values
-    '("unavailable" "G_TLS_ERROR_UNAVAILABLE" "0")
-    '("misc" "G_TLS_ERROR_MISC" "1")
-    '("bad-certificate" "G_TLS_ERROR_BAD_CERTIFICATE" "2")
-    '("not-tls" "G_TLS_ERROR_NOT_TLS" "3")
-    '("handshake" "G_TLS_ERROR_HANDSHAKE" "4")
-    '("certificate-required" "G_TLS_ERROR_CERTIFICATE_REQUIRED" "5")
-    '("eof" "G_TLS_ERROR_EOF" "6")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_TLS_CERTIFICATE_UNKNOWN_CA    = (1 << 0),
-;;   G_TLS_CERTIFICATE_BAD_IDENTITY  = (1 << 1),
-;;   G_TLS_CERTIFICATE_NOT_ACTIVATED = (1 << 2),
-;;   G_TLS_CERTIFICATE_EXPIRED       = (1 << 3),
-;;   G_TLS_CERTIFICATE_REVOKED       = (1 << 4),
-;;   G_TLS_CERTIFICATE_INSECURE      = (1 << 5),
-;;   G_TLS_CERTIFICATE_GENERIC_ERROR = (1 << 6),
-;; 
-;;   G_TLS_CERTIFICATE_VALIDATE_ALL  = 0x007f
-;; } GTlsCertificateFlags;
-
-(define-flags-extended TlsCertificateFlags
-  (in-module "G")
-  (c-name "GTlsCertificateFlags")
-  (values
-    '("unknown-ca" "G_TLS_CERTIFICATE_UNKNOWN_CA" "(1 << 0)")
-    '("bad-identity" "G_TLS_CERTIFICATE_BAD_IDENTITY" "(1 << 1)")
-    '("not-activated" "G_TLS_CERTIFICATE_NOT_ACTIVATED" "(1 << 2)")
-    '("expired" "G_TLS_CERTIFICATE_EXPIRED" "(1 << 3)")
-    '("revoked" "G_TLS_CERTIFICATE_REVOKED" "(1 << 4)")
-    '("insecure" "G_TLS_CERTIFICATE_INSECURE" "(1 << 5)")
-    '("generic-error" "G_TLS_CERTIFICATE_GENERIC_ERROR" "(1 << 6)")
-    '("validate-all" "G_TLS_CERTIFICATE_VALIDATE_ALL" "0x007f")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_TLS_AUTHENTICATION_NONE,
-;;   G_TLS_AUTHENTICATION_REQUESTED,
-;;   G_TLS_AUTHENTICATION_REQUIRED
-;; } GTlsAuthenticationMode;
 
 (define-enum-extended TlsAuthenticationMode
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GTlsAuthenticationMode")
   (values
     '("none" "G_TLS_AUTHENTICATION_NONE" "0")
@@ -1366,52 +812,62 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_TLS_REHANDSHAKE_NEVER,
-;;   G_TLS_REHANDSHAKE_SAFELY,
-;;   G_TLS_REHANDSHAKE_UNSAFELY
-;; } GTlsRehandshakeMode;
-
-(define-enum-extended TlsRehandshakeMode
-  (in-module "G")
-  (c-name "GTlsRehandshakeMode")
+(define-flags-extended TlsCertificateFlags
+  (in-module "Gio")
+  (c-name "GTlsCertificateFlags")
   (values
-    '("never" "G_TLS_REHANDSHAKE_NEVER" "0")
-    '("safely" "G_TLS_REHANDSHAKE_SAFELY" "1")
-    '("unsafely" "G_TLS_REHANDSHAKE_UNSAFELY" "2")
+    '("unknown_ca" "G_TLS_CERTIFICATE_UNKNOWN_CA" "1")
+    '("bad_identity" "G_TLS_CERTIFICATE_BAD_IDENTITY" "2")
+    '("not_activated" "G_TLS_CERTIFICATE_NOT_ACTIVATED" "4")
+    '("expired" "G_TLS_CERTIFICATE_EXPIRED" "8")
+    '("revoked" "G_TLS_CERTIFICATE_REVOKED" "16")
+    '("insecure" "G_TLS_CERTIFICATE_INSECURE" "32")
+    '("generic_error" "G_TLS_CERTIFICATE_GENERIC_ERROR" "64")
+    '("validate_all" "G_TLS_CERTIFICATE_VALIDATE_ALL" "127")
   )
 )
 
-;; Original typedef:
-;; typedef enum _GTlsPasswordFlags
-;; {
-;;   G_TLS_PASSWORD_NONE = 0,
-;;   G_TLS_PASSWORD_RETRY = 1 << 1,
-;;   G_TLS_PASSWORD_MANY_TRIES = 1 << 2,
-;;   G_TLS_PASSWORD_FINAL_TRY = 1 << 3
-;; } GTlsPasswordFlags;
-
-(define-flags-extended TlsPasswordFlags
-  (in-module "G")
-  (c-name "GTlsPasswordFlags")
+(define-enum-extended TlsCertificateRequestFlags
+  (in-module "Gio")
+  (c-name "GTlsCertificateRequestFlags")
   (values
-    '("none" "G_TLS_PASSWORD_NONE" "0x0")
-    '("retry" "G_TLS_PASSWORD_RETRY" "1 << 1")
-    '("many-tries" "G_TLS_PASSWORD_MANY_TRIES" "1 << 2")
-    '("final-try" "G_TLS_PASSWORD_FINAL_TRY" "1 << 3")
+    '("none" "G_TLS_CERTIFICATE_REQUEST_NONE" "0")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_TLS_INTERACTION_UNHANDLED,
-;;   G_TLS_INTERACTION_HANDLED,
-;;   G_TLS_INTERACTION_FAILED
-;; } GTlsInteractionResult;
+(define-enum-extended TlsDatabaseLookupFlags
+  (in-module "Gio")
+  (c-name "GTlsDatabaseLookupFlags")
+  (values
+    '("none" "G_TLS_DATABASE_LOOKUP_NONE" "0")
+    '("keypair" "G_TLS_DATABASE_LOOKUP_KEYPAIR" "1")
+  )
+)
+
+(define-flags-extended TlsDatabaseVerifyFlags
+  (in-module "Gio")
+  (c-name "GTlsDatabaseVerifyFlags")
+  (values
+    '("none" "G_TLS_DATABASE_VERIFY_NONE" "0")
+  )
+)
+
+(define-enum-extended TlsError
+  (in-module "Gio")
+  (c-name "GTlsError")
+  (values
+    '("unavailable" "G_TLS_ERROR_UNAVAILABLE" "0")
+    '("misc" "G_TLS_ERROR_MISC" "1")
+    '("bad_certificate" "G_TLS_ERROR_BAD_CERTIFICATE" "2")
+    '("not_tls" "G_TLS_ERROR_NOT_TLS" "3")
+    '("handshake" "G_TLS_ERROR_HANDSHAKE" "4")
+    '("certificate_required" "G_TLS_ERROR_CERTIFICATE_REQUIRED" "5")
+    '("eof" "G_TLS_ERROR_EOF" "6")
+  )
+)
 
 (define-enum-extended TlsInteractionResult
-  (in-module "G")
+  (in-module "Gio")
   (c-name "GTlsInteractionResult")
   (values
     '("unhandled" "G_TLS_INTERACTION_UNHANDLED" "0")
@@ -1420,298 +876,46 @@
   )
 )
 
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_DBUS_INTERFACE_SKELETON_FLAGS_NONE = 0,
-;;   G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD = (1<<0)
-;; } GDBusInterfaceSkeletonFlags;
-
-(define-flags-extended DBusInterfaceSkeletonFlags
-  (in-module "G")
-  (c-name "GDBusInterfaceSkeletonFlags")
+(define-flags-extended TlsPasswordFlags
+  (in-module "Gio")
+  (c-name "GTlsPasswordFlags")
   (values
-    '("none" "G_DBUS_INTERFACE_SKELETON_FLAGS_NONE" "0x0")
-    '("handle-method-invocations-in-thread" "G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD" "(1<<0)")
+    '("none" "G_TLS_PASSWORD_NONE" "0")
+    '("retry" "G_TLS_PASSWORD_RETRY" "2")
+    '("many_tries" "G_TLS_PASSWORD_MANY_TRIES" "4")
+    '("final_try" "G_TLS_PASSWORD_FINAL_TRY" "8")
   )
 )
 
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE = 0,
-;;   G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START = (1<<0)
-;; } GDBusObjectManagerClientFlags;
-
-(define-flags-extended DBusObjectManagerClientFlags
-  (in-module "G")
-  (c-name "GDBusObjectManagerClientFlags")
+(define-enum-extended TlsRehandshakeMode
+  (in-module "Gio")
+  (c-name "GTlsRehandshakeMode")
   (values
-    '("none" "G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE" "0x0")
-    '("do-not-auto-start" "G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START" "(1<<0)")
+    '("never" "G_TLS_REHANDSHAKE_NEVER" "0")
+    '("safely" "G_TLS_REHANDSHAKE_SAFELY" "1")
+    '("unsafely" "G_TLS_REHANDSHAKE_UNSAFELY" "2")
   )
 )
 
-;; Original typedef:
-;; typedef enum /*< flags >*/ {
-;;   G_TLS_DATABASE_VERIFY_NONE = 0
-;; } GTlsDatabaseVerifyFlags;
-
-(define-flags-extended TlsDatabaseVerifyFlags
-  (in-module "G")
-  (c-name "GTlsDatabaseVerifyFlags")
+(define-enum-extended UnixSocketAddressType
+  (in-module "Gio")
+  (c-name "GUnixSocketAddressType")
   (values
-    '("none" "G_TLS_DATABASE_VERIFY_NONE" "0x0")
+    '("invalid" "G_UNIX_SOCKET_ADDRESS_INVALID" "0")
+    '("anonymous" "G_UNIX_SOCKET_ADDRESS_ANONYMOUS" "1")
+    '("path" "G_UNIX_SOCKET_ADDRESS_PATH" "2")
+    '("abstract" "G_UNIX_SOCKET_ADDRESS_ABSTRACT" "3")
+    '("abstract_padded" "G_UNIX_SOCKET_ADDRESS_ABSTRACT_PADDED" "4")
   )
 )
 
-;; Original typedef:
-;; typedef enum {
-;;   G_TLS_DATABASE_LOOKUP_NONE = 0,
-;;   G_TLS_DATABASE_LOOKUP_KEYPAIR = 1
-;; } GTlsDatabaseLookupFlags;
-
-(define-flags-extended TlsDatabaseLookupFlags
-  (in-module "G")
-  (c-name "GTlsDatabaseLookupFlags")
+(define-enum-extended ZlibCompressorFormat
+  (in-module "Gio")
+  (c-name "GZlibCompressorFormat")
   (values
-    '("none" "G_TLS_DATABASE_LOOKUP_NONE" "0x0")
-    '("keypair" "G_TLS_DATABASE_LOOKUP_KEYPAIR" "0x1")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_TLS_CERTIFICATE_REQUEST_NONE = 0
-;; } GTlsCertificateRequestFlags;
-
-(define-flags-extended TlsCertificateRequestFlags
-  (in-module "G")
-  (c-name "GTlsCertificateRequestFlags")
-  (values
-    '("none" "G_TLS_CERTIFICATE_REQUEST_NONE" "0x0")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_IO_MODULE_SCOPE_NONE,
-;;   G_IO_MODULE_SCOPE_BLOCK_DUPLICATES
-;; } GIOModuleScopeFlags;
-
-(define-flags-extended IOModuleScopeFlags
-  (in-module "G")
-  (c-name "GIOModuleScopeFlags")
-  (values
-    '("none" "G_IO_MODULE_SCOPE_NONE" "0x0")
-    '("block-duplicates" "G_IO_MODULE_SCOPE_BLOCK_DUPLICATES" "0x1")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_SOCKET_CLIENT_RESOLVING,
-;;   G_SOCKET_CLIENT_RESOLVED,
-;;   G_SOCKET_CLIENT_CONNECTING,
-;;   G_SOCKET_CLIENT_CONNECTED,
-;;   G_SOCKET_CLIENT_PROXY_NEGOTIATING,
-;;   G_SOCKET_CLIENT_PROXY_NEGOTIATED,
-;;   G_SOCKET_CLIENT_TLS_HANDSHAKING,
-;;   G_SOCKET_CLIENT_TLS_HANDSHAKED,
-;;   G_SOCKET_CLIENT_COMPLETE
-;; } GSocketClientEvent;
-
-(define-enum-extended SocketClientEvent
-  (in-module "G")
-  (c-name "GSocketClientEvent")
-  (values
-    '("resolving" "G_SOCKET_CLIENT_RESOLVING" "0")
-    '("resolved" "G_SOCKET_CLIENT_RESOLVED" "1")
-    '("connecting" "G_SOCKET_CLIENT_CONNECTING" "2")
-    '("connected" "G_SOCKET_CLIENT_CONNECTED" "3")
-    '("proxy-negotiating" "G_SOCKET_CLIENT_PROXY_NEGOTIATING" "4")
-    '("proxy-negotiated" "G_SOCKET_CLIENT_PROXY_NEGOTIATED" "5")
-    '("tls-handshaking" "G_SOCKET_CLIENT_TLS_HANDSHAKING" "6")
-    '("tls-handshaked" "G_SOCKET_CLIENT_TLS_HANDSHAKED" "7")
-    '("complete" "G_SOCKET_CLIENT_COMPLETE" "8")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_SOCKET_LISTENER_BINDING,
-;;   G_SOCKET_LISTENER_BOUND,
-;;   G_SOCKET_LISTENER_LISTENING,
-;;   G_SOCKET_LISTENER_LISTENED
-;; } GSocketListenerEvent;
-
-(define-enum-extended SocketListenerEvent
-  (in-module "G")
-  (c-name "GSocketListenerEvent")
-  (values
-    '("binding" "G_SOCKET_LISTENER_BINDING" "0")
-    '("bound" "G_SOCKET_LISTENER_BOUND" "1")
-    '("listening" "G_SOCKET_LISTENER_LISTENING" "2")
-    '("listened" "G_SOCKET_LISTENER_LISTENED" "3")
-  )
-)
-
-;; Original typedef:
-;; typedef enum /*< flags >*/ {
-;;   G_TEST_DBUS_NONE = 0
-;; } GTestDBusFlags;
-
-(define-flags-extended TestDBusFlags
-  (in-module "G")
-  (c-name "GTestDBusFlags")
-  (values
-    '("us-none" "G_TEST_DBUS_NONE" "0x0")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_SUBPROCESS_FLAGS_NONE                  = 0,
-;;   G_SUBPROCESS_FLAGS_STDIN_PIPE            = (1u << 0),
-;;   G_SUBPROCESS_FLAGS_STDIN_INHERIT         = (1u << 1),
-;;   G_SUBPROCESS_FLAGS_STDOUT_PIPE           = (1u << 2),
-;;   G_SUBPROCESS_FLAGS_STDOUT_SILENCE        = (1u << 3),
-;;   G_SUBPROCESS_FLAGS_STDERR_PIPE           = (1u << 4),
-;;   G_SUBPROCESS_FLAGS_STDERR_SILENCE        = (1u << 5),
-;;   G_SUBPROCESS_FLAGS_STDERR_MERGE          = (1u << 6),
-;;   G_SUBPROCESS_FLAGS_INHERIT_FDS           = (1u << 7)
-;; } GSubprocessFlags;
-
-(define-flags-extended SubprocessFlags
-  (in-module "G")
-  (c-name "GSubprocessFlags")
-  (values
-    '("none" "G_SUBPROCESS_FLAGS_NONE" "0x0")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_NOTIFICATION_PRIORITY_NORMAL,
-;;   G_NOTIFICATION_PRIORITY_LOW,
-;;   G_NOTIFICATION_PRIORITY_HIGH,
-;;   G_NOTIFICATION_PRIORITY_URGENT
-;; } GNotificationPriority;
-
-(define-enum-extended NotificationPriority
-  (in-module "G")
-  (c-name "GNotificationPriority")
-  (values
-    '("normal" "G_NOTIFICATION_PRIORITY_NORMAL" "0")
-    '("low" "G_NOTIFICATION_PRIORITY_LOW" "1")
-    '("high" "G_NOTIFICATION_PRIORITY_HIGH" "2")
-    '("urgent" "G_NOTIFICATION_PRIORITY_URGENT" "3")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_NETWORK_CONNECTIVITY_LOCAL       = 1,
-;;   G_NETWORK_CONNECTIVITY_LIMITED     = 2,
-;;   G_NETWORK_CONNECTIVITY_PORTAL      = 3,
-;;   G_NETWORK_CONNECTIVITY_FULL        = 4
-;; } GNetworkConnectivity;
-
-(define-enum-extended NetworkConnectivity
-  (in-module "G")
-  (c-name "GNetworkConnectivity")
-  (values
-    '("local" "G_NETWORK_CONNECTIVITY_LOCAL" "1")
-    '("limited" "G_NETWORK_CONNECTIVITY_LIMITED" "2")
-    '("portal" "G_NETWORK_CONNECTIVITY_PORTAL" "3")
-    '("full" "G_NETWORK_CONNECTIVITY_FULL" "4")
-  )
-)
-
-;; From gsettings.h
-
-;; Original typedef:
-;; typedef enum
-;; {
-;;   G_SETTINGS_BIND_DEFAULT,
-;;   G_SETTINGS_BIND_GET            = (1<<0),
-;;   G_SETTINGS_BIND_SET            = (1<<1),
-;;   G_SETTINGS_BIND_NO_SENSITIVITY = (1<<2),
-;;   G_SETTINGS_BIND_GET_NO_CHANGES = (1<<3),
-;;   G_SETTINGS_BIND_INVERT_BOOLEAN = (1<<4)
-;; } GSettingsBindFlags;
-
-(define-flags-extended SettingsBindFlags
-  (in-module "G")
-  (c-name "GSettingsBindFlags")
-  (values
-    '("default" "G_SETTINGS_BIND_DEFAULT" "0x0")
-    '("get" "G_SETTINGS_BIND_GET" "(1<<0)")
-    '("set" "G_SETTINGS_BIND_SET" "(1<<1)")
-    '("no-sensitivity" "G_SETTINGS_BIND_NO_SENSITIVITY" "(1<<2)")
-    '("get-no-changes" "G_SETTINGS_BIND_GET_NO_CHANGES" "(1<<3)")
-    '("invert-boolean" "G_SETTINGS_BIND_INVERT_BOOLEAN" "(1<<4)")
-  )
-)
-
-;; From gwin32registrykey.h
-
-;; Original typedef:
-;; typedef enum {
-;;   G_WIN32_REGISTRY_VALUE_NONE = 0,
-;;   G_WIN32_REGISTRY_VALUE_BINARY = 1,
-;;   G_WIN32_REGISTRY_VALUE_UINT32LE = 2,
-;;   G_WIN32_REGISTRY_VALUE_UINT32BE = 3,
-;; #if G_BYTE_ORDER == G_BIG_ENDIAN
-;;   G_WIN32_REGISTRY_VALUE_UINT32 = G_WIN32_REGISTRY_VALUE_UINT32BE,
-;; #else
-;;   G_WIN32_REGISTRY_VALUE_UINT32 = G_WIN32_REGISTRY_VALUE_UINT32LE,
-;; #endif
-;;   G_WIN32_REGISTRY_VALUE_EXPAND_STR = 4,
-;;   G_WIN32_REGISTRY_VALUE_LINK = 5,
-;;   G_WIN32_REGISTRY_VALUE_MULTI_STR = 6,
-;;   G_WIN32_REGISTRY_VALUE_UINT64LE = 7,
-;; #if G_BYTE_ORDER == G_LITTLE_ENDIAN
-;;   G_WIN32_REGISTRY_VALUE_UINT64 = G_WIN32_REGISTRY_VALUE_UINT64LE,
-;; #endif
-;;   G_WIN32_REGISTRY_VALUE_STR = 8
-;; } GWin32RegistryValueType;
-
-(define-enum-extended Win32RegistryValueType
-  (in-module "G")
-  (c-name "GWin32RegistryValueType")
-  (values
-    '("none" "G_WIN32_REGISTRY_VALUE_NONE" "0")
-    '("binary" "G_WIN32_REGISTRY_VALUE_BINARY" "1")
-    '("uint32le" "G_WIN32_REGISTRY_VALUE_UINT32LE" "2")
-    '("uint32be" "G_WIN32_REGISTRY_VALUE_UINT32BE" "3")
-    '("uint32" "G_WIN32_REGISTRY_VALUE_UINT32" "3")
-    '("uint32" "G_WIN32_REGISTRY_VALUE_UINT32" "2")
-    '("expand-str" "G_WIN32_REGISTRY_VALUE_EXPAND_STR" "4")
-    '("link" "G_WIN32_REGISTRY_VALUE_LINK" "5")
-    '("multi-str" "G_WIN32_REGISTRY_VALUE_MULTI_STR" "6")
-    '("uint64le" "G_WIN32_REGISTRY_VALUE_UINT64LE" "7")
-    '("uint64" "G_WIN32_REGISTRY_VALUE_UINT64" "7")
-    '("str" "G_WIN32_REGISTRY_VALUE_STR" "8")
-  )
-)
-
-;; Original typedef:
-;; typedef enum {
-;;   G_WIN32_REGISTRY_WATCH_NAME = 1 << 0,
-;;   G_WIN32_REGISTRY_WATCH_ATTRIBUTES = 1 << 1,
-;;   G_WIN32_REGISTRY_WATCH_VALUES = 1 << 2,
-;;   G_WIN32_REGISTRY_WATCH_SECURITY = 1 << 3,
-;; } GWin32RegistryKeyWatcherFlags;
-
-(define-flags-extended Win32RegistryKeyWatcherFlags
-  (in-module "G")
-  (c-name "GWin32RegistryKeyWatcherFlags")
-  (values
-    '("name" "G_WIN32_REGISTRY_WATCH_NAME" "1 << 0")
-    '("attributes" "G_WIN32_REGISTRY_WATCH_ATTRIBUTES" "1 << 1")
-    '("values" "G_WIN32_REGISTRY_WATCH_VALUES" "1 << 2")
-    '("security" "G_WIN32_REGISTRY_WATCH_SECURITY" "1 << 3")
+    '("zlib" "G_ZLIB_COMPRESSOR_FORMAT_ZLIB" "0")
+    '("gzip" "G_ZLIB_COMPRESSOR_FORMAT_GZIP" "1")
+    '("raw" "G_ZLIB_COMPRESSOR_FORMAT_RAW" "2")
   )
 )
 
