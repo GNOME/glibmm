@@ -36,6 +36,12 @@ $MMGIRGEN_PATH GLib-2.0 GModule-2.0 GObject-2.0 \
     --namespace-mapping=GModule:GLib,GObject:GLib \
     --print-vfunc > $GLIBMM_DIR/glib/src/glib_vfuncs.defs
 
+#GLib functions & methods
+$MMGIRGEN_PATH GLib-2.0 GModule-2.0 GObject-2.0 \
+    --namespace=GLib \
+    --namespace-mapping=GModule:GLib,GObject:GLib \
+    --print-function > $GLIBMM_DIR/glib/src/glib_functions.defs
+
 patch_directory $GLIBMM_DIR/glib/src
 
 

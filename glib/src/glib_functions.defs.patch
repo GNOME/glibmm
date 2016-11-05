@@ -1,44 +1,51 @@
---- glib_functions.defs.orig	2015-02-15 16:49:21.605101660 +0100
-+++ glib_functions.defs	2015-02-15 16:49:21.617101670 +0100
-@@ -2739,7 +2739,7 @@
-   )
- )
- 
--(define-method 
-+(define-method iconv
-   (of-object "GIConv")
-   (c-name "g_iconv")
-   (return-type "gsize")
-@@ -13320,13 +13320,9 @@
-   (return-type "const-gchar*-const*")
- )
- 
--(define-function g_win32_get_system_data_dirs_for_module
--  (c-name "g_win32_get_system_data_dirs_for_module")
--  (return-type "const-gchar*-const*")
--  (parameters
--    '("void-(*" "address_of_function")
--  )
--)
-+;; the g_win32_get_system_data_dirs_for_module() function is removed because it
-+;; has a function pointer parameter and that is not handled correctly by
-+;; h2def.py.
- 
- (define-function g_get_system_config_dirs
-   (c-name "g_get_system_config_dirs")
-@@ -13419,13 +13415,8 @@
-   )
- )
- 
--(define-function atexit
--  (c-name "atexit")
--  (return-type "int")
--  (parameters
--    '("void" "(*")
--  )
--)
-+;; the atexit() function is removed because it has a function pointer parameter
-+;; and that is not handled correctly by h2def.py.
- 
- (define-function g_find_program_in_path
-   (c-name "g_find_program_in_path")
+--- a/glib/src/glib_functions.defs
++++ b/glib/src/glib_functions.defs
+@@ -7672,7 +7672,7 @@
+   (c-name "g_io_channel_write_chars")
+   (return-type "GIOStatus")
+   (parameters
++    '("const-gchar*" "buf")
+-    '("gchar*" "buf")
+     '("gssize" "count")
+     '("gsize*" "bytes_written")
+     '("GError**" "error")
+
+@@ -7961,7 +7961,7 @@
+   (return-type "gboolean")
+   (parameters
+     '("gchar*" "file")
++    '("const-gchar**" "search_dirs")
+-    '("gchar**" "search_dirs")
+     '("gchar**" "full_path")
+     '("GKeyFileFlags" "flags")
+     '("GError**" "error")
+
+@@ -10330,7 +10330,7 @@
+   (c-name "g_regex_replace")
+   (return-type "gchar*")
+   (parameters
++    '("const-gchar*" "string")
+-    '("gchar*" "string")
+     '("gssize" "string_len")
+     '("gint" "start_position")
+     '("const-gchar*" "replacement")
+
+@@ -10359,7 +10359,7 @@
+   (c-name "g_regex_replace_literal")
+   (return-type "gchar*")
+   (parameters
++    '("const-gchar*" "string")
+-    '("gchar*" "string")
+     '("gssize" "string_len")
+     '("gint" "start_position")
+     '("const-gchar*" "replacement")
+
+@@ -10383,7 +10383,7 @@
+   (c-name "g_regex_split_full")
+   (return-type "gchar**")
+   (parameters
++    '("const-gchar*" "string")
+-    '("gchar*" "string")
+     '("gssize" "string_len")
+     '("gint" "start_position")
+     '("GRegexMatchFlags" "match_options")
