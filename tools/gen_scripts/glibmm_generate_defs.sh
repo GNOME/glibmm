@@ -62,4 +62,9 @@ $MMGIRGEN_PATH Gio-2.0 \
     --namespace=Gio \
     --print-vfunc > $GLIBMM_DIR/gio/src/gio_vfuncs.defs
 
+#GLib functions & methods
+$MMGIRGEN_PATH Gio-2.0 \
+    --namespace=Gio \
+    --print-function > $GLIBMM_DIR/gio/src/gio_methods.defs
+
 patch_directory $GLIBMM_DIR/gio/src
