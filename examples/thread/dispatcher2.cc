@@ -85,10 +85,6 @@ ThreadTimer::ThreadTimer()
   signal_increment_.connect(sigc::mem_fun(*this, &ThreadTimer::timer_increment));
 }
 
-ThreadTimer::~ThreadTimer()
-{
-}
-
 void
 ThreadTimer::launch()
 {
