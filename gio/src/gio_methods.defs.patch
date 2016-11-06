@@ -1,13 +1,6 @@
 --- a/gio_methods.defs
 +++ b/gio_methods.defs
-@@ -1551,13 +1551,13 @@
- (define-method get_cwd
-   (of-object "GApplicationCommandLine")
-   (c-name "g_application_command_line_get_cwd")
--  (return-type "gchar*")
-+  (return-type "const-gchar*")
- )
- 
+@@ -1557,7 +1557,7 @@
  (define-method get_environ
    (of-object "GApplicationCommandLine")
    (c-name "g_application_command_line_get_environ")
@@ -17,25 +10,15 @@
  
  (define-method get_exit_status
 
-@@ -1705,7 +1705,7 @@
- (define-method peek_buffer
-   (of-object "GBufferedInputStream")
-   (c-name "g_buffered_input_stream_peek_buffer")
--  (return-type "void*")
-+  (return-type "const-void*")
+@@ -1696,7 +1696,7 @@
+   (c-name "g_buffered_input_stream_peek")
+   (return-type "gsize")
    (parameters
-     '("gsize*" "count")
++    '("void*" "buffer")
+-    '("const-void*" "buffer")
+     '("gsize" "offset")
+     '("gsize" "count")
    )
-
-@@ -4317,7 +4317,7 @@
- (define-method get_filename
-   (of-object "GDesktopAppInfo")
-   (c-name "g_desktop_app_info_get_filename")
--  (return-type "char*")
-+  (return-type "const-char*")
- )
- 
- (define-method get_generic_name
 
 @@ -4406,7 +4406,7 @@
  (define-method list_actions
@@ -47,16 +30,6 @@
  
  (define-function g_emblem_new
 
-@@ -4970,7 +4970,7 @@
- (define-method get_name
-   (of-object "GFileInfo")
-   (c-name "g_file_info_get_name")
--  (return-type "char*")
-+  (return-type "const-char*")
- )
- 
- (define-method get_size
-
 @@ -5713,7 +5713,7 @@
    (c-name "g_inet_address_new_from_bytes")
    (return-type "GInetAddress*")
@@ -67,34 +40,24 @@
    )
  )
 
-@@ -6243,7 +6243,7 @@
-   (c-name "g_memory_input_stream_add_data")
-   (return-type "void")
-   (parameters
--    '("void*" "data")
-+    '("const-void*" "data")
-     '("gssize" "len")
-     '("GDestroyNotify" "destroy")
-   )
-
-@@ -7217,7 +7217,7 @@
-   (c-name "g_output_stream_write")
+@@ -5985,7 +5985,7 @@
+   (c-name "g_input_stream_read")
    (return-type "gssize")
    (parameters
--    '("void*" "buffer")
-+    '("const-void*" "buffer")
++    '("void*" "buffer")
+-    '("const-void*" "buffer")
      '("gsize" "count")
      '("GCancellable*" "cancellable")
      '("GError**" "error")
 
-@@ -7229,7 +7229,7 @@
-   (c-name "g_output_stream_write_all")
+@@ -5997,7 +5997,7 @@
+   (c-name "g_input_stream_read_all")
    (return-type "gboolean")
    (parameters
--    '("void*" "buffer")
-+    '("const-void*" "buffer")
++    '("void*" "buffer")
+-    '("const-void*" "buffer")
      '("gsize" "count")
-     '("gsize*" "bytes_written")
+     '("gsize*" "bytes_read")
      '("GCancellable*" "cancellable")
 
 @@ -8157,7 +8157,7 @@
@@ -105,46 +68,16 @@
 +    '("const-gchar*-const*" "value")
    )
  )
- 
-@@ -9047,7 +9047,7 @@
-   (c-name "g_socket_send")
+
+@@ -8980,7 +8980,7 @@
+   (c-name "g_socket_receive")
    (return-type "gssize")
    (parameters
--    '("gchar*" "buffer")
-+    '("const-gchar*" "buffer")
++    '("gchar*" "buffer")
+-    '("const-gchar*" "buffer")
      '("gsize" "size")
      '("GCancellable*" "cancellable")
      '("GError**" "error")
-
-@@ -9089,7 +9089,7 @@
-   (return-type "gssize")
-   (parameters
-     '("GSocketAddress*" "address")
--    '("gchar*" "buffer")
-+    '("const-gchar*" "buffer")
-     '("gsize" "size")
-     '("GCancellable*" "cancellable")
-     '("GError**" "error")
-
-@@ -12220,7 +12220,7 @@
- (define-method get_commandline
-   (of-object "GAppInfo")
-   (c-name "g_app_info_get_commandline")
--  (return-type "char*")
-+  (return-type "const-char*")
- )
- 
- (define-method get_description
-
-@@ -12238,7 +12238,7 @@
- (define-method get_executable
-   (of-object "GAppInfo")
-   (c-name "g_app_info_get_executable")
--  (return-type "char*")
-+  (return-type "const-char*")
- )
- 
- (define-method get_icon
 
 @@ -12262,7 +12262,7 @@
  (define-method get_supported_types
@@ -156,22 +89,22 @@
  
  (define-method launch
 
-@@ -12454,7 +12454,7 @@
-   (c-name "g_converter_convert")
-   (return-type "GConverterResult")
+@@ -12456,7 +12456,7 @@
    (parameters
--    '("void*" "inbuf")
-+    '("const-void*" "inbuf")
+     '("const-void*" "inbuf")
      '("gsize" "inbuf_size")
-     '("void*" "outbuf")
++    '("void*" "outbuf")
+-    '("const-void*" "outbuf")
      '("gsize" "outbuf_size")
+     '("GConverterFlags" "flags")
+     '("gsize*" "bytes_read")
 
-@@ -14974,7 +14974,7 @@
-   (c-name "g_pollable_output_stream_write_nonblocking")
+@@ -14941,7 +14941,7 @@
+   (c-name "g_pollable_input_stream_read_nonblocking")
    (return-type "gssize")
    (parameters
--    '("void*" "buffer")
-+    '("const-void*" "buffer")
++    '("void*" "buffer")
+-    '("const-void*" "buffer")
      '("gsize" "count")
      '("GCancellable*" "cancellable")
      '("GError**" "error")
