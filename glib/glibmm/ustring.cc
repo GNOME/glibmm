@@ -841,6 +841,18 @@ ustring::rend() const
   return const_reverse_iterator(const_iterator(string_.begin()));
 }
 
+ustring::const_iterator
+ustring::cbegin() const
+{
+  return const_iterator(string_.begin());
+}
+
+ustring::const_iterator
+ustring::cend() const
+{
+  return const_iterator(string_.end());
+}
+
 /**** Glib::ustring::find() ************************************************/
 
 ustring::size_type

@@ -469,6 +469,16 @@ public:
   const_reverse_iterator rbegin() const;
   const_reverse_iterator rend() const;
 
+  /**
+   * @newin{2,52}
+   */
+  const_iterator cbegin() const;
+
+  /**
+   * @newin{2,52}
+   */
+  const_iterator cend() const;
+
   //! @}
   //! @name Find sub-strings.
   //! @{
