@@ -26,7 +26,6 @@
 
 namespace
 {
-#ifdef GLIBMM_DISABLE_DEPRECATED
 void
 time64_to_time_val(gint64 time64, Glib::TimeVal& time_val)
 {
@@ -36,7 +35,6 @@ time64_to_time_val(gint64 time64, Glib::TimeVal& time_val)
     static_cast<long>(time64 - static_cast<gint64>(seconds) * G_GINT64_CONSTANT(1000000));
   time_val = Glib::TimeVal(seconds, microseconds);
 }
-#endif // GLIBMM_DISABLE_DEPRECATED
 
 // TODO: At the next ABI break, replace ExtraSourceData by new data members in Source.
 // Then the mutex is not necessary, but to keep the code thread-safe, use the
@@ -1007,16 +1005,6 @@ Source::remove_poll(Glib::PollFD& poll_fd)
   g_source_remove_poll(gobject_, poll_fd.gobj());
 }
 
-#ifndef GLIBMM_DISABLE_DEPRECATED
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-void
-Source::get_current_time(Glib::TimeVal& current_time)
-{
-  g_source_get_current_time(gobject_, &current_time);
-}
-G_GNUC_END_IGNORE_DEPRECATIONS
-#endif // GLIBMM_DISABLE_DEPRECATED
-
 gint64
 Source::get_time() const
 {
@@ -1169,11 +1157,7 @@ bool
 TimeoutSource::prepare(int& timeout)
 {
   Glib::TimeVal current_time;
-#ifndef GLIBMM_DISABLE_DEPRECATED
-  get_current_time(current_time);
-#else
   time64_to_time_val(get_time(), current_time);
-#endif // GLIBMM_DISABLE_DEPRECATED
 
   Glib::TimeVal remaining = expiration_;
   remaining.subtract(current_time);
@@ -1210,11 +1194,7 @@ bool
 TimeoutSource::check()
 {
   Glib::TimeVal current_time;
-#ifndef GLIBMM_DISABLE_DEPRECATED
-  get_current_time(current_time);
-#else
   time64_to_time_val(get_time(), current_time);
-#endif // GLIBMM_DISABLE_DEPRECATED
 
   return (expiration_ <= current_time);
 }
@@ -1226,11 +1206,7 @@ TimeoutSource::dispatch(sigc::slot_base* slot)
 
   if (again)
   {
-#ifndef GLIBMM_DISABLE_DEPRECATED
-    get_current_time(expiration_);
-#else
     time64_to_time_val(get_time(), expiration_);
-#endif // GLIBMM_DISABLE_DEPRECATED
     expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
   }
 

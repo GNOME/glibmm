@@ -140,7 +140,6 @@
 #include <glibmm/uriutils.h>
 #include <glibmm/ustring.h>
 #include <glibmm/value.h>
-#include <glibmm/valuearray.h>
 #include <glibmm/variant.h>
 #include <glibmm/variantdict.h>
 #include <glibmm/variantiter.h>

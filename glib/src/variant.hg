@@ -95,29 +95,6 @@ class VariantBase
     g_variant_get, g_variant_get_va)
 public:
 
-_DEPRECATE_IFDEF_START
-  /** This typedef is just to make it more obvious that
-   * our operator const void* should be used like operator bool().
-   *
-   * @deprecated Use the explicit operator bool() instead.
-   */
-  using BoolExpr = const void*;
-
-  /** Test whether the Variant has an underlying instance.
-   *
-   * Mimics usage of pointers:
-   * @code
-   *   if (variant)
-   *     do_something();
-   * @endcode
-   *
-   * @deprecated Use the explicit operator bool() instead.
-   *
-   * @newin{2,36}
-   */
-   operator BoolExpr() const;
-_DEPRECATE_IFDEF_END
-
    /** Test whether the Variant has an underlying instance.
     *
     * @newin{2,50}
@@ -146,7 +123,6 @@ _DEPRECATE_IFDEF_END
   _WRAP_METHOD(GVariantClass classify() const, g_variant_classify)
 
   _WRAP_METHOD(gsize get_size() const, g_variant_get_size)
-  _WRAP_METHOD(gconstpointer get_data(), g_variant_get_data, deprecated "Use the const version instead.")
   _WRAP_METHOD(gconstpointer get_data() const, g_variant_get_data, newin "2,46")
   _WRAP_METHOD(Glib::RefPtr<const Glib::Bytes> get_data_as_bytes() const, g_variant_get_data_as_bytes, newin "2,46")
   _WRAP_METHOD(void store(gpointer data) const, g_variant_store)
