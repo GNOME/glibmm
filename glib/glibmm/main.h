@@ -30,17 +30,6 @@
 namespace Glib
 {
 
-#ifndef GLIBMM_DISABLE_DEPRECATED
-class Cond;
-class Mutex;
-
-namespace Threads
-{
-class Cond;
-class Mutex;
-}
-#endif // GLIBMM_DISABLE_DEPRECATED
-
 /** @defgroup MainLoop The Main Event Loop
  * Manages all available sources of events.
  * @{
@@ -68,16 +57,6 @@ public:
 private:
   GPollFD gobject_;
 };
-
-// Concerning SignalTimeout::connect_once(), SignalTimeout::connect_seconds_once()
-// and SignalIdle::connect_once():
-// See https://bugzilla.gnome.org/show_bug.cgi?id=396963 and
-// http://bugzilla.gnome.org/show_bug.cgi?id=512348 about the sigc::trackable issue.
-// It's recommended to replace sigc::slot<void()>& by std::function<void()>& in
-// Threads::Thread::create() and ThreadPool::push() at the next ABI break.
-// Such a replacement would be a mixed blessing in SignalTimeout and SignalIdle.
-// In a single-threaded program auto-disconnection of trackable slots is safe
-// and can be useful.
 
 class SignalTimeout
 {
@@ -452,36 +431,6 @@ public:
    * @return true if the operation succeeded, and this thread is now the owner of context.
    */
   bool acquire();
-
-#ifndef GLIBMM_DISABLE_DEPRECATED
-  /** Tries to become the owner of the specified context, as with acquire(). But if another thread
-   * is the owner,
-   * atomically drop mutex and wait on cond until that owner releases ownership or until cond is
-   * signaled, then try
-   * again (once) to become the owner.
-   * @param cond A condition variable.
-   * @param mutex A mutex, currently held.
-   * @return true if the operation succeeded, and this thread is now the owner of context.
-   *
-   * @deprecated Use wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex) instead.
-   */
-  bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
-
-  // Deprecated mostly because it uses deprecated Glib::Threads:: for parameters.
-  /** Tries to become the owner of the specified context, as with acquire(). But if another thread
-   * is the owner,
-   * atomically drop mutex and wait on cond until that owner releases ownership or until cond is
-   * signaled, then try
-   * again (once) to become the owner.
-   * @param cond A condition variable.
-   * @param mutex A mutex, currently held.
-   * @return true if the operation succeeded, and this thread is now the owner of context.
-   *
-   * @deprecated Please use the underlying g_main_context_wait() function if you really need this
-   * functionality.
-   */
-  bool wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex);
-#endif // GLIBMM_DISABLE_DEPRECATED
 
   /** Releases ownership of a context previously acquired by this thread with acquire(). If the
    * context was acquired

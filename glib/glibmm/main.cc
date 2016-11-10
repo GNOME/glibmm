@@ -17,13 +17,6 @@
 
 #include <glibmmconfig.h> // May define GLIBMM_DISABLE_DEPRECATED
 
-#ifndef GLIBMM_DISABLE_DEPRECATED
-// Include glibmm/thread.h first because we need it to be first to include <glib.h>,
-// so we can do an undef trick to still use deprecated API in the header:
-#include <glibmm/thread.h>
-#include <glibmm/threads.h>
-#endif // GLIBMM_DISABLE_DEPRECATED
-
 #include <glibmm/main.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/wrap.h>
@@ -607,20 +600,6 @@ MainContext::acquire()
 {
   return g_main_context_acquire(gobj());
 }
-
-#ifndef GLIBMM_DISABLE_DEPRECATED
-bool
-MainContext::wait(Glib::Cond& cond, Glib::Mutex& mutex)
-{
-  return g_main_context_wait(gobj(), cond.gobj(), mutex.gobj());
-}
-
-bool
-MainContext::wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex)
-{
-  return g_main_context_wait(gobj(), cond.gobj(), mutex.gobj());
-}
-#endif // GLIBMM_DISABLE_DEPRECATED
 
 void
 MainContext::release()

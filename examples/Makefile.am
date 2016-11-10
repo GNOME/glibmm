@@ -32,11 +32,7 @@ check_PROGRAMS =			\
 	options/example			\
 	properties/example		\
 	regex/example			\
-	settings/settings		\
-	thread/dispatcher		\
-	thread/dispatcher2		\
-	thread/thread			\
-	thread/threadpool
+	settings/settings
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
