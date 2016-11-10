@@ -34,16 +34,16 @@ dist_noinst_DATA    = README TODO
 dist_noinst_SCRIPTS = enum.pl
 
 noinst_PROGRAMS = extra_defs_gen/generate_defs_glib extra_defs_gen/generate_defs_gio
-lib_LTLIBRARIES = extra_defs_gen/libglibmm_generate_extra_defs-2.4.la
+lib_LTLIBRARIES = extra_defs_gen/libglibmm_generate_extra_defs-2.52.la
 
 extradefs_includedir      = $(includedir)/$(GLIBMM_MODULE_NAME)/glibmm_generate_extra_defs
 extradefs_include_HEADERS = extra_defs_gen/generate_extra_defs.h
 
 extradefs_ldflags = -no-undefined -version-info $(LIBGLIBMM_SO_VERSION)
 
-extra_defs_gen_libglibmm_generate_extra_defs_2_4_la_SOURCES = extra_defs_gen/generate_extra_defs.cc
-extra_defs_gen_libglibmm_generate_extra_defs_2_4_la_LDFLAGS = $(extradefs_ldflags)
-extra_defs_gen_libglibmm_generate_extra_defs_2_4_la_LIBADD  = $(GLIBMM_LIBS)
+extra_defs_gen_libglibmm_generate_extra_defs_2_52_la_SOURCES = extra_defs_gen/generate_extra_defs.cc
+extra_defs_gen_libglibmm_generate_extra_defs_2_52_la_LDFLAGS = $(extradefs_ldflags)
+extra_defs_gen_libglibmm_generate_extra_defs_2_52_la_LIBADD  = $(GLIBMM_LIBS)
 
 extra_defs_gen_generate_defs_glib_SOURCES = extra_defs_gen/generate_defs_glib.cc
 extra_defs_gen_generate_defs_glib_LDADD   = $(GLIBMM_LIBS) $(lib_LTLIBRARIES)
