@@ -22,6 +22,7 @@ check_PROGRAMS =				\
 	giomm_ioerror_and_iodbuserror/test	\
 	giomm_memoryinputstream/test			\
 	giomm_simple/test			\
+  giomm_stream_vfuncs/test \
 	giomm_asyncresult_sourceobject/test	\
 	giomm_tls_client/test			\
 	giomm_listmodel/test \
@@ -77,6 +78,9 @@ giomm_memoryinputstream_test_LDADD   = $(giomm_ldadd)
 
 giomm_simple_test_SOURCES  = giomm_simple/main.cc
 giomm_simple_test_LDADD    = $(giomm_ldadd)
+
+giomm_stream_vfuncs_test_SOURCES = giomm_stream_vfuncs/main.cc
+giomm_stream_vfuncs_test_LDADD   = $(giomm_ldadd)
 
 giomm_asyncresult_sourceobject_test_SOURCES  = giomm_asyncresult_sourceobject/main.cc
 giomm_asyncresult_sourceobject_test_LDADD    = $(giomm_ldadd)
