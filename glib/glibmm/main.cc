@@ -23,6 +23,7 @@
 #include <glibmm/iochannel.h>
 #include <algorithm>
 #include <map> // Needed until the next ABI break.
+#include <mutex>
 
 namespace
 {

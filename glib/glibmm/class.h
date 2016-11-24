@@ -1,8 +1,5 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_CLASS_H
 #define _GLIBMM_CLASS_H
-
-/* $Id$ */
 
 /* Copyright 2001 Free Software Foundation
  * Copyright (C) 1998-2002 The gtkmm Development Team
@@ -53,18 +50,6 @@ public:
   // static Glib::Object* wrap_new(GObject*);
 
   inline GType get_type() const;
-
-  // TODO: Remove this method at the next ABI/API break.
-  /** Register a static custom GType, derived from the parent of this class's type.
-   * The parent type of the registered custom type is the same C class as the parent
-   * of the get_type() type. If a type with the specified name is already registered,
-   * nothing is done. register_derived_type() must have been called.
-   * @param custom_type_name The name of the registered type is
-   *        "gtkmm__CustomObject_" + canonic(custom_type_name), where canonic()
-   *        replaces special characters with '+'.
-   * @return The registered type.
-   */
-  GType clone_custom_type(const char* custom_type_name) const;
 
   /// The type that holds pointers to the interfaces of custom types.
   using interface_class_vector_type = std::vector<const Interface_Class*>;

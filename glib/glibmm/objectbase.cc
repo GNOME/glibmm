@@ -40,24 +40,25 @@ namespace Glib
 
 /**** Glib::ObjectBase *****************************************************/
 
-// static data members
-ObjectBase::extra_object_base_data_type ObjectBase::extra_object_base_data;
-std::mutex ObjectBase::extra_object_base_data_mutex;
-
 ObjectBase::ObjectBase()
 : gobject_(nullptr),
   custom_type_name_(anonymous_custom_type_name),
-  cpp_destruction_in_progress_(false)
+  cpp_destruction_in_progress_(false),
+  custom_interface_classes_(nullptr)
 {
 }
 
 ObjectBase::ObjectBase(const char* custom_type_name)
-: gobject_(nullptr), custom_type_name_(custom_type_name), cpp_destruction_in_progress_(false)
+: gobject_(nullptr), custom_type_name_(custom_type_name),
+  cpp_destruction_in_progress_(false),
+  custom_interface_classes_(custom_type_name_ ? new Class::interface_class_vector_type : nullptr)
 {
 }
 
 ObjectBase::ObjectBase(const std::type_info& custom_type_info)
-: gobject_(nullptr), custom_type_name_(custom_type_info.name()), cpp_destruction_in_progress_(false)
+: gobject_(nullptr), custom_type_name_(custom_type_info.name()),
+  cpp_destruction_in_progress_(false),
+  custom_interface_classes_(new Class::interface_class_vector_type)
 {
 }
 
@@ -153,14 +154,6 @@ ObjectBase::~ObjectBase() noexcept
   // happens if a derived class's ctor throws an exception.  In that case
   // we have to call g_object_unref() on our own.
   //
-
-  // Just a precaution. Unless a derived class's ctor has thrown an exception,
-  // 'this' should have been erased from extra_object_base_data by
-  // Glib::Object's constructor.
-  {
-    std::lock_guard<std::mutex> lock(extra_object_base_data_mutex);
-    extra_object_base_data.erase(this);
-  }
 
   if (GObject* const gobject = gobject_)
   {

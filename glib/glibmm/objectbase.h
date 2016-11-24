@@ -28,9 +28,7 @@
 #include <glibmm/debug.h>
 #include <sigc++/trackable.h>
 #include <typeinfo>
-#include <map> // Needed until the next ABI break.
-#include <memory> // Not used by ObjectBase any more, but user code may rely on it being here.
-#include <mutex>
+#include <memory>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" {
@@ -224,20 +222,9 @@ protected:
 
   bool is_anonymous_custom_() const;
 
-  // TODO: At the next ABI break, replace extra_object_base_data by a non-static
-  // data member.
-  // This is a new data member that can't be added as instance data to
-  // ObjectBase now, because it would break ABI.
-  struct ExtraObjectBaseData
-  {
-    Class::interface_class_vector_type custom_interface_classes;
-  };
-
-  using extra_object_base_data_type = std::map<const ObjectBase*, ExtraObjectBaseData>;
-  static extra_object_base_data_type extra_object_base_data;
-  // ObjectBase instances may be used in different threads.
-  // Accesses to extra_object_base_data must be thread-safe.
-  static std::mutex extra_object_base_data_mutex;
+  // Vector of pointers to the interfaces of custom types.
+  // Used only during the construction of named custom types.
+  std::unique_ptr<Class::interface_class_vector_type> custom_interface_classes_;
 
 public:
   //  is_derived_() must be public, so that overridden vfuncs and signal handlers can call it

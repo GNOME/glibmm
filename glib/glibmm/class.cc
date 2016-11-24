@@ -85,12 +85,6 @@ Class::register_derived_type(GType base_type, GTypeModule* module)
 }
 
 GType
-Class::clone_custom_type(const char* custom_type_name) const
-{
-  return clone_custom_type(custom_type_name, interface_class_vector_type());
-}
-
-GType
 Class::clone_custom_type(
   const char* custom_type_name, const interface_class_vector_type& interface_classes) const
 {
