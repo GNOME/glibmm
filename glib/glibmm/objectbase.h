@@ -120,6 +120,10 @@ public:
   template <class PropertyType>
   void get_property(const Glib::ustring& property_name, PropertyType& value) const;
 
+  /// You probably want to use a specific property_*() accessor method instead.
+  template <class PropertyType>
+  PropertyType get_property(const Glib::ustring& property_name) const;
+
   // TODO: At the next ABI break, delete connect_property_changed_with_return()
   // and let connect_property_changed() return sigc::connection.
   /** You can use the signal_changed() signal of the property proxy instead.
@@ -292,6 +296,16 @@ ObjectBase::get_property(const Glib::ustring& property_name, PropertyType& value
   this->get_property_value(property_name, property_value);
 
   value = property_value.get();
+}
+
+template <class PropertyType>
+inline PropertyType
+ObjectBase::get_property(const Glib::ustring& property_name) const
+{
+  PropertyType value;
+  get_property(property_name, value);
+
+  return value;
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
