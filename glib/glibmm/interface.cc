@@ -98,7 +98,8 @@ Interface::Interface(const Interface_Class& interface_class)
     {
       // The GObject is not instantiated yet. Add to the custom_interface_classes_
       // and add the interface in the Glib::Object constructor.
-      custom_interface_classes_->emplace_back(&interface_class);
+      // custom_interface_classes_ is a std::forward_list. There is no emplace_back().
+      custom_interface_classes_.emplace_front(&interface_class);
     }
   }
 }

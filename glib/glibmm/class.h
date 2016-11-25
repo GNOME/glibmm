@@ -23,6 +23,7 @@
 #include <glibmmconfig.h> //Include this here so that the /private/*.h classes have access to GLIBMM_VFUNCS_ENABLED
 
 #include <vector> //For interface properties that custom types might override.
+#include <forward_list> //For interface classes that custom types might implement.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -51,8 +52,11 @@ public:
 
   inline GType get_type() const;
 
-  /// The type that holds pointers to the interfaces of custom types.
-  using interface_class_vector_type = std::vector<const Interface_Class*>;
+  /** The type that holds pointers to the interfaces of custom types.
+   * It's usually empty and never long. It's a std::forward_list to minimize
+   * storage requirement.
+   */
+  using interface_class_list_type = std::forward_list<const Interface_Class*>;
 
   /** Register a static custom GType, derived from the parent of this class's type.
    * The parent type of the registered custom type is the same C class as the parent
@@ -65,7 +69,7 @@ public:
    * @return The registered type.
    */
   GType clone_custom_type(
-    const char* custom_type_name, const interface_class_vector_type& interface_classes) const;
+    const char* custom_type_name, const interface_class_list_type& interface_classes) const;
 
 protected:
   GType gtype_;

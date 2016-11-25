@@ -86,7 +86,7 @@ Class::register_derived_type(GType base_type, GTypeModule* module)
 
 GType
 Class::clone_custom_type(
-  const char* custom_type_name, const interface_class_vector_type& interface_classes) const
+  const char* custom_type_name, const interface_class_list_type& interface_classes) const
 {
   std::string full_name("gtkmm__CustomObject_");
   Glib::append_canonical_typename(full_name, custom_type_name);
@@ -130,9 +130,8 @@ Class::clone_custom_type(
 
     // Add derived versions of interfaces, if the C type implements any interfaces.
     // For instance, TreeModel_Class::add_interface().
-    for (interface_class_vector_type::size_type i = 0; i < interface_classes.size(); i++)
+    for (auto interface_class : interface_classes)
     {
-      const Interface_Class* interface_class = interface_classes[i];
       if (interface_class)
       {
         interface_class->add_interface(custom_type);

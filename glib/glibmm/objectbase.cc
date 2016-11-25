@@ -43,22 +43,19 @@ namespace Glib
 ObjectBase::ObjectBase()
 : gobject_(nullptr),
   custom_type_name_(anonymous_custom_type_name),
-  cpp_destruction_in_progress_(false),
-  custom_interface_classes_(nullptr)
+  cpp_destruction_in_progress_(false)
 {
 }
 
 ObjectBase::ObjectBase(const char* custom_type_name)
 : gobject_(nullptr), custom_type_name_(custom_type_name),
-  cpp_destruction_in_progress_(false),
-  custom_interface_classes_(custom_type_name_ ? new Class::interface_class_vector_type : nullptr)
+  cpp_destruction_in_progress_(false)
 {
 }
 
 ObjectBase::ObjectBase(const std::type_info& custom_type_info)
 : gobject_(nullptr), custom_type_name_(custom_type_info.name()),
-  cpp_destruction_in_progress_(false),
-  custom_interface_classes_(new Class::interface_class_vector_type)
+  cpp_destruction_in_progress_(false)
 {
 }
 

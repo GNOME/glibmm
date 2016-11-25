@@ -28,7 +28,6 @@
 #include <glibmm/debug.h>
 #include <sigc++/trackable.h>
 #include <typeinfo>
-#include <memory>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" {
@@ -222,9 +221,9 @@ protected:
 
   bool is_anonymous_custom_() const;
 
-  // Vector of pointers to the interfaces of custom types.
+  // List of pointers to the interfaces of custom types.
   // Used only during the construction of named custom types.
-  std::unique_ptr<Class::interface_class_vector_type> custom_interface_classes_;
+  Class::interface_class_list_type custom_interface_classes_;
 
 public:
   //  is_derived_() must be public, so that overridden vfuncs and signal handlers can call it
