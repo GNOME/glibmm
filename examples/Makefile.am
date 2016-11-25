@@ -32,7 +32,9 @@ check_PROGRAMS =			\
 	options/example			\
 	properties/example		\
 	regex/example			\
-	settings/settings
+	settings/settings \
+	thread/dispatcher \
+	thread/dispatcher2
 
 glibmm_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 giomm_includes  = -I$(top_builddir)/gio $(if $(srcdir:.=),-I$(top_srcdir)/gio)
@@ -47,7 +49,6 @@ local_libgiomm  = $(top_builddir)/gio/giomm/libgiomm-$(GIOMM_API_VERSION).la
 
 LDADD        = $(GLIBMM_LIBS) $(local_libglibmm)
 giomm_ldadd  = $(GIOMM_LIBS) $(local_libglibmm) $(local_libgiomm)
-thread_ldadd = $(GLIBMM_LIBS) $(local_libglibmm)
 
 child_watch_child_watch_SOURCES  = child_watch/main.cc
 iochannel_stream_example_SOURCES =	\
@@ -64,13 +65,7 @@ properties_example_SOURCES = properties/properties_example.cc
 regex_example_SOURCES      = regex/main.cc
 
 thread_dispatcher_SOURCES  = thread/dispatcher.cc
-thread_dispatcher_LDADD    = $(thread_ldadd)
 thread_dispatcher2_SOURCES = thread/dispatcher2.cc
-thread_dispatcher2_LDADD   = $(thread_ldadd)
-thread_thread_SOURCES      = thread/thread.cc
-thread_thread_LDADD        = $(thread_ldadd)
-thread_threadpool_SOURCES  = thread/threadpool.cc
-thread_threadpool_LDADD    = $(thread_ldadd)
 
 # giomm examples
 dbus_session_bus_service_SOURCES = dbus/session_bus_service.cc
