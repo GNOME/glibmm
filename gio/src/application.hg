@@ -372,8 +372,7 @@ public:
 
   _WRAP_SIGNAL(void startup(), "startup")
 
-  //TODO: Remove no_default_handler when we can break ABI
-  _WRAP_SIGNAL(void shutdown(), "shutdown", no_default_handler, newin "2,46")
+  _WRAP_SIGNAL(void shutdown(), "shutdown", newin "2,46")
 
   _WRAP_SIGNAL(void activate(), "activate")
 
@@ -385,12 +384,12 @@ public:
 #m4 _CONVERSION(`GApplicationCommandLine*', `const Glib::RefPtr<ApplicationCommandLine>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(int command_line(const Glib::RefPtr<ApplicationCommandLine>& command_line), "command-line")
 
-  //TODO: Remove no_default_handler when we can break ABI
   //TODO: Avoid the use of the Variants in the VariantDict?
   //options must be non-const. The handler is meant to modify it. See the description
   //of add_main_option_entry(OptionType, ...).
 #m4 _CONVERSION(`GVariantDict*',`const Glib::RefPtr<Glib::VariantDict>&',`Glib::wrap($3, true)')
-  _WRAP_SIGNAL(int handle_local_options(const Glib::RefPtr<Glib::VariantDict>& options), "handle-local-options", no_default_handler)
+#m4 _CONVERSION(`const Glib::RefPtr<Glib::VariantDict>&',`GVariantDict*',__CONVERT_REFPTR_TO_P)
+  _WRAP_SIGNAL(int handle_local_options(const Glib::RefPtr<Glib::VariantDict>& options), "handle-local-options")
 
 protected:
   virtual void on_open(const type_vec_files& files, const Glib::ustring& hint);
