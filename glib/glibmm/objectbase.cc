@@ -341,21 +341,8 @@ ObjectBase::get_property_value(const Glib::ustring& property_name, Glib::ValueBa
   g_object_get_property(const_cast<GObject*>(gobj()), property_name.c_str(), value.gobj());
 }
 
-void
-ObjectBase::connect_property_changed(
-  const Glib::ustring& property_name, const sigc::slot<void()>& slot)
-{
-  connect_property_changed_with_return(property_name, slot);
-}
-
-void
-ObjectBase::connect_property_changed(const Glib::ustring& property_name, sigc::slot<void()>&& slot)
-{
-  connect_property_changed_with_return(property_name, std::move(slot));
-}
-
 sigc::connection
-ObjectBase::connect_property_changed_with_return(
+ObjectBase::connect_property_changed(
   const Glib::ustring& property_name, const sigc::slot<void()>& slot)
 {
   // Create a proxy to hold our connection info
@@ -368,7 +355,7 @@ ObjectBase::connect_property_changed_with_return(
 }
 
 sigc::connection
-ObjectBase::connect_property_changed_with_return(
+ObjectBase::connect_property_changed(
   const Glib::ustring& property_name, sigc::slot<void()>&& slot)
 {
   // Create a proxy to hold our connection info
