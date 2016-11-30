@@ -367,9 +367,6 @@ public:
   _WRAP_PROPERTY("resource-base-path", bool, newin "2,44")
   _WRAP_PROPERTY("is-busy", bool)
 
-//#m4 _CONVERSION(`const gchar*', `const Glib::ustring&', `Glib::ustring($3)')
-//#m4 _CONVERSION(`GVariant*', `const Glib::VariantBase&', `Glib::wrap($3, true)')
-
   _WRAP_SIGNAL(void startup(), "startup")
 
   _WRAP_SIGNAL(void shutdown(), "shutdown", newin "2,46")
@@ -407,7 +404,6 @@ protected:
   _WRAP_VFUNC(bool local_command_line(char**& arguments, int& exit_status), local_command_line)
 
 #m4 _CONVERSION(`GVariant*',`const Glib::VariantBase&',`Glib::wrap($3,true)')
-
   _WRAP_VFUNC(void before_emit(const Glib::VariantBase& platform_data), "before_emit")
   _WRAP_VFUNC(void after_emit(const Glib::VariantBase& platform_data), "after_emit")
 
@@ -417,6 +413,10 @@ protected:
   _WRAP_VFUNC(void quit_mainloop(), "quit_mainloop")
   _WRAP_VFUNC(void run_mainloop(), "run_mainloop")
 
+#m4 _CONVERSION(`GDBusConnection*', `const Glib::RefPtr<DBus::connection>&', `Glib::wrap($3, true)')
+#m4 _CONVERSION(`const Glib::RefPtr<DBus::Connection>&',`GDBusConnection*',__CONVERT_REFPTR_TO_P)
+  _WRAP_VFUNC(bool dbus_register(const Glib::RefPtr<DBus::Connection>& connection, const Glib::ustring& object_path), "dbus_register", errthrow)
+  _WRAP_VFUNC(void dbus_unregister(const Glib::RefPtr<DBus::Connection>& connection, const Glib::ustring& object_path), "dbus_unregister")
 
 private:
   /** This is just a way to call Glib::init() (which calls g_type_init()) before
