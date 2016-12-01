@@ -27,6 +27,7 @@ _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Gio
 {
+class SettingsSchema;
 
   _WRAP_ENUM(SettingsBindFlags, GSettingsBindFlags)
 
@@ -46,12 +47,14 @@ protected:
   _WRAP_CTOR(Settings(const Glib::ustring& schema_id, const Glib::ustring& path), g_settings_new_with_path)
   //TODO: Requires SettingsBackend: _WRAP_CTOR(Settings(const Glib::ustring& schema_id, const Glib::RefPtr<SettingsBackend>& backend), g_settings_new_with_backend)
   //TODO: Requires SettingsBackend: _WRAP_CTOR(Settings(const Glib::ustring& schema_id, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path), g_settings_new_with_backend_and_path)
+  //TODO: Requires SettingsBackend: _WRAP_CTOR(Settings(const Glib::RefPtr<SettingsSchema>& settings_schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path), g_settings_new_full)
 
 public:
   _WRAP_CREATE(const Glib::ustring& schema_id)
   _WRAP_CREATE(const Glib::ustring& schema_id, const Glib::ustring& path)
   //TODO: Requires SettingsBackend: _WRAP_CREATE(const Glib::ustring& schema_id, const Glib::RefPtr<SettingsBackend>& backend)
   //TODO: Requires SettingsBackend: _WRAP_CREATE(const Glib::ustring& schema_id, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
+  //TODO: Requires SettingsBackend: _WRAP_CREATE(const Glib::RefPtr<SettingsSchema>& settings_schema, const Glib::RefPtr<SettingsBackend>& backend, const Glib::ustring& path)
 
   //TODO: Rename these to get/set_*_value_variant() and add templated get/set_*_value() methods as elsewhere?
   _WRAP_METHOD(bool set_value(const Glib::ustring& key, const Glib::VariantBase& value),  g_settings_set_value)
@@ -136,7 +139,6 @@ public:
   _WRAP_METHOD(gint64 get_int64(const Glib::ustring& key) const, g_settings_get_int64)
   _WRAP_METHOD(void set_int64(const Glib::ustring& key, gint64 value), g_settings_set_int64)
   _WRAP_METHOD(guint get_uint(const Glib::ustring& key) const, g_settings_get_uint)
-  _IGNORE(g_settings_set_uint)
   _WRAP_METHOD(void set_uint(const Glib::ustring& key, guint value), g_settings_set_uint)
   _WRAP_METHOD(guint64 get_uint64(const Glib::ustring& key) const, g_settings_get_uint64)
   _WRAP_METHOD(void set_uint64(const Glib::ustring& key, guint64 value), g_settings_set_uint64)
@@ -178,7 +180,6 @@ public:
   _IGNORE(g_settings_get_range, g_settings_list_relocatable_schemas) // deprecated
 
   _IGNORE(g_settings_range_check)
-  //TODO: Wrap GSettingsSchema
 
 #m4 _CONVERSION(`Glib::ObjectBase*',`gpointer',(gpointer)$3->gobj())
   _WRAP_METHOD(void bind(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, SettingsBindFlags flags=SETTINGS_BIND_DEFAULT), g_settings_bind)
@@ -198,13 +199,12 @@ public:
   _IGNORE_PROPERTY("schema")
   _WRAP_PROPERTY("schema-id", Glib::ustring)
 
-  //TODO: _WRAP_PROPERTY("settings-schema", Glib::RefPtr<SettingsSchema>)
+  _WRAP_PROPERTY("settings-schema", Glib::RefPtr<SettingsSchema>, newin "2,52")
 
   //TODO?: _WRAP_SIGNAL(bool change_event(const Glib::ArrayHandle<Glib::QueryQuark>& keys, int n_keys), "change-event")
 
-  //TODO: Remove two_signal_methods when we can break ABI.
 #m4 _CONVERSION(`const char*',`const Glib::ustring&',__GCHARP_TO_USTRING)
-  _WRAP_SIGNAL(void changed(const Glib::ustring& key), "changed", detail_name key, two_signal_methods)
+  _WRAP_SIGNAL(void changed(const Glib::ustring& key), "changed", detail_name key)
 
   _WRAP_SIGNAL(bool writable_change_event(GQuark key), "writable-change-event")
   _WRAP_SIGNAL(void writable_changed(const Glib::ustring& key), writable_changed)
