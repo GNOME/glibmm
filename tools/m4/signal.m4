@@ -28,13 +28,13 @@ $10
 ',dnl detail_name
 $14,0,`dnl
 $10
-  Glib::SignalProxyDetailedAnyType<$5`'($6)> signal_$4`'(const Glib::ustring& $13 = Glib::ustring());
+  Glib::SignalProxyDetailed<$5`'($6)> signal_$4`'(const Glib::ustring& $13 = Glib::ustring());
 ',`dnl detail_name and two_signal_methods
 $10
   Glib::SignalProxy<$5`'($6)> signal_$4`'();
 
 $10
-  Glib::SignalProxyDetailedAnyType<$5`'($6)> signal_$4`'(const Glib::ustring& $13);
+  Glib::SignalProxyDetailed<$5`'($6)> signal_$4`'(const Glib::ustring& $13);
 ')dnl end detail_name
 ifelse(`$9',,,`_DEPRECATE_IFDEF_END
 ')dnl
@@ -167,9 +167,9 @@ Glib::SignalProxy<$5`'($6)> __CPPNAME__::signal_$4`'()
 }
 ',dnl detail_name
 $14,0,`dnl
-Glib::SignalProxyDetailedAnyType<$5`'($6)> __CPPNAME__::signal_$4`'(const Glib::ustring& $13)
+Glib::SignalProxyDetailed<$5`'($6)> __CPPNAME__::signal_$4`'(const Glib::ustring& $13)
 {
-  return Glib::SignalProxyDetailedAnyType<$5`'($6)>(this, &__CPPNAME__`'_signal_$4_info, $13);
+  return Glib::SignalProxyDetailed<$5`'($6)>(this, &__CPPNAME__`'_signal_$4_info, $13);
 }
 ',`dnl detail_name and two_signal_methods
 Glib::SignalProxy<$5`'($6)> __CPPNAME__::signal_$4`'()
@@ -177,9 +177,9 @@ Glib::SignalProxy<$5`'($6)> __CPPNAME__::signal_$4`'()
   return Glib::SignalProxy<$5`'($6)>(this, &__CPPNAME__`'_signal_$4_info);
 }
 
-Glib::SignalProxyDetailedAnyType<$5`'($6)> __CPPNAME__::signal_$4`'(const Glib::ustring& $13)
+Glib::SignalProxyDetailed<$5`'($6)> __CPPNAME__::signal_$4`'(const Glib::ustring& $13)
 {
-  return Glib::SignalProxyDetailedAnyType<$5`'($6)>(this, &__CPPNAME__`'_signal_$4_info, $13);
+  return Glib::SignalProxyDetailed<$5`'($6)>(this, &__CPPNAME__`'_signal_$4_info, $13);
 }
 ')dnl end detail_name
 ifelse(`$9',,,`_DEPRECATE_IFDEF_END

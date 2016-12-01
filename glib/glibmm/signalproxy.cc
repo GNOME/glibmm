@@ -110,9 +110,9 @@ SignalProxyNormal::slot0_void_callback(GObject* self, void* data)
   }
 }
 
-// SignalProxyDetailed implementation:
+// SignalProxyDetailedBase implementation:
 
-SignalProxyDetailed::SignalProxyDetailed(
+SignalProxyDetailedBase::SignalProxyDetailedBase(
   Glib::ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name)
 : SignalProxyBase(obj),
   info_(info),
@@ -121,12 +121,12 @@ SignalProxyDetailed::SignalProxyDetailed(
 {
 }
 
-SignalProxyDetailed::~SignalProxyDetailed() noexcept
+SignalProxyDetailedBase::~SignalProxyDetailedBase() noexcept
 {
 }
 
 sigc::slot_base&
-SignalProxyDetailed::connect_impl_(bool notify, const sigc::slot_base& slot, bool after)
+SignalProxyDetailedBase::connect_impl_(bool notify, const sigc::slot_base& slot, bool after)
 {
   // create a proxy to hold our connection info
   auto pConnectionNode = new SignalProxyConnectionNode(slot, obj_->gobj());
@@ -142,7 +142,7 @@ SignalProxyDetailed::connect_impl_(bool notify, const sigc::slot_base& slot, boo
 }
 
 sigc::slot_base&
-SignalProxyDetailed::connect_impl_(bool notify, sigc::slot_base&& slot, bool after)
+SignalProxyDetailedBase::connect_impl_(bool notify, sigc::slot_base&& slot, bool after)
 {
   // create a proxy to hold our connection info
   auto pConnectionNode = new SignalProxyConnectionNode(std::move(slot), obj_->gobj());
@@ -158,7 +158,7 @@ SignalProxyDetailed::connect_impl_(bool notify, sigc::slot_base&& slot, bool aft
 }
 
 void
-SignalProxyDetailed::emission_stop()
+SignalProxyDetailedBase::emission_stop()
 {
   g_signal_stop_emission_by_name(obj_->gobj(), detailed_name_.c_str());
 }

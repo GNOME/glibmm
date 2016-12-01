@@ -47,7 +47,7 @@ struct SignalProxyInfo
 
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-// This base class is used by SignalProxyNormal, SignalProxyDetailed and SignalProxyProperty.
+// This base class is used by SignalProxyNormal, SignalProxyDetailedBase and SignalProxyProperty.
 class SignalProxyBase
 {
 public:
@@ -67,7 +67,7 @@ protected:
   ObjectBase* obj_;
 
 private:
-  SignalProxyBase& operator=(const SignalProxyBase&); // not implemented
+  SignalProxyBase& operator=(const SignalProxyBase&) = delete;
 };
 
 // Shared portion of a Signal without detail
@@ -79,7 +79,7 @@ private:
  * the template derivatives, which serve as gatekeepers for the
  * types allowed on a particular signal.
  *
- * For signals with a detailed name (signal_name::detail_name) see SignalProxyDetailed.
+ * For signals with a detailed name (signal_name::detail_name) see SignalProxyDetailedBase.
  */
 class SignalProxyNormal : public SignalProxyBase
 {
@@ -140,7 +140,7 @@ private:
   sigc::slot_base& connect_impl_(GCallback callback, const sigc::slot_base& slot, bool after);
 
   // no copy assignment
-  SignalProxyNormal& operator=(const SignalProxyNormal&);
+  SignalProxyNormal& operator=(const SignalProxyNormal&) = delete;
 };
 
 /**** Glib::SignalProxy ***************************************************/
@@ -227,10 +227,6 @@ public:
   }
 };
 
-// TODO: When we can break ABI, consider renaming
-// SignalProxyDetailed => SignalProxyDetailedBase
-// SignalProxyDetailedAnyType => SignalProxyDetailed
-
 // Shared portion of a Signal with detail
 /** The SignalProxy provides an API similar to sigc::signal that can be used to
  * connect sigc::slots to glib signals.
@@ -240,10 +236,10 @@ public:
  * the template derivatives, which serve as gatekeepers for the
  * types allowed on a particular signal.
  */
-class SignalProxyDetailed : public SignalProxyBase
+class SignalProxyDetailedBase : public SignalProxyBase
 {
 public:
-  ~SignalProxyDetailed() noexcept;
+  ~SignalProxyDetailedBase() noexcept;
 
   /// Stops the current signal emission (not in libsigc++)
   void emission_stop();
@@ -255,11 +251,11 @@ protected:
    *             and the C callbacks that should be called by glib.
    * @param detail_name The detail name, if any.
    */
-  SignalProxyDetailed(
+  SignalProxyDetailedBase(
     Glib::ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name);
 
   /** Connects a signal handler to a signal.
-   * This is called by connect() and connect_notify() in derived SignalProxyDetailedAnyType classes.
+   * This is called by connect() and connect_notify() in derived SignalProxyDetailed classes.
    *
    * @param notify Whether this method is called by connect_notify() or by connect().
    * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
@@ -280,7 +276,7 @@ private:
   const Glib::ustring detailed_name_; // signal_name[::detail_name]
 
   // no copy assignment
-  SignalProxyDetailed& operator=(const SignalProxyDetailed&);
+  SignalProxyDetailedBase& operator=(const SignalProxyDetailedBase&) = delete;
 };
 
 /** Proxy for signals with any number of arguments and possibly a detailed name.
@@ -288,18 +284,18 @@ private:
  * to connect signal handlers to signals.
  */
 template <class R, class... T>
-class SignalProxyDetailedAnyType;
+class SignalProxyDetailed;
 
 template <class R, class... T>
-class SignalProxyDetailedAnyType<R(T...)> : public SignalProxyDetailed
+class SignalProxyDetailed<R(T...)> : public SignalProxyDetailedBase
 {
 public:
   using SlotType = sigc::slot<R(T...)>;
   using VoidSlotType = sigc::slot<void(T...)>;
 
-  SignalProxyDetailedAnyType(
+  SignalProxyDetailed(
     ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name)
-  : SignalProxyDetailed(obj, info, detail_name)
+  : SignalProxyDetailedBase(obj, info, detail_name)
   {
   }
 
@@ -364,25 +360,6 @@ public:
     return sigc::connection(connect_impl_(true, std::move(slot), after));
   }
 };
-
-/* Templates below has been added to avoid API break, and should not be
- * used in a newly created code. SignalProxyDetailedAnyType class should be
- * used instead of SignalProxyDetailed# class.
- */
-template <typename R>
-using SignalProxyDetailed0 = SignalProxyDetailedAnyType<R>;
-template <typename R, typename T1>
-using SignalProxyDetailed1 = SignalProxyDetailedAnyType<R, T1>;
-template <typename R, typename T1, typename T2>
-using SignalProxyDetailed2 = SignalProxyDetailedAnyType<R, T1, T2>;
-template <typename R, typename T1, typename T2, typename T3>
-using SignalProxyDetailed3 = SignalProxyDetailedAnyType<R, T1, T2, T3>;
-template <typename R, typename T1, typename T2, typename T3, typename T4>
-using SignalProxyDetailed4 = SignalProxyDetailedAnyType<R, T1, T2, T3, T4>;
-template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5>
-using SignalProxyDetailed5 = SignalProxyDetailedAnyType<R, T1, T2, T3, T4, T5>;
-template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-using SignalProxyDetailed6 = SignalProxyDetailedAnyType<R, T1, T2, T3, T4, T5, T6>;
 
 } // namespace Glib
 
