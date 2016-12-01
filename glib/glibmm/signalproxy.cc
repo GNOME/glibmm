@@ -43,19 +43,7 @@ SignalProxyNormal::~SignalProxyNormal() noexcept
 }
 
 sigc::slot_base&
-SignalProxyNormal::connect_(const sigc::slot_base& slot, bool after)
-{
-  return connect_impl_(info_->callback, slot, after);
-}
-
-sigc::slot_base&
-SignalProxyNormal::connect_notify_(const sigc::slot_base& slot, bool after)
-{
-  return connect_impl_(info_->notify_callback, slot, after);
-}
-
-sigc::slot_base&
-SignalProxyNormal::connect_impl_(GCallback callback, const sigc::slot_base& slot, bool after)
+SignalProxyNormal::connect_impl_(bool notify, const sigc::slot_base& slot, bool after)
 {
   // create a proxy to hold our connection info
   auto pConnectionNode = new SignalProxyConnectionNode(slot, obj_->gobj());
@@ -63,8 +51,9 @@ SignalProxyNormal::connect_impl_(GCallback callback, const sigc::slot_base& slot
   // connect it to glib
   // pConnectionNode will be passed in the data argument to the callback.
   pConnectionNode->connection_id_ = g_signal_connect_data(obj_->gobj(), info_->signal_name,
-    callback, pConnectionNode, &SignalProxyConnectionNode::destroy_notify_handler,
-    static_cast<GConnectFlags>((after) ? G_CONNECT_AFTER : 0));
+    notify ? info_->notify_callback : info_->callback, pConnectionNode,
+    &SignalProxyConnectionNode::destroy_notify_handler,
+    static_cast<GConnectFlags>(after ? G_CONNECT_AFTER : 0));
 
   return pConnectionNode->slot_;
 }
