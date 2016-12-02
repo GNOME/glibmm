@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/interface.h>
+#include <giomm/actiongroup.h>
 
 _DEFS(giomm,gio)
-_PINCLUDE(glibmm/private/interface_p.h)
+_PINCLUDE(giomm/private/actiongroup_p.h)
 _PINCLUDE(gio/gio.h)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -29,12 +29,6 @@ typedef struct _GRemoteActionGroupInterface GRemoteActionGroupInterface;
 
 namespace Gio
 {
-
-
-//TODO: Instead derive from ActionGroup, when we can break ABI,
-//because the GRemoteActionGroup interface requires the GActionGroup interface.
-//LoadableIcon does a similar thing correctly, for instance.
-
 
 /** RemoteActionGroup - a ActionGroup that interacts with other processes.
  * The RemoteActionGroup interface is implemented by ActionGroup instances that
@@ -57,9 +51,9 @@ namespace Gio
  * platform data for action invocations that arrive by way of D-Bus.
  * @newin{2,32}
  */
-class RemoteActionGroup : public Glib::Interface
+class RemoteActionGroup : public ActionGroup
 {
-  _CLASS_INTERFACE(RemoteActionGroup, GRemoteActionGroup, G_REMOTE_ACTION_GROUP, GRemoteActionGroupInterface)
+  _CLASS_INTERFACE(RemoteActionGroup, GRemoteActionGroup, G_REMOTE_ACTION_GROUP, GRemoteActionGroupInterface, ActionGroup, GActionGroup)
 
 public:
   _WRAP_METHOD(void activate_action(const Glib::ustring& action_name, const Glib::VariantBase& parameter, const Glib::VariantBase& platform_data), g_remote_action_group_activate_action_full)

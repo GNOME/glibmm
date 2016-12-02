@@ -229,7 +229,7 @@ _CONVERSION(`const Glib::RefPtr<MenuModel>&',`GMenuModel*',__CONVERT_CONST_REFPT
 
 # MenuItem
 _CONVERSION(`GMenuItem*',`Glib::RefPtr<MenuItem>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::RefPtr<MenuItem>&',`GMenuItem*',__CONVERT_CONST_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const MenuItem>&',`GMenuItem*',__CONVERT_CONST_REFPTR_TO_P)
 
 # Mount
 _CONVERSION(`GMount*',`Glib::RefPtr<Mount>',`Glib::wrap($3)')
