@@ -26,6 +26,7 @@
 #include <sigc++/sigc++.h>
 #include <vector>
 #include <cstddef>
+#include <atomic>
 
 namespace Glib
 {
@@ -770,6 +771,13 @@ protected:
 private:
   GSource* gobject_;
 
+  mutable std::atomic_int ref_count_ {1};
+  // The C++ wrapper (the Source instance) is deleted, when both Source::unreference()
+  // and SourceCallbackData::destroy_notify_callback() have decreased keep_wrapper_
+  // by calling destroy_notify_callback2().
+  // https://bugzilla.gnome.org/show_bug.cgi?id=561885
+  std::atomic_int keep_wrapper_ {2};
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   static inline Source* get_wrapper(GSource* source);
 
@@ -780,7 +788,8 @@ private:
   static gboolean dispatch_vfunc(GSource* source, GSourceFunc callback, void* user_data);
 
 public:
-  static void destroy_notify_callback(void* data);
+  // Really destroys the object during the second call. See keep_wrapper_.
+  static void destroy_notify_callback2(void* data);
   // Used by SignalXyz, possibly in other files.
   static sigc::connection attach_signal_source(const sigc::slot_base& slot, int priority,
     GSource* source, GMainContext* context, GSourceFunc callback_func);

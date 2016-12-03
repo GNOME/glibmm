@@ -22,8 +22,6 @@
 #include <glibmm/wrap.h>
 #include <glibmm/iochannel.h>
 #include <algorithm>
-#include <map> // Needed until the next ABI break.
-#include <mutex>
 
 namespace
 {
@@ -36,25 +34,6 @@ time64_to_time_val(gint64 time64, Glib::TimeVal& time_val)
     static_cast<long>(time64 - static_cast<gint64>(seconds) * G_GINT64_CONSTANT(1000000));
   time_val = Glib::TimeVal(seconds, microseconds);
 }
-
-// TODO: At the next ABI break, replace ExtraSourceData by new data members in Source.
-// Then the mutex is not necessary, but to keep the code thread-safe, use the
-// g_atomic_*() functions on these data elements.
-// These are new data members that can't be added to Glib::Source now,
-// because it would break ABI.
-struct ExtraSourceData
-{
-  ExtraSourceData() : ref_count(1), keep_wrapper(2) {}
-  int ref_count;
-  // When both Source::unreference() and SourceCallbackData::destroy_notify_callback()
-  // have decreased keep_wrapper, it's time to delete the C++ wrapper.
-  int keep_wrapper;
-};
-
-std::map<const Glib::Source*, ExtraSourceData> extra_source_data;
-// Source instances may be used in different threads.
-// Accesses to extra_source_data must be thread-safe.
-std::mutex extra_source_data_mutex;
 
 class SourceConnectionNode : public sigc::notifiable
 {
@@ -164,17 +143,8 @@ SourceCallbackData::destroy_notify_callback(void* data)
   if (self->node)
     SourceConnectionNode::destroy_notify_callback(self->node);
 
-  if (self->wrapper)
-  {
-    std::unique_lock<std::mutex> lock(extra_source_data_mutex);
-    if (--extra_source_data[self->wrapper].keep_wrapper == 0)
-    {
-      // No other reference exists to the wrapper. Delete it!
-      extra_source_data.erase(self->wrapper);
-      lock.unlock();
-      Glib::Source::destroy_notify_callback(self->wrapper);
-    }
-  }
+  // destroy_notify_callback2() does nothing if self->wrapper == nullptr.
+  Glib::Source::destroy_notify_callback2(self->wrapper);
 
   delete self;
 }
@@ -913,30 +883,17 @@ Source::gobj_copy() const
 void
 Source::reference() const
 {
-  std::lock_guard<std::mutex> lock(extra_source_data_mutex);
-  ++extra_source_data[this].ref_count;
+  ++ref_count_;
 }
 
 void
 Source::unreference() const
 {
-  std::unique_lock<std::mutex> lock(extra_source_data_mutex);
-  if (--extra_source_data[this].ref_count == 0)
+  if (--ref_count_ == 0)
   {
     GSource* const tmp_gobject = gobject_;
 
-    if (--extra_source_data[this].keep_wrapper == 0)
-    {
-      // The last reference from a RefPtr<Source> has been deleted, and
-      // SourceCallbackData::destroy_notify_callback() has been called while
-      // extra_source_data[this].keep_wrapper was > 1.
-      // Delete the wrapper!
-      extra_source_data.erase(this);
-      lock.unlock();
-      destroy_notify_callback(const_cast<Source*>(this));
-    }
-    else
-      lock.unlock();
+    destroy_notify_callback2(const_cast<Source*>(this));
 
     // Drop the one and only GSource reference held by the C++ wrapper.
     // If the GSource instance is attached to a main context, the GMainContext
@@ -1077,17 +1034,19 @@ Source::dispatch_vfunc(GSource*, GSourceFunc callback, void* user_data)
 
 // static
 void
-Source::destroy_notify_callback(void* data)
+Source::destroy_notify_callback2(void* data)
 {
   if (data)
   {
     Source* const self = static_cast<Source*>(data);
+    if (--self->keep_wrapper_ == 0)
+    {
+      // gobject_ is already invalid at this point.
+      self->gobject_ = nullptr;
 
-    // gobject_ is already invalid at this point.
-    self->gobject_ = nullptr;
-
-    // No exception checking: if the dtor throws, you're out of luck anyway.
-    delete self;
+      // No exception checking: if the dtor throws, you're out of luck anyway.
+      delete self;
+    }
   }
 }
 
