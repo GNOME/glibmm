@@ -324,14 +324,14 @@ PollFD::PollFD()
   gobject_.revents = 0;
 }
 
-PollFD::PollFD(int fd)
+PollFD::PollFD(PollFD::fd_t fd)
 {
   gobject_.fd = fd;
   gobject_.events = 0;
   gobject_.revents = 0;
 }
 
-PollFD::PollFD(int fd, IOCondition events)
+PollFD::PollFD(PollFD::fd_t fd, IOCondition events)
 {
   gobject_.fd = fd;
   gobject_.events = events;
@@ -460,7 +460,7 @@ inline SignalIO::SignalIO(GMainContext* context) : context_(context)
 
 sigc::connection
 SignalIO::connect(
-  const sigc::slot<bool(IOCondition)>& slot, int fd, IOCondition condition, int priority)
+  const sigc::slot<bool(IOCondition)>& slot, PollFD::fd_t fd, IOCondition condition, int priority)
 {
   const auto source = IOSource::create(fd, condition);
 
@@ -1220,7 +1220,7 @@ IdleSource::dispatch(sigc::slot_base* slot)
 
 // static
 Glib::RefPtr<IOSource>
-IOSource::create(int fd, IOCondition condition)
+IOSource::create(PollFD::fd_t fd, IOCondition condition)
 {
   return Glib::RefPtr<IOSource>(new IOSource(fd, condition));
 }
@@ -1237,7 +1237,7 @@ IOSource::connect(const sigc::slot<bool(IOCondition)>& slot)
   return connect_generic(slot);
 }
 
-IOSource::IOSource(int fd, IOCondition condition) : poll_fd_(fd, condition)
+IOSource::IOSource(PollFD::fd_t fd, IOCondition condition) : poll_fd_(fd, condition)
 {
   add_poll(poll_fd_);
 }

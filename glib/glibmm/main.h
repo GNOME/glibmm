@@ -39,12 +39,14 @@ namespace Glib
 class PollFD
 {
 public:
-  PollFD();
-  explicit PollFD(int fd);
-  PollFD(int fd, IOCondition events);
+  using fd_t = decltype(GPollFD::fd);
 
-  void set_fd(int fd) { gobject_.fd = fd; }
-  int get_fd() const { return gobject_.fd; }
+  PollFD();
+  explicit PollFD(fd_t fd);
+  PollFD(fd_t fd, IOCondition events);
+
+  void set_fd(fd_t fd) { gobject_.fd = fd; }
+  fd_t get_fd() const { return gobject_.fd; }
 
   void set_events(IOCondition events) { gobject_.events = events; }
   IOCondition get_events() const { return static_cast<IOCondition>(gobject_.events); }
@@ -285,7 +287,7 @@ public:
    * @param priority The priority of the new event source.
    * @return A connection handle, which can be used to disconnect the handler.
    */
-  sigc::connection connect(const sigc::slot<bool(IOCondition)>& slot, int fd, IOCondition condition,
+  sigc::connection connect(const sigc::slot<bool(IOCondition)>& slot, PollFD::fd_t fd, IOCondition condition,
     int priority = PRIORITY_DEFAULT);
 
   /** Connects an I/O handler that watches an I/O channel.
@@ -845,13 +847,13 @@ class IOSource : public Glib::Source
 public:
   using CppObjectType = Glib::IOSource;
 
-  static Glib::RefPtr<IOSource> create(int fd, IOCondition condition);
+  static Glib::RefPtr<IOSource> create(PollFD::fd_t fd, IOCondition condition);
   static Glib::RefPtr<IOSource> create(
     const Glib::RefPtr<IOChannel>& channel, IOCondition condition);
   sigc::connection connect(const sigc::slot<bool(IOCondition)>& slot);
 
 protected:
-  IOSource(int fd, IOCondition condition);
+  IOSource(PollFD::fd_t fd, IOCondition condition);
   IOSource(const Glib::RefPtr<IOChannel>& channel, IOCondition condition);
 
   /** Wrap an existing GSource object and install the given callback function.
