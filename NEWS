@@ -1,3 +1,72 @@
+2.51.1.1:
+
+General:
+* Remove no_default_handler in some _WRAP_SIGNAL()s
+  This allows application developers to simply override
+  the default on_*() signal handlers for these signals too,
+  as they can already with most other signals.
+  If you are using, for instance, the -Wsuggest-override
+  compiler option, watch out for new compiler warnings suggesting
+  that your existing signal handler should now be marked with the
+  override keyword - that means you should do so but you should
+  also stop connecting the signal handler in your code.
+  (Kjell Ahlstedt)
+* Build: examples/Makefile.am: Re-insert the dispatcher examples
+  (Kjell Ahlstedt)
+
+Glib:
+* Dispatcher: Don't cast a HANDLE to an int on Windows.
+  (Kjell Ahlstedt) Bug #772074
+* ObjectBase:
+  - Remove connect_property_changed_with_return()
+  and let connect_property_changed() return a sigc::connection.
+  (Kjell Ahlstedt)
+  - Use std::forward_list for interface class pointers.
+  (Kjell Ahlstedt)
+  - Replace extra_object_base_data map by instance data.
+  (Kjell Ahlstedt)
+* ObjectBase: overload get_property().
+  (Marcin Kolny)
+* Main, IOSource: autodeduce type of fd field.
+  (Marcin Kolny) Bug #770274
+* Settings: Add property_settings_schema(), and update
+  signal_changed().
+  (Kjell Ahlstedt)
+* Settings: Make set_enum() + set_flags() usable
+  (djb) Bug #774647
+* SettingsSchemaKey: Add missing value/range methods
+  (Daniel Boles) Bug #774903
+* SignalProxyNormal: Remove connect_() and connect_notify_(),
+  adding connect_impl().
+  (Kjell Ahlstedt)
+* Rename SignalProxyDetailed to SignalProxyDetailedBase, and
+  SignalProxyDetailedAnyType to SignalProxyDetailed.
+  Remove SignalProxyDetailed# aliases (# = 0..6).
+  (Kjell Ahlstedt)
+* Source: Replace extra_source_data by instance data.
+  (Kjell Ahlstedt) Bug #561885
+
+Gio:
+* ActionMap::add_action_vfunc(): Const correction.
+  (Murray Cumming)
+* Application: Add dbus_register/unregister_vfunc.
+  (Ritesh Khadgaray, Kjell Ahlstedt) Bug #762191
+* Menu: insert/prepend/add_item(): Const correction.
+  (Murray Cumming)
+* MenuAttributeIter: get_value(): Const correction.
+  (Murray Cumming)
+* MenuModel: get_item_atribute(): const correction.
+  (Murray Cumming)
+* RemoteActionGroup: Derive from Gio::ActionGroup.
+  (Murray Cumming)
+
+Gio::Dbus:
+* Proxy: Fix memory leak in get_cached_property_names().
+  (Kjell Ahlstedt) Bug #775210
+* Proxy: Derive from (and implement) Gio::DBus::Interface.
+  (Murray Cumming)
+
+
 2.51.1:
 
 This is the first release of the glibmm-2.52 API/ABI.
@@ -70,7 +139,7 @@ gmmproc:
 * Remove DocsParser::non_object_method_name()
   (Kjell Ahlstedt)
 * swap() implementations: Use std::swap().
-  (Murray Cumming <murrayc@murrayc.com>
+  (Murray Cumming)
 
 Documentation:
 * Gio::SocketService: Update the class documentation
