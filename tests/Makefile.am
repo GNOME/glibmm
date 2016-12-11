@@ -45,7 +45,6 @@ check_PROGRAMS =				\
 	glibmm_null_vectorutils/test		\
 	glibmm_refptr/test		\
 	glibmm_refptr_sigc_bind/test		\
-	glibmm_weakref/test		\
 	glibmm_bytearray/test			\
 	glibmm_ustring_make_valid/test
 

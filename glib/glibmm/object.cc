@@ -27,28 +27,6 @@
 
 #include <string.h>
 
-// Weak references:
-// I'm not sure what the point of these are apart from being a hacky way out of circular references,
-// but maybe we could make it easier to use them by making a Java Reference Object -style class like
-// so:
-// Glib::WeakRef<SomeDerivedObject> weakrefSomeObject(object1);
-// ...
-// if(weakrefSomeObject->isStillAlive())
-// {
-//   weakrefSomeObject->some_method();
-// }
-// else
-// {
-//   //Deal with it, maybe recreating the object.
-// }
-//
-// Without this, the coder has to define his own signal handler which sets his own isStillAlive
-// boolean.
-// weakrefSomeObject<> could still have its own signal_destroyed signal so that coders can choose to
-// deal
-// with the destruction as soon as it happens instead of just checking later before they try to use
-// it.
-
 namespace Glib
 {
 
