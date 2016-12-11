@@ -178,8 +178,8 @@ gint32 get_next_number()
 int compare_items1(const Glib::RefPtr<const Glib::Object>& a,
   const Glib::RefPtr<const Glib::Object>& b)
 {
-  const auto action_a = Glib::RefPtr<const Gio::SimpleAction>::cast_dynamic(a);
-  const auto action_b = Glib::RefPtr<const Gio::SimpleAction>::cast_dynamic(b);
+  const auto action_a = std::dynamic_pointer_cast<const Gio::SimpleAction>(a);
+  const auto action_b = std::dynamic_pointer_cast<const Gio::SimpleAction>(b);
   if (!action_a || !action_b)
   {
     result = EXIT_FAILURE;
