@@ -250,7 +250,7 @@ Glib::RefPtr<ListStore<T_item>> ListStore<T_item>::create()
 template <typename T_item>
 Glib::RefPtr<T_item> ListStore<T_item>::get_item(guint position)
 {
-  return Glib::RefPtr<T_item>::cast_dynamic(ListModel::get_object(position));
+  return std::dynamic_pointer_cast<T_item>(ListModel::get_object(position));
 }
 
 template <typename T_item>
@@ -310,9 +310,9 @@ int ListStore<T_item>::compare_data_func(gconstpointer a, gconstpointer b, gpoin
 
   // cast_dynamic is necessary if T_item is a user-derived class, such as
   // class MyObject : public Glib::Object
-  const Glib::RefPtr<const T_item> item_a = Glib::RefPtr<T_item>::cast_dynamic(
+  const Glib::RefPtr<const T_item> item_a = std::dynamic_pointer_cast<T_item>(
     Glib::wrap(static_cast<typename T_item::BaseObjectType*>(const_cast<gpointer>(a)), true));
-  const Glib::RefPtr<const T_item> item_b = Glib::RefPtr<T_item>::cast_dynamic(
+  const Glib::RefPtr<const T_item> item_b = std::dynamic_pointer_cast<T_item>(
     Glib::wrap(static_cast<typename T_item::BaseObjectType*>(const_cast<gpointer>(b)), true));
 
   return (*slot)(item_a, item_b);

@@ -75,7 +75,7 @@ public:
 Glib::ustring
 socket_address_to_string(const Glib::RefPtr<Gio::SocketAddress>& address)
 {
-  auto isockaddr = Glib::RefPtr<Gio::InetSocketAddress>::cast_dynamic(address);
+  auto isockaddr = std::dynamic_pointer_cast<Gio::InetSocketAddress>(address);
   if (!isockaddr)
     return Glib::ustring();
 
