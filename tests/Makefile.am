@@ -47,7 +47,6 @@ check_PROGRAMS =				\
 	glibmm_null_containerhandle/test	\
 	glibmm_refptr/test		\
 	glibmm_refptr_sigc_bind/test		\
-	glibmm_weakref/test		\
 	glibmm_bytearray/test
 
 TESTS =	$(check_PROGRAMS)
