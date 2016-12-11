@@ -287,7 +287,7 @@ static void
 print_connectable_sockaddr(Glib::RefPtr<Gio::SocketAddress> sockaddr)
 {
   Glib::ustring phys;
-  auto isa = Glib::RefPtr<Gio::InetSocketAddress>::cast_dynamic(sockaddr);
+  auto isa = std::dynamic_pointer_cast<Gio::InetSocketAddress>(sockaddr);
 
   if (!isa)
   {

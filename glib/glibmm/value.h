@@ -240,7 +240,7 @@ public:
   static GType value_type() { return T::get_base_type(); }
 
   void set(const CppType& data) { set_object(data.get()); }
-  CppType get() const { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
+  CppType get() const { return std::dynamic_pointer_cast<T>(get_object_copy()); }
 };
 
 // The SUN Forte Compiler has a problem with this:
@@ -259,7 +259,7 @@ public:
   static GType value_type() { return T::get_base_type(); }
 
   void set(const CppType& data) { set_object(const_cast<T*>(data.get())); }
-  CppType get() const { return Glib::RefPtr<T>::cast_dynamic(get_object_copy()); }
+  CppType get() const { return std::dynamic_pointer_cast<T>(get_object_copy()); }
 };
 #endif // GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
