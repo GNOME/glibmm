@@ -39,7 +39,7 @@ void test_store_boundaries()
 {
   auto store = Gio::ListStore<Gio::MenuItem>::create();
   auto item = Gio::MenuItem::create("", "");
-  auto weakref_item = Glib::WeakRef<Gio::MenuItem>(item);
+  std::weak_ptr<Gio::MenuItem> weakref_item = item;
 
   // Remove an item from an empty list.
   store->remove(0);
@@ -84,7 +84,7 @@ void test_store_boundaries()
 
   store.reset();
   item.reset();
-  if (weakref_item)
+  if (weakref_item.lock())
   {
     result = EXIT_FAILURE;
     std::cerr << "test_store_boundaries(), 10: weakref_item is not null" << std::endl;
@@ -116,16 +116,16 @@ void test_store_refcounts()
 
   const std::size_t n_items = 10;
   std::vector<Glib::RefPtr<Gio::MenuItem>> items;
-  std::vector<Glib::WeakRef<Gio::MenuItem>> weakref_items;
+  std::vector<std::weak_ptr<Gio::MenuItem>> weakref_items;
   for (std::size_t i = 0; i < n_items; ++i)
   {
     items.push_back(Gio::MenuItem::create("", ""));
-    weakref_items.push_back(Glib::WeakRef<Gio::MenuItem>(items[i]));
+    weakref_items.emplace_back(items[i]);
     store->append(items[i]);
   }
   check_store_refcounts_n_items(2, store, n_items);
 
-  if (store->get_item(3).operator->() != items[3].operator->())
+  if (store->get_item(3).get() != items[3].get())
   {
     result = EXIT_FAILURE;
     std::cerr << "test_store_refcounts(), 3: get_item(3) != items[3]" << std::endl;
@@ -134,25 +134,15 @@ void test_store_refcounts()
   for (std::size_t i = 0; i < n_items; ++i)
   {
     items[i].reset();
-    if (!weakref_items[i])
-    {
-      result = EXIT_FAILURE;
-      std::cerr << "test_store_refcounts(), 4: weakref_items[" << i << "] is null" << std::endl;
-    }
   }
 
   store->remove(4);
-  if (weakref_items[4])
-  {
-    result = EXIT_FAILURE;
-    std::cerr << "test_store_refcounts(), 5: weakref_items[4] is not null" << std::endl;
-  }
   check_store_refcounts_n_items(6, store, n_items-1);
 
   store.reset();
   for (std::size_t i = 0; i < n_items; ++i)
   {
-    if (weakref_items[i])
+    if (weakref_items[i].lock())
     {
       result = EXIT_FAILURE;
       std::cerr << "test_store_refcounts(), 7: weakref_items[" << i << "] is not null" << std::endl;
@@ -228,7 +218,7 @@ void test_store_sorted1()
       result = EXIT_FAILURE;
       std::cerr << "test_store_sorted1(), 2: i=" << i << ", items are not equal" << std::endl;
     }
-    if (a.operator->() == b.operator->())
+    if (a.get() == b.get())
     {
       result = EXIT_FAILURE;
       std::cerr << "test_store_sorted1(), 3: i=" << i << ", items are the same" << std::endl;
@@ -237,7 +227,7 @@ void test_store_sorted1()
     if (i > 0)
     {
       auto c = store->get_item(i * 2 - 1);
-      if (c.operator->() == a.operator->() || c.operator->() == b.operator->())
+      if (c.get() == a.get() || c.get() == b.get())
       {
         result = EXIT_FAILURE;
         std::cerr << "test_store_sorted1(), 4: i=" << i << ", items are the same" << std::endl;
@@ -311,7 +301,7 @@ void test_store_sorted2()
       result = EXIT_FAILURE;
       std::cerr << "test_store_sorted2(), 2: i=" << i << ", items are not equal" << std::endl;
     }
-    if (a.operator->() == b.operator->())
+    if (a.get() == b.get())
     {
       result = EXIT_FAILURE;
       std::cerr << "test_store_sorted2(), 3: i=" << i << ", items are the same" << std::endl;
@@ -320,7 +310,7 @@ void test_store_sorted2()
     if (i > 0)
     {
       auto c = store->get_item(i * 2 - 1);
-      if (c.operator->() == a.operator->() || c.operator->() == b.operator->())
+      if (c.get() == a.get() || c.get() == b.get())
       {
         result = EXIT_FAILURE;
         std::cerr << "test_store_sorted2(), 4: i=" << i << ", items are the same" << std::endl;
