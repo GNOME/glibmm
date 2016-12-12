@@ -25,7 +25,7 @@ using namespace std;
 class ChildWatch : public sigc::trackable
 {
 public:
-  ChildWatch(const Glib::RefPtr<Glib::MainLoop>& mainLoop) : m_mainLoop(mainLoop) {}
+  explicit ChildWatch(const Glib::RefPtr<Glib::MainLoop>& mainLoop) : m_mainLoop(mainLoop) {}
 
   void on_child_exited(GPid pid, int status);
   void run(); // fork a child and call signal_child_watch
