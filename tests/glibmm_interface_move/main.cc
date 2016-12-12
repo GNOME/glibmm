@@ -109,7 +109,7 @@ class TestInterface : public Glib::Interface
 protected:
   using CppClassType = TestInterface_Class;
 
-  TestInterface() : Glib::Interface(derived_interface_class_.init()) {}
+  TestInterface() : Glib::Interface(derived_interface_class_.init()), i_(0) {}
 
 public:
   // A real application would never make the constructor public.
