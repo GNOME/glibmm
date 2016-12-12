@@ -14,7 +14,6 @@ node_build_string(type_nodetree_string& node, std::string& string)
 int
 main()
 {
-  std::list<std::string> alma;
   std::string tstring, cstring;
   type_nodetree_string* root;
   type_nodetree_string* node;
