@@ -128,7 +128,7 @@ cancel_thread(Glib::RefPtr<Gio::Cancellable> cancellable)
 class JoinAndDelete
 {
 public:
-  void operator()(std::thread* thread)
+  void operator()(std::thread* thread) const
   {
     stop_thread = true;
     cond_thread.notify_all();
