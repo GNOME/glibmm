@@ -401,7 +401,7 @@ get_log_flags()
 
 struct WarnCatcher
 {
-  WarnCatcher(const std::string& domain)
+  explicit WarnCatcher(const std::string& domain)
   : m_domain(domain), m_old_flags(g_log_set_fatal_mask(m_domain.c_str(), get_log_flags()))
   {
   }

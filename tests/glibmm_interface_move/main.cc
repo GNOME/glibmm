@@ -187,7 +187,7 @@ public:
 
   // A real application would never make the constructor public.
   // It would instead have a protected constructor and a public create() method.
-  DerivedObject(int i)
+  explicit DerivedObject(int i)
   : Glib::ObjectBase(nullptr),
     Glib::Object(Glib::ConstructParams(derived_object_class_.init())),
     i_(i)

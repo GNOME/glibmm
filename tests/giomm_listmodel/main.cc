@@ -255,7 +255,7 @@ void test_store_sorted1()
 class MyObject : public Glib::Object
 {
 protected:
-  MyObject(int id) : m_id(id) {}
+  explicit MyObject(int id) : m_id(id) {}
 
 public:
   static Glib::RefPtr<MyObject> create(int id)

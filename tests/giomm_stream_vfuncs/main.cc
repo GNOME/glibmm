@@ -32,7 +32,7 @@ public:
   }
 
 protected:
-  Base64OutputStream(const Glib::RefPtr<Gio::OutputStream>& base_stream)
+  explicit Base64OutputStream(const Glib::RefPtr<Gio::OutputStream>& base_stream)
     : Gio::FilterOutputStream(base_stream), column(0), bit_count(0), bit_buffer(0), column_width(72) {}
 
   gssize write_vfunc(const void* buffer, gsize count, const Glib::RefPtr<Gio::Cancellable>& cancellable) override
