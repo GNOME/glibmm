@@ -184,7 +184,9 @@ gunichar get_unichar_from_std_iterator(std::string::const_iterator pos) G_GNUC_P
  * If you're using std::ostringstream to build strings for display in the
  * user interface, you must convert the result back to UTF-8 as shown below:
  * @code
- * std::locale::global(std::locale("")); // set the global locale to the user's preferred locale
+ * std::locale::global(std::locale("")); // Set the global locale to the user's preferred locale.
+ *                                       // Usually unnecessary here, because Glib::init()
+ *                                       // does it for you.
  * std::ostringstream output;
  * output << percentage << " % done";
  * label->set_text(Glib::locale_to_utf8(output.str()));
