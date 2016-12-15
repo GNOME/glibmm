@@ -24,10 +24,6 @@
 namespace Glib
 {
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-class DispatchNotifier;
-#endif
-
 /** Signal class for inter-thread communication.
  * @ingroup Threads
  * Glib::Dispatcher works similar to sigc::signal<void()>.  But unlike normal
@@ -93,13 +89,12 @@ public:
    */
   sigc::connection connect(sigc::slot<void()>&& slot);
 
-private:
-  sigc::signal<void()> signal_;
-  DispatchNotifier* notifier_;
+  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+  struct Impl;
+  #endif
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  friend class Glib::DispatchNotifier;
-#endif
+private:
+  Impl* impl_; // hidden implementation
 };
 
 /*! A Glib::Dispatcher example.
