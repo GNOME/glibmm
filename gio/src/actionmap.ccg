@@ -33,9 +33,9 @@ ActionMap::add_action(const Glib::ustring& name)
 
 Glib::RefPtr<SimpleAction>
 ActionMap::add_action_with_parameter(
-  const Glib::ustring& name, const ActivateWithParameterSlot& slot)
+  const Glib::ustring& name, const ActivateWithParameterSlot& slot, const Glib::VariantType& parameter_type)
 {
-  auto action = add_action(name);
+  auto action = SimpleAction::create(name, parameter_type);
   action->signal_activate().connect(slot);
   return action;
 }
