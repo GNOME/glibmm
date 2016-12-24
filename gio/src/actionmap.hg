@@ -46,19 +46,17 @@ class ActionMap : public Glib::Interface
   _CLASS_INTERFACE(ActionMap, GActionMap, G_ACTION_MAP, GActionMapInterface)
 
 public:
+  _WRAP_METHOD(void add_action(const Glib::RefPtr<Action>& action), g_action_map_add_action)
+  _WRAP_METHOD(void remove_action(const Glib::ustring& action_name), g_action_map_remove_action)
+
   _WRAP_METHOD(Glib::RefPtr<Action> lookup_action(const Glib::ustring& action_name), g_action_map_lookup_action, refreturn)
   _WRAP_METHOD(Glib::RefPtr<const Action> lookup_action(const Glib::ustring& action_name) const, g_action_map_lookup_action, constversion, refreturn)
 
-  /** A Slot to be called when an action has been activated,
-   * passing a parameter of a specified type.
-   * See add_action_with_parameter().
-   *
-   * For instance,
-   * void on_slot_activated(const Glib::VariantBase& parameter);
-   */
-  using ActivateWithParameterSlot = sigc::slot<void(const Glib::VariantBase&)>;
 
-  //This is an equivalent for g_action_map_add_action_entries().
+  // The various add_action() methods are our equivalent for g_action_map_add_action_entries().
+  _IGNORE(g_action_map_add_action_entries)
+
+
   /** A convenience method for creating a SimpleAction instance
    * and adding it to the ActionMap.
    *
@@ -66,17 +64,6 @@ public:
    * @return The Action.
    */
   Glib::RefPtr<SimpleAction> add_action(const Glib::ustring& name);
-
-  //This is an equivalent for g_action_map_add_action_entries().
-  /** A convenience method for creating a SimpleAction instance
-   * and adding it to the ActionMap.
-   *
-   * @param name The name of the Action.
-   * @param slot The callback method to be called when the action is activated.
-   * @return The Action.
-   */
-  Glib::RefPtr<SimpleAction> add_action_with_parameter(const Glib::ustring& name, const ActivateWithParameterSlot& slot, const Glib::VariantType& parameter_type);
-  _IGNORE(g_action_map_add_action_entries)
 
   /** A Slot to be called when an action has been activated,
    * without passing a parameter to the slot.
@@ -92,10 +79,29 @@ public:
    *
    * @param name The name of the Action.
    * @param slot The callback method to be called when the action is activated.
-   * @parameter_type The type of parameter to be passed to the slot.
    * @return The Action.
    */
   Glib::RefPtr<SimpleAction> add_action(const Glib::ustring& name, const ActivateSlot& slot);
+
+
+  /** A Slot to be called when an action has been activated,
+   * passing a parameter of a specified type.
+   * See add_action_with_parameter().
+   *
+   * For instance,
+   * void on_slot_activated(const Glib::VariantBase& parameter);
+   */
+  using ActivateWithParameterSlot = sigc::slot<void(const Glib::VariantBase&)>;
+
+  /** A convenience method for creating a SimpleAction instance
+   * and adding it to the ActionMap.
+   *
+   * @param name The name of the Action.
+   * @param slot The callback method to be called when the action is activated.
+   * @parameter_type The type of parameter to be passed to the slot.
+   * @return The Action.
+   */
+  Glib::RefPtr<SimpleAction> add_action_with_parameter(const Glib::ustring& name, const ActivateWithParameterSlot& slot, const Glib::VariantType& parameter_type);
 
 
   /** A convenience method for creating a boolean-stateful SimpleAction instance
@@ -147,6 +153,7 @@ public:
    */
   Glib::RefPtr<SimpleAction> add_action_radio_string(const Glib::ustring& name, const ActivateWithStringParameterSlot& slot, const Glib::ustring& state);
 
+
 //TODO: Docs: Add hints about how to specify the various possible states in the GtkBuilder XML.
   /** A convenience method for creating an integer-based radio SimpleAction instance
    * and adding it to the ActionMap.
@@ -176,9 +183,6 @@ public:
    */
   Glib::RefPtr<SimpleAction> add_action_radio_integer(const Glib::ustring& name, const ActivateWithIntParameterSlot& slot, gint32 state);
 
-
-  _WRAP_METHOD(void add_action(const Glib::RefPtr<Action>& action), g_action_map_add_action)
-  _WRAP_METHOD(void remove_action(const Glib::ustring& action_name), g_action_map_remove_action)
 
 #m4 _CONVERSION(`Glib::RefPtr<Action>', `GAction*', `Glib::unwrap($3)')
   _WRAP_VFUNC(Glib::RefPtr<Action> lookup_action(const Glib::ustring& name) const, "lookup_action", refreturn)
