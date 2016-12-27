@@ -78,9 +78,6 @@ G_GNUC_EXTENSION typedef long long long_long;
 G_GNUC_EXTENSION typedef unsigned long long unsigned_long_long;
 
 GLIB_VALUE_BASIC(bool, boolean)
-#ifndef GLIBMM_DISABLE_DEPRECATED
-GLIB_VALUE_BASIC(char, char, -128, 127)
-#endif // GLIBMM_DISABLE_DEPRECATED
 GLIB_VALUE_BASIC(signed char, schar, -128, 127)
 GLIB_VALUE_BASIC(unsigned char, uchar, 0, 255)
 GLIB_VALUE_BASIC(int, int, G_MININT, G_MAXINT)

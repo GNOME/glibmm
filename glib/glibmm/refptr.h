@@ -167,12 +167,6 @@ public:
    */
   inline explicit operator bool() const noexcept;
 
-#ifndef GLIBMM_DISABLE_DEPRECATED
-  /// @deprecated Use reset() instead because this leads to confusion with clear() methods on the
-  /// underlying class. For instance, people use .clear() when they mean ->clear().
-  inline void clear() noexcept;
-#endif // GLIBMM_DISABLE_DEPRECATED
-
   /** Set underlying instance to nullptr, decrementing reference count of existing instance
    * appropriately.
    * @newin{2,16}
@@ -401,15 +395,6 @@ inline RefPtr<T_CppObject>::operator bool() const noexcept
 {
   return (pCppObject_ != nullptr);
 }
-
-#ifndef GLIBMM_DISABLE_DEPRECATED
-template <class T_CppObject>
-inline void
-RefPtr<T_CppObject>::clear() noexcept
-{
-  reset();
-}
-#endif // GLIBMM_DISABLE_DEPRECATED
 
 template <class T_CppObject>
 inline void

@@ -67,10 +67,6 @@ divert[]dnl
 namespace Glib
 {
 GLIB_VALUE_BASIC(bool, boolean)
-#ifndef GLIBMM_DISABLE_DEPRECATED
-/// @deprecated Use Value<signed char> instead.
-GLIB_VALUE_BASIC(char, char)
-#endif // GLIBMM_DISABLE_DEPRECATED
 /// @newin{2,44}
 GLIB_VALUE_BASIC(signed char, int8)
 GLIB_VALUE_BASIC(unsigned char, uchar)
