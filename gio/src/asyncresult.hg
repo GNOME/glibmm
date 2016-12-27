@@ -117,15 +117,12 @@ public:
 
   _WRAP_METHOD(bool is_tagged(gpointer source_tag) const, g_async_result_is_tagged)
 
-
-  // TODO: For some reason, the compiler cannot find an unwrap() for ObjectBase.
+  // The compiler cannot find an unwrap() for ObjectBase, because
+  // ObjectBase::BaseObjectType is not declared.
   //#m4 _CONVERSION(`Glib::RefPtr<Glib::ObjectBase>',`GObject*',__CONVERT_REFPTR_TO_P)
 #m4 _CONVERSION(`Glib::RefPtr<Glib::ObjectBase>',`GObject*',`unwrap_objectbase_custom($3)')
-  _WRAP_VFUNC(Glib::RefPtr<Glib::ObjectBase> get_source_object(),
-              "get_source_object")
-
-  //TODO: is_tagged() vfunc when we can break ABI.
+  _WRAP_VFUNC(Glib::RefPtr<Glib::ObjectBase> get_source_object(), "get_source_object")
+  _WRAP_VFUNC(bool is_tagged(gpointer source_tag), "is_tagged")
 };
 
 } // namespace Gio
-
