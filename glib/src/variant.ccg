@@ -28,13 +28,10 @@ VariantBase::VariantBase(GVariant* castitem, bool make_a_copy /* = false */)
   if (castitem)
   {
     if (g_variant_is_floating(castitem))
-    {
       g_variant_ref_sink(castitem);
-    }
+
     if (make_a_copy)
-    {
       g_variant_ref(castitem);
-    }
   }
 
   gobject_ = castitem;
@@ -158,9 +155,7 @@ VariantContainerBase::create_tuple(const std::vector<VariantBase>& children)
   var_ptr* const var_array = new var_ptr[children.size()];
 
   for (std::vector<VariantBase>::size_type i = 0; i < children.size(); i++)
-  {
     var_array[i] = const_cast<GVariant*>(children[i].gobj());
-  }
 
   VariantContainerBase result =
     VariantContainerBase(g_variant_new_tuple(var_array, children.size()));
@@ -202,9 +197,8 @@ VariantContainerBase
 VariantBase::cast_dynamic<VariantContainerBase>(const VariantBase& v) throw(std::bad_cast)
 {
   if (!v.gobj())
-  {
     return VariantContainerBase();
-  }
+
   if (v.get_type().is_container())
   {
     return VariantContainerBase(const_cast<GVariant*>(v.gobj()), true);
@@ -227,7 +221,9 @@ VariantContainerBase::get_maybe(VariantBase& maybe) const
     return true;
   }
   else
+  {
     return false;
+  }
 }
 
 VariantIter
@@ -456,9 +452,7 @@ Variant<type_vec_ustring>::create(const type_vec_ustring& data)
 
   // Add the elements of the vector into the builder.
   for (const auto& str : data)
-  {
     g_variant_builder_add(builder, element_variant_type.get_string().c_str(), str.c_str());
-  }
 
   // Create the variant using the builder.
   auto result =
@@ -493,7 +487,6 @@ Variant<type_vec_ustring>::get() const
   for (gsize i = 0; i < n_children; i++)
   {
     GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
-
     result.emplace_back(Glib::Variant<Glib::ustring>(gvariant).get());
   }
 
@@ -534,9 +527,7 @@ Variant<type_vec_string>::create(const type_vec_string& data)
 
   // Add the elements of the vector into the string array.
   for (type_vec_string::size_type i = 0; i < data.size(); i++)
-  {
     str_array[i] = g_strdup(data[i].c_str());
-  }
 
   // Terminate the string array.
   str_array[data.size()] = nullptr;
@@ -557,9 +548,7 @@ Variant<type_vec_string>::create_from_object_paths(const type_vec_string& data)
 
   // Add the elements of the vector into the string array.
   for (type_vec_string::size_type i = 0; i < data.size(); i++)
-  {
     str_array[i] = g_strdup(data[i].c_str());
-  }
 
   // Terminate the string array.
   str_array[data.size()] = nullptr;
@@ -597,7 +586,6 @@ Variant<type_vec_string>::get() const
   for (gsize i = 0; i < n_children; i++)
   {
     GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
-
     result.emplace_back(Glib::Variant<std::string>(gvariant).get());
   }
 
