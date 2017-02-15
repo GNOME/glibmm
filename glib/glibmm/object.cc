@@ -195,13 +195,12 @@ Object::Object()
   if (custom_type_name_ && !is_anonymous_custom_())
   {
     object_class_.init();
-    // Reverse the interface class list in order to have the interfaces added
-    // in the same order as they are declared. (Don't know if it makes any difference,
-    // but it's an inexpensive operation. The list is often empty, never long.)
-    custom_interface_classes_.reverse();
+
     // This creates a type that is derived (indirectly) from GObject.
-    object_type = object_class_.clone_custom_type(custom_type_name_, custom_interface_classes_);
-    custom_interface_classes_.clear();
+    object_type = object_class_.clone_custom_type(custom_type_name_,
+      get_custom_interface_classes(), get_custom_class_init_functions(),
+      get_custom_instance_init_function());
+    custom_class_init_finished();
   }
 
   void* const new_object = g_object_newv(object_type, 0, nullptr);
@@ -220,10 +219,11 @@ Object::Object(const Glib::ConstructParams& construct_params)
 
   if (custom_type_name_ && !is_anonymous_custom_())
   {
-    custom_interface_classes_.reverse();
     object_type =
-      construct_params.glibmm_class.clone_custom_type(custom_type_name_, custom_interface_classes_);
-    custom_interface_classes_.clear();
+      construct_params.glibmm_class.clone_custom_type(custom_type_name_,
+      get_custom_interface_classes(), get_custom_class_init_functions(),
+      get_custom_instance_init_function());
+    custom_class_init_finished();
   }
 
   // Create a new GObject with the specified array of construct properties.

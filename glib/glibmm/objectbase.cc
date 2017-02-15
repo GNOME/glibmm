@@ -40,6 +40,17 @@ namespace Glib
 
 /**** Glib::ObjectBase *****************************************************/
 
+// Used only during the construction of named custom types.
+struct ObjectBase::PrivImpl
+{
+  // Pointers to the interfaces of custom types.
+  Class::interface_classes_type custom_interface_classes;
+  // Pointers to extra class init functions.
+  Class::class_init_funcs_type custom_class_init_functions;
+  // Pointer to the instance init function.
+  GInstanceInitFunc custom_instance_init_function = nullptr;
+};
+
 ObjectBase::ObjectBase()
 : gobject_(nullptr),
   custom_type_name_(anonymous_custom_type_name),
@@ -379,6 +390,49 @@ ObjectBase::thaw_notify()
   g_object_thaw_notify(gobj());
 }
 
+void ObjectBase::add_custom_interface_class(const Interface_Class* iface_class)
+{
+  if (!priv_pimpl_)
+    priv_pimpl_ = std::make_unique<PrivImpl>();
+  priv_pimpl_->custom_interface_classes.emplace_back(iface_class);
+}
+
+void ObjectBase::add_custom_class_init_function(GClassInitFunc class_init_func, void* class_data)
+{
+  if (!priv_pimpl_)
+    priv_pimpl_ = std::make_unique<PrivImpl>();
+  priv_pimpl_->custom_class_init_functions.emplace_back(
+    std::make_tuple(class_init_func, class_data));
+}
+
+void ObjectBase::set_custom_instance_init_function(GInstanceInitFunc instance_init_func)
+{
+  if (!priv_pimpl_)
+    priv_pimpl_ = std::make_unique<PrivImpl>();
+  priv_pimpl_->custom_instance_init_function = instance_init_func;
+}
+
+const Class::interface_classes_type* ObjectBase::get_custom_interface_classes() const
+{
+  return priv_pimpl_ ? &priv_pimpl_->custom_interface_classes : nullptr;
+}
+
+const Class::class_init_funcs_type* ObjectBase::get_custom_class_init_functions() const
+{
+  return priv_pimpl_ ? &priv_pimpl_->custom_class_init_functions : nullptr;
+}
+
+GInstanceInitFunc ObjectBase::get_custom_instance_init_function() const
+{
+  return priv_pimpl_ ? priv_pimpl_->custom_instance_init_function : nullptr;
+}
+
+void ObjectBase::custom_class_init_finished()
+{
+  priv_pimpl_.reset();
+}
+
+/**** Global function *****************************************************/
 bool
 _gobject_cppinstance_already_deleted(GObject* gobject)
 {

@@ -28,6 +28,7 @@
 #include <glibmm/debug.h>
 #include <sigc++/trackable.h>
 #include <typeinfo>
+#include <memory>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 extern "C" {
@@ -202,9 +203,15 @@ protected:
 
   bool is_anonymous_custom_() const;
 
-  // List of pointers to the interfaces of custom types.
-  // Used only during the construction of named custom types.
-  Class::interface_class_list_type custom_interface_classes_;
+  // The following 7 methods are used by Glib::ExtraClassInit, Glib::Interface
+  // and Glib::Object during construction of a named custom type.
+  void add_custom_interface_class(const Interface_Class* iface_class);
+  void add_custom_class_init_function(GClassInitFunc class_init_func, void* class_data = nullptr);
+  void set_custom_instance_init_function(GInstanceInitFunc instance_init_func);
+  const Class::interface_classes_type* get_custom_interface_classes() const;
+  const Class::class_init_funcs_type* get_custom_class_init_functions() const;
+  GInstanceInitFunc get_custom_instance_init_function() const;
+  void custom_class_init_finished();
 
 public:
   //  is_derived_() must be public, so that overridden vfuncs and signal handlers can call it
@@ -232,12 +239,15 @@ protected:
 
 private:
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  virtual void set_manage(); // calls g_error()
-#endif // DOXYGEN_SHOULD_SKIP_THIS
+  // Private part of implementation.
+  // Used only during construction of named custom types.
+  struct PrivImpl;
+  std::unique_ptr<PrivImpl> priv_pimpl_;
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  virtual void set_manage(); // calls g_error()
+
   friend class Glib::GSigConnectionNode; // for GSigConnectionNode::notify()
-#endif
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

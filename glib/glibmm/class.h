@@ -23,7 +23,7 @@
 #include <glibmmconfig.h> //Include this here so that the /private/*.h classes have access to GLIBMM_VFUNCS_ENABLED
 
 #include <vector> //For interface properties that custom types might override.
-#include <forward_list> //For interface classes that custom types might implement.
+#include <tuple>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -52,11 +52,13 @@ public:
 
   inline GType get_type() const;
 
-  /** The type that holds pointers to the interfaces of custom types.
-   * It's usually empty and never long. It's a std::forward_list to minimize
-   * storage requirement.
+  /// The type that holds pointers to the interfaces of custom types.
+  using interface_classes_type = std::vector<const Interface_Class*>;
+  /** The type that holds pointers to extra class init functions of custom types.
+   * The std::tuple contains a function pointer and a pointer to class data.
+   * The class data pointer can be nullptr, if the function does not need it.
    */
-  using interface_class_list_type = std::forward_list<const Interface_Class*>;
+  using class_init_funcs_type = std::vector<std::tuple<GClassInitFunc, void*>>;
 
   /** Register a static custom GType, derived from the parent of this class's type.
    * The parent type of the registered custom type is the same C class as the parent
@@ -65,11 +67,16 @@ public:
    * @param custom_type_name The name of the registered type is
    *        "gtkmm__CustomObject_" + canonic(custom_type_name), where canonic()
    *        replaces special characters with '+'.
-   * @param interface_classes Interfaces that the custom type implements.
+   * @param interface_classes Interfaces that the custom type implements (can be nullptr).
+   * @param class_init_funcs Extra class init functions (can be nullptr). These
+   *        functions, if any, are called after the class init function of this
+   *        class's type, e.g. Gtk::Widget.
+   * @param instance_init_func Instance init function (can be nullptr).
    * @return The registered type.
    */
   GType clone_custom_type(
-    const char* custom_type_name, const interface_class_list_type& interface_classes) const;
+    const char* custom_type_name, const interface_classes_type* interface_classes,
+    const class_init_funcs_type* class_init_funcs, GInstanceInitFunc instance_init_func) const;
 
 protected:
   GType gtype_;
