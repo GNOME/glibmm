@@ -202,11 +202,11 @@ Class::custom_class_init_function(void* g_class, void* class_data)
   gobject_class->set_property = &Glib::custom_set_property_callback;
 
   // Call extra class init functions, if any.
-  for (auto func : class_init_funcs)
+  for (std::size_t i = 1; i < class_init_funcs.size(); ++i)
   {
-    if (auto extra_init_func = std::get<GClassInitFunc>(func))
+    if (auto extra_init_func = std::get<GClassInitFunc>(class_init_funcs[i]))
     {
-      auto extra_class_data = std::get<void*>(func);
+      auto extra_class_data = std::get<void*>(class_init_funcs[i]);
       (*extra_init_func)(g_class, extra_class_data);
     }
   }
