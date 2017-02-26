@@ -1,0 +1,121 @@
+/* Copyright (C) 2017 The giomm Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <glibmm/object.h>
+#include <glibmm/refptr.h>
+#include <giomm/action.h>
+
+_DEFS(giomm,gio)
+_PINCLUDE(glibmm/private/object_p.h)
+
+namespace Gio
+{
+/** An Action reflecting a Glib::Object property.
+ *
+ * A %PropertyAction is a way to get an Action with a state value
+ * reflecting and controlling the value of a Glib::Object property.
+ *
+ * The state of the action will correspond to the value of the property.
+ * Changing it will change the property (assuming the requested value
+ * matches the requirements as specified in the GParamSpec, used when the
+ * property was installed).
+ *
+ * Only the most common types are presently supported. Booleans are
+ * mapped to booleans, strings to strings, signed/unsigned integers to
+ * int32/uint32 and floats and doubles to doubles.
+ *
+ * If the property is an enum then the state will be string-typed and
+ * conversion will automatically be performed between the enum value and
+ * "nick" string as per the GEnumValue table.
+ *
+ * Flags types are not currently supported.
+ *
+ * Properties of object types, boxed types and pointer types are not
+ * supported and probably never will be.
+ *
+ * Properties of Glib::Variant types are not currently supported.
+ *
+ * If the property is boolean-valued then the action will have a nullptr
+ * parameter type, and activating the action (with no parameter) will
+ * toggle the value of the property.
+ *
+ * In all other cases, the parameter type will correspond to the type of
+ * the property.
+ *
+ * The general idea here is to reduce the number of locations where a
+ * particular piece of state is kept (and therefore has to be synchronised
+ * between). %PropertyAction does not have a separate state that is kept
+ * in sync with the property value -- its state is the property value.
+ *
+ * For example, it might be useful to create an Action corresponding to
+ * property_visible_child_name() of a Gtk::Stack so that the current
+ * page can be switched from a menu. The active radio indication in the
+ * menu is then directly determined from the active page of the Gtk::Stack.
+ *
+ * An anti-example would be binding property_active_id() on a Gtk::ComboBox.
+ * This is because the state of the combobox itself is probably uninteresting
+ * and is actually being used to control something else.
+ *
+ * Another anti-example would be to bind to property_visible_child_name()
+ * of a Gtk::Stack if this value is actually stored in Gio::Settings.
+ * In that case, the real source of the value is
+ * Gio::Settings. If you want an Action to control a setting stored in
+ * Gio::Settings, see Gio::Settings::create_action() instead, and possibly
+ * combine its use with Gio::Settings::bind().
+ *
+ * @newin{2,52}
+ */
+class PropertyAction : public Glib::Object, public Action
+{
+  _CLASS_GOBJECT(PropertyAction, GPropertyAction, G_PROPERTY_ACTION, Glib::Object, GObject)
+  _IMPLEMENTS_INTERFACE(Action)
+
+protected:
+  PropertyAction(const Glib::ustring& name, const Glib::PropertyProxy_Base& property_proxy,
+    bool invert_boolean = false);
+
+public:
+  /** Creates an Action corresponding to the value of property @a property_proxy.
+   *
+   * The property must be existent and readable and writable (and not construct-only).
+   *
+   * This function takes a reference on the property's object and doesn't
+   * release it until the action is destroyed.
+   *
+   * @param name The name of the action to create.
+   * @param property_proxy The property to bind.
+   * @param invert_boolean If <tt>true</tt>, the state of the action will be
+   *        the negation of the property value, provided the property is boolean.
+   * @return A new %PropertyAction.
+   *
+   * @newin{2,52}
+   */
+  _WRAP_CREATE(const Glib::ustring& name, const Glib::PropertyProxy_Base& property_proxy,
+    bool invert_boolean = false)
+
+  _WRAP_PROPERTY("name", Glib::ustring, newin "2,52")
+  _WRAP_PROPERTY("parameter-type", Glib::VariantType, newin "2,52")
+  _WRAP_PROPERTY("enabled", bool, newin "2,52")
+  _WRAP_PROPERTY("state-type", Glib::VariantType, newin "2,52")
+  _WRAP_PROPERTY("state", Glib::VariantBase, newin "2,52")
+  //_WRAP_PROPERTY("object", Glib::ObjectBase) // write-only, construct-only
+  //_WRAP_PROPERTY("property-name", Glib::ustring) // write-only, construct-only
+  _WRAP_PROPERTY("invert-boolean", bool, newin "2,52")
+
+  // There are no methods (apart from ctor and create), signals or vfuncs.
+};
+
+} // namespace Gio
