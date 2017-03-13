@@ -42,17 +42,6 @@ make_unique_ptr_gfree(T* p)
   return std::unique_ptr<T[], decltype(&g_free)>(p, &g_free);
 }
 
-// TODO: Deprecate this? We don't use it ourselves.
-/** Removes the const nature of a ptr
- *
- */
-template <class T>
-inline T*
-unconst(const T* t)
-{
-  return const_cast<T*>(t);
-}
-
 // Convert const gchar* to ustring, while treating NULL as empty string.
 inline Glib::ustring
 convert_const_gchar_ptr_to_ustring(const char* str)
