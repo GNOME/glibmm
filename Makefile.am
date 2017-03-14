@@ -43,10 +43,10 @@ nodist_giomm_libinclude_HEADERS = gio/giommconfig.h
 pkgconfigdir = $(libdir)/pkgconfig
 nodist_pkgconfig_DATA = glib/$(GLIBMM_MODULE_NAME).pc gio/$(GIOMM_MODULE_NAME).pc
 
-include $(srcdir)/MSVC_Net2013/filelist.am
+include $(srcdir)/MSVC_Net2017/filelist.am
 
 text_files = COPYING.tools README.SUN README.win32
-msvc_files = $(addprefix MSVC_Net2013/,$(msvc_net2013_data))
+msvc_files = $(addprefix MSVC_Net2017/,$(msvc_net2017_data))
 
 dist_noinst_DATA = $(text_files) $(msvc_files)
 dist_noinst_SCRIPTS = autogen.sh

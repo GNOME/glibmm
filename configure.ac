@@ -155,12 +155,12 @@ AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  docs/Makefile
                  docs/reference/Doxyfile
-                 MSVC_Net2013/glibmm/glibmm.rc
-                 MSVC_Net2013/giomm/giomm.rc])
+                 MSVC_Net2017/glibmm/glibmm.rc
+                 MSVC_Net2017/giomm/giomm.rc])
 
 # Copy the generated configuration headers into the MSVC project directories.
-AC_CONFIG_COMMANDS([MSVC_Net2013/glibmm/glibmmconfig.h],
-                   [cp -f glib/glibmmconfig.h MSVC_Net2013/glibmm/glibmmconfig.h])
-AC_CONFIG_COMMANDS([MSVC_Net2013/giomm/giommconfig.h],
-                   [cp -f gio/giommconfig.h MSVC_Net2013/giomm/giommconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2017/glibmm/glibmmconfig.h],
+                   [cp -f glib/glibmmconfig.h MSVC_Net2017/glibmm/glibmmconfig.h])
+AC_CONFIG_COMMANDS([MSVC_Net2017/giomm/giommconfig.h],
+                   [cp -f gio/giommconfig.h MSVC_Net2017/giomm/giommconfig.h])
 AC_OUTPUT
