@@ -48,7 +48,8 @@ check_PROGRAMS =				\
 	glibmm_refptr/test		\
 	glibmm_refptr_sigc_bind/test		\
 	glibmm_weakref/test		\
-	glibmm_bytearray/test
+	glibmm_bytearray/test			\
+	glibmm_ustring_make_valid/test
 
 TESTS =	$(check_PROGRAMS)
 
@@ -123,3 +124,4 @@ glibmm_refptr_sigc_bind_test_SOURCES     = glibmm_refptr_sigc_bind/main.cc
 glibmm_weakref_test_SOURCES              = glibmm_weakref/main.cc
 glibmm_weakref_test_LDADD                = $(giomm_ldadd)
 glibmm_bytearray_test_SOURCES            = glibmm_bytearray/main.cc
+glibmm_ustring_make_valid_test_SOURCES   = glibmm_ustring_make_valid/main.cc

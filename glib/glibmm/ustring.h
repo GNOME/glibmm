@@ -596,6 +596,12 @@ public:
   /*! Check whether the string is valid UTF-8. */
   bool validate(const_iterator& first_invalid) const;
 
+  /*! Return a copy that is a valid UTF-8 string replacing invalid bytes in the
+   *  original with Unicode replacement character (U+FFFD).
+   *  If the string is valid - return it's copy.
+   */
+  ustring make_valid() const;
+
   /*! Check whether the string is plain 7-bit ASCII. @par
    * Unlike any other ustring method, is_ascii() is safe to use on invalid
    * UTF-8 strings.  If the string isn't valid UTF-8, it cannot be valid

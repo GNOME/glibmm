@@ -1219,6 +1219,12 @@ ustring::validate(ustring::const_iterator& first_invalid) const
   return (is_valid != 0);
 }
 
+ustring
+ustring::make_valid() const
+{
+  return ustring(g_utf8_make_valid(string_.data(), string_.size()));
+}
+
 bool
 ustring::is_ascii() const
 {
