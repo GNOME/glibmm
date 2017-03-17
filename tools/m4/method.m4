@@ -45,7 +45,7 @@ ifelse(`$8',,,`$8
 ')dnl
 ',dnl If the C function returns non-void:
 dnl Store the return if there are C output parameters.
-`ifelse(`$6',,`  return ',`  `$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');
+`ifelse(`$6',,`  return ',`  auto retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');
 dnl Insert the initializations for the C output parameters
 ifelse(`$8',,,`$8
 ')dnl
@@ -78,7 +78,7 @@ dnl Insert the declarations for C output parameters
 ifelse(`$6',,,`$6
 ')`'dnl
 ifelse(`$16',,dnl If no C++ output parameter is specified:
-`  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');
+`  ifelse(`$3',void,,`auto retvalue = ')_CONVERT($4,`$3',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)');
 'dnl
 ,dnl A C++ output parameter is specified:
 `  _INITIALIZE($17,$4,`$16',`$2`'(ifelse(`$9',1,const_cast<__CNAME__*>(gobj()),gobj())`'ifelse(`$7',,,`, ')$7)',$21);
@@ -144,7 +144,7 @@ dnl If no C++ output parameter is specified.
 `  ifelse(`$3',void,,dnl
 dnl Returns non-void:
 dnl Store the return if there are C output parameters
-ifelse(`$6',,`return ',``$3' retval = '))_CONVERT($4,`$3',`$2`'($7)');'dnl
+ifelse(`$6',,`return ',`auto retval = '))_CONVERT($4,`$3',`$2`'($7)');'dnl
 dnl A C++ output parameter is specified so initialize it from C return
 ,`  _INITIALIZE($14,$4,`$13',`$2`'($7)',$18);'dnl
 )
@@ -171,7 +171,7 @@ dnl Insert the declarations for the C output parameters
 ifelse(`$6',,,`$6
 ')`'dnl
 ifelse(`$13',,dnl If no C++ output parameter is specified:
-  ifelse(`$3',void,,``$3' retvalue = ')_CONVERT($4,`$3',`$2`'($7)');dnl
+  ifelse(`$3',void,,`auto retvalue = ')_CONVERT($4,`$3',`$2`'($7)');dnl
 dnl A C++ output parameter is specified:
 ,`  _INITIALIZE($14,$4,`$13',`$2`'($7)',$18);'dnl
 )dnl
