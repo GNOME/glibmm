@@ -19,7 +19,6 @@ _DEFS(glibmm,glib)
 
 #include <glibmmconfig.h>
 #include <glibmm/ustring.h>
-#include <glibmm/arrayhandle.h>
 #include <glibmm/error.h>
 #include <glibmm/utility.h>
 #include <glib.h>
@@ -139,13 +138,12 @@ public:
   bool load_from_data(const Glib::ustring& data, KeyFileFlags flags = Glib::KEY_FILE_NONE);
   _IGNORE(g_key_file_load_from_data)
 
-#m4 _CONVERSION(`const Glib::ArrayHandle<std::string>&', `const gchar**', `const_cast<const gchar**>($3.data())')
-#m4 _CONVERSION(`Glib::ArrayHandle<std::string>&', `gchar**', `const_cast<gchar**>($3.data())')
+#m4 _CONVERSION(`const std::vector<std::string>& ', `const gchar**', `const_cast<const gchar**>($3.data())')
 
   _IGNORE(g_key_file_load_from_dirs)
 
   _WRAP_METHOD_DOCS_ONLY(g_key_file_load_from_dirs)
-  bool load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, std::string& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE);
+  bool load_from_dirs(const std::string& file, const std::vector<std::string>&  search_dirs, std::string& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE);
 
   /** Looks for a KeyFile named @a file in the paths returned from
    * g_get_user_data_dir() and g_get_system_data_dirs() and loads them
@@ -175,7 +173,7 @@ public:
   /** Gets a list of all groups in the KeyFile
    * @returns A list containing the names of the groups
    */
-  Glib::ArrayHandle<Glib::ustring> get_groups() const;
+  std::vector<Glib::ustring> get_groups() const;
   _IGNORE(g_key_file_get_groups)
 
   /** Gets a list of all keys from the group @a group_name.
@@ -183,7 +181,7 @@ public:
    * @returns A list containing the names of the keys in @a group_name
    * @throw Glib::KeyFileError
    */
-  Glib::ArrayHandle<Glib::ustring> get_keys(const Glib::ustring& group_name) const;
+  std::vector<Glib::ustring> get_keys(const Glib::ustring& group_name) const;
   _IGNORE(g_key_file_get_keys)
 
   _WRAP_METHOD(bool has_group(const Glib::ustring& group_name) const, g_key_file_has_group)
@@ -280,7 +278,7 @@ public:
    * @return A list containing the values requested
    * @throw Glib::KeyFileError
    */
-  Glib::ArrayHandle<Glib::ustring> get_string_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
+  std::vector<Glib::ustring> get_string_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
   _IGNORE(g_key_file_get_string_list)
 
   /** Returns the values associated with @a key under @a group_name
@@ -290,7 +288,7 @@ public:
    * @return A list containing the values requested
    * @throw Glib::KeyFileError
    */
-  Glib::ArrayHandle<Glib::ustring> get_locale_string_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
+  std::vector<Glib::ustring> get_locale_string_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
 
   /** Returns the values associated with @a key under @a group_name
    * translated into @a locale, if available.
@@ -300,7 +298,7 @@ public:
    * @return A list containing the values requested
    * @throw Glib::KeyFileError
    */
-  Glib::ArrayHandle<Glib::ustring> get_locale_string_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale) const;
+  std::vector<Glib::ustring> get_locale_string_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale) const;
   _IGNORE(g_key_file_get_locale_string_list)
 
   /** Returns the values associated with @a key under @a group_name
@@ -309,7 +307,7 @@ public:
    * @return A list of booleans
    * @throw Glib::KeyFileError
    */
-  Glib::ArrayHandle<bool> get_boolean_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
+  std::vector<bool> get_boolean_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
   _IGNORE(g_key_file_get_boolean_list)
 
   /** Returns the values associated with @a key under @a group_name
@@ -318,7 +316,7 @@ public:
    * @return A list of integers
    * @throw Glib::KeyFileError
    */
-  Glib::ArrayHandle<int> get_integer_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
+  std::vector<int> get_integer_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
   _IGNORE(g_key_file_get_integer_list)
 
   /** Returns the values associated with @a key under @a group_name
@@ -327,7 +325,7 @@ public:
    * @return A list of doubles
    * @throw Glib::KeyFileError
    */
-  Glib::ArrayHandle<double> get_double_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
+  std::vector<double> get_double_list(const Glib::ustring& group_name, const Glib::ustring& key) const;
   _IGNORE(g_key_file_get_double_list)
 
   /** Get comment from top of file
@@ -361,7 +359,7 @@ public:
    * @param key The name of a key
    * @param list A list holding objects of type Glib::ustring
    */
-  void set_string_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ArrayHandle<Glib::ustring>& list);
+  void set_string_list(const Glib::ustring& group_name, const Glib::ustring& key, const std::vector<Glib::ustring>&  list);
   _IGNORE(g_key_file_set_string_list)
 
   /** Sets a list of string values for the @a key under @a group_name and marks
@@ -372,7 +370,7 @@ public:
    * @param locale A locale
    * @param list A list holding objects of type Glib::ustring
    */
-  void set_locale_string_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale, const Glib::ArrayHandle<Glib::ustring>& list);
+  void set_locale_string_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ustring& locale, const std::vector<Glib::ustring>&  list);
   _IGNORE(g_key_file_set_locale_string_list)
 
   /** Sets a list of booleans for the @a key under @a group_name.
@@ -381,7 +379,7 @@ public:
    * @param key The name of a key
    * @param list A list holding object of type bool
    */
-  void set_boolean_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ArrayHandle<bool>& list);
+  void set_boolean_list(const Glib::ustring& group_name, const Glib::ustring& key, const std::vector<bool>&  list);
   _IGNORE(g_key_file_set_boolean_list)
 
   /** Sets a list of integers for the @a key under @a group_name.
@@ -390,7 +388,7 @@ public:
    * @param key The name of a key
    * @param list A list holding object of type int
    */
-  void set_integer_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ArrayHandle<int>& list);
+  void set_integer_list(const Glib::ustring& group_name, const Glib::ustring& key, const std::vector<int>&  list);
   _IGNORE(g_key_file_set_integer_list)
 
   /** Sets a list of doubles for the @a key under @a group_name.
@@ -401,7 +399,7 @@ public:
    *
    * @newin{2,14}
    */
-  void set_double_list(const Glib::ustring& group_name, const Glib::ustring& key, const Glib::ArrayHandle<double>& list);
+  void set_double_list(const Glib::ustring& group_name, const Glib::ustring& key, const std::vector<double>&  list);
   _IGNORE(g_key_file_set_double_list)
 
 
