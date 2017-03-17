@@ -16,7 +16,6 @@
  */
 
 #include <gio/gio.h>
-#include <glibmm/arrayhandle.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -40,8 +39,8 @@ class AnnotationInfo final
   _IGNORE(g_dbus_annotation_info_ref, g_dbus_annotation_info_unref)
 
 public:
-#m4 _CONVERSION(`const Glib::ArrayHandle< Glib::RefPtr<AnnotationInfo> >&', `GDBusAnnotationInfo**', `const_cast<GDBusAnnotationInfo**>($3.data())')
-  _WRAP_METHOD(static Glib::ustring info_lookup(const Glib::ArrayHandle< Glib::RefPtr<AnnotationInfo> >& annotations, const Glib::ustring& name), g_dbus_annotation_info_lookup)
+#m4 _CONVERSION(`const std::vector<Glib::RefPtr<AnnotationInfo>>&', `GDBusAnnotationInfo**',`Glib::ArrayHandler<Glib::RefPtr<AnnotationInfo>>::vector_to_array($3).data()')
+  _WRAP_METHOD(static Glib::ustring info_lookup(const std::vector<Glib::RefPtr<AnnotationInfo>>&  annotations, const Glib::ustring& name), g_dbus_annotation_info_lookup)
 };
 
 /** ArgInfo - Stores information about an argument for a method or a

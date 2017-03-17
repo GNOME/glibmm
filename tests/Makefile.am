@@ -42,9 +42,7 @@ check_PROGRAMS =				\
 	glibmm_variant/test			\
 	glibmm_vector/test			\
 	glibmm_bool_vector/test			\
-	glibmm_bool_arrayhandle/test		\
 	glibmm_null_vectorutils/test		\
-	glibmm_null_containerhandle/test	\
 	glibmm_refptr/test		\
 	glibmm_refptr_sigc_bind/test		\
 	glibmm_weakref/test		\
@@ -114,11 +112,8 @@ glibmm_variant_test_SOURCES              = glibmm_variant/main.cc
 glibmm_vector_test_SOURCES               = glibmm_vector/main.cc
 glibmm_vector_test_LDADD                 = $(giomm_ldadd)
 glibmm_bool_vector_test_SOURCES          = glibmm_bool_vector/main.cc
-glibmm_bool_arrayhandle_test_SOURCES     = glibmm_bool_arrayhandle/main.cc
 glibmm_null_vectorutils_test_SOURCES     = glibmm_null_vectorutils/main.cc
 glibmm_null_vectorutils_test_LDADD       = $(giomm_ldadd)
-glibmm_null_containerhandle_test_SOURCES = glibmm_null_containerhandle/main.cc
-glibmm_null_containerhandle_test_LDADD   = $(giomm_ldadd)
 glibmm_refptr_test_SOURCES               = glibmm_refptr/main.cc
 glibmm_refptr_sigc_bind_test_SOURCES     = glibmm_refptr_sigc_bind/main.cc
 glibmm_weakref_test_SOURCES              = glibmm_weakref/main.cc

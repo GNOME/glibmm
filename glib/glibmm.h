@@ -84,7 +84,6 @@
 //#include <glibmm/i18n.h> //This must be included by the application, after system headers such as
 //<iostream>.
 
-#include <glibmm/arrayhandle.h>
 #include <glibmm/balancedtree.h>
 #include <glibmm/base64.h>
 #ifndef GLIBMM_INCLUDED_FROM_WRAP_INIT_CC

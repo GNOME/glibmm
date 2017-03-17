@@ -16,7 +16,6 @@
  */
 
 #include <glibmm/object.h>
-#include <glibmm/arrayhandle.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -44,9 +43,9 @@ protected:
   _CTOR_DEFAULT
   _IGNORE(g_unix_fd_list_new)
 
-  explicit UnixFDList(const Glib::ArrayHandle<int>& fds);
+  explicit UnixFDList(const std::vector<int>&  fds);
 
-  explicit UnixFDList(const Glib::ArrayHandle<int>& fds, int n_fds);
+  explicit UnixFDList(const std::vector<int>&  fds, int n_fds);
   _IGNORE(g_unix_fd_list_new_from_array)
 
 public:
@@ -61,10 +60,10 @@ public:
    * @param fds The list of file descriptors to use for creation.
    * @return A new UnixFDList.
    */
-  _WRAP_CREATE(const Glib::ArrayHandle<int>& fds)
+  _WRAP_CREATE(const std::vector<int>&  fds)
 
   _WRAP_METHOD_DOCS_ONLY(g_unix_fd_list_new_from_array)
-  _WRAP_CREATE(const Glib::ArrayHandle<int>& fds, int n_fds)
+  _WRAP_CREATE(const std::vector<int>&  fds, int n_fds)
 
   _WRAP_METHOD(int get_length() const, g_unix_fd_list_get_length)
   _WRAP_METHOD(int get(int index) const, g_unix_fd_list_get, errthrow)
@@ -78,7 +77,7 @@ public:
    *
    * @newin{2,28}
    */
-  const Glib::ArrayHandle<int> peek_fds() const;
+  const std::vector<int> peek_fds() const;
   _IGNORE(g_unix_fd_list_peek_fds)
 
   /** Returns the array of file descriptors that is contained in this object.
@@ -93,7 +92,7 @@ public:
    *
    * @newin{2,28}
    */
-  Glib::ArrayHandle<int> steal_fds();
+  std::vector<int> steal_fds();
   _IGNORE(g_unix_fd_list_steal_fds)
 
   _WRAP_METHOD_DOCS_ONLY(g_unix_fd_list_append)

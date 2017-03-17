@@ -22,14 +22,14 @@
 namespace Gio
 {
 
-Glib::ArrayHandle<int>
+std::vector<int>
 UnixFDMessage::steal_fds()
 {
   int length = 0;
   const auto fds = g_unix_fd_message_steal_fds(gobj(), &length);
   // The array is terminated with a -1, but that terminating element is
   // not included in the length that g_unix_fd_message_steal_fds() returns.
-  return Glib::ArrayHandle<int>(fds, length, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<int>::array_to_vector(fds, length, Glib::OWNERSHIP_DEEP);
 }
 
 } // namespace Gio

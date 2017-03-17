@@ -21,7 +21,6 @@
  */
 
 #include <glibmmconfig.h>
-#include <glibmm/sarray.h> /* for backward compatibility */
 #include <glibmm/wrap.h>
 #include <glib.h>
 #include <iterator>
