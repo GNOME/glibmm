@@ -22,7 +22,7 @@ namespace Glib
 
 /**** shell utility functions **********************************************/
 
-Glib::ArrayHandle<std::string>
+std::vector<std::string>
 shell_parse_argv(const std::string& command_line)
 {
   char** argv = nullptr;
@@ -34,7 +34,7 @@ shell_parse_argv(const std::string& command_line)
   if (error)
     Glib::Error::throw_exception(error);
 
-  return Glib::ArrayHandle<std::string>(argv, argc, Glib::OWNERSHIP_DEEP);
+  return Glib::ArrayHandler<std::string>::array_to_vector(argv, argc, Glib::OWNERSHIP_DEEP);
 }
 
 std::string
