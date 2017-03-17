@@ -109,7 +109,6 @@
 #include <glibmm/iochannel.h>
 #include <glibmm/init.h>
 #include <glibmm/keyfile.h>
-#include <glibmm/listhandle.h>
 #include <glibmm/main.h>
 #include <glibmm/markup.h>
 #include <glibmm/miscutils.h>
@@ -129,7 +128,6 @@
 #include <glibmm/shell.h>
 #include <glibmm/signalproxy_connectionnode.h>
 #include <glibmm/signalproxy.h>
-#include <glibmm/slisthandle.h>
 #include <glibmm/spawn.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/timer.h>

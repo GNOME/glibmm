@@ -127,10 +127,10 @@ content_type_guess_for_tree(const Glib::RefPtr<const File>& root)
     g_content_type_guess_for_tree(const_cast<GFile*>(root->gobj())), Glib::OWNERSHIP_DEEP);
 }
 
-Glib::ListHandle<Glib::ustring>
+std::vector<Glib::ustring>
 content_types_get_registered()
 {
-  return Glib::ListHandle<Glib::ustring>(g_content_types_get_registered(), Glib::OWNERSHIP_DEEP);
+  return Glib::ListHandler<Glib::ustring>::list_to_vector(g_content_types_get_registered(), Glib::OWNERSHIP_DEEP);
 }
 
 } // namespace Gio

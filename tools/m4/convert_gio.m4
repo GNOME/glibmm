@@ -69,7 +69,7 @@ _CONVERSION(`GAppLaunchContext*',`const Glib::RefPtr<AppLaunchContext>&',Glib::w
 _CONVERSION(`const Glib::RefPtr<AppInfo>&',`GAppInfo*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`Glib::RefPtr<AppInfo>',`GAppInfo*',__CONVERT_REFPTR_TO_P)
 _CONVERSION(`GAppInfo*',`const Glib::RefPtr<AppInfo>&',`Glib::wrap($3)')
-_CONVERSION(`const Glib::ListHandle< Glib::RefPtr<Gio::File> >&',`GList*',`$3.data()')
+_CONVERSION(`const std::vector<Glib::RefPtr<Gio::File>>&',`GList*',`Glib::ListHandler<Glib::RefPtr<Gio::File>>::vector_to_list($3).data()')
 
 # Application
 _CONVERSION(`GApplication*',`Glib::RefPtr<Application>',`Glib::wrap($3)')

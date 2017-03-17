@@ -15,7 +15,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/listhandle.h>
 #include <giomm/mount.h>
 #include <giomm/icon.h>
 //#include <giomm/volume.h>
@@ -62,8 +61,8 @@ public:
 
   _WRAP_METHOD(bool has_volumes() const, g_drive_has_volumes)
 
-#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<Volume> >',`$2($3, Glib::OWNERSHIP_SHALLOW)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<Volume> > get_volumes(), g_drive_get_volumes)
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<Volume>>',`Glib::ListHandler<Glib::RefPtr<Volume>>::list_to_vector($3, Glib::OWNERSHIP_SHALLOW)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<Volume>> get_volumes(), g_drive_get_volumes)
 
   _WRAP_METHOD(bool is_media_removable() const, g_drive_is_media_removable)
   _WRAP_METHOD(bool is_removable() const,  g_drive_is_removable)

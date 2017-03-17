@@ -20,7 +20,6 @@
 #define _GIOMM_CONTENTTYPE_H
 
 #include <glibmm/ustring.h>
-#include <glibmm/listhandle.h>
 #include <giomm/icon.h>
 #include <giomm/file.h>
 #include <string>
@@ -180,7 +179,7 @@ std::vector<Glib::ustring> content_type_guess_for_tree(const Glib::RefPtr<const 
  *
  * @return List of the registered content types.
  */
-Glib::ListHandle<Glib::ustring> content_types_get_registered();
+std::vector<Glib::ustring> content_types_get_registered();
 
 /** @} group giommContentType */
 
