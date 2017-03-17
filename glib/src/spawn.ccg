@@ -64,7 +64,7 @@ namespace Glib
 
 void
 spawn_async_with_pipes(const std::string& working_directory,
-  const Glib::ArrayHandle<std::string>& argv, const Glib::ArrayHandle<std::string>& envp,
+  const std::vector<std::string>& argv, const std::vector<std::string>& envp,
   SpawnFlags flags, const SlotSpawnChildSetup& child_setup, Pid* child_pid, int* standard_input,
   int* standard_output, int* standard_error)
 {
@@ -73,7 +73,7 @@ spawn_async_with_pipes(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async_with_pipes(Glib::c_str_or_nullptr(working_directory),
-    const_cast<char**>(argv.data()), const_cast<char**>(envp.data()),
+    const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(argv).data()), const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(envp).data()),
     static_cast<GSpawnFlags>(unsigned(flags)), (setup_slot) ? &child_setup_callback : nullptr,
     (setup_slot) ? &child_setup_ : nullptr, child_pid, standard_input, standard_output,
     standard_error, &gerror);
@@ -84,7 +84,7 @@ spawn_async_with_pipes(const std::string& working_directory,
 
 void
 spawn_async_with_pipes(const std::string& working_directory,
-  const Glib::ArrayHandle<std::string>& argv, SpawnFlags flags,
+  const std::vector<std::string>& argv, SpawnFlags flags,
   const SlotSpawnChildSetup& child_setup, Pid* child_pid, int* standard_input, int* standard_output,
   int* standard_error)
 {
@@ -93,7 +93,7 @@ spawn_async_with_pipes(const std::string& working_directory,
   GError* gerror = nullptr;
 
   g_spawn_async_with_pipes(Glib::c_str_or_nullptr(working_directory),
-    const_cast<char**>(argv.data()), nullptr, static_cast<GSpawnFlags>(unsigned(flags)),
+    const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(argv).data()), nullptr, static_cast<GSpawnFlags>(unsigned(flags)),
     (setup_slot) ? &child_setup_callback : nullptr, (setup_slot) ? &child_setup_ : nullptr,
     child_pid, standard_input, standard_output, standard_error, &gerror);
 
@@ -102,16 +102,16 @@ spawn_async_with_pipes(const std::string& working_directory,
 }
 
 void
-spawn_async(const std::string& working_directory, const Glib::ArrayHandle<std::string>& argv,
-  const Glib::ArrayHandle<std::string>& envp, SpawnFlags flags,
+spawn_async(const std::string& working_directory, const std::vector<std::string>& argv,
+  const std::vector<std::string>& envp, SpawnFlags flags,
   const SlotSpawnChildSetup& child_setup, Pid* child_pid)
 {
   const bool setup_slot = !child_setup.empty();
   auto child_setup_ = child_setup;
   GError* gerror = nullptr;
 
-  g_spawn_async(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(argv.data()),
-    const_cast<char**>(envp.data()), static_cast<GSpawnFlags>(unsigned(flags)),
+  g_spawn_async(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(argv).data()),
+    const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(envp).data()), static_cast<GSpawnFlags>(unsigned(flags)),
     (setup_slot) ? &child_setup_callback : nullptr, (setup_slot) ? &child_setup_ : nullptr,
     child_pid, &gerror);
 
@@ -120,14 +120,14 @@ spawn_async(const std::string& working_directory, const Glib::ArrayHandle<std::s
 }
 
 void
-spawn_async(const std::string& working_directory, const Glib::ArrayHandle<std::string>& argv,
+spawn_async(const std::string& working_directory, const std::vector<std::string>& argv,
   SpawnFlags flags, const SlotSpawnChildSetup& child_setup, Pid* child_pid)
 {
   const bool setup_slot = !child_setup.empty();
   auto child_setup_ = child_setup;
   GError* gerror = nullptr;
 
-  g_spawn_async(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(argv.data()), nullptr,
+  g_spawn_async(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(argv).data()), nullptr,
     static_cast<GSpawnFlags>(unsigned(flags)), (setup_slot) ? &child_setup_callback : nullptr,
     (setup_slot) ? &child_setup_ : nullptr, child_pid, &gerror);
 
@@ -136,8 +136,8 @@ spawn_async(const std::string& working_directory, const Glib::ArrayHandle<std::s
 }
 
 void
-spawn_sync(const std::string& working_directory, const Glib::ArrayHandle<std::string>& argv,
-  const Glib::ArrayHandle<std::string>& envp, SpawnFlags flags,
+spawn_sync(const std::string& working_directory, const std::vector<std::string>& argv,
+  const std::vector<std::string>& envp, SpawnFlags flags,
   const SlotSpawnChildSetup& child_setup, std::string* standard_output, std::string* standard_error,
   int* exit_status)
 {
@@ -147,8 +147,8 @@ spawn_sync(const std::string& working_directory, const Glib::ArrayHandle<std::st
   GError* gerror = nullptr;
   char* pch_buf_standard_output = nullptr;
   char* pch_buf_standard_error = nullptr;
-  g_spawn_sync(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(argv.data()),
-    const_cast<char**>(envp.data()), static_cast<GSpawnFlags>(unsigned(flags)),
+  g_spawn_sync(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(argv).data()),
+    const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(envp).data()), static_cast<GSpawnFlags>(unsigned(flags)),
     (setup_slot) ? &child_setup_callback : nullptr, (setup_slot) ? &child_setup_ : nullptr,
     (standard_output) ? &pch_buf_standard_output : nullptr,
     (standard_error) ? &pch_buf_standard_error : nullptr, exit_status, &gerror);
@@ -163,7 +163,7 @@ spawn_sync(const std::string& working_directory, const Glib::ArrayHandle<std::st
 }
 
 void
-spawn_sync(const std::string& working_directory, const Glib::ArrayHandle<std::string>& argv,
+spawn_sync(const std::string& working_directory, const std::vector<std::string>& argv,
   SpawnFlags flags, const SlotSpawnChildSetup& child_setup, std::string* standard_output,
   std::string* standard_error, int* exit_status)
 {
@@ -174,7 +174,7 @@ spawn_sync(const std::string& working_directory, const Glib::ArrayHandle<std::st
   char* pch_buf_standard_error = nullptr;
   GError* gerror = nullptr;
 
-  g_spawn_sync(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(argv.data()), nullptr,
+  g_spawn_sync(Glib::c_str_or_nullptr(working_directory), const_cast<char**>(Glib::ArrayHandler<std::string>::vector_to_array(argv).data()), nullptr,
     static_cast<GSpawnFlags>(unsigned(flags)), (setup_slot) ? &child_setup_callback : nullptr,
     (setup_slot) ? &child_setup_ : nullptr, (standard_output) ? &pch_buf_standard_output : nullptr,
     (standard_error) ? &pch_buf_standard_error : nullptr, exit_status, &gerror);
