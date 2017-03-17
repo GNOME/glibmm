@@ -265,7 +265,7 @@ _CONVERSION(`GResource*',`Glib::RefPtr<Resource>',`Glib::wrap($3)')
 
 #Settings
 _CONVERSION(`GSettings*',`Glib::RefPtr<Settings>',`Glib::wrap($3)')
-_CONVERSION(`const Glib::StringArrayHandle&',`const gchar*-const*',`($3).data()')
+_CONVERSION(`const std::vector<Glib::ustring>&',`const gchar*-const*',`Glib::ArrayHandler<Glib::ustring>::vector_to_array($3).data()')
 _CONVERSION(`const Glib::RefPtr<SettingsBackend>&',`GSettingsBackend*',__CONVERT_REFPTR_TO_P)
 
 _CONVERSION(`GSettingsSchemaKey*',`Glib::RefPtr<SettingsSchemaKey>',`Glib::wrap($3)')

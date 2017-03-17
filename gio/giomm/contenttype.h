@@ -172,7 +172,7 @@ Glib::ustring content_type_guess(
  *
  * @newin{2,18}
  */
-Glib::StringArrayHandle content_type_guess_for_tree(const Glib::RefPtr<const File>& root);
+std::vector<Glib::ustring> content_type_guess_for_tree(const Glib::RefPtr<const File>& root);
 
 /**
  * Gets a list of strings containing all the registered content types

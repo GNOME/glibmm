@@ -18,6 +18,7 @@
  */
 
 #include <giomm/contenttype.h>
+#include <glibmm/vectorutils.h>
 #include <gio/gio.h>
 
 namespace Gio
@@ -119,10 +120,10 @@ content_type_guess(const std::string& filename, const std::string& data, bool& r
   return Glib::convert_return_gchar_ptr_to_ustring(cresult);
 }
 
-Glib::StringArrayHandle
+std::vector<Glib::ustring>
 content_type_guess_for_tree(const Glib::RefPtr<const File>& root)
 {
-  return Glib::StringArrayHandle(
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector(
     g_content_type_guess_for_tree(const_cast<GFile*>(root->gobj())), Glib::OWNERSHIP_DEEP);
 }
 
