@@ -89,7 +89,7 @@ print_resolved_name(const Glib::ustring& phys, const Glib::ustring& name)
 
 static void
 print_resolved_addresses(
-  const Glib::ustring& name, const std::list<Glib::RefPtr<Gio::InetAddress>>& addresses)
+  const Glib::ustring& name, const std::vector<Glib::RefPtr<Gio::InetAddress>>& addresses)
 {
   std::lock_guard<std::mutex> lock_guard(response_mutex);
   std::cout << Glib::ustring::compose("Name:    %1\n", name);
@@ -103,7 +103,7 @@ print_resolved_addresses(
 }
 
 static void
-print_resolved_service(const Glib::ustring& service, const std::list<Gio::SrvTarget>& targets)
+print_resolved_service(const Glib::ustring& service, const std::vector<Gio::SrvTarget>& targets)
 {
   std::lock_guard<std::mutex> lock_guard(response_mutex);
   std::cout << Glib::ustring::compose("Service: %1\n", service);
@@ -174,11 +174,9 @@ lookup_one_sync(const Glib::ustring& arg)
   }
   else
   {
-    std::list<Glib::RefPtr<Gio::InetAddress>> addresses;
-
     try
     {
-      addresses = resolver->lookup_by_name(arg, cancellable);
+      const auto addresses = resolver->lookup_by_name(arg, cancellable);
       print_resolved_addresses(arg, addresses);
     }
     catch (const Gio::ResolverError& err)

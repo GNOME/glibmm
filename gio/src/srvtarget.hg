@@ -15,12 +15,6 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <glibmm/listhandle.h>
-
-// unfortunately we need to include the C header for the type traits
-// implementation
-#include <gio/gio.h>
-
 _DEFS(giomm,gio)
 
 namespace Gio
@@ -59,23 +53,6 @@ public:
 
 };
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-struct SrvTargetListTraits
-{
-  using CppType = Gio::SrvTarget;
-  using CType = const GSrvTarget*;
-  using CTypeNonConst = GSrvTarget*;
-
-  static CType to_c_type(const CppType& item) { return item.gobj(); }
-  static CType to_c_type(CType ptr) { return ptr; }
-  static CppType to_cpp_type(CType item) { return CppType(const_cast<CTypeNonConst>(item), true /* take_copy */); }
-  static void release_c_type(CType item) { g_srv_target_free(const_cast<CTypeNonConst>(item)); }
-};
-
-#endif // DOXYGEN_SHOULD_SKIP_THIS
-
-using ListHandle_SrvTarget = Glib::ListHandle<Gio::SrvTarget, SrvTargetListTraits>;
 
 } // namespace Gio
 

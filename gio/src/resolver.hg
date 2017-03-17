@@ -67,8 +67,8 @@ public:
   // g_resolver_free_addresses is just a C convenience function
   _IGNORE(g_resolver_free_addresses)
 
-#m4 _CONVERSION(`GList*',`Glib::ListHandle< Glib::RefPtr<InetAddress> >',`$2($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<InetAddress> > lookup_by_name(const Glib::ustring& hostname, const Glib::RefPtr<Cancellable>& cancellable{?}), g_resolver_lookup_by_name, errthrow)
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<InetAddress>>',`Glib::ListHandler<Glib::RefPtr<InetAddress>>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<InetAddress>> lookup_by_name(const Glib::ustring& hostname, const Glib::RefPtr<Cancellable>& cancellable{?}), g_resolver_lookup_by_name, errthrow)
 
   /** Begins asynchronously resolving hostname to determine its associated IP address(es), and eventually calls @a slot, which must call
    * lookup_by_name_finish() to get the result. See lookup_by_name() for more details.
@@ -88,7 +88,7 @@ public:
   void lookup_by_name_async(const Glib::ustring& hostname, const SlotAsyncReady& slot);
   _IGNORE(g_resolver_lookup_by_name_async)
 
-  _WRAP_METHOD(Glib::ListHandle< Glib::RefPtr<InetAddress> > lookup_by_name_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_name_finish, errthrow)
+  _WRAP_METHOD(std::vector<Glib::RefPtr<InetAddress>> lookup_by_name_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_name_finish, errthrow)
 
   _WRAP_METHOD(Glib::ustring lookup_by_address(const Glib::RefPtr<InetAddress>& address, const Glib::RefPtr<Cancellable>& cancellable{?}), g_resolver_lookup_by_address, errthrow)
 
@@ -112,8 +112,8 @@ public:
 
   _WRAP_METHOD(Glib::ustring lookup_by_address_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_by_address_finish, errthrow)
 
-#m4 _CONVERSION(`GList*',`ListHandle_SrvTarget',`$2($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(ListHandle_SrvTarget lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const Glib::RefPtr<Cancellable>& cancellable{?}), g_resolver_lookup_service, errthrow)
+#m4 _CONVERSION(`GList*',`std::vector<SrvTarget>',`Glib::ListHandler<SrvTarget, SrvTargetListTraits>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
+  _WRAP_METHOD(std::vector<SrvTarget> lookup_service(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const Glib::RefPtr<Cancellable>& cancellable{?}), g_resolver_lookup_service, errthrow)
 
   /** Begins asynchronously performing a DNS SRV lookup for the given service and protocol in the given domain, and eventually calls callback,
    * which must call lookup_service_finish() to get the final result. See glookup_service() for more details.
@@ -137,7 +137,7 @@ public:
   void lookup_service_async(const Glib::ustring& service, const Glib::ustring& protocol, const Glib::ustring& domain, const SlotAsyncReady& slot);
   _IGNORE(g_resolver_lookup_service_async)
 
-  _WRAP_METHOD(ListHandle_SrvTarget lookup_service_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_service_finish, errthrow)
+  _WRAP_METHOD(std::vector<SrvTarget> lookup_service_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_service_finish, errthrow)
 
 #m4 _CONVERSION(`GList*',`std::vector<Glib::VariantContainerBase>',`Glib::ListHandler<Glib::VariantContainerBase>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
 
