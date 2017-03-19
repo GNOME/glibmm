@@ -419,59 +419,10 @@ public:
 protected:
   GIOChannel* gobject_;
 
-  /** Constructor that should be used by derived classes.
-   * Use this constructor if you want to inherit from IOChannel.
-   * It will set up a GIOChannel that will call the vfuncs of your
-   * class even if it is being used from C code, and it will keep
-   * a reference to the C++ code while the GIOChannel exists.
-   */
-  IOChannel();
   _IGNORE(g_io_channel_init)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   IOChannel(GIOChannel* gobject, bool take_copy);
-#endif
-
-  //We don't put GLIBMM_DISABLE_DEPRECATED around these deprecated methods
-  //because they are virtual and that would make the ABI dependent on the ifdef.
-
-  /**
-   * @deprecated Custom Glib::IOChannel implementation was never really supported.
-   */
-  virtual IOStatus read_vfunc(char* buf, gsize count, gsize& bytes_read);
-
-  /**
-   * @deprecated Custom Glib::IOChannel implementation was never really supported.
-   */
-  virtual IOStatus write_vfunc(const char* buf, gsize count, gsize& bytes_written);
-
-  /**
-   * @deprecated Custom Glib::IOChannel implementation was never really supported.
-   */
-  virtual IOStatus seek_vfunc(gint64 offset, SeekType type);
-
-  /**
-   * @deprecated Custom Glib::IOChannel implementation was never really supported.
-   */
-  virtual IOStatus close_vfunc();
-
-  /**
-   * @deprecated Custom Glib::IOChannel implementation was never really supported.
-   */
-  virtual IOStatus set_flags_vfunc(IOFlags flags);
-
-  /**
-   * @deprecated Custom Glib::IOChannel implementation was never really supported.
-   */
-  virtual IOFlags  get_flags_vfunc();
-
-  /**
-   * @deprecated Custom Glib::IOChannel implementation was never really supported.
-   */
-  virtual Glib::RefPtr<Glib::Source> create_watch_vfunc(IOCondition cond);
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  friend class Glib::GlibmmIOChannel;
 #endif
 
 private:
