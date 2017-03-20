@@ -94,15 +94,15 @@ OptionContext::~OptionContext()
 void
 OptionContext::add_group(OptionGroup& group)
 {
-  // Strangely, GObjectContext actually takes ownership of the GOptionGroup, deleting it later.
-  g_option_context_add_group(gobj(), (group).gobj_give_ownership());
+  // GObjectContext takes ownership of the GOptionGroup, unrefing it later.
+  g_option_context_add_group(gobj(), group.gobj_copy());
 }
 
 void
 OptionContext::set_main_group(OptionGroup& group)
 {
-  // Strangely, GObjectContext actually takes ownership of the GOptionGroup, deleting it later.
-  g_option_context_set_main_group(gobj(), (group).gobj_give_ownership());
+  // GObjectContext takes ownership of the GOptionGroup, unrefing it later.
+  g_option_context_set_main_group(gobj(), group.gobj_copy());
 }
 
 /*

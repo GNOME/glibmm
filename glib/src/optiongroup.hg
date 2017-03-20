@@ -37,8 +37,16 @@ class OptionEntry;
 class OptionContext;
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
-//TODO: GOptionGroup is now refcounted. See https://bugzilla.gnome.org/show_bug.cgi?id=743349
-//When we can break API/ABI, make Glib::OptionGroup refcounted. _CLASS_OPAQUE_REFCOUNTED?
+// GOptionGroup is now refcounted. See https://bugzilla.gnome.org/show_bug.cgi?id=743349
+// But Glib::OptionGroup can't be a _CLASS_OPAQUE_REFCOUNTED, because it has
+// other data members than gobject_. The memory management would be more involved
+// if Glib::OptionGroup were refcounted. It would need a separate refcount for the
+// wrapper, like in Glib::IOChannel and Glib::Source. It's easier and good enough
+// to let Glib::OptionGroup remain non-refcounted. GOptionGroup's refcount still helps.
+// E.g. when GOptionContext takes ownership of a GOptionGroup, it's given a ref.
+// A drawback with this approach is that it's possible to have more than one wrapper
+// for one GOptionGroup, each wrapper with its own ref.
+
 /** An OptionGroup defines the options in a single group.
  * Libraries which need to parse commandline options are expected to provide a function that allows their OptionGroups to
  * be added to the application's OptionContext.
@@ -167,9 +175,14 @@ public:
 
   _WRAP_METHOD(void set_translation_domain(const Glib::ustring& domain), g_option_group_set_translation_domain)
 
+  /// Provides access to the underlying C instance.
   GOptionGroup*       gobj()       { return gobject_; }
+
+  /// Provides access to the underlying C instance.
   const GOptionGroup* gobj() const { return gobject_; }
-  GOptionGroup* gobj_give_ownership();
+
+  /// Provides access to the underlying C instance. The caller is responsible for unrefing it.
+  GOptionGroup*       gobj_copy() const;
 
 protected:
 
@@ -201,11 +214,10 @@ protected:
     gpointer data, GError** error);
 
   //Map of entry names to CppOptionEntry:
-  typedef std::map<Glib::ustring, CppOptionEntry> type_map_entries;
+  using type_map_entries = std::map<Glib::ustring, CppOptionEntry>;
   type_map_entries map_entries_;
 
   GOptionGroup* gobject_;
-  bool has_ownership_; //Whether the gobject_ belongs to this C++ instance.
 #endif //DOXYGEN_SHOULD_SKIP_THIS
 
 private:

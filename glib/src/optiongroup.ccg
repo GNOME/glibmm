@@ -269,8 +269,7 @@ OptionGroup::option_arg_callback(
 OptionGroup::OptionGroup(const Glib::ustring& name, const Glib::ustring& description,
   const Glib::ustring& help_description)
 : gobject_(g_option_group_new(name.c_str(), description.c_str(), help_description.c_str(),
-    this /* user_data */, nullptr /* destroy_func */)),
-  has_ownership_(true)
+    this /* user_data */, nullptr /* destroy_func */))
 {
   // g_callback_pre_parse(), post_parse_callback(), g_callback_error(), and
   // option_arg_callback() depend on user_data being this. The first three
@@ -283,18 +282,16 @@ OptionGroup::OptionGroup(const Glib::ustring& name, const Glib::ustring& descrip
   g_option_group_set_error_hook(gobj(), &g_callback_error);
 }
 
-OptionGroup::OptionGroup(GOptionGroup* castitem) : gobject_(castitem), has_ownership_(true)
+OptionGroup::OptionGroup(GOptionGroup* castitem) : gobject_(castitem)
 {
   // Always takes ownership - never takes copy.
 }
 
 OptionGroup::OptionGroup(OptionGroup&& other) noexcept
   : map_entries_(std::move(other.map_entries_)),
-    gobject_(std::move(other.gobject_)),
-    has_ownership_(std::move(other.has_ownership_))
+    gobject_(std::move(other.gobject_))
 {
   other.gobject_ = nullptr;
-  other.has_ownership_ = false;
 }
 
 OptionGroup&
@@ -304,10 +301,8 @@ OptionGroup::operator=(OptionGroup&& other) noexcept
 
   map_entries_ = std::move(other.map_entries_);
   gobject_ = std::move(other.gobject_);
-  has_ownership_ = std::move(other.has_ownership_);
 
   other.gobject_ = nullptr;
-  other.has_ownership_ = false;
 
   return *this;
 }
@@ -322,7 +317,7 @@ OptionGroup::release_gobject() noexcept
     cpp_entry.release_c_arg();
   }
 
-  if (has_ownership_ && gobject_)
+  if (gobject_)
   {
     g_option_group_unref(gobj());
     gobject_ = nullptr;
@@ -847,10 +842,9 @@ OptionGroup::CppOptionEntry::convert_c_to_cpp()
 }
 
 GOptionGroup*
-OptionGroup::gobj_give_ownership()
+OptionGroup::gobj_copy() const
 {
-  has_ownership_ = false;
-  return gobj();
+  return g_option_group_ref(gobject_);
 }
 
 } // namespace Glib
