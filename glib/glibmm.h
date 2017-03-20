@@ -104,7 +104,6 @@
 #include <glibmm/exception.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/fileutils.h>
-#include <glibmm/helperlist.h>
 #include <glibmm/interface.h>
 #include <glibmm/iochannel.h>
 #include <glibmm/init.h>
