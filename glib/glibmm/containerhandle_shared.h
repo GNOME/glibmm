@@ -54,43 +54,6 @@ enum OwnershipType
   OWNERSHIP_DEEP /*!< Release the list, and its elements, when the container is deleted. */
 };
 
-/** Utility class holding an iterator sequence.
- * @ingroup ContHandles
- * This can be used to initialize a Glib container handle (such as
- * Glib::ArrayHandle) with an iterator sequence.  Use the helper
- * function Glib::sequence() to create a Sequence<> object.
- */
-template <class Iterator>
-class Sequence
-{
-private:
-  Iterator pbegin_;
-  Iterator pend_;
-
-public:
-  Sequence(Iterator pbegin, Iterator pend) : pbegin_(pbegin), pend_(pend) {}
-
-  Iterator begin() const { return pbegin_; }
-  Iterator end() const { return pend_; }
-  std::size_t size() const { return std::distance(pbegin_, pend_); }
-};
-
-/** Helper function to create a Glib::Sequence<> object, which
- * in turn can be used to initialize a container handle.
- * @ingroup ContHandles
- *
- * @par Usage example:
- * @code
- * combo.set_popdown_strings(Glib::sequence(foo_begin, foo_end));
- * @endcode
- */
-template <class Iterator>
-inline Sequence<Iterator>
-sequence(Iterator pbegin, Iterator pend)
-{
-  return Sequence<Iterator>(pbegin, pend);
-}
-
 namespace Container_Helpers
 {
 
