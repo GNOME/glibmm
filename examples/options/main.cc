@@ -25,9 +25,9 @@ public:
   ExampleOptionGroup();
 
 private:
-  bool on_pre_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
-  bool on_post_parse(Glib::OptionContext& context, Glib::OptionGroup& group) override;
-  void on_error(Glib::OptionContext& context, Glib::OptionGroup& group) override;
+  bool on_pre_parse(Glib::OptionContext& context) override;
+  bool on_post_parse(Glib::OptionContext& context) override;
+  void on_error(Glib::OptionContext& context, const Glib::Error& error) override;
 
   bool on_option_arg_string(
     const Glib::ustring& option_name, const Glib::ustring& value, bool has_value);
@@ -108,7 +108,7 @@ ExampleOptionGroup::ExampleOptionGroup()
 }
 
 bool
-ExampleOptionGroup::on_pre_parse(Glib::OptionContext& /* context */, Glib::OptionGroup& /* group */)
+ExampleOptionGroup::on_pre_parse(Glib::OptionContext& /* context */)
 {
   // This is called before the m_arg_* instances are given their values.
   // You do not need to override this method. This is just here to show you how,
@@ -119,7 +119,7 @@ ExampleOptionGroup::on_pre_parse(Glib::OptionContext& /* context */, Glib::Optio
 
 bool
 ExampleOptionGroup::on_post_parse(
-  Glib::OptionContext& /* context */, Glib::OptionGroup& /* group */)
+  Glib::OptionContext& /* context */)
 {
   // This is called after the m_arg_* instances are given their values.
   // You do not need to override this method. This is just here to show you how,
@@ -129,7 +129,7 @@ ExampleOptionGroup::on_post_parse(
 }
 
 void
-ExampleOptionGroup::on_error(Glib::OptionContext& /* context */, Glib::OptionGroup& /* group */)
+ExampleOptionGroup::on_error(Glib::OptionContext& /* context */, const Glib::Error& /* error */)
 {
   std::cout << "on_error called" << std::endl;
 }

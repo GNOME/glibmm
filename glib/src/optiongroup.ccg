@@ -84,7 +84,7 @@ g_callback_pre_parse(
 
   try
   {
-    return option_group->on_pre_parse(cppContext, *option_group);
+    return option_group->on_pre_parse(cppContext);
   }
   catch (Glib::Error& err)
   {
@@ -99,18 +99,25 @@ g_callback_pre_parse(
 
 static void
 g_callback_error(
-  GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** /* TODO error */)
+  GOptionContext* context, GOptionGroup* /* group */, gpointer data, GError** error)
 {
-  // TODO GError** error is input data containing information on an error that
-  // has occurred before this function is called. When API can be broken,
-  // the function prototype of on_error ought to be changed to
-  // void on_error(OptionContext& context, Error& error).
+  // GError** error is input data containing information on an error that
+  // has occurred before this function is called.
 
   OptionContext cppContext(context, false /* take_ownership */);
 
   auto option_group = static_cast<OptionGroup*>(data);
-  if (option_group)
-    return option_group->on_error(cppContext, *option_group);
+  if (option_group && error && *error)
+  {
+    try
+    {
+      Error::throw_exception(g_error_copy(*error));
+    }
+    catch (const Error& err)
+    {
+      return option_group->on_error(cppContext, err);
+    }
+  }
 }
 
 const gchar*
@@ -167,7 +174,7 @@ OptionGroup::post_parse_callback(
 
   try
   {
-    return option_group->on_post_parse(cppContext, *option_group);
+    return option_group->on_post_parse(cppContext);
   }
   catch (Glib::Error& err)
   {
@@ -477,19 +484,19 @@ OptionGroup::add_entry_with_wrapper(const OptionEntry& entry, GOptionArg arg_typ
 }
 
 bool
-OptionGroup::on_pre_parse(OptionContext& /* context */, OptionGroup& /* group */)
+OptionGroup::on_pre_parse(OptionContext& /* context */)
 {
   return true;
 }
 
 bool
-OptionGroup::on_post_parse(OptionContext& /* context */, OptionGroup& /* group */)
+OptionGroup::on_post_parse(OptionContext& /* context */)
 {
   return true;
 }
 
 void
-OptionGroup::on_error(OptionContext& /* context */, OptionGroup& /* group */)
+OptionGroup::on_error(OptionContext& /* context */, const Error& /* error */)
 {
 }
 
