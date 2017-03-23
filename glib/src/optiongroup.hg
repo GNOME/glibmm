@@ -78,8 +78,13 @@ public:
   explicit OptionGroup(GOptionGroup* castitem);
   _IGNORE(g_option_group_new, g_option_group_ref)
 
-  OptionGroup(OptionGroup&& other) noexcept;
-  OptionGroup& operator=(OptionGroup&& other) noexcept;
+  // OptionGroup can't be copied or moved. The underlying GOptionGroup contains
+  // a pointer to the wrapper, set in the call to g_option_group_new().
+  // That pointer can't be changed.
+  OptionGroup(const OptionGroup& other) = delete;
+  OptionGroup& operator=(const OptionGroup& other) = delete;
+  OptionGroup(OptionGroup&& other) = delete;
+  OptionGroup& operator=(OptionGroup&& other) = delete;
 
   virtual ~OptionGroup();
   _IGNORE(g_option_group_free, g_option_group_unref)

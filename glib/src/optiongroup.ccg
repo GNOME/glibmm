@@ -294,26 +294,6 @@ OptionGroup::OptionGroup(GOptionGroup* castitem) : gobject_(castitem)
   // Always takes ownership - never takes copy.
 }
 
-OptionGroup::OptionGroup(OptionGroup&& other) noexcept
-  : map_entries_(std::move(other.map_entries_)),
-    gobject_(std::move(other.gobject_))
-{
-  other.gobject_ = nullptr;
-}
-
-OptionGroup&
-OptionGroup::operator=(OptionGroup&& other) noexcept
-{
-  release_gobject();
-
-  map_entries_ = std::move(other.map_entries_);
-  gobject_ = std::move(other.gobject_);
-
-  other.gobject_ = nullptr;
-
-  return *this;
-}
-
 void
 OptionGroup::release_gobject() noexcept
 {
