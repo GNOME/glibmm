@@ -54,8 +54,9 @@ class GSigConnectionNode;
 
 /* ConstructParams::ConstructParams() takes a varargs list of properties
  * and values, like g_object_new() does.  This list will then be converted
- * to a GParameter array, for use with g_object_newv().  No overhead is
- * involved, since g_object_new() is just a wrapper around g_object_newv()
+ * to an array of parameter names and an array of parameter values,
+ * for use with g_object_new_with_properties().  No overhead is
+ * involved, since g_object_new() is just a wrapper around g_object_new_with_properties()
  * as well.
  *
  * The advantage of an auxiliary ConstructParams object over g_object_new()
@@ -71,7 +72,8 @@ class ConstructParams
 public:
   const Glib::Class& glibmm_class;
   unsigned int n_parameters;
-  GParameter* parameters;
+  const char ** parameter_names;
+  GValue* parameter_values;
 
   explicit ConstructParams(const Glib::Class& glibmm_class_);
   ConstructParams(const Glib::Class& glibmm_class_, const char* first_property_name,

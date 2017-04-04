@@ -53,7 +53,7 @@ namespace Glib
 {
 
 ConstructParams::ConstructParams(const Glib::Class& glibmm_class_)
-: glibmm_class(glibmm_class_), n_parameters(0), parameters(nullptr)
+: glibmm_class(glibmm_class_), n_parameters(0), parameter_names(nullptr), parameter_values(nullptr)
 {
 }
 
@@ -69,7 +69,7 @@ ConstructParams::ConstructParams(const Glib::Class& glibmm_class_)
  */
 ConstructParams::ConstructParams(
   const Glib::Class& glibmm_class_, const char* first_property_name, ...)
-: glibmm_class(glibmm_class_), n_parameters(0), parameters(nullptr)
+: glibmm_class(glibmm_class_), n_parameters(0), parameter_names(nullptr), parameter_values(nullptr)
 {
   va_list var_args;
   va_start(var_args, first_property_name);
@@ -92,23 +92,25 @@ ConstructParams::ConstructParams(
       break;
     }
 
-    if (n_parameters >= n_alloced_params)
-      parameters = g_renew(GParameter, parameters, n_alloced_params += 8);
+    if (n_parameters >= n_alloced_params) {
+      parameter_names = g_renew(const char*, parameter_names, n_alloced_params += 8);
+      parameter_values = g_renew(GValue, parameter_values, n_alloced_params += 8);
+    }
 
-    GParameter& param = parameters[n_parameters];
-
-    param.name = name;
-    param.value.g_type = 0;
+    auto& param_name = parameter_names[n_parameters];
+    auto& param_value = parameter_values[n_parameters];
+    param_name = name;
+    param_value.g_type = 0;
 
     // Fill the GValue with the current vararg, and move on to the next one.
-    g_value_init(&param.value, G_PARAM_SPEC_VALUE_TYPE(pspec));
-    G_VALUE_COLLECT(&param.value, var_args, 0, &collect_error);
+    g_value_init(&param_value, G_PARAM_SPEC_VALUE_TYPE(pspec));
+    G_VALUE_COLLECT(&param_value, var_args, 0, &collect_error);
 
     if (collect_error)
     {
       g_warning("Glib::ConstructParams::ConstructParams(): %s", collect_error);
       g_free(collect_error);
-      g_value_unset(&param.value);
+      g_value_unset(&param_value);
       break;
     }
 
@@ -122,10 +124,13 @@ ConstructParams::ConstructParams(
 
 ConstructParams::~ConstructParams() noexcept
 {
-  while (n_parameters > 0)
-    g_value_unset(&parameters[--n_parameters].value);
+  while (n_parameters > 0) {
+    auto& param_value = parameter_values[--n_parameters];
+    g_value_unset(&param_value);
+  }
 
-  g_free(parameters);
+  g_free(parameter_names);
+  g_free(parameter_values);
 }
 
 /*
@@ -136,15 +141,22 @@ ConstructParams::~ConstructParams() noexcept
 ConstructParams::ConstructParams(const ConstructParams& other)
 : glibmm_class(other.glibmm_class),
   n_parameters(other.n_parameters),
-  parameters(g_new(GParameter, n_parameters))
+  parameter_names(g_new(const char*, n_parameters)),
+  parameter_values(g_new(GValue, n_parameters))
 {
   for (unsigned int i = 0; i < n_parameters; ++i)
   {
-    parameters[i].name = other.parameters[i].name;
-    parameters[i].value.g_type = 0;
+    auto& param_name = parameter_names[i];
+    auto& param_value = parameter_values[i];
 
-    g_value_init(&parameters[i].value, G_VALUE_TYPE(&other.parameters[i].value));
-    g_value_copy(&other.parameters[i].value, &parameters[i].value);
+    auto& other_param_name = other.parameter_names[i];
+    auto& other_param_value = other.parameter_values[i];
+
+    param_name = other_param_name;
+    param_value.g_type = 0;
+
+    g_value_init(&param_value, G_VALUE_TYPE(&other_param_value));
+    g_value_copy(&other_param_value, &param_value);
   }
 }
 
@@ -203,10 +215,10 @@ Object::Object()
     custom_class_init_finished();
   }
 
-  void* const new_object = g_object_newv(object_type, 0, nullptr);
+  GObject* const new_object = g_object_new_with_properties(object_type, 0, nullptr, nullptr);
 
   // Connect the GObject and Glib::Object instances.
-  ObjectBase::initialize(static_cast<GObject*>(new_object));
+  ObjectBase::initialize(new_object);
 }
 
 Object::Object(const Glib::ConstructParams& construct_params)
@@ -230,11 +242,11 @@ Object::Object(const Glib::ConstructParams& construct_params)
   // This works with custom types too, since those inherit the properties of
   // their base class.
 
-  void* const new_object =
-    g_object_newv(object_type, construct_params.n_parameters, construct_params.parameters);
+  GObject* const new_object =
+    g_object_new_with_properties(object_type, construct_params.n_parameters, construct_params.parameter_names, construct_params.parameter_values);
 
   // Connect the GObject and Glib::Object instances.
-  ObjectBase::initialize(static_cast<GObject*>(new_object));
+  ObjectBase::initialize(new_object);
 }
 
 Object::Object(GObject* castitem)
