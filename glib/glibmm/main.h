@@ -870,6 +870,14 @@ protected:
   bool dispatch(sigc::slot_base* slot) override;
 
 private:
+  friend IOChannel;
+
+  // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
+  static Glib::RefPtr<IOSource> create(GIOChannel* channel, IOCondition condition);
+
+  // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
+  IOSource(GIOChannel* channel, IOCondition condition);
+
   PollFD poll_fd_;
 };
 
