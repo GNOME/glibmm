@@ -23,6 +23,10 @@
 #include <giomm/cancellable.h>
 #include <sigc++/sigc++.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+using GSocket = struct _GSocket;
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
 namespace Gio
 {
 class Socket;
@@ -106,10 +110,23 @@ public:
     Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
 
+
 protected:
   SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
     const Glib::RefPtr<Cancellable>& cancellable);
   ~SocketSource() noexcept override;
+
+private:
+  friend Socket;
+
+  // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
+  static Glib::RefPtr<SocketSource> create(GSocket* socket,
+    Glib::IOCondition condition,
+    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+
+  // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
+  SocketSource(GSocket* socket, Glib::IOCondition condition,
+    const Glib::RefPtr<Cancellable>& cancellable);
 };
 
 } // namespace Gio
