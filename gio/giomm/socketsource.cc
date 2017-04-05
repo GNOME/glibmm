@@ -92,10 +92,26 @@ SocketSource::create(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condi
   return Glib::RefPtr<SocketSource>(new SocketSource(socket, condition, cancellable));
 }
 
+// static
+Glib::RefPtr<SocketSource>
+SocketSource::create(GSocket* socket, Glib::IOCondition condition,
+  const Glib::RefPtr<Cancellable>& cancellable)
+{
+  return Glib::RefPtr<SocketSource>(new SocketSource(socket, condition, cancellable));
+}
+
 SocketSource::SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
   const Glib::RefPtr<Cancellable>& cancellable)
 : IOSource(
     g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable)),
+    (GSourceFunc)&giomm_socketsource_callback)
+{
+}
+
+SocketSource::SocketSource(GSocket* socket, Glib::IOCondition condition,
+  const Glib::RefPtr<Cancellable>& cancellable)
+: IOSource(
+    g_socket_create_source(socket, (GIOCondition)condition, Glib::unwrap(cancellable)),
     (GSourceFunc)&giomm_socketsource_callback)
 {
 }

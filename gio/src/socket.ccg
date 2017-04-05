@@ -114,10 +114,7 @@ Socket::send_with_blocking(
 Glib::RefPtr<SocketSource>
 Socket::create_source(Glib::IOCondition condition, const Glib::RefPtr<Cancellable>& cancellable)
 {
-  // The corresponding unreference() takes place in the dtor
-  // of the Glib::RefPtr<Socket> object below.
-  reference();
-  return SocketSource::create(Glib::RefPtr<Socket>(this), condition, cancellable);
+  return SocketSource::create(gobj(), condition, cancellable);
 }
 
 } // namespace Gio
