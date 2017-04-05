@@ -1231,6 +1231,12 @@ IOSource::create(const Glib::RefPtr<IOChannel>& channel, IOCondition condition)
   return Glib::RefPtr<IOSource>(new IOSource(channel, condition));
 }
 
+Glib::RefPtr<IOSource>
+IOSource::create(GIOChannel* channel, IOCondition condition)
+{
+  return Glib::RefPtr<IOSource>(new IOSource(channel, condition));
+}
+
 sigc::connection
 IOSource::connect(const sigc::slot<bool(IOCondition)>& slot)
 {
@@ -1244,6 +1250,12 @@ IOSource::IOSource(PollFD::fd_t fd, IOCondition condition) : poll_fd_(fd, condit
 
 IOSource::IOSource(const Glib::RefPtr<IOChannel>& channel, IOCondition condition)
 : Source(g_io_create_watch(channel->gobj(), (GIOCondition)condition),
+    (GSourceFunc)&glibmm_iosource_callback)
+{
+}
+
+IOSource::IOSource(GIOChannel* channel, IOCondition condition)
+: Source(g_io_create_watch(channel, (GIOCondition)condition),
     (GSourceFunc)&glibmm_iosource_callback)
 {
 }

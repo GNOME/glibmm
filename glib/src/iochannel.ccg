@@ -276,10 +276,7 @@ IOChannel::get_line_term() const
 Glib::RefPtr<IOSource>
 IOChannel::create_watch(IOCondition condition)
 {
-  // The corresponding unreference() takes place in the dtor
-  // of the Glib::RefPtr<IOChannel> object below.
-  reference();
-  return IOSource::create(Glib::RefPtr<IOChannel>(this), condition);
+  return IOSource::create(gobj(), condition);
 }
 
 void
