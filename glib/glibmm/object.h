@@ -86,9 +86,7 @@ public:
   // away the copy, though.  See bug #132300.
   ConstructParams(const ConstructParams& other);
 
-private:
-  // no copy assignment
-  ConstructParams& operator=(const ConstructParams&);
+  ConstructParams& operator=(const ConstructParams&) = delete;
 };
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
