@@ -133,33 +133,6 @@ ConstructParams::~ConstructParams() noexcept
   g_free(parameter_values);
 }
 
-/*
- * Some compilers require the existence of a copy constructor in certain
- * usage contexts.  This implementation is fully functional, but unlikely
- * to be ever actually called due to optimization.
- */
-ConstructParams::ConstructParams(const ConstructParams& other)
-: glibmm_class(other.glibmm_class),
-  n_parameters(other.n_parameters),
-  parameter_names(g_new(const char*, n_parameters)),
-  parameter_values(g_new(GValue, n_parameters))
-{
-  for (unsigned int i = 0; i < n_parameters; ++i)
-  {
-    auto& param_name = parameter_names[i];
-    auto& param_value = parameter_values[i];
-
-    auto& other_param_name = other.parameter_names[i];
-    auto& other_param_value = other.parameter_values[i];
-
-    param_name = other_param_name;
-    param_value.g_type = 0;
-
-    g_value_init(&param_value, G_VALUE_TYPE(&other_param_value));
-    g_value_copy(&other_param_value, &param_value);
-  }
-}
-
 /**** Glib::Object_Class ***************************************************/
 
 const Glib::Class&

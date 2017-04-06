@@ -80,12 +80,7 @@ public:
     ...) G_GNUC_NULL_TERMINATED; // warn if called without a trailing NULL pointer
   ~ConstructParams() noexcept;
 
-  // The copy constructor is semantically required by the C++ compiler
-  // (since g++ 3.4) to be able to create temporary instances, depending
-  // on the usage context.  Apparently the compiler will actually optimize
-  // away the copy, though.  See bug #132300.
-  ConstructParams(const ConstructParams& other);
-
+  ConstructParams(const ConstructParams& other) = delete;
   ConstructParams& operator=(const ConstructParams&) = delete;
 };
 
