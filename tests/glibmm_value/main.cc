@@ -1,29 +1,79 @@
-
 #include <glibmm.h>
+#include <cassert>
 
 struct Foo
 {
-  int bar;
+  int bar = 1;
 };
 
 namespace Gtk
 {
-class Widget;
+
+class Widget {
+};
+
 }
 
 void
 test()
 {
-  // custom copyable
-  Glib::Value<Foo> value_foo;
+  {
+    Foo foo;
 
-  // custom pointer
-  Glib::Value<Foo*> value_foo_pointer;
-  Glib::Value<const Foo*> value_foo_const_pointer;
+    // custom copyable
+    Glib::Value<Foo> value;
+    value.init(Glib::Value<Foo>::value_type()); // TODO: Avoid this step?
+    value.set(foo);
 
-  // Glib::Object pointer
-  Glib::Value<Gtk::Widget*> value_widget_pointer;
-  Glib::Value<const Gtk::Widget*> value_widget_const_pointer;
+    const auto v = value.get();
+    assert(v.bar == 1);
+  }
+
+  {
+    Foo foo;
+
+    // custom pointer
+    Glib::Value<Foo*> value;
+    value.init(Glib::Value<Foo*>::value_type()); // TODO: Avoid this step?
+    value.set(&foo);
+
+    const auto v = value.get();
+    assert(v);
+  }
+
+  {
+    Foo foo;
+
+    Glib::Value<const Foo*> value;
+    value.init(Glib::Value<const Foo*>::value_type()); // TODO: Avoid this step?
+    value.set(&foo);
+
+    const auto v = value.get();
+    assert(v);
+  }
+
+  {
+    Gtk::Widget widget;
+
+    // Glib::Object pointer
+    Glib::Value<Gtk::Widget*> value;
+    value.init(Glib::Value<Gtk::Widget*>::value_type()); // TODO: Avoid this step?
+    value.set(&widget);
+
+    const auto v = value.get();
+    assert(v);
+  }
+
+  {
+    Gtk::Widget widget;
+
+    Glib::Value<const Gtk::Widget*> value;
+    value.init(Glib::Value<const Gtk::Widget*>::value_type()); // TODO: Avoid this step?
+    value.set(&widget);
+
+    const auto v = value.get();
+    assert(v);
+  }
 }
 
 // Glib::Object RefPtr<>
