@@ -12,7 +12,7 @@ class Widget;
 }
 
 void
-some_method()
+test()
 {
   // custom copyable
   Glib::Value<Foo> value_foo;
@@ -33,5 +33,7 @@ some_method()
 //
 
 int main() {
+  test();
+
   return EXIT_SUCCESS;
 }
