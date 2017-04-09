@@ -35,6 +35,7 @@ check_PROGRAMS =				\
 	glibmm_mainloop/test			\
 	glibmm_nodetree/test			\
 	glibmm_object_move/test			\
+	glibmm_objectbase/test			\
 	glibmm_objectbase_move/test			\
 	glibmm_ustring_compose/test		\
 	glibmm_ustring_format/test		\
@@ -102,7 +103,11 @@ glibmm_interface_move_test_CXXFLAGS = $(GLIBMM_INTERFACE_TEST_WXXFLAGS) $(cxxfla
 
 glibmm_mainloop_test_SOURCES             = glibmm_mainloop/main.cc
 glibmm_nodetree_test_SOURCES             = glibmm_nodetree/main.cc
+glibmm_object_test_SOURCES               = glibmm_object/main.cc \
+					   glibmm/object/test_derived_object.h
 glibmm_object_move_test_SOURCES          = glibmm_object_move/main.cc
+glibmm_objectbase_test_SOURCES           = glibmm_objectbase/main.cc \
+					   glibmm/objectbase/test_derived_objectbase.h
 glibmm_objectbase_move_test_SOURCES      = glibmm_objectbase_move/main.cc
 glibmm_ustring_compose_test_SOURCES      = glibmm_ustring_compose/main.cc
 glibmm_ustring_format_test_SOURCES       = glibmm_ustring_format/main.cc
