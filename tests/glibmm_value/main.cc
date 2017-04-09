@@ -1,3 +1,4 @@
+#include "../glibmm_object/test_derived_object.h"
 #include <glibmm.h>
 #include <cassert>
 
@@ -70,6 +71,45 @@ test()
     Glib::Value<const Gtk::Widget*> value;
     value.init(Glib::Value<const Gtk::Widget*>::value_type()); // TODO: Avoid this step?
     value.set(&widget);
+
+    const auto v = value.get();
+    assert(v);
+  }
+
+  Glib::init();
+
+  // RefPtr to Glib::ObjectBase-derived type:
+  {
+    GObject* gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
+    auto derived = Glib::make_refptr_for_instance(new DerivedObject(gobject, 5));
+
+    using ValueType = Glib::Value<Glib::RefPtr<DerivedObject>>;
+    ValueType value;
+    value.init(ValueType::value_type()); // TODO: Avoid this step?
+
+    // Check that value_type() returns the type of the underlying GObjectBase,
+    // not a custom GType for the Glib::RefPtr:
+    assert(ValueType::value_type() == DerivedObject::get_base_type());
+
+    value.set(derived);
+
+    const auto v = value.get();
+    assert(v);
+  }
+
+  {
+    GObject* gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
+    auto derived = Glib::make_refptr_for_instance(new DerivedObject(gobject, 5));
+
+    using ValueType = Glib::Value<Glib::RefPtr<const DerivedObject>>;
+    ValueType value;
+    value.init(ValueType::value_type()); // TODO: Avoid this step?
+
+    // Check that value_type() returns the type of the underlying GObjectBase,
+    // not a custom GType for the Glib::RefPtr:
+    assert(ValueType::value_type() == DerivedObject::get_base_type());
+
+    value.set(derived);
 
     const auto v = value.get();
     assert(v);
