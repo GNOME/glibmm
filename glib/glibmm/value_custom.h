@@ -57,10 +57,11 @@ GType custom_pointer_type_register(const char* type_name);
 /**
  * @ingroup glibmmValue
  */
-template <class T, class PtrT>
+template <class PtrT>
 class Value_Pointer : public ValueBase_Object
 {
 public:
+  using T = std::remove_cv_t<std::remove_pointer_t<PtrT>>;
   using CppType = PtrT;
 
   static inline GType value_type() G_GNUC_CONST;
@@ -120,7 +121,7 @@ private:
  * pointer, you must take care of that yourself.
  */
 template <class T>
-class Value<T*> : public Value_Pointer<T, T*>
+class Value<T*> : public Value_Pointer<T*>
 {
 };
 
@@ -130,36 +131,36 @@ class Value<T*> : public Value_Pointer<T, T*>
  * pointer, you must take care of that yourself.
  */
 template <class T>
-class Value<const T*> : public Value_Pointer<T, const T*>
+class Value<const T*> : public Value_Pointer<const T*>
 {
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-/**** Glib::Value_Pointer<T, PtrT> *****************************************/
+/**** Glib::Value_Pointer<PtrT> *****************************************/
 
 /** Implementation for Glib::Object pointers **/
 
 // static
-template <class T, class PtrT>
+template <class PtrT>
 inline GType
-Value_Pointer<T, PtrT>::value_type_(Glib::Object*)
+Value_Pointer<PtrT>::value_type_(Glib::Object*)
 {
   return T::get_base_type();
 }
 
-template <class T, class PtrT>
+template <class PtrT>
 inline void
-Value_Pointer<T, PtrT>::set_(PtrT data, Glib::Object*)
+Value_Pointer<PtrT>::set_(PtrT data, Glib::Object*)
 {
   set_object(const_cast<T*>(data));
 }
 
 // More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
 #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
-template <class T, class PtrT>
+template <class PtrT>
 inline PtrT
-Value_Pointer<T, PtrT>::get_(Glib::Object*) const
+Value_Pointer<PtrT>::get_(Glib::Object*) const
 {
   return dynamic_cast<T*>(get_object());
 }
@@ -168,9 +169,9 @@ Value_Pointer<T, PtrT>::get_(Glib::Object*) const
 /** Implementation for custom pointers **/
 
 // static
-template <class T, class PtrT>
+template <class PtrT>
 GType
-Value_Pointer<T, PtrT>::value_type_(void*)
+Value_Pointer<PtrT>::value_type_(void*)
 {
   static GType custom_type = 0;
 
@@ -180,16 +181,16 @@ Value_Pointer<T, PtrT>::value_type_(void*)
   return custom_type;
 }
 
-template <class T, class PtrT>
+template <class PtrT>
 inline void
-Value_Pointer<T, PtrT>::set_(PtrT data, void*)
+Value_Pointer<PtrT>::set_(PtrT data, void*)
 {
   gobject_.data[0].v_pointer = const_cast<T*>(data);
 }
 
-template <class T, class PtrT>
+template <class PtrT>
 inline PtrT
-Value_Pointer<T, PtrT>::get_(void*) const
+Value_Pointer<PtrT>::get_(void*) const
 {
   return static_cast<T*>(gobject_.data[0].v_pointer);
 }
@@ -197,25 +198,25 @@ Value_Pointer<T, PtrT>::get_(void*) const
 /** Public forwarding interface **/
 
 // static
-template <class T, class PtrT>
+template <class PtrT>
 inline GType
-Value_Pointer<T, PtrT>::value_type()
+Value_Pointer<PtrT>::value_type()
 {
   // Dispatch to the specific value_type_() overload.
-  return Value_Pointer<T, PtrT>::value_type_(static_cast<T*>(nullptr));
+  return Value_Pointer<PtrT>::value_type_(static_cast<T*>(nullptr));
 }
 
-template <class T, class PtrT>
+template <class PtrT>
 inline void
-Value_Pointer<T, PtrT>::set(PtrT data)
+Value_Pointer<PtrT>::set(PtrT data)
 {
   // Dispatch to the specific set_() overload.
   this->set_(data, static_cast<T*>(nullptr));
 }
 
-template <class T, class PtrT>
+template <class PtrT>
 inline PtrT
-Value_Pointer<T, PtrT>::get() const
+Value_Pointer<PtrT>::get() const
 {
   // Dispatch to the specific get_() overload.
   return this->get_(static_cast<T*>(nullptr));
