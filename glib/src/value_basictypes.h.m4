@@ -34,7 +34,6 @@ class Value<$1> : public ValueBase
 {
 public:
   using CppType = $1;
-  using CType = g$2;
 
   static GType value_type() G_GNUC_CONST;
 

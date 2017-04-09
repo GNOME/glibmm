@@ -140,7 +140,6 @@ protected:
 class ValueBase_Enum : public ValueBase
 {
 public:
-  using CType = gint;
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -161,7 +160,6 @@ protected:
 class ValueBase_Flags : public ValueBase
 {
 public:
-  using CType = guint;
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -182,7 +180,6 @@ protected:
 class ValueBase_String : public ValueBase
 {
 public:
-  using CType = const gchar*;
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -216,12 +213,11 @@ class Value_Boxed : public ValueBase_Boxed
 {
 public:
   using CppType = T;
-  using CType = typename T::BaseObjectType*;
 
   static GType value_type() { return T::get_type(); }
 
   void set(const CppType& data) { set_boxed(data.gobj()); }
-  CppType get() const { return CppType(static_cast<CType>(get_boxed())); }
+  CppType get() const { return CppType(static_cast<typename T::BaseObjectType*>(get_boxed())); }
 };
 
 // More spec-compliant compilers (such as Tru64) need this to be near Glib::Object instead.
@@ -235,7 +231,6 @@ class Value<Glib::RefPtr<T>> : public ValueBase_Object
 {
 public:
   using CppType = Glib::RefPtr<T>;
-  using CType = typename T::BaseObjectType*;
 
   static GType value_type() { return T::get_base_type(); }
 
@@ -254,7 +249,6 @@ class Value<Glib::RefPtr<const T>> : public ValueBase_Object
 {
 public:
   using CppType = Glib::RefPtr<const T>;
-  using CType = typename T::BaseObjectType*;
 
   static GType value_type() { return T::get_base_type(); }
 

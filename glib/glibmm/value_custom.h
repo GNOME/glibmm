@@ -62,7 +62,6 @@ class Value_Pointer : public ValueBase_Object
 {
 public:
   using CppType = PtrT;
-  using CType = void*;
 
   static inline GType value_type() G_GNUC_CONST;
 
@@ -101,7 +100,6 @@ class Value : public ValueBase_Boxed
 {
 public:
   using CppType = T;
-  using CType = T*;
 
   static GType value_type() G_GNUC_CONST;
 
