@@ -78,6 +78,10 @@ test()
 
   Glib::init();
 
+  // TODO: Put this test, of internal stuff, somewhere else.
+  static_assert(Glib::Traits::HasGetBaseType<DerivedObject, GType()>::value,
+    "DerivedObject has no get_base_type().");
+
   // RefPtr to Glib::ObjectBase-derived type:
   {
     GObject* gobject = G_OBJECT(g_object_new(TEST_TYPE_DERIVED, nullptr));
@@ -110,6 +114,29 @@ test()
     assert(ValueType::value_type() == DerivedObject::get_base_type());
 
     value.set(derived);
+
+    const auto v = value.get();
+    assert(v);
+  }
+
+  {
+    auto foo = std::make_shared<Foo>();
+
+    // custom pointer
+    Glib::Value<std::shared_ptr<Foo>> value;
+    value.init(Glib::Value<std::shared_ptr<Foo>>::value_type()); // TODO: Avoid this step?
+    value.set(foo);
+
+    const auto v = value.get();
+    assert(v);
+  }
+
+  {
+    auto foo = std::make_shared<Foo>();
+
+    Glib::Value<std::shared_ptr<const Foo>> value;
+    value.init(Glib::Value<std::shared_ptr<const Foo>>::value_type()); // TODO: Avoid this step?
+    value.set(foo);
 
     const auto v = value.get();
     assert(v);

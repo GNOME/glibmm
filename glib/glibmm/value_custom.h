@@ -96,7 +96,7 @@ private:
  * cannot ensure that no exceptions will be thrown, consider using either
  * a normal pointer or a smart pointer to hold your objects indirectly.
  */
-template <class T>
+template <class T, typename Enable = void>
 class Value : public ValueBase_Boxed
 {
 public:
@@ -120,8 +120,8 @@ private:
  * No attempt is made to manage the memory associated with the
  * pointer, you must take care of that yourself.
  */
-template <class T>
-class Value<T*> : public Value_Pointer<T*>
+template <class T, typename Enable>
+class Value<T*, Enable> : public Value_Pointer<T*>
 {
 };
 
@@ -130,8 +130,8 @@ class Value<T*> : public Value_Pointer<T*>
  * No attempt is made to manage the memory associated with the
  * pointer, you must take care of that yourself.
  */
-template <class T>
-class Value<const T*> : public Value_Pointer<const T*>
+template <class T, typename Enable>
+class Value<const T*, Enable> : public Value_Pointer<const T*>
 {
 };
 
@@ -225,29 +225,29 @@ Value_Pointer<PtrT>::get() const
 /**** Glib::Value<T> *******************************************************/
 
 // Static data, specific to each template instantiation.
-template <class T>
-GType Value<T>::custom_type_ = 0;
+template <class T, typename Enable>
+GType Value<T, Enable>::custom_type_ = 0;
 
-template <class T>
+template <class T, typename Enable>
 inline void
-Value<T>::set(const typename Value<T>::CppType& data)
+Value<T, Enable>::set(const typename Value<T, Enable>::CppType& data)
 {
   // Assume the value is already default-initialized.  See value_init_func().
   *static_cast<T*>(gobject_.data[0].v_pointer) = data;
 }
 
-template <class T>
-inline typename Value<T>::CppType
-Value<T>::get() const
+template <class T, typename Enable>
+inline typename Value<T, Enable>::CppType
+Value<T, Enable>::get() const
 {
   // Assume the pointer is not NULL.  See value_init_func().
   return *static_cast<T*>(gobject_.data[0].v_pointer);
 }
 
 // static
-template <class T>
+template <class T, typename Enable>
 GType
-Value<T>::value_type()
+Value<T, Enable>::value_type()
 {
   if (!custom_type_)
   {
@@ -258,26 +258,26 @@ Value<T>::value_type()
 }
 
 // static
-template <class T>
+template <class T, typename Enable>
 void
-Value<T>::value_init_func(GValue* value)
+Value<T, Enable>::value_init_func(GValue* value)
 {
   // Never store a NULL pointer (unless we're out of memory).
   value->data[0].v_pointer = new (std::nothrow) T();
 }
 
 // static
-template <class T>
+template <class T, typename Enable>
 void
-Value<T>::value_free_func(GValue* value)
+Value<T, Enable>::value_free_func(GValue* value)
 {
   delete static_cast<T*>(value->data[0].v_pointer);
 }
 
 // static
-template <class T>
+template <class T, typename Enable>
 void
-Value<T>::value_copy_func(const GValue* src_value, GValue* dest_value)
+Value<T, Enable>::value_copy_func(const GValue* src_value, GValue* dest_value)
 {
   // Assume the source is not NULL.  See value_init_func().
   const T& source = *static_cast<T*>(src_value->data[0].v_pointer);
