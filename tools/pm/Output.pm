@@ -690,12 +690,12 @@ sub output_wrap_sig_decl($$$$$$$$$$$$$$)
 }
 
 # void output_wrap_enum($filename, $line_num, $cpp_type, $c_type,
-#   $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+#   $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $in_class,
 #   $deprecated, $deprecation_docs, $newin)
-sub output_wrap_enum($$$$$$$$$$$$)
+sub output_wrap_enum($$$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $in_class,
     $deprecated, $deprecation_docs, $newin) = @_;
 
   my $objEnum = GtkDefs::lookup_enum($c_type);
@@ -705,9 +705,11 @@ sub output_wrap_enum($$$$$$$$$$$$)
     return;
   }
 
-  $objEnum->beautify_values();
+  $objEnum->beautify_values(1);
 
-  my $elements = $objEnum->build_element_list($ref_subst_in, $ref_subst_out, "  ");
+  my $indent = "  ";
+  $indent .= "  " if ($in_class);
+  my $elements = $objEnum->build_element_list(1, $ref_subst_in, $ref_subst_out, $indent);
 
   if(!$elements)
   {
@@ -715,37 +717,57 @@ sub output_wrap_enum($$$$$$$$$$$$)
     return;
   }
 
-  my $value_suffix = "Enum";
-  $value_suffix = "Flags" if($$objEnum{flags});
+  # Chop off the name prefix in the documentation.
+  my $name_prefix = $objEnum->get_name_prefix();
+  unshift(@$ref_subst_in, "^$name_prefix");
+  unshift(@$ref_subst_out, "");
 
   # Get the enum documentation from the parsed docs.
+  $indent = " ";
+  $indent .= "  " if ($in_class);
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
-    " ", $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
+    $indent, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
 
   # Merge the passed in comment to the existing enum documentation.
-  $comment .= "\n * " . $enum_docs if $enum_docs ne "";
+  $comment .= "\n$indent* $enum_docs" if $enum_docs ne "";
 
-  my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\')dnl\n",
+  my $value_suffix = "Enum";
+  $value_suffix = "Flags" if ($$objEnum{flags});
+
+  my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',%d,\`%s\',\`%s\')dnl\n",
     $cpp_type,
     $c_type,
     $value_suffix,
     $elements,
     $no_gtype,
+    $in_class,
     $comment,
     $deprecated
   );
-
   $self->append($str);
 }
 
-sub output_wrap_enum_docs_only($$$$$$$$$$$)
+sub output_wrap_enum_docs_only($$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $module_canonical, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin) = @_;
+    $comment, $ref_subst_in, $ref_subst_out, $in_class, $deprecation_docs, $newin) = @_;
 
-  # Get the existing enum description from the parsed docs.
+  my $objEnum = GtkDefs::lookup_enum($c_type);
+  if(!$objEnum)
+  {
+    $self->output_wrap_failed($c_type, "enum defs lookup failed.");
+    return;
+  }
+  # Chop off the name prefix in the documentation.
+  my $name_prefix = $objEnum->get_name_prefix();
+  unshift(@$ref_subst_in, "^$name_prefix");
+  unshift(@$ref_subst_out, "");
+
+  # Get the enum documentation from the parsed docs.
+  my $indent = " ";
+  $indent .= "  " if ($in_class);
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
-    " ", $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
+    $indent, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
 
   if($enum_docs eq "")
   {
@@ -754,10 +776,10 @@ sub output_wrap_enum_docs_only($$$$$$$$$$$)
   }
 
   # Include the enum docs in the module's enum docs group.
-  $enum_docs .= "\n *\n * \@ingroup ${module_canonical}Enums";
+  $enum_docs .= "\n$indent*\n$indent* \@ingroup ${module_canonical}Enums";
 
   # Merge the passed in comment to the existing enum documentation.
-  $comment = "/** " . $comment . "\n * " . $enum_docs . "\n */\n";
+  $comment = "/** " . $comment . "\n$indent* " . $enum_docs . "\n$indent*/\n";
 
   $self->append($comment);
 }
@@ -783,7 +805,7 @@ sub output_wrap_gerror($$$$$$$$$$$$$)
   # Shouldn't happen, and if it does, I'd like to know that.
   warn if($$objEnum{flags});
 
-  $objEnum->beautify_values();
+  $objEnum->beautify_values(0);
 
   # cut off the module prefix, e.g. GDK_
   my $prefix = $domain;
@@ -793,7 +815,7 @@ sub output_wrap_gerror($$$$$$$$$$$$$)
   unshift(@$ref_subst_in, "^${prefix}_");
   unshift(@$ref_subst_out, "");
 
-  my $elements = $objEnum->build_element_list($ref_subst_in, $ref_subst_out, "    ");
+  my $elements = $objEnum->build_element_list(0, $ref_subst_in, $ref_subst_out, "    ");
 
   # Get the enum documentation from the parsed docs.
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "Code",

@@ -1449,11 +1449,6 @@ sub on_wrap_any_enum($$)
     {
       $no_gtype = "NO_GTYPE";
     }
-    elsif ($arg =~ /^(get_type_func=)(\s*)$/)
-    {
-      my $part1 = $1;
-      my $part2 = $2;
-    }
     elsif ($arg =~ /^s#([^#]+)#([^#]*)#$/)
     {
       push(@subst_in,  $1);
@@ -1477,6 +1472,22 @@ sub on_wrap_any_enum($$)
     $argDeprecated, $deprecation_docs, $newin);
 }
 
+# void on_wrap_enum()
+# _WRAP_ENUM(cpp_type, c_type [,NO_GTYPE] [,s#regexpr#subst#]*)
+# Optional arguments:
+# NO_GTYPE Don't generate code for a specialization of the template
+#          Glib::Value_Enum or Glib::Value_Flags.
+#          Necessary, if the C type enum is not registered as a GType.
+# s#regexpr#subst# Zero or more substitutions in names of enum constants, e.g. s#^DATE_##.
+#
+# _WRAP_ENUM can be located either in a class or outside all classes.
+# When located in a class, and Value specialization shall be generated or it's
+# a Flags type (i.e. bitwise operators shall be generated), then the following
+# requirements must be fulfilled:
+# 1. _WRAP_ENUM must be located in the public part of the class.
+# 2. The class must contain a class macro (_CLASS_GENERIC, _CLASS_GOBJECT,
+#    _CLASS_GTKOBJECT, etc.) before _WRAP_ENUM.
+#
 sub on_wrap_enum($)
 {
   my ($self) = @_;
@@ -1491,7 +1502,7 @@ sub on_wrap_enum($)
 
   $$self{objOutputter}->output_wrap_enum(
     $$self{filename}, $$self{line_num}, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $$self{in_class},
     $argDeprecated, $deprecation_docs, $newin);
 }
 
@@ -1513,7 +1524,7 @@ sub on_wrap_enum_docs_only($)
 
   $$self{objOutputter}->output_wrap_enum_docs_only(
     $$self{filename}, $$self{line_num}, $module_canonical, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
+    $comment, $ref_subst_in, $ref_subst_out, $$self{in_class}, $deprecation_docs, $newin);
 }
 
 sub on_wrap_gerror($)

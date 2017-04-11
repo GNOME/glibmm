@@ -26,6 +26,7 @@ our @EXPORT_OK;
 #       string module;
 #       string c_type;
 #
+#       string array elem_short_names;
 #       string array elem_names;
 #       string array elem_values;
 #       string c_prefix;
@@ -147,6 +148,7 @@ sub new
   $$self{flags} = 0;
   $$self{c_prefix} = "";
 
+  $$self{elem_short_names}  = [];
   $$self{elem_names}  = [];
   $$self{elem_values} = [];
 
@@ -173,6 +175,7 @@ sub new
   }
 
   # this should never happen
+  warn if(scalar(@{$$self{elem_short_names}}) != scalar(@{$$self{elem_values}}));
   warn if(scalar(@{$$self{elem_names}}) != scalar(@{$$self{elem_values}}));
 
   return $self;
@@ -182,6 +185,7 @@ sub parse_values($$)
 {
   my ($self, $value) = @_;
 
+  my $elem_short_names  = [];
   my $elem_names  = [];
   my $elem_values = [];
   my $common_prefix = undef;
@@ -189,9 +193,9 @@ sub parse_values($$)
   # and handles triples like '("dq-token", "MY_SCANNER_DQ_TOKEN", "'"'").
   foreach (split_enum_tokens($value))
   {
-    if (/^"\S+" "(\S+)" "(.+)"$/)
+    if (/^"(\S+)" "(\S+)" "(.+)"$/)
     {
-      my ($name, $value) = ($1, $2);
+      my ($nick_name, $name, $value) = ($1, $2, $3);
 
       # detect whether there is module prefix common to all names, e.g. GTK_
       my $prefix = $1 if ($name =~ /^([^_]+_)/);
@@ -205,6 +209,16 @@ sub parse_values($$)
         $common_prefix = "";
       }
 
+      # enum.pl generates nick names from the C names of the enum constants.
+      # A nick name consists of the trailing part of the enum name.
+      # The leading part which is common for each constant of an enum type
+      # has been removed. The remaining part is then tranform to lowercase
+      # and hyphens.
+      # Transform the nick name with lowercase letters and hyphens
+      # back to a short name with uppercase letters and underscores.
+      # The short names are suitable for 'enum class' definitions.
+      $nick_name =~ tr/a-z-/A-Z_/;
+      push(@$elem_short_names, $nick_name);
       push(@$elem_names, $name);
       push(@$elem_values, $value);
     }
@@ -223,17 +237,18 @@ sub parse_values($$)
     $$self{c_prefix}  = $common_prefix;
   }
 
+  $$self{elem_short_names}  = $elem_short_names;
   $$self{elem_names}  = $elem_names;
   $$self{elem_values} = $elem_values;
 }
 
-sub beautify_values($)
+sub beautify_values($$)
 {
-  my ($self) = @_;
+  my ($self, $use_short_names) = @_;
 
   return if($$self{flags});
 
-  my $elem_names  = $$self{elem_names};
+  my $elem_names  = $use_short_names ? $$self{elem_short_names} : $$self{elem_names};
   my $elem_values = $$self{elem_values};
 
   my $num_elements = scalar(@$elem_values);
@@ -277,9 +292,9 @@ sub beautify_values($)
 
 sub build_element_list($$$$)
 {
-  my ($self, $ref_subst_in, $ref_subst_out, $indent) = @_;
+  my ($self, $use_short_names, $ref_subst_in, $ref_subst_out, $indent) = @_;
 
-  my $elem_names  = $$self{elem_names};
+  my $elem_names  = $use_short_names ? $$self{elem_short_names} : $$self{elem_names};
   my $elem_values = $$self{elem_values};
 
   my $num_elements = scalar(@$elem_names);
@@ -305,6 +320,19 @@ sub build_element_list($$$$)
   }
 
   return $elements;
+}
+
+# The name prefix is defined by: $name_prefix . $short_name eq $name
+# I.e. what shall be chopped off the name to get the short name.
+sub get_name_prefix($)
+{
+  my ($self) = @_;
+
+  my $name = ${$$self{elem_names}}[0];
+  my $short_name = ${$$self{elem_short_names}}[0];
+  my $prefix_length = length($name) - length($short_name);
+
+  return substr($name, 0, $prefix_length);
 }
 
 sub dump($)

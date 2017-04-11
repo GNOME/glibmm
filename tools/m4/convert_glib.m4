@@ -1,11 +1,22 @@
 dnl
 dnl Glib C names have prefix 'G' but C++ namespace Glib
 dnl
+# _CONV_GLIB_ENUM(enum_name)
 define(`_CONV_GLIB_ENUM',`dnl
 _CONVERSION(`G$1', `$1', (($1)(__ARG3__)))
 _CONVERSION(`G$1', `Glib::$1', ((Glib::$1)(__ARG3__)))
 _CONVERSION(`$1', `G$1', ((G$1)(__ARG3__)))
 _CONVERSION(`Glib::$1', `G$1', ((G$1)(__ARG3__)))
+')dnl
+
+# _CONV_GLIB_INCLASS_ENUM(class_name, enum_name)
+define(`_CONV_GLIB_INCLASS_ENUM',`dnl
+_CONVERSION(`G$1$2', `$2', (($2)(__ARG3__)))
+_CONVERSION(`G$1$2', `$1::$2', (($1::$2)(__ARG3__)))
+_CONVERSION(`G$1$2', `Glib::$1::$2', ((Glib::$1::$2)(__ARG3__)))
+_CONVERSION(`$2', `G$1$2', ((G$1$2)(__ARG3__)))
+_CONVERSION(`$1::$2', `G$1$2', ((G$1$2)(__ARG3__)))
+_CONVERSION(`Glib::$1::$2', `G$1$2', ((G$1$2)(__ARG3__)))
 ')dnl
 
 _EQUAL(gchar,char)

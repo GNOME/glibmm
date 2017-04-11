@@ -1,5 +1,3 @@
-dnl $Id$
-
 #
 #  Define a hashing for names
 #
@@ -52,11 +50,23 @@ define(`_EQUAL',`define(EV`'__HASH(`$1'),`$2')')
 
 
 define(`__ARG3__',`$`'3')
+
+# _CONV_ENUM(namespace, enum_name)
 define(`_CONV_ENUM',`dnl
 _CONVERSION(`$1$2', `$2', (($2)(__ARG3__)))
 _CONVERSION(`$1$2', `$1::$2', (($1::$2)(__ARG3__)))
 _CONVERSION(`$2', `$1$2', (($1$2)(__ARG3__)))
 _CONVERSION(`$1::$2', `$1$2', (($1$2)(__ARG3__)))
+')dnl
+
+# _CONV_INCLASS_ENUM(namespace, class_name, enum_name)
+define(`_CONV_INCLASS_ENUM',`dnl
+_CONVERSION(`$1$2$3', `$3', (($3)(__ARG3__)))
+_CONVERSION(`$1$2$3', `$2::$3', (($2::$3)(__ARG3__)))
+_CONVERSION(`$1$2$3', `$1::$2::$3', (($1::$2::$3)(__ARG3__)))
+_CONVERSION(`$3', `$1$2$3', (($1$2$3)(__ARG3__)))
+_CONVERSION(`$2::$3', `$1$2$3', (($1$2$3)(__ARG3__)))
+_CONVERSION(`$1::$2::$3', `$1$2$3', (($1$2$3)(__ARG3__)))
 ')dnl
 
 # e.g. Glib::RefPtr<Gdk::Something> to GdkSomething*

@@ -24,6 +24,7 @@ package DocsParser;
 use XML::Parser;
 use strict;
 use warnings;
+use feature 'state';
 
 use Util;
 use Function;
@@ -61,6 +62,9 @@ $DocsParser::currentParam = undef;
 
 $DocsParser::objCurrentFunction = undef; #Function
 %DocsParser::hasharrayFunctions = (); #Function elements
+%DocsParser::type_names = (); # Type names (e.g. enums) with non-standard C-to-C++ translation.
+%DocsParser::enumerator_name_prefixes = (); # Enumerator name prefixes with non-standard C-to-C++ translation.
+%DocsParser::enumerator_names = (); # Enumerator names with non-standard C-to-C++ translation.
 
 $DocsParser::commentStart = "  /** ";
 $DocsParser::commentMiddleStart = "   * ";
@@ -89,7 +93,7 @@ sub read_defs($$$)
     return;
   }
 
-  # C++ overide documentation:
+  # C++ override documentation:
   $DocsParser::CurrentFile = $path . '/' . $filename_override;
 
   # It is not an error if the documentation override file does not exist.
@@ -176,6 +180,21 @@ sub parse_on_start($$%)
   elsif($tag eq "mapping")
   {
     $$DocsParser::objCurrentFunction{mapped_class} = $attr{class};
+  }
+  elsif($tag eq "substitute_type_name")
+  {
+    $DocsParser::type_names{$attr{from}} = $attr{to};
+  }
+  elsif($tag eq "substitute_enumerator_name")
+  {
+    if (exists $attr{from_prefix})
+    {
+      $DocsParser::enumerator_name_prefixes{$attr{from_prefix}} = $attr{to_prefix};
+    }
+    if (exists $attr{from})
+    {
+      $DocsParser::enumerator_names{$attr{from}} = $attr{to};
+    }
   }
   elsif($tag ne "root")
   {
@@ -769,14 +788,12 @@ sub substitute_identifiers($$)
     s/(^|\s)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
     s/(#[A-Z]\w+)::([a-z\d-]+)(\(\))*([^:\w]|$)/my $name = "$1::signal_$2()$4"; $name =~ s"-"_"g; "$name";/ge;
 
-    s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/$1::$2/g; # type names
+    # Type names
+    s/[#%]([A-Z][a-z]*)([A-Z][A-Za-z]+)\b/&DocsParser::substitute_type_name($1, $2)/eg;
 
-    s/[#%]([A-Z])([A-Z]*)_([A-Z\d_]+)\b/$1\L$2\E::$3/g; # enum values
+    # Enumerator names
+    s/[#%]([A-Z]+)_([A-Z\d_]+)\b/&DocsParser::substitute_enumerator_name($1, $2)/eg;
 
-    # Undo wrong substitutions.
-    s/\bHas::/HAS_/g;
-    s/\bNo::/NO_/g;
-    s/\bO::/O_/g;
     s/\bG:://g; #Rename G::Something to Something.
 
     # Substitute callback types to slot types.
@@ -787,6 +804,69 @@ sub substitute_identifiers($$)
   }
 }
 
+sub substitute_type_name($$)
+{
+  my ($module, $name) = @_;
+  my $c_name = $module . $name;
+
+  if (exists $DocsParser::type_names{$c_name})
+  {
+    return $DocsParser::type_names{$c_name};
+  }
+  #print "DocsParser.pm: Assuming the type $c_name shall become " . (($module eq "G") ? "" : "${module}::") . "$name.\n";
+  return $module . "::" . $name;
+}
+
+sub substitute_enumerator_name($$)
+{
+  state $first_call = 1;
+  state @sorted_keys;
+
+  my ($module, $name) = @_;
+  my $c_name = $module . "_" . $name;
+
+  if (exists $DocsParser::enumerator_names{$c_name})
+  {
+    return $DocsParser::enumerator_names{$c_name};
+  }
+
+  if ($first_call)
+  {
+    # Sort only once, on the first call.
+    # "state @sorted_keys = ...;" is not possible. Only a scalar variable
+    # can have a one-time assignment in its defining "state" statement.
+    $first_call = 0;
+    @sorted_keys = reverse sort keys(%DocsParser::enumerator_name_prefixes);
+  }
+
+  # This is a linear search through the keys of %DocsParser::enumerator_name_prefixes.
+  # It's inefficient if %DocsParser::enumerator_name_prefixes contains many values.
+  #
+  # If one key is part of another key (e.g. G_REGEX_MATCH_ and G_REGEX_),
+  # search for a match against the longer key before the shorter key.
+  foreach my $key (@sorted_keys)
+  {
+    if ($c_name =~ m/^$key/)
+    {
+      # $c_name begins with $key. Replace that part of $c_name with the C++ analogue.
+      $c_name =~ s/^$key/$DocsParser::enumerator_name_prefixes{$key}/;
+      return $c_name; # Now it's the C++ name.
+    }
+  }
+
+  # Don't apply the default substitution to these module names.
+  # They are not really modules.
+  if (grep {$module eq $_} qw(HAS NO O SO AF))
+  {
+    return $c_name;
+  }
+
+  my $cxx_name = (($module eq "G") ? "" : (ucfirst(lc($module)) . "::")) . $name;
+
+  print "DocsParser.pm: Assuming the enumerator $c_name shall become $cxx_name.\n";
+
+  return $cxx_name;
+}
 
 sub substitute_function($$)
 {
