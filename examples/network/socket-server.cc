@@ -176,12 +176,12 @@ main(int argc, char* argv[])
 
   loop = Glib::MainLoop::create();
 
-  auto socket_type = use_udp ? Gio::SOCKET_TYPE_DATAGRAM : Gio::SOCKET_TYPE_STREAM;
-  auto socket_family = use_ipv6 ? Gio::SOCKET_FAMILY_IPV6 : Gio::SOCKET_FAMILY_IPV4;
+  auto socket_type = use_udp ? Gio::SocketType::DATAGRAM : Gio::SocketType::STREAM;
+  auto socket_family = use_ipv6 ? Gio::SocketFamily::IPV6 : Gio::SocketFamily::IPV4;
 
   try
   {
-    socket = Gio::Socket::create(socket_family, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
+    socket = Gio::Socket::create(socket_family, socket_type, Gio::SocketProtocol::DEFAULT);
   }
   catch (const Gio::Error& error)
   {
@@ -218,7 +218,7 @@ main(int argc, char* argv[])
 
     std::cout << Glib::ustring::compose("listening on port %1...\n", port);
 
-    ensure_condition(socket, "accept", cancellable, Glib::IO_IN);
+    ensure_condition(socket, "accept", cancellable, Glib::IOCondition::IN);
     try
     {
       new_socket = socket->accept(cancellable);
@@ -257,7 +257,7 @@ main(int argc, char* argv[])
     gchar buffer[4096] = {};
     gssize size;
 
-    ensure_condition(recv_socket, "receive", cancellable, Glib::IO_IN);
+    ensure_condition(recv_socket, "receive", cancellable, Glib::IOCondition::IN);
     try
     {
       if (use_udp)
@@ -289,7 +289,7 @@ main(int argc, char* argv[])
 
     while (to_send > 0)
     {
-      ensure_condition(recv_socket, "send", cancellable, Glib::IO_OUT);
+      ensure_condition(recv_socket, "send", cancellable, Glib::IOCondition::OUT);
       try
       {
         if (use_udp)

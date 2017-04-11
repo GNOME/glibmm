@@ -188,12 +188,12 @@ main(int argc, char* argv[])
 
   loop = Glib::MainLoop::create();
 
-  socket_type = use_udp ? Gio::SOCKET_TYPE_DATAGRAM : Gio::SOCKET_TYPE_STREAM;
-  socket_family = use_ipv6 ? Gio::SOCKET_FAMILY_IPV6 : Gio::SOCKET_FAMILY_IPV4;
+  socket_type = use_udp ? Gio::SocketType::DATAGRAM : Gio::SocketType::STREAM;
+  socket_family = use_ipv6 ? Gio::SocketFamily::IPV6 : Gio::SocketFamily::IPV4;
 
   try
   {
-    socket = Gio::Socket::create(socket_family, socket_type, Gio::SOCKET_PROTOCOL_DEFAULT);
+    socket = Gio::Socket::create(socket_family, socket_type, Gio::SocketProtocol::DEFAULT);
   }
   catch (const Gio::Error& error)
   {
@@ -272,7 +272,7 @@ main(int argc, char* argv[])
     buffer[to_send] = '\0';
     while (to_send > 0)
     {
-      ensure_condition(socket, "send", cancellable, Glib::IO_OUT);
+      ensure_condition(socket, "send", cancellable, Glib::IOCondition::OUT);
       try
       {
         if (use_udp)
@@ -305,7 +305,7 @@ main(int argc, char* argv[])
       to_send -= size;
     }
 
-    ensure_condition(socket, "receive", cancellable, Glib::IO_IN);
+    ensure_condition(socket, "receive", cancellable, Glib::IOCondition::IN);
     try
     {
       if (use_udp)

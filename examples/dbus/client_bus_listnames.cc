@@ -85,7 +85,7 @@ main(int, char**)
   loop = Glib::MainLoop::create();
 
   // Get the user session bus connection.
-  auto connection = Gio::DBus::Connection::get_sync(Gio::DBus::BUS_TYPE_SESSION);
+  auto connection = Gio::DBus::Connection::get_sync(Gio::DBus::BusType::SESSION);
 
   // Check for an unavailable connection.
   if (!connection)

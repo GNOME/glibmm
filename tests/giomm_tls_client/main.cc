@@ -77,7 +77,7 @@ main(int, char**)
             << std::endl;
 
   auto socket = Gio::Socket::create(
-    first_inet_address->get_family(), Gio::SOCKET_TYPE_STREAM, Gio::SOCKET_PROTOCOL_TCP);
+    first_inet_address->get_family(), Gio::SocketType::STREAM, Gio::SocketProtocol::TCP);
 
   auto address = Gio::InetSocketAddress::create(first_inet_address, 443);
 

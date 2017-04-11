@@ -124,7 +124,8 @@ on_server_new_connection(const Glib::RefPtr<Gio::DBus::Connection>& connection)
   std::cout << "Client connected." << std::endl
             << "Peer credentials: " << credentials_str << std::endl
             << "Negotiated capabilities: unix-fd-passing="
-            << (connection->get_capabilities() & Gio::DBus::CAPABILITY_FLAGS_UNIX_FD_PASSING)
+            << ((connection->get_capabilities() & Gio::DBus::CapabilityFlags::UNIX_FD_PASSING)
+               == Gio::DBus::CapabilityFlags::UNIX_FD_PASSING)
             << std::endl;
 
   // If there is already an active connection, do not accept this new one.

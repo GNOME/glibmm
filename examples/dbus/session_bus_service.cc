@@ -157,7 +157,7 @@ main(int, char**)
     return 1;
   }
 
-  const auto id = Gio::DBus::own_name(Gio::DBus::BUS_TYPE_SESSION, "org.glibmm.DBusExample",
+  const auto id = Gio::DBus::own_name(Gio::DBus::BusType::SESSION, "org.glibmm.DBusExample",
     sigc::ptr_fun(&on_bus_acquired), sigc::ptr_fun(&on_name_acquired),
     sigc::ptr_fun(&on_name_lost));
 
