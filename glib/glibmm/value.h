@@ -305,7 +305,7 @@ class Value_Enum : public ValueBase_Enum
 public:
   using CppType = T;
 
-  void set(CppType data) { set_enum(data); }
+  void set(CppType data) { set_enum(static_cast<int>(data)); }
   CppType get() const { return CppType(get_enum()); }
 };
 
@@ -318,7 +318,7 @@ class Value_Flags : public ValueBase_Flags
 public:
   using CppType = T;
 
-  void set(CppType data) { set_flags(data); }
+  void set(CppType data) { set_flags(static_cast<int>(data)); }
   CppType get() const { return CppType(get_flags()); }
 };
 

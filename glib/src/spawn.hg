@@ -50,7 +50,7 @@ using SlotSpawnChildSetup = sigc::slot<void()>;
  * The first string in @a argv is of
  * course the name of the program to execute. By default, the name of
  * the program must be a full path; the PATH shell variable
- * will only be searched if you pass the SPAWN_SEARCH_PATH flag.
+ * will only be searched if you pass the SpawnFlags::SEARCH_PATH flag.
  *
  * On Windows, note that all the string or string vector arguments to
  * this function and the other spawn*() functions are in UTF-8, the
@@ -92,7 +92,7 @@ using SlotSpawnChildSetup = sigc::slot<void()>;
  * the child's environment.
  *
  * @a flags should be the bitwise OR of any flags you want to affect the
- * function's behaviour. The SPAWN_DO_NOT_REAP_CHILD flags means that
+ * function's behaviour. The SpawnFlags::DO_NOT_REAP_CHILD flags means that
  * the child will not automatically be reaped; you must use a
  * ChildWatch source to be notified about the death of the child
  * process. Eventually you must call spawn_close_pid() on the
@@ -106,19 +106,19 @@ using SlotSpawnChildSetup = sigc::slot<void()>;
  * PAWN_LEAVE_DESCRIPTORS_OPEN means that the parent's open file
  * descriptors will be inherited by the child; otherwise all
  * descriptors except stdin/stdout/stderr will be closed before
- * calling exec() in the child. SPAWN_SEARCH_PATH
+ * calling exec() in the child. SpawnFlags::SEARCH_PATH
  * means that argv[0] need not be an absolute path, it
  * will be looked for in the user's PATH.
- * SPAWN_STDOUT_TO_DEV_NULL means that the child's standard output will
+ * SpawnFlags::STDOUT_TO_DEV_NULL means that the child's standard output will
  * be discarded, instead of going to the same location as the parent's
  * standard output. If you use this flag, @a standard_output must be nullptr.
- * SPAWN_STDERR_TO_DEV_NULL means that the child's standard error
+ * SpawnFlags::STDERR_TO_DEV_NULL means that the child's standard error
  * will be discarded, instead of going to the same location as the parent's
  * standard error. If you use this flag, @a standard_error must be nullptr.
- * SPAWN_CHILD_INHERITS_STDIN means that the child will inherit the parent's
+ * SpawnFlags::CHILD_INHERITS_STDIN means that the child will inherit the parent's
  * standard input (by default, the child's standard input is attached to
  * /dev/null). If you use this flag, @a standard_input must be nullptr.
- * G_SPAWN_FILE_AND_ARGV_ZERO means that the first element of @a argv is
+ * SpawnFlags::FILE_AND_ARGV_ZERO means that the first element of @a argv is
  * the file to execute, while the remaining elements are the
  * actual argument vector to pass to the file. Normally
  * spawn_async_with_pipes() uses argv[0] as the file to execute, and
@@ -141,9 +141,9 @@ using SlotSpawnChildSetup = sigc::slot<void()>;
  * If non-nullptr, @a child_pid will on Unix be filled with the child's
  * process ID. You can use the process ID to send signals to the
  * child, or to use child_watch_add() (or waitpid()) if you specified the
- * SPAWN_DO_NOT_REAP_CHILD flag. On Windows, @a child_pid will be
+ * SpawnFlags::DO_NOT_REAP_CHILD flag. On Windows, @a child_pid will be
  * filled with a handle to the child process only if you specified the
- * SPAWN_DO_NOT_REAP_CHILD flag. You can then access the child
+ * SpawnFlags::DO_NOT_REAP_CHILD flag. You can then access the child
  * process using the Win32 API, for example wait for its termination
  * with the WaitFor*() functions, or examine its
  * exit code with GetExitCodeProcess(). You should close the handle
@@ -157,14 +157,14 @@ using SlotSpawnChildSetup = sigc::slot<void()>;
  * pipe won't be created.
  *
  * If @a standard_input is nullptr, the child's standard input is attached to
- * /dev/null unless SPAWN_CHILD_INHERITS_STDIN is set.
+ * /dev/null unless SpawnFlags::CHILD_INHERITS_STDIN is set.
  *
  * If @a standard_error is nullptr, the child's standard error goes to the same
- * location as the parent's standard error unless SPAWN_STDERR_TO_DEV_NULL
+ * location as the parent's standard error unless SpawnFlags::STDERR_TO_DEV_NULL
  * is set.
  *
  * If @a standard_output is nullptr, the child's standard output goes to the same
- * location as the parent's standard output unless SPAWN_STDOUT_TO_DEV_NULL
+ * location as the parent's standard output unless SpawnFlags::STDOUT_TO_DEV_NULL
  * is set.
  *
  * If @a child_pid is not nullptr and an error does not occur then the returned
@@ -195,7 +195,7 @@ using SlotSpawnChildSetup = sigc::slot<void()>;
 void spawn_async_with_pipes(const std::string& working_directory,
                             const std::vector<std::string>& argv,
                             const std::vector<std::string>& envp,
-                            SpawnFlags flags = SPAWN_DEFAULT,
+                            SpawnFlags flags = SpawnFlags::DEFAULT,
                             const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                             Pid* child_pid = nullptr,
                             int* standard_input = nullptr,
@@ -221,7 +221,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
  */
 void spawn_async_with_pipes(const std::string& working_directory,
                             const std::vector<std::string>& argv,
-                            SpawnFlags flags = SPAWN_DEFAULT,
+                            SpawnFlags flags = SpawnFlags::DEFAULT,
                             const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                             Pid* child_pid = nullptr,
                             int* standard_input = nullptr,
@@ -252,7 +252,7 @@ void spawn_async_with_pipes(const std::string& working_directory,
 void spawn_async(const std::string& working_directory,
                  const std::vector<std::string>& argv,
                  const std::vector<std::string>& envp,
-                 SpawnFlags flags = SPAWN_DEFAULT,
+                 SpawnFlags flags = SpawnFlags::DEFAULT,
                  const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                  Pid* child_pid = nullptr);
 
@@ -271,20 +271,20 @@ void spawn_async(const std::string& working_directory,
  */
 void spawn_async(const std::string& working_directory,
                  const std::vector<std::string>& argv,
-                 SpawnFlags flags = SPAWN_DEFAULT,
+                 SpawnFlags flags = SpawnFlags::DEFAULT,
                  const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                  Pid* child_pid = nullptr);
 
 /** Executes a child synchronously (waits for the child to exit before returning).
  * All output from the child is stored in @a standard_output and @a standard_error,
  * if those parameters are non-nullptr. Note that you must set the
- * SPAWN_STDOUT_TO_DEV_NULL and SPAWN_STDERR_TO_DEV_NULL flags when
+ * SpawnFlags::STDOUT_TO_DEV_NULL and SpawnFlags::STDERR_TO_DEV_NULL flags when
  * passing nullptr for @a standard_output and @a standard_error.
  * If @a exit_status is non-nullptr, the exit status of the child is stored
  * there as it would be returned by waitpid(); standard UNIX macros such
  * as WIFEXITED() and WEXITSTATUS() must be used to evaluate the exit status.
  * Note that this function calls waitpid() even if @a exit_status is nullptr, and
- * does not accept the SPAWN_DO_NOT_REAP_CHILD flag.
+ * does not accept the SpawnFlags::DO_NOT_REAP_CHILD flag.
  * If an error occurs, no data is returned in @a standard_output,
  * @a standard_error, or @a exit_status.
  *
@@ -310,7 +310,7 @@ void spawn_async(const std::string& working_directory,
 void spawn_sync(const std::string& working_directory,
                 const std::vector<std::string>& argv,
                 const std::vector<std::string>& envp,
-                SpawnFlags flags = SPAWN_DEFAULT,
+                SpawnFlags flags = SpawnFlags::DEFAULT,
                 const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                 std::string* standard_output = nullptr,
                 std::string* standard_error = nullptr,
@@ -334,7 +334,7 @@ void spawn_sync(const std::string& working_directory,
  */
 void spawn_sync(const std::string& working_directory,
                 const std::vector<std::string>& argv,
-                SpawnFlags flags = SPAWN_DEFAULT,
+                SpawnFlags flags = SpawnFlags::DEFAULT,
                 const SlotSpawnChildSetup& child_setup = SlotSpawnChildSetup(),
                 std::string* standard_output = nullptr,
                 std::string* standard_error = nullptr,
@@ -343,8 +343,8 @@ void spawn_sync(const std::string& working_directory,
 /** A simple version of spawn_async() that parses a command line with
  * shell_parse_argv() and passes it to spawn_async(). It runs a
  * command line in the background. Unlike spawn_async(), the
- * SPAWN_SEARCH_PATH flag is enabled, other flags are not. Note
- * that SPAWN_SEARCH_PATH can have security implications, so
+ * SpawnFlags::SEARCH_PATH flag is enabled, other flags are not. Note
+ * that SpawnFlags::SEARCH_PATH can have security implications, so
  * consider using spawn_async() directly if appropriate.
  *
  * The same concerns on Windows apply as for spawn_command_line_sync().
@@ -362,8 +362,8 @@ void spawn_command_line_async(const std::string& command_line);
 /** A simple version of spawn_sync() with little-used parameters
  * removed, taking a command line instead of an argument vector.  See
  * spawn_sync() for full details. @a command_line will be parsed by
- * shell_parse_argv(). Unlike spawn_sync(), the SPAWN_SEARCH_PATH flag
- * is enabled. Note that SPAWN_SEARCH_PATH can have security
+ * shell_parse_argv(). Unlike spawn_sync(), the SpawnFlags::SEARCH_PATH flag
+ * is enabled. Note that SpawnFlags::SEARCH_PATH can have security
  * implications, so consider using spawn_sync() directly if
  * appropriate.
  *

@@ -222,10 +222,10 @@ DispatchNotifier::DispatchNotifier(const Glib::RefPtr<MainContext>& context)
 
     // The following code is equivalent to
     // context_->signal_io().connect(
-    //   sigc::mem_fun(*this, &DispatchNotifier::pipe_io_handler), fd, Glib::IO_IN);
+    //   sigc::mem_fun(*this, &DispatchNotifier::pipe_io_handler), fd, Glib::IOCondition::IN);
     // except for source->set_can_recurse(true).
 
-    const auto source = IOSource::create(fd, Glib::IO_IN);
+    const auto source = IOSource::create(fd, Glib::IOCondition::IN);
 
     // If the signal emission in pipe_io_handler() starts a new main loop,
     // the event source shall not be blocked while that loop runs. (E.g. while
@@ -404,10 +404,10 @@ DispatchNotifier::pipe_is_empty()
 #ifdef G_OS_WIN32
   return notify_queue_.empty();
 #else
-  PollFD poll_fd(fd_receiver_, Glib::IO_IN);
+  PollFD poll_fd(fd_receiver_, Glib::IOCondition::IN);
   // GPollFD*, number of file descriptors to poll, timeout (ms)
   g_poll(poll_fd.gobj(), 1, 0);
-  return (poll_fd.get_revents() & Glib::IO_IN) == 0;
+  return static_cast<int>(poll_fd.get_revents() & Glib::IOCondition::IN) == 0;
 #endif
 }
 

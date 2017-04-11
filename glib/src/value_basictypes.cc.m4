@@ -48,7 +48,7 @@ $1 Value<$1>::get() const
 GParamSpec* Value<$1>::create_param_spec(const Glib::ustring& name) const
 {
   return create_param_spec(name, Glib::ustring(), Glib::ustring(),
-      Glib::PARAM_READWRITE);
+      Glib::ParamFlags::READWRITE);
 }
 
 GParamSpec* Value<$1>::create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,

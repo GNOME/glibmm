@@ -611,7 +611,7 @@ public:
   bool is_ascii() const;
 
   /*! "Normalize" the %Unicode character representation of the string. */
-  ustring normalize(NormalizeMode mode = NORMALIZE_DEFAULT_COMPOSE) const;
+  ustring normalize(NormalizeMode mode = NormalizeMode::DEFAULT_COMPOSE) const;
 
   //! @}
   //! @name Character case conversion.

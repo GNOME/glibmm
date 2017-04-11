@@ -35,8 +35,8 @@ namespace Glib
 class Source;
 class IOSource;
 
-_WRAP_ENUM(SeekType, GSeekType, NO_GTYPE, s#^SEEK_#SEEK_TYPE_#)
-_WRAP_ENUM(IOStatus, GIOStatus, NO_GTYPE)
+_WRAP_ENUM(SeekType, GSeekType, NO_GTYPE)
+_WRAP_ENUM(IOStatus, GIOStatus, NO_GTYPE, s#^EOF$#ENDOFFILE#)
 _WRAP_ENUM(IOFlags, GIOFlags, NO_GTYPE)
 
 
@@ -203,8 +203,8 @@ public:
 
   /** Reads all the remaining data from the file.
    * @retval str The resulting string.
-   * @return Glib::IO_STATUS_NORMAL on success. This function never
-   *  returns Glib::IO_STATUS_EOF.
+   * @return Glib::IOStatus::NORMAL on success. This function never
+   *  returns Glib::IOStatus::ENDOFFILE.
    * @throw Glib::IOChannelError
    * @throw Glib::ConvertError
    */
@@ -214,7 +214,7 @@ public:
   /** Write a string to the I/O channel.
    * Note that this method does not return the number of characters written.
    * If the channel is blocking and the returned value is
-   * Glib::IO_STATUS_NORMAL, the whole string was written.
+   * Glib::IOStatus::NORMAL, the whole string was written.
    * @param str the string to write.
    * @return The status of the operation.
    * @throw Glib::IOChannelError
@@ -243,14 +243,14 @@ public:
 
   /** Seek the I/O channel to a specific position.
    * @param offset The offset in bytes from the position specified by @a type.
-   * @param type A SeekType. The type Glib::SEEK_TYPE_CUR is only allowed in
+   * @param type A SeekType. The type Glib::SeekType::CUR is only allowed in
    * those cases where a call to set_encoding() is allowed. See the
    * documentation for set_encoding() for details.
    * @return The status of the operation.
    * @throw Glib::IOChannelError
    * @throw Glib::ConvertError
    */
-  _WRAP_METHOD(IOStatus seek(gint64 offset, SeekType type = SEEK_TYPE_SET),
+  _WRAP_METHOD(IOStatus seek(gint64 offset, SeekType type = SeekType::SET),
                g_io_channel_seek_position, errthrow)
 
   /** Flush the buffers of the I/O channel.
@@ -306,10 +306,10 @@ public:
    *
    * A buffered channel can only be set unbuffered if the channel's internal
    * buffers have been flushed. Newly created channels or channels which have
-   * returned Glib::IO_STATUS_EOF not require such a flush. For write-only
+   * returned Glib::IOStatus::ENDOFFILE not require such a flush. For write-only
    * channels, a call to flush() is sufficient. For all other channels, the
    * buffers may be flushed by a call to seek().  This includes the possibility
-   * of seeking with seek type Glib::SEEK_TYPE_CUR and an offset of zero. Note
+   * of seeking with seek type Glib::SeekType::CUR and an offset of zero. Note
    * that this means that socket-based channels cannot be set unbuffered once
    * they have had data read from them.
    *
@@ -362,21 +362,21 @@ public:
    * -# The channel is a file, and the file pointer was just repositioned by a
    *  call to seek_position().  (This flushes all the internal buffers.)
    * -# The current encoding is <tt>""</tt> or UTF-8.
-   * -# One of the read methods has just returned Glib::IO_STATUS_EOF (or, in
-   *  the case of read_to_end(), Glib::IO_STATUS_NORMAL).
-   * -# The read() method has returned Glib::IO_STATUS_AGAIN or thrown
+   * -# One of the read methods has just returned Glib::IOStatus::ENDOFFILE (or, in
+   *  the case of read_to_end(), Glib::IOStatus::NORMAL).
+   * -# The read() method has returned Glib::IOStatus::AGAIN or thrown
    *  a Glib::Error exception.  This may be useful in the case of
    *  ConvertError::ILLEGAL_SEQUENCE.  Returning one of these statuses
    *  from read_line() or read_to_end() does <em>not</em> guarantee that
    *  the encoding can be changed.
    *
    * Channels which do not meet one of the above conditions cannot call
-   * seek_position() with a seek type of Glib::SEEK_TYPE_CUR and, if they
+   * seek_position() with a seek type of Glib::SeekType::CUR and, if they
    * are "seekable", cannot call write() after calling one of the API
    * "read" methods.
    *
    * @param encoding The encoding name, or <tt>""</tt> for binary.
-   * @return Glib::IO_STATUS_NORMAL if the encoding was successfully set.
+   * @return Glib::IOStatus::NORMAL if the encoding was successfully set.
    * @throw Glib::IOChannelError
    */
   IOStatus set_encoding(const std::string& encoding = std::string());

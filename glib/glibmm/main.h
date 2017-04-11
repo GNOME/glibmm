@@ -48,10 +48,10 @@ public:
   void set_fd(fd_t fd) { gobject_.fd = fd; }
   fd_t get_fd() const { return gobject_.fd; }
 
-  void set_events(IOCondition events) { gobject_.events = events; }
+  void set_events(IOCondition events) { gobject_.events = static_cast<decltype(gobject_.events)>(events); }
   IOCondition get_events() const { return static_cast<IOCondition>(gobject_.events); }
 
-  void set_revents(IOCondition revents) { gobject_.revents = revents; }
+  void set_revents(IOCondition revents) { gobject_.revents = static_cast<decltype(gobject_.revents)>(revents); }
   IOCondition get_revents() const { return static_cast<IOCondition>(gobject_.revents); }
 
   GPollFD* gobj() { return &gobject_; }

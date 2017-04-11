@@ -334,7 +334,7 @@ PollFD::PollFD(PollFD::fd_t fd)
 PollFD::PollFD(PollFD::fd_t fd, IOCondition events)
 {
   gobject_.fd = fd;
-  gobject_.events = events;
+  gobject_.events = static_cast<decltype(gobject_.events)>(events);
   gobject_.revents = 0;
 }
 
@@ -1278,7 +1278,7 @@ IOSource::prepare(int& timeout)
 bool
 IOSource::check()
 {
-  return ((poll_fd_.get_revents() & poll_fd_.get_events()) != 0);
+  return static_cast<int>(poll_fd_.get_revents() & poll_fd_.get_events()) != 0;
 }
 
 bool
