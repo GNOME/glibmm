@@ -18,16 +18,6 @@
 #include <gio/gio.h>
 #include <glibmm/value.h>
 
-// There have been issues with other libraries defining HOST_NOT_FOUND (e.g.
-// netdb.h).  As a workaround, we added the alternate name HOST_WAS_NOT_FOUND.
-// Portable code should not use HOST_NOT_FOUND.  Undefining it here (and
-// restoring it below) will allow programs to compile even if they include
-// netdb.h.  See Bug #529496
-#ifdef HOST_NOT_FOUND
-#define GIOMM_SAVED_HOST_NOT_FOUND HOST_NOT_FOUND
-#undef HOST_NOT_FOUND
-#endif // HOST_NOT_FOUND
-
 _DEFS(giomm,gio)
 
 namespace Gio
@@ -36,15 +26,8 @@ namespace Gio
 // BIG_ENDIAN and LITTLE_ENDIAN are defined as preprocessor macros somewhere.
 _WRAP_ENUM(DataStreamByteOrder, GDataStreamByteOrder, NO_GTYPE, s#ENDIAN$#ENDIAN_ORDER#)
 _WRAP_ENUM(DataStreamNewlineType, GDataStreamNewlineType, NO_GTYPE)
-_WRAP_ENUM(ErrorEnum, GIOErrorEnum, NO_GTYPE)
 _WRAP_ENUM(SocketFamily, GSocketFamily)
 _WRAP_ENUM(TlsAuthenticationMode, GTlsAuthenticationMode)
 _WRAP_ENUM(TlsCertificateFlags, GTlsCertificateFlags)
 
 } // namespace Gio
-
-#ifdef GIOMM_SAVED_HOST_NOT_FOUND
-// restore the previously-defined HOST_NOT_FOUND macro
-#define HOST_NOT_FOUND GIOMM_SAVED_HOST_NOT_FOUND
-#undef GIOMM_SAVED_HOST_NOT_FOUND
-#endif // GIOMM_SAVED_HOST_NOT_FOUND
