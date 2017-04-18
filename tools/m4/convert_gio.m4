@@ -78,7 +78,7 @@ _CONV_GIO_ENUM(TlsDatabaseLookupFlags)
 _CONV_GIO_ENUM(TlsInteractionResult)
 _CONV_GIO_INCLASS_ENUM(TlsPassword,Flags)
 _CONV_GIO_ENUM(TlsRehandshakeMode)
-_CONV_GIO_ENUM(UnixSocketAddressType)
+_CONV_GIO_INCLASS_ENUM(UnixSocketAddress,Type)
 _CONV_GIO_ENUM(ZlibCompressorFormat)
 
 # Action

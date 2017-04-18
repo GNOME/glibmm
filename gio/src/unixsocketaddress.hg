@@ -25,8 +25,6 @@ _PINCLUDE(giomm/private/socketaddress_p.h)
 namespace Gio
 {
 
-_WRAP_ENUM(UnixSocketAddressType, GUnixSocketAddressType)
-
 class ByteArray;
 
 /** UnixSocketAddress - UNIX SocketAddress.
@@ -52,12 +50,15 @@ class UnixSocketAddress
   _CLASS_GOBJECT(UnixSocketAddress, GUnixSocketAddress, G_UNIX_SOCKET_ADDRESS, SocketAddress, GSocketAddress)
   _GTKMMPROC_WIN32_NO_WRAP
 
+public:
+  _WRAP_ENUM(Type, GUnixSocketAddressType)
+
 protected:
  _WRAP_CTOR(UnixSocketAddress(const std::string& path), g_unix_socket_address_new)
 
  //TODO: Possibly add when g_unix_socket_address_new_with_type() does not do
  //more than call g_object_new() (maybe file a bug).
- //_WRAP_CTOR(UnixSocketAddress(const std::string& path, int path_len = -1, UnixSocketAddressType type = Gio::UnixSocketAddressType::PATH), g_unix_socket_address_new_with_type)
+ //_WRAP_CTOR(UnixSocketAddress(const std::string& path, int path_len = -1, Type type = Type::PATH), g_unix_socket_address_new_with_type)
 
 public:
  _WRAP_METHOD_DOCS_ONLY(g_unix_socket_address_new)
@@ -66,24 +67,24 @@ public:
  //TODO: Add when the above constructor is included, removing the handwritten
  //create() method for it below.
  //_WRAP_METHOD_DOCS_ONLY(g_unix_socket_address_new_with_type)
- //_WRAP_CREATE(const std::string& path, int path_len = -1, UnixSocketAddressType type = Gio::UnixSocketAddressType::PATH)
+ //_WRAP_CREATE(const std::string& path, int path_len = -1, Type type = Type::PATH)
 
  _WRAP_METHOD_DOCS_ONLY(g_unix_socket_address_new_with_type)
  static Glib::RefPtr<UnixSocketAddress> create(const std::string& path,
-   UnixSocketAddressType type = Gio::UnixSocketAddressType::ABSTRACT,
+   Type type = Type::ABSTRACT,
    int path_len = -1);
 
  // Deprecated.
  _IGNORE(g_unix_socket_address_get_is_abstract)
 
- _WRAP_METHOD(UnixSocketAddressType get_address_type() const, g_unix_socket_address_get_address_type)
+ _WRAP_METHOD(Type get_address_type() const, g_unix_socket_address_get_address_type)
  _WRAP_METHOD(std::string get_path() const, g_unix_socket_address_get_path)
  _IGNORE(g_unix_socket_address_get_path_len)
 
  _WRAP_METHOD(static bool abstract_names_supported(), g_unix_socket_address_abstract_names_supported)
 
   _IGNORE_PROPERTY("abstract")
-  _WRAP_PROPERTY("address-type", UnixSocketAddressType)
+  _WRAP_PROPERTY("address-type", Type)
   _WRAP_PROPERTY("path", std::string)
   _WRAP_PROPERTY("path-as-array", Glib::RefPtr<ByteArray>)
 };
