@@ -176,12 +176,12 @@ main(int argc, char* argv[])
 
   loop = Glib::MainLoop::create();
 
-  auto socket_type = use_udp ? Gio::SocketType::DATAGRAM : Gio::SocketType::STREAM;
+  auto socket_type = use_udp ? Gio::Socket::Type::DATAGRAM : Gio::Socket::Type::STREAM;
   auto socket_family = use_ipv6 ? Gio::SocketFamily::IPV6 : Gio::SocketFamily::IPV4;
 
   try
   {
-    socket = Gio::Socket::create(socket_family, socket_type, Gio::SocketProtocol::DEFAULT);
+    socket = Gio::Socket::create(socket_family, socket_type, Gio::Socket::Protocol::DEFAULT);
   }
   catch (const Gio::Error& error)
   {

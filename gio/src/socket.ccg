@@ -23,10 +23,13 @@
 #include <giomm/socketsource.h>
 #include "slot_async.h"
 
+using Type = Gio::Socket::Type;
+using Protocol = Gio::Socket::Protocol;
+
 namespace Gio
 {
 
-Socket::Socket(SocketFamily family, SocketType type, SocketProtocol protocol,
+Socket::Socket(SocketFamily family, Type type, Protocol protocol,
   const Glib::RefPtr<Cancellable>& cancellable)
 : _CONSTRUCT("family", int(family), "type", int(type), "protocol", int(protocol))
 {
@@ -40,7 +43,7 @@ Socket::Socket(int fd, const Glib::RefPtr<Cancellable>& cancellable) : _CONSTRUC
 
 // static
 Glib::RefPtr<Socket>
-Socket::create(SocketFamily family, SocketType type, SocketProtocol protocol,
+Socket::create(SocketFamily family, Type type, Protocol protocol,
   const Glib::RefPtr<Cancellable>& cancellable)
 {
   return Glib::make_refptr_for_instance<Socket>(new Socket(family, type, protocol, cancellable));

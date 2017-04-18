@@ -31,9 +31,6 @@ namespace Gio
 {
 class SocketSource;
 
-_WRAP_ENUM(SocketType, GSocketType)
-_WRAP_ENUM(SocketProtocol, GSocketProtocol)
-_WRAP_ENUM(SocketMsgFlags, GSocketMsgFlags)
 
 /** @defgroup NetworkIO Portable Network I/O Functionality
  */
@@ -91,8 +88,13 @@ class Socket : public Glib::Object, public Initable
   _CLASS_GOBJECT(Socket, GSocket, G_SOCKET, Glib::Object, GObject)
   _IMPLEMENTS_INTERFACE(Initable)
 
+public:
+  _WRAP_ENUM(Type, GSocketType)
+  _WRAP_ENUM(Protocol, GSocketProtocol)
+  _WRAP_ENUM(MsgFlags, GSocketMsgFlags)
+
 protected:
-  Socket(SocketFamily family, SocketType type, SocketProtocol protocol,
+  Socket(SocketFamily family, Type type, Protocol protocol,
          const Glib::RefPtr<Cancellable>& cancellable);
 
   Socket(int fd, const Glib::RefPtr<Cancellable>& cancellable);
@@ -104,7 +106,7 @@ public:
    * @throw Glib::Error
    */
   static Glib::RefPtr<Socket>
-  create(SocketFamily family, SocketType type, SocketProtocol protocol,
+  create(SocketFamily family, Type type, Protocol protocol,
          const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
 
   // gmmproc thinks that this function should be wrapped in this class because
@@ -278,8 +280,8 @@ public:
   _WRAP_METHOD(int get_fd() const, g_socket_get_fd)
   _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_local_address() const, g_socket_get_local_address, errthrow)
   _WRAP_METHOD(Glib::RefPtr<SocketAddress> get_remote_address() const, g_socket_get_remote_address, errthrow)
-  _WRAP_METHOD(SocketProtocol get_protocol() const, g_socket_get_protocol)
-  _WRAP_METHOD(SocketType get_socket_type() const, g_socket_get_socket_type)
+  _WRAP_METHOD(Protocol get_protocol() const, g_socket_get_protocol)
+  _WRAP_METHOD(Type get_socket_type() const, g_socket_get_socket_type)
   _WRAP_METHOD(bool speaks_ipv4() const, g_socket_speaks_ipv4)
 
   _WRAP_METHOD(Glib::RefPtr<Credentials> get_credentials(), g_socket_get_credentials, errthrow)
@@ -320,9 +322,9 @@ public:
   _WRAP_PROPERTY("local-address", Glib::RefPtr<SocketAddress>)
   _WRAP_PROPERTY("remote-address", Glib::RefPtr<SocketAddress>)
   _WRAP_PROPERTY("timeout", guint)
-  _WRAP_PROPERTY("protocol", SocketProtocol)
+  _WRAP_PROPERTY("protocol", Protocol)
   _WRAP_PROPERTY("broadcast", bool)
-  _WRAP_PROPERTY("type", SocketType)
+  _WRAP_PROPERTY("type", Type)
   _WRAP_PROPERTY("ttl", guint)
   _WRAP_PROPERTY("multicast-loopback", bool)
   _WRAP_PROPERTY("multicast-ttl", guint)
