@@ -28,8 +28,6 @@ namespace Gio
 {
 class SettingsSchema;
 
-  _WRAP_ENUM(SettingsBindFlags, GSettingsBindFlags)
-
 /** A high-level API for application settings
  *
  * The Settings class provides a convenient API for storing and retrieving
@@ -40,6 +38,9 @@ class SettingsSchema;
 class Settings : public Glib::Object
 {
   _CLASS_GOBJECT(Settings, GSettings, G_SETTINGS, Glib::Object, GObject)
+
+public:
+  _WRAP_ENUM(BindFlags, GSettingsBindFlags)
 
 protected:
   _WRAP_CTOR(Settings(const Glib::ustring& schema_id), g_settings_new)
@@ -181,8 +182,8 @@ public:
   _IGNORE(g_settings_range_check)
 
 #m4 _CONVERSION(`Glib::ObjectBase*',`gpointer',(gpointer)$3->gobj())
-  _WRAP_METHOD(void bind(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, SettingsBindFlags flags = SettingsBindFlags::DEFAULT), g_settings_bind)
-  void bind(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, SettingsBindFlags flags = SettingsBindFlags::DEFAULT);
+  _WRAP_METHOD(void bind(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, BindFlags flags = BindFlags::DEFAULT), g_settings_bind)
+  void bind(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, BindFlags flags = BindFlags::DEFAULT);
   // TODO: implement bind_with_mapping
   _WRAP_METHOD(void bind_writable(const Glib::ustring& key, Glib::ObjectBase* object, const Glib::ustring& property, bool inverted=false), g_settings_bind_writable)
   void bind_writable(const Glib::ustring& key, const Glib::PropertyProxy_Base& property_proxy, bool inverted=false);
