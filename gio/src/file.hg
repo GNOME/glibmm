@@ -45,10 +45,7 @@ class Mount;
 class Volume;
 
 _WRAP_ENUM(FileQueryInfoFlags, GFileQueryInfoFlags, NO_GTYPE)
-_WRAP_ENUM(FileCreateFlags, GFileCreateFlags, NO_GTYPE)
-_WRAP_ENUM(FileCopyFlags, GFileCopyFlags, NO_GTYPE)
 _WRAP_ENUM(FileMonitorFlags, GFileMonitorFlags, NO_GTYPE)
-_WRAP_ENUM(FileMeasureFlags, GFileMeasureFlags, NO_GTYPE)
 
 
 /** File and directory handling.
@@ -80,6 +77,9 @@ class File : public Glib::Interface
   _CLASS_INTERFACE(File, GFile, G_FILE, GFileIface)
 
 public:
+  _WRAP_ENUM(CreateFlags, GFileCreateFlags, NO_GTYPE)
+  _WRAP_ENUM(CopyFlags, GFileCopyFlags, NO_GTYPE)
+  _WRAP_ENUM(MeasureFlags, GFileMeasureFlags, NO_GTYPE)
 
   _IGNORE(g_file_icon_new) //g_file_icon_new is not a GFile method.
 
@@ -222,7 +222,7 @@ public:
    * the file doesn't already exist it is created.
    *
    * By default files created are generally readable by everyone,
-   * but if you pass FileCreateFlags::PRIVATE in @a flags the file
+   * but if you pass CreateFlags::PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
    *
@@ -235,17 +235,17 @@ public:
    * If the file is a directory a Gio::Error with IS_DIRECTORY will be
    * thrown. Other errors are possible too, and depend on what kind of
    * filesystem the file is on.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param cancellable Optional Cancellable object.
    * @return A FileOutputStream.
    */
-  Glib::RefPtr<FileOutputStream> append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileOutputStream> append_to(const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags = CreateFlags::NONE);
 
   /** Gets an output stream for appending data to the file. If
    * the file doesn't already exist it is created.
    *
    * By default files created are generally readable by everyone,
-   * but if you pass FileCreateFlags::PRIVATE in @a flags the file
+   * but if you pass CreateFlags::PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
    *
@@ -254,10 +254,10 @@ public:
    * If the file is a directory a Gio::Error with IS_DIRECTORY will be
    * thrown. Other errors are possible too, and depend on what kind of
    * filesystem the file is on.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @return A FileOutputStream.
    */
-  Glib::RefPtr<FileOutputStream> append_to(FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileOutputStream> append_to(CreateFlags flags = CreateFlags::NONE);
   _IGNORE(g_file_append_to)
 
   //We renamed this to create_file from (g_file_create() and g_file_create_readwrite), to avoid confusion with static create() methods,
@@ -267,7 +267,7 @@ public:
    * The file must not already exist.
    *
    * By default files created are generally readable by everyone,
-   * but if you pass FileCreateFlags::PRIVATE in @a flags the file
+   * but if you pass CreateFlags::PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
    *
@@ -285,16 +285,16 @@ public:
    * filesystem the file is on.
    *
    * @param cancellable A Cancellable object which can be used to cancel the operation.
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @return A FileOutputStream for the newly created file.
    */
-  Glib::RefPtr<FileOutputStream> create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileOutputStream> create_file(const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags = CreateFlags::NONE);
 
   /** Creates a new file and returns an output stream for writing to it.
    * The file must not already exist.
    *
    * By default files created are generally readable by everyone,
-   * but if you pass FileCreateFlags::PRIVATE in @a flags the file
+   * but if you pass CreateFlags::PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
    *
@@ -308,17 +308,17 @@ public:
    * Other errors are possible too, and depend on what kind of
    * filesystem the file is on.
    *
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @return A FileOutputStream for the newly created file.
    */
-  Glib::RefPtr<FileOutputStream> create_file(FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileOutputStream> create_file(CreateFlags flags = CreateFlags::NONE);
   _IGNORE(g_file_create)
 
   /** Creates a new file and returns a stream for reading and writing to it.
    * The file must not already exist.
    *
    * By default files created are generally readable by everyone,
-   * but if you pass FileCreateFlags::PRIVATE in @a flags the file
+   * but if you pass CreateFlags::PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
    *
@@ -340,16 +340,16 @@ public:
    * rather than just opening for reading or writing.
    *
    * @param cancellable A Cancellable object which can be used to cancel the operation.
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @return A FileOutputStream for the newly created file.
    */
-  Glib::RefPtr<FileIOStream> create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileIOStream> create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags = CreateFlags::NONE);
 
   /** Creates a new file and returns a stream for reading and writing to it.
    * The file must not already exist.
    *
    * By default files created are generally readable by everyone,
-   * but if you pass FileCreateFlags::PRIVATE in @a flags the file
+   * but if you pass CreateFlags::PRIVATE in @a flags the file
    * will be made readable only to the current user, to the level that
    * is supported on the target filesystem.
    *
@@ -367,10 +367,10 @@ public:
    * supported, so make sure you really need to do read and write streaming,
    * rather than just opening for reading or writing.
    *
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @return A FileOutputStream for the newly created file.
    */
-  Glib::RefPtr<FileIOStream> create_file_readwrite(FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileIOStream> create_file_readwrite(CreateFlags flags = CreateFlags::NONE);
   _IGNORE(g_file_create_readwrite)
 
 
@@ -380,7 +380,7 @@ public:
    * not affect an already existing copy of the file. For instance, for local files it may write to a
    * temporary file and then atomically rename over the destination when the stream is closed.
    *
-   * By default files created are generally readable by everyone, but if you pass FileCreateFlags::PRIVATE in
+   * By default files created are generally readable by everyone, but if you pass CreateFlags::PRIVATE in
    * @a flags the file will be made readable only to the current user, to the level that is supported on the
    * target filesystem.
    *
@@ -406,10 +406,10 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @return A FileOutputStream.
    */
-  Glib::RefPtr<FileOutputStream> replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileOutputStream> replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
 
   /** Returns an output stream for overwriting the file, possibly creating a backup copy of the file first.
@@ -417,7 +417,7 @@ public:
    * not affect an already existing copy of the file. For instance, for local files it may write to a
    * temporary file and then atomically rename over the destination when the stream is closed.
    *
-   * By default files created are generally readable by everyone, but if you pass FileCreateFlags::PRIVATE in
+   * By default files created are generally readable by everyone, but if you pass CreateFlags::PRIVATE in
    * @a flags the file will be made readable only to the current user, to the level that is supported on the
    * target filesystem.
    *
@@ -439,10 +439,10 @@ public:
    *
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @return A FileOutputStream.
    */
-  Glib::RefPtr<FileOutputStream> replace(const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileOutputStream> replace(const std::string& etag = std::string(), bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
   _IGNORE(g_file_replace)
 
@@ -453,20 +453,20 @@ public:
    * When the operation is finished, @a slot will be called. You can then call append_to_finish() to get the result of the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    */
-  void append_to_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void append_to_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Asynchronously opens the file for appending.
    * For more details, see append_to() which is the synchronous version of this call.
    *
    * When the operation is finished, @a slot will be called. You can then call append_to_finish() to get the result of the operation.
    * @param slot A callback slot which will be called when the request is satisfied.
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    */
-  void append_to_async(const SlotAsyncReady& slot, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void append_to_async(const SlotAsyncReady& slot, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_append_to_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> append_to_finish(const Glib::RefPtr<AsyncResult>& res),
@@ -483,10 +483,10 @@ public:
    *
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    */
-  void create_file_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void create_file_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Asynchronously creates a new file and returns an output stream for writing to it. The file must not already exist.
    * For more details, see create_file() which is the synchronous version of this call.
@@ -494,10 +494,10 @@ public:
    * When the operation is finished, @a slot will be called. You can then call create_file_finish() to get the result of the operation.
    *
    * @param slot A callback slot which will be called when the request is satisfied.
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    */
-  void create_file_async(const SlotAsyncReady& slot, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void create_file_async(const SlotAsyncReady& slot, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_create_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> create_file_finish(const Glib::RefPtr<AsyncResult>& res),
@@ -514,12 +514,12 @@ public:
    *
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param cancellable A Cancellable object which can be used to cancel the operation.
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    *
    * @newin{2,24}
    */
-  void create_file_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void create_file_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Asynchronously creates a new file and returns a stream for reading and
    * writing to it. The file must not already exist.
@@ -529,12 +529,12 @@ public:
    * When the operation is finished, @a slot will be called. You can then call create_file_readwrite_finish() to get the result of the operation.
    *
    * @param slot A callback slot which will be called when the request is satisfied.
-   * @param flags a set of FileCreateFlags.
+   * @param flags a set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    *
    * @newin{2,24}
    */
-  void create_file_readwrite_async(const SlotAsyncReady& slot, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void create_file_readwrite_async(const SlotAsyncReady& slot, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_create_readwrite_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileIOStream> create_file_readwrite_finish(const Glib::RefPtr<AsyncResult>& res),
@@ -549,10 +549,10 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param etag An entity tag for the current Gio::File.
    * @param make_backup true if a backup of the existing file should be made.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    */
-  void replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Asyncronously overwrites the file, replacing the contents, possibly creating a backup copy of the file first.
    * For more details, see replace() which is the synchronous version of this call.
@@ -561,10 +561,10 @@ public:
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param etag An entity tag for the current Gio::File.
    * @param make_backup true if a backup of the existing file should be made.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    */
-  void replace_async(const SlotAsyncReady& slot, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void replace_async(const SlotAsyncReady& slot, const std::string& etag = std::string(), bool make_backup = false, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_replace_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileOutputStream> replace_finish(const Glib::RefPtr<AsyncResult>& res),
@@ -634,12 +634,12 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @return A FileOutputStream.
    *
    * @newin{2,24}
    */
-  Glib::RefPtr<FileIOStream> replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileIOStream> replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
 
   /** Returns an output stream for overwriting the file in readwrite mode, possibly creating a backup copy of the file first.
@@ -654,12 +654,12 @@ public:
    *
    * @param etag An optional entity tag for the current Glib::File.
    * @param make_backup <tt>true</tt> if a backup should be created.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @return A FileOutputStream.
    *
    * @newin{2,24}
    */
-  Glib::RefPtr<FileIOStream> replace_readwrite(const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  Glib::RefPtr<FileIOStream> replace_readwrite(const std::string& etag = std::string(), bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
   _IGNORE(g_file_replace_readwrite)
 
@@ -674,12 +674,12 @@ public:
    * @param cancellable A Cancellable object which can be used to cancel the operation.
    * @param etag An entity tag for the current Gio::File.
    * @param make_backup true if a backup of the existing file should be made.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    *
    * @newin{2,24}
    */
-  void replace_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void replace_readwrite_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag = std::string(), bool make_backup = false, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Asyncronously overwrites the file in read-write mode, replacing the contents, possibly creating a backup copy of the file first.
    *
@@ -689,12 +689,12 @@ public:
    * @param slot A callback slot which will be called when the request is satisfied.
    * @param etag An entity tag for the current Gio::File.
    * @param make_backup true if a backup of the existing file should be made.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param io_priority The I/O priority of the request.
    *
    * @newin{2,24}
    */
-  void replace_readwrite_async(const SlotAsyncReady& slot, const std::string& etag = std::string(), bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void replace_readwrite_async(const SlotAsyncReady& slot, const std::string& etag = std::string(), bool make_backup = false, CreateFlags flags = CreateFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_replace_readwrite_async)
 
   _WRAP_METHOD(Glib::RefPtr<FileIOStream> replace_readwrite_finish(const Glib::RefPtr<AsyncResult>& res),
@@ -1121,8 +1121,8 @@ public:
   using SlotFileProgress = sigc::slot<void(goffset, goffset)>;
 
   /** Copies the file source to the location specified by destination. Can not handle recursive copies of directories.
-   * If the flag FileCopyFlags::OVERWRITE is specified an already existing destination file is overwritten.
-   * If the flag FileCopyFlags::NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
+   * If the flag CopyFlags::OVERWRITE is specified an already existing destination file is overwritten.
+   * If the flag CopyFlags::NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
    *
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
@@ -1130,55 +1130,55 @@ public:
    *
    * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
    *
-   * If FileCopyFlags::OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
+   * If CopyFlags::OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    *
    * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown.
    * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    *
-   * If the source is a directory and the target does not exist, or FileCopyFlags::OVERWRITE is specified and the target is a file,
+   * If the source is a directory and the target does not exist, or CopyFlags::OVERWRITE is specified and the target is a file,
    * then a Gio::Error with WOULD_RECURSE will be thrown.
    *
    * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
    */
-  bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FileCopyFlags::NONE);
+  bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags = CopyFlags::NONE);
 
   /** Copies the file source to the location specified by destination. Can not handle recursive copies of directories.
-   * If the flag FileCopyFlags::OVERWRITE is specified an already existing destination file is overwritten.
-   * If the flag FileCopyFlags::NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
+   * If the flag CopyFlags::OVERWRITE is specified an already existing destination file is overwritten.
+   * If the flag CopyFlags::NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
    *
    * The operation can be monitored via the @a slot callback.
    *
    * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
    *
-   * If FileCopyFlags::OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
+   * If CopyFlags::OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    *
    * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown.
    * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    *
-   * If the source is a directory and the target does not exist, or FileCopyFlags::OVERWRITE is specified and the target is a file,
+   * If the source is a directory and the target does not exist, or CopyFlags::OVERWRITE is specified and the target is a file,
    * then a Gio::Error with WOULD_RECURSE will be thrown.
    *
    * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
    */
-  bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags = FileCopyFlags::NONE);
+  bool copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, CopyFlags flags = CopyFlags::NONE);
 
   /** Copies the file source to the location specified by destination. Can not handle recursive copies of directories.
-   * If the flag FileCopyFlags::OVERWRITE is specified an already existing destination file is overwritten.
-   * If the flag FileCopyFlags::NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
+   * If the flag CopyFlags::OVERWRITE is specified an already existing destination file is overwritten.
+   * If the flag CopyFlags::NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
    *
    * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
    *
-   * If FileCopyFlags::OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
+   * If CopyFlags::OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    *
    * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown.
    * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    *
-   * If the source is a directory and the target does not exist, or FileCopyFlags::OVERWRITE is specified and the target is a file,
+   * If the source is a directory and the target does not exist, or CopyFlags::OVERWRITE is specified and the target is a file,
    * then a Gio::Error with WOULD_RECURSE will be thrown.
    *
    * If you are interested in copying the Gio::File object itself (not the on-disk file), see File::dup().
    */
-  bool copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FileCopyFlags::NONE);
+  bool copy(const Glib::RefPtr<File>& destination, CopyFlags flags = CopyFlags::NONE);
   _IGNORE(g_file_copy)
 
   /** Copies the file to the location specified by @a destination asynchronously.
@@ -1195,10 +1195,10 @@ public:
    * @param slot_progress The callback slot to be called with progress information
    * @param slot_ready A SlotAsyncReady to call when the request is satisfied
    * @param cancellable A Cancellable object which can be used to cancel the operation
-   * @param flags Set of FileCopyFlags
+   * @param flags Set of CopyFlags
    * @param io_priority The I/O priority of the request
    */
-  void copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress, const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FileCopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress, const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags = CopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Copies the file to the location specified by @a destination asynchronously.
    * For details of the behaviour, see copy().
@@ -1209,10 +1209,10 @@ public:
    * @param destination Destination File
    * @param slot_ready A SlotAsyncReady to call when the request is satisfied
    * @param cancellable A Cancellable object which can be used to cancel the operation
-   * @param flags Set of FileCopyFlags
+   * @param flags Set of CopyFlags
    * @param io_priority The I/O priority of the request
    */
-  void copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FileCopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags = CopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Copies the file to the location specified by @a destination asynchronously.
    * For details of the behaviour, see copy().
@@ -1227,10 +1227,10 @@ public:
    * @param destination Destination File
    * @param slot_progress The callback slot to be called with progress information
    * @param slot_ready A SlotAsyncReady to call when the request is satisfied
-   * @param flags Set of FileCopyFlags
+   * @param flags Set of CopyFlags
    * @param io_priority The I/O priority of the request
    */
-  void copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress, const SlotAsyncReady& slot_ready, FileCopyFlags flags = FileCopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress, const SlotAsyncReady& slot_ready, CopyFlags flags = CopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Copies the file to the location specified by @a destination asynchronously.
    * For details of the behaviour, see copy().
@@ -1240,10 +1240,10 @@ public:
    *
    * @param destination Destination File
    * @param slot_ready A SlotAsyncReady to call when the request is satisfied
-   * @param flags Set of FileCopyFlags
+   * @param flags Set of CopyFlags
    * @param io_priority The I/O priority of the request
    */
-  void copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& slot_ready, FileCopyFlags flags = FileCopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& slot_ready, CopyFlags flags = CopyFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_copy_async)
 
   _WRAP_METHOD(bool copy_finish(const Glib::RefPtr<AsyncResult>& res),
@@ -1254,27 +1254,27 @@ public:
    * used, otherwise a copy and delete fallback is used. The native implementation may support moving directories (for instance on moves inside
    * the same filesystem), but the fallback code does not.
    *
-   * If the flag FileCopyFlags::OVERWRITE is specified an already existing destination file is overwritten.
+   * If the flag CopyFlags::OVERWRITE is specified an already existing destination file is overwritten.
    *
-   * If the flag FileCopyFlags::NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
+   * If the flag CopyFlags::NOFOLLOW_SYMLINKS is specified then symlinks will be copied as symlinks, otherwise the target of the source symlink will be copied.
    *
    * The operation can be cancelled by triggering the cancellable object from another thread. If the operation was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
    * The operation can be monitored via the @a slot callback.
    * If the source file does not exist then a Gio::Error with NOT_FOUND will be thrown, independent on the status of the destination.
    *
-   * If G_FileCopyFlags::OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
+   * If G_CopyFlags::OVERWRITE is not specified and the target exists, then a Gio::Error with EXISTS will be thrown.
    *
    * If trying to overwrite a file over a directory a Gio::Error with IS_DIRECTORY will be thrown.
    * If trying to overwrite a directory with a directory a Gio::Error with WOULD_MERGE will be thrown.
    *
-   * If the source is a directory and the target does not exist, or FileCopyFlags::OVERWRITE is specified and the target is a file, then a Gio::Error with WOULD_RECURSE may be thrown (if the native move operation isn't available).
+   * If the source is a directory and the target does not exist, or CopyFlags::OVERWRITE is specified and the target is a file, then a Gio::Error with WOULD_RECURSE may be thrown (if the native move operation isn't available).
    */
-  bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FileCopyFlags::NONE);
+  bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags = CopyFlags::NONE);
 
-  bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags = FileCopyFlags::NONE);
+  bool move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, CopyFlags flags = CopyFlags::NONE);
 
-  bool move(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FileCopyFlags::NONE);
+  bool move(const Glib::RefPtr<File>& destination, CopyFlags flags = CopyFlags::NONE);
   _IGNORE(g_file_move)
 
   _WRAP_METHOD(bool make_directory(const Glib::RefPtr<Cancellable>& cancellable{?}),
@@ -1665,7 +1665,7 @@ public:
    * Normally only a subset of the file attributes are copied,
    * those that are copies in a normal file copy operation
    * (which for instance does not include e.g. mtime). However
-   * if FileCopyFlags::ALL_METADATA is specified in @a flags, then
+   * if CopyFlags::ALL_METADATA is specified in @a flags, then
    * all the metadata that is possible to copy is copied.
    *
    * @param destination A File to copy attributes to.
@@ -1673,21 +1673,21 @@ public:
    * @param flags A set of FileMonitorFlags.
    * @result true if the attributes were copied successfully, false otherwise.
    */
-  bool copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags = FileCopyFlags::NONE);
+  bool copy_attributes(const Glib::RefPtr<File>& destination, const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags = CopyFlags::NONE);
 
   /** Copies the file attributes from @a source to @a destination.
    *
    * Normally only a subset of the file attributes are copied,
    * those that are copies in a normal file copy operation
    * (which for instance does not include e.g. mtime). However
-   * if FileCopyFlags::ALL_METADATA is specified in @a flags, then
+   * if CopyFlags::ALL_METADATA is specified in @a flags, then
    * all the metadata that is possible to copy is copied.
    *
    * @param destination A File to copy attributes to.
    * @param flags A set of FileMonitorFlags.
    * @result true if the attributes were copied successfully, false otherwise.
    */
-  bool copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags = FileCopyFlags::NONE);
+  bool copy_attributes(const Glib::RefPtr<File>& destination, CopyFlags flags = CopyFlags::NONE);
   _IGNORE(g_file_copy_attributes)
 
   /** Obtains a directory monitor for the given file.
@@ -1833,9 +1833,9 @@ public:
    * @param disk_usage The number of bytes of disk space used.
    * @param num_dirs The number of directories encountered.
    * @param num_files The number of non-directories encountered.
-   * @param flags Set of FileMeasureFlags.
+   * @param flags Set of MeasureFlags.
    */
-  void measure_disk_usage(const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot_progress, guint64& disk_usage, guint64& num_dirs, guint64& num_files, FileMeasureFlags flags = FileMeasureFlags::NONE);
+  void measure_disk_usage(const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot_progress, guint64& disk_usage, guint64& num_dirs, guint64& num_files, MeasureFlags flags = MeasureFlags::NONE);
   _IGNORE(g_file_measure_disk_usage)
 
   /** Recursively measures the disk usage of the file.
@@ -1849,10 +1849,10 @@ public:
    * @param slot_ready A SlotAsyncReady to call when the request is satisfied
    * @param cancellable A Cancellable object which can be used to cancel the operation
    * @param slot_progress The callback slot to be called with progress information
-   * @param flags Set of FileMeasureFlags
+   * @param flags Set of MeasureFlags
    * @param io_priority The I/O priority of the request
    */
-  void measure_disk_usage_async(const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot_progress, FileMeasureFlags flags = FileMeasureFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void measure_disk_usage_async(const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot_progress, MeasureFlags flags = MeasureFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_file_measure_disk_usage_async)
 
   _WRAP_METHOD(bool measure_disk_usage_finish(const Glib::RefPtr<AsyncResult>& result, guint64& disk_usage, guint64& num_dirs, guint64& num_files), g_file_measure_disk_usage_finish, errthrow)
@@ -2172,12 +2172,12 @@ public:
    * @param etag The old entity tag
    * for the document.
    * @param make_backup <tt>true</tt> if a backup should be created.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param new_etag A location to a new entity tag
    * for the document.
    * @param cancellable A Cancellable object.
    */
-  void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
   /** Replaces the contents of the file with @a contents of @a length bytes.
    *
@@ -2193,11 +2193,11 @@ public:
    * @param etag The old entity tag
    * for the document.
    * @param make_backup <tt>true</tt> if a backup should be created.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param new_etag A location to a new entity tag
    * for the document.
    */
-  void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents(const char* contents, gsize length, const std::string& etag, std::string& new_etag, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
   /** Replaces the contents of the file with @a contents.
    *
@@ -2216,12 +2216,12 @@ public:
    * @param etag The old entity tag
    * for the document.
    * @param make_backup <tt>true</tt> if a backup should be created.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param new_etag A location to a new entity tag
    * for the document.
    * @param cancellable A Cancellable object.
    */
-  void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
   /** Replaces the contents of the file with @a contents.
    *
@@ -2236,11 +2236,11 @@ public:
    * @param etag The old entity tag
    * for the document.
    * @param make_backup <tt>true</tt> if a backup should be created.
-   * @param flags A set of FileCreateFlags.
+   * @param flags A set of CreateFlags.
    * @param new_etag A location to a new entity tag
    * for the document.
    */
-  void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
   _IGNORE(g_file_replace_contents)
 
 
@@ -2267,9 +2267,9 @@ public:
   * @param length The length of @a contents in bytes.
   * @param etag a new entity tag for the file.
   * @param make_backup true if a backup should be created.
-  * @param flags A set of FileCreateFlags.
+  * @param flags A set of CreateFlags.
   */
-  void replace_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const char* contents, gsize length, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const char* contents, gsize length, const std::string& etag, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
  /** Starts an asynchronous replacement of the file with the given
   * @a contents of @a length bytes. @a etag will replace the document's
@@ -2286,9 +2286,9 @@ public:
   * @param length The length of @a contents in bytes.
   * @param etag a new entity tag for the file.
   * @param make_backup true if a backup should be created.
-  * @param flags A set of FileCreateFlags.
+  * @param flags A set of CreateFlags.
   */
-  void replace_contents_async(const SlotAsyncReady& slot, const char* contents, gsize length, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents_async(const SlotAsyncReady& slot, const char* contents, gsize length, const std::string& etag, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
  /** Starts an asynchronous replacement of the file with the given
   * @a contents of @a length bytes. @a etag will replace the document's
@@ -2309,9 +2309,9 @@ public:
   * @param contents String of contents to replace the file with.
   * @param etag a new entity tag for the file.
   * @param make_backup true if a backup should be created.
-  * @param flags A set of FileCreateFlags.
+  * @param flags A set of CreateFlags.
   */
-  void replace_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const std::string& contents, const std::string& etag, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
  /** Starts an asynchronous replacement of the file with the given
   * @a contents. @a etag will replace the document's
@@ -2331,9 +2331,9 @@ public:
   * @param contents String of contents to replace the file with.
   * @param etag a new entity tag for the file.
   * @param make_backup true if a backup should be created.
-  * @param flags A set of FileCreateFlags.
+  * @param flags A set of CreateFlags.
   */
-  void replace_contents_async(const SlotAsyncReady& slot, const std::string& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents_async(const SlotAsyncReady& slot, const std::string& contents, const std::string& etag, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
   _IGNORE(g_file_replace_contents_async)
 
@@ -2373,9 +2373,9 @@ public:
   * @param contents Bytes of contents to replace the file with.
   * @param etag a new entity tag for the file.
   * @param make_backup true if a backup should be created.
-  * @param flags A set of FileCreateFlags.
+  * @param flags A set of CreateFlags.
   */
-  void replace_contents_bytes_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<const Glib::Bytes>& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents_bytes_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<const Glib::Bytes>& contents, const std::string& etag, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
  /** Same as replace_contents_async() but takes a Gio::Bytes input instead.
   *
@@ -2393,9 +2393,9 @@ public:
   * @param contents Bytes of contents to replace the file with.
   * @param etag a new entity tag for the file.
   * @param make_backup true if a backup should be created.
-  * @param flags A set of FileCreateFlags.
+  * @param flags A set of CreateFlags.
   */
-  void replace_contents_bytes_async(const SlotAsyncReady& slot, const Glib::RefPtr<const Glib::Bytes>& contents, const std::string& etag, bool make_backup = false, FileCreateFlags flags = FileCreateFlags::NONE);
+  void replace_contents_bytes_async(const SlotAsyncReady& slot, const Glib::RefPtr<const Glib::Bytes>& contents, const std::string& etag, bool make_backup = false, CreateFlags flags = CreateFlags::NONE);
 
   _IGNORE(g_file_replace_contents_async)
 

@@ -223,7 +223,7 @@ File::read_async(
 
 void
 File::append_to_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable,
-  FileCreateFlags flags, int io_priority)
+  CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -235,7 +235,7 @@ File::append_to_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable
 }
 
 void
-File::append_to_async(const SlotAsyncReady& slot, FileCreateFlags flags, int io_priority)
+File::append_to_async(const SlotAsyncReady& slot, CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -249,7 +249,7 @@ File::append_to_async(const SlotAsyncReady& slot, FileCreateFlags flags, int io_
 
 void
 File::create_file_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable,
-  FileCreateFlags flags, int io_priority)
+  CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -261,7 +261,7 @@ File::create_file_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellab
 }
 
 void
-File::create_file_async(const SlotAsyncReady& slot, FileCreateFlags flags, int io_priority)
+File::create_file_async(const SlotAsyncReady& slot, CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -275,7 +275,7 @@ File::create_file_async(const SlotAsyncReady& slot, FileCreateFlags flags, int i
 
 void
 File::create_file_readwrite_async(const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags, int io_priority)
+  const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -288,7 +288,7 @@ File::create_file_readwrite_async(const SlotAsyncReady& slot,
 
 void
 File::create_file_readwrite_async(
-  const SlotAsyncReady& slot, FileCreateFlags flags, int io_priority)
+  const SlotAsyncReady& slot, CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -302,7 +302,7 @@ File::create_file_readwrite_async(
 
 void
 File::replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable,
-  const std::string& etag, bool make_backup, FileCreateFlags flags, int io_priority)
+  const std::string& etag, bool make_backup, CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -316,7 +316,7 @@ File::replace_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>&
 
 void
 File::replace_async(const SlotAsyncReady& slot, const std::string& etag, bool make_backup,
-  FileCreateFlags flags, int io_priority)
+  CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -356,7 +356,7 @@ File::open_readwrite_async(
 void
 File::replace_readwrite_async(const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag, bool make_backup,
-  FileCreateFlags flags, int io_priority)
+  CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -370,7 +370,7 @@ File::replace_readwrite_async(const SlotAsyncReady& slot,
 
 void
 File::replace_readwrite_async(const SlotAsyncReady& slot, const std::string& etag, bool make_backup,
-  FileCreateFlags flags, int io_priority)
+  CreateFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -581,7 +581,7 @@ File::set_display_name_async(
 
 bool
 File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot,
-  const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
+  const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags)
 {
   GError* gerror = nullptr;
   bool res;
@@ -603,7 +603,7 @@ File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot,
 }
 
 bool
-File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags)
+File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, CopyFlags flags)
 {
   GError* gerror = nullptr;
   bool res;
@@ -625,7 +625,7 @@ File::copy(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
 }
 
 bool
-File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
+File::copy(const Glib::RefPtr<File>& destination, CopyFlags flags)
 {
   GError* gerror = nullptr;
   bool res = g_file_copy(gobj(), Glib::unwrap(destination), static_cast<GFileCopyFlags>(flags),
@@ -640,7 +640,7 @@ File::copy(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
 void
 File::copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress,
   const SlotAsyncReady& slot_ready, const Glib::RefPtr<Cancellable>& cancellable,
-  FileCopyFlags flags, int io_priority)
+  CopyFlags flags, int io_priority)
 {
   // Create a new pair which will hold copies of passed slots.
   // This will be deleted in the SignalProxy_file_copy_async_callback() callback
@@ -658,7 +658,7 @@ File::copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& 
 
 void
 File::copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& slot_ready,
-  const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags, int io_priority)
+  const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags, int io_priority)
 {
   // Create copies of slots.
   // Pointers to them will be passed through the callbacks' data parameter
@@ -672,7 +672,7 @@ File::copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& sl
 
 void
 File::copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot_progress,
-  const SlotAsyncReady& slot_ready, FileCopyFlags flags, int io_priority)
+  const SlotAsyncReady& slot_ready, CopyFlags flags, int io_priority)
 {
   // Create a new pair which will hold copies of passed slots.
   // This will be deleted in the SignalProxy_file_copy_async_callback() callback
@@ -690,7 +690,7 @@ File::copy_async(const Glib::RefPtr<File>& destination, const SlotFileProgress& 
 
 void
 File::copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& slot_ready,
-  FileCopyFlags flags, int io_priority)
+  CopyFlags flags, int io_priority)
 {
   // Create copies of slots.
   // Pointers to them will be passed through the callbacks' data parameter
@@ -703,7 +703,7 @@ File::copy_async(const Glib::RefPtr<File>& destination, const SlotAsyncReady& sl
 
 bool
 File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot,
-  const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
+  const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags)
 {
   GError* gerror = nullptr;
   bool res;
@@ -725,7 +725,7 @@ File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot,
 }
 
 bool
-File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, FileCopyFlags flags)
+File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, CopyFlags flags)
 {
   GError* gerror = nullptr;
   bool res;
@@ -747,7 +747,7 @@ File::move(const Glib::RefPtr<File>& destination, const SlotFileProgress& slot, 
 }
 
 bool
-File::move(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
+File::move(const Glib::RefPtr<File>& destination, CopyFlags flags)
 {
   GError* gerror = nullptr;
   bool res;
@@ -1090,7 +1090,7 @@ File::load_partial_contents_async(
 void
 File::replace_contents(const char* contents, gsize length, const std::string& etag,
   std::string& new_etag, const Glib::RefPtr<Cancellable>& cancellable, bool make_backup,
-  FileCreateFlags flags)
+  CreateFlags flags)
 {
   GError* gerror = nullptr;
   gchar* c_etag_new = nullptr;
@@ -1108,7 +1108,7 @@ File::replace_contents(const char* contents, gsize length, const std::string& et
 
 void
 File::replace_contents(const char* contents, gsize length, const std::string& etag,
-  std::string& new_etag, bool make_backup, FileCreateFlags flags)
+  std::string& new_etag, bool make_backup, CreateFlags flags)
 {
   GError* gerror = nullptr;
   gchar* c_etag_new = nullptr;
@@ -1125,7 +1125,7 @@ File::replace_contents(const char* contents, gsize length, const std::string& et
 
 void
 File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag,
-  const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, FileCreateFlags flags)
+  const Glib::RefPtr<Cancellable>& cancellable, bool make_backup, CreateFlags flags)
 {
   GError* gerror = nullptr;
   gchar* c_etag_new = nullptr;
@@ -1143,7 +1143,7 @@ File::replace_contents(const std::string& contents, const std::string& etag, std
 
 void
 File::replace_contents(const std::string& contents, const std::string& etag, std::string& new_etag,
-  bool make_backup, FileCreateFlags flags)
+  bool make_backup, CreateFlags flags)
 {
   GError* gerror = nullptr;
   gchar* c_etag_new = nullptr;
@@ -1161,7 +1161,7 @@ File::replace_contents(const std::string& contents, const std::string& etag, std
 void
 File::replace_contents_async(const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable, const char* contents, gsize length,
-  const std::string& etag, bool make_backup, FileCreateFlags flags)
+  const std::string& etag, bool make_backup, CreateFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1175,7 +1175,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
 
 void
 File::replace_contents_async(const SlotAsyncReady& slot, const char* contents, gsize length,
-  const std::string& etag, bool make_backup, FileCreateFlags flags)
+  const std::string& etag, bool make_backup, CreateFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1189,7 +1189,7 @@ File::replace_contents_async(const SlotAsyncReady& slot, const char* contents, g
 void
 File::replace_contents_async(const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable, const std::string& contents,
-  const std::string& etag, bool make_backup, FileCreateFlags flags)
+  const std::string& etag, bool make_backup, CreateFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1203,7 +1203,7 @@ File::replace_contents_async(const SlotAsyncReady& slot,
 
 void
 File::replace_contents_async(const SlotAsyncReady& slot, const std::string& contents,
-  const std::string& etag, bool make_backup, FileCreateFlags flags)
+  const std::string& etag, bool make_backup, CreateFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1242,7 +1242,7 @@ File::replace_contents_finish(const Glib::RefPtr<AsyncResult>& result)
 void
 File::replace_contents_bytes_async(const SlotAsyncReady& slot,
   const Glib::RefPtr<Cancellable>& cancellable, const Glib::RefPtr<const Glib::Bytes>& contents,
-  const std::string& etag, bool make_backup, FileCreateFlags flags)
+  const std::string& etag, bool make_backup, CreateFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1257,7 +1257,7 @@ File::replace_contents_bytes_async(const SlotAsyncReady& slot,
 void
 File::replace_contents_bytes_async(const SlotAsyncReady& slot,
   const Glib::RefPtr<const Glib::Bytes>& contents, const std::string& etag, bool make_backup,
-  FileCreateFlags flags)
+  CreateFlags flags)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -1271,7 +1271,7 @@ File::replace_contents_bytes_async(const SlotAsyncReady& slot,
 
 Glib::RefPtr<FileOutputStream>
 File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag,
-  bool make_backup, FileCreateFlags flags)
+  bool make_backup, CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue = Glib::wrap(g_file_replace(gobj(), Glib::c_str_or_nullptr(etag),
@@ -1284,7 +1284,7 @@ File::replace(const Glib::RefPtr<Cancellable>& cancellable, const std::string& e
 }
 
 Glib::RefPtr<FileOutputStream>
-File::replace(const std::string& etag, bool make_backup, FileCreateFlags flags)
+File::replace(const std::string& etag, bool make_backup, CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue = Glib::wrap(g_file_replace(gobj(), Glib::c_str_or_nullptr(etag),
@@ -1297,7 +1297,7 @@ File::replace(const std::string& etag, bool make_backup, FileCreateFlags flags)
 
 Glib::RefPtr<FileIOStream>
 File::replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std::string& etag,
-  bool make_backup, FileCreateFlags flags)
+  bool make_backup, CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), Glib::c_str_or_nullptr(etag),
@@ -1310,7 +1310,7 @@ File::replace_readwrite(const Glib::RefPtr<Cancellable>& cancellable, const std:
 }
 
 Glib::RefPtr<FileIOStream>
-File::replace_readwrite(const std::string& etag, bool make_backup, FileCreateFlags flags)
+File::replace_readwrite(const std::string& etag, bool make_backup, CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue = Glib::wrap(g_file_replace_readwrite(gobj(), Glib::c_str_or_nullptr(etag),
@@ -1396,7 +1396,7 @@ File::monitor(FileMonitorFlags flags)
 void
 File::measure_disk_usage(const Glib::RefPtr<Cancellable>& cancellable,
   const SlotFileMeasureProgress& slot_progress, guint64& disk_usage, guint64& num_dirs,
-  guint64& num_files, FileMeasureFlags flags)
+  guint64& num_files, MeasureFlags flags)
 {
   GError* gerror = nullptr;
   g_file_measure_disk_usage(gobj(), ((GFileMeasureFlags)(flags)),
@@ -1411,7 +1411,7 @@ File::measure_disk_usage(const Glib::RefPtr<Cancellable>& cancellable,
 void
 File::measure_disk_usage_async(const SlotAsyncReady& slot_ready,
   const Glib::RefPtr<Cancellable>& cancellable, const SlotFileMeasureProgress& slot_progress,
-  FileMeasureFlags flags, int io_priority)
+  MeasureFlags flags, int io_priority)
 {
   // Create a new pair which will hold copies of passed slots.
   // This will be deleted in the SignalProxy_file_measure_async_callback() callback
@@ -1556,7 +1556,7 @@ File::set_attributes_from_info(const Glib::RefPtr<FileInfo>& info, FileQueryInfo
 
 bool
 File::copy_attributes(const Glib::RefPtr<File>& destination,
-  const Glib::RefPtr<Cancellable>& cancellable, FileCopyFlags flags)
+  const Glib::RefPtr<Cancellable>& cancellable, CopyFlags flags)
 {
   GError* gerror = nullptr;
   bool res;
@@ -1571,7 +1571,7 @@ File::copy_attributes(const Glib::RefPtr<File>& destination,
 }
 
 bool
-File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags)
+File::copy_attributes(const Glib::RefPtr<File>& destination, CopyFlags flags)
 {
   GError* gerror = nullptr;
   bool res;
@@ -1586,7 +1586,7 @@ File::copy_attributes(const Glib::RefPtr<File>& destination, FileCopyFlags flags
 }
 
 Glib::RefPtr<FileOutputStream>
-File::create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
+File::create_file(const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue = Glib::wrap(g_file_create(gobj(), ((GFileCreateFlags)(flags)),
@@ -1598,7 +1598,7 @@ File::create_file(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags 
 }
 
 Glib::RefPtr<FileOutputStream>
-File::create_file(FileCreateFlags flags)
+File::create_file(CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue =
@@ -1610,7 +1610,7 @@ File::create_file(FileCreateFlags flags)
 }
 
 Glib::RefPtr<FileIOStream>
-File::create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
+File::create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue = Glib::wrap(g_file_create_readwrite(gobj(), ((GFileCreateFlags)(flags)),
@@ -1622,7 +1622,7 @@ File::create_file_readwrite(const Glib::RefPtr<Cancellable>& cancellable, FileCr
 }
 
 Glib::RefPtr<FileIOStream>
-File::create_file_readwrite(FileCreateFlags flags)
+File::create_file_readwrite(CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue =
@@ -1634,7 +1634,7 @@ File::create_file_readwrite(FileCreateFlags flags)
 }
 
 Glib::RefPtr<FileOutputStream>
-File::append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags flags)
+File::append_to(const Glib::RefPtr<Cancellable>& cancellable, CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue = Glib::wrap(g_file_append_to(gobj(), ((GFileCreateFlags)(flags)),
@@ -1646,7 +1646,7 @@ File::append_to(const Glib::RefPtr<Cancellable>& cancellable, FileCreateFlags fl
 }
 
 Glib::RefPtr<FileOutputStream>
-File::append_to(FileCreateFlags flags)
+File::append_to(CreateFlags flags)
 {
   GError* gerror = nullptr;
   auto retvalue =
