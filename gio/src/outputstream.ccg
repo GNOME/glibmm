@@ -22,6 +22,8 @@
 #include <glibmm/exceptionhandler.h>
 #include "slot_async.h"
 
+using SpliceFlags = Gio::OutputStream::SpliceFlags;
+
 namespace Gio
 {
 
@@ -79,7 +81,7 @@ OutputStream::write_all_async(
 
 void
 OutputStream::splice_async(const Glib::RefPtr<InputStream>& source, const SlotAsyncReady& slot,
-  const Glib::RefPtr<Cancellable>& cancellable, OutputStreamSpliceFlags flags, int io_priority)
+  const Glib::RefPtr<Cancellable>& cancellable, SpliceFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -93,7 +95,7 @@ OutputStream::splice_async(const Glib::RefPtr<InputStream>& source, const SlotAs
 
 void
 OutputStream::splice_async(const Glib::RefPtr<InputStream>& source, const SlotAsyncReady& slot,
-  OutputStreamSpliceFlags flags, int io_priority)
+  SpliceFlags flags, int io_priority)
 {
   // Create a copy of the slot.
   // A pointer to it will be passed through the callback's data parameter
@@ -229,7 +231,7 @@ OutputStream::write_bytes_async(
 
 gssize
 OutputStream::splice(const Glib::RefPtr<InputStream>& source,
-  const Glib::RefPtr<Cancellable>& cancellable, OutputStreamSpliceFlags flags)
+  const Glib::RefPtr<Cancellable>& cancellable, SpliceFlags flags)
 {
   GError* gerror = nullptr;
   gssize retvalue = g_output_stream_splice(gobj(), Glib::unwrap(source),
@@ -241,7 +243,7 @@ OutputStream::splice(const Glib::RefPtr<InputStream>& source,
 }
 
 gssize
-OutputStream::splice(const Glib::RefPtr<InputStream>& source, OutputStreamSpliceFlags flags)
+OutputStream::splice(const Glib::RefPtr<InputStream>& source, SpliceFlags flags)
 {
   GError* gerror = nullptr;
   gssize retvalue = g_output_stream_splice(

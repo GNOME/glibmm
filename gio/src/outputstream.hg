@@ -27,7 +27,6 @@ _PINCLUDE(gio/gio.h) // for GOutputStreamSpliceFlags
 namespace Gio
 {
 
-_WRAP_ENUM(OutputStreamSpliceFlags, GOutputStreamSpliceFlags, NO_GTYPE)
 
 /** Base class for implementing streaming output.
  *
@@ -43,6 +42,7 @@ protected:
   _CTOR_DEFAULT
 
 public:
+  _WRAP_ENUM(SpliceFlags, GOutputStreamSpliceFlags, NO_GTYPE)
 
   _WRAP_METHOD(gssize write(const void* buffer, gsize count, const Glib::RefPtr<Cancellable>& cancellable{?}),
                g_output_stream_write,
@@ -205,21 +205,21 @@ public:
   /** Splices an input stream into an output stream.
    *
    * @param source An InputStream.
-   * @param flags A set of OutputStreamSpliceFlags.
+   * @param flags A set of SpliceFlags.
    * @param cancellable A Cancellable object.
    * ignore.
    * @return A #gssize containing the size of the data spliced.
    */
-  gssize splice(const Glib::RefPtr<InputStream>& source, const Glib::RefPtr<Cancellable>& cancellable, OutputStreamSpliceFlags flags = OutputStreamSpliceFlags::NONE);
+  gssize splice(const Glib::RefPtr<InputStream>& source, const Glib::RefPtr<Cancellable>& cancellable, SpliceFlags flags = SpliceFlags::NONE);
 
   /** Splices an input stream into an output stream.
    *
    * @param source An InputStream.
-   * @param flags A set of OutputStreamSpliceFlags.
+   * @param flags A set of SpliceFlags.
    * ignore.
    * @return A #gssize containing the size of the data spliced.
    */
-  gssize splice(const Glib::RefPtr<InputStream>& source, OutputStreamSpliceFlags flags = OutputStreamSpliceFlags::NONE);
+  gssize splice(const Glib::RefPtr<InputStream>& source, SpliceFlags flags = SpliceFlags::NONE);
   _IGNORE(g_output_stream_splice)
 
   _WRAP_METHOD(bool flush(const Glib::RefPtr<Cancellable>& cancellable{?}),
@@ -411,10 +411,10 @@ public:
    * @param source An InputStream.
    * @param slot Callback slot to call when the request is satisfied.
    * @param cancellable Cancellable object.
-   * @param flags A set of OutputStreamSpliceFlags.
+   * @param flags A set of SpliceFlags.
    * @param io_priority The io priority of the request.
    */
-  void splice_async(const Glib::RefPtr<InputStream>& source, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, OutputStreamSpliceFlags flags = OutputStreamSpliceFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void splice_async(const Glib::RefPtr<InputStream>& source, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, SpliceFlags flags = SpliceFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   /** Splices a stream asynchronously.
    *  When the operation is finished @a slot will be called.
@@ -426,10 +426,10 @@ public:
    *
    * @param source An InputStream.
    * @param slot Callback slot to call when the request is satisfied.
-   * @param flags A set of OutputStreamSpliceFlags.
+   * @param flags A set of SpliceFlags.
    * @param io_priority The io priority of the request.
    */
-  void splice_async(const Glib::RefPtr<InputStream>& source, const SlotAsyncReady& slot, OutputStreamSpliceFlags flags = OutputStreamSpliceFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
+  void splice_async(const Glib::RefPtr<InputStream>& source, const SlotAsyncReady& slot, SpliceFlags flags = SpliceFlags::NONE, int io_priority = Glib::PRIORITY_DEFAULT);
 
   _IGNORE(g_output_stream_splice_async)
 
@@ -506,7 +506,7 @@ protected:
 #m4 _CONVERSION(`GCancellable*', `const Glib::RefPtr<Cancellable>&', `Glib::wrap($3, true)')
 #m4 _CONVERSION(`GInputStream*', `const Glib::RefPtr<InputStream>&', `Glib::wrap($3, true)')
   _WRAP_VFUNC(gssize write(const void* buffer, gsize count, const Glib::RefPtr<Cancellable>& cancellable), write_fn, errthrow, err_return_value -1)
-  _WRAP_VFUNC(gssize splice(const Glib::RefPtr<InputStream>& source, const Glib::RefPtr<Cancellable>& cancellable{.}, OutputStreamSpliceFlags flags{.}), splice, errthrow, err_return_value -1)
+  _WRAP_VFUNC(gssize splice(const Glib::RefPtr<InputStream>& source, const Glib::RefPtr<Cancellable>& cancellable{.}, SpliceFlags flags{.}), splice, errthrow, err_return_value -1)
   _WRAP_VFUNC(bool flush(const Glib::RefPtr<Cancellable>& cancellable), flush, errthrow)
   _WRAP_VFUNC(bool close(const Glib::RefPtr<Cancellable>& cancellable), close_fn, errthrow)
 };
