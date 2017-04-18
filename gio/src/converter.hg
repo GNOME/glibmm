@@ -30,8 +30,6 @@ typedef struct _GConverterIface GConverterIface;
 namespace Gio
 {
 
-_WRAP_ENUM(ConverterResult, GConverterResult)
-_WRAP_ENUM(ConverterFlags, GConverterFlags)
 
 /** Converter - Data conversion interface.
  * Converter is implemented by objects that convert binary data in various
@@ -47,11 +45,14 @@ class Converter : public Glib::Interface
   _CLASS_INTERFACE(Converter, GConverter, G_CONVERTER, GConverterIface)
 
 public:
-  _WRAP_METHOD(ConverterResult convert(const void* inbuf, gsize inbuf_size, void* outbuf, gsize outbuf_size, ConverterFlags flags, gsize& bytes_read, gsize& bytes_written), g_converter_convert, errthrow)
+  _WRAP_ENUM(Result, GConverterResult)
+  _WRAP_ENUM(Flags, GConverterFlags)
+
+  _WRAP_METHOD(Result convert(const void* inbuf, gsize inbuf_size, void* outbuf, gsize outbuf_size, Flags flags, gsize& bytes_read, gsize& bytes_written), g_converter_convert, errthrow)
   _WRAP_METHOD(void reset(), g_converter_reset)
 
 #m4 _CONVERSION(`gsize*',`gsize&',`*($3)')
-  _WRAP_VFUNC(ConverterResult convert(const void* inbuf, gsize inbuf_size, void* outbuf, gsize outbuf_size, ConverterFlags flags, gsize& bytes_read, gsize& bytes_written), "convert", errthrow)
+  _WRAP_VFUNC(Result convert(const void* inbuf, gsize inbuf_size, void* outbuf, gsize outbuf_size, Flags flags, gsize& bytes_read, gsize& bytes_written), "convert", errthrow)
 
   _WRAP_VFUNC(void reset(), "reset")
 };
