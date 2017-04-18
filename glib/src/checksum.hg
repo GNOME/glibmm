@@ -43,16 +43,16 @@ class Checksum
   _IGNORE(g_checksum_copy, g_checksum_free)
 
 public:
-  _WRAP_ENUM(ChecksumType, GChecksumType, NO_GTYPE)
+  _WRAP_ENUM(Type, GChecksumType, NO_GTYPE)
 
-#m4 _CONVERSION(`ChecksumType', `GChecksumType', `(($2)$3)')
+#m4 _CONVERSION(`Type', `GChecksumType', `(static_cast<$2>($3))')
 
   /** Creates a new Checksum, using the checksum algorithm @a checksum_type.
    * If the checksum_type is not known, then operator bool() will return false.
    *
    * @param checksum_type Checksum type, one of defined above.
    */
-  explicit Checksum(ChecksumType checksum_type);
+  explicit Checksum(Type checksum_type);
 
   /** Returns true if the Checksum object is valid.
    * This will return false, for instance, if an unsupported checksum type was provided to the constructor.
@@ -75,25 +75,25 @@ public:
   _WRAP_METHOD(std::string get_string() const, g_checksum_get_string)
 
 
-  _WRAP_METHOD(static std::string compute_checksum(ChecksumType checksum_type, const guchar* data, gsize length), g_compute_checksum_for_data)
+  _WRAP_METHOD(static std::string compute_checksum(Type checksum_type, const guchar* data, gsize length), g_compute_checksum_for_data)
 
   /** Computes the checksum of a string.
    *
-   * @param checksum_type A ChecksumType
+   * @param checksum_type A Type
    * @param str The string to compute the checksum of.
    * @result The checksum as a hexadecimal string.
    */
-  static std::string compute_checksum(ChecksumType checksum_type, const std::string& str);
+  static std::string compute_checksum(Type checksum_type, const std::string& str);
   _IGNORE(g_compute_checksum_for_string)
 
 
   //We don't use _WRAP_METHOD because this is not really a GCheckSum function:
   /** Gets the length in bytes of digests of type @a checksum_type.
    *
-   * @param checksum_type A ChecksumType.
+   * @param checksum_type A Type.
    * @result The checksum length, or -1 if @a checksum_type is not supported.
    */
-  static gssize get_length(ChecksumType checksum_type);
+  static gssize get_length(Type checksum_type);
 };
 
 } //namespace Glib
