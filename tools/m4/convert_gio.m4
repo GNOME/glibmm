@@ -25,7 +25,7 @@ define(`_CONV_GIO_DBUS_INCLASS_ENUM',`dnl
 _CONV_INCLASS_ENUM(`Gio::DBus',`$1',`$2',`m4_ifelse(`$3',,`GDBus$1$2',`$3')')
 ')dnl
 
-_CONV_GIO_ENUM(AppInfoCreateFlags)
+_CONV_GIO_INCLASS_ENUM(AppInfo,CreateFlags)
 _CONV_GIO_INCLASS_ENUM(Application,Flags)
 _CONV_GIO_ENUM(AskPasswordFlags)
 _CONV_GIO_ENUM(BusType)
