@@ -28,8 +28,6 @@ _PINCLUDE(glibmm/private/object_p.h)
 namespace Gio
 {
 
-_WRAP_ENUM(IOStreamSpliceFlags, GIOStreamSpliceFlags, NO_GTYPE)
-
 /** IOStream - Base class for implementing read/write streams.
  * IOStream represents an object that has both read and write streams.
  * Generally the two streams acts as separate input and output streams, but
@@ -65,6 +63,8 @@ class IOStream : public Glib::Object
 
 public:
 
+  _WRAP_ENUM(SpliceFlags, GIOStreamSpliceFlags, NO_GTYPE)
+
   /**  Asyncronously splice the output stream to the input stream of @a
    * stream2, and splice the output stream of @a stream2 to the input stream of
    * this stream.
@@ -75,21 +75,21 @@ public:
    * @param stream2 The second IOStream.
    * @param slot A SlotAsyncReady slot.
    * @param cancellable A Cancellable object.
-   * @param flags A set of IOStreamSpliceFlags.
+   * @param flags A set of SpliceFlags.
    * @param io_priority The io priority of the request.
    *
    * @newin{2,34}
    */
   void splice_async(const Glib::RefPtr<IOStream>& stream2,
     const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable,
-    IOStreamSpliceFlags flags = Gio::IOStreamSpliceFlags::NONE,
+    SpliceFlags flags = SpliceFlags::NONE,
     int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_io_stream_splice_async)
 
   /// A non-cancellable version of splice_async().
   void splice_async(const Glib::RefPtr<IOStream>& stream2,
     const SlotAsyncReady& slot,
-    IOStreamSpliceFlags flags = Gio::IOStreamSpliceFlags::NONE,
+    SpliceFlags flags = SpliceFlags::NONE,
     int io_priority = Glib::PRIORITY_DEFAULT);
 
   _WRAP_METHOD(static bool splice_finish(const Glib::RefPtr<AsyncResult>& result), g_io_stream_splice_finish, errthrow)
