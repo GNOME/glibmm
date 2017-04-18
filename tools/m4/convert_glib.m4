@@ -65,7 +65,7 @@ dnl
 dnl # These are for fixmegtkconst
 _CONVERSION(`const guchar*',`guchar*',`const_cast<guchar*>($3)',`$3')
 
-_CONV_GLIB_ENUM(BindingFlags)
+_CONV_GLIB_INCLASS_ENUM(Binding,Flags)
 _CONV_GLIB_ENUM(IOCondition)
 _CONV_GLIB_ENUM(IOFlags)
 _CONV_GLIB_ENUM(IOStatus)

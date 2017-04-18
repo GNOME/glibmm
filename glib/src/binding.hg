@@ -24,7 +24,6 @@ _PINCLUDE(glibmm/private/object_p.h)
 
 namespace Glib
 {
-_WRAP_ENUM(BindingFlags, GBindingFlags, newin "2,44")
 
 /** Bind two object properties.
  *
@@ -101,6 +100,8 @@ class Binding : public Glib::Object
   _CLASS_GOBJECT(Binding, GBinding, G_BINDING, Glib::Object, GObject)
 
 public:
+  _WRAP_ENUM(Flags, GBindingFlags, newin "2,44")
+
   /** For instance,<br>
    *   bool on_transform_to(const GValue* from_value, GValue* to_value);
    *
@@ -140,7 +141,7 @@ public:
   static Glib::RefPtr<Binding> bind_property_value(
     const PropertyProxy_Base& source_property,
     const PropertyProxy_Base& target_property,
-    BindingFlags flags = BindingFlags::DEFAULT,
+    Flags flags = Flags::DEFAULT,
     const SlotTransform& transform_to = SlotTransform(),
     const SlotTransform& transform_from = SlotTransform());
 
@@ -161,7 +162,7 @@ public:
   static Glib::RefPtr<Binding> bind_property(
     const PropertyProxy_Base& source_property,
     const PropertyProxy_Base& target_property,
-    BindingFlags flags = BindingFlags::DEFAULT)
+    Flags flags = Flags::DEFAULT)
   {
     return bind_property_value(source_property, target_property, flags);
   }
@@ -193,7 +194,7 @@ public:
   static Glib::RefPtr<Binding> bind_property(
     const PropertyProxy<T_source>& source_property,
     const PropertyProxy<T_target>& target_property,
-    BindingFlags flags,
+    Flags flags,
     const T_functor_to& transform_to)
   {
     sigc::slot<bool(const T_source&, T_target&)> slot_transform_to = transform_to;
@@ -229,7 +230,7 @@ public:
   static Glib::RefPtr<Binding> bind_property(
     const PropertyProxy<T_source>& source_property,
     const PropertyProxy_WriteOnly<T_target>& target_property,
-    BindingFlags flags,
+    Flags flags,
     const T_functor_to& transform_to)
   {
     sigc::slot<bool(const T_source&, T_target&)> slot_transform_to = transform_to;
@@ -265,7 +266,7 @@ public:
   static Glib::RefPtr<Binding> bind_property(
     const PropertyProxy_ReadOnly<T_source>& source_property,
     const PropertyProxy<T_target>& target_property,
-    BindingFlags flags,
+    Flags flags,
     const T_functor_to& transform_to)
   {
     sigc::slot<bool(const T_source&, T_target&)> slot_transform_to = transform_to;
@@ -301,7 +302,7 @@ public:
   static Glib::RefPtr<Binding> bind_property(
     const PropertyProxy_ReadOnly<T_source>& source_property,
     const PropertyProxy_WriteOnly<T_target>& target_property,
-    BindingFlags flags,
+    Flags flags,
     const T_functor_to& transform_to)
   {
     sigc::slot<bool(const T_source&, T_target&)> slot_transform_to = transform_to;
@@ -342,7 +343,7 @@ public:
   static Glib::RefPtr<Binding> bind_property(
     const PropertyProxy<T_source>& source_property,
     const PropertyProxy<T_target>& target_property,
-    BindingFlags flags,
+    Flags flags,
     const T_functor_to& transform_to,
     const T_functor_from& transform_from)
   {
@@ -360,7 +361,7 @@ public:
   _WRAP_METHOD(Glib::RefPtr<Glib::ObjectBase> get_target(), g_binding_get_target, refreturn, newin "2,44")
   _WRAP_METHOD(Glib::RefPtr<const Glib::ObjectBase> get_target() const, g_binding_get_target, refreturn, constversion, newin "2,44")
   _WRAP_METHOD(Glib::ustring get_target_property() const, g_binding_get_target_property, newin "2,44")
-  _WRAP_METHOD(BindingFlags get_flags() const, g_binding_get_flags, newin "2,44")
+  _WRAP_METHOD(Flags get_flags() const, g_binding_get_flags, newin "2,44")
 
   /** Explicitly releases the binding between the source and the target
    * property expressed by this Binding instance.
@@ -374,7 +375,7 @@ public:
   void unbind();
   _IGNORE(g_binding_unbind)
 
-  _WRAP_PROPERTY("flags", Glib::BindingFlags, newin "2,44")
+  _WRAP_PROPERTY("flags", Flags, newin "2,44")
   _WRAP_PROPERTY("source", Glib::RefPtr<Glib::ObjectBase>, newin "2,44")
   _WRAP_PROPERTY("source-property", Glib::ustring, newin "2,44")
   _WRAP_PROPERTY("target", Glib::RefPtr<Glib::ObjectBase>, newin "2,44")
