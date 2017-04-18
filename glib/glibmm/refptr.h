@@ -73,11 +73,11 @@ make_refptr(T_Arg... arg)
  * unreference() methods, and whose destructor is noexcept (the default for destructors).
  *
  * In gtkmm, that is anything derived from Glib::ObjectBase, such as
- * Gdk::Pixmap.
+ * Gdk::Pixbuf.
  *
  * Normal application code should not need to use this. However, this is necessary
  * when implementing create() methods for derived Glib::ObjectBase-derived
- * (not Gtk::Widget-derived) classes,  such as derived Gtk::TreeModels.
+ * (not Gtk::Widget-derived) classes, such as derived Gtk::TreeModels.
  */
 template <class T_CppObject>
 RefPtr<T_CppObject>
