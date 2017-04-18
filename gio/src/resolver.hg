@@ -36,8 +36,6 @@ class VariantContainerBase;
 namespace Gio
 {
 
-_WRAP_ENUM(ResolverRecordType, GResolverRecordType)
-
 /** Asynchronous and cancellable DNS resolver
  *
  * Resolver provides cancellable synchronous and asynchronous DNS resolution,
@@ -59,6 +57,8 @@ class Resolver
 protected:
 
 public:
+  _WRAP_ENUM(RecordType, GResolverRecordType)
+
   static Glib::RefPtr<Resolver> get_default();
   _IGNORE(g_resolver_get_default)
   static void set_default(const Glib::RefPtr<Resolver>& resolver);
@@ -141,7 +141,7 @@ public:
 
 #m4 _CONVERSION(`GList*',`std::vector<Glib::VariantContainerBase>',`Glib::ListHandler<Glib::VariantContainerBase>::list_to_vector($3, Glib::OWNERSHIP_DEEP)')
 
-  _WRAP_METHOD(std::vector<Glib::VariantContainerBase> lookup_records(const Glib::ustring& rrname, ResolverRecordType record_type, const Glib::RefPtr<Cancellable>& cancellable{?}), g_resolver_lookup_records, errthrow)
+  _WRAP_METHOD(std::vector<Glib::VariantContainerBase> lookup_records(const Glib::ustring& rrname, RecordType record_type, const Glib::RefPtr<Cancellable>& cancellable{?}), g_resolver_lookup_records, errthrow)
 
   /** Begins asynchronously performing a DNS lookup for the given @a rrname,
    * and eventually calls @a slot, which must call lookup_records_finish() to
@@ -154,13 +154,13 @@ public:
    * @newin{2,36}
    */
   void lookup_records_async(const Glib::ustring& rrname,
-    ResolverRecordType record_type, const SlotAsyncReady& slot,
+    RecordType record_type, const SlotAsyncReady& slot,
     const Glib::RefPtr<Cancellable>& cancellable);
   _IGNORE(g_resolver_lookup_records_async)
 
   /// A non-cancellable version of lookup_records_async().
   void lookup_records_async(const Glib::ustring& rrname,
-    ResolverRecordType record_type, const SlotAsyncReady& slot);
+    RecordType record_type, const SlotAsyncReady& slot);
 
   _WRAP_METHOD(std::vector<Glib::VariantContainerBase> lookup_records_finish(const Glib::RefPtr<AsyncResult>& result), g_resolver_lookup_records_finish, errthrow)
 
