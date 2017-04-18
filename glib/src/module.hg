@@ -26,8 +26,6 @@ extern "C" { typedef struct _GModule GModule; }
 namespace Glib
 {
 
-_WRAP_ENUM(ModuleFlags, GModuleFlags, NO_GTYPE)
-
 //TODO: Replace get_last_error() with exceptions?
 //Provide operator()?
 
@@ -44,6 +42,8 @@ class Module
   _IGNORE(g_module_open, g_module_open_utf8, g_module_close)
 
 public:
+
+  _WRAP_ENUM(Flags, GModuleFlags, NO_GTYPE)
 
   /** Opens a module.
    *
@@ -69,7 +69,7 @@ public:
    * @param file_name The library filename to open
    * @param flags Flags to configure the load process
    */
-  explicit Module(const std::string& file_name, ModuleFlags flags = ModuleFlags(0));
+  explicit Module(const std::string& file_name, Flags flags = Flags(0));
 
   Module(const Module&) = delete;
   Module& operator=(const Module&) = delete;
