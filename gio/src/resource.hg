@@ -35,9 +35,6 @@ namespace Gio
  */
 _WRAP_GERROR(ResourceError, GResourceError, G_RESOURCE_ERROR, NO_GTYPE, newin "2,34")
 
-_WRAP_ENUM(ResourceFlags, GResourceFlags, newin "2,44")
-_WRAP_ENUM(ResourceLookupFlags, GResourceLookupFlags, newin "2,44")
-
 /** %Resource framework.
  *
  * Applications and libraries often contain binary or textual data that is
@@ -134,13 +131,16 @@ class Resource final
   _IGNORE(g_resource_ref, g_resource_unref)
 
 public:
+  _WRAP_ENUM(Flags, GResourceFlags, newin "2,44")
+  _WRAP_ENUM(LookupFlags, GResourceLookupFlags, newin "2,44")
+
   _WRAP_METHOD(static Glib::RefPtr<Resource> create_from_data(const Glib::RefPtr<const Glib::Bytes>& data), g_resource_new_from_data, errthrow, newin "2,44")
   _WRAP_METHOD(static Glib::RefPtr<Resource> create_from_file(const std::string& filename), g_resource_load, errthrow, newin "2,44")
-  _WRAP_METHOD(Glib::RefPtr<InputStream> open_stream(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE) const, g_resource_open_stream, errthrow, newin "2,44")
-  _WRAP_METHOD(Glib::RefPtr<const Glib::Bytes> lookup_data(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE) const, g_resource_lookup_data, errthrow, newin "2,44")
+  _WRAP_METHOD(Glib::RefPtr<InputStream> open_stream(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE) const, g_resource_open_stream, errthrow, newin "2,44")
+  _WRAP_METHOD(Glib::RefPtr<const Glib::Bytes> lookup_data(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE) const, g_resource_lookup_data, errthrow, newin "2,44")
 
 #m4 _CONVERSION(`char**',`std::vector<std::string>',`Glib::ArrayHandler<std::string>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
-  _WRAP_METHOD(std::vector<std::string> enumerate_children(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE) const, g_resource_enumerate_children, errthrow, newin "2,44")
+  _WRAP_METHOD(std::vector<std::string> enumerate_children(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE) const, g_resource_enumerate_children, errthrow, newin "2,44")
 
   /** Looks for a file at the specified @a path in the resource and
    * if found returns information about it.
@@ -152,10 +152,10 @@ public:
    * @param path A pathname inside the resource.
    * @param[out] size A location to place the length of the contents of the file.
    * @param[out] flags A location to place the flags about the file.
-   * @param lookup_flags A ResourceLookupFlags.
+   * @param lookup_flags A LookupFlags.
    * @throw Gio::ResourceError if the file was not found.
    */
-  void get_info(const std::string& path, gsize& size, ResourceFlags& flags, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE) const;
+  void get_info(const std::string& path, gsize& size, Flags& flags, LookupFlags lookup_flags = LookupFlags::NONE) const;
   _IGNORE(g_resource_get_info)
 
   /** Looks for a file at the specified @a path in the resource.
@@ -165,10 +165,10 @@ public:
    * @newin{2,44}
    *
    * @param path A pathname inside the resource.
-   * @param lookup_flags A ResourceLookupFlags.
+   * @param lookup_flags A LookupFlags.
    * @throw Gio::ResourceError if the file was not found.
    */
-  void get_file_exists(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE) const;
+  void get_file_exists(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE) const;
 
   /** Looks for a file at the specified @a path in the resource.
    *
@@ -178,17 +178,17 @@ public:
    * @newin{2,44}
    *
    * @param path A pathname inside the resource.
-   * @param lookup_flags A ResourceLookupFlags.
+   * @param lookup_flags A LookupFlags.
    * @return <tt>true</tt> if the file was found, <tt>false</tt> if there were errors.
    */
-  bool get_file_exists_nothrow(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE) const;
+  bool get_file_exists_nothrow(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE) const;
 
   // 'register' is a keyword. Can't be the name of a method.
   _WRAP_METHOD(void register_global(), g_resources_register, newin "2,44")
   _WRAP_METHOD(void unregister_global(), g_resources_unregister, newin "2,44")
-  _WRAP_METHOD(static Glib::RefPtr<InputStream> open_stream_global(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE), g_resources_open_stream, errthrow, newin "2,44")
-  _WRAP_METHOD(static Glib::RefPtr<const Glib::Bytes> lookup_data_global(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE), g_resources_lookup_data, errthrow, newin "2,44")
-  _WRAP_METHOD(static std::vector<std::string> enumerate_children_global(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE), g_resources_enumerate_children, errthrow, newin "2,44")
+  _WRAP_METHOD(static Glib::RefPtr<InputStream> open_stream_global(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE), g_resources_open_stream, errthrow, newin "2,44")
+  _WRAP_METHOD(static Glib::RefPtr<const Glib::Bytes> lookup_data_global(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE), g_resources_lookup_data, errthrow, newin "2,44")
+  _WRAP_METHOD(static std::vector<std::string> enumerate_children_global(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE), g_resources_enumerate_children, errthrow, newin "2,44")
 
   /** Looks for a file at the specified @a path in the set of
    * globally registered resources and if found returns information about it.
@@ -200,10 +200,10 @@ public:
    * @param path A pathname inside the resource.
    * @param[out] size A location to place the length of the contents of the file.
    * @param[out] flags A location to place the flags about the file.
-   * @param lookup_flags A ResourceLookupFlags.
+   * @param lookup_flags A LookupFlags.
    * @throw Gio::ResourceError if the file was not found.
    */
-  static void get_info_global(const std::string& path, gsize& size, ResourceFlags& flags, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE);
+  static void get_info_global(const std::string& path, gsize& size, Flags& flags, LookupFlags lookup_flags = LookupFlags::NONE);
   _IGNORE(g_resources_get_info)
 
   /** Looks for a file at the specified @a path in the set of
@@ -214,10 +214,10 @@ public:
    * @newin{2,44}
    *
    * @param path A pathname inside the resource.
-   * @param lookup_flags A ResourceLookupFlags.
+   * @param lookup_flags A LookupFlags.
    * @throw Gio::ResourceError if the file was not found.
    */
-  static void get_file_exists_global(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE);
+  static void get_file_exists_global(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE);
 
   /** Looks for a file at the specified @a path in the set of
    * globally registered resources.
@@ -228,10 +228,10 @@ public:
    * @newin{2,44}
    *
    * @param path A pathname inside the resource.
-   * @param lookup_flags A ResourceLookupFlags.
+   * @param lookup_flags A LookupFlags.
    * @return <tt>true</tt> if the file was found, <tt>false</tt> if there were errors.
    */
-  static bool get_file_exists_global_nothrow(const std::string& path, ResourceLookupFlags lookup_flags = ResourceLookupFlags::NONE);
+  static bool get_file_exists_global_nothrow(const std::string& path, LookupFlags lookup_flags = LookupFlags::NONE);
 
   _IGNORE(g_static_resource_init, g_static_resource_fini, g_static_resource_get_resource)dnl//Used only by the glib-compile-resources command
 };
