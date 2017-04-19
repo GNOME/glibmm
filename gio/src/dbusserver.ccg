@@ -21,6 +21,8 @@
 #include <giomm/dbusconnection.h>
 #include <giomm/dbusauthobserver.h>
 
+using Flags = Gio::DBus::Server::Flags;
+
 namespace Gio
 {
 
@@ -29,7 +31,7 @@ namespace DBus
 
 Server::Server(const std::string& address, const std::string& guid,
   const Glib::RefPtr<AuthObserver>& observer, const Glib::RefPtr<Cancellable>& cancellable,
-  ServerFlags flags)
+  Flags flags)
 : _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
     static_cast<GDBusServerFlags>(flags), "guid", Glib::c_str_or_nullptr(guid),
     "authentication-observer", Glib::unwrap(observer))
@@ -38,7 +40,7 @@ Server::Server(const std::string& address, const std::string& guid,
 }
 
 Server::Server(const std::string& address, const std::string& guid,
-  const Glib::RefPtr<Cancellable>& cancellable, ServerFlags flags)
+  const Glib::RefPtr<Cancellable>& cancellable, Flags flags)
 : _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
     static_cast<GDBusServerFlags>(flags), "guid", Glib::c_str_or_nullptr(guid),
     "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
@@ -47,7 +49,7 @@ Server::Server(const std::string& address, const std::string& guid,
 }
 
 Server::Server(const std::string& address, const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer, ServerFlags flags)
+  const Glib::RefPtr<AuthObserver>& observer, Flags flags)
 : _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
     static_cast<GDBusServerFlags>(flags), "guid", Glib::c_str_or_nullptr(guid),
     "authentication-observer", Glib::unwrap(observer))
@@ -55,7 +57,7 @@ Server::Server(const std::string& address, const std::string& guid,
   init();
 }
 
-Server::Server(const std::string& address, const std::string& guid, ServerFlags flags)
+Server::Server(const std::string& address, const std::string& guid, Flags flags)
 : _CONSTRUCT("address", Glib::c_str_or_nullptr(address), "flags",
     static_cast<GDBusServerFlags>(flags), "guid", Glib::c_str_or_nullptr(guid),
     "authentication-observer", static_cast<GDBusAuthObserver*>(nullptr))
@@ -66,27 +68,27 @@ Server::Server(const std::string& address, const std::string& guid, ServerFlags 
 Glib::RefPtr<Server>
 Server::create_sync(const std::string& address, const std::string& guid,
   const Glib::RefPtr<AuthObserver>& observer, const Glib::RefPtr<Cancellable>& cancellable,
-  ServerFlags flags)
+  Flags flags)
 {
   return Glib::make_refptr_for_instance<Server>(new Server(address, guid, observer, cancellable, flags));
 }
 
 Glib::RefPtr<Server>
 Server::create_sync(const std::string& address, const std::string& guid,
-  const Glib::RefPtr<Cancellable>& cancellable, ServerFlags flags)
+  const Glib::RefPtr<Cancellable>& cancellable, Flags flags)
 {
   return Glib::make_refptr_for_instance<Server>(new Server(address, guid, cancellable, flags));
 }
 
 Glib::RefPtr<Server>
 Server::create_sync(const std::string& address, const std::string& guid,
-  const Glib::RefPtr<AuthObserver>& observer, ServerFlags flags)
+  const Glib::RefPtr<AuthObserver>& observer, Flags flags)
 {
   return Glib::make_refptr_for_instance<Server>(new Server(address, guid, observer, flags));
 }
 
 Glib::RefPtr<Server>
-Server::create_sync(const std::string& address, const std::string& guid, ServerFlags flags)
+Server::create_sync(const std::string& address, const std::string& guid, Flags flags)
 {
   return Glib::make_refptr_for_instance<Server>(new Server(address, guid, flags));
 }
