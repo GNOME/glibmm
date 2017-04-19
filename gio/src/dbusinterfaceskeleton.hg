@@ -28,8 +28,6 @@ namespace Gio
 namespace DBus
 {
 
-_WRAP_ENUM(InterfaceSkeletonFlags, GDBusInterfaceSkeletonFlags, NO_GTYPE)
-
 class InterfaceInfo;
 class Connection;
 class MethodInvocation;
@@ -47,6 +45,8 @@ class InterfaceSkeleton
   _IMPLEMENTS_INTERFACE(Interface)
 
 public:
+  _WRAP_ENUM(Flags, GDBusInterfaceSkeletonFlags, NO_GTYPE)
+
   _WRAP_METHOD(void flush(), g_dbus_interface_skeleton_flush)
 
   _WRAP_METHOD(Glib::RefPtr<InterfaceInfo> get_info(), g_dbus_interface_skeleton_get_info)
@@ -72,10 +72,10 @@ public:
 
   _WRAP_METHOD(Glib::ustring get_object_path() const, g_dbus_interface_skeleton_get_object_path)
 
-  _WRAP_METHOD(InterfaceSkeletonFlags get_flags() const, g_dbus_interface_skeleton_get_flags)
-  _WRAP_METHOD(void set_flags(InterfaceSkeletonFlags flags), g_dbus_interface_skeleton_set_flags)
+  _WRAP_METHOD(Flags get_flags() const, g_dbus_interface_skeleton_get_flags)
+  _WRAP_METHOD(void set_flags(Flags flags), g_dbus_interface_skeleton_set_flags)
 
-  _WRAP_PROPERTY("g-flags", InterfaceSkeletonFlags)
+  _WRAP_PROPERTY("g-flags", Flags)
 
 #m4 _CONVERSION(`GDBusMethodInvocation*',`const Glib::RefPtr<MethodInvocation>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(bool authorize_method(const Glib::RefPtr<MethodInvocation>& invocation), "g_authorize_method")
