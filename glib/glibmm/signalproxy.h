@@ -153,6 +153,17 @@ public:
    *
    * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
    *
+   * By default, the signal handler will be called after the default signal handler.
+   * This is often fine, but for some signal handlers that return a value, it can
+   * be necessary to connect before the default signal handler.
+   * Examples:
+   * - Gio::Application::signal_command_line() calls only one signal handler.
+   *   A handler connected after the default handler will never be called.
+   * - X event signals, such as Gtk::Widget::signal_button_press_event(), stop
+   *   calling signal handlers as soon as a called handler returns <tt>true</tt>.
+   *   If the default handler returns <tt>true</tt>, a handler connected after it
+   *   will not be called.
+   *
    * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
    * @param after Whether this signal handler should be called before or after the default signal
    * handler.
@@ -287,6 +298,17 @@ public:
   /** Connects a signal handler to a signal.
    *
    * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
+   *
+   * By default, the signal handler will be called after the default signal handler.
+   * This is often fine, but for some signal handlers that return a value, it can
+   * be necessary to connect before the default signal handler.
+   * Examples:
+   * - Gio::Application::signal_command_line() calls only one signal handler.
+   *   A handler connected after the default handler will never be called.
+   * - X event signals, such as Gtk::Widget::signal_button_press_event(), stop
+   *   calling signal handlers as soon as a called handler returns <tt>true</tt>.
+   *   If the default handler returns <tt>true</tt>, a handler connected after it
+   *   will not be called.
    *
    * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
    * @param after Whether this signal handler should be called before or after the default signal
