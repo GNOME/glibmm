@@ -115,7 +115,7 @@ main(int, char**)
   {
     auto tls_connection = Gio::TlsClientConnection::create(conn, address);
 
-    tls_connection->signal_accept_certificate().connect(sigc::ptr_fun(&on_accept_certificate));
+    tls_connection->signal_accept_certificate().connect(sigc::ptr_fun(&on_accept_certificate), false);
 
     tls_connection->handshake();
 

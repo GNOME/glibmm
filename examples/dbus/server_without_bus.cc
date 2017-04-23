@@ -194,7 +194,7 @@ main(int, char**)
 
   std::cout << "Server is listening at: " << server->get_client_address() << "." << std::endl;
 
-  server->signal_new_connection().connect(sigc::ptr_fun(&on_server_new_connection));
+  server->signal_new_connection().connect(sigc::ptr_fun(&on_server_new_connection), false);
 
   // Keep the server running until the process is killed:
   auto loop = Glib::MainLoop::create();

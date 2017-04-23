@@ -90,7 +90,7 @@ public:
   void emission_stop();
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // This callback for SignalProxy<void>
+  // This callback for SignalProxy<void()>
   // is defined here to avoid code duplication.
   static void slot0_void_callback(GObject*, void* data);
 #endif
@@ -139,6 +139,10 @@ class SignalProxy;
 /** Proxy for signals with any number of arguments.
  * Use the connect() or connect_notify() method, with sigc::mem_fun() or sigc::ptr_fun()
  * to connect signal handlers to signals.
+ *
+ * This is the primary template. There is a specialization for signal handlers
+ * that return @c void. The specialization has no %connect_notify() method, and
+ * the @a after parameter in its %connect() method has a default value.
  */
 template <class R, class... T>
 class SignalProxy<R(T...)> : public SignalProxyNormal
@@ -151,11 +155,10 @@ public:
 
   /** Connects a signal handler to a signal.
    *
-   * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
+   * For instance, connect(sigc::mem_fun(*this, &TheClass::on_something), false);
    *
-   * By default, the signal handler will be called after the default signal handler.
-   * This is often fine, but for some signal handlers that return a value, it can
-   * be necessary to connect before the default signal handler.
+   * For some signal handlers that return a value, it can make a big difference
+   * whether you connect before or after the default signal handler.
    * Examples:
    * - Gio::Application::signal_command_line() calls only one signal handler.
    *   A handler connected after the default handler will never be called.
@@ -167,8 +170,9 @@ public:
    * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
    * @param after Whether this signal handler should be called before or after the default signal
    * handler.
+   * @return A sigc::connection.
    */
-  sigc::connection connect(const SlotType& slot, bool after = true)
+  sigc::connection connect(const SlotType& slot, bool after)
   {
     return sigc::connection(connect_impl_(false, slot, after));
   }
@@ -178,7 +182,7 @@ public:
    *
    * @newin{2,48}
    */
-  sigc::connection connect(SlotType&& slot, bool after = true)
+  sigc::connection connect(SlotType&& slot, bool after)
   {
     return sigc::connection(connect_impl_(false, std::move(slot), after));
   }
@@ -188,12 +192,8 @@ public:
    *
    * For instance, connect_notify( sigc::mem_fun(*this, &TheClass::on_something) );
    *
-   * If the signal requires signal handlers with a @c void return type,
-   * the only difference between connect() and connect_notify() is the default
-   * value of @a after.
-   *
    * If the signal requires signal handlers with a return value of type T,
-   * connect_notify() binds <tt>return T()</tt> to the connected signal handler.
+   * %connect_notify() binds <tt>return T()</tt> to the connected signal handler.
    * For instance, if the return type is @c bool, the following two calls are equivalent.
    * @code
    * connect_notify(sigc::mem_fun(*this, &TheClass::on_something));
@@ -204,6 +204,7 @@ public:
    *        usually created with sigc::mem_fun() or sigc::ptr_fun().
    * @param after Whether this signal handler should be called before or after the default signal
    * handler.
+   * @return A sigc::connection.
    */
   sigc::connection connect_notify(const VoidSlotType& slot, bool after = false)
   {
@@ -218,6 +219,48 @@ public:
   sigc::connection connect_notify(VoidSlotType&& slot, bool after = false)
   {
     return sigc::connection(connect_impl_(true, std::move(slot), after));
+  }
+};
+
+/** Proxy for signals with any number of arguments.
+ * Use the connect() method, with sigc::mem_fun() or sigc::ptr_fun()
+ * to connect signal handlers to signals.
+ *
+ * This is a specialization for signal handlers that return @c void.
+ */
+template <class... T>
+class SignalProxy<void(T...)> : public SignalProxyNormal
+{
+public:
+  using SlotType = sigc::slot<void(T...)>;
+
+  SignalProxy(ObjectBase* obj, const SignalProxyInfo* info) : SignalProxyNormal(obj, info) {}
+
+  /** Connects a signal handler to a signal.
+   *
+   * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
+   *
+   * By default, the signal handler will be called after the default signal handler.
+   * This is usually fine for signal handlers that don't return a value.
+   *
+   * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
+   * @param after Whether this signal handler should be called before or after the default signal
+   * handler.
+   * @return A sigc::connection.
+   */
+  sigc::connection connect(const SlotType& slot, bool after = true)
+  {
+    return sigc::connection(connect_impl_(false, slot, after));
+  }
+
+  /** Connects a signal handler to a signal.
+   * @see connect(const SlotType& slot, bool after).
+   *
+   * @newin{2,48}
+   */
+  sigc::connection connect(SlotType&& slot, bool after = true)
+  {
+    return sigc::connection(connect_impl_(false, std::move(slot), after));
   }
 };
 
@@ -273,6 +316,8 @@ private:
   SignalProxyDetailedBase& operator=(const SignalProxyDetailedBase&) = delete;
 };
 
+/**** Glib::SignalProxyDetailed **********************************************/
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 template <class R, class... T>
 class SignalProxyDetailed;
@@ -281,6 +326,10 @@ class SignalProxyDetailed;
 /** Proxy for signals with any number of arguments and possibly a detailed name.
  * Use the connect() or connect_notify() method, with sigc::mem_fun() or sigc::ptr_fun()
  * to connect signal handlers to signals.
+ *
+ * This is the primary template. There is a specialization for signal handlers
+ * that return @c void. The specialization has no %connect_notify() method, and
+ * the @a after parameter in its %connect() method has a default value.
  */
 template <class R, class... T>
 class SignalProxyDetailed<R(T...)> : public SignalProxyDetailedBase
@@ -297,11 +346,10 @@ public:
 
   /** Connects a signal handler to a signal.
    *
-   * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
+   * For instance, connect(sigc::mem_fun(*this, &TheClass::on_something), false);
    *
-   * By default, the signal handler will be called after the default signal handler.
-   * This is often fine, but for some signal handlers that return a value, it can
-   * be necessary to connect before the default signal handler.
+   * For some signal handlers that return a value, it can make a big difference
+   * whether you connect before or after the default signal handler.
    * Examples:
    * - Gio::Application::signal_command_line() calls only one signal handler.
    *   A handler connected after the default handler will never be called.
@@ -313,8 +361,9 @@ public:
    * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
    * @param after Whether this signal handler should be called before or after the default signal
    * handler.
+   * @return A sigc::connection.
    */
-  sigc::connection connect(const SlotType& slot, bool after = true)
+  sigc::connection connect(const SlotType& slot, bool after)
   {
     return sigc::connection(connect_impl_(false, slot, after));
   }
@@ -324,7 +373,7 @@ public:
    *
    * @newin{2,48}
    */
-  sigc::connection connect(SlotType&& slot, bool after = true)
+  sigc::connection connect(SlotType&& slot, bool after)
   {
     return sigc::connection(connect_impl_(false, std::move(slot), after));
   }
@@ -334,12 +383,8 @@ public:
    *
    * For instance, connect_notify( sigc::mem_fun(*this, &TheClass::on_something) );
    *
-   * If the signal requires signal handlers with a @c void return type,
-   * the only difference between connect() and connect_notify() is the default
-   * value of @a after.
-   *
    * If the signal requires signal handlers with a return value of type T,
-   * connect_notify() binds <tt>return T()</tt> to the connected signal handler.
+   * %connect_notify() binds <tt>return T()</tt> to the connected signal handler.
    * For instance, if the return type is @c bool, the following two calls are equivalent.
    * @code
    * connect_notify(sigc::mem_fun(*this, &TheClass::on_something));
@@ -350,6 +395,7 @@ public:
    *        usually created with sigc::mem_fun() or sigc::ptr_fun().
    * @param after Whether this signal handler should be called before or after the default signal
    * handler.
+   * @return A sigc::connection.
    */
   sigc::connection connect_notify(const VoidSlotType& slot, bool after = false)
   {
@@ -364,6 +410,52 @@ public:
   sigc::connection connect_notify(VoidSlotType&& slot, bool after = false)
   {
     return sigc::connection(connect_impl_(true, std::move(slot), after));
+  }
+};
+
+/** Proxy for signals with any number of arguments and possibly a detailed name.
+ * Use the connect() method, with sigc::mem_fun() or sigc::ptr_fun()
+ * to connect signal handlers to signals.
+ *
+ * This is a specialization for signal handlers that return @c void.
+ */
+template <class... T>
+class SignalProxyDetailed<void(T...)> : public SignalProxyDetailedBase
+{
+public:
+  using SlotType = sigc::slot<void(T...)>;
+
+  SignalProxyDetailed(
+    ObjectBase* obj, const SignalProxyInfo* info, const Glib::ustring& detail_name)
+  : SignalProxyDetailedBase(obj, info, detail_name)
+  {
+  }
+
+  /** Connects a signal handler to a signal.
+   *
+   * For instance, connect( sigc::mem_fun(*this, &TheClass::on_something) );
+   *
+   * By default, the signal handler will be called after the default signal handler.
+   * This is usually fine for signal handlers that don't return a value.
+   *
+   * @param slot The signal handler, usually created with sigc::mem_fun() or sigc::ptr_fun().
+   * @param after Whether this signal handler should be called before or after the default signal
+   * handler.
+   * @return A sigc::connection.
+   */
+  sigc::connection connect(const SlotType& slot, bool after = true)
+  {
+    return sigc::connection(connect_impl_(false, slot, after));
+  }
+
+  /** Connects a signal handler to a signal.
+   * @see connect(const SlotType& slot, bool after).
+   *
+   * @newin{2,48}
+   */
+  sigc::connection connect(SlotType&& slot, bool after = true)
+  {
+    return sigc::connection(connect_impl_(false, std::move(slot), after));
   }
 };
 
