@@ -1,4 +1,103 @@
-2.53.1
+2.53.1.1 (unstable):
+
+Glib:
+* Use C++11 enum classes instead of old-style enums, and put many enums
+  inside relevant class declarations:
+  - Glib::NodeTree: Move enums into class.
+  - Glib::BindingFlags is now Glib::Binding::Flags.
+  - Glib::KeyfileFlags is now Glib::Keyfile::Flags.
+  - Glib::ModuleFlags is now Glib::Module::Flags.
+  - Glib::ChecksumType is now Glib::Checksum::Type.
+  - Glib::Regex: Move enums inside class.
+  - Glib::Resource: Move enums into class.
+  (Murray Cumming, Kjell Ahlstedt)
+* RefPtr: Make this an alias for std::shared_ptr<> instead.
+  - Use std::dynamic_pointer_cast<>() instead of RefPtr<>::cast_dynamic().
+  - Use std::static_pointer_cast<>() instead of RefPtr<>::cast_static().
+  - Use std::const_pointer_cast<>() instead of RefPtr<>::cast_const().
+  - When creating RefPtr directly, instead of using create() methods,
+    use Glib::make_refptr_for_instance() so the std::shared_ptr<> has the
+    necessary Deleter.
+  (Murray Cumming) Bug #755037
+* Remove Glib::WeakRef. Use std::weak_ref<> instead.
+  (Murray Cumming) Bug #755037
+* Object: Use g_object_new_with_properties() instead of (deprecated)
+  g_object_newv() and (deprecated) GParameter.
+  (Murray Cumming)
+* IOChannel: Avoid creating a RefPtr to this.
+  (Murray Cumming) Bug #755037
+* SignalProxy:
+  connect(): Signals with non-void return values now have no default value
+  for the "after" parameter, forcing application developers to think about
+  whether they should connect before or after already-connected signal
+  handlers, and default signal handlers. This is awkward but necessary.
+  Just provide "true" to get the previous behaviour, or use connect_notify().
+  connect_notify(): Signals with void return values have no connect_notify(),
+  because it is not useful with those signals.
+  (Kjell Ahlstedt) Bug #126213.
+
+Gio:
+* Use C++11 enum classes instead of old-style enums, and put many enums
+  inside relevant class declarations:
+  - Gio::Drive: Move enums into class.
+  - Gio::TlsDatabase: Move enums into class.
+  - Gio::UnixSocketAddressType is now Gio::UnixSocketAddress::Type.
+  - Gio::Mount: Move enums into class.
+  - Gio::TlsPasswordFlags is now Gio::TlsPassword::Flags.
+  - Gio::IOStreamSpliceFlags is now Gio::IOStream::SpliceFlags.
+  - Gio::SettingsBindFlags is now Gio::Settings::BindFlags.
+  - Gio::ResolverRecordType is now Gio::Resolver::RecordType.
+  - Gio::Socket: Move enums into class.
+  - Gio::File: Move some flags enums into the class.
+  - Gio::OutputStreamSpliceFlags is now Gio::OuputStream::SpliceFlags.
+  - Gio::CredentialsType is now Gio::Credentials::Type.
+  - Gio::NotificationPriority is now Gio::Notification::Priority.
+  - Gio::FileMonitorEvent is now Gio::FileMonitor::Event.
+  - Gio::FileAttributeInfoFlags is now Gio::FileAttributeInfo::Flags.
+  - Gio::EmblemOrigin is now Gio::Emblem::Origin.
+  - Gio::Converter: Put enums inside class.
+  - Gio::ConverterFlags is now Gio::Converter::Flags.
+  - Gio::ConverterResult is now Gio::Converter::Result.
+  - Gio::AppInfoCreateFlags is now Gio::AppInfo::CreateFlags.
+  - Gio::ApplicationFlags is now Gio::Application::Flags.
+  (Murray Cumming, Kjell Ahlstedt)
+* Remove duplicate ErrorEnum declaration.
+  (Kjell Ahlstedt)
+* ConstructParams:
+  - Remove (hopefully really unnecessary) copy constructor.
+  - C++11: =delete the operator=, instead of making it private.
+  (Murray Cumming)
+* Value:
+  - Remove the CType alias, which should be unnecessary.
+  - value_custom: Replace a template parameter with C++11 type traits.
+  - Value<RefPtr<T>>: Only use this specialization if T has get_base_type().
+  (Murray Cumming) Bug #755037
+* Variant:
+  - operator bool(): Simplify to avoid clang++ warnings.
+  - C++11: Variant: Replace throw(std::bad_cast) with noexcept(false).
+    See https://bugzilla.redhat.com/show_bug.cgi?id=1438766
+  (Murray Cumming)
+* Socket: Avoid creating a RefPtr to this.
+  (Murray Cumming) Bug #755037
+
+Gio:DBus:
+* Use C++11 enum classes instead of old-style enums, and put many enums
+  inside relevant class declarations:
+  - Gio::DBus::InterfaceSkeletonFlags is now Gio::DBus::InterfaceSkeleton::Flags.
+  - Gio::DBus::ServerFlags is now Gio::DBus::Server::Flags.
+  (Murray Cumming, Kjell Ahlstedt)
+
+gmmproc:
+* _WRAP_ENUM(): Generate C++ enum classes instead of enums, and let the enums
+  be inside class declarations.
+  (Kjell Ahlstedt) Bug #86864
+
+Build
+* Windows:  Visual Studio builds: Update ABI version
+  (Chun-wei Fan)
+
+
+2.53.1 (unstable):
 
 Glib:
 * OptionGroup:
