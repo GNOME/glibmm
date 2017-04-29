@@ -137,7 +137,6 @@ giomm_files_any_hg =			\
 	zlibcompressor.hg
 
 giomm_files_posix_hg =			\
-	desktopappinfo.hg		\
 	unixconnection.hg		\
 	unixcredentialsmessage.hg 	\
 	unixfdlist.hg 			\
@@ -146,10 +145,17 @@ giomm_files_posix_hg =			\
 	unixoutputstream.hg 		\
 	unixsocketaddress.hg
 
+giomm_files_not_mac =			\
+	desktopappinfo.hg
+
 if HOST_WINDOWS_NATIVE
 giomm_files_arch_hg =
 else
+if OS_COCOA
 giomm_files_arch_hg = $(giomm_files_posix_hg)
+else
+giomm_files_arch_hg = $(giomm_files_not_mac) $(giomm_files_posix_hg)
+endif
 endif
 giomm_files_used_hg = $(giomm_files_any_hg) $(giomm_files_arch_hg)
 

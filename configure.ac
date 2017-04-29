@@ -55,6 +55,18 @@ AS_CASE([$host_os], [mingw*], [glibmm_host_windows=yes], [glibmm_host_windows=no
 AC_MSG_RESULT([$glibmm_host_windows])
 AM_CONDITIONAL([HOST_WINDOWS_NATIVE], [test "x$glibmm_host_windows" = xyes])
 
+glib_have_cocoa=no
+AC_MSG_CHECKING([for Mac OS X Cocoa support])
+AC_TRY_CPP([
+#include <Cocoa/Cocoa.h>
+#ifdef GNUSTEP_BASE_VERSION
+#error "Detected GNUstep, not Cocoa"
+#endif
+], glib_have_cocoa=yes)
+
+AC_MSG_RESULT([$glib_have_cocoa])
+AM_CONDITIONAL(OS_COCOA, [test "$glib_have_cocoa" = "yes"])
+
 # TODO: This makes no sense. --danielk
 AS_IF([test "x$enable_static" = xyes],
 [
