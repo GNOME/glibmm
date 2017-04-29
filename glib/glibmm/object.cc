@@ -211,7 +211,7 @@ Object::Object()
     object_type = object_class_.clone_custom_type(custom_type_name_, custom_interface_classes);
   }
 
-  void* const new_object = g_object_newv(object_type, 0, nullptr);
+  void* const new_object = g_object_new(object_type, nullptr);
 
   // Connect the GObject and Glib::Object instances.
   ObjectBase::initialize(static_cast<GObject*>(new_object));
@@ -247,8 +247,13 @@ Object::Object(const Glib::ConstructParams& construct_params)
   // This works with custom types too, since those inherit the properties of
   // their base class.
 
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+  //TODO: Replace g_object_newv() by g_object_new_with_properties() when we can
+  // require glib 2.54. GParameter is also deprecated (only mentioned in a comment).
+  // Don't use it in ConstructParams when we can break ABI.
   void* const new_object =
     g_object_newv(object_type, construct_params.n_parameters, construct_params.parameters);
+  G_GNUC_END_IGNORE_DEPRECATIONS
 
   // Connect the GObject and Glib::Object instances.
   ObjectBase::initialize(static_cast<GObject*>(new_object));
