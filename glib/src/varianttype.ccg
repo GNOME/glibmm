@@ -122,4 +122,17 @@ VariantType::get_string() const
 {
   return std::string(g_variant_type_peek_string(gobj()), g_variant_type_get_string_length(gobj()));
 }
+
+std::vector<VariantType> VariantType::get_item_types() const
+{
+  std::vector<VariantType> result;
+  auto next_item_type = g_variant_type_first(gobj());
+  while (next_item_type)
+  {
+    result.emplace_back(const_cast<GVariantType*>(next_item_type), true);
+    next_item_type = g_variant_type_next(next_item_type);
+  }
+  return result;
 }
+
+} // namespace GLib

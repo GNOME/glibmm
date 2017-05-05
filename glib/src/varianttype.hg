@@ -162,14 +162,31 @@ public:
   _WRAP_METHOD(bool is_subtype_of(const VariantType& supertype) const, g_variant_type_is_subtype_of)
 
 // It's necessary to take an extra reference of the 'const GVariantType*'
-// returned by g_variant_type_element() because it doesn't do that already.
+// returned by g_variant_type_element(), g_variant_type_key() and
+// g_variant_type_value() because they don't do that already.
 #m4 _CONVERSION(`const GVariantType*',`VariantType',`Glib::wrap(const_cast<GVariantType*>($3), true)')
   _WRAP_METHOD(VariantType element() const, g_variant_type_element)
-  _WRAP_METHOD(VariantType first() const, g_variant_type_first)
-  _WRAP_METHOD(VariantType next () const, g_variant_type_next)
+  _WRAP_METHOD(VariantType first() const, g_variant_type_first, deprecated "Use get_item_types() instead.")
+  _WRAP_METHOD(VariantType next () const, g_variant_type_next, deprecated "Use get_item_types() instead.")
   _WRAP_METHOD(gsize n_items() const, g_variant_type_n_items)
   _WRAP_METHOD(VariantType key() const, g_variant_type_key)
   _WRAP_METHOD(VariantType value() const, g_variant_type_value)
+
+  /** Determines the item types of a tuple or dictionary entry type.
+   *
+   * This function may only be used with tuple or dictionary entry types,
+   * but must not be used with the generic tuple type VARIANT_TYPE_TUPLE.
+   *
+   * In the case of a dictionary entry type, returns a vector with
+   * 2 elements, the type of the key followed by the value type.
+   *
+   * An empty vector is returned in case of this %VariantType being VARIANT_TYPE_UNIT.
+   *
+   * @newin{2,52}
+   *
+   * @return The item types of this %VariantType, or an empty vector.
+   */
+  std::vector<VariantType> get_item_types() const;
 
   // This function is part of unexposed API in gvarianttypeinfo.{h,c} for an
   // also unexposed GVariantTypeInfo structure of glib.
