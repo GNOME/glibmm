@@ -55,10 +55,10 @@ define(`__ARG3__',`$`'3')
 # Specify C_enum_name, if it's not the concatenation of namespace+enum_name.
 define(`_CONV_ENUM',`dnl
 pushdef(`C_ENUM_NAME', `m4_ifelse(`$3',,`$1$2',`$3')')
-_CONVERSION(`C_ENUM_NAME', `$2', (($2)(__ARG3__)))
-_CONVERSION(`C_ENUM_NAME', `$1::$2', (($1::$2)(__ARG3__)))
-_CONVERSION(`$2', `C_ENUM_NAME', ((C_ENUM_NAME)(__ARG3__)))
-_CONVERSION(`$1::$2', `C_ENUM_NAME', ((C_ENUM_NAME)(__ARG3__)))
+_CONVERSION(`C_ENUM_NAME', `$2', static_cast<$2>(__ARG3__))
+_CONVERSION(`C_ENUM_NAME', `$1::$2', static_cast<$1::$2>(__ARG3__))
+_CONVERSION(`$2', `C_ENUM_NAME', static_cast<C_ENUM_NAME>(__ARG3__))
+_CONVERSION(`$1::$2', `C_ENUM_NAME', static_cast<C_ENUM_NAME>(__ARG3__))
 popdef(`C_ENUM_NAME')
 ')dnl
 
