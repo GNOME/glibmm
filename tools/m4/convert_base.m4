@@ -66,12 +66,12 @@ popdef(`C_ENUM_NAME')
 # Specify C_enum_name, if it's not the concatenation of namespace+class_name+enum_name.
 define(`_CONV_INCLASS_ENUM',`dnl
 pushdef(`C_ENUM_NAME', `m4_ifelse(`$4',,`$1$2$3',`$4')')
-_CONVERSION(`C_ENUM_NAME', `$3', (($3)(__ARG3__)))
-_CONVERSION(`C_ENUM_NAME', `$2::$3', (($2::$3)(__ARG3__)))
-_CONVERSION(`C_ENUM_NAME', `$1::$2::$3', (($1::$2::$3)(__ARG3__)))
-_CONVERSION(`$3', `C_ENUM_NAME', ((C_ENUM_NAME)(__ARG3__)))
-_CONVERSION(`$2::$3', `C_ENUM_NAME', ((C_ENUM_NAME)(__ARG3__)))
-_CONVERSION(`$1::$2::$3', `C_ENUM_NAME', ((C_ENUM_NAME)(__ARG3__)))
+_CONVERSION(`C_ENUM_NAME', `$3', static_cast<$3>(__ARG3__))
+_CONVERSION(`C_ENUM_NAME', `$2::$3', static_cast<$2::$3>(__ARG3__))
+_CONVERSION(`C_ENUM_NAME', `$1::$2::$3', static_cast<$1::$2::$3>(__ARG3__))
+_CONVERSION(`$3', `C_ENUM_NAME', static_cast<C_ENUM_NAME>(__ARG3__))
+_CONVERSION(`$2::$3', `C_ENUM_NAME', static_cast<C_ENUM_NAME>(__ARG3__))
+_CONVERSION(`$1::$2::$3', `C_ENUM_NAME', static_cast<C_ENUM_NAME>(__ARG3__))
 popdef(`C_ENUM_NAME')
 ')dnl
 
