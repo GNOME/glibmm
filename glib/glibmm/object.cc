@@ -71,8 +71,9 @@ ConstructParams::ConstructParams(
     }
 
     if (n_parameters >= n_alloced_params) {
-      parameter_names = g_renew(const char*, parameter_names, n_alloced_params += 8);
-      parameter_values = g_renew(GValue, parameter_values, n_alloced_params += 8);
+      n_alloced_params += 8;
+      parameter_names = g_renew(const char*, parameter_names, n_alloced_params);
+      parameter_values = g_renew(GValue, parameter_values, n_alloced_params);
     }
 
     auto& param_name = parameter_names[n_parameters];
