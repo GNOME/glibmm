@@ -260,24 +260,17 @@ public:
   _WRAP_METHOD(Glib::RefPtr<InterfaceInfo> get_interface_info(), g_dbus_proxy_get_interface_info)
   _WRAP_METHOD(Glib::RefPtr<const InterfaceInfo> get_interface_info() const, g_dbus_proxy_get_interface_info, constversion)
 
-  _WRAP_METHOD_DOCS_ONLY(g_dbus_proxy_call)
-  void call(
-    const Glib::ustring& method_name,
-    const SlotAsyncReady& slot,
-    const Glib::RefPtr<Cancellable>& cancellable,
-    const Glib::VariantContainerBase& parameters = Glib::VariantContainerBase(),
-    int timeout_msec = -1,
-    CallFlags flags = Gio::DBus::CALL_FLAGS_NONE
-  );
-
-  /// A non-cancellable version of call().
-  void call(
-    const Glib::ustring& method_name,
-    const SlotAsyncReady& slot,
-    const Glib::VariantContainerBase& parameters = Glib::VariantContainerBase(),
-    int timeout_msec = -1,
-    CallFlags flags = Gio::DBus::CALL_FLAGS_NONE
-  );
+  _WRAP_METHOD(
+    void call(
+      const Glib::ustring&               method_name{.},
+      const SlotAsyncReady&              slot{callback?},
+      const Glib::RefPtr<Cancellable>&   cancellable{.?},
+      const Glib::VariantContainerBase&  parameters{.} = Glib::VariantContainerBase(),
+      int                                timeout_msec{.} = -1,
+      CallFlags                          flags{.} = Gio::DBus::CALL_FLAGS_NONE
+    ),
+    g_dbus_proxy_call, slot_name slot, slot_callback SignalProxy_async_callback
+  )
 
   /** Finishes an operation started with call().
    *
@@ -289,81 +282,30 @@ public:
    */
   _WRAP_METHOD(Glib::VariantContainerBase call_finish(const Glib::RefPtr<AsyncResult>& res), g_dbus_proxy_call_finish, errthrow)
 
-//TODO: Use _WRAP_METHOD() for this?
-  /** Synchronously invokes the method_name method on proxy.
-   * See call(), the asynchronous version of this method for more information.
-   *
-   * @param method_name Name of method to invoke.
-   * @param timeout_msec The timeout in milliseconds or -1 to use the proxy
-   * default timeout.
-   * @param flags Flags from the CallFlags enumeration.
-   * @param parameters A Glib::VariantContainerBase tuple with parameters for the
-   * signal.
-   * @param cancellable A Cancellable.
-   * @result A Variant tuple with return values.
-   *
-   * @throw Glib::Error.
-   */
-  Glib::VariantContainerBase call_sync(
-    const Glib::ustring& method_name,
-    const Glib::RefPtr<Cancellable>& cancellable,
-    const Glib::VariantContainerBase& parameters = Glib::VariantContainerBase(),
-    int timeout_msec = -1,
-    CallFlags flags = Gio::DBus::CALL_FLAGS_NONE
-  );
-  _IGNORE(g_dbus_proxy_call_sync)
+  _WRAP_METHOD(
+    Glib::VariantContainerBase call_sync(
+      const Glib::ustring&               method_name{.},
+      const Glib::RefPtr<Cancellable>&   cancellable{.?},
+      const Glib::VariantContainerBase&  parameters{.} = Glib::VariantContainerBase(),
+      int                                timeout_msec{.} = -1,
+      CallFlags                          flags{.} = Gio::DBus::CALL_FLAGS_NONE
+    ),
+    g_dbus_proxy_call_sync, errthrow
+  )
 
-  /// A non-cancellable version of call_sync().
-  Glib::VariantContainerBase call_sync(
-    const Glib::ustring& method_name,
-    const Glib::VariantContainerBase& parameters = Glib::VariantContainerBase(),
-    int timeout_msec = -1,
-    CallFlags flags = Gio::DBus::CALL_FLAGS_NONE
-  );
-
-
-#ifdef G_OS_UNIX
-//TODO: Use _WRAP_METHOD() for this?
-  /** Like call() but also takes a GUnixFDList object.
-   * This method is only available on UNIX.
-   *
-   * This is an asynchronous method. When the operation is finished, callback
-   * will be invoked in the thread-default main loop of the thread you are
-   * calling this method from. You can then call call_with_unix_fd_finish() to
-   * get the result of the operation. See call_sync() for the synchronous
-   * version of this function.
-   *
-   * @param method_name The name of the method to invoke.
-   * @param parameters A Glib::VariantContainerBase tuple with parameters for the
-   * method or <tt>0</tt> if not passing parameters.
-   * @param slot A SlotAsyncReady to call when the request is satisfied.
-   * @param cancellable A Cancellable.
-   * @param fd_list A UnixFDList.
-   * @param timeout_msec The timeout in milliseconds, -1 to use the default
-   * timeout or G_MAXINT for no timeout.
-   * @param flags Flags from the Gio::DBus::CallFlags enumeration.
-   * @newin{2,34}
-   */
-  void call(
-    const Glib::ustring&                method_name,
-    const Glib::VariantContainerBase&   parameters,
-    const SlotAsyncReady&               slot,
-    const Glib::RefPtr<Cancellable>&    cancellable,
-    const Glib::RefPtr<UnixFDList>&     fd_list,
-    int                                 timeout_msec = -1,
-    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE);
-  _IGNORE(g_dbus_proxy_call_with_unix_fd_list)
-
-  /** A non-cancellable version of call() (with a UnixFDList).
-   * @newin{2,34}
-   */
-  void call(
-    const Glib::ustring&                method_name,
-    const Glib::VariantContainerBase&   parameters,
-    const SlotAsyncReady&               slot,
-    const Glib::RefPtr<UnixFDList>&     fd_list,
-    int                                 timeout_msec = -1,
-    CallFlags                           flags = Gio::DBus::CALL_FLAGS_NONE);
+  _WRAP_METHOD(
+    void call(
+      const Glib::ustring&                method_name{.},
+      const Glib::VariantContainerBase&   parameters{.},
+      const SlotAsyncReady&               slot{callback?},
+      const Glib::RefPtr<Cancellable>&    cancellable{.?},
+      const Glib::RefPtr<UnixFDList>&     fd_list{.},
+      int                                 timeout_msec{.} = -1,
+      CallFlags                           flags{.} = Gio::DBus::CALL_FLAGS_NONE
+    ),
+    g_dbus_proxy_call_with_unix_fd_list, ifdef G_OS_UNIX,
+      slot_name slot, slot_callback SignalProxy_async_callback
+  )
 
   /** Finishes an operation started with call() (with a UnixFDList).
    * @param res A AsyncResult obtained from the SlotAsyncReady passed to
@@ -374,7 +316,6 @@ public:
    * @newin{2,34}
    */
   _WRAP_METHOD(Glib::VariantContainerBase call_finish(const Glib::RefPtr<AsyncResult>& res{.}, Glib::RefPtr<UnixFDList>& out_fd_list{.>>}), g_dbus_proxy_call_with_unix_fd_list_finish, errthrow, ifdef G_OS_UNIX)
-#endif // G_OS_UNIX
 
   _WRAP_METHOD(
     Glib::VariantContainerBase call_sync(
