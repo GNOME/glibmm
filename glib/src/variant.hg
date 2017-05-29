@@ -1125,7 +1125,7 @@ Variant< std::vector<T> >::create(const std::vector<T>& data)
 template<class T>
 T Variant< std::vector<T> >::get_child(gsize index) const
 {
-  if(index >= g_variant_n_children(const_cast<GVariant*>(gobj())))
+  if (index >= get_n_children())
     throw std::out_of_range(
       "Variant< std::vector<T> >::get_child(): Index out of bounds.");
 
@@ -1143,9 +1143,7 @@ std::vector<T> Variant< std::vector<T> >::get() const
 {
   std::vector<T> result;
 
-  gsize n_children = g_variant_n_children(const_cast<GVariant*>(gobj()));
-
-  for(gsize i = 0; i < n_children; i++)
+  for (gsize i = 0, n_children = get_n_children(); i < n_children; ++i)
   {
     Glib::Variant<T> variant;
 
