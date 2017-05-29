@@ -184,7 +184,7 @@ VariantContainerBase::create_maybe(const VariantType& child_type, const VariantB
 void
 VariantContainerBase::get_child(VariantBase& child, gsize index) const
 {
-  if (index >= g_variant_n_children(gobject_))
+  if (index >= get_n_children())
     throw std::out_of_range("VariantContainerBase::get_child(): Index out of bounds.");
 
   GVariant* const gvariant = g_variant_get_child_value(gobject_, index);
@@ -411,7 +411,7 @@ Variant<type_vec_ustring>::create(const type_vec_ustring& data)
 Glib::ustring
 Variant<type_vec_ustring>::get_child(gsize index) const
 {
-  if (index >= g_variant_n_children(const_cast<GVariant*>(gobj())))
+  if (index >= get_n_children())
     throw std::out_of_range(
       "Variant< std::vector<Glib::ustring> >::get_child(): Index out of bounds.");
 
@@ -427,9 +427,7 @@ Variant<type_vec_ustring>::get() const
   // but the Variant can alternatively hold an array of object paths or DBus type signatures.
   type_vec_ustring result;
 
-  gsize n_children = g_variant_n_children(const_cast<GVariant*>(gobj()));
-
-  for (gsize i = 0; i < n_children; i++)
+  for (gsize i = 0, n_children = get_n_children(); i < n_children; ++i)
   {
     GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
     result.emplace_back(Glib::Variant<Glib::ustring>(gvariant).get());
@@ -509,7 +507,7 @@ Variant<type_vec_string>::create_from_object_paths(const type_vec_string& data)
 std::string
 Variant<type_vec_string>::get_child(gsize index) const
 {
-  if (index >= g_variant_n_children(const_cast<GVariant*>(gobj())))
+  if (index >= get_n_children())
     throw std::out_of_range(
       "Variant< std::vector<std::string> >::get_child(): Index out of bounds.");
 
@@ -526,9 +524,7 @@ Variant<type_vec_string>::get() const
   // signatures.
   type_vec_string result;
 
-  gsize n_children = g_variant_n_children(const_cast<GVariant*>(gobj()));
-
-  for (gsize i = 0; i < n_children; i++)
+  for (gsize i = 0, n_children = get_n_children(); i < n_children; ++i)
   {
     GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), i);
     result.emplace_back(Glib::Variant<std::string>(gvariant).get());
