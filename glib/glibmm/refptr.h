@@ -88,7 +88,7 @@ private:
 public:
   /** Default constructor
    *
-   * Afterwards it will be null and use of -> will cause a segmentation fault.
+   * Afterwards it will be null and use of -> will invoke undefined behaviour.
    */
   inline RefPtr() noexcept;
 
