@@ -1436,6 +1436,7 @@ sub on_wrap_any_enum($$)
   my @subst_in  = [];
   my @subst_out = [];
   my $no_gtype = "";
+  my $conv_to_int = "";
   my $argDeprecated = "";
   my $deprecation_docs = "";
   my $newin = "";
@@ -1447,7 +1448,11 @@ sub on_wrap_any_enum($$)
 
     if ($arg eq "NO_GTYPE")
     {
-      $no_gtype = "NO_GTYPE";
+      $no_gtype = $arg;
+    }
+    elsif (!$is_gerror and $arg eq "CONV_TO_INT")
+    {
+      $conv_to_int = $arg;
     }
     elsif ($arg =~ /^s#([^#]+)#([^#]*)#$/)
     {
@@ -1469,15 +1474,18 @@ sub on_wrap_any_enum($$)
     }
   }
   return ($cpp_type, $c_type, $domain, \@subst_in, \@subst_out, $no_gtype,
-    $argDeprecated, $deprecation_docs, $newin);
+    $conv_to_int, $argDeprecated, $deprecation_docs, $newin);
 }
 
 # void on_wrap_enum()
-# _WRAP_ENUM(cpp_type, c_type [,NO_GTYPE] [,s#regexpr#subst#]*)
+# _WRAP_ENUM(cpp_type, c_type [,NO_GTYPE] [,CONV_TO_INT] [,s#regexpr#subst#]*)
 # Optional arguments:
 # NO_GTYPE Don't generate code for a specialization of the template
 #          Glib::Value_Enum or Glib::Value_Flags.
 #          Necessary, if the C type enum is not registered as a GType.
+# CONV_TO_INT "Convertible to int" Generate a plain enum (not an enum class)
+#             within a class. Such an enum is scoped like an enum class,
+#             and it can be implicitly converted to int like a plain enum.
 # s#regexpr#subst# Zero or more substitutions in names of enum constants, e.g. s#^DATE_##.
 #
 # _WRAP_ENUM can be located either in a class or outside all classes.
@@ -1497,13 +1505,13 @@ sub on_wrap_enum($)
   my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
-  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, $no_gtype,
+  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, $no_gtype, $conv_to_int,
     $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(0);
 
   $$self{objOutputter}->output_wrap_enum(
     $$self{filename}, $$self{line_num}, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $$self{in_class},
-    $argDeprecated, $deprecation_docs, $newin);
+    $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $conv_to_int,
+    $$self{in_class}, $argDeprecated, $deprecation_docs, $newin);
 }
 
 sub on_wrap_enum_docs_only($)
@@ -1515,7 +1523,7 @@ sub on_wrap_enum_docs_only($)
   my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
-  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, undef,
+  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, undef, undef,
     $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(0);
 
   # Get the module name so the enum docs can be included in the module's
@@ -1539,7 +1547,7 @@ sub on_wrap_gerror($)
   my $class_docs = $self->extract_preceding_documentation();
 
   # get the arguments
-  my ($cpp_type, $c_type, $domain, $ref_subst_in, $ref_subst_out, $no_gtype,
+  my ($cpp_type, $c_type, $domain, $ref_subst_in, $ref_subst_out, $no_gtype, undef,
     $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(1);
 
   $$self{objOutputter}->output_wrap_gerror(

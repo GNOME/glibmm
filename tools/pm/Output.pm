@@ -690,13 +690,13 @@ sub output_wrap_sig_decl($$$$$$$$$$$$$$)
 }
 
 # void output_wrap_enum($filename, $line_num, $cpp_type, $c_type,
-#   $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $in_class,
-#   $deprecated, $deprecation_docs, $newin)
-sub output_wrap_enum($$$$$$$$$$$$$)
+#   $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $conv_to_int,
+#   $in_class, $deprecated, $deprecation_docs, $newin)
+sub output_wrap_enum($$$$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $in_class,
-    $deprecated, $deprecation_docs, $newin) = @_;
+    $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $conv_to_int,
+    $in_class, $deprecated, $deprecation_docs, $newin) = @_;
 
   my $objEnum = GtkDefs::lookup_enum($c_type);
   if(!$objEnum)
@@ -709,6 +709,7 @@ sub output_wrap_enum($$$$$$$$$$$$$)
 
   my $indent = "  ";
   $indent .= "  " if ($in_class);
+  $indent .= "  " if ($conv_to_int);
   my $elements = $objEnum->build_element_list(1, $ref_subst_in, $ref_subst_out, $indent);
 
   if(!$elements)
@@ -723,8 +724,7 @@ sub output_wrap_enum($$$$$$$$$$$$$)
   unshift(@$ref_subst_out, "");
 
   # Get the enum documentation from the parsed docs.
-  $indent = " ";
-  $indent .= "  " if ($in_class);
+  $indent = substr($indent, 1); # Remove one blank
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "$cpp_type",
     $indent, $ref_subst_in, $ref_subst_out, $deprecation_docs, $newin);
 
@@ -734,12 +734,13 @@ sub output_wrap_enum($$$$$$$$$$$$$)
   my $value_suffix = "Enum";
   $value_suffix = "Flags" if ($$objEnum{flags});
 
-  my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',%d,\`%s\',\`%s\')dnl\n",
+  my $str = sprintf("_ENUM(%s,%s,%s,\`%s\',\`%s\',\`%s\',%d,\`%s\',\`%s\')dnl\n",
     $cpp_type,
     $c_type,
     $value_suffix,
     $elements,
     $no_gtype,
+    $conv_to_int,
     $in_class,
     $comment,
     $deprecated
