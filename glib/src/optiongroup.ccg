@@ -378,7 +378,7 @@ OptionGroup::add_entry_filename(const OptionEntry& entry, vecstrings& arg)
 }
 
 // When the command argument value is to be parsed by a user-supplied function
-// (indicated by G_OPTION_ARG_CALLBACK), the FLAG_FILENAME in 'entry' is ignored.
+// (indicated by G_OPTION_ARG_CALLBACK), the OptionEntry::Flags::FILENAME in 'entry' is ignored.
 // set_c_arg_default() clears or sets it as required in a copy of 'entry'.
 //
 // The glib API is inconsistent here. The choice between UTF-8 and filename
@@ -386,7 +386,7 @@ OptionGroup::add_entry_filename(const OptionEntry& entry, vecstrings& arg)
 // G_OPTION_ARG_STRING_ARRAY, and G_OPTION_ARG_FILENAME_ARRAY, which in glibmm
 // are set by OptionGroup::add_entry[_filename]. But when a callback function
 // is chosen, there is only G_OPTION_ARG_CALLBACK, and the encoding is chosen
-// with G_OPTION_FLAG_FILENAME. We do this automatiically in set_c_arg_default().
+// with OptionEntry::Flags::FILENAME. We do this automatiically in set_c_arg_default().
 // Other option flags are set by OptionEntry::set_flags().
 
 void
@@ -621,15 +621,15 @@ OptionGroup::CppOptionEntry::set_c_arg_default(void* cpp_arg)
   {
     // No value to set here. The arg pointer is a function pointer.
 
-    // Set or clear FLAG_FILENAME in *entry_.
+    // Set or clear OptionEntry::Flags::FILENAME in *entry_.
     const OptionArgCallback* const option_arg = static_cast<const OptionArgCallback*>(cpp_arg);
     if (option_arg->is_filename_option())
     {
-      entry_->set_flags(entry_->get_flags() | OptionEntry::FLAG_FILENAME);
+      entry_->set_flags(entry_->get_flags() | OptionEntry::Flags::FILENAME);
     }
     else
     {
-      entry_->set_flags(entry_->get_flags() & ~OptionEntry::FLAG_FILENAME);
+      entry_->set_flags(entry_->get_flags() & ~OptionEntry::Flags::FILENAME);
     }
     break;
   }

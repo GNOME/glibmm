@@ -45,17 +45,7 @@ class OptionEntry
   _CLASS_GENERIC(OptionEntry, GOptionEntry)
 public:
 
-  //Copied from goption.h, instead of generated, so that we can put it inside the class.
-  enum Flags
-  {
-    FLAG_HIDDEN = 1 << 0,
-    FLAG_IN_MAIN = 1 << 1,
-    FLAG_REVERSE = 1 << 2,
-    FLAG_NO_ARG = 1 << 3,
-    FLAG_FILENAME = 1 << 4,
-    FLAG_OPTIONAL_ARG = 1 << 5,
-    FLAG_NOALIAS = 1 << 6
-  } GOptionFlags;
+  _WRAP_ENUM(Flags, GOptionFlags, NO_GTYPE)
 
   OptionEntry();
   OptionEntry(const OptionEntry& src);
@@ -76,13 +66,15 @@ public:
   _MEMBER_GET(short_name, short_name, gchar, gchar)
   _MEMBER_SET(short_name, short_name, gchar, gchar)
 
-  _MEMBER_GET(flags, flags, int, int)
+#m4 _CONVERSION(`int',`Flags',`static_cast<Flags>($3)')
+  _MEMBER_GET(flags, flags, Flags, int)
 
+#m4 _CONVERSION(`Flags',`int',`static_cast<int>($3)')
   /** Set one or more OptionEntry::Flags.
-   * Do not set FLAG_FILENAME. Character encoding is chosen when the OptionEntry
+   * Do not set Flags::FILENAME. Character encoding is chosen when the OptionEntry
    * is added to an OptionGroup.
    */
-  _MEMBER_SET(flags, flags, int, int)
+  _MEMBER_SET(flags, flags, Flags, int)
 
   _MEMBER_GET(description, description, Glib::ustring, const char*)
 

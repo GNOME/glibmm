@@ -89,7 +89,7 @@ ExampleOptionGroup::ExampleOptionGroup()
   entry6.set_long_name("x-string");
   entry6.set_short_name('x');
   entry6.set_description("A string with custom parsing");
-  entry6.set_flags(Glib::OptionEntry::FLAG_OPTIONAL_ARG);
+  entry6.set_flags(Glib::OptionEntry::Flags::OPTIONAL_ARG);
   m_arg_x_string = "not specified";
   add_entry(entry6, sigc::mem_fun(*this, &ExampleOptionGroup::on_option_arg_string));
 
@@ -97,7 +97,7 @@ ExampleOptionGroup::ExampleOptionGroup()
   entry7.set_long_name("x-filename");
   entry7.set_short_name('X');
   entry7.set_description("A filename with custom parsing");
-  entry7.set_flags(Glib::OptionEntry::FLAG_OPTIONAL_ARG);
+  entry7.set_flags(Glib::OptionEntry::Flags::OPTIONAL_ARG);
   m_arg_x_filename = "not specified";
   add_entry_filename(entry7, sigc::mem_fun(*this, &ExampleOptionGroup::on_option_arg_filename));
 

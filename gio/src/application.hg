@@ -228,12 +228,13 @@ public:
    * @param description The description for the option in `--help` output.
    * @param arg_description The placeholder to use for the extra argument parsed
    *     by the option in `--help` output.
-   * @param flags Flags from Glib::OptionEntry::Flags. Do not set FLAG_FILENAME.
+   * @param flags Flags from Glib::OptionEntry::Flags. Do not set OptionEntry::Flags::FILENAME.
    *     Character encoding is chosen with @a arg_type.
    */
   void add_main_option_entry(OptionType arg_type, const Glib::ustring& long_name,
     gchar short_name = '\0', const Glib::ustring& description = Glib::ustring(),
-    const Glib::ustring& arg_description = Glib::ustring(), int flags = 0);
+    const Glib::ustring& arg_description = Glib::ustring(),
+    Glib::OptionEntry::Flags flags = Glib::OptionEntry::Flags::NONE);
   _IGNORE(g_application_add_main_option_entries)
 
   //g_application_add_main_option() seems to be just a new convenience function,
@@ -253,12 +254,13 @@ public:
    * @newin{2,42}
    *
    * @see add_main_option_entry(OptionType, const Glib::ustring&,
-   *   gchar, const Glib::ustring&, const Glib::ustring&, int)
+   *   gchar, const Glib::ustring&, const Glib::ustring&, Glib::OptionEntry::Flags)
    */
   void add_main_option_entry(const Glib::OptionGroup::SlotOptionArgString& slot,
     const Glib::ustring& long_name,
     gchar short_name = '\0', const Glib::ustring& description = Glib::ustring(),
-    const Glib::ustring& arg_description = Glib::ustring(), int flags = 0);
+    const Glib::ustring& arg_description = Glib::ustring(),
+    Glib::OptionEntry::Flags flags = Glib::OptionEntry::Flags::NONE);
 
   /** Adds a main option entry to be handled by the Application.
    *
@@ -273,12 +275,13 @@ public:
    * @newin{2,42}
    *
    * @see add_main_option_entry(OptionType, const Glib::ustring&,
-   *   gchar, const Glib::ustring&, const Glib::ustring&, int)
+   *   gchar, const Glib::ustring&, const Glib::ustring&, Glib::OptionEntry::Flags)
    */
   void add_main_option_entry_filename(const Glib::OptionGroup::SlotOptionArgFilename& slot,
     const Glib::ustring& long_name,
     gchar short_name = '\0', const Glib::ustring& description = Glib::ustring(),
-    const Glib::ustring& arg_description = Glib::ustring(), int flags = 0);
+    const Glib::ustring& arg_description = Glib::ustring(),
+    Glib::OptionEntry::Flags flags = Glib::OptionEntry::Flags::NONE);
 
   // _WRAP_METHOD(void add_option_group(Glib::OptionGroup& group), g_application_add_option_group)
   // add_option_group() is probably not very useful. If implemented, it must probably
@@ -431,7 +434,7 @@ private:
   // Code, common to the public add_main_option_entry*() methods.
   void add_main_option_entry_private(GOptionArg arg, const Glib::ustring& long_name,
     gchar short_name, const Glib::ustring& description,
-    const Glib::ustring& arg_description, int flags);
+    const Glib::ustring& arg_description, Glib::OptionEntry::Flags flags);
 };
 
 } // namespace Gio
