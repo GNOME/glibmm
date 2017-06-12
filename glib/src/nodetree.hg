@@ -55,20 +55,7 @@ class NodeTree
 {
   _CLASS_GENERIC(NodeTree, GNode)
 public:
-  //Hand-written, instead of using _WRAP_ENUM,
-  //because the C enum values don't have a prefix.
-
-  /** Specifies the type of traveral performed by methods such as NodeTree::_traverse() and NodeTree::find().
-   *
-   * @ingroup glibmmEnums
-   */
-  enum class TraverseType
-  {
-    IN_ORDER = G_IN_ORDER, /*!< Visits a node's left child first, then the node itself, then its right child. This is the one to use if you want the output sorted according to the compare function.  */
-    PRE_ORDER = G_PRE_ORDER, /*!< Visits a node, then its children. */
-    POST_ORDER = G_POST_ORDER, /*!< Visits the node's children, then the node itself. */
-    LEVEL_ORDER = G_LEVEL_ORDER /*!< For NodeTree, it vists the root node first, then its children, then its grandchildren, and so on. Note that this is less efficient than the other orders. This is not implemented for Glib::Tree. */
-  };
+  _WRAP_ENUM(TraverseType, GTraverseType, NO_GTYPE)
 
   using TraverseFunc = sigc::slot<bool(NodeTree<T>&)>;
   using ForeachFunc = sigc::slot<void(NodeTree<T>&)>;
@@ -283,7 +270,8 @@ public:
   }
   _IGNORE(g_node_get_root)
 
-
+  // Can't use _WRAP_ENUM for a Flags-type enum in a template class.
+  // gmmproc would get the bitwise operators wrong.
   /** Specifies which nodes are visited during several of the NodeTree methods,
    *  including traverse() and find().
    *
@@ -364,7 +352,7 @@ public:
 
   /** Finds a node in a tree.
    *
-   * @param order The order in which nodes are visited: IN_ORDER, TraverseType::PRE_ORDER, TraverseType::POST_ORDER, or TraverseType::LEVEL_ORDER
+   * @param order The order in which nodes are visited: TraverseType::IN_ORDER, TraverseType::PRE_ORDER, TraverseType::POST_ORDER, or TraverseType::LEVEL_ORDER
    * @param flags Which types of children are to be visited: one of TraverseFlags::ALL, TraverseFlags::LEAVES or TraverseFlags::NON_LEAVES.
    * @param the_data The data for which to search.
    * @return The found node, or <tt>nullptr</tt> if the data is not found.
