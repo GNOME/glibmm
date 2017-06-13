@@ -19,6 +19,8 @@ my $module = "none";
 my $help = 0;
 # if user wants to omit deprecated stuff.
 my $omit = 0;
+# A long warning is printed at most once.
+my $has_warned_unknown_token = 0;
 #
 # prototypes.
 #
@@ -196,6 +198,8 @@ sub process($$)
   my $unknown_val = "";
   my $unknown_base = "";
   my $unknown_increment = 0;
+  # Part of a regular expression
+  my $optional_cast = '(?:\([a-z ]+\)\s*)?';
 
   my @lines = split(/,/, $line);
   my $iter = 0;
@@ -209,15 +213,15 @@ sub process($$)
     # except '(' and ')' enum values
     if ($lines[$iter] =~ /^\s*\S+\s*=\s*'[\(\)]'$/)
     {
-	$iter++;
+      $iter++;
     }
     else
     {
       do
       {
         $brackets_count += () = $lines[$iter] =~ /\(/g;
-	$brackets_count -= () = $lines[$iter] =~ /\)/g;
-	$iter++;
+        $brackets_count -= () = $lines[$iter] =~ /\)/g;
+        $iter++;
       } while ($iter < scalar @lines && $brackets_count != 0);
     }
 
@@ -249,7 +253,7 @@ sub process($$)
     # or 1 << 2 or (1 << 4) or (1 << 5) - 1].
     elsif ($i =~ /^(\S+)\s*=?\s*(0x[0-9a-fA-F]+[\s0-9a-fx<-]*)$/ or
            $i =~ /^(\S+)\s*=?\s*(-?\s*[0-9]+)$/ or
-           $i =~ /^(\S+)\s*=?\s*(\(?1\s*<<\s*[0-9]+\s*\)?[\s0-9a-fx<-]*)$/
+           $i =~ /^(\S+)\s*=?\s*($optional_cast\(?1[uU]?\s*<<\s*[0-9]+\s*\)?[\s0-9a-fx<-]*)$/
           )
     {
       my ($tmp1, $tmp2) = ($1, $2);
@@ -260,8 +264,11 @@ sub process($$)
       {
         $tmp2 =~ s/\s+//;
       }
-      eval("\$val = $tmp2;");
-      if ($tmp2 =~ /^\(?1\s*<</)
+      my $tmp3 = $tmp2;
+      # Perl does not understand C-style cast or the u suffix for unsigned.
+      $tmp3 =~ s/$optional_cast(\(?1)[uU]/$1/;
+      eval("\$val = $tmp3;");
+      if ($tmp2 =~ /^$optional_cast\(?1[uU]?\s*<</)
       {
         $e_h{"flags"} += 10;
       }
@@ -302,17 +309,22 @@ sub process($$)
       foreach my $tmpval (@tmps)
       {
         # if r-value is something like MY_FLAG or MY_DEFINE_VALUE3.
-        if ($tmpval =~ /([_A-Z0-9]+)/)
+        if ($tmpval =~ /([A-Z][_A-Z0-9]+)/)
         {
           my $tmp3 = $1;
           unless (defined($tokens{$tmp3}))
           {
             $dont_eval = 1;
-            print STDERR "WARNING: " . $tmp3 . " value of " . $tmp1 . " element in '" . $c_name . "' enum is an unknown token.\n" .
-                  "It probably is one of below:\n" .
-                  "         - preprocessor value - make sure that header defining this value is included in sources wrapping " . $c_name . ".\n" .
-                  "         - enum value from other header or module - see 'preprocessor value'.\n" .
-                  "         - typo (happens rarely) - send a patch fixing this to maintainer of this module.\n";
+            print STDERR "WARNING: " . $tmp3 . " value of " . $tmp1 . " element in '" . $c_name . "' enum is an unknown token.\n";
+            unless ($has_warned_unknown_token)
+            {
+              # Print this at most once.
+              print STDERR "It probably is one of:\n" .
+                  "  - preprocessor value - make sure that header defining this value is included in sources wrapping the enum.\n" .
+                  "  - enum value from other header or module - see 'preprocessor value'.\n" .
+                  "  - typo (happens rarely) - send a patch fixing this to maintainer of this module.\n";
+              $has_warned_unknown_token = 1;
+            }
             # unknown value often makes a flag.
             $e_h{"flags"}++;
           }
@@ -372,8 +384,9 @@ sub process($$)
       $unknown_flag = 0;
       $e_h{"enum"}++;
     }
-    # it should not get here.
-    else
+    # it should not get here,
+    # except if the last enumerator is followed by a comma.
+    elsif (!($i eq "" and $iter == scalar @lines))
     {
       print STDERR "WARNING: I do not know how to parse it: '" . $i . "' in '" . $c_name . "'.\n";
     }
@@ -410,7 +423,7 @@ sub process($$)
     {
       $numbers[$j] = eval($numbers[$j]);
     }
-    if ($numbers[$j] =~ /[0-9a-fA-F]+/ and $numbers[$j] !~ /[_G-Zg-z<]/)
+    if ($numbers[$j] =~ /[0-9a-fA-F]+/ and $numbers[$j] !~ /[_G-Zg-z<']/)
     {
       $numbers[$j] = sprintf($format, $numbers[$j]);
     }

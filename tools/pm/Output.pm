@@ -711,6 +711,7 @@ sub output_wrap_enum($$$$$$$$$$$$$$)
   $indent .= "  " if ($in_class);
   $indent .= "  " if ($conv_to_int);
   my $elements = $objEnum->build_element_list(1, $ref_subst_in, $ref_subst_out, $indent);
+  add_m4_quotes(\$elements);
 
   if(!$elements)
   {
@@ -817,6 +818,7 @@ sub output_wrap_gerror($$$$$$$$$$$$$)
   unshift(@$ref_subst_out, "");
 
   my $elements = $objEnum->build_element_list(0, $ref_subst_in, $ref_subst_out, "    ");
+  add_m4_quotes(\$elements);
 
   # Get the enum documentation from the parsed docs.
   my $enum_docs = DocsParser::lookup_enum_documentation("$c_type", "Code",
@@ -842,7 +844,7 @@ sub output_wrap_gerror($$$$$$$$$$$$$)
     # $class_docs has got ` and ' replaced and m4 quotes added in WrapParser::
     # on_comment_doxygen() and extract_preceding_documentation().
     # Fix $extra_class_docs here. $deprecation_docs can contain any characters.
-    DocsParser::add_m4_quotes(\$extra_class_docs);
+    add_m4_quotes(\$extra_class_docs);
     $class_docs .= $extra_class_docs;
   }
 
