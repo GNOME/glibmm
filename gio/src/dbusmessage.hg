@@ -88,16 +88,8 @@ public:
   _WRAP_METHOD(MessageType get_message_type() const, g_dbus_message_get_message_type)
   _WRAP_METHOD(void set_message_type(MessageType type), g_dbus_message_set_message_type)
 
-  //gmmproc can't handle the character literals, and this won't be expanded in future,
-  //so we just wrap it by hand.
-  enum ByteOrder
-  {
-    BYTE_ORDER_BIG_ENDIAN    = 'B',
-    BYTE_ORDER_LITTLE_ENDIAN = 'l'
-  };
-
-  #m4 _CONVERSION(`ByteOrder',`GDBusMessageByteOrder',`(GDBusMessageByteOrder)($3)')
-  #m4 _CONVERSION(`GDBusMessageByteOrder',`ByteOrder',`(ByteOrder)($3)')
+  // BIG_ENDIAN and LITTLE_ENDIAN are defined as preprocessor macros somewhere.
+  _WRAP_ENUM(ByteOrder, GDBusMessageByteOrder, NO_GTYPE, s#ENDIAN$#ENDIAN_ORDER#)
 
   _WRAP_METHOD(ByteOrder get_byte_order() const, g_dbus_message_get_byte_order)
   _WRAP_METHOD(void set_byte_order(ByteOrder byte_order), g_dbus_message_set_byte_order)
