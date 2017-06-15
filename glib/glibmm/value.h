@@ -344,7 +344,7 @@ class Value_Flags : public ValueBase_Flags
 public:
   using CppType = T;
 
-  void set(CppType data) { set_flags(static_cast<int>(data)); }
+  void set(CppType data) { set_flags(static_cast<unsigned int>(data)); }
   CppType get() const { return CppType(get_flags()); }
 };
 
