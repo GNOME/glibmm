@@ -105,12 +105,14 @@ protected:
 public:
   _CUSTOM_DTOR()
 
+  // Application::OptionType wraps GOptionArg, but _WRAP_ENUM can't be used here.
+  // GOptionArg is defined in glib_enums.defs, not in gio_enums.defs.
   /** The OptionType enum values determine the expected type of a command line option.
    * If an option expects an extra argument, it can be specified in several ways;
    * with a short option: "-x arg", with a long option: "--name arg" or combined
-   * in a single argument: "--name=arg". All option types except OPTION_TYPE_BOOL
-   * expect an extra argument. OPTION_TYPE_STRING_VECTOR and
-   * OPTION_TYPE_FILENAME_VECTOR accept more than one extra argument.
+   * in a single argument: "--name=arg". All option types except OptionType::BOOL
+   * expect an extra argument. OptionType::STRING_VECTOR and
+   * OptionType::FILENAME_VECTOR accept more than one extra argument.
    *
    * The descriptions of the enum values show what type of Glib::Variant<>
    * is stored in a Glib::VariantDict.
@@ -119,17 +121,17 @@ public:
    *
    * @ingroup glibmmEnums
    */
-  enum OptionType
+  enum class OptionType
   {
-    OPTION_TYPE_BOOL,   ///< bool
-    OPTION_TYPE_STRING, ///< Glib::ustring
-    OPTION_TYPE_INT,    ///< gint32
-    //OPTION_TYPE_CALLBACK,
-    OPTION_TYPE_FILENAME = OPTION_TYPE_INT+2, ///< std::string
-    OPTION_TYPE_STRING_VECTOR,   ///< std::vector<Glib::ustring>
-    OPTION_TYPE_FILENAME_VECTOR, ///< std::vector<std::string>
-    OPTION_TYPE_DOUBLE,          ///< double
-    OPTION_TYPE_INT64            ///< gint64
+    BOOL,   ///< bool
+    STRING, ///< Glib::ustring
+    INT,    ///< gint32
+    // CALLBACK,
+    FILENAME = INT+2, ///< std::string
+    STRING_VECTOR,    ///< std::vector<Glib::ustring>
+    FILENAME_VECTOR,  ///< std::vector<std::string>
+    DOUBLE,           ///< double
+    INT64             ///< gint64
   };
 
   /** Creates an application instance.
@@ -185,7 +187,7 @@ public:
    * Unlike OptionGroup + OptionContext, Application packs the arguments
    * into a Glib::VariantDict which is passed to the
    * signal_handle_local_options() handler, where it can be
-   * inspected and modified. If Gio::APPLICATION_HANDLES_COMMAND_LINE is
+   * inspected and modified. If Gio::Application::Flags::HANDLES_COMMAND_LINE is
    * set, then the resulting dictionary is sent to the primary instance,
    * where Gio::ApplicationCommandLine::get_options_dict() will return it.
    * This "packing" is done according to the type of the argument --
@@ -205,7 +207,7 @@ public:
    * on the local side.  Calling this function "opts in" to the new
    * behaviour, and in particular, means that unrecognised options will be
    * treated as errors.  Unrecognised options have never been ignored when
-   * Gio::APPLICATION_HANDLES_COMMAND_LINE is unset.
+   * Gio::Application::Flags::HANDLES_COMMAND_LINE is unset.
    *
    * If signal_handle_local_options() needs to see the list of
    * filenames, then the use of G_OPTION_REMAINING as @a long_name is recommended.
@@ -311,7 +313,7 @@ public:
    * opening files (eg: "view" vs "edit", etc).
    *
    * The application must be registered before calling this method
-   * and it must have the APPLICATION_HANDLES_OPEN flag set.
+   * and it must have the Application::Flags::HANDLES_OPEN flag set.
    *
    * @param files The files to open. This must be non-empty.
    * @param hint A hint.
@@ -331,7 +333,7 @@ public:
    * opening files (eg: "view" vs "edit", etc).
    *
    * The application must be registered before calling this method
-   * and it must have the APPLICATION_HANDLES_OPEN flag set.
+   * and it must have the Application::Flags::HANDLES_OPEN flag set.
    *
    * @param file The file to open. This must be non-empty.
    * @param hint A hint.
