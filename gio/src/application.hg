@@ -237,11 +237,7 @@ public:
     gchar short_name = '\0', const Glib::ustring& description = Glib::ustring(),
     const Glib::ustring& arg_description = Glib::ustring(),
     Glib::OptionEntry::Flags flags = Glib::OptionEntry::Flags::NONE);
-  _IGNORE(g_application_add_main_option_entries)
-
-  //g_application_add_main_option() seems to be just a new convenience function,
-  //TODO: Use it for some of our add_main_option_entry(without slot) implementation.
-  _IGNORE(g_application_add_main_option)
+  _IGNORE(g_application_add_main_option_entries, g_application_add_main_option)
 
   /** Adds a main option entry to be handled by the Application.
    *
@@ -433,10 +429,10 @@ private:
    */
   const Glib::Class& custom_class_init();
 
-  // Code, common to the public add_main_option_entry*() methods.
-  void add_main_option_entry_private(GOptionArg arg, const Glib::ustring& long_name,
-    gchar short_name, const Glib::ustring& description,
-    const Glib::ustring& arg_description, Glib::OptionEntry::Flags flags);
+  // Code, common to the public add_main_option_entry*() methods with a callback slot.
+  void add_main_option_entry_private(const gchar* long_name, gchar short_name,
+    const gchar* description, const gchar* arg_description,
+    Glib::OptionEntry::Flags flags);
 };
 
 } // namespace Gio
