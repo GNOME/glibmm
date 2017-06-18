@@ -17,6 +17,7 @@
 
 #include <glibmm/object.h>
 #include <giomm/converter.h>
+#include <giomm/initable.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
@@ -28,14 +29,16 @@ namespace Gio
  * CharsetConverter is an implementation of Converter based on GIConv.
  * @newin{2,34}
  */
-class CharsetConverter : public Glib::Object, public Converter
+class CharsetConverter
+: public Glib::Object, public Converter, public Initable
 {
   _CLASS_GOBJECT(CharsetConverter, GCharsetConverter, G_CHARSET_CONVERTER, Glib::Object, GObject)
   _IMPLEMENTS_INTERFACE(Converter)
+  _IMPLEMENTS_INTERFACE(Initable)
 
 protected:
-  // Handwritten to ignore the final GError** parameter in the *_new()
-  // function.
+  // Handwritten to ignore the final GError** parameter in the *_new() function.
+  // But it can throw, due to its call to Initable::init().
   explicit CharsetConverter(const Glib::ustring& to_charset, const Glib::ustring& from_charset);
   _IGNORE(g_charset_converter_new)
 
@@ -46,7 +49,8 @@ public:
    *
    * @param to_charset Destination charset.
    * @param from_charset Source charset.
-   * @return A new CharsetConverter, or <tt>0</tt> on error.
+   * @return A new CharsetConverter, or <tt>nullptr</tt> on error.
+   * @throw Gio::Error
    */
   _WRAP_CREATE(const Glib::ustring& to_charset, const Glib::ustring& from_charset)
 
