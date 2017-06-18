@@ -30,11 +30,11 @@ namespace Gio
 
 class Cancellable;
 
-//TODO: Instead derive from OutputStream, when we can break ABI,
-//because the GPollableOutputStream interface requires the GOutputStream interface.
-//LoadableIcon does a similar thing correctly, for instance.
-// However, GOutputStream is an actual class, deriving from GObject,
-// but GPollableOutputStream is a GInterface, that "requires" GOutputStream.
+// GPollableOutputStream requires GOutputStream, but Gio::PollableOutputStream
+// can't be derived from Gio::OutputStream, because Gio::OutputStream is a
+// Glib::Object. Gio::LoadableIcon is a different case. It can be derived from
+// Gio::Icon, because both are interfaces.
+// See https://bugzilla.gnome.org/show_bug.cgi?id=776537
 
 /** PollableOutputStream - Interface for pollable output streams.
  * PollableOutputStream is implemented by OutputStreams that can be polled for
