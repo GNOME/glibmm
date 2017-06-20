@@ -239,50 +239,50 @@ Regex::split(const Glib::ustring& string, int start_position, MatchFlags match_o
   return retvalue;
 }
 
-MatchInfo::MatchInfo() : gobject_(nullptr), take_ownership(false)
+MatchInfo::MatchInfo() : gobject_(nullptr), take_ownership_(false)
 {
 }
 
-MatchInfo::MatchInfo(GMatchInfo* castitem, bool take_the_ownership)
-: gobject_(castitem), take_ownership(take_the_ownership)
+MatchInfo::MatchInfo(GMatchInfo* castitem, bool take_ownership)
+: gobject_(castitem), take_ownership_(take_ownership)
 {
 }
 
 MatchInfo::MatchInfo(MatchInfo&& other) noexcept : gobject_(std::move(other.gobject_)),
-                                                   take_ownership(std::move(other.take_ownership))
+                                                   take_ownership_(std::move(other.take_ownership_))
 {
   other.gobject_ = nullptr;
-  other.take_ownership = false;
+  other.take_ownership_ = false;
 }
 
 MatchInfo&
 MatchInfo::operator=(MatchInfo&& other) noexcept
 {
-  if (take_ownership && gobject_)
+  if (take_ownership_ && gobject_)
     g_match_info_free(gobject_);
 
   gobject_ = std::move(other.gobject_);
-  take_ownership = std::move(other.take_ownership);
+  take_ownership_ = std::move(other.take_ownership_);
 
   other.gobject_ = nullptr;
-  other.take_ownership = false;
+  other.take_ownership_ = false;
 
   return *this;
 }
 
 void
-MatchInfo::set_gobject(GMatchInfo* castitem, bool take_the_ownership)
+MatchInfo::set_gobject(GMatchInfo* castitem, bool take_ownership)
 {
-  if (gobject_ && this->take_ownership)
+  if (gobject_ && this->take_ownership_)
     g_match_info_free(gobject_);
 
   gobject_ = castitem;
-  this->take_ownership = take_the_ownership;
+  this->take_ownership_ = take_ownership;
 }
 
 MatchInfo::~MatchInfo()
 {
-  if (take_ownership && gobject_)
+  if (take_ownership_ && gobject_)
     g_match_info_free(gobject_);
 }
 
