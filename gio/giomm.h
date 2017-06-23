@@ -72,6 +72,9 @@
 #include <giomm/file.h>
 #include <giomm/fileattributeinfo.h>
 #include <giomm/fileattributeinfolist.h>
+#ifndef G_OS_WIN32
+#include <giomm/filedescriptorbased.h>
+#endif
 #include <giomm/fileenumerator.h>
 #include <giomm/fileicon.h>
 #include <giomm/fileinfo.h>
