@@ -17,6 +17,7 @@
 
 #include <giomm/outputstream.h>
 #include <giomm/seekable.h>
+#include <giomm/pollableoutputstream.h>
 #include <glibmm/object.h>
 // TODO: remove this if possible -- it's here for the GReallocFunc definition
 #include <gio/gio.h>
@@ -45,10 +46,12 @@ namespace Gio
  */
 class MemoryOutputStream :
     public OutputStream,
-    public Seekable
+    public Seekable,
+    public PollableOutputStream
 {
   _CLASS_GOBJECT(MemoryOutputStream, GMemoryOutputStream, G_MEMORY_OUTPUT_STREAM, Gio::OutputStream, GOutputStream)
   _IMPLEMENTS_INTERFACE(Seekable)
+  _IMPLEMENTS_INTERFACE(PollableOutputStream)
 
 protected:
   // Hand-coded because it's equivalent to g_memory_output_stream_new_resizable(),

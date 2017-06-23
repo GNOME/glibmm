@@ -19,6 +19,7 @@ _CONFIGINCLUDE(giommconfig.h)
 
 #include <giomm/inputstream.h>
 #include <giomm/seekable.h>
+#include <giomm/pollableinputstream.h>
 
 _DEFS(giomm,gio)
 _PINCLUDE(giomm/private/inputstream_p.h)
@@ -34,10 +35,12 @@ namespace Gio
  */
 class MemoryInputStream
 : public Gio::InputStream,
-  public Seekable
+  public Seekable,
+  public PollableInputStream
 {
   _CLASS_GOBJECT(MemoryInputStream, GMemoryInputStream, G_MEMORY_INPUT_STREAM, Gio::InputStream, GInputStream)
   _IMPLEMENTS_INTERFACE(Seekable)
+  _IMPLEMENTS_INTERFACE(PollableInputStream)
 
 protected:
   _CTOR_DEFAULT
