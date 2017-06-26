@@ -99,7 +99,12 @@ public:
 
   _WRAP_VFUNC(TlsCertificateFlags verify_chain_finish(const Glib::RefPtr<AsyncResult>& result), "verify_chain_finish", errthrow)
 
+dnl// create_certificate_handle_vfunc() shall return a newly allocated string.
+dnl// Also, ensure that create_certificate_handle_vfunc() never returns an empty char[],
+dnl// because that could be caused by an intermediate empty ustring from an initial null char*.
 #m4 _CONVERSION(`GTlsCertificate*',`const Glib::RefPtr<const TlsCertificate>&',`Glib::wrap($3, true)')
+#m4 _CONVERSION(`Glib::ustring',`gchar*',`g_strdup(Glib::c_str_or_nullptr($3))')
+#m4 _CONVERSION(`gchar*',`Glib::ustring',`Glib::convert_return_gchar_ptr_to_ustring($3)')
   _WRAP_VFUNC(Glib::ustring create_certificate_handle(const Glib::RefPtr<const TlsCertificate>& certificate) const, "create_certificate_handle")
 
 #m4 _CONVERSION(`Glib::RefPtr<TlsCertificate>',`GTlsCertificate*',`G_TLS_CERTIFICATE(g_object_ref(Glib::unwrap($3)))')
