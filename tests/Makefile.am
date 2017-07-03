@@ -121,7 +121,5 @@ glibmm_null_vectorutils_test_SOURCES     = glibmm_null_vectorutils/main.cc
 glibmm_null_vectorutils_test_LDADD       = $(giomm_ldadd)
 glibmm_refptr_test_SOURCES               = glibmm_refptr/main.cc
 glibmm_refptr_sigc_bind_test_SOURCES     = glibmm_refptr_sigc_bind/main.cc
-glibmm_weakref_test_SOURCES              = glibmm_weakref/main.cc
-glibmm_weakref_test_LDADD                = $(giomm_ldadd)
 glibmm_bytearray_test_SOURCES            = glibmm_bytearray/main.cc
 glibmm_ustring_make_valid_test_SOURCES   = glibmm_ustring_make_valid/main.cc
