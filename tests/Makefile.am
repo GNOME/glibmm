@@ -34,6 +34,7 @@ check_PROGRAMS =				\
 	glibmm_interface_move/test			\
 	glibmm_mainloop/test			\
 	glibmm_nodetree/test			\
+	glibmm_object/test			\
 	glibmm_object_move/test			\
 	glibmm_objectbase/test			\
 	glibmm_objectbase_move/test			\
@@ -108,8 +109,11 @@ glibmm_object_test_SOURCES               = glibmm_object/main.cc \
 glibmm_object_move_test_SOURCES          = glibmm_object_move/main.cc \
 					   glibmm_object/test_derived_object.h
 glibmm_objectbase_test_SOURCES           = glibmm_objectbase/main.cc \
-					   glibmm_objectbase/test_derived_objectbase.h
-glibmm_objectbase_move_test_SOURCES      = glibmm_objectbase_move/main.cc
+					   glibmm_objectbase/test_derived_objectbase.h \
+					   glibmm_object/test_derived_object.h
+glibmm_objectbase_move_test_SOURCES      = glibmm_objectbase_move/main.cc \
+					   glibmm_objectbase/test_derived_objectbase.h \
+					   glibmm_object/test_derived_object.h
 glibmm_ustring_compose_test_SOURCES      = glibmm_ustring_compose/main.cc
 glibmm_ustring_format_test_SOURCES       = glibmm_ustring_format/main.cc
 glibmm_value_test_SOURCES                = glibmm_value/main.cc

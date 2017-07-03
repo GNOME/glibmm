@@ -17,7 +17,6 @@ main(int, char**)
 {
   Glib::init();
 
-  test_objectbase();
   test_object();
 
   return EXIT_SUCCESS;
