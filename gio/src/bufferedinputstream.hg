@@ -16,6 +16,7 @@
  */
 
 #include <giomm/filterinputstream.h>
+#include <giomm/seekable.h>
 #include <glibmm/object.h>
 
 _DEFS(giomm,gio)
@@ -40,9 +41,11 @@ namespace Gio
  *
  * @newin{2,16}
  */
-class BufferedInputStream : public Gio::FilterInputStream
+class BufferedInputStream : public Gio::FilterInputStream, public Gio::Seekable
 {
   _CLASS_GOBJECT(BufferedInputStream, GBufferedInputStream, G_BUFFERED_INPUT_STREAM, Gio::FilterInputStream, GFilterInputStream)
+  _IMPLEMENTS_INTERFACE(Seekable)
+
 protected:
   _WRAP_CTOR(BufferedInputStream(const Glib::RefPtr<InputStream>& base_stream), g_buffered_input_stream_new)
 

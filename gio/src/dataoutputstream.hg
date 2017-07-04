@@ -1,5 +1,3 @@
-// -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-
 /* Copyright (C) 2007 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -17,26 +15,28 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <giomm/bufferedoutputstream.h>
+#include <giomm/filteroutputstream.h>
+#include <giomm/seekable.h>
 #include <giomm/enums.h>
 
 _DEFS(giomm,gio)
-_PINCLUDE(giomm/private/bufferedoutputstream_p.h)
+_PINCLUDE(giomm/private/filteroutputstream_p.h)
 
 namespace Gio
 {
 
 /**
- * An implementation of BufferedOutputStream that allows for high-level data
+ * An implementation of FilterOutputStream that allows for high-level data
  * manipulation of arbitrary data (including binary operations).
  *
  * @ingroup Streams
  *
  * @newin{2,16}
  */
-class DataOutputStream : public Gio::BufferedOutputStream
+class DataOutputStream : public Gio::FilterOutputStream, public Gio::Seekable
 {
-  _CLASS_GOBJECT(DataOutputStream, GDataOutputStream, G_DATA_OUTPUT_STREAM, Gio::BufferedOutputStream, GBufferedOutputStream)
+  _CLASS_GOBJECT(DataOutputStream, GDataOutputStream, G_DATA_OUTPUT_STREAM, Gio::FilterOutputStream, GFilterOutputStream)
+  _IMPLEMENTS_INTERFACE(Seekable)
 
 protected:
   _WRAP_CTOR(DataOutputStream(const Glib::RefPtr<OutputStream>& base_stream), g_data_output_stream_new)
@@ -68,4 +68,3 @@ public:
 };
 
 } // namespace Gio
-
