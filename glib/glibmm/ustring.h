@@ -646,7 +646,6 @@ public:
   /* Returns fmt as is, but checks for invalid references in the format string.
    * @newin{2,18}
    */
-  template <class T1>
   static inline ustring compose(const ustring& fmt);
 
   /*! Substitute placeholders in a format string with the referenced arguments.
@@ -1355,7 +1354,6 @@ public:
   inline const ustring* ptr() const { return &string_; }
 };
 
-template <class T1>
 inline // static
   ustring
   ustring::compose(const ustring& fmt)
