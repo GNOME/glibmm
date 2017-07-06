@@ -1288,13 +1288,13 @@ ustring::casefold_collate_key() const
 
 // static
 ustring
-ustring::compose_argv(const Glib::ustring& fmt, int argc, const ustring* const* argv)
+ustring::compose_private(const Glib::ustring& fmt, std::initializer_list<const ustring*> const ilist)
 {
   std::string::size_type result_size = fmt.raw().size();
 
   // Guesstimate the final string size.
-  for (int i = 0; i < argc; ++i)
-    result_size += argv[i]->raw().size();
+  for (auto const it: ilist)
+    result_size += it->raw().size();
 
   std::string result;
   result.reserve(result_size);
@@ -1311,12 +1311,12 @@ ustring::compose_argv(const Glib::ustring& fmt, int argc, const ustring* const* 
     }
     else
     {
-      const int index = Ascii::digit_value(stop[1]) - 1;
+      const std::size_t index = Ascii::digit_value(stop[1]) - 1;
 
-      if (index >= 0 && index < argc)
+      if (index >= 0 && index < ilist.size())
       {
         result.append(start, stop - start);
-        result += argv[index]->raw();
+        result += (*(ilist.begin() + index))->raw();
         start = stop + 2;
       }
       else

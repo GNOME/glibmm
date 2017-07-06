@@ -22,6 +22,7 @@
 #include <glib.h>
 
 #include <cstddef> // for std::size_t and optionally std::ptrdiff_t
+#include <initializer_list>
 #include <iosfwd>
 #include <iterator>
 #include <sstream>
@@ -828,9 +829,10 @@ private:
 
   template <class T>
   class Stringify;
+
   class FormatStream;
 
-  static ustring compose_argv(const ustring& fmt, int argc, const ustring* const* argv);
+  static ustring compose_private(const ustring& fmt, std::initializer_list<const ustring*> ilist);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -1356,7 +1358,7 @@ inline // static
   ustring
   ustring::compose(const ustring& fmt)
 {
-  return ustring::compose_argv(fmt, 0, nullptr);
+  return ustring::compose_private(fmt, {});
 }
 
 template <class T1>
@@ -1366,8 +1368,7 @@ inline // static
 {
   const ustring::Stringify<T1> s1(a1);
 
-  const ustring* const argv[] = { s1.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr() });
 }
 
 template <class T1, class T2>
@@ -1378,8 +1379,7 @@ inline // static
   const ustring::Stringify<T1> s1(a1);
   const ustring::Stringify<T2> s2(a2);
 
-  const ustring* const argv[] = { s1.ptr(), s2.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr(), s2.ptr() });
 }
 
 template <class T1, class T2, class T3>
@@ -1391,8 +1391,7 @@ inline // static
   const ustring::Stringify<T2> s2(a2);
   const ustring::Stringify<T3> s3(a3);
 
-  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr() });
 }
 
 template <class T1, class T2, class T3, class T4>
@@ -1405,8 +1404,7 @@ inline // static
   const ustring::Stringify<T3> s3(a3);
   const ustring::Stringify<T4> s4(a4);
 
-  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr() });
 }
 
 template <class T1, class T2, class T3, class T4, class T5>
@@ -1421,8 +1419,7 @@ inline // static
   const ustring::Stringify<T4> s4(a4);
   const ustring::Stringify<T5> s5(a5);
 
-  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr() });
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6>
@@ -1438,8 +1435,7 @@ inline // static
   const ustring::Stringify<T5> s5(a5);
   const ustring::Stringify<T6> s6(a6);
 
-  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr() });
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
@@ -1456,9 +1452,7 @@ inline // static
   const ustring::Stringify<T6> s6(a6);
   const ustring::Stringify<T7> s7(a7);
 
-  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(),
-    s7.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(), s7.ptr() });
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
@@ -1476,9 +1470,7 @@ inline // static
   const ustring::Stringify<T7> s7(a7);
   const ustring::Stringify<T8> s8(a8);
 
-  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(),
-    s7.ptr(), s8.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr() });
 }
 
 template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -1497,9 +1489,7 @@ inline // static
   const ustring::Stringify<T8> s8(a8);
   const ustring::Stringify<T9> s9(a9);
 
-  const ustring* const argv[] = { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(),
-    s7.ptr(), s8.ptr(), s9.ptr() };
-  return ustring::compose_argv(fmt, G_N_ELEMENTS(argv), argv);
+  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr(), s9.ptr() });
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
