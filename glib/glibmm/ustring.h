@@ -21,13 +21,11 @@
 #include <glibmm/unicode.h>
 #include <glib.h>
 
+#include <cstddef> // for std::size_t and optionally std::ptrdiff_t
 #include <iosfwd>
 #include <iterator>
 #include <sstream>
 #include <string>
-#ifndef GLIBMM_HAVE_STD_ITERATOR_TRAITS
-#include <cstddef> /* for std::ptrdiff_t */
-#endif
 
 namespace Glib
 {
