@@ -110,9 +110,9 @@ dnl
 
 dnl _PUSH(section_name)
 dnl Uses pushdef() to redefine the __DIV__ macro
-dnl so that it diverts ouput to the section_name,
+dnl so that it diverts output to the section_name,
 dnl or discards it (-1) if no section_name is given.
-dnl TODO: However, as far as I can tell, __DIV__ is not used anywhere. murrayc.
+dnl _POP() uses __DIV__ for choosing diversion number.
 define(`_PUSH',`pushdef(`__DIV__',divnum)m4_divert(m4_ifelse($1,,-1,__SEC_$1))dnl`'')
 
 dnl _POP(section_name)

@@ -562,7 +562,6 @@ sub output_wrap_ctor($$$$$)
     }
 
     #Ctor Declaration:
-    #TODO: Add explicit.
     $self->append("  explicit " . $objCppfunc->get_declaration($arg_list) . "\n");
 
     my $errthrow = "";
