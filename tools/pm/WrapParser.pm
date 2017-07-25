@@ -670,45 +670,43 @@ sub extract_bracketed_text($)
   my $str = "";
 
   # Move to the first "(":
-  while ( scalar(@tokens) )
-    {
-      my $t = $self->extract_token();
-      last if ($t eq "(");
-    }
+  while (scalar(@tokens))
+  {
+    my $t = $self->extract_token();
+    last if ($t eq "(");
+  }
 
-  # TODO: Don't count "(" and ")" within double quotes.
-  # There may be .hg files with unpaired quotes that generate correct
-  # .h and .cc files. Don't want to break such code yet.
-  # See also TODO in string_split_commas().
+  my $filename = $$self{filename};
+  my $line_num = $$self{line_num};
 
   # Concatenate until the corresponding ")":
-  while ( scalar(@tokens) )
+  while (scalar(@tokens) and $filename eq $$self{filename})
+  {
+    my $t = $self->extract_token();
+    $in_quotes = !$in_quotes if ($t eq '"');
+    # Don't count "(" and ")" within double quotes.
+    if (!$in_quotes)
     {
-      my $t = $self->extract_token();
-      $in_quotes = !$in_quotes if ($t eq '"');
       $level++ if ($t eq "(");
       $level-- if ($t eq ")");
-
-      if (!$level)
-      {
-        $self->error("End of gmmproc directive within a quoted string.\n") if $in_quotes;
-        return $str;
-      }
-      $str .= $t;
+      return $str if (!$level); # Found matching ")"
     }
+    $str .= $t;
+  }
 
-  return "";
+  # No matching ")" found.
+  my $quote_text = $in_quotes ? " in a quoted string" : "";
+  die "$filename:$line_num: *** End of file$quote_text in a gmmproc macro. ***\n";
 }
 
 
 ########################################
 ###  breaks up a string by commas (smart)
-# @strings string_split_commas($string [, $ignore_quotes])
-sub string_split_commas($;$)
+# @strings string_split_commas($string)
+sub string_split_commas($)
 {
-  my ($in, $ignore_quotes) = @_;
+  my ($in) = @_;
 
-  $ignore_quotes = 2 unless defined $ignore_quotes;
   my @out;
   my $level = 0;
   my $in_braces = 0;
@@ -722,10 +720,7 @@ sub string_split_commas($;$)
 
     next if ($t eq "");
 
-    # TODO: Delete the test for scalar(@out) >= $ignore_quotes when we can stop accepting
-    # .hg files with unpaired quotes, such as _WRAP_PROPERTY("text_column, int).
-    # See also TODO in extract_bracketed_text().
-    $in_quotes = !$in_quotes if ($t eq '"' and scalar(@out) >= $ignore_quotes);
+    $in_quotes = !$in_quotes if ($t eq '"');
     if (!$in_quotes)
     {
       $in_braces++ if ($t eq "{");
@@ -1033,7 +1028,7 @@ sub on_wrap_method_docs_only($)
   my $line_num = $$self{line_num};
 
   my $str = $self->extract_bracketed_text();
-  my @args = string_split_commas($str, 1);
+  my @args = string_split_commas($str);
 
   my $entity_type = "method";
 
