@@ -32,6 +32,7 @@ _WRAP_ENUM(FormatSizeFlags, GFormatSizeFlags, NO_GTYPE)
 
 /** Gets a human-readable name for the application,
  * as set by Glib::set_application_name().
+ *
  * This name should be localized if possible, and is intended for display to
  * the user.  Contrast with Glib::get_prgname(), which gets a non-localized
  * name. If Glib::set_application_name() has not been called, returns the
@@ -58,9 +59,14 @@ Glib::ustring get_application_name();
 void set_application_name(const Glib::ustring& application_name);
 
 /** Gets the name of the program.
+ *
+ * This name should not be localized, in contrast to get_application_name().
+ *
  * If you are using GDK or GTK+ the program name is set in <tt>gdk_init()</tt>,
- * which is called by <tt>gtk_init()</tt>.  The program name is found by taking
- * the last component of <tt>argv[0]</tt>.
+ * which is called by <tt>gtk_init()</tt> and therefore by the constructors of
+ * Gtk::Main and Gtk::Application. The program name is found by taking the last
+ * component of <tt>argv[0]</tt>.
+ *
  * @return The name of the program.
  */
 std::string get_prgname();
@@ -137,13 +143,24 @@ void unsetenv(const std::string& variable);
 std::vector<std::string> listenv();
 
 /** Gets the user name of the current user.
+ *
+ * The encoding of the returned string is system-defined. On UNIX, it might be
+ * the preferred file name encoding, or something else, and there is no
+ * guarantee that it is ever consistent on a machine. On Windows, it is always
+ * UTF-8.
+ *
  * @return The name of the current user.
  */
 std::string get_user_name();
 
-/** Gets the real name of the user.
- * This usually comes from the user's entry in the <tt>passwd</tt> file.
- * @return The user's real name.
+/** Gets the real name of the current user.
+ *
+ * This usually comes from the user's entry in the <tt>passwd</tt> file. The
+ * encoding of the returned string is subject to the same variability as noted
+ * for get_user_name(). If the real user name cannot be determined, the string
+ * "Unknown" is returned.
+ *
+ * @return The current user's real name.
  */
 std::string get_real_name();
 
