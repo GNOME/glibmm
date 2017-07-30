@@ -233,11 +233,11 @@ struct TypeTraits<Glib::RefPtr<const T>>
 
 } // namespace Container_Helpers
 
-template <class T, class PtrT>
+template <class PtrT>
 inline PtrT
-Value_Pointer<T, PtrT>::get_(Glib::Object*) const
+Value_Pointer<PtrT>::get_(Glib::Object*) const
 {
-  return dynamic_cast<T*>(get_object());
+  return dynamic_cast<PtrT>(get_object());
 }
 
 /** Partial specialization for RefPtr<> to Glib::Object.
