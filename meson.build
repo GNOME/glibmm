@@ -9,16 +9,18 @@ project('glibmm', 'cpp',
   ],
 )
 
+glibdep = dependency('glib-2.0')
+gmoduledep = dependency('gmodule-2.0')
+gobjectdep = dependency('gobject-2.0')
+sigcppdep = dependency('sigc++-3.0')
+
+python = find_program('python')
+perl = find_program('perl')
+m4 = find_program('m4')
+
+wrap_output = join_paths(meson.source_root(), 'tools', 'wrap_output.py')
+
 conf = configuration_data()
-conf.set_quoted('PACKAGE_NAME', 'glibmm')
-conf.set('PACKAGE_VERSION', meson.project_version())
-conf.set_quoted('PACKAGE_DOCDIR', join_paths(get_option('prefix'), get_option('datadir'), 'doc/glibmm'))
-conf.set_quoted('PACKAGE_LIBDIR', join_paths(get_option('prefix'), get_option('libdir')))
-conf.set_quoted('PACKAGE_LOCALE_DIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
-conf.set_quoted('PACKAGE_LIBEXECDIR', join_paths(get_option('prefix'), get_option('libexecdir')))
-conf.set_quoted('PACKAGE_URL', 'https://bugzilla.gnome.org/enter_bug.cgi?product=glibmm')
-conf.set('GETTEXT_PACKAGE', 'PACKAGE_NAME')
-conf.set('LOCALEDIR', 'PACKAGE_LOCALE_DIR')
 
 conf.set('GLIBMM_API', '')
 conf.set('M4', 'm4')
@@ -28,11 +30,8 @@ configure_file(output : 'config.h',
 
 config_inc_dir = include_directories('.')
 
-global_cxx_args = [
-  '-Wno-unused-parameter'
-]
-
-add_project_arguments(global_cxx_args, language: 'cpp')
+add_project_arguments(language: 'cpp')
 
 subdir('tools')
 subdir('glib')
+subdir('gio')

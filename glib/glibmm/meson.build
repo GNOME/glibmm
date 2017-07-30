@@ -1,14 +1,3 @@
-glibdep = dependency('glib-2.0')
-gmoduledep = dependency('gmodule-2.0')
-gobjectdep = dependency('gobject-2.0')
-sigcppdep = dependency('sigc++-3.0')
-
-python = find_program('python')
-perl = find_program('perl')
-m4 = find_program('m4')
-
-wrap_output = join_paths(meson.source_root(), 'tools', 'wrap_output.py')
-
 glibmm_modules = [
   'balancedtree',
   'binding',
@@ -81,12 +70,12 @@ glibmm_targets = []
 
 #TODO ugly hack, has to be implemented in other way in the future
 private_dir = join_paths(meson.build_root(), 'glib', 'glibmm', 'private')
-glibmm_targets += custom_target('generate_priv_dir',
+glibmm_targets += custom_target('glibmm_generate_priv_dir',
   output : 'private',
   command : [python, '-c',
             'import os\nos.mkdir("' + private_dir + '")'])
 
-glibmm_targets += custom_target('generate_wrap_init',
+glibmm_targets += custom_target('glibmm_generate_wrap_init',
   output : 'wrap_init.cc',
   command : [python,
              wrap_output,
@@ -97,9 +86,9 @@ glibmm_targets += custom_target('generate_wrap_init',
              '--namespace=Glib', '--parent_dir=glibmm'])
 
 foreach glibmm_module : glibmm_modules
-  glibmm_targets += custom_target('generate_cc_' + glibmm_module,
+  glibmm_targets += custom_target('glibmm_generate_cc_' + glibmm_module,
     output : [glibmm_module + '.cc', glibmm_module + '.h'],
-    input : '../src/' + glibmm_module + '.hg',
+    input : join_paths('..', 'src', glibmm_module + '.hg'),
     command : [perl,
                '-I../tools/pm', '--', join_paths(meson.build_root(), 'tools', 'gmmproc'),
                '-I', join_paths(meson.source_root(), 'tools', 'm4'),
@@ -140,3 +129,4 @@ glibmm_library = shared_library(
   include_directories : glibmm_includes,
   dependencies : [glibdep, sigcppdep, gobjectdep, gmoduledep])
 
+glibmm_dep = declare_dependency(link_with : glibmm_library)
