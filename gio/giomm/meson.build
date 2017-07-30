@@ -180,9 +180,15 @@ endforeach
 
 giomm_includes = include_directories('..')
 
+giomm_deps = [glibmm_dep, giounixdep, giodep]
+
 giomm_library = shared_library(
   'giomm',
   giomm_targets, giomm_handwritten_sources,
   include_directories : giomm_includes,
-  dependencies : [glibdep, sigcppdep, gobjectdep, gmoduledep, giounixdep, giodep, glibmm_dep])
+  dependencies : giomm_deps)
 
+giomm_dep = declare_dependency(
+  link_with : giomm_library,
+  include_directories : include_directories('..'),
+  dependencies : giomm_deps)

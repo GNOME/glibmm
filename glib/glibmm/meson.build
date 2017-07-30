@@ -123,12 +123,15 @@ endforeach
 
 glibmm_includes = include_directories('..')
 
+glibmm_deps = [glibdep, sigcppdep, gobjectdep, gmoduledep]
+
 glibmm_library = shared_library(
   'glibmm',
   glibmm_targets, glibmm_handwritten_sources,
   include_directories : glibmm_includes,
-  dependencies : [glibdep, sigcppdep, gobjectdep, gmoduledep])
+  dependencies : glibmm_deps)
 
 glibmm_dep = declare_dependency(
   link_with : glibmm_library,
-  include_directories : include_directories('..'))
+  include_directories : include_directories('..'),
+  dependencies : glibmm_deps)
