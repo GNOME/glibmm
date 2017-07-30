@@ -178,7 +178,7 @@ foreach giomm_module : giomm_modules
                join_paths('gio', 'giomm')])
 endforeach
 
-giomm_includes = include_directories('..', 'gio', join_paths('..', '..', 'glib'))
+giomm_includes = include_directories('..')
 
 giomm_library = shared_library(
   'giomm',

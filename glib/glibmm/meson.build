@@ -121,7 +121,7 @@ foreach m4_file : glibmm_m4_files
 endforeach
 
 
-glibmm_includes = include_directories('..', 'glib')
+glibmm_includes = include_directories('..')
 
 glibmm_library = shared_library(
   'glibmm',
@@ -129,4 +129,6 @@ glibmm_library = shared_library(
   include_directories : glibmm_includes,
   dependencies : [glibdep, sigcppdep, gobjectdep, gmoduledep])
 
-glibmm_dep = declare_dependency(link_with : glibmm_library)
+glibmm_dep = declare_dependency(
+  link_with : glibmm_library,
+  include_directories : include_directories('..'))
