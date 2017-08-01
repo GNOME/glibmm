@@ -709,7 +709,6 @@ sub string_split_commas($)
 
   my @out;
   my $level = 0;
-  my $in_braces = 0;
   my $in_quotes = 0;
   my $str = "";
   my @in = split(/([,"()<>{}])/, $in);
@@ -723,15 +722,12 @@ sub string_split_commas($)
     $in_quotes = !$in_quotes if ($t eq '"');
     if (!$in_quotes)
     {
-      $in_braces++ if ($t eq "{");
-      $in_braces-- if ($t eq "}");
+      $level++ if ($t eq "(" or $t eq "<" or $t eq "{");
 
-      $level++ if ($t eq "(" or $t eq "<");
-
-      # In the case of a '>' decrease the level if it is not in a {...}
-      # because if it is found in a {...} it is most likely indicating that
-      # a parameter in a method declaration is an output param.
-      $level-- if ($t eq ")" or ($t eq ">" && !$in_braces));
+      # In the case of a '>' decrease the level if it is not in a {...} without
+      # a preceding '<', because then it is most likely indicating that
+      # a parameter in a method declaration is an output parameter (name{>>}).
+      $level-- if ($t eq ")" or $t eq "}" or ($t eq ">" && $str !~ /{[^<}]*$/));
 
       # Don't split at comma, if inside a function, e.g. void f1(int x, int y)
       # or std::map<Glib::ustring, float> f2(),

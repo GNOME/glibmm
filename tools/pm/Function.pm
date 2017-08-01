@@ -104,12 +104,11 @@ sub new($$)
   }
   elsif ($line =~ /^([^()]+)\s+(\S+)\s*\((.*)\)\s*(const)*$/)
   {
-    no warnings qw(uninitialized); # disable the uninitialize warning for $4
     $$self{rettype} = $1;
     $$self{name} = $2;
     $$self{c_name} = $2;
     $self->parse_param($3);
-    $$self{const} = ($4 eq "const");
+    $$self{const} = defined($4);
   }
   else
   {
@@ -158,7 +157,7 @@ sub new_ctor($$)
   if ($line =~ /^(\S+)\s*\((.*)\)\s*/)
   {
     $$self{name} = $1;
-    $$self{c_name} = $2;
+    $$self{c_name} = $1;
     $self->parse_param($2);
   }
   else
@@ -211,60 +210,73 @@ sub parse_param($$)
   $line =~ s/\s+/ /g; # Compress whitespace.
   return if ($line =~ /^$/);
 
-  # parse through argument list
+  # Add a ',' at the end. No special treatment of the last parameter is necessary,
+  # if it's followed by a comma, like the other parameters.
+  $line .= ',' if (substr($line, -1) ne ',');
+
+  # Parse through the argument list.
+  #
+  # We must find commas (,) that separate parameters, and equal signs (=) that
+  # separate parameter names from optional default values.
+  # '&', '*' and '>' are delimiters in split() because they must be separated
+  # from the parameter name even if there is no space char between.
+  # Commas within "<.,.>" or "{.,.}" or "(.,.)" do not end a parameter.
+  # This parsing is not guaranteed to work well if there are several levels
+  # of (()) or {{}}. X<Y<Z>> works in the normal case where there is nothing
+  # but possibly spaces between the multiple ">>".
+  # Quoted strings are not detected. If a quoted string exists in a function
+  # prototype, it's probably as part of a default value, inside ("x") or {"y"}.
+  # 
   my @str = ();
-  my $par = 0;
-  foreach (split(/(const )|([,=&*()])|({.*?})|(<[^,]*?>)|(\s+)/, $line)) #special characters OR <something> OR whitespace.
+  foreach (split(/(\bconst\b|[,=&*>]|<.*?>|{.*?}|\(.*?\)|\s+)/, $line))
   {
     next if ( !defined($_) or $_ eq "" );
 
-    if ( $_ eq "(" ) #Detect the opening bracket.
+    if ($_ =~ /^(?:const|[*&>]|<.*>|\(.*\)|\s+)$/)
     {
-       push(@str, $_);
-       $par++; #Increment the number of parameters.
-       next;
-    }
-    elsif ( $_ eq ")" )
-    {
-       push(@str, $_);
-       $par--; #Decrement the number of parameters.
-       next;
-    }
-    elsif( $_ =~ /{(.*)}/)
-    {
-      # gmmproc options have been specified for the current parameter so
-      # process them.
-
-      # Get the options.
-      my $options = $1;
-
-      # Check if param should be optional or an output param.
-      $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
-      $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
-
-      # Delete "NULL" from $options, so it won't be interpreted as a parameter name.
-      if ($options =~ s/(!?\bNULL\b)//)
-      {
-        $flags |= ($1 eq "!NULL") ? FLAG_PARAM_EMPTY_STRING : FLAG_PARAM_NULLPTR;
-      }
-
-      # Check if it should be mapped to a C param.
-      if ($options =~ /(\w+|\.)/)
-      {
-        $mapping = $1;
-        $mapping = $name if($mapping eq ".");
-      }
+      # Any separator, except ',' or '=' or {.*}.
+      push(@str, $_);
       next;
     }
-    elsif ( $par || /^(const )|(<[^,]*>)|([*&>])|(\s+)/ ) #TODO: What's happening here?
+    elsif ($_ =~ /^{(.*)}$/)
     {
-      push(@str, $_); #This looks like part of the type, so we store it.
+      if (!$has_value)
+      {
+        # gmmproc options have been specified for the current parameter so
+        # process them.
+
+        # Get the options.
+        my $options = $1;
+
+        # Check if param should be optional or an output param.
+        $flags = FLAG_PARAM_OPTIONAL if($options =~ /\?/);
+        $flags |= FLAG_PARAM_OUTPUT if($options =~ />>/);
+
+        # Delete "NULL" from $options, so it won't be interpreted as a parameter name.
+        if ($options =~ s/(!?\bNULL\b)//)
+        {
+          $flags |= ($1 eq "!NULL") ? FLAG_PARAM_EMPTY_STRING : FLAG_PARAM_NULLPTR;
+        }
+
+        # Check if it should be mapped to a C param.
+        if ($options =~ /(\w+|\.)/)
+        {
+          $mapping = $1;
+          $mapping = $name if($mapping eq ".");
+        }
+      }
+      else
+      {
+        # {...} in a default value.
+        push(@str, $_);
+      }
       next;
     }
     elsif ( $_ eq "=" ) #Default value
     {
       $str[$name_pos] = "" if ($name_pos >= 0);
-      $type = join("", @str); #The type is everything before the = character.
+      # The type is everything before the = character, except the parameter name.
+      $type = join("", @str);
       @str = (); #Wipe it so that it will only contain the default value, which comes next.
       $has_value = 1;
       next;
@@ -310,54 +322,26 @@ sub parse_param($$)
       $mapping = "";
 
       $id = 0;
-
       next;
     }
 
-    if ($has_value)
-    {
-      push(@str, $_);
-      next;
-    }
-
-    # The last identifier before ',', '=', or '{.*}' is the parameter name.
-    # E.g. int name, unsigned long int name = 42, const unsigned int& name.
-    # The name must be preceded by at least one other identifier (the type).
-    # 'const ' is treated specially, as it can't by itself denote the type.
-    $id++;
+    # Anything but a separator in split().
     push(@str, $_);
-    if ($id >= 2)
+
+    if (!$has_value)
     {
-      $name = $_;
-      $name_pos = $#str;
+      # The last identifier before ',', '=', or '{.*}' is the parameter name.
+      # E.g. int name, unsigned long int name = 42, const unsigned int& name.
+      # The name must be preceded by at least one other identifier (the type).
+      # 'const' is treated specially, as it can't by itself denote the type.
+      $id++;
+      if ($id >= 2)
+      {
+        $name = $_;
+        $name_pos = $#str;
+      }
     }
-  }
-
-  # handle last argument  (There's no , at the end.)
-  if ($has_value)
-  {
-    $value = join("", @str);
-  }
-  else
-  {
-    $str[$name_pos] = "" if ($name_pos >= 0);
-    $type = join("", @str);
-  }
-
-  if ($name eq "")
-  {
-    $name = sprintf("p%s", $#$param_types + 2)
-  }
-
-  $type = string_trim($type);
-
-  push(@$param_types, $type);
-  push(@$param_names, $name);
-  push(@$param_default_values, $value);
-  push(@$param_flags, $flags);
-
-  # Map from the c_name to the C++ index (no map if no name given).
-  $$param_mappings{$mapping} = $curr_param if($mapping);
+  } # end foreach
 }
 
 # add_parameter_autoname($, $type, $name)
