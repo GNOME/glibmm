@@ -237,7 +237,7 @@ template <class PtrT>
 inline PtrT
 Value_Pointer<PtrT>::get_(Glib::Object*) const
 {
-  return dynamic_cast<PtrT>(get_object());
+  return dynamic_cast<T>(get_object());
 }
 
 /** Partial specialization for RefPtr<> to Glib::Object.
