@@ -109,7 +109,6 @@ giomm_modules = [
   'dbusinterfaceskeleton',
   'inetaddress',
   'settingsschema',
-  'unixmount',
   'dbusinterfacevtable',
   'inetsocketaddress',
   'settingsschemakey',
@@ -152,9 +151,15 @@ private_dir = join_paths(meson.build_root(), 'gio', 'giomm', 'private')
 giomm_targets += custom_target('giomm_generate_priv_dir',
   output : 'private',
   command : [python, '-c',
-            'import os\nos.mkdir("' + private_dir + '")'])
+            'import os\nos.makedirs("' + private_dir + '", exist_ok=True)'])
+
+giomm_hg_files = []
+foreach module : giomm_modules
+  giomm_hg_files += [join_paths(meson.current_source_dir(), '..', 'src', module + '.hg')]
+endforeach
 
 giomm_targets += custom_target('giomm_generate_wrap_init',
+  input : glibmm_hg_files,
   output : 'wrap_init.cc',
   command : [python,
              wrap_output,
@@ -162,7 +167,7 @@ giomm_targets += custom_target('giomm_generate_wrap_init',
 	     join_paths(meson.current_build_dir(), 'wrap_init.cc'),
              '--',
              join_paths(meson.build_root(), 'tools', 'generate_wrap_init.pl'),
-             '--namespace=Gio', '--parent_dir=giomm'])
+             '--namespace=Gio', '--parent_dir=giomm'] + giomm_hg_files)
 
 # TODO: foreach below could be replaced with simpler code (see glibmm's meson file)
 foreach giomm_module : giomm_modules

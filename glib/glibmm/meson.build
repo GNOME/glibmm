@@ -73,9 +73,15 @@ private_dir = join_paths(meson.build_root(), 'glib', 'glibmm', 'private')
 glibmm_targets += custom_target('glibmm_generate_priv_dir',
   output : 'private',
   command : [python, '-c',
-            'import os\nos.mkdir("' + private_dir + '")'])
+            'import os\nos.makedirs("' + private_dir + '", exist_ok=True)'])
+
+glibmm_hg_files = []
+foreach module : glibmm_modules
+  glibmm_hg_files += [join_paths(meson.current_source_dir(), '..', 'src', module + '.hg')]
+endforeach
 
 glibmm_targets += custom_target('glibmm_generate_wrap_init',
+  input : glibmm_hg_files,
   output : 'wrap_init.cc',
   command : [python,
              wrap_output,
@@ -83,7 +89,7 @@ glibmm_targets += custom_target('glibmm_generate_wrap_init',
 	     join_paths(meson.current_build_dir(), 'wrap_init.cc'),
              '--',
              join_paths(meson.build_root(), 'tools', 'generate_wrap_init.pl'),
-             '--namespace=Glib', '--parent_dir=glibmm'])
+             '--namespace=Glib', '--parent_dir=glibmm'] + glibmm_hg_files)
 
 foreach glibmm_module : glibmm_modules
   glibmm_targets += custom_target('glibmm_generate_cc_' + glibmm_module,

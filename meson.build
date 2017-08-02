@@ -14,7 +14,7 @@ gmoduledep = dependency('gmodule-2.0')
 gobjectdep = dependency('gobject-2.0')
 sigcppdep = dependency('sigc++-3.0')
 
-python = find_program('python')
+python = import('python3').find_python()
 perl = find_program('perl')
 m4 = find_program('m4')
 
