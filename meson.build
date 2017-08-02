@@ -41,7 +41,7 @@ conf.set('GIOMM_DISABLE_DEPRECATED', get_option('disable-deprecated-api'))
 
 conf.set('SIZEOF_WCHAR_T', compiler.sizeof('wchar_t'))
 
-tstcompiler = '''struct foo
+member_function_member_template_src = '''struct foo
 {
   template <class C> inline void doit();
   void thebug();
@@ -77,11 +77,11 @@ int main() {
 }
 '''
 
-if compiler.compiles(tstcompiler)
+if compiler.compiles(member_function_member_template_src)
   conf.set('GLIBMM_MEMBER_FUNCTIONS_MEMBER_TEMPLATES', 1)
 endif
 
-compilertest = '''
+have_disambiguous_const_template_specializations_src = '''
 template <class T> class Foo {};
 
 template <class T> class Traits
@@ -114,11 +114,11 @@ int main() {
   return 0;
 }
 '''
-if compiler.compiles(compilertest)
+if compiler.compiles(have_disambiguous_const_template_specializations_src)
   conf.set('GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS', 1)
 endif
 
-compilertest = '''
+can_use_dynamic_cast_in_unused_template_without_definition_src = '''
 class SomeClass;
 
 SomeClass* some_function();
@@ -134,7 +134,7 @@ class SomeTemplate
   }
 };
 '''
-if compiler.compiles(compilertest)
+if compiler.compiles(can_use_dynamic_cast_in_unused_template_without_definition_src)
   conf.set('GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION', 1)
 endif
 

@@ -19,6 +19,9 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#ifndef _WIN32
+#include <config.h>
+#endif
 #include <giomm.h>
 #include <iostream>
 #include <mutex>
