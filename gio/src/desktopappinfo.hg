@@ -23,6 +23,9 @@ _CONFIGINCLUDE(giommconfig.h)
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
+// This file is not used on Windows and Mac OS Cocoa
+_GMMPROC_WRAP_CONDITIONALLY(if !defined(G_OS_WIN32) && !defined(GLIBMM_OS_COCOA))
+
 namespace Glib
 {
 
@@ -44,7 +47,6 @@ class DesktopAppInfo
 {
   _CLASS_GOBJECT(DesktopAppInfo, GDesktopAppInfo, G_DESKTOP_APP_INFO, Glib::Object, GObject)
   _IMPLEMENTS_INTERFACE(AppInfo)
-  _GTKMMPROC_WIN32_NO_WRAP
 
 public:
   // TODO: should use _WRAP_CREATE(), but these functions do more than just call
