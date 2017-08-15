@@ -61,7 +61,7 @@
 #include <giomm/dbussubtreevtable.h>
 #include <giomm/dbusutils.h>
 #include <giomm/dbuswatchname.h>
-#ifndef G_OS_WIN32
+#if !defined(G_OS_WIN32) && !defined(GLIBMM_OS_COCOA)
 #include <giomm/desktopappinfo.h>
 #endif
 #include <giomm/drive.h>
