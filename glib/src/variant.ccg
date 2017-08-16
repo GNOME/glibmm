@@ -324,6 +324,70 @@ Variant<Glib::ustring>::get() const
   return convert_const_gchar_ptr_to_ustring(g_variant_get_string(gobject_, nullptr));
 }
 
+/*--------------------Variant<Glib::DBusObjectPathString>---------------------*/
+
+Variant<Glib::DBusObjectPathString>::Variant() : VariantStringBase()
+{
+}
+
+Variant<Glib::DBusObjectPathString>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantStringBase(castitem, take_a_reference)
+{
+}
+
+// static
+const VariantType&
+Variant<Glib::DBusObjectPathString>::variant_type()
+{
+  return VARIANT_TYPE_OBJECT_PATH;
+}
+
+Variant<Glib::DBusObjectPathString>
+Variant<Glib::DBusObjectPathString>::create(const Glib::DBusObjectPathString& data)
+{
+  auto result = Variant<CppType>(g_variant_new_object_path(data.c_str()));
+  return result;
+}
+
+Glib::DBusObjectPathString
+Variant<Glib::DBusObjectPathString>::get() const
+{
+  const char* s = g_variant_get_string(gobject_, nullptr);
+  return s ? CppType(s) : CppType();
+}
+
+/*--------------------Variant<Glib::DBusSignatureString>---------------------*/
+
+Variant<Glib::DBusSignatureString>::Variant() : VariantStringBase()
+{
+}
+
+Variant<Glib::DBusSignatureString>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantStringBase(castitem, take_a_reference)
+{
+}
+
+// static
+const VariantType&
+Variant<Glib::DBusSignatureString>::variant_type()
+{
+  return VARIANT_TYPE_SIGNATURE;
+}
+
+Variant<Glib::DBusSignatureString>
+Variant<Glib::DBusSignatureString>::create(const Glib::DBusSignatureString& data)
+{
+  auto result = Variant<CppType>(g_variant_new_signature(data.c_str()));
+  return result;
+}
+
+Glib::DBusSignatureString
+Variant<Glib::DBusSignatureString>::get() const
+{
+  const char* s = g_variant_get_string(gobject_, nullptr);
+  return s ? CppType(s) : CppType();
+}
+
 /*--------------------Variant<std::string>---------------------*/
 
 Variant<std::string>::Variant() : VariantStringBase()
@@ -438,6 +502,80 @@ Variant<type_vec_ustring>::get() const
 
 VariantIter
 Variant<type_vec_ustring>::get_iter() const
+{
+  return VariantContainerBase::get_iter(variant_type());
+}
+
+/*--------------------Variant<std::vector<Glib::DBusObjectPathString>>---------------------*/
+
+using type_vec_opstring = std::vector<Glib::DBusObjectPathString>;
+
+Variant<type_vec_opstring>::Variant() : VariantContainerBase()
+{
+}
+
+Variant<type_vec_opstring>::Variant(GVariant* castitem, bool take_a_reference)
+: VariantContainerBase(castitem, take_a_reference)
+{
+}
+
+// static
+const VariantType&
+Variant<type_vec_opstring>::variant_type()
+{
+  return VARIANT_TYPE_OBJECT_PATH_ARRAY;
+}
+
+// static
+Variant<type_vec_opstring>
+Variant<type_vec_opstring>::create(const type_vec_opstring& data)
+{
+  // Get the variant type of the elements.
+  VariantType element_variant_type = Variant<CppType>::variant_type();
+
+  // Get the variant type of the array.
+  VariantType array_variant_type = Variant<type_vec_opstring>::variant_type();
+
+  // Create a GVariantBuilder to build the array.
+  GVariantBuilder* builder = g_variant_builder_new(array_variant_type.gobj());
+
+  // Add the elements of the vector into the builder.
+  for (const auto& str : data)
+    g_variant_builder_add(builder, element_variant_type.get_string().c_str(), str.c_str());
+
+  // Create the variant using the builder.
+  auto result =
+    Variant<type_vec_opstring>(g_variant_new(array_variant_type.get_string().c_str(), builder));
+
+  g_variant_builder_unref(builder);
+
+  return result;
+}
+
+Glib::DBusObjectPathString
+Variant<type_vec_opstring>::get_child(gsize index) const
+{
+  if (index >= get_n_children())
+    throw std::out_of_range(
+      "Variant< std::vector<Glib::DBusObjectPathString> >::get_child(): Index out of bounds.");
+
+  GVariant* gvariant = g_variant_get_child_value(const_cast<GVariant*>(gobj()), index);
+
+  return Glib::Variant<CppType>(gvariant).get();
+}
+
+type_vec_opstring
+Variant<type_vec_opstring>::get() const
+{
+  gsize n_children = 0;
+  const gchar** children = g_variant_get_objv(const_cast<GVariant*>(gobj()), &n_children);
+  type_vec_opstring result = type_vec_opstring(children, children+n_children);
+  g_free(children);
+  return result;
+}
+
+VariantIter
+Variant<type_vec_opstring>::get_iter() const
 {
   return VariantContainerBase::get_iter(variant_type());
 }
