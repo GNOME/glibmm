@@ -13,8 +13,7 @@
 ## for more details.
 ##
 ## You should have received a copy of the GNU General Public License along
-## with danielk's Autostuff; if not, write to the Free Software Foundation,
-## Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+## with danielk's Autostuff.  If not, see <http://www.gnu.org/licenses/>.
 
 #serial 20110910
 
