@@ -648,80 +648,32 @@ public:
   static inline ustring compose(const ustring& fmt);
 
   /*! Substitute placeholders in a format string with the referenced arguments.
-   * The template string should be in <tt>qt-format</tt>, that is
-   * <tt>"%1"</tt>, <tt>"%2"</tt>, ..., <tt>"%9"</tt> are used as placeholders
-   * and <tt>"%%"</tt> denotes a literal <tt>"%"</tt>.  Substitutions may be
-   * reordered.
+   *
+   * The template string uses a similar format to Qt’s QString class, in that
+   * <tt>%1</tt>, <tt>%2</tt>, and so on to <tt>%9</tt> are used as placeholders
+   * to be substituted with the string representation of the @a args 1–9, while
+   * <tt>%%</tt> inserts a literal <tt>%</tt> in the output. Placeholders do not
+   * have to appear in the same order as their corresponding function arguments.
+   *
    * @par Example:
    * @code
    * using Glib::ustring;
    * const int percentage = 50;
    * const ustring text = ustring::compose("%1%% done", percentage);
    * @endcode
-   * @param fmt A template string in <tt>qt-format</tt>.
-   * @param a1 The argument to substitute for <tt>"%1"</tt>.
+   *
+   * @param fmt The template string, in the format described above.
+   * @param args 1 to 9 arguments to substitute for <tt>%1</tt> to <tt>%9</tt>
+   * respectively.
+   *
    * @return The substituted message string.
+   *
    * @throw Glib::ConvertError
    *
-   * @newin{2,16}
+   * @newin{2,56}
    */
-  template <class T1>
-  static inline ustring compose(const ustring& fmt, const T1& a1);
-
-  /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin{2,16}
-   */
-  template <class T1, class T2>
-  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2);
-
-  /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3>
-  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3);
-
-  /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4>
-  static inline ustring compose(
-    const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4);
-
-  /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5>
-  static inline ustring compose(
-    const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5);
-
-  /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5, class T6>
-  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3,
-    const T4& a4, const T5& a5, const T6& a6);
-
-  /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3,
-    const T4& a4, const T5& a5, const T6& a6, const T7& a7);
-
-  /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3,
-    const T4& a4, const T5& a5, const T6& a6, const T7& a7, const T8& a8);
-
-  /* See the documentation for compose(const ustring& fmt, const T1& a1).
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8,
-    class T9>
-  static inline ustring compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3,
-    const T4& a4, const T5& a5, const T6& a6, const T7& a7, const T8& a8, const T9& a9);
+  template <class... Ts>
+  static inline ustring compose(const ustring& fmt, const Ts&... args);
 
   /*! Format the argument to its string representation.
    * Applies the arguments in order to an std::wostringstream and returns the
@@ -1361,135 +1313,15 @@ inline // static
   return ustring::compose_private(fmt, {});
 }
 
-template <class T1>
+template <class... Ts>
 inline // static
   ustring
-  ustring::compose(const ustring& fmt, const T1& a1)
+  ustring::compose(const ustring& fmt, const Ts&... args)
 {
-  const ustring::Stringify<T1> s1(a1);
+  static_assert(sizeof...(Ts) <= 9,
+                "ustring::compose only supports up to 9 placeholders.");
 
-  return compose_private(fmt, { s1.ptr() });
-}
-
-template <class T1, class T2>
-inline // static
-  ustring
-  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2)
-{
-  const ustring::Stringify<T1> s1(a1);
-  const ustring::Stringify<T2> s2(a2);
-
-  return compose_private(fmt, { s1.ptr(), s2.ptr() });
-}
-
-template <class T1, class T2, class T3>
-inline // static
-  ustring
-  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3)
-{
-  const ustring::Stringify<T1> s1(a1);
-  const ustring::Stringify<T2> s2(a2);
-  const ustring::Stringify<T3> s3(a3);
-
-  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr() });
-}
-
-template <class T1, class T2, class T3, class T4>
-inline // static
-  ustring
-  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4)
-{
-  const ustring::Stringify<T1> s1(a1);
-  const ustring::Stringify<T2> s2(a2);
-  const ustring::Stringify<T3> s3(a3);
-  const ustring::Stringify<T4> s4(a4);
-
-  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr() });
-}
-
-template <class T1, class T2, class T3, class T4, class T5>
-inline // static
-  ustring
-  ustring::compose(
-    const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5)
-{
-  const ustring::Stringify<T1> s1(a1);
-  const ustring::Stringify<T2> s2(a2);
-  const ustring::Stringify<T3> s3(a3);
-  const ustring::Stringify<T4> s4(a4);
-  const ustring::Stringify<T5> s5(a5);
-
-  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr() });
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6>
-inline // static
-  ustring
-  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4,
-    const T5& a5, const T6& a6)
-{
-  const ustring::Stringify<T1> s1(a1);
-  const ustring::Stringify<T2> s2(a2);
-  const ustring::Stringify<T3> s3(a3);
-  const ustring::Stringify<T4> s4(a4);
-  const ustring::Stringify<T5> s5(a5);
-  const ustring::Stringify<T6> s6(a6);
-
-  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr() });
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-inline // static
-  ustring
-  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4,
-    const T5& a5, const T6& a6, const T7& a7)
-{
-  const ustring::Stringify<T1> s1(a1);
-  const ustring::Stringify<T2> s2(a2);
-  const ustring::Stringify<T3> s3(a3);
-  const ustring::Stringify<T4> s4(a4);
-  const ustring::Stringify<T5> s5(a5);
-  const ustring::Stringify<T6> s6(a6);
-  const ustring::Stringify<T7> s7(a7);
-
-  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(), s7.ptr() });
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-inline // static
-  ustring
-  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4,
-    const T5& a5, const T6& a6, const T7& a7, const T8& a8)
-{
-  const ustring::Stringify<T1> s1(a1);
-  const ustring::Stringify<T2> s2(a2);
-  const ustring::Stringify<T3> s3(a3);
-  const ustring::Stringify<T4> s4(a4);
-  const ustring::Stringify<T5> s5(a5);
-  const ustring::Stringify<T6> s6(a6);
-  const ustring::Stringify<T7> s7(a7);
-  const ustring::Stringify<T8> s8(a8);
-
-  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr() });
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-inline // static
-  ustring
-  ustring::compose(const ustring& fmt, const T1& a1, const T2& a2, const T3& a3, const T4& a4,
-    const T5& a5, const T6& a6, const T7& a7, const T8& a8, const T9& a9)
-{
-  const ustring::Stringify<T1> s1(a1);
-  const ustring::Stringify<T2> s2(a2);
-  const ustring::Stringify<T3> s3(a3);
-  const ustring::Stringify<T4> s4(a4);
-  const ustring::Stringify<T5> s5(a5);
-  const ustring::Stringify<T6> s6(a6);
-  const ustring::Stringify<T7> s7(a7);
-  const ustring::Stringify<T8> s8(a8);
-  const ustring::Stringify<T9> s9(a9);
-
-  return compose_private(fmt, { s1.ptr(), s2.ptr(), s3.ptr(), s4.ptr(), s5.ptr(), s6.ptr(), s7.ptr(), s8.ptr(), s9.ptr() });
+  return compose_private(fmt, { Stringify<Ts>(args).ptr()... });
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
