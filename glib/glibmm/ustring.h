@@ -675,91 +675,45 @@ public:
   template <class... Ts>
   static inline ustring compose(const ustring& fmt, const Ts&... args);
 
-  /*! Format the argument to its string representation.
+  /*! Format the argument(s) to a string representation.
+   *
    * Applies the arguments in order to an std::wostringstream and returns the
    * resulting string.  I/O manipulators may also be used as arguments.  This
    * greatly simplifies the common task of converting a number to a string, as
    * demonstrated by the example below.  The format() methods can also be used
    * in conjunction with compose() to facilitate localization of user-visible
    * messages.
+   *
    * @code
    * using Glib::ustring;
    * double value = 22.0 / 7.0;
    * ustring text = ustring::format(std::fixed, std::setprecision(2), value);
    * @endcode
+   *
    * @note The use of a wide character stream in the implementation of format()
    * is almost completely transparent.  However, one of the instances where the
    * use of wide streams becomes visible is when the std::setfill() stream
    * manipulator is used.  In order for std::setfill() to work the argument
    * must be of type <tt>wchar_t</tt>.  This can be achieved by using the
    * <tt>L</tt> prefix with a character literal, as shown in the example.
+   *
    * @code
    * using Glib::ustring;
    * // Insert leading zeroes to fill in at least six digits
    * ustring text = ustring::format(std::setfill(L'0'), std::setw(6), 123);
    * @endcode
    *
-   * @param a1 A streamable value or an I/O manipulator.
+   * @param args One or more streamable values or I/O manipulators.
+   *
    * @return The string representation of the argument stream.
+   *
    * @throw Glib::ConvertError
    *
-   * @newin{2,16}
+   * @newin{2,56}
    */
-  template <class T1>
-  static inline ustring format(const T1& a1);
+  template <class... Ts>
+  static inline ustring format(const Ts&... args);
 
-  /* See the documentation for format(const T1& a1).
-   *
-   * @newin{2,16}
-   */
-  template <class T1, class T2>
-  static inline ustring format(const T1& a1, const T2& a2);
-
-  /* See the documentation for format(const T1& a1).
-   *
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3>
-  static inline ustring format(const T1& a1, const T2& a2, const T3& a3);
-
-  /* See the documentation for format(const T1& a1).
-   *
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4>
-  static inline ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4);
-
-  /* See the documentation for format(const T1& a1).
-   *
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5>
-  static inline ustring format(
-    const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5);
-
-  /* See the documentation for format(const T1& a1).
-   *
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5, class T6>
-  static inline ustring format(
-    const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5, const T6& a6);
-
-  /* See the documentation for format(const T1& a1).
-   *
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-  static inline ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
-    const T6& a6, const T7& a7);
-
-  /* See the documentation for format(const T1& a1).
-   *
-   * @newin{2,16}
-   */
-  template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-  static inline ustring format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
-    const T6& a6, const T7& a7, const T8& a8);
   //! @}
 
 private:
@@ -782,9 +736,15 @@ private:
   template <class T>
   class Stringify;
 
+  static ustring compose_private(const ustring& fmt, std::initializer_list<const ustring*> ilist);
+
   class FormatStream;
 
-  static ustring compose_private(const ustring& fmt, std::initializer_list<const ustring*> ilist);
+  template<class T>
+  static inline void format_private(FormatStream& buf, const T& arg);
+
+  template<class T1, class... Ts>
+  static inline void format_private(FormatStream& buf, const T1& a1, const Ts&... args);
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
@@ -1099,114 +1059,30 @@ ustring::raw() const
   return string_;
 }
 
-template <class T1>
+template <class T>
 inline // static
-  ustring
-  ustring::format(const T1& a1)
+  void
+  ustring::format_private(FormatStream& buf, const T& arg)
 {
-  ustring::FormatStream buf;
-  buf.stream(a1);
-  return buf.to_string();
+  buf.stream(arg);
 }
 
-template <class T1, class T2>
+template <class T1, class... Ts>
 inline // static
-  ustring
-  ustring::format(const T1& a1, const T2& a2)
+  void
+  ustring::format_private(FormatStream& buf, const T1& a1, const Ts&... args)
 {
-  ustring::FormatStream buf;
   buf.stream(a1);
-  buf.stream(a2);
-  return buf.to_string();
+  return format_private(buf, args...);
 }
 
-template <class T1, class T2, class T3>
+template <class... Ts>
 inline // static
   ustring
-  ustring::format(const T1& a1, const T2& a2, const T3& a3)
+  ustring::format(const Ts&... args)
 {
   ustring::FormatStream buf;
-  buf.stream(a1);
-  buf.stream(a2);
-  buf.stream(a3);
-  return buf.to_string();
-}
-
-template <class T1, class T2, class T3, class T4>
-inline // static
-  ustring
-  ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4)
-{
-  ustring::FormatStream buf;
-  buf.stream(a1);
-  buf.stream(a2);
-  buf.stream(a3);
-  buf.stream(a4);
-  return buf.to_string();
-}
-
-template <class T1, class T2, class T3, class T4, class T5>
-inline // static
-  ustring
-  ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5)
-{
-  ustring::FormatStream buf;
-  buf.stream(a1);
-  buf.stream(a2);
-  buf.stream(a3);
-  buf.stream(a4);
-  buf.stream(a5);
-  return buf.to_string();
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6>
-inline // static
-  ustring
-  ustring::format(
-    const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5, const T6& a6)
-{
-  ustring::FormatStream buf;
-  buf.stream(a1);
-  buf.stream(a2);
-  buf.stream(a3);
-  buf.stream(a4);
-  buf.stream(a5);
-  buf.stream(a6);
-  return buf.to_string();
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-inline // static
-  ustring
-  ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
-    const T6& a6, const T7& a7)
-{
-  ustring::FormatStream buf;
-  buf.stream(a1);
-  buf.stream(a2);
-  buf.stream(a3);
-  buf.stream(a4);
-  buf.stream(a5);
-  buf.stream(a6);
-  buf.stream(a7);
-  return buf.to_string();
-}
-
-template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-inline // static
-  ustring
-  ustring::format(const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5,
-    const T6& a6, const T7& a7, const T8& a8)
-{
-  ustring::FormatStream buf;
-  buf.stream(a1);
-  buf.stream(a2);
-  buf.stream(a3);
-  buf.stream(a4);
-  buf.stream(a5);
-  buf.stream(a6);
-  buf.stream(a7);
-  buf.stream(a8);
+  format_private(buf, args...);
   return buf.to_string();
 }
 
