@@ -1311,9 +1311,10 @@ ustring::compose_private(const Glib::ustring& fmt, std::initializer_list<const u
     }
     else
     {
-      const std::size_t index = Ascii::digit_value(stop[1]) - 1;
+      const int index = Ascii::digit_value(stop[1]) - 1;
+      const int size = ilist.size();
 
-      if (index >= 0 && index < ilist.size())
+      if (index >= 0 && index < size)
       {
         result.append(start, stop - start);
         result += (*(ilist.begin() + index))->raw();
