@@ -464,7 +464,7 @@ main(int argc, char** argv)
   signal(SIGINT, interrupted);
 
   chan = Glib::IOChannel::create_from_fd(cancel_fds[0]);
-  const auto source = chan->create_watch(Glib::IOCondition::IN);
+  const auto source = chan->create_watch(Glib::IOCondition::IO_IN);
   watch_conn = source->connect(sigc::bind(sigc::ptr_fun(async_cancel), cancellable));
 #endif
 

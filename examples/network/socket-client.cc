@@ -272,7 +272,7 @@ main(int argc, char* argv[])
     buffer[to_send] = '\0';
     while (to_send > 0)
     {
-      ensure_condition(socket, "send", cancellable, Glib::IOCondition::OUT);
+      ensure_condition(socket, "send", cancellable, Glib::IOCondition::IO_OUT);
       try
       {
         if (use_udp)
@@ -305,7 +305,7 @@ main(int argc, char* argv[])
       to_send -= size;
     }
 
-    ensure_condition(socket, "receive", cancellable, Glib::IOCondition::IN);
+    ensure_condition(socket, "receive", cancellable, Glib::IOCondition::IO_IN);
     try
     {
       if (use_udp)

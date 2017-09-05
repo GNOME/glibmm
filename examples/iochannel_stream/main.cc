@@ -43,7 +43,7 @@ Glib::RefPtr<Glib::MainLoop> mainloop;
 bool
 MyCallback(Glib::IOCondition io_condition)
 {
-  if ((io_condition & Glib::IOCondition::IN) != Glib::IOCondition::IN)
+  if ((io_condition & Glib::IOCondition::IO_IN) != Glib::IOCondition::IO_IN)
   {
     std::cerr << "Invalid fifo response" << std::endl;
   }
@@ -88,7 +88,7 @@ int main(/* int argc, char *argv[] */)
   }
 
   input_stream.attach(read_fd);
-  input_stream.connect(sigc::ptr_fun(MyCallback), Glib::IOCondition::IN);
+  input_stream.connect(sigc::ptr_fun(MyCallback), Glib::IOCondition::IO_IN);
 
   // and last but not least - run the application main loop
   mainloop->run();

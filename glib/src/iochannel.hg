@@ -39,6 +39,9 @@ _WRAP_ENUM(IOStatus, GIOStatus, NO_GTYPE, s#^EOF$#ENDOFFILE#)
 _WRAP_ENUM(IOFlags, GIOFlags, NO_GTYPE)
 
 
+// Glib::IOCondition::IN and Glib::IOCondition::OUT would be problematic.
+// IN and OUT can be preprocessor macros.
+// See https://bugzilla.gnome.org/show_bug.cgi?id=786717
 /** @enum IOCondition
  * A bitwise combination representing an I/O condition to watch for on an
  * event source.
@@ -46,11 +49,17 @@ _WRAP_ENUM(IOFlags, GIOFlags, NO_GTYPE)
  * on UNIX (see <tt>man 2 poll</tt>).  To test for individual flags, do
  * something like this:
  * @code
- * if ((condition & Glib::IOCondition::OUT) == Glib::IOCondition::OUT)
+ * if ((condition & Glib::IOCondition::IO_OUT) == Glib::IOCondition::IO_OUT)
  *   do_some_output();
  * @endcode
  */
-_WRAP_ENUM(IOCondition, GIOCondition, NO_GTYPE)
+_WRAP_ENUM(IOCondition, GIOCondition, NO_GTYPE,
+  s#^IN$#IO_IN#,
+  s#^OUT$#IO_OUT#,
+  s#^PRI$#IO_PRI#,
+  s#^ERR$#IO_ERR#,
+  s#^HUP$#IO_HUP#,
+  s#^NVAL$#IO_NVAL#)
 
 /** Exception class for IOChannel errors.
  */

@@ -218,7 +218,7 @@ main(int argc, char* argv[])
 
     std::cout << Glib::ustring::compose("listening on port %1...\n", port);
 
-    ensure_condition(socket, "accept", cancellable, Glib::IOCondition::IN);
+    ensure_condition(socket, "accept", cancellable, Glib::IOCondition::IO_IN);
     try
     {
       new_socket = socket->accept(cancellable);
@@ -257,7 +257,7 @@ main(int argc, char* argv[])
     gchar buffer[4096] = {};
     gssize size;
 
-    ensure_condition(recv_socket, "receive", cancellable, Glib::IOCondition::IN);
+    ensure_condition(recv_socket, "receive", cancellable, Glib::IOCondition::IO_IN);
     try
     {
       if (use_udp)
@@ -289,7 +289,7 @@ main(int argc, char* argv[])
 
     while (to_send > 0)
     {
-      ensure_condition(recv_socket, "send", cancellable, Glib::IOCondition::OUT);
+      ensure_condition(recv_socket, "send", cancellable, Glib::IOCondition::IO_OUT);
       try
       {
         if (use_udp)
