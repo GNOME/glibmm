@@ -99,15 +99,11 @@ sub check_deprecation($$$$$$)
     print STDERR "Warning, $main::source: The $entity_name $entity_type" .
       " is deprecated in the .defs file, but not in _WRAP_$wrapper.\n";
   }
-  # Uncomment the following lines some time in the future, when most
-  # signal.defs files have been updated with deprecation information.
-  # generate_extra_defs.cc was updated to generate this info soon after
-  # glibmm 2.47.6.
-  #elsif (!$defs_deprecated && $wrap_deprecated)
-  #{
-  #  print STDERR "Warning, $main::source: The $entity_name $entity_type" .
-  #    " is deprecated in _WRAP_$wrapper, but not in the .defs file.\n";
-  #}
+  elsif (!$defs_deprecated && $wrap_deprecated)
+  {
+    print STDERR "Warning, $main::source: The $entity_name $entity_type" .
+      " is deprecated in _WRAP_$wrapper, but not in the .defs file.\n";
+  }
 }
 
 sub ifdef($$)
