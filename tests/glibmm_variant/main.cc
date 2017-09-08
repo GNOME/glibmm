@@ -11,6 +11,70 @@ std::ostream& ostr = debug;
 static void test_variant_floating();
 static void test_dynamic_cast();
 
+namespace
+{
+
+int test_tuple()
+{
+  using TupleType = std::tuple<guint16, Glib::ustring, bool>;
+  using MapType = std::map<guint16, TupleType>;
+  bool result_ok = true;
+
+  // First tuple
+  const guint16 q1 = 2;
+  const Glib::ustring s1 = "Hi there";
+  const bool b1 = false;
+  auto t1 = std::make_tuple(q1, s1, b1);
+  auto tuple1_variant = Glib::Variant<TupleType>::create(t1);
+
+  // Second tuple
+  const guint16 q2 = 3;
+  const Glib::ustring s2 = "Hello";
+  const bool b2 = true;
+  auto t2 = std::make_tuple(q2, s2, b2);
+  auto tuple2_variant = Glib::Variant<TupleType>::create(t2);
+
+  // Insert the tuples in a map.
+  MapType m;
+  m[4] = t1;
+  m[5] = t2;
+  auto map_variant = Glib::Variant<MapType>::create(m);
+
+  std::string type_string = tuple1_variant.variant_type().get_string();
+  ostr << "Type string of tuple1: " << type_string << std::endl;
+  result_ok &= type_string == "(qsb)";
+
+  type_string = tuple2_variant.get_type_string();
+  ostr << "Type string of tuple2: " << type_string << std::endl;
+  result_ok &= type_string == "(qsb)";
+
+  type_string = map_variant.variant_type().get_string();
+  ostr << "Type string of map of tuples: " << type_string << std::endl;
+  result_ok &= map_variant.get_type_string() == "a{q(qsb)}";
+
+  // Extract from the map of tuples.
+  std::pair<guint16, TupleType> child0 = map_variant.get_child(0);
+  ostr << "Index of first map entry: " << child0.first << std::endl;
+  result_ok &= child0.first == 4;
+  auto extracted_tuple = child0.second;
+  auto q3 = std::get<guint16>(extracted_tuple);
+  auto s3 = std::get<Glib::ustring>(extracted_tuple);
+  auto b3 = std::get<bool>(extracted_tuple);
+  ostr << "Extracted tuple1 from map: (" << q3 << ", " << s3 << ", " << b3 << ")" << std::endl;
+  result_ok &= q3 == q1 && s3 == s1 && b3 == b1;
+
+  // Extract from a tuple.
+  auto q4 = tuple2_variant.get_child<guint16>(0);
+  auto s4 = tuple2_variant.get_child_variant<Glib::ustring>(1).get();
+  auto b4 = std::get<bool>(tuple2_variant.get());
+  ostr << "Extracted tuple2: (" << q4 << ", " << s4 << ", " << b4 << ")" << std::endl;
+  result_ok &= q4 == q2 && s4 == s2 && b4 == b2;
+
+  return result_ok ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+} // anonymous namespace
+
 int
 main(int, char**)
 {
@@ -163,7 +227,7 @@ main(int, char**)
   test_variant_floating();
   test_dynamic_cast();
 
-  return EXIT_SUCCESS;
+  return test_tuple();
 }
 
 // Test casting of multiple types to a ustring:
