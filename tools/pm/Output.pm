@@ -853,22 +853,22 @@ sub output_wrap_any_property($$$$$$$$$$)
   my $proxy_suffix = "";
 
   # Read/Write:
-  if($objProperty->get_construct_only() eq 1)
+  if ($objProperty->get_construct_only())
   {
     # construct-only functions can be read, but not written.
     $proxy_suffix = "_ReadOnly";
 
-    if($objProperty->get_readable() ne 1)
+    if (!$objProperty->get_readable())
     {
       $self->output_wrap_failed($name, "attempt to wrap write-only and construct-only property.");
       return;
     }
   }
-  elsif($objProperty->get_readable() ne 1)
+  elsif (!$objProperty->get_readable())
   {
     $proxy_suffix = "_WriteOnly";
   }
-  elsif($objProperty->get_writable() ne 1)
+  elsif (!$objProperty->get_writable())
   {
     $proxy_suffix = "_ReadOnly";
   }
@@ -914,6 +914,26 @@ sub output_wrap_any_property($$$$$$$$$$)
     {
       add_m4_quotes(\$documentation);
     }
+  }
+
+  # Default value, if available:
+  my $default_value = $objProperty->get_default_value();
+  if (defined($default_value))
+  {
+    DocsParser::convert_value_to_cpp(\$default_value);
+
+    # Add double quotes around a string value.
+    if ($objProperty->get_type() eq "GParamString")
+    {
+      $default_value = "\"" . $default_value . "\"";
+    }
+    $default_value = "Default value: $default_value";
+    add_m4_quotes(\$default_value);
+    if ($documentation ne "")
+    {
+      $documentation .= "\n   *\n   * ";
+    }
+    $documentation .= $default_value;
   }
 
   #Declaration:

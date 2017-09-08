@@ -27,6 +27,7 @@ our @EXPORT_OK;
 #       bool writable;
 #       bool construct_only;
 #       bool deprecated; # optional
+#       string default_value; # optional
 #       string docs;
 #    }
 
@@ -48,10 +49,11 @@ sub new
   $$self{writable} = ($1 eq "#t")       if ($def =~ s/\(writable (\S+)\)//);
   $$self{construct_only} = ($1 eq "#t") if ($def =~ s/\(construct-only (\S+)\)//);
   $$self{deprecated} = ($1 eq "#t")     if ($def =~ s/\(deprecated (\S+)\)//);
+  $$self{default_value} = $1            if ($def =~ s/\(default-value "(.*?)"\)//);
   $$self{entity_type} = 'property';
 
   # Property documentation:
-  my $propertydocs = $1                     if ($def =~ s/\(docs "([^"]*)"\)//);
+  my $propertydocs = $1                 if ($def =~ s/\(docs "([^"]*)"\)//);
   # Add a full-stop if there is not one already:
   if(defined($propertydocs))
   {
@@ -116,6 +118,12 @@ sub get_deprecated($)
 {
   my ($self) = @_;
   return $$self{deprecated}; # undef, 0 or 1
+}
+
+sub get_default_value($)
+{
+  my ($self) = @_;
+  return $$self{default_value}; # undef or a string (possibly empty)
 }
 
 sub get_docs($$)

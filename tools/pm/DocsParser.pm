@@ -390,6 +390,20 @@ sub lookup_documentation($$$;$)
   return $text;
 }
 
+# void convert_value_to_cpp(\$text)
+# Converts e.g. a property's default value.
+sub convert_value_to_cpp($)
+{
+  my ($text) = @_;
+
+  $$text =~ s"\bFALSE\b"<tt>false</tt>"g;
+  $$text =~ s"\bTRUE\b"<tt>true</tt>"g;
+  $$text =~ s"\bNULL\b"<tt>nullptr</tt>"g;
+
+  # Enumerator names
+  $$text =~ s/\b([A-Z]+)_([A-Z\d_]+)\b/&DocsParser::substitute_enumerator_name($1, $2)/eg;
+}
+
 # void remove_example_code($obj_name, \$text)
 # Removes example code from the text of docs (passed by reference).
 sub remove_example_code($$)
