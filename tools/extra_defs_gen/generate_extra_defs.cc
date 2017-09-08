@@ -18,6 +18,8 @@
 
 #include "generate_extra_defs.h"
 #include <algorithm>
+#include <regex>
+#include <sstream>
 
 std::string
 get_property_with_node_name(
@@ -56,6 +58,55 @@ get_property_with_node_name(
   strResult += "  (construct-only " + (bConstructOnly ? strTrue : strFalse) + ")\n";
   if (bDeprecated)
     strResult += "  (deprecated #t)\n"; // Default: not deprecated
+
+  // Default value:
+  const GValue* defValue = g_param_spec_get_default_value(pParamSpec);
+  std::string defString;
+  bool defValueExists = false;
+  if (G_VALUE_HOLDS_STRING(defValue))
+  {
+    defValueExists = true;
+    const char* defCString = g_value_get_string(defValue);
+    if (defCString)
+    {
+      // Replace newlines with \n.
+      // A string default value can contain newline characters.
+      // gmmproc removes all newlines when it reads .defs files.
+      defString = std::regex_replace(defCString, std::regex("\n"), "\\n");
+    }
+    else
+      defString = ""; // A NULL string pointer becomes an empty string.
+  }
+  else if (G_VALUE_HOLDS_FLOAT(defValue) || G_VALUE_HOLDS_DOUBLE(defValue))
+  {
+    // g_value_transform() can transform a floating point value to a terrible
+    // string, especially if the value is huge.
+    defValueExists = true;
+    const double defDouble = G_VALUE_HOLDS_FLOAT(defValue) ?
+      g_value_get_float(defValue) : g_value_get_double(defValue);
+    std::ostringstream defStringStream;
+    defStringStream << defDouble;
+    defString = defStringStream.str();
+  }
+  else
+  {
+    GValue defStringValue = G_VALUE_INIT;
+    g_value_init(&defStringValue, G_TYPE_STRING);
+
+    if (g_value_transform(defValue, &defStringValue))
+    {
+      const char* defCString = g_value_get_string(&defStringValue);
+      if (defCString)
+      {
+        defValueExists = true;
+        defString = defCString;
+      }
+    }
+    g_value_unset(&defStringValue);
+  }
+
+  if (defValueExists)
+    strResult += "  (default-value \"" + defString + "\")\n";
 
   strResult += ")\n\n"; // close (strNodeName
 
