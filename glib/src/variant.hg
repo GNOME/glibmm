@@ -19,6 +19,7 @@ _DEFS(glibmm,glib)
 #include <glibmmconfig.h>
 #include <glibmm/varianttype.h>
 #include <glibmm/variantiter.h>
+#include <glibmm/variantdbusstring.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
 #include <glibmm/error.h>
@@ -311,12 +312,12 @@ public:
    */
   explicit VariantStringBase(GVariant* castitem,  bool take_a_reference = false);
 
-  /** Creates a D-Bus object path variant with the contents of @a string. @a
-   * string must be a valid D-Bus object path. Use is_object_path() if unsure.
+  /** Creates a D-Bus object path variant with the contents of @a object_path.
+   * @a object_path must be a valid D-Bus object path. Use is_object_path() if unsure.
    *
-   * @param output A location in which to store the new object path variant
+   * @param[out] output A location in which to store the new object path variant
    * instance.
-   * @param object_path A normal nul-terminated string.
+   * @param object_path An object path string.
    * @newin{2,28}
    */
   static void create_object_path(VariantStringBase& output,
@@ -325,12 +326,12 @@ public:
 
   _WRAP_METHOD(static bool is_object_path(const std::string& string), g_variant_is_object_path)
 
-  /** Creates a D-Bus type signature variant with the contents of @a string. @a
-   * string must be a valid D-Bus type signature. Use is_signature() if unsure.
+  /** Creates a D-Bus type signature variant with the contents of @a signature.
+   * @a signature must be a valid D-Bus type signature. Use is_signature() if unsure.
    *
-   * @param output A location in which to store the new signature variant
+   * @param[out] output A location in which to store the new signature variant
    * instance.
-   * @param signature A normal nul-terminated string.
+   * @param signature A signature string.
    * @newin{2,28}
    */
   static void create_signature(VariantStringBase& output,
@@ -596,6 +597,98 @@ template<>
 Variant<Glib::ustring> VariantBase::cast_dynamic< Variant<Glib::ustring> >(const VariantBase& v)
 noexcept(false);
 
+/** Specialization of Variant containing a Glib::DBusObjectPathString,
+ * for variants of type object path.
+ * @newin{2,54}
+ * @ingroup Variant
+ */
+template<>
+class Variant<Glib::DBusObjectPathString> : public VariantStringBase
+{
+  // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
+  _CLASS_GENERIC(Variant<Glib::DBusObjectPathString>, GVariant)
+public:
+  using CType = char*;
+  using CppType = Glib::DBusObjectPathString;
+
+  /// Default constructor.
+  Variant();
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
+   */
+  explicit Variant(GVariant* castitem,  bool take_a_reference = false);
+
+  /** Gets the VariantType.
+   * @return The VariantType.
+   * @newin{2,54}
+   */
+  static const VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Variant<Glib::DBusObjectPathString>.
+   * @param data The value of the new Variant.
+   * @return The new Variant.
+   * @newin{2,54}
+   */
+  static Variant<CppType> create(const CppType& data);
+
+  //We can't use WRAP_METHOD() here because g_variant_get_string() takes an extra length parameter.
+  /** Gets the contents of the Variant.
+   * @return The contents of the Variant.
+   * @newin{2,54}
+   */
+  CppType get() const;
+};
+
+/** Specialization of Variant containing a Glib::DBusSignatureString,
+ * for variants of type signature.
+ * @newin{2,54}
+ * @ingroup Variant
+ */
+template<>
+class Variant<Glib::DBusSignatureString> : public VariantStringBase
+{
+  // Trick gmmproc into thinking this is derived from GVariant to wrap some methods.
+  _CLASS_GENERIC(Variant<Glib::DBusSignatureString>, GVariant)
+public:
+  using CType = char*;
+  using CppType = Glib::DBusSignatureString;
+
+  /// Default constructor.
+  Variant();
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
+   */
+  explicit Variant(GVariant* castitem,  bool take_a_reference = false);
+
+  /** Gets the VariantType.
+   * @return The VariantType.
+   * @newin{2,54}
+   */
+  static const VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Variant<Glib::DBusSignatureString>.
+   * @param data The value of the new Variant.
+   * @return The new Variant.
+   * @newin{2,54}
+   */
+  static Variant<CppType> create(const CppType& data);
+
+  //We can't use WRAP_METHOD() here because g_variant_get_string() takes an extra length parameter.
+  /** Gets the contents of the Variant.
+   * @return The contents of the Variant.
+   * @newin{2,54}
+   */
+  CppType get() const;
+};
+
 /** Specialization of Variant containing a std::string, for variants of type
  * bytestring, string, object path, or signature.
  * See also Variant<Glib::ustring> for UTF-8 strings.
@@ -823,6 +916,68 @@ public:
   /** Gets a VariantIter of the Variant.
    * @return the VariantIter.
    * @newin{2,28}
+   */
+  VariantIter get_iter() const;
+};
+
+/** Specialization of Variant containing an array of D-Bus object paths.
+ *
+ * @newin{2,54}
+ * @ingroup Variant
+ */
+template<>
+class Variant<std::vector<Glib::DBusObjectPathString>> : public VariantContainerBase
+{
+public:
+  using CppType = Glib::DBusObjectPathString;
+  using CppContainerType = std::vector<Glib::DBusObjectPathString>;
+
+  /// Default constructor.
+  Variant();
+
+  /** GVariant constructor.
+   * @param castitem The GVariant to wrap.
+   * @param take_a_reference Whether to take an extra reference of the
+   * GVariant or not (not taking one could destroy the GVariant with the
+   * wrapper).
+   */
+  explicit Variant(GVariant* castitem, bool take_a_reference = false);
+
+  /** Gets the VariantType.
+   * @return The VariantType.
+   * @newin{2,54}
+   */
+  static const VariantType& variant_type() G_GNUC_CONST;
+
+  /** Creates a new Variant from an array of strings.
+   * @param data The array to use for creation.
+   * @return The new Variant.
+   * @newin{2,54}
+   */
+  static Variant<CppContainerType> create(const CppContainerType& data);
+
+  /** Gets a specific element of the string array.  It is an error if @a index
+   * is greater than the number of child items in the container.  See
+   * VariantContainerBase::get_n_children().
+   *
+   * This function is O(1).
+   *
+   * @param index The index of the element.
+   * @return The element at index @a index.
+   * @throw std::out_of_range
+   * @newin{2,54}
+   */
+  CppType get_child(gsize index) const;
+
+  /** Gets the string vector of the Variant.
+   * @return The vector.
+   * @newin{2,54}
+   */
+  CppContainerType get() const;
+
+  /** Gets a VariantIter of the Variant.
+   * @return the VariantIter.
+   * @newin{2,54}
    */
   VariantIter get_iter() const;
 };

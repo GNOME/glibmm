@@ -14,7 +14,7 @@ static void test_dynamic_cast();
 namespace
 {
 
-int test_tuple()
+bool test_tuple()
 {
   using TupleType = std::tuple<guint16, Glib::ustring, bool>;
   using MapType = std::map<guint16, TupleType>;
@@ -70,7 +70,54 @@ int test_tuple()
   ostr << "Extracted tuple2: (" << q4 << ", " << s4 << ", " << b4 << ")" << std::endl;
   result_ok &= q4 == q2 && s4 == s2 && b4 == b2;
 
-  return result_ok ? EXIT_SUCCESS : EXIT_FAILURE;
+  return result_ok;
+}
+
+bool test_object_path()
+{
+  bool result_ok = true;
+
+  // Object path vector
+  std::vector<Glib::DBusObjectPathString> vec1 {"/object/path1", "/object/path_two", "/object/pathIII" };
+  auto variantvec1 = Glib::Variant<std::vector<Glib::DBusObjectPathString>>::create(vec1);
+
+  auto vec2 = variantvec1.get();
+  ostr << "Extracted object paths: " << vec2[0] << ", " << vec2[1] << ", " << vec2[2] << std::endl;
+
+  for (std::size_t i = 0; i < vec1.size(); ++i)
+    result_ok &= vec1[i] == vec2[i];
+
+  // Complicated structure of variant type a{oa{sa{sv}}}
+  // Glib::Variant<std::map<Glib::DBusObjectPathString, std::map<Glib::ustring, std::map<Glib::ustring, Glib::VariantBase>>>>
+  using three_leveled_map =
+    std::map<Glib::DBusObjectPathString, std::map<Glib::ustring, std::map<Glib::ustring, Glib::VariantBase>>>;
+
+  // Create the map
+  std::map<Glib::ustring, Glib::VariantBase> map1;
+  map1["map1_1"] = Glib::Variant<Glib::ustring>::create("value1");
+  std::map<Glib::ustring, std::map<Glib::ustring, Glib::VariantBase>> map2;
+  map2["map2_1"] = map1;
+  three_leveled_map map3;
+  map3["/map3/path1"] = map2;
+  // Create the corresponding Variant and check its type
+  auto variantmap = Glib::Variant<three_leveled_map>::create(map3);
+  ostr << "variantmap.get_type_string() = " << variantmap.get_type_string() << std::endl;
+  result_ok &= variantmap.get_type_string() == "a{oa{sa{sv}}}";
+  // Extract the map and check that the stored value remains.
+  auto map4 = variantmap.get();
+  auto variant1 = map4["/map3/path1"]["map2_1"]["map1_1"];
+  ostr << "variant1.get_type_string() = " << variant1.get_type_string() << std::endl;
+  auto variantstring = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(variant1);
+  if (variantstring && variantstring.get_type_string() == "s")
+  {
+    ostr << "Extracted map value: " << variantstring.get() << std::endl;
+    result_ok &= variantstring.get() == "value1";
+  }
+  else
+  {
+    result_ok = false;
+  }
+  return result_ok;
 }
 
 } // anonymous namespace
@@ -227,7 +274,9 @@ main(int, char**)
   test_variant_floating();
   test_dynamic_cast();
 
-  return test_tuple();
+  bool result_ok = test_tuple();
+  result_ok &= test_object_path();
+  return result_ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 // Test casting of multiple types to a ustring:
