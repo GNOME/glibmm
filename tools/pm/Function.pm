@@ -376,12 +376,12 @@ sub add_parameter($$$)
   return $self;
 }
 
-# $string get_refdoc_comment($existing_signal_docs)
+# $string get_refdoc_comment($existing_signal_docs, $signal_flags)
 # Generate a readable prototype for signals and merge the prototype into the
 # existing Doxygen comment block.
-sub get_refdoc_comment($$)
+sub get_refdoc_comment($$$)
 {
-  my ($self, $documentation) = @_;
+  my ($self, $documentation, $signal_flags) = @_;
 
   my $str = "  /**\n";
 
@@ -401,6 +401,11 @@ sub get_refdoc_comment($$)
 
   $str .= ")</tt>\n";
   $str .= "   *\n";
+
+  if ($signal_flags)
+  {
+    $str .= "   * Flags: $signal_flags\n   *\n";
+  }
 
   if($documentation ne "")
   {

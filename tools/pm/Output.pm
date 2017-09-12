@@ -630,7 +630,7 @@ sub output_wrap_sig_decl($$$$$$$$$$$$$$)
 
   # Create a merged Doxygen comment block for the signal from the looked up
   # docs (the block will also contain a prototype of the slot as an example).
-  my $doxycomment = $objCppfunc->get_refdoc_comment($documentation);
+  my $doxycomment = $objCppfunc->get_refdoc_comment($documentation, $$objCSignal{flags});
 
   # If there was already a previous doxygen comment, we want to merge this
   # one with the previous so it is one big comment. If

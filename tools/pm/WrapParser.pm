@@ -1676,13 +1676,26 @@ sub output_wrap_signal($$$$$$$$$$$$$$$$$)
     $objCSignal = GtkDefs::lookup_signal($$self{c_class}, $signal_name);
 
     # Check for failed lookup.
-    if($objCSignal eq 0)
+    if (!$objCSignal)
     {
       print STDERR "$signal_name\n";
         $objOutputter->output_wrap_failed($signal_name,
           " signal defs lookup failed");
       return;
     }
+  }
+
+  # Check detailed.
+  my $defs_detailed = $objCSignal->get_detailed();
+    if ($defs_detailed && !$detail_name)
+  {
+    print STDERR "Warning, $main::source: The $signal_name signal" .
+      " is marked 'detailed' in the .defs file, but not in _WRAP_SIGNAL.\n";
+  }
+  elsif (!$defs_detailed && $detail_name)
+  {
+    print STDERR "Warning, $main::source: The $signal_name signal" .
+      " is marked 'detailed' in _WRAP_SIGNAL, but not in the .defs file.\n";
   }
 
   Output::check_deprecation($$self{deprecated}, $objCSignal->get_deprecated(),
@@ -1693,7 +1706,7 @@ sub output_wrap_signal($$$$$$$$$$$$$$$$$)
     $deprecated, $deprecation_docs, $newin, $exceptionHandler,
     $detail_name, $bTwoSignalMethods);
 
-  if($bNoDefaultHandler eq 0)
+  if (!$bNoDefaultHandler)
   {
     $objOutputter->output_wrap_default_signal_handler_h($filename, $line_num,
       $objCppSignal, $objCSignal, $ifdef, $deprecated, $exceptionHandler);
