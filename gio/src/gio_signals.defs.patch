@@ -1,9 +1,9 @@
---- ./../../gio/src/gio_signals.defs.orig	2017-09-08 08:05:35.067247568 +0200
-+++ ./../../gio/src/gio_signals.defs	2017-09-08 08:05:35.127247478 +0200
-@@ -83,11 +83,11 @@
-   (of-object "GActionGroup")
+--- ./../../gio/src/gio_signals.defs.orig	2017-09-12 17:06:06.023464567 +0200
++++ ./../../gio/src/gio_signals.defs	2017-09-13 08:41:32.428298292 +0200
+@@ -87,11 +87,11 @@
    (return-type "void")
-   (when "last")
+   (flags "Run Last, Must Collect")
+   (detailed #t)
    (parameters
      '("const-gchar*" "p0")
 -    '("GVariant" "p1")
@@ -13,10 +13,22 @@
  
  ;; From GApplication
  
-@@ -734,11 +734,11 @@
+@@ -591,10 +591,11 @@
+   (prop-type "GParamBoolean")
+   (docs "Whether or not this is an abstract address")
+   (readable #t)
+   (writable #t)
+   (construct-only #t)
++  (deprecated #t)
+   (default-value "FALSE")
+ )
+ 
+ (define-property address-type
+   (of-object "GUnixSocketAddress")
+@@ -738,11 +739,11 @@
    (of-object "GMountOperation")
    (return-type "void")
-   (when "last")
+   (flags "Run Last")
    (parameters
      '("const-gchar*" "p0")
 -    '("GStrv*" "p1")
@@ -26,11 +38,11 @@
  
  (define-signal reply
    (of-object "GMountOperation")
-@@ -1100,11 +1100,11 @@
+@@ -1106,11 +1107,11 @@
  (define-signal writable-change-event
    (of-object "GSettings")
    (return-type "gboolean")
-   (when "last")
+   (flags "Run Last")
    (parameters
 -    '("guint" "p0")
 +    '("GQuark" "p0")
@@ -39,11 +51,11 @@
  
  (define-property settings-schema
    (of-object "GSettings")
-@@ -1184,20 +1184,20 @@
+@@ -1190,20 +1191,20 @@
  (define-signal activate
    (of-object "GSimpleAction")
    (return-type "void")
-   (when "last")
+   (flags "Run Last, Must Collect")
    (parameters
 -    '("GVariant" "p0")
 +    '("GVariant*" "p0")
@@ -53,7 +65,7 @@
  (define-signal change-state
    (of-object "GSimpleAction")
    (return-type "void")
-   (when "last")
+   (flags "Run Last, Must Collect")
    (parameters
 -    '("GVariant" "p0")
 +    '("GVariant*" "p0")
@@ -62,11 +74,11 @@
  
  (define-property name
    (of-object "GSimpleAction")
-@@ -1842,11 +1842,11 @@
+@@ -1850,11 +1851,11 @@
  (define-signal writable-change-event
    (of-object "GSettings")
    (return-type "gboolean")
-   (when "last")
+   (flags "Run Last")
    (parameters
 -    '("guint" "p0")
 +    '("GQuark" "p0")
@@ -75,11 +87,23 @@
  
  (define-property settings-schema
    (of-object "GSettings")
-@@ -2715,23 +2715,23 @@
+@@ -2345,10 +2346,11 @@
+   (prop-type "GParamBoolean")
+   (docs "Whether to verify peer certificates against the system certificate database")
+   (readable #t)
+   (writable #t)
+   (construct-only #f)
++  (deprecated #t)
+   (default-value "TRUE")
+ )
+ 
+ (define-property database
+   (of-object "GTlsConnection")
+@@ -2723,23 +2725,23 @@
  (define-signal g-properties-changed
    (of-object "GDBusProxy")
    (return-type "void")
-   (when "last")
+   (flags "Run Last, Must Collect")
    (parameters
 -    '("GVariant" "p0")
 -    '("GStrv*" "p1")
@@ -91,7 +115,7 @@
  (define-signal g-signal
    (of-object "GDBusProxy")
    (return-type "void")
-   (when "last")
+   (flags "Run Last, Must Collect")
    (parameters
      '("const-gchar*" "p0")
      '("const-gchar*" "p1")
