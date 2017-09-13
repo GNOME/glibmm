@@ -134,13 +134,14 @@ public:
   //TODO: Add templated method, renaming this to action_state_changed_variant).
   _WRAP_METHOD(void action_state_changed (const Glib::ustring& action_name, const Glib::VariantBase& state), g_action_group_action_state_changed)
 
-  _WRAP_SIGNAL(void action_added(const Glib::ustring& action_name), "action-added")
-  _WRAP_SIGNAL(void action_enabled_changed(const Glib::ustring& action_name, bool enabled), "action-enabled-changed")
-  _WRAP_SIGNAL(void action_removed(const Glib::ustring& action_name), "action-removed")
+  //TODO: Remove two_signal_methods when we can break ABI.
+  _WRAP_SIGNAL(void action_added(const Glib::ustring& action_name), "action-added", detail_name action_name, two_signal_methods)
+  _WRAP_SIGNAL(void action_enabled_changed(const Glib::ustring& action_name, bool enabled), "action-enabled-changed", detail_name action_name, two_signal_methods)
+  _WRAP_SIGNAL(void action_removed(const Glib::ustring& action_name), "action-removed", detail_name action_name, two_signal_methods)
 
 #m4 _CONVERSION(`GVariant*', `const Glib::VariantBase&', `Glib::wrap($3, true)')
 
-  _WRAP_SIGNAL(void action_state_changed(const Glib::ustring& action_name, const Glib::VariantBase& value), "action-state-changed")
+  _WRAP_SIGNAL(void action_state_changed(const Glib::ustring& action_name, const Glib::VariantBase& value), "action-state-changed", detail_name action_name, two_signal_methods)
 
   _WRAP_VFUNC(bool has_action(const Glib::ustring& name) const, "has_action")
 
