@@ -713,8 +713,9 @@ BEGIN { @GtkDefs::Signal::ISA=qw(GtkDefs::Function); }
 #
 #       string rettype;
 #
-#       string when. e.g. first, last, or both.
+#       string flags. e.g. Run Last, No Hooks
 #       string entity_type. e.g. vfunc or signal
+#       bool detailed; # optional
 #       bool deprecated; # optional
 #    }
 
@@ -741,7 +742,7 @@ sub new
   $$self{rettype} = "none";
   $$self{param_types} = [];
   $$self{param_names} = [];
-  $$self{when} = "";
+  $$self{flags} = "";
   $$self{class} = "";
 
   # snarf down lisp fields
@@ -760,9 +761,26 @@ sub new
     $$self{rettype} =~ s/-/ /g; #e.g. replace const-gchar* with const gchar*. Otherwise it will be used in code.
   }
 
-  if($def =~ s/\(when "(\S+)"\)//)
+  if ($def =~ s/\(flags "(.*?)"\)//)
   {
-    $$self{when} = $1;
+    $$self{flags} = $1;
+  }
+  elsif ($def =~ s/\(when "(\S+)"\)//)
+  {
+    # "when" is a deprecated alternative to "flags".
+    # when eq "none", "first", "last", or "both".
+    if ($1 eq "first")
+    {
+      $$self{flags} = "Run First";
+    }
+    elsif ($1 eq "last")
+    {
+      $$self{flags} = "Run Last";
+    }
+    elsif ($1 eq "both")
+    {
+      $$self{flags} = "Run First, Run Last";
+    }
   }
 
   if($$self{rettype} eq "none")
@@ -770,6 +788,7 @@ sub new
     $$self{rettype} = "void"
   }
 
+  $$self{detailed} = ($1 eq "#t") if ($def =~ s/\(detailed (\S+)\)//);
   $$self{deprecated} = ($1 eq "#t") if ($def =~ s/\(deprecated (\S+)\)//);
 
   # signals always have a parameter
@@ -788,6 +807,13 @@ sub new
   }
 
   return $self;
+}
+
+# bool get_detailed()
+sub get_detailed($)
+{
+  my ($self) = @_;
+  return $$self{detailed}; # undef, 0 or 1
 }
 
 # bool get_deprecated()
