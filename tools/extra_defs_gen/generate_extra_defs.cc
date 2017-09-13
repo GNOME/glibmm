@@ -21,6 +21,21 @@
 #include <regex>
 #include <sstream>
 
+namespace
+{
+void add_signal_flag_if(std::string& strFlags, const char* strFlag,
+  const GSignalQuery& signalQuery, GSignalFlags flag)
+{
+  if (signalQuery.signal_flags & flag)
+  {
+    if (!strFlags.empty())
+      strFlags += ", ";
+    strFlags += strFlag;
+  }
+}
+
+} // anonymous namespace
+
 std::string
 get_property_with_node_name(
   GParamSpec* pParamSpec, const std::string& strObjectName, const std::string& strNodeName)
@@ -260,24 +275,21 @@ get_signals(GType gtype, GTypeIsAPointerFunc is_a_pointer_func)
       // G_SIGNAL_TYPE_STATIC_SCOPE;
       strResult += "  (return-type \"" + strReturnTypeName + "\")\n";
 
-      // When:
-      {
-        bool bWhenFirst = (signalQuery.signal_flags & G_SIGNAL_RUN_FIRST) == G_SIGNAL_RUN_FIRST;
-        bool bWhenLast = (signalQuery.signal_flags & G_SIGNAL_RUN_LAST) == G_SIGNAL_RUN_LAST;
+      // Flags:
+      std::string strFlags;
+      add_signal_flag_if(strFlags, "Run First", signalQuery, G_SIGNAL_RUN_FIRST);
+      add_signal_flag_if(strFlags, "Run Last", signalQuery, G_SIGNAL_RUN_LAST);
+      add_signal_flag_if(strFlags, "Run Cleanup", signalQuery, G_SIGNAL_RUN_CLEANUP);
+      add_signal_flag_if(strFlags, "No Recurse", signalQuery, G_SIGNAL_NO_RECURSE);
+      add_signal_flag_if(strFlags, "Action", signalQuery, G_SIGNAL_ACTION);
+      add_signal_flag_if(strFlags, "No Hooks", signalQuery, G_SIGNAL_NO_HOOKS);
+      add_signal_flag_if(strFlags, "Must Collect", signalQuery, G_SIGNAL_MUST_COLLECT);
+      strResult += "  (flags \"" + strFlags + "\")\n";
 
-        std::string strWhen = "unknown";
+      if (signalQuery.signal_flags & G_SIGNAL_DETAILED)
+        strResult += "  (detailed #t)\n"; // Default: not detailed
 
-        if (bWhenFirst && bWhenLast)
-          strWhen = "both";
-        else if (bWhenFirst)
-          strWhen = "first";
-        else if (bWhenLast)
-          strWhen = "last";
-
-        strResult += "  (when \"" + strWhen + "\")\n";
-      }
-      bool bDeprecated = (signalQuery.signal_flags & G_SIGNAL_DEPRECATED) == G_SIGNAL_DEPRECATED;
-      if (bDeprecated)
+      if (signalQuery.signal_flags & G_SIGNAL_DEPRECATED)
         strResult += "  (deprecated #t)\n"; // Default: not deprecated
 
       // Loop through the list of parameters:
