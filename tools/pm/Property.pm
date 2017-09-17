@@ -2,6 +2,7 @@ package Property;
 
 use strict;
 use warnings;
+use DocsParser;
 
 BEGIN {
      use Exporter   ();
@@ -131,6 +132,8 @@ sub get_docs($$)
   my ($self, $deprecation_docs, $newin) = @_;
   my $text = $$self{docs};
 
+  DocsParser::convert_docs_to_cpp("$$self{class}:$$self{name}", \$text);
+
   #Add note about deprecation if we have specified that in our _WRAP_PROPERTY()
   #or_WRAP_CHILD_PROPERTY() call:
   if($deprecation_docs ne "")
@@ -141,6 +144,11 @@ sub get_docs($$)
   if ($newin ne "")
   {
     $text .= "\n   *\n   * \@newin{$newin}";
+  }
+
+  if ($text ne "")
+  {
+    DocsParser::add_m4_quotes(\$text);
   }
 
   return $text;

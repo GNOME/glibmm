@@ -921,7 +921,6 @@ sub output_wrap_any_property($$$$$$$$$$)
     my $objdoc = $objProperty->get_docs("", "");
     if ($objdoc ne "")
     {
-      add_m4_quotes(\$objdoc);
       $documentation = "$objdoc\n   *\n   * $documentation";
     }
   }
@@ -929,10 +928,6 @@ sub output_wrap_any_property($$$$$$$$$$)
   {
     # Try to get the (usually short) documentation from the Property object.
     $documentation = $objProperty->get_docs($deprecation_docs, $newin);
-    if ($documentation ne "")
-    {
-      add_m4_quotes(\$documentation);
-    }
   }
 
   # Default value, if available:

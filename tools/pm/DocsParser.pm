@@ -300,7 +300,7 @@ sub lookup_enum_documentation($$$$$$$)
   # Replace @newin in the enum description, but don't in the element descriptions.
   my $description = "\@enum $cpp_enum_name\n";
   $description .= $$objFunction{description};
-  DocsParser::convert_docs_to_cpp($objFunction, \$description);
+  DocsParser::convert_docs_to_cpp($c_enum_name, \$description);
   DocsParser::replace_or_add_newin(\$description, $newin);
 
   # Add note about deprecation if we have specified that in our _WRAP_ENUM(),
@@ -311,7 +311,7 @@ sub lookup_enum_documentation($$$$$$$)
   }
 
   # Append the enum description docs.
-  DocsParser::convert_docs_to_cpp($objFunction, \$docs);
+  DocsParser::convert_docs_to_cpp($c_enum_name, \$docs);
   $docs .= "\n\n$description";
   DocsParser::add_m4_quotes(\$docs);
 
@@ -350,7 +350,7 @@ sub lookup_documentation($$$;$)
     print "DocsParser.pm: Warning: No C docs for: \"$functionName\"\n";
   }
 
-  DocsParser::convert_docs_to_cpp($objFunction, \$text);
+  DocsParser::convert_docs_to_cpp($functionName, \$text);
   DocsParser::replace_or_add_newin(\$text, $newin);
   # A blank line, marking the end of a paragraph, is needed after @newin.
   # Most @newins are at the end of a function description.
@@ -569,7 +569,7 @@ sub append_parameter_docs($$;$)
       $param_name_mappings{$param} = "slot";
     }
 
-    DocsParser::convert_docs_to_cpp($obj_function, \$desc);
+    DocsParser::convert_docs_to_cpp($$obj_function{name}, \$desc);
     if(length($desc) > 0)
     {
       $desc  .= '.' unless($desc =~ /(?:^|\.)$/);
@@ -585,7 +585,7 @@ sub append_return_docs($$)
   my ($obj_function, $text) = @_;
 
   my $desc = $$obj_function{return_description};
-  DocsParser::convert_docs_to_cpp($obj_function, \$desc);
+  DocsParser::convert_docs_to_cpp($$obj_function{name}, \$desc);
 
   $desc  =~ s/\.$//;
   $$text .= "\n\@return \u${desc}." unless($desc eq "");
@@ -594,7 +594,7 @@ sub append_return_docs($$)
 
 sub convert_docs_to_cpp($$)
 {
-  my ($obj_function, $text) = @_;
+  my ($doc_func, $text) = @_;
 
   # Chop off leading and trailing whitespace.
   $$text =~ s/^\s+//;
@@ -603,7 +603,7 @@ sub convert_docs_to_cpp($$)
   # Convert C documentation to C++.
   DocsParser::remove_c_memory_handling_info($text);
   DocsParser::convert_tags_to_doxygen($text);
-  DocsParser::substitute_identifiers($$obj_function{name}, $text);
+  DocsParser::substitute_identifiers($doc_func, $text);
 
   $$text =~ s/\bX\s+Window\b/X&nbsp;\%Window/g;
   $$text =~ s/\bWindow\s+manager/\%Window manager/g;
