@@ -29,6 +29,7 @@ _DEFS(glibmm,glib)
 #include <tuple>
 #include <stdexcept>
 #include <typeinfo>
+#include <cstddef>
 
 namespace Glib
 {
@@ -1502,11 +1503,72 @@ const VariantType& Variant<std::tuple<Types...>>::variant_type()
   return type;
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace detail
 {
+// std::index_sequence and std::index_sequence_for are new in C++14,
+// but this version of glibmm requires only C++11.
+// The following code replaces std::index_sequence and std::index_sequence_for
+// until we can require C++14 support.
+// See https://bugzilla.gnome.org/show_bug.cgi?id=787648
+
+  /// Class template integer_sequence
+  template<typename T, T... Idx>
+    struct integer_sequence
+    {
+      typedef T value_type;
+      static constexpr std::size_t size() { return sizeof...(Idx); }
+    };
+
+  // Concatenates two integer_sequences.
+  template<typename Iseq1, typename Iseq2> struct iseq_cat;
+
+  template<typename T, std::size_t... Ind1, std::size_t... Ind2>
+    struct iseq_cat<integer_sequence<T, Ind1...>, integer_sequence<T, Ind2...>>
+    {
+      using type = integer_sequence<T, Ind1..., (Ind2 + sizeof...(Ind1))...>;
+    };
+
+  // Builds an integer_sequence<T, 0, 1, 2, ..., Num-1>.
+  template<typename T, std::size_t Num>
+    struct make_intseq
+    : iseq_cat<typename make_intseq<T, Num / 2>::type,
+		typename make_intseq<T, Num - Num / 2>::type>
+    { };
+
+  template<typename T>
+    struct make_intseq<T, 1>
+    {
+      typedef integer_sequence<T, 0> type;
+    };
+
+  template<typename T>
+    struct make_intseq<T, 0>
+    {
+      typedef integer_sequence<T> type;
+    };
+
+  /// Alias template make_integer_sequence
+  template<typename T, T Num>
+    using make_integer_sequence = typename make_intseq<T, Num>::type;
+
+  /// Alias template index_sequence
+  template<std::size_t... Idx>
+    using index_sequence = integer_sequence<std::size_t, Idx...>;
+
+  /// Alias template make_index_sequence
+  template<std::size_t Num>
+    using make_index_sequence = make_integer_sequence<std::size_t, Num>;
+
+  /// Alias template index_sequence_for
+  template<typename... Types>
+    using index_sequence_for = make_index_sequence<sizeof...(Types)>;
+
+// End of code that replaces std::index_sequence and std::index_sequence_for
+
 template <class Tuple, std::size_t... Is>
 void expand_tuple(std::vector<VariantBase> &variants, const Tuple & t,
-                  std::index_sequence<Is...>)
+                  detail::index_sequence<Is...>)
 {
   using swallow = int[]; // ensures left to right order
   auto expander = [&variants](const VariantBase &variant) -> int
@@ -1517,6 +1579,7 @@ void expand_tuple(std::vector<VariantBase> &variants, const Tuple & t,
   (void)swallow {(expander(Variant<typename std::tuple_element<Is, Tuple>::type>::create(std::get<Is>(t))))...};
 }
 } // namespace detail
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 template <class... Types>
 Variant<std::tuple<Types...>>
@@ -1524,7 +1587,7 @@ Variant<std::tuple<Types...>>::create(const std::tuple<Types...>& data)
 {
   // create a vector containing all tuple values as variants
   std::vector<Glib::VariantBase> variants;
-  detail::expand_tuple(variants, data, std::index_sequence_for<Types...>{});
+  detail::expand_tuple(variants, data, detail::index_sequence_for<Types...>{});
 
   using var_ptr = GVariant*;
   var_ptr* const var_array = new var_ptr[sizeof... (Types)];
@@ -1556,6 +1619,7 @@ Variant<T> Variant<std::tuple<Types...>>::get_child_variant(gsize index) const
   return entry;
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace detail
 {
 // swallows any argument
@@ -1567,13 +1631,14 @@ constexpr int any_arg(T&& arg)
 }
 
 template <class Tuple, std::size_t... Is>
-void assign_tuple(std::vector<VariantBase> &variants, Tuple & t, std::index_sequence<Is...>)
+void assign_tuple(std::vector<VariantBase> &variants, Tuple & t, detail::index_sequence<Is...>)
 {
   int i = 0;
   using swallow = int[]; // ensures left to right order
   (void)swallow {(any_arg(std::get<Is>(t) = VariantBase::cast_dynamic<Variant<typename std::tuple_element<Is, Tuple>::type > >(variants[i++]).get()))...};
 }
 } // namespace detail
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 template <class... Types>
 std::tuple<Types...> Variant<std::tuple<Types...>>::get() const
@@ -1589,7 +1654,7 @@ std::tuple<Types...> Variant<std::tuple<Types...>>::get() const
     return i++;
   };
   swallow{(expander(get_child_variant<Types>(i)))...};
-  detail::assign_tuple(variants, data, std::index_sequence_for<Types...>{});
+  detail::assign_tuple(variants, data, detail::index_sequence_for<Types...>{});
 
   return data;
 }
