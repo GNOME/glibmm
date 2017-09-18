@@ -1468,6 +1468,7 @@ const VariantType& Variant<std::tuple<Types...>>::variant_type()
   return type;
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace detail
 {
 template <class Tuple, std::size_t... Is>
@@ -1483,6 +1484,7 @@ void expand_tuple(std::vector<VariantBase> &variants, const Tuple & t,
   (void)swallow {(expander(Variant<typename std::tuple_element<Is, Tuple>::type>::create(std::get<Is>(t))))...};
 }
 } // namespace detail
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 template <class... Types>
 Variant<std::tuple<Types...>>
@@ -1522,6 +1524,7 @@ Variant<T> Variant<std::tuple<Types...>>::get_child_variant(gsize index) const
   return entry;
 }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace detail
 {
 // swallows any argument
@@ -1540,6 +1543,7 @@ void assign_tuple(std::vector<VariantBase> &variants, Tuple & t, std::index_sequ
   (void)swallow {(any_arg(std::get<Is>(t) = VariantBase::cast_dynamic<Variant<typename std::tuple_element<Is, Tuple>::type > >(variants[i++]).get()))...};
 }
 } // namespace detail
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 template <class... Types>
 std::tuple<Types...> Variant<std::tuple<Types...>>::get() const
