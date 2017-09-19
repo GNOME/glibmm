@@ -57,16 +57,26 @@ bool test_tuple()
   ostr << "Index of first map entry: " << child0.first << std::endl;
   result_ok &= child0.first == 4;
   auto extracted_tuple = child0.second;
+#if __cplusplus > 201103L // C++14 or higher
   auto q3 = std::get<guint16>(extracted_tuple);
   auto s3 = std::get<Glib::ustring>(extracted_tuple);
   auto b3 = std::get<bool>(extracted_tuple);
+#else // C++11
+  auto q3 = std::get<0>(extracted_tuple);
+  auto s3 = std::get<1>(extracted_tuple);
+  auto b3 = std::get<2>(extracted_tuple);
+#endif
   ostr << "Extracted tuple1 from map: (" << q3 << ", " << s3 << ", " << b3 << ")" << std::endl;
   result_ok &= q3 == q1 && s3 == s1 && b3 == b1;
 
   // Extract from a tuple.
   auto q4 = tuple2_variant.get_child<guint16>(0);
   auto s4 = tuple2_variant.get_child_variant<Glib::ustring>(1).get();
+#if __cplusplus > 201103L // C++14 or higher
   auto b4 = std::get<bool>(tuple2_variant.get());
+#else // C++11
+  auto b4 = std::get<2>(tuple2_variant.get());
+#endif
   ostr << "Extracted tuple2: (" << q4 << ", " << s4 << ", " << b4 << ")" << std::endl;
   result_ok &= q4 == q2 && s4 == s2 && b4 == b2;
 
