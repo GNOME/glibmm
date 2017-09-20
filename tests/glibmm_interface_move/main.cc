@@ -20,6 +20,13 @@ static void test_Iface_init(gpointer)
 GType
 test_Iface_get_type(void)
 {
+  // Avoid compiler warnings about unused functions.
+  // TODO: With C++17, use [[maybe unused]].
+  (void)TEST_IFACE;
+  (void)TEST_IS_IFACE;
+  (void)TEST_IFACE_GET_IFACE;
+  (void)glib_autoptr_cleanup_TestIface;
+
   static GType type = 0;
 
   if (!type)
