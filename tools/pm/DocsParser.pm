@@ -328,10 +328,12 @@ sub lookup_enum_documentation($$$$$$$)
 }
 
 # $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs, $newin, $objCppfunc)
-# The final objCppfunc parameter is optional.  If passed, it is used to
-# decide if the final C parameter should be omitted if the C++ method
-# has a slot parameter. It is also used for converting C parameter names to
-# C++ parameter names in the documentation, if they differ.
+# The final objCppfunc parameter is optional. If passed, it is used for
+# - deciding if the final C parameter shall be omitted if the C++ method
+#   has a slot parameter,
+# - converting C parameter names to C++ parameter names in the documentation,
+#   if they differ,
+# - deciding if the @return section shall be omitted.
 sub lookup_documentation($$$;$)
 {
   my ($functionName, $deprecation_docs, $newin, $objCppfunc) = @_;
@@ -364,8 +366,10 @@ sub lookup_documentation($$$;$)
   }
 
   my %param_name_mappings = DocsParser::append_parameter_docs($objFunction, \$text, $objCppfunc);
-  DocsParser::append_return_docs($objFunction, \$text);
-
+  if (!(defined($objCppfunc) && $$objCppfunc{rettype} eq "void"))
+  {
+    DocsParser::append_return_docs($objFunction, \$text);
+  }
   # Convert C parameter names to C++ parameter names where they differ.
   foreach my $key (keys %param_name_mappings)
   {
