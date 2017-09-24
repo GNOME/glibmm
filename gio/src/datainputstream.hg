@@ -69,7 +69,7 @@ public:
    * another thread. If the operation
    * was cancelled, a Gio::Error with CANCELLED will be thrown.
    *
-   * @param line A string to fill with the read data (without the newlines).
+   * @param[out] line A string to fill with the read data (without the newlines).
    * @param cancellable A cancellable object.
    * @result true if the read succeeded without error.
    */
@@ -78,25 +78,38 @@ public:
 
   /** A non-cancellable version of read_line().
    *
-   * @param line A string to fill with the read data (without the newlines).
+   * @param[out] line A string to fill with the read data (without the newlines).
    * @result true if the read succeeded without error.
    */
   bool read_line(std::string& line);
 
-// The below initialization is unusual because it stores the return in a 'tmp'
-// variable, sets the output parameter and then frees the return.  If this is
-// too weird, the methods can probably be just handwritten.
-# _INITIALIZATION(`std::string&',`return-char*',`char* tmp = $4; $3 = tmp; g_free(tmp)')
-
+#m4 _INITIALIZATION(`std::string&',`return-char*',`$3 = Glib::convert_return_gchar_ptr_to_stdstring($4)')
+  /** Reads a UTF-8 encoded line from the data input stream.
+   *
+   * If @a cancellable is supplied and not equal to Glib::RefPtr<Cancellable>(),
+   * then the operation can be cancelled by triggering the cancellable object
+   * from another thread. If the operation was cancelled, Gio::Error with
+   * code() == Gio::Error::CANCELLED will be thrown.
+   *
+   * @newin{2,30}
+   *
+   * @param[out] line A UTF-8 string with the line that was read in (without the newlines).
+   *   Supply @a length to get the length of the read line. On an error,
+   *   @a line is set to an empty string and an exception is thrown. For UTF-8
+   *   conversion errors, a Glib::ConvertError is thrown. If there's no content
+   *   to read, @a line will still be set to an empty string, but no exception
+   *   will be thrown.
+   * @param cancellable Optional Cancellable object.
+   * @param[out] length An optional gsize to get the length of the data read in.
+   */
   _WRAP_METHOD(void read_line_utf8(std::string& line{OUT}, const Glib::RefPtr<Cancellable>& cancellable{.?}, gsize& length{.?}), g_data_input_stream_read_line_utf8, errthrow)
 
-  /** The asynchronous version of read_until(). It is
+  /** The asynchronous version of read_line(). It is
    * an error to have two outstanding calls to this function.
    *
    * @param slot The slot to call when the request is satisfied.
    * @param cancellable A cancellable object.
    * @param io_priority The I/O priority of the request.
-   * @result true if the read succeeded without error.
    */
   void read_line_async(const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_data_input_stream_read_line_async)
@@ -104,12 +117,25 @@ public:
   /** Finish an asynchronous call started by read_line_async().
    *
    * @param result The AsyncResult that was provided to the callback slot.
-   * @param data A string to fill with the read data.
+   * @param[out] data A string to fill with the read data.
    * @result true if the read succeeded without error.
    */
   bool read_line_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data);
   _IGNORE(g_data_input_stream_read_line_finish)
 
+  /** Finish an asynchronous call started by read_line_async().
+   *
+   * @newin{2,30}
+   *
+   * @param result The AsyncResult that was provided to the callback.
+   * @param[out] data A UTF-8 string with the line that was read in (without the newlines).
+   *   Supply @a length to get the length of the read line. On an error,
+   *   @a line is set to an empty string and an exception is thrown. For UTF-8
+   *   conversion errors, a Glib::ConvertError is thrown. If there's no content
+   *   to read, @a line will still be set to an empty string, but no exception
+   *   will be thrown.
+   * @param[out] length An optional gsize to get the length of the data read in.
+   */
   _WRAP_METHOD(void read_line_finish_utf8(const Glib::RefPtr<AsyncResult>& result{.}, std::string& data{OUT}, gsize& length{.?}), g_data_input_stream_read_line_finish_utf8, errthrow)
 
   /** Reads a string from the data input stream, up to the first
@@ -124,7 +150,7 @@ public:
    * read_upto() instead, but note that that method
    * does not consume the stop character.
    *
-   * @param data A string to fill with the read data.
+   * @param[out] data A string to fill with the read data.
    * @param stop_chars Characters to terminate the read.
    * @param cancellable A cancellable object.
    * @result true if the read succeeded without error.
@@ -144,7 +170,7 @@ public:
    * read_upto() instead, but note that that method
    * does not consume the stop character.
    *
-   * @param data A string to fill with the read data.
+   * @param[out] data A string to fill with the read data.
    * @param stop_chars Characters to terminate the read.
    * @result true if the read succeeded without error.
    */
@@ -158,7 +184,6 @@ public:
    * this function does not consume the stop character that it finds.  You
    * must read it for yourself.
    *
-   *
    * Don't use this function in new code.  Its functionality is
    * inconsistent with read_until().  Both functions
    * will be marked as deprecated in a future release.  Use
@@ -168,7 +193,6 @@ public:
    * @param slot The slot to call when the request is satisfied.
    * @param cancellable A cancellable object.
    * @param io_priority The I/O priority of the request.
-   * @result true if the read succeeded without error.
    */
   void read_until_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_data_input_stream_read_until_async)
@@ -177,7 +201,7 @@ public:
   /** Finish an asynchronous call started by read_until_async().
    *
    * @param result The AsyncResult that was provided to the callback slot.
-   * @param data A string to fill with the read data.
+   * @param[out] data A string to fill with the read data.
    * @result true if the read succeeded without error.
    */
   bool read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data);
@@ -192,7 +216,7 @@ public:
    * to use read_byte() to get it before calling
    * read_upto() again.
    *
-   * @param data A string to fill with the read data.
+   * @param[out] data A string to fill with the read data.
    * @param stop_chars Characters to terminate the read.
    * @param cancellable A cancellable object.
    * @result true if the read succeeded without error.
@@ -201,7 +225,7 @@ public:
   _IGNORE(g_data_input_stream_read_upto)
 
   /** A non-cancellable version of read_upto().
-   * @param data A string to fill with the read data.
+   * @param[out] data A string to fill with the read data.
    * @param stop_chars Characters to terminate the read.
    * @result true if the read succeeded without error.
    */
@@ -221,7 +245,6 @@ public:
    * @param slot The slot to call when the request is satisfied.
    * @param cancellable A cancellable object.
    * @param io_priority The I/O priority of the request.
-   * @result true if the read succeeded without error.
    */
   void read_upto_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_data_input_stream_read_upto_async)
@@ -233,7 +256,7 @@ public:
    * get it before calling read_upto_async() again.
    *
    * @param result The AsyncResult that was provided to the callback slot.
-   * @param data A string to fill with the read data.
+   * @param[out] data A string to fill with the read data.
    * @result true if the read succeeded without error.
    */
   bool read_upto_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data);
