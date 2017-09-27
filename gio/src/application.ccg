@@ -272,9 +272,11 @@ Application::custom_class_init()
 
 Application::Application(const Glib::ustring& application_id, Flags flags)
 : // Mark this class as non-derived to allow C++ vfuncs to be skipped.
+  // GApplication complains about "" but allows nullptr, so we avoid passing "".
   Glib::ObjectBase(nullptr),
-  Glib::Object(Glib::ConstructParams(custom_class_init(), "application_id",
-    Glib::c_str_or_nullptr(application_id), "flags", ((GApplicationFlags)(flags)), nullptr))
+  Glib::Object(Glib::ConstructParams(custom_class_init(),
+    "application_id", Glib::c_str_or_nullptr(application_id),
+    "flags", static_cast<GApplicationFlags>(flags), nullptr))
 {
 }
 
