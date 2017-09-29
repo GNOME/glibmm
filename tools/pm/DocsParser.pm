@@ -327,16 +327,17 @@ sub lookup_enum_documentation($$$$$$$)
   return $docs;
 }
 
-# $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs, $newin, $objCppfunc)
+# $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs,
+#   $newin, $errthrow, $objCppfunc)
 # The final objCppfunc parameter is optional. If passed, it is used for
 # - deciding if the final C parameter shall be omitted if the C++ method
 #   has a slot parameter,
 # - converting C parameter names to C++ parameter names in the documentation,
 #   if they differ,
 # - deciding if the @return section shall be omitted.
-sub lookup_documentation($$$;$)
+sub lookup_documentation($$$$;$)
 {
-  my ($functionName, $deprecation_docs, $newin, $objCppfunc) = @_;
+  my ($functionName, $deprecation_docs, $newin, $errthrow, $objCppfunc) = @_;
 
   my $objFunction = $DocsParser::hasharrayFunctions{$functionName};
   if(!$objFunction)
@@ -370,6 +371,8 @@ sub lookup_documentation($$$;$)
   {
     DocsParser::append_return_docs($objFunction, \$text);
   }
+  DocsParser::add_throws(\$text, $errthrow);
+
   # Convert C parameter names to C++ parameter names where they differ.
   foreach my $key (keys %param_name_mappings)
   {
@@ -745,6 +748,24 @@ sub replace_or_add_newin($$)
   if (!($$text =~ s/\@newin\{[\d,]+\}/\@newin{$newin}/))
   {
     $$text .= "\n\n\@newin{$newin}";
+  }
+}
+
+# void add_throws(\$text, $errthrow)
+# If $errthrow is not empty, and $$text does not contain a @throw, @throws
+# or @exception Doxygen command, add one or more @throws commands.
+sub add_throws($$)
+{
+  my ($text, $errthrow) = @_;
+
+  return if ($errthrow eq "");
+
+  if (!($$text =~ /[\@\\](throws?|exception)\b/))
+  {
+    # Each comma, not preceded by backslash, creates a new @throws command.
+    $errthrow =~ s/([^\\]),\s*/$1\n\@throws /g;
+    $errthrow =~ s/\\,/,/g; # Delete backslash before comma
+    $$text .= "\n\n\@throws $errthrow";
   }
 }
 

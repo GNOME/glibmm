@@ -946,6 +946,7 @@ sub on_wrap_method($)
   $$objCfunc{throw_any_errors} = 0;
   $$objCfunc{constversion} = 0;
   $$objCfunc{deprecated} = "";
+  my $errthrow_docs = "";
   my $deprecation_docs = "";
   my $newin = "";
   my $ifdef;
@@ -957,9 +958,10 @@ sub on_wrap_method($)
     {
       $$objCfunc{rettype_needs_ref} = 1;
     }
-    elsif($argRef eq "errthrow")
+    elsif($argRef =~ /^errthrow(.*)/) #If errthrow is at the start.
     {
       $$objCfunc{throw_any_errors} = 1;
+      $errthrow_docs = ($1 ne "") ? string_unquote(string_trim($1)) : "Glib::Error";
     }
     elsif($argRef eq "constversion")
     {
@@ -1010,7 +1012,7 @@ sub on_wrap_method($)
   else
   {
     $commentblock = DocsParser::lookup_documentation($argCFunctionName,
-      $deprecation_docs, $newin, $objCppfunc);
+      $deprecation_docs, $newin, $errthrow_docs, $objCppfunc);
   }
 
   $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock, $ifdef);
@@ -1060,13 +1062,15 @@ sub on_wrap_method_docs_only($)
   }
 
   $$objCfunc{throw_any_errors} = 0;
+  my $errthrow_docs = "";
   my $newin = "";
   while($#args >= 1) # If the optional ref/err arguments are there.
   {
     my $argRef = string_trim(pop @args);
-    if($argRef eq "errthrow")
+    if($argRef =~ /^errthrow(.*)/) #If errthrow is at the start.
     {
       $$objCfunc{throw_any_errors} = 1;
+      $errthrow_docs = ($1 ne "") ? string_unquote(string_trim($1)) : "Glib::Error";
     }
     elsif($argRef =~ /^newin(.*)/) #If newin is at the start.
     {
@@ -1075,7 +1079,7 @@ sub on_wrap_method_docs_only($)
   }
 
   my $commentblock = "";
-  $commentblock = DocsParser::lookup_documentation($argCFunctionName, "", $newin);
+  $commentblock = DocsParser::lookup_documentation($argCFunctionName, "", $newin, $errthrow_docs);
   $objOutputter->output_wrap_meth_docs_only($filename, $line_num, $commentblock);
 }
 
