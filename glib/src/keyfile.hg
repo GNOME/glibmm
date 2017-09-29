@@ -142,9 +142,9 @@ public:
 #m4 _CONVERSION(`Glib::ArrayHandle<std::string>&', `gchar**', `const_cast<gchar**>($3.data())')
 
   _WRAP_METHOD(bool load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, Glib::ArrayHandle<std::string>& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE),
-    g_key_file_load_from_dirs, errthrow, deprecated "Use the load_from_dirs() method that takes a std::string& full_path.")
+    g_key_file_load_from_dirs, errthrow "Glib::KeyFileError, Glib::FileError", errthrow, deprecated "Use the load_from_dirs() method that takes a std::string& full_path.")
 
-  _WRAP_METHOD_DOCS_ONLY(g_key_file_load_from_dirs)
+  _WRAP_METHOD_DOCS_ONLY(g_key_file_load_from_dirs, errthrow "Glib::KeyFileError, Glib::FileError")
   bool load_from_dirs(const std::string& file, const Glib::ArrayHandle<std::string>& search_dirs, std::string& full_path, KeyFileFlags flags = Glib::KEY_FILE_NONE);
 
   /** Looks for a KeyFile named @a file in the paths returned from
@@ -152,7 +152,7 @@ public:
    * into the keyfile object, placing the full path to the file in
    * @a full_path.
    * @param file The file to search for
-   * @param full_path Return location for a string containing the full path of the file
+   * @param[out] full_path Return location for a string containing the full path of the file
    * @param flags Bitwise combination of the flags to use for the KeyFile
    * @return true if the KeyFile was successfully loaded, false otherwise
    * @throw Glib::KeyFileError
@@ -168,7 +168,7 @@ public:
   Glib::ustring to_data();
   _IGNORE(g_key_file_to_data)
 
-  _WRAP_METHOD(bool save_to_file(const std::string& filename), g_key_file_save_to_file, errthrow)
+  _WRAP_METHOD(bool save_to_file(const std::string& filename), g_key_file_save_to_file, errthrow "Glib::FileError", errthrow)
 
   _WRAP_METHOD(Glib::ustring get_start_group() const, g_key_file_get_start_group)
 
@@ -235,7 +235,7 @@ public:
    */
   gint64 get_int64(const Glib::ustring& key) const;
 
-  _WRAP_METHOD(gint64 get_int64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_int64, errthrow)
+  _WRAP_METHOD(gint64 get_int64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_int64, errthrow "Glib::KeyFileError", errthrow)
 
   /** Gets the value in the first group, under @a key, interpreting it as
    * an unsigned 64-bit integer. This is similar to get_integer() but can
@@ -248,7 +248,7 @@ public:
    */
   guint64 get_uint64(const Glib::ustring& key) const;
 
-  _WRAP_METHOD(guint64 get_uint64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_uint64, errthrow)
+  _WRAP_METHOD(guint64 get_uint64(const Glib::ustring& group_name, const Glib::ustring& key) const, g_key_file_get_uint64, errthrow "Glib::KeyFileError", errthrow)
 
   /** Gets the value in the first group, under @a key, interpreting it as
    * a double.
