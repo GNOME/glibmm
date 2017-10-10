@@ -84,7 +84,8 @@ struct TypeTraits
 // be next to the objects that they use.
 #ifdef GLIBMM_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 
-/** Partial specialization for pointers to GtkObject instances.
+/** Partial specialization for pointers to GObject instances.
+ * The C++ type is not a Glib::RefPtr<>. It can be a gtkmm widget.
  * @ingroup ContHelpers
  */
 template <class T>
@@ -116,7 +117,8 @@ struct TypeTraits<T*>
 // This confuse the SUN Forte compiler, so we ifdef it out:
 #ifdef GLIBMM_HAVE_DISAMBIGUOUS_CONST_TEMPLATE_SPECIALIZATIONS
 
-/** Partial specialization for pointers to const GtkObject instances.
+/** Partial specialization for pointers to const GObject instances.
+ * The C++ type is not a Glib::RefPtr<>. It can be a gtkmm widget.
  * @ingroup ContHelpers
  */
 template <class T>

@@ -279,9 +279,9 @@ ObjectBase::destroy_notify_callback_(void* data)
     (void*)cppObject, (void*)cppObject->gobject_, G_OBJECT_TYPE_NAME(cppObject->gobject_));
 #endif
 
-  if (cppObject) // This will be 0 if the C++ destructor has already run.
+  if (cppObject) // This will be nullptr if the C++ destructor has already run.
   {
-    cppObject->destroy_notify_(); // Virtual - it does different things for GObject and GtkObject.
+    cppObject->destroy_notify_(); // Virtual - it does different things for Glib::ObjectBase and Gtk::Object.
   }
 }
 
@@ -290,13 +290,13 @@ ObjectBase::destroy_notify_()
 {
 // The C instance is about to be disposed, making it unusable.  Now is a
 // good time to delete the C++ wrapper of the C instance.  There is no way
-// to force the disposal of the GObject (though GtkObject  has
-// gtk_object_destroy()), So this is the *only* place where we delete the
-// C++ wrapper.
+// to force the disposal of the GObject (though Gtk::Object::destroy_notify_()
+// can call g_object_run_dispose()), so this is the *only* place where we delete
+// the C++ wrapper.
 //
 // This will only happen after the last unreference(), which will be done by
 // the RefPtr<> destructor.  There should be no way to access the wrapper or
-// the undobjecterlying instance after that, so it's OK to delete this.
+// the underlying object instance after that, so it's OK to delete this.
 
 #ifdef GLIBMM_DEBUG_REFCOUNTING
   g_warning("Glib::ObjectBase::destroy_notify_: gobject_ = %p", (void*)gobject_);
