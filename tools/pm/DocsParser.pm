@@ -328,16 +328,16 @@ sub lookup_enum_documentation($$$$$$$)
 }
 
 # $strCommentBlock lookup_documentation($strFunctionName, $deprecation_docs,
-#   $newin, $errthrow, $objCppfunc)
-# The final objCppfunc parameter is optional. If passed, it is used for
+#   $newin, $objCppfunc, $errthrow, $voidreturn)
+# The parameters from objCppfunc are optional. If objCppfunc is passed, it is used for
 # - deciding if the final C parameter shall be omitted if the C++ method
 #   has a slot parameter,
 # - converting C parameter names to C++ parameter names in the documentation,
 #   if they differ,
 # - deciding if the @return section shall be omitted.
-sub lookup_documentation($$$$;$)
+sub lookup_documentation($$$;$$$)
 {
-  my ($functionName, $deprecation_docs, $newin, $errthrow, $objCppfunc) = @_;
+  my ($functionName, $deprecation_docs, $newin, $objCppfunc, $errthrow, $voidreturn) = @_;
 
   my $objFunction = $DocsParser::hasharrayFunctions{$functionName};
   if(!$objFunction)
@@ -367,7 +367,7 @@ sub lookup_documentation($$$$;$)
   }
 
   my %param_name_mappings = DocsParser::append_parameter_docs($objFunction, \$text, $objCppfunc);
-  if (!(defined($objCppfunc) && $$objCppfunc{rettype} eq "void"))
+  unless ((defined($objCppfunc) && $$objCppfunc{rettype} eq "void") || $voidreturn)
   {
     DocsParser::append_return_docs($objFunction, \$text);
   }
@@ -752,13 +752,13 @@ sub replace_or_add_newin($$)
 }
 
 # void add_throws(\$text, $errthrow)
-# If $errthrow is not empty, and $$text does not contain a @throw, @throws
-# or @exception Doxygen command, add one or more @throws commands.
+# If $errthrow is defined and not empty, and $$text does not contain a @throw,
+# @throws or @exception Doxygen command, add one or more @throws commands.
 sub add_throws($$)
 {
   my ($text, $errthrow) = @_;
 
-  return if ($errthrow eq "");
+  return if (!defined($errthrow) or $errthrow eq "");
 
   if (!($$text =~ /[\@\\](throws?|exception)\b/))
   {
