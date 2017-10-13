@@ -1012,7 +1012,7 @@ sub on_wrap_method($)
   else
   {
     $commentblock = DocsParser::lookup_documentation($argCFunctionName,
-      $deprecation_docs, $newin, $errthrow_docs, $objCppfunc);
+      $deprecation_docs, $newin, $objCppfunc, $errthrow_docs);
   }
 
   $objOutputter->output_wrap_meth($filename, $line_num, $objCppfunc, $objCfunc, $argCppMethodDecl, $commentblock, $ifdef);
@@ -1064,6 +1064,7 @@ sub on_wrap_method_docs_only($)
   $$objCfunc{throw_any_errors} = 0;
   my $errthrow_docs = "";
   my $newin = "";
+  my $voidreturn = 0;
   while($#args >= 1) # If the optional ref/err arguments are there.
   {
     my $argRef = string_trim(pop @args);
@@ -1076,10 +1077,15 @@ sub on_wrap_method_docs_only($)
     {
       $newin = string_unquote(string_trim($1));
     }
+    elsif($argRef eq "voidreturn")
+    {
+      $voidreturn = 1;
+    }
   }
 
   my $commentblock = "";
-  $commentblock = DocsParser::lookup_documentation($argCFunctionName, "", $newin, $errthrow_docs);
+  $commentblock = DocsParser::lookup_documentation($argCFunctionName, "", $newin,
+    undef, $errthrow_docs, $voidreturn);
   $objOutputter->output_wrap_meth_docs_only($filename, $line_num, $commentblock);
 }
 
