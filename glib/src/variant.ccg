@@ -22,6 +22,8 @@
 namespace Glib
 {
 
+/****************** VariantBase ***********************************/
+
 VariantBase::VariantBase(GVariant* castitem, bool make_a_copy /* = false */)
 {
   if (castitem)
@@ -34,6 +36,32 @@ VariantBase::VariantBase(GVariant* castitem, bool make_a_copy /* = false */)
   }
 
   gobject_ = castitem;
+}
+
+VariantBase::operator bool() const
+{
+  return gobj();
+}
+
+void
+VariantBase::init(const GVariant* cobject, bool take_a_reference)
+{
+  if (gobject_)
+    g_variant_unref(gobject_);
+
+  gobject_ = const_cast<GVariant*>(cobject);
+  if (take_a_reference)
+    g_variant_ref(gobject_);
+}
+
+bool VariantBase::operator==(const VariantBase& other) const
+{
+  return equal(other);
+}
+
+bool VariantBase::operator!=(const VariantBase& other) const
+{
+  return !equal(other);
 }
 
 void
@@ -108,6 +136,8 @@ VariantBase::is_castable_to(const VariantType& supertype) const
   return true;
 }
 
+/****************** VariantStringBase ***********************************/
+
 VariantStringBase::VariantStringBase() : VariantBase()
 {
 }
@@ -136,6 +166,8 @@ VariantStringBase::create_signature(VariantStringBase& output, const std::string
   g_variant_ref_sink(result);
   output.init(result);
 }
+
+/****************** VariantContainerBase ***********************************/
 
 VariantContainerBase::VariantContainerBase() : VariantBase()
 {
@@ -243,22 +275,6 @@ VariantContainerBase::get_iter(const VariantType& container_variant_type) const
 }
 
 /****************** Specializations ***********************************/
-
-VariantBase::operator bool() const
-{
-  return gobj();
-}
-
-void
-VariantBase::init(const GVariant* cobject, bool take_a_reference)
-{
-  if (gobject_)
-    g_variant_unref(gobject_);
-
-  gobject_ = const_cast<GVariant*>(cobject);
-  if (take_a_reference)
-    g_variant_ref(gobject_);
-}
 
 /*--------------------Variant<VariantBase>---------------------*/
 

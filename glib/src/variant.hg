@@ -143,6 +143,39 @@ public:
    */
   _WRAP_METHOD(bool equal(const VariantBase& other) const, g_variant_equal)
 
+  /** Checks if @a *this and @a other have the same type and value.
+   *
+   * @newin{2,56}
+   *
+   * @param other The Variant to compare with.
+   * @return <tt>true</tt> if @a *this and @a other are equal.
+   */
+  bool operator==(const VariantBase& other) const;
+
+  /** Checks if @a *this and @a other have the same type and value.
+   *
+   * @newin{2,56}
+   *
+   * @param other The Variant to compare with.
+   * @return <tt>true</tt> if @a *this and @a other are not equal.
+   */
+  bool operator!=(const VariantBase& other) const;
+
+  /** Ordering relational operators.
+   * These are explicitly deleted to prevent the compiler from generating
+   * error messages containing long lists of operators that can't be used.
+   */
+  bool operator<(const VariantBase& other) const = delete;
+
+  /// See operator<().
+  bool operator<=(const VariantBase& other) const = delete;
+
+  /// See operator<().
+  bool operator>(const VariantBase& other) const = delete;
+
+  /// See operator<().
+  bool operator>=(const VariantBase& other) const = delete;
+
   /** Gets a VariantBase instance that has the same value as this variant and
    * is trusted to be in normal form.
    *
@@ -223,27 +256,6 @@ protected:
    */
   bool is_castable_to(const VariantType& supertype) const;
 #endif //DOXYGEN_SHOULD_SKIP_THIS
-
-private:
-  /** Relational operators are deleted to prevent invalid conversion
-   * to const void*.
-   */
-  bool operator<(const VariantBase& src) const;
-
-  /// See operator<().
-  bool operator<=(const VariantBase& src) const;
-
-  /// See operator<().
-  bool operator>(const VariantBase& src) const;
-
-  /// See operator<().
-  bool operator>=(const VariantBase& src) const;
-
-  /// See operator<().
-  bool operator==(const VariantBase& src) const;
-
-  /// See operator<().
-  bool operator!=(const VariantBase& src) const;
 };
 
 template<class V_CastTo>
