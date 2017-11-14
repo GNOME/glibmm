@@ -120,6 +120,38 @@ bool test_object_path()
   return result_ok;
 }
 
+bool test_comparison()
+{
+  bool result_ok = true;
+
+  std::vector<int> int_vector1 = { 1, 2, 3, 4, 5, 6, 7, 8 };
+  std::vector<int> int_vector2 = { 1, 2, 3, 4, 5, 6, 7 };
+
+  auto int_variant1 = Glib::Variant<std::vector<int>>::create(int_vector1);
+  auto int_variant2 = Glib::Variant<std::vector<int>>::create(int_vector2);
+  auto int_variant3 = Glib::Variant<std::vector<int>>::create(int_vector1);
+
+  // Equality and inequality operators
+  ostr << "int_variant1 == int_variant2 (0): " << (int_variant1 == int_variant2) << std::endl;
+  result_ok &= !(int_variant1 == int_variant2);
+  ostr << "int_variant1 != int_variant2 (1): " << (int_variant1 != int_variant2) << std::endl;
+  result_ok &= (int_variant1 != int_variant2);
+
+  ostr << "int_variant1 == int_variant3 (1): " << (int_variant1 == int_variant3) << std::endl;
+  result_ok &= (int_variant1 == int_variant3);
+  ostr << "int_variant1 != int_variant3 (0): " << (int_variant1 != int_variant3) << std::endl;
+  result_ok &= !(int_variant1 != int_variant3);
+
+#if 0
+  // Less than (activate if operator<() exists)
+  ostr << "int_variant2 < int_variant1 (1): " << (int_variant2 < int_variant1) << std::endl;
+  result_ok &= (int_variant2 < int_variant1);
+  ostr << "int_variant1 < int_variant3 (0): " << (int_variant1 < int_variant3) << std::endl;
+  result_ok &= !(int_variant1 < int_variant3);
+#endif
+  return result_ok;
+}
+
 } // anonymous namespace
 
 int
@@ -276,6 +308,7 @@ main(int, char**)
 
   bool result_ok = test_tuple();
   result_ok &= test_object_path();
+  result_ok &= test_comparison();
   return result_ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
