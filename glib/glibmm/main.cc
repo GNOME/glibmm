@@ -14,8 +14,6 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <glibmmconfig.h> // May define GLIBMM_DISABLE_DEPRECATED
-
 #include <glibmm/main.h>
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/wrap.h>

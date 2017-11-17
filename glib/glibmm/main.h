@@ -17,7 +17,6 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <glibmmconfig.h>
 #include <glibmm/refptr.h>
 #include <glibmm/timeval.h>
 #include <glibmm/priorities.h>
@@ -738,17 +737,6 @@ protected:
    * @param poll_fd A PollFD object previously passed to add_poll().
    */
   void remove_poll(PollFD& poll_fd);
-
-#ifndef GLIBMM_DISABLE_DEPRECATED
-  /** Gets the "current time" to be used when checking this source. The advantage of calling this
-   * function over calling get_current_time() directly is that when checking multiple sources, GLib
-   * can cache a single value instead of having to repeatedly get the system time.
-   * @param current_time Glib::TimeVal in which to store current time.
-   *
-   * @deprecated Use get_time() instead.
-   */
-  void get_current_time(Glib::TimeVal& current_time);
-#endif // GLIBMM_DISABLE_DEPRECATED
 
   // TODO: Remove mention of g_get_monotonic time when we wrap it in C++.
   /** Gets the time to be used when checking this source. The advantage of
