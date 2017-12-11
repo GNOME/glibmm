@@ -472,6 +472,12 @@ sub append_parameter_docs($$;$)
   # due to imperfections in the C docs, and it's difficult to get the C docs
   # corrected, correct docs can be added to the docs_override.xml file.
 
+  if (scalar @docs_param_names != scalar @c_param_names)
+  {
+    print STDERR "DocsParser.pm: Warning, $$obj_function{name}\n" .
+      "  Incompatible parameter lists in the docs.xml file and the methods.defs file.\n";
+  }
+
   # Skip first param if this is a signal.
   if ($$obj_function{name} =~ /\w+::/)
   {
@@ -508,8 +514,14 @@ sub append_parameter_docs($$;$)
   # Skip the last param if it's an error output param.
   if (scalar @docs_param_names && $docs_param_names[-1] eq "error")
   {
-    pop(@docs_param_names);
-    pop(@c_param_names);
+    # If the number of parameters in @docs_param_names is not greater than
+    # the number of parameters in the _WRAP macro, the parameter called "error"
+    # is probably not an error output parameter.
+    if (!defined($objCppfunc) || scalar @docs_param_names > scalar @{$$objCppfunc{param_names}})
+    {
+      pop(@docs_param_names);
+      pop(@c_param_names);
+    }
   }
 
   my $cpp_param_names;
@@ -522,6 +534,11 @@ sub append_parameter_docs($$;$)
     if (exists $$param_mappings{OUT})
     {
       $out_param_index = $$param_mappings{OUT};
+    }
+    if (scalar @docs_param_names != scalar @$cpp_param_names)
+    {
+      print STDERR "DocsParser.pm: Warning, $$obj_function{name}\n" .
+        "  Incompatible parameter lists in the docs.xml file and the _WRAP macro.\n";
     }
   }
   my %param_name_mappings; # C name -> C++ name
