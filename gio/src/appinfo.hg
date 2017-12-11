@@ -89,7 +89,7 @@ public:
 #m4 _CONVERSION(`const std::vector< Glib::RefPtr<Gio::File> >&',`GList*',`Glib::ListHandler<Glib::RefPtr<Gio::File> >::vector_to_list($3).data ()')
 
   /** Launches the application. This passes the @a file to the launched application
-   * as an argument, using the optional @a launch_context to get information
+   * as an argument, using the optional @a context to get information
    * about the details of the launcher (like what screen it is on).
    * On error, an exception will be thrown accordingly.
    *
@@ -109,14 +109,14 @@ public:
    * @c GIO_LAUNCHED_DESKTOP_FILE, should it be inherited
    * by further processes. The @c DISPLAY and
    * @c DESKTOP_STARTUP_ID environment variables are also
-   * set, based on information provided in @a launch_context.
+   * set, based on information provided in @a context.
    * @param file A File object.
-   * @param launch_context An AppLaunchContext.
+   * @param context An AppLaunchContext.
    * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
    *
    * @newin{2,30}
    */
-  bool launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& launch_context);
+  bool launch(const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& context);
 
   /** Launches the application. This passes the @a file to the launched application
    * as an argument.
@@ -138,7 +138,7 @@ public:
    * @c GIO_LAUNCHED_DESKTOP_FILE, should it be inherited
    * by further processes. The @c DISPLAY and
    * @c DESKTOP_STARTUP_ID environment variables are also
-   * set, based on information provided in @a launch_context.
+   * set, based on information provided in @a context.
    * @param file A File object.
    * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
    *
@@ -147,7 +147,7 @@ public:
   bool launch(const Glib::RefPtr<Gio::File>& file);
 
   _WRAP_METHOD(bool launch(const std::vector< Glib::RefPtr<Gio::File> >& files,
-                           const Glib::RefPtr<AppLaunchContext>& launch_context{?}),
+                           const Glib::RefPtr<AppLaunchContext>& context{?}),
                g_app_info_launch,
                errthrow)
 
@@ -158,12 +158,12 @@ public:
 
   //TODO: I think we use Glib::ustring elsewhere for URIs:
   _WRAP_METHOD(bool launch_uris(const std::vector<std::string>& uris,
-                                const Glib::RefPtr<AppLaunchContext>& launch_context{?}),
+                                const Glib::RefPtr<AppLaunchContext>& context{?}),
                g_app_info_launch_uris,
                errthrow)
 
   /** Launches the application. This passes the @a uri to the launched application
-   * as an arguments, using the optional @a launch_context to get information
+   * as an arguments, using the optional @a context to get information
    * about the details of the launcher (like what screen it is on).
    * On error, an exception will be thrown accordingly.
    *
@@ -171,12 +171,12 @@ public:
    * can fail to start if it runs into problems during startup. There is
    * no way to detect this.
    * @param uris A URIs to launch.
-   * @param launch_context An AppLaunchContext.
+   * @param context An AppLaunchContext.
    * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
    *
    * @newin{2,30}
    */
-  bool launch_uri(const std::string& uris, const Glib::RefPtr<AppLaunchContext>& launch_context);
+  bool launch_uri(const std::string& uris, const Glib::RefPtr<AppLaunchContext>& context);
 
   /** A launch_uri() convenience overload.
    *
@@ -215,9 +215,9 @@ public:
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_type(const std::string& content_type, bool must_support_uris = true), g_app_info_get_default_for_type)
   _WRAP_METHOD(static Glib::RefPtr<AppInfo> get_default_for_uri_scheme(const std::string& uri_scheme), g_app_info_get_default_for_uri_scheme)
   _WRAP_METHOD(static void reset_type_associations(const std::string& content_type), g_app_info_reset_type_associations)
-  _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context{?}), g_app_info_launch_default_for_uri, errthrow)
+  _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context{?}), g_app_info_launch_default_for_uri, errthrow)
 
-  _WRAP_METHOD(static void launch_default_for_uri_async(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context{.?},
+  _WRAP_METHOD(static void launch_default_for_uri_async(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context{.?},
     const SlotAsyncReady& slot{callback?}, const Glib::RefPtr<Cancellable>& cancellable{.?}), g_app_info_launch_default_for_uri_async, slot_name slot, slot_callback SignalProxy_async_callback)
   _IGNORE(g_app_info_launch_default_for_uri_async)
   _WRAP_METHOD(static bool launch_default_for_uri_finish(const Glib::RefPtr<AsyncResult>& result), g_app_info_launch_default_for_uri_finish, errthrow)
@@ -230,10 +230,10 @@ protected:
   //_WRAP_VFUNC(std::string get_description() const, "get_description")
   //_WRAP_VFUNC(std::string get_executable() const, "get_executable")
   //_WRAP_VFUNC(Glib::RefPtr<Icon> get_icon() const, "get_icon")
-  //_WRAP_VFUNC(bool launch(const std::vector<Gio::File>& filenames, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch")
+  //_WRAP_VFUNC(bool launch(const std::vector<Gio::File>& filenames, const Glib::RefPtr<AppLaunchContext>& context, GError** error), "launch")
   //_WRAP_VFUNC(bool supports_uris() const, "supports_uris")
   //_WRAP_VFUNC(bool supports_files() const, "supports_files")
-  //_WRAP_VFUNC(bool launch_uris(const std::vector<std::string>& uris, const Glib::RefPtr<AppLaunchContext>& launch_context, GError** error), "launch_uris")
+  //_WRAP_VFUNC(bool launch_uris(const std::vector<std::string>& uris, const Glib::RefPtr<AppLaunchContext>& context, GError** error), "launch_uris")
   //_WRAP_VFUNC(bool should_show() const, "should_show")
   //_WRAP_VFUNC(bool set_as_default_for_type(const std::string& content_type, GError** error), "set_as_default_for_type")
   //_WRAP_VFUNC(bool set_as_default_for_extension(const std::string& extension, GError** error), "set_as_default_for_extension")
