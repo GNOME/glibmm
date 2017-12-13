@@ -28,6 +28,9 @@ typedef struct _GTlsServerConnectionInterface GTlsServerConnectionInterface;
 
 namespace Gio
 {
+// It's unusual that a subclass of Glib::Object is a base class of an interface.
+// For a discussion, see https://bugzilla.gnome.org/show_bug.cgi?id=776537
+// especially the last paragraph of comment 6.
 
 /** TlsServerConnection - TLS server-side connection.
  * TlsServerConnection is the server-side subclass of TlsConnection,
@@ -40,8 +43,8 @@ class TlsServerConnection : public Glib::Interface, public TlsConnection
   _CUSTOM_CTOR_CAST
 
 public:
-  //TODO: It's not possible to use _WRAP_CTOR/_WRAP_CREATE to wrap the new
-  //function because this is an interface.
+  // It's not possible to use _WRAP_CTOR/_WRAP_CREATE to wrap the new
+  // function because this is an interface.
 #m4 _CONVERSION(`GIOStream*',`Glib::RefPtr<TlsServerConnection>',`Glib::wrap(G_TLS_SERVER_CONNECTION($3))')
   _WRAP_METHOD(static Glib::RefPtr<IOStream> create(const Glib::RefPtr<IOStream>& base_io_stream, const Glib::RefPtr<TlsCertificate>& certificate), g_tls_server_connection_new, errthrow)
 

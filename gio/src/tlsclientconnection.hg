@@ -31,6 +31,10 @@ namespace Gio
 
 class SocketConnectable;
 
+// It's unusual that a subclass of Glib::Object is a base class of an interface.
+// For a discussion, see https://bugzilla.gnome.org/show_bug.cgi?id=776537
+// especially the last paragraph of comment 6.
+
 /** TlsClientConnection - TLS client-side connection.
  * TlsClientConnection is the client-side subclass of TlsConnection,
  * representing a client-side TLS connection.
@@ -44,8 +48,8 @@ class TlsClientConnection
   _CUSTOM_CTOR_CAST
 
 public:
-  //TODO: It's not possible to use _WRAP_CTOR/_WRAP_CREATE to wrap the new
-  //function because this is an interface.
+  // It's not possible to use _WRAP_CTOR/_WRAP_CREATE to wrap the new
+  // function because this is an interface.
 #m4 _CONVERSION(`GIOStream*',`Glib::RefPtr<TlsClientConnection>',`Glib::wrap(G_TLS_CLIENT_CONNECTION($3))')
   _WRAP_METHOD(static Glib::RefPtr<TlsClientConnection> create(const Glib::RefPtr<IOStream>& base_io_stream, const Glib::RefPtr<const SocketConnectable>& server_identity{?}), g_tls_client_connection_new, errthrow)
 

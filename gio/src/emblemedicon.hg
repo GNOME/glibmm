@@ -79,9 +79,9 @@ public:
 
 #m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<Emblem>>',`Glib::ListHandler<Glib::RefPtr<Emblem>>::list_to_vector($3, Glib::OWNERSHIP_NONE)')
   _WRAP_METHOD(std::vector<Glib::RefPtr<Emblem>> get_emblems(), g_emblemed_icon_get_emblems)
-
-//TODO: #m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<const Emblem>>',`$2($3, Glib::OWNERSHIP_NONE)')
-//  _WRAP_METHOD(std::vector<Glib::RefPtr<const Emblem>> get_emblems() const, g_emblemed_icon_get_emblems, constversion)
+  dnl// Can't use the constversion parameter in _WRAP_METHOD() when a vector is returned.
+#m4 _CONVERSION(`GList*',`std::vector<Glib::RefPtr<const Emblem>>',`Glib::ListHandler<Glib::RefPtr<const Emblem>>::list_to_vector($3, Glib::OWNERSHIP_NONE)')
+  _WRAP_METHOD(std::vector<Glib::RefPtr<const Emblem>> get_emblems() const, g_emblemed_icon_get_emblems)
 
   _WRAP_METHOD(void add_emblem(const Glib::RefPtr<Emblem>& emblem), g_emblemed_icon_add_emblem)
   _WRAP_METHOD(void clear_emblems(), g_emblemed_icon_clear_emblems)

@@ -28,6 +28,9 @@ typedef struct _GTlsFileDatabaseInterface GTlsFileDatabaseInterface;
 
 namespace Gio
 {
+// It's unusual that a subclass of Glib::Object is a base class of an interface.
+// For a discussion, see https://bugzilla.gnome.org/show_bug.cgi?id=776537
+// especially the last paragraph of comment 6.
 
 /** TlsFileDatabase - TLS file based database type.
  * TlsFileDatabase is implemented by TlsDatabase objects which load their
@@ -43,9 +46,8 @@ class TlsFileDatabase
   _CLASS_INTERFACE(TlsFileDatabase, GTlsFileDatabase, G_TLS_FILE_DATABASE, GTlsFileDatabaseInterface)
 
 public:
-  //TODO: It is not possible to use _WRAP_CTOR()/WRAP_CREATE() here because this
-  //class is an interface.
-  //  So, should we make it possible to use them? murrayc.
+  // It's not possible to use _WRAP_CTOR/_WRAP_CREATE to wrap the new
+  // function because this is an interface.
 #m4 _CONVERSION(`GTlsDatabase*',`Glib::RefPtr<TlsFileDatabase>',`Glib::wrap(G_TLS_FILE_DATABASE($3))')
   _WRAP_METHOD(static Glib::RefPtr<TlsFileDatabase> create(const std::string& anchors), g_tls_file_database_new, errthrow)
 
