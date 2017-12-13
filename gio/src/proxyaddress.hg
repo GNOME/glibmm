@@ -65,10 +65,10 @@ public:
   _WRAP_PROPERTY("protocol", Glib::ustring)
   _WRAP_PROPERTY("destination_protocol", Glib::ustring)
   _WRAP_PROPERTY("destination_hostname", Glib::ustring)
-
-//TODO: This should really be a guint16:
-  _WRAP_PROPERTY("destination_port", Glib::ustring)
-
+  // Don't use guint16 in _WRAP_PROPERTY().
+  // There is no Glib::Value<> specialization for guint16.
+  // Glib::Value<unsigned int> exists, and guint is a typedef of unsigned int.
+  _WRAP_PROPERTY("destination_port", guint)
   _WRAP_PROPERTY("username", Glib::ustring)
   _WRAP_PROPERTY("password", Glib::ustring)
   _WRAP_PROPERTY("uri", Glib::ustring)

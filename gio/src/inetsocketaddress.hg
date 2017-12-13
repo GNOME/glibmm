@@ -54,10 +54,13 @@ public:
  _WRAP_METHOD(guint32 get_flowinfo() const, g_inet_socket_address_get_flowinfo)
  _WRAP_METHOD(guint32 get_scope_id() const, g_inet_socket_address_get_scope_id)
 
- _WRAP_PROPERTY("address", Glib::RefPtr<InetAddress>)
- _WRAP_PROPERTY("port", guint16)
- _WRAP_PROPERTY("flowinfo", guint32)
- _WRAP_PROPERTY("scope-id", guint32)
+  _WRAP_PROPERTY("address", Glib::RefPtr<InetAddress>)
+  // Don't use guint16 or guint32 in _WRAP_PROPERTY().
+  // There are no Glib::Value<> specializations for those types.
+  // Glib::Value<unsigned int> exists, and guint is a typedef of unsigned int.
+  _WRAP_PROPERTY("port", guint)
+  _WRAP_PROPERTY("flowinfo", guint)
+  _WRAP_PROPERTY("scope-id", guint)
 };
 
 } // namespace Gio
