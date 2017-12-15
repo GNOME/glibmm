@@ -457,21 +457,22 @@ def process_final_sections(fp, line, cur_doc):
 
     return line
 
-def parse_dir(dir, doc_dict):
+def parse_dir(dir, exclude_files, doc_dict):
     for file in os.listdir(dir):
         if file in ('.', '..'): continue
         path = os.path.join(dir, file)
+        if path in exclude_files: continue
         if os.path.isdir(path):
             if not no_recursion:
-                parse_dir(path, doc_dict)
+                parse_dir(path, exclude_files, doc_dict)
         elif len(file) > 2 and file[-2:] in ('.c', '.h'):
             sys.stderr.write("Processing " + path + '\n')
             parse_file(open(path, 'r'), doc_dict)
 
-def extract(dirs, doc_dict=None):
+def extract(dirs, exclude_files, doc_dict=None):
     if not doc_dict: doc_dict = {}
     for dir in dirs:
-        parse_dir(dir, doc_dict)
+        parse_dir(dir, exclude_files, doc_dict)
     return doc_dict
 
 tmpl_section_pattern = re.compile(r'^<!-- ##### (\w+) (\w+) ##### -->$')
@@ -509,12 +510,13 @@ def parse_tmpl(fp, doc_dict):
 
         line = fp.readline()
 
-def extract_tmpl(dirs, doc_dict=None):
+def extract_tmpl(dirs, exclude_files, doc_dict=None):
     if not doc_dict: doc_dict = {}
     for dir in dirs:
         for file in os.listdir(dir):
             if file in ('.', '..'): continue
             path = os.path.join(dir, file)
+            if path in exclude_files: continue
             if os.path.isdir(path):
                 continue
             if len(file) > 5 and file[-5:] == '.sgml':
