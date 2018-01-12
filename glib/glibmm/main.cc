@@ -1102,7 +1102,7 @@ TimeoutSource::connect(const sigc::slot<bool()>& slot)
 
 TimeoutSource::TimeoutSource(unsigned int interval) : interval_(interval)
 {
-  expiration_.assign_current_time();
+  time64_to_time_val(get_time(), expiration_);
   expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
 }
 
