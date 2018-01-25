@@ -790,10 +790,9 @@ protected:
   void remove_poll(PollFD& poll_fd);
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
-  /** Gets the "current time" to be used when checking this source. The advantage of calling this
-   * function over calling get_current_time() directly is that when checking multiple sources, GLib
-   * can cache a single value instead of having to repeatedly get the system time.
-   * @param current_time Glib::TimeVal in which to store current time.
+  /** Gets the "current time" to be used when checking this source.
+   *
+   * @param[out] current_time Glib::TimeVal in which to store current time.
    *
    * @deprecated Use get_time() instead.
    */

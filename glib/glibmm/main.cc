@@ -32,7 +32,6 @@
 
 namespace
 {
-#ifdef GLIBMM_DISABLE_DEPRECATED
 void
 time64_to_time_val(gint64 time64, Glib::TimeVal& time_val)
 {
@@ -42,7 +41,6 @@ time64_to_time_val(gint64 time64, Glib::TimeVal& time_val)
     static_cast<long>(time64 - static_cast<gint64>(seconds) * G_GINT64_CONSTANT(1000000));
   time_val = Glib::TimeVal(seconds, microseconds);
 }
-#endif // GLIBMM_DISABLE_DEPRECATED
 
 // TODO: At the next ABI break, replace ExtraSourceData by new data members in Source.
 // Then the mutex is not necessary, but to keep the code thread-safe, use the
@@ -1031,7 +1029,10 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 gint64
 Source::get_time() const
 {
-  return g_source_get_time(const_cast<GSource*>(gobject_));
+  if (g_source_get_context(const_cast<GSource*>(gobject_)))
+    return g_source_get_time(const_cast<GSource*>(gobject_));
+  else
+    return g_get_monotonic_time();
 }
 
 inline // static
@@ -1167,7 +1168,7 @@ TimeoutSource::connect(const sigc::slot<bool>& slot)
 
 TimeoutSource::TimeoutSource(unsigned int interval) : interval_(interval)
 {
-  expiration_.assign_current_time();
+  time64_to_time_val(get_time(), expiration_);
   expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
 }
 
@@ -1179,11 +1180,7 @@ bool
 TimeoutSource::prepare(int& timeout)
 {
   Glib::TimeVal current_time;
-#ifndef GLIBMM_DISABLE_DEPRECATED
-  get_current_time(current_time);
-#else
   time64_to_time_val(get_time(), current_time);
-#endif // GLIBMM_DISABLE_DEPRECATED
 
   Glib::TimeVal remaining = expiration_;
   remaining.subtract(current_time);
@@ -1220,11 +1217,7 @@ bool
 TimeoutSource::check()
 {
   Glib::TimeVal current_time;
-#ifndef GLIBMM_DISABLE_DEPRECATED
-  get_current_time(current_time);
-#else
   time64_to_time_val(get_time(), current_time);
-#endif // GLIBMM_DISABLE_DEPRECATED
 
   return (expiration_ <= current_time);
 }
@@ -1236,11 +1229,7 @@ TimeoutSource::dispatch(sigc::slot_base* slot)
 
   if (again)
   {
-#ifndef GLIBMM_DISABLE_DEPRECATED
-    get_current_time(expiration_);
-#else
     time64_to_time_val(get_time(), expiration_);
-#endif // GLIBMM_DISABLE_DEPRECATED
     expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
   }
 
