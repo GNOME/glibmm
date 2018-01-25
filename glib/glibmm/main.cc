@@ -22,14 +22,11 @@
 
 namespace
 {
-void
-time64_to_time_val(gint64 time64, Glib::TimeVal& time_val)
+// Convert an interval from milliseconds to microseconds,
+// suitable for adding to Source::get_time().
+inline gint64 ms2us(unsigned int ms)
 {
-  // This function is not guaranteed to convert correctly if time64 is negative.
-  const long seconds = static_cast<long>(time64 / G_GINT64_CONSTANT(1000000));
-  const long microseconds =
-    static_cast<long>(time64 - static_cast<gint64>(seconds) * G_GINT64_CONSTANT(1000000));
-  time_val = Glib::TimeVal(seconds, microseconds);
+  return static_cast<gint64>(ms) * 1000;
 }
 
 class SourceConnectionNode : public sigc::notifiable
@@ -963,7 +960,10 @@ Source::remove_poll(Glib::PollFD& poll_fd)
 gint64
 Source::get_time() const
 {
-  return g_source_get_time(const_cast<GSource*>(gobject_));
+  if (g_source_get_context(const_cast<GSource*>(gobject_)))
+    return g_source_get_time(const_cast<GSource*>(gobject_));
+  else
+    return g_get_monotonic_time();
 }
 
 inline // static
@@ -1102,8 +1102,7 @@ TimeoutSource::connect(const sigc::slot<bool()>& slot)
 
 TimeoutSource::TimeoutSource(unsigned int interval) : interval_(interval)
 {
-  expiration_.assign_current_time();
-  expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
+  expiration_ = get_time() + ms2us(interval_);
 }
 
 TimeoutSource::~TimeoutSource() noexcept
@@ -1113,33 +1112,24 @@ TimeoutSource::~TimeoutSource() noexcept
 bool
 TimeoutSource::prepare(int& timeout)
 {
-  Glib::TimeVal current_time;
-  time64_to_time_val(get_time(), current_time);
+  gint64 remaining = expiration_ - get_time();
 
-  Glib::TimeVal remaining = expiration_;
-  remaining.subtract(current_time);
-
-  if (remaining.negative())
+  if (remaining <= 0)
   {
     // Already expired.
     timeout = 0;
   }
   else
   {
-    const unsigned long milliseconds = static_cast<unsigned long>(remaining.tv_sec) * 1000U +
-                                       static_cast<unsigned long>(remaining.tv_usec) / 1000U;
-
     // Set remaining milliseconds.
-    timeout = std::min<unsigned long>(G_MAXINT, milliseconds);
+    timeout = std::min<gint64>(G_MAXINT, remaining / 1000);
 
     // Check if the system time has been set backwards. (remaining > interval)
-    remaining.add_milliseconds(-std::min<unsigned long>(G_MAXLONG, interval_) - 1);
-    if (!remaining.negative())
+    if (remaining > ms2us(interval_))
     {
       // Oh well.  Reset the expiration time to now + interval;
       // this at least avoids hanging for long periods of time.
-      expiration_ = current_time;
-      expiration_.add_milliseconds(interval_);
+      expiration_ = get_time() + ms2us(interval_);
       timeout = std::min<unsigned int>(G_MAXINT, interval_);
     }
   }
@@ -1150,10 +1140,7 @@ TimeoutSource::prepare(int& timeout)
 bool
 TimeoutSource::check()
 {
-  Glib::TimeVal current_time;
-  time64_to_time_val(get_time(), current_time);
-
-  return (expiration_ <= current_time);
+  return expiration_ <= get_time();
 }
 
 bool
@@ -1162,10 +1149,7 @@ TimeoutSource::dispatch(sigc::slot_base* slot)
   const bool again = (*static_cast<sigc::slot<bool()>*>(slot))();
 
   if (again)
-  {
-    time64_to_time_val(get_time(), expiration_);
-    expiration_.add_milliseconds(std::min<unsigned long>(G_MAXLONG, interval_));
-  }
+    expiration_ = get_time() + ms2us(interval_);
 
   return again;
 }

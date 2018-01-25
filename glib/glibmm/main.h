@@ -18,7 +18,6 @@
  */
 
 #include <glibmm/refptr.h>
-#include <glibmm/timeval.h>
 #include <glibmm/priorities.h>
 #include <glibmm/iochannel.h>
 #include <sigc++/sigc++.h>
@@ -806,10 +805,8 @@ protected:
   bool dispatch(sigc::slot_base* slot) override;
 
 private:
-  // TODO: Replace with gint64, because TimeVal is deprecated, when we can break ABI.
-  Glib::TimeVal expiration_;
-
-  unsigned int interval_;
+  gint64 expiration_;     // microseconds
+  unsigned int interval_; // milliseconds
 };
 
 class IdleSource : public Glib::Source
