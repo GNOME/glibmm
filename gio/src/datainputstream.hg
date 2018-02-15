@@ -138,83 +138,11 @@ public:
    */
   _WRAP_METHOD(void read_line_finish_utf8(const Glib::RefPtr<AsyncResult>& result{.}, std::string& data{OUT}, gsize& length{.?}), g_data_input_stream_read_line_finish_utf8, errthrow)
 
-  /** Reads a string from the data input stream, up to the first
-   * occurrence of any of the stop characters.
-   *
-   * Note that, in contrast to read_until_async(),
-   * this function consumes the stop character that it finds.
-   *
-   * Don't use this function in new code.  Its functionality is
-   * inconsistent with read_until_async().  Both
-   * functions will be marked as deprecated in a future release.  Use
-   * read_upto() instead, but note that that method
-   * does not consume the stop character.
-   *
-   * @param[out] data A string to fill with the read data.
-   * @param stop_chars Characters to terminate the read.
-   * @param cancellable A cancellable object.
-   * @result true if the read succeeded without error.
-   */
-  bool read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable);
-  _IGNORE(g_data_input_stream_read_until)
-
-  //TODO: This will be really deprecated sometime, maybe sometime after glib 2.30.0.
-  /** A non-cancellable version of read_until().
-   *
-   * Note that, in contrast to read_until_async(),
-   * this function consumes the stop character that it finds.
-   *
-   * Don't use this function in new code.  Its functionality is
-   * inconsistent with read_until_async().  Both
-   * functions will be marked as deprecated in a future release.  Use
-   * read_upto() instead, but note that that method
-   * does not consume the stop character.
-   *
-   * @param[out] data A string to fill with the read data.
-   * @param stop_chars Characters to terminate the read.
-   * @result true if the read succeeded without error.
-   */
-  bool read_until(std::string& data, const std::string& stop_chars);
-
-  //TODO: This will be really deprecated sometime after glib 2.30.0.
-  /** The asynchronous version of read_until(). It is
-   * an error to have two outstanding calls to this function.
-   *
-   * Note that, in contrast to ead_until(),
-   * this function does not consume the stop character that it finds.  You
-   * must read it for yourself.
-   *
-   * Don't use this function in new code.  Its functionality is
-   * inconsistent with read_until().  Both functions
-   * will be marked as deprecated in a future release.  Use
-   * read_upto_async() instead.
-   *
-   * @param stop_chars Characters to terminate the read.
-   * @param slot The slot to call when the request is satisfied.
-   * @param cancellable A cancellable object.
-   * @param io_priority The I/O priority of the request.
-   */
-  void read_until_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
-  _IGNORE(g_data_input_stream_read_until_async)
-
-  //TODO: This will be really deprecated sometime after glib 2.30.0.
-  /** Finish an asynchronous call started by read_until_async().
-   *
-   * @param result The AsyncResult that was provided to the callback slot.
-   * @param[out] data A string to fill with the read data.
-   * @result true if the read succeeded without error.
-   */
-  bool read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data);
-  _IGNORE(g_data_input_stream_read_until_finish)
-
-
  /** Reads a string from the data input stream, up to the first
    * occurrence of any of the stop characters.
    *
-   * In contrast to read_until(), this method
-   * does <em>not</em> consume the stop character. You have
-   * to use read_byte() to get it before calling
-   * read_upto() again.
+   * This method does <em>not</em> consume the stop character. You have
+   * to use read_byte() to get it before calling %read_upto() again.
    *
    * @param[out] data A string to fill with the read data.
    * @param stop_chars Characters to terminate the read.
@@ -236,10 +164,8 @@ public:
   /** The asynchronous version of read_upto(). It is
    * an error to have two outstanding calls to this function.
    *
-   * In contrast to read_until(), this method
-   * does <em>not</em> consume the stop character. You have
-   * to use read_byte() to get it before calling
-   * read_upto() again.
+   * This method does <em>not</em> consume the stop character. You have
+   * to use read_byte() to get it before calling %read_upto_async() again.
    *
    * @param stop_chars Characters to terminate the read.
    * @param slot The slot to call when the request is satisfied.
