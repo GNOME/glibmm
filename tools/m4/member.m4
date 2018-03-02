@@ -94,6 +94,27 @@ ifelse(`$5',`deprecated',`_DEPRECATE_IFDEF_END  ')dnl
 
 _POP()')
 
+dnl Creates setters for a member which is of char* type:
+dnl The convenient way to use this macro is to pair it with
+dnl _CONVERSION(`Glib::ustring', `const gchar*', `($3).c_str()')
+dnl or similar conversion.
+dnl There is no _MEMBER_GET_STR. With a suitable _CONVERSION,
+dnl _MEMBER_GET can be used as the corresponding getter.
+define(`_MEMBER_SET_STR',`dnl
+ifelse(`$5',`deprecated',`_DEPRECATE_IFDEF_START  ')dnl
+void set_$1(const $3`'& value);
+ifelse(`$5',`deprecated',`_DEPRECATE_IFDEF_END  ')dnl
+_PUSH(SECTION_CC)
+ifelse(`$5',`deprecated',`_DEPRECATE_IFDEF_START  ')dnl
+void __CPPNAME__::set_$1(const $3`'& value)
+{
+  g_free((char*)gobj()->$2); // Cast away const, if any
+  gobj()->$2 = g_strdup(_CONVERT($3,$4,`value'));
+}
+ifelse(`$5',`deprecated',`_DEPRECATE_IFDEF_END  ')dnl
+
+_POP()')
+
 dnl Creates accessors for pointer types:
 define(`_MEMBER_SET_PTR',`dnl
 ifelse(`$5',`deprecated',`_DEPRECATE_IFDEF_START  ')dnl
