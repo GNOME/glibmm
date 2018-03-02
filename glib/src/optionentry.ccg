@@ -99,44 +99,4 @@ OptionEntry::operator=(OptionEntry&& other) noexcept
   return *this;
 }
 
-void
-OptionEntry::set_long_name(const Glib::ustring& value)
-{
-  if (gobject_->long_name)
-  {
-    g_free((gchar*)(gobject_->long_name));
-    gobject_->long_name = nullptr;
-  }
-
-  // Note that we do not use nullptr for an empty string,
-  // because G_OPTION_REMAINING is actually a "", so it actually has a distinct meaning:
-  // TODO: Wrap G_OPTION_REMAINING in C++ somehow, maybe as an explicit set_long_name(void) or
-  // set_is_remaining()? murrayc.
-  gobj()->long_name = (value).c_str() ? g_strdup((value).c_str()) : nullptr;
-}
-
-void
-OptionEntry::set_description(const Glib::ustring& value)
-{
-  if (gobject_->description)
-  {
-    g_free((gchar*)(gobject_->description));
-    gobject_->description = nullptr;
-  }
-
-  gobj()->description = (value).empty() ? nullptr : g_strdup((value).c_str());
-}
-
-void
-OptionEntry::set_arg_description(const Glib::ustring& value)
-{
-  if (gobject_->arg_description)
-  {
-    g_free((gchar*)(gobject_->arg_description));
-    gobject_->arg_description = nullptr;
-  }
-
-  gobj()->arg_description = (value).empty() ? nullptr : g_strdup((value).c_str());
-}
-
 } // namespace Glib

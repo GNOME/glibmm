@@ -22,7 +22,6 @@ _DEFS(glibmm,glib)
 extern "C" { typedef struct _GOptionEntry GOptionEntry; }
 #endif
 
-
 namespace Glib
 {
 
@@ -56,11 +55,13 @@ public:
 
   OptionEntry& operator=(const OptionEntry& src);
 
-  //#m4 _CONVERSION(`Glib::ustring',`const gchar*',`($3).empty() ? nullptr : g_strdup(($3).c_str())')
-
+  // We do not use nullptr for an empty string in set_long_name(),
+  // because G_OPTION_REMAINING is actually a "", so it has a distinct meaning.
+  // TODO: Wrap G_OPTION_REMAINING in C++ somehow, maybe as an overloaded
+  // set_long_name(void) or set_is_remaining()? murrayc.
+  #m4 _CONVERSION(`Glib::ustring',`const char*',`($3).c_str()')
   _MEMBER_GET(long_name, long_name, Glib::ustring, const char*)
-
-  void set_long_name(const Glib::ustring& value);
+  _MEMBER_SET_STR(long_name, long_name, Glib::ustring, const char*)
 
   _MEMBER_GET(short_name, short_name, gchar, gchar)
   _MEMBER_SET(short_name, short_name, gchar, gchar)
@@ -75,13 +76,13 @@ public:
    */
   _MEMBER_SET(flags, flags, Flags, int)
 
+  // We use nullptr for an empty string in set_description() and set_arg_description().
+  #m4 _CONVERSION(`Glib::ustring',`const char*',`Glib::c_str_or_nullptr($3)')
   _MEMBER_GET(description, description, Glib::ustring, const char*)
-
-  void set_description(const Glib::ustring& value);
+  _MEMBER_SET_STR(description, description, Glib::ustring, const char*)
 
   _MEMBER_GET(arg_description, arg_description, Glib::ustring, const char*)
-
-  void set_arg_description(const Glib::ustring& value);
+  _MEMBER_SET_STR(arg_description, arg_description, Glib::ustring, const char*)
 
   GOptionEntry*       gobj()       { return gobject_; }
   const GOptionEntry* gobj() const { return gobject_; }
@@ -90,7 +91,6 @@ private:
   void release_gobject() noexcept;
 
 protected:
-
   GOptionEntry* gobject_;
 };
 
