@@ -47,14 +47,14 @@ AppInfo::create_duplicate() const
 
 bool
 AppInfo::launch(
-  const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& launch_context)
+  const Glib::RefPtr<Gio::File>& file, const Glib::RefPtr<AppLaunchContext>& context)
 {
   std::vector<Glib::RefPtr<Gio::File>> vec = { file };
 
   GError* gerror = nullptr;
   const bool retvalue = g_app_info_launch(gobj(),
     Glib::ListHandler<Glib::RefPtr<Gio::File>>::vector_to_list(vec).data(),
-    Glib::unwrap(launch_context), &(gerror));
+    Glib::unwrap(context), &(gerror));
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
@@ -76,14 +76,14 @@ AppInfo::launch(const Glib::RefPtr<Gio::File>& file)
 }
 
 bool
-AppInfo::launch_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& launch_context)
+AppInfo::launch_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context)
 {
   std::vector<std::string> vec = { uri };
 
   GError* gerror = nullptr;
   const bool retvalue =
     g_app_info_launch_uris(gobj(), Glib::ListHandler<std::string>::vector_to_list(vec).data(),
-      Glib::unwrap(launch_context), &(gerror));
+      Glib::unwrap(context), &(gerror));
   if (gerror)
     ::Glib::Error::throw_exception(gerror);
 
