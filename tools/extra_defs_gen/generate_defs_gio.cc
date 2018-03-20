@@ -38,6 +38,11 @@ main(int, char**)
   // g_type_init() is deprecated as of 2.36.
   // g_type_init();
 
+  // Until the glib bug https://bugzilla.gnome.org/show_bug.cgi?id=465631
+  // is fixed, get_defs() must be called for a GObject before it's
+  // called for a GInterface.
+  (void)get_defs(G_TYPE_APPLICATION);
+
   std::cout << get_defs(G_TYPE_ASYNC_RESULT) << get_defs(G_TYPE_ACTION)
             << get_defs(G_TYPE_ACTION_GROUP) << get_defs(G_TYPE_APPLICATION)
             << get_defs(G_TYPE_APP_INFO_MONITOR) << get_defs(G_TYPE_CANCELLABLE)

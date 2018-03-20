@@ -519,6 +519,11 @@ Since: 2.26
 specified #G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT, then take the name from the other connection.
 </parameter_description>
 </parameter>
+<parameter name="G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE">
+<parameter_description> If another message bus connection owns the name, immediately
+return an error from g_bus_own_name() rather than entering the waiting queue for that name. (Since 2.54)
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -1659,7 +1664,8 @@ Since: 2.30
 </parameter_description>
 </parameter>
 <parameter name="invalidated_properties">
-<parameter_description> A %NULL terminated array of properties that was invalidated.
+<parameter_description> A %NULL terminated
+array of properties that were invalidated.
 </parameter_description>
 </parameter>
 </parameters>
@@ -2125,7 +2131,7 @@ This flag is only meaningful in proxies for well-known names.
 </parameter_description>
 </parameter>
 <parameter name="G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES">
-<parameter_description> If set, the property value for any &lt;emphasis&gt;invalidated property&lt;/emphasis&gt; will be (asynchronously) retrieved upon receiving the &lt;ulink url=&quot;http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties&quot;&gt;PropertiesChanged&lt;/ulink&gt; D-Bus signal and the property will not cause emission of the #GDBusProxy::g-properties-changed signal. When the value is received the #GDBusProxy::g-properties-changed signal is emitted for the property along with the retrieved value. Since 2.32.
+<parameter_description> If set, the property value for any __invalidated property__ will be (asynchronously) retrieved upon receiving the [`PropertiesChanged`](http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties) D-Bus signal and the property will not cause emission of the #GDBusProxy::g-properties-changed signal. When the value is received the #GDBusProxy::g-properties-changed signal is emitted for the property along with the retrieved value. Since 2.32.
 </parameter_description>
 </parameter>
 <parameter name="G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION">
@@ -2666,7 +2672,7 @@ Since: 2.48
 <description>
 The certificate database to use when verifying this TLS connection.
 If no certificate database is set, then the default database will be
-used. See g_dtls_backend_get_default_database().
+used. See g_tls_backend_get_default_database().
 
 Since: 2.48
 
@@ -3064,19 +3070,19 @@ Specifies what type of event a monitor event is.
 <parameter name="G_FILE_MONITOR_EVENT_RENAMED">
 <parameter_description> the file was renamed within the
 current directory -- only sent if the %G_FILE_MONITOR_WATCH_MOVES
-flag is set.  Since: 2.44.
+flag is set.  Since: 2.46.
 </parameter_description>
 </parameter>
 <parameter name="G_FILE_MONITOR_EVENT_MOVED_IN">
 <parameter_description> the file was moved into the
 monitored directory from another location -- only sent if the
-%G_FILE_MONITOR_WATCH_MOVES flag is set.  Since: 2.44.
+%G_FILE_MONITOR_WATCH_MOVES flag is set.  Since: 2.46.
 </parameter_description>
 </parameter>
 <parameter name="G_FILE_MONITOR_EVENT_MOVED_OUT">
 <parameter_description> the file was moved out of the
 monitored directory to another location -- only sent if the
-%G_FILE_MONITOR_WATCH_MOVES flag is set.  Since: 2.44
+%G_FILE_MONITOR_WATCH_MOVES flag is set.  Since: 2.46
 </parameter_description>
 </parameter>
 </parameters>
@@ -3101,7 +3107,7 @@ Flags used to set what a #GFileMonitor will watch for.
 by file renames (moves) and send a single G_FILE_MONITOR_EVENT_MOVED
 event instead (NB: not supported on all backends; the default
 behaviour -without specifying this flag- is to send single DELETED
-and CREATED events).  Deprecated since 2.44: use
+and CREATED events).  Deprecated since 2.46: use
 %G_FILE_MONITOR_WATCH_MOVES instead.
 </parameter_description>
 </parameter>
@@ -3114,7 +3120,7 @@ via another hard link. Since 2.36.
 <parameter_description> Watch for rename operations on a
 monitored directory.  This causes %G_FILE_MONITOR_EVENT_RENAMED,
 %G_FILE_MONITOR_EVENT_MOVED_IN and %G_FILE_MONITOR_EVENT_MOVED_OUT
-events to be emitted when possible.  Since: 2.44.
+events to be emitted when possible.  Since: 2.46.
 </parameter_description>
 </parameter>
 </parameters>
@@ -3743,8 +3749,11 @@ Emitted when the mount has been changed.
 
 <signal name="GMount::pre-unmount">
 <description>
-This signal is emitted when the #GMount is about to be
+This signal may be emitted when the #GMount is about to be
 unmounted.
+
+This signal depends on the backend and is only emitted if
+GIO was used to unmount.
 
 Since: 2.22
 
@@ -4092,11 +4101,7 @@ appears to be able to reach the full Internet.
 
 <signal name="GNetworkMonitor::network-changed">
 <description>
-Emitted when the network configuration changes. If @available is
-%TRUE, then some hosts may be reachable that were not reachable
-before, while others that were reachable before may no longer be
-reachable. If @available is %FALSE, then no remote hosts are
-reachable.
+Emitted when the network configuration changes.
 
 Since: 2.32
 
@@ -4106,7 +4111,7 @@ Since: 2.32
 <parameter_description> a #GNetworkMonitor
 </parameter_description>
 </parameter>
-<parameter name="available">
+<parameter name="network_available">
 <parameter_description> the current value of #GNetworkMonitor:network-available
 </parameter_description>
 </parameter>
@@ -4683,7 +4688,7 @@ callbacks when the writability of &quot;x&quot; changes.
 <return></return>
 </signal>
 
-<property name="GSettings:context">
+<property name="GSettings:backend">
 <description>
 The name of the context that the settings are stored in.
 
@@ -5414,7 +5419,7 @@ of fixed maximum length (e.g. SCTP).
 <description>
 Flags to define the behaviour of a #GSubprocess.
 
-Note that the default for stdin is to redirect from /dev/null.  For
+Note that the default for stdin is to redirect from `/dev/null`.  For
 stdout and stderr the default are for them to inherit the
 corresponding descriptor from the calling process.
 
@@ -5449,7 +5454,7 @@ g_subprocess_get_stdout_pipe().
 </parameter>
 <parameter name="G_SUBPROCESS_FLAGS_STDOUT_SILENCE">
 <parameter_description> silence the stdout of the spawned
-process (ie: redirect to /dev/null).
+process (ie: redirect to `/dev/null`).
 </parameter_description>
 </parameter>
 <parameter name="G_SUBPROCESS_FLAGS_STDERR_PIPE">
@@ -5460,7 +5465,7 @@ g_subprocess_get_stderr_pipe().
 </parameter>
 <parameter name="G_SUBPROCESS_FLAGS_STDERR_SILENCE">
 <parameter_description> silence the stderr of the spawned
-process (ie: redirect to /dev/null).
+process (ie: redirect to `/dev/null`).
 </parameter_description>
 </parameter>
 <parameter name="G_SUBPROCESS_FLAGS_STDERR_MERGE">
@@ -5784,18 +5789,21 @@ Since: 2.28
 
 <property name="GTlsClientConnection:use-ssl3">
 <description>
-If %TRUE, tells the connection to use a fallback version of TLS
+If %TRUE, forces the connection to use a fallback version of TLS
 or SSL, rather than trying to negotiate the best version of TLS
 to use. This can be used when talking to servers that don't
 implement version negotiation correctly and therefore refuse to
-handshake at all with a &quot;modern&quot; TLS handshake.
+handshake at all with a modern TLS handshake.
 
-Despite the property name, the fallback version is not
-necessarily SSL 3.0; if SSL 3.0 has been disabled, the
-#GTlsClientConnection will use the next highest available version
-(normally TLS 1.0) as the fallback version.
+Despite the property name, the fallback version is usually not
+SSL 3.0, because SSL 3.0 is generally disabled by the #GTlsBackend.
+#GTlsClientConnection will use the next-highest available version
+as the fallback version.
 
 Since: 2.28
+
+Deprecated: 2.56: SSL 3.0 is insecure, and this property does not
+generally enable or disable it, despite its name.
 
 </description>
 </property>
@@ -5980,7 +5988,7 @@ Deprecated: 2.30: Use GTlsConnection:database instead
 
 <enum name="GTlsDatabaseLookupFlags">
 <description>
-Flags for g_tls_database_lookup_certificate_handle(),
+Flags for g_tls_database_lookup_certificate_for_handle(),
 g_tls_database_lookup_certificate_issuer(),
 and g_tls_database_lookup_certificates_issued_by().
 
@@ -6507,7 +6515,10 @@ Emitted when a mount changes.
 
 <signal name="GVolumeMonitor::mount-pre-unmount">
 <description>
-Emitted when a mount is about to be removed.
+May be emitted when a mount is about to be removed.
+
+This signal depends on the backend and is only emitted if
+GIO was used to unmount.
 
 </description>
 <parameters>
@@ -6679,6 +6690,48 @@ If a signal handler returns %TRUE, it means the signal handler will handle the i
 </parameter_description>
 </parameter>
 <parameter name="arg_persistent">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpDocuments::handle-add-full">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddFull&quot;&gt;AddFull()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_documents_complete_add_full() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_fds">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_flags">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
 <parameter_description> Argument passed by remote caller.
 </parameter_description>
 </parameter>
@@ -6923,6 +6976,15 @@ If a signal handler returns %TRUE, it means the signal handler will handle the i
 </return>
 </signal>
 
+<property name="GXdpDocuments:version">
+<description>
+Represents the D-Bus property &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-Documents.version&quot;&gt;&quot;version&quot;&lt;/link&gt;.
+
+Since the D-Bus property for this #GObject property is readable but not writable, it is meaningful to read from it on both the client- and service-side. It is only meaningful, however, to write to it on the service-side.
+
+</description>
+</property>
+
 <signal name="GXdpNetworkMonitor::changed">
 <description>
 On the client-side, this signal is emitted whenever the D-Bus signal &lt;link linkend=&quot;gdbus-signal-org-freedesktop-portal-NetworkMonitor.changed&quot;&gt;&quot;changed&quot;&lt;/link&gt; is received.
@@ -6964,6 +7026,87 @@ Since the D-Bus property for this #GObject property is readable but not writable
 <property name="GXdpNetworkMonitor:metered">
 <description>
 Represents the D-Bus property &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-NetworkMonitor.metered&quot;&gt;&quot;metered&quot;&lt;/link&gt;.
+
+Since the D-Bus property for this #GObject property is readable but not writable, it is meaningful to read from it on both the client- and service-side. It is only meaningful, however, to write to it on the service-side.
+
+</description>
+</property>
+
+<signal name="GXdpOpenURI::handle-open-file">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-OpenURI.OpenFile&quot;&gt;OpenFile()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_open_uri_complete_open_file() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpOpenURI.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="arg_parent_window">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_fd">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_options">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<signal name="GXdpOpenURI::handle-open-uri">
+<description>
+Signal emitted when a remote caller is invoking the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-OpenURI.OpenURI&quot;&gt;OpenURI()&lt;/link&gt; D-Bus method.
+
+If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call gxdp_open_uri_complete_open_uri() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpOpenURI.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_parent_window">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_uri">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+<parameter name="arg_options">
+<parameter_description> Argument passed by remote caller.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+</return>
+</signal>
+
+<property name="GXdpOpenURI:version">
+<description>
+Represents the D-Bus property &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-OpenURI.version&quot;&gt;&quot;version&quot;&lt;/link&gt;.
 
 Since the D-Bus property for this #GObject property is readable but not writable, it is meaningful to read from it on both the client- and service-side. It is only meaningful, however, to write to it on the service-side.
 
@@ -8068,6 +8211,10 @@ Creates a duplicate of a #GAppInfo.
 <description>
 Checks if two #GAppInfos are equal.
 
+Note that the check &lt;emphasis&gt;may not&lt;/emphasis&gt; compare each individual
+field, and only does an identity check. In case detecting changes in the 
+contents is needed, program code must additionally compare relevant fields.
+
 
 </description>
 <parameters>
@@ -8365,7 +8512,7 @@ a list of content types.
 <function name="g_app_info_launch">
 <description>
 Launches the application. Passes @files to the launched application
-as arguments, using the optional @launch_context to get information
+as arguments, using the optional @context to get information
 about the details of the launcher (like what screen it is on).
 On error, @error will be set accordingly.
 
@@ -8390,7 +8537,7 @@ environment variable with the path of the launched desktop file and
 process. This can be used to ignore `GIO_LAUNCHED_DESKTOP_FILE`,
 should it be inherited by further processes. The `DISPLAY` and
 `DESKTOP_STARTUP_ID` environment variables are also set, based
-on information provided in @launch_context.
+on information provided in @context.
 
 
 </description>
@@ -8403,7 +8550,7 @@ on information provided in @launch_context.
 <parameter_description> a #GList of #GFile objects
 </parameter_description>
 </parameter>
-<parameter name="launch_context">
+<parameter name="context">
 <parameter_description> a #GAppLaunchContext or %NULL
 </parameter_description>
 </parameter>
@@ -8430,7 +8577,7 @@ required.
 <parameter_description> the uri to show
 </parameter_description>
 </parameter>
-<parameter name="launch_context">
+<parameter name="context">
 <parameter_description> an optional #GAppLaunchContext
 </parameter_description>
 </parameter>
@@ -8462,7 +8609,10 @@ Since: 2.50
 </parameter>
 <parameter name="context">
 <parameter_description> an optional #GAppLaunchContext
-cancellable: (allow-none): a #GCancellable
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -8502,7 +8652,7 @@ Since: 2.50
 <function name="g_app_info_launch_uris">
 <description>
 Launches the application. This passes the @uris to the launched application
-as arguments, using the optional @launch_context to get information
+as arguments, using the optional @context to get information
 about the details of the launcher (like what screen it is on).
 On error, @error will be set accordingly.
 
@@ -8523,7 +8673,7 @@ no way to detect this.
 <parameter_description> a #GList containing URIs to launch.
 </parameter_description>
 </parameter>
-<parameter name="launch_context">
+<parameter name="context">
 <parameter_description> a #GAppLaunchContext or %NULL
 </parameter_description>
 </parameter>
@@ -8769,8 +8919,8 @@ Since: 2.32
 </parameter_description>
 </parameter>
 </parameters>
-<return> the
-child's environment
+<return>
+the child's environment
 
 </return>
 </function>
@@ -9158,8 +9308,8 @@ Since: 2.28
 </parameter_description>
 </parameter>
 </parameters>
-<return> the string array
-containing the arguments (the argv)
+<return> (array length=argc) (element-type filename) (transfer full)
+the string array containing the arguments (the argv)
 
 </return>
 </function>
@@ -9216,8 +9366,8 @@ Since: 2.28
 </parameter_description>
 </parameter>
 </parameters>
-<return> the environment
-strings, or %NULL if they were not sent
+<return>
+the environment strings, or %NULL if they were not sent
 
 </return>
 </function>
@@ -9721,22 +9871,46 @@ Checks if @application_id is a valid application identifier.
 A valid ID is required for calls to g_application_new() and
 g_application_set_application_id().
 
+Application identifiers follow the same format as
+[D-Bus well-known bus names](https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names-bus).
 For convenience, the restrictions on application identifiers are
 reproduced here:
 
-- Application identifiers must contain only the ASCII characters
-&quot;[A-Z][a-z][0-9]_-.&quot; and must not begin with a digit.
+- Application identifiers are composed of 1 or more elements separated by a
+period (`.`) character. All elements must contain at least one character.
 
-- Application identifiers must contain at least one '.' (period)
-character (and thus at least three elements).
+- Each element must only contain the ASCII characters `[A-Z][a-z][0-9]_-`,
+with `-` discouraged in new application identifiers. Each element must not
+begin with a digit.
 
-- Application identifiers must not begin or end with a '.' (period)
-character.
+- Application identifiers must contain at least one `.` (period) character
+(and thus at least two elements).
 
-- Application identifiers must not contain consecutive '.' (period)
-characters.
+- Application identifiers must not begin with a `.` (period) character.
 
 - Application identifiers must not exceed 255 characters.
+
+Note that the hyphen (`-`) character is allowed in application identifiers,
+but is problematic or not allowed in various specifications and APIs that
+refer to D-Bus, such as
+[Flatpak application IDs](http://docs.flatpak.org/en/latest/introduction.html#identifiers),
+the
+[`DBusActivatable` interface in the Desktop Entry Specification](https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#dbus),
+and the convention that an application's &quot;main&quot; interface and object path
+resemble its application identifier and bus name. To avoid situations that
+require special-case handling, it is recommended that new application
+identifiers consistently replace hyphens with underscores.
+
+Like D-Bus interface names, application identifiers should start with the
+reversed DNS domain name of the author of the interface (in lower-case), and
+it is conventional for the rest of the application identifier to consist of
+words run together, with initial capital letters.
+
+As with D-Bus interface names, if the author's DNS domain name contains
+hyphen/minus characters they should be replaced by underscores, and if it
+contains leading digits they should be escaped by prepending an underscore.
+For example, if the owner of 7-zip.org used an application identifier for an
+archiving application, it might be named `org._7_zip.Archiver`.
 
 
 </description>
@@ -9850,6 +10024,10 @@ Upon return to the mainloop, g_application_run() will return,
 calling only the 'shutdown' function before doing so.
 
 The hold count is ignored.
+Take care if your code has called g_application_hold() on the application and
+is therefore still expecting it to exist.
+(Note that you may have called g_application_hold() indirectly, for example
+through gtk_application_add_window().)
 
 The result of calling g_application_run() again after it returns is
 unspecified.
@@ -10031,7 +10209,8 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="argv">
-<parameter_description> the argv from main(), or %NULL
+<parameter_description>
+the argv from main(), or %NULL
 </parameter_description>
 </parameter>
 </parameters>
@@ -10215,6 +10394,78 @@ Since: 2.28
 <return></return>
 </function>
 
+<function name="g_application_set_option_context_description">
+<description>
+Adds a description to the @application option context.
+
+See g_option_context_set_description() for more information.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the #GApplication
+</parameter_description>
+</parameter>
+<parameter name="description">
+<parameter_description> a string to be shown in `--help` output
+after the list of options, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_application_set_option_context_parameter_string">
+<description>
+Sets the parameter string to be used by the commandline handling of @application.
+
+This function registers the argument to be passed to g_option_context_new()
+when the internal #GOptionContext of @application is created.
+
+See g_option_context_new() for more information about @parameter_string.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the #GApplication
+</parameter_description>
+</parameter>
+<parameter name="parameter_string">
+<parameter_description> a string which is displayed
+in the first line of `--help` output, after the usage summary `programname [OPTION...]`.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_application_set_option_context_summary">
+<description>
+Adds a summary to the @application option context.
+
+See g_option_context_set_summary() for more information.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the #GApplication
+</parameter_description>
+</parameter>
+<parameter name="summary">
+<parameter_description> a string to be shown in `--help` output
+before the list of options, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_application_set_resource_base_path">
 <description>
 Sets (or unsets) the base resource path of @application.
@@ -10354,6 +10605,9 @@ interface. This must be done before any real use of the object after
 initial construction. If the object also implements #GInitable you can
 optionally call g_initable_init() instead.
 
+This method is intended for language bindings. If writing in C,
+g_async_initable_new_async() should typically be used instead.
+
 When the initialization is finished, @callback will be called. You can
 then call g_async_initable_init_finish() to get the result of the
 initialization.
@@ -10371,11 +10625,11 @@ g_object_ref() and g_object_unref() are considered to be invalid, and
 have undefined behaviour. They will often fail with g_critical() or
 g_warning(), but this must not be relied on.
 
-Implementations of this method must be idempotent: i.e. multiple calls
-to this function with the same argument should return the same results.
-Only the first call initializes the object; further calls return the result
-of the first call. This is so that it's safe to implement the singleton
-pattern in the GObject constructor function.
+Callers should not assume that a class which implements #GAsyncInitable can
+be initialized multiple times; for more information, see g_initable_init().
+If a class explicitly supports being initialized multiple times,
+implementation requires yielding all subsequent calls to init_async() on the
+results of the first call.
 
 For classes that also support the #GInitable interface, the default
 implementation of this method will run the g_initable_init() function
@@ -10574,6 +10828,8 @@ then call g_async_initable_new_finish() to get the new object and check
 for any errors.
 
 Since: 2.22
+Deprecated: 2.54: Use g_object_new_with_properties() and
+g_async_initable_init_async() instead. See #GParameter for more information.
 
 </description>
 <parameters>
@@ -10622,8 +10878,8 @@ Gets the source object from a #GAsyncResult.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a new reference to the source object for the @res,
-or %NULL if there is none.
+<return> a new reference to the source
+object for the @res, or %NULL if there is none.
 </return>
 </function>
 
@@ -10810,7 +11066,7 @@ Finishes an asynchronous read.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #gssize of the read stream, or %-1 on an error.
+<return> a #gssize of the read stream, or `-1` on an error.
 </return>
 </function>
 
@@ -11781,7 +12037,7 @@ same time as the cancellable operation is finished and the
 signal handler is removed. See #GCancellable::cancelled for
 details on how to use this.
 
-If @cancellable is %NULL or @handler_id is %0 this function does
+If @cancellable is %NULL or @handler_id is `0` this function does
 nothing.
 
 Since: 2.22
@@ -11793,7 +12049,7 @@ Since: 2.22
 </parameter_description>
 </parameter>
 <parameter name="handler_id">
-<parameter_description> Handler id of the handler to be disconnected, or %0.
+<parameter_description> Handler id of the handler to be disconnected, or `0`.
 </parameter_description>
 </parameter>
 </parameters>
@@ -12366,11 +12622,36 @@ Determines if @type is a subset of @supertype.
 </return>
 </function>
 
+<function name="g_content_type_is_mime_type">
+<description>
+Determines if @type is a subset of @mime_type.
+Convenience wrapper around g_content_type_is_a().
+
+Since: 2.52
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> a content type string
+</parameter_description>
+</parameter>
+<parameter name="mime_type">
+<parameter_description> a mime type string
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @type is a kind of @mime_type,
+%FALSE otherwise.
+
+</return>
+</function>
+
 <function name="g_content_type_is_unknown">
 <description>
 Checks if the content type is the generic &quot;unknown&quot; type.
 On UNIX this is the &quot;application/octet-stream&quot; mimetype,
-while on win32 it is &quot;*&quot;.
+while on win32 it is &quot;*&quot; and on OSX it is a dynamic type
+or octet-stream.
 
 
 </description>
@@ -13297,6 +13578,8 @@ functions will be marked as deprecated in a future release.  Use
 g_data_input_stream_read_upto() instead, but note that that function
 does not consume the stop character.
 
+Deprecated: 2.56: Use g_data_input_stream_read_upto() instead, which has more
+consistent behaviour regarding the stop character.
 
 </description>
 <parameters>
@@ -13347,6 +13630,8 @@ will be marked as deprecated in a future release.  Use
 g_data_input_stream_read_upto_async() instead.
 
 Since: 2.20
+Deprecated: 2.56: Use g_data_input_stream_read_upto_async() instead, which
+has more consistent behaviour regarding the stop character.
 
 </description>
 <parameters>
@@ -13385,6 +13670,8 @@ g_data_input_stream_read_until_async().
 
 Since: 2.20
 
+Deprecated: 2.56: Use g_data_input_stream_read_upto_finish() instead, which
+has more consistent behaviour regarding the stop character.
 
 </description>
 <parameters>
@@ -13424,6 +13711,8 @@ g_data_input_stream_read_upto() again.
 
 Note that @stop_chars may contain '\0' if @stop_chars_len is
 specified.
+
+The returned string will always be nul-terminated on success.
 
 Since: 2.26
 
@@ -13525,6 +13814,8 @@ g_data_input_stream_read_upto_async().
 Note that this function does not consume the stop character. You
 have to use g_data_input_stream_read_byte() to get it before calling
 g_data_input_stream_read_upto_async() again.
+
+The returned string will always be nul-terminated on success.
 
 Since: 2.24
 
@@ -14215,7 +14506,8 @@ Since: 2.32
 </parameter_description>
 </parameter>
 <parameter name="bus_name">
-<parameter_description> the bus name which exports the action group
+<parameter_description> the bus name which exports the action
+group or %NULL if @connection is not a message bus connection
 </parameter_description>
 </parameter>
 <parameter name="object_path">
@@ -14233,10 +14525,10 @@ Since: 2.32
 Escape @string so it can appear in a D-Bus address as the value
 part of a key-value pair.
 
-For instance, if @string is &quot;/run/bus-for-:0&quot;,
-this function would return &quot;/run/bus-for-%3A0&quot;,
+For instance, if @string is `/run/bus-for-:0`,
+this function would return `/run/bus-for-%3A0`,
 which could be used in a D-Bus address like
-&quot;unix:nonce-tcp:host=127.0.0.1,port=42,noncefile=/run/bus-for-%3A0&quot;.
+`unix:nonce-tcp:host=127.0.0.1,port=42,noncefile=/run/bus-for-%3A0`.
 
 Since: 2.36
 
@@ -14259,6 +14551,9 @@ non-optionally-escaped bytes escaped
 Synchronously looks up the D-Bus address for the well-known message
 bus instance specified by @bus_type. This may involve using various
 platform specific mechanisms.
+
+The returned address will be in the
+[D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
 
 Since: 2.26
 
@@ -14287,7 +14582,8 @@ Since: 2.26
 <description>
 Asynchronously connects to an endpoint specified by @address and
 sets up the connection so it is in a state to run the client-side
-of the D-Bus authentication conversation.
+of the D-Bus authentication conversation. @address must be in the
+[D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
 
 When the operation is finished, @callback will be invoked. You can
 then call g_dbus_address_get_stream_finish() to get the result of
@@ -14350,7 +14646,8 @@ Since: 2.26
 <description>
 Synchronously connects to an endpoint specified by @address and
 sets up the connection so it is in a state to run the client-side
-of the D-Bus authentication conversation.
+of the D-Bus authentication conversation. @address must be in the
+[D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
 
 This is a synchronous failable function. See
 g_dbus_address_get_stream() for the asynchronous version.
@@ -14613,7 +14910,9 @@ not compatible with the D-Bus protocol, the operation fails with
 
 If @reply_type is non-%NULL then the reply will be checked for having this type and an
 error will be raised if it does not match.  Said another way, if you give a @reply_type
-then any non-%NULL return value will be of this type.
+then any non-%NULL return value will be of this type. Unless it’s
+%G_VARIANT_TYPE_UNIT, the @reply_type will be a tuple containing one or more
+values.
 
 If the @parameters #GVariant is floating, it is consumed. This allows
 convenient 'inline' use of g_variant_new(), e.g.:
@@ -14676,7 +14975,8 @@ or %NULL if not passing parameters
 </parameter_description>
 </parameter>
 <parameter name="reply_type">
-<parameter_description> the expected type of the reply, or %NULL
+<parameter_description> the expected type of the reply (which will be a
+tuple), or %NULL
 </parameter_description>
 </parameter>
 <parameter name="flags">
@@ -15119,7 +15419,9 @@ Emits a signal.
 
 If the parameters GVariant is floating, it is consumed.
 
-This can only fail if @parameters is not compatible with the D-Bus protocol.
+This can only fail if @parameters is not compatible with the D-Bus protocol
+(%G_IO_ERROR_INVALID_ARGUMENT), or if @connection has been closed
+(%G_IO_ERROR_CLOSED).
 
 Since: 2.26
 
@@ -15608,7 +15910,8 @@ with g_object_unref().
 <description>
 Asynchronously connects and sets up a D-Bus client connection for
 exchanging D-Bus messages with an endpoint specified by @address
-which must be in the D-Bus address format.
+which must be in the
+[D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
 
 This constructor can only be used to initiate client-side
 connections - use g_dbus_connection_new() if you need to act as the
@@ -15687,7 +15990,8 @@ g_object_unref().
 <description>
 Synchronously connects and sets up a D-Bus client connection for
 exchanging D-Bus messages with an endpoint specified by @address
-which must be in the D-Bus address format.
+which must be in the
+[D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
 
 This constructor can only be used to initiate client-side
 connections - use g_dbus_connection_new_sync() if you need to act
@@ -16866,7 +17170,11 @@ g_variant_unref().
 Converts a #GVariant to a #GValue. If @value is floating, it is consumed.
 
 The rules specified in the g_dbus_gvalue_to_gvariant() function are
-used - this function is essentially its reverse form.
+used - this function is essentially its reverse form. So, a #GVariant
+containing any basic or string array type will be converted to a #GValue
+containing a basic value or string array. Any other #GVariant (handle,
+variant, tuple, dict entry) will be converted to a #GValue containing that
+#GVariant.
 
 The conversion never fails - a valid #GValue is always returned in
 @out_gvalue.
@@ -17198,7 +17506,7 @@ emitted immediately.
 
 For example, an exported D-Bus interface may queue up property
 changes and emit the
-`org.freedesktop.DBus.Properties::Propert``
+`org.freedesktop.DBus.Properties.PropertiesChanged`
 signal later (e.g. in an idle handler). This technique is useful
 for collapsing multiple property changes into one.
 
@@ -17437,7 +17745,8 @@ Since: 2.32
 
 <function name="g_dbus_is_address">
 <description>
-Checks if @string is a D-Bus address.
+Checks if @string is a
+[D-Bus address](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
 
 This doesn't check if @string is actually supported by #GDBusServer
 or #GDBusConnection - use g_dbus_is_supported_address() to do more
@@ -17534,9 +17843,10 @@ Since: 2.26
 
 <function name="g_dbus_is_supported_address">
 <description>
-Like g_dbus_is_address() but also checks if the library suppors the
+Like g_dbus_is_address() but also checks if the library supports the
 transports in @string and that key/value pairs for each transport
-are valid.
+are valid. See the specification of the
+[D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
 
 Since: 2.26
 
@@ -17596,6 +17906,7 @@ Since: 2.32
 </parameter>
 <parameter name="bus_name">
 <parameter_description> the bus name which exports the menu model
+or %NULL if @connection is not a message bus connection
 </parameter_description>
 </parameter>
 <parameter name="object_path">
@@ -18946,7 +19257,9 @@ Since: 2.26
 <description>
 Finishes handling a D-Bus method call by returning an error.
 
-This method will free @invocation, you cannot use it afterwards.
+This method will take ownership of @invocation. See
+#GDBusInterfaceVTable for more information about the ownership of
+@invocation.
 
 Since: 2.26
 
@@ -18983,7 +19296,9 @@ If you are writing an application intended to be portable,
 always register errors with g_dbus_error_register_error()
 or use g_dbus_method_invocation_return_dbus_error().
 
-This method will free @invocation, you cannot use it afterwards.
+This method will take ownership of @invocation. See
+#GDBusInterfaceVTable for more information about the ownership of
+@invocation.
 
 Since 2.48, if the method call requested for a reply not to be sent
 then this call will free @invocation but otherwise do nothing (as per
@@ -19021,7 +19336,9 @@ Since: 2.26
 <description>
 Like g_dbus_method_invocation_return_error() but without printf()-style formatting.
 
-This method will free @invocation, you cannot use it afterwards.
+This method will take ownership of @invocation. See
+#GDBusInterfaceVTable for more information about the ownership of
+@invocation.
 
 Since: 2.26
 
@@ -19052,7 +19369,9 @@ Since: 2.26
 Like g_dbus_method_invocation_return_error() but intended for
 language bindings.
 
-This method will free @invocation, you cannot use it afterwards.
+This method will take ownership of @invocation. See
+#GDBusInterfaceVTable for more information about the ownership of
+@invocation.
 
 Since: 2.26
 
@@ -19087,7 +19406,9 @@ Since: 2.26
 Like g_dbus_method_invocation_return_error() but takes a #GError
 instead of the error domain, error code and message.
 
-This method will free @invocation, you cannot use it afterwards.
+This method will take ownership of @invocation. See
+#GDBusInterfaceVTable for more information about the ownership of
+@invocation.
 
 Since: 2.26
 
@@ -19110,9 +19431,30 @@ Since: 2.26
 Finishes handling a D-Bus method call by returning @parameters.
 If the @parameters GVariant is floating, it is consumed.
 
-It is an error if @parameters is not of the right format.
+It is an error if @parameters is not of the right format: it must be a tuple
+containing the out-parameters of the D-Bus method. Even if the method has a
+single out-parameter, it must be contained in a tuple. If the method has no
+out-parameters, @parameters may be %NULL or an empty tuple.
 
-This method will free @invocation, you cannot use it afterwards.
+|[&lt;!-- language=&quot;C&quot; --&gt;
+GDBusMethodInvocation *invocation = some_invocation;
+g_autofree gchar *result_string = NULL;
+g_autoptr (GError) error = NULL;
+
+result_string = calculate_result (&amp;error);
+
+if (error != NULL)
+g_dbus_method_invocation_return_gerror (invocation, error);
+else
+g_dbus_method_invocation_return_value (invocation,
+g_variant_new (&quot;(s)&quot;, result_string));
+
+// Do not free @invocation here; returning a value does that
+]|
+
+This method will take ownership of @invocation. See
+#GDBusInterfaceVTable for more information about the ownership of
+@invocation.
 
 Since 2.48, if the method call requested for a reply not to be sent
 then this call will sink @parameters and free @invocation, but
@@ -19141,7 +19483,9 @@ Like g_dbus_method_invocation_return_value() but also takes a #GUnixFDList.
 
 This method is only available on UNIX.
 
-This method will free @invocation, you cannot use it afterwards.
+This method will take ownership of @invocation. See
+#GDBusInterfaceVTable for more information about the ownership of
+@invocation.
 
 Since: 2.30
 
@@ -19168,7 +19512,9 @@ Since: 2.30
 Like g_dbus_method_invocation_return_gerror() but takes ownership
 of @error so the caller does not need to free it.
 
-This method will free @invocation, you cannot use it afterwards.
+This method will take ownership of @invocation. See
+#GDBusInterfaceVTable for more information about the ownership of
+@invocation.
 
 Since: 2.30
 
@@ -20535,9 +20881,9 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> A reference to the #GVariant instance that holds the value
-for @property_name or %NULL if the value is not in the cache. The
-returned reference must be freed with g_variant_unref().
+<return> A reference to the #GVariant instance
+that holds the value for @property_name or %NULL if the value is not in
+the cache. The returned reference must be freed with g_variant_unref().
 
 </return>
 </function>
@@ -20555,7 +20901,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> A %NULL-terminated array of strings or %NULL if
+<return> A
+%NULL-terminated array of strings or %NULL if
 @proxy has no cached properties. Free the returned array with
 g_strfreev().
 
@@ -20635,8 +20982,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusInterfaceInfo or %NULL. Do not unref the returned
-object, it is owned by @proxy.
+<return> A #GDBusInterfaceInfo or %NULL.
+Do not unref the returned object, it is owned by @proxy.
 
 </return>
 </function>
@@ -20693,7 +21040,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> The name owner or %NULL if no name owner exists. Free with g_free().
+<return> The name owner or %NULL if no name
+owner exists. Free with g_free().
 
 </return>
 </function>
@@ -20803,7 +21151,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusProxy or %NULL if @error is set. Free with g_object_unref().
+<return> A #GDBusProxy or %NULL if @error is set.
+Free with g_object_unref().
 
 </return>
 </function>
@@ -20875,7 +21224,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusProxy or %NULL if @error is set. Free with g_object_unref().
+<return> A #GDBusProxy or %NULL if @error is set.
+Free with g_object_unref().
 
 </return>
 </function>
@@ -20924,7 +21274,8 @@ that @proxy conforms to or %NULL.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusProxy or %NULL if error is set. Free with g_object_unref().
+<return> A #GDBusProxy or %NULL if error is set.
+Free with g_object_unref().
 
 </return>
 </function>
@@ -20987,7 +21338,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 </parameters>
-<return> A #GDBusProxy or %NULL if error is set. Free with g_object_unref().
+<return> A #GDBusProxy or %NULL if error is set.
+Free with g_object_unref().
 
 </return>
 </function>
@@ -21087,7 +21439,8 @@ Since: 2.26
 </parameter_description>
 </parameter>
 <parameter name="info">
-<parameter_description> Minimum interface this proxy conforms to or %NULL to unset.
+<parameter_description> Minimum interface this proxy conforms to
+or %NULL to unset.
 </parameter_description>
 </parameter>
 </parameters>
@@ -21096,8 +21449,9 @@ Since: 2.26
 
 <function name="g_dbus_server_get_client_address">
 <description>
-Gets a D-Bus address string that can be used by clients to connect
-to @server.
+Gets a
+[D-Bus address](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses)
+string that can be used by clients to connect to @server.
 
 Since: 2.26
 
@@ -21449,6 +21803,32 @@ Since: 2.32
 </parameter>
 </parameters>
 <return> The value of the Keywords key
+
+</return>
+</function>
+
+<function name="g_desktop_app_info_get_locale_string">
+<description>
+Looks up a localized string value in the keyfile backing @info
+translated to the current locale.
+
+The @key is looked up in the &quot;Desktop Entry&quot; group.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="info">
+<parameter_description> a #GDesktopAppInfo
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> the key to look up
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string, or %NULL if the key
+is not found
 
 </return>
 </function>
@@ -23037,7 +23417,7 @@ Since: 2.48
 <description>
 Sets the certificate database that is used to verify peer certificates.
 This is set to the default database by default. See
-g_dtls_backend_get_default_database(). If set to %NULL, then
+g_tls_backend_get_default_database(). If set to %NULL, then
 peer certificate validation will always set the
 %G_TLS_CERTIFICATE_UNKNOWN_CA error (meaning
 #GDtlsConnection::accept-certificate will always be emitted on
@@ -23956,6 +24336,10 @@ If the flag #G_FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks
 will be copied as symlinks, otherwise the target of the
 @source symlink will be copied.
 
+If the flag #G_FILE_COPY_ALL_METADATA is specified then all the metadata
+that is possible to copy is copied, not just the default subset (which,
+for instance, does not include the owner, see #GFileInfo).
+
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
 was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
@@ -24817,7 +25201,7 @@ sure resources are released as early as possible.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
+<parameter_description> optional #GCancellable object, %NULL to ignore.
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -24849,7 +25233,7 @@ g_file_enumerator_close_finish().
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
-<parameter_description> optional #GCancellable object, %NULL to ignore. 
+<parameter_description> optional #GCancellable object, %NULL to ignore.
 </parameter_description>
 </parameter>
 <parameter name="callback">
@@ -25119,7 +25503,7 @@ priority is %G_PRIORITY_DEFAULT.
 </parameter_description>
 </parameter>
 <parameter name="io_priority">
-<parameter_description> the [I/O priority][io-priority] of the request 
+<parameter_description> the [I/O priority][io-priority] of the request
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
@@ -27211,6 +27595,124 @@ This call does no blocking I/O.
 </return>
 </function>
 
+<function name="g_file_load_bytes">
+<description>
+Loads the contents of @file and returns it as #GBytes.
+
+If @file is a resource:// based URI, the resulting bytes will reference the
+embedded resource instead of a copy. Otherwise, this is equivalent to calling
+g_file_load_contents() and g_bytes_new_take().
+
+For resources, @etag_out will be set to %NULL.
+
+The data contained in the resulting #GBytes is always zero-terminated, but
+this is not included in the #GBytes length. The resulting #GBytes should be
+freed with g_bytes_unref() when no longer in use.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable or %NULL
+</parameter_description>
+</parameter>
+<parameter name="etag_out">
+<parameter_description> a location to place the current
+entity tag for the file, or %NULL if the entity tag is not needed
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a location for a #GError or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GBytes or %NULL and @error is set
+
+</return>
+</function>
+
+<function name="g_file_load_bytes_async">
+<description>
+Asynchronously loads the contents of @file as #GBytes.
+
+If @file is a resource:// based URI, the resulting bytes will reference the
+embedded resource instead of a copy. Otherwise, this is equivalent to calling
+g_file_load_contents_async() and g_bytes_new_take().
+
+@callback should call g_file_load_bytes_finish() to get the result of this
+asynchronous operation.
+
+See g_file_load_bytes() for more information.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> a #GCancellable or %NULL
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> a #GAsyncReadyCallback to call when the
+request is satisfied
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> the data to pass to callback function
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_file_load_bytes_finish">
+<description>
+Completes an asynchronous request to g_file_load_bytes_async().
+
+For resources, @etag_out will be set to %NULL.
+
+The data contained in the resulting #GBytes is always zero-terminated, but
+this is not included in the #GBytes length. The resulting #GBytes should be
+freed with g_bytes_unref() when no longer in use.
+
+See g_file_load_bytes() for more information.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> a #GFile
+</parameter_description>
+</parameter>
+<parameter name="result">
+<parameter_description> a #GAsyncResult provided to the callback
+</parameter_description>
+</parameter>
+<parameter name="etag_out">
+<parameter_description> a location to place the current
+entity tag for the file, or %NULL if the entity tag is not needed
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> a location for a #GError, or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GBytes or %NULL and @error is set
+
+</return>
+</function>
+
 <function name="g_file_load_contents">
 <description>
 Loads the content of the file into memory. The data is always
@@ -27363,12 +27865,14 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 <parameter name="read_more_callback">
-<parameter_description> a #GFileReadMoreCallback to receive partial data
+<parameter_description> a
+#GFileReadMoreCallback to receive partial data
 and to specify whether further data should be read
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GAsyncReadyCallback to call when the request is satisfied
+<parameter_description> a #GAsyncReadyCallback to call
+when the request is satisfied
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -28188,6 +28692,32 @@ the callback function
 </return>
 </function>
 
+<function name="g_file_new_build_filename">
+<description>
+Constructs a #GFile from a series of elements using the correct
+separator for filenames.
+
+Using this function is equivalent to calling g_build_filename(),
+followed by g_file_new_for_path() on the result.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="first_element">
+<parameter_description> the first element in the path
+</parameter_description>
+</parameter>
+<parameter name="Varargs">
+<parameter_description> remaining elements in path, terminated by %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GFile
+
+</return>
+</function>
+
 <function name="g_file_new_for_commandline_arg">
 <description>
 Creates a #GFile with the given argument from the command line.
@@ -28584,6 +29114,30 @@ the @parse_name cannot be parsed.
 </return>
 </function>
 
+<function name="g_file_peek_path">
+<description>
+Exactly like g_file_get_path(), but caches the result via
+g_object_set_qdata_full().  This is useful for example in C
+applications which mix `g_file_*` APIs with native ones.  It
+also avoids an extra duplicated string when possible, so will be
+generally more efficient.
+
+This call does no blocking I/O.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="file">
+<parameter_description> input #GFile
+</parameter_description>
+</parameter>
+</parameters>
+<return> string containing the #GFile's path,
+or %NULL if no such path exists. The returned string is owned by @file.
+</return>
+</function>
+
 <function name="g_file_poll_mountable">
 <description>
 Polls a file of type #G_FILE_TYPE_MOUNTABLE.
@@ -28687,7 +29241,7 @@ When you are done with it, release it with g_object_unref()
 Utility function to check if a particular file exists. This is
 implemented using g_file_query_info() and as such does blocking I/O.
 
-Note that in many cases it is racy to first check for file existence
+Note that in many cases it is [racy to first check for file existence](https://en.wikipedia.org/wiki/Time_of_check_to_time_of_use)
 and then execute something based on the outcome of that, because the
 file might have been created or removed in between the operations. The
 general approach to handling that is to not check, but just do the
@@ -29717,7 +30271,7 @@ Free the returned object with g_object_unref().
 <description>
 Sets an attribute in the file with attribute name @attribute to @value.
 
-Some attributes can be unset by setting @attribute to
+Some attributes can be unset by setting @type to
 %G_FILE_ATTRIBUTE_TYPE_INVALID and @value_p to %NULL.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
@@ -31654,6 +32208,9 @@ parsed.
 <description>
 Initializes the object implementing the interface.
 
+This method is intended for language bindings. If writing in C,
+g_initable_new() should typically be used instead.
+
 The object must be initialized before any real use after initial
 construction, either with this function or g_async_initable_init_async().
 
@@ -31669,11 +32226,24 @@ error, then all operations on the object except g_object_ref() and
 g_object_unref() are considered to be invalid, and have undefined
 behaviour. See the [introduction][ginitable] for more details.
 
-Implementations of this method must be idempotent, i.e. multiple calls
-to this function with the same argument should return the same results.
-Only the first call initializes the object, further calls return the result
-of the first call. This is so that it's safe to implement the singleton
-pattern in the GObject constructor function.
+Callers should not assume that a class which implements #GInitable can be
+initialized multiple times, unless the class explicitly documents itself as
+supporting this. Generally, a class’ implementation of init() can assume
+(and assert) that it will only be called once. Previously, this documentation
+recommended all #GInitable implementations should be idempotent; that
+recommendation was relaxed in GLib 2.54.
+
+If a class explicitly supports being initialized multiple times, it is
+recommended that the method is idempotent: multiple calls with the same
+arguments should return the same results. Only the first call initializes
+the object; further calls return the result of the first call.
+
+One reason why a class might need to support idempotent initialization is if
+it is designed to be used via the singleton pattern, with a
+#GObjectClass.constructor that sometimes returns an existing instance.
+In this pattern, a caller would expect to be able to call g_initable_init()
+on the result of g_object_new(), regardless of whether it is in fact a new
+instance.
 
 Since: 2.22
 
@@ -31785,6 +32355,8 @@ similar to g_object_newv() but also initializes the object
 and returns %NULL, setting an error on failure.
 
 Since: 2.22
+Deprecated: 2.54: Use g_object_new_with_properties() and
+g_initable_init() instead. See #GParameter for more information.
 
 </description>
 <parameters>
@@ -31885,7 +32457,7 @@ operation.
 
 For behaviour details see g_input_stream_close().
 
-The asyncronous methods have a default fallback that uses threads to implement
+The asynchronous methods have a default fallback that uses threads to implement
 asynchronicity, so they are optional for inheriting classes. However, if you
 override one you must override all.
 
@@ -32190,7 +32762,7 @@ Any outstanding i/o request with higher priority (lower numerical value) will
 be executed before an outstanding request with lower priority. Default
 priority is %G_PRIORITY_DEFAULT.
 
-The asyncronous methods have a default fallback that uses threads to implement
+The asynchronous methods have a default fallback that uses threads to implement
 asynchronicity, so they are optional for inheriting classes. However, if you
 override one you must override all.
 
@@ -32542,6 +33114,8 @@ value %G_IO_ERROR_FAILED is returned for error codes not currently
 handled (but note that future GLib releases may return a more
 specific value instead).
 
+As %errno is global and may be modified by intermediate function
+calls, you should save its value as soon as the call which sets it
 
 </description>
 <parameters>
@@ -32810,6 +33384,14 @@ This function is run after the module has been loaded into GIO,
 to initialize the module. Typically, this function will call
 g_io_extension_point_implement().
 
+Since 2.56, this function should be named `g_io_&lt;modulename&gt;_load`, where
+`modulename` is the plugin’s filename with the `lib` or `libgio` prefix and
+everything after the first dot removed, and with `-` replaced with `_`
+throughout. For example, `libgiognutls-helper.so` becomes `gnutls_helper`.
+Using the new symbol names avoids name clashes when building modules
+statically. The old symbol names continue to be supported, but cannot be used
+for static builds.
+
 </description>
 <parameters>
 <parameter name="module">
@@ -32863,6 +33445,14 @@ points actually implemented must be returned by g_io_module_query()
 When installing a module that implements g_io_module_query() you must
 run gio-querymodules in order to build the cache files required for
 lazy loading.
+
+Since 2.56, this function should be named `g_io_&lt;modulename&gt;_query`, where
+`modulename` is the plugin’s filename with the `lib` or `libgio` prefix and
+everything after the first dot removed, and with `-` replaced with `_`
+throughout. For example, `libgiognutls-helper.so` becomes `gnutls_helper`.
+Using the new symbol names avoids name clashes when building modules
+statically. The old symbol names continue to be supported, but cannot be used
+for static builds.
 
 Since: 2.24
 
@@ -32943,6 +33533,14 @@ Required API for GIO modules to implement.
 
 This function is run when the module is being unloaded from GIO,
 to finalize the module.
+
+Since 2.56, this function should be named `g_io_&lt;modulename&gt;_unload`, where
+`modulename` is the plugin’s filename with the `lib` or `libgio` prefix and
+everything after the first dot removed, and with `-` replaced with `_`
+throughout. For example, `libgiognutls-helper.so` becomes `gnutls_helper`.
+Using the new symbol names avoids name clashes when building modules
+statically. The old symbol names continue to be supported, but cannot be used
+for static builds.
 
 </description>
 <parameters>
@@ -35855,7 +36453,7 @@ Since: 2.38
 
 <function name="g_mount_can_eject">
 <description>
-Checks if @mount can be eject.
+Checks if @mount can be ejected.
 
 
 </description>
@@ -35871,7 +36469,7 @@ Checks if @mount can be eject.
 
 <function name="g_mount_can_unmount">
 <description>
-Checks if @mount can be mounted.
+Checks if @mount can be unmounted.
 
 
 </description>
@@ -36967,7 +37565,7 @@ If no port is specified in @host_and_port then @default_port will be
 used as the port number to connect to.
 
 In general, @host_and_port is expected to be provided by the user
-(allowing them to give the hostname, and a port overide if necessary)
+(allowing them to give the hostname, and a port override if necessary)
 and @default_port is expected to be provided by the application.
 
 (The port component of @host_and_port can also be specified as a
@@ -37739,6 +38337,8 @@ Since: 2.40
 Deprecated in favor of g_notification_set_priority().
 
 Since: 2.40
+Deprecated: 2.42: Since 2.42, this has been deprecated in favour of
+g_notification_set_priority().
 
 </description>
 <parameters>
@@ -37846,7 +38446,7 @@ the result of the operation.
 
 For behaviour details see g_output_stream_close().
 
-The asyncronous methods have a default fallback that uses threads 
+The asynchronous methods have a default fallback that uses threads
 to implement asynchronicity, so they are optional for inheriting 
 classes. However, if you override one you must override all.
 
@@ -37996,7 +38596,7 @@ ignore.
 
 <function name="g_output_stream_has_pending">
 <description>
-Checks if an ouput stream has pending actions.
+Checks if an output stream has pending actions.
 
 
 </description>
@@ -38370,7 +38970,7 @@ g_output_stream_write().
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> location to store the number of bytes that was 
+<parameter_description> location to store the number of bytes that was
 written to the stream
 </parameter_description>
 </parameter>
@@ -38506,7 +39106,7 @@ Any outstanding I/O request with higher priority (lower numerical
 value) will be executed before an outstanding request with lower 
 priority. Default priority is %G_PRIORITY_DEFAULT.
 
-The asyncronous methods have a default fallback that uses threads 
+The asynchronous methods have a default fallback that uses threads
 to implement asynchronicity, so they are optional for inheriting 
 classes. However, if you override one you must override all.
 
@@ -39200,6 +39800,9 @@ use @cancellable to cancel it. However, it will return an error
 if @cancellable has already been cancelled when you call, which
 may happen if you call this method after a source triggers due
 to having been cancelled.
+
+Also note that if %G_IO_ERROR_WOULD_BLOCK is returned some underlying
+transports like D/TLS require that you send the same @buffer and @count.
 
 Virtual: write_nonblocking
 
@@ -40766,6 +41369,10 @@ the data should not be modified or freed.
 If you want to use this resource in the global resource namespace you need
 to register it with g_resources_register().
 
+Note: @data must be backed by memory that is at least pointer aligned.
+Otherwise this function will internally create a copy of the memory since
+GLib 2.56, or in older versions fail and exit the process.
+
 Since: 2.32
 
 </description>
@@ -40912,8 +41519,8 @@ or %NULL if the length is not needed
 </parameter_description>
 </parameter>
 <parameter name="flags">
-<parameter_description> a location to place the flags about the file,
-or %NULL if the length is not needed
+<parameter_description> a location to place the #GResourceFlags about the file,
+or %NULL if the flags are not needed
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -41049,7 +41656,8 @@ Tests if the stream supports the #GSeekableIface.
 
 <function name="g_seekable_can_truncate">
 <description>
-Tests if the stream can be truncated.
+Tests if the length of the stream can be adjusted with
+g_seekable_truncate().
 
 
 </description>
@@ -41129,7 +41737,9 @@ Tells the current position within the stream.
 
 <function name="g_seekable_truncate">
 <description>
-Truncates a stream with a given #offset. 
+Sets the length of the stream to @offset. If the stream was previously
+larger than @offset, the extra data is discarded. If the stream was
+previouly shorter than @offset, it is extended with NUL ('\0') bytes.
 
 If @cancellable is not %NULL, then the operation can be cancelled by
 triggering the cancellable object from another thread. If the operation
@@ -41137,7 +41747,6 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. If an
 operation was partially finished when the operation was cancelled the
 partial result will be returned, without an error.
 
-Virtual: truncate_fn
 
 </description>
 <parameters>
@@ -41146,7 +41755,7 @@ Virtual: truncate_fn
 </parameter_description>
 </parameter>
 <parameter name="offset">
-<parameter_description> a #goffset.
+<parameter_description> new length for @seekable, in bytes.
 </parameter_description>
 </parameter>
 <parameter name="cancellable">
@@ -41464,7 +42073,7 @@ function also establishes a binding between the writability of
 a boolean property by that name). See g_settings_bind_writable()
 for more details about writable bindings.
 
-Note that the lifecycle of the binding is tied to the object,
+Note that the lifecycle of the binding is tied to @object,
 and that you can have only one binding per object property.
 If you bind the same property twice on the same object, the second
 binding overrides the first one.
@@ -41505,7 +42114,7 @@ and the property @property of @object.
 The binding uses the provided mapping functions to map between
 settings and property values.
 
-Note that the lifecycle of the binding is tied to the object,
+Note that the lifecycle of the binding is tied to @object,
 and that you can have only one binding per object property.
 If you bind the same property twice on the same object, the second
 binding overrides the first one.
@@ -41571,7 +42180,7 @@ When the @inverted argument is %TRUE, the binding inverts the
 value as it passes from the setting to the object, i.e. @property
 will be set to %TRUE if the key is not writable.
 
-Note that the lifecycle of the binding is tied to the object,
+Note that the lifecycle of the binding is tied to @object,
 and that you can have only one binding per object property.
 If you bind the same property twice on the same object, the second
 binding overrides the first one.
@@ -42286,7 +42895,7 @@ with it.
 
 <function name="g_settings_list_relocatable_schemas">
 <description>
-&lt;!-- --&gt;
+Deprecated.
 
 Since: 2.28
 
@@ -42304,7 +42913,7 @@ modified or freed.
 
 <function name="g_settings_list_schemas">
 <description>
-&lt;!-- --&gt;
+Deprecated.
 
 Since: 2.26
 
@@ -43546,8 +44155,7 @@ Since: 2.26
 
 <function name="g_settings_sync">
 <description>
-Ensures that all pending operations for the given are complete for
-the default backend.
+Ensures that all pending operations are complete for the default backend.
 
 Writes made to a #GSettings are handled asynchronously.  For this
 reason, it is very unlikely that the changes have it to disk by the
@@ -46963,7 +47571,7 @@ Since: 2.22
 
 <function name="g_socket_get_remote_address">
 <description>
-Try to get the remove address of a connected socket. This is only
+Try to get the remote address of a connected socket. This is only
 useful for connection oriented sockets that have been connected.
 
 Since: 2.22
@@ -47097,6 +47705,9 @@ If @source_specific is %TRUE, source-specific multicast as defined
 in RFC 4604 is used. Note that on older platforms this may fail
 with a %G_IO_ERROR_NOT_SUPPORTED error.
 
+To bind to a given source-specific multicast address, use
+g_socket_join_multicast_group_ssm() instead.
+
 Since: 2.32
 
 </description>
@@ -47127,6 +47738,55 @@ Since: 2.32
 </return>
 </function>
 
+<function name="g_socket_join_multicast_group_ssm">
+<description>
+Registers @socket to receive multicast messages sent to @group.
+@socket must be a %G_SOCKET_TYPE_DATAGRAM socket, and must have
+been bound to an appropriate interface and port with
+g_socket_bind().
+
+If @iface is %NULL, the system will automatically pick an interface
+to bind to based on @group.
+
+If @source_specific is not %NULL, use source-specific multicast as
+defined in RFC 4604. Note that on older platforms this may fail
+with a %G_IO_ERROR_NOT_SUPPORTED error.
+
+Note that this function can be called multiple times for the same
+@group with different @source_specific in order to receive multicast
+packets from more than one source.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="socket">
+<parameter_description> a #GSocket.
+</parameter_description>
+</parameter>
+<parameter name="group">
+<parameter_description> a #GInetAddress specifying the group address to join.
+</parameter_description>
+</parameter>
+<parameter name="source_specific">
+<parameter_description> a #GInetAddress specifying the
+source-specific multicast address or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="iface">
+<parameter_description> Name of the interface to use, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on error.
+
+</return>
+</function>
+
 <function name="g_socket_leave_multicast_group">
 <description>
 Removes @socket from the multicast group defined by @group, @iface,
@@ -47135,6 +47795,9 @@ when you joined the group).
 
 @socket remains bound to its address and port, and can still receive
 unicast messages after calling this.
+
+To unbind to a given source-specific multicast address, use
+g_socket_leave_multicast_group_ssm() instead.
 
 Since: 2.32
 
@@ -47154,6 +47817,46 @@ Since: 2.32
 </parameter>
 <parameter name="source_specific">
 <parameter_description> %TRUE if source-specific multicast was used
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> #GError for error reporting, or %NULL to ignore.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE on error.
+
+</return>
+</function>
+
+<function name="g_socket_leave_multicast_group_ssm">
+<description>
+Removes @socket from the multicast group defined by @group, @iface,
+and @source_specific (which must all have the same values they had
+when you joined the group).
+
+@socket remains bound to its address and port, and can still receive
+unicast messages after calling this.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="socket">
+<parameter_description> a #GSocket.
+</parameter_description>
+</parameter>
+<parameter name="group">
+<parameter_description> a #GInetAddress specifying the group address to leave.
+</parameter_description>
+</parameter>
+<parameter name="source_specific">
+<parameter_description> a #GInetAddress specifying the
+source-specific multicast address or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="iface">
+<parameter_description> Name of the interface to use, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -47426,6 +48129,10 @@ is helpful for determining the port number that was used for when
 requesting a binding to port 0 (ie: &quot;any port&quot;).  This address, if
 requested, belongs to the caller and must be freed.
 
+Call g_socket_listener_close() to stop listening on @address; this will not
+be done automatically when you drop your final reference to @listener, as
+references may be held internally.
+
 Since: 2.22
 
 </description>
@@ -47510,6 +48217,10 @@ supported) on the specified port on all interfaces.
 to accept to identify this particular source, which is
 useful if you're listening on multiple addresses and do
 different things depending on what address is connected to.
+
+Call g_socket_listener_close() to stop listening on @port; this will not
+be done automatically when you drop your final reference to @listener, as
+references may be held internally.
 
 Since: 2.22
 
@@ -47900,8 +48611,8 @@ pointer, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="messages">
-<parameter_description> a pointer which
-may be filled with an array of #GSocketControlMessages, or %NULL
+<parameter_description> a pointer
+which may be filled with an array of #GSocketControlMessages, or %NULL
 </parameter_description>
 </parameter>
 <parameter name="num_messages">
@@ -49510,7 +50221,8 @@ Since: 2.40
 </parameter_description>
 </parameter>
 </parameters>
-<return> the value of the environment variable, %NULL if unset
+<return> the value of the environment variable,
+%NULL if unset
 
 </return>
 </function>
@@ -49611,6 +50323,13 @@ g_environ_unsetenv(), etc.
 As an alternative, you can use g_subprocess_launcher_setenv(),
 g_subprocess_launcher_unsetenv(), etc.
 
+Pass an empty array to set an empty environment. Pass %NULL to inherit the
+parent process’ environment. As of GLib 2.54, the parent process’ environment
+will be copied when g_subprocess_launcher_set_environ() is called.
+Previously, it was copied when the subprocess was executed. This means the
+copied environment may now be modified (using g_subprocess_launcher_setenv(),
+etc.) before launching the subprocess.
+
 On UNIX, all strings in this array can be arbitrary byte strings.
 On Windows, they should be in UTF-8.
 
@@ -49623,7 +50342,8 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="env">
-<parameter_description> the replacement environment
+<parameter_description>
+the replacement environment
 </parameter_description>
 </parameter>
 </parameters>
@@ -49771,7 +50491,8 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="variable">
-<parameter_description> the environment variable to set, must not contain '='
+<parameter_description> the environment variable to set,
+must not contain '='
 </parameter_description>
 </parameter>
 <parameter name="value">
@@ -49998,7 +50719,8 @@ Since: 2.40
 </parameter_description>
 </parameter>
 <parameter name="variable">
-<parameter_description> the environment variable to unset, must not contain '='
+<parameter_description> the environment variable to unset,
+must not contain '='
 </parameter_description>
 </parameter>
 </parameters>
@@ -51600,7 +52322,7 @@ Since: 2.48
 </parameter>
 </parameters>
 <return> the #GType of @backend’s #GDtlsClientConnection
-implementation.
+implementation, or %G_TYPE_INVALID if this backend doesn’t support DTLS.
 
 </return>
 </function>
@@ -51619,7 +52341,7 @@ Since: 2.48
 </parameter>
 </parameters>
 <return> the #GType of @backend’s #GDtlsServerConnection
-implementation.
+implementation, or %G_TYPE_INVALID if this backend doesn’t support DTLS.
 
 </return>
 </function>
@@ -52004,11 +52726,14 @@ known.
 
 <function name="g_tls_client_connection_get_use_ssl3">
 <description>
-Gets whether @conn will use SSL 3.0 rather than the
-highest-supported version of TLS; see
-g_tls_client_connection_set_use_ssl3().
+Gets whether @conn will force the lowest-supported TLS protocol
+version rather than attempt to negotiate the highest mutually-
+supported version of TLS; see g_tls_client_connection_set_use_ssl3().
 
 Since: 2.28
+
+Deprecated: 2.56: SSL 3.0 is insecure, and this function does not
+actually indicate whether it is enabled.
 
 </description>
 <parameters>
@@ -52017,7 +52742,7 @@ Since: 2.28
 </parameter_description>
 </parameter>
 </parameters>
-<return> whether @conn will use SSL 3.0
+<return> whether @conn will use the lowest-supported TLS protocol version
 
 </return>
 </function>
@@ -52098,13 +52823,19 @@ Since: 2.28
 
 <function name="g_tls_client_connection_set_use_ssl3">
 <description>
-If @use_ssl3 is %TRUE, this forces @conn to use SSL 3.0 rather than
-trying to properly negotiate the right version of TLS or SSL to use.
-This can be used when talking to servers that do not implement the
-fallbacks correctly and which will therefore fail to handshake with
-a &quot;modern&quot; TLS handshake attempt.
+If @use_ssl3 is %TRUE, this forces @conn to use the lowest-supported
+TLS protocol version rather than trying to properly negotiate the
+highest mutually-supported protocol version with the peer. This can
+be used when talking to broken TLS servers that exhibit protocol
+version intolerance.
+
+Be aware that SSL 3.0 is generally disabled by the #GTlsBackend, so
+the lowest-supported protocol version is probably not SSL 3.0.
 
 Since: 2.28
+
+Deprecated: 2.56: SSL 3.0 is insecure, and this function does not
+generally enable or disable it, despite its name.
 
 </description>
 <parameters>
@@ -52113,7 +52844,7 @@ Since: 2.28
 </parameter_description>
 </parameter>
 <parameter name="use_ssl3">
-<parameter_description> whether to use SSL 3.0
+<parameter_description> whether to use the lowest-supported protocol version
 </parameter_description>
 </parameter>
 </parameters>
@@ -52759,7 +53490,7 @@ Since: 2.30
 <function name="g_tls_database_lookup_certificate_for_handle_finish">
 <description>
 Finish an asynchronous lookup of a certificate by its handle. See
-g_tls_database_lookup_certificate_handle() for more information.
+g_tls_database_lookup_certificate_by_handle() for more information.
 
 If the handle is no longer valid, or does not point to a certificate in
 this database, then %NULL will be returned.
@@ -53019,11 +53750,11 @@ objects. Use g_object_unref() on each certificate, and g_list_free() on the rele
 
 <function name="g_tls_database_verify_chain">
 <description>
-Verify's a certificate chain after looking up and adding any missing
-certificates to the chain.
+Determines the validity of a certificate chain after looking up and
+adding any missing certificates to the chain.
 
 @chain is a chain of #GTlsCertificate objects each pointing to the next
-certificate in the chain by its %issuer property. The chain may initially
+certificate in the chain by its #GTlsCertificate:issuer property. The chain may initially
 consist of one or more certificates. After the verification process is
 complete, @chain may be modified by adding missing certificates, or removing
 extra certificates. If a certificate anchor was found, then it is added to
@@ -53040,6 +53771,15 @@ host by host basis.
 
 Currently there are no @flags, and %G_TLS_DATABASE_VERIFY_NONE should be
 used.
+
+If @chain is found to be valid, then the return value will be 0. If
+@chain is found to be invalid, then the return value will indicate
+the problems found. If the function is unable to determine whether
+@chain is valid or not (eg, because @cancellable is triggered
+before it completes) then the return value will be
+%G_TLS_CERTIFICATE_GENERIC_ERROR and @error will be set
+accordingly. @error is not set when @chain is successfully analyzed
+but found to be invalid.
 
 This function can block, use g_tls_database_verify_chain_async() to perform
 the verification operation asynchronously.
@@ -53089,9 +53829,9 @@ result of verification.
 
 <function name="g_tls_database_verify_chain_async">
 <description>
-Asynchronously verify's a certificate chain after looking up and adding
-any missing certificates to the chain. See g_tls_database_verify_chain()
-for more information.
+Asynchronously determines the validity of a certificate chain after
+looking up and adding any missing certificates to the chain. See
+g_tls_database_verify_chain() for more information.
 
 Since: 2.30
 
@@ -53140,7 +53880,17 @@ Since: 2.30
 <function name="g_tls_database_verify_chain_finish">
 <description>
 Finish an asynchronous verify chain operation. See
-g_tls_database_verify_chain() for more information. *
+g_tls_database_verify_chain() for more information.
+
+If @chain is found to be valid, then the return value will be 0. If
+@chain is found to be invalid, then the return value will indicate
+the problems found. If the function is unable to determine whether
+@chain is valid or not (eg, because @cancellable is triggered
+before it completes) then the return value will be
+%G_TLS_CERTIFICATE_GENERIC_ERROR and @error will be set
+accordingly. @error is not set when @chain is successfully analyzed
+but found to be invalid.
+
 Since: 2.30
 
 </description>
@@ -54585,6 +55335,53 @@ of the OS.
 </return>
 </function>
 
+<function name="g_unix_is_system_device_path">
+<description>
+Determines if @device_path is considered a block device path which is only
+used in implementation of the OS. This is primarily used for hiding
+mounted volumes that are intended as APIs for programs to read, and system
+administrators at a shell; rather than something that should, for example,
+appear in a GUI. For example, the Linux `/proc` filesystem.
+
+The list of device paths considered ‘system’ ones may change over time.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="device_path">
+<parameter_description> a device path, e.g. `/dev/loop0` or `nfsd`
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @device_path is considered an implementation detail of
+the OS.
+</return>
+</function>
+
+<function name="g_unix_is_system_fs_type">
+<description>
+Determines if @fs_type is considered a type of file system which is only
+used in implementation of the OS. This is primarily used for hiding
+mounted volumes that are intended as APIs for programs to read, and system
+administrators at a shell; rather than something that should, for example,
+appear in a GUI. For example, the Linux `/proc` filesystem.
+
+The list of file system types considered ‘system’ ones may change over time.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="fs_type">
+<parameter_description> a file system type, e.g. `procfs` or `tmpfs`
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if @fs_type is considered an implementation detail of the OS.
+</return>
+</function>
+
 <function name="g_unix_mount_at">
 <description>
 Gets a #GUnixMountEntry for a given mount path. If @time_read
@@ -54625,6 +55422,48 @@ Compares two unix mounts.
 </parameters>
 <return> 1, 0 or -1 if @mount1 is greater than, equal to,
 or less than @mount2, respectively. 
+</return>
+</function>
+
+<function name="g_unix_mount_copy">
+<description>
+Makes a copy of @mount_entry.
+
+Since: 2.54
+
+</description>
+<parameters>
+<parameter name="mount_entry">
+<parameter_description> a #GUnixMountEntry.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GUnixMountEntry
+
+</return>
+</function>
+
+<function name="g_unix_mount_for">
+<description>
+Gets a #GUnixMountEntry for a given file path. If @time_read
+is set, it will be filled with a unix timestamp for checking
+if the mounts have changed since with g_unix_mounts_changed_since().
+
+Since: 2.52
+
+</description>
+<parameters>
+<parameter name="file_path">
+<parameter_description> file path on some unix mount.
+</parameter_description>
+</parameter>
+<parameter name="time_read">
+<parameter_description> guint64 to contain a timestamp.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a #GUnixMountEntry.
+
 </return>
 </function>
 
@@ -54809,7 +55648,12 @@ Checks if a unix mount is mounted read only.
 
 <function name="g_unix_mount_is_system_internal">
 <description>
-Checks if a unix mount is a system path.
+Checks if a Unix mount is a system mount. This is the Boolean OR of
+g_unix_is_system_fs_type(), g_unix_is_system_device_path() and
+g_unix_is_mount_path_system_internal() on @mount_entry’s properties.
+
+The definition of what a ‘system’ mount entry is may change over time as new
+file system types and device paths are ignored.
 
 
 </description>
@@ -54909,6 +55753,24 @@ Compares two unix mount points.
 </parameters>
 <return> 1, 0 or -1 if @mount1 is greater than, equal to,
 or less than @mount2, respectively.
+</return>
+</function>
+
+<function name="g_unix_mount_point_copy">
+<description>
+Makes a copy of @mount_point.
+
+Since: 2.54
+
+</description>
+<parameters>
+<parameter name="mount_point">
+<parameter_description> a #GUnixMountPoint.
+</parameter_description>
+</parameter>
+</parameters>
+<return> a new #GUnixMountPoint
+
 </return>
 </function>
 
@@ -55895,7 +56757,7 @@ volume_activation_root = g_volume_get_activation_root (volume); // assume not NU
 then the expression
 |[&lt;!-- language=&quot;C&quot; --&gt;
 (g_file_has_prefix (volume_activation_root, mount_root) ||
-      g_file_equal (volume_activation_root, mount_root))
+g_file_equal (volume_activation_root, mount_root))
 ]|
 will always be %TRUE.
 
@@ -57654,6 +58516,150 @@ Finishes an operation started with gxdp_documents_call_add().
 </return>
 </function>
 
+<function name="gxdp_documents_call_add_full">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddFull&quot;&gt;AddFull()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_documents_call_add_full_finish() to get the result of the operation.
+
+See gxdp_documents_call_add_full_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_fds">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_flags">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_documents_call_add_full_finish">
+<description>
+Finishes an operation started with gxdp_documents_call_add_full().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_doc_ids">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_extra_out">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_fd_list">
+<parameter_description> Return location for a #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_documents_call_add_full().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_documents_call_add_full_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddFull&quot;&gt;AddFull()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_documents_call_add_full() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpDocumentsProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_o_path_fds">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_flags">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_app_id">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_permissions">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="out_doc_ids">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_extra_out">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_fd_list">
+<parameter_description> Return location for a #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
 <function name="gxdp_documents_call_add_named">
 <description>
 Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddNamed&quot;&gt;AddNamed()&lt;/link&gt; D-Bus method on @proxy.
@@ -58548,6 +59554,38 @@ This method will free @invocation, you cannot use it afterwards.
 <return></return>
 </function>
 
+<function name="gxdp_documents_complete_add_full">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddFull&quot;&gt;AddFull()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="doc_ids">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+<parameter name="extra_out">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="gxdp_documents_complete_add_named">
 <description>
 Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-Documents.AddNamed&quot;&gt;AddNamed()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
@@ -58734,6 +59772,24 @@ This method will free @invocation, you cannot use it afterwards.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="gxdp_documents_get_version">
+<description>
+Gets the value of the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-Documents.version&quot;&gt;&quot;version&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value.
+</return>
 </function>
 
 <function name="gxdp_documents_interface_info">
@@ -58973,6 +60029,26 @@ See gxdp_documents_proxy_new() for the asynchronous version of this constructor.
 </parameters>
 <return> The constructed proxy object or %NULL if @error is set.
 </return>
+</function>
+
+<function name="gxdp_documents_set_version">
+<description>
+Sets the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-Documents.version&quot;&gt;&quot;version&quot;&lt;/link&gt; D-Bus property to @value.
+
+Since this D-Bus property is not writable, it is only meaningful to use this function on the service-side.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpDocuments.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The value to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
 </function>
 
 <function name="gxdp_documents_skeleton_new">
@@ -59361,6 +60437,587 @@ Since this D-Bus property is not writable, it is only meaningful to use this fun
 <function name="gxdp_network_monitor_skeleton_new">
 <description>
 Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-NetworkMonitor.top_of_page&quot;&gt;org.freedesktop.portal.NetworkMonitor&lt;/link&gt;.
+
+
+</description>
+<parameters>
+</parameters>
+<return> The skeleton object.
+</return>
+</function>
+
+<function name="gxdp_open_uri_call_open_file">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-OpenURI.OpenFile&quot;&gt;OpenFile()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_open_uri_call_open_file_finish() to get the result of the operation.
+
+See gxdp_open_uri_call_open_file_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpOpenURIProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_parent_window">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_fd">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_options">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_open_uri_call_open_file_finish">
+<description>
+Finishes an operation started with gxdp_open_uri_call_open_file().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpOpenURIProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_handle">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_fd_list">
+<parameter_description> Return location for a #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_open_uri_call_open_file().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_open_uri_call_open_file_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-OpenURI.OpenFile&quot;&gt;OpenFile()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_open_uri_call_open_file() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpOpenURIProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_parent_window">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_fd">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_options">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="out_handle">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="out_fd_list">
+<parameter_description> Return location for a #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_open_uri_call_open_uri">
+<description>
+Asynchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-OpenURI.OpenURI&quot;&gt;OpenURI()&lt;/link&gt; D-Bus method on @proxy.
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_open_uri_call_open_uri_finish() to get the result of the operation.
+
+See gxdp_open_uri_call_open_uri_sync() for the synchronous, blocking version of this method.
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpOpenURIProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_parent_window">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_uri">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_options">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_open_uri_call_open_uri_finish">
+<description>
+Finishes an operation started with gxdp_open_uri_call_open_uri().
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpOpenURIProxy.
+</parameter_description>
+</parameter>
+<parameter name="out_handle">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_open_uri_call_open_uri().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_open_uri_call_open_uri_sync">
+<description>
+Synchronously invokes the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-OpenURI.OpenURI&quot;&gt;OpenURI()&lt;/link&gt; D-Bus method on @proxy. The calling thread is blocked until a reply is received.
+
+See gxdp_open_uri_call_open_uri() for the asynchronous version of this method.
+
+
+</description>
+<parameters>
+<parameter name="proxy">
+<parameter_description> A #GXdpOpenURIProxy.
+</parameter_description>
+</parameter>
+<parameter name="arg_parent_window">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_uri">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="arg_options">
+<parameter_description> Argument to pass with the method invocation.
+</parameter_description>
+</parameter>
+<parameter name="out_handle">
+<parameter_description> Return location for return parameter or %NULL to ignore.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL.
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the call succeded, %FALSE if @error is set.
+</return>
+</function>
+
+<function name="gxdp_open_uri_complete_open_file">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-OpenURI.OpenFile&quot;&gt;OpenFile()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpOpenURI.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="fd_list">
+<parameter_description> A #GUnixFDList or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="handle">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_open_uri_complete_open_uri">
+<description>
+Helper function used in service implementations to finish handling invocations of the &lt;link linkend=&quot;gdbus-method-org-freedesktop-portal-OpenURI.OpenURI&quot;&gt;OpenURI()&lt;/link&gt; D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
+
+This method will free @invocation, you cannot use it afterwards.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpOpenURI.
+</parameter_description>
+</parameter>
+<parameter name="invocation">
+<parameter_description> A #GDBusMethodInvocation.
+</parameter_description>
+</parameter>
+<parameter name="handle">
+<parameter_description> Parameter to return.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_open_uri_get_version">
+<description>
+Gets the value of the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-OpenURI.version&quot;&gt;&quot;version&quot;&lt;/link&gt; D-Bus property.
+
+Since this D-Bus property is readable, it is meaningful to use this function on both the client- and service-side.
+
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpOpenURI.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The property value.
+</return>
+</function>
+
+<function name="gxdp_open_uri_interface_info">
+<description>
+Gets a machine-readable description of the &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-OpenURI.top_of_page&quot;&gt;org.freedesktop.portal.OpenURI&lt;/link&gt; D-Bus interface.
+
+
+</description>
+<parameters>
+</parameters>
+<return> A #GDBusInterfaceInfo. Do not free.
+</return>
+</function>
+
+<function name="gxdp_open_uri_override_properties">
+<description>
+Overrides all #GObject properties in the #GXdpOpenURI interface for a concrete class.
+The properties are overridden in the order they are defined.
+
+
+</description>
+<parameters>
+<parameter name="klass">
+<parameter_description> The class structure for a #GObject&lt;!-- --&gt;-derived class.
+</parameter_description>
+</parameter>
+<parameter name="property_id_begin">
+<parameter_description> The property id to assign to the first overridden property.
+</parameter_description>
+</parameter>
+</parameters>
+<return> The last property id.
+</return>
+</function>
+
+<function name="gxdp_open_uri_proxy_new">
+<description>
+Asynchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-OpenURI.top_of_page&quot;&gt;org.freedesktop.portal.OpenURI&lt;/link&gt;. See g_dbus_proxy_new() for more details.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_open_uri_proxy_new_finish() to get the result of the operation.
+
+See gxdp_open_uri_proxy_new_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_open_uri_proxy_new_finish">
+<description>
+Finishes an operation started with gxdp_open_uri_proxy_new().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_open_uri_proxy_new().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_open_uri_proxy_new_for_bus">
+<description>
+Like gxdp_open_uri_proxy_new() but takes a #GBusType instead of a #GDBusConnection.
+
+When the operation is finished, @callback will be invoked in the &lt;link linkend=&quot;g-main-context-push-thread-default&quot;&gt;thread-default main loop&lt;/link&gt; of the thread you are calling this method from.
+You can then call gxdp_open_uri_proxy_new_for_bus_finish() to get the result of the operation.
+
+See gxdp_open_uri_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="callback">
+<parameter_description> A #GAsyncReadyCallback to call when the request is satisfied.
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> User data to pass to @callback.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_open_uri_proxy_new_for_bus_finish">
+<description>
+Finishes an operation started with gxdp_open_uri_proxy_new_for_bus().
+
+
+</description>
+<parameters>
+<parameter name="res">
+<parameter_description> The #GAsyncResult obtained from the #GAsyncReadyCallback passed to gxdp_open_uri_proxy_new_for_bus().
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_open_uri_proxy_new_for_bus_sync">
+<description>
+Like gxdp_open_uri_proxy_new_sync() but takes a #GBusType instead of a #GDBusConnection.
+
+The calling thread is blocked until a reply is received.
+
+See gxdp_open_uri_proxy_new_for_bus() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="bus_type">
+<parameter_description> A #GBusType.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique).
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_open_uri_proxy_new_sync">
+<description>
+Synchronously creates a proxy for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-OpenURI.top_of_page&quot;&gt;org.freedesktop.portal.OpenURI&lt;/link&gt;. See g_dbus_proxy_new_sync() for more details.
+
+The calling thread is blocked until a reply is received.
+
+See gxdp_open_uri_proxy_new() for the asynchronous version of this constructor.
+
+
+</description>
+<parameters>
+<parameter name="connection">
+<parameter_description> A #GDBusConnection.
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> Flags from the #GDBusProxyFlags enumeration.
+</parameter_description>
+</parameter>
+<parameter name="name">
+<parameter_description> A bus name (well-known or unique) or %NULL if @connection is not a message bus connection.
+</parameter_description>
+</parameter>
+<parameter name="object_path">
+<parameter_description> An object path.
+</parameter_description>
+</parameter>
+<parameter name="cancellable">
+<parameter_description> A #GCancellable or %NULL.
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> Return location for error or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> The constructed proxy object or %NULL if @error is set.
+</return>
+</function>
+
+<function name="gxdp_open_uri_set_version">
+<description>
+Sets the &lt;link linkend=&quot;gdbus-property-org-freedesktop-portal-OpenURI.version&quot;&gt;&quot;version&quot;&lt;/link&gt; D-Bus property to @value.
+
+Since this D-Bus property is not writable, it is only meaningful to use this function on the service-side.
+
+</description>
+<parameters>
+<parameter name="object">
+<parameter_description> A #GXdpOpenURI.
+</parameter_description>
+</parameter>
+<parameter name="value">
+<parameter_description> The value to set.
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="gxdp_open_uri_skeleton_new">
+<description>
+Creates a skeleton object for the D-Bus interface &lt;link linkend=&quot;gdbus-interface-org-freedesktop-portal-OpenURI.top_of_page&quot;&gt;org.freedesktop.portal.OpenURI&lt;/link&gt;.
 
 
 </description>

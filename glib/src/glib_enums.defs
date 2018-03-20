@@ -53,7 +53,8 @@
 ;;   G_CHECKSUM_MD5,
 ;;   G_CHECKSUM_SHA1,
 ;;   G_CHECKSUM_SHA256,
-;;   G_CHECKSUM_SHA512
+;;   G_CHECKSUM_SHA512,
+;;   G_CHECKSUM_SHA384
 ;; } GChecksumType;
 
 (define-enum-extended ChecksumType
@@ -64,6 +65,7 @@
     '("sha1" "G_CHECKSUM_SHA1" "1")
     '("sha256" "G_CHECKSUM_SHA256" "2")
     '("sha512" "G_CHECKSUM_SHA512" "3")
+    '("sha384" "G_CHECKSUM_SHA384" "4")
   )
 )
 
@@ -78,7 +80,8 @@
 ;;   G_CONVERT_ERROR_PARTIAL_INPUT,
 ;;   G_CONVERT_ERROR_BAD_URI,
 ;;   G_CONVERT_ERROR_NOT_ABSOLUTE_PATH,
-;;   G_CONVERT_ERROR_NO_MEMORY
+;;   G_CONVERT_ERROR_NO_MEMORY,
+;;   G_CONVERT_ERROR_EMBEDDED_NUL
 ;; } GConvertError;
 
 (define-enum-extended ConvertError
@@ -92,6 +95,7 @@
     '("bad-uri" "G_CONVERT_ERROR_BAD_URI" "4")
     '("not-absolute-path" "G_CONVERT_ERROR_NOT_ABSOLUTE_PATH" "5")
     '("no-memory" "G_CONVERT_ERROR_NO_MEMORY" "6")
+    '("embedded-nul" "G_CONVERT_ERROR_EMBEDDED_NUL" "7")
   )
 )
 
@@ -911,7 +915,7 @@
     '("newline-cr" "G_REGEX_NEWLINE_CR" "1 << 20")
     '("newline-lf" "G_REGEX_NEWLINE_LF" "1 << 21")
     '("newline-crlf" "G_REGEX_NEWLINE_CRLF" "0x300000")
-    '("newline-anycrlf" "G_REGEX_NEWLINE_ANYCRLF" "1048576 | 1 << 22")
+    '("newline-anycrlf" "G_REGEX_NEWLINE_ANYCRLF" "0x500000")
     '("bsr-anycrlf" "G_REGEX_BSR_ANYCRLF" "1 << 23")
     '("javascript-compat" "G_REGEX_JAVASCRIPT_COMPAT" "1 << 25")
   )
@@ -1233,6 +1237,22 @@
   )
 )
 
+;; Original typedef:
+;; typedef enum
+;;   {
+;;     G_NUMBER_PARSER_ERROR_INVALID,
+;;     G_NUMBER_PARSER_ERROR_OUT_OF_BOUNDS,
+;;   } GNumberParserError;
+
+(define-enum-extended NumberParserError
+  (in-module "G")
+  (c-name "GNumberParserError")
+  (values
+    '("invalid" "G_NUMBER_PARSER_ERROR_INVALID" "0")
+    '("out-of-bounds" "G_NUMBER_PARSER_ERROR_OUT_OF_BOUNDS" "1")
+  )
+)
+
 ;; From gtestutils.h
 
 ;; Original typedef:
@@ -1266,6 +1286,25 @@
     '("stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN" "1 << 0")
     '("stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT" "1 << 1")
     '("stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR" "1 << 2")
+  )
+)
+
+;; Original typedef:
+;; typedef enum {
+;;   G_TEST_RUN_SUCCESS,
+;;   G_TEST_RUN_SKIPPED,
+;;   G_TEST_RUN_FAILURE,
+;;   G_TEST_RUN_INCOMPLETE
+;; } GTestResult;
+
+(define-enum-extended TestResult
+  (in-module "G")
+  (c-name "GTestResult")
+  (values
+    '("success" "G_TEST_RUN_SUCCESS" "0")
+    '("skipped" "G_TEST_RUN_SKIPPED" "1")
+    '("failure" "G_TEST_RUN_FAILURE" "2")
+    '("incomplete" "G_TEST_RUN_INCOMPLETE" "3")
   )
 )
 
@@ -1490,7 +1529,10 @@
 ;;   G_UNICODE_BREAK_CLOSE_PARANTHESIS,
 ;;   G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER,
 ;;   G_UNICODE_BREAK_HEBREW_LETTER,
-;;   G_UNICODE_BREAK_REGIONAL_INDICATOR
+;;   G_UNICODE_BREAK_REGIONAL_INDICATOR,
+;;   G_UNICODE_BREAK_EMOJI_BASE,
+;;   G_UNICODE_BREAK_EMOJI_MODIFIER,
+;;   G_UNICODE_BREAK_ZERO_WIDTH_JOINER
 ;; } GUnicodeBreakType;
 
 (define-enum-extended UnicodeBreakType
@@ -1537,6 +1579,9 @@
     '("conditional-japanese-starter" "G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER" "37")
     '("hebrew-letter" "G_UNICODE_BREAK_HEBREW_LETTER" "38")
     '("regional-indicator" "G_UNICODE_BREAK_REGIONAL_INDICATOR" "39")
+    '("emoji-base" "G_UNICODE_BREAK_EMOJI_BASE" "40")
+    '("emoji-modifier" "G_UNICODE_BREAK_EMOJI_MODIFIER" "41")
+    '("zero-width-joiner" "G_UNICODE_BREAK_ZERO_WIDTH_JOINER" "42")
   )
 )
 
@@ -1693,7 +1738,21 @@
 ;;   G_UNICODE_SCRIPT_HATRAN,                 /* Hatr */
 ;;   G_UNICODE_SCRIPT_MULTANI,                /* Mult */
 ;;   G_UNICODE_SCRIPT_OLD_HUNGARIAN,          /* Hung */
-;;   G_UNICODE_SCRIPT_SIGNWRITING             /* Sgnw */
+;;   G_UNICODE_SCRIPT_SIGNWRITING,            /* Sgnw */
+;; 
+;;   /* Unicode 9.0 additions */
+;;   G_UNICODE_SCRIPT_ADLAM,                  /* Adlm */
+;;   G_UNICODE_SCRIPT_BHAIKSUKI,              /* Bhks */
+;;   G_UNICODE_SCRIPT_MARCHEN,                /* Marc */
+;;   G_UNICODE_SCRIPT_NEWA,                   /* Newa */
+;;   G_UNICODE_SCRIPT_OSAGE,                  /* Osge */
+;;   G_UNICODE_SCRIPT_TANGUT,                 /* Tang */
+;; 
+;;   /* Unicode 10.0 additions */
+;;   G_UNICODE_SCRIPT_MASARAM_GONDI,          /* Gonm */
+;;   G_UNICODE_SCRIPT_NUSHU,                  /* Nshu */
+;;   G_UNICODE_SCRIPT_SOYOMBO,                /* Soyo */
+;;   G_UNICODE_SCRIPT_ZANABAZAR_SQUARE        /* Zanb */
 ;; } GUnicodeScript;
 
 (define-enum-extended UnicodeScript
@@ -1833,6 +1892,16 @@
     '("multani" "G_UNICODE_SCRIPT_MULTANI" "129")
     '("old-hungarian" "G_UNICODE_SCRIPT_OLD_HUNGARIAN" "130")
     '("signwriting" "G_UNICODE_SCRIPT_SIGNWRITING" "131")
+    '("adlam" "G_UNICODE_SCRIPT_ADLAM" "132")
+    '("bhaiksuki" "G_UNICODE_SCRIPT_BHAIKSUKI" "133")
+    '("marchen" "G_UNICODE_SCRIPT_MARCHEN" "134")
+    '("newa" "G_UNICODE_SCRIPT_NEWA" "135")
+    '("osage" "G_UNICODE_SCRIPT_OSAGE" "136")
+    '("tangut" "G_UNICODE_SCRIPT_TANGUT" "137")
+    '("masaram-gondi" "G_UNICODE_SCRIPT_MASARAM_GONDI" "138")
+    '("nushu" "G_UNICODE_SCRIPT_NUSHU" "139")
+    '("soyombo" "G_UNICODE_SCRIPT_SOYOMBO" "140")
+    '("zanabazar-square" "G_UNICODE_SCRIPT_ZANABAZAR_SQUARE" "141")
   )
 )
 
@@ -1900,7 +1969,8 @@
 ;; {
 ;;   G_FORMAT_SIZE_DEFAULT     = 0,
 ;;   G_FORMAT_SIZE_LONG_FORMAT = 1 << 0,
-;;   G_FORMAT_SIZE_IEC_UNITS   = 1 << 1
+;;   G_FORMAT_SIZE_IEC_UNITS   = 1 << 1,
+;;   G_FORMAT_SIZE_BITS        = 1 << 2
 ;; } GFormatSizeFlags;
 
 (define-flags-extended FormatSizeFlags
@@ -1910,6 +1980,7 @@
     '("default" "G_FORMAT_SIZE_DEFAULT" "0x0")
     '("long-format" "G_FORMAT_SIZE_LONG_FORMAT" "1 << 0")
     '("iec-units" "G_FORMAT_SIZE_IEC_UNITS" "1 << 1")
+    '("bits" "G_FORMAT_SIZE_BITS" "1 << 2")
   )
 )
 
@@ -1942,7 +2013,7 @@
   (in-module "G")
   (c-name "GVariantClass")
   (values
-    '("boolean" "G_VARIANT_CLASS_BOOLEAN" "0")
+    '("boolean" "G_VARIANT_CLASS_BOOLEAN" "'b'")
     '("byte" "G_VARIANT_CLASS_BYTE" "'y'")
     '("int16" "G_VARIANT_CLASS_INT16" "'n'")
     '("uint16" "G_VARIANT_CLASS_UINT16" "'q'")
@@ -1951,13 +2022,13 @@
     '("int64" "G_VARIANT_CLASS_INT64" "'x'")
     '("uint64" "G_VARIANT_CLASS_UINT64" "'t'")
     '("handle" "G_VARIANT_CLASS_HANDLE" "'h'")
-    '("double" "G_VARIANT_CLASS_DOUBLE" "0")
+    '("double" "G_VARIANT_CLASS_DOUBLE" "'d'")
     '("string" "G_VARIANT_CLASS_STRING" "'s'")
     '("object-path" "G_VARIANT_CLASS_OBJECT_PATH" "'o'")
     '("signature" "G_VARIANT_CLASS_SIGNATURE" "'g'")
     '("variant" "G_VARIANT_CLASS_VARIANT" "'v'")
     '("maybe" "G_VARIANT_CLASS_MAYBE" "'m'")
-    '("array" "G_VARIANT_CLASS_ARRAY" "0")
+    '("array" "G_VARIANT_CLASS_ARRAY" "'a'")
     '("tuple" "G_VARIANT_CLASS_TUPLE" "'('")
     '("dict-entry" "G_VARIANT_CLASS_DICT_ENTRY" "'{'")
   )

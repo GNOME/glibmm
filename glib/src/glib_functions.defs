@@ -37,6 +37,7 @@
     '("sha1" "G_CHECKSUM_SHA1")
     '("sha256" "G_CHECKSUM_SHA256")
     '("sha512" "G_CHECKSUM_SHA512")
+    '("sha384" "G_CHECKSUM_SHA384")
   )
 )
 
@@ -52,6 +53,7 @@
     '("bad-uri" "G_CONVERT_ERROR_BAD_URI")
     '("not-absolute-path" "G_CONVERT_ERROR_NOT_ABSOLUTE_PATH")
     '("no-memory" "G_CONVERT_ERROR_NO_MEMORY")
+    '("embedded-nul" "G_CONVERT_ERROR_EMBEDDED_NUL")
   )
 )
 
@@ -627,6 +629,16 @@
   )
 )
 
+(define-enum ParserError
+  (in-module "GNumber")
+  (c-name "GNumberParserError")
+  (gtype-id "G_TYPE_NUMBER_PARSER_ERROR")
+  (values
+    '("invalid" "G_NUMBER_PARSER_ERROR_INVALID")
+    '("out-of-bounds" "G_NUMBER_PARSER_ERROR_OUT_OF_BOUNDS")
+  )
+)
+
 (define-flags TrapFlags
   (in-module "GTest")
   (c-name "GTestTrapFlags")
@@ -646,6 +658,18 @@
     '("stdin" "G_TEST_SUBPROCESS_INHERIT_STDIN")
     '("stdout" "G_TEST_SUBPROCESS_INHERIT_STDOUT")
     '("stderr" "G_TEST_SUBPROCESS_INHERIT_STDERR")
+  )
+)
+
+(define-enum Result
+  (in-module "GTest")
+  (c-name "GTestResult")
+  (gtype-id "G_TYPE_TEST_RESULT")
+  (values
+    '("success" "G_TEST_RUN_SUCCESS")
+    '("skipped" "G_TEST_RUN_SKIPPED")
+    '("failure" "G_TEST_RUN_FAILURE")
+    '("incomplete" "G_TEST_RUN_INCOMPLETE")
   )
 )
 
@@ -793,6 +817,9 @@
     '("conditional-japanese-starter" "G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER")
     '("hebrew-letter" "G_UNICODE_BREAK_HEBREW_LETTER")
     '("regional-indicator" "G_UNICODE_BREAK_REGIONAL_INDICATOR")
+    '("emoji-base" "G_UNICODE_BREAK_EMOJI_BASE")
+    '("emoji-modifier" "G_UNICODE_BREAK_EMOJI_MODIFIER")
+    '("zero-width-joiner" "G_UNICODE_BREAK_ZERO_WIDTH_JOINER")
   )
 )
 
@@ -934,6 +961,16 @@
     '("multani" "G_UNICODE_SCRIPT_MULTANI")
     '("old-hungarian" "G_UNICODE_SCRIPT_OLD_HUNGARIAN")
     '("signwriting" "G_UNICODE_SCRIPT_SIGNWRITING")
+    '("adlam" "G_UNICODE_SCRIPT_ADLAM")
+    '("bhaiksuki" "G_UNICODE_SCRIPT_BHAIKSUKI")
+    '("marchen" "G_UNICODE_SCRIPT_MARCHEN")
+    '("newa" "G_UNICODE_SCRIPT_NEWA")
+    '("osage" "G_UNICODE_SCRIPT_OSAGE")
+    '("tangut" "G_UNICODE_SCRIPT_TANGUT")
+    '("masaram-gondi" "G_UNICODE_SCRIPT_MASARAM_GONDI")
+    '("nushu" "G_UNICODE_SCRIPT_NUSHU")
+    '("soyombo" "G_UNICODE_SCRIPT_SOYOMBO")
+    '("zanabazar-square" "G_UNICODE_SCRIPT_ZANABAZAR_SQUARE")
   )
 )
 
@@ -978,6 +1015,7 @@
     '("default" "G_FORMAT_SIZE_DEFAULT")
     '("long-format" "G_FORMAT_SIZE_LONG_FORMAT")
     '("iec-units" "G_FORMAT_SIZE_IEC_UNITS")
+    '("bits" "G_FORMAT_SIZE_BITS")
   )
 )
 
@@ -1367,6 +1405,27 @@
   (parameters
     '("GFunc" "func")
     '("gpointer" "user_data")
+  )
+)
+
+(define-method find
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_find")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "needle")
+    '("guint*" "index_")
+  )
+)
+
+(define-method find_with_equal_func
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_find_with_equal_func")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "needle")
+    '("GEqualFunc" "equal_func")
+    '("guint*" "index_")
   )
 )
 
@@ -2661,6 +2720,14 @@
   (return-type "const-gchar*-const*")
 )
 
+(define-function g_get_language_names_with_category
+  (c-name "g_get_language_names_with_category")
+  (return-type "const-gchar*-const*")
+  (parameters
+    '("const-gchar*" "category_name")
+  )
+)
+
 (define-function g_get_locale_variants
   (c-name "g_get_locale_variants")
   (return-type "gchar**")
@@ -2943,50 +3010,6 @@
   )
 )
 
-(define-function g_filename_to_utf8_utf8
-  (c-name "g_filename_to_utf8_utf8")
-  (return-type "gchar*")
-  (parameters
-    '("const-gchar*" "opsysstring")
-    '("gssize" "len")
-    '("gsize*" "bytes_read")
-    '("gsize*" "bytes_written")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_filename_from_utf8_utf8
-  (c-name "g_filename_from_utf8_utf8")
-  (return-type "gchar*")
-  (parameters
-    '("const-gchar*" "utf8string")
-    '("gssize" "len")
-    '("gsize*" "bytes_read")
-    '("gsize*" "bytes_written")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_filename_from_uri_utf8
-  (c-name "g_filename_from_uri_utf8")
-  (return-type "gchar*")
-  (parameters
-    '("const-gchar*" "uri")
-    '("gchar**" "hostname")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_filename_to_uri_utf8
-  (c-name "g_filename_to_uri_utf8")
-  (return-type "gchar*")
-  (parameters
-    '("const-gchar*" "filename")
-    '("const-gchar*" "hostname")
-    '("GError**" "error")
-  )
-)
-
 
 
 ;; From gdataset.h
@@ -3184,6 +3207,12 @@
   (of-object "GDate")
   (c-name "g_date_free")
   (return-type "none")
+)
+
+(define-method copy
+  (of-object "GDate")
+  (c-name "g_date_copy")
+  (return-type "GDate*")
 )
 
 (define-method valid
@@ -3610,6 +3639,15 @@
   )
 )
 
+(define-function g_date_time_new_from_iso8601
+  (c-name "g_date_time_new_from_iso8601")
+  (return-type "GDateTime*")
+  (parameters
+    '("const-gchar*" "text")
+    '("GTimeZone*" "default_tz")
+  )
+)
+
 (define-function g_date_time_new
   (c-name "g_date_time_new")
   (is-constructor-of "GDateTime")
@@ -3950,22 +3988,6 @@
   (return-type "none")
 )
 
-(define-function g_dir_open_utf8
-  (c-name "g_dir_open_utf8")
-  (return-type "GDir*")
-  (parameters
-    '("const-gchar*" "path")
-    '("guint" "flags")
-    '("GError**" "error")
-  )
-)
-
-(define-method read_name_utf8
-  (of-object "GDir")
-  (c-name "g_dir_read_name_utf8")
-  (return-type "const-gchar*")
-)
-
 
 
 ;; From genviron.h
@@ -4031,32 +4053,6 @@
   (return-type "gchar**")
   (parameters
     '("gchar**" "envp")
-    '("const-gchar*" "variable")
-  )
-)
-
-(define-function g_getenv_utf8
-  (c-name "g_getenv_utf8")
-  (return-type "const-gchar*")
-  (parameters
-    '("const-gchar*" "variable")
-  )
-)
-
-(define-function g_setenv_utf8
-  (c-name "g_setenv_utf8")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "variable")
-    '("const-gchar*" "value")
-    '("gboolean" "overwrite")
-  )
-)
-
-(define-function g_unsetenv_utf8
-  (c-name "g_unsetenv_utf8")
-  (return-type "none")
-  (parameters
     '("const-gchar*" "variable")
   )
 )
@@ -4328,6 +4324,15 @@
   )
 )
 
+(define-function g_build_filename_valist
+  (c-name "g_build_filename_valist")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "first_element")
+    '("va_list*" "args")
+  )
+)
+
 (define-function g_mkdir_with_parents
   (c-name "g_mkdir_with_parents")
   (return-type "gint")
@@ -4380,49 +4385,6 @@
   (parameters
     '("const-gchar*" "file_name")
   )
-)
-
-(define-function g_file_test_utf8
-  (c-name "g_file_test_utf8")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "filename")
-    '("GFileTest" "test")
-  )
-)
-
-(define-function g_file_get_contents_utf8
-  (c-name "g_file_get_contents_utf8")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "filename")
-    '("gchar**" "contents")
-    '("gsize*" "length")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_mkstemp_utf8
-  (c-name "g_mkstemp_utf8")
-  (return-type "gint")
-  (parameters
-    '("gchar*" "tmpl")
-  )
-)
-
-(define-function g_file_open_tmp_utf8
-  (c-name "g_file_open_tmp_utf8")
-  (return-type "gint")
-  (parameters
-    '("const-gchar*" "tmpl")
-    '("gchar**" "name_used")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_get_current_dir_utf8
-  (c-name "g_get_current_dir_utf8")
-  (return-type "gchar*")
 )
 
 
@@ -5590,16 +5552,6 @@
   )
 )
 
-(define-function g_io_channel_new_file_utf8
-  (c-name "g_io_channel_new_file_utf8")
-  (return-type "GIOChannel*")
-  (parameters
-    '("const-gchar*" "filename")
-    '("const-gchar*" "mode")
-    '("GError**" "error")
-  )
-)
-
 
 
 ;; From gkeyfile.h
@@ -5820,6 +5772,17 @@
     '("const-gchar*" "key")
     '("const-gchar*" "locale")
     '("GError**" "error")
+  )
+)
+
+(define-method get_locale_for_key
+  (of-object "GKeyFile")
+  (c-name "g_key_file_get_locale_for_key")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "group_name")
+    '("const-gchar*" "key")
+    '("const-gchar*" "locale")
   )
 )
 
@@ -6208,10 +6171,6 @@
 
 
 ;; From glib-object.h
-
-
-
-;; From glib_probes.h
 
 
 
@@ -6710,7 +6669,7 @@
 (define-method check
   (of-object "GMainContext")
   (c-name "g_main_context_check")
-  (return-type "gint")
+  (return-type "gboolean")
   (parameters
     '("gint" "max_priority")
     '("GPollFD*" "fds")
@@ -7151,6 +7110,15 @@
   (parameters
     '("GSourceFuncs*" "funcs")
     '("gpointer" "user_data")
+  )
+)
+
+(define-function g_clear_handle_id
+  (c-name "g_clear_handle_id")
+  (return-type "none")
+  (parameters
+    '("guint*" "tag_ptr")
+    '("GClearHandleFunc" "clear_func")
   )
 )
 
@@ -7868,6 +7836,20 @@
     '("const-char*" "pretty_function")
     '("const-char*" "expression")
   )
+)
+
+(define-function g_log_structured_standard
+  (c-name "g_log_structured_standard")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "log_domain")
+    '("GLogLevelFlags" "log_level")
+    '("const-gchar*" "file")
+    '("const-gchar*" "line")
+    '("const-gchar*" "func")
+    '("const-gchar*" "message_format")
+  )
+  (varargs #t)
 )
 
 (define-function g_error
@@ -10469,77 +10451,6 @@
   )
 )
 
-(define-function g_spawn_async_utf8
-  (c-name "g_spawn_async_utf8")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "working_directory")
-    '("gchar**" "argv")
-    '("gchar**" "envp")
-    '("GSpawnFlags" "flags")
-    '("GSpawnChildSetupFunc" "child_setup")
-    '("gpointer" "user_data")
-    '("GPid*" "child_pid")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_spawn_async_with_pipes_utf8
-  (c-name "g_spawn_async_with_pipes_utf8")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "working_directory")
-    '("gchar**" "argv")
-    '("gchar**" "envp")
-    '("GSpawnFlags" "flags")
-    '("GSpawnChildSetupFunc" "child_setup")
-    '("gpointer" "user_data")
-    '("GPid*" "child_pid")
-    '("gint*" "standard_input")
-    '("gint*" "standard_output")
-    '("gint*" "standard_error")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_spawn_sync_utf8
-  (c-name "g_spawn_sync_utf8")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "working_directory")
-    '("gchar**" "argv")
-    '("gchar**" "envp")
-    '("GSpawnFlags" "flags")
-    '("GSpawnChildSetupFunc" "child_setup")
-    '("gpointer" "user_data")
-    '("gchar**" "standard_output")
-    '("gchar**" "standard_error")
-    '("gint*" "exit_status")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_spawn_command_line_sync_utf8
-  (c-name "g_spawn_command_line_sync_utf8")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "command_line")
-    '("gchar**" "standard_output")
-    '("gchar**" "standard_error")
-    '("gint*" "exit_status")
-    '("GError**" "error")
-  )
-)
-
-(define-function g_spawn_command_line_async_utf8
-  (c-name "g_spawn_command_line_async_utf8")
-  (return-type "gboolean")
-  (parameters
-    '("const-gchar*" "command_line")
-    '("GError**" "error")
-  )
-)
-
 
 
 ;; From gstdio.h
@@ -11173,6 +11084,37 @@
   (parameters
     '("const-gchar*-const*" "strv")
     '("const-gchar*" "str")
+  )
+)
+
+(define-function g_number_parser_error_quark
+  (c-name "g_number_parser_error_quark")
+  (return-type "GQuark")
+)
+
+(define-function g_ascii_string_to_signed
+  (c-name "g_ascii_string_to_signed")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "str")
+    '("guint" "base")
+    '("gint64" "min")
+    '("gint64" "max")
+    '("gint64*" "out_num")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_ascii_string_to_unsigned
+  (c-name "g_ascii_string_to_unsigned")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "str")
+    '("guint" "base")
+    '("guint64" "min")
+    '("guint64" "max")
+    '("guint64*" "out_num")
+    '("GError**" "error")
   )
 )
 
@@ -13309,6 +13251,15 @@
   )
 )
 
+(define-function g_utf8_make_valid
+  (c-name "g_utf8_make_valid")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "str")
+    '("gssize" "len")
+  )
+)
+
 
 
 ;; From gunicomp.h
@@ -13573,6 +13524,23 @@
 (define-function g_abort
   (c-name "g_abort")
   (return-type "none")
+)
+
+
+
+;; From guuid.h
+
+(define-function g_uuid_string_is_valid
+  (c-name "g_uuid_string_is_valid")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "str")
+  )
+)
+
+(define-function g_uuid_string_random
+  (c-name "g_uuid_string_random")
+  (return-type "gchar*")
 )
 
 
@@ -15079,25 +15047,6 @@
 (define-function g_win32_get_command_line
   (c-name "g_win32_get_command_line")
   (return-type "gchar**")
-)
-
-(define-function g_win32_get_package_installation_directory_utf8
-  (c-name "g_win32_get_package_installation_directory_utf8")
-  (return-type "gchar*")
-  (parameters
-    '("const-gchar*" "package")
-    '("const-gchar*" "dll_name")
-  )
-)
-
-(define-function g_win32_get_package_installation_subdirectory_utf8
-  (c-name "g_win32_get_package_installation_subdirectory_utf8")
-  (return-type "gchar*")
-  (parameters
-    '("const-gchar*" "package")
-    '("const-gchar*" "dll_name")
-    '("const-gchar*" "subdir")
-  )
 )
 
 (define-function g_win32_check_windows_version

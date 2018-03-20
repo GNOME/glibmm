@@ -855,7 +855,8 @@
 ;; {
 ;;   G_BUS_NAME_OWNER_FLAGS_NONE = 0,                    /*< nick=none >*/
 ;;   G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT = (1<<0),  /*< nick=allow-replacement >*/
-;;   G_BUS_NAME_OWNER_FLAGS_REPLACE = (1<<1)            /*< nick=replace >*/
+;;   G_BUS_NAME_OWNER_FLAGS_REPLACE = (1<<1),           /*< nick=replace >*/
+;;   G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE = (1<<2)       /*< nick=do-not-queue >*/
 ;; } GBusNameOwnerFlags;
 
 (define-flags-extended BusNameOwnerFlags
@@ -865,6 +866,7 @@
     '("none" "G_BUS_NAME_OWNER_FLAGS_NONE" "0x0")
     '("allow-replacement" "G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT" "(1<<0)")
     '("replace" "G_BUS_NAME_OWNER_FLAGS_REPLACE" "(1<<1)")
+    '("do-not-queue" "G_BUS_NAME_OWNER_FLAGS_DO_NOT_QUEUE" "(1<<2)")
   )
 )
 
@@ -1260,7 +1262,7 @@
   (in-module "G")
   (c-name "GDBusMessageByteOrder")
   (values
-    '("big-endian" "G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN" "0")
+    '("big-endian" "G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN" "'B'")
     '("little-endian" "G_DBUS_MESSAGE_BYTE_ORDER_LITTLE_ENDIAN" "'l'")
   )
 )
@@ -1587,6 +1589,14 @@
   (c-name "GSubprocessFlags")
   (values
     '("none" "G_SUBPROCESS_FLAGS_NONE" "0x0")
+    '("stdin-pipe" "G_SUBPROCESS_FLAGS_STDIN_PIPE" "(1u << 0)")
+    '("stdin-inherit" "G_SUBPROCESS_FLAGS_STDIN_INHERIT" "(1u << 1)")
+    '("stdout-pipe" "G_SUBPROCESS_FLAGS_STDOUT_PIPE" "(1u << 2)")
+    '("stdout-silence" "G_SUBPROCESS_FLAGS_STDOUT_SILENCE" "(1u << 3)")
+    '("stderr-pipe" "G_SUBPROCESS_FLAGS_STDERR_PIPE" "(1u << 4)")
+    '("stderr-silence" "G_SUBPROCESS_FLAGS_STDERR_SILENCE" "(1u << 5)")
+    '("stderr-merge" "G_SUBPROCESS_FLAGS_STDERR_MERGE" "(1u << 6)")
+    '("inherit-fds" "G_SUBPROCESS_FLAGS_INHERIT_FDS" "(1u << 7)")
   )
 )
 

@@ -544,6 +544,24 @@
   )
 )
 
+(define-function g_enum_to_string
+  (c-name "g_enum_to_string")
+  (return-type "gchar*")
+  (parameters
+    '("GType" "g_enum_type")
+    '("gint" "value")
+  )
+)
+
+(define-function g_flags_to_string
+  (c-name "g_flags_to_string")
+  (return-type "gchar*")
+  (parameters
+    '("GType" "flags_type")
+    '("guint" "value")
+  )
+)
+
 (define-method set_enum
   (of-object "GValue")
   (c-name "g_value_set_enum")
@@ -1462,6 +1480,17 @@
   (varargs #t)
 )
 
+(define-function g_object_new_with_properties
+  (c-name "g_object_new_with_properties")
+  (return-type "GObject*")
+  (parameters
+    '("GType" "object_type")
+    '("guint" "n_properties")
+    '("const-char*[]" "names")
+    '("const-GValue[]" "values")
+  )
+)
+
 (define-function g_object_newv
   (c-name "g_object_newv")
   (return-type "gpointer")
@@ -1522,6 +1551,17 @@
   (varargs #t)
 )
 
+(define-method setv
+  (of-object "GObject")
+  (c-name "g_object_setv")
+  (return-type "none")
+  (parameters
+    '("guint" "n_properties")
+    '("const-gchar*[]" "names")
+    '("const-GValue[]" "values")
+  )
+)
+
 (define-method set_valist
   (of-object "GObject")
   (c-name "g_object_set_valist")
@@ -1529,6 +1569,17 @@
   (parameters
     '("const-gchar*" "first_property_name")
     '("va_list" "var_args")
+  )
+)
+
+(define-method getv
+  (of-object "GObject")
+  (c-name "g_object_getv")
+  (return-type "none")
+  (parameters
+    '("guint" "n_properties")
+    '("const-gchar*[]" "names")
+    '("GValue[]" "values")
   )
 )
 
@@ -1953,10 +2004,6 @@
     '("gpointer" "object")
   )
 )
-
-
-
-;; From gobject_probes.h
 
 
 
@@ -3478,7 +3525,7 @@
   (c-name "g_type_check_value")
   (return-type "gboolean")
   (parameters
-    '("GValue*" "value")
+    '("const-GValue*" "value")
   )
 )
 
@@ -3486,7 +3533,7 @@
   (c-name "g_type_check_value_holds")
   (return-type "gboolean")
   (parameters
-    '("GValue*" "value")
+    '("const-GValue*" "value")
     '("GType" "type")
   )
 )
