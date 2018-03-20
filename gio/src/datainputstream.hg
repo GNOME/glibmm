@@ -138,7 +138,7 @@ public:
    */
   _WRAP_METHOD(void read_line_finish_utf8(const Glib::RefPtr<AsyncResult>& result{.}, std::string& data{OUT}, gsize& length{.?}), g_data_input_stream_read_line_finish_utf8, errthrow)
 
-  //TODO: This has been really deprecated in glib 2.56.
+_DEPRECATE_IFDEF_START
   /** Reads a string from the data input stream, up to the first
    * occurrence of any of the stop characters.
    *
@@ -146,8 +146,7 @@ public:
    * this function consumes the stop character that it finds.
    *
    * Don't use this function in new code.  Its functionality is
-   * inconsistent with read_until_async().  Both
-   * functions will be marked as deprecated in a future release.  Use
+   * inconsistent with read_until_async(). Use
    * read_upto() instead, but note that that method
    * does not consume the stop character.
    *
@@ -155,59 +154,61 @@ public:
    * @param stop_chars Characters to terminate the read.
    * @param cancellable A cancellable object.
    * @result true if the read succeeded without error.
+   *
+   * @deprecated Use read_upto() instead, which has more consistent behaviour regarding the stop character.
    */
   bool read_until(std::string& data, const std::string& stop_chars, const Glib::RefPtr<Cancellable>& cancellable);
   _IGNORE(g_data_input_stream_read_until)
 
-  //TODO: This has been really deprecated in glib 2.56.
   /** A non-cancellable version of read_until().
    *
    * Note that, in contrast to read_until_async(),
    * this function consumes the stop character that it finds.
    *
    * Don't use this function in new code.  Its functionality is
-   * inconsistent with read_until_async().  Both
-   * functions will be marked as deprecated in a future release.  Use
+   * inconsistent with read_until_async(). Use
    * read_upto() instead, but note that that method
    * does not consume the stop character.
    *
    * @param[out] data A string to fill with the read data.
    * @param stop_chars Characters to terminate the read.
    * @result true if the read succeeded without error.
+   *
+   * @deprecated Use read_upto() instead, which has more consistent behaviour regarding the stop character.
    */
   bool read_until(std::string& data, const std::string& stop_chars);
 
-  //TODO: This has been really deprecated in glib 2.56.
   /** The asynchronous version of read_until(). It is
    * an error to have two outstanding calls to this function.
    *
-   * Note that, in contrast to ead_until(),
+   * Note that, in contrast to read_until(),
    * this function does not consume the stop character that it finds.  You
    * must read it for yourself.
    *
    * Don't use this function in new code.  Its functionality is
-   * inconsistent with read_until().  Both functions
-   * will be marked as deprecated in a future release.  Use
-   * read_upto_async() instead.
+   * inconsistent with read_until(). Use read_upto_async() instead.
    *
    * @param stop_chars Characters to terminate the read.
    * @param slot The slot to call when the request is satisfied.
    * @param cancellable A cancellable object.
    * @param io_priority The I/O priority of the request.
+   *
+   * @deprecated Use read_upto_async() instead, which has more consistent behaviour regarding the stop character.
    */
   void read_until_async(const std::string& stop_chars, const SlotAsyncReady& slot, const Glib::RefPtr<Cancellable>& cancellable, int io_priority = Glib::PRIORITY_DEFAULT);
   _IGNORE(g_data_input_stream_read_until_async)
 
-  //TODO: This has been really deprecated in glib 2.56.
   /** Finish an asynchronous call started by read_until_async().
    *
    * @param result The AsyncResult that was provided to the callback slot.
    * @param[out] data A string to fill with the read data.
    * @result true if the read succeeded without error.
+   *
+   * @deprecated Use read_upto_finish() instead, which has more consistent behaviour regarding the stop character.
    */
   bool read_until_finish(const Glib::RefPtr<AsyncResult>& result, std::string& data);
   _IGNORE(g_data_input_stream_read_until_finish)
-
+_DEPRECATE_IFDEF_END
 
  /** Reads a string from the data input stream, up to the first
    * occurrence of any of the stop characters.
