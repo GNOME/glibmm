@@ -364,14 +364,33 @@ public:
   _WRAP_PROPERTY("inactivity-timeout", guint)
   _WRAP_PROPERTY("is-registered", bool)
   _WRAP_PROPERTY("is-remote", bool)
+
   //TODO: Change bool to std::string when we can break API/ABI.
-  /** @note
-   * Don't use %property_resource_base_path(). Use set_resource_base_path() or
-   * get_resource_base_path() instead.
-   * %property_resource_base_path() has got the wrong type.
-   * This bug will be fixed at the next API/ABI break.
+  _WRAP_PROPERTY("resource-base-path", bool, newin "2,44",
+    deprecated "This method has the wrong return type. Will be fixed at the next ABI break. Use property_resource_base_path_string() instead.")
+
+  /** The base resource path for the application.
+   *
+   * @newin{2,56}
+   *
+   * Default value: ""
+   *
+   * @return A PropertyProxy that allows you to get or set the value of the property,
+   * or receive notification when the value of the property changes.
    */
-  _WRAP_PROPERTY("resource-base-path", bool, newin "2,44")
+  Glib::PropertyProxy< std::string > property_resource_base_path_string();
+
+  /** The base resource path for the application.
+   *
+   * @newin{2,56}
+   *
+   * Default value: ""
+   *
+   * @return A PropertyProxy_ReadOnly that allows you to get the value of the property,
+   * or receive notification when the value of the property changes.
+   */
+  Glib::PropertyProxy_ReadOnly< std::string > property_resource_base_path_string() const;
+
   _WRAP_PROPERTY("is-busy", bool)
 
 //#m4 _CONVERSION(`const gchar*', `const Glib::ustring&', `Glib::ustring($3)')
