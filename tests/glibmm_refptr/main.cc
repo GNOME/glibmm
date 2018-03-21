@@ -91,6 +91,11 @@ test_initial_refcount()
   Glib::RefPtr<Something> refSomething(new Something());
   g_assert_cmpint(refSomething->ref_count(), ==, 1);
   g_assert_cmpint(refSomething->max_ref_count(), ==, 1);
+
+  // Test the get() method:
+  g_assert_cmpint(refSomething.get()->ref_count(), ==, 1);
+  refSomething.reset();
+  g_assert(refSomething.get() == nullptr);
 }
 
 static void
