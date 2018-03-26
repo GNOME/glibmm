@@ -53,6 +53,7 @@
     '("bad-uri" "G_CONVERT_ERROR_BAD_URI")
     '("not-absolute-path" "G_CONVERT_ERROR_NOT_ABSOLUTE_PATH")
     '("no-memory" "G_CONVERT_ERROR_NO_MEMORY")
+    '("embedded-nul" "G_CONVERT_ERROR_EMBEDDED_NUL")
   )
 )
 
@@ -2717,6 +2718,14 @@
 (define-function g_get_language_names
   (c-name "g_get_language_names")
   (return-type "const-gchar*-const*")
+)
+
+(define-function g_get_language_names_with_category
+  (c-name "g_get_language_names_with_category")
+  (return-type "const-gchar*-const*")
+  (parameters
+    '("const-gchar*" "category_name")
+  )
 )
 
 (define-function g_get_locale_variants
@@ -5766,6 +5775,17 @@
   )
 )
 
+(define-method get_locale_for_key
+  (of-object "GKeyFile")
+  (c-name "g_key_file_get_locale_for_key")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "group_name")
+    '("const-gchar*" "key")
+    '("const-gchar*" "locale")
+  )
+)
+
 (define-method set_locale_string
   (of-object "GKeyFile")
   (c-name "g_key_file_set_locale_string")
@@ -7816,6 +7836,20 @@
     '("const-char*" "pretty_function")
     '("const-char*" "expression")
   )
+)
+
+(define-function g_log_structured_standard
+  (c-name "g_log_structured_standard")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "log_domain")
+    '("GLogLevelFlags" "log_level")
+    '("const-gchar*" "file")
+    '("const-gchar*" "line")
+    '("const-gchar*" "func")
+    '("const-gchar*" "message_format")
+  )
+  (varargs #t)
 )
 
 (define-function g_error

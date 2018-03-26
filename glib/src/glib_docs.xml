@@ -195,7 +195,9 @@ sets is not supported.
 </parameter_description>
 </parameter>
 <parameter name="G_CONVERT_ERROR_ILLEGAL_SEQUENCE">
-<parameter_description> Invalid byte sequence in conversion input.
+<parameter_description> Invalid byte sequence in conversion input;
+or the character sequence could not be represented in the target
+character set.
 </parameter_description>
 </parameter>
 <parameter name="G_CONVERT_ERROR_FAILED">
@@ -216,6 +218,12 @@ sets is not supported.
 </parameter>
 <parameter name="G_CONVERT_ERROR_NO_MEMORY">
 <parameter_description> No memory available. Since: 2.40
+</parameter_description>
+</parameter>
+<parameter name="G_CONVERT_ERROR_EMBEDDED_NUL">
+<parameter_description> An embedded NUL character is present in
+conversion output where a NUL-terminated string is expected.
+Since: 2.56
 </parameter_description>
 </parameter>
 </parameters>
@@ -4333,7 +4341,8 @@ Sets a function to clear an element of @array.
 
 The @clear_func will be called when an element in the array
 data segment is removed and when the array is freed and data
-segment is deallocated as well.
+segment is deallocated as well. @clear_func will be passed a
+pointer to the element to clear, rather than the element itself.
 
 Note that in contrast with other uses of #GDestroyNotify
 functions, @clear_func is expected to clear the contents of
@@ -6891,9 +6900,9 @@ g_autofree guint8* membuf = NULL;
 
 membuf = g_malloc (8192);
 
-/&lt;!-- --&gt;* Some computation on membuf *&lt;!-- --&gt;/
+// Some computation on membuf
 
-/&lt;!-- --&gt;* membuf will be automatically freed here *&lt;!-- --&gt;/
+// membuf will be automatically freed here
 return TRUE;
 }
 ]|
@@ -6902,6 +6911,41 @@ Since: 2.44
 
 </description>
 <parameters>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_autolist">
+<description>
+Helper to declare a list variable with automatic deep cleanup.
+
+The list is deeply freed, in a way appropriate to the specified type, when the
+variable goes out of scope.  The type must support this.
+
+This feature is only supported on GCC and clang.  This macro is not
+defined on other compilers and should not be used in programs that
+are intended to be portable to those compilers.
+
+This is meant to be used to declare lists of a type with a cleanup
+function.  The type of the variable is a GList *.  You
+must not add your own '*'.
+
+This macro can be used to avoid having to do explicit cleanups of
+local variables when exiting functions.  It often vastly simplifies
+handling of error conditions, removing the need for various tricks
+such as 'goto out' or repeating of cleanup code.  It is also helpful
+for non-error cases.
+
+See also g_autoslist(), g_autoptr() and g_steal_pointer().
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="TypeName">
+<parameter_description> a supported variable type
+</parameter_description>
+</parameter>
 </parameters>
 <return></return>
 </function>
@@ -6961,6 +7005,41 @@ before it goes out of scope.
 See also g_auto(), g_autofree() and g_steal_pointer().
 
 Since: 2.44
+
+</description>
+<parameters>
+<parameter name="TypeName">
+<parameter_description> a supported variable type
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_autoslist">
+<description>
+Helper to declare a singly linked list variable with automatic deep cleanup.
+
+The list is deeply freed, in a way appropriate to the specified type, when the
+variable goes out of scope.  The type must support this.
+
+This feature is only supported on GCC and clang.  This macro is not
+defined on other compilers and should not be used in programs that
+are intended to be portable to those compilers.
+
+This is meant to be used to declare lists of a type with a cleanup
+function.  The type of the variable is a GSList *.  You
+must not add your own '*'.
+
+This macro can be used to avoid having to do explicit cleanups of
+local variables when exiting functions.  It often vastly simplifies
+handling of error conditions, removing the need for various tricks
+such as 'goto out' or repeating of cleanup code.  It is also helpful
+for non-error cases.
+
+See also g_autolist(), g_autoptr() and g_steal_pointer().
+
+Since: 2.56
 
 </description>
 <parameters>
@@ -8094,7 +8173,8 @@ Since: 2.12
 </parameter_description>
 </parameter>
 <parameter name="data">
-<parameter_description> desktop bookmarks loaded in memory
+<parameter_description> desktop bookmarks
+loaded in memory
 </parameter_description>
 </parameter>
 <parameter name="length">
@@ -8471,7 +8551,8 @@ Since: 2.12
 </parameter_description>
 </parameter>
 <parameter name="groups">
-<parameter_description> an array of group names, or %NULL to remove all groups
+<parameter_description> an array of
+group names, or %NULL to remove all groups
 </parameter_description>
 </parameter>
 <parameter name="length">
@@ -8679,8 +8760,8 @@ Since: 2.12
 </parameter_description>
 </parameter>
 </parameters>
-<return> a newly allocated string holding
-the contents of the #GBookmarkFile
+<return>
+a newly allocated string holding the contents of the #GBookmarkFile
 
 </return>
 </function>
@@ -9420,6 +9501,12 @@ Creates a #GBytes which is a subsection of another #GBytes. The @offset +
 
 A reference to @bytes will be held by the newly created #GBytes until
 the byte data is no longer needed.
+
+Since 2.56, if @offset is 0 and @length matches the size of @bytes, then
+@bytes will be returned with the reference count incremented by 1. If @bytes
+is a slice of another #GBytes, then the resulting #GBytes will reference
+the same #GBytes instead of @bytes. This allows consumers to simplify the
+usage of #GBytes when asynchronously writing to streams.
 
 Since: 2.32
 
@@ -12323,6 +12410,32 @@ pointer
 <return></return>
 </function>
 
+<function name="g_clear_weak_pointer">
+<description>
+Clears a weak reference to a #GObject.
+
+@weak_pointer_location must not be %NULL.
+
+If the weak reference is %NULL then this function does nothing.
+Otherwise, the weak reference to the object is removed for that location
+and the pointer is set to %NULL.
+
+A macro is also included that allows this function to be used without
+pointer casts. The function itself is static inline, so its address may vary
+between compilation units.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="weak_pointer_location">
+<parameter_description> The memory address of a pointer
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_close">
 <description>
 This wraps the close() call; in case of error, %errno will be
@@ -13418,7 +13531,7 @@ Since: 2.32
 Converts a string from one character set to another.
 
 Note that you should use g_iconv() for streaming conversions. 
-Despite the fact that @byes_read can return information about partial 
+Despite the fact that @bytes_read can return information about partial
 characters, the g_convert_... functions are not generally suitable
 for streaming. If the underlying converter maintains internal state,
 then this won't be preserved across successive calls to g_convert(),
@@ -13434,7 +13547,8 @@ well) on many platforms.  Consider using g_str_to_ascii() instead.
 </description>
 <parameters>
 <parameter name="str">
-<parameter_description>           the string to convert
+<parameter_description>
+the string to convert.
 </parameter_description>
 </parameter>
 <parameter name="len">
@@ -13453,19 +13567,19 @@ for the @len parameter is unsafe)
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
-<parameter_description>   location to store the number of bytes in the
-input string that were successfully converted, or %NULL.
+<parameter_description> location to store the number of bytes in
+the input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input. If the error
 #G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
-stored will the byte offset after the last valid
+stored will be the byte offset after the last valid
 input sequence.
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
+<parameter_description> the number of bytes stored in
+the output buffer (not including the terminating nul).
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -13474,9 +13588,10 @@ errors. Any of the errors in #GConvertError may occur.
 </parameter_description>
 </parameter>
 </parameters>
-<return> If the conversion was successful, a newly allocated
-nul-terminated string, which must be freed with
-g_free(). Otherwise %NULL and @error will be set.
+<return>
+If the conversion was successful, a newly allocated buffer
+containing the converted string, which must be freed with g_free().
+Otherwise %NULL and @error will be set.
 </return>
 </function>
 
@@ -13491,7 +13606,7 @@ to @to_codeset in their iconv() functions,
 in which case GLib will simply return that approximate conversion.
 
 Note that you should use g_iconv() for streaming conversions. 
-Despite the fact that @byes_read can return information about partial 
+Despite the fact that @bytes_read can return information about partial
 characters, the g_convert_... functions are not generally suitable
 for streaming. If the underlying converter maintains internal state,
 then this won't be preserved across successive calls to g_convert(),
@@ -13504,7 +13619,8 @@ could combine with the base character.)
 </description>
 <parameters>
 <parameter name="str">
-<parameter_description>          the string to convert
+<parameter_description>
+the string to convert.
 </parameter_description>
 </parameter>
 <parameter name="len">
@@ -13523,7 +13639,7 @@ for the @len parameter is unsafe)
 </parameter_description>
 </parameter>
 <parameter name="fallback">
-<parameter_description>     UTF-8 string to use in place of character not
+<parameter_description>     UTF-8 string to use in place of characters not
 present in the target encoding. (The string must be
 representable in the target encoding). 
 If %NULL, characters not in the target encoding will 
@@ -13531,16 +13647,16 @@ be represented as Unicode escapes \uxxxx or \Uxxxxyyyy.
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
-<parameter_description>   location to store the number of bytes in the
-input string that were successfully converted, or %NULL.
+<parameter_description> location to store the number of bytes in
+the input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input.
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
+<parameter_description> the number of bytes stored in
+the output buffer (not including the terminating nul).
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -13549,9 +13665,10 @@ errors. Any of the errors in #GConvertError may occur.
 </parameter_description>
 </parameter>
 </parameters>
-<return> If the conversion was successful, a newly allocated
-nul-terminated string, which must be freed with
-g_free(). Otherwise %NULL and @error will be set.
+<return>
+If the conversion was successful, a newly allocated buffer
+containing the converted string, which must be freed with g_free().
+Otherwise %NULL and @error will be set.
 </return>
 </function>
 
@@ -13560,7 +13677,7 @@ g_free(). Otherwise %NULL and @error will be set.
 Converts a string from one character set to another. 
 
 Note that you should use g_iconv() for streaming conversions. 
-Despite the fact that @byes_read can return information about partial 
+Despite the fact that @bytes_read can return information about partial
 characters, the g_convert_... functions are not generally suitable
 for streaming. If the underlying converter maintains internal state,
 then this won't be preserved across successive calls to g_convert(),
@@ -13569,11 +13686,20 @@ this is the GNU C converter for CP1255 which does not emit a base
 character until it knows that the next character is not a mark that
 could combine with the base character.)
 
+Characters which are valid in the input character set, but which have no
+representation in the output character set will result in a
+%G_CONVERT_ERROR_ILLEGAL_SEQUENCE error. This is in contrast to the iconv()
+specification, which leaves this behaviour implementation defined. Note that
+this is the same error code as is returned for an invalid byte sequence in
+the input character set. To get defined behaviour for conversion of
+unrepresentable characters, use g_convert_with_fallback().
+
 
 </description>
 <parameters>
 <parameter name="str">
-<parameter_description>           the string to convert
+<parameter_description>
+the string to convert.
 </parameter_description>
 </parameter>
 <parameter name="len">
@@ -13588,19 +13714,19 @@ for the @len parameter is unsafe)
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
-<parameter_description>    location to store the number of bytes in the
-input string that were successfully converted, or %NULL.
+<parameter_description> location to store the number of bytes in
+the input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input. If the error
 #G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
-stored will the byte offset after the last valid
+stored will be the byte offset after the last valid
 input sequence.
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
+<parameter_description> the number of bytes stored in
+the output buffer (not including the terminating nul).
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -13609,8 +13735,9 @@ errors. Any of the errors in #GConvertError may occur.
 </parameter_description>
 </parameter>
 </parameters>
-<return> If the conversion was successful, a newly allocated
-nul-terminated string, which must be freed with
+<return>
+If the conversion was successful, a newly allocated buffer
+containing the converted string, which must be freed with
 g_free(). Otherwise %NULL and @error will be set.
 </return>
 </function>
@@ -13904,7 +14031,7 @@ operation, for a member of @datalist.
 
 If the previous value was replaced then ownership of the
 old value (@oldval) is passed to the caller, including
-the registred destroy notify for it (passed out in @old_destroy).
+the registered destroy notify for it (passed out in @old_destroy).
 Its up to the caller to free this as he wishes, which may
 or may not include using @old_destroy as sometimes replacement
 should not destroy the object in the normal way.
@@ -15425,6 +15552,11 @@ g_date_time_unref().
 Creates a copy of @datetime and adds the specified number of months to the
 copy. Add negative values to subtract months.
 
+The day of the month of the resulting #GDateTime is clamped to the number
+of days in the updated calendar month. For example, if adding 1 month to
+31st January 2018, the result would be 28th February 2018. In 2020 (a leap
+year), the result would be 29th February.
+
 Since: 2.26
 
 </description>
@@ -15496,6 +15628,9 @@ g_date_time_unref().
 <description>
 Creates a copy of @datetime and adds the specified number of years to the
 copy. Add negative values to subtract years.
+
+As with g_date_time_add_months(), if the resulting date would be 29th
+February on a non-leap year, the day will be clamped to 28th February.
 
 Since: 2.26
 
@@ -15678,6 +15813,14 @@ for the specifier.
 for the specifier.
 - 0: Pad a numeric result with zeros. This overrides the default padding
 for the specifier.
+
+Additionally, when O is used with B, b, or h, it produces the alternative
+form of a month name. The alternative form should be used when the month
+name is used without a day number (e.g., standalone). It is required in
+some languages (Baltic, Slavic, Greek, and more) due to their grammatical
+rules. For other languages there is no difference. \%OB is a GNU and BSD
+strftime() extension expected to be added to the future POSIX specification,
+\%Ob and \%Oh are GNU strftime() extensions. Since: 2.56
 
 Since: 2.26
 
@@ -18034,11 +18177,17 @@ filenames. Note that on Windows GLib uses UTF-8 for filenames;
 on other platforms, this function indirectly depends on the 
 [current locale][setlocale].
 
+The input string shall not contain nul characters even if the @len
+argument is positive. A nul character found inside the string will result
+in error %G_CONVERT_ERROR_ILLEGAL_SEQUENCE. If the filename encoding is
+not UTF-8 and the conversion output contains a nul character, the error
+%G_CONVERT_ERROR_EMBEDDED_NUL is set and the function returns %NULL.
+
 
 </description>
 <parameters>
 <parameter name="utf8string">
-<parameter_description>    a UTF-8 encoded string.
+<parameter_description> a UTF-8 encoded string.
 </parameter_description>
 </parameter>
 <parameter name="len">
@@ -18052,14 +18201,14 @@ the input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input. If the error
-#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
-stored will the byte offset after the last valid
+%G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
+stored will be the byte offset after the last valid
 input sequence.
 </parameter_description>
 </parameter>
 <parameter name="bytes_written">
-<parameter_description> the number of bytes stored in the output buffer (not 
-including the terminating nul).
+<parameter_description> the number of bytes stored in
+the output buffer (not including the terminating nul).
 </parameter_description>
 </parameter>
 <parameter name="error">
@@ -18109,6 +18258,14 @@ filenames into a UTF-8 string. Note that on Windows GLib uses UTF-8
 for filenames; on other platforms, this function indirectly depends on 
 the [current locale][setlocale].
 
+The input string shall not contain nul characters even if the @len
+argument is positive. A nul character found inside the string will result
+in error %G_CONVERT_ERROR_ILLEGAL_SEQUENCE.
+If the source encoding is not UTF-8 and the conversion output contains a
+nul character, the error %G_CONVERT_ERROR_EMBEDDED_NUL is set and the
+function returns %NULL. Use g_convert() to produce output that
+may contain embedded nul characters.
+
 
 </description>
 <parameters>
@@ -18129,8 +18286,8 @@ input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input. If the error
-#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
-stored will the byte offset after the last valid
+%G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
+stored will be the byte offset after the last valid
 input sequence.
 </parameter_description>
 </parameter>
@@ -18553,6 +18710,10 @@ used by the &quot;narrow&quot; versions of C library and Win32 functions that
 handle file names. It might be different from the character set
 used by the C library's current locale.
 
+On Linux, the character set is found by consulting nl_langinfo() if
+available. If not, the environment variables `LC_ALL`, `LC_CTYPE`, `LANG`
+and `CHARSET` are queried in order.
+
 The return value is %TRUE if the locale's encoding is UTF-8, in that
 case you can perhaps avoid calling g_convert().
 
@@ -18677,8 +18838,9 @@ Since: 2.6
 
 </description>
 <parameters>
-<parameter name="charsets">
-<parameter_description> return location for the %NULL-terminated list of encoding names
+<parameter name="filename_charsets">
+<parameter_description>
+return location for the %NULL-terminated list of encoding names
 </parameter_description>
 </parameter>
 </parameters>
@@ -18763,6 +18925,34 @@ Since: 2.6
 
 </description>
 <parameters>
+</parameters>
+<return> a %NULL-terminated array of strings owned by GLib
+that must not be modified or freed.
+
+</return>
+</function>
+
+<function name="g_get_language_names_with_category">
+<description>
+Computes a list of applicable locale names with a locale category name,
+which can be used to construct the fallback locale-dependent filenames
+or search paths. The returned list is sorted from most desirable to
+least desirable and always contains the default locale &quot;C&quot;.
+
+This function consults the environment variables `LANGUAGE`, `LC_ALL`,
+@category_name, and `LANG` to find the list of locales specified by the
+user.
+
+g_get_language_names() returns g_get_language_names_with_category(&quot;LC_MESSAGES&quot;).
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="category_name">
+<parameter_description> a locale category name
+</parameter_description>
+</parameter>
 </parameters>
 <return> a %NULL-terminated array of strings owned by GLib
 that must not be modified or freed.
@@ -19183,6 +19373,10 @@ When a hash table only ever contains keys that have themselves as the
 corresponding value it is able to be stored more efficiently.  See
 the discussion in the section description.
 
+Starting from GLib 2.40, this function returns a boolean value to
+indicate whether the newly added value was already in the hash table
+or not.
+
 Since: 2.32
 
 </description>
@@ -19489,6 +19683,10 @@ value is replaced with the new value. If you supplied a
 value is freed using that function. If you supplied a
 @key_destroy_func when creating the #GHashTable, the passed
 key is freed using that function.
+
+Starting from GLib 2.40, this function returns a boolean value to
+indicate whether the newly added value was already in the hash table
+or not.
 
 
 </description>
@@ -19876,6 +20074,10 @@ new key. If you supplied a @value_destroy_func when creating
 the #GHashTable, the old value is freed using that function.
 If you supplied a @key_destroy_func when creating the
 #GHashTable, the old key is freed using that function.
+
+Starting from GLib 2.40, this function returns a boolean value to
+indicate whether the newly added value was already in the hash table
+or not.
 
 
 </description>
@@ -20859,6 +21061,13 @@ a native implementation.
 
 GLib provides g_convert() and g_locale_to_utf8() which are likely
 more convenient than the raw iconv wrappers.
+
+Note that the behaviour of iconv() for characters which are valid in the
+input character set, but which have no representation in the output character
+set, is implementation defined. This function may return success (with a
+positive number of non-reversible conversions as replacement characters were
+used), or it may return -1 and set an error such as %EILSEQ, in such a
+situation.
 
 
 </description>
@@ -22676,11 +22885,54 @@ Use g_strfreev() to free it.
 </return>
 </function>
 
+<function name="g_key_file_get_locale_for_key">
+<description>
+Returns the actual locale which the result of
+g_key_file_get_locale_string() or g_key_file_get_locale_string_list()
+came from.
+
+If calling g_key_file_get_locale_string() or
+g_key_file_get_locale_string_list() with exactly the same @key_file,
+@group_name, @key and @locale, the result of those functions will
+have originally been tagged with the locale that is the result of
+this function.
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="key_file">
+<parameter_description> a #GKeyFile
+</parameter_description>
+</parameter>
+<parameter name="group_name">
+<parameter_description> a group name
+</parameter_description>
+</parameter>
+<parameter name="key">
+<parameter_description> a key
+</parameter_description>
+</parameter>
+<parameter name="locale">
+<parameter_description> a locale identifier or %NULL
+</parameter_description>
+</parameter>
+</parameters>
+<return> the locale from the file, or %NULL if the key was not
+found or the entry in the file was was untranslated
+
+</return>
+</function>
+
 <function name="g_key_file_get_locale_string">
 <description>
 Returns the value associated with @key under @group_name
 translated in the given @locale if available.  If @locale is
 %NULL then the current locale is assumed. 
+
+If @locale is to be non-%NULL, or if the current locale will change over
+the lifetime of the #GKeyFile, it must be loaded with
+%G_KEY_FILE_KEEP_TRANSLATIONS in order to load strings for all locales.
 
 If @key cannot be found then %NULL is returned and @error is set 
 to #G_KEY_FILE_ERROR_KEY_NOT_FOUND. If the value associated
@@ -22723,6 +22975,10 @@ key cannot be found.
 Returns the values associated with @key under @group_name
 translated in the given @locale if available.  If @locale is
 %NULL then the current locale is assumed.
+
+If @locale is to be non-%NULL, or if the current locale will change over
+the lifetime of the #GKeyFile, it must be loaded with
+%G_KEY_FILE_KEEP_TRANSLATIONS in order to load strings for all locales.
 
 If @key cannot be found then %NULL is returned and @error is set 
 to #G_KEY_FILE_ERROR_KEY_NOT_FOUND. If the values associated
@@ -24721,6 +24977,11 @@ the C runtime (usually the same as that used by the operating
 system) in the [current locale][setlocale]. On Windows this means
 the system codepage.
 
+The input string shall not contain nul characters even if the @len
+argument is positive. A nul character found inside the string will result
+in error %G_CONVERT_ERROR_ILLEGAL_SEQUENCE. Use g_convert() to convert
+input that may contain embedded nul characters.
+
 
 </description>
 <parameters>
@@ -24730,9 +24991,7 @@ the system codepage.
 </parameter>
 <parameter name="len">
 <parameter_description>           the length of the string, or -1 if the string is
-nul-terminated (Note that some encodings may allow nul
-bytes to occur inside strings. In that case, using -1
-for the @len parameter is unsafe)
+nul-terminated.
 </parameter_description>
 </parameter>
 <parameter name="bytes_read">
@@ -24741,8 +25000,8 @@ input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input. If the error
-#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
-stored will the byte offset after the last valid
+%G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
+stored will be the byte offset after the last valid
 input sequence.
 </parameter_description>
 </parameter>
@@ -24757,7 +25016,8 @@ errors. Any of the errors in #GConvertError may occur.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly-allocated buffer containing the converted string,
+<return>
+A newly-allocated buffer containing the converted string,
 or %NULL on an error, and error will be set.
 </return>
 </function>
@@ -24768,11 +25028,20 @@ Converts a string which is in the encoding used for strings by
 the C runtime (usually the same as that used by the operating
 system) in the [current locale][setlocale] into a UTF-8 string.
 
+If the source encoding is not UTF-8 and the conversion output contains a
+nul character, the error %G_CONVERT_ERROR_EMBEDDED_NUL is set and the
+function returns %NULL.
+If the source encoding is UTF-8, an embedded nul character is treated with
+the %G_CONVERT_ERROR_ILLEGAL_SEQUENCE error for backward compatibility with
+earlier versions of this library. Use g_convert() to produce output that
+may contain embedded nul characters.
+
 
 </description>
 <parameters>
 <parameter name="opsysstring">
-<parameter_description>   a string in the encoding of the current locale. On Windows
+<parameter_description> a string in the
+encoding of the current locale. On Windows
 this means the system codepage.
 </parameter_description>
 </parameter>
@@ -24789,8 +25058,8 @@ input string that were successfully converted, or %NULL.
 Even if the conversion was successful, this may be 
 less than @len if there were partial characters
 at the end of the input. If the error
-#G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
-stored will the byte offset after the last valid
+%G_CONVERT_ERROR_ILLEGAL_SEQUENCE occurs, the value
+stored will be the byte offset after the last valid
 input sequence.
 </parameter_description>
 </parameter>
@@ -24805,8 +25074,7 @@ errors. Any of the errors in #GConvertError may occur.
 </parameter_description>
 </parameter>
 </parameters>
-<return> A newly-allocated buffer containing the converted string,
-or %NULL on an error, and error will be set.
+<return> The converted string, or %NULL on an error.
 </return>
 </function>
 
@@ -29782,8 +30050,8 @@ or %NULL
 </parameter_description>
 </parameter>
 <parameter name="notify">
-<parameter_description> function to be called when disposing the binding, to free the
-resources used by the transformation functions
+<parameter_description> a function to call when disposing the binding, to free
+resources used by the transformation functions, or %NULL if not required
 </parameter_description>
 </parameter>
 </parameters>
@@ -30478,6 +30746,8 @@ vtable initialization function (the @class_init member of
 #GTypeInfo.) It must not be called after after @class_init has
 been called for any object types implementing this interface.
 
+If @pspec is a floating reference, it will be consumed.
+
 Since: 2.4
 
 </description>
@@ -30861,7 +31131,7 @@ operation, for user data on an object.
 If the previous value was replaced then ownership of the
 old value (@oldval) is passed to the caller, including
 the registered destroy notify for it (passed out in @old_destroy).
-Its up to the caller to free this as he wishes, which may
+It’s up to the caller to free this as needed, which may
 or may not include using @old_destroy as sometimes replacement
 should not destroy the object in the normal way.
 
@@ -30912,7 +31182,7 @@ operation, for user data on an object.
 If the previous value was replaced then ownership of the
 old value (@oldval) is passed to the caller, including
 the registered destroy notify for it (passed out in @old_destroy).
-Its up to the caller to free this as he wishes, which may
+It’s up to the caller to free this as needed, which may
 or may not include using @old_destroy as sometimes replacement
 should not destroy the object in the normal way.
 
@@ -34346,8 +34616,7 @@ error message. If @err is %NULL (ie: no error variable) then do
 nothing.
 
 If *@err is %NULL (ie: an error variable is present but there is no
-error condition) then also do nothing. Whether or not it makes sense
-to take advantage of this feature is up to you.
+error condition) then also do nothing.
 
 Since: 2.16
 
@@ -39073,6 +39342,10 @@ It should return 0 if the items are equal, a negative value
 if the first item comes before the second, and a positive value
 if the second  item comes before the first.
 
+Note that when adding a large amount of data to a #GSequence,
+it is more efficient to do unsorted insertions and then call
+g_sequence_sort() or g_sequence_sort_iter().
+
 Since: 2.14
 
 </description>
@@ -39114,6 +39387,10 @@ It is called with two iterators pointing into @seq. It should
 return 0 if the iterators are equal, a negative value if the
 first iterator comes before the second, and a positive value
 if the second iterator comes before the first.
+
+Note that when adding a large amount of data to a #GSequence,
+it is more efficient to do unsorted insertions and then call
+g_sequence_sort() or g_sequence_sort_iter().
 
 Since: 2.14
 
@@ -39340,10 +39617,7 @@ the first item comes before the second, and a positive value if
 the second item comes before the first.
 
 This function will fail if the data contained in the sequence is
-unsorted.  Use g_sequence_insert_sorted() or
-g_sequence_insert_sorted_iter() to add data to your sequence or, if
-you want to add a large amount of data, call g_sequence_sort() after
-doing unsorted insertions.
+unsorted.
 
 Since: 2.28
 
@@ -39384,10 +39658,7 @@ if the first iterator comes before the second, and a positive
 value if the second iterator comes before the first.
 
 This function will fail if the data contained in the sequence is
-unsorted.  Use g_sequence_insert_sorted() or
-g_sequence_insert_sorted_iter() to add data to your sequence or, if
-you want to add a large amount of data, call g_sequence_sort() after
-doing unsorted insertions.
+unsorted.
 
 Since: 2.28
 
@@ -39599,10 +39870,7 @@ If you are simply searching for an existing element of the sequence,
 consider using g_sequence_lookup().
 
 This function will fail if the data contained in the sequence is
-unsorted.  Use g_sequence_insert_sorted() or
-g_sequence_insert_sorted_iter() to add data to your sequence or, if
-you want to add a large amount of data, call g_sequence_sort() after
-doing unsorted insertions.
+unsorted.
 
 Since: 2.14
 
@@ -39645,10 +39913,7 @@ If you are simply searching for an existing element of the sequence,
 consider using g_sequence_lookup_iter().
 
 This function will fail if the data contained in the sequence is
-unsorted.  Use g_sequence_insert_sorted() or
-g_sequence_insert_sorted_iter() to add data to your sequence or, if
-you want to add a large amount of data, call g_sequence_sort() after
-doing unsorted insertions.
+unsorted.
 
 Since: 2.14
 
@@ -40042,6 +40307,53 @@ example.
 </parameter>
 </parameters>
 <return> the old error message handler
+</return>
+</function>
+
+<function name="g_set_weak_pointer">
+<description>
+Updates a pointer to weakly refer to @new_object. It assigns @new_object
+to @weak_pointer_location and ensures that @weak_pointer_location will
+automaticaly be set to %NULL if @new_object gets destroyed. The assignment
+is not atomic. The weak reference is not thread-safe, see
+g_object_add_weak_pointer() for details.
+
+@weak_pointer_location must not be %NULL.
+
+A macro is also included that allows this function to be used without
+pointer casts. The function itself is static inline, so its address may vary
+between compilation units.
+
+One convenient usage of this function is in implementing property setters:
+|[
+void
+foo_set_bar (Foo *foo,
+Bar *new_bar)
+{
+g_return_if_fail (IS_FOO (foo));
+g_return_if_fail (new_bar == NULL || IS_BAR (new_bar));
+
+if (g_set_weak_pointer (&amp;foo-&gt;bar, new_bar))
+g_object_notify (foo, &quot;bar&quot;);
+}
+]|
+
+Since: 2.56
+
+</description>
+<parameters>
+<parameter name="weak_pointer_location">
+<parameter_description> the memory address of a pointer
+</parameter_description>
+</parameter>
+<parameter name="new_object">
+<parameter_description> a pointer to the new #GObject to
+assign to it, or %NULL to clear the pointer
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the value of @weak_pointer_location changed, %FALSE otherwise
+
 </return>
 </function>
 
@@ -44018,7 +44330,7 @@ will be discarded, instead of going to the same location as the parent's
 standard error. If you use this flag, @standard_error must be %NULL.
 %G_SPAWN_CHILD_INHERITS_STDIN means that the child will inherit the parent's
 standard input (by default, the child's standard input is attached to
-/dev/null). If you use this flag, @standard_input must be %NULL.
+`/dev/null`). If you use this flag, @standard_input must be %NULL.
 %G_SPAWN_FILE_AND_ARGV_ZERO means that the first element of @argv is
 the file to execute, while the remaining elements are the actual
 argument vector to pass to the file. Normally g_spawn_async_with_pipes()
@@ -44055,8 +44367,8 @@ The caller of g_spawn_async_with_pipes() must close these file descriptors
 when they are no longer in use. If these parameters are %NULL, the
 corresponding pipe won't be created.
 
-If @standard_input is NULL, the child's standard input is attached to 
-/dev/null unless %G_SPAWN_CHILD_INHERITS_STDIN is set.
+If @standard_input is %NULL, the child's standard input is attached to
+`/dev/null` unless %G_SPAWN_CHILD_INHERITS_STDIN is set.
 
 If @standard_error is NULL, the child's standard error goes to the same 
 location as the parent's standard error unless %G_SPAWN_STDERR_TO_DEV_NULL 
@@ -47816,15 +48128,16 @@ This can also be used to force a test to run that would otherwise
 be skipped (ie, a test whose name contains &quot;/subprocess&quot;).
 - `-m {perf|slow|thorough|quick|undefined|no-undefined}`: Execute tests according to these test modes:
 
-`perf`: Performance tests, may take long and report results.
+`perf`: Performance tests, may take long and report results (off by default).
 
-`slow`, `thorough`: Slow and thorough tests, may take quite long and maximize coverage.
+`slow`, `thorough`: Slow and thorough tests, may take quite long and maximize coverage
+(off by default).
 
-`quick`: Quick tests, should run really quickly and give good coverage.
+`quick`: Quick tests, should run really quickly and give good coverage (the default).
 
 `undefined`: Tests for undefined behaviour, may provoke programming errors
 under g_test_trap_subprocess() or g_test_expect_message() to check
-that appropriate assertions or warnings are given
+that appropriate assertions or warnings are given (the default).
 
 `no-undefined`: Avoid tests for undefined behaviour
 
@@ -48038,6 +48351,10 @@ Since: 2.16
 <description>
 Returns %TRUE if tests are run in performance mode.
 
+By default, tests are run in quick mode. In tests that use
+g_test_init(), the option `-m perf` enables performance tests, while
+`-m quick` disables them.
+
 
 </description>
 <parameters>
@@ -48113,6 +48430,10 @@ Returns %TRUE if tests are run in quick mode.
 Exactly one of g_test_quick() and g_test_slow() is active in any run;
 there is no &quot;medium speed&quot;.
 
+By default, tests are run in quick mode. In tests that use
+g_test_init(), the options `-m quick`, `-m slow` and `-m thorough`
+can be used to change this.
+
 
 </description>
 <parameters>
@@ -48124,6 +48445,8 @@ there is no &quot;medium speed&quot;.
 <function name="g_test_quiet">
 <description>
 Returns %TRUE if tests are run in quiet mode.
+In tests that use g_test_init(), the option `-q` or `--quiet` enables
+this, while `--verbose` disables it.
 The default is neither g_test_verbose() nor g_test_quiet().
 
 
@@ -48353,6 +48676,10 @@ Returns %TRUE if tests are run in slow mode.
 Exactly one of g_test_quick() and g_test_slow() is active in any run;
 there is no &quot;medium speed&quot;.
 
+By default, tests are run in quick mode. In tests that use
+g_test_init(), the options `-m quick`, `-m slow` and `-m thorough`
+can be used to change this.
+
 
 </description>
 <parameters>
@@ -48421,6 +48748,10 @@ Since: 2.16
 <description>
 Returns %TRUE if tests are run in thorough mode, equivalent to
 g_test_slow().
+
+By default, tests are run in quick mode. In tests that use
+g_test_init(), the options `-m quick`, `-m slow` and `-m thorough`
+can be used to change this.
 
 
 </description>
@@ -48747,7 +49078,10 @@ Since: 2.38
 <description>
 Returns %TRUE if tests may provoke assertions and other formally-undefined
 behaviour, to verify that appropriate warnings are given. It might, in some
-cases, be useful to turn this off if running tests under valgrind.
+cases, be useful to turn this off with if running tests under valgrind;
+in tests that use g_test_init(), the option `-m no-undefined` disables
+those tests, while `-m undefined` explicitly enables them (the default
+behaviour).
 
 
 </description>
@@ -48760,6 +49094,8 @@ cases, be useful to turn this off if running tests under valgrind.
 <function name="g_test_verbose">
 <description>
 Returns %TRUE if tests are run in verbose mode.
+In tests that use g_test_init(), the option `--verbose` enables this,
+while `-q` or `--quiet` disables it.
 The default is neither g_test_verbose() nor g_test_quiet().
 
 
@@ -52035,6 +52371,9 @@ for the type in this plugin, nothing will be done.
 As long as any instances of the type exist, the type plugin will
 not be unloaded.
 
+Since 2.56 if @module is %NULL this will call g_type_add_interface_static()
+instead. This can be used when making a static build of the module.
+
 </description>
 <parameters>
 <parameter name="module">
@@ -52066,6 +52405,9 @@ is newly registered, and the resulting #GType identifier returned.
 
 As long as any instances of the type exist, the type plugin will
 not be unloaded.
+
+Since 2.56 if @module is %NULL this will call g_type_register_static()
+instead. This can be used when making a static build of the module.
 
 Since: 2.6
 
@@ -52101,6 +52443,9 @@ is newly registered, and the resulting #GType identifier returned.
 
 As long as any instances of the type exist, the type plugin will
 not be unloaded.
+
+Since 2.56 if @module is %NULL this will call g_type_register_static()
+instead. This can be used when making a static build of the module.
 
 Since: 2.6
 
@@ -52140,6 +52485,9 @@ be the same as they were previously.
 
 As long as any instances of the type exist, the type plugin will
 not be unloaded.
+
+Since 2.56 if @module is %NULL this will call g_type_register_static()
+instead. This can be used when making a static build of the module.
 
 
 </description>
@@ -54750,6 +55098,9 @@ Like the standard C strncpy() function, but copies a given number
 of characters instead of a given number of bytes. The @src string
 must be valid UTF-8 encoded text. (Use g_utf8_validate() on all
 text before trying to use UTF-8 utility functions with it.)
+
+Note you must ensure @dest is at least 4 * @n to fit the
+largest possible UTF-8 characters
 
 
 </description>
@@ -59105,7 +59456,7 @@ const gchar *some_strings[] = { &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, NUL
 GVariant *new_variant;
 
 new_variant = g_variant_new (&quot;(t^as)&quot;,
-/&lt;!-- --&gt;* This cast is required. *&lt;!-- --&gt;/
+// This cast is required.
 (guint64) some_flags,
 some_strings);
 ]|
@@ -62127,7 +62478,9 @@ Values of this type can range from #G_MINLONG to #G_MAXLONG.
 <function name="goffset">
 <description>
 A signed integer type that is used for file offsets,
-corresponding to the C99 type off64_t.
+corresponding to the POSIX type `off_t` as if compiling with
+`_FILE_OFFSET_BITS` set to 64. #goffset is always 64 bits wide, even on
+32-bit architectures.
 Values of this type can range from #G_MINOFFSET to
 #G_MAXOFFSET.
 
