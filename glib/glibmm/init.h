@@ -53,7 +53,7 @@ void init();
  *              If <tt>false</tt>, init() will set the C++ global locale to the C global locale
  *              (std::locale::global(std::locale(std::setlocale(LC_ALL,&nbsp;nullptr)))).
  *
- * @newin{2,52}
+ * @newin{2,58}
  */
 void set_init_to_users_preferred_locale(bool state = true);
 
@@ -61,7 +61,7 @@ void set_init_to_users_preferred_locale(bool state = true);
  * @returns The state, set with set_init_to_users_preferred_locale(); <tt>true</tt>
  *          if set_init_to_users_preferred_locale() has not been called.
  *
- * @newin{2,52}
+ * @newin{2,58}
  */
 bool get_init_to_users_preferred_locale();
 

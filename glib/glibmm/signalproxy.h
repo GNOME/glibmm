@@ -110,7 +110,7 @@ protected:
    * @param after Whether this signal handler should be called before or after the default signal
    * handler.
    *
-   * @newin{2,52}
+   * @newin{2,58}
    */
   sigc::slot_base& connect_impl_(bool notify, const sigc::slot_base& slot, bool after);
 

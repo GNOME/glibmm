@@ -670,7 +670,7 @@ public:
    *
    * @throw Glib::ConvertError
    *
-   * @newin{2,56}
+   * @newin{2,58}
    */
   template <class... Ts>
   static inline ustring compose(const ustring& fmt, const Ts&... args);
@@ -709,7 +709,7 @@ public:
    *
    * @throw Glib::ConvertError
    *
-   * @newin{2,56}
+   * @newin{2,58}
    */
   template <class... Ts>
   static inline ustring format(const Ts&... args);

@@ -74,7 +74,7 @@ namespace Glib
  * in the example) must be listed before Glib::Object or a class derived from
  * %Glib::Object (Gtk::Widget in the example) in the list of base classes.
  *
- * @newin{2,52}
+ * @newin{2,58}
  */
 class ExtraClassInit : virtual public ObjectBase
 {
