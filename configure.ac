@@ -129,7 +129,7 @@ GLIBMM_C_STD_TIME_T_IS_NOT_INT32
 
 MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
-MM_ARG_WITH_TAGFILE_DOC([libsigc++-2.0.tag], [sigc++-2.0])
+MM_ARG_WITH_TAGFILE_DOC([libsigc++-3.0.tag], [sigc++-3.0])
 
 # Check whether --enable-debug-refcounting was given.
 GLIBMM_ARG_ENABLE_DEBUG_REFCOUNTING
