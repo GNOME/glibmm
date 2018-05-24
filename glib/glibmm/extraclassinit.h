@@ -47,20 +47,19 @@ namespace Glib
  *   }
  *   static void my_instance_init_function(GTypeInstance* instance, void* g_class)
  *   {
- *     gtk_widget_set_has_window(GTK_WIDGET(instance), true);
+ *     gtk_widget_set_has_surface(GTK_WIDGET(instance), true);
  *   }
  *
  *   Glib::ustring m_css_name;
  * };
  *
- * class MyWidget : public Gtk::WidgetCustomDraw, public MyExtraInit, public Gtk::Widget
+ * class MyWidget : public MyExtraInit, public Gtk::Widget
  * {
  * public:
  *   MyWidget()
  *   :
  *   // The GType name will be gtkmm__CustomObject_MyMidget
  *   Glib::ObjectBase("MyWidget"), // Unique class name
- *   Gtk::WidgetCustomDraw(),
  *   MyExtraInit("my-widget"),
  *   Gtk::Widget()
  *   {
@@ -70,8 +69,8 @@ namespace Glib
  * };
  * @endcode
  *
- * @note Classes derived from %ExtraClassInit (Gtk::WidgetCustomDraw and MyExtraInit
- * in the example) must be listed before Glib::Object or a class derived from
+ * @note Classes derived from %ExtraClassInit (MyExtraInit in the example)
+ * must be listed before Glib::Object or a class derived from
  * %Glib::Object (Gtk::Widget in the example) in the list of base classes.
  *
  * @newin{2,58}
