@@ -242,6 +242,7 @@ _CONVERSION(`GInetAddress*',`Glib::RefPtr<InetAddress>',`Glib::wrap($3)')
 _CONVERSION(`const Glib::RefPtr<InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`const Glib::RefPtr<Gio::InputStream>&',`GInputStream*',__CONVERT_CONST_REFPTR_TO_P)
 _CONVERSION(`GInputStream*',`Glib::RefPtr<InputStream>',`Glib::wrap($3)')
+_CONVERSION(`GInputStream*',`Glib::RefPtr<Gio::InputStream>',`Glib::wrap($3)')
 
 # MenuAttributeIter
 _CONVERSION(`GMenuAttributeIter*',`Glib::RefPtr<MenuAttributeIter>',`Glib::wrap($3)')
