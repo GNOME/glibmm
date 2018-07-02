@@ -987,8 +987,8 @@ sub on_wrap_method($)
     }
     # The "slot_callback" option tells gmmproc the name of the
     # callback function that should be passed to the C function if the
-    # method has a slot.
-    elsif($argRef =~ /^slot_callback\s+(\w+)/)
+    # method has a slot. The name can contain a namespace prefix.
+    elsif($argRef =~ /^slot_callback\s+([:\w]+)/)
     {
       $$objCppfunc{slot_callback} = $1;
     }
