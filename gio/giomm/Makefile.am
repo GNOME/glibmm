@@ -29,8 +29,6 @@ files_extra_ph = $(giomm_files_extra_ph)
 
 include $(top_srcdir)/build/compile-binding.am
 
-dist_noinst_HEADERS = slot_async.h
-
 local_includes = -I$(top_builddir)/glib $(if $(srcdir:.=),-I$(top_srcdir)/glib)
 local_cppflags = $(binding_includes) $(local_includes) $(binding_cppflags) -DGIOMM_BUILD=1
 

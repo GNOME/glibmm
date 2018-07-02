@@ -1,3 +1,6 @@
+#ifndef _GIOMM_SLOT_ASYNC_H
+#define _GIOMM_SLOT_ASYNC_H
+
 /* Copyright (C) 2007 The gtkmm Development Team
  *
  * This library is free software; you can redistribute it and/or
@@ -15,9 +18,24 @@
  */
 #include <gio/gio.h>
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 namespace Gio
 {
 
+/** Callback function, used in combination with Gio::SlotAsyncReady.
+ *
+ * Example:
+ * @code
+ * _WRAP_METHOD(void acquire_async(const SlotAsyncReady& slot{callback},
+ *   const Glib::RefPtr<Cancellable>& cancellable{.?}), g_permission_acquire_async,
+ *   slot_name slot, slot_callback SignalProxy_async_callback)
+ * @endcode
+ */
 void SignalProxy_async_callback(GObject*, GAsyncResult* res, void* data);
 
 } // namespace Gio
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+
+#endif /* _GIOMM_SLOT_ASYNC_H */
