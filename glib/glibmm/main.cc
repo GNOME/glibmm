@@ -597,6 +597,7 @@ MainContext::acquire()
 }
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 bool
 MainContext::wait(Glib::Cond& cond, Glib::Mutex& mutex)
 {
@@ -608,6 +609,7 @@ MainContext::wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex)
 {
   return g_main_context_wait(gobj(), cond.gobj(), mutex.gobj());
 }
+G_GNUC_END_IGNORE_DEPRECATIONS
 #endif // GLIBMM_DISABLE_DEPRECATED
 
 void

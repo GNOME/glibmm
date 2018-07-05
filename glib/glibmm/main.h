@@ -455,31 +455,29 @@ public:
   bool acquire();
 
 #ifndef GLIBMM_DISABLE_DEPRECATED
-  /** Tries to become the owner of the specified context, as with acquire(). But if another thread
-   * is the owner,
-   * atomically drop mutex and wait on cond until that owner releases ownership or until cond is
-   * signaled, then try
+  /** Tries to become the owner of the specified context, as with acquire().
+   * But if another thread is the owner, atomically drop mutex and wait on cond
+   * until that owner releases ownership or until cond is signaled, then try
    * again (once) to become the owner.
    * @param cond A condition variable.
    * @param mutex A mutex, currently held.
    * @return true if the operation succeeded, and this thread is now the owner of context.
    *
-   * @deprecated Use wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex) instead.
+   * @deprecated Use the underlying g_main_context_is_owner() function
+   *   and separate locking, if you really need this functionality.
    */
   bool wait(Glib::Cond& cond, Glib::Mutex& mutex);
 
-  // Deprecated mostly because it uses deprecated Glib::Threads:: for parameters.
-  /** Tries to become the owner of the specified context, as with acquire(). But if another thread
-   * is the owner,
-   * atomically drop mutex and wait on cond until that owner releases ownership or until cond is
-   * signaled, then try
+  /** Tries to become the owner of the specified context, as with acquire().
+   * But if another thread is the owner, atomically drop mutex and wait on cond
+   * until that owner releases ownership or until cond is signaled, then try
    * again (once) to become the owner.
    * @param cond A condition variable.
    * @param mutex A mutex, currently held.
    * @return true if the operation succeeded, and this thread is now the owner of context.
    *
-   * @deprecated Please use the underlying g_main_context_wait() function if you really need this
-   * functionality.
+   * @deprecated Use the underlying g_main_context_is_owner() function
+   *   and separate locking, if you really need this functionality.
    */
   bool wait(Glib::Threads::Cond& cond, Glib::Threads::Mutex& mutex);
 #endif // GLIBMM_DISABLE_DEPRECATED
