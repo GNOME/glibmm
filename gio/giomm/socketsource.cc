@@ -54,6 +54,19 @@ giomm_socketsource_callback(GSocket*, GIOCondition condition, void* user_data)
   return giomm_generic_socket_callback(slot, condition);
 }
 
+GSourceFunc giomm_socketsource_cb_as_gsourcefunc()
+{
+  // Conversion between different types of function pointers with
+  // reinterpret_cast can make gcc8 print a warning.
+  // https://github.com/libsigcplusplus/libsigcplusplus/issues/1
+  union {
+    GSourceFunc ps;
+    decltype(&giomm_socketsource_callback) pss;
+  } u;
+  u.pss = &giomm_socketsource_callback;
+  return u.ps;
+}
+
 } // anonymous namespace
 
 namespace Gio
@@ -72,8 +85,13 @@ SignalSocket::connect(const sigc::slot<bool(Glib::IOCondition)>& slot,
 {
   GSource* const source =
     g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable));
-  return Glib::Source::attach_signal_source(
-    slot, priority, source, context_, (GSourceFunc)&giomm_signalsocket_callback);
+
+  union {
+    GSourceFunc ps;
+    decltype(&giomm_signalsocket_callback) pss;
+  } u;
+  u.pss = &giomm_signalsocket_callback;
+  return Glib::Source::attach_signal_source(slot, priority, source, context_, u.ps);
 }
 
 SignalSocket
@@ -104,7 +122,7 @@ SocketSource::SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition
   const Glib::RefPtr<Cancellable>& cancellable)
 : IOSource(
     g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable)),
-    (GSourceFunc)&giomm_socketsource_callback)
+    giomm_socketsource_cb_as_gsourcefunc())
 {
 }
 
@@ -112,7 +130,7 @@ SocketSource::SocketSource(GSocket* socket, Glib::IOCondition condition,
   const Glib::RefPtr<Cancellable>& cancellable)
 : IOSource(
     g_socket_create_source(socket, (GIOCondition)condition, Glib::unwrap(cancellable)),
-    (GSourceFunc)&giomm_socketsource_callback)
+    giomm_socketsource_cb_as_gsourcefunc())
 {
 }
 

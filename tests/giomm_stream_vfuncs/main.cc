@@ -160,7 +160,7 @@ int main(int, char**)
       return EXIT_FAILURE;
     }
   }
-  catch (Gio::Error e)
+  catch (const Gio::Error& e)
   {
     std::cout << "Gio error: " << e.what() << std::endl;
     return EXIT_FAILURE;

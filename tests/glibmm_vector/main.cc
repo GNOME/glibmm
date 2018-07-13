@@ -196,14 +196,23 @@ public:
 
   ~Cache()
   {
+    // Conversion between different types of function pointers with
+    // reinterpret_cast can make gcc8 print a warning.
+    // https://github.com/libsigcplusplus/libsigcplusplus/issues/1
+    union {
+      GFunc pf;
+      decltype(&g_object_unref) pou;
+    } u;
+    u.pou = &g_object_unref;
+
     if (glist_)
     {
-      g_list_foreach(glist_, reinterpret_cast<GFunc>(g_object_unref), nullptr);
+      g_list_foreach(glist_, u.pf, nullptr);
       g_list_free(glist_);
     }
     if (gslist_)
     {
-      g_slist_foreach(gslist_, reinterpret_cast<GFunc>(g_object_unref), nullptr);
+      g_slist_foreach(gslist_, u.pf, nullptr);
       g_slist_free(gslist_);
     }
     if (garray_)
