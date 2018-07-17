@@ -278,19 +278,6 @@ glibmm_iosource_callback(GIOChannel*, GIOCondition condition, void* data)
   return 0;
 }
 
-GSourceFunc glibmm_iosource_cb_as_gsourcefunc()
-{
-  // Conversion between different types of function pointers with
-  // reinterpret_cast can make gcc8 print a warning.
-  // https://github.com/libsigcplusplus/libsigcplusplus/issues/1
-  union {
-    GSourceFunc ps;
-    decltype(&glibmm_iosource_callback) pios;
-  } u;
-  u.pios = &glibmm_iosource_callback;
-  return u.ps;
-}
-
 /* Only used by SignalChildWatch::connect().
  * These don't use Glib::Source, to avoid the unnecessary overhead
  * of a completely unused wrapper object.
@@ -553,12 +540,8 @@ SignalChildWatch::connect(const sigc::slot<void, GPid, int>& slot, GPid pid, int
   if (priority != G_PRIORITY_DEFAULT)
     g_source_set_priority(source, priority);
 
-  union {
-    GSourceFunc ps;
-    decltype(&glibmm_child_watch_callback) pcw;
-  } u;
-  u.pcw = &glibmm_child_watch_callback;
-  g_source_set_callback(source, u.ps, conn_node, &SourceConnectionNode::destroy_notify_callback);
+  g_source_set_callback(source, (GSourceFunc)&glibmm_child_watch_callback, conn_node,
+    &SourceConnectionNode::destroy_notify_callback);
 
   conn_node->install(source);
   g_source_attach(source, context_);
@@ -1326,7 +1309,7 @@ IOSource::IOSource(PollFD::fd_t fd, IOCondition condition) : poll_fd_(fd, condit
 
 IOSource::IOSource(const Glib::RefPtr<IOChannel>& channel, IOCondition condition)
 : Source(g_io_create_watch(channel->gobj(), (GIOCondition)condition),
-    glibmm_iosource_cb_as_gsourcefunc())
+    (GSourceFunc)&glibmm_iosource_callback)
 {
 }
 
