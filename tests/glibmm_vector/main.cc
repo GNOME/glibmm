@@ -198,12 +198,12 @@ public:
   {
     if (glist_)
     {
-      g_list_foreach(glist_, reinterpret_cast<GFunc>(g_object_unref), nullptr);
+      g_list_foreach(glist_, Glib::bitwise_equivalent_cast<GFunc>(g_object_unref), nullptr);
       g_list_free(glist_);
     }
     if (gslist_)
     {
-      g_slist_foreach(gslist_, reinterpret_cast<GFunc>(g_object_unref), nullptr);
+      g_slist_foreach(gslist_, Glib::bitwise_equivalent_cast<GFunc>(g_object_unref), nullptr);
       g_slist_free(gslist_);
     }
     if (garray_)

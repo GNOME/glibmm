@@ -571,12 +571,7 @@ OptionGroup::CppOptionEntry::allocate_c_arg()
   case G_OPTION_ARG_CALLBACK:
   {
     // The C arg pointer is a function pointer, cast to void*.
-    union {
-      void* dp;
-      GOptionArgFunc fp;
-    } u;
-    u.fp = &OptionGroup::option_arg_callback;
-    carg_ = u.dp;
+    carg_ = Glib::bitwise_equivalent_cast<void*>(&OptionGroup::option_arg_callback);
 
     // With all compiler warnings turned on and a high optimization level
     // it's difficult to cast a function pointer to a void*. See bug 589197.
