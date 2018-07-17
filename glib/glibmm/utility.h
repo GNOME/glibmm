@@ -93,6 +93,25 @@ destroy_notify_delete(void* data)
   delete static_cast<T*>(data);
 }
 
+// Conversion between different types of function pointers with
+// reinterpret_cast can make gcc8 print a warning.
+// https://github.com/libsigcplusplus/libsigcplusplus/issues/1
+/** Returns the supplied bit pattern, interpreted as another type.
+ *
+ * When reinterpret_cast causes a compiler warning or error, this function
+ * may work. Intended mainly for conversion between different types of pointers.
+ */
+template <typename T_out, typename T_in>
+inline T_out bitwise_equivalent_cast(T_in in)
+{
+  union {
+    T_in in;
+    T_out out;
+  } u;
+  u.in = in;
+  return u.out;
+}
+
 } // namespace Glib
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */

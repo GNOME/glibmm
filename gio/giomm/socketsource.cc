@@ -73,7 +73,8 @@ SignalSocket::connect(const sigc::slot<bool(Glib::IOCondition)>& slot,
   GSource* const source =
     g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable));
   return Glib::Source::attach_signal_source(
-    slot, priority, source, context_, (GSourceFunc)&giomm_signalsocket_callback);
+    slot, priority, source, context_,
+    Glib::bitwise_equivalent_cast<GSourceFunc>(&giomm_signalsocket_callback));
 }
 
 SignalSocket
@@ -104,7 +105,7 @@ SocketSource::SocketSource(const Glib::RefPtr<Socket>& socket, Glib::IOCondition
   const Glib::RefPtr<Cancellable>& cancellable)
 : IOSource(
     g_socket_create_source(socket->gobj(), (GIOCondition)condition, Glib::unwrap(cancellable)),
-    (GSourceFunc)&giomm_socketsource_callback)
+    Glib::bitwise_equivalent_cast<GSourceFunc>(&giomm_socketsource_callback))
 {
 }
 
@@ -112,7 +113,7 @@ SocketSource::SocketSource(GSocket* socket, Glib::IOCondition condition,
   const Glib::RefPtr<Cancellable>& cancellable)
 : IOSource(
     g_socket_create_source(socket, (GIOCondition)condition, Glib::unwrap(cancellable)),
-    (GSourceFunc)&giomm_socketsource_callback)
+    Glib::bitwise_equivalent_cast<GSourceFunc>(&giomm_socketsource_callback))
 {
 }
 

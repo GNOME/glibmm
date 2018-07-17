@@ -18,6 +18,7 @@
 #include <glibmm/exceptionhandler.h>
 #include <glibmm/wrap.h>
 #include <glibmm/iochannel.h>
+#include <glibmm/utility.h>
 #include <algorithm>
 
 namespace
@@ -507,7 +508,7 @@ SignalChildWatch::connect(const sigc::slot<void(GPid, int)>& slot, GPid pid, int
   if (priority != G_PRIORITY_DEFAULT)
     g_source_set_priority(source, priority);
 
-  g_source_set_callback(source, (GSourceFunc)&glibmm_child_watch_callback,
+  g_source_set_callback(source, Glib::bitwise_equivalent_cast<GSourceFunc>(&glibmm_child_watch_callback),
     conn_node,
     &glibmm_source_destroy_notify_callback);
 
@@ -1231,13 +1232,13 @@ IOSource::IOSource(PollFD::fd_t fd, IOCondition condition) : poll_fd_(fd, condit
 
 IOSource::IOSource(const Glib::RefPtr<IOChannel>& channel, IOCondition condition)
 : Source(g_io_create_watch(channel->gobj(), (GIOCondition)condition),
-    (GSourceFunc)&glibmm_iosource_callback)
+    Glib::bitwise_equivalent_cast<GSourceFunc>(&glibmm_iosource_callback))
 {
 }
 
 IOSource::IOSource(GIOChannel* channel, IOCondition condition)
 : Source(g_io_create_watch(channel, (GIOCondition)condition),
-    (GSourceFunc)&glibmm_iosource_callback)
+    Glib::bitwise_equivalent_cast<GSourceFunc>(&glibmm_iosource_callback))
 {
 }
 
