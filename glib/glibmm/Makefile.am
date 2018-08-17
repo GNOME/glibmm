@@ -18,7 +18,7 @@
 lib_LTLIBRARIES = libglibmm-@GLIBMM_API_VERSION@.la
 
 include $(srcdir)/../src/filelist.am
-include $(srcdir)/filelist.am
+include $(srcdir)/filelist.gmake.am
 
 files_built_cc = $(glibmm_files_built_cc)
 files_built_h  = $(glibmm_files_built_h)
