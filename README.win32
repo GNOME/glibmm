@@ -2,13 +2,14 @@ Building glibmm on Win32
 ===========================
 
 Currently, both the mingw (native win32) gcc compiler and MS Visual
-Studio 2017 are supported. glibmm can be built with mingw32-gcc using
-the gnu autotools (automake, autoconf, libtool). As explicitly stated
-in the gtk+ for win32 distribution (http://www.gimp.org/win32/), the
-gcc compiler provided by the cygwin distribution should not be used to
-build glib/glibmm libraries and/or applications (see the README.win32
-that comes with the gtk+ DLLs). This MIGHT cause conflicts between the
-cygwin and msvcrt runtime environments.
+Studio 2017 and later are supported. glibmm can be built with
+mingw32-gcc using the gnu autotools (automake, autoconf, libtool).
+As explicitly stated in the gtk+ for win32 distribution
+(http://www.gimp.org/win32/), the gcc compiler provided by the cygwin
+distribution should not be used to build glib/glibmm libraries and/or
+applications (see the README.win32 that comes with the gtk+ DLLs).
+This MIGHT cause conflicts between the cygwin and msvcrt runtime
+environments.
 
 1. Mingw
 
@@ -46,11 +47,18 @@ make install
 
 2. MS Visual Studio 2017
 
-Open the glibmm.sln solution file in the MSVC_NMake directory. In
-the Tools/Options panel, add the appropriate GTK+ include and lib
-directories to the Projects and Solutions/VC++ directories, if they
-are not in the locations specified by the property sheets, i.e.
-$(srcroot)\..\vs15\$(Platform). Build the solution.
+In a Visual Studio command prompt, navigate to the MSVC_NMake directory.
+Run 'nmake /f Makefile.vc CFG=[release|debug]' to build the glibmm and
+giomm DLLs, along with their example programs.  If a prefix other than
+$(srcroot)\..\vs15\$(Platform) is desired, pass in PREFIX=$(your_prefix)
+in the NMake command line.  In order to build the giomm settings example
+program, the glib-compile-schemas needs to reside in $(PREFIX)\bin, or
+it must be specified via passing in GLIB_COMPILE_SCHEMAS.
+
+A 'tests' target will build the test programs for glibmm and giomm, an
+'install' target is provided to copy the built DLLs and LIBs, along with
+with the public headers to appropriate subdirs of $(PREFIX).  A 'clean'
+target is also provided to remove all the built files.
 
 3. Glibmm methods and signals not available on win32
 
