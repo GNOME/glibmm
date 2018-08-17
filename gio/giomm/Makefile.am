@@ -17,8 +17,8 @@
 
 lib_LTLIBRARIES = libgiomm-@GIOMM_API_VERSION@.la
 
-include $(srcdir)/../src/filelist.am
-include $(srcdir)/filelist.am
+include $(srcdir)/../src/filelist.gmake.am
+include $(srcdir)/filelist.gmake.am
 
 files_built_cc = $(giomm_files_built_cc)
 files_built_h  = $(giomm_files_built_h)

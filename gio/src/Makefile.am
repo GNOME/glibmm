@@ -23,7 +23,7 @@ binding_name    = giomm
 wrap_init_flags = --namespace=Gio --parent_dir=giomm
 codegen_srcdir  = $(top_srcdir)/tools
 
-include $(srcdir)/filelist.am
+include $(srcdir)/filelist.gmake.am
 include $(top_srcdir)/tools/m4/filelist.am
 
 files_defs = $(giomm_files_defs)
