@@ -20,6 +20,9 @@ lib_LTLIBRARIES = libglibmm-@GLIBMM_API_VERSION@.la
 include $(srcdir)/../src/filelist.am
 include $(srcdir)/filelist.am
 
+# Separated from $(top_srcdir)/glib/glibmm/filelist.am
+glibmm_files_built_ph = $(patsubst %.hg,private/%_p.h,$(glibmm_files_used_hg))
+
 files_built_cc = $(glibmm_files_built_cc)
 files_built_h  = $(glibmm_files_built_h)
 files_built_ph = $(glibmm_files_built_ph)

@@ -18,7 +18,32 @@
 lib_LTLIBRARIES = libgiomm-@GIOMM_API_VERSION@.la
 
 include $(srcdir)/../src/filelist.am
+
+### Separated from $(top_srcdir)/gio/src/filelist.am
+
+if HOST_WINDOWS_NATIVE
+giomm_files_arch_hg =
+else
+if OS_COCOA
+giomm_files_arch_hg = $(giomm_files_posix_hg)
+else
+giomm_files_arch_hg = $(giomm_files_not_mac) $(giomm_files_posix_hg)
+endif
+endif
+giomm_files_used_hg = $(giomm_files_any_hg) $(giomm_files_arch_hg)
+
+giomm_files_hg = \
+  $(giomm_files_any_hg) \
+  $(giomm_files_posix_hg) \
+  $(giomm_files_not_mac)
+giomm_files_ccg = $(giomm_files_hg:.hg=.ccg)
+
+### End of separated from $(top_srcdir)/gio/src/filelist.am
+
 include $(srcdir)/filelist.am
+
+# Separated from $(top_srcdir)/gio/giomm/filelist.am
+giomm_files_built_ph = $(patsubst %.hg,private/%_p.h,$(giomm_files_used_hg))
 
 files_built_cc = $(giomm_files_built_cc)
 files_built_h  = $(giomm_files_built_h)
