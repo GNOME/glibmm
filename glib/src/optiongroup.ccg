@@ -552,22 +552,20 @@ OptionGroup::CppOptionEntry::allocate_c_arg()
   case G_OPTION_ARG_CALLBACK:
   {
     // The C arg pointer is a function pointer, cast to void*.
-    carg_ = Glib::bitwise_equivalent_cast<void*>(&OptionGroup::option_arg_callback);
-
-    // With all compiler warnings turned on and a high optimization level
-    // it's difficult to cast a function pointer to a void*. See bug 589197.
-    // A few results with g++ 4.4.5 with the flags -pedantic -O2 -Werror:
     //
-    // carg_ = reinterpret_cast<void*>(&OptionGroup::option_arg_callback);
-    // error: ISO C++ forbids casting between pointer-to-function and pointer-to-object
-    //
-    // *reinterpret_cast<GOptionArgFunc*>(&carg_) = &OptionGroup::option_arg_callback;
-    // *(OptionArgFunc*)&carg_ = &OptionGroup::option_arg_callback;
-    // error: dereferencing type-punned pointer will break strict-aliasing rules
-    //
-    // If any compiler dislikes the union, the following code is worth testing:
-    // carg_ = reinterpret_cast<void*>(
-    //         reinterpret_cast<unsigned long>(&OptionGroup::option_arg_callback));
+    //   carg_ = reinterpret_cast<void*>(&OptionGroup::option_arg_callback);
+    // or
+    //   union {
+    //     void* dp;
+    //     GOptionArgFunc fp;
+    //   } u;
+    //   u.fp = &OptionGroup::option_arg_callback;
+    //   carg_ = u.dp;
+    // ? See
+    // https://bugzilla.gnome.org/show_bug.cgi?id=589197
+    // https://github.com/libsigcplusplus/libsigcplusplus/issues/1
+    // https://github.com/libsigcplusplus/libsigcplusplus/issues/8
+    carg_ = reinterpret_cast<void*>(&OptionGroup::option_arg_callback);
 
     break;
   }
