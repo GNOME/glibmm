@@ -161,20 +161,23 @@ destroy_notify_delete(void* data)
 // Conversion between different types of function pointers with
 // reinterpret_cast can make gcc8 print a warning.
 // https://github.com/libsigcplusplus/libsigcplusplus/issues/1
-/** Returns the supplied bit pattern, interpreted as another type.
+// https://github.com/libsigcplusplus/libsigcplusplus/issues/8
+/** Returns the supplied function pointer, cast to a pointer to another function type.
  *
- * When reinterpret_cast causes a compiler warning or error, this function
- * may work. Intended mainly for conversion between different types of pointers.
+ * When a single reinterpret_cast between function pointer types causes a
+ * compiler warning or error, this function may work.
+ *
+ * Qualify calls with namespace names: sigc::internal::function_pointer_cast<>().
+ * If you don't, indirect calls from another library that also contains a
+ * function_pointer_cast<>() (perhaps glibmm), can be ambiguous due to ADL
+ * (argument-dependent lookup).
  */
 template <typename T_out, typename T_in>
-inline T_out bitwise_equivalent_cast(T_in in)
+inline T_out function_pointer_cast(T_in in)
 {
-  union {
-    T_in in;
-    T_out out;
-  } u;
-  u.in = in;
-  return u.out;
+  // The double reinterpret_cast suppresses a warning from gcc8 with the
+  // -Wcast-function-type option.
+  return reinterpret_cast<T_out>(reinterpret_cast<void (*)()>(in));
 }
 
 } // namespace Glib
