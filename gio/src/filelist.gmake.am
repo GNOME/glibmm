@@ -1,0 +1,21 @@
+## This file is part of glibmm.
+
+include $(top_srcdir)/gio/src/filelist.am
+
+# Split out from $(top_srcdir)/gio/src/filelist.am
+if HOST_WINDOWS_NATIVE
+giomm_files_arch_hg =
+else
+if OS_COCOA
+giomm_files_arch_hg = $(giomm_files_posix_hg)
+else
+giomm_files_arch_hg = $(giomm_files_not_mac) $(giomm_files_posix_hg)
+endif
+endif
+giomm_files_used_hg = $(giomm_files_any_hg) $(giomm_files_arch_hg)
+
+giomm_files_hg = \
+  $(giomm_files_any_hg) \
+  $(giomm_files_posix_hg) \
+  $(giomm_files_not_mac)
+giomm_files_ccg = $(giomm_files_hg:.hg=.ccg)
