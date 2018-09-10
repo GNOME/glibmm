@@ -2,13 +2,14 @@ Building glibmm on Win32
 ===========================
 
 Currently, both the mingw (native win32) gcc compiler and MS Visual
-Studio 2015 are supported. glibmm can be built with mingw32-gcc using
-the gnu autotools (automake, autoconf, libtool). As explicitly stated
-in the gtk+ for win32 distribution (http://www.gimp.org/win32/), the
-gcc compiler provided by the cygwin distribution should not be used to
-build glib/glibmm libraries and/or applications (see the README.win32
-that comes with the gtk+ DLLs). This MIGHT cause conflicts between the
-cygwin and msvcrt runtime environments.
+Studio 2015 and later are supported. glibmm can be built with
+mingw32-gcc using the gnu autotools (automake, autoconf, libtool).
+As explicitly stated in the gtk+ for win32 distribution
+(http://www.gimp.org/win32/), the gcc compiler provided by the cygwin
+distribution should not be used to build glib/glibmm libraries and/or
+applications (see the README.win32 that comes with the gtk+ DLLs).
+This MIGHT cause conflicts between the cygwin and msvcrt runtime
+environments.
 
 1. Mingw
 
@@ -18,7 +19,7 @@ following :
 * MinGW-4.1 as the base distribution.
 
 The bare mingw distribution does not provide the necessary tools (sh, perl, m4
-, autoconf, automake, ..) to run the provided configure script "as is". One 
+, autoconf, automake, ..) to run the provided configure script "as is". One
 (currently non supported) solution is to use mingw in conjunction with msys,
 which is readily available on the mingw website (http://www.mingw.org/).
 
@@ -27,7 +28,7 @@ that were mentioned above) with mingw by making sure that the mingw
 tools (gcc, ld, dlltool, ..) are called first.
 
 First, make sure that you have working distribution of the native port
-of both libsigc++-2.0.x and glib-2.0 on win32 (see
+of both libsigc++-2.10.x and glib-2.0 on win32 (see
 http://www.gimp.org/win32). If you can't compile a simple glib example
 using gcc and `pkg-config --cflags --libs`, you should not even think
 about trying to compile glibmm, let alone using precompiled libglibmm
@@ -46,11 +47,21 @@ make install
 
 2. MS Visual Studio 2015
 
-Open the glibmm.sln solution file in the MSVC_Net2015 directory. In
-the Tools/Options panel, add the appropriate GTK+ include and lib
-directories to the Projects and Solutions/VC++ directories, if they
-are not in the locations specified by the property sheets, i.e.
-$(srcroot)\..\vs14\$(Platform). Build the solution.
+In a Visual Studio command prompt, navigate to the MSVC_NMake directory.
+Run 'nmake /f Makefile.vc CFG=[release|debug]' to build the glibmm and
+giomm DLLs, along with their example programs.  If a prefix other than
+$(srcroot)\..\vs$(VSVER)\$(Platform) is desired, pass in PREFIX=$(your_prefix)
+in the NMake command line.  In order to build the giomm settings example
+program, the glib-compile-schemas needs to reside in $(PREFIX)\bin, or
+it must be specified via passing in GLIB_COMPILE_SCHEMAS.
+
+Note that $(VSVER) refers to 14 for Visual Studio 2015 and 15 for Visual
+Studio 2017.
+
+A 'tests' target will build the test programs for glibmm and giomm, an
+'install' target is provided to copy the built DLLs and LIBs, along with
+with the public headers to appropriate subdirs of $(PREFIX).  A 'clean'
+target is also provided to remove all the built files.
 
 3. Glibmm methods and signals not available on win32
 
