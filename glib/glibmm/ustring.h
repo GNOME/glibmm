@@ -740,12 +740,6 @@ private:
 
   class FormatStream;
 
-  template<class T>
-  static inline void format_private(FormatStream& buf, const T& arg);
-
-  template<class T1, class... Ts>
-  static inline void format_private(FormatStream& buf, const T1& a1, const Ts&... args);
-
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   std::string string_;
@@ -1059,30 +1053,13 @@ ustring::raw() const
   return string_;
 }
 
-template <class T>
-inline // static
-  void
-  ustring::format_private(FormatStream& buf, const T& arg)
-{
-  buf.stream(arg);
-}
-
-template <class T1, class... Ts>
-inline // static
-  void
-  ustring::format_private(FormatStream& buf, const T1& a1, const Ts&... args)
-{
-  buf.stream(a1);
-  return format_private(buf, args...);
-}
-
 template <class... Ts>
 inline // static
   ustring
   ustring::format(const Ts&... args)
 {
   ustring::FormatStream buf;
-  format_private(buf, args...);
+  (buf.stream(args), ...);
   return buf.to_string();
 }
 
