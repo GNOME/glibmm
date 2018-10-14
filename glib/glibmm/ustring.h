@@ -1074,9 +1074,6 @@ private:
 public:
   explicit inline Stringify(const T& arg) : string_(ustring::format(arg)) {}
 
-  // TODO: Why is this here? See the template specialization:
-  explicit inline Stringify(const char* arg) : string_(arg) {}
-
   // noncopyable
   Stringify(const ustring::Stringify<T>&) = delete;
   Stringify<T>& operator=(const ustring::Stringify<T>&) = delete;
