@@ -1069,7 +1069,7 @@ template <class T>
 class ustring::Stringify
 {
 private:
-  ustring string_;
+  const ustring string_;
 
 public:
   explicit inline Stringify(const T& arg) : string_(ustring::format(arg)) {}
