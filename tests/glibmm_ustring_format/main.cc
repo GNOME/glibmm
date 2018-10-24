@@ -6,6 +6,10 @@
 int
 main(int, char**)
 {
+  // Don't use the user's preferred locale. The decimal delimiter may be ','
+  // instead of the expected '.'.
+  Glib::set_init_to_users_preferred_locale(false);
+
   Glib::init();
 
   char carr[10] = "Užduotys";
