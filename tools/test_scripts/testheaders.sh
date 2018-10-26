@@ -18,8 +18,7 @@ function usage() {
   exit 1
 }
 
-#extra_gcc_args=-std=c++11
-extra_gcc_args=
+extra_gcc_args=-std=c++17
 
 # Search for directories to include in CFLAGS.
 idirs=""
@@ -56,7 +55,7 @@ shift
 # Search for more directories to include in CFLAGS.
 for i in "$@"
 do
-  if [ -d "$1" ]
+  if [ -d "$i" ]
   then
     idirs+=" -I$i"
   fi
