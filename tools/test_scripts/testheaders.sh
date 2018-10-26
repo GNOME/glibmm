@@ -53,7 +53,7 @@ shift
 # Search for more directories to include in CFLAGS.
 for i in "$@"
 do
-  if [ -d "$1" ]
+  if [ -d "$i" ]
   then
     idirs+=" -I$i"
   fi
