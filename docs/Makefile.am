@@ -16,9 +16,9 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
 include $(top_srcdir)/glib/src/filelist.am
-include $(top_srcdir)/glib/glibmm/filelist.am
-include $(top_srcdir)/gio/src/filelist.am
-include $(top_srcdir)/gio/giomm/filelist.am
+include $(top_srcdir)/glib/glibmm/filelist.gmake.am
+include $(top_srcdir)/gio/src/filelist.gmake.am
+include $(top_srcdir)/gio/giomm/filelist.gmake.am
 
 glibmm_files_h = $(filter-out wrap_init.h,$(glibmm_files_all_h))
 giomm_files_h  = $(filter-out wrap_init.h,$(giomm_files_all_h))
