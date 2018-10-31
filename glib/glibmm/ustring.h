@@ -740,12 +740,6 @@ private:
 
   class FormatStream;
 
-  template<class T>
-  static inline void format_private(FormatStream& buf, const T& arg);
-
-  template<class T1, class... Ts>
-  static inline void format_private(FormatStream& buf, const T1& a1, const Ts&... args);
-
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
   std::string string_;
@@ -1059,30 +1053,13 @@ ustring::raw() const
   return string_;
 }
 
-template <class T>
-inline // static
-  void
-  ustring::format_private(FormatStream& buf, const T& arg)
-{
-  buf.stream(arg);
-}
-
-template <class T1, class... Ts>
-inline // static
-  void
-  ustring::format_private(FormatStream& buf, const T1& a1, const Ts&... args)
-{
-  buf.stream(a1);
-  return format_private(buf, args...);
-}
-
 template <class... Ts>
 inline // static
   ustring
   ustring::format(const Ts&... args)
 {
   ustring::FormatStream buf;
-  format_private(buf, args...);
+  (buf.stream(args), ...);
   return buf.to_string();
 }
 
@@ -1092,19 +1069,16 @@ template <class T>
 class ustring::Stringify
 {
 private:
-  ustring string_;
+  const ustring string_;
 
 public:
   explicit inline Stringify(const T& arg) : string_(ustring::format(arg)) {}
-
-  // TODO: Why is this here? See the template specialization:
-  explicit inline Stringify(const char* arg) : string_(arg) {}
 
   // noncopyable
   Stringify(const ustring::Stringify<T>&) = delete;
   Stringify<T>& operator=(const ustring::Stringify<T>&) = delete;
 
-  inline const ustring* ptr() const { return &string_; }
+  inline const ustring& ref() const { return string_; }
 };
 
 /// A template specialization for Stringify<ustring>:
@@ -1121,7 +1095,7 @@ public:
   Stringify(const ustring::Stringify<ustring>&) = delete;
   Stringify<ustring>& operator=(const ustring::Stringify<ustring>&) = delete;
 
-  inline const ustring* ptr() const { return &string_; }
+  inline const ustring& ref() const { return string_; }
 };
 
 /** A template specialization for Stringify<const char*>,
@@ -1140,7 +1114,7 @@ public:
   Stringify(const ustring::Stringify<const char*>&) = delete;
   Stringify<ustring>& operator=(const ustring::Stringify<const char*>&) = delete;
 
-  inline const ustring* ptr() const { return &string_; }
+  inline const ustring& ref() const { return string_; }
 };
 
 /** A template specialization for Stringify<char[N]> (for string literals),
@@ -1159,7 +1133,7 @@ public:
   Stringify(const ustring::Stringify<char[N]>&) = delete;
   Stringify<ustring>& operator=(const ustring::Stringify<char[N]>&) = delete;
 
-  inline const ustring* ptr() const { return &string_; }
+  inline const ustring& ref() const { return string_; }
 };
 
 /** A template specialization for Stringify<const char[N]> (for string literals),
@@ -1179,7 +1153,7 @@ public:
   Stringify(const ustring::Stringify<const char[N]>&) = delete;
   Stringify<ustring>& operator=(const ustring::Stringify<const char[N]>&) = delete;
 
-  inline const ustring* ptr() const { return &string_; }
+  inline const ustring& ref() const { return string_; }
 };
 
 inline // static
@@ -1197,7 +1171,7 @@ inline // static
   static_assert(sizeof...(Ts) <= 9,
                 "ustring::compose only supports up to 9 placeholders.");
 
-  return compose_private(fmt, { Stringify<Ts>(args).ptr()... });
+  return compose_private(fmt, {&Stringify<Ts>(args).ref()...});
 }
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
