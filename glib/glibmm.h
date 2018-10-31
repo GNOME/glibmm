@@ -64,12 +64,12 @@
  *
  * If your  source file is @c program.cc, you can compile it with:
  * @code
- * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.58 giomm-2.58`
+ * g++ program.cc -o program  `pkg-config --cflags --libs glibmm-2.60 giomm-2.60`
  * @endcode
  *
  * Alternatively, if using autoconf, use the following in @c configure.ac:
  * @code
- * PKG_CHECK_MODULES([GLIBMM], [glibmm-2.58 giomm-2.58])
+ * PKG_CHECK_MODULES([GLIBMM], [glibmm-2.60 giomm-2.60])
  * @endcode
  * Then use the generated @c GLIBMM_CFLAGS and @c GLIBMM_LIBS variables in the
  * project Makefile.am files. For example:
