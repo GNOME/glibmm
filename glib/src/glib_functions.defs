@@ -971,6 +971,13 @@
     '("nushu" "G_UNICODE_SCRIPT_NUSHU")
     '("soyombo" "G_UNICODE_SCRIPT_SOYOMBO")
     '("zanabazar-square" "G_UNICODE_SCRIPT_ZANABAZAR_SQUARE")
+    '("dogra" "G_UNICODE_SCRIPT_DOGRA")
+    '("gunjala-gondi" "G_UNICODE_SCRIPT_GUNJALA_GONDI")
+    '("hanifi-rohingya" "G_UNICODE_SCRIPT_HANIFI_ROHINGYA")
+    '("makasar" "G_UNICODE_SCRIPT_MAKASAR")
+    '("medefaidrin" "G_UNICODE_SCRIPT_MEDEFAIDRIN")
+    '("old-sogdian" "G_UNICODE_SCRIPT_OLD_SOGDIAN")
+    '("sogdian" "G_UNICODE_SCRIPT_SOGDIAN")
   )
 )
 
@@ -1326,6 +1333,24 @@
 (define-method remove_index_fast
   (of-object "GPtrArray")
   (c-name "g_ptr_array_remove_index_fast")
+  (return-type "gpointer")
+  (parameters
+    '("guint" "index_")
+  )
+)
+
+(define-method steal_index
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_steal_index")
+  (return-type "gpointer")
+  (parameters
+    '("guint" "index_")
+  )
+)
+
+(define-method steal_index_fast
+  (of-object "GPtrArray")
+  (c-name "g_ptr_array_steal_index_fast")
   (return-type "gpointer")
   (parameters
     '("guint" "index_")
@@ -2990,7 +3015,7 @@
   (c-name "g_get_filename_charsets")
   (return-type "gboolean")
   (parameters
-    '("const-gchar***" "charsets")
+    '("const-gchar***" "filename_charsets")
   )
 )
 
@@ -3914,6 +3939,12 @@
   (return-type "GTimeSpan")
 )
 
+(define-method get_timezone
+  (of-object "GDateTime")
+  (c-name "g_date_time_get_timezone")
+  (return-type "GTimeZone*")
+)
+
 (define-method get_timezone_abbreviation
   (of-object "GDateTime")
   (c-name "g_date_time_get_timezone_abbreviation")
@@ -4387,6 +4418,15 @@
   )
 )
 
+(define-function g_canonicalize_filename
+  (c-name "g_canonicalize_filename")
+  (return-type "gchar*")
+  (parameters
+    '("const-gchar*" "filename")
+    '("const-gchar*" "relative_to")
+  )
+)
+
 
 
 ;; From ggettext.h
@@ -4531,6 +4571,17 @@
   (return-type "gboolean")
   (parameters
     '("gconstpointer" "key")
+  )
+)
+
+(define-method steal_extended
+  (of-object "GHashTable")
+  (c-name "g_hash_table_steal_extended")
+  (return-type "gboolean")
+  (parameters
+    '("gconstpointer" "lookup_key")
+    '("gpointer*" "stolen_key")
+    '("gpointer*" "stolen_value")
   )
 )
 
@@ -6107,10 +6158,6 @@
 
 
 
-;; From glibconfig.h
-
-
-
 ;; From glib.h
 
 
@@ -6139,6 +6186,11 @@
 
 (define-function g_thread_win32_init
   (c-name "g_thread_win32_init")
+  (return-type "none")
+)
+
+(define-function g_console_win32_init
+  (c-name "g_console_win32_init")
   (return-type "none")
 )
 
@@ -9103,6 +9155,238 @@
 
 
 
+;; From grcbox.h
+
+(define-function g_rc_box_alloc
+  (c-name "g_rc_box_alloc")
+  (return-type "gpointer")
+  (parameters
+    '("gsize" "block_size")
+  )
+)
+
+(define-function g_rc_box_alloc0
+  (c-name "g_rc_box_alloc0")
+  (return-type "gpointer")
+  (parameters
+    '("gsize" "block_size")
+  )
+)
+
+(define-function g_rc_box_dup
+  (c-name "g_rc_box_dup")
+  (return-type "gpointer")
+  (parameters
+    '("gsize" "block_size")
+    '("gconstpointer" "mem_block")
+  )
+)
+
+(define-function g_rc_box_acquire
+  (c-name "g_rc_box_acquire")
+  (return-type "gpointer")
+  (parameters
+    '("gpointer" "mem_block")
+  )
+)
+
+(define-function g_rc_box_release
+  (c-name "g_rc_box_release")
+  (return-type "none")
+  (parameters
+    '("gpointer" "mem_block")
+  )
+)
+
+(define-function g_rc_box_release_full
+  (c-name "g_rc_box_release_full")
+  (return-type "none")
+  (parameters
+    '("gpointer" "mem_block")
+    '("GDestroyNotify" "clear_func")
+  )
+)
+
+(define-function g_rc_box_get_size
+  (c-name "g_rc_box_get_size")
+  (return-type "gsize")
+  (parameters
+    '("gpointer" "mem_block")
+  )
+)
+
+(define-function g_atomic_rc_box_alloc
+  (c-name "g_atomic_rc_box_alloc")
+  (return-type "gpointer")
+  (parameters
+    '("gsize" "block_size")
+  )
+)
+
+(define-function g_atomic_rc_box_alloc0
+  (c-name "g_atomic_rc_box_alloc0")
+  (return-type "gpointer")
+  (parameters
+    '("gsize" "block_size")
+  )
+)
+
+(define-function g_atomic_rc_box_dup
+  (c-name "g_atomic_rc_box_dup")
+  (return-type "gpointer")
+  (parameters
+    '("gsize" "block_size")
+    '("gconstpointer" "mem_block")
+  )
+)
+
+(define-function g_atomic_rc_box_acquire
+  (c-name "g_atomic_rc_box_acquire")
+  (return-type "gpointer")
+  (parameters
+    '("gpointer" "mem_block")
+  )
+)
+
+(define-function g_atomic_rc_box_release
+  (c-name "g_atomic_rc_box_release")
+  (return-type "none")
+  (parameters
+    '("gpointer" "mem_block")
+  )
+)
+
+(define-function g_atomic_rc_box_release_full
+  (c-name "g_atomic_rc_box_release_full")
+  (return-type "none")
+  (parameters
+    '("gpointer" "mem_block")
+    '("GDestroyNotify" "clear_func")
+  )
+)
+
+(define-function g_atomic_rc_box_get_size
+  (c-name "g_atomic_rc_box_get_size")
+  (return-type "gsize")
+  (parameters
+    '("gpointer" "mem_block")
+  )
+)
+
+
+
+;; From grefcount.h
+
+(define-method init
+  (of-object "grefcount")
+  (c-name "g_ref_count_init")
+  (return-type "none")
+)
+
+(define-method inc
+  (of-object "grefcount")
+  (c-name "g_ref_count_inc")
+  (return-type "none")
+)
+
+(define-method dec
+  (of-object "grefcount")
+  (c-name "g_ref_count_dec")
+  (return-type "gboolean")
+)
+
+(define-method compare
+  (of-object "grefcount")
+  (c-name "g_ref_count_compare")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "val")
+  )
+)
+
+(define-method init
+  (of-object "gatomicrefcount")
+  (c-name "g_atomic_ref_count_init")
+  (return-type "none")
+)
+
+(define-method inc
+  (of-object "gatomicrefcount")
+  (c-name "g_atomic_ref_count_inc")
+  (return-type "none")
+)
+
+(define-method dec
+  (of-object "gatomicrefcount")
+  (c-name "g_atomic_ref_count_dec")
+  (return-type "gboolean")
+)
+
+(define-method compare
+  (of-object "gatomicrefcount")
+  (c-name "g_atomic_ref_count_compare")
+  (return-type "gboolean")
+  (parameters
+    '("gint" "val")
+  )
+)
+
+
+
+;; From grefstring.h
+
+(define-function g_ref_string_new
+  (c-name "g_ref_string_new")
+  (is-constructor-of "GRefString")
+  (return-type "char*")
+  (parameters
+    '("const-char*" "str")
+  )
+)
+
+(define-function g_ref_string_new_len
+  (c-name "g_ref_string_new_len")
+  (return-type "char*")
+  (parameters
+    '("const-char*" "str")
+    '("gssize" "len")
+  )
+)
+
+(define-function g_ref_string_new_intern
+  (c-name "g_ref_string_new_intern")
+  (return-type "char*")
+  (parameters
+    '("const-char*" "str")
+  )
+)
+
+(define-function g_ref_string_acquire
+  (c-name "g_ref_string_acquire")
+  (return-type "char*")
+  (parameters
+    '("char*" "str")
+  )
+)
+
+(define-function g_ref_string_release
+  (c-name "g_ref_string_release")
+  (return-type "none")
+  (parameters
+    '("char*" "str")
+  )
+)
+
+(define-function g_ref_string_length
+  (c-name "g_ref_string_length")
+  (return-type "gsize")
+  (parameters
+    '("char*" "str")
+  )
+)
+
+
+
 ;; From gregex.h
 
 (define-function g_regex_error_quark
@@ -10392,6 +10676,24 @@
     '("gint*" "standard_input")
     '("gint*" "standard_output")
     '("gint*" "standard_error")
+    '("GError**" "error")
+  )
+)
+
+(define-function g_spawn_async_with_fds
+  (c-name "g_spawn_async_with_fds")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "working_directory")
+    '("gchar**" "argv")
+    '("gchar**" "envp")
+    '("GSpawnFlags" "flags")
+    '("GSpawnChildSetupFunc" "child_setup")
+    '("gpointer" "user_data")
+    '("GPid*" "child_pid")
+    '("gint" "stdin_fd")
+    '("gint" "stdout_fd")
+    '("gint" "stderr_fd")
     '("GError**" "error")
   )
 )
@@ -12465,6 +12767,14 @@
   (return-type "GTimeZone*")
 )
 
+(define-function g_time_zone_new_offset
+  (c-name "g_time_zone_new_offset")
+  (return-type "GTimeZone*")
+  (parameters
+    '("gint32" "seconds")
+  )
+)
+
 (define-method ref
   (of-object "GTimeZone")
   (c-name "g_time_zone_ref")
@@ -12522,6 +12832,12 @@
   (parameters
     '("gint" "interval")
   )
+)
+
+(define-method get_identifier
+  (of-object "GTimeZone")
+  (c-name "g_time_zone_get_identifier")
+  (return-type "const-gchar*")
 )
 
 
@@ -13187,6 +13503,16 @@
   )
 )
 
+(define-function g_utf8_validate_len
+  (c-name "g_utf8_validate_len")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "str")
+    '("gsize" "max_len")
+    '("const-gchar**" "end")
+  )
+)
+
 (define-function g_utf8_strup
   (c-name "g_utf8_strup")
   (return-type "gchar*")
@@ -13545,6 +13871,10 @@
 
 
 
+;; From gvalgrind.h
+
+
+
 ;; From gvariant-core.h
 
 (define-function g_variant_new_from_children
@@ -13649,7 +13979,7 @@
   (c-name "g_variant_new_byte")
   (return-type "GVariant*")
   (parameters
-    '("guchar" "value")
+    '("guint8" "value")
   )
 )
 
@@ -13835,7 +14165,7 @@
 (define-method get_byte
   (of-object "GVariant")
   (c-name "g_variant_get_byte")
-  (return-type "guchar")
+  (return-type "guint8")
 )
 
 (define-method get_int16
@@ -14849,6 +15179,14 @@
   )
 )
 
+(define-function g_variant_type_string_get_depth_
+  (c-name "g_variant_type_string_get_depth_")
+  (return-type "gsize")
+  (parameters
+    '("const-gchar*" "type_string")
+  )
+)
+
 
 
 ;; From gvarianttypeinfo.h
@@ -14867,6 +15205,12 @@
     '("guint*" "alignment")
     '("gsize*" "size")
   )
+)
+
+(define-method query_depth
+  (of-object "GVariantTypeInfo")
+  (c-name "g_variant_type_info_query_depth")
+  (return-type "gsize")
 )
 
 (define-method element

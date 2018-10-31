@@ -1199,11 +1199,17 @@ Since: 2.54
 
 <signal name="GObject::notify">
 <description>
-The notify signal is emitted on an object when one of its
-properties has been changed. Note that getting this signal
-doesn't guarantee that the value of the property has actually
-changed, it may also be emitted when the setter for the property
-is called to reinstate the previous value.
+The notify signal is emitted on an object when one of its properties has
+its value set through g_object_set_property(), g_object_set(), et al.
+
+Note that getting this signal doesn’t itself guarantee that the value of
+the property has actually changed. When it is emitted is determined by the
+derived GObject class. If the implementor did not create the property with
+%G_PARAM_EXPLICIT_NOTIFY, then any call to g_object_set_property() results
+in ::notify being emitted, even if the new value is the same as the old.
+If they did pass %G_PARAM_EXPLICIT_NOTIFY, then this signal is emitted only
+when they explicitly call g_object_notify() or g_object_notify_by_pspec(),
+and common practice is to do that only when the value has actually changed.
 
 This signal is typically used to obtain change notification for a
 single property, by specifying the property name as a detail in the
@@ -1214,7 +1220,7 @@ G_CALLBACK (gtk_text_view_target_list_notify),
 text_view)
 ]|
 It is important to note that you must use
-[canonical][canonical-parameter-name] parameter names as
+[canonical parameter names][canonical-parameter-names] as
 detail strings for the notify signal.
 
 </description>
@@ -3502,6 +3508,34 @@ Old South Arabian. Since 2.26
 <parameter_description>     Zanabazar Square. Since: 2.54
 </parameter_description>
 </parameter>
+<parameter name="G_UNICODE_SCRIPT_DOGRA">
+<parameter_description>                Dogra. Since: 2.58
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_GUNJALA_GONDI">
+<parameter_description>        Gunjala Gondi. Since: 2.58
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_HANIFI_ROHINGYA">
+<parameter_description>      Hanifi Rohingya. Since: 2.58
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_MAKASAR">
+<parameter_description>              Makasar. Since: 2.58
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_MEDEFAIDRIN">
+<parameter_description>          Medefaidrin. Since: 2.58
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_OLD_SOGDIAN">
+<parameter_description>          Old Sogdian. Since: 2.58
+</parameter_description>
+</parameter>
+<parameter name="G_UNICODE_SCRIPT_SOGDIAN">
+<parameter_description>              Sogdian. Since: 2.58
+</parameter_description>
+</parameter>
 </parameters>
 </enum>
 
@@ -4024,15 +4058,15 @@ Adds @len elements onto the end of the array.
 <function name="g_array_free">
 <description>
 Frees the memory allocated for the #GArray. If @free_segment is
-%TRUE it frees the memory block holding the elements as well and
-also each element if @array has a @element_free_func set. Pass
+%TRUE it frees the memory block holding the elements as well. Pass
 %FALSE if you want to free the #GArray wrapper but preserve the
-underlying array for use elsewhere. If the reference count of @array
-is greater than one, the #GArray wrapper is preserved but the size
-of @array will be set to zero.
+underlying array for use elsewhere. If the reference count of
+@array is greater than one, the #GArray wrapper is preserved but
+the size of  @array will be set to zero.
 
-If array elements contain dynamically-allocated memory, they should
-be freed separately.
+If array contents point to dynamically-allocated memory, they should
+be freed separately if @free_seg is %TRUE and no @clear_func
+function has been set for @array.
 
 This function is not thread-safe. If using a #GArray from multiple
 threads, use only the atomic g_array_ref() and g_array_unref()
@@ -4138,6 +4172,14 @@ such as &quot;27&quot;. You must use variables.
 <description>
 Inserts @len elements into a #GArray at the given index.
 
+If @index_ is greater than the array’s current length, the array is expanded.
+The elements between the old end of the array and the newly inserted elements
+will be initialised to zero if the array was configured to clear elements;
+otherwise their values will be undefined.
+
+@data may be %NULL if (and only if) @len is zero. If @len is zero, this
+function is a no-op.
+
 
 </description>
 <parameters>
@@ -4221,6 +4263,9 @@ such as &quot;27&quot;. You must use variables.
 <description>
 Adds @len elements onto the start of the array.
 
+@data may be %NULL if (and only if) @len is zero. If @len is zero, this
+function is a no-op.
+
 This operation is slower than g_array_append_vals() since the
 existing elements in the array have to be moved to make space for
 the new elements.
@@ -4237,7 +4282,7 @@ the new elements.
 </parameter_description>
 </parameter>
 <parameter name="len">
-<parameter_description> the number of elements to prepend
+<parameter_description> the number of elements to prepend, which may be zero
 </parameter_description>
 </parameter>
 </parameters>
@@ -5262,7 +5307,10 @@ an error message is logged and the application is terminated.
 
 The macro can be turned off in final releases of code by defining
 `G_DISABLE_ASSERT` when compiling the application, so code must
-not depend on any side effects from @expr.
+not depend on any side effects from @expr. Similarly, it must not be used
+in unit tests, otherwise the unit tests will be ineffective if compiled with
+`G_DISABLE_ASSERT`. Use g_assert_true() and related macros in unit tests
+instead.
 
 </description>
 <parameters>
@@ -5298,6 +5346,36 @@ One of ==, !=, &lt;, &gt;, &lt;=, &gt;=.
 </parameter>
 <parameter name="n2">
 <parameter_description> another floating point number
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_assert_cmpfloat_with_epsilon">
+<description>
+Debugging macro to compare two floating point numbers within an epsilon.
+
+The effect of `g_assert_cmpfloat_with_epsilon (n1, n2, epsilon)` is
+the same as `g_assert_true (abs (n1 - n2) &lt; epsilon)`. The advantage
+of this macro is that it can produce a message that includes the
+actual values of @n1 and @n2.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="n1">
+<parameter_description> an floating point number
+</parameter_description>
+</parameter>
+<parameter name="n2">
+<parameter_description> another floating point number
+</parameter_description>
+</parameter>
+<parameter name="epsilon">
+<parameter_description> a numeric value that expresses the expected tolerance
+between @n1 and @n2
 </parameter_description>
 </parameter>
 </parameters>
@@ -5511,6 +5589,10 @@ If the assertion fails (i.e. the expression is not false),
 an error message is logged and the application is either
 terminated or the testcase marked as failed.
 
+Note that unlike g_assert(), this macro is unaffected by whether
+`G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
+conversely, g_assert() should not be used in tests.
+
 See g_test_set_nonfatal_assertions().
 
 Since: 2.38
@@ -5554,6 +5636,10 @@ If the assertion fails (i.e. the expression is %NULL),
 an error message is logged and the application is either
 terminated or the testcase marked as failed.
 
+Note that unlike g_assert(), this macro is unaffected by whether
+`G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
+conversely, g_assert() should not be used in tests.
+
 See g_test_set_nonfatal_assertions().
 
 Since: 2.40
@@ -5575,7 +5661,8 @@ reached. If it is reached, an error message is logged and the
 application is terminated.
 
 The macro can be turned off in final releases of code by defining
-`G_DISABLE_ASSERT` when compiling the application.
+`G_DISABLE_ASSERT` when compiling the application. Hence, it should not be
+used in unit tests, where assertions should always be effective.
 
 </description>
 <parameters>
@@ -5590,6 +5677,10 @@ Debugging macro to check an expression is %NULL.
 If the assertion fails (i.e. the expression is not %NULL),
 an error message is logged and the application is either
 terminated or the testcase marked as failed.
+
+Note that unlike g_assert(), this macro is unaffected by whether
+`G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
+conversely, g_assert() should not be used in tests.
 
 See g_test_set_nonfatal_assertions().
 
@@ -5612,6 +5703,10 @@ Debugging macro to check that an expression is true.
 If the assertion fails (i.e. the expression is not true),
 an error message is logged and the application is either
 terminated or the testcase marked as failed.
+
+Note that unlike g_assert(), this macro is unaffected by whether
+`G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
+conversely, g_assert() should not be used in tests.
 
 See g_test_set_nonfatal_assertions().
 
@@ -6816,6 +6911,279 @@ Since: 2.30
 </return>
 </function>
 
+<function name="g_atomic_rc_box_acquire">
+<description>
+Atomically acquires a reference on the data pointed by @mem_block.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="mem_block">
+<parameter_description> a pointer to reference counted data
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the data,
+with its reference count increased
+
+</return>
+</function>
+
+<function name="g_atomic_rc_box_alloc">
+<description>
+Allocates @block_size bytes of memory, and adds atomic
+reference counting semantics to it.
+
+The data will be freed when its reference count drops to
+zero.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="block_size">
+<parameter_description> the size of the allocation, must be greater than 0
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the allocated memory
+
+</return>
+</function>
+
+<function name="g_atomic_rc_box_alloc0">
+<description>
+Allocates @block_size bytes of memory, and adds atomic
+referenc counting semantics to it.
+
+The contents of the returned data is set to zero.
+
+The data will be freed when its reference count drops to
+zero.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="block_size">
+<parameter_description> the size of the allocation, must be greater than 0
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the allocated memory
+
+</return>
+</function>
+
+<function name="g_atomic_rc_box_dup">
+<description>
+Allocates a new block of data with atomit reference counting
+semantics, and copies @block_size bytes of @mem_block
+into it.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="block_size">
+<parameter_description> the number of bytes to copy, must be greater than 0
+</parameter_description>
+</parameter>
+<parameter name="mem_block">
+<parameter_description> the memory to copy
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the allocated
+memory
+
+</return>
+</function>
+
+<function name="g_atomic_rc_box_get_size">
+<description>
+Retrieves the size of the reference counted data pointed by @mem_block.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="mem_block">
+<parameter_description> a pointer to reference counted data
+</parameter_description>
+</parameter>
+</parameters>
+<return> the size of the data, in bytes
+
+</return>
+</function>
+
+<function name="g_atomic_rc_box_new">
+<description>
+A convenience macro to allocate atomically reference counted
+data with the size of the given @type.
+
+This macro calls g_atomic_rc_box_alloc() with `sizeof (@type)` and
+casts the returned pointer to a pointer of the given @type,
+avoiding a type cast in the source code.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> the type to allocate, typically a structure name
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the allocated
+memory, cast to a pointer for the given @type
+
+</return>
+</function>
+
+<function name="g_atomic_rc_box_new0">
+<description>
+A convenience macro to allocate atomically reference counted
+data with the size of the given @type, and set its contents
+to zero.
+
+This macro calls g_atomic_rc_box_alloc0() with `sizeof (@type)` and
+casts the returned pointer to a pointer of the given @type,
+avoiding a type cast in the source code.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> the type to allocate, typically a structure name
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the allocated
+memory, cast to a pointer for the given @type
+
+</return>
+</function>
+
+<function name="g_atomic_rc_box_release">
+<description>
+Atomically releases a reference on the data pointed by @mem_block.
+
+If the reference was the last one, it will free the
+resources allocated for @mem_block.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="mem_block">
+<parameter_description> a pointer to reference counted data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_atomic_rc_box_release_full">
+<description>
+Atomically releases a reference on the data pointed by @mem_block.
+
+If the reference was the last one, it will call @clear_func
+to clear the contents of @mem_block, and then will free the
+resources allocated for @mem_block.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="mem_block">
+<parameter_description> a pointer to reference counted data
+</parameter_description>
+</parameter>
+<parameter name="clear_func">
+<parameter_description> a function to call when clearing the data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_atomic_ref_count_compare">
+<description>
+Atomically compares the current value of @arc with @val.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="arc">
+<parameter_description> the address of an atomic reference count variable
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> the value to compare
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the reference count is the same
+as the given value
+
+</return>
+</function>
+
+<function name="g_atomic_ref_count_dec">
+<description>
+Atomically decreases the reference count.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="arc">
+<parameter_description> the address of an atomic reference count variable
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the reference count reached 0, and %FALSE otherwise
+
+</return>
+</function>
+
+<function name="g_atomic_ref_count_inc">
+<description>
+Atomically increases the reference count.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="arc">
+<parameter_description> the address of an atomic reference count variable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_atomic_ref_count_init">
+<description>
+Atomically initializes a reference count variable.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="arc">
+<parameter_description> the address of an atomic reference count variable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_auto">
 <description>
 Helper to declare a variable with automatic cleanup.
@@ -7680,8 +8048,8 @@ Since: 2.12
 
 <function name="g_bookmark_file_get_app_info">
 <description>
-Gets the registration informations of @app_name for the bookmark for
-@uri.  See g_bookmark_file_set_app_info() for more informations about
+Gets the registration information of @app_name for the bookmark for
+@uri.  See g_bookmark_file_set_app_info() for more information about
 the returned data.
 
 The string returned in @app_exec must be freed.
@@ -8196,7 +8564,7 @@ loaded in memory
 This function looks for a desktop bookmark file named @file in the
 paths returned from g_get_user_data_dir() and g_get_system_data_dirs(), 
 loads the file into @bookmark and returns the file's full path in 
-@full_path.  If the file could not be loaded then an %error is
+@full_path.  If the file could not be loaded then @error is
 set to either a #GFileError or #GBookmarkFileError.
 
 Since: 2.12
@@ -9352,7 +9720,13 @@ Since: 2.22
 <description>
 Compares the two #GBytes values.
 
-This function can be used to sort GBytes instances in lexographical order.
+This function can be used to sort GBytes instances in lexicographical order.
+
+If @bytes1 and @bytes2 have different length but the shorter one is a
+prefix of the longer one then the shorter one is considered to be less than
+the longer one. Otherwise the first byte where both differ is used for
+comparison. If @bytes1 has a smaller value at that position it is
+considered less, otherwise greater than @bytes2.
 
 Since: 2.32
 
@@ -9367,8 +9741,10 @@ Since: 2.32
 </parameter_description>
 </parameter>
 </parameters>
-<return> a negative value if bytes2 is lesser, a positive value if bytes2 is
-greater, and zero if bytes2 is equal to bytes1
+<return> a negative value if @bytes1 is less than @bytes2, a positive value
+if @bytes1 is greater than @bytes2, and zero if @bytes1 is equal to
+@bytes2
+
 
 </return>
 </function>
@@ -9892,6 +10268,42 @@ data structures to @func; use g_cache_key_foreach() instead
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_canonicalize_filename">
+<description>
+Gets the canonical file name from @filename. All triple slashes are turned into
+single slashes, and all `..` and `.`s resolved against @relative_to.
+
+Symlinks are not followed, and the returned path is guaranteed to be absolute.
+
+If @filename is an absolute path, @relative_to is ignored. Otherwise,
+@relative_to will be prepended to @filename to make it absolute. @relative_to
+must be an absolute path, or %NULL. If @relative_to is %NULL, it'll fallback
+to g_get_current_dir().
+
+This function never fails, and will canonicalize file paths even if they don't
+exist.
+
+No file system I/O is done.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="filename">
+<parameter_description> the name of the file
+</parameter_description>
+</parameter>
+<parameter name="relative_to">
+<parameter_description> the relative directory, or %NULL
+to use the current working directory
+</parameter_description>
+</parameter>
+</parameters>
+<return> a newly allocated string with the
+canonical file path
+</return>
 </function>
 
 <function name="g_cclosure_marshal_BOOLEAN__BOXED_BOXED">
@@ -11825,6 +12237,8 @@ g_closure_set_meta_marshal()
 Creates a new closure which invokes @callback_func with @user_data as
 the last parameter.
 
+@destroy_data will be called as a finalize notifier on the #GClosure.
+
 
 </description>
 <parameters>
@@ -11897,6 +12311,8 @@ after the object is is freed.
 <description>
 Creates a new closure which invokes @callback_func with @user_data as
 the first parameter.
+
+@destroy_data will be called as a finalize notifier on the #GClosure.
 
 
 </description>
@@ -12391,7 +12807,11 @@ Otherwise, the variable is destroyed using @destroy and the
 pointer is set to %NULL.
 
 A macro is also included that allows this function to be used without
-pointer casts.
+pointer casts. This will mask any warnings about incompatible function types
+or calling conventions, so you must ensure that your @destroy function is
+compatible with being called as `GDestroyNotify` using the standard calling
+convention for the platform that GLib was compiled for; otherwise the program
+will experience undefined behaviour.
 
 Since: 2.34
 
@@ -12570,7 +12990,7 @@ been invalidated before).
 </description>
 <parameters>
 <parameter name="closure">
-<parameter_description> GClosure to invalidate
+<parameter_description> #GClosure to invalidate
 </parameter_description>
 </parameter>
 </parameters>
@@ -13788,19 +14208,24 @@ from creat().
 <function name="g_critical">
 <description>
 Logs a &quot;critical warning&quot; (#G_LOG_LEVEL_CRITICAL).
-It's more or less application-defined what constitutes
-a critical vs. a regular warning. You could call
-g_log_set_always_fatal() to make critical warnings exit
-the program, then use g_critical() for fatal errors, for
-example.
 
-You can also make critical warnings fatal at runtime by
+Critical warnings are intended to be used in the event of an error
+that originated in the current process (a programmer error).
+Logging of a critical error is by definition an indication of a bug
+somewhere in the current program (or its libraries).
+
+g_return_if_fail(), g_return_val_if_fail(), g_return_if_reached() and
+g_return_val_if_reached() log at %G_LOG_LEVEL_CRITICAL.
+
+You can make critical warnings fatal at runtime by
 setting the `G_DEBUG` environment variable (see
 [Running GLib Applications](glib-running.html)):
 
 |[
 G_DEBUG=fatal-warnings gdb ./my-program
 ]|
+
+You can also use g_log_set_always_fatal().
 
 Any unrelated failures can be skipped over in
 [gdb](https://www.gnu.org/software/gdb/) using the `continue` command.
@@ -15243,7 +15668,10 @@ the user's current timezone.
 
 To set the value of a date to the current day, you could write:
 |[&lt;!-- language=&quot;C&quot; --&gt;
-g_date_set_time_t (date, time (NULL)); 
+time_t now = time (NULL);
+if (now == (time_t) -1)
+// handle the error
+g_date_set_time_t (date, now);
 ]|
 
 Since: 2.10
@@ -16008,6 +16436,23 @@ Since: 2.26
 </parameters>
 <return> the number of seconds
 
+</return>
+</function>
+
+<function name="g_date_time_get_timezone">
+<description>
+Get the time zone for this @datetime.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="datetime">
+<parameter_description> a #GDateTime
+</parameter_description>
+</parameter>
+</parameters>
+<return> the time zone
 </return>
 </function>
 
@@ -17651,8 +18096,8 @@ This is not intended for end user error reporting. Use of #GError is
 preferred for that instead, as it allows calling functions to perform actions
 conditional on the type of error.
 
-Error messages are always fatal, resulting in a call to
-abort() to terminate the application. This function will
+Error messages are always fatal, resulting in a call to G_BREAKPOINT()
+to terminate the application. This function will
 result in a core dump; don't use it for errors you expect.
 Using this function indicates a bug in your program, i.e.
 an assertion failure.
@@ -17968,6 +18413,17 @@ file which is then renamed to the final name. Notes:
 Also since the file is recreated, existing permissions, access control
 lists, metadata etc. may be lost. If @filename is a symbolic link,
 the link itself will be replaced, not the linked file.
+
+- On UNIX, if @filename already exists and is non-empty, and if the system
+supports it (via a journalling filesystem or equivalent), the fsync()
+call (or equivalent) will be used to ensure atomic replacement: @filename
+will contain either its old contents or @contents, even in the face of
+system power loss, the disk being unsafely removed, etc.
+
+- On UNIX, if @filename does not already exist or is empty, there is a
+possibility that system power loss etc. after calling this function will
+leave @filename empty or full of NUL bytes, depending on the underlying
+filesystem.
 
 - On Windows renaming a file will not remove an existing file with the
 new name, so on Windows there is a race condition between the existing
@@ -18954,8 +19410,9 @@ Since: 2.58
 </parameter_description>
 </parameter>
 </parameters>
-<return> a %NULL-terminated array of strings owned by GLib
-that must not be modified or freed.
+<return> a %NULL-terminated array of strings owned by
+the thread g_get_language_names_with_category was called from.
+It must not be modified or freed. It must be copied if planned to be used in another thread.
 
 </return>
 </function>
@@ -20151,6 +20608,46 @@ Since: 2.12
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_hash_table_steal_extended">
+<description>
+Looks up a key in the #GHashTable, stealing the original key and the
+associated value and returning %TRUE if the key was found. If the key was
+not found, %FALSE is returned.
+
+If found, the stolen key and value are removed from the hash table without
+calling the key and value destroy functions, and ownership is transferred to
+the caller of this method; as with g_hash_table_steal().
+
+You can pass %NULL for @lookup_key, provided the hash and equal functions
+of @hash_table are %NULL-safe.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="hash_table">
+<parameter_description> a #GHashTable
+</parameter_description>
+</parameter>
+<parameter name="lookup_key">
+<parameter_description> the key to look up
+</parameter_description>
+</parameter>
+<parameter name="stolen_key">
+<parameter_description> return location for the
+original key
+</parameter_description>
+</parameter>
+<parameter name="stolen_value">
+<parameter_description> return location
+for the value associated with the key
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the key was found in the #GHashTable
+</return>
 </function>
 
 <function name="g_hash_table_thaw">
@@ -24236,8 +24733,10 @@ a copy of each list element, in addition to copying the list
 container itself.
 
 @func, as a #GCopyFunc, takes two arguments, the data to be copied
-and a @user_data pointer. It's safe to pass %NULL as user_data,
-if the copy function takes only one argument.
+and a @user_data pointer. On common processor architectures, it's safe to
+pass %NULL as @user_data if the copy function takes only one argument. You
+may get compiler warnings from this though if compiling with GCC’s
+`-Wcast-function-type` warning.
 
 For instance, if @list holds a list of GObjects, you can do:
 |[&lt;!-- language=&quot;C&quot; --&gt;   
@@ -25082,8 +25581,9 @@ errors. Any of the errors in #GConvertError may occur.
 <description>
 Logs an error or debugging message.
 
-If the log level has been set as fatal, the abort()
-function is called to terminate the program.
+If the log level has been set as fatal, G_BREAKPOINT() is called
+to terminate the program. See the documentation for G_BREAKPOINT() for
+details of the debugging options this provides.
 
 If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
@@ -25122,7 +25622,7 @@ The default log handler set up by GLib; g_log_set_default_handler()
 allows to install an alternate default log handler.
 This is used if no log handler has been set for the particular log
 domain and log level combination. It outputs the message to stderr
-or stdout and if the log level is fatal it calls abort(). It automatically
+or stdout and if the log level is fatal it calls G_BREAKPOINT(). It automatically
 prints a new-line character after the message, so one does not need to be
 manually included in @message.
 
@@ -25259,6 +25759,11 @@ g_log_structured_array()). To change the fatal behaviour for specific log
 messages, programs must install a custom log writer function using
 g_log_set_writer_func(). See
 [Using Structured Logging][using-structured-logging].
+
+This function is mostly intended to be used with
+%G_LOG_LEVEL_CRITICAL.  You should typically not set
+%G_LOG_LEVEL_WARNING, %G_LOG_LEVEL_MESSAGE, %G_LOG_LEVEL_INFO or
+%G_LOG_LEVEL_DEBUG as fatal except inside of test programs.
 
 
 </description>
@@ -25416,7 +25921,7 @@ finished with, if non-%NULL
 Log a message with structured data. The message will be passed through to
 the log writer set by the application using g_log_set_writer_func(). If the
 message is fatal (i.e. its log level is %G_LOG_LEVEL_ERROR), the program will
-be aborted at the end of this function. If the log writer returns
+be aborted by calling G_BREAKPOINT() at the end of this function. If the log writer returns
 %G_LOG_WRITER_UNHANDLED (failure), no other fallback writers will be tried.
 See the documentation for #GLogWriterFunc for information on chaining
 writers.
@@ -25803,8 +26308,9 @@ Since: 2.50
 <description>
 Logs an error or debugging message.
 
-If the log level has been set as fatal, the abort()
-function is called to terminate the program.
+If the log level has been set as fatal, G_BREAKPOINT() is called
+to terminate the program. See the documentation for G_BREAKPOINT() for
+details of the debugging options this provides.
 
 If g_log_default_handler() is used as the log handler function, a new-line
 character will automatically be appended to @..., and need not be entered
@@ -26517,10 +27023,11 @@ the result is zero, free the context and free all associated memory.
 <description>
 Tries to become the owner of the specified context,
 as with g_main_context_acquire(). But if another thread
-is the owner, atomically drop @mutex and wait on @cond until 
+is the owner, atomically drop @mutex and wait on @cond until
 that owner releases ownership or until @cond is signaled, then
 try again (once) to become the owner.
 
+Deprecated: 2.58: Use g_main_context_is_owner() and separate locking instead.
 
 </description>
 <parameters>
@@ -31590,11 +32097,11 @@ use this @object as closure data.
 </description>
 <parameters>
 <parameter name="object">
-<parameter_description> GObject restricting lifetime of @closure
+<parameter_description> #GObject restricting lifetime of @closure
 </parameter_description>
 </parameter>
 <parameter name="closure">
-<parameter_description> GClosure to watch
+<parameter_description> #GClosure to watch
 </parameter_description>
 </parameter>
 </parameters>
@@ -32561,7 +33068,7 @@ Since: 2.44
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #GoptionGroup
+<return> a #GOptionGroup
 
 </return>
 </function>
@@ -34258,7 +34765,9 @@ component of the filename
 
 <function name="g_path_get_dirname">
 <description>
-Gets the directory components of a file name.
+Gets the directory components of a file name. For example, the directory
+component of `/usr/bin/test` is `/usr/bin`. The directory component of `/`
+is `/`.
 
 If the file name has no directory components &quot;.&quot; is returned.
 The returned string should be freed when no longer needed.
@@ -35221,7 +35730,8 @@ pointer was not found.
 Removes the pointer at the given index from the pointer array.
 The following elements are moved down one place. If @array has
 a non-%NULL #GDestroyNotify function it is called for the removed
-element.
+element. If so, the return value from this function will potentially point
+to freed memory (depending on the #GDestroyNotify implementation).
 
 
 </description>
@@ -35245,7 +35755,9 @@ Removes the pointer at the given index from the pointer array.
 The last element in the array is used to fill in the space, so
 this function does not preserve the order of the array. But it
 is faster than g_ptr_array_remove_index(). If @array has a non-%NULL
-#GDestroyNotify function it is called for the removed element.
+#GDestroyNotify function it is called for the removed element. If so, the
+return value from this function will potentially point to freed memory
+(depending on the #GDestroyNotify implementation).
 
 
 </description>
@@ -35409,6 +35921,56 @@ This is guaranteed to be a stable sort since version 2.32.
 </parameter>
 </parameters>
 <return></return>
+</function>
+
+<function name="g_ptr_array_steal_index">
+<description>
+Removes the pointer at the given index from the pointer array.
+The following elements are moved down one place. The #GDestroyNotify for
+@array is *not* called on the removed element; ownership is transferred to
+the caller of this function.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a #GPtrArray
+</parameter_description>
+</parameter>
+<parameter name="index_">
+<parameter_description> the index of the pointer to steal
+</parameter_description>
+</parameter>
+</parameters>
+<return> the pointer which was removed
+</return>
+</function>
+
+<function name="g_ptr_array_steal_index_fast">
+<description>
+Removes the pointer at the given index from the pointer array.
+The last element in the array is used to fill in the space, so
+this function does not preserve the order of the array. But it
+is faster than g_ptr_array_steal_index(). The #GDestroyNotify for @array is
+*not* called on the removed element; ownership is transferred to the caller
+of this function.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="array">
+<parameter_description> a #GPtrArray
+</parameter_description>
+</parameter>
+<parameter name="index_">
+<parameter_description> the index of the pointer to steal
+</parameter_description>
+</parameter>
+</parameters>
+<return> the pointer which was removed
+</return>
 </function>
 
 <function name="g_ptr_array_unref">
@@ -36720,6 +37282,205 @@ by the g_random_* functions, to @seed.
 <return></return>
 </function>
 
+<function name="g_rc_box_acquire">
+<description>
+Acquires a reference on the data pointed by @mem_block.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="mem_block">
+<parameter_description> a pointer to reference counted data
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the data,
+with its reference count increased
+
+</return>
+</function>
+
+<function name="g_rc_box_alloc">
+<description>
+Allocates @block_size bytes of memory, and adds reference
+counting semantics to it.
+
+The data will be freed when its reference count drops to
+zero.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="block_size">
+<parameter_description> the size of the allocation, must be greater than 0
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the allocated memory
+
+</return>
+</function>
+
+<function name="g_rc_box_alloc0">
+<description>
+Allocates @block_size bytes of memory, and adds reference
+counting semantics to it.
+
+The contents of the returned data is set to zero.
+
+The data will be freed when its reference count drops to
+zero.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="block_size">
+<parameter_description> the size of the allocation, must be greater than 0
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the allocated memory
+
+</return>
+</function>
+
+<function name="g_rc_box_dup">
+<description>
+Allocates a new block of data with reference counting
+semantics, and copies @block_size bytes of @mem_block
+into it.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="block_size">
+<parameter_description> the number of bytes to copy, must be greater than 0
+</parameter_description>
+</parameter>
+<parameter name="mem_block">
+<parameter_description> the memory to copy
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the allocated
+memory
+
+</return>
+</function>
+
+<function name="g_rc_box_get_size">
+<description>
+Retrieves the size of the reference counted data pointed by @mem_block.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="mem_block">
+<parameter_description> a pointer to reference counted data
+</parameter_description>
+</parameter>
+</parameters>
+<return> the size of the data, in bytes
+
+</return>
+</function>
+
+<function name="g_rc_box_new">
+<description>
+A convenience macro to allocate reference counted data with
+the size of the given @type.
+
+This macro calls g_rc_box_alloc() with `sizeof (@type)` and
+casts the returned pointer to a pointer of the given @type,
+avoiding a type cast in the source code.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> the type to allocate, typically a structure name
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the
+allocated memory, cast to a pointer for the given @type
+
+</return>
+</function>
+
+<function name="g_rc_box_new0">
+<description>
+A convenience macro to allocate reference counted data with
+the size of the given @type, and set its contents to zero.
+
+This macro calls g_rc_box_alloc0() with `sizeof (@type)` and
+casts the returned pointer to a pointer of the given @type,
+avoiding a type cast in the source code.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="type">
+<parameter_description> the type to allocate, typically a structure name
+</parameter_description>
+</parameter>
+</parameters>
+<return> a pointer to the
+allocated memory, cast to a pointer for the given @type
+
+</return>
+</function>
+
+<function name="g_rc_box_release">
+<description>
+Releases a reference on the data pointed by @mem_block.
+
+If the reference was the last one, it will free the
+resources allocated for @mem_block.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="mem_block">
+<parameter_description> a pointer to reference counted data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_rc_box_release_full">
+<description>
+Releases a reference on the data pointed by @mem_block.
+
+If the reference was the last one, it will call @clear_func
+to clear the contents of @mem_block, and then will free the
+resources allocated for @mem_block.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="mem_block">
+<parameter_description> a pointer to reference counted data
+</parameter_description>
+</parameter>
+<parameter name="clear_func">
+<parameter_description> a function to call when clearing the data
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_realloc">
 <description>
 Reallocates the memory pointed to by @mem, so that it now has space for
@@ -36896,6 +37657,201 @@ Since: 2.32
 <return></return>
 </function>
 
+<function name="g_ref_count_compare">
+<description>
+Compares the current value of @rc with @val.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="rc">
+<parameter_description> the address of a reference count variable
+</parameter_description>
+</parameter>
+<parameter name="val">
+<parameter_description> the value to compare
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the reference count is the same
+as the given value
+
+</return>
+</function>
+
+<function name="g_ref_count_dec">
+<description>
+Decreases the reference count.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="rc">
+<parameter_description> the address of a reference count variable
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the reference count reached 0, and %FALSE otherwise
+
+</return>
+</function>
+
+<function name="g_ref_count_inc">
+<description>
+Increases the reference count.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="rc">
+<parameter_description> the address of a reference count variable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_ref_count_init">
+<description>
+Initializes a reference count variable.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="rc">
+<parameter_description> the address of a reference count variable
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
+<function name="g_ref_string_acquire">
+<description>
+Acquires a reference on a string.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a reference counted string
+</parameter_description>
+</parameter>
+</parameters>
+<return> the given string, with its reference count increased
+
+</return>
+</function>
+
+<function name="g_ref_string_length">
+<description>
+Retrieves the length of @str.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a reference counted string
+</parameter_description>
+</parameter>
+</parameters>
+<return> the length of the given string, in bytes
+
+</return>
+</function>
+
+<function name="g_ref_string_new">
+<description>
+Creates a new reference counted string and copies the contents of @str
+into it.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a NUL-terminated string
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created reference counted string
+
+</return>
+</function>
+
+<function name="g_ref_string_new_intern">
+<description>
+Creates a new reference counted string and copies the content of @str
+into it.
+
+If you call this function multiple times with the same @str, or with
+the same contents of @str, it will return a new reference, instead of
+creating a new string.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a NUL-terminated string
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created reference
+counted string, or a new reference to an existing string
+
+</return>
+</function>
+
+<function name="g_ref_string_new_len">
+<description>
+Creates a new reference counted string and copies the contents of @str
+into it, up to @len bytes.
+
+Since this function does not stop at nul bytes, it is the caller's
+responsibility to ensure that @str has at least @len addressable bytes.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a string
+</parameter_description>
+</parameter>
+<parameter name="len">
+<parameter_description> length of @str to use, or -1 if @str is nul-terminated
+</parameter_description>
+</parameter>
+</parameters>
+<return> the newly created reference counted string
+
+</return>
+</function>
+
+<function name="g_ref_string_release">
+<description>
+Releases a reference on a string; if it was the last reference, the
+resources allocated by the string are freed as well.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a reference counted string
+</parameter_description>
+</parameter>
+</parameters>
+<return></return>
+</function>
+
 <function name="g_regex_check_replacement">
 <description>
 Checks whether @replacement is a valid replacement string
@@ -36976,7 +37932,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="length">
-<parameter_description> the length of @string, or -1 if @string is nul-terminated
+<parameter_description> the length of @string, in bytes, or -1 if @string is nul-terminated
 </parameter_description>
 </parameter>
 </parameters>
@@ -37145,10 +38101,12 @@ does not exists
 
 <function name="g_regex_match">
 <description>
-Scans for a match in string for the pattern in @regex.
+Scans for a match in @string for the pattern in @regex.
 The @match_options are combined with the match options specified
 when the @regex structure was created, letting you have more
 flexibility in reusing #GRegex structures.
+
+Unless %G_REGEX_RAW is specified in the options, @string must be valid UTF-8.
 
 A #GMatchInfo structure, used to get information on the match,
 is stored in @match_info if not %NULL. Note that if @match_info
@@ -37258,7 +38216,7 @@ the #GMatchInfo, or %NULL if you do not need it
 <function name="g_regex_match_all_full">
 <description>
 Using the standard algorithm for regular expression matching only
-the longest match in the string is retrieved, it is not possible
+the longest match in the @string is retrieved, it is not possible
 to obtain all the available matches. For instance matching
 &quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot; against the pattern &quot;&lt;.*&gt;&quot;
 you get &quot;&lt;a&gt; &lt;b&gt; &lt;c&gt;&quot;.
@@ -37284,6 +38242,8 @@ Setting @start_position differs from just passing over a shortened
 string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
 
+Unless %G_REGEX_RAW is specified in the options, @string must be valid UTF-8.
+
 A #GMatchInfo structure, used to get information on the match, is
 stored in @match_info if not %NULL. Note that if @match_info is
 not %NULL then it is created even if the function returns %FALSE,
@@ -37307,7 +38267,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="string_len">
-<parameter_description> the length of @string, or -1 if @string is nul-terminated
+<parameter_description> the length of @string, in bytes, or -1 if @string is nul-terminated
 </parameter_description>
 </parameter>
 <parameter name="start_position">
@@ -37335,7 +38295,7 @@ the #GMatchInfo, or %NULL if you do not need it
 
 <function name="g_regex_match_full">
 <description>
-Scans for a match in string for the pattern in @regex.
+Scans for a match in @string for the pattern in @regex.
 The @match_options are combined with the match options specified
 when the @regex structure was created, letting you have more
 flexibility in reusing #GRegex structures.
@@ -37343,6 +38303,8 @@ flexibility in reusing #GRegex structures.
 Setting @start_position differs from just passing over a shortened
 string and setting #G_REGEX_MATCH_NOTBOL in the case of a pattern
 that begins with any kind of lookbehind assertion, such as &quot;\b&quot;.
+
+Unless %G_REGEX_RAW is specified in the options, @string must be valid UTF-8.
 
 A #GMatchInfo structure, used to get information on the match, is
 stored in @match_info if not %NULL. Note that if @match_info is
@@ -37398,7 +38360,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="string_len">
-<parameter_description> the length of @string, or -1 if @string is nul-terminated
+<parameter_description> the length of @string, in bytes, or -1 if @string is nul-terminated
 </parameter_description>
 </parameter>
 <parameter name="start_position">
@@ -37555,7 +38517,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="string_len">
-<parameter_description> the length of @string, or -1 if @string is nul-terminated
+<parameter_description> the length of @string, in bytes, or -1 if @string is nul-terminated
 </parameter_description>
 </parameter>
 <parameter name="start_position">
@@ -37641,7 +38603,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="string_len">
-<parameter_description> the length of @string, or -1 if @string is nul-terminated
+<parameter_description> the length of @string, in bytes, or -1 if @string is nul-terminated
 </parameter_description>
 </parameter>
 <parameter name="start_position">
@@ -37694,7 +38656,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="string_len">
-<parameter_description> the length of @string, or -1 if @string is nul-terminated
+<parameter_description> the length of @string, in bytes, or -1 if @string is nul-terminated
 </parameter_description>
 </parameter>
 <parameter name="start_position">
@@ -37799,7 +38761,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="string_len">
-<parameter_description> the length of @string, or -1 if @string is nul-terminated
+<parameter_description> the length of @string, in bytes, or -1 if @string is nul-terminated
 </parameter_description>
 </parameter>
 <parameter name="start_position">
@@ -39333,14 +40295,14 @@ Since: 2.14
 
 <function name="g_sequence_insert_sorted">
 <description>
-Inserts @data into @sequence using @func to determine the new
+Inserts @data into @seq using @cmp_func to determine the new
 position. The sequence must already be sorted according to @cmp_func;
 otherwise the new position of @data is undefined.
 
-@cmp_func is called with two items of the @seq and @user_data.
+@cmp_func is called with two items of the @seq, and @cmp_data.
 It should return 0 if the items are equal, a negative value
 if the first item comes before the second, and a positive value
-if the second  item comes before the first.
+if the second item comes before the first.
 
 Note that when adding a large amount of data to a #GSequence,
 it is more efficient to do unsorted insertions and then call
@@ -39383,11 +40345,6 @@ It should return 0 if the iterators are equal, a negative
 value if the first iterator comes before the second, and a
 positive value if the second iterator comes before the first.
 
-It is called with two iterators pointing into @seq. It should
-return 0 if the iterators are equal, a negative value if the
-first iterator comes before the second, and a positive value
-if the second iterator comes before the first.
-
 Note that when adding a large amount of data to a #GSequence,
 it is more efficient to do unsorted insertions and then call
 g_sequence_sort() or g_sequence_sort_iter().
@@ -39409,7 +40366,7 @@ Since: 2.14
 </parameter_description>
 </parameter>
 <parameter name="cmp_data">
-<parameter_description> user data passed to @cmp_func
+<parameter_description> user data passed to @iter_cmp
 </parameter_description>
 </parameter>
 </parameters>
@@ -39611,7 +40568,7 @@ item is equal, it is not guaranteed that it is the first which is
 returned. In that case, you can use g_sequence_iter_next() and
 g_sequence_iter_prev() to get others.
 
-@cmp_func is called with two items of the @seq and @user_data.
+@cmp_func is called with two items of the @seq, and @cmp_data.
 It should return 0 if the items are equal, a negative value if
 the first item comes before the second, and a positive value if
 the second item comes before the first.
@@ -39682,7 +40639,7 @@ Since: 2.28
 </parameter>
 </parameters>
 <return> an #GSequenceIter pointing to the position of
-the first item found equal to @data according to @cmp_func
+the first item found equal to @data according to @iter_cmp
 and @cmp_data, or %NULL if no such item exists
 
 </return>
@@ -39714,13 +40671,13 @@ the item is moved
 
 <function name="g_sequence_move_range">
 <description>
-Inserts the (@begin, @end) range at the destination pointed to by ptr.
+Inserts the (@begin, @end) range at the destination pointed to by @dest.
 The @begin and @end iters must point into the same sequence. It is
 allowed for @dest to point to a different sequence than the one pointed
 into by @begin and @end.
 
-If @dest is NULL, the range indicated by @begin and @end is
-removed from the sequence. If @dest iter points to a place within
+If @dest is %NULL, the range indicated by @begin and @end is
+removed from the sequence. If @dest points to a place within
 the (@begin, @end) range, the range does not move.
 
 Since: 2.14
@@ -39861,7 +40818,7 @@ Since: 2.14
 Returns an iterator pointing to the position where @data would
 be inserted according to @cmp_func and @cmp_data.
 
-@cmp_func is called with two items of the @seq and @user_data.
+@cmp_func is called with two items of the @seq, and @cmp_data.
 It should return 0 if the items are equal, a negative value if
 the first item comes before the second, and a positive value if
 the second item comes before the first.
@@ -39996,12 +40953,13 @@ Since: 2.14
 
 <function name="g_sequence_sort_changed">
 <description>
-Moves the data pointed to a new position as indicated by @cmp_func. This
+Moves the data pointed to by @iter to a new position as indicated by
+@cmp_func. This
 function should be called for items in a sequence already sorted according
 to @cmp_func whenever some aspect of an item changes so that @cmp_func
 may return different values for that item.
 
-@cmp_func is called with two items of the @seq and @user_data.
+@cmp_func is called with two items of the @seq, and @cmp_data.
 It should return 0 if the items are equal, a negative value if
 the first item comes before the second, and a positive value if
 the second item comes before the first.
@@ -40032,7 +40990,8 @@ Like g_sequence_sort_changed(), but uses
 a #GSequenceIterCompareFunc instead of a #GCompareDataFunc as
 the compare function.
 
-@iter_cmp is called with two iterators pointing into @seq. It should
+@iter_cmp is called with two iterators pointing into the #GSequence that
+@iter points into. It should
 return 0 if the iterators are equal, a negative value if the first
 iterator comes before the second, and a positive value if the second
 iterator comes before the first.
@@ -40060,7 +41019,7 @@ Since: 2.14
 <function name="g_sequence_sort_iter">
 <description>
 Like g_sequence_sort(), but uses a #GSequenceIterCompareFunc instead
-of a GCompareDataFunc as the compare function
+of a #GCompareDataFunc as the compare function
 
 @cmp_func is called with two iterators pointing into @seq. It should
 return 0 if the iterators are equal, a negative value if the first
@@ -41640,7 +42599,7 @@ without a return value.
 Creates a new signal. (This is usually done in the class initializer.)
 
 This is a variant of g_signal_new() that takes a C callback instead
-off a class offset for the signal's class handler. This function
+of a class offset for the signal's class handler. This function
 doesn't need a function pointer exposed in the class structure of
 an object definition, instead the function pointer is passed
 directly and can be overriden by derived classes with
@@ -42530,9 +43489,11 @@ Makes a full (deep) copy of a #GSList.
 In contrast with g_slist_copy(), this function uses @func to make a copy of
 each list element, in addition to copying the list container itself.
 
-@func, as a #GCopyFunc, takes two arguments, the data to be copied and a user
-pointer. It's safe to pass #NULL as user_data, if the copy function takes only
-one argument.
+@func, as a #GCopyFunc, takes two arguments, the data to be copied
+and a @user_data pointer. On common processor architectures, it's safe to
+pass %NULL as @user_data if the copy function takes only one argument. You
+may get compiler warnings from this though if compiling with GCC’s
+`-Wcast-function-type` warning.
 
 For instance, if @list holds a list of GObjects, you can do:
 |[&lt;!-- language=&quot;C&quot; --&gt; 
@@ -42561,7 +43522,7 @@ Since: 2.34
 </parameter_description>
 </parameter>
 </parameters>
-<return> a full copy of @list, use #g_slist_free_full to free it
+<return> a full copy of @list, use g_slist_free_full() to free it
 
 </return>
 </function>
@@ -43424,6 +44385,11 @@ is a positive integer which is unique within a particular main loop
 context. The reverse
 mapping from ID to source is done by g_main_context_find_source_by_id().
 
+You can only call this function while the source is associated to a
+#GMainContext instance; calling this function before g_source_attach()
+or after g_source_destroy() yields undefined behavior. The ID returned
+is unique within the #GMainContext instance passed to g_source_attach().
+
 
 </description>
 <parameters>
@@ -43863,13 +44829,18 @@ called from the source's dispatch function.
 
 The exact type of @func depends on the type of source; ie. you
 should not count on @func being called with @data as its first
-parameter.
+parameter. Cast @func with G_SOURCE_FUNC() to avoid warnings about
+incompatible function types.
 
 See [memory management of sources][mainloop-memory-management] for details
 on how to handle memory management of @data.
 
 Typically, you won't use this function. Instead use functions specific
-to the type of source you are using.
+to the type of source you are using, such as g_idle_add() or g_timeout_add().
+
+It is safe to call this function multiple times on a source which has already
+been attached to a context. The changes will take effect for the next time
+the source is dispatched after this call returns.
 
 </description>
 <parameters>
@@ -43901,6 +44872,10 @@ g_source_set_callback_indirect() assumes
 an initial reference count on @callback_data, and thus
 @callback_funcs-&gt;unref will eventually be called once more
 than @callback_funcs-&gt;ref.
+
+It is safe to call this function multiple times on a source which has already
+been attached to a context. The changes will take effect for the next time
+the source is dispatched after this call returns.
 
 </description>
 <parameters>
@@ -44243,6 +45218,81 @@ child's environment, or %NULL to inherit parent's
 </return>
 </function>
 
+<function name="g_spawn_async_with_fds">
+<description>
+Identical to g_spawn_async_with_pipes() but instead of
+creating pipes for the stdin/stdout/stderr, you can pass existing
+file descriptors into this function through the @stdin_fd,
+@stdout_fd and @stderr_fd parameters. The following @flags
+also have their behaviour slightly tweaked as a result:
+
+%G_SPAWN_STDOUT_TO_DEV_NULL means that the child's standard output
+will be discarded, instead of going to the same location as the parent's
+standard output. If you use this flag, @standard_output must be -1.
+%G_SPAWN_STDERR_TO_DEV_NULL means that the child's standard error
+will be discarded, instead of going to the same location as the parent's
+standard error. If you use this flag, @standard_error must be -1.
+%G_SPAWN_CHILD_INHERITS_STDIN means that the child will inherit the parent's
+standard input (by default, the child's standard input is attached to
+/dev/null). If you use this flag, @standard_input must be -1.
+
+It is valid to pass the same fd in multiple parameters (e.g. you can pass
+a single fd for both stdout and stderr).
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="working_directory">
+<parameter_description> child's current working directory, or %NULL to inherit parent's, in the GLib file name encoding
+</parameter_description>
+</parameter>
+<parameter name="argv">
+<parameter_description> child's argument vector, in the GLib file name encoding
+</parameter_description>
+</parameter>
+<parameter name="envp">
+<parameter_description> child's environment, or %NULL to inherit parent's, in the GLib file name encoding
+</parameter_description>
+</parameter>
+<parameter name="flags">
+<parameter_description> flags from #GSpawnFlags
+</parameter_description>
+</parameter>
+<parameter name="child_setup">
+<parameter_description> function to run in the child just before exec()
+</parameter_description>
+</parameter>
+<parameter name="user_data">
+<parameter_description> user data for @child_setup
+</parameter_description>
+</parameter>
+<parameter name="child_pid">
+<parameter_description> return location for child process ID, or %NULL
+</parameter_description>
+</parameter>
+<parameter name="stdin_fd">
+<parameter_description> file descriptor to use for child's stdin, or -1
+</parameter_description>
+</parameter>
+<parameter name="stdout_fd">
+<parameter_description> file descriptor to use for child's stdout, or -1
+</parameter_description>
+</parameter>
+<parameter name="stderr_fd">
+<parameter_description> file descriptor to use for child's stderr, or -1
+</parameter_description>
+</parameter>
+<parameter name="error">
+<parameter_description> return location for error
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE on success, %FALSE if an error was set
+
+</return>
+</function>
+
 <function name="g_spawn_async_with_pipes">
 <description>
 Executes a child program asynchronously (your program will not
@@ -44313,10 +45363,11 @@ the %SIGCHLD signal manually. On Windows, calling g_spawn_close_pid()
 is equivalent to calling CloseHandle() on the process handle returned
 in @child_pid). See g_child_watch_add().
 
-%G_SPAWN_LEAVE_DESCRIPTORS_OPEN means that the parent's open file
-descriptors will be inherited by the child; otherwise all descriptors
-except stdin/stdout/stderr will be closed before calling exec() in
-the child. %G_SPAWN_SEARCH_PATH means that @argv[0] need not be an
+Open UNIX file descriptors marked as `FD_CLOEXEC` will be automatically
+closed in the child process. %G_SPAWN_LEAVE_DESCRIPTORS_OPEN means that
+other open file descriptors will be inherited by the child; otherwise all
+descriptors except stdin/stdout/stderr will be closed before calling exec()
+in the child. %G_SPAWN_SEARCH_PATH means that @argv[0] need not be an
 absolute path, it will be looked for in the `PATH` environment
 variable. %G_SPAWN_SEARCH_PATH_FROM_ENVP means need not be an
 absolute path, it will be looked for in the `PATH` variable from
@@ -44390,6 +45441,21 @@ and @standard_error will not be filled with valid values.
 
 If @child_pid is not %NULL and an error does not occur then the returned
 process reference must be closed using g_spawn_close_pid().
+
+On modern UNIX platforms, GLib can use an efficient process launching
+codepath driven internally by posix_spawn(). This has the advantage of
+avoiding the fork-time performance costs of cloning the parent process
+address space, and avoiding associated memory overcommit checks that are
+not relevant in the context of immediately executing a distinct process.
+This optimized codepath will be used provided that the following conditions
+are met:
+
+1. %G_SPAWN_DO_NOT_REAP_CHILD is set
+2. %G_SPAWN_LEAVE_DESCRIPTORS_OPEN is set
+3. %G_SPAWN_SEARCH_PATH_FROM_ENVP is not set
+4. @working_directory is %NULL
+5. @child_setup is %NULL
+6. The program is of a recognised binary format, or has a shebang. Otherwise, GLib will have to execute the program through the shell, which is not done using the optimized codepath.
 
 If you are writing a GTK+ application, and the program you are spawning is a
 graphical application too, then to ensure that the spawned program opens its
@@ -45366,9 +46432,9 @@ if they are equal. It can be passed to g_hash_table_new() as the
 @key_equal_func parameter, when using non-%NULL strings as keys in a
 #GHashTable.
 
-Note that this function is primarily meant as a hash table comparison
-function. For a general-purpose, %NULL-safe string comparison function,
-see g_strcmp0().
+This function is typically used for hash table comparisons, but can be used
+for general purpose comparisons of non-%NULL strings. For a %NULL-safe string
+comparison function, see g_strcmp0().
 
 
 </description>
@@ -45538,12 +46604,12 @@ change by version or even by runtime environment.
 If the source language of @str is known, it can used to improve the
 accuracy of the translation by passing it as @from_locale.  It should
 be a valid POSIX locale string (of the form
-&quot;language[_territory][.codeset][@modifier]&quot;).
+`language[_territory][.codeset][@modifier]`).
 
 If @from_locale is %NULL then the current locale is used.
 
 If you want to do translation for no specific locale, and you want it
-to be done independently of the currently locale, specify &quot;C&quot; for
+to be done independently of the currently locale, specify `&quot;C&quot;` for
 @from_locale.
 
 Since: 2.40
@@ -47580,7 +48646,7 @@ Since: 2.44
 <function name="g_strv_length">
 <description>
 Returns the length of the given %NULL-terminated
-string array @str_array.
+string array @str_array. @str_array must not be %NULL.
 
 Since: 2.6
 
@@ -48143,6 +49209,12 @@ that appropriate assertions or warnings are given (the default).
 
 - `--debug-log`: Debug test logging output.
 
+Since 2.58, if tests are compiled with `G_DISABLE_ASSERT` defined,
+g_test_init() will print an error and exit. This is to prevent no-op tests
+from being executed, as g_assert() is commonly (erroneously) used in unit
+tests, and is a no-op when compiled with `G_DISABLE_ASSERT`. Ensure your
+tests are compiled without `G_DISABLE_ASSERT` defined.
+
 Since: 2.16
 
 </description>
@@ -48584,8 +49656,9 @@ on the order that tests are run in. If you need to ensure that some
 particular code runs before or after a given test case, use
 g_test_add(), which lets you specify setup and teardown functions.
 
-If all tests are skipped, this function will return 0 if
-producing TAP output, or 77 (treated as &quot;skip test&quot; by Automake) otherwise.
+If all tests are skipped or marked as incomplete (expected failures),
+this function will return 0 if producing TAP output, or 77 (treated
+as &quot;skip test&quot; by Automake) otherwise.
 
 Since: 2.16
 
@@ -48593,7 +49666,8 @@ Since: 2.16
 <parameters>
 </parameters>
 <return> 0 on success, 1 on failure (assuming it returns at all),
-0 or 77 if all tests were skipped with g_test_skip()
+0 or 77 if all tests were skipped with g_test_skip() and/or
+g_test_incomplete()
 
 </return>
 </function>
@@ -49931,6 +51005,8 @@ seconds. It can optionally include fractions of a second and a time
 zone indicator. (In the absence of any time zone indication, the
 timestamp is assumed to be in local time.)
 
+Any leading or trailing space in @iso_date is ignored.
+
 Since: 2.12
 
 </description>
@@ -49973,10 +51049,12 @@ Use g_date_time_format() or g_strdup_printf() if a different
 variation of ISO 8601 format is required.
 
 If @time_ represents a date which is too large to fit into a `struct tm`,
-%NULL will be returned. This is platform dependent, but it is safe to assume
-years up to 3000 are supported. The return value of g_time_val_to_iso8601()
-has been nullable since GLib 2.54; before then, GLib would crash under the
-same conditions.
+%NULL will be returned. This is platform dependent. Note also that since
+`GTimeVal` stores the number of seconds as a `glong`, on 32-bit systems it
+is subject to the year 2038 problem.
+
+The return value of g_time_val_to_iso8601() has been nullable since GLib
+2.54; before then, GLib would crash under the same conditions.
 
 Since: 2.12
 
@@ -50101,6 +51179,30 @@ Since: 2.26
 </parameters>
 <return> the time zone abbreviation, which belongs to @tz
 
+</return>
+</function>
+
+<function name="g_time_zone_get_identifier">
+<description>
+Get the identifier of this #GTimeZone, as passed to g_time_zone_new().
+If the identifier passed at construction time was not recognised, `UTC` will
+be returned. If it was %NULL, the identifier of the local timezone at
+construction time will be returned.
+
+The identifier will be returned in the same format as provided at
+construction time: if provided as a time offset, that will be returned by
+this function.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="tz">
+<parameter_description> a #GTimeZone
+</parameter_description>
+</parameter>
+</parameters>
+<return> identifier for this timezone
 </return>
 </function>
 
@@ -50257,6 +51359,27 @@ Since: 2.26
 </return>
 </function>
 
+<function name="g_time_zone_new_offset">
+<description>
+Creates a #GTimeZone corresponding to the given constant offset from UTC,
+in seconds.
+
+This is equivalent to calling g_time_zone_new() with a string in the form
+`[+|-]hh[:mm[:ss]]`.
+
+Since: 2.58
+
+</description>
+<parameters>
+<parameter name="seconds">
+<parameter_description> offset to UTC, in seconds
+</parameter_description>
+</parameter>
+</parameters>
+<return> a timezone at the given offset from UTC
+</return>
+</function>
+
 <function name="g_time_zone_new_utc">
 <description>
 Creates a #GTimeZone corresponding to UTC.
@@ -50387,7 +51510,7 @@ the callback will be invoked in whichever thread is running that main
 context. You can do these steps manually if you need greater control or to
 use a custom main context.
 
-The interval given in terms of monotonic time, not wall clock time.
+The interval given is in terms of monotonic time, not wall clock time.
 See g_get_monotonic_time().
 
 
@@ -50568,7 +51691,7 @@ executed.
 The scheduling granularity/accuracy of this timeout source will be
 in seconds.
 
-The interval given in terms of monotonic time, not wall clock time.
+The interval given is in terms of monotonic time, not wall clock time.
 See g_get_monotonic_time().
 
 Since: 2.14	
@@ -51703,6 +52826,8 @@ return priv-&gt;some_field;
 ]|
 
 Since: 2.4
+Deprecated: 2.58: Use the G_ADD_PRIVATE() macro with the `G_DEFINE_*`
+family of macros to add instance private data to a type
 
 </description>
 <parameters>
@@ -55391,6 +56516,34 @@ positive and any of the @max_len bytes are nul.
 </return>
 </function>
 
+<function name="g_utf8_validate_len">
+<description>
+Validates UTF-8 encoded text.
+
+As with g_utf8_validate(), but @max_len must be set, and hence this function
+will always return %FALSE if any of the bytes of @str are nul.
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="str">
+<parameter_description> a pointer to character data
+</parameter_description>
+</parameter>
+<parameter name="max_len">
+<parameter_description> max bytes to validate
+</parameter_description>
+</parameter>
+<parameter name="end">
+<parameter_description> return location for end of valid data
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the text was valid UTF-8
+</return>
+</function>
+
 <function name="g_utime">
 <description>
 A wrapper for the POSIX utime() function. The utime() function
@@ -58104,7 +59257,7 @@ Since: 2.24
 </parameter_description>
 </parameter>
 </parameters>
-<return> a #guchar
+<return> a #guint8
 
 </return>
 </function>
@@ -58224,6 +59377,11 @@ in the container.  See g_variant_n_children().
 
 The returned value is never floating.  You should free it with
 g_variant_unref() when you're done with it.
+
+There may be implementation specific restrictions on deeply nested values,
+which would result in the unit tuple being returned as the child value,
+instead of further nested children. #GVariant is guaranteed to handle
+nesting up to at least 64 levels.
 
 This function is O(1).
 
@@ -58346,7 +59504,7 @@ as an array of the given C type, with @element_size set to the size
 the appropriate type:
 - %G_VARIANT_TYPE_INT16 (etc.): #gint16 (etc.)
 - %G_VARIANT_TYPE_BOOLEAN: #guchar (not #gboolean!)
-- %G_VARIANT_TYPE_BYTE: #guchar
+- %G_VARIANT_TYPE_BYTE: #guint8
 - %G_VARIANT_TYPE_HANDLE: #guint32
 - %G_VARIANT_TYPE_DOUBLE: #gdouble
 
@@ -58912,6 +60070,9 @@ If @value is found to be in normal form then it will be marked as
 being trusted.  If the value was already marked as being trusted then
 this function will immediately return %TRUE.
 
+There may be implementation specific restrictions on deeply nested values.
+GVariant is guaranteed to handle nesting up to at least 64 levels.
+
 Since: 2.24
 
 </description>
@@ -58932,10 +60093,10 @@ Determines if a given string is a valid D-Bus object path.  You
 should ensure that a string is a valid D-Bus object path before
 passing it to g_variant_new_object_path().
 
-A valid object path starts with '/' followed by zero or more
-sequences of characters separated by '/' characters.  Each sequence
-must contain only the characters &quot;[A-Z][a-z][0-9]_&quot;.  No sequence
-(including the one following the final '/' character) may be empty.
+A valid object path starts with `/` followed by zero or more
+sequences of characters separated by `/` characters.  Each sequence
+must contain only the characters `[A-Z][a-z][0-9]_`.  No sequence
+(including the one following the final `/` character) may be empty.
 
 Since: 2.24
 
@@ -61675,6 +62836,16 @@ This is not intended for end user error reporting. Use of #GError is
 preferred for that instead, as it allows calling functions to perform actions
 conditional on the type of error.
 
+Warning messages are intended to be used in the event of unexpected
+external conditions (system misconfiguration, missing files,
+other trusted programs violating protocol, invalid contents in
+trusted files, etc.)
+
+If attempting to deal with programmer errors (for example, incorrect function
+parameters) then you should use %G_LOG_LEVEL_CRITICAL instead.
+
+g_warn_if_reached() and g_warn_if_fail() log at %G_LOG_LEVEL_WARNING.
+
 You can make warnings fatal at runtime by setting the `G_DEBUG`
 environment variable (see
 [Running GLib Applications](glib-running.html)):
@@ -62130,6 +63301,26 @@ failure and lack of short names.
 </return>
 </function>
 
+<function name="gatomicrefcount">
+<description>
+A type for implementing atomic reference count semantics.
+
+Use g_atomic_ref_count_init() to initialize it; g_atomic_ref_count_inc()
+to increase the counter, and g_atomic_ref_count_dec() to decrease it.
+
+It is safe to use #gatomicrefcount if you're expecting to operate on the
+reference counter from multiple threads.
+
+See also: #grefcount
+
+Since: 2.58
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
 <function name="gboolean">
 <description>
 A standard boolean type.
@@ -62499,6 +63690,28 @@ Since: 2.14
 <description>
 An untyped pointer.
 #gpointer looks better and is easier to use than void*.
+
+</description>
+<parameters>
+</parameters>
+<return></return>
+</function>
+
+<function name="grefcount">
+<description>
+A type for implementing non-atomic reference count semantics.
+
+Use g_ref_count_init() to initialize it; g_ref_count_inc() to
+increase the counter, and g_ref_count_dec() to decrease it.
+
+It is safe to use #grefcount only if you're expecting to operate
+on the reference counter from a single thread. It is entirely up
+to you to ensure that all reference count changes happen in the
+same thread.
+
+See also: #gatomicrefcount
+
+Since: 2.58
 
 </description>
 <parameters>
