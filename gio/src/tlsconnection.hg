@@ -26,8 +26,6 @@ _PINCLUDE(giomm/private/iostream_p.h)
 namespace Gio
 {
 
-_WRAP_ENUM(TlsRehandshakeMode,GTlsRehandshakeMode)
-
 class Cancellable;
 class TlsDatabase;
 class TlsInteraction;
@@ -60,10 +58,8 @@ public:
   _WRAP_METHOD(void set_require_close_notify(bool require_close_notify = true), g_tls_connection_set_require_close_notify)
   _WRAP_METHOD(bool get_require_close_notify() const, g_tls_connection_get_require_close_notify)
 
-  _WRAP_METHOD(void set_rehandshake_mode(TlsRehandshakeMode mode), g_tls_connection_set_rehandshake_mode)
-  _WRAP_METHOD(TlsRehandshakeMode get_rehandshake_mode() const, g_tls_connection_get_rehandshake_mode)
-
-  _IGNORE(g_tls_connection_set_use_system_certdb, g_tls_connection_get_use_system_certdb)
+  _IGNORE(g_tls_connection_set_use_system_certdb, g_tls_connection_get_use_system_certdb)dnl // deprecated
+  _IGNORE(g_tls_connection_set_rehandshake_mode, g_tls_connection_get_rehandshake_mode)dnl // deprecated
 
   _WRAP_METHOD(Glib::RefPtr<TlsDatabase> get_database(), g_tls_connection_get_database)
   _WRAP_METHOD(Glib::RefPtr<const TlsDatabase> get_database() const, g_tls_connection_get_database, constversion)
@@ -88,9 +84,8 @@ public:
   _WRAP_PROPERTY("interaction", Glib::RefPtr<TlsInteraction>)
   _WRAP_PROPERTY("peer-certificate", Glib::RefPtr<TlsCertificate>)
   _WRAP_PROPERTY("peer-certificate-errors", TlsCertificateFlags)
-  _WRAP_PROPERTY("rehandshake-mode", TlsRehandshakeMode)
   _WRAP_PROPERTY("require-close-notify", bool)
-  _IGNORE_PROPERTY("use-system-certdb")
+  _IGNORE_PROPERTY("use-system-certdb", "rehandshake-mode")dnl // deprecated
 
 #m4 _CONVERSION(`GTlsCertificate*',`const Glib::RefPtr<const TlsCertificate>&',`Glib::wrap($3, true)')
   _WRAP_SIGNAL(bool accept_certificate(const Glib::RefPtr<const TlsCertificate>& peer_cert, TlsCertificateFlags errors), "accept_certificate")
