@@ -333,6 +333,28 @@ the default option processing continue.
 </return>
 </signal>
 
+<signal name="GApplication::name-lost">
+<description>
+The ::name-lost signal is emitted only on the registered primary instance
+when a new instance has taken over. This can only happen if the application
+is using the %G_APPLICATION_ALLOW_REPLACEMENT flag.
+
+The default handler for this signal calls g_application_quit().
+
+Since: 2.60
+
+</description>
+<parameters>
+<parameter name="application">
+<parameter_description> the application
+</parameter_description>
+</parameter>
+</parameters>
+<return> %TRUE if the signal has been handled
+
+</return>
+</signal>
+
 <signal name="GApplication::open">
 <description>
 The ::open signal is emitted on the primary instance when there are
@@ -462,6 +484,17 @@ Since: 2.30.
 <parameter_description> Allow users to override the
 application ID from the command line with `--gapplication-app-id`.
 Since: 2.48
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_ALLOW_REPLACEMENT">
+<parameter_description> Allow another instance to take over
+the bus name. Since: 2.60
+</parameter_description>
+</parameter>
+<parameter name="G_APPLICATION_REPLACE">
+<parameter_description> Take over from another instance. This flag is
+usually set by passing `--gapplication-replace` on the commandline.
+Since: 2.60
 </parameter_description>
 </parameter>
 </parameters>
@@ -2730,6 +2763,10 @@ g_dtls_connection_set_rehandshake_mode().
 
 Since: 2.48
 
+Deprecated: 2.60. Changing the rehandshake mode is no longer
+required for compatibility. Also, rehandshaking has been removed
+from the TLS protocol in TLS 1.3.
+
 </description>
 </property>
 
@@ -4007,7 +4044,7 @@ The domain to use for the mount operation.
 <property name="GMountOperation:is-tcrypt-hidden-volume">
 <description>
 Whether the device to be unlocked is a TCRYPT hidden volume.
-See https://www.veracrypt.fr/en/Hidden%20Volume.html.
+See [the VeraCrypt documentation](https://www.veracrypt.fr/en/Hidden%20Volume.html).
 
 Since: 2.58
 
@@ -4020,7 +4057,7 @@ Whether the device to be unlocked is a TCRYPT system volume.
 In this context, a system volume is a volume with a bootloader
 and operating system installed. This is only supported for Windows
 operating systems. For further documentation, see
-https://www.veracrypt.fr/en/System%20Encryption.html.
+[the VeraCrypt documentation](https://www.veracrypt.fr/en/System%20Encryption.html).
 
 Since: 2.58
 
@@ -4045,7 +4082,7 @@ Determines if and how the password information should be saved.
 <property name="GMountOperation:pim">
 <description>
 The VeraCrypt PIM value, when unlocking a VeraCrypt volume. See
-https://www.veracrypt.fr/en/Personal%20Iterations%20Multiplier%20(PIM).html.
+[the VeraCrypt documentation](https://www.veracrypt.fr/en/Personal%20Iterations%20Multiplier%20(PIM).html).
 
 Since: 2.58
 
@@ -6184,6 +6221,10 @@ g_tls_connection_set_rehandshake_mode().
 
 Since: 2.28
 
+Deprecated: 2.60. Changing the rehandshake mode is no longer
+required for compatibility. Also, rehandshaking has been removed
+from the TLS protocol in TLS 1.3.
+
 </description>
 <parameters>
 <parameter name="G_TLS_REHANDSHAKE_NEVER">
@@ -8177,7 +8218,7 @@ Since: 2.50
 </parameter_description>
 </parameter>
 <parameter name="callback">
-<parameter_description> a #GASyncReadyCallback to call when the request is done
+<parameter_description> a #GAsyncReadyCallback to call when the request is done
 </parameter_description>
 </parameter>
 <parameter name="user_data">
@@ -11654,7 +11695,7 @@ See also g_cancellable_make_pollfd().
 </parameter_description>
 </parameter>
 </parameters>
-<return> A valid file descriptor. %-1 if the file descriptor 
+<return> A valid file descriptor. `-1` if the file descriptor
 is not supported, or on errors. 
 </return>
 </function>
@@ -12746,7 +12787,7 @@ Reads an unsigned 8-bit/1-byte value from @stream.
 </parameter_description>
 </parameter>
 </parameters>
-<return> an unsigned 8-bit/1-byte value read from the @stream or %0 
+<return> an unsigned 8-bit/1-byte value read from the @stream or `0`
 if an error occurred.
 </return>
 </function>
@@ -12774,7 +12815,7 @@ see g_data_input_stream_get_byte_order() and g_data_input_stream_set_byte_order(
 </parameter_description>
 </parameter>
 </parameters>
-<return> a signed 16-bit/2-byte value read from @stream or %0 if 
+<return> a signed 16-bit/2-byte value read from @stream or `0` if
 an error occurred.
 </return>
 </function>
@@ -12806,7 +12847,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a signed 32-bit/4-byte value read from the @stream or %0 if 
+<return> a signed 32-bit/4-byte value read from the @stream or `0` if
 an error occurred. 
 </return>
 </function>
@@ -12838,7 +12879,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> a signed 64-bit/8-byte value read from @stream or %0 if 
+<return> a signed 64-bit/8-byte value read from @stream or `0` if
 an error occurred.  
 </return>
 </function>
@@ -13056,7 +13097,7 @@ see g_data_input_stream_get_byte_order() and g_data_input_stream_set_byte_order(
 </parameter_description>
 </parameter>
 </parameters>
-<return> an unsigned 16-bit/2-byte value read from the @stream or %0 if 
+<return> an unsigned 16-bit/2-byte value read from the @stream or `0` if
 an error occurred. 
 </return>
 </function>
@@ -13088,7 +13129,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> an unsigned 32-bit/4-byte value read from the @stream or %0 if 
+<return> an unsigned 32-bit/4-byte value read from the @stream or `0` if
 an error occurred. 
 </return>
 </function>
@@ -13120,7 +13161,7 @@ was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
 </parameter_description>
 </parameter>
 </parameters>
-<return> an unsigned 64-bit/8-byte read from @stream or %0 if 
+<return> an unsigned 64-bit/8-byte read from @stream or `0` if
 an error occurred. 
 </return>
 </function>
@@ -16170,6 +16211,11 @@ method from) at some point after @user_data is no longer
 needed. (It is not guaranteed to be called synchronously when the
 signal is unsubscribed from, and may be called after @connection
 has been destroyed.)
+
+The returned subscription identifier is an opaque value which is guaranteed
+to never be zero.
+
+This function can never fail.
 
 Since: 2.26
 
@@ -21514,7 +21560,7 @@ Looks up a string list value in the keyfile backing @info.
 
 The @key is looked up in the &quot;Desktop Entry&quot; group.
 
-Since: 2.59.0
+Since: 2.60.0
 
 </description>
 <parameters>
@@ -22964,8 +23010,15 @@ before or after completing the handshake).
 Likewise, on the server side, although a handshake is necessary at
 the beginning of the communication, you do not need to call this
 function explicitly unless you want clearer error reporting.
-However, you may call g_dtls_connection_handshake() later on to
-renegotiate parameters (encryption methods, etc) with the client.
+
+If TLS 1.2 or older is in use, you may call
+g_dtls_connection_handshake() after the initial handshake to
+rehandshake; however, this usage is deprecated because rehandshaking
+is no longer part of the TLS protocol in TLS 1.3. Accordingly, the
+behavior of calling this function after the initial handshake is now
+undefined, except it is guaranteed to be reasonable and
+nondestructive so as to preserve compatibility with code written for
+older versions of GLib.
 
 #GDtlsConnection::accept_certificate may be emitted during the
 handshake.
@@ -23166,6 +23219,10 @@ necessary if you need to allow renegotiation with older client
 software.
 
 Since: 2.48
+
+Deprecated: 2.60. Changing the rehandshake mode is no longer
+required for compatibility. Also, rehandshaking has been removed
+from the TLS protocol in TLS 1.3.
 
 </description>
 <parameters>
@@ -42651,16 +42708,9 @@ Gets the list of children on @settings.
 The list is exactly the list of strings for which it is not an error
 to call g_settings_get_child().
 
-For GSettings objects that are lists, this value can change at any
-time. Note that there is a race condition here: you may
-request a child after listing it only for it to have been destroyed
-in the meantime.  For this reason, g_settings_get_child() may return
-%NULL even for a child that was listed by this function.
-
-For GSettings objects that are not lists, you should probably not be
-calling this function from &quot;normal&quot; code (since you should already
-know what children are in your schema).  This function may still be
-useful there for introspection reasons, however.
+There is little reason to call this function from &quot;normal&quot; code, since
+you should already know what children are in your schema. This function
+may still be useful there for introspection reasons, however.
 
 You should free the return value with g_strfreev() when you are done
 with it.
@@ -52885,6 +52935,10 @@ g_tls_connection_set_rehandshake_mode() for details.
 
 Since: 2.28
 
+Deprecated: 2.60. Changing the rehandshake mode is no longer
+required for compatibility. Also, rehandshaking has been removed
+from the TLS protocol in TLS 1.3.
+
 </description>
 <parameters>
 <parameter name="conn">
@@ -52956,9 +53010,15 @@ before or after completing the handshake).
 Likewise, on the server side, although a handshake is necessary at
 the beginning of the communication, you do not need to call this
 function explicitly unless you want clearer error reporting.
-However, you may call g_tls_connection_handshake() later on to
-rehandshake, if TLS 1.2 or older is in use. With TLS 1.3, this will
-instead perform a rekey.
+
+If TLS 1.2 or older is in use, you may call
+g_tls_connection_handshake() after the initial handshake to
+rehandshake; however, this usage is deprecated because rehandshaking
+is no longer part of the TLS protocol in TLS 1.3. Accordingly, the
+behavior of calling this function after the initial handshake is now
+undefined, except it is guaranteed to be reasonable and
+nondestructive so as to preserve compatibility with code written for
+older versions of GLib.
 
 #GTlsConnection::accept_certificate may be emitted during the
 handshake.
@@ -53160,6 +53220,10 @@ necessary if you need to allow renegotiation with older client
 software.
 
 Since: 2.28
+
+Deprecated: 2.60. Changing the rehandshake mode is no longer
+required for compatibility. Also, rehandshaking has been removed
+from the TLS protocol in TLS 1.3.
 
 </description>
 <parameters>
@@ -53403,7 +53467,7 @@ Use g_object_unref() to release the certificate.
 <description>
 Lookup the issuer of @certificate in the database.
 
-The %issuer property
+The #GTlsCertificate:issuer property
 of @certificate is not modified, and the two certificates are not hooked
 into a chain.
 
