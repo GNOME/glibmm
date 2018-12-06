@@ -19,3 +19,20 @@
 #include <giomm/tlsdatabase.h>
 #include <giomm/tlsinteraction.h>
 #include "slot_async.h"
+
+namespace Gio
+{
+
+// Deprecated in glib 2.60, but not in glibmm 2.58.
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+void TlsConnection::set_rehandshake_mode(TlsRehandshakeMode mode)
+{
+  g_tls_connection_set_rehandshake_mode(gobj(), ((GTlsRehandshakeMode)(mode)));
+}
+TlsRehandshakeMode TlsConnection::get_rehandshake_mode() const
+{
+  return ((TlsRehandshakeMode)(g_tls_connection_get_rehandshake_mode(const_cast<GTlsConnection*>(gobj()))));
+}
+G_GNUC_END_IGNORE_DEPRECATIONS
+
+} // namespace Gio
