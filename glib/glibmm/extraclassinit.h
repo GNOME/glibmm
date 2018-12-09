@@ -58,7 +58,7 @@ namespace Glib
  * public:
  *   MyWidget()
  *   :
- *   // The GType name will be gtkmm__CustomObject_MyMidget
+ *   // The GType name will be gtkmm__CustomObject_MyWidget
  *   Glib::ObjectBase("MyWidget"), // Unique class name
  *   MyExtraInit("my-widget"),
  *   Gtk::Widget()
