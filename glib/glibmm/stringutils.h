@@ -82,7 +82,7 @@ double strtod(const std::string& str);
  *
  * @param str The string to convert to a numeric value.
  * @param start_index The index of the first character that should be used in the conversion.
- * @retval end_index The index of the character after the last character used in the conversion.
+ * @param[out] end_index The index of the character after the last character used in the conversion.
  * @return The <tt>double</tt> value.
  * @throw std::out_of_range    Thrown if @a start_index is out of range.
  * @throw std::overflow_error  Thrown if the correct value would cause overflow.
