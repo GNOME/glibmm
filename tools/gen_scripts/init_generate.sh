@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This file is part of glibmm.
+# This file is part of glibmm-2.4.
 # Initializes some variables for the scripts that generate docs and defs files.
 # Not intented to be called directly from the command line.
 
@@ -16,7 +16,7 @@
 # Usually you can leave GMMPROC_GEN_SOURCE_DIR undefined.
 # If you have set buildroot=None, GMMPROC_GEN_BUILD_DIR can also be undefined.
 
-# Root directory of glibmm source files.
+# Root directory of glibmm-2.4 source files.
 root_dir="$(dirname "$0")/../.."
 
 # Where to search for source files.
@@ -29,16 +29,16 @@ if [ -z "$GMMPROC_GEN_BUILD_DIR" ]; then
   GMMPROC_GEN_BUILD_DIR="$GMMPROC_GEN_SOURCE_DIR"
 fi
 
-# Scripts in glibmm. These are source files.
-gen_docs="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/docextract_to_xml.py"
-gen_methods="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/defs_gen/h2def.py"
-gen_enums="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/enum.pl"
+# Scripts in glibmm-2.4. These are source files.
+gen_docs="$GMMPROC_GEN_SOURCE_DIR/glibmm-2.4/tools/defs_gen/docextract_to_xml.py"
+gen_methods="$GMMPROC_GEN_SOURCE_DIR/glibmm-2.4/tools/defs_gen/h2def.py"
+gen_enums="$GMMPROC_GEN_SOURCE_DIR/glibmm-2.4/tools/enum.pl"
 
 # Where to find executables that generate extra defs (signals and properties).
-# glibmm is built with autotools.
-# autotools support non-source-dir builds, but glibmm does not.
-# See the glibmm entry in jhbuild's modulesets files.
-extra_defs_gen_dir="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/extra_defs_gen"
+# glibmm-2.4 is built with autotools.
+# autotools support non-source-dir builds, but glibmm-2.4 does not.
+# See the glibmm-2.4 entry in jhbuild's modulesets files.
+extra_defs_gen_dir="$GMMPROC_GEN_SOURCE_DIR/glibmm-2.4/tools/extra_defs_gen"
 
 source_prefix="$GMMPROC_GEN_SOURCE_DIR/glib"
 build_prefix="$GMMPROC_GEN_BUILD_DIR/glib"
