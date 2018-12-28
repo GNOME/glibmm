@@ -16,22 +16,22 @@
 # 3. ./gio_generate_extra_defs.sh --make-patch
 # 4. Like step 2 when updating only the gio_signals.defs file.
 
-ROOT_DIR="$(dirname "$0")/../.."
-GEN_DIR="$ROOT_DIR/tools/extra_defs_gen"
-OUT_DIR="$ROOT_DIR/gio/src"
-OUT_FILE=gio_signals.defs
-OUT_DIR_FILE="$OUT_DIR"/$OUT_FILE
+source "$(dirname "$0")/init_generate.sh"
+
+out_dir="$root_dir/gio/src"
+out_file=gio_signals.defs
+out_dir_file="$out_dir"/$out_file
 
 if [ $# -eq 0 ]
 then
-  "$GEN_DIR"/generate_defs_gio > "$OUT_DIR_FILE"
+  "$extra_defs_gen_dir"/generate_defs_gio > "$out_dir_file"
   # patch version 2.7.5 does not like directory names.
-  cd "$OUT_DIR"
-  PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"
-  patch $PATCH_OPTIONS $OUT_FILE $OUT_FILE.patch
+  cd "$out_dir"
+  patch_options="--backup --version-control=simple --suffix=.orig"
+  patch $patch_options $out_file $out_file.patch
 elif [ "$1" = "--make-patch" ]
 then
-  diff --unified=5 "$OUT_DIR_FILE".orig "$OUT_DIR_FILE" > "$OUT_DIR_FILE".patch
+  diff --unified=5 "$out_dir_file".orig "$out_dir_file" > "$out_dir_file".patch
 else
   echo "Usage: $0 [--make-patch]"
   exit 1

@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Note that JHBUILD_SOURCES should be defined to contain the path to the root
-# of the jhbuild sources. The script assumes that it resides in the
-# tools/gen_scripts directory and the defs file will be placed in gio/src.
+# The script assumes that it resides in the tools/gen_scripts directory and
+# the defs file will be placed in gio/src.
 
 # To update the gio_enums.defs file:
 # 1. ./gio_generate_enums.sh
@@ -17,30 +16,26 @@
 # 3. ./gio_generate_enums.sh --make-patch
 # 4. Like step 2 when updating only the gio_enums.defs file.
 
-if [ -z "$JHBUILD_SOURCES" ]; then
-  echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
-  exit 1;
-fi
+source "$(dirname "$0")/init_generate.sh"
 
-PREFIX="$JHBUILD_SOURCES/glib"
-ROOT_DIR="$(dirname "$0")/../.."
-OUT_DIR="$ROOT_DIR/gio/src"
-OUT_FILE=gio_enums.defs
-OUT_DIR_FILE="$OUT_DIR"/$OUT_FILE
+out_dir="$root_dir/gio/src"
+out_file=gio_enums.defs
+out_dir_file="$out_dir"/$out_file
 
 shopt -s extglob # Enable extended pattern matching
+shopt -s nullglob # Skip a filename pattern that matches no file
 if [ $# -eq 0 ]
 then
-  ENUM_PL="$JHBUILD_SOURCES/glibmm/tools/enum.pl"
   # Process files whose names end with .h, but not with private.h.
-  $ENUM_PL "$PREFIX"/gio/!(*private).h > "$OUT_DIR_FILE"
+  # Exclude $build_prefix/gio/xdp-dbus.h.
+  "$gen_enums" "$source_prefix"/gio/!(*private).h "$build_prefix"/gio/!(*private|xdp-dbus).h > "$out_dir_file"
   # patch version 2.7.5 does not like directory names.
-  cd "$OUT_DIR"
-  PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"
-  patch $PATCH_OPTIONS $OUT_FILE $OUT_FILE.patch
+  cd "$out_dir"
+  patch_options="--backup --version-control=simple --suffix=.orig"
+  patch $patch_options $out_file $out_file.patch
 elif [ "$1" = "--make-patch" ]
 then
-  diff --unified=5 "$OUT_DIR_FILE".orig "$OUT_DIR_FILE" > "$OUT_DIR_FILE".patch
+  diff --unified=5 "$out_dir_file".orig "$out_dir_file" > "$out_dir_file".patch
 else
   echo "Usage: $0 [--make-patch]"
   exit 1
