@@ -14,8 +14,10 @@ import docextract
 
 def usage():
     sys.stderr.write('usage: docextract_to_xml.py ' +
-        '[-s /src/dir | --source-dir=/src/dir] [-a | --with-annotations] ' +
-        '[-p | --with-properties] [-c | --with-sections] [-r | --no-recursion] ' +
+        '[-s /src/dir | --source-dir=/src/dir] ' +
+        '[-x /src/dir/file-to-exclude | --exclude-file=/src/dir/file-to-exclude] ' +
+        '[-a | --with-annotations] [-p | --with-properties] ' +
+        '[-c | --with-sections] [-r | --no-recursion] ' +
         '[-n | --no-since] [-i | --no-signals ] [-e | --no-enums ]\n')
     sys.exit(1)
 
@@ -61,15 +63,16 @@ def print_annotations(annotations):
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:s:o:apcrnie",
-                                   ["source-dir=", "with-annotations",
-                                    "with-properties", "with-sections",
-                                    "no-recursion", "no-since",
+        opts, args = getopt.getopt(sys.argv[1:], "s:x:apcrnie",
+                                   ["source-dir=", "exclude-file=",
+                                    "with-annotations", "with-properties",
+                                    "with-sections", "no-recursion", "no-since",
                                     "no-signals", "no-enums"])
     except getopt.error as e:
         sys.stderr.write('docextract_to_xml.py: %s\n' % e)
         usage()
     source_dirs = []
+    exclude_files = []
     with_annotations = False
     with_signals = True
     with_properties = False
@@ -78,25 +81,27 @@ if __name__ == '__main__':
     for opt, arg in opts:
         if opt in ('-s', '--source-dir'):
             source_dirs.append(arg)
-        if opt in ('-a', '--with-annotations'):
+        elif opt in ('-x', '--exclude-file'):
+            exclude_files.append(arg)
+        elif opt in ('-a', '--with-annotations'):
             with_annotations = True
-        if opt in ('-p', '--with-properties'):
+        elif opt in ('-p', '--with-properties'):
             with_properties = True
-        if opt in ('-c', '--with-sections'):
+        elif opt in ('-c', '--with-sections'):
             with_sections = True
-        if opt in ('-r', '--no-recursion'):
+        elif opt in ('-r', '--no-recursion'):
             docextract.no_recursion = True
-        if opt in ('-n', '--no-since'):
+        elif opt in ('-n', '--no-since'):
             docextract.no_since = True
-        if opt in ('-i', '--no-signals'):
+        elif opt in ('-i', '--no-signals'):
             with_signals = False
-        if opt in ('-e', '--no-enums'):
+        elif opt in ('-e', '--no-enums'):
             with_enums = False
     if len(args) != 0:
         usage()
 
-    docs = docextract.extract(source_dirs);
-    docextract.extract_tmpl(source_dirs, docs); #Try the tmpl sgml files too.
+    docs = docextract.extract(source_dirs, exclude_files);
+    docextract.extract_tmpl(source_dirs, exclude_files, docs); #Try the tmpl sgml files too.
 
     # print d.docs
 
