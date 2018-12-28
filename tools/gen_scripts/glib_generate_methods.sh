@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Note that JHBUILD_SOURCES should be defined to contain the path to the root
-# of the jhbuild sources. The script assumes it resides in the
-# tools/gen_scripts directory and the defs files will be placed in glib/src.
+# The script assumes it resides in the tools/gen_scripts directory and
+# the defs files will be placed in glib/src.
 
 # To update the g[lib|module|object]_functions.defs files:
 # 1. ./glib_generate_methods.sh
@@ -17,31 +16,27 @@
 # 3. ./glib_generate_methods.sh --make-patch
 # 4. Like step 2 when updating only the g[lib|module|object]_functions.defs files.
 
-if [ -z "$JHBUILD_SOURCES" ]; then
-  echo -e "JHBUILD_SOURCES must contain the path to the jhbuild sources."
-  exit 1;
-fi
+source "$(dirname "$0")/init_generate.sh"
 
-PREFIX="$JHBUILD_SOURCES/glib"
-ROOT_DIR="$(dirname "$0")/../.."
-OUT_DIR="$ROOT_DIR/glib/src"
+out_dir="$root_dir/glib/src"
 
 shopt -s extglob # Enable extended pattern matching
+shopt -s nullglob # Skip a filename pattern that matches no file
 if [ $# -eq 0 ]
 then
-  H2DEF_PY="$JHBUILD_SOURCES/glibmm/tools/defs_gen/h2def.py"
   # Process files whose names end with .h, but not with private.h.
-  $H2DEF_PY "$PREFIX"/glib/!(*private).h "$PREFIX"/glib/deprecated/!(*private).h > "$OUT_DIR"/glib_functions.defs
-  $H2DEF_PY "$PREFIX"/gmodule/!(*private).h > "$OUT_DIR"/gmodule_functions.defs
-  $H2DEF_PY "$PREFIX"/gobject/!(*private).h > "$OUT_DIR"/gobject_functions.defs
+  "$gen_methods" "$source_prefix"/glib/!(*private).h "$source_prefix"/glib/deprecated/!(*private).h \
+                 "$build_prefix"/glib/!(*private).h "$build_prefix"/glib/deprecated/!(*private).h > "$out_dir"/glib_functions.defs
+  "$gen_methods" "$source_prefix"/gmodule/!(*private).h "$build_prefix"/gmodule/!(*private).h > "$out_dir"/gmodule_functions.defs
+  "$gen_methods" "$source_prefix"/gobject/!(*private).h "$build_prefix"/gobject/!(*private).h > "$out_dir"/gobject_functions.defs
   # patch version 2.7.5 does not like directory names.
-  cd "$OUT_DIR"
-  PATCH_OPTIONS="--backup --version-control=simple --suffix=.orig"
-  patch $PATCH_OPTIONS glib_functions.defs glib_functions.defs.patch
+  cd "$out_dir"
+  patch_options="--backup --version-control=simple --suffix=.orig"
+  patch $patch_options glib_functions.defs glib_functions.defs.patch
 elif [ "$1" = "--make-patch" ]
 then
-  OUT_DIR_FILE="$OUT_DIR"/glib_functions.defs
-  diff --unified=5 "$OUT_DIR_FILE".orig "$OUT_DIR_FILE" > "$OUT_DIR_FILE".patch
+  out_dir_file="$out_dir"/glib_functions.defs
+  diff --unified=5 "$out_dir_file".orig "$out_dir_file" > "$out_dir_file".patch
 else
   echo "Usage: $0 [--make-patch]"
   exit 1
