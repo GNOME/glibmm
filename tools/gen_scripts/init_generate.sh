@@ -36,9 +36,8 @@ gen_enums="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/enum.pl"
 
 # Where to find executables that generate extra defs (signals and properties).
 # glibmm is built with autotools.
-# autotools support non-source-dir builds, but glibmm does not.
-# See the glibmm entry in jhbuild's modulesets files.
-extra_defs_gen_dir="$GMMPROC_GEN_SOURCE_DIR/glibmm/tools/extra_defs_gen"
+# autotools support, but don't require, non-source-dir builds.
+extra_defs_gen_dir="$GMMPROC_GEN_BUILD_DIR/glibmm/tools/extra_defs_gen"
 
 source_prefix="$GMMPROC_GEN_SOURCE_DIR/glib"
 build_prefix="$GMMPROC_GEN_BUILD_DIR/glib"
