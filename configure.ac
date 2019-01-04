@@ -94,10 +94,6 @@ PKG_CHECK_MODULES([GIOMM],  [$GIOMM_MODULES])
 AC_CHECK_PROGS([M4], [gm4 m4], [m4])
 GLIB_GSETTINGS
 
-# Check for the SUN Forte compiler, and define GLIBMM_COMPILER_SUN_FORTE
-# in the header.
-GLIBMM_PROG_CXX_SUN
-
 AC_CHECK_FUNCS([flockfile funlockfile getc_unlocked mkfifo])
 
 # Ensure MSVC-compatible struct packing convention is used when
@@ -118,14 +114,10 @@ DK_CHECK_FEATURE([wide stream],
 GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS
 GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR
 GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS
-GLIBMM_CXX_MEMBER_FUNCTIONS_MEMBER_TEMPLATES
 GLIBMM_CXX_CAN_DISAMBIGUATE_CONST_TEMPLATE_SPECIALIZATIONS
 GLIBMM_CXX_CAN_USE_DYNAMIC_CAST_IN_UNUSED_TEMPLATE_WITHOUT_DEFINITION
 GLIBMM_CXX_CAN_ASSIGN_NON_EXTERN_C_FUNCTIONS_TO_EXTERN_C_CALLBACKS
-GLIBMM_CXX_CAN_USE_NAMESPACES_INSIDE_EXTERNC
 GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS
-GLIBMM_CXX_CAN_USE_THREAD_LOCAL
-GLIBMM_C_STD_TIME_T_IS_NOT_INT32
 
 MM_ARG_ENABLE_DOCUMENTATION
 MM_ARG_WITH_TAGFILE_DOC([libstdc++.tag], [mm-common-libstdc++])
@@ -143,12 +135,6 @@ MM_ARG_ENABLE_WARNINGS([GLIBMM_WXXFLAGS],
 # Offer the ability to omit some API from the library,
 # to reduce the code size:
 MM_ARG_DISABLE_DEPRECATED_API([GLIBMM GIOMM])
-
-# These are just defined to avoid breaking old code:
-AC_DEFINE([GLIBMM_EXCEPTIONS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
-AC_DEFINE([GLIBMM_PROPERTIES_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
-AC_DEFINE([GLIBMM_VFUNCS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
-AC_DEFINE([GLIBMM_DEFAULT_SIGNAL_HANDLERS_ENABLED],[1], [This is always set. This is only for backwards compatibility.])
 
 AC_CHECK_PROGS([CLANG_FORMAT], [clang-format clang-format-3.9 clang-format-3.8 clang-format-3.7], [])
 AM_CONDITIONAL([HAVE_CLANG_FORMAT], test -n "$CLANG_FORMAT")

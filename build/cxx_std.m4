@@ -17,46 +17,6 @@
 
 #serial 20110910
 
-## GLIBMM_CXX_HAS_NAMESPACE_STD()
-##
-## Test whether libstdc++ declares namespace std.  For safety,
-## also check whether several randomly selected STL symbols
-## are available in namespace std.
-##
-## On success, #define GLIBMM_HAVE_NAMESPACE_STD to 1.
-##
-AC_DEFUN([GLIBMM_CXX_HAS_NAMESPACE_STD],
-[
-  AC_CACHE_CHECK(
-    [whether C++ library symbols are declared in namespace std],
-    [glibmm_cv_cxx_has_namespace_std],
-  [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
-    [[
-      #include <algorithm>
-      #include <iterator>
-      #include <iostream>
-      #include <string>
-    ]],[[
-      using std::min;
-      using std::find;
-      using std::copy;
-      using std::bidirectional_iterator_tag;
-      using std::string;
-      using std::istream;
-      using std::cout;
-    ]])],
-      [glibmm_cv_cxx_has_namespace_std='yes'],
-      [glibmm_cv_cxx_has_namespace_std='no']
-    )
-  ])
-
-  AS_VAR_IF([glibmm_cv_cxx_has_namespace_std], ['yes'],
-            [AC_DEFINE([GLIBMM_HAVE_NAMESPACE_STD], [1],
-                       [Defined when the libstdc++ declares the std-namespace])])[]dnl
-])
-
-
 ## GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS()
 ##
 ## Check for standard-conform std::iterator_traits<>, and
@@ -64,8 +24,6 @@ AC_DEFUN([GLIBMM_CXX_HAS_NAMESPACE_STD],
 ##
 AC_DEFUN([GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS],
 [
-  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
-
   AC_CACHE_CHECK(
     [whether the C++ library supports std::iterator_traits],
     [glibmm_cv_cxx_has_std_iterator_traits],
@@ -73,9 +31,7 @@ AC_DEFUN([GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS],
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
     [[
       #include <iterator>
-      #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
-      #endif
     ]],[[
       typedef iterator_traits<char*>::value_type ValueType;
     ]])],
@@ -97,8 +53,6 @@ AC_DEFUN([GLIBMM_CXX_HAS_STD_ITERATOR_TRAITS],
 ##
 AC_DEFUN([GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR],
 [
-  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
-
   AC_CACHE_CHECK(
     [for non-standard Sun libCstd reverse_iterator],
     [glibmm_cv_cxx_has_sun_reverse_iterator],
@@ -106,9 +60,7 @@ AC_DEFUN([GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR],
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
     [[
       #include <iterator>
-      #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
-      #endif
     ]],[[
       typedef reverse_iterator<char*,random_access_iterator_tag,char,char&,char*,int> ReverseIter;
     ]])],
@@ -130,8 +82,6 @@ AC_DEFUN([GLIBMM_CXX_HAS_SUN_REVERSE_ITERATOR],
 ##
 AC_DEFUN([GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
 [
-  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
-
   AC_CACHE_CHECK(
     [whether STL containers have templated sequence constructors],
     [glibmm_cv_cxx_has_template_sequence_ctors],
@@ -141,9 +91,7 @@ AC_DEFUN([GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
       #include <vector>
       #include <deque>
       #include <list>
-      #ifdef GLIBMM_HAVE_NAMESPACE_STD
       using namespace std;
-      #endif
     ]],[[
       const int array[8] = { 0, };
       vector<int>  test_vector (&array[0], &array[8]);
@@ -169,8 +117,6 @@ AC_DEFUN([GLIBMM_CXX_HAS_TEMPLATE_SEQUENCE_CTORS],
 ##
 AC_DEFUN([GLIBMM_CXX_ALLOWS_STATIC_INLINE_NPOS],
 [
-  AC_REQUIRE([GLIBMM_CXX_HAS_NAMESPACE_STD])
-
   AC_CACHE_CHECK(
     [whether the compiler allows a static member variable to be initialized inline to std::string::npos],
     [glibmm_cv_cxx_has_allows_static_inline_npos],
