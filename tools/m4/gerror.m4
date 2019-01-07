@@ -1,6 +1,6 @@
 dnl
-dnl _GERROR(cpp_type, c_type, domain, `element_list', `no_gtype', `class_docs', `enum_docs', 'deprecated')
-dnl            $1       $2      $3         $4             $5           $6           $7            $8
+dnl _GERROR(cpp_type, c_type, domain, `element_list', `gtype_func', `class_docs', `enum_docs', 'deprecated')
+dnl            $1       $2      $3         $4              $5            $6           $7            $8
 dnl
 
 m4_define(`_GERROR',`dnl
@@ -43,7 +43,7 @@ private:
 };
 ifelse(`$8',,,`_DEPRECATE_IFDEF_END')`'dnl The expansion of _DEPRECATE_IFDEF_END ends with a newline
 
-m4_ifelse($5,`NO_GTYPE',,`dnl else
+m4_ifelse(`$5',`NO_GTYPE',,`dnl else
 __NAMESPACE_END__
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -87,11 +87,15 @@ void __NAMESPACE__::__CPPNAME__::throw_func(GError* gobject)
   throw __NAMESPACE__::__CPPNAME__`'(gobject);
 }
 
-m4_ifelse($5,`NO_GTYPE',,`dnl else
+m4_ifelse(`$5',`NO_GTYPE',,`dnl else
 // static
 GType Glib::Value<__NAMESPACE__::__CPPNAME__::Code>::value_type()
 {
+m4_ifelse(`$5',,`dnl
   return _GET_TYPE_FUNC(__CNAME__);
+',`dnl
+  return `$5()';
+')dnl
 }
 
 ')dnl endif !NO_GTYPE

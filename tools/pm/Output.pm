@@ -684,12 +684,12 @@ sub output_wrap_sig_decl($$$$$$$$$$$$$$)
 }
 
 # void output_wrap_enum($filename, $line_num, $cpp_type, $c_type,
-#   $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+#   $comment, $ref_subst_in, $ref_subst_out, $gtype_func,
 #   $deprecated, $deprecation_docs, $newin)
 sub output_wrap_enum($$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $comment, $ref_subst_in, $ref_subst_out, $gtype_func,
     $deprecated, $deprecation_docs, $newin) = @_;
 
   my $objEnum = GtkDefs::lookup_enum($c_type);
@@ -725,7 +725,7 @@ sub output_wrap_enum($$$$$$$$$$$$)
     $c_type,
     $value_suffix,
     $elements,
-    $no_gtype,
+    $gtype_func,
     $comment,
     $deprecated
   );
@@ -758,12 +758,12 @@ sub output_wrap_enum_docs_only($$$$$$$$$$$)
 }
 
 # void output_wrap_gerror($filename, $line_num, $cpp_type, $c_type, $domain,
-#  $class_docs, $ref_subst_in, $ref_subst_out, $no_gtype,
+#  $class_docs, $ref_subst_in, $ref_subst_out, $gtype_func,
 #  $deprecated, $deprecation_docs, $newin)
 sub output_wrap_gerror($$$$$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $cpp_type, $c_type, $domain,
-    $class_docs, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $class_docs, $ref_subst_in, $ref_subst_out, $gtype_func,
     $deprecated, $deprecation_docs, $newin) = @_;
 
   my $objDefsParser = $$self{objDefsParser};
@@ -822,12 +822,12 @@ sub output_wrap_gerror($$$$$$$$$$$$$)
   # Prevent Doxygen from auto-linking to a class called Exception.
   $class_docs =~ s/([^%])(Exception class)/$1%$2/g;
 
-  my $str = sprintf("_GERROR(%s,%s,%s,\`%s\',%s,\`%s\',\`%s\',\`%s\')dnl\n",
+  my $str = sprintf("_GERROR(%s,%s,%s,\`%s\',\`%s\',\`%s\',\`%s\',\`%s\')dnl\n",
     $cpp_type,
     $c_type,
     $domain,
     $elements,
-    $no_gtype,
+    $gtype_func,
     $class_docs,
     $enum_docs,
     $deprecated

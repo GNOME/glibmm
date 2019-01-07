@@ -1440,10 +1440,19 @@ sub on_wrap_any_enum($$)
 
   my @subst_in  = [];
   my @subst_out = [];
-  my $no_gtype = "";
+  my $gtype_func = "";
   my $argDeprecated = "";
   my $deprecation_docs = "";
   my $newin = "";
+
+  # $gtype_func:
+  # 1. If an empty string, the M4 macro _ENUM or _GERROR calls _GET_TYPE_FUNC()
+  #    that generates the function name from the name of the C type, e.g.
+  #    GFileAttributeType -> g_file_attribute_type_get_type
+  # 2. If NO_GTYPE, no call to a *_get_type() function and no Glib::Value
+  #    specialization is generated for the enum type.
+  # 3. If anything else, it's assumed to be the name of the *_get_type() function
+  #    to generate a call to.
 
   # Build a list of custom substitutions, and recognize some flags too.
   foreach (@args)
@@ -1452,12 +1461,11 @@ sub on_wrap_any_enum($$)
 
     if ($arg eq "NO_GTYPE")
     {
-      $no_gtype = "NO_GTYPE";
+      $gtype_func = "NO_GTYPE";
     }
-    elsif ($arg =~ /^(get_type_func=)(\s*)$/)
+    elsif ($arg =~ /^gtype_func\s+(\w+)/)
     {
-      my $part1 = $1;
-      my $part2 = $2;
+      $gtype_func = $1;
     }
     elsif ($arg =~ /^s#([^#]+)#([^#]*)#$/)
     {
@@ -1478,7 +1486,7 @@ sub on_wrap_any_enum($$)
       $newin = string_unquote(string_trim($1));
     }
   }
-  return ($cpp_type, $c_type, $domain, \@subst_in, \@subst_out, $no_gtype,
+  return ($cpp_type, $c_type, $domain, \@subst_in, \@subst_out, $gtype_func,
     $argDeprecated, $deprecation_docs, $newin);
 }
 
@@ -1491,12 +1499,12 @@ sub on_wrap_enum($)
   my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
-  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, $no_gtype,
+  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, $gtype_func,
     $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(0);
 
   $$self{objOutputter}->output_wrap_enum(
     $$self{filename}, $$self{line_num}, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $comment, $ref_subst_in, $ref_subst_out, $gtype_func,
     $argDeprecated, $deprecation_docs, $newin);
 }
 
@@ -1533,12 +1541,12 @@ sub on_wrap_gerror($)
   my $class_docs = $self->extract_preceding_documentation();
 
   # get the arguments
-  my ($cpp_type, $c_type, $domain, $ref_subst_in, $ref_subst_out, $no_gtype,
+  my ($cpp_type, $c_type, $domain, $ref_subst_in, $ref_subst_out, $gtype_func,
     $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(1);
 
   $$self{objOutputter}->output_wrap_gerror(
     $$self{filename}, $$self{line_num}, $cpp_type, $c_type, $domain,
-    $class_docs, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $class_docs, $ref_subst_in, $ref_subst_out, $gtype_func,
     $argDeprecated, $deprecation_docs, $newin);
 }
 
