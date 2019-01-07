@@ -1,6 +1,6 @@
 dnl
-dnl _ENUM(cpp_type, c_type, value_suffix, `element_list', `no_gtype', `conv_to_int',
-dnl          $1       $2         $3             $4           $5            $6
+dnl _ENUM(cpp_type, c_type, value_suffix, `element_list', `gtype_func', `conv_to_int',
+dnl          $1       $2         $3             $4             $5            $6
 dnl in_class, `optional_refdoc_comment', 'deprecated')
 dnl   $7                $8                    $9
 dnl
@@ -108,7 +108,7 @@ _POP()
 
 ifelse(`$9',,,`_DEPRECATE_IFDEF_END')`'dnl The expansion of _DEPRECATE_IFDEF_END ends with a newline
 
-m4_ifelse($5,`NO_GTYPE',,`dnl else
+m4_ifelse(`$5',`NO_GTYPE',,`dnl else
 m4_ifelse($7,0,`dnl  not in_class
 __NAMESPACE_END__
 ',`dnl else
@@ -141,7 +141,11 @@ ifelse(`$9',,,`_DEPRECATE_IFDEF_START')`'dnl
 // static
 GType Glib::Value<__NAMESPACE__::__ENUM_CLASS_CPPNAME__>::value_type()
 {
+m4_ifelse(`$5',,`dnl
   return _GET_TYPE_FUNC(__ENUM_CNAME__);
+',`dnl
+  return `$5()';
+')dnl
 }
 ifelse(`$9',,,`_DEPRECATE_IFDEF_END')`'dnl
 

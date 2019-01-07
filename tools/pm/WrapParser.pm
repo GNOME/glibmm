@@ -1435,11 +1435,20 @@ sub on_wrap_any_enum($$)
 
   my @subst_in  = [];
   my @subst_out = [];
-  my $no_gtype = "";
+  my $gtype_func = "";
   my $conv_to_int = "";
   my $argDeprecated = "";
   my $deprecation_docs = "";
   my $newin = "";
+
+  # $gtype_func:
+  # 1. If an empty string, the M4 macro _ENUM or _GERROR calls _GET_TYPE_FUNC()
+  #    that generates the function name from the name of the C type, e.g.
+  #    GFileAttributeType -> g_file_attribute_type_get_type
+  # 2. If NO_GTYPE, no call to a *_get_type() function and no Glib::Value
+  #    specialization is generated for the enum type.
+  # 3. If anything else, it's assumed to be the name of the *_get_type() function
+  #    to generate a call to.
 
   # Build a list of custom substitutions, and recognize some flags too.
   foreach (@args)
@@ -1448,7 +1457,11 @@ sub on_wrap_any_enum($$)
 
     if ($arg eq "NO_GTYPE")
     {
-      $no_gtype = $arg;
+      $gtype_func = $arg;
+    }
+    elsif ($arg =~ /^gtype_func\s+(\w+)/)
+    {
+      $gtype_func = $1;
     }
     elsif (!$is_gerror and $arg eq "CONV_TO_INT")
     {
@@ -1473,16 +1486,19 @@ sub on_wrap_any_enum($$)
       $newin = string_unquote(string_trim($1));
     }
   }
-  return ($cpp_type, $c_type, $domain, \@subst_in, \@subst_out, $no_gtype,
+  return ($cpp_type, $c_type, $domain, \@subst_in, \@subst_out, $gtype_func,
     $conv_to_int, $argDeprecated, $deprecation_docs, $newin);
 }
 
 # void on_wrap_enum()
-# _WRAP_ENUM(cpp_type, c_type [,NO_GTYPE] [,CONV_TO_INT] [,s#regexpr#subst#]*)
+# _WRAP_ENUM(cpp_type, c_type [,NO_GTYPE] [,gtype_func funcname] [,CONV_TO_INT] [,s#regexpr#subst#]*)
 # Optional arguments:
 # NO_GTYPE Don't generate code for a specialization of the template
 #          Glib::Value_Enum or Glib::Value_Flags.
 #          Necessary, if the C type enum is not registered as a GType.
+# gtype_func funcname Call funcname() in the generated Glib::Value<>::value_type().
+#                     Necessary, if the M4 macro _GET_TYPE_FUNC() can't generate
+#                     the correct function name from the C type name of the enum.
 # CONV_TO_INT "Convertible to int" Generate a plain enum (not an enum class)
 #             within a class. Such an enum is scoped like an enum class,
 #             and it can be implicitly converted to int like a plain enum.
@@ -1505,12 +1521,12 @@ sub on_wrap_enum($)
   my $comment = $self->extract_preceding_documentation();
 
   # get the arguments
-  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, $no_gtype, $conv_to_int,
+  my ($cpp_type, $c_type, undef, $ref_subst_in, $ref_subst_out, $gtype_func, $conv_to_int,
     $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(0);
 
   $$self{objOutputter}->output_wrap_enum(
     $$self{filename}, $$self{line_num}, $cpp_type, $c_type,
-    $comment, $ref_subst_in, $ref_subst_out, $no_gtype, $conv_to_int,
+    $comment, $ref_subst_in, $ref_subst_out, $gtype_func, $conv_to_int,
     $$self{in_class}, $argDeprecated, $deprecation_docs, $newin);
 }
 
@@ -1547,12 +1563,12 @@ sub on_wrap_gerror($)
   my $class_docs = $self->extract_preceding_documentation();
 
   # get the arguments
-  my ($cpp_type, $c_type, $domain, $ref_subst_in, $ref_subst_out, $no_gtype, undef,
+  my ($cpp_type, $c_type, $domain, $ref_subst_in, $ref_subst_out, $gtype_func, undef,
     $argDeprecated, $deprecation_docs, $newin) = $self->on_wrap_any_enum(1);
 
   $$self{objOutputter}->output_wrap_gerror(
     $$self{filename}, $$self{line_num}, $cpp_type, $c_type, $domain,
-    $class_docs, $ref_subst_in, $ref_subst_out, $no_gtype,
+    $class_docs, $ref_subst_in, $ref_subst_out, $gtype_func,
     $argDeprecated, $deprecation_docs, $newin);
 }
 
