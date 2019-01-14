@@ -75,7 +75,7 @@ public:
    */
   sigc::connection connect(const sigc::slot<bool(Glib::IOCondition)>& slot,
     const Glib::RefPtr<Socket>& socket, Glib::IOCondition condition,
-    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>(),
+    const Glib::RefPtr<Cancellable>& cancellable = {},
     int priority = Glib::PRIORITY_DEFAULT);
 
 private:
@@ -93,7 +93,7 @@ private:
  * @ingroup NetworkIO
  */
 SignalSocket signal_socket(
-  const Glib::RefPtr<Glib::MainContext>& context = Glib::RefPtr<Glib::MainContext>());
+  const Glib::RefPtr<Glib::MainContext>& context = {});
 
 /** An event source that can monitor a Gio::Socket.
  * @see Gio::Socket::create_source().
@@ -108,7 +108,7 @@ public:
 
   static Glib::RefPtr<SocketSource> create(const Glib::RefPtr<Socket>& socket,
     Glib::IOCondition condition,
-    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+    const Glib::RefPtr<Cancellable>& cancellable = {});
 
 
 protected:
@@ -122,7 +122,7 @@ private:
   // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
   static Glib::RefPtr<SocketSource> create(GSocket* socket,
     Glib::IOCondition condition,
-    const Glib::RefPtr<Cancellable>& cancellable = Glib::RefPtr<Cancellable>());
+    const Glib::RefPtr<Cancellable>& cancellable = {});
 
   // This is just to avoid the need for Gio::Socket to create a RefPtr<> to itself.
   SocketSource(GSocket* socket, Glib::IOCondition condition,
