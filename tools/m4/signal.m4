@@ -28,7 +28,7 @@ $10
 ',dnl detail_name
 $14,0,`dnl
 $10
-  Glib::SignalProxyDetailed<$5`'($6)> signal_$4`'(const Glib::ustring& $13 = Glib::ustring());
+  Glib::SignalProxyDetailed<$5`'($6)> signal_$4`'(const Glib::ustring& $13 = {});
 ',`dnl detail_name and two_signal_methods
 $10
   Glib::SignalProxy<$5`'($6)> signal_$4`'();
@@ -350,4 +350,3 @@ ifelse($8,refreturn,`dnl Assume Glib::wrap() is correct if refreturn is requeste
 ifelse(`$9',,,`#endif // $9
 ')dnl
 _POP()')
-
