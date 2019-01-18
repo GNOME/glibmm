@@ -102,7 +102,6 @@ public:
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GParamSpec* create_param_spec(const Glib::ustring& name) const;
   GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
                                 const Glib::ustring& blurb, Glib::ParamFlags flags) const;
 #endif
@@ -121,10 +120,8 @@ public:
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GParamSpec* create_param_spec(const Glib::ustring& name) const;
   GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
                                 const Glib::ustring& blurb, Glib::ParamFlags flags) const;
-
 #endif
 
 protected:
@@ -142,10 +139,8 @@ public:
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GParamSpec* create_param_spec(const Glib::ustring& name) const;
   GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
                                 const Glib::ustring& blurb, Glib::ParamFlags flags) const;
-
 #endif
 
 protected:
@@ -162,10 +157,8 @@ public:
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GParamSpec* create_param_spec(const Glib::ustring& name) const;
   GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
                                 const Glib::ustring& blurb, Glib::ParamFlags flags) const;
-
 #endif
 
 protected:
@@ -182,10 +175,8 @@ public:
   static GType value_type() G_GNUC_CONST;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  GParamSpec* create_param_spec(const Glib::ustring& name) const;
   GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
                                 const Glib::ustring& blurb, Glib::ParamFlags flags) const;
-
 #endif
 
 protected:

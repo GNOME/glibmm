@@ -93,13 +93,6 @@ ValueBase_Boxed::get_boxed() const
   return g_value_get_boxed(&gobject_);
 }
 
-GParamSpec*
-ValueBase_Boxed::create_param_spec(const Glib::ustring& name) const
-{
-  return create_param_spec(name, Glib::ustring(), Glib::ustring(),
-    static_cast<Glib::ParamFlags>(G_PARAM_READABLE | G_PARAM_WRITABLE));
-}
-
 GParamSpec* ValueBase_Boxed::create_param_spec(const Glib::ustring& name,
   const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags) const
 {
@@ -135,13 +128,6 @@ ValueBase_Object::get_object_copy() const
 {
   GObject* const data = static_cast<GObject*>(g_value_get_object(&gobject_));
   return Glib::make_refptr_for_instance<Glib::ObjectBase>(Glib::wrap_auto(data, true));
-}
-
-GParamSpec*
-ValueBase_Object::create_param_spec(const Glib::ustring& name) const
-{
-  return create_param_spec(name, Glib::ustring(), Glib::ustring(),
-      static_cast<Glib::ParamFlags>(G_PARAM_READABLE | G_PARAM_WRITABLE));
 }
 
 GParamSpec*
@@ -190,13 +176,6 @@ ValueBase_Enum::get_enum() const
 }
 
 GParamSpec*
-ValueBase_Enum::create_param_spec(const Glib::ustring& name) const
-{
-  return create_param_spec(name, Glib::ustring(), Glib::ustring(),
-      static_cast<Glib::ParamFlags>(G_PARAM_READABLE | G_PARAM_WRITABLE));
-}
-
-GParamSpec*
 ValueBase_Enum::create_param_spec(const Glib::ustring& name,
   const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags) const
 {
@@ -224,13 +203,6 @@ unsigned int
 ValueBase_Flags::get_flags() const
 {
   return g_value_get_flags(&gobject_);
-}
-
-GParamSpec*
-ValueBase_Flags::create_param_spec(const Glib::ustring& name) const
-{
-  return create_param_spec(name, Glib::ustring(), Glib::ustring(),
-      static_cast<Glib::ParamFlags>(G_PARAM_READABLE | G_PARAM_WRITABLE));
 }
 
 GParamSpec* ValueBase_Flags::create_param_spec(const Glib::ustring& name,
@@ -262,13 +234,6 @@ ValueBase_String::get_cstring() const
     return data;
   else
     return "";
-}
-
-GParamSpec*
-ValueBase_String::create_param_spec(const Glib::ustring& name) const
-{
-  return create_param_spec(name, Glib::ustring(), Glib::ustring(),
-      static_cast<Glib::ParamFlags>(G_PARAM_READABLE | G_PARAM_WRITABLE));
 }
 
 GParamSpec*
