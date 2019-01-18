@@ -59,6 +59,14 @@ public:
   ObjectBase(const ObjectBase&) = delete;
   ObjectBase& operator=(const ObjectBase&) = delete;
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  // get_base_type() is needed so Glib::ObjectBase can be used with
+  // Glib::Value and _WRAP_PROPERTY in Glib::Binding without a
+  // Value<RefPtr<ObjectBase>> specialization.
+  // The Value<RefPtr<T>> specialization requires T::get_base_type().
+  static GType get_base_type() G_GNUC_CONST;
+#endif
+
 protected:
   /** This default constructor is called implicitly from the constructor of user-derived
    * classes, even if, for instance, Gtk::Button calls a different ObjectBase constructor.

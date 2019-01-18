@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef _GLIBMM_ERROR_H
 #define _GLIBMM_ERROR_H
 
@@ -20,6 +19,7 @@
 
 #include <glibmmconfig.h>
 #include <glibmm/exception.h>
+#include <glibmm/value.h>
 #include <glib.h>
 
 namespace Glib
@@ -36,6 +36,12 @@ public:
   Error& operator=(const Error& other);
 
   ~Error() noexcept override;
+
+  /** Test whether the %Error has an underlying instance.
+   *
+   * @newin{2,60}
+   */
+  explicit operator bool() const;
 
   GQuark domain() const;
   int code() const;
@@ -63,6 +69,23 @@ public:
 protected:
   GError* gobject_;
 };
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// This is needed so Glib::Error can be used with
+// Glib::Value and _WRAP_PROPERTY in Gtk::MediaStream.
+template <>
+class Value<Glib::Error> : public ValueBase_Boxed
+{
+public:
+  using CppType = Glib::Error;
+  using CType = GError*;
+
+  static GType value_type();
+
+  void set(const CppType& data);
+  CppType get() const;
+};
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 } // namespace Glib
 

@@ -1588,4 +1588,26 @@ VariantIter Variant<std::tuple<Types...>>::get_iter() const
   return VariantContainerBase::get_iter(type);
 }
 
+/*---------------------Value<Glib::VariantBase>---------------------*/
+
+// This is needed so Glib::VariantBase can be used with
+// Glib::Value and _WRAP_PROPERTY in Gio::Action and elsewhere.
+template <>
+class Value<Glib::VariantBase> : public ValueBase
+{
+public:
+  using CppType = Glib::VariantBase;
+  using CType = GVariant*;
+
+  static GType value_type() G_GNUC_CONST;
+
+  void set(CppType data);
+  CppType get() const;
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
+                                const Glib::ustring& blurb, Glib::ParamFlags flags) const;
+#endif
+};
+
 } // namespace Glib

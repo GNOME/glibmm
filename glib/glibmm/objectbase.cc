@@ -389,6 +389,11 @@ ObjectBase::thaw_notify()
   g_object_thaw_notify(gobj());
 }
 
+GType ObjectBase::get_base_type()
+{
+  return G_TYPE_OBJECT;
+}
+
 void ObjectBase::add_custom_interface_class(const Interface_Class* iface_class)
 {
   if (!priv_pimpl_)
