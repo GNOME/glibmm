@@ -21,6 +21,8 @@
 #include <giomm/asyncresult.h>
 #include <giomm/cancellable.h>
 
+#include <iomanip>
+
 _DEFS(giomm,gio)
 _PINCLUDE(glibmm/private/object_p.h)
 
@@ -395,4 +397,9 @@ protected:
   _WRAP_VFUNC(bool close(const Glib::RefPtr<Cancellable>& cancellable), close_fn, errthrow)
 };
 
+Glib::RefPtr<InputStream>(*iomanip)(const Glib::RefPtr<InputStream>&);
+Glib::RefPtr<InputStream> operator>> (const Glib::RefPtr<InputStream>& read, const std::string& str);
+Glib::RefPtr<InputStream> operator>> (const Glib::RefPtr<InputStream>& read, iomanip manip);
+Glib::RefPtr<InputStream> endl (const Glib::RefPtr<InputStream>& read);
 } // namespace Gio
+

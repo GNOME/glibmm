@@ -17,6 +17,7 @@
 #include <gio/gio.h>
 #include <glibmm/error.h>
 #include <giomm/asyncresult.h>
+#include <iomanip>
 #include "slot_async.h"
 
 namespace Gio
@@ -144,6 +145,36 @@ InputStream::close_async(const SlotAsyncReady& slot, int io_priority)
   auto slot_copy = new SlotAsyncReady(slot);
 
   g_input_stream_close_async(gobj(), io_priority, nullptr, &SignalProxy_async_callback, slot_copy);
+}
+
+Glib::RefPtr<InputStream>
+operator>> (const Glib::RefPtr<InputStream>& in, const std::string& str)
+{
+  g_return_val_if_fail (in, in);
+  in->read (str);
+  return in;
+}
+
+Glib::RefPtr<InputStream>
+operator<< (const Glib::RefPtr<InputStream>& in, iomanip manip)
+{
+  return manip (in);
+}
+
+Glib::RefPtr<InputStream>
+endl (const Glib::RefPtr<InputStream>& in)
+{
+  g_return_val_if_fail (in, in);
+  in->read ("\n");
+  return in;
+}
+
+Glib::RefPtr<InputStream>
+operator>> (const Glib::RefPtr<InputStream>& in, const std::byte& byte_var)
+{
+  g_return_val_if_fail (in, in);
+  in->read (byte_var);
+  return in;
 }
 
 } // namespace Gio

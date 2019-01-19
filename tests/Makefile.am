@@ -48,7 +48,8 @@ check_PROGRAMS =				\
 	glibmm_refptr/test		\
 	glibmm_refptr_sigc_bind/test		\
 	glibmm_bytearray/test			\
-	glibmm_ustring_make_valid/test
+	glibmm_ustring_make_valid/test \
+	glibmm_streams/test
 
 TESTS =	$(check_PROGRAMS)
 

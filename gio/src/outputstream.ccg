@@ -19,6 +19,7 @@
 #include <glibmm/exceptionhandler.h>
 #include "slot_async.h"
 
+#include <iomanip>
 using SpliceFlags = Gio::OutputStream::SpliceFlags;
 
 namespace Gio
@@ -251,4 +252,26 @@ OutputStream::splice(const Glib::RefPtr<InputStream>& source, SpliceFlags flags)
   return retvalue;
 }
 
+Glib::RefPtr<OutputStream>
+operator<< (const Glib::RefPtr<OutputStream>& out, const std::string& str)
+{
+  g_return_val_if_fail (out, out);
+  out->write (str);
+  return out;
+}
+
+Glib::RefPtr<OutputStream>
+operator<< (const Glib::RefPtr<OutputStream>& out, iomanip manip)
+{
+    return manip (out);
+}
+
+Glib::RefPtr<OutputStream>
+endl (const Glib::RefPtr<OutputStream>& out)
+{
+    g_return_val_if_fail (out, out);
+    out->write ("\n");
+    out->flush ();
+    return out;
+}
 } // namespace Gio
