@@ -184,9 +184,28 @@ protected:
   const char* get_cstring() const; // never returns nullptr
 };
 
+/**
+ * @ingroup glibmmValue
+ */
+class ValueBase_Variant : public ValueBase
+{
+public:
+  static GType value_type() G_GNUC_CONST;
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  GParamSpec* create_param_spec(const Glib::ustring& name, const Glib::ustring& nick,
+                                const Glib::ustring& blurb, Glib::ParamFlags flags) const;
+#endif
+
+protected:
+  void set_variant(GVariant* data);
+  GVariant* get_variant() const; // doesn't copy, may return nullptr
+};
+
+
 } // namespace Glib
 
-/* Include generic Glib::Value<> template, before any specializations:
+/* Include primary Glib::Value<> template, before any specializations:
  */
 #define _GLIBMM_VALUE_H_INCLUDE_VALUE_CUSTOM_H
 #include <glibmm/value_custom.h>

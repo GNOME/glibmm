@@ -244,6 +244,35 @@ ValueBase_String::create_param_spec(const Glib::ustring& name,
       get_cstring(), static_cast<GParamFlags>(flags));
 }
 
+/**** Glib::ValueBase_Variant ************************************************/
+
+// static
+GType ValueBase_Variant::value_type()
+{
+  return G_TYPE_VARIANT;
+}
+
+void ValueBase_Variant::set_variant(GVariant* data)
+{
+  g_value_set_variant(&gobject_, data);
+}
+
+GVariant* ValueBase_Variant::get_variant() const
+{
+  return g_value_get_variant(&gobject_);
+}
+
+GParamSpec* ValueBase_Variant::create_param_spec(const Glib::ustring& name,
+  const Glib::ustring& nick, const Glib::ustring& blurb, Glib::ParamFlags flags) const
+{
+  GVariant* gvariant = g_value_get_variant(&gobject_);
+  const GVariantType* gvariant_type = gvariant ? g_variant_get_type(gvariant) : G_VARIANT_TYPE_ANY;
+
+  return g_param_spec_variant(
+    name.c_str(), c_str_or_nullptr(nick), c_str_or_nullptr(blurb),
+    gvariant_type, gvariant, static_cast<GParamFlags>(flags));
+}
+
 /**** Glib::Value<std::string> *********************************************/
 
 void
