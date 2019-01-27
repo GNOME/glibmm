@@ -49,8 +49,17 @@ protected:
    * @param iconname A string containing an icon name.
    * @param use_default_fallbacks Whether to use all the names that can be created by shortening @a iconname at '-' characters.
    */
-  explicit ThemedIcon(const std::string& iconname, bool use_default_fallbacks = false);
+  explicit ThemedIcon(const Glib::ustring& iconname, bool use_default_fallbacks = false);
   _IGNORE(g_themed_icon_new, g_themed_icon_new_with_default_fallbacks)
+
+  /** Creates a new themed icon for @a iconnames.
+   *
+   * @param iconnames A vector of strings containing icon names.
+   *
+   * @newin{2,60}
+   */
+  explicit ThemedIcon(const std::vector<Glib::ustring>& iconnames);
+  _IGNORE(g_themed_icon_new_from_names)
 
 public:
   /** Creates a new themed icon for @a iconname, and optionally all the names that can be created by shortening @a iconname at '-' characters.
@@ -70,12 +79,18 @@ public:
    * @param iconname A string containing an icon name.
    * @param use_default_fallbacks Whether to use all the names that can be created by shortening @a iconname at '-' characters.
    */
-  _WRAP_CREATE(const std::string& iconname, bool use_default_fallbacks = false)
+  _WRAP_CREATE(const Glib::ustring& iconname, bool use_default_fallbacks = false)
 
-  //TODO: GIcon *g_themed_icon_new_from_names (char **iconnames, int len);
+  /** Creates a new themed icon for @a iconnames.
+   *
+   * @param iconnames A vector of strings containing icon names.
+   *
+   * @newin{2,60}
+   */
+  _WRAP_CREATE(const std::vector<Glib::ustring>& iconnames)
 
-  _WRAP_METHOD(void prepend_name(const std::string& iconname), g_themed_icon_prepend_name)
-  _WRAP_METHOD(void append_name(const std::string& iconname), g_themed_icon_append_name)
+  _WRAP_METHOD(void prepend_name(const Glib::ustring& iconname), g_themed_icon_prepend_name)
+  _WRAP_METHOD(void append_name(const Glib::ustring& iconname), g_themed_icon_append_name)
 
   #m4 _CONVERSION(`const gchar* const*',`std::vector<Glib::ustring>',`Glib::ArrayHandler<Glib::ustring>::array_to_vector($3, Glib::OWNERSHIP_DEEP)')
   _WRAP_METHOD(std::vector<Glib::ustring> get_names() const, g_themed_icon_get_names)
