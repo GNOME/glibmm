@@ -17,6 +17,7 @@
 #include <glibmm/value.h>
 #include <glibmm/objectbase.h>
 #include <glibmm/utility.h>
+#include <glibmm/vectorutils.h>
 #include <glibmm/wrap.h>
 #include <cstring> // std::memset()
 
@@ -287,6 +288,44 @@ void
 Value<Glib::ustring>::set(const Glib::ustring& data)
 {
   g_value_set_string(&gobject_, data.c_str());
+}
+
+/**** Glib::Value<std::vector<std::string>> ********************************/
+
+// static
+GType Value<std::vector<std::string>>::value_type()
+{
+  return G_TYPE_STRV;
+}
+
+void Value<std::vector<std::string>>::set(const CppType& data)
+{
+  set_boxed(Glib::ArrayHandler<std::string>::vector_to_array(data).data());
+}
+
+std::vector<std::string> Value<std::vector<std::string>>::get() const
+{
+  return Glib::ArrayHandler<std::string>::array_to_vector(
+    static_cast<const char* const*>(get_boxed()), Glib::OWNERSHIP_NONE);
+}
+
+/**** Glib::Value<std::vector<Glib::ustring>> ********************************/
+
+// static
+GType Value<std::vector<Glib::ustring>>::value_type()
+{
+  return G_TYPE_STRV;
+}
+
+void Value<std::vector<Glib::ustring>>::set(const CppType& data)
+{
+  set_boxed(Glib::ArrayHandler<Glib::ustring>::vector_to_array(data).data());
+}
+
+std::vector<Glib::ustring> Value<std::vector<Glib::ustring>>::get() const
+{
+  return Glib::ArrayHandler<Glib::ustring>::array_to_vector(
+    static_cast<const char* const*>(get_boxed()), Glib::OWNERSHIP_NONE);
 }
 
 } // namespace Glib
