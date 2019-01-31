@@ -860,11 +860,12 @@ sub output_wrap_gerror($$$$$$$$$$$$$)
 }
 
 # _PROPERTY_PROXY(name, cpp_type) and _CHILD_PROPERTY_PROXY(name, cpp_type)
-# void output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class, $deprecated, $deprecation_docs, $objProperty, $proxy_macro)
+# void output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class,
+#   $deprecated, $deprecation_docs, $newin, $bNoTypeCheck, $objProperty, $proxy_macro)
 sub output_wrap_any_property($$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $deprecated,
-      $deprecation_docs, $newin, $objProperty, $proxy_macro) = @_;
+      $deprecation_docs, $newin, $bNoTypeCheck, $objProperty, $proxy_macro) = @_;
 
   my $objDefsParser = $$self{objDefsParser};
 
@@ -950,19 +951,34 @@ sub output_wrap_any_property($$$$$$$$$$)
     $documentation .= $default_value;
   }
 
+  # Possibly generate a static_assert(), asserting that the generated code
+  # will include a Glib::Value instantiation which is compatible with
+  # _WRAP_PROPERTY and _WRAP_CHILD_PROPERTY.
+  # This test is skipped for some types that are known to have suitable
+  # Glib::Value<> instantiations, or if the no_type_check parameter is specified.
+  my $check_type = "";
+  if (!$bNoTypeCheck)
+  {
+    my @good_types = qw(bool int guint float double std::string Glib::ustring
+                        Widget* Gtk::Widget*);
+    push(@good_types, "unsigned int");
+    $check_type = "Glib::Traits::ValueCompatibleWithWrapProperty" if (!grep {$cpp_type eq $_} @good_types);
+  }
+
   #Declaration:
   if($deprecated ne "")
   {
     $self->append("\n_DEPRECATE_IFDEF_START\n");
   }
 
-  my $str = sprintf("$proxy_macro(%s,%s,%s,%s,%s,`%s')dnl\n",
+  my $str = sprintf("$proxy_macro(%s,%s,%s,%s,%s,`%s',`%s')dnl\n",
     $name,
     $name_underscored,
     $cpp_type,
     $proxy_suffix,
     $deprecated,
-    $documentation
+    $documentation,
+    $check_type
   );
   $self->append($str);
   $self->append("\n");
@@ -971,13 +987,15 @@ sub output_wrap_any_property($$$$$$$$$$)
   # then add a second const accessor for a read-only propertyproxy:
   if( ($proxy_suffix ne "_ReadOnly") && ($objProperty->get_readable()) )
   {
-    my $str = sprintf("$proxy_macro(%s,%s,%s,%s,%s,`%s')dnl\n",
+    $check_type = ""; # Don't check twice.
+    my $str = sprintf("$proxy_macro(%s,%s,%s,%s,%s,`%s',`%s')dnl\n",
       $name,
       $name_underscored,
       $cpp_type,
       "_ReadOnly",
       $deprecated,
-      $documentation
+      $documentation,
+      $check_type
     );
     $self->append($str);
   }
@@ -990,11 +1008,11 @@ sub output_wrap_any_property($$$$$$$$$$)
 
 # _PROPERTY_PROXY(name, cpp_type)
 # void output_wrap_property($filename, $line_num, $name, $cpp_type, $file_deprecated,
-#   $deprecated, $deprecation_docs)
+#   $deprecated, $deprecation_docs, $newin, $bNoTypeCheck)
 sub output_wrap_property($$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $file_deprecated,
-      $deprecated, $deprecation_docs, $newin) = @_;
+      $deprecated, $deprecation_docs, $newin, $bNoTypeCheck) = @_;
 
   my $objProperty = GtkDefs::lookup_property($c_class, $name);
   if($objProperty eq 0) #If the lookup failed:
@@ -1007,17 +1025,18 @@ sub output_wrap_property($$$$$$$$$$)
       $deprecated, $name, "property", "PROPERTY");
 
     $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class,
-      $deprecated, $deprecation_docs, $newin, $objProperty, "_PROPERTY_PROXY");
+      $deprecated, $deprecation_docs, $newin, $bNoTypeCheck, $objProperty,
+      "_PROPERTY_PROXY");
   }
 }
 
 # _CHILD_PROPERTY_PROXY(name, cpp_type)
 # void output_wrap_child_property($filename, $line_num, $name, $cpp_type, $file_deprecated,
-#   $deprecated, $deprecation_docs)
+#   $deprecated, $deprecation_docs, $newin, $bNoTypeCheck)
 sub output_wrap_child_property($$$$$$$$$$)
 {
   my ($self, $filename, $line_num, $name, $cpp_type, $c_class, $file_deprecated,
-      $deprecated, $deprecation_docs, $newin) = @_;
+      $deprecated, $deprecation_docs, $newin, $bNoTypeCheck) = @_;
 
   my $objChildProperty = GtkDefs::lookup_child_property($c_class, $name);
   if($objChildProperty eq 0) #If the lookup failed:
@@ -1030,7 +1049,8 @@ sub output_wrap_child_property($$$$$$$$$$)
       $deprecated, $name, "child property", "CHILD_PROPERTY");
 
     $self->output_wrap_any_property($filename, $line_num, $name, $cpp_type, $c_class,
-      $deprecated, $deprecation_docs, $newin, $objChildProperty, "_CHILD_PROPERTY_PROXY");
+      $deprecated, $deprecation_docs, $newin, $bNoTypeCheck, $objChildProperty,
+      "_CHILD_PROPERTY_PROXY");
   }
 }
 

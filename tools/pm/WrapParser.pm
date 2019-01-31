@@ -1600,6 +1600,7 @@ sub on_wrap_any_property($)
   my $argDeprecated = "";
   my $deprecation_docs = "";
   my $newin = "";
+  my $bNoTypeCheck = 0;
   while($#args >= 2) # If the optional arguments are there.
   {
     my $argRef = string_trim(pop @args);
@@ -1617,10 +1618,14 @@ sub on_wrap_any_property($)
     {
       $newin = string_unquote(string_trim($1));
     }
+    elsif($argRef eq "no_type_check")
+    {
+      $bNoTypeCheck = 1;
+    }
   }
 
   return ($filename, $line_num, $argPropertyName, $argCppType,
-          $argDeprecated, $deprecation_docs, $newin);
+          $argDeprecated, $deprecation_docs, $newin, $bNoTypeCheck);
 }
 
 sub on_wrap_property($)
@@ -1631,10 +1636,11 @@ sub on_wrap_property($)
   return unless ($self->check_for_eof());
 
   my ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated,
-      $deprecation_docs, $newin) = $self->on_wrap_any_property();
+      $deprecation_docs, $newin, $bNoTypeCheck) = $self->on_wrap_any_property();
 
   $objOutputter->output_wrap_property($filename, $line_num, $argPropertyName,
-    $argCppType, $$self{c_class}, $$self{deprecated}, $argDeprecated, $deprecation_docs, $newin);
+    $argCppType, $$self{c_class}, $$self{deprecated}, $argDeprecated, $deprecation_docs,
+    $newin, $bNoTypeCheck);
 }
 
 sub on_wrap_child_property($)
@@ -1645,10 +1651,11 @@ sub on_wrap_child_property($)
   return unless ($self->check_for_eof());
 
   my ($filename, $line_num, $argPropertyName, $argCppType, $argDeprecated,
-      $deprecation_docs, $newin) = $self->on_wrap_any_property();
+      $deprecation_docs, $newin, $bNoTypeCheck) = $self->on_wrap_any_property();
 
   $objOutputter->output_wrap_child_property($filename, $line_num, $argPropertyName,
-    $argCppType, $$self{c_class}, $$self{deprecated}, $argDeprecated, $deprecation_docs, $newin);
+    $argCppType, $$self{c_class}, $$self{deprecated}, $argDeprecated, $deprecation_docs,
+    $newin, $bNoTypeCheck);
 }
 
 sub output_wrap_check($$$$$$)
