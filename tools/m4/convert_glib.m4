@@ -109,7 +109,8 @@ _CONVERSION(`GDateTime*',`Glib::DateTime',`Glib::wrap($3)')
 _CONVERSION(`const DateTime&',`GDateTime*',`const_cast<$2>($3.gobj())')
 
 dnl KeyFile
-_CONVERSION(`Glib::KeyFile&',`GKeyFile*',`($3).gobj()')
+_CONVERSION(`const Glib::RefPtr<Glib::KeyFile>&',`GKeyFile*',__CONVERT_REFPTR_TO_P)
+_CONVERSION(`const Glib::RefPtr<const Glib::KeyFile>&',`GKeyFile*',__CONVERT_CONST_REFPTR_TO_P)
 
 dnl Object
 _CONVERSION(`const Glib::RefPtr<Glib::Object>&',`GObject*',__CONVERT_REFPTR_TO_P)

@@ -24,12 +24,12 @@ main(int, char**)
 
   const std::string filepath = "./example.ini";
 
-  Glib::KeyFile keyfile;
+  auto keyfile = Glib::KeyFile::create();
 
   // An exception will be thrown if the file is not there, or if the file is incorrectly formatted:
   try
   {
-    keyfile.load_from_file(filepath);
+    keyfile->load_from_file(filepath);
   }
   catch (const Glib::Error& ex)
   {
@@ -41,7 +41,7 @@ main(int, char**)
   // An exception will be thrown if the value is not in the file:
   try
   {
-    const Glib::ustring value = keyfile.get_value("somegroup", "somekey");
+    const Glib::ustring value = keyfile->get_value("somegroup", "somekey");
     std::cout << "somekey value=" << value << std::endl;
   }
   catch (const Glib::KeyFileError& ex)
@@ -53,7 +53,7 @@ main(int, char**)
   // An exception will be thrown if the value is not in the file:
   try
   {
-    const Glib::ustring value = keyfile.get_value("First Group", "Welcome");
+    const Glib::ustring value = keyfile->get_value("First Group", "Welcome");
     std::cout << "Welcome value=" << value << std::endl;
   }
   catch (const Glib::KeyFileError& ex)
@@ -65,7 +65,7 @@ main(int, char**)
   // An exception will be thrown if the value is not in the file:
   try
   {
-    const auto values = keyfile.get_integer_list("Another Group", "Numbers");
+    const auto values = keyfile->get_integer_list("Another Group", "Numbers");
 
     for (const auto& p : values)
       std::cout << "Number list value: item=" << p << std::endl;

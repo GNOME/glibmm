@@ -20,6 +20,7 @@ _DEFS(glibmm,glib)
 #include <glibmm/ustring.h>
 #include <glibmm/error.h>
 #include <glibmm/utility.h>
+#include <glibmm/refptr.h>
 #include <glib.h>
 #include <vector>
 
@@ -89,44 +90,18 @@ _WRAP_GERROR(KeyFileError, GKeyFileError, G_KEY_FILE_ERROR, NO_GTYPE)
  *
  * @newin{2,14}
  */
-class KeyFile
+class KeyFile final
 {
-  _CLASS_GENERIC(KeyFile, GKeyFile)
+  _CLASS_OPAQUE_REFCOUNTED(KeyFile, GKeyFile, g_key_file_new, g_key_file_ref, g_key_file_unref)
+  _IGNORE(g_key_file_new, g_key_file_ref, g_key_file_unref, g_key_file_free)
+
 public:
 
   _WRAP_ENUM(Flags, GKeyFileFlags, NO_GTYPE)
 
-  //TODO: GKeyFile now seems to be a reference-counted type.
-
   //TODO: Maybe replace all the get_*/set_* methods with some generic get/set
   //methods when it is possible.
 
-  /** Creates a new, empty KeyFile object.
-   */
-  KeyFile();
-
-  KeyFile(const KeyFile&) = delete;
-  KeyFile& operator=(const KeyFile&) = delete;
-
-  KeyFile(KeyFile&& other) noexcept;
-  KeyFile& operator=(KeyFile&& other) noexcept;
-
-  /** Destructor
-   */
-  ~KeyFile();
-  _IGNORE(g_key_file_free)
-
-  /** Creates a glibmm KeyFile wrapper for a GKeyFile object.
-   * Note, when using this that when the wrapper is deleted,
-   * it will not automatically delete the GKeyFile unless you
-   * set the @a takes_ownership boolean to <tt>true</tt>.
-   * @param castitem The C instance to wrap.
-   * @param takes_ownership If the C instance should be deleted when
-   * the wrapper is deleted.
-   */
-  KeyFile(GKeyFile* castitem, bool takes_ownership = false);
-
-public:
   _WRAP_METHOD(bool load_from_file(const std::string& file, Flags flags = Flags::NONE), g_key_file_load_from_file, errthrow)
 
   /** Loads a KeyFile from memory
@@ -421,14 +396,6 @@ public:
   _WRAP_METHOD(void remove_comment(const Glib::ustring& group_name, const Glib::ustring& key), g_key_file_remove_comment, errthrow)
   _WRAP_METHOD(void remove_key(const Glib::ustring& group_name, const Glib::ustring& key), g_key_file_remove_key, errthrow)
   _WRAP_METHOD(void remove_group(const Glib::ustring& group_name), g_key_file_remove_group, errthrow)
-
-  GKeyFile*       gobj()       { return gobject_; }
-  const GKeyFile* gobj() const { return gobject_; }
-
-protected:
-  GKeyFile* gobject_;
-  bool owns_gobject_;
 };
 
 } // namespace Glib
-

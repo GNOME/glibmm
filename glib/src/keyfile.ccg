@@ -17,48 +17,6 @@
 namespace Glib
 {
 
-/**** Glib::KeyFile ********************************************************/
-
-KeyFile::KeyFile()
-{
-  gobject_ = g_key_file_new();
-  owns_gobject_ = true;
-}
-
-KeyFile::KeyFile(GKeyFile* castitem, bool takes_ownership)
-{
-  gobject_ = castitem;
-  owns_gobject_ = takes_ownership;
-}
-
-KeyFile::KeyFile(KeyFile&& other) noexcept : gobject_(std::move(other.gobject_)),
-                                             owns_gobject_(std::move(other.owns_gobject_))
-{
-  other.gobject_ = nullptr;
-  other.owns_gobject_ = false;
-}
-
-KeyFile&
-KeyFile::operator=(KeyFile&& other) noexcept
-{
-  if (owns_gobject_)
-    g_key_file_free(gobject_);
-
-  gobject_ = std::move(other.gobject_);
-  owns_gobject_ = std::move(other.owns_gobject_);
-
-  other.gobject_ = nullptr;
-  other.owns_gobject_ = false;
-
-  return *this;
-}
-
-KeyFile::~KeyFile()
-{
-  if (owns_gobject_)
-    g_key_file_free(gobject_);
-}
-
 bool
 KeyFile::load_from_data(const Glib::ustring& data, Flags flags)
 {
