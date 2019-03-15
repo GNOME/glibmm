@@ -157,6 +157,10 @@ public:
    #m4 _CONVERSION(`const std::vector<std::string>&',`GList*',`Glib::ListHandler<std::string>::vector_to_list($3).data()')
 
   //TODO: I think we use Glib::ustring elsewhere for URIs:
+  // 2019-03-14 kjellahl: Glibmm is inconsistent; Glib::ustring in convert.hg,
+  // std::string in uriutils.hg.
+  // The reporter of libxml++ bug https://bugzilla.gnome.org/show_bug.cgi?id=790034
+  // proposes std::string.
   _WRAP_METHOD(bool launch_uris(const std::vector<std::string>& uris,
                                 const Glib::RefPtr<AppLaunchContext>& context{?}),
                g_app_info_launch_uris,
@@ -170,19 +174,27 @@ public:
    * Note that even if the launch is successful the application launched
    * can fail to start if it runs into problems during startup. There is
    * no way to detect this.
-   * @param uris A URIs to launch.
+   * @param uri A URI to launch.
    * @param context An AppLaunchContext.
    * @return <tt>true</tt> on successful launch, <tt>false</tt> otherwise.
    *
    * @newin{2,30}
    */
-  bool launch_uri(const std::string& uris, const Glib::RefPtr<AppLaunchContext>& context);
+  bool launch_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context);
 
   /** A launch_uri() convenience overload.
    *
    * @newin{2,30}
    */
   bool launch_uri(const std::string& uris);
+
+  _WRAP_METHOD(void launch_uris_async(const std::vector<std::string>& uris,
+    const Glib::RefPtr<AppLaunchContext>& context{.},
+    const SlotAsyncReady& slot{callback?},
+    const Glib::RefPtr<Cancellable>& cancellable{.} = {}),
+    g_app_info_launch_uris_async, slot_name slot, slot_callback SignalProxy_async_callback, newin "2,60")
+  _WRAP_METHOD(bool launch_uris_finish(const Glib::RefPtr<AsyncResult>& result),
+    g_app_info_launch_uris_finish, errthrow, newin "2,60")
 
   _WRAP_METHOD(bool should_show() const, g_app_info_should_show)
   // FIXME: use better terminology than delete/do_delete
@@ -218,8 +230,8 @@ public:
   _WRAP_METHOD(static bool launch_default_for_uri(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context{?}), g_app_info_launch_default_for_uri, errthrow)
 
   _WRAP_METHOD(static void launch_default_for_uri_async(const std::string& uri, const Glib::RefPtr<AppLaunchContext>& context{.?},
-    const SlotAsyncReady& slot{callback?}, const Glib::RefPtr<Cancellable>& cancellable{.?}), g_app_info_launch_default_for_uri_async, slot_name slot, slot_callback SignalProxy_async_callback)
-  _IGNORE(g_app_info_launch_default_for_uri_async)
+    const SlotAsyncReady& slot{callback?}, const Glib::RefPtr<Cancellable>& cancellable{.?}),
+    g_app_info_launch_default_for_uri_async, slot_name slot, slot_callback SignalProxy_async_callback)
   _WRAP_METHOD(static bool launch_default_for_uri_finish(const Glib::RefPtr<AsyncResult>& result), g_app_info_launch_default_for_uri_finish, errthrow)
 
 protected:
